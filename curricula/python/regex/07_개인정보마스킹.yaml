@@ -29,39 +29,26 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import re
-    solution: import re
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: 정규표현식 모듈
-    content: import re
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_sample_data
   title: 2단계. 개인정보 샘플 데이터
   structuredPrimary: true
   subtitle: 가상의 개인정보
-  goal: '2단계. 개인정보 샘플 데이터: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 개인정보 샘플 데이터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     실습을 위한 가상의 개인정보 데이터를 준비합니다. 실제 서비스에서는 절대 실제 개인정보를 사용하면 안 됩니다. 로그 파일, 개발 환경, 테스트 데이터에도 가상의 정보만 사용해야 개인정보보호법을 준수할 수 있습니다.
 
@@ -69,7 +56,6 @@ sections:
     실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다. - 로그 파일에 기록 전 자동 마스킹 - 화면 표시 시 일부만 표시 - 개발/테스트 환경에서도 실제 데이터 사용 금지
   tips:
   - 개인정보 보호의 중요성 실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다. - 로그 파일에 기록 전 자동 마스킹 - 화면 표시 시 일부만 표시 - 개발/테스트 환경에서도 실제 데이터 사용 금지
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     personalData = """
     이름: 김철수
@@ -86,7 +72,7 @@ sections:
     """
     personalData
   exercise:
-    prompt: '2단계. 개인정보 샘플 데이터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       personalData = """
       이름: 김철수
@@ -102,68 +88,17 @@ sections:
       전화번호: 010-9876-5432
       """
       personalData
-    solution: |-
-      personalData = """
-      이름: 김철수
-      주민번호: 901225-1234567
-      카드번호: 1234-5678-9012-3456
-      계좌번호: 110-123-456789
-      전화번호: 010-1234-5678
-
-      이름: 이영희
-      주민번호: 850315-2345678
-      카드번호: 9876-5432-1098-7654
-      계좌번호: 020-987-654321
-      전화번호: 010-9876-5432
-      """
-      personalData
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 실습을 위한 가상의 개인정보 데이터를 준비합니다. 실제 서비스에서는 절대 실제 개인정보를 사용하면 안 됩니다. 로그 파일, 개발 환경, 테스트 데이터에도 가상의 정보만 사용해야 개인정보보호법을 준수할
-      수 있습니다.
-  - type: code
-    language: python
-    title: 개인정보 샘플
-    description: 주민번호, 카드번호, 계좌번호 포함
-    content: |-
-      personalData = """
-      이름: 김철수
-      주민번호: 901225-1234567
-      카드번호: 1234-5678-9012-3456
-      계좌번호: 110-123-456789
-      전화번호: 010-1234-5678
-
-      이름: 이영희
-      주민번호: 850315-2345678
-      카드번호: 9876-5432-1098-7654
-      계좌번호: 020-987-654321
-      전화번호: 010-9876-5432
-      """
-      personalData
-  - type: note
-    style: warning
-    title: 개인정보 보호의 중요성
-    content: |-
-      실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다.
-      - 로그 파일에 기록 전 자동 마스킹
-      - 화면 표시 시 일부만 표시
-      - 개발/테스트 환경에서도 실제 데이터 사용 금지
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_mask_resident
   title: 3단계. 주민번호 마스킹
   structuredPrimary: true
   subtitle: 뒷자리 전체 숨기기
-  goal: '3단계. 주민번호 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 주민번호 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     주민번호 뒷자리 7자리를 모두 *로 마스킹합니다. 주민번호는 XXXXXX-YYYYYYY 형식으로, 앞 6자리는 생년월일, 뒷 7자리는 성별과 고유번호입니다. 뒷자리를 마스킹하면 생년월일 정보는 유지하면서 개인 식별을 방지할 수 있습니다.
 
@@ -171,70 +106,29 @@ sections:
     - `\1` : 첫 번째 그룹(앞자리 6자리) 유지 - `-*******` : 하이픈 + 별표 7개 - 앞자리는 그대로, 뒷자리만 마스킹
   tips:
   - '역참조로 부분 유지 - `\1` : 첫 번째 그룹(앞자리 6자리) 유지 - `-*******` : 하이픈 + 별표 7개 - 앞자리는 그대로, 뒷자리만 마스킹'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     pattern = r"(\d{6})-(\d{7})"
 
     test = "주민번호: 901225-1234567"
     re.findall(pattern, test)
   exercise:
-    prompt: '3단계. 주민번호 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"(\d{6})-(\d{7})"
 
       test = "주민번호: 901225-1234567"
       re.findall(pattern, test)
-    solution: |-
-      pattern = r"(\d{6})-(\d{7})"
-
-      test = "주민번호: 901225-1234567"
-      re.findall(pattern, test)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 주민번호 뒷자리 7자리를 모두 *로 마스킹합니다. 주민번호는 XXXXXX-YYYYYYY 형식으로, 앞 6자리는 생년월일, 뒷 7자리는 성별과 고유번호입니다. 뒷자리를 마스킹하면 생년월일 정보는 유지하면서
-      개인 식별을 방지할 수 있습니다.
-  - type: code
-    language: python
-    title: 주민번호 패턴
-    description: 앞자리-뒷자리 형식 인식
-    content: |-
-      pattern = r"(\d{6})-(\d{7})"
-
-      test = "주민번호: 901225-1234567"
-      re.findall(pattern, test)
-  - type: code
-    language: python
-    title: 뒷자리 마스킹
-    description: 뒷자리를 *******로 치환
-    content: |-
-      pattern = r"(\d{6})-(\d{7})"
-      replacement = r"\1-*******"
-
-      masked = re.sub(pattern, replacement, personalData)
-      masked[:200]
-  - type: note
-    style: tip
-    title: 역참조로 부분 유지
-    content: |-
-      - `\1` : 첫 번째 그룹(앞자리 6자리) 유지
-      - `-*******` : 하이픈 + 별표 7개
-      - 앞자리는 그대로, 뒷자리만 마스킹
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_mask_card
   title: 4단계. 카드번호 마스킹
   structuredPrimary: true
   subtitle: 중간 2개 그룹 숨기기
-  goal: '4단계. 카드번호 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 카드번호 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     카드번호는 첫 4자리와 마지막 4자리만 표시합니다. 카드번호는 16자리로, 처음 6자리는 카드사 식별번호(BIN), 마지막 4자리는 확인용으로 노출해도 비교적 안전합니다. 중간 8자리를 마스킹하면 결제 영수증이나 알림에 사용할 수 있습니다.
 
@@ -242,7 +136,6 @@ sections:
     - `\1` : 첫 번째 그룹 (1234) - `****` : 별표로 대체 - `\4` : 네 번째 그룹 (3456) 그룹 2, 3은 사용하지 않고 별표로 대체!
   tips:
   - '여러 그룹 참조 - `\1` : 첫 번째 그룹 (1234) - `****` : 별표로 대체 - `\4` : 네 번째 그룹 (3456) 그룹 2, 3은 사용하지 않고 별표로 대체!'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     pattern = r"(\d{4})-(\d{4})-(\d{4})-(\d{4})"
     replacement = r"\1-****-****-\4"
@@ -250,65 +143,30 @@ sections:
     test = "카드: 1234-5678-9012-3456"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: '4단계. 카드번호 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"(\d{4})-(\d{4})-(\d{4})-(\d{4})"
       replacement = r"\1-****-****-\4"
 
       test = "카드: 1234-5678-9012-3456"
       re.sub(pattern, replacement, test)
-    solution: |-
-      pattern = r"(\d{4})-(\d{4})-(\d{4})-(\d{4})"
-      replacement = r"\1-****-****-\4"
-
-      test = "카드: 1234-5678-9012-3456"
-      re.sub(pattern, replacement, test)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 카드번호는 첫 4자리와 마지막 4자리만 표시합니다. 카드번호는 16자리로, 처음 6자리는 카드사 식별번호(BIN), 마지막 4자리는 확인용으로 노출해도 비교적 안전합니다. 중간 8자리를 마스킹하면
-      결제 영수증이나 알림에 사용할 수 있습니다.
-  - type: code
-    language: python
-    title: 카드번호 마스킹
-    description: 1234-****-****-3456 형식
-    content: |-
-      pattern = r"(\d{4})-(\d{4})-(\d{4})-(\d{4})"
-      replacement = r"\1-****-****-\4"
-
-      test = "카드: 1234-5678-9012-3456"
-      re.sub(pattern, replacement, test)
-  - type: note
-    style: tip
-    title: 여러 그룹 참조
-    content: |-
-      - `\1` : 첫 번째 그룹 (1234)
-      - `****` : 별표로 대체
-      - `\4` : 네 번째 그룹 (3456)
-
-      그룹 2, 3은 사용하지 않고 별표로 대체!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_mask_account
   title: 5단계. 계좌번호 마스킹
   structuredPrimary: true
   subtitle: 마지막 3자리만 표시
-  goal: '5단계. 계좌번호 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 계좌번호 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     계좌번호는 마지막 3자리만 남기고 마스킹합니다.
 
     결과: 계좌: ***-***-***789
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     pattern = r"(\d{3})-(\d{3})-(\d{3})(\d{3})"
     replacement = r"***-***-***\4"
@@ -316,59 +174,31 @@ sections:
     test = "계좌: 110-123-456789"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: '5단계. 계좌번호 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"(\d{3})-(\d{3})-(\d{3})(\d{3})"
       replacement = r"***-***-***\4"
 
       test = "계좌: 110-123-456789"
       re.sub(pattern, replacement, test)
-    solution: |-
-      pattern = r"(\d{3})-(\d{3})-(\d{3})(\d{3})"
-      replacement = r"***-***-***\4"
-
-      test = "계좌: 110-123-456789"
-      re.sub(pattern, replacement, test)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 계좌번호는 마지막 3자리만 남기고 마스킹합니다.
-  - type: code
-    language: python
-    title: 계좌번호 마스킹
-    description: XXX-XXX-XXX789 형식
-    content: |-
-      pattern = r"(\d{3})-(\d{3})-(\d{3})(\d{3})"
-      replacement = r"***-***-***\4"
-
-      test = "계좌: 110-123-456789"
-      re.sub(pattern, replacement, test)
-  - type: text
-    content: '결과: 계좌: ***-***-***789'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_backreference
   title: 6단계. 역참조 심화
   structuredPrimary: true
   subtitle: 반복 패턴 찾기
-  goal: '6단계. 역참조 심화: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 역참조 심화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     역참조는 같은 패턴이 반복될 때도 사용할 수 있습니다.
 
     역참조 사용
     **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한** 단어 - `\b` : 단어 경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!
   tips:
-  - '역참조 사용 **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한** 단어 - `\b` : 단어
-    경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - '역참조 사용 **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한** 단어 - `\b` : 단어 경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!'
   snippet: |-
     pattern = r"\b(\w+)\s+\1\b"
 
@@ -376,64 +206,27 @@ sections:
     matches = re.findall(pattern, test)
     matches
   exercise:
-    prompt: '6단계. 역참조 심화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"\b(\w+)\s+\1\b"
 
       test = "정말 정말 중요한 사항입니다. 반드시 반드시 확인하세요."
       matches = re.findall(pattern, test)
       matches
-    solution: |-
-      pattern = r"\b(\w+)\s+\1\b"
-
-      test = "정말 정말 중요한 사항입니다. 반드시 반드시 확인하세요."
-      matches = re.findall(pattern, test)
-      matches
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 역참조는 같은 패턴이 반복될 때도 사용할 수 있습니다.
-  - type: code
-    language: python
-    title: 반복 단어 찾기
-    description: 같은 단어가 연속으로 나올 때
-    content: |-
-      pattern = r"\b(\w+)\s+\1\b"
-
-      test = "정말 정말 중요한 사항입니다. 반드시 반드시 확인하세요."
-      matches = re.findall(pattern, test)
-      matches
-  - type: note
-    style: tip
-    title: 역참조 사용
-    content: |-
-      **패턴: \\1**
-      `\b(\w+)\s+\1\b`:
-      - `(\w+)` : 단어를 그룹 1로 캡처
-      - `\s+` : 공백 1개 이상
-      - `\1` : 그룹 1과 **동일한** 단어
-      - `\b` : 단어 경계
-
-      "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_complete_masking
   title: 7단계. 완성된 마스킹 함수
   structuredPrimary: true
   subtitle: 모든 개인정보 자동 마스킹
-  goal: '7단계. 완성된 마스킹 함수: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 완성된 마스킹 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 배운 패턴을 모두 합쳐 완성된 마스킹 함수를 만듭니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def maskPersonalInfo(text):
         text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
@@ -449,7 +242,7 @@ sections:
     maskedData = maskPersonalInfo(personalData)
     maskedData
   exercise:
-    prompt: '7단계. 완성된 마스킹 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def maskPersonalInfo(text):
           text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
@@ -464,64 +257,23 @@ sections:
 
       maskedData = maskPersonalInfo(personalData)
       maskedData
-    solution: |-
-      def maskPersonalInfo(text):
-          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
-
-          text = re.sub(r"(\d{4})-(\d{4})-(\d{4})-(\d{4})", r"\1-****-****-\4", text)
-
-          text = re.sub(r"(\d{3})-(\d{3})-(\d{3})(\d{3})", r"***-***-***\4", text)
-
-          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
-
-          return text
-
-      maskedData = maskPersonalInfo(personalData)
-      maskedData
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 배운 패턴을 모두 합쳐 완성된 마스킹 함수를 만듭니다.
-  - type: code
-    language: python
-    title: 개인정보 마스킹 함수
-    description: 주민번호, 카드, 계좌, 전화번호 자동 마스킹
-    content: |-
-      def maskPersonalInfo(text):
-          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
-
-          text = re.sub(r"(\d{4})-(\d{4})-(\d{4})-(\d{4})", r"\1-****-****-\4", text)
-
-          text = re.sub(r"(\d{3})-(\d{3})-(\d{3})(\d{3})", r"***-***-***\4", text)
-
-          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
-
-          return text
-
-      maskedData = maskPersonalInfo(personalData)
-      maskedData
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_selective_masking
   title: 8단계. 선택적 마스킹
   structuredPrimary: true
   subtitle: 필요한 부분만 마스킹
-  goal: '8단계. 선택적 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 선택적 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     상황에 따라 다르게 마스킹할 수 있습니다.
 
     결과: 이름: 김** (성만 표시)
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     pattern = r"이름: (\S)(\S+)"
     replacement = r"이름: \1" + "*" * 2
@@ -529,57 +281,30 @@ sections:
     test = "이름: 김철수"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: '8단계. 선택적 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"이름: (\S)(\S+)"
       replacement = r"이름: \1" + "*" * 2
 
       test = "이름: 김철수"
       re.sub(pattern, replacement, test)
-    solution: |-
-      pattern = r"이름: (\S)(\S+)"
-      replacement = r"이름: \1" + "*" * 2
-
-      test = "이름: 김철수"
-      re.sub(pattern, replacement, test)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 상황에 따라 다르게 마스킹할 수 있습니다.
-  - type: code
-    language: python
-    title: 이름 부분 마스킹
-    description: 성은 그대로, 이름만 *로
-    content: |-
-      pattern = r"이름: (\S)(\S+)"
-      replacement = r"이름: \1" + "*" * 2
-
-      test = "이름: 김철수"
-      re.sub(pattern, replacement, test)
-  - type: text
-    content: '결과: 이름: 김** (성만 표시)'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_log_masking
   title: 9단계. 로그 자동 마스킹
   structuredPrimary: true
   subtitle: 실전 활용
-  goal: '9단계. 로그 자동 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 로그 자동 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     로그 파일에 개인정보가 실수로 기록되는 것을 방지합니다.
 
     모든 개인정보가 자동으로 마스킹되어 안전하게 로그에 기록됩니다!
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def safeLog(message):
         masked = maskPersonalInfo(message)
@@ -594,7 +319,7 @@ sections:
     safeLogs = [safeLog(msg) for msg in logMessages]
     safeLogs
   exercise:
-    prompt: '9단계. 로그 자동 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def safeLog(message):
           masked = maskPersonalInfo(message)
@@ -608,64 +333,23 @@ sections:
 
       safeLogs = [safeLog(msg) for msg in logMessages]
       safeLogs
-    solution: |-
-      def safeLog(message):
-          masked = maskPersonalInfo(message)
-          return f"[LOG] {masked}"
-
-      logMessages = [
-          "사용자 로그인: 주민번호 901225-1234567",
-          "결제 완료: 카드 1234-5678-9012-3456",
-          "계좌 이체: 110-123-456789 → 020-987-654321"
-      ]
-
-      safeLogs = [safeLog(msg) for msg in logMessages]
-      safeLogs
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 로그 파일에 개인정보가 실수로 기록되는 것을 방지합니다.
-  - type: code
-    language: python
-    title: 로그 마스킹 예제
-    description: 로그 기록 전 자동 마스킹
-    content: |-
-      def safeLog(message):
-          masked = maskPersonalInfo(message)
-          return f"[LOG] {masked}"
-
-      logMessages = [
-          "사용자 로그인: 주민번호 901225-1234567",
-          "결제 완료: 카드 1234-5678-9012-3456",
-          "계좌 이체: 110-123-456789 → 020-987-654321"
-      ]
-
-      safeLogs = [safeLog(msg) for msg in logMessages]
-      safeLogs
-  - type: text
-    content: 모든 개인정보가 자동으로 마스킹되어 안전하게 로그에 기록됩니다!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 10단계. 보안 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 잔존 탐지 → 오류 수정 → 운영 정책
-  goal: '10단계. 보안 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 보안 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     개인정보 마스킹은 화면에 별표가 보인다고 끝나는 작업이 아닙니다. 원문 주민번호, 카드번호, 계좌번호, 전화번호가 결과에 남아 있지 않은지 자동으로 검사해야 합니다. 이번 단계에서는 마스킹 후 원문 패턴이 0개 남을 것이라고 먼저 예측합니다. 그다음 일부러 깨진 마스킹 결과를 넣어 검증 함수가 실패하는지 확인하고, 운영 로그 정책에 맞게 재사용 가능한 함수로 고칩니다.
 
     보안 커리큘럼은 마스킹 함수를 만드는 데서 멈추면 부족합니다. 원문 패턴이 남지 않는지 검사하는 검증 함수까지 있어야 업무 로그와 리포트에 안전하게 적용할 수 있습니다.
   tips:
   - 보안 커리큘럼은 마스킹 함수를 만드는 데서 멈추면 부족합니다. 원문 패턴이 남지 않는지 검사하는 검증 함수까지 있어야 업무 로그와 리포트에 안전하게 적용할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     sensitivePatterns = {
         "residentNumber": r"\d{6}-\d{7}",
@@ -687,7 +371,7 @@ sections:
     assert len(leaks) == predictedLeakCount, leaks
     leaks
   exercise:
-    prompt: '10단계. 보안 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       sensitivePatterns = {
           "residentNumber": r"\d{6}-\d{7}",
@@ -708,138 +392,23 @@ sections:
 
       assert len(leaks) == predictedLeakCount, leaks
       leaks
-    solution: |-
-      sensitivePatterns = {
-          "residentNumber": r"\d{6}-\d{7}",
-          "cardNumber": r"\d{4}-\d{4}-\d{4}-\d{4}",
-          "accountNumber": r"\b\d{3}-\d{3}-\d{6}\b",
-          "phoneNumber": r"\b010-\d{3,4}-\d{4}\b",
-      }
-
-      def findSensitiveLeaks(text):
-          return {
-              name: re.findall(pattern, text)
-              for name, pattern in sensitivePatterns.items()
-              if re.findall(pattern, text)
-          }
-
-      predictedLeakCount = 0
-      leaks = findSensitiveLeaks(maskedData)
-
-      assert len(leaks) == predictedLeakCount, leaks
-      leaks
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: |-
-      개인정보 마스킹은 화면에 별표가 보인다고 끝나는 작업이 아닙니다. 원문 주민번호, 카드번호, 계좌번호, 전화번호가 결과에 남아 있지 않은지 자동으로 검사해야 합니다.
-
-      이번 단계에서는 마스킹 후 원문 패턴이 0개 남을 것이라고 먼저 예측합니다. 그다음 일부러 깨진 마스킹 결과를 넣어 검증 함수가 실패하는지 확인하고, 운영 로그 정책에 맞게 재사용 가능한 함수로 고칩니다.
-  - type: code
-    language: python
-    title: 잔존 개인정보 탐지 함수
-    description: 마스킹 결과에 원문 개인정보 패턴이 남아 있는지 확인합니다
-    content: |-
-      sensitivePatterns = {
-          "residentNumber": r"\d{6}-\d{7}",
-          "cardNumber": r"\d{4}-\d{4}-\d{4}-\d{4}",
-          "accountNumber": r"\b\d{3}-\d{3}-\d{6}\b",
-          "phoneNumber": r"\b010-\d{3,4}-\d{4}\b",
-      }
-
-      def findSensitiveLeaks(text):
-          return {
-              name: re.findall(pattern, text)
-              for name, pattern in sensitivePatterns.items()
-              if re.findall(pattern, text)
-          }
-
-      predictedLeakCount = 0
-      leaks = findSensitiveLeaks(maskedData)
-
-      assert len(leaks) == predictedLeakCount, leaks
-      leaks
-  - type: code
-    language: python
-    title: 마스킹 결과 계약 검증
-    description: 원문은 없어지고 필요한 일부 식별자만 남는지 확인합니다
-    content: |-
-      def validateMaskedPersonalInfo(text):
-          leaks = findSensitiveLeaks(text)
-          assert not leaks, f"원문 개인정보 잔존: {leaks}"
-
-          assert "901225-*******" in text
-          assert "1234-****-****-3456" in text
-          assert "***-***-***789" in text
-          assert "010-****-5678" in text
-
-          return True
-
-      assert validateMaskedPersonalInfo(maskedData)
-  - type: code
-    language: python
-    title: 의도한 오류 고치기
-    description: 카드번호 마스킹이 빠진 결과를 검증 함수가 잡아내는지 확인합니다
-    content: |-
-      def brokenMaskPersonalInfo(text):
-          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
-          text = re.sub(r"(\d{3})-(\d{3})-(\d{3})(\d{3})", r"***-***-***\4", text)
-          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
-          return text
-
-      brokenMaskedData = brokenMaskPersonalInfo(personalData)
-
-      try:
-          validateMaskedPersonalInfo(brokenMaskedData)
-      except AssertionError as exc:
-          print("검증 실패 확인:", exc)
-
-      fixedMaskedData = maskPersonalInfo(personalData)
-      assert validateMaskedPersonalInfo(fixedMaskedData)
-  - type: code
-    language: python
-    title: 운영 로그 정책 실험
-    description: 로그 묶음 전체에 원문 개인정보가 남지 않는지 확인합니다
-    content: |-
-      def safeLogBatch(messages):
-          return [safeLog(message) for message in messages]
-
-      operationLogs = safeLogBatch([
-          "회원 조회: 주민번호 901225-1234567, 전화 010-1234-5678",
-          "결제 승인: 카드 1234-5678-9012-3456",
-          "정산 계좌: 110-123-456789",
-      ])
-
-      joinedLogs = "\n".join(operationLogs)
-
-      assert all(log.startswith("[LOG] ") for log in operationLogs)
-      assert validateMaskedPersonalInfo(joinedLogs)
-
-      operationLogs
-  - type: tip
-    content: 보안 커리큘럼은 마스킹 함수를 만드는 데서 멈추면 부족합니다. 원문 패턴이 남지 않는지 검사하는 검증 함수까지 있어야 업무 로그와 리포트에 안전하게 적용할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 개인정보 마스킹 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     보안 담당자가 되어 개인정보를 안전하게 마스킹합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import re
 
@@ -862,7 +431,7 @@ sections:
     result = pat.sub(mask, text)
     result
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -884,91 +453,11 @@ sections:
       pat = re.compile(r"([\w.]+)@([\w.]+)")
       result = pat.sub(mask, text)
       result
-    solution: |-
-      import re
-
-      text = """
-      담당자: john.doe@company.com
-      CC: admin@service.org
-      수신: contact.person@shop.co.kr
-      """
-
-      def mask(match):
-          user = match.group(1)
-          domain = match.group(2)
-          if len(user) <= 2:
-              out = user[0] + "*"
-          else:
-              out = user[:2] + "*" * (len(user) - 2)
-          return f"{out}@{domain}"
-
-      pat = re.compile(r"([\w.]+)@([\w.]+)")
-      result = pat.sub(mask, text)
-      result
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 보안 담당자가 되어 개인정보를 안전하게 마스킹합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 이메일 아이디 마스킹'
-    blocks:
-    - type: code
-      title: 이메일 마스킹 함수
-      content: |-
-        import re
-
-        text = """
-        담당자: john.doe@company.com
-        CC: admin@service.org
-        수신: contact.person@shop.co.kr
-        """
-
-        def mask(match):
-            user = match.group(1)
-            domain = match.group(2)
-            if len(user) <= 2:
-                out = user[0] + "*"
-            else:
-                out = user[:2] + "*" * (len(user) - 2)
-            return f"{out}@{domain}"
-
-        pat = re.compile(r"([\w.]+)@([\w.]+)")
-        result = pat.sub(mask, text)
-        result
-  - type: expansion
-    title: '미션2: 종합 개인정보 마스킹'
-    blocks:
-    - type: code
-      title: 마스킹 함수 정의
-      content: |-
-        import re
-
-        raw = """
-        이름: 홍길동
-        주민번호: 901225-1234567
-        카드번호: 1234-5678-9012-3456
-        전화번호: 010-1234-5678
-        """
-
-        def hide(text):
-            text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
-            text = re.sub(r"(\d{4})-(\d{4})-(\d{4})-(\d{4})", r"\1-****-****-\4", text)
-            text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
-            return text
-
-        out = hide(raw)
-        out
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   subtitle: 일곱 번째 프로젝트 완료!

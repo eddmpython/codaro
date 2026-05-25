@@ -26,219 +26,117 @@ meta:
 intro:
   emoji: 📍
   goal: 기본 지도를 생성하고 마커를 추가합니다.
-  description: Folium의 기본인 지도 생성을 배웁니다. Map()으로 지도를 만들고 location과 zoom_start로 초기 화면을 설정합니다. Marker()로 특정 위치에 점을 찍고 popup으로
-    정보를 표시합니다.
+  description: Folium의 기본인 지도 생성을 배웁니다. Map()으로 지도를 만들고 location과 zoom_start로 초기 화면을 설정합니다. Marker()로 특정 위치에 점을 찍고 popup으로 정보를 표시합니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: folium과 Codaro를 불러옵니다. Codaro는 지도를 화면에 표시할 때 사용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import folium
-    solution: import folium
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: folium과 Codaro를 불러옵니다. Codaro는 지도를 화면에 표시할 때 사용합니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: folium과 Codaro를 불러옵니다
-    content: import folium
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_basic_map
   title: 2단계. 기본 지도 생성
   structuredPrimary: true
   subtitle: Map()
-  goal: '2단계. 기본 지도 생성: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 기본 지도 생성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
 
     zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
   tips:
   - zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
     m1
   exercise:
-    prompt: '2단계. 기본 지도 생성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=12)
       m1
-    solution: |-
-      seoulCenter = [37.5665, 126.9780]
-      m1 = folium.Map(location=seoulCenter, zoom_start=12)
-      m1
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
-  - type: code
-    language: python
-    title: 서울 중심 지도
-    description: 서울시청 좌표로 지도 생성
-    content: |-
-      seoulCenter = [37.5665, 126.9780]
-      m1 = folium.Map(location=seoulCenter, zoom_start=12)
-      m1
-  - type: tip
-    content: zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_zoom_levels
   title: 3단계. 줌 레벨 이해
   structuredPrimary: true
   subtitle: zoom_start 설정
-  goal: '3단계. 줌 레벨 이해: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 줌 레벨 이해: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
 
     마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
   tips:
   - 마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=10)
     m2
   exercise:
-    prompt: '3단계. 줌 레벨 이해: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=10)
       m2
-    solution: |-
-      m2 = folium.Map(location=seoulCenter, zoom_start=10)
-      m2
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
-  - type: code
-    language: python
-    title: 줌 레벨 10 (광역)
-    description: 서울 전체가 보이는 레벨
-    content: |-
-      m2 = folium.Map(location=seoulCenter, zoom_start=10)
-      m2
-  - type: code
-    language: python
-    title: 줌 레벨 15 (동네)
-    description: 동네 수준 상세도
-    content: |-
-      m3 = folium.Map(location=seoulCenter, zoom_start=15)
-      m3
-  - type: tip
-    content: 마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_marker
   title: 4단계. 마커 추가
   structuredPrimary: true
   subtitle: Marker()
-  goal: '4단계. 마커 추가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 마커 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
 
     popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
   tips:
   - popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m4 = folium.Map(location=seoulCenter, zoom_start=14)
     folium.Marker(location=seoulCenter).add_to(m4)
     m4
   exercise:
-    prompt: '4단계. 마커 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(location=seoulCenter).add_to(m4)
       m4
-    solution: |-
-      m4 = folium.Map(location=seoulCenter, zoom_start=14)
-      folium.Marker(location=seoulCenter).add_to(m4)
-      m4
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
-  - type: code
-    language: python
-    title: 마커 하나 추가
-    description: 서울시청에 마커 표시
-    content: |-
-      m4 = folium.Map(location=seoulCenter, zoom_start=14)
-      folium.Marker(location=seoulCenter).add_to(m4)
-      m4
-  - type: code
-    language: python
-    title: 팝업 추가
-    description: 마커 클릭 시 텍스트 표시
-    content: |-
-      m5 = folium.Map(location=seoulCenter, zoom_start=14)
-      folium.Marker(
-          location=seoulCenter,
-          popup="서울시청"
-      ).add_to(m5)
-      m5
-  - type: tip
-    content: popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_multiple_markers
   title: 5단계. 여러 마커 추가
   structuredPrimary: true
   subtitle: 반복문 활용
-  goal: '5단계. 여러 마커 추가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 여러 마커 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
 
     딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
   tips:
   - 딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     places = [
         {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -256,7 +154,7 @@ sections:
         ).add_to(m6)
     m6
   exercise:
-    prompt: '5단계. 여러 마커 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       places = [
           {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -273,70 +171,23 @@ sections:
               popup=place["name"]
           ).add_to(m6)
       m6
-    solution: |-
-      places = [
-          {"name": "서울시청", "loc": [37.5665, 126.9780]},
-          {"name": "강남역", "loc": [37.4979, 127.0276]},
-          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
-          {"name": "명동", "loc": [37.5636, 126.9869]},
-          {"name": "여의도", "loc": [37.5219, 126.9245]}
-      ]
-
-      m6 = folium.Map(location=seoulCenter, zoom_start=12)
-      for place in places:
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"]
-          ).add_to(m6)
-      m6
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
-  - type: code
-    language: python
-    title: 서울 주요 장소
-    description: 여러 마커 한번에 추가
-    content: |-
-      places = [
-          {"name": "서울시청", "loc": [37.5665, 126.9780]},
-          {"name": "강남역", "loc": [37.4979, 127.0276]},
-          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
-          {"name": "명동", "loc": [37.5636, 126.9869]},
-          {"name": "여의도", "loc": [37.5219, 126.9245]}
-      ]
-
-      m6 = folium.Map(location=seoulCenter, zoom_start=12)
-      for place in places:
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"]
-          ).add_to(m6)
-      m6
-  - type: tip
-    content: 딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_tooltip
   title: 6단계. 툴팁 추가
   structuredPrimary: true
   subtitle: tooltip vs popup
-  goal: '6단계. 툴팁 추가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 툴팁 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
 
     tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
   tips:
   - tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m7 = folium.Map(location=seoulCenter, zoom_start=14)
     folium.Marker(
@@ -346,7 +197,7 @@ sections:
     ).add_to(m7)
     m7
   exercise:
-    prompt: '6단계. 툴팁 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(
@@ -355,55 +206,23 @@ sections:
           tooltip="마우스 올리면 보여요"
       ).add_to(m7)
       m7
-    solution: |-
-      m7 = folium.Map(location=seoulCenter, zoom_start=14)
-      folium.Marker(
-          location=seoulCenter,
-          popup="클릭하면 보여요",
-          tooltip="마우스 올리면 보여요"
-      ).add_to(m7)
-      m7
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
-  - type: code
-    language: python
-    title: 툴팁 추가
-    description: 마우스 호버 시 표시
-    content: |-
-      m7 = folium.Map(location=seoulCenter, zoom_start=14)
-      folium.Marker(
-          location=seoulCenter,
-          popup="클릭하면 보여요",
-          tooltip="마우스 올리면 보여요"
-      ).add_to(m7)
-      m7
-  - type: tip
-    content: tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_marker_color
   title: 7단계. 마커 색상 변경
   structuredPrimary: true
   subtitle: icon 파라미터
-  goal: '7단계. 마커 색상 변경: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 마커 색상 변경: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Icon()으로 마커 색상과 아이콘을 변경합니다. 기본 색상은 blue입니다.
 
     사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
   tips:
-  - 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white,
-    pink, lightblue, lightgreen, gray, black, lightgray 입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
   snippet: |-
     m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -416,7 +235,7 @@ sections:
         ).add_to(m8)
     m8
   exercise:
-    prompt: '7단계. 마커 색상 변경: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -428,61 +247,23 @@ sections:
               icon=folium.Icon(color=colors[i % len(colors)])
           ).add_to(m8)
       m8
-    solution: |-
-      m8 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      colors = ["red", "blue", "green", "purple", "orange"]
-      for i, place in enumerate(places):
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"],
-              icon=folium.Icon(color=colors[i % len(colors)])
-          ).add_to(m8)
-      m8
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Icon()으로 마커 색상과 아이콘을 변경합니다. 기본 색상은 blue입니다.
-  - type: code
-    language: python
-    title: 색상 지정
-    description: 다양한 색상 마커
-    content: |-
-      m8 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      colors = ["red", "blue", "green", "purple", "orange"]
-      for i, place in enumerate(places):
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"],
-              icon=folium.Icon(color=colors[i % len(colors)])
-          ).add_to(m8)
-      m8
-  - type: tip
-    content: 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple,
-      white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_icon_type
   title: 8단계. 아이콘 모양 변경
   structuredPrimary: true
   subtitle: icon 파라미터
-  goal: '8단계. 아이콘 모양 변경: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 아이콘 모양 변경: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
 
     자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
   tips:
   - 자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -506,7 +287,7 @@ sections:
 
     m9
   exercise:
-    prompt: '8단계. 아이콘 모양 변경: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -529,82 +310,23 @@ sections:
       ).add_to(m9)
 
       m9
-    solution: |-
-      m9 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      folium.Marker(
-          location=[37.5665, 126.9780],
-          popup="시청",
-          icon=folium.Icon(color="red", icon="info-sign")
-      ).add_to(m9)
-
-      folium.Marker(
-          location=[37.4979, 127.0276],
-          popup="강남역",
-          icon=folium.Icon(color="blue", icon="star")
-      ).add_to(m9)
-
-      folium.Marker(
-          location=[37.5563, 126.9236],
-          popup="홍대",
-          icon=folium.Icon(color="green", icon="music")
-      ).add_to(m9)
-
-      m9
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
-  - type: code
-    language: python
-    title: 아이콘 지정
-    description: 다양한 아이콘
-    content: |-
-      m9 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      folium.Marker(
-          location=[37.5665, 126.9780],
-          popup="시청",
-          icon=folium.Icon(color="red", icon="info-sign")
-      ).add_to(m9)
-
-      folium.Marker(
-          location=[37.4979, 127.0276],
-          popup="강남역",
-          icon=folium.Icon(color="blue", icon="star")
-      ).add_to(m9)
-
-      folium.Marker(
-          location=[37.5563, 126.9236],
-          popup="홍대",
-          icon=folium.Icon(color="green", icon="music")
-      ).add_to(m9)
-
-      m9
-  - type: tip
-    content: 자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_fit_bounds
   title: 9단계. 자동 줌 맞추기
   structuredPrimary: true
   subtitle: fit_bounds()
-  goal: '9단계. 자동 줌 맞추기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 자동 줌 맞추기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
 
     fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
   tips:
   - fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m10 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -618,7 +340,7 @@ sections:
     m10.fit_bounds(allLocs)
     m10
   exercise:
-    prompt: '9단계. 자동 줌 맞추기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -631,59 +353,20 @@ sections:
 
       m10.fit_bounds(allLocs)
       m10
-    solution: |-
-      m10 = folium.Map(location=seoulCenter, zoom_start=12)
-
-      allLocs = [place["loc"] for place in places]
-      for place in places:
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"]
-          ).add_to(m10)
-
-      m10.fit_bounds(allLocs)
-      m10
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
-  - type: code
-    language: python
-    title: 모든 마커 보이기
-    description: 자동 줌 조절
-    content: |-
-      m10 = folium.Map(location=seoulCenter, zoom_start=12)
-
-      allLocs = [place["loc"] for place in places]
-      for place in places:
-          folium.Marker(
-              location=place["loc"],
-              popup=place["name"]
-          ).add_to(m10)
-
-      m10.fit_bounds(allLocs)
-      m10
-  - type: tip
-    content: fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 서울 관광지 지도
-  goal: '10단계. 완성 예제: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 완성 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 지금까지 배운 내용을 종합하여 서울 관광지 지도를 완성합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     tourSpots = [
         {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
@@ -705,7 +388,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: '10단계. 완성 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       tourSpots = [
           {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
@@ -726,76 +409,23 @@ sections:
           ).add_to(tourMap)
 
       tourMap
-    solution: |-
-      tourSpots = [
-          {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
-          {"name": "남산타워", "loc": [37.5512, 126.9882], "color": "orange"},
-          {"name": "명동", "loc": [37.5636, 126.9869], "color": "blue"},
-          {"name": "동대문", "loc": [37.5711, 127.0095], "color": "green"},
-          {"name": "이태원", "loc": [37.5340, 126.9948], "color": "purple"}
-      ]
-
-      tourMap = folium.Map(location=[37.56, 126.99], zoom_start=13)
-
-      for spot in tourSpots:
-          folium.Marker(
-              location=spot["loc"],
-              popup=f"<b>{spot['name']}</b>",
-              tooltip=spot["name"],
-              icon=folium.Icon(color=spot["color"], icon="star")
-          ).add_to(tourMap)
-
-      tourMap
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 내용을 종합하여 서울 관광지 지도를 완성합니다.
-  - type: code
-    language: python
-    title: 서울 관광지 지도
-    description: 종합 예제
-    content: |-
-      tourSpots = [
-          {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
-          {"name": "남산타워", "loc": [37.5512, 126.9882], "color": "orange"},
-          {"name": "명동", "loc": [37.5636, 126.9869], "color": "blue"},
-          {"name": "동대문", "loc": [37.5711, 127.0095], "color": "green"},
-          {"name": "이태원", "loc": [37.5340, 126.9948], "color": "purple"}
-      ]
-
-      tourMap = folium.Map(location=[37.56, 126.99], zoom_start=13)
-
-      for spot in tourSpots:
-          folium.Marker(
-              location=spot["loc"],
-              popup=f"<b>{spot['name']}</b>",
-              tooltip=spot["name"],
-              icon=folium.Icon(color=spot["color"], icon="star")
-          ).add_to(tourMap)
-
-      tourMap
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_workflow
   title: 11단계. 실무 위치 지도 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 검증
-  goal: '11단계. 실무 위치 지도 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 실무 위치 지도 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고 검증해야 합니다.
 
     Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
   tips:
   - Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     branchSites = [
         {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
@@ -812,7 +442,7 @@ sections:
     validationResult = [validateKoreaCoordinate(site) for site in branchSites]
     validationResult
   exercise:
-    prompt: '11단계. 실무 위치 지도 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       branchSites = [
           {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
@@ -828,139 +458,23 @@ sections:
 
       validationResult = [validateKoreaCoordinate(site) for site in branchSites]
       validationResult
-    solution: |-
-      branchSites = [
-          {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
-          {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
-          {"name": "여의도 파트너센터", "loc": [37.5219, 126.9245], "priority": "high"},
-      ]
-
-      def validateKoreaCoordinate(site):
-          lat, lon = site["loc"]
-          if not (33 <= lat <= 39 and 124 <= lon <= 132):
-              raise ValueError(f"좌표 범위 오류: {site['name']}")
-          return True
-
-      validationResult = [validateKoreaCoordinate(site) for site in branchSites]
-      validationResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고
-      검증해야 합니다.
-  - type: list
-    items:
-    - 실행 전에는 어느 지점이 지도 중심에 가까운지 먼저 예측합니다.
-    - 위도와 경도가 뒤바뀌면 지도는 엉뚱한 곳을 보여주는 업무 오류가 됩니다.
-    - 마커 이름이 HTML에 들어갔는지 확인하면 누락을 빠르게 찾을 수 있습니다.
-    - 지점이 늘어나면 fit_bounds로 전체 범위가 보이는지 검증합니다.
-  - type: code
-    language: python
-    title: 지점 데이터 준비
-    description: 영업 지점 후보를 지도에 올리기 전 좌표와 우선순위를 확인합니다.
-    content: |-
-      branchSites = [
-          {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
-          {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
-          {"name": "여의도 파트너센터", "loc": [37.5219, 126.9245], "priority": "high"},
-      ]
-
-      def validateKoreaCoordinate(site):
-          lat, lon = site["loc"]
-          if not (33 <= lat <= 39 and 124 <= lon <= 132):
-              raise ValueError(f"좌표 범위 오류: {site['name']}")
-          return True
-
-      validationResult = [validateKoreaCoordinate(site) for site in branchSites]
-      validationResult
-  - type: code
-    language: python
-    title: 좌표 오류 확인
-    description: 위도와 경도를 뒤집은 지점을 일부러 넣고 오류 메시지를 읽습니다.
-    content: |-
-      brokenSite = {"name": "좌표 뒤집힘", "loc": [127.0276, 37.4979], "priority": "low"}
-
-      try:
-          validateKoreaCoordinate(brokenSite)
-      except ValueError as exc:
-          coordinateErrorMessage = str(exc)
-
-      coordinateErrorMessage
-  - type: code
-    language: python
-    title: 업무 지도 만들기
-    description: 우선순위에 따라 마커 색상을 바꿔 지도를 만듭니다.
-    content: |-
-      priorityColor = {"high": "red", "medium": "orange", "low": "blue"}
-      branchMap = folium.Map(location=[37.525, 126.96], zoom_start=12)
-
-      for site in branchSites:
-          folium.Marker(
-              location=site["loc"],
-              popup=f"{site['name']} / 우선순위 {site['priority']}",
-              tooltip=site["name"],
-              icon=folium.Icon(color=priorityColor[site["priority"]], icon="info-sign"),
-          ).add_to(branchMap)
-
-      branchMap.fit_bounds([site["loc"] for site in branchSites])
-      branchMap
-  - type: code
-    language: python
-    title: 렌더 결과 검증
-    description: 모든 지점 이름과 오류 메시지가 예상대로 준비됐는지 점검합니다.
-    content: |-
-      branchHtml = branchMap.get_root().render()
-      checks = {
-          "allNamesRendered": all(site["name"] in branchHtml for site in branchSites),
-          "coordinateErrorOk": coordinateErrorMessage == "좌표 범위 오류: 좌표 뒤집힘",
-          "validationOk": all(validationResult),
-      }
-
-      assert all(checks.values()), checks
-      checks
-  - type: code
-    language: python
-    title: 수정 실험
-    description: 새 지점을 추가하면 검증해야 할 마커 수와 경계가 어떻게 바뀌는지 확인합니다.
-    content: |-
-      expandedSites = branchSites + [
-          {"name": "종로 교육장", "loc": [37.5796, 126.9770], "priority": "low"}
-      ]
-
-      expandedMap = folium.Map(location=[37.54, 126.96], zoom_start=12)
-      for site in expandedSites:
-          validateKoreaCoordinate(site)
-          folium.Marker(location=site["loc"], popup=site["name"]).add_to(expandedMap)
-      expandedMap.fit_bounds([site["loc"] for site in expandedSites])
-
-      expandedHtml = expandedMap.get_root().render()
-      assert len(expandedSites) == len(branchSites) + 1
-      assert "종로 교육장" in expandedHtml
-      len(branchSites), len(expandedSites), "종로 교육장" in expandedHtml
-  - type: tip
-    content: Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 지도 만들기
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
     각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import folium
     cafes = [
@@ -971,7 +485,7 @@ sections:
     ]
     cafes
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import folium
       cafes = [
@@ -981,85 +495,8 @@ sections:
           {"name": "커피빈 명동", "loc": [37.5630, 126.9860]}
       ]
       cafes
-    solution: |-
-      import folium
-      cafes = [
-          {"name": "스타벅스 시청점", "loc": [37.5660, 126.9785]},
-          {"name": "투썸플레이스 광화문", "loc": [37.5710, 126.9769]},
-          {"name": "이디야 을지로", "loc": [37.5660, 126.9910]},
-          {"name": "커피빈 명동", "loc": [37.5630, 126.9860]}
-      ]
-      cafes
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
-  - type: tip
-    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  - type: expansion
-    title: '미션1: 카페 지도'
-    blocks:
-    - type: code
-      title: 데이터 준비
-      content: |-
-        import folium
-        cafes = [
-            {"name": "스타벅스 시청점", "loc": [37.5660, 126.9785]},
-            {"name": "투썸플레이스 광화문", "loc": [37.5710, 126.9769]},
-            {"name": "이디야 을지로", "loc": [37.5660, 126.9910]},
-            {"name": "커피빈 명동", "loc": [37.5630, 126.9860]}
-        ]
-        cafes
-    - type: code
-      title: 지도 생성
-      content: |-
-        cafeMap = folium.Map(location=[37.567, 126.985], zoom_start=14)
-
-        for cafe in cafes:
-            folium.Marker(
-                location=cafe["loc"],
-                popup=cafe["name"],
-                tooltip="카페",
-                icon=folium.Icon(color="cadetblue", icon="cloud")
-            ).add_to(cafeMap)
-
-        cafeMap
-  - type: expansion
-    title: '미션2: 전국 도시 지도'
-    blocks:
-    - type: code
-      title: 데이터 준비
-      content: |-
-        import folium
-        cities = [
-            {"name": "서울", "loc": [37.5665, 126.9780], "color": "red"},
-            {"name": "부산", "loc": [35.1796, 129.0756], "color": "blue"},
-            {"name": "대전", "loc": [36.3504, 127.3845], "color": "green"},
-            {"name": "대구", "loc": [35.8714, 128.6014], "color": "purple"},
-            {"name": "광주", "loc": [35.1595, 126.8526], "color": "orange"},
-            {"name": "제주", "loc": [33.4996, 126.5312], "color": "pink"}
-        ]
-        cities
-    - type: code
-      title: 지도 생성
-      content: |-
-        koreaMap = folium.Map(location=[36.5, 127.5], zoom_start=7)
-
-        for city in cities:
-            folium.Marker(
-                location=city["loc"],
-                popup=f"<b>{city['name']}</b>",
-                tooltip=city["name"],
-                icon=folium.Icon(color=city["color"], icon="star")
-            ).add_to(koreaMap)
-
-        koreaMap
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

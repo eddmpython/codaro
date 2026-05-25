@@ -29,44 +29,29 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import re
-    solution: import re
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: 정규표현식 모듈
-    content: import re
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: 로컬 게시글 샘플
-  goal: '2단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 로컬 게시글 샘플에 HTML 태그를 추가해 크롤링 결과와 비슷한 입력을 만듭니다. 실제 웹 데이터에는 본문, 제목, 작성자 정보와 함께 태그가 섞여 있으므로 LLM 입력이나 분석 전에 태그 제거와
-    공백 정리가 필요합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 로컬 게시글 샘플에 HTML 태그를 추가해 크롤링 결과와 비슷한 입력을 만듭니다. 실제 웹 데이터에는 본문, 제목, 작성자 정보와 함께 태그가 섞여 있으므로 LLM 입력이나 분석 전에 태그 제거와 공백 정리가 필요합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     postsData = [
         {
@@ -103,7 +88,7 @@ sections:
 
     postsData[0]['body']
   exercise:
-    prompt: '2단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       postsData = [
           {
@@ -139,369 +124,136 @@ sections:
       ]
 
       postsData[0]['body']
-    solution: |-
-      postsData = [
-          {
-              "userId": 1,
-              "id": 1,
-              "title": "HTML cleaning checklist",
-              "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
-          },
-          {
-              "userId": 2,
-              "id": 2,
-              "title": "Script tags are not content",
-              "body": "Tracking scripts and inline styles should not reach the analysis step.",
-          },
-          {
-              "userId": 3,
-              "id": 3,
-              "title": "LLM input preparation",
-              "body": "Clean text reduces token waste and keeps prompts focused.",
-          },
-          {
-              "userId": 4,
-              "id": 4,
-              "title": "Crawler output review",
-              "body": "Raw pages often mix navigation, metadata, and article paragraphs.",
-          },
-          {
-              "userId": 5,
-              "id": 5,
-              "title": "Batch preprocessing note",
-              "body": "A reusable function makes hundreds of pages easier to clean.",
-          },
-      ]
-
-      postsData[0]['body']
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 로컬 게시글 샘플에 HTML 태그를 추가해 크롤링 결과와 비슷한 입력을 만듭니다. 실제 웹 데이터에는 본문, 제목, 작성자 정보와 함께 태그가 섞여 있으므로 LLM 입력이나 분석 전에 태그 제거와
-      공백 정리가 필요합니다.
-  - type: code
-    language: python
-    title: 게시글 데이터 로드
-    description: 로컬 게시글 샘플을 준비합니다
-    content: |-
-      postsData = [
-          {
-              "userId": 1,
-              "id": 1,
-              "title": "HTML cleaning checklist",
-              "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
-          },
-          {
-              "userId": 2,
-              "id": 2,
-              "title": "Script tags are not content",
-              "body": "Tracking scripts and inline styles should not reach the analysis step.",
-          },
-          {
-              "userId": 3,
-              "id": 3,
-              "title": "LLM input preparation",
-              "body": "Clean text reduces token waste and keeps prompts focused.",
-          },
-          {
-              "userId": 4,
-              "id": 4,
-              "title": "Crawler output review",
-              "body": "Raw pages often mix navigation, metadata, and article paragraphs.",
-          },
-          {
-              "userId": 5,
-              "id": 5,
-              "title": "Batch preprocessing note",
-              "body": "A reusable function makes hundreds of pages easier to clean.",
-          },
-      ]
-
-      postsData[0]['body']
-  - type: code
-    language: python
-    title: HTML 태그 추가
-    description: 실습을 위해 텍스트에 HTML 태그를 추가합니다
-    content: |-
-      htmlText = f"""
-      <html>
-      <head><title>게시글</title></head>
-      <body>
-          <h1>제목: {postsData[0]['title']}</h1>
-          <p class="content">{postsData[0]['body']}</p>
-          <div>
-              <span>작성자 ID: {postsData[0]['userId']}</span>
-          </div>
-      </body>
-      </html>
-      """
-      htmlText
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_wrong_pattern
   title: 3단계. 잘못된 패턴 (탐욕적 매칭)
   structuredPrimary: true
   subtitle: .* 의 함정
-  goal: '3단계. 잘못된 패턴 (탐욕적 매칭): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 잘못된 패턴 (탐욕적 매칭): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     직관적으로 생각하면 < 와 > 사이의 모든 문자를 찾으면 될 것 같습니다. 하지만 정규표현식의 기본 동작은 우리의 예상과 다를 수 있습니다. 이 문제를 통해 탐욕적 매칭이라는 중요한 개념을 배워봅시다.
 
     결과: ['<div>안녕</div><span>하세요</span>'] - 전체가 하나로 매칭되었습니다!
   tips:
-  - '탐욕적 매칭의 문제 `.*`는 **탐욕적(greedy)**입니다. 가능한 한 많이 매칭하려고 합니다. `<.*>` 는: 1. 첫 번째 `<` 를 찾고 2. 마지막 `>` 까지 최대한 많이 매칭 3. 중간의 모든
-    것을 다 포함 우리가 원하는 건 각 태그를 개별적으로 찾는 것입니다!'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - '탐욕적 매칭의 문제 `.*`는 **탐욕적(greedy)**입니다. 가능한 한 많이 매칭하려고 합니다. `<.*>` 는: 1. 첫 번째 `<` 를 찾고 2. 마지막 `>` 까지 최대한 많이 매칭 3. 중간의 모든 것을 다 포함 우리가 원하는 건 각 태그를 개별적으로 찾는 것입니다!'
   snippet: |-
     wrongPattern = r"<.*>"
 
     testHtml = "<div>안녕</div><span>하세요</span>"
     re.findall(wrongPattern, testHtml)
   exercise:
-    prompt: '3단계. 잘못된 패턴 (탐욕적 매칭): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       wrongPattern = r"<.*>"
 
       testHtml = "<div>안녕</div><span>하세요</span>"
       re.findall(wrongPattern, testHtml)
-    solution: |-
-      wrongPattern = r"<.*>"
-
-      testHtml = "<div>안녕</div><span>하세요</span>"
-      re.findall(wrongPattern, testHtml)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 직관적으로 생각하면 < 와 > 사이의 모든 문자를 찾으면 될 것 같습니다. 하지만 정규표현식의 기본 동작은 우리의 예상과 다를 수 있습니다. 이 문제를 통해 탐욕적 매칭이라는 중요한 개념을 배워봅시다.
-  - type: code
-    language: python
-    title: 탐욕적 패턴
-    description: < 와 > 사이를 찾아봅니다
-    content: |-
-      wrongPattern = r"<.*>"
-
-      testHtml = "<div>안녕</div><span>하세요</span>"
-      re.findall(wrongPattern, testHtml)
-  - type: text
-    content: '결과: [''<div>안녕</div><span>하세요</span>''] - 전체가 하나로 매칭되었습니다!'
-  - type: note
-    style: warning
-    title: 탐욕적 매칭의 문제
-    content: |-
-      `.*`는 **탐욕적(greedy)**입니다. 가능한 한 많이 매칭하려고 합니다.
-
-      `<.*>` 는:
-      1. 첫 번째 `<` 를 찾고
-      2. 마지막 `>` 까지 최대한 많이 매칭
-      3. 중간의 모든 것을 다 포함
-
-      우리가 원하는 건 각 태그를 개별적으로 찾는 것입니다!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_non_greedy
   title: 4단계. 올바른 패턴 (비탐욕적 매칭)
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: '4단계. 올바른 패턴 (비탐욕적 매칭): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 올바른 패턴 (비탐욕적 매칭): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 4단계. 올바른 패턴 (비탐욕적 매칭)의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     correctPattern = r"<.*?>"
 
     testHtml = "<div>안녕</div><span>하세요</span>"
     re.findall(correctPattern, testHtml)
   exercise:
-    prompt: '4단계. 올바른 패턴 (비탐욕적 매칭): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       correctPattern = r"<.*?>"
 
       testHtml = "<div>안녕</div><span>하세요</span>"
       re.findall(correctPattern, testHtml)
-    solution: |-
-      correctPattern = r"<.*?>"
-
-      testHtml = "<div>안녕</div><span>하세요</span>"
-      re.findall(correctPattern, testHtml)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: '탐욕적 매칭을 비탐욕적으로 만들려면 ? 를 붙입니다: .*?'
-  - type: code
-    language: python
-    title: 비탐욕적 패턴
-    description: .*? 로 최소 매칭합니다
-    content: |-
-      correctPattern = r"<.*?>"
-
-      testHtml = "<div>안녕</div><span>하세요</span>"
-      re.findall(correctPattern, testHtml)
-  - type: text
-    content: '결과: [''<div>'', ''</div>'', ''<span>'', ''</span>''] - 각 태그가 개별적으로 찾아졌습니다!'
-  - type: note
-    style: tip
-    title: '비탐욕적 매칭: *?'
-    content: |-
-      - `*` : 0개 이상 (탐욕적)
-      - `*?` : 0개 이상 (비탐욕적) **(신규)**
-      - `+?` : 1개 이상 (비탐욕적) **(신규)**
-      - `??` : 0 또는 1개 (비탐욕적) **(신규)**
-
-      비탐욕적은 조건을 만족하는 최소한만 매칭합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_remove_tags
   title: 5단계. HTML 태그 제거
   structuredPrimary: true
   subtitle: re.sub로 치환
-  goal: '5단계. HTML 태그 제거: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. HTML 태그 제거: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     이제 모든 HTML 태그를 빈 문자열로 치환하여 제거합니다.
 
     태그는 사라졌지만 여러 줄의 공백이 남아있네요. 추가 정제가 필요합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     pattern = r"<.*?>"
 
     cleanText = re.sub(pattern, "", htmlText)
     cleanText
   exercise:
-    prompt: '5단계. HTML 태그 제거: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"<.*?>"
 
       cleanText = re.sub(pattern, "", htmlText)
       cleanText
-    solution: |-
-      pattern = r"<.*?>"
-
-      cleanText = re.sub(pattern, "", htmlText)
-      cleanText
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 이제 모든 HTML 태그를 빈 문자열로 치환하여 제거합니다.
-  - type: code
-    language: python
-    title: 태그 제거
-    description: 모든 HTML 태그를 제거합니다
-    content: |-
-      pattern = r"<.*?>"
-
-      cleanText = re.sub(pattern, "", htmlText)
-      cleanText
-  - type: text
-    content: 태그는 사라졌지만 여러 줄의 공백이 남아있네요. 추가 정제가 필요합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_clean_whitespace
   title: 6단계. 공백 정리
   structuredPrimary: true
   subtitle: 연속된 공백 제거
-  goal: '6단계. 공백 정리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 공백 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     연속된 공백, 탭, 개행을 하나의 공백으로 통일합니다.
 
     공백 패턴
     **패턴: \\s+** - `\s` : 공백 문자 (스페이스, 탭, 개행 등) - `\s+` : 공백 문자 1개 이상 - `.strip()` : 양 끝 공백 제거 LLM 전처리에서 매우 자주 사용하는 패턴입니다!
   tips:
-  - '공백 패턴 **패턴: \\s+** - `\s` : 공백 문자 (스페이스, 탭, 개행 등) - `\s+` : 공백 문자 1개 이상 - `.strip()` : 양 끝 공백 제거 LLM 전처리에서 매우 자주 사용하는
-    패턴입니다!'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - '공백 패턴 **패턴: \\s+** - `\s` : 공백 문자 (스페이스, 탭, 개행 등) - `\s+` : 공백 문자 1개 이상 - `.strip()` : 양 끝 공백 제거 LLM 전처리에서 매우 자주 사용하는 패턴입니다!'
   snippet: |-
     cleanText = re.sub(r"\s+", " ", cleanText)
     cleanText = cleanText.strip()
     cleanText
   exercise:
-    prompt: '6단계. 공백 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       cleanText = re.sub(r"\s+", " ", cleanText)
       cleanText = cleanText.strip()
       cleanText
-    solution: |-
-      cleanText = re.sub(r"\s+", " ", cleanText)
-      cleanText = cleanText.strip()
-      cleanText
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 연속된 공백, 탭, 개행을 하나의 공백으로 통일합니다.
-  - type: code
-    language: python
-    title: 공백 정리
-    description: 연속된 공백을 하나로 만듭니다
-    content: |-
-      cleanText = re.sub(r"\s+", " ", cleanText)
-      cleanText = cleanText.strip()
-      cleanText
-  - type: note
-    style: tip
-    title: 공백 패턴
-    content: |-
-      **패턴: \\s+**
-      - `\s` : 공백 문자 (스페이스, 탭, 개행 등)
-      - `\s+` : 공백 문자 1개 이상
-      - `.strip()` : 양 끝 공백 제거
-
-      LLM 전처리에서 매우 자주 사용하는 패턴입니다!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_dotall_flag
   title: 7단계. re.DOTALL 플래그
   structuredPrimary: true
   subtitle: . 이 개행 포함하기
-  goal: '7단계. re.DOTALL 플래그: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. re.DOTALL 플래그: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     기본적으로 . 은 개행(\n)을 매칭하지 않습니다. 여러 줄에 걸친 태그를 처리하려면 플래그가 필요합니다.
 
     re.DOTALL (re.S)
     **re.DOTALL** 또는 **re.S** 플래그: - `.` 이 개행 문자도 매칭하게 만듭니다 - 여러 줄에 걸친 패턴을 찾을 때 필수 - `flags=re.DOTALL` 또는 `flags=re.S` 로 사용
   tips:
-  - 're.DOTALL (re.S) **re.DOTALL** 또는 **re.S** 플래그: - `.` 이 개행 문자도 매칭하게 만듭니다 - 여러 줄에 걸친 패턴을 찾을 때 필수 - `flags=re.DOTALL` 또는
-    `flags=re.S` 로 사용'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 're.DOTALL (re.S) **re.DOTALL** 또는 **re.S** 플래그: - `.` 이 개행 문자도 매칭하게 만듭니다 - 여러 줄에 걸친 패턴을 찾을 때 필수 - `flags=re.DOTALL` 또는 `flags=re.S` 로 사용'
   snippet: |-
     multilineHtml = """
     <div
@@ -511,7 +263,7 @@ sections:
     </div>
     """
   exercise:
-    prompt: '7단계. re.DOTALL 플래그: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       multilineHtml = """
       <div
@@ -520,125 +272,43 @@ sections:
       내용
       </div>
       """
-    solution: |-
-      multilineHtml = """
-      <div
-          class="container"
-          id="main">
-      내용
-      </div>
-      """
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 기본적으로 . 은 개행(\n)을 매칭하지 않습니다. 여러 줄에 걸친 태그를 처리하려면 플래그가 필요합니다.
-  - type: code
-    language: python
-    title: 여러 줄 태그 테스트
-    description: 개행이 포함된 태그
-    content: |-
-      multilineHtml = """
-      <div
-          class="container"
-          id="main">
-      내용
-      </div>
-      """
-  - type: code
-    language: python
-    title: re.DOTALL 플래그 사용
-    description: . 이 개행도 매칭하도록 설정
-    content: |-
-      pattern = r"<.*?>"
-
-      withoutFlag = re.sub(pattern, "", multilineHtml)
-      withFlag = re.sub(pattern, "", multilineHtml, flags=re.DOTALL)
-
-      f"플래그 없음:\n{withoutFlag}\n\n플래그 있음:\n{withFlag}"
-  - type: note
-    style: tip
-    title: re.DOTALL (re.S)
-    content: |-
-      **re.DOTALL** 또는 **re.S** 플래그:
-      - `.` 이 개행 문자도 매칭하게 만듭니다
-      - 여러 줄에 걸친 패턴을 찾을 때 필수
-      - `flags=re.DOTALL` 또는 `flags=re.S` 로 사용
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_complete_function
   title: 8단계. 완성된 HTML 정제 함수
   structuredPrimary: true
   subtitle: 재사용 가능한 함수
-  goal: '8단계. 완성된 HTML 정제 함수: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 완성된 HTML 정제 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 배운 내용을 모두 합쳐 완성된 함수를 만듭니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def stripHtml(html):
         noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
         cleaned = re.sub(r"\s+", " ", noTags)
         return cleaned.strip()
   exercise:
-    prompt: '8단계. 완성된 HTML 정제 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def stripHtml(html):
           noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
           cleaned = re.sub(r"\s+", " ", noTags)
           return cleaned.strip()
-    solution: |-
-      def stripHtml(html):
-          noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
-          cleaned = re.sub(r"\s+", " ", noTags)
-          return cleaned.strip()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 배운 내용을 모두 합쳐 완성된 함수를 만듭니다.
-  - type: code
-    language: python
-    title: HTML 정제 함수
-    description: HTML에서 순수 텍스트만 추출하는 함수
-    content: |-
-      def stripHtml(html):
-          noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
-          cleaned = re.sub(r"\s+", " ", noTags)
-          return cleaned.strip()
-  - type: code
-    language: python
-    title: 실제 데이터 적용
-    description: 여러 게시글에 적용
-    content: |-
-      samplePosts = [
-          f"<h1>{post['title']}</h1><p>{post['body']}</p>"
-          for post in postsData[:3]
-      ]
-
-      cleanedPosts = [stripHtml(post) for post in samplePosts]
-      cleanedPosts[0]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_token_comparison
   title: 9단계. LLM 토큰 절약 효과
   structuredPrimary: true
   subtitle: 전처리 전후 비교
-  goal: '9단계. LLM 토큰 절약 효과: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. LLM 토큰 절약 효과: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     HTML 태그 제거가 LLM 토큰에 얼마나 영향을 주는지 확인해봅시다.
 
@@ -646,7 +316,6 @@ sections:
     HTML 태그 제거로 평균 30~50% 토큰 절약! - 원본 1000자 → 정제 후 500자 - 토큰 수: ~250 → ~125 - API 비용: 50% 절감 웹 크롤링 후 필수 전처리 단계입니다.
   tips:
   - '실제 토큰 절약 HTML 태그 제거로 평균 30~50% 토큰 절약! - 원본 1000자 → 정제 후 500자 - 토큰 수: ~250 → ~125 - API 비용: 50% 절감 웹 크롤링 후 필수 전처리 단계입니다.'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     original = htmlText
     cleaned = stripHtml(htmlText)
@@ -657,7 +326,7 @@ sections:
 
     f"원본: {originalLen}자\n정제: {cleanedLen}자\n절약: {saved:.1f}%"
   exercise:
-    prompt: '9단계. LLM 토큰 절약 효과: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       original = htmlText
       cleaned = stripHtml(htmlText)
@@ -667,65 +336,23 @@ sections:
       saved = ((originalLen - cleanedLen) / originalLen) * 100
 
       f"원본: {originalLen}자\n정제: {cleanedLen}자\n절약: {saved:.1f}%"
-    solution: |-
-      original = htmlText
-      cleaned = stripHtml(htmlText)
-
-      originalLen = len(original)
-      cleanedLen = len(cleaned)
-      saved = ((originalLen - cleanedLen) / originalLen) * 100
-
-      f"원본: {originalLen}자\n정제: {cleanedLen}자\n절약: {saved:.1f}%"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: HTML 태그 제거가 LLM 토큰에 얼마나 영향을 주는지 확인해봅시다.
-  - type: code
-    language: python
-    title: 길이 비교
-    description: 문자 수로 토큰 절약 추정
-    content: |-
-      original = htmlText
-      cleaned = stripHtml(htmlText)
-
-      originalLen = len(original)
-      cleanedLen = len(cleaned)
-      saved = ((originalLen - cleanedLen) / originalLen) * 100
-
-      f"원본: {originalLen}자\n정제: {cleanedLen}자\n절약: {saved:.1f}%"
-  - type: note
-    style: tip
-    title: 실제 토큰 절약
-    content: |-
-      HTML 태그 제거로 평균 30~50% 토큰 절약!
-
-      - 원본 1000자 → 정제 후 500자
-      - 토큰 수: ~250 → ~125
-      - API 비용: 50% 절감
-
-      웹 크롤링 후 필수 전처리 단계입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: HTML 정제 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     웹 개발자가 되어 다양한 HTML 문서를 정제합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import re
 
@@ -750,7 +377,7 @@ sections:
 
     strip(raw)
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -774,116 +401,11 @@ sections:
           return out.strip()
 
       strip(raw)
-    solution: |-
-      import re
-
-      raw = """
-      <html>
-      <head>
-          <style>.red { color: red; }</style>
-          <script>console.log('test');</script>
-      </head>
-      <body>
-          <p>실제 내용입니다</p>
-      </body>
-      </html>
-      """
-
-      def strip(html):
-          out = re.sub(r"<script.*?</script>", "", html, flags=re.DOTALL)
-          out = re.sub(r"<style.*?</style>", "", out, flags=re.DOTALL)
-          out = re.sub(r"<.*?>", "", out, flags=re.DOTALL)
-          out = re.sub(r"\s+", " ", out)
-          return out.strip()
-
-      strip(raw)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 웹 개발자가 되어 다양한 HTML 문서를 정제합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: style과 script 태그 제거'
-    blocks:
-    - type: code
-      title: 고급 HTML 정제 함수
-      content: |-
-        import re
-
-        raw = """
-        <html>
-        <head>
-            <style>.red { color: red; }</style>
-            <script>console.log('test');</script>
-        </head>
-        <body>
-            <p>실제 내용입니다</p>
-        </body>
-        </html>
-        """
-
-        def strip(html):
-            out = re.sub(r"<script.*?</script>", "", html, flags=re.DOTALL)
-            out = re.sub(r"<style.*?</style>", "", out, flags=re.DOTALL)
-            out = re.sub(r"<.*?>", "", out, flags=re.DOTALL)
-            out = re.sub(r"\s+", " ", out)
-            return out.strip()
-
-        strip(raw)
-  - type: expansion
-    title: '미션2: 로컬 게시글 텍스트 추출'
-    blocks:
-    - type: code
-      title: 데이터 로드 및 HTML 생성
-      content: |-
-        import re
-
-        posts = [
-            {
-                "userId": 1,
-                "id": 1,
-                "title": "HTML cleaning checklist",
-                "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
-            },
-            {
-                "userId": 2,
-                "id": 2,
-                "title": "Script tags are not content",
-                "body": "Tracking scripts and inline styles should not reach the analysis step.",
-            },
-            {
-                "userId": 3,
-                "id": 3,
-                "title": "LLM input preparation",
-                "body": "Clean text reduces token waste and keeps prompts focused.",
-            },
-        ]
-
-        content = [
-            f"<h1>{p['title']}</h1><p>{p['body']}</p>"
-            for p in posts
-        ]
-        content[0]
-    - type: code
-      title: 태그 제거 및 결과
-      content: |-
-        def clean(html):
-            out = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
-            out = re.sub(r"\s+", " ", out)
-            return out.strip()
-
-        result = [clean(c) for c in content]
-        result
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   subtitle: 네 번째 프로젝트 완료!
@@ -902,13 +424,11 @@ sections:
   title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
   structuredPrimary: true
   subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-    안전하게 처리합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import re
 
@@ -928,7 +448,7 @@ sections:
     assert phones == ['010-1234-5678', '02-987-6543']
     emails, phones
   exercise:
-    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -947,114 +467,8 @@ sections:
       assert emails == ['kim@example.com', 'lee@company.co.kr']
       assert phones == ['010-1234-5678', '02-987-6543']
       emails, phones
-    solution: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-      안전하게 처리합니다.
-  - type: code
-    language: python
-    title: 이메일과 전화번호 추출
-    description: 실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다.
-    content: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
-  - type: code
-    language: python
-    title: 패턴 오류와 빈 입력을 먼저 실패시킨다
-    description: 컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다.
-    content: |-
-      try:
-          re.compile(r'([A-Z]+')
-      except re.error as exc:
-          regexCompileError = str(exc)
-
-      def extractRequiredEmails(text):
-          found = emailPattern.findall(text)
-          if not found:
-              raise ValueError('email not found')
-          return found
-
-      try:
-          extractRequiredEmails('no contact here')
-      except ValueError as exc:
-          emailExtractError = str(exc)
-
-      assert regexCompileError
-      assert emailExtractError == 'email not found'
-      regexCompileError, emailExtractError
-  - type: code
-    language: python
-    title: 정제 결과를 업무 구조로 검증
-    description: 추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다.
-    content: |-
-      def maskEmail(email):
-          name, domain = email.split('@')
-          return name[0] + '***@' + domain
-
-      contactReport = [
-          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
-          for email in emails
-      ]
-      domainCounts = {row['domain']: 0 for row in contactReport}
-      for row in contactReport:
-          domainCounts[row['domain']] += 1
-
-      assert contactReport[0]['masked'] == 'k***@example.com'
-      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
-      contactReport
-  - type: code
-    language: python
-    title: '실무 변주: 허용 도메인 정책 바꾸기'
-    description: 회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다.
-    content: |-
-      def filterAllowedDomains(report, allowedDomains):
-          if not allowedDomains:
-              raise ValueError('allowedDomains must not be empty')
-          return [row for row in report if row['domain'] in allowedDomains]
-
-      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
-      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
-      companyOnly
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

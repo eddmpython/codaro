@@ -34,62 +34,39 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, Codaro 로컬 데이터셋에서 직접 불러와 인터넷 연결 없이 실행할 수 있습니다.
 
     import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
   tips:
   - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import matplotlib.pyplot as plt
     import pandas as pd
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import pandas as pd
-    solution: |-
-      import matplotlib.pyplot as plt
-      import pandas as pd
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, Codaro 로컬 데이터셋에서 직접 불러와 인터넷 연결 없이 실행할 수 있습니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: matplotlib, pandas를 불러옵니다
-    content: |-
-      import matplotlib.pyplot as plt
-      import pandas as pd
-  - type: tip
-    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학
-      커뮤니티의 표준입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
-  goal: '1-1단계. 한글 폰트 설정: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1-1단계. 한글 폰트 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
     font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
   tips:
   - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from matplotlib import font_manager
 
@@ -101,7 +78,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: '1-1단계. 한글 폰트 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -112,197 +89,95 @@ sections:
               plt.rcParams["font.family"] = fontName
               break
       plt.rcParams["axes.unicode_minus"] = False
-    solution: |-
-      from matplotlib import font_manager
-
-      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
-      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
-      for fontName in fontCandidates:
-          if fontName in availableFonts:
-              plt.rcParams["font.family"] = fontName
-              break
-      plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는
-      무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
-  - type: code
-    language: python
-    title: 한글 폰트 설정
-    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
-    content: |-
-      from matplotlib import font_manager
-
-      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
-      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
-      for fontName in fontCandidates:
-          if fontName in availableFonts:
-              plt.rcParams["font.family"] = fontName
-              break
-      plt.rcParams["axes.unicode_minus"] = False
-  - type: tip
-    content: font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을
-      방지합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: Codaro 로컬 데이터셋에서 로드
-  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에 적합합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 
     gapminder = loadLocalDataset("gapminder")
     gapminder.head()
   exercise:
-    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       gapminder = loadLocalDataset("gapminder")
       gapminder.head()
-    solution: |-
-      from codaro.curriculum.localData import loadLocalDataset
-
-      gapminder = loadLocalDataset("gapminder")
-      gapminder.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에 적합합니다.
-  - type: code
-    language: python
-    title: gapminder 데이터 로드
-    description: Codaro 로컬 데이터셋에서 CSV 파일을 불러옵니다
-    content: |-
-      from codaro.curriculum.localData import loadLocalDataset
-
-      gapminder = loadLocalDataset("gapminder")
-      gapminder.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_filter
   title: 3단계. 2007년 데이터 필터링
   structuredPrimary: true
   subtitle: 최근 연도 선택
-  goal: '3단계. 2007년 데이터 필터링: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 2007년 데이터 필터링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 대륙별 비교를 위해 가장 최근 연도인 2007년 데이터만 추출합니다. 불리언 인덱싱으로 year 컬럼이 2007인 행만 선택합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     data2007 = gapminder[gapminder['year'] == 2007]
     data2007.shape
   exercise:
-    prompt: '3단계. 2007년 데이터 필터링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       data2007 = gapminder[gapminder['year'] == 2007]
       data2007.shape
-    solution: |-
-      data2007 = gapminder[gapminder['year'] == 2007]
-      data2007.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 대륙별 비교를 위해 가장 최근 연도인 2007년 데이터만 추출합니다. 불리언 인덱싱으로 year 컬럼이 2007인 행만 선택합니다.
-  - type: code
-    language: python
-    title: 2007년 필터링
-    description: 2007년 데이터만 추출합니다
-    content: |-
-      data2007 = gapminder[gapminder['year'] == 2007]
-      data2007.shape
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_groupby
   title: 4단계. 대륙별 인구 집계
   structuredPrimary: true
   subtitle: groupby().sum()
-  goal: '4단계. 대륙별 인구 집계: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 대륙별 인구 집계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame 형태로 변환합니다. 억 단위로
-    표시하기 위해 10억으로 나눕니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame 형태로 변환합니다. 억 단위로 표시하기 위해 10억으로 나눕니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
     popByContinent['popBillion'] = popByContinent['pop'] / 1e9
     popByContinent
   exercise:
-    prompt: '4단계. 대륙별 인구 집계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
       popByContinent['popBillion'] = popByContinent['pop'] / 1e9
       popByContinent
-    solution: |-
-      popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
-      popByContinent['popBillion'] = popByContinent['pop'] / 1e9
-      popByContinent
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame 형태로 변환합니다. 억 단위로 표시하기
-      위해 10억으로 나눕니다.
-  - type: code
-    language: python
-    title: 대륙별 인구 합계
-    description: 대륙별로 인구를 집계합니다
-    content: |-
-      popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
-      popByContinent['popBillion'] = popByContinent['pop'] / 1e9
-      popByContinent
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_bar
   title: 5단계. 기본 막대 그래프
   structuredPrimary: true
   subtitle: ax.bar()
-  goal: '5단계. 기본 막대 그래프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 기본 막대 그래프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     ax.bar()로 수직 막대 그래프를 그립니다. 첫 번째 인자는 x축 위치(카테고리), 두 번째 인자는 막대 높이(수치)입니다. 대륙별 인구를 한눈에 비교할 수 있습니다.
 
     ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
   tips:
   - ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     figBar, axBar = plt.subplots(figsize=(10, 6))
     axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
@@ -311,7 +186,7 @@ sections:
     axBar.set_ylabel('인구 (10억 명)', fontsize=12)
     figBar
   exercise:
-    prompt: '5단계. 기본 막대 그래프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figBar, axBar = plt.subplots(figsize=(10, 6))
       axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
@@ -319,50 +194,20 @@ sections:
       axBar.set_xlabel('대륙', fontsize=12)
       axBar.set_ylabel('인구 (10억 명)', fontsize=12)
       figBar
-    solution: |-
-      figBar, axBar = plt.subplots(figsize=(10, 6))
-      axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
-      axBar.set_title('2007년 대륙별 인구', fontsize=14)
-      axBar.set_xlabel('대륙', fontsize=12)
-      axBar.set_ylabel('인구 (10억 명)', fontsize=12)
-      figBar
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: ax.bar()로 수직 막대 그래프를 그립니다. 첫 번째 인자는 x축 위치(카테고리), 두 번째 인자는 막대 높이(수치)입니다. 대륙별 인구를 한눈에 비교할 수 있습니다.
-  - type: code
-    language: python
-    title: 기본 막대 그래프
-    description: 대륙별 인구를 막대 그래프로 표시합니다
-    content: |-
-      figBar, axBar = plt.subplots(figsize=(10, 6))
-      axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
-      axBar.set_title('2007년 대륙별 인구', fontsize=14)
-      axBar.set_xlabel('대륙', fontsize=12)
-      axBar.set_ylabel('인구 (10억 명)', fontsize=12)
-      figBar
-  - type: tip
-    content: ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값
-      0.8).
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_color
   title: 6단계. 색상 설정
   structuredPrimary: true
   subtitle: color 파라미터
-  goal: '6단계. 색상 설정: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 색상 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 각 막대에 다른 색상을 지정하면 시각적 구분이 명확해집니다. color 파라미터에 색상 리스트를 전달하면 각 막대에 순서대로 색상이 적용됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     figColor, axColor = plt.subplots(figsize=(10, 6))
     colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -372,7 +217,7 @@ sections:
     axColor.set_ylabel('인구 (10억 명)', fontsize=12)
     figColor
   exercise:
-    prompt: '6단계. 색상 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figColor, axColor = plt.subplots(figsize=(10, 6))
       colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -381,53 +226,23 @@ sections:
       axColor.set_xlabel('대륙', fontsize=12)
       axColor.set_ylabel('인구 (10억 명)', fontsize=12)
       figColor
-    solution: |-
-      figColor, axColor = plt.subplots(figsize=(10, 6))
-      colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      axColor.bar(popByContinent['continent'], popByContinent['popBillion'], color=colorsBasic)
-      axColor.set_title('2007년 대륙별 인구', fontsize=14)
-      axColor.set_xlabel('대륙', fontsize=12)
-      axColor.set_ylabel('인구 (10억 명)', fontsize=12)
-      figColor
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 각 막대에 다른 색상을 지정하면 시각적 구분이 명확해집니다. color 파라미터에 색상 리스트를 전달하면 각 막대에 순서대로 색상이 적용됩니다.
-  - type: code
-    language: python
-    title: 색상 설정
-    description: 각 대륙에 다른 색상을 적용합니다
-    content: |-
-      figColor, axColor = plt.subplots(figsize=(10, 6))
-      colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      axColor.bar(popByContinent['continent'], popByContinent['popBillion'], color=colorsBasic)
-      axColor.set_title('2007년 대륙별 인구', fontsize=14)
-      axColor.set_xlabel('대륙', fontsize=12)
-      axColor.set_ylabel('인구 (10억 명)', fontsize=12)
-      figColor
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_xticks
   title: 7단계. x축 눈금 조정
   structuredPrimary: true
   subtitle: set_xticks(), rotation
-  goal: '7단계. x축 눈금 조정: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. x축 눈금 조정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     x축 라벨이 길거나 많을 때는 회전시키면 겹침을 방지할 수 있습니다. tick_params의 rotation으로 라벨 각도를 조정합니다. 한글 라벨로 변경하여 가독성을 높입니다.
 
     ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
   tips:
-  - ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할
-    수도 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
   snippet: |-
     figTicks, axTicks = plt.subplots(figsize=(10, 6))
     colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -440,7 +255,7 @@ sections:
     axTicks.tick_params(axis='x', rotation=0)
     figTicks
   exercise:
-    prompt: '7단계. x축 눈금 조정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figTicks, axTicks = plt.subplots(figsize=(10, 6))
       colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -452,62 +267,23 @@ sections:
       axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
       axTicks.tick_params(axis='x', rotation=0)
       figTicks
-    solution: |-
-      figTicks, axTicks = plt.subplots(figsize=(10, 6))
-      colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      continentKrTicks = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
-
-      barsTicks = axTicks.bar(continentKrTicks, popByContinent['popBillion'], color=colorsTicks)
-      axTicks.set_title('2007년 대륙별 인구', fontsize=14)
-      axTicks.set_xlabel('대륙', fontsize=12)
-      axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
-      axTicks.tick_params(axis='x', rotation=0)
-      figTicks
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: x축 라벨이 길거나 많을 때는 회전시키면 겹침을 방지할 수 있습니다. tick_params의 rotation으로 라벨 각도를 조정합니다. 한글 라벨로 변경하여 가독성을 높입니다.
-  - type: code
-    language: python
-    title: x축 라벨 조정
-    description: x축 라벨을 회전하고 한글로 변경합니다
-    content: |-
-      figTicks, axTicks = plt.subplots(figsize=(10, 6))
-      colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      continentKrTicks = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
-
-      barsTicks = axTicks.bar(continentKrTicks, popByContinent['popBillion'], color=colorsTicks)
-      axTicks.set_title('2007년 대륙별 인구', fontsize=14)
-      axTicks.set_xlabel('대륙', fontsize=12)
-      axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
-      axTicks.tick_params(axis='x', rotation=0)
-      figTicks
-  - type: tip
-    content: ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를
-      직접 지정할 수도 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_annotate
   title: 8단계. 막대 위에 값 표시
   structuredPrimary: true
   subtitle: ax.annotate()
-  goal: '8단계. 막대 위에 값 표시: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 막대 위에 값 표시: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     각 막대 위에 정확한 수치를 표시하면 정보 전달력이 높아집니다. annotate()로 지정한 위치에 텍스트를 추가합니다. 막대의 x좌표와 높이를 이용해 위치를 계산합니다.
 
     ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
   tips:
-  - ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와
-    bar.get_height()로 막대의 좌표와 높이를 얻습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
   snippet: |-
     figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
     colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -517,7 +293,7 @@ sections:
     barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
     figAnnotate
   exercise:
-    prompt: '8단계. 막대 위에 값 표시: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
       colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -526,70 +302,23 @@ sections:
 
       barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
       figAnnotate
-    solution: |-
-      figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
-      colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      continentKrAnnotate = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
-      valuesAnnotate = popByContinent['popBillion'].values
-
-      barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
-      figAnnotate
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 각 막대 위에 정확한 수치를 표시하면 정보 전달력이 높아집니다. annotate()로 지정한 위치에 텍스트를 추가합니다. 막대의 x좌표와 높이를 이용해 위치를 계산합니다.
-  - type: code
-    language: python
-    title: Figure 및 막대 그리기
-    description: 막대 그래프를 생성합니다
-    content: |-
-      figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
-      colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
-      continentKrAnnotate = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
-      valuesAnnotate = popByContinent['popBillion'].values
-
-      barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
-      figAnnotate
-  - type: code
-    language: python
-    title: 값 레이블 추가
-    description: 각 막대 위에 인구 수치를 표시합니다
-    content: |-
-      for bar, val in zip(barsAnnotate, valuesAnnotate):
-          axAnnotate.annotate(f'{val:.2f}',
-                             xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
-                             ha='center', va='bottom',
-                             fontsize=11, fontweight='bold')
-
-      axAnnotate.set_title('2007년 대륙별 인구', fontsize=14)
-      axAnnotate.set_xlabel('대륙', fontsize=12)
-      axAnnotate.set_ylabel('인구 (10억 명)', fontsize=12)
-      figAnnotate
-  - type: tip
-    content: ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다.
-      bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_barh
   title: 9단계. 수평 막대 그래프
   structuredPrimary: true
   subtitle: ax.barh()
-  goal: '9단계. 수평 막대 그래프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 수평 막대 그래프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     카테고리명이 길거나 비교 항목이 많을 때는 수평 막대 그래프가 더 읽기 쉽습니다. barh()를 사용하면 막대가 수평으로 그려집니다. 인구가 많은 순서로 정렬하면 순위를 쉽게 파악할 수 있습니다.
 
     ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
   tips:
   - ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     figBarh, axBarh = plt.subplots(figsize=(10, 6))
 
@@ -600,7 +329,7 @@ sections:
     barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
     figBarh
   exercise:
-    prompt: '9단계. 수평 막대 그래프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figBarh, axBarh = plt.subplots(figsize=(10, 6))
 
@@ -610,68 +339,20 @@ sections:
 
       barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
       figBarh
-    solution: |-
-      figBarh, axBarh = plt.subplots(figsize=(10, 6))
-
-      popSortedBarh = popByContinent.sort_values('popBillion', ascending=True)
-      continentKrSorted = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
-      colorsSorted = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
-
-      barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
-      figBarh
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 카테고리명이 길거나 비교 항목이 많을 때는 수평 막대 그래프가 더 읽기 쉽습니다. barh()를 사용하면 막대가 수평으로 그려집니다. 인구가 많은 순서로 정렬하면 순위를 쉽게 파악할 수 있습니다.
-  - type: code
-    language: python
-    title: 데이터 정렬 및 막대 그리기
-    description: 인구 순으로 정렬하고 수평 막대를 그립니다
-    content: |-
-      figBarh, axBarh = plt.subplots(figsize=(10, 6))
-
-      popSortedBarh = popByContinent.sort_values('popBillion', ascending=True)
-      continentKrSorted = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
-      colorsSorted = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
-
-      barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
-      figBarh
-  - type: code
-    language: python
-    title: 레이블 및 스타일링
-    description: 막대 옆에 값을 표시하고 스타일을 적용합니다
-    content: |-
-      for bar, val in zip(barsBarh, popSortedBarh['popBillion']):
-          axBarh.annotate(f'{val:.2f}',
-                         xy=(val, bar.get_y() + bar.get_height()/2),
-                         ha='left', va='center',
-                         fontsize=10, fontweight='bold')
-
-      axBarh.set_title('2007년 대륙별 인구 (인구 순)', fontsize=14)
-      axBarh.set_xlabel('인구 (10억 명)', fontsize=12)
-      axBarh.set_ylabel('대륙', fontsize=12)
-      figBarh
-  - type: tip
-    content: ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 막대 그래프
-  goal: '10단계. 최종 시각화: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 최종 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 대륙별 인구 비교 차트를 만듭니다. 그리드, 스파인 제거, 값 레이블을 모두 적용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     figFinal, axFinal = plt.subplots(figsize=(11, 7))
 
@@ -682,7 +363,7 @@ sections:
     barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
     figFinal
   exercise:
-    prompt: '10단계. 최종 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(11, 7))
 
@@ -692,78 +373,23 @@ sections:
 
       barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
       figFinal
-    solution: |-
-      figFinal, axFinal = plt.subplots(figsize=(11, 7))
-
-      popSortedFinal = popByContinent.sort_values('popBillion', ascending=True)
-      continentKrFinal = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
-      colorsFinal = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
-
-      barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
-      figFinal
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 대륙별 인구 비교 차트를 만듭니다. 그리드, 스파인 제거, 값 레이블을 모두 적용합니다.
-  - type: code
-    language: python
-    title: 데이터 준비 및 막대 그리기
-    description: 정렬된 데이터로 수평 막대를 그립니다
-    content: |-
-      figFinal, axFinal = plt.subplots(figsize=(11, 7))
-
-      popSortedFinal = popByContinent.sort_values('popBillion', ascending=True)
-      continentKrFinal = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
-      colorsFinal = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
-
-      barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
-      figFinal
-  - type: code
-    language: python
-    title: 레이블 추가
-    description: 막대 옆에 값을 표시합니다
-    content: |-
-      for bar, val in zip(barsFinal, popSortedFinal['popBillion']):
-          axFinal.annotate(f'{val:.2f}B',
-                          xy=(val + 0.1, bar.get_y() + bar.get_height()/2),
-                          ha='left', va='center',
-                          fontsize=11, fontweight='bold')
-      figFinal
-  - type: code
-    language: python
-    title: 스타일링 적용
-    description: 제목, 그리드, 스파인을 설정합니다
-    content: |-
-      axFinal.set_title('2007년 대륙별 총 인구 비교', fontsize=16, fontweight='bold')
-      axFinal.set_xlabel('인구 (10억 명)', fontsize=12)
-      axFinal.set_xlim(0, 5)
-      axFinal.grid(True, axis='x', alpha=0.3)
-      axFinal.spines['top'].set_visible(False)
-      axFinal.spines['right'].set_visible(False)
-      plt.tight_layout()
-      figFinal
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 대륙별 데이터 분석 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     지금까지 배운 내용을 활용해서 gapminder 데이터를 다양한 관점에서 분석해봅시다. bar, barh, xticks, annotate 등 모든 개념을 종합적으로 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import matplotlib.pyplot as plt
     import pandas as pd
@@ -775,7 +401,7 @@ sections:
     lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
     lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import pandas as pd
@@ -786,106 +412,11 @@ sections:
       year2007 = data[data['year'] == 2007]
       lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
       lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
-    solution: |-
-      import matplotlib.pyplot as plt
-      import pandas as pd
-      from codaro.curriculum.localData import loadLocalDataset
-
-      data = loadLocalDataset("gapminder")
-
-      year2007 = data[data['year'] == 2007]
-      lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
-      lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 내용을 활용해서 gapminder 데이터를 다양한 관점에서 분석해봅시다. bar, barh, xticks, annotate 등 모든 개념을 종합적으로 활용합니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 대륙별 평균 기대수명 비교'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        from codaro.curriculum.localData import loadLocalDataset
-
-        data = loadLocalDataset("gapminder")
-
-        year2007 = data[data['year'] == 2007]
-        lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
-        lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
-    - type: code
-      title: 차트 생성
-      content: |-
-        chart, plot = plt.subplots(figsize=(10, 6))
-        palette = ['#E74C3C', '#F39C12', '#3498DB', '#9B59B6', '#27AE60']
-        continents = lifeSorted['continent'].values
-
-        rects = plot.barh(continents, lifeSorted['lifeExp'], color=palette)
-
-        for rect, val in zip(rects, lifeSorted['lifeExp']):
-            plot.annotate(f'{val:.1f}세',
-                          xy=(val + 0.5, rect.get_y() + rect.get_height()/2),
-                          ha='left', va='center', fontsize=10, fontweight='bold')
-
-        plot.set_title('2007년 대륙별 평균 기대수명', fontsize=14, fontweight='bold')
-        plot.set_xlabel('기대수명 (세)', fontsize=12)
-        plot.set_xlim(0, 85)
-        plot.grid(True, axis='x', alpha=0.3)
-        plot.spines['top'].set_visible(False)
-        plot.spines['right'].set_visible(False)
-
-        plt.tight_layout()
-        chart
-  - type: expansion
-    title: '미션2: 연도별 아시아 인구 변화'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        from codaro.curriculum.localData import loadLocalDataset
-
-        df = loadLocalDataset("gapminder")
-
-        asia = df[df['continent'] == 'Asia']
-        popByYear = asia.groupby('year')['pop'].sum().reset_index()
-        popByYear['billion'] = popByYear['pop'] / 1e9
-    - type: code
-      title: 차트 생성
-      content: |-
-        canvas, panel = plt.subplots(figsize=(12, 6))
-        columns = panel.bar(popByYear['year'].astype(str),
-                            popByYear['billion'],
-                            color='#E74C3C', edgecolor='white')
-
-        for idx, (col, val) in enumerate(zip(columns, popByYear['billion'])):
-            if idx % 2 == 0:
-                panel.annotate(f'{val:.1f}',
-                               xy=(col.get_x() + col.get_width()/2, col.get_height()),
-                               ha='center', va='bottom', fontsize=9)
-
-        panel.set_title('아시아 대륙 연도별 총 인구 변화', fontsize=14, fontweight='bold')
-        panel.set_xlabel('연도', fontsize=12)
-        panel.set_ylabel('인구 (10억 명)', fontsize=12)
-        panel.tick_params(axis='x', rotation=45)
-        panel.grid(True, axis='y', alpha=0.3)
-
-        plt.tight_layout()
-        canvas
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   blocks:
@@ -906,13 +437,11 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서
-    기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -936,7 +465,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -967,99 +496,7 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을
-      만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
-  - type: code
-    language: python
-    title: 보고서 데이터 검증
-    description: 필수 컬럼과 금액 범위를 확인합니다.
-    content: |-
-      import pandas as pd
-      import matplotlib.pyplot as plt
-
-      reportData = pd.DataFrame({
-          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          "revenue": [82, 91, 105, 112, 121, 130],
-          "cost": [55, 58, 62, 64, 68, 72],
-          "target": [100, 100, 100, 100, 100, 100],
-      })
-
-      def validateChartFrame(frame: pd.DataFrame) -> bool:
-          requiredColumns = {"month", "revenue", "cost", "target"}
-          missingColumns = requiredColumns - set(frame.columns)
-          if missingColumns:
-              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
-          if frame[["revenue", "cost", "target"]].lt(0).any().any():
-              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
-          return True
-
-      validateChartFrame(reportData)
-      reportData
-  - type: code
-    language: python
-    title: 실패 입력 확인
-    description: 목표선 컬럼이 빠진 데이터를 검증 함수가 거부하는지 확인합니다.
-    content: |-
-      try:
-          validateChartFrame(reportData.drop(columns=["target"]))
-      except ValueError as exc:
-          chartValidationMessage = str(exc)
-
-      assert "필수 컬럼" in chartValidationMessage
-      chartValidationMessage
-  - type: code
-    language: python
-    title: 예측 후 차트 구성
-    description: 4개월이 목표를 넘을 것이라고 예측하고 선 차트로 확인합니다.
-    content: |-
-      # 예측: 3월부터 6월까지 4개월은 매출이 목표선을 넘습니다.
-      figReport, axReport = plt.subplots(figsize=(8, 4))
-      axReport.plot(reportData["month"], reportData["revenue"], marker="o", label="Revenue")
-      axReport.plot(reportData["month"], reportData["cost"], marker="o", label="Cost")
-      axReport.axhline(100, color="gray", linestyle="--", label="Target")
-      axReport.set_title("Monthly Revenue vs Cost")
-      axReport.set_xlabel("Month")
-      axReport.set_ylabel("Amount")
-      axReport.legend()
-
-      monthsAboveTarget = int((reportData["revenue"] >= reportData["target"]).sum())
-      figReport
-  - type: code
-    language: python
-    title: 차트 품질 검증
-    description: 보고서에 필요한 구성 요소와 수치 메시지를 assert로 확인합니다.
-    content: |-
-      chartChecks = {
-          "has_three_lines": len(axReport.lines) == 3,
-          "has_title": axReport.get_title() == "Monthly Revenue vs Cost",
-          "has_axis_labels": axReport.get_xlabel() == "Month" and axReport.get_ylabel() == "Amount",
-          "target_reached_for_four_months": monthsAboveTarget == 4,
-          "legend_is_present": axReport.get_legend() is not None,
-      }
-
-      assert all(chartChecks.values()), chartChecks
-      chartChecks
-  - type: expansion
-    title: '실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?'
-    blocks:
-    - type: code
-      language: python
-      title: 목표선 민감도 분석
-      content: |-
-        targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
-            monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
-        )
-
-        assert targetScenario["monthsPassed"].is_monotonic_decreasing
-        targetScenario
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

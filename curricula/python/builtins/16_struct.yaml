@@ -29,16 +29,14 @@ sections:
   title: struct 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
-  goal: 'struct 모듈 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'struct 모듈 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     struct는 파이썬 표준 라이브러리입니다. Python 값과 C 구조체 형태의 바이너리 데이터 간 변환을 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 struct 모듈을 사용할 수 있습니다.
   tips:
   - 이 섹션을 먼저 실행하면 아래 모든 예제에서 struct 모듈을 사용할 수 있습니다.
-  - Codaro에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import struct
     import tempfile
@@ -49,7 +47,7 @@ sections:
 
     'struct 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: 'struct 모듈 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import struct
       import tempfile
@@ -59,407 +57,152 @@ sections:
       structScratch.mkdir(parents=True, exist_ok=True)
 
       'struct 모듈이 정상적으로 로드되었습니다'
-    solution: |-
-      import struct
-      import tempfile
-      from pathlib import Path
-
-      structScratch = Path(tempfile.gettempdir()) / 'codaro_struct_scratch'
-      structScratch.mkdir(parents=True, exist_ok=True)
-
-      'struct 모듈이 정상적으로 로드되었습니다'
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct는 파이썬 표준 라이브러리입니다. Python 값과 C 구조체 형태의 바이너리 데이터 간 변환을 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
-  - type: note
-    content: 이 섹션을 먼저 실행하면 아래 모든 예제에서 struct 모듈을 사용할 수 있습니다.
-  - type: code
-    language: python
-    title: struct 모듈 불러오기
-    description: struct 모듈을 불러옵니다.
-    content: |-
-      import struct
-      import tempfile
-      from pathlib import Path
-
-      structScratch = Path(tempfile.gettempdir()) / 'codaro_struct_scratch'
-      structScratch.mkdir(parents=True, exist_ok=True)
-
-      'struct 모듈이 정상적으로 로드되었습니다'
-  - type: tip
-    content: Codaro에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: basic_packing
   title: 바이너리로 변환
   structuredPrimary: true
   subtitle: pack으로 인코딩
-  goal: '바이너리로 변환: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '바이너리로 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     struct.pack()은 Python 값을 바이너리 데이터로 변환합니다. 포맷 문자열로 데이터 타입과 순서를 지정하면 C 구조체처럼 메모리에 바이트로 배치됩니다. 네트워크 프로토콜, 바이너리 파일 포맷, 임베디드 시스템 통신에 필수적입니다.
 
     포맷 문자: i=정수(4바이트), f=float(4바이트), d=double(8바이트), c=문자(1바이트)
   tips:
   - '포맷 문자: i=정수(4바이트), f=float(4바이트), d=double(8바이트), c=문자(1바이트)'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     numberValue = 42
     packedInt = struct.pack('i', numberValue)
     packedInt
   exercise:
-    prompt: '바이너리로 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       numberValue = 42
       packedInt = struct.pack('i', numberValue)
       packedInt
-    solution: |-
-      numberValue = 42
-      packedInt = struct.pack('i', numberValue)
-      packedInt
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct.pack()은 Python 값을 바이너리 데이터로 변환합니다. 포맷 문자열로 데이터 타입과 순서를 지정하면 C 구조체처럼 메모리에 바이트로 배치됩니다. 네트워크 프로토콜, 바이너리 파일
-      포맷, 임베디드 시스템 통신에 필수적입니다.
-  - type: list
-    items:
-    - 'pack(포맷, 값들...): Python → 바이너리'
-    - 포맷 문자열로 타입 지정
-    - 바이트 객체 반환
-    - 고정 크기 바이너리 생성
-  - type: code
-    language: python
-    title: 정수 패킹
-    description: 정수를 4바이트 바이너리로 변환합니다.
-    content: |-
-      numberValue = 42
-      packedInt = struct.pack('i', numberValue)
-      packedInt
-  - type: code
-    language: python
-    title: 여러 값 패킹
-    description: 정수 두 개를 바이너리로 변환합니다.
-    content: |-
-      x, y = 10, 20
-      packedPair = struct.pack('ii', x, y)
-      len(packedPair)
-  - type: code
-    language: python
-    title: 실수 패킹
-    description: 부동소수점 수를 바이너리로 변환합니다.
-    content: |-
-      floatValue = 3.14
-      packedFloat = struct.pack('f', floatValue)
-      len(packedFloat)
-  - type: tip
-    content: '포맷 문자: i=정수(4바이트), f=float(4바이트), d=double(8바이트), c=문자(1바이트)'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: basic_unpacking
   title: 바이너리 읽기
   structuredPrimary: true
   subtitle: unpack으로 디코딩
-  goal: '바이너리 읽기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '바이너리 읽기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     struct.unpack()은 바이너리 데이터를 Python 값으로 변환합니다. pack()과 동일한 포맷 문자열을 사용하여 바이트를 해석하고 튜플로 반환합니다. 바이너리 파일 읽기, 네트워크 패킷 파싱, 프로토콜 디코딩에 활용됩니다.
 
     unpack()은 항상 튜플을 반환하므로 단일 값도 [0]으로 접근해야 합니다.
   tips:
   - unpack()은 항상 튜플을 반환하므로 단일 값도 [0]으로 접근해야 합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     binaryData = struct.pack('i', 100)
     unpackedInt = struct.unpack('i', binaryData)
     unpackedInt[0]
   exercise:
-    prompt: '바이너리 읽기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       binaryData = struct.pack('i', 100)
       unpackedInt = struct.unpack('i', binaryData)
       unpackedInt[0]
-    solution: |-
-      binaryData = struct.pack('i', 100)
-      unpackedInt = struct.unpack('i', binaryData)
-      unpackedInt[0]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct.unpack()은 바이너리 데이터를 Python 값으로 변환합니다. pack()과 동일한 포맷 문자열을 사용하여 바이트를 해석하고 튜플로 반환합니다. 바이너리 파일 읽기, 네트워크 패킷
-      파싱, 프로토콜 디코딩에 활용됩니다.
-  - type: list
-    items:
-    - 'unpack(포맷, 바이트): 바이너리 → Python'
-    - 튜플로 반환
-    - 포맷과 데이터 크기 일치 필수
-    - 순서대로 값 추출
-  - type: code
-    language: python
-    title: 정수 언패킹
-    description: 바이너리 데이터를 정수로 변환합니다.
-    content: |-
-      binaryData = struct.pack('i', 100)
-      unpackedInt = struct.unpack('i', binaryData)
-      unpackedInt[0]
-  - type: code
-    language: python
-    title: 여러 값 언패킹
-    description: 바이너리에서 두 정수를 추출합니다.
-    content: |-
-      packedValues = struct.pack('ii', 5, 15)
-      val1, val2 = struct.unpack('ii', packedValues)
-      val1, val2
-  - type: code
-    language: python
-    title: 실수 언패킹
-    description: 바이너리 데이터를 실수로 변환합니다.
-    content: |-
-      floatBytes = struct.pack('f', 2.718)
-      restoredFloat = struct.unpack('f', floatBytes)[0]
-      restoredFloat
-  - type: tip
-    content: unpack()은 항상 튜플을 반환하므로 단일 값도 [0]으로 접근해야 합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: format_strings
   title: 포맷 문자열
   structuredPrimary: true
   subtitle: 데이터 타입 지정
-  goal: '포맷 문자열: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '포맷 문자열: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     포맷 문자열은 데이터의 타입, 크기, 순서를 지정합니다. c는 1바이트 문자, h는 2바이트 정수, i는 4바이트 정수, f는 4바이트 실수입니다. 반복 횟수를 숫자로 지정할 수 있으며, 다양한 타입을 조합하여 복잡한 구조체를 표현합니다.
 
     포맷과 실제 데이터 개수가 일치하지 않으면 에러가 발생합니다.
   tips:
   - 포맷과 실제 데이터 개수가 일치하지 않으면 에러가 발생합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     mixedData = struct.pack('cif', b'A', 42, 3.14)
     len(mixedData)
   exercise:
-    prompt: '포맷 문자열: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       mixedData = struct.pack('cif', b'A', 42, 3.14)
       len(mixedData)
-    solution: |-
-      mixedData = struct.pack('cif', b'A', 42, 3.14)
-      len(mixedData)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 포맷 문자열은 데이터의 타입, 크기, 순서를 지정합니다. c는 1바이트 문자, h는 2바이트 정수, i는 4바이트 정수, f는 4바이트 실수입니다. 반복 횟수를 숫자로 지정할 수 있으며, 다양한
-      타입을 조합하여 복잡한 구조체를 표현합니다.
-  - type: list
-    items:
-    - 'c: char (1바이트)'
-    - 'b/B: signed/unsigned char (1바이트)'
-    - 'h/H: signed/unsigned short (2바이트)'
-    - 'i/I: signed/unsigned int (4바이트)'
-    - 'f: float (4바이트), d: double (8바이트)'
-  - type: code
-    language: python
-    title: 다양한 타입 조합
-    description: 문자, 정수, 실수를 함께 패킹합니다.
-    content: |-
-      mixedData = struct.pack('cif', b'A', 42, 3.14)
-      len(mixedData)
-  - type: code
-    language: python
-    title: 반복 지정
-    description: 같은 타입을 여러 번 패킹합니다.
-    content: |-
-      threeInts = struct.pack('3i', 10, 20, 30)
-      len(threeInts)
-  - type: code
-    language: python
-    title: 크기 계산
-    description: 포맷의 총 바이트 크기를 계산합니다.
-    content: |-
-      formatSize = struct.calcsize('if')
-      formatSize
-  - type: tip
-    content: 포맷과 실제 데이터 개수가 일치하지 않으면 에러가 발생합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: byte_order
   title: 바이트 순서
   structuredPrimary: true
   subtitle: 엔디안 지정
-  goal: '바이트 순서: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '바이트 순서: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     바이트 순서는 다중 바이트 값을 메모리에 저장하는 방식입니다. 네이티브(@), 리틀엔디안(<), 빅엔디안(>)을 포맷 앞에 지정할 수 있습니다. 네트워크 프로토콜은 보통 빅엔디안을 사용하며, Intel CPU는 리틀엔디안입니다.
 
     네트워크 통신에는 '>' 또는 '!'를 사용하여 플랫폼에 관계없이 일관된 바이트 순서를 유지하세요.
   tips:
   - 네트워크 통신에는 '>' 또는 '!'를 사용하여 플랫폼에 관계없이 일관된 바이트 순서를 유지하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     nativeBytes = struct.pack('@i', 1000)
     nativeBytes
   exercise:
-    prompt: '바이트 순서: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       nativeBytes = struct.pack('@i', 1000)
       nativeBytes
-    solution: |-
-      nativeBytes = struct.pack('@i', 1000)
-      nativeBytes
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 바이트 순서는 다중 바이트 값을 메모리에 저장하는 방식입니다. 네이티브(@), 리틀엔디안(<), 빅엔디안(>)을 포맷 앞에 지정할 수 있습니다. 네트워크 프로토콜은 보통 빅엔디안을 사용하며, Intel
-      CPU는 리틀엔디안입니다.
-  - type: list
-    items:
-    - '@: 네이티브 (시스템 기본)'
-    - '<: 리틀엔디안 (작은 바이트 먼저)'
-    - '>: 빅엔디안 (큰 바이트 먼저)'
-    - '!: 네트워크 (빅엔디안)'
-  - type: code
-    language: python
-    title: 네이티브 바이트 순서
-    description: 시스템 기본 바이트 순서로 패킹합니다.
-    content: |-
-      nativeBytes = struct.pack('@i', 1000)
-      nativeBytes
-  - type: code
-    language: python
-    title: 빅엔디안
-    description: 빅엔디안 순서로 패킹합니다.
-    content: |-
-      bigEndian = struct.pack('>i', 1000)
-      bigEndian
-  - type: code
-    language: python
-    title: 리틀엔디안
-    description: 리틀엔디안 순서로 패킹합니다.
-    content: |-
-      littleEndian = struct.pack('<i', 1000)
-      littleEndian
-  - type: tip
-    content: 네트워크 통신에는 '>' 또는 '!'를 사용하여 플랫폼에 관계없이 일관된 바이트 순서를 유지하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: advanced_formats
   title: 고급 포맷
   structuredPrimary: true
   subtitle: 문자열과 패딩
-  goal: '고급 포맷: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '고급 포맷: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     struct는 고정 길이 문자열과 패딩을 지원합니다. s는 고정 길이 문자열, x는 패딩 바이트를 나타냅니다. 바이너리 파일 헤더나 고정 크기 레코드를 다룰 때 유용하며, 메모리 정렬을 맞추는 데도 사용됩니다.
 
     문자열은 바이트 객체여야 하며, 길이가 부족하면 null 바이트로 채워집니다.
   tips:
   - 문자열은 바이트 객체여야 하며, 길이가 부족하면 null 바이트로 채워집니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     textBytes = struct.pack('10s', b'Hello')
     textBytes
   exercise:
-    prompt: '고급 포맷: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       textBytes = struct.pack('10s', b'Hello')
       textBytes
-    solution: |-
-      textBytes = struct.pack('10s', b'Hello')
-      textBytes
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct는 고정 길이 문자열과 패딩을 지원합니다. s는 고정 길이 문자열, x는 패딩 바이트를 나타냅니다. 바이너리 파일 헤더나 고정 크기 레코드를 다룰 때 유용하며, 메모리 정렬을 맞추는 데도
-      사용됩니다.
-  - type: list
-    items:
-    - 's: 고정 길이 문자열'
-    - 'x: 패딩 바이트 (건너뛰기)'
-    - 숫자로 반복 지정
-    - 바이트 정렬 조정
-  - type: code
-    language: python
-    title: 고정 길이 문자열
-    description: 10바이트 고정 길이 문자열을 패킹합니다.
-    content: |-
-      textBytes = struct.pack('10s', b'Hello')
-      textBytes
-  - type: code
-    language: python
-    title: 패딩 사용
-    description: 정수 사이에 2바이트 패딩을 넣습니다.
-    content: |-
-      paddedData = struct.pack('i2xi', 100, 200)
-      len(paddedData)
-  - type: code
-    language: python
-    title: 문자열 언패킹
-    description: 고정 길이 문자열을 읽어옵니다.
-    content: |-
-      strData = struct.pack('8s', b'test')
-      unpackedStr = struct.unpack('8s', strData)[0]
-      unpackedStr
-  - type: tip
-    content: 문자열은 바이트 객체여야 하며, 길이가 부족하면 null 바이트로 채워집니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: 파일 헤더와 프로토콜
-  goal: '실전 활용: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실전 활용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     실무에서 자주 사용하는 struct 활용 패턴을 살펴봅니다. 바이너리 파일 헤더 읽기/쓰기, 네트워크 프로토콜 구현, 센서 데이터 파싱 등 다양한 시나리오에서 struct를 효과적으로 사용할 수 있습니다.
 
     바이너리 파일을 읽을 때는 정확한 포맷을 알아야 하므로, 파일 형식 문서를 잘 관리하세요.
   tips:
   - 바이너리 파일을 읽을 때는 정확한 포맷을 알아야 하므로, 파일 형식 문서를 잘 관리하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     magicNumber = 0x12345678
     version = 1
@@ -467,82 +210,27 @@ sections:
     headerBytes = struct.pack('>III', magicNumber, version, dataSize)
     len(headerBytes)
   exercise:
-    prompt: '실전 활용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       magicNumber = 0x12345678
       version = 1
       dataSize = 1024
       headerBytes = struct.pack('>III', magicNumber, version, dataSize)
       len(headerBytes)
-    solution: |-
-      magicNumber = 0x12345678
-      version = 1
-      dataSize = 1024
-      headerBytes = struct.pack('>III', magicNumber, version, dataSize)
-      len(headerBytes)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 실무에서 자주 사용하는 struct 활용 패턴을 살펴봅니다. 바이너리 파일 헤더 읽기/쓰기, 네트워크 프로토콜 구현, 센서 데이터 파싱 등 다양한 시나리오에서 struct를 효과적으로 사용할 수
-      있습니다.
-  - type: list
-    items:
-    - 파일 헤더 처리
-    - 네트워크 패킷 생성
-    - 센서 데이터 파싱
-    - 바이너리 레코드 관리
-  - type: code
-    language: python
-    title: 파일 헤더 생성
-    description: 매직 넘버, 버전, 크기로 구성된 헤더를 만듭니다.
-    content: |-
-      magicNumber = 0x12345678
-      version = 1
-      dataSize = 1024
-      headerBytes = struct.pack('>III', magicNumber, version, dataSize)
-      len(headerBytes)
-  - type: code
-    language: python
-    title: 헤더 파싱
-    description: 바이너리 헤더를 읽어 값을 추출합니다.
-    content: |-
-      header = struct.pack('>III', 0xAABBCCDD, 2, 2048)
-      magic, ver, size = struct.unpack('>III', header)
-      magic, ver, size
-  - type: code
-    language: python
-    title: 레코드 저장
-    description: ID, 이름, 점수를 바이너리 레코드로 저장합니다.
-    content: |-
-      recordId = 1
-      recordName = b'Alice'
-      recordScore = 95
-      recordData = struct.pack('i10si', recordId, recordName, recordScore)
-      with open(structScratch / 'record.bin', 'wb') as f:
-          f.write(recordData)
-      'record.bin 저장 완료'
-  - type: tip
-    content: 바이너리 파일을 읽을 때는 정확한 포맷을 알아야 하므로, 파일 형식 문서를 잘 관리하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: '검증 루프: 바이너리 레코드 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: '검증 루프: 바이너리 레코드 품질 게이트: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '검증 루프: 바이너리 레코드 품질 게이트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: struct는 바이트 길이와 엔디안이 하나만 어긋나도 데이터를 잘못 해석합니다. 여기서는 센서 패킷 포맷을 미리 정의하고, 잘린 패킷과 잘못된 매직 넘버를 실패시킨 뒤, 정상 레코드를 파일로
-    저장하고 다시 검증합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: struct는 바이트 길이와 엔디안이 하나만 어긋나도 데이터를 잘못 해석합니다. 여기서는 센서 패킷 포맷을 미리 정의하고, 잘린 패킷과 잘못된 매직 넘버를 실패시킨 뒤, 정상 레코드를 파일로 저장하고 다시 검증합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     structWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_struct_workflow_'))
     packetFormat = '>4sBIfH'
@@ -569,7 +257,7 @@ sections:
     assert decodedSensor['sensorId'] == 7
     decodedSensor
   exercise:
-    prompt: '검증 루프: 바이너리 레코드 품질 게이트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       structWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_struct_workflow_'))
       packetFormat = '>4sBIfH'
@@ -595,281 +283,32 @@ sections:
       decodedSensor = decodeSensorPacket(sensorPacket)
       assert decodedSensor['sensorId'] == 7
       decodedSensor
-    solution: |-
-      structWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_struct_workflow_'))
-      packetFormat = '>4sBIfH'
-      packetSize = struct.calcsize(packetFormat)
-      magicBytes = b'CDRO'
-
-      def encodeSensorPacket(sensorId, temperature, humidity):
-          assert 0 <= humidity <= 100, 'humidity는 0~100 범위여야 합니다'
-          return struct.pack(packetFormat, magicBytes, 1, sensorId, temperature, humidity)
-
-      def decodeSensorPacket(packet):
-          assert len(packet) == packetSize, '패킷 길이가 포맷과 다릅니다'
-          magic, version, sensorId, temperature, humidity = struct.unpack(packetFormat, packet)
-          assert magic == magicBytes, '매직 넘버가 다릅니다'
-          assert version == 1, '지원하지 않는 버전입니다'
-          return {
-              'sensorId': sensorId,
-              'temperature': round(temperature, 2),
-              'humidity': humidity
-          }
-
-      sensorPacket = encodeSensorPacket(7, 23.5, 45)
-      decodedSensor = decodeSensorPacket(sensorPacket)
-      assert decodedSensor['sensorId'] == 7
-      decodedSensor
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct는 바이트 길이와 엔디안이 하나만 어긋나도 데이터를 잘못 해석합니다. 여기서는 센서 패킷 포맷을 미리 정의하고, 잘린 패킷과 잘못된 매직 넘버를 실패시킨 뒤, 정상 레코드를 파일로 저장하고
-      다시 검증합니다.
-  - type: code
-    language: python
-    title: 패킷 포맷과 인코더 정의
-    description: 매직 넘버, 버전, 센서 ID, 온도, 습도를 고정 포맷으로 패킹합니다.
-    content: |-
-      structWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_struct_workflow_'))
-      packetFormat = '>4sBIfH'
-      packetSize = struct.calcsize(packetFormat)
-      magicBytes = b'CDRO'
-
-      def encodeSensorPacket(sensorId, temperature, humidity):
-          assert 0 <= humidity <= 100, 'humidity는 0~100 범위여야 합니다'
-          return struct.pack(packetFormat, magicBytes, 1, sensorId, temperature, humidity)
-
-      def decodeSensorPacket(packet):
-          assert len(packet) == packetSize, '패킷 길이가 포맷과 다릅니다'
-          magic, version, sensorId, temperature, humidity = struct.unpack(packetFormat, packet)
-          assert magic == magicBytes, '매직 넘버가 다릅니다'
-          assert version == 1, '지원하지 않는 버전입니다'
-          return {
-              'sensorId': sensorId,
-              'temperature': round(temperature, 2),
-              'humidity': humidity
-          }
-
-      sensorPacket = encodeSensorPacket(7, 23.5, 45)
-      decodedSensor = decodeSensorPacket(sensorPacket)
-      assert decodedSensor['sensorId'] == 7
-      decodedSensor
-  - type: code
-    language: python
-    title: 깨진 패킷을 먼저 실패시킨다
-    description: 길이 오류와 매직 넘버 오류를 검증 단계에서 잡아냅니다.
-    content: |-
-      try:
-          decodeSensorPacket(sensorPacket[:-1])
-      except AssertionError as exc:
-          sizeProblem = str(exc)
-
-      badMagicPacket = struct.pack(packetFormat, b'BAD!', 1, 7, 23.5, 45)
-      try:
-          decodeSensorPacket(badMagicPacket)
-      except AssertionError as exc:
-          magicProblem = str(exc)
-
-      assert '길이' in sizeProblem
-      assert '매직' in magicProblem
-      sizeProblem, magicProblem
-  - type: code
-    language: python
-    title: 파일 저장 후 재검증
-    description: 바이너리 파일에 쓴 뒤 정확한 바이트 수와 값을 다시 확인합니다.
-    content: |-
-      packetFile = structWorkflowRoot / 'sensor_packet.bin'
-      packetFile.write_bytes(sensorPacket)
-      restoredPacket = packetFile.read_bytes()
-      restoredSensor = decodeSensorPacket(restoredPacket)
-
-      assert packetFile.stat().st_size == packetSize
-      assert restoredSensor == decodedSensor
-      restoredSensor
-  - type: code
-    language: python
-    title: '실무 변주: 여러 레코드 스트림'
-    description: 고정 크기 레코드를 이어 붙이고 packetSize 단위로 안전하게 읽습니다.
-    content: |-
-      packets = [
-          encodeSensorPacket(1, 21.0, 40),
-          encodeSensorPacket(2, 24.2, 55),
-          encodeSensorPacket(3, 20.8, 35)
-      ]
-      streamBytes = b''.join(packets)
-      parsedStream = [
-          decodeSensorPacket(streamBytes[offset:offset + packetSize])
-          for offset in range(0, len(streamBytes), packetSize)
-      ]
-
-      assert len(parsedStream) == 3
-      assert max(item['humidity'] for item in parsedStream) == 55
-      parsedStream
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: struct 모듈 종합 복습
   structuredPrimary: true
   subtitle: 바이너리 데이터 마스터하기
-  goal: 'struct 모듈 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'struct 모듈 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: struct 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     intVal = 123
     intPacked = struct.pack('i', intVal)
     len(intPacked)
   exercise:
-    prompt: 'struct 모듈 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       intVal = 123
       intPacked = struct.pack('i', intVal)
       len(intPacked)
-    solution: |-
-      intVal = 123
-      intPacked = struct.pack('i', intVal)
-      len(intPacked)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: struct 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
-  - type: expansion
-    title: '🟢 기본1: 정수 패킹'
-    code: |-
-      intVal = 123
-      intPacked = struct.pack('i', intVal)
-      len(intPacked)
-  - type: expansion
-    title: '🟢 기본2: 정수 언패킹'
-    code: |-
-      binData = struct.pack('i', 456)
-      unpacked = struct.unpack('i', binData)[0]
-      unpacked
-  - type: expansion
-    title: '🟢 기본3: 실수 패킹'
-    code: |-
-      fVal = 1.5
-      fPacked = struct.pack('f', fVal)
-      len(fPacked)
-  - type: expansion
-    title: '🟢 기본4: 두 정수 패킹'
-    code: |-
-      twoInts = struct.pack('ii', 10, 20)
-      len(twoInts)
-  - type: expansion
-    title: '🟢 기본5: 크기 계산'
-    code: |-
-      formatLen = struct.calcsize('ifi')
-      formatLen
-  - type: expansion
-    title: '🟡 응용1: 여러 값 언패킹'
-    code: |-
-      multi = struct.pack('iii', 1, 2, 3)
-      a, b, c = struct.unpack('iii', multi)
-      a, b, c
-  - type: expansion
-    title: '🟡 응용2: 빅엔디안'
-    code: |-
-      bigEnd = struct.pack('>i', 999)
-      bigEnd
-  - type: expansion
-    title: '🟡 응용3: 리틀엔디안'
-    code: |-
-      littleEnd = struct.pack('<i', 999)
-      littleEnd
-  - type: expansion
-    title: '🟡 응용4: 반복 포맷'
-    code: |-
-      fourInts = struct.pack('4i', 5, 10, 15, 20)
-      len(fourInts)
-  - type: expansion
-    title: '🟡 응용5: 문자열 패킹'
-    code: |-
-      strPack = struct.pack('5s', b'Hi')
-      strPack
-  - type: expansion
-    title: '🔴 심화1: 혼합 타입'
-    code: |-
-      mixed = struct.pack('cif', b'X', 100, 2.5)
-      len(mixed)
-  - type: expansion
-    title: '🔴 심화2: 패딩 사용'
-    code: |-
-      withPad = struct.pack('i2xi', 1, 2)
-      len(withPad)
-  - type: expansion
-    title: '🔴 심화3: 헤더 생성'
-    code: |-
-      hdrMagic = 0xABCD
-      hdrVer = 1
-      hdrData = struct.pack('>HH', hdrMagic, hdrVer)
-      len(hdrData)
-  - type: expansion
-    title: '🔴 심화4: 헤더 파싱'
-    code: |-
-      header2 = struct.pack('>HHI', 0x1234, 5, 1024)
-      mag2, ver2, sz2 = struct.unpack('>HHI', header2)
-      mag2, ver2, sz2
-  - type: expansion
-    title: '🔴 심화5: 레코드 저장'
-    code: |-
-      recId = 10
-      recScore = 85
-      recBytes = struct.pack('ii', recId, recScore)
-      with open(structScratch / 'rec.bin', 'wb') as f:
-          f.write(recBytes)
-      'Saved'
-  - type: expansion
-    title: '🔴 심화6: 레코드 읽기'
-    code: |-
-      rec2 = struct.pack('ii', 20, 90)
-      with open(structScratch / 'rec2.bin', 'wb') as f:
-          f.write(rec2)
-      with open(structScratch / 'rec2.bin', 'rb') as f:
-          readRec = f.read()
-      rid, rscore = struct.unpack('ii', readRec)
-      rid, rscore
-  - type: expansion
-    title: '🔴 심화7: 문자열 언패킹'
-    code: |-
-      strData2 = struct.pack('10s', b'test')
-      extractedStr = struct.unpack('10s', strData2)[0]
-      extractedStr
-  - type: expansion
-    title: '🔴 심화8: 네트워크 포맷'
-    code: |-
-      netData = struct.pack('!I', 12345678)
-      netData
-  - type: expansion
-    title: '🔴 심화9: 복잡한 구조'
-    code: |-
-      complexStruct = struct.pack('i8sf', 1, b'name', 3.14)
-      len(complexStruct)
-  - type: expansion
-    title: '🔴 심화10: 바이너리 파일 처리'
-    code: |-
-      fileHeader = struct.pack('>4sHH', b'MYFT', 1, 0)
-      with open(structScratch / 'myfile.bin', 'wb') as f:
-          f.write(fileHeader)
-      with open(structScratch / 'myfile.bin', 'rb') as f:
-          readHeader = f.read()
-      sig, v1, v2 = struct.unpack('>4sHH', readHeader)
-      sig, v1, v2
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

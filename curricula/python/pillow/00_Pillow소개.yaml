@@ -72,8 +72,7 @@ sections:
     title: 🏛️ Pillow란?
     subtitle: PIL의 현대적 계승자
   - type: text
-    content: Pillow는 PIL(Python Imaging Library)의 친화적인 포크(fork)입니다. 원본 PIL은 2009년 이후 업데이트가 중단되었지만, Pillow가 이를 이어받아 현재까지 활발히
-      개발되고 있습니다. 파이썬에서 이미지를 다룰 때 가장 널리 사용되는 라이브러리이며, 설치도 간단하고 사용법도 직관적입니다.
+    content: Pillow는 PIL(Python Imaging Library)의 친화적인 포크(fork)입니다. 원본 PIL은 2009년 이후 업데이트가 중단되었지만, Pillow가 이를 이어받아 현재까지 활발히 개발되고 있습니다. 파이썬에서 이미지를 다룰 때 가장 널리 사용되는 라이브러리이며, 설치도 간단하고 사용법도 직관적입니다.
   - type: featureCards
     cards:
     - emoji: 📂
@@ -91,20 +90,17 @@ sections:
     title: 🚀 왜 Pillow인가?
     subtitle: 이미지 처리의 시작점
   - type: text
-    content: 이미지는 본질적으로 픽셀의 2차원 배열입니다. Pillow는 이 픽셀 데이터에 쉽게 접근하고 조작할 수 있게 해줍니다. 웹 개발에서 썸네일 생성, 데이터 분석에서 이미지 전처리, 자동화 스크립트에서
-      일괄 변환 등 다양한 곳에서 활용됩니다.
+    content: 이미지는 본질적으로 픽셀의 2차원 배열입니다. Pillow는 이 픽셀 데이터에 쉽게 접근하고 조작할 수 있게 해줍니다. 웹 개발에서 썸네일 생성, 데이터 분석에서 이미지 전처리, 자동화 스크립트에서 일괄 변환 등 다양한 곳에서 활용됩니다.
   - type: note
     title: OpenCV와의 차이
-    content: OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입 같은 작업은 Pillow가 더 간단합니다.
-      얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다.
+    content: OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입 같은 작업은 Pillow가 더 간단합니다. 얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다.
 - id: image_basics
   blocks:
   - type: sectionHeader
     title: 📦 이미지의 구조
     subtitle: 픽셀과 채널
   - type: text
-    content: 디지털 이미지는 픽셀(pixel)의 격자입니다. 각 픽셀은 색상 값을 가지며, 이 값의 구성 방식을 색상 모드(mode)라고 합니다. RGB 모드는 빨강, 초록, 파랑 세 채널로 색을 표현하고,
-      L 모드는 밝기 하나로 흑백을 표현합니다.
+    content: 디지털 이미지는 픽셀(pixel)의 격자입니다. 각 픽셀은 색상 값을 가지며, 이 값의 구성 방식을 색상 모드(mode)라고 합니다. RGB 모드는 빨강, 초록, 파랑 세 채널로 색을 표현하고, L 모드는 밝기 하나로 흑백을 표현합니다.
   - type: table
     headers:
     - 모드
@@ -299,8 +295,7 @@ sections:
     subtitle: Codaro 로컬 Python 환경에서의 이미지
   - type: note
     title: 이미지 데이터 소스
-    content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는 내장 이미지와 Image.new()
-      합성 이미지를 함께 사용합니다.
+    content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는 내장 이미지와 Image.new() 합성 이미지를 함께 사용합니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -350,21 +345,19 @@ sections:
     title: 🎯 시작하기
     subtitle: 첫 번째 프로젝트로
   - type: text
-    content: Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게 됩니다. 첫 번째 프로젝트에서 sklearn의
-      꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
+    content: Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게 됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
 - id: workflow_validation
   title: 로컬 이미지 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '로컬 이미지 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '로컬 이미지 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Pillow 입문은 이미지를 열고 저장하는 문법보다, 이미지의 mode, size, alpha, 픽셀 변화가 의도대로 유지되는지 확인하는 습관이 중요합니다. 로컬에서 이미지를 직접 만들고 잘못된 입력을 넣어 실패를 확인한 뒤, 결과를 수치로 검증합니다.
 
     Pillow 결과물은 눈으로 확인하기 전에 mode, size, histogram, 픽셀 차이를 먼저 검증하면 실무 자동화에서 훨씬 안전합니다.
   tips:
   - Pillow 결과물은 눈으로 확인하기 전에 mode, size, histogram, 픽셀 차이를 먼저 검증하면 실무 자동화에서 훨씬 안전합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from PIL import Image, ImageDraw, ImageFilter, ImageStat
 
@@ -382,7 +375,7 @@ sections:
 
     validateRgbImage(introImage)
   exercise:
-    prompt: '로컬 이미지 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageFilter, ImageStat
 
@@ -399,105 +392,8 @@ sections:
           return True
 
       validateRgbImage(introImage)
-    solution: |-
-      from PIL import Image, ImageDraw, ImageFilter, ImageStat
-
-      introImage = Image.new("RGB", (160, 100), "white")
-      introDraw = ImageDraw.Draw(introImage)
-      introDraw.rectangle((20, 20, 140, 80), fill=(80, 140, 220), outline=(20, 60, 120), width=4)
-      introDraw.ellipse((58, 28, 102, 72), fill=(240, 210, 80))
-
-      def validateRgbImage(image):
-          if image.mode != "RGB":
-              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-          if image.size[0] < 1 or image.size[1] < 1:
-              raise ValueError(f"이미지 크기가 올바르지 않습니다: {image.size}")
-          return True
-
-      validateRgbImage(introImage)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Pillow 입문은 이미지를 열고 저장하는 문법보다, 이미지의 mode, size, alpha, 픽셀 변화가 의도대로 유지되는지 확인하는 습관이 중요합니다. 로컬에서 이미지를 직접 만들고 잘못된
-      입력을 넣어 실패를 확인한 뒤, 결과를 수치로 검증합니다.
-  - type: list
-    items:
-    - 실행 전에는 출력 크기와 색상 변화가 어떻게 나올지 예측합니다.
-    - 파일이 없어도 Image.new와 ImageDraw로 재현 가능한 테스트 이미지를 만듭니다.
-    - 잘못된 mode나 크기 설정은 오류로 잡습니다.
-    - 리사이즈, 필터, 저장 포맷 변주가 품질 기준을 깨지 않는지 확인합니다.
-  - type: code
-    language: python
-    title: 로컬 샘플 이미지 준비
-    description: 외부 파일 없이 Pillow 이미지 객체를 만듭니다.
-    content: |-
-      from PIL import Image, ImageDraw, ImageFilter, ImageStat
-
-      introImage = Image.new("RGB", (160, 100), "white")
-      introDraw = ImageDraw.Draw(introImage)
-      introDraw.rectangle((20, 20, 140, 80), fill=(80, 140, 220), outline=(20, 60, 120), width=4)
-      introDraw.ellipse((58, 28, 102, 72), fill=(240, 210, 80))
-
-      def validateRgbImage(image):
-          if image.mode != "RGB":
-              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-          if image.size[0] < 1 or image.size[1] < 1:
-              raise ValueError(f"이미지 크기가 올바르지 않습니다: {image.size}")
-          return True
-
-      validateRgbImage(introImage)
-  - type: code
-    language: python
-    title: 잘못된 mode 확인
-    description: 그레이스케일 이미지를 넣어 검증 실패를 확인합니다.
-    content: |-
-      brokenIntroImage = introImage.convert("L")
-
-      try:
-          validateRgbImage(brokenIntroImage)
-      except ValueError as exc:
-          introModeError = str(exc)
-
-      introModeError
-  - type: code
-    language: python
-    title: 변환 결과 검증
-    description: 리사이즈와 필터 결과의 크기, mode, 픽셀 변화를 확인합니다.
-    content: |-
-      introThumbnail = introImage.resize((80, 50))
-      introBlur = introImage.filter(ImageFilter.GaussianBlur(radius=2))
-      introDiffBox = introImage.getbbox()
-      introChecks = {
-          "modeOk": introImage.mode == "RGB",
-          "thumbnailSizeOk": introThumbnail.size == (80, 50),
-          "filterKeepsSize": introBlur.size == introImage.size,
-          "imageNotBlank": introDiffBox is not None,
-          "errorOk": introModeError == "RGB 이미지가 아닙니다: L",
-      }
-
-      assert all(introChecks.values()), introChecks
-      introChecks
-  - type: code
-    language: python
-    title: 실무 변주
-    description: 썸네일 크기를 바꿔도 비율이 유지되는지 확인합니다.
-    content: |-
-      largeThumb = introImage.copy()
-      largeThumb.thumbnail((120, 120))
-      smallThumb = introImage.copy()
-      smallThumb.thumbnail((40, 40))
-
-      assert largeThumb.size == (120, 75)
-      assert smallThumb.size == (40, 25)
-      largeThumb.size, smallThumb.size
-  - type: tip
-    content: Pillow 결과물은 눈으로 확인하기 전에 mode, size, histogram, 픽셀 차이를 먼저 검증하면 실무 자동화에서 훨씬 안전합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

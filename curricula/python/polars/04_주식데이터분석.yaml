@@ -35,15 +35,14 @@ sections:
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: Apple 주식 시세 데이터
-  goal: '1단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Apple 주식의 일별 시세 데이터를 분석합니다. 주식 데이터는 시계열(time series) 데이터의 대표적인 예로, 날짜 순서가 중요합니다. 이번 프로젝트에서는 윈도우 함수(window function)를 배웁니다. 윈도우 함수는 이전 행이나 다음 행을 참조하여 계산하는 강력한 기능으로, shift(이전 값 참조), rolling_mean(이동평균), cum_sum(누적합계) 등이 있습니다. 주식 분석의 핵심 지표들을 직접 계산해봅니다.
 
     주식 데이터는 시계열 분석의 대표적인 예입니다. Polars는 시계열 데이터 처리에 특화되어 있어 이동평균, 수익률 계산 등이 매우 빠릅니다. pandas보다 10배 이상 빠른 성능을 보입니다.
   tips:
   - 주식 데이터는 시계열 분석의 대표적인 예입니다. Polars는 시계열 데이터 처리에 특화되어 있어 이동평균, 수익률 계산 등이 매우 빠릅니다. pandas보다 10배 이상 빠른 성능을 보입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import polars as pl
     from io import StringIO
@@ -53,7 +52,7 @@ sections:
     df = pl.read_csv(StringIO(stockCsv))
     df.shape
   exercise:
-    prompt: '1단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import polars as pl
       from io import StringIO
@@ -62,89 +61,38 @@ sections:
       stockCsv = loadLocalDataset("apple_stock").to_csv(index=False)
       df = pl.read_csv(StringIO(stockCsv))
       df.shape
-    solution: |-
-      import polars as pl
-      from io import StringIO
-      from codaro.curriculum.localData import loadLocalDataset
-
-      stockCsv = loadLocalDataset("apple_stock").to_csv(index=False)
-      df = pl.read_csv(StringIO(stockCsv))
-      df.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Apple 주식의 일별 시세 데이터를 분석합니다. 주식 데이터는 시계열(time series) 데이터의 대표적인 예로, 날짜 순서가 중요합니다. 이번 프로젝트에서는 윈도우 함수(window function)를
-      배웁니다. 윈도우 함수는 이전 행이나 다음 행을 참조하여 계산하는 강력한 기능으로, shift(이전 값 참조), rolling_mean(이동평균), cum_sum(누적합계) 등이 있습니다. 주식 분석의 핵심
-      지표들을 직접 계산해봅니다.
-  - type: code
-    language: python
-    title: 데이터 불러오기
-    description: Apple 주식 일별 시세
-    content: |-
-      import polars as pl
-      from io import StringIO
-      from codaro.curriculum.localData import loadLocalDataset
-
-      stockCsv = loadLocalDataset("apple_stock").to_csv(index=False)
-      df = pl.read_csv(StringIO(stockCsv))
-      df.shape
-  - type: tip
-    content: 주식 데이터는 시계열 분석의 대표적인 예입니다. Polars는 시계열 데이터 처리에 특화되어 있어 이동평균, 수익률 계산 등이 매우 빠릅니다. pandas보다 10배 이상 빠른 성능을 보입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_head
   title: 2단계. 데이터 미리보기
   structuredPrimary: true
   subtitle: 구조 파악
-  goal: '2단계. 데이터 미리보기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 미리보기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Date, AAPL.Open, AAPL.High, AAPL.Low, AAPL.Close, AAPL.Volume 등의 컬럼이 있습니다. AAPL은 Apple의 주식 티커(코드)이며, Open(시가),
-    High(고가), Low(저가), Close(종가), Volume(거래량)은 주식 데이터의 기본 구성 요소입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Date, AAPL.Open, AAPL.High, AAPL.Low, AAPL.Close, AAPL.Volume 등의 컬럼이 있습니다. AAPL은 Apple의 주식 티커(코드)이며, Open(시가), High(고가), Low(저가), Close(종가), Volume(거래량)은 주식 데이터의 기본 구성 요소입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: df.head()
   exercise:
-    prompt: '2단계. 데이터 미리보기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: df.head()
-    solution: df.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Date, AAPL.Open, AAPL.High, AAPL.Low, AAPL.Close, AAPL.Volume 등의 컬럼이 있습니다. AAPL은 Apple의 주식 티커(코드)이며, Open(시가),
-      High(고가), Low(저가), Close(종가), Volume(거래량)은 주식 데이터의 기본 구성 요소입니다.
-  - type: code
-    language: python
-    title: 미리보기
-    description: 처음 5행
-    content: df.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_select
   title: 3단계. 필요한 컬럼 선택
   structuredPrimary: true
   subtitle: 날짜와 종가만
-  goal: '3단계. 필요한 컬럼 선택: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 필요한 컬럼 선택: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 분석에 필요한 날짜(Date)와 종가(AAPL.Close)만 선택합니다. 종가는 하루 중 마지막 거래 가격으로, 주식 분석에서 가장 많이 사용되는 지표입니다. alias()로 컬럼명을 간단하게
-    바꾸면 이후 코드가 깔끔해집니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 분석에 필요한 날짜(Date)와 종가(AAPL.Close)만 선택합니다. 종가는 하루 중 마지막 거래 가격으로, 주식 분석에서 가장 많이 사용되는 지표입니다. alias()로 컬럼명을 간단하게 바꾸면 이후 코드가 깔끔해집니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     base = df.select([
         pl.col("Date").alias("date"),
@@ -152,105 +100,53 @@ sections:
     ])
     base.head()
   exercise:
-    prompt: '3단계. 필요한 컬럼 선택: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       base = df.select([
           pl.col("Date").alias("date"),
           pl.col("AAPL.Close").alias("close")
       ])
       base.head()
-    solution: |-
-      base = df.select([
-          pl.col("Date").alias("date"),
-          pl.col("AAPL.Close").alias("close")
-      ])
-      base.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 분석에 필요한 날짜(Date)와 종가(AAPL.Close)만 선택합니다. 종가는 하루 중 마지막 거래 가격으로, 주식 분석에서 가장 많이 사용되는 지표입니다. alias()로 컬럼명을 간단하게 바꾸면
-      이후 코드가 깔끔해집니다.
-  - type: code
-    language: python
-    title: 컬럼 선택 및 이름 변경
-    description: date, close 컬럼만 사용
-    content: |-
-      base = df.select([
-          pl.col("Date").alias("date"),
-          pl.col("AAPL.Close").alias("close")
-      ])
-      base.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_datetime
   title: 4단계. 날짜 타입 변환
   structuredPrimary: true
   subtitle: 문자열을 날짜로
-  goal: '4단계. 날짜 타입 변환: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 날짜 타입 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: date 컬럼이 문자열이면 날짜 함수를 사용할 수 없습니다. str.to_date()로 Date 타입으로 변환해야 dt.year(), dt.month() 같은 날짜 함수를 사용할 수 있습니다.
-    "%Y-%m-%d"는 연도-월-일 형식을 의미합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: date 컬럼이 문자열이면 날짜 함수를 사용할 수 없습니다. str.to_date()로 Date 타입으로 변환해야 dt.year(), dt.month() 같은 날짜 함수를 사용할 수 있습니다. "%Y-%m-%d"는 연도-월-일 형식을 의미합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     dated = base.with_columns(
         pl.col("date").str.to_date("%Y-%m-%d")
     )
     dated.head()
   exercise:
-    prompt: '4단계. 날짜 타입 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       dated = base.with_columns(
           pl.col("date").str.to_date("%Y-%m-%d")
       )
       dated.head()
-    solution: |-
-      dated = base.with_columns(
-          pl.col("date").str.to_date("%Y-%m-%d")
-      )
-      dated.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: date 컬럼이 문자열이면 날짜 함수를 사용할 수 없습니다. str.to_date()로 Date 타입으로 변환해야 dt.year(), dt.month() 같은 날짜 함수를 사용할 수 있습니다. "%Y-%m-%d"는
-      연도-월-일 형식을 의미합니다.
-  - type: code
-    language: python
-    title: 날짜 타입 변환
-    description: 문자열에서 Date 타입으로
-    content: |-
-      dated = base.with_columns(
-          pl.col("date").str.to_date("%Y-%m-%d")
-      )
-      dated.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_dt
   title: 5단계. 날짜 정보 추출
   structuredPrimary: true
   subtitle: 연도, 월 추출
-  goal: '5단계. 날짜 정보 추출: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 날짜 정보 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: dt.year(), dt.month()로 날짜에서 연도와 월을 추출합니다. 연도와 월 컬럼을 추가하면 월별/연도별 그룹 분석이 가능해집니다. 이전 프로젝트에서 배운 dt accessor를 다시
-    한번 복습합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: dt.year(), dt.month()로 날짜에서 연도와 월을 추출합니다. 연도와 월 컬럼을 추가하면 월별/연도별 그룹 분석이 가능해집니다. 이전 프로젝트에서 배운 dt accessor를 다시 한번 복습합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     withYearMonth = dated.with_columns([
         pl.col("date").dt.year().alias("year"),
@@ -258,49 +154,24 @@ sections:
     ])
     withYearMonth.head()
   exercise:
-    prompt: '5단계. 날짜 정보 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       withYearMonth = dated.with_columns([
           pl.col("date").dt.year().alias("year"),
           pl.col("date").dt.month().alias("month")
       ])
       withYearMonth.head()
-    solution: |-
-      withYearMonth = dated.with_columns([
-          pl.col("date").dt.year().alias("year"),
-          pl.col("date").dt.month().alias("month")
-      ])
-      withYearMonth.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: dt.year(), dt.month()로 날짜에서 연도와 월을 추출합니다. 연도와 월 컬럼을 추가하면 월별/연도별 그룹 분석이 가능해집니다. 이전 프로젝트에서 배운 dt accessor를 다시 한번
-      복습합니다.
-  - type: code
-    language: python
-    title: 연도, 월 추출
-    description: dt accessor 사용
-    content: |-
-      withYearMonth = dated.with_columns([
-          pl.col("date").dt.year().alias("year"),
-          pl.col("date").dt.month().alias("month")
-      ])
-      withYearMonth.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_cast
   title: 6단계. 타입 변환
   structuredPrimary: true
   subtitle: cast()로 형변환
-  goal: '6단계. 타입 변환: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 타입 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     close 컬럼이 Float64인지 확인합니다. 계산을 위해 명시적으로 Float64로 변환하면 타입 불일치로 인한 오류를 예방할 수 있습니다. cast()는 데이터 타입을 변환하는 함수입니다.
 
@@ -308,318 +179,166 @@ sections:
     cast(pl.Float64)는 컬럼 타입을 Float64로 변환합니다. 수치 계산 전에 타입을 맞춰두면 오류를 방지할 수 있습니다.
   tips:
   - cast() 핵심 cast(pl.Float64)는 컬럼 타입을 Float64로 변환합니다. 수치 계산 전에 타입을 맞춰두면 오류를 방지할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     casted = withYearMonth.with_columns(
         pl.col("close").cast(pl.Float64)
     )
     casted.schema
   exercise:
-    prompt: '6단계. 타입 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       casted = withYearMonth.with_columns(
           pl.col("close").cast(pl.Float64)
       )
       casted.schema
-    solution: |-
-      casted = withYearMonth.with_columns(
-          pl.col("close").cast(pl.Float64)
-      )
-      casted.schema
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: close 컬럼이 Float64인지 확인합니다. 계산을 위해 명시적으로 Float64로 변환하면 타입 불일치로 인한 오류를 예방할 수 있습니다. cast()는 데이터 타입을 변환하는 함수입니다.
-  - type: note
-    style: tip
-    title: cast() 핵심
-    content: cast(pl.Float64)는 컬럼 타입을 Float64로 변환합니다. 수치 계산 전에 타입을 맞춰두면 오류를 방지할 수 있습니다.
-  - type: code
-    language: python
-    title: 타입 확인 및 변환
-    description: Float64로 명시적 변환
-    content: |-
-      casted = withYearMonth.with_columns(
-          pl.col("close").cast(pl.Float64)
-      )
-      casted.schema
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_shift
   title: 7단계. 전일 종가 계산
   structuredPrimary: true
   subtitle: shift()로 이전 값 참조
-  goal: '7단계. 전일 종가 계산: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 전일 종가 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     주식 수익률을 계산하려면 "오늘 가격"과 "어제 가격"을 비교해야 합니다. 하지만 한 행에는 오늘 가격만 있고 어제 가격은 없습니다. shift() 함수는 이 문제를 해결합니다. shift(1)은 전체 컬럼을 한 행 아래로 밀어서, 각 행에서 이전 행의 값을 참조할 수 있게 만듭니다. 첫 번째 행은 이전 값이 없으므로 null이 됩니다. 이것은 시계열 분석의 핵심 기법입니다.
 
     shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년 값을 참조할 때 필수적인 함수입니다. pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
   tips:
-  - shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년 값을 참조할 때 필수적인 함수입니다.
-    pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년 값을 참조할 때 필수적인 함수입니다. pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
   snippet: |-
     withPrev = casted.with_columns(
         pl.col("close").shift(1).alias("prevClose")
     )
     withPrev.head(10)
   exercise:
-    prompt: '7단계. 전일 종가 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       withPrev = casted.with_columns(
           pl.col("close").shift(1).alias("prevClose")
       )
       withPrev.head(10)
-    solution: |-
-      withPrev = casted.with_columns(
-          pl.col("close").shift(1).alias("prevClose")
-      )
-      withPrev.head(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 주식 수익률을 계산하려면 "오늘 가격"과 "어제 가격"을 비교해야 합니다. 하지만 한 행에는 오늘 가격만 있고 어제 가격은 없습니다. shift() 함수는 이 문제를 해결합니다. shift(1)은
-      전체 컬럼을 한 행 아래로 밀어서, 각 행에서 이전 행의 값을 참조할 수 있게 만듭니다. 첫 번째 행은 이전 값이 없으므로 null이 됩니다. 이것은 시계열 분석의 핵심 기법입니다.
-  - type: code
-    language: python
-    title: 전일 종가 추가
-    description: shift(1)로 전일 값 참조
-    content: |-
-      withPrev = casted.with_columns(
-          pl.col("close").shift(1).alias("prevClose")
-      )
-      withPrev.head(10)
-  - type: tip
-    content: shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년 값을 참조할
-      때 필수적인 함수입니다. pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_return
   title: 8단계. 일일 수익률 계산
   structuredPrimary: true
   subtitle: (오늘 - 어제) / 어제
-  goal: '8단계. 일일 수익률 계산: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 일일 수익률 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 일일 수익률 = (당일 종가 - 전일 종가) / 전일 종가로 계산합니다. 100을 곱해 백분율로 표시하면 "2.5%"처럼 직관적으로 이해할 수 있습니다. 이 공식은 주식 분석의 가장 기본적인
-    지표입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 일일 수익률 = (당일 종가 - 전일 종가) / 전일 종가로 계산합니다. 100을 곱해 백분율로 표시하면 "2.5%"처럼 직관적으로 이해할 수 있습니다. 이 공식은 주식 분석의 가장 기본적인 지표입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     withReturn = withPrev.with_columns(
         ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
     )
     withReturn.head(10)
   exercise:
-    prompt: '8단계. 일일 수익률 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       withReturn = withPrev.with_columns(
           ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
       )
       withReturn.head(10)
-    solution: |-
-      withReturn = withPrev.with_columns(
-          ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
-      )
-      withReturn.head(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 일일 수익률 = (당일 종가 - 전일 종가) / 전일 종가로 계산합니다. 100을 곱해 백분율로 표시하면 "2.5%"처럼 직관적으로 이해할 수 있습니다. 이 공식은 주식 분석의 가장 기본적인 지표입니다.
-  - type: code
-    language: python
-    title: 일일 수익률
-    description: 전일 대비 변화율
-    content: |-
-      withReturn = withPrev.with_columns(
-          ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
-      )
-      withReturn.head(10)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_rolling
   title: 9단계. 20일 이동평균
   structuredPrimary: true
   subtitle: rolling_mean()
-  goal: '9단계. 20일 이동평균: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 20일 이동평균: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     주식 가격은 매일 오르내리며 변동이 심합니다. 전체적인 추세를 보려면 단기 변동을 완화해야 하는데, 이때 사용하는 것이 이동평균(moving average)입니다. rolling_mean(window_size=20)은 현재 행을 포함한 최근 20개 값의 평균을 계산합니다. 예를 들어 5번째 행의 이동평균은 1~5번째 행의 평균이고, 30번째 행의 이동평균은 11~30번째 행의 평균입니다. 주식에서는 20일(약 1개월) 이동평균이 대표적이며, 골든크로스/데드크로스 등의 매매 신호로 활용됩니다.
 
     rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을 주로 사용합니다. window_size를 바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
   tips:
-  - rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을 주로 사용합니다. window_size를
-    바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을 주로 사용합니다. window_size를 바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
   snippet: |-
     withMa = withReturn.with_columns(
         pl.col("close").rolling_mean(window_size=20).alias("ma20")
     )
     withMa.tail(10)
   exercise:
-    prompt: '9단계. 20일 이동평균: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       withMa = withReturn.with_columns(
           pl.col("close").rolling_mean(window_size=20).alias("ma20")
       )
       withMa.tail(10)
-    solution: |-
-      withMa = withReturn.with_columns(
-          pl.col("close").rolling_mean(window_size=20).alias("ma20")
-      )
-      withMa.tail(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 주식 가격은 매일 오르내리며 변동이 심합니다. 전체적인 추세를 보려면 단기 변동을 완화해야 하는데, 이때 사용하는 것이 이동평균(moving average)입니다. rolling_mean(window_size=20)은
-      현재 행을 포함한 최근 20개 값의 평균을 계산합니다. 예를 들어 5번째 행의 이동평균은 1~5번째 행의 평균이고, 30번째 행의 이동평균은 11~30번째 행의 평균입니다. 주식에서는 20일(약 1개월) 이동평균이
-      대표적이며, 골든크로스/데드크로스 등의 매매 신호로 활용됩니다.
-  - type: code
-    language: python
-    title: 20일 이동평균
-    description: 단기 변동 완화
-    content: |-
-      withMa = withReturn.with_columns(
-          pl.col("close").rolling_mean(window_size=20).alias("ma20")
-      )
-      withMa.tail(10)
-  - type: tip
-    content: rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을 주로 사용합니다.
-      window_size를 바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_cumsum
   title: 10단계. 누적 수익률
   structuredPrimary: true
   subtitle: cum_sum()
-  goal: '10단계. 누적 수익률: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 누적 수익률: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     일일 수익률은 하루하루의 변화율이지만, 전체 기간 동안 얼마나 수익이 났는지 보려면 누적 수익률이 필요합니다. cum_sum()은 cumulative sum(누적 합계)의 약자로, 처음부터 현재까지의 값을 모두 더합니다. 예를 들어 1일차 +2%, 2일차 +1%, 3일차 -0.5%라면 누적 수익률은 2%, 3%, 2.5%가 됩니다. 이를 그래프로 그리면 투자 수익 추이를 한눈에 볼 수 있습니다.
 
     cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적 곱) 등 다양한 누적 함수가 있습니다. 시계열 분석의 필수 함수입니다.
   tips:
-  - cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적 곱) 등 다양한 누적
-    함수가 있습니다. 시계열 분석의 필수 함수입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적 곱) 등 다양한 누적 함수가 있습니다. 시계열 분석의 필수 함수입니다.
   snippet: |-
     final = withMa.with_columns(
         pl.col("dailyReturn").cum_sum().alias("cumReturn")
     )
     final.tail(10)
   exercise:
-    prompt: '10단계. 누적 수익률: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       final = withMa.with_columns(
           pl.col("dailyReturn").cum_sum().alias("cumReturn")
       )
       final.tail(10)
-    solution: |-
-      final = withMa.with_columns(
-          pl.col("dailyReturn").cum_sum().alias("cumReturn")
-      )
-      final.tail(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 일일 수익률은 하루하루의 변화율이지만, 전체 기간 동안 얼마나 수익이 났는지 보려면 누적 수익률이 필요합니다. cum_sum()은 cumulative sum(누적 합계)의 약자로, 처음부터 현재까지의
-      값을 모두 더합니다. 예를 들어 1일차 +2%, 2일차 +1%, 3일차 -0.5%라면 누적 수익률은 2%, 3%, 2.5%가 됩니다. 이를 그래프로 그리면 투자 수익 추이를 한눈에 볼 수 있습니다.
-  - type: code
-    language: python
-    title: 누적 수익률
-    description: 일일 수익률 누적 합계
-    content: |-
-      final = withMa.with_columns(
-          pl.col("dailyReturn").cum_sum().alias("cumReturn")
-      )
-      final.tail(10)
-  - type: tip
-    content: cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적 곱)
-      등 다양한 누적 함수가 있습니다. 시계열 분석의 필수 함수입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_result
   title: 11단계. 결과물 - 최종 데이터
   structuredPrimary: true
   subtitle: 종가 + 이동평균 + 수익률
-  goal: '11단계. 결과물 - 최종 데이터: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 결과물 - 최종 데이터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 모든 분석 결과를 포함한 최종 데이터프레임입니다. drop_nulls()로 null 값이 있는 행(첫 번째 행 등)을 제거하고, select로 핵심 컬럼만 선택하여 깔끔한 결과를 만듭니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
   exercise:
-    prompt: '11단계. 결과물 - 최종 데이터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
-    solution: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 모든 분석 결과를 포함한 최종 데이터프레임입니다. drop_nulls()로 null 값이 있는 행(첫 번째 행 등)을 제거하고, select로 핵심 컬럼만 선택하여 깔끔한 결과를 만듭니다.
-  - type: code
-    language: python
-    title: 최종 분석 결과
-    description: 주가와 분석 지표
-    content: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 주식 분석 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     배운 내용으로 주식 분석을 해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import polars as pl
     from io import StringIO
@@ -630,7 +349,7 @@ sections:
         pl.col("AAPL.Close").alias("close")
     ])
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import polars as pl
       from io import StringIO
@@ -640,82 +359,11 @@ sections:
           pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
           pl.col("AAPL.Close").alias("close")
       ])
-    solution: |-
-      import polars as pl
-      from io import StringIO
-      from codaro.curriculum.localData import loadLocalDataset
-
-      aaplBase = pl.read_csv(StringIO(loadLocalDataset("apple_stock").to_csv(index=False))).select([
-          pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
-          pl.col("AAPL.Close").alias("close")
-      ])
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 배운 내용으로 주식 분석을 해봅시다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 이동평균선과 골든크로스 분석'
-    blocks:
-    - type: code
-      title: 데이터 로드 및 전처리
-      content: |-
-        import polars as pl
-        from io import StringIO
-        from codaro.curriculum.localData import loadLocalDataset
-
-        aaplBase = pl.read_csv(StringIO(loadLocalDataset("apple_stock").to_csv(index=False))).select([
-            pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
-            pl.col("AAPL.Close").alias("close")
-        ])
-    - type: code
-      title: 이동평균 계산
-      content: |-
-        maAnalysis = aaplBase.with_columns([
-            pl.col("close").rolling_mean(window_size=5).alias("ma5"),
-            pl.col("close").rolling_mean(window_size=20).alias("ma20"),
-            pl.col("close").rolling_mean(window_size=60).alias("ma60")
-        ]).drop_nulls()
-        maAnalysis.tail(10)
-  - type: expansion
-    title: '미션2: 월별 수익률과 변동성 분석'
-    blocks:
-    - type: code
-      title: 데이터 로드 및 전처리
-      content: |-
-        import polars as pl
-        from io import StringIO
-        from codaro.curriculum.localData import loadLocalDataset
-
-        priceData = pl.read_csv(StringIO(loadLocalDataset("apple_stock").to_csv(index=False))).select([
-            pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
-            pl.col("AAPL.Close").alias("close")
-        ]).with_columns([
-            pl.col("date").dt.year().alias("year"),
-            pl.col("date").dt.month().alias("month"),
-            pl.col("close").shift(1).alias("prevClose")
-        ]).with_columns(
-            ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
-        )
-    - type: code
-      title: 월별 집계
-      content: |-
-        monthlyVolatility = priceData.drop_nulls().group_by(["year", "month"]).agg([
-            pl.col("close").mean().round(2).alias("avgClose"),
-            pl.col("dailyReturn").mean().round(2).alias("avgReturn"),
-            pl.col("dailyReturn").std().round(2).alias("volatility")
-        ]).sort(["year", "month"])
-        monthlyVolatility
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   blocks:
@@ -736,13 +384,11 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 주문 매출 파이프라인
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는
-    기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import polars as pl
 
@@ -768,7 +414,7 @@ sections:
     validateOrderFrame(orderFrame)
     orderFrame
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
@@ -804,111 +450,7 @@ sections:
       validateOrderFrame(orderFrame)
       orderFrame
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는
-      기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
-  - type: code
-    language: python
-    title: 주문 데이터와 입력 검증
-    description: 필수 컬럼, 수량, 단가 조건을 로컬에서 검증합니다.
-    content: |-
-      import polars as pl
-
-      orderFrame = pl.DataFrame({
-          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
-          "channel": ["web", "store", "web", "partner", "store", "web"],
-          "quantity": [3, 2, 5, 1, 4, 2],
-          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
-          "refund": [0, 0, 1, 0, 0, 0],
-      })
-
-      def validateOrderFrame(frame: pl.DataFrame) -> bool:
-          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
-          missingColumns = requiredColumns - set(frame.columns)
-          if missingColumns:
-              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
-          if frame.select((pl.col("quantity") <= 0).any()).item():
-              raise ValueError("quantity는 0보다 커야 합니다.")
-          if frame.select((pl.col("unitPrice") <= 0).any()).item():
-              raise ValueError("unitPrice는 0보다 커야 합니다.")
-          return True
-
-      validateOrderFrame(orderFrame)
-      orderFrame
-  - type: code
-    language: python
-    title: 예측 후 채널별 매출 집계
-    description: store 채널이 가장 클 것이라고 예측하고 집계로 확인합니다.
-    content: |-
-      # 예측: store는 주문 수는 적지만 단가가 높아 순매출 1위일 가능성이 큽니다.
-      expectedTopChannel = "store"
-      revenueByChannel = (
-          orderFrame
-          .with_columns((pl.col("quantity") * pl.col("unitPrice") * (1 - pl.col("refund"))).alias("netRevenue"))
-          .group_by("channel")
-          .agg([
-              pl.len().alias("orders"),
-              pl.sum("netRevenue").alias("netRevenue"),
-              pl.mean("quantity").round(2).alias("avgQuantity"),
-          ])
-          .sort("netRevenue", descending=True)
-      )
-
-      topChannel = revenueByChannel.row(0, named=True)["channel"]
-      revenueByChannel
-  - type: code
-    language: python
-    title: 실패 입력을 잡는 오류 처리
-    description: 수량이 0인 주문을 검증 함수가 거부하는지 확인합니다.
-    content: |-
-      brokenOrderFrame = orderFrame.with_columns(
-          pl.when(pl.col("orderId") == 1001).then(0).otherwise(pl.col("quantity")).alias("quantity")
-      )
-
-      try:
-          validateOrderFrame(brokenOrderFrame)
-      except ValueError as exc:
-          validationMessage = str(exc)
-
-      assert "quantity" in validationMessage
-      validationMessage
-  - type: code
-    language: python
-    title: 업무 기준 검증
-    description: 집계 결과가 보고서에 들어갈 수 있는 상태인지 assert로 확인합니다.
-    content: |-
-      pipelineChecks = {
-          "top_channel_matches_prediction": topChannel == expectedTopChannel,
-          "net_revenue_positive": revenueByChannel.select((pl.col("netRevenue") > 0).all()).item(),
-          "all_channels_present": revenueByChannel.height == orderFrame.select(pl.col("channel").n_unique()).item(),
-          "refund_removed_from_revenue": revenueByChannel.filter(pl.col("channel") == "web").row(0, named=True)["netRevenue"] == 80000,
-      }
-
-      assert all(pipelineChecks.values()), pipelineChecks
-      pipelineChecks
-  - type: expansion
-    title: '실무 변주: 매출 기준선을 바꾸면 후보 채널 수가 어떻게 변할까?'
-    blocks:
-    - type: code
-      language: python
-      title: 기준값 민감도 분석
-      content: |-
-        thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
-            pl.col("threshold").map_elements(
-                lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
-                return_dtype=pl.Int64,
-            ).alias("qualifiedChannels")
-        )
-
-        assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
-        thresholdFrame
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

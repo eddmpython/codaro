@@ -176,12 +176,11 @@ sections:
   title: 파이썬 vs 다른 언어
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: '파이썬 vs 다른 언어: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '파이썬 vs 다른 언어: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 파이썬 vs 다른 언어의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     # Python - 1줄이면 충분!
     print("Hello, World!")
@@ -193,7 +192,7 @@ sections:
     #     }
     # }
   exercise:
-    prompt: '파이썬 vs 다른 언어: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       # Python - 1줄이면 충분!
       print("Hello, World!")
@@ -204,58 +203,12 @@ sections:
       #         System.out.println("Hello, World!");
       #     }
       # }
-    solution: |-
-      # Python - 1줄이면 충분!
-      print("Hello, World!")
-
-      # Java - 5줄 필요...
-      # public class Main {
-      #     public static void main(String[] args) {
-      #         System.out.println("Hello, World!");
-      #     }
-      # }
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
   titleEmoji: ⚔️
-  blocks:
-  - type: compare
-    leftTitle: 다른 프로그래밍 언어
-    rightTitle: 파이썬
-    leftIcon: ❌
-    rightIcon: ✅
-    leftItems:
-    - 복잡한 문법과 세미콜론, 중괄호
-    - 변수 선언 시 타입을 명시해야 함
-    - 간단한 프로그램도 코드가 길어짐
-    - 컴파일 과정이 필요한 경우가 많음
-    - 환경 설정이 복잡함
-    rightItems:
-    - 영어처럼 읽히는 깔끔한 문법
-    - 타입을 자동으로 추론해줌
-    - 같은 기능을 절반의 코드로 구현
-    - 작성 즉시 실행 가능
-    - uv run --with 패키지 한 줄로 필요한 라이브러리 포함 실행
-  - type: code
-    language: python
-    title: Hello World 비교
-    code: |
-      # Python - 1줄이면 충분!
-      print("Hello, World!")
-
-      # Java - 5줄 필요...
-      # public class Main {
-      #     public static void main(String[] args) {
-      #         System.out.println("Hello, World!");
-      #     }
-      # }
 - id: isItEasy
   title: 정말로 쉽다고?
   titleEmoji: 🤔
@@ -379,18 +332,16 @@ sections:
   - type: tipCard
     icon: info
     title: 학습 팁
-    content: 30-Days-Of-Python은 체계적인 커리큘럼으로 구성되어 있어 초보자부터 중급자까지 단계별로 학습할 수 있습니다. @eddmpython 스레드에서는 실무에서 바로 활용할 수 있는 최신 정보와
-      꿀팁들을 확인하세요!
+    content: 30-Days-Of-Python은 체계적인 커리큘럼으로 구성되어 있어 초보자부터 중급자까지 단계별로 학습할 수 있습니다. @eddmpython 스레드에서는 실무에서 바로 활용할 수 있는 최신 정보와 꿀팁들을 확인하세요!
 - id: workflow_validation
   title: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def normalizeTask(rawTask):
         title = rawTask.get('title', '').strip()
@@ -415,7 +366,7 @@ sections:
     assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
     task
   exercise:
-    prompt: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def normalizeTask(rawTask):
           title = rawTask.get('title', '').strip()
@@ -439,95 +390,8 @@ sections:
       task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
       assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
       task
-    solution: |-
-      def normalizeTask(rawTask):
-          title = rawTask.get('title', '').strip()
-          status = rawTask.get('status', '').strip().lower()
-          minutes = int(rawTask.get('minutes', 0))
-
-          if not title:
-              raise ValueError('title is required')
-          if status not in {'todo', 'doing', 'done'}:
-              raise ValueError('unsupported status')
-          if minutes <= 0:
-              raise ValueError('minutes must be positive')
-
-          return {
-              'title': title,
-              'status': status,
-              'minutes': minutes,
-              'urgent': status != 'done' and minutes >= 60,
-          }
-
-      task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
-      assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
-      task
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다.
-  - type: code
-    language: python
-    title: 업무 항목 정규화와 검증
-    description: 문자열 정리, 상태 제한, 우선순위 계산을 한 번에 확인합니다.
-    content: |-
-      def normalizeTask(rawTask):
-          title = rawTask.get('title', '').strip()
-          status = rawTask.get('status', '').strip().lower()
-          minutes = int(rawTask.get('minutes', 0))
-
-          if not title:
-              raise ValueError('title is required')
-          if status not in {'todo', 'doing', 'done'}:
-              raise ValueError('unsupported status')
-          if minutes <= 0:
-              raise ValueError('minutes must be positive')
-
-          return {
-              'title': title,
-              'status': status,
-              'minutes': minutes,
-              'urgent': status != 'done' and minutes >= 60,
-          }
-
-      task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
-      assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
-      task
-  - type: code
-    language: python
-    title: 잘못된 입력을 먼저 실패시킨다
-    description: 제목 누락과 잘못된 상태를 오류 메시지로 확인합니다.
-    content: |-
-      try:
-          normalizeTask({'title': ' ', 'status': 'blocked', 'minutes': '10'})
-      except ValueError as exc:
-          taskError = str(exc)
-
-      assert taskError in {'title is required', 'unsupported status'}
-      taskError
-  - type: code
-    language: python
-    title: '실무 변주: 완료율 리포트 만들기'
-    description: 여러 업무 항목을 정규화하고 완료율과 긴급 작업을 계산합니다.
-    content: |-
-      rawTasks = [
-          {'title': 'report', 'status': 'done', 'minutes': '40'},
-          {'title': 'invoice', 'status': 'todo', 'minutes': '90'},
-          {'title': 'mail', 'status': 'doing', 'minutes': '15'},
-      ]
-      tasks = [normalizeTask(row) for row in rawTasks]
-      doneRate = sum(task['status'] == 'done' for task in tasks) / len(tasks)
-      urgentTitles = [task['title'] for task in tasks if task['urgent']]
-
-      assert round(doneRate, 2) == 0.33
-      assert urgentTitles == ['invoice']
-      doneRate, urgentTitles
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

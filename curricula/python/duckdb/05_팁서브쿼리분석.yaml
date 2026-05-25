@@ -33,13 +33,11 @@ sections:
   title: 1단계. 데이터 준비
   structuredPrimary: true
   subtitle: tips 데이터 로드
-  goal: '1단계. 데이터 준비: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 데이터 준비: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 레스토랑 팁 데이터를 불러옵니다. 서브쿼리를 활용해 평균과 비교하고 고급 필터링을 수행합니다. 서브쿼리는 쿼리 안에 쿼리를 중첩하는 강력한 기법으로, 동적 조건 필터링과 복잡한 집계 분석을 가능하게
-    합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 레스토랑 팁 데이터를 불러옵니다. 서브쿼리를 활용해 평균과 비교하고 고급 필터링을 수행합니다. 서브쿼리는 쿼리 안에 쿼리를 중첩하는 강력한 기법으로, 동적 조건 필터링과 복잡한 집계 분석을 가능하게 합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset
@@ -48,7 +46,7 @@ sections:
     df = loadLocalDataset("tips")
     tips = duckdb.from_df(df)
   exercise:
-    prompt: '1단계. 데이터 준비: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -56,102 +54,49 @@ sections:
 
       df = loadLocalDataset("tips")
       tips = duckdb.from_df(df)
-    solution: |-
-      import pandas as pd
-      from codaro.curriculum.localData import loadLocalDataset
-      import duckdb
-
-      df = loadLocalDataset("tips")
-      tips = duckdb.from_df(df)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 레스토랑 팁 데이터를 불러옵니다. 서브쿼리를 활용해 평균과 비교하고 고급 필터링을 수행합니다. 서브쿼리는 쿼리 안에 쿼리를 중첩하는 강력한 기법으로, 동적 조건 필터링과 복잡한 집계 분석을 가능하게
-      합니다.
-  - type: code
-    language: python
-    title: 데이터 불러오기
-    description: tips.csv 로드
-    content: |-
-      import pandas as pd
-      from codaro.curriculum.localData import loadLocalDataset
-      import duckdb
-
-      df = loadLocalDataset("tips")
-      tips = duckdb.from_df(df)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_subquery_intro
   title: 2단계. 서브쿼리란?
   structuredPrimary: true
   subtitle: 쿼리 안의 쿼리
-  goal: '2단계. 서브쿼리란?: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 서브쿼리란?: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 서브쿼리는 SELECT 문 안에 또 다른 SELECT 문을 넣는 것입니다. 크게 3가지 패턴이 있습니다. 1) 스칼라 서브쿼리 (SELECT 절에 사용), 2) WHERE 서브쿼리 (조건 필터링에
-    사용), 3) FROM 서브쿼리 (집계 결과를 테이블처럼 사용).
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 서브쿼리는 SELECT 문 안에 또 다른 SELECT 문을 넣는 것입니다. 크게 3가지 패턴이 있습니다. 1) 스칼라 서브쿼리 (SELECT 절에 사용), 2) WHERE 서브쿼리 (조건 필터링에 사용), 3) FROM 서브쿼리 (집계 결과를 테이블처럼 사용).
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT AVG(tip) AS avgTip
         FROM tips
     """).show()
   exercise:
-    prompt: '2단계. 서브쿼리란?: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT AVG(tip) AS avgTip
           FROM tips
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT AVG(tip) AS avgTip
-          FROM tips
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 서브쿼리는 SELECT 문 안에 또 다른 SELECT 문을 넣는 것입니다. 크게 3가지 패턴이 있습니다. 1) 스칼라 서브쿼리 (SELECT 절에 사용), 2) WHERE 서브쿼리 (조건 필터링에
-      사용), 3) FROM 서브쿼리 (집계 결과를 테이블처럼 사용).
-  - type: code
-    language: python
-    title: 전체 평균 팁 조회
-    description: 기본 집계 쿼리
-    content: |-
-      duckdb.sql("""
-          SELECT AVG(tip) AS avgTip
-          FROM tips
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_scalar_subquery
   title: 3단계. 스칼라 서브쿼리
   structuredPrimary: true
   subtitle: SELECT 절 안에 서브쿼리
-  goal: '3단계. 스칼라 서브쿼리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 스칼라 서브쿼리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     스칼라 서브쿼리는 SELECT 절에 서브쿼리를 넣어 단일 값(1행 1열)을 가져옵니다. 각 행마다 전체 평균과 비교할 때 매우 유용합니다. 예를 들어 "이 고객의 팁이 전체 평균보다 높은가?"라는 질문에 답할 수 있습니다. 서브쿼리는 메인 쿼리가 실행될 때마다 평가되어 동적인 비교가 가능합니다.
 
     스칼라 서브쿼리는 반드시 단일 값(1행 1열)을 반환해야 합니다. (SELECT AVG(...) FROM ...)처럼 집계 함수를 사용하면 안전합니다.
   tips:
   - 스칼라 서브쿼리는 반드시 단일 값(1행 1열)을 반환해야 합니다. (SELECT AVG(...) FROM ...)처럼 집계 함수를 사용하면 안전합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -164,7 +109,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: '3단계. 스칼라 서브쿼리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -176,59 +121,20 @@ sections:
           ORDER BY tip DESC
           LIMIT 10
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              total_bill,
-              tip,
-              (SELECT AVG(tip) FROM tips) AS avgTip,
-              tip - (SELECT AVG(tip) FROM tips) AS diffFromAvg
-          FROM tips
-          ORDER BY tip DESC
-          LIMIT 10
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 스칼라 서브쿼리는 SELECT 절에 서브쿼리를 넣어 단일 값(1행 1열)을 가져옵니다. 각 행마다 전체 평균과 비교할 때 매우 유용합니다. 예를 들어 "이 고객의 팁이 전체 평균보다 높은가?"라는
-      질문에 답할 수 있습니다. 서브쿼리는 메인 쿼리가 실행될 때마다 평가되어 동적인 비교가 가능합니다.
-  - type: code
-    language: python
-    title: 전체 평균과 비교
-    description: 각 행에 평균 추가
-    content: |-
-      duckdb.sql("""
-          SELECT
-              total_bill,
-              tip,
-              (SELECT AVG(tip) FROM tips) AS avgTip,
-              tip - (SELECT AVG(tip) FROM tips) AS diffFromAvg
-          FROM tips
-          ORDER BY tip DESC
-          LIMIT 10
-      """).show()
-  - type: tip
-    content: 스칼라 서브쿼리는 반드시 단일 값(1행 1열)을 반환해야 합니다. (SELECT AVG(...) FROM ...)처럼 집계 함수를 사용하면 안전합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_scalar_tip_rate
   title: 4단계. 팁 비율 비교
   structuredPrimary: true
   subtitle: 스칼라 서브쿼리 활용
-  goal: '4단계. 팁 비율 비교: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 팁 비율 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 각 고객의 팁 비율을 전체 평균 팁 비율과 비교합니다. 평균보다 후하게 팁을 준 고객을 찾을 수 있습니다. 스칼라 서브쿼리는 매 행마다 평균값을 참조하여 개별 데이터와 전체 통계를 동시에 볼
-    수 있게 해줍니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 각 고객의 팁 비율을 전체 평균 팁 비율과 비교합니다. 평균보다 후하게 팁을 준 고객을 찾을 수 있습니다. 스칼라 서브쿼리는 매 행마다 평균값을 참조하여 개별 데이터와 전체 통계를 동시에 볼 수 있게 해줍니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -242,7 +148,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: '4단계. 팁 비율 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -255,61 +161,23 @@ sections:
           ORDER BY tipPct DESC
           LIMIT 10
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              day,
-              total_bill,
-              tip,
-              ROUND(tip / total_bill * 100, 1) AS tipPct,
-              ROUND((SELECT AVG(tip / total_bill) * 100 FROM tips), 1) AS avgTipPct
-          FROM tips
-          ORDER BY tipPct DESC
-          LIMIT 10
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 각 고객의 팁 비율을 전체 평균 팁 비율과 비교합니다. 평균보다 후하게 팁을 준 고객을 찾을 수 있습니다. 스칼라 서브쿼리는 매 행마다 평균값을 참조하여 개별 데이터와 전체 통계를 동시에 볼 수
-      있게 해줍니다.
-  - type: code
-    language: python
-    title: 팁 비율 비교
-    description: 개별 팁 비율 vs 평균 팁 비율
-    content: |-
-      duckdb.sql("""
-          SELECT
-              day,
-              total_bill,
-              tip,
-              ROUND(tip / total_bill * 100, 1) AS tipPct,
-              ROUND((SELECT AVG(tip / total_bill) * 100 FROM tips), 1) AS avgTipPct
-          FROM tips
-          ORDER BY tipPct DESC
-          LIMIT 10
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_where_subquery
   title: 5단계. WHERE 서브쿼리
   structuredPrimary: true
   subtitle: 동적 조건 필터링
-  goal: '5단계. WHERE 서브쿼리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. WHERE 서브쿼리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     WHERE 절에 서브쿼리를 사용하면 하드코딩 없이 동적으로 조건을 설정할 수 있습니다. 평균 이상인 데이터만 필터링해봅니다.
 
     WHERE 서브쿼리는 데이터 기반 필터링을 가능하게 합니다. WHERE tip > 3 대신 WHERE tip > (SELECT AVG(...))로 평균이 바뀌어도 자동 적용됩니다.
   tips:
   - WHERE 서브쿼리는 데이터 기반 필터링을 가능하게 합니다. WHERE tip > 3 대신 WHERE tip > (SELECT AVG(...))로 평균이 바뀌어도 자동 적용됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT *
@@ -319,7 +187,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: '5단계. WHERE 서브쿼리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT *
@@ -328,54 +196,23 @@ sections:
           ORDER BY tip DESC
           LIMIT 10
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT *
-          FROM tips
-          WHERE tip > (SELECT AVG(tip) FROM tips)
-          ORDER BY tip DESC
-          LIMIT 10
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: WHERE 절에 서브쿼리를 사용하면 하드코딩 없이 동적으로 조건을 설정할 수 있습니다. 평균 이상인 데이터만 필터링해봅니다.
-  - type: code
-    language: python
-    title: 평균 이상 팁 필터링
-    description: WHERE tip > (서브쿼리)
-    content: |-
-      duckdb.sql("""
-          SELECT *
-          FROM tips
-          WHERE tip > (SELECT AVG(tip) FROM tips)
-          ORDER BY tip DESC
-          LIMIT 10
-      """).show()
-  - type: tip
-    content: WHERE 서브쿼리는 데이터 기반 필터링을 가능하게 합니다. WHERE tip > 3 대신 WHERE tip > (SELECT AVG(...))로 평균이 바뀌어도 자동 적용됩니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_where_in
   title: 6단계. WHERE IN 서브쿼리
   structuredPrimary: true
   subtitle: 목록 필터링
-  goal: '6단계. WHERE IN 서브쿼리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. WHERE IN 서브쿼리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     WHERE IN 서브쿼리로 특정 조건을 만족하는 그룹의 데이터만 선택할 수 있습니다. 평균 팁이 3달러 이상인 요일의 데이터만 조회합니다.
 
     WHERE col IN (서브쿼리)는 서브쿼리 결과 목록에 포함된 값만 선택합니다. 서브쿼리는 단일 컬럼을 반환해야 합니다.
   tips:
   - WHERE col IN (서브쿼리)는 서브쿼리 결과 목록에 포함된 값만 선택합니다. 서브쿼리는 단일 컬럼을 반환해야 합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -393,7 +230,7 @@ sections:
         ORDER BY avgTip DESC
     """).show()
   exercise:
-    prompt: '6단계. WHERE IN 서브쿼리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -410,70 +247,23 @@ sections:
           GROUP BY day
           ORDER BY avgTip DESC
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              day,
-              COUNT(*) AS cnt,
-              ROUND(AVG(tip), 2) AS avgTip
-          FROM tips
-          WHERE day IN (
-              SELECT day
-              FROM tips
-              GROUP BY day
-              HAVING AVG(tip) > 3
-          )
-          GROUP BY day
-          ORDER BY avgTip DESC
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: WHERE IN 서브쿼리로 특정 조건을 만족하는 그룹의 데이터만 선택할 수 있습니다. 평균 팁이 3달러 이상인 요일의 데이터만 조회합니다.
-  - type: code
-    language: python
-    title: 특정 요일 데이터만 필터링
-    description: WHERE day IN (서브쿼리)
-    content: |-
-      duckdb.sql("""
-          SELECT
-              day,
-              COUNT(*) AS cnt,
-              ROUND(AVG(tip), 2) AS avgTip
-          FROM tips
-          WHERE day IN (
-              SELECT day
-              FROM tips
-              GROUP BY day
-              HAVING AVG(tip) > 3
-          )
-          GROUP BY day
-          ORDER BY avgTip DESC
-      """).show()
-  - type: tip
-    content: WHERE col IN (서브쿼리)는 서브쿼리 결과 목록에 포함된 값만 선택합니다. 서브쿼리는 단일 컬럼을 반환해야 합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_from_subquery
   title: 7단계. FROM 서브쿼리
   structuredPrimary: true
   subtitle: 집계 결과를 테이블처럼 사용
-  goal: '7단계. FROM 서브쿼리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. FROM 서브쿼리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     FROM 절에 서브쿼리를 넣으면 집계 결과를 마치 테이블처럼 사용할 수 있습니다. 복잡한 집계를 단계적으로 수행할 때 유용합니다.
 
     FROM 서브쿼리는 반드시 AS로 별칭을 지정해야 합니다. 별칭 없이는 컬럼을 참조할 수 없습니다.
   tips:
   - FROM 서브쿼리는 반드시 AS로 별칭을 지정해야 합니다. 별칭 없이는 컬럼을 참조할 수 없습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -493,7 +283,7 @@ sections:
         ORDER BY sub.avgTip DESC
     """).show()
   exercise:
-    prompt: '7단계. FROM 서브쿼리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -512,72 +302,20 @@ sections:
           ) AS sub
           ORDER BY sub.avgTip DESC
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              sub.day,
-              sub.avgTip,
-              sub.maxTip,
-              sub.cnt
-          FROM (
-              SELECT
-                  day,
-                  ROUND(AVG(tip), 2) AS avgTip,
-                  MAX(tip) AS maxTip,
-                  COUNT(*) AS cnt
-              FROM tips
-              GROUP BY day
-          ) AS sub
-          ORDER BY sub.avgTip DESC
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: FROM 절에 서브쿼리를 넣으면 집계 결과를 마치 테이블처럼 사용할 수 있습니다. 복잡한 집계를 단계적으로 수행할 때 유용합니다.
-  - type: code
-    language: python
-    title: 집계 결과 재사용
-    description: FROM (서브쿼리) AS 별칭
-    content: |-
-      duckdb.sql("""
-          SELECT
-              sub.day,
-              sub.avgTip,
-              sub.maxTip,
-              sub.cnt
-          FROM (
-              SELECT
-                  day,
-                  ROUND(AVG(tip), 2) AS avgTip,
-                  MAX(tip) AS maxTip,
-                  COUNT(*) AS cnt
-              FROM tips
-              GROUP BY day
-          ) AS sub
-          ORDER BY sub.avgTip DESC
-      """).show()
-  - type: tip
-    content: FROM 서브쿼리는 반드시 AS로 별칭을 지정해야 합니다. 별칭 없이는 컬럼을 참조할 수 없습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_from_rank
   title: 8단계. FROM 서브쿼리 + 윈도우 함수
   structuredPrimary: true
   subtitle: 순위 매긴 후 조회
-  goal: '8단계. FROM 서브쿼리 + 윈도우 함수: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. FROM 서브쿼리 + 윈도우 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: FROM 서브쿼리와 윈도우 함수를 조합하면 순위를 매긴 후 특정 순위만 추출할 수 있습니다. 윈도우 함수는 WHERE 절에 직접 사용할 수 없으므로, FROM 서브쿼리로 한 번 감싸서 결과를
-    필터링합니다. 이 패턴은 'TOP N' 쿼리에서 자주 사용됩니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: FROM 서브쿼리와 윈도우 함수를 조합하면 순위를 매긴 후 특정 순위만 추출할 수 있습니다. 윈도우 함수는 WHERE 절에 직접 사용할 수 없으므로, FROM 서브쿼리로 한 번 감싸서 결과를 필터링합니다. 이 패턴은 'TOP N' 쿼리에서 자주 사용됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -595,7 +333,7 @@ sections:
         ORDER BY sub.tipRank
     """).show()
   exercise:
-    prompt: '8단계. FROM 서브쿼리 + 윈도우 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -612,66 +350,20 @@ sections:
           ) AS sub
           ORDER BY sub.tipRank
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              sub.day,
-              sub.avgTip,
-              sub.tipRank
-          FROM (
-              SELECT
-                  day,
-                  ROUND(AVG(tip), 2) AS avgTip,
-                  RANK() OVER(ORDER BY AVG(tip) DESC) AS tipRank
-              FROM tips
-              GROUP BY day
-          ) AS sub
-          ORDER BY sub.tipRank
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: FROM 서브쿼리와 윈도우 함수를 조합하면 순위를 매긴 후 특정 순위만 추출할 수 있습니다. 윈도우 함수는 WHERE 절에 직접 사용할 수 없으므로, FROM 서브쿼리로 한 번 감싸서 결과를 필터링합니다.
-      이 패턴은 'TOP N' 쿼리에서 자주 사용됩니다.
-  - type: code
-    language: python
-    title: 요일별 순위 분석
-    description: 윈도우 함수 결과 활용
-    content: |-
-      duckdb.sql("""
-          SELECT
-              sub.day,
-              sub.avgTip,
-              sub.tipRank
-          FROM (
-              SELECT
-                  day,
-                  ROUND(AVG(tip), 2) AS avgTip,
-                  RANK() OVER(ORDER BY AVG(tip) DESC) AS tipRank
-              FROM tips
-              GROUP BY day
-          ) AS sub
-          ORDER BY sub.tipRank
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_complex_subquery
   title: 9단계. 복합 서브쿼리
   structuredPrimary: true
   subtitle: 그룹 평균과 비교
-  goal: '9단계. 복합 서브쿼리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 복합 서브쿼리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 서브쿼리를 JOIN과 결합하면 각 그룹의 평균과 개별 값을 비교할 수 있습니다. 요일별 평균보다 높은 팁만 추출합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -691,7 +383,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: '9단계. 복합 서브쿼리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -710,70 +402,20 @@ sections:
           ORDER BY diffFromDayAvg DESC
           LIMIT 10
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              t.day,
-              t.total_bill,
-              t.tip,
-              dayAvg.avgTip AS dayAvgTip,
-              ROUND(t.tip - dayAvg.avgTip, 2) AS diffFromDayAvg
-          FROM tips t
-          JOIN (
-              SELECT day, AVG(tip) AS avgTip
-              FROM tips
-              GROUP BY day
-          ) AS dayAvg ON t.day = dayAvg.day
-          WHERE t.tip > dayAvg.avgTip
-          ORDER BY diffFromDayAvg DESC
-          LIMIT 10
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 서브쿼리를 JOIN과 결합하면 각 그룹의 평균과 개별 값을 비교할 수 있습니다. 요일별 평균보다 높은 팁만 추출합니다.
-  - type: code
-    language: python
-    title: 요일별 평균 초과 팁
-    description: 서브쿼리 + JOIN
-    content: |-
-      duckdb.sql("""
-          SELECT
-              t.day,
-              t.total_bill,
-              t.tip,
-              dayAvg.avgTip AS dayAvgTip,
-              ROUND(t.tip - dayAvg.avgTip, 2) AS diffFromDayAvg
-          FROM tips t
-          JOIN (
-              SELECT day, AVG(tip) AS avgTip
-              FROM tips
-              GROUP BY day
-          ) AS dayAvg ON t.day = dayAvg.day
-          WHERE t.tip > dayAvg.avgTip
-          ORDER BY diffFromDayAvg DESC
-          LIMIT 10
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_time_analysis
   title: 10단계. 시간대별 복합 분석
   structuredPrimary: true
   subtitle: 다중 서브쿼리
-  goal: '10단계. 시간대별 복합 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 시간대별 복합 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 전체 평균과 시간대별 평균을 동시에 비교하여 팁 성향을 분석합니다. 스칼라 서브쿼리와 FROM 서브쿼리를 함께 사용하면 여러 층위의 통계를 한 번에 비교할 수 있습니다. 개별 데이터가 그룹 평균
-    및 전체 평균과 어떻게 다른지 한눈에 파악할 수 있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 전체 평균과 시간대별 평균을 동시에 비교하여 팁 성향을 분석합니다. 스칼라 서브쿼리와 FROM 서브쿼리를 함께 사용하면 여러 층위의 통계를 한 번에 비교할 수 있습니다. 개별 데이터가 그룹 평균 및 전체 평균과 어떻게 다른지 한눈에 파악할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -796,7 +438,7 @@ sections:
         LIMIT 12
     """).show()
   exercise:
-    prompt: '10단계. 시간대별 복합 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -818,77 +460,20 @@ sections:
           ORDER BY t.tip DESC
           LIMIT 12
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              t.time,
-              t.day,
-              t.tip,
-              (SELECT AVG(tip) FROM tips) AS totalAvg,
-              timeAvg.avgTip AS timeAvgTip,
-              CASE
-                  WHEN t.tip > timeAvg.avgTip THEN '평균 이상'
-                  ELSE '평균 이하'
-              END AS category
-          FROM tips t
-          JOIN (
-              SELECT time, AVG(tip) AS avgTip
-              FROM tips
-              GROUP BY time
-          ) AS timeAvg ON t.time = timeAvg.time
-          ORDER BY t.tip DESC
-          LIMIT 12
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 전체 평균과 시간대별 평균을 동시에 비교하여 팁 성향을 분석합니다. 스칼라 서브쿼리와 FROM 서브쿼리를 함께 사용하면 여러 층위의 통계를 한 번에 비교할 수 있습니다. 개별 데이터가 그룹 평균
-      및 전체 평균과 어떻게 다른지 한눈에 파악할 수 있습니다.
-  - type: code
-    language: python
-    title: 시간대별 종합 비교
-    description: 스칼라 + FROM 서브쿼리 조합
-    content: |-
-      duckdb.sql("""
-          SELECT
-              t.time,
-              t.day,
-              t.tip,
-              (SELECT AVG(tip) FROM tips) AS totalAvg,
-              timeAvg.avgTip AS timeAvgTip,
-              CASE
-                  WHEN t.tip > timeAvg.avgTip THEN '평균 이상'
-                  ELSE '평균 이하'
-              END AS category
-          FROM tips t
-          JOIN (
-              SELECT time, AVG(tip) AS avgTip
-              FROM tips
-              GROUP BY time
-          ) AS timeAvg ON t.time = timeAvg.time
-          ORDER BY t.tip DESC
-          LIMIT 12
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_final
   title: 11단계. 최종 결과물
   structuredPrimary: true
   subtitle: 서브쿼리 패턴 정리
-  goal: '11단계. 최종 결과물: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 최종 결과물: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 지금까지 배운 3가지 서브쿼리 패턴을 정리합니다. 스칼라 서브쿼리는 단일 값 반환, WHERE 서브쿼리는 조건 필터링, FROM 서브쿼리는 집계 결과를 테이블처럼 사용합니다. 각 패턴의 특성을
-    이해하면 상황에 맞는 최적의 쿼리를 작성할 수 있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 지금까지 배운 3가지 서브쿼리 패턴을 정리합니다. 스칼라 서브쿼리는 단일 값 반환, WHERE 서브쿼리는 조건 필터링, FROM 서브쿼리는 집계 결과를 테이블처럼 사용합니다. 각 패턴의 특성을 이해하면 상황에 맞는 최적의 쿼리를 작성할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -907,7 +492,7 @@ sections:
             '집계 결과 테이블화'
     """).show()
   exercise:
-    prompt: '11단계. 최종 결과물: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -925,71 +510,23 @@ sections:
               'FROM (SELECT ...) AS sub',
               '집계 결과 테이블화'
       """).show()
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              '스칼라' AS pattern,
-              'SELECT (SELECT ...) FROM ...' AS syntax,
-              '단일 값 반환' AS description
-          UNION ALL
-          SELECT
-              'WHERE',
-              'WHERE col IN/>/< (SELECT ...)',
-              '조건 필터링'
-          UNION ALL
-          SELECT
-              'FROM',
-              'FROM (SELECT ...) AS sub',
-              '집계 결과 테이블화'
-      """).show()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 3가지 서브쿼리 패턴을 정리합니다. 스칼라 서브쿼리는 단일 값 반환, WHERE 서브쿼리는 조건 필터링, FROM 서브쿼리는 집계 결과를 테이블처럼 사용합니다. 각 패턴의 특성을 이해하면
-      상황에 맞는 최적의 쿼리를 작성할 수 있습니다.
-  - type: code
-    language: python
-    title: 서브쿼리 패턴 요약
-    description: 3가지 패턴 비교
-    content: |-
-      duckdb.sql("""
-          SELECT
-              '스칼라' AS pattern,
-              'SELECT (SELECT ...) FROM ...' AS syntax,
-              '단일 값 반환' AS description
-          UNION ALL
-          SELECT
-              'WHERE',
-              'WHERE col IN/>/< (SELECT ...)',
-              '조건 필터링'
-          UNION ALL
-          SELECT
-              'FROM',
-              'FROM (SELECT ...) AS sub',
-              '집계 결과 테이블화'
-      """).show()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 12단계. 실무 서브쿼리 검증
   structuredPrimary: true
   subtitle: 예측 → 스칼라 오류 확인 → 결과 검증 → 기준 실험
-  goal: '12단계. 실무 서브쿼리 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '12단계. 실무 서브쿼리 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     서브쿼리는 결과가 나왔다고 끝이 아닙니다. 실무에서는 스칼라 서브쿼리가 정말 1행 1열인지, 동적 기준이 예상한 그룹을 고르는지, 최종 결과가 전체 평균과 그룹 평균을 모두 넘는지 검증해야 합니다.
 
     서브쿼리 학습은 문법 암기가 아니라 기준을 코드로 고정하는 연습입니다. 오류가 나는 서브쿼리와 통과해야 하는 결과를 함께 검증하면 SQL을 업무 리포트에 사용할 수 있습니다.
   tips:
   - 서브쿼리 학습은 문법 암기가 아니라 기준을 코드로 고정하는 연습입니다. 오류가 나는 서브쿼리와 통과해야 하는 결과를 함께 검증하면 SQL을 업무 리포트에 사용할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     dayTipSummary = duckdb.sql("""
         SELECT
@@ -1010,7 +547,7 @@ sections:
     bestTipDay = dayTipSummary.iloc[0]["day"]
     bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
   exercise:
-    prompt: '12단계. 실무 서브쿼리 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       dayTipSummary = duckdb.sql("""
           SELECT
@@ -1030,172 +567,23 @@ sections:
 
       bestTipDay = dayTipSummary.iloc[0]["day"]
       bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
-    solution: |-
-      dayTipSummary = duckdb.sql("""
-          SELECT
-              day,
-              ROUND(AVG(tip), 2) AS avgTip,
-              COUNT(*) AS orderCount
-          FROM tips
-          GROUP BY day
-          ORDER BY avgTip DESC
-      """).df()
-
-      aboveTotalAvgCount = duckdb.sql("""
-          SELECT COUNT(*) AS cnt
-          FROM tips
-          WHERE tip > (SELECT AVG(tip) FROM tips)
-      """).fetchone()[0]
-
-      bestTipDay = dayTipSummary.iloc[0]["day"]
-      bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 서브쿼리는 결과가 나왔다고 끝이 아닙니다. 실무에서는 스칼라 서브쿼리가 정말 1행 1열인지, 동적 기준이 예상한 그룹을 고르는지, 최종 결과가 전체 평균과 그룹 평균을 모두 넘는지 검증해야 합니다.
-  - type: list
-    items:
-    - 실행 전에는 어느 요일의 평균 팁이 가장 높을지 먼저 예측합니다.
-    - 스칼라 서브쿼리가 여러 행을 반환하면 SQL 오류로 확인합니다.
-    - 최종 결과는 show()만 보지 말고 df()로 받아 행 수와 첫 행을 검증합니다.
-    - 평균 초과 기준을 바꾸며 운영 대상 주문 수가 어떻게 달라지는지 실험합니다.
-  - type: code
-    language: python
-    title: 업무 기준 예측
-    description: 전체 평균, 요일 평균, 평균 초과 주문 수를 먼저 계산합니다.
-    content: |-
-      dayTipSummary = duckdb.sql("""
-          SELECT
-              day,
-              ROUND(AVG(tip), 2) AS avgTip,
-              COUNT(*) AS orderCount
-          FROM tips
-          GROUP BY day
-          ORDER BY avgTip DESC
-      """).df()
-
-      aboveTotalAvgCount = duckdb.sql("""
-          SELECT COUNT(*) AS cnt
-          FROM tips
-          WHERE tip > (SELECT AVG(tip) FROM tips)
-      """).fetchone()[0]
-
-      bestTipDay = dayTipSummary.iloc[0]["day"]
-      bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
-  - type: code
-    language: python
-    title: 스칼라 서브쿼리 오류 확인
-    description: 여러 행을 반환하는 서브쿼리를 SELECT 절에 넣으면 어떤 오류가 나는지 확인합니다.
-    content: |-
-      try:
-          duckdb.sql("""
-              SELECT
-                  day,
-                  (SELECT tip FROM tips) AS brokenTip
-              FROM tips
-              LIMIT 1
-          """).df()
-      except duckdb.InvalidInputException as exc:
-          scalarSubqueryError = str(exc).splitlines()[0]
-
-      scalarSubqueryError
-  - type: code
-    language: python
-    title: 평균 초과 주문 추출
-    description: 전체 평균과 요일 평균을 모두 넘는 주문을 FROM 서브쿼리로 비교합니다.
-    content: |-
-      aboveAverageOrders = duckdb.sql("""
-          SELECT
-              t.day,
-              t.time,
-              t.total_bill,
-              t.tip,
-              ROUND(t.tip - totalAvg.avgTip, 2) AS diffTotalAvg,
-              ROUND(t.tip - dayAvg.avgTip, 2) AS diffDayAvg
-          FROM tips t
-          CROSS JOIN (
-              SELECT AVG(tip) AS avgTip
-              FROM tips
-          ) AS totalAvg
-          JOIN (
-              SELECT day, AVG(tip) AS avgTip
-              FROM tips
-              GROUP BY day
-          ) AS dayAvg ON t.day = dayAvg.day
-          WHERE t.tip > totalAvg.avgTip
-            AND t.tip > dayAvg.avgTip
-          ORDER BY diffDayAvg DESC
-          LIMIT 10
-      """).df()
-
-      aboveAverageOrders
-  - type: code
-    language: python
-    title: 결과 검증
-    description: 예측한 최고 요일, 오류 메시지, 최종 결과 첫 행을 검증합니다.
-    content: |-
-      subqueryChecks = {
-          "bestDayOk": bestTipDay == "Sun",
-          "aboveTotalCountOk": aboveTotalAvgCount == 60,
-          "scalarErrorOk": scalarSubqueryError.startswith("Invalid Input Error: More than one row returned"),
-          "resultRowsOk": len(aboveAverageOrders) == 10,
-          "topOrderOk": aboveAverageOrders.iloc[0].to_dict() == {
-              "day": "Sun",
-              "time": "Dinner",
-              "total_bill": 46.65,
-              "tip": 8.21,
-              "diffTotalAvg": 3.16,
-              "diffDayAvg": 1.77,
-          },
-      }
-
-      assert all(subqueryChecks.values()), subqueryChecks
-      subqueryChecks
-  - type: code
-    language: python
-    title: 수정 실험
-    description: 요일 평균보다 얼마나 더 높은 주문만 볼지 기준을 바꿔 비교합니다.
-    content: |-
-      def countOrdersAboveDayAverage(minDiff):
-          return duckdb.sql(f"""
-              SELECT COUNT(*) AS cnt
-              FROM tips t
-              JOIN (
-                  SELECT day, AVG(tip) AS avgTip
-                  FROM tips
-                  GROUP BY day
-              ) AS dayAvg ON t.day = dayAvg.day
-              WHERE t.tip - dayAvg.avgTip >= {minDiff}
-          """).fetchone()[0]
-
-      broadOrderCount = countOrdersAboveDayAverage(0.5)
-      strictOrderCount = countOrdersAboveDayAverage(1.5)
-
-      broadOrderCount, strictOrderCount
-  - type: tip
-    content: 서브쿼리 학습은 문법 암기가 아니라 기준을 코드로 고정하는 연습입니다. 오류가 나는 서브쿼리와 통과해야 하는 결과를 함께 검증하면 SQL을 업무 리포트에 사용할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 서브쿼리 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     배운 서브쿼리 패턴을 활용해 팁 데이터를 분석합니다. 스칼라 서브쿼리로 전체 평균을 계산하고, WHERE 서브쿼리로 조건 비교를 수행합니다. 서브쿼리는 복잡한 비교 분석의 핵심 도구입니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import pandas as pd
     import duckdb
@@ -1210,7 +598,7 @@ sections:
     })
     tbl1 = duckdb.from_df(data)
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       import duckdb
@@ -1224,102 +612,11 @@ sections:
           "size": [2, 4, 3, 2, 5, 2, 2, 3],
       })
       tbl1 = duckdb.from_df(data)
-    solution: |-
-      import pandas as pd
-      import duckdb
-      data = pd.DataFrame({
-          "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
-          "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
-          "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
-          "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
-          "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
-          "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
-          "size": [2, 4, 3, 2, 5, 2, 2, 3],
-      })
-      tbl1 = duckdb.from_df(data)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 배운 서브쿼리 패턴을 활용해 팁 데이터를 분석합니다. 스칼라 서브쿼리로 전체 평균을 계산하고, WHERE 서브쿼리로 조건 비교를 수행합니다. 서브쿼리는 복잡한 비교 분석의 핵심 도구입니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 전체 평균 팁 비율보다 높은 팁을 준 손님 조회'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import pandas as pd
-        import duckdb
-        data = pd.DataFrame({
-            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
-            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
-            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
-            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
-            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
-            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
-            "size": [2, 4, 3, 2, 5, 2, 2, 3],
-        })
-        tbl1 = duckdb.from_df(data)
-    - type: code
-      title: 쿼리 실행
-      content: |-
-        duckdb.sql("""
-            SELECT
-                day,
-                time,
-                total_bill AS bill,
-                tip,
-                ROUND(tip / total_bill * 100, 1) AS tipPct,
-                ROUND((SELECT AVG(tip / total_bill) * 100 FROM tbl1), 1) AS avgPct
-            FROM tbl1
-            WHERE tip / total_bill > (SELECT AVG(tip / total_bill) FROM tbl1)
-            ORDER BY tipPct DESC
-            LIMIT 10
-        """)
-  - type: expansion
-    title: '미션2: 평균 결제금액이 더 높은 시간대 데이터만 필터링'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import pandas as pd
-        import duckdb
-        frame = pd.DataFrame({
-            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
-            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
-            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
-            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
-            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
-            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
-            "size": [2, 4, 3, 2, 5, 2, 2, 3],
-        })
-        tbl2 = duckdb.from_df(frame)
-    - type: code
-      title: 쿼리 실행
-      content: |-
-        duckdb.sql("""
-            SELECT time, total_bill AS bill, tip
-            FROM tbl2
-            WHERE time = (
-                SELECT time
-                FROM tbl2
-                GROUP BY time
-                ORDER BY AVG(total_bill) DESC
-                LIMIT 1
-            )
-            ORDER BY bill DESC
-            LIMIT 10
-        """)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   blocks:

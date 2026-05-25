@@ -34,12 +34,11 @@ sections:
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: 분석 대상 이미지
-  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: sklearn의 flower 이미지를 불러옵니다. 꽃의 주황색 영역을 검출하는 파이프라인을 구축합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -54,7 +53,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -68,72 +67,23 @@ sections:
       plt.title(f'Scene: {scene.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      flower = load_sample_image('flower.jpg')
-      scene = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(flower)
-      plt.title(f'Scene: {scene.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: sklearn의 flower 이미지를 불러옵니다. 꽃의 주황색 영역을 검출하는 파이프라인을 구축합니다.
-  - type: code
-    language: python
-    title: 라이브러리와 이미지 로드
-    description: flower 이미지를 불러옵니다
-    content: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      flower = load_sample_image('flower.jpg')
-      scene = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(flower)
-      plt.title(f'Scene: {scene.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 원본 이미지 출력
-    description: 분석할 이미지입니다
-    content: |-
-      plt.figure(figsize=(10, 6))
-      plt.imshow(flower)
-      plt.title('Original Image')
-      plt.axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_hsv
   title: 2단계. HSV 변환
   structuredPrimary: true
   subtitle: 색상 기반 분석 준비
-  goal: '2단계. HSV 변환: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. HSV 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     RGB에서는 "빨간색 계열"을 찾으려면 R, G, B 세 채널을 복잡하게 조합해야 하지만, HSV에서는 Hue(색상) 채널 하나만 보면 됩니다. Hue 값이 비슷하면 밝기나 채도와 관계없이 같은 색 계열입니다. 이러한 특성 때문에 HSV는 색상 기반 객체 검출에 널리 사용됩니다.
 
     OpenCV HSV에서 H는 0-179 범위입니다. 주황색은 대략 5-25, 노란색은 25-35, 녹색은 35-85 정도입니다. 정확한 값은 이미지마다 다르므로 확인이 필요합니다.
   tips:
   - OpenCV HSV에서 H는 0-179 범위입니다. 주황색은 대략 5-25, 노란색은 25-35, 녹색은 35-85 정도입니다. 정확한 값은 이미지마다 다르므로 확인이 필요합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
     hue, sat, val = cv2.split(hsv)
@@ -143,7 +93,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '2단계. HSV 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
       hue, sat, val = cv2.split(hsv)
@@ -152,71 +102,23 @@ sections:
       plt.title(f'HSV: {hsv.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
-      hue, sat, val = cv2.split(hsv)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(hsv)
-      plt.title(f'HSV: {hsv.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: RGB에서는 "빨간색 계열"을 찾으려면 R, G, B 세 채널을 복잡하게 조합해야 하지만, HSV에서는 Hue(색상) 채널 하나만 보면 됩니다. Hue 값이 비슷하면 밝기나 채도와 관계없이 같은
-      색 계열입니다. 이러한 특성 때문에 HSV는 색상 기반 객체 검출에 널리 사용됩니다.
-  - type: code
-    language: python
-    title: HSV 변환
-    description: BGR을 HSV로 변환합니다
-    content: |-
-      hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
-      hue, sat, val = cv2.split(hsv)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(hsv)
-      plt.title(f'HSV: {hsv.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: HSV 채널 확인
-    description: 각 채널을 시각화합니다
-    content: |-
-      figHsv, axHsv = plt.subplots(1, 3, figsize=(14, 4))
-      axHsv[0].imshow(hue, cmap='hsv')
-      axHsv[0].set_title('Hue')
-      axHsv[0].axis('off')
-      axHsv[1].imshow(sat, cmap='gray')
-      axHsv[1].set_title('Saturation')
-      axHsv[1].axis('off')
-      axHsv[2].imshow(val, cmap='gray')
-      axHsv[2].set_title('Value')
-      axHsv[2].axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: OpenCV HSV에서 H는 0-179 범위입니다. 주황색은 대략 5-25, 노란색은 25-35, 녹색은 35-85 정도입니다. 정확한 값은 이미지마다 다르므로 확인이 필요합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_mask
   title: 3단계. 색상 마스킹
   structuredPrimary: true
   subtitle: inRange()
-  goal: '3단계. 색상 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 색상 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     inRange()는 범위 필터링 함수로, 지정한 하한(lower)과 상한(upper) 사이의 픽셀만 흰색(255)으로, 나머지는 검은색(0)으로 만드는 이진 마스크를 생성합니다. HSV에서 [H_min, S_min, V_min]과 [H_max, S_max, V_max]를 지정하면 해당 색상 범위의 픽셀만 추출됩니다. 색상 기반 객체 분할의 핵심 함수입니다.
 
     inRange(src, lowerb, upperb)는 lowerb <= pixel <= upperb인 픽셀을 255로, 나머지를 0으로 설정합니다. HSV에서 [H, S, V] 순서로 범위를 지정합니다.
   tips:
   - inRange(src, lowerb, upperb)는 lowerb <= pixel <= upperb인 픽셀을 255로, 나머지를 0으로 설정합니다. HSV에서 [H, S, V] 순서로 범위를 지정합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     lowerOrange = np.array([5, 100, 100])
     upperOrange = np.array([25, 255, 255])
@@ -227,7 +129,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '3단계. 색상 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       lowerOrange = np.array([5, 100, 100])
       upperOrange = np.array([25, 255, 255])
@@ -237,67 +139,20 @@ sections:
       plt.title(f'Mask: {mask.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      lowerOrange = np.array([5, 100, 100])
-      upperOrange = np.array([25, 255, 255])
-      mask = cv2.inRange(hsv, lowerOrange, upperOrange)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(mask, cmap='gray')
-      plt.title(f'Mask: {mask.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: inRange()는 범위 필터링 함수로, 지정한 하한(lower)과 상한(upper) 사이의 픽셀만 흰색(255)으로, 나머지는 검은색(0)으로 만드는 이진 마스크를 생성합니다. HSV에서 [H_min,
-      S_min, V_min]과 [H_max, S_max, V_max]를 지정하면 해당 색상 범위의 픽셀만 추출됩니다. 색상 기반 객체 분할의 핵심 함수입니다.
-  - type: code
-    language: python
-    title: 주황색 범위 설정
-    description: 꽃의 주황색 범위를 지정합니다
-    content: |-
-      lowerOrange = np.array([5, 100, 100])
-      upperOrange = np.array([25, 255, 255])
-      mask = cv2.inRange(hsv, lowerOrange, upperOrange)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(mask, cmap='gray')
-      plt.title(f'Mask: {mask.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: inRange(src, lowerb, upperb)는 lowerb <= pixel <= upperb인 픽셀을 255로, 나머지를 0으로 설정합니다. HSV에서 [H, S, V] 순서로 범위를 지정합니다.
-  - type: code
-    language: python
-    title: 마스크 확인
-    description: 생성된 마스크를 확인합니다
-    content: |-
-      figMask, axMask = plt.subplots(1, 2, figsize=(12, 5))
-      axMask[0].imshow(flower)
-      axMask[0].set_title('Original')
-      axMask[0].axis('off')
-      axMask[1].imshow(mask, cmap='gray')
-      axMask[1].set_title('Orange Mask')
-      axMask[1].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_morph
   title: 4단계. 마스크 정제
   structuredPrimary: true
   subtitle: 모폴로지 연산
-  goal: '4단계. 마스크 정제: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 마스크 정제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 마스크에 노이즈가 있을 수 있습니다. 모폴로지 연산으로 작은 노이즈를 제거하고 구멍을 채웁니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
@@ -308,7 +163,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '4단계. 마스크 정제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
       maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
@@ -318,67 +173,23 @@ sections:
       plt.title(f'Mask Clean: {maskClean.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-      maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-      maskClean = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, kernel)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(maskClean, cmap='gray')
-      plt.title(f'Mask Clean: {maskClean.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 마스크에 노이즈가 있을 수 있습니다. 모폴로지 연산으로 작은 노이즈를 제거하고 구멍을 채웁니다.
-  - type: code
-    language: python
-    title: 열기와 닫기 적용
-    description: 노이즈 제거와 구멍 채우기입니다
-    content: |-
-      kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-      maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-      maskClean = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, kernel)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(maskClean, cmap='gray')
-      plt.title(f'Mask Clean: {maskClean.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 정제 비교
-    description: 정제 전후를 비교합니다
-    content: |-
-      figClean, axClean = plt.subplots(1, 2, figsize=(12, 5))
-      axClean[0].imshow(mask, cmap='gray')
-      axClean[0].set_title('Raw Mask')
-      axClean[0].axis('off')
-      axClean[1].imshow(maskClean, cmap='gray')
-      axClean[1].set_title('Cleaned Mask')
-      axClean[1].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_apply
   title: 5단계. 마스크 적용
   structuredPrimary: true
   subtitle: bitwise_and()
-  goal: '5단계. 마스크 적용: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 마스크 적용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     bitwise_and()는 비트 단위 AND 연산을 수행합니다. mask 파라미터를 사용하면 마스크가 흰색(255)인 픽셀만 연산 결과가 유지되고, 검은색(0)인 픽셀은 0이 됩니다. 이를 통해 원본 이미지에서 특정 영역만 추출하는 마스킹(masking) 효과를 얻습니다.
 
     bitwise_and(src1, src2, mask=mask)는 mask가 0이 아닌 픽셀에서만 연산을 수행합니다. src1과 src2가 같으면 마스킹 효과가 됩니다.
   tips:
   - bitwise_and(src1, src2, mask=mask)는 mask가 0이 아닌 픽셀에서만 연산을 수행합니다. src1과 src2가 같으면 마스킹 효과가 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     masked = cv2.bitwise_and(scene, scene, mask=maskClean)
     plt.figure(figsize=(10, 6))
@@ -387,7 +198,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '5단계. 마스크 적용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       masked = cv2.bitwise_and(scene, scene, mask=maskClean)
       plt.figure(figsize=(10, 6))
@@ -395,143 +206,45 @@ sections:
       plt.title(f'Masked: {masked.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      masked = cv2.bitwise_and(scene, scene, mask=maskClean)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      plt.title(f'Masked: {masked.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: bitwise_and()는 비트 단위 AND 연산을 수행합니다. mask 파라미터를 사용하면 마스크가 흰색(255)인 픽셀만 연산 결과가 유지되고, 검은색(0)인 픽셀은 0이 됩니다. 이를 통해
-      원본 이미지에서 특정 영역만 추출하는 마스킹(masking) 효과를 얻습니다.
-  - type: code
-    language: python
-    title: 마스크 적용
-    description: 원본에 마스크를 적용합니다
-    content: |-
-      masked = cv2.bitwise_and(scene, scene, mask=maskClean)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      plt.title(f'Masked: {masked.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: bitwise_and(src1, src2, mask=mask)는 mask가 0이 아닌 픽셀에서만 연산을 수행합니다. src1과 src2가 같으면 마스킹 효과가 됩니다.
-  - type: code
-    language: python
-    title: 마스킹 결과
-    description: 주황색 영역만 추출되었습니다
-    content: |-
-      figApply, axApply = plt.subplots(1, 2, figsize=(12, 5))
-      axApply[0].imshow(flower)
-      axApply[0].set_title('Original')
-      axApply[0].axis('off')
-      axApply[1].imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      axApply[1].set_title('Masked Result')
-      axApply[1].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_contour
   title: 6단계. 컨투어 분석
   structuredPrimary: true
   subtitle: 객체 검출
-  goal: '6단계. 컨투어 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 컨투어 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 마스크에서 컨투어를 검출하여 객체를 분석합니다. 면적 기준으로 유의미한 영역만 필터링합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     len(contours)
   exercise:
-    prompt: '6단계. 컨투어 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
       len(contours)
-    solution: |-
-      contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-      len(contours)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 마스크에서 컨투어를 검출하여 객체를 분석합니다. 면적 기준으로 유의미한 영역만 필터링합니다.
-  - type: code
-    language: python
-    title: 컨투어 검출
-    description: 마스크에서 컨투어를 찾습니다
-    content: |-
-      contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-      len(contours)
-  - type: code
-    language: python
-    title: 면적 필터링
-    description: 일정 면적 이상의 컨투어만 선택합니다
-    content: |-
-      minArea = 500
-      shapes = [c for c in contours if cv2.contourArea(c) > minArea]
-      len(shapes)
-  - type: code
-    language: python
-    title: 컨투어 그리기
-    description: 검출된 영역에 윤곽선을 그립니다
-    content: |-
-      drawn = scene.copy()
-      cv2.drawContours(drawn, shapes, -1, (0, 255, 0), 2)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(cv2.cvtColor(drawn, cv2.COLOR_BGR2RGB))
-      plt.title(f'Drawn: {drawn.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 바운딩 박스
-    description: 각 영역에 사각형을 그립니다
-    content: |-
-      final = scene.copy()
-      for cnt in shapes:
-          x, y, w, h = cv2.boundingRect(cnt)
-          cv2.rectangle(final, (x, y), (x + w, y + h), (0, 255, 0), 2)
-          area = cv2.contourArea(cnt)
-          cv2.putText(final, f'{int(area)}', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      plt.title(f'Final: {final.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_result
   title: 7단계. 최종 결과
   structuredPrimary: true
   subtitle: 파이프라인 결과
-  goal: '7단계. 최종 결과: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 최종 결과: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     전체 파이프라인 결과를 확인합니다. 색상 변환 → 마스킹 → 정제 → 컨투어 검출까지 완료되었습니다.
 
     이 파이프라인은 색상 기반 객체 검출의 기본 패턴입니다. 다른 색상 범위를 지정하거나, 에지 검출을 추가하는 등 확장할 수 있습니다.
   tips:
   - 이 파이프라인은 색상 기반 객체 검출의 기본 패턴입니다. 다른 색상 범위를 지정하거나, 에지 검출을 추가하는 등 확장할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
     axFinal[0, 0].imshow(flower)
@@ -554,7 +267,7 @@ sections:
     axFinal[1, 2].axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '7단계. 최종 결과: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
       axFinal[0, 0].imshow(flower)
@@ -576,80 +289,23 @@ sections:
       axFinal[1, 2].set_title(f'6. Detected ({len(shapes)} objects)')
       axFinal[1, 2].axis('off')
       plt.tight_layout()
-    solution: |-
-      figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
-      axFinal[0, 0].imshow(flower)
-      axFinal[0, 0].set_title('1. Original')
-      axFinal[0, 0].axis('off')
-      axFinal[0, 1].imshow(hue, cmap='hsv')
-      axFinal[0, 1].set_title('2. HSV Hue')
-      axFinal[0, 1].axis('off')
-      axFinal[0, 2].imshow(mask, cmap='gray')
-      axFinal[0, 2].set_title('3. Raw Mask')
-      axFinal[0, 2].axis('off')
-      axFinal[1, 0].imshow(maskClean, cmap='gray')
-      axFinal[1, 0].set_title('4. Cleaned Mask')
-      axFinal[1, 0].axis('off')
-      axFinal[1, 1].imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      axFinal[1, 1].set_title('5. Masked')
-      axFinal[1, 1].axis('off')
-      axFinal[1, 2].imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      axFinal[1, 2].set_title(f'6. Detected ({len(shapes)} objects)')
-      axFinal[1, 2].axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 전체 파이프라인 결과를 확인합니다. 색상 변환 → 마스킹 → 정제 → 컨투어 검출까지 완료되었습니다.
-  - type: code
-    language: python
-    title: 최종 시각화
-    description: 전체 과정을 한눈에 봅니다
-    content: |-
-      figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
-      axFinal[0, 0].imshow(flower)
-      axFinal[0, 0].set_title('1. Original')
-      axFinal[0, 0].axis('off')
-      axFinal[0, 1].imshow(hue, cmap='hsv')
-      axFinal[0, 1].set_title('2. HSV Hue')
-      axFinal[0, 1].axis('off')
-      axFinal[0, 2].imshow(mask, cmap='gray')
-      axFinal[0, 2].set_title('3. Raw Mask')
-      axFinal[0, 2].axis('off')
-      axFinal[1, 0].imshow(maskClean, cmap='gray')
-      axFinal[1, 0].set_title('4. Cleaned Mask')
-      axFinal[1, 0].axis('off')
-      axFinal[1, 1].imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      axFinal[1, 1].set_title('5. Masked')
-      axFinal[1, 1].axis('off')
-      axFinal[1, 2].imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      axFinal[1, 2].set_title(f'6. Detected ({len(shapes)} objects)')
-      axFinal[1, 2].axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: 이 파이프라인은 색상 기반 객체 검출의 기본 패턴입니다. 다른 색상 범위를 지정하거나, 에지 검출을 추가하는 등 확장할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 종합 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     china 이미지로 녹색 영역을 검출해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -662,7 +318,7 @@ sections:
     plt.imshow(china)
     plt.axis('off')
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -674,130 +330,20 @@ sections:
       chinaHsv = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2HSV)
       plt.imshow(china)
       plt.axis('off')
-    solution: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      china = load_sample_image('china.jpg')
-      chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
-      chinaHsv = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2HSV)
-      plt.imshow(china)
-      plt.axis('off')
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: china 이미지로 녹색 영역을 검출해봅시다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: china 녹색 영역 검출'
-    blocks:
-    - type: code
-      title: 이미지 로드 및 HSV 변환
-      content: |-
-        import cv2
-        import numpy as np
-        from sklearn.datasets import load_sample_image
-        import matplotlib.pyplot as plt
-
-        china = load_sample_image('china.jpg')
-        chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
-        chinaHsv = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2HSV)
-        plt.imshow(china)
-        plt.axis('off')
-    - type: code
-      title: 녹색 마스크 생성
-      content: |-
-        lowerGreen = np.array([35, 40, 40])
-        upperGreen = np.array([85, 255, 255])
-        greenMask = cv2.inRange(chinaHsv, lowerGreen, upperGreen)
-        krnl = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-        greenClean = cv2.morphologyEx(greenMask, cv2.MORPH_OPEN, krnl)
-        greenClean = cv2.morphologyEx(greenClean, cv2.MORPH_CLOSE, krnl)
-        plt.figure(figsize=(10, 6))
-        plt.imshow(greenClean, cmap='gray')
-        plt.title(f'Green Clean: {greenClean.shape}')
-        plt.axis('off')
-        plt.tight_layout()
-    - type: code
-      title: 마스크 적용 및 시각화
-      content: |-
-        greenMasked = cv2.bitwise_and(chinaBgr, chinaBgr, mask=greenClean)
-        figGreen, axGreen = plt.subplots(1, 3, figsize=(14, 5))
-        axGreen[0].imshow(china)
-        axGreen[0].set_title('Original')
-        axGreen[0].axis('off')
-        axGreen[1].imshow(greenClean, cmap='gray')
-        axGreen[1].set_title('Green Mask')
-        axGreen[1].axis('off')
-        axGreen[2].imshow(cv2.cvtColor(greenMasked, cv2.COLOR_BGR2RGB))
-        axGreen[2].set_title('Green Regions')
-        axGreen[2].axis('off')
-        plt.tight_layout()
-  - type: expansion
-    title: '미션2: 에지와 컨투어 결합'
-    blocks:
-    - type: code
-      title: 이미지 준비
-      content: |-
-        import cv2
-        import numpy as np
-        from sklearn.datasets import load_sample_image
-        import matplotlib.pyplot as plt
-
-        img = load_sample_image('flower.jpg')
-        imgBgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        imgGray = cv2.cvtColor(imgBgr, cv2.COLOR_BGR2GRAY)
-        plt.imshow(img)
-        plt.axis('off')
-    - type: code
-      title: 에지 검출 및 컨투어
-      content: |-
-        blurred = cv2.GaussianBlur(imgGray, (5, 5), 0)
-        edges = cv2.Canny(blurred, 50, 150)
-        edgeCnts, edgeHier = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        largeCnts = [c for c in edgeCnts if cv2.contourArea(c) > 1000]
-        len(largeCnts)
-    - type: code
-      title: 결합 시각화
-      content: |-
-        result = imgBgr.copy()
-        for cnt in largeCnts:
-            x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(result, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        figEdge, axEdge = plt.subplots(1, 3, figsize=(14, 5))
-        axEdge[0].imshow(img)
-        axEdge[0].set_title('Original')
-        axEdge[0].axis('off')
-        axEdge[1].imshow(edges, cmap='gray')
-        axEdge[1].set_title('Edges')
-        axEdge[1].axis('off')
-        axEdge[2].imshow(cv2.cvtColor(result, cv2.COLOR_BGR2RGB))
-        axEdge[2].set_title(f'Detected: {len(largeCnts)}')
-        axEdge[2].axis('off')
-        plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 8단계. 종합 비전 파이프라인 검증
   structuredPrimary: true
   subtitle: 색상 마스크 → 형태 정제 → 컨투어 분석
-  goal: '8단계. 종합 비전 파이프라인 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 종합 비전 파이프라인 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 종합 비전 프로젝트는 색상 필터링, 마스크 정제, 컨투어 분석이 한 번에 이어지는 파이프라인입니다. HSV 범위 계약을 검증하고, 마스크 픽셀 수와 객체 면적을 확인한 뒤, 기준을 바꾸는 실무
-    변주까지 점검합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 종합 비전 프로젝트는 색상 필터링, 마스크 정제, 컨투어 분석이 한 번에 이어지는 파이프라인입니다. HSV 범위 계약을 검증하고, 마스크 픽셀 수와 객체 면적을 확인한 뒤, 기준을 바꾸는 실무 변주까지 점검합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -817,7 +363,7 @@ sections:
 
     validateHsvRange((0, 80, 80), (10, 255, 255))
   exercise:
-    prompt: '8단계. 종합 비전 파이프라인 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -836,112 +382,8 @@ sections:
           return True
 
       validateHsvRange((0, 80, 80), (10, 255, 255))
-    solution: |-
-      import cv2
-      import numpy as np
-
-      visionImage = np.zeros((140, 180, 3), dtype=np.uint8)
-      visionImage[:] = [35, 35, 35]
-      cv2.circle(visionImage, (55, 70), 24, (0, 0, 255), -1)
-      cv2.rectangle(visionImage, (110, 45), (155, 95), (0, 0, 230), -1)
-      cv2.circle(visionImage, (20, 20), 3, (0, 0, 255), -1)
-
-      def validateHsvRange(lower, upper):
-          if len(lower) != 3 or len(upper) != 3:
-              raise ValueError("HSV 범위는 길이 3이어야 합니다")
-          if any(lo > hi for lo, hi in zip(lower, upper)):
-              raise ValueError(f"HSV lower가 upper보다 큽니다: {lower} > {upper}")
-          return True
-
-      validateHsvRange((0, 80, 80), (10, 255, 255))
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 종합 비전 프로젝트는 색상 필터링, 마스크 정제, 컨투어 분석이 한 번에 이어지는 파이프라인입니다. HSV 범위 계약을 검증하고, 마스크 픽셀 수와 객체 면적을 확인한 뒤, 기준을 바꾸는 실무 변주까지
-      점검합니다.
-  - type: code
-    language: python
-    title: 컬러 객체 이미지 준비
-    description: 빨간 객체 두 개와 배경 잡음을 가진 BGR 이미지를 만듭니다.
-    content: |-
-      import cv2
-      import numpy as np
-
-      visionImage = np.zeros((140, 180, 3), dtype=np.uint8)
-      visionImage[:] = [35, 35, 35]
-      cv2.circle(visionImage, (55, 70), 24, (0, 0, 255), -1)
-      cv2.rectangle(visionImage, (110, 45), (155, 95), (0, 0, 230), -1)
-      cv2.circle(visionImage, (20, 20), 3, (0, 0, 255), -1)
-
-      def validateHsvRange(lower, upper):
-          if len(lower) != 3 or len(upper) != 3:
-              raise ValueError("HSV 범위는 길이 3이어야 합니다")
-          if any(lo > hi for lo, hi in zip(lower, upper)):
-              raise ValueError(f"HSV lower가 upper보다 큽니다: {lower} > {upper}")
-          return True
-
-      validateHsvRange((0, 80, 80), (10, 255, 255))
-  - type: code
-    language: python
-    title: HSV 범위 오류 확인
-    description: lower가 upper보다 큰 범위를 넣어 오류를 확인합니다.
-    content: |-
-      try:
-          validateHsvRange((20, 200, 200), (10, 255, 255))
-      except ValueError as exc:
-          hsvRangeErrorMessage = str(exc)
-
-      hsvRangeErrorMessage
-  - type: code
-    language: python
-    title: 종합 파이프라인 실행
-    description: 빨간 객체를 마스크로 분리하고 모폴로지로 정제한 뒤 컨투어를 찾습니다.
-    content: |-
-      visionHsv = cv2.cvtColor(visionImage, cv2.COLOR_BGR2HSV)
-      lowerRed1 = np.array([0, 80, 80])
-      upperRed1 = np.array([10, 255, 255])
-      lowerRed2 = np.array([170, 80, 80])
-      upperRed2 = np.array([180, 255, 255])
-      redVisionMask = cv2.bitwise_or(
-          cv2.inRange(visionHsv, lowerRed1, upperRed1),
-          cv2.inRange(visionHsv, lowerRed2, upperRed2),
-      )
-      cleanVisionMask = cv2.morphologyEx(redVisionMask, cv2.MORPH_OPEN, np.ones((5, 5), dtype=np.uint8))
-      visionContours, _ = cv2.findContours(cleanVisionMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-      cleanVisionContours = [contour for contour in visionContours if cv2.contourArea(contour) >= 1000]
-      visionAreas = sorted([cv2.contourArea(contour) for contour in cleanVisionContours], reverse=True)
-      visionChecks = {
-          "maskHasPixels": int(np.count_nonzero(redVisionMask)) > 3000,
-          "noiseRemoved": int(np.count_nonzero(cleanVisionMask)) < int(np.count_nonzero(redVisionMask)),
-          "objectCountOk": len(cleanVisionContours) == 2,
-          "areaOk": visionAreas[0] > 1500 and visionAreas[1] > 1400,
-          "errorOk": hsvRangeErrorMessage.startswith("HSV lower가 upper보다 큽니다"),
-      }
-
-      assert all(visionChecks.values()), visionChecks
-      visionChecks
-  - type: code
-    language: python
-    title: 실무 변주
-    description: 최소 면적 기준을 높이면 어떤 객체만 남는지 확인합니다.
-    content: |-
-      def selectContoursByArea(contours, minArea):
-          if minArea <= 0:
-              raise ValueError("minArea는 양수여야 합니다")
-          return [contour for contour in contours if cv2.contourArea(contour) >= minArea]
-
-      defaultObjects = selectContoursByArea(visionContours, 1000)
-      strictObjects = selectContoursByArea(visionContours, 2000)
-
-      assert len(defaultObjects) == 2
-      assert len(strictObjects) == 1
-      len(defaultObjects), len(strictObjects)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

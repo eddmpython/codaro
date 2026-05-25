@@ -77,8 +77,7 @@ sections:
   - type: note
     style: info
     title: 예측 vs 추론
-    content: 머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?", "이 변수는 통계적으로
-      유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
+    content: 머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?", "이 변수는 통계적으로 유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
   - type: featureCards
     cards:
     - emoji: 📐
@@ -101,8 +100,7 @@ sections:
   - type: note
     style: info
     title: sklearn vs statsmodels
-    content: sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량 등 30개 이상의 통계량을 제공합니다.
-      "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
+    content: sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량 등 30개 이상의 통계량을 제공합니다. "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
   - type: featureCards
     cards:
     - emoji: 📋
@@ -179,8 +177,7 @@ sections:
   - type: note
     style: tip
     title: 용도별 선택 가이드
-    content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로 유의미한가?"를 증명하려면 statsmodels의
-      p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
+    content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로 유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -277,8 +274,7 @@ sections:
   - type: note
     style: tip
     title: p-value 해석
-    content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면 더 강력한 증거입니다. 비즈니스
-      의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
+    content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면 더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -359,8 +355,7 @@ sections:
   - type: note
     style: info
     title: 프로젝트 기반 학습
-    content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야 할까?" 같은 실전 질문에 답합니다.
-      10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
+    content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야 할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
 - id: statsmodels_vs_r
   blocks:
   - type: sectionHeader
@@ -369,8 +364,7 @@ sections:
   - type: note
     style: info
     title: R과의 호환성
-    content: statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도 거의 동일합니다. R 경험자라면
-      쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
+    content: statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도 거의 동일합니다. R 경험자라면 쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
   - type: table
     headers:
     - R
@@ -400,8 +394,7 @@ sections:
   - type: note
     style: info
     title: 로컬에서 바로 실행
-    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨 안에서는 import가 성공하는지
-      확인합니다.
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨 안에서는 import가 성공하는지 확인합니다.
   - type: featureCards
     cards:
     - emoji: 🌐
@@ -439,13 +432,11 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 회귀 리포트 품질 게이트
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가
-    보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import pandas as pd
     import statsmodels.api as sm
@@ -463,7 +454,7 @@ sections:
 
     marketingData[requiredColumns].head()
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       compactX = sm.add_constant(marketingData[["TV", "Radio"]])
       compactModel = sm.OLS(reportY, compactX).fit()
@@ -494,96 +485,7 @@ sections:
 
       marketingData[requiredColumns].head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에
-      들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
-  - type: code
-    language: python
-    title: 로컬 마케팅 데이터 검증
-    description: 광고비와 매출 데이터를 불러오고 분석 전 조건을 확인합니다.
-    content: |-
-      import pandas as pd
-      import statsmodels.api as sm
-      from statsmodels.stats.diagnostic import het_breuschpagan
-      from codaro.curriculum.localData import loadLocalDataset
-
-      marketingData = loadLocalDataset("advertising")
-      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
-
-      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
-      if missingColumns:
-          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
-      if marketingData[requiredColumns].isna().any().any():
-          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
-
-      marketingData[requiredColumns].head()
-  - type: code
-    language: python
-    title: 다중회귀 모델 적합
-    description: TV, Radio, Newspaper 광고비로 Sales를 설명합니다.
-    content: |-
-      # 예측: TV와 Radio의 p-value는 낮고, 모델 R²는 0.9 이상일 것입니다.
-      reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
-      reportY = marketingData["Sales"]
-      try:
-          reportModel = sm.OLS(reportY, reportX).fit()
-      except ValueError as exc:
-          raise ValueError("OLS 입력 행렬을 확인하세요.") from exc
-
-      reportModel.rsquared, reportModel.f_pvalue
-  - type: code
-    language: python
-    title: 통계 리포트 기준 검증
-    description: 설명력, 모델 전체 유의성, 핵심 변수 유의성을 assert로 확인합니다.
-    content: |-
-      reportChecks = {
-          "r_squared_is_reportable": reportModel.rsquared >= 0.90,
-          "model_is_significant": reportModel.f_pvalue < 0.05,
-          "tv_is_significant": reportModel.pvalues["TV"] < 0.05,
-          "radio_is_significant": reportModel.pvalues["Radio"] < 0.05,
-      }
-
-      assert all(reportChecks.values()), reportChecks
-      reportChecks
-  - type: code
-    language: python
-    title: 잔차 진단
-    description: Breusch-Pagan 검정으로 심한 이분산 신호가 없는지 확인합니다.
-    content: |-
-      bpStat, bpPvalue, _, _ = het_breuschpagan(reportModel.resid, reportModel.model.exog)
-      residualChecks = {
-          "bp_pvalue_recorded": bpPvalue >= 0,
-          "residual_mean_near_zero": abs(reportModel.resid.mean()) < 1e-9,
-      }
-
-      assert all(residualChecks.values()), residualChecks
-      round(float(bpPvalue), 3), residualChecks
-  - type: expansion
-    title: '실무 변주: Newspaper 변수를 빼도 설명력이 유지될까?'
-    blocks:
-    - type: code
-      language: python
-      title: 축소 모델 비교
-      content: |-
-        compactX = sm.add_constant(marketingData[["TV", "Radio"]])
-        compactModel = sm.OLS(reportY, compactX).fit()
-        r2Drop = reportModel.rsquared - compactModel.rsquared
-
-        assert compactModel.rsquared >= 0.95
-        {
-            "fullR2": round(reportModel.rsquared, 3),
-            "compactR2": round(compactModel.rsquared, 3),
-            "r2Drop": round(r2Drop, 3),
-            "fullAIC": round(reportModel.aic, 1),
-            "compactAIC": round(compactModel.aic, 1),
-        }
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

@@ -24,66 +24,38 @@ meta:
 intro:
   emoji: 📋
   goal: Pydantic 모델에서 REST API 문서화용 JSON Schema를 자동 생성합니다.
-  description: API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를 생성하여 코드와 문서가 항상 동기화됩니다.
-    FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다.
+  description: API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를 생성하여 코드와 문서가 항상 동기화됩니다. FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다.
 sections:
 - id: load
   title: 라이브러리 로드
   structuredPrimary: true
   subtitle: Pydantic 설치 및 import
-  goal: '라이브러리 로드: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '라이브러리 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로 JSON Schema를 생성합니다.
-    이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로 JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: '라이브러리 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import pydantic
-    solution: import pydantic
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로 JSON Schema를 생성합니다.
-      이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
-  - type: code
-    language: python
-    title: 패키지 설치
-    description: pip으로 pydantic 설치
-    content: import pydantic
-  - type: code
-    language: python
-    title: 핵심 모듈 import
-    description: BaseModel과 Field
-    content: |-
-      from pydantic import BaseModel, Field, computed_field
-      from typing import Optional, Union
-      from enum import Enum
-      import json
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: basic
   title: 기본 스키마 생성
   structuredPrimary: true
   subtitle: model_json_schema
-  goal: '기본 스키마 생성: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '기본 스키마 생성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
 
     스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
   tips:
   - 스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     class User(BaseModel):
         name: str
@@ -93,7 +65,7 @@ sections:
     userSchema = User.model_json_schema()
     userSchema
   exercise:
-    prompt: '기본 스키마 생성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class User(BaseModel):
           name: str
@@ -102,60 +74,20 @@ sections:
 
       userSchema = User.model_json_schema()
       userSchema
-    solution: |-
-      class User(BaseModel):
-          name: str
-          age: int
-          email: str
-
-      userSchema = User.model_json_schema()
-      userSchema
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로
-      매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
-  - type: code
-    language: python
-    title: 기본 모델 스키마
-    description: model_json_schema 호출
-    content: |-
-      class User(BaseModel):
-          name: str
-          age: int
-          email: str
-
-      userSchema = User.model_json_schema()
-      userSchema
-  - type: tip
-    content: 스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
-  - type: code
-    language: python
-    title: 예쁜 출력
-    description: JSON 형식화
-    content: |-
-      prettySchema = json.dumps(userSchema, indent=2)
-      prettySchema
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: description
   title: 필드 설명 추가
   structuredPrimary: true
   subtitle: Field description
-  goal: '필드 설명 추가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '필드 설명 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를 이해할 수 있습니다. 제약조건(gt,
-    le, min_length 등)도 스키마에 반영됩니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를 이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class Product(BaseModel):
         productId: str = Field(description="고유 상품 식별자")
@@ -166,7 +98,7 @@ sections:
     productSchema = Product.model_json_schema()
     json.dumps(productSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: '필드 설명 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Product(BaseModel):
           productId: str = Field(description="고유 상품 식별자")
@@ -176,58 +108,20 @@ sections:
 
       productSchema = Product.model_json_schema()
       json.dumps(productSchema, indent=2, ensure_ascii=False)
-    solution: |-
-      class Product(BaseModel):
-          productId: str = Field(description="고유 상품 식별자")
-          name: str = Field(description="상품명", min_length=1, max_length=100)
-          price: float = Field(description="상품 가격 (원)", gt=0)
-          stock: int = Field(default=0, description="재고 수량", ge=0)
-
-      productSchema = Product.model_json_schema()
-      json.dumps(productSchema, indent=2, ensure_ascii=False)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를 이해할 수 있습니다. 제약조건(gt,
-      le, min_length 등)도 스키마에 반영됩니다.
-  - type: code
-    language: python
-    title: 문서화된 상품 모델
-    description: 설명과 제약조건
-    content: |-
-      class Product(BaseModel):
-          productId: str = Field(description="고유 상품 식별자")
-          name: str = Field(description="상품명", min_length=1, max_length=100)
-          price: float = Field(description="상품 가격 (원)", gt=0)
-          stock: int = Field(default=0, description="재고 수량", ge=0)
-
-      productSchema = Product.model_json_schema()
-      json.dumps(productSchema, indent=2, ensure_ascii=False)
-  - type: code
-    language: python
-    title: 개별 필드 스키마
-    description: 제약조건 확인
-    content: productSchema["properties"]["price"]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: examples
   title: 예시 값 추가
   structuredPrimary: true
   subtitle: examples 파라미터
-  goal: '예시 값 추가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '예시 값 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델 전체에 예시 데이터를 추가할 수도
-    있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델 전체에 예시 데이터를 추가할 수도 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class Contact(BaseModel):
         name: str = Field(description="이름", examples=["홍길동", "김철수"])
@@ -237,7 +131,7 @@ sections:
     contactSchema = Contact.model_json_schema()
     contactSchema["properties"]["name"]
   exercise:
-    prompt: '예시 값 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Contact(BaseModel):
           name: str = Field(description="이름", examples=["홍길동", "김철수"])
@@ -246,69 +140,20 @@ sections:
 
       contactSchema = Contact.model_json_schema()
       contactSchema["properties"]["name"]
-    solution: |-
-      class Contact(BaseModel):
-          name: str = Field(description="이름", examples=["홍길동", "김철수"])
-          phone: str = Field(description="전화번호", examples=["010-1234-5678"])
-          email: str = Field(description="이메일", examples=["user@example.com"])
-
-      contactSchema = Contact.model_json_schema()
-      contactSchema["properties"]["name"]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델 전체에 예시 데이터를 추가할 수도 있습니다.
-  - type: code
-    language: python
-    title: 필드별 예시
-    description: examples 사용
-    content: |-
-      class Contact(BaseModel):
-          name: str = Field(description="이름", examples=["홍길동", "김철수"])
-          phone: str = Field(description="전화번호", examples=["010-1234-5678"])
-          email: str = Field(description="이메일", examples=["user@example.com"])
-
-      contactSchema = Contact.model_json_schema()
-      contactSchema["properties"]["name"]
-  - type: code
-    language: python
-    title: 모델 전체 예시
-    description: json_schema_extra
-    content: |-
-      class Address(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "examples": [
-                      {"street": "강남대로 123", "city": "서울", "zipCode": "06234"},
-                      {"street": "해운대로 456", "city": "부산", "zipCode": "48099"}
-                  ]
-              }
-          }
-          street: str
-          city: str
-          zipCode: str
-
-      addressSchema = Address.model_json_schema()
-      addressSchema.get("examples")
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: nested
   title: 중첩 모델 스키마
   structuredPrimary: true
   subtitle: $defs와 $ref
-  goal: '중첩 모델 스키마: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '중첩 모델 스키마: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서 재사용할 때 중복을 피할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class Author(BaseModel):
         authorId: str = Field(description="작성자 ID")
@@ -322,7 +167,7 @@ sections:
     articleSchema = Article.model_json_schema()
     json.dumps(articleSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: '중첩 모델 스키마: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Author(BaseModel):
           authorId: str = Field(description="작성자 ID")
@@ -335,62 +180,20 @@ sections:
 
       articleSchema = Article.model_json_schema()
       json.dumps(articleSchema, indent=2, ensure_ascii=False)
-    solution: |-
-      class Author(BaseModel):
-          authorId: str = Field(description="작성자 ID")
-          name: str = Field(description="작성자 이름")
-
-      class Article(BaseModel):
-          title: str = Field(description="기사 제목")
-          content: str = Field(description="기사 내용")
-          author: Author
-
-      articleSchema = Article.model_json_schema()
-      json.dumps(articleSchema, indent=2, ensure_ascii=False)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서 재사용할 때 중복을 피할 수 있습니다.
-  - type: code
-    language: python
-    title: 중첩 모델 스키마
-    description: Author → Article
-    content: |-
-      class Author(BaseModel):
-          authorId: str = Field(description="작성자 ID")
-          name: str = Field(description="작성자 이름")
-
-      class Article(BaseModel):
-          title: str = Field(description="기사 제목")
-          content: str = Field(description="기사 내용")
-          author: Author
-
-      articleSchema = Article.model_json_schema()
-      json.dumps(articleSchema, indent=2, ensure_ascii=False)
-  - type: code
-    language: python
-    title: $ref 참조 확인
-    description: author 필드
-    content: articleSchema["properties"]["author"]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: optional
   title: Optional과 Union 스키마
   structuredPrimary: true
   subtitle: anyOf 표현
-  goal: 'Optional과 Union 스키마: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'Optional과 Union 스키마: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class Profile(BaseModel):
         username: str
@@ -400,7 +203,7 @@ sections:
     profileSchema = Profile.model_json_schema()
     profileSchema["properties"]["bio"]
   exercise:
-    prompt: 'Optional과 Union 스키마: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -409,59 +212,20 @@ sections:
 
       profileSchema = Profile.model_json_schema()
       profileSchema["properties"]["bio"]
-    solution: |-
-      class Profile(BaseModel):
-          username: str
-          bio: Optional[str] = None
-          website: Optional[str] = None
-
-      profileSchema = Profile.model_json_schema()
-      profileSchema["properties"]["bio"]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다.
-  - type: code
-    language: python
-    title: Optional 스키마
-    description: null 허용
-    content: |-
-      class Profile(BaseModel):
-          username: str
-          bio: Optional[str] = None
-          website: Optional[str] = None
-
-      profileSchema = Profile.model_json_schema()
-      profileSchema["properties"]["bio"]
-  - type: code
-    language: python
-    title: Union 스키마
-    description: 여러 타입
-    content: |-
-      class FlexValue(BaseModel):
-          value: Union[str, int, float]
-
-      flexSchema = FlexValue.model_json_schema()
-      flexSchema["properties"]["value"]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: enum
   title: Enum과 Literal 스키마
   structuredPrimary: true
   subtitle: 허용값 목록
-  goal: 'Enum과 Literal 스키마: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'Enum과 Literal 스키마: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class Status(str, Enum):
         PENDING = "pending"
@@ -475,7 +239,7 @@ sections:
     taskSchema = Task.model_json_schema()
     taskSchema["$defs"]["Status"]
   exercise:
-    prompt: 'Enum과 Literal 스키마: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Status(str, Enum):
           PENDING = "pending"
@@ -488,69 +252,20 @@ sections:
 
       taskSchema = Task.model_json_schema()
       taskSchema["$defs"]["Status"]
-    solution: |-
-      class Status(str, Enum):
-          PENDING = "pending"
-          ACTIVE = "active"
-          COMPLETED = "completed"
-
-      class Task(BaseModel):
-          taskId: str
-          status: Status = Field(description="작업 상태")
-
-      taskSchema = Task.model_json_schema()
-      taskSchema["$defs"]["Status"]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수 있습니다.
-  - type: code
-    language: python
-    title: Enum 스키마
-    description: 상태 열거형
-    content: |-
-      class Status(str, Enum):
-          PENDING = "pending"
-          ACTIVE = "active"
-          COMPLETED = "completed"
-
-      class Task(BaseModel):
-          taskId: str
-          status: Status = Field(description="작업 상태")
-
-      taskSchema = Task.model_json_schema()
-      taskSchema["$defs"]["Status"]
-  - type: code
-    language: python
-    title: Literal 스키마
-    description: 허용값 목록
-    content: |-
-      from typing import Literal
-
-      class Priority(BaseModel):
-          level: Literal["low", "medium", "high"] = Field(description="우선순위")
-
-      prioritySchema = Priority.model_json_schema()
-      prioritySchema["properties"]["level"]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: list
   title: 리스트와 딕셔너리
   structuredPrimary: true
   subtitle: array와 object
-  goal: '리스트와 딕셔너리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '리스트와 딕셔너리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class TaggedItem(BaseModel):
         itemId: str
@@ -560,7 +275,7 @@ sections:
     taggedSchema = TaggedItem.model_json_schema()
     taggedSchema["properties"]["tags"]
   exercise:
-    prompt: '리스트와 딕셔너리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class TaggedItem(BaseModel):
           itemId: str
@@ -569,63 +284,23 @@ sections:
 
       taggedSchema = TaggedItem.model_json_schema()
       taggedSchema["properties"]["tags"]
-    solution: |-
-      class TaggedItem(BaseModel):
-          itemId: str
-          tags: list[str] = Field(description="태그 목록")
-          scores: list[int] = Field(default=[], description="점수 목록")
-
-      taggedSchema = TaggedItem.model_json_schema()
-      taggedSchema["properties"]["tags"]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다.
-  - type: code
-    language: python
-    title: 리스트 스키마
-    description: array 타입
-    content: |-
-      class TaggedItem(BaseModel):
-          itemId: str
-          tags: list[str] = Field(description="태그 목록")
-          scores: list[int] = Field(default=[], description="점수 목록")
-
-      taggedSchema = TaggedItem.model_json_schema()
-      taggedSchema["properties"]["tags"]
-  - type: code
-    language: python
-    title: 딕셔너리 스키마
-    description: additionalProperties
-    content: |-
-      class Metadata(BaseModel):
-          data: dict[str, str] = Field(description="메타데이터")
-          counts: dict[str, int] = Field(default={}, description="카운트 정보")
-
-      metaSchema = Metadata.model_json_schema()
-      metaSchema["properties"]["data"]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: mode
   title: 스키마 생성 모드
   structuredPrimary: true
   subtitle: validation vs serialization
-  goal: '스키마 생성 모드: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '스키마 생성 모드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다.
 
     validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
   tips:
   - validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     class Item(BaseModel):
         name: str
@@ -639,7 +314,7 @@ sections:
     validationSchema = Item.model_json_schema(mode='validation')
     "formattedPrice" in validationSchema.get("properties", {})
   exercise:
-    prompt: '스키마 생성 모드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class Item(BaseModel):
           name: str
@@ -652,67 +327,20 @@ sections:
 
       validationSchema = Item.model_json_schema(mode='validation')
       "formattedPrice" in validationSchema.get("properties", {})
-    solution: |-
-      class Item(BaseModel):
-          name: str
-          price: float
-
-          @computed_field
-          @property
-          def formattedPrice(self) -> str:
-              return f"₩{self.price:,.0f}"
-
-      validationSchema = Item.model_json_schema(mode='validation')
-      "formattedPrice" in validationSchema.get("properties", {})
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은
-      출력용(computed_field 포함) 스키마입니다.
-  - type: code
-    language: python
-    title: 검증 모드
-    description: computed_field 미포함
-    content: |-
-      class Item(BaseModel):
-          name: str
-          price: float
-
-          @computed_field
-          @property
-          def formattedPrice(self) -> str:
-              return f"₩{self.price:,.0f}"
-
-      validationSchema = Item.model_json_schema(mode='validation')
-      "formattedPrice" in validationSchema.get("properties", {})
-  - type: tip
-    content: validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
-  - type: code
-    language: python
-    title: 직렬화 모드
-    description: computed_field 포함
-    content: |-
-      serializationSchema = Item.model_json_schema(mode='serialization')
-      "formattedPrice" in serializationSchema.get("properties", {})
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: custom
   title: 커스텀 스키마 수정
   structuredPrimary: true
   subtitle: json_schema_extra
-  goal: '커스텀 스키마 수정: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '커스텀 스키마 수정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는 메타데이터를 추가할 때 유용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class CustomModel(BaseModel):
         model_config = {
@@ -728,7 +356,7 @@ sections:
     customSchema = CustomModel.model_json_schema()
     customSchema.get("x-api-version"), customSchema.get("x-tags")
   exercise:
-    prompt: '커스텀 스키마 수정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class CustomModel(BaseModel):
           model_config = {
@@ -743,61 +371,20 @@ sections:
 
       customSchema = CustomModel.model_json_schema()
       customSchema.get("x-api-version"), customSchema.get("x-tags")
-    solution: |-
-      class CustomModel(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "x-api-version": "v1",
-                  "x-deprecated": False,
-                  "x-tags": ["users", "auth"]
-              }
-          }
-          userId: str
-          role: str
-
-      customSchema = CustomModel.model_json_schema()
-      customSchema.get("x-api-version"), customSchema.get("x-tags")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는 메타데이터를 추가할 때 유용합니다.
-  - type: code
-    language: python
-    title: 확장 필드 추가
-    description: x- 접두사 필드
-    content: |-
-      class CustomModel(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "x-api-version": "v1",
-                  "x-deprecated": False,
-                  "x-tags": ["users", "auth"]
-              }
-          }
-          userId: str
-          role: str
-
-      customSchema = CustomModel.model_json_schema()
-      customSchema.get("x-api-version"), customSchema.get("x-tags")
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: result
   title: REST API 스키마 시스템
   structuredPrimary: true
   subtitle: 요청/응답 스키마 완성
-  goal: 'REST API 스키마 시스템: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'REST API 스키마 시스템: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로 Swagger 문서를 생성합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     class CreateUserRequest(BaseModel):
         model_config = {
@@ -816,7 +403,7 @@ sections:
     requestSchema = CreateUserRequest.model_json_schema()
     json.dumps(requestSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 'REST API 스키마 시스템: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       class CreateUserRequest(BaseModel):
           model_config = {
@@ -834,108 +421,23 @@ sections:
 
       requestSchema = CreateUserRequest.model_json_schema()
       json.dumps(requestSchema, indent=2, ensure_ascii=False)
-    solution: |-
-      class CreateUserRequest(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "examples": [{
-                      "username": "alice",
-                      "email": "alice@example.com",
-                      "password": "secure123"
-                  }]
-              }
-          }
-          username: str = Field(min_length=3, max_length=50, description="사용자명")
-          email: str = Field(description="이메일 주소")
-          password: str = Field(min_length=8, description="비밀번호")
-
-      requestSchema = CreateUserRequest.model_json_schema()
-      json.dumps(requestSchema, indent=2, ensure_ascii=False)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로 Swagger 문서를 생성합니다.
-  - type: code
-    language: python
-    title: API 요청 모델
-    description: 사용자 생성 요청
-    content: |-
-      class CreateUserRequest(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "examples": [{
-                      "username": "alice",
-                      "email": "alice@example.com",
-                      "password": "secure123"
-                  }]
-              }
-          }
-          username: str = Field(min_length=3, max_length=50, description="사용자명")
-          email: str = Field(description="이메일 주소")
-          password: str = Field(min_length=8, description="비밀번호")
-
-      requestSchema = CreateUserRequest.model_json_schema()
-      json.dumps(requestSchema, indent=2, ensure_ascii=False)
-  - type: code
-    language: python
-    title: API 응답 모델
-    description: 사용자 생성 응답
-    content: |-
-      class CreateUserResponse(BaseModel):
-          userId: str = Field(description="생성된 사용자 ID")
-          username: str = Field(description="사용자명")
-          createdAt: str = Field(description="생성 시각")
-
-      responseSchema = CreateUserResponse.model_json_schema()
-      responseSchema
-  - type: code
-    language: python
-    title: OpenAPI 경로 정의
-    description: 스키마 조합
-    content: |-
-      openApiPath = {
-          "/users": {
-              "post": {
-                  "summary": "사용자 생성",
-                  "requestBody": {
-                      "content": {
-                          "application/json": {"schema": requestSchema}
-                      }
-                  },
-                  "responses": {
-                      "201": {
-                          "description": "생성 성공",
-                          "content": {
-                              "application/json": {"schema": responseSchema}
-                          }
-                      }
-                  }
-              }
-          }
-      }
-      list(openApiPath.keys())
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: API 스키마 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from pydantic import BaseModel, Field
     from typing import Optional
@@ -979,7 +481,7 @@ sections:
     blogReqSchema = BlogPostRequest.model_json_schema()
     blogReqSchema
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from pydantic import BaseModel, Field
       from typing import Optional
@@ -1022,185 +524,20 @@ sections:
 
       blogReqSchema = BlogPostRequest.model_json_schema()
       blogReqSchema
-    solution: |-
-      from pydantic import BaseModel, Field
-      from typing import Optional
-      from enum import Enum
-      import json
-
-      class PostStatus(str, Enum):
-          DRAFT = "draft"
-          PUBLISHED = "published"
-          ARCHIVED = "archived"
-
-      class AuthorInfo(BaseModel):
-          authorId: str = Field(description="작성자 고유 ID")
-          name: str = Field(description="작성자 이름")
-
-      class BlogPostRequest(BaseModel):
-          model_config = {
-              "json_schema_extra": {
-                  "examples": [{
-                      "title": "Pydantic 시작하기",
-                      "content": "Pydantic은 데이터 검증 라이브러리입니다...",
-                      "tags": ["python", "pydantic"]
-                  }]
-              }
-          }
-          title: str = Field(min_length=1, max_length=200, description="포스트 제목")
-          content: str = Field(min_length=10, description="포스트 본문")
-          tags: list[str] = Field(default=[], description="태그 목록")
-          status: PostStatus = Field(default=PostStatus.DRAFT, description="게시 상태")
-
-      class BlogPostResponse(BaseModel):
-          postId: str = Field(description="포스트 고유 ID")
-          title: str = Field(description="포스트 제목")
-          content: str = Field(description="포스트 본문")
-          author: AuthorInfo
-          tags: list[str] = Field(description="태그 목록")
-          status: PostStatus = Field(description="게시 상태")
-          createdAt: str = Field(description="생성 시각")
-          updatedAt: Optional[str] = Field(default=None, description="수정 시각")
-
-      blogReqSchema = BlogPostRequest.model_json_schema()
-      blogReqSchema
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 블로그 API 스키마'
-    blocks:
-    - type: code
-      title: 블로그 모델 정의
-      content: |-
-        from pydantic import BaseModel, Field
-        from typing import Optional
-        from enum import Enum
-        import json
-
-        class PostStatus(str, Enum):
-            DRAFT = "draft"
-            PUBLISHED = "published"
-            ARCHIVED = "archived"
-
-        class AuthorInfo(BaseModel):
-            authorId: str = Field(description="작성자 고유 ID")
-            name: str = Field(description="작성자 이름")
-
-        class BlogPostRequest(BaseModel):
-            model_config = {
-                "json_schema_extra": {
-                    "examples": [{
-                        "title": "Pydantic 시작하기",
-                        "content": "Pydantic은 데이터 검증 라이브러리입니다...",
-                        "tags": ["python", "pydantic"]
-                    }]
-                }
-            }
-            title: str = Field(min_length=1, max_length=200, description="포스트 제목")
-            content: str = Field(min_length=10, description="포스트 본문")
-            tags: list[str] = Field(default=[], description="태그 목록")
-            status: PostStatus = Field(default=PostStatus.DRAFT, description="게시 상태")
-
-        class BlogPostResponse(BaseModel):
-            postId: str = Field(description="포스트 고유 ID")
-            title: str = Field(description="포스트 제목")
-            content: str = Field(description="포스트 본문")
-            author: AuthorInfo
-            tags: list[str] = Field(description="태그 목록")
-            status: PostStatus = Field(description="게시 상태")
-            createdAt: str = Field(description="생성 시각")
-            updatedAt: Optional[str] = Field(default=None, description="수정 시각")
-
-        blogReqSchema = BlogPostRequest.model_json_schema()
-        blogReqSchema
-    - type: code
-      title: 스키마 확인
-      content: |-
-        blogRespSchema = BlogPostResponse.model_json_schema()
-        blogSummary = {
-            "request_fields": list(blogReqSchema["properties"].keys()),
-            "response_fields": list(blogRespSchema["properties"].keys()),
-            "has_author_ref": "$ref" in str(blogRespSchema)
-        }
-        blogSummary
-  - type: expansion
-    title: '미션2: E-커머스 API 스키마'
-    blocks:
-    - type: code
-      title: 상품 모델 정의
-      content: |-
-        from pydantic import BaseModel, Field
-        from typing import Optional
-        import json
-
-        class ProductCategory(BaseModel):
-            categoryId: str = Field(description="카테고리 ID")
-            name: str = Field(description="카테고리명")
-
-        class ProductRequest(BaseModel):
-            model_config = {
-                "json_schema_extra": {
-                    "title": "상품 등록",
-                    "examples": [{
-                        "name": "노트북",
-                        "price": 1500000,
-                        "categoryId": "electronics"
-                    }]
-                }
-            }
-            name: str = Field(min_length=2, max_length=100, description="상품명")
-            price: float = Field(gt=0, description="가격")
-            description: Optional[str] = Field(default=None, max_length=1000, description="상품 설명")
-            categoryId: str = Field(description="카테고리 ID")
-            stock: int = Field(default=0, ge=0, description="재고 수량")
-            isActive: bool = Field(default=True, description="판매 활성화 여부")
-
-        class ProductResponse(BaseModel):
-            productId: str = Field(description="상품 고유 ID")
-            name: str = Field(description="상품명")
-            price: float = Field(description="가격")
-            description: Optional[str] = Field(description="상품 설명")
-            category: ProductCategory
-            stock: int = Field(description="재고 수량")
-            isActive: bool = Field(description="판매 활성화 여부")
-            createdAt: str = Field(description="등록 시각")
-
-        prodReqSchema = ProductRequest.model_json_schema()
-        prodReqSchema
-    - type: code
-      title: 스키마 요약
-      content: |-
-        prodRespSchema = ProductResponse.model_json_schema()
-        ecommerceSummary = {
-            "request_required": prodReqSchema.get("required", []),
-            "response_fields": list(prodRespSchema["properties"].keys()),
-            "has_examples": "examples" in prodReqSchema
-        }
-        ecommerceSummary
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
-    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from typing import Literal
     from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -1236,7 +573,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -1271,154 +608,8 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-    solution: |-
-      from typing import Literal
-      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
-
-      class OrderInput(BaseModel):
-          orderId: str
-          customer: str
-          amount: int = Field(gt=0)
-          status: Literal['paid', 'pending', 'cancelled']
-
-          @field_validator('orderId', 'customer')
-          @classmethod
-          def stripRequiredText(cls, value):
-              cleaned = value.strip()
-              if not cleaned:
-                  raise ValueError('text field must not be empty')
-              return cleaned
-
-          @computed_field
-          @property
-          def isRevenue(self) -> bool:
-              return self.status == 'paid'
-
-      validOrder = OrderInput.model_validate({
-          'orderId': ' A-100 ',
-          'customer': ' kim ',
-          'amount': '120000',
-          'status': 'paid',
-      })
-
-      assert validOrder.orderId == 'A-100'
-      assert validOrder.amount == 120000
-      assert validOrder.isRevenue is True
-      validOrder.model_dump()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
-      다음 단계로 넘기는 흐름을 검증합니다.
-  - type: code
-    language: python
-    title: 주문 입력 모델과 정상 데이터 예측
-    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
-    content: |-
-      from typing import Literal
-      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
-
-      class OrderInput(BaseModel):
-          orderId: str
-          customer: str
-          amount: int = Field(gt=0)
-          status: Literal['paid', 'pending', 'cancelled']
-
-          @field_validator('orderId', 'customer')
-          @classmethod
-          def stripRequiredText(cls, value):
-              cleaned = value.strip()
-              if not cleaned:
-                  raise ValueError('text field must not be empty')
-              return cleaned
-
-          @computed_field
-          @property
-          def isRevenue(self) -> bool:
-              return self.status == 'paid'
-
-      validOrder = OrderInput.model_validate({
-          'orderId': ' A-100 ',
-          'customer': ' kim ',
-          'amount': '120000',
-          'status': 'paid',
-      })
-
-      assert validOrder.orderId == 'A-100'
-      assert validOrder.amount == 120000
-      assert validOrder.isRevenue is True
-      validOrder.model_dump()
-  - type: code
-    language: python
-    title: 잘못된 입력을 먼저 실패시킨다
-    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
-    content: |-
-      try:
-          OrderInput.model_validate({
-              'orderId': 'A-101',
-              'customer': 'lee',
-              'amount': 0,
-              'status': 'refunded',
-          })
-      except ValidationError as exc:
-          orderValidationErrors = exc.errors()
-      else:
-          raise AssertionError('잘못된 주문 입력은 실패해야 합니다')
-
-      errorFields = {error['loc'][0] for error in orderValidationErrors}
-      assert {'amount', 'status'} <= errorFields
-      orderValidationErrors
-  - type: code
-    language: python
-    title: 배치 입력을 정상/오류로 분리
-    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
-    content: |-
-      rawOrders = [
-          {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
-          {'orderId': 'A-101', 'customer': 'lee', 'amount': '20000', 'status': 'pending'},
-          {'orderId': ' ', 'customer': 'park', 'amount': '50000', 'status': 'paid'},
-          {'orderId': 'A-103', 'customer': 'choi', 'amount': '-1', 'status': 'paid'},
-      ]
-
-      def validateOrderBatch(rows):
-          accepted = []
-          rejected = []
-          for index, row in enumerate(rows, start=1):
-              try:
-                  accepted.append(OrderInput.model_validate(row))
-              except ValidationError as exc:
-                  rejected.append({'rowNumber': index, 'errors': exc.errors()})
-          return accepted, rejected
-
-      acceptedOrders, rejectedOrders = validateOrderBatch(rawOrders)
-      paidRevenue = sum(order.amount for order in acceptedOrders if order.isRevenue)
-
-      assert len(acceptedOrders) == 2
-      assert len(rejectedOrders) == 2
-      assert paidRevenue == 120000
-      acceptedOrders, rejectedOrders
-  - type: code
-    language: python
-    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
-    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
-    content: |-
-      def filterRevenueOrders(orders, minAmount):
-          if minAmount <= 0:
-              raise ValueError('minAmount must be positive')
-          return [order for order in orders if order.isRevenue and order.amount >= minAmount]
-
-      revenueOver50000 = filterRevenueOrders(acceptedOrders, 50000)
-      revenueOver150000 = filterRevenueOrders(acceptedOrders, 150000)
-
-      assert [order.orderId for order in revenueOver50000] == ['A-100']
-      assert revenueOver150000 == []
-      revenueOver50000, revenueOver150000
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

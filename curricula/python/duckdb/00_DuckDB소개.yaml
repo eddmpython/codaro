@@ -76,8 +76,7 @@ sections:
   - type: note
     style: info
     title: OLAP vs OLTP
-    content: 데이터베이스는 크게 두 종류입니다. OLTP는 주문, 결제처럼 빠른 트랜잭션 처리용(MySQL, PostgreSQL). OLAP는 집계, 통계처럼 대량 데이터 분석용(DuckDB, BigQuery).
-      DuckDB는 OLAP에 특화된 데이터베이스입니다.
+    content: 데이터베이스는 크게 두 종류입니다. OLTP는 주문, 결제처럼 빠른 트랜잭션 처리용(MySQL, PostgreSQL). OLAP는 집계, 통계처럼 대량 데이터 분석용(DuckDB, BigQuery). DuckDB는 OLAP에 특화된 데이터베이스입니다.
   - type: featureCards
     cards:
     - emoji: 📊
@@ -335,13 +334,11 @@ sections:
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
-  goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-    고정합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import duckdb
 
@@ -364,7 +361,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import duckdb
 
@@ -386,136 +383,8 @@ sections:
 
       assert rowCount == 5
       rowCount
-    solution: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-      고정합니다.
-  - type: code
-    language: python
-    title: 로컬 주문 테이블 준비와 예측
-    description: 네트워크나 외부 DB 없이 인메모리 DuckDB 테이블로 재현 가능한 분석 흐름을 만듭니다.
-    content: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
-  - type: code
-    language: python
-    title: SQL 오류를 먼저 확인한다
-    description: 없는 컬럼을 조회해 BinderException을 확인하고, 컬럼명을 고쳐 다시 실행합니다.
-    content: |-
-      try:
-          workflowCon.sql("SELECT missingAmount FROM lessonOrders").fetchall()
-      except duckdb.BinderException as exc:
-          duckdbColumnError = str(exc).splitlines()[0]
-      else:
-          raise AssertionError("없는 컬럼 조회는 실패해야 합니다")
-
-      fixedAmounts = workflowCon.sql("""
-          SELECT orderId, amount
-          FROM lessonOrders
-          WHERE status = 'paid'
-          ORDER BY amount DESC
-      """).fetchall()
-
-      assert "missingAmount" in duckdbColumnError
-      assert fixedAmounts[0] == ('A-102', 120000)
-      duckdbColumnError
-  - type: code
-    language: python
-    title: 집계 결과를 업무 규칙으로 검증
-    description: 상태별 매출 집계가 예상한 paid 건수와 금액을 만족하는지 확인합니다.
-    content: |-
-      def validateRevenueReport(rows):
-          if not rows:
-              raise ValueError("report must not be empty")
-
-          revenueByStatus = {status: revenue for status, count, revenue in rows}
-          countByStatus = {status: count for status, count, revenue in rows}
-          if revenueByStatus.get('paid') != expectedPaidRevenue:
-              raise ValueError("paid revenue mismatch")
-          if countByStatus.get('paid') != expectedPaidCount:
-              raise ValueError("paid count mismatch")
-          return True
-
-      revenueReport = workflowCon.sql("""
-          SELECT
-              status,
-              COUNT(*) AS orderCount,
-              SUM(amount) AS revenue
-          FROM lessonOrders
-          GROUP BY status
-          ORDER BY status
-      """).fetchall()
-
-      assert validateRevenueReport(revenueReport)
-      assert dict((status, count) for status, count, revenue in revenueReport)['paid'] == 3
-      revenueReport
-  - type: code
-    language: python
-    title: '실무 변주: 기준 금액을 바꿔 대상 추출'
-    description: 고액 결제 기준을 바꾸며 대상 주문이 어떻게 달라지는지 비교합니다.
-    content: |-
-      def findHighValuePaidOrders(minAmount):
-          if minAmount <= 0:
-              raise ValueError("minAmount must be positive")
-          return workflowCon.sql(f"""
-              SELECT orderId, amount
-              FROM lessonOrders
-              WHERE status = 'paid' AND amount >= {minAmount}
-              ORDER BY amount DESC
-          """).fetchall()
-
-      highValue60000 = findHighValuePaidOrders(60000)
-      highValue100000 = findHighValuePaidOrders(100000)
-
-      assert [row[0] for row in highValue60000] == ['A-102', 'A-104']
-      assert [row[0] for row in highValue100000] == ['A-102']
-      highValue60000, highValue100000
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

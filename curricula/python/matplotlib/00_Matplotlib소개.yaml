@@ -127,8 +127,7 @@ sections:
   - type: note
     style: info
     title: Matplotlib이 먼저인 이유
-    content: Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes 개념을 이해하면 다른 라이브러리도
-      쉽게 배울 수 있습니다.
+    content: Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes 개념을 이해하면 다른 라이브러리도 쉽게 배울 수 있습니다.
 - id: figure_axes
   blocks:
   - type: sectionHeader
@@ -156,8 +155,7 @@ sections:
   - type: note
     style: info
     title: pyplot vs 객체 지향
-    content: plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게 제어할 때 사용합니다. 이 과정에서는
-      두 방식 모두 배웁니다.
+    content: plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게 제어할 때 사용합니다. 이 과정에서는 두 방식 모두 배웁니다.
 - id: chart_types
   blocks:
   - type: sectionHeader
@@ -368,13 +366,11 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서
-    기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -398,7 +394,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -429,99 +425,7 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을
-      만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
-  - type: code
-    language: python
-    title: 보고서 데이터 검증
-    description: 필수 컬럼과 금액 범위를 확인합니다.
-    content: |-
-      import pandas as pd
-      import matplotlib.pyplot as plt
-
-      reportData = pd.DataFrame({
-          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          "revenue": [82, 91, 105, 112, 121, 130],
-          "cost": [55, 58, 62, 64, 68, 72],
-          "target": [100, 100, 100, 100, 100, 100],
-      })
-
-      def validateChartFrame(frame: pd.DataFrame) -> bool:
-          requiredColumns = {"month", "revenue", "cost", "target"}
-          missingColumns = requiredColumns - set(frame.columns)
-          if missingColumns:
-              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
-          if frame[["revenue", "cost", "target"]].lt(0).any().any():
-              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
-          return True
-
-      validateChartFrame(reportData)
-      reportData
-  - type: code
-    language: python
-    title: 실패 입력 확인
-    description: 목표선 컬럼이 빠진 데이터를 검증 함수가 거부하는지 확인합니다.
-    content: |-
-      try:
-          validateChartFrame(reportData.drop(columns=["target"]))
-      except ValueError as exc:
-          chartValidationMessage = str(exc)
-
-      assert "필수 컬럼" in chartValidationMessage
-      chartValidationMessage
-  - type: code
-    language: python
-    title: 예측 후 차트 구성
-    description: 4개월이 목표를 넘을 것이라고 예측하고 선 차트로 확인합니다.
-    content: |-
-      # 예측: 3월부터 6월까지 4개월은 매출이 목표선을 넘습니다.
-      figReport, axReport = plt.subplots(figsize=(8, 4))
-      axReport.plot(reportData["month"], reportData["revenue"], marker="o", label="Revenue")
-      axReport.plot(reportData["month"], reportData["cost"], marker="o", label="Cost")
-      axReport.axhline(100, color="gray", linestyle="--", label="Target")
-      axReport.set_title("Monthly Revenue vs Cost")
-      axReport.set_xlabel("Month")
-      axReport.set_ylabel("Amount")
-      axReport.legend()
-
-      monthsAboveTarget = int((reportData["revenue"] >= reportData["target"]).sum())
-      figReport
-  - type: code
-    language: python
-    title: 차트 품질 검증
-    description: 보고서에 필요한 구성 요소와 수치 메시지를 assert로 확인합니다.
-    content: |-
-      chartChecks = {
-          "has_three_lines": len(axReport.lines) == 3,
-          "has_title": axReport.get_title() == "Monthly Revenue vs Cost",
-          "has_axis_labels": axReport.get_xlabel() == "Month" and axReport.get_ylabel() == "Amount",
-          "target_reached_for_four_months": monthsAboveTarget == 4,
-          "legend_is_present": axReport.get_legend() is not None,
-      }
-
-      assert all(chartChecks.values()), chartChecks
-      chartChecks
-  - type: expansion
-    title: '실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?'
-    blocks:
-    - type: code
-      language: python
-      title: 목표선 민감도 분석
-      content: |-
-        targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
-            monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
-        )
-
-        assert targetScenario["monthsPassed"].is_monotonic_decreasing
-        targetScenario
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

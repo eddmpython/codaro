@@ -802,10 +802,12 @@ function exerciseContract(value: unknown): LearningExerciseContract {
       difficulty: "easy",
     };
   }
+  const starterCode = textValue(value.starterCode ?? value.starter ?? value.template ?? value.content);
+  const solution = textValue(value.solution ?? value.answer ?? value.code) || starterCode;
   return {
     prompt: textValue(value.prompt ?? value.title ?? value.description ?? value.content),
-    starterCode: textValue(value.starterCode ?? value.starter ?? value.template ?? value.content),
-    solution: textValue(value.solution ?? value.answer ?? value.code),
+    starterCode,
+    solution,
     check: checkMap(value.check ?? value.checkConfig),
     hints: uniqueTextList(value.hints ?? value.tips),
     difficulty: textValue(value.difficulty) || "easy",

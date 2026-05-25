@@ -28,19 +28,17 @@ meta:
 intro:
   emoji: 🏥
   goal: 이진 분류 모델로 유방암 양성/악성을 판별합니다.
-  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을 익힙니다. 이전 프로젝트에서 배운 train_test_split,
-    StandardScaler, LogisticRegression을 복습합니다.
+  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을 익힙니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler, LogisticRegression을 복습합니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을 제공합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
@@ -52,7 +50,7 @@ sections:
     import matplotlib.pyplot as plt
     import seaborn as sns
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from sklearn.datasets import load_breast_cancer
       from sklearn.model_selection import train_test_split
@@ -63,115 +61,49 @@ sections:
       import pandas as pd
       import matplotlib.pyplot as plt
       import seaborn as sns
-    solution: |-
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-      from sklearn.metrics import confusion_matrix, classification_report
-      import pandas as pd
-      import matplotlib.pyplot as plt
-      import seaborn as sns
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을 제공합니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: sklearn과 pandas 임포트
-    content: |-
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-      from sklearn.metrics import confusion_matrix, classification_report
-      import pandas as pd
-      import matplotlib.pyplot as plt
-      import seaborn as sns
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: load_breast_cancer()
-  goal: '2단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     유방암 데이터셋을 불러옵니다. 세포핵의 반지름, 질감, 둘레, 면적 등 30개의 특성으로 양성(benign)과 악성(malignant)을 구분합니다. 타겟 0은 악성, 1은 양성입니다.
 
     target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
   tips:
   - target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     cancer = load_breast_cancer()
     X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
     y = cancer.target
     X.shape
   exercise:
-    prompt: '2단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       cancer = load_breast_cancer()
       X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
       y = cancer.target
       X.shape
-    solution: |-
-      cancer = load_breast_cancer()
-      X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
-      y = cancer.target
-      X.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 유방암 데이터셋을 불러옵니다. 세포핵의 반지름, 질감, 둘레, 면적 등 30개의 특성으로 양성(benign)과 악성(malignant)을 구분합니다. 타겟 0은 악성, 1은 양성입니다.
-  - type: code
-    language: python
-    title: 데이터 로드
-    description: 유방암 데이터셋 불러오기
-    content: |-
-      cancer = load_breast_cancer()
-      X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
-      y = cancer.target
-      X.shape
-  - type: code
-    language: python
-    title: 클래스 확인
-    description: 양성/악성 분포
-    content: |-
-      classCounts = pd.Series(y).value_counts()
-      pd.DataFrame({'class': cancer.target_names, 'count': [classCounts[0], classCounts[1]]})
-  - type: tip
-    content: target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는
-      것이 좋습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_split_scale
   title: 3단계. 분할과 스케일링
   structuredPrimary: true
   subtitle: 전처리
-  goal: '3단계. 분할과 스케일링: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 분할과 스케일링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 이전 프로젝트에서 배운 대로 데이터를 분할하고 스케일링합니다. 30개의 특성이 모두 다른 스케일이므로 StandardScaler가 필수입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -180,7 +112,7 @@ sections:
     xTestSc = scaler.transform(xTest)
     xTrainSc.shape
   exercise:
-    prompt: '3단계. 분할과 스케일링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -188,437 +120,212 @@ sections:
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
       xTrainSc.shape
-    solution: |-
-      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
-
-      scaler = StandardScaler()
-      xTrainSc = scaler.fit_transform(xTrain)
-      xTestSc = scaler.transform(xTest)
-      xTrainSc.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 이전 프로젝트에서 배운 대로 데이터를 분할하고 스케일링합니다. 30개의 특성이 모두 다른 스케일이므로 StandardScaler가 필수입니다.
-  - type: code
-    language: python
-    title: 분할과 스케일링
-    description: train/test 분할 후 표준화
-    content: |-
-      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
-
-      scaler = StandardScaler()
-      xTrainSc = scaler.fit_transform(xTrain)
-      xTestSc = scaler.transform(xTest)
-      xTrainSc.shape
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_train
   title: 4단계. 모델 학습
   structuredPrimary: true
   subtitle: LogisticRegression
-  goal: '4단계. 모델 학습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 모델 학습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고 합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     model = LogisticRegression(max_iter=1000)
     model.fit(xTrainSc, yTrain)
   exercise:
-    prompt: '4단계. 모델 학습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       model = LogisticRegression(max_iter=1000)
       model.fit(xTrainSc, yTrain)
-    solution: |-
-      model = LogisticRegression(max_iter=1000)
-      model.fit(xTrainSc, yTrain)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고 합니다.
-  - type: code
-    language: python
-    title: 모델 학습
-    description: 이진 분류 모델 학습
-    content: |-
-      model = LogisticRegression(max_iter=1000)
-      model.fit(xTrainSc, yTrain)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_predict
   title: 5단계. 예측
   structuredPrimary: true
   subtitle: predict
-  goal: '5단계. 예측: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 예측: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 테스트 데이터로 예측을 수행합니다. 의료 진단에서는 악성(0)을 놓치지 않는 것이 중요합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     yPred = model.predict(xTestSc)
     yPred[:10]
   exercise:
-    prompt: '5단계. 예측: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       yPred = model.predict(xTestSc)
       yPred[:10]
-    solution: |-
-      yPred = model.predict(xTestSc)
-      yPred[:10]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 테스트 데이터로 예측을 수행합니다. 의료 진단에서는 악성(0)을 놓치지 않는 것이 중요합니다.
-  - type: code
-    language: python
-    title: 예측 수행
-    description: 테스트 데이터 예측
-    content: |-
-      yPred = model.predict(xTestSc)
-      yPred[:10]
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_accuracy
   title: 6단계. 정확도
   structuredPrimary: true
   subtitle: accuracy_score
-  goal: '6단계. 정확도: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 정확도: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 전체 정확도를 확인합니다. 하지만 의료 진단에서는 정확도만으로는 부족합니다. 악성을 양성으로 잘못 판단하면 치명적이기 때문입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     acc = accuracy_score(yTest, yPred)
     f"정확도: {acc:.2%}"
   exercise:
-    prompt: '6단계. 정확도: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       acc = accuracy_score(yTest, yPred)
       f"정확도: {acc:.2%}"
-    solution: |-
-      acc = accuracy_score(yTest, yPred)
-      f"정확도: {acc:.2%}"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 전체 정확도를 확인합니다. 하지만 의료 진단에서는 정확도만으로는 부족합니다. 악성을 양성으로 잘못 판단하면 치명적이기 때문입니다.
-  - type: code
-    language: python
-    title: 정확도
-    description: 전체 정확도 확인
-    content: |-
-      acc = accuracy_score(yTest, yPred)
-      f"정확도: {acc:.2%}"
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_precision_recall
   title: 7단계. 정밀도와 재현율
   structuredPrimary: true
   subtitle: precision, recall
-  goal: '7단계. 정밀도와 재현율: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 정밀도와 재현율: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
 
     암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
   tips:
-  - 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안
-    되므로 정밀도가 더 중요합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
   snippet: |-
     prec = precision_score(yTest, yPred)
     f"정밀도: {prec:.2%}"
   exercise:
-    prompt: '7단계. 정밀도와 재현율: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       prec = precision_score(yTest, yPred)
       f"정밀도: {prec:.2%}"
-    solution: |-
-      prec = precision_score(yTest, yPred)
-      f"정밀도: {prec:.2%}"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
-  - type: code
-    language: python
-    title: 정밀도
-    description: 양성 예측의 정확도
-    content: |-
-      prec = precision_score(yTest, yPred)
-      f"정밀도: {prec:.2%}"
-  - type: code
-    language: python
-    title: 재현율
-    description: 실제 양성 중 맞춘 비율
-    content: |-
-      rec = recall_score(yTest, yPred)
-      f"재현율: {rec:.2%}"
-  - type: tip
-    content: 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면
-      안 되므로 정밀도가 더 중요합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_f1
   title: 8단계. F1 점수
   structuredPrimary: true
   subtitle: 조화평균
-  goal: '8단계. F1 점수: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. F1 점수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     F1 점수는 정밀도와 재현율의 조화평균입니다. 두 지표 중 하나만 높으면 F1이 낮아집니다. 정밀도와 재현율의 균형을 평가할 때 사용합니다.
 
     F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
   tips:
-  - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면
-    F1은 0.18에 불과합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
   snippet: |-
     f1 = f1_score(yTest, yPred)
     f"F1 점수: {f1:.2%}"
   exercise:
-    prompt: '8단계. F1 점수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       f1 = f1_score(yTest, yPred)
       f"F1 점수: {f1:.2%}"
-    solution: |-
-      f1 = f1_score(yTest, yPred)
-      f"F1 점수: {f1:.2%}"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: F1 점수는 정밀도와 재현율의 조화평균입니다. 두 지표 중 하나만 높으면 F1이 낮아집니다. 정밀도와 재현율의 균형을 평가할 때 사용합니다.
-  - type: code
-    language: python
-    title: F1 점수
-    description: 정밀도와 재현율의 조화평균
-    content: |-
-      f1 = f1_score(yTest, yPred)
-      f"F1 점수: {f1:.2%}"
-  - type: code
-    language: python
-    title: 평가 지표 종합
-    description: 모든 지표 한눈에 보기
-    content: |-
-      metrics = pd.DataFrame({
-          'Metric': ['Accuracy', 'Precision', 'Recall', 'F1'],
-          'Score': [acc, prec, rec, f1]
-      })
-      metrics
-  - type: tip
-    content: F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면
-      F1은 0.18에 불과합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_confusion
   title: 9단계. 혼동행렬 분석
   structuredPrimary: true
   subtitle: TP, TN, FP, FN
-  goal: '9단계. 혼동행렬 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 혼동행렬 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     혼동행렬을 통해 True Positive(TP), True Negative(TN), False Positive(FP), False Negative(FN)를 확인합니다. 의료에서 FN(실제 악성을 양성으로 예측)이 가장 위험합니다.
 
     혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.
   tips:
   - '혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     cm = confusion_matrix(yTest, yPred)
     cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
     cmDf
   exercise:
-    prompt: '9단계. 혼동행렬 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       cm = confusion_matrix(yTest, yPred)
       cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
       cmDf
-    solution: |-
-      cm = confusion_matrix(yTest, yPred)
-      cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
-      cmDf
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 혼동행렬을 통해 True Positive(TP), True Negative(TN), False Positive(FP), False Negative(FN)를 확인합니다. 의료에서 FN(실제 악성을
-      양성으로 예측)이 가장 위험합니다.
-  - type: code
-    language: python
-    title: 혼동행렬
-    description: TP, TN, FP, FN 확인
-    content: |-
-      cm = confusion_matrix(yTest, yPred)
-      cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
-      cmDf
-  - type: code
-    language: python
-    title: 히트맵
-    description: 혼동행렬 시각화
-    content: |-
-      fig, ax = plt.subplots(figsize=(8, 6))
-      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Malignant', 'Benign'], yticklabels=['Malignant', 'Benign'], ax=ax)
-      ax.set_xlabel('Predicted')
-      ax.set_ylabel('Actual')
-      ax.set_title('Confusion Matrix - Breast Cancer')
-      fig
-  - type: tip
-    content: '혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_report
   title: 10단계. 상세 리포트
   structuredPrimary: true
   subtitle: classification_report
-  goal: '10단계. 상세 리포트: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 상세 리포트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: classification_report로 클래스별 상세 평가를 확인합니다. 악성(0)과 양성(1) 각각의 precision, recall, f1을 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
     report
   exercise:
-    prompt: '10단계. 상세 리포트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
       report
-    solution: |-
-      report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
-      report
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: classification_report로 클래스별 상세 평가를 확인합니다. 악성(0)과 양성(1) 각각의 precision, recall, f1을 비교합니다.
-  - type: code
-    language: python
-    title: 분류 리포트
-    description: 클래스별 상세 평가
-    content: |-
-      report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
-      report
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_proba
   title: 11단계. 확률 예측
   structuredPrimary: true
   subtitle: predict_proba
-  goal: '11단계. 확률 예측: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 확률 예측: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     predict_proba()로 각 클래스의 확률을 얻을 수 있습니다. 의료에서는 확률값을 활용하여 위험도를 세분화하거나, 임계값을 조정할 수 있습니다.
 
     기본 임계값은 0.5입니다. 악성 확률이 0.5 이상이면 악성으로 예측합니다. 재현율을 높이려면 임계값을 낮춰서 더 많은 케이스를 악성으로 분류할 수 있습니다.
   tips:
   - 기본 임계값은 0.5입니다. 악성 확률이 0.5 이상이면 악성으로 예측합니다. 재현율을 높이려면 임계값을 낮춰서 더 많은 케이스를 악성으로 분류할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     proba = model.predict_proba(xTestSc)
     probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
     probaDf.head(10)
   exercise:
-    prompt: '11단계. 확률 예측: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       proba = model.predict_proba(xTestSc)
       probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
       probaDf.head(10)
-    solution: |-
-      proba = model.predict_proba(xTestSc)
-      probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
-      probaDf.head(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: predict_proba()로 각 클래스의 확률을 얻을 수 있습니다. 의료에서는 확률값을 활용하여 위험도를 세분화하거나, 임계값을 조정할 수 있습니다.
-  - type: code
-    language: python
-    title: 확률 예측
-    description: 악성/양성 확률 확인
-    content: |-
-      proba = model.predict_proba(xTestSc)
-      probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
-      probaDf.head(10)
-  - type: tip
-    content: 기본 임계값은 0.5입니다. 악성 확률이 0.5 이상이면 악성으로 예측합니다. 재현율을 높이려면 임계값을 낮춰서 더 많은 케이스를 악성으로 분류할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step12_summary
   title: 12단계. 정리
   structuredPrimary: true
   subtitle: 이진 분류 완료
-  goal: '12단계. 정리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '12단계. 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다. 의료처럼 오분류 비용이 다른
-    경우 상황에 맞는 지표를 선택해야 합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다. 의료처럼 오분류 비용이 다른 경우 상황에 맞는 지표를 선택해야 합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     summary = pd.DataFrame({
         'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
@@ -626,56 +333,30 @@ sections:
     })
     summary
   exercise:
-    prompt: '12단계. 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       summary = pd.DataFrame({
           'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
           'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
       })
       summary
-    solution: |-
-      summary = pd.DataFrame({
-          'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
-          'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
-      })
-      summary
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다. 의료처럼 오분류 비용이 다른 경우
-      상황에 맞는 지표를 선택해야 합니다.
-  - type: code
-    language: python
-    title: 최종 요약
-    description: 주요 결과 정리
-    content: |-
-      summary = pd.DataFrame({
-          'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
-          'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
-      })
-      summary
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 유방암 진단 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     의료 AI 개발자가 되어 진단 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. 이전 프로젝트의 train_test_split, StandardScaler와 이번 프로젝트의 precision, recall, F1을 모두 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
@@ -711,7 +392,7 @@ sections:
         'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
     })
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from sklearn.datasets import load_breast_cancer
       from sklearn.model_selection import train_test_split
@@ -746,134 +427,20 @@ sections:
           'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
           'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
       })
-    solution: |-
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, f1_score
-      import pandas as pd
-
-      data = load_breast_cancer()
-      xFull = pd.DataFrame(data.data, columns=data.feature_names)
-      yFull = data.target
-
-      top10 = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension']
-      xTop10 = xFull[top10]
-
-      xTr1, xTe1, yTr1, yTe1 = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
-      xTr2, xTe2, yTr2, yTe2 = train_test_split(xTop10, yFull, test_size=0.2, random_state=42)
-
-      sc1 = StandardScaler()
-      sc2 = StandardScaler()
-
-      model1 = LogisticRegression(max_iter=1000)
-      model1.fit(sc1.fit_transform(xTr1), yTr1)
-      pred1 = model1.predict(sc1.transform(xTe1))
-
-      model2 = LogisticRegression(max_iter=1000)
-      model2.fit(sc2.fit_transform(xTr2), yTr2)
-      pred2 = model2.predict(sc2.transform(xTe2))
-
-      pd.DataFrame({
-          'Features': ['All 30', 'Top 10'],
-          'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
-          'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
-      })
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 의료 AI 개발자가 되어 진단 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. 이전 프로젝트의 train_test_split, StandardScaler와
-      이번 프로젝트의 precision, recall, F1을 모두 활용합니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 특성 10개만 사용하여 분류 성능 비교'
-    code: |-
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, f1_score
-      import pandas as pd
-
-      data = load_breast_cancer()
-      xFull = pd.DataFrame(data.data, columns=data.feature_names)
-      yFull = data.target
-
-      top10 = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension']
-      xTop10 = xFull[top10]
-
-      xTr1, xTe1, yTr1, yTe1 = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
-      xTr2, xTe2, yTr2, yTe2 = train_test_split(xTop10, yFull, test_size=0.2, random_state=42)
-
-      sc1 = StandardScaler()
-      sc2 = StandardScaler()
-
-      model1 = LogisticRegression(max_iter=1000)
-      model1.fit(sc1.fit_transform(xTr1), yTr1)
-      pred1 = model1.predict(sc1.transform(xTe1))
-
-      model2 = LogisticRegression(max_iter=1000)
-      model2.fit(sc2.fit_transform(xTr2), yTr2)
-      pred2 = model2.predict(sc2.transform(xTe2))
-
-      pd.DataFrame({
-          'Features': ['All 30', 'Top 10'],
-          'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
-          'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
-      })
-  - type: expansion
-    title: '미션2: 악성 클래스 재현율 집중 분석'
-    code: |-
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import confusion_matrix, classification_report
-      import pandas as pd
-
-      cancerData = load_breast_cancer()
-      xMission = pd.DataFrame(cancerData.data, columns=cancerData.feature_names)
-      yMission = cancerData.target
-
-      xTrM, xTeM, yTrM, yTeM = train_test_split(xMission, yMission, test_size=0.2, random_state=42)
-
-      scM = StandardScaler()
-      xTrMSc = scM.fit_transform(xTrM)
-      xTeMSc = scM.transform(xTeM)
-
-      modelM = LogisticRegression(max_iter=1000)
-      modelM.fit(xTrMSc, yTrM)
-      predM = modelM.predict(xTeMSc)
-
-      cmM = confusion_matrix(yTeM, predM)
-      tn, fp, fn, tp = cmM.ravel()
-
-      pd.DataFrame({
-          'Metric': ['True Negative (악성→악성)', 'False Positive (악성→양성)', 'False Negative (양성→악성)', 'True Positive (양성→양성)', 'Malignant Recall'],
-          'Value': [tn, fp, fn, tp, tn / (tn + fp)]
-      })
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
-    검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from sklearn.datasets import make_classification
     from sklearn.model_selection import train_test_split
@@ -900,7 +467,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -945,111 +512,7 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
-      검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
-  - type: code
-    language: python
-    title: 분류 데이터와 파이프라인 준비
-    description: 재현 가능한 이탈 고객 위험 예측 데이터를 만듭니다.
-    content: |-
-      from sklearn.datasets import make_classification
-      from sklearn.model_selection import train_test_split
-      from sklearn.pipeline import Pipeline
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, f1_score
-
-      features, target = make_classification(
-          n_samples=240,
-          n_features=6,
-          n_informative=4,
-          n_redundant=0,
-          class_sep=1.4,
-          random_state=42,
-      )
-      xTrain, xTest, yTrain, yTest = train_test_split(
-          features, target, test_size=0.25, random_state=42, stratify=target
-      )
-
-      riskPipeline = Pipeline([
-          ("scaler", StandardScaler()),
-          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
-      ])
-      xTrain.shape, xTest.shape
-  - type: code
-    language: python
-    title: 입력 검증이 있는 학습 함수
-    description: 행 수 불일치나 단일 클래스 데이터를 학습 전에 차단합니다.
-    content: |-
-      def fitRiskModel(model, features, labels):
-          if features.shape[0] != len(labels):
-              raise ValueError("특성 행 수와 타깃 길이가 다릅니다.")
-          if len(set(labels)) < 2:
-              raise ValueError("분류 모델은 최소 두 개 이상의 클래스가 필요합니다.")
-          try:
-              return model.fit(features, labels)
-          except ValueError as exc:
-              raise ValueError("모델 학습 입력을 다시 확인하세요.") from exc
-
-      trainedRiskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
-      trainedRiskModel
-  - type: code
-    language: python
-    title: 예측과 지표 계산
-    description: 실행 전에는 정확도와 F1이 0.8 이상일 것으로 예측하고 확인합니다.
-    content: |-
-      # 예측: class_sep이 충분히 커서 정확도와 F1이 모두 0.8 이상일 가능성이 높습니다.
-      riskPred = trainedRiskModel.predict(xTest)
-      riskAccuracy = accuracy_score(yTest, riskPred)
-      riskF1 = f1_score(yTest, riskPred)
-
-      round(riskAccuracy, 3), round(riskF1, 3)
-  - type: code
-    language: python
-    title: 운영 배포 전 품질 검증
-    description: 최소 성능과 예측 라벨 범위를 assert로 고정합니다.
-    content: |-
-      modelChecks = {
-          "accuracy_gate": riskAccuracy >= 0.80,
-          "f1_gate": riskF1 >= 0.80,
-          "prediction_labels_are_valid": set(riskPred).issubset({0, 1}),
-          "test_rows_preserved": len(riskPred) == len(yTest),
-      }
-
-      assert all(modelChecks.values()), modelChecks
-      modelChecks
-  - type: expansion
-    title: '실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?'
-    blocks:
-    - type: code
-      language: python
-      title: 하이퍼파라미터 변경 비교
-      content: |-
-        conservativePipeline = Pipeline([
-            ("scaler", StandardScaler()),
-            ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
-        ])
-        conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
-        conservativePred = conservativeModel.predict(xTest)
-        conservativeAccuracy = accuracy_score(yTest, conservativePred)
-        conservativeF1 = f1_score(yTest, conservativePred)
-
-        assert conservativeAccuracy >= 0.75
-        {
-            "baselineAccuracy": round(riskAccuracy, 3),
-            "baselineF1": round(riskF1, 3),
-            "conservativeAccuracy": round(conservativeAccuracy, 3),
-            "conservativeF1": round(conservativeF1, 3),
-            "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
-        }
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

@@ -32,462 +32,178 @@ sections:
   title: import 기본
   structuredPrimary: true
   subtitle: 모듈 가져오기
-  goal: 'import 기본: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'import 기본: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
 
     처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
   tips:
   - 처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import math
 
     math.sqrt(16)
   exercise:
-    prompt: 'import 기본: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import math
 
       math.sqrt(16)
-    solution: |-
-      import math
-
-      math.sqrt(16)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
-  - type: list
-    items:
-    - import 모듈명 형식
-    - 모듈명.함수명() 사용
-    - 표준 라이브러리 제공
-    - 코드 재사용
-  - type: code
-    language: python
-    title: math 모듈
-    description: math 모듈을 가져와 사용합니다.
-    content: |-
-      import math
-
-      math.sqrt(16)
-  - type: code
-    language: python
-    title: 여러 함수 사용
-    description: 모듈의 여러 함수를 사용할 수 있습니다.
-    content: |-
-      # import math  # 이미 위 셀에서 import한 경우 제거
-
-      radius = 5
-      area = math.pi * radius ** 2
-      area
-  - type: code
-    language: python
-    title: 여러 모듈
-    description: 여러 모듈을 가져올 수 있습니다.
-    content: |-
-      # import math  # 이미 위 셀에서 import한 경우 제거
-      import random
-
-      value = math.ceil(3.2)
-      value
-  - type: tip
-    content: 처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: from_import
   title: from import
   structuredPrimary: true
   subtitle: 특정 함수만 가져오기
-  goal: 'from import: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'from import: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
 
     필요한 함수만 가져오면 코드가 깔끔해집니다.
   tips:
   - 필요한 함수만 가져오면 코드가 깔끔해집니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from math import sqrt
 
     sqrt(25)
   exercise:
-    prompt: 'from import: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from math import sqrt
 
       sqrt(25)
-    solution: |-
-      from math import sqrt
-
-      sqrt(25)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
-  - type: list
-    items:
-    - from 모듈명 import 함수명
-    - 모듈명 없이 사용
-    - 쉼표로 여러 함수
-    - 코드 간결화
-  - type: code
-    language: python
-    title: 함수 직접 사용
-    description: from import로 함수를 직접 사용합니다.
-    content: |-
-      from math import sqrt
-
-      sqrt(25)
-  - type: code
-    language: python
-    title: 여러 함수 가져오기
-    description: 여러 함수를 한 번에 가져옵니다.
-    content: |-
-      from math import pi, ceil, floor
-
-      ceil(3.2), floor(3.8)
-  - type: code
-    language: python
-    title: 계산에 활용
-    description: 가져온 함수와 상수를 계산에 사용합니다.
-    content: |-
-      from math import pi, pow
-
-      r = 3
-      volume = 4 / 3 * pi * pow(r, 3)
-      volume
-  - type: tip
-    content: 필요한 함수만 가져오면 코드가 깔끔해집니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: import_as
   title: as 별칭
   structuredPrimary: true
   subtitle: 모듈/함수 이름 바꾸기
-  goal: 'as 별칭: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'as 별칭: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
 
     별칭은 짧고 의미있게 지으세요.
   tips:
   - 별칭은 짧고 의미있게 지으세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import math as m
 
     m.sqrt(36)
   exercise:
-    prompt: 'as 별칭: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import math as m
 
       m.sqrt(36)
-    solution: |-
-      import math as m
-
-      m.sqrt(36)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
-  - type: list
-    items:
-    - as 별칭 형식
-    - 긴 이름 단축
-    - 이름 충돌 방지
-    - 관습적 별칭 존재
-  - type: code
-    language: python
-    title: 모듈 별칭
-    description: 모듈에 짧은 별칭을 붙입니다.
-    content: |-
-      import math as m
-
-      m.sqrt(36)
-  - type: code
-    language: python
-    title: 함수 별칭
-    description: 함수에 별칭을 붙입니다.
-    content: |-
-      from math import sqrt as sq
-
-      sq(49)
-  - type: code
-    language: python
-    title: 여러 별칭
-    description: 여러 함수에 별칭을 붙입니다.
-    content: |-
-      from random import randint as rInt, choice as pick
-
-      rInt(1, 10)
-  - type: tip
-    content: 별칭은 짧고 의미있게 지으세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: math_module
   title: math 모듈
   structuredPrimary: true
   subtitle: 수학 함수
-  goal: 'math 모듈: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'math 모듈: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
 
     math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
   tips:
   - math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from math import sqrt
 
     sqrt(144)
   exercise:
-    prompt: 'math 모듈: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from math import sqrt
 
       sqrt(144)
-    solution: |-
-      from math import sqrt
-
-      sqrt(144)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
-  - type: list
-    items:
-    - 'sqrt(): 제곱근'
-    - 'ceil(): 올림'
-    - 'floor(): 내림'
-    - 'pow(): 거듭제곱'
-  - type: code
-    language: python
-    title: 제곱근
-    description: sqrt로 제곱근을 계산합니다.
-    content: |-
-      from math import sqrt
-
-      sqrt(144)
-  - type: code
-    language: python
-    title: 올림과 내림
-    description: ceil과 floor로 올림과 내림을 합니다.
-    content: |-
-      from math import ceil, floor
-
-      num = 5.7
-      ceil(num), floor(num)
-  - type: code
-    language: python
-    title: 거듭제곱
-    description: pow로 거듭제곱을 계산합니다.
-    content: |-
-      from math import pow
-
-      pow(2, 10)
-  - type: tip
-    content: math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: random_module
   title: random 모듈
   structuredPrimary: true
   subtitle: 난수 생성
-  goal: 'random 모듈: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'random 모듈: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
 
     난수는 실행할 때마다 다른 값이 나옵니다.
   tips:
   - 난수는 실행할 때마다 다른 값이 나옵니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from random import randint
 
     randint(1, 100)
   exercise:
-    prompt: 'random 모듈: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from random import randint
 
       randint(1, 100)
-    solution: |-
-      from random import randint
-
-      randint(1, 100)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
-  - type: list
-    items:
-    - 'randint(a, b): a~b 정수'
-    - 'choice(리스트): 랜덤 선택'
-    - 'shuffle(리스트): 섞기'
-    - 'random(): 0~1 실수'
-  - type: code
-    language: python
-    title: 정수 난수
-    description: randint로 범위 내 정수를 생성합니다.
-    content: |-
-      from random import randint
-
-      randint(1, 100)
-  - type: code
-    language: python
-    title: 랜덤 선택
-    description: choice로 리스트에서 하나를 선택합니다.
-    content: |-
-      from random import choice
-
-      colors = ['red', 'green', 'blue', 'yellow']
-      choice(colors)
-  - type: code
-    language: python
-    title: 실수 난수
-    description: random()으로 0과 1 사이의 실수를 생성합니다.
-    content: |-
-      from random import random
-
-      random()
-  - type: tip
-    content: 난수는 실행할 때마다 다른 값이 나옵니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: datetime_module
   title: datetime 모듈
   structuredPrimary: true
   subtitle: 날짜와 시간
-  goal: 'datetime 모듈: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'datetime 모듈: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
 
     datetime 객체는 여러 속성과 메서드를 제공합니다.
   tips:
   - datetime 객체는 여러 속성과 메서드를 제공합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from datetime import datetime
 
     now = datetime.now()
     now.year, now.month, now.day
   exercise:
-    prompt: 'datetime 모듈: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from datetime import datetime
 
       now = datetime.now()
       now.year, now.month, now.day
-    solution: |-
-      from datetime import datetime
-
-      now = datetime.now()
-      now.year, now.month, now.day
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
-  - type: list
-    items:
-    - 'datetime.now(): 현재 시각'
-    - 'date(): 날짜 생성'
-    - 'time(): 시간 생성'
-    - 'timedelta(): 시간 차이'
-  - type: code
-    language: python
-    title: 현재 시각
-    description: datetime.now()로 현재 시각을 가져옵니다.
-    content: |-
-      from datetime import datetime
-
-      now = datetime.now()
-      now.year, now.month, now.day
-  - type: code
-    language: python
-    title: 날짜 생성
-    description: 특정 날짜를 생성합니다.
-    content: |-
-      from datetime import date
-
-      birthday = date(2000, 1, 1)
-      birthday.year, birthday.month, birthday.day
-  - type: code
-    language: python
-    title: 시간 차이
-    description: timedelta로 시간 차이를 계산합니다.
-    content: |-
-      from datetime import date, timedelta
-
-      today = date(2024, 1, 1)
-      tomorrow = today + timedelta(days=1)
-      tomorrow.day
-  - type: tip
-    content: datetime 객체는 여러 속성과 메서드를 제공합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 실무 import 조합 루프
   structuredPrimary: true
   subtitle: 필요한 도구를 고르고 오류를 읽기
-  goal: '실무 import 조합 루프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실무 import 조합 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다.
 
     import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
   tips:
   - import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from datetime import datetime
     from pathlib import Path
@@ -517,7 +233,7 @@ sections:
     workSummary = summarizeWorkLogs(workLogs)
     workSummary
   exercise:
-    prompt: '실무 import 조합 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from datetime import datetime
       from pathlib import Path
@@ -546,352 +262,32 @@ sections:
 
       workSummary = summarizeWorkLogs(workLogs)
       workSummary
-    solution: |-
-      from datetime import datetime
-      from pathlib import Path
-      from statistics import mean
-
-      workLogs = [
-          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
-          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
-          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
-          {"startedAt": "2026-05-03 16:00", "minutes": 12, "status": "todo"},
-      ]
-
-      def summarizeWorkLogs(logs):
-          finishedLogs = [log for log in logs if log["status"] == "done"]
-          latestStartedAt = max(
-              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
-              for log in finishedLogs
-          )
-          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
-          return {
-              "doneCount": len(finishedLogs),
-              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
-              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
-              "reportFile": reportPath.name,
-          }
-
-      workSummary = summarizeWorkLogs(workLogs)
-      workSummary
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import
-      방식과 별칭을 확인해 고칩니다.
-  - type: list
-    items:
-    - datetime은 문자열 날짜를 계산 가능한 시간 값으로 바꿉니다.
-    - statistics는 평균처럼 자주 쓰는 통계 계산을 맡깁니다.
-    - pathlib은 파일을 실제로 만들지 않아도 경로를 안전하게 조립합니다.
-    - NameError가 나오면 모듈 이름, 별칭, from import 대상을 먼저 확인합니다.
-  - type: code
-    language: python
-    title: 표준 라이브러리로 업무 리포트 준비
-    description: 날짜, 평균, 리포트 파일명을 각 모듈에 맡깁니다. 실행 전에 latestDate와 averageMinutes를 예측해보세요.
-    content: |-
-      from datetime import datetime
-      from pathlib import Path
-      from statistics import mean
-
-      workLogs = [
-          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
-          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
-          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
-          {"startedAt": "2026-05-03 16:00", "minutes": 12, "status": "todo"},
-      ]
-
-      def summarizeWorkLogs(logs):
-          finishedLogs = [log for log in logs if log["status"] == "done"]
-          latestStartedAt = max(
-              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
-              for log in finishedLogs
-          )
-          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
-          return {
-              "doneCount": len(finishedLogs),
-              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
-              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
-              "reportFile": reportPath.name,
-          }
-
-      workSummary = summarizeWorkLogs(workLogs)
-      workSummary
-  - type: code
-    language: python
-    title: 별칭 오류 읽기
-    description: stats라는 별칭을 import하지 않고 사용하면 어떤 오류가 나는지 확인합니다.
-    content: |-
-      try:
-          stats.mean([18, 32, 21])
-      except NameError as exc:
-          moduleErrorMessage = str(exc)
-
-      moduleErrorMessage
-  - type: code
-    language: python
-    title: 별칭을 정하고 다시 실행
-    description: import as로 별칭을 만든 뒤 같은 계산을 다시 실행합니다.
-    content: |-
-      import statistics as stats
-
-      stats.mean([18, 32, 21])
-  - type: code
-    language: python
-    title: 리포트 결과 검증
-    description: 리포트 요약이 예상한 업무 규칙과 맞는지 점검합니다.
-    content: |-
-      expectedSummary = {
-          "doneCount": 3,
-          "averageMinutes": 23.7,
-          "latestDate": "2026-05-03",
-          "reportFile": "daily-2026-05-03.txt",
-      }
-
-      checks = {
-          key: workSummary[key] == expectedSummary[key]
-          for key in expectedSummary
-      }
-
-      assert all(checks.values())
-      checks
-  - type: code
-    language: python
-    title: 수정 실험
-    description: 작업 시간이 줄어들면 평균 리포트가 어떻게 바뀌는지 비교합니다.
-    content: |-
-      from datetime import timedelta
-
-      shorterLogs = [
-          {**log, "minutes": max(log["minutes"] - 5, 1)}
-          for log in workLogs
-      ]
-      shorterSummary = summarizeWorkLogs(shorterLogs)
-      nextReviewAt = datetime.strptime(workSummary["latestDate"], "%Y-%m-%d") + timedelta(days=7)
-
-      workSummary["averageMinutes"], shorterSummary["averageMinutes"], nextReviewAt.strftime("%Y-%m-%d")
-  - type: tip
-    content: import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: Day 18 종합 복습
   structuredPrimary: true
   subtitle: 모듈과 import 마스터하기
-  goal: 'Day 18 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'Day 18 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import math  # 첫 번째 셀에서 import
 
     math.sqrt(81)
   exercise:
-    prompt: 'Day 18 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import math  # 첫 번째 셀에서 import
 
       math.sqrt(81)
-    solution: |-
-      import math  # 첫 번째 셀에서 import
-
-      math.sqrt(81)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
-  - type: expansion
-    title: '🟢 기본1: import'
-    code: |-
-      import math  # 첫 번째 셀에서 import
-
-      math.sqrt(81)
-  - type: expansion
-    title: '🟢 기본2: from import'
-    code: |-
-      from math import pi
-
-      pi
-  - type: expansion
-    title: '🟢 기본3: as 별칭'
-    code: |-
-      from math import sqrt as sq
-
-      sq(64)
-  - type: expansion
-    title: '🟢 기본4: random'
-    code: |-
-      from random import randint
-
-      randint(1, 6)
-  - type: expansion
-    title: '🟢 기본5: datetime'
-    code: |-
-      from datetime import date
-
-      today = date(2024, 12, 25)
-      today.year, today.month
-  - type: expansion
-    title: '🟡 응용1: 원의 넓이'
-    code: |-
-      from math import pi
-
-      r = 7
-      area = pi * r ** 2
-      area
-  - type: expansion
-    title: '🟡 응용2: 주사위'
-    code: |-
-      from random import randint
-
-      dice1 = randint(1, 6)
-      dice2 = randint(1, 6)
-      total = dice1 + dice2
-      total
-  - type: expansion
-    title: '🟡 응용3: 올림과 내림'
-    code: |-
-      from math import ceil, floor
-
-      price = 15750
-      upper = ceil(price / 1000) * 1000
-      lower = floor(price / 1000) * 1000
-      upper, lower
-  - type: expansion
-    title: '🟡 응용4: 랜덤 선택'
-    code: |-
-      from random import choice
-
-      menu = ['pizza', 'burger', 'pasta', 'salad']
-      selected = choice(menu)
-      selected
-  - type: expansion
-    title: '🟡 응용5: 날짜 계산'
-    code: |-
-      from datetime import date, timedelta
-
-      start = date(2024, 1, 1)
-      end = start + timedelta(days=100)
-      end.month, end.day
-  - type: expansion
-    title: '🔴 심화1-1: 피타고라스'
-    code: |-
-      from math import sqrt, pow
-
-      a = 3
-      b = 4
-      c = sqrt(pow(a, 2) + pow(b, 2))
-      c
-  - type: expansion
-    title: '🔴 심화1-2: 구의 부피'
-    code: |-
-      from math import pi, pow
-
-      radius = 5
-      volume = 4 / 3 * pi * pow(radius, 3)
-      volume
-  - type: expansion
-    title: '🔴 심화2-1: 로또 번호'
-    code: |-
-      from random import randint
-
-      numbers = []
-      for i in range(6):
-          num = randint(1, 45)
-          numbers.append(num)
-      numbers
-  - type: expansion
-    title: '🔴 심화2-2: 팀 나누기'
-    code: |-
-      from random import choice
-
-      members = ['Alice', 'Bob', 'Charlie', 'David']
-      teamA = []
-      teamB = []
-      for member in members:
-          team = choice(['A', 'B'])
-          if team == 'A':
-              teamA.append(member)
-          else:
-              teamB.append(member)
-      teamA, teamB
-  - type: expansion
-    title: '🔴 심화3-1: 나이 계산'
-    code: |-
-      from datetime import date
-
-      birth = date(1990, 5, 15)
-      today = date(2024, 1, 1)
-      age = today.year - birth.year
-      age
-  - type: expansion
-    title: '🔴 심화3-2: D-Day 계산'
-    code: |-
-      from datetime import date
-
-      today = date(2024, 1, 1)
-      target = date(2024, 12, 31)
-      diff = target - today
-      diff.days
-  - type: expansion
-    title: '🔴 심화4-1: 거리 계산'
-    code: |-
-      from math import sqrt, pow
-
-      x1, y1 = 0, 0
-      x2, y2 = 3, 4
-      distance = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2))
-      distance
-  - type: expansion
-    title: '🔴 심화4-2: 각도 계산'
-    code: |-
-      from math import pi
-
-      degrees = 180
-      radians = degrees * pi / 180
-      radians
-  - type: expansion
-    title: '🔴 심화5-1: 랜덤 비밀번호'
-    code: |-
-      from random import randint, choice
-
-      chars = 'abcdefghijklmnopqrstuvwxyz'
-      password = ''
-      for i in range(8):
-          idx = randint(0, len(chars) - 1)
-          password = password + chars[idx]
-      password
-  - type: expansion
-    title: '🔴 심화5-2: 근무일 계산'
-    code: |-
-      from datetime import date, timedelta
-
-      start = date(2024, 1, 1)
-      end = date(2024, 12, 31)
-      days = (end - start).days + 1
-      weekends = 0
-      current = start
-      while current <= end:
-          if current.weekday() >= 5:
-              weekends = weekends + 1
-          current = current + timedelta(days=1)
-      workdays = days - weekends
-      workdays
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

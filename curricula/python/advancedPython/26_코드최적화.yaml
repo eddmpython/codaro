@@ -30,12 +30,11 @@ sections:
   title: 시간 복잡도 개선
   structuredPrimary: true
   subtitle: O(n²)에서 O(n)으로
-  goal: '시간 복잡도 개선: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '시간 복잡도 개선: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: Set을 활용하면 in 연산이 O(1)이 되어 전체 복잡도가 개선됩니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def findDupSlow(nums):
         dups = []
@@ -60,7 +59,7 @@ sections:
     tcResult = (tcSlow, tcFast)
     tcResult
   exercise:
-    prompt: '시간 복잡도 개선: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def findDupSlow(nums):
           dups = []
@@ -84,105 +83,20 @@ sections:
       tcFast = findDupFast(tcNums)
       tcResult = (tcSlow, tcFast)
       tcResult
-    solution: |-
-      def findDupSlow(nums):
-          dups = []
-          for i in range(len(nums)):
-              for j in range(i + 1, len(nums)):
-                  if nums[i] == nums[j] and nums[i] not in dups:
-                      dups.append(nums[i])
-          return dups
-
-      def findDupFast(nums):
-          seen = set()
-          dups = set()
-          for num in nums:
-              if num in seen:
-                  dups.add(num)
-              seen.add(num)
-          return list(dups)
-
-      tcNums = [1, 2, 3, 2, 4, 3, 5]
-      tcSlow = findDupSlow(tcNums)
-      tcFast = findDupFast(tcNums)
-      tcResult = (tcSlow, tcFast)
-      tcResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Set을 활용하면 in 연산이 O(1)이 되어 전체 복잡도가 개선됩니다.
-  - type: code
-    language: python
-    title: 중복 찾기 최적화
-    description: Set 활용 O(n) 달성
-    content: |-
-      def findDupSlow(nums):
-          dups = []
-          for i in range(len(nums)):
-              for j in range(i + 1, len(nums)):
-                  if nums[i] == nums[j] and nums[i] not in dups:
-                      dups.append(nums[i])
-          return dups
-
-      def findDupFast(nums):
-          seen = set()
-          dups = set()
-          for num in nums:
-              if num in seen:
-                  dups.add(num)
-              seen.add(num)
-          return list(dups)
-
-      tcNums = [1, 2, 3, 2, 4, 3, 5]
-      tcSlow = findDupSlow(tcNums)
-      tcFast = findDupFast(tcNums)
-      tcResult = (tcSlow, tcFast)
-      tcResult
-  - type: code
-    language: python
-    title: Two Sum 최적화
-    description: 해시맵으로 보수 찾기
-    content: |-
-      def twoSumSlow(nums, target):
-          for i in range(len(nums)):
-              for j in range(i + 1, len(nums)):
-                  if nums[i] + nums[j] == target:
-                      return [i, j]
-          return []
-
-      def twoSumFast(nums, target):
-          numMap = {}
-          for i, num in enumerate(nums):
-              comp = target - num
-              if comp in numMap:
-                  return [numMap[comp], i]
-              numMap[num] = i
-          return []
-
-      tsArr = [2, 7, 11, 15]
-      tsSlow = twoSumSlow(tsArr, 9)
-      tsFast = twoSumFast(tsArr, 9)
-      tsResult = (tsSlow, tsFast)
-      tsResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: data_structure
   title: 자료구조 선택
   structuredPrimary: true
   subtitle: 적절한 자료구조로 성능 향상
-  goal: '자료구조 선택: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '자료구조 선택: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: List는 검색 O(n), Set/Dict는 O(1). 검색이 잦으면 Set/Dict를 사용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     dsTestList = list(range(10000))
     dsTestSet = set(dsTestList)
@@ -195,7 +109,7 @@ sections:
     dsResult = (dsListIn, dsSetIn, dsDictIn)
     dsResult
   exercise:
-    prompt: '자료구조 선택: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       dsTestList = list(range(10000))
       dsTestSet = set(dsTestList)
@@ -207,84 +121,20 @@ sections:
       dsDictIn = dsTarget in dsTestDict
       dsResult = (dsListIn, dsSetIn, dsDictIn)
       dsResult
-    solution: |-
-      dsTestList = list(range(10000))
-      dsTestSet = set(dsTestList)
-      dsTestDict = {i: i for i in dsTestList}
-
-      dsTarget = 9999
-      dsListIn = dsTarget in dsTestList
-      dsSetIn = dsTarget in dsTestSet
-      dsDictIn = dsTarget in dsTestDict
-      dsResult = (dsListIn, dsSetIn, dsDictIn)
-      dsResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: List는 검색 O(n), Set/Dict는 O(1). 검색이 잦으면 Set/Dict를 사용합니다.
-  - type: code
-    language: python
-    title: 검색 성능 비교
-    description: List vs Set vs Dict
-    content: |-
-      dsTestList = list(range(10000))
-      dsTestSet = set(dsTestList)
-      dsTestDict = {i: i for i in dsTestList}
-
-      dsTarget = 9999
-      dsListIn = dsTarget in dsTestList
-      dsSetIn = dsTarget in dsTestSet
-      dsDictIn = dsTarget in dsTestDict
-      dsResult = (dsListIn, dsSetIn, dsDictIn)
-      dsResult
-  - type: code
-    language: python
-    title: Deque 활용
-    description: 큐 연산 O(1) 보장
-    content: |-
-      from collections import deque
-
-      def useListQueue(n):
-          q = []
-          for i in range(n):
-              q.append(i)
-          result = []
-          while q:
-              result.append(q.pop(0))
-          return len(result)
-
-      def useDequeQueue(n):
-          q = deque()
-          for i in range(n):
-              q.append(i)
-          result = []
-          while q:
-              result.append(q.popleft())
-          return len(result)
-
-      dqListLen = useListQueue(1000)
-      dqDequeLen = useDequeQueue(1000)
-      dqResult = (dqListLen, dqDequeLen)
-      dqResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: memory_opt
   title: 메모리 최적화
   structuredPrimary: true
   subtitle: 메모리 사용량 줄이기
-  goal: '메모리 최적화: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '메모리 최적화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 제너레이터는 값을 즉시 생성하지 않아 메모리를 절약합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def useListMem(n):
         return [i ** 2 for i in range(n)]
@@ -299,7 +149,7 @@ sections:
     memResult = (memListSum, memGenSum)
     memResult
   exercise:
-    prompt: '메모리 최적화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def useListMem(n):
           return [i ** 2 for i in range(n)]
@@ -313,81 +163,20 @@ sections:
       memGenSum = sum(memGen)
       memResult = (memListSum, memGenSum)
       memResult
-    solution: |-
-      def useListMem(n):
-          return [i ** 2 for i in range(n)]
-
-      def useGenMem(n):
-          return (i ** 2 for i in range(n))
-
-      memList = useListMem(10)
-      memGen = useGenMem(10)
-      memListSum = sum(memList)
-      memGenSum = sum(memGen)
-      memResult = (memListSum, memGenSum)
-      memResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 제너레이터는 값을 즉시 생성하지 않아 메모리를 절약합니다.
-  - type: code
-    language: python
-    title: Generator 활용
-    description: 지연 평가로 메모리 절약
-    content: |-
-      def useListMem(n):
-          return [i ** 2 for i in range(n)]
-
-      def useGenMem(n):
-          return (i ** 2 for i in range(n))
-
-      memList = useListMem(10)
-      memGen = useGenMem(10)
-      memListSum = sum(memList)
-      memGenSum = sum(memGen)
-      memResult = (memListSum, memGenSum)
-      memResult
-  - type: code
-    language: python
-    title: __slots__ 활용
-    description: __dict__ 생략으로 메모리 절약
-    content: |-
-      class RegularPt:
-          def __init__(self, x, y):
-              self.x = x
-              self.y = y
-
-      class SlottedPt:
-          __slots__ = ['x', 'y']
-          def __init__(self, x, y):
-              self.x = x
-              self.y = y
-
-      regPt = RegularPt(1, 2)
-      slotPt = SlottedPt(1, 2)
-      regHasDict = hasattr(regPt, '__dict__')
-      slotHasDict = hasattr(slotPt, '__dict__')
-      slotResult = (regHasDict, slotHasDict)
-      slotResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: builtin_func
   title: 내장 함수 활용
   structuredPrimary: true
   subtitle: C 구현 내장 함수 성능
-  goal: '내장 함수 활용: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '내장 함수 활용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: sum, min, max 등 내장 함수는 C로 구현되어 직접 루프보다 빠릅니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     bfNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -404,7 +193,7 @@ sections:
     bfResult = (bfManualSum, bfBuiltinSum, bfBuiltinMin)
     bfResult
   exercise:
-    prompt: '내장 함수 활용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       bfNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -420,82 +209,20 @@ sections:
       bfBuiltinMin = min(bfNums)
       bfResult = (bfManualSum, bfBuiltinSum, bfBuiltinMin)
       bfResult
-    solution: |-
-      bfNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-      def manualSumFn(lst):
-          total = 0
-          for n in lst:
-              total += n
-          return total
-
-      bfManualSum = manualSumFn(bfNums)
-      bfBuiltinSum = sum(bfNums)
-      bfManualMin = min(bfNums[0], *bfNums[1:])
-      bfBuiltinMin = min(bfNums)
-      bfResult = (bfManualSum, bfBuiltinSum, bfBuiltinMin)
-      bfResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: sum, min, max 등 내장 함수는 C로 구현되어 직접 루프보다 빠릅니다.
-  - type: code
-    language: python
-    title: sum, min 비교
-    description: 내장 함수 vs 수동 구현
-    content: |-
-      bfNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-      def manualSumFn(lst):
-          total = 0
-          for n in lst:
-              total += n
-          return total
-
-      bfManualSum = manualSumFn(bfNums)
-      bfBuiltinSum = sum(bfNums)
-      bfManualMin = min(bfNums[0], *bfNums[1:])
-      bfBuiltinMin = min(bfNums)
-      bfResult = (bfManualSum, bfBuiltinSum, bfBuiltinMin)
-      bfResult
-  - type: code
-    language: python
-    title: join 활용
-    description: 문자열 연결 최적화
-    content: |-
-      jnWords = ["hello", "world", "python"]
-
-      def manualJoinFn(lst, sep):
-          if not lst:
-              return ""
-          result = lst[0]
-          for w in lst[1:]:
-              result += sep + w
-          return result
-
-      jnManual = manualJoinFn(jnWords, " ")
-      jnBuiltin = " ".join(jnWords)
-      jnResult = (jnManual, jnBuiltin)
-      jnResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: algorithm
   title: 알고리즘 선택
   structuredPrimary: true
   subtitle: 문제에 맞는 최적 알고리즘
-  goal: '알고리즘 선택: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '알고리즘 선택: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 정렬된 배열에서는 이진 탐색 O(log n)이 선형 탐색 O(n)보다 빠릅니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def linearSrch(arr, target):
         for i, val in enumerate(arr):
@@ -522,7 +249,7 @@ sections:
     srchResult = (srchLinear, srchBinary)
     srchResult
   exercise:
-    prompt: '알고리즘 선택: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def linearSrch(arr, target):
           for i, val in enumerate(arr):
@@ -548,83 +275,20 @@ sections:
       srchBinary = binarySrch(srchArr, srchTarget)
       srchResult = (srchLinear, srchBinary)
       srchResult
-    solution: |-
-      def linearSrch(arr, target):
-          for i, val in enumerate(arr):
-              if val == target:
-                  return i
-          return -1
-
-      def binarySrch(arr, target):
-          left, right = 0, len(arr) - 1
-          while left <= right:
-              mid = (left + right) // 2
-              if arr[mid] == target:
-                  return mid
-              elif arr[mid] < target:
-                  left = mid + 1
-              else:
-                  right = mid - 1
-          return -1
-
-      srchArr = list(range(1000))
-      srchTarget = 750
-      srchLinear = linearSrch(srchArr, srchTarget)
-      srchBinary = binarySrch(srchArr, srchTarget)
-      srchResult = (srchLinear, srchBinary)
-      srchResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정렬된 배열에서는 이진 탐색 O(log n)이 선형 탐색 O(n)보다 빠릅니다.
-  - type: code
-    language: python
-    title: 선형 vs 이진 검색
-    description: O(n) vs O(log n)
-    content: |-
-      def linearSrch(arr, target):
-          for i, val in enumerate(arr):
-              if val == target:
-                  return i
-          return -1
-
-      def binarySrch(arr, target):
-          left, right = 0, len(arr) - 1
-          while left <= right:
-              mid = (left + right) // 2
-              if arr[mid] == target:
-                  return mid
-              elif arr[mid] < target:
-                  left = mid + 1
-              else:
-                  right = mid - 1
-          return -1
-
-      srchArr = list(range(1000))
-      srchTarget = 750
-      srchLinear = linearSrch(srchArr, srchTarget)
-      srchBinary = binarySrch(srchArr, srchTarget)
-      srchResult = (srchLinear, srchBinary)
-      srchResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: caching
   title: 캐싱과 메모이제이션
   structuredPrimary: true
   subtitle: 반복 계산 방지
-  goal: '캐싱과 메모이제이션: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '캐싱과 메모이제이션: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 같은 입력에 대한 결과를 저장해두면 재계산을 피할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from functools import lru_cache
 
@@ -645,7 +309,7 @@ sections:
     fibResult = (fibNc, fibC, fibInfo.hits)
     fibResult
   exercise:
-    prompt: '캐싱과 메모이제이션: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from functools import lru_cache
 
@@ -665,67 +329,17 @@ sections:
       fibInfo = fibCached.cache_info()
       fibResult = (fibNc, fibC, fibInfo.hits)
       fibResult
-    solution: |-
-      from functools import lru_cache
-
-      def fibNoCache(n):
-          if n <= 1:
-              return n
-          return fibNoCache(n - 1) + fibNoCache(n - 2)
-
-      @lru_cache(maxsize=None)
-      def fibCached(n):
-          if n <= 1:
-              return n
-          return fibCached(n - 1) + fibCached(n - 2)
-
-      fibNc = fibNoCache(20)
-      fibC = fibCached(30)
-      fibInfo = fibCached.cache_info()
-      fibResult = (fibNc, fibC, fibInfo.hits)
-      fibResult
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 같은 입력에 대한 결과를 저장해두면 재계산을 피할 수 있습니다.
-  - type: code
-    language: python
-    title: lru_cache 활용
-    description: 피보나치 메모이제이션
-    content: |-
-      from functools import lru_cache
-
-      def fibNoCache(n):
-          if n <= 1:
-              return n
-          return fibNoCache(n - 1) + fibNoCache(n - 2)
-
-      @lru_cache(maxsize=None)
-      def fibCached(n):
-          if n <= 1:
-              return n
-          return fibCached(n - 1) + fibCached(n - 2)
-
-      fibNc = fibNoCache(20)
-      fibC = fibCached(30)
-      fibInfo = fibCached.cache_info()
-      fibResult = (fibNc, fibC, fibInfo.hits)
-      fibResult
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: '현업 흐름 검증: 중복 주문 탐지 최적화'
   structuredPrimary: true
   subtitle: 추측이 아니라 같은 결과와 작업량 비교로 최적화를 검증합니다
-  goal: '현업 흐름 검증: 중복 주문 탐지 최적화: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 중복 주문 탐지 최적화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     최적화는 빠를 것 같은 코드를 고르는 일이 아닙니다. 먼저 느린 기준 구현과 빠른 구현이 같은 결과를 내는지 확인하고, 반복 횟수나 캐시 hit처럼 측정 가능한 신호를 비교하세요.
 
@@ -733,7 +347,6 @@ sections:
     주문 ID가 10만 개일 때도 결과가 같아야 합니다. 테스트 데이터 크기만 키워도 느린 구현과 빠른 구현의 작업량 차이가 어떻게 커지는지 확인하세요.
   tips:
   - 변주 실험 주문 ID가 10만 개일 때도 결과가 같아야 합니다. 테스트 데이터 크기만 키워도 느린 구현과 빠른 구현의 작업량 차이가 어떻게 커지는지 확인하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     def findDuplicatesSlow(orderIds):
         duplicates = []
@@ -773,7 +386,7 @@ sections:
 
     assert message == "orderIds must be a list"
   exercise:
-    prompt: '현업 흐름 검증: 중복 주문 탐지 최적화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def findDuplicatesSlow(orderIds):
           duplicates = []
@@ -812,133 +425,20 @@ sections:
           message = str(exc)
 
       assert message == "orderIds must be a list"
-    solution: |-
-      def findDuplicatesSlow(orderIds):
-          duplicates = []
-          comparisons = 0
-          for index, orderId in enumerate(orderIds):
-              for previous in orderIds[:index]:
-                  comparisons += 1
-                  if orderId == previous and orderId not in duplicates:
-                      duplicates.append(orderId)
-          return duplicates, comparisons
-
-      def findDuplicatesFast(orderIds):
-          if not isinstance(orderIds, list):
-              raise TypeError("orderIds must be a list")
-          seen = set()
-          duplicates = []
-          checks = 0
-          for orderId in orderIds:
-              checks += 1
-              if orderId in seen and orderId not in duplicates:
-                  duplicates.append(orderId)
-              seen.add(orderId)
-          return duplicates, checks
-
-      orderIds = ["O-1", "O-2", "O-3", "O-2", "O-4", "O-1"]
-      slowResult, slowChecks = findDuplicatesSlow(orderIds)
-      fastResult, fastChecks = findDuplicatesFast(orderIds)
-
-      assert slowResult == fastResult == ["O-2", "O-1"]
-      assert fastChecks == len(orderIds)
-      assert slowChecks > fastChecks
-
-      try:
-          findDuplicatesFast("O-1,O-2")
-      except TypeError as exc:
-          message = str(exc)
-
-      assert message == "orderIds must be a list"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 최적화는 빠를 것 같은 코드를 고르는 일이 아닙니다. 먼저 느린 기준 구현과 빠른 구현이 같은 결과를 내는지 확인하고, 반복 횟수나 캐시 hit처럼 측정 가능한 신호를 비교하세요.
-  - type: code
-    language: python
-    title: O(n²) 탐지를 set 기반 O(n) 탐지로 바꾸기
-    description: 두 구현의 결과와 비교 횟수를 함께 검증합니다.
-    content: |-
-      def findDuplicatesSlow(orderIds):
-          duplicates = []
-          comparisons = 0
-          for index, orderId in enumerate(orderIds):
-              for previous in orderIds[:index]:
-                  comparisons += 1
-                  if orderId == previous and orderId not in duplicates:
-                      duplicates.append(orderId)
-          return duplicates, comparisons
-
-      def findDuplicatesFast(orderIds):
-          if not isinstance(orderIds, list):
-              raise TypeError("orderIds must be a list")
-          seen = set()
-          duplicates = []
-          checks = 0
-          for orderId in orderIds:
-              checks += 1
-              if orderId in seen and orderId not in duplicates:
-                  duplicates.append(orderId)
-              seen.add(orderId)
-          return duplicates, checks
-
-      orderIds = ["O-1", "O-2", "O-3", "O-2", "O-4", "O-1"]
-      slowResult, slowChecks = findDuplicatesSlow(orderIds)
-      fastResult, fastChecks = findDuplicatesFast(orderIds)
-
-      assert slowResult == fastResult == ["O-2", "O-1"]
-      assert fastChecks == len(orderIds)
-      assert slowChecks > fastChecks
-
-      try:
-          findDuplicatesFast("O-1,O-2")
-      except TypeError as exc:
-          message = str(exc)
-
-      assert message == "orderIds must be a list"
-  - type: code
-    language: python
-    title: 캐시 hit로 반복 정규화 비용 줄이기
-    description: lru_cache가 실제로 반복 입력을 재사용하는지 확인합니다.
-    content: |-
-      from functools import lru_cache
-
-      @lru_cache(maxsize=32)
-      def normalizeSku(rawSku):
-          return rawSku.strip().upper().replace(" ", "-")
-
-      values = [" a 100 ", "a 100", " b 200 ", " a 100 "]
-      normalized = [normalizeSku(value) for value in values]
-      normalizedAgain = normalizeSku("a 100")
-      cacheInfo = normalizeSku.cache_info()
-
-      assert normalized == ["A-100", "A-100", "B-200", "A-100"]
-      assert normalizedAgain == "A-100"
-      assert cacheInfo.hits >= 1
-  - type: tip
-    title: 변주 실험
-    content: 주문 ID가 10만 개일 때도 결과가 같아야 합니다. 테스트 데이터 크기만 키워도 느린 구현과 빠른 구현의 작업량 차이가 어떻게 커지는지 확인하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 코드 최적화 실습
-  goal: '종합 연습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '종합 연습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Day 26에서 배운 코드 최적화 기법을 난이도별로 복습합니다. 프로파일링은 병목 지점을 찾는 첫 단계이며, 시간/공간 복잡도 분석은 최적화 방향을 결정합니다. 캐싱, 메모이제이션, 지연 평가는
-    반복 연산을 줄이는 핵심 기법입니다. 🟢 기본 문제로 O(n²)를 O(n)으로 개선하는 패턴을 익히고, 🟡 응용 문제로 자료구조 선택과 알고리즘 개선을 연습하세요. 🔴 심화 문제에서는 Cython, NumPy 활용,
-    병렬 처리 등 고급 최적화를 직접 적용해봅니다. 최적화는 측정 없이 추측하면 안 되며, 항상 프로파일링 결과를 기반으로 진행해야 합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Day 26에서 배운 코드 최적화 기법을 난이도별로 복습합니다. 프로파일링은 병목 지점을 찾는 첫 단계이며, 시간/공간 복잡도 분석은 최적화 방향을 결정합니다. 캐싱, 메모이제이션, 지연 평가는 반복 연산을 줄이는 핵심 기법입니다. 🟢 기본 문제로 O(n²)를 O(n)으로 개선하는 패턴을 익히고, 🟡 응용 문제로 자료구조 선택과 알고리즘 개선을 연습하세요. 🔴 심화 문제에서는 Cython, NumPy 활용, 병렬 처리 등 고급 최적화를 직접 적용해봅니다. 최적화는 측정 없이 추측하면 안 되며, 항상 프로파일링 결과를 기반으로 진행해야 합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     def dedupSlow(lst):
         result = []
@@ -962,7 +462,7 @@ sections:
     ex1Result = (ex1Slow, ex1Fast)
     ex1Result
   exercise:
-    prompt: '종합 연습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def dedupSlow(lst):
           result = []
@@ -985,473 +485,8 @@ sections:
       ex1Fast = dedupFast(ex1Data)
       ex1Result = (ex1Slow, ex1Fast)
       ex1Result
-    solution: |-
-      def dedupSlow(lst):
-          result = []
-          for item in lst:
-              if item not in result:
-                  result.append(item)
-          return result
-
-      def dedupFast(lst):
-          seen = set()
-          result = []
-          for item in lst:
-              if item not in seen:
-                  seen.add(item)
-                  result.append(item)
-          return result
-
-      ex1Data = [1, 2, 2, 3, 3, 3, 4]
-      ex1Slow = dedupSlow(ex1Data)
-      ex1Fast = dedupFast(ex1Data)
-      ex1Result = (ex1Slow, ex1Fast)
-      ex1Result
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Day 26에서 배운 코드 최적화 기법을 난이도별로 복습합니다. 프로파일링은 병목 지점을 찾는 첫 단계이며, 시간/공간 복잡도 분석은 최적화 방향을 결정합니다. 캐싱, 메모이제이션, 지연 평가는
-      반복 연산을 줄이는 핵심 기법입니다. 🟢 기본 문제로 O(n²)를 O(n)으로 개선하는 패턴을 익히고, 🟡 응용 문제로 자료구조 선택과 알고리즘 개선을 연습하세요. 🔴 심화 문제에서는 Cython, NumPy
-      활용, 병렬 처리 등 고급 최적화를 직접 적용해봅니다. 최적화는 측정 없이 추측하면 안 되며, 항상 프로파일링 결과를 기반으로 진행해야 합니다.
-  - type: expansion
-    title: '기본1: 중복 제거'
-    code: |-
-      def dedupSlow(lst):
-          result = []
-          for item in lst:
-              if item not in result:
-                  result.append(item)
-          return result
-
-      def dedupFast(lst):
-          seen = set()
-          result = []
-          for item in lst:
-              if item not in seen:
-                  seen.add(item)
-                  result.append(item)
-          return result
-
-      ex1Data = [1, 2, 2, 3, 3, 3, 4]
-      ex1Slow = dedupSlow(ex1Data)
-      ex1Fast = dedupFast(ex1Data)
-      ex1Result = (ex1Slow, ex1Fast)
-      ex1Result
-  - type: expansion
-    title: '기본2: 문자열 연결'
-    code: |-
-      def concatSlow(strings):
-          result = ""
-          for s in strings:
-              result += s
-          return result
-
-      def concatFast(strings):
-          return "".join(strings)
-
-      ex2Strs = ["hello", " ", "world"]
-      ex2Slow = concatSlow(ex2Strs)
-      ex2Fast = concatFast(ex2Strs)
-      ex2Result = (ex2Slow, ex2Fast)
-      ex2Result
-  - type: expansion
-    title: '기본3: 리스트 컴프리헨션'
-    code: |-
-      def filterLoop(nums):
-          result = []
-          for n in nums:
-              if n % 2 == 0:
-                  result.append(n ** 2)
-          return result
-
-      def filterComp(nums):
-          return [n ** 2 for n in nums if n % 2 == 0]
-
-      ex3Nums = list(range(20))
-      ex3Loop = filterLoop(ex3Nums)
-      ex3Comp = filterComp(ex3Nums)
-      ex3Result = (ex3Loop, ex3Comp)
-      ex3Result
-  - type: expansion
-    title: '기본4: Counter 활용'
-    code: |-
-      def countManual(items):
-          result = {}
-          for item in items:
-              result[item] = result.get(item, 0) + 1
-          return result
-
-      from collections import Counter
-      def countBuiltin(items):
-          return dict(Counter(items))
-
-      ex4Items = ["a", "b", "a", "c", "b", "a"]
-      ex4Manual = countManual(ex4Items)
-      ex4Builtin = countBuiltin(ex4Items)
-      ex4Result = (ex4Manual, ex4Builtin)
-      ex4Result
-  - type: expansion
-    title: '기본5: any/all 활용'
-    code: |-
-      def hasPosSlow(nums):
-          for n in nums:
-              if n > 0:
-                  return True
-          return False
-
-      def hasPosFast(nums):
-          return any(n > 0 for n in nums)
-
-      ex5Mixed = [-1, -2, 3, -4]
-      ex5Slow = hasPosSlow(ex5Mixed)
-      ex5Fast = hasPosFast(ex5Mixed)
-      ex5Result = (ex5Slow, ex5Fast)
-      ex5Result
-  - type: expansion
-    title: '중급6: 부분합 (Prefix Sum)'
-    code: |-
-      def rangeSumSlow(nums, queries):
-          results = []
-          for start, end in queries:
-              results.append(sum(nums[start:end + 1]))
-          return results
-
-      def rangeSumFast(nums, queries):
-          prefix = [0]
-          for num in nums:
-              prefix.append(prefix[-1] + num)
-          results = []
-          for start, end in queries:
-              results.append(prefix[end + 1] - prefix[start])
-          return results
-
-      ex6Nums = [1, 2, 3, 4, 5]
-      ex6Queries = [(0, 2), (1, 3), (0, 4)]
-      ex6Slow = rangeSumSlow(ex6Nums, ex6Queries)
-      ex6Fast = rangeSumFast(ex6Nums, ex6Queries)
-      ex6Result = (ex6Slow, ex6Fast)
-      ex6Result
-  - type: expansion
-    title: '중급7: 슬라이딩 윈도우'
-    code: |-
-      def maxSumSlow(nums, k):
-          maxVal = float('-inf')
-          for i in range(len(nums) - k + 1):
-              maxVal = max(maxVal, sum(nums[i:i + k]))
-          return maxVal
-
-      def maxSumFast(nums, k):
-          winSum = sum(nums[:k])
-          maxVal = winSum
-          for i in range(k, len(nums)):
-              winSum = winSum - nums[i - k] + nums[i]
-              maxVal = max(maxVal, winSum)
-          return maxVal
-
-      ex7Nums = [1, 4, 2, 10, 23, 3, 1, 0, 20]
-      ex7Slow = maxSumSlow(ex7Nums, 4)
-      ex7Fast = maxSumFast(ex7Nums, 4)
-      ex7Result = (ex7Slow, ex7Fast)
-      ex7Result
-  - type: expansion
-    title: '중급8: 투 포인터'
-    code: |-
-      def pairSumSlow(arr, target):
-          for i in range(len(arr)):
-              for j in range(i + 1, len(arr)):
-                  if arr[i] + arr[j] == target:
-                      return [i, j]
-          return []
-
-      def pairSumFast(arr, target):
-          left, right = 0, len(arr) - 1
-          while left < right:
-              total = arr[left] + arr[right]
-              if total == target:
-                  return [left, right]
-              elif total < target:
-                  left += 1
-              else:
-                  right -= 1
-          return []
-
-      ex8Arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-      ex8Slow = pairSumSlow(ex8Arr, 10)
-      ex8Fast = pairSumFast(ex8Arr, 10)
-      ex8Result = (ex8Slow, ex8Fast)
-      ex8Result
-  - type: expansion
-    title: '중급9: 집합 연산'
-    code: |-
-      def interSlow(lst1, lst2):
-          result = []
-          for item in lst1:
-              if item in lst2 and item not in result:
-                  result.append(item)
-          return result
-
-      def interFast(lst1, lst2):
-          return list(set(lst1) & set(lst2))
-
-      ex9A = [1, 2, 2, 3, 4]
-      ex9B = [2, 3, 3, 5]
-      ex9Slow = interSlow(ex9A, ex9B)
-      ex9Fast = sorted(interFast(ex9A, ex9B))
-      ex9Result = (ex9Slow, ex9Fast)
-      ex9Result
-  - type: expansion
-    title: '중급10: 계단 오르기 DP'
-    code: |-
-      def climbSlow(n):
-          if n <= 2:
-              return n
-          return climbSlow(n - 1) + climbSlow(n - 2)
-
-      def climbFast(n):
-          if n <= 2:
-              return n
-          prev2, prev1 = 1, 2
-          for _ in range(3, n + 1):
-              curr = prev2 + prev1
-              prev2 = prev1
-              prev1 = curr
-          return prev1
-
-      ex10Fast = climbFast(20)
-      ex10Result = ex10Fast
-      ex10Result
-  - type: expansion
-    title: '고급11: 비트 연산'
-    code: |-
-      def isEvenMod(n):
-          return n % 2 == 0
-
-      def isEvenBit(n):
-          return (n & 1) == 0
-
-      def mul2Slow(n):
-          return n * 2
-
-      def mul2Fast(n):
-          return n << 1
-
-      ex11Num = 100
-      ex11Even = (isEvenMod(ex11Num), isEvenBit(ex11Num))
-      ex11Mul = (mul2Slow(ex11Num), mul2Fast(ex11Num))
-      ex11Result = (ex11Even, ex11Mul)
-      ex11Result
-  - type: expansion
-    title: '고급12: 조기 종료'
-    code: |-
-      def findFirstSlow(items, pred):
-          matches = [item for item in items if pred(item)]
-          return matches[0] if matches else None
-
-      def findFirstFast(items, pred):
-          return next((item for item in items if pred(item)), None)
-
-      ex12Items = list(range(10000))
-      ex12Slow = findFirstSlow(ex12Items, lambda x: x > 100)
-      ex12Fast = findFirstFast(ex12Items, lambda x: x > 100)
-      ex12Result = (ex12Slow, ex12Fast)
-      ex12Result
-  - type: expansion
-    title: '고급13: defaultdict 활용'
-    code: |-
-      def groupSlow(items, keyFn):
-          result = {}
-          for item in items:
-              key = keyFn(item)
-              if key not in result:
-                  result[key] = []
-              result[key].append(item)
-          return result
-
-      from collections import defaultdict
-      def groupFast(items, keyFn):
-          result = defaultdict(list)
-          for item in items:
-              result[keyFn(item)].append(item)
-          return dict(result)
-
-      ex13Words = ["apple", "banana", "apricot", "blueberry"]
-      ex13Slow = groupSlow(ex13Words, lambda x: x[0])
-      ex13Fast = groupFast(ex13Words, lambda x: x[0])
-      ex13Result = (ex13Slow, ex13Fast)
-      ex13Result
-  - type: expansion
-    title: '고급14: attrgetter 활용'
-    code: |-
-      class Item:
-          def __init__(self, name, val):
-              self.name = name
-              self.val = val
-
-      def sortLambda(items):
-          return sorted(items, key=lambda x: x.val)
-
-      from operator import attrgetter
-      def sortAttr(items):
-          return sorted(items, key=attrgetter('val'))
-
-      ex14Items = [Item("c", 3), Item("a", 1), Item("b", 2)]
-      ex14Lambda = [i.name for i in sortLambda(ex14Items)]
-      ex14Attr = [i.name for i in sortAttr(ex14Items)]
-      ex14Result = (ex14Lambda, ex14Attr)
-      ex14Result
-  - type: expansion
-    title: '고급15: 종합 최적화'
-    code: |-
-      def processSlow(data):
-          filtered = []
-          for item in data:
-              if item > 0:
-                  filtered.append(item)
-          squared = []
-          for item in filtered:
-              squared.append(item ** 2)
-          total = 0
-          for item in squared:
-              total += item
-          return total
-
-      def processFast(data):
-          return sum(x ** 2 for x in data if x > 0)
-
-      ex15Data = [-5, 3, -2, 7, 0, 4, -1, 8]
-      ex15Slow = processSlow(ex15Data)
-      ex15Fast = processFast(ex15Data)
-      ex15Result = (ex15Slow, ex15Fast, ex15Slow == ex15Fast)
-      ex15Result
-  - type: expansion
-    title: '고급16: 슬라이딩 윈도우'
-    code: |-
-      def maxSumSlow(arr, k):
-          maxSum = float('-inf')
-          for i in range(len(arr) - k + 1):
-              windowSum = sum(arr[i:i+k])
-              maxSum = max(maxSum, windowSum)
-          return maxSum
-
-      def maxSumFast(arr, k):
-          windowSum = sum(arr[:k])
-          maxSum = windowSum
-          for i in range(k, len(arr)):
-              windowSum = windowSum - arr[i-k] + arr[i]
-              maxSum = max(maxSum, windowSum)
-          return maxSum
-
-      ex16Arr = [2, 1, 5, 1, 3, 2, 8, 1, 3]
-      ex16Slow = maxSumSlow(ex16Arr, 3)
-      ex16Fast = maxSumFast(ex16Arr, 3)
-      ex16Result = (ex16Slow, ex16Fast)
-      ex16Result
-  - type: expansion
-    title: '고급17: 프리픽스 합'
-    code: |-
-      def rangeSumSlow(arr, queries):
-          results = []
-          for start, end in queries:
-              results.append(sum(arr[start:end+1]))
-          return results
-
-      def rangeSumFast(arr, queries):
-          prefix = [0]
-          for num in arr:
-              prefix.append(prefix[-1] + num)
-          results = []
-          for start, end in queries:
-              results.append(prefix[end+1] - prefix[start])
-          return results
-
-      ex17Arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-      ex17Queries = [(0, 2), (3, 6), (0, 9)]
-      ex17Slow = rangeSumSlow(ex17Arr, ex17Queries)
-      ex17Fast = rangeSumFast(ex17Arr, ex17Queries)
-      ex17Result = (ex17Slow, ex17Fast)
-      ex17Result
-  - type: expansion
-    title: '고급18: 해시맵 카운팅'
-    code: |-
-      def countPairsSlow(arr, target):
-          count = 0
-          for i in range(len(arr)):
-              for j in range(i+1, len(arr)):
-                  if arr[i] + arr[j] == target:
-                      count += 1
-          return count
-
-      from collections import Counter
-      def countPairsFast(arr, target):
-          count = 0
-          seen = Counter()
-          for num in arr:
-              complement = target - num
-              count += seen[complement]
-              seen[num] += 1
-          return count
-
-      ex18Arr = [1, 5, 7, 1, 5, 3, 3, 2]
-      ex18Slow = countPairsSlow(ex18Arr, 6)
-      ex18Fast = countPairsFast(ex18Arr, 6)
-      ex18Result = (ex18Slow, ex18Fast)
-      ex18Result
-  - type: expansion
-    title: '고급19: 이진 탐색'
-    code: |-
-      def searchSlow(arr, target):
-          for i, val in enumerate(arr):
-              if val == target:
-                  return i
-          return -1
-
-      def searchFast(arr, target):
-          left, right = 0, len(arr) - 1
-          while left <= right:
-              mid = (left + right) // 2
-              if arr[mid] == target:
-                  return mid
-              elif arr[mid] < target:
-                  left = mid + 1
-              else:
-                  right = mid - 1
-          return -1
-
-      ex19Arr = list(range(0, 10000, 2))
-      ex19Slow = searchSlow(ex19Arr, 8888)
-      ex19Fast = searchFast(ex19Arr, 8888)
-      ex19Result = (ex19Slow, ex19Fast)
-      ex19Result
-  - type: expansion
-    title: '고급20: 힙 활용'
-    code: |-
-      def topKSlow(arr, k):
-          return sorted(arr, reverse=True)[:k]
-
-      import heapq
-      def topKFast(arr, k):
-          return heapq.nlargest(k, arr)
-
-      def topKHeap(arr, k):
-          heap = arr[:k]
-          heapq.heapify(heap)
-          for num in arr[k:]:
-              if num > heap[0]:
-                  heapq.heapreplace(heap, num)
-          return sorted(heap, reverse=True)
-
-      ex20Arr = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
-      ex20Slow = topKSlow(ex20Arr, 3)
-      ex20Fast = topKFast(ex20Arr, 3)
-      ex20Heap = topKHeap(ex20Arr, 3)
-      ex20Result = (ex20Slow, ex20Fast, ex20Heap)
-      ex20Result
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

@@ -34,15 +34,14 @@ sections:
   title: 1단계. 데이터 로딩
   structuredPrimary: true
   subtitle: 와인 데이터
-  goal: '1단계. 데이터 로딩: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 데이터 로딩: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
 
     와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
   tips:
   - 와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import pandas as pd
     import numpy as np
@@ -59,7 +58,7 @@ sections:
     y = wine.target
     X.shape, np.unique(y)
   exercise:
-    prompt: '1단계. 데이터 로딩: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -75,118 +74,45 @@ sections:
       X = pd.DataFrame(wine.data, columns=wine.feature_names)
       y = wine.target
       X.shape, np.unique(y)
-    solution: |-
-      import pandas as pd
-      import numpy as np
-      from sklearn.datasets import load_wine
-      from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.svm import SVC
-      from sklearn.ensemble import RandomForestClassifier
-      from sklearn.metrics import accuracy_score, classification_report
-      import matplotlib.pyplot as plt
-
-      wine = load_wine()
-      X = pd.DataFrame(wine.data, columns=wine.feature_names)
-      y = wine.target
-      X.shape, np.unique(y)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
-  - type: code
-    language: python
-    title: 데이터 로딩
-    description: 와인 데이터를 불러옵니다
-    content: |-
-      import pandas as pd
-      import numpy as np
-      from sklearn.datasets import load_wine
-      from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.svm import SVC
-      from sklearn.ensemble import RandomForestClassifier
-      from sklearn.metrics import accuracy_score, classification_report
-      import matplotlib.pyplot as plt
-
-      wine = load_wine()
-      X = pd.DataFrame(wine.data, columns=wine.feature_names)
-      y = wine.target
-      X.shape, np.unique(y)
-  - type: tip
-    content: 와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_prep
   title: 2단계. 데이터 준비
   structuredPrimary: true
   subtitle: 분할 및 스케일링
-  goal: '2단계. 데이터 준비: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 준비: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: '2단계. 데이터 준비: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
       xTrain.shape, xTest.shape
-    solution: |-
-      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-      xTrain.shape, xTest.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
-  - type: code
-    language: python
-    title: 데이터 분할
-    description: 학습/테스트 데이터로 분할합니다
-    content: |-
-      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-      xTrain.shape, xTest.shape
-  - type: code
-    language: python
-    title: 스케일링
-    description: StandardScaler를 적용합니다
-    content: |-
-      scaler = StandardScaler()
-      xTrainSc = scaler.fit_transform(xTrain)
-      xTestSc = scaler.transform(xTest)
-      xTrainSc.shape
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_baseline
   title: 3단계. 기본 모델
   structuredPrimary: true
   subtitle: 기본 SVM
-  goal: '3단계. 기본 모델: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 기본 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
 
     SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
   tips:
   - SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     svcBase = SVC(random_state=42)
     svcBase.fit(xTrainSc, yTrain)
@@ -194,57 +120,30 @@ sections:
     accBase = accuracy_score(yTest, yPredBase)
     print(f"Baseline Accuracy: {accBase:.4f}")
   exercise:
-    prompt: '3단계. 기본 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       svcBase = SVC(random_state=42)
       svcBase.fit(xTrainSc, yTrain)
       yPredBase = svcBase.predict(xTestSc)
       accBase = accuracy_score(yTest, yPredBase)
       print(f"Baseline Accuracy: {accBase:.4f}")
-    solution: |-
-      svcBase = SVC(random_state=42)
-      svcBase.fit(xTrainSc, yTrain)
-      yPredBase = svcBase.predict(xTestSc)
-      accBase = accuracy_score(yTest, yPredBase)
-      print(f"Baseline Accuracy: {accBase:.4f}")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
-  - type: code
-    language: python
-    title: 기본 SVM
-    description: 기본 파라미터로 SVM을 학습합니다
-    content: |-
-      svcBase = SVC(random_state=42)
-      svcBase.fit(xTrainSc, yTrain)
-      yPredBase = svcBase.predict(xTestSc)
-      accBase = accuracy_score(yTest, yPredBase)
-      print(f"Baseline Accuracy: {accBase:.4f}")
-  - type: tip
-    content: SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_params
   title: 4단계. 파라미터 그리드
   structuredPrimary: true
   subtitle: 탐색 범위
-  goal: '4단계. 파라미터 그리드: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 파라미터 그리드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
 
     C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
   tips:
   - C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     paramGrid = {
         "C": [0.1, 1, 10, 100],
@@ -254,7 +153,7 @@ sections:
     totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
     print(f"Total combinations: {totalComb}")
   exercise:
-    prompt: '4단계. 파라미터 그리드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       paramGrid = {
           "C": [0.1, 1, 10, 100],
@@ -263,166 +162,71 @@ sections:
       }
       totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
       print(f"Total combinations: {totalComb}")
-    solution: |-
-      paramGrid = {
-          "C": [0.1, 1, 10, 100],
-          "gamma": [0.001, 0.01, 0.1, 1],
-          "kernel": ["rbf", "linear"]
-      }
-      totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
-      print(f"Total combinations: {totalComb}")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
-  - type: code
-    language: python
-    title: 파라미터 그리드
-    description: 탐색할 파라미터 범위를 정의합니다
-    content: |-
-      paramGrid = {
-          "C": [0.1, 1, 10, 100],
-          "gamma": [0.001, 0.01, 0.1, 1],
-          "kernel": ["rbf", "linear"]
-      }
-      totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
-      print(f"Total combinations: {totalComb}")
-  - type: tip
-    content: C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_gridsearch
   title: 5단계. GridSearchCV 실행
   structuredPrimary: true
   subtitle: 체계적 탐색
-  goal: '5단계. GridSearchCV 실행: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. GridSearchCV 실행: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
 
     GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
   tips:
   - GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
     gridSearch.fit(xTrainSc, yTrain)
     gridSearch
   exercise:
-    prompt: '5단계. GridSearchCV 실행: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
       gridSearch.fit(xTrainSc, yTrain)
       gridSearch
-    solution: |-
-      gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
-      gridSearch.fit(xTrainSc, yTrain)
-      gridSearch
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
-  - type: code
-    language: python
-    title: GridSearchCV
-    description: 그리드 서치를 실행합니다
-    content: |-
-      gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
-      gridSearch.fit(xTrainSc, yTrain)
-      gridSearch
-  - type: code
-    language: python
-    title: 최적 파라미터
-    description: 최적의 파라미터 조합을 확인합니다
-    content: |-
-      print(f"Best Parameters: {gridSearch.best_params_}")
-      print(f"Best CV Score: {gridSearch.best_score_:.4f}")
-  - type: tip
-    content: GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_results
   title: 6단계. 결과 분석
   structuredPrimary: true
   subtitle: cv_results_
-  goal: '6단계. 결과 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 결과 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     resultsDf = pd.DataFrame(gridSearch.cv_results_)
     cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
     resultsDf[cols].sort_values("rank_test_score").head(10)
   exercise:
-    prompt: '6단계. 결과 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       resultsDf = pd.DataFrame(gridSearch.cv_results_)
       cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
       resultsDf[cols].sort_values("rank_test_score").head(10)
-    solution: |-
-      resultsDf = pd.DataFrame(gridSearch.cv_results_)
-      cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
-      resultsDf[cols].sort_values("rank_test_score").head(10)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
-  - type: code
-    language: python
-    title: 결과 데이터프레임
-    description: 모든 조합의 결과를 확인합니다
-    content: |-
-      resultsDf = pd.DataFrame(gridSearch.cv_results_)
-      cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
-      resultsDf[cols].sort_values("rank_test_score").head(10)
-  - type: code
-    language: python
-    title: 상위 조합 시각화
-    description: 상위 10개 조합을 막대 그래프로 표시합니다
-    content: |-
-      top10 = resultsDf.nsmallest(10, "rank_test_score")
-      labels = [f"C={r['param_C']}, g={r['param_gamma']}" for _, r in top10.iterrows()]
-
-      figTop, axTop = plt.subplots(figsize=(10, 5))
-      axTop.barh(labels[::-1], top10["mean_test_score"].values[::-1], xerr=top10["std_test_score"].values[::-1], color="steelblue")
-      axTop.set_xlabel("Mean CV Accuracy")
-      axTop.set_title("Top 10 Parameter Combinations")
-      figTop
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_best
   title: 7단계. 최적 모델 평가
   structuredPrimary: true
   subtitle: best_estimator_
-  goal: '7단계. 최적 모델 평가: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 최적 모델 평가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     bestModel = gridSearch.best_estimator_
     yPredBest = bestModel.predict(xTestSc)
@@ -431,7 +235,7 @@ sections:
     print(f"Tuned Accuracy: {accBest:.4f}")
     print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
   exercise:
-    prompt: '7단계. 최적 모델 평가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       bestModel = gridSearch.best_estimator_
       yPredBest = bestModel.predict(xTestSc)
@@ -439,52 +243,20 @@ sections:
       print(f"Baseline Accuracy: {accBase:.4f}")
       print(f"Tuned Accuracy: {accBest:.4f}")
       print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
-    solution: |-
-      bestModel = gridSearch.best_estimator_
-      yPredBest = bestModel.predict(xTestSc)
-      accBest = accuracy_score(yTest, yPredBest)
-      print(f"Baseline Accuracy: {accBase:.4f}")
-      print(f"Tuned Accuracy: {accBest:.4f}")
-      print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
-  - type: code
-    language: python
-    title: 최적 모델 평가
-    description: 테스트 데이터로 최적 모델을 평가합니다
-    content: |-
-      bestModel = gridSearch.best_estimator_
-      yPredBest = bestModel.predict(xTestSc)
-      accBest = accuracy_score(yTest, yPredBest)
-      print(f"Baseline Accuracy: {accBase:.4f}")
-      print(f"Tuned Accuracy: {accBest:.4f}")
-      print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
-  - type: code
-    language: python
-    title: 분류 리포트
-    description: 최적 모델의 상세 성능을 확인합니다
-    content: print(classification_report(yTest, yPredBest, target_names=wine.target_names))
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_heatmap
   title: 8단계. 파라미터 히트맵
   structuredPrimary: true
   subtitle: C vs gamma
-  goal: '8단계. 파라미터 히트맵: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 파라미터 히트맵: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
     pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
@@ -504,7 +276,7 @@ sections:
     plt.colorbar(im, ax=axHeat)
     figHeat
   exercise:
-    prompt: '8단계. 파라미터 히트맵: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
       pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
@@ -523,69 +295,20 @@ sections:
               axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
       plt.colorbar(im, ax=axHeat)
       figHeat
-    solution: |-
-      rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
-      pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
-
-      figHeat, axHeat = plt.subplots(figsize=(8, 6))
-      im = axHeat.imshow(pivot.values, cmap="YlGn", aspect="auto")
-      axHeat.set_xticks(range(len(pivot.columns)))
-      axHeat.set_yticks(range(len(pivot.index)))
-      axHeat.set_xticklabels(pivot.columns)
-      axHeat.set_yticklabels(pivot.index)
-      axHeat.set_xlabel("C")
-      axHeat.set_ylabel("gamma")
-      axHeat.set_title("CV Accuracy: C vs gamma (RBF kernel)")
-      for i in range(len(pivot.index)):
-          for j in range(len(pivot.columns)):
-              axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
-      plt.colorbar(im, ax=axHeat)
-      figHeat
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
-  - type: code
-    language: python
-    title: 파라미터 히트맵
-    description: C와 gamma 조합별 성능을 히트맵으로 표시합니다
-    content: |-
-      rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
-      pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
-
-      figHeat, axHeat = plt.subplots(figsize=(8, 6))
-      im = axHeat.imshow(pivot.values, cmap="YlGn", aspect="auto")
-      axHeat.set_xticks(range(len(pivot.columns)))
-      axHeat.set_yticks(range(len(pivot.index)))
-      axHeat.set_xticklabels(pivot.columns)
-      axHeat.set_yticklabels(pivot.index)
-      axHeat.set_xlabel("C")
-      axHeat.set_ylabel("gamma")
-      axHeat.set_title("CV Accuracy: C vs gamma (RBF kernel)")
-      for i in range(len(pivot.index)):
-          for j in range(len(pivot.columns)):
-              axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
-      plt.colorbar(im, ax=axHeat)
-      figHeat
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_rf
   title: 9단계. RandomForest 튜닝
   structuredPrimary: true
   subtitle: 다른 모델 적용
-  goal: '9단계. RandomForest 튜닝: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. RandomForest 튜닝: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     rfParamGrid = {
         "n_estimators": [50, 100, 150],
@@ -595,7 +318,7 @@ sections:
     rfTotalComb = 3 * 4 * 3
     print(f"Total combinations: {rfTotalComb}")
   exercise:
-    prompt: '9단계. RandomForest 튜닝: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       rfParamGrid = {
           "n_estimators": [50, 100, 150],
@@ -604,58 +327,20 @@ sections:
       }
       rfTotalComb = 3 * 4 * 3
       print(f"Total combinations: {rfTotalComb}")
-    solution: |-
-      rfParamGrid = {
-          "n_estimators": [50, 100, 150],
-          "max_depth": [3, 5, 7, None],
-          "min_samples_split": [2, 5, 10]
-      }
-      rfTotalComb = 3 * 4 * 3
-      print(f"Total combinations: {rfTotalComb}")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
-  - type: code
-    language: python
-    title: RF 파라미터 그리드
-    description: RandomForest 파라미터를 정의합니다
-    content: |-
-      rfParamGrid = {
-          "n_estimators": [50, 100, 150],
-          "max_depth": [3, 5, 7, None],
-          "min_samples_split": [2, 5, 10]
-      }
-      rfTotalComb = 3 * 4 * 3
-      print(f"Total combinations: {rfTotalComb}")
-  - type: code
-    language: python
-    title: RF GridSearchCV
-    description: RandomForest 그리드 서치를 실행합니다
-    content: |-
-      rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
-      rfGridSearch.fit(xTrainSc, yTrain)
-      print(f"Best Parameters: {rfGridSearch.best_params_}")
-      print(f"Best CV Score: {rfGridSearch.best_score_:.4f}")
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_compare
   title: 10단계. 모델 비교
   structuredPrimary: true
   subtitle: SVM vs RF
-  goal: '10단계. 모델 비교: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 모델 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     rfBest = rfGridSearch.best_estimator_
     rfPred = rfBest.predict(xTestSc)
@@ -673,7 +358,7 @@ sections:
         axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
     figComp
   exercise:
-    prompt: '10단계. 모델 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       rfBest = rfGridSearch.best_estimator_
       rfPred = rfBest.predict(xTestSc)
@@ -690,131 +375,50 @@ sections:
       for i, v in enumerate(accs):
           axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
       figComp
-    solution: |-
-      rfBest = rfGridSearch.best_estimator_
-      rfPred = rfBest.predict(xTestSc)
-      rfAcc = accuracy_score(yTest, rfPred)
-
-      figComp, axComp = plt.subplots(figsize=(7, 5))
-      models = ["SVM (baseline)", "SVM (tuned)", "RF (tuned)"]
-      accs = [accBase, accBest, rfAcc]
-      colors = ["gray", "steelblue", "coral"]
-      axComp.bar(models, accs, color=colors)
-      axComp.set_ylabel("Accuracy")
-      axComp.set_title("Model Comparison")
-      axComp.set_ylim(0.8, 1.0)
-      for i, v in enumerate(accs):
-          axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
-      figComp
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
-  - type: code
-    language: python
-    title: 모델 비교
-    description: 두 모델의 테스트 성능을 비교합니다
-    content: |-
-      rfBest = rfGridSearch.best_estimator_
-      rfPred = rfBest.predict(xTestSc)
-      rfAcc = accuracy_score(yTest, rfPred)
-
-      figComp, axComp = plt.subplots(figsize=(7, 5))
-      models = ["SVM (baseline)", "SVM (tuned)", "RF (tuned)"]
-      accs = [accBase, accBest, rfAcc]
-      colors = ["gray", "steelblue", "coral"]
-      axComp.bar(models, accs, color=colors)
-      axComp.set_ylabel("Accuracy")
-      axComp.set_title("Model Comparison")
-      axComp.set_ylim(0.8, 1.0)
-      for i, v in enumerate(accs):
-          axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
-      figComp
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_cv
   title: 11단계. 교차검증 상세
   structuredPrimary: true
   subtitle: cv별 점수
-  goal: '11단계. 교차검증 상세: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 교차검증 상세: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
 
     교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
   tips:
   - 교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
     print(f"CV Scores: {cvScores}")
     print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
   exercise:
-    prompt: '11단계. 교차검증 상세: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
       print(f"CV Scores: {cvScores}")
       print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
-    solution: |-
-      cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
-      print(f"CV Scores: {cvScores}")
-      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
-  - type: code
-    language: python
-    title: 폴드별 점수
-    description: 교차검증 각 폴드의 점수를 확인합니다
-    content: |-
-      cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
-      print(f"CV Scores: {cvScores}")
-      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
-  - type: code
-    language: python
-    title: 폴드별 시각화
-    description: 각 폴드의 점수를 막대 그래프로 표시합니다
-    content: |-
-      figCv, axCv = plt.subplots(figsize=(8, 4))
-      folds = [f"Fold {i+1}" for i in range(5)]
-      axCv.bar(folds, cvScores, color="steelblue")
-      axCv.axhline(cvScores.mean(), color="red", linestyle="--", label=f"Mean: {cvScores.mean():.3f}")
-      axCv.set_ylabel("Accuracy")
-      axCv.set_title("Cross-Validation Scores by Fold")
-      axCv.legend()
-      figCv
-  - type: tip
-    content: 교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step12_time
   title: 12단계. 학습 시간
   structuredPrimary: true
   subtitle: 시간 비용
-  goal: '12단계. 학습 시간: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '12단계. 학습 시간: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
 
     시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)
   tips:
   - '시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     totalTime = resultsDf["mean_fit_time"].sum()
     meanTime = resultsDf["mean_fit_time"].mean()
@@ -822,57 +426,30 @@ sections:
     print(f"Total fit time: {totalTime:.2f}s")
     print(f"Mean time per combination: {meanTime:.4f}s")
   exercise:
-    prompt: '12단계. 학습 시간: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       totalTime = resultsDf["mean_fit_time"].sum()
       meanTime = resultsDf["mean_fit_time"].mean()
       print(f"Total combinations: {len(resultsDf)}")
       print(f"Total fit time: {totalTime:.2f}s")
       print(f"Mean time per combination: {meanTime:.4f}s")
-    solution: |-
-      totalTime = resultsDf["mean_fit_time"].sum()
-      meanTime = resultsDf["mean_fit_time"].mean()
-      print(f"Total combinations: {len(resultsDf)}")
-      print(f"Total fit time: {totalTime:.2f}s")
-      print(f"Mean time per combination: {meanTime:.4f}s")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
-  - type: code
-    language: python
-    title: 학습 시간
-    description: 그리드 서치 소요 시간을 확인합니다
-    content: |-
-      totalTime = resultsDf["mean_fit_time"].sum()
-      meanTime = resultsDf["mean_fit_time"].mean()
-      print(f"Total combinations: {len(resultsDf)}")
-      print(f"Total fit time: {totalTime:.2f}s")
-      print(f"Mean time per combination: {meanTime:.4f}s")
-  - type: tip
-    content: '시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 하이퍼파라미터 튜닝
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import pandas as pd
     import numpy as np
@@ -900,7 +477,7 @@ sections:
     predC = gridC.predict(xTeCsc)
     print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -927,120 +504,20 @@ sections:
 
       predC = gridC.predict(xTeCsc)
       print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
-    solution: |-
-      import pandas as pd
-      import numpy as np
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split, GridSearchCV
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.svm import SVC
-      from sklearn.metrics import accuracy_score
-      import matplotlib.pyplot as plt
-
-      cancer = load_breast_cancer()
-      xC = cancer.data
-      yC = cancer.target
-      xTrC, xTeC, yTrC, yTeC = train_test_split(xC, yC, test_size=0.2, random_state=42)
-      scalerC = StandardScaler()
-      xTrCsc = scalerC.fit_transform(xTrC)
-      xTeCsc = scalerC.transform(xTeC)
-
-      paramC = {"C": [0.1, 1, 10], "gamma": [0.01, 0.1, 1]}
-      gridC = GridSearchCV(SVC(random_state=42), paramC, cv=5)
-      gridC.fit(xTrCsc, yTrC)
-      print(f"Best Params: {gridC.best_params_}")
-      print(f"Best CV Score: {gridC.best_score_:.4f}")
-
-      predC = gridC.predict(xTeCsc)
-      print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 유방암 SVM 튜닝'
-    code: |-
-      import pandas as pd
-      import numpy as np
-      from sklearn.datasets import load_breast_cancer
-      from sklearn.model_selection import train_test_split, GridSearchCV
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.svm import SVC
-      from sklearn.metrics import accuracy_score
-      import matplotlib.pyplot as plt
-
-      cancer = load_breast_cancer()
-      xC = cancer.data
-      yC = cancer.target
-      xTrC, xTeC, yTrC, yTeC = train_test_split(xC, yC, test_size=0.2, random_state=42)
-      scalerC = StandardScaler()
-      xTrCsc = scalerC.fit_transform(xTrC)
-      xTeCsc = scalerC.transform(xTeC)
-
-      paramC = {"C": [0.1, 1, 10], "gamma": [0.01, 0.1, 1]}
-      gridC = GridSearchCV(SVC(random_state=42), paramC, cv=5)
-      gridC.fit(xTrCsc, yTrC)
-      print(f"Best Params: {gridC.best_params_}")
-      print(f"Best CV Score: {gridC.best_score_:.4f}")
-
-      predC = gridC.predict(xTeCsc)
-      print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
-  - type: expansion
-    title: '미션2: digits KNN 튜닝'
-    code: |-
-      import pandas as pd
-      import numpy as np
-      from sklearn.datasets import load_digits
-      from sklearn.model_selection import train_test_split, GridSearchCV
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.neighbors import KNeighborsClassifier
-      from sklearn.metrics import accuracy_score
-      import matplotlib.pyplot as plt
-
-      digits = load_digits()
-      xD = digits.data
-      yD = digits.target
-      xTrD, xTeD, yTrD, yTeD = train_test_split(xD, yD, test_size=0.2, random_state=42)
-      scalerD = StandardScaler()
-      xTrDsc = scalerD.fit_transform(xTrD)
-      xTeDsc = scalerD.transform(xTeD)
-
-      paramD = {"n_neighbors": [3, 5, 7, 9], "weights": ["uniform", "distance"], "metric": ["euclidean", "manhattan"]}
-      gridD = GridSearchCV(KNeighborsClassifier(), paramD, cv=5)
-      gridD.fit(xTrDsc, yTrD)
-      print(f"Best Params: {gridD.best_params_}")
-      print(f"Best CV Score: {gridD.best_score_:.4f}")
-
-      resD = pd.DataFrame(gridD.cv_results_)
-      top5 = resD.nsmallest(5, "rank_test_score")
-      figM2, axM2 = plt.subplots(figsize=(10, 4))
-      labels = [f"k={r['param_n_neighbors']}, {r['param_weights']}" for _, r in top5.iterrows()]
-      axM2.barh(labels[::-1], top5["mean_test_score"].values[::-1], color="teal")
-      axM2.set_xlabel("Mean CV Accuracy")
-      axM2.set_title("Top 5 KNN Configurations")
-      figM2
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
-    검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from sklearn.datasets import make_classification
     from sklearn.model_selection import train_test_split
@@ -1067,7 +544,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -1112,111 +589,7 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
-      검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
-  - type: code
-    language: python
-    title: 분류 데이터와 파이프라인 준비
-    description: 재현 가능한 이탈 고객 위험 예측 데이터를 만듭니다.
-    content: |-
-      from sklearn.datasets import make_classification
-      from sklearn.model_selection import train_test_split
-      from sklearn.pipeline import Pipeline
-      from sklearn.preprocessing import StandardScaler
-      from sklearn.linear_model import LogisticRegression
-      from sklearn.metrics import accuracy_score, f1_score
-
-      features, target = make_classification(
-          n_samples=240,
-          n_features=6,
-          n_informative=4,
-          n_redundant=0,
-          class_sep=1.4,
-          random_state=42,
-      )
-      xTrain, xTest, yTrain, yTest = train_test_split(
-          features, target, test_size=0.25, random_state=42, stratify=target
-      )
-
-      riskPipeline = Pipeline([
-          ("scaler", StandardScaler()),
-          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
-      ])
-      xTrain.shape, xTest.shape
-  - type: code
-    language: python
-    title: 입력 검증이 있는 학습 함수
-    description: 행 수 불일치나 단일 클래스 데이터를 학습 전에 차단합니다.
-    content: |-
-      def fitRiskModel(model, features, labels):
-          if features.shape[0] != len(labels):
-              raise ValueError("특성 행 수와 타깃 길이가 다릅니다.")
-          if len(set(labels)) < 2:
-              raise ValueError("분류 모델은 최소 두 개 이상의 클래스가 필요합니다.")
-          try:
-              return model.fit(features, labels)
-          except ValueError as exc:
-              raise ValueError("모델 학습 입력을 다시 확인하세요.") from exc
-
-      trainedRiskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
-      trainedRiskModel
-  - type: code
-    language: python
-    title: 예측과 지표 계산
-    description: 실행 전에는 정확도와 F1이 0.8 이상일 것으로 예측하고 확인합니다.
-    content: |-
-      # 예측: class_sep이 충분히 커서 정확도와 F1이 모두 0.8 이상일 가능성이 높습니다.
-      riskPred = trainedRiskModel.predict(xTest)
-      riskAccuracy = accuracy_score(yTest, riskPred)
-      riskF1 = f1_score(yTest, riskPred)
-
-      round(riskAccuracy, 3), round(riskF1, 3)
-  - type: code
-    language: python
-    title: 운영 배포 전 품질 검증
-    description: 최소 성능과 예측 라벨 범위를 assert로 고정합니다.
-    content: |-
-      modelChecks = {
-          "accuracy_gate": riskAccuracy >= 0.80,
-          "f1_gate": riskF1 >= 0.80,
-          "prediction_labels_are_valid": set(riskPred).issubset({0, 1}),
-          "test_rows_preserved": len(riskPred) == len(yTest),
-      }
-
-      assert all(modelChecks.values()), modelChecks
-      modelChecks
-  - type: expansion
-    title: '실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?'
-    blocks:
-    - type: code
-      language: python
-      title: 하이퍼파라미터 변경 비교
-      content: |-
-        conservativePipeline = Pipeline([
-            ("scaler", StandardScaler()),
-            ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
-        ])
-        conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
-        conservativePred = conservativeModel.predict(xTest)
-        conservativeAccuracy = accuracy_score(yTest, conservativePred)
-        conservativeF1 = f1_score(yTest, conservativePred)
-
-        assert conservativeAccuracy >= 0.75
-        {
-            "baselineAccuracy": round(riskAccuracy, 3),
-            "baselineF1": round(riskF1, 3),
-            "conservativeAccuracy": round(conservativeAccuracy, 3),
-            "conservativeF1": round(conservativeF1, 3),
-            "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
-        }
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

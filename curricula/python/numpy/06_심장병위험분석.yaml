@@ -38,137 +38,77 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import numpy as np
     import pandas as pd
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
-    solution: |-
-      import numpy as np
-      import pandas as pd
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: numpy와 pandas를 불러옵니다
-    content: |-
-      import numpy as np
-      import pandas as pd
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: 심장병 데이터셋
-  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: UCI(캘리포니아 대학교)에서 제공하는 유명한 심장병 데이터셋입니다. 303명의 환자 데이터가 있으며, 콜레스테롤(chol, 혈중 지방 수치), 안정 시 혈압(trestbps), 최대 심박수(thalach)
-    등 건강 지표와 함께 심장병 유무(target, 1이면 심장병 있음)가 기록되어 있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: UCI(캘리포니아 대학교)에서 제공하는 유명한 심장병 데이터셋입니다. 303명의 환자 데이터가 있으며, 콜레스테롤(chol, 혈중 지방 수치), 안정 시 혈압(trestbps), 최대 심박수(thalach) 등 건강 지표와 함께 심장병 유무(target, 1이면 심장병 있음)가 기록되어 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 
     df = loadLocalDataset("heart")
     df.head()
   exercise:
-    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       df = loadLocalDataset("heart")
       df.head()
-    solution: |-
-      from codaro.curriculum.localData import loadLocalDataset
-
-      df = loadLocalDataset("heart")
-      df.head()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: UCI(캘리포니아 대학교)에서 제공하는 유명한 심장병 데이터셋입니다. 303명의 환자 데이터가 있으며, 콜레스테롤(chol, 혈중 지방 수치), 안정 시 혈압(trestbps), 최대 심박수(thalach)
-      등 건강 지표와 함께 심장병 유무(target, 1이면 심장병 있음)가 기록되어 있습니다.
-  - type: code
-    language: python
-    title: 심장병 데이터 로드
-    description: Codaro 로컬 데이터셋에서 심장병 데이터를 불러옵니다
-    content: |-
-      from codaro.curriculum.localData import loadLocalDataset
-
-      df = loadLocalDataset("heart")
-      df.head()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_columns
   title: 3단계. 컬럼 확인
   structuredPrimary: true
   subtitle: 데이터 구조
-  goal: '3단계. 컬럼 확인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 컬럼 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 데이터의 컬럼을 확인합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: df.columns.tolist()
   exercise:
-    prompt: '3단계. 컬럼 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: df.columns.tolist()
-    solution: df.columns.tolist()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 데이터의 컬럼을 확인합니다.
-  - type: code
-    language: python
-    title: 컬럼 목록
-    description: 데이터 컬럼을 확인합니다
-    content: df.columns.tolist()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_extract
   title: 4단계. 배열 추출
   structuredPrimary: true
   subtitle: 주요 변수
-  goal: '4단계. 배열 추출: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 배열 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 주요 수치형 변수들을 NumPy 배열로 추출합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     age = df['age'].values
     chol = df['chol'].values
@@ -177,7 +117,7 @@ sections:
     target = df['target'].values
     age.shape
   exercise:
-    prompt: '4단계. 배열 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       age = df['age'].values
       chol = df['chol'].values
@@ -185,97 +125,48 @@ sections:
       hr = df['thalach'].values
       target = df['target'].values
       age.shape
-    solution: |-
-      age = df['age'].values
-      chol = df['chol'].values
-      bp = df['trestbps'].values
-      hr = df['thalach'].values
-      target = df['target'].values
-      age.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 주요 수치형 변수들을 NumPy 배열로 추출합니다.
-  - type: code
-    language: python
-    title: 변수 추출
-    description: 나이, 콜레스테롤, 혈압 등을 추출합니다
-    content: |-
-      age = df['age'].values
-      chol = df['chol'].values
-      bp = df['trestbps'].values
-      hr = df['thalach'].values
-      target = df['target'].values
-      age.shape
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_concat_1d
   title: 5단계. 1차원 배열 결합
   structuredPrimary: true
   subtitle: np.concatenate()
-  goal: '5단계. 1차원 배열 결합: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 1차원 배열 결합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     concatenate(연결하다)는 여러 배열을 하나로 이어붙이는 함수입니다. 기차 객차를 연결하듯이 배열들을 순서대로 붙입니다. 예를 들어 [1,2,3]과 [4,5]를 concatenate하면 [1,2,3,4,5]가 됩니다. 여러 소스의 데이터를 하나로 합칠 때 유용합니다.
 
     np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
   tips:
   - np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     concat = np.concatenate([age, chol])
     concat.shape
   exercise:
-    prompt: '5단계. 1차원 배열 결합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       concat = np.concatenate([age, chol])
       concat.shape
-    solution: |-
-      concat = np.concatenate([age, chol])
-      concat.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: concatenate(연결하다)는 여러 배열을 하나로 이어붙이는 함수입니다. 기차 객차를 연결하듯이 배열들을 순서대로 붙입니다. 예를 들어 [1,2,3]과 [4,5]를 concatenate하면 [1,2,3,4,5]가
-      됩니다. 여러 소스의 데이터를 하나로 합칠 때 유용합니다.
-  - type: code
-    language: python
-    title: 1D 결합
-    description: 두 배열을 이어붙입니다
-    content: |-
-      concat = np.concatenate([age, chol])
-      concat.shape
-  - type: tip
-    content: np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_concat_2d
   title: 6단계. 2차원 열 결합
   structuredPrimary: true
   subtitle: axis=1
-  goal: '6단계. 2차원 열 결합: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 2차원 열 결합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     여러 변수를 열로 나란히 붙여 2차원 테이블을 만듭니다. 각 1차원 배열을 reshape(-1, 1)로 열 벡터로 바꾼 뒤, axis=1(열 방향)로 결합합니다. -1은 '나머지 크기는 자동 계산해줘'라는 의미입니다. 결과적으로 303명 × 3개 변수의 테이블이 만들어집니다.
 
     axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
   tips:
   - axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     c1 = age.reshape(-1, 1)
     c2 = chol.reshape(-1, 1)
@@ -283,157 +174,79 @@ sections:
     features = np.concatenate([c1, c2, c3], axis=1)
     features.shape
   exercise:
-    prompt: '6단계. 2차원 열 결합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       c1 = age.reshape(-1, 1)
       c2 = chol.reshape(-1, 1)
       c3 = bp.reshape(-1, 1)
       features = np.concatenate([c1, c2, c3], axis=1)
       features.shape
-    solution: |-
-      c1 = age.reshape(-1, 1)
-      c2 = chol.reshape(-1, 1)
-      c3 = bp.reshape(-1, 1)
-      features = np.concatenate([c1, c2, c3], axis=1)
-      features.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 여러 변수를 열로 나란히 붙여 2차원 테이블을 만듭니다. 각 1차원 배열을 reshape(-1, 1)로 열 벡터로 바꾼 뒤, axis=1(열 방향)로 결합합니다. -1은 '나머지 크기는 자동 계산해줘'라는
-      의미입니다. 결과적으로 303명 × 3개 변수의 테이블이 만들어집니다.
-  - type: code
-    language: python
-    title: 2D 열 결합
-    description: 세 변수를 열로 결합합니다
-    content: |-
-      c1 = age.reshape(-1, 1)
-      c2 = chol.reshape(-1, 1)
-      c3 = bp.reshape(-1, 1)
-      features = np.concatenate([c1, c2, c3], axis=1)
-      features.shape
-  - type: tip
-    content: axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_vstack_hstack
   title: 7단계. vstack과 column_stack
   structuredPrimary: true
   subtitle: 편리한 결합
-  goal: '7단계. vstack과 column_stack: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. vstack과 column_stack: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     vstack, hstack, column_stack은 concatenate보다 직관적인 결합 함수입니다. vstack은 vertical(수직) stack으로 배열들을 위아래로 쌓고, hstack은 horizontal(수평) stack으로 좌우로 붙입니다. column_stack은 1차원 배열들을 각각 하나의 열로 만들어 옆으로 붙여줍니다.
 
     np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
   tips:
   - np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     v = np.vstack([age, chol, bp])
     v.shape
   exercise:
-    prompt: '7단계. vstack과 column_stack: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       v = np.vstack([age, chol, bp])
       v.shape
-    solution: |-
-      v = np.vstack([age, chol, bp])
-      v.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: vstack, hstack, column_stack은 concatenate보다 직관적인 결합 함수입니다. vstack은 vertical(수직) stack으로 배열들을 위아래로 쌓고, hstack은
-      horizontal(수평) stack으로 좌우로 붙입니다. column_stack은 1차원 배열들을 각각 하나의 열로 만들어 옆으로 붙여줍니다.
-  - type: code
-    language: python
-    title: vstack
-    description: 수직으로 쌓습니다
-    content: |-
-      v = np.vstack([age, chol, bp])
-      v.shape
-  - type: code
-    language: python
-    title: column_stack
-    description: 열로 쌓습니다
-    content: |-
-      h = np.column_stack([age, chol, bp])
-      h.shape
-  - type: tip
-    content: np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_group_compare
   title: 8단계. 그룹별 비교
   structuredPrimary: true
   subtitle: 심장병 유무
-  goal: '8단계. 그룹별 비교: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 그룹별 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 심장병 유무(target)에 따른 평균 나이를 비교합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     sick = target == 1
     well = target == 0
     f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
   exercise:
-    prompt: '8단계. 그룹별 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       sick = target == 1
       well = target == 0
       f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
-    solution: |-
-      sick = target == 1
-      well = target == 0
-      f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 심장병 유무(target)에 따른 평균 나이를 비교합니다.
-  - type: code
-    language: python
-    title: 그룹별 평균
-    description: 심장병 유무에 따른 평균 나이를 비교합니다
-    content: |-
-      sick = target == 1
-      well = target == 0
-      f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_any_all
   title: 9단계. any와 all
   structuredPrimary: true
   subtitle: 조건 검사
-  goal: '9단계. any와 all: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. any와 all: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     any()는 '하나라도 있으면 True', all()은 '전부 다 그래야 True'입니다. 예를 들어 np.any(chol > 240)은 콜레스테롤 240 초과인 환자가 한 명이라도 있는지 확인합니다. np.all(bp < 180)은 모든 환자의 혈압이 180 미만인지 검사합니다. 데이터 전체에 대한 조건 검증에 유용합니다.
 
     np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
   tips:
   - np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     hi1 = chol > 240
     hi2 = bp > 140
@@ -441,209 +254,110 @@ sections:
     all1 = np.all(bp < 180)
     f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
   exercise:
-    prompt: '9단계. any와 all: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       hi1 = chol > 240
       hi2 = bp > 140
       any1 = np.any(hi1)
       all1 = np.all(bp < 180)
       f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
-    solution: |-
-      hi1 = chol > 240
-      hi2 = bp > 140
-      any1 = np.any(hi1)
-      all1 = np.all(bp < 180)
-      f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: any()는 '하나라도 있으면 True', all()은 '전부 다 그래야 True'입니다. 예를 들어 np.any(chol > 240)은 콜레스테롤 240 초과인 환자가 한 명이라도 있는지 확인합니다.
-      np.all(bp < 180)은 모든 환자의 혈압이 180 미만인지 검사합니다. 데이터 전체에 대한 조건 검증에 유용합니다.
-  - type: code
-    language: python
-    title: any/all 조건 검사
-    description: 고위험 요인 존재 여부를 확인합니다
-    content: |-
-      hi1 = chol > 240
-      hi2 = bp > 140
-      any1 = np.any(hi1)
-      all1 = np.all(bp < 180)
-      f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
-  - type: tip
-    content: np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_any_axis
   title: 10단계. 행별 any/all
   structuredPrimary: true
   subtitle: axis=1
-  goal: '10단계. 행별 any/all: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 행별 any/all: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     각 환자별로 위험 요인이 있는지 확인합니다.
 
     axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
   tips:
   - axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     risks = np.column_stack([hi1, hi2, age > 60])
     any2 = np.any(risks, axis=1)
     all2 = np.all(risks, axis=1)
     f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
   exercise:
-    prompt: '10단계. 행별 any/all: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       risks = np.column_stack([hi1, hi2, age > 60])
       any2 = np.any(risks, axis=1)
       all2 = np.all(risks, axis=1)
       f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
-    solution: |-
-      risks = np.column_stack([hi1, hi2, age > 60])
-      any2 = np.any(risks, axis=1)
-      all2 = np.all(risks, axis=1)
-      f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 각 환자별로 위험 요인이 있는지 확인합니다.
-  - type: code
-    language: python
-    title: 환자별 위험 요인
-    description: 각 환자의 위험 요인 보유 여부를 확인합니다
-    content: |-
-      risks = np.column_stack([hi1, hi2, age > 60])
-      any2 = np.any(risks, axis=1)
-      all2 = np.all(risks, axis=1)
-      f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
-  - type: tip
-    content: axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_sort
   title: 11단계. 정렬
   structuredPrimary: true
   subtitle: np.sort()
-  goal: '11단계. 정렬: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 정렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     나이순으로 데이터를 정렬합니다.
 
     np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
   tips:
   - np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     sorted_ = np.sort(age)
     sorted_[:10]
   exercise:
-    prompt: '11단계. 정렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       sorted_ = np.sort(age)
       sorted_[:10]
-    solution: |-
-      sorted_ = np.sort(age)
-      sorted_[:10]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 나이순으로 데이터를 정렬합니다.
-  - type: code
-    language: python
-    title: 나이 정렬
-    description: 나이를 오름차순 정렬합니다
-    content: |-
-      sorted_ = np.sort(age)
-      sorted_[:10]
-  - type: tip
-    content: np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step12_argsort
   title: 12단계. 정렬 인덱스
   structuredPrimary: true
   subtitle: np.argsort()
-  goal: '12단계. 정렬 인덱스: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '12단계. 정렬 인덱스: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     argsort로 정렬 인덱스를 얻어 다른 배열도 같이 정렬합니다.
 
     np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
   tips:
   - np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     order = np.argsort(age)
     arr1 = age[order]
     arr2 = chol[order]
     pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
   exercise:
-    prompt: '12단계. 정렬 인덱스: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       order = np.argsort(age)
       arr1 = age[order]
       arr2 = chol[order]
       pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
-    solution: |-
-      order = np.argsort(age)
-      arr1 = age[order]
-      arr2 = chol[order]
-      pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: argsort로 정렬 인덱스를 얻어 다른 배열도 같이 정렬합니다.
-  - type: code
-    language: python
-    title: 연동 정렬
-    description: 나이순으로 다른 변수도 정렬합니다
-    content: |-
-      order = np.argsort(age)
-      arr1 = age[order]
-      arr2 = chol[order]
-      pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
-  - type: tip
-    content: np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step13_top10
   title: 13단계. 상위 N개 추출
   structuredPrimary: true
   subtitle: 내림차순
-  goal: '13단계. 상위 N개 추출: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '13단계. 상위 N개 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 콜레스테롤 기준 상위 10명을 찾습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     idx = np.argsort(chol)[::-1]
     top = idx[:10]
@@ -653,7 +367,7 @@ sections:
         'HeartDisease': target[top]
     })
   exercise:
-    prompt: '13단계. 상위 N개 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       idx = np.argsort(chol)[::-1]
       top = idx[:10]
@@ -662,101 +376,47 @@ sections:
           'Cholesterol': chol[top],
           'HeartDisease': target[top]
       })
-    solution: |-
-      idx = np.argsort(chol)[::-1]
-      top = idx[:10]
-      pd.DataFrame({
-          'Age': age[top],
-          'Cholesterol': chol[top],
-          'HeartDisease': target[top]
-      })
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 콜레스테롤 기준 상위 10명을 찾습니다.
-  - type: code
-    language: python
-    title: 상위 10명
-    description: 콜레스테롤이 높은 상위 10명을 확인합니다
-    content: |-
-      idx = np.argsort(chol)[::-1]
-      top = idx[:10]
-      pd.DataFrame({
-          'Age': age[top],
-          'Cholesterol': chol[top],
-          'HeartDisease': target[top]
-      })
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step14_cumsum
   title: 14단계. 누적합
   structuredPrimary: true
   subtitle: np.cumsum()
-  goal: '14단계. 누적합: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '14단계. 누적합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     cumsum(cumulative sum, 누적합)은 배열의 값을 순서대로 더해가는 함수입니다. [1,2,3]의 cumsum은 [1, 1+2, 1+2+3] = [1, 3, 6]입니다. 나이순 정렬된 심장병 유무(1 또는 0) 데이터에 cumsum을 적용하면, 각 나이까지 심장병 환자가 몇 명인지 누적 수를 볼 수 있습니다.
 
     np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
   tips:
   - np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     t = target[order]
     cumsum = np.cumsum(t)
     cumsum[:20]
   exercise:
-    prompt: '14단계. 누적합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       t = target[order]
       cumsum = np.cumsum(t)
       cumsum[:20]
-    solution: |-
-      t = target[order]
-      cumsum = np.cumsum(t)
-      cumsum[:20]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: cumsum(cumulative sum, 누적합)은 배열의 값을 순서대로 더해가는 함수입니다. [1,2,3]의 cumsum은 [1, 1+2, 1+2+3] = [1, 3, 6]입니다. 나이순 정렬된
-      심장병 유무(1 또는 0) 데이터에 cumsum을 적용하면, 각 나이까지 심장병 환자가 몇 명인지 누적 수를 볼 수 있습니다.
-  - type: code
-    language: python
-    title: 누적 환자 수
-    description: 나이순 심장병 환자 누적 수를 계산합니다
-    content: |-
-      t = target[order]
-      cumsum = np.cumsum(t)
-      cumsum[:20]
-  - type: tip
-    content: np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step15_risk_score
   title: 15단계. 위험 점수 분석
   structuredPrimary: true
   subtitle: 종합 분석
-  goal: '15단계. 위험 점수 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '15단계. 위험 점수 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 여러 위험 요인을 종합한 점수를 만들어 분석합니다. 불리언 배열에 .astype(int)를 적용하면 True는 1, False는 0으로 변환됩니다. 콜레스테롤 > 200, 혈압 > 130, 나이
-    > 55 세 가지 조건을 더하면 0~3점의 위험 점수가 됩니다. 점수가 높을수록 심장병 발생률이 높아지는지 확인할 수 있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 여러 위험 요인을 종합한 점수를 만들어 분석합니다. 불리언 배열에 .astype(int)를 적용하면 True는 1, False는 0으로 변환됩니다. 콜레스테롤 > 200, 혈압 > 130, 나이 > 55 세 가지 조건을 더하면 0~3점의 위험 점수가 됩니다. 점수가 높을수록 심장병 발생률이 높아지는지 확인할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
     levels, counts = np.unique(score, return_counts=True)
@@ -767,7 +427,7 @@ sections:
         rows.append([r, np.sum(mask), round(rate * 100, 1)])
     pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
   exercise:
-    prompt: '15단계. 위험 점수 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
       levels, counts = np.unique(score, return_counts=True)
@@ -777,48 +437,17 @@ sections:
           rate = np.mean(target[mask])
           rows.append([r, np.sum(mask), round(rate * 100, 1)])
       pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
-    solution: |-
-      score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
-      levels, counts = np.unique(score, return_counts=True)
-      rows = []
-      for r in levels:
-          mask = score == r
-          rate = np.mean(target[mask])
-          rows.append([r, np.sum(mask), round(rate * 100, 1)])
-      pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 여러 위험 요인을 종합한 점수를 만들어 분석합니다. 불리언 배열에 .astype(int)를 적용하면 True는 1, False는 0으로 변환됩니다. 콜레스테롤 > 200, 혈압 > 130, 나이
-      > 55 세 가지 조건을 더하면 0~3점의 위험 점수가 됩니다. 점수가 높을수록 심장병 발생률이 높아지는지 확인할 수 있습니다.
-  - type: code
-    language: python
-    title: 위험 그룹별 발생률
-    description: 위험 점수별 심장병 비율을 확인합니다
-    content: |-
-      score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
-      levels, counts = np.unique(score, return_counts=True)
-      rows = []
-      for r in levels:
-          mask = score == r
-          rate = np.mean(target[mask])
-          rows.append([r, np.sum(mask), round(rate * 100, 1)])
-      pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: '현업 흐름 검증: 심장병 위험 점수 배치 계산'
   structuredPrimary: true
   subtitle: 조건 배열, 정렬, cumsum, 실패 케이스
-  goal: '현업 흐름 검증: 심장병 위험 점수 배치 계산: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 심장병 위험 점수 배치 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     위험 점수는 조건을 많이 더하는 만큼 기준을 잘못 잡기 쉽습니다. 각 조건 배열을 분리해 예측하고, 정렬 후 누적 환자 수가 의도대로 계산되는지 검증하세요.
 
@@ -826,7 +455,6 @@ sections:
     나이 기준을 55세에서 60세로 바꾸면 위험 점수 분포와 누적 환자 수 해석이 어떻게 달라지는지 비교하세요.
   tips:
   - 변주 실험 나이 기준을 55세에서 60세로 바꾸면 위험 점수 분포와 누적 환자 수 해석이 어떻게 달라지는지 비교하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import numpy as np
 
@@ -843,7 +471,7 @@ sections:
     assert age[order].tolist() == [39, 45, 58, 62]
     assert cumulativeDisease.tolist() == [0, 0, 1, 2]
   exercise:
-    prompt: '현업 흐름 검증: 심장병 위험 점수 배치 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import numpy as np
 
@@ -859,88 +487,23 @@ sections:
       assert riskScore.tolist() == [0, 3, 3, 0]
       assert age[order].tolist() == [39, 45, 58, 62]
       assert cumulativeDisease.tolist() == [0, 0, 1, 2]
-    solution: |-
-      import numpy as np
-
-      age = np.array([45, 62, 58, 39])
-      chol = np.array([180, 230, 205, 190])
-      bp = np.array([120, 145, 135, 118])
-      disease = np.array([0, 1, 1, 0])
-
-      riskScore = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
-      order = np.argsort(age)
-      cumulativeDisease = np.cumsum(disease[order])
-
-      assert riskScore.tolist() == [0, 3, 3, 0]
-      assert age[order].tolist() == [39, 45, 58, 62]
-      assert cumulativeDisease.tolist() == [0, 0, 1, 2]
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 위험 점수는 조건을 많이 더하는 만큼 기준을 잘못 잡기 쉽습니다. 각 조건 배열을 분리해 예측하고, 정렬 후 누적 환자 수가 의도대로 계산되는지 검증하세요.
-  - type: code
-    language: python
-    title: 위험 점수와 누적 환자 수
-    description: 불리언 조건을 정수로 바꾸고 나이순 누적을 확인합니다.
-    content: |-
-      import numpy as np
-
-      age = np.array([45, 62, 58, 39])
-      chol = np.array([180, 230, 205, 190])
-      bp = np.array([120, 145, 135, 118])
-      disease = np.array([0, 1, 1, 0])
-
-      riskScore = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
-      order = np.argsort(age)
-      cumulativeDisease = np.cumsum(disease[order])
-
-      assert riskScore.tolist() == [0, 3, 3, 0]
-      assert age[order].tolist() == [39, 45, 58, 62]
-      assert cumulativeDisease.tolist() == [0, 0, 1, 2]
-  - type: code
-    language: python
-    title: 입력 길이 오류 확인
-    description: 특성 배열과 정답 배열 길이가 다르면 분석 전에 멈춥니다.
-    content: |-
-      import numpy as np
-
-      def validateSameLength(*arrays):
-          lengths = {len(array) for array in arrays}
-          if len(lengths) != 1:
-              raise ValueError("all arrays must have the same length")
-          return [np.asarray(array) for array in arrays]
-
-      try:
-          validateSameLength([1, 2], [1])
-      except ValueError as exc:
-          message = str(exc)
-
-      assert message == "all arrays must have the same length"
-  - type: tip
-    title: 변주 실험
-    content: 나이 기준을 55세에서 60세로 바꾸면 위험 점수 분포와 누적 환자 수 해석이 어떻게 달라지는지 비교하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 심장병 위험 분석
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import numpy as np
     import pandas as pd
@@ -962,7 +525,7 @@ sections:
     hr = data['thalach'].values
     target = data['target'].values
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
@@ -983,121 +546,8 @@ sections:
       age = data['age'].values
       hr = data['thalach'].values
       target = data['target'].values
-    solution: |-
-      import numpy as np
-      import pandas as pd
-
-      heartIdx = np.arange(303)
-      data = pd.DataFrame({
-          'age': 35 + (heartIdx * 3) % 38,
-          'trestbps': 112 + (heartIdx * 5) % 48,
-          'chol': 165 + (heartIdx * 7) % 155,
-          'thalach': 178 - (heartIdx * 4) % 58,
-      })
-      data['target'] = (
-          (data['chol'] > 225).astype(int)
-          + (data['trestbps'] > 135).astype(int)
-          + (data['age'] > 56).astype(int)
-          >= 2
-      ).astype(int)
-      age = data['age'].values
-      hr = data['thalach'].values
-      target = data['target'].values
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 최대 심박수 기준 위험군 분석'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import numpy as np
-        import pandas as pd
-
-        heartIdx = np.arange(303)
-        data = pd.DataFrame({
-            'age': 35 + (heartIdx * 3) % 38,
-            'trestbps': 112 + (heartIdx * 5) % 48,
-            'chol': 165 + (heartIdx * 7) % 155,
-            'thalach': 178 - (heartIdx * 4) % 58,
-        })
-        data['target'] = (
-            (data['chol'] > 225).astype(int)
-            + (data['trestbps'] > 135).astype(int)
-            + (data['age'] > 56).astype(int)
-            >= 2
-        ).astype(int)
-        age = data['age'].values
-        hr = data['thalach'].values
-        target = data['target'].values
-    - type: code
-      title: 위험군 분석
-      content: |-
-        limit = 220 - age
-        ratio = hr / limit
-        low = ratio < 0.7
-        mid = (ratio >= 0.7) & (ratio < 0.85)
-        high = ratio >= 0.85
-        rows = []
-        for name, mask in [('Low (<70%)', low), ('Normal (70-85%)', mid), ('High (>=85%)', high)]:
-            n = np.sum(mask)
-            rate = np.mean(target[mask]) * 100 if n > 0 else 0
-            rows.append([name, n, round(rate, 1)])
-        pd.DataFrame(rows, columns=['HR Category', 'Count', 'Disease Rate (%)'])
-  - type: expansion
-    title: '미션2: 복합 위험 요인 누적 분석'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import numpy as np
-        import pandas as pd
-
-        heartIdx = np.arange(303)
-        df = pd.DataFrame({
-            'age': 35 + (heartIdx * 3) % 38,
-            'trestbps': 112 + (heartIdx * 5) % 48,
-            'chol': 165 + (heartIdx * 7) % 155,
-        })
-        df['target'] = (
-            (df['chol'] > 225).astype(int)
-            + (df['trestbps'] > 135).astype(int)
-            + (df['age'] > 56).astype(int)
-            >= 2
-        ).astype(int)
-        age = df['age'].values
-        chol = df['chol'].values
-        bp = df['trestbps'].values
-        target = df['target'].values
-    - type: code
-      title: 누적 분석
-      content: |-
-        old = (age > 55).astype(int)
-        hi = (chol > 240).astype(int)
-        hyp = (bp > 140).astype(int)
-        matrix = np.column_stack([old, hi, hyp])
-        score = np.sum(matrix, axis=1)
-        idx = np.argsort(score)[::-1]
-        sorted1 = score[idx]
-        sorted2 = target[idx]
-        cumsum = np.cumsum(sorted2)
-        pts = [10, 30, 50, 100, 150, 200, 250, 302]
-        pd.DataFrame({
-            'TopN': pts,
-            'MinRiskScore': sorted1[np.array(pts) - 1],
-            'CumDisease': cumsum[np.array(pts) - 1],
-            'CumRate': np.round(cumsum[np.array(pts) - 1] / np.array(pts), 3)
-        })
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

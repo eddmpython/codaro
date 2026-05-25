@@ -74,8 +74,7 @@ sections:
   - type: note
     style: info
     title: 왜 데이터 검증이 필요한가?
-    content: 외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고 오류가 발생하기 쉽습니다.
-      Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러 메시지를 제공합니다.
+    content: 외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고 오류가 발생하기 쉽습니다. Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러 메시지를 제공합니다.
   - type: featureCards
     cards:
     - emoji: 📝
@@ -98,8 +97,7 @@ sections:
   - type: note
     style: info
     title: 수동 검증의 문제점
-    content: 수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다. 새 필드가 추가되면 검증 코드도
-      수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
+    content: 수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다. 새 필드가 추가되면 검증 코드도 수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
   - type: featureCards
     cards:
     - emoji: ⚡
@@ -168,8 +166,7 @@ sections:
   - type: note
     style: tip
     title: 선택 가이드
-    content: 단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를 사용한다면 Pydantic은
-      필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
+    content: 단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를 사용한다면 Pydantic은 필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -203,13 +200,11 @@ sections:
   - type: note
     style: info
     title: 사용자 모델 정의
-    content: Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면 ValidationError가
-      발생합니다.
+    content: Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면 ValidationError가 발생합니다.
   - type: note
     style: tip
     title: 코드 예시
-    content: 'class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25", email="a@b.com")
-      호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.'
+    content: 'class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25", email="a@b.com") 호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.'
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -290,8 +285,7 @@ sections:
   - type: note
     style: info
     title: 프로젝트 기반 학습
-    content: 각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면 Pydantic을 활용한 견고한 데이터
-      모델을 설계할 수 있습니다.
+    content: 각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면 Pydantic을 활용한 견고한 데이터 모델을 설계할 수 있습니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -358,13 +352,11 @@ sections:
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
-    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from typing import Literal
     from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -400,7 +392,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -435,154 +427,8 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-    solution: |-
-      from typing import Literal
-      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
-
-      class OrderInput(BaseModel):
-          orderId: str
-          customer: str
-          amount: int = Field(gt=0)
-          status: Literal['paid', 'pending', 'cancelled']
-
-          @field_validator('orderId', 'customer')
-          @classmethod
-          def stripRequiredText(cls, value):
-              cleaned = value.strip()
-              if not cleaned:
-                  raise ValueError('text field must not be empty')
-              return cleaned
-
-          @computed_field
-          @property
-          def isRevenue(self) -> bool:
-              return self.status == 'paid'
-
-      validOrder = OrderInput.model_validate({
-          'orderId': ' A-100 ',
-          'customer': ' kim ',
-          'amount': '120000',
-          'status': 'paid',
-      })
-
-      assert validOrder.orderId == 'A-100'
-      assert validOrder.amount == 120000
-      assert validOrder.isRevenue is True
-      validOrder.model_dump()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
-      다음 단계로 넘기는 흐름을 검증합니다.
-  - type: code
-    language: python
-    title: 주문 입력 모델과 정상 데이터 예측
-    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
-    content: |-
-      from typing import Literal
-      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
-
-      class OrderInput(BaseModel):
-          orderId: str
-          customer: str
-          amount: int = Field(gt=0)
-          status: Literal['paid', 'pending', 'cancelled']
-
-          @field_validator('orderId', 'customer')
-          @classmethod
-          def stripRequiredText(cls, value):
-              cleaned = value.strip()
-              if not cleaned:
-                  raise ValueError('text field must not be empty')
-              return cleaned
-
-          @computed_field
-          @property
-          def isRevenue(self) -> bool:
-              return self.status == 'paid'
-
-      validOrder = OrderInput.model_validate({
-          'orderId': ' A-100 ',
-          'customer': ' kim ',
-          'amount': '120000',
-          'status': 'paid',
-      })
-
-      assert validOrder.orderId == 'A-100'
-      assert validOrder.amount == 120000
-      assert validOrder.isRevenue is True
-      validOrder.model_dump()
-  - type: code
-    language: python
-    title: 잘못된 입력을 먼저 실패시킨다
-    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
-    content: |-
-      try:
-          OrderInput.model_validate({
-              'orderId': 'A-101',
-              'customer': 'lee',
-              'amount': 0,
-              'status': 'refunded',
-          })
-      except ValidationError as exc:
-          orderValidationErrors = exc.errors()
-      else:
-          raise AssertionError('잘못된 주문 입력은 실패해야 합니다')
-
-      errorFields = {error['loc'][0] for error in orderValidationErrors}
-      assert {'amount', 'status'} <= errorFields
-      orderValidationErrors
-  - type: code
-    language: python
-    title: 배치 입력을 정상/오류로 분리
-    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
-    content: |-
-      rawOrders = [
-          {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
-          {'orderId': 'A-101', 'customer': 'lee', 'amount': '20000', 'status': 'pending'},
-          {'orderId': ' ', 'customer': 'park', 'amount': '50000', 'status': 'paid'},
-          {'orderId': 'A-103', 'customer': 'choi', 'amount': '-1', 'status': 'paid'},
-      ]
-
-      def validateOrderBatch(rows):
-          accepted = []
-          rejected = []
-          for index, row in enumerate(rows, start=1):
-              try:
-                  accepted.append(OrderInput.model_validate(row))
-              except ValidationError as exc:
-                  rejected.append({'rowNumber': index, 'errors': exc.errors()})
-          return accepted, rejected
-
-      acceptedOrders, rejectedOrders = validateOrderBatch(rawOrders)
-      paidRevenue = sum(order.amount for order in acceptedOrders if order.isRevenue)
-
-      assert len(acceptedOrders) == 2
-      assert len(rejectedOrders) == 2
-      assert paidRevenue == 120000
-      acceptedOrders, rejectedOrders
-  - type: code
-    language: python
-    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
-    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
-    content: |-
-      def filterRevenueOrders(orders, minAmount):
-          if minAmount <= 0:
-              raise ValueError('minAmount must be positive')
-          return [order for order in orders if order.isRevenue and order.amount >= minAmount]
-
-      revenueOver50000 = filterRevenueOrders(acceptedOrders, 50000)
-      revenueOver150000 = filterRevenueOrders(acceptedOrders, 150000)
-
-      assert [order.orderId for order in revenueOver50000] == ['A-100']
-      assert revenueOver150000 == []
-      revenueOver50000, revenueOver150000
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

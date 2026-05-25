@@ -434,13 +434,11 @@ sections:
   title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
   structuredPrimary: true
   subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-    안전하게 처리합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import re
 
@@ -460,7 +458,7 @@ sections:
     assert phones == ['010-1234-5678', '02-987-6543']
     emails, phones
   exercise:
-    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -479,114 +477,8 @@ sections:
       assert emails == ['kim@example.com', 'lee@company.co.kr']
       assert phones == ['010-1234-5678', '02-987-6543']
       emails, phones
-    solution: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-      안전하게 처리합니다.
-  - type: code
-    language: python
-    title: 이메일과 전화번호 추출
-    description: 실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다.
-    content: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
-  - type: code
-    language: python
-    title: 패턴 오류와 빈 입력을 먼저 실패시킨다
-    description: 컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다.
-    content: |-
-      try:
-          re.compile(r'([A-Z]+')
-      except re.error as exc:
-          regexCompileError = str(exc)
-
-      def extractRequiredEmails(text):
-          found = emailPattern.findall(text)
-          if not found:
-              raise ValueError('email not found')
-          return found
-
-      try:
-          extractRequiredEmails('no contact here')
-      except ValueError as exc:
-          emailExtractError = str(exc)
-
-      assert regexCompileError
-      assert emailExtractError == 'email not found'
-      regexCompileError, emailExtractError
-  - type: code
-    language: python
-    title: 정제 결과를 업무 구조로 검증
-    description: 추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다.
-    content: |-
-      def maskEmail(email):
-          name, domain = email.split('@')
-          return name[0] + '***@' + domain
-
-      contactReport = [
-          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
-          for email in emails
-      ]
-      domainCounts = {row['domain']: 0 for row in contactReport}
-      for row in contactReport:
-          domainCounts[row['domain']] += 1
-
-      assert contactReport[0]['masked'] == 'k***@example.com'
-      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
-      contactReport
-  - type: code
-    language: python
-    title: '실무 변주: 허용 도메인 정책 바꾸기'
-    description: 회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다.
-    content: |-
-      def filterAllowedDomains(report, allowedDomains):
-          if not allowedDomains:
-              raise ValueError('allowedDomains must not be empty')
-          return [row for row in report if row['domain'] in allowedDomains]
-
-      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
-      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
-      companyOnly
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

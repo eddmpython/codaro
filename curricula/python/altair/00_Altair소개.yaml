@@ -81,8 +81,7 @@ sections:
   - type: note
     style: info
     title: 선언적(Declarative) 프로그래밍이란?
-    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에, 저 데이터를 y축에 놓고, 색깔은
-      이걸로'라고 선언하면 나머지는 알아서 처리합니다.
+    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에, 저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다.
   - type: featureCards
     cards:
     - emoji: 📝
@@ -189,8 +188,7 @@ sections:
   - type: note
     style: info
     title: 시각화 문법(Grammar of Graphics)
-    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의 어떤 열을 어떤 시각 요소(위치,
-      색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.
+    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의 어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.
   - type: featureCards
     cards:
     - emoji: 📦
@@ -208,8 +206,7 @@ sections:
   - type: note
     style: tip
     title: 생각의 흐름대로 코딩
-    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을 찍어서, x는 A, y는 B, 색깔은
-      C'라고 생각하는 대로 코드를 작성하면 됩니다.
+    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을 찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다.
 - id: local_integration
   blocks:
   - type: sectionHeader
@@ -218,8 +215,7 @@ sections:
   - type: note
     style: info
     title: Altair chart selection
-    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택, 줌 등이 자동 활성화됩니다. 선택한
-      데이터를 다른 셀에서 바로 사용할 수도 있습니다.
+    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택, 줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다.
   - type: featureCards
     cards:
     - emoji: 🎯
@@ -237,8 +233,7 @@ sections:
   - type: note
     style: tip
     title: 분석과 시각화의 통합
-    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할 수 있습니다. 코드와 시각화가 하나로
-      연결됩니다.
+    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할 수 있습니다. 코드와 시각화가 하나로 연결됩니다.
 - id: data_types
   blocks:
   - type: sectionHeader
@@ -274,8 +269,7 @@ sections:
   - type: note
     style: tip
     title: 타입 지정 방법
-    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다. 숫자인데 범주로 쓰고 싶으면 :N을
-      붙이면 됩니다.
+    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다. 숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다.
 - id: interaction_intro
   blocks:
   - type: sectionHeader
@@ -304,8 +298,7 @@ sections:
   - type: note
     style: info
     title: 코드 몇 줄로 인터랙션 추가
-    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다. Codaro에서는 이마저도 자동입니다.
-      탐색적 분석에서 이 차이가 생산성을 크게 높입니다.
+    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다. Codaro에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -368,15 +361,14 @@ sections:
   title: 10단계. Altair 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '10단계. Altair 학습 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. Altair 학습 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
 
     Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
   tips:
   - Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import altair as alt
     from codaro.curriculum.localData import loadLocalDataset
@@ -389,7 +381,7 @@ sections:
     assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
     assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
   exercise:
-    prompt: '10단계. Altair 학습 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -401,93 +393,11 @@ sections:
       assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
       assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
       assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
-    solution: |-
-      import altair as alt
-      from codaro.curriculum.localData import loadLocalDataset
-
-      altairMpg = loadLocalDataset("mpg")
-      requiredColumns = {"mpg", "horsepower", "weight", "origin"}
-      missingColumns = requiredColumns - set(altairMpg.columns)
-
-      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
-      assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
-      assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
-  - type: code
-    language: python
-    title: 로컬 데이터와 분석 예측
-    description: 자동차 데이터에서 무게와 연비 관계를 확인합니다
-    content: |-
-      import altair as alt
-      from codaro.curriculum.localData import loadLocalDataset
-
-      altairMpg = loadLocalDataset("mpg")
-      requiredColumns = {"mpg", "horsepower", "weight", "origin"}
-      missingColumns = requiredColumns - set(altairMpg.columns)
-
-      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
-      assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
-      assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
-  - type: code
-    language: python
-    title: Vega-Lite spec 검증
-    description: point 차트의 mark와 encoding 필드를 확인합니다
-    content: |-
-      introChart = alt.Chart(altairMpg).mark_point().encode(
-          x="horsepower:Q",
-          y="mpg:Q",
-          color="origin:N",
-          tooltip=["origin:N", "horsepower:Q", "mpg:Q"],
-      ).properties(title="MPG by horsepower")
-      introSpec = introChart.to_dict()
-
-      assert introSpec["mark"]["type"] == "point"
-      assert introSpec["encoding"]["x"]["field"] == "horsepower"
-      assert introSpec["encoding"]["y"]["field"] == "mpg"
-      assert introSpec["encoding"]["color"]["field"] == "origin"
-      introChart
-  - type: code
-    language: python
-    title: 의도한 오류 고치기
-    description: 필수 인코딩 컬럼이 빠지면 차트 생성을 중단합니다
-    content: |-
-      def requireAltairColumns(frame, columns):
-          missing = set(columns) - set(frame.columns)
-          if missing:
-              raise ValueError(f"Altair 차트 필수 컬럼 누락: {sorted(missing)}")
-          return True
-
-      brokenMpg = altairMpg.drop(columns=["mpg"])
-      try:
-          requireAltairColumns(brokenMpg, ["horsepower", "mpg"])
-      except ValueError as exc:
-          print("검증 실패 확인:", exc)
-
-      assert requireAltairColumns(altairMpg, ["horsepower", "mpg"])
-  - type: code
-    language: python
-    title: 실무 변주 실험
-    description: 생산국별 평균 연비와 고마력 차량 수를 비교합니다
-    content: |-
-      originReport = altairMpg.groupby("origin").agg(avgMpg=("mpg", "mean"), highPowerCount=("horsepower", lambda values: int((values >= 120).sum()))).round(1)
-
-      assert originReport["avgMpg"].idxmax() == "europe"
-      assert originReport["highPowerCount"].sum() > 0
-      originReport
-  - type: tip
-    content: Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: next
   blocks:
   - type: hero

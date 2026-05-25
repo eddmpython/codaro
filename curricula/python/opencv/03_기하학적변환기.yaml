@@ -35,15 +35,14 @@ sections:
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 샘플 이미지
-  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     네트워크 상태에 영향을 받지 않도록 sklearn에 내장된 샘플 이미지를 사용합니다.
 
     sklearn 샘플 이미지는 RGB 형식입니다. OpenCV는 BGR을 사용하므로 cvtColor()로 변환합니다. flower.jpg와 china.jpg 두 개의 샘플이 있습니다.
   tips:
   - sklearn 샘플 이미지는 RGB 형식입니다. OpenCV는 BGR을 사용하므로 cvtColor()로 변환합니다. flower.jpg와 china.jpg 두 개의 샘플이 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -58,7 +57,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -72,76 +71,23 @@ sections:
       plt.title(f'Original: {frame.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      flowerArr = load_sample_image('flower.jpg')
-      frame = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(flowerArr)
-      plt.title(f'Original: {frame.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 네트워크 상태에 영향을 받지 않도록 sklearn에 내장된 샘플 이미지를 사용합니다.
-  - type: code
-    language: python
-    title: 라이브러리와 이미지 로드
-    description: sklearn에서 이미지를 불러옵니다
-    content: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      flowerArr = load_sample_image('flower.jpg')
-      frame = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(flowerArr)
-      plt.title(f'Original: {frame.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: sklearn 샘플 이미지는 RGB 형식입니다. OpenCV는 BGR을 사용하므로 cvtColor()로 변환합니다. flower.jpg와 china.jpg 두 개의 샘플이 있습니다.
-  - type: code
-    language: python
-    title: 원본 이미지 출력
-    description: BGR을 RGB로 변환하여 출력합니다
-    content: |-
-      frameRgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(frameRgb)
-      plt.title(f'Original: {frame.shape[1]}x{frame.shape[0]}')
-      plt.axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_resize
   title: 2단계. 크기 조절
   structuredPrimary: true
   subtitle: resize()
-  goal: '2단계. 크기 조절: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 크기 조절: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     resize()는 이미지 크기를 변경합니다. 크기를 바꿀 때 새로운 픽셀 값을 계산해야 하는데, 이 계산 방법을 보간법(interpolation)이라고 합니다. 이미지를 확대하면 원래 없던 픽셀을 만들어야 하고, 축소하면 여러 픽셀을 하나로 합쳐야 합니다. 보간법에 따라 처리 속도와 화질이 달라집니다.
 
     resize()의 dsize는 (너비, 높이) 순서입니다. shape은 (높이, 너비, 채널)이므로 순서가 반대입니다. 주의하세요.
   tips:
   - resize()의 dsize는 (너비, 높이) 순서입니다. shape은 (높이, 너비, 채널)이므로 순서가 반대입니다. 주의하세요.
-  - INTER_NEAREST는 빠르지만 품질이 낮습니다. INTER_LINEAR(기본값)은 속도와 품질의 균형입니다. INTER_CUBIC은 품질이 좋지만 느립니다. 축소 시에는 INTER_AREA가 권장됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     resized = cv2.resize(frame, (300, 200))
     plt.figure(figsize=(6, 4))
@@ -150,7 +96,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '2단계. 크기 조절: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       resized = cv2.resize(frame, (300, 200))
       plt.figure(figsize=(6, 4))
@@ -158,97 +104,23 @@ sections:
       plt.title(f'Resized: {resized.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      resized = cv2.resize(frame, (300, 200))
-      plt.figure(figsize=(6, 4))
-      plt.imshow(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB))
-      plt.title(f'Resized: {resized.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: resize()는 이미지 크기를 변경합니다. 크기를 바꿀 때 새로운 픽셀 값을 계산해야 하는데, 이 계산 방법을 보간법(interpolation)이라고 합니다. 이미지를 확대하면 원래 없던 픽셀을
-      만들어야 하고, 축소하면 여러 픽셀을 하나로 합쳐야 합니다. 보간법에 따라 처리 속도와 화질이 달라집니다.
-  - type: code
-    language: python
-    title: 절대 크기로 리사이즈
-    description: 300x200 크기로 변환합니다
-    content: |-
-      resized = cv2.resize(frame, (300, 200))
-      plt.figure(figsize=(6, 4))
-      plt.imshow(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB))
-      plt.title(f'Resized: {resized.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: resize()의 dsize는 (너비, 높이) 순서입니다. shape은 (높이, 너비, 채널)이므로 순서가 반대입니다. 주의하세요.
-  - type: code
-    language: python
-    title: 비율로 리사이즈
-    description: 50%로 축소합니다
-    content: |-
-      scaled = cv2.resize(frame, None, fx=0.5, fy=0.5)
-      plt.figure(figsize=(6, 4))
-      plt.imshow(cv2.cvtColor(scaled, cv2.COLOR_BGR2RGB))
-      plt.title(f'Scaled 50%: {scaled.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 보간법 비교
-    description: 확대 시 보간법 차이를 확인합니다
-    content: |-
-      small = cv2.resize(frame, (100, 80))
-      nearestUp = cv2.resize(small, (400, 320), interpolation=cv2.INTER_NEAREST)
-      linearUp = cv2.resize(small, (400, 320), interpolation=cv2.INTER_LINEAR)
-      cubicUp = cv2.resize(small, (400, 320), interpolation=cv2.INTER_CUBIC)
-      plt.figure(figsize=(6, 4))
-      plt.imshow(cv2.cvtColor(small, cv2.COLOR_BGR2RGB))
-      plt.title(f'Small: {small.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: INTER_NEAREST는 빠르지만 품질이 낮습니다. INTER_LINEAR(기본값)은 속도와 품질의 균형입니다. INTER_CUBIC은 품질이 좋지만 느립니다. 축소 시에는 INTER_AREA가
-      권장됩니다.
-  - type: code
-    language: python
-    title: 보간법 시각화
-    description: 세 방법을 비교합니다
-    content: |-
-      figInterp, axInterp = plt.subplots(1, 3, figsize=(12, 4))
-      axInterp[0].imshow(cv2.cvtColor(nearestUp, cv2.COLOR_BGR2RGB))
-      axInterp[0].set_title('INTER_NEAREST')
-      axInterp[0].axis('off')
-      axInterp[1].imshow(cv2.cvtColor(linearUp, cv2.COLOR_BGR2RGB))
-      axInterp[1].set_title('INTER_LINEAR')
-      axInterp[1].axis('off')
-      axInterp[2].imshow(cv2.cvtColor(cubicUp, cv2.COLOR_BGR2RGB))
-      axInterp[2].set_title('INTER_CUBIC')
-      axInterp[2].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_rotate
   title: 3단계. 이미지 회전
   structuredPrimary: true
   subtitle: rotate()
-  goal: '3단계. 이미지 회전: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 이미지 회전: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     cv2.rotate()는 90도 단위 회전을 수행합니다. 임의 각도 회전은 getRotationMatrix2D()와 warpAffine()을 사용합니다.
 
     cv2.rotate()는 ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE 세 가지 옵션만 제공합니다. 임의 각도 회전은 아핀 변환을 사용해야 합니다.
   tips:
   - cv2.rotate()는 ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE 세 가지 옵션만 제공합니다. 임의 각도 회전은 아핀 변환을 사용해야 합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
     plt.figure(figsize=(6, 8))
@@ -257,7 +129,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '3단계. 이미지 회전: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
       plt.figure(figsize=(6, 8))
@@ -265,91 +137,23 @@ sections:
       plt.title(f'90° CW: {rotatedCw.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 8))
-      plt.imshow(cv2.cvtColor(rotatedCw, cv2.COLOR_BGR2RGB))
-      plt.title(f'90° CW: {rotatedCw.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: cv2.rotate()는 90도 단위 회전을 수행합니다. 임의 각도 회전은 getRotationMatrix2D()와 warpAffine()을 사용합니다.
-  - type: code
-    language: python
-    title: 90도 회전
-    description: 시계 방향 90도 회전합니다
-    content: |-
-      rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 8))
-      plt.imshow(cv2.cvtColor(rotatedCw, cv2.COLOR_BGR2RGB))
-      plt.title(f'90° CW: {rotatedCw.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 180도 회전
-    description: 180도 회전합니다
-    content: |-
-      rotatedHalf = cv2.rotate(frame, cv2.ROTATE_180)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(rotatedHalf, cv2.COLOR_BGR2RGB))
-      plt.title(f'180°: {rotatedHalf.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 270도 회전
-    description: 반시계 방향 90도와 동일합니다
-    content: |-
-      rotatedCcw = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-      plt.figure(figsize=(6, 8))
-      plt.imshow(cv2.cvtColor(rotatedCcw, cv2.COLOR_BGR2RGB))
-      plt.title(f'270° (90° CCW): {rotatedCcw.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: cv2.rotate()는 ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE 세 가지 옵션만 제공합니다. 임의 각도 회전은 아핀 변환을 사용해야
-      합니다.
-  - type: code
-    language: python
-    title: 회전 결과 비교
-    description: 세 회전을 나란히 표시합니다
-    content: |-
-      figRotate, axRotate = plt.subplots(1, 3, figsize=(12, 4))
-      axRotate[0].imshow(cv2.cvtColor(rotatedCw, cv2.COLOR_BGR2RGB))
-      axRotate[0].set_title('90° CW')
-      axRotate[0].axis('off')
-      axRotate[1].imshow(cv2.cvtColor(rotatedHalf, cv2.COLOR_BGR2RGB))
-      axRotate[1].set_title('180°')
-      axRotate[1].axis('off')
-      axRotate[2].imshow(cv2.cvtColor(rotatedCcw, cv2.COLOR_BGR2RGB))
-      axRotate[2].set_title('270° (90° CCW)')
-      axRotate[2].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_flip
   title: 4단계. 이미지 뒤집기
   structuredPrimary: true
   subtitle: flip()
-  goal: '4단계. 이미지 뒤집기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 이미지 뒤집기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     flip()은 이미지를 거울처럼 뒤집는 함수입니다. 수평 뒤집기(좌우 반전)는 셀카를 거울처럼 보이게 할 때, 수직 뒤집기(상하 반전)는 물에 비친 반사 효과를 만들 때 사용합니다. flipCode 파라미터로 방향을 지정합니다.
 
     flipCode가 1이면 수평(좌우), 0이면 수직(상하), -1이면 양방향 뒤집기입니다. 양방향 뒤집기는 180도 회전과 동일한 결과입니다.
   tips:
   - flipCode가 1이면 수평(좌우), 0이면 수직(상하), -1이면 양방향 뒤집기입니다. 양방향 뒤집기는 180도 회전과 동일한 결과입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     flippedH = cv2.flip(frame, 1)
     plt.figure(figsize=(8, 6))
@@ -358,7 +162,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '4단계. 이미지 뒤집기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       flippedH = cv2.flip(frame, 1)
       plt.figure(figsize=(8, 6))
@@ -366,91 +170,23 @@ sections:
       plt.title('Horizontal Flip')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      flippedH = cv2.flip(frame, 1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(flippedH, cv2.COLOR_BGR2RGB))
-      plt.title('Horizontal Flip')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: flip()은 이미지를 거울처럼 뒤집는 함수입니다. 수평 뒤집기(좌우 반전)는 셀카를 거울처럼 보이게 할 때, 수직 뒤집기(상하 반전)는 물에 비친 반사 효과를 만들 때 사용합니다. flipCode
-      파라미터로 방향을 지정합니다.
-  - type: code
-    language: python
-    title: 수평 뒤집기
-    description: 좌우를 뒤집습니다
-    content: |-
-      flippedH = cv2.flip(frame, 1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(flippedH, cv2.COLOR_BGR2RGB))
-      plt.title('Horizontal Flip')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 수직 뒤집기
-    description: 상하를 뒤집습니다
-    content: |-
-      flippedV = cv2.flip(frame, 0)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(flippedV, cv2.COLOR_BGR2RGB))
-      plt.title('Vertical Flip')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 양방향 뒤집기
-    description: 상하좌우 모두 뒤집습니다
-    content: |-
-      flippedBoth = cv2.flip(frame, -1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(flippedBoth, cv2.COLOR_BGR2RGB))
-      plt.title('Both Flip')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: flipCode가 1이면 수평(좌우), 0이면 수직(상하), -1이면 양방향 뒤집기입니다. 양방향 뒤집기는 180도 회전과 동일한 결과입니다.
-  - type: code
-    language: python
-    title: 뒤집기 결과 비교
-    description: 세 뒤집기를 나란히 표시합니다
-    content: |-
-      figFlip, axFlip = plt.subplots(1, 3, figsize=(12, 4))
-      axFlip[0].imshow(cv2.cvtColor(flippedH, cv2.COLOR_BGR2RGB))
-      axFlip[0].set_title('Horizontal Flip')
-      axFlip[0].axis('off')
-      axFlip[1].imshow(cv2.cvtColor(flippedV, cv2.COLOR_BGR2RGB))
-      axFlip[1].set_title('Vertical Flip')
-      axFlip[1].axis('off')
-      axFlip[2].imshow(cv2.cvtColor(flippedBoth, cv2.COLOR_BGR2RGB))
-      axFlip[2].set_title('Both')
-      axFlip[2].axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_crop
   title: 5단계. 이미지 자르기
   structuredPrimary: true
   subtitle: 배열 슬라이싱
-  goal: '5단계. 이미지 자르기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 이미지 자르기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     OpenCV에서 자르기는 NumPy 슬라이싱으로 수행합니다. img[y1:y2, x1:x2]로 사각형 영역을 추출합니다. y(행)가 먼저, x(열)가 나중입니다.
 
     슬라이싱은 뷰를 반환합니다. 원본을 수정하지 않으려면 .copy()를 사용하세요. cropped = frame[y1:y2, x1:x2].copy()
   tips:
   - 슬라이싱은 뷰를 반환합니다. 원본을 수정하지 않으려면 .copy()를 사용하세요. cropped = frame[y1:y2, x1:x2].copy()
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     h, w = frame.shape[:2]
     y1, y2 = h // 4, h * 3 // 4
@@ -462,7 +198,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '5단계. 이미지 자르기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       h, w = frame.shape[:2]
       y1, y2 = h // 4, h * 3 // 4
@@ -473,65 +209,20 @@ sections:
       plt.title(f'Cropped: {cropped.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      h, w = frame.shape[:2]
-      y1, y2 = h // 4, h * 3 // 4
-      x1, x2 = w // 4, w * 3 // 4
-      cropped = frame[y1:y2, x1:x2]
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-      plt.title(f'Cropped: {cropped.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: OpenCV에서 자르기는 NumPy 슬라이싱으로 수행합니다. img[y1:y2, x1:x2]로 사각형 영역을 추출합니다. y(행)가 먼저, x(열)가 나중입니다.
-  - type: code
-    language: python
-    title: 중앙 영역 자르기
-    description: 이미지 중앙 50% 영역을 추출합니다
-    content: |-
-      h, w = frame.shape[:2]
-      y1, y2 = h // 4, h * 3 // 4
-      x1, x2 = w // 4, w * 3 // 4
-      cropped = frame[y1:y2, x1:x2]
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-      plt.title(f'Cropped: {cropped.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 자른 영역 확인
-    description: 추출된 영역을 출력합니다
-    content: |-
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-      plt.title(f'Cropped: {cropped.shape[1]}x{cropped.shape[0]}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: tip
-    content: 슬라이싱은 뷰를 반환합니다. 원본을 수정하지 않으려면 .copy()를 사용하세요. cropped = frame[y1:y2, x1:x2].copy()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_combine
   title: 6단계. 변환 조합
   structuredPrimary: true
   subtitle: 여러 변환 연결
-  goal: '6단계. 변환 조합: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 변환 조합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 여러 기하학적 변환을 순차적으로 적용할 수 있습니다. 자르기 → 리사이즈 → 회전 순서로 적용해봅시다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     step1 = frame[50:350, 100:400]
     step2 = cv2.resize(step1, (200, 200))
@@ -542,7 +233,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '6단계. 변환 조합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       step1 = frame[50:350, 100:400]
       step2 = cv2.resize(step1, (200, 200))
@@ -552,64 +243,23 @@ sections:
       plt.title(f'Final: {final.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      step1 = frame[50:350, 100:400]
-      step2 = cv2.resize(step1, (200, 200))
-      final = cv2.rotate(step2, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 6))
-      plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      plt.title(f'Final: {final.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 여러 기하학적 변환을 순차적으로 적용할 수 있습니다. 자르기 → 리사이즈 → 회전 순서로 적용해봅시다.
-  - type: code
-    language: python
-    title: 변환 조합
-    description: 자르기 + 리사이즈 + 회전을 적용합니다
-    content: |-
-      step1 = frame[50:350, 100:400]
-      step2 = cv2.resize(step1, (200, 200))
-      final = cv2.rotate(step2, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 6))
-      plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      plt.title(f'Final: {final.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-  - type: code
-    language: python
-    title: 최종 결과
-    description: 모든 변환이 적용된 이미지입니다
-    content: |-
-      plt.figure(figsize=(6, 6))
-      plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      plt.title('Crop + Resize + Rotate')
-      plt.axis('off')
-      plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 기하 변환 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     sklearn 이미지에 다양한 기하학적 변환을 적용해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -624,7 +274,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -638,121 +288,20 @@ sections:
       plt.title(f'Flower: {flower.shape}')
       plt.axis('off')
       plt.tight_layout()
-    solution: |-
-      import cv2
-      import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
-
-      flower = load_sample_image('flower.jpg')
-      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(flower)
-      plt.title(f'Flower: {flower.shape}')
-      plt.axis('off')
-      plt.tight_layout()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: sklearn 이미지에 다양한 기하학적 변환을 적용해봅시다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: flower 크기 조절과 뒤집기'
-    blocks:
-    - type: code
-      title: 이미지 로드
-      content: |-
-        import cv2
-        import numpy as np
-        from sklearn.datasets import load_sample_image
-        import matplotlib.pyplot as plt
-
-        flower = load_sample_image('flower.jpg')
-        flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-        plt.figure(figsize=(8, 6))
-        plt.imshow(flower)
-        plt.title(f'Flower: {flower.shape}')
-        plt.axis('off')
-        plt.tight_layout()
-    - type: code
-      title: 리사이즈
-      content: |-
-        flowerSmall = cv2.resize(flowerBgr, (320, 213))
-        plt.figure(figsize=(6, 4))
-        plt.imshow(cv2.cvtColor(flowerSmall, cv2.COLOR_BGR2RGB))
-        plt.title(f'Small: {flowerSmall.shape}')
-        plt.axis('off')
-        plt.tight_layout()
-    - type: code
-      title: 뒤집기 및 출력
-      content: |-
-        flowerFlip = cv2.flip(flowerSmall, 1)
-        figFlower, axFlower = plt.subplots(1, 2, figsize=(10, 4))
-        axFlower[0].imshow(cv2.cvtColor(flowerSmall, cv2.COLOR_BGR2RGB))
-        axFlower[0].set_title('Resized')
-        axFlower[0].axis('off')
-        axFlower[1].imshow(cv2.cvtColor(flowerFlip, cv2.COLOR_BGR2RGB))
-        axFlower[1].set_title('Flipped')
-        axFlower[1].axis('off')
-        plt.tight_layout()
-  - type: expansion
-    title: '미션2: china 자르기와 회전 조합'
-    blocks:
-    - type: code
-      title: 이미지 로드
-      content: |-
-        import cv2
-        import numpy as np
-        from sklearn.datasets import load_sample_image
-        import matplotlib.pyplot as plt
-
-        china = load_sample_image('china.jpg')
-        chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
-        plt.figure(figsize=(10, 6))
-        plt.imshow(china)
-        plt.title(f'China: {china.shape}')
-        plt.axis('off')
-        plt.tight_layout()
-    - type: code
-      title: 중앙 자르기
-      content: |-
-        ch, cw = chinaBgr.shape[:2]
-        chinaCrop = chinaBgr[ch//4:ch*3//4, cw//4:cw*3//4]
-        plt.figure(figsize=(8, 6))
-        plt.imshow(cv2.cvtColor(chinaCrop, cv2.COLOR_BGR2RGB))
-        plt.title(f'Cropped: {chinaCrop.shape}')
-        plt.axis('off')
-        plt.tight_layout()
-    - type: code
-      title: 회전 및 출력
-      content: |-
-        chinaRot = cv2.rotate(chinaCrop, cv2.ROTATE_90_CLOCKWISE)
-        chinaFinal = cv2.resize(chinaRot, (300, 400))
-        plt.figure(figsize=(6, 8))
-        plt.imshow(cv2.cvtColor(chinaFinal, cv2.COLOR_BGR2RGB))
-        plt.title('Crop + Rotate + Resize')
-        plt.axis('off')
-        plt.tight_layout()
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 7단계. 기하 변환 검증 루프
   structuredPrimary: true
   subtitle: 크기, 회전, crop 계약 확인
-  goal: '7단계. 기하 변환 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 기하 변환 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 기하학적 변환은 화면에 맞춰 보정하는 작업이지만, 실무에서는 출력 크기와 관심 영역이 정확한지가 더 중요합니다. 스케일 오류를 먼저 잡고 resize, rotate, crop 결과를 수치로 검증합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -768,7 +317,7 @@ sections:
     resizedGeo = resizeByScale(geoImage, 0.5)
     resizedGeo.shape
   exercise:
-    prompt: '7단계. 기하 변환 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -783,86 +332,8 @@ sections:
 
       resizedGeo = resizeByScale(geoImage, 0.5)
       resizedGeo.shape
-    solution: |-
-      import cv2
-      import numpy as np
-
-      geoImage = np.zeros((80, 120, 3), dtype=np.uint8)
-      cv2.rectangle(geoImage, (30, 20), (90, 60), (0, 255, 0), -1)
-
-      def resizeByScale(image, scale):
-          if scale <= 0:
-              raise ValueError(f"scale은 양수여야 합니다: {scale}")
-          return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-
-      resizedGeo = resizeByScale(geoImage, 0.5)
-      resizedGeo.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 기하학적 변환은 화면에 맞춰 보정하는 작업이지만, 실무에서는 출력 크기와 관심 영역이 정확한지가 더 중요합니다. 스케일 오류를 먼저 잡고 resize, rotate, crop 결과를 수치로 검증합니다.
-  - type: code
-    language: python
-    title: 기준 이미지와 변환 함수
-    description: 중앙 사각형이 있는 이미지를 만들고 스케일 입력을 검증합니다.
-    content: |-
-      import cv2
-      import numpy as np
-
-      geoImage = np.zeros((80, 120, 3), dtype=np.uint8)
-      cv2.rectangle(geoImage, (30, 20), (90, 60), (0, 255, 0), -1)
-
-      def resizeByScale(image, scale):
-          if scale <= 0:
-              raise ValueError(f"scale은 양수여야 합니다: {scale}")
-          return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-
-      resizedGeo = resizeByScale(geoImage, 0.5)
-      resizedGeo.shape
-  - type: code
-    language: python
-    title: 잘못된 스케일 확인
-    description: 0 이하 스케일을 넣어 오류를 확인합니다.
-    content: |-
-      try:
-          resizeByScale(geoImage, 0)
-      except ValueError as exc:
-          scaleErrorMessage = str(exc)
-
-      scaleErrorMessage
-  - type: code
-    language: python
-    title: 회전과 crop 검증
-    description: 변환 후 shape와 관심 영역 픽셀을 확인합니다.
-    content: |-
-      h, w = geoImage.shape[:2]
-      rotationMatrix = cv2.getRotationMatrix2D((w / 2, h / 2), 90, 1.0)
-      rotatedGeo = cv2.warpAffine(geoImage, rotationMatrix, (w, h))
-      cropGeo = geoImage[20:60, 30:90]
-      geoChecks = {
-          "resizeShapeOk": resizedGeo.shape == (40, 60, 3),
-          "rotateShapeOk": rotatedGeo.shape == geoImage.shape,
-          "cropShapeOk": cropGeo.shape == (40, 60, 3),
-          "cropHasObject": int(np.count_nonzero(cropGeo[:, :, 1])) > 2000,
-          "errorOk": scaleErrorMessage == "scale은 양수여야 합니다: 0",
-      }
-
-      assert all(geoChecks.values()), geoChecks
-      geoChecks
-  - type: code
-    language: python
-    title: 실무 변주
-    description: 다른 배율을 적용해 결과 크기가 예측대로 바뀌는지 확인합니다.
-    content: |-
-      doubleGeo = resizeByScale(geoImage, 2.0)
-      assert doubleGeo.shape == (160, 240, 3)
-      resizedGeo.shape, doubleGeo.shape
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

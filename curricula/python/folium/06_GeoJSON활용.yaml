@@ -31,48 +31,32 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import folium
-    solution: import folium
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: folium과 Codaro를 불러옵니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: folium과 Codaro 불러오기
-    content: import folium
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_geojson_structure
   title: 2단계. GeoJSON 구조
   structuredPrimary: true
   subtitle: 기본 형식
-  goal: '2단계. GeoJSON 구조: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. GeoJSON 구조: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     GeoJSON은 type, geometry, properties로 구성됩니다. geometry에 좌표 정보가 있고, properties에 속성 정보가 있습니다.
 
     주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다.
   tips:
   - '주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다.'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     pointGeo = {
         "type": "Feature",
@@ -86,7 +70,7 @@ sections:
     }
     pointGeo
   exercise:
-    prompt: '2단계. GeoJSON 구조: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pointGeo = {
           "type": "Feature",
@@ -99,62 +83,23 @@ sections:
           }
       }
       pointGeo
-    solution: |-
-      pointGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "Point",
-              "coordinates": [126.9780, 37.5665]
-          },
-          "properties": {
-              "name": "서울시청"
-          }
-      }
-      pointGeo
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GeoJSON은 type, geometry, properties로 구성됩니다. geometry에 좌표 정보가 있고, properties에 속성 정보가 있습니다.
-  - type: code
-    language: python
-    title: GeoJSON 기본 구조
-    description: 점 데이터
-    content: |-
-      pointGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "Point",
-              "coordinates": [126.9780, 37.5665]
-          },
-          "properties": {
-              "name": "서울시청"
-          }
-      }
-      pointGeo
-  - type: tip
-    content: '주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다.'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_polygon_geojson
   title: 3단계. 폴리곤 GeoJSON
   structuredPrimary: true
   subtitle: 영역 데이터
-  goal: '3단계. 폴리곤 GeoJSON: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 폴리곤 GeoJSON: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Polygon 타입으로 영역을 표현합니다. 좌표 리스트의 리스트 형태이고, 시작점과 끝점이 같아야 합니다.
 
     Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
   tips:
   - Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -180,7 +125,7 @@ sections:
 
     m1
   exercise:
-    prompt: '3단계. 폴리곤 GeoJSON: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -205,86 +150,23 @@ sections:
       folium.GeoJson(areaGeo).add_to(m1)
 
       m1
-    solution: |-
-      seoulCenter = [37.5665, 126.9780]
-      m1 = folium.Map(location=seoulCenter, zoom_start=14)
-
-      areaGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "Polygon",
-              "coordinates": [[
-                  [126.9730, 37.5630],
-                  [126.9830, 37.5630],
-                  [126.9830, 37.5700],
-                  [126.9730, 37.5700],
-                  [126.9730, 37.5630]
-              ]]
-          },
-          "properties": {
-              "name": "시청 주변"
-          }
-      }
-
-      folium.GeoJson(areaGeo).add_to(m1)
-
-      m1
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Polygon 타입으로 영역을 표현합니다. 좌표 리스트의 리스트 형태이고, 시작점과 끝점이 같아야 합니다.
-  - type: code
-    language: python
-    title: 사각형 영역
-    description: Polygon 타입
-    content: |-
-      seoulCenter = [37.5665, 126.9780]
-      m1 = folium.Map(location=seoulCenter, zoom_start=14)
-
-      areaGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "Polygon",
-              "coordinates": [[
-                  [126.9730, 37.5630],
-                  [126.9830, 37.5630],
-                  [126.9830, 37.5700],
-                  [126.9730, 37.5700],
-                  [126.9730, 37.5630]
-              ]]
-          },
-          "properties": {
-              "name": "시청 주변"
-          }
-      }
-
-      folium.GeoJson(areaGeo).add_to(m1)
-
-      m1
-  - type: tip
-    content: Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_feature_collection
   title: 4단계. FeatureCollection
   structuredPrimary: true
   subtitle: 여러 도형 묶기
-  goal: '4단계. FeatureCollection: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. FeatureCollection: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     FeatureCollection으로 여러 Feature를 하나로 묶습니다. 대부분의 GeoJSON 파일은 이 형태입니다.
 
     properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
   tips:
   - properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -340,7 +222,7 @@ sections:
 
     m2
   exercise:
-    prompt: '4단계. FeatureCollection: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -395,146 +277,23 @@ sections:
       folium.GeoJson(areasGeo).add_to(m2)
 
       m2
-    solution: |-
-      m2 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      areasGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9730, 37.5630],
-                          [126.9780, 37.5630],
-                          [126.9780, 37.5680],
-                          [126.9730, 37.5680],
-                          [126.9730, 37.5630]
-                      ]]
-                  },
-                  "properties": {"name": "A구역", "value": 100}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9780, 37.5630],
-                          [126.9830, 37.5630],
-                          [126.9830, 37.5680],
-                          [126.9780, 37.5680],
-                          [126.9780, 37.5630]
-                      ]]
-                  },
-                  "properties": {"name": "B구역", "value": 80}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9730, 37.5680],
-                          [126.9780, 37.5680],
-                          [126.9780, 37.5730],
-                          [126.9730, 37.5730],
-                          [126.9730, 37.5680]
-                      ]]
-                  },
-                  "properties": {"name": "C구역", "value": 60}
-              }
-          ]
-      }
-
-      folium.GeoJson(areasGeo).add_to(m2)
-
-      m2
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: FeatureCollection으로 여러 Feature를 하나로 묶습니다. 대부분의 GeoJSON 파일은 이 형태입니다.
-  - type: code
-    language: python
-    title: 여러 영역
-    description: FeatureCollection
-    content: |-
-      m2 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      areasGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9730, 37.5630],
-                          [126.9780, 37.5630],
-                          [126.9780, 37.5680],
-                          [126.9730, 37.5680],
-                          [126.9730, 37.5630]
-                      ]]
-                  },
-                  "properties": {"name": "A구역", "value": 100}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9780, 37.5630],
-                          [126.9830, 37.5630],
-                          [126.9830, 37.5680],
-                          [126.9780, 37.5680],
-                          [126.9780, 37.5630]
-                      ]]
-                  },
-                  "properties": {"name": "B구역", "value": 80}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.9730, 37.5680],
-                          [126.9780, 37.5680],
-                          [126.9780, 37.5730],
-                          [126.9730, 37.5730],
-                          [126.9730, 37.5680]
-                      ]]
-                  },
-                  "properties": {"name": "C구역", "value": 60}
-              }
-          ]
-      }
-
-      folium.GeoJson(areasGeo).add_to(m2)
-
-      m2
-  - type: tip
-    content: properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_style_function
   title: 5단계. 스타일 함수
   structuredPrimary: true
   subtitle: style_function
-  goal: '5단계. 스타일 함수: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 스타일 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     style_function으로 GeoJSON 요소의 스타일을 지정합니다. 함수는 feature를 받아 스타일 딕셔너리를 반환합니다.
 
     feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
   tips:
   - feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -553,7 +312,7 @@ sections:
 
     m3
   exercise:
-    prompt: '5단계. 스타일 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -571,100 +330,23 @@ sections:
       ).add_to(m3)
 
       m3
-    solution: |-
-      m3 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      def styleFunc(feature):
-          return {
-              "fillColor": "green",
-              "color": "darkgreen",
-              "weight": 2,
-              "fillOpacity": 0.4
-          }
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=styleFunc
-      ).add_to(m3)
-
-      m3
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: style_function으로 GeoJSON 요소의 스타일을 지정합니다. 함수는 feature를 받아 스타일 딕셔너리를 반환합니다.
-  - type: code
-    language: python
-    title: 기본 스타일
-    description: 색상 지정
-    content: |-
-      m3 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      def styleFunc(feature):
-          return {
-              "fillColor": "green",
-              "color": "darkgreen",
-              "weight": 2,
-              "fillOpacity": 0.4
-          }
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=styleFunc
-      ).add_to(m3)
-
-      m3
-  - type: code
-    language: python
-    title: 조건부 스타일
-    description: 속성에 따라 다른 색상
-    content: |-
-      m4 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      def conditionalStyle(feature):
-          value = feature["properties"]["value"]
-          if value >= 90:
-              color = "red"
-          elif value >= 70:
-              color = "orange"
-          else:
-              color = "green"
-          return {
-              "fillColor": color,
-              "color": "black",
-              "weight": 1,
-              "fillOpacity": 0.5
-          }
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=conditionalStyle
-      ).add_to(m4)
-
-      m4
-  - type: tip
-    content: feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_popup_tooltip
   title: 6단계. 팝업과 툴팁
   structuredPrimary: true
   subtitle: GeoJsonPopup, GeoJsonTooltip
-  goal: '6단계. 팝업과 툴팁: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 팝업과 툴팁: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     GeoJsonPopup과 GeoJsonTooltip으로 클릭/호버 시 정보를 표시합니다. fields에 표시할 속성을 지정합니다.
 
     aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
   tips:
   - aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -676,7 +358,7 @@ sections:
 
     m5
   exercise:
-    prompt: '6단계. 팝업과 툴팁: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -687,75 +369,23 @@ sections:
       ).add_to(m5)
 
       m5
-    solution: |-
-      m5 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=lambda x: {"fillColor": "blue", "fillOpacity": 0.3},
-          popup=folium.GeoJsonPopup(fields=["name", "value"])
-      ).add_to(m5)
-
-      m5
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GeoJsonPopup과 GeoJsonTooltip으로 클릭/호버 시 정보를 표시합니다. fields에 표시할 속성을 지정합니다.
-  - type: code
-    language: python
-    title: 팝업 추가
-    description: GeoJsonPopup
-    content: |-
-      m5 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=lambda x: {"fillColor": "blue", "fillOpacity": 0.3},
-          popup=folium.GeoJsonPopup(fields=["name", "value"])
-      ).add_to(m5)
-
-      m5
-  - type: code
-    language: python
-    title: 툴팁 추가
-    description: GeoJsonTooltip
-    content: |-
-      m6 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=lambda x: {"fillColor": "purple", "fillOpacity": 0.3},
-          tooltip=folium.GeoJsonTooltip(
-              fields=["name", "value"],
-              aliases=["구역명:", "수치:"]
-          )
-      ).add_to(m6)
-
-      m6
-  - type: tip
-    content: aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_highlight
   title: 7단계. 하이라이트 효과
   structuredPrimary: true
   subtitle: highlight_function
-  goal: '7단계. 하이라이트 효과: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 하이라이트 효과: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     highlight_function으로 마우스 호버 시 스타일을 변경합니다.
 
     하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
   tips:
   - 하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -784,7 +414,7 @@ sections:
 
     m7
   exercise:
-    prompt: '7단계. 하이라이트 효과: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -812,92 +442,23 @@ sections:
       ).add_to(m7)
 
       m7
-    solution: |-
-      m7 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      def normalStyle(feature):
-          return {
-              "fillColor": "blue",
-              "color": "black",
-              "weight": 1,
-              "fillOpacity": 0.3
-          }
-
-      def highlightStyle(feature):
-          return {
-              "fillColor": "yellow",
-              "color": "black",
-              "weight": 3,
-              "fillOpacity": 0.7
-          }
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=normalStyle,
-          highlight_function=highlightStyle,
-          tooltip=folium.GeoJsonTooltip(fields=["name"])
-      ).add_to(m7)
-
-      m7
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: highlight_function으로 마우스 호버 시 스타일을 변경합니다.
-  - type: code
-    language: python
-    title: 호버 하이라이트
-    description: 마우스 올리면 강조
-    content: |-
-      m7 = folium.Map(location=seoulCenter, zoom_start=13)
-
-      def normalStyle(feature):
-          return {
-              "fillColor": "blue",
-              "color": "black",
-              "weight": 1,
-              "fillOpacity": 0.3
-          }
-
-      def highlightStyle(feature):
-          return {
-              "fillColor": "yellow",
-              "color": "black",
-              "weight": 3,
-              "fillOpacity": 0.7
-          }
-
-      folium.GeoJson(
-          areasGeo,
-          style_function=normalStyle,
-          highlight_function=highlightStyle,
-          tooltip=folium.GeoJsonTooltip(fields=["name"])
-      ).add_to(m7)
-
-      m7
-  - type: tip
-    content: 하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_line_geojson
   title: 8단계. 라인 GeoJSON
   structuredPrimary: true
   subtitle: LineString
-  goal: '8단계. 라인 GeoJSON: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 라인 GeoJSON: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     LineString 타입으로 선(경로, 도로)을 표현합니다.
 
     LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
   tips:
   - LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
 
@@ -930,7 +491,7 @@ sections:
 
     m8
   exercise:
-    prompt: '8단계. 라인 GeoJSON: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
 
@@ -962,100 +523,23 @@ sections:
       ).add_to(m8)
 
       m8
-    solution: |-
-      m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
-
-      routeGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "LineString",
-              "coordinates": [
-                  [126.9200, 37.5283],
-                  [126.9300, 37.5300],
-                  [126.9400, 37.5350],
-                  [126.9500, 37.5400]
-              ]
-          },
-          "properties": {
-              "name": "한강 산책로",
-              "distance": "3km"
-          }
-      }
-
-      folium.GeoJson(
-          routeGeo,
-          style_function=lambda x: {
-              "color": "blue",
-              "weight": 5,
-              "opacity": 0.8
-          },
-          tooltip=folium.GeoJsonTooltip(fields=["name", "distance"])
-      ).add_to(m8)
-
-      m8
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: LineString 타입으로 선(경로, 도로)을 표현합니다.
-  - type: code
-    language: python
-    title: 경로 데이터
-    description: LineString
-    content: |-
-      m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
-
-      routeGeo = {
-          "type": "Feature",
-          "geometry": {
-              "type": "LineString",
-              "coordinates": [
-                  [126.9200, 37.5283],
-                  [126.9300, 37.5300],
-                  [126.9400, 37.5350],
-                  [126.9500, 37.5400]
-              ]
-          },
-          "properties": {
-              "name": "한강 산책로",
-              "distance": "3km"
-          }
-      }
-
-      folium.GeoJson(
-          routeGeo,
-          style_function=lambda x: {
-              "color": "blue",
-              "weight": 5,
-              "opacity": 0.8
-          },
-          tooltip=folium.GeoJsonTooltip(fields=["name", "distance"])
-      ).add_to(m8)
-
-      m8
-  - type: tip
-    content: LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_seoul_gu
   title: 9단계. 서울 구 경계 예제
   structuredPrimary: true
   subtitle: 행정구역
-  goal: '9단계. 서울 구 경계 예제: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 서울 구 경계 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     서울의 구 경계를 간단한 GeoJSON으로 표현합니다.
 
     실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
   tips:
   - 실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
 
@@ -1127,7 +611,7 @@ sections:
 
     m9
   exercise:
-    prompt: '9단계. 서울 구 경계 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
 
@@ -1198,175 +682,20 @@ sections:
       ).add_to(m9)
 
       m9
-    solution: |-
-      m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
-
-      seoulGu = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.58],
-                          [127.00, 37.58],
-                          [127.00, 37.61],
-                          [126.96, 37.61],
-                          [126.96, 37.58]
-                      ]]
-                  },
-                  "properties": {"name": "종로구", "population": 150000}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.55],
-                          [127.00, 37.55],
-                          [127.00, 37.58],
-                          [126.96, 37.58],
-                          [126.96, 37.55]
-                      ]]
-                  },
-                  "properties": {"name": "중구", "population": 130000}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.52],
-                          [127.00, 37.52],
-                          [127.00, 37.55],
-                          [126.96, 37.55],
-                          [126.96, 37.52]
-                      ]]
-                  },
-                  "properties": {"name": "용산구", "population": 230000}
-              }
-          ]
-      }
-
-      def popStyle(feature):
-          pop = feature["properties"]["population"]
-          if pop >= 200000:
-              return {"fillColor": "red", "fillOpacity": 0.5, "color": "black", "weight": 2}
-          elif pop >= 150000:
-              return {"fillColor": "orange", "fillOpacity": 0.5, "color": "black", "weight": 2}
-          else:
-              return {"fillColor": "green", "fillOpacity": 0.5, "color": "black", "weight": 2}
-
-      folium.GeoJson(
-          seoulGu,
-          style_function=popStyle,
-          tooltip=folium.GeoJsonTooltip(
-              fields=["name", "population"],
-              aliases=["구:", "인구:"]
-          )
-      ).add_to(m9)
-
-      m9
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 서울의 구 경계를 간단한 GeoJSON으로 표현합니다.
-  - type: code
-    language: python
-    title: 서울 3개 구
-    description: 종로, 중구, 용산
-    content: |-
-      m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
-
-      seoulGu = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.58],
-                          [127.00, 37.58],
-                          [127.00, 37.61],
-                          [126.96, 37.61],
-                          [126.96, 37.58]
-                      ]]
-                  },
-                  "properties": {"name": "종로구", "population": 150000}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.55],
-                          [127.00, 37.55],
-                          [127.00, 37.58],
-                          [126.96, 37.58],
-                          [126.96, 37.55]
-                      ]]
-                  },
-                  "properties": {"name": "중구", "population": 130000}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.96, 37.52],
-                          [127.00, 37.52],
-                          [127.00, 37.55],
-                          [126.96, 37.55],
-                          [126.96, 37.52]
-                      ]]
-                  },
-                  "properties": {"name": "용산구", "population": 230000}
-              }
-          ]
-      }
-
-      def popStyle(feature):
-          pop = feature["properties"]["population"]
-          if pop >= 200000:
-              return {"fillColor": "red", "fillOpacity": 0.5, "color": "black", "weight": 2}
-          elif pop >= 150000:
-              return {"fillColor": "orange", "fillOpacity": 0.5, "color": "black", "weight": 2}
-          else:
-              return {"fillColor": "green", "fillOpacity": 0.5, "color": "black", "weight": 2}
-
-      folium.GeoJson(
-          seoulGu,
-          style_function=popStyle,
-          tooltip=folium.GeoJsonTooltip(
-              fields=["name", "population"],
-              aliases=["구:", "인구:"]
-          )
-      ).add_to(m9)
-
-      m9
-  - type: tip
-    content: 실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 구역별 정보 지도
-  goal: '10단계. 완성 예제: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 완성 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: GeoJSON으로 구역을 표시하고 스타일, 팝업, 하이라이트를 모두 적용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
 
@@ -1458,7 +787,7 @@ sections:
 
     zoneMap
   exercise:
-    prompt: '10단계. 완성 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
 
@@ -1549,216 +878,23 @@ sections:
       ).add_to(zoneMap)
 
       zoneMap
-    solution: |-
-      zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
-
-      zonesGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.560],
-                          [126.980, 37.560],
-                          [126.980, 37.570],
-                          [126.970, 37.570],
-                          [126.970, 37.560]
-                      ]]
-                  },
-                  "properties": {"name": "상업지구", "type": "commercial", "score": 85}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.980, 37.560],
-                          [126.990, 37.560],
-                          [126.990, 37.570],
-                          [126.980, 37.570],
-                          [126.980, 37.560]
-                      ]]
-                  },
-                  "properties": {"name": "주거지구", "type": "residential", "score": 72}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.570],
-                          [126.980, 37.570],
-                          [126.980, 37.580],
-                          [126.970, 37.580],
-                          [126.970, 37.570]
-                      ]]
-                  },
-                  "properties": {"name": "녹지지구", "type": "green", "score": 90}
-              }
-          ]
-      }
-
-      colorMap = {
-          "commercial": "#e74c3c",
-          "residential": "#3498db",
-          "green": "#2ecc71"
-      }
-
-      def zoneStyle(feature):
-          zoneType = feature["properties"]["type"]
-          return {
-              "fillColor": colorMap.get(zoneType, "gray"),
-              "color": "white",
-              "weight": 2,
-              "fillOpacity": 0.5
-          }
-
-      def zoneHighlight(feature):
-          return {
-              "fillColor": "yellow",
-              "color": "black",
-              "weight": 3,
-              "fillOpacity": 0.8
-          }
-
-      folium.GeoJson(
-          zonesGeo,
-          style_function=zoneStyle,
-          highlight_function=zoneHighlight,
-          tooltip=folium.GeoJsonTooltip(
-              fields=["name", "type", "score"],
-              aliases=["구역:", "용도:", "점수:"],
-              style="font-size: 12px;"
-          ),
-          popup=folium.GeoJsonPopup(
-              fields=["name", "score"],
-              aliases=["구역명:", "평가점수:"]
-          )
-      ).add_to(zoneMap)
-
-      zoneMap
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GeoJSON으로 구역을 표시하고 스타일, 팝업, 하이라이트를 모두 적용합니다.
-  - type: code
-    language: python
-    title: 완성 예제
-    description: 종합 GeoJSON 지도
-    content: |-
-      zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
-
-      zonesGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.560],
-                          [126.980, 37.560],
-                          [126.980, 37.570],
-                          [126.970, 37.570],
-                          [126.970, 37.560]
-                      ]]
-                  },
-                  "properties": {"name": "상업지구", "type": "commercial", "score": 85}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.980, 37.560],
-                          [126.990, 37.560],
-                          [126.990, 37.570],
-                          [126.980, 37.570],
-                          [126.980, 37.560]
-                      ]]
-                  },
-                  "properties": {"name": "주거지구", "type": "residential", "score": 72}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.570],
-                          [126.980, 37.570],
-                          [126.980, 37.580],
-                          [126.970, 37.580],
-                          [126.970, 37.570]
-                      ]]
-                  },
-                  "properties": {"name": "녹지지구", "type": "green", "score": 90}
-              }
-          ]
-      }
-
-      colorMap = {
-          "commercial": "#e74c3c",
-          "residential": "#3498db",
-          "green": "#2ecc71"
-      }
-
-      def zoneStyle(feature):
-          zoneType = feature["properties"]["type"]
-          return {
-              "fillColor": colorMap.get(zoneType, "gray"),
-              "color": "white",
-              "weight": 2,
-              "fillOpacity": 0.5
-          }
-
-      def zoneHighlight(feature):
-          return {
-              "fillColor": "yellow",
-              "color": "black",
-              "weight": 3,
-              "fillOpacity": 0.8
-          }
-
-      folium.GeoJson(
-          zonesGeo,
-          style_function=zoneStyle,
-          highlight_function=zoneHighlight,
-          tooltip=folium.GeoJsonTooltip(
-              fields=["name", "type", "score"],
-              aliases=["구역:", "용도:", "점수:"],
-              style="font-size: 12px;"
-          ),
-          popup=folium.GeoJsonPopup(
-              fields=["name", "score"],
-              aliases=["구역명:", "평가점수:"]
-          )
-      ).add_to(zoneMap)
-
-      zoneMap
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_workflow
   title: 11단계. GeoJSON 경계 데이터 검증
   structuredPrimary: true
   subtitle: 좌표 순서와 속성 누락 확인
-  goal: '11단계. GeoJSON 경계 데이터 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. GeoJSON 경계 데이터 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     GeoJSON 업무에서 가장 흔한 오류는 지도가 안 그려지는 문제가 아니라, 그럴듯하게 그려졌지만 좌표 순서나 속성 키가 틀린 상태입니다. 실행 전에 [경도, 위도] 순서를 예측하고, 폴리곤이 닫혔는지, 필수 속성이 있는지 검증해야 합니다.
 
     GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
   tips:
   - GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     deliveryZonesGeo = {
         "type": "FeatureCollection",
@@ -1797,7 +933,7 @@ sections:
     requiredProperties = {"zoneId", "name", "slaMinutes"}
     len(deliveryZonesGeo["features"]), requiredProperties
   exercise:
-    prompt: '11단계. GeoJSON 경계 데이터 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       deliveryZonesGeo = {
           "type": "FeatureCollection",
@@ -1835,260 +971,20 @@ sections:
 
       requiredProperties = {"zoneId", "name", "slaMinutes"}
       len(deliveryZonesGeo["features"]), requiredProperties
-    solution: |-
-      deliveryZonesGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.560],
-                          [126.985, 37.560],
-                          [126.985, 37.572],
-                          [126.970, 37.572],
-                          [126.970, 37.560],
-                      ]],
-                  },
-                  "properties": {"zoneId": "A", "name": "중심 권역", "slaMinutes": 25},
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.985, 37.560],
-                          [127.000, 37.560],
-                          [127.000, 37.572],
-                          [126.985, 37.572],
-                          [126.985, 37.560],
-                      ]],
-                  },
-                  "properties": {"zoneId": "B", "name": "동부 권역", "slaMinutes": 35},
-              },
-          ],
-      }
-
-      requiredProperties = {"zoneId", "name", "slaMinutes"}
-      len(deliveryZonesGeo["features"]), requiredProperties
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GeoJSON 업무에서 가장 흔한 오류는 지도가 안 그려지는 문제가 아니라, 그럴듯하게 그려졌지만 좌표 순서나 속성 키가 틀린 상태입니다. 실행 전에 [경도, 위도] 순서를 예측하고, 폴리곤이 닫혔는지,
-      필수 속성이 있는지 검증해야 합니다.
-  - type: list
-    items:
-    - GeoJSON 좌표는 [경도, 위도] 순서입니다.
-    - Polygon의 첫 좌표와 마지막 좌표는 같아야 합니다.
-    - 업무 지도에 필요한 properties 키는 렌더 전에 검증합니다.
-    - 경계 수정 실험은 면적/구역 수/HTML 렌더 결과를 함께 확인합니다.
-  - type: code
-    language: python
-    title: 배달 권역 GeoJSON 준비
-    description: 권역 경계를 만들고 검증할 필수 속성을 정합니다.
-    content: |-
-      deliveryZonesGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.560],
-                          [126.985, 37.560],
-                          [126.985, 37.572],
-                          [126.970, 37.572],
-                          [126.970, 37.560],
-                      ]],
-                  },
-                  "properties": {"zoneId": "A", "name": "중심 권역", "slaMinutes": 25},
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.985, 37.560],
-                          [127.000, 37.560],
-                          [127.000, 37.572],
-                          [126.985, 37.572],
-                          [126.985, 37.560],
-                      ]],
-                  },
-                  "properties": {"zoneId": "B", "name": "동부 권역", "slaMinutes": 35},
-              },
-          ],
-      }
-
-      requiredProperties = {"zoneId", "name", "slaMinutes"}
-      len(deliveryZonesGeo["features"]), requiredProperties
-  - type: code
-    language: python
-    title: 구조 검증 함수 만들기
-    description: 좌표 순서, 닫힌 폴리곤, 필수 속성을 실행 전에 검사합니다.
-    content: |-
-      def validateDeliveryZones(geoJson):
-          for feature in geoJson["features"]:
-              properties = feature.get("properties", {})
-              missing = sorted(requiredProperties - set(properties))
-              if missing:
-                  raise ValueError(f"필수 속성 누락: {properties.get('name', 'unknown')} {missing}")
-
-              ring = feature["geometry"]["coordinates"][0]
-              if ring[0] != ring[-1]:
-                  raise ValueError(f"닫히지 않은 폴리곤: {properties['name']}")
-
-              for lon, lat in ring:
-                  if not (124 <= lon <= 132 and 33 <= lat <= 39):
-                      raise ValueError(f"좌표 순서 오류: {properties['name']}")
-          return True
-
-      validateDeliveryZones(deliveryZonesGeo)
-  - type: code
-    language: python
-    title: 좌표 순서 오류 확인
-    description: Folium 좌표 순서처럼 [위도, 경도]를 넣으면 검증에서 잡히는지 확인합니다.
-    content: |-
-      brokenCoordinateGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  **deliveryZonesGeo["features"][0],
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [37.560, 126.970],
-                          [37.560, 126.985],
-                          [37.572, 126.985],
-                          [37.572, 126.970],
-                          [37.560, 126.970],
-                      ]],
-                  },
-              }
-          ],
-      }
-
-      try:
-          validateDeliveryZones(brokenCoordinateGeo)
-      except ValueError as exc:
-          coordinateOrderError = str(exc)
-
-      coordinateOrderError
-  - type: code
-    language: python
-    title: 속성 누락 오류 확인
-    description: SLA 속성이 빠진 권역을 검증해 오류 메시지를 읽습니다.
-    content: |-
-      brokenPropertyGeo = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": deliveryZonesGeo["features"][0]["geometry"],
-                  "properties": {"zoneId": "C", "name": "누락 권역"},
-              }
-          ],
-      }
-
-      try:
-          validateDeliveryZones(brokenPropertyGeo)
-      except ValueError as exc:
-          propertyError = str(exc)
-
-      propertyError
-  - type: code
-    language: python
-    title: 검증된 권역 지도 생성
-    description: SLA 기준으로 색을 나누고 렌더링합니다.
-    content: |-
-      validateDeliveryZones(deliveryZonesGeo)
-      deliveryMap = folium.Map(location=[37.566, 126.985], zoom_start=13, tiles="CartoDB Positron")
-
-      def deliveryStyle(feature):
-          sla = feature["properties"]["slaMinutes"]
-          fillColor = "#2ecc71" if sla <= 30 else "#f39c12"
-          return {
-              "fillColor": fillColor,
-              "color": "white",
-              "weight": 2,
-              "fillOpacity": 0.55,
-          }
-
-      folium.GeoJson(
-          deliveryZonesGeo,
-          style_function=deliveryStyle,
-          tooltip=folium.GeoJsonTooltip(
-              fields=["zoneId", "name", "slaMinutes"],
-              aliases=["권역:", "이름:", "목표 배송분:"],
-          ),
-      ).add_to(deliveryMap)
-
-      deliveryMap
-  - type: code
-    language: python
-    title: 렌더 결과 검증
-    description: 권역 이름과 오류 메시지가 예상대로 준비됐는지 점검합니다.
-    content: |-
-      deliveryHtml = deliveryMap.get_root().render()
-      zoneNames = [feature["properties"]["name"] for feature in deliveryZonesGeo["features"]]
-
-      import json
-      def renderedContains(html, text):
-          escaped = json.dumps(text, ensure_ascii=True)[1:-1]
-          return text in html or escaped in html
-
-      checks = {
-          "zonesRendered": all(renderedContains(deliveryHtml, name) for name in zoneNames),
-          "coordinateErrorOk": coordinateOrderError == "좌표 순서 오류: 중심 권역",
-          "propertyErrorOk": propertyError == "필수 속성 누락: 누락 권역 ['slaMinutes']",
-      }
-
-      assert all(checks.values()), checks
-      checks
-  - type: code
-    language: python
-    title: 수정 실험
-    description: SLA 기준을 바꾸면 어떤 권역이 지연 위험으로 분류되는지 비교합니다.
-    content: |-
-      def classifySla(feature, targetMinutes):
-          sla = feature["properties"]["slaMinutes"]
-          return "정상" if sla <= targetMinutes else "지연 위험"
-
-      currentClasses = {
-          feature["properties"]["zoneId"]: classifySla(feature, 30)
-          for feature in deliveryZonesGeo["features"]
-      }
-      relaxedClasses = {
-          feature["properties"]["zoneId"]: classifySla(feature, 40)
-          for feature in deliveryZonesGeo["features"]
-      }
-
-      assert currentClasses["B"] == "지연 위험"
-      assert relaxedClasses["B"] == "정상"
-      currentClasses, relaxedClasses
-  - type: tip
-    content: GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: GeoJSON 활용
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import folium
     deliveryZones = {
@@ -2126,7 +1022,7 @@ sections:
     }
     deliveryZones
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import folium
       deliveryZones = {
@@ -2163,188 +1059,8 @@ sections:
           ]
       }
       deliveryZones
-    solution: |-
-      import folium
-      deliveryZones = {
-          "type": "FeatureCollection",
-          "features": [
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.970, 37.560],
-                          [126.985, 37.560],
-                          [126.985, 37.575],
-                          [126.970, 37.575],
-                          [126.970, 37.560]
-                      ]]
-                  },
-                  "properties": {"zone": "A", "fee": 0}
-              },
-              {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [[
-                          [126.960, 37.550],
-                          [126.995, 37.550],
-                          [126.995, 37.585],
-                          [126.960, 37.585],
-                          [126.960, 37.550]
-                      ]]
-                  },
-                  "properties": {"zone": "B", "fee": 1000}
-              }
-          ]
-      }
-      deliveryZones
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
-  - type: expansion
-    title: '미션1: 배달 구역 지도'
-    blocks:
-    - type: code
-      title: 데이터 준비
-      content: |-
-        import folium
-        deliveryZones = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [126.970, 37.560],
-                            [126.985, 37.560],
-                            [126.985, 37.575],
-                            [126.970, 37.575],
-                            [126.970, 37.560]
-                        ]]
-                    },
-                    "properties": {"zone": "A", "fee": 0}
-                },
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [126.960, 37.550],
-                            [126.995, 37.550],
-                            [126.995, 37.585],
-                            [126.960, 37.585],
-                            [126.960, 37.550]
-                        ]]
-                    },
-                    "properties": {"zone": "B", "fee": 1000}
-                }
-            ]
-        }
-        deliveryZones
-    - type: code
-      title: 지도 생성
-      content: |-
-        deliveryMap = folium.Map(location=[37.567, 126.977], zoom_start=14)
-
-        def deliveryStyle(feature):
-            fee = feature["properties"]["fee"]
-            if fee == 0:
-                return {"fillColor": "green", "fillOpacity": 0.4, "color": "darkgreen", "weight": 2}
-            else:
-                return {"fillColor": "orange", "fillOpacity": 0.3, "color": "darkorange", "weight": 2}
-
-        folium.GeoJson(
-            deliveryZones,
-            style_function=deliveryStyle,
-            tooltip=folium.GeoJsonTooltip(
-                fields=["zone", "fee"],
-                aliases=["구역:", "배달비:"]
-            )
-        ).add_to(deliveryMap)
-
-        folium.Marker(
-            [37.5665, 126.9780],
-            popup="매장",
-            icon=folium.Icon(color="red")
-        ).add_to(deliveryMap)
-
-        deliveryMap
-  - type: expansion
-    title: '미션2: 학군 지도'
-    blocks:
-    - type: code
-      title: 데이터 준비
-      content: |-
-        import folium
-        schoolDistricts = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [126.965, 37.555],
-                            [126.980, 37.555],
-                            [126.980, 37.570],
-                            [126.965, 37.570],
-                            [126.965, 37.555]
-                        ]]
-                    },
-                    "properties": {"school": "A초등학교", "students": 800}
-                },
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [126.980, 37.555],
-                            [126.995, 37.555],
-                            [126.995, 37.570],
-                            [126.980, 37.570],
-                            [126.980, 37.555]
-                        ]]
-                    },
-                    "properties": {"school": "B초등학교", "students": 600}
-                }
-            ]
-        }
-        schoolDistricts
-    - type: code
-      title: 지도 생성
-      content: |-
-        schoolMap = folium.Map(location=[37.562, 126.980], zoom_start=14)
-
-        def schoolStyle(feature):
-            students = feature["properties"]["students"]
-            if students >= 700:
-                return {"fillColor": "blue", "fillOpacity": 0.4, "color": "navy", "weight": 2}
-            else:
-                return {"fillColor": "lightblue", "fillOpacity": 0.4, "color": "blue", "weight": 2}
-
-        def schoolHighlight(feature):
-            return {"fillColor": "yellow", "fillOpacity": 0.7, "color": "black", "weight": 3}
-
-        folium.GeoJson(
-            schoolDistricts,
-            style_function=schoolStyle,
-            highlight_function=schoolHighlight,
-            tooltip=folium.GeoJsonTooltip(
-                fields=["school", "students"],
-                aliases=["학교:", "학생수:"]
-            )
-        ).add_to(schoolMap)
-
-        schoolMap
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

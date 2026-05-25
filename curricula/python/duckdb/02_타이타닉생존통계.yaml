@@ -32,13 +32,11 @@ sections:
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: titanic 데이터 준비
-  goal: '1단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 타이타닉 승객 데이터를 불러옵니다. 1912년 침몰한 타이타닉호의 891명 승객 정보가 담겨 있으며, 생존 여부, 객실 등급, 성별, 나이, 요금 등의 변수를 포함합니다. 이 데이터로 "누가
-    생존했고, 어떤 요인이 생존에 영향을 미쳤는지"를 분석하는 것이 이번 프로젝트의 목표입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 타이타닉 승객 데이터를 불러옵니다. 1912년 침몰한 타이타닉호의 891명 승객 정보가 담겨 있으며, 생존 여부, 객실 등급, 성별, 나이, 요금 등의 변수를 포함합니다. 이 데이터로 "누가 생존했고, 어떤 요인이 생존에 영향을 미쳤는지"를 분석하는 것이 이번 프로젝트의 목표입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset
@@ -47,7 +45,7 @@ sections:
     df = loadLocalDataset("titanic")
     titanic = duckdb.from_df(df)
   exercise:
-    prompt: '1단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -55,123 +53,59 @@ sections:
 
       df = loadLocalDataset("titanic")
       titanic = duckdb.from_df(df)
-    solution: |-
-      import pandas as pd
-      from codaro.curriculum.localData import loadLocalDataset
-      import duckdb
-
-      df = loadLocalDataset("titanic")
-      titanic = duckdb.from_df(df)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 타이타닉 승객 데이터를 불러옵니다. 1912년 침몰한 타이타닉호의 891명 승객 정보가 담겨 있으며, 생존 여부, 객실 등급, 성별, 나이, 요금 등의 변수를 포함합니다. 이 데이터로 "누가 생존했고,
-      어떤 요인이 생존에 영향을 미쳤는지"를 분석하는 것이 이번 프로젝트의 목표입니다.
-  - type: code
-    language: python
-    title: 데이터 불러오기
-    description: titanic.csv 로드
-    content: |-
-      import pandas as pd
-      from codaro.curriculum.localData import loadLocalDataset
-      import duckdb
-
-      df = loadLocalDataset("titanic")
-      titanic = duckdb.from_df(df)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_explore
   title: 2단계. 데이터 구조 파악
   structuredPrimary: true
   subtitle: 컬럼 확인
-  goal: '2단계. 데이터 구조 파악: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 데이터 구조 파악: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 데이터의 구조와 컬럼을 파악합니다. survived(생존여부, 0/1), pclass(객실등급, 1/2/3등석), sex(성별), age(나이), fare(요금), embarked(승선항) 등의
-    컬럼이 있습니다. 분석 전에 데이터 구조를 먼저 확인하는 것은 필수적인 단계입니다. 어떤 변수가 있고, 어떤 타입인지 알아야 적절한 분석 방법을 선택할 수 있기 때문입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 데이터의 구조와 컬럼을 파악합니다. survived(생존여부, 0/1), pclass(객실등급, 1/2/3등석), sex(성별), age(나이), fare(요금), embarked(승선항) 등의 컬럼이 있습니다. 분석 전에 데이터 구조를 먼저 확인하는 것은 필수적인 단계입니다. 어떤 변수가 있고, 어떤 타입인지 알아야 적절한 분석 방법을 선택할 수 있기 때문입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: duckdb.sql("SELECT * FROM titanic LIMIT 10")
   exercise:
-    prompt: '2단계. 데이터 구조 파악: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: duckdb.sql("SELECT * FROM titanic LIMIT 10")
-    solution: duckdb.sql("SELECT * FROM titanic LIMIT 10")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 데이터의 구조와 컬럼을 파악합니다. survived(생존여부, 0/1), pclass(객실등급, 1/2/3등석), sex(성별), age(나이), fare(요금), embarked(승선항) 등의
-      컬럼이 있습니다. 분석 전에 데이터 구조를 먼저 확인하는 것은 필수적인 단계입니다. 어떤 변수가 있고, 어떤 타입인지 알아야 적절한 분석 방법을 선택할 수 있기 때문입니다.
-  - type: code
-    language: python
-    title: 전체 데이터 확인
-    description: 전체 행 조회
-    content: duckdb.sql("SELECT * FROM titanic LIMIT 10")
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_count_basic
   title: 3단계. 전체 승객 수 세기
   structuredPrimary: true
   subtitle: COUNT(*)
-  goal: '3단계. 전체 승객 수 세기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 전체 승객 수 세기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     COUNT(*)는 테이블의 전체 행 수를 셉니다. 집계 함수 중 가장 기본이 되는 함수로, 데이터가 몇 건인지 빠르게 파악할 때 사용합니다. 타이타닉 데이터에 몇 명의 승객이 기록되어 있는지 확인해봅시다. 이 정보는 이후 생존율 계산의 분모가 됩니다.
 
     COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다.
   tips:
   - COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
   exercise:
-    prompt: '3단계. 전체 승객 수 세기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
-    solution: duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: COUNT(*)는 테이블의 전체 행 수를 셉니다. 집계 함수 중 가장 기본이 되는 함수로, 데이터가 몇 건인지 빠르게 파악할 때 사용합니다. 타이타닉 데이터에 몇 명의 승객이 기록되어 있는지 확인해봅시다.
-      이 정보는 이후 생존율 계산의 분모가 됩니다.
-  - type: code
-    language: python
-    title: 전체 승객 수
-    description: COUNT(*) 사용
-    content: duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
-  - type: tip
-    content: COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_count_column
   title: 4단계. 특정 컬럼 행 수 세기
   structuredPrimary: true
   subtitle: COUNT(col)
-  goal: '4단계. 특정 컬럼 행 수 세기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 특정 컬럼 행 수 세기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: COUNT(컬럼명)은 해당 컬럼에서 NULL이 아닌 값만 셉니다. 실제 데이터에는 누락된 값(NULL)이 많으며, 이를 파악하는 것이 데이터 품질 확인의 첫 단계입니다. age 컬럼에는 177명의
-    승객 나이 정보가 누락되어 있습니다. COUNT(*)와 COUNT(age)를 비교하면 결측치 개수를 알 수 있습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: COUNT(컬럼명)은 해당 컬럼에서 NULL이 아닌 값만 셉니다. 실제 데이터에는 누락된 값(NULL)이 많으며, 이를 파악하는 것이 데이터 품질 확인의 첫 단계입니다. age 컬럼에는 177명의 승객 나이 정보가 누락되어 있습니다. COUNT(*)와 COUNT(age)를 비교하면 결측치 개수를 알 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -180,7 +114,7 @@ sections:
         FROM titanic
     """)
   exercise:
-    prompt: '4단계. 특정 컬럼 행 수 세기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -188,90 +122,44 @@ sections:
               COUNT(age) AS ageNotNull
           FROM titanic
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              COUNT(*) AS totalRows,
-              COUNT(age) AS ageNotNull
-          FROM titanic
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: COUNT(컬럼명)은 해당 컬럼에서 NULL이 아닌 값만 셉니다. 실제 데이터에는 누락된 값(NULL)이 많으며, 이를 파악하는 것이 데이터 품질 확인의 첫 단계입니다. age 컬럼에는 177명의
-      승객 나이 정보가 누락되어 있습니다. COUNT(*)와 COUNT(age)를 비교하면 결측치 개수를 알 수 있습니다.
-  - type: code
-    language: python
-    title: 나이 정보 있는 승객 수
-    description: COUNT(age) vs COUNT(*)
-    content: |-
-      duckdb.sql("""
-          SELECT
-              COUNT(*) AS totalRows,
-              COUNT(age) AS ageNotNull
-          FROM titanic
-      """)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_distinct
   title: 5단계. 고유 값 확인
   structuredPrimary: true
   subtitle: DISTINCT
-  goal: '5단계. 고유 값 확인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 고유 값 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     DISTINCT는 중복을 제거한 고유 값만 반환합니다. 데이터에 어떤 값들이 존재하는지 파악할 때 유용합니다. 객실 등급(pclass)이 몇 종류인지, 어떤 값들인지 확인해봅시다. 타이타닉에는 1등석, 2등석, 3등석 세 가지 등급이 있으며, 등급에 따라 생존율이 크게 달랐습니다.
 
     DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
   tips:
   - DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
   exercise:
-    prompt: '5단계. 고유 값 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
-    solution: duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: DISTINCT는 중복을 제거한 고유 값만 반환합니다. 데이터에 어떤 값들이 존재하는지 파악할 때 유용합니다. 객실 등급(pclass)이 몇 종류인지, 어떤 값들인지 확인해봅시다. 타이타닉에는 1등석,
-      2등석, 3등석 세 가지 등급이 있으며, 등급에 따라 생존율이 크게 달랐습니다.
-  - type: code
-    language: python
-    title: 객실 등급 종류
-    description: DISTINCT 사용
-    content: duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
-  - type: tip
-    content: DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_groupby_basic
   title: 6단계. GROUP BY 기초
   structuredPrimary: true
   subtitle: 그룹별 집계
-  goal: '6단계. GROUP BY 기초: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. GROUP BY 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     GROUP BY는 데이터를 특정 컬럼 기준으로 그룹화하여 집계합니다. 엑셀의 피벗 테이블과 비슷한 개념으로, 범주별 통계를 낼 때 필수적입니다. 객실 등급별로 승객이 몇 명인지 세어봅시다. 1등석, 2등석, 3등석 승객 수의 차이를 통해 당시 사회 구조를 엿볼 수 있습니다.
 
     GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
   tips:
   - GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT pclass, COUNT(*) AS passengers
@@ -279,58 +167,30 @@ sections:
         GROUP BY pclass
     """)
   exercise:
-    prompt: '6단계. GROUP BY 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT pclass, COUNT(*) AS passengers
           FROM titanic
           GROUP BY pclass
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT pclass, COUNT(*) AS passengers
-          FROM titanic
-          GROUP BY pclass
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GROUP BY는 데이터를 특정 컬럼 기준으로 그룹화하여 집계합니다. 엑셀의 피벗 테이블과 비슷한 개념으로, 범주별 통계를 낼 때 필수적입니다. 객실 등급별로 승객이 몇 명인지 세어봅시다. 1등석,
-      2등석, 3등석 승객 수의 차이를 통해 당시 사회 구조를 엿볼 수 있습니다.
-  - type: code
-    language: python
-    title: 객실 등급별 승객 수
-    description: GROUP BY 기본
-    content: |-
-      duckdb.sql("""
-          SELECT pclass, COUNT(*) AS passengers
-          FROM titanic
-          GROUP BY pclass
-      """)
-  - type: tip
-    content: GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_sum
   title: 7단계. 합계 구하기
   structuredPrimary: true
   subtitle: SUM()
-  goal: '7단계. 합계 구하기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 합계 구하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     SUM() 함수는 숫자 컬럼의 합계를 계산합니다. survived 컬럼은 생존=1, 사망=0으로 코딩되어 있으므로, SUM(survived)는 곧 생존자 수가 됩니다. 객실 등급별 생존자 수를 계산해봅시다. 이 결과를 보면 1등석 승객의 생존자가 많다는 것을 알 수 있지만, 정확한 비교를 위해서는 생존율(비율)을 계산해야 합니다.
 
     survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
   tips:
   - survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT pclass, SUM(survived) AS survivors
@@ -338,58 +198,30 @@ sections:
         GROUP BY pclass
     """)
   exercise:
-    prompt: '7단계. 합계 구하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT pclass, SUM(survived) AS survivors
           FROM titanic
           GROUP BY pclass
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT pclass, SUM(survived) AS survivors
-          FROM titanic
-          GROUP BY pclass
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: SUM() 함수는 숫자 컬럼의 합계를 계산합니다. survived 컬럼은 생존=1, 사망=0으로 코딩되어 있으므로, SUM(survived)는 곧 생존자 수가 됩니다. 객실 등급별 생존자 수를 계산해봅시다.
-      이 결과를 보면 1등석 승객의 생존자가 많다는 것을 알 수 있지만, 정확한 비교를 위해서는 생존율(비율)을 계산해야 합니다.
-  - type: code
-    language: python
-    title: 등급별 생존자 수
-    description: SUM(survived)
-    content: |-
-      duckdb.sql("""
-          SELECT pclass, SUM(survived) AS survivors
-          FROM titanic
-          GROUP BY pclass
-      """)
-  - type: tip
-    content: survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_avg
   title: 8단계. 평균 구하기
   structuredPrimary: true
   subtitle: AVG()
-  goal: '8단계. 평균 구하기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 평균 구하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     AVG() 함수로 평균을 계산합니다. survived 컬럼이 0과 1로만 이루어져 있으므로, AVG(survived)는 1의 비율, 즉 생존율이 됩니다. 예를 들어 10명 중 6명이 생존했다면 평균은 0.6이고, 이는 60% 생존율을 의미합니다. 100을 곱하면 퍼센트로 표시됩니다. 이 방법은 이진(0/1) 데이터의 비율을 계산하는 표준적인 SQL 패턴입니다.
 
     AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다.
   tips:
   - AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -399,7 +231,7 @@ sections:
         GROUP BY pclass
     """)
   exercise:
-    prompt: '8단계. 평균 구하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -408,55 +240,23 @@ sections:
           FROM titanic
           GROUP BY pclass
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: AVG() 함수로 평균을 계산합니다. survived 컬럼이 0과 1로만 이루어져 있으므로, AVG(survived)는 1의 비율, 즉 생존율이 됩니다. 예를 들어 10명 중 6명이 생존했다면 평균은
-      0.6이고, 이는 60% 생존율을 의미합니다. 100을 곱하면 퍼센트로 표시됩니다. 이 방법은 이진(0/1) 데이터의 비율을 계산하는 표준적인 SQL 패턴입니다.
-  - type: code
-    language: python
-    title: 등급별 생존율
-    description: AVG(survived)
-    content: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-      """)
-  - type: tip
-    content: AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_minmax
   title: 9단계. 최소/최대 구하기
   structuredPrimary: true
   subtitle: MIN(), MAX()
-  goal: '9단계. 최소/최대 구하기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 최소/최대 구하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     MIN()과 MAX() 함수로 최소값과 최대값을 구합니다. 데이터의 범위를 파악하는 데 유용하며, 이상치를 탐지하는 데도 활용됩니다. 객실 등급별 요금(fare) 범위를 확인해봅시다. 1등석은 최저 0달러부터 최고 500달러가 넘는 요금까지 분포하며, 3등석은 상대적으로 좁은 범위를 가집니다.
 
     MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
   tips:
   - MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -468,7 +268,7 @@ sections:
         GROUP BY pclass
     """)
   exercise:
-    prompt: '9단계. 최소/최대 구하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -479,59 +279,23 @@ sections:
           FROM titanic
           GROUP BY pclass
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              MIN(fare) AS minFare,
-              MAX(fare) AS maxFare,
-              ROUND(AVG(fare), 2) AS avgFare
-          FROM titanic
-          GROUP BY pclass
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: MIN()과 MAX() 함수로 최소값과 최대값을 구합니다. 데이터의 범위를 파악하는 데 유용하며, 이상치를 탐지하는 데도 활용됩니다. 객실 등급별 요금(fare) 범위를 확인해봅시다. 1등석은 최저
-      0달러부터 최고 500달러가 넘는 요금까지 분포하며, 3등석은 상대적으로 좁은 범위를 가집니다.
-  - type: code
-    language: python
-    title: 등급별 요금 범위
-    description: MIN, MAX 사용
-    content: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              MIN(fare) AS minFare,
-              MAX(fare) AS maxFare,
-              ROUND(AVG(fare), 2) AS avgFare
-          FROM titanic
-          GROUP BY pclass
-      """)
-  - type: tip
-    content: MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_orderby
   title: 10단계. 결과 정렬
   structuredPrimary: true
   subtitle: ORDER BY
-  goal: '10단계. 결과 정렬: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. 결과 정렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     ORDER BY 절은 쿼리 결과를 특정 컬럼 기준으로 정렬합니다. 기본적으로 오름차순(ASC, 작은 값 먼저)으로 정렬되며, 데이터를 보기 좋게 정리하거나 상위/하위 항목을 찾을 때 필수입니다. 생존율이 낮은 순서부터 높은 순서로 정렬해봅시다. 어느 등급의 생존율이 가장 낮았는지 명확하게 볼 수 있습니다.
 
     ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
   tips:
   - ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -543,7 +307,7 @@ sections:
         ORDER BY survivalRate
     """)
   exercise:
-    prompt: '10단계. 결과 정렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -554,59 +318,23 @@ sections:
           GROUP BY pclass
           ORDER BY survivalRate
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              COUNT(*) AS passengers,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-          ORDER BY survivalRate
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: ORDER BY 절은 쿼리 결과를 특정 컬럼 기준으로 정렬합니다. 기본적으로 오름차순(ASC, 작은 값 먼저)으로 정렬되며, 데이터를 보기 좋게 정리하거나 상위/하위 항목을 찾을 때 필수입니다.
-      생존율이 낮은 순서부터 높은 순서로 정렬해봅시다. 어느 등급의 생존율이 가장 낮았는지 명확하게 볼 수 있습니다.
-  - type: code
-    language: python
-    title: 생존율 순 정렬
-    description: ORDER BY 사용
-    content: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              COUNT(*) AS passengers,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-          ORDER BY survivalRate
-      """)
-  - type: tip
-    content: ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step11_desc
   title: 11단계. 내림차순 정렬
   structuredPrimary: true
   subtitle: DESC
-  goal: '11단계. 내림차순 정렬: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '11단계. 내림차순 정렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     DESC(descending)를 ORDER BY 뒤에 붙이면 내림차순(큰 값 먼저)으로 정렬됩니다. 실무에서는 "상위 10개", "가장 많이 팔린 상품" 같은 분석에 DESC를 자주 사용합니다. 생존율이 높은 등급부터 표시해봅시다. 1등석 승객의 생존율이 가장 높고, 3등석이 가장 낮다는 것을 명확하게 확인할 수 있습니다.
 
     DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다.
   tips:
   - DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -618,7 +346,7 @@ sections:
         ORDER BY survivalRate DESC
     """)
   exercise:
-    prompt: '11단계. 내림차순 정렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -629,57 +357,20 @@ sections:
           GROUP BY pclass
           ORDER BY survivalRate DESC
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              COUNT(*) AS passengers,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-          ORDER BY survivalRate DESC
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: DESC(descending)를 ORDER BY 뒤에 붙이면 내림차순(큰 값 먼저)으로 정렬됩니다. 실무에서는 "상위 10개", "가장 많이 팔린 상품" 같은 분석에 DESC를 자주 사용합니다.
-      생존율이 높은 등급부터 표시해봅시다. 1등석 승객의 생존율이 가장 높고, 3등석이 가장 낮다는 것을 명확하게 확인할 수 있습니다.
-  - type: code
-    language: python
-    title: 생존율 높은 순
-    description: DESC 사용
-    content: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              COUNT(*) AS passengers,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass
-          ORDER BY survivalRate DESC
-      """)
-  - type: tip
-    content: DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step12_groupby_multi
   title: 12단계. 다중 그룹화
   structuredPrimary: true
   subtitle: 여러 컬럼으로 GROUP BY
-  goal: '12단계. 다중 그룹화: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '12단계. 다중 그룹화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: GROUP BY에 여러 컬럼을 콤마로 구분하여 나열하면 다중 그룹화가 가능합니다. 등급별 분석만으로는 놓치는 패턴이 있을 수 있습니다. 등급과 성별을 함께 그룹화하면 "1등석 여성", "3등석
-    남성" 같은 세부 그룹별 통계를 얻을 수 있습니다. 실제로 타이타닉에서 "여성과 아이 먼저" 정책으로 인해 성별에 따른 생존율 차이가 매우 컸습니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: GROUP BY에 여러 컬럼을 콤마로 구분하여 나열하면 다중 그룹화가 가능합니다. 등급별 분석만으로는 놓치는 패턴이 있을 수 있습니다. 등급과 성별을 함께 그룹화하면 "1등석 여성", "3등석 남성" 같은 세부 그룹별 통계를 얻을 수 있습니다. 실제로 타이타닉에서 "여성과 아이 먼저" 정책으로 인해 성별에 따른 생존율 차이가 매우 컸습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -693,7 +384,7 @@ sections:
         ORDER BY pclass, sex
     """)
   exercise:
-    prompt: '12단계. 다중 그룹화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -706,59 +397,20 @@ sections:
           GROUP BY pclass, sex
           ORDER BY pclass, sex
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              sex,
-              COUNT(*) AS passengers,
-              SUM(survived) AS survivors,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass, sex
-          ORDER BY pclass, sex
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: GROUP BY에 여러 컬럼을 콤마로 구분하여 나열하면 다중 그룹화가 가능합니다. 등급별 분석만으로는 놓치는 패턴이 있을 수 있습니다. 등급과 성별을 함께 그룹화하면 "1등석 여성", "3등석 남성"
-      같은 세부 그룹별 통계를 얻을 수 있습니다. 실제로 타이타닉에서 "여성과 아이 먼저" 정책으로 인해 성별에 따른 생존율 차이가 매우 컸습니다.
-  - type: code
-    language: python
-    title: 등급+성별별 생존율
-    description: 다중 GROUP BY
-    content: |-
-      duckdb.sql("""
-          SELECT
-              pclass,
-              sex,
-              COUNT(*) AS passengers,
-              SUM(survived) AS survivors,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate
-          FROM titanic
-          GROUP BY pclass, sex
-          ORDER BY pclass, sex
-      """)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step13_final
   title: 13단계. 최종 분석
   structuredPrimary: true
   subtitle: 종합 생존 통계
-  goal: '13단계. 최종 분석: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '13단계. 최종 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 지금까지 배운 COUNT, SUM, AVG, MIN, MAX, GROUP BY, ORDER BY를 모두 활용한 종합 분석입니다. 성별에 따른 생존 통계를 정리하면 타이타닉 생존의 핵심 패턴이
-    드러납니다. 여성 생존율 74%, 남성 생존율 19%로 큰 차이가 나며, 이는 구명보트 탑승 시 "여성과 아이 먼저" 원칙이 적용되었기 때문입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 지금까지 배운 COUNT, SUM, AVG, MIN, MAX, GROUP BY, ORDER BY를 모두 활용한 종합 분석입니다. 성별에 따른 생존 통계를 정리하면 타이타닉 생존의 핵심 패턴이 드러납니다. 여성 생존율 74%, 남성 생존율 19%로 큰 차이가 나며, 이는 구명보트 탑승 시 "여성과 아이 먼저" 원칙이 적용되었기 때문입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -775,7 +427,7 @@ sections:
         ORDER BY survivalRate DESC
     """)
   exercise:
-    prompt: '13단계. 최종 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -791,67 +443,23 @@ sections:
           GROUP BY sex
           ORDER BY survivalRate DESC
       """)
-    solution: |-
-      duckdb.sql("""
-          SELECT
-              sex,
-              COUNT(*) AS totalPassengers,
-              COUNT(age) AS ageKnown,
-              SUM(survived) AS survivors,
-              COUNT(*) - SUM(survived) AS deceased,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate,
-              ROUND(AVG(age), 1) AS avgAge,
-              ROUND(AVG(fare), 2) AS avgFare
-          FROM titanic
-          GROUP BY sex
-          ORDER BY survivalRate DESC
-      """)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 지금까지 배운 COUNT, SUM, AVG, MIN, MAX, GROUP BY, ORDER BY를 모두 활용한 종합 분석입니다. 성별에 따른 생존 통계를 정리하면 타이타닉 생존의 핵심 패턴이 드러납니다.
-      여성 생존율 74%, 남성 생존율 19%로 큰 차이가 나며, 이는 구명보트 탑승 시 "여성과 아이 먼저" 원칙이 적용되었기 때문입니다.
-  - type: code
-    language: python
-    title: 성별 생존 통계 종합
-    description: 최종 결과물
-    content: |-
-      duckdb.sql("""
-          SELECT
-              sex,
-              COUNT(*) AS totalPassengers,
-              COUNT(age) AS ageKnown,
-              SUM(survived) AS survivors,
-              COUNT(*) - SUM(survived) AS deceased,
-              ROUND(AVG(survived) * 100, 1) AS survivalRate,
-              ROUND(AVG(age), 1) AS avgAge,
-              ROUND(AVG(fare), 2) AS avgFare
-          FROM titanic
-          GROUP BY sex
-          ORDER BY survivalRate DESC
-      """)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 타이타닉 생존 분석 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     배운 GROUP BY와 집계 함수를 활용하여 타이타닉 데이터를 다양한 관점에서 분석합니다. COUNT, SUM, AVG, MIN, MAX를 적절히 조합하고 ORDER BY로 결과를 정렬하면 의미 있는 인사이트를 도출할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import pandas as pd
     import duckdb
@@ -868,7 +476,7 @@ sections:
     })
     tbl = duckdb.from_df(data)
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
       import duckdb
@@ -884,105 +492,11 @@ sections:
           "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
       })
       tbl = duckdb.from_df(data)
-    solution: |-
-      import pandas as pd
-      import duckdb
-      data = pd.DataFrame({
-          "survived": [0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
-          "pclass": [3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 1],
-          "sex": ["male", "female", "female", "male", "female", "male", "female", "male", "male", "male", "male", "female"],
-          "age": [22, 38, 18, 8, 29, 41, 45, 54, 49, 36, 42, 31],
-          "fare": [7.25, 71.28, 13.00, 21.08, 76.29, 8.05, 83.47, 26.00, 35.50, 30.50, 13.00, 79.65],
-          "class": ["Third", "First", "Second", "Second", "First", "Third", "First", "Second", "First", "First", "Second", "First"],
-          "who": ["man", "woman", "woman", "child", "woman", "man", "woman", "man", "man", "man", "man", "woman"],
-          "embark_town": ["Southampton", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Queenstown", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Southampton", "Cherbourg"],
-          "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
-      })
-      tbl = duckdb.from_df(data)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 배운 GROUP BY와 집계 함수를 활용하여 타이타닉 데이터를 다양한 관점에서 분석합니다. COUNT, SUM, AVG, MIN, MAX를 적절히 조합하고 ORDER BY로 결과를 정렬하면 의미
-      있는 인사이트를 도출할 수 있습니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 승선항별 승객 통계'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import pandas as pd
-        import duckdb
-        data = pd.DataFrame({
-            "survived": [0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
-            "pclass": [3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 1],
-            "sex": ["male", "female", "female", "male", "female", "male", "female", "male", "male", "male", "male", "female"],
-            "age": [22, 38, 18, 8, 29, 41, 45, 54, 49, 36, 42, 31],
-            "fare": [7.25, 71.28, 13.00, 21.08, 76.29, 8.05, 83.47, 26.00, 35.50, 30.50, 13.00, 79.65],
-            "class": ["Third", "First", "Second", "Second", "First", "Third", "First", "Second", "First", "First", "Second", "First"],
-            "who": ["man", "woman", "woman", "child", "woman", "man", "woman", "man", "man", "man", "man", "woman"],
-            "embark_town": ["Southampton", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Queenstown", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Southampton", "Cherbourg"],
-            "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
-        })
-        tbl = duckdb.from_df(data)
-    - type: code
-      title: 쿼리 실행
-      content: |-
-        duckdb.sql("""
-            SELECT
-                embark_town,
-                COUNT(*) AS passengers,
-                SUM(survived) AS survivors,
-                ROUND(AVG(survived) * 100, 1) AS survivalRate
-            FROM tbl
-            WHERE embark_town IS NOT NULL
-            GROUP BY embark_town
-            ORDER BY passengers DESC
-        """)
-  - type: expansion
-    title: '미션2: 객실 등급별 나이 통계'
-    blocks:
-    - type: code
-      title: 데이터 로드
-      content: |-
-        import pandas as pd
-        import duckdb
-        frame = pd.DataFrame({
-            "survived": [0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
-            "pclass": [3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 1],
-            "sex": ["male", "female", "female", "male", "female", "male", "female", "male", "male", "male", "male", "female"],
-            "age": [22, 38, 18, 8, 29, 41, 45, 54, 49, 36, 42, 31],
-            "fare": [7.25, 71.28, 13.00, 21.08, 76.29, 8.05, 83.47, 26.00, 35.50, 30.50, 13.00, 79.65],
-            "class": ["Third", "First", "Second", "Second", "First", "Third", "First", "Second", "First", "First", "Second", "First"],
-            "who": ["man", "woman", "woman", "child", "woman", "man", "woman", "man", "man", "man", "man", "woman"],
-            "embark_town": ["Southampton", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Queenstown", "Cherbourg", "Southampton", "Southampton", "Cherbourg", "Southampton", "Cherbourg"],
-            "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
-        })
-        rel = duckdb.from_df(frame)
-    - type: code
-      title: 쿼리 실행
-      content: |-
-        duckdb.sql("""
-            SELECT
-                pclass,
-                COUNT(age) AS ageKnown,
-                ROUND(MIN(age), 0) AS minAge,
-                ROUND(MAX(age), 0) AS maxAge,
-                ROUND(AVG(age), 1) AS avgAge
-            FROM rel
-            GROUP BY pclass
-            ORDER BY pclass
-        """)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   blocks:
@@ -1005,13 +519,11 @@ sections:
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
-  goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-    고정합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import duckdb
 
@@ -1034,7 +546,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import duckdb
 
@@ -1056,136 +568,8 @@ sections:
 
       assert rowCount == 5
       rowCount
-    solution: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-      고정합니다.
-  - type: code
-    language: python
-    title: 로컬 주문 테이블 준비와 예측
-    description: 네트워크나 외부 DB 없이 인메모리 DuckDB 테이블로 재현 가능한 분석 흐름을 만듭니다.
-    content: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
-  - type: code
-    language: python
-    title: SQL 오류를 먼저 확인한다
-    description: 없는 컬럼을 조회해 BinderException을 확인하고, 컬럼명을 고쳐 다시 실행합니다.
-    content: |-
-      try:
-          workflowCon.sql("SELECT missingAmount FROM lessonOrders").fetchall()
-      except duckdb.BinderException as exc:
-          duckdbColumnError = str(exc).splitlines()[0]
-      else:
-          raise AssertionError("없는 컬럼 조회는 실패해야 합니다")
-
-      fixedAmounts = workflowCon.sql("""
-          SELECT orderId, amount
-          FROM lessonOrders
-          WHERE status = 'paid'
-          ORDER BY amount DESC
-      """).fetchall()
-
-      assert "missingAmount" in duckdbColumnError
-      assert fixedAmounts[0] == ('A-102', 120000)
-      duckdbColumnError
-  - type: code
-    language: python
-    title: 집계 결과를 업무 규칙으로 검증
-    description: 상태별 매출 집계가 예상한 paid 건수와 금액을 만족하는지 확인합니다.
-    content: |-
-      def validateRevenueReport(rows):
-          if not rows:
-              raise ValueError("report must not be empty")
-
-          revenueByStatus = {status: revenue for status, count, revenue in rows}
-          countByStatus = {status: count for status, count, revenue in rows}
-          if revenueByStatus.get('paid') != expectedPaidRevenue:
-              raise ValueError("paid revenue mismatch")
-          if countByStatus.get('paid') != expectedPaidCount:
-              raise ValueError("paid count mismatch")
-          return True
-
-      revenueReport = workflowCon.sql("""
-          SELECT
-              status,
-              COUNT(*) AS orderCount,
-              SUM(amount) AS revenue
-          FROM lessonOrders
-          GROUP BY status
-          ORDER BY status
-      """).fetchall()
-
-      assert validateRevenueReport(revenueReport)
-      assert dict((status, count) for status, count, revenue in revenueReport)['paid'] == 3
-      revenueReport
-  - type: code
-    language: python
-    title: '실무 변주: 기준 금액을 바꿔 대상 추출'
-    description: 고액 결제 기준을 바꾸며 대상 주문이 어떻게 달라지는지 비교합니다.
-    content: |-
-      def findHighValuePaidOrders(minAmount):
-          if minAmount <= 0:
-              raise ValueError("minAmount must be positive")
-          return workflowCon.sql(f"""
-              SELECT orderId, amount
-              FROM lessonOrders
-              WHERE status = 'paid' AND amount >= {minAmount}
-              ORDER BY amount DESC
-          """).fetchall()
-
-      highValue60000 = findHighValuePaidOrders(60000)
-      highValue100000 = findHighValuePaidOrders(100000)
-
-      assert [row[0] for row in highValue60000] == ['A-102', 'A-104']
-      assert [row[0] for row in highValue100000] == ['A-102']
-      highValue60000, highValue100000
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

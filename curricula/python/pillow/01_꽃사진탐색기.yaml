@@ -34,16 +34,14 @@ sections:
   title: 1단계. 라이브러리와 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 내장 이미지
-  goal: '1단계. 라이브러리와 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리와 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     sklearn에는 학습용 샘플 이미지가 내장되어 있습니다. load_sample_image() 함수로 china.jpg와 flower.jpg를 불러올 수 있습니다. 이 이미지는 NumPy 배열로 반환되므로 Pillow의 Image.fromarray()로 변환합니다.
 
     load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB 3채널입니다.
   tips:
   - load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB 3채널입니다.
-  - Image.fromarray()는 NumPy 배열을 Pillow Image 객체로 변환합니다. Jupyter/Codaro에서 Image 객체를 마지막 라인에 두면 이미지가 출력됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from PIL import Image
     from sklearn.datasets import load_sample_image
@@ -51,280 +49,128 @@ sections:
     flowerArr = load_sample_image('flower.jpg')
     flowerArr.shape
   exercise:
-    prompt: '1단계. 라이브러리와 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
 
       flowerArr = load_sample_image('flower.jpg')
       flowerArr.shape
-    solution: |-
-      from PIL import Image
-      from sklearn.datasets import load_sample_image
-
-      flowerArr = load_sample_image('flower.jpg')
-      flowerArr.shape
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: sklearn에는 학습용 샘플 이미지가 내장되어 있습니다. load_sample_image() 함수로 china.jpg와 flower.jpg를 불러올 수 있습니다. 이 이미지는 NumPy 배열로
-      반환되므로 Pillow의 Image.fromarray()로 변환합니다.
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: PIL과 sklearn에서 필요한 모듈을 임포트합니다
-    content: |-
-      from PIL import Image
-      from sklearn.datasets import load_sample_image
-
-      flowerArr = load_sample_image('flower.jpg')
-      flowerArr.shape
-  - type: tip
-    content: load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB 3채널입니다.
-  - type: code
-    language: python
-    title: NumPy 배열을 Pillow 이미지로
-    description: Image.fromarray()로 변환합니다
-    content: |-
-      img = Image.fromarray(flowerArr)
-      img
-  - type: tip
-    content: Image.fromarray()는 NumPy 배열을 Pillow Image 객체로 변환합니다. Jupyter/Codaro에서 Image 객체를 마지막 라인에 두면 이미지가 출력됩니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_info
   title: 2단계. 이미지 정보 확인
   structuredPrimary: true
   subtitle: size, mode, format
-  goal: '2단계. 이미지 정보 확인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 이미지 정보 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: Pillow Image 객체는 여러 속성을 제공합니다. size는 (너비, 높이) 튜플, mode는 색상 모드(RGB, L 등), format은 파일 포맷입니다. 배열에서 변환한 이미지는 format이
-    None입니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: Pillow Image 객체는 여러 속성을 제공합니다. size는 (너비, 높이) 튜플, mode는 색상 모드(RGB, L 등), format은 파일 포맷입니다. 배열에서 변환한 이미지는 format이 None입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     width, height = img.size
     width, height
   exercise:
-    prompt: '2단계. 이미지 정보 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       width, height = img.size
       width, height
-    solution: |-
-      width, height = img.size
-      width, height
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Pillow Image 객체는 여러 속성을 제공합니다. size는 (너비, 높이) 튜플, mode는 색상 모드(RGB, L 등), format은 파일 포맷입니다. 배열에서 변환한 이미지는 format이
-      None입니다.
-  - type: code
-    language: python
-    title: 이미지 크기
-    description: width와 height를 확인합니다
-    content: |-
-      width, height = img.size
-      width, height
-  - type: code
-    language: python
-    title: 색상 모드
-    description: RGB, L, RGBA 등을 확인합니다
-    content: img.mode
-  - type: code
-    language: python
-    title: 이미지 포맷
-    description: 파일에서 읽으면 JPEG, PNG 등이 표시됩니다
-    content: img.format
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_thumbnail
   title: 3단계. 썸네일 생성
   structuredPrimary: true
   subtitle: thumbnail()
-  goal: '3단계. 썸네일 생성: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 썸네일 생성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     thumbnail() 메서드는 이미지를 지정한 크기 내에 맞게 축소합니다. 원본 비율을 유지하면서 최대 크기를 제한합니다. 주의할 점은 thumbnail()이 원본 이미지를 직접 수정한다는 것입니다. 원본을 보존하려면 copy()로 복사본을 만들어야 합니다.
 
     thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를 사용하세요.
   tips:
   - thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를 사용하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     thumb = img.copy()
     thumb.size
   exercise:
-    prompt: '3단계. 썸네일 생성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       thumb = img.copy()
       thumb.size
-    solution: |-
-      thumb = img.copy()
-      thumb.size
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: thumbnail() 메서드는 이미지를 지정한 크기 내에 맞게 축소합니다. 원본 비율을 유지하면서 최대 크기를 제한합니다. 주의할 점은 thumbnail()이 원본 이미지를 직접 수정한다는 것입니다.
-      원본을 보존하려면 copy()로 복사본을 만들어야 합니다.
-  - type: code
-    language: python
-    title: 복사본 생성
-    description: 원본 보존을 위해 copy()합니다
-    content: |-
-      thumb = img.copy()
-      thumb.size
-  - type: code
-    language: python
-    title: 썸네일 만들기
-    description: 최대 150x150 내로 축소합니다
-    content: |-
-      thumb.thumbnail((150, 150))
-      thumb.size
-  - type: tip
-    content: thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를 사용하세요.
-  - type: code
-    language: python
-    title: 썸네일 확인
-    description: 축소된 이미지를 출력합니다
-    content: thumb
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_resize
   title: 4단계. 리사이즈
   structuredPrimary: true
   subtitle: resize()
-  goal: '4단계. 리사이즈: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 리사이즈: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     resize()는 정확한 크기로 이미지를 변환합니다. thumbnail()과 달리 비율을 무시하고 지정한 크기로 변환합니다. resize()는 새 이미지를 반환하고 원본은 유지됩니다.
 
     resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율 계산 후 resize()를 사용하세요.
   tips:
   - resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율 계산 후 resize()를 사용하세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     square = img.resize((200, 200))
     square.size
   exercise:
-    prompt: '4단계. 리사이즈: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       square = img.resize((200, 200))
       square.size
-    solution: |-
-      square = img.resize((200, 200))
-      square.size
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: resize()는 정확한 크기로 이미지를 변환합니다. thumbnail()과 달리 비율을 무시하고 지정한 크기로 변환합니다. resize()는 새 이미지를 반환하고 원본은 유지됩니다.
-  - type: code
-    language: python
-    title: 정사각형으로 리사이즈
-    description: 200x200으로 변환합니다
-    content: |-
-      square = img.resize((200, 200))
-      square.size
-  - type: code
-    language: python
-    title: 리사이즈 결과
-    description: 비율이 변경된 이미지입니다
-    content: square
-  - type: tip
-    content: resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율 계산 후 resize()를
-      사용하세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_display
   title: 5단계. 나란히 비교
   structuredPrimary: true
   subtitle: 원본과 썸네일
-  goal: '5단계. 나란히 비교: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 나란히 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 원본 이미지와 생성한 썸네일, 리사이즈 이미지를 비교해봅시다. 각각의 크기 차이를 확인할 수 있습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     original = img.size
     thumbSize = thumb.size
     squareSize = square.size
     original, thumbSize, squareSize
   exercise:
-    prompt: '5단계. 나란히 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       original = img.size
       thumbSize = thumb.size
       squareSize = square.size
       original, thumbSize, squareSize
-    solution: |-
-      original = img.size
-      thumbSize = thumb.size
-      squareSize = square.size
-      original, thumbSize, squareSize
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 원본 이미지와 생성한 썸네일, 리사이즈 이미지를 비교해봅시다. 각각의 크기 차이를 확인할 수 있습니다.
-  - type: code
-    language: python
-    title: 크기 비교
-    description: 세 이미지의 크기를 확인합니다
-    content: |-
-      original = img.size
-      thumbSize = thumb.size
-      squareSize = square.size
-      original, thumbSize, squareSize
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: china 이미지 탐색
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     sklearn의 china.jpg 이미지를 불러와 정보를 확인하고 썸네일을 생성해봅시다. 위에서 배운 size, mode 속성 확인과 thumbnail(), resize() 메서드를 직접 적용해봅니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     from PIL import Image
     from sklearn.datasets import load_sample_image
@@ -333,7 +179,7 @@ sections:
     china = Image.fromarray(chinaArr)
     china.size, china.mode
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -341,74 +187,20 @@ sections:
       chinaArr = load_sample_image('china.jpg')
       china = Image.fromarray(chinaArr)
       china.size, china.mode
-    solution: |-
-      from PIL import Image
-      from sklearn.datasets import load_sample_image
-
-      chinaArr = load_sample_image('china.jpg')
-      china = Image.fromarray(chinaArr)
-      china.size, china.mode
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: sklearn의 china.jpg 이미지를 불러와 정보를 확인하고 썸네일을 생성해봅시다. 위에서 배운 size, mode 속성 확인과 thumbnail(), resize() 메서드를 직접 적용해봅니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: china 이미지 정보'
-    blocks:
-    - type: code
-      title: 이미지 로드
-      content: |-
-        from PIL import Image
-        from sklearn.datasets import load_sample_image
-
-        chinaArr = load_sample_image('china.jpg')
-        china = Image.fromarray(chinaArr)
-        china.size, china.mode
-    - type: code
-      title: 이미지 출력
-      content: china
-  - type: expansion
-    title: '미션2: china 썸네일 생성'
-    blocks:
-    - type: code
-      title: 이미지 로드
-      content: |-
-        from PIL import Image
-        from sklearn.datasets import load_sample_image
-
-        landscapeArr = load_sample_image('china.jpg')
-        landscape = Image.fromarray(landscapeArr)
-        landscape.size
-    - type: code
-      title: 썸네일 생성
-      content: |-
-        preview = landscape.copy()
-        preview.thumbnail((100, 100))
-        preview.size
-    - type: code
-      title: 썸네일 출력
-      content: preview
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: 6단계. 이미지 메타데이터 검증 루프
   structuredPrimary: true
   subtitle: size, mode, thumbnail 확인
-  goal: '6단계. 이미지 메타데이터 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 이미지 메타데이터 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 이미지를 여는 법을 배웠다면 다음 단계는 입력 이미지가 기대한 크기와 mode인지 검증하는 것입니다. 로컬에서 꽃 모양 이미지를 만들고 썸네일 생성 규칙을 assert로 확인합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     from PIL import Image, ImageDraw, ImageStat
 
@@ -427,7 +219,7 @@ sections:
 
     validateImageInfo(flowerImage)
   exercise:
-    prompt: '6단계. 이미지 메타데이터 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageStat
 
@@ -445,96 +237,8 @@ sections:
           return True
 
       validateImageInfo(flowerImage)
-    solution: |-
-      from PIL import Image, ImageDraw, ImageStat
-
-      flowerImage = Image.new("RGB", (180, 120), (235, 245, 255))
-      flowerDraw = ImageDraw.Draw(flowerImage)
-      for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
-          flowerDraw.ellipse(box, fill=(238, 90, 150))
-      flowerDraw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
-
-      def validateImageInfo(image):
-          if image.mode != "RGB":
-              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-          if image.size[0] < 100 or image.size[1] < 80:
-              raise ValueError(f"이미지가 너무 작습니다: {image.size}")
-          return True
-
-      validateImageInfo(flowerImage)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 이미지를 여는 법을 배웠다면 다음 단계는 입력 이미지가 기대한 크기와 mode인지 검증하는 것입니다. 로컬에서 꽃 모양 이미지를 만들고 썸네일 생성 규칙을 assert로 확인합니다.
-  - type: code
-    language: python
-    title: 꽃 이미지 샘플 만들기
-    description: 외부 사진 없이 꽃잎과 중심을 가진 RGB 이미지를 만듭니다.
-    content: |-
-      from PIL import Image, ImageDraw, ImageStat
-
-      flowerImage = Image.new("RGB", (180, 120), (235, 245, 255))
-      flowerDraw = ImageDraw.Draw(flowerImage)
-      for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
-          flowerDraw.ellipse(box, fill=(238, 90, 150))
-      flowerDraw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
-
-      def validateImageInfo(image):
-          if image.mode != "RGB":
-              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-          if image.size[0] < 100 or image.size[1] < 80:
-              raise ValueError(f"이미지가 너무 작습니다: {image.size}")
-          return True
-
-      validateImageInfo(flowerImage)
-  - type: code
-    language: python
-    title: 작은 이미지 오류 확인
-    description: 너무 작은 이미지를 넣어 검증 실패를 확인합니다.
-    content: |-
-      tinyFlower = Image.new("RGB", (40, 40), "white")
-
-      try:
-          validateImageInfo(tinyFlower)
-      except ValueError as exc:
-          flowerErrorMessage = str(exc)
-
-      flowerErrorMessage
-  - type: code
-    language: python
-    title: 썸네일과 색상 검증
-    description: thumbnail 결과 크기와 꽃 영역의 평균 색을 확인합니다.
-    content: |-
-      flowerThumb = flowerImage.copy()
-      flowerThumb.thumbnail((90, 90))
-      flowerStat = ImageStat.Stat(flowerImage)
-      flowerChecks = {
-          "thumbnailKeepsRatio": flowerThumb.size == (90, 60),
-          "modeOk": flowerImage.mode == "RGB",
-          "sizeOk": flowerImage.size == (180, 120),
-          "redChannelDominant": flowerStat.mean[0] > flowerStat.mean[2] * 0.8,
-          "errorOk": flowerErrorMessage == "이미지가 너무 작습니다: (40, 40)",
-      }
-
-      assert all(flowerChecks.values()), flowerChecks
-      flowerChecks
-  - type: code
-    language: python
-    title: 실무 변주
-    description: 다른 썸네일 제한을 적용해도 원본이 변하지 않는지 확인합니다.
-    content: |-
-      reviewThumb = flowerImage.copy()
-      reviewThumb.thumbnail((60, 50))
-
-      assert reviewThumb.size == (60, 40)
-      assert flowerImage.size == (180, 120)
-      reviewThumb.size, flowerImage.size
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

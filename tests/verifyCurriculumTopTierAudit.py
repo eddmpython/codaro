@@ -197,8 +197,8 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         "missingPackages": missingPackages,
         "documentRuntimePackages": documentRuntimePackages,
         "solutionCount": solutionCount,
-        "hasPractice": countBlocks(content, "expansion") > 0,
-        "codeBlockCount": countBlocks(content, "code"),
+        "hasPractice": countBlocks(content, "expansion") > 0 or structuredPracticeCount(content) > 0,
+        "codeBlockCount": countBlocks(content, "code") + structuredCodeCount(content),
         "directPipInstall": bool(re.search(r"\bpip\s+install\b", text)),
         "badInstallCopy": bool(BAD_INSTALL_COPY_RE.search(text) and declaredPackages),
         "externalUrlCount": len(re.findall(r"https?://", text)),
@@ -260,16 +260,63 @@ def introSignalSummary(
 
 def inferImportedPackages(content: dict[str, Any]) -> list[str]:
     packages: set[str] = set()
-    for block in walkBlocks(content):
-        if block.get("type") not in {"code", "expansion"}:
-            continue
-        code = textValue(block.get("code") if block.get("code") is not None else block.get("content"))
+    for code in codeSamples(content):
         for match in IMPORT_RE.finditer(code):
             moduleName = (match.group(1) or match.group(2) or "").split(".")[0]
             if not moduleName or moduleName in STDLIB_MODULES:
                 continue
             packages.add(PACKAGE_ALIASES.get(moduleName, moduleName))
     return sorted(packages, key=str.lower)
+
+
+def codeSamples(content: dict[str, Any]):
+    for block in walkBlocks(content):
+        if block.get("type") not in {"code", "expansion"}:
+            continue
+        yield textValue(block.get("code") if block.get("code") is not None else block.get("content"))
+    for section in structuredSections(content):
+        yield textValue(section.get("snippet"))
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict):
+            yield textValue(exercise.get("starterCode"))
+            yield textValue(exercise.get("solution"))
+
+
+def structuredSections(content: dict[str, Any]) -> list[dict[str, Any]]:
+    sections = content.get("sections")
+    if not isinstance(sections, list):
+        return []
+    return [
+        section
+        for section in sections
+        if isinstance(section, dict)
+        and (
+            section.get("structuredPrimary") is True
+            or any(key in section for key in ("goal", "snippet", "exercise", "check"))
+        )
+    ]
+
+
+def structuredPracticeCount(content: dict[str, Any]) -> int:
+    count = 0
+    for section in structuredSections(content):
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict) and any(
+            textValue(exercise.get(key)) for key in ("prompt", "starterCode", "solution")
+        ):
+            count += 1
+    return count
+
+
+def structuredCodeCount(content: dict[str, Any]) -> int:
+    count = 0
+    for section in structuredSections(content):
+        if textValue(section.get("snippet")):
+            count += 1
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict) and textValue(exercise.get("starterCode")):
+            count += 1
+    return count
 
 
 def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
@@ -565,7 +612,9 @@ def isOrientation(rel: str, category: str, content: dict[str, Any]) -> bool:
     fileName = rel.rsplit("/", 1)[-1]
     if fileName.startswith("00_") or category in ORIENTATION_CATEGORIES:
         return True
-    return countBlocks(content, "expansion") == 0 and countBlocks(content, "code") < 2
+    return structuredPracticeCount(content) == 0 and countBlocks(content, "expansion") == 0 and (
+        countBlocks(content, "code") + structuredCodeCount(content)
+    ) < 2
 
 
 def uniqueTextList(value: Any) -> list[str]:

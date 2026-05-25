@@ -78,8 +78,7 @@ sections:
   - type: note
     style: info
     title: DuckDB + 클라우드 = MotherDuck
-    content: MotherDuck은 DuckDB 엔진을 기반으로 한 서버리스 클라우드 데이터 웨어하우스입니다. 로컬에서 돌리던 DuckDB 쿼리를 그대로 클라우드에서 실행할 수 있고, 둘을 동시에 쿼리하는 하이브리드
-      실행도 가능합니다.
+    content: MotherDuck은 DuckDB 엔진을 기반으로 한 서버리스 클라우드 데이터 웨어하우스입니다. 로컬에서 돌리던 DuckDB 쿼리를 그대로 클라우드에서 실행할 수 있고, 둘을 동시에 쿼리하는 하이브리드 실행도 가능합니다.
   - type: featureCards
     cards:
     - emoji: ☁️
@@ -104,8 +103,7 @@ sections:
   - type: note
     style: tip
     title: 로컬 + 클라우드 동시 실행
-    content: 로컬 DuckDB에서 ATTACH 'md:' 한 줄이면 MotherDuck에 연결됩니다. 이후 하나의 쿼리에서 로컬 데이터와 클라우드 데이터를 동시에 조인할 수 있어요. 옵티마이저가 자동으로 데이터
-      위치에 따라 실행을 분배합니다.
+    content: 로컬 DuckDB에서 ATTACH 'md:' 한 줄이면 MotherDuck에 연결됩니다. 이후 하나의 쿼리에서 로컬 데이터와 클라우드 데이터를 동시에 조인할 수 있어요. 옵티마이저가 자동으로 데이터 위치에 따라 실행을 분배합니다.
   - type: featureCards
     cards:
     - emoji: 💻
@@ -128,8 +126,7 @@ sections:
   - type: note
     style: info
     title: Scale-Up 철학
-    content: 분석에 따르면 95% 이상의 데이터베이스가 1TB 미만이고, 95% 이상의 쿼리가 10GB 미만 데이터를 다룹니다. MotherDuck은 복잡한 분산 시스템 대신 단일 노드 수직 확장(Scale-Up)
-      방식을 선택했습니다.
+    content: 분석에 따르면 95% 이상의 데이터베이스가 1TB 미만이고, 95% 이상의 쿼리가 10GB 미만 데이터를 다룹니다. MotherDuck은 복잡한 분산 시스템 대신 단일 노드 수직 확장(Scale-Up) 방식을 선택했습니다.
   - type: featureCards
     cards:
     - emoji: 👤
@@ -218,8 +215,7 @@ sections:
   - type: note
     style: info
     title: 비용 절감 사례
-    content: Definite는 기존 데이터 웨어하우스에서 MotherDuck으로 전환 후 70% 비용 절감을 달성했습니다. DuckDB의 효율적인 쿼리 엔진과 Scale-Up 아키텍처 덕분에 타 서비스 대비
-      10배 저렴한 경우도 있습니다.
+    content: Definite는 기존 데이터 웨어하우스에서 MotherDuck으로 전환 후 70% 비용 절감을 달성했습니다. DuckDB의 효율적인 쿼리 엔진과 Scale-Up 아키텍처 덕분에 타 서비스 대비 10배 저렴한 경우도 있습니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -322,13 +318,11 @@ sections:
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
-  goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-    고정합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import duckdb
 
@@ -351,7 +345,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import duckdb
 
@@ -373,136 +367,8 @@ sections:
 
       assert rowCount == 5
       rowCount
-    solution: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로
-      고정합니다.
-  - type: code
-    language: python
-    title: 로컬 주문 테이블 준비와 예측
-    description: 네트워크나 외부 DB 없이 인메모리 DuckDB 테이블로 재현 가능한 분석 흐름을 만듭니다.
-    content: |-
-      import duckdb
-
-      workflowCon = duckdb.connect()
-      workflowCon.sql("""
-          CREATE OR REPLACE TABLE lessonOrders AS
-          SELECT * FROM (VALUES
-              ('A-100', 'paid', 50000, 'web'),
-              ('A-101', 'pending', 20000, 'app'),
-              ('A-102', 'paid', 120000, 'web'),
-              ('A-103', 'cancelled', 15000, 'store'),
-              ('A-104', 'paid', 62000, 'app')
-          ) AS t(orderId, status, amount, channel)
-      """)
-
-      expectedPaidRevenue = 232000
-      expectedPaidCount = 3
-      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
-
-      assert rowCount == 5
-      rowCount
-  - type: code
-    language: python
-    title: SQL 오류를 먼저 확인한다
-    description: 없는 컬럼을 조회해 BinderException을 확인하고, 컬럼명을 고쳐 다시 실행합니다.
-    content: |-
-      try:
-          workflowCon.sql("SELECT missingAmount FROM lessonOrders").fetchall()
-      except duckdb.BinderException as exc:
-          duckdbColumnError = str(exc).splitlines()[0]
-      else:
-          raise AssertionError("없는 컬럼 조회는 실패해야 합니다")
-
-      fixedAmounts = workflowCon.sql("""
-          SELECT orderId, amount
-          FROM lessonOrders
-          WHERE status = 'paid'
-          ORDER BY amount DESC
-      """).fetchall()
-
-      assert "missingAmount" in duckdbColumnError
-      assert fixedAmounts[0] == ('A-102', 120000)
-      duckdbColumnError
-  - type: code
-    language: python
-    title: 집계 결과를 업무 규칙으로 검증
-    description: 상태별 매출 집계가 예상한 paid 건수와 금액을 만족하는지 확인합니다.
-    content: |-
-      def validateRevenueReport(rows):
-          if not rows:
-              raise ValueError("report must not be empty")
-
-          revenueByStatus = {status: revenue for status, count, revenue in rows}
-          countByStatus = {status: count for status, count, revenue in rows}
-          if revenueByStatus.get('paid') != expectedPaidRevenue:
-              raise ValueError("paid revenue mismatch")
-          if countByStatus.get('paid') != expectedPaidCount:
-              raise ValueError("paid count mismatch")
-          return True
-
-      revenueReport = workflowCon.sql("""
-          SELECT
-              status,
-              COUNT(*) AS orderCount,
-              SUM(amount) AS revenue
-          FROM lessonOrders
-          GROUP BY status
-          ORDER BY status
-      """).fetchall()
-
-      assert validateRevenueReport(revenueReport)
-      assert dict((status, count) for status, count, revenue in revenueReport)['paid'] == 3
-      revenueReport
-  - type: code
-    language: python
-    title: '실무 변주: 기준 금액을 바꿔 대상 추출'
-    description: 고액 결제 기준을 바꾸며 대상 주문이 어떻게 달라지는지 비교합니다.
-    content: |-
-      def findHighValuePaidOrders(minAmount):
-          if minAmount <= 0:
-              raise ValueError("minAmount must be positive")
-          return workflowCon.sql(f"""
-              SELECT orderId, amount
-              FROM lessonOrders
-              WHERE status = 'paid' AND amount >= {minAmount}
-              ORDER BY amount DESC
-          """).fetchall()
-
-      highValue60000 = findHighValuePaidOrders(60000)
-      highValue100000 = findHighValuePaidOrders(100000)
-
-      assert [row[0] for row in highValue60000] == ['A-102', 'A-104']
-      assert [row[0] for row in highValue100000] == ['A-102']
-      highValue60000, highValue100000
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

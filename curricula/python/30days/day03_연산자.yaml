@@ -31,867 +31,411 @@ sections:
   title: 덧셈 연산자
   structuredPrimary: true
   subtitle: + 기호로 더하기
-  goal: '덧셈 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '덧셈 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
 
     결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
   tips:
   - 결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     itemA = 10
     itemB = 20
     itemA + itemB
   exercise:
-    prompt: '덧셈 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       itemA = 10
       itemB = 20
       itemA + itemB
-    solution: |-
-      itemA = 10
-      itemB = 20
-      itemA + itemB
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
-  - type: list
-    items:
-    - 정수 덧셈 가능
-    - 소수 덧셈 가능
-    - 정수 + 소수 = 소수
-  - type: code
-    language: python
-    title: 덧셈 계산
-    description: 두 숫자를 더한 결과가 자동 출력됩니다.
-    content: |-
-      itemA = 10
-      itemB = 20
-      itemA + itemB
-  - type: tip
-    content: 결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: sub_operator
   title: 뺄셈 연산자
   structuredPrimary: true
   subtitle: '- 기호로 빼기'
-  goal: '뺄셈 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '뺄셈 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     budget = 100
     spent = 35
     budget - spent
   exercise:
-    prompt: '뺄셈 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       budget = 100
       spent = 35
       budget - spent
-    solution: |-
-      budget = 100
-      spent = 35
-      budget - spent
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
-  - type: list
-    items:
-    - 앞 숫자 - 뒤 숫자
-    - 음수 결과 가능
-    - 순서 바뀌면 결과도 바뀜
-  - type: code
-    language: python
-    title: 뺄셈 계산
-    description: 100에서 35를 뺀 결과입니다.
-    content: |-
-      budget = 100
-      spent = 35
-      budget - spent
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: mul_operator
   title: 곱셈 연산자
   structuredPrimary: true
   subtitle: '* 기호로 곱하기'
-  goal: '곱셈 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '곱셈 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     width = 7
     height = 8
     width * height
   exercise:
-    prompt: '곱셈 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       width = 7
       height = 8
       width * height
-    solution: |-
-      width = 7
-      height = 8
-      width * height
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
-  - type: list
-    items:
-    - '* 기호로 곱셈'
-    - 정수와 소수 모두 가능
-    - 음수 곱셈도 가능
-  - type: code
-    language: python
-    title: 곱셈 계산
-    description: 7과 8을 곱한 결과입니다.
-    content: |-
-      width = 7
-      height = 8
-      width * height
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: div_operator
   title: 나눗셈 연산자
   structuredPrimary: true
   subtitle: / 기호로 나누기
-  goal: '나눗셈 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '나눗셈 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
 
     결과가 3.3333...처럼 소수로 나옵니다.
   tips:
   - 결과가 3.3333...처럼 소수로 나옵니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     dividend = 10
     divisor = 3
     dividend / divisor
   exercise:
-    prompt: '나눗셈 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       dividend = 10
       divisor = 3
       dividend / divisor
-    solution: |-
-      dividend = 10
-      divisor = 3
-      dividend / divisor
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
-  - type: list
-    items:
-    - / 기호로 나눗셈
-    - 결과는 항상 소수
-    - 0으로 나누면 에러
-  - type: code
-    language: python
-    title: 나눗셈 계산
-    description: 10을 3으로 나눈 결과입니다.
-    content: |-
-      dividend = 10
-      divisor = 3
-      dividend / divisor
-  - type: tip
-    content: 결과가 3.3333...처럼 소수로 나옵니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: floordiv_operator
   title: 몫 연산자
   structuredPrimary: true
   subtitle: // 기호로 몫 구하기
-  goal: '몫 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '몫 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     items = 17
     boxes = 5
     items // boxes
   exercise:
-    prompt: '몫 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       items = 17
       boxes = 5
       items // boxes
-    solution: |-
-      items = 17
-      boxes = 5
-      items // boxes
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
-  - type: list
-    items:
-    - // 기호로 몫 계산
-    - 소수점 이하 버림
-    - 정수 결과 반환
-  - type: code
-    language: python
-    title: 몫 계산
-    description: 17을 5로 나눈 몫을 구합니다.
-    content: |-
-      items = 17
-      boxes = 5
-      items // boxes
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: mod_operator
   title: 나머지 연산자
   structuredPrimary: true
   subtitle: '% 기호로 나머지 구하기'
-  goal: '나머지 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '나머지 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
 
     val % 2가 0이면 짝수, 1이면 홀수입니다.
   tips:
   - val % 2가 0이면 짝수, 1이면 홀수입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     coins = 17
     slots = 5
     coins % slots
   exercise:
-    prompt: '나머지 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       coins = 17
       slots = 5
       coins % slots
-    solution: |-
-      coins = 17
-      slots = 5
-      coins % slots
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
-  - type: list
-    items:
-    - '% 기호로 나머지 계산'
-    - 나눗셈 후 남은 값
-    - 짝수/홀수 판별에 유용
-  - type: code
-    language: python
-    title: 나머지 계산
-    description: 17을 5로 나눈 나머지를 구합니다.
-    content: |-
-      coins = 17
-      slots = 5
-      coins % slots
-  - type: tip
-    content: val % 2가 0이면 짝수, 1이면 홀수입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: pow_operator
   title: 거듭제곱 연산자
   structuredPrimary: true
   subtitle: '** 기호로 제곱 계산'
-  goal: '거듭제곱 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '거듭제곱 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     base = 2
     power = 10
     base ** power
   exercise:
-    prompt: '거듭제곱 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       base = 2
       power = 10
       base ** power
-    solution: |-
-      base = 2
-      power = 10
-      base ** power
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
-  - type: list
-    items:
-    - '** 기호로 거듭제곱'
-    - 2 ** 3 = 2³ = 8
-    - 제곱근도 가능 (9 ** 0.5 = 3)
-  - type: code
-    language: python
-    title: 거듭제곱 계산
-    description: 2의 10승을 계산합니다.
-    content: |-
-      base = 2
-      power = 10
-      base ** power
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: compare_equal
   title: 같음 비교 연산자
   structuredPrimary: true
   subtitle: == 기호로 같은지 확인
-  goal: '같음 비교 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '같음 비교 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!
 
     = 하나는 대입, == 두 개는 비교입니다.
   tips:
   - = 하나는 대입, == 두 개는 비교입니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     left = 10
     right = 10
     left == right
   exercise:
-    prompt: '같음 비교 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       left = 10
       right = 10
       left == right
-    solution: |-
-      left = 10
-      right = 10
-      left == right
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: '같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!'
-  - type: list
-    items:
-    - == 기호로 같은지 비교
-    - 결과는 True 또는 False
-    - = (대입)과 == (비교) 구별
-  - type: code
-    language: python
-    title: 같음 비교
-    description: 두 숫자가 같은지 비교합니다.
-    content: |-
-      left = 10
-      right = 10
-      left == right
-  - type: tip
-    content: = 하나는 대입, == 두 개는 비교입니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: compare_notequal
   title: 다름 비교 연산자
   structuredPrimary: true
   subtitle: '!= 기호로 다른지 확인'
-  goal: '다름 비교 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '다름 비교 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     first = 5
     second = 8
     first != second
   exercise:
-    prompt: '다름 비교 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       first = 5
       second = 8
       first != second
-    solution: |-
-      first = 5
-      second = 8
-      first != second
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
-  - type: list
-    items:
-    - '!= 기호로 다른지 비교'
-    - 다르면 True
-    - 같으면 False
-  - type: code
-    language: python
-    title: 다름 비교
-    description: 두 숫자가 다른지 비교합니다.
-    content: |-
-      first = 5
-      second = 8
-      first != second
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: compare_greater
   title: 크기 비교 연산자
   structuredPrimary: true
   subtitle: '> < >= <= 기호로 크기 비교'
-  goal: '크기 비교 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '크기 비교 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     val = 15
     target = 10
     val > target
   exercise:
-    prompt: '크기 비교 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       val = 15
       target = 10
       val > target
-    solution: |-
-      val = 15
-      target = 10
-      val > target
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
-  - type: list
-    items:
-    - '> (크다), < (작다)'
-    - '>= (크거나 같다), <= (작거나 같다)'
-    - 결과는 True 또는 False
-  - type: code
-    language: python
-    title: 크다 (>)
-    description: 왼쪽이 오른쪽보다 큰지 비교합니다.
-    content: |-
-      val = 15
-      target = 10
-      val > target
-  - type: code
-    language: python
-    title: 작다 (<)
-    description: 왼쪽이 오른쪽보다 작은지 비교합니다.
-    content: |-
-      num = 15
-      limit = 10
-      num < limit
-  - type: code
-    language: python
-    title: 크거나 같다 (>=)
-    description: 왼쪽이 오른쪽보다 크거나 같은지 비교합니다.
-    content: |-
-      level = 15
-      min = 10
-      level >= min
-  - type: code
-    language: python
-    title: 작거나 같다 (<=)
-    description: 왼쪽이 오른쪽보다 작거나 같은지 비교합니다.
-    content: |-
-      stock = 15
-      max = 10
-      stock <= max
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: logical_and
   title: and 논리 연산자
   structuredPrimary: true
   subtitle: 모두 참이어야 참
-  goal: 'and 논리 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'and 논리 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     adult = True
     valid = True
     adult and valid
   exercise:
-    prompt: 'and 논리 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       adult = True
       valid = True
       adult and valid
-    solution: |-
-      adult = True
-      valid = True
-      adult and valid
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
-  - type: list
-    items:
-    - 양쪽 모두 True → True
-    - 하나라도 False → False
-    - '''그리고''의 의미'
-  - type: code
-    language: python
-    title: and 연산
-    description: 두 조건을 and로 결합합니다.
-    content: |-
-      adult = True
-      valid = True
-      adult and valid
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: logical_or
   title: or 논리 연산자
   structuredPrimary: true
   subtitle: 하나만 참이어도 참
-  goal: 'or 논리 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'or 논리 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     cash = True
     card = False
     cash or card
   exercise:
-    prompt: 'or 논리 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       cash = True
       card = False
       cash or card
-    solution: |-
-      cash = True
-      card = False
-      cash or card
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
-  - type: list
-    items:
-    - 하나라도 True → True
-    - 둘 다 False → False
-    - '''또는''의 의미'
-  - type: code
-    language: python
-    title: or 연산
-    description: 두 조건을 or로 결합합니다.
-    content: |-
-      cash = True
-      card = False
-      cash or card
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: logical_not
   title: not 논리 연산자
   structuredPrimary: true
   subtitle: 참과 거짓 반전
-  goal: 'not 논리 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'not 논리 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     rain = True
     not rain
   exercise:
-    prompt: 'not 논리 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       rain = True
       not rain
-    solution: |-
-      rain = True
-      not rain
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
-  - type: list
-    items:
-    - True → False
-    - False → True
-    - '''아니다''의 의미'
-  - type: code
-    language: python
-    title: not 연산
-    description: 조건을 반전시킵니다.
-    content: |-
-      rain = True
-      not rain
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: membership_in
   title: in 멤버십 연산자
   structuredPrimary: true
   subtitle: 포함 여부 확인
-  goal: 'in 멤버십 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'in 멤버십 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
 
     'not in'을 사용하면 포함되지 않았는지 확인할 수 있습니다.
   tips:
   - '''not in''을 사용하면 포함되지 않았는지 확인할 수 있습니다.'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     lang = 'Python'
     'th' in lang
   exercise:
-    prompt: 'in 멤버십 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       lang = 'Python'
       'th' in lang
-    solution: |-
-      lang = 'Python'
-      'th' in lang
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
-  - type: list
-    items:
-    - 포함되어 있으면 True
-    - 없으면 False
-    - 문자열 검색에 유용
-  - type: code
-    language: python
-    title: in 연산
-    description: 문자열에 특정 문자가 포함되어 있는지 확인합니다.
-    content: |-
-      lang = 'Python'
-      'th' in lang
-  - type: tip
-    content: '''not in''을 사용하면 포함되지 않았는지 확인할 수 있습니다.'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: compound_assign
   title: 복합 대입 연산자
   structuredPrimary: true
   subtitle: 연산과 대입을 한번에
-  goal: '복합 대입 연산자: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '복합 대입 연산자: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     balance = 50
     balance += 10
     balance
   exercise:
-    prompt: '복합 대입 연산자: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       balance = 50
       balance += 10
       balance
-    solution: |-
-      balance = 50
-      balance += 10
-      balance
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
-  - type: list
-    items:
-    - += 덧셈 후 대입
-    - -= 뺄셈 후 대입
-    - '*= 곱셈 후 대입'
-    - /= 나눗셈 후 대입
-  - type: code
-    language: python
-    title: 복합 대입 연산
-    description: 숫자에 10을 더한 후 다시 저장합니다.
-    content: |-
-      balance = 50
-      balance += 10
-      balance
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: operator_priority
   title: 연산자 우선순위
   structuredPrimary: true
   subtitle: 계산 순서 이해하기
-  goal: '연산자 우선순위: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '연산자 우선순위: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
 
     헷갈릴 때는 괄호를 사용하면 명확해집니다.
   tips:
   - 헷갈릴 때는 괄호를 사용하면 명확해집니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     raw = 2 + 3 * 4
     grouped = (2 + 3) * 4
     print('without_paren:', raw)
     print('with_paren:', grouped)
   exercise:
-    prompt: '연산자 우선순위: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       raw = 2 + 3 * 4
       grouped = (2 + 3) * 4
       print('without_paren:', raw)
       print('with_paren:', grouped)
-    solution: |-
-      raw = 2 + 3 * 4
-      grouped = (2 + 3) * 4
-      print('without_paren:', raw)
-      print('with_paren:', grouped)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
-  - type: list
-    items:
-    - '1순위: 괄호 ()'
-    - '2순위: 거듭제곱 **'
-    - '3순위: 곱셈/나눗셈 * / // %'
-    - '4순위: 덧셈/뺄셈 + -'
-    - '5순위: 비교 연산자'
-    - '6순위: 논리 연산자'
-  - type: code
-    language: python
-    title: 연산자 우선순위
-    description: 우선순위에 따라 계산됩니다.
-    content: |-
-      raw = 2 + 3 * 4
-      grouped = (2 + 3) * 4
-      print('without_paren:', raw)
-      print('with_paren:', grouped)
-  - type: tip
-    content: 헷갈릴 때는 괄호를 사용하면 명확해집니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: workflow_validation
   title: '검증 루프: 주문 계산식과 승인 조건'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: '검증 루프: 주문 계산식과 승인 조건: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '검증 루프: 주문 계산식과 승인 조건: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저 예측하고, 괄호 하나가 결과를 어떻게
-    바꾸는지 검증해야 합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저 예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     unitPrice = 12000
     quantity = 4
@@ -909,7 +453,7 @@ sections:
     assert total == 46656
     total
   exercise:
-    prompt: '검증 루프: 주문 계산식과 승인 조건: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       unitPrice = 12000
       quantity = 4
@@ -926,387 +470,33 @@ sections:
       assert discount == 4800
       assert total == 46656
       total
-    solution: |-
-      unitPrice = 12000
-      quantity = 4
-      discountRate = 10
-      taxRate = 8
-
-      subtotal = unitPrice * quantity
-      discount = subtotal * discountRate / 100
-      taxableAmount = subtotal - discount
-      tax = taxableAmount * taxRate / 100
-      total = taxableAmount + tax
-
-      assert subtotal == 48000
-      assert discount == 4800
-      assert total == 46656
-      total
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저 예측하고, 괄호 하나가 결과를 어떻게
-      바꾸는지 검증해야 합니다.
-  - type: code
-    language: python
-    title: 주문 합계 계산을 예상값으로 검증
-    description: 산술 연산자를 조합해 소계, 할인, 세금, 최종 금액을 계산합니다.
-    content: |-
-      unitPrice = 12000
-      quantity = 4
-      discountRate = 10
-      taxRate = 8
-
-      subtotal = unitPrice * quantity
-      discount = subtotal * discountRate / 100
-      taxableAmount = subtotal - discount
-      tax = taxableAmount * taxRate / 100
-      total = taxableAmount + tax
-
-      assert subtotal == 48000
-      assert discount == 4800
-      assert total == 46656
-      total
-  - type: code
-    language: python
-    title: 잘못된 입력을 먼저 실패시킨다
-    description: 수량과 단가는 양수여야 한다는 업무 규칙을 계산 전에 확인합니다.
-    content: |-
-      def calculateSubtotal(unitPrice, quantity):
-          if unitPrice <= 0:
-              raise ValueError("unitPrice must be positive")
-          if quantity <= 0:
-              raise ValueError("quantity must be positive")
-          return unitPrice * quantity
-
-      try:
-          calculateSubtotal(12000, 0)
-      except ValueError as exc:
-          operatorInputError = str(exc)
-
-      assert "quantity" in operatorInputError
-      operatorInputError
-  - type: code
-    language: python
-    title: 괄호 누락 오류를 확인한다
-    description: 연산자 우선순위 때문에 할인 계산이 달라지는 상황을 비교합니다.
-    content: |-
-      wrongTotal = subtotal - discountRate / 100
-      rightTotal = subtotal * (1 - discountRate / 100)
-
-      assert wrongTotal != rightTotal
-      assert rightTotal == 43200
-
-      badShippingRule = subtotal + tax >= 50000
-      correctShippingRule = total >= 50000
-
-      assert badShippingRule is True
-      assert correctShippingRule is False
-      badShippingRule, correctShippingRule
-  - type: code
-    language: python
-    title: 승인 조건을 논리 연산자로 표현
-    description: 비교 연산자와 and/or/not을 조합해 업무 조건을 만듭니다.
-    content: |-
-      customerAge = 29
-      monthlySpend = 180000
-      hasOverduePayment = False
-      membership = "gold"
-
-      eligibleForCoupon = (
-          customerAge >= 20
-          and monthlySpend >= 100000
-          and not hasOverduePayment
-          and membership in ("gold", "vip")
-      )
-
-      assert eligibleForCoupon is True
-      eligibleForCoupon
-  - type: code
-    language: python
-    title: '실무 변주: 계산 리포트 만들기'
-    description: 계산값과 조건값을 한 딕셔너리에 담아 다음 단계에서 재사용합니다.
-    content: |-
-      orderReport = {
-          "subtotal": subtotal,
-          "discount": discount,
-          "tax": tax,
-          "total": total,
-          "freeShipping": correctShippingRule,
-          "couponEligible": eligibleForCoupon
-      }
-
-      assert orderReport["total"] == 46656
-      assert orderReport["freeShipping"] is False
-      assert orderReport["couponEligible"] is True
-      orderReport
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: Day 3 종합 복습
   structuredPrimary: true
   subtitle: 연산자 마스터하기
-  goal: 'Day 3 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: 'Day 3 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     math = 85
     english = 90
     total = math + english
     print('total:', total)
   exercise:
-    prompt: 'Day 3 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       apples = 15
       oranges = 25
       apples + oranges
-    solution: |-
-      apples = 15
-      oranges = 25
-      apples + oranges
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
-  - type: expansion
-    title: '🟢 기본1: 덧셈'
-    code: |-
-      apples = 15
-      oranges = 25
-      apples + oranges
-  - type: expansion
-    title: '🟢 기본2: 곱셈'
-    code: |-
-      rows = 6
-      cols = 7
-      rows * cols
-  - type: expansion
-    title: '🟢 기본3: 나눗셈'
-    code: |-
-      pizza = 20
-      people = 4
-      pizza / people
-  - type: expansion
-    title: '🟢 기본4: 같음 비교'
-    code: |-
-      yours = 100
-      mine = 100
-      yours == mine
-  - type: expansion
-    title: '🟢 기본5: 크기 비교'
-    code: |-
-      salary = 50
-      expense = 30
-      salary > expense
-  - type: expansion
-    title: '🟡 응용1: 온도 범위 확인'
-    code: |-
-      temp = 25
-      ok = (temp >= 18) and (temp <= 28)
-      ok
-  - type: expansion
-    title: '🟡 응용2: 점수 계산 및 비교'
-    blocks:
-    - type: code
-      title: 총점
-      content: |-
-        math = 85
-        english = 90
-        total = math + english
-        print('total:', total)
-    - type: code
-      title: 평균
-      content: |-
-        korean = 85
-        science = 90
-        added = korean + science
-        average = added / 2
-        print('average:', average)
-    - type: code
-      title: 합격 여부
-      content: |-
-        history = 85
-        art = 90
-        combined = history + art
-        mean = combined / 2
-        passed = mean >= 80
-        print('pass:', passed)
-  - type: expansion
-    title: '🟡 응용3: 할인가 계산'
-    code: |-
-      original = 50000
-      rate = 20
-      discount = original * rate / 100
-      final = original - discount
-      final
-  - type: expansion
-    title: '🟡 응용4: 자격 조건 확인'
-    code: |-
-      years = 25
-      license = True
-      exp = False
-      ok = (years >= 20) and (license or exp)
-      ok
-  - type: expansion
-    title: '🟡 응용5: 이메일 검증'
-    code: |-
-      email = 'user@example.com'
-      at = '@' in email
-      dot = '.' in email
-      valid = at and dot
-      valid
-  - type: expansion
-    title: '🔴 심화1: 학점 계산 시스템'
-    blocks:
-    - type: code
-      title: 점수
-      content: |-
-        grade = 85
-        print('score:', grade)
-    - type: code
-      title: A학점 여부
-      content: |-
-        point = 85
-        gradeA = point >= 90
-        print('is_A:', gradeA)
-    - type: code
-      title: B학점 여부
-      content: |-
-        mark = 85
-        gradeB = (mark >= 80) and (mark < 90)
-        print('is_B:', gradeB)
-    - type: code
-      title: C학점 여부
-      content: |-
-        score = 85
-        gradeC = (score >= 70) and (score < 80)
-        print('is_C:', gradeC)
-  - type: expansion
-    title: '🔴 심화2: 쇼핑 총액 계산'
-    blocks:
-    - type: code
-      title: 소계
-      content: |-
-        unitA = 15000
-        qtyA = 3
-        subtotal = unitA * qtyA
-        print('subtotal:', subtotal)
-    - type: code
-      title: 세금
-      content: |-
-        unitB = 15000
-        qtyB = 3
-        base = unitB * qtyB
-        tax = base * 10 / 100
-        print('tax:', tax)
-    - type: code
-      title: 총액
-      content: |-
-        unitC = 15000
-        qtyC = 3
-        sub = unitC * qtyC
-        fee = sub * 10 / 100
-        amount = sub + fee
-        print('total:', amount)
-    - type: code
-      title: 무료배송 여부
-      content: |-
-        unitD = 15000
-        qtyD = 3
-        subD = unitD * qtyD
-        vat = subD * 10 / 100
-        grand = subD + vat
-        free = grand >= 50000
-        print('free_shipping:', free)
-  - type: expansion
-    title: '🔴 심화3: 온도 변환 및 검증'
-    blocks:
-    - type: code
-      title: 섭씨 온도
-      content: |-
-        celsius = 25
-        print('celsius:', celsius)
-    - type: code
-      title: 화씨 온도
-      content: |-
-        degree = 25
-        fahrenheit = degree * 9 / 5 + 32
-        print('fahrenheit:', fahrenheit)
-    - type: code
-      title: 쾌적 여부
-      content: |-
-        thermal = 25
-        comfort = (thermal >= 20) and (thermal <= 26)
-        print('comfortable:', comfort)
-  - type: expansion
-    title: '🔴 심화4: 게임 점수 시스템'
-    blocks:
-    - type: code
-      title: 게임 점수
-      content: |-
-        kills = 10
-        deaths = 3
-        assists = 5
-        score = kills * 100 - deaths * 50 + assists * 30
-        print('score:', score)
-    - type: code
-      title: KDA 비율
-      content: |-
-        frags = 10
-        loses = 3
-        helps = 5
-        kda = (frags + helps) / loses
-        print('kda_ratio:', kda)
-    - type: code
-      title: MVP 여부
-      content: |-
-        hit = 10
-        miss = 3
-        mvp = (hit > 15) or ((hit > 10) and (miss < 5))
-        print('is_mvp:', mvp)
-  - type: expansion
-    title: '🔴 심화5: 복잡한 조건 판별'
-    blocks:
-    - type: code
-      title: 조건1 확인
-      content: |-
-        ageA = 28
-        income = 45000
-        check1 = (ageA >= 25) and (income >= 40000)
-        print('condition1:', check1)
-    - type: code
-      title: 조건2 확인
-      content: |-
-        ageB = 28
-        credit = 720
-        check2 = (credit >= 700) and (ageB >= 20)
-        print('condition2:', check2)
-    - type: code
-      title: 최종 승인
-      content: |-
-        ageC = 28
-        wage = 45000
-        rating = 720
-        rule1 = (ageC >= 25) and (wage >= 40000)
-        rule2 = (rating >= 700) and (ageC >= 20)
-        approved = rule1 or rule2
-        print('approved:', approved)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

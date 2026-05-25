@@ -135,6 +135,8 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
     directExercise = _exerciseContract(section.get("exercise"))
     inferredExercise = _firstExerciseFromBlocks(blocks)
     exercise = directExercise if _hasExerciseData(directExercise) else inferredExercise
+    if exercise.starterCode and not exercise.solution:
+        exercise = exercise.model_copy(update={"solution": exercise.starterCode})
     check = _checkMap(section.get("check")) or exercise.check
     contract = LearningSectionContract(
         id=_textValue(section.get("id")) or f"section-{index}",

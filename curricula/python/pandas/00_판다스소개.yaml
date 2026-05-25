@@ -309,8 +309,7 @@ sections:
   - type: note
     style: info
     title: 이 커리큘럼의 방식
-    content: 아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약 체계적으로 공부하고 싶다면 Pandas공식문서를
-      우선 공부하면 도움됩니다.
+    content: 아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약 체계적으로 공부하고 싶다면 Pandas공식문서를 우선 공부하면 도움됩니다.
   - type: links
     items:
     - text: pandas 공식 문서
@@ -326,8 +325,8 @@ sections:
   title: '현업 흐름 검증: 주문 DataFrame 기본 점검'
   structuredPrimary: true
   subtitle: DataFrame 생성, 컬럼 검증, 집계, 실패 케이스
-  goal: '현업 흐름 검증: 주문 DataFrame 기본 점검: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 주문 DataFrame 기본 점검: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다.
 
@@ -335,7 +334,6 @@ sections:
     요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요.
   tips:
   - 변주 실험 요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import pandas as pd
 
@@ -351,7 +349,7 @@ sections:
     assert daily.set_index("day").loc["Mon", "amount"] == 20000
     assert daily["amount"].sum() == orders["amount"].sum()
   exercise:
-    prompt: '현업 흐름 검증: 주문 DataFrame 기본 점검: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import pandas as pd
 
@@ -366,71 +364,8 @@ sections:
       assert list(orders.columns) == ["orderId", "day", "amount"]
       assert daily.set_index("day").loc["Mon", "amount"] == 20000
       assert daily["amount"].sum() == orders["amount"].sum()
-    solution: |-
-      import pandas as pd
-
-      orders = pd.DataFrame({
-          "orderId": ["O-1", "O-2", "O-3"],
-          "day": ["Mon", "Mon", "Tue"],
-          "amount": [12000, 8000, 15000],
-      })
-
-      daily = orders.groupby("day", as_index=False)["amount"].sum()
-
-      assert list(orders.columns) == ["orderId", "day", "amount"]
-      assert daily.set_index("day").loc["Mon", "amount"] == 20000
-      assert daily["amount"].sum() == orders["amount"].sum()
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다.
-  - type: code
-    language: python
-    title: 주문 표 생성과 일별 집계
-    description: DataFrame 기본 조작을 업무 검증 흐름으로 확인합니다.
-    content: |-
-      import pandas as pd
-
-      orders = pd.DataFrame({
-          "orderId": ["O-1", "O-2", "O-3"],
-          "day": ["Mon", "Mon", "Tue"],
-          "amount": [12000, 8000, 15000],
-      })
-
-      daily = orders.groupby("day", as_index=False)["amount"].sum()
-
-      assert list(orders.columns) == ["orderId", "day", "amount"]
-      assert daily.set_index("day").loc["Mon", "amount"] == 20000
-      assert daily["amount"].sum() == orders["amount"].sum()
-  - type: code
-    language: python
-    title: 필수 컬럼 오류 확인
-    description: 필수 컬럼이 빠진 표는 분석 전에 멈춥니다.
-    content: |-
-      import pandas as pd
-
-      def validateOrders(frame):
-          required = {"orderId", "day", "amount"}
-          missing = required - set(frame.columns)
-          if missing:
-              raise ValueError(f"missing columns: {sorted(missing)}")
-          return True
-
-      try:
-          validateOrders(pd.DataFrame({"orderId": ["O-1"]}))
-      except ValueError as exc:
-          message = str(exc)
-
-      assert "amount" in message
-  - type: tip
-    title: 변주 실험
-    content: 요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

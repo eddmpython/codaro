@@ -190,8 +190,7 @@ sections:
   - type: note
     style: info
     title: Figure-level vs Axes-level
-    content: Figure-level 함수는 col, row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. Axes-level 함수는 ax 파라미터로 기존 서브플롯에 그릴 수 있어 Matplotlib과 조합하기
-      좋습니다.
+    content: Figure-level 함수는 col, row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. Axes-level 함수는 ax 파라미터로 기존 서브플롯에 그릴 수 있어 Matplotlib과 조합하기 좋습니다.
 - id: relational
   blocks:
   - type: sectionHeader
@@ -518,15 +517,14 @@ sections:
   title: 17단계. Seaborn 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
-  goal: '17단계. Seaborn 학습 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '17단계. Seaborn 학습 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Seaborn 입문은 함수 이름을 외우는 과정이 아닙니다. 어떤 질문에 어떤 차트를 고르고, 데이터 구조가 그 차트에 맞는지 확인한 뒤, 완성된 Axes가 보고서에 들어갈 수준인지 점검해야 합니다.
 
     입문 레슨도 로컬 데이터, 예측, 검증, 변주를 한 번 통과해야 뒤 레슨의 차트 선택 기준이 생깁니다.
   tips:
   - 입문 레슨도 로컬 데이터, 예측, 검증, 변주를 한 번 통과해야 뒤 레슨의 차트 선택 기준이 생깁니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import matplotlib.pyplot as plt
     import seaborn as sns
@@ -546,7 +544,7 @@ sections:
 
     print(prediction, round(correlation, 3))
   exercise:
-    prompt: '17단계. Seaborn 학습 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -565,108 +563,8 @@ sections:
       assert correlation > 0.6
 
       print(prediction, round(correlation, 3))
-    solution: |-
-      import matplotlib.pyplot as plt
-      import seaborn as sns
-      from codaro.curriculum.localData import loadLocalDataset
-
-      seabornTips = loadLocalDataset("tips")
-      requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
-      missingColumns = requiredColumns - set(seabornTips.columns)
-
-      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
-      assert len(seabornTips) >= 100
-      assert seabornTips["total_bill"].gt(seabornTips["tip"]).all()
-
-      prediction = "계산 금액이 클수록 팁도 대체로 커질 것이다"
-      correlation = seabornTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
-      assert correlation > 0.6
-
-      print(prediction, round(correlation, 3))
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Seaborn 입문은 함수 이름을 외우는 과정이 아닙니다. 어떤 질문에 어떤 차트를 고르고, 데이터 구조가 그 차트에 맞는지 확인한 뒤, 완성된 Axes가 보고서에 들어갈 수준인지 점검해야 합니다.
-  - type: code
-    language: python
-    title: 로컬 데이터와 학습 예측 확인
-    description: tips 데이터로 분포와 관계 차트에 필요한 컬럼을 확인합니다
-    content: |-
-      import matplotlib.pyplot as plt
-      import seaborn as sns
-      from codaro.curriculum.localData import loadLocalDataset
-
-      seabornTips = loadLocalDataset("tips")
-      requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
-      missingColumns = requiredColumns - set(seabornTips.columns)
-
-      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
-      assert len(seabornTips) >= 100
-      assert seabornTips["total_bill"].gt(seabornTips["tip"]).all()
-
-      prediction = "계산 금액이 클수록 팁도 대체로 커질 것이다"
-      correlation = seabornTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
-      assert correlation > 0.6
-
-      print(prediction, round(correlation, 3))
-  - type: code
-    language: python
-    title: 차트 선택과 객체 검증
-    description: scatterplot이 관계 질문을 실제 축과 제목으로 표현했는지 확인합니다
-    content: |-
-      figIntro, axIntro = plt.subplots(figsize=(7, 5))
-      sns.scatterplot(data=seabornTips, x="total_bill", y="tip", hue="time", ax=axIntro)
-      axIntro.set_title("Tip grows with bill size")
-      axIntro.set_xlabel("Total bill")
-      axIntro.set_ylabel("Tip")
-
-      assert axIntro.get_xlabel() == "Total bill"
-      assert axIntro.get_ylabel() == "Tip"
-      assert "Tip grows" in axIntro.get_title()
-      assert axIntro.get_legend() is not None
-
-      figIntro
-  - type: code
-    language: python
-    title: 의도한 오류 고치기
-    description: 차트에 필요한 컬럼이 없을 때 조용히 진행하지 않고 실패시킵니다
-    content: |-
-      def requireChartColumns(frame, columns):
-          missing = set(columns) - set(frame.columns)
-          if missing:
-              raise ValueError(f"차트에 필요한 컬럼이 없습니다: {sorted(missing)}")
-          return True
-
-      brokenTips = seabornTips.drop(columns=["tip"])
-      try:
-          requireChartColumns(brokenTips, ["total_bill", "tip"])
-      except ValueError as exc:
-          print("검증 실패 확인:", exc)
-
-      assert requireChartColumns(seabornTips, ["total_bill", "tip"])
-  - type: code
-    language: python
-    title: 실무 변주 실험
-    description: hue 후보를 바꿔 분석 질문이 어떻게 달라지는지 비교합니다
-    content: |-
-      hueCandidates = ["time", "smoker", "day"]
-      hueSummary = []
-      for hueColumn in hueCandidates:
-          groupCount = seabornTips[hueColumn].nunique()
-          tipSpread = seabornTips.groupby(hueColumn)["tip"].mean().max() - seabornTips.groupby(hueColumn)["tip"].mean().min()
-          hueSummary.append({"hue": hueColumn, "groups": int(groupCount), "tipSpread": round(float(tipSpread), 2)})
-
-      assert hueSummary[0]["groups"] == 2
-      assert max(item["tipSpread"] for item in hueSummary) > 1.0
-      hueSummary
-  - type: tip
-    content: 입문 레슨도 로컬 데이터, 예측, 검증, 변주를 한 번 통과해야 뒤 레슨의 차트 선택 기준이 생깁니다.
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인

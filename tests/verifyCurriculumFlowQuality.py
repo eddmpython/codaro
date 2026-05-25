@@ -75,9 +75,9 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
     declaredPackages = uniquePackages(meta.get("packages"))
     declaredNormalized = {normalizePackageName(item) for item in declaredPackages}
     missingPackages = [package for package in importedPackages if normalizePackageName(package) not in declaredNormalized]
-    expansionCount = countBlocks(content, "expansion")
-    codeCount = countBlocks(content, "code")
-    orientation = isOrientation(rel, category, expansionCount)
+    expansionCount = countBlocks(content, "expansion") + structuredPracticeCount(content)
+    codeCount = countBlocks(content, "code") + structuredCodeCount(content)
+    orientation = isOrientation(rel, category)
     failures: list[str] = []
 
     try:
@@ -148,16 +148,61 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
 
 def inferImportedPackages(content: dict[str, Any]) -> list[str]:
     packages: set[str] = set()
-    for block in walkBlocks(content):
-        if block.get("type") not in {"code", "expansion"}:
-            continue
-        code = textValue(block.get("code") if block.get("code") is not None else block.get("content"))
+    for code in codeSamples(content):
         for match in IMPORT_RE.finditer(code):
             moduleName = (match.group(1) or match.group(2) or "").split(".")[0]
             if not moduleName or moduleName in STDLIB_MODULES:
                 continue
             packages.add(PACKAGE_ALIASES.get(moduleName, moduleName))
     return sorted(packages, key=str.lower)
+
+
+def codeSamples(content: dict[str, Any]):
+    for block in walkBlocks(content):
+        if block.get("type") not in {"code", "expansion"}:
+            continue
+        yield textValue(block.get("code") if block.get("code") is not None else block.get("content"))
+    for section in structuredSections(content):
+        yield textValue(section.get("snippet"))
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict):
+            yield textValue(exercise.get("starterCode"))
+            yield textValue(exercise.get("solution"))
+
+
+def structuredSections(content: dict[str, Any]) -> list[dict[str, Any]]:
+    sections = content.get("sections")
+    if not isinstance(sections, list):
+        return []
+    result: list[dict[str, Any]] = []
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        if section.get("structuredPrimary") is True or any(key in section for key in ("goal", "snippet", "exercise", "check")):
+            result.append(section)
+    return result
+
+
+def structuredPracticeCount(content: dict[str, Any]) -> int:
+    count = 0
+    for section in structuredSections(content):
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict) and any(
+            textValue(exercise.get(key)) for key in ("prompt", "starterCode", "solution")
+        ):
+            count += 1
+    return count
+
+
+def structuredCodeCount(content: dict[str, Any]) -> int:
+    count = 0
+    for section in structuredSections(content):
+        if textValue(section.get("snippet")):
+            count += 1
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict) and textValue(exercise.get("starterCode")):
+            count += 1
+    return count
 
 
 def countBlocks(content: dict[str, Any], sourceType: str) -> int:
@@ -181,6 +226,11 @@ def hasCompletionSignal(content: dict[str, Any]) -> bool:
         if not isinstance(section, dict):
             continue
         parts.append(textValue(section.get("title")))
+        parts.append(textValue(section.get("goal")))
+        parts.append(textValue(section.get("why")))
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict):
+            parts.append(textValue(exercise.get("prompt")))
         for block in section.get("blocks", []):
             if isinstance(block, dict):
                 parts.append(textValue(block.get("title")))
@@ -189,9 +239,9 @@ def hasCompletionSignal(content: dict[str, Any]) -> bool:
     return any(marker in haystack for marker in COMPLETION_MARKERS)
 
 
-def isOrientation(rel: str, category: str, expansionCount: int) -> bool:
+def isOrientation(rel: str, category: str) -> bool:
     fileName = rel.rsplit("/", 1)[-1]
-    return expansionCount == 0 and (fileName.startswith("00_") or category in ORIENTATION_CATEGORIES)
+    return fileName.startswith("00_") or category in ORIENTATION_CATEGORIES
 
 
 def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:

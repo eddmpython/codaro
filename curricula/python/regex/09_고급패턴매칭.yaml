@@ -30,169 +30,90 @@ sections:
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: import re
-    solution: import re
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: code
-    language: python
-    title: 라이브러리 불러오기
-    description: 정규표현식 모듈
-    content: import re
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step2_problem
   title: 2단계. 문제 상황
   structuredPrimary: true
   subtitle: 일반 패턴의 한계
-  goal: '2단계. 문제 상황: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '2단계. 문제 상황: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     가격에서 숫자만 추출하고 싶은 상황을 생각해봅시다. $100, $200처럼 달러 기호 뒤의 숫자를 찾고 싶지만, $ 기호 자체는 결과에 포함하고 싶지 않습니다. 일반 패턴으로는 이런 조건부 매칭이 어렵습니다.
 
     결과: ['$100', '$200', '$300'] - $ 기호가 포함되었습니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     text = "가격: $100, $200, $300"
 
     pattern = r"\$\d+"
     re.findall(pattern, text)
   exercise:
-    prompt: '2단계. 문제 상황: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "가격: $100, $200, $300"
 
       pattern = r"\$\d+"
       re.findall(pattern, text)
-    solution: |-
-      text = "가격: $100, $200, $300"
-
-      pattern = r"\$\d+"
-      re.findall(pattern, text)
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 가격에서 숫자만 추출하고 싶은 상황을 생각해봅시다. $100, $200처럼 달러 기호 뒤의 숫자를 찾고 싶지만, $ 기호 자체는 결과에 포함하고 싶지 않습니다. 일반 패턴으로는 이런 조건부 매칭이
-      어렵습니다.
-  - type: code
-    language: python
-    title: 일반 패턴의 문제
-    description: $ 기호가 포함되어 버림
-    content: |-
-      text = "가격: $100, $200, $300"
-
-      pattern = r"\$\d+"
-      re.findall(pattern, text)
-  - type: text
-    content: '결과: [''$100'', ''$200'', ''$300''] - $ 기호가 포함되었습니다.'
-  - type: text
-    content: '원하는 결과: [''100'', ''200'', ''300''] - 숫자만 필요합니다!'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step3_positive_lookbehind
   title: 3단계. 긍정 후방탐색 (?<=...)
   structuredPrimary: true
   subtitle: 뒤를 보되 포함하지 않기
-  goal: '3단계. 긍정 후방탐색 (?<=...): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '3단계. 긍정 후방탐색 (?<=...): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     긍정 후방탐색 (?<=패턴)은 앞에 특정 패턴이 있는 위치를 찾되, 그 패턴 자체는 결과에 포함하지 않습니다. 제로폭 단언(zero-width assertion)이라고도 하며, 위치만 확인하고 문자를 소비하지 않는 특수한 기능입니다.
 
     결과: ['100', '200', '300'] - 완벽합니다!
   tips:
-  - '긍정 후방탐색: (?<=...) **(?<=패턴)매칭**: - "앞에 패턴이 있는" 매칭을 찾음 - 하지만 패턴 자체는 결과에 포함하지 않음 - **제로폭 단언**: 위치만 확인, 문자 소비 안 함 예: `(?<=@)\w+`
-    → @ 뒤의 단어 (@ 제외)'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - '긍정 후방탐색: (?<=...) **(?<=패턴)매칭**: - "앞에 패턴이 있는" 매칭을 찾음 - 하지만 패턴 자체는 결과에 포함하지 않음 - **제로폭 단언**: 위치만 확인, 문자 소비 안 함 예: `(?<=@)\w+` → @ 뒤의 단어 (@ 제외)'
   snippet: |-
     pattern = r"(?<=\$)\d+"
 
     prices = re.findall(pattern, text)
     prices
   exercise:
-    prompt: '3단계. 긍정 후방탐색 (?<=...): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       pattern = r"(?<=\$)\d+"
 
       prices = re.findall(pattern, text)
       prices
-    solution: |-
-      pattern = r"(?<=\$)\d+"
-
-      prices = re.findall(pattern, text)
-      prices
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 긍정 후방탐색 (?<=패턴)은 앞에 특정 패턴이 있는 위치를 찾되, 그 패턴 자체는 결과에 포함하지 않습니다. 제로폭 단언(zero-width assertion)이라고도 하며, 위치만 확인하고 문자를
-      소비하지 않는 특수한 기능입니다.
-  - type: code
-    language: python
-    title: 긍정 후방탐색 사용
-    description: $ 뒤의 숫자만 추출
-    content: |-
-      pattern = r"(?<=\$)\d+"
-
-      prices = re.findall(pattern, text)
-      prices
-  - type: text
-    content: '결과: [''100'', ''200'', ''300''] - 완벽합니다!'
-  - type: note
-    style: tip
-    title: '긍정 후방탐색: (?<=...)'
-    content: |-
-      **(?<=패턴)매칭**:
-      - "앞에 패턴이 있는" 매칭을 찾음
-      - 하지만 패턴 자체는 결과에 포함하지 않음
-      - **제로폭 단언**: 위치만 확인, 문자 소비 안 함
-
-      예: `(?<=@)\w+` → @ 뒤의 단어 (@ 제외)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step4_positive_lookahead
   title: 4단계. 긍정 전방탐색 (?=...)
   structuredPrimary: true
   subtitle: 앞을 보되 포함하지 않기
-  goal: '4단계. 긍정 전방탐색 (?=...): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '4단계. 긍정 전방탐색 (?=...): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     긍정 전방탐색 (?=패턴)은 뒤에 특정 패턴이 있는 위치를 찾되, 그 패턴은 결과에 포함하지 않습니다. 후방탐색과 반대 방향으로 작동합니다. 예를 들어 퍼센트 기호 앞의 숫자만 추출할 때 유용합니다.
 
     결과: ['10', '20', '30'] - % 기호는 제외!
   tips:
   - '긍정 전방탐색: (?=...) **매칭(?=패턴)**: - "뒤에 패턴이 있는" 매칭을 찾음 - 패턴은 결과에 포함하지 않음 예: `\w+(?=@)` → @ 앞의 단어 (@ 제외)'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     text = "할인율: 10%, 20%, 30%"
 
@@ -201,7 +122,7 @@ sections:
     discounts = re.findall(pattern, text)
     discounts
   exercise:
-    prompt: '4단계. 긍정 전방탐색 (?=...): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "할인율: 10%, 20%, 30%"
 
@@ -209,61 +130,23 @@ sections:
 
       discounts = re.findall(pattern, text)
       discounts
-    solution: |-
-      text = "할인율: 10%, 20%, 30%"
-
-      pattern = r"\d+(?=%)"
-
-      discounts = re.findall(pattern, text)
-      discounts
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 긍정 전방탐색 (?=패턴)은 뒤에 특정 패턴이 있는 위치를 찾되, 그 패턴은 결과에 포함하지 않습니다. 후방탐색과 반대 방향으로 작동합니다. 예를 들어 퍼센트 기호 앞의 숫자만 추출할 때 유용합니다.
-  - type: code
-    language: python
-    title: 긍정 전방탐색 사용
-    description: '% 앞의 숫자만 추출'
-    content: |-
-      text = "할인율: 10%, 20%, 30%"
-
-      pattern = r"\d+(?=%)"
-
-      discounts = re.findall(pattern, text)
-      discounts
-  - type: text
-    content: '결과: [''10'', ''20'', ''30''] - % 기호는 제외!'
-  - type: note
-    style: tip
-    title: '긍정 전방탐색: (?=...)'
-    content: |-
-      **매칭(?=패턴)**:
-      - "뒤에 패턴이 있는" 매칭을 찾음
-      - 패턴은 결과에 포함하지 않음
-
-      예: `\w+(?=@)` → @ 앞의 단어 (@ 제외)
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step5_negative_lookbehind
   title: 5단계. 부정 후방탐색 (?<!...)
   structuredPrimary: true
   subtitle: 뒤에 패턴이 없을 때
-  goal: '5단계. 부정 후방탐색 (?<!...): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '5단계. 부정 후방탐색 (?<!...): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     부정 후방탐색 (?<!패턴)은 앞에 특정 패턴이 없을 때만 매칭합니다. 긍정 후방탐색의 반대 개념으로, 특정 접두사가 없는 패턴을 찾을 때 사용합니다. 예를 들어 달러 기호가 없는 숫자만 찾을 수 있습니다.
 
     결과: ['200'] - $ 없는 숫자만 찾았습니다!
   tips:
   - '부정 후방탐색: (?<!...) **(?<!패턴)매칭**: - "앞에 패턴이 없는" 매칭만 찾음 - 특정 문맥을 제외할 때 유용 예: `(?<!un)\w+` → un으로 시작하지 않는 단어'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     text = "금액: $100 또는 200 또는 $300"
 
@@ -272,7 +155,7 @@ sections:
     numbers = re.findall(pattern, text)
     numbers
   exercise:
-    prompt: '5단계. 부정 후방탐색 (?<!...): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "금액: $100 또는 200 또는 $300"
 
@@ -280,62 +163,23 @@ sections:
 
       numbers = re.findall(pattern, text)
       numbers
-    solution: |-
-      text = "금액: $100 또는 200 또는 $300"
-
-      pattern = r"(?<!\$)\b\d+"
-
-      numbers = re.findall(pattern, text)
-      numbers
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 부정 후방탐색 (?<!패턴)은 앞에 특정 패턴이 없을 때만 매칭합니다. 긍정 후방탐색의 반대 개념으로, 특정 접두사가 없는 패턴을 찾을 때 사용합니다. 예를 들어 달러 기호가 없는 숫자만 찾을 수
-      있습니다.
-  - type: code
-    language: python
-    title: 부정 후방탐색 사용
-    description: $ 기호가 없는 숫자만 찾기
-    content: |-
-      text = "금액: $100 또는 200 또는 $300"
-
-      pattern = r"(?<!\$)\b\d+"
-
-      numbers = re.findall(pattern, text)
-      numbers
-  - type: text
-    content: '결과: [''200''] - $ 없는 숫자만 찾았습니다!'
-  - type: note
-    style: tip
-    title: '부정 후방탐색: (?<!...)'
-    content: |-
-      **(?<!패턴)매칭**:
-      - "앞에 패턴이 없는" 매칭만 찾음
-      - 특정 문맥을 제외할 때 유용
-
-      예: `(?<!un)\w+` → un으로 시작하지 않는 단어
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step6_negative_lookahead
   title: 6단계. 부정 전방탐색 (?!...)
   structuredPrimary: true
   subtitle: 앞에 패턴이 없을 때
-  goal: '6단계. 부정 전방탐색 (?!...): 실행 가능한 Python 흐름으로 익힌다.'
-  why: '6단계. 부정 전방탐색 (?!...): 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     (?!패턴) : "뒤에 패턴이 없으면" 매칭합니다.
 
     .com이 아닌 이메일만 추출되었습니다!
   tips:
   - '부정 전방탐색: (?!...) **매칭(?!패턴)**: - "뒤에 패턴이 없는" 매칭만 찾음 - 특정 경우를 제외할 때 사용 예: `\d+(?!%)` → % 로 끝나지 않는 숫자'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     text = "이메일: user@site.com, admin@service.org, info@shop.net"
 
@@ -344,7 +188,7 @@ sections:
     nonComEmails = re.findall(pattern, text)
     nonComEmails
   exercise:
-    prompt: '6단계. 부정 전방탐색 (?!...): 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "이메일: user@site.com, admin@service.org, info@shop.net"
 
@@ -352,61 +196,23 @@ sections:
 
       nonComEmails = re.findall(pattern, text)
       nonComEmails
-    solution: |-
-      text = "이메일: user@site.com, admin@service.org, info@shop.net"
-
-      pattern = r"\S+@\S+\.(?!com)\w+"
-
-      nonComEmails = re.findall(pattern, text)
-      nonComEmails
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: '(?!패턴) : "뒤에 패턴이 없으면" 매칭합니다.'
-  - type: code
-    language: python
-    title: 부정 전방탐색 사용
-    description: .com이 아닌 이메일만 찾기
-    content: |-
-      text = "이메일: user@site.com, admin@service.org, info@shop.net"
-
-      pattern = r"\S+@\S+\.(?!com)\w+"
-
-      nonComEmails = re.findall(pattern, text)
-      nonComEmails
-  - type: text
-    content: .com이 아닌 이메일만 추출되었습니다!
-  - type: note
-    style: tip
-    title: '부정 전방탐색: (?!...)'
-    content: |-
-      **매칭(?!패턴)**:
-      - "뒤에 패턴이 없는" 매칭만 찾음
-      - 특정 경우를 제외할 때 사용
-
-      예: `\d+(?!%)` → % 로 끝나지 않는 숫자
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step7_combination
   title: 7단계. 조합 사용
   structuredPrimary: true
   subtitle: Lookaround 여러 개
-  goal: '7단계. 조합 사용: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '7단계. 조합 사용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Lookahead와 Lookbehind를 동시에 사용하여 복잡한 조건을 만듭니다.
 
     결과: ['100'] - $ 뒤에 있고 % 앞에 있는 숫자만!
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     text = "예산: $100%, 매출: $200, 목표: 300%"
 
@@ -415,7 +221,7 @@ sections:
     result = re.findall(pattern, text)
     result
   exercise:
-    prompt: '7단계. 조합 사용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "예산: $100%, 매출: $200, 목표: 300%"
 
@@ -423,54 +229,24 @@ sections:
 
       result = re.findall(pattern, text)
       result
-    solution: |-
-      text = "예산: $100%, 매출: $200, 목표: 300%"
-
-      pattern = r"(?<=\$)\d+(?=%)"
-
-      result = re.findall(pattern, text)
-      result
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Lookahead와 Lookbehind를 동시에 사용하여 복잡한 조건을 만듭니다.
-  - type: code
-    language: python
-    title: 전방 + 후방 조합
-    description: $와 % 사이의 숫자만
-    content: |-
-      text = "예산: $100%, 매출: $200, 목표: 300%"
-
-      pattern = r"(?<=\$)\d+(?=%)"
-
-      result = re.findall(pattern, text)
-      result
-  - type: text
-    content: '결과: [''100''] - $ 뒤에 있고 % 앞에 있는 숫자만!'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step8_password_validation
   title: 8단계. 비밀번호 검증
   structuredPrimary: true
   subtitle: 실전 활용
-  goal: '8단계. 비밀번호 검증: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '8단계. 비밀번호 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Lookahead로 "8자 이상, 대문자 포함, 숫자 포함" 조건을 동시에 검증합니다.
 
     복수 조건 검증
     `^(?=.*[A-Z])(?=.*\d).{8,}$`: - `(?=.*[A-Z])` : 대문자가 있는지 확인 - `(?=.*\d)` : 숫자가 있는지 확인 - `.{8,}` : 8자 이상 각 조건이 독립적으로 검증됩니다!
   tips:
-  - '복수 조건 검증 `^(?=.*[A-Z])(?=.*\d).{8,}$`: - `(?=.*[A-Z])` : 대문자가 있는지 확인 - `(?=.*\d)` : 숫자가 있는지 확인 - `.{8,}` : 8자 이상 각 조건이
-    독립적으로 검증됩니다!'
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - '복수 조건 검증 `^(?=.*[A-Z])(?=.*\d).{8,}$`: - `(?=.*[A-Z])` : 대문자가 있는지 확인 - `(?=.*\d)` : 숫자가 있는지 확인 - `.{8,}` : 8자 이상 각 조건이 독립적으로 검증됩니다!'
   snippet: |-
     def validatePassword(password):
         pattern = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
@@ -481,7 +257,7 @@ sections:
     results = {pwd: validatePassword(pwd) for pwd in passwords}
     results
   exercise:
-    prompt: '8단계. 비밀번호 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       def validatePassword(password):
           pattern = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
@@ -491,64 +267,23 @@ sections:
 
       results = {pwd: validatePassword(pwd) for pwd in passwords}
       results
-    solution: |-
-      def validatePassword(password):
-          pattern = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
-          return re.match(pattern, password) is not None
-
-      passwords = ["weak", "Weak123", "STRONG456", "Good1Pass"]
-
-      results = {pwd: validatePassword(pwd) for pwd in passwords}
-      results
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Lookahead로 "8자 이상, 대문자 포함, 숫자 포함" 조건을 동시에 검증합니다.
-  - type: code
-    language: python
-    title: 비밀번호 규칙
-    description: 여러 조건을 모두 만족하는지 확인
-    content: |-
-      def validatePassword(password):
-          pattern = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
-          return re.match(pattern, password) is not None
-
-      passwords = ["weak", "Weak123", "STRONG456", "Good1Pass"]
-
-      results = {pwd: validatePassword(pwd) for pwd in passwords}
-      results
-  - type: note
-    style: tip
-    title: 복수 조건 검증
-    content: |-
-      `^(?=.*[A-Z])(?=.*\d).{8,}$`:
-      - `(?=.*[A-Z])` : 대문자가 있는지 확인
-      - `(?=.*\d)` : 숫자가 있는지 확인
-      - `.{8,}` : 8자 이상
-
-      각 조건이 독립적으로 검증됩니다!
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step9_extract_between
   title: 9단계. 특정 구간 추출
   structuredPrimary: true
   subtitle: 태그 사이의 내용만
-  goal: '9단계. 특정 구간 추출: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '9단계. 특정 구간 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     HTML 태그 사이의 내용만 추출합니다.
 
     결과: ['첫 단락', '둘째 단락'] - 태그는 제외하고 내용만!
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
 
@@ -557,7 +292,7 @@ sections:
     contents = re.findall(pattern, html)
     contents
   exercise:
-    prompt: '9단계. 특정 구간 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
 
@@ -565,54 +300,24 @@ sections:
 
       contents = re.findall(pattern, html)
       contents
-    solution: |-
-      html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
-
-      pattern = r"(?<=<p>).*?(?=</p>)"
-
-      contents = re.findall(pattern, html)
-      contents
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: HTML 태그 사이의 내용만 추출합니다.
-  - type: code
-    language: python
-    title: 태그 내용 추출
-    description: <p>와 </p> 사이만
-    content: |-
-      html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
-
-      pattern = r"(?<=<p>).*?(?=</p>)"
-
-      contents = re.findall(pattern, html)
-      contents
-  - type: text
-    content: '결과: [''첫 단락'', ''둘째 단락''] - 태그는 제외하고 내용만!'
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: step10_summary
   title: 10단계. Lookaround 정리
   structuredPrimary: true
   subtitle: 4가지 패턴 비교
-  goal: '10단계. Lookaround 정리: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '10단계. Lookaround 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     Lookaround 패턴을 한눈에 정리합니다.
 
     Lookaround 4종 정리
     | 이름 | 문법 | 의미 | |------|------|------| | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y | | 부정 후방탐색 | (?<!X)Y | X가 아닌 것 뒤의 Y | | 긍정 전방탐색 | Y(?=X) | X 앞의 Y | | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
   tips:
-  - Lookaround 4종 정리 | 이름 | 문법 | 의미 | |------|------|------| | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y | | 부정 후방탐색 | (?<!X)Y | X가 아닌 것
-    뒤의 Y | | 긍정 전방탐색 | Y(?=X) | X 앞의 Y | | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - Lookaround 4종 정리 | 이름 | 문법 | 의미 | |------|------|------| | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y | | 부정 후방탐색 | (?<!X)Y | X가 아닌 것 뒤의 Y | | 긍정 전방탐색 | Y(?=X) | X 앞의 Y | | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
   snippet: |-
     text = "test123abc"
 
@@ -625,7 +330,7 @@ sections:
 
     {name: re.findall(pattern, text) for name, pattern in patterns.items()}
   exercise:
-    prompt: '10단계. Lookaround 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       text = "test123abc"
 
@@ -637,68 +342,23 @@ sections:
       }
 
       {name: re.findall(pattern, text) for name, pattern in patterns.items()}
-    solution: |-
-      text = "test123abc"
-
-      patterns = {
-          "긍정 후방 (?<=test)": r"(?<=test)\d+",
-          "부정 후방 (?<!test)": r"(?<!test)\d+",
-          "긍정 전방 (?=abc)": r"\d+(?=abc)",
-          "부정 전방 (?!abc)": r"\d+(?!abc)"
-      }
-
-      {name: re.findall(pattern, text) for name, pattern in patterns.items()}
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: Lookaround 패턴을 한눈에 정리합니다.
-  - type: code
-    language: python
-    title: 4가지 Lookaround
-    description: 동일한 텍스트로 비교
-    content: |-
-      text = "test123abc"
-
-      patterns = {
-          "긍정 후방 (?<=test)": r"(?<=test)\d+",
-          "부정 후방 (?<!test)": r"(?<!test)\d+",
-          "긍정 전방 (?=abc)": r"\d+(?=abc)",
-          "부정 전방 (?!abc)": r"\d+(?!abc)"
-      }
-
-      {name: re.findall(pattern, text) for name, pattern in patterns.items()}
-  - type: note
-    style: tip
-    title: Lookaround 4종 정리
-    content: |-
-      | 이름 | 문법 | 의미 |
-      |------|------|------|
-      | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y |
-      | 부정 후방탐색 | (?<!X)Y | X가 아닌 것 뒤의 Y |
-      | 긍정 전방탐색 | Y(?=X) | X 앞의 Y |
-      | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 고급 패턴 매칭 프로젝트
-  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
   explanation: |-
     정규표현식 전문가가 되어 복잡한 조건 매칭을 수행합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
   - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
   snippet: |-
     import re
 
@@ -708,7 +368,7 @@ sections:
     prices = re.findall(pat, text)
     prices
   exercise:
-    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -717,62 +377,11 @@ sections:
       pat = r"(?<!만)\b\d+(?=원)"
       prices = re.findall(pat, text)
       prices
-    solution: |-
-      import re
-
-      text = "가격: 1000원, 2000원, 만원, 3000원"
-
-      pat = r"(?<!만)\b\d+(?=원)"
-      prices = re.findall(pat, text)
-      prices
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정규표현식 전문가가 되어 복잡한 조건 매칭을 수행합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
-  - type: tip
-    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  - type: expansion
-    title: '미션1: 가격 추출 (만원 제외)'
-    blocks:
-    - type: code
-      title: 가격 패턴 매칭
-      content: |-
-        import re
-
-        text = "가격: 1000원, 2000원, 만원, 3000원"
-
-        pat = r"(?<!만)\b\d+(?=원)"
-        prices = re.findall(pat, text)
-        prices
-  - type: expansion
-    title: '미션2: 비밀번호 강도 검증'
-    blocks:
-    - type: code
-      title: 검증 함수 정의
-      content: |-
-        import re
-
-        samples = ["weak", "Weak123", "Strong123!", "GoodPass1@", "short1!"]
-
-        def check(pwd):
-            pat = r"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$"
-            return re.match(pat, pwd) is not None
-
-        check("Strong123!")
-    - type: code
-      title: 전체 검증 결과
-      content: |-
-        result = {p: check(p) for p in samples}
-        result
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
 - id: summary
   title: 정리
   subtitle: 아홉 번째 프로젝트 완료!
@@ -791,13 +400,11 @@ sections:
   title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
   structuredPrimary: true
   subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
-  why: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
-  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-    안전하게 처리합니다.
+  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
+  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
   tips:
-  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
-  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import re
 
@@ -817,7 +424,7 @@ sections:
     assert phones == ['010-1234-5678', '02-987-6543']
     emails, phones
   exercise:
-    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
     starterCode: |-
       import re
 
@@ -836,114 +443,8 @@ sections:
       assert emails == ['kim@example.com', 'lee@company.co.kr']
       assert phones == ['010-1234-5678', '02-987-6543']
       emails, phones
-    solution: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
     hints:
-    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
-    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
-    - 오류가 나면 import와 변수 이름부터 확인하세요.
-    check:
-      noError: 실행 오류가 없어야 한다.
-      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
   check:
-    noError: 실행 오류가 없어야 한다.
-    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
-  blocks:
-  - type: text
-    content: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
-      안전하게 처리합니다.
-  - type: code
-    language: python
-    title: 이메일과 전화번호 추출
-    description: 실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다.
-    content: |-
-      import re
-
-      contactText = '''
-      김개발 <kim@example.com> 010-1234-5678
-      lee@company.co.kr / 02-987-6543
-      잘못된 주소: hello@ / 번호: 12345
-      '''
-
-      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
-
-      emails = emailPattern.findall(contactText)
-      phones = phonePattern.findall(contactText)
-
-      assert emails == ['kim@example.com', 'lee@company.co.kr']
-      assert phones == ['010-1234-5678', '02-987-6543']
-      emails, phones
-  - type: code
-    language: python
-    title: 패턴 오류와 빈 입력을 먼저 실패시킨다
-    description: 컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다.
-    content: |-
-      try:
-          re.compile(r'([A-Z]+')
-      except re.error as exc:
-          regexCompileError = str(exc)
-
-      def extractRequiredEmails(text):
-          found = emailPattern.findall(text)
-          if not found:
-              raise ValueError('email not found')
-          return found
-
-      try:
-          extractRequiredEmails('no contact here')
-      except ValueError as exc:
-          emailExtractError = str(exc)
-
-      assert regexCompileError
-      assert emailExtractError == 'email not found'
-      regexCompileError, emailExtractError
-  - type: code
-    language: python
-    title: 정제 결과를 업무 구조로 검증
-    description: 추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다.
-    content: |-
-      def maskEmail(email):
-          name, domain = email.split('@')
-          return name[0] + '***@' + domain
-
-      contactReport = [
-          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
-          for email in emails
-      ]
-      domainCounts = {row['domain']: 0 for row in contactReport}
-      for row in contactReport:
-          domainCounts[row['domain']] += 1
-
-      assert contactReport[0]['masked'] == 'k***@example.com'
-      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
-      contactReport
-  - type: code
-    language: python
-    title: '실무 변주: 허용 도메인 정책 바꾸기'
-    description: 회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다.
-    content: |-
-      def filterAllowedDomains(report, allowedDomains):
-          if not allowedDomains:
-              raise ValueError('allowedDomains must not be empty')
-          return [row for row in report if row['domain'] in allowedDomains]
-
-      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
-      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
-      companyOnly
+    noError: 오류 없이 실행
+    resultCheck: 출력 또는 assert 확인
