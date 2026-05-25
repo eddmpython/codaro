@@ -19,6 +19,8 @@ whenToUse: 커밋 메시지 작성, PR 본문 작성, 릴리즈 태그 발행, G
 - 로컬 브랜치 생성 금지. 모든 작업은 로컬 `main`에서 직접 수행하고, 새 로컬 브랜치 생성/전환/비-`main` push를 하지 않는다. 저장소 Git hook 경로는 `.githooks`이며, `reference-transaction`과 `pre-push`가 `refs/heads/main` 외 로컬 브랜치 ref 생성/갱신/푸시를 차단한다.
 - 외부 contributor의 GitHub pull request는 검토/코멘트/머지할 수 있다. 단, `gh pr checkout`처럼 로컬 브랜치를 만드는 방식은 금지한다. 외부 PR 검토는 GitHub 도구, `gh pr view/diff`, 또는 로컬 브랜치를 만들지 않는 detached/FETCH_HEAD 방식만 사용한다.
 - 이 저장소에서 직접 원격 반영할 때는 `main -> origin/main`만 사용한다.
+- 푸시는 기본적으로 수동 게이트다. 사용자가 `푸시해`, `원격에 올려`, `발간해`처럼 명시했을 때만 실행한다.
+- 예외적으로 사용자가 현재 세션이나 작업 목표에서 `검증 통과 후 자동 푸시`를 명시적으로 허용하면, 관련 gate가 통과하고 tracked worktree가 clean인 한 사이클 끝에서만 `main -> origin/main`으로 푸시할 수 있다. 이 허용은 해당 세션/목표에만 적용하며, 커밋마다 자동 푸시하지 않는다.
 - `.githooks/commit-msg`는 커밋 메시지의 AI 도구명, generated-by 문구, contributor trailer를 차단한다.
 - 릴리즈 시 `CHANGELOG.md`에 변경 내용을 상세하게 기록한다.
 - 배포는 GitHub Actions trusted publishing 기준을 유지한다.
