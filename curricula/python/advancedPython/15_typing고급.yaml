@@ -1,39 +1,93 @@
 meta:
-  id: "15"
-  title: "typing 고급"
+  id: '15'
+  title: typing 고급
   day: 15
-  category: "advancedPython"
-  tags: ["Literal", "Final", "TypedDict", "Annotated", "NewType", "검증", "데이터계약"]
+  category: advancedPython
+  tags:
+  - Literal
+  - Final
+  - TypedDict
+  - Annotated
+  - NewType
+  - 검증
+  - 데이터계약
   seo:
-    title: "파이썬 typing 고급 - Literal, Final, TypedDict, Annotated"
-    description: "고급 타이핑을 마스터합니다. Literal, Final, TypedDict, Annotated, NewType, TypeGuard 완벽 이해."
-    keywords: ["Literal", "Final", "TypedDict", "Annotated", "NewType"]
-
+    title: 파이썬 typing 고급 - Literal, Final, TypedDict, Annotated
+    description: 고급 타이핑을 마스터합니다. Literal, Final, TypedDict, Annotated, NewType, TypeGuard 완벽 이해.
+    keywords:
+    - Literal
+    - Final
+    - TypedDict
+    - Annotated
+    - NewType
 intro:
-  emoji: "🔒"
+  emoji: 🔒
   points:
-  - "Literal로 특정 값만 허용"
-  - "Final로 상수 표시"
-  - "TypedDict로 딕셔너리 타입"
-  - "Annotated로 메타데이터 추가"
-
+  - Literal로 특정 값만 허용
+  - Final로 상수 표시
+  - TypedDict로 딕셔너리 타입
+  - Annotated로 메타데이터 추가
 sections:
-- id: "literal"
-  title: "Literal"
-  subtitle: "특정 값만 허용"
+- id: literal
+  title: Literal
+  structuredPrimary: true
+  subtitle: 특정 값만 허용
+  goal: 'Literal: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Literal: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Literal은 특정 리터럴 값만 허용하는 타입입니다. 문자열, 정수, 불리언, None 등의 리터럴을 지정할 수 있습니다. 함수 인자나 반환 타입을 특정 값으로 제한합니다. @overload와 함께 사용하면 값에 따른 반환 타입을 정확히 표현할 수 있습니다. 타입 체커가 허용되지 않은 값을 감지합니다. 설정 옵션, 모드 선택 등에 유용합니다.
+
+    Literal[True]와 Literal[False]를 사용하면 불리언 값에 따른 조건부 타입을 표현할 수 있습니다.
+  tips:
+  - Literal[True]와 Literal[False]를 사용하면 불리언 값에 따른 조건부 타입을 표현할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import Literal
+
+    def setMode(mode: Literal['read', 'write', 'append']) -> str:
+        return f"Mode set to {mode}"
+
+    setMode('read'), setMode('write')
+  exercise:
+    prompt: 'Literal: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+
+      def setMode(mode: Literal['read', 'write', 'append']) -> str:
+          return f"Mode set to {mode}"
+
+      setMode('read'), setMode('write')
+    solution: |-
+      from typing import Literal
+
+      def setMode(mode: Literal['read', 'write', 'append']) -> str:
+          return f"Mode set to {mode}"
+
+      setMode('read'), setMode('write')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Literal은 특정 리터럴 값만 허용하는 타입입니다. 문자열, 정수, 불리언, None 등의 리터럴을 지정할 수 있습니다. 함수 인자나 반환 타입을 특정 값으로 제한합니다. @overload와 함께 사용하면 값에 따른 반환 타입을 정확히 표현할 수 있습니다. 타입 체커가 허용되지 않은 값을 감지합니다. 설정 옵션, 모드 선택 등에 유용합니다."
-  - type: "list"
+  - type: text
+    content: Literal은 특정 리터럴 값만 허용하는 타입입니다. 문자열, 정수, 불리언, None 등의 리터럴을 지정할 수 있습니다. 함수 인자나 반환 타입을 특정 값으로 제한합니다. @overload와
+      함께 사용하면 값에 따른 반환 타입을 정확히 표현할 수 있습니다. 타입 체커가 허용되지 않은 값을 감지합니다. 설정 옵션, 모드 선택 등에 유용합니다.
+  - type: list
     items:
-    - "Literal['a', 'b']: 'a' 또는 'b'만"
-    - "문자열, 정수, bool, None 지원"
-    - "허용되지 않은 값은 타입 에러"
-    - "@overload와 함께 정밀한 타입"
-  - type: "code"
-    language: "python"
-    title: "Literal 기본"
-    description: "특정 문자열만 허용합니다."
+    - 'Literal[''a'', ''b'']: ''a'' 또는 ''b''만'
+    - 문자열, 정수, bool, None 지원
+    - 허용되지 않은 값은 타입 에러
+    - '@overload와 함께 정밀한 타입'
+  - type: code
+    language: python
+    title: Literal 기본
+    description: 특정 문자열만 허용합니다.
     content: |-
       from typing import Literal
 
@@ -41,10 +95,10 @@ sections:
           return f"Mode set to {mode}"
 
       setMode('read'), setMode('write')
-  - type: "code"
-    language: "python"
-    title: "Literal과 overload"
-    description: "값에 따라 반환 타입이 다릅니다."
+  - type: code
+    language: python
+    title: Literal과 overload
+    description: 값에 따라 반환 타입이 다릅니다.
     content: |-
       from typing import Literal, overload, List
 
@@ -59,10 +113,10 @@ sections:
           return {"id": 1}
 
       fetch(False), fetch(True)
-  - type: "code"
-    language: "python"
-    title: "숫자 Literal"
-    description: "특정 정수만 허용합니다."
+  - type: code
+    language: python
+    title: 숫자 Literal
+    description: 특정 정수만 허용합니다.
     content: |-
       from typing import Literal
 
@@ -70,25 +124,68 @@ sections:
           return f"Verbosity: {level}"
 
       setVerbosity(0), setVerbosity(2)
-  - type: "tip"
-    content: "Literal[True]와 Literal[False]를 사용하면 불리언 값에 따른 조건부 타입을 표현할 수 있습니다."
+  - type: tip
+    content: Literal[True]와 Literal[False]를 사용하면 불리언 값에 따른 조건부 타입을 표현할 수 있습니다.
+- id: final
+  title: Final
+  structuredPrimary: true
+  subtitle: 상수 표시
+  goal: 'Final: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Final: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Final은 변수나 속성이 재할당되어서는 안 된다는 것을 표시합니다. 타입 체커가 재할당 시도를 감지합니다. 클래스 속성에 사용하면 오버라이드도 금지합니다. @final 데코레이터는 메서드나 클래스의 상속/오버라이드를 금지합니다. 상수를 명시적으로 표시하여 의도를 전달합니다. 런타임에는 아무 효과가 없습니다.
 
-- id: "final"
-  title: "Final"
-  subtitle: "상수 표시"
+    Final은 문서화 역할도 하여 코드를 읽는 사람에게 의도를 전달합니다.
+  tips:
+  - Final은 문서화 역할도 하여 코드를 읽는 사람에게 의도를 전달합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import Final
+
+    MAX_SIZE: Final[int] = 100
+    API_URL: Final = "https://api.example.com"
+
+    MAX_SIZE, API_URL
+  exercise:
+    prompt: 'Final: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Final
+
+      MAX_SIZE: Final[int] = 100
+      API_URL: Final = "https://api.example.com"
+
+      MAX_SIZE, API_URL
+    solution: |-
+      from typing import Final
+
+      MAX_SIZE: Final[int] = 100
+      API_URL: Final = "https://api.example.com"
+
+      MAX_SIZE, API_URL
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Final은 변수나 속성이 재할당되어서는 안 된다는 것을 표시합니다. 타입 체커가 재할당 시도를 감지합니다. 클래스 속성에 사용하면 오버라이드도 금지합니다. @final 데코레이터는 메서드나 클래스의 상속/오버라이드를 금지합니다. 상수를 명시적으로 표시하여 의도를 전달합니다. 런타임에는 아무 효과가 없습니다."
-  - type: "list"
+  - type: text
+    content: Final은 변수나 속성이 재할당되어서는 안 된다는 것을 표시합니다. 타입 체커가 재할당 시도를 감지합니다. 클래스 속성에 사용하면 오버라이드도 금지합니다. @final 데코레이터는 메서드나 클래스의
+      상속/오버라이드를 금지합니다. 상수를 명시적으로 표시하여 의도를 전달합니다. 런타임에는 아무 효과가 없습니다.
+  - type: list
     items:
-    - "Final[T]: 재할당 금지"
-    - "@final: 상속/오버라이드 금지"
-    - "타입 체커가 위반 감지"
-    - "런타임에는 영향 없음"
-  - type: "code"
-    language: "python"
-    title: "Final 변수"
-    description: "상수를 선언합니다."
+    - 'Final[T]: 재할당 금지'
+    - '@final: 상속/오버라이드 금지'
+    - 타입 체커가 위반 감지
+    - 런타임에는 영향 없음
+  - type: code
+    language: python
+    title: Final 변수
+    description: 상수를 선언합니다.
     content: |-
       from typing import Final
 
@@ -96,10 +193,10 @@ sections:
       API_URL: Final = "https://api.example.com"
 
       MAX_SIZE, API_URL
-  - type: "code"
-    language: "python"
-    title: "클래스에서 Final"
-    description: "클래스 상수와 인스턴스 상수입니다."
+  - type: code
+    language: python
+    title: 클래스에서 Final
+    description: 클래스 상수와 인스턴스 상수입니다.
     content: |-
       from typing import Final
 
@@ -110,10 +207,10 @@ sections:
               self.name: Final = name
 
       Config.VERSION
-  - type: "code"
-    language: "python"
-    title: "@final 데코레이터"
-    description: "상속이나 오버라이드를 금지합니다."
+  - type: code
+    language: python
+    title: '@final 데코레이터'
+    description: 상속이나 오버라이드를 금지합니다.
     content: |-
       from typing import final
 
@@ -127,25 +224,77 @@ sections:
           pass
 
       Base().criticalMethod()
-  - type: "tip"
-    content: "Final은 문서화 역할도 하여 코드를 읽는 사람에게 의도를 전달합니다."
+  - type: tip
+    content: Final은 문서화 역할도 하여 코드를 읽는 사람에게 의도를 전달합니다.
+- id: typeddict
+  title: TypedDict
+  structuredPrimary: true
+  subtitle: 타입 있는 딕셔너리
+  goal: 'TypedDict: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'TypedDict: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    TypedDict는 키 이름과 값 타입을 지정한 딕셔너리 타입입니다. API 응답, 설정 파일 등 구조화된 딕셔너리에 유용합니다. 필수 키와 선택적 키를 구분할 수 있습니다. total=False로 모든 키를 선택적으로 만들 수 있습니다. NotRequired와 Required로 개별 키의 필수 여부를 지정합니다. 런타임에는 일반 dict로 동작합니다.
 
-- id: "typeddict"
-  title: "TypedDict"
-  subtitle: "타입 있는 딕셔너리"
+    TypedDict는 상속도 지원합니다. class Admin(User): role: str
+  tips:
+  - 'TypedDict는 상속도 지원합니다. class Admin(User): role: str'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import TypedDict
+
+    class User(TypedDict):
+        id: int
+        name: str
+        email: str
+
+    user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
+    user
+  exercise:
+    prompt: 'TypedDict: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import TypedDict
+
+      class User(TypedDict):
+          id: int
+          name: str
+          email: str
+
+      user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
+      user
+    solution: |-
+      from typing import TypedDict
+
+      class User(TypedDict):
+          id: int
+          name: str
+          email: str
+
+      user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
+      user
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "TypedDict는 키 이름과 값 타입을 지정한 딕셔너리 타입입니다. API 응답, 설정 파일 등 구조화된 딕셔너리에 유용합니다. 필수 키와 선택적 키를 구분할 수 있습니다. total=False로 모든 키를 선택적으로 만들 수 있습니다. NotRequired와 Required로 개별 키의 필수 여부를 지정합니다. 런타임에는 일반 dict로 동작합니다."
-  - type: "list"
+  - type: text
+    content: TypedDict는 키 이름과 값 타입을 지정한 딕셔너리 타입입니다. API 응답, 설정 파일 등 구조화된 딕셔너리에 유용합니다. 필수 키와 선택적 키를 구분할 수 있습니다. total=False로
+      모든 키를 선택적으로 만들 수 있습니다. NotRequired와 Required로 개별 키의 필수 여부를 지정합니다. 런타임에는 일반 dict로 동작합니다.
+  - type: list
     items:
-    - "TypedDict: 키별 타입 지정"
-    - "total=False: 모든 키 선택적"
-    - "NotRequired, Required: 개별 지정"
-    - "런타임에는 일반 dict"
-  - type: "code"
-    language: "python"
-    title: "TypedDict 기본"
-    description: "키별 타입을 지정합니다."
+    - 'TypedDict: 키별 타입 지정'
+    - 'total=False: 모든 키 선택적'
+    - 'NotRequired, Required: 개별 지정'
+    - 런타임에는 일반 dict
+  - type: code
+    language: python
+    title: TypedDict 기본
+    description: 키별 타입을 지정합니다.
     content: |-
       from typing import TypedDict
 
@@ -156,10 +305,10 @@ sections:
 
       user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
       user
-  - type: "code"
-    language: "python"
-    title: "선택적 키"
-    description: "NotRequired로 선택적 키를 지정합니다."
+  - type: code
+    language: python
+    title: 선택적 키
+    description: NotRequired로 선택적 키를 지정합니다.
     content: |-
       from typing import TypedDict, NotRequired
 
@@ -171,10 +320,10 @@ sections:
 
       config: Config = {"host": "localhost", "port": 8080}
       config
-  - type: "code"
-    language: "python"
-    title: "total=False"
-    description: "모든 키를 선택적으로 만듭니다."
+  - type: code
+    language: python
+    title: total=False
+    description: 모든 키를 선택적으로 만듭니다.
     content: |-
       from typing import TypedDict, Required
 
@@ -185,25 +334,77 @@ sections:
 
       user: PartialUser = {"id": 1}
       user
-  - type: "tip"
-    content: "TypedDict는 상속도 지원합니다. class Admin(User): role: str"
+  - type: tip
+    content: 'TypedDict는 상속도 지원합니다. class Admin(User): role: str'
+- id: annotated
+  title: Annotated
+  structuredPrimary: true
+  subtitle: 메타데이터 추가
+  goal: 'Annotated: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Annotated: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Annotated는 타입에 추가 메타데이터를 첨부합니다. Annotated[T, metadata1, metadata2, ...]로 사용합니다. 타입 체커는 첫 번째 인자(T)만 사용하고 나머지는 무시합니다. 메타데이터는 런타임에 접근할 수 있습니다. 검증 라이브러리(Pydantic 등)에서 제약 조건을 표현하는 데 사용됩니다. 문서화, 직렬화 힌트 등 다양한 용도로 활용됩니다.
 
-- id: "annotated"
-  title: "Annotated"
-  subtitle: "메타데이터 추가"
+    Pydantic v2는 Annotated를 적극 활용하여 Field 정보를 표현합니다.
+  tips:
+  - Pydantic v2는 Annotated를 적극 활용하여 Field 정보를 표현합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import Annotated
+
+    PositiveInt = Annotated[int, "must be positive"]
+    EmailStr = Annotated[str, "valid email format"]
+
+    def createUser(age: PositiveInt, email: EmailStr) -> dict:
+        return {"age": age, "email": email}
+
+    createUser(25, "user@example.com")
+  exercise:
+    prompt: 'Annotated: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Annotated
+
+      PositiveInt = Annotated[int, "must be positive"]
+      EmailStr = Annotated[str, "valid email format"]
+
+      def createUser(age: PositiveInt, email: EmailStr) -> dict:
+          return {"age": age, "email": email}
+
+      createUser(25, "user@example.com")
+    solution: |-
+      from typing import Annotated
+
+      PositiveInt = Annotated[int, "must be positive"]
+      EmailStr = Annotated[str, "valid email format"]
+
+      def createUser(age: PositiveInt, email: EmailStr) -> dict:
+          return {"age": age, "email": email}
+
+      createUser(25, "user@example.com")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Annotated는 타입에 추가 메타데이터를 첨부합니다. Annotated[T, metadata1, metadata2, ...]로 사용합니다. 타입 체커는 첫 번째 인자(T)만 사용하고 나머지는 무시합니다. 메타데이터는 런타임에 접근할 수 있습니다. 검증 라이브러리(Pydantic 등)에서 제약 조건을 표현하는 데 사용됩니다. 문서화, 직렬화 힌트 등 다양한 용도로 활용됩니다."
-  - type: "list"
+  - type: text
+    content: Annotated는 타입에 추가 메타데이터를 첨부합니다. Annotated[T, metadata1, metadata2, ...]로 사용합니다. 타입 체커는 첫 번째 인자(T)만 사용하고 나머지는
+      무시합니다. 메타데이터는 런타임에 접근할 수 있습니다. 검증 라이브러리(Pydantic 등)에서 제약 조건을 표현하는 데 사용됩니다. 문서화, 직렬화 힌트 등 다양한 용도로 활용됩니다.
+  - type: list
     items:
-    - "Annotated[T, metadata, ...]"
-    - "타입 체커는 T만 사용"
-    - "메타데이터는 런타임 접근 가능"
-    - "검증, 문서화 등에 활용"
-  - type: "code"
-    language: "python"
-    title: "Annotated 기본"
-    description: "타입에 메타데이터를 추가합니다."
+    - Annotated[T, metadata, ...]
+    - 타입 체커는 T만 사용
+    - 메타데이터는 런타임 접근 가능
+    - 검증, 문서화 등에 활용
+  - type: code
+    language: python
+    title: Annotated 기본
+    description: 타입에 메타데이터를 추가합니다.
     content: |-
       from typing import Annotated
 
@@ -214,10 +415,10 @@ sections:
           return {"age": age, "email": email}
 
       createUser(25, "user@example.com")
-  - type: "code"
-    language: "python"
-    title: "제약 조건 클래스"
-    description: "제약 조건을 클래스로 표현합니다."
+  - type: code
+    language: python
+    title: 제약 조건 클래스
+    description: 제약 조건을 클래스로 표현합니다.
     content: |-
       from typing import Annotated
       from dataclasses import dataclass
@@ -238,10 +439,10 @@ sections:
           return True
 
       validate(85, "alice")
-  - type: "code"
-    language: "python"
-    title: "런타임 접근"
-    description: "메타데이터를 런타임에 읽습니다."
+  - type: code
+    language: python
+    title: 런타임 접근
+    description: 메타데이터를 런타임에 읽습니다.
     content: |-
       from typing import Annotated, get_type_hints, get_args, get_origin
 
@@ -258,25 +459,80 @@ sections:
           pass
 
       getAnnotations(example)
-  - type: "tip"
-    content: "Pydantic v2는 Annotated를 적극 활용하여 Field 정보를 표현합니다."
+  - type: tip
+    content: Pydantic v2는 Annotated를 적극 활용하여 Field 정보를 표현합니다.
+- id: newtype
+  title: NewType
+  structuredPrimary: true
+  subtitle: 타입 별칭 강화
+  goal: 'NewType: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'NewType: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    NewType은 기존 타입의 구별되는 새 타입을 만듭니다. 타입 별칭(TypeAlias)과 달리 타입 체커가 다른 타입으로 취급합니다. UserId = NewType('UserId', int)로 정의하면 int와 호환되지만 구별됩니다. 실수로 잘못된 값을 전달하는 것을 방지합니다. 런타임에는 아무 변환도 하지 않습니다(제로 오버헤드).
 
-- id: "newtype"
-  title: "NewType"
-  subtitle: "타입 별칭 강화"
+    NewType은 상속할 수 없습니다. 더 복잡한 경우 클래스를 사용하세요.
+  tips:
+  - NewType은 상속할 수 없습니다. 더 복잡한 경우 클래스를 사용하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import NewType
+
+    UserId = NewType('UserId', int)
+    OrderId = NewType('OrderId', int)
+
+    def getUser(userId: UserId) -> dict:
+        return {"id": userId}
+
+    userId = UserId(123)
+    getUser(userId)
+  exercise:
+    prompt: 'NewType: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import NewType
+
+      UserId = NewType('UserId', int)
+      OrderId = NewType('OrderId', int)
+
+      def getUser(userId: UserId) -> dict:
+          return {"id": userId}
+
+      userId = UserId(123)
+      getUser(userId)
+    solution: |-
+      from typing import NewType
+
+      UserId = NewType('UserId', int)
+      OrderId = NewType('OrderId', int)
+
+      def getUser(userId: UserId) -> dict:
+          return {"id": userId}
+
+      userId = UserId(123)
+      getUser(userId)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "NewType은 기존 타입의 구별되는 새 타입을 만듭니다. 타입 별칭(TypeAlias)과 달리 타입 체커가 다른 타입으로 취급합니다. UserId = NewType('UserId', int)로 정의하면 int와 호환되지만 구별됩니다. 실수로 잘못된 값을 전달하는 것을 방지합니다. 런타임에는 아무 변환도 하지 않습니다(제로 오버헤드)."
-  - type: "list"
+  - type: text
+    content: NewType은 기존 타입의 구별되는 새 타입을 만듭니다. 타입 별칭(TypeAlias)과 달리 타입 체커가 다른 타입으로 취급합니다. UserId = NewType('UserId', int)로
+      정의하면 int와 호환되지만 구별됩니다. 실수로 잘못된 값을 전달하는 것을 방지합니다. 런타임에는 아무 변환도 하지 않습니다(제로 오버헤드).
+  - type: list
     items:
-    - "NewType(name, base): 새 타입 생성"
-    - "기본 타입과 구별됨"
-    - "잘못된 값 전달 방지"
-    - "런타임 오버헤드 없음"
-  - type: "code"
-    language: "python"
-    title: "NewType 기본"
-    description: "구별되는 새 타입을 만듭니다."
+    - 'NewType(name, base): 새 타입 생성'
+    - 기본 타입과 구별됨
+    - 잘못된 값 전달 방지
+    - 런타임 오버헤드 없음
+  - type: code
+    language: python
+    title: NewType 기본
+    description: 구별되는 새 타입을 만듭니다.
     content: |-
       from typing import NewType
 
@@ -288,10 +544,10 @@ sections:
 
       userId = UserId(123)
       getUser(userId)
-  - type: "code"
-    language: "python"
-    title: "타입 구별"
-    description: "같은 기본 타입이지만 구별됩니다."
+  - type: code
+    language: python
+    title: 타입 구별
+    description: 같은 기본 타입이지만 구별됩니다.
     content: |-
       from typing import NewType
 
@@ -303,10 +559,10 @@ sections:
 
       distance = Meters(100.0)
       toFeet(distance)
-  - type: "code"
-    language: "python"
-    title: "NewType vs TypeAlias"
-    description: "NewType과 TypeAlias의 차이입니다."
+  - type: code
+    language: python
+    title: NewType vs TypeAlias
+    description: NewType과 TypeAlias의 차이입니다.
     content: |-
       from typing import NewType, TypeAlias
 
@@ -321,25 +577,83 @@ sections:
 
       aliasFunc(123)
       newFunc(UserIdNew(123))
-  - type: "tip"
-    content: "NewType은 상속할 수 없습니다. 더 복잡한 경우 클래스를 사용하세요."
+  - type: tip
+    content: NewType은 상속할 수 없습니다. 더 복잡한 경우 클래스를 사용하세요.
+- id: type_guards
+  title: 타입 가드
+  structuredPrimary: true
+  subtitle: TypeGuard와 타입 좁히기
+  goal: '타입 가드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '타입 가드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    TypeGuard는 타입 좁히기(type narrowing) 함수를 정의합니다. 함수가 True를 반환하면 인자가 특정 타입임을 보장합니다. isinstance보다 복잡한 조건을 표현할 수 있습니다. 타입 체커가 이후 코드에서 좁혀진 타입을 사용합니다. Python 3.10+에서는 TypeIs도 도입되었습니다. 커스텀 타입 검사 함수에 유용합니다.
 
-- id: "type_guards"
-  title: "타입 가드"
-  subtitle: "TypeGuard와 타입 좁히기"
+    Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다.
+  tips:
+  - Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import TypeGuard, List, Union
+
+    def isStringList(val: List[Union[str, int]]) -> TypeGuard[List[str]]:
+        return all(isinstance(x, str) for x in val)
+
+    def process(items: List[Union[str, int]]) -> str:
+        if isStringList(items):
+            return ",".join(items)
+        return "mixed"
+
+    process(["a", "b"]), process([1, 2])
+  exercise:
+    prompt: '타입 가드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import TypeGuard, List, Union
+
+      def isStringList(val: List[Union[str, int]]) -> TypeGuard[List[str]]:
+          return all(isinstance(x, str) for x in val)
+
+      def process(items: List[Union[str, int]]) -> str:
+          if isStringList(items):
+              return ",".join(items)
+          return "mixed"
+
+      process(["a", "b"]), process([1, 2])
+    solution: |-
+      from typing import TypeGuard, List, Union
+
+      def isStringList(val: List[Union[str, int]]) -> TypeGuard[List[str]]:
+          return all(isinstance(x, str) for x in val)
+
+      def process(items: List[Union[str, int]]) -> str:
+          if isStringList(items):
+              return ",".join(items)
+          return "mixed"
+
+      process(["a", "b"]), process([1, 2])
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "TypeGuard는 타입 좁히기(type narrowing) 함수를 정의합니다. 함수가 True를 반환하면 인자가 특정 타입임을 보장합니다. isinstance보다 복잡한 조건을 표현할 수 있습니다. 타입 체커가 이후 코드에서 좁혀진 타입을 사용합니다. Python 3.10+에서는 TypeIs도 도입되었습니다. 커스텀 타입 검사 함수에 유용합니다."
-  - type: "list"
+  - type: text
+    content: TypeGuard는 타입 좁히기(type narrowing) 함수를 정의합니다. 함수가 True를 반환하면 인자가 특정 타입임을 보장합니다. isinstance보다 복잡한 조건을 표현할 수 있습니다.
+      타입 체커가 이후 코드에서 좁혀진 타입을 사용합니다. Python 3.10+에서는 TypeIs도 도입되었습니다. 커스텀 타입 검사 함수에 유용합니다.
+  - type: list
     items:
-    - "TypeGuard[T]: 타입 좁히기 함수"
-    - "True 반환 시 인자가 T 타입"
-    - "복잡한 조건 표현 가능"
-    - "isinstance 대안"
-  - type: "code"
-    language: "python"
-    title: "TypeGuard 기본"
-    description: "커스텀 타입 가드를 정의합니다."
+    - 'TypeGuard[T]: 타입 좁히기 함수'
+    - True 반환 시 인자가 T 타입
+    - 복잡한 조건 표현 가능
+    - isinstance 대안
+  - type: code
+    language: python
+    title: TypeGuard 기본
+    description: 커스텀 타입 가드를 정의합니다.
     content: |-
       from typing import TypeGuard, List, Union
 
@@ -352,10 +666,10 @@ sections:
           return "mixed"
 
       process(["a", "b"]), process([1, 2])
-  - type: "code"
-    language: "python"
-    title: "딕셔너리 타입 가드"
-    description: "특정 키가 있는지 검사합니다."
+  - type: code
+    language: python
+    title: 딕셔너리 타입 가드
+    description: 특정 키가 있는지 검사합니다.
     content: |-
       from typing import TypeGuard, TypedDict, Any
 
@@ -374,10 +688,10 @@ sections:
           data["name"]
       else:
           "invalid"
-  - type: "code"
-    language: "python"
-    title: "None 체크"
-    description: "None이 아님을 보장합니다."
+  - type: code
+    language: python
+    title: None 체크
+    description: None이 아님을 보장합니다.
     content: |-
       from typing import TypeGuard, Optional
 
@@ -390,19 +704,161 @@ sections:
           return "empty"
 
       process("hello"), process(None)
-  - type: "tip"
-    content: "Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다."
+  - type: tip
+    content: Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 결제 요청 데이터 계약 만들기'
+  structuredPrimary: true
+  subtitle: Literal, Final, TypedDict, Annotated, NewType을 실행 가능한 검증 흐름으로 연결합니다
+  goal: '현업 흐름 검증: 결제 요청 데이터 계약 만들기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 결제 요청 데이터 계약 만들기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    정밀한 typing은 API 경계에서 특히 효과가 큽니다. 결제 요청 딕셔너리의 필수 키, 허용 값, 금액 제한을 타입으로 표현하고, 런타임 검증 함수가 같은 계약을 지키는지 확인하세요.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 결제 요청 데이터 계약 만들기"
-  subtitle: "Literal, Final, TypedDict, Annotated, NewType을 실행 가능한 검증 흐름으로 연결합니다"
+    변주 실험
+    `refund` 메서드를 추가할 때 허용 통화와 금액 범위를 어떻게 바꿔야 하는지 `Literal`과 검증 함수를 같이 수정한 뒤 실패 케이스를 먼저 작성하세요.
+  tips:
+  - 변주 실험 `refund` 메서드를 추가할 때 허용 통화와 금액 범위를 어떻게 바꿔야 하는지 `Literal`과 검증 함수를 같이 수정한 뒤 실패 케이스를 먼저 작성하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
+
+    OrderId = NewType("OrderId", str)
+    Currency = Literal["KRW", "USD"]
+    Method = Literal["card", "bank"]
+    PositiveAmount = Annotated[int, "positive"]
+    MAX_AMOUNT: Final[int] = 1_000_000
+
+    class PaymentPayload(TypedDict):
+        orderId: str
+        amount: int
+        currency: Currency
+        method: Method
+
+    def validatePayment(payload: PaymentPayload) -> PaymentPayload:
+        required = {"orderId", "amount", "currency", "method"}
+        missing = required - payload.keys()
+        if missing:
+            raise KeyError(f"missing keys: {sorted(missing)}")
+        if payload["currency"] not in get_args(Currency):
+            raise ValueError("unsupported currency")
+        if payload["method"] not in get_args(Method):
+            raise ValueError("unsupported method")
+        if not 0 < payload["amount"] <= MAX_AMOUNT:
+            raise ValueError("amount out of range")
+        return payload
+
+    request: PaymentPayload = {
+        "orderId": OrderId("O-100"),
+        "amount": 49_000,
+        "currency": "KRW",
+        "method": "card",
+    }
+
+    checked = validatePayment(request)
+
+    assert checked["orderId"] == "O-100"
+    assert get_origin(PositiveAmount) is Annotated
+    assert get_args(Currency) == ("KRW", "USD")
+  exercise:
+    prompt: '현업 흐름 검증: 결제 요청 데이터 계약 만들기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
+
+      OrderId = NewType("OrderId", str)
+      Currency = Literal["KRW", "USD"]
+      Method = Literal["card", "bank"]
+      PositiveAmount = Annotated[int, "positive"]
+      MAX_AMOUNT: Final[int] = 1_000_000
+
+      class PaymentPayload(TypedDict):
+          orderId: str
+          amount: int
+          currency: Currency
+          method: Method
+
+      def validatePayment(payload: PaymentPayload) -> PaymentPayload:
+          required = {"orderId", "amount", "currency", "method"}
+          missing = required - payload.keys()
+          if missing:
+              raise KeyError(f"missing keys: {sorted(missing)}")
+          if payload["currency"] not in get_args(Currency):
+              raise ValueError("unsupported currency")
+          if payload["method"] not in get_args(Method):
+              raise ValueError("unsupported method")
+          if not 0 < payload["amount"] <= MAX_AMOUNT:
+              raise ValueError("amount out of range")
+          return payload
+
+      request: PaymentPayload = {
+          "orderId": OrderId("O-100"),
+          "amount": 49_000,
+          "currency": "KRW",
+          "method": "card",
+      }
+
+      checked = validatePayment(request)
+
+      assert checked["orderId"] == "O-100"
+      assert get_origin(PositiveAmount) is Annotated
+      assert get_args(Currency) == ("KRW", "USD")
+    solution: |-
+      from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
+
+      OrderId = NewType("OrderId", str)
+      Currency = Literal["KRW", "USD"]
+      Method = Literal["card", "bank"]
+      PositiveAmount = Annotated[int, "positive"]
+      MAX_AMOUNT: Final[int] = 1_000_000
+
+      class PaymentPayload(TypedDict):
+          orderId: str
+          amount: int
+          currency: Currency
+          method: Method
+
+      def validatePayment(payload: PaymentPayload) -> PaymentPayload:
+          required = {"orderId", "amount", "currency", "method"}
+          missing = required - payload.keys()
+          if missing:
+              raise KeyError(f"missing keys: {sorted(missing)}")
+          if payload["currency"] not in get_args(Currency):
+              raise ValueError("unsupported currency")
+          if payload["method"] not in get_args(Method):
+              raise ValueError("unsupported method")
+          if not 0 < payload["amount"] <= MAX_AMOUNT:
+              raise ValueError("amount out of range")
+          return payload
+
+      request: PaymentPayload = {
+          "orderId": OrderId("O-100"),
+          "amount": 49_000,
+          "currency": "KRW",
+          "method": "card",
+      }
+
+      checked = validatePayment(request)
+
+      assert checked["orderId"] == "O-100"
+      assert get_origin(PositiveAmount) is Annotated
+      assert get_args(Currency) == ("KRW", "USD")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "정밀한 typing은 API 경계에서 특히 효과가 큽니다. 결제 요청 딕셔너리의 필수 키, 허용 값, 금액 제한을 타입으로 표현하고, 런타임 검증 함수가 같은 계약을 지키는지 확인하세요."
-  - type: "code"
-    language: "python"
-    title: "결제 요청 타입과 검증 함수"
-    description: "TypedDict와 Literal로 구조를 표현하고, Annotated 메타데이터와 Final 상수를 함께 확인합니다."
+  - type: text
+    content: 정밀한 typing은 API 경계에서 특히 효과가 큽니다. 결제 요청 딕셔너리의 필수 키, 허용 값, 금액 제한을 타입으로 표현하고, 런타임 검증 함수가 같은 계약을 지키는지 확인하세요.
+  - type: code
+    language: python
+    title: 결제 요청 타입과 검증 함수
+    description: TypedDict와 Literal로 구조를 표현하고, Annotated 메타데이터와 Final 상수를 함께 확인합니다.
     content: |-
       from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
 
@@ -443,10 +899,10 @@ sections:
       assert checked["orderId"] == "O-100"
       assert get_origin(PositiveAmount) is Annotated
       assert get_args(Currency) == ("KRW", "USD")
-  - type: "code"
-    language: "python"
-    title: "API 경계 오류 확인"
-    description: "잘못된 통화와 누락 키가 다른 예외로 드러나는지 확인합니다."
+  - type: code
+    language: python
+    title: API 경계 오류 확인
+    description: 잘못된 통화와 누락 키가 다른 예외로 드러나는지 확인합니다.
     content: |-
       from typing import Final, Literal, TypedDict, get_args
 
@@ -485,19 +941,61 @@ sections:
 
       assert currencyMessage == "unsupported currency"
       assert "method" in missingMessage
-  - type: "tip"
-    title: "변주 실험"
-    content: "`refund` 메서드를 추가할 때 허용 통화와 금액 범위를 어떻게 바꿔야 하는지 `Literal`과 검증 함수를 같이 수정한 뒤 실패 케이스를 먼저 작성하세요."
+  - type: tip
+    title: 변주 실험
+    content: '`refund` 메서드를 추가할 때 허용 통화와 금액 범위를 어떻게 바꿔야 하는지 `Literal`과 검증 함수를 같이 수정한 뒤 실패 케이스를 먼저 작성하세요.'
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: typing 고급 마스터하기
+  goal: '종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 15에서 배운 고급 typing을 난이도별로 복습합니다. Literal로 특정 값만 허용하고, Final로 상수를 표시하며, TypedDict로 딕셔너리 구조를, Annotated로 메타데이터를
+    표현합니다. NewType은 같은 기본 타입이지만 의미가 다른 값을 구별하고, TypeGuard는 타입 좁히기 함수를 정의합니다. 🟢 기본 문제로 각 타입의 기본 사용법을 익히고, 🟡 응용 문제로 복합 타입과 overload
+    조합을 연습하세요. 🔴 심화 문제에서는 Unpack, 재귀 타입, Self 등 최신 타입 시스템을 다룹니다. 정밀한 타입 정의는 타입 체커의 도움을 극대화하고 런타임 버그를 사전에 방지합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
 
-- id: "practice"
-  title: "종합 복습"
-  subtitle: "typing 고급 마스터하기"
+    def getColor(name: Literal['red', 'green', 'blue']) -> str:
+        return f"Color: {name}"
+
+    getColor('red')
+  exercise:
+    prompt: '종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+
+      def getColor(name: Literal['red', 'green', 'blue']) -> str:
+          return f"Color: {name}"
+
+      getColor('red')
+    solution: |-
+      from typing import Literal
+
+      def getColor(name: Literal['red', 'green', 'blue']) -> str:
+          return f"Color: {name}"
+
+      getColor('red')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 15에서 배운 고급 typing을 난이도별로 복습합니다. Literal로 특정 값만 허용하고, Final로 상수를 표시하며, TypedDict로 딕셔너리 구조를, Annotated로 메타데이터를 표현합니다. NewType은 같은 기본 타입이지만 의미가 다른 값을 구별하고, TypeGuard는 타입 좁히기 함수를 정의합니다. 🟢 기본 문제로 각 타입의 기본 사용법을 익히고, 🟡 응용 문제로 복합 타입과 overload 조합을 연습하세요. 🔴 심화 문제에서는 Unpack, 재귀 타입, Self 등 최신 타입 시스템을 다룹니다. 정밀한 타입 정의는 타입 체커의 도움을 극대화하고 런타임 버그를 사전에 방지합니다."
-
-  - type: "expansion"
-    title: "🟢 기본1: Literal"
+  - type: text
+    content: Day 15에서 배운 고급 typing을 난이도별로 복습합니다. Literal로 특정 값만 허용하고, Final로 상수를 표시하며, TypedDict로 딕셔너리 구조를, Annotated로 메타데이터를
+      표현합니다. NewType은 같은 기본 타입이지만 의미가 다른 값을 구별하고, TypeGuard는 타입 좁히기 함수를 정의합니다. 🟢 기본 문제로 각 타입의 기본 사용법을 익히고, 🟡 응용 문제로 복합 타입과
+      overload 조합을 연습하세요. 🔴 심화 문제에서는 Unpack, 재귀 타입, Self 등 최신 타입 시스템을 다룹니다. 정밀한 타입 정의는 타입 체커의 도움을 극대화하고 런타임 버그를 사전에 방지합니다.
+  - type: expansion
+    title: '🟢 기본1: Literal'
     code: |-
       from typing import Literal
 
@@ -505,9 +1003,8 @@ sections:
           return f"Color: {name}"
 
       getColor('red')
-
-  - type: "expansion"
-    title: "🟢 기본2: Final"
+  - type: expansion
+    title: '🟢 기본2: Final'
     code: |-
       from typing import Final
 
@@ -515,9 +1012,8 @@ sections:
       MAX_RETRIES: Final[int] = 3
 
       PI, MAX_RETRIES
-
-  - type: "expansion"
-    title: "🟢 기본3: TypedDict"
+  - type: expansion
+    title: '🟢 기본3: TypedDict'
     code: |-
       from typing import TypedDict
 
@@ -527,9 +1023,8 @@ sections:
 
       p: Point = {"x": 10, "y": 20}
       p
-
-  - type: "expansion"
-    title: "🟢 기본4: Annotated"
+  - type: expansion
+    title: '🟢 기본4: Annotated'
     code: |-
       from typing import Annotated
 
@@ -539,9 +1034,8 @@ sections:
           return f"Age: {age}"
 
       setAge(25)
-
-  - type: "expansion"
-    title: "🟢 기본5: NewType"
+  - type: expansion
+    title: '🟢 기본5: NewType'
     code: |-
       from typing import NewType
 
@@ -551,9 +1045,8 @@ sections:
           return {"id": uid}
 
       getUser(UserId(1))
-
-  - type: "expansion"
-    title: "🟡 응용1: Literal Union"
+  - type: expansion
+    title: '🟡 응용1: Literal Union'
     code: |-
       from typing import Literal, Union
 
@@ -563,9 +1056,8 @@ sections:
           return f"{method} {url}"
 
       request('GET', '/api/users')
-
-  - type: "expansion"
-    title: "🟡 응용2: TypedDict 상속"
+  - type: expansion
+    title: '🟡 응용2: TypedDict 상속'
     code: |-
       from typing import TypedDict
 
@@ -579,9 +1071,8 @@ sections:
 
       admin: AdminUser = {"id": 1, "name": "Admin", "role": "admin", "permissions": ["all"]}
       admin
-
-  - type: "expansion"
-    title: "🟡 응용3: Annotated 제약"
+  - type: expansion
+    title: '🟡 응용3: Annotated 제약'
     code: |-
       from typing import Annotated
       from dataclasses import dataclass
@@ -601,9 +1092,8 @@ sections:
           return f"Score: {score}%"
 
       calculate(85.5)
-
-  - type: "expansion"
-    title: "🟡 응용4: TypeGuard"
+  - type: expansion
+    title: '🟡 응용4: TypeGuard'
     code: |-
       from typing import TypeGuard, Any
 
@@ -613,9 +1103,8 @@ sections:
       data: Any = [1, 2, 3]
       if isIntList(data):
           sum(data)
-
-  - type: "expansion"
-    title: "🟡 응용5: 복합 타입"
+  - type: expansion
+    title: '🟡 응용5: 복합 타입'
     code: |-
       from typing import TypedDict, Literal, NotRequired
 
@@ -627,9 +1116,8 @@ sections:
       success: APIResponse = {"status": "success", "data": {"id": 1}}
       error: APIResponse = {"status": "error", "error": "Not found"}
       success, error
-
-  - type: "expansion"
-    title: "🔴 심화1: Required/NotRequired"
+  - type: expansion
+    title: '🔴 심화1: Required/NotRequired'
     code: |-
       from typing import TypedDict, Required, NotRequired
 
@@ -641,9 +1129,8 @@ sections:
 
       user: UserCreate = {"username": "alice", "password": "secret"}
       user
-
-  - type: "expansion"
-    title: "🔴 심화2: Literal overload"
+  - type: expansion
+    title: '🔴 심화2: Literal overload'
     code: |-
       from typing import Literal, overload
 
@@ -658,9 +1145,8 @@ sections:
           return b"binary data"
 
       process('text'), process('binary')
-
-  - type: "expansion"
-    title: "🔴 심화3: 중첩 TypedDict"
+  - type: expansion
+    title: '🔴 심화3: 중첩 TypedDict'
     code: |-
       from typing import TypedDict, List
 
@@ -679,9 +1165,8 @@ sections:
           "employees": ["Alice", "Bob"]
       }
       company
-
-  - type: "expansion"
-    title: "🔴 심화4: Annotated 검증"
+  - type: expansion
+    title: '🔴 심화4: Annotated 검증'
     code: |-
       from typing import Annotated, get_type_hints, get_origin, get_args
 
@@ -708,9 +1193,8 @@ sections:
           return score
 
       validate(setScore, score=85), validate(setScore, score=150)
-
-  - type: "expansion"
-    title: "🔴 심화5: Self 타입"
+  - type: expansion
+    title: '🔴 심화5: Self 타입'
     code: |-
       from typing import Self
 
@@ -727,9 +1211,8 @@ sections:
               return self
 
       Builder().add(5).multiply(2).value
-
-  - type: "expansion"
-    title: "🔴 심화6: LiteralString"
+  - type: expansion
+    title: '🔴 심화6: LiteralString'
     code: |-
       from typing import LiteralString
 
@@ -737,9 +1220,8 @@ sections:
           return f"Executing: {query}"
 
       executeSQL("SELECT * FROM users")
-
-  - type: "expansion"
-    title: "🔴 심화7: TypedDict 함수형"
+  - type: expansion
+    title: '🔴 심화7: TypedDict 함수형'
     code: |-
       from typing import TypedDict
 
@@ -749,9 +1231,8 @@ sections:
       p2: Point = {'x': 1, 'y': 2}
       p3: Point3D = {'x': 1, 'y': 2, 'z': 3}
       p2, p3
-
-  - type: "expansion"
-    title: "🔴 심화8: Unpack과 TypedDict"
+  - type: expansion
+    title: '🔴 심화8: Unpack과 TypedDict'
     code: |-
       from typing import TypedDict, Unpack
 
@@ -764,9 +1245,8 @@ sections:
           return {"url": url, **kwargs}
 
       request("/api", timeout=30, debug=True)
-
-  - type: "expansion"
-    title: "🔴 심화9: 재귀 타입"
+  - type: expansion
+    title: '🔴 심화9: 재귀 타입'
     code: |-
       from typing import TypeAlias, Union, Dict, List
 
@@ -783,9 +1263,8 @@ sections:
           "meta": {"active": True}
       }
       data
-
-  - type: "expansion"
-    title: "🔴 심화10: Never"
+  - type: expansion
+    title: '🔴 심화10: Never'
     code: |-
       from typing import Never, NoReturn
 

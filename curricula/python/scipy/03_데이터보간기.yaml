@@ -1,33 +1,95 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scipy
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
   id: scipy_03
   title: 데이터보간기
   order: 3
   category: scipy
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["scipy.interpolate", "보간법", "interp1d", "스플라인", "결측값"]
+  tags:
+  - scipy.interpolate
+  - 보간법
+  - interp1d
+  - 스플라인
+  - 결측값
   seo:
-    title: "scipy.interpolate 보간법 - 데이터 사이 값 추정하기"
-    description: "scipy.interpolate로 데이터 사이 값을 추정합니다. 선형보간, 스플라인, 다차원 보간을 배웁니다."
-    keywords: ["scipy", "interpolate", "보간", "스플라인", "interp1d"]
-
+    title: scipy.interpolate 보간법 - 데이터 사이 값 추정하기
+    description: scipy.interpolate로 데이터 사이 값을 추정합니다. 선형보간, 스플라인, 다차원 보간을 배웁니다.
+    keywords:
+    - scipy
+    - interpolate
+    - 보간
+    - 스플라인
+    - interp1d
 intro:
-  emoji: "📈"
+  emoji: 📈
   goal: 센서 데이터의 결측값을 보간하고 해상도를 높여 부드러운 온도 변화 곡선을 만듭니다.
-  description: "IoT 온도 센서가 2시간마다 데이터를 수집합니다. 하지만 1시간 간격으로 더 세밀한 온도 변화를 알고 싶습니다. 또한 센서 오류로 일부 데이터가 누락되었습니다. scipy.interpolate의 보간 기법으로 측정되지 않은 시점의 값을 추정합니다. 선형보간, 3차 스플라인, PCHIP 등 다양한 방법을 비교하고, 각 상황에 맞는 최적의 방법을 선택합니다."
-
+  description: IoT 온도 센서가 2시간마다 데이터를 수집합니다. 하지만 1시간 간격으로 더 세밀한 온도 변화를 알고 싶습니다. 또한 센서 오류로 일부 데이터가 누락되었습니다. scipy.interpolate의
+    보간 기법으로 측정되지 않은 시점의 값을 추정합니다. 선형보간, 3차 스플라인, PCHIP 등 다양한 방법을 비교하고, 각 상황에 맞는 최적의 방법을 선택합니다.
 sections:
 - id: load
   title: 라이브러리 및 데이터 로드
+  structuredPrimary: true
   subtitle: scipy.interpolate
+  goal: '라이브러리 및 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '라이브러리 및 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate 모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다.
+
+    이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다.
+  tips:
+  - 이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import interpolate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+    temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+  exercise:
+    prompt: '라이브러리 및 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+      temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+    solution: |-
+      import scipy
+
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+      temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate 모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다."
+    content: 보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate
+      모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다.
   - type: code
     language: python
     title: 패키지 설치 및 데이터 준비
@@ -48,14 +110,67 @@ sections:
       tempDf = pd.DataFrame({'Hour': hours, 'Temperature': temps})
       tempDf
   - type: tip
-    content: "이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다."
-
+    content: 이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다.
 - id: explore
   title: 데이터 탐색
+  structuredPrimary: true
   subtitle: 측정 지점 시각화
+  goal: '데이터 탐색: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '데이터 탐색: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의 직선 연결은 실제 온도 변화의 부드러운
+    곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figOrig, axOrig = plt.subplots(figsize=(12, 6))
+    axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+    axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+    axOrig.set_xlabel('Hour')
+    axOrig.set_ylabel('Temperature (°C)')
+    axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+    axOrig.set_xticks(range(0, 25, 2))
+    axOrig.legend()
+    axOrig.grid(True, alpha=0.3)
+    figOrig
+  exercise:
+    prompt: '데이터 탐색: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figOrig, axOrig = plt.subplots(figsize=(12, 6))
+      axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+      axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+      axOrig.set_xlabel('Hour')
+      axOrig.set_ylabel('Temperature (°C)')
+      axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+      axOrig.set_xticks(range(0, 25, 2))
+      axOrig.legend()
+      axOrig.grid(True, alpha=0.3)
+      figOrig
+    solution: |-
+      figOrig, axOrig = plt.subplots(figsize=(12, 6))
+      axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+      axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+      axOrig.set_xlabel('Hour')
+      axOrig.set_ylabel('Temperature (°C)')
+      axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+      axOrig.set_xticks(range(0, 25, 2))
+      axOrig.legend()
+      axOrig.grid(True, alpha=0.3)
+      figOrig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의 직선 연결은 실제 온도 변화의 부드러운 곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다."
+    content: 보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의 직선 연결은 실제 온도 변화의 부드러운
+      곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다.
   - type: code
     language: python
     title: 원본 데이터 시각화
@@ -70,13 +185,53 @@ sections:
       axOrig.legend()
       axOrig.grid(True, alpha=0.3)
       figOrig
-
 - id: linear
   title: 선형 보간
+  structuredPrimary: true
   subtitle: interp1d(kind='linear')
+  goal: '선형 보간: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '선형 보간: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이 함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다.
+
+    interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다.
+  tips:
+  - interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+    hoursNew = np.arange(0, 24.1, 1)
+    tempsLinear = linearFunc(hoursNew)
+    tempsLinear
+  exercise:
+    prompt: '선형 보간: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+      hoursNew = np.arange(0, 24.1, 1)
+      tempsLinear = linearFunc(hoursNew)
+      tempsLinear
+    solution: |-
+      linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+      hoursNew = np.arange(0, 24.1, 1)
+      tempsLinear = linearFunc(hoursNew)
+      tempsLinear
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이 함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다."
+    content: 선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이
+      함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다.
   - type: code
     language: python
     title: 선형 보간 함수 생성
@@ -87,7 +242,7 @@ sections:
       tempsLinear = linearFunc(hoursNew)
       tempsLinear
   - type: tip
-    content: "interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다."
+    content: interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다.
   - type: code
     language: python
     title: 선형 보간 시각화
@@ -102,13 +257,77 @@ sections:
       axLinear.legend()
       axLinear.grid(True, alpha=0.3)
       figLinear
-
 - id: cubic
   title: 3차 스플라인 보간
+  structuredPrimary: true
   subtitle: kind='cubic'
+  goal: '3차 스플라인 보간: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3차 스플라인 보간: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인 변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다.
+
+    cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다.
+  tips:
+  - cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+    tempsCubic = cubicFunc(hoursNew)
+
+    figCubic, axCubic = plt.subplots(figsize=(12, 6))
+    axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+    axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+    axCubic.set_xlabel('Hour')
+    axCubic.set_ylabel('Temperature (°C)')
+    axCubic.set_title('Cubic Spline Interpolation')
+    axCubic.set_xticks(range(0, 25, 2))
+    axCubic.legend()
+    axCubic.grid(True, alpha=0.3)
+    figCubic
+  exercise:
+    prompt: '3차 스플라인 보간: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+      tempsCubic = cubicFunc(hoursNew)
+
+      figCubic, axCubic = plt.subplots(figsize=(12, 6))
+      axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+      axCubic.set_xlabel('Hour')
+      axCubic.set_ylabel('Temperature (°C)')
+      axCubic.set_title('Cubic Spline Interpolation')
+      axCubic.set_xticks(range(0, 25, 2))
+      axCubic.legend()
+      axCubic.grid(True, alpha=0.3)
+      figCubic
+    solution: |-
+      cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+      tempsCubic = cubicFunc(hoursNew)
+
+      figCubic, axCubic = plt.subplots(figsize=(12, 6))
+      axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+      axCubic.set_xlabel('Hour')
+      axCubic.set_ylabel('Temperature (°C)')
+      axCubic.set_title('Cubic Spline Interpolation')
+      axCubic.set_xticks(range(0, 25, 2))
+      axCubic.legend()
+      axCubic.grid(True, alpha=0.3)
+      figCubic
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인 변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다."
+    content: 3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인
+      변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다.
   - type: code
     language: python
     title: 3차 스플라인 보간
@@ -127,14 +346,48 @@ sections:
       axCubic.grid(True, alpha=0.3)
       figCubic
   - type: tip
-    content: "cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다."
-
+    content: cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다.
 - id: compare
   title: 보간 방법 비교
+  structuredPrimary: true
   subtitle: linear vs cubic vs PCHIP
+  goal: '보간 방법 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '보간 방법 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다. 각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다.
+
+    PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다.
+  tips:
+  - PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    pchipFunc = interpolate.PchipInterpolator(hours, temps)
+    tempsPchip = pchipFunc(hoursNew)
+    tempsPchip[:5]
+  exercise:
+    prompt: '보간 방법 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      pchipFunc = interpolate.PchipInterpolator(hours, temps)
+      tempsPchip = pchipFunc(hoursNew)
+      tempsPchip[:5]
+    solution: |-
+      pchipFunc = interpolate.PchipInterpolator(hours, temps)
+      tempsPchip = pchipFunc(hoursNew)
+      tempsPchip[:5]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다. 각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다."
+    content: 다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다.
+      각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다.
   - type: code
     language: python
     title: PCHIP 보간 추가
@@ -159,14 +412,52 @@ sections:
       axCompare.grid(True, alpha=0.3)
       figCompare
   - type: tip
-    content: "PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다."
-
+    content: PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다.
 - id: missing
   title: 결측값 처리
+  structuredPrimary: true
   subtitle: NaN 보간
+  goal: '결측값 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '결측값 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다. 먼저 유효한 데이터만 추출하고,
+    이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+    timePoints = np.arange(len(sensorData))
+
+    sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+    sensorDf
+  exercise:
+    prompt: '결측값 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+      timePoints = np.arange(len(sensorData))
+
+      sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+      sensorDf
+    solution: |-
+      sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+      timePoints = np.arange(len(sensorData))
+
+      sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+      sensorDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다. 먼저 유효한 데이터만 추출하고, 이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다."
+    content: 보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다. 먼저 유효한 데이터만 추출하고,
+      이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다.
   - type: code
     language: python
     title: 결측값 있는 센서 데이터
@@ -208,13 +499,69 @@ sections:
       axFill.legend()
       axFill.grid(True, alpha=0.3)
       figFill
-
 - id: result
   title: 최종 온도 분석 보고서
+  structuredPrimary: true
   subtitle: 고해상도 온도 곡선
+  goal: '최종 온도 분석 보고서: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최종 온도 분석 보고서: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수 있습니다. 실무에서는 이런 고해상도
+    데이터가 에너지 관리, 농업, 기상 예보 등에 활용됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    hoursHigh = np.arange(0, 24.1, 0.5)
+    tempsHigh = pchipFunc(hoursHigh)
+
+    maxIdx = np.argmax(tempsHigh)
+    minIdx = np.argmin(tempsHigh)
+
+    analysisDf = pd.DataFrame({
+        'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+        'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+    })
+    analysisDf
+  exercise:
+    prompt: '최종 온도 분석 보고서: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      hoursHigh = np.arange(0, 24.1, 0.5)
+      tempsHigh = pchipFunc(hoursHigh)
+
+      maxIdx = np.argmax(tempsHigh)
+      minIdx = np.argmin(tempsHigh)
+
+      analysisDf = pd.DataFrame({
+          'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+          'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+      })
+      analysisDf
+    solution: |-
+      hoursHigh = np.arange(0, 24.1, 0.5)
+      tempsHigh = pchipFunc(hoursHigh)
+
+      maxIdx = np.argmax(tempsHigh)
+      minIdx = np.argmin(tempsHigh)
+
+      analysisDf = pd.DataFrame({
+          'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+          'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+      })
+      analysisDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수 있습니다. 실무에서는 이런 고해상도 데이터가 에너지 관리, 농업, 기상 예보 등에 활용됩니다."
+    content: 2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수 있습니다. 실무에서는 이런 고해상도 데이터가
+      에너지 관리, 농업, 기상 예보 등에 활용됩니다.
   - type: code
     language: python
     title: 고해상도 분석
@@ -257,17 +604,78 @@ sections:
       axResult2.legend()
       axResult2.grid(True, alpha=0.3)
       figResult
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 보간 활용 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을 만듭니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import interpolate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(123)
+    days = np.arange(1, 31)
+    basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+    missingIdx = [4, 5, 10, 15, 16, 17, 22]
+    pricesWithNan = basePrices.copy()
+    pricesWithNan[missingIdx] = np.nan
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(123)
+      days = np.arange(1, 31)
+      basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+      missingIdx = [4, 5, 10, 15, 16, 17, 22]
+      pricesWithNan = basePrices.copy()
+      pricesWithNan[missingIdx] = np.nan
+    solution: |-
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(123)
+      days = np.arange(1, 31)
+      basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+      missingIdx = [4, 5, 10, 15, 16, 17, 22]
+      pricesWithNan = basePrices.copy()
+      pricesWithNan[missingIdx] = np.nan
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을 만듭니다."
+    content: 지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을
+      만듭니다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 주가 결측값 처리"
+    title: '미션1: 주가 결측값 처리'
     blocks:
     - type: code
       title: 데이터 생성
@@ -313,7 +721,7 @@ sections:
         axStock.grid(True, alpha=0.3)
         figStock
   - type: expansion
-    title: "미션2: 신호 업샘플링"
+    title: '미션2: 신호 업샘플링'
     blocks:
     - type: code
       title: 저해상도 데이터
@@ -350,13 +758,84 @@ sections:
         axUp.legend()
         axUp.grid(True, alpha=0.3)
         figUp
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+    합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다."
+    content: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+      합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   - type: code
     language: python
     title: 지연시간 샘플과 입력 검증
@@ -428,7 +907,7 @@ sections:
       assert all(latencyChecks.values()), latencyChecks
       latencyChecks
   - type: expansion
-    title: "실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?"
+    title: '실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?'
     blocks:
     - type: code
       language: python

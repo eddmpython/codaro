@@ -42,6 +42,7 @@ def testGateNamesAreStable() -> None:
         "runtime-recovery-contract",
         "runtime-recovery-browser",
         "curriculum-quality-matrix",
+        "curriculum-top-tier-audit",
         "onboarding-browser",
         "frontend-performance-budget",
         "learning-card-contract",

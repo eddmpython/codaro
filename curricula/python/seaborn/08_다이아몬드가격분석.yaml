@@ -1,29 +1,87 @@
 meta:
   packages:
-    - matplotlib
-    - pandas
-    - seaborn
+  - matplotlib
+  - pandas
+  - seaborn
   id: seaborn_08
   title: 다이아몬드가격분석
   order: 8
   category: seaborn
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["seaborn", "displot", "kdeplot", "ecdf", "diamonds", "분포분석"]
+  tags:
+  - seaborn
+  - displot
+  - kdeplot
+  - ecdf
+  - diamonds
+  - 분포분석
   seo:
-    title: "Seaborn displot - 다이아몬드 가격 분포 분석"
-    description: "Seaborn displot, kdeplot, ecdf로 다이아몬드 가격 분포를 분석합니다. multiple, kind, 2차원 분포 시각화를 배웁니다."
-    keywords: ["seaborn", "displot", "kdeplot", "ecdf", "diamonds", "분포분석"]
-
+    title: Seaborn displot - 다이아몬드 가격 분포 분석
+    description: Seaborn displot, kdeplot, ecdf로 다이아몬드 가격 분포를 분석합니다. multiple, kind, 2차원 분포 시각화를 배웁니다.
+    keywords:
+    - seaborn
+    - displot
+    - kdeplot
+    - ecdf
+    - diamonds
+    - 분포분석
 intro:
-  emoji: "💎"
+  emoji: 💎
   goal: diamonds 데이터로 캐럿, 컷 등급별 가격 분포를 다양한 분포 차트로 분석합니다.
-  description: diamonds 로컬 데이터셋은 약 5,400개 다이아몬드의 캐럿, 컷, 색상, 투명도, 가격 정보를 담고 있습니다. displot()과 kdeplot()을 활용하여 분포를 분석합니다. 이전에 배운 relplot, heatmap, lineplot 개념을 함께 활용합니다.
-
+  description: diamonds 로컬 데이터셋은 약 5,400개 다이아몬드의 캐럿, 컷, 색상, 투명도, 가격 정보를 담고 있습니다. displot()과 kdeplot()을 활용하여 분포를 분석합니다. 이전에
+    배운 relplot, heatmap, lineplot 개념을 함께 활용합니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    seaborn과 matplotlib을 불러옵니다. diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다.
+
+    diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium < Ideal 순서입니다.
+  tips:
+  - diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium
+    < Ideal 순서입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    diamonds = loadLocalDataset('diamonds')
+    diamonds
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      diamonds = loadLocalDataset('diamonds')
+      diamonds
+    solution: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      diamonds = loadLocalDataset('diamonds')
+      diamonds
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: seaborn과 matplotlib을 불러옵니다. diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다.
@@ -40,11 +98,45 @@ sections:
       diamonds = loadLocalDataset('diamonds')
       diamonds
   - type: tip
-    content: diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium < Ideal 순서입니다.
-
+    content: diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good
+      < Premium < Ideal 순서입니다.
 - id: step2_histplot_basic
   title: 2단계. 기본 히스토그램
+  structuredPrimary: true
   subtitle: sns.histplot()
+  goal: '2단계. 기본 히스토그램: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기본 히스토그램: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 가격 분포를 히스토그램으로 확인합니다. bins 파라미터로 구간 수를 조절합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figHist, axHist = plt.subplots(figsize=(10, 5))
+    sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
+    axHist.set_title('Diamond Price Distribution')
+    figHist
+  exercise:
+    prompt: '2단계. 기본 히스토그램: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figHist, axHist = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
+      axHist.set_title('Diamond Price Distribution')
+      figHist
+    solution: |-
+      figHist, axHist = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
+      axHist.set_title('Diamond Price Distribution')
+      figHist
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 가격 분포를 히스토그램으로 확인합니다. bins 파라미터로 구간 수를 조절합니다.
@@ -57,10 +149,43 @@ sections:
       sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
       axHist.set_title('Diamond Price Distribution')
       figHist
-
 - id: step3_histplot_hue
   title: 3단계. 컷 등급별 구분
+  structuredPrimary: true
   subtitle: hue 파라미터
+  goal: '3단계. 컷 등급별 구분: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 컷 등급별 구분: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 컷 등급별로 색상을 구분합니다. 여러 그룹의 분포를 한 차트에서 비교할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figHistHue, axHistHue = plt.subplots(figsize=(10, 5))
+    sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
+    axHistHue.set_title('Price Distribution by Cut')
+    figHistHue
+  exercise:
+    prompt: '3단계. 컷 등급별 구분: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figHistHue, axHistHue = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
+      axHistHue.set_title('Price Distribution by Cut')
+      figHistHue
+    solution: |-
+      figHistHue, axHistHue = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
+      axHistHue.set_title('Price Distribution by Cut')
+      figHistHue
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 컷 등급별로 색상을 구분합니다. 여러 그룹의 분포를 한 차트에서 비교할 수 있습니다.
@@ -73,10 +198,46 @@ sections:
       sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
       axHistHue.set_title('Price Distribution by Cut')
       figHistHue
-
 - id: step4_multiple
   title: 4단계. 누적 히스토그램
+  structuredPrimary: true
   subtitle: multiple 파라미터
+  goal: '4단계. 누적 히스토그램: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 누적 히스토그램: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    multiple 파라미터로 히스토그램 표시 방식을 변경합니다. 'stack'은 그룹을 누적하여 표시합니다.
+
+    multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다.
+  tips:
+  - multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figStack, axStack = plt.subplots(figsize=(10, 5))
+    sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
+    axStack.set_title('Stacked Price Distribution by Cut')
+    figStack
+  exercise:
+    prompt: '4단계. 누적 히스토그램: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figStack, axStack = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
+      axStack.set_title('Stacked Price Distribution by Cut')
+      figStack
+    solution: |-
+      figStack, axStack = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
+      axStack.set_title('Stacked Price Distribution by Cut')
+      figStack
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: multiple 파라미터로 히스토그램 표시 방식을 변경합니다. 'stack'은 그룹을 누적하여 표시합니다.
@@ -90,11 +251,47 @@ sections:
       axStack.set_title('Stacked Price Distribution by Cut')
       figStack
   - type: tip
-    content: "multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다."
-
+    content: multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다.
 - id: step5_kdeplot
   title: 5단계. KDE 분포
+  structuredPrimary: true
   subtitle: sns.kdeplot()
+  goal: '5단계. KDE 분포: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. KDE 분포: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    KDE(커널 밀도 추정)로 부드러운 분포를 그립니다. 히스토그램보다 연속적인 분포 형태를 파악하기 좋습니다.
+
+    kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
+  tips:
+  - kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figKde, axKde = plt.subplots(figsize=(10, 5))
+    sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
+    axKde.set_title('Price KDE by Cut')
+    figKde
+  exercise:
+    prompt: '5단계. KDE 분포: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figKde, axKde = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
+      axKde.set_title('Price KDE by Cut')
+      figKde
+    solution: |-
+      figKde, axKde = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
+      axKde.set_title('Price KDE by Cut')
+      figKde
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: KDE(커널 밀도 추정)로 부드러운 분포를 그립니다. 히스토그램보다 연속적인 분포 형태를 파악하기 좋습니다.
@@ -109,10 +306,43 @@ sections:
       figKde
   - type: tip
     content: kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
-
 - id: step6_kdeplot_fill
   title: 6단계. 영역 채우기
+  structuredPrimary: true
   subtitle: fill 파라미터
+  goal: '6단계. 영역 채우기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 영역 채우기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: KDE에서 fill로 영역을 채웁니다. alpha로 투명도를 조절하여 겹치는 영역을 구분합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figKdeFill, axKdeFill = plt.subplots(figsize=(10, 5))
+    sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
+    axKdeFill.set_title('Filled KDE by Cut')
+    figKdeFill
+  exercise:
+    prompt: '6단계. 영역 채우기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figKdeFill, axKdeFill = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
+      axKdeFill.set_title('Filled KDE by Cut')
+      figKdeFill
+    solution: |-
+      figKdeFill, axKdeFill = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
+      axKdeFill.set_title('Filled KDE by Cut')
+      figKdeFill
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: KDE에서 fill로 영역을 채웁니다. alpha로 투명도를 조절하여 겹치는 영역을 구분합니다.
@@ -125,10 +355,44 @@ sections:
       sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
       axKdeFill.set_title('Filled KDE by Cut')
       figKdeFill
-
 - id: step7_displot
   title: 7단계. displot 기본
+  structuredPrimary: true
   subtitle: Figure-level 분포
+  goal: '7단계. displot 기본: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. displot 기본: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    displot()으로 Figure-level 분포 차트를 그립니다. kind로 히스토그램, KDE, ECDF 중 선택합니다.
+
+    displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수 있습니다.
+  tips:
+  - displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수
+    있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
+    gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
+    gDis.figure
+  exercise:
+    prompt: '7단계. displot 기본: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
+      gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
+      gDis.figure
+    solution: |-
+      gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
+      gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
+      gDis.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: displot()으로 Figure-level 분포 차트를 그립니다. kind로 히스토그램, KDE, ECDF 중 선택합니다.
@@ -141,11 +405,42 @@ sections:
       gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
       gDis.figure
   - type: tip
-    content: "displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수 있습니다."
-
+    content: displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중
+      패널을 만들 수 있습니다.
 - id: step8_displot_col
   title: 8단계. 패널 분리
+  structuredPrimary: true
   subtitle: col 파라미터
+  goal: '8단계. 패널 분리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 패널 분리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 컷 등급별로 패널을 분리합니다. 각 그룹의 분포를 독립적으로 확인할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
+    gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
+    gDisCol.figure
+  exercise:
+    prompt: '8단계. 패널 분리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
+      gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
+      gDisCol.figure
+    solution: |-
+      gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
+      gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
+      gDisCol.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 컷 등급별로 패널을 분리합니다. 각 그룹의 분포를 독립적으로 확인할 수 있습니다.
@@ -157,10 +452,46 @@ sections:
       gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
       gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
       gDisCol.figure
-
 - id: step9_2d_kde
   title: 9단계. 2차원 KDE
+  structuredPrimary: true
   subtitle: x, y 동시 지정
+  goal: '9단계. 2차원 KDE: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 2차원 KDE: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    캐럿과 가격의 2차원 분포를 확인합니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다.
+
+    x와 y 모두 지정하면 2차원 분포를 그립니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다. 대용량 데이터는 샘플링하여 성능을 개선합니다.
+  tips:
+  - x와 y 모두 지정하면 2차원 분포를 그립니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다. 대용량 데이터는 샘플링하여 성능을 개선합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    diamondsSample = diamonds.sample(n=5000, random_state=42)
+    gDis2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='kde', height=6)
+    gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
+    gDis2d.figure
+  exercise:
+    prompt: '9단계. 2차원 KDE: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      diamondsSample = diamonds.sample(n=5000, random_state=42)
+      gDis2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='kde', height=6)
+      gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
+      gDis2d.figure
+    solution: |-
+      diamondsSample = diamonds.sample(n=5000, random_state=42)
+      gDis2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='kde', height=6)
+      gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
+      gDis2d.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 캐럿과 가격의 2차원 분포를 확인합니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다.
@@ -175,10 +506,40 @@ sections:
       gDis2d.figure
   - type: tip
     content: x와 y 모두 지정하면 2차원 분포를 그립니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다. 대용량 데이터는 샘플링하여 성능을 개선합니다.
-
 - id: step10_2d_hist
   title: 10단계. 2차원 히스토그램
+  structuredPrimary: true
   subtitle: 히트맵 형태
+  goal: '10단계. 2차원 히스토그램: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 2차원 히스토그램: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2차원 히스토그램과 주변 분포를 함께 표시합니다. cbar로 컬러바를 추가합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
+    gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
+    gDisHist2d.figure
+  exercise:
+    prompt: '10단계. 2차원 히스토그램: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
+      gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
+      gDisHist2d.figure
+    solution: |-
+      gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
+      gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
+      gDisHist2d.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 2차원 히스토그램과 주변 분포를 함께 표시합니다. cbar로 컬러바를 추가합니다.
@@ -190,10 +551,43 @@ sections:
       gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
       gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
       gDisHist2d.figure
-
 - id: step11_ecdf
   title: 11단계. 누적분포
-  subtitle: "kind='ecdf'"
+  structuredPrimary: true
+  subtitle: kind='ecdf'
+  goal: '11단계. 누적분포: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 누적분포: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    색상 등급별 가격 분포를 누적분포(ECDF)로 비교합니다. y축은 해당 x값 이하인 데이터의 비율입니다.
+
+    ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
+  tips:
+  - ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
+    gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
+    gEcdf.figure
+  exercise:
+    prompt: '11단계. 누적분포: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
+      gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
+      gEcdf.figure
+    solution: |-
+      gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
+      gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
+      gEcdf.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 색상 등급별 가격 분포를 누적분포(ECDF)로 비교합니다. y축은 해당 x값 이하인 데이터의 비율입니다.
@@ -206,11 +600,48 @@ sections:
       gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
       gEcdf.figure
   - type: tip
-    content: ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
-
+    content: ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게
+      비교할 수 있습니다.
 - id: step12_col_row
   title: 12단계. 2차원 패널
+  structuredPrimary: true
   subtitle: col과 row
+  goal: '12단계. 2차원 패널: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 2차원 패널: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    컷과 색상 조합별 가격 분포를 비교합니다. col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다.
+
+    col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다. 두 범주형 변수의 모든 조합을 한눈에 비교할 수 있습니다.
+  tips:
+  - col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다. 두 범주형 변수의 모든 조합을 한눈에 비교할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    diamondsTop = diamonds[diamonds['cut'].isin(['Ideal', 'Premium'])].copy()
+    gDisColRow = sns.displot(data=diamondsTop, x='price', col='cut', row='color', kind='kde', height=2.5, aspect=1.5)
+    gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
+    gDisColRow.figure
+  exercise:
+    prompt: '12단계. 2차원 패널: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      diamondsTop = diamonds[diamonds['cut'].isin(['Ideal', 'Premium'])].copy()
+      gDisColRow = sns.displot(data=diamondsTop, x='price', col='cut', row='color', kind='kde', height=2.5, aspect=1.5)
+      gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
+      gDisColRow.figure
+    solution: |-
+      diamondsTop = diamonds[diamonds['cut'].isin(['Ideal', 'Premium'])].copy()
+      gDisColRow = sns.displot(data=diamondsTop, x='price', col='cut', row='color', kind='kde', height=2.5, aspect=1.5)
+      gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
+      gDisColRow.figure
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 컷과 색상 조합별 가격 분포를 비교합니다. col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다.
@@ -225,14 +656,73 @@ sections:
       gDisColRow.figure
   - type: tip
     content: col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다. 두 범주형 변수의 모든 조합을 한눈에 비교할 수 있습니다.
-
 - id: workflow_validation
   title: 13단계. 다이아몬드 분포 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: '13단계. 다이아몬드 분포 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '13단계. 다이아몬드 분포 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    가격 분포는 긴 꼬리와 등급별 차이를 함께 봐야 합니다. 가격과 캐럿이 양수인지 확인하고, 등급별 가격 차이가 차트와 수치에서 같은 방향인지 검증합니다.
+
+    대용량 분포 분석에서는 원가격과 단위 가격을 모두 변주해 봐야 가격 요인을 더 현실적으로 볼 수 있습니다.
+  tips:
+  - 대용량 분포 분석에서는 원가격과 단위 가격을 모두 변주해 봐야 가격 요인을 더 현실적으로 볼 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    diamondFlow = loadLocalDataset("diamonds")
+    requiredColumns = {"carat", "cut", "color", "clarity", "price"}
+    missingColumns = requiredColumns - set(diamondFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert diamondFlow[["carat", "price"]].gt(0).all().all()
+
+    priceByCut = diamondFlow.groupby("cut")["price"].mean().sort_values()
+    assert priceByCut.index[-1] == "Ideal"
+    priceByCut.round(0)
+  exercise:
+    prompt: '13단계. 다이아몬드 분포 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      diamondFlow = loadLocalDataset("diamonds")
+      requiredColumns = {"carat", "cut", "color", "clarity", "price"}
+      missingColumns = requiredColumns - set(diamondFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert diamondFlow[["carat", "price"]].gt(0).all().all()
+
+      priceByCut = diamondFlow.groupby("cut")["price"].mean().sort_values()
+      assert priceByCut.index[-1] == "Ideal"
+      priceByCut.round(0)
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      diamondFlow = loadLocalDataset("diamonds")
+      requiredColumns = {"carat", "cut", "color", "clarity", "price"}
+      missingColumns = requiredColumns - set(diamondFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert diamondFlow[["carat", "price"]].gt(0).all().all()
+
+      priceByCut = diamondFlow.groupby("cut")["price"].mean().sort_values()
+      assert priceByCut.index[-1] == "Ideal"
+      priceByCut.round(0)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      가격 분포는 긴 꼬리와 등급별 차이를 함께 봐야 합니다. 가격과 캐럿이 양수인지 확인하고, 등급별 가격 차이가 차트와 수치에서 같은 방향인지 검증합니다.
+    content: 가격 분포는 긴 꼬리와 등급별 차이를 함께 봐야 합니다. 가격과 캐럿이 양수인지 확인하고, 등급별 가격 차이가 차트와 수치에서 같은 방향인지 검증합니다.
   - type: code
     language: python
     title: 데이터 계약과 가격 예측
@@ -299,21 +789,60 @@ sections:
       assert pricePerCarat.max() > pricePerCarat.min()
       pricePerCarat.round(0)
   - type: tip
-    content: "대용량 분포 분석에서는 원가격과 단위 가격을 모두 변주해 봐야 가격 요인을 더 현실적으로 볼 수 있습니다."
-
+    content: 대용량 분포 분석에서는 원가격과 단위 가격을 모두 변주해 봐야 가격 요인을 더 현실적으로 볼 수 있습니다.
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 분포 시각화
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    data = loadLocalDataset('tips')
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    solution: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: tips 팁 금액 분포 다중 표시"
+    title: '미션1: tips 팁 금액 분포 다중 표시'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import seaborn as sns
         from codaro.curriculum.localData import loadLocalDataset
@@ -321,16 +850,16 @@ sections:
 
         data = loadLocalDataset('tips')
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         chart = sns.displot(data=data, x='tip', hue='time', col='sex', kind='kde', fill=True, height=4)
         chart.figure.suptitle('Tip Distribution by Time and Sex', y=1.02)
         chart.figure
   - type: expansion
-    title: "미션2: penguins 부리 길이 ECDF 비교"
+    title: '미션2: penguins 부리 길이 ECDF 비교'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import seaborn as sns
         from codaro.curriculum.localData import loadLocalDataset
@@ -338,7 +867,7 @@ sections:
 
         df = loadLocalDataset('penguins').dropna()
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         canvas = sns.displot(data=df, x='bill_length_mm', hue='species', col='island', kind='ecdf', height=4)
         canvas.figure.suptitle('Bill Length ECDF by Species and Island', y=1.02)

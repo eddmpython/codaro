@@ -1,30 +1,96 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - opencv-python
-    - scikit-learn
+  - matplotlib
+  - numpy
+  - opencv-python
+  - scikit-learn
   id: opencv_02
   title: 색공간변환기
   order: 2
   category: opencv
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["OpenCV", "cvtColor", "BGR", "RGB", "Gray", "HSV", "LAB"]
+  tags:
+  - OpenCV
+  - cvtColor
+  - BGR
+  - RGB
+  - Gray
+  - HSV
+  - LAB
   seo:
-    title: "OpenCV 입문 - 색공간 변환기"
-    description: "OpenCV cvtColor로 BGR, RGB, Gray, HSV, LAB 등 다양한 색공간을 변환합니다."
-    keywords: ["OpenCV", "cvtColor", "색공간", "HSV", "Gray", "LAB"]
-
+    title: OpenCV 입문 - 색공간 변환기
+    description: OpenCV cvtColor로 BGR, RGB, Gray, HSV, LAB 등 다양한 색공간을 변환합니다.
+    keywords:
+    - OpenCV
+    - cvtColor
+    - 색공간
+    - HSV
+    - Gray
+    - LAB
 intro:
-  emoji: "🌈"
+  emoji: 🌈
   goal: cvtColor()로 다양한 색공간(Gray, HSV, LAB)을 변환하고 비교합니다.
   description: 색공간 변환은 이미지 처리의 기본입니다. 흑백 변환, HSV를 이용한 색상 분리, LAB 색공간의 특징을 배웁니다.
-
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
+  structuredPrimary: true
   subtitle: BGR 변환 준비
+  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sklearn의 china 이미지를 불러와 BGR로 변환합니다. OpenCV의 cvtColor() 함수는 BGR 이미지를 기준으로 다양한 색공간으로 변환합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+    import matplotlib.pyplot as plt
+
+    photo = load_sample_image('china.jpg')
+    plt.figure(figsize=(10, 6))
+    plt.imshow(photo)
+    plt.title(f'Original: {photo.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      photo = load_sample_image('china.jpg')
+      plt.figure(figsize=(10, 6))
+      plt.imshow(photo)
+      plt.title(f'Original: {photo.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      photo = load_sample_image('china.jpg')
+      plt.figure(figsize=(10, 6))
+      plt.imshow(photo)
+      plt.title(f'Original: {photo.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn의 china 이미지를 불러와 BGR로 변환합니다. OpenCV의 cvtColor() 함수는 BGR 이미지를 기준으로 다양한 색공간으로 변환합니다.
@@ -55,13 +121,57 @@ sections:
       plt.title('BGR (colors inverted when shown as RGB)')
       plt.axis('off')
       plt.tight_layout()
-
 - id: step2_gray
   title: 2단계. 그레이스케일 변환
+  structuredPrimary: true
   subtitle: COLOR_BGR2GRAY
+  goal: '2단계. 그레이스케일 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 그레이스케일 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    그레이스케일(grayscale, 흑백) 변환은 가장 기본적인 색공간 변환입니다. 컬러 이미지의 3채널(R, G, B)을 1채널(밝기)로 변환합니다. 단순 평균이 아닌 Y = 0.299R + 0.587G + 0.114B 공식을 사용하는데, 이는 인간의 눈이 녹색에 가장 민감하고 파란색에 가장 둔감하기 때문입니다. 에지 검출, 이진화, 히스토그램 분석 등 많은 이미지 처리가 그레이스케일에서 수행됩니다.
+
+    그레이스케일은 2차원 배열입니다. shape이 (높이, 너비)로 채널이 없습니다. Y = 0.299R + 0.587G + 0.114B 공식으로 밝기를 계산합니다.
+  tips:
+  - 그레이스케일은 2차원 배열입니다. shape이 (높이, 너비)로 채널이 없습니다. Y = 0.299R + 0.587G + 0.114B 공식으로 밝기를 계산합니다.
+  - matplotlib에서 2D 배열을 imshow()하면 기본적으로 컬러맵이 적용됩니다. cmap='gray'를 지정해야 올바른 흑백으로 표시됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    gray = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2GRAY)
+    plt.figure(figsize=(10, 6))
+    plt.imshow(gray, cmap='gray')
+    plt.title(f'Grayscale: {gray.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '2단계. 그레이스케일 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gray = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2GRAY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(gray, cmap='gray')
+      plt.title(f'Grayscale: {gray.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      gray = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2GRAY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(gray, cmap='gray')
+      plt.title(f'Grayscale: {gray.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 그레이스케일(grayscale, 흑백) 변환은 가장 기본적인 색공간 변환입니다. 컬러 이미지의 3채널(R, G, B)을 1채널(밝기)로 변환합니다. 단순 평균이 아닌 Y = 0.299R + 0.587G + 0.114B 공식을 사용하는데, 이는 인간의 눈이 녹색에 가장 민감하고 파란색에 가장 둔감하기 때문입니다. 에지 검출, 이진화, 히스토그램 분석 등 많은 이미지 처리가 그레이스케일에서 수행됩니다.
+    content: 그레이스케일(grayscale, 흑백) 변환은 가장 기본적인 색공간 변환입니다. 컬러 이미지의 3채널(R, G, B)을 1채널(밝기)로 변환합니다. 단순 평균이 아닌 Y = 0.299R + 0.587G
+      + 0.114B 공식을 사용하는데, 이는 인간의 눈이 녹색에 가장 민감하고 파란색에 가장 둔감하기 때문입니다. 에지 검출, 이진화, 히스토그램 분석 등 많은 이미지 처리가 그레이스케일에서 수행됩니다.
   - type: code
     language: python
     title: 그레이스케일 변환
@@ -87,13 +197,56 @@ sections:
       plt.tight_layout()
   - type: tip
     content: matplotlib에서 2D 배열을 imshow()하면 기본적으로 컬러맵이 적용됩니다. cmap='gray'를 지정해야 올바른 흑백으로 표시됩니다.
-
 - id: step3_hsv
   title: 3단계. HSV 색공간
+  structuredPrimary: true
   subtitle: 색상, 채도, 명도
+  goal: '3단계. HSV 색공간: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. HSV 색공간: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    HSV는 Hue(색상), Saturation(채도), Value(명도)로 색을 표현하는 색공간입니다. Hue는 색의 종류(빨강, 노랑, 초록 등)를 각도로 표현하고, Saturation은 색의 선명도(회색~원색), Value는 밝기(검정~밝음)를 나타냅니다. RGB에서는 "빨간색 계열"을 찾으려면 복잡한 조건이 필요하지만, HSV에서는 H 값만 보면 됩니다. 색상 기반 객체 추적, 크로마키(배경 제거) 등에 널리 사용됩니다.
+
+    OpenCV의 HSV에서 H는 0-179 범위입니다(일반적인 0-360의 절반). S와 V는 0-255 범위입니다. H=0은 빨강, H=60은 초록, H=120은 파랑입니다.
+  tips:
+  - OpenCV의 HSV에서 H는 0-179 범위입니다(일반적인 0-360의 절반). S와 V는 0-255 범위입니다. H=0은 빨강, H=60은 초록, H=120은 파랑입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    hsv = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2HSV)
+    plt.figure(figsize=(10, 6))
+    plt.imshow(hsv)
+    plt.title(f'HSV: {hsv.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '3단계. HSV 색공간: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      hsv = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2HSV)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(hsv)
+      plt.title(f'HSV: {hsv.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      hsv = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2HSV)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(hsv)
+      plt.title(f'HSV: {hsv.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: HSV는 Hue(색상), Saturation(채도), Value(명도)로 색을 표현하는 색공간입니다. Hue는 색의 종류(빨강, 노랑, 초록 등)를 각도로 표현하고, Saturation은 색의 선명도(회색~원색), Value는 밝기(검정~밝음)를 나타냅니다. RGB에서는 "빨간색 계열"을 찾으려면 복잡한 조건이 필요하지만, HSV에서는 H 값만 보면 됩니다. 색상 기반 객체 추적, 크로마키(배경 제거) 등에 널리 사용됩니다.
+    content: HSV는 Hue(색상), Saturation(채도), Value(명도)로 색을 표현하는 색공간입니다. Hue는 색의 종류(빨강, 노랑, 초록 등)를 각도로 표현하고, Saturation은 색의 선명도(회색~원색),
+      Value는 밝기(검정~밝음)를 나타냅니다. RGB에서는 "빨간색 계열"을 찾으려면 복잡한 조건이 필요하지만, HSV에서는 H 값만 보면 됩니다. 색상 기반 객체 추적, 크로마키(배경 제거) 등에 널리 사용됩니다.
   - type: code
     language: python
     title: HSV 변환
@@ -140,13 +293,56 @@ sections:
       axHsv[2].set_title('Value (Brightness)')
       axHsv[2].axis('off')
       plt.tight_layout()
-
 - id: step4_lab
   title: 4단계. LAB 색공간
+  structuredPrimary: true
   subtitle: 밝기와 색 분리
+  goal: '4단계. LAB 색공간: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. LAB 색공간: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    LAB(또는 L*a*b*) 색공간은 L(Lightness, 밝기), A(녹색-빨강 축), B(파랑-노랑 축)로 구성됩니다. CIE(국제조명위원회)가 인간의 색 인지를 모델링하여 만든 색공간으로, 모든 인간이 볼 수 있는 색을 포함합니다. L 채널은 밝기만, A와 B 채널은 색상만 담당하여 완전히 분리됩니다. 이 특성 덕분에 L 채널에만 히스토그램 평활화를 적용하면 색상 왜곡 없이 대비를 개선할 수 있습니다.
+
+    LAB의 L 채널은 그레이스케일과 유사하지만 인간의 시각 인지에 더 가깝게 설계되었습니다. A는 녹색(-) ~ 빨강(+), B는 파랑(-) ~ 노랑(+) 축입니다.
+  tips:
+  - LAB의 L 채널은 그레이스케일과 유사하지만 인간의 시각 인지에 더 가깝게 설계되었습니다. A는 녹색(-) ~ 빨강(+), B는 파랑(-) ~ 노랑(+) 축입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    lab = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2LAB)
+    plt.figure(figsize=(10, 6))
+    plt.imshow(lab)
+    plt.title(f'LAB: {lab.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '4단계. LAB 색공간: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      lab = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2LAB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(lab)
+      plt.title(f'LAB: {lab.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      lab = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2LAB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(lab)
+      plt.title(f'LAB: {lab.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: LAB(또는 L*a*b*) 색공간은 L(Lightness, 밝기), A(녹색-빨강 축), B(파랑-노랑 축)로 구성됩니다. CIE(국제조명위원회)가 인간의 색 인지를 모델링하여 만든 색공간으로, 모든 인간이 볼 수 있는 색을 포함합니다. L 채널은 밝기만, A와 B 채널은 색상만 담당하여 완전히 분리됩니다. 이 특성 덕분에 L 채널에만 히스토그램 평활화를 적용하면 색상 왜곡 없이 대비를 개선할 수 있습니다.
+    content: LAB(또는 L*a*b*) 색공간은 L(Lightness, 밝기), A(녹색-빨강 축), B(파랑-노랑 축)로 구성됩니다. CIE(국제조명위원회)가 인간의 색 인지를 모델링하여 만든 색공간으로,
+      모든 인간이 볼 수 있는 색을 포함합니다. L 채널은 밝기만, A와 B 채널은 색상만 담당하여 완전히 분리됩니다. 이 특성 덕분에 L 채널에만 히스토그램 평활화를 적용하면 색상 왜곡 없이 대비를 개선할 수 있습니다.
   - type: code
     language: python
     title: LAB 변환
@@ -187,10 +383,73 @@ sections:
       axLab[2].set_title('B (Blue-Yellow)')
       axLab[2].axis('off')
       plt.tight_layout()
-
 - id: step5_compare
   title: 5단계. 색공간 비교
+  structuredPrimary: true
   subtitle: 변환 결과 비교
+  goal: '5단계. 색공간 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 색공간 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 원본과 각 색공간 변환 결과를 나란히 비교해봅시다. 각 색공간이 이미지 정보를 어떻게 다르게 표현하는지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figCompare, axCompare = plt.subplots(2, 2, figsize=(10, 8))
+    axCompare[0, 0].imshow(photo)
+    axCompare[0, 0].set_title('Original (RGB)')
+    axCompare[0, 0].axis('off')
+    axCompare[0, 1].imshow(gray, cmap='gray')
+    axCompare[0, 1].set_title('Grayscale')
+    axCompare[0, 1].axis('off')
+    axCompare[1, 0].imshow(hue, cmap='hsv')
+    axCompare[1, 0].set_title('HSV - Hue')
+    axCompare[1, 0].axis('off')
+    axCompare[1, 1].imshow(lCh, cmap='gray')
+    axCompare[1, 1].set_title('LAB - Lightness')
+    axCompare[1, 1].axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '5단계. 색공간 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figCompare, axCompare = plt.subplots(2, 2, figsize=(10, 8))
+      axCompare[0, 0].imshow(photo)
+      axCompare[0, 0].set_title('Original (RGB)')
+      axCompare[0, 0].axis('off')
+      axCompare[0, 1].imshow(gray, cmap='gray')
+      axCompare[0, 1].set_title('Grayscale')
+      axCompare[0, 1].axis('off')
+      axCompare[1, 0].imshow(hue, cmap='hsv')
+      axCompare[1, 0].set_title('HSV - Hue')
+      axCompare[1, 0].axis('off')
+      axCompare[1, 1].imshow(lCh, cmap='gray')
+      axCompare[1, 1].set_title('LAB - Lightness')
+      axCompare[1, 1].axis('off')
+      plt.tight_layout()
+    solution: |-
+      figCompare, axCompare = plt.subplots(2, 2, figsize=(10, 8))
+      axCompare[0, 0].imshow(photo)
+      axCompare[0, 0].set_title('Original (RGB)')
+      axCompare[0, 0].axis('off')
+      axCompare[0, 1].imshow(gray, cmap='gray')
+      axCompare[0, 1].set_title('Grayscale')
+      axCompare[0, 1].axis('off')
+      axCompare[1, 0].imshow(hue, cmap='hsv')
+      axCompare[1, 0].set_title('HSV - Hue')
+      axCompare[1, 0].axis('off')
+      axCompare[1, 1].imshow(lCh, cmap='gray')
+      axCompare[1, 1].set_title('LAB - Lightness')
+      axCompare[1, 1].axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 원본과 각 색공간 변환 결과를 나란히 비교해봅시다. 각 색공간이 이미지 정보를 어떻게 다르게 표현하는지 확인합니다.
@@ -213,10 +472,55 @@ sections:
       axCompare[1, 1].set_title('LAB - Lightness')
       axCompare[1, 1].axis('off')
       plt.tight_layout()
-
 - id: step6_back
   title: 6단계. 역변환
+  structuredPrimary: true
   subtitle: 색공간 복원
+  goal: '6단계. 역변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 역변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    HSV나 LAB에서 수정 후 다시 BGR/RGB로 변환할 수 있습니다. 변환 과정에서 약간의 정보 손실이 있을 수 있습니다.
+
+    색공간 변환은 대부분 가역적이지만, 양자화 오차로 완벽히 동일하지 않을 수 있습니다. 정밀한 작업에서는 이 점을 고려해야 합니다.
+  tips:
+  - 색공간 변환은 대부분 가역적이지만, 양자화 오차로 완벽히 동일하지 않을 수 있습니다. 정밀한 작업에서는 이 점을 고려해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    backBgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    backRgb = cv2.cvtColor(backBgr, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(10, 6))
+    plt.imshow(backRgb)
+    plt.title(f'Restored: {backRgb.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '6단계. 역변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      backBgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+      backRgb = cv2.cvtColor(backBgr, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(backRgb)
+      plt.title(f'Restored: {backRgb.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      backBgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+      backRgb = cv2.cvtColor(backBgr, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(backRgb)
+      plt.title(f'Restored: {backRgb.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: HSV나 LAB에서 수정 후 다시 BGR/RGB로 변환할 수 있습니다. 변환 과정에서 약간의 정보 손실이 있을 수 있습니다.
@@ -248,20 +552,80 @@ sections:
       plt.tight_layout()
   - type: tip
     content: 색공간 변환은 대부분 가역적이지만, 양자화 오차로 완벽히 동일하지 않을 수 있습니다. 정밀한 작업에서는 이 점을 고려해야 합니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 색공간 활용
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    flower 이미지로 색공간 변환을 연습해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+    import matplotlib.pyplot as plt
+
+    flower = load_sample_image('flower.jpg')
+    flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+    plt.figure(figsize=(10, 6))
+    plt.imshow(flower)
+    plt.title(f'Flower: {flower.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(flower)
+      plt.title(f'Flower: {flower.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(flower)
+      plt.title(f'Flower: {flower.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: flower 이미지로 색공간 변환을 연습해봅시다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: flower 그레이스케일과 HSV"
+    title: '미션1: flower 그레이스케일과 HSV'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         import cv2
         import numpy as np
@@ -276,7 +640,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "그레이스케일 변환"
+      title: 그레이스케일 변환
       content: |-
         flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
         plt.figure(figsize=(10, 6))
@@ -285,7 +649,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "HSV 변환 및 시각화"
+      title: HSV 변환 및 시각화
       content: |-
         flowerHsv = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2HSV)
         fHue, fSat, fVal = cv2.split(flowerHsv)
@@ -301,10 +665,10 @@ sections:
         axFlower[2].axis('off')
         plt.tight_layout()
   - type: expansion
-    title: "미션2: LAB 채널 분석"
+    title: '미션2: LAB 채널 분석'
     blocks:
     - type: code
-      title: "이미지 로드 및 LAB 변환"
+      title: 이미지 로드 및 LAB 변환
       content: |-
         import cv2
         import numpy as np
@@ -320,7 +684,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "채널 분리"
+      title: 채널 분리
       content: |-
         sL, sA, sB = cv2.split(sceneLab)
         plt.figure(figsize=(10, 6))
@@ -329,7 +693,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "채널별 시각화"
+      title: 채널별 시각화
       content: |-
         figScene, axScene = plt.subplots(2, 2, figsize=(10, 8))
         axScene[0, 0].imshow(scene)
@@ -345,10 +709,70 @@ sections:
         axScene[1, 1].set_title('B Channel')
         axScene[1, 1].axis('off')
         plt.tight_layout()
-
 - id: workflow_validation
   title: 8단계. 색공간 변환 검증 루프
+  structuredPrimary: true
   subtitle: BGR → HSV → 마스크 확인
+  goal: '8단계. 색공간 변환 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 색공간 변환 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 색공간 변환은 결과 이미지가 예쁘게 보이는지보다, 원하는 색이 안정적으로 분리되는지가 중요합니다. 기준 색 패치를 만들고 HSV 마스크 면적을 검증한 뒤, 변환 코드 오류와 임계값 변주를 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    colorImage = np.zeros((90, 120, 3), dtype=np.uint8)
+    colorImage[:, :60] = [0, 0, 255]
+    colorImage[:, 60:] = [0, 180, 0]
+
+    def validateColorImage(image):
+        if image.ndim != 3 or image.shape[2] != 3:
+            raise ValueError("색공간 변환에는 BGR 3채널 이미지가 필요합니다")
+        return True
+
+    validateColorImage(colorImage)
+  exercise:
+    prompt: '8단계. 색공간 변환 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      colorImage = np.zeros((90, 120, 3), dtype=np.uint8)
+      colorImage[:, :60] = [0, 0, 255]
+      colorImage[:, 60:] = [0, 180, 0]
+
+      def validateColorImage(image):
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError("색공간 변환에는 BGR 3채널 이미지가 필요합니다")
+          return True
+
+      validateColorImage(colorImage)
+    solution: |-
+      import cv2
+      import numpy as np
+
+      colorImage = np.zeros((90, 120, 3), dtype=np.uint8)
+      colorImage[:, :60] = [0, 0, 255]
+      colorImage[:, 60:] = [0, 180, 0]
+
+      def validateColorImage(image):
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError("색공간 변환에는 BGR 3채널 이미지가 필요합니다")
+          return True
+
+      validateColorImage(colorImage)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 색공간 변환은 결과 이미지가 예쁘게 보이는지보다, 원하는 색이 안정적으로 분리되는지가 중요합니다. 기준 색 패치를 만들고 HSV 마스크 면적을 검증한 뒤, 변환 코드 오류와 임계값 변주를 확인합니다.

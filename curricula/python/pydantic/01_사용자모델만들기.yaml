@@ -1,36 +1,67 @@
 meta:
   packages:
-    - pydantic
+  - pydantic
   id: pydantic_01
   title: 사용자모델만들기
   order: 1
   category: pydantic
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["pydantic", "BaseModel", "타입힌트", "검증", "기본값"]
+  tags:
+  - pydantic
+  - BaseModel
+  - 타입힌트
+  - 검증
+  - 기본값
   seo:
-    title: "Pydantic BaseModel - 첫 번째 데이터 모델 만들기"
-    description: "Pydantic의 BaseModel로 첫 번째 데이터 모델을 정의합니다. 타입 검증, 자동 변환, 에러 메시지를 배웁니다."
-    keywords: ["pydantic", "BaseModel", "데이터모델", "타입검증"]
-
+    title: Pydantic BaseModel - 첫 번째 데이터 모델 만들기
+    description: Pydantic의 BaseModel로 첫 번째 데이터 모델을 정의합니다. 타입 검증, 자동 변환, 에러 메시지를 배웁니다.
+    keywords:
+    - pydantic
+    - BaseModel
+    - 데이터모델
+    - 타입검증
 intro:
-  emoji: "👤"
+  emoji: 👤
   goal: Pydantic의 BaseModel로 사용자 프로필 관리 시스템을 구축합니다.
-  description: "이 프로젝트에서는 실제 서비스에서 사용되는 사용자 프로필 데이터 모델을 만들어봅니다. 타입 힌트로 필드를 선언하면 인스턴스 생성 시 자동으로 검증이 이루어지고, 잘못된 데이터는 명확한 에러 메시지와 함께 거부됩니다. 이 패턴은 API 개발, 데이터 처리, 설정 관리 등 모든 Python 애플리케이션의 기반이 됩니다."
-
+  description: 이 프로젝트에서는 실제 서비스에서 사용되는 사용자 프로필 데이터 모델을 만들어봅니다. 타입 힌트로 필드를 선언하면 인스턴스 생성 시 자동으로 검증이 이루어지고, 잘못된 데이터는 명확한 에러 메시지와
+    함께 거부됩니다. 이 패턴은 API 개발, 데이터 처리, 설정 관리 등 모든 Python 애플리케이션의 기반이 됩니다.
 sections:
 - id: load
   title: 라이브러리 로드
+  structuredPrimary: true
   subtitle: Pydantic 설치 및 import
+  goal: '라이브러리 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '라이브러리 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을
+    자랑합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import pydantic
+  exercise:
+    prompt: '라이브러리 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import pydantic
+    solution: import pydantic
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을 자랑합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다."
+    content: Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을
+      자랑합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다.
   - type: code
     language: python
     title: 패키지 설치
     description: pip으로 pydantic 설치
-    content: |-
-      import pydantic
+    content: import pydantic
   - type: code
     language: python
     title: BaseModel 가져오기
@@ -38,13 +69,59 @@ sections:
     content: |-
       from pydantic import BaseModel
       from typing import Optional
-
 - id: define
   title: 기본 모델 정의
+  structuredPrimary: true
   subtitle: 첫 번째 사용자 모델
+  goal: '기본 모델 정의: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '기본 모델 정의: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가 됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다.
+
+    인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다.
+  tips:
+  - 인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class User(BaseModel):
+        name: str
+        age: int
+        email: str
+
+    user = User(name="Alice", age=25, email="alice@example.com")
+    user
+  exercise:
+    prompt: '기본 모델 정의: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class User(BaseModel):
+          name: str
+          age: int
+          email: str
+
+      user = User(name="Alice", age=25, email="alice@example.com")
+      user
+    solution: |-
+      class User(BaseModel):
+          name: str
+          age: int
+          email: str
+
+      user = User(name="Alice", age=25, email="alice@example.com")
+      user
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가 됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다."
+    content: BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가
+      됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다.
   - type: code
     language: python
     title: User 모델
@@ -58,20 +135,50 @@ sections:
       user = User(name="Alice", age=25, email="alice@example.com")
       user
   - type: tip
-    content: "인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다."
+    content: 인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다.
   - type: code
     language: python
     title: 필드 접근
     description: 속성으로 값 읽기
-    content: |-
-      user.name, user.age, user.email
-
+    content: user.name, user.age, user.email
 - id: coercion
   title: 타입 자동 변환
+  structuredPrimary: true
   subtitle: 스마트 변환 기능
+  goal: '타입 자동 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '타입 자동 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 "30"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는 숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다.
+
+    변환이 불가능한 경우(예: "invalid"를 int로)에는 ValidationError가 발생합니다. Pydantic은 "스마트" 변환만 수행합니다.
+  tips:
+  - '변환이 불가능한 경우(예: "invalid"를 int로)에는 ValidationError가 발생합니다. Pydantic은 "스마트" 변환만 수행합니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    converted = User(name="Bob", age="30", email="bob@test.com")
+    converted.age, type(converted.age)
+  exercise:
+    prompt: '타입 자동 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      converted = User(name="Bob", age="30", email="bob@test.com")
+      converted.age, type(converted.age)
+    solution: |-
+      converted = User(name="Bob", age="30", email="bob@test.com")
+      converted.age, type(converted.age)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 \"30\"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는 숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다."
+    content: Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 "30"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는
+      숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다.
   - type: code
     language: python
     title: 문자열에서 정수로
@@ -94,14 +201,60 @@ sections:
       assert numNameError == "string_type"
       numNameError
   - type: tip
-    content: "변환이 불가능한 경우(예: \"invalid\"를 int로)에는 ValidationError가 발생합니다. Pydantic은 \"스마트\" 변환만 수행합니다."
-
+    content: '변환이 불가능한 경우(예: "invalid"를 int로)에는 ValidationError가 발생합니다. Pydantic은 "스마트" 변환만 수행합니다.'
 - id: validation
   title: 검증 실패 처리
+  structuredPrimary: true
   subtitle: ValidationError 이해하기
+  goal: '검증 실패 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '검증 실패 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를 얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다.
+
+    errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다.
+  tips:
+  - errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pydantic import ValidationError
+
+    try:
+        invalid = User(name="Charlie", age="not_a_number", email="c@c.com")
+    except ValidationError as exc:
+        errorInfo = exc.errors()
+        errorInfo
+  exercise:
+    prompt: '검증 실패 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import ValidationError
+
+      try:
+          invalid = User(name="Charlie", age="not_a_number", email="c@c.com")
+      except ValidationError as exc:
+          errorInfo = exc.errors()
+          errorInfo
+    solution: |-
+      from pydantic import ValidationError
+
+      try:
+          invalid = User(name="Charlie", age="not_a_number", email="c@c.com")
+      except ValidationError as exc:
+          errorInfo = exc.errors()
+          errorInfo
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를 얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다."
+    content: 변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를
+      얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다.
   - type: code
     language: python
     title: 검증 실패 유도
@@ -125,14 +278,61 @@ sections:
           errorCount = exc.error_count()
           errorCount
   - type: tip
-    content: "errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다."
-
+    content: errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다.
 - id: default
   title: 기본값과 Optional
+  structuredPrimary: true
   subtitle: 선택적 필드 정의
+  goal: '기본값과 Optional: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '기본값과 Optional: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 필드에 기본값을 지정하면 인스턴스 생성 시 해당 필드를 생략할 수 있습니다. Optional[T]는 T 또는 None을 허용하는 타입입니다. 기본값과 Optional을 조합하면 유연한 데이터
+    모델을 설계할 수 있습니다. 주의할 점은 기본값이 있는 필드는 반드시 기본값이 없는 필드 뒤에 와야 한다는 것입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Profile(BaseModel):
+        username: str
+        bio: Optional[str] = None
+        age: int = 18
+        active: bool = True
+
+    minimal = Profile(username="dave")
+    minimal
+  exercise:
+    prompt: '기본값과 Optional: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Profile(BaseModel):
+          username: str
+          bio: Optional[str] = None
+          age: int = 18
+          active: bool = True
+
+      minimal = Profile(username="dave")
+      minimal
+    solution: |-
+      class Profile(BaseModel):
+          username: str
+          bio: Optional[str] = None
+          age: int = 18
+          active: bool = True
+
+      minimal = Profile(username="dave")
+      minimal
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "필드에 기본값을 지정하면 인스턴스 생성 시 해당 필드를 생략할 수 있습니다. Optional[T]는 T 또는 None을 허용하는 타입입니다. 기본값과 Optional을 조합하면 유연한 데이터 모델을 설계할 수 있습니다. 주의할 점은 기본값이 있는 필드는 반드시 기본값이 없는 필드 뒤에 와야 한다는 것입니다."
+    content: 필드에 기본값을 지정하면 인스턴스 생성 시 해당 필드를 생략할 수 있습니다. Optional[T]는 T 또는 None을 허용하는 타입입니다. 기본값과 Optional을 조합하면 유연한 데이터 모델을
+      설계할 수 있습니다. 주의할 점은 기본값이 있는 필드는 반드시 기본값이 없는 필드 뒤에 와야 한다는 것입니다.
   - type: code
     language: python
     title: 기본값 있는 모델
@@ -153,13 +353,44 @@ sections:
     content: |-
       full = Profile(username="eve", bio="Developer", age=25, active=False)
       full
-
 - id: serialize
   title: 직렬화와 역직렬화
+  structuredPrimary: true
   subtitle: dict와 JSON 변환
+  goal: '직렬화와 역직렬화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '직렬화와 역직렬화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는 딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다.
+
+    Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다.
+  tips:
+  - Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    userDict = user.model_dump()
+    userDict
+  exercise:
+    prompt: '직렬화와 역직렬화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      userDict = user.model_dump()
+      userDict
+    solution: |-
+      userDict = user.model_dump()
+      userDict
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는 딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다."
+    content: Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는
+      딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다.
   - type: code
     language: python
     title: 딕셔너리 변환
@@ -175,7 +406,7 @@ sections:
       userJson = user.model_dump_json(indent=2)
       userJson
   - type: tip
-    content: "Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다."
+    content: Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다.
   - type: code
     language: python
     title: 딕셔너리에서 생성
@@ -192,13 +423,57 @@ sections:
       jsonStr = '{"name": "Grace", "age": 28, "email": "grace@mail.com"}'
       fromJson = User.model_validate_json(jsonStr)
       fromJson
-
 - id: immutable
   title: 불변 모델
+  structuredPrimary: true
   subtitle: frozen 설정
+  goal: '불변 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '불변 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: model_config에서 frozen=True를 설정하면 인스턴스 생성 후 필드 값을 수정할 수 없습니다. 이는 함수형 프로그래밍 패러다임에서 중요한 불변성(immutability)을 보장합니다.
+    실수로 데이터를 변경하는 버그를 방지하고, 해시 가능한 객체로 만들어 딕셔너리 키나 집합 원소로 사용할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ImmutableUser(BaseModel):
+        model_config = {"frozen": True}
+        name: str
+        age: int
+
+    frozen = ImmutableUser(name="Henry", age=30)
+    frozen
+  exercise:
+    prompt: '불변 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ImmutableUser(BaseModel):
+          model_config = {"frozen": True}
+          name: str
+          age: int
+
+      frozen = ImmutableUser(name="Henry", age=30)
+      frozen
+    solution: |-
+      class ImmutableUser(BaseModel):
+          model_config = {"frozen": True}
+          name: str
+          age: int
+
+      frozen = ImmutableUser(name="Henry", age=30)
+      frozen
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "model_config에서 frozen=True를 설정하면 인스턴스 생성 후 필드 값을 수정할 수 없습니다. 이는 함수형 프로그래밍 패러다임에서 중요한 불변성(immutability)을 보장합니다. 실수로 데이터를 변경하는 버그를 방지하고, 해시 가능한 객체로 만들어 딕셔너리 키나 집합 원소로 사용할 수 있습니다."
+    content: model_config에서 frozen=True를 설정하면 인스턴스 생성 후 필드 값을 수정할 수 없습니다. 이는 함수형 프로그래밍 패러다임에서 중요한 불변성(immutability)을 보장합니다.
+      실수로 데이터를 변경하는 버그를 방지하고, 해시 가능한 객체로 만들어 딕셔너리 키나 집합 원소로 사용할 수 있습니다.
   - type: code
     language: python
     title: 불변 모델 정의
@@ -223,13 +498,93 @@ sections:
       except ValidationError as exc:
           freezeError = type(exc).__name__
           freezeError
-
 - id: result
   title: 최종 사용자 시스템
+  structuredPrimary: true
   subtitle: 종합 프로필 모델
+  goal: '최종 사용자 시스템: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최종 사용자 시스템: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 모든 개념을 종합하여 실제 서비스에서 사용할 수 있는 사용자 프로필 시스템을 완성합니다. 필수 필드와 선택적 필드를 적절히 조합하고, model_fields로 스키마 정보를 확인하며,
+    다양한 직렬화 옵션을 활용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class UserProfile(BaseModel):
+        model_config = {"frozen": False}
+
+        userId: str
+        username: str
+        email: str
+        displayName: Optional[str] = None
+        age: Optional[int] = None
+        isActive: bool = True
+        role: str = "user"
+
+    profile = UserProfile(
+        userId="usr_001",
+        username="alice",
+        email="alice@example.com",
+        displayName="Alice Kim",
+        age=25
+    )
+    profile
+  exercise:
+    prompt: '최종 사용자 시스템: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class UserProfile(BaseModel):
+          model_config = {"frozen": False}
+
+          userId: str
+          username: str
+          email: str
+          displayName: Optional[str] = None
+          age: Optional[int] = None
+          isActive: bool = True
+          role: str = "user"
+
+      profile = UserProfile(
+          userId="usr_001",
+          username="alice",
+          email="alice@example.com",
+          displayName="Alice Kim",
+          age=25
+      )
+      profile
+    solution: |-
+      class UserProfile(BaseModel):
+          model_config = {"frozen": False}
+
+          userId: str
+          username: str
+          email: str
+          displayName: Optional[str] = None
+          age: Optional[int] = None
+          isActive: bool = True
+          role: str = "user"
+
+      profile = UserProfile(
+          userId="usr_001",
+          username="alice",
+          email="alice@example.com",
+          displayName="Alice Kim",
+          age=25
+      )
+      profile
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 모든 개념을 종합하여 실제 서비스에서 사용할 수 있는 사용자 프로필 시스템을 완성합니다. 필수 필드와 선택적 필드를 적절히 조합하고, model_fields로 스키마 정보를 확인하며, 다양한 직렬화 옵션을 활용합니다."
+    content: 지금까지 배운 모든 개념을 종합하여 실제 서비스에서 사용할 수 있는 사용자 프로필 시스템을 완성합니다. 필수 필드와 선택적 필드를 적절히 조합하고, model_fields로 스키마 정보를 확인하며,
+      다양한 직렬화 옵션을 활용합니다.
   - type: code
     language: python
     title: 완성된 프로필 모델
@@ -272,17 +627,98 @@ sections:
       import json
       schema = UserProfile.model_json_schema()
       json.dumps(schema, indent=2)[:300]
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 모델 정의 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pydantic import BaseModel
+    from typing import Optional
+
+    class Product(BaseModel):
+        productId: str
+        name: str
+        price: float
+        quantity: int = 0
+        description: Optional[str] = None
+        isAvailable: bool = True
+
+    laptop = Product(
+        productId="P001",
+        name="MacBook Pro",
+        price=2500000,
+        quantity=10,
+        description="M3 Pro chip"
+    )
+    laptop
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import BaseModel
+      from typing import Optional
+
+      class Product(BaseModel):
+          productId: str
+          name: str
+          price: float
+          quantity: int = 0
+          description: Optional[str] = None
+          isAvailable: bool = True
+
+      laptop = Product(
+          productId="P001",
+          name="MacBook Pro",
+          price=2500000,
+          quantity=10,
+          description="M3 Pro chip"
+      )
+      laptop
+    solution: |-
+      from pydantic import BaseModel
+      from typing import Optional
+
+      class Product(BaseModel):
+          productId: str
+          name: str
+          price: float
+          quantity: int = 0
+          description: Optional[str] = None
+          isAvailable: bool = True
+
+      laptop = Product(
+          productId="P001",
+          name="MacBook Pro",
+          price=2500000,
+          quantity=10,
+          description="M3 Pro chip"
+      )
+      laptop
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다."
+    content: 지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 상품 모델"
+    title: '미션1: 상품 모델'
     blocks:
     - type: code
       title: 모델 정의
@@ -318,7 +754,7 @@ sections:
         }
         productSummary
   - type: expansion
-    title: "미션2: 주문 시스템"
+    title: '미션2: 주문 시스템'
     blocks:
     - type: code
       title: 주문 모델 정의
@@ -362,17 +798,139 @@ sections:
             "fields": list(Order.model_fields.keys())
         }
         testResult
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
+    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
-  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    solution: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
-  - type: "code"
-    language: "python"
-    title: "주문 입력 모델과 정상 데이터 예측"
-    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+  - type: text
+    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
+      다음 단계로 넘기는 흐름을 검증합니다.
+  - type: code
+    language: python
+    title: 주문 입력 모델과 정상 데이터 예측
+    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
     content: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -407,10 +965,10 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-  - type: "code"
-    language: "python"
-    title: "잘못된 입력을 먼저 실패시킨다"
-    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+  - type: code
+    language: python
+    title: 잘못된 입력을 먼저 실패시킨다
+    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
     content: |-
       try:
           OrderInput.model_validate({
@@ -427,10 +985,10 @@ sections:
       errorFields = {error['loc'][0] for error in orderValidationErrors}
       assert {'amount', 'status'} <= errorFields
       orderValidationErrors
-  - type: "code"
-    language: "python"
-    title: "배치 입력을 정상/오류로 분리"
-    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+  - type: code
+    language: python
+    title: 배치 입력을 정상/오류로 분리
+    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
     content: |-
       rawOrders = [
           {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
@@ -456,10 +1014,10 @@ sections:
       assert len(rejectedOrders) == 2
       assert paidRevenue == 120000
       acceptedOrders, rejectedOrders
-  - type: "code"
-    language: "python"
-    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
-    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
+    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
     content: |-
       def filterRevenueOrders(orders, minAmount):
           if minAmount <= 0:

@@ -1,31 +1,92 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scikit-learn
-    - seaborn
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  - seaborn
   id: sklearn_05
   title: 손글씨숫자인식
   order: 5
   category: sklearn
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 기초
-  tags: ["다중분류", "이미지", "PCA", "digits", "시각화"]
+  tags:
+  - 다중분류
+  - 이미지
+  - PCA
+  - digits
+  - 시각화
   seo:
-    title: "scikit-learn 다중 분류 - 손글씨 숫자 인식"
-    description: "이미지 데이터로 0~9 숫자를 분류합니다. PCA로 고차원 데이터를 시각화합니다."
-    keywords: ["scikit-learn", "다중분류", "digits", "PCA", "이미지"]
-
+    title: scikit-learn 다중 분류 - 손글씨 숫자 인식
+    description: 이미지 데이터로 0~9 숫자를 분류합니다. PCA로 고차원 데이터를 시각화합니다.
+    keywords:
+    - scikit-learn
+    - 다중분류
+    - digits
+    - PCA
+    - 이미지
 intro:
-  emoji: "✍️"
+  emoji: ✍️
   goal: 이미지 데이터로 손글씨 숫자(0~9)를 인식하는 모델을 만듭니다.
-  description: 64픽셀(8x8) 이미지 데이터로 10개 클래스 분류를 수행합니다. PCA로 고차원 데이터를 2차원으로 축소하여 시각화합니다. 이전 프로젝트의 train_test_split, StandardScaler, 다중분류 개념을 복습하고 PCA를 새로 배웁니다.
-
+  description: 64픽셀(8x8) 이미지 데이터로 10개 클래스 분류를 수행합니다. PCA로 고차원 데이터를 2차원으로 축소하여 시각화합니다. 이전 프로젝트의 train_test_split, StandardScaler,
+    다중분류 개념을 복습하고 PCA를 새로 배웁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 손글씨 숫자 인식에 필요한 라이브러리를 불러옵니다. 차원 축소를 위해 PCA를 추가로 임포트합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.datasets import load_digits
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+    from sklearn.decomposition import PCA
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+      from sklearn.decomposition import PCA
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+    solution: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+      from sklearn.decomposition import PCA
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 손글씨 숫자 인식에 필요한 라이브러리를 불러옵니다. 차원 축소를 위해 PCA를 추가로 임포트합니다.
@@ -44,10 +105,46 @@ sections:
       import numpy as np
       import matplotlib.pyplot as plt
       import seaborn as sns
-
 - id: step2_load
   title: 2단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: load_digits()
+  goal: '2단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    손글씨 숫자 데이터셋은 8x8 픽셀 이미지 1,797개를 담고 있습니다. 각 픽셀은 0~16 사이의 밝기값입니다. 이미지가 64차원 벡터로 펼쳐져 있습니다.
+
+    8x8=64 픽셀이 1차원으로 펼쳐져 있습니다. digits.images를 사용하면 (1797, 8, 8) 형태의 원래 이미지를 볼 수 있습니다.
+  tips:
+  - 8x8=64 픽셀이 1차원으로 펼쳐져 있습니다. digits.images를 사용하면 (1797, 8, 8) 형태의 원래 이미지를 볼 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    digits = load_digits()
+    X = digits.data
+    y = digits.target
+    X.shape
+  exercise:
+    prompt: '2단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      digits = load_digits()
+      X = digits.data
+      y = digits.target
+      X.shape
+    solution: |-
+      digits = load_digits()
+      X = digits.data
+      y = digits.target
+      X.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 손글씨 숫자 데이터셋은 8x8 픽셀 이미지 1,797개를 담고 있습니다. 각 픽셀은 0~16 사이의 밝기값입니다. 이미지가 64차원 벡터로 펼쳐져 있습니다.
@@ -62,10 +159,52 @@ sections:
       X.shape
   - type: tip
     content: 8x8=64 픽셀이 1차원으로 펼쳐져 있습니다. digits.images를 사용하면 (1797, 8, 8) 형태의 원래 이미지를 볼 수 있습니다.
-
 - id: step3_visualize
   title: 3단계. 이미지 시각화
+  structuredPrimary: true
   subtitle: 샘플 확인
+  goal: '3단계. 이미지 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 이미지 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실제 이미지가 어떻게 생겼는지 확인합니다. 8x8 해상도지만 사람이 숫자를 인식할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+    for i, ax in enumerate(axes.flat):
+        ax.imshow(digits.images[i], cmap='gray')
+        ax.set_title(f'Label: {digits.target[i]}')
+        ax.axis('off')
+    fig.suptitle('Sample Digit Images')
+    fig
+  exercise:
+    prompt: '3단계. 이미지 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+      for i, ax in enumerate(axes.flat):
+          ax.imshow(digits.images[i], cmap='gray')
+          ax.set_title(f'Label: {digits.target[i]}')
+          ax.axis('off')
+      fig.suptitle('Sample Digit Images')
+      fig
+    solution: |-
+      fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+      for i, ax in enumerate(axes.flat):
+          ax.imshow(digits.images[i], cmap='gray')
+          ax.set_title(f'Label: {digits.target[i]}')
+          ax.axis('off')
+      fig.suptitle('Sample Digit Images')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 실제 이미지가 어떻게 생겼는지 확인합니다. 8x8 해상도지만 사람이 숫자를 인식할 수 있습니다.
@@ -81,10 +220,37 @@ sections:
           ax.axis('off')
       fig.suptitle('Sample Digit Images')
       fig
-
 - id: step4_split
   title: 4단계. 데이터 분할
+  structuredPrimary: true
   subtitle: train_test_split
+  goal: '4단계. 데이터 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 데이터 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '4단계. 데이터 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    solution: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다.
@@ -95,10 +261,40 @@ sections:
     content: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
-
 - id: step5_scale
   title: 5단계. 스케일링
+  structuredPrimary: true
   subtitle: StandardScaler
+  goal: '5단계. 스케일링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 스케일링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 픽셀값은 0~16 범위이지만, 스케일링을 적용하면 LogisticRegression의 수렴이 빨라집니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+  exercise:
+    prompt: '5단계. 스케일링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    solution: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 픽셀값은 0~16 범위이지만, 스케일링을 적용하면 LogisticRegression의 수렴이 빨라집니다.
@@ -110,10 +306,40 @@ sections:
       scaler = StandardScaler()
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
-
 - id: step6_model
   title: 6단계. 모델 학습
+  structuredPrimary: true
   subtitle: LogisticRegression
+  goal: '6단계. 모델 학습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 모델 학습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    10개 클래스(0~9)를 분류하는 다중 분류 문제입니다. LogisticRegression은 자동으로 다중 분류를 처리합니다.
+
+    LogisticRegression은 기본적으로 OvR(One-vs-Rest) 방식으로 다중 분류를 처리합니다. 각 클래스에 대해 이진 분류기를 학습하고, 가장 높은 확률의 클래스를 선택합니다.
+  tips:
+  - LogisticRegression은 기본적으로 OvR(One-vs-Rest) 방식으로 다중 분류를 처리합니다. 각 클래스에 대해 이진 분류기를 학습하고, 가장 높은 확률의 클래스를 선택합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    model = LogisticRegression(max_iter=1000)
+    model.fit(xTrainSc, yTrain)
+  exercise:
+    prompt: '6단계. 모델 학습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+    solution: |-
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 10개 클래스(0~9)를 분류하는 다중 분류 문제입니다. LogisticRegression은 자동으로 다중 분류를 처리합니다.
@@ -126,10 +352,40 @@ sections:
       model.fit(xTrainSc, yTrain)
   - type: tip
     content: LogisticRegression은 기본적으로 OvR(One-vs-Rest) 방식으로 다중 분류를 처리합니다. 각 클래스에 대해 이진 분류기를 학습하고, 가장 높은 확률의 클래스를 선택합니다.
-
 - id: step7_evaluate
   title: 7단계. 평가
+  structuredPrimary: true
   subtitle: 정확도와 분류 리포트
+  goal: '7단계. 평가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 평가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 10개 클래스의 분류 성능을 평가합니다. 어떤 숫자가 인식하기 어려운지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    yPred = model.predict(xTestSc)
+    acc = accuracy_score(yTest, yPred)
+    f"정확도: {acc:.2%}"
+  exercise:
+    prompt: '7단계. 평가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      yPred = model.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+    solution: |-
+      yPred = model.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 10개 클래스의 분류 성능을 평가합니다. 어떤 숫자가 인식하기 어려운지 확인합니다.
@@ -148,10 +404,52 @@ sections:
     content: |-
       report = classification_report(yTest, yPred)
       report
-
 - id: step8_confusion
   title: 8단계. 혼동행렬
+  structuredPrimary: true
   subtitle: 오분류 패턴
+  goal: '8단계. 혼동행렬: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 혼동행렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 10x10 혼동행렬로 어떤 숫자가 어떤 숫자로 잘못 인식되는지 확인합니다. 예를 들어 8과 3이 혼동되는 경우가 많습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    cm = confusion_matrix(yTest, yPred)
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('Actual')
+    ax.set_title('Confusion Matrix - Digits')
+    fig
+  exercise:
+    prompt: '8단계. 혼동행렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cm = confusion_matrix(yTest, yPred)
+      fig, ax = plt.subplots(figsize=(10, 8))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix - Digits')
+      fig
+    solution: |-
+      cm = confusion_matrix(yTest, yPred)
+      fig, ax = plt.subplots(figsize=(10, 8))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix - Digits')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 10x10 혼동행렬로 어떤 숫자가 어떤 숫자로 잘못 인식되는지 확인합니다. 예를 들어 8과 3이 혼동되는 경우가 많습니다.
@@ -167,10 +465,64 @@ sections:
       ax.set_ylabel('Actual')
       ax.set_title('Confusion Matrix - Digits')
       fig
-
 - id: step9_errors
   title: 9단계. 오분류 분석
+  structuredPrimary: true
   subtitle: 잘못 예측한 이미지
+  goal: '9단계. 오분류 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 오분류 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모델이 잘못 예측한 이미지를 확인합니다. 사람도 헷갈릴 수 있는 필체인지, 모델의 한계인지 파악합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    errors = np.where(yPred != yTest)[0]
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+    for i, ax in enumerate(axes.flat):
+        if i < len(errors):
+            idx = errors[i]
+            img = xTest[idx].reshape(8, 8)
+            ax.imshow(img, cmap='gray')
+            ax.set_title(f'True: {yTest[idx]}, Pred: {yPred[idx]}')
+        ax.axis('off')
+    fig.suptitle('Misclassified Samples')
+    fig
+  exercise:
+    prompt: '9단계. 오분류 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      errors = np.where(yPred != yTest)[0]
+      fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+      for i, ax in enumerate(axes.flat):
+          if i < len(errors):
+              idx = errors[i]
+              img = xTest[idx].reshape(8, 8)
+              ax.imshow(img, cmap='gray')
+              ax.set_title(f'True: {yTest[idx]}, Pred: {yPred[idx]}')
+          ax.axis('off')
+      fig.suptitle('Misclassified Samples')
+      fig
+    solution: |-
+      errors = np.where(yPred != yTest)[0]
+      fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+      for i, ax in enumerate(axes.flat):
+          if i < len(errors):
+              idx = errors[i]
+              img = xTest[idx].reshape(8, 8)
+              ax.imshow(img, cmap='gray')
+              ax.set_title(f'True: {yTest[idx]}, Pred: {yPred[idx]}')
+          ax.axis('off')
+      fig.suptitle('Misclassified Samples')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모델이 잘못 예측한 이미지를 확인합니다. 사람도 헷갈릴 수 있는 필체인지, 모델의 한계인지 파악합니다.
@@ -190,13 +542,47 @@ sections:
           ax.axis('off')
       fig.suptitle('Misclassified Samples')
       fig
-
 - id: step10_pca_intro
   title: 10단계. PCA 소개
+  structuredPrimary: true
   subtitle: 차원 축소
+  goal: '10단계. PCA 소개: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. PCA 소개: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    PCA(Principal Component Analysis)는 고차원 데이터를 저차원으로 압축합니다. 64차원 데이터를 2차원으로 축소하면 시각화할 수 있습니다. 정보 손실을 최소화하면서 차원을 줄입니다.
+
+    PCA는 분산을 최대화하는 방향(주성분)을 찾습니다. 첫 번째 주성분이 가장 많은 분산을 설명하고, 두 번째가 그 다음입니다. n_components로 유지할 주성분 수를 지정합니다.
+  tips:
+  - PCA는 분산을 최대화하는 방향(주성분)을 찾습니다. 첫 번째 주성분이 가장 많은 분산을 설명하고, 두 번째가 그 다음입니다. n_components로 유지할 주성분 수를 지정합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    pca = PCA(n_components=2)
+    xPca = pca.fit_transform(xTrainSc)
+    xPca.shape
+  exercise:
+    prompt: '10단계. PCA 소개: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      pca = PCA(n_components=2)
+      xPca = pca.fit_transform(xTrainSc)
+      xPca.shape
+    solution: |-
+      pca = PCA(n_components=2)
+      xPca = pca.fit_transform(xTrainSc)
+      xPca.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: PCA(Principal Component Analysis)는 고차원 데이터를 저차원으로 압축합니다. 64차원 데이터를 2차원으로 축소하면 시각화할 수 있습니다. 정보 손실을 최소화하면서 차원을 줄입니다.
+    content: PCA(Principal Component Analysis)는 고차원 데이터를 저차원으로 압축합니다. 64차원 데이터를 2차원으로 축소하면 시각화할 수 있습니다. 정보 손실을 최소화하면서 차원을
+      줄입니다.
   - type: code
     language: python
     title: PCA 적용
@@ -207,10 +593,58 @@ sections:
       xPca.shape
   - type: tip
     content: PCA는 분산을 최대화하는 방향(주성분)을 찾습니다. 첫 번째 주성분이 가장 많은 분산을 설명하고, 두 번째가 그 다음입니다. n_components로 유지할 주성분 수를 지정합니다.
-
 - id: step11_pca_visualize
   title: 11단계. PCA 시각화
+  structuredPrimary: true
   subtitle: 2D 산점도
+  goal: '11단계. PCA 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. PCA 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    2차원으로 축소된 데이터를 산점도로 시각화합니다. 같은 숫자끼리 군집을 이루는지, 어떤 숫자가 겹치는지 확인합니다.
+
+    explained_variance_ratio_는 각 주성분이 전체 분산의 몇 %를 설명하는지 나타냅니다. 2개 주성분으로 약 20~30%를 설명하면, 나머지 70~80%의 정보가 손실됩니다.
+  tips:
+  - explained_variance_ratio_는 각 주성분이 전체 분산의 몇 %를 설명하는지 나타냅니다. 2개 주성분으로 약 20~30%를 설명하면, 나머지 70~80%의 정보가 손실됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(10, 8))
+    scatter = ax.scatter(xPca[:, 0], xPca[:, 1], c=yTrain, cmap='tab10', alpha=0.6)
+    ax.set_xlabel('PC1')
+    ax.set_ylabel('PC2')
+    ax.set_title('Digits in 2D (PCA)')
+    cbar = plt.colorbar(scatter, ax=ax)
+    cbar.set_label('Digit')
+    fig
+  exercise:
+    prompt: '11단계. PCA 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(10, 8))
+      scatter = ax.scatter(xPca[:, 0], xPca[:, 1], c=yTrain, cmap='tab10', alpha=0.6)
+      ax.set_xlabel('PC1')
+      ax.set_ylabel('PC2')
+      ax.set_title('Digits in 2D (PCA)')
+      cbar = plt.colorbar(scatter, ax=ax)
+      cbar.set_label('Digit')
+      fig
+    solution: |-
+      fig, ax = plt.subplots(figsize=(10, 8))
+      scatter = ax.scatter(xPca[:, 0], xPca[:, 1], c=yTrain, cmap='tab10', alpha=0.6)
+      ax.set_xlabel('PC1')
+      ax.set_ylabel('PC2')
+      ax.set_title('Digits in 2D (PCA)')
+      cbar = plt.colorbar(scatter, ax=ax)
+      cbar.set_label('Digit')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 2차원으로 축소된 데이터를 산점도로 시각화합니다. 같은 숫자끼리 군집을 이루는지, 어떤 숫자가 겹치는지 확인합니다.
@@ -236,10 +670,67 @@ sections:
       f"PC1: {expVar[0]:.2%}, PC2: {expVar[1]:.2%}, Total: {expVar.sum():.2%}"
   - type: tip
     content: explained_variance_ratio_는 각 주성분이 전체 분산의 몇 %를 설명하는지 나타냅니다. 2개 주성분으로 약 20~30%를 설명하면, 나머지 70~80%의 정보가 손실됩니다.
-
 - id: step12_pca_components
   title: 12단계. 적정 차원 수
+  structuredPrimary: true
   subtitle: 분산 누적
+  goal: '12단계. 적정 차원 수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 적정 차원 수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 몇 개의 주성분으로 충분한 정보를 유지할 수 있는지 확인합니다. 보통 95% 분산을 유지하는 차원 수를 선택합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    pcaFull = PCA()
+    pcaFull.fit(xTrainSc)
+    cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(range(1, 65), cumVar, 'bo-')
+    ax.axhline(0.95, color='r', linestyle='--', label='95% threshold')
+    ax.set_xlabel('Number of Components')
+    ax.set_ylabel('Cumulative Explained Variance')
+    ax.set_title('PCA - Cumulative Variance')
+    ax.legend()
+    fig
+  exercise:
+    prompt: '12단계. 적정 차원 수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      pcaFull = PCA()
+      pcaFull.fit(xTrainSc)
+      cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+
+      fig, ax = plt.subplots(figsize=(10, 5))
+      ax.plot(range(1, 65), cumVar, 'bo-')
+      ax.axhline(0.95, color='r', linestyle='--', label='95% threshold')
+      ax.set_xlabel('Number of Components')
+      ax.set_ylabel('Cumulative Explained Variance')
+      ax.set_title('PCA - Cumulative Variance')
+      ax.legend()
+      fig
+    solution: |-
+      pcaFull = PCA()
+      pcaFull.fit(xTrainSc)
+      cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+
+      fig, ax = plt.subplots(figsize=(10, 5))
+      ax.plot(range(1, 65), cumVar, 'bo-')
+      ax.axhline(0.95, color='r', linestyle='--', label='95% threshold')
+      ax.set_xlabel('Number of Components')
+      ax.set_ylabel('Cumulative Explained Variance')
+      ax.set_title('PCA - Cumulative Variance')
+      ax.legend()
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 몇 개의 주성분으로 충분한 정보를 유지할 수 있는지 확인합니다. 보통 95% 분산을 유지하는 차원 수를 선택합니다.
@@ -267,10 +758,47 @@ sections:
     content: |-
       nFor95 = np.argmax(cumVar >= 0.95) + 1
       f"95% 분산 유지에 필요한 주성분: {nFor95}개"
-
 - id: step13_summary
   title: 13단계. 정리
+  structuredPrimary: true
   subtitle: 이미지 분류와 PCA 완료
+  goal: '13단계. 정리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '13단계. 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이번 프로젝트에서는 손글씨 숫자 인식 모델을 만들어 이미지 분류를 학습했습니다. 64차원 데이터를 PCA로 축소하여 시각화하는 방법을 배웠습니다. 고차원 데이터에서 패턴을 파악하는 데 PCA가
+    유용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    summary = pd.DataFrame({
+        'Item': ['Dataset', 'Features', 'Classes', 'Accuracy', 'PCA for 95%'],
+        'Value': ['Digits (1,797)', '64 (8x8)', '10 (0-9)', f'{acc:.2%}', f'{nFor95} components']
+    })
+    summary
+  exercise:
+    prompt: '13단계. 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Features', 'Classes', 'Accuracy', 'PCA for 95%'],
+          'Value': ['Digits (1,797)', '64 (8x8)', '10 (0-9)', f'{acc:.2%}', f'{nFor95} components']
+      })
+      summary
+    solution: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Features', 'Classes', 'Accuracy', 'PCA for 95%'],
+          'Value': ['Digits (1,797)', '64 (8x8)', '10 (0-9)', f'{acc:.2%}', f'{nFor95} components']
+      })
+      summary
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 이번 프로젝트에서는 손글씨 숫자 인식 모델을 만들어 이미지 분류를 학습했습니다. 64차원 데이터를 PCA로 축소하여 시각화하는 방법을 배웠습니다. 고차원 데이터에서 패턴을 파악하는 데 PCA가 유용합니다.
@@ -284,17 +812,144 @@ sections:
           'Value': ['Digits (1,797)', '64 (8x8)', '10 (0-9)', f'{acc:.2%}', f'{nFor95} components']
       })
       summary
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 숫자 인식 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    OCR 개발자가 되어 숫자 인식 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, PCA, confusion_matrix를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from sklearn.datasets import load_digits
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.decomposition import PCA
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score
+    import pandas as pd
+
+    data = load_digits()
+    xData = data.data
+    yData = data.target
+
+    xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+    sc = StandardScaler()
+    xTrSc = sc.fit_transform(xTr)
+    xTeSc = sc.transform(xTe)
+
+    dims = [2, 5, 10, 20, 30, 64]
+    results = []
+
+    for d in dims:
+        if d < 64:
+            pca = PCA(n_components=d)
+            xTrPca = pca.fit_transform(xTrSc)
+            xTePca = pca.transform(xTeSc)
+        else:
+            xTrPca, xTePca = xTrSc, xTeSc
+
+        model = LogisticRegression(max_iter=1000)
+        model.fit(xTrPca, yTr)
+        pred = model.predict(xTePca)
+        results.append({'Dimensions': d, 'Accuracy': accuracy_score(yTe, pred)})
+
+    pd.DataFrame(results)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.decomposition import PCA
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score
+      import pandas as pd
+
+      data = load_digits()
+      xData = data.data
+      yData = data.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+      xTeSc = sc.transform(xTe)
+
+      dims = [2, 5, 10, 20, 30, 64]
+      results = []
+
+      for d in dims:
+          if d < 64:
+              pca = PCA(n_components=d)
+              xTrPca = pca.fit_transform(xTrSc)
+              xTePca = pca.transform(xTeSc)
+          else:
+              xTrPca, xTePca = xTrSc, xTeSc
+
+          model = LogisticRegression(max_iter=1000)
+          model.fit(xTrPca, yTr)
+          pred = model.predict(xTePca)
+          results.append({'Dimensions': d, 'Accuracy': accuracy_score(yTe, pred)})
+
+      pd.DataFrame(results)
+    solution: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.decomposition import PCA
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score
+      import pandas as pd
+
+      data = load_digits()
+      xData = data.data
+      yData = data.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+      xTeSc = sc.transform(xTe)
+
+      dims = [2, 5, 10, 20, 30, 64]
+      results = []
+
+      for d in dims:
+          if d < 64:
+              pca = PCA(n_components=d)
+              xTrPca = pca.fit_transform(xTrSc)
+              xTePca = pca.transform(xTeSc)
+          else:
+              xTrPca, xTePca = xTrSc, xTeSc
+
+          model = LogisticRegression(max_iter=1000)
+          model.fit(xTrPca, yTr)
+          pred = model.predict(xTePca)
+          results.append({'Dimensions': d, 'Accuracy': accuracy_score(yTe, pred)})
+
+      pd.DataFrame(results)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: OCR 개발자가 되어 숫자 인식 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, PCA, confusion_matrix를 모두 활용합니다.
+    content: OCR 개발자가 되어 숫자 인식 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler,
+      LogisticRegression, PCA, confusion_matrix를 모두 활용합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: PCA 차원별 분류 정확도 비교"
+    title: '미션1: PCA 차원별 분류 정확도 비교'
     code: |-
       from sklearn.datasets import load_digits
       from sklearn.model_selection import train_test_split
@@ -331,7 +986,7 @@ sections:
 
       pd.DataFrame(results)
   - type: expansion
-    title: "미션2: 가장 혼동이 많은 숫자 쌍 분석"
+    title: '미션2: 가장 혼동이 많은 숫자 쌍 분석'
     code: |-
       from sklearn.datasets import load_digits
       from sklearn.model_selection import train_test_split
@@ -363,13 +1018,101 @@ sections:
 
       pairDf = pd.DataFrame(pairs).sort_values('Count', ascending=False)
       pairDf.head(10)
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+    검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다."
+    content: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+      검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   - type: code
     language: python
     title: 분류 데이터와 파이프라인 준비
@@ -442,7 +1185,7 @@ sections:
       assert all(modelChecks.values()), modelChecks
       modelChecks
   - type: expansion
-    title: "실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?"
+    title: '실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?'
     blocks:
     - type: code
       language: python

@@ -1,30 +1,85 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scikit-learn
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
   id: sklearn_04
   title: 주택가격예측
   order: 4
   category: sklearn
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 기초
-  tags: ["회귀", "교차검증", "cross_val_score", "로컬데이터", "주택"]
+  tags:
+  - 회귀
+  - 교차검증
+  - cross_val_score
+  - 로컬데이터
+  - 주택
   seo:
-    title: "scikit-learn 교차검증 - 로컬 주택 가격 예측"
-    description: "cross_val_score로 교차검증을 수행합니다. 대규모 데이터셋으로 회귀 모델을 평가합니다."
-    keywords: ["scikit-learn", "교차검증", "cross_val_score", "주택가격", "회귀"]
-
+    title: scikit-learn 교차검증 - 로컬 주택 가격 예측
+    description: cross_val_score로 교차검증을 수행합니다. 대규모 데이터셋으로 회귀 모델을 평가합니다.
+    keywords:
+    - scikit-learn
+    - 교차검증
+    - cross_val_score
+    - 주택가격
+    - 회귀
 intro:
-  emoji: "🏠"
+  emoji: 🏠
   goal: 교차검증으로 모델의 일반화 성능을 평가합니다.
-  description: Codaro 로컬 주택 가격 데이터로 회귀 모델을 학습합니다. 교차검증(cross-validation)으로 모델이 새로운 데이터에도 잘 작동하는지 확인합니다. 이전 프로젝트의 train_test_split, StandardScaler, LinearRegression, R²를 복습하고 cross_val_score를 새로 배웁니다.
-
+  description: Codaro 로컬 주택 가격 데이터로 회귀 모델을 학습합니다. 교차검증(cross-validation)으로 모델이 새로운 데이터에도 잘 작동하는지 확인합니다. 이전 프로젝트의 train_test_split,
+    StandardScaler, LinearRegression, R²를 복습하고 cross_val_score를 새로 배웁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 로컬 주택 가격 예측에 필요한 라이브러리를 불러옵니다. 교차검증을 위해 cross_val_score를 추가로 임포트합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.model_selection import train_test_split, cross_val_score
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LinearRegression, Ridge
+    from sklearn.metrics import mean_squared_error, r2_score
+    from codaro.curriculum.localData import loadLocalDataset
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression, Ridge
+      from sklearn.metrics import mean_squared_error, r2_score
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+    solution: |-
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression, Ridge
+      from sklearn.metrics import mean_squared_error, r2_score
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 로컬 주택 가격 예측에 필요한 라이브러리를 불러옵니다. 교차검증을 위해 cross_val_score를 추가로 임포트합니다.
@@ -41,13 +96,53 @@ sections:
       import pandas as pd
       import numpy as np
       import matplotlib.pyplot as plt
-
 - id: step2_load
   title: 2단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: loadLocalDataset()
+  goal: '2단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Codaro 로컬 주택 데이터셋은 방 개수, 범죄율, 세금, 학생-교사 비율, 저소득층 비율 같은 특성으로 주택 가격 중앙값을 예측합니다. 외부 다운로드 없이 실행되므로 로컬 Python 학습 흐름에 맞습니다.
+
+    rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를 막을 수 있습니다.
+  tips:
+  - rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를 막을 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    housing = loadLocalDataset("boston_housing")
+    X = housing.drop(columns=["medv"])
+    y = housing["medv"]
+    featureNames = X.columns.tolist()
+    X.shape
+  exercise:
+    prompt: '2단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      housing = loadLocalDataset("boston_housing")
+      X = housing.drop(columns=["medv"])
+      y = housing["medv"]
+      featureNames = X.columns.tolist()
+      X.shape
+    solution: |-
+      housing = loadLocalDataset("boston_housing")
+      X = housing.drop(columns=["medv"])
+      y = housing["medv"]
+      featureNames = X.columns.tolist()
+      X.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: Codaro 로컬 주택 데이터셋은 방 개수, 범죄율, 세금, 학생-교사 비율, 저소득층 비율 같은 특성으로 주택 가격 중앙값을 예측합니다. 외부 다운로드 없이 실행되므로 로컬 Python 학습 흐름에 맞습니다.
+    content: Codaro 로컬 주택 데이터셋은 방 개수, 범죄율, 세금, 학생-교사 비율, 저소득층 비율 같은 특성으로 주택 가격 중앙값을 예측합니다. 외부 다운로드 없이 실행되므로 로컬 Python 학습 흐름에
+      맞습니다.
   - type: code
     language: python
     title: 데이터 로드
@@ -62,14 +157,35 @@ sections:
     language: python
     title: 특성 확인
     description: 8가지 특성 미리보기
-    content: |-
-      X.head()
+    content: X.head()
   - type: tip
-    content: rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를 막을 수 있습니다.
-
+    content: rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를
+      막을 수 있습니다.
 - id: step3_explore
   title: 3단계. 데이터 탐색
+  structuredPrimary: true
   subtitle: 분포 확인
+  goal: '3단계. 데이터 탐색: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 데이터 탐색: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 대규모 데이터셋의 특성과 타겟 분포를 확인합니다. 이상치나 스케일 차이를 파악합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: X.describe()
+  exercise:
+    prompt: '3단계. 데이터 탐색: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: X.describe()
+    solution: X.describe()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 대규모 데이터셋의 특성과 타겟 분포를 확인합니다. 이상치나 스케일 차이를 파악합니다.
@@ -77,8 +193,7 @@ sections:
     language: python
     title: 기초 통계
     description: 특성별 분포 확인
-    content: |-
-      X.describe()
+    content: X.describe()
   - type: code
     language: python
     title: 타겟 분포
@@ -90,10 +205,37 @@ sections:
       ax.set_ylabel('Count')
       ax.set_title('Distribution of House Prices')
       fig
-
 - id: step4_split
   title: 4단계. 데이터 분할
+  structuredPrimary: true
   subtitle: train_test_split
+  goal: '4단계. 데이터 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 데이터 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 데이터가 작을수록 분할 운에 성능이 흔들릴 수 있습니다. 그래서 단일 테스트 성능만 보지 않고 뒤에서 교차검증 평균과 표준편차를 함께 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '4단계. 데이터 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    solution: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 데이터가 작을수록 분할 운에 성능이 흔들릴 수 있습니다. 그래서 단일 테스트 성능만 보지 않고 뒤에서 교차검증 평균과 표준편차를 함께 확인합니다.
@@ -104,10 +246,40 @@ sections:
     content: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
-
 - id: step5_scale
   title: 5단계. 스케일링
+  structuredPrimary: true
   subtitle: StandardScaler
+  goal: '5단계. 스케일링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 스케일링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 특성들의 스케일이 서로 다릅니다. 방 개수, 세금, 저소득층 비율처럼 단위가 다른 변수를 함께 쓰므로 StandardScaler로 표준화합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+  exercise:
+    prompt: '5단계. 스케일링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    solution: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 특성들의 스케일이 서로 다릅니다. 방 개수, 세금, 저소득층 비율처럼 단위가 다른 변수를 함께 쓰므로 StandardScaler로 표준화합니다.
@@ -119,10 +291,46 @@ sections:
       scaler = StandardScaler()
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
-
 - id: step6_baseline
   title: 6단계. 기본 모델
+  structuredPrimary: true
   subtitle: LinearRegression
+  goal: '6단계. 기본 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 기본 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 먼저 LinearRegression으로 기본 성능을 확인합니다. 이 성능을 기준(baseline)으로 다른 모델과 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    modelLr = LinearRegression()
+    modelLr.fit(xTrainSc, yTrain)
+    predLr = modelLr.predict(xTestSc)
+    r2Lr = r2_score(yTest, predLr)
+    f"LinearRegression R²: {r2Lr:.4f}"
+  exercise:
+    prompt: '6단계. 기본 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      modelLr = LinearRegression()
+      modelLr.fit(xTrainSc, yTrain)
+      predLr = modelLr.predict(xTestSc)
+      r2Lr = r2_score(yTest, predLr)
+      f"LinearRegression R²: {r2Lr:.4f}"
+    solution: |-
+      modelLr = LinearRegression()
+      modelLr.fit(xTrainSc, yTrain)
+      predLr = modelLr.predict(xTestSc)
+      r2Lr = r2_score(yTest, predLr)
+      f"LinearRegression R²: {r2Lr:.4f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 먼저 LinearRegression으로 기본 성능을 확인합니다. 이 성능을 기준(baseline)으로 다른 모델과 비교합니다.
@@ -136,13 +344,44 @@ sections:
       predLr = modelLr.predict(xTestSc)
       r2Lr = r2_score(yTest, predLr)
       f"LinearRegression R²: {r2Lr:.4f}"
-
 - id: step7_cv_intro
   title: 7단계. 교차검증 소개
+  structuredPrimary: true
   subtitle: 왜 필요한가?
+  goal: '7단계. 교차검증 소개: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 교차검증 소개: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증(cross-validation)은 데이터를 K개로 나눠 K번 반복 평가합니다. 모든 데이터가 한 번씩 테스트에 사용되므로 더 신뢰할 수 있는 성능 추정이 가능합니다.
+
+    cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
+  tips:
+  - cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
+    cvScores
+  exercise:
+    prompt: '7단계. 교차검증 소개: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
+      cvScores
+    solution: |-
+      cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
+      cvScores
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증(cross-validation)은 데이터를 K개로 나눠 K번 반복 평가합니다. 모든 데이터가 한 번씩 테스트에 사용되므로 더 신뢰할 수 있는 성능 추정이 가능합니다.
+    content: 단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증(cross-validation)은 데이터를 K개로 나눠 K번 반복 평가합니다. 모든 데이터가 한 번씩 테스트에 사용되므로
+      더 신뢰할 수 있는 성능 추정이 가능합니다.
   - type: code
     language: python
     title: 5-fold 교차검증
@@ -151,11 +390,45 @@ sections:
       cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
       cvScores
   - type: tip
-    content: cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
-
+    content: cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이
+      사용합니다.
 - id: step8_cv_analysis
   title: 8단계. 교차검증 분석
+  structuredPrimary: true
   subtitle: 평균과 표준편차
+  goal: '8단계. 교차검증 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 교차검증 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    교차검증 결과의 평균과 표준편차를 확인합니다. 표준편차가 작으면 모델이 안정적입니다. 표준편차가 크면 데이터 분할에 따라 성능이 크게 달라지는 것입니다.
+
+    모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다.
+  tips:
+  - 모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cvMean = cvScores.mean()
+    cvStd = cvScores.std()
+    f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
+  exercise:
+    prompt: '8단계. 교차검증 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cvMean = cvScores.mean()
+      cvStd = cvScores.std()
+      f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
+    solution: |-
+      cvMean = cvScores.mean()
+      cvStd = cvScores.std()
+      f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 교차검증 결과의 평균과 표준편차를 확인합니다. 표준편차가 작으면 모델이 안정적입니다. 표준편차가 크면 데이터 분할에 따라 성능이 크게 달라지는 것입니다.
@@ -175,11 +448,50 @@ sections:
       foldDf = pd.DataFrame({'Fold': range(1, 6), 'R²': cvScores})
       foldDf
   - type: tip
-    content: "모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다."
-
+    content: 모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다.
 - id: step9_ridge
   title: 9단계. Ridge 회귀
+  structuredPrimary: true
   subtitle: 정규화
+  goal: '9단계. Ridge 회귀: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. Ridge 회귀: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Ridge 회귀는 LinearRegression에 L2 정규화를 추가한 것입니다. 과적합을 방지하고 모델을 더 안정적으로 만듭니다. alpha 파라미터로 정규화 강도를 조절합니다.
+
+    Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
+  tips:
+  - Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    modelRidge = Ridge(alpha=1.0)
+    modelRidge.fit(xTrainSc, yTrain)
+    predRidge = modelRidge.predict(xTestSc)
+    r2Ridge = r2_score(yTest, predRidge)
+    f"Ridge R²: {r2Ridge:.4f}"
+  exercise:
+    prompt: '9단계. Ridge 회귀: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      modelRidge = Ridge(alpha=1.0)
+      modelRidge.fit(xTrainSc, yTrain)
+      predRidge = modelRidge.predict(xTestSc)
+      r2Ridge = r2_score(yTest, predRidge)
+      f"Ridge R²: {r2Ridge:.4f}"
+    solution: |-
+      modelRidge = Ridge(alpha=1.0)
+      modelRidge.fit(xTrainSc, yTrain)
+      predRidge = modelRidge.predict(xTestSc)
+      r2Ridge = r2_score(yTest, predRidge)
+      f"Ridge R²: {r2Ridge:.4f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Ridge 회귀는 LinearRegression에 L2 정규화를 추가한 것입니다. 과적합을 방지하고 모델을 더 안정적으로 만듭니다. alpha 파라미터로 정규화 강도를 조절합니다.
@@ -202,10 +514,52 @@ sections:
       f"Ridge CV R²: {cvRidge.mean():.4f} ± {cvRidge.std():.4f}"
   - type: tip
     content: Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
-
 - id: step10_compare
   title: 10단계. 모델 비교
+  structuredPrimary: true
   subtitle: 성능 비교
+  goal: '10단계. 모델 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 모델 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: LinearRegression과 Ridge의 성능을 비교합니다. 교차검증 결과와 테스트 결과를 함께 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    comparison = pd.DataFrame({
+        'Model': ['LinearRegression', 'Ridge'],
+        'Test R²': [r2Lr, r2Ridge],
+        'CV R² (mean)': [cvScores.mean(), cvRidge.mean()],
+        'CV R² (std)': [cvScores.std(), cvRidge.std()]
+    })
+    comparison
+  exercise:
+    prompt: '10단계. 모델 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      comparison = pd.DataFrame({
+          'Model': ['LinearRegression', 'Ridge'],
+          'Test R²': [r2Lr, r2Ridge],
+          'CV R² (mean)': [cvScores.mean(), cvRidge.mean()],
+          'CV R² (std)': [cvScores.std(), cvRidge.std()]
+      })
+      comparison
+    solution: |-
+      comparison = pd.DataFrame({
+          'Model': ['LinearRegression', 'Ridge'],
+          'Test R²': [r2Lr, r2Ridge],
+          'CV R² (mean)': [cvScores.mean(), cvRidge.mean()],
+          'CV R² (std)': [cvScores.std(), cvRidge.std()]
+      })
+      comparison
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: LinearRegression과 Ridge의 성능을 비교합니다. 교차검증 결과와 테스트 결과를 함께 확인합니다.
@@ -221,10 +575,52 @@ sections:
           'CV R² (std)': [cvScores.std(), cvRidge.std()]
       })
       comparison
-
 - id: step11_feature_importance
   title: 11단계. 특성 중요도
+  structuredPrimary: true
   subtitle: 회귀 계수 분석
+  goal: '11단계. 특성 중요도: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 특성 중요도: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    회귀 계수의 절대값을 비교하여 어떤 특성이 주택 가격에 가장 큰 영향을 미치는지 확인합니다.
+
+    양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. 표준화된 입력에서는 계수 절대값으로 어떤 변수가 예측에 더 크게 기여하는지 비교할 수 있습니다.
+  tips:
+  - 양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. 표준화된 입력에서는 계수 절대값으로 어떤 변수가 예측에 더 크게 기여하는지 비교할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    importance = pd.DataFrame({
+        'Feature': featureNames,
+        'Coefficient': modelLr.coef_
+    })
+    importance['Abs'] = importance['Coefficient'].abs()
+    importance.sort_values('Abs', ascending=False)
+  exercise:
+    prompt: '11단계. 특성 중요도: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      importance = pd.DataFrame({
+          'Feature': featureNames,
+          'Coefficient': modelLr.coef_
+      })
+      importance['Abs'] = importance['Coefficient'].abs()
+      importance.sort_values('Abs', ascending=False)
+    solution: |-
+      importance = pd.DataFrame({
+          'Feature': featureNames,
+          'Coefficient': modelLr.coef_
+      })
+      importance['Abs'] = importance['Coefficient'].abs()
+      importance.sort_values('Abs', ascending=False)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 회귀 계수의 절대값을 비교하여 어떤 특성이 주택 가격에 가장 큰 영향을 미치는지 확인합니다.
@@ -253,13 +649,51 @@ sections:
       fig
   - type: tip
     content: 양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. 표준화된 입력에서는 계수 절대값으로 어떤 변수가 예측에 더 크게 기여하는지 비교할 수 있습니다.
-
 - id: step12_summary
   title: 12단계. 정리
+  structuredPrimary: true
   subtitle: 교차검증 완료
+  goal: '12단계. 정리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이번 프로젝트에서는 로컬 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge 회귀로 정규화의 효과를 확인했습니다.
+    다운로드 없는 로컬 회귀 분석 워크플로우를 익혔습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    summary = pd.DataFrame({
+        'Item': ['Dataset', 'Best Model', 'Test R²', 'CV R²', 'Key Feature'],
+        'Value': ['Codaro local housing', 'Ridge', f'{r2Ridge:.4f}', f'{cvRidge.mean():.4f}', importance.sort_values('Abs', ascending=False).iloc[0]['Feature']]
+    })
+    summary
+  exercise:
+    prompt: '12단계. 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Best Model', 'Test R²', 'CV R²', 'Key Feature'],
+          'Value': ['Codaro local housing', 'Ridge', f'{r2Ridge:.4f}', f'{cvRidge.mean():.4f}', importance.sort_values('Abs', ascending=False).iloc[0]['Feature']]
+      })
+      summary
+    solution: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Best Model', 'Test R²', 'CV R²', 'Key Feature'],
+          'Value': ['Codaro local housing', 'Ridge', f'{r2Ridge:.4f}', f'{cvRidge.mean():.4f}', importance.sort_values('Abs', ascending=False).iloc[0]['Feature']]
+      })
+      summary
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 이번 프로젝트에서는 로컬 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge 회귀로 정규화의 효과를 확인했습니다. 다운로드 없는 로컬 회귀 분석 워크플로우를 익혔습니다.
+    content: 이번 프로젝트에서는 로컬 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge 회귀로 정규화의 효과를 확인했습니다. 다운로드
+      없는 로컬 회귀 분석 워크플로우를 익혔습니다.
   - type: code
     language: python
     title: 최종 요약
@@ -270,17 +704,111 @@ sections:
           'Value': ['Codaro local housing', 'Ridge', f'{r2Ridge:.4f}', f'{cvRidge.mean():.4f}', importance.sort_values('Abs', ascending=False).iloc[0]['Feature']]
       })
       summary
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 주택 가격 예측 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from sklearn.model_selection import train_test_split, cross_val_score
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import Ridge
+    from codaro.curriculum.localData import loadLocalDataset
+    import pandas as pd
+
+    data = loadLocalDataset("boston_housing")
+    xData = data.drop(columns=["medv"])
+    yData = data["medv"]
+
+    xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+    sc = StandardScaler()
+    xTrSc = sc.fit_transform(xTr)
+
+    alphas = [0.01, 0.1, 1.0, 10.0, 100.0]
+    results = []
+
+    for a in alphas:
+        ridge = Ridge(alpha=a)
+        cvScore = cross_val_score(ridge, xTrSc, yTr, cv=5, scoring='r2')
+        results.append({'alpha': a, 'CV R² mean': cvScore.mean(), 'CV R² std': cvScore.std()})
+
+    pd.DataFrame(results)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import Ridge
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+
+      data = loadLocalDataset("boston_housing")
+      xData = data.drop(columns=["medv"])
+      yData = data["medv"]
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+
+      alphas = [0.01, 0.1, 1.0, 10.0, 100.0]
+      results = []
+
+      for a in alphas:
+          ridge = Ridge(alpha=a)
+          cvScore = cross_val_score(ridge, xTrSc, yTr, cv=5, scoring='r2')
+          results.append({'alpha': a, 'CV R² mean': cvScore.mean(), 'CV R² std': cvScore.std()})
+
+      pd.DataFrame(results)
+    solution: |-
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import Ridge
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+
+      data = loadLocalDataset("boston_housing")
+      xData = data.drop(columns=["medv"])
+      yData = data["medv"]
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+
+      alphas = [0.01, 0.1, 1.0, 10.0, 100.0]
+      results = []
+
+      for a in alphas:
+          ridge = Ridge(alpha=a)
+          cvScore = cross_val_score(ridge, xTrSc, yTr, cv=5, scoring='r2')
+          results.append({'alpha': a, 'CV R² mean': cvScore.mean(), 'CV R² std': cvScore.std()})
+
+      pd.DataFrame(results)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
+    content: 부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler,
+      LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 다양한 alpha 값으로 Ridge 비교"
+    title: '미션1: 다양한 alpha 값으로 Ridge 비교'
     code: |-
       from sklearn.model_selection import train_test_split, cross_val_score
       from sklearn.preprocessing import StandardScaler
@@ -306,7 +834,7 @@ sections:
 
       pd.DataFrame(results)
   - type: expansion
-    title: "미션2: 상위 3개 특성만으로 모델 성능 비교"
+    title: '미션2: 상위 3개 특성만으로 모델 성능 비교'
     code: |-
       from sklearn.model_selection import train_test_split, cross_val_score
       from sklearn.preprocessing import StandardScaler
@@ -342,13 +870,101 @@ sections:
           'CV R² mean': [cvFull.mean(), cv3.mean()],
           'CV R² std': [cvFull.std(), cv3.std()]
       })
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+    검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다."
+    content: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+      검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   - type: code
     language: python
     title: 분류 데이터와 파이프라인 준비
@@ -421,7 +1037,7 @@ sections:
       assert all(modelChecks.values()), modelChecks
       modelChecks
   - type: expansion
-    title: "실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?"
+    title: '실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?'
     blocks:
     - type: code
       language: python

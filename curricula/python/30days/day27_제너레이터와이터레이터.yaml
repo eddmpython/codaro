@@ -1,39 +1,96 @@
 meta:
-  id: "day27"
-  title: "제너레이터와 이터레이터"
+  id: day27
+  title: 제너레이터와 이터레이터
   day: 27
-  category: "30days"
-  tags: ["제너레이터", "이터레이터", "yield", "스트리밍", "메모리효율", "검증"]
+  category: 30days
+  tags:
+  - 제너레이터
+  - 이터레이터
+  - yield
+  - 스트리밍
+  - 메모리효율
+  - 검증
   seo:
-    title: "파이썬 제너레이터와 이터레이터 - 효율적인 순회"
-    description: "yield, generator, iter, next, iterator protocol을 배웁니다."
-    keywords: ['제너레이터', 'generator', 'yield', 'iterator', 'iter', 'next']
-
+    title: 파이썬 제너레이터와 이터레이터 - 효율적인 순회
+    description: yield, generator, iter, next, iterator protocol을 배웁니다.
+    keywords:
+    - 제너레이터
+    - generator
+    - yield
+    - iterator
+    - iter
+    - next
 intro:
-  emoji: "♻️"
+  emoji: ♻️
   points:
-  - "yield로 제너레이터 생성"
-  - "메모리 효율적인 순회"
-  - "iter()와 next() 활용"
-  - "이터레이터 프로토콜 구현"
-
+  - yield로 제너레이터 생성
+  - 메모리 효율적인 순회
+  - iter()와 next() 활용
+  - 이터레이터 프로토콜 구현
 sections:
-- id: "generator_basic"
-  title: "제너레이터 기초"
-  subtitle: "yield 키워드"
+- id: generator_basic
+  title: 제너레이터 기초
+  structuredPrimary: true
+  subtitle: yield 키워드
+  goal: '제너레이터 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '제너레이터 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    제너레이터는 yield 키워드를 사용하여 값을 하나씩 생성하는 함수입니다. return과 달리 yield는 함수 실행을 일시 중지하고 값을 반환한 후, 다음 호출 시 중지된 지점부터 계속 실행됩니다. 모든 값을 메모리에 저장하지 않고 필요할 때마다 생성하므로 매우 효율적입니다.
+
+    제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다.
+  tips:
+  - 제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def simpleGen():
+        yield 1
+        yield 2
+        yield 3
+
+    gen = simpleGen()
+    next(gen), next(gen), next(gen)
+  exercise:
+    prompt: '제너레이터 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def simpleGen():
+          yield 1
+          yield 2
+          yield 3
+
+      gen = simpleGen()
+      next(gen), next(gen), next(gen)
+    solution: |-
+      def simpleGen():
+          yield 1
+          yield 2
+          yield 3
+
+      gen = simpleGen()
+      next(gen), next(gen), next(gen)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "제너레이터는 yield 키워드를 사용하여 값을 하나씩 생성하는 함수입니다. return과 달리 yield는 함수 실행을 일시 중지하고 값을 반환한 후, 다음 호출 시 중지된 지점부터 계속 실행됩니다. 모든 값을 메모리에 저장하지 않고 필요할 때마다 생성하므로 매우 효율적입니다."
-  - type: "list"
+  - type: text
+    content: 제너레이터는 yield 키워드를 사용하여 값을 하나씩 생성하는 함수입니다. return과 달리 yield는 함수 실행을 일시 중지하고 값을 반환한 후, 다음 호출 시 중지된 지점부터 계속 실행됩니다.
+      모든 값을 메모리에 저장하지 않고 필요할 때마다 생성하므로 매우 효율적입니다.
+  - type: list
     items:
-    - "yield: 값을 하나씩 생성"
-    - "함수 실행 일시 중지"
-    - "메모리 효율적"
-    - "필요할 때 값 생성"
-  - type: "code"
-    language: "python"
-    title: "기본 제너레이터"
-    description: "yield로 숫자를 하나씩 생성합니다."
+    - 'yield: 값을 하나씩 생성'
+    - 함수 실행 일시 중지
+    - 메모리 효율적
+    - 필요할 때 값 생성
+  - type: code
+    language: python
+    title: 기본 제너레이터
+    description: yield로 숫자를 하나씩 생성합니다.
     content: |-
       def simpleGen():
           yield 1
@@ -42,10 +99,10 @@ sections:
 
       gen = simpleGen()
       next(gen), next(gen), next(gen)
-  - type: "code"
-    language: "python"
-    title: "범위 제너레이터"
-    description: "특정 범위의 숫자를 생성합니다."
+  - type: code
+    language: python
+    title: 범위 제너레이터
+    description: 특정 범위의 숫자를 생성합니다.
     content: |-
       def rangeGen(n):
           i = 0
@@ -55,10 +112,10 @@ sections:
 
       g = rangeGen(5)
       list(g)
-  - type: "code"
-    language: "python"
-    title: "제너레이터 순회"
-    description: "for 루프로 제너레이터를 순회합니다."
+  - type: code
+    language: python
+    title: 제너레이터 순회
+    description: for 루프로 제너레이터를 순회합니다.
     content: |-
       def countdown(n):
           while n > 0:
@@ -69,78 +126,143 @@ sections:
       for val in countdown(5):
           output.append(val)
       output
-  - type: "tip"
-    content: "제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다."
+  - type: tip
+    content: 제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다.
+- id: generator_expression
+  title: 제너레이터 표현식
+  structuredPrimary: true
+  subtitle: 간결한 제너레이터 생성
+  goal: '제너레이터 표현식: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '제너레이터 표현식: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    제너레이터 표현식은 리스트 컴프리헨션과 비슷하지만 괄호를 사용합니다. (표현식 for 변수 in 시퀀스) 형태로 작성하며, 리스트를 만들지 않고 제너레이터를 반환합니다. 대량의 데이터를 처리할 때 메모리를 절약할 수 있습니다.
 
-- id: "generator_expression"
-  title: "제너레이터 표현식"
-  subtitle: "간결한 제너레이터 생성"
+    제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다.
+  tips:
+  - 제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    squares = (x ** 2 for x in range(5))
+    list(squares)
+  exercise:
+    prompt: '제너레이터 표현식: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      squares = (x ** 2 for x in range(5))
+      list(squares)
+    solution: |-
+      squares = (x ** 2 for x in range(5))
+      list(squares)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "제너레이터 표현식은 리스트 컴프리헨션과 비슷하지만 괄호를 사용합니다. (표현식 for 변수 in 시퀀스) 형태로 작성하며, 리스트를 만들지 않고 제너레이터를 반환합니다. 대량의 데이터를 처리할 때 메모리를 절약할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: 제너레이터 표현식은 리스트 컴프리헨션과 비슷하지만 괄호를 사용합니다. (표현식 for 변수 in 시퀀스) 형태로 작성하며, 리스트를 만들지 않고 제너레이터를 반환합니다. 대량의 데이터를 처리할 때
+      메모리를 절약할 수 있습니다.
+  - type: list
     items:
-    - "(표현식 for 변수 in 시퀀스) 형식"
-    - "괄호 사용"
-    - "리스트 대신 제너레이터"
-    - "메모리 절약"
-  - type: "code"
-    language: "python"
-    title: "기본 제너레이터 표현식"
-    description: "제곱수를 생성하는 제너레이터를 만듭니다."
+    - (표현식 for 변수 in 시퀀스) 형식
+    - 괄호 사용
+    - 리스트 대신 제너레이터
+    - 메모리 절약
+  - type: code
+    language: python
+    title: 기본 제너레이터 표현식
+    description: 제곱수를 생성하는 제너레이터를 만듭니다.
     content: |-
       squares = (x ** 2 for x in range(5))
       list(squares)
-  - type: "code"
-    language: "python"
-    title: "조건부 제너레이터"
-    description: "조건을 만족하는 값만 생성합니다."
+  - type: code
+    language: python
+    title: 조건부 제너레이터
+    description: 조건을 만족하는 값만 생성합니다.
     content: |-
       evens = (n for n in range(10) if n % 2 == 0)
       list(evens)
-  - type: "code"
-    language: "python"
-    title: "변환 제너레이터"
-    description: "문자열을 대문자로 변환합니다."
+  - type: code
+    language: python
+    title: 변환 제너레이터
+    description: 문자열을 대문자로 변환합니다.
     content: |-
       words = ['hello', 'world', 'python']
       upper = (w.upper() for w in words)
       list(upper)
-  - type: "tip"
-    content: "제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다."
+  - type: tip
+    content: 제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다.
+- id: iterator_basic
+  title: 이터레이터 기초
+  structuredPrimary: true
+  subtitle: iter()와 next()
+  goal: '이터레이터 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '이터레이터 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    이터레이터는 순회 가능한 객체입니다. iter() 함수로 이터레이터를 생성하고, next() 함수로 다음 값을 가져옵니다. 리스트, 튜플, 문자열 등 모든 시퀀스는 iter()로 이터레이터를 만들 수 있으며, 더 이상 값이 없으면 StopIteration 예외가 발생합니다.
 
-- id: "iterator_basic"
-  title: "이터레이터 기초"
-  subtitle: "iter()와 next()"
+    for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다.
+  tips:
+  - for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    nums = [1, 2, 3]
+    it = iter(nums)
+    next(it), next(it), next(it)
+  exercise:
+    prompt: '이터레이터 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      nums = [1, 2, 3]
+      it = iter(nums)
+      next(it), next(it), next(it)
+    solution: |-
+      nums = [1, 2, 3]
+      it = iter(nums)
+      next(it), next(it), next(it)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "이터레이터는 순회 가능한 객체입니다. iter() 함수로 이터레이터를 생성하고, next() 함수로 다음 값을 가져옵니다. 리스트, 튜플, 문자열 등 모든 시퀀스는 iter()로 이터레이터를 만들 수 있으며, 더 이상 값이 없으면 StopIteration 예외가 발생합니다."
-  - type: "list"
+  - type: text
+    content: 이터레이터는 순회 가능한 객체입니다. iter() 함수로 이터레이터를 생성하고, next() 함수로 다음 값을 가져옵니다. 리스트, 튜플, 문자열 등 모든 시퀀스는 iter()로 이터레이터를 만들
+      수 있으며, 더 이상 값이 없으면 StopIteration 예외가 발생합니다.
+  - type: list
     items:
-    - "iter(): 이터레이터 생성"
-    - "next(): 다음 값 가져오기"
-    - "StopIteration: 종료 신호"
-    - "모든 시퀀스 지원"
-  - type: "code"
-    language: "python"
-    title: "리스트 이터레이터"
-    description: "리스트를 이터레이터로 변환합니다."
+    - 'iter(): 이터레이터 생성'
+    - 'next(): 다음 값 가져오기'
+    - 'StopIteration: 종료 신호'
+    - 모든 시퀀스 지원
+  - type: code
+    language: python
+    title: 리스트 이터레이터
+    description: 리스트를 이터레이터로 변환합니다.
     content: |-
       nums = [1, 2, 3]
       it = iter(nums)
       next(it), next(it), next(it)
-  - type: "code"
-    language: "python"
-    title: "문자열 이터레이터"
-    description: "문자열을 한 글자씩 순회합니다."
+  - type: code
+    language: python
+    title: 문자열 이터레이터
+    description: 문자열을 한 글자씩 순회합니다.
     content: |-
       text = 'abc'
       textIter = iter(text)
       next(textIter), next(textIter)
-  - type: "code"
-    language: "python"
-    title: "수동 순회"
-    description: "while과 next로 수동으로 순회합니다."
+  - type: code
+    language: python
+    title: 수동 순회
+    description: while과 next로 수동으로 순회합니다.
     content: |-
       items = [10, 20, 30]
       iterator = iter(items)
@@ -151,25 +273,98 @@ sections:
       except StopIteration:
           pass
       collected
-  - type: "tip"
-    content: "for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다."
+  - type: tip
+    content: for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다.
+- id: iterator_protocol
+  title: 이터레이터 프로토콜
+  structuredPrimary: true
+  subtitle: __iter__와 __next__ 구현
+  goal: '이터레이터 프로토콜: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '이터레이터 프로토콜: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    이터레이터 프로토콜은 __iter__와 __next__ 메서드를 구현하여 객체를 순회 가능하게 만드는 규약입니다. __iter__는 self를 반환하고, __next__는 다음 값을 반환하거나 StopIteration을 발생시킵니다. 이를 통해 사용자 정의 객체를 for 루프에서 사용할 수 있습니다.
 
-- id: "iterator_protocol"
-  title: "이터레이터 프로토콜"
-  subtitle: "__iter__와 __next__ 구현"
+    제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다.
+  tips:
+  - 제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Counter:
+        def __init__(self, max):
+            self.max = max
+            self.current = 0
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if self.current < self.max:
+                self.current = self.current + 1
+                return self.current
+            raise StopIteration
+
+    c = Counter(3)
+    list(c)
+  exercise:
+    prompt: '이터레이터 프로토콜: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Counter:
+          def __init__(self, max):
+              self.max = max
+              self.current = 0
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current < self.max:
+                  self.current = self.current + 1
+                  return self.current
+              raise StopIteration
+
+      c = Counter(3)
+      list(c)
+    solution: |-
+      class Counter:
+          def __init__(self, max):
+              self.max = max
+              self.current = 0
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current < self.max:
+                  self.current = self.current + 1
+                  return self.current
+              raise StopIteration
+
+      c = Counter(3)
+      list(c)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "이터레이터 프로토콜은 __iter__와 __next__ 메서드를 구현하여 객체를 순회 가능하게 만드는 규약입니다. __iter__는 self를 반환하고, __next__는 다음 값을 반환하거나 StopIteration을 발생시킵니다. 이를 통해 사용자 정의 객체를 for 루프에서 사용할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: 이터레이터 프로토콜은 __iter__와 __next__ 메서드를 구현하여 객체를 순회 가능하게 만드는 규약입니다. __iter__는 self를 반환하고, __next__는 다음 값을 반환하거나 StopIteration을
+      발생시킵니다. 이를 통해 사용자 정의 객체를 for 루프에서 사용할 수 있습니다.
+  - type: list
     items:
-    - "__iter__: self 반환"
-    - "__next__: 다음 값 반환"
-    - "StopIteration 발생"
-    - "for 루프 지원"
-  - type: "code"
-    language: "python"
-    title: "기본 이터레이터 클래스"
-    description: "숫자를 순회하는 이터레이터를 만듭니다."
+    - '__iter__: self 반환'
+    - '__next__: 다음 값 반환'
+    - StopIteration 발생
+    - for 루프 지원
+  - type: code
+    language: python
+    title: 기본 이터레이터 클래스
+    description: 숫자를 순회하는 이터레이터를 만듭니다.
     content: |-
       class Counter:
           def __init__(self, max):
@@ -187,10 +382,10 @@ sections:
 
       c = Counter(3)
       list(c)
-  - type: "code"
-    language: "python"
-    title: "범위 이터레이터"
-    description: "시작과 끝을 지정하는 이터레이터를 만듭니다."
+  - type: code
+    language: python
+    title: 범위 이터레이터
+    description: 시작과 끝을 지정하는 이터레이터를 만듭니다.
     content: |-
       class Range:
           def __init__(self, start, end):
@@ -209,10 +404,10 @@ sections:
 
       r = Range(5, 10)
       list(r)
-  - type: "code"
-    language: "python"
-    title: "무한 이터레이터"
-    description: "무한히 값을 생성하는 이터레이터를 만듭니다."
+  - type: code
+    language: python
+    title: 무한 이터레이터
+    description: 무한히 값을 생성하는 이터레이터를 만듭니다.
     content: |-
       class Infinite:
           def __init__(self):
@@ -232,25 +427,85 @@ sections:
           if val >= 5:
               break
       values
-  - type: "tip"
-    content: "제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다."
+  - type: tip
+    content: 제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다.
+- id: generator_advanced
+  title: 고급 제너레이터
+  structuredPrimary: true
+  subtitle: 실전 활용 패턴
+  goal: '고급 제너레이터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '고급 제너레이터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    제너레이터는 파일 읽기, 무한 시퀀스 생성, 파이프라인 처리 등 다양한 실전 상황에서 활용됩니다. 메모리를 효율적으로 사용하면서도 코드를 간결하게 유지할 수 있어 대용량 데이터 처리에 매우 유용합니다.
 
-- id: "generator_advanced"
-  title: "고급 제너레이터"
-  subtitle: "실전 활용 패턴"
+    여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다.
+  tips:
+  - 여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def fibonacci():
+        a = 0
+        b = 1
+        while True:
+            yield a
+            a, b = b, a + b
+
+    fib = fibonacci()
+    sequence = []
+    for i in range(10):
+        sequence.append(next(fib))
+    sequence
+  exercise:
+    prompt: '고급 제너레이터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def fibonacci():
+          a = 0
+          b = 1
+          while True:
+              yield a
+              a, b = b, a + b
+
+      fib = fibonacci()
+      sequence = []
+      for i in range(10):
+          sequence.append(next(fib))
+      sequence
+    solution: |-
+      def fibonacci():
+          a = 0
+          b = 1
+          while True:
+              yield a
+              a, b = b, a + b
+
+      fib = fibonacci()
+      sequence = []
+      for i in range(10):
+          sequence.append(next(fib))
+      sequence
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "제너레이터는 파일 읽기, 무한 시퀀스 생성, 파이프라인 처리 등 다양한 실전 상황에서 활용됩니다. 메모리를 효율적으로 사용하면서도 코드를 간결하게 유지할 수 있어 대용량 데이터 처리에 매우 유용합니다."
-  - type: "list"
+  - type: text
+    content: 제너레이터는 파일 읽기, 무한 시퀀스 생성, 파이프라인 처리 등 다양한 실전 상황에서 활용됩니다. 메모리를 효율적으로 사용하면서도 코드를 간결하게 유지할 수 있어 대용량 데이터 처리에 매우 유용합니다.
+  - type: list
     items:
-    - "파일 처리"
-    - "무한 시퀀스"
-    - "데이터 파이프라인"
-    - "메모리 효율성"
-  - type: "code"
-    language: "python"
-    title: "피보나치 제너레이터"
-    description: "피보나치 수열을 무한히 생성합니다."
+    - 파일 처리
+    - 무한 시퀀스
+    - 데이터 파이프라인
+    - 메모리 효율성
+  - type: code
+    language: python
+    title: 피보나치 제너레이터
+    description: 피보나치 수열을 무한히 생성합니다.
     content: |-
       def fibonacci():
           a = 0
@@ -264,10 +519,10 @@ sections:
       for i in range(10):
           sequence.append(next(fib))
       sequence
-  - type: "code"
-    language: "python"
-    title: "필터링 제너레이터"
-    description: "조건에 맞는 값만 생성합니다."
+  - type: code
+    language: python
+    title: 필터링 제너레이터
+    description: 조건에 맞는 값만 생성합니다.
     content: |-
       def filterPositive(numbers):
           for n in numbers:
@@ -277,10 +532,10 @@ sections:
       dataset = [-2, -1, 0, 1, 2, 3]
       filtered = filterPositive(dataset)
       list(filtered)
-  - type: "code"
-    language: "python"
-    title: "변환 제너레이터"
-    description: "값을 변환하여 생성합니다."
+  - type: code
+    language: python
+    title: 변환 제너레이터
+    description: 값을 변환하여 생성합니다.
     content: |-
       def doubleValues(nums):
           for n in nums:
@@ -289,25 +544,88 @@ sections:
       source = [1, 2, 3, 4, 5]
       doubled = doubleValues(source)
       list(doubled)
-  - type: "tip"
-    content: "여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다."
+  - type: tip
+    content: 여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다.
+- id: practical_patterns
+  title: 실전 패턴
+  structuredPrimary: true
+  subtitle: 제너레이터와 이터레이터 활용
+  goal: '실전 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실전 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    제너레이터와 이터레이터는 실무에서 대용량 파일 처리, 배치 처리, 스트리밍 데이터 처리 등에 활용됩니다. 메모리를 절약하면서도 깔끔한 코드를 작성할 수 있어 파이썬의 강력한 기능 중 하나입니다.
 
-- id: "practical_patterns"
-  title: "실전 패턴"
-  subtitle: "제너레이터와 이터레이터 활용"
+    제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다.
+  tips:
+  - 제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def batchGen(elements, size):
+        chunk = []
+        for item in elements:
+            chunk.append(item)
+            if len(chunk) == size:
+                yield chunk
+                chunk = []
+        if chunk:
+            yield chunk
+
+    collection = [1, 2, 3, 4, 5, 6, 7]
+    batches = list(batchGen(collection, 3))
+    batches
+  exercise:
+    prompt: '실전 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def batchGen(elements, size):
+          chunk = []
+          for item in elements:
+              chunk.append(item)
+              if len(chunk) == size:
+                  yield chunk
+                  chunk = []
+          if chunk:
+              yield chunk
+
+      collection = [1, 2, 3, 4, 5, 6, 7]
+      batches = list(batchGen(collection, 3))
+      batches
+    solution: |-
+      def batchGen(elements, size):
+          chunk = []
+          for item in elements:
+              chunk.append(item)
+              if len(chunk) == size:
+                  yield chunk
+                  chunk = []
+          if chunk:
+              yield chunk
+
+      collection = [1, 2, 3, 4, 5, 6, 7]
+      batches = list(batchGen(collection, 3))
+      batches
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "제너레이터와 이터레이터는 실무에서 대용량 파일 처리, 배치 처리, 스트리밍 데이터 처리 등에 활용됩니다. 메모리를 절약하면서도 깔끔한 코드를 작성할 수 있어 파이썬의 강력한 기능 중 하나입니다."
-  - type: "list"
+  - type: text
+    content: 제너레이터와 이터레이터는 실무에서 대용량 파일 처리, 배치 처리, 스트리밍 데이터 처리 등에 활용됩니다. 메모리를 절약하면서도 깔끔한 코드를 작성할 수 있어 파이썬의 강력한 기능 중 하나입니다.
+  - type: list
     items:
-    - "배치 처리"
-    - "청크 단위 읽기"
-    - "파이프라인 구성"
-    - "메모리 최적화"
-  - type: "code"
-    language: "python"
-    title: "배치 제너레이터"
-    description: "데이터를 일정 크기로 묶어 생성합니다."
+    - 배치 처리
+    - 청크 단위 읽기
+    - 파이프라인 구성
+    - 메모리 최적화
+  - type: code
+    language: python
+    title: 배치 제너레이터
+    description: 데이터를 일정 크기로 묶어 생성합니다.
     content: |-
       def batchGen(elements, size):
           chunk = []
@@ -322,10 +640,10 @@ sections:
       collection = [1, 2, 3, 4, 5, 6, 7]
       batches = list(batchGen(collection, 3))
       batches
-  - type: "code"
-    language: "python"
-    title: "체인 제너레이터"
-    description: "여러 제너레이터를 연결합니다."
+  - type: code
+    language: python
+    title: 체인 제너레이터
+    description: 여러 제너레이터를 연결합니다.
     content: |-
       def square(values):
           for n in values:
@@ -338,10 +656,10 @@ sections:
       original = [1, 2, 3, 4, 5]
       pipeline = addTen(square(original))
       list(pipeline)
-  - type: "code"
-    language: "python"
-    title: "조건부 생성"
-    description: "여러 조건을 조합하여 생성합니다."
+  - type: code
+    language: python
+    title: 조건부 생성
+    description: 여러 조건을 조합하여 생성합니다.
     content: |-
       def complexFilter(entries):
           for item in entries:
@@ -351,25 +669,77 @@ sections:
       integers = [-2, -1, 0, 1, 2, 3, 4, 5, 6]
       outcomes = list(complexFilter(integers))
       outcomes
-  - type: "tip"
-    content: "제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다."
+  - type: tip
+    content: 제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다.
+- id: workflow_validation
+  title: 실무 스트리밍 처리 루프
+  structuredPrimary: true
+  subtitle: 예측 → 지연 처리 → 소진 확인 → 검증
+  goal: '실무 스트리밍 처리 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실무 스트리밍 처리 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    제너레이터는 단순히 yield를 쓰는 문법이 아니라, 로그나 이벤트처럼 많은 데이터를 한 번에 메모리에 올리지 않고 필요한 만큼만 처리하는 방식입니다. 실행 전에는 어떤 이벤트가 통과할지 예측하고, 제너레이터가 한 번 소진되면 다시 쓸 수 없다는 점까지 검증해야 합니다.
 
-- id: "workflow_validation"
-  title: "실무 스트리밍 처리 루프"
-  subtitle: "예측 → 지연 처리 → 소진 확인 → 검증"
+    제너레이터는 대용량 데이터에서 강력하지만 한 번 흘러간 스트림은 다시 읽을 수 없습니다. 필요한 결과는 리스트나 파일로 남기고, 검증은 작은 샘플 스트림으로 먼저 통과시키세요.
+  tips:
+  - 제너레이터는 대용량 데이터에서 강력하지만 한 번 흘러간 스트림은 다시 읽을 수 없습니다. 필요한 결과는 리스트나 파일로 남기고, 검증은 작은 샘플 스트림으로 먼저 통과시키세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    eventRows = [
+        {"id": "E-1", "level": "info", "service": "api", "latencyMs": 120},
+        {"id": "E-2", "level": "warning", "service": "worker", "latencyMs": 480},
+        {"id": "E-3", "level": "error", "service": "api", "latencyMs": 900},
+        {"id": "E-4", "level": "info", "service": "web", "latencyMs": 80},
+        {"id": "E-5", "level": "error", "service": "worker", "latencyMs": 1100},
+    ]
+
+    len(eventRows)
+  exercise:
+    prompt: '실무 스트리밍 처리 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      eventRows = [
+          {"id": "E-1", "level": "info", "service": "api", "latencyMs": 120},
+          {"id": "E-2", "level": "warning", "service": "worker", "latencyMs": 480},
+          {"id": "E-3", "level": "error", "service": "api", "latencyMs": 900},
+          {"id": "E-4", "level": "info", "service": "web", "latencyMs": 80},
+          {"id": "E-5", "level": "error", "service": "worker", "latencyMs": 1100},
+      ]
+
+      len(eventRows)
+    solution: |-
+      eventRows = [
+          {"id": "E-1", "level": "info", "service": "api", "latencyMs": 120},
+          {"id": "E-2", "level": "warning", "service": "worker", "latencyMs": 480},
+          {"id": "E-3", "level": "error", "service": "api", "latencyMs": 900},
+          {"id": "E-4", "level": "info", "service": "web", "latencyMs": 80},
+          {"id": "E-5", "level": "error", "service": "worker", "latencyMs": 1100},
+      ]
+
+      len(eventRows)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "제너레이터는 단순히 yield를 쓰는 문법이 아니라, 로그나 이벤트처럼 많은 데이터를 한 번에 메모리에 올리지 않고 필요한 만큼만 처리하는 방식입니다. 실행 전에는 어떤 이벤트가 통과할지 예측하고, 제너레이터가 한 번 소진되면 다시 쓸 수 없다는 점까지 검증해야 합니다."
-  - type: "list"
+  - type: text
+    content: 제너레이터는 단순히 yield를 쓰는 문법이 아니라, 로그나 이벤트처럼 많은 데이터를 한 번에 메모리에 올리지 않고 필요한 만큼만 처리하는 방식입니다. 실행 전에는 어떤 이벤트가 통과할지 예측하고,
+      제너레이터가 한 번 소진되면 다시 쓸 수 없다는 점까지 검증해야 합니다.
+  - type: list
     items:
-    - "필터 제너레이터는 조건에 맞는 이벤트만 흘려보냅니다."
-    - "변환 제너레이터는 원본 이벤트를 리포트용 구조로 바꿉니다."
-    - "배치 제너레이터는 스트림을 작은 묶음으로 나눕니다."
-    - "한 번 순회한 제너레이터를 다시 쓰면 빈 결과가 나오는 오류를 확인합니다."
-  - type: "code"
-    language: "python"
-    title: "이벤트 스트림 준비"
-    description: "실행 전에 어떤 이벤트가 경고 리포트에 들어갈지 먼저 예측해보세요."
+    - 필터 제너레이터는 조건에 맞는 이벤트만 흘려보냅니다.
+    - 변환 제너레이터는 원본 이벤트를 리포트용 구조로 바꿉니다.
+    - 배치 제너레이터는 스트림을 작은 묶음으로 나눕니다.
+    - 한 번 순회한 제너레이터를 다시 쓰면 빈 결과가 나오는 오류를 확인합니다.
+  - type: code
+    language: python
+    title: 이벤트 스트림 준비
+    description: 실행 전에 어떤 이벤트가 경고 리포트에 들어갈지 먼저 예측해보세요.
     content: |-
       eventRows = [
           {"id": "E-1", "level": "info", "service": "api", "latencyMs": 120},
@@ -380,10 +750,10 @@ sections:
       ]
 
       len(eventRows)
-  - type: "code"
-    language: "python"
-    title: "필터와 변환 제너레이터"
-    description: "경고 이상 이벤트만 통과시키고 리포트 행으로 바꿉니다."
+  - type: code
+    language: python
+    title: 필터와 변환 제너레이터
+    description: 경고 이상 이벤트만 통과시키고 리포트 행으로 바꿉니다.
     content: |-
       def iterAlertEvents(events):
           for event in events:
@@ -403,18 +773,18 @@ sections:
       reportStream = iterReportRows(alertStream)
       reportRows = list(reportStream)
       reportRows
-  - type: "code"
-    language: "python"
-    title: "소진된 제너레이터 오류 확인"
-    description: "한 번 사용한 제너레이터를 다시 읽으면 빈 결과가 나오는지 확인합니다."
+  - type: code
+    language: python
+    title: 소진된 제너레이터 오류 확인
+    description: 한 번 사용한 제너레이터를 다시 읽으면 빈 결과가 나오는지 확인합니다.
     content: |-
       secondRead = list(alertStream)
       generatorConsumed = secondRead == []
       generatorConsumed
-  - type: "code"
-    language: "python"
-    title: "필수 키 오류 확인"
-    description: "스트림 처리 중 필수 키가 빠진 이벤트를 잡아냅니다."
+  - type: code
+    language: python
+    title: 필수 키 오류 확인
+    description: 스트림 처리 중 필수 키가 빠진 이벤트를 잡아냅니다.
     content: |-
       def iterValidatedEvents(events):
           requiredKeys = {"id", "level", "service", "latencyMs"}
@@ -431,10 +801,10 @@ sections:
           eventErrorMessage = str(exc)
 
       eventErrorMessage
-  - type: "code"
-    language: "python"
-    title: "배치 제너레이터로 나누기"
-    description: "리포트 행을 일정 크기씩 묶어 전송 가능한 단위로 만듭니다."
+  - type: code
+    language: python
+    title: 배치 제너레이터로 나누기
+    description: 리포트 행을 일정 크기씩 묶어 전송 가능한 단위로 만듭니다.
     content: |-
       def iterBatches(rows, size):
           batch = []
@@ -449,10 +819,10 @@ sections:
       alertRows = list(iterReportRows(iterAlertEvents(eventRows)))
       alertBatches = list(iterBatches(alertRows, 2))
       alertBatches
-  - type: "code"
-    language: "python"
-    title: "예상값으로 검증"
-    description: "스트리밍 처리 결과를 예상한 리포트와 비교합니다."
+  - type: code
+    language: python
+    title: 예상값으로 검증
+    description: 스트리밍 처리 결과를 예상한 리포트와 비교합니다.
     content: |-
       expectedReportRows = [
           {"id": "E-2", "service": "worker", "severity": "WARNING", "slow": False},
@@ -469,10 +839,10 @@ sections:
 
       assert all(checks.values())
       checks
-  - type: "code"
-    language: "python"
-    title: "수정 실험"
-    description: "느림 기준을 바꾸면 slow 판정이 어떻게 달라지는지 비교합니다."
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 느림 기준을 바꾸면 slow 판정이 어떻게 달라지는지 비교합니다.
     content: |-
       def iterReportRowsWithThreshold(events, slowThreshold):
           for event in events:
@@ -485,18 +855,59 @@ sections:
       slow400 = list(iterReportRowsWithThreshold(iterAlertEvents(eventRows), 400))
 
       slow800, slow400
-  - type: "tip"
-    content: "제너레이터는 대용량 데이터에서 강력하지만 한 번 흘러간 스트림은 다시 읽을 수 없습니다. 필요한 결과는 리스트나 파일로 남기고, 검증은 작은 샘플 스트림으로 먼저 통과시키세요."
+  - type: tip
+    content: 제너레이터는 대용량 데이터에서 강력하지만 한 번 흘러간 스트림은 다시 읽을 수 없습니다. 필요한 결과는 리스트나 파일로 남기고, 검증은 작은 샘플 스트림으로 먼저 통과시키세요.
+- id: practice
+  title: Day 27 종합 복습
+  structuredPrimary: true
+  subtitle: 제너레이터와 이터레이터 마스터하기
+  goal: 'Day 27 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Day 27 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 27에서 배운 제너레이터와 이터레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def simpleYield():
+        yield 10
+        yield 20
+        yield 30
 
-- id: "practice"
-  title: "Day 27 종합 복습"
-  subtitle: "제너레이터와 이터레이터 마스터하기"
+    generator = simpleYield()
+    list(generator)
+  exercise:
+    prompt: 'Day 27 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def simpleYield():
+          yield 10
+          yield 20
+          yield 30
+
+      generator = simpleYield()
+      list(generator)
+    solution: |-
+      def simpleYield():
+          yield 10
+          yield 20
+          yield 30
+
+      generator = simpleYield()
+      list(generator)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 27에서 배운 제너레이터와 이터레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
-
-  - type: "expansion"
-    title: "🟢 기본1: 간단한 제너레이터"
+  - type: text
+    content: Day 27에서 배운 제너레이터와 이터레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  - type: expansion
+    title: '🟢 기본1: 간단한 제너레이터'
     code: |-
       def simpleYield():
           yield 10
@@ -505,9 +916,8 @@ sections:
 
       generator = simpleYield()
       list(generator)
-
-  - type: "expansion"
-    title: "🟢 기본2: 범위 생성"
+  - type: expansion
+    title: '🟢 기본2: 범위 생성'
     code: |-
       def genRange(n):
           i = 0
@@ -517,29 +927,25 @@ sections:
 
       genObj = genRange(5)
       list(genObj)
-
-  - type: "expansion"
-    title: "🟢 기본3: 제너레이터 표현식"
+  - type: expansion
+    title: '🟢 기본3: 제너레이터 표현식'
     code: |-
       cubes = (x ** 3 for x in range(5))
       list(cubes)
-
-  - type: "expansion"
-    title: "🟢 기본4: iter와 next"
+  - type: expansion
+    title: '🟢 기본4: iter와 next'
     code: |-
       elements = [5, 10, 15]
       elementIter = iter(elements)
       next(elementIter), next(elementIter)
-
-  - type: "expansion"
-    title: "🟢 기본5: 문자열 이터레이터"
+  - type: expansion
+    title: '🟢 기본5: 문자열 이터레이터'
     code: |-
       s = 'abc'
       strIter = iter(s)
       list(strIter)
-
-  - type: "expansion"
-    title: "🟡 응용1: 조건부 제너레이터"
+  - type: expansion
+    title: '🟡 응용1: 조건부 제너레이터'
     code: |-
       def odds(n):
           i = 1
@@ -550,16 +956,14 @@ sections:
 
       oddGen = odds(10)
       list(oddGen)
-
-  - type: "expansion"
-    title: "🟡 응용2: 제너레이터 표현식 필터"
+  - type: expansion
+    title: '🟡 응용2: 제너레이터 표현식 필터'
     code: |-
       digits = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       selected = (n for n in digits if n > 5)
       list(selected)
-
-  - type: "expansion"
-    title: "🟡 응용3: 변환 제너레이터"
+  - type: expansion
+    title: '🟡 응용3: 변환 제너레이터'
     code: |-
       def triple(nums):
           for n in nums:
@@ -568,9 +972,8 @@ sections:
       vals = [1, 2, 3, 4, 5]
       tripled = triple(vals)
       list(tripled)
-
-  - type: "expansion"
-    title: "🟡 응용4: 이터레이터 클래스"
+  - type: expansion
+    title: '🟡 응용4: 이터레이터 클래스'
     code: |-
       class Countdown:
           def __init__(self, start):
@@ -588,9 +991,8 @@ sections:
 
       cd = Countdown(5)
       list(cd)
-
-  - type: "expansion"
-    title: "🟡 응용5: 무한 카운터"
+  - type: expansion
+    title: '🟡 응용5: 무한 카운터'
     code: |-
       def infiniteCounter():
           n = 1
@@ -603,9 +1005,8 @@ sections:
       for i in range(5):
           accumulator.append(next(counter))
       accumulator
-
-  - type: "expansion"
-    title: "🔴 심화1: 피보나치 N개"
+  - type: expansion
+    title: '🔴 심화1: 피보나치 N개'
     code: |-
       def fib(n):
           a = 0
@@ -618,9 +1019,8 @@ sections:
 
       fibGen = fib(8)
       list(fibGen)
-
-  - type: "expansion"
-    title: "🔴 심화2: 제곱수 필터"
+  - type: expansion
+    title: '🔴 심화2: 제곱수 필터'
     code: |-
       def squareFilter(start, end):
           i = start
@@ -631,9 +1031,8 @@ sections:
 
       perfectSquares = squareFilter(1, 20)
       list(perfectSquares)
-
-  - type: "expansion"
-    title: "🔴 심화3: 배치 생성"
+  - type: expansion
+    title: '🔴 심화3: 배치 생성'
     code: |-
       def makeBatch(data, batchSize):
           batch = []
@@ -648,9 +1047,8 @@ sections:
       range10 = list(range(1, 11))
       groups = list(makeBatch(range10, 3))
       groups
-
-  - type: "expansion"
-    title: "🔴 심화4: 파이프라인"
+  - type: expansion
+    title: '🔴 심화4: 파이프라인'
     code: |-
       def addFive(nums):
           for n in nums:
@@ -663,9 +1061,8 @@ sections:
       base = [1, 2, 3, 4, 5]
       pipe = multiplyTwo(addFive(base))
       list(pipe)
-
-  - type: "expansion"
-    title: "🔴 심화5: 복합 필터"
+  - type: expansion
+    title: '🔴 심화5: 복합 필터'
     code: |-
       def complexGen(items):
           for item in items:
@@ -676,9 +1073,8 @@ sections:
       numbers = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
       processed = list(complexGen(numbers))
       processed
-
-  - type: "expansion"
-    title: "🔴 심화6: 커스텀 범위"
+  - type: expansion
+    title: '🔴 심화6: 커스텀 범위'
     code: |-
       class CustomRange:
           def __init__(self, start, end, step):
@@ -698,9 +1094,8 @@ sections:
 
       cr = CustomRange(0, 10, 2)
       list(cr)
-
-  - type: "expansion"
-    title: "🔴 심화7: 누적 합계"
+  - type: expansion
+    title: '🔴 심화7: 누적 합계'
     code: |-
       def cumulativeSum(nums):
           total = 0
@@ -711,9 +1106,8 @@ sections:
       numberList = [1, 2, 3, 4, 5]
       cumSum = list(cumulativeSum(numberList))
       cumSum
-
-  - type: "expansion"
-    title: "🔴 심화8: 윈도우 생성"
+  - type: expansion
+    title: '🔴 심화8: 윈도우 생성'
     code: |-
       def window(sequence, size):
           i = 0
@@ -724,9 +1118,8 @@ sections:
       series = [1, 2, 3, 4, 5, 6, 7]
       windows = list(window(series, 3))
       windows
-
-  - type: "expansion"
-    title: "🔴 심화9: 조건부 변환"
+  - type: expansion
+    title: '🔴 심화9: 조건부 변환'
     code: |-
       def conditionalTransform(nums):
           for n in nums:
@@ -738,9 +1131,8 @@ sections:
       inputData = [1, 3, 5, 7, 9, 11]
       transformed = list(conditionalTransform(inputData))
       transformed
-
-  - type: "expansion"
-    title: "🔴 심화10: 중첩 제너레이터"
+  - type: expansion
+    title: '🔴 심화10: 중첩 제너레이터'
     code: |-
       def flattenGen(nested):
           for sublist in nested:

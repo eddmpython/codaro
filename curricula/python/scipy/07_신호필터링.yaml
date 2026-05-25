@@ -1,33 +1,104 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scipy
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
   id: scipy_07
   title: 신호필터링
   order: 7
   category: scipy
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["scipy.signal", "필터", "butter", "filtfilt", "노이즈제거"]
+  tags:
+  - scipy.signal
+  - 필터
+  - butter
+  - filtfilt
+  - 노이즈제거
   seo:
-    title: "scipy.signal 필터링 - 노이즈 제거와 신호 처리"
-    description: "scipy.signal로 신호에서 노이즈를 제거합니다. 버터워스 필터, 저역통과, 고역통과 필터를 배웁니다."
-    keywords: ["scipy", "signal", "filter", "butter", "노이즈제거"]
-
+    title: scipy.signal 필터링 - 노이즈 제거와 신호 처리
+    description: scipy.signal로 신호에서 노이즈를 제거합니다. 버터워스 필터, 저역통과, 고역통과 필터를 배웁니다.
+    keywords:
+    - scipy
+    - signal
+    - filter
+    - butter
+    - 노이즈제거
 intro:
-  emoji: "🔊"
+  emoji: 🔊
   goal: scipy.signal로 신호에서 노이즈를 제거하고 원하는 주파수 성분을 추출합니다.
   description: 센서 데이터, 오디오 신호, 생체신호에서 노이즈를 제거하는 디지털 필터를 설계하고 적용합니다. 버터워스 필터를 중심으로 저역통과, 고역통과, 대역통과 필터를 배웁니다.
-
 sections:
 - id: load
   title: 데이터 로드
+  structuredPrimary: true
   subtitle: 노이즈가 섞인 신호
+  goal: '데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고, 필터링으로 원래 신호를 복원합니다.
+    실제 센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import signal
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    fs = 500
+    t = np.linspace(0, 1, fs)
+
+    cleanSig = np.sin(2 * np.pi * 5 * t)
+    noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+    noisySig = cleanSig + noise
+  exercise:
+    prompt: '데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      t = np.linspace(0, 1, fs)
+
+      cleanSig = np.sin(2 * np.pi * 5 * t)
+      noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+      noisySig = cleanSig + noise
+    solution: |-
+      import scipy
+
+      import numpy as np
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      t = np.linspace(0, 1, fs)
+
+      cleanSig = np.sin(2 * np.pi * 5 * t)
+      noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+      noisySig = cleanSig + noise
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고, 필터링으로 원래 신호를 복원합니다. 실제 센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
+    content: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고, 필터링으로 원래 신호를 복원합니다. 실제
+      센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
   - type: code
     language: python
     title: 라이브러리 및 신호 생성
@@ -68,10 +139,70 @@ sections:
 
       plt.tight_layout()
       figLoad
-
 - id: butter
   title: 버터워스 필터 설계
+  structuredPrimary: true
   subtitle: signal.butter
+  goal: '버터워스 필터 설계: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '버터워스 필터 설계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    버터워스 필터는 통과대역에서 가장 평탄한 주파수 응답을 가집니다. butter 함수로 필터 계수(b, a)를 설계합니다. 차단 주파수는 나이퀴스트 주파수(샘플링 주파수의 절반)로 정규화해야 합니다.
+
+    btype='low'는 저역통과(저주파만 통과), 'high'는 고역통과, 'band'는 대역통과입니다. order가 높을수록 전이대역이 급격하지만 위상왜곡이 커집니다.
+  tips:
+  - btype='low'는 저역통과(저주파만 통과), 'high'는 고역통과, 'band'는 대역통과입니다. order가 높을수록 전이대역이 급격하지만 위상왜곡이 커집니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cutoff = 10
+    nyquist = fs / 2
+    normalCutoff = cutoff / nyquist
+    order = 4
+
+    b, a = signal.butter(order, normalCutoff, btype='low')
+
+    filterDf = pd.DataFrame({
+        'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+        'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+    })
+    filterDf
+  exercise:
+    prompt: '버터워스 필터 설계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cutoff = 10
+      nyquist = fs / 2
+      normalCutoff = cutoff / nyquist
+      order = 4
+
+      b, a = signal.butter(order, normalCutoff, btype='low')
+
+      filterDf = pd.DataFrame({
+          'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+          'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+      })
+      filterDf
+    solution: |-
+      cutoff = 10
+      nyquist = fs / 2
+      normalCutoff = cutoff / nyquist
+      order = 4
+
+      b, a = signal.butter(order, normalCutoff, btype='low')
+
+      filterDf = pd.DataFrame({
+          'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+          'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+      })
+      filterDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 버터워스 필터는 통과대역에서 가장 평탄한 주파수 응답을 가집니다. butter 함수로 필터 계수(b, a)를 설계합니다. 차단 주파수는 나이퀴스트 주파수(샘플링 주파수의 절반)로 정규화해야 합니다.
@@ -94,10 +225,95 @@ sections:
       filterDf
   - type: tip
     content: btype='low'는 저역통과(저주파만 통과), 'high'는 고역통과, 'band'는 대역통과입니다. order가 높을수록 전이대역이 급격하지만 위상왜곡이 커집니다.
-
 - id: freqresp
   title: 주파수 응답
+  structuredPrimary: true
   subtitle: 필터 특성 확인
+  goal: '주파수 응답: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '주파수 응답: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 설계된 필터가 각 주파수를 얼마나 통과시키는지 주파수 응답으로 확인합니다. -3dB 지점이 차단 주파수이며, 이 지점에서 신호 전력이 절반으로 감소합니다. 차단 주파수 이상의 고주파는 급격히
+    감쇄됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    w, h = signal.freqz(b, a, worN=2000)
+    freqs = w * fs / (2 * np.pi)
+
+    figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+    axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+    axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+    axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+    axFreqM.set_ylabel('Magnitude (dB)')
+    axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+    axFreqM.set_ylim(-60, 5)
+    axFreqM.legend()
+    axFreqM.grid(True, alpha=0.3)
+
+    axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+    axFreqP.set_xlabel('Frequency (Hz)')
+    axFreqP.set_ylabel('Phase (degrees)')
+    axFreqP.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    figFreq
+  exercise:
+    prompt: '주파수 응답: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      w, h = signal.freqz(b, a, worN=2000)
+      freqs = w * fs / (2 * np.pi)
+
+      figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+      axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+      axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+      axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+      axFreqM.set_ylabel('Magnitude (dB)')
+      axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+      axFreqM.set_ylim(-60, 5)
+      axFreqM.legend()
+      axFreqM.grid(True, alpha=0.3)
+
+      axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+      axFreqP.set_xlabel('Frequency (Hz)')
+      axFreqP.set_ylabel('Phase (degrees)')
+      axFreqP.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFreq
+    solution: |-
+      w, h = signal.freqz(b, a, worN=2000)
+      freqs = w * fs / (2 * np.pi)
+
+      figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+      axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+      axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+      axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+      axFreqM.set_ylabel('Magnitude (dB)')
+      axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+      axFreqM.set_ylim(-60, 5)
+      axFreqM.legend()
+      axFreqM.grid(True, alpha=0.3)
+
+      axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+      axFreqP.set_xlabel('Frequency (Hz)')
+      axFreqP.set_ylabel('Phase (degrees)')
+      axFreqP.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFreq
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 설계된 필터가 각 주파수를 얼마나 통과시키는지 주파수 응답으로 확인합니다. -3dB 지점이 차단 주파수이며, 이 지점에서 신호 전력이 절반으로 감소합니다. 차단 주파수 이상의 고주파는 급격히 감쇄됩니다.
@@ -127,10 +343,74 @@ sections:
 
       plt.tight_layout()
       figFreq
-
 - id: filtfilt
   title: 제로위상 필터링
+  structuredPrimary: true
   subtitle: signal.filtfilt
+  goal: '제로위상 필터링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '제로위상 필터링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: filtfilt은 신호를 정방향과 역방향으로 두 번 필터링하여 위상 왜곡을 제거합니다. 시간 지연 없이 깨끗한 필터링 결과를 얻습니다. 오프라인 분석에서는 항상 filtfilt을 사용하는 것이
+    좋습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    filteredSig = signal.filtfilt(b, a, noisySig)
+
+    figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+    axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+    axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+    axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+    axFilt.set_xlabel('Time (s)')
+    axFilt.set_ylabel('Amplitude')
+    axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+    axFilt.legend()
+    axFilt.grid(True, alpha=0.3)
+    figFilt
+  exercise:
+    prompt: '제로위상 필터링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      filteredSig = signal.filtfilt(b, a, noisySig)
+
+      figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+      axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+      axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+      axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+      axFilt.set_xlabel('Time (s)')
+      axFilt.set_ylabel('Amplitude')
+      axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+      axFilt.legend()
+      axFilt.grid(True, alpha=0.3)
+      figFilt
+    solution: |-
+      filteredSig = signal.filtfilt(b, a, noisySig)
+
+      figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+      axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+      axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+      axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+      axFilt.set_xlabel('Time (s)')
+      axFilt.set_ylabel('Amplitude')
+      axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+      axFilt.legend()
+      axFilt.grid(True, alpha=0.3)
+      figFilt
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: filtfilt은 신호를 정방향과 역방향으로 두 번 필터링하여 위상 왜곡을 제거합니다. 시간 지연 없이 깨끗한 필터링 결과를 얻습니다. 오프라인 분석에서는 항상 filtfilt을 사용하는 것이 좋습니다.
@@ -167,13 +447,82 @@ sections:
           'Improvement': ['baseline', f'{(1 - rmseFiltered/rmseNoisy)*100:.1f}%']
       })
       rmseDf
-
 - id: lfilter
   title: lfilter vs filtfilt
+  structuredPrimary: true
   subtitle: 위상 지연 비교
+  goal: 'lfilter vs filtfilt: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'lfilter vs filtfilt: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요.
+
+    lfilter의 위상 지연은 필터 차수와 차단 주파수에 따라 달라집니다. filtfilt은 두 번 필터링하므로 감쇄가 2배가 되어 더 급격한 롤오프를 보입니다.
+  tips:
+  - lfilter의 위상 지연은 필터 차수와 차단 주파수에 따라 달라집니다. filtfilt은 두 번 필터링하므로 감쇄가 2배가 되어 더 급격한 롤오프를 보입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    lfilterResult = signal.lfilter(b, a, noisySig)
+
+    figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+    axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+    axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+    axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+    axLfilt.set_xlim(0, 0.3)
+    axLfilt.set_xlabel('Time (s)')
+    axLfilt.set_ylabel('Amplitude')
+    axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+    axLfilt.legend()
+    axLfilt.grid(True, alpha=0.3)
+    figLfilt
+  exercise:
+    prompt: 'lfilter vs filtfilt: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      lfilterResult = signal.lfilter(b, a, noisySig)
+
+      figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+      axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+      axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+      axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+      axLfilt.set_xlim(0, 0.3)
+      axLfilt.set_xlabel('Time (s)')
+      axLfilt.set_ylabel('Amplitude')
+      axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+      axLfilt.legend()
+      axLfilt.grid(True, alpha=0.3)
+      figLfilt
+    solution: |-
+      lfilterResult = signal.lfilter(b, a, noisySig)
+
+      figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+      axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+      axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+      axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+      axLfilt.set_xlim(0, 0.3)
+      axLfilt.set_xlabel('Time (s)')
+      axLfilt.set_ylabel('Amplitude')
+      axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+      axLfilt.legend()
+      axLfilt.grid(True, alpha=0.3)
+      figLfilt
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요."
+    content: 'lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요.'
   - type: code
     language: python
     title: 두 방식 비교
@@ -196,10 +545,37 @@ sections:
       figLfilt
   - type: tip
     content: lfilter의 위상 지연은 필터 차수와 차단 주파수에 따라 달라집니다. filtfilt은 두 번 필터링하므로 감쇄가 2배가 되어 더 급격한 롤오프를 보입니다.
-
 - id: highpass
   title: 고역통과 필터
+  structuredPrimary: true
   subtitle: 저주파 제거
+  goal: '고역통과 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '고역통과 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 고역통과 필터는 저주파 성분(드리프트, DC 오프셋)을 제거합니다. 심전도(ECG) 신호에서 기저선 변동을 제거하거나, 가속도계에서 중력 성분을 제거할 때 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+    driftSig = cleanSig + drift
+  exercise:
+    prompt: '고역통과 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+      driftSig = cleanSig + drift
+    solution: |-
+      drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+      driftSig = cleanSig + drift
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 고역통과 필터는 저주파 성분(드리프트, DC 오프셋)을 제거합니다. 심전도(ECG) 신호에서 기저선 변동을 제거하거나, 가속도계에서 중력 성분을 제거할 때 사용합니다.
@@ -238,13 +614,48 @@ sections:
 
       plt.tight_layout()
       figHigh
-
 - id: bandpass
   title: 대역통과 필터
+  structuredPrimary: true
   subtitle: 특정 주파수 대역 추출
+  goal: '대역통과 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '대역통과 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만 추출하거나, 특정 진동 주파수를
+    분석할 때 유용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    comp1 = np.sin(2 * np.pi * 5 * t)
+    comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+    comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+    complexSig = comp1 + comp2 + comp3
+  exercise:
+    prompt: '대역통과 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      comp1 = np.sin(2 * np.pi * 5 * t)
+      comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+      comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+      complexSig = comp1 + comp2 + comp3
+    solution: |-
+      comp1 = np.sin(2 * np.pi * 5 * t)
+      comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+      comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+      complexSig = comp1 + comp2 + comp3
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만 추출하거나, 특정 진동 주파수를 분석할 때 유용합니다.
+    content: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만 추출하거나, 특정 진동 주파수를 분석할
+      때 유용합니다.
   - type: code
     language: python
     title: 복합 신호 생성
@@ -284,10 +695,88 @@ sections:
 
       plt.tight_layout()
       figBand
-
 - id: notch
   title: 노치 필터
+  structuredPrimary: true
   subtitle: 특정 주파수 제거
+  goal: '노치 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '노치 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 노치(대역저지) 필터는 특정 주파수만 제거합니다. 전력선 간섭(50Hz 또는 60Hz)을 제거할 때 주로 사용합니다. 생체신호(ECG, EEG) 분석에서 필수적인 전처리 단계입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    notchFreq = 50
+    quality = 30
+    bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+    powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+    contaminated = cleanSig + powerNoise
+    notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+    figNotch, axNotch = plt.subplots(figsize=(12, 5))
+    axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+    axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+    axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+    axNotch.set_xlim(0, 0.5)
+    axNotch.set_xlabel('Time (s)')
+    axNotch.set_ylabel('Amplitude')
+    axNotch.set_title('50Hz Power Line Noise Removal')
+    axNotch.legend()
+    axNotch.grid(True, alpha=0.3)
+    figNotch
+  exercise:
+    prompt: '노치 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      notchFreq = 50
+      quality = 30
+      bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+      powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+      contaminated = cleanSig + powerNoise
+      notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+      figNotch, axNotch = plt.subplots(figsize=(12, 5))
+      axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+      axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+      axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axNotch.set_xlim(0, 0.5)
+      axNotch.set_xlabel('Time (s)')
+      axNotch.set_ylabel('Amplitude')
+      axNotch.set_title('50Hz Power Line Noise Removal')
+      axNotch.legend()
+      axNotch.grid(True, alpha=0.3)
+      figNotch
+    solution: |-
+      notchFreq = 50
+      quality = 30
+      bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+      powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+      contaminated = cleanSig + powerNoise
+      notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+      figNotch, axNotch = plt.subplots(figsize=(12, 5))
+      axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+      axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+      axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axNotch.set_xlim(0, 0.5)
+      axNotch.set_xlabel('Time (s)')
+      axNotch.set_ylabel('Amplitude')
+      axNotch.set_title('50Hz Power Line Noise Removal')
+      axNotch.legend()
+      axNotch.grid(True, alpha=0.3)
+      figNotch
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 노치(대역저지) 필터는 특정 주파수만 제거합니다. 전력선 간섭(50Hz 또는 60Hz)을 제거할 때 주로 사용합니다. 생체신호(ECG, EEG) 분석에서 필수적인 전처리 단계입니다.
@@ -315,10 +804,73 @@ sections:
       axNotch.legend()
       axNotch.grid(True, alpha=0.3)
       figNotch
-
 - id: sos
   title: SOS 형식 필터
+  structuredPrimary: true
   subtitle: 수치 안정성
+  goal: 'SOS 형식 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'SOS 형식 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    높은 차수의 필터는 b/a 형식으로 불안정할 수 있습니다. SOS(Second-Order Sections) 형식이 더 안정적입니다. 고차 필터(order > 4)에서는 SOS를 권장합니다.
+
+    output='sos'로 SOS 형식 계수를 얻고, sosfiltfilt로 필터링합니다. 수치적으로 훨씬 안정적이며, 특히 협대역 필터에서 중요합니다.
+  tips:
+  - output='sos'로 SOS 형식 계수를 얻고, sosfiltfilt로 필터링합니다. 수치적으로 훨씬 안정적이며, 특히 협대역 필터에서 중요합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+    sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+    figSos, axSos = plt.subplots(figsize=(12, 5))
+    axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+    axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+    axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+    axSos.set_xlabel('Time (s)')
+    axSos.set_ylabel('Amplitude')
+    axSos.set_title('Filtering with SOS Format (Higher Order)')
+    axSos.legend()
+    axSos.grid(True, alpha=0.3)
+    figSos
+  exercise:
+    prompt: 'SOS 형식 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+      sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+      figSos, axSos = plt.subplots(figsize=(12, 5))
+      axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+      axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+      axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+      axSos.set_xlabel('Time (s)')
+      axSos.set_ylabel('Amplitude')
+      axSos.set_title('Filtering with SOS Format (Higher Order)')
+      axSos.legend()
+      axSos.grid(True, alpha=0.3)
+      figSos
+    solution: |-
+      sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+      sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+      figSos, axSos = plt.subplots(figsize=(12, 5))
+      axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+      axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+      axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+      axSos.set_xlabel('Time (s)')
+      axSos.set_ylabel('Amplitude')
+      axSos.set_title('Filtering with SOS Format (Higher Order)')
+      axSos.legend()
+      axSos.grid(True, alpha=0.3)
+      figSos
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 높은 차수의 필터는 b/a 형식으로 불안정할 수 있습니다. SOS(Second-Order Sections) 형식이 더 안정적입니다. 고차 필터(order > 4)에서는 SOS를 권장합니다.
@@ -342,13 +894,57 @@ sections:
       figSos
   - type: tip
     content: output='sos'로 SOS 형식 계수를 얻고, sosfiltfilt로 필터링합니다. 수치적으로 훨씬 안정적이며, 특히 협대역 필터에서 중요합니다.
-
 - id: result
   title: 필터 선택 가이드
+  structuredPrimary: true
   subtitle: 상황별 권장
+  goal: '필터 선택 가이드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '필터 선택 가이드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다. 필터 차수는 4-6차가 일반적이며,
+    높은 차수는 SOS 형식을 사용하세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    guideDf = pd.DataFrame({
+        'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+        'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+        'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+        'btype': ['low', 'high', 'band', 'iirnotch']
+    })
+    guideDf
+  exercise:
+    prompt: '필터 선택 가이드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      guideDf = pd.DataFrame({
+          'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+          'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+          'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+          'btype': ['low', 'high', 'band', 'iirnotch']
+      })
+      guideDf
+    solution: |-
+      guideDf = pd.DataFrame({
+          'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+          'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+          'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+          'btype': ['low', 'high', 'band', 'iirnotch']
+      })
+      guideDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다. 필터 차수는 4-6차가 일반적이며, 높은 차수는 SOS 형식을 사용하세요.
+    content: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다. 필터 차수는 4-6차가 일반적이며, 높은
+      차수는 SOS 형식을 사용하세요.
   - type: code
     language: python
     title: 필터 가이드
@@ -361,15 +957,69 @@ sections:
           'btype': ['low', 'high', 'band', 'iirnotch']
       })
       guideDf
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 신호처리 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
+  tips:
+  - 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    fsEcg = 360
+    tEcg = np.linspace(0, 2, fsEcg * 2)
+    nyqEcg = fsEcg / 2
+
+    ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+    ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+    baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+    powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+    muscle = 0.1 * np.random.randn(len(tEcg))
+    ecgNoisy = ecgClean + baseline + powerline + muscle
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      fsEcg = 360
+      tEcg = np.linspace(0, 2, fsEcg * 2)
+      nyqEcg = fsEcg / 2
+
+      ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+      ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+      baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+      powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+      muscle = 0.1 * np.random.randn(len(tEcg))
+      ecgNoisy = ecgClean + baseline + powerline + muscle
+    solution: |-
+      fsEcg = 360
+      tEcg = np.linspace(0, 2, fsEcg * 2)
+      nyqEcg = fsEcg / 2
+
+      ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+      ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+      baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+      powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+      muscle = 0.1 * np.random.randn(len(tEcg))
+      ecgNoisy = ecgClean + baseline + powerline + muscle
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: tip
     content: 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
   - type: expansion
-    title: "미션1: ECG 신호 정제"
+    title: '미션1: ECG 신호 정제'
     blocks:
     - type: code
       language: python
@@ -417,7 +1067,7 @@ sections:
         plt.tight_layout()
         figEcg
   - type: expansion
-    title: "미션2: 가속도계 스무딩"
+    title: '미션2: 가속도계 스무딩'
     blocks:
     - type: code
       language: python
@@ -450,13 +1100,84 @@ sections:
         axAcc.legend()
         axAcc.grid(True, alpha=0.3)
         figAcc
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+    합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다."
+    content: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+      합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   - type: code
     language: python
     title: 지연시간 샘플과 입력 검증
@@ -528,7 +1249,7 @@ sections:
       assert all(latencyChecks.values()), latencyChecks
       latencyChecks
   - type: expansion
-    title: "실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?"
+    title: '실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?'
     blocks:
     - type: code
       language: python

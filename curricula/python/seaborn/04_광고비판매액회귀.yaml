@@ -1,32 +1,77 @@
 meta:
   packages:
-    - matplotlib
-    - pandas
-    - seaborn
+  - matplotlib
+  - pandas
+  - seaborn
   id: seaborn_04
   title: 광고비판매액회귀
   order: 4
   category: seaborn
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["seaborn", "regplot", "회귀", "scatter", "ci", "advertising"]
+  tags:
+  - seaborn
+  - regplot
+  - 회귀
+  - scatter
+  - ci
+  - advertising
   seo:
-    title: "Seaborn 회귀 시각화 - 광고비와 판매액 관계 분석"
-    description: "Seaborn regplot으로 광고비와 판매액의 회귀 관계를 시각화합니다. 신뢰구간과 다양한 회귀 옵션을 배웁니다."
-    keywords: ["seaborn", "regplot", "회귀", "신뢰구간", "advertising"]
-
+    title: Seaborn 회귀 시각화 - 광고비와 판매액 관계 분석
+    description: Seaborn regplot으로 광고비와 판매액의 회귀 관계를 시각화합니다. 신뢰구간과 다양한 회귀 옵션을 배웁니다.
+    keywords:
+    - seaborn
+    - regplot
+    - 회귀
+    - 신뢰구간
+    - advertising
 intro:
-  emoji: "📺"
+  emoji: 📺
   goal: 광고비와 판매액의 관계를 회귀선으로 시각화합니다.
   description: regplot으로 산점도와 회귀선을 함께 그리고, 신뢰구간으로 불확실성을 표현합니다. 이전에 배운 scatterplot, histplot, boxplot 개념을 함께 활용합니다.
-
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: seaborn, matplotlib, pandas를 불러옵니다. 광고비 데이터는 TV, Radio, Newspaper 세 매체의 광고비와 판매액의 관계를 담고 있습니다. 마케팅 분석에서 자주
+    사용되는 클래식한 데이터셋입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+    import pandas as pd
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+      import pandas as pd
+    solution: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+      import pandas as pd
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: seaborn, matplotlib, pandas를 불러옵니다. 광고비 데이터는 TV, Radio, Newspaper 세 매체의 광고비와 판매액의 관계를 담고 있습니다. 마케팅 분석에서 자주 사용되는 클래식한 데이터셋입니다.
+    content: seaborn, matplotlib, pandas를 불러옵니다. 광고비 데이터는 TV, Radio, Newspaper 세 매체의 광고비와 판매액의 관계를 담고 있습니다. 마케팅 분석에서 자주 사용되는
+      클래식한 데이터셋입니다.
   - type: code
     language: python
     title: 라이브러리 불러오기
@@ -36,13 +81,48 @@ sections:
       from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       import pandas as pd
-
 - id: step2_data
   title: 2단계. 데이터 로드
+  structuredPrimary: true
   subtitle: advertising 데이터셋
+  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 광고비 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. TV, Radio, Newspaper 광고비(천 달러)와 Sales(판매량, 천 단위)를 비교해 어떤 매체가 판매에 가장 효과적인지
+    분석할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    adData = loadLocalDataset("advertising")
+    adData.head()
+  exercise:
+    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      adData = loadLocalDataset("advertising")
+      adData.head()
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      adData = loadLocalDataset("advertising")
+      adData.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 광고비 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. TV, Radio, Newspaper 광고비(천 달러)와 Sales(판매량, 천 단위)를 비교해 어떤 매체가 판매에 가장 효과적인지 분석할 수 있습니다.
+    content: 광고비 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. TV, Radio, Newspaper 광고비(천 달러)와 Sales(판매량, 천 단위)를 비교해 어떤 매체가 판매에 가장 효과적인지 분석할
+      수 있습니다.
   - type: code
     language: python
     title: 광고비 데이터 로드
@@ -52,10 +132,49 @@ sections:
 
       adData = loadLocalDataset("advertising")
       adData.head()
-
 - id: step3_scatter
   title: 3단계. 산점도 확인
+  structuredPrimary: true
   subtitle: scatterplot으로 탐색
+  goal: '3단계. 산점도 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 산점도 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 먼저 scatterplot으로 TV 광고비와 판매액의 관계를 확인합니다. 이전 프로젝트에서 배운 scatterplot을 복습합니다. 두 변수 사이에 양의 상관관계가 있는지, 이상치가 있는지 파악합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.scatterplot(data=adData, x='TV', y='Sales', alpha=0.7, ax=ax)
+    ax.set_title('TV Advertising vs Sales')
+    ax.set_xlabel('TV Advertising ($1000)')
+    ax.set_ylabel('Sales (1000 units)')
+    fig
+  exercise:
+    prompt: '3단계. 산점도 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=adData, x='TV', y='Sales', alpha=0.7, ax=ax)
+      ax.set_title('TV Advertising vs Sales')
+      ax.set_xlabel('TV Advertising ($1000)')
+      ax.set_ylabel('Sales (1000 units)')
+      fig
+    solution: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=adData, x='TV', y='Sales', alpha=0.7, ax=ax)
+      ax.set_title('TV Advertising vs Sales')
+      ax.set_xlabel('TV Advertising ($1000)')
+      ax.set_ylabel('Sales (1000 units)')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 먼저 scatterplot으로 TV 광고비와 판매액의 관계를 확인합니다. 이전 프로젝트에서 배운 scatterplot을 복습합니다. 두 변수 사이에 양의 상관관계가 있는지, 이상치가 있는지 파악합니다.
@@ -70,10 +189,52 @@ sections:
       ax.set_xlabel('TV Advertising ($1000)')
       ax.set_ylabel('Sales (1000 units)')
       fig
-
 - id: step4_basic_reg
   title: 4단계. 기본 회귀선
+  structuredPrimary: true
   subtitle: regplot()
+  goal: '4단계. 기본 회귀선: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 기본 회귀선: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    regplot()은 산점도와 회귀선을 함께 그립니다. 기본적으로 선형 회귀(1차 함수)를 적용하고, 95% 신뢰구간을 음영으로 표시합니다. 회귀선의 기울기로 두 변수의 관계 강도를 파악할 수 있습니다.
+
+    sns.regplot(data, x, y)는 산점도 + 회귀선 + 95% 신뢰구간을 그립니다. 회귀선은 최소제곱법(OLS)으로 피팅됩니다. 음영 영역은 회귀선 추정의 불확실성을 나타냅니다.
+  tips:
+  - sns.regplot(data, x, y)는 산점도 + 회귀선 + 95% 신뢰구간을 그립니다. 회귀선은 최소제곱법(OLS)으로 피팅됩니다. 음영 영역은 회귀선 추정의 불확실성을 나타냅니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figReg, axReg = plt.subplots(figsize=(8, 6))
+    sns.regplot(data=adData, x='TV', y='Sales', ax=axReg)
+    axReg.set_title('TV Advertising vs Sales (Regression)')
+    axReg.set_xlabel('TV Advertising ($1000)')
+    axReg.set_ylabel('Sales (1000 units)')
+    figReg
+  exercise:
+    prompt: '4단계. 기본 회귀선: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figReg, axReg = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales', ax=axReg)
+      axReg.set_title('TV Advertising vs Sales (Regression)')
+      axReg.set_xlabel('TV Advertising ($1000)')
+      axReg.set_ylabel('Sales (1000 units)')
+      figReg
+    solution: |-
+      figReg, axReg = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales', ax=axReg)
+      axReg.set_title('TV Advertising vs Sales (Regression)')
+      axReg.set_xlabel('TV Advertising ($1000)')
+      axReg.set_ylabel('Sales (1000 units)')
+      figReg
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: regplot()은 산점도와 회귀선을 함께 그립니다. 기본적으로 선형 회귀(1차 함수)를 적용하고, 95% 신뢰구간을 음영으로 표시합니다. 회귀선의 기울기로 두 변수의 관계 강도를 파악할 수 있습니다.
@@ -90,13 +251,68 @@ sections:
       figReg
   - type: tip
     content: sns.regplot(data, x, y)는 산점도 + 회귀선 + 95% 신뢰구간을 그립니다. 회귀선은 최소제곱법(OLS)으로 피팅됩니다. 음영 영역은 회귀선 추정의 불확실성을 나타냅니다.
-
 - id: step5_ci
   title: 5단계. 신뢰구간 조절
+  structuredPrimary: true
   subtitle: ci 파라미터
+  goal: '5단계. 신뢰구간 조절: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 신뢰구간 조절: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    ci 파라미터로 신뢰구간의 수준을 변경할 수 있습니다. 기본값은 95%이며, 99%, 68% 등으로 조절하거나 ci=None으로 음영을 제거할 수 있습니다. 신뢰구간이 넓을수록 추정의 불확실성이 큽니다.
+
+    ci=95(기본), ci=99, ci=68 등으로 신뢰구간을 설정합니다. ci=None으로 음영을 제거합니다. 신뢰구간은 부트스트랩 방법으로 계산됩니다.
+  tips:
+  - ci=95(기본), ci=99, ci=68 등으로 신뢰구간을 설정합니다. ci=None으로 음영을 제거합니다. 신뢰구간은 부트스트랩 방법으로 계산됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figCi, (axCi99, axCiNone) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.regplot(data=adData, x='TV', y='Sales', ci=99, ax=axCi99)
+    axCi99.set_title('99% Confidence Interval')
+
+    sns.regplot(data=adData, x='TV', y='Sales', ci=None, ax=axCiNone)
+    axCiNone.set_title('No Confidence Interval')
+
+    plt.tight_layout()
+    figCi
+  exercise:
+    prompt: '5단계. 신뢰구간 조절: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figCi, (axCi99, axCiNone) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', ci=99, ax=axCi99)
+      axCi99.set_title('99% Confidence Interval')
+
+      sns.regplot(data=adData, x='TV', y='Sales', ci=None, ax=axCiNone)
+      axCiNone.set_title('No Confidence Interval')
+
+      plt.tight_layout()
+      figCi
+    solution: |-
+      figCi, (axCi99, axCiNone) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', ci=99, ax=axCi99)
+      axCi99.set_title('99% Confidence Interval')
+
+      sns.regplot(data=adData, x='TV', y='Sales', ci=None, ax=axCiNone)
+      axCiNone.set_title('No Confidence Interval')
+
+      plt.tight_layout()
+      figCi
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: ci 파라미터로 신뢰구간의 수준을 변경할 수 있습니다. 기본값은 95%이며, 99%, 68% 등으로 조절하거나 ci=None으로 음영을 제거할 수 있습니다. 신뢰구간이 넓을수록 추정의 불확실성이 큽니다.
+    content: ci 파라미터로 신뢰구간의 수준을 변경할 수 있습니다. 기본값은 95%이며, 99%, 68% 등으로 조절하거나 ci=None으로 음영을 제거할 수 있습니다. 신뢰구간이 넓을수록 추정의 불확실성이
+      큽니다.
   - type: code
     language: python
     title: 신뢰구간 비교
@@ -114,10 +330,62 @@ sections:
       figCi
   - type: tip
     content: ci=95(기본), ci=99, ci=68 등으로 신뢰구간을 설정합니다. ci=None으로 음영을 제거합니다. 신뢰구간은 부트스트랩 방법으로 계산됩니다.
-
 - id: step6_scatter_style
   title: 6단계. 산점도 스타일
+  structuredPrimary: true
   subtitle: scatter_kws
+  goal: '6단계. 산점도 스타일: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 산점도 스타일: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    scatter_kws 딕셔너리로 산점도 점의 스타일을 조절합니다. color, alpha, s(크기), edgecolor 등을 지정할 수 있습니다. line_kws로 회귀선 스타일도 변경할 수 있습니다.
+
+    scatter_kws={'alpha': 0.5, 's': 30}로 점 스타일을, line_kws={'color': 'red', 'lw': 2}로 선 스타일을 지정합니다. kws는 keyword arguments의 약자입니다.
+  tips:
+  - 'scatter_kws={''alpha'': 0.5, ''s'': 30}로 점 스타일을, line_kws={''color'': ''red'', ''lw'': 2}로 선 스타일을 지정합니다. kws는 keyword
+    arguments의 약자입니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figStyled, axStyled = plt.subplots(figsize=(8, 6))
+    sns.regplot(data=adData, x='TV', y='Sales',
+               scatter_kws={'color': '#3498DB', 'alpha': 0.6, 's': 50, 'edgecolor': 'white'},
+               line_kws={'color': '#E74C3C', 'linewidth': 2},
+               ax=axStyled)
+    axStyled.set_title('Styled Regression Plot')
+    axStyled.set_xlabel('TV Advertising ($1000)')
+    axStyled.set_ylabel('Sales (1000 units)')
+    figStyled
+  exercise:
+    prompt: '6단계. 산점도 스타일: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figStyled, axStyled = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales',
+                 scatter_kws={'color': '#3498DB', 'alpha': 0.6, 's': 50, 'edgecolor': 'white'},
+                 line_kws={'color': '#E74C3C', 'linewidth': 2},
+                 ax=axStyled)
+      axStyled.set_title('Styled Regression Plot')
+      axStyled.set_xlabel('TV Advertising ($1000)')
+      axStyled.set_ylabel('Sales (1000 units)')
+      figStyled
+    solution: |-
+      figStyled, axStyled = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales',
+                 scatter_kws={'color': '#3498DB', 'alpha': 0.6, 's': 50, 'edgecolor': 'white'},
+                 line_kws={'color': '#E74C3C', 'linewidth': 2},
+                 ax=axStyled)
+      axStyled.set_title('Styled Regression Plot')
+      axStyled.set_xlabel('TV Advertising ($1000)')
+      axStyled.set_ylabel('Sales (1000 units)')
+      figStyled
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: scatter_kws 딕셔너리로 산점도 점의 스타일을 조절합니다. color, alpha, s(크기), edgecolor 등을 지정할 수 있습니다. line_kws로 회귀선 스타일도 변경할 수 있습니다.
@@ -136,14 +404,77 @@ sections:
       axStyled.set_ylabel('Sales (1000 units)')
       figStyled
   - type: tip
-    content: "scatter_kws={'alpha': 0.5, 's': 30}로 점 스타일을, line_kws={'color': 'red', 'lw': 2}로 선 스타일을 지정합니다. kws는 keyword arguments의 약자입니다."
-
+    content: 'scatter_kws={''alpha'': 0.5, ''s'': 30}로 점 스타일을, line_kws={''color'': ''red'', ''lw'': 2}로 선 스타일을 지정합니다. kws는
+      keyword arguments의 약자입니다.'
 - id: step7_compare_media
   title: 7단계. 매체별 비교
+  structuredPrimary: true
   subtitle: 세 매체 회귀선
+  goal: '7단계. 매체별 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 매체별 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: TV, Radio, Newspaper 세 매체의 광고비-판매액 관계를 비교합니다. 회귀선의 기울기와 신뢰구간을 비교하면 어떤 매체가 판매에 더 효과적인지 파악할 수 있습니다. R² 값이 높을수록
+    설명력이 좋습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figMedia, (axTv, axRadio, axNews) = plt.subplots(1, 3, figsize=(15, 5))
+
+    sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C', ax=axTv)
+    axTv.set_title('TV vs Sales')
+
+    sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60', ax=axRadio)
+    axRadio.set_title('Radio vs Sales')
+
+    sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB', ax=axNews)
+    axNews.set_title('Newspaper vs Sales')
+
+    plt.tight_layout()
+    figMedia
+  exercise:
+    prompt: '7단계. 매체별 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figMedia, (axTv, axRadio, axNews) = plt.subplots(1, 3, figsize=(15, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C', ax=axTv)
+      axTv.set_title('TV vs Sales')
+
+      sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60', ax=axRadio)
+      axRadio.set_title('Radio vs Sales')
+
+      sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB', ax=axNews)
+      axNews.set_title('Newspaper vs Sales')
+
+      plt.tight_layout()
+      figMedia
+    solution: |-
+      figMedia, (axTv, axRadio, axNews) = plt.subplots(1, 3, figsize=(15, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C', ax=axTv)
+      axTv.set_title('TV vs Sales')
+
+      sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60', ax=axRadio)
+      axRadio.set_title('Radio vs Sales')
+
+      sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB', ax=axNews)
+      axNews.set_title('Newspaper vs Sales')
+
+      plt.tight_layout()
+      figMedia
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: TV, Radio, Newspaper 세 매체의 광고비-판매액 관계를 비교합니다. 회귀선의 기울기와 신뢰구간을 비교하면 어떤 매체가 판매에 더 효과적인지 파악할 수 있습니다. R² 값이 높을수록 설명력이 좋습니다.
+    content: TV, Radio, Newspaper 세 매체의 광고비-판매액 관계를 비교합니다. 회귀선의 기울기와 신뢰구간을 비교하면 어떤 매체가 판매에 더 효과적인지 파악할 수 있습니다. R² 값이 높을수록
+      설명력이 좋습니다.
   - type: code
     language: python
     title: 세 매체 비교
@@ -162,13 +493,51 @@ sections:
 
       plt.tight_layout()
       figMedia
-
 - id: step8_residuals
   title: 8단계. 잔차 분석
+  structuredPrimary: true
   subtitle: fit_reg=False
+  goal: '8단계. 잔차 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 잔차 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 회귀 분석에서 잔차(residual)는 실제값과 예측값의 차이입니다. 잔차가 무작위로 분포하면 선형 회귀가 적합하고, 패턴이 있으면 비선형 관계가 있을 수 있습니다. fit_reg=False로
+    회귀선 없이 산점도만 그릴 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figScatter, axScatter = plt.subplots(figsize=(8, 6))
+    sns.regplot(data=adData, x='TV', y='Sales', fit_reg=False,
+               scatter_kws={'alpha': 0.6}, ax=axScatter)
+    axScatter.set_title('TV vs Sales (Scatter Only)')
+    figScatter
+  exercise:
+    prompt: '8단계. 잔차 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figScatter, axScatter = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales', fit_reg=False,
+                 scatter_kws={'alpha': 0.6}, ax=axScatter)
+      axScatter.set_title('TV vs Sales (Scatter Only)')
+      figScatter
+    solution: |-
+      figScatter, axScatter = plt.subplots(figsize=(8, 6))
+      sns.regplot(data=adData, x='TV', y='Sales', fit_reg=False,
+                 scatter_kws={'alpha': 0.6}, ax=axScatter)
+      axScatter.set_title('TV vs Sales (Scatter Only)')
+      figScatter
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 회귀 분석에서 잔차(residual)는 실제값과 예측값의 차이입니다. 잔차가 무작위로 분포하면 선형 회귀가 적합하고, 패턴이 있으면 비선형 관계가 있을 수 있습니다. fit_reg=False로 회귀선 없이 산점도만 그릴 수 있습니다.
+    content: 회귀 분석에서 잔차(residual)는 실제값과 예측값의 차이입니다. 잔차가 무작위로 분포하면 선형 회귀가 적합하고, 패턴이 있으면 비선형 관계가 있을 수 있습니다. fit_reg=False로 회귀선
+      없이 산점도만 그릴 수 있습니다.
   - type: code
     language: python
     title: 산점도만 표시
@@ -179,10 +548,61 @@ sections:
                  scatter_kws={'alpha': 0.6}, ax=axScatter)
       axScatter.set_title('TV vs Sales (Scatter Only)')
       figScatter
-
 - id: step9_histogram
   title: 9단계. 분포와 함께 분석
+  structuredPrimary: true
   subtitle: 이전 개념 복습
+  goal: '9단계. 분포와 함께 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 분포와 함께 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 회귀 분석과 함께 각 변수의 분포도 확인하면 데이터를 더 잘 이해할 수 있습니다. 이전에 배운 histplot으로 판매액 분포를, boxplot으로 매체별 광고비 분포를 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figDist, (axDistReg, axDistHist) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.regplot(data=adData, x='TV', y='Sales', ax=axDistReg)
+    axDistReg.set_title('TV vs Sales')
+
+    sns.histplot(data=adData, x='Sales', kde=True, color='#27AE60', ax=axDistHist)
+    axDistHist.set_title('Sales Distribution')
+
+    plt.tight_layout()
+    figDist
+  exercise:
+    prompt: '9단계. 분포와 함께 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figDist, (axDistReg, axDistHist) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', ax=axDistReg)
+      axDistReg.set_title('TV vs Sales')
+
+      sns.histplot(data=adData, x='Sales', kde=True, color='#27AE60', ax=axDistHist)
+      axDistHist.set_title('Sales Distribution')
+
+      plt.tight_layout()
+      figDist
+    solution: |-
+      figDist, (axDistReg, axDistHist) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.regplot(data=adData, x='TV', y='Sales', ax=axDistReg)
+      axDistReg.set_title('TV vs Sales')
+
+      sns.histplot(data=adData, x='Sales', kde=True, color='#27AE60', ax=axDistHist)
+      axDistHist.set_title('Sales Distribution')
+
+      plt.tight_layout()
+      figDist
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 회귀 분석과 함께 각 변수의 분포도 확인하면 데이터를 더 잘 이해할 수 있습니다. 이전에 배운 histplot으로 판매액 분포를, boxplot으로 매체별 광고비 분포를 확인합니다.
@@ -201,10 +621,94 @@ sections:
 
       plt.tight_layout()
       figDist
-
 - id: step10_final
   title: 10단계. 최종 분석 대시보드
+  structuredPrimary: true
   subtitle: 종합 시각화
+  goal: '10단계. 최종 분석 대시보드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 최종 분석 대시보드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 모든 요소를 종합하여 광고비-판매액 분석 대시보드를 완성합니다. 세 매체의 회귀선과 판매액 분포를 한눈에 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+    sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C',
+               scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 0])
+    axesFinal[0, 0].set_title('TV Advertising Effect')
+
+    sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60',
+               scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 1])
+    axesFinal[0, 1].set_title('Radio Advertising Effect')
+
+    sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB',
+               scatter_kws={'alpha': 0.6}, ax=axesFinal[1, 0])
+    axesFinal[1, 0].set_title('Newspaper Advertising Effect')
+
+    adMelted = adData.melt(id_vars=['Sales'], value_vars=['TV', 'Radio', 'Newspaper'],
+                          var_name='Media', value_name='Spending')
+    sns.boxplot(data=adMelted, x='Media', y='Spending', hue='Media', palette='Set2', legend=False, ax=axesFinal[1, 1])
+    axesFinal[1, 1].set_title('Advertising Spending by Media')
+
+    plt.tight_layout()
+    figFinal
+  exercise:
+    prompt: '10단계. 최종 분석 대시보드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('TV Advertising Effect')
+
+      sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Radio Advertising Effect')
+
+      sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Newspaper Advertising Effect')
+
+      adMelted = adData.melt(id_vars=['Sales'], value_vars=['TV', 'Radio', 'Newspaper'],
+                            var_name='Media', value_name='Spending')
+      sns.boxplot(data=adMelted, x='Media', y='Spending', hue='Media', palette='Set2', legend=False, ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Advertising Spending by Media')
+
+      plt.tight_layout()
+      figFinal
+    solution: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.regplot(data=adData, x='TV', y='Sales', color='#E74C3C',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('TV Advertising Effect')
+
+      sns.regplot(data=adData, x='Radio', y='Sales', color='#27AE60',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Radio Advertising Effect')
+
+      sns.regplot(data=adData, x='Newspaper', y='Sales', color='#3498DB',
+                 scatter_kws={'alpha': 0.6}, ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Newspaper Advertising Effect')
+
+      adMelted = adData.melt(id_vars=['Sales'], value_vars=['TV', 'Radio', 'Newspaper'],
+                            var_name='Media', value_name='Spending')
+      sns.boxplot(data=adMelted, x='Media', y='Spending', hue='Media', palette='Set2', legend=False, ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Advertising Spending by Media')
+
+      plt.tight_layout()
+      figFinal
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 모든 요소를 종합하여 광고비-판매액 분석 대시보드를 완성합니다. 세 매체의 회귀선과 판매액 분포를 한눈에 비교합니다.
@@ -234,20 +738,59 @@ sections:
 
       plt.tight_layout()
       figFinal
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 회귀 분석 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 regplot, ci, scatter_kws, line_kws를 활용해서 다양한 회귀 시각화를 만들어봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    data = loadLocalDataset('tips')
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    solution: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 regplot, ci, scatter_kws, line_kws를 활용해서 다양한 회귀 시각화를 만들어봅시다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: tips 데이터 결제금액-팁 회귀"
+    title: '미션1: tips 데이터 결제금액-팁 회귀'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import seaborn as sns
         from codaro.curriculum.localData import loadLocalDataset
@@ -255,7 +798,7 @@ sections:
 
         data = loadLocalDataset('tips')
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         chart, (plot1, plot2) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -273,10 +816,10 @@ sections:
         plt.tight_layout()
         chart
   - type: expansion
-    title: "미션2: 펭귄 날개-체중 회귀 종별 비교"
+    title: '미션2: 펭귄 날개-체중 회귀 종별 비교'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import seaborn as sns
         from codaro.curriculum.localData import loadLocalDataset
@@ -288,7 +831,7 @@ sections:
 
         tones = {'Adelie': '#E74C3C', 'Chinstrap': '#27AE60', 'Gentoo': '#3498DB'}
     - type: code
-      title: "종별 회귀선"
+      title: 종별 회귀선
       content: |-
         for panel, species in zip([panels[0, 0], panels[0, 1], panels[1, 0]], tones.keys()):
             subset = df[df['species'] == species]
@@ -298,7 +841,7 @@ sections:
             panel.set_xlabel('Flipper Length (mm)')
             panel.set_ylabel('Body Mass (g)')
     - type: code
-      title: "전체 산점도"
+      title: 전체 산점도
       content: |-
         sns.scatterplot(data=df, x='flipper_length_mm', y='body_mass_g',
                        hue='species', palette=tones, alpha=0.7, ax=panels[1, 1])
@@ -306,7 +849,6 @@ sections:
 
         plt.tight_layout()
         canvas
-
 - id: summary
   title: 정리
   blocks:
@@ -314,22 +856,81 @@ sections:
     content: Seaborn regplot으로 광고비와 판매액의 회귀 관계를 시각화했습니다.
   - type: list
     items:
-    - "sns.regplot() - 산점도 + 회귀선 + 신뢰구간"
-    - "ci=95/99/None - 신뢰구간 수준 조절"
-    - "scatter_kws - 점 스타일 딕셔너리"
-    - "line_kws - 선 스타일 딕셔너리"
-    - "fit_reg=False - 회귀선 없이 산점도만"
-    - "회귀선 기울기로 관계 강도 파악"
+    - sns.regplot() - 산점도 + 회귀선 + 신뢰구간
+    - ci=95/99/None - 신뢰구간 수준 조절
+    - scatter_kws - 점 스타일 딕셔너리
+    - line_kws - 선 스타일 딕셔너리
+    - fit_reg=False - 회귀선 없이 산점도만
+    - 회귀선 기울기로 관계 강도 파악
   - type: text
     content: 다음 시간에는 barplot과 catplot으로 타이타닉 생존 분석을 합니다.
-
 - id: workflow_validation
   title: 11단계. 광고 회귀 차트 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: '11단계. 광고 회귀 차트 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 광고 회귀 차트 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    회귀선은 그럴듯해 보이기 쉽습니다. 광고비와 매출의 관계를 먼저 수치로 확인하고, 차트가 회귀선과 축 라벨을 제대로 담았는지 검증합니다.
+
+    회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요.
+  tips:
+  - 회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    adFlow = loadLocalDataset("advertising")
+    requiredColumns = {"TV", "Radio", "Newspaper", "Sales"}
+    missingColumns = requiredColumns - set(adFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert adFlow[list(requiredColumns)].ge(0).all().all()
+
+    salesCorrelation = adFlow.corr(numeric_only=True)["Sales"].drop("Sales").sort_values(ascending=False)
+    assert salesCorrelation.index[0] == "TV"
+    salesCorrelation.round(3)
+  exercise:
+    prompt: '11단계. 광고 회귀 차트 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      adFlow = loadLocalDataset("advertising")
+      requiredColumns = {"TV", "Radio", "Newspaper", "Sales"}
+      missingColumns = requiredColumns - set(adFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert adFlow[list(requiredColumns)].ge(0).all().all()
+
+      salesCorrelation = adFlow.corr(numeric_only=True)["Sales"].drop("Sales").sort_values(ascending=False)
+      assert salesCorrelation.index[0] == "TV"
+      salesCorrelation.round(3)
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      adFlow = loadLocalDataset("advertising")
+      requiredColumns = {"TV", "Radio", "Newspaper", "Sales"}
+      missingColumns = requiredColumns - set(adFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert adFlow[list(requiredColumns)].ge(0).all().all()
+
+      salesCorrelation = adFlow.corr(numeric_only=True)["Sales"].drop("Sales").sort_values(ascending=False)
+      assert salesCorrelation.index[0] == "TV"
+      salesCorrelation.round(3)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      회귀선은 그럴듯해 보이기 쉽습니다. 광고비와 매출의 관계를 먼저 수치로 확인하고, 차트가 회귀선과 축 라벨을 제대로 담았는지 검증합니다.
+    content: 회귀선은 그럴듯해 보이기 쉽습니다. 광고비와 매출의 관계를 먼저 수치로 확인하고, 차트가 회귀선과 축 라벨을 제대로 담았는지 검증합니다.
   - type: code
     language: python
     title: 데이터 계약과 관계 예측
@@ -401,4 +1002,4 @@ sections:
       assert channelSummary[-1]["channel"] == "Newspaper"
       channelSummary
   - type: tip
-    content: "회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요."
+    content: 회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요.

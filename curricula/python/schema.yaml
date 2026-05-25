@@ -9,9 +9,25 @@
 #   title: "변수와 내장함수"         # lesson title
 #   day: 2                         # optional day number
 #   category: "30days"             # folder/category key
+#   packages: ["pandas"]           # lesson-local runtime packages; prepared lazily with uv
 #   source: "30-Days-Of-Python"    # optional source
 #   sourceUrl: "https://..."       # optional source URL
 #   tags: ["변수", "함수", "기초"]   # search tags
+
+# ============================================
+# Intro Contract
+# ============================================
+# intro:
+#   direction: "이 레슨에서 만드는 능력"
+#   benefits:
+#     - "과정 후 할 수 있는 일"
+#   diagram:
+#     steps:
+#       - label: "목표"
+#         detail: "무슨 공부"
+#     runtime:
+#       - label: "환경"
+#         detail: "uv로 필요한 패키지만 준비"
 
 # ============================================
 # Sections
@@ -19,7 +35,29 @@
 # sections:
 #   - id: "section_id"
 #     title: "섹션 제목"
+#     structuredPrimary: true        # structured fields가 이 섹션의 1차 학습 계약일 때
 #     subtitle: "부제목"            # optional
+#     goal: "이 섹션을 끝내면 할 수 있는 일"
+#     why: "실무/학습에서 중요한 이유"
+#     explanation: "3문장 이내 핵심 설명"
+#     tips:
+#       - "막힐 때 확인할 기준"
+#     snippet: |
+#       print("read-only example")
+#     exercise:
+#       prompt: "학습자가 직접 할 일"
+#       starterCode: |
+#         result = ___
+#       solution: |
+#         result = "answer"
+#       hints:
+#         - "개념 힌트"
+#       check:
+#         noError: "실행 오류가 없어야 한다."
+#     check:
+#       noError: "실행 오류가 없어야 한다."
+#     # blocks는 structured card 뒤에 붙는 보조 자료 또는 legacy curriculum 변환용이다.
+#     # 신규 레슨은 위 structured section fields를 우선하고, 표/영상/참고 링크만 blocks로 보조한다.
 #     blocks:
 #       - type: "text"
 #         content: "..."

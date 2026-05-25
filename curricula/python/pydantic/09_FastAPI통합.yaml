@@ -1,36 +1,67 @@
 meta:
   packages:
-    - pydantic
+  - pydantic
   id: pydantic_09
   title: FastAPI통합
   order: 9
   category: pydantic
-  difficulty: "⭐⭐⭐⭐"
+  difficulty: ⭐⭐⭐⭐
   badge: 고급
-  tags: ["pydantic", "FastAPI", "API", "웹개발", "스키마"]
+  tags:
+  - pydantic
+  - FastAPI
+  - API
+  - 웹개발
+  - 스키마
   seo:
-    title: "Pydantic과 FastAPI - 웹 API 개발"
-    description: "Pydantic 모델을 FastAPI와 통합합니다. 요청/응답 스키마, 자동 문서화, 검증을 배웁니다."
-    keywords: ["pydantic", "FastAPI", "API", "웹개발"]
-
+    title: Pydantic과 FastAPI - 웹 API 개발
+    description: Pydantic 모델을 FastAPI와 통합합니다. 요청/응답 스키마, 자동 문서화, 검증을 배웁니다.
+    keywords:
+    - pydantic
+    - FastAPI
+    - API
+    - 웹개발
 intro:
-  emoji: "⚡"
+  emoji: ⚡
   goal: Pydantic 모델로 완전한 REST API 모델 세트를 설계합니다.
-  description: "FastAPI는 Pydantic을 핵심 검증 엔진으로 사용하는 현대적인 웹 프레임워크입니다. 요청 본문, 응답 스키마, 쿼리 파라미터를 모두 Pydantic 모델로 정의하면 자동 검증, 타입 변환, API 문서화까지 한번에 해결됩니다. 이 프로젝트에서는 실제 API에서 사용하는 CRUD 모델 패턴을 설계합니다."
-
+  description: FastAPI는 Pydantic을 핵심 검증 엔진으로 사용하는 현대적인 웹 프레임워크입니다. 요청 본문, 응답 스키마, 쿼리 파라미터를 모두 Pydantic 모델로 정의하면 자동 검증, 타입
+    변환, API 문서화까지 한번에 해결됩니다. 이 프로젝트에서는 실제 API에서 사용하는 CRUD 모델 패턴을 설계합니다.
 sections:
 - id: load
   title: 라이브러리 로드
+  structuredPrimary: true
   subtitle: Pydantic 설치 및 import
+  goal: '라이브러리 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '라이브러리 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로
+    정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import pydantic
+  exercise:
+    prompt: '라이브러리 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import pydantic
+    solution: import pydantic
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다."
+    content: FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로
+      정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다.
   - type: code
     language: python
     title: 패키지 설치
     description: pip으로 pydantic 설치
-    content: |-
-      import pydantic
+    content: import pydantic
   - type: code
     language: python
     title: 핵심 모듈 import
@@ -40,13 +71,80 @@ sections:
       from typing import Optional, Generic, TypeVar, Literal
       from datetime import datetime
       from enum import Enum
-
 - id: request
   title: 요청 모델
+  structuredPrimary: true
   subtitle: Request Body
+  goal: '요청 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '요청 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다. 모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다.
+
+    요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다.
+  tips:
+  - 요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class CreateUserRequest(BaseModel):
+        username: str = Field(min_length=3, max_length=50, description="사용자명")
+        email: str = Field(description="이메일 주소")
+        password: str = Field(min_length=8, description="비밀번호")
+        fullName: Optional[str] = Field(default=None, description="전체 이름")
+
+    requestData = {
+        "username": "alice",
+        "email": "alice@example.com",
+        "password": "secure123",
+        "fullName": "Alice Smith"
+    }
+    createReq = CreateUserRequest.model_validate(requestData)
+    createReq
+  exercise:
+    prompt: '요청 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class CreateUserRequest(BaseModel):
+          username: str = Field(min_length=3, max_length=50, description="사용자명")
+          email: str = Field(description="이메일 주소")
+          password: str = Field(min_length=8, description="비밀번호")
+          fullName: Optional[str] = Field(default=None, description="전체 이름")
+
+      requestData = {
+          "username": "alice",
+          "email": "alice@example.com",
+          "password": "secure123",
+          "fullName": "Alice Smith"
+      }
+      createReq = CreateUserRequest.model_validate(requestData)
+      createReq
+    solution: |-
+      class CreateUserRequest(BaseModel):
+          username: str = Field(min_length=3, max_length=50, description="사용자명")
+          email: str = Field(description="이메일 주소")
+          password: str = Field(min_length=8, description="비밀번호")
+          fullName: Optional[str] = Field(default=None, description="전체 이름")
+
+      requestData = {
+          "username": "alice",
+          "email": "alice@example.com",
+          "password": "secure123",
+          "fullName": "Alice Smith"
+      }
+      createReq = CreateUserRequest.model_validate(requestData)
+      createReq
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다. 모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다."
+    content: 요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다.
+      모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다.
   - type: code
     language: python
     title: 사용자 생성 요청
@@ -67,20 +165,96 @@ sections:
       createReq = CreateUserRequest.model_validate(requestData)
       createReq
   - type: tip
-    content: "요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다."
+    content: 요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다.
   - type: code
     language: python
     title: 요청 직렬화
     description: 검증된 데이터
-    content: |-
-      createReq.model_dump()
-
+    content: createReq.model_dump()
 - id: response
   title: 응답 모델
+  structuredPrimary: true
   subtitle: Response Schema
+  goal: '응답 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '응답 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는 제외됩니다. FastAPI는 응답
+    모델에 맞게 자동으로 JSON 직렬화합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class UserResponse(BaseModel):
+        userId: str = Field(description="사용자 고유 ID")
+        username: str = Field(description="사용자명")
+        email: str = Field(description="이메일")
+        fullName: Optional[str] = Field(description="전체 이름")
+        createdAt: datetime = Field(description="생성 시각")
+        isActive: bool = Field(default=True, description="활성 상태")
+
+    responseData = {
+        "userId": "usr_123456",
+        "username": "alice",
+        "email": "alice@example.com",
+        "fullName": "Alice Smith",
+        "createdAt": "2024-03-15T10:30:00",
+        "isActive": True
+    }
+    userResp = UserResponse.model_validate(responseData)
+    userResp
+  exercise:
+    prompt: '응답 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class UserResponse(BaseModel):
+          userId: str = Field(description="사용자 고유 ID")
+          username: str = Field(description="사용자명")
+          email: str = Field(description="이메일")
+          fullName: Optional[str] = Field(description="전체 이름")
+          createdAt: datetime = Field(description="생성 시각")
+          isActive: bool = Field(default=True, description="활성 상태")
+
+      responseData = {
+          "userId": "usr_123456",
+          "username": "alice",
+          "email": "alice@example.com",
+          "fullName": "Alice Smith",
+          "createdAt": "2024-03-15T10:30:00",
+          "isActive": True
+      }
+      userResp = UserResponse.model_validate(responseData)
+      userResp
+    solution: |-
+      class UserResponse(BaseModel):
+          userId: str = Field(description="사용자 고유 ID")
+          username: str = Field(description="사용자명")
+          email: str = Field(description="이메일")
+          fullName: Optional[str] = Field(description="전체 이름")
+          createdAt: datetime = Field(description="생성 시각")
+          isActive: bool = Field(default=True, description="활성 상태")
+
+      responseData = {
+          "userId": "usr_123456",
+          "username": "alice",
+          "email": "alice@example.com",
+          "fullName": "Alice Smith",
+          "createdAt": "2024-03-15T10:30:00",
+          "isActive": True
+      }
+      userResp = UserResponse.model_validate(responseData)
+      userResp
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는 제외됩니다. FastAPI는 응답 모델에 맞게 자동으로 JSON 직렬화합니다."
+    content: 응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는 제외됩니다. FastAPI는 응답
+      모델에 맞게 자동으로 JSON 직렬화합니다.
   - type: code
     language: python
     title: 사용자 응답 모델
@@ -108,15 +282,97 @@ sections:
     language: python
     title: JSON 응답
     description: 직렬화
-    content: |-
-      userResp.model_dump_json(indent=2)
-
+    content: userResp.model_dump_json(indent=2)
 - id: crud
   title: CRUD 모델 세트
+  structuredPrimary: true
   subtitle: 생성/읽기/수정 분리
+  goal: 'CRUD 모델 세트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'CRUD 모델 세트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update 모델은 모든 필드를 Optional로
+    하여 부분 수정(PATCH)을 지원합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ProductBase(BaseModel):
+        name: str = Field(min_length=2, max_length=100)
+        description: Optional[str] = Field(default=None, max_length=1000)
+        price: float = Field(gt=0)
+        category: str
+
+    class ProductCreate(ProductBase):
+        sku: str = Field(description="상품 코드")
+
+    class ProductUpdate(BaseModel):
+        name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+        description: Optional[str] = Field(default=None, max_length=1000)
+        price: Optional[float] = Field(default=None, gt=0)
+        category: Optional[str] = None
+
+    class ProductResponse(ProductBase):
+        productId: str
+        sku: str
+        createdAt: datetime
+        updatedAt: Optional[datetime] = None
+  exercise:
+    prompt: 'CRUD 모델 세트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ProductBase(BaseModel):
+          name: str = Field(min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: float = Field(gt=0)
+          category: str
+
+      class ProductCreate(ProductBase):
+          sku: str = Field(description="상품 코드")
+
+      class ProductUpdate(BaseModel):
+          name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: Optional[float] = Field(default=None, gt=0)
+          category: Optional[str] = None
+
+      class ProductResponse(ProductBase):
+          productId: str
+          sku: str
+          createdAt: datetime
+          updatedAt: Optional[datetime] = None
+    solution: |-
+      class ProductBase(BaseModel):
+          name: str = Field(min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: float = Field(gt=0)
+          category: str
+
+      class ProductCreate(ProductBase):
+          sku: str = Field(description="상품 코드")
+
+      class ProductUpdate(BaseModel):
+          name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: Optional[float] = Field(default=None, gt=0)
+          category: Optional[str] = None
+
+      class ProductResponse(ProductBase):
+          productId: str
+          sku: str
+          createdAt: datetime
+          updatedAt: Optional[datetime] = None
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update 모델은 모든 필드를 Optional로 하여 부분 수정(PATCH)을 지원합니다."
+    content: 실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update 모델은 모든 필드를 Optional로
+      하여 부분 수정(PATCH)을 지원합니다.
   - type: code
     language: python
     title: 상품 CRUD 모델
@@ -157,13 +413,90 @@ sections:
 
       updateProduct = ProductUpdate(price=1400000)
       createProduct.model_dump(), updateProduct.model_dump(exclude_unset=True)
-
 - id: query
   title: 쿼리 파라미터
+  structuredPrimary: true
   subtitle: 검색과 필터링
+  goal: '쿼리 파라미터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '쿼리 파라미터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가 자동화됩니다. Literal로 정렬
+    옵션을 제한하면 API 문서에도 반영됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class SearchParams(BaseModel):
+        query: Optional[str] = Field(default=None, min_length=1, description="검색어")
+        category: Optional[str] = Field(default=None, description="카테고리 필터")
+        minPrice: Optional[float] = Field(default=None, ge=0, description="최소 가격")
+        maxPrice: Optional[float] = Field(default=None, ge=0, description="최대 가격")
+        sortBy: Literal["name", "price", "createdAt"] = Field(default="createdAt")
+        sortOrder: Literal["asc", "desc"] = Field(default="desc")
+        page: int = Field(default=1, ge=1)
+        pageSize: int = Field(default=20, ge=1, le=100)
+
+    searchParams = SearchParams(
+        query="laptop",
+        category="electronics",
+        minPrice=500000,
+        sortBy="price",
+        sortOrder="asc"
+    )
+    searchParams.model_dump()
+  exercise:
+    prompt: '쿼리 파라미터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class SearchParams(BaseModel):
+          query: Optional[str] = Field(default=None, min_length=1, description="검색어")
+          category: Optional[str] = Field(default=None, description="카테고리 필터")
+          minPrice: Optional[float] = Field(default=None, ge=0, description="최소 가격")
+          maxPrice: Optional[float] = Field(default=None, ge=0, description="최대 가격")
+          sortBy: Literal["name", "price", "createdAt"] = Field(default="createdAt")
+          sortOrder: Literal["asc", "desc"] = Field(default="desc")
+          page: int = Field(default=1, ge=1)
+          pageSize: int = Field(default=20, ge=1, le=100)
+
+      searchParams = SearchParams(
+          query="laptop",
+          category="electronics",
+          minPrice=500000,
+          sortBy="price",
+          sortOrder="asc"
+      )
+      searchParams.model_dump()
+    solution: |-
+      class SearchParams(BaseModel):
+          query: Optional[str] = Field(default=None, min_length=1, description="검색어")
+          category: Optional[str] = Field(default=None, description="카테고리 필터")
+          minPrice: Optional[float] = Field(default=None, ge=0, description="최소 가격")
+          maxPrice: Optional[float] = Field(default=None, ge=0, description="최대 가격")
+          sortBy: Literal["name", "price", "createdAt"] = Field(default="createdAt")
+          sortOrder: Literal["asc", "desc"] = Field(default="desc")
+          page: int = Field(default=1, ge=1)
+          pageSize: int = Field(default=20, ge=1, le=100)
+
+      searchParams = SearchParams(
+          query="laptop",
+          category="electronics",
+          minPrice=500000,
+          sortBy="price",
+          sortOrder="asc"
+      )
+      searchParams.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가 자동화됩니다. Literal로 정렬 옵션을 제한하면 API 문서에도 반영됩니다."
+    content: FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가 자동화됩니다. Literal로 정렬 옵션을
+      제한하면 API 문서에도 반영됩니다.
   - type: code
     language: python
     title: 검색 파라미터
@@ -187,13 +520,129 @@ sections:
           sortOrder="asc"
       )
       searchParams.model_dump()
-
 - id: pagination
   title: 페이지네이션 응답
+  structuredPrimary: true
   subtitle: 목록 래퍼
+  goal: '페이지네이션 응답: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '페이지네이션 응답: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들 수 있습니다. 전체 개수, 현재
+    페이지, 다음/이전 페이지 존재 여부 등을 포함합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    T = TypeVar('T')
+
+    class PaginatedResponse(BaseModel, Generic[T]):
+        items: list[T] = Field(description="데이터 목록")
+        total: int = Field(description="전체 개수")
+        page: int = Field(description="현재 페이지")
+        pageSize: int = Field(description="페이지 크기")
+        totalPages: int = Field(description="전체 페이지 수")
+        hasNext: bool = Field(description="다음 페이지 존재")
+        hasPrev: bool = Field(description="이전 페이지 존재")
+
+    class SimpleProduct(BaseModel):
+        productId: str
+        name: str
+        price: float
+
+    sampleProducts = [
+        SimpleProduct(productId="P1", name="Product A", price=100),
+        SimpleProduct(productId="P2", name="Product B", price=200)
+    ]
+
+    paginatedResp = PaginatedResponse[SimpleProduct](
+        items=sampleProducts,
+        total=50,
+        page=1,
+        pageSize=20,
+        totalPages=3,
+        hasNext=True,
+        hasPrev=False
+    )
+    paginatedResp.model_dump()
+  exercise:
+    prompt: '페이지네이션 응답: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      T = TypeVar('T')
+
+      class PaginatedResponse(BaseModel, Generic[T]):
+          items: list[T] = Field(description="데이터 목록")
+          total: int = Field(description="전체 개수")
+          page: int = Field(description="현재 페이지")
+          pageSize: int = Field(description="페이지 크기")
+          totalPages: int = Field(description="전체 페이지 수")
+          hasNext: bool = Field(description="다음 페이지 존재")
+          hasPrev: bool = Field(description="이전 페이지 존재")
+
+      class SimpleProduct(BaseModel):
+          productId: str
+          name: str
+          price: float
+
+      sampleProducts = [
+          SimpleProduct(productId="P1", name="Product A", price=100),
+          SimpleProduct(productId="P2", name="Product B", price=200)
+      ]
+
+      paginatedResp = PaginatedResponse[SimpleProduct](
+          items=sampleProducts,
+          total=50,
+          page=1,
+          pageSize=20,
+          totalPages=3,
+          hasNext=True,
+          hasPrev=False
+      )
+      paginatedResp.model_dump()
+    solution: |-
+      T = TypeVar('T')
+
+      class PaginatedResponse(BaseModel, Generic[T]):
+          items: list[T] = Field(description="데이터 목록")
+          total: int = Field(description="전체 개수")
+          page: int = Field(description="현재 페이지")
+          pageSize: int = Field(description="페이지 크기")
+          totalPages: int = Field(description="전체 페이지 수")
+          hasNext: bool = Field(description="다음 페이지 존재")
+          hasPrev: bool = Field(description="이전 페이지 존재")
+
+      class SimpleProduct(BaseModel):
+          productId: str
+          name: str
+          price: float
+
+      sampleProducts = [
+          SimpleProduct(productId="P1", name="Product A", price=100),
+          SimpleProduct(productId="P2", name="Product B", price=200)
+      ]
+
+      paginatedResp = PaginatedResponse[SimpleProduct](
+          items=sampleProducts,
+          total=50,
+          page=1,
+          pageSize=20,
+          totalPages=3,
+          hasNext=True,
+          hasPrev=False
+      )
+      paginatedResp.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들 수 있습니다. 전체 개수, 현재 페이지, 다음/이전 페이지 존재 여부 등을 포함합니다."
+    content: 목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들 수 있습니다. 전체 개수, 현재 페이지,
+      다음/이전 페이지 존재 여부 등을 포함합니다.
   - type: code
     language: python
     title: 페이지네이션 래퍼
@@ -230,13 +679,99 @@ sections:
           hasPrev=False
       )
       paginatedResp.model_dump()
-
 - id: error
   title: 에러 응답
+  structuredPrimary: true
   subtitle: 표준 에러 형식
+  goal: '에러 응답: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '에러 응답: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의 HTTPException과 함께 사용하면
+    표준화된 에러 응답을 반환할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ErrorDetail(BaseModel):
+        field: str = Field(description="에러 필드")
+        message: str = Field(description="에러 메시지")
+        code: str = Field(description="에러 코드")
+
+    class ErrorResponse(BaseModel):
+        success: bool = False
+        error: str = Field(description="에러 타입")
+        message: str = Field(description="에러 설명")
+        details: list[ErrorDetail] = Field(default=[], description="상세 에러")
+        timestamp: datetime = Field(default_factory=datetime.now)
+
+    errorResp = ErrorResponse(
+        error="VALIDATION_ERROR",
+        message="입력 데이터 검증 실패",
+        details=[
+            ErrorDetail(field="email", message="유효한 이메일 형식이 아닙니다", code="invalid_format"),
+            ErrorDetail(field="password", message="8자 이상이어야 합니다", code="too_short")
+        ]
+    )
+    errorResp.model_dump_json(indent=2)
+  exercise:
+    prompt: '에러 응답: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ErrorDetail(BaseModel):
+          field: str = Field(description="에러 필드")
+          message: str = Field(description="에러 메시지")
+          code: str = Field(description="에러 코드")
+
+      class ErrorResponse(BaseModel):
+          success: bool = False
+          error: str = Field(description="에러 타입")
+          message: str = Field(description="에러 설명")
+          details: list[ErrorDetail] = Field(default=[], description="상세 에러")
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      errorResp = ErrorResponse(
+          error="VALIDATION_ERROR",
+          message="입력 데이터 검증 실패",
+          details=[
+              ErrorDetail(field="email", message="유효한 이메일 형식이 아닙니다", code="invalid_format"),
+              ErrorDetail(field="password", message="8자 이상이어야 합니다", code="too_short")
+          ]
+      )
+      errorResp.model_dump_json(indent=2)
+    solution: |-
+      class ErrorDetail(BaseModel):
+          field: str = Field(description="에러 필드")
+          message: str = Field(description="에러 메시지")
+          code: str = Field(description="에러 코드")
+
+      class ErrorResponse(BaseModel):
+          success: bool = False
+          error: str = Field(description="에러 타입")
+          message: str = Field(description="에러 설명")
+          details: list[ErrorDetail] = Field(default=[], description="상세 에러")
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      errorResp = ErrorResponse(
+          error="VALIDATION_ERROR",
+          message="입력 데이터 검증 실패",
+          details=[
+              ErrorDetail(field="email", message="유효한 이메일 형식이 아닙니다", code="invalid_format"),
+              ErrorDetail(field="password", message="8자 이상이어야 합니다", code="too_short")
+          ]
+      )
+      errorResp.model_dump_json(indent=2)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의 HTTPException과 함께 사용하면 표준화된 에러 응답을 반환할 수 있습니다."
+    content: API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의 HTTPException과 함께 사용하면
+      표준화된 에러 응답을 반환할 수 있습니다.
   - type: code
     language: python
     title: 에러 응답 모델
@@ -263,13 +798,127 @@ sections:
           ]
       )
       errorResp.model_dump_json(indent=2)
-
 - id: nested
   title: 중첩 API 모델
+  structuredPrimary: true
   subtitle: 복잡한 요청/응답
+  goal: '중첩 API 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '중첩 API 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면 전체가 자동으로 검증됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class OrderItemRequest(BaseModel):
+        productId: str
+        quantity: int = Field(ge=1)
+        note: Optional[str] = None
+
+    class ShippingAddress(BaseModel):
+        recipientName: str
+        phone: str
+        address: str
+        zipCode: str
+
+    class CreateOrderRequest(BaseModel):
+        items: list[OrderItemRequest] = Field(min_length=1)
+        shippingAddress: ShippingAddress
+        paymentMethod: Literal["card", "bank", "cash"]
+        couponCode: Optional[str] = None
+
+    orderRequest = CreateOrderRequest(
+        items=[
+            {"productId": "P001", "quantity": 2},
+            {"productId": "P002", "quantity": 1, "note": "선물포장"}
+        ],
+        shippingAddress={
+            "recipientName": "홍길동",
+            "phone": "010-1234-5678",
+            "address": "서울시 강남구 테헤란로 123",
+            "zipCode": "06234"
+        },
+        paymentMethod="card"
+    )
+    orderRequest.model_dump()
+  exercise:
+    prompt: '중첩 API 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class OrderItemRequest(BaseModel):
+          productId: str
+          quantity: int = Field(ge=1)
+          note: Optional[str] = None
+
+      class ShippingAddress(BaseModel):
+          recipientName: str
+          phone: str
+          address: str
+          zipCode: str
+
+      class CreateOrderRequest(BaseModel):
+          items: list[OrderItemRequest] = Field(min_length=1)
+          shippingAddress: ShippingAddress
+          paymentMethod: Literal["card", "bank", "cash"]
+          couponCode: Optional[str] = None
+
+      orderRequest = CreateOrderRequest(
+          items=[
+              {"productId": "P001", "quantity": 2},
+              {"productId": "P002", "quantity": 1, "note": "선물포장"}
+          ],
+          shippingAddress={
+              "recipientName": "홍길동",
+              "phone": "010-1234-5678",
+              "address": "서울시 강남구 테헤란로 123",
+              "zipCode": "06234"
+          },
+          paymentMethod="card"
+      )
+      orderRequest.model_dump()
+    solution: |-
+      class OrderItemRequest(BaseModel):
+          productId: str
+          quantity: int = Field(ge=1)
+          note: Optional[str] = None
+
+      class ShippingAddress(BaseModel):
+          recipientName: str
+          phone: str
+          address: str
+          zipCode: str
+
+      class CreateOrderRequest(BaseModel):
+          items: list[OrderItemRequest] = Field(min_length=1)
+          shippingAddress: ShippingAddress
+          paymentMethod: Literal["card", "bank", "cash"]
+          couponCode: Optional[str] = None
+
+      orderRequest = CreateOrderRequest(
+          items=[
+              {"productId": "P001", "quantity": 2},
+              {"productId": "P002", "quantity": 1, "note": "선물포장"}
+          ],
+          shippingAddress={
+              "recipientName": "홍길동",
+              "phone": "010-1234-5678",
+              "address": "서울시 강남구 테헤란로 123",
+              "zipCode": "06234"
+          },
+          paymentMethod="card"
+      )
+      orderRequest.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면 전체가 자동으로 검증됩니다."
+    content: 실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면 전체가 자동으로 검증됩니다.
   - type: code
     language: python
     title: 주문 요청 모델
@@ -306,13 +955,114 @@ sections:
           paymentMethod="card"
       )
       orderRequest.model_dump()
-
 - id: filter
   title: 응답 필터링
+  structuredPrimary: true
   subtitle: include/exclude
+  goal: '응답 필터링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '응답 필터링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의 include/exclude
+    옵션으로 유연하게 제어할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class FullUserProfile(BaseModel):
+        userId: str
+        username: str
+        email: str
+        phone: str
+        address: str
+        birthDate: str
+        createdAt: datetime
+        lastLoginAt: Optional[datetime] = None
+        isAdmin: bool = False
+
+    fullProfile = FullUserProfile(
+        userId="U001",
+        username="alice",
+        email="alice@example.com",
+        phone="010-1234-5678",
+        address="서울시 강남구",
+        birthDate="1990-01-15",
+        createdAt="2024-01-01T00:00:00",
+        lastLoginAt="2024-03-15T10:30:00",
+        isAdmin=False
+    )
+
+    publicView = fullProfile.model_dump(include={"userId", "username"})
+    basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
+    publicView, basicView
+  exercise:
+    prompt: '응답 필터링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class FullUserProfile(BaseModel):
+          userId: str
+          username: str
+          email: str
+          phone: str
+          address: str
+          birthDate: str
+          createdAt: datetime
+          lastLoginAt: Optional[datetime] = None
+          isAdmin: bool = False
+
+      fullProfile = FullUserProfile(
+          userId="U001",
+          username="alice",
+          email="alice@example.com",
+          phone="010-1234-5678",
+          address="서울시 강남구",
+          birthDate="1990-01-15",
+          createdAt="2024-01-01T00:00:00",
+          lastLoginAt="2024-03-15T10:30:00",
+          isAdmin=False
+      )
+
+      publicView = fullProfile.model_dump(include={"userId", "username"})
+      basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
+      publicView, basicView
+    solution: |-
+      class FullUserProfile(BaseModel):
+          userId: str
+          username: str
+          email: str
+          phone: str
+          address: str
+          birthDate: str
+          createdAt: datetime
+          lastLoginAt: Optional[datetime] = None
+          isAdmin: bool = False
+
+      fullProfile = FullUserProfile(
+          userId="U001",
+          username="alice",
+          email="alice@example.com",
+          phone="010-1234-5678",
+          address="서울시 강남구",
+          birthDate="1990-01-15",
+          createdAt="2024-01-01T00:00:00",
+          lastLoginAt="2024-03-15T10:30:00",
+          isAdmin=False
+      )
+
+      publicView = fullProfile.model_dump(include={"userId", "username"})
+      basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
+      publicView, basicView
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의 include/exclude 옵션으로 유연하게 제어할 수 있습니다."
+    content: 상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의 include/exclude
+      옵션으로 유연하게 제어할 수 있습니다.
   - type: code
     language: python
     title: 필드 필터링
@@ -344,13 +1094,133 @@ sections:
       publicView = fullProfile.model_dump(include={"userId", "username"})
       basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
       publicView, basicView
-
 - id: computed
   title: 계산 필드 응답
+  structuredPrimary: true
   subtitle: computed_field
+  goal: '계산 필드 응답: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '계산 필드 응답: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로 직렬화에 포함시킬 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class CartItem(BaseModel):
+        productId: str
+        productName: str
+        unitPrice: float
+        quantity: int
+
+        @computed_field
+        @property
+        def subtotal(self) -> float:
+            return self.unitPrice * self.quantity
+
+    class CartResponse(BaseModel):
+        cartId: str
+        items: list[CartItem]
+
+        @computed_field
+        @property
+        def totalAmount(self) -> float:
+            return sum(item.subtotal for item in self.items)
+
+        @computed_field
+        @property
+        def itemCount(self) -> int:
+            return sum(item.quantity for item in self.items)
+
+    cart = CartResponse(
+        cartId="CART-001",
+        items=[
+            CartItem(productId="P1", productName="노트북", unitPrice=1000000, quantity=1),
+            CartItem(productId="P2", productName="마우스", unitPrice=50000, quantity=2)
+        ]
+    )
+    cart.model_dump()
+  exercise:
+    prompt: '계산 필드 응답: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class CartItem(BaseModel):
+          productId: str
+          productName: str
+          unitPrice: float
+          quantity: int
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.unitPrice * self.quantity
+
+      class CartResponse(BaseModel):
+          cartId: str
+          items: list[CartItem]
+
+          @computed_field
+          @property
+          def totalAmount(self) -> float:
+              return sum(item.subtotal for item in self.items)
+
+          @computed_field
+          @property
+          def itemCount(self) -> int:
+              return sum(item.quantity for item in self.items)
+
+      cart = CartResponse(
+          cartId="CART-001",
+          items=[
+              CartItem(productId="P1", productName="노트북", unitPrice=1000000, quantity=1),
+              CartItem(productId="P2", productName="마우스", unitPrice=50000, quantity=2)
+          ]
+      )
+      cart.model_dump()
+    solution: |-
+      class CartItem(BaseModel):
+          productId: str
+          productName: str
+          unitPrice: float
+          quantity: int
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.unitPrice * self.quantity
+
+      class CartResponse(BaseModel):
+          cartId: str
+          items: list[CartItem]
+
+          @computed_field
+          @property
+          def totalAmount(self) -> float:
+              return sum(item.subtotal for item in self.items)
+
+          @computed_field
+          @property
+          def itemCount(self) -> int:
+              return sum(item.quantity for item in self.items)
+
+      cart = CartResponse(
+          cartId="CART-001",
+          items=[
+              CartItem(productId="P1", productName="노트북", unitPrice=1000000, quantity=1),
+              CartItem(productId="P2", productName="마우스", unitPrice=50000, quantity=2)
+          ]
+      )
+      cart.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로 직렬화에 포함시킬 수 있습니다."
+    content: 응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로 직렬화에 포함시킬 수 있습니다.
   - type: code
     language: python
     title: 장바구니 응답
@@ -389,13 +1259,55 @@ sections:
           ]
       )
       cart.model_dump()
-
 - id: result
   title: 완전한 API 모델 세트
+  structuredPrimary: true
   subtitle: 종합 설계
+  goal: '완전한 API 모델 세트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '완전한 API 모델 세트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지 모두 포함합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ApiResponse(BaseModel, Generic[T]):
+        success: bool = True
+        data: T
+        timestamp: datetime = Field(default_factory=datetime.now)
+
+    successResp = ApiResponse[UserResponse](data=userResp)
+    successResp.model_dump_json(indent=2)[:300]
+  exercise:
+    prompt: '완전한 API 모델 세트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ApiResponse(BaseModel, Generic[T]):
+          success: bool = True
+          data: T
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      successResp = ApiResponse[UserResponse](data=userResp)
+      successResp.model_dump_json(indent=2)[:300]
+    solution: |-
+      class ApiResponse(BaseModel, Generic[T]):
+          success: bool = True
+          data: T
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      successResp = ApiResponse[UserResponse](data=userResp)
+      successResp.model_dump_json(indent=2)[:300]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지 모두 포함합니다."
+    content: 지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지 모두 포함합니다.
   - type: code
     language: python
     title: 성공 응답 래퍼
@@ -445,17 +1357,173 @@ sections:
           createdAt="2024-03-15T10:00:00"
       )
       orderResp.model_dump()
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: API 모델 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pydantic import BaseModel, Field, computed_field
+    from typing import Optional, Literal
+    from datetime import datetime
+
+    class AuthorInfo(BaseModel):
+        authorId: str
+        name: str
+        avatarUrl: Optional[str] = None
+
+    class PostBase(BaseModel):
+        title: str = Field(min_length=1, max_length=200)
+        content: str = Field(min_length=10)
+        tags: list[str] = Field(default=[])
+
+    class CreatePostRequest(PostBase):
+        status: Literal["draft", "published"] = "draft"
+
+    class UpdatePostRequest(BaseModel):
+        title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+        content: Optional[str] = Field(default=None, min_length=10)
+        tags: Optional[list[str]] = None
+        status: Optional[Literal["draft", "published"]] = None
+
+    class PostResponse(PostBase):
+        postId: str
+        author: AuthorInfo
+        status: str
+        viewCount: int = 0
+        likeCount: int = 0
+        createdAt: datetime
+        updatedAt: Optional[datetime] = None
+
+        @computed_field
+        @property
+        def isPublished(self) -> bool:
+            return self.status == "published"
+
+    createReq = CreatePostRequest(
+        title="Pydantic 가이드",
+        content="Pydantic은 Python 데이터 검증 라이브러리입니다...",
+        tags=["python", "pydantic"],
+        status="published"
+    )
+    createReq.model_dump()
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import BaseModel, Field, computed_field
+      from typing import Optional, Literal
+      from datetime import datetime
+
+      class AuthorInfo(BaseModel):
+          authorId: str
+          name: str
+          avatarUrl: Optional[str] = None
+
+      class PostBase(BaseModel):
+          title: str = Field(min_length=1, max_length=200)
+          content: str = Field(min_length=10)
+          tags: list[str] = Field(default=[])
+
+      class CreatePostRequest(PostBase):
+          status: Literal["draft", "published"] = "draft"
+
+      class UpdatePostRequest(BaseModel):
+          title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+          content: Optional[str] = Field(default=None, min_length=10)
+          tags: Optional[list[str]] = None
+          status: Optional[Literal["draft", "published"]] = None
+
+      class PostResponse(PostBase):
+          postId: str
+          author: AuthorInfo
+          status: str
+          viewCount: int = 0
+          likeCount: int = 0
+          createdAt: datetime
+          updatedAt: Optional[datetime] = None
+
+          @computed_field
+          @property
+          def isPublished(self) -> bool:
+              return self.status == "published"
+
+      createReq = CreatePostRequest(
+          title="Pydantic 가이드",
+          content="Pydantic은 Python 데이터 검증 라이브러리입니다...",
+          tags=["python", "pydantic"],
+          status="published"
+      )
+      createReq.model_dump()
+    solution: |-
+      from pydantic import BaseModel, Field, computed_field
+      from typing import Optional, Literal
+      from datetime import datetime
+
+      class AuthorInfo(BaseModel):
+          authorId: str
+          name: str
+          avatarUrl: Optional[str] = None
+
+      class PostBase(BaseModel):
+          title: str = Field(min_length=1, max_length=200)
+          content: str = Field(min_length=10)
+          tags: list[str] = Field(default=[])
+
+      class CreatePostRequest(PostBase):
+          status: Literal["draft", "published"] = "draft"
+
+      class UpdatePostRequest(BaseModel):
+          title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+          content: Optional[str] = Field(default=None, min_length=10)
+          tags: Optional[list[str]] = None
+          status: Optional[Literal["draft", "published"]] = None
+
+      class PostResponse(PostBase):
+          postId: str
+          author: AuthorInfo
+          status: str
+          viewCount: int = 0
+          likeCount: int = 0
+          createdAt: datetime
+          updatedAt: Optional[datetime] = None
+
+          @computed_field
+          @property
+          def isPublished(self) -> bool:
+              return self.status == "published"
+
+      createReq = CreatePostRequest(
+          title="Pydantic 가이드",
+          content="Pydantic은 Python 데이터 검증 라이브러리입니다...",
+          tags=["python", "pydantic"],
+          status="published"
+      )
+      createReq.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다."
+    content: 지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 블로그 API"
+    title: '미션1: 블로그 API'
     blocks:
     - type: code
       title: 블로그 모델
@@ -526,7 +1594,7 @@ sections:
         }
         postSummary
   - type: expansion
-    title: "미션2: E-커머스 주문"
+    title: '미션2: E-커머스 주문'
     blocks:
     - type: code
       title: 주문 모델
@@ -598,17 +1666,139 @@ sections:
             "status": orderData.paymentStatus.value
         }
         orderSummaryView
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
+    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
-  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    solution: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
-  - type: "code"
-    language: "python"
-    title: "주문 입력 모델과 정상 데이터 예측"
-    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+  - type: text
+    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
+      다음 단계로 넘기는 흐름을 검증합니다.
+  - type: code
+    language: python
+    title: 주문 입력 모델과 정상 데이터 예측
+    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
     content: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -643,10 +1833,10 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-  - type: "code"
-    language: "python"
-    title: "잘못된 입력을 먼저 실패시킨다"
-    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+  - type: code
+    language: python
+    title: 잘못된 입력을 먼저 실패시킨다
+    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
     content: |-
       try:
           OrderInput.model_validate({
@@ -663,10 +1853,10 @@ sections:
       errorFields = {error['loc'][0] for error in orderValidationErrors}
       assert {'amount', 'status'} <= errorFields
       orderValidationErrors
-  - type: "code"
-    language: "python"
-    title: "배치 입력을 정상/오류로 분리"
-    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+  - type: code
+    language: python
+    title: 배치 입력을 정상/오류로 분리
+    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
     content: |-
       rawOrders = [
           {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
@@ -692,10 +1882,10 @@ sections:
       assert len(rejectedOrders) == 2
       assert paidRevenue == 120000
       acceptedOrders, rejectedOrders
-  - type: "code"
-    language: "python"
-    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
-    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
+    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
     content: |-
       def filterRevenueOrders(orders, minAmount):
           if minAmount <= 0:

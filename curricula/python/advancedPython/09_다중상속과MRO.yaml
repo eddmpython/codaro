@@ -1,39 +1,116 @@
 meta:
-  id: "09"
-  title: "다중 상속과 MRO"
+  id: 09
+  title: 다중 상속과 MRO
   day: 9
-  category: "advancedPython"
-  tags: ["multiple inheritance", "MRO", "super", "mixin", "검증", "협력상속"]
+  category: advancedPython
+  tags:
+  - multiple inheritance
+  - MRO
+  - super
+  - mixin
+  - 검증
+  - 협력상속
   seo:
-    title: "파이썬 다중 상속과 MRO - 메서드 해석 순서 완벽 이해"
-    description: "다중 상속의 동작 원리와 MRO를 이해합니다. C3 선형화, super() 심화, Mixin 패턴, 상속 vs 합성."
-    keywords: ["다중상속", "MRO", "super", "mixin", "C3 linearization"]
-
+    title: 파이썬 다중 상속과 MRO - 메서드 해석 순서 완벽 이해
+    description: 다중 상속의 동작 원리와 MRO를 이해합니다. C3 선형화, super() 심화, Mixin 패턴, 상속 vs 합성.
+    keywords:
+    - 다중상속
+    - MRO
+    - super
+    - mixin
+    - C3 linearization
 intro:
-  emoji: "🔀"
+  emoji: 🔀
   points:
-  - "다중 상속의 작동 원리"
-  - "MRO(Method Resolution Order) 이해"
-  - "다이아몬드 문제와 해결책"
-  - "Mixin 패턴으로 기능 조합"
-
+  - 다중 상속의 작동 원리
+  - MRO(Method Resolution Order) 이해
+  - 다이아몬드 문제와 해결책
+  - Mixin 패턴으로 기능 조합
 sections:
-- id: "multiple_inheritance"
-  title: "다중 상속 기초"
-  subtitle: "여러 부모 클래스"
+- id: multiple_inheritance
+  title: 다중 상속 기초
+  structuredPrimary: true
+  subtitle: 여러 부모 클래스
+  goal: '다중 상속 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '다중 상속 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    파이썬은 다중 상속을 지원합니다. 클래스 정의 시 여러 부모 클래스를 쉼표로 구분하여 지정합니다. 자식 클래스는 모든 부모 클래스의 속성과 메서드를 상속받습니다. 같은 이름의 메서드가 여러 부모에 있으면 MRO에 따라 첫 번째 발견된 것이 사용됩니다. 다중 상속은 강력하지만 복잡성을 증가시킬 수 있습니다. 올바르게 사용하면 코드 재사용성을 높이고 유연한 설계가 가능합니다.
+
+    다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다.
+  tips:
+  - 다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Flyable:
+        def fly(self):
+            return "Flying"
+
+    class Swimmable:
+        def swim(self):
+            return "Swimming"
+
+    class Duck(Flyable, Swimmable):
+        def quack(self):
+            return "Quack!"
+
+    duck = Duck()
+    duck.fly(), duck.swim(), duck.quack()
+  exercise:
+    prompt: '다중 상속 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Flyable:
+          def fly(self):
+              return "Flying"
+
+      class Swimmable:
+          def swim(self):
+              return "Swimming"
+
+      class Duck(Flyable, Swimmable):
+          def quack(self):
+              return "Quack!"
+
+      duck = Duck()
+      duck.fly(), duck.swim(), duck.quack()
+    solution: |-
+      class Flyable:
+          def fly(self):
+              return "Flying"
+
+      class Swimmable:
+          def swim(self):
+              return "Swimming"
+
+      class Duck(Flyable, Swimmable):
+          def quack(self):
+              return "Quack!"
+
+      duck = Duck()
+      duck.fly(), duck.swim(), duck.quack()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "파이썬은 다중 상속을 지원합니다. 클래스 정의 시 여러 부모 클래스를 쉼표로 구분하여 지정합니다. 자식 클래스는 모든 부모 클래스의 속성과 메서드를 상속받습니다. 같은 이름의 메서드가 여러 부모에 있으면 MRO에 따라 첫 번째 발견된 것이 사용됩니다. 다중 상속은 강력하지만 복잡성을 증가시킬 수 있습니다. 올바르게 사용하면 코드 재사용성을 높이고 유연한 설계가 가능합니다."
-  - type: "list"
+  - type: text
+    content: 파이썬은 다중 상속을 지원합니다. 클래스 정의 시 여러 부모 클래스를 쉼표로 구분하여 지정합니다. 자식 클래스는 모든 부모 클래스의 속성과 메서드를 상속받습니다. 같은 이름의 메서드가 여러 부모에
+      있으면 MRO에 따라 첫 번째 발견된 것이 사용됩니다. 다중 상속은 강력하지만 복잡성을 증가시킬 수 있습니다. 올바르게 사용하면 코드 재사용성을 높이고 유연한 설계가 가능합니다.
+  - type: list
     items:
-    - "class Child(Parent1, Parent2, ...)"
-    - "모든 부모의 속성/메서드 상속"
-    - "메서드 충돌 시 MRO로 해결"
-    - "왼쪽에서 오른쪽으로 검색"
-  - type: "code"
-    language: "python"
-    title: "기본 다중 상속"
-    description: "여러 부모 클래스를 상속받습니다."
+    - class Child(Parent1, Parent2, ...)
+    - 모든 부모의 속성/메서드 상속
+    - 메서드 충돌 시 MRO로 해결
+    - 왼쪽에서 오른쪽으로 검색
+  - type: code
+    language: python
+    title: 기본 다중 상속
+    description: 여러 부모 클래스를 상속받습니다.
     content: |-
       class Flyable:
           def fly(self):
@@ -49,10 +126,10 @@ sections:
 
       duck = Duck()
       duck.fly(), duck.swim(), duck.quack()
-  - type: "code"
-    language: "python"
-    title: "메서드 충돌"
-    description: "같은 이름의 메서드가 있을 때 순서가 중요합니다."
+  - type: code
+    language: python
+    title: 메서드 충돌
+    description: 같은 이름의 메서드가 있을 때 순서가 중요합니다.
     content: |-
       class A:
           def greet(self):
@@ -69,10 +146,10 @@ sections:
           pass
 
       C().greet(), D().greet()
-  - type: "code"
-    language: "python"
-    title: "__init__ 처리"
-    description: "다중 상속에서 초기화를 처리합니다."
+  - type: code
+    language: python
+    title: __init__ 처리
+    description: 다중 상속에서 초기화를 처리합니다.
     content: |-
       class Engine:
           def __init__(self):
@@ -89,25 +166,90 @@ sections:
 
       car = Car()
       car.engineType, car.wheelCount
-  - type: "tip"
-    content: "다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다."
+  - type: tip
+    content: 다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다.
+- id: mro_algorithm
+  title: MRO 알고리즘
+  structuredPrimary: true
+  subtitle: C3 선형화
+  goal: 'MRO 알고리즘: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'MRO 알고리즘: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    MRO(Method Resolution Order)는 메서드를 찾는 순서입니다. 파이썬은 C3 선형화 알고리즘을 사용합니다. C3는 단조성(부모-자식 순서 유지)과 지역 우선(왼쪽 부모 우선)을 보장합니다. 클래스.__mro__ 또는 클래스.mro()로 MRO를 확인할 수 있습니다. MRO는 클래스 정의 시 계산되며, 유효하지 않은 상속 구조는 TypeError를 발생시킵니다. super()는 MRO의 다음 클래스를 호출합니다.
 
-- id: "mro_algorithm"
-  title: "MRO 알고리즘"
-  subtitle: "C3 선형화"
+    MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다.
+  tips:
+  - MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class A:
+        pass
+
+    class B(A):
+        pass
+
+    class C(A):
+        pass
+
+    class D(B, C):
+        pass
+
+    [cls.__name__ for cls in D.__mro__]
+  exercise:
+    prompt: 'MRO 알고리즘: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class A:
+          pass
+
+      class B(A):
+          pass
+
+      class C(A):
+          pass
+
+      class D(B, C):
+          pass
+
+      [cls.__name__ for cls in D.__mro__]
+    solution: |-
+      class A:
+          pass
+
+      class B(A):
+          pass
+
+      class C(A):
+          pass
+
+      class D(B, C):
+          pass
+
+      [cls.__name__ for cls in D.__mro__]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "MRO(Method Resolution Order)는 메서드를 찾는 순서입니다. 파이썬은 C3 선형화 알고리즘을 사용합니다. C3는 단조성(부모-자식 순서 유지)과 지역 우선(왼쪽 부모 우선)을 보장합니다. 클래스.__mro__ 또는 클래스.mro()로 MRO를 확인할 수 있습니다. MRO는 클래스 정의 시 계산되며, 유효하지 않은 상속 구조는 TypeError를 발생시킵니다. super()는 MRO의 다음 클래스를 호출합니다."
-  - type: "list"
+  - type: text
+    content: MRO(Method Resolution Order)는 메서드를 찾는 순서입니다. 파이썬은 C3 선형화 알고리즘을 사용합니다. C3는 단조성(부모-자식 순서 유지)과 지역 우선(왼쪽 부모 우선)을
+      보장합니다. 클래스.__mro__ 또는 클래스.mro()로 MRO를 확인할 수 있습니다. MRO는 클래스 정의 시 계산되며, 유효하지 않은 상속 구조는 TypeError를 발생시킵니다. super()는 MRO의
+      다음 클래스를 호출합니다.
+  - type: list
     items:
-    - "C3 선형화 알고리즘"
-    - "단조성: 부모는 자식 뒤에"
-    - "지역 우선: 왼쪽 부모가 우선"
-    - "클래스.__mro__로 확인"
-  - type: "code"
-    language: "python"
-    title: "MRO 확인"
-    description: "__mro__로 메서드 해석 순서를 확인합니다."
+    - C3 선형화 알고리즘
+    - '단조성: 부모는 자식 뒤에'
+    - '지역 우선: 왼쪽 부모가 우선'
+    - 클래스.__mro__로 확인
+  - type: code
+    language: python
+    title: MRO 확인
+    description: __mro__로 메서드 해석 순서를 확인합니다.
     content: |-
       class A:
           pass
@@ -122,10 +264,10 @@ sections:
           pass
 
       [cls.__name__ for cls in D.__mro__]
-  - type: "code"
-    language: "python"
-    title: "복잡한 MRO"
-    description: "더 복잡한 상속 구조의 MRO입니다."
+  - type: code
+    language: python
+    title: 복잡한 MRO
+    description: 더 복잡한 상속 구조의 MRO입니다.
     content: |-
       class A:
           def method(self):
@@ -146,10 +288,10 @@ sections:
           pass
 
       [cls.__name__ for cls in D.__mro__], [cls.__name__ for cls in E.__mro__]
-  - type: "code"
-    language: "python"
-    title: "mro() 메서드"
-    description: "mro() 메서드도 같은 결과를 반환합니다."
+  - type: code
+    language: python
+    title: mro() 메서드
+    description: mro() 메서드도 같은 결과를 반환합니다.
     content: |-
       class X:
           pass
@@ -164,25 +306,111 @@ sections:
           pass
 
       W.mro()
-  - type: "tip"
-    content: "MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다."
+  - type: tip
+    content: MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다.
+- id: diamond_problem
+  title: 다이아몬드 문제
+  structuredPrimary: true
+  subtitle: 공통 조상 처리
+  goal: '다이아몬드 문제: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '다이아몬드 문제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다이아몬드 문제는 두 부모가 같은 조상을 가질 때 발생합니다. 조상의 메서드가 두 번 호출될 수 있는 문제입니다. 파이썬의 MRO와 super()는 이 문제를 해결합니다. C3 선형화는 각 클래스가 MRO에서 한 번만 나타나도록 보장합니다. super()를 사용하면 MRO를 따라 각 클래스의 메서드가 한 번씩만 호출됩니다. 협력적 다중 상속(cooperative multiple inheritance)이라고 합니다.
 
-- id: "diamond_problem"
-  title: "다이아몬드 문제"
-  subtitle: "공통 조상 처리"
+    다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요.
+  tips:
+  - 다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class A:
+        def __init__(self):
+            self.value = "A"
+
+    class B(A):
+        def __init__(self):
+            super().__init__()
+            self.value += "B"
+
+    class C(A):
+        def __init__(self):
+            super().__init__()
+            self.value += "C"
+
+    class D(B, C):
+        def __init__(self):
+            super().__init__()
+            self.value += "D"
+
+    D().value
+  exercise:
+    prompt: '다이아몬드 문제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class A:
+          def __init__(self):
+              self.value = "A"
+
+      class B(A):
+          def __init__(self):
+              super().__init__()
+              self.value += "B"
+
+      class C(A):
+          def __init__(self):
+              super().__init__()
+              self.value += "C"
+
+      class D(B, C):
+          def __init__(self):
+              super().__init__()
+              self.value += "D"
+
+      D().value
+    solution: |-
+      class A:
+          def __init__(self):
+              self.value = "A"
+
+      class B(A):
+          def __init__(self):
+              super().__init__()
+              self.value += "B"
+
+      class C(A):
+          def __init__(self):
+              super().__init__()
+              self.value += "C"
+
+      class D(B, C):
+          def __init__(self):
+              super().__init__()
+              self.value += "D"
+
+      D().value
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "다이아몬드 문제는 두 부모가 같은 조상을 가질 때 발생합니다. 조상의 메서드가 두 번 호출될 수 있는 문제입니다. 파이썬의 MRO와 super()는 이 문제를 해결합니다. C3 선형화는 각 클래스가 MRO에서 한 번만 나타나도록 보장합니다. super()를 사용하면 MRO를 따라 각 클래스의 메서드가 한 번씩만 호출됩니다. 협력적 다중 상속(cooperative multiple inheritance)이라고 합니다."
-  - type: "list"
+  - type: text
+    content: 다이아몬드 문제는 두 부모가 같은 조상을 가질 때 발생합니다. 조상의 메서드가 두 번 호출될 수 있는 문제입니다. 파이썬의 MRO와 super()는 이 문제를 해결합니다. C3 선형화는 각 클래스가
+      MRO에서 한 번만 나타나도록 보장합니다. super()를 사용하면 MRO를 따라 각 클래스의 메서드가 한 번씩만 호출됩니다. 협력적 다중 상속(cooperative multiple inheritance)이라고
+      합니다.
+  - type: list
     items:
-    - "두 부모가 같은 조상 상속"
-    - "조상 메서드 중복 호출 위험"
-    - "C3 MRO로 한 번만 등장"
-    - "super()로 협력적 호출"
-  - type: "code"
-    language: "python"
-    title: "다이아몬드 구조"
-    description: "공통 조상을 가진 다중 상속입니다."
+    - 두 부모가 같은 조상 상속
+    - 조상 메서드 중복 호출 위험
+    - C3 MRO로 한 번만 등장
+    - super()로 협력적 호출
+  - type: code
+    language: python
+    title: 다이아몬드 구조
+    description: 공통 조상을 가진 다중 상속입니다.
     content: |-
       class A:
           def __init__(self):
@@ -204,10 +432,10 @@ sections:
               self.value += "D"
 
       D().value
-  - type: "code"
-    language: "python"
-    title: "super() 호출 순서"
-    description: "MRO를 따라 순서대로 호출됩니다."
+  - type: code
+    language: python
+    title: super() 호출 순서
+    description: MRO를 따라 순서대로 호출됩니다.
     content: |-
       class Root:
           def show(self):
@@ -226,10 +454,10 @@ sections:
               return super().show() + ["Child"]
 
       Child().show()
-  - type: "code"
-    language: "python"
-    title: "super() 없이 직접 호출"
-    description: "직접 호출하면 중복이 발생할 수 있습니다."
+  - type: code
+    language: python
+    title: super() 없이 직접 호출
+    description: 직접 호출하면 중복이 발생할 수 있습니다.
     content: |-
       class Base:
           def __init__(self):
@@ -254,25 +482,80 @@ sections:
               Right2.__init__(self)
 
       Child2().count
-  - type: "tip"
-    content: "다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요."
+  - type: tip
+    content: 다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요.
+- id: super_function
+  title: super() 심화
+  structuredPrimary: true
+  subtitle: 협력적 상속
+  goal: 'super() 심화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'super() 심화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    super()는 MRO에서 현재 클래스 다음의 클래스를 반환합니다. super(Type, obj)처럼 인자를 지정할 수도 있습니다. 메서드 내에서 super()를 호출하면 자동으로 현재 클래스와 인스턴스가 사용됩니다. super()는 프록시 객체를 반환하며, 이 프록시가 MRO의 다음 클래스의 메서드를 호출합니다. 협력적 다중 상속에서는 모든 클래스가 super()를 호출해야 체인이 완성됩니다.
 
-- id: "super_function"
-  title: "super() 심화"
-  subtitle: "협력적 상속"
+    super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다.
+  tips:
+  - super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Parent:
+        def greet(self):
+            return "Hello from Parent"
+
+    class Child(Parent):
+        def greet(self):
+            parentGreet = super().greet()
+            return f"{parentGreet} and Child"
+
+    Child().greet()
+  exercise:
+    prompt: 'super() 심화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Parent:
+          def greet(self):
+              return "Hello from Parent"
+
+      class Child(Parent):
+          def greet(self):
+              parentGreet = super().greet()
+              return f"{parentGreet} and Child"
+
+      Child().greet()
+    solution: |-
+      class Parent:
+          def greet(self):
+              return "Hello from Parent"
+
+      class Child(Parent):
+          def greet(self):
+              parentGreet = super().greet()
+              return f"{parentGreet} and Child"
+
+      Child().greet()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "super()는 MRO에서 현재 클래스 다음의 클래스를 반환합니다. super(Type, obj)처럼 인자를 지정할 수도 있습니다. 메서드 내에서 super()를 호출하면 자동으로 현재 클래스와 인스턴스가 사용됩니다. super()는 프록시 객체를 반환하며, 이 프록시가 MRO의 다음 클래스의 메서드를 호출합니다. 협력적 다중 상속에서는 모든 클래스가 super()를 호출해야 체인이 완성됩니다."
-  - type: "list"
+  - type: text
+    content: super()는 MRO에서 현재 클래스 다음의 클래스를 반환합니다. super(Type, obj)처럼 인자를 지정할 수도 있습니다. 메서드 내에서 super()를 호출하면 자동으로 현재 클래스와
+      인스턴스가 사용됩니다. super()는 프록시 객체를 반환하며, 이 프록시가 MRO의 다음 클래스의 메서드를 호출합니다. 협력적 다중 상속에서는 모든 클래스가 super()를 호출해야 체인이 완성됩니다.
+  - type: list
     items:
-    - "super(): 현재 클래스 기준 MRO 다음"
-    - "super(Type, obj): 명시적 지정"
-    - "프록시 객체 반환"
-    - "모든 클래스가 super() 호출 필요"
-  - type: "code"
-    language: "python"
-    title: "super() 기본"
-    description: "super()의 기본 동작입니다."
+    - 'super(): 현재 클래스 기준 MRO 다음'
+    - 'super(Type, obj): 명시적 지정'
+    - 프록시 객체 반환
+    - 모든 클래스가 super() 호출 필요
+  - type: code
+    language: python
+    title: super() 기본
+    description: super()의 기본 동작입니다.
     content: |-
       class Parent:
           def greet(self):
@@ -284,10 +567,10 @@ sections:
               return f"{parentGreet} and Child"
 
       Child().greet()
-  - type: "code"
-    language: "python"
-    title: "super()와 MRO"
-    description: "super()가 MRO를 따라가는 것을 확인합니다."
+  - type: code
+    language: python
+    title: super()와 MRO
+    description: super()가 MRO를 따라가는 것을 확인합니다.
     content: |-
       class A:
           def method(self):
@@ -306,10 +589,10 @@ sections:
               return super().method() + ["D"]
 
       D().method(), [c.__name__ for c in D.__mro__]
-  - type: "code"
-    language: "python"
-    title: "인자 전달"
-    description: "*args, **kwargs로 인자를 전달합니다."
+  - type: code
+    language: python
+    title: 인자 전달
+    description: '*args, **kwargs로 인자를 전달합니다.'
     content: |-
       class Base:
           def __init__(self, value, **kwargs):
@@ -328,25 +611,101 @@ sections:
 
       combined = Combined(value=10, extra="data", name="test")
       combined.value, combined.extra, combined.name
-  - type: "tip"
-    content: "super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다."
+  - type: tip
+    content: super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다.
+- id: mixin_pattern
+  title: Mixin 패턴
+  structuredPrimary: true
+  subtitle: 기능 조합
+  goal: 'Mixin 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Mixin 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Mixin은 독립적인 기능을 제공하는 작은 클래스입니다. 단독으로 사용하지 않고 다른 클래스와 조합합니다. Mixin은 보통 특정 기능만 추가하고 인스턴스 상태는 최소화합니다. 이름에 Mixin 접미사를 붙여 용도를 명확히 합니다. 여러 Mixin을 조합해 다양한 기능을 가진 클래스를 만들 수 있습니다. Mixin은 is-a 관계보다 has-a 기능에 가깝습니다.
 
-- id: "mixin_pattern"
-  title: "Mixin 패턴"
-  subtitle: "기능 조합"
+    Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다.
+  tips:
+  - Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class JSONMixin:
+        def toJSON(self):
+            import json
+            return json.dumps(self.__dict__)
+
+    class XMLMixin:
+        def toXML(self):
+            attrs = " ".join(f'{k}="{v}"' for k, v in self.__dict__.items())
+            return f"<object {attrs}/>"
+
+    class Data(JSONMixin, XMLMixin):
+        def __init__(self, name, value):
+            self.name = name
+            self.value = value
+
+    data = Data("test", 42)
+    data.toJSON(), data.toXML()
+  exercise:
+    prompt: 'Mixin 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class JSONMixin:
+          def toJSON(self):
+              import json
+              return json.dumps(self.__dict__)
+
+      class XMLMixin:
+          def toXML(self):
+              attrs = " ".join(f'{k}="{v}"' for k, v in self.__dict__.items())
+              return f"<object {attrs}/>"
+
+      class Data(JSONMixin, XMLMixin):
+          def __init__(self, name, value):
+              self.name = name
+              self.value = value
+
+      data = Data("test", 42)
+      data.toJSON(), data.toXML()
+    solution: |-
+      class JSONMixin:
+          def toJSON(self):
+              import json
+              return json.dumps(self.__dict__)
+
+      class XMLMixin:
+          def toXML(self):
+              attrs = " ".join(f'{k}="{v}"' for k, v in self.__dict__.items())
+              return f"<object {attrs}/>"
+
+      class Data(JSONMixin, XMLMixin):
+          def __init__(self, name, value):
+              self.name = name
+              self.value = value
+
+      data = Data("test", 42)
+      data.toJSON(), data.toXML()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Mixin은 독립적인 기능을 제공하는 작은 클래스입니다. 단독으로 사용하지 않고 다른 클래스와 조합합니다. Mixin은 보통 특정 기능만 추가하고 인스턴스 상태는 최소화합니다. 이름에 Mixin 접미사를 붙여 용도를 명확히 합니다. 여러 Mixin을 조합해 다양한 기능을 가진 클래스를 만들 수 있습니다. Mixin은 is-a 관계보다 has-a 기능에 가깝습니다."
-  - type: "list"
+  - type: text
+    content: Mixin은 독립적인 기능을 제공하는 작은 클래스입니다. 단독으로 사용하지 않고 다른 클래스와 조합합니다. Mixin은 보통 특정 기능만 추가하고 인스턴스 상태는 최소화합니다. 이름에 Mixin
+      접미사를 붙여 용도를 명확히 합니다. 여러 Mixin을 조합해 다양한 기능을 가진 클래스를 만들 수 있습니다. Mixin은 is-a 관계보다 has-a 기능에 가깝습니다.
+  - type: list
     items:
-    - "독립적인 기능 단위"
-    - "단독 사용하지 않음"
-    - "여러 Mixin 조합 가능"
-    - "이름에 Mixin 접미사 권장"
-  - type: "code"
-    language: "python"
-    title: "기본 Mixin"
-    description: "기능을 추가하는 Mixin입니다."
+    - 독립적인 기능 단위
+    - 단독 사용하지 않음
+    - 여러 Mixin 조합 가능
+    - 이름에 Mixin 접미사 권장
+  - type: code
+    language: python
+    title: 기본 Mixin
+    description: 기능을 추가하는 Mixin입니다.
     content: |-
       class JSONMixin:
           def toJSON(self):
@@ -365,10 +724,10 @@ sections:
 
       data = Data("test", 42)
       data.toJSON(), data.toXML()
-  - type: "code"
-    language: "python"
-    title: "로깅 Mixin"
-    description: "로깅 기능을 추가하는 Mixin입니다."
+  - type: code
+    language: python
+    title: 로깅 Mixin
+    description: 로깅 기능을 추가하는 Mixin입니다.
     content: |-
       class LoggingMixin:
           def __init__(self, *args, **kwargs):
@@ -393,10 +752,10 @@ sections:
       svc = LoggedService("API")
       svc.process()
       svc.getLogs()
-  - type: "code"
-    language: "python"
-    title: "비교 Mixin"
-    description: "비교 연산을 추가하는 Mixin입니다."
+  - type: code
+    language: python
+    title: 비교 Mixin
+    description: 비교 연산을 추가하는 Mixin입니다.
     content: |-
       class ComparableMixin:
           def __eq__(self, other):
@@ -421,25 +780,78 @@ sections:
       s1 = Score(85)
       s2 = Score(90)
       s1 < s2, s1 > s2, s1 == Score(85)
-  - type: "tip"
-    content: "Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다."
+  - type: tip
+    content: Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다.
+- id: composition
+  title: 상속 vs 합성
+  structuredPrimary: true
+  subtitle: 언제 무엇을 사용할지
+  goal: '상속 vs 합성: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '상속 vs 합성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상속보다 합성을 선호하라(Favor composition over inheritance)는 유명한 설계 원칙입니다. 상속은 is-a 관계를 표현하고, 합성은 has-a 관계를 표현합니다. 상속은 부모의 구현에 강하게 결합되어 변경에 취약합니다. 합성은 객체를 멤버로 포함하여 느슨한 결합을 유지합니다. 상속이 적합한 경우: 명확한 is-a 관계, 부모 인터페이스 재사용. 합성이 적합한 경우: 구현 재사용, 유연한 조합이 필요할 때.
 
-- id: "composition"
-  title: "상속 vs 합성"
-  subtitle: "언제 무엇을 사용할지"
+    변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요.
+  tips:
+  - 변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Engine:
+        def start(self):
+            return "Engine started"
+
+    class Car(Engine):
+        def drive(self):
+            return f"{self.start()} -> Driving"
+
+    Car().drive()
+  exercise:
+    prompt: '상속 vs 합성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Engine:
+          def start(self):
+              return "Engine started"
+
+      class Car(Engine):
+          def drive(self):
+              return f"{self.start()} -> Driving"
+
+      Car().drive()
+    solution: |-
+      class Engine:
+          def start(self):
+              return "Engine started"
+
+      class Car(Engine):
+          def drive(self):
+              return f"{self.start()} -> Driving"
+
+      Car().drive()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "상속보다 합성을 선호하라(Favor composition over inheritance)는 유명한 설계 원칙입니다. 상속은 is-a 관계를 표현하고, 합성은 has-a 관계를 표현합니다. 상속은 부모의 구현에 강하게 결합되어 변경에 취약합니다. 합성은 객체를 멤버로 포함하여 느슨한 결합을 유지합니다. 상속이 적합한 경우: 명확한 is-a 관계, 부모 인터페이스 재사용. 합성이 적합한 경우: 구현 재사용, 유연한 조합이 필요할 때."
-  - type: "list"
+  - type: text
+    content: '상속보다 합성을 선호하라(Favor composition over inheritance)는 유명한 설계 원칙입니다. 상속은 is-a 관계를 표현하고, 합성은 has-a 관계를 표현합니다. 상속은
+      부모의 구현에 강하게 결합되어 변경에 취약합니다. 합성은 객체를 멤버로 포함하여 느슨한 결합을 유지합니다. 상속이 적합한 경우: 명확한 is-a 관계, 부모 인터페이스 재사용. 합성이 적합한 경우: 구현 재사용,
+      유연한 조합이 필요할 때.'
+  - type: list
     items:
-    - "상속: is-a 관계, 인터페이스 공유"
-    - "합성: has-a 관계, 구현 재사용"
-    - "상속: 강한 결합"
-    - "합성: 느슨한 결합, 유연함"
-  - type: "code"
-    language: "python"
-    title: "상속 방식"
-    description: "상속으로 기능을 확장합니다."
+    - '상속: is-a 관계, 인터페이스 공유'
+    - '합성: has-a 관계, 구현 재사용'
+    - '상속: 강한 결합'
+    - '합성: 느슨한 결합, 유연함'
+  - type: code
+    language: python
+    title: 상속 방식
+    description: 상속으로 기능을 확장합니다.
     content: |-
       class Engine:
           def start(self):
@@ -450,10 +862,10 @@ sections:
               return f"{self.start()} -> Driving"
 
       Car().drive()
-  - type: "code"
-    language: "python"
-    title: "합성 방식"
-    description: "합성으로 기능을 조합합니다."
+  - type: code
+    language: python
+    title: 합성 방식
+    description: 합성으로 기능을 조합합니다.
     content: |-
       class Engine2:
           def start(self):
@@ -467,10 +879,10 @@ sections:
               return f"{self.engine.start()} -> Driving"
 
       Car2().drive()
-  - type: "code"
-    language: "python"
-    title: "합성의 유연성"
-    description: "합성은 런타임에 교체가 가능합니다."
+  - type: code
+    language: python
+    title: 합성의 유연성
+    description: 합성은 런타임에 교체가 가능합니다.
     content: |-
       class GasEngine:
           def start(self):
@@ -490,19 +902,155 @@ sections:
       gasCar = FlexibleCar(GasEngine())
       electricCar = FlexibleCar(ElectricEngine())
       gasCar.drive(), electricCar.drive()
-  - type: "tip"
-    content: "변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요."
+  - type: tip
+    content: 변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요.
+- id: workflow_validation
+  title: '현업 흐름 검증: 믹스인 처리 순서 고정하기'
+  structuredPrimary: true
+  subtitle: 예측 → MRO 확인 → super 체인 → 오류 검증
+  goal: '현업 흐름 검증: 믹스인 처리 순서 고정하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 믹스인 처리 순서 고정하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다중 상속은 믹스인이 모두 cooperative super를 지킬 때만 안전합니다. 처리 파이프라인에서 검증, 감사, 기본 처리 순서가 MRO와 일치하는지 확인합니다.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 믹스인 처리 순서 고정하기"
-  subtitle: "예측 → MRO 확인 → super 체인 → 오류 검증"
+    변주 실험
+    `AuditMixin`과 `ValidateMixin`의 상속 순서를 바꾸고, 실패 요청이 감사 로그에 남아야 하는지 업무 정책에 맞춰 기대 순서를 고정하세요.
+  tips:
+  - 변주 실험 `AuditMixin`과 `ValidateMixin`의 상속 순서를 바꾸고, 실패 요청이 감사 로그에 남아야 하는지 업무 정책에 맞춰 기대 순서를 고정하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class BaseProcessor:
+        def process(self, payload):
+            payload["steps"].append("base")
+            payload["status"] = "processed"
+            return payload
+
+    class ValidateMixin:
+        def process(self, payload):
+            if "orderId" not in payload:
+                raise ValueError("orderId is required")
+            payload["steps"].append("validate")
+            return super().process(payload)
+
+    class AuditMixin:
+        def process(self, payload):
+            payload["steps"].append("audit")
+            return super().process(payload)
+
+    class OrderProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+        pass
+
+    processor = OrderProcessor()
+    payload = {"orderId": "A-100", "steps": []}
+    result = processor.process(payload)
+
+    assert result["steps"] == ["validate", "audit", "base"]
+    assert result["status"] == "processed"
+    assert [cls.__name__ for cls in OrderProcessor.__mro__[:4]] == [
+        "OrderProcessor", "ValidateMixin", "AuditMixin", "BaseProcessor"
+    ]
+
+    try:
+        processor.process({"steps": []})
+    except ValueError as exc:
+        assert "orderId" in str(exc)
+
+    print("다중 상속 MRO 검증 흐름 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 믹스인 처리 순서 고정하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class BaseProcessor:
+          def process(self, payload):
+              payload["steps"].append("base")
+              payload["status"] = "processed"
+              return payload
+
+      class ValidateMixin:
+          def process(self, payload):
+              if "orderId" not in payload:
+                  raise ValueError("orderId is required")
+              payload["steps"].append("validate")
+              return super().process(payload)
+
+      class AuditMixin:
+          def process(self, payload):
+              payload["steps"].append("audit")
+              return super().process(payload)
+
+      class OrderProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+          pass
+
+      processor = OrderProcessor()
+      payload = {"orderId": "A-100", "steps": []}
+      result = processor.process(payload)
+
+      assert result["steps"] == ["validate", "audit", "base"]
+      assert result["status"] == "processed"
+      assert [cls.__name__ for cls in OrderProcessor.__mro__[:4]] == [
+          "OrderProcessor", "ValidateMixin", "AuditMixin", "BaseProcessor"
+      ]
+
+      try:
+          processor.process({"steps": []})
+      except ValueError as exc:
+          assert "orderId" in str(exc)
+
+      print("다중 상속 MRO 검증 흐름 통과")
+    solution: |-
+      class BaseProcessor:
+          def process(self, payload):
+              payload["steps"].append("base")
+              payload["status"] = "processed"
+              return payload
+
+      class ValidateMixin:
+          def process(self, payload):
+              if "orderId" not in payload:
+                  raise ValueError("orderId is required")
+              payload["steps"].append("validate")
+              return super().process(payload)
+
+      class AuditMixin:
+          def process(self, payload):
+              payload["steps"].append("audit")
+              return super().process(payload)
+
+      class OrderProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+          pass
+
+      processor = OrderProcessor()
+      payload = {"orderId": "A-100", "steps": []}
+      result = processor.process(payload)
+
+      assert result["steps"] == ["validate", "audit", "base"]
+      assert result["status"] == "processed"
+      assert [cls.__name__ for cls in OrderProcessor.__mro__[:4]] == [
+          "OrderProcessor", "ValidateMixin", "AuditMixin", "BaseProcessor"
+      ]
+
+      try:
+          processor.process({"steps": []})
+      except ValueError as exc:
+          assert "orderId" in str(exc)
+
+      print("다중 상속 MRO 검증 흐름 통과")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "다중 상속은 믹스인이 모두 cooperative super를 지킬 때만 안전합니다. 처리 파이프라인에서 검증, 감사, 기본 처리 순서가 MRO와 일치하는지 확인합니다."
-  - type: "code"
-    language: "python"
-    title: "주문 처리 믹스인 체인"
-    description: "MRO 순서대로 검증과 감사 단계가 실행되는지 고정합니다."
+  - type: text
+    content: 다중 상속은 믹스인이 모두 cooperative super를 지킬 때만 안전합니다. 처리 파이프라인에서 검증, 감사, 기본 처리 순서가 MRO와 일치하는지 확인합니다.
+  - type: code
+    language: python
+    title: 주문 처리 믹스인 체인
+    description: MRO 순서대로 검증과 감사 단계가 실행되는지 고정합니다.
     content: |-
       class BaseProcessor:
           def process(self, payload):
@@ -541,24 +1089,87 @@ sections:
           assert "orderId" in str(exc)
 
       print("다중 상속 MRO 검증 흐름 통과")
-  - type: "list"
+  - type: list
     items:
-    - "믹스인은 직접 부모 이름을 호출하지 말고 super() 체인을 유지해야 합니다."
-    - "MRO는 코드 실행 순서이므로 예측값을 assert로 고정합니다."
-    - "검증 믹스인은 체인의 앞에 두어 실패를 빠르게 드러내게 합니다."
-  - type: "tip"
-    title: "변주 실험"
-    content: "`AuditMixin`과 `ValidateMixin`의 상속 순서를 바꾸고, 실패 요청이 감사 로그에 남아야 하는지 업무 정책에 맞춰 기대 순서를 고정하세요."
+    - 믹스인은 직접 부모 이름을 호출하지 말고 super() 체인을 유지해야 합니다.
+    - MRO는 코드 실행 순서이므로 예측값을 assert로 고정합니다.
+    - 검증 믹스인은 체인의 앞에 두어 실패를 빠르게 드러내게 합니다.
+  - type: tip
+    title: 변주 실험
+    content: '`AuditMixin`과 `ValidateMixin`의 상속 순서를 바꾸고, 실패 요청이 감사 로그에 남아야 하는지 업무 정책에 맞춰 기대 순서를 고정하세요.'
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 다중 상속과 MRO 마스터하기
+  goal: '종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 9에서 배운 다중 상속과 MRO를 난이도별로 복습합니다. 파이썬의 다중 상속은 C3 선형화 알고리즘으로 MRO(Method Resolution Order)를 결정하여 다이아몬드 문제를
+    해결합니다. super()는 MRO를 따라 다음 클래스를 호출하므로 협력적 다중 상속이 가능합니다. 🟢 기본 문제로 MRO 확인과 super() 기본 사용법을 익히고, 🟡 응용 문제로 Mixin 패턴과 협력적 super()
+    체인을 연습하세요. 🔴 심화 문제에서는 복잡한 상속 구조, 인터페이스 분리, 합성 vs 상속 판단 등을 다룹니다. 다중 상속은 강력하지만 남용하면 복잡해지므로 Mixin 패턴 위주로 사용하는 것이 권장됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class A:
+        def methodA(self):
+            return "A"
 
-- id: "practice"
-  title: "종합 복습"
-  subtitle: "다중 상속과 MRO 마스터하기"
+    class B:
+        def methodB(self):
+            return "B"
+
+    class C(A, B):
+        pass
+
+    obj = C()
+    obj.methodA(), obj.methodB()
+  exercise:
+    prompt: '종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class A:
+          def methodA(self):
+              return "A"
+
+      class B:
+          def methodB(self):
+              return "B"
+
+      class C(A, B):
+          pass
+
+      obj = C()
+      obj.methodA(), obj.methodB()
+    solution: |-
+      class A:
+          def methodA(self):
+              return "A"
+
+      class B:
+          def methodB(self):
+              return "B"
+
+      class C(A, B):
+          pass
+
+      obj = C()
+      obj.methodA(), obj.methodB()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 9에서 배운 다중 상속과 MRO를 난이도별로 복습합니다. 파이썬의 다중 상속은 C3 선형화 알고리즘으로 MRO(Method Resolution Order)를 결정하여 다이아몬드 문제를 해결합니다. super()는 MRO를 따라 다음 클래스를 호출하므로 협력적 다중 상속이 가능합니다. 🟢 기본 문제로 MRO 확인과 super() 기본 사용법을 익히고, 🟡 응용 문제로 Mixin 패턴과 협력적 super() 체인을 연습하세요. 🔴 심화 문제에서는 복잡한 상속 구조, 인터페이스 분리, 합성 vs 상속 판단 등을 다룹니다. 다중 상속은 강력하지만 남용하면 복잡해지므로 Mixin 패턴 위주로 사용하는 것이 권장됩니다."
-
-  - type: "expansion"
-    title: "🟢 기본1: 기본 다중 상속"
+  - type: text
+    content: Day 9에서 배운 다중 상속과 MRO를 난이도별로 복습합니다. 파이썬의 다중 상속은 C3 선형화 알고리즘으로 MRO(Method Resolution Order)를 결정하여 다이아몬드 문제를 해결합니다.
+      super()는 MRO를 따라 다음 클래스를 호출하므로 협력적 다중 상속이 가능합니다. 🟢 기본 문제로 MRO 확인과 super() 기본 사용법을 익히고, 🟡 응용 문제로 Mixin 패턴과 협력적 super()
+      체인을 연습하세요. 🔴 심화 문제에서는 복잡한 상속 구조, 인터페이스 분리, 합성 vs 상속 판단 등을 다룹니다. 다중 상속은 강력하지만 남용하면 복잡해지므로 Mixin 패턴 위주로 사용하는 것이 권장됩니다.
+  - type: expansion
+    title: '🟢 기본1: 기본 다중 상속'
     code: |-
       class A:
           def methodA(self):
@@ -573,9 +1184,8 @@ sections:
 
       obj = C()
       obj.methodA(), obj.methodB()
-
-  - type: "expansion"
-    title: "🟢 기본2: MRO 확인"
+  - type: expansion
+    title: '🟢 기본2: MRO 확인'
     code: |-
       class X:
           pass
@@ -590,9 +1200,8 @@ sections:
           pass
 
       [cls.__name__ for cls in W.__mro__]
-
-  - type: "expansion"
-    title: "🟢 기본3: 메서드 우선순위"
+  - type: expansion
+    title: '🟢 기본3: 메서드 우선순위'
     code: |-
       class First:
           def speak(self):
@@ -606,9 +1215,8 @@ sections:
           pass
 
       Child().speak()
-
-  - type: "expansion"
-    title: "🟢 기본4: super() 기본"
+  - type: expansion
+    title: '🟢 기본4: super() 기본'
     code: |-
       class Parent:
           def greet(self):
@@ -619,9 +1227,8 @@ sections:
               return super().greet() + " -> Child"
 
       Child().greet()
-
-  - type: "expansion"
-    title: "🟢 기본5: Mixin 기본"
+  - type: expansion
+    title: '🟢 기본5: Mixin 기본'
     code: |-
       class PrintMixin:
           def show(self):
@@ -632,9 +1239,8 @@ sections:
               self.x = x
 
       Data(10).show()
-
-  - type: "expansion"
-    title: "🟡 응용1: 다이아몬드 상속"
+  - type: expansion
+    title: '🟡 응용1: 다이아몬드 상속'
     code: |-
       class A:
           def method(self):
@@ -653,9 +1259,8 @@ sections:
               return super().method() + ["D"]
 
       D().method()
-
-  - type: "expansion"
-    title: "🟡 응용2: super()로 __init__"
+  - type: expansion
+    title: '🟡 응용2: super()로 __init__'
     code: |-
       class Base:
           def __init__(self, **kwargs):
@@ -678,9 +1283,8 @@ sections:
 
       child = Child(left=1, right=2, name="test")
       child.left, child.right, child.name
-
-  - type: "expansion"
-    title: "🟡 응용3: 여러 Mixin 조합"
+  - type: expansion
+    title: '🟡 응용3: 여러 Mixin 조합'
     code: |-
       class JSONMixin:
           def toJSON(self):
@@ -698,9 +1302,8 @@ sections:
 
       entity = Entity(1, "test")
       entity.toJSON(), entity.validate()
-
-  - type: "expansion"
-    title: "🟡 응용4: 합성 패턴"
+  - type: expansion
+    title: '🟡 응용4: 합성 패턴'
     code: |-
       class Logger:
           def log(self, msg):
@@ -727,9 +1330,8 @@ sections:
 
       service = Service()
       service.process("x", 10), service.cache.get("x")
-
-  - type: "expansion"
-    title: "🟡 응용5: Mixin 순서"
+  - type: expansion
+    title: '🟡 응용5: Mixin 순서'
     code: |-
       class FirstMixin:
           def action(self):
@@ -746,9 +1348,8 @@ sections:
           pass
 
       A().action(), B().action()
-
-  - type: "expansion"
-    title: "🔴 심화1: 협력적 __init__"
+  - type: expansion
+    title: '🔴 심화1: 협력적 __init__'
     code: |-
       class Root:
           def __init__(self, **kwargs):
@@ -771,9 +1372,8 @@ sections:
 
       obj = C(a=1, b=2, c=3)
       obj.a, obj.b, obj.c
-
-  - type: "expansion"
-    title: "🔴 심화2: Mixin으로 기능 주입"
+  - type: expansion
+    title: '🔴 심화2: Mixin으로 기능 주입'
     code: |-
       class TimestampMixin:
           def __init__(self, **kwargs):
@@ -791,9 +1391,8 @@ sections:
 
       ent = Entity(name="test")
       ent.name, bool(ent.createdAt)
-
-  - type: "expansion"
-    title: "🔴 심화3: 메서드 체이닝"
+  - type: expansion
+    title: '🔴 심화3: 메서드 체이닝'
     code: |-
       class A:
           def process(self, data):
@@ -812,9 +1411,8 @@ sections:
               return super().process(data) + ["D"]
 
       D().process([])
-
-  - type: "expansion"
-    title: "🔴 심화4: 전략 Mixin"
+  - type: expansion
+    title: '🔴 심화4: 전략 Mixin'
     code: |-
       class SortStrategyMixin:
           def sort(self, data):
@@ -836,9 +1434,8 @@ sections:
 
       data = [3, 1, 4, 1, 5]
       AscProcessor().process(data), DescProcessor().process(data)
-
-  - type: "expansion"
-    title: "🔴 심화5: 동적 Mixin"
+  - type: expansion
+    title: '🔴 심화5: 동적 Mixin'
     code: |-
       def createMixin(attrName, attrValue):
           class DynamicMixin:
@@ -860,9 +1457,8 @@ sections:
 
       prod = Product(name="Widget")
       prod.name, prod.version, prod.author
-
-  - type: "expansion"
-    title: "🔴 심화6: 합성으로 변환"
+  - type: expansion
+    title: '🔴 심화6: 합성으로 변환'
     code: |-
       class Flyable:
           def fly(self):
@@ -885,9 +1481,8 @@ sections:
 
       duck = Duck()
       duck.fly(), duck.swim()
-
-  - type: "expansion"
-    title: "🔴 심화7: super() 명시적 호출"
+  - type: expansion
+    title: '🔴 심화7: super() 명시적 호출'
     code: |-
       class A:
           def method(self):
@@ -902,9 +1497,8 @@ sections:
               return "C" + super(C, self).method()
 
       C().method()
-
-  - type: "expansion"
-    title: "🔴 심화8: 플러그인 아키텍처"
+  - type: expansion
+    title: '🔴 심화8: 플러그인 아키텍처'
     code: |-
       class PluginBase:
           plugins = []
@@ -926,9 +1520,8 @@ sections:
               return "authenticating"
 
       [p.__name__ for p in PluginBase.plugins]
-
-  - type: "expansion"
-    title: "🔴 심화9: 다중 상속 검증"
+  - type: expansion
+    title: '🔴 심화9: 다중 상속 검증'
     code: |-
       class ValidatedMixin:
           requiredAttrs = []
@@ -954,9 +1547,8 @@ sections:
 
       entity2 = Entity(name="test", id=1)
       entity2.name, entity2.id
-
-  - type: "expansion"
-    title: "🔴 심화10: 데코레이터로 Mixin"
+  - type: expansion
+    title: '🔴 심화10: 데코레이터로 Mixin'
     code: |-
       def addLogging(cls):
           originalInit = cls.__init__

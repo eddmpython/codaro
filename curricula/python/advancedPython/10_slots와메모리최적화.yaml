@@ -1,39 +1,100 @@
 meta:
-  id: "10"
-  title: "slots와 메모리 최적화"
+  id: '10'
+  title: slots와 메모리 최적화
   day: 10
-  category: "advancedPython"
-  tags: ["__slots__", "memory", "optimization", "getsizeof", "검증", "데이터모델"]
+  category: advancedPython
+  tags:
+  - __slots__
+  - memory
+  - optimization
+  - getsizeof
+  - 검증
+  - 데이터모델
   seo:
-    title: "파이썬 __slots__와 메모리 최적화 - 대량 객체 최적화"
-    description: "__slots__로 메모리를 절약합니다. sys.getsizeof, 상속과 slots, 성능 비교, weakref 지원까지."
-    keywords: ["__slots__", "메모리최적화", "getsizeof", "Python optimization"]
-
+    title: 파이썬 __slots__와 메모리 최적화 - 대량 객체 최적화
+    description: __slots__로 메모리를 절약합니다. sys.getsizeof, 상속과 slots, 성능 비교, weakref 지원까지.
+    keywords:
+    - __slots__
+    - 메모리최적화
+    - getsizeof
+    - Python optimization
 intro:
-  emoji: "💾"
+  emoji: 💾
   points:
-  - "__slots__의 동작 원리와 효과"
-  - "메모리 사용량 측정 방법"
-  - "상속에서의 __slots__ 처리"
-  - "제한사항과 트레이드오프"
-
+  - __slots__의 동작 원리와 효과
+  - 메모리 사용량 측정 방법
+  - 상속에서의 __slots__ 처리
+  - 제한사항과 트레이드오프
 sections:
-- id: "slots_basic"
-  title: "__slots__ 기초"
-  subtitle: "__dict__ 제거"
+- id: slots_basic
+  title: __slots__ 기초
+  structuredPrimary: true
+  subtitle: __dict__ 제거
+  goal: '__slots__ 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '__slots__ 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    __slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가 생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다.
+
+    __slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다.
+  tips:
+  - __slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Point:
+        __slots__ = ('x', 'y')
+
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+    p = Point(3, 4)
+    p.x, p.y
+  exercise:
+    prompt: '__slots__ 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Point:
+          __slots__ = ('x', 'y')
+
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      p = Point(3, 4)
+      p.x, p.y
+    solution: |-
+      class Point:
+          __slots__ = ('x', 'y')
+
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      p = Point(3, 4)
+      p.x, p.y
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "__slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가 생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다."
-  - type: "list"
+  - type: text
+    content: __slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가
+      생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다.
+  - type: list
     items:
-    - "__slots__ = ('attr1', 'attr2', ...)"
-    - "__dict__ 딕셔너리 생성 안 함"
-    - "메모리 크게 절약"
-    - "동적 속성 추가 불가"
-  - type: "code"
-    language: "python"
-    title: "기본 __slots__"
-    description: "__slots__를 사용한 클래스를 정의합니다."
+    - __slots__ = ('attr1', 'attr2', ...)
+    - __dict__ 딕셔너리 생성 안 함
+    - 메모리 크게 절약
+    - 동적 속성 추가 불가
+  - type: code
+    language: python
+    title: 기본 __slots__
+    description: __slots__를 사용한 클래스를 정의합니다.
     content: |-
       class Point:
           __slots__ = ('x', 'y')
@@ -44,10 +105,10 @@ sections:
 
       p = Point(3, 4)
       p.x, p.y
-  - type: "code"
-    language: "python"
-    title: "__dict__ 비교"
-    description: "__slots__ 유무에 따른 __dict__ 차이입니다."
+  - type: code
+    language: python
+    title: __dict__ 비교
+    description: __slots__ 유무에 따른 __dict__ 차이입니다.
     content: |-
       class WithDict:
           def __init__(self, x):
@@ -59,10 +120,10 @@ sections:
               self.x = x
 
       hasattr(WithDict(1), '__dict__'), hasattr(WithSlots(1), '__dict__')
-  - type: "code"
-    language: "python"
-    title: "동적 속성 제한"
-    description: "__slots__에 없는 속성은 추가할 수 없습니다."
+  - type: code
+    language: python
+    title: 동적 속성 제한
+    description: __slots__에 없는 속성은 추가할 수 없습니다.
     content: |-
       class Rigid:
           __slots__ = ('a', 'b')
@@ -72,25 +133,114 @@ sections:
 
       rigid = Rigid(1, 2)
       rigid.a, rigid.b
-  - type: "tip"
-    content: "__slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다."
+  - type: tip
+    content: __slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다.
+- id: memory_comparison
+  title: 메모리 비교
+  structuredPrimary: true
+  subtitle: sys.getsizeof
+  goal: '메모리 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '메모리 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로 오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의 크기는 포함되지 않습니다.
 
-- id: "memory_comparison"
-  title: "메모리 비교"
-  subtitle: "sys.getsizeof"
+    정확한 메모리 측정은 tracemalloc 모듈을 사용하세요.
+  tips:
+  - 정확한 메모리 측정은 tracemalloc 모듈을 사용하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import sys
+
+    class Regular:
+        def __init__(self, x, y, z):
+            self.x = x
+            self.y = y
+            self.z = z
+
+    class Slotted:
+        __slots__ = ('x', 'y', 'z')
+        def __init__(self, x, y, z):
+            self.x = x
+            self.y = y
+            self.z = z
+
+    regular = Regular(1, 2, 3)
+    slotted = Slotted(1, 2, 3)
+
+    regularSize = sys.getsizeof(regular) + sys.getsizeof(regular.__dict__)
+    slottedSize = sys.getsizeof(slotted)
+    regularSize, slottedSize
+  exercise:
+    prompt: '메모리 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import sys
+
+      class Regular:
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      class Slotted:
+          __slots__ = ('x', 'y', 'z')
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      regular = Regular(1, 2, 3)
+      slotted = Slotted(1, 2, 3)
+
+      regularSize = sys.getsizeof(regular) + sys.getsizeof(regular.__dict__)
+      slottedSize = sys.getsizeof(slotted)
+      regularSize, slottedSize
+    solution: |-
+      import sys
+
+      class Regular:
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      class Slotted:
+          __slots__ = ('x', 'y', 'z')
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      regular = Regular(1, 2, 3)
+      slotted = Slotted(1, 2, 3)
+
+      regularSize = sys.getsizeof(regular) + sys.getsizeof(regular.__dict__)
+      slottedSize = sys.getsizeof(slotted)
+      regularSize, slottedSize
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로 오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의 크기는 포함되지 않습니다."
-  - type: "list"
+  - type: text
+    content: sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로
+      오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의
+      크기는 포함되지 않습니다.
+  - type: list
     items:
-    - "sys.getsizeof(obj): 객체 크기 (바이트)"
-    - "__dict__ 오버헤드: 64~112 바이트"
-    - "__slots__ 인스턴스: 훨씬 작음"
-    - "얕은 크기만 측정 (참조 객체 제외)"
-  - type: "code"
-    language: "python"
-    title: "객체 크기 비교"
-    description: "__slots__ 유무에 따른 메모리 차이입니다."
+    - 'sys.getsizeof(obj): 객체 크기 (바이트)'
+    - '__dict__ 오버헤드: 64~112 바이트'
+    - '__slots__ 인스턴스: 훨씬 작음'
+    - 얕은 크기만 측정 (참조 객체 제외)
+  - type: code
+    language: python
+    title: 객체 크기 비교
+    description: __slots__ 유무에 따른 메모리 차이입니다.
     content: |-
       import sys
 
@@ -113,10 +263,10 @@ sections:
       regularSize = sys.getsizeof(regular) + sys.getsizeof(regular.__dict__)
       slottedSize = sys.getsizeof(slotted)
       regularSize, slottedSize
-  - type: "code"
-    language: "python"
-    title: "대량 객체 메모리"
-    description: "많은 객체 생성 시 메모리 차이를 추정합니다."
+  - type: code
+    language: python
+    title: 대량 객체 메모리
+    description: 많은 객체 생성 시 메모리 차이를 추정합니다.
     content: |-
       import sys
 
@@ -136,34 +286,102 @@ sections:
       normalTotal = sum(sys.getsizeof(o) + sys.getsizeof(o.__dict__) for o in normalObjs)
       optimizedTotal = sum(sys.getsizeof(o) for o in optimizedObjs)
       f"Normal: {normalTotal:,} bytes, Optimized: {optimizedTotal:,} bytes"
-  - type: "code"
-    language: "python"
-    title: "빈 딕셔너리 크기"
-    description: "빈 __dict__도 메모리를 차지합니다."
+  - type: code
+    language: python
+    title: 빈 딕셔너리 크기
+    description: 빈 __dict__도 메모리를 차지합니다.
     content: |-
       import sys
 
       emptyDict = {}
       sys.getsizeof(emptyDict)
-  - type: "tip"
-    content: "정확한 메모리 측정은 tracemalloc 모듈을 사용하세요."
+  - type: tip
+    content: 정확한 메모리 측정은 tracemalloc 모듈을 사용하세요.
+- id: slots_inheritance
+  title: 상속과 __slots__
+  structuredPrimary: true
+  subtitle: 부모와 자식 슬롯
+  goal: '상속과 __slots__: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '상속과 __slots__: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다. 부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 문제가 됩니다.
 
-- id: "slots_inheritance"
-  title: "상속과 __slots__"
-  subtitle: "부모와 자식 슬롯"
+    다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다.
+  tips:
+  - 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Parent:
+        __slots__ = ('a', 'b')
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+
+    class Child(Parent):
+        __slots__ = ('c',)
+        def __init__(self, a, b, c):
+            super().__init__(a, b)
+            self.c = c
+
+    child = Child(1, 2, 3)
+    child.a, child.b, child.c
+  exercise:
+    prompt: '상속과 __slots__: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Parent:
+          __slots__ = ('a', 'b')
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+      class Child(Parent):
+          __slots__ = ('c',)
+          def __init__(self, a, b, c):
+              super().__init__(a, b)
+              self.c = c
+
+      child = Child(1, 2, 3)
+      child.a, child.b, child.c
+    solution: |-
+      class Parent:
+          __slots__ = ('a', 'b')
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+      class Child(Parent):
+          __slots__ = ('c',)
+          def __init__(self, a, b, c):
+              super().__init__(a, b)
+              self.c = c
+
+      child = Child(1, 2, 3)
+      child.a, child.b, child.c
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다. 부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 문제가 됩니다."
-  - type: "list"
+  - type: text
+    content: 상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다.
+      부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를
+      가지면 문제가 됩니다.
+  - type: list
     items:
-    - "자식 슬롯 = 부모 슬롯 + 자신 슬롯"
-    - "자식에서 __slots__ 미정의 시 __dict__ 생성"
-    - "중복 슬롯 선언 피하기"
-    - "__slots__ = () 로 빈 슬롯 유지"
-  - type: "code"
-    language: "python"
-    title: "슬롯 상속"
-    description: "부모와 자식의 슬롯이 합쳐집니다."
+    - 자식 슬롯 = 부모 슬롯 + 자신 슬롯
+    - 자식에서 __slots__ 미정의 시 __dict__ 생성
+    - 중복 슬롯 선언 피하기
+    - __slots__ = () 로 빈 슬롯 유지
+  - type: code
+    language: python
+    title: 슬롯 상속
+    description: 부모와 자식의 슬롯이 합쳐집니다.
     content: |-
       class Parent:
           __slots__ = ('a', 'b')
@@ -179,10 +397,10 @@ sections:
 
       child = Child(1, 2, 3)
       child.a, child.b, child.c
-  - type: "code"
-    language: "python"
-    title: "빈 슬롯 유지"
-    description: "새 속성 없이 슬롯 방식을 유지합니다."
+  - type: code
+    language: python
+    title: 빈 슬롯 유지
+    description: 새 속성 없이 슬롯 방식을 유지합니다.
     content: |-
       class Base:
           __slots__ = ('x', 'y')
@@ -196,10 +414,10 @@ sections:
       ext.x = 3
       ext.y = 4
       ext.area()
-  - type: "code"
-    language: "python"
-    title: "슬롯 미정의 시"
-    description: "__slots__ 없으면 __dict__가 생성됩니다."
+  - type: code
+    language: python
+    title: 슬롯 미정의 시
+    description: __slots__ 없으면 __dict__가 생성됩니다.
     content: |-
       class SlottedParent:
           __slots__ = ('x',)
@@ -211,25 +429,72 @@ sections:
       nc.x = 1
       nc.extra = "dynamic"
       hasattr(nc, '__dict__'), nc.extra
-  - type: "tip"
-    content: "다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다."
+  - type: tip
+    content: 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다.
+- id: slots_limitations
+  title: 제한사항
+  structuredPrimary: true
+  subtitle: 트레이드오프
+  goal: '제한사항: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '제한사항: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    __slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다. 기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에 추가해야 합니다.
 
-- id: "slots_limitations"
-  title: "제한사항"
-  subtitle: "트레이드오프"
+    pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다.
+  tips:
+  - pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Strict:
+        __slots__ = ('x', 'y')
+
+    strict = Strict()
+    strict.x = 1
+    strict.y = 2
+    strict.x, strict.y
+  exercise:
+    prompt: '제한사항: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Strict:
+          __slots__ = ('x', 'y')
+
+      strict = Strict()
+      strict.x = 1
+      strict.y = 2
+      strict.x, strict.y
+    solution: |-
+      class Strict:
+          __slots__ = ('x', 'y')
+
+      strict = Strict()
+      strict.x = 1
+      strict.y = 2
+      strict.x, strict.y
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "__slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다. 기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에 추가해야 합니다."
-  - type: "list"
+  - type: text
+    content: __slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다.
+      기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에
+      추가해야 합니다.
+  - type: list
     items:
-    - "동적 속성 추가 불가"
-    - "vars(obj) 사용 불가"
-    - "클래스 수준 기본값 불가"
-    - "다중 상속 시 슬롯 충돌 주의"
-  - type: "code"
-    language: "python"
-    title: "동적 속성 제한"
-    description: "선언되지 않은 속성은 추가할 수 없습니다."
+    - 동적 속성 추가 불가
+    - vars(obj) 사용 불가
+    - 클래스 수준 기본값 불가
+    - 다중 상속 시 슬롯 충돌 주의
+  - type: code
+    language: python
+    title: 동적 속성 제한
+    description: 선언되지 않은 속성은 추가할 수 없습니다.
     content: |-
       class Strict:
           __slots__ = ('x', 'y')
@@ -238,10 +503,10 @@ sections:
       strict.x = 1
       strict.y = 2
       strict.x, strict.y
-  - type: "code"
-    language: "python"
-    title: "vars() 대안"
-    description: "슬롯의 값을 가져오는 방법입니다."
+  - type: code
+    language: python
+    title: vars() 대안
+    description: 슬롯의 값을 가져오는 방법입니다.
     content: |-
       class Slotted:
           __slots__ = ('a', 'b', 'c')
@@ -254,10 +519,10 @@ sections:
               return {slot: getattr(self, slot) for slot in self.__slots__}
 
       Slotted(1, 2, 3).asDict()
-  - type: "code"
-    language: "python"
-    title: "다중 상속 충돌"
-    description: "비어 있지 않은 슬롯 간 다중 상속은 불가합니다."
+  - type: code
+    language: python
+    title: 다중 상속 충돌
+    description: 비어 있지 않은 슬롯 간 다중 상속은 불가합니다.
     content: |-
       class A:
           __slots__ = ('x',)
@@ -272,25 +537,74 @@ sections:
       cObj.x = 1
       cObj.y = 2
       cObj.x, cObj.y
-  - type: "tip"
-    content: "pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다."
+  - type: tip
+    content: pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다.
+- id: weakref_support
+  title: weakref 지원
+  structuredPrimary: true
+  subtitle: __weakref__ 슬롯
+  goal: 'weakref 지원: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'weakref 지원: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__ 클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다.
 
-- id: "weakref_support"
-  title: "weakref 지원"
-  subtitle: "__weakref__ 슬롯"
+    WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다.
+  tips:
+  - WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import weakref
+
+    class Normal:
+        pass
+
+    obj = Normal()
+    ref = weakref.ref(obj)
+    ref() is obj
+  exercise:
+    prompt: 'weakref 지원: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import weakref
+
+      class Normal:
+          pass
+
+      obj = Normal()
+      ref = weakref.ref(obj)
+      ref() is obj
+    solution: |-
+      import weakref
+
+      class Normal:
+          pass
+
+      obj = Normal()
+      ref = weakref.ref(obj)
+      ref() is obj
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__ 클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다."
-  - type: "list"
+  - type: text
+    content: weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__
+      클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다.
+  - type: list
     items:
-    - "weakref: 약한 참조 (참조 카운트 X)"
-    - "일반 클래스: 자동 지원"
-    - "__slots__ 클래스: '__weakref__' 필요"
-    - "캐시, 옵저버에서 메모리 누수 방지"
-  - type: "code"
-    language: "python"
-    title: "weakref 기본"
-    description: "일반 클래스의 약한 참조입니다."
+    - 'weakref: 약한 참조 (참조 카운트 X)'
+    - '일반 클래스: 자동 지원'
+    - '__slots__ 클래스: ''__weakref__'' 필요'
+    - 캐시, 옵저버에서 메모리 누수 방지
+  - type: code
+    language: python
+    title: weakref 기본
+    description: 일반 클래스의 약한 참조입니다.
     content: |-
       import weakref
 
@@ -300,10 +614,10 @@ sections:
       obj = Normal()
       ref = weakref.ref(obj)
       ref() is obj
-  - type: "code"
-    language: "python"
-    title: "__slots__와 weakref"
-    description: "__weakref__를 슬롯에 추가합니다."
+  - type: code
+    language: python
+    title: __slots__와 weakref
+    description: __weakref__를 슬롯에 추가합니다.
     content: |-
       import weakref
 
@@ -315,10 +629,10 @@ sections:
       obj = WeakSlotted(42)
       ref = weakref.ref(obj)
       ref().value
-  - type: "code"
-    language: "python"
-    title: "WeakValueDictionary"
-    description: "약한 참조를 값으로 가지는 딕셔너리입니다."
+  - type: code
+    language: python
+    title: WeakValueDictionary
+    description: 약한 참조를 값으로 가지는 딕셔너리입니다.
     content: |-
       import weakref
 
@@ -332,25 +646,104 @@ sections:
       cache["key"] = item
 
       "key" in cache, cache["key"].name
-  - type: "tip"
-    content: "WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다."
+  - type: tip
+    content: WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다.
+- id: performance
+  title: 성능 비교
+  structuredPrimary: true
+  subtitle: 속성 접근 속도
+  goal: '성능 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '성능 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    __slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리 절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다.
 
-- id: "performance"
-  title: "성능 비교"
-  subtitle: "속성 접근 속도"
+    Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다.
+  tips:
+  - Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Normal:
+        def __init__(self, x):
+            self.x = x
+
+    class Slotted:
+        __slots__ = ('x',)
+        def __init__(self, x):
+            self.x = x
+
+    norm = Normal(1)
+    slot = Slotted(1)
+
+    def accessTest(obj, count):
+        for _ in range(count):
+            _ = obj.x
+        return "done"
+
+    accessTest(norm, 10000), accessTest(slot, 10000)
+  exercise:
+    prompt: '성능 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Normal:
+          def __init__(self, x):
+              self.x = x
+
+      class Slotted:
+          __slots__ = ('x',)
+          def __init__(self, x):
+              self.x = x
+
+      norm = Normal(1)
+      slot = Slotted(1)
+
+      def accessTest(obj, count):
+          for _ in range(count):
+              _ = obj.x
+          return "done"
+
+      accessTest(norm, 10000), accessTest(slot, 10000)
+    solution: |-
+      class Normal:
+          def __init__(self, x):
+              self.x = x
+
+      class Slotted:
+          __slots__ = ('x',)
+          def __init__(self, x):
+              self.x = x
+
+      norm = Normal(1)
+      slot = Slotted(1)
+
+      def accessTest(obj, count):
+          for _ in range(count):
+              _ = obj.x
+          return "done"
+
+      accessTest(norm, 10000), accessTest(slot, 10000)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "__slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리 절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다."
-  - type: "list"
+  - type: text
+    content: __slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리
+      절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다.
+  - type: list
     items:
-    - "속성 접근 약간 빠름"
-    - "고정 오프셋 vs 해시 테이블 검색"
-    - "주요 이점은 메모리 절약"
-    - "대량 단순 객체에 적합"
-  - type: "code"
-    language: "python"
-    title: "접근 속도 비교"
-    description: "간단한 접근 성능을 비교합니다."
+    - 속성 접근 약간 빠름
+    - 고정 오프셋 vs 해시 테이블 검색
+    - 주요 이점은 메모리 절약
+    - 대량 단순 객체에 적합
+  - type: code
+    language: python
+    title: 접근 속도 비교
+    description: 간단한 접근 성능을 비교합니다.
     content: |-
       class Normal:
           def __init__(self, x):
@@ -370,10 +763,10 @@ sections:
           return "done"
 
       accessTest(norm, 10000), accessTest(slot, 10000)
-  - type: "code"
-    language: "python"
-    title: "사용 시나리오"
-    description: "__slots__ 사용이 적합한 경우입니다."
+  - type: code
+    language: python
+    title: 사용 시나리오
+    description: __slots__ 사용이 적합한 경우입니다.
     content: |-
       """
       __slots__ 적합:
@@ -389,10 +782,10 @@ sections:
       - 유연한 API 필요
       """
       "guidelines"
-  - type: "code"
-    language: "python"
-    title: "dataclass와 slots"
-    description: "Python 3.10+ dataclass의 slots 옵션입니다."
+  - type: code
+    language: python
+    title: dataclass와 slots
+    description: Python 3.10+ dataclass의 slots 옵션입니다.
     content: |-
       from dataclasses import dataclass
 
@@ -404,19 +797,161 @@ sections:
 
       coord = Coordinate(1.0, 2.0, 3.0)
       coord.x, coord.y, coord.z, hasattr(coord, '__dict__')
-  - type: "tip"
-    content: "Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다."
+  - type: tip
+    content: Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기'
+  structuredPrimary: true
+  subtitle: 예측 → 메모리 모델 → 동적 속성 차단 → dataclass slots 검증
+  goal: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    __slots__는 속도를 위한 마법이 아니라, 대량으로 생성되는 단순 객체의 메모리와 속성 계약을 고정하는 선택입니다. 동적 속성이 필요한 모델에는 맞지 않으므로 실패 조건까지 확인해야 합니다.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기"
-  subtitle: "예측 → 메모리 모델 → 동적 속성 차단 → dataclass slots 검증"
+    변주 실험
+    나중에 태그를 자유롭게 붙여야 하는 이벤트 모델이라면 slots가 맞지 않습니다. `tags` 슬롯을 명시적으로 추가한 버전과 일반 객체 버전을 비교하세요.
+  tips:
+  - 변주 실험 나중에 태그를 자유롭게 붙여야 하는 이벤트 모델이라면 slots가 맞지 않습니다. `tags` 슬롯을 명시적으로 추가한 버전과 일반 객체 버전을 비교하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from dataclasses import dataclass
+    import sys
+
+    class NormalEvent:
+        def __init__(self, eventId, amount):
+            self.eventId = eventId
+            self.amount = amount
+
+    class SlottedEvent:
+        __slots__ = ("eventId", "amount")
+
+        def __init__(self, eventId, amount):
+            self.eventId = eventId
+            self.amount = amount
+
+    @dataclass(slots=True)
+    class MetricSample:
+        name: str
+        value: int
+
+    normal = NormalEvent("E-100", 12000)
+    slotted = SlottedEvent("E-100", 12000)
+    metric = MetricSample("paidRevenue", 12000)
+
+    assert hasattr(normal, "__dict__")
+    assert not hasattr(slotted, "__dict__")
+    assert not hasattr(metric, "__dict__")
+    assert metric.value == 12000
+    assert sys.getsizeof(slotted) <= sys.getsizeof(normal) + 128
+
+    normal.extra = "allowed"
+    assert normal.extra == "allowed"
+
+    try:
+        slotted.extra = "blocked"
+    except AttributeError as exc:
+        assert "extra" in str(exc)
+
+    print("slots 이벤트 모델 검증 흐름 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from dataclasses import dataclass
+      import sys
+
+      class NormalEvent:
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      class SlottedEvent:
+          __slots__ = ("eventId", "amount")
+
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      @dataclass(slots=True)
+      class MetricSample:
+          name: str
+          value: int
+
+      normal = NormalEvent("E-100", 12000)
+      slotted = SlottedEvent("E-100", 12000)
+      metric = MetricSample("paidRevenue", 12000)
+
+      assert hasattr(normal, "__dict__")
+      assert not hasattr(slotted, "__dict__")
+      assert not hasattr(metric, "__dict__")
+      assert metric.value == 12000
+      assert sys.getsizeof(slotted) <= sys.getsizeof(normal) + 128
+
+      normal.extra = "allowed"
+      assert normal.extra == "allowed"
+
+      try:
+          slotted.extra = "blocked"
+      except AttributeError as exc:
+          assert "extra" in str(exc)
+
+      print("slots 이벤트 모델 검증 흐름 통과")
+    solution: |-
+      from dataclasses import dataclass
+      import sys
+
+      class NormalEvent:
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      class SlottedEvent:
+          __slots__ = ("eventId", "amount")
+
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      @dataclass(slots=True)
+      class MetricSample:
+          name: str
+          value: int
+
+      normal = NormalEvent("E-100", 12000)
+      slotted = SlottedEvent("E-100", 12000)
+      metric = MetricSample("paidRevenue", 12000)
+
+      assert hasattr(normal, "__dict__")
+      assert not hasattr(slotted, "__dict__")
+      assert not hasattr(metric, "__dict__")
+      assert metric.value == 12000
+      assert sys.getsizeof(slotted) <= sys.getsizeof(normal) + 128
+
+      normal.extra = "allowed"
+      assert normal.extra == "allowed"
+
+      try:
+          slotted.extra = "blocked"
+      except AttributeError as exc:
+          assert "extra" in str(exc)
+
+      print("slots 이벤트 모델 검증 흐름 통과")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "__slots__는 속도를 위한 마법이 아니라, 대량으로 생성되는 단순 객체의 메모리와 속성 계약을 고정하는 선택입니다. 동적 속성이 필요한 모델에는 맞지 않으므로 실패 조건까지 확인해야 합니다."
-  - type: "code"
-    language: "python"
-    title: "이벤트 레코드 slots 검증"
-    description: "일반 객체와 slotted 객체, slots dataclass의 속성 계약을 비교합니다."
+  - type: text
+    content: __slots__는 속도를 위한 마법이 아니라, 대량으로 생성되는 단순 객체의 메모리와 속성 계약을 고정하는 선택입니다. 동적 속성이 필요한 모델에는 맞지 않으므로 실패 조건까지 확인해야 합니다.
+  - type: code
+    language: python
+    title: 이벤트 레코드 slots 검증
+    description: 일반 객체와 slotted 객체, slots dataclass의 속성 계약을 비교합니다.
     content: |-
       from dataclasses import dataclass
       import sys
@@ -457,24 +992,73 @@ sections:
           assert "extra" in str(exc)
 
       print("slots 이벤트 모델 검증 흐름 통과")
-  - type: "list"
+  - type: list
     items:
-    - "__slots__는 동적 속성을 막기 때문에 입력 스키마가 안정적인 대량 객체에 맞습니다."
-    - "메모리 수치는 환경별로 달라질 수 있으므로 핵심 계약은 __dict__ 유무와 속성 차단으로 검증합니다."
-    - "새 코드에서는 dataclass(slots=True)가 명시성과 생산성의 균형이 좋습니다."
-  - type: "tip"
-    title: "변주 실험"
-    content: "나중에 태그를 자유롭게 붙여야 하는 이벤트 모델이라면 slots가 맞지 않습니다. `tags` 슬롯을 명시적으로 추가한 버전과 일반 객체 버전을 비교하세요."
+    - __slots__는 동적 속성을 막기 때문에 입력 스키마가 안정적인 대량 객체에 맞습니다.
+    - 메모리 수치는 환경별로 달라질 수 있으므로 핵심 계약은 __dict__ 유무와 속성 차단으로 검증합니다.
+    - 새 코드에서는 dataclass(slots=True)가 명시성과 생산성의 균형이 좋습니다.
+  - type: tip
+    title: 변주 실험
+    content: 나중에 태그를 자유롭게 붙여야 하는 이벤트 모델이라면 slots가 맞지 않습니다. `tags` 슬롯을 명시적으로 추가한 버전과 일반 객체 버전을 비교하세요.
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: __slots__와 메모리 최적화 마스터하기
+  goal: '종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 10에서 배운 __slots__와 메모리 최적화를 난이도별로 복습합니다. __slots__는 인스턴스 속성을 고정하여 __dict__ 생성을 막고 메모리를 절약하는 기법입니다. 수만~수백만
+    개의 객체를 생성할 때 효과적이며, 속성 접근 속도도 약간 빨라집니다. 🟢 기본 문제로 __slots__ 정의와 메모리 비교를 익히고, 🟡 응용 문제로 상속, weakref 지원 패턴을 연습하세요. 🔴 심화 문제에서는
+    pickle 직렬화, 동적 슬롯 클래스, dataclass(slots=True) 등 고급 기법을 다룹니다. __slots__는 메모리와 유연성 사이의 트레이드오프이므로 대량 데이터 객체에 선택적으로 적용하세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Point:
+        __slots__ = ('x', 'y')
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
 
-- id: "practice"
-  title: "종합 복습"
-  subtitle: "__slots__와 메모리 최적화 마스터하기"
+    pt = Point(3, 4)
+    pt.x, pt.y
+  exercise:
+    prompt: '종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Point:
+          __slots__ = ('x', 'y')
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      pt = Point(3, 4)
+      pt.x, pt.y
+    solution: |-
+      class Point:
+          __slots__ = ('x', 'y')
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      pt = Point(3, 4)
+      pt.x, pt.y
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 10에서 배운 __slots__와 메모리 최적화를 난이도별로 복습합니다. __slots__는 인스턴스 속성을 고정하여 __dict__ 생성을 막고 메모리를 절약하는 기법입니다. 수만~수백만 개의 객체를 생성할 때 효과적이며, 속성 접근 속도도 약간 빨라집니다. 🟢 기본 문제로 __slots__ 정의와 메모리 비교를 익히고, 🟡 응용 문제로 상속, weakref 지원 패턴을 연습하세요. 🔴 심화 문제에서는 pickle 직렬화, 동적 슬롯 클래스, dataclass(slots=True) 등 고급 기법을 다룹니다. __slots__는 메모리와 유연성 사이의 트레이드오프이므로 대량 데이터 객체에 선택적으로 적용하세요."
-
-  - type: "expansion"
-    title: "🟢 기본1: 기본 __slots__"
+  - type: text
+    content: Day 10에서 배운 __slots__와 메모리 최적화를 난이도별로 복습합니다. __slots__는 인스턴스 속성을 고정하여 __dict__ 생성을 막고 메모리를 절약하는 기법입니다. 수만~수백만
+      개의 객체를 생성할 때 효과적이며, 속성 접근 속도도 약간 빨라집니다. 🟢 기본 문제로 __slots__ 정의와 메모리 비교를 익히고, 🟡 응용 문제로 상속, weakref 지원 패턴을 연습하세요. 🔴 심화
+      문제에서는 pickle 직렬화, 동적 슬롯 클래스, dataclass(slots=True) 등 고급 기법을 다룹니다. __slots__는 메모리와 유연성 사이의 트레이드오프이므로 대량 데이터 객체에 선택적으로
+      적용하세요.
+  - type: expansion
+    title: '🟢 기본1: 기본 __slots__'
     code: |-
       class Point:
           __slots__ = ('x', 'y')
@@ -484,9 +1068,8 @@ sections:
 
       pt = Point(3, 4)
       pt.x, pt.y
-
-  - type: "expansion"
-    title: "🟢 기본2: __dict__ 확인"
+  - type: expansion
+    title: '🟢 기본2: __dict__ 확인'
     code: |-
       class Normal:
           def __init__(self, v):
@@ -498,9 +1081,8 @@ sections:
               self.v = v
 
       hasattr(Normal(1), '__dict__'), hasattr(Slotted(1), '__dict__')
-
-  - type: "expansion"
-    title: "🟢 기본3: 메모리 크기"
+  - type: expansion
+    title: '🟢 기본3: 메모리 크기'
     code: |-
       import sys
 
@@ -516,9 +1098,8 @@ sections:
       a = A()
       b = B()
       sys.getsizeof(a), sys.getsizeof(b)
-
-  - type: "expansion"
-    title: "🟢 기본4: 슬롯 상속"
+  - type: expansion
+    title: '🟢 기본4: 슬롯 상속'
     code: |-
       class Parent:
           __slots__ = ('a',)
@@ -531,9 +1112,8 @@ sections:
 
       ch = Child(1, 2)
       ch.a, ch.b
-
-  - type: "expansion"
-    title: "🟢 기본5: 빈 슬롯"
+  - type: expansion
+    title: '🟢 기본5: 빈 슬롯'
     code: |-
       class Base:
           __slots__ = ('x', 'y')
@@ -546,9 +1126,8 @@ sections:
       extended = Extended()
       extended.x, extended.y = 3, 4
       extended.sum()
-
-  - type: "expansion"
-    title: "🟡 응용1: asDict 메서드"
+  - type: expansion
+    title: '🟡 응용1: asDict 메서드'
     code: |-
       class Record:
           __slots__ = ('id', 'name', 'value')
@@ -562,9 +1141,8 @@ sections:
               return {s: getattr(self, s) for s in self.__slots__}
 
       Record(1, "test", 100).asDict()
-
-  - type: "expansion"
-    title: "🟡 응용2: __repr__ 구현"
+  - type: expansion
+    title: '🟡 응용2: __repr__ 구현'
     code: |-
       class Entity:
           __slots__ = ('a', 'b', 'c')
@@ -579,9 +1157,8 @@ sections:
               return f"{self.__class__.__name__}({attrs})"
 
       Entity(1, "hello", [1, 2, 3])
-
-  - type: "expansion"
-    title: "🟡 응용3: weakref 지원"
+  - type: expansion
+    title: '🟡 응용3: weakref 지원'
     code: |-
       import weakref
 
@@ -594,9 +1171,8 @@ sections:
       obj = Trackable("important")
       ref = weakref.ref(obj)
       ref().data
-
-  - type: "expansion"
-    title: "🟡 응용4: 기본값 처리"
+  - type: expansion
+    title: '🟡 응용4: 기본값 처리'
     code: |-
       class Config:
           __slots__ = ('host', 'port', 'debug')
@@ -609,9 +1185,8 @@ sections:
       cfg1 = Config()
       cfg2 = Config(host="0.0.0.0", port=3000)
       (cfg1.host, cfg1.port), (cfg2.host, cfg2.port)
-
-  - type: "expansion"
-    title: "🟡 응용5: 복사 지원"
+  - type: expansion
+    title: '🟡 응용5: 복사 지원'
     code: |-
       class Copyable:
           __slots__ = ('x', 'y')
@@ -629,9 +1204,8 @@ sections:
       original = Copyable(1, 2)
       copied = original.copy()
       original is copied, (copied.x, copied.y)
-
-  - type: "expansion"
-    title: "🔴 심화1: 메모리 대량 비교"
+  - type: expansion
+    title: '🔴 심화1: 메모리 대량 비교'
     code: |-
       import sys
 
@@ -655,9 +1229,8 @@ sections:
       normalMem = sum(sys.getsizeof(o) for o in normalList)
       slottedMem = sum(sys.getsizeof(o) for o in slottedList)
       f"Normal: {normalMem}, Slotted: {slottedMem}, Ratio: {normalMem/slottedMem:.2f}x"
-
-  - type: "expansion"
-    title: "🔴 심화2: 다중 상속 해결"
+  - type: expansion
+    title: '🔴 심화2: 다중 상속 해결'
     code: |-
       class A:
           __slots__ = ()
@@ -677,9 +1250,8 @@ sections:
 
       cInst = C(1, 2)
       cInst.methodA(), cInst.methodB(), cInst.x, cInst.y
-
-  - type: "expansion"
-    title: "🔴 심화3: pickle 지원"
+  - type: expansion
+    title: '🔴 심화3: pickle 지원'
     code: |-
       import pickle
 
@@ -702,9 +1274,8 @@ sections:
       restored = Serializable.__new__(Serializable)
       restored.__setstate__(pickle.loads(data))
       restored.a, restored.b
-
-  - type: "expansion"
-    title: "🔴 심화4: 동적 슬롯 클래스"
+  - type: expansion
+    title: '🔴 심화4: 동적 슬롯 클래스'
     code: |-
       def createSlottedClass(name, slots):
           def initMethod(self, **kwargs):
@@ -718,9 +1289,8 @@ sections:
       Person = createSlottedClass("Person", ["name", "age", "email"])
       person = Person(name="Alice", age=30, email="alice@example.com")
       person.name, person.age
-
-  - type: "expansion"
-    title: "🔴 심화5: 불변 슬롯"
+  - type: expansion
+    title: '🔴 심화5: 불변 슬롯'
     code: |-
       class Immutable:
           __slots__ = ('_x', '_y')
@@ -742,9 +1312,8 @@ sections:
 
       im = Immutable(3, 4)
       im.x, im.y
-
-  - type: "expansion"
-    title: "🔴 심화6: WeakSet 활용"
+  - type: expansion
+    title: '🔴 심화6: WeakSet 활용'
     code: |-
       import weakref
 
@@ -761,9 +1330,8 @@ sections:
       t3 = Tracked(3)
 
       len(Tracked.instances)
-
-  - type: "expansion"
-    title: "🔴 심화7: 상속 체인"
+  - type: expansion
+    title: '🔴 심화7: 상속 체인'
     code: |-
       class L1:
           __slots__ = ('a',)
@@ -780,9 +1348,8 @@ sections:
       obj = L4()
       obj.a, obj.b, obj.c, obj.d = 1, 2, 3, 4
       (obj.a, obj.b, obj.c, obj.d)
-
-  - type: "expansion"
-    title: "🔴 심화8: 프로퍼티와 슬롯"
+  - type: expansion
+    title: '🔴 심화8: 프로퍼티와 슬롯'
     code: |-
       class Validated:
           __slots__ = ('_value',)
@@ -803,9 +1370,8 @@ sections:
       validated = Validated(10)
       validated.value = 20
       validated.value
-
-  - type: "expansion"
-    title: "🔴 심화9: 메타클래스와 슬롯"
+  - type: expansion
+    title: '🔴 심화9: 메타클래스와 슬롯'
     code: |-
       class SlotMeta(type):
           def __new__(mcs, name, bases, namespace):
@@ -823,9 +1389,8 @@ sections:
 
       model = Model(1, "test")
       model.id, model.name, model.active, hasattr(model, '__dict__')
-
-  - type: "expansion"
-    title: "🔴 심화10: dataclass slots"
+  - type: expansion
+    title: '🔴 심화10: dataclass slots'
     code: |-
       from dataclasses import dataclass, field
 

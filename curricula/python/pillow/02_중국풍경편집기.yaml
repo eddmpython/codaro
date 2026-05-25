@@ -1,31 +1,82 @@
 meta:
   packages:
-    - pillow
-    - scikit-learn
+  - pillow
+  - scikit-learn
   id: pillow_02
   title: 중국풍경편집기
   order: 2
   category: pillow
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["Pillow", "crop", "rotate", "transpose", "resize"]
+  tags:
+  - Pillow
+  - crop
+  - rotate
+  - transpose
+  - resize
   seo:
-    title: "Pillow 입문 - 중국 풍경 편집기"
-    description: "Pillow로 이미지를 자르고, 회전하고, 뒤집습니다. crop, rotate, transpose 메서드를 익힙니다."
-    keywords: ["Pillow", "crop", "rotate", "transpose", "이미지편집", "회전"]
-
+    title: Pillow 입문 - 중국 풍경 편집기
+    description: Pillow로 이미지를 자르고, 회전하고, 뒤집습니다. crop, rotate, transpose 메서드를 익힙니다.
+    keywords:
+    - Pillow
+    - crop
+    - rotate
+    - transpose
+    - 이미지편집
+    - 회전
 intro:
-  emoji: "🏯"
+  emoji: 🏯
   goal: sklearn의 china 이미지를 자르고 회전하여 편집합니다.
   description: crop()으로 원하는 영역을 추출하고, rotate()로 각도 회전, transpose()로 뒤집기를 수행합니다. 이미지 편집의 기본 작업들을 익힙니다.
-
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
+  structuredPrimary: true
   subtitle: china.jpg 로드
+  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sklearn의 china.jpg 이미지를 불러옵니다. 이전 프로젝트에서 배운 대로 NumPy 배열을 Pillow Image로 변환합니다. 중국 풍경 이미지로 자르기, 회전, 뒤집기 같은 편집
+    작업을 연습해봅니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    chinaArr = load_sample_image('china.jpg')
+    photo = Image.fromarray(chinaArr)
+    photo.size
+  exercise:
+    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaArr = load_sample_image('china.jpg')
+      photo = Image.fromarray(chinaArr)
+      photo.size
+    solution: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaArr = load_sample_image('china.jpg')
+      photo = Image.fromarray(chinaArr)
+      photo.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: sklearn의 china.jpg 이미지를 불러옵니다. 이전 프로젝트에서 배운 대로 NumPy 배열을 Pillow Image로 변환합니다. 중국 풍경 이미지로 자르기, 회전, 뒤집기 같은 편집 작업을 연습해봅니다.
+    content: sklearn의 china.jpg 이미지를 불러옵니다. 이전 프로젝트에서 배운 대로 NumPy 배열을 Pillow Image로 변환합니다. 중국 풍경 이미지로 자르기, 회전, 뒤집기 같은 편집 작업을
+      연습해봅니다.
   - type: code
     language: python
     title: 라이브러리와 이미지
@@ -41,15 +92,57 @@ sections:
     language: python
     title: 원본 이미지
     description: china 풍경 이미지입니다
-    content: |-
-      photo
-
+    content: photo
 - id: step2_crop
   title: 2단계. 이미지 자르기
+  structuredPrimary: true
   subtitle: crop()
+  goal: '2단계. 이미지 자르기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 이미지 자르기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    crop() 메서드는 이미지의 특정 영역을 잘라냅니다. (left, upper, right, lower) 튜플로 사각형 영역을 지정합니다. 좌표는 왼쪽 상단이 (0, 0)이고, right와 lower는 포함되지 않는 경계입니다.
+
+    crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left, lower-upper)입니다.
+  tips:
+  - crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left, lower-upper)입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    width, height = photo.size
+    left = width // 4
+    upper = height // 4
+    right = width * 3 // 4
+    lower = height * 3 // 4
+    left, upper, right, lower
+  exercise:
+    prompt: '2단계. 이미지 자르기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      width, height = photo.size
+      left = width // 4
+      upper = height // 4
+      right = width * 3 // 4
+      lower = height * 3 // 4
+      left, upper, right, lower
+    solution: |-
+      width, height = photo.size
+      left = width // 4
+      upper = height // 4
+      right = width * 3 // 4
+      lower = height * 3 // 4
+      left, upper, right, lower
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: crop() 메서드는 이미지의 특정 영역을 잘라냅니다. (left, upper, right, lower) 튜플로 사각형 영역을 지정합니다. 좌표는 왼쪽 상단이 (0, 0)이고, right와 lower는 포함되지 않는 경계입니다.
+    content: crop() 메서드는 이미지의 특정 영역을 잘라냅니다. (left, upper, right, lower) 튜플로 사각형 영역을 지정합니다. 좌표는 왼쪽 상단이 (0, 0)이고, right와 lower는
+      포함되지 않는 경계입니다.
   - type: code
     language: python
     title: 중앙 영역 자르기
@@ -69,20 +162,51 @@ sections:
       cropped = photo.crop((left, upper, right, lower))
       cropped.size
   - type: tip
-    content: crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left, lower-upper)입니다.
+    content: crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left,
+      lower-upper)입니다.
   - type: code
     language: python
     title: 자른 이미지
     description: 중앙 영역만 추출되었습니다
-    content: |-
-      cropped
-
+    content: cropped
 - id: step3_rotate
   title: 3단계. 이미지 회전
+  structuredPrimary: true
   subtitle: rotate()
+  goal: '3단계. 이미지 회전: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 이미지 회전: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    rotate() 메서드는 이미지를 시계 반대 방향으로 회전합니다. 기본적으로 원본 크기를 유지하므로 모서리가 잘릴 수 있습니다. expand=True를 주면 회전된 이미지 전체가 보이도록 캔버스가 확장됩니다.
+
+    expand=True를 사용하면 회전 후 이미지 전체가 보이도록 캔버스 크기가 자동으로 조정됩니다. 빈 공간은 검은색(또는 투명)으로 채워집니다.
+  tips:
+  - expand=True를 사용하면 회전 후 이미지 전체가 보이도록 캔버스 크기가 자동으로 조정됩니다. 빈 공간은 검은색(또는 투명)으로 채워집니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    rotated = cropped.rotate(45)
+    rotated.size
+  exercise:
+    prompt: '3단계. 이미지 회전: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      rotated = cropped.rotate(45)
+      rotated.size
+    solution: |-
+      rotated = cropped.rotate(45)
+      rotated.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: rotate() 메서드는 이미지를 시계 반대 방향으로 회전합니다. 기본적으로 원본 크기를 유지하므로 모서리가 잘릴 수 있습니다. expand=True를 주면 회전된 이미지 전체가 보이도록 캔버스가 확장됩니다.
+    content: rotate() 메서드는 이미지를 시계 반대 방향으로 회전합니다. 기본적으로 원본 크기를 유지하므로 모서리가 잘릴 수 있습니다. expand=True를 주면 회전된 이미지 전체가 보이도록 캔버스가
+      확장됩니다.
   - type: code
     language: python
     title: 45도 회전 (기본)
@@ -94,8 +218,7 @@ sections:
     language: python
     title: 회전 결과 (기본)
     description: 모서리가 잘린 것을 확인합니다
-    content: |-
-      rotated
+    content: rotated
   - type: code
     language: python
     title: 45도 회전 (확장)
@@ -109,15 +232,45 @@ sections:
     language: python
     title: 확장 회전 결과
     description: 전체 이미지가 보입니다
-    content: |-
-      expanded
-
+    content: expanded
 - id: step4_transpose
   title: 4단계. 이미지 뒤집기
+  structuredPrimary: true
   subtitle: transpose()
+  goal: '4단계. 이미지 뒤집기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 이미지 뒤집기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    transpose() 메서드는 이미지를 뒤집거나 90도 단위로 회전합니다. 미리 정의된 상수를 사용하며, FLIP_LEFT_RIGHT(좌우 반전), FLIP_TOP_BOTTOM(상하 반전), ROTATE_90(90도 회전) 등이 있습니다.
+
+    transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이 없습니다.
+  tips:
+  - transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이 없습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    flipped = photo.transpose(Image.FLIP_LEFT_RIGHT)
+    flipped
+  exercise:
+    prompt: '4단계. 이미지 뒤집기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      flipped = photo.transpose(Image.FLIP_LEFT_RIGHT)
+      flipped
+    solution: |-
+      flipped = photo.transpose(Image.FLIP_LEFT_RIGHT)
+      flipped
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: transpose() 메서드는 이미지를 뒤집거나 90도 단위로 회전합니다. 미리 정의된 상수를 사용하며, FLIP_LEFT_RIGHT(좌우 반전), FLIP_TOP_BOTTOM(상하 반전), ROTATE_90(90도 회전) 등이 있습니다.
+    content: transpose() 메서드는 이미지를 뒤집거나 90도 단위로 회전합니다. 미리 정의된 상수를 사용하며, FLIP_LEFT_RIGHT(좌우 반전), FLIP_TOP_BOTTOM(상하 반전), ROTATE_90(90도
+      회전) 등이 있습니다.
   - type: code
     language: python
     title: 좌우 반전
@@ -133,7 +286,8 @@ sections:
       upsideDown = photo.transpose(Image.FLIP_TOP_BOTTOM)
       upsideDown
   - type: tip
-    content: transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이 없습니다.
+    content: transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이
+      없습니다.
   - type: code
     language: python
     title: 90도 회전
@@ -141,10 +295,46 @@ sections:
     content: |-
       turned = photo.transpose(Image.ROTATE_90)
       turned.size
-
 - id: step5_combine
   title: 5단계. 변환 조합
+  structuredPrimary: true
   subtitle: 메서드 체이닝
+  goal: '5단계. 변환 조합: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 변환 조합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pillow의 변환 메서드들은 새 이미지를 반환하므로 체이닝이 가능합니다. 자르기 → 회전 → 리사이즈를 한 번에 연결할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    final = (photo
+        .crop((100, 50, 500, 350))
+        .rotate(15, expand=True)
+        .resize((200, 200)))
+    final.size
+  exercise:
+    prompt: '5단계. 변환 조합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      final = (photo
+          .crop((100, 50, 500, 350))
+          .rotate(15, expand=True)
+          .resize((200, 200)))
+      final.size
+    solution: |-
+      final = (photo
+          .crop((100, 50, 500, 350))
+          .rotate(15, expand=True)
+          .resize((200, 200)))
+      final.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Pillow의 변환 메서드들은 새 이미지를 반환하므로 체이닝이 가능합니다. 자르기 → 회전 → 리사이즈를 한 번에 연결할 수 있습니다.
@@ -162,22 +352,63 @@ sections:
     language: python
     title: 최종 결과
     description: 모든 변환이 적용된 이미지
-    content: |-
-      final
-
+    content: final
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 다양한 편집 적용
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    flower 이미지에 자르기와 회전을 적용해봅시다. 위에서 배운 crop(), rotate(), transpose() 메서드를 조합하여 다양한 편집을 수행합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    flowerData = load_sample_image('flower.jpg')
+    flower = Image.fromarray(flowerData)
+    flower.size
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerData = load_sample_image('flower.jpg')
+      flower = Image.fromarray(flowerData)
+      flower.size
+    solution: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerData = load_sample_image('flower.jpg')
+      flower = Image.fromarray(flowerData)
+      flower.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: flower 이미지에 자르기와 회전을 적용해봅시다. 위에서 배운 crop(), rotate(), transpose() 메서드를 조합하여 다양한 편집을 수행합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: flower 중앙 자르기"
+    title: '미션1: flower 중앙 자르기'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image
         from sklearn.datasets import load_sample_image
@@ -186,21 +417,21 @@ sections:
         flower = Image.fromarray(flowerData)
         flower.size
     - type: code
-      title: "중앙 영역 계산"
+      title: 중앙 영역 계산
       content: |-
         w, h = flower.size
         centerBox = (w//4, h//4, w*3//4, h*3//4)
         centerBox
     - type: code
-      title: "자르기 실행"
+      title: 자르기 실행
       content: |-
         centerCrop = flower.crop(centerBox)
         centerCrop
   - type: expansion
-    title: "미션2: 회전과 뒤집기 조합"
+    title: '미션2: 회전과 뒤집기 조합'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image
         from sklearn.datasets import load_sample_image
@@ -209,19 +440,87 @@ sections:
         scene = Image.fromarray(imgData)
         scene.size
     - type: code
-      title: "좌우 반전 후 30도 회전"
+      title: 좌우 반전 후 30도 회전
       content: |-
         mirrored = scene.transpose(Image.FLIP_LEFT_RIGHT)
         tilted = mirrored.rotate(30, expand=True)
         tilted.size
     - type: code
-      title: "결과 출력"
-      content: |-
-        tilted
-
+      title: 결과 출력
+      content: tilted
 - id: workflow_validation
   title: 6단계. crop과 회전 검증 루프
+  structuredPrimary: true
   subtitle: 편집 좌표와 출력 크기 확인
+  goal: '6단계. crop과 회전 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. crop과 회전 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: crop, rotate, flip은 눈으로 보면 쉬워 보이지만 좌표가 한 칸만 틀려도 결과물이 달라집니다. crop 박스가 원본 안에 있는지 먼저 검증하고, 회전과 뒤집기 결과의 size를 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import Image, ImageDraw
+
+    landscapeImage = Image.new("RGB", (200, 120), (135, 190, 235))
+    landscapeDraw = ImageDraw.Draw(landscapeImage)
+    landscapeDraw.polygon([(0, 90), (60, 35), (120, 90)], fill=(70, 130, 95))
+    landscapeDraw.polygon([(80, 95), (150, 30), (220, 95)], fill=(55, 115, 85))
+    landscapeDraw.ellipse((145, 15, 180, 50), fill=(245, 210, 80))
+
+    def validateCropBox(image, box):
+        left, top, right, bottom = box
+        if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
+            raise ValueError(f"crop 범위가 이미지 밖입니다: {box}")
+        return True
+
+    cropBox = (40, 20, 160, 100)
+    validateCropBox(landscapeImage, cropBox)
+  exercise:
+    prompt: '6단계. crop과 회전 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image, ImageDraw
+
+      landscapeImage = Image.new("RGB", (200, 120), (135, 190, 235))
+      landscapeDraw = ImageDraw.Draw(landscapeImage)
+      landscapeDraw.polygon([(0, 90), (60, 35), (120, 90)], fill=(70, 130, 95))
+      landscapeDraw.polygon([(80, 95), (150, 30), (220, 95)], fill=(55, 115, 85))
+      landscapeDraw.ellipse((145, 15, 180, 50), fill=(245, 210, 80))
+
+      def validateCropBox(image, box):
+          left, top, right, bottom = box
+          if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
+              raise ValueError(f"crop 범위가 이미지 밖입니다: {box}")
+          return True
+
+      cropBox = (40, 20, 160, 100)
+      validateCropBox(landscapeImage, cropBox)
+    solution: |-
+      from PIL import Image, ImageDraw
+
+      landscapeImage = Image.new("RGB", (200, 120), (135, 190, 235))
+      landscapeDraw = ImageDraw.Draw(landscapeImage)
+      landscapeDraw.polygon([(0, 90), (60, 35), (120, 90)], fill=(70, 130, 95))
+      landscapeDraw.polygon([(80, 95), (150, 30), (220, 95)], fill=(55, 115, 85))
+      landscapeDraw.ellipse((145, 15, 180, 50), fill=(245, 210, 80))
+
+      def validateCropBox(image, box):
+          left, top, right, bottom = box
+          if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
+              raise ValueError(f"crop 범위가 이미지 밖입니다: {box}")
+          return True
+
+      cropBox = (40, 20, 160, 100)
+      validateCropBox(landscapeImage, cropBox)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: crop, rotate, flip은 눈으로 보면 쉬워 보이지만 좌표가 한 칸만 틀려도 결과물이 달라집니다. crop 박스가 원본 안에 있는지 먼저 검증하고, 회전과 뒤집기 결과의 size를 확인합니다.

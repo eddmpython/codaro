@@ -1,28 +1,82 @@
 meta:
   packages:
-    - altair
-    - pandas
+  - altair
+  - pandas
   id: altair_01
   title: 자동차연비탐색
   order: 1
   category: altair
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["mpg", "scatter", "point", "기초"]
+  tags:
+  - mpg
+  - scatter
+  - point
+  - 기초
   seo:
-    title: "Altair 산점도 - 마력과 연비 관계 분석"
-    description: "mpg 데이터로 마력과 연비의 관계를 산점도로 시각화합니다. mark_point, encode, 데이터 타입 지정법을 배웁니다."
-    keywords: ["altair", "mark_point", "산점도", "mpg", "연비분석"]
-
+    title: Altair 산점도 - 마력과 연비 관계 분석
+    description: mpg 데이터로 마력과 연비의 관계를 산점도로 시각화합니다. mark_point, encode, 데이터 타입 지정법을 배웁니다.
+    keywords:
+    - altair
+    - mark_point
+    - 산점도
+    - mpg
+    - 연비분석
 intro:
-  emoji: "🚗"
+  emoji: 🚗
   goal: 마력과 연비의 관계를 산점도로 시각화합니다.
   description: Altair로 첫 번째 시각화를 만듭니다. 데이터 로드, 마크 선택, 인코딩의 기본 흐름을 익힙니다.
-
 sections:
 - id: step1_import
   title: 1단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: seaborn-data
+  goal: '1단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. mpg는 자동차의 연비(mpg), 마력(horsepower), 생산국(origin) 등 정보가 담긴 데이터입니다. pandas는 데이터 분석을 위한 도구이고, DataFrame은 표 데이터를 담는 구조입니다. 이번 레슨에서는 Codaro 로컬 데이터셋을 불러와 인터넷 연결 없이 같은 결과를 재현합니다. Altair는 시각화 라이브러리로, 데이터를 차트로 만들어줍니다.
+
+    import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다. warnings.filterwarnings()는 불필요한 경고 메시지를 숨기는 코드입니다. 차트 기능에는 영향이 없으니 신경 쓰지 않아도 됩니다.
+  tips:
+  - import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다. warnings.filterwarnings()는
+    불필요한 경고 메시지를 숨기는 코드입니다. 차트 기능에는 영향이 없으니 신경 쓰지 않아도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    mpg = loadLocalDataset("mpg")
+  exercise:
+    prompt: '1단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpg = loadLocalDataset("mpg")
+    solution: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpg = loadLocalDataset("mpg")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -48,10 +102,32 @@ sections:
       import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다.
 
       warnings.filterwarnings()는 불필요한 경고 메시지를 숨기는 코드입니다. 차트 기능에는 영향이 없으니 신경 쓰지 않아도 됩니다.
-
 - id: step2_explore
   title: 2단계. 데이터 확인
+  structuredPrimary: true
   subtitle: 컬럼 구조 파악
+  goal: '2단계. 데이터 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 어떤 컬럼(열, 항목)이 있는지 확인합니다. 컬럼은 데이터의 종류를 나타냅니다. name(차량명), mpg(연비), horsepower(마력), origin(생산국) 등이 있습니다. head()는
+    데이터의 처음 5줄을 보여주는 함수로, 점(.)으로 연결하여 사용합니다. 마력과 연비의 관계를 분석해보겠습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: mpg.head()
+  exercise:
+    prompt: '2단계. 데이터 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: mpg.head()
+    solution: mpg.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -64,12 +140,48 @@ sections:
     language: python
     title: 데이터 미리보기
     description: 처음 5행을 확인합니다
-    content: |-
-      mpg.head()
-
+    content: mpg.head()
 - id: step3_first_scatter
   title: 3단계. 첫 번째 산점도
+  structuredPrimary: true
   subtitle: mark_point, encode
+  goal: '3단계. 첫 번째 산점도: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 첫 번째 산점도: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Altair의 기본 구조는 Chart(데이터).mark_종류().encode(인코딩)입니다. 이 문장을 세 부분으로 나누어 이해해봅시다. 첫째, Chart(데이터)는 차트 객체를 만듭니다. 괄호 안에 시각화할 데이터를 넣습니다. 둘째, mark_point()는 "점으로 그리겠다"는 의미입니다. 점 대신 선, 막대 등 다른 모양도 가능합니다. 셋째, encode()는 "인코딩한다", 즉 "어떤 데이터를 어디에 표시할지 지정한다"는 뜻입니다. x축과 y축에 어떤 컬럼을 매핑할지 지정합니다.
+
+    점(.)으로 여러 함수를 연결하는 것을 "메서드 체이닝"이라고 합니다. Chart()로 차트를 만들고, mark_point()로 점으로 그리겠다고 하고, encode()로 어떤 데이터를 x, y축에 넣을지 지정하는 과정이 연결된 것입니다. encode() 괄호 안에서 x='horsepower'는 "x축에 horsepower 컬럼을 사용하겠다"는 뜻입니다. 등호(=)는 "할당한다"는 의미입니다.
+  tips:
+  - 점(.)으로 여러 함수를 연결하는 것을 "메서드 체이닝"이라고 합니다. Chart()로 차트를 만들고, mark_point()로 점으로 그리겠다고 하고, encode()로 어떤 데이터를 x, y축에 넣을지 지정하는
+    과정이 연결된 것입니다. encode() 괄호 안에서 x='horsepower'는 "x축에 horsepower 컬럼을 사용하겠다"는 뜻입니다. 등호(=)는 "할당한다"는 의미입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    alt.Chart(mpg).mark_point().encode(
+        x='horsepower',
+        y='mpg'
+    )
+  exercise:
+    prompt: '3단계. 첫 번째 산점도: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower',
+          y='mpg'
+      )
+    solution: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower',
+          y='mpg'
+      )
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -94,10 +206,46 @@ sections:
       점(.)으로 여러 함수를 연결하는 것을 "메서드 체이닝"이라고 합니다. Chart()로 차트를 만들고, mark_point()로 점으로 그리겠다고 하고, encode()로 어떤 데이터를 x, y축에 넣을지 지정하는 과정이 연결된 것입니다.
 
       encode() 괄호 안에서 x='horsepower'는 "x축에 horsepower 컬럼을 사용하겠다"는 뜻입니다. 등호(=)는 "할당한다"는 의미입니다.
-
 - id: step4_datatype
   title: 4단계. 데이터 타입 지정
-  subtitle: ":Q, :N"
+  structuredPrimary: true
+  subtitle: :Q, :N
+  goal: '4단계. 데이터 타입 지정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 데이터 타입 지정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Altair는 컬럼명 뒤에 콜론(:)과 타입 약어를 붙여 데이터 타입을 명시합니다. 'horsepower:Q'처럼 작은따옴표 안에 컬럼명과 타입을 함께 씁니다. :Q는 Quantitative(수량형)의 약자로, 숫자를 의미합니다. 마력, 연비 같은 연속적인 숫자 데이터에 사용합니다. :N은 Nominal(명목형)의 약자로, 카테고리를 의미합니다. 생산국, 색상 같은 그룹 이름에 사용합니다. 타입을 명시하면 Altair가 적절한 축 스케일과 범례를 자동으로 설정해줍니다.
+
+    :Q(수량형)는 연속적인 숫자, :N(명목형)는 카테고리, :O(순서형)는 순서가 있는 카테고리, :T(시계열)는 날짜/시간을 의미합니다.
+  tips:
+  - :Q(수량형)는 연속적인 숫자, :N(명목형)는 카테고리, :O(순서형)는 순서가 있는 카테고리, :T(시계열)는 날짜/시간을 의미합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q'
+    )
+  exercise:
+    prompt: '4단계. 데이터 타입 지정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q'
+      )
+    solution: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q'
+      )
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -118,11 +266,54 @@ sections:
           y='mpg:Q'
       )
   - type: tip
-    content: ":Q(수량형)는 연속적인 숫자, :N(명목형)는 카테고리, :O(순서형)는 순서가 있는 카테고리, :T(시계열)는 날짜/시간을 의미합니다."
-
+    content: :Q(수량형)는 연속적인 숫자, :N(명목형)는 카테고리, :O(순서형)는 순서가 있는 카테고리, :T(시계열)는 날짜/시간을 의미합니다.
 - id: step5_color
   title: 5단계. 색상 인코딩
+  structuredPrimary: true
   subtitle: color로 그룹 구분
+  goal: '5단계. 색상 인코딩: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 색상 인코딩: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    color에 origin(생산국)을 지정하면 usa, europe, japan 자동차를 색상으로 구분할 수 있습니다. origin은 숫자가 아니라 그룹 이름(카테고리)이므로 :N(명목형)을 붙입니다. encode() 괄호 안에 x, y 외에 color도 추가할 수 있습니다. 쉼표(,)로 구분하여 여러 인코딩을 나열합니다.
+
+    figColor = 이라는 부분은 변수에 값을 저장하는 것입니다. 등호(=) 왼쪽이 변수명, 오른쪽이 저장할 값입니다. 마지막 줄의 figColor는 저장한 차트를 화면에 표시하라는 의미입니다. 변수명만 쓰면 그 변수에 담긴 내용이 출력됩니다.
+  tips:
+  - figColor = 이라는 부분은 변수에 값을 저장하는 것입니다. 등호(=) 왼쪽이 변수명, 오른쪽이 저장할 값입니다. 마지막 줄의 figColor는 저장한 차트를 화면에 표시하라는 의미입니다. 변수명만 쓰면 그
+    변수에 담긴 내용이 출력됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figColor = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N'
+    )
+    figColor
+  exercise:
+    prompt: '5단계. 색상 인코딩: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figColor = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N'
+      )
+      figColor
+    solution: |-
+      figColor = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N'
+      )
+      figColor
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -147,10 +338,56 @@ sections:
       figColor = 이라는 부분은 변수에 값을 저장하는 것입니다. 등호(=) 왼쪽이 변수명, 오른쪽이 저장할 값입니다.
 
       마지막 줄의 figColor는 저장한 차트를 화면에 표시하라는 의미입니다. 변수명만 쓰면 그 변수에 담긴 내용이 출력됩니다.
-
 - id: step6_tooltip
   title: 6단계. 툴팁 추가
+  structuredPrimary: true
   subtitle: tooltip으로 상세정보
+  goal: '6단계. 툴팁 추가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 툴팁 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    점 위에 마우스를 올리면 상세 정보를 보여주는 툴팁을 추가합니다. tooltip에 보여줄 컬럼들을 리스트로 지정합니다. 리스트는 대괄호 [ ] 안에 여러 항목을 쉼표로 구분하여 나열한 것입니다. tooltip=['name', 'horsepower']처럼 작은따옴표로 감싼 컬럼명을 나열하면, 해당 컬럼들의 값이 툴팁에 표시됩니다.
+
+    Codaro 환경에서는 다른 셀에서 같은 변수명을 재사용할 수 없습니다. 따라서 각 셀마다 다른 변수명(figColor, figTooltip, figScatter 등)을 사용해야 합니다. 같은 셀 안에서는 fig = ... 후 fig.update() 같은 방식으로 같은 변수를 계속 사용할 수 있지만, 다른 셀에서는 새로운 변수명이 필요합니다.
+  tips:
+  - Codaro 환경에서는 다른 셀에서 같은 변수명을 재사용할 수 없습니다. 따라서 각 셀마다 다른 변수명(figColor, figTooltip, figScatter 등)을 사용해야 합니다. 같은 셀 안에서는 fig
+    = ... 후 fig.update() 같은 방식으로 같은 변수를 계속 사용할 수 있지만, 다른 셀에서는 새로운 변수명이 필요합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figTooltip = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        tooltip=['name', 'horsepower', 'mpg', 'origin']
+    )
+    figTooltip
+  exercise:
+    prompt: '6단계. 툴팁 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figTooltip = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figTooltip
+    solution: |-
+      figTooltip = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figTooltip
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -176,10 +413,53 @@ sections:
       Codaro 환경에서는 다른 셀에서 같은 변수명을 재사용할 수 없습니다. 따라서 각 셀마다 다른 변수명(figColor, figTooltip, figScatter 등)을 사용해야 합니다.
 
       같은 셀 안에서는 fig = ... 후 fig.update() 같은 방식으로 같은 변수를 계속 사용할 수 있지만, 다른 셀에서는 새로운 변수명이 필요합니다.
-
 - id: step7_final
   title: 7단계. 최종 결과물
+  structuredPrimary: true
   subtitle: 완성된 산점도
+  goal: '7단계. 최종 결과물: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 최종 결과물: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 내용을 종합하여 마력-연비 산점도를 완성합니다. Chart()로 차트 객체를 만들고, mark_point()로 점을 그리고, encode()로 x축(마력), y축(연비), 색상(생산국),
+    툴팁을 모두 지정했습니다. 이 차트로 미국, 유럽, 일본 자동차의 마력과 연비 관계를 한눈에 비교할 수 있습니다. 마력이 높을수록 연비가 낮아지는 경향이 보입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figScatter = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        tooltip=['name', 'horsepower', 'mpg', 'origin']
+    )
+    figScatter
+  exercise:
+    prompt: '7단계. 최종 결과물: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figScatter = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figScatter
+    solution: |-
+      figScatter = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figScatter
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -200,19 +480,74 @@ sections:
           tooltip=['name', 'horsepower', 'mpg', 'origin']
       )
       figScatter
-
 - id: step8_workflow
   title: 8단계. 실무 산점도 검증
+  structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 차트 사양 검증 → 기준 실험
+  goal: '8단계. 실무 산점도 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 실무 산점도 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    업무 차트는 화면에 점이 보이는 것만으로 충분하지 않습니다. 어떤 질문을 답하려는지 먼저 예측하고, 필요한 컬럼이 있는지 확인하고, Altair 차트 사양에 x축·y축·색상·툴팁이 의도대로 들어갔는지 검증해야 합니다.
+
+    Altair 입문에서도 차트 사양 검증을 함께 배워야 합니다. 축, 색상, 툴팁, 데이터 행 수를 확인하면 예쁜 차트가 아니라 업무 질문에 답하는 차트를 만들 수 있습니다.
+  tips:
+  - Altair 입문에서도 차트 사양 검증을 함께 배워야 합니다. 축, 색상, 툴팁, 데이터 행 수를 확인하면 예쁜 차트가 아니라 업무 질문에 답하는 차트를 만들 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+    missingColumns = sorted(requiredColumns - set(mpg.columns))
+    if missingColumns:
+        raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+    originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+    bestMpgOrigin = originMpgSummary.index[0]
+    highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+    bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+  exercise:
+    prompt: '8단계. 실무 산점도 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+      missingColumns = sorted(requiredColumns - set(mpg.columns))
+      if missingColumns:
+          raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+      originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+      bestMpgOrigin = originMpgSummary.index[0]
+      highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+      bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+    solution: |-
+      requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+      missingColumns = sorted(requiredColumns - set(mpg.columns))
+      if missingColumns:
+          raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+      originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+      bestMpgOrigin = originMpgSummary.index[0]
+      highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+      bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 업무 차트는 화면에 점이 보이는 것만으로 충분하지 않습니다. 어떤 질문을 답하려는지 먼저 예측하고, 필요한 컬럼이 있는지 확인하고, Altair 차트 사양에 x축·y축·색상·툴팁이 의도대로 들어갔는지 검증해야 합니다.
+    content: 업무 차트는 화면에 점이 보이는 것만으로 충분하지 않습니다. 어떤 질문을 답하려는지 먼저 예측하고, 필요한 컬럼이 있는지 확인하고, Altair 차트 사양에 x축·y축·색상·툴팁이 의도대로 들어갔는지
+      검증해야 합니다.
   - type: list
     items:
-    - "실행 전에는 어느 생산국의 평균 연비가 가장 높을지 먼저 예측합니다."
-    - "y축에 잘못된 컬럼을 넣으면 차트는 그럴듯하지만 질문에 답하지 못하는 오류가 됩니다."
-    - "to_dict()로 Altair 차트 사양을 확인하면 축과 툴팁 누락을 코드로 잡을 수 있습니다."
-    - "고마력·저연비 기준을 바꾸며 어떤 차량이 점검 대상이 되는지 실험합니다."
+    - 실행 전에는 어느 생산국의 평균 연비가 가장 높을지 먼저 예측합니다.
+    - y축에 잘못된 컬럼을 넣으면 차트는 그럴듯하지만 질문에 답하지 못하는 오류가 됩니다.
+    - to_dict()로 Altair 차트 사양을 확인하면 축과 툴팁 누락을 코드로 잡을 수 있습니다.
+    - 고마력·저연비 기준을 바꾸며 어떤 차량이 점검 대상이 되는지 실험합니다.
   - type: code
     language: python
     title: 분석 질문과 데이터 검증
@@ -314,10 +649,46 @@ sections:
       defaultTarget, strictTarget
   - type: tip
     content: Altair 입문에서도 차트 사양 검증을 함께 배워야 합니다. 축, 색상, 툴팁, 데이터 행 수를 확인하면 예쁜 차트가 아니라 업무 질문에 답하는 차트를 만들 수 있습니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: mpg 데이터 시각화 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    mpg 데이터로 다양한 산점도를 만들어봅시다. 이 섹션에서 배운 내용을 정리하면 다음과 같습니다. Chart()로 차트를 만들고, mark_point()로 점을 그리고, encode()로 축과 색상을 지정하는 기본 흐름을 배웠습니다. :Q는 숫자 데이터, :N은 카테고리 데이터에 사용합니다. color로 그룹을 색상으로 구분하고, tooltip으로 마우스 호버 시 상세 정보를 표시할 수 있습니다. 각 미션에서 이 개념들을 모두 활용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    car = loadLocalDataset("mpg")
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      car = loadLocalDataset("mpg")
+    solution: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      car = loadLocalDataset("mpg")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -329,17 +700,17 @@ sections:
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 배기량과 마력의 관계"
+    title: '미션1: 배기량과 마력의 관계'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import altair as alt
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
         car = loadLocalDataset("mpg")
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         figDisp = alt.Chart(car).mark_point().encode(
             x='displacement:Q',
@@ -349,17 +720,17 @@ sections:
         )
         figDisp
   - type: expansion
-    title: "미션2: 무게와 연비의 관계"
+    title: '미션2: 무게와 연비의 관계'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import altair as alt
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
         auto = loadLocalDataset("mpg")
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         figWeight = alt.Chart(auto).mark_point().encode(
             x='weight:Q',
@@ -368,7 +739,6 @@ sections:
             tooltip=['name', 'weight', 'mpg', 'origin']
         )
         figWeight
-
 - id: summary
   title: 정리
   blocks:
@@ -376,12 +746,12 @@ sections:
     content: Altair로 첫 산점도를 완성했습니다.
   - type: list
     items:
-    - "alt.Chart(data) - 차트 객체 생성"
-    - "mark_point() - 점(산점도) 마크 선택"
-    - "encode(x, y) - 축에 컬럼 매핑"
-    - ":Q - 수량형(Quantitative) 데이터 타입"
-    - ":N - 명목형(Nominal) 데이터 타입"
-    - "color='컬럼:N' - 색상으로 그룹 구분"
-    - "tooltip=[...] - 호버 시 상세정보 표시"
+    - alt.Chart(data) - 차트 객체 생성
+    - mark_point() - 점(산점도) 마크 선택
+    - encode(x, y) - 축에 컬럼 매핑
+    - :Q - 수량형(Quantitative) 데이터 타입
+    - :N - 명목형(Nominal) 데이터 타입
+    - color='컬럼:N' - 색상으로 그룹 구분
+    - tooltip=[...] - 호버 시 상세정보 표시
   - type: text
     content: 다음 시간에는 붓꽃 데이터로 circle 마크와 size, shape 인코딩을 배웁니다.

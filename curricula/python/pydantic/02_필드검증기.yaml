@@ -1,36 +1,68 @@
 meta:
   packages:
-    - pydantic
+  - pydantic
   id: pydantic_02
   title: 필드검증기
   order: 2
   category: pydantic
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["pydantic", "Field", "validator", "제약조건", "커스텀검증"]
+  tags:
+  - pydantic
+  - Field
+  - validator
+  - 제약조건
+  - 커스텀검증
   seo:
-    title: "Pydantic Field 검증 - 필드 제약조건과 커스텀 검증"
-    description: "Pydantic Field로 필드에 제약조건을 설정합니다. 최소/최대값, 문자열 길이, 정규식 패턴, 커스텀 검증기를 배웁니다."
-    keywords: ["pydantic", "Field", "validator", "제약조건", "검증"]
-
+    title: Pydantic Field 검증 - 필드 제약조건과 커스텀 검증
+    description: Pydantic Field로 필드에 제약조건을 설정합니다. 최소/최대값, 문자열 길이, 정규식 패턴, 커스텀 검증기를 배웁니다.
+    keywords:
+    - pydantic
+    - Field
+    - validator
+    - 제약조건
+    - 검증
 intro:
-  emoji: "✅"
+  emoji: ✅
   goal: Field와 validator로 회원가입 폼 검증 시스템을 구축합니다.
-  description: "이 프로젝트에서는 실제 웹 서비스의 회원가입 폼처럼 다양한 검증 규칙을 적용합니다. 숫자 범위 제한, 문자열 길이 검사, 정규식 패턴 매칭, 그리고 비즈니스 로직에 맞는 커스텀 검증까지. 이런 검증 시스템이 있으면 잘못된 데이터가 데이터베이스에 들어가는 것을 원천 차단할 수 있습니다."
-
+  description: 이 프로젝트에서는 실제 웹 서비스의 회원가입 폼처럼 다양한 검증 규칙을 적용합니다. 숫자 범위 제한, 문자열 길이 검사, 정규식 패턴 매칭, 그리고 비즈니스 로직에 맞는 커스텀 검증까지. 이런
+    검증 시스템이 있으면 잘못된 데이터가 데이터베이스에 들어가는 것을 원천 차단할 수 있습니다.
 sections:
 - id: load
   title: 라이브러리 로드
+  structuredPrimary: true
   subtitle: Field와 validator import
+  goal: '라이브러리 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '라이브러리 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Field 함수는 필드에 메타데이터와 제약조건을 추가합니다. field_validator 데코레이터는 커스텀 검증 로직을 구현하고, model_validator는 여러 필드를 동시에 검증합니다.
+    이들을 조합하면 복잡한 비즈니스 규칙도 우아하게 표현할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import pydantic
+  exercise:
+    prompt: '라이브러리 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import pydantic
+    solution: import pydantic
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Field 함수는 필드에 메타데이터와 제약조건을 추가합니다. field_validator 데코레이터는 커스텀 검증 로직을 구현하고, model_validator는 여러 필드를 동시에 검증합니다. 이들을 조합하면 복잡한 비즈니스 규칙도 우아하게 표현할 수 있습니다."
+    content: Field 함수는 필드에 메타데이터와 제약조건을 추가합니다. field_validator 데코레이터는 커스텀 검증 로직을 구현하고, model_validator는 여러 필드를 동시에 검증합니다.
+      이들을 조합하면 복잡한 비즈니스 규칙도 우아하게 표현할 수 있습니다.
   - type: code
     language: python
     title: 패키지 설치
     description: pip으로 pydantic 설치
-    content: |-
-      import pydantic
+    content: import pydantic
   - type: code
     language: python
     title: 핵심 모듈 import
@@ -38,13 +70,59 @@ sections:
     content: |-
       from pydantic import BaseModel, Field, field_validator, model_validator, ValidationError
       from typing import Optional
-
 - id: numeric
   title: 숫자 제약조건
+  structuredPrimary: true
   subtitle: gt, ge, lt, le
+  goal: '숫자 제약조건: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '숫자 제약조건: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    숫자 필드에는 gt(초과), ge(이상), lt(미만), le(이하)로 범위를 제한할 수 있습니다. 예를 들어 나이는 0 이상 150 이하, 점수는 0 이상 100 이하로 제한하는 것이 일반적입니다. 이런 제약조건은 Field 함수의 파라미터로 간단히 지정합니다.
+
+    gt=0은 0 초과(양수만), ge=0은 0 이상을 의미합니다. lt, le도 마찬가지로 미만과 이하를 구분합니다.
+  tips:
+  - gt=0은 0 초과(양수만), ge=0은 0 이상을 의미합니다. lt, le도 마찬가지로 미만과 이하를 구분합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Student(BaseModel):
+        name: str
+        age: int = Field(ge=1, le=150)
+        score: float = Field(ge=0, le=100)
+
+    student = Student(name="Alice", age=20, score=85.5)
+    student
+  exercise:
+    prompt: '숫자 제약조건: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Student(BaseModel):
+          name: str
+          age: int = Field(ge=1, le=150)
+          score: float = Field(ge=0, le=100)
+
+      student = Student(name="Alice", age=20, score=85.5)
+      student
+    solution: |-
+      class Student(BaseModel):
+          name: str
+          age: int = Field(ge=1, le=150)
+          score: float = Field(ge=0, le=100)
+
+      student = Student(name="Alice", age=20, score=85.5)
+      student
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "숫자 필드에는 gt(초과), ge(이상), lt(미만), le(이하)로 범위를 제한할 수 있습니다. 예를 들어 나이는 0 이상 150 이하, 점수는 0 이상 100 이하로 제한하는 것이 일반적입니다. 이런 제약조건은 Field 함수의 파라미터로 간단히 지정합니다."
+    content: 숫자 필드에는 gt(초과), ge(이상), lt(미만), le(이하)로 범위를 제한할 수 있습니다. 예를 들어 나이는 0 이상 150 이하, 점수는 0 이상 100 이하로 제한하는 것이 일반적입니다.
+      이런 제약조건은 Field 함수의 파라미터로 간단히 지정합니다.
   - type: code
     language: python
     title: 학생 점수 모델
@@ -58,7 +136,7 @@ sections:
       student = Student(name="Alice", age=20, score=85.5)
       student
   - type: tip
-    content: "gt=0은 0 초과(양수만), ge=0은 0 이상을 의미합니다. lt, le도 마찬가지로 미만과 이하를 구분합니다."
+    content: gt=0은 0 초과(양수만), ge=0은 0 이상을 의미합니다. lt, le도 마찬가지로 미만과 이하를 구분합니다.
   - type: code
     language: python
     title: 범위 초과 테스트
@@ -69,13 +147,56 @@ sections:
       except ValidationError as e:
           rangeErr = e.errors()
           rangeErr
-
 - id: string
   title: 문자열 제약조건
+  structuredPrimary: true
   subtitle: min_length, max_length, pattern
+  goal: '문자열 제약조건: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '문자열 제약조건: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    문자열 필드에는 min_length와 max_length로 길이를 제한하고, pattern으로 정규식 패턴을 지정할 수 있습니다. 사용자명 3~20자, 비밀번호 8자 이상, 전화번호 형식 검사 등 웹 서비스에서 흔히 필요한 검증을 간단히 구현할 수 있습니다.
+
+    정규식 패턴은 re 모듈의 문법을 따릅니다. ^는 시작, $는 끝, \d는 숫자를 의미합니다.
+  tips:
+  - 정규식 패턴은 re 모듈의 문법을 따릅니다. ^는 시작, $는 끝, \d는 숫자를 의미합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Account(BaseModel):
+        username: str = Field(min_length=3, max_length=20)
+        password: str = Field(min_length=8)
+
+    account = Account(username="alice", password="secure123")
+    account
+  exercise:
+    prompt: '문자열 제약조건: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Account(BaseModel):
+          username: str = Field(min_length=3, max_length=20)
+          password: str = Field(min_length=8)
+
+      account = Account(username="alice", password="secure123")
+      account
+    solution: |-
+      class Account(BaseModel):
+          username: str = Field(min_length=3, max_length=20)
+          password: str = Field(min_length=8)
+
+      account = Account(username="alice", password="secure123")
+      account
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "문자열 필드에는 min_length와 max_length로 길이를 제한하고, pattern으로 정규식 패턴을 지정할 수 있습니다. 사용자명 3~20자, 비밀번호 8자 이상, 전화번호 형식 검사 등 웹 서비스에서 흔히 필요한 검증을 간단히 구현할 수 있습니다."
+    content: 문자열 필드에는 min_length와 max_length로 길이를 제한하고, pattern으로 정규식 패턴을 지정할 수 있습니다. 사용자명 3~20자, 비밀번호 8자 이상, 전화번호 형식 검사 등
+      웹 서비스에서 흔히 필요한 검증을 간단히 구현할 수 있습니다.
   - type: code
     language: python
     title: 계정 모델
@@ -99,7 +220,7 @@ sections:
       contact = Contact(phone="010-1234-5678", email="test@example.com")
       contact
   - type: tip
-    content: "정규식 패턴은 re 모듈의 문법을 따릅니다. ^는 시작, $는 끝, \\d는 숫자를 의미합니다."
+    content: 정규식 패턴은 re 모듈의 문법을 따릅니다. ^는 시작, $는 끝, \d는 숫자를 의미합니다.
   - type: code
     language: python
     title: 패턴 불일치 테스트
@@ -110,13 +231,57 @@ sections:
       except ValidationError as e:
           patternErr = e.errors()
           patternErr
-
 - id: description
   title: 필드 설명과 기본값
+  structuredPrimary: true
   subtitle: description, default
+  goal: '필드 설명과 기본값: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '필드 설명과 기본값: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Field의 description 파라미터로 필드에 설명을 추가할 수 있습니다. 이 설명은 JSON Schema에 포함되어 API 문서화에 활용됩니다. default로 기본값을 지정하면서 동시에
+    제약조건도 적용할 수 있어, 유연하면서도 안전한 모델을 설계할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ServerConfig(BaseModel):
+        host: str = Field(default="localhost", description="서버 호스트 주소")
+        port: int = Field(default=8080, ge=1, le=65535, description="포트 번호")
+        debug: bool = Field(default=False, description="디버그 모드")
+
+    config = ServerConfig()
+    config
+  exercise:
+    prompt: '필드 설명과 기본값: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ServerConfig(BaseModel):
+          host: str = Field(default="localhost", description="서버 호스트 주소")
+          port: int = Field(default=8080, ge=1, le=65535, description="포트 번호")
+          debug: bool = Field(default=False, description="디버그 모드")
+
+      config = ServerConfig()
+      config
+    solution: |-
+      class ServerConfig(BaseModel):
+          host: str = Field(default="localhost", description="서버 호스트 주소")
+          port: int = Field(default=8080, ge=1, le=65535, description="포트 번호")
+          debug: bool = Field(default=False, description="디버그 모드")
+
+      config = ServerConfig()
+      config
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Field의 description 파라미터로 필드에 설명을 추가할 수 있습니다. 이 설명은 JSON Schema에 포함되어 API 문서화에 활용됩니다. default로 기본값을 지정하면서 동시에 제약조건도 적용할 수 있어, 유연하면서도 안전한 모델을 설계할 수 있습니다."
+    content: Field의 description 파라미터로 필드에 설명을 추가할 수 있습니다. 이 설명은 JSON Schema에 포함되어 API 문서화에 활용됩니다. default로 기본값을 지정하면서 동시에
+      제약조건도 적용할 수 있어, 유연하면서도 안전한 모델을 설계할 수 있습니다.
   - type: code
     language: python
     title: 서버 설정 모델
@@ -137,13 +302,60 @@ sections:
       import json
       configSchema = ServerConfig.model_json_schema()
       json.dumps(configSchema, indent=2, ensure_ascii=False)[:400]
-
 - id: alias
   title: 필드 별칭
+  structuredPrimary: true
   subtitle: alias와 validation_alias
+  goal: '필드 별칭: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '필드 별칭: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 외부 API나 데이터베이스에서 snake_case를 사용하고 Python 코드에서는 camelCase를 사용하고 싶을 때 alias가 유용합니다. alias로 외부 이름을 지정하면 입력 시 alias로,
+    Python 코드에서는 원래 필드명으로 접근할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ApiResponse(BaseModel):
+        userId: int = Field(alias="user_id")
+        userName: str = Field(alias="user_name")
+        createdAt: str = Field(alias="created_at")
+
+    responseData = {"user_id": 1, "user_name": "Alice", "created_at": "2024-01-01"}
+    apiResp = ApiResponse.model_validate(responseData)
+    apiResp
+  exercise:
+    prompt: '필드 별칭: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ApiResponse(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+          createdAt: str = Field(alias="created_at")
+
+      responseData = {"user_id": 1, "user_name": "Alice", "created_at": "2024-01-01"}
+      apiResp = ApiResponse.model_validate(responseData)
+      apiResp
+    solution: |-
+      class ApiResponse(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+          createdAt: str = Field(alias="created_at")
+
+      responseData = {"user_id": 1, "user_name": "Alice", "created_at": "2024-01-01"}
+      apiResp = ApiResponse.model_validate(responseData)
+      apiResp
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "외부 API나 데이터베이스에서 snake_case를 사용하고 Python 코드에서는 camelCase를 사용하고 싶을 때 alias가 유용합니다. alias로 외부 이름을 지정하면 입력 시 alias로, Python 코드에서는 원래 필드명으로 접근할 수 있습니다."
+    content: 외부 API나 데이터베이스에서 snake_case를 사용하고 Python 코드에서는 camelCase를 사용하고 싶을 때 alias가 유용합니다. alias로 외부 이름을 지정하면 입력 시 alias로,
+      Python 코드에서는 원래 필드명으로 접근할 수 있습니다.
   - type: code
     language: python
     title: API 응답 모델
@@ -161,15 +373,87 @@ sections:
     language: python
     title: Python 속성명으로 접근
     description: 원래 필드명 사용
-    content: |-
-      apiResp.userId, apiResp.userName, apiResp.createdAt
-
+    content: apiResp.userId, apiResp.userName, apiResp.createdAt
 - id: fieldvalidator
   title: 커스텀 필드 검증기
+  structuredPrimary: true
   subtitle: field_validator 데코레이터
+  goal: '커스텀 필드 검증기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '커스텀 필드 검증기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    field_validator 데코레이터로 커스텀 검증 로직을 구현합니다. 값을 정규화(소문자 변환, 공백 제거 등)하거나, 비즈니스 규칙에 맞지 않으면 ValueError를 발생시켜 검증을 실패시킬 수 있습니다. 하나의 검증기를 여러 필드에 적용하는 것도 가능합니다.
+
+    field_validator는 반드시 @classmethod와 함께 사용해야 합니다. 첫 번째 인자는 cls, 두 번째가 검증할 값 v입니다.
+  tips:
+  - field_validator는 반드시 @classmethod와 함께 사용해야 합니다. 첫 번째 인자는 cls, 두 번째가 검증할 값 v입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Person(BaseModel):
+        name: str
+        email: str
+
+        @field_validator('name')
+        @classmethod
+        def normalizeName(cls, v):
+            return v.strip().title()
+
+        @field_validator('email')
+        @classmethod
+        def lowercaseEmail(cls, v):
+            return v.lower()
+
+    person = Person(name="  alice smith  ", email="ALICE@EXAMPLE.COM")
+    person.name, person.email
+  exercise:
+    prompt: '커스텀 필드 검증기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Person(BaseModel):
+          name: str
+          email: str
+
+          @field_validator('name')
+          @classmethod
+          def normalizeName(cls, v):
+              return v.strip().title()
+
+          @field_validator('email')
+          @classmethod
+          def lowercaseEmail(cls, v):
+              return v.lower()
+
+      person = Person(name="  alice smith  ", email="ALICE@EXAMPLE.COM")
+      person.name, person.email
+    solution: |-
+      class Person(BaseModel):
+          name: str
+          email: str
+
+          @field_validator('name')
+          @classmethod
+          def normalizeName(cls, v):
+              return v.strip().title()
+
+          @field_validator('email')
+          @classmethod
+          def lowercaseEmail(cls, v):
+              return v.lower()
+
+      person = Person(name="  alice smith  ", email="ALICE@EXAMPLE.COM")
+      person.name, person.email
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "field_validator 데코레이터로 커스텀 검증 로직을 구현합니다. 값을 정규화(소문자 변환, 공백 제거 등)하거나, 비즈니스 규칙에 맞지 않으면 ValueError를 발생시켜 검증을 실패시킬 수 있습니다. 하나의 검증기를 여러 필드에 적용하는 것도 가능합니다."
+    content: field_validator 데코레이터로 커스텀 검증 로직을 구현합니다. 값을 정규화(소문자 변환, 공백 제거 등)하거나, 비즈니스 규칙에 맞지 않으면 ValueError를 발생시켜 검증을 실패시킬
+      수 있습니다. 하나의 검증기를 여러 필드에 적용하는 것도 가능합니다.
   - type: code
     language: python
     title: 이름 정규화 검증기
@@ -192,7 +476,7 @@ sections:
       person = Person(name="  alice smith  ", email="ALICE@EXAMPLE.COM")
       person.name, person.email
   - type: tip
-    content: "field_validator는 반드시 @classmethod와 함께 사용해야 합니다. 첫 번째 인자는 cls, 두 번째가 검증할 값 v입니다."
+    content: field_validator는 반드시 @classmethod와 함께 사용해야 합니다. 첫 번째 인자는 cls, 두 번째가 검증할 값 v입니다.
   - type: code
     language: python
     title: 금지어 검사
@@ -215,13 +499,75 @@ sections:
       except ValidationError as e:
           bannedErr = e.errors()
           bannedErr
-
 - id: modelvalidator
   title: 모델 검증기
+  structuredPrimary: true
   subtitle: model_validator 데코레이터
+  goal: '모델 검증기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '모델 검증기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: model_validator는 여러 필드를 동시에 검증합니다. 비밀번호와 비밀번호 확인이 일치하는지, 시작일이 종료일보다 앞서는지 등 필드 간 관계를 검사할 때 사용합니다. mode='after'는
+    개별 필드 검증이 완료된 후 실행됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Registration(BaseModel):
+        email: str
+        password: str = Field(min_length=8)
+        confirmPassword: str
+
+        @model_validator(mode='after')
+        def checkPasswords(self):
+            if self.password != self.confirmPassword:
+                raise ValueError("비밀번호가 일치하지 않습니다")
+            return self
+
+    reg = Registration(email="test@test.com", password="secure123", confirmPassword="secure123")
+    reg
+  exercise:
+    prompt: '모델 검증기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Registration(BaseModel):
+          email: str
+          password: str = Field(min_length=8)
+          confirmPassword: str
+
+          @model_validator(mode='after')
+          def checkPasswords(self):
+              if self.password != self.confirmPassword:
+                  raise ValueError("비밀번호가 일치하지 않습니다")
+              return self
+
+      reg = Registration(email="test@test.com", password="secure123", confirmPassword="secure123")
+      reg
+    solution: |-
+      class Registration(BaseModel):
+          email: str
+          password: str = Field(min_length=8)
+          confirmPassword: str
+
+          @model_validator(mode='after')
+          def checkPasswords(self):
+              if self.password != self.confirmPassword:
+                  raise ValueError("비밀번호가 일치하지 않습니다")
+              return self
+
+      reg = Registration(email="test@test.com", password="secure123", confirmPassword="secure123")
+      reg
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "model_validator는 여러 필드를 동시에 검증합니다. 비밀번호와 비밀번호 확인이 일치하는지, 시작일이 종료일보다 앞서는지 등 필드 간 관계를 검사할 때 사용합니다. mode='after'는 개별 필드 검증이 완료된 후 실행됩니다."
+    content: model_validator는 여러 필드를 동시에 검증합니다. 비밀번호와 비밀번호 확인이 일치하는지, 시작일이 종료일보다 앞서는지 등 필드 간 관계를 검사할 때 사용합니다. mode='after'는
+      개별 필드 검증이 완료된 후 실행됩니다.
   - type: code
     language: python
     title: 비밀번호 확인 검증
@@ -250,13 +596,75 @@ sections:
       except ValidationError as e:
           mismatchErr = e.errors()
           mismatchErr
-
 - id: computed
   title: 계산된 필드
+  structuredPrimary: true
   subtitle: computed_field 데코레이터
+  goal: '계산된 필드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '계산된 필드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: computed_field는 다른 필드 값을 기반으로 계산되는 읽기 전용 필드입니다. 예를 들어 firstName과 lastName에서 fullName을 자동 생성하거나, 가격과 수량에서 총액을
+    계산할 수 있습니다. 이 필드는 직렬화 시 자동으로 포함됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pydantic import computed_field
+
+    class FullName(BaseModel):
+        firstName: str
+        lastName: str
+
+        @computed_field
+        @property
+        def fullName(self) -> str:
+            return f"{self.firstName} {self.lastName}"
+
+    nameObj = FullName(firstName="John", lastName="Doe")
+    nameObj.fullName
+  exercise:
+    prompt: '계산된 필드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import computed_field
+
+      class FullName(BaseModel):
+          firstName: str
+          lastName: str
+
+          @computed_field
+          @property
+          def fullName(self) -> str:
+              return f"{self.firstName} {self.lastName}"
+
+      nameObj = FullName(firstName="John", lastName="Doe")
+      nameObj.fullName
+    solution: |-
+      from pydantic import computed_field
+
+      class FullName(BaseModel):
+          firstName: str
+          lastName: str
+
+          @computed_field
+          @property
+          def fullName(self) -> str:
+              return f"{self.firstName} {self.lastName}"
+
+      nameObj = FullName(firstName="John", lastName="Doe")
+      nameObj.fullName
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "computed_field는 다른 필드 값을 기반으로 계산되는 읽기 전용 필드입니다. 예를 들어 firstName과 lastName에서 fullName을 자동 생성하거나, 가격과 수량에서 총액을 계산할 수 있습니다. 이 필드는 직렬화 시 자동으로 포함됩니다."
+    content: computed_field는 다른 필드 값을 기반으로 계산되는 읽기 전용 필드입니다. 예를 들어 firstName과 lastName에서 fullName을 자동 생성하거나, 가격과 수량에서 총액을
+      계산할 수 있습니다. 이 필드는 직렬화 시 자동으로 포함됩니다.
   - type: code
     language: python
     title: 전체 이름 계산
@@ -279,15 +687,121 @@ sections:
     language: python
     title: 직렬화에 포함
     description: model_dump 확인
-    content: |-
-      nameObj.model_dump()
-
+    content: nameObj.model_dump()
 - id: result
   title: 종합 회원가입 시스템
+  structuredPrimary: true
   subtitle: 모든 검증 기법 통합
+  goal: '종합 회원가입 시스템: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 회원가입 시스템: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 모든 검증 기법을 종합하여 실제 서비스에서 사용할 수 있는 회원가입 폼 검증 시스템을 완성합니다. 숫자 범위, 문자열 패턴, 커스텀 검증, 필드 간 관계 검사, 계산 필드까지 모두
+    활용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class SignupForm(BaseModel):
+        username: str = Field(min_length=4, max_length=20, description="영문 숫자만")
+        email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+        password: str = Field(min_length=8)
+        confirmPw: str
+        age: int = Field(ge=14, description="14세 이상만 가입 가능")
+
+        @field_validator('username')
+        @classmethod
+        def alphanumeric(cls, v):
+            if not v.isalnum():
+                raise ValueError("영문과 숫자만 허용")
+            return v.lower()
+
+        @model_validator(mode='after')
+        def passwordMatch(self):
+            if self.password != self.confirmPw:
+                raise ValueError("비밀번호 불일치")
+            return self
+
+    signup = SignupForm(
+        username="Alice123",
+        email="alice@mail.com",
+        password="secure123",
+        confirmPw="secure123",
+        age=25
+    )
+    signup
+  exercise:
+    prompt: '종합 회원가입 시스템: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class SignupForm(BaseModel):
+          username: str = Field(min_length=4, max_length=20, description="영문 숫자만")
+          email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+          password: str = Field(min_length=8)
+          confirmPw: str
+          age: int = Field(ge=14, description="14세 이상만 가입 가능")
+
+          @field_validator('username')
+          @classmethod
+          def alphanumeric(cls, v):
+              if not v.isalnum():
+                  raise ValueError("영문과 숫자만 허용")
+              return v.lower()
+
+          @model_validator(mode='after')
+          def passwordMatch(self):
+              if self.password != self.confirmPw:
+                  raise ValueError("비밀번호 불일치")
+              return self
+
+      signup = SignupForm(
+          username="Alice123",
+          email="alice@mail.com",
+          password="secure123",
+          confirmPw="secure123",
+          age=25
+      )
+      signup
+    solution: |-
+      class SignupForm(BaseModel):
+          username: str = Field(min_length=4, max_length=20, description="영문 숫자만")
+          email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+          password: str = Field(min_length=8)
+          confirmPw: str
+          age: int = Field(ge=14, description="14세 이상만 가입 가능")
+
+          @field_validator('username')
+          @classmethod
+          def alphanumeric(cls, v):
+              if not v.isalnum():
+                  raise ValueError("영문과 숫자만 허용")
+              return v.lower()
+
+          @model_validator(mode='after')
+          def passwordMatch(self):
+              if self.password != self.confirmPw:
+                  raise ValueError("비밀번호 불일치")
+              return self
+
+      signup = SignupForm(
+          username="Alice123",
+          email="alice@mail.com",
+          password="secure123",
+          confirmPw="secure123",
+          age=25
+      )
+      signup
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 모든 검증 기법을 종합하여 실제 서비스에서 사용할 수 있는 회원가입 폼 검증 시스템을 완성합니다. 숫자 범위, 문자열 패턴, 커스텀 검증, 필드 간 관계 검사, 계산 필드까지 모두 활용합니다."
+    content: 지금까지 배운 모든 검증 기법을 종합하여 실제 서비스에서 사용할 수 있는 회원가입 폼 검증 시스템을 완성합니다. 숫자 범위, 문자열 패턴, 커스텀 검증, 필드 간 관계 검사, 계산 필드까지 모두
+      활용합니다.
   - type: code
     language: python
     title: 완성된 회원가입 모델
@@ -333,17 +847,149 @@ sections:
           "fields": list(SignupForm.model_fields.keys())
       }
       signupResult
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 검증 시스템 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 Field 제약조건, field_validator, model_validator, computed_field를 활용하여 다양한 도메인의 검증 시스템을 구축합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pydantic import BaseModel, Field, field_validator, computed_field, ValidationError
+    from typing import Optional
+
+    class ProductForm(BaseModel):
+        productName: str = Field(min_length=2, max_length=100)
+        basePrice: float = Field(gt=0)
+        discountRate: float = Field(ge=0, le=100, default=0)
+        stock: int = Field(ge=0, default=0)
+        category: str
+
+        @field_validator('category')
+        @classmethod
+        def validCategory(cls, v):
+            allowed = ['electronics', 'clothing', 'food', 'books']
+            if v.lower() not in allowed:
+                raise ValueError(f"허용 카테고리: {allowed}")
+            return v.lower()
+
+        @computed_field
+        @property
+        def finalPrice(self) -> float:
+            return self.basePrice * (1 - self.discountRate / 100)
+
+        @computed_field
+        @property
+        def inStock(self) -> bool:
+            return self.stock > 0
+
+    product = ProductForm(
+        productName="노트북",
+        basePrice=1000000,
+        discountRate=10,
+        stock=50,
+        category="Electronics"
+    )
+    product
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import BaseModel, Field, field_validator, computed_field, ValidationError
+      from typing import Optional
+
+      class ProductForm(BaseModel):
+          productName: str = Field(min_length=2, max_length=100)
+          basePrice: float = Field(gt=0)
+          discountRate: float = Field(ge=0, le=100, default=0)
+          stock: int = Field(ge=0, default=0)
+          category: str
+
+          @field_validator('category')
+          @classmethod
+          def validCategory(cls, v):
+              allowed = ['electronics', 'clothing', 'food', 'books']
+              if v.lower() not in allowed:
+                  raise ValueError(f"허용 카테고리: {allowed}")
+              return v.lower()
+
+          @computed_field
+          @property
+          def finalPrice(self) -> float:
+              return self.basePrice * (1 - self.discountRate / 100)
+
+          @computed_field
+          @property
+          def inStock(self) -> bool:
+              return self.stock > 0
+
+      product = ProductForm(
+          productName="노트북",
+          basePrice=1000000,
+          discountRate=10,
+          stock=50,
+          category="Electronics"
+      )
+      product
+    solution: |-
+      from pydantic import BaseModel, Field, field_validator, computed_field, ValidationError
+      from typing import Optional
+
+      class ProductForm(BaseModel):
+          productName: str = Field(min_length=2, max_length=100)
+          basePrice: float = Field(gt=0)
+          discountRate: float = Field(ge=0, le=100, default=0)
+          stock: int = Field(ge=0, default=0)
+          category: str
+
+          @field_validator('category')
+          @classmethod
+          def validCategory(cls, v):
+              allowed = ['electronics', 'clothing', 'food', 'books']
+              if v.lower() not in allowed:
+                  raise ValueError(f"허용 카테고리: {allowed}")
+              return v.lower()
+
+          @computed_field
+          @property
+          def finalPrice(self) -> float:
+              return self.basePrice * (1 - self.discountRate / 100)
+
+          @computed_field
+          @property
+          def inStock(self) -> bool:
+              return self.stock > 0
+
+      product = ProductForm(
+          productName="노트북",
+          basePrice=1000000,
+          discountRate=10,
+          stock=50,
+          category="Electronics"
+      )
+      product
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 Field 제약조건, field_validator, model_validator, computed_field를 활용하여 다양한 도메인의 검증 시스템을 구축합니다."
+    content: 지금까지 배운 Field 제약조건, field_validator, model_validator, computed_field를 활용하여 다양한 도메인의 검증 시스템을 구축합니다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 상품 등록 폼"
+    title: '미션1: 상품 등록 폼'
     blocks:
     - type: code
       title: 상품 모델 정의
@@ -397,7 +1043,7 @@ sections:
         }
         productInfo
   - type: expansion
-    title: "미션2: 예약 시스템"
+    title: '미션2: 예약 시스템'
     blocks:
     - type: code
       title: 예약 모델 정의
@@ -453,17 +1099,139 @@ sections:
             "guests": reservation.guests
         }
         reserveInfo
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
+    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
-  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    solution: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
-  - type: "code"
-    language: "python"
-    title: "주문 입력 모델과 정상 데이터 예측"
-    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+  - type: text
+    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
+      다음 단계로 넘기는 흐름을 검증합니다.
+  - type: code
+    language: python
+    title: 주문 입력 모델과 정상 데이터 예측
+    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
     content: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -498,10 +1266,10 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-  - type: "code"
-    language: "python"
-    title: "잘못된 입력을 먼저 실패시킨다"
-    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+  - type: code
+    language: python
+    title: 잘못된 입력을 먼저 실패시킨다
+    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
     content: |-
       try:
           OrderInput.model_validate({
@@ -518,10 +1286,10 @@ sections:
       errorFields = {error['loc'][0] for error in orderValidationErrors}
       assert {'amount', 'status'} <= errorFields
       orderValidationErrors
-  - type: "code"
-    language: "python"
-    title: "배치 입력을 정상/오류로 분리"
-    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+  - type: code
+    language: python
+    title: 배치 입력을 정상/오류로 분리
+    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
     content: |-
       rawOrders = [
           {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
@@ -547,10 +1315,10 @@ sections:
       assert len(rejectedOrders) == 2
       assert paidRevenue == 120000
       acceptedOrders, rejectedOrders
-  - type: "code"
-    language: "python"
-    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
-    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
+    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
     content: |-
       def filterRevenueOrders(orders, minAmount):
           if minAmount <= 0:

@@ -324,7 +324,11 @@ def testDocumentHasMissions() -> None:
 
     missionCells = [b for b in document.blocks if b.id in solutions]
     assert len(missionCells) > 0
-    assert all(b.content == "" for b in missionCells)
+    legacyMissionCells = [b for b in missionCells if b.sourceType == "expansion"]
+    structuredMissionCells = [b for b in missionCells if b.sourceType == "sectionContract:exercise"]
+    assert legacyMissionCells or structuredMissionCells
+    assert all(b.content == "" for b in legacyMissionCells)
+    assert all(b.content != "" for b in structuredMissionCells)
 
 
 def testPrevNext() -> None:

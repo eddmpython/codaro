@@ -1,39 +1,103 @@
 meta:
-  id: "day28"
-  title: "고급 문법 종합"
+  id: day28
+  title: 고급 문법 종합
   day: 28
-  category: "30days"
-  tags: ["고급문법", "컨텍스트매니저", "데코레이터", "제너레이터", "검증"]
+  category: 30days
+  tags:
+  - 고급문법
+  - 컨텍스트매니저
+  - 데코레이터
+  - 제너레이터
+  - 검증
   seo:
-    title: "파이썬 고급 문법 종합 - 컨텍스트 매니저"
-    description: "with 문, context manager, __enter__, __exit__을 배웁니다."
-    keywords: ['컨텍스트매니저', 'with', '__enter__', '__exit__', '리소스관리']
-
+    title: 파이썬 고급 문법 종합 - 컨텍스트 매니저
+    description: with 문, context manager, __enter__, __exit__을 배웁니다.
+    keywords:
+    - 컨텍스트매니저
+    - with
+    - __enter__
+    - __exit__
+    - 리소스관리
 intro:
-  emoji: "🎯"
+  emoji: 🎯
   points:
-  - "with 문으로 리소스 관리"
-  - "컨텍스트 매니저 프로토콜"
-  - "자동 정리 메커니즘"
-  - "커스텀 컨텍스트 매니저"
-
+  - with 문으로 리소스 관리
+  - 컨텍스트 매니저 프로토콜
+  - 자동 정리 메커니즘
+  - 커스텀 컨텍스트 매니저
 sections:
-- id: "with_basic"
-  title: "with 문 기초"
-  subtitle: "자동 리소스 관리"
+- id: with_basic
+  title: with 문 기초
+  structuredPrimary: true
+  subtitle: 자동 리소스 관리
+  goal: 'with 문 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'with 문 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다.
+
+    with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
+  tips:
+  - with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pathlib import Path
+    import tempfile
+
+    day28Scratch = Path(tempfile.mkdtemp(prefix='codaro_day28_'))
+    testFile = day28Scratch / 'test.txt'
+    content = ''
+    with open(testFile, 'w') as f:
+        f.write('Hello World')
+        content = 'written'
+    content
+  exercise:
+    prompt: 'with 문 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      import tempfile
+
+      day28Scratch = Path(tempfile.mkdtemp(prefix='codaro_day28_'))
+      testFile = day28Scratch / 'test.txt'
+      content = ''
+      with open(testFile, 'w') as f:
+          f.write('Hello World')
+          content = 'written'
+      content
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      day28Scratch = Path(tempfile.mkdtemp(prefix='codaro_day28_'))
+      testFile = day28Scratch / 'test.txt'
+      content = ''
+      with open(testFile, 'w') as f:
+          f.write('Hello World')
+          content = 'written'
+      content
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다."
-  - type: "list"
+  - type: text
+    content: with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를
+      직접 호출할 필요가 없습니다.
+  - type: list
     items:
-    - "with 문: 자동 정리"
-    - "블록 종료시 자동 close"
-    - "예외 발생시에도 정리 보장"
-    - "코드 간결성 향상"
-  - type: "code"
-    language: "python"
-    title: "기본 with 문"
-    description: "with를 사용하여 파일을 안전하게 처리합니다."
+    - 'with 문: 자동 정리'
+    - 블록 종료시 자동 close
+    - 예외 발생시에도 정리 보장
+    - 코드 간결성 향상
+  - type: code
+    language: python
+    title: 기본 with 문
+    description: with를 사용하여 파일을 안전하게 처리합니다.
     content: |-
       from pathlib import Path
       import tempfile
@@ -45,43 +109,98 @@ sections:
           f.write('Hello World')
           content = 'written'
       content
-  - type: "code"
-    language: "python"
-    title: "with 없이 사용"
-    description: "수동으로 파일을 닫아야 합니다."
+  - type: code
+    language: python
+    title: with 없이 사용
+    description: 수동으로 파일을 닫아야 합니다.
     content: |-
       manualFile = day28Scratch / 'manual.txt'
       fileHandle = open(manualFile, 'w')
       fileHandle.write('Manual close')
       fileHandle.close()
       'closed manually'
-  - type: "code"
-    language: "python"
-    title: "with와 읽기"
-    description: "파일을 읽고 자동으로 닫습니다."
+  - type: code
+    language: python
+    title: with와 읽기
+    description: 파일을 읽고 자동으로 닫습니다.
     content: |-
       with open(testFile, 'r') as reader:
           textData = reader.read()
       textData
-  - type: "tip"
-    content: "with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다."
+  - type: tip
+    content: with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
+- id: context_manager_protocol
+  title: 컨텍스트 매니저 프로토콜
+  structuredPrimary: true
+  subtitle: __enter__와 __exit__
+  goal: '컨텍스트 매니저 프로토콜: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '컨텍스트 매니저 프로토콜: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다.
 
-- id: "context_manager_protocol"
-  title: "컨텍스트 매니저 프로토콜"
-  subtitle: "__enter__와 __exit__"
+    __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
+  tips:
+  - __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class SimpleContext:
+        def __enter__(self):
+            return 'entered'
+
+        def __exit__(self, excType, excVal, excTb):
+            return False
+
+    with SimpleContext() as sc:
+        result = sc
+    result
+  exercise:
+    prompt: '컨텍스트 매니저 프로토콜: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class SimpleContext:
+          def __enter__(self):
+              return 'entered'
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with SimpleContext() as sc:
+          result = sc
+      result
+    solution: |-
+      class SimpleContext:
+          def __enter__(self):
+              return 'entered'
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with SimpleContext() as sc:
+          result = sc
+      result
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다."
-  - type: "list"
+  - type: text
+    content: 컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는
+      예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다.
+  - type: list
     items:
-    - "__enter__: 진입시 호출"
-    - "__exit__: 종료시 호출"
-    - "예외 정보 처리 가능"
-    - "자동 정리 보장"
-  - type: "code"
-    language: "python"
-    title: "기본 컨텍스트 매니저"
-    description: "간단한 컨텍스트 매니저를 만듭니다."
+    - '__enter__: 진입시 호출'
+    - '__exit__: 종료시 호출'
+    - 예외 정보 처리 가능
+    - 자동 정리 보장
+  - type: code
+    language: python
+    title: 기본 컨텍스트 매니저
+    description: 간단한 컨텍스트 매니저를 만듭니다.
     content: |-
       class SimpleContext:
           def __enter__(self):
@@ -93,10 +212,10 @@ sections:
       with SimpleContext() as sc:
           result = sc
       result
-  - type: "code"
-    language: "python"
-    title: "상태 추적 컨텍스트"
-    description: "진입과 종료를 추적합니다."
+  - type: code
+    language: python
+    title: 상태 추적 컨텍스트
+    description: 진입과 종료를 추적합니다.
     content: |-
       class StateTracker:
           def __init__(self):
@@ -114,10 +233,10 @@ sections:
       with tracker:
           pass
       tracker.status
-  - type: "code"
-    language: "python"
-    title: "값 반환 컨텍스트"
-    description: "__enter__에서 반환한 값을 사용합니다."
+  - type: code
+    language: python
+    title: 값 반환 컨텍스트
+    description: __enter__에서 반환한 값을 사용합니다.
     content: |-
       class ValueProvider:
           def __enter__(self):
@@ -129,25 +248,104 @@ sections:
       with ValueProvider() as vals:
           total = sum(vals)
       total
-  - type: "tip"
-    content: "__exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다."
+  - type: tip
+    content: __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
+- id: resource_management
+  title: 리소스 관리
+  structuredPrimary: true
+  subtitle: 파일과 연결 관리
+  goal: '리소스 관리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '리소스 관리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다.
 
-- id: "resource_management"
-  title: "리소스 관리"
-  subtitle: "파일과 연결 관리"
+    with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
+  tips:
+  - with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class FileManager:
+        def __init__(self, filename, mode):
+            self.filename = filename
+            self.mode = mode
+            self.fileObj = None
+
+        def __enter__(self):
+            self.fileObj = open(self.filename, self.mode)
+            return self.fileObj
+
+        def __exit__(self, excType, excVal, excTb):
+            if self.fileObj:
+                self.fileObj.close()
+            return False
+
+    with FileManager('resource.txt', 'w') as fm:
+        fm.write('Resource managed')
+    'completed'
+  exercise:
+    prompt: '리소스 관리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class FileManager:
+          def __init__(self, filename, mode):
+              self.filename = filename
+              self.mode = mode
+              self.fileObj = None
+
+          def __enter__(self):
+              self.fileObj = open(self.filename, self.mode)
+              return self.fileObj
+
+          def __exit__(self, excType, excVal, excTb):
+              if self.fileObj:
+                  self.fileObj.close()
+              return False
+
+      with FileManager('resource.txt', 'w') as fm:
+          fm.write('Resource managed')
+      'completed'
+    solution: |-
+      class FileManager:
+          def __init__(self, filename, mode):
+              self.filename = filename
+              self.mode = mode
+              self.fileObj = None
+
+          def __enter__(self):
+              self.fileObj = open(self.filename, self.mode)
+              return self.fileObj
+
+          def __exit__(self, excType, excVal, excTb):
+              if self.fileObj:
+                  self.fileObj.close()
+              return False
+
+      with FileManager('resource.txt', 'w') as fm:
+          fm.write('Resource managed')
+      'completed'
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다."
-  - type: "list"
+  - type: text
+    content: 컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와
+      관계없이 리소스가 정리됩니다.
+  - type: list
     items:
-    - "파일 자동 닫기"
-    - "연결 자동 종료"
-    - "예외 안전성"
-    - "메모리 누수 방지"
-  - type: "code"
-    language: "python"
-    title: "파일 컨텍스트"
-    description: "파일을 안전하게 읽고 씁니다."
+    - 파일 자동 닫기
+    - 연결 자동 종료
+    - 예외 안전성
+    - 메모리 누수 방지
+  - type: code
+    language: python
+    title: 파일 컨텍스트
+    description: 파일을 안전하게 읽고 씁니다.
     content: |-
       class FileManager:
           def __init__(self, filename, mode):
@@ -167,10 +365,10 @@ sections:
       with FileManager('resource.txt', 'w') as fm:
           fm.write('Resource managed')
       'completed'
-  - type: "code"
-    language: "python"
-    title: "연결 컨텍스트"
-    description: "연결을 자동으로 정리합니다."
+  - type: code
+    language: python
+    title: 연결 컨텍스트
+    description: 연결을 자동으로 정리합니다.
     content: |-
       class Connection:
           def __init__(self, host):
@@ -189,10 +387,10 @@ sections:
       with conn:
           status = conn.connected
       conn.connected, status
-  - type: "code"
-    language: "python"
-    title: "리소스 카운터"
-    description: "리소스 사용을 추적합니다."
+  - type: code
+    language: python
+    title: 리소스 카운터
+    description: 리소스 사용을 추적합니다.
     content: |-
       class ResourceCounter:
           count = 0
@@ -209,25 +407,89 @@ sections:
           with ResourceCounter() as rc2:
               peak = ResourceCounter.count
       ResourceCounter.count, peak
-  - type: "tip"
-    content: "with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다."
+  - type: tip
+    content: with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
+- id: exception_handling
+  title: 예외 처리
+  structuredPrimary: true
+  subtitle: 컨텍스트 매니저와 예외
+  goal: '예외 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '예외 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다.
 
-- id: "exception_handling"
-  title: "예외 처리"
-  subtitle: "컨텍스트 매니저와 예외"
+    __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
+  tips:
+  - __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class ExceptionSuppressor:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, excType, excVal, excTb):
+            if excType is ZeroDivisionError:
+                return True
+            return False
+
+    outcome = 'no error'
+    with ExceptionSuppressor():
+        outcome = 10 / 0
+    outcome
+  exercise:
+    prompt: '예외 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ExceptionSuppressor:
+          def __enter__(self):
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              if excType is ZeroDivisionError:
+                  return True
+              return False
+
+      outcome = 'no error'
+      with ExceptionSuppressor():
+          outcome = 10 / 0
+      outcome
+    solution: |-
+      class ExceptionSuppressor:
+          def __enter__(self):
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              if excType is ZeroDivisionError:
+                  return True
+              return False
+
+      outcome = 'no error'
+      with ExceptionSuppressor():
+          outcome = 10 / 0
+      outcome
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: 컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할
+      수 있습니다.
+  - type: list
     items:
-    - "예외 정보 수신"
-    - "예외 억제 가능"
-    - "정리 작업 보장"
-    - "예외 전파 제어"
-  - type: "code"
-    language: "python"
-    title: "예외 억제"
-    description: "예외를 잡아서 억제합니다."
+    - 예외 정보 수신
+    - 예외 억제 가능
+    - 정리 작업 보장
+    - 예외 전파 제어
+  - type: code
+    language: python
+    title: 예외 억제
+    description: 예외를 잡아서 억제합니다.
     content: |-
       class ExceptionSuppressor:
           def __enter__(self):
@@ -242,10 +504,10 @@ sections:
       with ExceptionSuppressor():
           outcome = 10 / 0
       outcome
-  - type: "code"
-    language: "python"
-    title: "예외 로깅"
-    description: "예외 정보를 기록하고 전파합니다."
+  - type: code
+    language: python
+    title: 예외 로깅
+    description: 예외 정보를 기록하고 전파합니다.
     content: |-
       class ExceptionLogger:
           def __init__(self):
@@ -266,10 +528,10 @@ sections:
       except ValueError:
           pass
       logger.errors
-  - type: "code"
-    language: "python"
-    title: "조건부 억제"
-    description: "특정 예외만 억제합니다."
+  - type: code
+    language: python
+    title: 조건부 억제
+    description: 특정 예외만 억제합니다.
     content: |-
       class SelectiveSuppressor:
           def __init__(self, suppress):
@@ -285,25 +547,70 @@ sections:
       with SelectiveSuppressor([TypeError]):
           msg = 'error' + 5
       msg
-  - type: "tip"
-    content: "__exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다."
+  - type: tip
+    content: __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
+- id: multiple_context
+  title: 다중 컨텍스트
+  structuredPrimary: true
+  subtitle: 여러 컨텍스트 매니저 사용
+  goal: '다중 컨텍스트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '다중 컨텍스트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다.
 
-- id: "multiple_context"
-  title: "다중 컨텍스트"
-  subtitle: "여러 컨텍스트 매니저 사용"
+    다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.
+  tips:
+  - '다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    sourceFile = day28Scratch / 'source.txt'
+    destFile = day28Scratch / 'dest.txt'
+    with open(sourceFile, 'w') as src, open(destFile, 'w') as dst:
+        src.write('source')
+        dst.write('destination')
+        combined = 'both written'
+    combined
+  exercise:
+    prompt: '다중 컨텍스트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sourceFile = day28Scratch / 'source.txt'
+      destFile = day28Scratch / 'dest.txt'
+      with open(sourceFile, 'w') as src, open(destFile, 'w') as dst:
+          src.write('source')
+          dst.write('destination')
+          combined = 'both written'
+      combined
+    solution: |-
+      sourceFile = day28Scratch / 'source.txt'
+      destFile = day28Scratch / 'dest.txt'
+      with open(sourceFile, 'w') as src, open(destFile, 'w') as dst:
+          src.write('source')
+          dst.write('destination')
+          combined = 'both written'
+      combined
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다."
-  - type: "list"
+  - type: text
+    content: 하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다.
+  - type: list
     items:
-    - "여러 리소스 동시 관리"
-    - "콤마로 구분"
-    - "진입: 왼쪽→오른쪽"
-    - "종료: 오른쪽→왼쪽"
-  - type: "code"
-    language: "python"
-    title: "다중 파일"
-    description: "여러 파일을 동시에 관리합니다."
+    - 여러 리소스 동시 관리
+    - 콤마로 구분
+    - '진입: 왼쪽→오른쪽'
+    - '종료: 오른쪽→왼쪽'
+  - type: code
+    language: python
+    title: 다중 파일
+    description: 여러 파일을 동시에 관리합니다.
     content: |-
       sourceFile = day28Scratch / 'source.txt'
       destFile = day28Scratch / 'dest.txt'
@@ -312,10 +619,10 @@ sections:
           dst.write('destination')
           combined = 'both written'
       combined
-  - type: "code"
-    language: "python"
-    title: "순서 추적"
-    description: "진입과 종료 순서를 확인합니다."
+  - type: code
+    language: python
+    title: 순서 추적
+    description: 진입과 종료 순서를 확인합니다.
     content: |-
       class OrderTracker:
           def __init__(self, name):
@@ -330,10 +637,10 @@ sections:
       with OrderTracker('first') as f, OrderTracker('second') as s:
           order = f, s
       order
-  - type: "code"
-    language: "python"
-    title: "리소스 체인"
-    description: "여러 리소스를 체인으로 연결합니다."
+  - type: code
+    language: python
+    title: 리소스 체인
+    description: 여러 리소스를 체인으로 연결합니다.
     content: |-
       class ChainResource:
           def __init__(self, value):
@@ -348,25 +655,94 @@ sections:
       with ChainResource(10) as a, ChainResource(20) as b, ChainResource(30) as c:
           sumTotal = a + b + c
       sumTotal
-  - type: "tip"
-    content: "다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다."
+  - type: tip
+    content: '다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.'
+- id: practical_patterns
+  title: 실전 패턴
+  structuredPrimary: true
+  subtitle: 컨텍스트 매니저 활용
+  goal: '실전 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실전 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다.
 
-- id: "practical_patterns"
-  title: "실전 패턴"
-  subtitle: "컨텍스트 매니저 활용"
+    컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
+  tips:
+  - 컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import time
+
+    class Timer:
+        def __enter__(self):
+            self.start = time.time()
+            return self
+
+        def __exit__(self, excType, excVal, excTb):
+            self.elapsed = time.time() - self.start
+            return False
+
+    timer = Timer()
+    with timer:
+        total = sum(range(1000))
+    timer.elapsed > 0
+  exercise:
+    prompt: '실전 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import time
+
+      class Timer:
+          def __enter__(self):
+              self.start = time.time()
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              self.elapsed = time.time() - self.start
+              return False
+
+      timer = Timer()
+      with timer:
+          total = sum(range(1000))
+      timer.elapsed > 0
+    solution: |-
+      import time
+
+      class Timer:
+          def __enter__(self):
+              self.start = time.time()
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              self.elapsed = time.time() - self.start
+              return False
+
+      timer = Timer()
+      with timer:
+          total = sum(range(1000))
+      timer.elapsed > 0
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다."
-  - type: "list"
+  - type: text
+    content: 컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다.
+  - type: list
     items:
-    - "타이머 측정"
-    - "임시 상태 변경"
-    - "트랜잭션 관리"
-    - "코드 블록 래핑"
-  - type: "code"
-    language: "python"
-    title: "타이머 컨텍스트"
-    description: "코드 실행 시간을 측정합니다."
+    - 타이머 측정
+    - 임시 상태 변경
+    - 트랜잭션 관리
+    - 코드 블록 래핑
+  - type: code
+    language: python
+    title: 타이머 컨텍스트
+    description: 코드 실행 시간을 측정합니다.
     content: |-
       import time
 
@@ -383,10 +759,10 @@ sections:
       with timer:
           total = sum(range(1000))
       timer.elapsed > 0
-  - type: "code"
-    language: "python"
-    title: "상태 백업"
-    description: "상태를 임시로 변경하고 복원합니다."
+  - type: code
+    language: python
+    title: 상태 백업
+    description: 상태를 임시로 변경하고 복원합니다.
     content: |-
       class StateBackup:
           def __init__(self, obj, attr, newVal):
@@ -411,10 +787,10 @@ sections:
       with StateBackup(cfg, 'debug', True):
           insideVal = cfg.debug
       cfg.debug, insideVal
-  - type: "code"
-    language: "python"
-    title: "리스트 보호"
-    description: "리스트를 임시로 사용하고 복원합니다."
+  - type: code
+    language: python
+    title: 리스트 보호
+    description: 리스트를 임시로 사용하고 복원합니다.
     content: |-
       class ListGuard:
           def __init__(self, lst):
@@ -435,19 +811,155 @@ sections:
           ml.append(5)
           modified = len(ml)
       len(myList), modified
-  - type: "tip"
-    content: "컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다."
+  - type: tip
+    content: 컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기'
+  structuredPrimary: true
+  subtitle: 예측 → 리소스 열기 → 오류 처리 → 정리 검증
+  goal: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상 기록, 오류, 정리 상태를 검증합니다.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기"
-  subtitle: "예측 → 리소스 열기 → 오류 처리 → 정리 검증"
+    실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요.
+  tips:
+  - '실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pathlib import Path
+    import tempfile
+
+    class ReportWriter:
+        def __init__(self, root, filename):
+            self.root = Path(root)
+            self.path = self.root / filename
+            self.fileObj = None
+
+        def __enter__(self):
+            self.root.mkdir(parents=True, exist_ok=True)
+            self.fileObj = self.path.open('w', encoding='utf-8')
+            return self
+
+        def writeLine(self, text):
+            if not text.strip():
+                raise ValueError('report line must not be empty')
+            self.fileObj.write(text.strip() + '\n')
+
+        def __exit__(self, excType, excValue, traceback):
+            self.fileObj.close()
+            return False
+
+    with tempfile.TemporaryDirectory() as tempDir:
+        with ReportWriter(tempDir, 'dailyReport.txt') as report:
+            report.writeLine('paidCount=2')
+            report.writeLine('paidRevenue=230000')
+            reportClosedInside = report.fileObj.closed
+            reportPath = report.path
+
+        savedReport = reportPath.read_text(encoding='utf-8')
+        reportClosedAfter = report.fileObj.closed
+
+    assert reportClosedInside is False
+    assert reportClosedAfter is True
+    assert 'paidRevenue=230000' in savedReport
+    savedReport
+  exercise:
+    prompt: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      import tempfile
+
+      class ReportWriter:
+          def __init__(self, root, filename):
+              self.root = Path(root)
+              self.path = self.root / filename
+              self.fileObj = None
+
+          def __enter__(self):
+              self.root.mkdir(parents=True, exist_ok=True)
+              self.fileObj = self.path.open('w', encoding='utf-8')
+              return self
+
+          def writeLine(self, text):
+              if not text.strip():
+                  raise ValueError('report line must not be empty')
+              self.fileObj.write(text.strip() + '\n')
+
+          def __exit__(self, excType, excValue, traceback):
+              self.fileObj.close()
+              return False
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          with ReportWriter(tempDir, 'dailyReport.txt') as report:
+              report.writeLine('paidCount=2')
+              report.writeLine('paidRevenue=230000')
+              reportClosedInside = report.fileObj.closed
+              reportPath = report.path
+
+          savedReport = reportPath.read_text(encoding='utf-8')
+          reportClosedAfter = report.fileObj.closed
+
+      assert reportClosedInside is False
+      assert reportClosedAfter is True
+      assert 'paidRevenue=230000' in savedReport
+      savedReport
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      class ReportWriter:
+          def __init__(self, root, filename):
+              self.root = Path(root)
+              self.path = self.root / filename
+              self.fileObj = None
+
+          def __enter__(self):
+              self.root.mkdir(parents=True, exist_ok=True)
+              self.fileObj = self.path.open('w', encoding='utf-8')
+              return self
+
+          def writeLine(self, text):
+              if not text.strip():
+                  raise ValueError('report line must not be empty')
+              self.fileObj.write(text.strip() + '\n')
+
+          def __exit__(self, excType, excValue, traceback):
+              self.fileObj.close()
+              return False
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          with ReportWriter(tempDir, 'dailyReport.txt') as report:
+              report.writeLine('paidCount=2')
+              report.writeLine('paidRevenue=230000')
+              reportClosedInside = report.fileObj.closed
+              reportPath = report.path
+
+          savedReport = reportPath.read_text(encoding='utf-8')
+          reportClosedAfter = report.fileObj.closed
+
+      assert reportClosedInside is False
+      assert reportClosedAfter is True
+      assert 'paidRevenue=230000' in savedReport
+      savedReport
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상 기록, 오류, 정리 상태를 검증합니다."
-  - type: "code"
-    language: "python"
-    title: "리포트 파일 컨텍스트 매니저"
-    description: "파일을 열고 쓰고 닫는 책임을 with 블록 안에 고정합니다."
+  - type: text
+    content: 고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상
+      기록, 오류, 정리 상태를 검증합니다.
+  - type: code
+    language: python
+    title: 리포트 파일 컨텍스트 매니저
+    description: 파일을 열고 쓰고 닫는 책임을 with 블록 안에 고정합니다.
     content: |-
       from pathlib import Path
       import tempfile
@@ -486,10 +998,10 @@ sections:
       assert reportClosedAfter is True
       assert 'paidRevenue=230000' in savedReport
       savedReport
-  - type: "code"
-    language: "python"
-    title: "오류가 나도 정리되는지 확인"
-    description: "빈 줄을 기록하려 하면 실패하지만 파일 핸들은 닫혀야 합니다."
+  - type: code
+    language: python
+    title: 오류가 나도 정리되는지 확인
+    description: 빈 줄을 기록하려 하면 실패하지만 파일 핸들은 닫혀야 합니다.
     content: |-
       with tempfile.TemporaryDirectory() as tempDir:
           try:
@@ -503,18 +1015,65 @@ sections:
       assert 'empty' in reportError
       assert closedAfterError is True
       reportError
-  - type: "tip"
-    content: "실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요."
+  - type: tip
+    content: '실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요.'
+- id: practice
+  title: Day 28 종합 복습
+  structuredPrimary: true
+  subtitle: 컨텍스트 매니저 마스터하기
+  goal: 'Day 28 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Day 28 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pathlib import Path
+    import tempfile
 
-- id: "practice"
-  title: "Day 28 종합 복습"
-  subtitle: "컨텍스트 매니저 마스터하기"
+    basicScratch = Path(tempfile.mkdtemp(prefix='codaro_day28_basic_'))
+    basicFile = basicScratch / 'basic.txt'
+    with open(basicFile, 'w') as f:
+        f.write('test')
+        written = True
+    written
+  exercise:
+    prompt: 'Day 28 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      import tempfile
+
+      basicScratch = Path(tempfile.mkdtemp(prefix='codaro_day28_basic_'))
+      basicFile = basicScratch / 'basic.txt'
+      with open(basicFile, 'w') as f:
+          f.write('test')
+          written = True
+      written
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      basicScratch = Path(tempfile.mkdtemp(prefix='codaro_day28_basic_'))
+      basicFile = basicScratch / 'basic.txt'
+      with open(basicFile, 'w') as f:
+          f.write('test')
+          written = True
+      written
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
-
-  - type: "expansion"
-    title: "🟢 기본1: 간단한 with"
+  - type: text
+    content: Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  - type: expansion
+    title: '🟢 기본1: 간단한 with'
     code: |-
       from pathlib import Path
       import tempfile
@@ -525,9 +1084,8 @@ sections:
           f.write('test')
           written = True
       written
-
-  - type: "expansion"
-    title: "🟢 기본2: 기본 컨텍스트"
+  - type: expansion
+    title: '🟢 기본2: 기본 컨텍스트'
     code: |-
       class BasicCtx:
           def __enter__(self):
@@ -539,9 +1097,8 @@ sections:
       with BasicCtx() as bc:
           msg = bc
       msg
-
-  - type: "expansion"
-    title: "🟢 기본3: 상태 변경"
+  - type: expansion
+    title: '🟢 기본3: 상태 변경'
     code: |-
       class StateSetter:
           def __init__(self):
@@ -559,9 +1116,8 @@ sections:
       with ss:
           active = ss.state
       ss.state, active
-
-  - type: "expansion"
-    title: "🟢 기본4: 값 반환"
+  - type: expansion
+    title: '🟢 기본4: 값 반환'
     code: |-
       class NumberProvider:
           def __enter__(self):
@@ -573,9 +1129,8 @@ sections:
       with NumberProvider() as num:
           doubled = num * 2
       doubled
-
-  - type: "expansion"
-    title: "🟢 기본5: 리스트 제공"
+  - type: expansion
+    title: '🟢 기본5: 리스트 제공'
     code: |-
       class ListProvider:
           def __enter__(self):
@@ -587,9 +1142,8 @@ sections:
       with ListProvider() as lp:
           length = len(lp)
       length
-
-  - type: "expansion"
-    title: "🟡 응용1: 카운터 컨텍스트"
+  - type: expansion
+    title: '🟡 응용1: 카운터 컨텍스트'
     code: |-
       class Counter:
           def __init__(self):
@@ -607,9 +1161,8 @@ sections:
       with counter as c:
           value = c
       counter.count, value
-
-  - type: "expansion"
-    title: "🟡 응용2: 예외 억제"
+  - type: expansion
+    title: '🟡 응용2: 예외 억제'
     code: |-
       class ErrorSuppressor:
           def __enter__(self):
@@ -622,9 +1175,8 @@ sections:
       with ErrorSuppressor():
           errorMsg = int('abc')
       errorMsg
-
-  - type: "expansion"
-    title: "🟡 응용3: 다중 컨텍스트"
+  - type: expansion
+    title: '🟡 응용3: 다중 컨텍스트'
     code: |-
       class ValueCtx:
           def __init__(self, val):
@@ -639,9 +1191,8 @@ sections:
       with ValueCtx(10) as v1, ValueCtx(20) as v2:
           sumVal = v1 + v2
       sumVal
-
-  - type: "expansion"
-    title: "🟡 응용4: 속성 추적"
+  - type: expansion
+    title: '🟡 응용4: 속성 추적'
     code: |-
       class AttrTracker:
           def __init__(self):
@@ -659,9 +1210,8 @@ sections:
       with at:
           pass
       at.attrs
-
-  - type: "expansion"
-    title: "🟡 응용5: 조건부 실행"
+  - type: expansion
+    title: '🟡 응용5: 조건부 실행'
     code: |-
       class ConditionalCtx:
           def __init__(self, enabled):
@@ -678,9 +1228,8 @@ sections:
       with ConditionalCtx(True) as cc:
           status = cc
       status
-
-  - type: "expansion"
-    title: "🔴 심화1: 중첩 카운터"
+  - type: expansion
+    title: '🔴 심화1: 중첩 카운터'
     code: |-
       class NestCounter:
           depth = 0
@@ -697,9 +1246,8 @@ sections:
           with NestCounter() as d2:
               maxDepth = d2
       NestCounter.depth, maxDepth
-
-  - type: "expansion"
-    title: "🔴 심화2: 리소스 풀"
+  - type: expansion
+    title: '🔴 심화2: 리소스 풀'
     code: |-
       class ResourcePool:
           def __init__(self, size):
@@ -722,9 +1270,8 @@ sections:
           with pool as p2:
               used = pool.allocated
       pool.available, used
-
-  - type: "expansion"
-    title: "🔴 심화3: 예외 분류"
+  - type: expansion
+    title: '🔴 심화3: 예외 분류'
     code: |-
       class ExceptionClassifier:
           def __init__(self):
@@ -743,9 +1290,8 @@ sections:
       with ec:
           x = 1 / 0
       ec.exceptions
-
-  - type: "expansion"
-    title: "🔴 심화4: 값 누적"
+  - type: expansion
+    title: '🔴 심화4: 값 누적'
     code: |-
       class Accumulator:
           def __init__(self):
@@ -766,9 +1312,8 @@ sections:
           acc.add(2)
           acc.add(3)
       sum(acc.values)
-
-  - type: "expansion"
-    title: "🔴 심화5: 상태 머신"
+  - type: expansion
+    title: '🔴 심화5: 상태 머신'
     code: |-
       class StateMachine:
           def __init__(self):
@@ -790,9 +1335,8 @@ sections:
           sm.transition('working')
           sm.transition('done')
       sm.history
-
-  - type: "expansion"
-    title: "🔴 심화6: 시간 제한"
+  - type: expansion
+    title: '🔴 심화6: 시간 제한'
     code: |-
       import time
 
@@ -814,9 +1358,8 @@ sections:
       with tl:
           pass
       tl.exceeded
-
-  - type: "expansion"
-    title: "🔴 심화7: 조건부 롤백"
+  - type: expansion
+    title: '🔴 심화7: 조건부 롤백'
     code: |-
       class Transaction:
           def __init__(self, initialData):
@@ -840,9 +1383,8 @@ sections:
 
       assert txn.data == [1, 2, 3]
       txn.data
-
-  - type: "expansion"
-    title: "🔴 심화8: 멀티 상태"
+  - type: expansion
+    title: '🔴 심화8: 멀티 상태'
     code: |-
       class MultiState:
           def __init__(self):
@@ -863,9 +1405,8 @@ sections:
       with ms:
           ms.set('middle', True)
       len(ms.states)
-
-  - type: "expansion"
-    title: "🔴 심화9: 체인 컨텍스트"
+  - type: expansion
+    title: '🔴 심화9: 체인 컨텍스트'
     code: |-
       class ChainCtx:
           def __init__(self, value):
@@ -883,9 +1424,8 @@ sections:
           with ChainCtx(c1) as c2:
               finalVal = c2
       finalVal
-
-  - type: "expansion"
-    title: "🔴 심화10: 컨텍스트 팩토리"
+  - type: expansion
+    title: '🔴 심화10: 컨텍스트 팩토리'
     code: |-
       class ContextFactory:
           def __init__(self, ctxType):

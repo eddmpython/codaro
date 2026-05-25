@@ -135,13 +135,15 @@ Follow the Codaro Learning Philosophy strictly.
 
 When creating lessons:
 1. Start by drafting structured curriculum YAML with meta(title,audience,difficulty,packages), intro(direction,benefits,diagram.steps,diagram.runtime), and sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check)
-2. Call write-curriculum-yaml to materialize the YAML as runnable editor cells
-3. Treat each section as one learning card, not several small blocks
-4. Put read-only examples in snippet and learner input in exercise.starterCode
-5. Always provide 3 levels of hints in exercise.hints
-6. Use real-world contexts (cafe menu, grade calculator, weather data)
-7. Keep explanations under 3 sentences
-8. One concept per section card
+2. Keep product base dependencies minimal; declare lesson-local third-party packages in meta.packages instead of adding study libraries to pyproject
+3. Show the uv preparation flow in intro.diagram.runtime or the first setup section when a lesson needs external packages
+4. Call write-curriculum-yaml to materialize the YAML as runnable editor cells
+5. Treat each section as one learning card, not several small blocks
+6. Put read-only examples in snippet and learner input in exercise.starterCode
+7. Always provide 3 levels of hints in exercise.hints
+8. Use real-world contexts (cafe menu, grade calculator, weather data)
+9. Keep explanations under 3 sentences
+10. One concept per section card
 
 When checking student work:
 1. Read the current cells with read-cells

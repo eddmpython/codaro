@@ -1,30 +1,74 @@
 meta:
   packages:
-    - sympy
+  - sympy
   id: sympy_01
   title: 기초수식계산
   order: 1
   category: sympy
-  difficulty: "⭐"
+  difficulty: ⭐
   badge: 입문
-  tags: ["sympy", "symbols", "expand", "factor", "simplify"]
+  tags:
+  - sympy
+  - symbols
+  - expand
+  - factor
+  - simplify
   seo:
-    title: "SymPy 기초 - 기호 정의와 수식 정리"
-    description: "SymPy로 기호를 정의하고 수식을 전개, 인수분해, 간소화합니다. 기호 수학의 첫걸음을 배웁니다."
-    keywords: ["sympy", "symbols", "expand", "factor", "simplify", "기호수학"]
-
+    title: SymPy 기초 - 기호 정의와 수식 정리
+    description: SymPy로 기호를 정의하고 수식을 전개, 인수분해, 간소화합니다. 기호 수학의 첫걸음을 배웁니다.
+    keywords:
+    - sympy
+    - symbols
+    - expand
+    - factor
+    - simplify
+    - 기호수학
 intro:
-  emoji: "✏️"
+  emoji: ✏️
   goal: 기호를 정의하고 수식을 만들어 전개, 인수분해, 간소화를 수행합니다.
-  description: "SymPy의 핵심은 기호(symbol)입니다. 일반 계산기는 숫자만 다루지만, SymPy는 x, y 같은 미지수를 그대로 수식으로 다룹니다. 중고등학교에서 손으로 했던 (x+1)² = x²+2x+1 전개, x²-1 = (x+1)(x-1) 인수분해를 SymPy가 정확하게 수행합니다. 복잡한 분수식 약분, 동류항 정리까지 한 줄의 코드로 해결됩니다. 이 프로젝트를 완료하면 어떤 다항식이든 전개하고 인수분해하며, 복잡한 수식을 간결하게 정리할 수 있게 됩니다."
-
+  description: SymPy의 핵심은 기호(symbol)입니다. 일반 계산기는 숫자만 다루지만, SymPy는 x, y 같은 미지수를 그대로 수식으로 다룹니다. 중고등학교에서 손으로 했던 (x+1)² = x²+2x+1
+    전개, x²-1 = (x+1)(x-1) 인수분해를 SymPy가 정확하게 수행합니다. 복잡한 분수식 약분, 동류항 정리까지 한 줄의 코드로 해결됩니다. 이 프로젝트를 완료하면 어떤 다항식이든 전개하고 인수분해하며,
+    복잡한 수식을 간결하게 정리할 수 있게 됩니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SymPy는 파이썬의 기호 수학 라이브러리입니다. symbols로 변수를 정의하고, expand, factor, simplify로 수식을 조작합니다. sqrt와 Rational은 제곱근과 분수를
+    정확하게 표현합니다. init_printing()을 호출하면 수식이 수학 교과서처럼 예쁘게 출력됩니다. 웹 환경에서는 LaTeX 렌더링으로 x² 같은 표현이 그대로 보입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational
+      from sympy import init_printing
+      init_printing()
+    solution: |-
+      from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SymPy는 파이썬의 기호 수학 라이브러리입니다. symbols로 변수를 정의하고, expand, factor, simplify로 수식을 조작합니다. sqrt와 Rational은 제곱근과 분수를 정확하게 표현합니다. init_printing()을 호출하면 수식이 수학 교과서처럼 예쁘게 출력됩니다. 웹 환경에서는 LaTeX 렌더링으로 x² 같은 표현이 그대로 보입니다."
+    content: SymPy는 파이썬의 기호 수학 라이브러리입니다. symbols로 변수를 정의하고, expand, factor, simplify로 수식을 조작합니다. sqrt와 Rational은 제곱근과 분수를
+      정확하게 표현합니다. init_printing()을 호출하면 수식이 수학 교과서처럼 예쁘게 출력됩니다. 웹 환경에서는 LaTeX 렌더링으로 x² 같은 표현이 그대로 보입니다.
   - type: code
     language: python
     title: 라이브러리 불러오기
@@ -33,13 +77,44 @@ sections:
       from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational
       from sympy import init_printing
       init_printing()
-
 - id: step2_symbol
   title: 2단계. 기호 정의
+  structuredPrimary: true
   subtitle: symbols()
+  goal: '2단계. 기호 정의: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기호 정의: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    symbols() 함수로 수학에서 사용하는 미지수를 만듭니다. x = symbols('x')를 실행하면 x는 더 이상 파이썬 변수가 아니라 수학 기호가 됩니다. 이 기호는 값이 정해지지 않은 상태로 수식에 참여합니다. 방정식의 미지수, 함수의 변수 등 모든 수학적 계산의 출발점입니다. y, z처럼 여러 기호가 필요하면 한 번에 정의할 수 있어 편리합니다.
+
+    symbols('x y z')처럼 공백으로 구분하면 여러 기호를 한 번에 만들 수 있습니다. 반환값을 같은 수의 변수에 할당합니다.
+  tips:
+  - symbols('x y z')처럼 공백으로 구분하면 여러 기호를 한 번에 만들 수 있습니다. 반환값을 같은 수의 변수에 할당합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    x = symbols('x')
+    x
+  exercise:
+    prompt: '2단계. 기호 정의: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      x = symbols('x')
+      x
+    solution: |-
+      x = symbols('x')
+      x
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "symbols() 함수로 수학에서 사용하는 미지수를 만듭니다. x = symbols('x')를 실행하면 x는 더 이상 파이썬 변수가 아니라 수학 기호가 됩니다. 이 기호는 값이 정해지지 않은 상태로 수식에 참여합니다. 방정식의 미지수, 함수의 변수 등 모든 수학적 계산의 출발점입니다. y, z처럼 여러 기호가 필요하면 한 번에 정의할 수 있어 편리합니다."
+    content: symbols() 함수로 수학에서 사용하는 미지수를 만듭니다. x = symbols('x')를 실행하면 x는 더 이상 파이썬 변수가 아니라 수학 기호가 됩니다. 이 기호는 값이 정해지지 않은 상태로
+      수식에 참여합니다. 방정식의 미지수, 함수의 변수 등 모든 수학적 계산의 출발점입니다. y, z처럼 여러 기호가 필요하면 한 번에 정의할 수 있어 편리합니다.
   - type: code
     language: python
     title: 단일 기호 정의
@@ -56,13 +131,44 @@ sections:
       y, z
   - type: tip
     content: symbols('x y z')처럼 공백으로 구분하면 여러 기호를 한 번에 만들 수 있습니다. 반환값을 같은 수의 변수에 할당합니다.
-
 - id: step3_expr
   title: 3단계. 수식 생성
+  structuredPrimary: true
   subtitle: 기본 연산
+  goal: '3단계. 수식 생성: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 수식 생성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    정의한 기호로 수식(expression)을 만듭니다. 파이썬의 +, -, *, / 연산자를 그대로 사용하고, 거듭제곱은 **를 씁니다. x**2 + 2*x + 1처럼 작성하면 SymPy가 자동으로 수학 수식 객체를 생성합니다. 이 수식은 단순한 문자열이 아니라, 전개, 인수분해, 미분 등 다양한 수학 연산이 가능한 객체입니다. 여러 변수를 섞어 다변수 다항식도 만들 수 있습니다.
+
+    SymPy 수식에서 곱셈은 *를 명시해야 합니다. 2x가 아니라 2*x로 씁니다. 거듭제곱 x²는 x**2로 표현합니다.
+  tips:
+  - SymPy 수식에서 곱셈은 *를 명시해야 합니다. 2x가 아니라 2*x로 씁니다. 거듭제곱 x²는 x**2로 표현합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    expr = x**2 + 2*x + 1
+    expr
+  exercise:
+    prompt: '3단계. 수식 생성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      expr = x**2 + 2*x + 1
+      expr
+    solution: |-
+      expr = x**2 + 2*x + 1
+      expr
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "정의한 기호로 수식(expression)을 만듭니다. 파이썬의 +, -, *, / 연산자를 그대로 사용하고, 거듭제곱은 **를 씁니다. x**2 + 2*x + 1처럼 작성하면 SymPy가 자동으로 수학 수식 객체를 생성합니다. 이 수식은 단순한 문자열이 아니라, 전개, 인수분해, 미분 등 다양한 수학 연산이 가능한 객체입니다. 여러 변수를 섞어 다변수 다항식도 만들 수 있습니다."
+    content: 정의한 기호로 수식(expression)을 만듭니다. 파이썬의 +, -, *, / 연산자를 그대로 사용하고, 거듭제곱은 **를 씁니다. x**2 + 2*x + 1처럼 작성하면 SymPy가 자동으로
+      수학 수식 객체를 생성합니다. 이 수식은 단순한 문자열이 아니라, 전개, 인수분해, 미분 등 다양한 수학 연산이 가능한 객체입니다. 여러 변수를 섞어 다변수 다항식도 만들 수 있습니다.
   - type: code
     language: python
     title: 다항식 생성
@@ -79,13 +185,48 @@ sections:
       poly
   - type: tip
     content: SymPy 수식에서 곱셈은 *를 명시해야 합니다. 2x가 아니라 2*x로 씁니다. 거듭제곱 x²는 x**2로 표현합니다.
-
 - id: step4_expand
   title: 4단계. 수식 전개
+  structuredPrimary: true
   subtitle: expand()
+  goal: '4단계. 수식 전개: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 수식 전개: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    expand()는 괄호를 풀어 전개하는 함수입니다. 중학교에서 배운 곱셈 공식 (a+b)² = a²+2ab+b²를 자동으로 적용합니다. 손으로 계산하면 실수하기 쉬운 (x+y)³ 같은 복잡한 전개도 정확하게 처리합니다. 물리학에서 테일러 급수 전개 후 정리할 때, 공학에서 제어 시스템 전달함수를 분석할 때 등 실무에서도 자주 사용됩니다. 복잡한 곱셈을 풀어헤쳐 각 항을 명확하게 보고 싶을 때 expand()를 사용합니다.
+
+    expand()는 분배법칙을 적용하여 모든 괄호를 풉니다. 복잡한 곱셈도 한 번에 전개할 수 있습니다.
+  tips:
+  - expand()는 분배법칙을 적용하여 모든 괄호를 풉니다. 복잡한 곱셈도 한 번에 전개할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    squared = (x + 1)**2
+    expanded = expand(squared)
+    expanded
+  exercise:
+    prompt: '4단계. 수식 전개: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      squared = (x + 1)**2
+      expanded = expand(squared)
+      expanded
+    solution: |-
+      squared = (x + 1)**2
+      expanded = expand(squared)
+      expanded
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "expand()는 괄호를 풀어 전개하는 함수입니다. 중학교에서 배운 곱셈 공식 (a+b)² = a²+2ab+b²를 자동으로 적용합니다. 손으로 계산하면 실수하기 쉬운 (x+y)³ 같은 복잡한 전개도 정확하게 처리합니다. 물리학에서 테일러 급수 전개 후 정리할 때, 공학에서 제어 시스템 전달함수를 분석할 때 등 실무에서도 자주 사용됩니다. 복잡한 곱셈을 풀어헤쳐 각 항을 명확하게 보고 싶을 때 expand()를 사용합니다."
+    content: expand()는 괄호를 풀어 전개하는 함수입니다. 중학교에서 배운 곱셈 공식 (a+b)² = a²+2ab+b²를 자동으로 적용합니다. 손으로 계산하면 실수하기 쉬운 (x+y)³ 같은 복잡한 전개도
+      정확하게 처리합니다. 물리학에서 테일러 급수 전개 후 정리할 때, 공학에서 제어 시스템 전달함수를 분석할 때 등 실무에서도 자주 사용됩니다. 복잡한 곱셈을 풀어헤쳐 각 항을 명확하게 보고 싶을 때 expand()를
+      사용합니다.
   - type: code
     language: python
     title: 제곱 전개
@@ -112,13 +253,48 @@ sections:
       cube
   - type: tip
     content: expand()는 분배법칙을 적용하여 모든 괄호를 풉니다. 복잡한 곱셈도 한 번에 전개할 수 있습니다.
-
 - id: step5_factor
   title: 5단계. 인수분해
+  structuredPrimary: true
   subtitle: factor()
+  goal: '5단계. 인수분해: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 인수분해: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    factor()는 expand()의 역연산으로, 다항식을 인수들의 곱으로 분해합니다. x²-1을 (x+1)(x-1)로, x²+5x+6을 (x+2)(x+3)으로 만듭니다. 인수분해는 방정식을 풀 때 핵심 기법입니다. x²-1=0을 (x+1)(x-1)=0으로 바꾸면 x=-1 또는 x=1이라는 해를 쉽게 찾을 수 있습니다. 복잡한 분수식을 약분하거나, 다항식의 근을 찾거나, 수식을 간결하게 표현할 때 factor()를 사용합니다.
+
+    factor()는 정수 계수 범위에서 인수분해합니다. 인수분해가 불가능하면 원래 수식을 그대로 반환합니다.
+  tips:
+  - factor()는 정수 계수 범위에서 인수분해합니다. 인수분해가 불가능하면 원래 수식을 그대로 반환합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    diff2 = x**2 - 1
+    factored = factor(diff2)
+    factored
+  exercise:
+    prompt: '5단계. 인수분해: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      diff2 = x**2 - 1
+      factored = factor(diff2)
+      factored
+    solution: |-
+      diff2 = x**2 - 1
+      factored = factor(diff2)
+      factored
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "factor()는 expand()의 역연산으로, 다항식을 인수들의 곱으로 분해합니다. x²-1을 (x+1)(x-1)로, x²+5x+6을 (x+2)(x+3)으로 만듭니다. 인수분해는 방정식을 풀 때 핵심 기법입니다. x²-1=0을 (x+1)(x-1)=0으로 바꾸면 x=-1 또는 x=1이라는 해를 쉽게 찾을 수 있습니다. 복잡한 분수식을 약분하거나, 다항식의 근을 찾거나, 수식을 간결하게 표현할 때 factor()를 사용합니다."
+    content: factor()는 expand()의 역연산으로, 다항식을 인수들의 곱으로 분해합니다. x²-1을 (x+1)(x-1)로, x²+5x+6을 (x+2)(x+3)으로 만듭니다. 인수분해는 방정식을 풀 때
+      핵심 기법입니다. x²-1=0을 (x+1)(x-1)=0으로 바꾸면 x=-1 또는 x=1이라는 해를 쉽게 찾을 수 있습니다. 복잡한 분수식을 약분하거나, 다항식의 근을 찾거나, 수식을 간결하게 표현할 때 factor()를
+      사용합니다.
   - type: code
     language: python
     title: 차의 제곱 인수분해
@@ -145,13 +321,47 @@ sections:
       fsum
   - type: tip
     content: factor()는 정수 계수 범위에서 인수분해합니다. 인수분해가 불가능하면 원래 수식을 그대로 반환합니다.
-
 - id: step6_simplify
   title: 6단계. 수식 간소화
+  structuredPrimary: true
   subtitle: simplify()
+  goal: '6단계. 수식 간소화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 수식 간소화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    simplify()는 수식을 가장 간단한 형태로 자동 정리합니다. 분수 (x²-1)/(x-1)을 x+1로 약분하고, 동류항을 합치고, 삼각함수 항등식 sin²x+cos²x=1을 적용합니다. expand()나 factor()와 달리 특정 방향으로 변환하는 것이 아니라, 가장 짧고 깔끔한 표현을 자동으로 찾아줍니다. 복잡한 계산 결과를 정리할 때, 답안을 검증할 때, 수식을 읽기 쉽게 만들 때 유용합니다.
+
+    simplify()는 다양한 기법을 시도하여 가장 짧은 표현을 찾습니다. 때로는 expand()나 factor()가 더 적절할 수 있습니다.
+  tips:
+  - simplify()는 다양한 기법을 시도하여 가장 짧은 표현을 찾습니다. 때로는 expand()나 factor()가 더 적절할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    frac = (x**2 - 1)/(x - 1)
+    simplified = simplify(frac)
+    simplified
+  exercise:
+    prompt: '6단계. 수식 간소화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      frac = (x**2 - 1)/(x - 1)
+      simplified = simplify(frac)
+      simplified
+    solution: |-
+      frac = (x**2 - 1)/(x - 1)
+      simplified = simplify(frac)
+      simplified
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "simplify()는 수식을 가장 간단한 형태로 자동 정리합니다. 분수 (x²-1)/(x-1)을 x+1로 약분하고, 동류항을 합치고, 삼각함수 항등식 sin²x+cos²x=1을 적용합니다. expand()나 factor()와 달리 특정 방향으로 변환하는 것이 아니라, 가장 짧고 깔끔한 표현을 자동으로 찾아줍니다. 복잡한 계산 결과를 정리할 때, 답안을 검증할 때, 수식을 읽기 쉽게 만들 때 유용합니다."
+    content: simplify()는 수식을 가장 간단한 형태로 자동 정리합니다. 분수 (x²-1)/(x-1)을 x+1로 약분하고, 동류항을 합치고, 삼각함수 항등식 sin²x+cos²x=1을 적용합니다. expand()나
+      factor()와 달리 특정 방향으로 변환하는 것이 아니라, 가장 짧고 깔끔한 표현을 자동으로 찾아줍니다. 복잡한 계산 결과를 정리할 때, 답안을 검증할 때, 수식을 읽기 쉽게 만들 때 유용합니다.
   - type: code
     language: python
     title: 분수식 간소화
@@ -170,13 +380,48 @@ sections:
       clean
   - type: tip
     content: simplify()는 다양한 기법을 시도하여 가장 짧은 표현을 찾습니다. 때로는 expand()나 factor()가 더 적절할 수 있습니다.
-
 - id: step7_collect
   title: 7단계. 변수로 정리
+  structuredPrimary: true
   subtitle: collect()
+  goal: '7단계. 변수로 정리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 변수로 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    collect()는 특정 변수를 기준으로 수식을 정리합니다. x*y + x² + 2*x + y*x² 같은 복잡한 다변수 수식을 x로 정리하면 x²(1+y) + x(2+y)처럼 x의 거듭제곱별로 계수가 묶입니다. 물리학에서 여러 매개변수가 섞인 수식을 특정 변수 관점으로 정리할 때, 미분방정식의 계수를 파악할 때 자주 사용합니다. expand()로 펼친 수식을 다시 특정 구조로 재정리하고 싶을 때 collect()가 유용합니다.
+
+    collect(expr, x)는 x의 거듭제곱별로 계수를 묶습니다. 여러 변수가 있을 때 특정 변수 기준으로 정리하고 싶을 때 사용합니다.
+  tips:
+  - collect(expr, x)는 x의 거듭제곱별로 계수를 묶습니다. 여러 변수가 있을 때 특정 변수 기준으로 정리하고 싶을 때 사용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    mixed = x*y + x**2 + 2*x + y*x**2
+    byX = collect(mixed, x)
+    byX
+  exercise:
+    prompt: '7단계. 변수로 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mixed = x*y + x**2 + 2*x + y*x**2
+      byX = collect(mixed, x)
+      byX
+    solution: |-
+      mixed = x*y + x**2 + 2*x + y*x**2
+      byX = collect(mixed, x)
+      byX
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "collect()는 특정 변수를 기준으로 수식을 정리합니다. x*y + x² + 2*x + y*x² 같은 복잡한 다변수 수식을 x로 정리하면 x²(1+y) + x(2+y)처럼 x의 거듭제곱별로 계수가 묶입니다. 물리학에서 여러 매개변수가 섞인 수식을 특정 변수 관점으로 정리할 때, 미분방정식의 계수를 파악할 때 자주 사용합니다. expand()로 펼친 수식을 다시 특정 구조로 재정리하고 싶을 때 collect()가 유용합니다."
+    content: collect()는 특정 변수를 기준으로 수식을 정리합니다. x*y + x² + 2*x + y*x² 같은 복잡한 다변수 수식을 x로 정리하면 x²(1+y) + x(2+y)처럼 x의 거듭제곱별로 계수가
+      묶입니다. 물리학에서 여러 매개변수가 섞인 수식을 특정 변수 관점으로 정리할 때, 미분방정식의 계수를 파악할 때 자주 사용합니다. expand()로 펼친 수식을 다시 특정 구조로 재정리하고 싶을 때 collect()가
+      유용합니다.
   - type: code
     language: python
     title: x로 정리
@@ -194,13 +439,48 @@ sections:
       byY
   - type: tip
     content: collect(expr, x)는 x의 거듭제곱별로 계수를 묶습니다. 여러 변수가 있을 때 특정 변수 기준으로 정리하고 싶을 때 사용합니다.
-
 - id: step8_rational
   title: 8단계. 정확한 분수
+  structuredPrimary: true
   subtitle: Rational()
+  goal: '8단계. 정확한 분수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 정확한 분수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Rational()은 분수를 정확하게 표현합니다. 파이썬에서 1/3을 계산하면 0.3333333...으로 근사되어 오차가 발생합니다. 하지만 Rational(1, 3)은 정확히 1/3 그 자체를 유지합니다. Rational(1,3) + Rational(1,6) = Rational(1,2)처럼 분수 연산도 정확합니다. 과학 계산에서 반올림 오차가 누적되면 결과가 틀어질 수 있는데, Rational을 사용하면 최종 결과까지 정확한 값을 유지할 수 있습니다.
+
+    파이썬의 1/3은 0.333...으로 근사됩니다. Rational(1, 3)은 정확한 1/3을 유지합니다. 기호 수학에서는 정확한 값이 중요합니다.
+  tips:
+  - 파이썬의 1/3은 0.333...으로 근사됩니다. Rational(1, 3)은 정확한 1/3을 유지합니다. 기호 수학에서는 정확한 값이 중요합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    half = Rational(1, 2)
+    third = Rational(1, 3)
+    half, third
+  exercise:
+    prompt: '8단계. 정확한 분수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      half = Rational(1, 2)
+      third = Rational(1, 3)
+      half, third
+    solution: |-
+      half = Rational(1, 2)
+      third = Rational(1, 3)
+      half, third
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Rational()은 분수를 정확하게 표현합니다. 파이썬에서 1/3을 계산하면 0.3333333...으로 근사되어 오차가 발생합니다. 하지만 Rational(1, 3)은 정확히 1/3 그 자체를 유지합니다. Rational(1,3) + Rational(1,6) = Rational(1,2)처럼 분수 연산도 정확합니다. 과학 계산에서 반올림 오차가 누적되면 결과가 틀어질 수 있는데, Rational을 사용하면 최종 결과까지 정확한 값을 유지할 수 있습니다."
+    content: Rational()은 분수를 정확하게 표현합니다. 파이썬에서 1/3을 계산하면 0.3333333...으로 근사되어 오차가 발생합니다. 하지만 Rational(1, 3)은 정확히 1/3 그 자체를
+      유지합니다. Rational(1,3) + Rational(1,6) = Rational(1,2)처럼 분수 연산도 정확합니다. 과학 계산에서 반올림 오차가 누적되면 결과가 틀어질 수 있는데, Rational을 사용하면
+      최종 결과까지 정확한 값을 유지할 수 있습니다.
   - type: code
     language: python
     title: 분수 생성
@@ -218,13 +498,44 @@ sections:
       frac2
   - type: tip
     content: 파이썬의 1/3은 0.333...으로 근사됩니다. Rational(1, 3)은 정확한 1/3을 유지합니다. 기호 수학에서는 정확한 값이 중요합니다.
-
 - id: step9_sqrt
   title: 9단계. 제곱근
+  structuredPrimary: true
   subtitle: sqrt()
+  goal: '9단계. 제곱근: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 제곱근: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sqrt()는 제곱근을 기호로 표현합니다. 파이썬의 math.sqrt(2)는 1.4142135...로 근사하지만, SymPy의 sqrt(2)는 √2 그 자체를 유지합니다. sqrt(2) * sqrt(8)
+    = sqrt(16) = 4처럼 제곱근끼리의 연산도 정확하게 처리합니다. 기하학에서 정확한 대각선 길이, 물리학에서 무리수가 포함된 공식을 다룰 때 근사 없이 정확한 값을 유지할 수 있습니다. simplify()와
+    함께 사용하면 복잡한 제곱근 수식도 깔끔하게 정리됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    root2 = sqrt(2)
+    root2
+  exercise:
+    prompt: '9단계. 제곱근: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      root2 = sqrt(2)
+      root2
+    solution: |-
+      root2 = sqrt(2)
+      root2
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "sqrt()는 제곱근을 기호로 표현합니다. 파이썬의 math.sqrt(2)는 1.4142135...로 근사하지만, SymPy의 sqrt(2)는 √2 그 자체를 유지합니다. sqrt(2) * sqrt(8) = sqrt(16) = 4처럼 제곱근끼리의 연산도 정확하게 처리합니다. 기하학에서 정확한 대각선 길이, 물리학에서 무리수가 포함된 공식을 다룰 때 근사 없이 정확한 값을 유지할 수 있습니다. simplify()와 함께 사용하면 복잡한 제곱근 수식도 깔끔하게 정리됩니다."
+    content: sqrt()는 제곱근을 기호로 표현합니다. 파이썬의 math.sqrt(2)는 1.4142135...로 근사하지만, SymPy의 sqrt(2)는 √2 그 자체를 유지합니다. sqrt(2) * sqrt(8)
+      = sqrt(16) = 4처럼 제곱근끼리의 연산도 정확하게 처리합니다. 기하학에서 정확한 대각선 길이, 물리학에서 무리수가 포함된 공식을 다룰 때 근사 없이 정확한 값을 유지할 수 있습니다. simplify()와
+      함께 사용하면 복잡한 제곱근 수식도 깔끔하게 정리됩니다.
   - type: code
     language: python
     title: 제곱근 생성
@@ -248,13 +559,48 @@ sections:
       rexpr = (sqrt(x) + 1)**2
       eroot = expand(rexpr)
       eroot
-
 - id: step10_combine
   title: 10단계. 종합 예제
+  structuredPrimary: true
   subtitle: 함께 사용하기
+  goal: '10단계. 종합 예제: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 종합 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 expand(), factor(), simplify(), collect()를 조합하면 어떤 복잡한 수식도 원하는 형태로 변환할 수 있습니다. 실제 수학 문제에서는 전개 후 정리,
+    인수분해 후 약분 등 여러 단계를 거칩니다. (a+b)²(a-b)를 전개하고, 그 결과를 다시 인수분해하면 원래 형태로 돌아오는지 확인할 수 있습니다. 이렇게 역변환으로 검증하는 습관은 수학 계산의 정확성을 보장합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    a, b = symbols('a b')
+    comb = (a + b)**2 * (a - b)
+    step1 = expand(comb)
+    step1
+  exercise:
+    prompt: '10단계. 종합 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      a, b = symbols('a b')
+      comb = (a + b)**2 * (a - b)
+      step1 = expand(comb)
+      step1
+    solution: |-
+      a, b = symbols('a b')
+      comb = (a + b)**2 * (a - b)
+      step1 = expand(comb)
+      step1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 expand(), factor(), simplify(), collect()를 조합하면 어떤 복잡한 수식도 원하는 형태로 변환할 수 있습니다. 실제 수학 문제에서는 전개 후 정리, 인수분해 후 약분 등 여러 단계를 거칩니다. (a+b)²(a-b)를 전개하고, 그 결과를 다시 인수분해하면 원래 형태로 돌아오는지 확인할 수 있습니다. 이렇게 역변환으로 검증하는 습관은 수학 계산의 정확성을 보장합니다."
+    content: 지금까지 배운 expand(), factor(), simplify(), collect()를 조합하면 어떤 복잡한 수식도 원하는 형태로 변환할 수 있습니다. 실제 수학 문제에서는 전개 후 정리, 인수분해
+      후 약분 등 여러 단계를 거칩니다. (a+b)²(a-b)를 전개하고, 그 결과를 다시 인수분해하면 원래 형태로 돌아오는지 확인할 수 있습니다. 이렇게 역변환으로 검증하는 습관은 수학 계산의 정확성을 보장합니다.
   - type: code
     language: python
     title: 복잡한 전개 후 정리
@@ -279,20 +625,67 @@ sections:
       fcomp = (x**3 - x)/(x**2 + x)
       final = simplify(fcomp)
       final
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 수식 조작 연습
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 symbols, expand, factor, simplify, collect를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 곱셈 공식의 전개와 인수분해를 연습합니다. (p+q)⁴ 같은 고차 전개도 SymPy면 한 줄입니다. 미션2는 분수식의 간소화를 다룹니다. 분자분모를 인수분해하고 약분하는 과정을 SymPy가 자동으로 처리합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from sympy import symbols, expand, factor
+
+    p, q = symbols('p q')
+
+    formula = (p + q)**4
+    spread = expand(formula)
+    spread
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sympy import symbols, expand, factor
+
+      p, q = symbols('p q')
+
+      formula = (p + q)**4
+      spread = expand(formula)
+      spread
+    solution: |-
+      from sympy import symbols, expand, factor
+
+      p, q = symbols('p q')
+
+      formula = (p + q)**4
+      spread = expand(formula)
+      spread
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 symbols, expand, factor, simplify, collect를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 곱셈 공식의 전개와 인수분해를 연습합니다. (p+q)⁴ 같은 고차 전개도 SymPy면 한 줄입니다. 미션2는 분수식의 간소화를 다룹니다. 분자분모를 인수분해하고 약분하는 과정을 SymPy가 자동으로 처리합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요."
+    content: 지금까지 배운 symbols, expand, factor, simplify, collect를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 곱셈 공식의 전개와 인수분해를 연습합니다. (p+q)⁴
+      같은 고차 전개도 SymPy면 한 줄입니다. 미션2는 분수식의 간소화를 다룹니다. 분자분모를 인수분해하고 약분하는 과정을 SymPy가 자동으로 처리합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터
+      시작하세요.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 곱셈 공식 전개와 인수분해"
+    title: '미션1: 곱셈 공식 전개와 인수분해'
     blocks:
     - type: code
-      title: "4제곱 전개"
+      title: 4제곱 전개
       content: |-
         from sympy import symbols, expand, factor
 
@@ -302,22 +695,22 @@ sections:
         spread = expand(formula)
         spread
     - type: code
-      title: "인수분해 검증"
+      title: 인수분해 검증
       content: |-
         back = factor(spread)
         back
     - type: code
-      title: "차와 합 공식"
+      title: 차와 합 공식
       content: |-
         product = (p**2 - q**2)*(p**2 + q**2)
         opened = expand(product)
         closed = factor(opened)
         opened, closed
   - type: expansion
-    title: "미션2: 분수식 간소화"
+    title: '미션2: 분수식 간소화'
     blocks:
     - type: code
-      title: "세제곱 분수"
+      title: 세제곱 분수
       content: |-
         from sympy import symbols, simplify, factor, Rational
 
@@ -327,28 +720,96 @@ sections:
         reduced = simplify(ratio)
         reduced
     - type: code
-      title: "두 변수 분수"
+      title: 두 변수 분수
       content: |-
         ratio2 = (m**2 - n**2)/(m**2 + 2*m*n + n**2)
         reduced2 = simplify(ratio2)
         reduced2
     - type: code
-      title: "분수 계수 정리"
+      title: 분수 계수 정리
       content: |-
         combo = Rational(1, 2)*(m + n)**2 - Rational(1, 2)*(m - n)**2
         result = simplify(combo)
         result
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨
+    뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import sympy as sp
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 손익분기 수식을 기호로 검증하기"
-  subtitle: "예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주"
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    solution: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다."
+    content: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤,
+      기준 변경 실험을 수행합니다.
   - type: code
     language: python
-    title: "손익분기 수식 만들기"
-    description: "수량 x에 대한 매출, 비용, 이익 수식을 만들고 해를 예측합니다."
+    title: 손익분기 수식 만들기
+    description: 수량 x에 대한 매출, 비용, 이익 수식을 만들고 해를 예측합니다.
     content: |-
       import sympy as sp
 
@@ -367,8 +828,8 @@ sections:
       profitExpr, breakEvenQuantity
   - type: code
     language: python
-    title: "잘못된 수식 전제를 먼저 실패시킨다"
-    description: "단위 이익이 0 이하이면 손익분기점을 계산할 수 없게 차단합니다."
+    title: 잘못된 수식 전제를 먼저 실패시킨다
+    description: 단위 이익이 0 이하이면 손익분기점을 계산할 수 없게 차단합니다.
     content: |-
       def buildProfitExpression(quantitySymbol, fixedCost, unitPrice, unitCost):
           unitMargin = unitPrice - unitCost
@@ -385,8 +846,8 @@ sections:
       sympyModelError
   - type: code
     language: python
-    title: "대입값과 미분으로 결과 검증"
-    description: "해를 대입하면 이익이 0이고, 이익 함수의 기울기는 단위 이익과 같아야 합니다."
+    title: 대입값과 미분으로 결과 검증
+    description: 해를 대입하면 이익이 0이고, 이익 함수의 기울기는 단위 이익과 같아야 합니다.
     content: |-
       profitAtBreakEven = profitExpr.subs(x, breakEvenQuantity)
       profitSlope = sp.diff(profitExpr, x)
@@ -396,8 +857,8 @@ sections:
       profitAtBreakEven, profitSlope
   - type: code
     language: python
-    title: "실무 변주: 가격 정책 바꾸기"
-    description: "가격을 바꾸면 손익분기 수량이 어떻게 달라지는지 비교합니다."
+    title: '실무 변주: 가격 정책 바꾸기'
+    description: 가격을 바꾸면 손익분기 수량이 어떻게 달라지는지 비교합니다.
     content: |-
       premiumProfitExpr = buildProfitExpression(x, fixedCost, 6500, unitCost)
       premiumBreakEven = sp.solve(sp.Eq(premiumProfitExpr, 0), x)[0]

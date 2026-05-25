@@ -1,291 +1,364 @@
 meta:
   packages:
-    - sympy
+  - sympy
   id: sympy_00
   title: SymPy소개
   order: 0
   category: sympy
   badge: 소개
-  tags: ["sympy", "기호수학", "symbolic", "대수학", "미적분"]
+  tags:
+  - sympy
+  - 기호수학
+  - symbolic
+  - 대수학
+  - 미적분
   seo:
-    title: "SymPy 소개 - 파이썬 기호 수학 라이브러리"
-    description: "SymPy로 수식을 기호로 다루고 미분, 적분, 방정식 풀이를 배웁니다. 수학 문제를 파이썬으로 해결하는 방법을 소개합니다."
-    keywords: ["sympy", "기호수학", "symbolic math", "미분", "적분", "방정식"]
-
+    title: SymPy 소개 - 파이썬 기호 수학 라이브러리
+    description: SymPy로 수식을 기호로 다루고 미분, 적분, 방정식 풀이를 배웁니다. 수학 문제를 파이썬으로 해결하는 방법을 소개합니다.
+    keywords:
+    - sympy
+    - 기호수학
+    - symbolic math
+    - 미분
+    - 적분
+    - 방정식
+intro:
+  direction: SymPy소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  benefits:
+  - SymPy소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
+  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
+  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  diagram:
+    steps:
+    - label: 목표
+      detail: 완료 후 만들 산출물을 먼저 확인
+    - label: 준비
+      detail: meta.packages 기반 uv 준비와 import 확인
+    - label: 실습
+      detail: 예제 스니펫을 바꿔 직접 실행
+    - label: 검증
+      detail: assert와 결과 비교로 완료 판단
+    runtime:
+    - label: 패키지
+      detail: packages-check -> packages-install(누락 시) -> cell-call
+    - label: 첫 실행
+      detail: import 확인과 assert 검증
+    - label: 완료
+      detail: 리포트/자동화/검증 루틴으로 재사용
 sections:
 - id: intro
   blocks:
-    - type: mainHeader
-      emoji: "🔢"
-      title: "SymPy"
-      subtitle: "파이썬 기호 수학 라이브러리"
-
-    - type: hero
-      emoji: "∫"
-      title: "수식을 기호로 다루는 수학"
-      subtitle: "정확한 수학적 계산과 수식 조작"
-      points:
-        - emoji: "📐"
-          title: "미분과 적분"
-        - emoji: "🎯"
-          title: "방정식 풀이"
-        - emoji: "📊"
-          title: "행렬 연산"
-        - emoji: "∞"
-          title: "극한과 급수"
-
+  - type: mainHeader
+    emoji: 🔢
+    title: SymPy
+    subtitle: 파이썬 기호 수학 라이브러리
+  - type: hero
+    emoji: ∫
+    title: 수식을 기호로 다루는 수학
+    subtitle: 정확한 수학적 계산과 수식 조작
+    points:
+    - emoji: 📐
+      title: 미분과 적분
+    - emoji: 🎯
+      title: 방정식 풀이
+    - emoji: 📊
+      title: 행렬 연산
+    - emoji: ∞
+      title: 극한과 급수
 - id: sympy_history
   blocks:
-    - type: sectionHeader
-      title: "🏛️ SymPy란?"
-      subtitle: "기호 수학의 세계"
-
-    - type: text
-      content: |-
-        SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를 주는 것과 달리, SymPy는 x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
-
-    - type: featureCards
-      cards:
-        - emoji: "🔣"
-          title: "기호 계산"
-          description: "x, y 같은 변수를 값 없이 수식으로 조작합니다"
-        - emoji: "✨"
-          title: "정확한 결과"
-          description: "√2를 1.414...가 아닌 정확한 기호로 유지합니다"
-        - emoji: "🐍"
-          title: "순수 파이썬"
-          description: "외부 의존성 없이 어디서나 실행됩니다"
-
+  - type: sectionHeader
+    title: 🏛️ SymPy란?
+    subtitle: 기호 수학의 세계
+  - type: text
+    content: SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를 주는 것과 달리, SymPy는
+      x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔣
+      title: 기호 계산
+      description: x, y 같은 변수를 값 없이 수식으로 조작합니다
+    - emoji: ✨
+      title: 정확한 결과
+      description: √2를 1.414...가 아닌 정확한 기호로 유지합니다
+    - emoji: 🐍
+      title: 순수 파이썬
+      description: 외부 의존성 없이 어디서나 실행됩니다
 - id: numeric_vs_symbolic
   blocks:
-    - type: sectionHeader
-      title: "⚖️ 숫자 vs 기호"
-      subtitle: "근본적인 차이"
-
-    - type: text
-      content: |-
-        숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은 √2 그 자체를 유지하며, 정확한 값을 보존합니다.
-
-    - type: table
-      headers:
-        - 구분
-        - 숫자 계산
-        - 기호 계산
-      rows:
-        - - √2
-          - "1.41421356..."
-          - "√2"
-        - - π
-          - "3.14159265..."
-          - "π"
-        - - (x+1)²
-          - x 값 필요
-          - "x² + 2x + 1"
-        - - 미분
-          - 수치 근사
-          - 정확한 도함수
-
-    - type: note
-      title: "왜 기호 계산이 필요한가?"
-      content: "수치 계산은 반올림 오차가 누적됩니다. 기호 계산은 정확한 수식을 유지하므로 오차가 없습니다. 미분, 적분 같은 수학적 조작은 기호로 해야 정확한 결과를 얻습니다."
-
+  - type: sectionHeader
+    title: ⚖️ 숫자 vs 기호
+    subtitle: 근본적인 차이
+  - type: text
+    content: 숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은 √2 그 자체를 유지하며, 정확한
+      값을 보존합니다.
+  - type: table
+    headers:
+    - 구분
+    - 숫자 계산
+    - 기호 계산
+    rows:
+    - - √2
+      - 1.41421356...
+      - √2
+    - - π
+      - 3.14159265...
+      - π
+    - - (x+1)²
+      - x 값 필요
+      - x² + 2x + 1
+    - - 미분
+      - 수치 근사
+      - 정확한 도함수
+  - type: note
+    title: 왜 기호 계산이 필요한가?
+    content: 수치 계산은 반올림 오차가 누적됩니다. 기호 계산은 정확한 수식을 유지하므로 오차가 없습니다. 미분, 적분 같은 수학적 조작은 기호로 해야 정확한 결과를 얻습니다.
 - id: features
   blocks:
-    - type: sectionHeader
-      title: "🛠️ SymPy 주요 기능"
-      subtitle: "대학 수학의 모든 것"
-
-    - type: text
-      content: |-
-        SymPy는 대학 수학 과정의 거의 모든 내용을 다룰 수 있습니다. 기초 대수부터 고급 미적분, 선형대수, 미분방정식까지 폭넓게 지원합니다.
-
-    - type: table
-      headers:
-        - 분야
-        - 기능
-        - 예시
-      rows:
-        - - 대수학
-          - 전개, 인수분해, 방정식
-          - "factor(x²-1) → (x+1)(x-1)"
-        - - 미적분
-          - 미분, 적분, 극한
-          - "diff(x³) → 3x²"
-        - - 급수
-          - 테일러 급수, 합
-          - "series(sin(x)) → x - x³/6 + ..."
-        - - 선형대수
-          - 행렬, 역행렬, 고유값
-          - "Matrix([[1,2],[3,4]]).det()"
-        - - 삼각함수
-          - 항등식, 변환
-          - "trigsimp(sin²+cos²) → 1"
-
+  - type: sectionHeader
+    title: 🛠️ SymPy 주요 기능
+    subtitle: 대학 수학의 모든 것
+  - type: text
+    content: SymPy는 대학 수학 과정의 거의 모든 내용을 다룰 수 있습니다. 기초 대수부터 고급 미적분, 선형대수, 미분방정식까지 폭넓게 지원합니다.
+  - type: table
+    headers:
+    - 분야
+    - 기능
+    - 예시
+    rows:
+    - - 대수학
+      - 전개, 인수분해, 방정식
+      - factor(x²-1) → (x+1)(x-1)
+    - - 미적분
+      - 미분, 적분, 극한
+      - diff(x³) → 3x²
+    - - 급수
+      - 테일러 급수, 합
+      - series(sin(x)) → x - x³/6 + ...
+    - - 선형대수
+      - 행렬, 역행렬, 고유값
+      - Matrix([[1,2],[3,4]]).det()
+    - - 삼각함수
+      - 항등식, 변환
+      - trigsimp(sin²+cos²) → 1
 - id: comparison
   blocks:
-    - type: sectionHeader
-      title: "🔄 SymPy vs 다른 도구"
-      subtitle: "적재적소에 맞는 선택"
-
-    - type: table
-      headers:
-        - 도구
-        - 특징
-        - 적합한 용도
-      rows:
-        - - SymPy
-          - 무료, 파이썬 통합, 기호 계산
-          - 수학 학습, 공식 유도
-        - - NumPy/SciPy
-          - 빠른 수치 계산
-          - 대용량 데이터 연산
-        - - Mathematica
-          - 상용, 강력한 기호 계산
-          - 전문 연구
-        - - WolframAlpha
-          - 웹 서비스, 편리
-          - 빠른 검색
-
+  - type: sectionHeader
+    title: 🔄 SymPy vs 다른 도구
+    subtitle: 적재적소에 맞는 선택
+  - type: table
+    headers:
+    - 도구
+    - 특징
+    - 적합한 용도
+    rows:
+    - - SymPy
+      - 무료, 파이썬 통합, 기호 계산
+      - 수학 학습, 공식 유도
+    - - NumPy/SciPy
+      - 빠른 수치 계산
+      - 대용량 데이터 연산
+    - - Mathematica
+      - 상용, 강력한 기호 계산
+      - 전문 연구
+    - - WolframAlpha
+      - 웹 서비스, 편리
+      - 빠른 검색
 - id: use_cases
   blocks:
-    - type: sectionHeader
-      title: "💡 활용 분야"
-      subtitle: "SymPy가 사용되는 곳"
-
-    - type: text
-      content: |-
-        SymPy는 수학 학습, 과학 연구, 공학 계산 등 다양한 분야에서 활용됩니다.
-
-    - type: table
-      headers:
-        - 분야
-        - 활용 예시
-      rows:
-        - - 수학 학습
-          - 미적분 풀이 검증, 복잡한 계산 확인
-        - - 물리학
-          - 운동 방정식 풀이, 라그랑지안 계산
-        - - 공학
-          - 제어 시스템, 신호 처리, 회로 해석
-        - - 교육
-          - 문제 자동 생성, 단계별 풀이 제공
-
+  - type: sectionHeader
+    title: 💡 활용 분야
+    subtitle: SymPy가 사용되는 곳
+  - type: text
+    content: SymPy는 수학 학습, 과학 연구, 공학 계산 등 다양한 분야에서 활용됩니다.
+  - type: table
+    headers:
+    - 분야
+    - 활용 예시
+    rows:
+    - - 수학 학습
+      - 미적분 풀이 검증, 복잡한 계산 확인
+    - - 물리학
+      - 운동 방정식 풀이, 라그랑지안 계산
+    - - 공학
+      - 제어 시스템, 신호 처리, 회로 해석
+    - - 교육
+      - 문제 자동 생성, 단계별 풀이 제공
 - id: core_concepts
   blocks:
-    - type: sectionHeader
-      title: "📌 핵심 개념"
-      subtitle: "알아야 할 것들"
-
-    - type: featureCards
-      cards:
-        - emoji: "🔤"
-          title: "기호 (Symbol)"
-          description: "x, y, z 같은 수학 변수를 정의합니다"
-        - emoji: "📝"
-          title: "표현식 (Expression)"
-          description: "x² + 2x + 1 같은 수식입니다"
-        - emoji: "⚖️"
-          title: "방정식 (Equation)"
-          description: "Eq(x², 4)처럼 등호를 포함한 수식입니다"
-        - emoji: "📈"
-          title: "함수 (Function)"
-          description: "sin, cos, exp, log 같은 수학 함수입니다"
-
+  - type: sectionHeader
+    title: 📌 핵심 개념
+    subtitle: 알아야 할 것들
+  - type: featureCards
+    cards:
+    - emoji: 🔤
+      title: 기호 (Symbol)
+      description: x, y, z 같은 수학 변수를 정의합니다
+    - emoji: 📝
+      title: 표현식 (Expression)
+      description: x² + 2x + 1 같은 수식입니다
+    - emoji: ⚖️
+      title: 방정식 (Equation)
+      description: Eq(x², 4)처럼 등호를 포함한 수식입니다
+    - emoji: 📈
+      title: 함수 (Function)
+      description: sin, cos, exp, log 같은 수학 함수입니다
 - id: workflow
   blocks:
-    - type: sectionHeader
-      title: "🔄 작업 흐름"
-      subtitle: "SymPy 사용 순서"
-
-    - type: table
-      headers:
-        - 단계
-        - 설명
-        - 예시
-      rows:
-        - - "1. 기호 정의"
-          - 변수 생성
-          - "x, y = symbols('x y')"
-        - - "2. 수식 생성"
-          - 표현식 작성
-          - "expr = x**2 + 2*x + 1"
-        - - "3. 수식 조작"
-          - 전개, 인수분해
-          - "factor(expr)"
-        - - "4. 계산 수행"
-          - 미분, 적분, 풀이
-          - "diff(expr, x)"
-        - - "5. 결과 확인"
-          - 값 대입, 수치화
-          - "expr.subs(x, 2).evalf()"
-
+  - type: sectionHeader
+    title: 🔄 작업 흐름
+    subtitle: SymPy 사용 순서
+  - type: table
+    headers:
+    - 단계
+    - 설명
+    - 예시
+    rows:
+    - - 1. 기호 정의
+      - 변수 생성
+      - x, y = symbols('x y')
+    - - 2. 수식 생성
+      - 표현식 작성
+      - expr = x**2 + 2*x + 1
+    - - 3. 수식 조작
+      - 전개, 인수분해
+      - factor(expr)
+    - - 4. 계산 수행
+      - 미분, 적분, 풀이
+      - diff(expr, x)
+    - - 5. 결과 확인
+      - 값 대입, 수치화
+      - expr.subs(x, 2).evalf()
 - id: curriculum
   blocks:
-    - type: sectionHeader
-      title: "📚 커리큘럼"
-      subtitle: "10개 프로젝트로 마스터"
-
-    - type: text
-      content: |-
-        이 카테고리에서는 10개의 프로젝트를 통해 SymPy의 핵심 기능을 배웁니다.
-
-    - type: table
-      headers:
-        - 프로젝트
-        - 주제
-        - 핵심 개념
-      rows:
-        - - "01. 기초 수식 계산"
-          - 대수학 입문
-          - 기호, 전개, 인수분해
-        - - "02. 대입과 계산"
-          - 수식 평가
-          - subs, evalf, simplify
-        - - "03. 방정식 풀이"
-          - 대수 방정식
-          - solve, Eq, 연립방정식
-        - - "04. 미분 기초"
-          - 미분법
-          - diff, 고차미분, 편미분
-        - - "05. 적분 기초"
-          - 적분법
-          - integrate, 정적분
-        - - "06. 극한과 급수"
-          - 해석학
-          - limit, series, summation
-        - - "07. 삼각함수 활용"
-          - 삼각법
-          - trigsimp, 항등식
-        - - "08. 행렬 연산"
-          - 선형대수
-          - Matrix, 역행렬, 고유값
-        - - "09. 수식 시각화"
-          - 그래프
-          - plot, matplotlib 연동
-        - - "10. 종합 수학 문제"
-          - 응용
-          - 최적화, 미분방정식
-
+  - type: sectionHeader
+    title: 📚 커리큘럼
+    subtitle: 10개 프로젝트로 마스터
+  - type: text
+    content: 이 카테고리에서는 10개의 프로젝트를 통해 SymPy의 핵심 기능을 배웁니다.
+  - type: table
+    headers:
+    - 프로젝트
+    - 주제
+    - 핵심 개념
+    rows:
+    - - 01. 기초 수식 계산
+      - 대수학 입문
+      - 기호, 전개, 인수분해
+    - - 02. 대입과 계산
+      - 수식 평가
+      - subs, evalf, simplify
+    - - 03. 방정식 풀이
+      - 대수 방정식
+      - solve, Eq, 연립방정식
+    - - 04. 미분 기초
+      - 미분법
+      - diff, 고차미분, 편미분
+    - - 05. 적분 기초
+      - 적분법
+      - integrate, 정적분
+    - - 06. 극한과 급수
+      - 해석학
+      - limit, series, summation
+    - - 07. 삼각함수 활용
+      - 삼각법
+      - trigsimp, 항등식
+    - - 08. 행렬 연산
+      - 선형대수
+      - Matrix, 역행렬, 고유값
+    - - 09. 수식 시각화
+      - 그래프
+      - plot, matplotlib 연동
+    - - 10. 종합 수학 문제
+      - 응용
+      - 최적화, 미분방정식
 - id: start
   blocks:
-    - type: sectionHeader
-      title: "🎯 시작하기"
-      subtitle: "첫 번째 프로젝트로"
+  - type: sectionHeader
+    title: 🎯 시작하기
+    subtitle: 첫 번째 프로젝트로
+  - type: text
+    content: SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서 기호를 정의하고 수식을 전개하는
+      것부터 시작합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨
+    뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import sympy as sp
 
-    - type: text
-      content: |-
-        SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서 기호를 정의하고 수식을 전개하는 것부터 시작합니다.
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 손익분기 수식을 기호로 검증하기"
-  subtitle: "예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주"
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    solution: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다."
+    content: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤,
+      기준 변경 실험을 수행합니다.
   - type: code
     language: python
-    title: "손익분기 수식 만들기"
-    description: "수량 x에 대한 매출, 비용, 이익 수식을 만들고 해를 예측합니다."
+    title: 손익분기 수식 만들기
+    description: 수량 x에 대한 매출, 비용, 이익 수식을 만들고 해를 예측합니다.
     content: |-
       import sympy as sp
 
@@ -304,8 +377,8 @@ sections:
       profitExpr, breakEvenQuantity
   - type: code
     language: python
-    title: "잘못된 수식 전제를 먼저 실패시킨다"
-    description: "단위 이익이 0 이하이면 손익분기점을 계산할 수 없게 차단합니다."
+    title: 잘못된 수식 전제를 먼저 실패시킨다
+    description: 단위 이익이 0 이하이면 손익분기점을 계산할 수 없게 차단합니다.
     content: |-
       def buildProfitExpression(quantitySymbol, fixedCost, unitPrice, unitCost):
           unitMargin = unitPrice - unitCost
@@ -322,8 +395,8 @@ sections:
       sympyModelError
   - type: code
     language: python
-    title: "대입값과 미분으로 결과 검증"
-    description: "해를 대입하면 이익이 0이고, 이익 함수의 기울기는 단위 이익과 같아야 합니다."
+    title: 대입값과 미분으로 결과 검증
+    description: 해를 대입하면 이익이 0이고, 이익 함수의 기울기는 단위 이익과 같아야 합니다.
     content: |-
       profitAtBreakEven = profitExpr.subs(x, breakEvenQuantity)
       profitSlope = sp.diff(profitExpr, x)
@@ -333,8 +406,8 @@ sections:
       profitAtBreakEven, profitSlope
   - type: code
     language: python
-    title: "실무 변주: 가격 정책 바꾸기"
-    description: "가격을 바꾸면 손익분기 수량이 어떻게 달라지는지 비교합니다."
+    title: '실무 변주: 가격 정책 바꾸기'
+    description: 가격을 바꾸면 손익분기 수량이 어떻게 달라지는지 비교합니다.
     content: |-
       premiumProfitExpr = buildProfitExpression(x, fixedCost, 6500, unitCost)
       premiumBreakEven = sp.solve(sp.Eq(premiumProfitExpr, 0), x)[0]

@@ -104,6 +104,7 @@ class AuditContext:
         self.runtimeRecovery = readJson("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json")
         self.curriculumMatrix = readJson("output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json")
         self.curriculumFlow = readJson("output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json")
+        self.curriculumTopTier = readJson("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json")
         self.onboarding = readJson("output/test-runner/onboarding-browser/onboarding-report.json")
         self.frontendPerf = readJson("output/test-runner/frontend-performance-budget/performance-report.json")
 
@@ -135,6 +136,8 @@ def buildDomains(context: AuditContext) -> list[dict[str, Any]]:
             gatePassed(context, "curriculum-quality-matrix"),
             artifactPassed("curriculum matrix report", context.curriculumMatrix),
             artifactPassed("curriculum flow report", context.curriculumFlow),
+            artifactPassed("curriculum top-tier report", context.curriculumTopTier),
+            scoreAtLeast("curriculum top-tier score", context.curriculumTopTier.get("score"), 9.0),
             textCheck("learning YAML section card SSOT", "docs/skills/architecture/learning-yaml-contract.md", "섹션 단위 학습카드"),
             textCheck("browser learning card proof", "tests/verifyLearningCardPlaywright.py", "desktopOverview"),
             textCheck("exercise check dispatch", "src/codaro/curriculum/exerciseCheck.py", "runExerciseCheck"),

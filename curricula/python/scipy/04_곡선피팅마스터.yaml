@@ -1,33 +1,101 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scipy
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
   id: scipy_04
   title: 곡선피팅마스터
   order: 4
   category: scipy
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["scipy.optimize", "curve_fit", "비선형회귀", "모델피팅", "파라미터추정"]
+  tags:
+  - scipy.optimize
+  - curve_fit
+  - 비선형회귀
+  - 모델피팅
+  - 파라미터추정
   seo:
-    title: "scipy.optimize curve_fit - 데이터에 곡선 맞추기"
-    description: "scipy.optimize의 curve_fit으로 데이터에 수학 함수를 피팅합니다. 지수함수, 로그함수, 다항식 피팅을 배웁니다."
-    keywords: ["scipy", "curve_fit", "비선형회귀", "피팅", "파라미터추정"]
-
+    title: scipy.optimize curve_fit - 데이터에 곡선 맞추기
+    description: scipy.optimize의 curve_fit으로 데이터에 수학 함수를 피팅합니다. 지수함수, 로그함수, 다항식 피팅을 배웁니다.
+    keywords:
+    - scipy
+    - curve_fit
+    - 비선형회귀
+    - 피팅
+    - 파라미터추정
 intro:
-  emoji: "📐"
+  emoji: 📐
   goal: 스타트업 사용자 증가 데이터를 지수 성장 모델로 피팅하여 미래 사용자를 예측합니다.
-  description: "스타트업에서 12개월간 사용자 수를 기록했습니다. 이 데이터가 지수 성장을 따르는지 확인하고, 수학 모델 y = a × e^(bx)의 파라미터 a와 b를 찾아 18개월 후 사용자 수를 예측합니다. scipy.optimize.curve_fit은 비선형 최소제곱법으로 데이터에 가장 잘 맞는 곡선의 파라미터를 자동으로 찾아줍니다. 성장률 추정, 모델 검증, 예측까지 전체 워크플로우를 완성합니다."
-
+  description: 스타트업에서 12개월간 사용자 수를 기록했습니다. 이 데이터가 지수 성장을 따르는지 확인하고, 수학 모델 y = a × e^(bx)의 파라미터 a와 b를 찾아 18개월 후 사용자 수를 예측합니다.
+    scipy.optimize.curve_fit은 비선형 최소제곱법으로 데이터에 가장 잘 맞는 곡선의 파라미터를 자동으로 찾아줍니다. 성장률 추정, 모델 검증, 예측까지 전체 워크플로우를 완성합니다.
 sections:
 - id: load
   title: 라이브러리 및 데이터 로드
+  structuredPrimary: true
   subtitle: scipy.optimize
+  goal: '라이브러리 및 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '라이브러리 및 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    곡선 피팅(Curve Fitting)은 데이터에 가장 잘 맞는 수학 함수의 파라미터를 찾는 과정입니다. 사용자 증가율, 약물 농도 감소, 온도 냉각 등 자연 현상을 수학 모델로 표현하면 미래 예측이 가능해집니다. scipy.optimize.curve_fit은 비선형 함수도 피팅할 수 있어 선형 회귀보다 훨씬 유연합니다. 이 프로젝트에서는 가상의 스타트업 사용자 증가 데이터를 분석합니다.
+
+    이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다.
+  tips:
+  - 이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import optimize
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(42)
+    months = np.arange(1, 13)
+    users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
+    users = np.maximum(users, 0).astype(int)
+  exercise:
+    prompt: '라이브러리 및 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      months = np.arange(1, 13)
+      users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
+      users = np.maximum(users, 0).astype(int)
+    solution: |-
+      import scipy
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      months = np.arange(1, 13)
+      users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
+      users = np.maximum(users, 0).astype(int)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "곡선 피팅(Curve Fitting)은 데이터에 가장 잘 맞는 수학 함수의 파라미터를 찾는 과정입니다. 사용자 증가율, 약물 농도 감소, 온도 냉각 등 자연 현상을 수학 모델로 표현하면 미래 예측이 가능해집니다. scipy.optimize.curve_fit은 비선형 함수도 피팅할 수 있어 선형 회귀보다 훨씬 유연합니다. 이 프로젝트에서는 가상의 스타트업 사용자 증가 데이터를 분석합니다."
+    content: 곡선 피팅(Curve Fitting)은 데이터에 가장 잘 맞는 수학 함수의 파라미터를 찾는 과정입니다. 사용자 증가율, 약물 농도 감소, 온도 냉각 등 자연 현상을 수학 모델로 표현하면 미래 예측이
+      가능해집니다. scipy.optimize.curve_fit은 비선형 함수도 피팅할 수 있어 선형 회귀보다 훨씬 유연합니다. 이 프로젝트에서는 가상의 스타트업 사용자 증가 데이터를 분석합니다.
   - type: code
     language: python
     title: 패키지 설치 및 데이터 준비
@@ -50,14 +118,84 @@ sections:
       userDf = pd.DataFrame({'Month': months, 'Users': users})
       userDf
   - type: tip
-    content: "이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다."
-
+    content: 이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다.
 - id: explore
   title: 데이터 탐색
+  structuredPrimary: true
   subtitle: 성장 패턴 시각화
+  goal: '데이터 탐색: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '데이터 탐색: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    피팅 전에 데이터를 시각화하여 어떤 모델이 적합한지 파악합니다. 사용자 수가 선형으로 증가하는지, 지수적으로 증가하는지에 따라 적용할 함수가 달라집니다. 그래프에서 증가 속도가 점점 빨라지면 지수 성장, 일정하면 선형 성장입니다. 로그 스케일로 그렸을 때 직선이면 지수 성장의 확실한 증거입니다.
+
+    로그 스케일에서 거의 직선으로 보이면 지수 성장입니다. log(y) = log(a) + bx 형태가 되어 직선이 됩니다.
+  tips:
+  - 로그 스케일에서 거의 직선으로 보이면 지수 성장입니다. log(y) = log(a) + bx 형태가 되어 직선이 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    axExplore1.scatter(months, users, s=100, c='blue', label='Actual Users')
+    axExplore1.set_xlabel('Month')
+    axExplore1.set_ylabel('Users')
+    axExplore1.set_title('User Growth (Linear Scale)')
+    axExplore1.grid(True, alpha=0.3)
+
+    axExplore2.scatter(months, users, s=100, c='blue')
+    axExplore2.set_yscale('log')
+    axExplore2.set_xlabel('Month')
+    axExplore2.set_ylabel('Users (log scale)')
+    axExplore2.set_title('User Growth (Log Scale)')
+    axExplore2.grid(True, alpha=0.3)
+    figExplore
+  exercise:
+    prompt: '데이터 탐색: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axExplore1.scatter(months, users, s=100, c='blue', label='Actual Users')
+      axExplore1.set_xlabel('Month')
+      axExplore1.set_ylabel('Users')
+      axExplore1.set_title('User Growth (Linear Scale)')
+      axExplore1.grid(True, alpha=0.3)
+
+      axExplore2.scatter(months, users, s=100, c='blue')
+      axExplore2.set_yscale('log')
+      axExplore2.set_xlabel('Month')
+      axExplore2.set_ylabel('Users (log scale)')
+      axExplore2.set_title('User Growth (Log Scale)')
+      axExplore2.grid(True, alpha=0.3)
+      figExplore
+    solution: |-
+      figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axExplore1.scatter(months, users, s=100, c='blue', label='Actual Users')
+      axExplore1.set_xlabel('Month')
+      axExplore1.set_ylabel('Users')
+      axExplore1.set_title('User Growth (Linear Scale)')
+      axExplore1.grid(True, alpha=0.3)
+
+      axExplore2.scatter(months, users, s=100, c='blue')
+      axExplore2.set_yscale('log')
+      axExplore2.set_xlabel('Month')
+      axExplore2.set_ylabel('Users (log scale)')
+      axExplore2.set_title('User Growth (Log Scale)')
+      axExplore2.grid(True, alpha=0.3)
+      figExplore
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "피팅 전에 데이터를 시각화하여 어떤 모델이 적합한지 파악합니다. 사용자 수가 선형으로 증가하는지, 지수적으로 증가하는지에 따라 적용할 함수가 달라집니다. 그래프에서 증가 속도가 점점 빨라지면 지수 성장, 일정하면 선형 성장입니다. 로그 스케일로 그렸을 때 직선이면 지수 성장의 확실한 증거입니다."
+    content: 피팅 전에 데이터를 시각화하여 어떤 모델이 적합한지 파악합니다. 사용자 수가 선형으로 증가하는지, 지수적으로 증가하는지에 따라 적용할 함수가 달라집니다. 그래프에서 증가 속도가 점점 빨라지면 지수
+      성장, 일정하면 선형 성장입니다. 로그 스케일로 그렸을 때 직선이면 지수 성장의 확실한 증거입니다.
   - type: code
     language: python
     title: 성장 추세 시각화
@@ -78,14 +216,45 @@ sections:
       axExplore2.grid(True, alpha=0.3)
       figExplore
   - type: tip
-    content: "로그 스케일에서 거의 직선으로 보이면 지수 성장입니다. log(y) = log(a) + bx 형태가 되어 직선이 됩니다."
-
+    content: 로그 스케일에서 거의 직선으로 보이면 지수 성장입니다. log(y) = log(a) + bx 형태가 되어 직선이 됩니다.
 - id: define_model
   title: 지수 성장 모델 정의
+  structuredPrimary: true
   subtitle: curve_fit용 함수
+  goal: '지수 성장 모델 정의: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '지수 성장 모델 정의: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    curve_fit에 사용할 함수를 정의합니다. 함수의 첫 번째 인자는 반드시 독립변수(x)이고, 나머지 인자들이 찾을 파라미터입니다. 지수 성장 모델 y = a × e^(bx)에서 a는 초기 사용자 수, b는 성장률입니다. 함수는 numpy 배열을 입력받아 numpy 배열을 반환해야 합니다.
+
+    def expGrowth(x, a, b)에서 x는 독립변수, a와 b가 curve_fit이 최적화할 파라미터입니다. 파라미터 수는 제한이 없습니다.
+  tips:
+  - def expGrowth(x, a, b)에서 x는 독립변수, a와 b가 curve_fit이 최적화할 파라미터입니다. 파라미터 수는 제한이 없습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def expGrowth(x, a, b):
+        return a * np.exp(b * x)
+  exercise:
+    prompt: '지수 성장 모델 정의: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def expGrowth(x, a, b):
+          return a * np.exp(b * x)
+    solution: |-
+      def expGrowth(x, a, b):
+          return a * np.exp(b * x)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "curve_fit에 사용할 함수를 정의합니다. 함수의 첫 번째 인자는 반드시 독립변수(x)이고, 나머지 인자들이 찾을 파라미터입니다. 지수 성장 모델 y = a × e^(bx)에서 a는 초기 사용자 수, b는 성장률입니다. 함수는 numpy 배열을 입력받아 numpy 배열을 반환해야 합니다."
+    content: curve_fit에 사용할 함수를 정의합니다. 함수의 첫 번째 인자는 반드시 독립변수(x)이고, 나머지 인자들이 찾을 파라미터입니다. 지수 성장 모델 y = a × e^(bx)에서 a는 초기 사용자
+      수, b는 성장률입니다. 함수는 numpy 배열을 입력받아 numpy 배열을 반환해야 합니다.
   - type: code
     language: python
     title: 지수함수 정의
@@ -99,14 +268,48 @@ sections:
       testY = expGrowth(months, 1000, 0.15)
       testY[:5]
   - type: tip
-    content: "def expGrowth(x, a, b)에서 x는 독립변수, a와 b가 curve_fit이 최적화할 파라미터입니다. 파라미터 수는 제한이 없습니다."
-
+    content: def expGrowth(x, a, b)에서 x는 독립변수, a와 b가 curve_fit이 최적화할 파라미터입니다. 파라미터 수는 제한이 없습니다.
 - id: fitting
   title: 곡선 피팅 실행
+  structuredPrimary: true
   subtitle: curve_fit
+  goal: '곡선 피팅 실행: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '곡선 피팅 실행: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    curve_fit(함수, x데이터, y데이터)를 호출하면 최적 파라미터와 공분산 행렬을 반환합니다. p0 인자로 초기 추정값을 제공하면 수렴이 빠르고 안정적입니다. 비선형 최적화는 초기값에 따라 결과가 달라질 수 있으므로, 도메인 지식을 활용하여 합리적인 초기값을 설정하는 것이 중요합니다.
+
+    p0=[1000, 0.1]은 '초기 사용자 약 1000명, 월 10% 성장률'이라는 초기 추정입니다. curve_fit은 이 값에서 시작하여 최적값을 찾습니다.
+  tips:
+  - p0=[1000, 0.1]은 '초기 사용자 약 1000명, 월 10% 성장률'이라는 초기 추정입니다. curve_fit은 이 값에서 시작하여 최적값을 찾습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    params, covariance = optimize.curve_fit(expGrowth, months, users, p0=[1000, 0.1])
+    aFit, bFit = params
+    aFit, bFit
+  exercise:
+    prompt: '곡선 피팅 실행: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      params, covariance = optimize.curve_fit(expGrowth, months, users, p0=[1000, 0.1])
+      aFit, bFit = params
+      aFit, bFit
+    solution: |-
+      params, covariance = optimize.curve_fit(expGrowth, months, users, p0=[1000, 0.1])
+      aFit, bFit = params
+      aFit, bFit
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "curve_fit(함수, x데이터, y데이터)를 호출하면 최적 파라미터와 공분산 행렬을 반환합니다. p0 인자로 초기 추정값을 제공하면 수렴이 빠르고 안정적입니다. 비선형 최적화는 초기값에 따라 결과가 달라질 수 있으므로, 도메인 지식을 활용하여 합리적인 초기값을 설정하는 것이 중요합니다."
+    content: curve_fit(함수, x데이터, y데이터)를 호출하면 최적 파라미터와 공분산 행렬을 반환합니다. p0 인자로 초기 추정값을 제공하면 수렴이 빠르고 안정적입니다. 비선형 최적화는 초기값에 따라
+      결과가 달라질 수 있으므로, 도메인 지식을 활용하여 합리적인 초기값을 설정하는 것이 중요합니다.
   - type: code
     language: python
     title: 피팅 실행
@@ -115,7 +318,7 @@ sections:
       aFit, bFit = params
       aFit, bFit
   - type: tip
-    content: "p0=[1000, 0.1]은 '초기 사용자 약 1000명, 월 10% 성장률'이라는 초기 추정입니다. curve_fit은 이 값에서 시작하여 최적값을 찾습니다."
+    content: p0=[1000, 0.1]은 '초기 사용자 약 1000명, 월 10% 성장률'이라는 초기 추정입니다. curve_fit은 이 값에서 시작하여 최적값을 찾습니다.
   - type: code
     language: python
     title: 파라미터 해석
@@ -127,13 +330,53 @@ sections:
           'Error (%)': [abs(aFit - 1000) / 1000 * 100, abs(bFit - 0.15) / 0.15 * 100]
       })
       paramDf
-
 - id: validate
   title: 피팅 검증
+  structuredPrimary: true
   subtitle: R² 및 잔차 분석
+  goal: '피팅 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '피팅 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    피팅 품질을 평가하기 위해 R²(결정계수)와 잔차를 분석합니다. R²는 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. 잔차(실제값 - 예측값)가 무작위로 분포하면 좋은 모델이고, 패턴이 있으면 모델이 데이터의 특성을 놓치고 있다는 의미입니다.
+
+    잔차가 0 주위에 무작위로 분포하고 특별한 패턴이 없으면 모델이 적합합니다. 잔차에 곡선 패턴이 있으면 모델을 변경해야 합니다.
+  tips:
+  - 잔차가 0 주위에 무작위로 분포하고 특별한 패턴이 없으면 모델이 적합합니다. 잔차에 곡선 패턴이 있으면 모델을 변경해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    usersPred = expGrowth(months, aFit, bFit)
+    ssRes = np.sum((users - usersPred) ** 2)
+    ssTot = np.sum((users - np.mean(users)) ** 2)
+    rSquared = 1 - (ssRes / ssTot)
+    rSquared
+  exercise:
+    prompt: '피팅 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      usersPred = expGrowth(months, aFit, bFit)
+      ssRes = np.sum((users - usersPred) ** 2)
+      ssTot = np.sum((users - np.mean(users)) ** 2)
+      rSquared = 1 - (ssRes / ssTot)
+      rSquared
+    solution: |-
+      usersPred = expGrowth(months, aFit, bFit)
+      ssRes = np.sum((users - usersPred) ** 2)
+      ssTot = np.sum((users - np.mean(users)) ** 2)
+      rSquared = 1 - (ssRes / ssTot)
+      rSquared
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "피팅 품질을 평가하기 위해 R²(결정계수)와 잔차를 분석합니다. R²는 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. 잔차(실제값 - 예측값)가 무작위로 분포하면 좋은 모델이고, 패턴이 있으면 모델이 데이터의 특성을 놓치고 있다는 의미입니다."
+    content: 피팅 품질을 평가하기 위해 R²(결정계수)와 잔차를 분석합니다. R²는 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. 잔차(실제값 - 예측값)가 무작위로 분포하면 좋은 모델이고,
+      패턴이 있으면 모델이 데이터의 특성을 놓치고 있다는 의미입니다.
   - type: code
     language: python
     title: R² 계산
@@ -164,14 +407,61 @@ sections:
       axResid2.set_title('Residual Distribution')
       figResid
   - type: tip
-    content: "잔차가 0 주위에 무작위로 분포하고 특별한 패턴이 없으면 모델이 적합합니다. 잔차에 곡선 패턴이 있으면 모델을 변경해야 합니다."
-
+    content: 잔차가 0 주위에 무작위로 분포하고 특별한 패턴이 없으면 모델이 적합합니다. 잔차에 곡선 패턴이 있으면 모델을 변경해야 합니다.
 - id: predict
   title: 미래 예측
+  structuredPrimary: true
   subtitle: 18개월 후 사용자
+  goal: '미래 예측: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '미래 예측: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도 계산합니다. 공분산 행렬의
+    대각 원소 제곱근이 각 파라미터의 표준오차입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    futureMonths = np.arange(1, 19)
+    futureUsers = expGrowth(futureMonths, aFit, bFit)
+
+    predDf = pd.DataFrame({
+        'Month': [12, 15, 18],
+        'Predicted Users': [int(expGrowth(12, aFit, bFit)), int(expGrowth(15, aFit, bFit)), int(expGrowth(18, aFit, bFit))]
+    })
+    predDf
+  exercise:
+    prompt: '미래 예측: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      futureMonths = np.arange(1, 19)
+      futureUsers = expGrowth(futureMonths, aFit, bFit)
+
+      predDf = pd.DataFrame({
+          'Month': [12, 15, 18],
+          'Predicted Users': [int(expGrowth(12, aFit, bFit)), int(expGrowth(15, aFit, bFit)), int(expGrowth(18, aFit, bFit))]
+      })
+      predDf
+    solution: |-
+      futureMonths = np.arange(1, 19)
+      futureUsers = expGrowth(futureMonths, aFit, bFit)
+
+      predDf = pd.DataFrame({
+          'Month': [12, 15, 18],
+          'Predicted Users': [int(expGrowth(12, aFit, bFit)), int(expGrowth(15, aFit, bFit)), int(expGrowth(18, aFit, bFit))]
+      })
+      predDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도 계산합니다. 공분산 행렬의 대각 원소 제곱근이 각 파라미터의 표준오차입니다."
+    content: 피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도 계산합니다. 공분산 행렬의 대각
+      원소 제곱근이 각 파라미터의 표준오차입니다.
   - type: code
     language: python
     title: 18개월 예측
@@ -202,13 +492,63 @@ sections:
       axPred.legend()
       axPred.grid(True, alpha=0.3)
       figPred
-
 - id: result
   title: 최종 분석 보고서
+  structuredPrimary: true
   subtitle: 성장률 및 예측 요약
+  goal: '최종 분석 보고서: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최종 분석 보고서: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는 투자자 보고, 사업 계획, 인프라
+    확장 계획에 활용됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    monthlyGrowthRate = bFit
+    doublingTime = np.log(2) / bFit
+    annualGrowthRate = (np.exp(bFit * 12) - 1) * 100
+
+    growthDf = pd.DataFrame({
+        'Metric': ['Monthly Growth Rate', 'Doubling Time', 'Annual Growth Rate', 'Initial Users (a)', 'R² Score'],
+        'Value': [f'{monthlyGrowthRate*100:.1f}%', f'{doublingTime:.1f} months', f'{annualGrowthRate:.0f}%', f'{aFit:.0f}', f'{rSquared:.4f}']
+    })
+    growthDf
+  exercise:
+    prompt: '최종 분석 보고서: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      monthlyGrowthRate = bFit
+      doublingTime = np.log(2) / bFit
+      annualGrowthRate = (np.exp(bFit * 12) - 1) * 100
+
+      growthDf = pd.DataFrame({
+          'Metric': ['Monthly Growth Rate', 'Doubling Time', 'Annual Growth Rate', 'Initial Users (a)', 'R² Score'],
+          'Value': [f'{monthlyGrowthRate*100:.1f}%', f'{doublingTime:.1f} months', f'{annualGrowthRate:.0f}%', f'{aFit:.0f}', f'{rSquared:.4f}']
+      })
+      growthDf
+    solution: |-
+      monthlyGrowthRate = bFit
+      doublingTime = np.log(2) / bFit
+      annualGrowthRate = (np.exp(bFit * 12) - 1) * 100
+
+      growthDf = pd.DataFrame({
+          'Metric': ['Monthly Growth Rate', 'Doubling Time', 'Annual Growth Rate', 'Initial Users (a)', 'R² Score'],
+          'Value': [f'{monthlyGrowthRate*100:.1f}%', f'{doublingTime:.1f} months', f'{annualGrowthRate:.0f}%', f'{aFit:.0f}', f'{rSquared:.4f}']
+      })
+      growthDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는 투자자 보고, 사업 계획, 인프라 확장 계획에 활용됩니다."
+    content: 곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는 투자자 보고, 사업 계획, 인프라 확장
+      계획에 활용됩니다.
   - type: code
     language: python
     title: 성장 지표 계산
@@ -239,17 +579,75 @@ sections:
       axFinal.legend()
       axFinal.grid(True, alpha=0.3)
       figFinal
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 곡선 피팅 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 curve_fit, 파라미터 해석, R² 계산, 예측을 활용하여 다양한 현상을 모델링합니다. 미션1은 배터리 방전 곡선(지수 감쇠), 미션2는 로지스틱 성장 모델(S자 곡선)입니다. 각 미션은 함수 정의, 피팅, 검증, 시각화를 포함합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    def batteryDecay(t, v0, tau, vMin):
+        return (v0 - vMin) * np.exp(-t / tau) + vMin
+
+    np.random.seed(222)
+    hours = np.arange(0, 25, 2)
+    voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      def batteryDecay(t, v0, tau, vMin):
+          return (v0 - vMin) * np.exp(-t / tau) + vMin
+
+      np.random.seed(222)
+      hours = np.arange(0, 25, 2)
+      voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
+    solution: |-
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      def batteryDecay(t, v0, tau, vMin):
+          return (v0 - vMin) * np.exp(-t / tau) + vMin
+
+      np.random.seed(222)
+      hours = np.arange(0, 25, 2)
+      voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "지금까지 배운 curve_fit, 파라미터 해석, R² 계산, 예측을 활용하여 다양한 현상을 모델링합니다. 미션1은 배터리 방전 곡선(지수 감쇠), 미션2는 로지스틱 성장 모델(S자 곡선)입니다. 각 미션은 함수 정의, 피팅, 검증, 시각화를 포함합니다."
+    content: 지금까지 배운 curve_fit, 파라미터 해석, R² 계산, 예측을 활용하여 다양한 현상을 모델링합니다. 미션1은 배터리 방전 곡선(지수 감쇠), 미션2는 로지스틱 성장 모델(S자 곡선)입니다.
+      각 미션은 함수 정의, 피팅, 검증, 시각화를 포함합니다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 배터리 방전 곡선"
+    title: '미션1: 배터리 방전 곡선'
     blocks:
     - type: code
       title: 데이터 생성
@@ -298,7 +696,7 @@ sections:
         axBat.grid(True, alpha=0.3)
         figBat
   - type: expansion
-    title: "미션2: 시장 점유율 (로지스틱 성장)"
+    title: '미션2: 시장 점유율 (로지스틱 성장)'
     blocks:
     - type: code
       title: 데이터 생성
@@ -348,13 +746,84 @@ sections:
         axLog.legend()
         axLog.grid(True, alpha=0.3)
         figLog
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+    합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다."
+    content: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+      합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   - type: code
     language: python
     title: 지연시간 샘플과 입력 검증
@@ -426,7 +895,7 @@ sections:
       assert all(latencyChecks.values()), latencyChecks
       latencyChecks
   - type: expansion
-    title: "실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?"
+    title: '실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?'
     blocks:
     - type: code
       language: python

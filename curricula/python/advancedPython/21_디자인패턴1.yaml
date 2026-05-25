@@ -1,33 +1,115 @@
 meta:
-  id: "21"
-  title: "디자인 패턴 1"
+  id: '21'
+  title: 디자인 패턴 1
   day: 21
-  category: "advancedPython"
-  tags: ["design-pattern", "singleton", "factory", "builder", "adapter", "decorator", "검증", "설계패턴"]
+  category: advancedPython
+  tags:
+  - design-pattern
+  - singleton
+  - factory
+  - builder
+  - adapter
+  - decorator
+  - 검증
+  - 설계패턴
   seo:
-    title: "파이썬 디자인 패턴 1 - 생성 패턴과 구조 패턴"
-    description: "싱글톤, 팩토리, 빌더, 어댑터, 데코레이터 패턴을 학습합니다."
-    keywords: ["디자인 패턴", "싱글톤", "팩토리", "빌더", "어댑터", "데코레이터"]
-
+    title: 파이썬 디자인 패턴 1 - 생성 패턴과 구조 패턴
+    description: 싱글톤, 팩토리, 빌더, 어댑터, 데코레이터 패턴을 학습합니다.
+    keywords:
+    - 디자인 패턴
+    - 싱글톤
+    - 팩토리
+    - 빌더
+    - 어댑터
+    - 데코레이터
 intro:
-  emoji: "🎨"
+  emoji: 🎨
   points:
-  - "싱글톤 패턴으로 인스턴스 하나만 생성"
-  - "팩토리 패턴으로 객체 생성 위임"
-  - "빌더 패턴으로 복잡한 객체 단계적 생성"
-  - "어댑터와 데코레이터로 구조 확장"
-
+  - 싱글톤 패턴으로 인스턴스 하나만 생성
+  - 팩토리 패턴으로 객체 생성 위임
+  - 빌더 패턴으로 복잡한 객체 단계적 생성
+  - 어댑터와 데코레이터로 구조 확장
 sections:
-- id: "singleton"
-  title: "싱글톤 패턴"
-  subtitle: "인스턴스 하나만 생성"
+- id: singleton
+  title: 싱글톤 패턴
+  structuredPrimary: true
+  subtitle: 인스턴스 하나만 생성
+  goal: '싱글톤 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '싱글톤 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 인스턴스를 하나만 생성하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class SingletonMeta(type):
+        _instances = {}
+
+        def __call__(cls, *args, **kwargs):
+            if cls not in cls._instances:
+                cls._instances[cls] = super().__call__(*args, **kwargs)
+            return cls._instances[cls]
+
+    class Database(metaclass=SingletonMeta):
+        def __init__(self):
+            self.connection = "Connected"
+
+    db1 = Database()
+    db2 = Database()
+    singletonCheck = db1 is db2
+    singletonCheck
+  exercise:
+    prompt: '싱글톤 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class SingletonMeta(type):
+          _instances = {}
+
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._instances:
+                  cls._instances[cls] = super().__call__(*args, **kwargs)
+              return cls._instances[cls]
+
+      class Database(metaclass=SingletonMeta):
+          def __init__(self):
+              self.connection = "Connected"
+
+      db1 = Database()
+      db2 = Database()
+      singletonCheck = db1 is db2
+      singletonCheck
+    solution: |-
+      class SingletonMeta(type):
+          _instances = {}
+
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._instances:
+                  cls._instances[cls] = super().__call__(*args, **kwargs)
+              return cls._instances[cls]
+
+      class Database(metaclass=SingletonMeta):
+          def __init__(self):
+              self.connection = "Connected"
+
+      db1 = Database()
+      db2 = Database()
+      singletonCheck = db1 is db2
+      singletonCheck
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "인스턴스를 하나만 생성하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "메타클래스 싱글톤"
-    description: "메타클래스를 사용한 싱글톤 구현입니다."
+  - type: text
+    content: 인스턴스를 하나만 생성하는 패턴
+  - type: code
+    language: python
+    title: 메타클래스 싱글톤
+    description: 메타클래스를 사용한 싱글톤 구현입니다.
     content: |-
       class SingletonMeta(type):
           _instances = {}
@@ -45,10 +127,10 @@ sections:
       db2 = Database()
       singletonCheck = db1 is db2
       singletonCheck
-  - type: "code"
-    language: "python"
-    title: "데코레이터 싱글톤"
-    description: "데코레이터를 사용한 싱글톤 구현입니다."
+  - type: code
+    language: python
+    title: 데코레이터 싱글톤
+    description: 데코레이터를 사용한 싱글톤 구현입니다.
     content: |-
       class SingletonDecorator:
           def __init__(self, cls):
@@ -69,17 +151,122 @@ sections:
       cfg2 = Config()
       decoratorCheck = cfg1 is cfg2
       decoratorCheck
+- id: factory
+  title: 팩토리 패턴
+  structuredPrimary: true
+  subtitle: 객체 생성 위임
+  goal: '팩토리 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '팩토리 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 객체 생성을 서브클래스에 위임하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from abc import ABC, abstractmethod
 
-- id: "factory"
-  title: "팩토리 패턴"
-  subtitle: "객체 생성 위임"
+    class Animal(ABC):
+        @abstractmethod
+        def speak(self):
+            pass
+
+    class Dog(Animal):
+        def speak(self):
+            return "Woof!"
+
+    class Cat(Animal):
+        def speak(self):
+            return "Meow!"
+
+    class AnimalFactory:
+        @staticmethod
+        def create(animalType):
+            if animalType == "dog":
+                return Dog()
+            elif animalType == "cat":
+                return Cat()
+            raise ValueError(f"Unknown type: {animalType}")
+
+    factoryDog = AnimalFactory.create("dog")
+    factoryCat = AnimalFactory.create("cat")
+    factoryResult = (factoryDog.speak(), factoryCat.speak())
+    factoryResult
+  exercise:
+    prompt: '팩토리 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from abc import ABC, abstractmethod
+
+      class Animal(ABC):
+          @abstractmethod
+          def speak(self):
+              pass
+
+      class Dog(Animal):
+          def speak(self):
+              return "Woof!"
+
+      class Cat(Animal):
+          def speak(self):
+              return "Meow!"
+
+      class AnimalFactory:
+          @staticmethod
+          def create(animalType):
+              if animalType == "dog":
+                  return Dog()
+              elif animalType == "cat":
+                  return Cat()
+              raise ValueError(f"Unknown type: {animalType}")
+
+      factoryDog = AnimalFactory.create("dog")
+      factoryCat = AnimalFactory.create("cat")
+      factoryResult = (factoryDog.speak(), factoryCat.speak())
+      factoryResult
+    solution: |-
+      from abc import ABC, abstractmethod
+
+      class Animal(ABC):
+          @abstractmethod
+          def speak(self):
+              pass
+
+      class Dog(Animal):
+          def speak(self):
+              return "Woof!"
+
+      class Cat(Animal):
+          def speak(self):
+              return "Meow!"
+
+      class AnimalFactory:
+          @staticmethod
+          def create(animalType):
+              if animalType == "dog":
+                  return Dog()
+              elif animalType == "cat":
+                  return Cat()
+              raise ValueError(f"Unknown type: {animalType}")
+
+      factoryDog = AnimalFactory.create("dog")
+      factoryCat = AnimalFactory.create("cat")
+      factoryResult = (factoryDog.speak(), factoryCat.speak())
+      factoryResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "객체 생성을 서브클래스에 위임하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "심플 팩토리"
-    description: "간단한 팩토리 패턴 구현입니다."
+  - type: text
+    content: 객체 생성을 서브클래스에 위임하는 패턴
+  - type: code
+    language: python
+    title: 심플 팩토리
+    description: 간단한 팩토리 패턴 구현입니다.
     content: |-
       from abc import ABC, abstractmethod
 
@@ -109,10 +296,10 @@ sections:
       factoryCat = AnimalFactory.create("cat")
       factoryResult = (factoryDog.speak(), factoryCat.speak())
       factoryResult
-  - type: "code"
-    language: "python"
-    title: "추상 팩토리"
-    description: "추상 팩토리 패턴 구현입니다."
+  - type: code
+    language: python
+    title: 추상 팩토리
+    description: 추상 팩토리 패턴 구현입니다.
     content: |-
       from abc import ABC, abstractmethod
 
@@ -151,17 +338,167 @@ sections:
       macFactory = getFactory("mac")
       abstractFactoryResult = (winFactory.createButton().render(), macFactory.createButton().render())
       abstractFactoryResult
+- id: builder
+  title: 빌더 패턴
+  structuredPrimary: true
+  subtitle: 복잡한 객체 단계적 생성
+  goal: '빌더 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '빌더 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 복잡한 객체를 단계적으로 생성하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Pizza:
+        def __init__(self):
+            self.size = None
+            self.cheese = False
+            self.pepperoni = False
+            self.mushrooms = False
 
-- id: "builder"
-  title: "빌더 패턴"
-  subtitle: "복잡한 객체 단계적 생성"
+        def __str__(self):
+            toppings = []
+            if self.cheese:
+                toppings.append("cheese")
+            if self.pepperoni:
+                toppings.append("pepperoni")
+            if self.mushrooms:
+                toppings.append("mushrooms")
+            return f"{self.size} pizza with {', '.join(toppings)}"
+
+    class PizzaBuilder:
+        def __init__(self):
+            self.pizza = Pizza()
+
+        def setSize(self, size):
+            self.pizza.size = size
+            return self
+
+        def addCheese(self):
+            self.pizza.cheese = True
+            return self
+
+        def addPepperoni(self):
+            self.pizza.pepperoni = True
+            return self
+
+        def addMushrooms(self):
+            self.pizza.mushrooms = True
+            return self
+
+        def build(self):
+            return self.pizza
+
+    pizzaBuilt = PizzaBuilder().setSize("large").addCheese().addPepperoni().build()
+    pizzaStr = str(pizzaBuilt)
+    pizzaStr
+  exercise:
+    prompt: '빌더 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Pizza:
+          def __init__(self):
+              self.size = None
+              self.cheese = False
+              self.pepperoni = False
+              self.mushrooms = False
+
+          def __str__(self):
+              toppings = []
+              if self.cheese:
+                  toppings.append("cheese")
+              if self.pepperoni:
+                  toppings.append("pepperoni")
+              if self.mushrooms:
+                  toppings.append("mushrooms")
+              return f"{self.size} pizza with {', '.join(toppings)}"
+
+      class PizzaBuilder:
+          def __init__(self):
+              self.pizza = Pizza()
+
+          def setSize(self, size):
+              self.pizza.size = size
+              return self
+
+          def addCheese(self):
+              self.pizza.cheese = True
+              return self
+
+          def addPepperoni(self):
+              self.pizza.pepperoni = True
+              return self
+
+          def addMushrooms(self):
+              self.pizza.mushrooms = True
+              return self
+
+          def build(self):
+              return self.pizza
+
+      pizzaBuilt = PizzaBuilder().setSize("large").addCheese().addPepperoni().build()
+      pizzaStr = str(pizzaBuilt)
+      pizzaStr
+    solution: |-
+      class Pizza:
+          def __init__(self):
+              self.size = None
+              self.cheese = False
+              self.pepperoni = False
+              self.mushrooms = False
+
+          def __str__(self):
+              toppings = []
+              if self.cheese:
+                  toppings.append("cheese")
+              if self.pepperoni:
+                  toppings.append("pepperoni")
+              if self.mushrooms:
+                  toppings.append("mushrooms")
+              return f"{self.size} pizza with {', '.join(toppings)}"
+
+      class PizzaBuilder:
+          def __init__(self):
+              self.pizza = Pizza()
+
+          def setSize(self, size):
+              self.pizza.size = size
+              return self
+
+          def addCheese(self):
+              self.pizza.cheese = True
+              return self
+
+          def addPepperoni(self):
+              self.pizza.pepperoni = True
+              return self
+
+          def addMushrooms(self):
+              self.pizza.mushrooms = True
+              return self
+
+          def build(self):
+              return self.pizza
+
+      pizzaBuilt = PizzaBuilder().setSize("large").addCheese().addPepperoni().build()
+      pizzaStr = str(pizzaBuilt)
+      pizzaStr
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "복잡한 객체를 단계적으로 생성하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "피자 빌더"
-    description: "빌더 패턴으로 피자를 만듭니다."
+  - type: text
+    content: 복잡한 객체를 단계적으로 생성하는 패턴
+  - type: code
+    language: python
+    title: 피자 빌더
+    description: 빌더 패턴으로 피자를 만듭니다.
     content: |-
       class Pizza:
           def __init__(self):
@@ -206,10 +543,10 @@ sections:
       pizzaBuilt = PizzaBuilder().setSize("large").addCheese().addPepperoni().build()
       pizzaStr = str(pizzaBuilt)
       pizzaStr
-  - type: "code"
-    language: "python"
-    title: "컴퓨터 빌더와 디렉터"
-    description: "디렉터를 사용한 빌더 패턴입니다."
+  - type: code
+    language: python
+    title: 컴퓨터 빌더와 디렉터
+    description: 디렉터를 사용한 빌더 패턴입니다.
     content: |-
       class Computer:
           def __init__(self):
@@ -257,17 +594,95 @@ sections:
       officePC = ComputerDirector.buildOfficePC(ComputerBuilder())
       directorResult = (gamingPC.specs(), officePC.specs())
       directorResult
+- id: adapter
+  title: 어댑터 패턴
+  structuredPrimary: true
+  subtitle: 인터페이스 연결
+  goal: '어댑터 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '어댑터 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 호환되지 않는 인터페이스를 연결하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class OldPrinter:
+        def printOld(self, text):
+            return f"[OLD] {text}"
 
-- id: "adapter"
-  title: "어댑터 패턴"
-  subtitle: "인터페이스 연결"
+    class NewPrinter:
+        def printNew(self, text):
+            return f"[NEW] {text}"
+
+    class PrinterAdapter:
+        def __init__(self, oldPrinter):
+            self.oldPrinter = oldPrinter
+
+        def printNew(self, text):
+            return self.oldPrinter.printOld(text)
+
+    oldPrt = OldPrinter()
+    adapter = PrinterAdapter(oldPrt)
+    adapterResult = adapter.printNew("Hello World")
+    adapterResult
+  exercise:
+    prompt: '어댑터 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class OldPrinter:
+          def printOld(self, text):
+              return f"[OLD] {text}"
+
+      class NewPrinter:
+          def printNew(self, text):
+              return f"[NEW] {text}"
+
+      class PrinterAdapter:
+          def __init__(self, oldPrinter):
+              self.oldPrinter = oldPrinter
+
+          def printNew(self, text):
+              return self.oldPrinter.printOld(text)
+
+      oldPrt = OldPrinter()
+      adapter = PrinterAdapter(oldPrt)
+      adapterResult = adapter.printNew("Hello World")
+      adapterResult
+    solution: |-
+      class OldPrinter:
+          def printOld(self, text):
+              return f"[OLD] {text}"
+
+      class NewPrinter:
+          def printNew(self, text):
+              return f"[NEW] {text}"
+
+      class PrinterAdapter:
+          def __init__(self, oldPrinter):
+              self.oldPrinter = oldPrinter
+
+          def printNew(self, text):
+              return self.oldPrinter.printOld(text)
+
+      oldPrt = OldPrinter()
+      adapter = PrinterAdapter(oldPrt)
+      adapterResult = adapter.printNew("Hello World")
+      adapterResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "호환되지 않는 인터페이스를 연결하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "프린터 어댑터"
-    description: "레거시 프린터를 새 인터페이스에 연결합니다."
+  - type: text
+    content: 호환되지 않는 인터페이스를 연결하는 패턴
+  - type: code
+    language: python
+    title: 프린터 어댑터
+    description: 레거시 프린터를 새 인터페이스에 연결합니다.
     content: |-
       class OldPrinter:
           def printOld(self, text):
@@ -288,10 +703,10 @@ sections:
       adapter = PrinterAdapter(oldPrt)
       adapterResult = adapter.printNew("Hello World")
       adapterResult
-  - type: "code"
-    language: "python"
-    title: "소켓 어댑터"
-    description: "유럽 소켓을 미국 소켓에 연결합니다."
+  - type: code
+    language: python
+    title: 소켓 어댑터
+    description: 유럽 소켓을 미국 소켓에 연결합니다.
     content: |-
       class EuropeanSocket:
           def voltage(self):
@@ -324,17 +739,179 @@ sections:
       socketAdapter = SocketAdapter(euSocket)
       socketResult = (socketAdapter.voltage(), socketAdapter.plugType(), socketAdapter.originalVoltage())
       socketResult
+- id: decorator_pattern
+  title: 데코레이터 패턴
+  structuredPrimary: true
+  subtitle: 동적 기능 추가
+  goal: '데코레이터 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '데코레이터 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 객체에 동적으로 기능을 추가하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from abc import ABC, abstractmethod
 
-- id: "decorator_pattern"
-  title: "데코레이터 패턴"
-  subtitle: "동적 기능 추가"
+    class Coffee(ABC):
+        @abstractmethod
+        def cost(self):
+            pass
+
+        @abstractmethod
+        def description(self):
+            pass
+
+    class SimpleCoffee(Coffee):
+        def cost(self):
+            return 2.0
+
+        def description(self):
+            return "Simple Coffee"
+
+    class CoffeeDecorator(Coffee):
+        def __init__(self, coffee):
+            self._coffee = coffee
+
+        def cost(self):
+            return self._coffee.cost()
+
+        def description(self):
+            return self._coffee.description()
+
+    class MilkDecorator(CoffeeDecorator):
+        def cost(self):
+            return self._coffee.cost() + 0.5
+
+        def description(self):
+            return self._coffee.description() + ", Milk"
+
+    class SugarDecorator(CoffeeDecorator):
+        def cost(self):
+            return self._coffee.cost() + 0.2
+
+        def description(self):
+            return self._coffee.description() + ", Sugar"
+
+    simpleCoffee = SimpleCoffee()
+    milkCoffee = MilkDecorator(simpleCoffee)
+    sweetMilkCoffee = SugarDecorator(milkCoffee)
+    coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
+    coffeeResult
+  exercise:
+    prompt: '데코레이터 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from abc import ABC, abstractmethod
+
+      class Coffee(ABC):
+          @abstractmethod
+          def cost(self):
+              pass
+
+          @abstractmethod
+          def description(self):
+              pass
+
+      class SimpleCoffee(Coffee):
+          def cost(self):
+              return 2.0
+
+          def description(self):
+              return "Simple Coffee"
+
+      class CoffeeDecorator(Coffee):
+          def __init__(self, coffee):
+              self._coffee = coffee
+
+          def cost(self):
+              return self._coffee.cost()
+
+          def description(self):
+              return self._coffee.description()
+
+      class MilkDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.5
+
+          def description(self):
+              return self._coffee.description() + ", Milk"
+
+      class SugarDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.2
+
+          def description(self):
+              return self._coffee.description() + ", Sugar"
+
+      simpleCoffee = SimpleCoffee()
+      milkCoffee = MilkDecorator(simpleCoffee)
+      sweetMilkCoffee = SugarDecorator(milkCoffee)
+      coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
+      coffeeResult
+    solution: |-
+      from abc import ABC, abstractmethod
+
+      class Coffee(ABC):
+          @abstractmethod
+          def cost(self):
+              pass
+
+          @abstractmethod
+          def description(self):
+              pass
+
+      class SimpleCoffee(Coffee):
+          def cost(self):
+              return 2.0
+
+          def description(self):
+              return "Simple Coffee"
+
+      class CoffeeDecorator(Coffee):
+          def __init__(self, coffee):
+              self._coffee = coffee
+
+          def cost(self):
+              return self._coffee.cost()
+
+          def description(self):
+              return self._coffee.description()
+
+      class MilkDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.5
+
+          def description(self):
+              return self._coffee.description() + ", Milk"
+
+      class SugarDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.2
+
+          def description(self):
+              return self._coffee.description() + ", Sugar"
+
+      simpleCoffee = SimpleCoffee()
+      milkCoffee = MilkDecorator(simpleCoffee)
+      sweetMilkCoffee = SugarDecorator(milkCoffee)
+      coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
+      coffeeResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "객체에 동적으로 기능을 추가하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "커피 데코레이터"
-    description: "커피에 재료를 추가합니다."
+  - type: text
+    content: 객체에 동적으로 기능을 추가하는 패턴
+  - type: code
+    language: python
+    title: 커피 데코레이터
+    description: 커피에 재료를 추가합니다.
     content: |-
       from abc import ABC, abstractmethod
 
@@ -383,10 +960,10 @@ sections:
       sweetMilkCoffee = SugarDecorator(milkCoffee)
       coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
       coffeeResult
-  - type: "code"
-    language: "python"
-    title: "텍스트 프로세서"
-    description: "텍스트 처리 데코레이터 체인입니다."
+  - type: code
+    language: python
+    title: 텍스트 프로세서
+    description: 텍스트 처리 데코레이터 체인입니다.
     content: |-
       class TextProcessor:
           def process(self, text):
@@ -421,17 +998,113 @@ sections:
       replacedProcessor = ReplaceDecorator(upperProcessor, " ", "_")
       textResult = replacedProcessor.process("  hello world  ")
       textResult
+- id: prototype
+  title: 프로토타입 패턴
+  structuredPrimary: true
+  subtitle: 객체 복제
+  goal: '프로토타입 패턴: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '프로토타입 패턴: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 기존 객체를 복제하여 새 객체를 생성하는 패턴
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import copy
 
-- id: "prototype"
-  title: "프로토타입 패턴"
-  subtitle: "객체 복제"
+    class Prototype:
+        def clone(self):
+            return copy.deepcopy(self)
+
+    class Document(Prototype):
+        def __init__(self, title, content):
+            self.title = title
+            self.content = content
+            self.attachments = []
+
+        def addAttachment(self, attachment):
+            self.attachments.append(attachment)
+
+        def __str__(self):
+            return f"{self.title}: {self.content} ({len(self.attachments)} attachments)"
+
+    originalDoc = Document("Report", "Annual Report 2024")
+    originalDoc.addAttachment("chart.png")
+    clonedDoc = originalDoc.clone()
+    clonedDoc.title = "Report Copy"
+    clonedDoc.addAttachment("table.xlsx")
+    protoResult = (str(originalDoc), str(clonedDoc))
+    protoResult
+  exercise:
+    prompt: '프로토타입 패턴: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import copy
+
+      class Prototype:
+          def clone(self):
+              return copy.deepcopy(self)
+
+      class Document(Prototype):
+          def __init__(self, title, content):
+              self.title = title
+              self.content = content
+              self.attachments = []
+
+          def addAttachment(self, attachment):
+              self.attachments.append(attachment)
+
+          def __str__(self):
+              return f"{self.title}: {self.content} ({len(self.attachments)} attachments)"
+
+      originalDoc = Document("Report", "Annual Report 2024")
+      originalDoc.addAttachment("chart.png")
+      clonedDoc = originalDoc.clone()
+      clonedDoc.title = "Report Copy"
+      clonedDoc.addAttachment("table.xlsx")
+      protoResult = (str(originalDoc), str(clonedDoc))
+      protoResult
+    solution: |-
+      import copy
+
+      class Prototype:
+          def clone(self):
+              return copy.deepcopy(self)
+
+      class Document(Prototype):
+          def __init__(self, title, content):
+              self.title = title
+              self.content = content
+              self.attachments = []
+
+          def addAttachment(self, attachment):
+              self.attachments.append(attachment)
+
+          def __str__(self):
+              return f"{self.title}: {self.content} ({len(self.attachments)} attachments)"
+
+      originalDoc = Document("Report", "Annual Report 2024")
+      originalDoc.addAttachment("chart.png")
+      clonedDoc = originalDoc.clone()
+      clonedDoc.title = "Report Copy"
+      clonedDoc.addAttachment("table.xlsx")
+      protoResult = (str(originalDoc), str(clonedDoc))
+      protoResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "기존 객체를 복제하여 새 객체를 생성하는 패턴"
-  - type: "code"
-    language: "python"
-    title: "문서 프로토타입"
-    description: "문서를 복제합니다."
+  - type: text
+    content: 기존 객체를 복제하여 새 객체를 생성하는 패턴
+  - type: code
+    language: python
+    title: 문서 프로토타입
+    description: 문서를 복제합니다.
     content: |-
       import copy
 
@@ -458,10 +1131,10 @@ sections:
       clonedDoc.addAttachment("table.xlsx")
       protoResult = (str(originalDoc), str(clonedDoc))
       protoResult
-  - type: "code"
-    language: "python"
-    title: "도형 레지스트리"
-    description: "도형을 등록하고 복제합니다."
+  - type: code
+    language: python
+    title: 도형 레지스트리
+    description: 도형을 등록하고 복제합니다.
     content: |-
       import copy
 
@@ -502,17 +1175,163 @@ sections:
       circle2.radius = 10
       registryResult = (str(circle1), str(circle2))
       registryResult
+- id: workflow_validation
+  title: '현업 흐름 검증: 리포트 내보내기 구조 설계하기'
+  structuredPrimary: true
+  subtitle: Factory, Builder, Adapter, Decorator를 변경 지점 기준으로 검증합니다
+  goal: '현업 흐름 검증: 리포트 내보내기 구조 설계하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 리포트 내보내기 구조 설계하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter, 로깅은 Decorator로 분리해보세요.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 리포트 내보내기 구조 설계하기"
-  subtitle: "Factory, Builder, Adapter, Decorator를 변경 지점 기준으로 검증합니다"
+    변주 실험
+    PDF exporter를 추가할 때 기존 호출 코드를 수정하지 않고 Factory registry와 어댑터만 바꾸는 구조인지 확인하세요.
+  tips:
+  - 변주 실험 PDF exporter를 추가할 때 기존 호출 코드를 수정하지 않고 Factory registry와 어댑터만 바꾸는 구조인지 확인하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import json
+
+    class CsvExporter:
+        def export(self, rows):
+            header = ",".join(rows[0].keys())
+            body = [",".join(str(value) for value in row.values()) for row in rows]
+            return "\n".join([header, *body])
+
+    class JsonExporter:
+        def export(self, rows):
+            return json.dumps(rows, ensure_ascii=False)
+
+    class ExporterFactory:
+        registry = {
+            "csv": CsvExporter,
+            "json": JsonExporter,
+        }
+
+        @classmethod
+        def create(cls, formatName):
+            if formatName not in cls.registry:
+                raise ValueError(f"unsupported export format: {formatName}")
+            return cls.registry[formatName]()
+
+    class LegacyExcelApi:
+        def makeWorkbook(self, rows):
+            return {"sheet": "orders", "rows": rows}
+
+    class ExcelAdapter:
+        def __init__(self, legacyApi):
+            self.legacyApi = legacyApi
+
+        def export(self, rows):
+            return self.legacyApi.makeWorkbook(rows)
+
+    rows = [{"id": "O-1", "amount": 12000}, {"id": "O-2", "amount": 8000}]
+
+    assert ExporterFactory.create("json").export(rows).startswith("[")
+    assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
+    assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
+  exercise:
+    prompt: '현업 흐름 검증: 리포트 내보내기 구조 설계하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import json
+
+      class CsvExporter:
+          def export(self, rows):
+              header = ",".join(rows[0].keys())
+              body = [",".join(str(value) for value in row.values()) for row in rows]
+              return "\n".join([header, *body])
+
+      class JsonExporter:
+          def export(self, rows):
+              return json.dumps(rows, ensure_ascii=False)
+
+      class ExporterFactory:
+          registry = {
+              "csv": CsvExporter,
+              "json": JsonExporter,
+          }
+
+          @classmethod
+          def create(cls, formatName):
+              if formatName not in cls.registry:
+                  raise ValueError(f"unsupported export format: {formatName}")
+              return cls.registry[formatName]()
+
+      class LegacyExcelApi:
+          def makeWorkbook(self, rows):
+              return {"sheet": "orders", "rows": rows}
+
+      class ExcelAdapter:
+          def __init__(self, legacyApi):
+              self.legacyApi = legacyApi
+
+          def export(self, rows):
+              return self.legacyApi.makeWorkbook(rows)
+
+      rows = [{"id": "O-1", "amount": 12000}, {"id": "O-2", "amount": 8000}]
+
+      assert ExporterFactory.create("json").export(rows).startswith("[")
+      assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
+      assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
+    solution: |-
+      import json
+
+      class CsvExporter:
+          def export(self, rows):
+              header = ",".join(rows[0].keys())
+              body = [",".join(str(value) for value in row.values()) for row in rows]
+              return "\n".join([header, *body])
+
+      class JsonExporter:
+          def export(self, rows):
+              return json.dumps(rows, ensure_ascii=False)
+
+      class ExporterFactory:
+          registry = {
+              "csv": CsvExporter,
+              "json": JsonExporter,
+          }
+
+          @classmethod
+          def create(cls, formatName):
+              if formatName not in cls.registry:
+                  raise ValueError(f"unsupported export format: {formatName}")
+              return cls.registry[formatName]()
+
+      class LegacyExcelApi:
+          def makeWorkbook(self, rows):
+              return {"sheet": "orders", "rows": rows}
+
+      class ExcelAdapter:
+          def __init__(self, legacyApi):
+              self.legacyApi = legacyApi
+
+          def export(self, rows):
+              return self.legacyApi.makeWorkbook(rows)
+
+      rows = [{"id": "O-1", "amount": 12000}, {"id": "O-2", "amount": 8000}]
+
+      assert ExporterFactory.create("json").export(rows).startswith("[")
+      assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
+      assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter, 로깅은 Decorator로 분리해보세요."
-  - type: "code"
-    language: "python"
-    title: "Factory와 Adapter로 exporter 만들기"
-    description: "포맷 추가가 호출 코드로 번지지 않는지 확인합니다."
+  - type: text
+    content: 디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter,
+      로깅은 Decorator로 분리해보세요.
+  - type: code
+    language: python
+    title: Factory와 Adapter로 exporter 만들기
+    description: 포맷 추가가 호출 코드로 번지지 않는지 확인합니다.
     content: |-
       import json
 
@@ -554,10 +1373,10 @@ sections:
       assert ExporterFactory.create("json").export(rows).startswith("[")
       assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
       assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
-  - type: "code"
-    language: "python"
-    title: "Builder와 Decorator로 옵션과 로깅 분리하기"
-    description: "리포트 옵션 생성과 실행 로그를 호출 코드 밖으로 분리합니다."
+  - type: code
+    language: python
+    title: Builder와 Decorator로 옵션과 로깅 분리하기
+    description: 리포트 옵션 생성과 실행 로그를 호출 코드 밖으로 분리합니다.
     content: |-
       class ReportConfigBuilder:
           def __init__(self):
@@ -596,10 +1415,10 @@ sections:
       assert config == {"columns": ["id", "amount"], "includeSummary": True}
       assert output == "O-1\nO-2"
       assert log == ["exported 2 rows"]
-  - type: "code"
-    language: "python"
-    title: "지원하지 않는 포맷 오류 확인"
-    description: "생성 실패를 조용히 넘기지 않고 명시적 예외로 검증합니다."
+  - type: code
+    language: python
+    title: 지원하지 않는 포맷 오류 확인
+    description: 생성 실패를 조용히 넘기지 않고 명시적 예외로 검증합니다.
     content: |-
       class ExporterFactory:
           registry = {}
@@ -616,19 +1435,106 @@ sections:
           message = str(exc)
 
       assert message == "unsupported export format: pdf"
-  - type: "tip"
-    title: "변주 실험"
-    content: "PDF exporter를 추가할 때 기존 호출 코드를 수정하지 않고 Factory registry와 어댑터만 바꾸는 구조인지 확인하세요."
+  - type: tip
+    title: 변주 실험
+    content: PDF exporter를 추가할 때 기존 호출 코드를 수정하지 않고 Factory registry와 어댑터만 바꾸는 구조인지 확인하세요.
+- id: practice
+  title: 종합 연습
+  structuredPrimary: true
+  subtitle: 디자인 패턴 마스터하기
+  goal: '종합 연습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 연습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에 필수적입니다. 팩토리 패턴은 객체
+    생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡 응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서
+    사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를 이해하는 것이 중요합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Logger:
+        _instance = None
 
-- id: "practice"
-  title: "종합 연습"
-  subtitle: "디자인 패턴 마스터하기"
+        def __new__(cls):
+            if cls._instance is None:
+                cls._instance = super().__new__(cls)
+                cls._instance.logs = []
+            return cls._instance
+
+        def log(self, message):
+            self.logs.append(message)
+
+        def getLogs(self):
+            return self.logs
+
+    logger1 = Logger()
+    logger1.log("First message")
+    logger2 = Logger()
+    logger2.log("Second message")
+    ex1Result = (logger1 is logger2, logger1.getLogs())
+    ex1Result
+  exercise:
+    prompt: '종합 연습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Logger:
+          _instance = None
+
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+                  cls._instance.logs = []
+              return cls._instance
+
+          def log(self, message):
+              self.logs.append(message)
+
+          def getLogs(self):
+              return self.logs
+
+      logger1 = Logger()
+      logger1.log("First message")
+      logger2 = Logger()
+      logger2.log("Second message")
+      ex1Result = (logger1 is logger2, logger1.getLogs())
+      ex1Result
+    solution: |-
+      class Logger:
+          _instance = None
+
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+                  cls._instance.logs = []
+              return cls._instance
+
+          def log(self, message):
+              self.logs.append(message)
+
+          def getLogs(self):
+              return self.logs
+
+      logger1 = Logger()
+      logger1.log("First message")
+      logger2 = Logger()
+      logger2.log("Second message")
+      ex1Result = (logger1 is logger2, logger1.getLogs())
+      ex1Result
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에 필수적입니다. 팩토리 패턴은 객체 생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡 응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서 사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를 이해하는 것이 중요합니다."
-
-  - type: "expansion"
-    title: "🟢 기본1: 간단한 싱글톤"
+  - type: text
+    content: Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에 필수적입니다. 팩토리 패턴은 객체 생성
+      로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡 응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서
+      사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를 이해하는 것이 중요합니다.
+  - type: expansion
+    title: '🟢 기본1: 간단한 싱글톤'
     code: |-
       class Logger:
           _instance = None
@@ -651,9 +1557,8 @@ sections:
       logger2.log("Second message")
       ex1Result = (logger1 is logger2, logger1.getLogs())
       ex1Result
-
-  - type: "expansion"
-    title: "🟢 기본2: 간단한 팩토리"
+  - type: expansion
+    title: '🟢 기본2: 간단한 팩토리'
     code: |-
       class Shape:
           def draw(self):
@@ -685,9 +1590,8 @@ sections:
       ex2Square = ShapeFactory.create("square")
       ex2Result = (ex2Circle.draw(), ex2Square.draw())
       ex2Result
-
-  - type: "expansion"
-    title: "🟢 기본3: 간단한 빌더"
+  - type: expansion
+    title: '🟢 기본3: 간단한 빌더'
     code: |-
       class House:
           def __init__(self):
@@ -730,9 +1634,8 @@ sections:
       houseBuilt = HouseBuilder().buildWalls(4).buildDoors(2).buildWindows(6).buildRoof().getHouse()
       ex3Result = str(houseBuilt)
       ex3Result
-
-  - type: "expansion"
-    title: "🟢 기본4: 간단한 어댑터"
+  - type: expansion
+    title: '🟢 기본4: 간단한 어댑터'
     code: |-
       class LegacyPayment:
           def makePaymentOld(self, amount):
@@ -753,9 +1656,8 @@ sections:
       payAdapter = PaymentAdapter(legacyPay)
       ex4Result = payAdapter.pay(100)
       ex4Result
-
-  - type: "expansion"
-    title: "🟢 기본5: 간단한 데코레이터"
+  - type: expansion
+    title: '🟢 기본5: 간단한 데코레이터'
     code: |-
       class Notifier:
           def send(self, message):
@@ -780,9 +1682,8 @@ sections:
       fullNotifier = EmailDecorator(smsNotifier)
       ex5Result = fullNotifier.send("Alert!")
       ex5Result
-
-  - type: "expansion"
-    title: "🟡 응용1: 팩토리 메서드 패턴"
+  - type: expansion
+    title: '🟡 응용1: 팩토리 메서드 패턴'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -820,9 +1721,8 @@ sections:
       seaLog = SeaLogistics()
       ex6Result = (roadLog.planDelivery(), seaLog.planDelivery())
       ex6Result
-
-  - type: "expansion"
-    title: "🟡 응용2: 파사드 패턴"
+  - type: expansion
+    title: '🟡 응용2: 파사드 패턴'
     code: |-
       class CPU:
           def freeze(self):
@@ -856,9 +1756,8 @@ sections:
       computerFacade = ComputerFacade()
       ex7Result = computerFacade.start()
       ex7Result
-
-  - type: "expansion"
-    title: "🟡 응용3: 컴포지트 패턴"
+  - type: expansion
+    title: '🟡 응용3: 컴포지트 패턴'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -904,9 +1803,8 @@ sections:
       rootFolder.add(File("readme.txt", 10))
       ex8Result = (rootFolder.getName(), rootFolder.getSize())
       ex8Result
-
-  - type: "expansion"
-    title: "🟡 응용4: 브릿지 패턴"
+  - type: expansion
+    title: '🟡 응용4: 브릿지 패턴'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -943,9 +1841,8 @@ sections:
       rasterCircle = CircleBridge(RasterRenderer(), 5)
       ex9Result = (vectorCircle.draw(), rasterCircle.draw())
       ex9Result
-
-  - type: "expansion"
-    title: "🟡 응용5: 플라이웨이트 패턴"
+  - type: expansion
+    title: '🟡 응용5: 플라이웨이트 패턴'
     code: |-
       class TreeType:
           def __init__(self, name, color, texture):
@@ -990,9 +1887,8 @@ sections:
       ex10TreeCount = len(forest)
       ex10Result = (ex10TypeCount, ex10TreeCount)
       ex10Result
-
-  - type: "expansion"
-    title: "🔴 심화1: 추상 팩토리 확장"
+  - type: expansion
+    title: '🔴 심화1: 추상 팩토리 확장'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -1051,9 +1947,8 @@ sections:
       ex11Victorian = (victorianFactory.createChair().sitOn(), victorianFactory.createTable().putOn())
       ex11Result = (ex11Modern, ex11Victorian)
       ex11Result
-
-  - type: "expansion"
-    title: "🔴 심화2: 빌더 + 디렉터 확장"
+  - type: expansion
+    title: '🔴 심화2: 빌더 + 디렉터 확장'
     code: |-
       class Meal:
           def __init__(self):
@@ -1102,9 +1997,8 @@ sections:
       nonVegMeal = MealDirector.prepareNonVegMeal()
       ex12Result = (str(vegMeal), str(nonVegMeal))
       ex12Result
-
-  - type: "expansion"
-    title: "🔴 심화3: 데코레이터 체인"
+  - type: expansion
+    title: '🔴 심화3: 데코레이터 체인'
     code: |-
       class DataSource:
           def writeData(self, data):
@@ -1158,9 +2052,8 @@ sections:
       readResult = fileSource.data
       ex13Result = (writeResult, readResult)
       ex13Result
-
-  - type: "expansion"
-    title: "🔴 심화4: 프록시 패턴"
+  - type: expansion
+    title: '🔴 심화4: 프록시 패턴'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -1203,9 +2096,8 @@ sections:
       proxy3 = CachedProxyImage("photo2.jpg")
       ex14Result = (proxy1.display(), proxy2.display(), proxy3.display())
       ex14Result
-
-  - type: "expansion"
-    title: "🔴 심화5: 싱글톤 + 팩토리 조합"
+  - type: expansion
+    title: '🔴 심화5: 싱글톤 + 팩토리 조합'
     code: |-
       class DatabaseConnection:
           _instance = None
@@ -1236,9 +2128,8 @@ sections:
       ex15IsSame = dbManager1 is dbManager2
       ex15Result = (ex15IsSame, mysqlConn, postgresConn)
       ex15Result
-
-  - type: "expansion"
-    title: "🔴 심화6: 빌더 with 검증"
+  - type: expansion
+    title: '🔴 심화6: 빌더 with 검증'
     code: |-
       class Email:
           def __init__(self):
@@ -1291,9 +2182,8 @@ sections:
       emailBuilt = EmailBuilder().setSender("from@test.com").addRecipient("to@test.com").setSubject("Hello").setBody("Content").build()
       ex16Result = str(emailBuilt)
       ex16Result
-
-  - type: "expansion"
-    title: "🔴 심화7: 객체 풀 패턴"
+  - type: expansion
+    title: '🔴 심화7: 객체 풀 패턴'
     code: |-
       class Connection:
           def __init__(self, connId):
@@ -1334,9 +2224,8 @@ sections:
       status2 = connPool.getStatus()
       ex17Result = (status1, status2)
       ex17Result
-
-  - type: "expansion"
-    title: "🔴 심화8: 널 객체 패턴"
+  - type: expansion
+    title: '🔴 심화8: 널 객체 패턴'
     code: |-
       from abc import ABC, abstractmethod
 
@@ -1377,9 +2266,8 @@ sections:
       unknown = CustomerFactory.getCustomer("Unknown")
       ex18Result = (alice.getName(), alice.isNull(), unknown.getName(), unknown.isNull())
       ex18Result
-
-  - type: "expansion"
-    title: "🔴 심화9: 멀티톤 패턴"
+  - type: expansion
+    title: '🔴 심화9: 멀티톤 패턴'
     code: |-
       class DatabaseMultiton:
           _instances = {}
@@ -1407,9 +2295,8 @@ sections:
       ex19Count = DatabaseMultiton.getInstanceCount()
       ex19Result = (ex19Same, ex19Different, ex19Count)
       ex19Result
-
-  - type: "expansion"
-    title: "🔴 심화10: 레지스트리 패턴"
+  - type: expansion
+    title: '🔴 심화10: 레지스트리 패턴'
     code: |-
       class ServiceRegistry:
           _services = {}

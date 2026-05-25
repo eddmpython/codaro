@@ -1,30 +1,337 @@
 meta:
   packages:
-    - pandas
+  - pandas
   id: pandas_10
   title: 실전종합프로젝트
   order: 10
   category: pandas
-  difficulty: "⭐⭐⭐⭐⭐"
+  difficulty: ⭐⭐⭐⭐⭐
   badge: 심화
-  tags: ["실전", "API", "JSON", "프로젝트", "종합", "검증", "통합프로젝트"]
+  tags:
+  - 실전
+  - API
+  - JSON
+  - 프로젝트
+  - 종합
+  - 검증
+  - 통합프로젝트
   seo:
-    title: "pandas 실전 프로젝트 - API 응답 분석부터 저장까지"
-    description: "API 응답 형태의 JSON 데이터를 pandas로 분석하는 전체 과정을 실습합니다. 데이터 구조 이해, 정제, 분석, 저장까지 완전한 파이프라인을 경험합니다."
-    keywords: ["pandas API", "JSON", "응답 데이터", "실전 프로젝트", "데이터 파이프라인"]
-
+    title: pandas 실전 프로젝트 - API 응답 분석부터 저장까지
+    description: API 응답 형태의 JSON 데이터를 pandas로 분석하는 전체 과정을 실습합니다. 데이터 구조 이해, 정제, 분석, 저장까지 완전한 파이프라인을 경험합니다.
+    keywords:
+    - pandas API
+    - JSON
+    - 응답 데이터
+    - 실전 프로젝트
+    - 데이터 파이프라인
 intro:
-  emoji: "🚀"
+  emoji: 🚀
   goal: API 응답 형태의 JSON 데이터를 정제하고 분석하는 전체 과정을 경험합니다.
   description: 지금까지 배운 모든 기술을 총동원합니다. 실제 API 응답과 같은 JSON 구조를 로컬 샘플로 재현하고, 수집 이후의 정제와 분석 워크플로우를 끝까지 익힙니다.
-
 sections:
 - id: step1_api_concept
   title: 1단계. API 개념
+  structuredPrimary: true
   subtitle: 데이터를 가져오는 방법
+  goal: '1단계. API 개념: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. API 개념: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. 이 수업에서는 GitHub Issues API 응답과 같은 리스트/딕셔너리 구조를 로컬 샘플로 만들고 DataFrame으로 변환합니다. 네트워크, 인증, 호출 제한에 흔들리지 않고 JSON 구조 파악, 컬럼 선택, 날짜 변환, 집계, 저장이라는 핵심 pandas 흐름에 집중합니다.
+
+    API 응답은 보통 딕셔너리의 리스트 형태로 들어옵니다. pd.DataFrame()에 이 리스트를 넣으면 각 딕셔너리의 키가 컬럼이 됩니다. 실제 API를 붙일 때도 이 구조를 먼저 이해해야 이후 정제와 분석 코드가 안정적입니다.
+  tips:
+  - API 응답은 보통 딕셔너리의 리스트 형태로 들어옵니다. pd.DataFrame()에 이 리스트를 넣으면 각 딕셔너리의 키가 컬럼이 됩니다. 실제 API를 붙일 때도 이 구조를 먼저 이해해야 이후 정제와 분석 코드가
+    안정적입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import pandas as pd
+
+    def sampleGithubIssues(repo="pandas-dev/pandas"):
+        project = repo.split("/")[-1]
+        return [
+            {
+                "number": 101,
+                "title": f"[{project}] Improve groupby documentation for beginners",
+                "state": "open",
+                "created_at": "2026-01-15T09:30:00Z",
+                "comments": 4,
+                "user": {"login": "dataTeacher"},
+            },
+            {
+                "number": 102,
+                "title": f"[{project}] Fix read_csv encoding edge case",
+                "state": "closed",
+                "created_at": "2026-01-10T12:00:00Z",
+                "comments": 8,
+                "user": {"login": "csvMaintainer"},
+            },
+            {
+                "number": 103,
+                "title": f"[{project}] Add examples for datetime parsing",
+                "state": "open",
+                "created_at": "2026-01-08T15:45:00Z",
+                "comments": 2,
+                "user": {"login": "timeSeriesFan"},
+            },
+            {
+                "number": 104,
+                "title": f"[{project}] Clarify nullable integer behavior",
+                "state": "closed",
+                "created_at": "2026-01-06T08:10:00Z",
+                "comments": 12,
+                "user": {"login": "dtypeReviewer"},
+            },
+            {
+                "number": 105,
+                "title": f"[{project}] Add cookbook section for joins",
+                "state": "open",
+                "created_at": "2026-01-04T14:20:00Z",
+                "comments": 6,
+                "user": {"login": "mergeHelper"},
+            },
+            {
+                "number": 106,
+                "title": f"[{project}] Improve error message for missing columns",
+                "state": "closed",
+                "created_at": "2025-12-30T11:05:00Z",
+                "comments": 3,
+                "user": {"login": "bugReporter"},
+            },
+            {
+                "number": 107,
+                "title": f"[{project}] Benchmark rolling window examples",
+                "state": "open",
+                "created_at": "2025-12-28T16:40:00Z",
+                "comments": 10,
+                "user": {"login": "perfAnalyst"},
+            },
+            {
+                "number": 108,
+                "title": f"[{project}] Update plotting guide screenshots",
+                "state": "closed",
+                "created_at": "2025-12-24T09:00:00Z",
+                "comments": 1,
+                "user": {"login": "docsCurator"},
+            },
+            {
+                "number": 109,
+                "title": f"[{project}] Investigate memory spike in concat",
+                "state": "open",
+                "created_at": "2025-12-20T18:25:00Z",
+                "comments": 15,
+                "user": {"login": "memoryWatch"},
+            },
+            {
+                "number": 110,
+                "title": f"[{project}] Add beginner exercise for value_counts",
+                "state": "closed",
+                "created_at": "2025-12-18T07:35:00Z",
+                "comments": 5,
+                "user": {"login": "courseBuilder"},
+            },
+        ]
+
+    issueRecords = sampleGithubIssues()
+    issues = pd.DataFrame(issueRecords)
+    issues.shape
+  exercise:
+    prompt: '1단계. API 개념: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      def sampleGithubIssues(repo="pandas-dev/pandas"):
+          project = repo.split("/")[-1]
+          return [
+              {
+                  "number": 101,
+                  "title": f"[{project}] Improve groupby documentation for beginners",
+                  "state": "open",
+                  "created_at": "2026-01-15T09:30:00Z",
+                  "comments": 4,
+                  "user": {"login": "dataTeacher"},
+              },
+              {
+                  "number": 102,
+                  "title": f"[{project}] Fix read_csv encoding edge case",
+                  "state": "closed",
+                  "created_at": "2026-01-10T12:00:00Z",
+                  "comments": 8,
+                  "user": {"login": "csvMaintainer"},
+              },
+              {
+                  "number": 103,
+                  "title": f"[{project}] Add examples for datetime parsing",
+                  "state": "open",
+                  "created_at": "2026-01-08T15:45:00Z",
+                  "comments": 2,
+                  "user": {"login": "timeSeriesFan"},
+              },
+              {
+                  "number": 104,
+                  "title": f"[{project}] Clarify nullable integer behavior",
+                  "state": "closed",
+                  "created_at": "2026-01-06T08:10:00Z",
+                  "comments": 12,
+                  "user": {"login": "dtypeReviewer"},
+              },
+              {
+                  "number": 105,
+                  "title": f"[{project}] Add cookbook section for joins",
+                  "state": "open",
+                  "created_at": "2026-01-04T14:20:00Z",
+                  "comments": 6,
+                  "user": {"login": "mergeHelper"},
+              },
+              {
+                  "number": 106,
+                  "title": f"[{project}] Improve error message for missing columns",
+                  "state": "closed",
+                  "created_at": "2025-12-30T11:05:00Z",
+                  "comments": 3,
+                  "user": {"login": "bugReporter"},
+              },
+              {
+                  "number": 107,
+                  "title": f"[{project}] Benchmark rolling window examples",
+                  "state": "open",
+                  "created_at": "2025-12-28T16:40:00Z",
+                  "comments": 10,
+                  "user": {"login": "perfAnalyst"},
+              },
+              {
+                  "number": 108,
+                  "title": f"[{project}] Update plotting guide screenshots",
+                  "state": "closed",
+                  "created_at": "2025-12-24T09:00:00Z",
+                  "comments": 1,
+                  "user": {"login": "docsCurator"},
+              },
+              {
+                  "number": 109,
+                  "title": f"[{project}] Investigate memory spike in concat",
+                  "state": "open",
+                  "created_at": "2025-12-20T18:25:00Z",
+                  "comments": 15,
+                  "user": {"login": "memoryWatch"},
+              },
+              {
+                  "number": 110,
+                  "title": f"[{project}] Add beginner exercise for value_counts",
+                  "state": "closed",
+                  "created_at": "2025-12-18T07:35:00Z",
+                  "comments": 5,
+                  "user": {"login": "courseBuilder"},
+              },
+          ]
+
+      issueRecords = sampleGithubIssues()
+      issues = pd.DataFrame(issueRecords)
+      issues.shape
+    solution: |-
+      import pandas as pd
+
+      def sampleGithubIssues(repo="pandas-dev/pandas"):
+          project = repo.split("/")[-1]
+          return [
+              {
+                  "number": 101,
+                  "title": f"[{project}] Improve groupby documentation for beginners",
+                  "state": "open",
+                  "created_at": "2026-01-15T09:30:00Z",
+                  "comments": 4,
+                  "user": {"login": "dataTeacher"},
+              },
+              {
+                  "number": 102,
+                  "title": f"[{project}] Fix read_csv encoding edge case",
+                  "state": "closed",
+                  "created_at": "2026-01-10T12:00:00Z",
+                  "comments": 8,
+                  "user": {"login": "csvMaintainer"},
+              },
+              {
+                  "number": 103,
+                  "title": f"[{project}] Add examples for datetime parsing",
+                  "state": "open",
+                  "created_at": "2026-01-08T15:45:00Z",
+                  "comments": 2,
+                  "user": {"login": "timeSeriesFan"},
+              },
+              {
+                  "number": 104,
+                  "title": f"[{project}] Clarify nullable integer behavior",
+                  "state": "closed",
+                  "created_at": "2026-01-06T08:10:00Z",
+                  "comments": 12,
+                  "user": {"login": "dtypeReviewer"},
+              },
+              {
+                  "number": 105,
+                  "title": f"[{project}] Add cookbook section for joins",
+                  "state": "open",
+                  "created_at": "2026-01-04T14:20:00Z",
+                  "comments": 6,
+                  "user": {"login": "mergeHelper"},
+              },
+              {
+                  "number": 106,
+                  "title": f"[{project}] Improve error message for missing columns",
+                  "state": "closed",
+                  "created_at": "2025-12-30T11:05:00Z",
+                  "comments": 3,
+                  "user": {"login": "bugReporter"},
+              },
+              {
+                  "number": 107,
+                  "title": f"[{project}] Benchmark rolling window examples",
+                  "state": "open",
+                  "created_at": "2025-12-28T16:40:00Z",
+                  "comments": 10,
+                  "user": {"login": "perfAnalyst"},
+              },
+              {
+                  "number": 108,
+                  "title": f"[{project}] Update plotting guide screenshots",
+                  "state": "closed",
+                  "created_at": "2025-12-24T09:00:00Z",
+                  "comments": 1,
+                  "user": {"login": "docsCurator"},
+              },
+              {
+                  "number": 109,
+                  "title": f"[{project}] Investigate memory spike in concat",
+                  "state": "open",
+                  "created_at": "2025-12-20T18:25:00Z",
+                  "comments": 15,
+                  "user": {"login": "memoryWatch"},
+              },
+              {
+                  "number": 110,
+                  "title": f"[{project}] Add beginner exercise for value_counts",
+                  "state": "closed",
+                  "created_at": "2025-12-18T07:35:00Z",
+                  "comments": 5,
+                  "user": {"login": "courseBuilder"},
+              },
+          ]
+
+      issueRecords = sampleGithubIssues()
+      issues = pd.DataFrame(issueRecords)
+      issues.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. 이 수업에서는 GitHub Issues API 응답과 같은 리스트/딕셔너리 구조를 로컬 샘플로 만들고 DataFrame으로 변환합니다. 네트워크, 인증, 호출 제한에 흔들리지 않고 JSON 구조 파악, 컬럼 선택, 날짜 변환, 집계, 저장이라는 핵심 pandas 흐름에 집중합니다.
+    content: API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. 이 수업에서는 GitHub Issues API 응답과 같은 리스트/딕셔너리 구조를
+      로컬 샘플로 만들고 DataFrame으로 변환합니다. 네트워크, 인증, 호출 제한에 흔들리지 않고 JSON 구조 파악, 컬럼 선택, 날짜 변환, 집계, 저장이라는 핵심 pandas 흐름에 집중합니다.
   - type: code
     language: python
     title: API 응답 샘플 + DataFrame 변환
@@ -121,27 +428,79 @@ sections:
       issues = pd.DataFrame(issueRecords)
       issues.shape
   - type: tip
-    content: API 응답은 보통 딕셔너리의 리스트 형태로 들어옵니다. pd.DataFrame()에 이 리스트를 넣으면 각 딕셔너리의 키가 컬럼이 됩니다. 실제 API를 붙일 때도 이 구조를 먼저 이해해야 이후 정제와 분석 코드가 안정적입니다.
-
+    content: API 응답은 보통 딕셔너리의 리스트 형태로 들어옵니다. pd.DataFrame()에 이 리스트를 넣으면 각 딕셔너리의 키가 컬럼이 됩니다. 실제 API를 붙일 때도 이 구조를 먼저 이해해야 이후
+      정제와 분석 코드가 안정적입니다.
 - id: step2_preview
   title: 2단계. 데이터 확인
+  structuredPrimary: true
   subtitle: 컬럼 목록 확인
+  goal: '2단계. 데이터 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: API 응답 데이터는 컬럼이 매우 많습니다. GitHub Issues API의 경우 30개 이상의 컬럼이 반환됩니다. 모든 컬럼을 사용하면 복잡하고 분석에 불필요한 정보가 많으므로, 목적에 맞는
+    컬럼만 선택하는 것이 중요합니다. columns.tolist()로 전체 컬럼 목록을 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: issues.columns.tolist()[:10]
+  exercise:
+    prompt: '2단계. 데이터 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: issues.columns.tolist()[:10]
+    solution: issues.columns.tolist()[:10]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: API 응답 데이터는 컬럼이 매우 많습니다. GitHub Issues API의 경우 30개 이상의 컬럼이 반환됩니다. 모든 컬럼을 사용하면 복잡하고 분석에 불필요한 정보가 많으므로, 목적에 맞는 컬럼만 선택하는 것이 중요합니다. columns.tolist()로 전체 컬럼 목록을 확인합니다.
+    content: API 응답 데이터는 컬럼이 매우 많습니다. GitHub Issues API의 경우 30개 이상의 컬럼이 반환됩니다. 모든 컬럼을 사용하면 복잡하고 분석에 불필요한 정보가 많으므로, 목적에 맞는
+      컬럼만 선택하는 것이 중요합니다. columns.tolist()로 전체 컬럼 목록을 확인합니다.
   - type: code
     language: python
     title: 컬럼 확인
     description: 어떤 컬럼이 있는지 확인
-    content: |-
-      issues.columns.tolist()[:10]
-
+    content: issues.columns.tolist()[:10]
 - id: step3_select
   title: 3단계. 필요한 컬럼 선택
+  structuredPrimary: true
   subtitle: 분석할 데이터만 추출
+  goal: '3단계. 필요한 컬럼 선택: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 필요한 컬럼 선택: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 분석 목적에 맞는 컬럼만 선택합니다. number(이슈 번호), title(제목), state(상태), created_at(생성일), comments(댓글 수) 5가지를 선택합니다. copy()를
+    붙여서 원본과 분리된 새 DataFrame을 만듭니다. 이렇게 필요한 데이터만 추출하면 메모리를 절약하고 분석이 명확해집니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
+    clean.head()
+  exercise:
+    prompt: '3단계. 필요한 컬럼 선택: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
+      clean.head()
+    solution: |-
+      clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
+      clean.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 분석 목적에 맞는 컬럼만 선택합니다. number(이슈 번호), title(제목), state(상태), created_at(생성일), comments(댓글 수) 5가지를 선택합니다. copy()를 붙여서 원본과 분리된 새 DataFrame을 만듭니다. 이렇게 필요한 데이터만 추출하면 메모리를 절약하고 분석이 명확해집니다.
+    content: 분석 목적에 맞는 컬럼만 선택합니다. number(이슈 번호), title(제목), state(상태), created_at(생성일), comments(댓글 수) 5가지를 선택합니다. copy()를
+      붙여서 원본과 분리된 새 DataFrame을 만듭니다. 이렇게 필요한 데이터만 추출하면 메모리를 절약하고 분석이 명확해집니다.
   - type: code
     language: python
     title: 필요한 컬럼 선택
@@ -149,13 +508,45 @@ sections:
     content: |-
       clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
       clean.head()
-
 - id: step4_datetime
   title: 4단계. 날짜 타입 변환
+  structuredPrimary: true
   subtitle: pd.to_datetime()
+  goal: '4단계. 날짜 타입 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 날짜 타입 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: API에서 받은 날짜는 '2024-01-15T09:30:00Z' 같은 ISO 8601 형식의 문자열입니다. pd.to_datetime()으로 datetime 타입으로 변환해야 날짜 계산, 기간
+    필터링, 시계열 분석이 가능합니다. datetime 타입이어야 .dt 접근자로 연도, 월, 요일 등을 추출할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    dated = clean.copy()
+    dated['created_at'] = pd.to_datetime(dated['created_at'])
+    dated.dtypes
+  exercise:
+    prompt: '4단계. 날짜 타입 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dated = clean.copy()
+      dated['created_at'] = pd.to_datetime(dated['created_at'])
+      dated.dtypes
+    solution: |-
+      dated = clean.copy()
+      dated['created_at'] = pd.to_datetime(dated['created_at'])
+      dated.dtypes
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: API에서 받은 날짜는 '2024-01-15T09:30:00Z' 같은 ISO 8601 형식의 문자열입니다. pd.to_datetime()으로 datetime 타입으로 변환해야 날짜 계산, 기간 필터링, 시계열 분석이 가능합니다. datetime 타입이어야 .dt 접근자로 연도, 월, 요일 등을 추출할 수 있습니다.
+    content: API에서 받은 날짜는 '2024-01-15T09:30:00Z' 같은 ISO 8601 형식의 문자열입니다. pd.to_datetime()으로 datetime 타입으로 변환해야 날짜 계산, 기간 필터링,
+      시계열 분석이 가능합니다. datetime 타입이어야 .dt 접근자로 연도, 월, 요일 등을 추출할 수 있습니다.
   - type: code
     language: python
     title: 날짜 타입 변환
@@ -164,10 +555,41 @@ sections:
       dated = clean.copy()
       dated['created_at'] = pd.to_datetime(dated['created_at'])
       dated.dtypes
-
 - id: step5_new_column
   title: 5단계. 새 컬럼 추가
+  structuredPrimary: true
   subtitle: 제목 길이 계산
+  goal: '5단계. 새 컬럼 추가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 새 컬럼 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 5단계. 새 컬럼 추가의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - str.len()은 문자열 길이를 반환합니다. Series에 .str을 붙이면 각 행에 문자열 메서드를 적용할 수 있습니다. str.upper(), str.lower(), str.contains() 등 다양한 문자열
+    처리 메서드를 사용할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    final = dated.copy()
+    final['titleLength'] = final['title'].str.len()
+    final[['title', 'titleLength']].head()
+  exercise:
+    prompt: '5단계. 새 컬럼 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      final = dated.copy()
+      final['titleLength'] = final['title'].str.len()
+      final[['title', 'titleLength']].head()
+    solution: |-
+      final = dated.copy()
+      final['titleLength'] = final['title'].str.len()
+      final[['title', 'titleLength']].head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: str.len()으로 제목 길이를 계산합니다. 긴 제목이 더 복잡한 이슈일까요? 새로운 파생 변수를 만들어 분석의 폭을 넓힙니다.
@@ -180,11 +602,33 @@ sections:
       final['titleLength'] = final['title'].str.len()
       final[['title', 'titleLength']].head()
   - type: tip
-    content: str.len()은 문자열 길이를 반환합니다. Series에 .str을 붙이면 각 행에 문자열 메서드를 적용할 수 있습니다. str.upper(), str.lower(), str.contains() 등 다양한 문자열 처리 메서드를 사용할 수 있습니다.
-
+    content: str.len()은 문자열 길이를 반환합니다. Series에 .str을 붙이면 각 행에 문자열 메서드를 적용할 수 있습니다. str.upper(), str.lower(), str.contains()
+      등 다양한 문자열 처리 메서드를 사용할 수 있습니다.
 - id: step6_describe
   title: 6단계. 기본 통계
+  structuredPrimary: true
   subtitle: describe()로 분포 확인
+  goal: '6단계. 기본 통계: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 기본 통계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 댓글 수와 제목 길이의 분포를 확인합니다. describe()로 평균, 표준편차, 최소/최대값 등을 한눈에 파악합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: final[['comments', 'titleLength']].describe()
+  exercise:
+    prompt: '6단계. 기본 통계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final[['comments', 'titleLength']].describe()
+    solution: final[['comments', 'titleLength']].describe()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 댓글 수와 제목 길이의 분포를 확인합니다. describe()로 평균, 표준편차, 최소/최대값 등을 한눈에 파악합니다.
@@ -192,12 +636,32 @@ sections:
     language: python
     title: 기본 통계
     description: 댓글 수 통계
-    content: |-
-      final[['comments', 'titleLength']].describe()
-
+    content: final[['comments', 'titleLength']].describe()
 - id: step7_value_counts
   title: 7단계. 상태별 개수
+  structuredPrimary: true
   subtitle: open vs closed
+  goal: '7단계. 상태별 개수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 상태별 개수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 열린 이슈와 닫힌 이슈의 비율을 확인합니다. value_counts()로 범주형 데이터의 분포를 파악합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: final['state'].value_counts()
+  exercise:
+    prompt: '7단계. 상태별 개수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final['state'].value_counts()
+    solution: final['state'].value_counts()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 열린 이슈와 닫힌 이슈의 비율을 확인합니다. value_counts()로 범주형 데이터의 분포를 파악합니다.
@@ -205,12 +669,32 @@ sections:
     language: python
     title: 상태별 개수
     description: open vs closed
-    content: |-
-      final['state'].value_counts()
-
+    content: final['state'].value_counts()
 - id: step8_top_comments
   title: 8단계. 댓글 많은 이슈
+  structuredPrimary: true
   subtitle: nlargest 활용
+  goal: '8단계. 댓글 많은 이슈: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 댓글 많은 이슈: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 댓글이 가장 많은 이슈 5개를 확인합니다. nlargest로 TOP N을 빠르게 찾습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
+  exercise:
+    prompt: '8단계. 댓글 많은 이슈: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
+    solution: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 댓글이 가장 많은 이슈 5개를 확인합니다. nlargest로 TOP N을 빠르게 찾습니다.
@@ -218,12 +702,32 @@ sections:
     language: python
     title: 댓글 많은 이슈 TOP 5
     description: 가장 논의가 활발한 이슈
-    content: |-
-      final.nlargest(5, 'comments')[['number', 'title', 'comments']]
-
+    content: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
 - id: step9_corr
   title: 9단계. 상관관계 분석
+  structuredPrimary: true
   subtitle: 제목 길이 vs 댓글 수
+  goal: '9단계. 상관관계 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 상관관계 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 9단계. 상관관계 분석의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: final[['titleLength', 'comments']].corr()
+  exercise:
+    prompt: '9단계. 상관관계 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final[['titleLength', 'comments']].corr()
+    solution: final[['titleLength', 'comments']].corr()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 제목이 긴 이슈가 댓글이 많을까요? 상관관계로 두 변수의 관계를 확인합니다.
@@ -231,12 +735,32 @@ sections:
     language: python
     title: 상관관계
     description: 긴 제목 = 복잡한 이슈 = 댓글 많음?
-    content: |-
-      final[['titleLength', 'comments']].corr()
-
+    content: final[['titleLength', 'comments']].corr()
 - id: step10_groupby
   title: 10단계. 상태별 평균
+  structuredPrimary: true
   subtitle: groupby 활용
+  goal: '10단계. 상태별 평균: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 상태별 평균: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: open 이슈와 closed 이슈의 평균 댓글 수를 비교합니다. groupby로 그룹별 통계를 계산합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: final.groupby('state')['comments'].mean()
+  exercise:
+    prompt: '10단계. 상태별 평균: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final.groupby('state')['comments'].mean()
+    solution: final.groupby('state')['comments'].mean()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: open 이슈와 closed 이슈의 평균 댓글 수를 비교합니다. groupby로 그룹별 통계를 계산합니다.
@@ -244,16 +768,46 @@ sections:
     language: python
     title: 상태별 평균 댓글 수
     description: open 이슈가 댓글이 더 많을까?
-    content: |-
-      final.groupby('state')['comments'].mean()
-
+    content: final.groupby('state')['comments'].mean()
 - id: step11_json_normalize
   title: 11단계. 중첩 JSON 펼치기
+  structuredPrimary: true
   subtitle: json_normalize()
+  goal: '11단계. 중첩 JSON 펼치기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 중첩 JSON 펼치기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    API 응답에는 중첩된 구조가 많습니다. {'user': {'login': 'name'}} 같은 형태를 user.login처럼 펼쳐서 접근하기 쉽게 만듭니다. json_normalize()가 자동으로 평탄화합니다.
+
+    pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을 DataFrame으로 변환할 때 유용합니다.
+  tips:
+  - pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을 DataFrame으로
+    변환할 때 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    flat = pd.json_normalize(issueRecords, max_level=1)
+    flat[['number', 'user.login']].head()
+  exercise:
+    prompt: '11단계. 중첩 JSON 펼치기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      flat = pd.json_normalize(issueRecords, max_level=1)
+      flat[['number', 'user.login']].head()
+    solution: |-
+      flat = pd.json_normalize(issueRecords, max_level=1)
+      flat[['number', 'user.login']].head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      API 응답에는 중첩된 구조가 많습니다. {'user': {'login': 'name'}} 같은 형태를 user.login처럼 펼쳐서 접근하기 쉽게 만듭니다. json_normalize()가 자동으로 평탄화합니다.
+    content: 'API 응답에는 중첩된 구조가 많습니다. {''user'': {''login'': ''name''}} 같은 형태를 user.login처럼 펼쳐서 접근하기 쉽게 만듭니다. json_normalize()가
+      자동으로 평탄화합니다.'
   - type: code
     language: python
     title: 중첩 데이터 펼치기
@@ -262,26 +816,89 @@ sections:
       flat = pd.json_normalize(issueRecords, max_level=1)
       flat[['number', 'user.login']].head()
   - type: tip
-    content: pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을 DataFrame으로 변환할 때 유용합니다.
-
+    content: pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을
+      DataFrame으로 변환할 때 유용합니다.
 - id: step12_save
   title: 12단계. CSV 저장
+  structuredPrimary: true
   subtitle: to_csv()
+  goal: '12단계. CSV 저장: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. CSV 저장: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    분석 결과를 파일로 저장합니다. encoding='utf-8-sig'는 엑셀에서 한글이 깨지지 않게 하는 BOM(Byte Order Mark)을 추가합니다. index=False로 불필요한 인덱스 컬럼을 제외합니다.
+
+    to_csv()는 DataFrame을 CSV 파일로 저장합니다. index=False로 인덱스를 제외하고, encoding='utf-8-sig'는 한글이 깨지지 않도록 BOM을 추가합니다. sep 파라미터로 구분자를 변경할 수 있습니다(기본값은 쉼표).
+  tips:
+  - to_csv()는 DataFrame을 CSV 파일로 저장합니다. index=False로 인덱스를 제외하고, encoding='utf-8-sig'는 한글이 깨지지 않도록 BOM을 추가합니다. sep 파라미터로 구분자를
+    변경할 수 있습니다(기본값은 쉼표).
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
+  exercise:
+    prompt: '12단계. CSV 저장: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
+    solution: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 분석 결과를 파일로 저장합니다. encoding='utf-8-sig'는 엑셀에서 한글이 깨지지 않게 하는 BOM(Byte Order Mark)을 추가합니다. index=False로 불필요한 인덱스 컬럼을 제외합니다.
+    content: 분석 결과를 파일로 저장합니다. encoding='utf-8-sig'는 엑셀에서 한글이 깨지지 않게 하는 BOM(Byte Order Mark)을 추가합니다. index=False로 불필요한 인덱스
+      컬럼을 제외합니다.
   - type: code
     language: python
     title: CSV로 저장
     description: index=False로 인덱스 제외
-    content: |-
-      final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
+    content: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
   - type: tip
-    content: to_csv()는 DataFrame을 CSV 파일로 저장합니다. index=False로 인덱스를 제외하고, encoding='utf-8-sig'는 한글이 깨지지 않도록 BOM을 추가합니다. sep 파라미터로 구분자를 변경할 수 있습니다(기본값은 쉼표).
-
+    content: to_csv()는 DataFrame을 CSV 파일로 저장합니다. index=False로 인덱스를 제외하고, encoding='utf-8-sig'는 한글이 깨지지 않도록 BOM을 추가합니다. sep
+      파라미터로 구분자를 변경할 수 있습니다(기본값은 쉼표).
 - id: step13_function
   title: 13단계. 재사용 함수 만들기
+  structuredPrimary: true
   subtitle: 파이프라인 자동화
+  goal: '13단계. 재사용 함수 만들기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '13단계. 재사용 함수 만들기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 한 과정을 함수로 정리하면 같은 응답 구조를 쓰는 다른 리포지토리 샘플에도 쉽게 적용할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def fetchGithubIssues(repo, perPage=10):
+        records = sampleGithubIssues(repo)[:perPage]
+        return pd.DataFrame(records)
+
+    fetchGithubIssues('numpy/numpy', 5)
+  exercise:
+    prompt: '13단계. 재사용 함수 만들기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def fetchGithubIssues(repo, perPage=10):
+          records = sampleGithubIssues(repo)[:perPage]
+          return pd.DataFrame(records)
+
+      fetchGithubIssues('numpy/numpy', 5)
+    solution: |-
+      def fetchGithubIssues(repo, perPage=10):
+          records = sampleGithubIssues(repo)[:perPage]
+          return pd.DataFrame(records)
+
+      fetchGithubIssues('numpy/numpy', 5)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 한 과정을 함수로 정리하면 같은 응답 구조를 쓰는 다른 리포지토리 샘플에도 쉽게 적용할 수 있습니다.
@@ -295,17 +912,99 @@ sections:
           return pd.DataFrame(records)
 
       fetchGithubIssues('numpy/numpy', 5)
-
 - id: workflow_validation
-  title: "현업 흐름 검증: 이슈 응답을 운영 리포트로 변환"
-  subtitle: "JSON 정규화, 날짜 변환, groupby, 실패 케이스"
+  title: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환'
+  structuredPrimary: true
+  subtitle: JSON 정규화, 날짜 변환, groupby, 실패 케이스
+  goal: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    실전 프로젝트는 API 호출 자체보다 응답 구조를 안정적으로 표로 바꾸고 검증하는 과정이 중요합니다. 샘플 JSON을 DataFrame으로 변환하고, 상태별 집계와 날짜 파생 컬럼을 확인하세요.
+
+    변주 실험
+    labels를 explode해서 라벨별 이슈 수 리포트를 만들고, 라벨이 없는 이슈를 어떤 그룹으로 처리할지 정책을 정하세요.
+  tips:
+  - 변주 실험 labels를 explode해서 라벨별 이슈 수 리포트를 만들고, 라벨이 없는 이슈를 어떤 그룹으로 처리할지 정책을 정하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import pandas as pd
+
+    records = [
+        {"number": 1, "state": "open", "created_at": "2026-05-01", "labels": ["bug"]},
+        {"number": 2, "state": "closed", "created_at": "2026-05-03", "labels": ["docs", "good first issue"]},
+        {"number": 3, "state": "open", "created_at": "2026-05-04", "labels": []},
+    ]
+
+    issues = pd.DataFrame(records)
+    issues["created_at"] = pd.to_datetime(issues["created_at"])
+    issues["labelCount"] = issues["labels"].apply(len)
+    stateReport = issues.groupby("state", as_index=False).agg(
+        issueCount=("number", "size"),
+        avgLabels=("labelCount", "mean"),
+    )
+
+    assert issues["created_at"].dt.month.tolist() == [5, 5, 5]
+    assert stateReport.set_index("state").loc["open", "issueCount"] == 2
+    assert stateReport["issueCount"].sum() == len(issues)
+  exercise:
+    prompt: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      records = [
+          {"number": 1, "state": "open", "created_at": "2026-05-01", "labels": ["bug"]},
+          {"number": 2, "state": "closed", "created_at": "2026-05-03", "labels": ["docs", "good first issue"]},
+          {"number": 3, "state": "open", "created_at": "2026-05-04", "labels": []},
+      ]
+
+      issues = pd.DataFrame(records)
+      issues["created_at"] = pd.to_datetime(issues["created_at"])
+      issues["labelCount"] = issues["labels"].apply(len)
+      stateReport = issues.groupby("state", as_index=False).agg(
+          issueCount=("number", "size"),
+          avgLabels=("labelCount", "mean"),
+      )
+
+      assert issues["created_at"].dt.month.tolist() == [5, 5, 5]
+      assert stateReport.set_index("state").loc["open", "issueCount"] == 2
+      assert stateReport["issueCount"].sum() == len(issues)
+    solution: |-
+      import pandas as pd
+
+      records = [
+          {"number": 1, "state": "open", "created_at": "2026-05-01", "labels": ["bug"]},
+          {"number": 2, "state": "closed", "created_at": "2026-05-03", "labels": ["docs", "good first issue"]},
+          {"number": 3, "state": "open", "created_at": "2026-05-04", "labels": []},
+      ]
+
+      issues = pd.DataFrame(records)
+      issues["created_at"] = pd.to_datetime(issues["created_at"])
+      issues["labelCount"] = issues["labels"].apply(len)
+      stateReport = issues.groupby("state", as_index=False).agg(
+          issueCount=("number", "size"),
+          avgLabels=("labelCount", "mean"),
+      )
+
+      assert issues["created_at"].dt.month.tolist() == [5, 5, 5]
+      assert stateReport.set_index("state").loc["open", "issueCount"] == 2
+      assert stateReport["issueCount"].sum() == len(issues)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실전 프로젝트는 API 호출 자체보다 응답 구조를 안정적으로 표로 바꾸고 검증하는 과정이 중요합니다. 샘플 JSON을 DataFrame으로 변환하고, 상태별 집계와 날짜 파생 컬럼을 확인하세요."
+    content: 실전 프로젝트는 API 호출 자체보다 응답 구조를 안정적으로 표로 바꾸고 검증하는 과정이 중요합니다. 샘플 JSON을 DataFrame으로 변환하고, 상태별 집계와 날짜 파생 컬럼을 확인하세요.
   - type: code
     language: python
-    title: "이슈 샘플 리포트 만들기"
-    description: "JSON 레코드를 표로 바꾸고 상태별 집계를 검증합니다."
+    title: 이슈 샘플 리포트 만들기
+    description: JSON 레코드를 표로 바꾸고 상태별 집계를 검증합니다.
     content: |-
       import pandas as pd
 
@@ -328,8 +1027,8 @@ sections:
       assert stateReport["issueCount"].sum() == len(issues)
   - type: code
     language: python
-    title: "응답 스키마 오류 확인"
-    description: "필수 키가 없는 API 응답은 변환 전에 멈춥니다."
+    title: 응답 스키마 오류 확인
+    description: 필수 키가 없는 API 응답은 변환 전에 멈춥니다.
     content: |-
       def validateIssueRecords(records):
           required = {"number", "state", "created_at", "labels"}
@@ -346,21 +1045,316 @@ sections:
 
       assert "created_at" in message
   - type: tip
-    title: "변주 실험"
-    content: "labels를 explode해서 라벨별 이슈 수 리포트를 만들고, 라벨이 없는 이슈를 어떤 그룹으로 처리할지 정책을 정하세요."
+    title: 변주 실험
+    content: labels를 explode해서 라벨별 이슈 수 리포트를 만들고, 라벨이 없는 이슈를 어떤 그룹으로 처리할지 정책을 정하세요.
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 실전 분석 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다른 리포지토리로 분석해보세요.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import pandas as pd
+
+    def sampleGithubIssues(repo="pandas-dev/pandas"):
+        project = repo.split("/")[-1]
+        return [
+            {
+                "number": 101,
+                "title": f"[{project}] Improve groupby documentation for beginners",
+                "state": "open",
+                "created_at": "2026-01-15T09:30:00Z",
+                "comments": 4,
+                "user": {"login": "dataTeacher"},
+            },
+            {
+                "number": 102,
+                "title": f"[{project}] Fix read_csv encoding edge case",
+                "state": "closed",
+                "created_at": "2026-01-10T12:00:00Z",
+                "comments": 8,
+                "user": {"login": "csvMaintainer"},
+            },
+            {
+                "number": 103,
+                "title": f"[{project}] Add examples for datetime parsing",
+                "state": "open",
+                "created_at": "2026-01-08T15:45:00Z",
+                "comments": 2,
+                "user": {"login": "timeSeriesFan"},
+            },
+            {
+                "number": 104,
+                "title": f"[{project}] Clarify nullable integer behavior",
+                "state": "closed",
+                "created_at": "2026-01-06T08:10:00Z",
+                "comments": 12,
+                "user": {"login": "dtypeReviewer"},
+            },
+            {
+                "number": 105,
+                "title": f"[{project}] Add cookbook section for joins",
+                "state": "open",
+                "created_at": "2026-01-04T14:20:00Z",
+                "comments": 6,
+                "user": {"login": "mergeHelper"},
+            },
+            {
+                "number": 106,
+                "title": f"[{project}] Improve error message for missing columns",
+                "state": "closed",
+                "created_at": "2025-12-30T11:05:00Z",
+                "comments": 3,
+                "user": {"login": "bugReporter"},
+            },
+            {
+                "number": 107,
+                "title": f"[{project}] Benchmark rolling window examples",
+                "state": "open",
+                "created_at": "2025-12-28T16:40:00Z",
+                "comments": 10,
+                "user": {"login": "perfAnalyst"},
+            },
+            {
+                "number": 108,
+                "title": f"[{project}] Update plotting guide screenshots",
+                "state": "closed",
+                "created_at": "2025-12-24T09:00:00Z",
+                "comments": 1,
+                "user": {"login": "docsCurator"},
+            },
+            {
+                "number": 109,
+                "title": f"[{project}] Investigate memory spike in concat",
+                "state": "open",
+                "created_at": "2025-12-20T18:25:00Z",
+                "comments": 15,
+                "user": {"login": "memoryWatch"},
+            },
+            {
+                "number": 110,
+                "title": f"[{project}] Add beginner exercise for value_counts",
+                "state": "closed",
+                "created_at": "2025-12-18T07:35:00Z",
+                "comments": 5,
+                "user": {"login": "courseBuilder"},
+            },
+        ]
+
+    def fetchIssues(repo, perPage=10):
+        records = sampleGithubIssues(repo)[:perPage]
+        return pd.DataFrame(records)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      def sampleGithubIssues(repo="pandas-dev/pandas"):
+          project = repo.split("/")[-1]
+          return [
+              {
+                  "number": 101,
+                  "title": f"[{project}] Improve groupby documentation for beginners",
+                  "state": "open",
+                  "created_at": "2026-01-15T09:30:00Z",
+                  "comments": 4,
+                  "user": {"login": "dataTeacher"},
+              },
+              {
+                  "number": 102,
+                  "title": f"[{project}] Fix read_csv encoding edge case",
+                  "state": "closed",
+                  "created_at": "2026-01-10T12:00:00Z",
+                  "comments": 8,
+                  "user": {"login": "csvMaintainer"},
+              },
+              {
+                  "number": 103,
+                  "title": f"[{project}] Add examples for datetime parsing",
+                  "state": "open",
+                  "created_at": "2026-01-08T15:45:00Z",
+                  "comments": 2,
+                  "user": {"login": "timeSeriesFan"},
+              },
+              {
+                  "number": 104,
+                  "title": f"[{project}] Clarify nullable integer behavior",
+                  "state": "closed",
+                  "created_at": "2026-01-06T08:10:00Z",
+                  "comments": 12,
+                  "user": {"login": "dtypeReviewer"},
+              },
+              {
+                  "number": 105,
+                  "title": f"[{project}] Add cookbook section for joins",
+                  "state": "open",
+                  "created_at": "2026-01-04T14:20:00Z",
+                  "comments": 6,
+                  "user": {"login": "mergeHelper"},
+              },
+              {
+                  "number": 106,
+                  "title": f"[{project}] Improve error message for missing columns",
+                  "state": "closed",
+                  "created_at": "2025-12-30T11:05:00Z",
+                  "comments": 3,
+                  "user": {"login": "bugReporter"},
+              },
+              {
+                  "number": 107,
+                  "title": f"[{project}] Benchmark rolling window examples",
+                  "state": "open",
+                  "created_at": "2025-12-28T16:40:00Z",
+                  "comments": 10,
+                  "user": {"login": "perfAnalyst"},
+              },
+              {
+                  "number": 108,
+                  "title": f"[{project}] Update plotting guide screenshots",
+                  "state": "closed",
+                  "created_at": "2025-12-24T09:00:00Z",
+                  "comments": 1,
+                  "user": {"login": "docsCurator"},
+              },
+              {
+                  "number": 109,
+                  "title": f"[{project}] Investigate memory spike in concat",
+                  "state": "open",
+                  "created_at": "2025-12-20T18:25:00Z",
+                  "comments": 15,
+                  "user": {"login": "memoryWatch"},
+              },
+              {
+                  "number": 110,
+                  "title": f"[{project}] Add beginner exercise for value_counts",
+                  "state": "closed",
+                  "created_at": "2025-12-18T07:35:00Z",
+                  "comments": 5,
+                  "user": {"login": "courseBuilder"},
+              },
+          ]
+
+      def fetchIssues(repo, perPage=10):
+          records = sampleGithubIssues(repo)[:perPage]
+          return pd.DataFrame(records)
+    solution: |-
+      import pandas as pd
+
+      def sampleGithubIssues(repo="pandas-dev/pandas"):
+          project = repo.split("/")[-1]
+          return [
+              {
+                  "number": 101,
+                  "title": f"[{project}] Improve groupby documentation for beginners",
+                  "state": "open",
+                  "created_at": "2026-01-15T09:30:00Z",
+                  "comments": 4,
+                  "user": {"login": "dataTeacher"},
+              },
+              {
+                  "number": 102,
+                  "title": f"[{project}] Fix read_csv encoding edge case",
+                  "state": "closed",
+                  "created_at": "2026-01-10T12:00:00Z",
+                  "comments": 8,
+                  "user": {"login": "csvMaintainer"},
+              },
+              {
+                  "number": 103,
+                  "title": f"[{project}] Add examples for datetime parsing",
+                  "state": "open",
+                  "created_at": "2026-01-08T15:45:00Z",
+                  "comments": 2,
+                  "user": {"login": "timeSeriesFan"},
+              },
+              {
+                  "number": 104,
+                  "title": f"[{project}] Clarify nullable integer behavior",
+                  "state": "closed",
+                  "created_at": "2026-01-06T08:10:00Z",
+                  "comments": 12,
+                  "user": {"login": "dtypeReviewer"},
+              },
+              {
+                  "number": 105,
+                  "title": f"[{project}] Add cookbook section for joins",
+                  "state": "open",
+                  "created_at": "2026-01-04T14:20:00Z",
+                  "comments": 6,
+                  "user": {"login": "mergeHelper"},
+              },
+              {
+                  "number": 106,
+                  "title": f"[{project}] Improve error message for missing columns",
+                  "state": "closed",
+                  "created_at": "2025-12-30T11:05:00Z",
+                  "comments": 3,
+                  "user": {"login": "bugReporter"},
+              },
+              {
+                  "number": 107,
+                  "title": f"[{project}] Benchmark rolling window examples",
+                  "state": "open",
+                  "created_at": "2025-12-28T16:40:00Z",
+                  "comments": 10,
+                  "user": {"login": "perfAnalyst"},
+              },
+              {
+                  "number": 108,
+                  "title": f"[{project}] Update plotting guide screenshots",
+                  "state": "closed",
+                  "created_at": "2025-12-24T09:00:00Z",
+                  "comments": 1,
+                  "user": {"login": "docsCurator"},
+              },
+              {
+                  "number": 109,
+                  "title": f"[{project}] Investigate memory spike in concat",
+                  "state": "open",
+                  "created_at": "2025-12-20T18:25:00Z",
+                  "comments": 15,
+                  "user": {"login": "memoryWatch"},
+              },
+              {
+                  "number": 110,
+                  "title": f"[{project}] Add beginner exercise for value_counts",
+                  "state": "closed",
+                  "created_at": "2025-12-18T07:35:00Z",
+                  "comments": 5,
+                  "user": {"login": "courseBuilder"},
+              },
+          ]
+
+      def fetchIssues(repo, perPage=10):
+          records = sampleGithubIssues(repo)[:perPage]
+          return pd.DataFrame(records)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 다른 리포지토리로 분석해보세요.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 다른 리포지토리 분석 + 통계"
+    title: '미션1: 다른 리포지토리 분석 + 통계'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import pandas as pd
 
@@ -453,17 +1447,17 @@ sections:
             records = sampleGithubIssues(repo)[:perPage]
             return pd.DataFrame(records)
     - type: code
-      title: "분석 수행"
+      title: 분석 수행
       content: |-
         data = fetchIssues('scikit-learn/scikit-learn', 20)
         preview = data[['number', 'title', 'state', 'comments']].head(10)
         noCommentRatio = (data['comments'] == 0).mean() * 100
         (preview, noCommentRatio)
   - type: expansion
-    title: "미션2: 날짜 분석 + 작성자 집계"
+    title: '미션2: 날짜 분석 + 작성자 집계'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import pandas as pd
 
@@ -557,12 +1551,11 @@ sections:
         df['created_at'] = pd.to_datetime(df['created_at'])
         flatDf = pd.json_normalize(records, max_level=1)
     - type: code
-      title: "분석 수행"
+      title: 분석 수행
       content: |-
         recentIssues = df.sort_values('created_at', ascending=False).head(5)
         authorCounts = flatDf['user.login'].value_counts().head(10)
         (recentIssues, authorCounts)
-
 - id: summary
   title: 정리
   subtitle: 전체 커리큘럼 완료!
@@ -571,13 +1564,14 @@ sections:
     content: API 응답형 JSON 데이터 파이프라인을 경험했습니다! 구조 파악부터 저장까지 전체 흐름을 익혔습니다.
   - type: list
     items:
-    - "API 응답 구조 - 리스트/딕셔너리 JSON 형태"
-    - "sampleGithubIssues() - 응답 샘플을 재사용 가능한 함수로 준비"
-    - "pd.DataFrame(json) - JSON을 DataFrame으로"
-    - "pd.to_datetime() - 문자열을 datetime으로"
-    - "df['컬럼'].str.len() - 문자열 길이"
-    - "pd.json_normalize() - 중첩 JSON 평탄화"
-    - "df.to_csv() - CSV 파일로 저장"
-    - "def 함수(): - 재사용 가능한 함수 정의"
+    - API 응답 구조 - 리스트/딕셔너리 JSON 형태
+    - sampleGithubIssues() - 응답 샘플을 재사용 가능한 함수로 준비
+    - pd.DataFrame(json) - JSON을 DataFrame으로
+    - pd.to_datetime() - 문자열을 datetime으로
+    - df['컬럼'].str.len() - 문자열 길이
+    - pd.json_normalize() - 중첩 JSON 평탄화
+    - df.to_csv() - CSV 파일로 저장
+    - 'def 함수(): - 재사용 가능한 함수 정의'
   - type: text
-    content: pandas 전체 과정 완료! 입문(01-02) → 기초(03-05) → 중급(06-08) → 심화(09-10)를 모두 마스터했습니다. 이제 실제 데이터를 다룰 준비가 되었습니다. 공공데이터포털, Kaggle 등에서 데이터를 찾아 분석해보세요!
+    content: pandas 전체 과정 완료! 입문(01-02) → 기초(03-05) → 중급(06-08) → 심화(09-10)를 모두 마스터했습니다. 이제 실제 데이터를 다룰 준비가 되었습니다. 공공데이터포털,
+      Kaggle 등에서 데이터를 찾아 분석해보세요!

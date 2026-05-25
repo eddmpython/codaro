@@ -22,6 +22,8 @@ _ROLE_PROMPTS: dict[str, str] = {
         "If the user gave enough context, proceed. If context is missing, stop at the clarification gate first; only a continuation after that gate may proceed with clarification assumptions recorded in the workloop.\n"
         "When drafting curriculum YAML for a new lesson, use the structured Codaro learning contract, not legacy sections[].blocks: "
         "meta(title,audience,difficulty,packages), intro(direction,benefits,diagram.steps,diagram.runtime), and sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check). "
+        "Keep product base dependencies minimal; never solve a learning topic by adding study libraries to pyproject. "
+        "Declare only lesson-local third-party packages in meta.packages and expose the uv preparation flow in intro.diagram.runtime or the first setup section. "
         "Place the lesson flow diagram under intro.diagram.steps and intro.diagram.runtime. "
         "Every section must be one learning card: goal/why/explanation/tips set the card context, snippet is read-only example code, "
         "exercise.prompt/starterCode/solution/hints/check creates the learner input cell, and check defines validation feedback. "

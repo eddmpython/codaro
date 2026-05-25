@@ -3,36 +3,248 @@ meta:
   title: LLM전처리파이프라인
   order: 10
   category: regex
-  difficulty: "⭐⭐⭐⭐"
+  difficulty: ⭐⭐⭐⭐
   badge: 심화
-  tags: ["LLM", "전처리", "파이프라인", "토큰 최적화", "실전 프로젝트"]
+  tags:
+  - LLM
+  - 전처리
+  - 파이프라인
+  - 토큰 최적화
+  - 실전 프로젝트
   seo:
-    title: "정규표현식 실전 - LLM 전처리 완전 자동화"
-    description: "정규표현식으로 웹 데이터를 LLM 입력으로 최적화합니다. HTML 제거, 정제, 토큰 절약을 한 번에 처리합니다."
-    keywords: ["정규표현식", "regex", "LLM 전처리", "토큰 최적화", "파이프라인"]
-
+    title: 정규표현식 실전 - LLM 전처리 완전 자동화
+    description: 정규표현식으로 웹 데이터를 LLM 입력으로 최적화합니다. HTML 제거, 정제, 토큰 절약을 한 번에 처리합니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - LLM 전처리
+    - 토큰 최적화
+    - 파이프라인
 intro:
-  emoji: "🚀"
+  emoji: 🚀
   goal: 웹 크롤링 데이터를 LLM API 입력으로 최적화하는 완전 자동화 파이프라인을 구축합니다.
   description: 지금까지 배운 모든 개념을 종합합니다. HTML 제거, 개인정보 마스킹, 텍스트 정제, 토큰 최적화를 한 번에 처리하여 API 비용을 30% 이상 절감합니다.
-
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import re
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import re
+    solution: import re
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: code
     language: python
     title: 라이브러리 불러오기
     description: 정규표현식 모듈
-    content: |-
-      import re
+    content: import re
 - id: step2_load_data
   title: 2단계. 실제 웹 데이터 로드
+  structuredPrimary: true
   subtitle: 로컬 게시글 + HTML
+  goal: '2단계. 실제 웹 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 실제 웹 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 로컬 게시글 입력을 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다.
+    또한 개인정보가 포함될 수 있으므로 마스킹까지 포함한 종합 파이프라인을 끝까지 실습합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    postsData = [
+        {
+            "userId": 1,
+            "id": 1,
+            "title": "Support article about account recovery",
+            "body": "Reset flow failed for user hana@blog.com, phone 010-1234-5678.",
+        },
+        {
+            "userId": 2,
+            "id": 2,
+            "title": "Release note draft",
+            "body": "Remove tracking scripts, compress whitespace, and mask private fields.",
+        },
+        {
+            "userId": 3,
+            "id": 3,
+            "title": "Crawler quality report",
+            "body": "Navigation links, style blocks, and duplicate banners polluted the page.",
+        },
+        {
+            "userId": 4,
+            "id": 4,
+            "title": "Knowledge base cleanup",
+            "body": "The source article contains emails, phone numbers, and noisy markup.",
+        },
+        {
+            "userId": 5,
+            "id": 5,
+            "title": "Prompt input budget review",
+            "body": "Shorter cleaned text reduces token cost while preserving the answer context.",
+        },
+    ]
+
+    rawWebData = f"""
+    <html>
+    <head><title>블로그 게시글</title></head>
+    <body>
+        <div class="post">
+            <h1>{postsData[0]['title']}</h1>
+            <p class="author">작성자 ID: {postsData[0]['userId']}</p>
+            <p class="content">{postsData[0]['body']}</p>
+            <div class="contact">
+                <span>문의: admin@blog.com</span>
+                <span>전화: 010-1234-5678</span>
+                <span>주민번호: 901225-1234567</span>
+            </div>
+        </div>
+        <script>console.log('tracking');</script>
+        <style>.post {{ color: red; }}</style>
+    </body>
+    </html>
+    """
+    len(rawWebData)
+  exercise:
+    prompt: '2단계. 실제 웹 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      postsData = [
+          {
+              "userId": 1,
+              "id": 1,
+              "title": "Support article about account recovery",
+              "body": "Reset flow failed for user hana@blog.com, phone 010-1234-5678.",
+          },
+          {
+              "userId": 2,
+              "id": 2,
+              "title": "Release note draft",
+              "body": "Remove tracking scripts, compress whitespace, and mask private fields.",
+          },
+          {
+              "userId": 3,
+              "id": 3,
+              "title": "Crawler quality report",
+              "body": "Navigation links, style blocks, and duplicate banners polluted the page.",
+          },
+          {
+              "userId": 4,
+              "id": 4,
+              "title": "Knowledge base cleanup",
+              "body": "The source article contains emails, phone numbers, and noisy markup.",
+          },
+          {
+              "userId": 5,
+              "id": 5,
+              "title": "Prompt input budget review",
+              "body": "Shorter cleaned text reduces token cost while preserving the answer context.",
+          },
+      ]
+
+      rawWebData = f"""
+      <html>
+      <head><title>블로그 게시글</title></head>
+      <body>
+          <div class="post">
+              <h1>{postsData[0]['title']}</h1>
+              <p class="author">작성자 ID: {postsData[0]['userId']}</p>
+              <p class="content">{postsData[0]['body']}</p>
+              <div class="contact">
+                  <span>문의: admin@blog.com</span>
+                  <span>전화: 010-1234-5678</span>
+                  <span>주민번호: 901225-1234567</span>
+              </div>
+          </div>
+          <script>console.log('tracking');</script>
+          <style>.post {{ color: red; }}</style>
+      </body>
+      </html>
+      """
+      len(rawWebData)
+    solution: |-
+      postsData = [
+          {
+              "userId": 1,
+              "id": 1,
+              "title": "Support article about account recovery",
+              "body": "Reset flow failed for user hana@blog.com, phone 010-1234-5678.",
+          },
+          {
+              "userId": 2,
+              "id": 2,
+              "title": "Release note draft",
+              "body": "Remove tracking scripts, compress whitespace, and mask private fields.",
+          },
+          {
+              "userId": 3,
+              "id": 3,
+              "title": "Crawler quality report",
+              "body": "Navigation links, style blocks, and duplicate banners polluted the page.",
+          },
+          {
+              "userId": 4,
+              "id": 4,
+              "title": "Knowledge base cleanup",
+              "body": "The source article contains emails, phone numbers, and noisy markup.",
+          },
+          {
+              "userId": 5,
+              "id": 5,
+              "title": "Prompt input budget review",
+              "body": "Shorter cleaned text reduces token cost while preserving the answer context.",
+          },
+      ]
+
+      rawWebData = f"""
+      <html>
+      <head><title>블로그 게시글</title></head>
+      <body>
+          <div class="post">
+              <h1>{postsData[0]['title']}</h1>
+              <p class="author">작성자 ID: {postsData[0]['userId']}</p>
+              <p class="content">{postsData[0]['body']}</p>
+              <div class="contact">
+                  <span>문의: admin@blog.com</span>
+                  <span>전화: 010-1234-5678</span>
+                  <span>주민번호: 901225-1234567</span>
+              </div>
+          </div>
+          <script>console.log('tracking');</script>
+          <style>.post {{ color: red; }}</style>
+      </body>
+      </html>
+      """
+      len(rawWebData)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 로컬 게시글 입력을 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다. 또한 개인정보가 포함될 수 있으므로 마스킹까지 포함한 종합 파이프라인을 끝까지 실습합니다.
+    content: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 로컬 게시글 입력을 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다. 또한
+      개인정보가 포함될 수 있으므로 마스킹까지 포함한 종합 파이프라인을 끝까지 실습합니다.
   - type: code
     language: python
     title: 웹 데이터 로드
@@ -93,10 +305,60 @@ sections:
       len(rawWebData)
 - id: step3_step1_html
   title: 3단계. HTML 태그 제거
+  structuredPrimary: true
   subtitle: 순수 텍스트 추출
+  goal: '3단계. HTML 태그 제거: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. HTML 태그 제거: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    첫 번째 단계로 script, style 태그와 모든 HTML 태그를 제거합니다. script와 style 태그는 본문 내용이 아니므로 먼저 제거하고, 그 다음 나머지 태그들을 정리합니다. 비탐욕적 매칭과 re.DOTALL 플래그를 함께 사용해 멀티라인 태그도 처리합니다.
+
+    **토큰 절약: 1단계** - 원본: ~400자 → 정제 후: ~200자 - **50% 절약!**
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def removeHtml(text):
+        text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+        return text
+
+    step1 = removeHtml(rawWebData)
+    step1[:200]
+  exercise:
+    prompt: '3단계. HTML 태그 제거: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def removeHtml(text):
+          text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+          return text
+
+      step1 = removeHtml(rawWebData)
+      step1[:200]
+    solution: |-
+      def removeHtml(text):
+          text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+          return text
+
+      step1 = removeHtml(rawWebData)
+      step1[:200]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "첫 번째 단계로 script, style 태그와 모든 HTML 태그를 제거합니다. script와 style 태그는 본문 내용이 아니므로 먼저 제거하고, 그 다음 나머지 태그들을 정리합니다. 비탐욕적 매칭과 re.DOTALL 플래그를 함께 사용해 멀티라인 태그도 처리합니다."
+    content: 첫 번째 단계로 script, style 태그와 모든 HTML 태그를 제거합니다. script와 style 태그는 본문 내용이 아니므로 먼저 제거하고, 그 다음 나머지 태그들을 정리합니다. 비탐욕적
+      매칭과 re.DOTALL 플래그를 함께 사용해 멀티라인 태그도 처리합니다.
   - type: code
     language: python
     title: HTML 정제
@@ -115,13 +377,62 @@ sections:
       **토큰 절약: 1단계**
       - 원본: ~400자 → 정제 후: ~200자
       - **50% 절약!**
-
 - id: step4_step2_personal
   title: 4단계. 개인정보 마스킹
+  structuredPrimary: true
   subtitle: 보안 처리
+  goal: '4단계. 개인정보 마스킹: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 개인정보 마스킹: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    두 번째 단계로 개인정보를 자동으로 마스킹합니다. LLM에 개인정보를 그대로 전송하면 개인정보보호법 위반이 될 수 있습니다. 주민번호, 전화번호, 이메일 등을 자동으로 탐지하고 마스킹하는 함수를 만들어 파이프라인에 포함시킵니다.
+
+    개인정보가 안전하게 마스킹되었습니다. 주민번호 뒷자리, 전화번호 중간자리, 이메일 아이디 일부가 별표로 대체되어 개인을 식별할 수 없지만 데이터의 맥락은 유지됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def maskPersonalInfo(text):
+        text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
+        text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+        text = re.sub(r"([\w.]{1,2})[\w.]*@([\w.]+)", r"\1***@\2", text)
+        return text
+
+    step2 = maskPersonalInfo(step1)
+    step2[:300]
+  exercise:
+    prompt: '4단계. 개인정보 마스킹: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def maskPersonalInfo(text):
+          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
+          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+          text = re.sub(r"([\w.]{1,2})[\w.]*@([\w.]+)", r"\1***@\2", text)
+          return text
+
+      step2 = maskPersonalInfo(step1)
+      step2[:300]
+    solution: |-
+      def maskPersonalInfo(text):
+          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
+          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+          text = re.sub(r"([\w.]{1,2})[\w.]*@([\w.]+)", r"\1***@\2", text)
+          return text
+
+      step2 = maskPersonalInfo(step1)
+      step2[:300]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "두 번째 단계로 개인정보를 자동으로 마스킹합니다. LLM에 개인정보를 그대로 전송하면 개인정보보호법 위반이 될 수 있습니다. 주민번호, 전화번호, 이메일 등을 자동으로 탐지하고 마스킹하는 함수를 만들어 파이프라인에 포함시킵니다."
+    content: 두 번째 단계로 개인정보를 자동으로 마스킹합니다. LLM에 개인정보를 그대로 전송하면 개인정보보호법 위반이 될 수 있습니다. 주민번호, 전화번호, 이메일 등을 자동으로 탐지하고 마스킹하는 함수를
+      만들어 파이프라인에 포함시킵니다.
   - type: code
     language: python
     title: 개인정보 마스킹
@@ -137,13 +448,61 @@ sections:
       step2[:300]
   - type: text
     content: 개인정보가 안전하게 마스킹되었습니다. 주민번호 뒷자리, 전화번호 중간자리, 이메일 아이디 일부가 별표로 대체되어 개인을 식별할 수 없지만 데이터의 맥락은 유지됩니다.
-
 - id: step5_step3_normalize
   title: 5단계. 텍스트 정규화
+  structuredPrimary: true
   subtitle: 공백과 특수문자 정리
+  goal: '5단계. 텍스트 정규화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 텍스트 정규화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    세 번째 단계: 연속 공백 제거, 특수문자 정리로 토큰을 추가 절약합니다.
+
+    **토큰 절약: 2단계** - 공백 정규화: 10% 추가 절약 - 특수문자 제거: 5% 추가 절약
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def normalizeText(text):
+        text = re.sub(r"\s+", " ", text)
+        text = re.sub(r"[^\w\s가-힣-]", "", text)
+        text = text.strip()
+        return text
+
+    step3 = normalizeText(step2)
+    step3[:200]
+  exercise:
+    prompt: '5단계. 텍스트 정규화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def normalizeText(text):
+          text = re.sub(r"\s+", " ", text)
+          text = re.sub(r"[^\w\s가-힣-]", "", text)
+          text = text.strip()
+          return text
+
+      step3 = normalizeText(step2)
+      step3[:200]
+    solution: |-
+      def normalizeText(text):
+          text = re.sub(r"\s+", " ", text)
+          text = re.sub(r"[^\w\s가-힣-]", "", text)
+          text = text.strip()
+          return text
+
+      step3 = normalizeText(step2)
+      step3[:200]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "세 번째 단계: 연속 공백 제거, 특수문자 정리로 토큰을 추가 절약합니다."
+    content: '세 번째 단계: 연속 공백 제거, 특수문자 정리로 토큰을 추가 절약합니다.'
   - type: code
     language: python
     title: 텍스트 정규화
@@ -162,13 +521,73 @@ sections:
       **토큰 절약: 2단계**
       - 공백 정규화: 10% 추가 절약
       - 특수문자 제거: 5% 추가 절약
-
 - id: step6_step4_extract
   title: 6단계. 핵심 정보 추출
+  structuredPrimary: true
   subtitle: 필요한 부분만
+  goal: '6단계. 핵심 정보 추출: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 핵심 정보 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: '네 번째 단계: 제목, 내용 등 핵심 정보만 추출합니다.'
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def extractKeyInfo(text):
+        title = re.search(r"([^가-힣\s]+(?:\s+[^가-힣\s]+)*)", text)
+        userId = re.search(r"ID\s*:?\s*(\d+)", text)
+        content = re.search(r"(?:내용|content)[:\s]+(.+?)(?:문의|$)", text, re.IGNORECASE)
+
+        return {
+            "title": title.group(1) if title else "",
+            "user_id": userId.group(1) if userId else "",
+            "content_preview": content.group(1)[:100] if content else text[:100]
+        }
+
+    extracted = extractKeyInfo(step3)
+    extracted
+  exercise:
+    prompt: '6단계. 핵심 정보 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def extractKeyInfo(text):
+          title = re.search(r"([^가-힣\s]+(?:\s+[^가-힣\s]+)*)", text)
+          userId = re.search(r"ID\s*:?\s*(\d+)", text)
+          content = re.search(r"(?:내용|content)[:\s]+(.+?)(?:문의|$)", text, re.IGNORECASE)
+
+          return {
+              "title": title.group(1) if title else "",
+              "user_id": userId.group(1) if userId else "",
+              "content_preview": content.group(1)[:100] if content else text[:100]
+          }
+
+      extracted = extractKeyInfo(step3)
+      extracted
+    solution: |-
+      def extractKeyInfo(text):
+          title = re.search(r"([^가-힣\s]+(?:\s+[^가-힣\s]+)*)", text)
+          userId = re.search(r"ID\s*:?\s*(\d+)", text)
+          content = re.search(r"(?:내용|content)[:\s]+(.+?)(?:문의|$)", text, re.IGNORECASE)
+
+          return {
+              "title": title.group(1) if title else "",
+              "user_id": userId.group(1) if userId else "",
+              "content_preview": content.group(1)[:100] if content else text[:100]
+          }
+
+      extracted = extractKeyInfo(step3)
+      extracted
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "네 번째 단계: 제목, 내용 등 핵심 정보만 추출합니다."
+    content: '네 번째 단계: 제목, 내용 등 핵심 정보만 추출합니다.'
   - type: code
     language: python
     title: 구조화된 정보 추출
@@ -187,10 +606,88 @@ sections:
 
       extracted = extractKeyInfo(step3)
       extracted
-
 - id: step7_complete_pipeline
   title: 7단계. 완성된 파이프라인
+  structuredPrimary: true
   subtitle: 모든 단계 통합
+  goal: '7단계. 완성된 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 완성된 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모든 전처리 단계를 하나의 파이프라인으로 통합합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def preprocessForLLM(rawHtml):
+        noHtml = removeHtml(rawHtml)
+
+        masked = maskPersonalInfo(noHtml)
+
+        normalized = normalizeText(masked)
+
+        keyInfo = extractKeyInfo(normalized)
+
+        return {
+            "raw_length": len(rawHtml),
+            "processed_length": len(normalized),
+            "token_saved_percent": ((len(rawHtml) - len(normalized)) / len(rawHtml)) * 100,
+            "processed_text": normalized,
+            "extracted_info": keyInfo
+        }
+
+    result = preprocessForLLM(rawWebData)
+    f"원본: {result['raw_length']}자\n처리 후: {result['processed_length']}자\n절약: {result['token_saved_percent']:.1f}%"
+  exercise:
+    prompt: '7단계. 완성된 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def preprocessForLLM(rawHtml):
+          noHtml = removeHtml(rawHtml)
+
+          masked = maskPersonalInfo(noHtml)
+
+          normalized = normalizeText(masked)
+
+          keyInfo = extractKeyInfo(normalized)
+
+          return {
+              "raw_length": len(rawHtml),
+              "processed_length": len(normalized),
+              "token_saved_percent": ((len(rawHtml) - len(normalized)) / len(rawHtml)) * 100,
+              "processed_text": normalized,
+              "extracted_info": keyInfo
+          }
+
+      result = preprocessForLLM(rawWebData)
+      f"원본: {result['raw_length']}자\n처리 후: {result['processed_length']}자\n절약: {result['token_saved_percent']:.1f}%"
+    solution: |-
+      def preprocessForLLM(rawHtml):
+          noHtml = removeHtml(rawHtml)
+
+          masked = maskPersonalInfo(noHtml)
+
+          normalized = normalizeText(masked)
+
+          keyInfo = extractKeyInfo(normalized)
+
+          return {
+              "raw_length": len(rawHtml),
+              "processed_length": len(normalized),
+              "token_saved_percent": ((len(rawHtml) - len(normalized)) / len(rawHtml)) * 100,
+              "processed_text": normalized,
+              "extracted_info": keyInfo
+          }
+
+      result = preprocessForLLM(rawWebData)
+      f"원본: {result['raw_length']}자\n처리 후: {result['processed_length']}자\n절약: {result['token_saved_percent']:.1f}%"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모든 전처리 단계를 하나의 파이프라인으로 통합합니다.
@@ -218,10 +715,58 @@ sections:
 
       result = preprocessForLLM(rawWebData)
       f"원본: {result['raw_length']}자\n처리 후: {result['processed_length']}자\n절약: {result['token_saved_percent']:.1f}%"
-
 - id: step8_batch_processing
   title: 8단계. 배치 처리
+  structuredPrimary: true
   subtitle: 여러 문서 한 번에
+  goal: '8단계. 배치 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 배치 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 여러 웹 페이지를 한 번에 처리합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    batchData = [
+        f"<h1>{post['title']}</h1><p>{post['body']}</p>"
+        for post in postsData[:5]
+    ]
+
+    batchResults = [preprocessForLLM(html) for html in batchData]
+
+    totalSaved = sum(r['token_saved_percent'] for r in batchResults) / len(batchResults)
+    f"평균 토큰 절약: {totalSaved:.1f}%"
+  exercise:
+    prompt: '8단계. 배치 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      batchData = [
+          f"<h1>{post['title']}</h1><p>{post['body']}</p>"
+          for post in postsData[:5]
+      ]
+
+      batchResults = [preprocessForLLM(html) for html in batchData]
+
+      totalSaved = sum(r['token_saved_percent'] for r in batchResults) / len(batchResults)
+      f"평균 토큰 절약: {totalSaved:.1f}%"
+    solution: |-
+      batchData = [
+          f"<h1>{post['title']}</h1><p>{post['body']}</p>"
+          for post in postsData[:5]
+      ]
+
+      batchResults = [preprocessForLLM(html) for html in batchData]
+
+      totalSaved = sum(r['token_saved_percent'] for r in batchResults) / len(batchResults)
+      f"평균 토큰 절약: {totalSaved:.1f}%"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 여러 웹 페이지를 한 번에 처리합니다.
@@ -239,10 +784,104 @@ sections:
 
       totalSaved = sum(r['token_saved_percent'] for r in batchResults) / len(batchResults)
       f"평균 토큰 절약: {totalSaved:.1f}%"
-
 - id: step9_comparison
   title: 9단계. 비용 절감 계산
+  structuredPrimary: true
   subtitle: 실제 API 비용
+  goal: '9단계. 비용 절감 계산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 비용 절감 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    LLM API 비용을 실제로 얼마나 절감하는지 계산합니다.
+
+    실제 비용 절감 효과
+    **100,000건 처리 시:** - 전처리 없음: $30 - 전처리 사용: $18 - **절약: $12 (40%)** 월 1,000,000건이면 $120 절약!
+  tips:
+  - '실제 비용 절감 효과 **100,000건 처리 시:** - 전처리 없음: $30 - 전처리 사용: $18 - **절약: $12 (40%)** 월 1,000,000건이면 $120 절약!'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def calculateCostSaving(originalChars, processedChars):
+        tokensPerChar = 0.25
+        costPerToken = 0.00003
+
+        originalTokens = int(originalChars * tokensPerChar)
+        processedTokens = int(processedChars * tokensPerChar)
+
+        originalCost = originalTokens * costPerToken
+        processedCost = processedTokens * costPerToken
+        savedCost = originalCost - processedCost
+        savedPercent = (savedCost / originalCost) * 100
+
+        return {
+            "원본 토큰": originalTokens,
+            "처리 후 토큰": processedTokens,
+            "원본 비용": f"${originalCost:.4f}",
+            "처리 후 비용": f"${processedCost:.4f}",
+            "절약액": f"${savedCost:.4f}",
+            "절약률": f"{savedPercent:.1f}%"
+        }
+
+    cost = calculateCostSaving(result['raw_length'], result['processed_length'])
+    cost
+  exercise:
+    prompt: '9단계. 비용 절감 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def calculateCostSaving(originalChars, processedChars):
+          tokensPerChar = 0.25
+          costPerToken = 0.00003
+
+          originalTokens = int(originalChars * tokensPerChar)
+          processedTokens = int(processedChars * tokensPerChar)
+
+          originalCost = originalTokens * costPerToken
+          processedCost = processedTokens * costPerToken
+          savedCost = originalCost - processedCost
+          savedPercent = (savedCost / originalCost) * 100
+
+          return {
+              "원본 토큰": originalTokens,
+              "처리 후 토큰": processedTokens,
+              "원본 비용": f"${originalCost:.4f}",
+              "처리 후 비용": f"${processedCost:.4f}",
+              "절약액": f"${savedCost:.4f}",
+              "절약률": f"{savedPercent:.1f}%"
+          }
+
+      cost = calculateCostSaving(result['raw_length'], result['processed_length'])
+      cost
+    solution: |-
+      def calculateCostSaving(originalChars, processedChars):
+          tokensPerChar = 0.25
+          costPerToken = 0.00003
+
+          originalTokens = int(originalChars * tokensPerChar)
+          processedTokens = int(processedChars * tokensPerChar)
+
+          originalCost = originalTokens * costPerToken
+          processedCost = processedTokens * costPerToken
+          savedCost = originalCost - processedCost
+          savedPercent = (savedCost / originalCost) * 100
+
+          return {
+              "원본 토큰": originalTokens,
+              "처리 후 토큰": processedTokens,
+              "원본 비용": f"${originalCost:.4f}",
+              "처리 후 비용": f"${processedCost:.4f}",
+              "절약액": f"${savedCost:.4f}",
+              "절약률": f"{savedPercent:.1f}%"
+          }
+
+      cost = calculateCostSaving(result['raw_length'], result['processed_length'])
+      cost
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: LLM API 비용을 실제로 얼마나 절감하는지 계산합니다.
@@ -276,7 +915,7 @@ sections:
       cost
   - type: note
     style: tip
-    title: "실제 비용 절감 효과"
+    title: 실제 비용 절감 효과
     content: |-
       **100,000건 처리 시:**
       - 전처리 없음: $30
@@ -284,10 +923,175 @@ sections:
       - **절약: $12 (40%)**
 
       월 1,000,000건이면 $120 절약!
-
 - id: step10_final_function
   title: 10단계. 프로덕션 레디 함수
+  structuredPrimary: true
   subtitle: 실전 배포용
+  goal: '10단계. 프로덕션 레디 함수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 프로덕션 레디 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 에러 처리와 로깅을 추가한 프로덕션 버전을 만듭니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def productionPreprocess(rawHtml, options=None):
+        if options is None:
+            options = {
+                "remove_html": True,
+                "mask_personal": True,
+                "normalize": True,
+                "extract_info": True
+            }
+
+        try:
+            if not isinstance(rawHtml, str):
+                raise TypeError("rawHtml must be a string")
+            if rawHtml == "":
+                raise ValueError("rawHtml must not be empty")
+
+            text = rawHtml
+
+            if options.get("remove_html"):
+                text = removeHtml(text)
+
+            if options.get("mask_personal"):
+                text = maskPersonalInfo(text)
+
+            if options.get("normalize"):
+                text = normalizeText(text)
+
+            result = {
+                "success": True,
+                "processed_text": text,
+                "original_length": len(rawHtml),
+                "processed_length": len(text),
+                "token_saved": ((len(rawHtml) - len(text)) / len(rawHtml)) * 100
+            }
+
+            if options.get("extract_info"):
+                result["extracted"] = extractKeyInfo(text)
+
+            return result
+
+        except (TypeError, ValueError, re.error) as exc:
+            return {
+                "success": False,
+                "error": str(exc),
+                "original_text": str(rawHtml)[:100]
+            }
+
+    final = productionPreprocess(rawWebData)
+    f"성공: {final['success']}, 토큰 절약: {final['token_saved']:.1f}%"
+  exercise:
+    prompt: '10단계. 프로덕션 레디 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def productionPreprocess(rawHtml, options=None):
+          if options is None:
+              options = {
+                  "remove_html": True,
+                  "mask_personal": True,
+                  "normalize": True,
+                  "extract_info": True
+              }
+
+          try:
+              if not isinstance(rawHtml, str):
+                  raise TypeError("rawHtml must be a string")
+              if rawHtml == "":
+                  raise ValueError("rawHtml must not be empty")
+
+              text = rawHtml
+
+              if options.get("remove_html"):
+                  text = removeHtml(text)
+
+              if options.get("mask_personal"):
+                  text = maskPersonalInfo(text)
+
+              if options.get("normalize"):
+                  text = normalizeText(text)
+
+              result = {
+                  "success": True,
+                  "processed_text": text,
+                  "original_length": len(rawHtml),
+                  "processed_length": len(text),
+                  "token_saved": ((len(rawHtml) - len(text)) / len(rawHtml)) * 100
+              }
+
+              if options.get("extract_info"):
+                  result["extracted"] = extractKeyInfo(text)
+
+              return result
+
+          except (TypeError, ValueError, re.error) as exc:
+              return {
+                  "success": False,
+                  "error": str(exc),
+                  "original_text": str(rawHtml)[:100]
+              }
+
+      final = productionPreprocess(rawWebData)
+      f"성공: {final['success']}, 토큰 절약: {final['token_saved']:.1f}%"
+    solution: |-
+      def productionPreprocess(rawHtml, options=None):
+          if options is None:
+              options = {
+                  "remove_html": True,
+                  "mask_personal": True,
+                  "normalize": True,
+                  "extract_info": True
+              }
+
+          try:
+              if not isinstance(rawHtml, str):
+                  raise TypeError("rawHtml must be a string")
+              if rawHtml == "":
+                  raise ValueError("rawHtml must not be empty")
+
+              text = rawHtml
+
+              if options.get("remove_html"):
+                  text = removeHtml(text)
+
+              if options.get("mask_personal"):
+                  text = maskPersonalInfo(text)
+
+              if options.get("normalize"):
+                  text = normalizeText(text)
+
+              result = {
+                  "success": True,
+                  "processed_text": text,
+                  "original_length": len(rawHtml),
+                  "processed_length": len(text),
+                  "token_saved": ((len(rawHtml) - len(text)) / len(rawHtml)) * 100
+              }
+
+              if options.get("extract_info"):
+                  result["extracted"] = extractKeyInfo(text)
+
+              return result
+
+          except (TypeError, ValueError, re.error) as exc:
+              return {
+                  "success": False,
+                  "error": str(exc),
+                  "original_text": str(rawHtml)[:100]
+              }
+
+      final = productionPreprocess(rawWebData)
+      f"성공: {final['success']}, 토큰 절약: {final['token_saved']:.1f}%"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 에러 처리와 로깅을 추가한 프로덕션 버전을 만듭니다.
@@ -344,20 +1148,95 @@ sections:
 
       final = productionPreprocess(rawWebData)
       f"성공: {final['success']}, 토큰 절약: {final['token_saved']:.1f}%"
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: LLM 전처리 종합 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 모든 정규표현식 개념을 사용하여 자신만의 전처리 함수를 만들어보세요! 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import re
+
+    raw = """
+    <div>
+        <a href="https://example.com">링크</a>
+        <p>게시일: 2025/12/26</p>
+        <p>내용입니다</p>
+    </div>
+    """
+
+    def strip(text):
+        text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL)
+        text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL)
+        text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+        return text
+
+    strip(raw)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import re
+
+      raw = """
+      <div>
+          <a href="https://example.com">링크</a>
+          <p>게시일: 2025/12/26</p>
+          <p>내용입니다</p>
+      </div>
+      """
+
+      def strip(text):
+          text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL)
+          text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL)
+          text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+          return text
+
+      strip(raw)
+    solution: |-
+      import re
+
+      raw = """
+      <div>
+          <a href="https://example.com">링크</a>
+          <p>게시일: 2025/12/26</p>
+          <p>내용입니다</p>
+      </div>
+      """
+
+      def strip(text):
+          text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL)
+          text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL)
+          text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+          return text
+
+      strip(raw)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 모든 정규표현식 개념을 사용하여 자신만의 전처리 함수를 만들어보세요! 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: URL 제거 및 날짜 정규화"
+    title: '미션1: URL 제거 및 날짜 정규화'
     blocks:
     - type: code
-      title: "정제 함수 정의"
+      title: 정제 함수 정의
       content: |-
         import re
 
@@ -377,7 +1256,7 @@ sections:
 
         strip(raw)
     - type: code
-      title: "URL 제거 및 날짜 변환"
+      title: URL 제거 및 날짜 변환
       content: |-
         def clean(html):
             html = strip(html)
@@ -388,10 +1267,10 @@ sections:
 
         clean(raw)
   - type: expansion
-    title: "미션2: 종합 전처리 파이프라인"
+    title: '미션2: 종합 전처리 파이프라인'
     blocks:
     - type: code
-      title: "데이터 로드 및 HTML 생성"
+      title: 데이터 로드 및 HTML 생성
       content: |-
         import re
 
@@ -421,7 +1300,7 @@ sections:
         """
         html[:100]
     - type: code
-      title: "파이프라인 함수 정의"
+      title: 파이프라인 함수 정의
       content: |-
         def remove(text):
             return re.sub(r"<.*?>", "", text, flags=re.DOTALL)
@@ -436,7 +1315,7 @@ sections:
 
         norm(mask(remove(html)))
     - type: code
-      title: "파이프라인 실행 및 결과"
+      title: 파이프라인 실행 및 결과
       content: |-
         def pipe(raw):
             out = remove(raw)
@@ -451,36 +1330,109 @@ sections:
 
         result = pipe(html)
         f"절약률: {result['token_saved']:.1f}%"
-
 - id: summary
   title: 정리
   subtitle: 열 번째 프로젝트 완료!
   blocks:
   - type: text
-    content: "정규표현식 마스터 완성! 10개 프로젝트를 통해 모든 핵심 개념을 배웠습니다."
+    content: 정규표현식 마스터 완성! 10개 프로젝트를 통해 모든 핵심 개념을 배웠습니다.
   - type: list
     items:
-    - "기본 패턴: \\w, \\d, \\s, ., ^, $"
-    - "수량자: +, *, ?, {n,m}, *?"
-    - "문자 클래스: [abc], [^abc]"
-    - "그룹: (), (?:), (?P<name>)"
-    - "함수: findall, search, sub, split, finditer"
-    - "플래그: re.I, re.M, re.S, re.DOTALL"
-    - "고급: (?<=), (?=), (?<!), (?!)"
-    - "실전: HTML 제거, 마스킹, 토큰 최적화"
+    - '기본 패턴: \w, \d, \s, ., ^, $'
+    - '수량자: +, *, ?, {n,m}, *?'
+    - '문자 클래스: [abc], [^abc]'
+    - '그룹: (), (?:), (?P<name>)'
+    - '함수: findall, search, sub, split, finditer'
+    - '플래그: re.I, re.M, re.S, re.DOTALL'
+    - '고급: (?<=), (?=), (?<!), (?!)'
+    - '실전: HTML 제거, 마스킹, 토큰 최적화'
   - type: text
     content: 이제 실무에서 자신있게 정규표현식을 사용하세요!
+- id: workflow_validation
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
+  structuredPrimary: true
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
+    안전하게 처리합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import re
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
-  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+    contactText = '''
+    김개발 <kim@example.com> 010-1234-5678
+    lee@company.co.kr / 02-987-6543
+    잘못된 주소: hello@ / 번호: 12345
+    '''
+
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+    phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+    emails = emailPattern.findall(contactText)
+    phones = phonePattern.findall(contactText)
+
+    assert emails == ['kim@example.com', 'lee@company.co.kr']
+    assert phones == ['010-1234-5678', '02-987-6543']
+    emails, phones
+  exercise:
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    solution: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+    content: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을
+      안전하게 처리합니다.
   - type: code
     language: python
-    title: "이메일과 전화번호 추출"
-    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    title: 이메일과 전화번호 추출
+    description: 실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다.
     content: |-
       import re
 
@@ -501,8 +1453,8 @@ sections:
       emails, phones
   - type: code
     language: python
-    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
-    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    title: 패턴 오류와 빈 입력을 먼저 실패시킨다
+    description: 컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다.
     content: |-
       try:
           re.compile(r'([A-Z]+')
@@ -525,8 +1477,8 @@ sections:
       regexCompileError, emailExtractError
   - type: code
     language: python
-    title: "정제 결과를 업무 구조로 검증"
-    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    title: 정제 결과를 업무 구조로 검증
+    description: 추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다.
     content: |-
       def maskEmail(email):
           name, domain = email.split('@')
@@ -545,8 +1497,8 @@ sections:
       contactReport
   - type: code
     language: python
-    title: "실무 변주: 허용 도메인 정책 바꾸기"
-    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    title: '실무 변주: 허용 도메인 정책 바꾸기'
+    description: 회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다.
     content: |-
       def filterAllowedDomains(report, allowedDomains):
           if not allowedDomains:

@@ -1,31 +1,71 @@
 meta:
   packages:
-    - matplotlib
-    - networkx
+  - matplotlib
+  - networkx
   id: networkx_08
   title: 그래프알고리즘
   order: 8
   category: networkx
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["networkx", "BFS", "DFS", "최소신장트리", "위상정렬"]
+  tags:
+  - networkx
+  - BFS
+  - DFS
+  - 최소신장트리
+  - 위상정렬
   seo:
-    title: "NetworkX 그래프 알고리즘 - BFS, DFS, MST"
-    description: "NetworkX로 고전 그래프 알고리즘을 배웁니다. BFS, DFS, 최소신장트리, 위상정렬을 실습합니다."
-    keywords: ["networkx", "BFS", "DFS", "MST", "위상정렬", "그래프알고리즘"]
-
+    title: NetworkX 그래프 알고리즘 - BFS, DFS, MST
+    description: NetworkX로 고전 그래프 알고리즘을 배웁니다. BFS, DFS, 최소신장트리, 위상정렬을 실습합니다.
+    keywords:
+    - networkx
+    - BFS
+    - DFS
+    - MST
+    - 위상정렬
+    - 그래프알고리즘
 intro:
-  emoji: "🔍"
+  emoji: 🔍
   goal: BFS, DFS, 최소신장트리, 위상정렬 등 고전 그래프 알고리즘을 배웁니다.
-  description: 그래프 알고리즘은 컴퓨터 과학의 핵심입니다. 너비우선탐색(BFS)과 깊이우선탐색(DFS)은 그래프 순회의 기본입니다. 최소신장트리(MST)는 모든 노드를 최소 비용으로 연결합니다. 위상정렬은 의존성 순서를 결정합니다.
-
+  description: 그래프 알고리즘은 컴퓨터 과학의 핵심입니다. 너비우선탐색(BFS)과 깊이우선탐색(DFS)은 그래프 순회의 기본입니다. 최소신장트리(MST)는 모든 노드를 최소 비용으로 연결합니다. 위상정렬은
+    의존성 순서를 결정합니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를 해결합니다. 이 장에서는 그래프
+    순회(BFS, DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    solution: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를 해결합니다. 이 장에서는 그래프 순회(BFS, DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
+    content: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를 해결합니다. 이 장에서는 그래프 순회(BFS,
+      DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
   - type: code
     language: python
     title: 라이브러리 불러오기
@@ -33,13 +73,56 @@ sections:
     content: |-
       import networkx as nx
       import matplotlib.pyplot as plt
-
 - id: step2_bfs
   title: 2단계. 너비우선탐색
+  structuredPrimary: true
   subtitle: BFS
+  goal: '2단계. 너비우선탐색: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 너비우선탐색: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며, 가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
+
+    BFS는 최단 경로 찾기에 사용됩니다. 가중치가 없는 그래프에서 최단 경로를 보장합니다.
+  tips:
+  - BFS는 최단 경로 찾기에 사용됩니다. 가중치가 없는 그래프에서 최단 경로를 보장합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    G = nx.Graph()
+    G.add_edges_from([
+        (1, 2), (1, 3), (2, 4), (2, 5),
+        (3, 6), (3, 7), (4, 8), (5, 8)
+    ])
+    G.number_of_nodes(), G.number_of_edges()
+  exercise:
+    prompt: '2단계. 너비우선탐색: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 4), (2, 5),
+          (3, 6), (3, 7), (4, 8), (5, 8)
+      ])
+      G.number_of_nodes(), G.number_of_edges()
+    solution: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 4), (2, 5),
+          (3, 6), (3, 7), (4, 8), (5, 8)
+      ])
+      G.number_of_nodes(), G.number_of_edges()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며, 가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
+    content: 너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며,
+      가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
   - type: code
     language: python
     title: 샘플 그래프
@@ -67,13 +150,44 @@ sections:
       bfsNodes
   - type: tip
     content: BFS는 최단 경로 찾기에 사용됩니다. 가중치가 없는 그래프에서 최단 경로를 보장합니다.
-
 - id: step3_dfs
   title: 3단계. 깊이우선탐색
+  structuredPrimary: true
   subtitle: DFS
+  goal: '3단계. 깊이우선탐색: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 깊이우선탐색: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기, 퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
+
+    BFS는 레벨 순서(1→2,3→4,5,6,7→8), DFS는 한 가지를 깊이 탐색(1→2→4→8→5→3→6→7)합니다.
+  tips:
+  - BFS는 레벨 순서(1→2,3→4,5,6,7→8), DFS는 한 가지를 깊이 탐색(1→2→4→8→5→3→6→7)합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    dfsEdges = list(nx.dfs_edges(G, source=1))
+    dfsEdges
+  exercise:
+    prompt: '3단계. 깊이우선탐색: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dfsEdges = list(nx.dfs_edges(G, source=1))
+      dfsEdges
+    solution: |-
+      dfsEdges = list(nx.dfs_edges(G, source=1))
+      dfsEdges
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기, 퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
+    content: 깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기,
+      퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
   - type: code
     language: python
     title: DFS 엣지
@@ -100,13 +214,72 @@ sections:
       comparison
   - type: tip
     content: BFS는 레벨 순서(1→2,3→4,5,6,7→8), DFS는 한 가지를 깊이 탐색(1→2→4→8→5→3→6→7)합니다.
-
 - id: step4_visualize_traversal
   title: 4단계. 탐색 시각화
+  structuredPrimary: true
   subtitle: 방문 순서 표시
+  goal: '4단계. 탐색 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 탐색 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다. BFS는 너비 방향으로 균등하게 퍼져나가고,
+    DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    posG = nx.spring_layout(G, seed=42)
+
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+            node_size=500, edge_color='lightgray', ax=ax1)
+    nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                            edge_color='blue', width=2, ax=ax1)
+
+    labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+    nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+    ax1.set_title('BFS Traversal Order')
+    fig1
+  exercise:
+    prompt: '4단계. 탐색 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      posG = nx.spring_layout(G, seed=42)
+
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+              node_size=500, edge_color='lightgray', ax=ax1)
+      nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                              edge_color='blue', width=2, ax=ax1)
+
+      labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+      nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+      ax1.set_title('BFS Traversal Order')
+      fig1
+    solution: |-
+      posG = nx.spring_layout(G, seed=42)
+
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+              node_size=500, edge_color='lightgray', ax=ax1)
+      nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                              edge_color='blue', width=2, ax=ax1)
+
+      labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+      nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+      ax1.set_title('BFS Traversal Order')
+      fig1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다. BFS는 너비 방향으로 균등하게 퍼져나가고, DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
+    content: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다. BFS는 너비 방향으로 균등하게 퍼져나가고,
+      DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
   - type: code
     language: python
     title: BFS 시각화
@@ -139,13 +312,71 @@ sections:
       nx.draw_networkx_labels(G, pos=posG, labels=labelsDFS, font_size=12, ax=ax2)
       ax2.set_title('DFS Traversal Order')
       fig2
-
 - id: step5_mst
   title: 5단계. 최소신장트리
+  structuredPrimary: true
   subtitle: minimum_spanning_tree()
+  goal: '5단계. 최소신장트리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 최소신장트리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소 케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
+
+    MST는 n개 노드를 n-1개 엣지로 연결합니다. 크루스칼이나 프림 알고리즘을 사용합니다.
+  tips:
+  - MST는 n개 노드를 n-1개 엣지로 연결합니다. 크루스칼이나 프림 알고리즘을 사용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    wG = nx.Graph()
+    wG.add_edge("A", "B", weight=4)
+    wG.add_edge("A", "C", weight=2)
+    wG.add_edge("B", "C", weight=1)
+    wG.add_edge("B", "D", weight=5)
+    wG.add_edge("C", "D", weight=8)
+    wG.add_edge("C", "E", weight=10)
+    wG.add_edge("D", "E", weight=2)
+    wG.add_edge("D", "F", weight=6)
+    wG.add_edge("E", "F", weight=3)
+    wG.edges(data=True)
+  exercise:
+    prompt: '5단계. 최소신장트리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      wG = nx.Graph()
+      wG.add_edge("A", "B", weight=4)
+      wG.add_edge("A", "C", weight=2)
+      wG.add_edge("B", "C", weight=1)
+      wG.add_edge("B", "D", weight=5)
+      wG.add_edge("C", "D", weight=8)
+      wG.add_edge("C", "E", weight=10)
+      wG.add_edge("D", "E", weight=2)
+      wG.add_edge("D", "F", weight=6)
+      wG.add_edge("E", "F", weight=3)
+      wG.edges(data=True)
+    solution: |-
+      wG = nx.Graph()
+      wG.add_edge("A", "B", weight=4)
+      wG.add_edge("A", "C", weight=2)
+      wG.add_edge("B", "C", weight=1)
+      wG.add_edge("B", "D", weight=5)
+      wG.add_edge("C", "D", weight=8)
+      wG.add_edge("C", "E", weight=10)
+      wG.add_edge("D", "E", weight=2)
+      wG.add_edge("D", "F", weight=6)
+      wG.add_edge("E", "F", weight=3)
+      wG.edges(data=True)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소 케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
+    content: 최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소
+      케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
   - type: code
     language: python
     title: 가중치 그래프
@@ -179,13 +410,81 @@ sections:
       mstWeight
   - type: tip
     content: MST는 n개 노드를 n-1개 엣지로 연결합니다. 크루스칼이나 프림 알고리즘을 사용합니다.
-
 - id: step6_mst_viz
   title: 6단계. MST 시각화
+  structuredPrimary: true
   subtitle: 신장트리 강조
+  goal: '6단계. MST 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. MST 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의 가중치를 표시합니다. MST는 항상
+    n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    posW = nx.spring_layout(wG, seed=42)
+
+    fig3, ax3 = plt.subplots(figsize=(10, 7))
+    nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+            node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+    mstEdgeList = [(u, v) for u, v, d in mstEdges]
+    nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                            edge_color='green', width=3, ax=ax3)
+
+    edgeLabels = nx.get_edge_attributes(wG, 'weight')
+    nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                  font_size=10, ax=ax3)
+    ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+    fig3
+  exercise:
+    prompt: '6단계. MST 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      posW = nx.spring_layout(wG, seed=42)
+
+      fig3, ax3 = plt.subplots(figsize=(10, 7))
+      nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+              node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+      mstEdgeList = [(u, v) for u, v, d in mstEdges]
+      nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                              edge_color='green', width=3, ax=ax3)
+
+      edgeLabels = nx.get_edge_attributes(wG, 'weight')
+      nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax3)
+      ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+      fig3
+    solution: |-
+      posW = nx.spring_layout(wG, seed=42)
+
+      fig3, ax3 = plt.subplots(figsize=(10, 7))
+      nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+              node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+      mstEdgeList = [(u, v) for u, v, d in mstEdges]
+      nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                              edge_color='green', width=3, ax=ax3)
+
+      edgeLabels = nx.get_edge_attributes(wG, 'weight')
+      nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax3)
+      ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+      fig3
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의 가중치를 표시합니다. MST는 항상 n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
+    content: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의 가중치를 표시합니다. MST는 항상
+      n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
   - type: code
     language: python
     title: MST 시각화
@@ -206,13 +505,59 @@ sections:
                                     font_size=10, ax=ax3)
       ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
       fig3
-
 - id: step7_topological
   title: 7단계. 위상정렬
+  structuredPrimary: true
   subtitle: topological_sort()
+  goal: '7단계. 위상정렬: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 위상정렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를 반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
+
+    위상정렬은 "선행 작업이 완료된 후에만 수행"하는 순서입니다. DAG에서만 가능합니다.
+  tips:
+  - 위상정렬은 "선행 작업이 완료된 후에만 수행"하는 순서입니다. DAG에서만 가능합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    dag = nx.DiGraph()
+    dag.add_edges_from([
+        ("A", "B"), ("A", "C"),
+        ("B", "D"), ("C", "D"),
+        ("D", "E"), ("C", "E")
+    ])
+    dag.edges()
+  exercise:
+    prompt: '7단계. 위상정렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dag = nx.DiGraph()
+      dag.add_edges_from([
+          ("A", "B"), ("A", "C"),
+          ("B", "D"), ("C", "D"),
+          ("D", "E"), ("C", "E")
+      ])
+      dag.edges()
+    solution: |-
+      dag = nx.DiGraph()
+      dag.add_edges_from([
+          ("A", "B"), ("A", "C"),
+          ("B", "D"), ("C", "D"),
+          ("D", "E"), ("C", "E")
+      ])
+      dag.edges()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를 반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
+    content: 위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를
+      반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
   - type: code
     language: python
     title: DAG 생성
@@ -241,13 +586,57 @@ sections:
       allTopo
   - type: tip
     content: 위상정렬은 "선행 작업이 완료된 후에만 수행"하는 순서입니다. DAG에서만 가능합니다.
-
 - id: step8_dag_viz
   title: 8단계. DAG 시각화
+  structuredPrimary: true
   subtitle: 의존성 그래프
+  goal: '8단계. DAG 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. DAG 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며, A→B는 'A가 완료되어야 B를 시작할
+    수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    posDAG = nx.spring_layout(dag, seed=42)
+
+    fig4, ax4 = plt.subplots(figsize=(8, 6))
+    nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+            node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+    ax4.set_title('Directed Acyclic Graph (DAG)')
+    fig4
+  exercise:
+    prompt: '8단계. DAG 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      posDAG = nx.spring_layout(dag, seed=42)
+
+      fig4, ax4 = plt.subplots(figsize=(8, 6))
+      nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+              node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+      ax4.set_title('Directed Acyclic Graph (DAG)')
+      fig4
+    solution: |-
+      posDAG = nx.spring_layout(dag, seed=42)
+
+      fig4, ax4 = plt.subplots(figsize=(8, 6))
+      nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+              node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+      ax4.set_title('Directed Acyclic Graph (DAG)')
+      fig4
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며, A→B는 'A가 완료되어야 B를 시작할 수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
+    content: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며, A→B는 'A가 완료되어야 B를 시작할
+      수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
   - type: code
     language: python
     title: DAG 시각화
@@ -272,13 +661,44 @@ sections:
               node_size=900, font_size=10, arrows=True, arrowsize=20, ax=ax5)
       ax5.set_title('Topological Order')
       fig5
-
 - id: step9_ancestors
   title: 9단계. 조상과 후손
+  structuredPrimary: true
   subtitle: ancestors(), descendants()
+  goal: '9단계. 조상과 후손: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 조상과 후손: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다. 작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
+
+    DAG에서 조상은 "나보다 먼저 완료되어야 하는 작업", 후손은 "나 이후에 시작할 수 있는 작업"입니다.
+  tips:
+  - DAG에서 조상은 "나보다 먼저 완료되어야 하는 작업", 후손은 "나 이후에 시작할 수 있는 작업"입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    ancestorsE = nx.ancestors(dag, "E")
+    ancestorsE
+  exercise:
+    prompt: '9단계. 조상과 후손: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      ancestorsE = nx.ancestors(dag, "E")
+      ancestorsE
+    solution: |-
+      ancestorsE = nx.ancestors(dag, "E")
+      ancestorsE
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다. 작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
+    content: 방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다.
+      작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
   - type: code
     language: python
     title: 조상 노드
@@ -303,13 +723,63 @@ sections:
       canReach, pathAE
   - type: tip
     content: DAG에서 조상은 "나보다 먼저 완료되어야 하는 작업", 후손은 "나 이후에 시작할 수 있는 작업"입니다.
-
 - id: step10_practical
   title: 10단계. 실전 응용
+  structuredPrimary: true
   subtitle: 작업 스케줄링
+  goal: '10단계. 실전 응용: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 실전 응용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API → 통합 → 테스트 → 배포의 의존성을
+    그래프로 표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    project = nx.DiGraph()
+    project.add_edge("Design", "Frontend")
+    project.add_edge("Design", "Backend")
+    project.add_edge("Backend", "API")
+    project.add_edge("Frontend", "Integration")
+    project.add_edge("API", "Integration")
+    project.add_edge("Integration", "Testing")
+    project.add_edge("Testing", "Deploy")
+    project.edges()
+  exercise:
+    prompt: '10단계. 실전 응용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      project = nx.DiGraph()
+      project.add_edge("Design", "Frontend")
+      project.add_edge("Design", "Backend")
+      project.add_edge("Backend", "API")
+      project.add_edge("Frontend", "Integration")
+      project.add_edge("API", "Integration")
+      project.add_edge("Integration", "Testing")
+      project.add_edge("Testing", "Deploy")
+      project.edges()
+    solution: |-
+      project = nx.DiGraph()
+      project.add_edge("Design", "Frontend")
+      project.add_edge("Design", "Backend")
+      project.add_edge("Backend", "API")
+      project.add_edge("Frontend", "Integration")
+      project.add_edge("API", "Integration")
+      project.add_edge("Integration", "Testing")
+      project.add_edge("Testing", "Deploy")
+      project.edges()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API → 통합 → 테스트 → 배포의 의존성을 그래프로 표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
+    content: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API → 통합 → 테스트 → 배포의 의존성을 그래프로
+      표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
   - type: code
     language: python
     title: 프로젝트 그래프
@@ -343,17 +813,80 @@ sections:
               node_size=1200, font_size=9, arrows=True, arrowsize=15, ax=ax6)
       ax6.set_title('Project Task Dependencies')
       fig6
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 그래프 알고리즘
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 그래프 알고리즘을 활용하여 실전 미션을 수행해봅시다. 네트워크 케이블링 비용을 최소화하는 MST 문제와 소프트웨어 빌드 순서를 결정하는 위상정렬 문제를 해결합니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    data = nx.Graph()
+    data.add_edge("Server", "Switch1", weight=10)
+    data.add_edge("Server", "Switch2", weight=15)
+    data.add_edge("Switch1", "Switch2", weight=5)
+    data.add_edge("Switch1", "PC1", weight=3)
+    data.add_edge("Switch1", "PC2", weight=4)
+    data.add_edge("Switch2", "PC3", weight=6)
+    data.add_edge("Switch2", "PC4", weight=7)
+    data.add_edge("PC1", "PC2", weight=2)
+    data.edges(data=True)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      data = nx.Graph()
+      data.add_edge("Server", "Switch1", weight=10)
+      data.add_edge("Server", "Switch2", weight=15)
+      data.add_edge("Switch1", "Switch2", weight=5)
+      data.add_edge("Switch1", "PC1", weight=3)
+      data.add_edge("Switch1", "PC2", weight=4)
+      data.add_edge("Switch2", "PC3", weight=6)
+      data.add_edge("Switch2", "PC4", weight=7)
+      data.add_edge("PC1", "PC2", weight=2)
+      data.edges(data=True)
+    solution: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      data = nx.Graph()
+      data.add_edge("Server", "Switch1", weight=10)
+      data.add_edge("Server", "Switch2", weight=15)
+      data.add_edge("Switch1", "Switch2", weight=5)
+      data.add_edge("Switch1", "PC1", weight=3)
+      data.add_edge("Switch1", "PC2", weight=4)
+      data.add_edge("Switch2", "PC3", weight=6)
+      data.add_edge("Switch2", "PC4", weight=7)
+      data.add_edge("PC1", "PC2", weight=2)
+      data.edges(data=True)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 그래프 알고리즘을 활용하여 실전 미션을 수행해봅시다. 네트워크 케이블링 비용을 최소화하는 MST 문제와 소프트웨어 빌드 순서를 결정하는 위상정렬 문제를 해결합니다.
   - type: tip
     content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   - type: expansion
-    title: "미션1: 네트워크 케이블링"
+    title: '미션1: 네트워크 케이블링'
     blocks:
     - type: code
       title: 네트워크 생성
@@ -393,7 +926,7 @@ sections:
         plot.set_title(f'Network Cabling MST (Cost: {mstCost})')
         chart
   - type: expansion
-    title: "미션2: 빌드 순서"
+    title: '미션2: 빌드 순서'
     blocks:
     - type: code
       title: 의존성 정의
@@ -426,13 +959,93 @@ sections:
                 node_size=1000, font_size=9, arrows=True, arrowsize=15, ax=panel)
         panel.set_title('Build Order (Topological Sort)')
         canvas
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: 인수인계 네트워크
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로
+    검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다."
+    content: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로
+      검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   - type: code
     language: python
     title: 인수인계 네트워크 구성
@@ -504,7 +1117,7 @@ sections:
       assert all(workflowChecks.values()), workflowChecks
       workflowChecks
   - type: expansion
-    title: "실무 변주: 직접 연결을 추가하면 병목이 줄어들까?"
+    title: '실무 변주: 직접 연결을 추가하면 병목이 줄어들까?'
     blocks:
     - type: code
       language: python

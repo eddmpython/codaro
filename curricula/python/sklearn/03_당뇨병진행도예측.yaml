@@ -1,30 +1,85 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scikit-learn
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
   id: sklearn_03
   title: 당뇨병진행도예측
   order: 3
   category: sklearn
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["회귀", "LinearRegression", "MSE", "R²", "당뇨병"]
+  tags:
+  - 회귀
+  - LinearRegression
+  - MSE
+  - R²
+  - 당뇨병
   seo:
-    title: "scikit-learn 회귀 입문 - 당뇨병 진행도 예측"
-    description: "LinearRegression으로 당뇨병 진행도를 예측합니다. MSE와 R²로 회귀 모델을 평가합니다."
-    keywords: ["scikit-learn", "회귀", "LinearRegression", "MSE", "R²"]
-
+    title: scikit-learn 회귀 입문 - 당뇨병 진행도 예측
+    description: LinearRegression으로 당뇨병 진행도를 예측합니다. MSE와 R²로 회귀 모델을 평가합니다.
+    keywords:
+    - scikit-learn
+    - 회귀
+    - LinearRegression
+    - MSE
+    - R²
 intro:
-  emoji: "💉"
+  emoji: 💉
   goal: 선형 회귀로 당뇨병 진행도를 예측합니다.
-  description: 분류가 아닌 회귀(regression) 문제를 다룹니다. LinearRegression으로 연속적인 값을 예측하고, MSE와 R²로 모델을 평가합니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler를 복습하고 회귀 평가 지표를 새로 배웁니다.
-
+  description: 분류가 아닌 회귀(regression) 문제를 다룹니다. LinearRegression으로 연속적인 값을 예측하고, MSE와 R²로 모델을 평가합니다. 이전 프로젝트에서 배운 train_test_split,
+    StandardScaler를 복습하고 회귀 평가 지표를 새로 배웁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 당뇨병 진행도 예측 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. 회귀 문제이므로 LinearRegression과 회귀 평가 지표를 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.datasets import load_diabetes
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+    solution: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 당뇨병 진행도 예측 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. 회귀 문제이므로 LinearRegression과 회귀 평가 지표를 사용합니다.
@@ -41,10 +96,46 @@ sections:
       import pandas as pd
       import numpy as np
       import matplotlib.pyplot as plt
-
 - id: step2_load
   title: 2단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: load_diabetes()
+  goal: '2단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    당뇨병 데이터셋은 442명 환자의 10가지 기준값(나이, 성별, BMI, 혈압 등)과 1년 후 질병 진행도를 담고 있습니다. 진행도는 연속적인 숫자이므로 회귀 문제입니다.
+
+    이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
+  tips:
+  - 이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    diabetes = load_diabetes()
+    X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+    y = diabetes.target
+    X.shape
+  exercise:
+    prompt: '2단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      diabetes = load_diabetes()
+      X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+      y = diabetes.target
+      X.shape
+    solution: |-
+      diabetes = load_diabetes()
+      X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+      y = diabetes.target
+      X.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 당뇨병 데이터셋은 442명 환자의 10가지 기준값(나이, 성별, BMI, 혈압 등)과 1년 후 질병 진행도를 담고 있습니다. 진행도는 연속적인 숫자이므로 회귀 문제입니다.
@@ -61,14 +152,34 @@ sections:
     language: python
     title: 특성 확인
     description: 10가지 특성 미리보기
-    content: |-
-      X.head()
+    content: X.head()
   - type: tip
     content: 이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
-
 - id: step3_target
   title: 3단계. 타겟 분석
+  structuredPrimary: true
   subtitle: 연속값 분포
+  goal: '3단계. 타겟 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 타겟 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 회귀 문제의 타겟은 연속적인 숫자입니다. 분류와 달리 클래스가 아닌 값의 분포를 확인합니다. 히스토그램으로 진행도의 분포를 살펴봅니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: pd.Series(y).describe()
+  exercise:
+    prompt: '3단계. 타겟 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: pd.Series(y).describe()
+    solution: pd.Series(y).describe()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 회귀 문제의 타겟은 연속적인 숫자입니다. 분류와 달리 클래스가 아닌 값의 분포를 확인합니다. 히스토그램으로 진행도의 분포를 살펴봅니다.
@@ -76,8 +187,7 @@ sections:
     language: python
     title: 타겟 통계
     description: 진행도 분포 확인
-    content: |-
-      pd.Series(y).describe()
+    content: pd.Series(y).describe()
   - type: code
     language: python
     title: 타겟 분포 시각화
@@ -89,10 +199,37 @@ sections:
       ax.set_ylabel('Count')
       ax.set_title('Distribution of Target Variable')
       fig
-
 - id: step4_split
   title: 4단계. 데이터 분할
+  structuredPrimary: true
   subtitle: train_test_split
+  goal: '4단계. 데이터 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 데이터 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다. 회귀에서도 동일한 방식으로 분할합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '4단계. 데이터 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    solution: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다. 회귀에서도 동일한 방식으로 분할합니다.
@@ -103,10 +240,40 @@ sections:
     content: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
-
 - id: step5_scale
   title: 5단계. 스케일링
+  structuredPrimary: true
   subtitle: StandardScaler
+  goal: '5단계. 스케일링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 스케일링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이 데이터셋은 이미 정규화되어 있지만, 실전에서는 항상 스케일링하는 습관을 들이는 것이 좋습니다. LinearRegression은 스케일에 덜 민감하지만, 다른 알고리즘으로 교체할 때를 대비합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+  exercise:
+    prompt: '5단계. 스케일링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    solution: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 이 데이터셋은 이미 정규화되어 있지만, 실전에서는 항상 스케일링하는 습관을 들이는 것이 좋습니다. LinearRegression은 스케일에 덜 민감하지만, 다른 알고리즘으로 교체할 때를 대비합니다.
@@ -118,10 +285,40 @@ sections:
       scaler = StandardScaler()
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
-
 - id: step6_model
   title: 6단계. 선형 회귀 모델
+  structuredPrimary: true
   subtitle: LinearRegression
+  goal: '6단계. 선형 회귀 모델: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 선형 회귀 모델: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    LinearRegression은 가장 기본적인 회귀 알고리즘입니다. 입력 특성과 타겟 사이의 선형 관계를 학습합니다. y = w1*x1 + w2*x2 + ... + b 형태의 식을 찾습니다.
+
+    coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
+  tips:
+  - coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    model = LinearRegression()
+    model.fit(xTrainSc, yTrain)
+  exercise:
+    prompt: '6단계. 선형 회귀 모델: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      model = LinearRegression()
+      model.fit(xTrainSc, yTrain)
+    solution: |-
+      model = LinearRegression()
+      model.fit(xTrainSc, yTrain)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: LinearRegression은 가장 기본적인 회귀 알고리즘입니다. 입력 특성과 타겟 사이의 선형 관계를 학습합니다. y = w1*x1 + w2*x2 + ... + b 형태의 식을 찾습니다.
@@ -141,10 +338,37 @@ sections:
       coefDf.sort_values('Coefficient', key=abs, ascending=False)
   - type: tip
     content: coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
-
 - id: step7_predict
   title: 7단계. 예측
+  structuredPrimary: true
   subtitle: predict
+  goal: '7단계. 예측: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 예측: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 학습된 모델로 테스트 데이터의 진행도를 예측합니다. 회귀는 연속적인 값을 출력하므로 클래스가 아닌 숫자가 나옵니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    yPred = model.predict(xTestSc)
+    yPred[:10]
+  exercise:
+    prompt: '7단계. 예측: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      yPred = model.predict(xTestSc)
+      yPred[:10]
+    solution: |-
+      yPred = model.predict(xTestSc)
+      yPred[:10]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 학습된 모델로 테스트 데이터의 진행도를 예측합니다. 회귀는 연속적인 값을 출력하므로 클래스가 아닌 숫자가 나옵니다.
@@ -162,10 +386,43 @@ sections:
     content: |-
       comparison = pd.DataFrame({'Actual': yTest[:10], 'Predicted': yPred[:10], 'Error': yTest[:10] - yPred[:10]})
       comparison
-
 - id: step8_mse
   title: 8단계. MSE 평가
+  structuredPrimary: true
   subtitle: mean_squared_error
+  goal: '8단계. MSE 평가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. MSE 평가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    MSE(Mean Squared Error)는 예측 오차의 제곱 평균입니다. 값이 작을수록 좋습니다. RMSE는 MSE의 제곱근으로, 원래 단위로 해석할 수 있습니다.
+
+    MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
+  tips:
+  - MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    mse = mean_squared_error(yTest, yPred)
+    rmse = np.sqrt(mse)
+    f"MSE: {mse:.2f}, RMSE: {rmse:.2f}"
+  exercise:
+    prompt: '8단계. MSE 평가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mse = mean_squared_error(yTest, yPred)
+      rmse = np.sqrt(mse)
+      f"MSE: {mse:.2f}, RMSE: {rmse:.2f}"
+    solution: |-
+      mse = mean_squared_error(yTest, yPred)
+      rmse = np.sqrt(mse)
+      f"MSE: {mse:.2f}, RMSE: {rmse:.2f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: MSE(Mean Squared Error)는 예측 오차의 제곱 평균입니다. 값이 작을수록 좋습니다. RMSE는 MSE의 제곱근으로, 원래 단위로 해석할 수 있습니다.
@@ -179,10 +436,40 @@ sections:
       f"MSE: {mse:.2f}, RMSE: {rmse:.2f}"
   - type: tip
     content: MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
-
 - id: step9_mae
   title: 9단계. MAE 평가
+  structuredPrimary: true
   subtitle: mean_absolute_error
+  goal: '9단계. MAE 평가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. MAE 평가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    MAE(Mean Absolute Error)는 예측 오차의 절대값 평균입니다. MSE보다 이상치에 덜 민감합니다. 평균적으로 얼마나 틀리는지를 나타냅니다.
+
+    MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
+  tips:
+  - MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    mae = mean_absolute_error(yTest, yPred)
+    f"MAE: {mae:.2f}"
+  exercise:
+    prompt: '9단계. MAE 평가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mae = mean_absolute_error(yTest, yPred)
+      f"MAE: {mae:.2f}"
+    solution: |-
+      mae = mean_absolute_error(yTest, yPred)
+      f"MAE: {mae:.2f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: MAE(Mean Absolute Error)는 예측 오차의 절대값 평균입니다. MSE보다 이상치에 덜 민감합니다. 평균적으로 얼마나 틀리는지를 나타냅니다.
@@ -195,10 +482,40 @@ sections:
       f"MAE: {mae:.2f}"
   - type: tip
     content: MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
-
 - id: step10_r2
   title: 10단계. R² 평가
+  structuredPrimary: true
   subtitle: 결정계수
+  goal: '10단계. R² 평가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. R² 평가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    R²(결정계수)는 모델이 타겟 변동의 몇 %를 설명하는지 나타냅니다. 1에 가까울수록 좋고, 0이면 평균만큼도 못 맞추는 것입니다. statsmodels에서 배운 R²와 동일한 개념입니다.
+
+    R² = 1 - (SS_res / SS_tot). SS_res는 잔차 제곱합, SS_tot은 전체 변동입니다. R²=0.5면 모델이 타겟 변동의 50%를 설명합니다. 음수도 가능하며, 이는 평균보다 못한 모델입니다.
+  tips:
+  - R² = 1 - (SS_res / SS_tot). SS_res는 잔차 제곱합, SS_tot은 전체 변동입니다. R²=0.5면 모델이 타겟 변동의 50%를 설명합니다. 음수도 가능하며, 이는 평균보다 못한 모델입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    r2 = r2_score(yTest, yPred)
+    f"R²: {r2:.4f}"
+  exercise:
+    prompt: '10단계. R² 평가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      r2 = r2_score(yTest, yPred)
+      f"R²: {r2:.4f}"
+    solution: |-
+      r2 = r2_score(yTest, yPred)
+      f"R²: {r2:.4f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: R²(결정계수)는 모델이 타겟 변동의 몇 %를 설명하는지 나타냅니다. 1에 가까울수록 좋고, 0이면 평균만큼도 못 맞추는 것입니다. statsmodels에서 배운 R²와 동일한 개념입니다.
@@ -220,11 +537,57 @@ sections:
       })
       metrics
   - type: tip
-    content: R² = 1 - (SS_res / SS_tot). SS_res는 잔차 제곱합, SS_tot은 전체 변동입니다. R²=0.5면 모델이 타겟 변동의 50%를 설명합니다. 음수도 가능하며, 이는 평균보다 못한 모델입니다.
-
+    content: R² = 1 - (SS_res / SS_tot). SS_res는 잔차 제곱합, SS_tot은 전체 변동입니다. R²=0.5면 모델이 타겟 변동의 50%를 설명합니다. 음수도 가능하며, 이는 평균보다
+      못한 모델입니다.
 - id: step11_visualize
   title: 11단계. 시각화
+  structuredPrimary: true
   subtitle: 예측 vs 실제
+  goal: '11단계. 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    예측값과 실제값을 산점도로 비교합니다. 완벽한 모델이라면 점들이 대각선(y=x) 위에 있어야 합니다.
+
+    잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
+  tips:
+  - 잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.scatter(yTest, yPred, alpha=0.6)
+    ax.plot([yTest.min(), yTest.max()], [yTest.min(), yTest.max()], 'r--', lw=2)
+    ax.set_xlabel('Actual')
+    ax.set_ylabel('Predicted')
+    ax.set_title(f'Actual vs Predicted (R² = {r2:.4f})')
+    fig
+  exercise:
+    prompt: '11단계. 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      ax.scatter(yTest, yPred, alpha=0.6)
+      ax.plot([yTest.min(), yTest.max()], [yTest.min(), yTest.max()], 'r--', lw=2)
+      ax.set_xlabel('Actual')
+      ax.set_ylabel('Predicted')
+      ax.set_title(f'Actual vs Predicted (R² = {r2:.4f})')
+      fig
+    solution: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      ax.scatter(yTest, yPred, alpha=0.6)
+      ax.plot([yTest.min(), yTest.max()], [yTest.min(), yTest.max()], 'r--', lw=2)
+      ax.set_xlabel('Actual')
+      ax.set_ylabel('Predicted')
+      ax.set_title(f'Actual vs Predicted (R² = {r2:.4f})')
+      fig
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 예측값과 실제값을 산점도로 비교합니다. 완벽한 모델이라면 점들이 대각선(y=x) 위에 있어야 합니다.
@@ -255,13 +618,51 @@ sections:
       fig
   - type: tip
     content: 잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
-
 - id: step12_summary
   title: 12단계. 정리
+  structuredPrimary: true
   subtitle: 회귀 분석 완료
+  goal: '12단계. 정리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 정리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이번 프로젝트에서는 당뇨병 진행도 예측 모델을 만들어 회귀 분석을 학습했습니다. LinearRegression으로 연속값을 예측하고, MSE, MAE, R²로 모델을 평가하는 방법을 배웠습니다.
+    statsmodels에서 배운 R² 개념이 sklearn에서도 동일하게 적용됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    summary = pd.DataFrame({
+        'Item': ['Dataset', 'Model', 'Features', 'MSE', 'R²'],
+        'Value': ['Diabetes (442 samples)', 'LinearRegression', '10', f'{mse:.2f}', f'{r2:.4f}']
+    })
+    summary
+  exercise:
+    prompt: '12단계. 정리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Model', 'Features', 'MSE', 'R²'],
+          'Value': ['Diabetes (442 samples)', 'LinearRegression', '10', f'{mse:.2f}', f'{r2:.4f}']
+      })
+      summary
+    solution: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Model', 'Features', 'MSE', 'R²'],
+          'Value': ['Diabetes (442 samples)', 'LinearRegression', '10', f'{mse:.2f}', f'{r2:.4f}']
+      })
+      summary
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 이번 프로젝트에서는 당뇨병 진행도 예측 모델을 만들어 회귀 분석을 학습했습니다. LinearRegression으로 연속값을 예측하고, MSE, MAE, R²로 모델을 평가하는 방법을 배웠습니다. statsmodels에서 배운 R² 개념이 sklearn에서도 동일하게 적용됩니다.
+    content: 이번 프로젝트에서는 당뇨병 진행도 예측 모델을 만들어 회귀 분석을 학습했습니다. LinearRegression으로 연속값을 예측하고, MSE, MAE, R²로 모델을 평가하는 방법을 배웠습니다.
+      statsmodels에서 배운 R² 개념이 sklearn에서도 동일하게 적용됩니다.
   - type: code
     language: python
     title: 최종 요약
@@ -272,17 +673,135 @@ sections:
           'Value': ['Diabetes (442 samples)', 'LinearRegression', '10', f'{mse:.2f}', f'{r2:.4f}']
       })
       summary
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 당뇨병 예측 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    의료 데이터 분석가가 되어 당뇨병 진행도 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, MSE, R²를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from sklearn.datasets import load_diabetes
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import r2_score, mean_squared_error
+    import pandas as pd
+    import numpy as np
+
+    data = load_diabetes()
+    xAll = pd.DataFrame(data.data, columns=data.feature_names)
+    xBmi = xAll[['bmi']]
+    yData = data.target
+
+    xTr1, xTe1, yTr1, yTe1 = train_test_split(xAll, yData, test_size=0.2, random_state=42)
+    xTr2, xTe2, yTr2, yTe2 = train_test_split(xBmi, yData, test_size=0.2, random_state=42)
+
+    sc1, sc2 = StandardScaler(), StandardScaler()
+
+    model1 = LinearRegression()
+    model1.fit(sc1.fit_transform(xTr1), yTr1)
+    pred1 = model1.predict(sc1.transform(xTe1))
+
+    model2 = LinearRegression()
+    model2.fit(sc2.fit_transform(xTr2), yTr2)
+    pred2 = model2.predict(sc2.transform(xTe2))
+
+    pd.DataFrame({
+        'Model': ['All Features (10)', 'BMI Only (1)'],
+        'R²': [r2_score(yTe1, pred1), r2_score(yTe2, pred2)],
+        'RMSE': [np.sqrt(mean_squared_error(yTe1, pred1)), np.sqrt(mean_squared_error(yTe2, pred2))]
+    })
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import r2_score, mean_squared_error
+      import pandas as pd
+      import numpy as np
+
+      data = load_diabetes()
+      xAll = pd.DataFrame(data.data, columns=data.feature_names)
+      xBmi = xAll[['bmi']]
+      yData = data.target
+
+      xTr1, xTe1, yTr1, yTe1 = train_test_split(xAll, yData, test_size=0.2, random_state=42)
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xBmi, yData, test_size=0.2, random_state=42)
+
+      sc1, sc2 = StandardScaler(), StandardScaler()
+
+      model1 = LinearRegression()
+      model1.fit(sc1.fit_transform(xTr1), yTr1)
+      pred1 = model1.predict(sc1.transform(xTe1))
+
+      model2 = LinearRegression()
+      model2.fit(sc2.fit_transform(xTr2), yTr2)
+      pred2 = model2.predict(sc2.transform(xTe2))
+
+      pd.DataFrame({
+          'Model': ['All Features (10)', 'BMI Only (1)'],
+          'R²': [r2_score(yTe1, pred1), r2_score(yTe2, pred2)],
+          'RMSE': [np.sqrt(mean_squared_error(yTe1, pred1)), np.sqrt(mean_squared_error(yTe2, pred2))]
+      })
+    solution: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import r2_score, mean_squared_error
+      import pandas as pd
+      import numpy as np
+
+      data = load_diabetes()
+      xAll = pd.DataFrame(data.data, columns=data.feature_names)
+      xBmi = xAll[['bmi']]
+      yData = data.target
+
+      xTr1, xTe1, yTr1, yTe1 = train_test_split(xAll, yData, test_size=0.2, random_state=42)
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xBmi, yData, test_size=0.2, random_state=42)
+
+      sc1, sc2 = StandardScaler(), StandardScaler()
+
+      model1 = LinearRegression()
+      model1.fit(sc1.fit_transform(xTr1), yTr1)
+      pred1 = model1.predict(sc1.transform(xTe1))
+
+      model2 = LinearRegression()
+      model2.fit(sc2.fit_transform(xTr2), yTr2)
+      pred2 = model2.predict(sc2.transform(xTe2))
+
+      pd.DataFrame({
+          'Model': ['All Features (10)', 'BMI Only (1)'],
+          'R²': [r2_score(yTe1, pred1), r2_score(yTe2, pred2)],
+          'RMSE': [np.sqrt(mean_squared_error(yTe1, pred1)), np.sqrt(mean_squared_error(yTe2, pred2))]
+      })
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 의료 데이터 분석가가 되어 당뇨병 진행도 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, MSE, R²를 모두 활용합니다.
+    content: 의료 데이터 분석가가 되어 당뇨병 진행도 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler,
+      LinearRegression, MSE, R²를 모두 활용합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: BMI 단일 특성으로 예측 vs 전체 특성 비교"
+    title: '미션1: BMI 단일 특성으로 예측 vs 전체 특성 비교'
     code: |-
       from sklearn.datasets import load_diabetes
       from sklearn.model_selection import train_test_split
@@ -316,7 +835,7 @@ sections:
           'RMSE': [np.sqrt(mean_squared_error(yTe1, pred1)), np.sqrt(mean_squared_error(yTe2, pred2))]
       })
   - type: expansion
-    title: "미션2: 특성별 중요도 분석과 상위 5개 특성 모델"
+    title: '미션2: 특성별 중요도 분석과 상위 5개 특성 모델'
     code: |-
       from sklearn.datasets import load_diabetes
       from sklearn.model_selection import train_test_split
@@ -351,13 +870,101 @@ sections:
           'Model': ['All 10 Features', f'Top 5: {top5}'],
           'R²': [r2_score(yTeF, predF), r2_score(yTe5, pred5)]
       })
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+    검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다."
+    content: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로
+      검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   - type: code
     language: python
     title: 분류 데이터와 파이프라인 준비
@@ -430,7 +1037,7 @@ sections:
       assert all(modelChecks.values()), modelChecks
       modelChecks
   - type: expansion
-    title: "실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?"
+    title: '실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?'
     blocks:
     - type: code
       language: python

@@ -1,28 +1,68 @@
 meta:
   packages:
-    - numpy
-    - pandas
+  - numpy
+  - pandas
   id: numpy_04
   title: 음악특성분석
   order: 4
   category: numpy
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["numpy", "reshape", "normalization", "corrcoef", "broadcasting", "nan", "검증", "특성분석"]
+  tags:
+  - numpy
+  - reshape
+  - normalization
+  - corrcoef
+  - broadcasting
+  - nan
+  - 검증
+  - 특성분석
   seo:
-    title: "NumPy 정규화와 상관관계 - Spotify 음악 분석"
-    description: "NumPy의 배열 변형과 정규화를 배우며 Spotify 음악 특성 데이터의 상관관계를 분석합니다."
-    keywords: ["numpy", "정규화", "상관계수", "corrcoef", "spotify", "음악분석"]
-
+    title: NumPy 정규화와 상관관계 - Spotify 음악 분석
+    description: NumPy의 배열 변형과 정규화를 배우며 Spotify 음악 특성 데이터의 상관관계를 분석합니다.
+    keywords:
+    - numpy
+    - 정규화
+    - 상관계수
+    - corrcoef
+    - spotify
+    - 음악분석
 intro:
-  emoji: "🎵"
+  emoji: 🎵
   goal: Spotify 음악 특성 데이터로 정규화와 상관관계를 익힙니다.
   description: 32,000곡의 음악 특성 데이터를 분석합니다. reshape으로 배열 형태를 변경하고, 브로드캐스팅으로 정규화를 수행하며, 상관계수를 계산합니다.
-
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    solution: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
@@ -33,13 +73,48 @@ sections:
     content: |-
       import numpy as np
       import pandas as pd
-
 - id: step2_data
   title: 2단계. 데이터 로드
+  structuredPrimary: true
   subtitle: Spotify 데이터셋
+  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: TidyTuesday는 매주 다양한 공개 데이터셋을 제공하는 프로젝트입니다. Spotify 데이터에는 32,000곡의 음악 특성이 담겨 있습니다. danceability(춤추기 좋은 정도),
+    energy(에너지), valence(밝고 긍정적인 정도) 등 Spotify가 자체 알고리즘으로 분석한 0~1 사이의 수치들입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("spotify_songs")
+    df.head()
+  exercise:
+    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("spotify_songs")
+      df.head()
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("spotify_songs")
+      df.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "TidyTuesday는 매주 다양한 공개 데이터셋을 제공하는 프로젝트입니다. Spotify 데이터에는 32,000곡의 음악 특성이 담겨 있습니다. danceability(춤추기 좋은 정도), energy(에너지), valence(밝고 긍정적인 정도) 등 Spotify가 자체 알고리즘으로 분석한 0~1 사이의 수치들입니다."
+    content: TidyTuesday는 매주 다양한 공개 데이터셋을 제공하는 프로젝트입니다. Spotify 데이터에는 32,000곡의 음악 특성이 담겨 있습니다. danceability(춤추기 좋은 정도), energy(에너지),
+      valence(밝고 긍정적인 정도) 등 Spotify가 자체 알고리즘으로 분석한 0~1 사이의 수치들입니다.
   - type: code
     language: python
     title: Spotify 데이터 로드
@@ -49,13 +124,48 @@ sections:
 
       df = loadLocalDataset("spotify_songs")
       df.head()
-
 - id: step3_extract
   title: 3단계. 특성 배열 추출
+  structuredPrimary: true
   subtitle: 다중 컬럼
+  goal: '3단계. 특성 배열 추출: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 특성 배열 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 여러 개의 열(컬럼)을 동시에 선택할 수 있습니다. df[['A', 'B', 'C']]처럼 열 이름 리스트를 전달하면 해당 열들만 추출됩니다. 9개 음악 특성을 선택하면 32,000행 × 9열
+    크기의 2차원 배열이 만들어집니다. 각 행은 하나의 곡, 각 열은 하나의 특성입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    cols = ['danceability', 'energy', 'loudness', 'speechiness',
+            'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+    features = df[cols].values
+    features.shape
+  exercise:
+    prompt: '3단계. 특성 배열 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cols = ['danceability', 'energy', 'loudness', 'speechiness',
+              'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+      features = df[cols].values
+      features.shape
+    solution: |-
+      cols = ['danceability', 'energy', 'loudness', 'speechiness',
+              'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+      features = df[cols].values
+      features.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "여러 개의 열(컬럼)을 동시에 선택할 수 있습니다. df[['A', 'B', 'C']]처럼 열 이름 리스트를 전달하면 해당 열들만 추출됩니다. 9개 음악 특성을 선택하면 32,000행 × 9열 크기의 2차원 배열이 만들어집니다. 각 행은 하나의 곡, 각 열은 하나의 특성입니다."
+    content: 여러 개의 열(컬럼)을 동시에 선택할 수 있습니다. df[['A', 'B', 'C']]처럼 열 이름 리스트를 전달하면 해당 열들만 추출됩니다. 9개 음악 특성을 선택하면 32,000행 × 9열 크기의
+      2차원 배열이 만들어집니다. 각 행은 하나의 곡, 각 열은 하나의 특성입니다.
   - type: code
     language: python
     title: 특성 배열 추출
@@ -65,10 +175,40 @@ sections:
               'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
       features = df[cols].values
       features.shape
-
 - id: step4_stats
   title: 4단계. 기본 통계
+  structuredPrimary: true
   subtitle: axis=0
+  goal: '4단계. 기본 통계: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 기본 통계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 각 특성의 평균과 표준편차를 계산합니다. axis=0으로 열 방향 연산을 수행합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    avg = np.mean(features, axis=0)
+    std = np.std(features, axis=0)
+    pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+  exercise:
+    prompt: '4단계. 기본 통계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      avg = np.mean(features, axis=0)
+      std = np.std(features, axis=0)
+      pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+    solution: |-
+      avg = np.mean(features, axis=0)
+      std = np.std(features, axis=0)
+      pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 각 특성의 평균과 표준편차를 계산합니다. axis=0으로 열 방향 연산을 수행합니다.
@@ -80,28 +220,86 @@ sections:
       avg = np.mean(features, axis=0)
       std = np.std(features, axis=0)
       pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
-
 - id: step5_nan_check
   title: 5단계. 결측값 확인
+  structuredPrimary: true
   subtitle: np.isnan()
+  goal: '5단계. 결측값 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 결측값 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    NaN(Not a Number)은 '값이 없음'을 나타내는 특수한 표시입니다. 엑셀의 빈 셀과 비슷합니다. 실제 데이터에서는 측정 실패, 입력 누락 등으로 결측값이 자주 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. sum()으로 전체 NaN 개수를 셀 수 있습니다.
+
+    np.isnan()은 NaN(결측값) 여부를 불리언 배열로 반환합니다. sum()으로 전체 NaN 개수를 확인할 수 있습니다.
+  tips:
+  - np.isnan()은 NaN(결측값) 여부를 불리언 배열로 반환합니다. sum()으로 전체 NaN 개수를 확인할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: np.sum(np.isnan(features))
+  exercise:
+    prompt: '5단계. 결측값 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: np.sum(np.isnan(features))
+    solution: np.sum(np.isnan(features))
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "NaN(Not a Number)은 '값이 없음'을 나타내는 특수한 표시입니다. 엑셀의 빈 셀과 비슷합니다. 실제 데이터에서는 측정 실패, 입력 누락 등으로 결측값이 자주 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. sum()으로 전체 NaN 개수를 셀 수 있습니다."
+    content: NaN(Not a Number)은 '값이 없음'을 나타내는 특수한 표시입니다. 엑셀의 빈 셀과 비슷합니다. 실제 데이터에서는 측정 실패, 입력 누락 등으로 결측값이 자주 발생합니다. np.isnan()은
+      각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. sum()으로 전체 NaN 개수를 셀 수 있습니다.
   - type: code
     language: python
     title: 결측값 개수
     description: 전체 NaN 개수를 확인합니다
-    content: |-
-      np.sum(np.isnan(features))
+    content: np.sum(np.isnan(features))
   - type: tip
     content: np.isnan()은 NaN(결측값) 여부를 불리언 배열로 반환합니다. sum()으로 전체 NaN 개수를 확인할 수 있습니다.
-
 - id: step6_nan_remove
   title: 6단계. 결측값 제거
+  structuredPrimary: true
   subtitle: np.any()
+  goal: '6단계. 결측값 제거: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 결측값 제거: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    any()는 '하나라도 있으면 True'를 반환합니다. np.any(np.isnan(features), axis=1)은 각 행(axis=1)에서 NaN이 하나라도 있으면 True입니다. 이 True/False 배열 앞에 ~(틸다)를 붙이면 반전되어, NaN이 없는 행만 True가 됩니다. 결과적으로 NaN이 없는 깨끗한 행들만 남습니다.
+
+    np.any(arr, axis=1)은 각 행에서 하나라도 True가 있으면 True를 반환합니다. ~(틸다)는 불리언 배열을 반전시킵니다.
+  tips:
+  - np.any(arr, axis=1)은 각 행에서 하나라도 True가 있으면 True를 반환합니다. ~(틸다)는 불리언 배열을 반전시킵니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    mask = np.any(np.isnan(features), axis=1)
+    clean = features[~mask]
+    clean.shape
+  exercise:
+    prompt: '6단계. 결측값 제거: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mask = np.any(np.isnan(features), axis=1)
+      clean = features[~mask]
+      clean.shape
+    solution: |-
+      mask = np.any(np.isnan(features), axis=1)
+      clean = features[~mask]
+      clean.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "any()는 '하나라도 있으면 True'를 반환합니다. np.any(np.isnan(features), axis=1)은 각 행(axis=1)에서 NaN이 하나라도 있으면 True입니다. 이 True/False 배열 앞에 ~(틸다)를 붙이면 반전되어, NaN이 없는 행만 True가 됩니다. 결과적으로 NaN이 없는 깨끗한 행들만 남습니다."
+    content: any()는 '하나라도 있으면 True'를 반환합니다. np.any(np.isnan(features), axis=1)은 각 행(axis=1)에서 NaN이 하나라도 있으면 True입니다. 이 True/False
+      배열 앞에 ~(틸다)를 붙이면 반전되어, NaN이 없는 행만 True가 됩니다. 결과적으로 NaN이 없는 깨끗한 행들만 남습니다.
   - type: code
     language: python
     title: 결측값 행 제거
@@ -112,13 +310,50 @@ sections:
       clean.shape
   - type: tip
     content: np.any(arr, axis=1)은 각 행에서 하나라도 True가 있으면 True를 반환합니다. ~(틸다)는 불리언 배열을 반전시킵니다.
-
 - id: step7_minmax
   title: 7단계. Min-Max 정규화
+  structuredPrimary: true
   subtitle: 0~1 범위
+  goal: '7단계. Min-Max 정규화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. Min-Max 정규화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    정규화(Normalization)는 서로 다른 단위의 데이터를 같은 범위로 맞추는 작업입니다. tempo(템포)는 50~200 범위이고 danceability는 0~1 범위라서 직접 비교하기 어렵습니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 모든 값을 0~1 범위로 변환합니다. 브로드캐스팅 덕분에 for문 없이 한 줄로 전체 배열에 적용됩니다.
+
+    Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 계산합니다. 브로드캐스팅 덕분에 반복문 없이 전체 배열에 연산이 적용됩니다.
+  tips:
+  - Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 계산합니다. 브로드캐스팅 덕분에 반복문 없이 전체 배열에 연산이 적용됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    lo = np.min(clean, axis=0)
+    hi = np.max(clean, axis=0)
+    norm = (clean - lo) / (hi - lo)
+    norm[:5]
+  exercise:
+    prompt: '7단계. Min-Max 정규화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      lo = np.min(clean, axis=0)
+      hi = np.max(clean, axis=0)
+      norm = (clean - lo) / (hi - lo)
+      norm[:5]
+    solution: |-
+      lo = np.min(clean, axis=0)
+      hi = np.max(clean, axis=0)
+      norm = (clean - lo) / (hi - lo)
+      norm[:5]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "정규화(Normalization)는 서로 다른 단위의 데이터를 같은 범위로 맞추는 작업입니다. tempo(템포)는 50~200 범위이고 danceability는 0~1 범위라서 직접 비교하기 어렵습니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 모든 값을 0~1 범위로 변환합니다. 브로드캐스팅 덕분에 for문 없이 한 줄로 전체 배열에 적용됩니다."
+    content: 정규화(Normalization)는 서로 다른 단위의 데이터를 같은 범위로 맞추는 작업입니다. tempo(템포)는 50~200 범위이고 danceability는 0~1 범위라서 직접 비교하기 어렵습니다.
+      Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 모든 값을 0~1 범위로 변환합니다. 브로드캐스팅 덕분에 for문 없이 한 줄로 전체 배열에 적용됩니다.
   - type: code
     language: python
     title: Min-Max 정규화
@@ -130,10 +365,58 @@ sections:
       norm[:5]
   - type: tip
     content: Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 계산합니다. 브로드캐스팅 덕분에 반복문 없이 전체 배열에 연산이 적용됩니다.
-
 - id: step8_norm_verify
   title: 8단계. 정규화 확인
+  structuredPrimary: true
   subtitle: 범위 검증
+  goal: '8단계. 정규화 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 정규화 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 정규화 후 모든 특성이 0~1 범위에 있는지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    avg = np.mean(norm, axis=0)
+    mins = np.min(norm, axis=0)
+    maxs = np.max(norm, axis=0)
+    pd.DataFrame({
+        'Feature': cols,
+        'Min': np.round(mins, 2),
+        'Max': np.round(maxs, 2),
+        'Mean': np.round(avg, 2)
+    })
+  exercise:
+    prompt: '8단계. 정규화 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      avg = np.mean(norm, axis=0)
+      mins = np.min(norm, axis=0)
+      maxs = np.max(norm, axis=0)
+      pd.DataFrame({
+          'Feature': cols,
+          'Min': np.round(mins, 2),
+          'Max': np.round(maxs, 2),
+          'Mean': np.round(avg, 2)
+      })
+    solution: |-
+      avg = np.mean(norm, axis=0)
+      mins = np.min(norm, axis=0)
+      maxs = np.max(norm, axis=0)
+      pd.DataFrame({
+          'Feature': cols,
+          'Min': np.round(mins, 2),
+          'Max': np.round(maxs, 2),
+          'Mean': np.round(avg, 2)
+      })
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 정규화 후 모든 특성이 0~1 범위에 있는지 확인합니다.
@@ -151,13 +434,50 @@ sections:
           'Max': np.round(maxs, 2),
           'Mean': np.round(avg, 2)
       })
-
 - id: step9_zscore
   title: 9단계. Z-score 표준화
+  structuredPrimary: true
   subtitle: 평균 0, 표준편차 1
+  goal: '9단계. Z-score 표준화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. Z-score 표준화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과 값은 '평균에서 표준편차 몇 개 만큼 떨어져 있는가'를 의미합니다. Z=2면 평균보다 표준편차 2개만큼 큰 값이고, Z=-1이면 평균보다 표준편차 1개만큼 작은 값입니다. 표준화 후에는 평균이 0, 표준편차가 1이 됩니다.
+
+    Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과의 평균은 0, 표준편차는 1이 됩니다.
+  tips:
+  - Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과의 평균은 0, 표준편차는 1이 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    mu = np.mean(clean, axis=0)
+    sigma = np.std(clean, axis=0)
+    z = (clean - mu) / sigma
+    z[:5]
+  exercise:
+    prompt: '9단계. Z-score 표준화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      z[:5]
+    solution: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      z[:5]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과 값은 '평균에서 표준편차 몇 개 만큼 떨어져 있는가'를 의미합니다. Z=2면 평균보다 표준편차 2개만큼 큰 값이고, Z=-1이면 평균보다 표준편차 1개만큼 작은 값입니다. 표준화 후에는 평균이 0, 표준편차가 1이 됩니다."
+    content: Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과 값은 '평균에서 표준편차 몇 개 만큼 떨어져 있는가'를 의미합니다. Z=2면 평균보다 표준편차 2개만큼 큰 값이고, Z=-1이면
+      평균보다 표준편차 1개만큼 작은 값입니다. 표준화 후에는 평균이 0, 표준편차가 1이 됩니다.
   - type: code
     language: python
     title: Z-score 표준화
@@ -169,10 +489,31 @@ sections:
       z[:5]
   - type: tip
     content: Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과의 평균은 0, 표준편차는 1이 됩니다.
-
 - id: step10_zscore_verify
   title: 10단계. 표준화 확인
+  structuredPrimary: true
   subtitle: 결과 검증
+  goal: '10단계. 표준화 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 표준화 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 표준화 후 평균이 0, 표준편차가 1에 가까운지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
+  exercise:
+    prompt: '10단계. 표준화 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
+    solution: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 표준화 후 평균이 0, 표준편차가 1에 가까운지 확인합니다.
@@ -180,15 +521,51 @@ sections:
     language: python
     title: 표준화 검증
     description: 표준화 결과를 확인합니다
-    content: |-
-      f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
-
+    content: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
 - id: step11_corr_two
   title: 11단계. 두 변수 상관계수
+  structuredPrimary: true
   subtitle: np.corrcoef()
+  goal: '11단계. 두 변수 상관계수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 두 변수 상관계수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상관계수는 두 변수가 함께 변하는 정도를 -1에서 1 사이 숫자로 나타냅니다. 1에 가까우면 양의 상관(하나가 커지면 다른 것도 커짐), -1에 가까우면 음의 상관(하나가 커지면 다른 것은 작아짐), 0에 가까우면 관계가 없습니다. np.corrcoef()는 상관계수 행렬을 반환하는데, 2x2 행렬의 비대각선 값이 실제 상관계수입니다.
+
+    np.corrcoef(x, y)는 피어슨 상관계수 행렬을 반환합니다. 대각선은 항상 1(자기 자신과의 상관), 비대각선이 두 변수 간 상관계수입니다.
+  tips:
+  - np.corrcoef(x, y)는 피어슨 상관계수 행렬을 반환합니다. 대각선은 항상 1(자기 자신과의 상관), 비대각선이 두 변수 간 상관계수입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    dance = clean[:, 0]
+    energy = clean[:, 1]
+    corr = np.corrcoef(dance, energy)
+    corr
+  exercise:
+    prompt: '11단계. 두 변수 상관계수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dance = clean[:, 0]
+      energy = clean[:, 1]
+      corr = np.corrcoef(dance, energy)
+      corr
+    solution: |-
+      dance = clean[:, 0]
+      energy = clean[:, 1]
+      corr = np.corrcoef(dance, energy)
+      corr
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "상관계수는 두 변수가 함께 변하는 정도를 -1에서 1 사이 숫자로 나타냅니다. 1에 가까우면 양의 상관(하나가 커지면 다른 것도 커짐), -1에 가까우면 음의 상관(하나가 커지면 다른 것은 작아짐), 0에 가까우면 관계가 없습니다. np.corrcoef()는 상관계수 행렬을 반환하는데, 2x2 행렬의 비대각선 값이 실제 상관계수입니다."
+    content: 상관계수는 두 변수가 함께 변하는 정도를 -1에서 1 사이 숫자로 나타냅니다. 1에 가까우면 양의 상관(하나가 커지면 다른 것도 커짐), -1에 가까우면 음의 상관(하나가 커지면 다른 것은 작아짐),
+      0에 가까우면 관계가 없습니다. np.corrcoef()는 상관계수 행렬을 반환하는데, 2x2 행렬의 비대각선 값이 실제 상관계수입니다.
   - type: code
     language: python
     title: 상관계수 행렬
@@ -200,10 +577,37 @@ sections:
       corr
   - type: tip
     content: np.corrcoef(x, y)는 피어슨 상관계수 행렬을 반환합니다. 대각선은 항상 1(자기 자신과의 상관), 비대각선이 두 변수 간 상관계수입니다.
-
 - id: step12_corr_value
   title: 12단계. 상관계수 추출
+  structuredPrimary: true
   subtitle: 행렬 인덱싱
+  goal: '12단계. 상관계수 추출: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 상관계수 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 상관계수 행렬에서 두 변수 간 상관계수만 추출합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    r = corr[0, 1]
+    f"danceability-energy 상관계수: {r:.3f}"
+  exercise:
+    prompt: '12단계. 상관계수 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      r = corr[0, 1]
+      f"danceability-energy 상관계수: {r:.3f}"
+    solution: |-
+      r = corr[0, 1]
+      f"danceability-energy 상관계수: {r:.3f}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 상관계수 행렬에서 두 변수 간 상관계수만 추출합니다.
@@ -214,13 +618,44 @@ sections:
     content: |-
       r = corr[0, 1]
       f"danceability-energy 상관계수: {r:.3f}"
-
 - id: step13_corr_all
   title: 13단계. 전체 상관계수 행렬
+  structuredPrimary: true
   subtitle: 전치 활용
+  goal: '13단계. 전체 상관계수 행렬: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '13단계. 전체 상관계수 행렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    9개 특성 간의 모든 상관계수를 한 번에 계산합니다. corrcoef()는 행을 변수로 취급하는데, 현재 데이터는 열이 특성입니다. .T(전치)로 행과 열을 바꿔주면 됩니다. 전치란 행과 열을 서로 뒤집는 것으로, (32000, 9) 배열이 (9, 32000)으로 바뀝니다. 결과는 9x9 상관계수 행렬입니다.
+
+    corrcoef는 행을 변수로 취급합니다. 특성이 열에 있으므로 .T로 전치하여 행과 열을 바꿔줍니다.
+  tips:
+  - corrcoef는 행을 변수로 취급합니다. 특성이 열에 있으므로 .T로 전치하여 행과 열을 바꿔줍니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    matrix = np.corrcoef(clean.T)
+    matrix.shape
+  exercise:
+    prompt: '13단계. 전체 상관계수 행렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      matrix = np.corrcoef(clean.T)
+      matrix.shape
+    solution: |-
+      matrix = np.corrcoef(clean.T)
+      matrix.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "9개 특성 간의 모든 상관계수를 한 번에 계산합니다. corrcoef()는 행을 변수로 취급하는데, 현재 데이터는 열이 특성입니다. .T(전치)로 행과 열을 바꿔주면 됩니다. 전치란 행과 열을 서로 뒤집는 것으로, (32000, 9) 배열이 (9, 32000)으로 바뀝니다. 결과는 9x9 상관계수 행렬입니다."
+    content: 9개 특성 간의 모든 상관계수를 한 번에 계산합니다. corrcoef()는 행을 변수로 취급하는데, 현재 데이터는 열이 특성입니다. .T(전치)로 행과 열을 바꿔주면 됩니다. 전치란 행과 열을 서로
+      뒤집는 것으로, (32000, 9) 배열이 (9, 32000)으로 바뀝니다. 결과는 9x9 상관계수 행렬입니다.
   - type: code
     language: python
     title: 전체 상관계수 행렬
@@ -230,10 +665,37 @@ sections:
       matrix.shape
   - type: tip
     content: corrcoef는 행을 변수로 취급합니다. 특성이 열에 있으므로 .T로 전치하여 행과 열을 바꿔줍니다.
-
 - id: step14_corr_display
   title: 14단계. 상관계수 시각화
+  structuredPrimary: true
   subtitle: DataFrame 변환
+  goal: '14단계. 상관계수 시각화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '14단계. 상관계수 시각화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 상관계수 행렬을 DataFrame으로 보기 좋게 표시합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+    result
+  exercise:
+    prompt: '14단계. 상관계수 시각화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+      result
+    solution: |-
+      result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+      result
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 상관계수 행렬을 DataFrame으로 보기 좋게 표시합니다.
@@ -244,13 +706,56 @@ sections:
     content: |-
       result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
       result
-
 - id: step15_corr_extreme
   title: 15단계. 강한 상관관계 찾기
+  structuredPrimary: true
   subtitle: np.triu(), unravel_index
+  goal: '15단계. 강한 상관관계 찾기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '15단계. 강한 상관관계 찾기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상관계수 행렬에서 가장 강한 관계를 찾습니다. 대각선은 자기 자신과의 상관(항상 1)이므로 제외해야 합니다. np.triu(matrix, k=1)은 상삼각 부분만 남깁니다(대각선 위쪽). unravel_index는 1차원 인덱스를 2차원 위치(행, 열)로 변환합니다. 가장 높은 양의 상관과 음의 상관을 가진 특성 쌍을 찾을 수 있습니다.
+
+    np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
+  tips:
+  - np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    upper = np.triu(matrix, k=1)
+    idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+    temp = matrix.copy()
+    np.fill_diagonal(temp, 0)
+    idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+    f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+  exercise:
+    prompt: '15단계. 강한 상관관계 찾기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      upper = np.triu(matrix, k=1)
+      idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+      temp = matrix.copy()
+      np.fill_diagonal(temp, 0)
+      idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+      f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+    solution: |-
+      upper = np.triu(matrix, k=1)
+      idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+      temp = matrix.copy()
+      np.fill_diagonal(temp, 0)
+      idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+      f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "상관계수 행렬에서 가장 강한 관계를 찾습니다. 대각선은 자기 자신과의 상관(항상 1)이므로 제외해야 합니다. np.triu(matrix, k=1)은 상삼각 부분만 남깁니다(대각선 위쪽). unravel_index는 1차원 인덱스를 2차원 위치(행, 열)로 변환합니다. 가장 높은 양의 상관과 음의 상관을 가진 특성 쌍을 찾을 수 있습니다."
+    content: 상관계수 행렬에서 가장 강한 관계를 찾습니다. 대각선은 자기 자신과의 상관(항상 1)이므로 제외해야 합니다. np.triu(matrix, k=1)은 상삼각 부분만 남깁니다(대각선 위쪽). unravel_index는
+      1차원 인덱스를 2차원 위치(행, 열)로 변환합니다. 가장 높은 양의 상관과 음의 상관을 가진 특성 쌍을 찾을 수 있습니다.
   - type: code
     language: python
     title: 가장 강한 상관관계
@@ -264,17 +769,99 @@ sections:
       f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
   - type: tip
     content: np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
-
 - id: workflow_validation
-  title: "현업 흐름 검증: 음악 특성 정규화와 결측 처리"
-  subtitle: "nanmean, min-max scaling, corrcoef, 실패 케이스"
+  title: '현업 흐름 검증: 음악 특성 정규화와 결측 처리'
+  structuredPrimary: true
+  subtitle: nanmean, min-max scaling, corrcoef, 실패 케이스
+  goal: '현업 흐름 검증: 음악 특성 정규화와 결측 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 음악 특성 정규화와 결측 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    음악 특성처럼 단위가 섞인 배열은 먼저 정규화하고 결측값을 처리해야 합니다. 결측을 무시한 평균과 정규화 범위를 검증한 뒤 상관관계를 해석하세요.
+
+    변주 실험
+    템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요.
+  tips:
+  - 변주 실험 템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+
+    features = np.array([
+        [0.8, 120.0, 0.6],
+        [0.5, np.nan, 0.7],
+        [0.9, 140.0, 0.4],
+    ])
+
+    columnMeans = np.nanmean(features, axis=0)
+    filled = np.where(np.isnan(features), columnMeans, features)
+    minimum = filled.min(axis=0)
+    maximum = filled.max(axis=0)
+    scaled = (filled - minimum) / (maximum - minimum)
+    corr = np.corrcoef(scaled, rowvar=False)
+
+    assert not np.isnan(filled).any()
+    assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+    assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+    assert corr.shape == (3, 3)
+  exercise:
+    prompt: '현업 흐름 검증: 음악 특성 정규화와 결측 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      features = np.array([
+          [0.8, 120.0, 0.6],
+          [0.5, np.nan, 0.7],
+          [0.9, 140.0, 0.4],
+      ])
+
+      columnMeans = np.nanmean(features, axis=0)
+      filled = np.where(np.isnan(features), columnMeans, features)
+      minimum = filled.min(axis=0)
+      maximum = filled.max(axis=0)
+      scaled = (filled - minimum) / (maximum - minimum)
+      corr = np.corrcoef(scaled, rowvar=False)
+
+      assert not np.isnan(filled).any()
+      assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+      assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+      assert corr.shape == (3, 3)
+    solution: |-
+      import numpy as np
+
+      features = np.array([
+          [0.8, 120.0, 0.6],
+          [0.5, np.nan, 0.7],
+          [0.9, 140.0, 0.4],
+      ])
+
+      columnMeans = np.nanmean(features, axis=0)
+      filled = np.where(np.isnan(features), columnMeans, features)
+      minimum = filled.min(axis=0)
+      maximum = filled.max(axis=0)
+      scaled = (filled - minimum) / (maximum - minimum)
+      corr = np.corrcoef(scaled, rowvar=False)
+
+      assert not np.isnan(filled).any()
+      assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+      assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+      assert corr.shape == (3, 3)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "음악 특성처럼 단위가 섞인 배열은 먼저 정규화하고 결측값을 처리해야 합니다. 결측을 무시한 평균과 정규화 범위를 검증한 뒤 상관관계를 해석하세요."
+    content: 음악 특성처럼 단위가 섞인 배열은 먼저 정규화하고 결측값을 처리해야 합니다. 결측을 무시한 평균과 정규화 범위를 검증한 뒤 상관관계를 해석하세요.
   - type: code
     language: python
-    title: "특성 행렬 정규화"
-    description: "NaN을 평균으로 대체하고 0~1 범위로 정규화합니다."
+    title: 특성 행렬 정규화
+    description: NaN을 평균으로 대체하고 0~1 범위로 정규화합니다.
     content: |-
       import numpy as np
 
@@ -297,8 +884,8 @@ sections:
       assert corr.shape == (3, 3)
   - type: code
     language: python
-    title: "상수 컬럼 정규화 오류 확인"
-    description: "분모가 0이 되는 특성은 정규화 전에 잡습니다."
+    title: 상수 컬럼 정규화 오류 확인
+    description: 분모가 0이 되는 특성은 정규화 전에 잡습니다.
     content: |-
       import numpy as np
 
@@ -316,22 +903,106 @@ sections:
 
       assert message == "constant feature cannot be min-max scaled"
   - type: tip
-    title: "변주 실험"
-    content: "템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요."
-
+    title: 변주 실험
+    content: 템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요.
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: Spotify 음악 분석
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame({
+        'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                       'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+        'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                           'rock', 'acoustic', 'edm', 'ambient'],
+        'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+        'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+        'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+        'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+        'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+        'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+        'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+        'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+        'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+        'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+    })
+    cols = ['danceability', 'energy', 'valence', 'tempo']
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                         'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+          'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                             'rock', 'acoustic', 'edm', 'ambient'],
+          'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+          'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+          'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+          'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+          'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+          'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+          'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+          'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+          'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+          'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+      })
+      cols = ['danceability', 'energy', 'valence', 'tempo']
+    solution: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                         'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+          'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                             'rock', 'acoustic', 'edm', 'ambient'],
+          'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+          'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+          'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+          'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+          'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+          'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+          'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+          'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+          'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+          'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+      })
+      cols = ['danceability', 'energy', 'valence', 'tempo']
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 장르별 음악 특성 평균 비교"
+    title: '미션1: 장르별 음악 특성 평균 비교'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import numpy as np
         import pandas as pd
@@ -354,7 +1025,7 @@ sections:
         })
         cols = ['danceability', 'energy', 'valence', 'tempo']
     - type: code
-      title: "장르별 분석"
+      title: 장르별 분석
       content: |-
         genres = data['playlist_genre'].unique()
         rows = []
@@ -365,10 +1036,10 @@ sections:
             rows.append([g] + list(np.round(avg, 3)))
         pd.DataFrame(rows, columns=['Genre'] + cols)
   - type: expansion
-    title: "미션2: 인기도와 음악 특성 상관관계 분석"
+    title: '미션2: 인기도와 음악 특성 상관관계 분석'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import numpy as np
         import pandas as pd
@@ -392,7 +1063,7 @@ sections:
         cols = ['danceability', 'energy', 'loudness', 'speechiness',
                 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
     - type: code
-      title: "상관관계 분석"
+      title: 상관관계 분석
       content: |-
         pop = df['track_popularity'].values
         feat = df[cols].values

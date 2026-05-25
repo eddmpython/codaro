@@ -1,30 +1,97 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - opencv-python
-    - scikit-learn
+  - matplotlib
+  - numpy
+  - opencv-python
+  - scikit-learn
   id: opencv_04
   title: 이미지필터랩
   order: 4
   category: opencv
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["OpenCV", "blur", "GaussianBlur", "medianBlur", "bilateralFilter", "필터"]
+  tags:
+  - OpenCV
+  - blur
+  - GaussianBlur
+  - medianBlur
+  - bilateralFilter
+  - 필터
   seo:
-    title: "OpenCV 기초 - 이미지 필터 랩"
-    description: "OpenCV로 다양한 블러링과 노이즈 제거 필터를 적용합니다."
-    keywords: ["OpenCV", "blur", "GaussianBlur", "medianBlur", "bilateralFilter"]
-
+    title: OpenCV 기초 - 이미지 필터 랩
+    description: OpenCV로 다양한 블러링과 노이즈 제거 필터를 적용합니다.
+    keywords:
+    - OpenCV
+    - blur
+    - GaussianBlur
+    - medianBlur
+    - bilateralFilter
 intro:
-  emoji: "🔮"
+  emoji: 🔮
   goal: blur, GaussianBlur, medianBlur, bilateralFilter로 이미지를 부드럽게 합니다.
   description: 다양한 블러링 기법을 비교합니다. 각 필터의 특성과 노이즈 제거 효과를 이해합니다.
-
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
+  structuredPrimary: true
   subtitle: sklearn 샘플 이미지
+  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sklearn에 내장된 샘플 이미지를 사용합니다. 필터링은 노이즈 제거, 이미지 부드럽게 만들기, 에지 검출 전처리 등에 사용됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+    import matplotlib.pyplot as plt
+
+    flowerArr = load_sample_image('flower.jpg')
+    pic = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(flowerArr)
+    plt.title(f'Original: {pic.shape}')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flowerArr = load_sample_image('flower.jpg')
+      pic = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(flowerArr)
+      plt.title(f'Original: {pic.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flowerArr = load_sample_image('flower.jpg')
+      pic = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(flowerArr)
+      plt.title(f'Original: {pic.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn에 내장된 샘플 이미지를 사용합니다. 필터링은 노이즈 제거, 이미지 부드럽게 만들기, 에지 검출 전처리 등에 사용됩니다.
@@ -56,13 +123,56 @@ sections:
       plt.title(f'Original: {pic.shape[1]}x{pic.shape[0]}')
       plt.axis('off')
       plt.tight_layout()
-
 - id: step2_blur
   title: 2단계. 기본 블러
+  structuredPrimary: true
   subtitle: blur()
+  goal: '2단계. 기본 블러: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기본 블러: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    blur()는 평균 블러(mean blur)입니다. 커널(kernel)은 이미지 위를 이동하며 연산을 수행하는 작은 행렬입니다. 3x3 커널이면 9개 픽셀의 평균으로 중심 픽셀을 대체합니다. 커널이 클수록 더 많은 픽셀을 평균하므로 더 흐려집니다. 이 과정을 컨볼루션(convolution)이라고 합니다.
+
+    blur()의 두 번째 인자 (3, 3)은 커널 크기입니다. 홀수로 지정합니다. 커널이 클수록 블러 효과가 강해집니다. 연산 시간도 증가합니다.
+  tips:
+  - blur()의 두 번째 인자 (3, 3)은 커널 크기입니다. 홀수로 지정합니다. 커널이 클수록 블러 효과가 강해집니다. 연산 시간도 증가합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    blurred3 = cv2.blur(pic, (3, 3))
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cv2.cvtColor(blurred3, cv2.COLOR_BGR2RGB))
+    plt.title('Blur 3x3')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '2단계. 기본 블러: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      blurred3 = cv2.blur(pic, (3, 3))
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(blurred3, cv2.COLOR_BGR2RGB))
+      plt.title('Blur 3x3')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      blurred3 = cv2.blur(pic, (3, 3))
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(blurred3, cv2.COLOR_BGR2RGB))
+      plt.title('Blur 3x3')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: blur()는 평균 블러(mean blur)입니다. 커널(kernel)은 이미지 위를 이동하며 연산을 수행하는 작은 행렬입니다. 3x3 커널이면 9개 픽셀의 평균으로 중심 픽셀을 대체합니다. 커널이 클수록 더 많은 픽셀을 평균하므로 더 흐려집니다. 이 과정을 컨볼루션(convolution)이라고 합니다.
+    content: blur()는 평균 블러(mean blur)입니다. 커널(kernel)은 이미지 위를 이동하며 연산을 수행하는 작은 행렬입니다. 3x3 커널이면 9개 픽셀의 평균으로 중심 픽셀을 대체합니다. 커널이
+      클수록 더 많은 픽셀을 평균하므로 더 흐려집니다. 이 과정을 컨볼루션(convolution)이라고 합니다.
   - type: code
     language: python
     title: 3x3 블러
@@ -103,13 +213,56 @@ sections:
       axBlur[2].set_title('Blur 7x7')
       axBlur[2].axis('off')
       plt.tight_layout()
-
 - id: step3_gaussian
   title: 3단계. 가우시안 블러
+  structuredPrimary: true
   subtitle: GaussianBlur()
+  goal: '3단계. 가우시안 블러: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 가우시안 블러: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    GaussianBlur()는 가우시안(정규분포) 함수를 이용한 블러입니다. 평균 블러와 달리 중심에 가까운 픽셀에 더 큰 가중치를 부여합니다. 종 모양의 가우시안 분포처럼 중심이 높고 가장자리가 낮은 가중치를 사용하여 자연스러운 블러 효과를 만듭니다. 노이즈 제거와 에지 검출 전처리에 가장 많이 사용됩니다.
+
+    GaussianBlur의 세 번째 인자 sigmaX는 가우시안 분포의 표준편차입니다. 0이면 커널 크기에서 자동 계산됩니다. 값이 클수록 블러가 강해집니다.
+  tips:
+  - GaussianBlur의 세 번째 인자 sigmaX는 가우시안 분포의 표준편차입니다. 0이면 커널 크기에서 자동 계산됩니다. 값이 클수록 블러가 강해집니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    gaussian5 = cv2.GaussianBlur(pic, (5, 5), 0)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cv2.cvtColor(gaussian5, cv2.COLOR_BGR2RGB))
+    plt.title('Gaussian 5x5')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '3단계. 가우시안 블러: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      gaussian5 = cv2.GaussianBlur(pic, (5, 5), 0)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(gaussian5, cv2.COLOR_BGR2RGB))
+      plt.title('Gaussian 5x5')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      gaussian5 = cv2.GaussianBlur(pic, (5, 5), 0)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(gaussian5, cv2.COLOR_BGR2RGB))
+      plt.title('Gaussian 5x5')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: GaussianBlur()는 가우시안(정규분포) 함수를 이용한 블러입니다. 평균 블러와 달리 중심에 가까운 픽셀에 더 큰 가중치를 부여합니다. 종 모양의 가우시안 분포처럼 중심이 높고 가장자리가 낮은 가중치를 사용하여 자연스러운 블러 효과를 만듭니다. 노이즈 제거와 에지 검출 전처리에 가장 많이 사용됩니다.
+    content: GaussianBlur()는 가우시안(정규분포) 함수를 이용한 블러입니다. 평균 블러와 달리 중심에 가까운 픽셀에 더 큰 가중치를 부여합니다. 종 모양의 가우시안 분포처럼 중심이 높고 가장자리가
+      낮은 가중치를 사용하여 자연스러운 블러 효과를 만듭니다. 노이즈 제거와 에지 검출 전처리에 가장 많이 사용됩니다.
   - type: code
     language: python
     title: 가우시안 블러
@@ -150,13 +303,71 @@ sections:
       axGauss[2].set_title('Gaussian 9x9, σ=2')
       axGauss[2].axis('off')
       plt.tight_layout()
-
 - id: step4_median
   title: 4단계. 미디언 블러
+  structuredPrimary: true
   subtitle: medianBlur()
+  goal: '4단계. 미디언 블러: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 미디언 블러: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    medianBlur()는 커널 영역의 중앙값(median)을 사용합니다. 평균과 달리 중앙값은 극단적인 값에 영향을 받지 않습니다. salt-and-pepper 노이즈(소금-후추 잡음, 이미지에 흰점과 검은점이 무작위로 나타나는 노이즈)에 특히 효과적입니다. 커널 크기는 홀수만 가능합니다.
+
+    medianBlur()의 커널 크기는 홀수 정수 하나만 지정합니다. (5, 5)가 아닌 5로 지정합니다. 중앙값 특성상 극단값(노이즈)이 결과에 영향을 주지 않습니다.
+  tips:
+  - medianBlur()의 커널 크기는 홀수 정수 하나만 지정합니다. (5, 5)가 아닌 5로 지정합니다. 중앙값 특성상 극단값(노이즈)이 결과에 영향을 주지 않습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    noisy = pic.copy()
+    numNoise = 3000
+    coords = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+    noisy[coords[:, 0], coords[:, 1]] = [255, 255, 255]
+    coords2 = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+    noisy[coords2[:, 0], coords2[:, 1]] = [0, 0, 0]
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cv2.cvtColor(noisy, cv2.COLOR_BGR2RGB))
+    plt.title('Noisy Image')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '4단계. 미디언 블러: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      noisy = pic.copy()
+      numNoise = 3000
+      coords = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+      noisy[coords[:, 0], coords[:, 1]] = [255, 255, 255]
+      coords2 = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+      noisy[coords2[:, 0], coords2[:, 1]] = [0, 0, 0]
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(noisy, cv2.COLOR_BGR2RGB))
+      plt.title('Noisy Image')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      noisy = pic.copy()
+      numNoise = 3000
+      coords = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+      noisy[coords[:, 0], coords[:, 1]] = [255, 255, 255]
+      coords2 = np.random.randint(0, min(pic.shape[:2]), (numNoise, 2))
+      noisy[coords2[:, 0], coords2[:, 1]] = [0, 0, 0]
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(noisy, cv2.COLOR_BGR2RGB))
+      plt.title('Noisy Image')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: medianBlur()는 커널 영역의 중앙값(median)을 사용합니다. 평균과 달리 중앙값은 극단적인 값에 영향을 받지 않습니다. salt-and-pepper 노이즈(소금-후추 잡음, 이미지에 흰점과 검은점이 무작위로 나타나는 노이즈)에 특히 효과적입니다. 커널 크기는 홀수만 가능합니다.
+    content: medianBlur()는 커널 영역의 중앙값(median)을 사용합니다. 평균과 달리 중앙값은 극단적인 값에 영향을 받지 않습니다. salt-and-pepper 노이즈(소금-후추 잡음, 이미지에
+      흰점과 검은점이 무작위로 나타나는 노이즈)에 특히 효과적입니다. 커널 크기는 홀수만 가능합니다.
   - type: code
     language: python
     title: 노이즈 추가
@@ -202,13 +413,58 @@ sections:
       axMedian[2].set_title('Median Blur')
       axMedian[2].axis('off')
       plt.tight_layout()
-
 - id: step5_bilateral
   title: 5단계. 양방향 필터
+  structuredPrimary: true
   subtitle: bilateralFilter()
+  goal: '5단계. 양방향 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 양방향 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    bilateralFilter()는 양방향 필터(bilateral filter)로, 에지를 보존하면서 블러를 적용합니다. 일반 블러는 에지(경계)까지 흐리게 만들지만, 양방향 필터는 색상이 비슷한 영역만 블러하고 색상 차이가 큰 에지는 유지합니다. 공간적 거리(spatial distance)와 색상 차이(color difference)를 모두 고려하기 때문입니다. 피부 보정(blemish 제거하면서 얼굴 윤곽 유지)이나 카툰 스타일화에 많이 사용됩니다.
+
+    bilateralFilter(src, d, sigmaColor, sigmaSpace)에서 d는 필터 크기, sigmaColor는 색상 유사도 기준, sigmaSpace는 공간 거리 기준입니다. sigmaColor가 크면 더 넓은 색상 범위가 혼합됩니다.
+  tips:
+  - bilateralFilter(src, d, sigmaColor, sigmaSpace)에서 d는 필터 크기, sigmaColor는 색상 유사도 기준, sigmaSpace는 공간 거리 기준입니다. sigmaColor가
+    크면 더 넓은 색상 범위가 혼합됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    bilateral = cv2.bilateralFilter(pic, 9, 75, 75)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cv2.cvtColor(bilateral, cv2.COLOR_BGR2RGB))
+    plt.title('Bilateral Filter')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '5단계. 양방향 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      bilateral = cv2.bilateralFilter(pic, 9, 75, 75)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(bilateral, cv2.COLOR_BGR2RGB))
+      plt.title('Bilateral Filter')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      bilateral = cv2.bilateralFilter(pic, 9, 75, 75)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(bilateral, cv2.COLOR_BGR2RGB))
+      plt.title('Bilateral Filter')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: bilateralFilter()는 양방향 필터(bilateral filter)로, 에지를 보존하면서 블러를 적용합니다. 일반 블러는 에지(경계)까지 흐리게 만들지만, 양방향 필터는 색상이 비슷한 영역만 블러하고 색상 차이가 큰 에지는 유지합니다. 공간적 거리(spatial distance)와 색상 차이(color difference)를 모두 고려하기 때문입니다. 피부 보정(blemish 제거하면서 얼굴 윤곽 유지)이나 카툰 스타일화에 많이 사용됩니다.
+    content: bilateralFilter()는 양방향 필터(bilateral filter)로, 에지를 보존하면서 블러를 적용합니다. 일반 블러는 에지(경계)까지 흐리게 만들지만, 양방향 필터는 색상이 비슷한
+      영역만 블러하고 색상 차이가 큰 에지는 유지합니다. 공간적 거리(spatial distance)와 색상 차이(color difference)를 모두 고려하기 때문입니다. 피부 보정(blemish 제거하면서 얼굴
+      윤곽 유지)이나 카툰 스타일화에 많이 사용됩니다.
   - type: code
     language: python
     title: 양방향 필터 적용
@@ -221,7 +477,8 @@ sections:
       plt.axis('off')
       plt.tight_layout()
   - type: tip
-    content: bilateralFilter(src, d, sigmaColor, sigmaSpace)에서 d는 필터 크기, sigmaColor는 색상 유사도 기준, sigmaSpace는 공간 거리 기준입니다. sigmaColor가 크면 더 넓은 색상 범위가 혼합됩니다.
+    content: bilateralFilter(src, d, sigmaColor, sigmaSpace)에서 d는 필터 크기, sigmaColor는 색상 유사도 기준, sigmaSpace는 공간 거리 기준입니다. sigmaColor가
+      크면 더 넓은 색상 범위가 혼합됩니다.
   - type: code
     language: python
     title: 양방향 필터 비교
@@ -239,10 +496,61 @@ sections:
       axBilat[2].set_title('Bilateral (Edge Preserved)')
       axBilat[2].axis('off')
       plt.tight_layout()
-
 - id: step6_compare
   title: 6단계. 필터 종합 비교
+  structuredPrimary: true
   subtitle: 4가지 필터 비교
+  goal: '6단계. 필터 종합 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 필터 종합 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    네 가지 블러 필터를 한눈에 비교해봅시다. 각 필터의 특성과 적합한 용도를 파악합니다.
+
+    Average와 Gaussian은 일반 블러, Median은 노이즈 제거, Bilateral은 에지 보존에 적합합니다. 용도에 따라 선택하세요.
+  tips:
+  - Average와 Gaussian은 일반 블러, Median은 노이즈 제거, Bilateral은 에지 보존에 적합합니다. 용도에 따라 선택하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    avgBlur = cv2.blur(pic, (7, 7))
+    gaussBlur = cv2.GaussianBlur(pic, (7, 7), 0)
+    medBlur = cv2.medianBlur(pic, 7)
+    bilatBlur = cv2.bilateralFilter(pic, 7, 75, 75)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cv2.cvtColor(avgBlur, cv2.COLOR_BGR2RGB))
+    plt.title('Average Blur 7x7')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '6단계. 필터 종합 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      avgBlur = cv2.blur(pic, (7, 7))
+      gaussBlur = cv2.GaussianBlur(pic, (7, 7), 0)
+      medBlur = cv2.medianBlur(pic, 7)
+      bilatBlur = cv2.bilateralFilter(pic, 7, 75, 75)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(avgBlur, cv2.COLOR_BGR2RGB))
+      plt.title('Average Blur 7x7')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      avgBlur = cv2.blur(pic, (7, 7))
+      gaussBlur = cv2.GaussianBlur(pic, (7, 7), 0)
+      medBlur = cv2.medianBlur(pic, 7)
+      bilatBlur = cv2.bilateralFilter(pic, 7, 75, 75)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(avgBlur, cv2.COLOR_BGR2RGB))
+      plt.title('Average Blur 7x7')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 네 가지 블러 필터를 한눈에 비교해봅시다. 각 필터의 특성과 적합한 용도를 파악합니다.
@@ -281,20 +589,71 @@ sections:
       plt.tight_layout()
   - type: tip
     content: Average와 Gaussian은 일반 블러, Median은 노이즈 제거, Bilateral은 에지 보존에 적합합니다. 용도에 따라 선택하세요.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 필터 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    sklearn 이미지에 다양한 필터를 적용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+    import matplotlib.pyplot as plt
+
+    flower = load_sample_image('flower.jpg')
+    flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+    plt.imshow(flower)
+    plt.axis('off')
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      plt.imshow(flower)
+      plt.axis('off')
+    solution: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      plt.imshow(flower)
+      plt.axis('off')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn 이미지에 다양한 필터를 적용해봅시다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: flower 가우시안 블러 체인"
+    title: '미션1: flower 가우시안 블러 체인'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         import cv2
         import numpy as np
@@ -306,7 +665,7 @@ sections:
         plt.imshow(flower)
         plt.axis('off')
     - type: code
-      title: "연속 가우시안 블러"
+      title: 연속 가우시안 블러
       content: |-
         blur1 = cv2.GaussianBlur(flowerBgr, (5, 5), 0)
         blur2 = cv2.GaussianBlur(blur1, (5, 5), 0)
@@ -317,7 +676,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "블러 체인 시각화"
+      title: 블러 체인 시각화
       content: |-
         figChain, axChain = plt.subplots(1, 4, figsize=(14, 4))
         axChain[0].imshow(flower)
@@ -334,10 +693,10 @@ sections:
         axChain[3].axis('off')
         plt.tight_layout()
   - type: expansion
-    title: "미션2: china 노이즈 제거 비교"
+    title: '미션2: china 노이즈 제거 비교'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         import cv2
         import numpy as np
@@ -349,7 +708,7 @@ sections:
         plt.imshow(china)
         plt.axis('off')
     - type: code
-      title: "노이즈 추가"
+      title: 노이즈 추가
       content: |-
         chinaNoisy = chinaBgr.copy()
         noise = np.random.randint(-30, 30, chinaBgr.shape, dtype=np.int16)
@@ -360,7 +719,7 @@ sections:
         plt.axis('off')
         plt.tight_layout()
     - type: code
-      title: "필터 비교"
+      title: 필터 비교
       content: |-
         chinaGauss = cv2.GaussianBlur(chinaNoisy, (5, 5), 0)
         chinaMed = cv2.medianBlur(chinaNoisy, 5)
@@ -379,10 +738,76 @@ sections:
         axNoise[1, 1].set_title('Bilateral')
         axNoise[1, 1].axis('off')
         plt.tight_layout()
-
 - id: workflow_validation
   title: 7단계. 필터 품질 검증 루프
+  structuredPrimary: true
   subtitle: 노이즈 감소와 커널 입력 확인
+  goal: '7단계. 필터 품질 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 필터 품질 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 필터는 흐리게 보이면 성공이 아니라, 노이즈가 줄면서 구조가 보존되는지 확인해야 합니다. 커널 크기 오류를 잡고, 필터 전후 표준편차를 비교해 품질을 검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    rng = np.random.default_rng(42)
+    cleanFilterImage = np.full((96, 128), 120, dtype=np.uint8)
+    cv2.rectangle(cleanFilterImage, (32, 24), (96, 72), 190, -1)
+    noise = rng.normal(0, 18, cleanFilterImage.shape).astype(np.int16)
+    noisyFilterImage = np.clip(cleanFilterImage.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+
+    def validateOddKernel(kernelSize):
+        if kernelSize <= 1 or kernelSize % 2 == 0:
+            raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {kernelSize}")
+        return True
+
+    validateOddKernel(5)
+  exercise:
+    prompt: '7단계. 필터 품질 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      rng = np.random.default_rng(42)
+      cleanFilterImage = np.full((96, 128), 120, dtype=np.uint8)
+      cv2.rectangle(cleanFilterImage, (32, 24), (96, 72), 190, -1)
+      noise = rng.normal(0, 18, cleanFilterImage.shape).astype(np.int16)
+      noisyFilterImage = np.clip(cleanFilterImage.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+
+      def validateOddKernel(kernelSize):
+          if kernelSize <= 1 or kernelSize % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {kernelSize}")
+          return True
+
+      validateOddKernel(5)
+    solution: |-
+      import cv2
+      import numpy as np
+
+      rng = np.random.default_rng(42)
+      cleanFilterImage = np.full((96, 128), 120, dtype=np.uint8)
+      cv2.rectangle(cleanFilterImage, (32, 24), (96, 72), 190, -1)
+      noise = rng.normal(0, 18, cleanFilterImage.shape).astype(np.int16)
+      noisyFilterImage = np.clip(cleanFilterImage.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+
+      def validateOddKernel(kernelSize):
+          if kernelSize <= 1 or kernelSize % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {kernelSize}")
+          return True
+
+      validateOddKernel(5)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 필터는 흐리게 보이면 성공이 아니라, 노이즈가 줄면서 구조가 보존되는지 확인해야 합니다. 커널 크기 오류를 잡고, 필터 전후 표준편차를 비교해 품질을 검증합니다.

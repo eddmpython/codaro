@@ -5,27 +5,137 @@ meta:
   category: excel
   badge: 입문
   packages:
-    - openpyxl
-  tags: ["excel","openpyxl","워크북","로컬Python","자동화"]
+  - openpyxl
+  tags:
+  - excel
+  - openpyxl
+  - 워크북
+  - 로컬Python
+  - 자동화
   seo:
-    title: "Excel 로컬 자동화 입문 - 로컬 Python 엑셀 자동화"
-    description: "openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다."
-    keywords: ["excel","openpyxl","워크북","로컬Python","자동화"]
-
+    title: Excel 로컬 자동화 입문 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
+    - openpyxl
+    - 워크북
+    - 로컬Python
+    - 자동화
+intro:
+  direction: Excel 로컬 자동화 입문에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  benefits:
+  - Excel 로컬 자동화 입문 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
+  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
+  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  diagram:
+    steps:
+    - label: 목표
+      detail: 완료 후 만들 산출물을 먼저 확인
+    - label: 준비
+      detail: meta.packages 기반 uv 준비와 import 확인
+    - label: 실습
+      detail: 예제 스니펫을 바꿔 직접 실행
+    - label: 검증
+      detail: assert와 결과 비교로 완료 판단
+    runtime:
+    - label: 패키지
+      detail: packages-check -> packages-install(누락 시) -> cell-call
+    - label: 첫 실행
+      detail: import 확인과 assert 검증
+    - label: 완료
+      detail: 리포트/자동화/검증 루틴으로 재사용
 sections:
 - id: intro
   title: 1단계. 로컬 Excel 자동화의 기준
   subtitle: 앱 제어 대신 파일 기반 자동화
   blocks:
   - type: text
-    content: |-
-      로컬 Python 커리큘럼에서는 Excel 프로그램을 직접 조종하기보다, xlsx 파일을 코드로 생성하고 검증하는 흐름을 먼저 배웁니다. 이 방식은 CI와 서버에서도 재현 가능하고, 사용자가 같은 파일을 업무에 바로 가져갈 수 있습니다.
+    content: 로컬 Python 커리큘럼에서는 Excel 프로그램을 직접 조종하기보다, xlsx 파일을 코드로 생성하고 검증하는 흐름을 먼저 배웁니다. 이 방식은 CI와 서버에서도 재현 가능하고, 사용자가 같은
+      파일을 업무에 바로 가져갈 수 있습니다.
   - type: tip
-    content: "Excel 앱 제어가 필요한 특수 업무는 나중에 선택지로 다루고, 기본 커리큘럼은 openpyxl/pandas 파일 자동화를 기준으로 잡습니다."
-
+    content: Excel 앱 제어가 필요한 특수 업무는 나중에 선택지로 다루고, 기본 커리큘럼은 openpyxl/pandas 파일 자동화를 기준으로 잡습니다.
 - id: create_workbook
   title: 2단계. 워크북 만들기
+  structuredPrimary: true
   subtitle: Workbook과 Worksheet
+  goal: '2단계. 워크북 만들기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 워크북 만들기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2단계. 워크북 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    salesPath = excelRoot / "sales_report.xlsx"
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "sales"
+    sheet.append(["date", "region", "product", "amount"])
+    sheet.append(["2026-05-01", "Seoul", "Notebook", 1250000])
+    sheet.append(["2026-05-02", "Busan", "Monitor", 420000])
+    sheet.append(["2026-05-03", "Seoul", "Keyboard", 180000])
+    workbook.save(salesPath)
+
+    assert salesPath.exists()
+    salesPath
+  exercise:
+    prompt: '2단계. 워크북 만들기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      salesPath = excelRoot / "sales_report.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "sales"
+      sheet.append(["date", "region", "product", "amount"])
+      sheet.append(["2026-05-01", "Seoul", "Notebook", 1250000])
+      sheet.append(["2026-05-02", "Busan", "Monitor", 420000])
+      sheet.append(["2026-05-03", "Seoul", "Keyboard", 180000])
+      workbook.save(salesPath)
+
+      assert salesPath.exists()
+      salesPath
+    solution: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      salesPath = excelRoot / "sales_report.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "sales"
+      sheet.append(["date", "region", "product", "amount"])
+      sheet.append(["2026-05-01", "Seoul", "Notebook", 1250000])
+      sheet.append(["2026-05-02", "Busan", "Monitor", 420000])
+      sheet.append(["2026-05-03", "Seoul", "Keyboard", 180000])
+      workbook.save(salesPath)
+
+      assert salesPath.exists()
+      salesPath
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: code
     language: python
@@ -65,14 +175,71 @@ sections:
       assert len(rows) == 3
       assert sum(row[3] for row in rows) == 1850000
       rows
-
 - id: workflow_validation
   title: 3단계. 워크북 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '3단계. 워크북 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 워크북 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을 때 명확하게 실패시키는 흐름을
+    만듭니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def validateSalesWorksheet(worksheet):
+        headers = [cell.value for cell in worksheet[1]]
+        requiredHeaders = ["date", "region", "product", "amount"]
+        if headers != requiredHeaders:
+            raise ValueError(f"헤더가 다릅니다: {headers}")
+        amounts = [row[3] for row in worksheet.iter_rows(min_row=2, values_only=True)]
+        assert all(amount > 0 for amount in amounts)
+        return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
+
+    salesValidation = validateSalesWorksheet(loadedSheet)
+    assert salesValidation["rowCount"] == 3
+    salesValidation
+  exercise:
+    prompt: '3단계. 워크북 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def validateSalesWorksheet(worksheet):
+          headers = [cell.value for cell in worksheet[1]]
+          requiredHeaders = ["date", "region", "product", "amount"]
+          if headers != requiredHeaders:
+              raise ValueError(f"헤더가 다릅니다: {headers}")
+          amounts = [row[3] for row in worksheet.iter_rows(min_row=2, values_only=True)]
+          assert all(amount > 0 for amount in amounts)
+          return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
+
+      salesValidation = validateSalesWorksheet(loadedSheet)
+      assert salesValidation["rowCount"] == 3
+      salesValidation
+    solution: |-
+      def validateSalesWorksheet(worksheet):
+          headers = [cell.value for cell in worksheet[1]]
+          requiredHeaders = ["date", "region", "product", "amount"]
+          if headers != requiredHeaders:
+              raise ValueError(f"헤더가 다릅니다: {headers}")
+          amounts = [row[3] for row in worksheet.iter_rows(min_row=2, values_only=True)]
+          assert all(amount > 0 for amount in amounts)
+          return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
+
+      salesValidation = validateSalesWorksheet(loadedSheet)
+      assert salesValidation["rowCount"] == 3
+      salesValidation
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을 때 명확하게 실패시키는 흐름을 만듭니다.
+    content: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을 때 명확하게 실패시키는 흐름을 만듭니다.
   - type: code
     language: python
     title: 데이터 계약 검증
@@ -124,11 +291,9 @@ sections:
       assert reportRegions["Seoul"] > reportRegions["Busan"]
       assert set(reportRegions) == {"Seoul", "Busan"}
       reportRegions
-
 - id: summary
   title: 정리
   subtitle: 파일 자동화의 기본 완주 조건
   blocks:
   - type: text
-    content: |-
-      이번 레슨에서는 로컬 xlsx 파일을 만들고, 시트 구조와 금액 규칙을 검증하고, 기준을 바꿔 지역별 요약을 만드는 흐름을 완성했습니다.
+    content: 이번 레슨에서는 로컬 xlsx 파일을 만들고, 시트 구조와 금액 규칙을 검증하고, 기준을 바꿔 지역별 요약을 만드는 흐름을 완성했습니다.

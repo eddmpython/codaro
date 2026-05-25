@@ -1,27 +1,59 @@
 meta:
   packages:
-    - folium
+  - folium
   id: folium_04
   title: 지도 스타일 변경
   order: 4
   category: folium
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["folium", "tiles", "TileLayer", "스타일", "테마"]
+  tags:
+  - folium
+  - tiles
+  - TileLayer
+  - 스타일
+  - 테마
   seo:
-    title: "Folium 지도 스타일 - 타일 레이어 변경"
-    description: "Folium으로 지도 스타일을 변경합니다. OpenStreetMap, CartoDB, OpenTopoMap 등 다양한 타일을 사용합니다."
-    keywords: ["folium", "tiles", "TileLayer", "CartoDB", "OpenTopoMap", "지도 스타일"]
-
+    title: Folium 지도 스타일 - 타일 레이어 변경
+    description: Folium으로 지도 스타일을 변경합니다. OpenStreetMap, CartoDB, OpenTopoMap 등 다양한 타일을 사용합니다.
+    keywords:
+    - folium
+    - tiles
+    - TileLayer
+    - CartoDB
+    - OpenTopoMap
+    - 지도 스타일
 intro:
-  emoji: "🎨"
+  emoji: 🎨
   goal: 다양한 타일 레이어로 지도 스타일을 변경합니다.
-  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, attribution을 명시한 커스텀 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
-
+  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, attribution을 명시한 커스텀 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여
+    지도를 꾸밉니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: folium과 Codaro를 불러옵니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import folium
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import folium
+    solution: import folium
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: folium과 Codaro를 불러옵니다.
@@ -29,11 +61,44 @@ sections:
     language: python
     title: 라이브러리 불러오기
     description: folium과 Codaro 불러오기
-    content: |-
-      import folium
+    content: import folium
 - id: step2_default_tiles
   title: 2단계. 기본 타일
+  structuredPrimary: true
   subtitle: OpenStreetMap
+  goal: '2단계. 기본 타일: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기본 타일: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    기본 타일은 OpenStreetMap입니다. tiles 파라미터를 지정하지 않으면 자동 적용됩니다.
+
+    OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
+  tips:
+  - OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    seoulCenter = [37.5665, 126.9780]
+    m1 = folium.Map(location=seoulCenter, zoom_start=12)
+    m1
+  exercise:
+    prompt: '2단계. 기본 타일: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=12)
+      m1
+    solution: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=12)
+      m1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 기본 타일은 OpenStreetMap입니다. tiles 파라미터를 지정하지 않으면 자동 적용됩니다.
@@ -58,10 +123,52 @@ sections:
       m2
   - type: tip
     content: OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
-
 - id: step3_cartodb
   title: 3단계. CartoDB 타일
+  structuredPrimary: true
   subtitle: Positron, DarkMatter
+  goal: '3단계. CartoDB 타일: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. CartoDB 타일: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    CartoDB는 깔끔한 스타일의 타일을 제공합니다. Positron은 밝은 테마, DarkMatter는 어두운 테마입니다.
+
+    Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
+  tips:
+  - Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m3 = folium.Map(
+        location=seoulCenter,
+        zoom_start=12,
+        tiles="CartoDB Positron"
+    )
+    m3
+  exercise:
+    prompt: '3단계. CartoDB 타일: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m3 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+      m3
+    solution: |-
+      m3 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+      m3
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: CartoDB는 깔끔한 스타일의 타일을 제공합니다. Positron은 밝은 테마, DarkMatter는 어두운 테마입니다.
@@ -89,10 +196,61 @@ sections:
       m4
   - type: tip
     content: Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
-
 - id: step4_custom_tiles
   title: 4단계. 커스텀 타일
+  structuredPrimary: true
   subtitle: attribution 있는 외부 타일
+  goal: '4단계. 커스텀 타일: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 커스텀 타일: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    외부 타일 서버를 사용할 때는 URL과 attribution을 함께 지정합니다. attribution이 없으면 최신 Folium에서는 실행 오류가 납니다.
+
+    외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
+  tips:
+  - 외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+    folium.TileLayer(
+        tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+        name="OpenTopoMap 지형도"
+    ).add_to(m5)
+
+    m5
+  exercise:
+    prompt: '4단계. 커스텀 타일: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+          name="OpenTopoMap 지형도"
+      ).add_to(m5)
+
+      m5
+    solution: |-
+      m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+          name="OpenTopoMap 지형도"
+      ).add_to(m5)
+
+      m5
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 외부 타일 서버를 사용할 때는 URL과 attribution을 함께 지정합니다. attribution이 없으면 최신 Folium에서는 실행 오류가 납니다.
@@ -134,10 +292,55 @@ sections:
       m7
   - type: tip
     content: 외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
-
 - id: step5_tile_comparison
   title: 5단계. 타일 비교
+  structuredPrimary: true
   subtitle: 같은 위치 다른 스타일
+  goal: '5단계. 타일 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 타일 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    동일한 위치를 여러 타일 스타일로 비교해봅니다.
+
+    어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
+  tips:
+  - 어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    tiles = [
+        "OpenStreetMap",
+        "CartoDB Positron",
+        "CartoDB Dark_Matter",
+        "OpenTopoMap URL + attr"
+    ]
+    tiles
+  exercise:
+    prompt: '5단계. 타일 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      tiles = [
+          "OpenStreetMap",
+          "CartoDB Positron",
+          "CartoDB Dark_Matter",
+          "OpenTopoMap URL + attr"
+      ]
+      tiles
+    solution: |-
+      tiles = [
+          "OpenStreetMap",
+          "CartoDB Positron",
+          "CartoDB Dark_Matter",
+          "OpenTopoMap URL + attr"
+      ]
+      tiles
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 동일한 위치를 여러 타일 스타일로 비교해봅니다.
@@ -175,10 +378,49 @@ sections:
       m9
   - type: tip
     content: 어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
-
 - id: step6_tilelayer
   title: 6단계. TileLayer 추가
+  structuredPrimary: true
   subtitle: TileLayer()
+  goal: '6단계. TileLayer 추가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. TileLayer 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    TileLayer()로 지도에 타일 레이어를 추가합니다. 여러 타일을 겹쳐 사용하거나 전환할 수 있습니다.
+
+    tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
+  tips:
+  - tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+    folium.TileLayer("OpenStreetMap").add_to(m10)
+
+    m10
+  exercise:
+    prompt: '6단계. TileLayer 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("OpenStreetMap").add_to(m10)
+
+      m10
+    solution: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("OpenStreetMap").add_to(m10)
+
+      m10
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: TileLayer()로 지도에 타일 레이어를 추가합니다. 여러 타일을 겹쳐 사용하거나 전환할 수 있습니다.
@@ -208,10 +450,61 @@ sections:
       m11
   - type: tip
     content: tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
-
 - id: step7_custom_tile
   title: 7단계. 커스텀 타일 URL
+  structuredPrimary: true
   subtitle: 외부 타일 서버
+  goal: '7단계. 커스텀 타일 URL: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 커스텀 타일 URL: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    URL 템플릿으로 외부 타일 서버를 사용할 수 있습니다. {z}, {x}, {y}는 줌 레벨과 타일 좌표입니다.
+
+    attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
+  tips:
+  - attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+    folium.TileLayer(
+        tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        attr="OpenTopoMap",
+        name="지형도"
+    ).add_to(m12)
+
+    m12
+  exercise:
+    prompt: '7단계. 커스텀 타일 URL: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="OpenTopoMap",
+          name="지형도"
+      ).add_to(m12)
+
+      m12
+    solution: |-
+      m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="OpenTopoMap",
+          name="지형도"
+      ).add_to(m12)
+
+      m12
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: URL 템플릿으로 외부 타일 서버를 사용할 수 있습니다. {z}, {x}, {y}는 줌 레벨과 타일 좌표입니다.
@@ -231,10 +524,64 @@ sections:
       m12
   - type: tip
     content: attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
-
 - id: step8_tile_opacity
   title: 8단계. 타일 투명도
+  structuredPrimary: true
   subtitle: opacity
+  goal: '8단계. 타일 투명도: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 타일 투명도: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    타일의 투명도를 조절하여 여러 타일을 겹쳐 볼 수 있습니다.
+
+    opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
+  tips:
+  - opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m13 = folium.Map(location=seoulCenter, zoom_start=12)
+
+    folium.TileLayer(
+        tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+        opacity=0.3,
+        name="지형 오버레이"
+    ).add_to(m13)
+
+    m13
+  exercise:
+    prompt: '8단계. 타일 투명도: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m13 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+          opacity=0.3,
+          name="지형 오버레이"
+      ).add_to(m13)
+
+      m13
+    solution: |-
+      m13 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+          opacity=0.3,
+          name="지형 오버레이"
+      ).add_to(m13)
+
+      m13
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 타일의 투명도를 조절하여 여러 타일을 겹쳐 볼 수 있습니다.
@@ -255,10 +602,100 @@ sections:
       m13
   - type: tip
     content: opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
-
 - id: step9_use_cases
   title: 9단계. 용도별 추천
+  structuredPrimary: true
   subtitle: 상황에 맞는 타일
+  goal: '9단계. 용도별 추천: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 용도별 추천: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    용도에 따라 적합한 타일을 선택합니다.
+
+    밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
+  tips:
+  - 밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    dataMap = folium.Map(
+        location=seoulCenter,
+        zoom_start=12,
+        tiles="CartoDB Positron"
+    )
+
+    spots = [
+        [37.5665, 126.9780],
+        [37.4979, 127.0276],
+        [37.5563, 126.9236]
+    ]
+
+    for spot in spots:
+        folium.CircleMarker(
+            location=spot,
+            radius=15,
+            color="blue",
+            fill=True,
+            fill_opacity=0.6
+        ).add_to(dataMap)
+
+    dataMap
+  exercise:
+    prompt: '9단계. 용도별 추천: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dataMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+
+      spots = [
+          [37.5665, 126.9780],
+          [37.4979, 127.0276],
+          [37.5563, 126.9236]
+      ]
+
+      for spot in spots:
+          folium.CircleMarker(
+              location=spot,
+              radius=15,
+              color="blue",
+              fill=True,
+              fill_opacity=0.6
+          ).add_to(dataMap)
+
+      dataMap
+    solution: |-
+      dataMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+
+      spots = [
+          [37.5665, 126.9780],
+          [37.4979, 127.0276],
+          [37.5563, 126.9236]
+      ]
+
+      for spot in spots:
+          folium.CircleMarker(
+              location=spot,
+              radius=15,
+              color="blue",
+              fill=True,
+              fill_opacity=0.6
+          ).add_to(dataMap)
+
+      dataMap
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 용도에 따라 적합한 타일을 선택합니다.
@@ -319,10 +756,124 @@ sections:
       nightMap
   - type: tip
     content: 밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
-
 - id: step10_complete
   title: 10단계. 완성 예제
+  structuredPrimary: true
   subtitle: 낮/밤 모드 지도
+  goal: '10단계. 완성 예제: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 완성 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    LayerControl로 낮/밤 모드를 전환할 수 있는 지도를 만듭니다.
+
+    우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
+  tips:
+  - 우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    places = [
+        {"name": "서울시청", "loc": [37.5665, 126.9780]},
+        {"name": "강남역", "loc": [37.4979, 127.0276]},
+        {"name": "홍대입구", "loc": [37.5563, 126.9236]},
+        {"name": "명동", "loc": [37.5636, 126.9869]}
+    ]
+
+    themeMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+    folium.TileLayer(
+        "CartoDB Positron",
+        name="낮 모드"
+    ).add_to(themeMap)
+
+    folium.TileLayer(
+        "CartoDB Dark_Matter",
+        name="밤 모드"
+    ).add_to(themeMap)
+
+    for place in places:
+        folium.Marker(
+            location=place["loc"],
+            popup=place["name"],
+            tooltip=place["name"],
+            icon=folium.Icon(color="red", icon="star")
+        ).add_to(themeMap)
+
+    folium.LayerControl().add_to(themeMap)
+
+    themeMap
+  exercise:
+    prompt: '10단계. 완성 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      places = [
+          {"name": "서울시청", "loc": [37.5665, 126.9780]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
+          {"name": "명동", "loc": [37.5636, 126.9869]}
+      ]
+
+      themeMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer(
+          "CartoDB Positron",
+          name="낮 모드"
+      ).add_to(themeMap)
+
+      folium.TileLayer(
+          "CartoDB Dark_Matter",
+          name="밤 모드"
+      ).add_to(themeMap)
+
+      for place in places:
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"],
+              tooltip=place["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(themeMap)
+
+      folium.LayerControl().add_to(themeMap)
+
+      themeMap
+    solution: |-
+      places = [
+          {"name": "서울시청", "loc": [37.5665, 126.9780]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
+          {"name": "명동", "loc": [37.5636, 126.9869]}
+      ]
+
+      themeMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer(
+          "CartoDB Positron",
+          name="낮 모드"
+      ).add_to(themeMap)
+
+      folium.TileLayer(
+          "CartoDB Dark_Matter",
+          name="밤 모드"
+      ).add_to(themeMap)
+
+      for place in places:
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"],
+              tooltip=place["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(themeMap)
+
+      folium.LayerControl().add_to(themeMap)
+
+      themeMap
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: LayerControl로 낮/밤 모드를 전환할 수 있는 지도를 만듭니다.
@@ -363,19 +914,86 @@ sections:
       themeMap
   - type: tip
     content: 우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
-
 - id: step11_workflow
   title: 11단계. 실무 타일 선택 검증
+  structuredPrimary: true
   subtitle: 예측 → attribution 오류 확인 → 렌더 검증 → 용도 실험
+  goal: '11단계. 실무 타일 선택 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 실무 타일 선택 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지도 스타일은 취향 문제가 아니라 데이터가 잘 읽히는지와 라이선스 표시가 맞는지의 문제입니다. 업무용 지도에서는 타일 프로필을 정의하고, 커스텀 URL에는 attribution이 있는지 검증한 뒤, 레이어 이름이 HTML에 렌더링되는지 확인해야 합니다.
+
+    타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
+  tips:
+  - 타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    tileProfiles = {
+        "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
+        "report": {"name": "리포트 배경", "tiles": "CartoDB Positron", "attr": None, "useCase": "데이터 시각화"},
+        "night": {"name": "야간 관제", "tiles": "CartoDB Dark_Matter", "attr": None, "useCase": "야간 대시보드"},
+        "terrain": {
+            "name": "지형 점검",
+            "tiles": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+            "attr": "Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+            "useCase": "산악/고도 맥락",
+        },
+    }
+
+    recommendedProfile = tileProfiles["report"]
+    recommendedProfile["name"], recommendedProfile["useCase"]
+  exercise:
+    prompt: '11단계. 실무 타일 선택 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      tileProfiles = {
+          "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
+          "report": {"name": "리포트 배경", "tiles": "CartoDB Positron", "attr": None, "useCase": "데이터 시각화"},
+          "night": {"name": "야간 관제", "tiles": "CartoDB Dark_Matter", "attr": None, "useCase": "야간 대시보드"},
+          "terrain": {
+              "name": "지형 점검",
+              "tiles": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+              "attr": "Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+              "useCase": "산악/고도 맥락",
+          },
+      }
+
+      recommendedProfile = tileProfiles["report"]
+      recommendedProfile["name"], recommendedProfile["useCase"]
+    solution: |-
+      tileProfiles = {
+          "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
+          "report": {"name": "리포트 배경", "tiles": "CartoDB Positron", "attr": None, "useCase": "데이터 시각화"},
+          "night": {"name": "야간 관제", "tiles": "CartoDB Dark_Matter", "attr": None, "useCase": "야간 대시보드"},
+          "terrain": {
+              "name": "지형 점검",
+              "tiles": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+              "attr": "Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+              "useCase": "산악/고도 맥락",
+          },
+      }
+
+      recommendedProfile = tileProfiles["report"]
+      recommendedProfile["name"], recommendedProfile["useCase"]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 지도 스타일은 취향 문제가 아니라 데이터가 잘 읽히는지와 라이선스 표시가 맞는지의 문제입니다. 업무용 지도에서는 타일 프로필을 정의하고, 커스텀 URL에는 attribution이 있는지 검증한 뒤, 레이어 이름이 HTML에 렌더링되는지 확인해야 합니다.
+    content: 지도 스타일은 취향 문제가 아니라 데이터가 잘 읽히는지와 라이선스 표시가 맞는지의 문제입니다. 업무용 지도에서는 타일 프로필을 정의하고, 커스텀 URL에는 attribution이 있는지 검증한 뒤,
+      레이어 이름이 HTML에 렌더링되는지 확인해야 합니다.
   - type: list
     items:
-    - "실행 전에는 어떤 업무 목적에 어떤 타일이 맞을지 먼저 예측합니다."
-    - "커스텀 타일 URL에 attribution이 없으면 실행 전에 오류로 확인합니다."
-    - "LayerControl에 업무용 레이어 이름이 모두 들어갔는지 검증합니다."
-    - "목적을 바꾸는 실험으로 타일 선택 기준이 어떻게 달라지는지 비교합니다."
+    - 실행 전에는 어떤 업무 목적에 어떤 타일이 맞을지 먼저 예측합니다.
+    - 커스텀 타일 URL에 attribution이 없으면 실행 전에 오류로 확인합니다.
+    - LayerControl에 업무용 레이어 이름이 모두 들어갔는지 검증합니다.
+    - 목적을 바꾸는 실험으로 타일 선택 기준이 어떻게 달라지는지 비교합니다.
   - type: code
     language: python
     title: 타일 프로필 정의
@@ -497,15 +1115,57 @@ sections:
       reportTile, mountainTile
   - type: tip
     content: 타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 타일 스타일
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import folium
+    mountains = [
+        {"name": "북한산", "loc": [37.6608, 126.9933]},
+        {"name": "관악산", "loc": [37.4450, 126.9639]},
+        {"name": "도봉산", "loc": [37.6985, 127.0145]}
+    ]
+    mountains
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import folium
+      mountains = [
+          {"name": "북한산", "loc": [37.6608, 126.9933]},
+          {"name": "관악산", "loc": [37.4450, 126.9639]},
+          {"name": "도봉산", "loc": [37.6985, 127.0145]}
+      ]
+      mountains
+    solution: |-
+      import folium
+      mountains = [
+          {"name": "북한산", "loc": [37.6608, 126.9933]},
+          {"name": "관악산", "loc": [37.4450, 126.9639]},
+          {"name": "도봉산", "loc": [37.6985, 127.0145]}
+      ]
+      mountains
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   - type: expansion
-    title: "미션1: 등산 지도"
+    title: '미션1: 등산 지도'
     blocks:
     - type: code
       title: 데이터 준비
@@ -541,7 +1201,7 @@ sections:
 
         hikingMap
   - type: expansion
-    title: "미션2: 프레젠테이션용 지도"
+    title: '미션2: 프레젠테이션용 지도'
     blocks:
     - type: code
       title: 데이터 준비

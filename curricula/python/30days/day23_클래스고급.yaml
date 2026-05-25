@@ -1,39 +1,110 @@
 meta:
-  id: "day23"
-  title: "클래스 고급"
+  id: day23
+  title: 클래스 고급
   day: 23
-  category: "30days"
-  tags: ["상속", "오버라이딩", "super", "다형성", "객체설계", "검증"]
+  category: 30days
+  tags:
+  - 상속
+  - 오버라이딩
+  - super
+  - 다형성
+  - 객체설계
+  - 검증
   seo:
-    title: "파이썬 클래스 고급 - 상속과 다형성"
-    description: "상속, super(), 메서드 오버라이딩, 다중 상속을 배웁니다."
-    keywords: ['상속', 'inheritance', 'super', '오버라이딩', '다중상속']
-
+    title: 파이썬 클래스 고급 - 상속과 다형성
+    description: 상속, super(), 메서드 오버라이딩, 다중 상속을 배웁니다.
+    keywords:
+    - 상속
+    - inheritance
+    - super
+    - 오버라이딩
+    - 다중상속
 intro:
-  emoji: "🎯"
+  emoji: 🎯
   points:
-  - "상속으로 클래스 확장"
-  - "super()로 부모 메서드 호출"
-  - "메서드 오버라이딩으로 재정의"
-  - "다중 상속으로 여러 부모 활용"
-
+  - 상속으로 클래스 확장
+  - super()로 부모 메서드 호출
+  - 메서드 오버라이딩으로 재정의
+  - 다중 상속으로 여러 부모 활용
 sections:
-- id: "inheritance_basic"
-  title: "상속 기초"
-  subtitle: "부모 클래스로부터 확장"
+- id: inheritance_basic
+  title: 상속 기초
+  structuredPrimary: true
+  subtitle: 부모 클래스로부터 확장
+  goal: '상속 기초: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '상속 기초: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상속은 기존 클래스를 확장하여 새로운 클래스를 만드는 기능입니다. class 자식클래스(부모클래스): 형식으로 정의하며, 자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받습니다. 코드 재사용성이 높아지고 계층 구조를 표현할 수 있습니다.
+
+    상속은 is-a 관계를 나타냅니다. Dog is an Animal, Car is a Vehicle.
+  tips:
+  - 상속은 is-a 관계를 나타냅니다. Dog is an Animal, Car is a Vehicle.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Animal:
+        def __init__(self, name):
+            self.name = name
+
+        def speak(self):
+            return 'Some sound'
+
+    class Dog(Animal):
+        pass
+
+    myDog = Dog('Buddy')
+    myDog.name
+  exercise:
+    prompt: '상속 기초: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Animal:
+          def __init__(self, name):
+              self.name = name
+
+          def speak(self):
+              return 'Some sound'
+
+      class Dog(Animal):
+          pass
+
+      myDog = Dog('Buddy')
+      myDog.name
+    solution: |-
+      class Animal:
+          def __init__(self, name):
+              self.name = name
+
+          def speak(self):
+              return 'Some sound'
+
+      class Dog(Animal):
+          pass
+
+      myDog = Dog('Buddy')
+      myDog.name
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "상속은 기존 클래스를 확장하여 새로운 클래스를 만드는 기능입니다. class 자식클래스(부모클래스): 형식으로 정의하며, 자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받습니다. 코드 재사용성이 높아지고 계층 구조를 표현할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: '상속은 기존 클래스를 확장하여 새로운 클래스를 만드는 기능입니다. class 자식클래스(부모클래스): 형식으로 정의하며, 자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받습니다. 코드 재사용성이
+      높아지고 계층 구조를 표현할 수 있습니다.'
+  - type: list
     items:
-    - "class 자식(부모): 형식"
-    - "부모의 속성과 메서드 상속"
-    - "코드 재사용"
-    - "계층 구조 표현"
-  - type: "code"
-    language: "python"
-    title: "기본 상속"
-    description: "부모 클래스를 상속받는 자식 클래스를 만듭니다."
+    - 'class 자식(부모): 형식'
+    - 부모의 속성과 메서드 상속
+    - 코드 재사용
+    - 계층 구조 표현
+  - type: code
+    language: python
+    title: 기본 상속
+    description: 부모 클래스를 상속받는 자식 클래스를 만듭니다.
     content: |-
       class Animal:
           def __init__(self, name):
@@ -47,10 +118,10 @@ sections:
 
       myDog = Dog('Buddy')
       myDog.name
-  - type: "code"
-    language: "python"
-    title: "상속받은 메서드 호출"
-    description: "자식 클래스에서 부모의 메서드를 그대로 사용합니다."
+  - type: code
+    language: python
+    title: 상속받은 메서드 호출
+    description: 자식 클래스에서 부모의 메서드를 그대로 사용합니다.
     content: |-
       class Vehicle:
           def __init__(self, brand):
@@ -64,25 +135,77 @@ sections:
 
       myCar = Car('Tesla')
       myCar.start()
-  - type: "tip"
-    content: "상속은 is-a 관계를 나타냅니다. Dog is an Animal, Car is a Vehicle."
+  - type: tip
+    content: 상속은 is-a 관계를 나타냅니다. Dog is an Animal, Car is a Vehicle.
+- id: inheritance_init
+  title: 상속과 __init__
+  structuredPrimary: true
+  subtitle: 자식 클래스의 초기화
+  goal: '상속과 __init__: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '상속과 __init__: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    자식 클래스에서 __init__을 정의하지 않으면 부모의 __init__을 자동으로 사용합니다. 자식이 __init__을 정의하면 부모의 __init__은 자동으로 호출되지 않으므로 명시적으로 호출해야 합니다.
 
-- id: "inheritance_init"
-  title: "상속과 __init__"
-  subtitle: "자식 클래스의 초기화"
+    자식 __init__에서 부모 __init__을 호출할 때는 self를 명시해야 합니다.
+  tips:
+  - 자식 __init__에서 부모 __init__을 호출할 때는 self를 명시해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Shape:
+        def __init__(self, color):
+            self.color = color
+
+    class Square(Shape):
+        pass
+
+    sq = Square('red')
+    sq.color
+  exercise:
+    prompt: '상속과 __init__: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Shape:
+          def __init__(self, color):
+              self.color = color
+
+      class Square(Shape):
+          pass
+
+      sq = Square('red')
+      sq.color
+    solution: |-
+      class Shape:
+          def __init__(self, color):
+              self.color = color
+
+      class Square(Shape):
+          pass
+
+      sq = Square('red')
+      sq.color
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "자식 클래스에서 __init__을 정의하지 않으면 부모의 __init__을 자동으로 사용합니다. 자식이 __init__을 정의하면 부모의 __init__은 자동으로 호출되지 않으므로 명시적으로 호출해야 합니다."
-  - type: "list"
+  - type: text
+    content: 자식 클래스에서 __init__을 정의하지 않으면 부모의 __init__을 자동으로 사용합니다. 자식이 __init__을 정의하면 부모의 __init__은 자동으로 호출되지 않으므로 명시적으로 호출해야
+      합니다.
+  - type: list
     items:
-    - "__init__ 없으면 부모 것 사용"
-    - "__init__ 정의하면 부모 것 덮어씀"
-    - "명시적 호출 필요"
-    - "추가 속성 정의 가능"
-  - type: "code"
-    language: "python"
-    title: "부모 __init__ 그대로 사용"
-    description: "자식이 __init__을 정의하지 않으면 부모의 것을 사용합니다."
+    - __init__ 없으면 부모 것 사용
+    - __init__ 정의하면 부모 것 덮어씀
+    - 명시적 호출 필요
+    - 추가 속성 정의 가능
+  - type: code
+    language: python
+    title: 부모 __init__ 그대로 사용
+    description: 자식이 __init__을 정의하지 않으면 부모의 것을 사용합니다.
     content: |-
       class Shape:
           def __init__(self, color):
@@ -93,10 +216,10 @@ sections:
 
       sq = Square('red')
       sq.color
-  - type: "code"
-    language: "python"
-    title: "부모 __init__ 명시적 호출"
-    description: "자식 __init__에서 부모의 __init__을 직접 호출합니다."
+  - type: code
+    language: python
+    title: 부모 __init__ 명시적 호출
+    description: 자식 __init__에서 부모의 __init__을 직접 호출합니다.
     content: |-
       class Person:
           def __init__(self, name):
@@ -109,10 +232,10 @@ sections:
 
       alice = Student('Alice', 90)
       alice.name, alice.grade
-  - type: "code"
-    language: "python"
-    title: "추가 속성 정의"
-    description: "자식 클래스에서 새로운 속성을 추가합니다."
+  - type: code
+    language: python
+    title: 추가 속성 정의
+    description: 자식 클래스에서 새로운 속성을 추가합니다.
     content: |-
       class Device:
           def __init__(self, brand):
@@ -125,25 +248,83 @@ sections:
 
       ph = Phone('Samsung', 'Galaxy')
       ph.brand, ph.model
-  - type: "tip"
-    content: "자식 __init__에서 부모 __init__을 호출할 때는 self를 명시해야 합니다."
+  - type: tip
+    content: 자식 __init__에서 부모 __init__을 호출할 때는 self를 명시해야 합니다.
+- id: super_function
+  title: super() 함수
+  structuredPrimary: true
+  subtitle: 부모 클래스 참조
+  goal: 'super() 함수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'super() 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    super()는 부모 클래스를 참조하는 함수입니다. super().__init__() 형태로 부모의 __init__을 호출할 수 있으며, 부모 클래스명을 직접 쓰는 것보다 유연하고 권장됩니다. 다중 상속 시 특히 유용합니다.
 
-- id: "super_function"
-  title: "super() 함수"
-  subtitle: "부모 클래스 참조"
+    super()를 사용하면 상속 구조가 바뀌어도 코드 변경이 최소화됩니다.
+  tips:
+  - super()를 사용하면 상속 구조가 바뀌어도 코드 변경이 최소화됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Employee:
+        def __init__(self, name):
+            self.name = name
+
+    class Manager(Employee):
+        def __init__(self, name, department):
+            super().__init__(name)
+            self.department = department
+
+    mgr = Manager('Bob', 'IT')
+    mgr.name, mgr.department
+  exercise:
+    prompt: 'super() 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Employee:
+          def __init__(self, name):
+              self.name = name
+
+      class Manager(Employee):
+          def __init__(self, name, department):
+              super().__init__(name)
+              self.department = department
+
+      mgr = Manager('Bob', 'IT')
+      mgr.name, mgr.department
+    solution: |-
+      class Employee:
+          def __init__(self, name):
+              self.name = name
+
+      class Manager(Employee):
+          def __init__(self, name, department):
+              super().__init__(name)
+              self.department = department
+
+      mgr = Manager('Bob', 'IT')
+      mgr.name, mgr.department
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "super()는 부모 클래스를 참조하는 함수입니다. super().__init__() 형태로 부모의 __init__을 호출할 수 있으며, 부모 클래스명을 직접 쓰는 것보다 유연하고 권장됩니다. 다중 상속 시 특히 유용합니다."
-  - type: "list"
+  - type: text
+    content: super()는 부모 클래스를 참조하는 함수입니다. super().__init__() 형태로 부모의 __init__을 호출할 수 있으며, 부모 클래스명을 직접 쓰는 것보다 유연하고 권장됩니다. 다중
+      상속 시 특히 유용합니다.
+  - type: list
     items:
-    - "super()로 부모 참조"
-    - "super().__init__() 형태"
-    - "클래스명 직접 쓰는 것보다 유연"
-    - "다중 상속에서 유용"
-  - type: "code"
-    language: "python"
-    title: "super()로 __init__ 호출"
-    description: "super()를 사용하여 부모 __init__을 호출합니다."
+    - super()로 부모 참조
+    - super().__init__() 형태
+    - 클래스명 직접 쓰는 것보다 유연
+    - 다중 상속에서 유용
+  - type: code
+    language: python
+    title: super()로 __init__ 호출
+    description: super()를 사용하여 부모 __init__을 호출합니다.
     content: |-
       class Employee:
           def __init__(self, name):
@@ -156,10 +337,10 @@ sections:
 
       mgr = Manager('Bob', 'IT')
       mgr.name, mgr.department
-  - type: "code"
-    language: "python"
-    title: "super()로 메서드 호출"
-    description: "super()를 사용하여 부모의 다른 메서드도 호출할 수 있습니다."
+  - type: code
+    language: python
+    title: super()로 메서드 호출
+    description: super()를 사용하여 부모의 다른 메서드도 호출할 수 있습니다.
     content: |-
       class Base:
           def greet(self):
@@ -172,10 +353,10 @@ sections:
 
       derived = Derived()
       derived.greet()
-  - type: "code"
-    language: "python"
-    title: "super()의 장점"
-    description: "부모 클래스명이 바뀌어도 코드 수정이 필요 없습니다."
+  - type: code
+    language: python
+    title: super()의 장점
+    description: 부모 클래스명이 바뀌어도 코드 수정이 필요 없습니다.
     content: |-
       class Product:
           def __init__(self, name, price):
@@ -189,25 +370,80 @@ sections:
 
       bk = Book('Python Guide', 30000, 'Kim')
       bk.name, bk.price, bk.author
-  - type: "tip"
-    content: "super()를 사용하면 상속 구조가 바뀌어도 코드 변경이 최소화됩니다."
+  - type: tip
+    content: super()를 사용하면 상속 구조가 바뀌어도 코드 변경이 최소화됩니다.
+- id: method_override
+  title: 메서드 오버라이딩
+  structuredPrimary: true
+  subtitle: 부모 메서드 재정의
+  goal: '메서드 오버라이딩: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '메서드 오버라이딩: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    메서드 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 재정의하는 것입니다. 같은 이름의 메서드를 자식 클래스에 정의하면 부모의 메서드를 덮어씁니다. 필요하면 super()로 부모 메서드를 호출한 후 추가 기능을 구현할 수 있습니다.
 
-- id: "method_override"
-  title: "메서드 오버라이딩"
-  subtitle: "부모 메서드 재정의"
+    오버라이딩은 같은 인터페이스로 다른 동작을 구현하는 다형성의 핵심입니다.
+  tips:
+  - 오버라이딩은 같은 인터페이스로 다른 동작을 구현하는 다형성의 핵심입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Bird:
+        def sound(self):
+            return 'chirp'
+
+    class Parrot(Bird):
+        def sound(self):
+            return 'squawk'
+
+    myBird = Parrot()
+    myBird.sound()
+  exercise:
+    prompt: '메서드 오버라이딩: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Bird:
+          def sound(self):
+              return 'chirp'
+
+      class Parrot(Bird):
+          def sound(self):
+              return 'squawk'
+
+      myBird = Parrot()
+      myBird.sound()
+    solution: |-
+      class Bird:
+          def sound(self):
+              return 'chirp'
+
+      class Parrot(Bird):
+          def sound(self):
+              return 'squawk'
+
+      myBird = Parrot()
+      myBird.sound()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "메서드 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 재정의하는 것입니다. 같은 이름의 메서드를 자식 클래스에 정의하면 부모의 메서드를 덮어씁니다. 필요하면 super()로 부모 메서드를 호출한 후 추가 기능을 구현할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: 메서드 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 재정의하는 것입니다. 같은 이름의 메서드를 자식 클래스에 정의하면 부모의 메서드를 덮어씁니다. 필요하면 super()로 부모 메서드를 호출한
+      후 추가 기능을 구현할 수 있습니다.
+  - type: list
     items:
-    - "같은 이름 메서드 재정의"
-    - "부모 메서드를 덮어씀"
-    - "super()로 부모 메서드 호출 가능"
-    - "다형성 구현"
-  - type: "code"
-    language: "python"
-    title: "기본 오버라이딩"
-    description: "자식 클래스에서 부모 메서드를 재정의합니다."
+    - 같은 이름 메서드 재정의
+    - 부모 메서드를 덮어씀
+    - super()로 부모 메서드 호출 가능
+    - 다형성 구현
+  - type: code
+    language: python
+    title: 기본 오버라이딩
+    description: 자식 클래스에서 부모 메서드를 재정의합니다.
     content: |-
       class Bird:
           def sound(self):
@@ -219,10 +455,10 @@ sections:
 
       myBird = Parrot()
       myBird.sound()
-  - type: "code"
-    language: "python"
-    title: "부모 메서드 호출 후 확장"
-    description: "super()로 부모 메서드를 호출하고 추가 기능을 구현합니다."
+  - type: code
+    language: python
+    title: 부모 메서드 호출 후 확장
+    description: super()로 부모 메서드를 호출하고 추가 기능을 구현합니다.
     content: |-
       class Rectangle:
           def __init__(self, width, height):
@@ -243,10 +479,10 @@ sections:
 
       cr = ColoredRectangle(5, 3, 'blue')
       cr.area()
-  - type: "code"
-    language: "python"
-    title: "완전히 다른 구현"
-    description: "부모 메서드를 완전히 다르게 재정의합니다."
+  - type: code
+    language: python
+    title: 완전히 다른 구현
+    description: 부모 메서드를 완전히 다르게 재정의합니다.
     content: |-
       class Account:
           def __init__(self):
@@ -265,25 +501,89 @@ sections:
       safe = SafeAccount()
       safe.balance = 1000
       safe.withdraw(1500)
-  - type: "tip"
-    content: "오버라이딩은 같은 인터페이스로 다른 동작을 구현하는 다형성의 핵심입니다."
+  - type: tip
+    content: 오버라이딩은 같은 인터페이스로 다른 동작을 구현하는 다형성의 핵심입니다.
+- id: multiple_inheritance
+  title: 다중 상속
+  structuredPrimary: true
+  subtitle: 여러 부모 클래스 상속
+  goal: '다중 상속: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '다중 상속: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다중 상속은 여러 부모 클래스를 동시에 상속받는 것입니다. class 자식(부모1, 부모2): 형식으로 정의하며, 모든 부모의 속성과 메서드를 상속받습니다. 메서드 이름이 겹치면 MRO 순서에 따라 왼쪽 부모가 우선입니다.
 
-- id: "multiple_inheritance"
-  title: "다중 상속"
-  subtitle: "여러 부모 클래스 상속"
+    다중 상속은 강력하지만 복잡할 수 있습니다. 신중하게 사용하세요.
+  tips:
+  - 다중 상속은 강력하지만 복잡할 수 있습니다. 신중하게 사용하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Flyer:
+        def fly(self):
+            return 'flying'
+
+    class Swimmer:
+        def swim(self):
+            return 'swimming'
+
+    class Duck(Flyer, Swimmer):
+        pass
+
+    myDuck = Duck()
+    myDuck.fly(), myDuck.swim()
+  exercise:
+    prompt: '다중 상속: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Flyer:
+          def fly(self):
+              return 'flying'
+
+      class Swimmer:
+          def swim(self):
+              return 'swimming'
+
+      class Duck(Flyer, Swimmer):
+          pass
+
+      myDuck = Duck()
+      myDuck.fly(), myDuck.swim()
+    solution: |-
+      class Flyer:
+          def fly(self):
+              return 'flying'
+
+      class Swimmer:
+          def swim(self):
+              return 'swimming'
+
+      class Duck(Flyer, Swimmer):
+          pass
+
+      myDuck = Duck()
+      myDuck.fly(), myDuck.swim()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "다중 상속은 여러 부모 클래스를 동시에 상속받는 것입니다. class 자식(부모1, 부모2): 형식으로 정의하며, 모든 부모의 속성과 메서드를 상속받습니다. 메서드 이름이 겹치면 MRO 순서에 따라 왼쪽 부모가 우선입니다."
-  - type: "list"
+  - type: text
+    content: '다중 상속은 여러 부모 클래스를 동시에 상속받는 것입니다. class 자식(부모1, 부모2): 형식으로 정의하며, 모든 부모의 속성과 메서드를 상속받습니다. 메서드 이름이 겹치면 MRO 순서에
+      따라 왼쪽 부모가 우선입니다.'
+  - type: list
     items:
-    - "class 자식(부모1, 부모2): 형식"
-    - "모든 부모의 기능 상속"
-    - "왼쪽 부모가 우선"
-    - "MRO로 순서 결정"
-  - type: "code"
-    language: "python"
-    title: "기본 다중 상속"
-    description: "두 개의 부모 클래스를 동시에 상속받습니다."
+    - 'class 자식(부모1, 부모2): 형식'
+    - 모든 부모의 기능 상속
+    - 왼쪽 부모가 우선
+    - MRO로 순서 결정
+  - type: code
+    language: python
+    title: 기본 다중 상속
+    description: 두 개의 부모 클래스를 동시에 상속받습니다.
     content: |-
       class Flyer:
           def fly(self):
@@ -298,10 +598,10 @@ sections:
 
       myDuck = Duck()
       myDuck.fly(), myDuck.swim()
-  - type: "code"
-    language: "python"
-    title: "메서드 우선순위"
-    description: "같은 이름의 메서드가 있으면 왼쪽 부모가 우선입니다."
+  - type: code
+    language: python
+    title: 메서드 우선순위
+    description: 같은 이름의 메서드가 있으면 왼쪽 부모가 우선입니다.
     content: |-
       class First:
           def action(self):
@@ -316,10 +616,10 @@ sections:
 
       childObj = Child()
       childObj.action()
-  - type: "code"
-    language: "python"
-    title: "순서 바꾸기"
-    description: "상속 순서를 바꾸면 우선순위가 바뀝니다."
+  - type: code
+    language: python
+    title: 순서 바꾸기
+    description: 상속 순서를 바꾸면 우선순위가 바뀝니다.
     content: |-
       class Left:
           def method(self):
@@ -334,10 +634,10 @@ sections:
 
       combined = Combined()
       combined.method()
-  - type: "code"
-    language: "python"
-    title: "__init__과 다중 상속"
-    description: "다중 상속 시 super()를 사용하여 모든 부모 __init__을 호출합니다."
+  - type: code
+    language: python
+    title: __init__과 다중 상속
+    description: 다중 상속 시 super()를 사용하여 모든 부모 __init__을 호출합니다.
     content: |-
       class Named:
           def __init__(self, name):
@@ -354,19 +654,73 @@ sections:
 
       john = Human('John', 30)
       john.name, john.age
-  - type: "tip"
-    content: "다중 상속은 강력하지만 복잡할 수 있습니다. 신중하게 사용하세요."
+  - type: tip
+    content: 다중 상속은 강력하지만 복잡할 수 있습니다. 신중하게 사용하세요.
+- id: inheritance_example
+  title: 상속 실전 예제
+  structuredPrimary: true
+  subtitle: 계층 구조 설계
+  goal: '상속 실전 예제: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '상속 실전 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    상속을 활용하여 실제 문제를 해결하는 예제를 살펴봅니다. 기본 클래스를 정의하고 여러 자식 클래스로 확장하여 코드 재사용성을 높입니다.
 
-- id: "inheritance_example"
-  title: "상속 실전 예제"
-  subtitle: "계층 구조 설계"
+    상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다.
+  tips:
+  - 상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Polygon:
+        def __init__(self, sides):
+            self.sides = sides
+
+    class Triangle(Polygon):
+        def __init__(self):
+            super().__init__(3)
+
+    tri = Triangle()
+    tri.sides
+  exercise:
+    prompt: '상속 실전 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Polygon:
+          def __init__(self, sides):
+              self.sides = sides
+
+      class Triangle(Polygon):
+          def __init__(self):
+              super().__init__(3)
+
+      tri = Triangle()
+      tri.sides
+    solution: |-
+      class Polygon:
+          def __init__(self, sides):
+              self.sides = sides
+
+      class Triangle(Polygon):
+          def __init__(self):
+              super().__init__(3)
+
+      tri = Triangle()
+      tri.sides
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "상속을 활용하여 실제 문제를 해결하는 예제를 살펴봅니다. 기본 클래스를 정의하고 여러 자식 클래스로 확장하여 코드 재사용성을 높입니다."
-  - type: "code"
-    language: "python"
-    title: "도형 계층"
-    description: "기본 도형 클래스와 여러 구체적인 도형 클래스를 만듭니다."
+  - type: text
+    content: 상속을 활용하여 실제 문제를 해결하는 예제를 살펴봅니다. 기본 클래스를 정의하고 여러 자식 클래스로 확장하여 코드 재사용성을 높입니다.
+  - type: code
+    language: python
+    title: 도형 계층
+    description: 기본 도형 클래스와 여러 구체적인 도형 클래스를 만듭니다.
     content: |-
       class Polygon:
           def __init__(self, sides):
@@ -378,10 +732,10 @@ sections:
 
       tri = Triangle()
       tri.sides
-  - type: "code"
-    language: "python"
-    title: "직원 관리 시스템"
-    description: "기본 직원 클래스를 상속받아 다양한 직급을 구현합니다."
+  - type: code
+    language: python
+    title: 직원 관리 시스템
+    description: 기본 직원 클래스를 상속받아 다양한 직급을 구현합니다.
     content: |-
       class Worker:
           def __init__(self, name, salary):
@@ -398,10 +752,10 @@ sections:
 
       dev = Developer('Alice', 5000, 'Python')
       dev.getSalary()
-  - type: "code"
-    language: "python"
-    title: "보너스 계산"
-    description: "메서드 오버라이딩으로 다른 보너스 계산 방식을 구현합니다."
+  - type: code
+    language: python
+    title: 보너스 계산
+    description: 메서드 오버라이딩으로 다른 보너스 계산 방식을 구현합니다.
     content: |-
       class Staff:
           def __init__(self, basePay):
@@ -417,17 +771,213 @@ sections:
       junior = Staff(3000)
       senior = SeniorStaff(3000)
       junior.bonus(), senior.bonus()
-  - type: "tip"
-    content: "상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다."
+  - type: tip
+    content: 상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기'
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Notification:
+        def __init__(self, recipient):
+            if not recipient:
+                raise ValueError("recipient is required")
+            self.recipient = recipient
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 알림 채널을 다형성으로 처리하기"
+        def send(self, message):
+            if not message.strip():
+                raise ValueError("message is required")
+            return {
+                "channel": "base",
+                "recipient": self.recipient,
+                "message": message,
+            }
+
+    class EmailNotification(Notification):
+        def __init__(self, recipient):
+            if "@" not in recipient:
+                raise ValueError("email recipient must contain @")
+            super().__init__(recipient)
+
+        def send(self, message):
+            payload = super().send(message)
+            payload["channel"] = "email"
+            payload["subject"] = "system notice"
+            return payload
+
+    class SmsNotification(Notification):
+        def __init__(self, recipient):
+            if not recipient.isdigit():
+                raise ValueError("sms recipient must contain digits only")
+            super().__init__(recipient)
+
+        def send(self, message):
+            payload = super().send(message)
+            payload["channel"] = "sms"
+            payload["message"] = message[:40]
+            return payload
+
+    senders = [
+        EmailNotification("team@example.com"),
+        SmsNotification("01012345678"),
+    ]
+
+    results = []
+    for sender in senders:
+        results.append(sender.send("배포가 완료되었습니다"))
+
+    assert [item["channel"] for item in results] == ["email", "sms"]
+    assert results[0]["subject"] == "system notice"
+    assert results[1]["message"] == "배포가 완료되었습니다"
+
+    try:
+        EmailNotification("team.example.com")
+    except ValueError as exc:
+        assert "email" in str(exc)
+
+    print("알림 다형성 흐름 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Notification:
+          def __init__(self, recipient):
+              if not recipient:
+                  raise ValueError("recipient is required")
+              self.recipient = recipient
+
+          def send(self, message):
+              if not message.strip():
+                  raise ValueError("message is required")
+              return {
+                  "channel": "base",
+                  "recipient": self.recipient,
+                  "message": message,
+              }
+
+      class EmailNotification(Notification):
+          def __init__(self, recipient):
+              if "@" not in recipient:
+                  raise ValueError("email recipient must contain @")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "email"
+              payload["subject"] = "system notice"
+              return payload
+
+      class SmsNotification(Notification):
+          def __init__(self, recipient):
+              if not recipient.isdigit():
+                  raise ValueError("sms recipient must contain digits only")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "sms"
+              payload["message"] = message[:40]
+              return payload
+
+      senders = [
+          EmailNotification("team@example.com"),
+          SmsNotification("01012345678"),
+      ]
+
+      results = []
+      for sender in senders:
+          results.append(sender.send("배포가 완료되었습니다"))
+
+      assert [item["channel"] for item in results] == ["email", "sms"]
+      assert results[0]["subject"] == "system notice"
+      assert results[1]["message"] == "배포가 완료되었습니다"
+
+      try:
+          EmailNotification("team.example.com")
+      except ValueError as exc:
+          assert "email" in str(exc)
+
+      print("알림 다형성 흐름 통과")
+    solution: |-
+      class Notification:
+          def __init__(self, recipient):
+              if not recipient:
+                  raise ValueError("recipient is required")
+              self.recipient = recipient
+
+          def send(self, message):
+              if not message.strip():
+                  raise ValueError("message is required")
+              return {
+                  "channel": "base",
+                  "recipient": self.recipient,
+                  "message": message,
+              }
+
+      class EmailNotification(Notification):
+          def __init__(self, recipient):
+              if "@" not in recipient:
+                  raise ValueError("email recipient must contain @")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "email"
+              payload["subject"] = "system notice"
+              return payload
+
+      class SmsNotification(Notification):
+          def __init__(self, recipient):
+              if not recipient.isdigit():
+                  raise ValueError("sms recipient must contain digits only")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "sms"
+              payload["message"] = message[:40]
+              return payload
+
+      senders = [
+          EmailNotification("team@example.com"),
+          SmsNotification("01012345678"),
+      ]
+
+      results = []
+      for sender in senders:
+          results.append(sender.send("배포가 완료되었습니다"))
+
+      assert [item["channel"] for item in results] == ["email", "sms"]
+      assert results[0]["subject"] == "system notice"
+      assert results[1]["message"] == "배포가 완료되었습니다"
+
+      try:
+          EmailNotification("team.example.com")
+      except ValueError as exc:
+          assert "email" in str(exc)
+
+      print("알림 다형성 흐름 통과")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다."
-  - type: "code"
-    language: "python"
-    title: "알림 채널 다형성"
+  - type: text
+    content: 상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다.
+  - type: code
+    language: python
+    title: 알림 채널 다형성
     code: |
       class Notification:
           def __init__(self, recipient):
@@ -487,22 +1037,69 @@ sections:
           assert "email" in str(exc)
 
       print("알림 다형성 흐름 통과")
-  - type: "list"
+  - type: list
     items:
-    - "부모 클래스는 공통 검증과 공통 반환 구조를 책임집니다."
-    - "자식 클래스는 채널별 입력 검증과 추가 필드만 책임집니다."
-    - "호출하는 쪽은 구체 클래스 이름을 몰라도 send()만 호출하면 됩니다."
-    - "실무 변주: SlackNotification 클래스를 추가하고, 같은 senders 리스트에서 이메일·문자·슬랙 결과가 같은 구조로 나오는지 검증해 보세요."
+    - 부모 클래스는 공통 검증과 공통 반환 구조를 책임집니다.
+    - 자식 클래스는 채널별 입력 검증과 추가 필드만 책임집니다.
+    - 호출하는 쪽은 구체 클래스 이름을 몰라도 send()만 호출하면 됩니다.
+    - '실무 변주: SlackNotification 클래스를 추가하고, 같은 senders 리스트에서 이메일·문자·슬랙 결과가 같은 구조로 나오는지 검증해 보세요.'
+- id: practice
+  title: Day 23 종합 복습
+  structuredPrimary: true
+  subtitle: 클래스 고급 마스터하기
+  goal: 'Day 23 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Day 23 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 23에서 배운 클래스 고급 개념을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class Food:
+        def __init__(self, name):
+            self.name = name
 
-- id: "practice"
-  title: "Day 23 종합 복습"
-  subtitle: "클래스 고급 마스터하기"
+    class Fruit(Food):
+        pass
+
+    apple = Fruit('Apple')
+    apple.name
+  exercise:
+    prompt: 'Day 23 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Food:
+          def __init__(self, name):
+              self.name = name
+
+      class Fruit(Food):
+          pass
+
+      apple = Fruit('Apple')
+      apple.name
+    solution: |-
+      class Food:
+          def __init__(self, name):
+              self.name = name
+
+      class Fruit(Food):
+          pass
+
+      apple = Fruit('Apple')
+      apple.name
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 23에서 배운 클래스 고급 개념을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
-
-  - type: "expansion"
-    title: "🟢 기본1: 단순 상속"
+  - type: text
+    content: Day 23에서 배운 클래스 고급 개념을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  - type: expansion
+    title: '🟢 기본1: 단순 상속'
     code: |-
       class Food:
           def __init__(self, name):
@@ -513,9 +1110,8 @@ sections:
 
       apple = Fruit('Apple')
       apple.name
-
-  - type: "expansion"
-    title: "🟢 기본2: 부모 메서드 사용"
+  - type: expansion
+    title: '🟢 기본2: 부모 메서드 사용'
     code: |-
       class Appliance:
           def power(self):
@@ -526,9 +1122,8 @@ sections:
 
       myFridge = Fridge()
       myFridge.power()
-
-  - type: "expansion"
-    title: "🟢 기본3: 자식 __init__ 없이"
+  - type: expansion
+    title: '🟢 기본3: 자식 __init__ 없이'
     code: |-
       class Container:
           def __init__(self, capacity):
@@ -539,9 +1134,8 @@ sections:
 
       bt = Bottle(500)
       bt.capacity
-
-  - type: "expansion"
-    title: "🟢 기본4: 부모 __init__ 직접 호출"
+  - type: expansion
+    title: '🟢 기본4: 부모 __init__ 직접 호출'
     code: |-
       class Machine:
           def __init__(self, brand):
@@ -554,9 +1148,8 @@ sections:
 
       pr = Printer('HP', 'LaserJet')
       pr.brand
-
-  - type: "expansion"
-    title: "🟢 기본5: super() 기본"
+  - type: expansion
+    title: '🟢 기본5: super() 기본'
     code: |-
       class Parent:
           def __init__(self, value):
@@ -569,9 +1162,8 @@ sections:
 
       ch = Child(10, 20)
       ch.value, ch.extra
-
-  - type: "expansion"
-    title: "🟡 응용1: 메서드 오버라이딩"
+  - type: expansion
+    title: '🟡 응용1: 메서드 오버라이딩'
     code: |-
       class Toy:
           def play(self):
@@ -583,9 +1175,8 @@ sections:
 
       rb = Robot()
       rb.play()
-
-  - type: "expansion"
-    title: "🟡 응용2: super()로 메서드 확장"
+  - type: expansion
+    title: '🟡 응용2: super()로 메서드 확장'
     code: |-
       class Logger:
           def log(self, msg):
@@ -598,9 +1189,8 @@ sections:
 
       lg = AdvancedLogger()
       lg.log('test')
-
-  - type: "expansion"
-    title: "🟡 응용3: 속성 추가"
+  - type: expansion
+    title: '🟡 응용3: 속성 추가'
     code: |-
       class Item:
           def __init__(self, name):
@@ -613,9 +1203,8 @@ sections:
 
       pi = PricedItem('Shirt', 20000)
       pi.name, pi.price
-
-  - type: "expansion"
-    title: "🟡 응용4: 다중 상속 기본"
+  - type: expansion
+    title: '🟡 응용4: 다중 상속 기본'
     code: |-
       class Walker:
           def walk(self):
@@ -630,9 +1219,8 @@ sections:
 
       ath = Athlete()
       ath.walk(), ath.run()
-
-  - type: "expansion"
-    title: "🟡 응용5: 우선순위 확인"
+  - type: expansion
+    title: '🟡 응용5: 우선순위 확인'
     code: |-
       class Alpha:
           def test(self):
@@ -647,9 +1235,8 @@ sections:
 
       gm = Gamma()
       gm.test()
-
-  - type: "expansion"
-    title: "🔴 심화1: 계산 메서드 오버라이딩"
+  - type: expansion
+    title: '🔴 심화1: 계산 메서드 오버라이딩'
     code: |-
       class BasicCalc:
           def __init__(self, val):
@@ -665,9 +1252,8 @@ sections:
       bc = BasicCalc(10)
       ac = AdvancedCalc(10)
       bc.compute(), ac.compute()
-
-  - type: "expansion"
-    title: "🔴 심화2: 체인 상속"
+  - type: expansion
+    title: '🔴 심화2: 체인 상속'
     code: |-
       class GrandParent:
           def __init__(self):
@@ -685,9 +1271,8 @@ sections:
 
       desc = Descendant()
       desc.level
-
-  - type: "expansion"
-    title: "🔴 심화3: 조건부 메서드"
+  - type: expansion
+    title: '🔴 심화3: 조건부 메서드'
     code: |-
       class BankAcct:
           def __init__(self):
@@ -705,9 +1290,8 @@ sections:
       sa = SecureAcct()
       sa.balance = 1000
       sa.withdraw(500)
-
-  - type: "expansion"
-    title: "🔴 심화4: 다중 상속 __init__"
+  - type: expansion
+    title: '🔴 심화4: 다중 상속 __init__'
     code: |-
       class Identified:
           def __init__(self, idNum):
@@ -724,9 +1308,8 @@ sections:
 
       ast = Asset('A001', 50000)
       ast.idNum, ast.worth
-
-  - type: "expansion"
-    title: "🔴 심화5: 메서드 순서"
+  - type: expansion
+    title: '🔴 심화5: 메서드 순서'
     code: |-
       class Mixin1:
           def action(self):
@@ -745,9 +1328,8 @@ sections:
       c1 = Combo1()
       c2 = Combo2()
       c1.action(), c2.action()
-
-  - type: "expansion"
-    title: "🔴 심화6: 복합 계층 1"
+  - type: expansion
+    title: '🔴 심화6: 복합 계층 1'
     code: |-
       class Transport:
           def __init__(self, speed):
@@ -764,9 +1346,8 @@ sections:
 
       bike = Bike()
       bike.speed, bike.wheels
-
-  - type: "expansion"
-    title: "🔴 심화7: 복합 계층 2"
+  - type: expansion
+    title: '🔴 심화7: 복합 계층 2'
     code: |-
       class Creature:
           def __init__(self):
@@ -786,9 +1367,8 @@ sections:
 
       ct = Cat('orange')
       ct.alive, ct.furColor, ct.meow()
-
-  - type: "expansion"
-    title: "🔴 심화8: 메서드 조합"
+  - type: expansion
+    title: '🔴 심화8: 메서드 조합'
     code: |-
       class Counter:
           def __init__(self):
@@ -808,9 +1388,8 @@ sections:
       tc = TripleCounter()
       tc.increment()
       tc.count
-
-  - type: "expansion"
-    title: "🔴 심화9: super()로 부모 호출 후 수정"
+  - type: expansion
+    title: '🔴 심화9: super()로 부모 호출 후 수정'
     code: |-
       class Multiplier:
           def __init__(self, num):
@@ -826,9 +1405,8 @@ sections:
 
       bm = BonusMultiplier(5)
       bm.calculate()
-
-  - type: "expansion"
-    title: "🔴 심화10: 복잡한 다중 상속"
+  - type: expansion
+    title: '🔴 심화10: 복잡한 다중 상속'
     code: |-
       class HasName:
           def __init__(self, name):

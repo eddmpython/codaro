@@ -24,6 +24,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
         "output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json",
     ),
+    "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
@@ -191,6 +192,12 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumFlowQuality.py")),
         ),
+        ci_required=False,
+    ),
+    "curriculum-top-tier-audit": Gate(
+        tier="fast",
+        description="커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, 의존성, 소개 레슨, structured source 채택률로 점수화한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumTopTierAudit.py")),),
         ci_required=False,
     ),
     "onboarding-browser": Gate(
@@ -742,8 +749,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 29:
-        failures.append(f"expected 29 gates, found {len(GATES)}")
+    if len(GATES) != 30:
+        failures.append(f"expected 30 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

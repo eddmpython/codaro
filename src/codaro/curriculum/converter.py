@@ -66,7 +66,7 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
                 )
             )
 
-        if sectionContract and sectionHasStructuredFields(section) and not sourceBlocks:
+        if sectionContract and sectionHasStructuredFields(section):
             blocks.extend(_convertStructuredSection(sectionContract, solutions))
 
         for block in sourceBlocks:
@@ -489,9 +489,9 @@ def _convertExpansionSolutionCodeBlock(
 
 def _buildIntroMarkdown(title: str, intro: dict[str, Any]) -> str:
     emoji = _textValue(intro.get("emoji"))
-    goal = _textValue(intro.get("goal"))
+    goal = _textValue(intro.get("goal") or intro.get("direction"))
     description = _textValue(intro.get("description"))
-    points = _arrayOfText(intro.get("points"))
+    points = _arrayOfText(intro.get("points") or intro.get("benefits"))
     heading = f"# {emoji} {title}" if emoji else f"# {title}"
     lines = [heading, goal, description, "\n".join(f"- {point}" for point in points)]
     return "\n\n".join(item for item in lines if item)

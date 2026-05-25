@@ -1,27 +1,57 @@
 meta:
   packages:
-    - pydantic
+  - pydantic
   id: pydantic_04
   title: 타입변환기
   order: 4
   category: pydantic
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기본
-  tags: ["pydantic", "coercion", "타입변환", "strict", "serializer"]
+  tags:
+  - pydantic
+  - coercion
+  - 타입변환
+  - strict
+  - serializer
   seo:
-    title: "Pydantic 타입 변환 - 자동 변환과 엄격 모드"
-    description: "Pydantic의 타입 변환 동작을 이해합니다. 자동 강제 변환, 엄격 모드, 커스텀 직렬화를 배웁니다."
-    keywords: ["pydantic", "타입변환", "coercion", "strict", "serializer"]
-
+    title: Pydantic 타입 변환 - 자동 변환과 엄격 모드
+    description: Pydantic의 타입 변환 동작을 이해합니다. 자동 강제 변환, 엄격 모드, 커스텀 직렬화를 배웁니다.
+    keywords:
+    - pydantic
+    - 타입변환
+    - coercion
+    - strict
+    - serializer
 intro:
-  emoji: "🔄"
+  emoji: 🔄
   goal: Pydantic의 타입 변환과 직렬화를 제어합니다.
   description: 자동 타입 강제 변환의 동작을 이해하고, 엄격 모드와 커스텀 직렬화기로 세밀하게 제어합니다.
-
 sections:
 - id: step1_install
   title: 1단계. 패키지 설치
+  structuredPrimary: true
   subtitle: pip
+  goal: '1단계. 패키지 설치: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 패키지 설치: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import pydantic
+  exercise:
+    prompt: '1단계. 패키지 설치: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import pydantic
+    solution: import pydantic
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
@@ -29,12 +59,66 @@ sections:
     language: python
     title: 패키지 설치
     description: pip으로 pydantic 설치
-    content: |-
-      import pydantic
-
+    content: import pydantic
 - id: step2_auto_coercion
   title: 2단계. 자동 타입 변환
+  structuredPrimary: true
   subtitle: 기본 동작
+  goal: '2단계. 자동 타입 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 자동 타입 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Pydantic v2는 문자열 숫자를 int/float로, 1/0 같은 값을 bool로 변환하지만 숫자를 문자열로 자동 변환하지는 않습니다. 문자열 필드는 실제 문자열을 넣어야 합니다.
+
+    1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
+  tips:
+  - 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나
+    field_validator(mode='before')로 변환 규칙을 명시하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from pydantic import BaseModel
+
+    class Data(BaseModel):
+        intVal: int
+        floatVal: float
+        strVal: str
+        boolVal: bool
+
+    data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
+    data1
+  exercise:
+    prompt: '2단계. 자동 타입 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import BaseModel
+
+      class Data(BaseModel):
+          intVal: int
+          floatVal: float
+          strVal: str
+          boolVal: bool
+
+      data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
+      data1
+    solution: |-
+      from pydantic import BaseModel
+
+      class Data(BaseModel):
+          intVal: int
+          floatVal: float
+          strVal: str
+          boolVal: bool
+
+      data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
+      data1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Pydantic v2는 문자열 숫자를 int/float로, 1/0 같은 값을 bool로 변환하지만 숫자를 문자열로 자동 변환하지는 않습니다. 문자열 필드는 실제 문자열을 넣어야 합니다.
@@ -66,11 +150,57 @@ sections:
       }
       typeInfo
   - type: tip
-    content: 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
-
+    content: 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를
+      호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
 - id: step3_strict_mode
   title: 3단계. 엄격 모드
+  structuredPrimary: true
   subtitle: strict=True
+  goal: '3단계. 엄격 모드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 엄격 모드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
+
+    엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
+  tips:
+  - 엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class StrictData(BaseModel):
+        model_config = {"strict": True}
+        intVal: int
+        strVal: str
+
+    strictData = StrictData(intVal=123, strVal="hello")
+    strictData
+  exercise:
+    prompt: '3단계. 엄격 모드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class StrictData(BaseModel):
+          model_config = {"strict": True}
+          intVal: int
+          strVal: str
+
+      strictData = StrictData(intVal=123, strVal="hello")
+      strictData
+    solution: |-
+      class StrictData(BaseModel):
+          model_config = {"strict": True}
+          intVal: int
+          strVal: str
+
+      strictData = StrictData(intVal=123, strVal="hello")
+      strictData
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
@@ -100,10 +230,58 @@ sections:
           strictError
   - type: tip
     content: 엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
-
 - id: step4_field_strict
   title: 4단계. 필드별 엄격 모드
+  structuredPrimary: true
   subtitle: Field(strict=True)
+  goal: '4단계. 필드별 엄격 모드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 필드별 엄격 모드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 특정 필드만 엄격 모드로 설정할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pydantic import Field
+
+    class MixedData(BaseModel):
+        flexibleInt: int
+        strictInt: int = Field(strict=True)
+        flexibleStr: str
+
+    mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
+    mixed1
+  exercise:
+    prompt: '4단계. 필드별 엄격 모드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import Field
+
+      class MixedData(BaseModel):
+          flexibleInt: int
+          strictInt: int = Field(strict=True)
+          flexibleStr: str
+
+      mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
+      mixed1
+    solution: |-
+      from pydantic import Field
+
+      class MixedData(BaseModel):
+          flexibleInt: int
+          strictInt: int = Field(strict=True)
+          flexibleStr: str
+
+      mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
+      mixed1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 특정 필드만 엄격 모드로 설정할 수 있습니다.
@@ -131,10 +309,76 @@ sections:
       except ValidationError as e:
           fieldStrictError = e.errors()
           fieldStrictError
-
 - id: step5_datetime
   title: 5단계. 날짜/시간 변환
+  structuredPrimary: true
   subtitle: datetime 타입
+  goal: '5단계. 날짜/시간 변환: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 날짜/시간 변환: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 문자열을 datetime, date, time 객체로 자동 변환합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from datetime import datetime, date, time
+
+    class Event(BaseModel):
+        eventName: str
+        eventDate: date
+        startTime: time
+        createdAt: datetime
+
+    event1 = Event(
+        eventName="Conference",
+        eventDate="2024-06-15",
+        startTime="09:30:00",
+        createdAt="2024-01-01T12:00:00"
+    )
+    event1
+  exercise:
+    prompt: '5단계. 날짜/시간 변환: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from datetime import datetime, date, time
+
+      class Event(BaseModel):
+          eventName: str
+          eventDate: date
+          startTime: time
+          createdAt: datetime
+
+      event1 = Event(
+          eventName="Conference",
+          eventDate="2024-06-15",
+          startTime="09:30:00",
+          createdAt="2024-01-01T12:00:00"
+      )
+      event1
+    solution: |-
+      from datetime import datetime, date, time
+
+      class Event(BaseModel):
+          eventName: str
+          eventDate: date
+          startTime: time
+          createdAt: datetime
+
+      event1 = Event(
+          eventName="Conference",
+          eventDate="2024-06-15",
+          startTime="09:30:00",
+          createdAt="2024-01-01T12:00:00"
+      )
+      event1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Pydantic은 문자열을 datetime, date, time 객체로 자동 변환합니다.
@@ -179,10 +423,70 @@ sections:
 
       ts1 = Timestamp(createdAt=1704067200)
       ts1.createdAt
-
 - id: step6_enum
   title: 6단계. Enum 타입
+  structuredPrimary: true
   subtitle: 열거형 변환
+  goal: '6단계. Enum 타입: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. Enum 타입: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Enum 타입은 문자열이나 값으로 자동 변환됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from enum import Enum
+
+    class Status(str, Enum):
+        PENDING = "pending"
+        ACTIVE = "active"
+        COMPLETED = "completed"
+
+    class Task(BaseModel):
+        taskId: str
+        status: Status
+
+    task1 = Task(taskId="T001", status="active")
+    task1
+  exercise:
+    prompt: '6단계. Enum 타입: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from enum import Enum
+
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status
+
+      task1 = Task(taskId="T001", status="active")
+      task1
+    solution: |-
+      from enum import Enum
+
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status
+
+      task1 = Task(taskId="T001", status="active")
+      task1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Enum 타입은 문자열이나 값으로 자동 변환됩니다.
@@ -208,8 +512,7 @@ sections:
     language: python
     title: Enum 접근
     description: 값과 이름
-    content: |-
-      task1.status, task1.status.value, task1.status.name
+    content: task1.status, task1.status.value, task1.status.name
   - type: code
     language: python
     title: 잘못된 Enum
@@ -220,10 +523,55 @@ sections:
       except ValidationError as e:
           enumError = e.errors()
           enumError
-
 - id: step7_literal
   title: 7단계. Literal 타입
+  structuredPrimary: true
   subtitle: 특정 값만 허용
+  goal: '7단계. Literal 타입: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. Literal 타입: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Literal로 필드가 가질 수 있는 값을 제한합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
+
+    class Priority(BaseModel):
+        level: Literal["low", "medium", "high"]
+        score: Literal[1, 2, 3, 4, 5]
+
+    priority1 = Priority(level="high", score=5)
+    priority1
+  exercise:
+    prompt: '7단계. Literal 타입: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+
+      class Priority(BaseModel):
+          level: Literal["low", "medium", "high"]
+          score: Literal[1, 2, 3, 4, 5]
+
+      priority1 = Priority(level="high", score=5)
+      priority1
+    solution: |-
+      from typing import Literal
+
+      class Priority(BaseModel):
+          level: Literal["low", "medium", "high"]
+          score: Literal[1, 2, 3, 4, 5]
+
+      priority1 = Priority(level="high", score=5)
+      priority1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Literal로 필드가 가질 수 있는 값을 제한합니다.
@@ -250,10 +598,67 @@ sections:
       except ValidationError as e:
           literalError = e.errors()
           literalError
-
 - id: step8_serializer
   title: 8단계. 필드 직렬화기
+  structuredPrimary: true
   subtitle: field_serializer
+  goal: '8단계. 필드 직렬화기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 필드 직렬화기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: field_serializer로 필드의 직렬화 방식을 커스터마이즈합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pydantic import field_serializer
+
+    class Article(BaseModel):
+        title: str
+        publishedAt: datetime
+
+        @field_serializer('publishedAt')
+        def serializeDate(self, v: datetime) -> str:
+            return v.strftime("%Y년 %m월 %d일")
+
+    article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+    article1.model_dump()
+  exercise:
+    prompt: '8단계. 필드 직렬화기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import field_serializer
+
+      class Article(BaseModel):
+          title: str
+          publishedAt: datetime
+
+          @field_serializer('publishedAt')
+          def serializeDate(self, v: datetime) -> str:
+              return v.strftime("%Y년 %m월 %d일")
+
+      article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+      article1.model_dump()
+    solution: |-
+      from pydantic import field_serializer
+
+      class Article(BaseModel):
+          title: str
+          publishedAt: datetime
+
+          @field_serializer('publishedAt')
+          def serializeDate(self, v: datetime) -> str:
+              return v.strftime("%Y년 %m월 %d일")
+
+      article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+      article1.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: field_serializer로 필드의 직렬화 방식을 커스터마이즈합니다.
@@ -278,12 +683,104 @@ sections:
     language: python
     title: JSON 출력
     description: 형식화된 날짜
-    content: |-
-      article1.model_dump_json()
-
+    content: article1.model_dump_json()
 - id: step9_computed
   title: 9단계. 계산 필드 직렬화
+  structuredPrimary: true
   subtitle: computed_field
+  goal: '9단계. 계산 필드 직렬화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 계산 필드 직렬화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: computed_field로 다른 필드에서 계산된 값을 직렬화에 포함합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pydantic import computed_field
+
+    class Invoice(BaseModel):
+        itemPrice: float
+        quantity: int
+        taxRate: float = 10
+
+        @computed_field
+        @property
+        def subtotal(self) -> float:
+            return self.itemPrice * self.quantity
+
+        @computed_field
+        @property
+        def tax(self) -> float:
+            return self.subtotal * self.taxRate / 100
+
+        @computed_field
+        @property
+        def total(self) -> float:
+            return self.subtotal + self.tax
+
+    invoice1 = Invoice(itemPrice=10000, quantity=3)
+    invoice1.model_dump()
+  exercise:
+    prompt: '9단계. 계산 필드 직렬화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import computed_field
+
+      class Invoice(BaseModel):
+          itemPrice: float
+          quantity: int
+          taxRate: float = 10
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.itemPrice * self.quantity
+
+          @computed_field
+          @property
+          def tax(self) -> float:
+              return self.subtotal * self.taxRate / 100
+
+          @computed_field
+          @property
+          def total(self) -> float:
+              return self.subtotal + self.tax
+
+      invoice1 = Invoice(itemPrice=10000, quantity=3)
+      invoice1.model_dump()
+    solution: |-
+      from pydantic import computed_field
+
+      class Invoice(BaseModel):
+          itemPrice: float
+          quantity: int
+          taxRate: float = 10
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.itemPrice * self.quantity
+
+          @computed_field
+          @property
+          def tax(self) -> float:
+              return self.subtotal * self.taxRate / 100
+
+          @computed_field
+          @property
+          def total(self) -> float:
+              return self.subtotal + self.tax
+
+      invoice1 = Invoice(itemPrice=10000, quantity=3)
+      invoice1.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: computed_field로 다른 필드에서 계산된 값을 직렬화에 포함합니다.
@@ -316,10 +813,55 @@ sections:
 
       invoice1 = Invoice(itemPrice=10000, quantity=3)
       invoice1.model_dump()
-
 - id: step10_mode
   title: 10단계. 직렬화 모드
+  structuredPrimary: true
   subtitle: mode 파라미터
+  goal: '10단계. 직렬화 모드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 직렬화 모드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
+
+    mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
+  tips:
+  - mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    class Sample(BaseModel):
+        createdAt: datetime
+        price: float
+
+    sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+    pythonMode = sample1.model_dump(mode='python')
+    pythonMode
+  exercise:
+    prompt: '10단계. 직렬화 모드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class Sample(BaseModel):
+          createdAt: datetime
+          price: float
+
+      sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+      pythonMode = sample1.model_dump(mode='python')
+      pythonMode
+    solution: |-
+      class Sample(BaseModel):
+          createdAt: datetime
+          price: float
+
+      sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+      pythonMode = sample1.model_dump(mode='python')
+      pythonMode
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
@@ -344,10 +886,58 @@ sections:
       jsonMode
   - type: tip
     content: mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
-
 - id: step11_exclude
   title: 11단계. 필드 제외
+  structuredPrimary: true
   subtitle: exclude, include
+  goal: '11단계. 필드 제외: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 필드 제외: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: model_dump에서 특정 필드를 제외하거나 포함할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class UserProfile(BaseModel):
+        userId: str
+        username: str
+        password: str
+        email: str
+
+    profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+    safeProfile = profile1.model_dump(exclude={"password"})
+    safeProfile
+  exercise:
+    prompt: '11단계. 필드 제외: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class UserProfile(BaseModel):
+          userId: str
+          username: str
+          password: str
+          email: str
+
+      profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+      safeProfile = profile1.model_dump(exclude={"password"})
+      safeProfile
+    solution: |-
+      class UserProfile(BaseModel):
+          userId: str
+          username: str
+          password: str
+          email: str
+
+      profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+      safeProfile = profile1.model_dump(exclude={"password"})
+      safeProfile
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: model_dump에서 특정 필드를 제외하거나 포함할 수 있습니다.
@@ -389,10 +979,58 @@ sections:
       contact1 = Contact(name="Bob", address={"street": "123 Main", "city": "Seoul", "zipCode": "12345"})
       partial = contact1.model_dump(exclude={"address": {"zipCode"}})
       partial
-
 - id: step12_alias_serial
   title: 12단계. 별칭 직렬화
+  structuredPrimary: true
   subtitle: by_alias
+  goal: '12단계. 별칭 직렬화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 별칭 직렬화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: by_alias=True로 직렬화 시 별칭을 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class ApiData(BaseModel):
+        userId: int = Field(alias="user_id")
+        userName: str = Field(alias="user_name")
+
+    apiData1 = ApiData(user_id=1, user_name="Alice")
+
+    normalDump = apiData1.model_dump()
+    aliasDump = apiData1.model_dump(by_alias=True)
+    normalDump, aliasDump
+  exercise:
+    prompt: '12단계. 별칭 직렬화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class ApiData(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+
+      apiData1 = ApiData(user_id=1, user_name="Alice")
+
+      normalDump = apiData1.model_dump()
+      aliasDump = apiData1.model_dump(by_alias=True)
+      normalDump, aliasDump
+    solution: |-
+      class ApiData(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+
+      apiData1 = ApiData(user_id=1, user_name="Alice")
+
+      normalDump = apiData1.model_dump()
+      aliasDump = apiData1.model_dump(by_alias=True)
+      normalDump, aliasDump
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: by_alias=True로 직렬화 시 별칭을 사용합니다.
@@ -414,17 +1052,127 @@ sections:
     language: python
     title: JSON 별칭
     description: API 응답 형식
-    content: |-
-      apiData1.model_dump_json(by_alias=True, indent=2)
-
+    content: apiData1.model_dump_json(by_alias=True, indent=2)
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 타입 변환 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 다양한 타입 변환과 직렬화를 적용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pydantic import BaseModel, Field, field_serializer, computed_field
+    from datetime import datetime
+    from typing import Literal
+
+    class ApiResponse(BaseModel):
+        statusCode: int = Field(alias="status_code")
+        message: str
+        timestamp: datetime
+        responseTime: float = Field(alias="response_time_ms")
+
+        @field_serializer('timestamp')
+        def formatTimestamp(self, v: datetime) -> str:
+            return v.isoformat()
+
+        @computed_field
+        @property
+        def isSuccess(self) -> bool:
+            return 200 <= self.statusCode < 300
+
+    resp = ApiResponse(
+        status_code=200,
+        message="Success",
+        timestamp="2024-03-15T10:30:00",
+        response_time_ms=45.5
+    )
+    respOutput = {
+        "normal": resp.model_dump(),
+        "alias": resp.model_dump(by_alias=True)
+    }
+    respOutput
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pydantic import BaseModel, Field, field_serializer, computed_field
+      from datetime import datetime
+      from typing import Literal
+
+      class ApiResponse(BaseModel):
+          statusCode: int = Field(alias="status_code")
+          message: str
+          timestamp: datetime
+          responseTime: float = Field(alias="response_time_ms")
+
+          @field_serializer('timestamp')
+          def formatTimestamp(self, v: datetime) -> str:
+              return v.isoformat()
+
+          @computed_field
+          @property
+          def isSuccess(self) -> bool:
+              return 200 <= self.statusCode < 300
+
+      resp = ApiResponse(
+          status_code=200,
+          message="Success",
+          timestamp="2024-03-15T10:30:00",
+          response_time_ms=45.5
+      )
+      respOutput = {
+          "normal": resp.model_dump(),
+          "alias": resp.model_dump(by_alias=True)
+      }
+      respOutput
+    solution: |-
+      from pydantic import BaseModel, Field, field_serializer, computed_field
+      from datetime import datetime
+      from typing import Literal
+
+      class ApiResponse(BaseModel):
+          statusCode: int = Field(alias="status_code")
+          message: str
+          timestamp: datetime
+          responseTime: float = Field(alias="response_time_ms")
+
+          @field_serializer('timestamp')
+          def formatTimestamp(self, v: datetime) -> str:
+              return v.isoformat()
+
+          @computed_field
+          @property
+          def isSuccess(self) -> bool:
+              return 200 <= self.statusCode < 300
+
+      resp = ApiResponse(
+          status_code=200,
+          message="Success",
+          timestamp="2024-03-15T10:30:00",
+          response_time_ms=45.5
+      )
+      respOutput = {
+          "normal": resp.model_dump(),
+          "alias": resp.model_dump(by_alias=True)
+      }
+      respOutput
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 다양한 타입 변환과 직렬화를 적용합니다.
   - type: expansion
-    title: "미션1: API 응답 모델"
+    title: '미션1: API 응답 모델'
     code: |-
       from pydantic import BaseModel, Field, field_serializer, computed_field
       from datetime import datetime
@@ -457,7 +1205,7 @@ sections:
       }
       respOutput
   - type: expansion
-    title: "미션2: 결제 처리 모델"
+    title: '미션2: 결제 처리 모델'
     code: |-
       from pydantic import BaseModel, Field, field_serializer, computed_field
       from datetime import datetime
@@ -507,17 +1255,139 @@ sections:
       )
       paymentOutput = payment.model_dump()
       paymentOutput
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상
+    데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
-  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    solution: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
-  - type: "code"
-    language: "python"
-    title: "주문 입력 모델과 정상 데이터 예측"
-    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+  - type: text
+    content: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만
+      다음 단계로 넘기는 흐름을 검증합니다.
+  - type: code
+    language: python
+    title: 주문 입력 모델과 정상 데이터 예측
+    description: 타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다.
     content: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -552,10 +1422,10 @@ sections:
       assert validOrder.amount == 120000
       assert validOrder.isRevenue is True
       validOrder.model_dump()
-  - type: "code"
-    language: "python"
-    title: "잘못된 입력을 먼저 실패시킨다"
-    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+  - type: code
+    language: python
+    title: 잘못된 입력을 먼저 실패시킨다
+    description: 금액과 상태가 틀린 입력을 ValidationError로 분리합니다.
     content: |-
       try:
           OrderInput.model_validate({
@@ -572,10 +1442,10 @@ sections:
       errorFields = {error['loc'][0] for error in orderValidationErrors}
       assert {'amount', 'status'} <= errorFields
       orderValidationErrors
-  - type: "code"
-    language: "python"
-    title: "배치 입력을 정상/오류로 분리"
-    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+  - type: code
+    language: python
+    title: 배치 입력을 정상/오류로 분리
+    description: 여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다.
     content: |-
       rawOrders = [
           {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
@@ -601,10 +1471,10 @@ sections:
       assert len(rejectedOrders) == 2
       assert paidRevenue == 120000
       acceptedOrders, rejectedOrders
-  - type: "code"
-    language: "python"
-    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
-    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: '실무 변주: 최소 결제 금액 정책 바꾸기'
+    description: 정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다.
     content: |-
       def filterRevenueOrders(orders, minAmount):
           if minAmount <= 0:

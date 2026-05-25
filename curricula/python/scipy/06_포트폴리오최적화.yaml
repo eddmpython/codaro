@@ -1,33 +1,136 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - scipy
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
   id: scipy_06
   title: 포트폴리오최적화
   order: 6
   category: scipy
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["scipy.optimize", "minimize", "포트폴리오", "최적화", "제약조건"]
+  tags:
+  - scipy.optimize
+  - minimize
+  - 포트폴리오
+  - 최적화
+  - 제약조건
   seo:
-    title: "scipy.optimize minimize - 투자 포트폴리오 최적화"
-    description: "scipy.optimize의 minimize로 포트폴리오 최적화를 수행합니다. 제약조건 하에서 위험 대비 수익을 최대화합니다."
-    keywords: ["scipy", "optimize", "minimize", "포트폴리오", "투자"]
-
+    title: scipy.optimize minimize - 투자 포트폴리오 최적화
+    description: scipy.optimize의 minimize로 포트폴리오 최적화를 수행합니다. 제약조건 하에서 위험 대비 수익을 최대화합니다.
+    keywords:
+    - scipy
+    - optimize
+    - minimize
+    - 포트폴리오
+    - 투자
 intro:
-  emoji: "💰"
+  emoji: 💰
   goal: scipy.optimize로 위험 대비 수익이 최대인 포트폴리오를 찾습니다.
   description: 여러 자산에 투자할 때 각 자산의 비중을 어떻게 결정할까요? minimize 함수로 샤프 비율을 최대화하거나 위험을 최소화하는 최적 배분을 계산합니다.
-
 sections:
 - id: load
   title: 데이터 로드
+  structuredPrimary: true
   subtitle: 자산 수익률과 공분산
+  goal: '데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    포트폴리오 최적화는 여러 자산의 투자 비중을 결정하는 문제입니다. 각 자산의 예상 수익률과 자산 간 상관관계(공분산)를 알면 최적의 배분을 찾을 수 있습니다. 이 프로젝트에서는 주식 2종, 채권, 금 4개 자산으로 구성된 포트폴리오를 최적화합니다.
+
+    공분산 행렬의 대각원소는 각 자산의 분산(변동성²)입니다. 비대각원소는 자산 간 공분산으로, 양수면 같이 움직이고 음수면 반대로 움직입니다.
+  tips:
+  - 공분산 행렬의 대각원소는 각 자산의 분산(변동성²)입니다. 비대각원소는 자산 간 공분산으로, 양수면 같이 움직이고 음수면 반대로 움직입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import optimize
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    assets = ['Stock A', 'Stock B', 'Bond', 'Gold']
+    returns = np.array([0.12, 0.10, 0.05, 0.07])
+
+    covMatrix = np.array([
+        [0.0225, 0.0135, 0.0020, 0.0010],
+        [0.0135, 0.0196, 0.0015, 0.0005],
+        [0.0020, 0.0015, 0.0025, 0.0002],
+        [0.0010, 0.0005, 0.0002, 0.0100]
+    ])
+
+    assetDf = pd.DataFrame({
+        'Asset': assets,
+        'Return': [f'{r*100:.1f}%' for r in returns],
+        'Volatility': [f'{np.sqrt(covMatrix[i,i])*100:.1f}%' for i in range(len(assets))]
+    })
+    assetDf
+  exercise:
+    prompt: '데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      assets = ['Stock A', 'Stock B', 'Bond', 'Gold']
+      returns = np.array([0.12, 0.10, 0.05, 0.07])
+
+      covMatrix = np.array([
+          [0.0225, 0.0135, 0.0020, 0.0010],
+          [0.0135, 0.0196, 0.0015, 0.0005],
+          [0.0020, 0.0015, 0.0025, 0.0002],
+          [0.0010, 0.0005, 0.0002, 0.0100]
+      ])
+
+      assetDf = pd.DataFrame({
+          'Asset': assets,
+          'Return': [f'{r*100:.1f}%' for r in returns],
+          'Volatility': [f'{np.sqrt(covMatrix[i,i])*100:.1f}%' for i in range(len(assets))]
+      })
+      assetDf
+    solution: |-
+      import scipy
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      assets = ['Stock A', 'Stock B', 'Bond', 'Gold']
+      returns = np.array([0.12, 0.10, 0.05, 0.07])
+
+      covMatrix = np.array([
+          [0.0225, 0.0135, 0.0020, 0.0010],
+          [0.0135, 0.0196, 0.0015, 0.0005],
+          [0.0020, 0.0015, 0.0025, 0.0002],
+          [0.0010, 0.0005, 0.0002, 0.0100]
+      ])
+
+      assetDf = pd.DataFrame({
+          'Asset': assets,
+          'Return': [f'{r*100:.1f}%' for r in returns],
+          'Volatility': [f'{np.sqrt(covMatrix[i,i])*100:.1f}%' for i in range(len(assets))]
+      })
+      assetDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 포트폴리오 최적화는 여러 자산의 투자 비중을 결정하는 문제입니다. 각 자산의 예상 수익률과 자산 간 상관관계(공분산)를 알면 최적의 배분을 찾을 수 있습니다. 이 프로젝트에서는 주식 2종, 채권, 금 4개 자산으로 구성된 포트폴리오를 최적화합니다.
+    content: 포트폴리오 최적화는 여러 자산의 투자 비중을 결정하는 문제입니다. 각 자산의 예상 수익률과 자산 간 상관관계(공분산)를 알면 최적의 배분을 찾을 수 있습니다. 이 프로젝트에서는 주식 2종, 채권,
+      금 4개 자산으로 구성된 포트폴리오를 최적화합니다.
   - type: code
     language: python
     title: 라이브러리 및 데이터
@@ -58,13 +161,66 @@ sections:
       assetDf
   - type: tip
     content: 공분산 행렬의 대각원소는 각 자산의 분산(변동성²)입니다. 비대각원소는 자산 간 공분산으로, 양수면 같이 움직이고 음수면 반대로 움직입니다.
-
 - id: metrics
   title: 포트폴리오 지표
+  structuredPrimary: true
   subtitle: 수익률, 위험, 샤프비율
+  goal: '포트폴리오 지표: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '포트폴리오 지표: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 포트폴리오 수익률은 각 자산 수익률의 가중평균입니다. 위험(표준편차)은 공분산을 고려하여 계산합니다. 샤프 비율은 (수익률 - 무위험수익률) / 위험으로, 위험 대비 초과수익을 측정합니다. 샤프
+    비율이 높을수록 효율적인 투자입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def portfolioReturn(weights, rets):
+        return np.dot(weights, rets)
+
+    def portfolioRisk(weights, cov):
+        return np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
+
+    def sharpeRatio(weights, rets, cov, riskFree=0.02):
+        pRet = portfolioReturn(weights, rets)
+        pRisk = portfolioRisk(weights, cov)
+        return (pRet - riskFree) / pRisk
+  exercise:
+    prompt: '포트폴리오 지표: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def portfolioReturn(weights, rets):
+          return np.dot(weights, rets)
+
+      def portfolioRisk(weights, cov):
+          return np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
+
+      def sharpeRatio(weights, rets, cov, riskFree=0.02):
+          pRet = portfolioReturn(weights, rets)
+          pRisk = portfolioRisk(weights, cov)
+          return (pRet - riskFree) / pRisk
+    solution: |-
+      def portfolioReturn(weights, rets):
+          return np.dot(weights, rets)
+
+      def portfolioRisk(weights, cov):
+          return np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
+
+      def sharpeRatio(weights, rets, cov, riskFree=0.02):
+          pRet = portfolioReturn(weights, rets)
+          pRisk = portfolioRisk(weights, cov)
+          return (pRet - riskFree) / pRisk
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 포트폴리오 수익률은 각 자산 수익률의 가중평균입니다. 위험(표준편차)은 공분산을 고려하여 계산합니다. 샤프 비율은 (수익률 - 무위험수익률) / 위험으로, 위험 대비 초과수익을 측정합니다. 샤프 비율이 높을수록 효율적인 투자입니다.
+    content: 포트폴리오 수익률은 각 자산 수익률의 가중평균입니다. 위험(표준편차)은 공분산을 고려하여 계산합니다. 샤프 비율은 (수익률 - 무위험수익률) / 위험으로, 위험 대비 초과수익을 측정합니다. 샤프
+      비율이 높을수록 효율적인 투자입니다.
   - type: code
     language: python
     title: 지표 함수 정의
@@ -96,13 +252,53 @@ sections:
           'Value': [f'{eqRet*100:.2f}%', f'{eqRisk*100:.2f}%', f'{eqSharpe:.3f}']
       })
       equalDf
-
 - id: constraints
   title: 제약조건 설정
+  structuredPrimary: true
   subtitle: 합계와 범위 제한
+  goal: '제약조건 설정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '제약조건 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    포트폴리오 최적화에는 제약조건이 필수입니다. 가장 기본적인 제약은 비중 합계가 100%여야 한다는 것과 공매도를 금지하는 비음수 조건입니다. scipy.optimize.minimize는 등식 제약('eq')과 부등식 제약('ineq'), 변수 범위(bounds)를 모두 지원합니다.
+
+    'eq' 제약은 함수 결과가 0이 되어야 함을 의미합니다. 따라서 sum(w) - 1 = 0, 즉 sum(w) = 1입니다. 'ineq'는 결과가 0 이상이어야 합니다.
+  tips:
+  - '''eq'' 제약은 함수 결과가 0이 되어야 함을 의미합니다. 따라서 sum(w) - 1 = 0, 즉 sum(w) = 1입니다. ''ineq''는 결과가 0 이상이어야 합니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+
+    bounds = tuple((0, 1) for _ in range(len(assets)))
+
+    initWeights = np.array([0.25, 0.25, 0.25, 0.25])
+  exercise:
+    prompt: '제약조건 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+
+      bounds = tuple((0, 1) for _ in range(len(assets)))
+
+      initWeights = np.array([0.25, 0.25, 0.25, 0.25])
+    solution: |-
+      constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+
+      bounds = tuple((0, 1) for _ in range(len(assets)))
+
+      initWeights = np.array([0.25, 0.25, 0.25, 0.25])
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 포트폴리오 최적화에는 제약조건이 필수입니다. 가장 기본적인 제약은 비중 합계가 100%여야 한다는 것과 공매도를 금지하는 비음수 조건입니다. scipy.optimize.minimize는 등식 제약('eq')과 부등식 제약('ineq'), 변수 범위(bounds)를 모두 지원합니다.
+    content: 포트폴리오 최적화에는 제약조건이 필수입니다. 가장 기본적인 제약은 비중 합계가 100%여야 한다는 것과 공매도를 금지하는 비음수 조건입니다. scipy.optimize.minimize는 등식 제약('eq')과
+      부등식 제약('ineq'), 변수 범위(bounds)를 모두 지원합니다.
   - type: code
     language: python
     title: 제약조건 정의
@@ -114,11 +310,95 @@ sections:
 
       initWeights = np.array([0.25, 0.25, 0.25, 0.25])
   - type: tip
-    content: "'eq' 제약은 함수 결과가 0이 되어야 함을 의미합니다. 따라서 sum(w) - 1 = 0, 즉 sum(w) = 1입니다. 'ineq'는 결과가 0 이상이어야 합니다."
-
+    content: '''eq'' 제약은 함수 결과가 0이 되어야 함을 의미합니다. 따라서 sum(w) - 1 = 0, 즉 sum(w) = 1입니다. ''ineq''는 결과가 0 이상이어야 합니다.'
 - id: minrisk
   title: 최소위험 포트폴리오
+  structuredPrimary: true
   subtitle: 변동성 최소화
+  goal: '최소위험 포트폴리오: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최소위험 포트폴리오: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 가장 보수적인 전략은 위험(변동성)을 최소화하는 것입니다. 수익률과 무관하게 변동성만 최소화합니다. 이 포트폴리오는 효율적 프론티어의 가장 왼쪽 끝에 위치하며, 리스크 회피 투자자에게 적합합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def negRisk(weights):
+        return portfolioRisk(weights, covMatrix)
+
+    minRiskResult = optimize.minimize(
+        negRisk,
+        initWeights,
+        method='SLSQP',
+        bounds=bounds,
+        constraints=constraints
+    )
+
+    minRiskW = minRiskResult.x
+    minRiskRet = portfolioReturn(minRiskW, returns)
+    minRiskVol = portfolioRisk(minRiskW, covMatrix)
+    minRiskSharpe = sharpeRatio(minRiskW, returns, covMatrix)
+
+    minRiskDf = pd.DataFrame({
+        'Asset': assets,
+        'Weight': [f'{w*100:.1f}%' for w in minRiskW]
+    })
+    minRiskDf
+  exercise:
+    prompt: '최소위험 포트폴리오: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def negRisk(weights):
+          return portfolioRisk(weights, covMatrix)
+
+      minRiskResult = optimize.minimize(
+          negRisk,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      minRiskW = minRiskResult.x
+      minRiskRet = portfolioReturn(minRiskW, returns)
+      minRiskVol = portfolioRisk(minRiskW, covMatrix)
+      minRiskSharpe = sharpeRatio(minRiskW, returns, covMatrix)
+
+      minRiskDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in minRiskW]
+      })
+      minRiskDf
+    solution: |-
+      def negRisk(weights):
+          return portfolioRisk(weights, covMatrix)
+
+      minRiskResult = optimize.minimize(
+          negRisk,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      minRiskW = minRiskResult.x
+      minRiskRet = portfolioReturn(minRiskW, returns)
+      minRiskVol = portfolioRisk(minRiskW, covMatrix)
+      minRiskSharpe = sharpeRatio(minRiskW, returns, covMatrix)
+
+      minRiskDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in minRiskW]
+      })
+      minRiskDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 가장 보수적인 전략은 위험(변동성)을 최소화하는 것입니다. 수익률과 무관하게 변동성만 최소화합니다. 이 포트폴리오는 효율적 프론티어의 가장 왼쪽 끝에 위치하며, 리스크 회피 투자자에게 적합합니다.
@@ -148,13 +428,99 @@ sections:
           'Weight': [f'{w*100:.1f}%' for w in minRiskW]
       })
       minRiskDf
-
 - id: maxsharpe
   title: 최대샤프 포트폴리오
+  structuredPrimary: true
   subtitle: 위험대비 수익 최대화
+  goal: '최대샤프 포트폴리오: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최대샤프 포트폴리오: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 샤프 비율을 최대화하면 위험 대비 가장 효율적인 포트폴리오를 찾습니다. minimize 함수는 최소화만 하므로, 음수 샤프 비율을 최소화하여 최대화 효과를 냅니다. 이 포트폴리오가 일반적으로
+    가장 추천되는 배분입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def negSharpe(weights):
+        return -sharpeRatio(weights, returns, covMatrix)
+
+    maxSharpeResult = optimize.minimize(
+        negSharpe,
+        initWeights,
+        method='SLSQP',
+        bounds=bounds,
+        constraints=constraints
+    )
+
+    maxSharpeW = maxSharpeResult.x
+    maxSharpeRet = portfolioReturn(maxSharpeW, returns)
+    maxSharpeVol = portfolioRisk(maxSharpeW, covMatrix)
+    maxSharpeSharpe = sharpeRatio(maxSharpeW, returns, covMatrix)
+
+    maxSharpeDf = pd.DataFrame({
+        'Asset': assets,
+        'Weight': [f'{w*100:.1f}%' for w in maxSharpeW]
+    })
+    maxSharpeDf
+  exercise:
+    prompt: '최대샤프 포트폴리오: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def negSharpe(weights):
+          return -sharpeRatio(weights, returns, covMatrix)
+
+      maxSharpeResult = optimize.minimize(
+          negSharpe,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      maxSharpeW = maxSharpeResult.x
+      maxSharpeRet = portfolioReturn(maxSharpeW, returns)
+      maxSharpeVol = portfolioRisk(maxSharpeW, covMatrix)
+      maxSharpeSharpe = sharpeRatio(maxSharpeW, returns, covMatrix)
+
+      maxSharpeDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in maxSharpeW]
+      })
+      maxSharpeDf
+    solution: |-
+      def negSharpe(weights):
+          return -sharpeRatio(weights, returns, covMatrix)
+
+      maxSharpeResult = optimize.minimize(
+          negSharpe,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      maxSharpeW = maxSharpeResult.x
+      maxSharpeRet = portfolioReturn(maxSharpeW, returns)
+      maxSharpeVol = portfolioRisk(maxSharpeW, covMatrix)
+      maxSharpeSharpe = sharpeRatio(maxSharpeW, returns, covMatrix)
+
+      maxSharpeDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in maxSharpeW]
+      })
+      maxSharpeDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 샤프 비율을 최대화하면 위험 대비 가장 효율적인 포트폴리오를 찾습니다. minimize 함수는 최소화만 하므로, 음수 샤프 비율을 최소화하여 최대화 효과를 냅니다. 이 포트폴리오가 일반적으로 가장 추천되는 배분입니다.
+    content: 샤프 비율을 최대화하면 위험 대비 가장 효율적인 포트폴리오를 찾습니다. minimize 함수는 최소화만 하므로, 음수 샤프 비율을 최소화하여 최대화 효과를 냅니다. 이 포트폴리오가 일반적으로 가장
+      추천되는 배분입니다.
   - type: code
     language: python
     title: 샤프비율 최대화
@@ -181,13 +547,57 @@ sections:
           'Weight': [f'{w*100:.1f}%' for w in maxSharpeW]
       })
       maxSharpeDf
-
 - id: compare
   title: 전략 비교
+  structuredPrimary: true
   subtitle: 세 포트폴리오 분석
+  goal: '전략 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '전략 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 균등배분, 최소위험, 최대샤프 세 가지 전략을 비교합니다. 최소위험은 수익률이 낮지만 변동성도 낮고, 최대샤프는 위험 단위당 수익이 가장 높습니다. 투자 목적과 위험 허용도에 따라 적절한 전략을
+    선택해야 합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    compareDf = pd.DataFrame({
+        'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
+        'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],
+        'Risk': [f'{eqRisk*100:.2f}%', f'{minRiskVol*100:.2f}%', f'{maxSharpeVol*100:.2f}%'],
+        'Sharpe': [f'{eqSharpe:.3f}', f'{minRiskSharpe:.3f}', f'{maxSharpeSharpe:.3f}']
+    })
+    compareDf
+  exercise:
+    prompt: '전략 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      compareDf = pd.DataFrame({
+          'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
+          'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{eqRisk*100:.2f}%', f'{minRiskVol*100:.2f}%', f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{eqSharpe:.3f}', f'{minRiskSharpe:.3f}', f'{maxSharpeSharpe:.3f}']
+      })
+      compareDf
+    solution: |-
+      compareDf = pd.DataFrame({
+          'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
+          'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{eqRisk*100:.2f}%', f'{minRiskVol*100:.2f}%', f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{eqSharpe:.3f}', f'{minRiskSharpe:.3f}', f'{maxSharpeSharpe:.3f}']
+      })
+      compareDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 균등배분, 최소위험, 최대샤프 세 가지 전략을 비교합니다. 최소위험은 수익률이 낮지만 변동성도 낮고, 최대샤프는 위험 단위당 수익이 가장 높습니다. 투자 목적과 위험 허용도에 따라 적절한 전략을 선택해야 합니다.
+    content: 균등배분, 최소위험, 최대샤프 세 가지 전략을 비교합니다. 최소위험은 수익률이 낮지만 변동성도 낮고, 최대샤프는 위험 단위당 수익이 가장 높습니다. 투자 목적과 위험 허용도에 따라 적절한 전략을
+      선택해야 합니다.
   - type: code
     language: python
     title: 전략 비교표
@@ -222,13 +632,84 @@ sections:
       axCompare.legend()
       axCompare.grid(True, alpha=0.3, axis='y')
       figCompare
-
 - id: frontier
   title: 효율적 프론티어
+  structuredPrimary: true
   subtitle: 수익-위험 곡선
+  goal: '효율적 프론티어: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '효율적 프론티어: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 효율적 프론티어는 주어진 위험 수준에서 달성 가능한 최대 수익의 집합입니다. 목표 수익률을 변화시키며 각 수준에서 최소 위험 포트폴리오를 찾으면 프론티어를 그릴 수 있습니다. 프론티어 위의 점만이
+    효율적인 투자입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    targetRets = np.linspace(0.05, 0.12, 50)
+    frontierRisks = []
+    frontierWeights = []
+
+    for target in targetRets:
+        cons = [
+            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+            {'type': 'eq', 'fun': lambda w, t=target: portfolioReturn(w, returns) - t}
+        ]
+        res = optimize.minimize(negRisk, initWeights, method='SLSQP', bounds=bounds, constraints=cons)
+        if res.success:
+            frontierRisks.append(portfolioRisk(res.x, covMatrix))
+            frontierWeights.append(res.x)
+        else:
+            frontierRisks.append(np.nan)
+            frontierWeights.append(None)
+  exercise:
+    prompt: '효율적 프론티어: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      targetRets = np.linspace(0.05, 0.12, 50)
+      frontierRisks = []
+      frontierWeights = []
+
+      for target in targetRets:
+          cons = [
+              {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+              {'type': 'eq', 'fun': lambda w, t=target: portfolioReturn(w, returns) - t}
+          ]
+          res = optimize.minimize(negRisk, initWeights, method='SLSQP', bounds=bounds, constraints=cons)
+          if res.success:
+              frontierRisks.append(portfolioRisk(res.x, covMatrix))
+              frontierWeights.append(res.x)
+          else:
+              frontierRisks.append(np.nan)
+              frontierWeights.append(None)
+    solution: |-
+      targetRets = np.linspace(0.05, 0.12, 50)
+      frontierRisks = []
+      frontierWeights = []
+
+      for target in targetRets:
+          cons = [
+              {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+              {'type': 'eq', 'fun': lambda w, t=target: portfolioReturn(w, returns) - t}
+          ]
+          res = optimize.minimize(negRisk, initWeights, method='SLSQP', bounds=bounds, constraints=cons)
+          if res.success:
+              frontierRisks.append(portfolioRisk(res.x, covMatrix))
+              frontierWeights.append(res.x)
+          else:
+              frontierRisks.append(np.nan)
+              frontierWeights.append(None)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 효율적 프론티어는 주어진 위험 수준에서 달성 가능한 최대 수익의 집합입니다. 목표 수익률을 변화시키며 각 수준에서 최소 위험 포트폴리오를 찾으면 프론티어를 그릴 수 있습니다. 프론티어 위의 점만이 효율적인 투자입니다.
+    content: 효율적 프론티어는 주어진 위험 수준에서 달성 가능한 최대 수익의 집합입니다. 목표 수익률을 변화시키며 각 수준에서 최소 위험 포트폴리오를 찾으면 프론티어를 그릴 수 있습니다. 프론티어 위의 점만이
+      효율적인 투자입니다.
   - type: code
     language: python
     title: 프론티어 계산
@@ -274,13 +755,72 @@ sections:
       axFrontier.legend()
       axFrontier.grid(True, alpha=0.3)
       figFrontier
-
 - id: monte
   title: 몬테카를로 시뮬레이션
+  structuredPrimary: true
   subtitle: 랜덤 포트폴리오 분포
+  goal: '몬테카를로 시뮬레이션: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '몬테카를로 시뮬레이션: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 수천 개의 랜덤 포트폴리오를 생성하여 가능한 수익-위험 조합을 시각화합니다. 효율적 프론티어가 모든 랜덤 포트폴리오의 상단 경계임을 확인할 수 있습니다. 샤프 비율을 색상으로 표현하면 최대샤프
+    포트폴리오가 가장 밝게 표시됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    np.random.seed(42)
+    nSim = 10000
+    simRets = []
+    simRisks = []
+    simSharpes = []
+
+    for _ in range(nSim):
+        w = np.random.random(len(assets))
+        w /= w.sum()
+        simRets.append(portfolioReturn(w, returns))
+        simRisks.append(portfolioRisk(w, covMatrix))
+        simSharpes.append(sharpeRatio(w, returns, covMatrix))
+  exercise:
+    prompt: '몬테카를로 시뮬레이션: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      np.random.seed(42)
+      nSim = 10000
+      simRets = []
+      simRisks = []
+      simSharpes = []
+
+      for _ in range(nSim):
+          w = np.random.random(len(assets))
+          w /= w.sum()
+          simRets.append(portfolioReturn(w, returns))
+          simRisks.append(portfolioRisk(w, covMatrix))
+          simSharpes.append(sharpeRatio(w, returns, covMatrix))
+    solution: |-
+      np.random.seed(42)
+      nSim = 10000
+      simRets = []
+      simRisks = []
+      simSharpes = []
+
+      for _ in range(nSim):
+          w = np.random.random(len(assets))
+          w /= w.sum()
+          simRets.append(portfolioReturn(w, returns))
+          simRisks.append(portfolioRisk(w, covMatrix))
+          simSharpes.append(sharpeRatio(w, returns, covMatrix))
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 수천 개의 랜덤 포트폴리오를 생성하여 가능한 수익-위험 조합을 시각화합니다. 효율적 프론티어가 모든 랜덤 포트폴리오의 상단 경계임을 확인할 수 있습니다. 샤프 비율을 색상으로 표현하면 최대샤프 포트폴리오가 가장 밝게 표시됩니다.
+    content: 수천 개의 랜덤 포트폴리오를 생성하여 가능한 수익-위험 조합을 시각화합니다. 효율적 프론티어가 모든 랜덤 포트폴리오의 상단 경계임을 확인할 수 있습니다. 샤프 비율을 색상으로 표현하면 최대샤프 포트폴리오가
+      가장 밝게 표시됩니다.
   - type: code
     language: python
     title: 랜덤 포트폴리오 생성
@@ -317,13 +857,69 @@ sections:
       axMonte.legend()
       axMonte.grid(True, alpha=0.3)
       figMonte
-
 - id: result
   title: 최종 추천
+  structuredPrimary: true
   subtitle: 투자 보고서
+  goal: '최종 추천: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '최종 추천: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 최적화 결과를 종합하면 최대샤프 포트폴리오가 위험 대비 가장 효율적입니다. 그러나 실제 투자에서는 개인의 위험 허용도, 투자 기간, 유동성 필요 등을 고려해야 합니다. 최소위험과 최대샤프 사이에서
+    본인에게 맞는 지점을 선택하세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    reportDf = pd.DataFrame({
+        'Portfolio': ['Max Sharpe (Recommended)'],
+        'Stock A': [f'{maxSharpeW[0]*100:.1f}%'],
+        'Stock B': [f'{maxSharpeW[1]*100:.1f}%'],
+        'Bond': [f'{maxSharpeW[2]*100:.1f}%'],
+        'Gold': [f'{maxSharpeW[3]*100:.1f}%'],
+        'Exp Return': [f'{maxSharpeRet*100:.2f}%'],
+        'Risk': [f'{maxSharpeVol*100:.2f}%'],
+        'Sharpe': [f'{maxSharpeSharpe:.3f}']
+    })
+    reportDf
+  exercise:
+    prompt: '최종 추천: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      reportDf = pd.DataFrame({
+          'Portfolio': ['Max Sharpe (Recommended)'],
+          'Stock A': [f'{maxSharpeW[0]*100:.1f}%'],
+          'Stock B': [f'{maxSharpeW[1]*100:.1f}%'],
+          'Bond': [f'{maxSharpeW[2]*100:.1f}%'],
+          'Gold': [f'{maxSharpeW[3]*100:.1f}%'],
+          'Exp Return': [f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{maxSharpeSharpe:.3f}']
+      })
+      reportDf
+    solution: |-
+      reportDf = pd.DataFrame({
+          'Portfolio': ['Max Sharpe (Recommended)'],
+          'Stock A': [f'{maxSharpeW[0]*100:.1f}%'],
+          'Stock B': [f'{maxSharpeW[1]*100:.1f}%'],
+          'Bond': [f'{maxSharpeW[2]*100:.1f}%'],
+          'Gold': [f'{maxSharpeW[3]*100:.1f}%'],
+          'Exp Return': [f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{maxSharpeSharpe:.3f}']
+      })
+      reportDf
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 최적화 결과를 종합하면 최대샤프 포트폴리오가 위험 대비 가장 효율적입니다. 그러나 실제 투자에서는 개인의 위험 허용도, 투자 기간, 유동성 필요 등을 고려해야 합니다. 최소위험과 최대샤프 사이에서 본인에게 맞는 지점을 선택하세요.
+    content: 최적화 결과를 종합하면 최대샤프 포트폴리오가 위험 대비 가장 효율적입니다. 그러나 실제 투자에서는 개인의 위험 허용도, 투자 기간, 유동성 필요 등을 고려해야 합니다. 최소위험과 최대샤프 사이에서
+      본인에게 맞는 지점을 선택하세요.
   - type: code
     language: python
     title: 투자 보고서
@@ -340,15 +936,63 @@ sections:
           'Sharpe': [f'{maxSharpeSharpe:.3f}']
       })
       reportDf
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 포트폴리오 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 투자 분석가가 되어 다양한 자산 조합과 제약조건으로 포트폴리오를 최적화해보세요. 자산 수를 늘리거나 특정 자산에 최대 비중 제한을 두는 등 실무적인 조건을 추가해보세요.
+  tips:
+  - 투자 분석가가 되어 다양한 자산 조합과 제약조건으로 포트폴리오를 최적화해보세요. 자산 수를 늘리거나 특정 자산에 최대 비중 제한을 두는 등 실무적인 조건을 추가해보세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    assets5 = ['Tech', 'Healthcare', 'Energy', 'Real Estate', 'Treasury']
+    returns5 = np.array([0.15, 0.11, 0.08, 0.09, 0.03])
+    cov5 = np.array([
+        [0.0400, 0.0180, 0.0100, 0.0120, 0.0010],
+        [0.0180, 0.0289, 0.0080, 0.0100, 0.0005],
+        [0.0100, 0.0080, 0.0324, 0.0150, 0.0002],
+        [0.0120, 0.0100, 0.0150, 0.0256, 0.0008],
+        [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
+    ])
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      assets5 = ['Tech', 'Healthcare', 'Energy', 'Real Estate', 'Treasury']
+      returns5 = np.array([0.15, 0.11, 0.08, 0.09, 0.03])
+      cov5 = np.array([
+          [0.0400, 0.0180, 0.0100, 0.0120, 0.0010],
+          [0.0180, 0.0289, 0.0080, 0.0100, 0.0005],
+          [0.0100, 0.0080, 0.0324, 0.0150, 0.0002],
+          [0.0120, 0.0100, 0.0150, 0.0256, 0.0008],
+          [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
+      ])
+    solution: |-
+      assets5 = ['Tech', 'Healthcare', 'Energy', 'Real Estate', 'Treasury']
+      returns5 = np.array([0.15, 0.11, 0.08, 0.09, 0.03])
+      cov5 = np.array([
+          [0.0400, 0.0180, 0.0100, 0.0120, 0.0010],
+          [0.0180, 0.0289, 0.0080, 0.0100, 0.0005],
+          [0.0100, 0.0080, 0.0324, 0.0150, 0.0002],
+          [0.0120, 0.0100, 0.0150, 0.0256, 0.0008],
+          [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
+      ])
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: tip
     content: 투자 분석가가 되어 다양한 자산 조합과 제약조건으로 포트폴리오를 최적화해보세요. 자산 수를 늘리거나 특정 자산에 최대 비중 제한을 두는 등 실무적인 조건을 추가해보세요.
   - type: expansion
-    title: "미션1: 5개 자산 포트폴리오"
+    title: '미션1: 5개 자산 포트폴리오'
     blocks:
     - type: code
       language: python
@@ -391,7 +1035,7 @@ sections:
         })
         result5Df
   - type: expansion
-    title: "미션2: 목표수익률 달성"
+    title: '미션2: 목표수익률 달성'
     blocks:
     - type: code
       language: python
@@ -422,13 +1066,84 @@ sections:
             'Value': [f'{targetGoal*100:.1f}%', f'{goalRet*100:.2f}%', f'{goalRisk*100:.2f}%']
         })
         goalDf
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+    합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다."
+    content: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야
+      합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   - type: code
     language: python
     title: 지연시간 샘플과 입력 검증
@@ -500,7 +1215,7 @@ sections:
       assert all(latencyChecks.values()), latencyChecks
       latencyChecks
   - type: expansion
-    title: "실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?"
+    title: '실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?'
     blocks:
     - type: code
       language: python

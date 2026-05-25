@@ -85,7 +85,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (12) — 5층 구조
+## Architecture (13) — 5층 구조
 
 - [ssot-map](architecture/ssot-map.md)
 - [overview](architecture/overview.md)
@@ -94,6 +94,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [dataflow](architecture/dataflow.md)
 - [widget-bridge](architecture/widget-bridge.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
+- [curriculum-authoring](architecture/curriculum-authoring.md)
 - [learning-yaml-contract](architecture/learning-yaml-contract.md)
 - [curriculum-registry](architecture/curriculum-registry.md)
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
@@ -130,8 +131,3 @@ Product:
 - [branding](ops/product/branding.md)
 - [dogfood-alpha](ops/product/dogfood-alpha.md)
 - [product-quality](ops/product/service-candidate.md)
-
-## 후속 (PR 2 이후)
-
-- `architecture/{document,kernel,runtime,system}.md` — 기존 src/codaro/*/DEV.md 본문 이관
-- `launcher/{packaging,provisioning,manifest,backend-lifecycle}.md` — launcher/PRD.md 530줄 분할

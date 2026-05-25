@@ -43,6 +43,8 @@ curricula/
 - 물리 셀 타입은 `markdown`과 `code`를 기본으로 유지하고, 학습 의미는 `role`, `displayKind`, `executionKind`, `payload`에 둔다.
 - AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기를 통과한다.
 - `study.yaml` 파일명과 `/study/...` URL은 기존 콘텐츠 포맷과 라우트 계약이므로 폴더명 변경과 별개로 유지한다.
+- built-in 레슨의 외부 패키지는 `meta.packages`에 둔다. 기본 프로젝트 의존성은 제품 실행용 최소 패키지로 유지하고, 학습 패키지는 레슨을 열거나 실행할 때 uv preflight로 준비한다.
+- 트랙의 `00_*소개.yaml`은 단순 소개가 아니라 해당 과정을 통해 만들 수 있는 산출물, 필요한 패키지 준비, 첫 실행 검증, 이후 로드맵을 보여주는 오리엔테이션이어야 한다.
 
 ## 카테고리 그룹 계약
 
@@ -70,3 +72,4 @@ curricula/
 - [[learning-three-pillars]] — 기본 커리큘럼과 AI 생성 YAML의 제품 사상
 - [[document-model]] — YAML이 block document로 전개되는 방식
 - [[frontend-product-surface]] — reference curriculum을 제품 UI에서 다루는 방식
+- [[curriculum-authoring]] — 커리큘럼 작성 절차와 lazy uv 의존성 기준

@@ -1,33 +1,118 @@
 meta:
-  id: "27"
-  title: "문자열 알고리즘"
+  id: '27'
+  title: 문자열 알고리즘
   day: 27
-  category: "advancedPython"
-  tags: ["문자열", "알고리즘", "패턴매칭", "KMP", "Trie", "검증", "검색엔진"]
+  category: advancedPython
+  tags:
+  - 문자열
+  - 알고리즘
+  - 패턴매칭
+  - KMP
+  - Trie
+  - 검증
+  - 검색엔진
   seo:
-    title: "파이썬 문자열 알고리즘"
-    description: "KMP, Rabin-Karp, Trie 등 문자열 알고리즘 학습"
-    keywords: ["문자열", "패턴매칭", "KMP", "Trie"]
-
+    title: 파이썬 문자열 알고리즘
+    description: KMP, Rabin-Karp, Trie 등 문자열 알고리즘 학습
+    keywords:
+    - 문자열
+    - 패턴매칭
+    - KMP
+    - Trie
 intro:
-  emoji: "🔤"
+  emoji: 🔤
   points:
-  - "패턴 매칭 알고리즘"
-  - "문자열 검색 최적화"
-  - "Trie 자료구조"
-  - "문자열 처리 기법"
-
+  - 패턴 매칭 알고리즘
+  - 문자열 검색 최적화
+  - Trie 자료구조
+  - 문자열 처리 기법
 sections:
-- id: "brute_force"
-  title: "브루트 포스 매칭"
-  subtitle: "기본 문자열 패턴 매칭"
+- id: brute_force
+  title: 브루트 포스 매칭
+  structuredPrimary: true
+  subtitle: 기본 문자열 패턴 매칭
+  goal: '브루트 포스 매칭: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '브루트 포스 매칭: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 가장 단순한 방법은 모든 위치에서 패턴을 비교하는 것입니다. O(nm) 시간복잡도.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def bfSearch(text, pattern):
+        textLen = len(text)
+        patLen = len(pattern)
+        positions = []
+        for i in range(textLen - patLen + 1):
+            match = True
+            for j in range(patLen):
+                if text[i + j] != pattern[j]:
+                    match = False
+                    break
+            if match:
+                positions.append(i)
+        return positions
+
+    bfText = "AABAACAADAABAAABAA"
+    bfPattern = "AABA"
+    bfResult = bfSearch(bfText, bfPattern)
+    bfResult
+  exercise:
+    prompt: '브루트 포스 매칭: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def bfSearch(text, pattern):
+          textLen = len(text)
+          patLen = len(pattern)
+          positions = []
+          for i in range(textLen - patLen + 1):
+              match = True
+              for j in range(patLen):
+                  if text[i + j] != pattern[j]:
+                      match = False
+                      break
+              if match:
+                  positions.append(i)
+          return positions
+
+      bfText = "AABAACAADAABAAABAA"
+      bfPattern = "AABA"
+      bfResult = bfSearch(bfText, bfPattern)
+      bfResult
+    solution: |-
+      def bfSearch(text, pattern):
+          textLen = len(text)
+          patLen = len(pattern)
+          positions = []
+          for i in range(textLen - patLen + 1):
+              match = True
+              for j in range(patLen):
+                  if text[i + j] != pattern[j]:
+                      match = False
+                      break
+              if match:
+                  positions.append(i)
+          return positions
+
+      bfText = "AABAACAADAABAAABAA"
+      bfPattern = "AABA"
+      bfResult = bfSearch(bfText, bfPattern)
+      bfResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "가장 단순한 방법은 모든 위치에서 패턴을 비교하는 것입니다. O(nm) 시간복잡도."
-  - type: "code"
-    language: "python"
-    title: "브루트 포스 검색"
-    description: "모든 위치에서 패턴 비교"
+  - type: text
+    content: 가장 단순한 방법은 모든 위치에서 패턴을 비교하는 것입니다. O(nm) 시간복잡도.
+  - type: code
+    language: python
+    title: 브루트 포스 검색
+    description: 모든 위치에서 패턴 비교
     content: |-
       def bfSearch(text, pattern):
           textLen = len(text)
@@ -47,10 +132,10 @@ sections:
       bfPattern = "AABA"
       bfResult = bfSearch(bfText, bfPattern)
       bfResult
-  - type: "code"
-    language: "python"
-    title: "내장 함수 활용"
-    description: "find 메서드로 간단하게"
+  - type: code
+    language: python
+    title: 내장 함수 활용
+    description: find 메서드로 간단하게
     content: |-
       def findAll(text, pattern):
           positions = []
@@ -67,17 +152,101 @@ sections:
       faPattern = "aba"
       faResult = findAll(faText, faPattern)
       faResult
+- id: kmp
+  title: KMP 알고리즘
+  structuredPrimary: true
+  subtitle: O(n+m) 패턴 매칭
+  goal: 'KMP 알고리즘: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'KMP 알고리즘: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실패 함수(LPS)를 이용해 불필요한 비교를 건너뜁니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def computeLps(pattern):
+        patLen = len(pattern)
+        lps = [0] * patLen
+        length = 0
+        i = 1
+        while i < patLen:
+            if pattern[i] == pattern[length]:
+                length += 1
+                lps[i] = length
+                i += 1
+            else:
+                if length != 0:
+                    length = lps[length - 1]
+                else:
+                    lps[i] = 0
+                    i += 1
+        return lps
 
-- id: "kmp"
-  title: "KMP 알고리즘"
-  subtitle: "O(n+m) 패턴 매칭"
+    lpsPattern = "AABAACAAB"
+    lpsResult = computeLps(lpsPattern)
+    lpsResult
+  exercise:
+    prompt: 'KMP 알고리즘: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def computeLps(pattern):
+          patLen = len(pattern)
+          lps = [0] * patLen
+          length = 0
+          i = 1
+          while i < patLen:
+              if pattern[i] == pattern[length]:
+                  length += 1
+                  lps[i] = length
+                  i += 1
+              else:
+                  if length != 0:
+                      length = lps[length - 1]
+                  else:
+                      lps[i] = 0
+                      i += 1
+          return lps
+
+      lpsPattern = "AABAACAAB"
+      lpsResult = computeLps(lpsPattern)
+      lpsResult
+    solution: |-
+      def computeLps(pattern):
+          patLen = len(pattern)
+          lps = [0] * patLen
+          length = 0
+          i = 1
+          while i < patLen:
+              if pattern[i] == pattern[length]:
+                  length += 1
+                  lps[i] = length
+                  i += 1
+              else:
+                  if length != 0:
+                      length = lps[length - 1]
+                  else:
+                      lps[i] = 0
+                      i += 1
+          return lps
+
+      lpsPattern = "AABAACAAB"
+      lpsResult = computeLps(lpsPattern)
+      lpsResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "실패 함수(LPS)를 이용해 불필요한 비교를 건너뜁니다."
-  - type: "code"
-    language: "python"
-    title: "LPS 배열 계산"
-    description: "실패 함수 구하기"
+  - type: text
+    content: 실패 함수(LPS)를 이용해 불필요한 비교를 건너뜁니다.
+  - type: code
+    language: python
+    title: LPS 배열 계산
+    description: 실패 함수 구하기
     content: |-
       def computeLps(pattern):
           patLen = len(pattern)
@@ -100,10 +269,10 @@ sections:
       lpsPattern = "AABAACAAB"
       lpsResult = computeLps(lpsPattern)
       lpsResult
-  - type: "code"
-    language: "python"
-    title: "KMP 검색"
-    description: "LPS 활용 패턴 매칭"
+  - type: code
+    language: python
+    title: KMP 검색
+    description: LPS 활용 패턴 매칭
     content: |-
       def kmpSearch(text, pattern):
           textLen = len(text)
@@ -140,17 +309,116 @@ sections:
       kmpPattern = "ABABCABAB"
       kmpResult = kmpSearch(kmpText, kmpPattern)
       kmpResult
+- id: rabin_karp
+  title: Rabin-Karp 알고리즘
+  structuredPrimary: true
+  subtitle: 해시 기반 패턴 매칭
+  goal: 'Rabin-Karp 알고리즘: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Rabin-Karp 알고리즘: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 롤링 해시로 O(n+m) 평균 시간복잡도. 다중 패턴 검색에 유리.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def rabinKarp(text, pattern, prime=101):
+        textLen = len(text)
+        patLen = len(pattern)
+        base = 256
+        patHash = textHash = 0
+        h = 1
+        positions = []
+        for i in range(patLen - 1):
+            h = (h * base) % prime
+        for i in range(patLen):
+            patHash = (base * patHash + ord(pattern[i])) % prime
+            textHash = (base * textHash + ord(text[i])) % prime
+        for i in range(textLen - patLen + 1):
+            if patHash == textHash:
+                if text[i:i + patLen] == pattern:
+                    positions.append(i)
+            if i < textLen - patLen:
+                textHash = (base * (textHash - ord(text[i]) * h) + ord(text[i + patLen])) % prime
+                if textHash < 0:
+                    textHash += prime
+        return positions
 
-- id: "rabin_karp"
-  title: "Rabin-Karp 알고리즘"
-  subtitle: "해시 기반 패턴 매칭"
+    rkText = "GEEKS FOR GEEKS"
+    rkPattern = "GEEK"
+    rkResult = rabinKarp(rkText, rkPattern)
+    rkResult
+  exercise:
+    prompt: 'Rabin-Karp 알고리즘: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def rabinKarp(text, pattern, prime=101):
+          textLen = len(text)
+          patLen = len(pattern)
+          base = 256
+          patHash = textHash = 0
+          h = 1
+          positions = []
+          for i in range(patLen - 1):
+              h = (h * base) % prime
+          for i in range(patLen):
+              patHash = (base * patHash + ord(pattern[i])) % prime
+              textHash = (base * textHash + ord(text[i])) % prime
+          for i in range(textLen - patLen + 1):
+              if patHash == textHash:
+                  if text[i:i + patLen] == pattern:
+                      positions.append(i)
+              if i < textLen - patLen:
+                  textHash = (base * (textHash - ord(text[i]) * h) + ord(text[i + patLen])) % prime
+                  if textHash < 0:
+                      textHash += prime
+          return positions
+
+      rkText = "GEEKS FOR GEEKS"
+      rkPattern = "GEEK"
+      rkResult = rabinKarp(rkText, rkPattern)
+      rkResult
+    solution: |-
+      def rabinKarp(text, pattern, prime=101):
+          textLen = len(text)
+          patLen = len(pattern)
+          base = 256
+          patHash = textHash = 0
+          h = 1
+          positions = []
+          for i in range(patLen - 1):
+              h = (h * base) % prime
+          for i in range(patLen):
+              patHash = (base * patHash + ord(pattern[i])) % prime
+              textHash = (base * textHash + ord(text[i])) % prime
+          for i in range(textLen - patLen + 1):
+              if patHash == textHash:
+                  if text[i:i + patLen] == pattern:
+                      positions.append(i)
+              if i < textLen - patLen:
+                  textHash = (base * (textHash - ord(text[i]) * h) + ord(text[i + patLen])) % prime
+                  if textHash < 0:
+                      textHash += prime
+          return positions
+
+      rkText = "GEEKS FOR GEEKS"
+      rkPattern = "GEEK"
+      rkResult = rabinKarp(rkText, rkPattern)
+      rkResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "롤링 해시로 O(n+m) 평균 시간복잡도. 다중 패턴 검색에 유리."
-  - type: "code"
-    language: "python"
-    title: "Rabin-Karp 검색"
-    description: "롤링 해시 활용"
+  - type: text
+    content: 롤링 해시로 O(n+m) 평균 시간복잡도. 다중 패턴 검색에 유리.
+  - type: code
+    language: python
+    title: Rabin-Karp 검색
+    description: 롤링 해시 활용
     content: |-
       def rabinKarp(text, pattern, prime=101):
           textLen = len(text)
@@ -178,17 +446,164 @@ sections:
       rkPattern = "GEEK"
       rkResult = rabinKarp(rkText, rkPattern)
       rkResult
+- id: trie
+  title: Trie 자료구조
+  structuredPrimary: true
+  subtitle: 접두사 트리
+  goal: 'Trie 자료구조: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Trie 자료구조: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 문자열 삽입/검색 O(m). 자동완성, 사전 검색에 활용.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    class TrieNode:
+        def __init__(self):
+            self.children = {}
+            self.isEnd = False
 
-- id: "trie"
-  title: "Trie 자료구조"
-  subtitle: "접두사 트리"
+    class Trie:
+        def __init__(self):
+            self.root = TrieNode()
+
+        def insert(self, word):
+            node = self.root
+            for char in word:
+                if char not in node.children:
+                    node.children[char] = TrieNode()
+                node = node.children[char]
+            node.isEnd = True
+
+        def search(self, word):
+            node = self.root
+            for char in word:
+                if char not in node.children:
+                    return False
+                node = node.children[char]
+            return node.isEnd
+
+        def startsWith(self, prefix):
+            node = self.root
+            for char in prefix:
+                if char not in node.children:
+                    return False
+                node = node.children[char]
+            return True
+
+    trie = Trie()
+    trieWords = ["apple", "app", "banana"]
+    for w in trieWords:
+        trie.insert(w)
+    trieSearch = trie.search("app")
+    triePrefix = trie.startsWith("ban")
+    trieMiss = trie.search("ap")
+    trieResult = (trieSearch, triePrefix, trieMiss)
+    trieResult
+  exercise:
+    prompt: 'Trie 자료구조: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      class TrieNode:
+          def __init__(self):
+              self.children = {}
+              self.isEnd = False
+
+      class Trie:
+          def __init__(self):
+              self.root = TrieNode()
+
+          def insert(self, word):
+              node = self.root
+              for char in word:
+                  if char not in node.children:
+                      node.children[char] = TrieNode()
+                  node = node.children[char]
+              node.isEnd = True
+
+          def search(self, word):
+              node = self.root
+              for char in word:
+                  if char not in node.children:
+                      return False
+                  node = node.children[char]
+              return node.isEnd
+
+          def startsWith(self, prefix):
+              node = self.root
+              for char in prefix:
+                  if char not in node.children:
+                      return False
+                  node = node.children[char]
+              return True
+
+      trie = Trie()
+      trieWords = ["apple", "app", "banana"]
+      for w in trieWords:
+          trie.insert(w)
+      trieSearch = trie.search("app")
+      triePrefix = trie.startsWith("ban")
+      trieMiss = trie.search("ap")
+      trieResult = (trieSearch, triePrefix, trieMiss)
+      trieResult
+    solution: |-
+      class TrieNode:
+          def __init__(self):
+              self.children = {}
+              self.isEnd = False
+
+      class Trie:
+          def __init__(self):
+              self.root = TrieNode()
+
+          def insert(self, word):
+              node = self.root
+              for char in word:
+                  if char not in node.children:
+                      node.children[char] = TrieNode()
+                  node = node.children[char]
+              node.isEnd = True
+
+          def search(self, word):
+              node = self.root
+              for char in word:
+                  if char not in node.children:
+                      return False
+                  node = node.children[char]
+              return node.isEnd
+
+          def startsWith(self, prefix):
+              node = self.root
+              for char in prefix:
+                  if char not in node.children:
+                      return False
+                  node = node.children[char]
+              return True
+
+      trie = Trie()
+      trieWords = ["apple", "app", "banana"]
+      for w in trieWords:
+          trie.insert(w)
+      trieSearch = trie.search("app")
+      triePrefix = trie.startsWith("ban")
+      trieMiss = trie.search("ap")
+      trieResult = (trieSearch, triePrefix, trieMiss)
+      trieResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "문자열 삽입/검색 O(m). 자동완성, 사전 검색에 활용."
-  - type: "code"
-    language: "python"
-    title: "Trie 구현"
-    description: "기본 Trie 클래스"
+  - type: text
+    content: 문자열 삽입/검색 O(m). 자동완성, 사전 검색에 활용.
+  - type: code
+    language: python
+    title: Trie 구현
+    description: 기본 Trie 클래스
     content: |-
       class TrieNode:
           def __init__(self):
@@ -232,10 +647,10 @@ sections:
       trieMiss = trie.search("ap")
       trieResult = (trieSearch, triePrefix, trieMiss)
       trieResult
-  - type: "code"
-    language: "python"
-    title: "자동완성"
-    description: "접두사로 단어 추천"
+  - type: code
+    language: python
+    title: 자동완성
+    description: 접두사로 단어 추천
     content: |-
       class AutoTrie:
           def __init__(self):
@@ -272,17 +687,77 @@ sections:
           autoTrie.insert(w)
       autoResult = autoTrie.autocomplete("car")
       autoResult
+- id: string_processing
+  title: 문자열 처리
+  structuredPrimary: true
+  subtitle: 실용적인 문자열 알고리즘
+  goal: '문자열 처리: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '문자열 처리: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 공통 접두사, 팰린드롬 등 자주 사용되는 문자열 처리 기법.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def longestCommonPrefix(strs):
+        if not strs:
+            return ""
+        shortest = min(strs, key=len)
+        for i, char in enumerate(shortest):
+            for s in strs:
+                if s[i] != char:
+                    return shortest[:i]
+        return shortest
 
-- id: "string_processing"
-  title: "문자열 처리"
-  subtitle: "실용적인 문자열 알고리즘"
+    lcpStrs = ["flower", "flow", "flight"]
+    lcpResult = longestCommonPrefix(lcpStrs)
+    lcpResult
+  exercise:
+    prompt: '문자열 처리: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def longestCommonPrefix(strs):
+          if not strs:
+              return ""
+          shortest = min(strs, key=len)
+          for i, char in enumerate(shortest):
+              for s in strs:
+                  if s[i] != char:
+                      return shortest[:i]
+          return shortest
+
+      lcpStrs = ["flower", "flow", "flight"]
+      lcpResult = longestCommonPrefix(lcpStrs)
+      lcpResult
+    solution: |-
+      def longestCommonPrefix(strs):
+          if not strs:
+              return ""
+          shortest = min(strs, key=len)
+          for i, char in enumerate(shortest):
+              for s in strs:
+                  if s[i] != char:
+                      return shortest[:i]
+          return shortest
+
+      lcpStrs = ["flower", "flow", "flight"]
+      lcpResult = longestCommonPrefix(lcpStrs)
+      lcpResult
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "공통 접두사, 팰린드롬 등 자주 사용되는 문자열 처리 기법."
-  - type: "code"
-    language: "python"
-    title: "최장 공통 접두사"
-    description: "여러 문자열의 공통 접두사"
+  - type: text
+    content: 공통 접두사, 팰린드롬 등 자주 사용되는 문자열 처리 기법.
+  - type: code
+    language: python
+    title: 최장 공통 접두사
+    description: 여러 문자열의 공통 접두사
     content: |-
       def longestCommonPrefix(strs):
           if not strs:
@@ -297,10 +772,10 @@ sections:
       lcpStrs = ["flower", "flow", "flight"]
       lcpResult = longestCommonPrefix(lcpStrs)
       lcpResult
-  - type: "code"
-    language: "python"
-    title: "팰린드롬 검사"
-    description: "앞뒤가 같은 문자열"
+  - type: code
+    language: python
+    title: 팰린드롬 검사
+    description: 앞뒤가 같은 문자열
     content: |-
       def isPalindrome(s):
           cleaned = ''.join(c.lower() for c in s if c.isalnum())
@@ -329,17 +804,156 @@ sections:
       palLongest = longestPalindrome("babad")
       palResult = (palIs, palLongest)
       palResult
+- id: workflow_validation
+  title: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성'
+  structuredPrimary: true
+  subtitle: KMP와 Trie를 실제 검색 문제에 적용하고 결과를 검증합니다
+  goal: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    문자열 알고리즘은 검색, 자동완성, 로그 분석처럼 실제 텍스트 업무에서 바로 쓰입니다. 패턴이 어디서 발견되는지와 접두어 검색 결과가 맞는지 작은 데이터로 먼저 확인하세요.
 
-- id: "workflow_validation"
-  title: "현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성"
-  subtitle: "KMP와 Trie를 실제 검색 문제에 적용하고 결과를 검증합니다"
+    변주 실험
+    검색어를 소문자로 정규화하는 단계를 추가하고, 사용자가 `a-1`을 입력해도 같은 추천이 나오는지 테스트하세요.
+  tips:
+  - 변주 실험 검색어를 소문자로 정규화하는 단계를 추가하고, 사용자가 `a-1`을 입력해도 같은 추천이 나오는지 테스트하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def buildLps(pattern):
+        if not pattern:
+            raise ValueError("pattern must not be empty")
+        lps = [0] * len(pattern)
+        length = 0
+        index = 1
+        while index < len(pattern):
+            if pattern[index] == pattern[length]:
+                length += 1
+                lps[index] = length
+                index += 1
+            elif length:
+                length = lps[length - 1]
+            else:
+                index += 1
+        return lps
+
+    def kmpSearch(text, pattern):
+        lps = buildLps(pattern)
+        matches = []
+        textIndex = patternIndex = 0
+        while textIndex < len(text):
+            if text[textIndex] == pattern[patternIndex]:
+                textIndex += 1
+                patternIndex += 1
+                if patternIndex == len(pattern):
+                    matches.append(textIndex - patternIndex)
+                    patternIndex = lps[patternIndex - 1]
+            elif patternIndex:
+                patternIndex = lps[patternIndex - 1]
+            else:
+                textIndex += 1
+        return matches
+
+    logText = "payment failed; retry ok; payment failed again"
+
+    assert kmpSearch(logText, "payment failed") == [0, 26]
+    assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
+  exercise:
+    prompt: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def buildLps(pattern):
+          if not pattern:
+              raise ValueError("pattern must not be empty")
+          lps = [0] * len(pattern)
+          length = 0
+          index = 1
+          while index < len(pattern):
+              if pattern[index] == pattern[length]:
+                  length += 1
+                  lps[index] = length
+                  index += 1
+              elif length:
+                  length = lps[length - 1]
+              else:
+                  index += 1
+          return lps
+
+      def kmpSearch(text, pattern):
+          lps = buildLps(pattern)
+          matches = []
+          textIndex = patternIndex = 0
+          while textIndex < len(text):
+              if text[textIndex] == pattern[patternIndex]:
+                  textIndex += 1
+                  patternIndex += 1
+                  if patternIndex == len(pattern):
+                      matches.append(textIndex - patternIndex)
+                      patternIndex = lps[patternIndex - 1]
+              elif patternIndex:
+                  patternIndex = lps[patternIndex - 1]
+              else:
+                  textIndex += 1
+          return matches
+
+      logText = "payment failed; retry ok; payment failed again"
+
+      assert kmpSearch(logText, "payment failed") == [0, 26]
+      assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
+    solution: |-
+      def buildLps(pattern):
+          if not pattern:
+              raise ValueError("pattern must not be empty")
+          lps = [0] * len(pattern)
+          length = 0
+          index = 1
+          while index < len(pattern):
+              if pattern[index] == pattern[length]:
+                  length += 1
+                  lps[index] = length
+                  index += 1
+              elif length:
+                  length = lps[length - 1]
+              else:
+                  index += 1
+          return lps
+
+      def kmpSearch(text, pattern):
+          lps = buildLps(pattern)
+          matches = []
+          textIndex = patternIndex = 0
+          while textIndex < len(text):
+              if text[textIndex] == pattern[patternIndex]:
+                  textIndex += 1
+                  patternIndex += 1
+                  if patternIndex == len(pattern):
+                      matches.append(textIndex - patternIndex)
+                      patternIndex = lps[patternIndex - 1]
+              elif patternIndex:
+                  patternIndex = lps[patternIndex - 1]
+              else:
+                  textIndex += 1
+          return matches
+
+      logText = "payment failed; retry ok; payment failed again"
+
+      assert kmpSearch(logText, "payment failed") == [0, 26]
+      assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "문자열 알고리즘은 검색, 자동완성, 로그 분석처럼 실제 텍스트 업무에서 바로 쓰입니다. 패턴이 어디서 발견되는지와 접두어 검색 결과가 맞는지 작은 데이터로 먼저 확인하세요."
-  - type: "code"
-    language: "python"
-    title: "KMP로 오류 패턴 위치 찾기"
-    description: "부분 일치 테이블을 만들고, 로그 안에서 모든 등장 위치를 검증합니다."
+  - type: text
+    content: 문자열 알고리즘은 검색, 자동완성, 로그 분석처럼 실제 텍스트 업무에서 바로 쓰입니다. 패턴이 어디서 발견되는지와 접두어 검색 결과가 맞는지 작은 데이터로 먼저 확인하세요.
+  - type: code
+    language: python
+    title: KMP로 오류 패턴 위치 찾기
+    description: 부분 일치 테이블을 만들고, 로그 안에서 모든 등장 위치를 검증합니다.
     content: |-
       def buildLps(pattern):
           if not pattern:
@@ -379,10 +993,10 @@ sections:
 
       assert kmpSearch(logText, "payment failed") == [0, 26]
       assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
-  - type: "code"
-    language: "python"
-    title: "Trie로 SKU 자동완성 만들기"
-    description: "접두어별 추천 결과를 정렬된 리스트로 검증합니다."
+  - type: code
+    language: python
+    title: Trie로 SKU 자동완성 만들기
+    description: 접두어별 추천 결과를 정렬된 리스트로 검증합니다.
     content: |-
       class TrieNode:
           def __init__(self):
@@ -413,18 +1027,64 @@ sections:
 
       assert trie.suggest("A-1") == ["A-100", "A-110"]
       assert trie.suggest("C") == []
-  - type: "tip"
-    title: "변주 실험"
-    content: "검색어를 소문자로 정규화하는 단계를 추가하고, 사용자가 `a-1`을 입력해도 같은 추천이 나오는지 테스트하세요."
+  - type: tip
+    title: 변주 실험
+    content: 검색어를 소문자로 정규화하는 단계를 추가하고, 사용자가 `a-1`을 입력해도 같은 추천이 나오는지 테스트하세요.
+- id: practice
+  title: 종합 연습
+  structuredPrimary: true
+  subtitle: 문자열 알고리즘 실습
+  goal: '종합 연습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 연습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 27에서 배운 문자열 알고리즘을 난이도별로 복습합니다. KMP, 라빈-카프, 보이어-무어는 효율적인 패턴 매칭의 기초이며, 트라이는 문자열 검색과 자동완성에 필수입니다. 접미사 배열과
+    LCP 배열은 대용량 텍스트 처리의 핵심 자료구조입니다. 🟢 기본 문제로 애너그램, 회문 등 기초 문자열 처리를 익히고, 🟡 응용 문제로 패턴 매칭 알고리즘을 직접 구현해봅니다. 🔴 심화 문제에서는 트라이 기반
+    자동완성, 접미사 배열을 활용한 최장 공통 부분 문자열 등을 구현합니다. 문자열 알고리즘은 검색 엔진, 에디터, 컴파일러의 핵심입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def areAnagrams(s1, s2):
+        return sorted(s1.lower()) == sorted(s2.lower())
 
-- id: "practice"
-  title: "종합 연습"
-  subtitle: "문자열 알고리즘 실습"
+    ex1A = "listen"
+    ex1B = "silent"
+    ex1Result = areAnagrams(ex1A, ex1B)
+    ex1Result
+  exercise:
+    prompt: '종합 연습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def areAnagrams(s1, s2):
+          return sorted(s1.lower()) == sorted(s2.lower())
+
+      ex1A = "listen"
+      ex1B = "silent"
+      ex1Result = areAnagrams(ex1A, ex1B)
+      ex1Result
+    solution: |-
+      def areAnagrams(s1, s2):
+          return sorted(s1.lower()) == sorted(s2.lower())
+
+      ex1A = "listen"
+      ex1B = "silent"
+      ex1Result = areAnagrams(ex1A, ex1B)
+      ex1Result
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 27에서 배운 문자열 알고리즘을 난이도별로 복습합니다. KMP, 라빈-카프, 보이어-무어는 효율적인 패턴 매칭의 기초이며, 트라이는 문자열 검색과 자동완성에 필수입니다. 접미사 배열과 LCP 배열은 대용량 텍스트 처리의 핵심 자료구조입니다. 🟢 기본 문제로 애너그램, 회문 등 기초 문자열 처리를 익히고, 🟡 응용 문제로 패턴 매칭 알고리즘을 직접 구현해봅니다. 🔴 심화 문제에서는 트라이 기반 자동완성, 접미사 배열을 활용한 최장 공통 부분 문자열 등을 구현합니다. 문자열 알고리즘은 검색 엔진, 에디터, 컴파일러의 핵심입니다."
-  - type: "expansion"
-    title: "기본1: 애너그램 검사"
+  - type: text
+    content: Day 27에서 배운 문자열 알고리즘을 난이도별로 복습합니다. KMP, 라빈-카프, 보이어-무어는 효율적인 패턴 매칭의 기초이며, 트라이는 문자열 검색과 자동완성에 필수입니다. 접미사 배열과 LCP
+      배열은 대용량 텍스트 처리의 핵심 자료구조입니다. 🟢 기본 문제로 애너그램, 회문 등 기초 문자열 처리를 익히고, 🟡 응용 문제로 패턴 매칭 알고리즘을 직접 구현해봅니다. 🔴 심화 문제에서는 트라이 기반 자동완성,
+      접미사 배열을 활용한 최장 공통 부분 문자열 등을 구현합니다. 문자열 알고리즘은 검색 엔진, 에디터, 컴파일러의 핵심입니다.
+  - type: expansion
+    title: '기본1: 애너그램 검사'
     code: |-
       def areAnagrams(s1, s2):
           return sorted(s1.lower()) == sorted(s2.lower())
@@ -433,8 +1093,8 @@ sections:
       ex1B = "silent"
       ex1Result = areAnagrams(ex1A, ex1B)
       ex1Result
-  - type: "expansion"
-    title: "기본2: 문자열 회전 검사"
+  - type: expansion
+    title: '기본2: 문자열 회전 검사'
     code: |-
       def isRotation(s1, s2):
           if len(s1) != len(s2):
@@ -445,8 +1105,8 @@ sections:
       ex2B = "erbottlewat"
       ex2Result = isRotation(ex2A, ex2B)
       ex2Result
-  - type: "expansion"
-    title: "기본3: 첫 고유 문자"
+  - type: expansion
+    title: '기본3: 첫 고유 문자'
     code: |-
       def firstUniq(s):
           from collections import Counter
@@ -459,8 +1119,8 @@ sections:
       ex3Str = "loveleetcode"
       ex3Result = firstUniq(ex3Str)
       ex3Result
-  - type: "expansion"
-    title: "기본4: 문자열 압축"
+  - type: expansion
+    title: '기본4: 문자열 압축'
     code: |-
       def compress(s):
           if not s:
@@ -480,8 +1140,8 @@ sections:
       ex4Str = "aabcccccaaa"
       ex4Result = compress(ex4Str)
       ex4Result
-  - type: "expansion"
-    title: "기본5: 단어 뒤집기"
+  - type: expansion
+    title: '기본5: 단어 뒤집기'
     code: |-
       def reverseWords(s):
           return ' '.join(reversed(s.split()))
@@ -494,8 +1154,8 @@ sections:
       ex5Each = reverseEach(ex5Str)
       ex5Result = (ex5Rev, ex5Each)
       ex5Result
-  - type: "expansion"
-    title: "중급6: 편집 거리"
+  - type: expansion
+    title: '중급6: 편집 거리'
     code: |-
       def editDist(s1, s2):
           m, n = len(s1), len(s2)
@@ -516,8 +1176,8 @@ sections:
       ex6B = "sitting"
       ex6Result = editDist(ex6A, ex6B)
       ex6Result
-  - type: "expansion"
-    title: "중급7: 팰린드롬 개수"
+  - type: expansion
+    title: '중급7: 팰린드롬 개수'
     code: |-
       def countPalindromes(s):
           count = 0
@@ -535,8 +1195,8 @@ sections:
       ex7Str = "aaa"
       ex7Result = countPalindromes(ex7Str)
       ex7Result
-  - type: "expansion"
-    title: "중급8: 단어 분리"
+  - type: expansion
+    title: '중급8: 단어 분리'
     code: |-
       def wordBreak(s, wordDict):
           wordSet = set(wordDict)
@@ -553,8 +1213,8 @@ sections:
       ex8Dict = ["leet", "code"]
       ex8Result = wordBreak(ex8Str, ex8Dict)
       ex8Result
-  - type: "expansion"
-    title: "중급9: Z 알고리즘"
+  - type: expansion
+    title: '중급9: Z 알고리즘'
     code: |-
       def zFunction(s):
           n = len(s)
@@ -572,8 +1232,8 @@ sections:
       ex9Str = "aabxaab"
       ex9Result = zFunction(ex9Str)
       ex9Result
-  - type: "expansion"
-    title: "중급10: 문자열 인터리빙"
+  - type: expansion
+    title: '중급10: 문자열 인터리빙'
     code: |-
       def isInterleave(s1, s2, s3):
           if len(s1) + len(s2) != len(s3):
@@ -595,8 +1255,8 @@ sections:
       ex10C = "aadbbcbcac"
       ex10Result = isInterleave(ex10A, ex10B, ex10C)
       ex10Result
-  - type: "expansion"
-    title: "고급11: 와일드카드 매칭"
+  - type: expansion
+    title: '고급11: 와일드카드 매칭'
     code: |-
       def wildcardMatch(s, p):
           m, n = len(s), len(p)
@@ -617,8 +1277,8 @@ sections:
       ex11Pat = "*a*b"
       ex11Result = wildcardMatch(ex11Str, ex11Pat)
       ex11Result
-  - type: "expansion"
-    title: "고급12: 정규식 매칭"
+  - type: expansion
+    title: '고급12: 정규식 매칭'
     code: |-
       def regexMatch(s, p):
           m, n = len(s), len(p)
@@ -641,8 +1301,8 @@ sections:
       ex12Pat = "c*a*b"
       ex12Result = regexMatch(ex12Str, ex12Pat)
       ex12Result
-  - type: "expansion"
-    title: "고급13: 최소 윈도우"
+  - type: expansion
+    title: '고급13: 최소 윈도우'
     code: |-
       def minWindow(s, t):
           from collections import Counter
@@ -676,8 +1336,8 @@ sections:
       ex13T = "ABC"
       ex13Result = minWindow(ex13S, ex13T)
       ex13Result
-  - type: "expansion"
-    title: "고급14: 고유 부분문자열 개수"
+  - type: expansion
+    title: '고급14: 고유 부분문자열 개수'
     code: |-
       def countDistinct(s):
           root = {}
@@ -695,8 +1355,8 @@ sections:
       ex14Str = "abab"
       ex14Result = countDistinct(ex14Str)
       ex14Result
-  - type: "expansion"
-    title: "고급15: 문자열 곱셈"
+  - type: expansion
+    title: '고급15: 문자열 곱셈'
     code: |-
       def multiply(num1, num2):
           if num1 == "0" or num2 == "0":
@@ -717,8 +1377,8 @@ sections:
       ex15B = "456"
       ex15Result = multiply(ex15A, ex15B)
       ex15Result
-  - type: "expansion"
-    title: "고급16: 반복 부분문자열"
+  - type: expansion
+    title: '고급16: 반복 부분문자열'
     code: |-
       def repeatedSubstring(s):
           n = len(s)
@@ -742,8 +1402,8 @@ sections:
           "hasRepeatB": hasRepeatedPattern(ex16B)
       }
       ex16Result
-  - type: "expansion"
-    title: "고급17: 롤링 해시"
+  - type: expansion
+    title: '고급17: 롤링 해시'
     code: |-
       def rabinKarp(text, pattern):
           if not pattern or len(pattern) > len(text):
@@ -770,8 +1430,8 @@ sections:
       ex17Pat = "AABA"
       ex17Result = rabinKarp(ex17Text, ex17Pat)
       ex17Result
-  - type: "expansion"
-    title: "고급18: 최장 반복 부분문자열"
+  - type: expansion
+    title: '고급18: 최장 반복 부분문자열'
     code: |-
       def longestRepeating(s):
           n = len(s)
@@ -800,8 +1460,8 @@ sections:
       ex18Str = "banana"
       ex18Result = longestRepeating(ex18Str)
       ex18Result
-  - type: "expansion"
-    title: "고급19: 회문 분할"
+  - type: expansion
+    title: '고급19: 회문 분할'
     code: |-
       def palindromePartition(s):
           n = len(s)
@@ -826,8 +1486,8 @@ sections:
       ex19Str = "aab"
       ex19Result = palindromePartition(ex19Str)
       ex19Result
-  - type: "expansion"
-    title: "고급20: 문자열 압축"
+  - type: expansion
+    title: '고급20: 문자열 압축'
     code: |-
       def encode(s):
           if not s:

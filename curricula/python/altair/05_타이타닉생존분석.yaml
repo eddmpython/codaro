@@ -1,28 +1,79 @@
 meta:
   packages:
-    - altair
-    - pandas
+  - altair
+  - pandas
   id: altair_05
   title: 타이타닉생존분석
   order: 5
   category: altair
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["row", "column", "facet", "transform_filter", "titanic"]
+  tags:
+  - row
+  - column
+  - facet
+  - transform_filter
+  - titanic
   seo:
-    title: "Altair 패싯 차트 - 타이타닉 생존 분석"
-    description: "Altair로 패싯 차트를 만들고 데이터를 필터링합니다. row/column, facet, transform_filter를 배웁니다."
-    keywords: ["altair facet", "row column", "transform_filter", "titanic"]
-
+    title: Altair 패싯 차트 - 타이타닉 생존 분석
+    description: Altair로 패싯 차트를 만들고 데이터를 필터링합니다. row/column, facet, transform_filter를 배웁니다.
+    keywords:
+    - altair facet
+    - row column
+    - transform_filter
+    - titanic
 intro:
-  emoji: "🚢"
+  emoji: 🚢
   goal: 타이타닉 승객 데이터를 패싯 차트로 분할하고 생존율을 분석합니다.
   description: row/column 인코딩으로 차트를 분할하고, transform_filter로 데이터를 필터링합니다.
-
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: seaborn-data
+  goal: '1단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Codaro 로컬 데이터셋에서 titanic 데이터를 불러옵니다. 타이타닉호 승객의 생존 여부와 정보가 담긴 데이터입니다. survived(생존여부), pclass(객실등급), sex(성별),
+    age(나이), fare(요금), embarked(승선항) 등 컬럼이 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanic = loadLocalDataset("titanic")
+  exercise:
+    prompt: '1단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset("titanic")
+    solution: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset("titanic")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -43,7 +94,50 @@ sections:
       titanic = loadLocalDataset("titanic")
 - id: step2_basic_bar
   title: 2단계. 기본 막대 차트
+  structuredPrimary: true
   subtitle: 생존자 수 집계
+  goal: '2단계. 기본 막대 차트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기본 막대 차트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. 생존 여부별 승객 수를 막대 차트로 표현합니다.
+
+    survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
+  tips:
+  - survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    chartSurvived = alt.Chart(titanic).mark_bar().encode(
+        x='survived:N',
+        y='count()',
+        color='survived:N'
+    )
+    chartSurvived
+  exercise:
+    prompt: '2단계. 기본 막대 차트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartSurvived = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N'
+      )
+      chartSurvived
+    solution: |-
+      chartSurvived = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N'
+      )
+      chartSurvived
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -62,12 +156,57 @@ sections:
       )
       chartSurvived
   - type: tip
-    content: |-
-      survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
-
+    content: survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
 - id: step3_row_encoding
   title: 3단계. 행 분할
+  structuredPrimary: true
   subtitle: row 인코딩
+  goal: '3단계. 행 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 행 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    row 인코딩으로 차트를 여러 행으로 분할합니다. encode() 괄호 안에 row='sex:N'을 추가하면 됩니다. 성별(sex)로 분할하면 남녀 생존율을 각각 따로 차트로 보여줍니다. 위아래로 두 개의 차트가 나열됩니다. 같은 차트를 여러 조건별로 나누어 보여주는 것을 "패싯(facet)"이라고 합니다.
+
+    row는 "행"을 의미합니다. row='sex:N'은 성별 값(male, female)마다 행을 하나씩 만들어 차트를 위아래로 배치합니다. column은 "열"을 의미하며, 차트를 좌우로 배치합니다. row와 column을 함께 사용하면 2차원 그리드를 만들 수 있습니다.
+  tips:
+  - row는 "행"을 의미합니다. row='sex:N'은 성별 값(male, female)마다 행을 하나씩 만들어 차트를 위아래로 배치합니다. column은 "열"을 의미하며, 차트를 좌우로 배치합니다. row와 column을
+    함께 사용하면 2차원 그리드를 만들 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    chartRow = alt.Chart(titanic).mark_bar().encode(
+        x='survived:N',
+        y='count()',
+        color='survived:N',
+        row='sex:N'
+    )
+    chartRow
+  exercise:
+    prompt: '3단계. 행 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartRow = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          row='sex:N'
+      )
+      chartRow
+    solution: |-
+      chartRow = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          row='sex:N'
+      )
+      chartRow
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -93,10 +232,55 @@ sections:
       row는 "행"을 의미합니다. row='sex:N'은 성별 값(male, female)마다 행을 하나씩 만들어 차트를 위아래로 배치합니다.
 
       column은 "열"을 의미하며, 차트를 좌우로 배치합니다. row와 column을 함께 사용하면 2차원 그리드를 만들 수 있습니다.
-
 - id: step4_column_encoding
   title: 4단계. 열 분할
+  structuredPrimary: true
   subtitle: column 인코딩
+  goal: '4단계. 열 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 열 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    column 인코딩으로 차트를 가로로 분할합니다. 객실 등급(pclass)으로 분할해봅니다.
+
+    pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
+  tips:
+  - pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    chartColumn = alt.Chart(titanic).mark_bar().encode(
+        x='survived:N',
+        y='count()',
+        color='survived:N',
+        column='pclass:O'
+    )
+    chartColumn
+  exercise:
+    prompt: '4단계. 열 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartColumn = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          column='pclass:O'
+      )
+      chartColumn
+    solution: |-
+      chartColumn = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          column='pclass:O'
+      )
+      chartColumn
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -116,12 +300,47 @@ sections:
       )
       chartColumn
   - type: tip
-    content: |-
-      pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
-
+    content: pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
 - id: step5_row_column
   title: 5단계. 행+열 분할
+  structuredPrimary: true
   subtitle: 2차원 패싯
+  goal: '5단계. 행+열 분할: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 행+열 분할: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: row와 column을 함께 사용하면 2차원 그리드로 분할됩니다. 성별(row)과 등급(column)의 조합별 생존율을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    chartGrid = alt.Chart(titanic).mark_bar().encode(
+        x='survived:N', y='count()', color='survived:N',
+        row='sex:N', column='pclass:O'
+    ).properties(width=120, height=100)
+    chartGrid
+  exercise:
+    prompt: '5단계. 행+열 분할: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartGrid = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N',
+          row='sex:N', column='pclass:O'
+      ).properties(width=120, height=100)
+      chartGrid
+    solution: |-
+      chartGrid = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N',
+          row='sex:N', column='pclass:O'
+      ).properties(width=120, height=100)
+      chartGrid
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -138,10 +357,65 @@ sections:
           row='sex:N', column='pclass:O'
       ).properties(width=120, height=100)
       chartGrid
-
 - id: step6_transform_filter
   title: 6단계. 데이터 필터링
+  structuredPrimary: true
   subtitle: transform_filter
+  goal: '6단계. 데이터 필터링: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 데이터 필터링: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    transform_filter()로 특정 조건의 데이터만 시각화합니다. 필터는 "걸러낸다"는 의미로, 원하는 데이터만 선택합니다. 1등급 승객만 필터링해봅니다. encode() 뒤에 .transform_filter()를 연결합니다. alt.datum.pclass == 1은 "pclass 컬럼 값이 1인 것만"이라는 조건입니다. alt.datum은 "각 데이터 행"을 의미하고, 점(.)으로 컬럼명을 연결합니다. ==는 "같다"를 의미하는 비교 연산자입니다. =(할당)과 다릅니다.
+
+    비교 연산자: == (같다), != (다르다), < (작다), > (크다), <= (작거나 같다), >= (크거나 같다) 논리 연산자: & (AND, 그리고), | (OR, 또는). 여러 조건을 결합할 때 사용합니다. 괄호로 각 조건을 감싸야 합니다.
+  tips:
+  - '비교 연산자: == (같다), != (다르다), < (작다), > (크다), <= (작거나 같다), >= (크거나 같다) 논리 연산자: & (AND, 그리고), | (OR, 또는). 여러 조건을 결합할 때 사용합니다.
+    괄호로 각 조건을 감싸야 합니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    chartFilter = alt.Chart(titanic).mark_bar().encode(
+        x='sex:N',
+        y='count()',
+        color='survived:N'
+    ).transform_filter(
+        alt.datum.pclass == 1
+    ).properties(
+        title='1등급 승객 생존율'
+    )
+    chartFilter
+  exercise:
+    prompt: '6단계. 데이터 필터링: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartFilter = alt.Chart(titanic).mark_bar().encode(
+          x='sex:N',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          alt.datum.pclass == 1
+      ).properties(
+          title='1등급 승객 생존율'
+      )
+      chartFilter
+    solution: |-
+      chartFilter = alt.Chart(titanic).mark_bar().encode(
+          x='sex:N',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          alt.datum.pclass == 1
+      ).properties(
+          title='1등급 승객 생존율'
+      )
+      chartFilter
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -172,10 +446,62 @@ sections:
       비교 연산자: == (같다), != (다르다), < (작다), > (크다), <= (작거나 같다), >= (크거나 같다)
 
       논리 연산자: & (AND, 그리고), | (OR, 또는). 여러 조건을 결합할 때 사용합니다. 괄호로 각 조건을 감싸야 합니다.
-
 - id: step7_multi_filter
   title: 7단계. 복합 필터
+  structuredPrimary: true
   subtitle: 다중 조건
+  goal: '7단계. 복합 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 복합 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 여러 조건을 결합해 필터링할 수 있습니다. & 연산자로 "그리고" 조건을 만듭니다. 성인(age >= 18) 여성(sex == 'female') 승객만 필터링합니다. (조건1) & (조건2)
+    형태로 씁니다. 각 조건을 괄호로 감싸야 합니다. 괄호 없이 쓰면 에러가 발생합니다. 문자열(female)은 작은따옴표로 감쌉니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    chartMultiFilter = alt.Chart(titanic).mark_bar().encode(
+        x='pclass:O',
+        y='count()',
+        color='survived:N'
+    ).transform_filter(
+        (alt.datum.age >= 18) & (alt.datum.sex == 'female')
+    ).properties(
+        title='성인 여성 등급별 생존율'
+    )
+    chartMultiFilter
+  exercise:
+    prompt: '7단계. 복합 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartMultiFilter = alt.Chart(titanic).mark_bar().encode(
+          x='pclass:O',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          (alt.datum.age >= 18) & (alt.datum.sex == 'female')
+      ).properties(
+          title='성인 여성 등급별 생존율'
+      )
+      chartMultiFilter
+    solution: |-
+      chartMultiFilter = alt.Chart(titanic).mark_bar().encode(
+          x='pclass:O',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          (alt.datum.age >= 18) & (alt.datum.sex == 'female')
+      ).properties(
+          title='성인 여성 등급별 생존율'
+      )
+      chartMultiFilter
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -199,10 +525,46 @@ sections:
           title='성인 여성 등급별 생존율'
       )
       chartMultiFilter
-
 - id: step8_facet
   title: 8단계. facet 메서드
+  structuredPrimary: true
   subtitle: 유연한 분할
+  goal: '8단계. facet 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. facet 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    facet() 메서드는 row/column 인코딩보다 유연합니다. properties() 뒤에 .facet()을 연결합니다. facet('embarked:N')은 승선 항구별로 차트를 나눕니다. columns=3은 한 줄에 3개씩 배치하라는 의미입니다. row/column은 encode() 안에 쓰지만, facet()은 메서드로 마지막에 연결합니다. facet()이 더 유연하게 레이아웃을 조정할 수 있습니다.
+
+    메서드 체이닝 순서: mark_bar() → encode() → properties() → facet() 순으로 연결합니다. 각 단계는 점(.)으로 연결되며, 순서를 바꾸면 에러가 발생할 수 있습니다.
+  tips:
+  - '메서드 체이닝 순서: mark_bar() → encode() → properties() → facet() 순으로 연결합니다. 각 단계는 점(.)으로 연결되며, 순서를 바꾸면 에러가 발생할 수 있습니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    chartFacet = alt.Chart(titanic).mark_bar().encode(
+        x='survived:N', y='count()', color='survived:N'
+    ).properties(width=100, height=80).facet('embarked:N', columns=3)
+    chartFacet
+  exercise:
+    prompt: '8단계. facet 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartFacet = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N'
+      ).properties(width=100, height=80).facet('embarked:N', columns=3)
+      chartFacet
+    solution: |-
+      chartFacet = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N'
+      ).properties(width=100, height=80).facet('embarked:N', columns=3)
+      chartFacet
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -225,10 +587,55 @@ sections:
       메서드 체이닝 순서: mark_bar() → encode() → properties() → facet() 순으로 연결합니다.
 
       각 단계는 점(.)으로 연결되며, 순서를 바꾸면 에러가 발생할 수 있습니다.
-
 - id: step9_final
   title: 9단계. 최종 결과물
+  structuredPrimary: true
   subtitle: 타이타닉 생존 분석
+  goal: '9단계. 최종 결과물: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 최종 결과물: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 개념을 종합해 타이타닉 생존 분석 차트를 완성합니다. 성별, 등급별 생존율을 한눈에 비교합니다.
+
+    여성과 1등급 승객의 생존율이 높습니다. "여성과 어린이 먼저"라는 당시 관행이 데이터에 반영되어 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    chartFinal = alt.Chart(titanic).mark_bar().encode(
+        x=alt.X('survived:N', title='생존 여부', axis=alt.Axis(labelExpr="datum.value == 1 ? '생존' : '사망'")),
+        y=alt.Y('count()', title='승객 수'),
+        color=alt.Color('survived:N', title='생존', legend=None),
+        row=alt.Row('sex:N', title='성별'), column=alt.Column('pclass:O', title='객실 등급')
+    ).properties(width=100, height=80)
+    chartFinal
+  exercise:
+    prompt: '9단계. 최종 결과물: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      chartFinal = alt.Chart(titanic).mark_bar().encode(
+          x=alt.X('survived:N', title='생존 여부', axis=alt.Axis(labelExpr="datum.value == 1 ? '생존' : '사망'")),
+          y=alt.Y('count()', title='승객 수'),
+          color=alt.Color('survived:N', title='생존', legend=None),
+          row=alt.Row('sex:N', title='성별'), column=alt.Column('pclass:O', title='객실 등급')
+      ).properties(width=100, height=80)
+      chartFinal
+    solution: |-
+      chartFinal = alt.Chart(titanic).mark_bar().encode(
+          x=alt.X('survived:N', title='생존 여부', axis=alt.Axis(labelExpr="datum.value == 1 ? '생존' : '사망'")),
+          y=alt.Y('count()', title='승객 수'),
+          color=alt.Color('survived:N', title='생존', legend=None),
+          row=alt.Row('sex:N', title='성별'), column=alt.Column('pclass:O', title='객실 등급')
+      ).properties(width=100, height=80)
+      chartFinal
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -252,10 +659,46 @@ sections:
       여성과 1등급 승객의 생존율이 높습니다.
 
       "여성과 어린이 먼저"라는 당시 관행이 데이터에 반영되어 있습니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 타이타닉 패싯 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    이 프로젝트에서 배운 내용을 정리합니다. row와 column으로 차트를 행과 열로 분할했습니다. 2차원 그리드를 만들 수 있습니다. transform_filter()로 조건에 맞는 데이터만 필터링했습니다. alt.datum.컬럼명으로 조건을 지정하고, ==, &, | 연산자를 사용합니다. facet() 메서드로 유연하게 패싯 차트를 만들었습니다. columns로 레이아웃을 조정할 수 있습니다. 각 미션에서 이 개념들을 활용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    ship = loadLocalDataset("titanic")
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      ship = loadLocalDataset("titanic")
+    solution: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      ship = loadLocalDataset("titanic")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: |-
@@ -267,17 +710,17 @@ sections:
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 승선 항구별 평균 요금 (막대 차트)"
+    title: '미션1: 승선 항구별 평균 요금 (막대 차트)'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import altair as alt
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
         ship = loadLocalDataset("titanic")
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         figPort = alt.Chart(ship).mark_bar().encode(
             x='embarked:N',
@@ -288,17 +731,17 @@ sections:
         )
         figPort
   - type: expansion
-    title: "미션2: 생존자만 필터링, 등급별 나이 분포 (산점도)"
+    title: '미션2: 생존자만 필터링, 등급별 나이 분포 (산점도)'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import altair as alt
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
         voyage = loadLocalDataset("titanic")
     - type: code
-      title: "차트 생성"
+      title: 차트 생성
       content: |-
         figAlive = alt.Chart(voyage).mark_circle(opacity=0.6).encode(
             x='pclass:O',
@@ -310,7 +753,6 @@ sections:
             title='생존자 등급별 나이 분포'
         )
         figAlive
-
 - id: summary
   title: 정리
   blocks:
@@ -318,22 +760,75 @@ sections:
     content: Altair로 패싯 차트와 필터링을 마스터했습니다!
   - type: list
     items:
-    - "row='컬럼:N' - 행 방향으로 차트 분할"
-    - "column='컬럼:N' - 열 방향으로 차트 분할"
-    - "row + column - 2차원 그리드 분할"
-    - "transform_filter(alt.datum.컬럼 == 값) - 데이터 필터링"
-    - "&, | 연산자 - 다중 조건 결합"
-    - ".facet('컬럼:N', columns=n) - 유연한 패싯"
+    - row='컬럼:N' - 행 방향으로 차트 분할
+    - column='컬럼:N' - 열 방향으로 차트 분할
+    - row + column - 2차원 그리드 분할
+    - transform_filter(alt.datum.컬럼 == 값) - 데이터 필터링
+    - '&, | 연산자 - 다중 조건 결합'
+    - .facet('컬럼:N', columns=n) - 유연한 패싯
   - type: text
     content: 다음 프로젝트에서는 항공편 데이터로 히트맵과 박스플롯을 배웁니다.
-
 - id: workflow_validation
   title: 10단계. 타이타닉 Facet 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '10단계. 타이타닉 Facet 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 타이타닉 Facet 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Facet 차트는 여러 집단을 동시에 비교하므로 생존 컬럼의 의미, 집단 표본, row/column 사양을 함께 확인해야 합니다.
+
+    Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다.
+  tips:
+  - Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import altair as alt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanicFlow = loadLocalDataset("titanic")
+    requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+    missingColumns = requiredColumns - set(titanicFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+    assert titanicFlow.groupby("sex")["survived"].mean()["female"] > titanicFlow.groupby("sex")["survived"].mean()["male"]
+  exercise:
+    prompt: '10단계. 타이타닉 Facet 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanicFlow = loadLocalDataset("titanic")
+      requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+      missingColumns = requiredColumns - set(titanicFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+      assert titanicFlow.groupby("sex")["survived"].mean()["female"] > titanicFlow.groupby("sex")["survived"].mean()["male"]
+    solution: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanicFlow = loadLocalDataset("titanic")
+      requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+      missingColumns = requiredColumns - set(titanicFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+      assert titanicFlow.groupby("sex")["survived"].mean()["female"] > titanicFlow.groupby("sex")["survived"].mean()["male"]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      Facet 차트는 여러 집단을 동시에 비교하므로 생존 컬럼의 의미, 집단 표본, row/column 사양을 함께 확인해야 합니다.
+    content: Facet 차트는 여러 집단을 동시에 비교하므로 생존 컬럼의 의미, 집단 표본, row/column 사양을 함께 확인해야 합니다.
   - type: code
     language: python
     title: 데이터 계약과 생존율 예측
@@ -401,4 +896,4 @@ sections:
       assert fareSurvival[True] > fareSurvival[False]
       {"classSurvival": classSurvival.round(2).to_dict(), "fareSurvival": fareSurvival.round(2).to_dict()}
   - type: tip
-    content: "Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다."
+    content: Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다.

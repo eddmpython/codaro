@@ -30,7 +30,8 @@ teacherSkills: tuple[TeacherSkill, ...] = (
         requiredTools=("write-curriculum-yaml", "read-cells"),
         policy=(
             "신규 레슨은 meta/intro/sections structured YAML로 만들고 sections[].blocks는 legacy 변환에만 쓴다. "
-            "각 section은 goal/why/explanation/tips/snippet/exercise/check를 가진 하나의 학습카드 단위다."
+            "각 section은 goal/why/explanation/tips/snippet/exercise/check를 가진 하나의 학습카드 단위다. "
+            "학습 주제별 패키지는 기본 의존성에 넣지 않고 meta.packages에 선언하며 소개/첫 섹션에서 uv 준비 흐름을 드러낸다."
         ),
     ),
     TeacherSkill(
@@ -45,7 +46,7 @@ teacherSkills: tuple[TeacherSkill, ...] = (
         purpose="외부 라이브러리가 필요한 실행 전에 설치 여부를 확인한다.",
         trigger="pandas, matplotlib, selenium, playwright 등 외부 패키지가 필요한 요청일 때",
         requiredTools=("packages-check", "packages-install"),
-        policy="packages-install은 packages-check 결과의 missing에 있는 패키지에만 사용한다.",
+        policy="packages-install은 packages-check 결과의 missing에 있는 패키지에만 사용하며, 설치는 프로젝트 .venv 대상 uv 경로만 따른다.",
     ),
     TeacherSkill(
         skillId="answer-checking",

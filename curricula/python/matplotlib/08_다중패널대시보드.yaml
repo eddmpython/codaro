@@ -1,30 +1,81 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - pandas
-    - seaborn
+  - matplotlib
+  - numpy
+  - pandas
+  - seaborn
   id: matplotlib_08
   title: 다중패널대시보드
   order: 8
   category: matplotlib
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["matplotlib", "GridSpec", "style", "tight_layout", "dashboard", "pie"]
+  tags:
+  - matplotlib
+  - GridSpec
+  - style
+  - tight_layout
+  - dashboard
+  - pie
   seo:
-    title: "Matplotlib 대시보드 - GridSpec으로 다중 패널 레이아웃"
-    description: "Matplotlib으로 4개 이상의 차트를 조합한 대시보드를 만듭니다. GridSpec, style, tight_layout, pie 사용법을 배웁니다."
-    keywords: ["matplotlib", "GridSpec", "대시보드", "pie", "스타일", "레이아웃"]
-
+    title: Matplotlib 대시보드 - GridSpec으로 다중 패널 레이아웃
+    description: Matplotlib으로 4개 이상의 차트를 조합한 대시보드를 만듭니다. GridSpec, style, tight_layout, pie 사용법을 배웁니다.
+    keywords:
+    - matplotlib
+    - GridSpec
+    - 대시보드
+    - pie
+    - 스타일
+    - 레이아웃
 intro:
-  emoji: "📋"
+  emoji: 📋
   goal: 4개 차트로 구성된 팁 데이터 분석 대시보드를 만듭니다.
-  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie, subplots 개념을 모두 활용합니다.
-
+  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie, subplots 개념을 모두
+    활용합니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    tips 데이터를 사용하여 레스토랑 팁 분석 대시보드를 만듭니다. GridSpec은 서브플롯보다 더 유연한 레이아웃을 구성할 수 있습니다. 스타일 시트를 적용하면 기본 디자인이 크게 개선됩니다.
+
+    import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
+  tips:
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import numpy as np
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import numpy as np
+    solution: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import numpy as np
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: tips 데이터를 사용하여 레스토랑 팁 분석 대시보드를 만듭니다. GridSpec은 서브플롯보다 더 유연한 레이아웃을 구성할 수 있습니다. 스타일 시트를 적용하면 기본 디자인이 크게 개선됩니다.
@@ -40,13 +91,65 @@ sections:
       import numpy as np
   - type: tip
     content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
-
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
+  goal: '1-1단계. 한글 폰트 설정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1-1단계. 한글 폰트 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: '1-1단계. 한글 폰트 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    solution: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+    content: Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는
+      무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
   - type: code
     language: python
     title: 한글 폰트 설정
@@ -62,11 +165,45 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
   - type: tip
-    content: font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
-
+    content: font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을
+      방지합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
+  structuredPrimary: true
   subtitle: tips 데이터
+  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: tips 데이터를 불러오고 기본 통계를 확인합니다. 대시보드에는 총 결제금액, 팁, 요일, 시간대, 인원수 등 다양한 변수를 활용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips = loadLocalDataset('tips')
+    tips.head()
+  exercise:
+    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
+      tips.head()
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
+      tips.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: tips 데이터를 불러오고 기본 통계를 확인합니다. 대시보드에는 총 결제금액, 팁, 요일, 시간대, 인원수 등 다양한 변수를 활용합니다.
@@ -79,25 +216,121 @@ sections:
 
       tips = loadLocalDataset('tips')
       tips.head()
-
 - id: step3_style
   title: 3단계. 스타일 시트 적용
+  structuredPrimary: true
   subtitle: plt.style.use()
+  goal: '3단계. 스타일 시트 적용: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 스타일 시트 적용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에 적합합니다.
+
+    plt.style.use('스타일명')으로 스타일을 적용합니다. 주요 스타일: 'seaborn-v0_8-whitegrid'(깔끔한 격자), 'ggplot'(R 스타일), 'dark_background'(어두운 배경), 'fivethirtyeight'(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.
+  tips:
+  - 'plt.style.use(''스타일명'')으로 스타일을 적용합니다. 주요 스타일: ''seaborn-v0_8-whitegrid''(깔끔한 격자), ''ggplot''(R 스타일), ''dark_background''(어두운
+    배경), ''fivethirtyeight''(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: plt.style.available[:10]
+  exercise:
+    prompt: '3단계. 스타일 시트 적용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: plt.style.available[:10]
+    solution: plt.style.available[:10]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에 적합합니다.
+    content: Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에
+      적합합니다.
   - type: code
     language: python
     title: 스타일 확인
     description: 사용 가능한 스타일 목록을 확인합니다
-    content: |-
-      plt.style.available[:10]
+    content: plt.style.available[:10]
   - type: tip
-    content: "plt.style.use('스타일명')으로 스타일을 적용합니다. 주요 스타일: 'seaborn-v0_8-whitegrid'(깔끔한 격자), 'ggplot'(R 스타일), 'dark_background'(어두운 배경), 'fivethirtyeight'(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다."
-
+    content: 'plt.style.use(''스타일명'')으로 스타일을 적용합니다. 주요 스타일: ''seaborn-v0_8-whitegrid''(깔끔한 격자), ''ggplot''(R 스타일), ''dark_background''(어두운
+      배경), ''fivethirtyeight''(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.'
 - id: step4_gridspec
   title: 4단계. GridSpec 기본
+  structuredPrimary: true
   subtitle: 그리드 레이아웃
+  goal: '4단계. GridSpec 기본: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. GridSpec 기본: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    GridSpec은 Figure를 그리드로 분할하고, 각 셀에 차트를 배치합니다. 2x2 그리드를 만들고 각 위치에 다른 차트를 배치해봅니다. subplots보다 더 유연한 레이아웃이 가능합니다.
+
+    GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
+  tips:
+  - GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러
+    셀을 합칠 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figGrid = plt.figure(figsize=(12, 10))
+    gs = GridSpec(2, 2, figure=figGrid)
+
+    ax1 = figGrid.add_subplot(gs[0, 0])
+    ax2 = figGrid.add_subplot(gs[0, 1])
+    ax3 = figGrid.add_subplot(gs[1, 0])
+    ax4 = figGrid.add_subplot(gs[1, 1])
+
+    ax1.set_title('위치 [0, 0]')
+    ax2.set_title('위치 [0, 1]')
+    ax3.set_title('위치 [1, 0]')
+    ax4.set_title('위치 [1, 1]')
+
+    plt.tight_layout()
+    figGrid
+  exercise:
+    prompt: '4단계. GridSpec 기본: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figGrid = plt.figure(figsize=(12, 10))
+      gs = GridSpec(2, 2, figure=figGrid)
+
+      ax1 = figGrid.add_subplot(gs[0, 0])
+      ax2 = figGrid.add_subplot(gs[0, 1])
+      ax3 = figGrid.add_subplot(gs[1, 0])
+      ax4 = figGrid.add_subplot(gs[1, 1])
+
+      ax1.set_title('위치 [0, 0]')
+      ax2.set_title('위치 [0, 1]')
+      ax3.set_title('위치 [1, 0]')
+      ax4.set_title('위치 [1, 1]')
+
+      plt.tight_layout()
+      figGrid
+    solution: |-
+      figGrid = plt.figure(figsize=(12, 10))
+      gs = GridSpec(2, 2, figure=figGrid)
+
+      ax1 = figGrid.add_subplot(gs[0, 0])
+      ax2 = figGrid.add_subplot(gs[0, 1])
+      ax3 = figGrid.add_subplot(gs[1, 0])
+      ax4 = figGrid.add_subplot(gs[1, 1])
+
+      ax1.set_title('위치 [0, 0]')
+      ax2.set_title('위치 [0, 1]')
+      ax3.set_title('위치 [1, 0]')
+      ax4.set_title('위치 [1, 1]')
+
+      plt.tight_layout()
+      figGrid
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: GridSpec은 Figure를 그리드로 분할하고, 각 셀에 차트를 배치합니다. 2x2 그리드를 만들고 각 위치에 다른 차트를 배치해봅니다. subplots보다 더 유연한 레이아웃이 가능합니다.
@@ -122,11 +355,60 @@ sections:
       plt.tight_layout()
       figGrid
   - type: tip
-    content: GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
-
+    content: GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼
+      슬라이싱으로 여러 셀을 합칠 수 있습니다.
 - id: step5_hist_box
   title: 5단계. 히스토그램과 박스플롯
+  structuredPrimary: true
   subtitle: 분포 시각화
+  goal: '5단계. 히스토그램과 박스플롯: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 히스토그램과 박스플롯: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 첫 번째 행에 팁 금액의 분포를 히스토그램과 박스플롯으로 표시합니다. 이전에 배운 기법들을 적용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figDist = plt.figure(figsize=(14, 5))
+    gs = GridSpec(1, 2, figure=figDist)
+
+    axHist = figDist.add_subplot(gs[0, 0])
+    axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+    axHist.set_title('팁 금액 분포', fontsize=12)
+    axHist.set_xlabel('팁 ($)')
+    axHist.set_ylabel('빈도')
+    figDist
+  exercise:
+    prompt: '5단계. 히스토그램과 박스플롯: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figDist = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figDist)
+
+      axHist = figDist.add_subplot(gs[0, 0])
+      axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      axHist.set_title('팁 금액 분포', fontsize=12)
+      axHist.set_xlabel('팁 ($)')
+      axHist.set_ylabel('빈도')
+      figDist
+    solution: |-
+      figDist = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figDist)
+
+      axHist = figDist.add_subplot(gs[0, 0])
+      axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      axHist.set_title('팁 금액 분포', fontsize=12)
+      axHist.set_xlabel('팁 ($)')
+      axHist.set_ylabel('빈도')
+      figDist
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 첫 번째 행에 팁 금액의 분포를 히스토그램과 박스플롯으로 표시합니다. 이전에 배운 기법들을 적용합니다.
@@ -161,10 +443,73 @@ sections:
 
       plt.tight_layout()
       figDist
-
 - id: step6_scatter_bar
   title: 6단계. 산점도와 막대 그래프
+  structuredPrimary: true
   subtitle: 관계와 비교
+  goal: '6단계. 산점도와 막대 그래프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 산점도와 막대 그래프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 두 번째 행에 결제금액-팁 관계 산점도와 시간대별 평균 팁 막대 그래프를 배치합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figRelation = plt.figure(figsize=(14, 5))
+    gs = GridSpec(1, 2, figure=figRelation)
+
+    axScatter = figRelation.add_subplot(gs[0, 0])
+    colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axScatter.scatter(subset['total_bill'], subset['tip'],
+                         c=colors[time], label=time, alpha=0.6, s=50)
+    axScatter.set_title('결제금액 vs 팁', fontsize=12)
+    axScatter.set_xlabel('결제금액 ($)')
+    axScatter.set_ylabel('팁 ($)')
+    axScatter.legend()
+    figRelation
+  exercise:
+    prompt: '6단계. 산점도와 막대 그래프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figRelation = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figRelation)
+
+      axScatter = figRelation.add_subplot(gs[0, 0])
+      colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axScatter.scatter(subset['total_bill'], subset['tip'],
+                           c=colors[time], label=time, alpha=0.6, s=50)
+      axScatter.set_title('결제금액 vs 팁', fontsize=12)
+      axScatter.set_xlabel('결제금액 ($)')
+      axScatter.set_ylabel('팁 ($)')
+      axScatter.legend()
+      figRelation
+    solution: |-
+      figRelation = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figRelation)
+
+      axScatter = figRelation.add_subplot(gs[0, 0])
+      colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axScatter.scatter(subset['total_bill'], subset['tip'],
+                           c=colors[time], label=time, alpha=0.6, s=50)
+      axScatter.set_title('결제금액 vs 팁', fontsize=12)
+      axScatter.set_xlabel('결제금액 ($)')
+      axScatter.set_ylabel('팁 ($)')
+      axScatter.legend()
+      figRelation
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 두 번째 행에 결제금액-팁 관계 산점도와 시간대별 평균 팁 막대 그래프를 배치합니다.
@@ -203,10 +548,68 @@ sections:
 
       plt.tight_layout()
       figRelation
-
 - id: step7_pie
   title: 7단계. 파이 차트
+  structuredPrimary: true
   subtitle: 비율 시각화
+  goal: '7단계. 파이 차트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 파이 차트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    파이 차트는 전체 대비 각 부분의 비율을 보여줍니다. 요일별 주문 비율을 파이 차트로 시각화합니다. autopct로 퍼센트를 표시하고, explode로 특정 조각을 강조할 수 있습니다.
+
+    ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
+  tips:
+  - ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작
+    각도를 조절합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    figPie, axPie = plt.subplots(figsize=(8, 8))
+
+    dayCount = tips['day'].value_counts()
+    colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+    explode = (0, 0, 0.05, 0)
+
+    axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+             colors=colors, explode=explode, shadow=True, startangle=90)
+    axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+    figPie
+  exercise:
+    prompt: '7단계. 파이 차트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figPie, axPie = plt.subplots(figsize=(8, 8))
+
+      dayCount = tips['day'].value_counts()
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0)
+
+      axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+      figPie
+    solution: |-
+      figPie, axPie = plt.subplots(figsize=(8, 8))
+
+      dayCount = tips['day'].value_counts()
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0)
+
+      axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+      figPie
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 파이 차트는 전체 대비 각 부분의 비율을 보여줍니다. 요일별 주문 비율을 파이 차트로 시각화합니다. autopct로 퍼센트를 표시하고, explode로 특정 조각을 강조할 수 있습니다.
@@ -227,11 +630,66 @@ sections:
 
       figPie
   - type: tip
-    content: ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
-
+    content: ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로
+      시작 각도를 조절합니다.
 - id: step8_dashboard
   title: 8단계. 4패널 대시보드
+  structuredPrimary: true
   subtitle: 모든 차트 조합
+  goal: '8단계. 4패널 대시보드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 4패널 대시보드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 만든 4가지 차트를 하나의 대시보드로 조합합니다. 2x2 GridSpec으로 레이아웃을 구성하고, 각 위치에 적절한 차트를 배치합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figDash = plt.figure(figsize=(14, 12))
+    gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+    ax1Dash = figDash.add_subplot(gs[0, 0])
+    ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+    ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+    ax1Dash.set_xlabel('팁 ($)')
+    ax1Dash.set_ylabel('빈도')
+    ax1Dash.spines['top'].set_visible(False)
+    ax1Dash.spines['right'].set_visible(False)
+    figDash
+  exercise:
+    prompt: '8단계. 4패널 대시보드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figDash = plt.figure(figsize=(14, 12))
+      gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+      ax1Dash = figDash.add_subplot(gs[0, 0])
+      ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+      ax1Dash.set_xlabel('팁 ($)')
+      ax1Dash.set_ylabel('빈도')
+      ax1Dash.spines['top'].set_visible(False)
+      ax1Dash.spines['right'].set_visible(False)
+      figDash
+    solution: |-
+      figDash = plt.figure(figsize=(14, 12))
+      gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+      ax1Dash = figDash.add_subplot(gs[0, 0])
+      ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+      ax1Dash.set_xlabel('팁 ($)')
+      ax1Dash.set_ylabel('빈도')
+      ax1Dash.spines['top'].set_visible(False)
+      ax1Dash.spines['right'].set_visible(False)
+      figDash
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 만든 4가지 차트를 하나의 대시보드로 조합합니다. 2x2 GridSpec으로 레이아웃을 구성하고, 각 위치에 적절한 차트를 배치합니다.
@@ -299,10 +757,76 @@ sections:
 
       figDash.suptitle('레스토랑 팁 데이터 분석 대시보드', fontsize=16, fontweight='bold', y=0.98)
       figDash
-
 - id: step9_advanced
   title: 9단계. 고급 레이아웃
+  structuredPrimary: true
   subtitle: 불균등 그리드
+  goal: '9단계. 고급 레이아웃: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 고급 레이아웃: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: GridSpec으로 불균등한 크기의 셀을 만들 수 있습니다. 위쪽에 큰 차트, 아래쪽에 작은 차트 3개를 배치하는 등 다양한 레이아웃이 가능합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figAdvanced = plt.figure(figsize=(14, 10))
+    gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+    axMain = figAdvanced.add_subplot(gs[0, :])
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axMain.scatter(subset['total_bill'], subset['tip'],
+                      c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                      label=time, alpha=0.6, s=60)
+    axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+    axMain.set_xlabel('결제금액 ($)', fontsize=12)
+    axMain.set_ylabel('팁 ($)', fontsize=12)
+    axMain.legend(fontsize=11)
+    axMain.grid(True, alpha=0.3)
+    figAdvanced
+  exercise:
+    prompt: '9단계. 고급 레이아웃: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figAdvanced = plt.figure(figsize=(14, 10))
+      gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+      axMain = figAdvanced.add_subplot(gs[0, :])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axMain.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=60)
+      axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+      axMain.set_xlabel('결제금액 ($)', fontsize=12)
+      axMain.set_ylabel('팁 ($)', fontsize=12)
+      axMain.legend(fontsize=11)
+      axMain.grid(True, alpha=0.3)
+      figAdvanced
+    solution: |-
+      figAdvanced = plt.figure(figsize=(14, 10))
+      gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+      axMain = figAdvanced.add_subplot(gs[0, :])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axMain.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=60)
+      axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+      axMain.set_xlabel('결제금액 ($)', fontsize=12)
+      axMain.set_ylabel('팁 ($)', fontsize=12)
+      axMain.legend(fontsize=11)
+      axMain.grid(True, alpha=0.3)
+      figAdvanced
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: GridSpec으로 불균등한 크기의 셀을 만들 수 있습니다. 위쪽에 큰 차트, 아래쪽에 작은 차트 3개를 배치하는 등 다양한 레이아웃이 가능합니다.
@@ -350,10 +874,85 @@ sections:
 
       figAdvanced.suptitle('팁 데이터 종합 분석', fontsize=16, fontweight='bold')
       figAdvanced
-
 - id: step10_final
   title: 10단계. 최종 대시보드
+  structuredPrimary: true
   subtitle: 완성된 분석 리포트
+  goal: '10단계. 최종 대시보드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 최종 대시보드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 분석 대시보드를 만듭니다. 일관된 스타일, 명확한 제목, 적절한 여백으로 전문적인 리포트를 완성합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    figFinal = plt.figure(figsize=(16, 12))
+    gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+    colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+    axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axFinal1.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=70, edgecolors='white')
+    axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+    axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+    axFinal1.set_ylabel('팁 ($)', fontsize=11)
+    axFinal1.legend(fontsize=10)
+    axFinal1.grid(True, alpha=0.3)
+    axFinal1.spines['top'].set_visible(False)
+    axFinal1.spines['right'].set_visible(False)
+    figFinal
+  exercise:
+    prompt: '10단계. 최종 대시보드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      figFinal = plt.figure(figsize=(16, 12))
+      gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+      colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+      axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axFinal1.scatter(subset['total_bill'], subset['tip'],
+                          c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                          label=time, alpha=0.6, s=70, edgecolors='white')
+      axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+      axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+      axFinal1.set_ylabel('팁 ($)', fontsize=11)
+      axFinal1.legend(fontsize=10)
+      axFinal1.grid(True, alpha=0.3)
+      axFinal1.spines['top'].set_visible(False)
+      axFinal1.spines['right'].set_visible(False)
+      figFinal
+    solution: |-
+      figFinal = plt.figure(figsize=(16, 12))
+      gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+      colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+      axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axFinal1.scatter(subset['total_bill'], subset['tip'],
+                          c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                          label=time, alpha=0.6, s=70, edgecolors='white')
+      axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+      axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+      axFinal1.set_ylabel('팁 ($)', fontsize=11)
+      axFinal1.legend(fontsize=10)
+      axFinal1.grid(True, alpha=0.3)
+      axFinal1.spines['top'].set_visible(False)
+      axFinal1.spines['right'].set_visible(False)
+      figFinal
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 분석 대시보드를 만듭니다. 일관된 스타일, 명확한 제목, 적절한 여백으로 전문적인 리포트를 완성합니다.
@@ -435,20 +1034,80 @@ sections:
       figFinal.suptitle('레스토랑 팁 데이터 분석 리포트', fontsize=18, fontweight='bold', y=0.98)
       plt.tight_layout()
       figFinal
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 대시보드 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset('penguins').dropna()
+
+    chart = plt.figure(figsize=(14, 10))
+    grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+    kinds = data['species'].unique()
+    palette = ['#E74C3C', '#27AE60', '#3498DB']
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset('penguins').dropna()
+
+      chart = plt.figure(figsize=(14, 10))
+      grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+      kinds = data['species'].unique()
+      palette = ['#E74C3C', '#27AE60', '#3498DB']
+    solution: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset('penguins').dropna()
+
+      chart = plt.figure(figsize=(14, 10))
+      grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+      kinds = data['species'].unique()
+      palette = ['#E74C3C', '#27AE60', '#3498DB']
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 펭귄 데이터 분석 대시보드"
+    title: '미션1: 펭귄 데이터 분석 대시보드'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import matplotlib.pyplot as plt
         from matplotlib.gridspec import GridSpec
@@ -463,7 +1122,7 @@ sections:
         kinds = data['species'].unique()
         palette = ['#E74C3C', '#27AE60', '#3498DB']
     - type: code
-      title: "산점도"
+      title: 산점도
       content: |-
         plot1 = chart.add_subplot(grid[0, 0])
         for sp, clr in zip(kinds, palette):
@@ -475,7 +1134,7 @@ sections:
         plot1.set_ylabel('체중 (g)')
         plot1.legend()
     - type: code
-      title: "파이차트"
+      title: 파이차트
       content: |-
         plot2 = chart.add_subplot(grid[0, 1])
         kindCount = data['species'].value_counts()
@@ -483,7 +1142,7 @@ sections:
                   colors=palette, shadow=True)
         plot2.set_title('종별 비율', fontsize=12, fontweight='bold')
     - type: code
-      title: "박스플롯"
+      title: 박스플롯
       content: |-
         plot3 = chart.add_subplot(grid[1, 0])
         massData = [data[data['species'] == sp]['body_mass_g'] for sp in kinds]
@@ -494,7 +1153,7 @@ sections:
         plot3.set_title('종별 체중 분포', fontsize=12, fontweight='bold')
         plot3.set_ylabel('체중 (g)')
     - type: code
-      title: "히스토그램"
+      title: 히스토그램
       content: |-
         plot4 = chart.add_subplot(grid[1, 1])
         plot4.hist(data['bill_length_mm'], bins=20, color='#9B59B6',
@@ -507,10 +1166,10 @@ sections:
         plt.tight_layout()
         chart
   - type: expansion
-    title: "미션2: iris 데이터 불균등 레이아웃 대시보드"
+    title: '미션2: iris 데이터 불균등 레이아웃 대시보드'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import matplotlib.pyplot as plt
         from matplotlib.gridspec import GridSpec
@@ -526,7 +1185,7 @@ sections:
         tones = ['#E74C3C', '#27AE60', '#3498DB']
         marks = ['o', 's', '^']
     - type: code
-      title: "메인 산점도"
+      title: 메인 산점도
       content: |-
         mainPanel = canvas.add_subplot(layout[0, :])
         for sp, clr, mk in zip(types, tones, marks):
@@ -539,7 +1198,7 @@ sections:
         mainPanel.legend()
         mainPanel.grid(True, alpha=0.3)
     - type: code
-      title: "히스토그램"
+      title: 히스토그램
       content: |-
         panel1 = canvas.add_subplot(layout[1, 0])
         for sp, clr in zip(types, tones):
@@ -549,7 +1208,7 @@ sections:
         panel1.set_xlabel('꽃받침 길이 (cm)')
         panel1.legend(fontsize=8)
     - type: code
-      title: "막대 + 박스플롯"
+      title: 막대 + 박스플롯
       content: |-
         panel2 = canvas.add_subplot(layout[1, 1])
         avgByType = df.groupby('species')['petal_length'].mean()
@@ -568,7 +1227,6 @@ sections:
         canvas.suptitle('붓꽃 품종 분석 대시보드', fontsize=16, fontweight='bold')
         plt.tight_layout()
         canvas
-
 - id: summary
   title: 정리
   blocks:
@@ -576,22 +1234,93 @@ sections:
     content: GridSpec으로 다중 패널 대시보드를 만들었습니다.
   - type: list
     items:
-    - "GridSpec(rows, cols) - 유연한 그리드 레이아웃 정의"
-    - "fig.add_subplot(gs[row, col]) - 그리드 위치에 Axes 추가"
-    - "gs[0:2, 0] - 슬라이싱으로 여러 셀 합치기"
-    - "height_ratios, width_ratios - 불균등 크기 설정"
-    - "ax.pie(values, autopct) - 파이 차트"
-    - "plt.style.use() - 스타일 시트 적용"
-    - "plt.tight_layout() - 자동 여백 조정"
+    - GridSpec(rows, cols) - 유연한 그리드 레이아웃 정의
+    - fig.add_subplot(gs[row, col]) - 그리드 위치에 Axes 추가
+    - gs[0:2, 0] - 슬라이싱으로 여러 셀 합치기
+    - height_ratios, width_ratios - 불균등 크기 설정
+    - ax.pie(values, autopct) - 파이 차트
+    - plt.style.use() - 스타일 시트 적용
+    - plt.tight_layout() - 자동 여백 조정
   - type: text
     content: 다음 시간에는 annotate와 LaTeX로 고급 주석 차트를 만듭니다.
-
 - id: workflow_validation
   title: 업무 흐름 검증
+  structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
+  goal: '업무 흐름 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '업무 흐름 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서
+    기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: '업무 흐름 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다."
+    content: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을
+      만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   - type: code
     language: python
     title: 보고서 데이터 검증
@@ -663,7 +1392,7 @@ sections:
       assert all(chartChecks.values()), chartChecks
       chartChecks
   - type: expansion
-    title: "실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?"
+    title: '실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?'
     blocks:
     - type: code
       language: python

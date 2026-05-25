@@ -5,22 +5,127 @@ meta:
   category: excel
   badge: 리포트
   packages:
+  - openpyxl
+  - pandas
+  tags:
+  - excel
+  - openpyxl
+  - pandas
+  - 리포트
+  - 차트
+  seo:
+    title: Excel 리포트 자동 생성 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
     - openpyxl
     - pandas
-  tags: ["excel","openpyxl","pandas","리포트","차트"]
-  seo:
-    title: "Excel 리포트 자동 생성 - 로컬 Python 엑셀 자동화"
-    description: "openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다."
-    keywords: ["excel","openpyxl","pandas","리포트","차트"]
-
+    - 리포트
+    - 차트
+intro:
+  direction: Excel 리포트 자동 생성에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  benefits:
+  - Excel 리포트 자동 생성 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
+  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
+  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  diagram:
+    steps:
+    - label: 목표
+      detail: 완료 후 만들 산출물을 먼저 확인
+    - label: 준비
+      detail: meta.packages 기반 uv 준비와 import 확인
+    - label: 실습
+      detail: 예제 스니펫을 바꿔 직접 실행
+    - label: 검증
+      detail: assert와 결과 비교로 완료 판단
+    runtime:
+    - label: 패키지
+      detail: packages-check -> packages-install(누락 시) -> cell-call
+    - label: 첫 실행
+      detail: import 확인과 assert 검증
+    - label: 완료
+      detail: 리포트/자동화/검증 루틴으로 재사용
 sections:
 - id: intro
   title: 1단계. 보고서 파일의 목표
+  structuredPrimary: true
   subtitle: 데이터 + 요약 + 차트
+  goal: '1단계. 보고서 파일의 목표: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 보고서 파일의 목표: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 자동화된 Excel 리포트는 원본 데이터, 요약 표, 차트가 한 파일 안에 일관되게 들어 있어야 합니다. 이번 레슨은 pandas와 openpyxl을 함께 사용해 보고서 파일을 생성하고 구조를
+    검증합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    import pandas as pd
+    from openpyxl import load_workbook
+    from openpyxl.chart import BarChart, Reference
+    from codaro.curriculum.localData import loadLocalDataset
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    reportPath = excelRoot / "tips_report.xlsx"
+
+    tips = loadLocalDataset("tips")
+    tipsReport = tips.assign(tip_rate=tips["tip"] / tips["total_bill"])
+    summary = tipsReport.groupby("time", as_index=False).agg(order_count=("tip", "size"), avg_tip=("tip", "mean"), avg_tip_rate=("tip_rate", "mean"))
+
+    assert set(summary["time"]) == {"Lunch", "Dinner"}
+    summary.round(3)
+  exercise:
+    prompt: '1단계. 보고서 파일의 목표: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+      from openpyxl import load_workbook
+      from openpyxl.chart import BarChart, Reference
+      from codaro.curriculum.localData import loadLocalDataset
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      reportPath = excelRoot / "tips_report.xlsx"
+
+      tips = loadLocalDataset("tips")
+      tipsReport = tips.assign(tip_rate=tips["tip"] / tips["total_bill"])
+      summary = tipsReport.groupby("time", as_index=False).agg(order_count=("tip", "size"), avg_tip=("tip", "mean"), avg_tip_rate=("tip_rate", "mean"))
+
+      assert set(summary["time"]) == {"Lunch", "Dinner"}
+      summary.round(3)
+    solution: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+      from openpyxl import load_workbook
+      from openpyxl.chart import BarChart, Reference
+      from codaro.curriculum.localData import loadLocalDataset
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      reportPath = excelRoot / "tips_report.xlsx"
+
+      tips = loadLocalDataset("tips")
+      tipsReport = tips.assign(tip_rate=tips["tip"] / tips["total_bill"])
+      summary = tipsReport.groupby("time", as_index=False).agg(order_count=("tip", "size"), avg_tip=("tip", "mean"), avg_tip_rate=("tip_rate", "mean"))
+
+      assert set(summary["time"]) == {"Lunch", "Dinner"}
+      summary.round(3)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      자동화된 Excel 리포트는 원본 데이터, 요약 표, 차트가 한 파일 안에 일관되게 들어 있어야 합니다. 이번 레슨은 pandas와 openpyxl을 함께 사용해 보고서 파일을 생성하고 구조를 검증합니다.
+    content: 자동화된 Excel 리포트는 원본 데이터, 요약 표, 차트가 한 파일 안에 일관되게 들어 있어야 합니다. 이번 레슨은 pandas와 openpyxl을 함께 사용해 보고서 파일을 생성하고 구조를 검증합니다.
   - type: code
     language: python
     title: 로컬 데이터 준비
@@ -43,10 +148,52 @@ sections:
 
       assert set(summary["time"]) == {"Lunch", "Dinner"}
       summary.round(3)
-
 - id: build_report
   title: 2단계. 리포트 파일 만들기
+  structuredPrimary: true
   subtitle: 시트와 차트
+  goal: '2단계. 리포트 파일 만들기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 리포트 파일 만들기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2단계. 리포트 파일 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
+        tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
+        summary.to_excel(writer, sheet_name="summary", index=False)
+
+    assert reportPath.exists()
+    workbook = load_workbook(reportPath)
+    assert workbook.sheetnames == ["raw_data", "summary"]
+  exercise:
+    prompt: '2단계. 리포트 파일 만들기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
+          tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
+          summary.to_excel(writer, sheet_name="summary", index=False)
+
+      assert reportPath.exists()
+      workbook = load_workbook(reportPath)
+      assert workbook.sheetnames == ["raw_data", "summary"]
+    solution: |-
+      with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
+          tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
+          summary.to_excel(writer, sheet_name="summary", index=False)
+
+      assert reportPath.exists()
+      workbook = load_workbook(reportPath)
+      assert workbook.sheetnames == ["raw_data", "summary"]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: code
     language: python
@@ -80,14 +227,79 @@ sections:
       reloadedWorkbook = load_workbook(reportPath)
       assert len(reloadedWorkbook["summary"]._charts) == 1
       reportPath
-
 - id: workflow_validation
   title: 3단계. 리포트 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '3단계. 리포트 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 리포트 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 리포트 자동화는 파일 생성보다 검증이 중요합니다. 시트 구성, 요약 행 수, 차트 존재를 확인하고, 잘못된 리포트 구조를 명확하게 실패시킵니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def validateExcelReport(path):
+        workbook = load_workbook(path, data_only=True)
+        requiredSheets = {"raw_data", "summary"}
+        missingSheets = requiredSheets - set(workbook.sheetnames)
+        if missingSheets:
+            raise ValueError(f"리포트 필수 시트 누락: {sorted(missingSheets)}")
+        summarySheet = workbook["summary"]
+        headers = [cell.value for cell in summarySheet[1]]
+        assert {"time", "order_count", "avg_tip", "avg_tip_rate"}.issubset(set(headers))
+        assert len(workbook["summary"]._charts) == 1
+        return {"sheetCount": len(workbook.sheetnames), "summaryRows": summarySheet.max_row - 1}
+
+    reportValidation = validateExcelReport(reportPath)
+    assert reportValidation["summaryRows"] == 2
+    reportValidation
+  exercise:
+    prompt: '3단계. 리포트 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def validateExcelReport(path):
+          workbook = load_workbook(path, data_only=True)
+          requiredSheets = {"raw_data", "summary"}
+          missingSheets = requiredSheets - set(workbook.sheetnames)
+          if missingSheets:
+              raise ValueError(f"리포트 필수 시트 누락: {sorted(missingSheets)}")
+          summarySheet = workbook["summary"]
+          headers = [cell.value for cell in summarySheet[1]]
+          assert {"time", "order_count", "avg_tip", "avg_tip_rate"}.issubset(set(headers))
+          assert len(workbook["summary"]._charts) == 1
+          return {"sheetCount": len(workbook.sheetnames), "summaryRows": summarySheet.max_row - 1}
+
+      reportValidation = validateExcelReport(reportPath)
+      assert reportValidation["summaryRows"] == 2
+      reportValidation
+    solution: |-
+      def validateExcelReport(path):
+          workbook = load_workbook(path, data_only=True)
+          requiredSheets = {"raw_data", "summary"}
+          missingSheets = requiredSheets - set(workbook.sheetnames)
+          if missingSheets:
+              raise ValueError(f"리포트 필수 시트 누락: {sorted(missingSheets)}")
+          summarySheet = workbook["summary"]
+          headers = [cell.value for cell in summarySheet[1]]
+          assert {"time", "order_count", "avg_tip", "avg_tip_rate"}.issubset(set(headers))
+          assert len(workbook["summary"]._charts) == 1
+          return {"sheetCount": len(workbook.sheetnames), "summaryRows": summarySheet.max_row - 1}
+
+      reportValidation = validateExcelReport(reportPath)
+      assert reportValidation["summaryRows"] == 2
+      reportValidation
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      리포트 자동화는 파일 생성보다 검증이 중요합니다. 시트 구성, 요약 행 수, 차트 존재를 확인하고, 잘못된 리포트 구조를 명확하게 실패시킵니다.
+    content: 리포트 자동화는 파일 생성보다 검증이 중요합니다. 시트 구성, 요약 행 수, 차트 존재를 확인하고, 잘못된 리포트 구조를 명확하게 실패시킵니다.
   - type: code
     language: python
     title: 리포트 구조 검증
@@ -135,11 +347,9 @@ sections:
       assert len(selectedDays) <= len(daySummary)
       assert selectedDays["revenue"].min() >= minimumRevenue
       selectedDays.sort_values("revenue", ascending=False)
-
 - id: summary
   title: 정리
   subtitle: Excel 리포트 자동화 완주
   blocks:
   - type: text
-    content: |-
-      이번 레슨에서는 로컬 데이터로 Excel 리포트 파일을 만들고, 여러 시트와 차트가 들어 있는지 검증하고, 집계 기준을 바꾸는 변주까지 완성했습니다.
+    content: 이번 레슨에서는 로컬 데이터로 Excel 리포트 파일을 만들고, 여러 시트와 차트가 들어 있는지 검증하고, 집계 기준을 바꾸는 변주까지 완성했습니다.

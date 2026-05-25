@@ -1,27 +1,63 @@
 meta:
   packages:
-    - folium
+  - folium
   id: folium_08
   title: 히트맵
   order: 8
   category: folium
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["folium", "HeatMap", "히트맵", "밀도", "시각화"]
+  tags:
+  - folium
+  - HeatMap
+  - 히트맵
+  - 밀도
+  - 시각화
   seo:
-    title: "Folium HeatMap - 밀도 시각화"
-    description: "Folium으로 히트맵을 만듭니다. 포인트 데이터의 밀도를 색상으로 시각화합니다."
-    keywords: ["folium", "HeatMap", "히트맵", "밀도", "gradient"]
-
+    title: Folium HeatMap - 밀도 시각화
+    description: Folium으로 히트맵을 만듭니다. 포인트 데이터의 밀도를 색상으로 시각화합니다.
+    keywords:
+    - folium
+    - HeatMap
+    - 히트맵
+    - 밀도
+    - gradient
 intro:
-  emoji: "🔥"
+  emoji: 🔥
   goal: 포인트 데이터를 히트맵으로 시각화합니다.
   description: 히트맵은 데이터의 밀집도를 색상으로 표현합니다. 많은 포인트가 모인 곳은 빨갛게, 적은 곳은 파랗게 표시됩니다. 인구 밀도, 매장 분포, 범죄 발생 지역 등을 시각화할 때 사용합니다.
-
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: folium과 HeatMap 플러그인을 불러옵니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap
+    solution: |-
+      import folium
+      from folium.plugins import HeatMap
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: folium과 HeatMap 플러그인을 불러옵니다.
@@ -34,7 +70,86 @@ sections:
       from folium.plugins import HeatMap
 - id: step2_basic_heatmap
   title: 2단계. 기본 히트맵
+  structuredPrimary: true
   subtitle: HeatMap()
+  goal: '2단계. 기본 히트맵: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 기본 히트맵: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    HeatMap은 좌표 리스트를 받아 밀도를 시각화합니다. 좌표가 많이 모인 곳이 더 진하게 표시됩니다.
+
+    좌표가 밀집된 곳(시청 근처)이 더 진한 색으로 표시됩니다.
+  tips:
+  - 좌표가 밀집된 곳(시청 근처)이 더 진한 색으로 표시됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    seoulCenter = [37.5665, 126.9780]
+    m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    heatData = [
+        [37.5665, 126.9780],
+        [37.5670, 126.9785],
+        [37.5660, 126.9775],
+        [37.5668, 126.9782],
+        [37.5663, 126.9778],
+        [37.5700, 126.9750],
+        [37.5705, 126.9755],
+        [37.5630, 126.9820],
+        [37.5632, 126.9825]
+    ]
+
+    HeatMap(heatData).add_to(m1)
+
+    m1
+  exercise:
+    prompt: '2단계. 기본 히트맵: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      heatData = [
+          [37.5665, 126.9780],
+          [37.5670, 126.9785],
+          [37.5660, 126.9775],
+          [37.5668, 126.9782],
+          [37.5663, 126.9778],
+          [37.5700, 126.9750],
+          [37.5705, 126.9755],
+          [37.5630, 126.9820],
+          [37.5632, 126.9825]
+      ]
+
+      HeatMap(heatData).add_to(m1)
+
+      m1
+    solution: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      heatData = [
+          [37.5665, 126.9780],
+          [37.5670, 126.9785],
+          [37.5660, 126.9775],
+          [37.5668, 126.9782],
+          [37.5663, 126.9778],
+          [37.5700, 126.9750],
+          [37.5705, 126.9755],
+          [37.5630, 126.9820],
+          [37.5632, 126.9825]
+      ]
+
+      HeatMap(heatData).add_to(m1)
+
+      m1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: HeatMap은 좌표 리스트를 받아 밀도를 시각화합니다. 좌표가 많이 모인 곳이 더 진하게 표시됩니다.
@@ -63,10 +178,58 @@ sections:
       m1
   - type: tip
     content: 좌표가 밀집된 곳(시청 근처)이 더 진한 색으로 표시됩니다.
-
 - id: step3_radius_blur
   title: 3단계. radius와 blur
+  structuredPrimary: true
   subtitle: 크기 조절
+  goal: '3단계. radius와 blur: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. radius와 blur: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    radius는 각 포인트의 영향 범위, blur는 경계의 부드러움을 조절합니다.
+
+    radius를 크게 하면 넓게 퍼지고, blur를 높이면 경계가 부드러워집니다. 기본값은 radius=25, blur=15입니다.
+  tips:
+  - radius를 크게 하면 넓게 퍼지고, blur를 높이면 경계가 부드러워집니다. 기본값은 radius=25, blur=15입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    HeatMap(
+        heatData,
+        radius=25
+    ).add_to(m2)
+
+    m2
+  exercise:
+    prompt: '3단계. radius와 blur: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          radius=25
+      ).add_to(m2)
+
+      m2
+    solution: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          radius=25
+      ).add_to(m2)
+
+      m2
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: radius는 각 포인트의 영향 범위, blur는 경계의 부드러움을 조절합니다.
@@ -99,10 +262,85 @@ sections:
       m3
   - type: tip
     content: radius를 크게 하면 넓게 퍼지고, blur를 높이면 경계가 부드러워집니다. 기본값은 radius=25, blur=15입니다.
-
 - id: step4_gradient
   title: 4단계. 색상 그라데이션
+  structuredPrimary: true
   subtitle: gradient
+  goal: '4단계. 색상 그라데이션: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 색상 그라데이션: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    gradient로 색상 구간을 지정합니다. 0~1 사이 값에 색상을 매핑합니다.
+
+    gradient 키는 0~1 사이 값이고, 밀도가 높을수록 1에 가까운 색상이 적용됩니다.
+  tips:
+  - gradient 키는 0~1 사이 값이고, 밀도가 높을수록 1에 가까운 색상이 적용됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m4 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    customGradient = {
+        0.2: "blue",
+        0.4: "lime",
+        0.6: "yellow",
+        0.8: "orange",
+        1.0: "red"
+    }
+
+    HeatMap(
+        heatData,
+        gradient=customGradient,
+        radius=25
+    ).add_to(m4)
+
+    m4
+  exercise:
+    prompt: '4단계. 색상 그라데이션: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      customGradient = {
+          0.2: "blue",
+          0.4: "lime",
+          0.6: "yellow",
+          0.8: "orange",
+          1.0: "red"
+      }
+
+      HeatMap(
+          heatData,
+          gradient=customGradient,
+          radius=25
+      ).add_to(m4)
+
+      m4
+    solution: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      customGradient = {
+          0.2: "blue",
+          0.4: "lime",
+          0.6: "yellow",
+          0.8: "orange",
+          1.0: "red"
+      }
+
+      HeatMap(
+          heatData,
+          gradient=customGradient,
+          radius=25
+      ).add_to(m4)
+
+      m4
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: gradient로 색상 구간을 지정합니다. 0~1 사이 값에 색상을 매핑합니다.
@@ -151,10 +389,73 @@ sections:
       m5
   - type: tip
     content: gradient 키는 0~1 사이 값이고, 밀도가 높을수록 1에 가까운 색상이 적용됩니다.
-
 - id: step5_weighted_heatmap
   title: 5단계. 가중치 히트맵
+  structuredPrimary: true
   subtitle: weight
+  goal: '5단계. 가중치 히트맵: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 가중치 히트맵: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    좌표에 가중치를 추가하면 특정 포인트를 더 강조할 수 있습니다. [위도, 경도, 가중치] 형태로 데이터를 전달합니다.
+
+    가중치가 1에 가까울수록 더 진하게 표시됩니다. 매출액, 인구수 등을 가중치로 사용합니다.
+  tips:
+  - 가중치가 1에 가까울수록 더 진하게 표시됩니다. 매출액, 인구수 등을 가중치로 사용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    weightedData = [
+        [37.5665, 126.9780, 1.0],
+        [37.5670, 126.9785, 0.8],
+        [37.5660, 126.9775, 0.5],
+        [37.5700, 126.9750, 0.3],
+        [37.5630, 126.9820, 0.2]
+    ]
+
+    HeatMap(weightedData, radius=30).add_to(m6)
+
+    m6
+  exercise:
+    prompt: '5단계. 가중치 히트맵: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      weightedData = [
+          [37.5665, 126.9780, 1.0],
+          [37.5670, 126.9785, 0.8],
+          [37.5660, 126.9775, 0.5],
+          [37.5700, 126.9750, 0.3],
+          [37.5630, 126.9820, 0.2]
+      ]
+
+      HeatMap(weightedData, radius=30).add_to(m6)
+
+      m6
+    solution: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      weightedData = [
+          [37.5665, 126.9780, 1.0],
+          [37.5670, 126.9785, 0.8],
+          [37.5660, 126.9775, 0.5],
+          [37.5700, 126.9750, 0.3],
+          [37.5630, 126.9820, 0.2]
+      ]
+
+      HeatMap(weightedData, radius=30).add_to(m6)
+
+      m6
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 좌표에 가중치를 추가하면 특정 포인트를 더 강조할 수 있습니다. [위도, 경도, 가중치] 형태로 데이터를 전달합니다.
@@ -178,10 +479,61 @@ sections:
       m6
   - type: tip
     content: 가중치가 1에 가까울수록 더 진하게 표시됩니다. 매출액, 인구수 등을 가중치로 사용합니다.
-
 - id: step6_min_opacity
   title: 6단계. 최소 투명도
+  structuredPrimary: true
   subtitle: min_opacity
+  goal: '6단계. 최소 투명도: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 최소 투명도: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    min_opacity로 낮은 밀도 영역의 최소 투명도를 설정합니다.
+
+    min_opacity를 높이면 낮은 밀도 영역도 보입니다. 기본값은 0.5입니다.
+  tips:
+  - min_opacity를 높이면 낮은 밀도 영역도 보입니다. 기본값은 0.5입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    HeatMap(
+        heatData,
+        min_opacity=0.3,
+        radius=25
+    ).add_to(m7)
+
+    m7
+  exercise:
+    prompt: '6단계. 최소 투명도: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          min_opacity=0.3,
+          radius=25
+      ).add_to(m7)
+
+      m7
+    solution: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          min_opacity=0.3,
+          radius=25
+      ).add_to(m7)
+
+      m7
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: min_opacity로 낮은 밀도 영역의 최소 투명도를 설정합니다.
@@ -201,10 +553,61 @@ sections:
       m7
   - type: tip
     content: min_opacity를 높이면 낮은 밀도 영역도 보입니다. 기본값은 0.5입니다.
-
 - id: step7_max_zoom
   title: 7단계. 줌 레벨 설정
+  structuredPrimary: true
   subtitle: max_zoom
+  goal: '7단계. 줌 레벨 설정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 줌 레벨 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    max_zoom으로 히트맵이 표시되는 최대 줌 레벨을 설정합니다. 높은 줌에서는 포인트가 분산됩니다.
+
+    줌을 많이 확대하면 포인트들이 분산되어 히트맵 효과가 줄어듭니다.
+  tips:
+  - 줌을 많이 확대하면 포인트들이 분산되어 히트맵 효과가 줄어듭니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m8 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    HeatMap(
+        heatData,
+        max_zoom=15,
+        radius=25
+    ).add_to(m8)
+
+    m8
+  exercise:
+    prompt: '7단계. 줌 레벨 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          max_zoom=15,
+          radius=25
+      ).add_to(m8)
+
+      m8
+    solution: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      HeatMap(
+          heatData,
+          max_zoom=15,
+          radius=25
+      ).add_to(m8)
+
+      m8
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: max_zoom으로 히트맵이 표시되는 최대 줌 레벨을 설정합니다. 높은 줌에서는 포인트가 분산됩니다.
@@ -224,10 +627,88 @@ sections:
       m8
   - type: tip
     content: 줌을 많이 확대하면 포인트들이 분산되어 히트맵 효과가 줄어듭니다.
-
 - id: step8_large_data
   title: 8단계. 대량 데이터
+  structuredPrimary: true
   subtitle: 많은 포인트
+  goal: '8단계. 대량 데이터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 대량 데이터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    히트맵은 대량의 포인트 데이터에서 진가를 발휘합니다. 랜덤 데이터로 테스트합니다.
+
+    특정 위치에 포인트를 집중시키면 그 영역이 더 진하게 표시됩니다.
+  tips:
+  - 특정 위치에 포인트를 집중시키면 그 영역이 더 진하게 표시됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import random
+
+    m9 = folium.Map(location=seoulCenter, zoom_start=12)
+
+    largeData = []
+    for _ in range(100):
+        lat = 37.5 + random.uniform(-0.05, 0.05)
+        lon = 126.95 + random.uniform(-0.05, 0.05)
+        largeData.append([lat, lon])
+
+    for _ in range(50):
+        lat = 37.5665 + random.uniform(-0.01, 0.01)
+        lon = 126.9780 + random.uniform(-0.01, 0.01)
+        largeData.append([lat, lon])
+
+    HeatMap(largeData, radius=15).add_to(m9)
+
+    m9
+  exercise:
+    prompt: '8단계. 대량 데이터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import random
+
+      m9 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      largeData = []
+      for _ in range(100):
+          lat = 37.5 + random.uniform(-0.05, 0.05)
+          lon = 126.95 + random.uniform(-0.05, 0.05)
+          largeData.append([lat, lon])
+
+      for _ in range(50):
+          lat = 37.5665 + random.uniform(-0.01, 0.01)
+          lon = 126.9780 + random.uniform(-0.01, 0.01)
+          largeData.append([lat, lon])
+
+      HeatMap(largeData, radius=15).add_to(m9)
+
+      m9
+    solution: |-
+      import random
+
+      m9 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      largeData = []
+      for _ in range(100):
+          lat = 37.5 + random.uniform(-0.05, 0.05)
+          lon = 126.95 + random.uniform(-0.05, 0.05)
+          largeData.append([lat, lon])
+
+      for _ in range(50):
+          lat = 37.5665 + random.uniform(-0.01, 0.01)
+          lon = 126.9780 + random.uniform(-0.01, 0.01)
+          largeData.append([lat, lon])
+
+      HeatMap(largeData, radius=15).add_to(m9)
+
+      m9
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 히트맵은 대량의 포인트 데이터에서 진가를 발휘합니다. 랜덤 데이터로 테스트합니다.
@@ -256,10 +737,112 @@ sections:
       m9
   - type: tip
     content: 특정 위치에 포인트를 집중시키면 그 영역이 더 진하게 표시됩니다.
-
 - id: step9_with_markers
   title: 9단계. 마커와 조합
+  structuredPrimary: true
   subtitle: 히트맵 + 마커
+  goal: '9단계. 마커와 조합: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 마커와 조합: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    히트맵 위에 마커를 추가하여 주요 위치를 강조합니다.
+
+    밝은 배경(CartoDB Positron)에서 히트맵이 더 잘 보입니다.
+  tips:
+  - 밝은 배경(CartoDB Positron)에서 히트맵이 더 잘 보입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    m10 = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
+
+    storeLocations = []
+    for _ in range(30):
+        lat = 37.5665 + random.uniform(-0.02, 0.02)
+        lon = 126.9780 + random.uniform(-0.02, 0.02)
+        storeLocations.append([lat, lon])
+
+    for _ in range(20):
+        lat = 37.5500 + random.uniform(-0.01, 0.01)
+        lon = 126.9900 + random.uniform(-0.01, 0.01)
+        storeLocations.append([lat, lon])
+
+    HeatMap(
+        storeLocations,
+        radius=20,
+        gradient={0.4: "yellow", 0.6: "orange", 1: "red"}
+    ).add_to(m10)
+
+    folium.Marker(
+        seoulCenter,
+        popup="본사",
+        icon=folium.Icon(color="blue", icon="home")
+    ).add_to(m10)
+
+    m10
+  exercise:
+    prompt: '9단계. 마커와 조합: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
+
+      storeLocations = []
+      for _ in range(30):
+          lat = 37.5665 + random.uniform(-0.02, 0.02)
+          lon = 126.9780 + random.uniform(-0.02, 0.02)
+          storeLocations.append([lat, lon])
+
+      for _ in range(20):
+          lat = 37.5500 + random.uniform(-0.01, 0.01)
+          lon = 126.9900 + random.uniform(-0.01, 0.01)
+          storeLocations.append([lat, lon])
+
+      HeatMap(
+          storeLocations,
+          radius=20,
+          gradient={0.4: "yellow", 0.6: "orange", 1: "red"}
+      ).add_to(m10)
+
+      folium.Marker(
+          seoulCenter,
+          popup="본사",
+          icon=folium.Icon(color="blue", icon="home")
+      ).add_to(m10)
+
+      m10
+    solution: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
+
+      storeLocations = []
+      for _ in range(30):
+          lat = 37.5665 + random.uniform(-0.02, 0.02)
+          lon = 126.9780 + random.uniform(-0.02, 0.02)
+          storeLocations.append([lat, lon])
+
+      for _ in range(20):
+          lat = 37.5500 + random.uniform(-0.01, 0.01)
+          lon = 126.9900 + random.uniform(-0.01, 0.01)
+          storeLocations.append([lat, lon])
+
+      HeatMap(
+          storeLocations,
+          radius=20,
+          gradient={0.4: "yellow", 0.6: "orange", 1: "red"}
+      ).add_to(m10)
+
+      folium.Marker(
+          seoulCenter,
+          popup="본사",
+          icon=folium.Icon(color="blue", icon="home")
+      ).add_to(m10)
+
+      m10
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 히트맵 위에 마커를 추가하여 주요 위치를 강조합니다.
@@ -296,10 +879,220 @@ sections:
       m10
   - type: tip
     content: 밝은 배경(CartoDB Positron)에서 히트맵이 더 잘 보입니다.
-
 - id: step10_complete
   title: 10단계. 완성 예제
+  structuredPrimary: true
   subtitle: 인구 밀도 지도
+  goal: '10단계. 완성 예제: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 완성 예제: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 서울 주요 지역의 인구 밀도를 히트맵으로 시각화합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import random
+
+    densityMap = folium.Map(
+        location=[37.55, 126.98],
+        zoom_start=12,
+        tiles="CartoDB Dark_Matter"
+    )
+
+    densityData = []
+
+    gangnam = [37.4979, 127.0276]
+    for _ in range(80):
+        lat = gangnam[0] + random.uniform(-0.015, 0.015)
+        lon = gangnam[1] + random.uniform(-0.015, 0.015)
+        densityData.append([lat, lon, 0.8])
+
+    myeongdong = [37.5636, 126.9869]
+    for _ in range(60):
+        lat = myeongdong[0] + random.uniform(-0.01, 0.01)
+        lon = myeongdong[1] + random.uniform(-0.01, 0.01)
+        densityData.append([lat, lon, 0.9])
+
+    hongdae = [37.5563, 126.9236]
+    for _ in range(50):
+        lat = hongdae[0] + random.uniform(-0.012, 0.012)
+        lon = hongdae[1] + random.uniform(-0.012, 0.012)
+        densityData.append([lat, lon, 0.7])
+
+    for _ in range(100):
+        lat = 37.55 + random.uniform(-0.08, 0.08)
+        lon = 126.98 + random.uniform(-0.08, 0.08)
+        densityData.append([lat, lon, 0.2])
+
+    densityGradient = {
+        0.2: "#0000ff",
+        0.4: "#00ffff",
+        0.6: "#00ff00",
+        0.8: "#ffff00",
+        1.0: "#ff0000"
+    }
+
+    HeatMap(
+        densityData,
+        radius=25,
+        blur=20,
+        gradient=densityGradient,
+        min_opacity=0.4
+    ).add_to(densityMap)
+
+    hotspots = [
+        {"name": "강남", "loc": gangnam},
+        {"name": "명동", "loc": myeongdong},
+        {"name": "홍대", "loc": hongdae}
+    ]
+
+    for spot in hotspots:
+        folium.Marker(
+            location=spot["loc"],
+            popup=spot["name"],
+            icon=folium.Icon(color="white", icon="star")
+        ).add_to(densityMap)
+
+    densityMap
+  exercise:
+    prompt: '10단계. 완성 예제: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import random
+
+      densityMap = folium.Map(
+          location=[37.55, 126.98],
+          zoom_start=12,
+          tiles="CartoDB Dark_Matter"
+      )
+
+      densityData = []
+
+      gangnam = [37.4979, 127.0276]
+      for _ in range(80):
+          lat = gangnam[0] + random.uniform(-0.015, 0.015)
+          lon = gangnam[1] + random.uniform(-0.015, 0.015)
+          densityData.append([lat, lon, 0.8])
+
+      myeongdong = [37.5636, 126.9869]
+      for _ in range(60):
+          lat = myeongdong[0] + random.uniform(-0.01, 0.01)
+          lon = myeongdong[1] + random.uniform(-0.01, 0.01)
+          densityData.append([lat, lon, 0.9])
+
+      hongdae = [37.5563, 126.9236]
+      for _ in range(50):
+          lat = hongdae[0] + random.uniform(-0.012, 0.012)
+          lon = hongdae[1] + random.uniform(-0.012, 0.012)
+          densityData.append([lat, lon, 0.7])
+
+      for _ in range(100):
+          lat = 37.55 + random.uniform(-0.08, 0.08)
+          lon = 126.98 + random.uniform(-0.08, 0.08)
+          densityData.append([lat, lon, 0.2])
+
+      densityGradient = {
+          0.2: "#0000ff",
+          0.4: "#00ffff",
+          0.6: "#00ff00",
+          0.8: "#ffff00",
+          1.0: "#ff0000"
+      }
+
+      HeatMap(
+          densityData,
+          radius=25,
+          blur=20,
+          gradient=densityGradient,
+          min_opacity=0.4
+      ).add_to(densityMap)
+
+      hotspots = [
+          {"name": "강남", "loc": gangnam},
+          {"name": "명동", "loc": myeongdong},
+          {"name": "홍대", "loc": hongdae}
+      ]
+
+      for spot in hotspots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.Icon(color="white", icon="star")
+          ).add_to(densityMap)
+
+      densityMap
+    solution: |-
+      import random
+
+      densityMap = folium.Map(
+          location=[37.55, 126.98],
+          zoom_start=12,
+          tiles="CartoDB Dark_Matter"
+      )
+
+      densityData = []
+
+      gangnam = [37.4979, 127.0276]
+      for _ in range(80):
+          lat = gangnam[0] + random.uniform(-0.015, 0.015)
+          lon = gangnam[1] + random.uniform(-0.015, 0.015)
+          densityData.append([lat, lon, 0.8])
+
+      myeongdong = [37.5636, 126.9869]
+      for _ in range(60):
+          lat = myeongdong[0] + random.uniform(-0.01, 0.01)
+          lon = myeongdong[1] + random.uniform(-0.01, 0.01)
+          densityData.append([lat, lon, 0.9])
+
+      hongdae = [37.5563, 126.9236]
+      for _ in range(50):
+          lat = hongdae[0] + random.uniform(-0.012, 0.012)
+          lon = hongdae[1] + random.uniform(-0.012, 0.012)
+          densityData.append([lat, lon, 0.7])
+
+      for _ in range(100):
+          lat = 37.55 + random.uniform(-0.08, 0.08)
+          lon = 126.98 + random.uniform(-0.08, 0.08)
+          densityData.append([lat, lon, 0.2])
+
+      densityGradient = {
+          0.2: "#0000ff",
+          0.4: "#00ffff",
+          0.6: "#00ff00",
+          0.8: "#ffff00",
+          1.0: "#ff0000"
+      }
+
+      HeatMap(
+          densityData,
+          radius=25,
+          blur=20,
+          gradient=densityGradient,
+          min_opacity=0.4
+      ).add_to(densityMap)
+
+      hotspots = [
+          {"name": "강남", "loc": gangnam},
+          {"name": "명동", "loc": myeongdong},
+          {"name": "홍대", "loc": hongdae}
+      ]
+
+      for spot in hotspots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.Icon(color="white", icon="star")
+          ).add_to(densityMap)
+
+      densityMap
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 서울 주요 지역의 인구 밀도를 히트맵으로 시각화합니다.
@@ -371,19 +1164,92 @@ sections:
           ).add_to(densityMap)
 
       densityMap
-
 - id: step11_workflow
   title: 11단계. 실무 히트맵 검증
+  structuredPrimary: true
   subtitle: 예측 → 데이터 오류 확인 → 렌더 검증 → 기준 실험
+  goal: '11단계. 실무 히트맵 검증: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 실무 히트맵 검증: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을 바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
+
+    히트맵은 색보다 데이터 계약이 먼저입니다. 좌표, 가중치, 권역 합계, 렌더 결과를 검증하면 밀도 지도를 업무 리포트의 근거로 사용할 수 있습니다.
+  tips:
+  - 히트맵은 색보다 데이터 계약이 먼저입니다. 좌표, 가중치, 권역 합계, 렌더 결과를 검증하면 밀도 지도를 업무 리포트의 근거로 사용할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    complaintHeatRows = [
+        {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
+        {"district": "강남", "loc": [37.5010, 127.0310], "weight": 0.80, "type": "재고부족"},
+        {"district": "강남", "loc": [37.4930, 127.0240], "weight": 0.70, "type": "배송지연"},
+        {"district": "홍대", "loc": [37.5563, 126.9236], "weight": 0.65, "type": "응대지연"},
+        {"district": "홍대", "loc": [37.5580, 126.9255], "weight": 0.55, "type": "응대지연"},
+        {"district": "여의도", "loc": [37.5219, 126.9245], "weight": 0.45, "type": "배송지연"},
+        {"district": "여의도", "loc": [37.5260, 126.9290], "weight": 0.35, "type": "문의증가"},
+    ]
+
+    districtHeatScore = {}
+    for row in complaintHeatRows:
+        districtHeatScore[row["district"]] = districtHeatScore.get(row["district"], 0) + row["weight"]
+
+    hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
+    hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
+  exercise:
+    prompt: '11단계. 실무 히트맵 검증: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      complaintHeatRows = [
+          {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
+          {"district": "강남", "loc": [37.5010, 127.0310], "weight": 0.80, "type": "재고부족"},
+          {"district": "강남", "loc": [37.4930, 127.0240], "weight": 0.70, "type": "배송지연"},
+          {"district": "홍대", "loc": [37.5563, 126.9236], "weight": 0.65, "type": "응대지연"},
+          {"district": "홍대", "loc": [37.5580, 126.9255], "weight": 0.55, "type": "응대지연"},
+          {"district": "여의도", "loc": [37.5219, 126.9245], "weight": 0.45, "type": "배송지연"},
+          {"district": "여의도", "loc": [37.5260, 126.9290], "weight": 0.35, "type": "문의증가"},
+      ]
+
+      districtHeatScore = {}
+      for row in complaintHeatRows:
+          districtHeatScore[row["district"]] = districtHeatScore.get(row["district"], 0) + row["weight"]
+
+      hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
+      hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
+    solution: |-
+      complaintHeatRows = [
+          {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
+          {"district": "강남", "loc": [37.5010, 127.0310], "weight": 0.80, "type": "재고부족"},
+          {"district": "강남", "loc": [37.4930, 127.0240], "weight": 0.70, "type": "배송지연"},
+          {"district": "홍대", "loc": [37.5563, 126.9236], "weight": 0.65, "type": "응대지연"},
+          {"district": "홍대", "loc": [37.5580, 126.9255], "weight": 0.55, "type": "응대지연"},
+          {"district": "여의도", "loc": [37.5219, 126.9245], "weight": 0.45, "type": "배송지연"},
+          {"district": "여의도", "loc": [37.5260, 126.9290], "weight": 0.35, "type": "문의증가"},
+      ]
+
+      districtHeatScore = {}
+      for row in complaintHeatRows:
+          districtHeatScore[row["district"]] = districtHeatScore.get(row["district"], 0) + row["weight"]
+
+      hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
+      hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을 바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
+    content: 히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을
+      바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
   - type: list
     items:
-    - "실행 전에는 어느 권역이 가장 뜨거운 지역으로 보일지 먼저 예측합니다."
-    - "가중치가 0보다 작거나 1보다 크면 히트맵 색 해석이 무너지는 오류입니다."
-    - "지도 HTML에는 분석 기준을 설명하는 마커와 권역명이 들어갔는지 확인합니다."
-    - "가중치 기준을 바꾸면 고위험 권역 목록이 어떻게 달라지는지 실험합니다."
+    - 실행 전에는 어느 권역이 가장 뜨거운 지역으로 보일지 먼저 예측합니다.
+    - 가중치가 0보다 작거나 1보다 크면 히트맵 색 해석이 무너지는 오류입니다.
+    - 지도 HTML에는 분석 기준을 설명하는 마커와 권역명이 들어갔는지 확인합니다.
+    - 가중치 기준을 바꾸면 고위험 권역 목록이 어떻게 달라지는지 실험합니다.
   - type: code
     language: python
     title: 민원 히트맵 데이터 준비
@@ -495,15 +1361,87 @@ sections:
       strictHotDistricts, relaxedHotDistricts
   - type: tip
     content: 히트맵은 색보다 데이터 계약이 먼저입니다. 좌표, 가중치, 권역 합계, 렌더 결과를 검증하면 밀도 지도를 업무 리포트의 근거로 사용할 수 있습니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 히트맵
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap
+    import random
+    incidentData = []
+    hotspot1 = [37.57, 126.98]
+    for _ in range(40):
+        lat = hotspot1[0] + random.uniform(-0.008, 0.008)
+        lon = hotspot1[1] + random.uniform(-0.008, 0.008)
+        incidentData.append([lat, lon])
+
+    hotspot2 = [37.56, 126.99]
+    for _ in range(25):
+        lat = hotspot2[0] + random.uniform(-0.006, 0.006)
+        lon = hotspot2[1] + random.uniform(-0.006, 0.006)
+        incidentData.append([lat, lon])
+
+    len(incidentData)
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap
+      import random
+      incidentData = []
+      hotspot1 = [37.57, 126.98]
+      for _ in range(40):
+          lat = hotspot1[0] + random.uniform(-0.008, 0.008)
+          lon = hotspot1[1] + random.uniform(-0.008, 0.008)
+          incidentData.append([lat, lon])
+
+      hotspot2 = [37.56, 126.99]
+      for _ in range(25):
+          lat = hotspot2[0] + random.uniform(-0.006, 0.006)
+          lon = hotspot2[1] + random.uniform(-0.006, 0.006)
+          incidentData.append([lat, lon])
+
+      len(incidentData)
+    solution: |-
+      import folium
+      from folium.plugins import HeatMap
+      import random
+      incidentData = []
+      hotspot1 = [37.57, 126.98]
+      for _ in range(40):
+          lat = hotspot1[0] + random.uniform(-0.008, 0.008)
+          lon = hotspot1[1] + random.uniform(-0.008, 0.008)
+          incidentData.append([lat, lon])
+
+      hotspot2 = [37.56, 126.99]
+      for _ in range(25):
+          lat = hotspot2[0] + random.uniform(-0.006, 0.006)
+          lon = hotspot2[1] + random.uniform(-0.006, 0.006)
+          incidentData.append([lat, lon])
+
+      len(incidentData)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   - type: expansion
-    title: "미션1: 사건 발생 히트맵"
+    title: '미션1: 사건 발생 히트맵'
     blocks:
     - type: code
       title: 데이터 준비
@@ -546,7 +1484,7 @@ sections:
 
         incidentMap
   - type: expansion
-    title: "미션2: 매장 밀집도"
+    title: '미션2: 매장 밀집도'
     blocks:
     - type: code
       title: 데이터 준비

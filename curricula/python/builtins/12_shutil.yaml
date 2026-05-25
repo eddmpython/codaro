@@ -1,45 +1,131 @@
 meta:
-  id: "12_shutil"
-  title: "shutil - 파일 연산"
-  category: "builtins"
-  tags: ["shutil", "파일", "복사", "이동", "압축"]
+  id: 12_shutil
+  title: shutil - 파일 연산
+  category: builtins
+  tags:
+  - shutil
+  - 파일
+  - 복사
+  - 이동
+  - 압축
   seo:
-    title: "파이썬 shutil 모듈 완전 정복"
-    description: "shutil 모듈로 파일 복사, 이동, 압축을 배웁니다."
-    keywords: ["shutil", "파일복사", "파일이동", "압축", "파이썬파일"]
-
+    title: 파이썬 shutil 모듈 완전 정복
+    description: shutil 모듈로 파일 복사, 이동, 압축을 배웁니다.
+    keywords:
+    - shutil
+    - 파일복사
+    - 파일이동
+    - 압축
+    - 파이썬파일
 intro:
-  emoji: "📋"
+  emoji: 📋
   points:
-  - "파일 복사와 이동"
-  - "디렉토리 전체 작업"
-  - "압축 파일 생성/해제"
-  - "디스크 사용량 확인"
-
+  - 파일 복사와 이동
+  - 디렉토리 전체 작업
+  - 압축 파일 생성/해제
+  - 디스크 사용량 확인
 sections:
-- id: "module_import"
-  title: "shutil 모듈 불러오기"
-  subtitle: "⚠️ 가장 먼저 실행하세요"
+- id: module_import
+  title: shutil 모듈 불러오기
+  structuredPrimary: true
+  subtitle: ⚠️ 가장 먼저 실행하세요
+  goal: 'shutil 모듈 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'shutil 모듈 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: shutil은 파일과 디렉토리를 고수준으로 다루는 모듈입니다. 복사, 이동, 삭제, 압축 등의 작업을 간단하게 수행할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: import shutil
+  exercise:
+    prompt: 'shutil 모듈 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: import shutil
+    solution: import shutil
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "shutil은 파일과 디렉토리를 고수준으로 다루는 모듈입니다. 복사, 이동, 삭제, 압축 등의 작업을 간단하게 수행할 수 있습니다."
-  - type: "code"
-    language: "python"
-    title: "shutil 모듈 불러오기"
-    description: "shutil 모듈을 불러옵니다."
-    content: |-
-      import shutil
+  - type: text
+    content: shutil은 파일과 디렉토리를 고수준으로 다루는 모듈입니다. 복사, 이동, 삭제, 압축 등의 작업을 간단하게 수행할 수 있습니다.
+  - type: code
+    language: python
+    title: shutil 모듈 불러오기
+    description: shutil 모듈을 불러옵니다.
+    content: import shutil
+- id: file_operations
+  title: 파일 복사/이동
+  structuredPrimary: true
+  subtitle: 파일 단위 작업
+  goal: '파일 복사/이동: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '파일 복사/이동: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: copy는 파일을 복사하고, copy2는 메타데이터도 복사합니다. move는 파일을 이동하거나 이름을 변경합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    import tempfile
+    import os
 
-- id: "file_operations"
-  title: "파일 복사/이동"
-  subtitle: "파일 단위 작업"
+    tempDir = tempfile.mkdtemp()
+    sourceFile = os.path.join(tempDir, "source.txt")
+    with open(sourceFile, "w") as f:
+        f.write("Original content")
+
+    destFile = os.path.join(tempDir, "dest.txt")
+    shutil.copy(sourceFile, destFile)
+    os.path.exists(destFile)
+  exercise:
+    prompt: '파일 복사/이동: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("Original content")
+
+      destFile = os.path.join(tempDir, "dest.txt")
+      shutil.copy(sourceFile, destFile)
+      os.path.exists(destFile)
+    solution: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("Original content")
+
+      destFile = os.path.join(tempDir, "dest.txt")
+      shutil.copy(sourceFile, destFile)
+      os.path.exists(destFile)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "copy는 파일을 복사하고, copy2는 메타데이터도 복사합니다. move는 파일을 이동하거나 이름을 변경합니다."
-  - type: "code"
-    language: "python"
-    title: "파일 복사"
-    description: "파일을 복사합니다."
+  - type: text
+    content: copy는 파일을 복사하고, copy2는 메타데이터도 복사합니다. move는 파일을 이동하거나 이름을 변경합니다.
+  - type: code
+    language: python
+    title: 파일 복사
+    description: 파일을 복사합니다.
     content: |-
       import shutil
       import tempfile
@@ -53,10 +139,10 @@ sections:
       destFile = os.path.join(tempDir, "dest.txt")
       shutil.copy(sourceFile, destFile)
       os.path.exists(destFile)
-  - type: "code"
-    language: "python"
-    title: "메타데이터 포함 복사"
-    description: "파일을 메타데이터와 함께 복사합니다."
+  - type: code
+    language: python
+    title: 메타데이터 포함 복사
+    description: 파일을 메타데이터와 함께 복사합니다.
     content: |-
       import shutil
       import tempfile
@@ -71,10 +157,10 @@ sections:
       shutil.copy2(originalFile, copiedFile)
       with open(copiedFile, "r") as f:
           f.read()
-  - type: "code"
-    language: "python"
-    title: "파일 이동"
-    description: "파일을 이동합니다."
+  - type: code
+    language: python
+    title: 파일 이동
+    description: 파일을 이동합니다.
     content: |-
       import shutil
       import tempfile
@@ -88,10 +174,10 @@ sections:
       newPath = os.path.join(tempDir, "new.txt")
       shutil.move(oldPath, newPath)
       os.path.exists(newPath)
-  - type: "code"
-    language: "python"
-    title: "이동 후 원본 확인"
-    description: "파일 이동 후 원본이 사라졌는지 확인합니다."
+  - type: code
+    language: python
+    title: 이동 후 원본 확인
+    description: 파일 이동 후 원본이 사라졌는지 확인합니다.
     content: |-
       import shutil
       import tempfile
@@ -105,10 +191,10 @@ sections:
       movedFile = os.path.join(tempDir, "moved.txt")
       shutil.move(fileToMove, movedFile)
       os.path.exists(fileToMove)
-  - type: "code"
-    language: "python"
-    title: "복사 결과 확인"
-    description: "복사된 파일의 경로를 확인합니다."
+  - type: code
+    language: python
+    title: 복사 결과 확인
+    description: 복사된 파일의 경로를 확인합니다.
     content: |-
       import shutil
       import tempfile
@@ -122,17 +208,77 @@ sections:
       dstFile = os.path.join(tempDir, "dst.txt")
       result = shutil.copy(srcFile, dstFile)
       os.path.basename(result)
+- id: directory_operations
+  title: 디렉토리 작업
+  structuredPrimary: true
+  subtitle: 디렉토리 단위 작업
+  goal: '디렉토리 작업: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '디렉토리 작업: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: copytree는 디렉토리를 재귀적으로 복사합니다. rmtree는 디렉토리와 내용을 모두 삭제합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    import tempfile
+    import os
 
-- id: "directory_operations"
-  title: "디렉토리 작업"
-  subtitle: "디렉토리 단위 작업"
+    tempDir = tempfile.mkdtemp()
+    srcDir = os.path.join(tempDir, "source")
+    os.makedirs(srcDir)
+    with open(os.path.join(srcDir, "file.txt"), "w") as f:
+        f.write("Data")
+
+    dstDir = os.path.join(tempDir, "destination")
+    shutil.copytree(srcDir, dstDir)
+    os.path.exists(dstDir)
+  exercise:
+    prompt: '디렉토리 작업: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcDir = os.path.join(tempDir, "source")
+      os.makedirs(srcDir)
+      with open(os.path.join(srcDir, "file.txt"), "w") as f:
+          f.write("Data")
+
+      dstDir = os.path.join(tempDir, "destination")
+      shutil.copytree(srcDir, dstDir)
+      os.path.exists(dstDir)
+    solution: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcDir = os.path.join(tempDir, "source")
+      os.makedirs(srcDir)
+      with open(os.path.join(srcDir, "file.txt"), "w") as f:
+          f.write("Data")
+
+      dstDir = os.path.join(tempDir, "destination")
+      shutil.copytree(srcDir, dstDir)
+      os.path.exists(dstDir)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "copytree는 디렉토리를 재귀적으로 복사합니다. rmtree는 디렉토리와 내용을 모두 삭제합니다."
-  - type: "code"
-    language: "python"
-    title: "디렉토리 복사"
-    description: "디렉토리를 재귀적으로 복사합니다."
+  - type: text
+    content: copytree는 디렉토리를 재귀적으로 복사합니다. rmtree는 디렉토리와 내용을 모두 삭제합니다.
+  - type: code
+    language: python
+    title: 디렉토리 복사
+    description: 디렉토리를 재귀적으로 복사합니다.
     content: |-
       import shutil
       import tempfile
@@ -147,10 +293,10 @@ sections:
       dstDir = os.path.join(tempDir, "destination")
       shutil.copytree(srcDir, dstDir)
       os.path.exists(dstDir)
-  - type: "code"
-    language: "python"
-    title: "복사 후 내부 파일 확인"
-    description: "복사된 디렉토리 내부 파일을 확인합니다."
+  - type: code
+    language: python
+    title: 복사 후 내부 파일 확인
+    description: 복사된 디렉토리 내부 파일을 확인합니다.
     content: |-
       import shutil
       import tempfile
@@ -165,10 +311,10 @@ sections:
       destDir = os.path.join(tempDir, "dst")
       shutil.copytree(sourceDir, destDir)
       os.path.exists(os.path.join(destDir, "test.txt"))
-  - type: "code"
-    language: "python"
-    title: "디렉토리 삭제"
-    description: "디렉토리와 내용을 모두 삭제합니다."
+  - type: code
+    language: python
+    title: 디렉토리 삭제
+    description: 디렉토리와 내용을 모두 삭제합니다.
     content: |-
       import shutil
       import tempfile
@@ -182,10 +328,10 @@ sections:
 
       shutil.rmtree(dirToRemove)
       os.path.exists(dirToRemove)
-  - type: "code"
-    language: "python"
-    title: "중첩 디렉토리 복사"
-    description: "중첩된 디렉토리 구조를 복사합니다."
+  - type: code
+    language: python
+    title: 중첩 디렉토리 복사
+    description: 중첩된 디렉토리 구조를 복사합니다.
     content: |-
       import shutil
       import tempfile
@@ -200,10 +346,10 @@ sections:
       copiedDir = os.path.join(tempDir, "copied")
       shutil.copytree(os.path.join(tempDir, "parent"), copiedDir)
       os.path.exists(os.path.join(copiedDir, "child", "data.txt"))
-  - type: "code"
-    language: "python"
-    title: "하위 디렉토리 포함 삭제"
-    description: "하위 디렉토리를 포함하여 삭제합니다."
+  - type: code
+    language: python
+    title: 하위 디렉토리 포함 삭제
+    description: 하위 디렉토리를 포함하여 삭제합니다.
     content: |-
       import shutil
       import tempfile
@@ -217,17 +363,77 @@ sections:
 
       shutil.rmtree(testDir)
       os.path.exists(subDir)
+- id: archive_operations
+  title: 압축 파일
+  structuredPrimary: true
+  subtitle: 압축 생성 및 해제
+  goal: '압축 파일: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '압축 파일: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Codaro 로컬 커널에서는 임시 디렉터리에서 안전하게 생성과 해제를 실습할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    import tempfile
+    import os
 
-- id: "archive_operations"
-  title: "압축 파일"
-  subtitle: "압축 생성 및 해제"
+    tempDir = tempfile.mkdtemp()
+    sourceDir = os.path.join(tempDir, "data")
+    os.makedirs(sourceDir)
+    with open(os.path.join(sourceDir, "file.txt"), "w") as f:
+        f.write("Archive me")
+
+    archivePath = os.path.join(tempDir, "archive")
+    result = shutil.make_archive(archivePath, 'zip', sourceDir)
+    os.path.exists(result)
+  exercise:
+    prompt: '압축 파일: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceDir = os.path.join(tempDir, "data")
+      os.makedirs(sourceDir)
+      with open(os.path.join(sourceDir, "file.txt"), "w") as f:
+          f.write("Archive me")
+
+      archivePath = os.path.join(tempDir, "archive")
+      result = shutil.make_archive(archivePath, 'zip', sourceDir)
+      os.path.exists(result)
+    solution: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceDir = os.path.join(tempDir, "data")
+      os.makedirs(sourceDir)
+      with open(os.path.join(sourceDir, "file.txt"), "w") as f:
+          f.write("Archive me")
+
+      archivePath = os.path.join(tempDir, "archive")
+      result = shutil.make_archive(archivePath, 'zip', sourceDir)
+      os.path.exists(result)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Codaro 로컬 커널에서는 임시 디렉터리에서 안전하게 생성과 해제를 실습할 수 있습니다."
-  - type: "code"
-    language: "python"
-    title: "압축 파일 생성"
-    description: "디렉토리를 zip으로 압축합니다."
+  - type: text
+    content: make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Codaro 로컬 커널에서는 임시 디렉터리에서 안전하게 생성과 해제를 실습할 수 있습니다.
+  - type: code
+    language: python
+    title: 압축 파일 생성
+    description: 디렉토리를 zip으로 압축합니다.
     content: |-
       import shutil
       import tempfile
@@ -242,10 +448,10 @@ sections:
       archivePath = os.path.join(tempDir, "archive")
       result = shutil.make_archive(archivePath, 'zip', sourceDir)
       os.path.exists(result)
-  - type: "code"
-    language: "python"
-    title: "압축 파일명 확인"
-    description: "생성된 압축 파일명을 확인합니다."
+  - type: code
+    language: python
+    title: 압축 파일명 확인
+    description: 생성된 압축 파일명을 확인합니다.
     content: |-
       import shutil
       import tempfile
@@ -260,10 +466,10 @@ sections:
       archiveName = os.path.join(tempDir, "myarchive")
       shutil.make_archive(archiveName, 'zip', dataDir)
       os.path.basename(archiveName + '.zip')
-  - type: "code"
-    language: "python"
-    title: "압축 해제"
-    description: "zip 파일을 해제합니다."
+  - type: code
+    language: python
+    title: 압축 해제
+    description: zip 파일을 해제합니다.
     content: |-
       import shutil
       import tempfile
@@ -280,10 +486,10 @@ sections:
       extractDir = os.path.join(tempDir, "extracted")
       shutil.unpack_archive(zipPath + '.zip', extractDir)
       os.path.exists(extractDir)
-  - type: "code"
-    language: "python"
-    title: "압축 해제 후 파일 확인"
-    description: "압축 해제 후 내부 파일을 확인합니다."
+  - type: code
+    language: python
+    title: 압축 해제 후 파일 확인
+    description: 압축 해제 후 내부 파일을 확인합니다.
     content: |-
       import shutil
       import tempfile
@@ -300,71 +506,161 @@ sections:
       unpackDir = os.path.join(tempDir, "unpacked")
       shutil.unpack_archive(archiveBase + '.zip', unpackDir)
       os.path.exists(os.path.join(unpackDir, "test.txt"))
-  - type: "code"
-    language: "python"
-    title: "지원 압축 형식 확인"
-    description: "지원하는 압축 형식을 확인합니다."
+  - type: code
+    language: python
+    title: 지원 압축 형식 확인
+    description: 지원하는 압축 형식을 확인합니다.
     content: |-
       import shutil
       shutil.get_archive_formats()[:2]
-
-- id: "disk_usage"
-  title: "디스크 사용량"
-  subtitle: "디스크 정보 확인"
+- id: disk_usage
+  title: 디스크 사용량
+  structuredPrimary: true
+  subtitle: 디스크 정보 확인
+  goal: '디스크 사용량: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '디스크 사용량: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공하며, Codaro 로컬 커널에서는 지정한 로컬 경로가 위치한 디스크 기준으로 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    usageInfo = shutil.disk_usage("/")
+    type(usageInfo).__name__
+  exercise:
+    prompt: '디스크 사용량: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      usageInfo = shutil.disk_usage("/")
+      type(usageInfo).__name__
+    solution: |-
+      import shutil
+      usageInfo = shutil.disk_usage("/")
+      type(usageInfo).__name__
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공하며, Codaro 로컬 커널에서는 지정한 로컬 경로가 위치한 디스크 기준으로 확인합니다."
-  - type: "code"
-    language: "python"
-    title: "디스크 사용량 타입"
-    description: "디스크 사용량 객체 타입을 확인합니다."
+  - type: text
+    content: disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공하며, Codaro 로컬 커널에서는 지정한 로컬 경로가 위치한 디스크 기준으로 확인합니다.
+  - type: code
+    language: python
+    title: 디스크 사용량 타입
+    description: 디스크 사용량 객체 타입을 확인합니다.
     content: |-
       import shutil
       usageInfo = shutil.disk_usage("/")
       type(usageInfo).__name__
-  - type: "code"
-    language: "python"
-    title: "사용량 정보 개수"
-    description: "반환되는 정보 개수를 확인합니다."
+  - type: code
+    language: python
+    title: 사용량 정보 개수
+    description: 반환되는 정보 개수를 확인합니다.
     content: |-
       import shutil
       diskInfo = shutil.disk_usage(".")
       len(diskInfo)
-  - type: "code"
-    language: "python"
-    title: "전체 용량 확인"
-    description: "디스크 전체 용량을 확인합니다."
+  - type: code
+    language: python
+    title: 전체 용량 확인
+    description: 디스크 전체 용량을 확인합니다.
     content: |-
       import shutil
       usage = shutil.disk_usage("/")
       usage.total > 0
-  - type: "code"
-    language: "python"
-    title: "사용 용량 확인"
-    description: "디스크 사용 용량을 확인합니다."
+  - type: code
+    language: python
+    title: 사용 용량 확인
+    description: 디스크 사용 용량을 확인합니다.
     content: |-
       import shutil
       stats = shutil.disk_usage(".")
       stats.used >= 0
-  - type: "code"
-    language: "python"
-    title: "여유 공간 확인"
-    description: "디스크 여유 공간을 확인합니다."
+  - type: code
+    language: python
+    title: 여유 공간 확인
+    description: 디스크 여유 공간을 확인합니다.
     content: |-
       import shutil
       info = shutil.disk_usage("/")
       info.free >= 0
+- id: practical_use
+  title: 실전 활용
+  structuredPrimary: true
+  subtitle: 실무 계산 예제
+  goal: '실전 활용: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실전 활용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: shutil을 활용한 백업, 배포, 정리 작업 예제입니다. 실무에서 자주 사용되는 패턴을 학습합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    import tempfile
+    import os
 
-- id: "practical_use"
-  title: "실전 활용"
-  subtitle: "실무 계산 예제"
+    tempDir = tempfile.mkdtemp()
+    projectDir = os.path.join(tempDir, "project")
+    os.makedirs(projectDir)
+    with open(os.path.join(projectDir, "main.py"), "w") as f:
+        f.write("code")
+
+    backupDir = os.path.join(tempDir, "backup")
+    shutil.copytree(projectDir, backupDir)
+    os.path.exists(backupDir)
+  exercise:
+    prompt: '실전 활용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      projectDir = os.path.join(tempDir, "project")
+      os.makedirs(projectDir)
+      with open(os.path.join(projectDir, "main.py"), "w") as f:
+          f.write("code")
+
+      backupDir = os.path.join(tempDir, "backup")
+      shutil.copytree(projectDir, backupDir)
+      os.path.exists(backupDir)
+    solution: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      projectDir = os.path.join(tempDir, "project")
+      os.makedirs(projectDir)
+      with open(os.path.join(projectDir, "main.py"), "w") as f:
+          f.write("code")
+
+      backupDir = os.path.join(tempDir, "backup")
+      shutil.copytree(projectDir, backupDir)
+      os.path.exists(backupDir)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "shutil을 활용한 백업, 배포, 정리 작업 예제입니다. 실무에서 자주 사용되는 패턴을 학습합니다."
-  - type: "code"
-    language: "python"
-    title: "프로젝트 백업"
-    description: "프로젝트 디렉토리를 백업합니다."
+  - type: text
+    content: shutil을 활용한 백업, 배포, 정리 작업 예제입니다. 실무에서 자주 사용되는 패턴을 학습합니다.
+  - type: code
+    language: python
+    title: 프로젝트 백업
+    description: 프로젝트 디렉토리를 백업합니다.
     content: |-
       import shutil
       import tempfile
@@ -379,10 +675,10 @@ sections:
       backupDir = os.path.join(tempDir, "backup")
       shutil.copytree(projectDir, backupDir)
       os.path.exists(backupDir)
-  - type: "code"
-    language: "python"
-    title: "로그 압축 보관"
-    description: "로그 파일을 압축하여 보관합니다."
+  - type: code
+    language: python
+    title: 로그 압축 보관
+    description: 로그 파일을 압축하여 보관합니다.
     content: |-
       import shutil
       import tempfile
@@ -398,10 +694,10 @@ sections:
       archivePath = os.path.join(tempDir, "logs_backup")
       shutil.make_archive(archivePath, 'zip', logDir)
       os.path.exists(archivePath + '.zip')
-  - type: "code"
-    language: "python"
-    title: "디렉토리 이름 변경"
-    description: "디렉토리를 이동하여 이름을 변경합니다."
+  - type: code
+    language: python
+    title: 디렉토리 이름 변경
+    description: 디렉토리를 이동하여 이름을 변경합니다.
     content: |-
       import shutil
       import tempfile
@@ -416,10 +712,10 @@ sections:
       newDir = os.path.join(tempDir, "new")
       shutil.move(oldDir, newDir)
       os.path.exists(newDir)
-  - type: "code"
-    language: "python"
-    title: "캐시 정리"
-    description: "캐시 디렉토리를 삭제합니다."
+  - type: code
+    language: python
+    title: 캐시 정리
+    description: 캐시 디렉토리를 삭제합니다.
     content: |-
       import shutil
       import tempfile
@@ -434,10 +730,10 @@ sections:
 
       shutil.rmtree(cacheDir)
       os.path.exists(cacheDir)
-  - type: "code"
-    language: "python"
-    title: "릴리스 패키징"
-    description: "배포용 디렉토리를 복사하고 압축합니다."
+  - type: code
+    language: python
+    title: 릴리스 패키징
+    description: 배포용 디렉토리를 복사하고 압축합니다.
     content: |-
       import shutil
       import tempfile
@@ -454,17 +750,136 @@ sections:
       releaseArchive = os.path.join(tempDir, "release")
       result = shutil.make_archive(releaseArchive, 'zip', releaseDir)
       os.path.exists(result)
+- id: workflow_validation
+  title: '검증 루프: 안전한 백업 파이프라인'
+  structuredPrimary: true
+  subtitle: 복사, 압축, 검증, _backup 이동
+  goal: '검증 루프: 안전한 백업 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '검증 루프: 안전한 백업 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    shutil은 실제 파일을 복사·이동·삭제할 수 있으므로 실무에서는 작업공간을 먼저 격리하고, 복사 전후 파일 수와 압축 결과를 검증해야 합니다. 삭제 대신 _backup 이동 패턴을 사용하면 되돌릴 여지도 남길 수 있습니다.
 
-- id: "workflow_validation"
-  title: "검증 루프: 안전한 백업 파이프라인"
-  subtitle: "복사, 압축, 검증, _backup 이동"
+    변주 실험
+    압축 파일 이름에 날짜를 붙이고, 같은 이름이 이미 있으면 덮어쓰기 대신 새 버전을 만들도록 백업 정책을 확장하세요.
+  tips:
+  - 변주 실험 압축 파일 이름에 날짜를 붙이고, 같은 이름이 이미 있으면 덮어쓰기 대신 새 버전을 만들도록 백업 정책을 확장하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import os
+    import shutil
+    import tempfile
+
+    backupRoot = tempfile.mkdtemp(prefix='codaro_shutil_workflow_')
+    projectDir = os.path.join(backupRoot, 'project')
+    os.makedirs(os.path.join(projectDir, 'src'), exist_ok=True)
+    os.makedirs(os.path.join(projectDir, 'data'), exist_ok=True)
+
+    projectFiles = {
+        os.path.join(projectDir, 'src', 'main.py'): "print('hello')\n",
+        os.path.join(projectDir, 'src', 'utils.py'): "VALUE = 42\n",
+        os.path.join(projectDir, 'data', 'sample.csv'): "id,value\n1,10\n",
+    }
+
+    for path, content in projectFiles.items():
+        with open(path, 'w', encoding='utf-8') as file:
+            file.write(content)
+
+    def countFiles(folder):
+        total = 0
+        for root, dirs, files in os.walk(folder):
+            total += len(files)
+        return total
+
+    sourceFileCount = countFiles(projectDir)
+
+    assert sourceFileCount == 3
+    assert os.path.exists(os.path.join(projectDir, 'src', 'main.py'))
+
+    sourceFileCount
+  exercise:
+    prompt: '검증 루프: 안전한 백업 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import os
+      import shutil
+      import tempfile
+
+      backupRoot = tempfile.mkdtemp(prefix='codaro_shutil_workflow_')
+      projectDir = os.path.join(backupRoot, 'project')
+      os.makedirs(os.path.join(projectDir, 'src'), exist_ok=True)
+      os.makedirs(os.path.join(projectDir, 'data'), exist_ok=True)
+
+      projectFiles = {
+          os.path.join(projectDir, 'src', 'main.py'): "print('hello')\n",
+          os.path.join(projectDir, 'src', 'utils.py'): "VALUE = 42\n",
+          os.path.join(projectDir, 'data', 'sample.csv'): "id,value\n1,10\n",
+      }
+
+      for path, content in projectFiles.items():
+          with open(path, 'w', encoding='utf-8') as file:
+              file.write(content)
+
+      def countFiles(folder):
+          total = 0
+          for root, dirs, files in os.walk(folder):
+              total += len(files)
+          return total
+
+      sourceFileCount = countFiles(projectDir)
+
+      assert sourceFileCount == 3
+      assert os.path.exists(os.path.join(projectDir, 'src', 'main.py'))
+
+      sourceFileCount
+    solution: |-
+      import os
+      import shutil
+      import tempfile
+
+      backupRoot = tempfile.mkdtemp(prefix='codaro_shutil_workflow_')
+      projectDir = os.path.join(backupRoot, 'project')
+      os.makedirs(os.path.join(projectDir, 'src'), exist_ok=True)
+      os.makedirs(os.path.join(projectDir, 'data'), exist_ok=True)
+
+      projectFiles = {
+          os.path.join(projectDir, 'src', 'main.py'): "print('hello')\n",
+          os.path.join(projectDir, 'src', 'utils.py'): "VALUE = 42\n",
+          os.path.join(projectDir, 'data', 'sample.csv'): "id,value\n1,10\n",
+      }
+
+      for path, content in projectFiles.items():
+          with open(path, 'w', encoding='utf-8') as file:
+              file.write(content)
+
+      def countFiles(folder):
+          total = 0
+          for root, dirs, files in os.walk(folder):
+              total += len(files)
+          return total
+
+      sourceFileCount = countFiles(projectDir)
+
+      assert sourceFileCount == 3
+      assert os.path.exists(os.path.join(projectDir, 'src', 'main.py'))
+
+      sourceFileCount
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "shutil은 실제 파일을 복사·이동·삭제할 수 있으므로 실무에서는 작업공간을 먼저 격리하고, 복사 전후 파일 수와 압축 결과를 검증해야 합니다. 삭제 대신 _backup 이동 패턴을 사용하면 되돌릴 여지도 남길 수 있습니다."
-  - type: "code"
-    language: "python"
-    title: "백업 대상 프로젝트 준비"
-    description: "임시 프로젝트를 만들고 복사 전 파일 매니페스트를 계산합니다."
+  - type: text
+    content: shutil은 실제 파일을 복사·이동·삭제할 수 있으므로 실무에서는 작업공간을 먼저 격리하고, 복사 전후 파일 수와 압축 결과를 검증해야 합니다. 삭제 대신 _backup 이동 패턴을 사용하면 되돌릴
+      여지도 남길 수 있습니다.
+  - type: code
+    language: python
+    title: 백업 대상 프로젝트 준비
+    description: 임시 프로젝트를 만들고 복사 전 파일 매니페스트를 계산합니다.
     content: |-
       import os
       import shutil
@@ -497,10 +912,10 @@ sections:
       assert os.path.exists(os.path.join(projectDir, 'src', 'main.py'))
 
       sourceFileCount
-  - type: "code"
-    language: "python"
-    title: "copytree 충돌 오류 잡기"
-    description: "대상 폴더가 이미 있으면 copytree가 실패하는 상황을 검증합니다."
+  - type: code
+    language: python
+    title: copytree 충돌 오류 잡기
+    description: 대상 폴더가 이미 있으면 copytree가 실패하는 상황을 검증합니다.
     content: |-
       backupDir = os.path.join(backupRoot, 'backup_copy')
       shutil.copytree(projectDir, backupDir)
@@ -514,10 +929,10 @@ sections:
       assert copyProblem
 
       copyProblem
-  - type: "code"
-    language: "python"
-    title: "압축 백업 검증"
-    description: "백업 폴더를 zip으로 압축하고 해제 후 파일 수를 비교합니다."
+  - type: code
+    language: python
+    title: 압축 백업 검증
+    description: 백업 폴더를 zip으로 압축하고 해제 후 파일 수를 비교합니다.
     content: |-
       archiveBase = os.path.join(backupRoot, 'project_backup')
       archivePath = shutil.make_archive(archiveBase, 'zip', backupDir)
@@ -529,10 +944,10 @@ sections:
       assert countFiles(unpackDir) == sourceFileCount
 
       {"archive": archivePath, "unpackedFiles": countFiles(unpackDir)}
-  - type: "code"
-    language: "python"
-    title: "삭제 대신 _backup 이동"
-    description: "정리 대상 폴더를 삭제하지 않고 _backup 아래로 이동합니다."
+  - type: code
+    language: python
+    title: 삭제 대신 _backup 이동
+    description: 정리 대상 폴더를 삭제하지 않고 _backup 아래로 이동합니다.
     content: |-
       cleanupTarget = os.path.join(backupRoot, 'old_output')
       os.makedirs(cleanupTarget, exist_ok=True)
@@ -553,10 +968,10 @@ sections:
       assert os.path.commonpath([backupShelf, archivedTarget]) == backupShelf
 
       archivedTarget
-  - type: "code"
-    language: "python"
-    title: "백업 이름 오류 확인"
-    description: "경로 구분자가 들어간 백업 이름은 작업공간 밖 이동 위험이 있어 차단합니다."
+  - type: code
+    language: python
+    title: 백업 이름 오류 확인
+    description: 경로 구분자가 들어간 백업 이름은 작업공간 밖 이동 위험이 있어 차단합니다.
     content: |-
       def validateBackupName(name):
           if os.path.basename(name) != name:
@@ -570,19 +985,75 @@ sections:
 
       assert backupNameMessage == "backup name must not contain path separators"
       assert validateBackupName("old_output") == "old_output"
-  - type: "tip"
-    title: "변주 실험"
-    content: "압축 파일 이름에 날짜를 붙이고, 같은 이름이 이미 있으면 덮어쓰기 대신 새 버전을 만들도록 백업 정책을 확장하세요."
+  - type: tip
+    title: 변주 실험
+    content: 압축 파일 이름에 날짜를 붙이고, 같은 이름이 이미 있으면 덮어쓰기 대신 새 버전을 만들도록 백업 정책을 확장하세요.
+- id: practice
+  title: shutil 모듈 종합 복습
+  structuredPrimary: true
+  subtitle: 파일 연산 마스터하기
+  goal: 'shutil 모듈 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'shutil 모듈 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 지금까지 배운 shutil 모듈의 모든 기능을 복습합니다. 🟢 기초 5개, 🟡 중급 5개, 🔴 고급 10개 문제를 풀어보세요.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import shutil
+    import tempfile
+    import os
 
-- id: "practice"
-  title: "shutil 모듈 종합 복습"
-  subtitle: "파일 연산 마스터하기"
+    tempDir = tempfile.mkdtemp()
+    sourceFile = os.path.join(tempDir, "source.txt")
+    with open(sourceFile, "w") as f:
+        f.write("data")
+
+    backupFile = os.path.join(tempDir, "backup.txt")
+    shutil.copy(sourceFile, backupFile)
+    os.path.exists(backupFile)
+  exercise:
+    prompt: 'shutil 모듈 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("data")
+
+      backupFile = os.path.join(tempDir, "backup.txt")
+      shutil.copy(sourceFile, backupFile)
+      os.path.exists(backupFile)
+    solution: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("data")
+
+      backupFile = os.path.join(tempDir, "backup.txt")
+      shutil.copy(sourceFile, backupFile)
+      os.path.exists(backupFile)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "지금까지 배운 shutil 모듈의 모든 기능을 복습합니다. 🟢 기초 5개, 🟡 중급 5개, 🔴 고급 10개 문제를 풀어보세요."
-
-  - type: "expansion"
-    title: "🟢 기초1: 파일 복사"
+  - type: text
+    content: 지금까지 배운 shutil 모듈의 모든 기능을 복습합니다. 🟢 기초 5개, 🟡 중급 5개, 🔴 고급 10개 문제를 풀어보세요.
+  - type: expansion
+    title: '🟢 기초1: 파일 복사'
     code: |-
       import shutil
       import tempfile
@@ -596,9 +1067,8 @@ sections:
       backupFile = os.path.join(tempDir, "backup.txt")
       shutil.copy(sourceFile, backupFile)
       os.path.exists(backupFile)
-
-  - type: "expansion"
-    title: "🟢 기초2: 파일 이동"
+  - type: expansion
+    title: '🟢 기초2: 파일 이동'
     code: |-
       import shutil
       import tempfile
@@ -612,9 +1082,8 @@ sections:
       newFile = os.path.join(tempDir, "new.txt")
       shutil.move(oldFile, newFile)
       os.path.exists(newFile)
-
-  - type: "expansion"
-    title: "🟢 기초3: 디렉토리 삭제"
+  - type: expansion
+    title: '🟢 기초3: 디렉토리 삭제'
     code: |-
       import shutil
       import tempfile
@@ -625,23 +1094,20 @@ sections:
       os.makedirs(removeDir)
       shutil.rmtree(removeDir)
       os.path.exists(removeDir)
-
-  - type: "expansion"
-    title: "🟢 기초4: 디스크 사용량 확인"
+  - type: expansion
+    title: '🟢 기초4: 디스크 사용량 확인'
     code: |-
       import shutil
       usage = shutil.disk_usage("/")
       usage.total > 0
-
-  - type: "expansion"
-    title: "🟢 기초5: 압축 형식 개수"
+  - type: expansion
+    title: '🟢 기초5: 압축 형식 개수'
     code: |-
       import shutil
       formats = shutil.get_archive_formats()
       len(formats) >= 5
-
-  - type: "expansion"
-    title: "🟡 중급1: 디렉토리 복사"
+  - type: expansion
+    title: '🟡 중급1: 디렉토리 복사'
     code: |-
       import shutil
       import tempfile
@@ -656,9 +1122,8 @@ sections:
       dstDir = os.path.join(tempDir, "dst")
       shutil.copytree(srcDir, dstDir)
       os.path.exists(os.path.join(dstDir, "file.txt"))
-
-  - type: "expansion"
-    title: "🟡 중급2: 메타데이터 복사"
+  - type: expansion
+    title: '🟡 중급2: 메타데이터 복사'
     code: |-
       import shutil
       import tempfile
@@ -672,9 +1137,8 @@ sections:
       copiedFile = os.path.join(tempDir, "copied.txt")
       shutil.copy2(origFile, copiedFile)
       os.path.exists(copiedFile)
-
-  - type: "expansion"
-    title: "🟡 중급3: 디렉토리 압축"
+  - type: expansion
+    title: '🟡 중급3: 디렉토리 압축'
     code: |-
       import shutil
       import tempfile
@@ -689,16 +1153,14 @@ sections:
       archiveName = os.path.join(tempDir, "archive")
       result = shutil.make_archive(archiveName, 'zip', dataDir)
       os.path.exists(result)
-
-  - type: "expansion"
-    title: "🟡 중급4: 여유 공간 확인"
+  - type: expansion
+    title: '🟡 중급4: 여유 공간 확인'
     code: |-
       import shutil
       diskInfo = shutil.disk_usage(".")
       diskInfo.free >= 0
-
-  - type: "expansion"
-    title: "🟡 중급5: 복사 후 원본 유지"
+  - type: expansion
+    title: '🟡 중급5: 복사 후 원본 유지'
     code: |-
       import shutil
       import tempfile
@@ -712,9 +1174,8 @@ sections:
       copyPath = os.path.join(tempDir, "copy.txt")
       shutil.copy(originalPath, copyPath)
       os.path.exists(originalPath)
-
-  - type: "expansion"
-    title: "🔴 고급1: 백업 시스템"
+  - type: expansion
+    title: '🔴 고급1: 백업 시스템'
     code: |-
       import shutil
       import tempfile
@@ -732,9 +1193,8 @@ sections:
       shutil.copytree(projectDir, backupBase + "_copy")
       result = shutil.make_archive(backupBase, 'zip', backupBase + "_copy")
       os.path.exists(result)
-
-  - type: "expansion"
-    title: "🔴 고급2: 로그 정리 압축"
+  - type: expansion
+    title: '🔴 고급2: 로그 정리 압축'
     code: |-
       import shutil
       import tempfile
@@ -754,9 +1214,8 @@ sections:
       shutil.make_archive(archiveDest, 'zip', logsDir)
       shutil.rmtree(logsDir)
       os.path.exists(archiveDest + '.zip') and not os.path.exists(logsDir)
-
-  - type: "expansion"
-    title: "🔴 고급3: 압축 해제 검증"
+  - type: expansion
+    title: '🔴 고급3: 압축 해제 검증'
     code: |-
       import shutil
       import tempfile
@@ -775,9 +1234,8 @@ sections:
       extractDir = os.path.join(tempDir, "extracted")
       shutil.unpack_archive(zipPath + '.zip', extractDir)
       os.path.exists(os.path.join(extractDir, "target.txt"))
-
-  - type: "expansion"
-    title: "🔴 고급4: 디렉토리 이동 검증"
+  - type: expansion
+    title: '🔴 고급4: 디렉토리 이동 검증'
     code: |-
       import shutil
       import tempfile
@@ -793,9 +1251,8 @@ sections:
       newLocation = os.path.join(tempDir, "new")
       shutil.move(oldLocation, newLocation)
       len(os.listdir(newLocation))
-
-  - type: "expansion"
-    title: "🔴 고급5: 중첩 구조 복사"
+  - type: expansion
+    title: '🔴 고급5: 중첩 구조 복사'
     code: |-
       import shutil
       import tempfile
@@ -811,9 +1268,8 @@ sections:
       copyRoot = os.path.join(tempDir, "copied")
       shutil.copytree(os.path.join(tempDir, "level1"), copyRoot)
       os.path.exists(os.path.join(copyRoot, "level2", "level3", "deep.txt"))
-
-  - type: "expansion"
-    title: "🔴 고급6: 캐시 정리 패턴"
+  - type: expansion
+    title: '🔴 고급6: 캐시 정리 패턴'
     code: |-
       import shutil
       import tempfile
@@ -828,9 +1284,8 @@ sections:
       fileCount = len(os.listdir(cacheDir))
       shutil.rmtree(cacheDir)
       fileCount == 10 and not os.path.exists(cacheDir)
-
-  - type: "expansion"
-    title: "🔴 고급7: 배포 패키징"
+  - type: expansion
+    title: '🔴 고급7: 배포 패키징'
     code: |-
       import shutil
       import tempfile
@@ -849,17 +1304,15 @@ sections:
       shutil.copytree(buildDir, releaseDir)
       result = shutil.make_archive(finalArchive, 'zip', releaseDir)
       os.path.exists(result) and os.path.exists(releaseDir)
-
-  - type: "expansion"
-    title: "🔴 고급8: 디스크 사용률 계산"
+  - type: expansion
+    title: '🔴 고급8: 디스크 사용률 계산'
     code: |-
       import shutil
       diskStats = shutil.disk_usage("/")
       usagePercent = (diskStats.used / diskStats.total) * 100
       0 <= usagePercent <= 100
-
-  - type: "expansion"
-    title: "🔴 고급9: 복사 후 삭제"
+  - type: expansion
+    title: '🔴 고급9: 복사 후 삭제'
     code: |-
       import shutil
       import tempfile
@@ -874,9 +1327,8 @@ sections:
       shutil.copy(srcFile, dstFile)
       os.remove(srcFile)
       os.path.exists(dstFile) and not os.path.exists(srcFile)
-
-  - type: "expansion"
-    title: "🔴 고급10: 다중 백업 버전"
+  - type: expansion
+    title: '🔴 고급10: 다중 백업 버전'
     code: |-
       import shutil
       import tempfile

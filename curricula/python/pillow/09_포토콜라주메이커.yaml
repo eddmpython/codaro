@@ -1,28 +1,80 @@
 meta:
   packages:
-    - pillow
-    - scikit-learn
+  - pillow
+  - scikit-learn
   id: pillow_09
   title: 포토콜라주메이커
   order: 9
   category: pillow
-  difficulty: "⭐⭐⭐⭐"
+  difficulty: ⭐⭐⭐⭐
   badge: 심화
-  tags: ["Pillow", "paste", "collage", "합성", "resize", "레이아웃"]
+  tags:
+  - Pillow
+  - paste
+  - collage
+  - 합성
+  - resize
+  - 레이아웃
   seo:
-    title: "Pillow 심화 - 포토 콜라주 메이커"
-    description: "Pillow로 여러 이미지를 배치하여 콜라주를 만듭니다. paste와 좌표 계산을 배웁니다."
-    keywords: ["Pillow", "콜라주", "paste", "이미지합성", "레이아웃"]
-
+    title: Pillow 심화 - 포토 콜라주 메이커
+    description: Pillow로 여러 이미지를 배치하여 콜라주를 만듭니다. paste와 좌표 계산을 배웁니다.
+    keywords:
+    - Pillow
+    - 콜라주
+    - paste
+    - 이미지합성
+    - 레이아웃
 intro:
-  emoji: "🖼️"
+  emoji: 🖼️
   goal: 여러 이미지를 배치하여 4분할 콜라주를 만듭니다.
   description: paste()로 이미지를 특정 위치에 붙이고, resize()로 크기를 맞춥니다. 좌표 계산을 통해 정렬된 레이아웃을 구성합니다.
-
 sections:
 - id: step1_images
   title: 1단계. 이미지 준비
+  structuredPrimary: true
   subtitle: sklearn 샘플 이미지 활용
+  goal: '1단계. 이미지 준비: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 이미지 준비: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    sklearn 샘플 이미지를 다양하게 변형하여 콜라주용 이미지를 만듭니다. flower와 china 이미지를 크롭하고 리사이즈하여 네 장의 이미지를 준비합니다.
+
+    한정된 이미지로도 crop()과 resize()를 활용하면 다양한 콜라주 소재를 만들 수 있습니다. 각기 다른 영역을 잘라내면 다른 이미지처럼 보입니다.
+  tips:
+  - 한정된 이미지로도 crop()과 resize()를 활용하면 다양한 콜라주 소재를 만들 수 있습니다. 각기 다른 영역을 잘라내면 다른 이미지처럼 보입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+    flower.size, china.size
+  exercise:
+    prompt: '1단계. 이미지 준비: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      china = Image.fromarray(load_sample_image('china.jpg'))
+      flower.size, china.size
+    solution: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      china = Image.fromarray(load_sample_image('china.jpg'))
+      flower.size, china.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn 샘플 이미지를 다양하게 변형하여 콜라주용 이미지를 만듭니다. flower와 china 이미지를 크롭하고 리사이즈하여 네 장의 이미지를 준비합니다.
@@ -50,10 +102,49 @@ sections:
       img1.size, img2.size, img3.size, img4.size
   - type: tip
     content: 한정된 이미지로도 crop()과 resize()를 활용하면 다양한 콜라주 소재를 만들 수 있습니다. 각기 다른 영역을 잘라내면 다른 이미지처럼 보입니다.
-
 - id: step2_canvas
   title: 2단계. 콜라주 캔버스
+  structuredPrimary: true
   subtitle: 전체 크기 계산
+  goal: '2단계. 콜라주 캔버스: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 콜라주 캔버스: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2x2 그리드의 콜라주 캔버스를 생성합니다. 각 이미지가 200x200이면 전체 캔버스는 400x400입니다. 여백을 추가하면 더 보기 좋습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    cellSize = 200
+    gap = 10
+    cols, rows = 2, 2
+    totalW = cols * cellSize + (cols + 1) * gap
+    totalH = rows * cellSize + (rows + 1) * gap
+    totalW, totalH
+  exercise:
+    prompt: '2단계. 콜라주 캔버스: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cellSize = 200
+      gap = 10
+      cols, rows = 2, 2
+      totalW = cols * cellSize + (cols + 1) * gap
+      totalH = rows * cellSize + (rows + 1) * gap
+      totalW, totalH
+    solution: |-
+      cellSize = 200
+      gap = 10
+      cols, rows = 2, 2
+      totalW = cols * cellSize + (cols + 1) * gap
+      totalH = rows * cellSize + (rows + 1) * gap
+      totalW, totalH
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 2x2 그리드의 콜라주 캔버스를 생성합니다. 각 이미지가 200x200이면 전체 캔버스는 400x400입니다. 여백을 추가하면 더 보기 좋습니다.
@@ -79,12 +170,47 @@ sections:
     language: python
     title: 빈 캔버스 확인
     description: 이미지를 붙이기 전 상태입니다
-    content: |-
-      collage
-
+    content: collage
 - id: step3_paste
   title: 3단계. 이미지 배치
+  structuredPrimary: true
   subtitle: paste()
+  goal: '3단계. 이미지 배치: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 이미지 배치: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    paste() 메서드로 이미지를 캔버스의 특정 위치에 붙입니다. 위치는 (x, y) 좌표로 지정하며, 붙일 이미지의 왼쪽 상단이 해당 좌표에 배치됩니다.
+
+    paste()는 원본 이미지를 직접 수정합니다. 반환값이 없으며, 원본을 보존하려면 copy() 후 paste()해야 합니다.
+  tips:
+  - paste()는 원본 이미지를 직접 수정합니다. 반환값이 없으며, 원본을 보존하려면 copy() 후 paste()해야 합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    x1 = gap
+    y1 = gap
+    collage.paste(img1, (x1, y1))
+    collage
+  exercise:
+    prompt: '3단계. 이미지 배치: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      x1 = gap
+      y1 = gap
+      collage.paste(img1, (x1, y1))
+      collage
+    solution: |-
+      x1 = gap
+      y1 = gap
+      collage.paste(img1, (x1, y1))
+      collage
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: paste() 메서드로 이미지를 캔버스의 특정 위치에 붙입니다. 위치는 (x, y) 좌표로 지정하며, 붙일 이미지의 왼쪽 상단이 해당 좌표에 배치됩니다.
@@ -110,10 +236,49 @@ sections:
       collage.paste(img3, (x1, y2))
       collage.paste(img4, (x2, y2))
       collage
-
 - id: step4_resize_fit
   title: 4단계. 크기 맞춤
+  structuredPrimary: true
   subtitle: 다른 크기 이미지 처리
+  goal: '4단계. 크기 맞춤: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 크기 맞춤: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    실제 이미지는 크기가 제각각입니다. sklearn 이미지를 콜라주에 넣으려면 resize()로 크기를 맞춰야 합니다.
+
+    resize()는 비율을 무시하고 정확한 크기로 변환합니다. 비율을 유지하려면 thumbnail()을 사용하거나, 비율 계산 후 resize()합니다.
+  tips:
+  - resize()는 비율을 무시하고 정확한 크기로 변환합니다. 비율을 유지하려면 thumbnail()을 사용하거나, 비율 계산 후 resize()합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from sklearn.datasets import load_sample_image
+
+    bloomArr = load_sample_image('flower.jpg')
+    bloom = Image.fromarray(bloomArr)
+    bloom.size
+  exercise:
+    prompt: '4단계. 크기 맞춤: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from sklearn.datasets import load_sample_image
+
+      bloomArr = load_sample_image('flower.jpg')
+      bloom = Image.fromarray(bloomArr)
+      bloom.size
+    solution: |-
+      from sklearn.datasets import load_sample_image
+
+      bloomArr = load_sample_image('flower.jpg')
+      bloom = Image.fromarray(bloomArr)
+      bloom.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 실제 이미지는 크기가 제각각입니다. sklearn 이미지를 콜라주에 넣으려면 resize()로 크기를 맞춰야 합니다.
@@ -144,10 +309,43 @@ sections:
       newCollage
   - type: tip
     content: resize()는 비율을 무시하고 정확한 크기로 변환합니다. 비율을 유지하려면 thumbnail()을 사용하거나, 비율 계산 후 resize()합니다.
-
 - id: step5_mixed
   title: 5단계. 혼합 콜라주
+  structuredPrimary: true
   subtitle: 다양한 소스 조합
+  goal: '5단계. 혼합 콜라주: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 혼합 콜라주: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sklearn 이미지와 Lorem Picsum 이미지를 섞어 콜라주를 만듭니다. 각 이미지를 셀 크기에 맞게 조절합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    sceneArr = load_sample_image('china.jpg')
+    scene = Image.fromarray(sceneArr)
+    sceneResized = scene.resize((cellSize, cellSize))
+    sceneResized.size
+  exercise:
+    prompt: '5단계. 혼합 콜라주: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sceneArr = load_sample_image('china.jpg')
+      scene = Image.fromarray(sceneArr)
+      sceneResized = scene.resize((cellSize, cellSize))
+      sceneResized.size
+    solution: |-
+      sceneArr = load_sample_image('china.jpg')
+      scene = Image.fromarray(sceneArr)
+      sceneResized = scene.resize((cellSize, cellSize))
+      sceneResized.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn 이미지와 Lorem Picsum 이미지를 섞어 콜라주를 만듭니다. 각 이미지를 셀 크기에 맞게 조절합니다.
@@ -171,10 +369,79 @@ sections:
       mixedCollage.paste(img1.resize((cellSize, cellSize)), (gap, gap + cellSize + gap))
       mixedCollage.paste(img2.resize((cellSize, cellSize)), (gap + cellSize + gap, gap + cellSize + gap))
       mixedCollage
-
 - id: step6_border
   title: 6단계. 테두리 추가
+  structuredPrimary: true
   subtitle: ImageDraw 활용
+  goal: '6단계. 테두리 추가: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 테두리 추가: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: ImageDraw로 각 이미지 주변에 테두리를 그려 콜라주를 더 세련되게 만듭니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import ImageDraw
+
+    finalCollage = mixedCollage.copy()
+    borderPen = ImageDraw.Draw(finalCollage)
+
+    positions = [
+        (gap, gap),
+        (gap + cellSize + gap, gap),
+        (gap, gap + cellSize + gap),
+        (gap + cellSize + gap, gap + cellSize + gap)
+    ]
+
+    for x, y in positions:
+        borderPen.rectangle([x-2, y-2, x+cellSize+1, y+cellSize+1], outline='black', width=2)
+
+    finalCollage
+  exercise:
+    prompt: '6단계. 테두리 추가: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import ImageDraw
+
+      finalCollage = mixedCollage.copy()
+      borderPen = ImageDraw.Draw(finalCollage)
+
+      positions = [
+          (gap, gap),
+          (gap + cellSize + gap, gap),
+          (gap, gap + cellSize + gap),
+          (gap + cellSize + gap, gap + cellSize + gap)
+      ]
+
+      for x, y in positions:
+          borderPen.rectangle([x-2, y-2, x+cellSize+1, y+cellSize+1], outline='black', width=2)
+
+      finalCollage
+    solution: |-
+      from PIL import ImageDraw
+
+      finalCollage = mixedCollage.copy()
+      borderPen = ImageDraw.Draw(finalCollage)
+
+      positions = [
+          (gap, gap),
+          (gap + cellSize + gap, gap),
+          (gap, gap + cellSize + gap),
+          (gap + cellSize + gap, gap + cellSize + gap)
+      ]
+
+      for x, y in positions:
+          borderPen.rectangle([x-2, y-2, x+cellSize+1, y+cellSize+1], outline='black', width=2)
+
+      finalCollage
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: ImageDraw로 각 이미지 주변에 테두리를 그려 콜라주를 더 세련되게 만듭니다.
@@ -199,20 +466,77 @@ sections:
           borderPen.rectangle([x-2, y-2, x+cellSize+1, y+cellSize+1], outline='black', width=2)
 
       finalCollage
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 콜라주 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    다양한 레이아웃의 콜라주를 만들어봅시다. 위에서 배운 paste()와 좌표 계산을 활용하여 가로 스트립과 듀오 콜라주를 직접 구성합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    bloomImg = Image.fromarray(load_sample_image('flower.jpg'))
+    sceneImg = Image.fromarray(load_sample_image('china.jpg'))
+
+    stripSize = (150, 100)
+    strip1 = bloomImg.crop((0, 0, 300, 200)).resize(stripSize)
+    strip2 = bloomImg.crop((200, 150, 500, 350)).resize(stripSize)
+    strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
+    strip1
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      bloomImg = Image.fromarray(load_sample_image('flower.jpg'))
+      sceneImg = Image.fromarray(load_sample_image('china.jpg'))
+
+      stripSize = (150, 100)
+      strip1 = bloomImg.crop((0, 0, 300, 200)).resize(stripSize)
+      strip2 = bloomImg.crop((200, 150, 500, 350)).resize(stripSize)
+      strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
+      strip1
+    solution: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      bloomImg = Image.fromarray(load_sample_image('flower.jpg'))
+      sceneImg = Image.fromarray(load_sample_image('china.jpg'))
+
+      stripSize = (150, 100)
+      strip1 = bloomImg.crop((0, 0, 300, 200)).resize(stripSize)
+      strip2 = bloomImg.crop((200, 150, 500, 350)).resize(stripSize)
+      strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
+      strip1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 다양한 레이아웃의 콜라주를 만들어봅시다. 위에서 배운 paste()와 좌표 계산을 활용하여 가로 스트립과 듀오 콜라주를 직접 구성합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 가로 스트립 콜라주"
+    title: '미션1: 가로 스트립 콜라주'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image
         from sklearn.datasets import load_sample_image
@@ -226,7 +550,7 @@ sections:
         strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
         strip1
     - type: code
-      title: "가로 스트립 생성"
+      title: 가로 스트립 생성
       content: |-
         stripWidth = 150 * 3 + 10 * 4
         stripCollage = Image.new('RGB', (stripWidth, 120), 'white')
@@ -235,10 +559,10 @@ sections:
         stripCollage.paste(strip3, (330, 10))
         stripCollage
   - type: expansion
-    title: "미션2: sklearn 듀오 콜라주"
+    title: '미션2: sklearn 듀오 콜라주'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image, ImageDraw
         from sklearn.datasets import load_sample_image
@@ -247,14 +571,14 @@ sections:
         duoChina = Image.fromarray(load_sample_image('china.jpg'))
         duoFlower
     - type: code
-      title: "리사이즈"
+      title: 리사이즈
       content: |-
         targetSize = (300, 200)
         duoFlowerFit = duoFlower.resize(targetSize)
         duoChinaFit = duoChina.resize(targetSize)
         duoFlowerFit.size
     - type: code
-      title: "듀오 콜라주 생성"
+      title: 듀오 콜라주 생성
       content: |-
         duoCanvas = Image.new('RGB', (620, 220), 'darkgray')
         duoCanvas.paste(duoFlowerFit, (10, 10))
@@ -263,10 +587,70 @@ sections:
         duoPen.rectangle([8, 8, 312, 212], outline='white', width=2)
         duoPen.rectangle([318, 8, 612, 212], outline='white', width=2)
         duoCanvas
-
 - id: workflow_validation
   title: 7단계. 콜라주 레이아웃 검증 루프
+  structuredPrimary: true
   subtitle: grid, padding, paste 위치 확인
+  goal: '7단계. 콜라주 레이아웃 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 콜라주 레이아웃 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 콜라주는 이미지를 붙이는 과제가 아니라 레이아웃 계산 문제입니다. 이미지 개수와 그리드가 맞는지 검증하고, 각 타일이 의도한 좌표에 배치됐는지 픽셀로 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import Image, ImageOps
+
+    collageTiles = [
+        Image.new("RGB", (80, 60), color)
+        for color in [(220, 80, 80), (80, 180, 120), (80, 120, 220), (230, 190, 80)]
+    ]
+
+    def validateGrid(tiles, rows, cols):
+        if len(tiles) != rows * cols:
+            raise ValueError(f"타일 수와 그리드가 맞지 않습니다: tiles={len(tiles)}, grid={rows}x{cols}")
+        return True
+
+    validateGrid(collageTiles, 2, 2)
+  exercise:
+    prompt: '7단계. 콜라주 레이아웃 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image, ImageOps
+
+      collageTiles = [
+          Image.new("RGB", (80, 60), color)
+          for color in [(220, 80, 80), (80, 180, 120), (80, 120, 220), (230, 190, 80)]
+      ]
+
+      def validateGrid(tiles, rows, cols):
+          if len(tiles) != rows * cols:
+              raise ValueError(f"타일 수와 그리드가 맞지 않습니다: tiles={len(tiles)}, grid={rows}x{cols}")
+          return True
+
+      validateGrid(collageTiles, 2, 2)
+    solution: |-
+      from PIL import Image, ImageOps
+
+      collageTiles = [
+          Image.new("RGB", (80, 60), color)
+          for color in [(220, 80, 80), (80, 180, 120), (80, 120, 220), (230, 190, 80)]
+      ]
+
+      def validateGrid(tiles, rows, cols):
+          if len(tiles) != rows * cols:
+              raise ValueError(f"타일 수와 그리드가 맞지 않습니다: tiles={len(tiles)}, grid={rows}x{cols}")
+          return True
+
+      validateGrid(collageTiles, 2, 2)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 콜라주는 이미지를 붙이는 과제가 아니라 레이아웃 계산 문제입니다. 이미지 개수와 그리드가 맞는지 검증하고, 각 타일이 의도한 좌표에 배치됐는지 픽셀로 확인합니다.

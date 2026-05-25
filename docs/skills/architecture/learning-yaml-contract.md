@@ -48,6 +48,7 @@ intro:
 sections:
   - id: dataframe-basics
     title: DataFrame 만들기
+    structuredPrimary: true
     subtitle: 행과 열의 감각
     goal: dict에서 DataFrame을 만드는 흐름을 익힌다.
     why: 엑셀 표 자동화의 첫 단계다.
@@ -93,9 +94,19 @@ sections:
 - `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다. 렌더러는 이 영역을 `Python 실습 코드`와 `학습자가 작성` 상태로 명확히 표시하고 `data-learning-exercise-input-role="student-practice"`를 유지한다.
 - `meta.packages`는 런타임 패키지 preflight의 1차 입력이다. 코드 import 추론은 보조 수단이다.
 
+## 의존성 계약
+
+- Codaro 기본 의존성은 제품 실행에 필요한 최소 패키지만 가진다. 학습 주제별 패키지는 `pyproject.toml`에 넣지 않고 레슨 YAML의 `meta.packages`에 선언한다.
+- `meta.packages`는 해당 레슨을 열고 실행할 때 필요한 패키지 목록이다. 트랙 전체에서 언젠가 쓸 수 있는 패키지를 미리 모두 넣지 않는다.
+- 외부 패키지가 필요한 레슨의 `intro.diagram.runtime`에는 uv 준비 흐름을 드러낸다. 예: `라이브러리 확인`, `uv로 누락 설치`, `셀 실행/검증`.
+- 소개 레슨은 첫 실행 경험에서 import 확인과 작은 `assert` 검증을 포함해 "필요할 때 준비하고 바로 실행한다"는 감각을 만든다.
+- 패키지 흐름은 항상 `packages-check → packages-install(필요할 때만) → cell-call`이다. 설치 성공 또는 이미 준비됨 결과가 없으면 실행으로 넘어가지 않는다.
+- 레슨 본문에는 직접 `pip install` 안내를 쓰지 않는다. 설치는 제품 capability와 uv 경로가 맡는다.
+
 ## 호환 레이어
 
 기존 curriculum은 `sections[].blocks[]`를 계속 허용한다. 다만 materializer는 legacy blocks를 읽더라도 `learningContract`와 `sectionContract` payload를 함께 만든다.
+`structuredPrimary: true`가 붙은 섹션은 structured fields가 1차 학습 계약이고, `blocks`는 표, 영상, 링크, 추가 설명 같은 보조 자료다. 이 경우 materializer는 structured section card를 먼저 만들고, 남은 blocks를 뒤에 이어 붙여 원본 자료를 잃지 않는다.
 
 새 YAML에서 `blocks`가 없고 structured section fields가 있으면 materializer가 설명, 스니펫, 실습, 검증 셀을 직접 생성한다.
 
@@ -127,6 +138,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 - `learning-card-browser` gate는 불완전한 structured section도 포함해 `data-learning-section-contract-gaps` 경고가 desktop/mobile 카드 안에서 보이고 넘치지 않는지 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.
 - trace/workloop에는 `커리큘럼 YAML 전개`, `라이브러리 확인`, `uv 라이브러리 설치`, `셀 실행/검증` 같은 사용자가 읽을 수 있는 단계가 남는다.
+- 커리큘럼 작성 절차는 [[curriculum-authoring]]을 따른다. 특히 새 트랙의 소개 레슨은 이 과정에서 무엇을 만들 수 있는지, 어떤 준비가 필요한지, 완료 후 어떤 산출물을 만들 수 있는지를 보여줘야 한다.
 - 질문이 필요할 때만 1-3개 핵심 질문을 제안하고, 바로 생성하지 않고 현재 작업 기준이 trace/workloop에 남는다.
 
 ## 관련
@@ -134,3 +146,4 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 - [[frontend-product-surface]]
 - [[teacher-tool-loop]]
 - [[curriculum-registry]]
+- [[curriculum-authoring]]

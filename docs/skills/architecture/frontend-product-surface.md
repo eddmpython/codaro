@@ -102,7 +102,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 ## 관련
 
-- [[overview]] — UI는 실행기 구현 세부사항에 직접 묶이지 않는다
+- [[architecture-overview]] — UI는 실행기 구현 세부사항에 직접 묶이지 않는다
 - [[widget-bridge]] — Python descriptor와 프론트 렌더링 경계
 - [[learning-yaml-contract]] — 섹션 단위 학습카드의 YAML SSOT
 - [[learning-three-pillars]] — 학습 모드의 콘텐츠와 철학

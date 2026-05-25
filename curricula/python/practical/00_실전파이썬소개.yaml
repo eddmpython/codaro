@@ -1,193 +1,296 @@
 meta:
-  id: "00_실전파이썬소개"
+  id: 00_실전파이썬소개
   title: 실전파이썬 소개
-  category: "practical"
-  tags: [실전, 로컬도구, 앱, 자동화]
-
+  category: practical
+  tags:
+  - 실전
+  - 로컬도구
+  - 앱
+  - 자동화
 intro:
-  emoji: "🔥"
-  title: 실전파이썬
-  goal: "실제 업무에서 바로 사용할 수 있는 Python 도구를 만들고 배웁니다."
-  description: "단순한 문법 학습을 넘어, 실무에서 진짜 쓰이는 자동화 도구를 직접 만들어봅니다. 각 도구는 Codaro 로컬 셀과 자동화 태스크로 제작되어 바로 실행할 수 있습니다."
-
+  direction: 실전파이썬 소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  benefits:
+  - 실전파이썬 소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
+  - 추가 패키지 없이 로컬 Python에서 바로 실행하고, 첫 실행에서 assert로 확인한다.
+  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  diagram:
+    steps:
+    - label: 목표
+      detail: 완료 후 만들 산출물을 먼저 확인
+    - label: 준비
+      detail: 표준 라이브러리 또는 기본 Python 실행 확인
+    - label: 실습
+      detail: 예제 스니펫을 바꿔 직접 실행
+    - label: 검증
+      detail: assert와 결과 비교로 완료 판단
+    runtime:
+    - label: 패키지
+      detail: 표준 라이브러리 확인 -> cell-call -> assert 검증
+    - label: 첫 실행
+      detail: import 확인과 assert 검증
+    - label: 완료
+      detail: 리포트/자동화/검증 루틴으로 재사용
 sections:
-  - id: concept
-    title: 실전파이썬이란?
-    subtitle: 학습과 실용을 동시에
-    blocks:
-    - type: text
-      content: "실전파이썬은 실제 업무에서 마주치는 반복 작업을 Python으로 자동화하는 프로젝트 모음입니다. 각 프로젝트는 두 가지를 제공합니다. 첫째, 바로 실행할 수 있는 Codaro 로컬 도구. 둘째, 그 도구를 어떻게 만드는지 배우는 학습 콘텐츠. 도구가 필요하면 앱을 쓰고, 원리가 궁금하면 학습 페이지에서 배우세요."
+- id: concept
+  title: 실전파이썬이란?
+  subtitle: 학습과 실용을 동시에
+  blocks:
+  - type: text
+    content: 실전파이썬은 실제 업무에서 마주치는 반복 작업을 Python으로 자동화하는 프로젝트 모음입니다. 각 프로젝트는 두 가지를 제공합니다. 첫째, 바로 실행할 수 있는 Codaro 로컬 도구. 둘째,
+      그 도구를 어떻게 만드는지 배우는 학습 콘텐츠. 도구가 필요하면 앱을 쓰고, 원리가 궁금하면 학습 페이지에서 배우세요.
+  - type: compare
+    left:
+      icon: 🎓
+      title: 학습 페이지
+      subtitle: study.yaml
+      items:
+      - 앱 제작 과정을 단계별로 설명
+      - Codaro 로컬 실행 흐름 이해
+      - Codaro 셀과 UI 구성법
+      - 실무 팁과 확장 아이디어
+    right:
+      icon: 🚀
+      title: Codaro 로컬 도구
+      subtitle: note.py
+      items:
+      - 웹에서 바로 실행 가능
+      - 파일 업로드/다운로드 지원
+      - 인터랙티브 UI
+      - 코드 수정 없이 사용
+- id: philosophy
+  title: 왜 실전파이썬인가?
+  subtitle: 학습과 실용의 연결
+  blocks:
+  - type: text
+    content: 많은 Python 강의가 문법과 개념에 집중합니다. 리스트, 딕셔너리, 함수를 배우지만 '그래서 뭘 만들지?'라는 질문에 답하기 어렵습니다. 실전파이썬은 반대로 접근합니다. 먼저 실제로 유용한 도구를
+      보여주고, 그 도구를 만드는 과정에서 필요한 개념을 자연스럽게 배웁니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎯
+      title: 목표 지향
+      description: 무엇을 만들지 먼저 정하고, 거기에 필요한 것만 배웁니다
+    - emoji: ⚡
+      title: 즉시 활용
+      description: 배운 즉시 실제 업무에 적용할 수 있는 도구를 얻습니다
+    - emoji: 🔄
+      title: 양방향 연결
+      description: 앱이 궁금하면 학습으로, 학습 후엔 앱으로 돌아갑니다
+- id: Codaro
+  title: 왜 Codaro 로컬 셀인가?
+  subtitle: 로컬에서 실행되는 Python
+  blocks:
+  - type: text
+    content: Codaro는 로컬 Python을 기반으로 하는 반응형 노트북입니다. Jupyter와 비슷하지만 순수 Python 파일로 저장해 Git 관리가 쉽고, 셀 간 의존성을 추적해 값이 바뀌면 관련 셀을
+      다시 실행할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: 웹 기반 실행
+      description: Codaro 로컬 Python 커널로 실행. 파일 I/O와 패키지 사용까지 로컬 기준으로 실습
+    - emoji: ⚡
+      title: 반응형 셀
+      description: UI 값이 바뀌면 관련 셀이 자동 재실행. 인터랙티브 앱 제작이 쉬움
+    - emoji: 📄
+      title: 순수 Python
+      description: .py 파일로 저장. Git diff가 깔끔하고 코드 리뷰가 가능
+  - type: note
+    title: Codaro 로컬 Python 환경의 특징
+    content: Codaro 로컬 Python는 사용자의 작업공간에서 Python을 실행합니다. glob, pathlib, 로컬 파일 읽기/쓰기, 패키지 설치, 네트워크 요청, 데이터 처리, 시각화를 모두 로컬
+      기준으로 실습할 수 있습니다.
+- id: tools
+  title: 제공하는 도구들
+  subtitle: 실무에서 바로 사용하세요
+  blocks:
+  - type: text
+    content: 실전파이썬은 파일 처리, 데이터 변환, 텍스트 처리 등 다양한 분야의 도구를 제공합니다. 각 도구는 실제 업무에서 자주 마주치는 반복 작업을 자동화합니다. 아래는 현재 제공 중이거나 준비 중인 도구
+      목록입니다.
+  - type: featureCards
+    cards:
+    - emoji: 📊
+      title: 엑셀 파일 병합
+      description: 여러 엑셀 파일을 수직/수평으로 합치기
+    - emoji: 📑
+      title: PDF 병합
+      description: 여러 PDF를 하나로 합치기 (준비중)
+    - emoji: 🖼️
+      title: 이미지 일괄 변환
+      description: PNG/JPG 포맷 변환 및 리사이즈 (준비중)
+    - emoji: 📝
+      title: CSV 인코딩 변환
+      description: EUC-KR ↔ UTF-8 변환 (준비중)
+- id: howToUse
+  title: 사용 방법
+  subtitle: 두 가지 경로
+  blocks:
+  - type: text
+    content: 실전파이썬은 두 가지 방식으로 사용할 수 있습니다. 도구가 당장 필요하다면 Codaro 로컬 도구로 바로 이동하세요. 원리를 이해하고 싶거나 비슷한 도구를 직접 만들고 싶다면 학습 페이지를 먼저
+      살펴보세요.
+  - type: compare
+    left:
+      icon: 🚀
+      title: 도구 먼저 사용
+      subtitle: 급하게 필요할 때
+      items:
+      - 사이드바에서 원하는 도구 선택
+      - Codaro 로컬 도구에서 바로 사용
+      - 사용 후 '어떻게 만들었지?' 궁금하면
+      - 학습 페이지 링크 클릭
+    right:
+      icon: 🎓
+      title: 학습 먼저 하기
+      subtitle: 원리를 이해하고 싶을 때
+      items:
+      - 학습 페이지에서 단계별 설명 읽기
+      - 코드 블록 따라 실행해보기
+      - 원리 이해 후
+      - Codaro 로컬 도구에서 실제 사용
+- id: workflow_validation
+  title: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def normalizeTask(rawTask):
+        title = rawTask.get('title', '').strip()
+        status = rawTask.get('status', '').strip().lower()
+        minutes = int(rawTask.get('minutes', 0))
 
-    - type: compare
-      left:
-        icon: "🎓"
-        title: 학습 페이지
-        subtitle: study.yaml
-        items:
-          - "앱 제작 과정을 단계별로 설명"
-          - "Codaro 로컬 실행 흐름 이해"
-          - "Codaro 셀과 UI 구성법"
-          - "실무 팁과 확장 아이디어"
-      right:
-        icon: "🚀"
-        title: Codaro 로컬 도구
-        subtitle: note.py
-        items:
-          - "웹에서 바로 실행 가능"
-          - "파일 업로드/다운로드 지원"
-          - "인터랙티브 UI"
-          - "코드 수정 없이 사용"
+        if not title:
+            raise ValueError('title is required')
+        if status not in {'todo', 'doing', 'done'}:
+            raise ValueError('unsupported status')
+        if minutes <= 0:
+            raise ValueError('minutes must be positive')
 
-  - id: philosophy
-    title: 왜 실전파이썬인가?
-    subtitle: 학습과 실용의 연결
-    blocks:
-    - type: text
-      content: "많은 Python 강의가 문법과 개념에 집중합니다. 리스트, 딕셔너리, 함수를 배우지만 '그래서 뭘 만들지?'라는 질문에 답하기 어렵습니다. 실전파이썬은 반대로 접근합니다. 먼저 실제로 유용한 도구를 보여주고, 그 도구를 만드는 과정에서 필요한 개념을 자연스럽게 배웁니다."
+        return {
+            'title': title,
+            'status': status,
+            'minutes': minutes,
+            'urgent': status != 'done' and minutes >= 60,
+        }
 
-    - type: featureCards
-      cards:
-      - emoji: "🎯"
-        title: 목표 지향
-        description: "무엇을 만들지 먼저 정하고, 거기에 필요한 것만 배웁니다"
-      - emoji: "⚡"
-        title: 즉시 활용
-        description: "배운 즉시 실제 업무에 적용할 수 있는 도구를 얻습니다"
-      - emoji: "🔄"
-        title: 양방향 연결
-        description: "앱이 궁금하면 학습으로, 학습 후엔 앱으로 돌아갑니다"
+    task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
+    assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
+    task
+  exercise:
+    prompt: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def normalizeTask(rawTask):
+          title = rawTask.get('title', '').strip()
+          status = rawTask.get('status', '').strip().lower()
+          minutes = int(rawTask.get('minutes', 0))
 
-  - id: Codaro
-    title: 왜 Codaro 로컬 셀인가?
-    subtitle: 로컬에서 실행되는 Python
-    blocks:
-    - type: text
-      content: "Codaro는 로컬 Python을 기반으로 하는 반응형 노트북입니다. Jupyter와 비슷하지만 순수 Python 파일로 저장해 Git 관리가 쉽고, 셀 간 의존성을 추적해 값이 바뀌면 관련 셀을 다시 실행할 수 있습니다."
+          if not title:
+              raise ValueError('title is required')
+          if status not in {'todo', 'doing', 'done'}:
+              raise ValueError('unsupported status')
+          if minutes <= 0:
+              raise ValueError('minutes must be positive')
 
-    - type: featureCards
-      cards:
-      - emoji: "🌐"
-        title: 웹 기반 실행
-        description: "Codaro 로컬 Python 커널로 실행. 파일 I/O와 패키지 사용까지 로컬 기준으로 실습"
-      - emoji: "⚡"
-        title: 반응형 셀
-        description: "UI 값이 바뀌면 관련 셀이 자동 재실행. 인터랙티브 앱 제작이 쉬움"
-      - emoji: "📄"
-        title: 순수 Python
-        description: ".py 파일로 저장. Git diff가 깔끔하고 코드 리뷰가 가능"
+          return {
+              'title': title,
+              'status': status,
+              'minutes': minutes,
+              'urgent': status != 'done' and minutes >= 60,
+          }
 
-    - type: note
-      title: "Codaro 로컬 Python 환경의 특징"
-      content: "Codaro 로컬 Python는 사용자의 작업공간에서 Python을 실행합니다. glob, pathlib, 로컬 파일 읽기/쓰기, 패키지 설치, 네트워크 요청, 데이터 처리, 시각화를 모두 로컬 기준으로 실습할 수 있습니다."
+      task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
+      assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
+      task
+    solution: |-
+      def normalizeTask(rawTask):
+          title = rawTask.get('title', '').strip()
+          status = rawTask.get('status', '').strip().lower()
+          minutes = int(rawTask.get('minutes', 0))
 
-  - id: tools
-    title: 제공하는 도구들
-    subtitle: 실무에서 바로 사용하세요
-    blocks:
-    - type: text
-      content: "실전파이썬은 파일 처리, 데이터 변환, 텍스트 처리 등 다양한 분야의 도구를 제공합니다. 각 도구는 실제 업무에서 자주 마주치는 반복 작업을 자동화합니다. 아래는 현재 제공 중이거나 준비 중인 도구 목록입니다."
+          if not title:
+              raise ValueError('title is required')
+          if status not in {'todo', 'doing', 'done'}:
+              raise ValueError('unsupported status')
+          if minutes <= 0:
+              raise ValueError('minutes must be positive')
 
-    - type: featureCards
-      cards:
-      - emoji: "📊"
-        title: 엑셀 파일 병합
-        description: "여러 엑셀 파일을 수직/수평으로 합치기"
-      - emoji: "📑"
-        title: PDF 병합
-        description: "여러 PDF를 하나로 합치기 (준비중)"
-      - emoji: "🖼️"
-        title: 이미지 일괄 변환
-        description: "PNG/JPG 포맷 변환 및 리사이즈 (준비중)"
-      - emoji: "📝"
-        title: CSV 인코딩 변환
-        description: "EUC-KR ↔ UTF-8 변환 (준비중)"
+          return {
+              'title': title,
+              'status': status,
+              'minutes': minutes,
+              'urgent': status != 'done' and minutes >= 60,
+          }
 
-  - id: howToUse
-    title: 사용 방법
-    subtitle: 두 가지 경로
-    blocks:
-    - type: text
-      content: "실전파이썬은 두 가지 방식으로 사용할 수 있습니다. 도구가 당장 필요하다면 Codaro 로컬 도구로 바로 이동하세요. 원리를 이해하고 싶거나 비슷한 도구를 직접 만들고 싶다면 학습 페이지를 먼저 살펴보세요."
+      task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
+      assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
+      task
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  blocks:
+  - type: text
+    content: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다.
+  - type: code
+    language: python
+    title: 업무 항목 정규화와 검증
+    description: 문자열 정리, 상태 제한, 우선순위 계산을 한 번에 확인합니다.
+    content: |-
+      def normalizeTask(rawTask):
+          title = rawTask.get('title', '').strip()
+          status = rawTask.get('status', '').strip().lower()
+          minutes = int(rawTask.get('minutes', 0))
 
-    - type: compare
-      left:
-        icon: "🚀"
-        title: 도구 먼저 사용
-        subtitle: 급하게 필요할 때
-        items:
-          - "사이드바에서 원하는 도구 선택"
-          - "Codaro 로컬 도구에서 바로 사용"
-          - "사용 후 '어떻게 만들었지?' 궁금하면"
-          - "학습 페이지 링크 클릭"
-      right:
-        icon: "🎓"
-        title: 학습 먼저 하기
-        subtitle: 원리를 이해하고 싶을 때
-        items:
-          - "학습 페이지에서 단계별 설명 읽기"
-          - "코드 블록 따라 실행해보기"
-          - "원리 이해 후"
-          - "Codaro 로컬 도구에서 실제 사용"
+          if not title:
+              raise ValueError('title is required')
+          if status not in {'todo', 'doing', 'done'}:
+              raise ValueError('unsupported status')
+          if minutes <= 0:
+              raise ValueError('minutes must be positive')
 
-  - id: "workflow_validation"
-    title: "현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기"
-    subtitle: "예측 → 실행 → 오류 수정 → 검증 → 실무 변주"
-    blocks:
-      - type: text
-        content: "입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다."
-      - type: code
-        language: python
-        title: "업무 항목 정규화와 검증"
-        description: "문자열 정리, 상태 제한, 우선순위 계산을 한 번에 확인합니다."
-        content: |-
-          def normalizeTask(rawTask):
-              title = rawTask.get('title', '').strip()
-              status = rawTask.get('status', '').strip().lower()
-              minutes = int(rawTask.get('minutes', 0))
+          return {
+              'title': title,
+              'status': status,
+              'minutes': minutes,
+              'urgent': status != 'done' and minutes >= 60,
+          }
 
-              if not title:
-                  raise ValueError('title is required')
-              if status not in {'todo', 'doing', 'done'}:
-                  raise ValueError('unsupported status')
-              if minutes <= 0:
-                  raise ValueError('minutes must be positive')
+      task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
+      assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
+      task
+  - type: code
+    language: python
+    title: 잘못된 입력을 먼저 실패시킨다
+    description: 제목 누락과 잘못된 상태를 오류 메시지로 확인합니다.
+    content: |-
+      try:
+          normalizeTask({'title': ' ', 'status': 'blocked', 'minutes': '10'})
+      except ValueError as exc:
+          taskError = str(exc)
 
-              return {
-                  'title': title,
-                  'status': status,
-                  'minutes': minutes,
-                  'urgent': status != 'done' and minutes >= 60,
-              }
+      assert taskError in {'title is required', 'unsupported status'}
+      taskError
+  - type: code
+    language: python
+    title: '실무 변주: 완료율 리포트 만들기'
+    description: 여러 업무 항목을 정규화하고 완료율과 긴급 작업을 계산합니다.
+    content: |-
+      rawTasks = [
+          {'title': 'report', 'status': 'done', 'minutes': '40'},
+          {'title': 'invoice', 'status': 'todo', 'minutes': '90'},
+          {'title': 'mail', 'status': 'doing', 'minutes': '15'},
+      ]
+      tasks = [normalizeTask(row) for row in rawTasks]
+      doneRate = sum(task['status'] == 'done' for task in tasks) / len(tasks)
+      urgentTitles = [task['title'] for task in tasks if task['urgent']]
 
-          task = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})
-          assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
-          task
-      - type: code
-        language: python
-        title: "잘못된 입력을 먼저 실패시킨다"
-        description: "제목 누락과 잘못된 상태를 오류 메시지로 확인합니다."
-        content: |-
-          try:
-              normalizeTask({'title': ' ', 'status': 'blocked', 'minutes': '10'})
-          except ValueError as exc:
-              taskError = str(exc)
-
-          assert taskError in {'title is required', 'unsupported status'}
-          taskError
-      - type: code
-        language: python
-        title: "실무 변주: 완료율 리포트 만들기"
-        description: "여러 업무 항목을 정규화하고 완료율과 긴급 작업을 계산합니다."
-        content: |-
-          rawTasks = [
-              {'title': 'report', 'status': 'done', 'minutes': '40'},
-              {'title': 'invoice', 'status': 'todo', 'minutes': '90'},
-              {'title': 'mail', 'status': 'doing', 'minutes': '15'},
-          ]
-          tasks = [normalizeTask(row) for row in rawTasks]
-          doneRate = sum(task['status'] == 'done' for task in tasks) / len(tasks)
-          urgentTitles = [task['title'] for task in tasks if task['urgent']]
-
-          assert round(doneRate, 2) == 0.33
-          assert urgentTitles == ['invoice']
-          doneRate, urgentTitles
+      assert round(doneRate, 2) == 0.33
+      assert urgentTitles == ['invoice']
+      doneRate, urgentTitles

@@ -1,31 +1,80 @@
 meta:
   packages:
-    - pandas
+  - pandas
   id: pandas_08
   title: 교통사고원인분석
   order: 8
   category: pandas
-  difficulty: "⭐⭐⭐⭐"
+  difficulty: ⭐⭐⭐⭐
   badge: 중급
   dataSource: codaro-local:car_crashes
-  tags: ["car_crashes", "지역비교", "rank", "시각화", "heatmap", "검증", "지역비교"]
+  tags:
+  - car_crashes
+  - 지역비교
+  - rank
+  - 시각화
+  - heatmap
+  - 검증
+  - 지역비교
   seo:
-    title: "pandas 지역별 비교 분석 - 미국 교통사고 데이터"
-    description: "미국 주별 교통사고 데이터로 지역 비교를 배웁니다. rank 순위, 상관관계 히트맵, 위험도 점수 계산을 실습합니다."
-    keywords: ["pandas rank", "지역비교", "상관분석", "car_crashes", "히트맵"]
-
+    title: pandas 지역별 비교 분석 - 미국 교통사고 데이터
+    description: 미국 주별 교통사고 데이터로 지역 비교를 배웁니다. rank 순위, 상관관계 히트맵, 위험도 점수 계산을 실습합니다.
+    keywords:
+    - pandas rank
+    - 지역비교
+    - 상관분석
+    - car_crashes
+    - 히트맵
 intro:
-  emoji: "🚗"
+  emoji: 🚗
   goal: 미국 주별 교통사고 데이터에서 "가장 위험한 주는 어디인가?"를 분석합니다.
   description: 지역별 비교 분석을 배웁니다. 순위를 매기고, 여러 지표를 종합해서 위험도를 계산합니다.
-
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
+  structuredPrimary: true
   subtitle: 51개 주 교통사고 통계
+  goal: '1단계. 데이터 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 데이터 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요 주 약자를 포함한 샘플 데이터를
+    함께 둡니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    crashes = loadLocalDataset("car_crashes")
+    crashes.shape
+  exercise:
+    prompt: '1단계. 데이터 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      crashes = loadLocalDataset("car_crashes")
+      crashes.shape
+    solution: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      crashes = loadLocalDataset("car_crashes")
+      crashes.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요 주 약자를 포함한 샘플 데이터를 함께 둡니다.
+    content: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요 주 약자를 포함한 샘플 데이터를 함께
+      둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
@@ -38,7 +87,29 @@ sections:
       crashes.shape
 - id: step2_head
   title: 2단계. 미리보기
+  structuredPrimary: true
   subtitle: 데이터 구조 파악
+  goal: '2단계. 미리보기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 미리보기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: total(총 사고), speeding(과속), alcohol(음주), not_distracted(집중), ins_premium(보험료), abbrev(주 약자)
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: crashes.head()
+  exercise:
+    prompt: '2단계. 미리보기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: crashes.head()
+    solution: crashes.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: total(총 사고), speeding(과속), alcohol(음주), not_distracted(집중), ins_premium(보험료), abbrev(주 약자)
@@ -46,12 +117,42 @@ sections:
     language: python
     title: 미리보기
     description: 주별 사고 원인 통계
-    content: |-
-      crashes.head()
-
+    content: crashes.head()
 - id: step3_set_index
   title: 3단계. 인덱스 설정
+  structuredPrimary: true
   subtitle: 주 약자를 인덱스로
+  goal: '3단계. 인덱스 설정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 인덱스 설정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    주 약자(abbrev)를 인덱스로 설정하면 'CA', 'TX'처럼 이름으로 접근할 수 있습니다. 인덱스를 의미있는 값으로 설정하면 데이터 조회가 직관적이고 편리해집니다.
+
+    set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로 직관적인 조회가 가능합니다.
+  tips:
+  - set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로 직관적인 조회가
+    가능합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    indexed = crashes.set_index('abbrev')
+    indexed.head()
+  exercise:
+    prompt: '3단계. 인덱스 설정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      indexed = crashes.set_index('abbrev')
+      indexed.head()
+    solution: |-
+      indexed = crashes.set_index('abbrev')
+      indexed.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 주 약자(abbrev)를 인덱스로 설정하면 'CA', 'TX'처럼 이름으로 접근할 수 있습니다. 인덱스를 의미있는 값으로 설정하면 데이터 조회가 직관적이고 편리해집니다.
@@ -63,11 +164,33 @@ sections:
       indexed = crashes.set_index('abbrev')
       indexed.head()
   - type: tip
-    content: set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로 직관적인 조회가 가능합니다.
-
+    content: set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로
+      직관적인 조회가 가능합니다.
 - id: step4_loc
   title: 4단계. 특정 주 조회
+  structuredPrimary: true
   subtitle: loc으로 이름 접근
+  goal: '4단계. 특정 주 조회: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 특정 주 조회: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 인덱스를 설정하면 주 이름으로 바로 조회할 수 있습니다. 인덱스 기반 조회는 속도도 빠릅니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: indexed.loc['CA']
+  exercise:
+    prompt: '4단계. 특정 주 조회: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: indexed.loc['CA']
+    solution: indexed.loc['CA']
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 인덱스를 설정하면 주 이름으로 바로 조회할 수 있습니다. 인덱스 기반 조회는 속도도 빠릅니다.
@@ -75,12 +198,32 @@ sections:
     language: python
     title: 특정 주 조회
     description: 캘리포니아(CA)의 데이터
-    content: |-
-      indexed.loc['CA']
-
+    content: indexed.loc['CA']
 - id: step5_multi_loc
   title: 5단계. 여러 주 비교
+  structuredPrimary: true
   subtitle: 리스트로 여러 행 조회
+  goal: '5단계. 여러 주 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 여러 주 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 리스트를 넣으면 여러 주를 동시에 비교할 수 있습니다. 관심있는 주들만 선택해서 볼 수 있어 편리합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: indexed.loc[['CA', 'TX', 'NY']]
+  exercise:
+    prompt: '5단계. 여러 주 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: indexed.loc[['CA', 'TX', 'NY']]
+    solution: indexed.loc[['CA', 'TX', 'NY']]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 리스트를 넣으면 여러 주를 동시에 비교할 수 있습니다. 관심있는 주들만 선택해서 볼 수 있어 편리합니다.
@@ -88,12 +231,45 @@ sections:
     language: python
     title: 여러 주 비교
     description: 캘리포니아, 텍사스, 뉴욕 비교
-    content: |-
-      indexed.loc[['CA', 'TX', 'NY']]
-
+    content: indexed.loc[['CA', 'TX', 'NY']]
 - id: step6_rank
   title: 6단계. 순위 매기기
+  structuredPrimary: true
   subtitle: rank()
+  goal: '6단계. 순위 매기기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 순위 매기기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    rank()는 값의 순위를 매깁니다. ascending=False로 큰 값이 1위가 됩니다. 순위를 매기면 상대적인 위치를 쉽게 파악할 수 있습니다.
+
+    rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로 처리 방식을 선택할 수 있습니다(average, min, max 등).
+  tips:
+  - rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로 처리 방식을
+    선택할 수 있습니다(average, min, max 등).
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    ranked = indexed.copy()
+    ranked['totalRank'] = ranked['total'].rank(ascending=False)
+    ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+  exercise:
+    prompt: '6단계. 순위 매기기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      ranked = indexed.copy()
+      ranked['totalRank'] = ranked['total'].rank(ascending=False)
+      ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+    solution: |-
+      ranked = indexed.copy()
+      ranked['totalRank'] = ranked['total'].rank(ascending=False)
+      ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: rank()는 값의 순위를 매깁니다. ascending=False로 큰 값이 1위가 됩니다. 순위를 매기면 상대적인 위치를 쉽게 파악할 수 있습니다.
@@ -106,11 +282,39 @@ sections:
       ranked['totalRank'] = ranked['total'].rank(ascending=False)
       ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
   - type: tip
-    content: rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로 처리 방식을 선택할 수 있습니다(average, min, max 등).
-
+    content: rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로
+      처리 방식을 선택할 수 있습니다(average, min, max 등).
 - id: step7_alcohol_rank
   title: 7단계. 음주사고 순위
+  structuredPrimary: true
   subtitle: 다른 지표에도 적용
+  goal: '7단계. 음주사고 순위: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 음주사고 순위: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 음주사고율이 높은 주의 순위를 매깁니다. 여러 지표의 순위를 비교하면 주별 특성을 파악할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+    ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+  exercise:
+    prompt: '7단계. 음주사고 순위: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+      ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+    solution: |-
+      ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+      ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 음주사고율이 높은 주의 순위를 매깁니다. 여러 지표의 순위를 비교하면 주별 특성을 파악할 수 있습니다.
@@ -121,10 +325,31 @@ sections:
     content: |-
       ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
       ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
-
 - id: step8_corr
   title: 8단계. 상관관계 분석
+  structuredPrimary: true
   subtitle: 원인들 사이의 관계
+  goal: '8단계. 상관관계 분석: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 상관관계 분석: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 음주사고가 총 사고율과 0.85로 높은 상관관계를 보입니다. 상관관계 분석으로 어떤 요인들이 함께 움직이는지 파악할 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+  exercise:
+    prompt: '8단계. 상관관계 분석: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+    solution: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 음주사고가 총 사고율과 0.85로 높은 상관관계를 보입니다. 상관관계 분석으로 어떤 요인들이 함께 움직이는지 파악할 수 있습니다.
@@ -132,19 +357,55 @@ sections:
     language: python
     title: 상관관계 행렬
     description: 수치형 컬럼들의 상관관계
-    content: |-
-      indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
-
+    content: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
 - id: step9_normalize_func
   title: 9단계. 정규화 함수
+  structuredPrimary: true
   subtitle: 0~1 스케일로 변환
+  goal: '9단계. 정규화 함수: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 정규화 함수: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다. Min-Max 정규화 방식을 사용합니다.
+
+    함수 정의 (def)
+    def는 '함수를 정의한다'는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로 결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도 한 곳만 바꾸면 됩니다.
+  tips:
+  - '함수 정의 (def) def는 ''함수를 정의한다''는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로
+    결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도
+    한 곳만 바꾸면 됩니다.'
+  - 정규화(normalization)는 서로 다른 범위의 값들을 동일한 스케일로 변환하는 작업입니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소) 공식으로 모든 값을 0~1 사이로 변환합니다. 최소값은
+    0, 최대값은 1이 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def normalize(series):
+        return (series - series.min()) / (series.max() - series.min())
+  exercise:
+    prompt: '9단계. 정규화 함수: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def normalize(series):
+          return (series - series.min()) / (series.max() - series.min())
+    solution: |-
+      def normalize(series):
+          return (series - series.min()) / (series.max() - series.min())
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다. Min-Max 정규화 방식을 사용합니다.
+    content: 여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다.
+      Min-Max 정규화 방식을 사용합니다.
   - type: tip
-    title: "함수 정의 (def)"
-    content: |-
-      def는 '함수를 정의한다'는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로 결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도 한 곳만 바꾸면 됩니다.
+    title: 함수 정의 (def)
+    content: 'def는 ''함수를 정의한다''는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로
+      결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할
+      때도 한 곳만 바꾸면 됩니다.'
   - type: code
     language: python
     title: 정규화 함수
@@ -153,14 +414,59 @@ sections:
       def normalize(series):
           return (series - series.min()) / (series.max() - series.min())
   - type: tip
-    content: 정규화(normalization)는 서로 다른 범위의 값들을 동일한 스케일로 변환하는 작업입니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소) 공식으로 모든 값을 0~1 사이로 변환합니다. 최소값은 0, 최대값은 1이 됩니다.
-
+    content: 정규화(normalization)는 서로 다른 범위의 값들을 동일한 스케일로 변환하는 작업입니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소) 공식으로 모든 값을 0~1 사이로 변환합니다.
+      최소값은 0, 최대값은 1이 됩니다.
 - id: step10_danger_score
   title: 10단계. 위험도 점수 계산
+  structuredPrimary: true
   subtitle: 여러 지표 종합
+  goal: '10단계. 위험도 점수 계산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 위험도 점수 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를 더한 뒤 3으로 나누면 평균 위험도
+    점수가 됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    danger = indexed.copy()
+    danger['dangerScore'] = (
+        normalize(danger['speeding']) +
+        normalize(danger['alcohol']) +
+        (1 - normalize(danger['not_distracted']))
+    ) / 3
+    danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+  exercise:
+    prompt: '10단계. 위험도 점수 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      danger = indexed.copy()
+      danger['dangerScore'] = (
+          normalize(danger['speeding']) +
+          normalize(danger['alcohol']) +
+          (1 - normalize(danger['not_distracted']))
+      ) / 3
+      danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+    solution: |-
+      danger = indexed.copy()
+      danger['dangerScore'] = (
+          normalize(danger['speeding']) +
+          normalize(danger['alcohol']) +
+          (1 - normalize(danger['not_distracted']))
+      ) / 3
+      danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를 더한 뒤 3으로 나누면 평균 위험도 점수가 됩니다.
+    content: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를 더한 뒤 3으로 나누면 평균 위험도 점수가
+      됩니다.
   - type: code
     language: python
     title: 위험도 점수 계산
@@ -173,10 +479,31 @@ sections:
           (1 - normalize(danger['not_distracted']))
       ) / 3
       danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
-
 - id: step11_top_dangerous
   title: 11단계. 가장 위험한 주
+  structuredPrimary: true
   subtitle: nlargest 활용
+  goal: '11단계. 가장 위험한 주: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 가장 위험한 주: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 종합 위험도 상위 5개 주를 확인합니다. nlargest는 가장 큰 값을 빠르게 찾습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+  exercise:
+    prompt: '11단계. 가장 위험한 주: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    solution: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 종합 위험도 상위 5개 주를 확인합니다. nlargest는 가장 큰 값을 빠르게 찾습니다.
@@ -184,12 +511,36 @@ sections:
     language: python
     title: 가장 위험한 주 TOP 5
     description: 종합 위험도 상위 5개 주
-    content: |-
-      danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
-
+    content: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
 - id: step12_safest
   title: 12단계. 가장 안전한 주
+  structuredPrimary: true
   subtitle: nsmallest 활용
+  goal: '12단계. 가장 안전한 주: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 가장 안전한 주: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    종합 위험도가 가장 낮은 5개 주입니다. nsmallest는 가장 작은 값을 빠르게 찾습니다.
+
+    nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
+  tips:
+  - nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다.
+    대용량 데이터에서 TOP N을 찾을 때 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+  exercise:
+    prompt: '12단계. 가장 안전한 주: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    solution: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 종합 위험도가 가장 낮은 5개 주입니다. nsmallest는 가장 작은 값을 빠르게 찾습니다.
@@ -197,21 +548,94 @@ sections:
     language: python
     title: 가장 안전한 주 TOP 5
     description: 종합 위험도 하위 5개 주
-    content: |-
-      danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    content: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
   - type: tip
-    content: nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
-
+    content: nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다
+      성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
 - id: workflow_validation
-  title: "현업 흐름 검증: 지역별 사고 위험도 산정"
-  subtitle: "rank, nlargest, nsmallest, 실패 케이스"
+  title: '현업 흐름 검증: 지역별 사고 위험도 산정'
+  structuredPrimary: true
+  subtitle: rank, nlargest, nsmallest, 실패 케이스
+  goal: '현업 흐름 검증: 지역별 사고 위험도 산정: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 지역별 사고 위험도 산정: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요.
+
+    변주 실험
+    음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요.
+  tips:
+  - 변주 실험 음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import pandas as pd
+
+    crashes = pd.DataFrame({
+        "state": ["A", "B", "C"],
+        "total": [20, 12, 18],
+        "speeding": [5, 2, 7],
+        "alcohol": [4, 1, 2],
+    }).set_index("state")
+
+    crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+    top = crashes.nlargest(1, "dangerScore")
+    safe = crashes.nsmallest(1, "dangerScore")
+
+    assert top.index.tolist() == ["A"]
+    assert safe.index.tolist() == ["B"]
+    assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+  exercise:
+    prompt: '현업 흐름 검증: 지역별 사고 위험도 산정: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      crashes = pd.DataFrame({
+          "state": ["A", "B", "C"],
+          "total": [20, 12, 18],
+          "speeding": [5, 2, 7],
+          "alcohol": [4, 1, 2],
+      }).set_index("state")
+
+      crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+      top = crashes.nlargest(1, "dangerScore")
+      safe = crashes.nsmallest(1, "dangerScore")
+
+      assert top.index.tolist() == ["A"]
+      assert safe.index.tolist() == ["B"]
+      assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+    solution: |-
+      import pandas as pd
+
+      crashes = pd.DataFrame({
+          "state": ["A", "B", "C"],
+          "total": [20, 12, 18],
+          "speeding": [5, 2, 7],
+          "alcohol": [4, 1, 2],
+      }).set_index("state")
+
+      crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+      top = crashes.nlargest(1, "dangerScore")
+      safe = crashes.nsmallest(1, "dangerScore")
+
+      assert top.index.tolist() == ["A"]
+      assert safe.index.tolist() == ["B"]
+      assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요."
+    content: 종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요.
   - type: code
     language: python
-    title: "위험 점수와 상하위 지역"
-    description: "여러 원인을 합산한 점수로 TOP/BOTTOM 지역을 검증합니다."
+    title: 위험 점수와 상하위 지역
+    description: 여러 원인을 합산한 점수로 TOP/BOTTOM 지역을 검증합니다.
     content: |-
       import pandas as pd
 
@@ -231,8 +655,8 @@ sections:
       assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
   - type: code
     language: python
-    title: "음수 사고 수 오류 확인"
-    description: "사고 수는 음수가 될 수 없으므로 분석 전에 확인합니다."
+    title: 음수 사고 수 오류 확인
+    description: 사고 수는 음수가 될 수 없으므로 분석 전에 확인합니다.
     content: |-
       import pandas as pd
 
@@ -249,22 +673,61 @@ sections:
 
       assert message == "crash counts must be non-negative"
   - type: tip
-    title: "변주 실험"
-    content: "음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요."
-
+    title: 변주 실험
+    content: 음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요.
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 교통안전 분석 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("car_crashes")
+    dataIndexed = data.set_index("abbrev")
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("car_crashes")
+      dataIndexed = data.set_index("abbrev")
+    solution: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("car_crashes")
+      dataIndexed = data.set_index("abbrev")
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
   - type: tip
-    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: TOP N 분석 + 상관관계"
+    title: '미션1: TOP N 분석 + 상관관계'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
@@ -272,16 +735,16 @@ sections:
         data = loadLocalDataset("car_crashes")
         dataIndexed = data.set_index("abbrev")
     - type: code
-      title: "분석 수행"
+      title: 분석 수행
       content: |-
         topPremium = dataIndexed.nlargest(5, 'ins_premium')[['ins_premium', 'total']]
         speedingCorr = dataIndexed[['speeding', 'ins_premium']].corr()
         (topPremium, speedingCorr)
   - type: expansion
-    title: "미션2: 순위 비교 + 손실 비율 분석"
+    title: '미션2: 순위 비교 + 손실 비율 분석'
     blocks:
     - type: code
-      title: "데이터 준비"
+      title: 데이터 준비
       content: |-
         import pandas as pd
         from codaro.curriculum.localData import loadLocalDataset
@@ -291,14 +754,13 @@ sections:
         dfIndexed["totalRank"] = dfIndexed["total"].rank(ascending=False)
         dfIndexed["alcoholRank"] = dfIndexed["alcohol"].rank(ascending=False)
     - type: code
-      title: "분석 수행"
+      title: 분석 수행
       content: |-
         dfIndexed['rankDiff'] = abs(dfIndexed['totalRank'] - dfIndexed['alcoholRank'])
         rankDiffTop = dfIndexed[['totalRank', 'alcoholRank', 'rankDiff']].sort_values('rankDiff', ascending=False).head(10)
         dfIndexed['lossRatio'] = dfIndexed['ins_losses'] / dfIndexed['ins_premium']
         lossRatioTop = dfIndexed.nlargest(5, 'lossRatio')[['ins_premium', 'ins_losses', 'lossRatio']]
         (rankDiffTop, lossRatioTop)
-
 - id: summary
   title: 정리
   subtitle: 중급 과정 완료!
@@ -307,9 +769,9 @@ sections:
     content: pandas 중급 과정을 모두 마쳤습니다!
   - type: list
     items:
-    - "set_index() - 의미있는 인덱스 설정"
-    - "rank() - 순위 매기기"
-    - "정규화 - 0~1 사이로 스케일 조정"
-    - "종합 점수 - 여러 지표를 하나로"
+    - set_index() - 의미있는 인덱스 설정
+    - rank() - 순위 매기기
+    - 정규화 - 0~1 사이로 스케일 조정
+    - 종합 점수 - 여러 지표를 하나로
   - type: text
     content: 다음 시간부터는 심화 과정입니다. 여러 데이터를 합치는 merge를 배웁니다.

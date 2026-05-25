@@ -1,28 +1,70 @@
 meta:
   packages:
-    - numpy
-    - pandas
+  - numpy
+  - pandas
   id: numpy_10
   title: 당뇨병종합분석
   order: 10
   category: numpy
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 심화
-  tags: ["numpy", "종합", "random", "bincount", "histogram", "cov", "eig", "apply_along_axis", "검증", "종합분석"]
+  tags:
+  - numpy
+  - 종합
+  - random
+  - bincount
+  - histogram
+  - cov
+  - eig
+  - apply_along_axis
+  - 검증
+  - 종합분석
   seo:
-    title: "NumPy 종합 프로젝트 - 당뇨병 데이터 분석"
-    description: "NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 심층 분석합니다."
-    keywords: ["numpy", "종합분석", "당뇨병", "random", "histogram", "cov"]
-
+    title: NumPy 종합 프로젝트 - 당뇨병 데이터 분석
+    description: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 심층 분석합니다.
+    keywords:
+    - numpy
+    - 종합분석
+    - 당뇨병
+    - random
+    - histogram
+    - cov
 intro:
-  emoji: "🩺"
+  emoji: 🩺
   goal: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 분석합니다.
   description: Pima 인디언 당뇨병 데이터셋으로 지금까지 배운 모든 NumPy 개념을 종합 활용합니다. 배열 생성, 인덱싱, 통계, 선형대수, 결측값 처리, 상관분석을 모두 다룹니다.
-
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
   subtitle: import
+  goal: '1단계. 라이브러리 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 라이브러리 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: '1단계. 라이브러리 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    solution: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
@@ -33,13 +75,48 @@ sections:
     content: |-
       import numpy as np
       import pandas as pd
-
 - id: step2_data
   title: 2단계. 데이터 로드
+  structuredPrimary: true
   subtitle: 당뇨병 데이터셋
+  goal: '2단계. 데이터 로드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 데이터 로드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다. Glucose(혈당), BloodPressure(혈압),
+    BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("diabetes")
+    df.head()
+  exercise:
+    prompt: '2단계. 데이터 로드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("diabetes")
+      df.head()
+    solution: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("diabetes")
+      df.head()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다. Glucose(혈당), BloodPressure(혈압), BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다."
+    content: Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다. Glucose(혈당), BloodPressure(혈압),
+      BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다.
   - type: code
     language: python
     title: 당뇨병 데이터 로드
@@ -49,10 +126,43 @@ sections:
 
       df = loadLocalDataset("diabetes")
       df.head()
-
 - id: step3_extract
   title: 3단계. 배열 추출
+  structuredPrimary: true
   subtitle: 전체 특성
+  goal: '3단계. 배열 추출: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 배열 추출: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모든 특성과 타겟을 NumPy 배열로 추출합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+    X = df[cols].values
+    y = df['Outcome'].values
+    X.shape, y.shape
+  exercise:
+    prompt: '3단계. 배열 추출: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+      X = df[cols].values
+      y = df['Outcome'].values
+      X.shape, y.shape
+    solution: |-
+      cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+      X = df[cols].values
+      y = df['Outcome'].values
+      X.shape, y.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모든 특성과 타겟을 NumPy 배열로 추출합니다.
@@ -65,13 +175,45 @@ sections:
       X = df[cols].values
       y = df['Outcome'].values
       X.shape, y.shape
-
 - id: step4_zero_check
   title: 4단계. 결측값 확인
+  structuredPrimary: true
   subtitle: 0값 처리
+  goal: '4단계. 결측값 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 결측값 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은 생물학적으로 불가능합니다. 살아있는
+    사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    zeros = np.sum(X == 0, axis=0)
+    ratio = zeros / len(X) * 100
+    pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+  exercise:
+    prompt: '4단계. 결측값 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      zeros = np.sum(X == 0, axis=0)
+      ratio = zeros / len(X) * 100
+      pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+    solution: |-
+      zeros = np.sum(X == 0, axis=0)
+      ratio = zeros / len(X) * 100
+      pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은 생물학적으로 불가능합니다. 살아있는 사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다."
+    content: 이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은 생물학적으로 불가능합니다. 살아있는
+      사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다.
   - type: code
     language: python
     title: 0값 개수
@@ -80,10 +222,46 @@ sections:
       zeros = np.sum(X == 0, axis=0)
       ratio = zeros / len(X) * 100
       pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
-
 - id: step5_replace_nan
   title: 5단계. 0을 NaN으로
+  structuredPrimary: true
   subtitle: np.where()
+  goal: '5단계. 0을 NaN으로: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 0을 NaN으로: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Glucose, BloodPressure, SkinThickness, Insulin, BMI의 0값은 결측값이므로 NaN으로 변환합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    idx = [1, 2, 3, 4, 5]
+    clean = X.astype(float).copy()
+    for i in idx:
+        clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+    np.sum(np.isnan(clean), axis=0)
+  exercise:
+    prompt: '5단계. 0을 NaN으로: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      idx = [1, 2, 3, 4, 5]
+      clean = X.astype(float).copy()
+      for i in idx:
+          clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+      np.sum(np.isnan(clean), axis=0)
+    solution: |-
+      idx = [1, 2, 3, 4, 5]
+      clean = X.astype(float).copy()
+      for i in idx:
+          clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+      np.sum(np.isnan(clean), axis=0)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: Glucose, BloodPressure, SkinThickness, Insulin, BMI의 0값은 결측값이므로 NaN으로 변환합니다.
@@ -97,10 +275,46 @@ sections:
       for i in idx:
           clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
       np.sum(np.isnan(clean), axis=0)
-
 - id: step6_impute
   title: 6단계. 결측값 대체
+  structuredPrimary: true
   subtitle: nanmean
+  goal: '6단계. 결측값 대체: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 결측값 대체: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 결측값을 각 컬럼의 평균으로 대체합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    avg = np.nanmean(clean, axis=0)
+    mask = np.isnan(clean)
+    ci = np.where(mask)[1]
+    clean[mask] = avg[ci]
+    np.sum(np.isnan(clean))
+  exercise:
+    prompt: '6단계. 결측값 대체: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      avg = np.nanmean(clean, axis=0)
+      mask = np.isnan(clean)
+      ci = np.where(mask)[1]
+      clean[mask] = avg[ci]
+      np.sum(np.isnan(clean))
+    solution: |-
+      avg = np.nanmean(clean, axis=0)
+      mask = np.isnan(clean)
+      ci = np.where(mask)[1]
+      clean[mask] = avg[ci]
+      np.sum(np.isnan(clean))
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 결측값을 각 컬럼의 평균으로 대체합니다.
@@ -114,13 +328,47 @@ sections:
       ci = np.where(mask)[1]
       clean[mask] = avg[ci]
       np.sum(np.isnan(clean))
-
 - id: step7_histogram
   title: 7단계. 히스토그램
+  structuredPrimary: true
   subtitle: np.histogram()
+  goal: '7단계. 히스토그램: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 히스토그램: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다.
+
+    np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
+  tips:
+  - np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    glucose = clean[:, 1]
+    hist, edges = np.histogram(glucose, bins=10)
+    pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+  exercise:
+    prompt: '7단계. 히스토그램: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      glucose = clean[:, 1]
+      hist, edges = np.histogram(glucose, bins=10)
+      pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+    solution: |-
+      glucose = clean[:, 1]
+      hist, edges = np.histogram(glucose, bins=10)
+      pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다."
+    content: 히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은
+      그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다.
   - type: code
     language: python
     title: 혈당 분포
@@ -131,13 +379,44 @@ sections:
       pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
   - type: tip
     content: np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
-
 - id: step8_bincount
   title: 8단계. 빈도 계산
+  structuredPrimary: true
   subtitle: np.bincount()
+  goal: '8단계. 빈도 계산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 빈도 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다.
+
+    np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
+  tips:
+  - np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    counts = np.bincount(y)
+    f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+  exercise:
+    prompt: '8단계. 빈도 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      counts = np.bincount(y)
+      f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+    solution: |-
+      counts = np.bincount(y)
+      f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다."
+    content: np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스
+      불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다.
   - type: code
     language: python
     title: 당뇨병 빈도
@@ -147,13 +426,44 @@ sections:
       f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
   - type: tip
     content: np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
-
 - id: step9_cov
   title: 9단계. 공분산 행렬
+  structuredPrimary: true
   subtitle: np.cov()
+  goal: '9단계. 공분산 행렬: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '9단계. 공분산 행렬: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다.
+
+    np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
+  tips:
+  - np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cov = np.cov(clean.T)
+    cov.shape
+  exercise:
+    prompt: '9단계. 공분산 행렬: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cov = np.cov(clean.T)
+      cov.shape
+    solution: |-
+      cov = np.cov(clean.T)
+      cov.shape
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다."
+    content: 공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다.
+      np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다.
   - type: code
     language: python
     title: 공분산 행렬
@@ -163,10 +473,52 @@ sections:
       cov.shape
   - type: tip
     content: np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
-
 - id: step10_corr_target
   title: 10단계. 타겟 상관관계
+  structuredPrimary: true
   subtitle: corrcoef
+  goal: '10단계. 타겟 상관관계: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '10단계. 타겟 상관관계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 각 특성과 당뇨병 유무의 상관계수를 계산합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    corrs = []
+    for i in range(clean.shape[1]):
+        r = np.corrcoef(clean[:, i], y)[0, 1]
+        corrs.append(r)
+    corrs = np.array(corrs)
+    result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+    result.sort_values('Correlation', ascending=False)
+  exercise:
+    prompt: '10단계. 타겟 상관관계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      corrs = []
+      for i in range(clean.shape[1]):
+          r = np.corrcoef(clean[:, i], y)[0, 1]
+          corrs.append(r)
+      corrs = np.array(corrs)
+      result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+      result.sort_values('Correlation', ascending=False)
+    solution: |-
+      corrs = []
+      for i in range(clean.shape[1]):
+          r = np.corrcoef(clean[:, i], y)[0, 1]
+          corrs.append(r)
+      corrs = np.array(corrs)
+      result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+      result.sort_values('Correlation', ascending=False)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 각 특성과 당뇨병 유무의 상관계수를 계산합니다.
@@ -182,10 +534,64 @@ sections:
       corrs = np.array(corrs)
       result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
       result.sort_values('Correlation', ascending=False)
-
 - id: step11_group_stats
   title: 11단계. 그룹별 통계
+  structuredPrimary: true
   subtitle: 당뇨/비당뇨
+  goal: '11단계. 그룹별 통계: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '11단계. 그룹별 통계: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 당뇨병 유무에 따른 각 특성의 평균을 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    sick = y == 1
+    well = y == 0
+    avg1 = np.mean(clean[sick], axis=0)
+    avg2 = np.mean(clean[well], axis=0)
+    diff = (avg1 - avg2) / avg2 * 100
+    pd.DataFrame({
+        'Feature': cols,
+        'Normal': avg2.round(2),
+        'Diabetic': avg1.round(2),
+        'Diff(%)': diff.round(1)
+    })
+  exercise:
+    prompt: '11단계. 그룹별 통계: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sick = y == 1
+      well = y == 0
+      avg1 = np.mean(clean[sick], axis=0)
+      avg2 = np.mean(clean[well], axis=0)
+      diff = (avg1 - avg2) / avg2 * 100
+      pd.DataFrame({
+          'Feature': cols,
+          'Normal': avg2.round(2),
+          'Diabetic': avg1.round(2),
+          'Diff(%)': diff.round(1)
+      })
+    solution: |-
+      sick = y == 1
+      well = y == 0
+      avg1 = np.mean(clean[sick], axis=0)
+      avg2 = np.mean(clean[well], axis=0)
+      diff = (avg1 - avg2) / avg2 * 100
+      pd.DataFrame({
+          'Feature': cols,
+          'Normal': avg2.round(2),
+          'Diabetic': avg1.round(2),
+          'Diff(%)': diff.round(1)
+      })
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 당뇨병 유무에 따른 각 특성의 평균을 비교합니다.
@@ -205,10 +611,43 @@ sections:
           'Diabetic': avg1.round(2),
           'Diff(%)': diff.round(1)
       })
-
 - id: step12_standardize
   title: 12단계. 표준화
+  structuredPrimary: true
   subtitle: Z-score
+  goal: '12단계. 표준화: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '12단계. 표준화: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모든 특성을 Z-score로 표준화합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    mu = np.mean(clean, axis=0)
+    sigma = np.std(clean, axis=0)
+    z = (clean - mu) / sigma
+    f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+  exercise:
+    prompt: '12단계. 표준화: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+    solution: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모든 특성을 Z-score로 표준화합니다.
@@ -221,13 +660,56 @@ sections:
       sigma = np.std(clean, axis=0)
       z = (clean - mu) / sigma
       f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
-
 - id: step13_eig
   title: 13단계. 고유값 분해
+  structuredPrimary: true
   subtitle: np.linalg.eig()
+  goal: '13단계. 고유값 분해: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '13단계. 고유값 분해: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다.
+
+    np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
+  tips:
+  - np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    c = np.cov(z.T)
+    eig, vec = np.linalg.eig(c)
+    order = np.argsort(eig)[::-1]
+    eig = eig[order]
+    var = eig / np.sum(eig) * 100
+    pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+  exercise:
+    prompt: '13단계. 고유값 분해: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      c = np.cov(z.T)
+      eig, vec = np.linalg.eig(c)
+      order = np.argsort(eig)[::-1]
+      eig = eig[order]
+      var = eig / np.sum(eig) * 100
+      pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+    solution: |-
+      c = np.cov(z.T)
+      eig, vec = np.linalg.eig(c)
+      order = np.argsort(eig)[::-1]
+      eig = eig[order]
+      var = eig / np.sum(eig) * 100
+      pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다."
+    content: 고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이
+      데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다.
   - type: code
     language: python
     title: 고유값 분해
@@ -241,13 +723,53 @@ sections:
       pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
   - type: tip
     content: np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
-
 - id: step14_apply_along
   title: 14단계. 축 따라 적용
+  structuredPrimary: true
   subtitle: np.apply_along_axis()
+  goal: '14단계. 축 따라 적용: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '14단계. 축 따라 적용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다.
+
+    np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
+  tips:
+  - np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    def iqr(x):
+        return np.percentile(x, 75) - np.percentile(x, 25)
+
+    vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+    pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+  exercise:
+    prompt: '14단계. 축 따라 적용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def iqr(x):
+          return np.percentile(x, 75) - np.percentile(x, 25)
+
+      vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+      pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+    solution: |-
+      def iqr(x):
+          return np.percentile(x, 75) - np.percentile(x, 25)
+
+      vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+      pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다."
+    content: np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다.
+      IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다.
   - type: code
     language: python
     title: 커스텀 함수 적용
@@ -260,13 +782,78 @@ sections:
       pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
   - type: tip
     content: np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
-
 - id: step15_risk_score
   title: 15단계. 위험 점수 계산
+  structuredPrimary: true
   subtitle: 종합 분석
+  goal: '15단계. 위험 점수 계산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '15단계. 위험 점수 계산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가 높은 특성일수록 가중치가 크고, 그
+    특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    w = np.abs(corrs) / np.sum(np.abs(corrs))
+    score = np.sum(z * w, axis=1)
+    pct = np.percentile(score, [25, 50, 75, 90])
+    pd.DataFrame({
+        'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+        'Threshold': list(pct.round(2)) + ['-'],
+        'DiabeticRate': [
+            np.mean(y[score < pct[0]]) * 100,
+            np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+            np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+            np.mean(y[score >= pct[3]]) * 100,
+            np.mean(y) * 100
+        ]
+    }).round(1)
+  exercise:
+    prompt: '15단계. 위험 점수 계산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      w = np.abs(corrs) / np.sum(np.abs(corrs))
+      score = np.sum(z * w, axis=1)
+      pct = np.percentile(score, [25, 50, 75, 90])
+      pd.DataFrame({
+          'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+          'Threshold': list(pct.round(2)) + ['-'],
+          'DiabeticRate': [
+              np.mean(y[score < pct[0]]) * 100,
+              np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+              np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+              np.mean(y[score >= pct[3]]) * 100,
+              np.mean(y) * 100
+          ]
+      }).round(1)
+    solution: |-
+      w = np.abs(corrs) / np.sum(np.abs(corrs))
+      score = np.sum(z * w, axis=1)
+      pct = np.percentile(score, [25, 50, 75, 90])
+      pd.DataFrame({
+          'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+          'Threshold': list(pct.round(2)) + ['-'],
+          'DiabeticRate': [
+              np.mean(y[score < pct[0]]) * 100,
+              np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+              np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+              np.mean(y[score >= pct[3]]) * 100,
+              np.mean(y) * 100
+          ]
+      }).round(1)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가 높은 특성일수록 가중치가 크고, 그 특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다."
+    content: 위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가 높은 특성일수록 가중치가 크고, 그 특성값이
+      높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다.
   - type: code
     language: python
     title: 위험 점수
@@ -286,17 +873,102 @@ sections:
               np.mean(y) * 100
           ]
       }).round(1)
-
 - id: workflow_validation
-  title: "현업 흐름 검증: 당뇨 위험 점수 파이프라인"
-  subtitle: "표준화, 공분산, 히스토그램, 위험군 검증"
+  title: '현업 흐름 검증: 당뇨 위험 점수 파이프라인'
+  structuredPrimary: true
+  subtitle: 표준화, 공분산, 히스토그램, 위험군 검증
+  goal: '현업 흐름 검증: 당뇨 위험 점수 파이프라인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '현업 흐름 검증: 당뇨 위험 점수 파이프라인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    종합 분석은 여러 NumPy 기능을 이어 붙이는 만큼 중간 산출물을 검증해야 합니다. 표준화 평균, 위험 점수 shape, 구간별 환자 수를 단계별로 확인하세요.
+
+    변주 실험
+    가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요.
+  tips:
+  - 변주 실험 가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+
+    X = np.array([
+        [120, 70, 28],
+        [160, 85, 35],
+        [140, 80, 31],
+        [180, 95, 40],
+    ], dtype=float)
+    y = np.array([0, 1, 0, 1])
+
+    z = (X - X.mean(axis=0)) / X.std(axis=0)
+    weights = np.array([0.4, 0.3, 0.3])
+    riskScore = z @ weights
+    counts, bins = np.histogram(riskScore, bins=2)
+    covariance = np.cov(X, rowvar=False)
+
+    assert np.allclose(z.mean(axis=0), [0.0, 0.0, 0.0])
+    assert riskScore.shape == (4,)
+    assert counts.sum() == len(y)
+    assert covariance.shape == (3, 3)
+  exercise:
+    prompt: '현업 흐름 검증: 당뇨 위험 점수 파이프라인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      X = np.array([
+          [120, 70, 28],
+          [160, 85, 35],
+          [140, 80, 31],
+          [180, 95, 40],
+      ], dtype=float)
+      y = np.array([0, 1, 0, 1])
+
+      z = (X - X.mean(axis=0)) / X.std(axis=0)
+      weights = np.array([0.4, 0.3, 0.3])
+      riskScore = z @ weights
+      counts, bins = np.histogram(riskScore, bins=2)
+      covariance = np.cov(X, rowvar=False)
+
+      assert np.allclose(z.mean(axis=0), [0.0, 0.0, 0.0])
+      assert riskScore.shape == (4,)
+      assert counts.sum() == len(y)
+      assert covariance.shape == (3, 3)
+    solution: |-
+      import numpy as np
+
+      X = np.array([
+          [120, 70, 28],
+          [160, 85, 35],
+          [140, 80, 31],
+          [180, 95, 40],
+      ], dtype=float)
+      y = np.array([0, 1, 0, 1])
+
+      z = (X - X.mean(axis=0)) / X.std(axis=0)
+      weights = np.array([0.4, 0.3, 0.3])
+      riskScore = z @ weights
+      counts, bins = np.histogram(riskScore, bins=2)
+      covariance = np.cov(X, rowvar=False)
+
+      assert np.allclose(z.mean(axis=0), [0.0, 0.0, 0.0])
+      assert riskScore.shape == (4,)
+      assert counts.sum() == len(y)
+      assert covariance.shape == (3, 3)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: "종합 분석은 여러 NumPy 기능을 이어 붙이는 만큼 중간 산출물을 검증해야 합니다. 표준화 평균, 위험 점수 shape, 구간별 환자 수를 단계별로 확인하세요."
+    content: 종합 분석은 여러 NumPy 기능을 이어 붙이는 만큼 중간 산출물을 검증해야 합니다. 표준화 평균, 위험 점수 shape, 구간별 환자 수를 단계별로 확인하세요.
   - type: code
     language: python
-    title: "위험 점수와 구간 분포 계산"
-    description: "특성 표준화 후 가중 합계와 histogram을 검증합니다."
+    title: 위험 점수와 구간 분포 계산
+    description: 특성 표준화 후 가중 합계와 histogram을 검증합니다.
     content: |-
       import numpy as np
 
@@ -320,8 +992,8 @@ sections:
       assert covariance.shape == (3, 3)
   - type: code
     language: python
-    title: "상수 특성 오류 확인"
-    description: "표준편차가 0인 특성은 표준화 전에 잡습니다."
+    title: 상수 특성 오류 확인
+    description: 표준편차가 0인 특성은 표준화 전에 잡습니다.
     content: |-
       import numpy as np
 
@@ -339,22 +1011,112 @@ sections:
 
       assert message == "constant feature cannot be standardized"
   - type: tip
-    title: "변주 실험"
-    content: "가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요."
-
+    title: 변주 실험
+    content: 가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요.
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 당뇨병 종합 분석
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame([
+        [6, 148, 72, 35, 0, 33.6, 0.627, 50, 1],
+        [1, 85, 66, 29, 0, 26.6, 0.351, 31, 0],
+        [8, 183, 64, 0, 0, 23.3, 0.672, 32, 1],
+        [1, 89, 66, 23, 94, 28.1, 0.167, 21, 0],
+        [0, 137, 40, 35, 168, 43.1, 2.288, 33, 1],
+        [5, 116, 74, 0, 0, 25.6, 0.201, 30, 0],
+        [3, 78, 50, 32, 88, 31.0, 0.248, 26, 1],
+        [10, 115, 0, 0, 0, 35.3, 0.134, 29, 0],
+        [2, 197, 70, 45, 543, 30.5, 0.158, 53, 1],
+        [8, 125, 96, 0, 0, 0.0, 0.232, 54, 1],
+        [4, 110, 76, 20, 100, 37.2, 0.450, 61, 0],
+        [7, 160, 82, 42, 210, 39.4, 0.690, 66, 1],
+    ])
+    data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+    age = data['Age'].values
+    target = data['Outcome'].values
+    glucose = data['Glucose'].values
+    bmi = data['BMI'].values
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame([
+          [6, 148, 72, 35, 0, 33.6, 0.627, 50, 1],
+          [1, 85, 66, 29, 0, 26.6, 0.351, 31, 0],
+          [8, 183, 64, 0, 0, 23.3, 0.672, 32, 1],
+          [1, 89, 66, 23, 94, 28.1, 0.167, 21, 0],
+          [0, 137, 40, 35, 168, 43.1, 2.288, 33, 1],
+          [5, 116, 74, 0, 0, 25.6, 0.201, 30, 0],
+          [3, 78, 50, 32, 88, 31.0, 0.248, 26, 1],
+          [10, 115, 0, 0, 0, 35.3, 0.134, 29, 0],
+          [2, 197, 70, 45, 543, 30.5, 0.158, 53, 1],
+          [8, 125, 96, 0, 0, 0.0, 0.232, 54, 1],
+          [4, 110, 76, 20, 100, 37.2, 0.450, 61, 0],
+          [7, 160, 82, 42, 210, 39.4, 0.690, 66, 1],
+      ])
+      data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+      age = data['Age'].values
+      target = data['Outcome'].values
+      glucose = data['Glucose'].values
+      bmi = data['BMI'].values
+    solution: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame([
+          [6, 148, 72, 35, 0, 33.6, 0.627, 50, 1],
+          [1, 85, 66, 29, 0, 26.6, 0.351, 31, 0],
+          [8, 183, 64, 0, 0, 23.3, 0.672, 32, 1],
+          [1, 89, 66, 23, 94, 28.1, 0.167, 21, 0],
+          [0, 137, 40, 35, 168, 43.1, 2.288, 33, 1],
+          [5, 116, 74, 0, 0, 25.6, 0.201, 30, 0],
+          [3, 78, 50, 32, 88, 31.0, 0.248, 26, 1],
+          [10, 115, 0, 0, 0, 35.3, 0.134, 29, 0],
+          [2, 197, 70, 45, 543, 30.5, 0.158, 53, 1],
+          [8, 125, 96, 0, 0, 0.0, 0.232, 54, 1],
+          [4, 110, 76, 20, 100, 37.2, 0.450, 61, 0],
+          [7, 160, 82, 42, 210, 39.4, 0.690, 66, 1],
+      ])
+      data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+      age = data['Age'].values
+      target = data['Outcome'].values
+      glucose = data['Glucose'].values
+      bmi = data['BMI'].values
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: 나이 그룹별 당뇨 위험 분석"
+    title: '미션1: 나이 그룹별 당뇨 위험 분석'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import numpy as np
         import pandas as pd
@@ -379,7 +1141,7 @@ sections:
         glucose = data['Glucose'].values
         bmi = data['BMI'].values
     - type: code
-      title: "나이 그룹별 분석"
+      title: 나이 그룹별 분석
       content: |-
         bins = np.array([20, 30, 40, 50, 60, 100])
         groups = np.digitize(age, bins)
@@ -396,10 +1158,10 @@ sections:
                 })
         pd.DataFrame(rows).round(1)
   - type: expansion
-    title: "미션2: 다중 위험 요인 조합 분석"
+    title: '미션2: 다중 위험 요인 조합 분석'
     blocks:
     - type: code
-      title: "데이터 로드"
+      title: 데이터 로드
       content: |-
         import numpy as np
         import pandas as pd
@@ -425,7 +1187,7 @@ sections:
         bp = df['BloodPressure'].values
         target = df['Outcome'].values
     - type: code
-      title: "위험 조합 분석"
+      title: 위험 조합 분석
       content: |-
         gHigh = glucose > np.percentile(glucose[glucose > 0], 75)
         bHigh = bmi > np.percentile(bmi[bmi > 0], 75)

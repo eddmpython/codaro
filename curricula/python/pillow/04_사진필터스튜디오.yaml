@@ -1,29 +1,79 @@
 meta:
   packages:
-    - numpy
-    - pillow
-    - scikit-learn
+  - numpy
+  - pillow
+  - scikit-learn
   id: pillow_04
   title: 사진필터스튜디오
   order: 4
   category: pillow
-  difficulty: "⭐⭐"
+  difficulty: ⭐⭐
   badge: 기초
-  tags: ["Pillow", "ImageFilter", "BLUR", "SHARPEN", "CONTOUR", "EDGE"]
+  tags:
+  - Pillow
+  - ImageFilter
+  - BLUR
+  - SHARPEN
+  - CONTOUR
+  - EDGE
   seo:
-    title: "Pillow 기초 - 사진 필터 스튜디오"
-    description: "Pillow ImageFilter로 블러, 샤픈, 윤곽선 등 다양한 필터를 적용합니다. 이미지 효과 처리의 기초를 배웁니다."
-    keywords: ["Pillow", "ImageFilter", "BLUR", "SHARPEN", "필터", "이미지효과"]
-
+    title: Pillow 기초 - 사진 필터 스튜디오
+    description: Pillow ImageFilter로 블러, 샤픈, 윤곽선 등 다양한 필터를 적용합니다. 이미지 효과 처리의 기초를 배웁니다.
+    keywords:
+    - Pillow
+    - ImageFilter
+    - BLUR
+    - SHARPEN
+    - 필터
+    - 이미지효과
 intro:
-  emoji: "🎭"
+  emoji: 🎭
   goal: ImageFilter 모듈로 다양한 필터 효과를 적용하고 비교합니다.
   description: BLUR, SHARPEN, CONTOUR, EDGE_ENHANCE 등 Pillow의 내장 필터를 사용해봅니다. filter() 메서드로 간단하게 이미지 효과를 적용합니다.
-
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
+  structuredPrimary: true
   subtitle: sklearn 샘플 이미지
+  goal: '1단계. 이미지 불러오기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 이미지 불러오기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: sklearn에 내장된 샘플 이미지를 사용합니다. 필터 효과를 잘 확인할 수 있도록 꽃 이미지를 사용합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import Image, ImageFilter
+    from sklearn.datasets import load_sample_image
+
+    flowerArr = load_sample_image('flower.jpg')
+    canvas = Image.fromarray(flowerArr)
+    canvas.size
+  exercise:
+    prompt: '1단계. 이미지 불러오기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      canvas = Image.fromarray(flowerArr)
+      canvas.size
+    solution: |-
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      canvas = Image.fromarray(flowerArr)
+      canvas.size
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn에 내장된 샘플 이미지를 사용합니다. 필터 효과를 잘 확인할 수 있도록 꽃 이미지를 사용합니다.
@@ -42,12 +92,42 @@ sections:
     language: python
     title: 원본 이미지
     description: 필터 적용 전 원본입니다
-    content: |-
-      canvas
-
+    content: canvas
 - id: step2_blur
   title: 2단계. 블러 필터
+  structuredPrimary: true
   subtitle: BLUR, GaussianBlur
+  goal: '2단계. 블러 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 블러 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    블러 필터는 이미지를 부드럽게 흐리게 만듭니다. BLUR는 기본 블러이고, GaussianBlur는 반경을 조절할 수 있는 가우시안 블러입니다. 블러는 노이즈 제거나 배경 처리에 자주 사용됩니다.
+
+    filter() 메서드는 새 이미지를 반환하고 원본은 유지됩니다. ImageFilter.BLUR는 3x3 커널을 사용하는 기본 블러입니다.
+  tips:
+  - filter() 메서드는 새 이미지를 반환하고 원본은 유지됩니다. ImageFilter.BLUR는 3x3 커널을 사용하는 기본 블러입니다.
+  - GaussianBlur의 radius가 클수록 더 강하게 흐려집니다. radius=2는 약한 블러, radius=10은 강한 블러입니다. 포토샵의 가우시안 블러와 동일한 알고리즘입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    blurred = canvas.filter(ImageFilter.BLUR)
+    blurred
+  exercise:
+    prompt: '2단계. 블러 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      blurred = canvas.filter(ImageFilter.BLUR)
+      blurred
+    solution: |-
+      blurred = canvas.filter(ImageFilter.BLUR)
+      blurred
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 블러 필터는 이미지를 부드럽게 흐리게 만듭니다. BLUR는 기본 블러이고, GaussianBlur는 반경을 조절할 수 있는 가우시안 블러입니다. 블러는 노이즈 제거나 배경 처리에 자주 사용됩니다.
@@ -69,10 +149,40 @@ sections:
       gaussian
   - type: tip
     content: GaussianBlur의 radius가 클수록 더 강하게 흐려집니다. radius=2는 약한 블러, radius=10은 강한 블러입니다. 포토샵의 가우시안 블러와 동일한 알고리즘입니다.
-
 - id: step3_sharpen
   title: 3단계. 샤픈 필터
+  structuredPrimary: true
   subtitle: SHARPEN, UnsharpMask
+  goal: '3단계. 샤픈 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 샤픈 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    샤픈 필터는 이미지의 경계를 강조하여 선명하게 만듭니다. SHARPEN은 기본 샤프닝이고, UnsharpMask는 더 정교한 조절이 가능합니다. 흐린 사진을 선명하게 보정할 때 사용합니다.
+
+    UnsharpMask는 세 가지 파라미터를 가집니다. radius는 효과 범위, percent는 강도(100=보통, 200=2배), threshold는 적용 기준입니다. 사진 보정에서 가장 많이 쓰이는 샤프닝 기법입니다.
+  tips:
+  - UnsharpMask는 세 가지 파라미터를 가집니다. radius는 효과 범위, percent는 강도(100=보통, 200=2배), threshold는 적용 기준입니다. 사진 보정에서 가장 많이 쓰이는 샤프닝 기법입니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    sharpened = canvas.filter(ImageFilter.SHARPEN)
+    sharpened
+  exercise:
+    prompt: '3단계. 샤픈 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      sharpened = canvas.filter(ImageFilter.SHARPEN)
+      sharpened
+    solution: |-
+      sharpened = canvas.filter(ImageFilter.SHARPEN)
+      sharpened
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 샤픈 필터는 이미지의 경계를 강조하여 선명하게 만듭니다. SHARPEN은 기본 샤프닝이고, UnsharpMask는 더 정교한 조절이 가능합니다. 흐린 사진을 선명하게 보정할 때 사용합니다.
@@ -91,11 +201,42 @@ sections:
       unsharp = canvas.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
       unsharp
   - type: tip
-    content: UnsharpMask는 세 가지 파라미터를 가집니다. radius는 효과 범위, percent는 강도(100=보통, 200=2배), threshold는 적용 기준입니다. 사진 보정에서 가장 많이 쓰이는 샤프닝 기법입니다.
-
+    content: UnsharpMask는 세 가지 파라미터를 가집니다. radius는 효과 범위, percent는 강도(100=보통, 200=2배), threshold는 적용 기준입니다. 사진 보정에서 가장 많이
+      쓰이는 샤프닝 기법입니다.
 - id: step4_edge
   title: 4단계. 윤곽선 필터
+  structuredPrimary: true
   subtitle: CONTOUR, FIND_EDGES
+  goal: '4단계. 윤곽선 필터: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 윤곽선 필터: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    윤곽선 필터는 이미지에서 경계선을 추출합니다. CONTOUR는 윤곽선만 남기고, FIND_EDGES는 에지(가장자리)를 검출합니다. 이미지 분석이나 아트 효과에 활용됩니다.
+
+    FIND_EDGES는 소벨(Sobel) 연산자를 사용하여 밝기 변화가 급격한 곳을 검출합니다. 검은 배경에 흰 선으로 경계가 표시됩니다. 컴퓨터 비전에서 객체 검출의 기초가 됩니다.
+  tips:
+  - FIND_EDGES는 소벨(Sobel) 연산자를 사용하여 밝기 변화가 급격한 곳을 검출합니다. 검은 배경에 흰 선으로 경계가 표시됩니다. 컴퓨터 비전에서 객체 검출의 기초가 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    contour = canvas.filter(ImageFilter.CONTOUR)
+    contour
+  exercise:
+    prompt: '4단계. 윤곽선 필터: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      contour = canvas.filter(ImageFilter.CONTOUR)
+      contour
+    solution: |-
+      contour = canvas.filter(ImageFilter.CONTOUR)
+      contour
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 윤곽선 필터는 이미지에서 경계선을 추출합니다. CONTOUR는 윤곽선만 남기고, FIND_EDGES는 에지(가장자리)를 검출합니다. 이미지 분석이나 아트 효과에 활용됩니다.
@@ -115,10 +256,40 @@ sections:
       edge
   - type: tip
     content: FIND_EDGES는 소벨(Sobel) 연산자를 사용하여 밝기 변화가 급격한 곳을 검출합니다. 검은 배경에 흰 선으로 경계가 표시됩니다. 컴퓨터 비전에서 객체 검출의 기초가 됩니다.
-
 - id: step5_emboss
   title: 5단계. 엠보스와 강조
+  structuredPrimary: true
   subtitle: EMBOSS, EDGE_ENHANCE
+  goal: '5단계. 엠보스와 강조: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 엠보스와 강조: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    EMBOSS는 양각 효과를 주어 입체감을 만듭니다. EDGE_ENHANCE는 경계선을 강조하여 이미지를 더 선명하게 보이게 합니다.
+
+    EDGE_ENHANCE는 약한 강조, EDGE_ENHANCE_MORE는 강한 강조입니다. 선명도를 높이면서 자연스러움을 유지하고 싶을 때 EDGE_ENHANCE가 적합합니다.
+  tips:
+  - EDGE_ENHANCE는 약한 강조, EDGE_ENHANCE_MORE는 강한 강조입니다. 선명도를 높이면서 자연스러움을 유지하고 싶을 때 EDGE_ENHANCE가 적합합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    emboss = canvas.filter(ImageFilter.EMBOSS)
+    emboss
+  exercise:
+    prompt: '5단계. 엠보스와 강조: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      emboss = canvas.filter(ImageFilter.EMBOSS)
+      emboss
+    solution: |-
+      emboss = canvas.filter(ImageFilter.EMBOSS)
+      emboss
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: EMBOSS는 양각 효과를 주어 입체감을 만듭니다. EDGE_ENHANCE는 경계선을 강조하여 이미지를 더 선명하게 보이게 합니다.
@@ -138,10 +309,37 @@ sections:
       enhanced
   - type: tip
     content: EDGE_ENHANCE는 약한 강조, EDGE_ENHANCE_MORE는 강한 강조입니다. 선명도를 높이면서 자연스러움을 유지하고 싶을 때 EDGE_ENHANCE가 적합합니다.
-
 - id: step6_smooth
   title: 6단계. 스무딩
+  structuredPrimary: true
   subtitle: SMOOTH, DETAIL
+  goal: '6단계. 스무딩: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 스무딩: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: SMOOTH는 노이즈를 줄이고 부드럽게 만듭니다. DETAIL은 세부 사항을 강조합니다. 이 두 필터는 반대 효과를 가집니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
+    smooth
+  exercise:
+    prompt: '6단계. 스무딩: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
+      smooth
+    solution: |-
+      smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
+      smooth
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: SMOOTH는 노이즈를 줄이고 부드럽게 만듭니다. DETAIL은 세부 사항을 강조합니다. 이 두 필터는 반대 효과를 가집니다.
@@ -159,20 +357,62 @@ sections:
     content: |-
       detail = canvas.filter(ImageFilter.DETAIL)
       detail
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 필터 조합
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    sklearn 이미지에 다양한 필터를 적용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    from PIL import Image, ImageFilter
+    from sklearn.datasets import load_sample_image
+
+    bloomArr = load_sample_image('flower.jpg')
+    bloom = Image.fromarray(bloomArr)
+    bloom
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      bloomArr = load_sample_image('flower.jpg')
+      bloom = Image.fromarray(bloomArr)
+      bloom
+    solution: |-
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      bloomArr = load_sample_image('flower.jpg')
+      bloom = Image.fromarray(bloomArr)
+      bloom
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: sklearn 이미지에 다양한 필터를 적용해봅시다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: flower 블러와 샤픈 비교"
+    title: '미션1: flower 블러와 샤픈 비교'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image, ImageFilter
         from sklearn.datasets import load_sample_image
@@ -181,20 +421,20 @@ sections:
         bloom = Image.fromarray(bloomArr)
         bloom
     - type: code
-      title: "블러 적용"
+      title: 블러 적용
       content: |-
         bloomBlur = bloom.filter(ImageFilter.GaussianBlur(radius=3))
         bloomBlur
     - type: code
-      title: "샤픈 적용"
+      title: 샤픈 적용
       content: |-
         bloomSharp = bloom.filter(ImageFilter.UnsharpMask(radius=2, percent=200))
         bloomSharp
   - type: expansion
-    title: "미션2: china 에지 검출과 엠보스"
+    title: '미션2: china 에지 검출과 엠보스'
     blocks:
     - type: code
-      title: "이미지 로드"
+      title: 이미지 로드
       content: |-
         from PIL import Image, ImageFilter
         from sklearn.datasets import load_sample_image
@@ -203,19 +443,82 @@ sections:
         china = Image.fromarray(chinaArr)
         china
     - type: code
-      title: "에지 검출"
+      title: 에지 검출
       content: |-
         chinaEdge = china.filter(ImageFilter.FIND_EDGES)
         chinaEdge
     - type: code
-      title: "엠보스 효과"
+      title: 엠보스 효과
       content: |-
         chinaEmboss = china.filter(ImageFilter.EMBOSS)
         chinaEmboss
-
 - id: workflow_validation
   title: 7단계. 필터 효과 검증 루프
+  structuredPrimary: true
   subtitle: blur, sharpen, edge 수치 확인
+  goal: '7단계. 필터 효과 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '7단계. 필터 효과 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 필터는 분위기 효과처럼 보이지만 자동화에서는 픽셀 분산과 경계 검출량을 확인해야 합니다. 반지름 입력을 검증하고 blur와 edge 결과를 수치로 비교합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from PIL import Image, ImageDraw, ImageFilter, ImageStat
+    import numpy as np
+
+    filterImage = Image.new("L", (140, 100), 80)
+    filterDraw = ImageDraw.Draw(filterImage)
+    filterDraw.rectangle((30, 25, 110, 75), fill=210)
+    filterDraw.line((30, 25, 110, 75), fill=20, width=4)
+
+    def validateBlurRadius(radius):
+        if radius < 0:
+            raise ValueError(f"blur radius는 0 이상이어야 합니다: {radius}")
+        return True
+
+    validateBlurRadius(2)
+  exercise:
+    prompt: '7단계. 필터 효과 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from PIL import Image, ImageDraw, ImageFilter, ImageStat
+      import numpy as np
+
+      filterImage = Image.new("L", (140, 100), 80)
+      filterDraw = ImageDraw.Draw(filterImage)
+      filterDraw.rectangle((30, 25, 110, 75), fill=210)
+      filterDraw.line((30, 25, 110, 75), fill=20, width=4)
+
+      def validateBlurRadius(radius):
+          if radius < 0:
+              raise ValueError(f"blur radius는 0 이상이어야 합니다: {radius}")
+          return True
+
+      validateBlurRadius(2)
+    solution: |-
+      from PIL import Image, ImageDraw, ImageFilter, ImageStat
+      import numpy as np
+
+      filterImage = Image.new("L", (140, 100), 80)
+      filterDraw = ImageDraw.Draw(filterImage)
+      filterDraw.rectangle((30, 25, 110, 75), fill=210)
+      filterDraw.line((30, 25, 110, 75), fill=20, width=4)
+
+      def validateBlurRadius(radius):
+          if radius < 0:
+              raise ValueError(f"blur radius는 0 이상이어야 합니다: {radius}")
+          return True
+
+      validateBlurRadius(2)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 필터는 분위기 효과처럼 보이지만 자동화에서는 픽셀 분산과 경계 검출량을 확인해야 합니다. 반지름 입력을 검증하고 blur와 edge 결과를 수치로 비교합니다.

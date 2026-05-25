@@ -111,10 +111,13 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         filledExerciseBlocks = [
             block.title or block.id
             for block in solutionBlocks.values()
-            if block.role != "exercise" or block.content.strip()
+            if block.role != "exercise"
+            or (block.content.strip() and block.sourceType != "sectionContract:exercise")
         ]
         if filledExerciseBlocks:
-            failures.append(f"{rel}: solution cells must be blank exercise cells: {', '.join(filledExerciseBlocks[:3])}")
+            failures.append(
+                f"{rel}: legacy solution cells must be blank exercise cells: {', '.join(filledExerciseBlocks[:3])}"
+            )
 
     if not orientation:
         if not expansionCount:

@@ -5,22 +5,138 @@ meta:
   category: excel
   badge: 실무
   packages:
-    - openpyxl
-    - pandas
-  tags: ["excel","pandas","openpyxl","데이터정제","xlsx"]
+  - openpyxl
+  - pandas
+  tags:
+  - excel
+  - pandas
+  - openpyxl
+  - 데이터정제
+  - xlsx
   seo:
-    title: "Excel 데이터 읽기와 정제 - 로컬 Python 엑셀 자동화"
-    description: "openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다."
-    keywords: ["excel","pandas","openpyxl","데이터정제","xlsx"]
-
+    title: Excel 데이터 읽기와 정제 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
+    - pandas
+    - openpyxl
+    - 데이터정제
+    - xlsx
+intro:
+  direction: Excel 데이터 읽기와 정제에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  benefits:
+  - Excel 데이터 읽기와 정제 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
+  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
+  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  diagram:
+    steps:
+    - label: 목표
+      detail: 완료 후 만들 산출물을 먼저 확인
+    - label: 준비
+      detail: meta.packages 기반 uv 준비와 import 확인
+    - label: 실습
+      detail: 예제 스니펫을 바꿔 직접 실행
+    - label: 검증
+      detail: assert와 결과 비교로 완료 판단
+    runtime:
+    - label: 패키지
+      detail: packages-check -> packages-install(누락 시) -> cell-call
+    - label: 첫 실행
+      detail: import 확인과 assert 검증
+    - label: 완료
+      detail: 리포트/자동화/검증 루틴으로 재사용
 sections:
 - id: intro
   title: 1단계. 업무 파일을 DataFrame으로 읽기
+  structuredPrimary: true
   subtitle: read_excel과 계약 확인
+  goal: '1단계. 업무 파일을 DataFrame으로 읽기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 업무 파일을 DataFrame으로 읽기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 실무 엑셀 파일은 사람이 만들기 때문에 헤더 누락, 음수 값, 불필요한 시트가 자주 생깁니다. pandas로 읽은 뒤 컬럼 계약을 먼저 확인하는 습관을 만듭니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook
+    import pandas as pd
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    ordersPath = excelRoot / "orders.xlsx"
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "quantity", "unit_price"])
+    sheet.append(["A001", "Seoul", 3, 120000])
+    sheet.append(["A002", "Busan", 2, 80000])
+    sheet.append(["A003", "Seoul", 5, 45000])
+    workbook.save(ordersPath)
+
+    orders = pd.read_excel(ordersPath, sheet_name="orders")
+    assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
+    orders
+  exercise:
+    prompt: '1단계. 업무 파일을 DataFrame으로 읽기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook
+      import pandas as pd
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      ordersPath = excelRoot / "orders.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "quantity", "unit_price"])
+      sheet.append(["A001", "Seoul", 3, 120000])
+      sheet.append(["A002", "Busan", 2, 80000])
+      sheet.append(["A003", "Seoul", 5, 45000])
+      workbook.save(ordersPath)
+
+      orders = pd.read_excel(ordersPath, sheet_name="orders")
+      assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
+      orders
+    solution: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook
+      import pandas as pd
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      ordersPath = excelRoot / "orders.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "quantity", "unit_price"])
+      sheet.append(["A001", "Seoul", 3, 120000])
+      sheet.append(["A002", "Busan", 2, 80000])
+      sheet.append(["A003", "Seoul", 5, 45000])
+      workbook.save(ordersPath)
+
+      orders = pd.read_excel(ordersPath, sheet_name="orders")
+      assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
+      orders
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      실무 엑셀 파일은 사람이 만들기 때문에 헤더 누락, 음수 값, 불필요한 시트가 자주 생깁니다. pandas로 읽은 뒤 컬럼 계약을 먼저 확인하는 습관을 만듭니다.
+    content: 실무 엑셀 파일은 사람이 만들기 때문에 헤더 누락, 음수 값, 불필요한 시트가 자주 생깁니다. pandas로 읽은 뒤 컬럼 계약을 먼저 확인하는 습관을 만듭니다.
   - type: code
     language: python
     title: 샘플 주문 파일 생성
@@ -47,10 +163,49 @@ sections:
       orders = pd.read_excel(ordersPath, sheet_name="orders")
       assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
       orders
-
 - id: cleaning_flow
   title: 2단계. 파생 컬럼과 요약
+  structuredPrimary: true
   subtitle: amount 계산
+  goal: '2단계. 파생 컬럼과 요약: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 파생 컬럼과 요약: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 2단계. 파생 컬럼과 요약의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    orders = orders.assign(amount=orders["quantity"] * orders["unit_price"])
+    regionSummary = orders.groupby("region", as_index=False)["amount"].sum().sort_values("amount", ascending=False)
+
+    assert orders["amount"].sum() == 745000
+    assert regionSummary.iloc[0]["region"] == "Seoul"
+    regionSummary
+  exercise:
+    prompt: '2단계. 파생 컬럼과 요약: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      orders = orders.assign(amount=orders["quantity"] * orders["unit_price"])
+      regionSummary = orders.groupby("region", as_index=False)["amount"].sum().sort_values("amount", ascending=False)
+
+      assert orders["amount"].sum() == 745000
+      assert regionSummary.iloc[0]["region"] == "Seoul"
+      regionSummary
+    solution: |-
+      orders = orders.assign(amount=orders["quantity"] * orders["unit_price"])
+      regionSummary = orders.groupby("region", as_index=False)["amount"].sum().sort_values("amount", ascending=False)
+
+      assert orders["amount"].sum() == 745000
+      assert regionSummary.iloc[0]["region"] == "Seoul"
+      regionSummary
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: code
     language: python
@@ -77,14 +232,64 @@ sections:
       writtenSheets = pd.ExcelFile(cleanPath).sheet_names
       assert writtenSheets == ["orders", "summary"]
       writtenSheets
-
 - id: workflow_validation
   title: 3단계. 정제 파이프라인 검증 루프
+  structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '3단계. 정제 파이프라인 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 정제 파이프라인 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 엑셀 정제 파이프라인은 읽기, 계산, 저장이 모두 맞아야 합니다. 입력 컬럼을 검증하고, 잘못된 수량을 잡고, 집계 기준을 바꿔 결과가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    def validateOrders(frame):
+        requiredColumns = {"order_id", "region", "quantity", "unit_price"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"주문 파일 필수 컬럼 누락: {sorted(missingColumns)}")
+        assert frame["quantity"].gt(0).all()
+        assert frame["unit_price"].gt(0).all()
+        return True
+
+    assert validateOrders(orders)
+  exercise:
+    prompt: '3단계. 정제 파이프라인 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      def validateOrders(frame):
+          requiredColumns = {"order_id", "region", "quantity", "unit_price"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"주문 파일 필수 컬럼 누락: {sorted(missingColumns)}")
+          assert frame["quantity"].gt(0).all()
+          assert frame["unit_price"].gt(0).all()
+          return True
+
+      assert validateOrders(orders)
+    solution: |-
+      def validateOrders(frame):
+          requiredColumns = {"order_id", "region", "quantity", "unit_price"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"주문 파일 필수 컬럼 누락: {sorted(missingColumns)}")
+          assert frame["quantity"].gt(0).all()
+          assert frame["unit_price"].gt(0).all()
+          return True
+
+      assert validateOrders(orders)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: |-
-      엑셀 정제 파이프라인은 읽기, 계산, 저장이 모두 맞아야 합니다. 입력 컬럼을 검증하고, 잘못된 수량을 잡고, 집계 기준을 바꿔 결과가 어떻게 달라지는지 확인합니다.
+    content: 엑셀 정제 파이프라인은 읽기, 계산, 저장이 모두 맞아야 합니다. 입력 컬럼을 검증하고, 잘못된 수량을 잡고, 집계 기준을 바꿔 결과가 어떻게 달라지는지 확인합니다.
   - type: code
     language: python
     title: 입력 DataFrame 검증
@@ -127,11 +332,9 @@ sections:
       assert thresholdReport[0]["rows"] >= thresholdReport[1]["rows"] >= thresholdReport[2]["rows"]
       assert thresholdReport[0]["totalAmount"] >= thresholdReport[-1]["totalAmount"]
       thresholdReport
-
 - id: summary
   title: 정리
   subtitle: 읽기-정제-저장 완주
   blocks:
   - type: text
-    content: |-
-      이번 레슨에서는 xlsx 입력을 DataFrame으로 읽고, 파생 컬럼을 만들고, 정제 결과와 요약을 여러 시트로 저장했습니다.
+    content: 이번 레슨에서는 xlsx 입력을 DataFrame으로 읽고, 파생 컬럼을 만들고, 정제 결과와 요약을 여러 시트로 저장했습니다.

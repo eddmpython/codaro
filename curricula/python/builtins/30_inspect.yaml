@@ -1,36 +1,90 @@
 meta:
-  id: "30_inspect"
-  title: "inspect - 객체 검사"
-  category: "builtins"
-  tags: ["inspect", "검사", "introspection", "signature", "메타프로그래밍"]
-  description: "런타임 객체 검사를 위한 inspect 모듈"
-  keywords: ["inspect", "검사", "introspection", "signature", "메타프로그래밍"]
-
+  id: 30_inspect
+  title: inspect - 객체 검사
+  category: builtins
+  tags:
+  - inspect
+  - 검사
+  - introspection
+  - signature
+  - 메타프로그래밍
+  description: 런타임 객체 검사를 위한 inspect 모듈
+  keywords:
+  - inspect
+  - 검사
+  - introspection
+  - signature
+  - 메타프로그래밍
 intro:
-  emoji: "🔍"
+  emoji: 🔍
   points:
-  - "객체 정보 추출"
-  - "함수 시그니처 확인"
-  - "소스 코드 조회"
-  - "메타프로그래밍 지원"
-
+  - 객체 정보 추출
+  - 함수 시그니처 확인
+  - 소스 코드 조회
+  - 메타프로그래밍 지원
 sections:
-- id: "module_import"
-  title: "모듈 임포트"
-  subtitle: "inspect 시작하기"
+- id: module_import
+  title: 모듈 임포트
+  structuredPrimary: true
+  subtitle: inspect 시작하기
+  goal: '모듈 임포트: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '모듈 임포트: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다.
+
+    inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다.
+  tips:
+  - inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    def greet(name):
+        return f"Hello {name}"
+
+    sig = inspect.signature(greet)
+    str(sig)
+  exercise:
+    prompt: '모듈 임포트: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def greet(name):
+          return f"Hello {name}"
+
+      sig = inspect.signature(greet)
+      str(sig)
+    solution: |-
+      import inspect
+
+      def greet(name):
+          return f"Hello {name}"
+
+      sig = inspect.signature(greet)
+      str(sig)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다.
+  - type: list
     items:
-    - "getmembers(): 멤버 조회"
-    - "signature(): 함수 시그니처"
-    - "getsource(): 소스 코드"
-    - "isfunction(), isclass(): 타입 확인"
-  - type: "code"
-    language: "python"
-    title: "기본 임포트"
-    description: "inspect 모듈 임포트 및 기본 사용법"
+    - 'getmembers(): 멤버 조회'
+    - 'signature(): 함수 시그니처'
+    - 'getsource(): 소스 코드'
+    - 'isfunction(), isclass(): 타입 확인'
+  - type: code
+    language: python
+    title: 기본 임포트
+    description: inspect 모듈 임포트 및 기본 사용법
     content: |-
       import inspect
 
@@ -39,25 +93,85 @@ sections:
 
       sig = inspect.signature(greet)
       str(sig)
-  - type: "note"
-    content: "inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다."
+  - type: note
+    content: inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다.
+- id: type_checking
+  title: 타입 확인
+  structuredPrimary: true
+  subtitle: 객체 종류 판별
+  goal: '타입 확인: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '타입 확인: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다.
 
-- id: "type_checking"
-  title: "타입 확인"
-  subtitle: "객체 종류 판별"
+    isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드
+  tips:
+  - 'isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드'
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    def myFunc():
+        pass
+
+    class MyClass:
+        pass
+
+    funcCheck = inspect.isfunction(myFunc)
+    classCheck = inspect.isclass(MyClass)
+
+    funcCheck, classCheck
+  exercise:
+    prompt: '타입 확인: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def myFunc():
+          pass
+
+      class MyClass:
+          pass
+
+      funcCheck = inspect.isfunction(myFunc)
+      classCheck = inspect.isclass(MyClass)
+
+      funcCheck, classCheck
+    solution: |-
+      import inspect
+
+      def myFunc():
+          pass
+
+      class MyClass:
+          pass
+
+      funcCheck = inspect.isfunction(myFunc)
+      classCheck = inspect.isclass(MyClass)
+
+      funcCheck, classCheck
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다."
-  - type: "list"
+  - type: text
+    content: inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다.
+  - type: list
     items:
-    - "isfunction(): 함수 확인"
-    - "ismethod(): 메서드 확인"
-    - "isclass(): 클래스 확인"
-    - "ismodule(): 모듈 확인"
-  - type: "code"
-    language: "python"
-    title: "함수와 클래스 구분"
-    description: "타입 판별"
+    - 'isfunction(): 함수 확인'
+    - 'ismethod(): 메서드 확인'
+    - 'isclass(): 클래스 확인'
+    - 'ismodule(): 모듈 확인'
+  - type: code
+    language: python
+    title: 함수와 클래스 구분
+    description: 타입 판별
     content: |-
       import inspect
 
@@ -71,10 +185,10 @@ sections:
       classCheck = inspect.isclass(MyClass)
 
       funcCheck, classCheck
-  - type: "code"
-    language: "python"
-    title: "메서드 확인"
-    description: "바운드 메서드"
+  - type: code
+    language: python
+    title: 메서드 확인
+    description: 바운드 메서드
     content: |-
       import inspect
 
@@ -88,10 +202,10 @@ sections:
       boundCheck = inspect.ismethod(obj.action)
 
       unboundCheck, boundCheck
-  - type: "code"
-    language: "python"
-    title: "여러 타입 확인"
-    description: "다양한 객체 검사"
+  - type: code
+    language: python
+    title: 여러 타입 확인
+    description: 다양한 객체 검사
     content: |-
       import inspect
 
@@ -108,25 +222,76 @@ sections:
       }
 
       checks
-  - type: "tip"
-    content: "isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드"
+  - type: tip
+    content: 'isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드'
+- id: signatures
+  title: 함수 시그니처
+  structuredPrimary: true
+  subtitle: 매개변수 정보
+  goal: '함수 시그니처: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '함수 시그니처: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    signature()로 함수의 매개변수 정보를 추출할 수 있습니다.
 
-- id: "signatures"
-  title: "함수 시그니처"
-  subtitle: "매개변수 정보"
+    signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다.
+  tips:
+  - signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    def calculate(x, y, z=10):
+        return x + y + z
+
+    sig = inspect.signature(calculate)
+    params = list(sig.parameters.keys())
+
+    params
+  exercise:
+    prompt: '함수 시그니처: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def calculate(x, y, z=10):
+          return x + y + z
+
+      sig = inspect.signature(calculate)
+      params = list(sig.parameters.keys())
+
+      params
+    solution: |-
+      import inspect
+
+      def calculate(x, y, z=10):
+          return x + y + z
+
+      sig = inspect.signature(calculate)
+      params = list(sig.parameters.keys())
+
+      params
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "signature()로 함수의 매개변수 정보를 추출할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: signature()로 함수의 매개변수 정보를 추출할 수 있습니다.
+  - type: list
     items:
-    - "signature(func): 시그니처 객체"
-    - "parameters: 매개변수 딕셔너리"
-    - "return_annotation: 반환 타입"
-    - "Parameter.kind: 매개변수 종류"
-  - type: "code"
-    language: "python"
-    title: "기본 시그니처"
-    description: "함수 매개변수 확인"
+    - 'signature(func): 시그니처 객체'
+    - 'parameters: 매개변수 딕셔너리'
+    - 'return_annotation: 반환 타입'
+    - 'Parameter.kind: 매개변수 종류'
+  - type: code
+    language: python
+    title: 기본 시그니처
+    description: 함수 매개변수 확인
     content: |-
       import inspect
 
@@ -137,10 +302,10 @@ sections:
       params = list(sig.parameters.keys())
 
       params
-  - type: "code"
-    language: "python"
-    title: "매개변수 상세 정보"
-    description: "기본값 확인"
+  - type: code
+    language: python
+    title: 매개변수 상세 정보
+    description: 기본값 확인
     content: |-
       import inspect
 
@@ -157,10 +322,10 @@ sections:
           }
 
       paramInfo
-  - type: "code"
-    language: "python"
-    title: "타입 힌트 확인"
-    description: "어노테이션 추출"
+  - type: code
+    language: python
+    title: 타입 힌트 확인
+    description: 어노테이션 추출
     content: |-
       import inspect
 
@@ -175,25 +340,97 @@ sections:
               annotations[name] = param.annotation.__name__
 
       annotations
-  - type: "tip"
-    content: "signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다."
+  - type: tip
+    content: signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다.
+- id: members
+  title: 멤버 조회
+  structuredPrimary: true
+  subtitle: getmembers 함수
+  goal: '멤버 조회: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '멤버 조회: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다.
 
-- id: "members"
-  title: "멤버 조회"
-  subtitle: "getmembers 함수"
+    getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요.
+  tips:
+  - getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    class Person:
+        species = 'Human'
+
+        def __init__(self, name):
+            self.name = name
+
+        def greet(self):
+            return f"Hi, I'm {self.name}"
+
+    person = Person('Alice')
+    members = inspect.getmembers(person)
+
+    userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
+    userDefined
+  exercise:
+    prompt: '멤버 조회: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      class Person:
+          species = 'Human'
+
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self):
+              return f"Hi, I'm {self.name}"
+
+      person = Person('Alice')
+      members = inspect.getmembers(person)
+
+      userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
+      userDefined
+    solution: |-
+      import inspect
+
+      class Person:
+          species = 'Human'
+
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self):
+              return f"Hi, I'm {self.name}"
+
+      person = Person('Alice')
+      members = inspect.getmembers(person)
+
+      userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
+      userDefined
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다.
+  - type: list
     items:
-    - "getmembers(obj): 모든 멤버"
-    - "predicate: 필터 함수"
-    - "(name, value) 튜플 리스트"
-    - "상속된 멤버도 포함"
-  - type: "code"
-    language: "python"
-    title: "클래스 멤버"
-    description: "모든 속성 조회"
+    - 'getmembers(obj): 모든 멤버'
+    - 'predicate: 필터 함수'
+    - (name, value) 튜플 리스트
+    - 상속된 멤버도 포함
+  - type: code
+    language: python
+    title: 클래스 멤버
+    description: 모든 속성 조회
     content: |-
       import inspect
 
@@ -211,10 +448,10 @@ sections:
 
       userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
       userDefined
-  - type: "code"
-    language: "python"
-    title: "메서드만 필터링"
-    description: "predicate 사용"
+  - type: code
+    language: python
+    title: 메서드만 필터링
+    description: predicate 사용
     content: |-
       import inspect
 
@@ -230,10 +467,10 @@ sections:
 
       methodNames = [name for name, _ in methods if not name.startswith('_')]
       methodNames
-  - type: "code"
-    language: "python"
-    title: "함수만 조회"
-    description: "클래스 함수 목록"
+  - type: code
+    language: python
+    title: 함수만 조회
+    description: 클래스 함수 목록
     content: |-
       import inspect
 
@@ -253,25 +490,127 @@ sections:
       functionList = [name for name, _ in functions]
 
       functionList
-  - type: "tip"
-    content: "getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요."
+  - type: tip
+    content: getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요.
+- id: source_code
+  title: 소스 코드 조회
+  structuredPrimary: true
+  subtitle: getsource 함수
+  goal: '소스 코드 조회: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '소스 코드 조회: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다.
 
-- id: "source_code"
-  title: "소스 코드 조회"
-  subtitle: "getsource 함수"
+    getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다.
+  tips:
+  - getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import importlib.util
+    import inspect
+    import sys
+    import tempfile
+    import textwrap
+    from pathlib import Path
+
+    moduleCode = textwrap.dedent('''
+    def fibonacci(n):
+        if n <= 1:
+            return n
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    ''')
+
+    with tempfile.TemporaryDirectory() as tempDir:
+        modulePath = Path(tempDir) / 'math_tools.py'
+        modulePath.write_text(moduleCode, encoding='utf-8')
+        spec = importlib.util.spec_from_file_location('math_tools', modulePath)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        source = inspect.getsource(module.fibonacci)
+
+    assert 'def fibonacci' in source
+    source
+  exercise:
+    prompt: '소스 코드 조회: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import importlib.util
+      import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
+
+      moduleCode = textwrap.dedent('''
+      def fibonacci(n):
+          if n <= 1:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+      ''')
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'math_tools.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('math_tools', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          source = inspect.getsource(module.fibonacci)
+
+      assert 'def fibonacci' in source
+      source
+    solution: |-
+      import importlib.util
+      import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
+
+      moduleCode = textwrap.dedent('''
+      def fibonacci(n):
+          if n <= 1:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+      ''')
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'math_tools.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('math_tools', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          source = inspect.getsource(module.fibonacci)
+
+      assert 'def fibonacci' in source
+      source
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다."
-  - type: "list"
+  - type: text
+    content: getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다.
+  - type: list
     items:
-    - "getsource(obj): 소스 코드 문자열"
-    - "getsourcelines(obj): 줄 단위 리스트"
-    - "getfile(obj): 파일 경로"
-    - "내장 객체는 불가"
-  - type: "code"
-    language: "python"
-    title: "함수 소스 조회"
-    description: "파일에 정의된 함수에서 getsource 사용"
+    - 'getsource(obj): 소스 코드 문자열'
+    - 'getsourcelines(obj): 줄 단위 리스트'
+    - 'getfile(obj): 파일 경로'
+    - 내장 객체는 불가
+  - type: code
+    language: python
+    title: 함수 소스 조회
+    description: 파일에 정의된 함수에서 getsource 사용
     content: |-
       import importlib.util
       import inspect
@@ -299,10 +638,10 @@ sections:
 
       assert 'def fibonacci' in source
       source
-  - type: "code"
-    language: "python"
-    title: "클래스 소스 조회"
-    description: "파일에 정의된 클래스 코드"
+  - type: code
+    language: python
+    title: 클래스 소스 조회
+    description: 파일에 정의된 클래스 코드
     content: |-
       import importlib.util
       import inspect
@@ -332,10 +671,10 @@ sections:
 
       assert 'class Counter' in classSource
       classSource
-  - type: "code"
-    language: "python"
-    title: "소스 라인 정보"
-    description: "파일 기반 객체에서 getsourcelines 사용"
+  - type: code
+    language: python
+    title: 소스 라인 정보
+    description: 파일 기반 객체에서 getsourcelines 사용
     content: |-
       import importlib.util
       import inspect
@@ -364,25 +703,73 @@ sections:
 
       assert lineCount == 3
       lineCount, startLine
-  - type: "tip"
-    content: "getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다."
+  - type: tip
+    content: getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다.
+- id: advanced_inspection
+  title: 고급 검사
+  structuredPrimary: true
+  subtitle: 프레임과 스택
+  goal: '고급 검사: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '고급 검사: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다.
 
-- id: "advanced_inspection"
-  title: "고급 검사"
-  subtitle: "프레임과 스택"
+    프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다.
+  tips:
+  - 프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    def currentFunction():
+        frame = inspect.currentframe()
+        return frame.f_code.co_name
+
+    funcName = currentFunction()
+    funcName
+  exercise:
+    prompt: '고급 검사: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def currentFunction():
+          frame = inspect.currentframe()
+          return frame.f_code.co_name
+
+      funcName = currentFunction()
+      funcName
+    solution: |-
+      import inspect
+
+      def currentFunction():
+          frame = inspect.currentframe()
+          return frame.f_code.co_name
+
+      funcName = currentFunction()
+      funcName
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다.
+  - type: list
     items:
-    - "currentframe(): 현재 프레임"
-    - "stack(): 호출 스택"
-    - "getframeinfo(): 프레임 정보"
-    - "디버깅에 유용"
-  - type: "code"
-    language: "python"
-    title: "현재 함수명"
-    description: "실행 중인 함수 확인"
+    - 'currentframe(): 현재 프레임'
+    - 'stack(): 호출 스택'
+    - 'getframeinfo(): 프레임 정보'
+    - 디버깅에 유용
+  - type: code
+    language: python
+    title: 현재 함수명
+    description: 실행 중인 함수 확인
     content: |-
       import inspect
 
@@ -392,10 +779,10 @@ sections:
 
       funcName = currentFunction()
       funcName
-  - type: "code"
-    language: "python"
-    title: "호출 스택"
-    description: "stack 사용"
+  - type: code
+    language: python
+    title: 호출 스택
+    description: stack 사용
     content: |-
       import inspect
 
@@ -411,10 +798,10 @@ sections:
 
       result = level1()
       result
-  - type: "code"
-    language: "python"
-    title: "프레임 정보"
-    description: "getframeinfo 활용"
+  - type: code
+    language: python
+    title: 프레임 정보
+    description: getframeinfo 활용
     content: |-
       import inspect
 
@@ -428,19 +815,94 @@ sections:
 
       frameData = traceInfo()
       frameData
-  - type: "tip"
-    content: "프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다."
+  - type: tip
+    content: 프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다.
+- id: practical
+  title: 실전 활용
+  structuredPrimary: true
+  subtitle: 실무 활용 사례
+  goal: '실전 활용: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실전 활용: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    inspect 모듈을 활용한 실무 패턴들입니다.
 
-- id: "practical"
-  title: "실전 활용"
-  subtitle: "실무 활용 사례"
+    inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다.
+  tips:
+  - inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import inspect
+
+    def multiply(x: int, y: int) -> int:
+        """두 수를 곱합니다."""
+        return x * y
+
+    sig = inspect.signature(multiply)
+    doc = inspect.getdoc(multiply)
+
+    documentation = {
+        'name': multiply.__name__,
+        'signature': str(sig),
+        'docstring': doc,
+        'parameters': list(sig.parameters.keys())
+    }
+
+    documentation
+  exercise:
+    prompt: '실전 활용: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def multiply(x: int, y: int) -> int:
+          """두 수를 곱합니다."""
+          return x * y
+
+      sig = inspect.signature(multiply)
+      doc = inspect.getdoc(multiply)
+
+      documentation = {
+          'name': multiply.__name__,
+          'signature': str(sig),
+          'docstring': doc,
+          'parameters': list(sig.parameters.keys())
+      }
+
+      documentation
+    solution: |-
+      import inspect
+
+      def multiply(x: int, y: int) -> int:
+          """두 수를 곱합니다."""
+          return x * y
+
+      sig = inspect.signature(multiply)
+      doc = inspect.getdoc(multiply)
+
+      documentation = {
+          'name': multiply.__name__,
+          'signature': str(sig),
+          'docstring': doc,
+          'parameters': list(sig.parameters.keys())
+      }
+
+      documentation
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "inspect 모듈을 활용한 실무 패턴들입니다."
-  - type: "code"
-    language: "python"
-    title: "함수 문서화"
-    description: "자동 문서 생성"
+  - type: text
+    content: inspect 모듈을 활용한 실무 패턴들입니다.
+  - type: code
+    language: python
+    title: 함수 문서화
+    description: 자동 문서 생성
     content: |-
       import inspect
 
@@ -459,10 +921,10 @@ sections:
       }
 
       documentation
-  - type: "code"
-    language: "python"
-    title: "클래스 분석"
-    description: "메서드 목록 추출"
+  - type: code
+    language: python
+    title: 클래스 분석
+    description: 메서드 목록 추출
     content: |-
       import inspect
 
@@ -486,10 +948,10 @@ sections:
       }
 
       apiAnalysis
-  - type: "code"
-    language: "python"
-    title: "파라미터 검증"
-    description: "동적 검증"
+  - type: code
+    language: python
+    title: 파라미터 검증
+    description: 동적 검증
     content: |-
       import inspect
 
@@ -512,19 +974,126 @@ sections:
 
       validation = validator(register)
       validation
-  - type: "tip"
-    content: "inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다."
+  - type: tip
+    content: inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다.
+- id: workflow_validation
+  title: '검증 루프: 플러그인 계약 검사'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 플러그인 계약 검사: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '검증 루프: 플러그인 계약 검사: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: inspect의 실무 가치는 런타임 객체를 들여다본 뒤 계약을 자동 검증하는 데 있습니다. 함수 시그니처, 타입 힌트, docstring, 공개 메서드 목록을 검사하면 플러그인이나 자동화 훅을
+    실행 전에 걸러낼 수 있습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import inspect
+    from typing import get_type_hints
 
-- id: "workflow_validation"
-  title: "검증 루프: 플러그인 계약 검사"
-  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+    def validateAction(func):
+        sig = inspect.signature(func)
+        parameters = list(sig.parameters.values())
+        hints = get_type_hints(func)
+
+        assert len(parameters) >= 2, 'payload와 context 인자가 필요합니다'
+        assert parameters[0].name == 'payload', '첫 번째 인자는 payload여야 합니다'
+        assert parameters[1].name == 'context', '두 번째 인자는 context여야 합니다'
+        assert hints.get('payload') is dict, 'payload 타입 힌트는 dict여야 합니다'
+        assert hints.get('context') is dict, 'context 타입 힌트는 dict여야 합니다'
+        assert hints.get('return') is dict, '반환 타입 힌트는 dict여야 합니다'
+
+        return {
+            'name': func.__name__,
+            'signature': str(sig),
+            'requiredParameters': [param.name for param in parameters[:2]]
+        }
+
+    def normalizeOrder(payload: dict, context: dict) -> dict:
+        return {'orderId': payload['id'], 'source': context['source']}
+
+    actionReport = validateAction(normalizeOrder)
+
+    assert actionReport['requiredParameters'] == ['payload', 'context']
+    actionReport
+  exercise:
+    prompt: '검증 루프: 플러그인 계약 검사: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+      from typing import get_type_hints
+
+      def validateAction(func):
+          sig = inspect.signature(func)
+          parameters = list(sig.parameters.values())
+          hints = get_type_hints(func)
+
+          assert len(parameters) >= 2, 'payload와 context 인자가 필요합니다'
+          assert parameters[0].name == 'payload', '첫 번째 인자는 payload여야 합니다'
+          assert parameters[1].name == 'context', '두 번째 인자는 context여야 합니다'
+          assert hints.get('payload') is dict, 'payload 타입 힌트는 dict여야 합니다'
+          assert hints.get('context') is dict, 'context 타입 힌트는 dict여야 합니다'
+          assert hints.get('return') is dict, '반환 타입 힌트는 dict여야 합니다'
+
+          return {
+              'name': func.__name__,
+              'signature': str(sig),
+              'requiredParameters': [param.name for param in parameters[:2]]
+          }
+
+      def normalizeOrder(payload: dict, context: dict) -> dict:
+          return {'orderId': payload['id'], 'source': context['source']}
+
+      actionReport = validateAction(normalizeOrder)
+
+      assert actionReport['requiredParameters'] == ['payload', 'context']
+      actionReport
+    solution: |-
+      import inspect
+      from typing import get_type_hints
+
+      def validateAction(func):
+          sig = inspect.signature(func)
+          parameters = list(sig.parameters.values())
+          hints = get_type_hints(func)
+
+          assert len(parameters) >= 2, 'payload와 context 인자가 필요합니다'
+          assert parameters[0].name == 'payload', '첫 번째 인자는 payload여야 합니다'
+          assert parameters[1].name == 'context', '두 번째 인자는 context여야 합니다'
+          assert hints.get('payload') is dict, 'payload 타입 힌트는 dict여야 합니다'
+          assert hints.get('context') is dict, 'context 타입 힌트는 dict여야 합니다'
+          assert hints.get('return') is dict, '반환 타입 힌트는 dict여야 합니다'
+
+          return {
+              'name': func.__name__,
+              'signature': str(sig),
+              'requiredParameters': [param.name for param in parameters[:2]]
+          }
+
+      def normalizeOrder(payload: dict, context: dict) -> dict:
+          return {'orderId': payload['id'], 'source': context['source']}
+
+      actionReport = validateAction(normalizeOrder)
+
+      assert actionReport['requiredParameters'] == ['payload', 'context']
+      actionReport
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "inspect의 실무 가치는 런타임 객체를 들여다본 뒤 계약을 자동 검증하는 데 있습니다. 함수 시그니처, 타입 힌트, docstring, 공개 메서드 목록을 검사하면 플러그인이나 자동화 훅을 실행 전에 걸러낼 수 있습니다."
-  - type: "code"
-    language: "python"
-    title: "함수 계약을 검사한다"
-    description: "payload/context 인자와 반환 타입 힌트를 강제합니다."
+  - type: text
+    content: inspect의 실무 가치는 런타임 객체를 들여다본 뒤 계약을 자동 검증하는 데 있습니다. 함수 시그니처, 타입 힌트, docstring, 공개 메서드 목록을 검사하면 플러그인이나 자동화 훅을 실행
+      전에 걸러낼 수 있습니다.
+  - type: code
+    language: python
+    title: 함수 계약을 검사한다
+    description: payload/context 인자와 반환 타입 힌트를 강제합니다.
     content: |-
       import inspect
       from typing import get_type_hints
@@ -554,10 +1123,10 @@ sections:
 
       assert actionReport['requiredParameters'] == ['payload', 'context']
       actionReport
-  - type: "code"
-    language: "python"
-    title: "잘못된 액션을 먼저 실패시킨다"
-    description: "실행 전에 시그니처 문제를 잡습니다."
+  - type: code
+    language: python
+    title: 잘못된 액션을 먼저 실패시킨다
+    description: 실행 전에 시그니처 문제를 잡습니다.
     content: |-
       def badNormalize(payload):
           return payload
@@ -569,10 +1138,10 @@ sections:
 
       assert 'context' in inspectProblem or '인자' in inspectProblem
       inspectProblem
-  - type: "code"
-    language: "python"
-    title: "클래스 공개 메서드 문서를 점검한다"
-    description: "자동 문서화와 운영 검증에 필요한 메서드 정보를 추출합니다."
+  - type: code
+    language: python
+    title: 클래스 공개 메서드 문서를 점검한다
+    description: 자동 문서화와 운영 검증에 필요한 메서드 정보를 추출합니다.
     content: |-
       class OrderActions:
           def normalize(self, payload: dict, context: dict) -> dict:
@@ -600,10 +1169,10 @@ sections:
 
       assert set(methodDocs) == {'normalize', 'validate'}
       methodDocs
-  - type: "code"
-    language: "python"
-    title: "실무 변주: 파일 기반 소스 조회"
-    description: "동적 셀이 아니라 실제 파일에 있는 코드에서 소스를 가져오는 패턴입니다."
+  - type: code
+    language: python
+    title: '실무 변주: 파일 기반 소스 조회'
+    description: 동적 셀이 아니라 실제 파일에 있는 코드에서 소스를 가져오는 패턴입니다.
     content: |-
       import importlib.util
       import sys
@@ -630,12 +1199,55 @@ sections:
       assert 'def transform' in sourceText
       assert 'return' in sourceText
       sourceText
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: '종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 종합 복습의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import inspect
 
-- id: "practice"
-  title: "종합 복습"
+    def test1():
+        pass
+
+    check1 = inspect.isfunction(test1)
+    check1
+  exercise:
+    prompt: '종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import inspect
+
+      def test1():
+          pass
+
+      check1 = inspect.isfunction(test1)
+      check1
+    solution: |-
+      import inspect
+
+      def test1():
+          pass
+
+      check1 = inspect.isfunction(test1)
+      check1
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "expansion"
-    title: "🟢 기본1: 함수 확인"
+  - type: expansion
+    title: '🟢 기본1: 함수 확인'
     code: |-
       import inspect
 
@@ -644,8 +1256,8 @@ sections:
 
       check1 = inspect.isfunction(test1)
       check1
-  - type: "expansion"
-    title: "🟢 기본2: 클래스 확인"
+  - type: expansion
+    title: '🟢 기본2: 클래스 확인'
     code: |-
       import inspect
 
@@ -654,8 +1266,8 @@ sections:
 
       check2 = inspect.isclass(Test2)
       check2
-  - type: "expansion"
-    title: "🟢 기본3: 시그니처 조회"
+  - type: expansion
+    title: '🟢 기본3: 시그니처 조회'
     code: |-
       import inspect
 
@@ -664,8 +1276,8 @@ sections:
 
       sig1 = inspect.signature(add)
       str(sig1)
-  - type: "expansion"
-    title: "🟢 기본4: 파라미터 목록"
+  - type: expansion
+    title: '🟢 기본4: 파라미터 목록'
     code: |-
       import inspect
 
@@ -675,8 +1287,8 @@ sections:
       sig2 = inspect.signature(func1)
       params1 = list(sig2.parameters.keys())
       params1
-  - type: "expansion"
-    title: "🟢 기본5: 소스 코드"
+  - type: expansion
+    title: '🟢 기본5: 소스 코드'
     code: |-
       import importlib.util
       import inspect
@@ -702,8 +1314,8 @@ sections:
 
       assert 'return 42' in source1
       source1
-  - type: "expansion"
-    title: "🟡 응용1: 기본값 확인"
+  - type: expansion
+    title: '🟡 응용1: 기본값 확인'
     code: |-
       import inspect
 
@@ -713,8 +1325,8 @@ sections:
       sig3 = inspect.signature(greet1)
       hasDefault = sig3.parameters['greeting'].default != inspect.Parameter.empty
       hasDefault
-  - type: "expansion"
-    title: "🟡 응용2: 메서드 조회"
+  - type: expansion
+    title: '🟡 응용2: 메서드 조회'
     code: |-
       import inspect
 
@@ -727,8 +1339,8 @@ sections:
       methods1 = inspect.getmembers(Tool1, predicate=inspect.isfunction)
       methodNames1 = [n for n, _ in methods1 if not n.startswith('_')]
       methodNames1
-  - type: "expansion"
-    title: "🟡 응용3: 타입 힌트"
+  - type: expansion
+    title: '🟡 응용3: 타입 힌트'
     code: |-
       import inspect
 
@@ -738,8 +1350,8 @@ sections:
       sig4 = inspect.signature(typed1)
       paramType = sig4.parameters['x'].annotation
       paramType.__name__
-  - type: "expansion"
-    title: "🟡 응용4: 현재 함수명"
+  - type: expansion
+    title: '🟡 응용4: 현재 함수명'
     code: |-
       import inspect
 
@@ -749,8 +1361,8 @@ sections:
 
       name1 = getCurrentName()
       name1
-  - type: "expansion"
-    title: "🟡 응용5: docstring 조회"
+  - type: expansion
+    title: '🟡 응용5: docstring 조회'
     code: |-
       import inspect
 
@@ -760,8 +1372,8 @@ sections:
 
       doc1 = inspect.getdoc(documented)
       doc1
-  - type: "expansion"
-    title: "🔴 심화1: 모든 파라미터 분석"
+  - type: expansion
+    title: '🔴 심화1: 모든 파라미터 분석'
     code: |-
       import inspect
 
@@ -774,8 +1386,8 @@ sections:
           analysis1[pName] = str(pObj.kind)
 
       analysis1
-  - type: "expansion"
-    title: "🔴 심화2: 클래스 멤버 필터"
+  - type: expansion
+    title: '🔴 심화2: 클래스 멤버 필터'
     code: |-
       import inspect
 
@@ -788,8 +1400,8 @@ sections:
       custom = [(n, type(v).__name__) for n, v in members1
                 if not n.startswith('_')]
       custom
-  - type: "expansion"
-    title: "🔴 심화3: 소스 라인 수"
+  - type: expansion
+    title: '🔴 심화3: 소스 라인 수'
     code: |-
       import importlib.util
       import inspect
@@ -819,8 +1431,8 @@ sections:
       lineCount1 = len(lines1)
       assert lineCount1 == 5
       lineCount1
-  - type: "expansion"
-    title: "🔴 심화4: 필수 파라미터"
+  - type: expansion
+    title: '🔴 심화4: 필수 파라미터'
     code: |-
       import inspect
 
@@ -831,8 +1443,8 @@ sections:
       required = [n for n, p in sig6.parameters.items()
                   if p.default == inspect.Parameter.empty]
       required
-  - type: "expansion"
-    title: "🔴 심화5: 메서드 바인딩 확인"
+  - type: expansion
+    title: '🔴 심화5: 메서드 바인딩 확인'
     code: |-
       import inspect
 
@@ -843,8 +1455,8 @@ sections:
       instance1 = Obj1()
       boundCheck1 = inspect.ismethod(instance1.method)
       boundCheck1
-  - type: "expansion"
-    title: "🔴 심화6: 함수 정보 수집"
+  - type: expansion
+    title: '🔴 심화6: 함수 정보 수집'
     code: |-
       import inspect
 
@@ -858,8 +1470,8 @@ sections:
           'doc': inspect.getdoc(target)
       }
       info1
-  - type: "expansion"
-    title: "🔴 심화7: 클래스 분석"
+  - type: expansion
+    title: '🔴 심화7: 클래스 분석'
     code: |-
       import inspect
 
@@ -875,8 +1487,8 @@ sections:
       publicMethods = [n for n, _ in serviceMethods if not n.startswith('_')]
 
       {'class': 'Service1', 'methods': publicMethods}
-  - type: "expansion"
-    title: "🔴 심화8: 어노테이션 추출"
+  - type: expansion
+    title: '🔴 심화8: 어노테이션 추출'
     code: |-
       import inspect
 
@@ -890,8 +1502,8 @@ sections:
               annotations1[pName] = pObj.annotation.__name__
 
       annotations1
-  - type: "expansion"
-    title: "🔴 심화9: 프레임 정보"
+  - type: expansion
+    title: '🔴 심화9: 프레임 정보'
     code: |-
       import inspect
 
@@ -902,8 +1514,8 @@ sections:
 
       frameInfo1 = frameTest()
       frameInfo1
-  - type: "expansion"
-    title: "🔴 심화10: 전체 활용 - API 분석기"
+  - type: expansion
+    title: '🔴 심화10: 전체 활용 - API 분석기'
     code: |-
       import inspect
 

@@ -1,202 +1,371 @@
 meta:
-  id: "day12"
-  title: "딕셔너리메서드"
+  id: day12
+  title: 딕셔너리메서드
   day: 12
-  category: "30days"
-  tags: ["딕셔너리", "get", "update", "items", "설정병합", "검증"]
+  category: 30days
+  tags:
+  - 딕셔너리
+  - get
+  - update
+  - items
+  - 설정병합
+  - 검증
   seo:
-    title: "파이썬 딕셔너리 메서드 - 효율적인 데이터 관리"
-    description: "get, keys, values, items, update, pop, popitem, clear 메서드를 배웁니다."
-    keywords: ['딕셔너리메서드', 'get', 'keys', 'values', 'items', 'update']
-
+    title: 파이썬 딕셔너리 메서드 - 효율적인 데이터 관리
+    description: get, keys, values, items, update, pop, popitem, clear 메서드를 배웁니다.
+    keywords:
+    - 딕셔너리메서드
+    - get
+    - keys
+    - values
+    - items
+    - update
 intro:
-  emoji: "🔧"
+  emoji: 🔧
   points:
-  - "안전한 값 접근 get()"
-  - "키, 값, 아이템 순회"
-  - "딕셔너리 병합과 삭제"
-  - "실전 데이터 처리"
-
+  - 안전한 값 접근 get()
+  - 키, 값, 아이템 순회
+  - 딕셔너리 병합과 삭제
+  - 실전 데이터 처리
 sections:
-- id: "method_get"
-  title: "get() 메서드"
-  subtitle: "안전한 값 접근"
+- id: method_get
+  title: get() 메서드
+  structuredPrimary: true
+  subtitle: 안전한 값 접근
+  goal: 'get() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'get() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다.
+
+    get()은 설정값이나 옵션 처리에 매우 유용합니다.
+  tips:
+  - get()은 설정값이나 옵션 처리에 매우 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    config = {'host': 'localhost', 'port': 8080}
+    config.get('host')
+  exercise:
+    prompt: 'get() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.get('host')
+    solution: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.get('host')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다."
-  - type: "list"
+  - type: text
+    content: get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default)
+      형식으로 사용합니다.
+  - type: list
     items:
-    - "dict.get(key) 형식"
-    - "없는 키는 None 반환"
-    - "기본값 지정 가능"
-    - "에러 없이 안전"
-  - type: "code"
-    language: "python"
-    title: "기본 get()"
-    description: "존재하는 키로 값을 가져옵니다."
+    - dict.get(key) 형식
+    - 없는 키는 None 반환
+    - 기본값 지정 가능
+    - 에러 없이 안전
+  - type: code
+    language: python
+    title: 기본 get()
+    description: 존재하는 키로 값을 가져옵니다.
     content: |-
       config = {'host': 'localhost', 'port': 8080}
       config.get('host')
-  - type: "code"
-    language: "python"
-    title: "없는 키 get()"
-    description: "없는 키는 None을 반환합니다."
+  - type: code
+    language: python
+    title: 없는 키 get()
+    description: 없는 키는 None을 반환합니다.
     content: |-
       server = {'host': 'localhost', 'port': 8080}
       server.get('user')
-  - type: "code"
-    language: "python"
-    title: "기본값 지정"
-    description: "두 번째 인자로 기본값을 지정합니다."
+  - type: code
+    language: python
+    title: 기본값 지정
+    description: 두 번째 인자로 기본값을 지정합니다.
     content: |-
       db = {'host': 'localhost', 'port': 5432}
       db.get('user', 'admin')
-  - type: "tip"
-    content: "get()은 설정값이나 옵션 처리에 매우 유용합니다."
+  - type: tip
+    content: get()은 설정값이나 옵션 처리에 매우 유용합니다.
+- id: method_keys
+  title: keys() 메서드
+  structuredPrimary: true
+  subtitle: 모든 키 가져오기
+  goal: 'keys() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'keys() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다.
 
-- id: "method_keys"
-  title: "keys() 메서드"
-  subtitle: "모든 키 가져오기"
+    keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
+  tips:
+  - keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    grade = {'math': 85, 'english': 90, 'science': 88}
+    grade.keys()
+  exercise:
+    prompt: 'keys() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      grade = {'math': 85, 'english': 90, 'science': 88}
+      grade.keys()
+    solution: |-
+      grade = {'math': 85, 'english': 90, 'science': 88}
+      grade.keys()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다."
-  - type: "list"
+  - type: text
+    content: keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다.
+  - type: list
     items:
-    - "dict.keys() 형식"
-    - "dict_keys 객체 반환"
-    - "list()로 변환 가능"
-    - "키 목록 확인용"
-  - type: "code"
-    language: "python"
-    title: "keys() 기본"
-    description: "딕셔너리의 모든 키를 가져옵니다."
+    - dict.keys() 형식
+    - dict_keys 객체 반환
+    - list()로 변환 가능
+    - 키 목록 확인용
+  - type: code
+    language: python
+    title: keys() 기본
+    description: 딕셔너리의 모든 키를 가져옵니다.
     content: |-
       grade = {'math': 85, 'english': 90, 'science': 88}
       grade.keys()
-  - type: "code"
-    language: "python"
-    title: "리스트 변환"
-    description: "list()로 변환하여 리스트로 만듭니다."
+  - type: code
+    language: python
+    title: 리스트 변환
+    description: list()로 변환하여 리스트로 만듭니다.
     content: |-
       score = {'math': 85, 'english': 90, 'science': 88}
       list(score.keys())
-  - type: "code"
-    language: "python"
-    title: "키 개수 확인"
-    description: "len()과 함께 사용합니다."
+  - type: code
+    language: python
+    title: 키 개수 확인
+    description: len()과 함께 사용합니다.
     content: |-
       point = {'math': 85, 'english': 90, 'science': 88}
       len(point.keys())
-  - type: "tip"
-    content: "keys()는 딕셔너리 순회나 키 확인에 사용됩니다."
+  - type: tip
+    content: keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
+- id: method_values
+  title: values() 메서드
+  structuredPrimary: true
+  subtitle: 모든 값 가져오기
+  goal: 'values() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'values() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다.
 
-- id: "method_values"
-  title: "values() 메서드"
-  subtitle: "모든 값 가져오기"
+    values()는 값의 존재 확인이나 통계 계산에 유용합니다.
+  tips:
+  - values()는 값의 존재 확인이나 통계 계산에 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    exam = {'math': 85, 'english': 90, 'science': 88}
+    exam.values()
+  exercise:
+    prompt: 'values() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      exam = {'math': 85, 'english': 90, 'science': 88}
+      exam.values()
+    solution: |-
+      exam = {'math': 85, 'english': 90, 'science': 88}
+      exam.values()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다."
-  - type: "list"
+  - type: text
+    content: values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다.
+  - type: list
     items:
-    - "dict.values() 형식"
-    - "dict_values 객체 반환"
-    - "list()로 변환 가능"
-    - "값 목록 확인용"
-  - type: "code"
-    language: "python"
-    title: "values() 기본"
-    description: "딕셔너리의 모든 값을 가져옵니다."
+    - dict.values() 형식
+    - dict_values 객체 반환
+    - list()로 변환 가능
+    - 값 목록 확인용
+  - type: code
+    language: python
+    title: values() 기본
+    description: 딕셔너리의 모든 값을 가져옵니다.
     content: |-
       exam = {'math': 85, 'english': 90, 'science': 88}
       exam.values()
-  - type: "code"
-    language: "python"
-    title: "리스트 변환"
-    description: "list()로 변환하여 리스트로 만듭니다."
+  - type: code
+    language: python
+    title: 리스트 변환
+    description: list()로 변환하여 리스트로 만듭니다.
     content: |-
       test = {'math': 85, 'english': 90, 'science': 88}
       list(test.values())
-  - type: "code"
-    language: "python"
-    title: "값 확인"
-    description: "특정 값이 있는지 in으로 확인합니다."
+  - type: code
+    language: python
+    title: 값 확인
+    description: 특정 값이 있는지 in으로 확인합니다.
     content: |-
       result = {'math': 85, 'english': 90, 'science': 88}
       85 in result.values()
-  - type: "tip"
-    content: "values()는 값의 존재 확인이나 통계 계산에 유용합니다."
+  - type: tip
+    content: values()는 값의 존재 확인이나 통계 계산에 유용합니다.
+- id: method_items
+  title: items() 메서드
+  structuredPrimary: true
+  subtitle: 키-값 쌍 가져오기
+  goal: 'items() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'items() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다.
 
-- id: "method_items"
-  title: "items() 메서드"
-  subtitle: "키-값 쌍 가져오기"
+    items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
+  tips:
+  - items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+    product.items()
+  exercise:
+    prompt: 'items() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      product.items()
+    solution: |-
+      product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      product.items()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다."
-  - type: "list"
+  - type: text
+    content: items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다.
+  - type: list
     items:
-    - "dict.items() 형식"
-    - "dict_items 객체 반환"
-    - "(키, 값) 튜플로 반환"
-    - "순회와 변환에 유용"
-  - type: "code"
-    language: "python"
-    title: "items() 기본"
-    description: "딕셔너리의 모든 키-값 쌍을 가져옵니다."
+    - dict.items() 형식
+    - dict_items 객체 반환
+    - (키, 값) 튜플로 반환
+    - 순회와 변환에 유용
+  - type: code
+    language: python
+    title: items() 기본
+    description: 딕셔너리의 모든 키-값 쌍을 가져옵니다.
     content: |-
       product = {'name': '노트북', 'price': 1200000, 'stock': 5}
       product.items()
-  - type: "code"
-    language: "python"
-    title: "리스트 변환"
-    description: "list()로 변환하여 튜플 리스트로 만듭니다."
+  - type: code
+    language: python
+    title: 리스트 변환
+    description: list()로 변환하여 튜플 리스트로 만듭니다.
     content: |-
       item = {'name': '노트북', 'price': 1200000, 'stock': 5}
       list(item.items())
-  - type: "code"
-    language: "python"
-    title: "첫 번째 아이템"
-    description: "리스트로 변환 후 인덱싱합니다."
+  - type: code
+    language: python
+    title: 첫 번째 아이템
+    description: 리스트로 변환 후 인덱싱합니다.
     content: |-
       goods = {'name': '노트북', 'price': 1200000, 'stock': 5}
       pairs = list(goods.items())
       pairs[0]
-  - type: "tip"
-    content: "items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다."
+  - type: tip
+    content: items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
+- id: method_update
+  title: update() 메서드
+  structuredPrimary: true
+  subtitle: 딕셔너리 병합
+  goal: 'update() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'update() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다.
 
-- id: "method_update"
-  title: "update() 메서드"
-  subtitle: "딕셔너리 병합"
+    update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
+  tips:
+  - update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    user = {'name': '김철수', 'age': 30}
+    extra = {'city': '서울', 'job': 'developer'}
+    user.update(extra)
+    user
+  exercise:
+    prompt: 'update() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      user = {'name': '김철수', 'age': 30}
+      extra = {'city': '서울', 'job': 'developer'}
+      user.update(extra)
+      user
+    solution: |-
+      user = {'name': '김철수', 'age': 30}
+      extra = {'city': '서울', 'job': 'developer'}
+      user.update(extra)
+      user
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다."
-  - type: "list"
+  - type: text
+    content: update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다.
+      같은 키가 있으면 값이 덮어씌워집니다.
+  - type: list
     items:
-    - "dict1.update(dict2) 형식"
-    - "dict2의 내용을 dict1에 병합"
-    - "같은 키는 값 덮어쓰기"
-    - "원본 딕셔너리 직접 변경"
-  - type: "code"
-    language: "python"
-    title: "새 키 추가"
-    description: "다른 딕셔너리의 새 키를 추가합니다."
+    - dict1.update(dict2) 형식
+    - dict2의 내용을 dict1에 병합
+    - 같은 키는 값 덮어쓰기
+    - 원본 딕셔너리 직접 변경
+  - type: code
+    language: python
+    title: 새 키 추가
+    description: 다른 딕셔너리의 새 키를 추가합니다.
     content: |-
       user = {'name': '김철수', 'age': 30}
       extra = {'city': '서울', 'job': 'developer'}
       user.update(extra)
       user
-  - type: "code"
-    language: "python"
-    title: "값 덮어쓰기"
-    description: "같은 키가 있으면 값이 업데이트됩니다."
+  - type: code
+    language: python
+    title: 값 덮어쓰기
+    description: 같은 키가 있으면 값이 업데이트됩니다.
     content: |-
       account = {'name': '이영희', 'age': 25, 'city': '부산'}
       change = {'age': 26, 'job': 'designer'}
       account.update(change)
       account
-  - type: "code"
-    language: "python"
-    title: "여러 번 병합"
-    description: "여러 딕셔너리를 순차적으로 병합합니다."
+  - type: code
+    language: python
+    title: 여러 번 병합
+    description: 여러 딕셔너리를 순차적으로 병합합니다.
     content: |-
       base = {'name': '박민수'}
       info1 = {'age': 35, 'city': '대구'}
@@ -204,197 +373,408 @@ sections:
       base.update(info1)
       base.update(info2)
       base
-  - type: "tip"
-    content: "update()는 설정 병합이나 데이터 통합에 매우 유용합니다."
+  - type: tip
+    content: update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
+- id: method_pop
+  title: pop() 메서드
+  structuredPrimary: true
+  subtitle: 키로 값 제거하고 반환
+  goal: 'pop() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'pop() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다.
 
-- id: "method_pop"
-  title: "pop() 메서드"
-  subtitle: "키로 값 제거하고 반환"
+    pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
+  tips:
+  - pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+    stock.pop('mouse')
+  exercise:
+    prompt: 'pop() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      stock.pop('mouse')
+    solution: |-
+      stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      stock.pop('mouse')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다."
-  - type: "list"
+  - type: text
+    content: pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로
+      기본값을 지정할 수 있습니다.
+  - type: list
     items:
-    - "dict.pop(key) 형식"
-    - "키 제거하고 값 반환"
-    - "없는 키는 에러 발생"
-    - "기본값 지정 가능"
-  - type: "code"
-    language: "python"
-    title: "pop() 기본"
-    description: "키를 제거하고 값을 반환합니다."
+    - dict.pop(key) 형식
+    - 키 제거하고 값 반환
+    - 없는 키는 에러 발생
+    - 기본값 지정 가능
+  - type: code
+    language: python
+    title: pop() 기본
+    description: 키를 제거하고 값을 반환합니다.
     content: |-
       stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
       stock.pop('mouse')
-  - type: "code"
-    language: "python"
-    title: "기본값 지정"
-    description: "없는 키를 pop할 때 기본값을 반환합니다."
+  - type: code
+    language: python
+    title: 기본값 지정
+    description: 없는 키를 pop할 때 기본값을 반환합니다.
     content: |-
       inventory = {'laptop': 10, 'keyboard': 30}
       inventory.pop('monitor', 0)
-  - type: "code"
-    language: "python"
-    title: "여러 키 제거"
-    description: "여러 키를 순차적으로 제거합니다."
+  - type: code
+    language: python
+    title: 여러 키 제거
+    description: 여러 키를 순차적으로 제거합니다.
     content: |-
       data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
       data.pop('b')
       data.pop('d')
       data
-  - type: "tip"
-    content: "pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다."
+  - type: tip
+    content: pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
+- id: method_popitem
+  title: popitem() 메서드
+  structuredPrimary: true
+  subtitle: 마지막 키-값 쌍 제거
+  goal: 'popitem() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'popitem() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다.
 
-- id: "method_popitem"
-  title: "popitem() 메서드"
-  subtitle: "마지막 키-값 쌍 제거"
+    popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
+  tips:
+  - popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    queue = {'first': 1, 'second': 2, 'third': 3}
+    queue.popitem()
+  exercise:
+    prompt: 'popitem() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      queue = {'first': 1, 'second': 2, 'third': 3}
+      queue.popitem()
+    solution: |-
+      queue = {'first': 1, 'second': 2, 'third': 3}
+      queue.popitem()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다."
-  - type: "list"
+  - type: text
+    content: popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다.
+  - type: list
     items:
-    - "dict.popitem() 형식"
-    - "마지막 키-값 쌍 제거"
-    - "(키, 값) 튜플 반환"
-    - "빈 딕셔너리는 에러"
-  - type: "code"
-    language: "python"
-    title: "popitem() 기본"
-    description: "마지막 키-값 쌍을 제거하고 반환합니다."
+    - dict.popitem() 형식
+    - 마지막 키-값 쌍 제거
+    - (키, 값) 튜플 반환
+    - 빈 딕셔너리는 에러
+  - type: code
+    language: python
+    title: popitem() 기본
+    description: 마지막 키-값 쌍을 제거하고 반환합니다.
     content: |-
       queue = {'first': 1, 'second': 2, 'third': 3}
       queue.popitem()
-  - type: "code"
-    language: "python"
-    title: "연속 제거"
-    description: "popitem()을 여러 번 호출하여 제거합니다."
+  - type: code
+    language: python
+    title: 연속 제거
+    description: popitem()을 여러 번 호출하여 제거합니다.
     content: |-
       stack = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
       stack.popitem()
       stack.popitem()
       stack
-  - type: "code"
-    language: "python"
-    title: "키와 값 분리"
-    description: "반환된 튜플에서 키와 값을 인덱싱으로 가져옵니다."
+  - type: code
+    language: python
+    title: 키와 값 분리
+    description: 반환된 튜플에서 키와 값을 인덱싱으로 가져옵니다.
     content: |-
       record = {'name': '김철수', 'age': 30, 'city': '서울'}
       pair = record.popitem()
       pair[0]
-  - type: "tip"
-    content: "popitem()은 LIFO(후입선출) 스택 구현에 유용합니다."
+  - type: tip
+    content: popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
+- id: method_clear
+  title: clear() 메서드
+  structuredPrimary: true
+  subtitle: 모든 항목 제거
+  goal: 'clear() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'clear() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다.
 
-- id: "method_clear"
-  title: "clear() 메서드"
-  subtitle: "모든 항목 제거"
+    clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
+  tips:
+  - clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    temp = {'a': 1, 'b': 2, 'c': 3}
+    temp.clear()
+    temp
+  exercise:
+    prompt: 'clear() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      temp = {'a': 1, 'b': 2, 'c': 3}
+      temp.clear()
+      temp
+    solution: |-
+      temp = {'a': 1, 'b': 2, 'c': 3}
+      temp.clear()
+      temp
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다."
-  - type: "list"
+  - type: text
+    content: clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다.
+  - type: list
     items:
-    - "dict.clear() 형식"
-    - "모든 키-값 쌍 제거"
-    - "빈 딕셔너리로 만듦"
-    - "반환값 없음(None)"
-  - type: "code"
-    language: "python"
-    title: "clear() 기본"
-    description: "딕셔너리의 모든 항목을 제거합니다."
+    - dict.clear() 형식
+    - 모든 키-값 쌍 제거
+    - 빈 딕셔너리로 만듦
+    - 반환값 없음(None)
+  - type: code
+    language: python
+    title: clear() 기본
+    description: 딕셔너리의 모든 항목을 제거합니다.
     content: |-
       temp = {'a': 1, 'b': 2, 'c': 3}
       temp.clear()
       temp
-  - type: "code"
-    language: "python"
-    title: "초기화 비교"
-    description: "clear()와 빈 딕셔너리 할당은 다릅니다."
+  - type: code
+    language: python
+    title: 초기화 비교
+    description: clear()와 빈 딕셔너리 할당은 다릅니다.
     content: |-
       data1 = {'x': 1, 'y': 2}
       data2 = {'x': 1, 'y': 2}
       data1.clear()
       data2 = {}
       data1 == data2
-  - type: "tip"
-    content: "clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다."
+  - type: tip
+    content: clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
+- id: method_setdefault
+  title: setdefault() 메서드
+  structuredPrimary: true
+  subtitle: 키가 없으면 추가
+  goal: 'setdefault() 메서드: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'setdefault() 메서드: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다.
 
-- id: "method_setdefault"
-  title: "setdefault() 메서드"
-  subtitle: "키가 없으면 추가"
+    setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
+  tips:
+  - setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    cache = {'name': '김철수', 'age': 30}
+    cache.setdefault('name', '이영희')
+  exercise:
+    prompt: 'setdefault() 메서드: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cache = {'name': '김철수', 'age': 30}
+      cache.setdefault('name', '이영희')
+    solution: |-
+      cache = {'name': '김철수', 'age': 30}
+      cache.setdefault('name', '이영희')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다."
-  - type: "list"
+  - type: text
+    content: setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다.
+  - type: list
     items:
-    - "dict.setdefault(key, default) 형식"
-    - "키 있으면 값 반환"
-    - "키 없으면 추가하고 반환"
-    - "카운팅에 유용"
-  - type: "code"
-    language: "python"
-    title: "키 있을 때"
-    description: "이미 있는 키는 기존 값을 반환합니다."
+    - dict.setdefault(key, default) 형식
+    - 키 있으면 값 반환
+    - 키 없으면 추가하고 반환
+    - 카운팅에 유용
+  - type: code
+    language: python
+    title: 키 있을 때
+    description: 이미 있는 키는 기존 값을 반환합니다.
     content: |-
       cache = {'name': '김철수', 'age': 30}
       cache.setdefault('name', '이영희')
-  - type: "code"
-    language: "python"
-    title: "키 없을 때"
-    description: "없는 키는 기본값으로 추가됩니다."
+  - type: code
+    language: python
+    title: 키 없을 때
+    description: 없는 키는 기본값으로 추가됩니다.
     content: |-
       session = {'user': 'admin'}
       session.setdefault('timeout', 3600)
       session
-  - type: "code"
-    language: "python"
-    title: "빈 리스트 초기화"
-    description: "빈 리스트를 기본값으로 사용합니다."
+  - type: code
+    language: python
+    title: 빈 리스트 초기화
+    description: 빈 리스트를 기본값으로 사용합니다.
     content: |-
       groups = {'admin': ['user1', 'user2']}
       groups.setdefault('guest', [])
       groups
-  - type: "tip"
-    content: "setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다."
+  - type: tip
+    content: setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
+- id: method_comparison
+  title: 메서드 비교
+  structuredPrimary: true
+  subtitle: 언제 어떤 메서드를 사용할까?
+  goal: '메서드 비교: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '메서드 비교: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다.
 
-- id: "method_comparison"
-  title: "메서드 비교"
-  subtitle: "언제 어떤 메서드를 사용할까?"
+    상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
+  tips:
+  - 상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    setting = {'host': 'localhost', 'port': 8080}
+    setting.update({'user': 'admin', 'timeout': 30})
+    setting.pop('port')
+    setting
+  exercise:
+    prompt: '메서드 비교: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      setting = {'host': 'localhost', 'port': 8080}
+      setting.update({'user': 'admin', 'timeout': 30})
+      setting.pop('port')
+      setting
+    solution: |-
+      setting = {'host': 'localhost', 'port': 8080}
+      setting.update({'user': 'admin', 'timeout': 30})
+      setting.pop('port')
+      setting
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다."
-  - type: "list"
+  - type: text
+    content: 딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다.
+  - type: list
     items:
-    - "get(): 안전한 값 접근"
-    - "keys/values/items: 순회"
-    - "update(): 딕셔너리 병합"
-    - "pop/popitem/clear: 제거"
-  - type: "code"
-    language: "python"
-    title: "종합 예제"
-    description: "여러 메서드를 조합하여 사용합니다."
+    - 'get(): 안전한 값 접근'
+    - 'keys/values/items: 순회'
+    - 'update(): 딕셔너리 병합'
+    - 'pop/popitem/clear: 제거'
+  - type: code
+    language: python
+    title: 종합 예제
+    description: 여러 메서드를 조합하여 사용합니다.
     content: |-
       setting = {'host': 'localhost', 'port': 8080}
       setting.update({'user': 'admin', 'timeout': 30})
       setting.pop('port')
       setting
-  - type: "tip"
-    content: "상황에 맞는 메서드를 선택하면 코드가 간결해집니다."
+  - type: tip
+    content: 상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
+- id: workflow_validation
+  title: '검증 루프: 기본 설정과 사용자 설정 병합하기'
+  structuredPrimary: true
+  subtitle: get, update, pop, items로 안전한 설정 레코드 만들기
+  goal: '검증 루프: 기본 설정과 사용자 설정 병합하기: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '검증 루프: 기본 설정과 사용자 설정 병합하기: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 딕셔너리 메서드는 설정, 요청 파라미터, 사용자 입력처럼 일부 값이 빠질 수 있는 데이터를 다룰 때 강합니다. 기본값을 안전하게 읽고, 사용자 설정으로 덮어쓰고, 내부 전용 키를 제거한 뒤 검증하는
+    흐름을 익혀야 합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    defaultConfig = {'timeout': 30, 'retries': 3, 'debug': False}
+    userConfig = {'timeout': 60, 'region': 'kr'}
+    finalConfig = {}
+    finalConfig.update(defaultConfig)
+    finalConfig.update(userConfig)
 
-- id: "workflow_validation"
-  title: "검증 루프: 기본 설정과 사용자 설정 병합하기"
-  subtitle: "get, update, pop, items로 안전한 설정 레코드 만들기"
+    timeout = finalConfig.get('timeout', 10)
+    retries = finalConfig.get('retries', 1)
+    locale = finalConfig.get('locale', 'ko-KR')
+
+    assert timeout == 60
+    assert retries == 3
+    assert locale == 'ko-KR'
+    assert finalConfig['region'] == 'kr'
+  exercise:
+    prompt: '검증 루프: 기본 설정과 사용자 설정 병합하기: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      counters = {}
+      counters.setdefault('success', 0)
+      counters.setdefault('failed', 0)
+      counters['success'] = counters['success'] + 1
+
+      assert counters == {'success': 1, 'failed': 0}
+      counters
+    solution: |-
+      counters = {}
+      counters.setdefault('success', 0)
+      counters.setdefault('failed', 0)
+      counters['success'] = counters['success'] + 1
+
+      assert counters == {'success': 1, 'failed': 0}
+      counters
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "딕셔너리 메서드는 설정, 요청 파라미터, 사용자 입력처럼 일부 값이 빠질 수 있는 데이터를 다룰 때 강합니다. 기본값을 안전하게 읽고, 사용자 설정으로 덮어쓰고, 내부 전용 키를 제거한 뒤 검증하는 흐름을 익혀야 합니다."
-  - type: "list"
+  - type: text
+    content: 딕셔너리 메서드는 설정, 요청 파라미터, 사용자 입력처럼 일부 값이 빠질 수 있는 데이터를 다룰 때 강합니다. 기본값을 안전하게 읽고, 사용자 설정으로 덮어쓰고, 내부 전용 키를 제거한 뒤 검증하는
+      흐름을 익혀야 합니다.
+  - type: list
     items:
-    - "예측: 기본 설정 위에 사용자 설정이 덮어쓴다고 정한다."
-    - "실행: update로 병합하고 get으로 기본값을 읽는다."
-    - "오류 수정: pop 기본값 없이 없는 키를 제거할 때 KeyError를 확인한다."
-    - "검증: 공개 설정, 필수 키, 값 목록을 assert로 확인한다."
-  - type: "code"
-    language: "python"
-    title: "설정 병합과 기본값"
-    description: "기본 설정과 사용자 설정을 병합하고 누락된 값은 get 기본값으로 처리합니다."
+    - '예측: 기본 설정 위에 사용자 설정이 덮어쓴다고 정한다.'
+    - '실행: update로 병합하고 get으로 기본값을 읽는다.'
+    - '오류 수정: pop 기본값 없이 없는 키를 제거할 때 KeyError를 확인한다.'
+    - '검증: 공개 설정, 필수 키, 값 목록을 assert로 확인한다.'
+  - type: code
+    language: python
+    title: 설정 병합과 기본값
+    description: 기본 설정과 사용자 설정을 병합하고 누락된 값은 get 기본값으로 처리합니다.
     content: |-
       defaultConfig = {'timeout': 30, 'retries': 3, 'debug': False}
       userConfig = {'timeout': 60, 'region': 'kr'}
@@ -410,10 +790,10 @@ sections:
       assert retries == 3
       assert locale == 'ko-KR'
       assert finalConfig['region'] == 'kr'
-  - type: "code"
-    language: "python"
-    title: "내부 키 제거와 실패 확인"
-    description: "pop으로 내부 전용 키를 제거하고, 없는 키 제거 실패를 확인합니다."
+  - type: code
+    language: python
+    title: 내부 키 제거와 실패 확인
+    description: pop으로 내부 전용 키를 제거하고, 없는 키 제거 실패를 확인합니다.
     content: |-
       payload = {'name': '김고객', 'email': 'kim@example.com', '_token': 'secret'}
       removedToken = payload.pop('_token')
@@ -428,10 +808,10 @@ sections:
       assert removedToken == 'secret'
       assert '_token' not in payload
       assert missingKey == '_missing'
-  - type: "code"
-    language: "python"
-    title: "items로 공개 필드 검증"
-    description: "items()를 사용해 공개 가능한 필드만 남았는지 확인합니다."
+  - type: code
+    language: python
+    title: items로 공개 필드 검증
+    description: items()를 사용해 공개 가능한 필드만 남았는지 확인합니다.
     content: |-
       profile = {'name': '김고객', 'email': 'kim@example.com'}
       publicPairs = list(profile.items())
@@ -441,8 +821,8 @@ sections:
       assert ('name', '김고객') in publicPairs
       assert publicKeys == ['name', 'email']
       assert 'kim@example.com' in publicValues
-  - type: "expansion"
-    title: "실무 변주: 로그 카운터 초기화"
+  - type: expansion
+    title: '실무 변주: 로그 카운터 초기화'
     code: |-
       counters = {}
       counters.setdefault('success', 0)
@@ -451,48 +831,69 @@ sections:
 
       assert counters == {'success': 1, 'failed': 0}
       counters
-
-- id: "practice"
-  title: "Day 12 종합 복습"
-  subtitle: "딕셔너리 메서드 마스터하기"
+- id: practice
+  title: Day 12 종합 복습
+  structuredPrimary: true
+  subtitle: 딕셔너리 메서드 마스터하기
+  goal: 'Day 12 종합 복습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: 'Day 12 종합 복습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    cfg = {'host': 'localhost', 'port': 8080}
+    cfg.get('user', 'admin')
+  exercise:
+    prompt: 'Day 12 종합 복습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      cfg = {'host': 'localhost', 'port': 8080}
+      cfg.get('user', 'admin')
+    solution: |-
+      cfg = {'host': 'localhost', 'port': 8080}
+      cfg.get('user', 'admin')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
-  - type: "text"
-    content: "Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
-
-  - type: "expansion"
-    title: "🟢 기본1: get() 메서드"
+  - type: text
+    content: Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  - type: expansion
+    title: '🟢 기본1: get() 메서드'
     code: |-
       cfg = {'host': 'localhost', 'port': 8080}
       cfg.get('user', 'admin')
-
-  - type: "expansion"
-    title: "🟢 기본2: keys() 메서드"
+  - type: expansion
+    title: '🟢 기본2: keys() 메서드'
     code: |-
       sample = {'a': 1, 'b': 2, 'c': 3}
       list(sample.keys())
-
-  - type: "expansion"
-    title: "🟢 기본3: values() 메서드"
+  - type: expansion
+    title: '🟢 기본3: values() 메서드'
     code: |-
       nums = {'x': 10, 'y': 20, 'z': 30}
       list(nums.values())
-
-  - type: "expansion"
-    title: "🟢 기본4: items() 메서드"
+  - type: expansion
+    title: '🟢 기본4: items() 메서드'
     code: |-
       pair = {'name': '홍길동', 'age': 25}
       list(pair.items())
-
-  - type: "expansion"
-    title: "🟢 기본5: update() 메서드"
+  - type: expansion
+    title: '🟢 기본5: update() 메서드'
     code: |-
       person = {'name': '김철수'}
       extra = {'age': 30, 'city': '서울'}
       person.update(extra)
       person
-
-  - type: "expansion"
-    title: "🟡 응용1: 설정 관리"
+  - type: expansion
+    title: '🟡 응용1: 설정 관리'
     code: |-
       defaults = {'timeout': 30, 'retries': 3, 'debug': False}
       custom = {'timeout': 60, 'port': 8080}
@@ -500,43 +901,38 @@ sections:
       final.update(defaults)
       final.update(custom)
       final
-
-  - type: "expansion"
-    title: "🟡 응용2: 재고 관리"
+  - type: expansion
+    title: '🟡 응용2: 재고 관리'
     code: |-
       warehouse = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
       warehouse.pop('mouse')
       warehouse.setdefault('monitor', 20)
       warehouse
-
-  - type: "expansion"
-    title: "🟡 응용3: 성적 분석"
+  - type: expansion
+    title: '🟡 응용3: 성적 분석'
     code: |-
       scores = {'math': 85, 'english': 90, 'science': 88}
       vals = list(scores.values())
       avg = (vals[0] + vals[1] + vals[2]) / len(vals)
       scores.update({'history': 92})
       avg
-
-  - type: "expansion"
-    title: "🟡 응용4: 사용자 프로필"
+  - type: expansion
+    title: '🟡 응용4: 사용자 프로필'
     code: |-
       profile = {'username': 'developer', 'email': 'dev@example.com'}
       profile.update({'age': 28, 'city': '부산'})
       profile.pop('email')
       profile
-
-  - type: "expansion"
-    title: "🟡 응용5: 주문 처리"
+  - type: expansion
+    title: '🟡 응용5: 주문 처리'
     code: |-
       cart = {'product1': 2, 'product2': 1, 'product3': 3}
       qty = list(cart.values())
       total = qty[0] + qty[1] + qty[2]
       cart.popitem()
       total
-
-  - type: "expansion"
-    title: "🔴 심화1-1: 멀티 설정 병합"
+  - type: expansion
+    title: '🔴 심화1-1: 멀티 설정 병합'
     code: |-
       base = {'host': 'localhost'}
       dev = {'port': 3000, 'debug': True}
@@ -546,18 +942,16 @@ sections:
       merged.update(dev)
       merged.update(prod)
       merged
-
-  - type: "expansion"
-    title: "🔴 심화1-2: 설정 분석"
+  - type: expansion
+    title: '🔴 심화1-2: 설정 분석'
     code: |-
       settings = {'host': 'localhost', 'port': 8080, 'debug': False, 'workers': 4}
       port = settings.get('port')
       debug = settings.get('debug', True)
       timeout = settings.get('timeout', 30)
       port, debug, timeout
-
-  - type: "expansion"
-    title: "🔴 심화2-1: 캐시 구현"
+  - type: expansion
+    title: '🔴 심화2-1: 캐시 구현'
     code: |-
       cache = {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
       cache.get('key1', 'miss')
@@ -565,24 +959,21 @@ sections:
       cache.pop('key2')
       cache.setdefault('key4', 'value4')
       cache
-
-  - type: "expansion"
-    title: "🔴 심화2-2: 캐시 통계"
+  - type: expansion
+    title: '🔴 심화2-2: 캐시 통계'
     code: |-
       store = {'key1': 'value1', 'key3': 'value3', 'key4': 'value4'}
       keys = list(store.keys())
       items = list(store.items())
       len(keys), keys[0], items[len(items) - 1]
-
-  - type: "expansion"
-    title: "🔴 심화3-1: 주문 시스템"
+  - type: expansion
+    title: '🔴 심화3-1: 주문 시스템'
     code: |-
       order = {'orderId': 'ORD001', 'customer': '김철수'}
       order.update({'product': '노트북', 'quantity': 2, 'price': 2400000})
       order
-
-  - type: "expansion"
-    title: "🔴 심화3-2: 주문 처리"
+  - type: expansion
+    title: '🔴 심화3-2: 주문 처리'
     code: |-
       purchase = {'orderId': 'ORD001', 'customer': '김철수', 'product': '노트북', 'quantity': 2, 'price': 2400000}
       count = purchase.get('quantity')
@@ -590,35 +981,31 @@ sections:
       purchase.pop('price')
       purchase.setdefault('status', 'pending')
       unit
-
-  - type: "expansion"
-    title: "🔴 심화4-1: 팀 관리"
+  - type: expansion
+    title: '🔴 심화4-1: 팀 관리'
     code: |-
       team = {}
       team.update({'member1': {'name': '김개발', 'role': 'developer'}})
       team.update({'member2': {'name': '이디자인', 'role': 'designer'}})
       team.update({'member3': {'name': '박기획', 'role': 'planner'}})
       team
-
-  - type: "expansion"
-    title: "🔴 심화4-2: 팀 재구성"
+  - type: expansion
+    title: '🔴 심화4-2: 팀 재구성'
     code: |-
       org = {'member1': {'name': '김개발', 'role': 'developer'}, 'member2': {'name': '이디자인', 'role': 'designer'}, 'member3': {'name': '박기획', 'role': 'planner'}}
       org.popitem()
       dev = org.get('member1')
       dev.get('name')
-
-  - type: "expansion"
-    title: "🔴 심화5-1: 통계 계산"
+  - type: expansion
+    title: '🔴 심화5-1: 통계 계산'
     code: |-
       sales = {'jan': 1000000, 'feb': 1200000, 'mar': 1500000, 'apr': 1300000}
       revenues = list(sales.values())
       total = revenues[0] + revenues[1] + revenues[2] + revenues[3]
       avg = total / len(revenues)
       avg
-
-  - type: "expansion"
-    title: "🔴 심화5-2: 통계 분석"
+  - type: expansion
+    title: '🔴 심화5-2: 통계 분석'
     code: |-
       report = {'jan': 1000000, 'feb': 1200000, 'mar': 1500000, 'apr': 1300000}
       jan = report.get('jan')

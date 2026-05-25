@@ -1,30 +1,99 @@
 meta:
   packages:
-    - matplotlib
-    - numpy
-    - opencv-python
-    - scikit-learn
+  - matplotlib
+  - numpy
+  - opencv-python
+  - scikit-learn
   id: opencv_07
   title: 모폴로지연산기
   order: 7
   category: opencv
-  difficulty: "⭐⭐⭐"
+  difficulty: ⭐⭐⭐
   badge: 중급
-  tags: ["OpenCV", "erode", "dilate", "morphologyEx", "모폴로지"]
+  tags:
+  - OpenCV
+  - erode
+  - dilate
+  - morphologyEx
+  - 모폴로지
   seo:
-    title: "OpenCV 중급 - 모폴로지 연산기"
-    description: "OpenCV erode, dilate, morphologyEx로 이진 이미지의 형태를 변형합니다."
-    keywords: ["OpenCV", "erode", "dilate", "morphologyEx", "모폴로지"]
-
+    title: OpenCV 중급 - 모폴로지 연산기
+    description: OpenCV erode, dilate, morphologyEx로 이진 이미지의 형태를 변형합니다.
+    keywords:
+    - OpenCV
+    - erode
+    - dilate
+    - morphologyEx
+    - 모폴로지
 intro:
-  emoji: "🔲"
+  emoji: 🔲
   goal: erode, dilate, morphologyEx로 이진 이미지의 노이즈를 제거하고 형태를 개선합니다.
   description: 모폴로지(morphology)는 형태학이라는 뜻으로, 이진 이미지에서 객체 형태를 변형합니다. 침식, 팽창, 열기, 닫기 연산을 배웁니다.
-
 sections:
 - id: step1_create
   title: 1단계. 테스트 이미지 생성
+  structuredPrimary: true
   subtitle: 합성 이미지
+  goal: '1단계. 테스트 이미지 생성: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '1단계. 테스트 이미지 생성: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모폴로지 연산 효과를 명확하게 보기 위해 도형이 있는 합성 이미지를 생성합니다. 노이즈도 추가하여 제거 효과를 확인합니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    base = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
+    cv2.circle(base, (280, 100), 60, 255, -1)
+    cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(base, cmap='gray')
+    plt.title('Base Image')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '1단계. 테스트 이미지 생성: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+      base = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
+      cv2.circle(base, (280, 100), 60, 255, -1)
+      cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(base, cmap='gray')
+      plt.title('Base Image')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      import cv2
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+      base = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
+      cv2.circle(base, (280, 100), 60, 255, -1)
+      cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(base, cmap='gray')
+      plt.title('Base Image')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모폴로지 연산 효과를 명확하게 보기 위해 도형이 있는 합성 이미지를 생성합니다. 노이즈도 추가하여 제거 효과를 확인합니다.
@@ -73,13 +142,44 @@ sections:
       axBase[1].set_title('Noisy')
       axBase[1].axis('off')
       plt.tight_layout()
-
 - id: step2_kernel
   title: 2단계. 구조 요소
+  structuredPrimary: true
   subtitle: getStructuringElement()
+  goal: '2단계. 구조 요소: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '2단계. 구조 요소: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    모폴로지 연산에는 커널(kernel) 또는 구조 요소(structuring element)가 필요합니다. 구조 요소는 연산이 적용되는 이웃 픽셀의 패턴을 정의합니다. 사각형, 타원형, 십자형 등 다양한 모양이 있으며, 크기와 모양에 따라 연산 결과가 달라집니다.
+
+    MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
+  tips:
+  - MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    kernelSmall
+  exercise:
+    prompt: '2단계. 구조 요소: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      kernelSmall
+    solution: |-
+      kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      kernelSmall
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 모폴로지 연산에는 커널(kernel) 또는 구조 요소(structuring element)가 필요합니다. 구조 요소는 연산이 적용되는 이웃 픽셀의 패턴을 정의합니다. 사각형, 타원형, 십자형 등 다양한 모양이 있으며, 크기와 모양에 따라 연산 결과가 달라집니다.
+    content: 모폴로지 연산에는 커널(kernel) 또는 구조 요소(structuring element)가 필요합니다. 구조 요소는 연산이 적용되는 이웃 픽셀의 패턴을 정의합니다. 사각형, 타원형, 십자형 등
+      다양한 모양이 있으며, 크기와 모양에 따라 연산 결과가 달라집니다.
   - type: code
     language: python
     title: 사각형 커널
@@ -108,13 +208,56 @@ sections:
       plt.tight_layout()
   - type: tip
     content: MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
-
 - id: step3_erode
   title: 3단계. 침식 연산
+  structuredPrimary: true
   subtitle: erode()
+  goal: '3단계. 침식 연산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '3단계. 침식 연산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    erode()는 침식(erosion) 연산으로, 커널 영역 내 최소값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 검은 픽셀(0)이 하나라도 있으면 중심이 검은색이 됩니다. 결과적으로 흰색 영역(전경)이 깎여나가며, 객체 경계가 안쪽으로 수축합니다. 작은 흰색 노이즈 제거나 붙어있는 객체 분리에 사용됩니다.
+
+    iterations=2는 침식을 2번 반복합니다. 반복할수록 흰색 영역이 더 많이 축소됩니다. 큰 커널과 적은 반복 또는 작은 커널과 많은 반복을 선택할 수 있습니다.
+  tips:
+  - iterations=2는 침식을 2번 반복합니다. 반복할수록 흰색 영역이 더 많이 축소됩니다. 큰 커널과 적은 반복 또는 작은 커널과 많은 반복을 선택할 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    eroded = cv2.erode(noisy, kernelSmall, iterations=1)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(eroded, cmap='gray')
+    plt.title('Eroded')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '3단계. 침식 연산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      eroded = cv2.erode(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(eroded, cmap='gray')
+      plt.title('Eroded')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      eroded = cv2.erode(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(eroded, cmap='gray')
+      plt.title('Eroded')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: erode()는 침식(erosion) 연산으로, 커널 영역 내 최소값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 검은 픽셀(0)이 하나라도 있으면 중심이 검은색이 됩니다. 결과적으로 흰색 영역(전경)이 깎여나가며, 객체 경계가 안쪽으로 수축합니다. 작은 흰색 노이즈 제거나 붙어있는 객체 분리에 사용됩니다.
+    content: erode()는 침식(erosion) 연산으로, 커널 영역 내 최소값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 검은 픽셀(0)이 하나라도 있으면 중심이 검은색이 됩니다. 결과적으로
+      흰색 영역(전경)이 깎여나가며, 객체 경계가 안쪽으로 수축합니다. 작은 흰색 노이즈 제거나 붙어있는 객체 분리에 사용됩니다.
   - type: code
     language: python
     title: 침식 적용
@@ -162,13 +305,54 @@ sections:
       axErode[3].set_title('Erode x3')
       axErode[3].axis('off')
       plt.tight_layout()
-
 - id: step4_dilate
   title: 4단계. 팽창 연산
+  structuredPrimary: true
   subtitle: dilate()
+  goal: '4단계. 팽창 연산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '4단계. 팽창 연산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: dilate()는 팽창(dilation) 연산으로, 커널 영역 내 최대값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 흰 픽셀(255)이 하나라도 있으면 중심이 흰색이 됩니다.
+    결과적으로 흰색 영역(전경)이 바깥으로 확장됩니다. 끊어진 선 연결, 작은 구멍 채우기, 객체 강조에 사용됩니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(dilated, cmap='gray')
+    plt.title('Dilated')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '4단계. 팽창 연산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(dilated, cmap='gray')
+      plt.title('Dilated')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(dilated, cmap='gray')
+      plt.title('Dilated')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: dilate()는 팽창(dilation) 연산으로, 커널 영역 내 최대값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 흰 픽셀(255)이 하나라도 있으면 중심이 흰색이 됩니다. 결과적으로 흰색 영역(전경)이 바깥으로 확장됩니다. 끊어진 선 연결, 작은 구멍 채우기, 객체 강조에 사용됩니다.
+    content: dilate()는 팽창(dilation) 연산으로, 커널 영역 내 최대값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 흰 픽셀(255)이 하나라도 있으면 중심이 흰색이 됩니다. 결과적으로
+      흰색 영역(전경)이 바깥으로 확장됩니다. 끊어진 선 연결, 작은 구멍 채우기, 객체 강조에 사용됩니다.
   - type: code
     language: python
     title: 팽창 적용
@@ -214,13 +398,56 @@ sections:
       axDilate[3].set_title('Dilate x3')
       axDilate[3].axis('off')
       plt.tight_layout()
-
 - id: step5_open
   title: 5단계. 열기 연산
+  structuredPrimary: true
   subtitle: MORPH_OPEN
+  goal: '5단계. 열기 연산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '5단계. 열기 연산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    열기(Opening)는 침식(erode) 후 팽창(dilate)을 수행하는 연산입니다. 먼저 침식으로 작은 흰색 노이즈를 제거한 후, 팽창으로 원래 객체 크기를 복원합니다. 노이즈는 사라지고 큰 객체는 유지됩니다. 이름의 유래는 연산 후 객체 사이의 좁은 연결이 '열리기(open)' 때문입니다.
+
+    morphologyEx()는 다양한 모폴로지 연산을 수행합니다. MORPH_OPEN은 erode 후 dilate와 동일합니다. 한 번의 호출로 두 연산을 처리합니다.
+  tips:
+  - morphologyEx()는 다양한 모폴로지 연산을 수행합니다. MORPH_OPEN은 erode 후 dilate와 동일합니다. 한 번의 호출로 두 연산을 처리합니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(opened, cmap='gray')
+    plt.title('Opened')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '5단계. 열기 연산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(opened, cmap='gray')
+      plt.title('Opened')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(opened, cmap='gray')
+      plt.title('Opened')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 열기(Opening)는 침식(erode) 후 팽창(dilate)을 수행하는 연산입니다. 먼저 침식으로 작은 흰색 노이즈를 제거한 후, 팽창으로 원래 객체 크기를 복원합니다. 노이즈는 사라지고 큰 객체는 유지됩니다. 이름의 유래는 연산 후 객체 사이의 좁은 연결이 '열리기(open)' 때문입니다.
+    content: 열기(Opening)는 침식(erode) 후 팽창(dilate)을 수행하는 연산입니다. 먼저 침식으로 작은 흰색 노이즈를 제거한 후, 팽창으로 원래 객체 크기를 복원합니다. 노이즈는 사라지고 큰
+      객체는 유지됩니다. 이름의 유래는 연산 후 객체 사이의 좁은 연결이 '열리기(open)' 때문입니다.
   - type: code
     language: python
     title: 열기 연산
@@ -265,13 +492,56 @@ sections:
       axOpen[2].set_title('Original')
       axOpen[2].axis('off')
       plt.tight_layout()
-
 - id: step6_close
   title: 6단계. 닫기 연산
+  structuredPrimary: true
   subtitle: MORPH_CLOSE
+  goal: '6단계. 닫기 연산: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '6단계. 닫기 연산: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    닫기(Closing)는 팽창(dilate) 후 침식(erode)을 수행하는 연산입니다. 먼저 팽창으로 작은 구멍이나 틈을 채운 후, 침식으로 원래 객체 크기를 복원합니다. 객체 내부의 검은 구멍이 사라집니다. 이름의 유래는 연산 후 객체 내부의 작은 구멍이 '닫히기(close)' 때문입니다.
+
+    열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
+  tips:
+  - 열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
+    plt.figure(figsize=(8, 6))
+    plt.imshow(closed, cmap='gray')
+    plt.title('Closed')
+    plt.axis('off')
+    plt.tight_layout()
+  exercise:
+    prompt: '6단계. 닫기 연산: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(closed, cmap='gray')
+      plt.title('Closed')
+      plt.axis('off')
+      plt.tight_layout()
+    solution: |-
+      closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(closed, cmap='gray')
+      plt.title('Closed')
+      plt.axis('off')
+      plt.tight_layout()
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
-    content: 닫기(Closing)는 팽창(dilate) 후 침식(erode)을 수행하는 연산입니다. 먼저 팽창으로 작은 구멍이나 틈을 채운 후, 침식으로 원래 객체 크기를 복원합니다. 객체 내부의 검은 구멍이 사라집니다. 이름의 유래는 연산 후 객체 내부의 작은 구멍이 '닫히기(close)' 때문입니다.
+    content: 닫기(Closing)는 팽창(dilate) 후 침식(erode)을 수행하는 연산입니다. 먼저 팽창으로 작은 구멍이나 틈을 채운 후, 침식으로 원래 객체 크기를 복원합니다. 객체 내부의 검은 구멍이
+      사라집니다. 이름의 유래는 연산 후 객체 내부의 작은 구멍이 '닫히기(close)' 때문입니다.
   - type: code
     language: python
     title: 닫기 연산
@@ -315,20 +585,77 @@ sections:
       plt.tight_layout()
   - type: tip
     content: 열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
-
 - id: practice
   title: 실습
+  structuredPrimary: true
   subtitle: 모폴로지 프로젝트
+  goal: '실습: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '실습: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: |-
+    실제 이미지에 모폴로지 연산을 적용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+    import matplotlib.pyplot as plt
+
+    flower = load_sample_image('flower.jpg')
+    flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+    flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+    retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    plt.imshow(flower)
+    plt.axis('off')
+  exercise:
+    prompt: '실습: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+      retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      plt.imshow(flower)
+      plt.axis('off')
+    solution: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+      retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      plt.imshow(flower)
+      plt.axis('off')
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 실제 이미지에 모폴로지 연산을 적용해봅시다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
-    title: "미션1: flower 이진화 후 정제"
+    title: '미션1: flower 이진화 후 정제'
     blocks:
     - type: code
-      title: "이미지 로드 및 이진화"
+      title: 이미지 로드 및 이진화
       content: |-
         import cv2
         import numpy as np
@@ -342,7 +669,7 @@ sections:
         plt.imshow(flower)
         plt.axis('off')
     - type: code
-      title: "모폴로지 적용"
+      title: 모폴로지 적용
       content: |-
         krnl = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         flowerOpen = cv2.morphologyEx(flowerBin, cv2.MORPH_OPEN, krnl)
@@ -356,7 +683,7 @@ sections:
         axFl[1].axis('off')
         plt.tight_layout()
     - type: code
-      title: "결과 비교"
+      title: 결과 비교
       content: |-
         figFlower, axFlower = plt.subplots(1, 3, figsize=(12, 4))
         axFlower[0].imshow(flowerBin, cmap='gray')
@@ -370,10 +697,10 @@ sections:
         axFlower[2].axis('off')
         plt.tight_layout()
   - type: expansion
-    title: "미션2: 커널 모양 비교"
+    title: '미션2: 커널 모양 비교'
     blocks:
     - type: code
-      title: "테스트 이미지 생성"
+      title: 테스트 이미지 생성
       content: |-
         import cv2
         import numpy as np
@@ -387,7 +714,7 @@ sections:
         plt.imshow(testImg, cmap='gray')
         plt.axis('off')
     - type: code
-      title: "다른 커널로 열기"
+      title: 다른 커널로 열기
       content: |-
         kRect = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
         kEllip = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -407,7 +734,7 @@ sections:
         axOp[2].axis('off')
         plt.tight_layout()
     - type: code
-      title: "커널별 비교"
+      title: 커널별 비교
       content: |-
         figKernel, axKernel = plt.subplots(2, 2, figsize=(10, 8))
         axKernel[0, 0].imshow(testImg, cmap='gray')
@@ -423,10 +750,76 @@ sections:
         axKernel[1, 1].set_title('MORPH_CROSS')
         axKernel[1, 1].axis('off')
         plt.tight_layout()
-
 - id: workflow_validation
   title: 8단계. 모폴로지 검증 루프
+  structuredPrimary: true
   subtitle: 노이즈 제거와 구멍 메우기 확인
+  goal: '8단계. 모폴로지 검증 루프: 실행 가능한 Python 흐름으로 익힌다.'
+  why: '8단계. 모폴로지 검증 루프: 이후 분석, 자동화, 검증 루틴을 만들 때 반복해서 쓰이는 기본 단위다.'
+  explanation: 모폴로지는 형태를 다루는 연산이라 결과가 조금 달라 보여도 좋은지 나쁜지 판단하기 어렵습니다. 노이즈 제거와 구멍 메우기를 픽셀 수로 검증하고, 커널 크기 오류를 먼저 잡습니다.
+  tips:
+  - 한 번에 많이 바꾸지 말고 작은 입력부터 실행하세요.
+  - 실행 결과는 출력, 변수 값, assert 중 하나로 바로 검증하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    morphMask = np.zeros((100, 130), dtype=np.uint8)
+    cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
+    cv2.circle(morphMask, (65, 50), 10, 0, -1)
+    morphMask[10, 10] = 255
+    morphMask[90, 120] = 255
+
+    def makeMorphKernel(size):
+        if size <= 1 or size % 2 == 0:
+            raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+        return np.ones((size, size), dtype=np.uint8)
+
+    morphKernel = makeMorphKernel(5)
+  exercise:
+    prompt: '8단계. 모폴로지 검증 루프: 예제를 실행한 뒤 입력값이나 변수 하나를 바꿔 결과 변화를 확인하세요.'
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      morphMask = np.zeros((100, 130), dtype=np.uint8)
+      cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
+      cv2.circle(morphMask, (65, 50), 10, 0, -1)
+      morphMask[10, 10] = 255
+      morphMask[90, 120] = 255
+
+      def makeMorphKernel(size):
+          if size <= 1 or size % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+          return np.ones((size, size), dtype=np.uint8)
+
+      morphKernel = makeMorphKernel(5)
+    solution: |-
+      import cv2
+      import numpy as np
+
+      morphMask = np.zeros((100, 130), dtype=np.uint8)
+      cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
+      cv2.circle(morphMask, (65, 50), 10, 0, -1)
+      morphMask[10, 10] = 255
+      morphMask[90, 120] = 255
+
+      def makeMorphKernel(size):
+          if size <= 1 or size % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+          return np.ones((size, size), dtype=np.uint8)
+
+      morphKernel = makeMorphKernel(5)
+    hints:
+    - 처음에는 예제 스니펫을 그대로 실행해 기준 결과를 확인하세요.
+    - 값 하나만 바꾸고 다시 실행해 차이를 비교하세요.
+    - 오류가 나면 import와 변수 이름부터 확인하세요.
+    check:
+      noError: 실행 오류가 없어야 한다.
+      resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
+  check:
+    noError: 실행 오류가 없어야 한다.
+    resultCheck: 출력 또는 assert 결과로 의도한 변화를 확인한다.
   blocks:
   - type: text
     content: 모폴로지는 형태를 다루는 연산이라 결과가 조금 달라 보여도 좋은지 나쁜지 판단하기 어렵습니다. 노이즈 제거와 구멍 메우기를 픽셀 수로 검증하고, 커널 크기 오류를 먼저 잡습니다.

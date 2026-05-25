@@ -111,6 +111,8 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 `curriculum-quality-matrix`는 `output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json`에 대표 주제별 section/snippet/exercise/check count, package 보존 여부, contract gap count를 남긴다. report의 `allRequiredFlowsObserved`, `allSolutionsCaptured`, `totalContractGaps: 0`은 학습 YAML이 카드 렌더링에 필요한 구조를 실제로 만족한다는 증거다.
 
+`curriculum-top-tier-audit`는 위 matrix를 통과한 뒤에도 남는 완성도 격차를 본다. 작성 절차가 `docs/skills/architecture/curriculum-authoring.md`와 teacher skill registry에 연결됐는지, 기본 의존성이 학습 패키지로 무거워지지 않는지, 소개 레슨이 과정 후 할 수 있는 일과 uv 준비/첫 assert/완료 산출물을 보여주는지, built-in YAML 원본이 structured section contract로 충분히 이관됐는지 점수화하고 `output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json`에 `score`, `summary`, `actionableGaps`를 남긴다. 9.0 미만이면 학습 시스템은 동작 가능해도 최상위 커리큘럼 완성도는 아직 아니다.
+
 ## 온보딩/첫 화면
 
 첫 화면은 사용자가 무엇을 먼저 해야 하는지 보여야 한다.
@@ -175,6 +177,7 @@ uv run python -X utf8 tests/run.py gate install-launcher-smoke
 uv run python -X utf8 tests/run.py gate runtime-recovery-contract
 uv run python -X utf8 tests/run.py gate runtime-recovery-browser
 uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
+uv run python -X utf8 tests/run.py gate curriculum-top-tier-audit
 uv run python -X utf8 tests/run.py gate onboarding-browser
 uv run python -X utf8 tests/run.py gate frontend-performance-budget
 uv run python -X utf8 tests/run.py gate landing-build
