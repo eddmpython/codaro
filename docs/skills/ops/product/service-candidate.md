@@ -164,6 +164,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle
+uv run python -X utf8 tests/run.py gate root-clean
 uv run python -X utf8 tests/run.py gate docs
 uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate learning-system-readiness
@@ -189,4 +190,4 @@ uv run python -X utf8 tests/run.py gate objective-nineplus-audit
 
 ## 완료 판단
 
-목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, `automation-ide-audit`, `objective-nineplus-audit`, 개별 gate 결과가 있어야 하며, `learning-goal-audit`의 `latest-quality-cycle-artifacts`가 tracked worktree clean 상태에서 최신 `output/test-runner/quality-cycle/sequence-summary.json`과 `output/test-runner/ai-live-smoke/live-smoke-report.json`을 현재 `gitHead`와 대조해 stale artifact가 아님을 확인해야 한다. 이 최종 artifact 검사는 17개 product gate 통과, 각 gate command log path/size/freshness와 실제 repo-local log 파일 존재/크기, `softFailureCount: 0`, live provider credential, clarification-before-provider, `packages-check → write-curriculum-yaml` 필수 prefix, `packages-check → cell-call` exact sequence를 함께 본다. live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`과 quality-cycle `softFailureCount`를 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.
+목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, `automation-ide-audit`, `objective-nineplus-audit`, 개별 gate 결과가 있어야 하며, `learning-goal-audit`의 `latest-quality-cycle-artifacts`가 tracked worktree clean 상태에서 최신 `output/test-runner/quality-cycle/sequence-summary.json`과 `output/test-runner/ai-live-smoke/live-smoke-report.json`을 현재 `gitHead`와 대조해 stale artifact가 아님을 확인해야 한다. 이 최종 artifact 검사는 18개 product gate 통과, 각 gate command log path/size/freshness와 실제 repo-local log 파일 존재/크기, `softFailureCount: 0`, live provider credential, clarification-before-provider, `packages-check → write-curriculum-yaml` 필수 prefix, `packages-check → cell-call` exact sequence를 함께 본다. live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`과 quality-cycle `softFailureCount`를 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.

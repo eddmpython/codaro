@@ -33,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
+      - name: Run root clean gate
+        run: uv run python -X utf8 tests/run.py gate root-clean
+
       - name: Run docs gate
         run: uv run python -X utf8 tests/run.py gate docs
 

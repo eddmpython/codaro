@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "output" / "test-runner" / "objective-nineplus-audit" / "objective-nineplus-report.json"
 MINIMUM_DOMAIN_SCORE = 9.0
 PRODUCT_QUALITY_GATES = (
+    "root-clean",
     "docs",
     "backend",
     "learning-system-readiness",
@@ -249,7 +250,7 @@ def qualityCycleCheck(context: AuditContext) -> CheckResult:
         and payload.get("totalGateCount") == len(PRODUCT_QUALITY_GATES)
         and payload.get("softFailureCount") == 0
     )
-    return CheckResult("quality-cycle summary passed", passed, "quality-cycle completed 17/17 with softFailureCount 0" if passed else "quality-cycle summary missing or not fully passed")
+    return CheckResult("quality-cycle summary passed", passed, "quality-cycle completed 18/18 with softFailureCount 0" if passed else "quality-cycle summary missing or not fully passed")
 
 
 def gatePassed(context: AuditContext, gateName: str) -> CheckResult:

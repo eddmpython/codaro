@@ -59,7 +59,8 @@ curricula/
 - Codaro 커리큘럼은 브라우저 전용 Python이 아니라 로컬 Python 커널을 기준으로 작성한다.
 - builtins 작성 기준은 `curricula/python/builtins/LOCAL_RUNTIME_COMPATIBILITY.md`에 둔다.
 - 과거 Pyodide 기준 문서는 삭제하지 않고 레거시 링크 포인터로 유지하며, 현재 source of truth는 `LOCAL_RUNTIME_COMPATIBILITY.md`다.
-- 표준 라이브러리 레슨은 `tempfile` 같은 안전한 실습 경로를 사용하고, 파일 삭제/외부 프로세스/네트워크 예제는 실행 영향과 복구 절차를 설명해야 한다.
+- 표준 라이브러리 레슨은 `tempfile` 같은 안전한 실습 경로를 사용하고, 저장소 루트에 `.txt`/`.csv`/로그 산출물을 만들지 않는다. 파일 삭제/외부 프로세스/네트워크 예제는 실행 영향과 복구 절차를 설명해야 한다.
+- 커리큘럼 예제가 루트 상대 경로에 쓰는 순간 제품 workspace가 더러워지므로, 파일 입출력 학습은 임시 디렉터리나 명시적 scratch 경로를 만든 뒤 그 안에서 읽고 쓴다.
 
 ## 정리 원칙
 

@@ -10,6 +10,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
 PRODUCT_QUALITY_GATES = (
+    "root-clean",
     "docs",
     "backend",
     "learning-system-readiness",

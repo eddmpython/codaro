@@ -24,6 +24,7 @@ def testGateNamesAreStable() -> None:
     runner = loadRunner()
 
     assert set(runner.GATES) == {
+        "root-clean",
         "docs",
         "backend",
         "teacher-eval",
@@ -55,8 +56,9 @@ def testGateNamesAreStable() -> None:
         "objective-nineplus-audit",
         "public-readiness-audit",
     }
-    assert runner.PREFLIGHT_GATES == ("docs", "backend")
+    assert runner.PREFLIGHT_GATES == ("root-clean", "docs", "backend")
     assert runner.PRODUCT_QUALITY_GATES == (
+        "root-clean",
         "docs",
         "backend",
         "learning-system-readiness",

@@ -22,6 +22,7 @@ WORKTREE_CHANGE_GROUPS = (
     ("quality-gates", ("tests/",)),
 )
 PRODUCT_QUALITY_GATES = (
+    "root-clean",
     "docs",
     "backend",
     "learning-system-readiness",

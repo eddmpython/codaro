@@ -69,6 +69,11 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
         ),
     ),
+    "root-clean": Gate(
+        tier="fast",
+        description="저장소 루트에 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 검사한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyRootClean.py")),),
+    ),
     "backend": Gate(
         tier="fast",
         description="Python backend 전체 테스트를 실행한다.",
@@ -273,8 +278,9 @@ GATES: dict[str, Gate] = {
     ),
 }
 
-PREFLIGHT_GATES = ("docs", "backend")
+PREFLIGHT_GATES = ("root-clean", "docs", "backend")
 PRODUCT_QUALITY_GATES = (
+    "root-clean",
     "docs",
     "backend",
     "learning-system-readiness",
@@ -749,8 +755,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 30:
-        failures.append(f"expected 30 gates, found {len(GATES)}")
+    if len(GATES) != 31:
+        failures.append(f"expected 31 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

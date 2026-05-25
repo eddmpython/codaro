@@ -30,12 +30,15 @@ whenToUse: 새 머신 셋업, 인코딩 깨짐 디버그, WSL/PowerShell 동시 
 
 # 로컬 산출물 위생
 
+- 저장소 루트는 항상 제품/운영 SSOT 파일만 보이는 상태를 유지한다. 새 실습 파일, 임시 데이터, 로그, preview 출력은 루트에 만들지 않는다.
+- 루트에 `.txt`, `.csv`, `.log`, `.pid`, `.tmp`, `.tsbuildinfo`, `.ipynb`, `.sqlite`, `.db`, `.parquet` 같은 로컬 산출물을 남기면 `root-clean` gate가 실패해야 한다.
+- 파일 입출력 예제와 커리큘럼 코드는 `open("data.txt")`, `Path("output.txt")`처럼 루트 상대 경로에 쓰지 않는다. `tempfile.TemporaryDirectory()`, `Path(tempfile.gettempdir()) / "codaro_..."`, 또는 gate runner가 제공하는 `output/test-runner/<gate>/scratch` 아래를 사용한다.
 - 프로젝트 루트는 임시 로그/스크린샷/캐시/세션 파일을 쓰는 장소가 아니다.
 - 백그라운드 서버를 띄울 때 `*.log`, `*.pid`, `.playwright-cli/`, `vite-dev*.log`, `tsconfig.tsbuildinfo`를 루트나 앱 루트에 만들지 않는다.
 - stdout/stderr 리다이렉트가 필요하면 `$env:TEMP\codaro\...` 아래를 우선 사용한다.
-- 보존이 필요 없는 로컬 산출물은 삭제한다. 보존이 꼭 필요하면 레포 밖 `$env:TEMP\codaro\...` 아래를 사용한다.
+- 보존이 필요 없는 로컬 산출물은 삭제한다. 보존이 꼭 필요하거나 사용자 파일 가능성이 있으면 `_backup/` 아래로 옮긴다. 새 실행 산출물은 레포 밖 `$env:TEMP\codaro\...`를 우선 사용한다.
 - Playwright CLI는 레포 루트에서 실행하지 않는다. 브라우저 산출물이 필요하면 임시 작업 폴더나 `$env:TEMP\codaro\...`를 사용한다.
-- 백그라운드 프로세스를 띄운 작업은 종료 전 반드시 프로세스를 정리하고, 루트에 `*.log`와 `.playwright-cli/`가 남지 않았는지 확인한다.
+- 백그라운드 프로세스를 띄운 작업은 종료 전 반드시 프로세스를 정리하고, 루트에 `*.log`, `.playwright-cli/`, 실습 `.txt`/`.csv`가 남지 않았는지 `uv run python -X utf8 tests/run.py gate root-clean`으로 확인한다.
 
 # 주요 명령
 
