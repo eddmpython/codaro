@@ -76,7 +76,7 @@ uv run python -X utf8 tests/run.py gate public-readiness-audit
 | Gate | Tier | 역할 |
 | --- | --- | --- |
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
-| `root-clean` | fast | 저장소 루트에 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
+| `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
 | `backend` | fast | Python backend 전체 테스트를 실행한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
 | `teacher-e2e` | fast | scripted provider loop, provider error workloop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness와 9점 기준 score를 실행한다. |
@@ -115,7 +115,7 @@ uv run python -X utf8 tests/run.py gate public-readiness-audit
 
 - 새 gate는 `tests/run.py`, 이 문서, CI 중 필요한 위치를 함께 갱신한다.
 - 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다.
-- `root-clean`은 루트 청결의 절대 gate다. 루트에 로컬 실습 `.txt`/`.csv`, 로그, pid, 임시 파일, 노트북, parquet/sqlite 같은 산출물이 있거나, git이 추적하지 않는 루트 파일/폴더가 남으면 실패해야 한다. 보존은 `_backup/`, 실행 scratch는 `output/test-runner/<gate>/scratch` 또는 OS temp를 사용한다.
+- `root-clean`은 루트 구조와 청결의 절대 gate다. canonical tree의 SSOT는 `docs/skills/architecture/repository-structure.md`이고, 실행 검증은 `tests/verifyRootClean.py`다. 루트에 로컬 실습 `.txt`/`.csv`, 로그, pid, 임시 파일, 노트북, parquet/sqlite 같은 산출물이 있거나, 허용되지 않은 루트 파일/폴더가 남으면 실패해야 한다. 백업성 루트(`_backup/`, `_archive/`, `_reference/`)는 만들지 않고, 실행 scratch는 `output/test-runner/<gate>/scratch` 또는 OS temp를 사용한다.
 - `ai-live-smoke`는 opt-in gate다. credential/token이 없으면 skip하지 않고 `live credential missing`을 JSON으로 보고한다. `CODARO_AI_LIVE_PROVIDERS=oauth-chatgpt,openai,ollama,custom`처럼 matrix를 명시하면 provider별 `passed`/`failed`/`credentialMissing` summary를 남긴다. credential missing과 provider exception은 `diagnostic.code`/`diagnostic.action`을 포함해 다시 로그인, API 키 입력, Base URL 입력, 네트워크 점검, OAuth 호환성 점검을 구분한다. live YAML tool loop는 실제 provider 응답에서 `packages-check → write-curriculum-yaml` 필수 prefix를 확인하고, 작성 결과 확인을 위한 `read-cells` 또는 정책 순서를 지킨 즉시 `cell-call` 후속 도구를 허용한다. cell 실행 smoke는 `packages-check → cell-call` exact sequence를 별도 확인한다. provider가 보낸 YAML은 실제 materializer로 변환해 `contractGapCount=0`, section/snippet/exercise cell 신호를 확인한다. 실행 결과는 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 provider/model, case별 latency, diagnostic action, tool sequence, `workloopReadable`/`workloopLabels`/`workloopSamples`, tuning signal, `gitHead`, `startedAt`, `completedAt`, `durationMs`로 남긴다. 이 gate는 CI required가 아니며, credential missing exit code 2만 quality-cycle soft status로 기록한다. 실제 provider/OAuth/네트워크 실패 exit code 1은 hard failure로 남겨 기본 CI 안정성과 live provider 품질 판단을 분리한다.
 - provider 설정 UI 변경은 `provider-settings-browser`로 실제 브라우저에서 연결 전 fallback, OAuth authorize/status polling의 실패/성공, 저장된 provider 선택 후 실제 응답 상태, OAuth 호환성/네트워크/base URL 실패 안내가 보이는지 확인한다. 이 gate는 `output/test-runner/provider-settings-browser/provider-settings-report.json`에 case별 결과와 `oauthStateMismatchHandled`, `oauthPermissionDeniedHandled`, `oauthLoginSucceeded`, `openaiSelectedAndLive`, `desktopVisualIntegrity`, `mobileVisualIntegrity` signal을 남기고, `quality-cycle` summary는 이 report를 `payloadGitHead` evidence로 대조한다. stub provider API를 쓰므로 secret이나 실제 token을 저장소에 남기지 않는다.
 - teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label/detail, structured YAML contract, provider loop result signal 중 변경 표면 하나를 고정한다.

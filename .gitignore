@@ -1,6 +1,7 @@
 # Python-generated files
 __pycache__/
 .pytest_cache/
+.ruff_cache/
 *.py[oc]
 /build/
 dist/
@@ -19,11 +20,8 @@ AGENTS.md
 # Data (available via gh release)
 data/
 
-# Local reference/archive/backup artifacts
-_reference/
+# Local reference artifacts
 .__marimo_upstream/
-_backup/
-_archive/
 
 # Local tool artifacts
 *.log

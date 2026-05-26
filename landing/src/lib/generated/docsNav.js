@@ -1,5 +1,20 @@
 export const docsPages = [
   {
+    "path": "skills/architecture/repository-structure",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "repository-structure"
+    ],
+    "title": "Repository Structure",
+    "description": "Canonical top-level tree and placement rules for Codaro.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 199,
+    "url": "/codaro/docs/skills/architecture/repository-structure",
+    "contentModule": "page6fe25d66a26c"
+  },
+  {
     "path": "skills/architecture/ssot-map",
     "slugSegments": [
       "skills",
@@ -869,6 +884,21 @@ export const docsSections = [
     "slug": "architecture",
     "label": "Architecture",
     "pages": [
+      {
+        "path": "skills/architecture/repository-structure",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "repository-structure"
+        ],
+        "title": "Repository Structure",
+        "description": "Canonical top-level tree and placement rules for Codaro.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 199,
+        "url": "/codaro/docs/skills/architecture/repository-structure",
+        "contentModule": "page6fe25d66a26c"
+      },
       {
         "path": "skills/architecture/ssot-map",
         "slugSegments": [
