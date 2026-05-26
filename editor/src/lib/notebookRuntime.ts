@@ -101,6 +101,7 @@ export async function runNotebookBlock({
     if (preflight.failed) {
       return {
         sessionId: activeSession.sessionId,
+        result: packagePreflightFailureResult(block, preflight.failed, localExecutionCount),
         notice: packagePreflightFailureNotice(preflight.failed),
       };
     }
@@ -173,6 +174,9 @@ export async function runReactiveNotebook({
     if (preflight.failed) {
       return {
         sessionId: activeSession.sessionId,
+        results: {
+          [firstBlock.id]: packagePreflightFailureResult(firstBlock, preflight.failed, 1),
+        },
         notice: packagePreflightFailureNotice(preflight.failed),
       };
     }
@@ -261,6 +265,25 @@ function packagePreflightFailureNotice(result: PackageInstallResult): AppNotice 
     tone: "error",
     title: translate("runtime.libraryFailed"),
     detail: firstMessageLine(result.message) || translate("runtime.packageInstallFailed", { package: result.package }),
+  };
+}
+
+function packagePreflightFailureResult(
+  block: BlockConfig,
+  result: PackageInstallResult,
+  executionCount: number,
+): ExecutionResult {
+  const detail = firstMessageLine(result.message) || translate("runtime.packageInstallFailed", { package: result.package });
+  return {
+    type: "text",
+    blockId: block.id,
+    data: null,
+    stdout: "",
+    stderr: `${translate("runtime.libraryFailed")}\n${detail}`,
+    variables: [],
+    stateDelta: { added: [], updated: [], removed: [] },
+    executionCount,
+    status: "package-error",
   };
 }
 

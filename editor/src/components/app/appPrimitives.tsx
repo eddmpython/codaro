@@ -93,7 +93,8 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
 
 export function ExecutionOutput({ result }: { result: ExecutionResult }) {
   const { t } = useLocale();
-  const hasError = result.status === "error" || Boolean(result.stderr);
+  const packageError = result.status === "package-error";
+  const hasError = packageError || result.status === "error" || Boolean(result.stderr);
   const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   return (
     <div
@@ -113,13 +114,15 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
       {hasError ? (
         <div
           className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"
-          data-runtime-recovery="cell-error"
+          data-runtime-recovery={packageError ? "package-error" : "cell-error"}
         >
           <XCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
           <div className="min-w-0">
-            <div className="font-medium text-foreground">{t("system.recoverCellError.title")}</div>
+            <div className="font-medium text-foreground">
+              {packageError ? t("system.recoverPackageError.title") : t("system.recoverCellError.title")}
+            </div>
             <div className="text-muted-foreground">
-              {t("system.recoverCellError.detail")}
+              {packageError ? t("system.recoverPackageError.detail") : t("system.recoverCellError.detail")}
             </div>
           </div>
         </div>

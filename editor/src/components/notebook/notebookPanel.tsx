@@ -299,7 +299,6 @@ function DocumentBlock({
   onSelect: () => void;
 }) {
   const cellTitle = block.type === "markdown" ? "Markdown" : "Python";
-  const lineCount = countMeaningfulLines(draft);
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
 
   if (block.type === "markdown") {
@@ -308,7 +307,6 @@ function DocumentBlock({
         <CellInsertRail onInsertCell={onInsertCell} />
         <div className="min-w-0">
           <CellMetaBar
-            lineCount={lineCount}
             status={resultStatus}
             title={cellTitle}
             type="markdown"
@@ -338,7 +336,6 @@ function DocumentBlock({
       <div className="min-w-0">
         <CellMetaBar
           canRun={canRun}
-          lineCount={lineCount}
           running={isRunning}
           status={resultStatus}
           title={cellTitle}
@@ -380,7 +377,6 @@ function DocumentBlock({
 
 function CellMetaBar({
   canRun = false,
-  lineCount,
   running = false,
   status,
   title,
@@ -392,7 +388,6 @@ function CellMetaBar({
   onRun,
 }: {
   canRun?: boolean;
-  lineCount: number;
   running?: boolean;
   status: string;
   title: string;
@@ -531,10 +526,6 @@ function EmptyNotebookActions({
       </Button>
     </div>
   );
-}
-
-function countMeaningfulLines(value: string) {
-  return value.split("\n").filter((line) => line.trim()).length;
 }
 
 function normalizeNotebookFilename(value: string) {

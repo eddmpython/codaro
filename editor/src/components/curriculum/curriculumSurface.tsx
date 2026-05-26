@@ -40,7 +40,7 @@ import {
   type CellAiAction,
   type LearningCellKind,
 } from "@/lib/cellModel";
-import { difficultyLabel, statusLabel } from "@/lib/displayFormat";
+import { statusLabel } from "@/lib/displayFormat";
 import { inferDocumentPackages, normalizePackageName } from "@/lib/packageInference";
 import { cn } from "@/lib/utils";
 import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
@@ -814,7 +814,7 @@ function StructuredSectionLearningBody({
           part="snippet"
           title={blockLabel(parts.snippet)}
         >
-          <CodePayload value={parts.snippet.content} />
+          <CodePayload label="코드" value={parts.snippet.content} />
         </StructuredSectionBand>
       ) : null}
 
@@ -830,7 +830,6 @@ function StructuredSectionLearningBody({
               <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                 <Play className="size-3.5" />
                 <span>직접 입력 실습</span>
-                {exercise.guide ? <Badge variant="outline">{difficultyLabel(exercise.guide.difficulty)}</Badge> : null}
               </div>
               <h3 className="mt-1 text-base font-semibold tracking-normal">{blockLabel(exercise)}</h3>
               {exerciseDescription ? (
@@ -840,17 +839,16 @@ function StructuredSectionLearningBody({
               ) : null}
               {exerciseCheck ? (
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-                  <span className="font-medium text-foreground">확인할 것</span>
-                  <span className="mx-1 text-muted-foreground">·</span>
+                  <span className="font-medium text-foreground">확인: </span>
                   {exerciseCheck.text}
                 </p>
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
               {exerciseRunning || exerciseResult ? (
-              <Badge className="h-7 rounded-md px-2 text-xs" variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
-                {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
-              </Badge>
+                <Badge className="h-7 rounded-md px-2 text-xs" variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
+                  {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
+                </Badge>
               ) : null}
               <IconButton
                 className="size-7 rounded-md [&_svg]:size-3.5"
@@ -872,10 +870,7 @@ function StructuredSectionLearningBody({
             </div>
           </div>
 
-          <div className="mt-3 space-y-1.5">
-            <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Python 실습 코드</span>
-            </div>
+          <div className="mt-3">
             <div
               aria-label={`${blockLabel(exercise)} 직접 입력 실습 코드 편집기`}
               className={cn(
@@ -1054,10 +1049,10 @@ function preferredValidationEntry(entries: ValidationEntry[]) {
 
 function validationLabel(key: string) {
   const labels: Record<string, string> = {
-    noError: "오류 없이 실행",
-    resultCheck: "결과 확인",
-    assertCheck: "assert 통과",
-    outputCheck: "출력 확인",
+    noError: "실행 조건",
+    resultCheck: "확인할 것",
+    assertCheck: "assert",
+    outputCheck: "출력",
   };
   return labels[key] ?? key;
 }
@@ -1383,7 +1378,6 @@ function CurriculumLearningCell({
   const Icon = meta.Icon;
   const role = block.role ?? (block.type === "code" ? "snippet" : "explanation");
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
-  const lineCount = block.type === "code" ? draft.split("\n").filter((line) => line.trim()).length : 0;
   const tone = curriculumCellTone(kind, role, block.displayKind);
   const bodyFirst = block.displayKind === "hero";
   const isSnippetCode = block.type === "code" && role === "snippet";
@@ -1512,7 +1506,7 @@ function CurriculumLearningCell({
         </div>
         <div className={cn("space-y-3", embedded ? "px-4 pb-4" : "px-3 py-3")}>
           {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
-          {!isSnippetCode && block.guide ? <ExerciseBrief block={block} lineCount={lineCount} /> : null}
+          {!isSnippetCode && block.guide ? <ExerciseBrief block={block} /> : null}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{isSnippetCode ? "Python 연습 코드" : "Python 코드"}</span>
@@ -1644,32 +1638,21 @@ function curriculumInitialDraft(block: BlockConfig) {
   return block.content;
 }
 
-function ExerciseBrief({ block, lineCount }: { block: BlockConfig; lineCount: number }) {
+function ExerciseBrief({ block }: { block: BlockConfig }) {
   if (!block.guide) return null;
-  const hints = block.guide.hints ?? [];
+  const description = specificPracticeCopy(block.guide.description);
+  const check = preferredValidationEntry(validationEntriesFromCheckConfig(block.guide.checkConfig));
+  if (!description && !check) return null;
+
   return (
-    <div className="border-l-2 border-emerald-400/40 pl-3">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="text-sm font-semibold tracking-normal">실습</div>
-          {block.guide.description ? (
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(block.guide.description)}</p>
-          ) : null}
-        </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Badge variant="outline">{difficultyLabel(block.guide.difficulty)}</Badge>
-          <Badge variant="outline">{lineCount}줄</Badge>
-        </div>
-      </div>
-      {hints.length ? (
-        <div className="mt-3 grid gap-1.5">
-          {hints.slice(0, 3).map((hint, index) => (
-            <div className="flex gap-2 text-xs leading-5 text-muted-foreground" key={`${hint}-${index}`}>
-              <Lightbulb className="mt-0.5 size-3.5 shrink-0 text-emerald-300" />
-              <span>{stripBullet(hint)}</span>
-            </div>
-          ))}
-        </div>
+    <div className="rounded-md border bg-muted/20 px-3 py-2.5">
+      {description ? <p className="text-sm leading-6 text-muted-foreground">{description}</p> : null}
+      {check ? (
+        <p className={cn("text-sm leading-6 text-muted-foreground", description && "mt-1")}>
+          <span className="font-medium text-foreground">확인할 것</span>
+          <span className="mx-1 text-muted-foreground">·</span>
+          {check.text}
+        </p>
       ) : null}
     </div>
   );

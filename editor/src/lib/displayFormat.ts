@@ -4,6 +4,7 @@ export function statusLabel(status?: string | null) {
   if (normalized === "success") return "성공";
   if (normalized === "error") return "오류";
   if (normalized === "running") return "실행 중";
+  if (normalized === "package-error") return "준비 실패";
   if (normalized === "idle") return "대기";
   if (normalized === "done") return "완료";
   if (normalized === "pending") return "대기 중";

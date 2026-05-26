@@ -74,13 +74,13 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("reload")
         cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "custom runtime recovery curriculum")
         cli.eval(jsClickText(PACKAGE_FAILURE_TITLE))
-        cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "idle result recovery copy")
+        cli.waitEval(jsTextPresent("직접 입력 실습"), "idle direct practice section")
         idle = recordCheck(checks, "idle-runtime-copy", cli.eval(jsAssertIdleRuntimeRecovery()))
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("라이브러리 준비 실패"), "package install failure notice")
         failure = recordCheck(checks, "package-install-failure", cli.eval(jsAssertPackageFailureRecovery()))
         cli.eval(jsClickText(CELL_FAILURE_TITLE))
-        cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "cell failure idle result copy")
+        cli.waitEval(jsTextPresent("직접 입력 실습"), "cell failure direct practice section")
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("셀 실행 실패"), "cell execution failure recovery")
         cellFailure = recordCheck(checks, "cell-execution-failure", cli.eval(jsAssertCellFailureRecovery()))
@@ -396,9 +396,12 @@ def jsAssertIdleRuntimeRecovery() -> str:
     return compactJs("""
 (() => {
   const text = document.body.innerText;
-  const required = ['Python 실습 코드', '학습자가 작성', '셀을 실행하면 결과와 오류가 여기에 표시됩니다.'];
+  const required = ['직접 입력 실습'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('idle runtime recovery missing: ' + missing.join(', '));
+  const forbidden = ['Python 실습 코드', '학습자가 작성', 'Ctrl+Enter 실행', '셀을 실행하면 결과와 오류가 여기에 표시됩니다.'];
+  const leaked = forbidden.filter((item) => text.includes(item));
+  if (leaked.length) throw new Error('idle runtime recovery leaked noisy copy: ' + leaked.join(', '));
   if (!document.querySelector('[data-learning-exercise-input-role="student-practice"]')) {
     throw new Error('direct student practice editor missing');
   }
