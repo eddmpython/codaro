@@ -56,6 +56,7 @@ CATEGORY_MAPPING = {
     "opencv": "OpenCV 컴퓨터비전",
     "pydantic": "Pydantic 데이터검증",
     "practical": "실전파이썬",
+    "playwright": "Playwright 브라우저자동화",
 }
 
 CATEGORY_META = {
@@ -82,6 +83,7 @@ CATEGORY_META = {
     "opencv": {"description": "컴퓨터 비전의 세계"},
     "pydantic": {"description": "타입 기반 데이터 검증"},
     "practical": {"description": "실전 프로젝트로 배우는 Python"},
+    "playwright": {"description": "브라우저 화면 점검과 웹 자동화"},
 }
 
 CATEGORY_GROUPS = {
@@ -89,14 +91,14 @@ CATEGORY_GROUPS = {
     "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
     "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
     "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-    "자동화·실무": ["excel", "regex", "practical"],
+    "자동화·실무": ["excel", "regex", "practical", "playwright"],
     "이미지·비전": ["pillow", "opencv"],
 }
 
 LEARNING_PATHS = {
     "초급": {"categories": ["30days"], "description": "프로그래밍이 처음이라면"},
     "중급": {"categories": ["advancedPython", "builtins", "pandas", "numpy"], "description": "기초를 마쳤다면"},
-    "실무": {"categories": ["duckdb", "pydantic", "excel", "regex", "practical"], "description": "로컬 자동화와 데이터 작업으로 확장"},
+    "실무": {"categories": ["duckdb", "pydantic", "excel", "regex", "practical", "playwright"], "description": "로컬 자동화와 데이터 작업으로 확장"},
     "고급": {"categories": ["scipy", "statsmodels", "sklearn", "networkx"], "description": "모델링과 분석을 깊게 다룬다면"},
 }
 

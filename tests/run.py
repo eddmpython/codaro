@@ -32,6 +32,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
+    "playwright-curriculum-runtime": (
+        "output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
+    ),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "objective-nineplus-audit": ("output/test-runner/objective-nineplus-audit/objective-nineplus-report.json",),
@@ -205,6 +208,25 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, 의존성, 소개 레슨, structured source 채택률로 점수화한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumTopTierAudit.py")),),
+        ci_required=False,
+    ),
+    "playwright-curriculum-runtime": Gate(
+        tier="fast",
+        description="Playwright 학습 트랙의 structured YAML 계약과 예제/정답 코드가 실제 Chromium에서 실행되는지 확인한다.",
+        commands=(
+            command((
+                "uv",
+                "run",
+                "--with",
+                "playwright",
+                "--with",
+                "pytest",
+                "python",
+                "-X",
+                "utf8",
+                "tests/verifyPlaywrightCurriculumRuntime.py",
+            ), timeoutSeconds=1200),
+        ),
         ci_required=False,
     ),
     "onboarding-browser": Gate(
@@ -757,8 +779,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 31:
-        failures.append(f"expected 31 gates, found {len(GATES)}")
+    if len(GATES) != 32:
+        failures.append(f"expected 32 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
