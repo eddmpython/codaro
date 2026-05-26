@@ -14,7 +14,13 @@ import yaml
 
 from browserStaticServer import StaticAppServer
 from codaro.curriculum.converter import yamlToDocument
-from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
+from playwrightCli import (
+    PlaywrightCli,
+    PlaywrightCliError,
+    repoLocalPlaywrightWorkspace,
+    resolvePlaywrightCli,
+    uniquePlaywrightSessionName,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     port = args.port or freePort()
     url = f"http://127.0.0.1:{port}/#curriculum"
     workspace = repoLocalPlaywrightWorkspace(ROOT, "learning-card-browser")
-    session = f"codaro-learning-card-{int(time.time())}"
+    session = uniquePlaywrightSessionName("codaro-learning-card")
     server = StaticAppServer(port=port)
     server.start()
     cli: PlaywrightCli | None = None

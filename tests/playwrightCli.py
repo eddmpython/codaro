@@ -130,6 +130,11 @@ def repoLocalPlaywrightWorkspace(root: Path, name: str) -> Path:
     return workspace
 
 
+def uniquePlaywrightSessionName(prefix: str) -> str:
+    safePrefix = re.sub(r"[^A-Za-z0-9_.-]+", "-", prefix).strip("-") or "codaro"
+    return f"{safePrefix}-{os.getpid()}-{time.time_ns()}"
+
+
 def isPlaywrightEvalError(output: str) -> bool:
     stripped = output.lstrip()
     if stripped.startswith("### Error"):

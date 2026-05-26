@@ -19,7 +19,13 @@ import yaml
 
 from browserStaticServer import StaticAppServer
 from codaro.curriculum.converter import yamlToDocument
-from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
+from playwrightCli import (
+    PlaywrightCli,
+    PlaywrightCliError,
+    repoLocalPlaywrightWorkspace,
+    resolvePlaywrightCli,
+    uniquePlaywrightSessionName,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
     api.start()
     url = f"http://127.0.0.1:{appPort}/#curriculum"
     workspace = repoLocalPlaywrightWorkspace(ROOT, "runtime-recovery-browser")
-    session = f"codaro-runtime-recovery-{int(time.time())}"
+    session = uniquePlaywrightSessionName("codaro-runtime-recovery")
     server = StaticAppServer(port=appPort, apiBaseUrl=api.baseUrl)
     server.start()
     cli: PlaywrightCli | None = None

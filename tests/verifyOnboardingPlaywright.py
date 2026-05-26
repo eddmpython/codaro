@@ -16,7 +16,13 @@ from pathlib import Path
 from typing import Any
 
 from browserStaticServer import StaticAppServer
-from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
+from playwrightCli import (
+    PlaywrightCli,
+    PlaywrightCliError,
+    repoLocalPlaywrightWorkspace,
+    resolvePlaywrightCli,
+    uniquePlaywrightSessionName,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     api.start()
     url = f"http://127.0.0.1:{appPort}/#chat"
     workspace = repoLocalPlaywrightWorkspace(ROOT, "onboarding-browser")
-    session = f"codaro-onboarding-{int(time.time())}"
+    session = uniquePlaywrightSessionName("codaro-onboarding")
     server = StaticAppServer(port=appPort, apiBaseUrl=api.baseUrl)
     server.start()
     cli: PlaywrightCli | None = None
