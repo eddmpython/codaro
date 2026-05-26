@@ -517,7 +517,7 @@ input:focus-visible {
 
 .workspaceGrid {
   display: grid;
-  grid-template-columns: minmax(210px, 0.82fr) minmax(280px, 1.18fr);
+  grid-template-columns: minmax(180px, 0.82fr) minmax(220px, 1.18fr);
   gap: 12px;
   padding: 14px;
 }

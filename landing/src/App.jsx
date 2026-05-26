@@ -121,7 +121,7 @@ function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem("codaroLandingTheme");
   if (stored === "dark" || stored === "light") return stored;
-  return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return "dark";
 }
 
 function groupBy(items, key) {
@@ -444,7 +444,7 @@ function HomePage() {
                   </div>
                   <pre>{`import pandas as pd
 df = pd.read_csv("expenses.csv")
-summary = df.groupby("category").amount.sum()`}</pre>
+summary = df.groupby("category").sum()`}</pre>
                   <div className="runResult">실행 가능 / 검증 가능 / 태스크 승격 가능</div>
                 </div>
               </div>
