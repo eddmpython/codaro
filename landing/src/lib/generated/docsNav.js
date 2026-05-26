@@ -195,6 +195,21 @@ export const docsPages = [
     "contentModule": "pagef49c9e49c1de"
   },
   {
+    "path": "skills/architecture/share-pack-distribution",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "share-pack-distribution"
+    ],
+    "title": "공유 팩 배포",
+    "description": "Codaro curricula and automation recipe packs for local import, export, and future gallery distribution.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 210,
+    "url": "/codaro/docs/skills/architecture/share-pack-distribution",
+    "contentModule": "page25598b3d6e81"
+  },
+  {
     "path": "skills/identity/transparent-scope-isolation",
     "slugSegments": [
       "skills",
@@ -558,7 +573,7 @@ export const docsPages = [
       "launch-playbook"
     ],
     "title": "Launch Playbook",
-    "description": "Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.",
+    "description": "Public launch playbook for positioning, demos, video, release notes, and first-user feedback.",
     "section": "ops",
     "sectionLabel": "Operations",
     "order": 308,
@@ -612,6 +627,38 @@ export const docsPages = [
     "order": 331,
     "url": "/codaro/docs/skills/ops/product/dogfood-alpha",
     "contentModule": "paged9f9df765f91"
+  },
+  {
+    "path": "skills/ops/product/world-class-blueprint",
+    "slugSegments": [
+      "skills",
+      "ops",
+      "product",
+      "world-class-blueprint"
+    ],
+    "title": "세계 1위 학습·자동화 청사진",
+    "description": "PRD-level blueprint for making Codaro the leading education and automation AI product.",
+    "section": "ops",
+    "sectionLabel": "Operations",
+    "order": 332,
+    "url": "/codaro/docs/skills/ops/product/world-class-blueprint",
+    "contentModule": "page192ff323541f"
+  },
+  {
+    "path": "skills/ops/product/contentPipeline",
+    "slugSegments": [
+      "skills",
+      "ops",
+      "product",
+      "contentPipeline"
+    ],
+    "title": "콘텐츠 발급 파이프라인",
+    "description": "Local-only short video, carousel, and publishing package workflow for Codaro.",
+    "section": "ops",
+    "sectionLabel": "Operations",
+    "order": 342,
+    "url": "/codaro/docs/skills/ops/product/contentPipeline",
+    "contentModule": "page5394c7b8fa83"
   },
   {
     "path": "skills",
@@ -1016,6 +1063,21 @@ export const docsSections = [
         "order": 209,
         "url": "/codaro/docs/skills/architecture/live-provider-ops",
         "contentModule": "pagef49c9e49c1de"
+      },
+      {
+        "path": "skills/architecture/share-pack-distribution",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "share-pack-distribution"
+        ],
+        "title": "공유 팩 배포",
+        "description": "Codaro curricula and automation recipe packs for local import, export, and future gallery distribution.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 210,
+        "url": "/codaro/docs/skills/architecture/share-pack-distribution",
+        "contentModule": "page25598b3d6e81"
       }
     ]
   },
@@ -1222,7 +1284,7 @@ export const docsSections = [
           "launch-playbook"
         ],
         "title": "Launch Playbook",
-        "description": "Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.",
+        "description": "Public launch playbook for positioning, demos, video, release notes, and first-user feedback.",
         "section": "ops",
         "sectionLabel": "Operations",
         "order": 308,
@@ -1276,6 +1338,38 @@ export const docsSections = [
         "order": 331,
         "url": "/codaro/docs/skills/ops/product/dogfood-alpha",
         "contentModule": "paged9f9df765f91"
+      },
+      {
+        "path": "skills/ops/product/world-class-blueprint",
+        "slugSegments": [
+          "skills",
+          "ops",
+          "product",
+          "world-class-blueprint"
+        ],
+        "title": "세계 1위 학습·자동화 청사진",
+        "description": "PRD-level blueprint for making Codaro the leading education and automation AI product.",
+        "section": "ops",
+        "sectionLabel": "Operations",
+        "order": 332,
+        "url": "/codaro/docs/skills/ops/product/world-class-blueprint",
+        "contentModule": "page192ff323541f"
+      },
+      {
+        "path": "skills/ops/product/contentPipeline",
+        "slugSegments": [
+          "skills",
+          "ops",
+          "product",
+          "contentPipeline"
+        ],
+        "title": "콘텐츠 발급 파이프라인",
+        "description": "Local-only short video, carousel, and publishing package workflow for Codaro.",
+        "section": "ops",
+        "sectionLabel": "Operations",
+        "order": 342,
+        "url": "/codaro/docs/skills/ops/product/contentPipeline",
+        "contentModule": "page5394c7b8fa83"
       }
     ]
   }
