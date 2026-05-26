@@ -618,8 +618,11 @@ def commandLogSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, o
     logsDir = localGateWorkspace(gateName) / "logs"
     if not logsDir.exists():
         return []
+    logPaths = list(logsDir.glob("*.log"))
+    for logPath in logPaths:
+        waitForLogFileStable(logPath)
     summaries: list[dict[str, object]] = []
-    for logPath in sorted(logsDir.glob("*.log"), key=lambda path: path.stat().st_mtime_ns):
+    for logPath in sorted(logPaths, key=lambda path: path.stat().st_mtime_ns):
         modifiedAtNs = logPath.stat().st_mtime_ns
         if modifiedAtNs < gateStartedAtNs:
             continue
@@ -631,6 +634,27 @@ def commandLogSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, o
             "bytes": logPath.stat().st_size,
         })
     return summaries
+
+
+def waitForLogFileStable(path: Path, *, timeoutSeconds: float = 3.0, stableSeconds: float = 0.25) -> None:
+    deadline = time.monotonic() + timeoutSeconds
+    lastState: tuple[int, int] | None = None
+    stableSince: float | None = None
+    while time.monotonic() < deadline:
+        try:
+            stat = path.stat()
+        except OSError:
+            return
+        state = (stat.st_size, stat.st_mtime_ns)
+        now = time.monotonic()
+        if state == lastState:
+            stableSince = stableSince or now
+            if now - stableSince >= stableSeconds:
+                return
+        else:
+            lastState = state
+            stableSince = None
+        time.sleep(0.05)
 
 
 def jsonArtifactEvidence(path: Path, *, expectedGitHead: str | None) -> dict[str, object]:
