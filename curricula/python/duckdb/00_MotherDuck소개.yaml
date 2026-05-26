@@ -28,6 +28,7 @@ meta:
 intro:
   direction: MotherDuck소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
   - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
   - MotherDuck소개 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
   - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
