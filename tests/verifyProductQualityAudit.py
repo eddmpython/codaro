@@ -686,6 +686,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "GATE_WORK_ROOT",
                 "UV_NO_CACHE",
                 "normalizePytestArgs",
+                "localGatePytestBaseTemp",
                 "--basetemp",
                 "normalizeCargoArgs",
                 "--target-dir",
@@ -730,7 +731,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "`output/test-runner/<gate>/`",
                 "`uv --no-cache run`",
-                "`--basetemp output/test-runner/<gate>/pytest`",
+                "`--basetemp output/test-runner/<gate>/pytest/run-<pid>-<time_ns>`",
                 "`--target-dir output/test-runner/<gate>/cargo-target`",
                 "`output/test-runner/<gate>/scratch`",
                 "`output/test-runner/<gate>/logs`",

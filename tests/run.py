@@ -371,7 +371,7 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
 
 
 def commandLogPath(gateName: str, commandArgs: tuple[str, ...]) -> Path:
-    commandName = commandArgs[0] if commandArgs else "command"
+    commandName = Path(commandArgs[0]).name if commandArgs else "command"
     safeCommand = re.sub(r"[^A-Za-z0-9_.-]+", "-", commandName).strip("-") or "command"
     return localGateWorkspace(gateName) / "logs" / f"{time.time_ns()}-{safeCommand}.log"
 
@@ -441,8 +441,14 @@ def normalizePytestArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]
     if "-p" not in nextArgs:
         nextArgs.extend(("-p", "no:cacheprovider"))
     if not any(item == "--basetemp" or item.startswith("--basetemp=") for item in nextArgs):
-        nextArgs.extend(("--basetemp", str(localGateWorkspace(gateName) / "pytest")))
+        nextArgs.extend(("--basetemp", str(localGatePytestBaseTemp(gateName))))
     return tuple(nextArgs)
+
+
+def localGatePytestBaseTemp(gateName: str) -> Path:
+    tempRoot = localGateWorkspace(gateName) / "pytest"
+    tempRoot.mkdir(parents=True, exist_ok=True)
+    return tempRoot / f"run-{os.getpid()}-{time.time_ns()}"
 
 
 def normalizeCargoArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:

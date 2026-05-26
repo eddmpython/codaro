@@ -65,7 +65,7 @@ uv run python -X utf8 tests/run.py gate public-readiness-audit
 `tests/run.py`는 로컬/CI gate 실행 시 도구가 반드시 만드는 실행 작업공간만 저장소 안의 `output/test-runner/<gate>/` 아래로 고정한다. 제품 소스와 원래 build 설정은 건드리지 않고, 사용자 홈의 uv cache, OS temp, 기존 launcher `target` lock, 외부 `npx` fetch 상태가 gate 결과를 흔들지 않게 한다.
 
 - `uv run` 명령은 runner 안에서 `uv --no-cache run`으로 실행한다. gate runner는 uv cache를 만들거나 재사용하지 않는다.
-- pytest suite는 cache provider를 끄고 `--basetemp output/test-runner/<gate>/pytest`를 자동으로 붙인다.
+- pytest suite는 cache provider를 끄고 `--basetemp output/test-runner/<gate>/pytest/run-<pid>-<time_ns>`를 자동으로 붙인다.
 - cargo suite는 `--target-dir output/test-runner/<gate>/cargo-target`를 자동으로 붙여 기존 `target` lock과 충돌하지 않는다.
 - `TMP`, `TEMP`, `TMPDIR`은 도구 실행 중 필요한 scratch 용도로만 `output/test-runner/<gate>/scratch`를 가리킨다.
 - 브라우저 verifier는 `tempfile.mkdtemp`로 OS temp를 직접 만들지 않는다. `repoLocalPlaywrightWorkspace`를 통해 gate runner의 scratch를 쓰고, 직접 실행 시에도 `output/test-runner/<verifier>/scratch/playwright` 아래에서만 Playwright daemon/session 파일을 만든다. `PLAYWRIGHT_DAEMON_SESSION_DIR`와 `PLAYWRIGHT_SERVER_REGISTRY`는 wrapper가 이 workspace로 덮어쓴다.
