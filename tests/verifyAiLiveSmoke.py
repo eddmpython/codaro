@@ -46,6 +46,7 @@ LIVE_PROVIDER_ERRORS = (
 )
 
 AsyncLiveCaseRunner = Callable[[LLMConfig], Awaitable["LiveSmokeCase"]]
+LiveCaseRunner = Callable[[LLMConfig], "LiveSmokeCase"]
 
 
 @dataclass(frozen=True)
@@ -235,8 +236,8 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
     cellCallCase = asyncio.run(runAsyncLiveCaseWithNetworkRetry(selection.config, runCellCallLoopCase))
     cases = (
         runProviderAvailabilityCase(selection.config),
-        runShortAnswerCase(selection.config),
-        runTeacherAnswerCase(selection.config),
+        runLiveCaseWithNetworkRetry(selection.config, runShortAnswerCase),
+        runLiveCaseWithNetworkRetry(selection.config, runTeacherAnswerCase),
         runClarificationGateCase(),
         toolLoopCase,
         cellCallCase,
@@ -248,6 +249,22 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
         status="passed" if passed else "failed",
         cases=cases,
     )
+
+
+def runLiveCaseWithNetworkRetry(
+    config: LLMConfig,
+    runner: LiveCaseRunner,
+) -> LiveSmokeCase:
+    maxAttempts = liveNetworkRetryAttempts()
+    networkFailures: list[LiveSmokeCase] = []
+    for attempt in range(1, maxAttempts + 1):
+        case = runner(config)
+        if case.passed:
+            return caseWithNetworkRetrySignals(case, attempt, networkFailures)
+        if not isRecoverableNetworkCase(case) or attempt == maxAttempts:
+            return caseWithNetworkRetrySignals(case, attempt, networkFailures)
+        networkFailures.append(case)
+    return caseWithNetworkRetrySignals(case, maxAttempts, networkFailures)
 
 
 async def runAsyncLiveCaseWithNetworkRetry(

@@ -304,6 +304,44 @@ def testAsyncLiveCaseRetriesRecoverableNetworkFailure(monkeypatch) -> None:
     assert case.signals["recoveredAfterNetworkRetry"] is True
 
 
+def testLiveCaseRetriesRecoverableNetworkFailure(monkeypatch) -> None:
+    smoke = loadSmoke()
+    attempts = []
+
+    def flakyCase(_config):
+        attempts.append("run")
+        if len(attempts) == 1:
+            return smoke.LiveSmokeCase(
+                caseId="short-answer",
+                passed=False,
+                status="provider_network_error",
+                durationMs=90_000,
+                signals={
+                    "diagnosticCode": "provider_network_error",
+                    "diagnosticAction": "check-network",
+                },
+            )
+        return smoke.LiveSmokeCase(
+            caseId="short-answer",
+            passed=True,
+            status="passed",
+            durationMs=100,
+            signals={"answerChars": 12},
+        )
+
+    monkeypatch.setenv("CODARO_AI_LIVE_NETWORK_RETRIES", "2")
+    case = smoke.runLiveCaseWithNetworkRetry(
+        smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+        flakyCase,
+    )
+
+    assert case.passed
+    assert len(attempts) == 2
+    assert case.signals["attemptCount"] == 2
+    assert case.signals["networkRetryCount"] == 1
+    assert case.signals["recoveredAfterNetworkRetry"] is True
+
+
 def testWorkloopSignalReportsReadableBoundedSamples() -> None:
     smoke = loadSmoke()
     trace = {
