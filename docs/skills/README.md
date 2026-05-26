@@ -85,7 +85,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (13) — 5층 구조
+## Architecture (14) — 5층 구조
 
 - [ssot-map](architecture/ssot-map.md)
 - [overview](architecture/overview.md)
@@ -99,9 +99,10 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [curriculum-registry](architecture/curriculum-registry.md)
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
 - [automation-authoring-loop](architecture/automation-authoring-loop.md)
+- [share-pack-distribution](architecture/share-pack-distribution.md)
 - [live-provider-ops](architecture/live-provider-ops.md)
 
-## Ops (14) — 운영 규칙
+## Ops (15) — 운영 규칙
 
 - [ops index](ops/README.md)
 
@@ -129,5 +130,7 @@ Release:
 Product:
 
 - [branding](ops/product/branding.md)
+- [content-pipeline](ops/product/contentPipeline.md)
 - [dogfood-alpha](ops/product/dogfood-alpha.md)
 - [product-quality](ops/product/service-candidate.md)
+- [world-class-blueprint](ops/product/world-class-blueprint.md)

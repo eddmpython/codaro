@@ -29,9 +29,13 @@ _archive/
 *.log
 *.tsbuildinfo
 output/
+localData/
 editor/output/
 .playwright-cli/
 logs/
+
+# SNS content pipeline (local briefs, renders, publish packages)
+/sns/
 
 # Node modules (all locations)
 node_modules/
