@@ -6,6 +6,7 @@ import type {
   CellRole,
   CodaroDocument,
   CurriculumCategoriesPayload,
+  CurriculumCategoryTreeNode,
   CurriculumContentsPayload,
   CurriculumLessonPayload,
   ExecutionKind,
@@ -83,7 +84,7 @@ const categoryLabels: Record<string, { title: string; track: string; description
   },
   excel: {
     title: "엑셀 자동화",
-    track: "자동화·실무",
+    track: "자동화",
     description: "반복되는 워크북 작업을 Python 자동화로 바꿉니다.",
   },
   numpy: {
@@ -163,7 +164,7 @@ const categoryLabels: Record<string, { title: string; track: string; description
   },
   regex: {
     title: "Regex",
-    track: "자동화·실무",
+    track: "자동화",
     description: "텍스트 처리용 정규식을 익힙니다.",
   },
   pillow: {
@@ -178,12 +179,12 @@ const categoryLabels: Record<string, { title: string; track: string; description
   },
   practical: {
     title: "실전 파이썬",
-    track: "자동화·실무",
+    track: "자동화",
     description: "실행 가능한 Python 셀로 작은 프로젝트를 만듭니다.",
   },
   playwright: {
     title: "Playwright",
-    track: "자동화·실무",
+    track: "자동화",
     description: "브라우저 화면 점검, 폼 입력, 네트워크 mock, 증거 저장을 Python으로 자동화합니다.",
   },
 };
@@ -193,9 +194,79 @@ const categoryGroups: Record<string, string[]> = {
   "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-  "자동화·실무": ["excel", "regex", "practical", "playwright"],
+  "자동화": ["playwright", "excel", "regex", "practical"],
   "이미지·비전": ["pillow", "opencv"],
 };
+
+const categoryTree: CurriculumCategoryTreeNode[] = [
+  {
+    id: "python-basics",
+    name: "Python 기초",
+    description: "언어 기본기와 표준 라이브러리로 로컬 Python 감각을 만든다.",
+    categories: ["30days", "advancedPython", "builtins"],
+  },
+  {
+    id: "data-analysis",
+    name: "데이터 분석",
+    description: "표 데이터, SQL, 데이터 계약을 다루는 분석 경로다.",
+    categories: ["pandas", "numpy", "polars", "duckdb", "pydantic"],
+  },
+  {
+    id: "visualization",
+    name: "시각화",
+    description: "정적·통계·인터랙티브·지도 시각화를 구분한다.",
+    categories: ["matplotlib", "seaborn", "plotly", "altair", "folium"],
+  },
+  {
+    id: "math-stat-ml",
+    name: "수학·통계·ML",
+    description: "수학 계산, 통계 모델, 머신러닝과 그래프 분석 경로다.",
+    categories: ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
+  },
+  {
+    id: "automation",
+    name: "자동화",
+    description: "반복 작업을 로컬 실행, 브라우저, 업무 도구 단위로 나눈다.",
+    children: [
+      {
+        id: "browser-automation",
+        name: "브라우저 자동화",
+        description: "화면 점검, 폼 입력, 증거 저장, E2E 흐름을 다룬다.",
+        categories: ["playwright"],
+      },
+      {
+        id: "office-automation",
+        name: "업무 자동화",
+        description: "워크북, 작은 도구, 반복 업무를 실행 가능한 Python으로 만든다.",
+        categories: ["excel", "practical"],
+      },
+      {
+        id: "text-automation",
+        name: "텍스트 자동화",
+        description: "비정형 문자열 추출과 변환을 자동화한다.",
+        categories: ["regex"],
+      },
+      {
+        id: "os-automation",
+        name: "OS 자동화",
+        description: "파일, 프로세스, 입력, 창 제어 트랙을 위한 자리다.",
+        categories: [],
+      },
+      {
+        id: "test-automation",
+        name: "테스트 자동화",
+        description: "단위, 통합, E2E, 회귀 테스트 트랙을 위한 자리다.",
+        categories: [],
+      },
+    ],
+  },
+  {
+    id: "image-vision",
+    name: "이미지·비전",
+    description: "이미지 처리와 화면 인식 기반 자동화를 다룬다.",
+    categories: ["pillow", "opencv"],
+  },
+];
 
 const lessons = Object.entries(rawCurricula)
   .map(([path, loadRaw]) => {
@@ -236,6 +307,7 @@ export function registryCategories(): CurriculumCategoriesPayload {
   return {
     categories,
     groups,
+    tree: filteredCategoryTree(categories.map((category) => category.key)),
     learningPaths: {
       Codaro: {
         categories: categories.map((category) => category.key),
@@ -812,6 +884,19 @@ function exerciseContract(value: unknown): LearningExerciseContract {
     check: checkMap(value.check ?? value.checkConfig),
     hints: uniqueTextList(value.hints ?? value.tips),
     difficulty: textValue(value.difficulty) || "easy",
+  };
+}
+
+function filteredCategoryTree(categoryKeys: string[]): CurriculumCategoryTreeNode[] {
+  const keySet = new Set(categoryKeys);
+  return categoryTree.map((node) => pruneCategoryTreeNode(node, keySet));
+}
+
+function pruneCategoryTreeNode(node: CurriculumCategoryTreeNode, keySet: Set<string>): CurriculumCategoryTreeNode {
+  return {
+    ...node,
+    categories: (node.categories ?? []).filter((category) => keySet.has(category)),
+    children: (node.children ?? []).map((child) => pruneCategoryTreeNode(child, keySet)),
   };
 }
 

@@ -65,6 +65,7 @@ function App() {
     applyCurriculumSelectionState,
     categories,
     categoryGroups,
+    categoryTree,
     contents,
     contentsLoading,
     curriculumDocument,
@@ -282,6 +283,7 @@ function App() {
       <ProductSidebar
         categories={filteredCategories}
         categoryGroups={categoryGroups}
+        categoryTree={categoryTree}
         contentsLoading={contentsLoading}
         contents={contents}
         customCurricula={sidebarCustomCurricula}

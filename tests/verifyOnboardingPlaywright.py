@@ -274,13 +274,27 @@ class OnboardingStubApi:
                         "categories": [
                             {"key": "30days", "name": "파이썬 기초", "description": "첫 경로", "count": 30, "track": "Python 기초"},
                             {"key": "pandas", "name": "Pandas", "description": "데이터 분석", "count": 11, "track": "데이터 분석"},
-                            {"key": "excel", "name": "엑셀 자동화", "description": "반복 작업 자동화", "count": 3, "track": "자동화·실무"},
+                            {"key": "excel", "name": "엑셀 자동화", "description": "반복 작업 자동화", "count": 3, "track": "자동화"},
+                            {"key": "playwright", "name": "Playwright", "description": "브라우저 자동화", "count": 11, "track": "자동화"},
                         ],
                         "groups": {
                             "Python 기초": ["30days"],
                             "데이터 분석": ["pandas"],
-                            "자동화·실무": ["excel"],
+                            "자동화": ["playwright", "excel"],
                         },
+                        "tree": [
+                            {"id": "python-basics", "name": "Python 기초", "categories": ["30days"], "children": []},
+                            {"id": "data-analysis", "name": "데이터 분석", "categories": ["pandas"], "children": []},
+                            {
+                                "id": "automation",
+                                "name": "자동화",
+                                "categories": [],
+                                "children": [
+                                    {"id": "browser-automation", "name": "브라우저 자동화", "categories": ["playwright"], "children": []},
+                                    {"id": "office-automation", "name": "업무 자동화", "categories": ["excel"], "children": []},
+                                ],
+                            },
+                        ],
                         "learningPaths": {},
                     })
                 elif path.startswith("/api/curriculum/contents/"):
@@ -369,7 +383,7 @@ def jsTextPresent(text: str) -> str:
 
 def jsAssertFallbackOnboarding() -> str:
     return compactJs("""
-(() => {
+(async () => {
   const text = document.body.innerText;
   const providerButton = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Provider 연결'));
   const avatar = [...document.querySelectorAll('img')].some((img) => img.getAttribute('src')?.includes('/brand/avatar-small.png'));
@@ -469,13 +483,18 @@ def jsAssertReadyOnboarding() -> str:
 
 def jsAssertCurriculumSidebarGroups() -> str:
     return compactJs("""
-(() => {
+(async () => {
   const text = document.body.innerText;
-  const required = ['Codaro 커리큘럼', 'Python 기초', '데이터 분석', '자동화·실무'];
+  const required = ['Codaro 커리큘럼', 'Python 기초', '데이터 분석', '자동화'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('curriculum sidebar groups missing: ' + missing.join(', '));
-  const groupButtons = [...document.querySelectorAll('button')].filter((button) => ['Python 기초', '데이터 분석', '자동화·실무'].some((label) => button.textContent?.includes(label)));
+  const groupButtons = [...document.querySelectorAll('button[aria-expanded]')].filter((button) => ['Python 기초', '데이터 분석', '자동화'].some((label) => button.textContent?.includes(label)));
   if (groupButtons.length < 3) throw new Error('curriculum sidebar group buttons missing');
+  const automationButton = groupButtons.find((button) => button.textContent?.includes('자동화'));
+  if (!automationButton) throw new Error('automation tree button missing');
+  automationButton.click();
+  await new Promise((resolve) => setTimeout(resolve, 80));
+  if (!document.body.innerText.includes('브라우저 자동화')) throw new Error('browser automation branch missing after expanding automation tree');
   return 'curriculum-sidebar-groups-ok';
 })()
 """)

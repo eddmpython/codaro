@@ -29,7 +29,7 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
   excel: {
     title: "엑셀 자동화",
     subtitle: "반복되는 워크북 작업을 감사 가능한 Python 태스크로 바꿉니다.",
-    track: "자동화·실무",
+    track: "자동화",
   },
   numpy: {
     title: "NumPy",
@@ -109,7 +109,7 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
   regex: {
     title: "Regex",
     subtitle: "복잡한 텍스트를 안정적으로 추출하고 변환합니다.",
-    track: "자동화·실무",
+    track: "자동화",
   },
   pillow: {
     title: "Pillow",
@@ -124,7 +124,12 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
   practical: {
     title: "실전 파이썬",
     subtitle: "반복 가능한 도구가 되는 작은 프로젝트를 만듭니다.",
-    track: "자동화·실무",
+    track: "자동화",
+  },
+  playwright: {
+    title: "Playwright",
+    subtitle: "브라우저 화면 점검, 폼 입력, 증거 저장을 Python으로 자동화합니다.",
+    track: "자동화",
   },
 };
 
@@ -174,8 +179,31 @@ export const fallbackCategories: CurriculumCategoriesPayload = {
   groups: {
     "Python 기초": ["30days"],
     "데이터 분석": ["pandas"],
-    "자동화·실무": ["excel"],
+    "자동화": ["excel"],
   },
+  tree: [
+    {
+      id: "python-basics",
+      name: "Python 기초",
+      categories: ["30days"],
+    },
+    {
+      id: "data-analysis",
+      name: "데이터 분석",
+      categories: ["pandas"],
+    },
+    {
+      id: "automation",
+      name: "자동화",
+      children: [
+        {
+          id: "office-automation",
+          name: "업무 자동화",
+          categories: ["excel"],
+        },
+      ],
+    },
+  ],
   learningPaths: {
     입문: {
       categories: ["30days"],

@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.contentCache import CurriculumContentCache
-from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS
+from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
@@ -20,7 +20,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
     @router.get("/api/curriculum/categories")
     def apiCurriculumCategories() -> dict[str, object]:
         if state.studyLoader is None:
-            return {"categories": [], "groups": {}, "learningPaths": {}}
+            return {"categories": [], "groups": {}, "tree": [], "learningPaths": {}}
         categories = state.studyLoader.listCategories()
         logger.debug(
             "curriculum %s",
@@ -29,6 +29,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         return {
             "categories": [category.model_dump() for category in categories],
             "groups": CATEGORY_GROUPS,
+            "tree": curriculumCategoryTree(),
             "learningPaths": LEARNING_PATHS,
         }
 

@@ -46,13 +46,15 @@ curricula/
 - built-in 레슨의 외부 패키지는 `meta.packages`에 둔다. 기본 프로젝트 의존성은 제품 실행용 최소 패키지로 유지하고, 학습 패키지는 레슨을 열거나 실행할 때 uv preflight로 준비한다.
 - 트랙의 `00_*소개.yaml`은 단순 소개가 아니라 해당 과정을 통해 만들 수 있는 산출물, 필요한 패키지 준비, 첫 실행 검증, 이후 로드맵을 보여주는 오리엔테이션이어야 한다.
 
-## 카테고리 그룹 계약
+## 카테고리 트리 계약
 
-- 커리큘럼 목록은 평면 카테고리 나열이 아니라 track 단위 그룹으로 노출한다.
-- backend SSOT는 `src/codaro/curriculum/studyLoader.py`의 `CATEGORY_GROUPS`다.
-- editor fallback/bundled registry는 같은 그룹 이름을 유지한다: `Python 기초`, `데이터 분석`, `시각화`, `수학·통계·ML`, `자동화·실무`, `이미지·비전`.
-- `/api/curriculum/categories`는 `categories[].track`과 `groups`를 함께 내려준다.
-- 제품 사이드바는 `groups`를 먼저 렌더링하고, 선택된 group 안에서 category와 lesson을 펼친다. 새 카테고리는 반드시 한 그룹에만 속해야 한다.
+- 커리큘럼 목록은 평면 카테고리 나열이 아니라 카테고리 트리로 노출한다.
+- backend SSOT는 `src/codaro/curriculum/studyLoader.py`의 `CATEGORY_TREE`다. `CATEGORY_GROUPS`는 기존 클라이언트와 단순 group fallback을 위한 호환 레이어다.
+- editor fallback/bundled registry는 같은 트리 이름을 유지한다: `Python 기초`, `데이터 분석`, `시각화`, `수학·통계·ML`, `자동화`, `이미지·비전`.
+- `/api/curriculum/categories`는 `categories[].track`, `categories[].path`, `groups`, `tree`를 함께 내려준다.
+- 제품 사이드바는 `tree`를 먼저 렌더링하고, 없을 때만 `groups`를 fallback으로 쓴다. 선택된 leaf category 안에서 lesson을 펼친다.
+- 자동화는 `자동화 > 브라우저 자동화 > Playwright`처럼 하위 분야를 명시한다. OS 자동화, 업무 자동화, 텍스트 자동화, 테스트 자동화처럼 분야가 갈라질 수 있으므로 새 자동화 트랙은 `자동화` 바로 아래에 평면으로 추가하지 않고 적절한 하위 노드에 둔다. 아직 콘텐츠가 없는 하위 노드는 API 계약에는 둘 수 있지만, 제품 사이드바에서는 실제 카테고리가 생길 때 노출한다.
+- 새 카테고리는 기본 진입 경로를 하나만 가져야 한다. 같은 레슨을 다른 분야에서 보여줘야 하면 category를 중복 배치하지 않고 추천/관련 학습 링크로 연결한다.
 
 ## 로컬 Runtime 호환성
 

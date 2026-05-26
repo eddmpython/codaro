@@ -164,6 +164,15 @@ export type CurriculumCategory = {
   description: string;
   count: number;
   track?: string;
+  path?: string[];
+};
+
+export type CurriculumCategoryTreeNode = {
+  id: string;
+  name: string;
+  description?: string;
+  categories?: string[];
+  children?: CurriculumCategoryTreeNode[];
 };
 
 export type CurriculumContentSummary = {
@@ -174,6 +183,7 @@ export type CurriculumContentSummary = {
 export type CurriculumCategoriesPayload = {
   categories: CurriculumCategory[];
   groups: Record<string, string[]>;
+  tree?: CurriculumCategoryTreeNode[];
   learningPaths: Record<string, { categories: string[]; description: string }>;
 };
 

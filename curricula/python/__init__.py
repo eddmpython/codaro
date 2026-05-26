@@ -34,6 +34,7 @@ categoryMapping = {
     'opencv': 'OpenCV 컴퓨터비전',
     'pydantic': 'Pydantic 데이터검증',
     'practical': '실전파이썬',
+    'playwright': 'Playwright 브라우저자동화',
 }
 
 categoryMeta = {
@@ -175,6 +176,12 @@ categoryMeta = {
         'description': '실전 프로젝트로 배우는 Python',
         'imageUrl': None,
     },
+    'playwright': {
+        'icon': 'web_asset',
+        'color': 'emerald',
+        'description': '브라우저 화면 점검과 웹 자동화',
+        'imageUrl': None,
+    },
 }
 
 categoryGroups = {
@@ -183,7 +190,7 @@ categoryGroups = {
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
-    '자동화·실무': ['excel', 'regex', 'practical'],
+    '자동화': ['playwright', 'excel', 'regex', 'practical'],
     '이미지·비전': ['pillow', 'opencv'],
 }
 
@@ -205,7 +212,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {

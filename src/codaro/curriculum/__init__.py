@@ -19,10 +19,12 @@ from .exerciseCheck import (
 from .studyLoader import (
     CATEGORY_GROUPS,
     CATEGORY_MAPPING,
+    CATEGORY_TREE,
     LEARNING_PATHS,
     CategoryInfo,
     StudyLoader,
     StudySummary,
+    curriculumCategoryTree,
 )
 from .converter import yamlToDocument
 from .learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, PHILOSOPHY
@@ -44,6 +46,7 @@ __all__ = [
     "AI_TEACHER_INSTRUCTIONS",
     "CATEGORY_GROUPS",
     "CATEGORY_MAPPING",
+    "CATEGORY_TREE",
     "CategoryInfo",
     "CheckResult",
     "CurriculumContentCache",
@@ -76,6 +79,7 @@ __all__ = [
     "checkVariableSnapshotContains",
     "runExerciseCheck",
     "runToolExerciseCheck",
+    "curriculumCategoryTree",
     "lessonContractFromYaml",
     "sectionContractGaps",
     "sectionHasStructuredFields",

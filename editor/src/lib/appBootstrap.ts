@@ -10,6 +10,7 @@ import type {
   AppNotice,
   CodaroDocument,
   CurriculumCategory,
+  CurriculumCategoryTreeNode,
   CurriculumContentSummary,
   DiagnosticCategory,
   DiagnosticSummary,
@@ -33,6 +34,7 @@ export type AppBootstrapState = {
   apiOnline: boolean;
   categories: CurriculumCategory[];
   categoryGroups: Record<string, string[]>;
+  categoryTree: CurriculumCategoryTreeNode[];
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
   diagnostics: DiagnosticSummary;
@@ -73,6 +75,7 @@ export const initialBootstrapState: AppBootstrapState = {
   apiOnline: false,
   categories: preferredCategories(builtInCategories.categories),
   categoryGroups: builtInCategories.groups,
+  categoryTree: builtInCategories.tree ?? [],
   contents: initialCurriculum.contents.contents,
   curriculumDocument: initialCurriculum.document,
   diagnostics: emptyDiagnosticSummary,
@@ -116,6 +119,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     apiOnline,
     categories: preferredCategories(categoryResult.data.categories),
     categoryGroups: categoryResult.data.groups,
+    categoryTree: categoryResult.data.tree ?? builtInCategories.tree ?? [],
     diagnostics: diagnosticsResult.data,
     documentToApply: loadedDocument.document,
     notice: chooseBootstrapNotice(loadedDocument.notice, diagnosticsNotice),

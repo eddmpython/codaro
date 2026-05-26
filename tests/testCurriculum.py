@@ -8,7 +8,7 @@ import yaml
 from pydantic import ValidationError
 
 from codaro.curriculum.contentCache import CurriculumContentCache
-from codaro.curriculum.studyLoader import CATEGORY_GROUPS, StudyLoader
+from codaro.curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_TREE, StudyLoader, curriculumCategoryTree
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
@@ -71,6 +71,24 @@ def testCategoryGroupsCoverListedCategoriesAndTracks() -> None:
     assert all(category.track == expectedTracks[category.key] for category in categories)
 
 
+def testCategoryTreeCoversListedCategoriesAndAutomationBranch() -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
+    categories = loader.listCategories()
+
+    categoryKeys = {category.key for category in categories}
+    treeKeys = set(_treeCategoryKeys(curriculumCategoryTree()))
+    assert categoryKeys.issubset(treeKeys)
+
+    browserAutomation = _treeNodeByPath(CATEGORY_TREE, ("자동화", "브라우저 자동화"))
+    assert browserAutomation is not None
+    assert "playwright" in browserAutomation.get("categories", [])
+
+    paths = {category.key: category.path for category in categories}
+    assert paths["playwright"] == ["자동화", "브라우저 자동화"]
+
+
 def testBuiltinsRuntimeCompatibilityDocsUseLocalContract() -> None:
     builtinsDir = CURRICULA_DIR / "builtins"
     localGuide = builtinsDir / "LOCAL_RUNTIME_COMPATIBILITY.md"
@@ -89,6 +107,33 @@ def testBuiltinsRuntimeCompatibilityDocsUseLocalContract() -> None:
     assert "source of truth" in legacyText
     assert "CATEGORY_GROUPS" in registryText
     assert "LOCAL_RUNTIME_COMPATIBILITY.md" in registryText
+
+
+def _treeCategoryKeys(nodes: list[dict]) -> list[str]:
+    keys: list[str] = []
+    for node in nodes:
+        categories = node.get("categories")
+        if isinstance(categories, list):
+            keys.extend(category for category in categories if isinstance(category, str))
+        children = node.get("children")
+        if isinstance(children, list):
+            keys.extend(_treeCategoryKeys([child for child in children if isinstance(child, dict)]))
+    return keys
+
+
+def _treeNodeByPath(nodes: list[dict], path: tuple[str, ...]) -> dict | None:
+    if not path:
+        return None
+    for node in nodes:
+        if node.get("name") != path[0]:
+            continue
+        if len(path) == 1:
+            return node
+        children = node.get("children")
+        if not isinstance(children, list):
+            return None
+        return _treeNodeByPath([child for child in children if isinstance(child, dict)], path[1:])
+    return None
 
 
 def testCurriculaAvoidBrowserRuntimeAndBarePipCopy() -> None:
