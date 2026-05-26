@@ -26,33 +26,33 @@ intro:
   - 커스텀 인코딩/디코딩
   direction: json JSON 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - json JSON 처리 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - json JSON 처리 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: json 모듈 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
     - label: 기본 직렬화 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
     - label: 파일 읽기와 쓰기 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
     - label: json JSON 처리 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 표준 라이브러리 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: json JSON 처리 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
     - label: json JSON 처리 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
 sections:
 - id: module_import
   title: json 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
   goal: json 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     json은 파이썬 표준 라이브러리입니다. JSON(JavaScript Object Notation) 데이터를 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -69,7 +69,7 @@ sections:
 
     'json 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: json 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: json 모듈 불러오기 예제에서 `jsonScratch` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       import json
       import tempfile
@@ -80,17 +80,17 @@ sections:
 
       'json 모듈이 정상적으로 로드되었습니다'
     hints:
-    - json 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `jsonScratch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `jsonScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: json 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: json 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: json 모듈 불러오기에서 `jsonScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: json 모듈 불러오기 실행 뒤 `jsonScratch` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: basic_serialization
   title: 기본 직렬화
   structuredPrimary: true
   subtitle: dumps와 loads
   goal: 기본 직렬화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     json 모듈은 Python 객체와 JSON 문자열 간 변환을 제공합니다. dumps()는 Python 객체를 JSON 문자열로 직렬화하고, loads()는 JSON 문자열을 Python 객체로 역직렬화합니다. API 통신, 설정 파일, 데이터 교환에 필수적입니다.
 
@@ -102,23 +102,23 @@ sections:
     jsonString = json.dumps(userData)
     jsonString
   exercise:
-    prompt: 기본 직렬화 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 기본 직렬화 예제에서 `userData`, `jsonString` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       userData = {'name': 'Alice', 'age': 30, 'city': 'Seoul'}
       jsonString = json.dumps(userData)
       jsonString
     hints:
-    - 기본 직렬화 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `userData = ...` 오른쪽 값입니다.
+    - 실행 뒤 `userData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 기본 직렬화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기본 직렬화에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 기본 직렬화에서 `userData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 직렬화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: file_operations
   title: 파일 읽기와 쓰기
   structuredPrimary: true
   subtitle: dump와 load
   goal: 파일 읽기와 쓰기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     dump()는 Python 객체를 JSON 파일로 저장하고, load()는 JSON 파일을 Python 객체로 읽어옵니다. 설정 파일, 데이터 캐싱, 영속성 저장에 활용됩니다. 파일 핸들을 직접 전달하여 효율적으로 처리합니다.
 
@@ -131,24 +131,24 @@ sections:
         json.dump(configData, f)
     'config.json 저장 완료'
   exercise:
-    prompt: 파일 읽기와 쓰기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 파일 읽기와 쓰기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       configData = {'theme': 'dark', 'language': 'ko', 'notifications': True}
       with open(jsonScratch / 'config.json', 'w', encoding='utf-8') as f:
           json.dump(configData, f)
       'config.json 저장 완료'
     hints:
-    - 파일 읽기와 쓰기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 파일 읽기와 쓰기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 파일 읽기와 쓰기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 파일 읽기와 쓰기의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 파일 읽기와 쓰기의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: formatting
   title: 포맷팅 옵션
   structuredPrimary: true
   subtitle: indent, sort_keys, separators
   goal: 포맷팅 옵션에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     JSON 출력을 사람이 읽기 쉽게 포맷팅할 수 있습니다. indent는 들여쓰기 수준을 지정하고, sort_keys는 키를 정렬하며, separators는 구분자를 커스터마이즈합니다. 디버깅, 로그, 설정 파일 작성에 유용합니다.
 
@@ -160,23 +160,23 @@ sections:
     prettyJson = json.dumps(studentData, indent=2, ensure_ascii=False)
     prettyJson
   exercise:
-    prompt: 포맷팅 옵션 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 포맷팅 옵션 예제에서 `studentData`, `prettyJson` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       studentData = {'name': '김철수', 'grade': 'A', 'score': 95}
       prettyJson = json.dumps(studentData, indent=2, ensure_ascii=False)
       prettyJson
     hints:
-    - 포맷팅 옵션 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `studentData = ...` 오른쪽 값입니다.
+    - 실행 뒤 `studentData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 포맷팅 옵션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 포맷팅 옵션에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 포맷팅 옵션에서 `studentData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 포맷팅 옵션 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: data_types
   title: 지원 데이터 타입
   structuredPrimary: true
   subtitle: Python ↔ JSON 변환
   goal: 지원 데이터 타입에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     JSON은 제한된 데이터 타입만 지원합니다. Python의 일부 타입은 JSON으로 직렬화할 수 없거나 변환 시 타입이 바뀝니다. 딕셔너리, 리스트, 문자열, 숫자, 불린, None만 직접 지원되며, 날짜나 집합 등은 커스텀 처리가 필요합니다.
 
@@ -195,7 +195,7 @@ sections:
     convertedJson = json.dumps(mixedData, indent=2)
     convertedJson
   exercise:
-    prompt: 지원 데이터 타입 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 지원 데이터 타입 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       mixedData = {
           'text': 'Hello',
@@ -208,17 +208,17 @@ sections:
       convertedJson = json.dumps(mixedData, indent=2)
       convertedJson
     hints:
-    - 지원 데이터 타입 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 지원 데이터 타입 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 지원 데이터 타입에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 지원 데이터 타입에서 `mixedData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 지원 데이터 타입 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: custom_encoding
   title: 커스텀 인코딩
   structuredPrimary: true
   subtitle: default와 object_hook
   goal: 커스텀 인코딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     기본 지원되지 않는 타입을 JSON으로 변환하려면 default 함수를 사용합니다. 역직렬화 시 커스텀 변환은 object_hook으로 구현합니다. 날짜, 집합, 사용자 정의 클래스 등을 JSON으로 처리할 수 있습니다.
 
@@ -235,7 +235,7 @@ sections:
     encodedSet = json.dumps(dataWithSet, default=customEncoder)
     encodedSet
   exercise:
-    prompt: 커스텀 인코딩 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 커스텀 인코딩 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def customEncoder(obj):
           if isinstance(obj, set):
@@ -246,17 +246,17 @@ sections:
       encodedSet = json.dumps(dataWithSet, default=customEncoder)
       encodedSet
     hints:
-    - 커스텀 인코딩 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 커스텀 인코딩 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 커스텀 인코딩에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 커스텀 인코딩의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 커스텀 인코딩 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: API, 설정 파일, 로그
   goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     실무에서 자주 사용하는 JSON 활용 패턴을 살펴봅니다. API 응답 처리, 설정 파일 관리, 로그 저장, 데이터 교환 등 다양한 시나리오에서 JSON을 효과적으로 사용할 수 있습니다.
 
@@ -269,24 +269,24 @@ sections:
     totalUsers = parsedResponse['data']['users']
     totalUsers
   exercise:
-    prompt: 실전 활용 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실전 활용 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       apiResponse = '{"status": "success", "data": {"users": 150, "active": 120}}'
       parsedResponse = json.loads(apiResponse)
       totalUsers = parsedResponse['data']['users']
       totalUsers
     hints:
-    - 실전 활용 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실전 활용에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실전 활용에서 `apiResponse` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실전 활용 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: '검증 루프: JSON 설정 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
   goal: '검증 루프: JSON 설정 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 JSON은 읽고 쓰는 것보다 구조를 검증하고 민감 정보를 제거한 뒤, 다시 읽어도 같은 데이터인지 확인하는 과정이 중요합니다. 여기서는 잘못된 JSON,
     누락된 필드, 저장 후 재검증을 한 흐름으로 묶습니다.
   tips:
@@ -316,7 +316,7 @@ sections:
     assert 'token' not in normalizedConfig
     normalizedConfig
   exercise:
-    prompt: '검증 루프: JSON 설정 품질 게이트 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '검증 루프: JSON 설정 품질 게이트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.'
     starterCode: |-
       jsonWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_json_workflow_'))
       rawConfig = {
@@ -342,17 +342,17 @@ sections:
       assert 'token' not in normalizedConfig
       normalizedConfig
     hints:
-    - '검증 루프: JSON 설정 품질 게이트 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: '검증 루프: JSON 설정 품질 게이트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '검증 루프: JSON 설정 품질 게이트에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.'
+    noError: '검증 루프: JSON 설정 품질 게이트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.'
+    resultCheck: '검증 루프: JSON 설정 품질 게이트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: json 모듈 종합 복습
   structuredPrimary: true
   subtitle: JSON 처리 마스터하기
   goal: json 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: json 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -361,14 +361,14 @@ sections:
     jsonStr = json.dumps(person)
     jsonStr
   exercise:
-    prompt: json 모듈 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: json 모듈 종합 복습 예제에서 `person`, `jsonStr` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       person = {'name': 'John', 'age': 25}
       jsonStr = json.dumps(person)
       jsonStr
     hints:
-    - json 모듈 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `person = ...` 오른쪽 값입니다.
+    - 실행 뒤 `person` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: json 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: json 모듈 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: json 모듈 종합 복습에서 `person` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: json 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

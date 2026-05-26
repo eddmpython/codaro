@@ -26,26 +26,26 @@ meta:
 intro:
   direction: Pillow소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - Pillow소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
+  - Pillow소개 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
+  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 로컬 이미지 검증 루프 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
-    - label: 핵심 처리 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 출력과 상태 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 이미지 변환/합성/저장 처리 실행
+      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
+    - label: 이미지 크기, 모드, 채널, 결과 검증
+      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
     - label: Pillow소개 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 이미지 처리 환경
       detail: pillow 기준으로 로컬 Python 실행을 준비합니다.
     - label: Pillow소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
     - label: Pillow소개 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -66,6 +66,8 @@ sections:
       title: 필터/효과
     - emoji: ✏️
       title: 텍스트/도형
+  goal: Pillow에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: pillow_history
   blocks:
   - type: sectionHeader
@@ -85,6 +87,8 @@ sections:
     - emoji: 🔗
       title: NumPy 연동
       description: NumPy 배열과 상호 변환이 가능해 과학 계산과 연계됩니다
+  goal: 🏛️ Pillow란?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: why_pillow
   blocks:
   - type: sectionHeader
@@ -97,6 +101,8 @@ sections:
     title: OpenCV와의 차이
     content: OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입
       같은 작업은 Pillow가 더 간단합니다. 얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다.
+  goal: 🚀 왜 Pillow인가?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: image_basics
   blocks:
   - type: sectionHeader
@@ -132,6 +138,8 @@ sections:
     title: 픽셀 좌표계
     content: Pillow에서 좌표 (0, 0)은 이미지의 왼쪽 상단입니다. x는 오른쪽으로, y는 아래쪽으로 증가합니다. (100, 50)은 왼쪽에서 100픽셀, 위에서 50픽셀
       떨어진 위치입니다.
+  goal: 📦 이미지의 구조에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -169,6 +177,8 @@ sections:
     - - 합성
       - 이미지 붙이기, 블렌딩
       - paste(), blend(), alpha_composite()
+  goal: 🛠️ Pillow 주요 기능에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: imagefilter
   blocks:
   - type: sectionHeader
@@ -195,6 +205,8 @@ sections:
       - 에지 검출
     - - SMOOTH
       - 노이즈 감소
+  goal: 🎭 ImageFilter에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: imageenhance
   blocks:
   - type: sectionHeader
@@ -221,6 +233,8 @@ sections:
     - - Sharpness
       - 선명도 조절
       - 0.0=블러, 2.0=샤픈
+  goal: ✨ ImageEnhance에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: imagedraw
   blocks:
   - type: sectionHeader
@@ -249,6 +263,8 @@ sections:
     - - text()
       - 텍스트
       - xy, text, fill, font
+  goal: ✏️ ImageDraw에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: comparison
   blocks:
   - type: sectionHeader
@@ -272,6 +288,8 @@ sections:
     - - ImageMagick
       - 명령줄 도구, 일괄 처리
       - 대량 변환 자동화
+  goal: ⚖️ Pillow vs 다른 도구에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: usecases
   blocks:
   - type: sectionHeader
@@ -294,6 +312,8 @@ sections:
       - 스캔 이미지 보정, 텍스트 영역 추출
     - - 디자인
       - 배너 생성, 텍스트 오버레이
+  goal: 💡 활용 분야에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -303,6 +323,8 @@ sections:
     title: 이미지 데이터 소스
     content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는
       내장 이미지와 Image.new() 합성 이미지를 함께 사용합니다.
+  goal: 📋 이미지 소스 안내에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -346,6 +368,8 @@ sections:
     - - 10. 종합 이미지 에디터
       - 복합
       - 전체 개념 종합
+  goal: 📚 커리큘럼에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: start
   blocks:
   - type: sectionHeader
@@ -354,12 +378,14 @@ sections:
   - type: text
     content: Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게
       됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
+  goal: 🎯 시작하기에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: workflow_validation
   title: 로컬 이미지 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 로컬 이미지 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     Pillow 입문은 이미지를 열고 저장하는 문법보다, 이미지의 mode, size, alpha, 픽셀 변화가 의도대로 유지되는지 확인하는 습관이 중요합니다. 로컬에서 이미지를 직접 만들고 잘못된 입력을 넣어 실패를 확인한 뒤, 결과를 수치로 검증합니다.
 
@@ -383,7 +409,7 @@ sections:
 
     validateRgbImage(introImage)
   exercise:
-    prompt: 로컬 이미지 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 로컬 이미지 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageFilter, ImageStat
 
@@ -401,8 +427,8 @@ sections:
 
       validateRgbImage(introImage)
     hints:
-    - 로컬 이미지 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 로컬 이미지 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 로컬 이미지 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 로컬 이미지 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 로컬 이미지 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

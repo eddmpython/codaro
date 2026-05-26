@@ -27,33 +27,33 @@ intro:
   - 커스텀 컨텍스트 매니저
   direction: 고급 문법 종합에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
   benefits:
-  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
-  - 고급 문법 종합 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 고급 문법 종합 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: with 문 기초 입력 확인
-      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
     - label: 컨텍스트 매니저 프로토콜 처리 실행
-      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
     - label: 리소스 관리 결과 검증
-      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
     - label: 고급 문법 종합 재사용
-      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
     runtime:
     - label: 기초 자동화 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 고급 문법 종합 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
     - label: 고급 문법 종합 완료
-      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
 sections:
 - id: with_basic
   title: with 문 기초
   structuredPrimary: true
   subtitle: 자동 리소스 관리
-  goal: with 문 기초에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: with 문 기초에서 `day28Scratch` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다.
 
@@ -72,7 +72,7 @@ sections:
         content = 'written'
     content
   exercise:
-    prompt: with 문 기초 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: with 문 기초 예제에서 `day28Scratch`, `testFile`, `content` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -85,17 +85,17 @@ sections:
           content = 'written'
       content
     hints:
-    - with 문 기초 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `day28Scratch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `day28Scratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: with 문 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: with 문 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: with 문 기초에서 `day28Scratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: with 문 기초 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: context_manager_protocol
   title: 컨텍스트 매니저 프로토콜
   structuredPrimary: true
   subtitle: __enter__와 __exit__
-  goal: 컨텍스트 매니저 프로토콜에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 컨텍스트 매니저 프로토콜에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다.
 
@@ -114,7 +114,7 @@ sections:
         result = sc
     result
   exercise:
-    prompt: 컨텍스트 매니저 프로토콜 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 컨텍스트 매니저 프로토콜 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class SimpleContext:
           def __enter__(self):
@@ -127,17 +127,17 @@ sections:
           result = sc
       result
     hints:
-    - 컨텍스트 매니저 프로토콜 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 컨텍스트 매니저 프로토콜 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 컨텍스트 매니저 프로토콜에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 컨텍스트 매니저 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 컨텍스트 매니저 프로토콜 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: resource_management
   title: 리소스 관리
   structuredPrimary: true
   subtitle: 파일과 연결 관리
-  goal: 리소스 관리에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 리소스 관리에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다.
 
@@ -164,7 +164,7 @@ sections:
         fm.write('Resource managed')
     'completed'
   exercise:
-    prompt: 리소스 관리 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 리소스 관리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class FileManager:
           def __init__(self, filename, mode):
@@ -185,17 +185,17 @@ sections:
           fm.write('Resource managed')
       'completed'
     hints:
-    - 리소스 관리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 리소스 관리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 리소스 관리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 리소스 관리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 리소스 관리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: exception_handling
   title: 예외 처리
   structuredPrimary: true
   subtitle: 컨텍스트 매니저와 예외
-  goal: 예외 처리에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 예외 처리에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다.
 
@@ -217,7 +217,7 @@ sections:
         outcome = 10 / 0
     outcome
   exercise:
-    prompt: 예외 처리 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 예외 처리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class ExceptionSuppressor:
           def __enter__(self):
@@ -233,17 +233,17 @@ sections:
           outcome = 10 / 0
       outcome
     hints:
-    - 예외 처리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 예외 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 예외 처리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 예외 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: multiple_context
   title: 다중 컨텍스트
   structuredPrimary: true
   subtitle: 여러 컨텍스트 매니저 사용
-  goal: 다중 컨텍스트에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 다중 컨텍스트에서 `sourceFile` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다.
 
@@ -259,7 +259,7 @@ sections:
         combined = 'both written'
     combined
   exercise:
-    prompt: 다중 컨텍스트 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 다중 컨텍스트 예제에서 `sourceFile`, `destFile`, `combined` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       sourceFile = day28Scratch / 'source.txt'
       destFile = day28Scratch / 'dest.txt'
@@ -269,17 +269,17 @@ sections:
           combined = 'both written'
       combined
     hints:
-    - 다중 컨텍스트 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `sourceFile = ...` 오른쪽 값입니다.
+    - 실행 뒤 `sourceFile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 다중 컨텍스트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 다중 컨텍스트에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 다중 컨텍스트에서 `sourceFile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 다중 컨텍스트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practical_patterns
   title: 실전 패턴
   structuredPrimary: true
   subtitle: 컨텍스트 매니저 활용
-  goal: 실전 패턴에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 실전 패턴에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다.
 
@@ -303,7 +303,7 @@ sections:
         total = sum(range(1000))
     timer.elapsed > 0
   exercise:
-    prompt: 실전 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실전 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import time
 
@@ -321,17 +321,17 @@ sections:
           total = sum(range(1000))
       timer.elapsed > 0
     hints:
-    - 실전 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실전 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실전 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기'
   structuredPrimary: true
   subtitle: 예측 → 리소스 열기 → 오류 처리 → 정리 검증
-  goal: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상 기록, 오류, 정리 상태를 검증합니다.
 
@@ -377,7 +377,7 @@ sections:
     assert 'paidRevenue=230000' in savedReport
     savedReport
   exercise:
-    prompt: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -417,17 +417,17 @@ sections:
       assert 'paidRevenue=230000' in savedReport
       savedReport
     hints:
-    - '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: Day 28 종합 복습
   structuredPrimary: true
   subtitle: 컨텍스트 매니저 마스터하기
-  goal: Day 28 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: Day 28 종합 복습에서 `basicScratch` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -442,7 +442,7 @@ sections:
         written = True
     written
   exercise:
-    prompt: Day 28 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: Day 28 종합 복습 예제에서 `basicScratch`, `basicFile`, `written` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -454,8 +454,8 @@ sections:
           written = True
       written
     hints:
-    - Day 28 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `basicScratch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `basicScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: Day 28 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Day 28 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: Day 28 종합 복습에서 `basicScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 28 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

@@ -27,7 +27,7 @@ intro:
     - label: 업무 코드 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 실전파이썬 소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 실전파이썬 소개 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -57,6 +57,8 @@ sections:
       - 파일 업로드/다운로드 지원
       - 인터랙티브 UI
       - 코드 수정 없이 사용
+  goal: 실전파이썬이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: philosophy
   title: 왜 실전파이썬인가?
   subtitle: 학습과 실용의 연결
@@ -75,6 +77,8 @@ sections:
     - emoji: 🔄
       title: 양방향 연결
       description: 앱이 궁금하면 학습으로, 학습 후엔 앱으로 돌아갑니다
+  goal: 왜 실전파이썬인가?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: Codaro
   title: 왜 Codaro 로컬 셀인가?
   subtitle: 로컬에서 실행되는 Python
@@ -97,6 +101,8 @@ sections:
     title: Codaro 로컬 Python 환경의 특징
     content: Codaro 로컬 Python는 사용자의 작업공간에서 Python을 실행합니다. glob, pathlib, 로컬 파일 읽기/쓰기, 패키지 설치, 네트워크 요청,
       데이터 처리, 시각화를 모두 로컬 기준으로 실습할 수 있습니다.
+  goal: 왜 Codaro 로컬 셀인가?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: tools
   title: 제공하는 도구들
   subtitle: 실무에서 바로 사용하세요
@@ -118,6 +124,8 @@ sections:
     - emoji: 📝
       title: CSV 인코딩 변환
       description: EUC-KR ↔ UTF-8 변환 (준비중)
+  goal: 제공하는 도구들에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: howToUse
   title: 사용 방법
   subtitle: 두 가지 경로
@@ -144,12 +152,14 @@ sections:
       - 코드 블록 따라 실행해보기
       - 원리 이해 후
       - Codaro 로컬 도구에서 실제 사용
+  goal: 사용 방법에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제
     학습으로 이어집니다.
   tips:
@@ -178,7 +188,7 @@ sections:
     assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
     task
   exercise:
-    prompt: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       def normalizeTask(rawTask):
           title = rawTask.get('title', '').strip()
@@ -203,8 +213,8 @@ sections:
       assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
       task
     hints:
-    - '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'

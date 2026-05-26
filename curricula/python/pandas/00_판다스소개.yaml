@@ -43,7 +43,7 @@ intro:
     - label: 표 데이터 환경
       detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 판다스소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
     - label: 판다스소개 완료
       detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
@@ -66,6 +66,8 @@ sections:
       title: 이론 설명 없음
     - emoji: ✋
       title: 직접 해보기
+  goal: 판다스?? 파이썬 아니고??에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -91,6 +93,8 @@ sections:
     - emoji: 🌐
       title: 웹 데이터 수집
       description: CSV, JSON, HTML 테이블 등 다양한 소스에서 데이터 로드
+  goal: 🎯 판다스로 뭘 할 수 있나요?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: python_vs_pandas
   blocks:
   - type: sectionHeader
@@ -123,6 +127,8 @@ sections:
       - 결과 바로 확인
       - 필요한 문법은 그때 학습
       infoBox: 🎉 오늘 바로 시작합시다!
+  goal: 🤔 파이썬 문법 다 배우고 판다스?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: excel_connection
   blocks:
   - type: hero
@@ -156,6 +162,8 @@ sections:
   - type: note
     title: 위 표가 바로 DataFrame입니다
     content: pandas에서 데이터는 이런 표 형태로 저장됩니다. 엑셀 시트와 똑같이 생겼죠?
+  goal: 엑셀 스프레드시트 = DataFrame에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: excel_vs_pandas
   blocks:
   - type: sectionHeader
@@ -192,6 +200,8 @@ sections:
   - type: video
     platform: local
     url: python/excel/xlwings_sample.webm
+  goal: 🆚 엑셀 vs 판다스에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: alternatives
   blocks:
   - type: sectionHeader
@@ -255,6 +265,8 @@ sections:
     style: tip
     title: '결론: 판다스로 시작 → 확장'
     content: 판다스가 가장 직관적이고, 자료도 가장 많고, 대부분의 라이브러리와 호환됩니다. 판다스로 기본기 익힌 후, 필요하면 Polars나 Modin으로 확장하세요!
+  goal: 🤷 Polars? Modin? 그건 뭔가요?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: roadmap
   blocks:
   - type: sectionHeader
@@ -288,6 +300,8 @@ sections:
     style: info
     title: 실습은 우측 Codaro에서!
     content: 필요한 패키지는 uv로 준비한 뒤 바로 실습할 수 있습니다. 코드를 직접 써보면서 배워보세요!
+  goal: 🗺️ 판다스 학습 로드맵에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: cheat_sheet
   blocks:
   - type: sectionHeader
@@ -301,6 +315,8 @@ sections:
     url: https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
     title: Pandas 공식 Cheat Sheet
     height: 800px
+  goal: 📋 판다스 치트시트에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: official_docs
   blocks:
   - type: sectionHeader
@@ -316,18 +332,22 @@ sections:
     - text: pandas 공식 문서
       url: https://pandas.pydata.org/docs/getting_started/index.html
       icon: 🔗
+  goal: 📚 체계적으로 공부하고 싶다면에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: DataFrame 완전 정복'
     subtitle: 엑셀 시트처럼 생긴 DataFrame, 직접 만들고 다뤄봅시다!
+  goal: '다음: DataFrame 완전 정복에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.'
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 DataFrame 기본 점검'
   structuredPrimary: true
   subtitle: DataFrame 생성, 컬럼 검증, 집계, 실패 케이스
   goal: '현업 흐름 검증: 주문 DataFrame 기본 점검에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다.
 
@@ -350,7 +370,7 @@ sections:
     assert daily.set_index("day").loc["Mon", "amount"] == 20000
     assert daily["amount"].sum() == orders["amount"].sum()
   exercise:
-    prompt: '현업 흐름 검증: 주문 DataFrame 기본 점검 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 DataFrame 기본 점검 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -366,8 +386,8 @@ sections:
       assert daily.set_index("day").loc["Mon", "amount"] == 20000
       assert daily["amount"].sum() == orders["amount"].sum()
     hints:
-    - '현업 흐름 검증: 주문 DataFrame 기본 점검 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 DataFrame 기본 점검 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 DataFrame 기본 점검에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 DataFrame 기본 점검의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 DataFrame 기본 점검의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'

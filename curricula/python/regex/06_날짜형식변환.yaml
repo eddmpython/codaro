@@ -26,52 +26,52 @@ intro:
   description: 실무에서 가장 골치아픈 작업 중 하나가 날짜 형식 통일입니다. 여러 패턴을 조합하고 re.compile로 최적화하는 방법을 배웁니다.
   direction: 날짜형식변환에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 날짜형식변환 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - 날짜형식변환 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 라이브러리 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 다양한 날짜 형식 확 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. YYYYMMDD 형식 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
     - label: 날짜형식변환 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 텍스트 정제 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 날짜형식변환 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
     - label: 날짜형식변환 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import re
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_date_formats
   title: 2단계. 다양한 날짜 형식 확인
   structuredPrimary: true
   subtitle: 실제 데이터의 혼란
   goal: 2단계. 다양한 날짜 형식 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     실제 데이터에서는 날짜가 온갖 형식으로 저장되어 있습니다. 미국식(MM/DD/YYYY), 유럽식(DD.MM.YYYY), 아시아식(YYYY-MM-DD), 한국어(2024년 1월 1일), 영문 월명(Jan 1, 2024) 등 다양한 형식이 혼재합니다. 이런 데이터를 분석하거나 DB에 저장하려면 반드시 형식을 통일해야 합니다.
 
@@ -93,7 +93,7 @@ sections:
     """
     mixedDates
   exercise:
-    prompt: 2단계. 다양한 날짜 형식 확인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 다양한 날짜 형식 확인 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       mixedDates = """
       생년월일: 1990-12-25
@@ -109,17 +109,17 @@ sections:
       """
       mixedDates
     hints:
-    - 2단계. 다양한 날짜 형식 확인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 2단계. 다양한 날짜 형식 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 다양한 날짜 형식 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 다양한 날짜 형식 확인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 다양한 날짜 형식 확인의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: step3_pattern1_yyyymmdd
   title: 3단계. YYYY-MM-DD 형식 처리
   structuredPrimary: true
   subtitle: 가장 표준적인 형식
   goal: 3단계. YYYYMMDD 형식 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     먼저 이미 표준 형식인 YYYY-MM-DD 날짜들을 찾습니다. 변환이 필요 없는 데이터를 먼저 확인하면 어떤 형식들을 추가로 처리해야 하는지 파악할 수 있습니다. 수량자 {1,2}를 사용하면 한 자리 월/일도 매칭할 수 있습니다.
 
@@ -134,24 +134,24 @@ sections:
     matches = re.findall(pattern, mixedDates)
     matches
   exercise:
-    prompt: 3단계. YYYYMMDD 형식 처리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. YYYYMMDD 형식 처리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       pattern = r"\d{4}-\d{1,2}-\d{1,2}"
 
       matches = re.findall(pattern, mixedDates)
       matches
     hints:
-    - 3단계. YYYYMMDD 형식 처리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 3단계. YYYYMMDD 형식 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. YYYYMMDD 형식 처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. YYYYMMDD 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. YYYYMMDD 형식 처리의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: step4_pattern2_slash
   title: 4단계. 슬래시(/) 형식 처리
   structuredPrimary: true
   subtitle: YYYY/MM/DD 변환
   goal: 4단계. 슬래시(/) 형식 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     슬래시로 구분된 날짜를 하이픈으로 변환합니다. YYYY/MM/DD 형식은 연도가 앞에 있어 순서는 같고 구분자만 바꾸면 됩니다. 그룹 캡처 후 동일한 순서로 재조합하되 구분자를 하이픈으로 변경합니다.
 
@@ -165,7 +165,7 @@ sections:
     result = re.sub(pattern, replacement, "입사일: 2020/03/15")
     result
   exercise:
-    prompt: 4단계. 슬래시(/) 형식 처리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 슬래시(/) 형식 처리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       pattern = r"(\d{4})/(\d{1,2})/(\d{1,2})"
       replacement = r"\1-\2-\3"
@@ -173,17 +173,17 @@ sections:
       result = re.sub(pattern, replacement, "입사일: 2020/03/15")
       result
     hints:
-    - 4단계. 슬래시(/) 형식 처리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 4단계. 슬래시(/) 형식 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 슬래시(/) 형식 처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 슬래시(/) 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 슬래시(/) 형식 처리의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: step5_pattern3_dotdmy
   title: 5단계. DD.MM.YYYY 형식 처리
   structuredPrimary: true
   subtitle: 유럽식 날짜 순서 변경
   goal: 5단계. DD.MM.YYYY 형식 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     유럽에서 많이 쓰는 DD.MM.YYYY 형식은 일-월-년 순서입니다. YYYY-MM-DD로 변환하려면 그룹의 순서를 역순으로 바꿔야 합니다. 치환 문자열에서 \\3-\\2-\\1처럼 그룹 순서를 바꿔 참조하면 됩니다.
 
@@ -199,7 +199,7 @@ sections:
     result = re.sub(pattern, replacement, "계약일: 12.05.2023")
     result
   exercise:
-    prompt: 5단계. DD.MM.YYYY 형식 처리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. DD.MM.YYYY 형식 처리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       pattern = r"(\d{1,2})\.(\d{1,2})\.(\d{4})"
       replacement = r"\3-\2-\1"
@@ -207,17 +207,17 @@ sections:
       result = re.sub(pattern, replacement, "계약일: 12.05.2023")
       result
     hints:
-    - 5단계. DD.MM.YYYY 형식 처리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 5단계. DD.MM.YYYY 형식 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. DD.MM.YYYY 형식 처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. DD.MM.YYYY 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. DD.MM.YYYY 형식 처리의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: step6_multiple_patterns
   title: 6단계. 여러 패턴 한 번에 처리
   structuredPrimary: true
   subtitle: 순차적 치환
   goal: 6단계. 여러 패턴 한 번에 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: 모든 패턴을 함수로 만들어 순차적으로 적용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -238,7 +238,7 @@ sections:
     result = normalizeDates(mixedDates)
     result[:300]
   exercise:
-    prompt: 6단계. 여러 패턴 한 번에 처리 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 여러 패턴 한 번에 처리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def normalizeDates(text):
           text = re.sub(r"(\d{4})/(\d{1,2})/(\d{1,2})", r"\1-\2-\3", text)
@@ -256,17 +256,17 @@ sections:
       result = normalizeDates(mixedDates)
       result[:300]
     hints:
-    - 6단계. 여러 패턴 한 번에 처리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 6단계. 여러 패턴 한 번에 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 여러 패턴 한 번에 처리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 6단계. 여러 패턴 한 번에 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 여러 패턴 한 번에 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step7_compile_pattern
   title: 7단계. re.compile로 최적화
   structuredPrimary: true
   subtitle: 패턴 재사용
   goal: 7단계. re.compile로 최적화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     같은 패턴을 여러 번 사용할 때는 re.compile로 미리 컴파일하면 성능이 향상됩니다.
 
@@ -286,7 +286,7 @@ sections:
     text = dotPattern.sub(r"\3-\2-\1", text)
     text
   exercise:
-    prompt: 7단계. re.compile로 최적화 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. re.compile로 최적화 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       slashPattern = re.compile(r"(\d{4})/(\d{1,2})/(\d{1,2})")
       dotPattern = re.compile(r"(\d{1,2})\.(\d{1,2})\.(\d{4})")
@@ -297,17 +297,17 @@ sections:
       text = dotPattern.sub(r"\3-\2-\1", text)
       text
     hints:
-    - 7단계. re.compile로 최적화 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. re.compile로 최적화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. re.compile로 최적화에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. re.compile로 최적화의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. re.compile로 최적화 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step8_month_names
   title: 8단계. 영문 월 이름 처리
   structuredPrimary: true
   subtitle: Dec → 12 변환
   goal: 8단계. 영문 월 이름 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     "Dec 25, 2024" 같은 영문 날짜를 숫자로 변환합니다.
 
@@ -323,7 +323,7 @@ sections:
         "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
     }
   exercise:
-    prompt: 8단계. 영문 월 이름 처리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 영문 월 이름 처리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       monthMap = {
           "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
@@ -331,17 +331,17 @@ sections:
           "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
       }
     hints:
-    - 8단계. 영문 월 이름 처리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 8단계. 영문 월 이름 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 영문 월 이름 처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. 영문 월 이름 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 영문 월 이름 처리의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: step9_complete_converter
   title: 9단계. 완성된 날짜 변환기
   structuredPrimary: true
   subtitle: 모든 형식 처리
   goal: 9단계. 완성된 날짜 변환기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: 배운 모든 패턴을 합쳐 완성된 변환기를 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -407,7 +407,7 @@ sections:
     result = convertAllDates(mixedDates)
     result
   exercise:
-    prompt: 9단계. 완성된 날짜 변환기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 완성된 날짜 변환기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       MONTH_NAME_PATTERN = r"Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
       monthMap = {
@@ -470,17 +470,17 @@ sections:
       result = convertAllDates(mixedDates)
       result
     hints:
-    - 9단계. 완성된 날짜 변환기 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 9단계. 완성된 날짜 변환기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 완성된 날짜 변환기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 9단계. 완성된 날짜 변환기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 완성된 날짜 변환기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step10_extract_dates
   title: 10단계. 날짜만 추출
   structuredPrimary: true
   subtitle: 최종 결과 확인
   goal: 10단계. 날짜만 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     변환된 텍스트에서 표준 형식의 날짜만 추출합니다.
 
@@ -492,23 +492,23 @@ sections:
     standardDates = re.findall(r"\d{4}-\d{2}-\d{2}", converted)
     standardDates
   exercise:
-    prompt: 10단계. 날짜만 추출 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 날짜만 추출 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       converted = convertAllDates(mixedDates)
       standardDates = re.findall(r"\d{4}-\d{2}-\d{2}", converted)
       standardDates
     hints:
-    - 10단계. 날짜만 추출 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
-    noError: 10단계. 날짜만 추출 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 날짜만 추출에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. 날짜만 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 날짜만 추출의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: workflow_validation
   title: 11단계. 날짜 정규화 검증 루프
   structuredPrimary: true
   subtitle: 누락과 0-padding을 검증
   goal: 11단계. 날짜 정규화 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 날짜 정제는 눈으로 결과를 훑으면 누락을 놓치기 쉽습니다. 변환 후 날짜 개수, 정확한 YYYY-MM-DD 형식, 한 자리 월/일의 0-padding, 영문
     일-월-연도 형식까지 검증해야 업무 데이터로 쓸 수 있습니다.
   tips:
@@ -531,7 +531,7 @@ sections:
     standardDates = validateStandardDates(converted, expectedCount=10)
     standardDates
   exercise:
-    prompt: 11단계. 날짜 정규화 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 날짜 정규화 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       standardDatePattern = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
@@ -550,17 +550,17 @@ sections:
       standardDates = validateStandardDates(converted, expectedCount=10)
       standardDates
     hints:
-    - 11단계. 날짜 정규화 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 11단계. 날짜 정규화 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 날짜 정규화 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 11단계. 날짜 정규화 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 날짜 정규화 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 날짜 변환 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     데이터 정제 담당자가 되어 다양한 형식의 데이터를 통일합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
@@ -591,7 +591,7 @@ sections:
     result = pat.sub(convert, text)
     result
   exercise:
-    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import re
 
@@ -616,11 +616,11 @@ sections:
       result = pat.sub(convert, text)
       result
     hints:
-    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
   title: 정리
   subtitle: 여섯 번째 프로젝트 완료!
@@ -635,9 +635,13 @@ sections:
     - \3-\2-\1 - 그룹 순서 변경
   - type: text
     content: 다음 프로젝트에서는 개인정보를 자동으로 마스킹하는 방법을 배웁니다!
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
 - id: workflow_variation
   title: '실무 변주: 날짜 변환 정책 확장'
   blocks:
   - type: tip
     content: '실무 변주: YYYY-MM-DD, YYYY/MM/DD, 2026년 5월 24일 형식을 모두 같은 날짜로 바꾸고, 변환 실패 행은 원본 문자열과 함께 오류 리포트로
       분리해 보세요.'
+  goal: '실무 변주: 날짜 변환 정책 확장에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.'
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.

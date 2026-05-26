@@ -47,7 +47,7 @@ intro:
     - label: 표 데이터 환경
       detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 실전종합프로젝트 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
     - label: 실전종합프로젝트 완료
       detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
@@ -56,7 +56,7 @@ sections:
   structuredPrimary: true
   subtitle: 데이터를 가져오는 방법
   goal: 1단계. API 개념에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. 이 수업에서는 GitHub Issues API 응답과 같은 리스트/딕셔너리 구조를 로컬 샘플로 만들고 DataFrame으로 변환합니다. 네트워크, 인증, 호출 제한에 흔들리지 않고 JSON 구조 파악, 컬럼 선택, 날짜 변환, 집계, 저장이라는 핵심 pandas 흐름에 집중합니다.
 
@@ -156,7 +156,7 @@ sections:
     issues = pd.DataFrame(issueRecords)
     issues.shape
   exercise:
-    prompt: 1단계. API 개념 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. API 개념 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
 
@@ -249,37 +249,37 @@ sections:
       issues = pd.DataFrame(issueRecords)
       issues.shape
     hints:
-    - 1단계. API 개념 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. API 개념 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. API 개념에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 1단계. API 개념의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. API 개념 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step2_preview
   title: 2단계. 데이터 확인
   structuredPrimary: true
   subtitle: 컬럼 목록 확인
   goal: 2단계. 데이터 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: API 응답 데이터는 컬럼이 매우 많습니다. GitHub Issues API의 경우 30개 이상의 컬럼이 반환됩니다. 모든 컬럼을 사용하면 복잡하고 분석에
     불필요한 정보가 많으므로, 목적에 맞는 컬럼만 선택하는 것이 중요합니다. columns.tolist()로 전체 컬럼 목록을 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: issues.columns.tolist()[:10]
   exercise:
-    prompt: 2단계. 데이터 확인 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: issues.columns.tolist()[:10]
     hints:
-    - 2단계. 데이터 확인 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 데이터 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 확인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 확인의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 2단계. 데이터 확인 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step3_select
   title: 3단계. 필요한 컬럼 선택
   structuredPrimary: true
   subtitle: 분석할 데이터만 추출
   goal: 3단계. 필요한 컬럼 선택에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 분석 목적에 맞는 컬럼만 선택합니다. number(이슈 번호), title(제목), state(상태), created_at(생성일), comments(댓글
     수) 5가지를 선택합니다. copy()를 붙여서 원본과 분리된 새 DataFrame을 만듭니다. 이렇게 필요한 데이터만 추출하면 메모리를 절약하고 분석이 명확해집니다.
   tips:
@@ -288,22 +288,22 @@ sections:
     clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
     clean.head()
   exercise:
-    prompt: 3단계. 필요한 컬럼 선택 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 필요한 컬럼 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
       clean.head()
     hints:
-    - 3단계. 필요한 컬럼 선택 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 필요한 컬럼 선택 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 필요한 컬럼 선택에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 필요한 컬럼 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 필요한 컬럼 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step4_datetime
   title: 4단계. 날짜 타입 변환
   structuredPrimary: true
   subtitle: pd.to_datetime()
   goal: 4단계. 날짜 타입 변환에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: API에서 받은 날짜는 '2024-01-15T09:30:00Z' 같은 ISO 8601 형식의 문자열입니다. pd.to_datetime()으로 datetime
     타입으로 변환해야 날짜 계산, 기간 필터링, 시계열 분석이 가능합니다. datetime 타입이어야 .dt 접근자로 연도, 월, 요일 등을 추출할 수 있습니다.
   tips:
@@ -313,23 +313,23 @@ sections:
     dated['created_at'] = pd.to_datetime(dated['created_at'])
     dated.dtypes
   exercise:
-    prompt: 4단계. 날짜 타입 변환 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 날짜 타입 변환 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       dated = clean.copy()
       dated['created_at'] = pd.to_datetime(dated['created_at'])
       dated.dtypes
     hints:
-    - 4단계. 날짜 타입 변환 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 4단계. 날짜 타입 변환 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 날짜 타입 변환에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 날짜 타입 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 날짜 타입 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step5_new_column
   title: 5단계. 새 컬럼 추가
   structuredPrimary: true
   subtitle: 제목 길이 계산
   goal: 5단계. 새 컬럼 추가에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 5단계. 새 컬럼 추가의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - str.len()은 문자열 길이를 반환합니다. Series에 .str을 붙이면 각 행에 문자열 메서드를 적용할 수 있습니다. str.upper(), str.lower(), str.contains()
@@ -339,118 +339,118 @@ sections:
     final['titleLength'] = final['title'].str.len()
     final[['title', 'titleLength']].head()
   exercise:
-    prompt: 5단계. 새 컬럼 추가 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 새 컬럼 추가 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       final = dated.copy()
       final['titleLength'] = final['title'].str.len()
       final[['title', 'titleLength']].head()
     hints:
-    - 5단계. 새 컬럼 추가 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 새 컬럼 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 새 컬럼 추가에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 새 컬럼 추가의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 새 컬럼 추가의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step6_describe
   title: 6단계. 기본 통계
   structuredPrimary: true
   subtitle: describe()로 분포 확인
   goal: 6단계. 기본 통계에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 댓글 수와 제목 길이의 분포를 확인합니다. describe()로 평균, 표준편차, 최소/최대값 등을 한눈에 파악합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final[['comments', 'titleLength']].describe()
   exercise:
-    prompt: 6단계. 기본 통계 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 기본 통계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: final[['comments', 'titleLength']].describe()
     hints:
-    - 6단계. 기본 통계 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 기본 통계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 기본 통계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 기본 통계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 6단계. 기본 통계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step7_value_counts
   title: 7단계. 상태별 개수
   structuredPrimary: true
   subtitle: open vs closed
   goal: 7단계. 상태별 개수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 열린 이슈와 닫힌 이슈의 비율을 확인합니다. value_counts()로 범주형 데이터의 분포를 파악합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final['state'].value_counts()
   exercise:
-    prompt: 7단계. 상태별 개수 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 상태별 개수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: final['state'].value_counts()
     hints:
-    - 7단계. 상태별 개수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. 상태별 개수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 상태별 개수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 상태별 개수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 상태별 개수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_top_comments
   title: 8단계. 댓글 많은 이슈
   structuredPrimary: true
   subtitle: nlargest 활용
   goal: 8단계. 댓글 많은 이슈에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 댓글이 가장 많은 이슈 5개를 확인합니다. nlargest로 TOP N을 빠르게 찾습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
   exercise:
-    prompt: 8단계. 댓글 많은 이슈 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 댓글 많은 이슈 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: final.nlargest(5, 'comments')[['number', 'title', 'comments']]
     hints:
-    - 8단계. 댓글 많은 이슈 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 댓글 많은 이슈 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 댓글 많은 이슈에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 댓글 많은 이슈의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. 댓글 많은 이슈 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step9_corr
   title: 9단계. 상관관계 분석
   structuredPrimary: true
   subtitle: 제목 길이 vs 댓글 수
   goal: 9단계. 상관관계 분석에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 9단계. 상관관계 분석의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final[['titleLength', 'comments']].corr()
   exercise:
-    prompt: 9단계. 상관관계 분석 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 상관관계 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: final[['titleLength', 'comments']].corr()
     hints:
-    - 9단계. 상관관계 분석 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 9단계. 상관관계 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 상관관계 분석에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 상관관계 분석의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 9단계. 상관관계 분석 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step10_groupby
   title: 10단계. 상태별 평균
   structuredPrimary: true
   subtitle: groupby 활용
   goal: 10단계. 상태별 평균에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: open 이슈와 closed 이슈의 평균 댓글 수를 비교합니다. groupby로 그룹별 통계를 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: final.groupby('state')['comments'].mean()
   exercise:
-    prompt: 10단계. 상태별 평균 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 상태별 평균 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: final.groupby('state')['comments'].mean()
     hints:
-    - 10단계. 상태별 평균 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 10단계. 상태별 평균 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 상태별 평균에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 상태별 평균의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 10단계. 상태별 평균 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step11_json_normalize
   title: 11단계. 중첩 JSON 펼치기
   structuredPrimary: true
   subtitle: json_normalize()
   goal: 11단계. 중첩 JSON 펼치기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     API 응답에는 중첩된 구조가 많습니다. {'user': {'login': 'name'}} 같은 형태를 user.login처럼 펼쳐서 접근하기 쉽게 만듭니다. json_normalize()가 자동으로 평탄화합니다.
 
@@ -462,22 +462,22 @@ sections:
     flat = pd.json_normalize(issueRecords, max_level=1)
     flat[['number', 'user.login']].head()
   exercise:
-    prompt: 11단계. 중첩 JSON 펼치기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 중첩 JSON 펼치기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       flat = pd.json_normalize(issueRecords, max_level=1)
       flat[['number', 'user.login']].head()
     hints:
-    - 11단계. 중첩 JSON 펼치기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 중첩 JSON 펼치기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 중첩 JSON 펼치기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 11단계. 중첩 JSON 펼치기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 중첩 JSON 펼치기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step12_save
   title: 12단계. CSV 저장
   structuredPrimary: true
   subtitle: to_csv()
   goal: 12단계. CSV 저장에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     분석 결과를 파일로 저장합니다. encoding='utf-8-sig'는 엑셀에서 한글이 깨지지 않게 하는 BOM(Byte Order Mark)을 추가합니다. index=False로 불필요한 인덱스 컬럼을 제외합니다.
 
@@ -487,20 +487,20 @@ sections:
     추가합니다. sep 파라미터로 구분자를 변경할 수 있습니다(기본값은 쉼표).
   snippet: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
   exercise:
-    prompt: 12단계. CSV 저장 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. CSV 저장 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
     hints:
-    - 12단계. CSV 저장 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 12단계. CSV 저장 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. CSV 저장에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 12단계. CSV 저장의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. CSV 저장의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step13_function
   title: 13단계. 재사용 함수 만들기
   structuredPrimary: true
   subtitle: 파이프라인 자동화
   goal: 13단계. 재사용 함수 만들기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 지금까지 한 과정을 함수로 정리하면 같은 응답 구조를 쓰는 다른 리포지토리 샘플에도 쉽게 적용할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -511,7 +511,7 @@ sections:
 
     fetchGithubIssues('numpy/numpy', 5)
   exercise:
-    prompt: 13단계. 재사용 함수 만들기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 13단계. 재사용 함수 만들기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       def fetchGithubIssues(repo, perPage=10):
           records = sampleGithubIssues(repo)[:perPage]
@@ -519,17 +519,17 @@ sections:
 
       fetchGithubIssues('numpy/numpy', 5)
     hints:
-    - 13단계. 재사용 함수 만들기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 13단계. 재사용 함수 만들기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 13단계. 재사용 함수 만들기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 13단계. 재사용 함수 만들기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 재사용 함수 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환'
   structuredPrimary: true
   subtitle: JSON 정규화, 날짜 변환, groupby, 실패 케이스
   goal: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     실전 프로젝트는 API 호출 자체보다 응답 구조를 안정적으로 표로 바꾸고 검증하는 과정이 중요합니다. 샘플 JSON을 DataFrame으로 변환하고, 상태별 집계와 날짜 파생 컬럼을 확인하세요.
 
@@ -558,7 +558,7 @@ sections:
     assert stateReport.set_index("state").loc["open", "issueCount"] == 2
     assert stateReport["issueCount"].sum() == len(issues)
   exercise:
-    prompt: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -580,17 +580,17 @@ sections:
       assert stateReport.set_index("state").loc["open", "issueCount"] == 2
       assert stateReport["issueCount"].sum() == len(issues)
     hints:
-    - '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 이슈 응답을 운영 리포트로 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 실전 분석 프로젝트
   goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     다른 리포지토리로 분석해보세요.
 
@@ -689,7 +689,7 @@ sections:
         records = sampleGithubIssues(repo)[:perPage]
         return pd.DataFrame(records)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
 
@@ -782,11 +782,11 @@ sections:
           records = sampleGithubIssues(repo)[:perPage]
           return pd.DataFrame(records)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
   title: 정리
   subtitle: 전체 커리큘럼 완료!
@@ -806,3 +806,5 @@ sections:
   - type: text
     content: pandas 전체 과정 완료! 입문(01-02) → 기초(03-05) → 중급(06-08) → 심화(09-10)를 모두 마스터했습니다. 이제 실제 데이터를 다룰
       준비가 되었습니다. 공공데이터포털, Kaggle 등에서 데이터를 찾아 분석해보세요!
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.

@@ -48,7 +48,7 @@ intro:
     - label: 과학 계산 환경
       detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
     - label: 포트폴리오최적화 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
     - label: 포트폴리오최적화 완료
       detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 자산 수익률과 공분산
   goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     포트폴리오 최적화는 여러 자산의 투자 비중을 결정하는 문제입니다. 각 자산의 예상 수익률과 자산 간 상관관계(공분산)를 알면 최적의 배분을 찾을 수 있습니다. 이 프로젝트에서는 주식 2종, 채권, 금 4개 자산으로 구성된 포트폴리오를 최적화합니다.
 
@@ -89,7 +89,7 @@ sections:
     })
     assetDf
   exercise:
-    prompt: 데이터 로드 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import scipy
 
@@ -115,17 +115,17 @@ sections:
       })
       assetDf
     hints:
-    - 데이터 로드 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데이터 로드에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 데이터 로드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 데이터 로드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: metrics
   title: 포트폴리오 지표
   structuredPrimary: true
   subtitle: 수익률, 위험, 샤프비율
   goal: 포트폴리오 지표에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 포트폴리오 수익률은 각 자산 수익률의 가중평균입니다. 위험(표준편차)은 공분산을 고려하여 계산합니다. 샤프 비율은 (수익률 - 무위험수익률) / 위험으로,
     위험 대비 초과수익을 측정합니다. 샤프 비율이 높을수록 효율적인 투자입니다.
   tips:
@@ -142,7 +142,7 @@ sections:
         pRisk = portfolioRisk(weights, cov)
         return (pRet - riskFree) / pRisk
   exercise:
-    prompt: 포트폴리오 지표 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 포트폴리오 지표 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def portfolioReturn(weights, rets):
           return np.dot(weights, rets)
@@ -155,17 +155,17 @@ sections:
           pRisk = portfolioRisk(weights, cov)
           return (pRet - riskFree) / pRisk
     hints:
-    - 포트폴리오 지표 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 포트폴리오 지표 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 포트폴리오 지표에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 포트폴리오 지표의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 포트폴리오 지표 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: constraints
   title: 제약조건 설정
   structuredPrimary: true
   subtitle: 합계와 범위 제한
   goal: 제약조건 설정에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     포트폴리오 최적화에는 제약조건이 필수입니다. 가장 기본적인 제약은 비중 합계가 100%여야 한다는 것과 공매도를 금지하는 비음수 조건입니다. scipy.optimize.minimize는 등식 제약('eq')과 부등식 제약('ineq'), 변수 범위(bounds)를 모두 지원합니다.
 
@@ -179,7 +179,7 @@ sections:
 
     initWeights = np.array([0.25, 0.25, 0.25, 0.25])
   exercise:
-    prompt: 제약조건 설정 예제에서 반복 대상이나 범위을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 제약조건 설정 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
 
@@ -187,17 +187,17 @@ sections:
 
       initWeights = np.array([0.25, 0.25, 0.25, 0.25])
     hints:
-    - 제약조건 설정 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 제약조건 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 제약조건 설정에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 제약조건 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 제약조건 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: minrisk
   title: 최소위험 포트폴리오
   structuredPrimary: true
   subtitle: 변동성 최소화
   goal: 최소위험 포트폴리오에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 가장 보수적인 전략은 위험(변동성)을 최소화하는 것입니다. 수익률과 무관하게 변동성만 최소화합니다. 이 포트폴리오는 효율적 프론티어의 가장 왼쪽 끝에 위치하며,
     리스크 회피 투자자에게 적합합니다.
   tips:
@@ -225,7 +225,7 @@ sections:
     })
     minRiskDf
   exercise:
-    prompt: 최소위험 포트폴리오 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 최소위험 포트폴리오 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       def negRisk(weights):
           return portfolioRisk(weights, covMatrix)
@@ -249,17 +249,17 @@ sections:
       })
       minRiskDf
     hints:
-    - 최소위험 포트폴리오 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 최소위험 포트폴리오 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최소위험 포트폴리오에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 최소위험 포트폴리오의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 최소위험 포트폴리오 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: maxsharpe
   title: 최대샤프 포트폴리오
   structuredPrimary: true
   subtitle: 위험대비 수익 최대화
   goal: 최대샤프 포트폴리오에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 샤프 비율을 최대화하면 위험 대비 가장 효율적인 포트폴리오를 찾습니다. minimize 함수는 최소화만 하므로, 음수 샤프 비율을 최소화하여 최대화 효과를
     냅니다. 이 포트폴리오가 일반적으로 가장 추천되는 배분입니다.
   tips:
@@ -287,7 +287,7 @@ sections:
     })
     maxSharpeDf
   exercise:
-    prompt: 최대샤프 포트폴리오 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 최대샤프 포트폴리오 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       def negSharpe(weights):
           return -sharpeRatio(weights, returns, covMatrix)
@@ -311,17 +311,17 @@ sections:
       })
       maxSharpeDf
     hints:
-    - 최대샤프 포트폴리오 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 최대샤프 포트폴리오 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최대샤프 포트폴리오에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 최대샤프 포트폴리오의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 최대샤프 포트폴리오 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: compare
   title: 전략 비교
   structuredPrimary: true
   subtitle: 세 포트폴리오 분석
   goal: 전략 비교에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 균등배분, 최소위험, 최대샤프 세 가지 전략을 비교합니다. 최소위험은 수익률이 낮지만 변동성도 낮고, 최대샤프는 위험 단위당 수익이 가장 높습니다. 투자 목적과
     위험 허용도에 따라 적절한 전략을 선택해야 합니다.
   tips:
@@ -335,7 +335,7 @@ sections:
     })
     compareDf
   exercise:
-    prompt: 전략 비교 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 전략 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       compareDf = pd.DataFrame({
           'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
@@ -345,17 +345,17 @@ sections:
       })
       compareDf
     hints:
-    - 전략 비교 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 전략 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 전략 비교에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 전략 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 전략 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: frontier
   title: 효율적 프론티어
   structuredPrimary: true
   subtitle: 수익-위험 곡선
   goal: 효율적 프론티어에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 효율적 프론티어는 주어진 위험 수준에서 달성 가능한 최대 수익의 집합입니다. 목표 수익률을 변화시키며 각 수준에서 최소 위험 포트폴리오를 찾으면 프론티어를
     그릴 수 있습니다. 프론티어 위의 점만이 효율적인 투자입니다.
   tips:
@@ -378,7 +378,7 @@ sections:
             frontierRisks.append(np.nan)
             frontierWeights.append(None)
   exercise:
-    prompt: 효율적 프론티어 예제에서 반복 대상이나 범위을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 효율적 프론티어 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       targetRets = np.linspace(0.05, 0.12, 50)
       frontierRisks = []
@@ -397,17 +397,17 @@ sections:
               frontierRisks.append(np.nan)
               frontierWeights.append(None)
     hints:
-    - 효율적 프론티어 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 효율적 프론티어 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 효율적 프론티어에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 효율적 프론티어의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 효율적 프론티어 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: monte
   title: 몬테카를로 시뮬레이션
   structuredPrimary: true
   subtitle: 랜덤 포트폴리오 분포
   goal: 몬테카를로 시뮬레이션에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 수천 개의 랜덤 포트폴리오를 생성하여 가능한 수익-위험 조합을 시각화합니다. 효율적 프론티어가 모든 랜덤 포트폴리오의 상단 경계임을 확인할 수 있습니다. 샤프
     비율을 색상으로 표현하면 최대샤프 포트폴리오가 가장 밝게 표시됩니다.
   tips:
@@ -426,7 +426,7 @@ sections:
         simRisks.append(portfolioRisk(w, covMatrix))
         simSharpes.append(sharpeRatio(w, returns, covMatrix))
   exercise:
-    prompt: 몬테카를로 시뮬레이션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 몬테카를로 시뮬레이션 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       np.random.seed(42)
       nSim = 10000
@@ -441,17 +441,17 @@ sections:
           simRisks.append(portfolioRisk(w, covMatrix))
           simSharpes.append(sharpeRatio(w, returns, covMatrix))
     hints:
-    - 몬테카를로 시뮬레이션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 몬테카를로 시뮬레이션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 몬테카를로 시뮬레이션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 몬테카를로 시뮬레이션의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 몬테카를로 시뮬레이션 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: result
   title: 최종 추천
   structuredPrimary: true
   subtitle: 투자 보고서
   goal: 최종 추천에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 최적화 결과를 종합하면 최대샤프 포트폴리오가 위험 대비 가장 효율적입니다. 그러나 실제 투자에서는 개인의 위험 허용도, 투자 기간, 유동성 필요 등을 고려해야
     합니다. 최소위험과 최대샤프 사이에서 본인에게 맞는 지점을 선택하세요.
   tips:
@@ -469,7 +469,7 @@ sections:
     })
     reportDf
   exercise:
-    prompt: 최종 추천 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 최종 추천 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       reportDf = pd.DataFrame({
           'Portfolio': ['Max Sharpe (Recommended)'],
@@ -483,17 +483,17 @@ sections:
       })
       reportDf
     hints:
-    - 최종 추천 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 최종 추천 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최종 추천에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 최종 추천의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 최종 추천의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 포트폴리오 프로젝트
   goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 투자 분석가가 되어 다양한 자산 조합과 제약조건으로 포트폴리오를 최적화해보세요. 자산 수를 늘리거나 특정 자산에 최대 비중 제한을 두는 등 실무적인 조건을
     추가해보세요.
   tips:
@@ -509,7 +509,7 @@ sections:
         [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
     ])
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       assets5 = ['Tech', 'Healthcare', 'Energy', 'Real Estate', 'Treasury']
       returns5 = np.array([0.15, 0.11, 0.08, 0.09, 0.03])
@@ -521,17 +521,17 @@ sections:
           [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
       ])
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `assets5` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
   goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
     신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
@@ -555,7 +555,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -590,8 +590,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

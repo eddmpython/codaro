@@ -46,7 +46,7 @@ intro:
     - label: 통계 시각화 환경
       detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: Seaborn소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
     - label: Seaborn소개 완료
       detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
@@ -69,6 +69,8 @@ sections:
       title: Matplotlib 완벽 호환
     - emoji: ⚡
       title: 빠른 탐색적 분석
+  goal: Seaborn에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: seaborn_history
   blocks:
   - type: sectionHeader
@@ -93,6 +95,8 @@ sections:
     - emoji: 📚
       title: 활발한 커뮤니티
       description: 지속적인 업데이트와 풍부한 문서
+  goal: 🏛️ Seaborn의 탄생에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: why_seaborn
   blocks:
   - type: sectionHeader
@@ -128,6 +132,8 @@ sections:
       - 범례 자동 생성
       - 팔레트 자동 적용
       infoBox: 빠른 탐색적 분석에 적합
+  goal: 🤔 왜 Seaborn인가?에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: semantic_mapping
   blocks:
   - type: sectionHeader
@@ -157,6 +163,8 @@ sections:
     title: 다차원 데이터 시각화
     content: x, y, hue, style, size, col, row를 조합하면 최대 7개 변수를 하나의 그림에 표현할 수 있습니다. Matplotlib으로 같은 결과를
       얻으려면 수십 줄의 코드가 필요합니다.
+  goal: 🎯 시맨틱 매핑에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: chart_categories
   blocks:
   - type: sectionHeader
@@ -193,6 +201,8 @@ sections:
     title: Figure-level vs Axes-level
     content: Figure-level 함수는 col, row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. Axes-level 함수는 ax 파라미터로 기존 서브플롯에 그릴
       수 있어 Matplotlib과 조합하기 좋습니다.
+  goal: 📊 차트 유형별 분류에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: relational
   blocks:
   - type: sectionHeader
@@ -214,6 +224,8 @@ sections:
     - emoji: 🔲
       title: relplot()
       description: Figure-level. col/row로 다중 패널 지원
+  goal: 🔗 관계형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: distribution
   blocks:
   - type: sectionHeader
@@ -235,6 +247,8 @@ sections:
     - emoji: 📈
       title: displot()
       description: Figure-level. 다중 패널 분포 비교
+  goal: 📊 분포형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: categorical
   blocks:
   - type: sectionHeader
@@ -272,6 +286,8 @@ sections:
     - - pointplot()
       - 평균 추세
       - 점과 선으로 연결
+  goal: 📋 범주형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: regression
   blocks:
   - type: sectionHeader
@@ -293,6 +309,8 @@ sections:
     - emoji: 📊
       title: residplot()
       description: 잔차 플롯. 회귀 모델 진단
+  goal: 📐 회귀형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: matrix
   blocks:
   - type: sectionHeader
@@ -311,6 +329,8 @@ sections:
     - emoji: 🌳
       title: clustermap()
       description: 계층적 군집화 + 히트맵. 패턴 발견에 유용
+  goal: 🔥 행렬형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: multiplot
   blocks:
   - type: sectionHeader
@@ -332,6 +352,8 @@ sections:
     - emoji: 📊
       title: FacetGrid
       description: 조건부 다중 패널. 커스텀 시각화 구성
+  goal: 🔲 다변량 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: styling
   blocks:
   - type: sectionHeader
@@ -364,6 +386,8 @@ sections:
     style: tip
     title: 색맹 친화적 팔레트
     content: colorblind 팔레트는 색각 이상이 있는 사람도 구분할 수 있는 색상으로 구성되어 있습니다. 발표나 출판물에서는 이 팔레트를 권장합니다.
+  goal: 🎨 스타일링 시스템에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -409,6 +433,8 @@ sections:
     style: info
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 완성된 분석 결과물을 만듭니다. 개념을 배우면서 실제 데이터로 EDA를 수행합니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: datasets
   blocks:
   - type: sectionHeader
@@ -454,6 +480,8 @@ sections:
       - '398'
       - 연비, 실린더, 마력, 원산지
       - 회귀, 다변량
+  goal: 📦 내장 데이터셋에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: when_to_use
   blocks:
   - type: sectionHeader
@@ -491,6 +519,8 @@ sections:
     title: Matplotlib과 함께 사용하기
     content: Seaborn으로 빠르게 기본 차트를 만들고, Matplotlib으로 세부 조정하는 워크플로우가 효과적입니다. ax 파라미터로 기존 Axes에 Seaborn 차트를
       추가할 수 있습니다.
+  goal: ⚖️ 언제 Seaborn을 선택할까?에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -510,18 +540,22 @@ sections:
     - text: Seaborn GitHub
       url: https://github.com/mwaskom/seaborn
       icon: 🔗
+  goal: 📚 참고 자료에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 붓꽃 품종 산점도'
     subtitle: scatterplot으로 품종별 꽃잎 특성을 시각화합니다
+  goal: '다음: 붓꽃 품종 산점도에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.'
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: workflow_validation
   title: 17단계. Seaborn 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
   goal: 17단계. Seaborn 학습 흐름 검증에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     Seaborn 입문은 함수 이름을 외우는 과정이 아닙니다. 어떤 질문에 어떤 차트를 고르고, 데이터 구조가 그 차트에 맞는지 확인한 뒤, 완성된 Axes가 보고서에 들어갈 수준인지 점검해야 합니다.
 
@@ -547,7 +581,7 @@ sections:
 
     print(prediction, round(correlation, 3))
   exercise:
-    prompt: 17단계. Seaborn 학습 흐름 검증 예제에서 출력 문자열을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 17단계. Seaborn 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -567,8 +601,8 @@ sections:
 
       print(prediction, round(correlation, 3))
     hints:
-    - 17단계. Seaborn 학습 흐름 검증 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 17단계. Seaborn 학습 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 17단계. Seaborn 학습 흐름 검증에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 17단계. Seaborn 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 17단계. Seaborn 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

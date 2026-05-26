@@ -46,7 +46,7 @@ intro:
     - label: 시각 리포트 환경
       detail: matplotlib, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: Matplotlib소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
     - label: Matplotlib소개 완료
       detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
@@ -69,6 +69,8 @@ sections:
       title: 모든 차트 유형 지원
     - emoji: 🏛️
       title: 20년 검증된 표준 라이브러리
+  goal: Matplotlib에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: matplotlib_history
   blocks:
   - type: sectionHeader
@@ -93,6 +95,8 @@ sections:
     - emoji: 🔧
       title: 완전한 제어권
       description: 그래프의 모든 요소를 픽셀 단위로 조정 가능
+  goal: 🏛️ Matplotlib의 역사에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: visualization_tools
   blocks:
   - type: sectionHeader
@@ -130,6 +134,8 @@ sections:
     title: Matplotlib이 먼저인 이유
     content: Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes
       개념을 이해하면 다른 라이브러리도 쉽게 배울 수 있습니다.
+  goal: 🗺️ 파이썬 시각화 생태계에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: figure_axes
   blocks:
   - type: sectionHeader
@@ -159,6 +165,8 @@ sections:
     title: pyplot vs 객체 지향
     content: plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게
       제어할 때 사용합니다. 이 과정에서는 두 방식 모두 배웁니다.
+  goal: 🖼️ Figure와 Axes 이해하기에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: chart_types
   blocks:
   - type: sectionHeader
@@ -209,6 +217,8 @@ sections:
     - - 특수
       - 지도
       - Basemap, Cartopy 연동
+  goal: 📊 지원하는 차트 종류에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -254,6 +264,8 @@ sections:
     style: info
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 완성된 결과물을 만듭니다. 개념을 배우면서 실제 분석 차트를 그려봅니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: styling
   blocks:
   - type: sectionHeader
@@ -277,6 +289,8 @@ sections:
     style: tip
     title: 스타일 시트 활용
     content: plt.style.use('seaborn-v0_8-whitegrid')처럼 한 줄로 전체 스타일을 바꿀 수 있습니다. 직접 모든 걸 설정하지 않아도 됩니다.
+  goal: 🎨 스타일링 기능에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: save_formats
   blocks:
   - type: sectionHeader
@@ -304,6 +318,8 @@ sections:
     style: info
     title: 해상도 설정
     content: plt.savefig('chart.png', dpi=300)으로 고해상도 이미지를 저장할 수 있습니다. 인쇄용은 300dpi, 웹용은 72-150dpi가 적당합니다.
+  goal: 💾 저장 형식에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: when_to_use
   blocks:
   - type: sectionHeader
@@ -340,6 +356,8 @@ sections:
     style: tip
     title: 정적 시각화의 장점
     content: 인터랙티브 차트는 웹에서 편리하지만, 논문이나 보고서에 넣을 때는 고해상도 이미지가 필요합니다. Matplotlib은 이런 상황에 최적화되어 있습니다.
+  goal: ⚖️ 언제 Matplotlib을 선택할까?에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -359,18 +377,22 @@ sections:
     - text: Scientific Visualization Book
       url: https://github.com/rougier/scientific-visualization-book
       icon: 🔗
+  goal: 📚 참고 자료에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 주가 추세 분석'
     subtitle: 선 그래프로 일별 주가 변동을 시각화합니다
+  goal: '다음: 주가 추세 분석에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.'
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
   goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
     제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
@@ -398,7 +420,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -429,8 +451,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

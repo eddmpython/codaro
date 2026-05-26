@@ -49,7 +49,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 종합ML파이프라인 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 종합ML파이프라인 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: 타이타닉 데이터
   goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     타이타닉 생존 데이터를 사용합니다. 수치형과 범주형 변수가 혼합되어 있어 Pipeline 실습에 적합합니다. Codaro 로컬 데이터셋에는 결측치, 수치형/범주형 컬럼, 생존 타깃이 모두 포함되어 Pipeline과 GridSearch 흐름을 끝까지 실행할 수 있습니다.
 
@@ -83,7 +83,7 @@ sections:
     titanic = loadLocalDataset("titanic_passengers")
     titanic.head()
   exercise:
-    prompt: 1단계. 데이터 로딩 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -101,17 +101,17 @@ sections:
       titanic = loadLocalDataset("titanic_passengers")
       titanic.head()
     hints:
-    - 1단계. 데이터 로딩 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 로딩 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 로딩에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_eda
   title: 2단계. 데이터 탐색
   structuredPrimary: true
   subtitle: 결측치와 분포
   goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 결측치 현황과 생존 분포를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -122,7 +122,7 @@ sections:
     })
     missingDf[missingDf["missing"] > 0]
   exercise:
-    prompt: 2단계. 데이터 탐색 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 탐색 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       missingDf = pd.DataFrame({
           "missing": titanic.isnull().sum(),
@@ -130,17 +130,17 @@ sections:
       })
       missingDf[missingDf["missing"] > 0]
     hints:
-    - 2단계. 데이터 탐색 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 탐색에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 탐색의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 탐색의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_select
   title: 3단계. 특성 선택
   structuredPrimary: true
   subtitle: 수치형/범주형 분류
   goal: 3단계. 특성 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     분석에 사용할 특성을 선택하고 수치형/범주형으로 분류합니다.
 
@@ -156,7 +156,7 @@ sections:
     y = titanic["Survived"].copy()
     X.shape, y.shape
   exercise:
-    prompt: 3단계. 특성 선택 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 특성 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       numCols = ["Age", "SibSp", "Parch", "Fare"]
       catCols = ["Pclass", "Sex", "Embarked"]
@@ -166,17 +166,17 @@ sections:
       y = titanic["Survived"].copy()
       X.shape, y.shape
     hints:
-    - 3단계. 특성 선택 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 특성 선택 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 특성 선택에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 특성 선택에서 `numCols` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 특성 선택 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_split
   title: 4단계. 데이터 분할
   structuredPrimary: true
   subtitle: 학습/테스트 분리
   goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     학습/테스트 데이터로 분할합니다. 파이프라인 구축 전에 분할하여 데이터 누수를 방지합니다.
 
@@ -187,22 +187,22 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 4단계. 데이터 분할 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 데이터 분할 예제에서 `xTrain`, `xTest`, `yTrain` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
       xTrain.shape, xTest.shape
     hints:
-    - 4단계. 데이터 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. 데이터 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 데이터 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 데이터 분할에서 `xTrain`, `xTest`, `yTrain` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 4단계. 데이터 분할 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_preprocessor
   title: 5단계. 전처리 파이프라인
   structuredPrimary: true
   subtitle: ColumnTransformer
   goal: 5단계. 전처리 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     ColumnTransformer로 수치형/범주형 컬럼에 다른 전처리를 적용합니다.
 
@@ -216,7 +216,7 @@ sections:
     ])
     numPipeline
   exercise:
-    prompt: 5단계. 전처리 파이프라인 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 전처리 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       numPipeline = Pipeline([
           ("imputer", SimpleImputer(strategy="median")),
@@ -224,17 +224,17 @@ sections:
       ])
       numPipeline
     hints:
-    - 5단계. 전처리 파이프라인 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 전처리 파이프라인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 전처리 파이프라인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 전처리 파이프라인에서 `numPipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 전처리 파이프라인 실행 뒤 `numPipeline` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step6_fullpipe
   title: 6단계. 전체 파이프라인
   structuredPrimary: true
   subtitle: 전처리 + 모델
   goal: 6단계. 전체 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     전처리와 모델을 하나의 파이프라인으로 연결합니다. fit과 predict가 한 번에 실행됩니다.
 
@@ -248,7 +248,7 @@ sections:
     ])
     fullPipeline
   exercise:
-    prompt: 6단계. 전체 파이프라인 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 전체 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       fullPipeline = Pipeline([
           ("preprocessor", preprocessor),
@@ -256,17 +256,17 @@ sections:
       ])
       fullPipeline
     hints:
-    - 6단계. 전체 파이프라인 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 전체 파이프라인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 전체 파이프라인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 전체 파이프라인에서 `fullPipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 전체 파이프라인 실행 뒤 `fullPipeline` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step7_cv
   title: 7단계. 교차검증
   structuredPrimary: true
   subtitle: 파이프라인 CV
   goal: 7단계. 교차검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     파이프라인 전체에 교차검증을 적용합니다. 각 폴드에서 전처리도 다시 수행됩니다.
 
@@ -278,23 +278,23 @@ sections:
     print(f"CV Scores: {cvScores}")
     print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
   exercise:
-    prompt: 7단계. 교차검증 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 교차검증 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       cvScores = cross_val_score(fullPipeline, xTrain, yTrain, cv=5, scoring="accuracy")
       print(f"CV Scores: {cvScores}")
       print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
     hints:
-    - 7단계. 교차검증 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 7단계. 교차검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 교차검증에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 7단계. 교차검증의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 7단계. 교차검증 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: step8_grid
   title: 8단계. 파이프라인 GridSearch
   structuredPrimary: true
   subtitle: 하이퍼파라미터 튜닝
   goal: 8단계. 파이프라인 GridSearch에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     파이프라인의 모델 파라미터를 GridSearchCV로 튜닝합니다. 파라미터명에 단계명을 접두사로 붙입니다.
 
@@ -309,7 +309,7 @@ sections:
     }
     paramGrid
   exercise:
-    prompt: 8단계. 파이프라인 GridSearch 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 파이프라인 GridSearch 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       paramGrid = {
           "classifier__n_estimators": [50, 100],
@@ -318,17 +318,17 @@ sections:
       }
       paramGrid
     hints:
-    - 8단계. 파이프라인 GridSearch 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 파이프라인 GridSearch 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 파이프라인 GridSearch에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 파이프라인 GridSearch에서 `paramGrid` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 파이프라인 GridSearch 실행 뒤 `paramGrid` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step9_models
   title: 9단계. 모델 비교
   structuredPrimary: true
   subtitle: 여러 알고리즘
   goal: 9단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 동일한 전처리로 여러 모델의 성능을 비교합니다. 파이프라인을 재사용하면 효율적입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -349,7 +349,7 @@ sections:
         results[name] = {"mean": scores.mean(), "std": scores.std()}
         print(f"{name}: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
   exercise:
-    prompt: 9단계. 모델 비교 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 모델 비교 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       models = {
           "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
@@ -367,17 +367,17 @@ sections:
           results[name] = {"mean": scores.mean(), "std": scores.std()}
           print(f"{name}: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
     hints:
-    - 9단계. 모델 비교 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 모델 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 모델 비교에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 9단계. 모델 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 모델 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_final
   title: 10단계. 최종 평가
   structuredPrimary: true
   subtitle: 테스트 성능
   goal: 10단계. 최종 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: 최적 모델로 테스트 데이터 성능을 평가합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -387,24 +387,24 @@ sections:
     accFinal = accuracy_score(yTest, yPredFinal)
     print(f"Test Accuracy: {accFinal:.4f}")
   exercise:
-    prompt: 10단계. 최종 평가 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 최종 평가 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       bestPipe = gridSearch.best_estimator_
       yPredFinal = bestPipe.predict(xTest)
       accFinal = accuracy_score(yTest, yPredFinal)
       print(f"Test Accuracy: {accFinal:.4f}")
     hints:
-    - 10단계. 최종 평가 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 10단계. 최종 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 최종 평가에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 10단계. 최종 평가의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 10단계. 최종 평가 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step11_proba
   title: 11단계. 확률 예측
   structuredPrimary: true
   subtitle: ROC-AUC
   goal: 11단계. 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: 생존 확률을 예측하고 ROC-AUC로 성능을 평가합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -413,23 +413,23 @@ sections:
     auc = roc_auc_score(yTest, yProba)
     print(f"ROC-AUC: {auc:.4f}")
   exercise:
-    prompt: 11단계. 확률 예측 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 확률 예측 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       yProba = bestPipe.predict_proba(xTest)[:, 1]
       auc = roc_auc_score(yTest, yProba)
       print(f"ROC-AUC: {auc:.4f}")
     hints:
-    - 11단계. 확률 예측 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 11단계. 확률 예측 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 확률 예측에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 11단계. 확률 예측의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 11단계. 확률 예측 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step12_importance
   title: 12단계. 특성 중요도
   structuredPrimary: true
   subtitle: 모델 해석
   goal: 12단계. 특성 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     파이프라인에서 특성 중요도를 추출합니다. OneHotEncoder로 생성된 특성명을 복원합니다.
 
@@ -443,7 +443,7 @@ sections:
     allFeatures = numFeatures + catFeatures
     allFeatures
   exercise:
-    prompt: 12단계. 특성 중요도 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 특성 중요도 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       numFeatures = numCols
       catEncoder = bestPipe.named_steps["preprocessor"].named_transformers_["cat"].named_steps["encoder"]
@@ -451,17 +451,17 @@ sections:
       allFeatures = numFeatures + catFeatures
       allFeatures
     hints:
-    - 12단계. 특성 중요도 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 12단계. 특성 중요도 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 특성 중요도에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 특성 중요도에서 `numFeatures` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 특성 중요도 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: ML 파이프라인
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -496,7 +496,7 @@ sections:
     cvR2 = cross_val_score(regPipe, xTrD, yTrD, cv=5, scoring="r2")
     print(f"CV R2: {cvR2.mean():.4f} (+/- {cvR2.std() * 2:.4f})")
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -525,17 +525,17 @@ sections:
       cvR2 = cross_val_score(regPipe, xTrD, yTrD, cv=5, scoring="r2")
       print(f"CV R2: {cvR2.mean():.4f} (+/- {cvR2.std() * 2:.4f})")
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -566,7 +566,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -611,8 +611,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

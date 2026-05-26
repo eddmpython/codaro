@@ -45,7 +45,7 @@ intro:
     - label: 데이터 계약 환경
       detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
     - label: 사용자모델만들기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
     - label: 사용자모델만들기 완료
       detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
@@ -54,27 +54,27 @@ sections:
   structuredPrimary: true
   subtitle: Pydantic 설치 및 import
   goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를
     사용하여 V1보다 5~50배 빠른 성능을 자랑합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 라이브러리 로드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import pydantic
     hints:
-    - 라이브러리 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 라이브러리 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 라이브러리 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: define
   title: 기본 모델 정의
   structuredPrimary: true
   subtitle: 첫 번째 사용자 모델
   goal: 기본 모델 정의에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가 됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다.
 
@@ -90,7 +90,7 @@ sections:
     user = User(name="Alice", age=25, email="alice@example.com")
     user
   exercise:
-    prompt: 기본 모델 정의 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 기본 모델 정의 예제에서 `user` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class User(BaseModel):
           name: str
@@ -100,17 +100,17 @@ sections:
       user = User(name="Alice", age=25, email="alice@example.com")
       user
     hints:
-    - 기본 모델 정의 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `user = ...` 오른쪽 값입니다.
+    - 실행 뒤 `user` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 기본 모델 정의 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기본 모델 정의에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 기본 모델 정의에서 `user` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 모델 정의 실행 뒤 `user` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: coercion
   title: 타입 자동 변환
   structuredPrimary: true
   subtitle: 스마트 변환 기능
   goal: 타입 자동 변환에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 "30"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는 숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다.
 
@@ -121,22 +121,22 @@ sections:
     converted = User(name="Bob", age="30", email="bob@test.com")
     converted.age, type(converted.age)
   exercise:
-    prompt: 타입 자동 변환 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 타입 자동 변환 예제에서 `converted` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       converted = User(name="Bob", age="30", email="bob@test.com")
       converted.age, type(converted.age)
     hints:
-    - 타입 자동 변환 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `converted = ...` 오른쪽 값입니다.
+    - 실행 뒤 `converted` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 타입 자동 변환 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 타입 자동 변환에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 타입 자동 변환에서 `converted` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 타입 자동 변환 실행 뒤 `converted` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: validation
   title: 검증 실패 처리
   structuredPrimary: true
   subtitle: ValidationError 이해하기
   goal: 검증 실패 처리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를 얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다.
 
@@ -152,7 +152,7 @@ sections:
         errorInfo = exc.errors()
         errorInfo
   exercise:
-    prompt: 검증 실패 처리 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 검증 실패 처리 예제에서 `invalid`, `errorInfo` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       from pydantic import ValidationError
 
@@ -162,17 +162,17 @@ sections:
           errorInfo = exc.errors()
           errorInfo
     hints:
-    - 검증 실패 처리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `invalid = ...` 오른쪽 값입니다.
+    - 실행 뒤 `invalid` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 검증 실패 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 검증 실패 처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 검증 실패 처리에서 `invalid` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 검증 실패 처리 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: default
   title: 기본값과 Optional
   structuredPrimary: true
   subtitle: 선택적 필드 정의
   goal: 기본값과 Optional에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 필드에 기본값을 지정하면 인스턴스 생성 시 해당 필드를 생략할 수 있습니다. Optional[T]는 T 또는 None을 허용하는 타입입니다. 기본값과 Optional을
     조합하면 유연한 데이터 모델을 설계할 수 있습니다. 주의할 점은 기본값이 있는 필드는 반드시 기본값이 없는 필드 뒤에 와야 한다는 것입니다.
   tips:
@@ -187,7 +187,7 @@ sections:
     minimal = Profile(username="dave")
     minimal
   exercise:
-    prompt: 기본값과 Optional 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 기본값과 Optional 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -198,17 +198,17 @@ sections:
       minimal = Profile(username="dave")
       minimal
     hints:
-    - 기본값과 Optional 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 기본값과 Optional 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기본값과 Optional에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 기본값과 Optional에서 `minimal` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본값과 Optional 실행 뒤 `minimal` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: serialize
   title: 직렬화와 역직렬화
   structuredPrimary: true
   subtitle: dict와 JSON 변환
   goal: 직렬화와 역직렬화에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는 딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다.
 
@@ -219,22 +219,22 @@ sections:
     userDict = user.model_dump()
     userDict
   exercise:
-    prompt: 직렬화와 역직렬화 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 직렬화와 역직렬화 예제에서 `userDict` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       userDict = user.model_dump()
       userDict
     hints:
-    - 직렬화와 역직렬화 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `userDict = ...` 오른쪽 값입니다.
+    - 실행 뒤 `userDict` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 직렬화와 역직렬화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 직렬화와 역직렬화에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 직렬화와 역직렬화에서 `userDict` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 직렬화와 역직렬화 실행 뒤 `userDict` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: immutable
   title: 불변 모델
   structuredPrimary: true
   subtitle: frozen 설정
   goal: 불변 모델에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: model_config에서 frozen=True를 설정하면 인스턴스 생성 후 필드 값을 수정할 수 없습니다. 이는 함수형 프로그래밍 패러다임에서 중요한 불변성(immutability)을
     보장합니다. 실수로 데이터를 변경하는 버그를 방지하고, 해시 가능한 객체로 만들어 딕셔너리 키나 집합 원소로 사용할 수 있습니다.
   tips:
@@ -248,7 +248,7 @@ sections:
     frozen = ImmutableUser(name="Henry", age=30)
     frozen
   exercise:
-    prompt: 불변 모델 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 불변 모델 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class ImmutableUser(BaseModel):
           model_config = {"frozen": True}
@@ -258,17 +258,17 @@ sections:
       frozen = ImmutableUser(name="Henry", age=30)
       frozen
     hints:
-    - 불변 모델 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 불변 모델 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 불변 모델에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 불변 모델의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 불변 모델의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: result
   title: 최종 사용자 시스템
   structuredPrimary: true
   subtitle: 종합 프로필 모델
   goal: 최종 사용자 시스템에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 개념을 종합하여 실제 서비스에서 사용할 수 있는 사용자 프로필 시스템을 완성합니다. 필수 필드와 선택적 필드를 적절히 조합하고, model_fields로
     스키마 정보를 확인하며, 다양한 직렬화 옵션을 활용합니다.
   tips:
@@ -294,7 +294,7 @@ sections:
     )
     profile
   exercise:
-    prompt: 최종 사용자 시스템 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 최종 사용자 시스템 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class UserProfile(BaseModel):
           model_config = {"frozen": False}
@@ -316,17 +316,17 @@ sections:
       )
       profile
     hints:
-    - 최종 사용자 시스템 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 최종 사용자 시스템 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최종 사용자 시스템에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 최종 사용자 시스템의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 최종 사용자 시스템의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 모델 정의 프로젝트
   goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다.
 
@@ -354,7 +354,7 @@ sections:
     )
     laptop
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from pydantic import BaseModel
       from typing import Optional
@@ -376,17 +376,17 @@ sections:
       )
       laptop
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `laptop` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
     잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
@@ -426,7 +426,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -462,8 +462,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'

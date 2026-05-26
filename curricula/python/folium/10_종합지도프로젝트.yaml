@@ -47,7 +47,7 @@ intro:
     - label: 지도 시각화 환경
       detail: branca, folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 종합 지도 프로젝트 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 종합 지도 프로젝트 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -56,7 +56,7 @@ sections:
   structuredPrimary: true
   subtitle: 모든 플러그인 import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: 필요한 모든 라이브러리와 플러그인을 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -66,24 +66,24 @@ sections:
     import branca.colormap as cm
     import random
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
       import branca.colormap as cm
       import random
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_base_map
   title: 2단계. 베이스 맵 설정
   structuredPrimary: true
   subtitle: 기본 지도
   goal: 2단계. 베이스 맵 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     다중 타일 레이어를 지원하는 베이스 맵을 만듭니다.
 
@@ -116,7 +116,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 2단계. 베이스 맵 설정 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 베이스 맵 설정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
 
@@ -143,17 +143,17 @@ sections:
 
       tourMap
     hints:
-    - 2단계. 베이스 맵 설정 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 베이스 맵 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 베이스 맵 설정에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 베이스 맵 설정에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 베이스 맵 설정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_landmark_markers
   title: 3단계. 주요 랜드마크
   structuredPrimary: true
   subtitle: 개별 마커
   goal: 3단계. 주요 랜드마크에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     주요 랜드마크는 개별 마커로 강조합니다.
 
@@ -169,7 +169,7 @@ sections:
     ]
     landmarks
   exercise:
-    prompt: 3단계. 주요 랜드마크 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 주요 랜드마크 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       landmarks = [
           {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
@@ -179,17 +179,17 @@ sections:
       ]
       landmarks
     hints:
-    - 3단계. 주요 랜드마크 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 주요 랜드마크 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 주요 랜드마크에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 주요 랜드마크에서 `landmarks` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 주요 랜드마크 실행 뒤 `landmarks` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step4_cafe_cluster
   title: 4단계. 카페 클러스터
   structuredPrimary: true
   subtitle: MarkerCluster
   goal: 4단계. 카페 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     카페 위치를 클러스터로 표시합니다. 대량 데이터를 효율적으로 관리합니다.
 
@@ -220,7 +220,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 4단계. 카페 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 카페 클러스터 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       cafeCluster = MarkerCluster(name="카페")
 
@@ -245,17 +245,17 @@ sections:
 
       tourMap
     hints:
-    - 4단계. 카페 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 4단계. 카페 클러스터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 카페 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 4단계. 카페 클러스터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 카페 클러스터 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step5_restaurant_cluster
   title: 5단계. 음식점 클러스터
   structuredPrimary: true
   subtitle: 별도 클러스터
   goal: 5단계. 음식점 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     음식점용 별도 클러스터를 만들어 카테고리를 분리합니다.
 
@@ -285,7 +285,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 5단계. 음식점 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 음식점 클러스터 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       restaurantCluster = MarkerCluster(name="음식점", show=False)
 
@@ -309,17 +309,17 @@ sections:
 
       tourMap
     hints:
-    - 5단계. 음식점 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 5단계. 음식점 클러스터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 음식점 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 5단계. 음식점 클러스터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 음식점 클러스터 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step6_heatmap
   title: 6단계. 관광객 밀도 히트맵
   structuredPrimary: true
   subtitle: HeatMap
   goal: 6단계. 관광객 밀도 히트맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     관광객 밀도를 히트맵으로 시각화합니다.
 
@@ -355,7 +355,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 6단계. 관광객 밀도 히트맵 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 관광객 밀도 히트맵 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
 
@@ -385,17 +385,17 @@ sections:
 
       tourMap
     hints:
-    - 6단계. 관광객 밀도 히트맵 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 6단계. 관광객 밀도 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 관광객 밀도 히트맵에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 6단계. 관광객 밀도 히트맵의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 관광객 밀도 히트맵 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step7_gu_boundaries
   title: 7단계. 구 경계 GeoJSON
   structuredPrimary: true
   subtitle: 행정구역
   goal: 7단계. 구 경계 GeoJSON에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     서울의 주요 구 경계를 GeoJSON으로 표시합니다.
 
@@ -454,7 +454,7 @@ sections:
     }
     guBoundaries
   exercise:
-    prompt: 7단계. 구 경계 GeoJSON 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 구 경계 GeoJSON 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       guBoundaries = {
           "type": "FeatureCollection",
@@ -507,17 +507,17 @@ sections:
       }
       guBoundaries
     hints:
-    - 7단계. 구 경계 GeoJSON 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. 구 경계 GeoJSON 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 구 경계 GeoJSON에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 구 경계 GeoJSON에서 `guBoundaries` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 구 경계 GeoJSON 실행 뒤 `guBoundaries` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step8_routes
   title: 8단계. 관광 코스
   structuredPrimary: true
   subtitle: PolyLine
   goal: 8단계. 관광 코스에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     추천 관광 코스를 경로로 표시합니다.
 
@@ -561,7 +561,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 8단계. 관광 코스 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 관광 코스 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
 
@@ -599,11 +599,11 @@ sections:
 
       tourMap
     hints:
-    - 8단계. 관광 코스 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 관광 코스 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 관광 코스에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 관광 코스에서 `routeGroup` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 관광 코스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_layer_control
   title: 9단계. 레이어 컨트롤
   structuredPrimary: true
@@ -621,23 +621,23 @@ sections:
 
     tourMap
   exercise:
-    prompt: 9단계. 레이어 컨트롤 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 레이어 컨트롤 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       folium.LayerControl(collapsed=False).add_to(tourMap)
 
       tourMap
     hints:
-    - 9단계. 레이어 컨트롤 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 9단계. 레이어 컨트롤 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 레이어 컨트롤에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. 레이어 컨트롤의 수정 코드가 지도 레이어 구성 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 9단계. 레이어 컨트롤 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step10_complete
   title: 10단계. 완성 코드
   structuredPrimary: true
   subtitle: 전체 종합
   goal: 10단계. 완성 코드에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 지금까지 작성한 모든 코드를 하나로 합친 완성 버전입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -742,7 +742,7 @@ sections:
 
     finalMap
   exercise:
-    prompt: 10단계. 완성 코드 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 코드 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -844,17 +844,17 @@ sections:
 
       finalMap
     hints:
-    - 10단계. 완성 코드 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 완성 코드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 코드에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 코드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 코드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 11단계. 종합 지도 품질 검증
   structuredPrimary: true
   subtitle: 데이터 계약과 레이어 렌더 확인
   goal: 11단계. 종합 지도 품질 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
 
@@ -910,7 +910,7 @@ sections:
 
     len(projectSites), len(projectGeo["features"]), len(routePoints)
   exercise:
-    prompt: 11단계. 종합 지도 품질 검증 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 종합 지도 품질 검증 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -960,17 +960,17 @@ sections:
 
       len(projectSites), len(projectGeo["features"]), len(routePoints)
     hints:
-    - 11단계. 종합 지도 품질 검증 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 종합 지도 품질 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 종합 지도 품질 검증에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 종합 지도 품질 검증의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 종합 지도 품질 검증의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 종합 프로젝트
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 지금까지 배운 내용을 활용하여 나만의 종합 지도를 만들어봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -1054,7 +1054,7 @@ sections:
 
     realEstateMap
   exercise:
-    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -1135,8 +1135,8 @@ sections:
 
       realEstateMap
     hints:
-    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.

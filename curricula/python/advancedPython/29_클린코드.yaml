@@ -43,7 +43,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 클린 코드 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 클린 코드 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -52,7 +52,7 @@ sections:
   structuredPrimary: true
   subtitle: 의미 있고 명확한 이름
   goal: 명명법에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 변수명만 보고도 용도를 알 수 있어야 합니다. 매직 넘버를 상수로, 불리언은 is/has/can 접두사로.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -74,7 +74,7 @@ sections:
     }
     namingResult
   exercise:
-    prompt: 명명법 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 명명법 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       badData = [1, 2, 3]
       userAges = [25, 30, 35]
@@ -93,17 +93,17 @@ sections:
       }
       namingResult
     hints:
-    - 명명법 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 명명법 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 명명법에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 명명법에서 `badData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 명명법 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: function_design
   title: 함수 설계
   structuredPrimary: true
   subtitle: 단일 책임과 작은 함수
   goal: 함수 설계에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 함수는 한 가지 일만 해야 합니다. 큰 함수는 작은 함수로 분리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -130,7 +130,7 @@ sections:
     processedResult = processUser(testUser.copy())
     processedResult
   exercise:
-    prompt: 함수 설계 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 함수 설계 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def normalizeEmail(email):
           return email.lower().strip()
@@ -154,17 +154,17 @@ sections:
       processedResult = processUser(testUser.copy())
       processedResult
     hints:
-    - 함수 설계 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 함수 설계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 함수 설계에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 함수 설계의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 함수 설계 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: conditionals
   title: 조건문 단순화
   structuredPrimary: true
   subtitle: 중첩을 평탄화하기
   goal: 조건문 단순화에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 조기 반환(guard clause)으로 중첩을 줄입니다. 전략 패턴으로 if-else 체인을 제거합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -192,7 +192,7 @@ sections:
     validResult = (isValidUser(testValid), isValidUser(testInvalid))
     validResult
   exercise:
-    prompt: 조건문 단순화 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 조건문 단순화 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def isValidUserBad(user):
           if user is not None:
@@ -217,17 +217,17 @@ sections:
       validResult = (isValidUser(testValid), isValidUser(testInvalid))
       validResult
     hints:
-    - 조건문 단순화 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 조건문 단순화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 조건문 단순화에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 조건문 단순화의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 조건문 단순화 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: error_handling
   title: 에러 처리
   structuredPrimary: true
   subtitle: 의미 있는 예외 처리
   goal: 에러 처리에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 커스텀 예외로 에러 정보를 명확히. Result 패턴으로 예외 대신 반환값 사용.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -257,7 +257,7 @@ sections:
         errorResult.append(str(e))
     errorResult
   exercise:
-    prompt: 에러 처리 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 에러 처리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class UserNotFoundError(Exception):
           def __init__(self, userId):
@@ -284,17 +284,17 @@ sections:
           errorResult.append(str(e))
       errorResult
     hints:
-    - 에러 처리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 에러 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 에러 처리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 에러 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 에러 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: structure
   title: 코드 구조화
   structuredPrimary: true
   subtitle: 의존성 주입과 모듈화
   goal: 코드 구조화에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 의존성 주입으로 테스트 용이성 확보. 리포지토리 패턴으로 데이터 접근 추상화.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -315,7 +315,7 @@ sections:
     notifyResult = notifySvc.notifyByEmail("user@test.com", "Hello", "Welcome!")
     notifyResult
   exercise:
-    prompt: 코드 구조화 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 코드 구조화 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class EmailService:
           def send(self, to, subject, body):
@@ -333,17 +333,17 @@ sections:
       notifyResult = notifySvc.notifyByEmail("user@test.com", "Hello", "Welcome!")
       notifyResult
     hints:
-    - 코드 구조화 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 코드 구조화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 코드 구조화에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 코드 구조화의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 코드 구조화 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: refactoring
   title: 리팩토링 기법
   structuredPrimary: true
   subtitle: 코드 품질 개선
   goal: 리팩토링 기법에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 함수 추출, 클래스 분리로 단일 책임 원칙 적용.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -370,7 +370,7 @@ sections:
     orderTotal = calculateOrderTotal(testOrder)
     orderTotal
   exercise:
-    prompt: 리팩토링 기법 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 리팩토링 기법 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def calculateSubtotal(items):
           return sum(item["price"] * item["qty"] for item in items)
@@ -394,17 +394,17 @@ sections:
       orderTotal = calculateOrderTotal(testOrder)
       orderTotal
     hints:
-    - 리팩토링 기법 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 리팩토링 기법 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 리팩토링 기법에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 리팩토링 기법의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 리팩토링 기법 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 금액 계산 리팩토링'
   structuredPrimary: true
   subtitle: 이름, 책임 분리, 실패 조건, 회귀 테스트를 함께 확인합니다
   goal: '현업 흐름 검증: 주문 금액 계산 리팩토링에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     클린 코드는 예쁜 코드가 아니라 변경할 때 덜 깨지는 코드입니다. 계산 규칙을 작은 함수로 나누고, 정상 케이스와 실패 케이스를 assert로 묶어 리팩토링 전후의 동작을 지키세요.
 
@@ -448,7 +448,7 @@ sections:
     assert calculateSubtotal(order["items"]) == 25_000
     assert calculateOrderTotal(order) == 24_750
   exercise:
-    prompt: '현업 흐름 검증: 주문 금액 계산 리팩토링 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 금액 계산 리팩토링 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       TAX_RATE = 0.1
 
@@ -484,17 +484,17 @@ sections:
       assert calculateSubtotal(order["items"]) == 25_000
       assert calculateOrderTotal(order) == 24_750
     hints:
-    - '현업 흐름 검증: 주문 금액 계산 리팩토링 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 금액 계산 리팩토링 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 금액 계산 리팩토링에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 금액 계산 리팩토링의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 금액 계산 리팩토링 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 클린 코드 실습
   goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Day 29에서 배운 클린 코드 원칙을 난이도별로 복습합니다. 명확한 변수명과 함수명은 코드의 의도를 드러내고, 단일 책임 원칙은 유지보수성을 높입니다. SOLID
     원칙과 DRY, KISS는 좋은 설계의 기초이며, 리팩토링은 기술 부채를 줄이는 핵심 활동입니다. 🟢 기본 문제로 변수명 개선, 매직 넘버 제거 등 기초 리팩토링을 연습하고,
     🟡 응용 문제로 함수 분리, 클래스 추출을 수행합니다. 🔴 심화 문제에서는 레거시 코드를 SOLID 원칙에 맞게 전면 리팩토링해봅니다. 클린 코드는 읽기 쉽고, 테스트하기 쉽고,
@@ -514,7 +514,7 @@ sections:
     ex1Result = {"constant": DAYS_IN_WEEK, "list": userScores, "bool": isEnabled}
     ex1Result
   exercise:
-    prompt: 종합 연습 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 연습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       d = 7
       DAYS_IN_WEEK = 7
@@ -528,8 +528,8 @@ sections:
       ex1Result = {"constant": DAYS_IN_WEEK, "list": userScores, "bool": isEnabled}
       ex1Result
     hints:
-    - 종합 연습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 연습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 종합 연습에서 `d` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 종합 연습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

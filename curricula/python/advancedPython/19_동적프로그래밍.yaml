@@ -45,7 +45,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 동적 프로그래밍 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 동적 프로그래밍 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: DP의 핵심 원리
   goal: 동적 프로그래밍 개념에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     동적 프로그래밍(DP)은 복잡한 문제를 작은 하위 문제로 나누어 해결하는 알고리즘 기법입니다. 핵심은 중복되는 하위 문제의 결과를 저장하여 재계산을 방지하는 것입니다. DP가 적용되려면 두 가지 조건이 필요합니다. 첫째, 최적 부분구조(Optimal Substructure) - 큰 문제의 최적해가 작은 문제의 최적해로 구성됩니다. 둘째, 중복 부분문제(Overlapping Subproblems) - 같은 하위 문제가 여러 번 계산됩니다.
 
@@ -79,7 +79,7 @@ sections:
 
     f"DP 피보나치(30): {fibDP(30)}"
   exercise:
-    prompt: 동적 프로그래밍 개념 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 동적 프로그래밍 개념 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def fibRecursive(n):
           if n <= 1:
@@ -98,17 +98,17 @@ sections:
 
       f"DP 피보나치(30): {fibDP(30)}"
     hints:
-    - 동적 프로그래밍 개념 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 동적 프로그래밍 개념 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 동적 프로그래밍 개념에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 동적 프로그래밍 개념의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 동적 프로그래밍 개념 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: memoization
   title: 메모이제이션
   structuredPrimary: true
   subtitle: Top-down 방식
   goal: 메모이제이션에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     메모이제이션은 재귀 함수의 결과를 캐시에 저장하여 중복 계산을 방지하는 기법입니다. 위에서 아래로(Top-down) 문제를 해결하며, 필요한 하위 문제만 계산합니다. 파이썬의 functools.lru_cache 데코레이터로 쉽게 구현할 수 있습니다. 딕셔너리를 사용한 수동 구현도 가능합니다.
 
@@ -127,7 +127,7 @@ sections:
     fibMemoResult = [fibMemo(i) for i in range(15)]
     f"피보나치 수열: {fibMemoResult}"
   exercise:
-    prompt: 메모이제이션 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메모이제이션 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import lru_cache
 
@@ -140,17 +140,17 @@ sections:
       fibMemoResult = [fibMemo(i) for i in range(15)]
       f"피보나치 수열: {fibMemoResult}"
     hints:
-    - 메모이제이션 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메모이제이션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메모이제이션에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메모이제이션의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메모이제이션 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: tabulation
   title: 타뷸레이션
   structuredPrimary: true
   subtitle: Bottom-up 방식
   goal: 타뷸레이션에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     타뷸레이션은 작은 문제부터 차례로 해결하여 테이블을 채워나가는 방식입니다. 아래에서 위로(Bottom-up) 진행하며 반복문을 사용합니다. 재귀 호출 오버헤드가 없어 일반적으로 더 빠릅니다. 모든 하위 문제를 계산하므로 필요 없는 계산이 포함될 수 있습니다.
 
@@ -170,7 +170,7 @@ sections:
     fibTableResult = fibTable(30)
     f"타뷸레이션 피보나치(30): {fibTableResult}"
   exercise:
-    prompt: 타뷸레이션 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 타뷸레이션 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def fibTable(n):
           if n <= 1:
@@ -184,17 +184,17 @@ sections:
       fibTableResult = fibTable(30)
       f"타뷸레이션 피보나치(30): {fibTableResult}"
     hints:
-    - 타뷸레이션 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 타뷸레이션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 타뷸레이션에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 타뷸레이션의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 타뷸레이션 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: classic_problems
   title: 클래식 DP 문제
   structuredPrimary: true
   subtitle: 계단 오르기와 배낭 문제
   goal: 클래식 DP 문제에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     DP의 대표적인 문제들을 살펴봅니다. 계단 오르기는 1칸 또는 2칸씩 오를 때 가능한 경우의 수를 구합니다. 0/1 배낭 문제는 제한된 용량에서 최대 가치를 구합니다. 동전 교환 문제는 최소 동전 개수를 구합니다. 이 문제들은 상태 전이 방정식을 설계하는 좋은 예시입니다.
 
@@ -215,7 +215,7 @@ sections:
     stairsResult = climbStairs(10)
     f"10계단 오르기 경우의 수: {stairsResult}"
   exercise:
-    prompt: 클래식 DP 문제 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 클래식 DP 문제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def climbStairs(n):
           if n <= 2:
@@ -230,17 +230,17 @@ sections:
       stairsResult = climbStairs(10)
       f"10계단 오르기 경우의 수: {stairsResult}"
     hints:
-    - 클래식 DP 문제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 클래식 DP 문제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 클래식 DP 문제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 클래식 DP 문제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 클래식 DP 문제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: string_dp
   title: 문자열 DP
   structuredPrimary: true
   subtitle: LCS와 편집 거리
   goal: 문자열 DP에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     문자열 관련 DP 문제는 2차원 테이블을 사용합니다. LCS(최장 공통 부분수열)는 두 문자열의 공통 부분수열 중 가장 긴 것을 찾습니다. 편집 거리(Levenshtein Distance)는 한 문자열을 다른 문자열로 변환하는 최소 연산 횟수입니다. 두 문제 모두 dp[i][j]로 부분 문자열의 결과를 저장합니다.
 
@@ -264,7 +264,7 @@ sections:
     lcsResult = lcsLength(strA, strB)
     f"LCS 길이: {lcsResult}"
   exercise:
-    prompt: 문자열 DP 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 문자열 DP 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def lcsLength(s1, s2):
           m, n = len(s1), len(s2)
@@ -282,17 +282,17 @@ sections:
       lcsResult = lcsLength(strA, strB)
       f"LCS 길이: {lcsResult}"
     hints:
-    - 문자열 DP 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 문자열 DP 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 문자열 DP에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 문자열 DP의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 문자열 DP 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: advanced_dp
   title: 고급 DP 패턴
   structuredPrimary: true
   subtitle: LIS와 구간 DP
   goal: 고급 DP 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     최장 증가 부분수열(LIS)은 배열에서 순서를 유지하며 증가하는 가장 긴 부분수열입니다. 이진 탐색으로 O(n log n)에 해결할 수 있습니다. 구간 DP는 구간을 분할하여 최적해를 구하는 패턴입니다. 행렬 체인 곱셈, 버스트 풍선 등이 대표적인 예시입니다.
 
@@ -313,7 +313,7 @@ sections:
     lisResult = lisLength(lisNums)
     f"LIS 길이: {lisResult}"
   exercise:
-    prompt: 고급 DP 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 고급 DP 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def lisLength(nums):
           n = len(nums)
@@ -328,17 +328,17 @@ sections:
       lisResult = lisLength(lisNums)
       f"LIS 길이: {lisResult}"
     hints:
-    - 고급 DP 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 고급 DP 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 고급 DP 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 고급 DP 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 고급 DP 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기'
   structuredPrimary: true
   subtitle: 점화식, 테이블 채우기, 선택 복원을 한 번에 검증합니다
   goal: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     동적 프로그래밍은 코딩 테스트 공식이 아니라 제한 조건 아래에서 최선의 조합을 찾는 방식입니다. 캠페인 후보의 비용과 기대 효과를 보고 예산 안에서 최대 효과를 내는 조합을 구해보세요.
 
@@ -388,7 +388,7 @@ sections:
     assert bestValue == 20
     assert selected == ["search", "content"]
   exercise:
-    prompt: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       def bestCampaigns(items, budget):
           if budget < 0:
@@ -431,17 +431,17 @@ sections:
       assert bestValue == 20
       assert selected == ["search", "content"]
     hints:
-    - '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 동적 프로그래밍 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 19에서 배운 동적 프로그래밍을 난이도별로 복습합니다. DP는 중복되는 하위 문제를 한 번만 계산하고 결과를 저장하여 재사용하는 최적화 기법입니다.
     상향식(bottom-up) 테이블 채우기와 하향식(top-down) 메모이제이션 두 가지 접근법이 있습니다. 🟢 기본 문제로 계단 오르기, 피보나치 DP를 익히고, 🟡 응용 문제로
     최장 증가 부분 수열(LIS), 배낭 문제를 연습하세요. 🔴 심화 문제에서는 2차원 DP, 경로 문제, 문자열 DP 등 코딩 테스트 필수 유형을 다룹니다. DP 문제 해결의 핵심은
@@ -460,7 +460,7 @@ sections:
     ex1Result = climbKSteps(10, 3)
     f"10계단 3칸까지: {ex1Result}"
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def climbKSteps(n, k):
           dp = [0] * (n + 1)
@@ -473,8 +473,8 @@ sections:
       ex1Result = climbKSteps(10, 3)
       f"10계단 3칸까지: {ex1Result}"
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

@@ -46,7 +46,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: typing 고급 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: typing 고급 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -55,7 +55,7 @@ sections:
   structuredPrimary: true
   subtitle: 특정 값만 허용
   goal: Literal에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     Literal은 특정 리터럴 값만 허용하는 타입입니다. 문자열, 정수, 불리언, None 등의 리터럴을 지정할 수 있습니다. 함수 인자나 반환 타입을 특정 값으로 제한합니다. @overload와 함께 사용하면 값에 따른 반환 타입을 정확히 표현할 수 있습니다. 타입 체커가 허용되지 않은 값을 감지합니다. 설정 옵션, 모드 선택 등에 유용합니다.
 
@@ -70,7 +70,7 @@ sections:
 
     setMode('read'), setMode('write')
   exercise:
-    prompt: Literal 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: Literal 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -79,11 +79,11 @@ sections:
 
       setMode('read'), setMode('write')
     hints:
-    - Literal 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: Literal 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Literal에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: Literal의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Literal 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: final
   title: Final
   structuredPrimary: true
@@ -104,7 +104,7 @@ sections:
 
     MAX_SIZE, API_URL
   exercise:
-    prompt: Final 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: Final 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from typing import Final
 
@@ -113,11 +113,11 @@ sections:
 
       MAX_SIZE, API_URL
     hints:
-    - Final 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: Final 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Final에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: Final의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: Final 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: typeddict
   title: TypedDict
   structuredPrimary: true
@@ -141,7 +141,7 @@ sections:
     user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
     user
   exercise:
-    prompt: TypedDict 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: TypedDict 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       from typing import TypedDict
 
@@ -153,17 +153,17 @@ sections:
       user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
       user
     hints:
-    - TypedDict 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
+    - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: TypedDict 코드가 예외 없이 끝나야 합니다.
-    resultCheck: TypedDict에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: TypedDict의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: TypedDict 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: annotated
   title: Annotated
   structuredPrimary: true
   subtitle: 메타데이터 추가
   goal: Annotated에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     Annotated는 타입에 추가 메타데이터를 첨부합니다. Annotated[T, metadata1, metadata2, ...]로 사용합니다. 타입 체커는 첫 번째 인자(T)만 사용하고 나머지는 무시합니다. 메타데이터는 런타임에 접근할 수 있습니다. 검증 라이브러리(Pydantic 등)에서 제약 조건을 표현하는 데 사용됩니다. 문서화, 직렬화 힌트 등 다양한 용도로 활용됩니다.
 
@@ -181,7 +181,7 @@ sections:
 
     createUser(25, "user@example.com")
   exercise:
-    prompt: Annotated 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: Annotated 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import Annotated
 
@@ -193,17 +193,17 @@ sections:
 
       createUser(25, "user@example.com")
     hints:
-    - Annotated 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: Annotated 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Annotated에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: Annotated의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Annotated 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: newtype
   title: NewType
   structuredPrimary: true
   subtitle: 타입 별칭 강화
   goal: NewType에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     NewType은 기존 타입의 구별되는 새 타입을 만듭니다. 타입 별칭(TypeAlias)과 달리 타입 체커가 다른 타입으로 취급합니다. UserId = NewType('UserId', int)로 정의하면 int와 호환되지만 구별됩니다. 실수로 잘못된 값을 전달하는 것을 방지합니다. 런타임에는 아무 변환도 하지 않습니다(제로 오버헤드).
 
@@ -222,7 +222,7 @@ sections:
     userId = UserId(123)
     getUser(userId)
   exercise:
-    prompt: NewType 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: NewType 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import NewType
 
@@ -235,17 +235,17 @@ sections:
       userId = UserId(123)
       getUser(userId)
     hints:
-    - NewType 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: NewType 코드가 예외 없이 끝나야 합니다.
-    resultCheck: NewType에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: NewType의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: NewType 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: type_guards
   title: 타입 가드
   structuredPrimary: true
   subtitle: TypeGuard와 타입 좁히기
   goal: 타입 가드에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     TypeGuard는 타입 좁히기(type narrowing) 함수를 정의합니다. 함수가 True를 반환하면 인자가 특정 타입임을 보장합니다. isinstance보다 복잡한 조건을 표현할 수 있습니다. 타입 체커가 이후 코드에서 좁혀진 타입을 사용합니다. Python 3.10+에서는 TypeIs도 도입되었습니다. 커스텀 타입 검사 함수에 유용합니다.
 
@@ -265,7 +265,7 @@ sections:
 
     process(["a", "b"]), process([1, 2])
   exercise:
-    prompt: 타입 가드 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 타입 가드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import TypeGuard, List, Union
 
@@ -279,17 +279,17 @@ sections:
 
       process(["a", "b"]), process([1, 2])
     hints:
-    - 타입 가드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 타입 가드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 타입 가드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 타입 가드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 타입 가드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 결제 요청 데이터 계약 만들기'
   structuredPrimary: true
   subtitle: Literal, Final, TypedDict, Annotated, NewType을 실행 가능한 검증 흐름으로 연결합니다
   goal: '현업 흐름 검증: 결제 요청 데이터 계약 만들기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     정밀한 typing은 API 경계에서 특히 효과가 큽니다. 결제 요청 딕셔너리의 필수 키, 허용 값, 금액 제한을 타입으로 표현하고, 런타임 검증 함수가 같은 계약을 지키는지 확인하세요.
 
@@ -338,7 +338,7 @@ sections:
     assert get_origin(PositiveAmount) is Annotated
     assert get_args(Currency) == ("KRW", "USD")
   exercise:
-    prompt: '현업 흐름 검증: 결제 요청 데이터 계약 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 결제 요청 데이터 계약 만들기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
 
@@ -380,17 +380,17 @@ sections:
       assert get_origin(PositiveAmount) is Annotated
       assert get_args(Currency) == ("KRW", "USD")
     hints:
-    - '현업 흐름 검증: 결제 요청 데이터 계약 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 결제 요청 데이터 계약 만들기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 결제 요청 데이터 계약 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 결제 요청 데이터 계약 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 결제 요청 데이터 계약 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: typing 고급 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 15에서 배운 고급 typing을 난이도별로 복습합니다. Literal로 특정 값만 허용하고, Final로 상수를 표시하며, TypedDict로 딕셔너리
     구조를, Annotated로 메타데이터를 표현합니다. NewType은 같은 기본 타입이지만 의미가 다른 값을 구별하고, TypeGuard는 타입 좁히기 함수를 정의합니다. 🟢
     기본 문제로 각 타입의 기본 사용법을 익히고, 🟡 응용 문제로 복합 타입과 overload 조합을 연습하세요. 🔴 심화 문제에서는 Unpack, 재귀 타입, Self 등 최신
@@ -405,7 +405,7 @@ sections:
 
     getColor('red')
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -414,8 +414,8 @@ sections:
 
       getColor('red')
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

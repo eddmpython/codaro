@@ -44,7 +44,7 @@ intro:
     - label: 인터랙티브 차트 환경
       detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
     - label: Plotly소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
     - label: Plotly소개 완료
       detail: 검증된 코드를 공유 대시보드로 남깁니다.
 sections:
@@ -69,6 +69,8 @@ sections:
       title: 애니메이션 차트
   - type: image
     src: https://images.plot.ly/plotly-documentation/thumbnail/plotly-express.png
+  goal: Plotly Express??에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: why_plotly
   blocks:
   - type: sectionHeader
@@ -99,6 +101,8 @@ sections:
       - 클릭으로 필터링
       - 한 줄로 완성
       infoBox: 웹, 대시보드에 적합
+  goal: 🤔 matplotlib으로 충분하지 않나요?에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: plotly_express
   blocks:
   - type: sectionHeader
@@ -123,6 +127,8 @@ sections:
     - emoji: 🔗
       title: DataFrame 친화적
       description: pandas DataFrame을 바로 넣으면 됨
+  goal: 🚀 Plotly Express란?에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: builtin_data
   blocks:
   - type: sectionHeader
@@ -171,6 +177,8 @@ sections:
     style: tip
     title: 인터넷 연결 필요 없음
     content: px.data 데이터는 라이브러리에 내장되어 있어서 인터넷 연결 없이도 사용할 수 있습니다. 학습용으로 완벽합니다.
+  goal: 📦 px.data 내장 데이터에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -216,6 +224,8 @@ sections:
     style: info
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: interactive_features
   blocks:
   - type: sectionHeader
@@ -241,6 +251,8 @@ sections:
     - emoji: 📦
       title: 선택
       description: 박스/올가미로 데이터 포인트 선택
+  goal: 🖱️ 대화형 차트의 기능에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: comparison_chart
   blocks:
   - type: sectionHeader
@@ -271,6 +283,8 @@ sections:
     style: tip
     title: 정답은 없습니다
     content: 상황에 맞는 도구를 선택하세요. 이 과정에서는 Plotly Express로 대화형 시각화의 매력을 경험합니다.
+  goal: 📊 Python 시각화 라이브러리 비교에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -287,12 +301,14 @@ sections:
     - text: Plotly Express Cheat Sheet
       url: https://www.datacamp.com/cheat-sheet/plotly-express-cheat-sheet
       icon: 🔗
+  goal: 📚 참고 자료에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: workflow_validation
   title: 10단계. Plotly 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 10단계. Plotly 학습 흐름 검증에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     Plotly 입문은 인터랙티브라는 특징을 말로 아는 데서 끝나지 않습니다. 로컬 데이터로 Figure를 만들고, trace와 layout이 분석 질문을 제대로 담는지 확인해야 합니다.
 
@@ -314,7 +330,7 @@ sections:
     assert billTipCorrelation > 0.6
     round(float(billTipCorrelation), 3)
   exercise:
-    prompt: 10단계. Plotly 학습 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. Plotly 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import plotly.express as px
       from codaro.curriculum.localData import loadLocalDataset
@@ -330,14 +346,16 @@ sections:
       assert billTipCorrelation > 0.6
       round(float(billTipCorrelation), 3)
     hints:
-    - 10단계. Plotly 학습 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. Plotly 학습 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. Plotly 학습 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. Plotly 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. Plotly 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 기본 차트 입문'
     subtitle: 산점도, 선 그래프, 막대 그래프, 히스토그램을 한 번에 배웁니다
+  goal: '다음: 기본 차트 입문에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.'
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.

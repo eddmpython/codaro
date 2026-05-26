@@ -33,33 +33,33 @@ intro:
     적용합니다.
   direction: 사진필터스튜디오에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 사진필터스튜디오 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
+  - 사진필터스튜디오 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
+  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 이미지 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 블러 필터 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. 샤픈 필터 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
     - label: 사진필터스튜디오 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 이미지 처리 환경
       detail: numpy, pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 사진필터스튜디오 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
     - label: 사진필터스튜디오 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 샘플 이미지
   goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: sklearn에 내장된 샘플 이미지를 사용합니다. 필터 효과를 잘 확인할 수 있도록 꽃 이미지를 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -71,7 +71,7 @@ sections:
     canvas = Image.fromarray(flowerArr)
     canvas.size
   exercise:
-    prompt: 1단계. 이미지 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image, ImageFilter
       from sklearn.datasets import load_sample_image
@@ -80,17 +80,17 @@ sections:
       canvas = Image.fromarray(flowerArr)
       canvas.size
     hints:
-    - 1단계. 이미지 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 이미지 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step2_blur
   title: 2단계. 블러 필터
   structuredPrimary: true
   subtitle: BLUR, GaussianBlur
   goal: 2단계. 블러 필터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     블러 필터는 이미지를 부드럽게 흐리게 만듭니다. BLUR는 기본 블러이고, GaussianBlur는 반경을 조절할 수 있는 가우시안 블러입니다. 블러는 노이즈 제거나 배경 처리에 자주 사용됩니다.
 
@@ -101,22 +101,22 @@ sections:
     blurred = canvas.filter(ImageFilter.BLUR)
     blurred
   exercise:
-    prompt: 2단계. 블러 필터 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 블러 필터 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       blurred = canvas.filter(ImageFilter.BLUR)
       blurred
     hints:
-    - 2단계. 블러 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 블러 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 블러 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 블러 필터의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 블러 필터 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step3_sharpen
   title: 3단계. 샤픈 필터
   structuredPrimary: true
   subtitle: SHARPEN, UnsharpMask
   goal: 3단계. 샤픈 필터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     샤픈 필터는 이미지의 경계를 강조하여 선명하게 만듭니다. SHARPEN은 기본 샤프닝이고, UnsharpMask는 더 정교한 조절이 가능합니다. 흐린 사진을 선명하게 보정할 때 사용합니다.
 
@@ -128,22 +128,22 @@ sections:
     sharpened = canvas.filter(ImageFilter.SHARPEN)
     sharpened
   exercise:
-    prompt: 3단계. 샤픈 필터 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 샤픈 필터 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       sharpened = canvas.filter(ImageFilter.SHARPEN)
       sharpened
     hints:
-    - 3단계. 샤픈 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 샤픈 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 샤픈 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 샤픈 필터의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 샤픈 필터 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step4_edge
   title: 4단계. 윤곽선 필터
   structuredPrimary: true
   subtitle: CONTOUR, FIND_EDGES
   goal: 4단계. 윤곽선 필터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     윤곽선 필터는 이미지에서 경계선을 추출합니다. CONTOUR는 윤곽선만 남기고, FIND_EDGES는 에지(가장자리)를 검출합니다. 이미지 분석이나 아트 효과에 활용됩니다.
 
@@ -154,22 +154,22 @@ sections:
     contour = canvas.filter(ImageFilter.CONTOUR)
     contour
   exercise:
-    prompt: 4단계. 윤곽선 필터 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 윤곽선 필터 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       contour = canvas.filter(ImageFilter.CONTOUR)
       contour
     hints:
-    - 4단계. 윤곽선 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 윤곽선 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 윤곽선 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 윤곽선 필터의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 윤곽선 필터 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step5_emboss
   title: 5단계. 엠보스와 강조
   structuredPrimary: true
   subtitle: EMBOSS, EDGE_ENHANCE
   goal: 5단계. 엠보스와 강조에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     EMBOSS는 양각 효과를 주어 입체감을 만듭니다. EDGE_ENHANCE는 경계선을 강조하여 이미지를 더 선명하게 보이게 합니다.
 
@@ -180,22 +180,22 @@ sections:
     emboss = canvas.filter(ImageFilter.EMBOSS)
     emboss
   exercise:
-    prompt: 5단계. 엠보스와 강조 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 엠보스와 강조 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       emboss = canvas.filter(ImageFilter.EMBOSS)
       emboss
     hints:
-    - 5단계. 엠보스와 강조 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 엠보스와 강조 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 엠보스와 강조에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 엠보스와 강조의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 엠보스와 강조 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step6_smooth
   title: 6단계. 스무딩
   structuredPrimary: true
   subtitle: SMOOTH, DETAIL
   goal: 6단계. 스무딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: SMOOTH는 노이즈를 줄이고 부드럽게 만듭니다. DETAIL은 세부 사항을 강조합니다. 이 두 필터는 반대 효과를 가집니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -203,22 +203,22 @@ sections:
     smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
     smooth
   exercise:
-    prompt: 6단계. 스무딩 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 스무딩 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
       smooth
     hints:
-    - 6단계. 스무딩 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 스무딩 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 스무딩에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 스무딩의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 스무딩 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 필터 조합
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     sklearn 이미지에 다양한 필터를 적용해봅시다.
 
@@ -233,7 +233,7 @@ sections:
     bloom = Image.fromarray(bloomArr)
     bloom
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image, ImageFilter
       from sklearn.datasets import load_sample_image
@@ -242,17 +242,17 @@ sections:
       bloom = Image.fromarray(bloomArr)
       bloom
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 7단계. 필터 효과 검증 루프
   structuredPrimary: true
   subtitle: blur, sharpen, edge 수치 확인
   goal: 7단계. 필터 효과 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 필터는 분위기 효과처럼 보이지만 자동화에서는 픽셀 분산과 경계 검출량을 확인해야 합니다. 반지름 입력을 검증하고 blur와 edge 결과를 수치로 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -272,7 +272,7 @@ sections:
 
     validateBlurRadius(2)
   exercise:
-    prompt: 7단계. 필터 효과 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 필터 효과 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageFilter, ImageStat
       import numpy as np
@@ -289,8 +289,8 @@ sections:
 
       validateBlurRadius(2)
     hints:
-    - 7단계. 필터 효과 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 필터 효과 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 필터 효과 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 필터 효과 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 필터 효과 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

@@ -45,7 +45,7 @@ intro:
     - label: 선언형 차트 환경
       detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 타이타닉생존분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
     - label: 타이타닉생존분석 완료
       detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: seaborn-data
   goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: Codaro 로컬 데이터셋에서 titanic 데이터를 불러옵니다. 타이타닉호 승객의 생존 여부와 정보가 담긴 데이터입니다. survived(생존여부), pclass(객실등급),
     sex(성별), age(나이), fare(요금), embarked(승선항) 등 컬럼이 있습니다.
   tips:
@@ -68,7 +68,7 @@ sections:
 
     titanic = loadLocalDataset("titanic")
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -78,17 +78,17 @@ sections:
 
       titanic = loadLocalDataset("titanic")
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_basic_bar
   title: 2단계. 기본 막대 차트
   structuredPrimary: true
   subtitle: 생존자 수 집계
   goal: 2단계. 기본 막대 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. 생존 여부별 승객 수를 막대 차트로 표현합니다.
 
@@ -103,7 +103,7 @@ sections:
     )
     chartSurvived
   exercise:
-    prompt: 2단계. 기본 막대 차트 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 기본 막대 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartSurvived = alt.Chart(titanic).mark_bar().encode(
           x='survived:N',
@@ -112,17 +112,17 @@ sections:
       )
       chartSurvived
     hints:
-    - 2단계. 기본 막대 차트 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 기본 막대 차트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 기본 막대 차트에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 기본 막대 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 막대 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_row_encoding
   title: 3단계. 행 분할
   structuredPrimary: true
   subtitle: row 인코딩
   goal: 3단계. 행 분할에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     row 인코딩으로 차트를 여러 행으로 분할합니다. encode() 괄호 안에 row='sex:N'을 추가하면 됩니다. 성별(sex)로 분할하면 남녀 생존율을 각각 따로 차트로 보여줍니다. 위아래로 두 개의 차트가 나열됩니다. 같은 차트를 여러 조건별로 나누어 보여주는 것을 "패싯(facet)"이라고 합니다.
 
@@ -139,7 +139,7 @@ sections:
     )
     chartRow
   exercise:
-    prompt: 3단계. 행 분할 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 행 분할 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartRow = alt.Chart(titanic).mark_bar().encode(
           x='survived:N',
@@ -149,17 +149,17 @@ sections:
       )
       chartRow
     hints:
-    - 3단계. 행 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 행 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 행 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 행 분할의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 행 분할의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_column_encoding
   title: 4단계. 열 분할
   structuredPrimary: true
   subtitle: column 인코딩
   goal: 4단계. 열 분할에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     column 인코딩으로 차트를 가로로 분할합니다. 객실 등급(pclass)으로 분할해봅니다.
 
@@ -175,7 +175,7 @@ sections:
     )
     chartColumn
   exercise:
-    prompt: 4단계. 열 분할 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 열 분할 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartColumn = alt.Chart(titanic).mark_bar().encode(
           x='survived:N',
@@ -185,17 +185,17 @@ sections:
       )
       chartColumn
     hints:
-    - 4단계. 열 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 열 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 열 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 열 분할의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 열 분할의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_row_column
   title: 5단계. 행+열 분할
   structuredPrimary: true
   subtitle: 2차원 패싯
   goal: 5단계. 행+열 분할에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: row와 column을 함께 사용하면 2차원 그리드로 분할됩니다. 성별(row)과 등급(column)의 조합별 생존율을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -206,7 +206,7 @@ sections:
     ).properties(width=120, height=100)
     chartGrid
   exercise:
-    prompt: 5단계. 행+열 분할 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 행+열 분할 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartGrid = alt.Chart(titanic).mark_bar().encode(
           x='survived:N', y='count()', color='survived:N',
@@ -214,17 +214,17 @@ sections:
       ).properties(width=120, height=100)
       chartGrid
     hints:
-    - 5단계. 행+열 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 행+열 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 행+열 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 행+열 분할의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 행+열 분할의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_transform_filter
   title: 6단계. 데이터 필터링
   structuredPrimary: true
   subtitle: transform_filter
   goal: 6단계. 데이터 필터링에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     transform_filter()로 특정 조건의 데이터만 시각화합니다. 필터는 "걸러낸다"는 의미로, 원하는 데이터만 선택합니다. 1등급 승객만 필터링해봅니다. encode() 뒤에 .transform_filter()를 연결합니다. alt.datum.pclass == 1은 "pclass 컬럼 값이 1인 것만"이라는 조건입니다. alt.datum은 "각 데이터 행"을 의미하고, 점(.)으로 컬럼명을 연결합니다. ==는 "같다"를 의미하는 비교 연산자입니다. =(할당)과 다릅니다.
 
@@ -244,7 +244,7 @@ sections:
     )
     chartFilter
   exercise:
-    prompt: 6단계. 데이터 필터링 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 데이터 필터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartFilter = alt.Chart(titanic).mark_bar().encode(
           x='sex:N',
@@ -257,17 +257,17 @@ sections:
       )
       chartFilter
     hints:
-    - 6단계. 데이터 필터링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 데이터 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 데이터 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 데이터 필터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 데이터 필터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_multi_filter
   title: 7단계. 복합 필터
   structuredPrimary: true
   subtitle: 다중 조건
   goal: 7단계. 복합 필터에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 여러 조건을 결합해 필터링할 수 있습니다. & 연산자로 "그리고" 조건을 만듭니다. 성인(age >= 18) 여성(sex == 'female') 승객만 필터링합니다.
     (조건1) & (조건2) 형태로 씁니다. 각 조건을 괄호로 감싸야 합니다. 괄호 없이 쓰면 에러가 발생합니다. 문자열(female)은 작은따옴표로 감쌉니다.
   tips:
@@ -284,7 +284,7 @@ sections:
     )
     chartMultiFilter
   exercise:
-    prompt: 7단계. 복합 필터 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 복합 필터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartMultiFilter = alt.Chart(titanic).mark_bar().encode(
           x='pclass:O',
@@ -297,17 +297,17 @@ sections:
       )
       chartMultiFilter
     hints:
-    - 7단계. 복합 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 복합 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 복합 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 복합 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 복합 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_facet
   title: 8단계. facet 메서드
   structuredPrimary: true
   subtitle: 유연한 분할
   goal: 8단계. facet 메서드에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     facet() 메서드는 row/column 인코딩보다 유연합니다. properties() 뒤에 .facet()을 연결합니다. facet('embarked:N')은 승선 항구별로 차트를 나눕니다. columns=3은 한 줄에 3개씩 배치하라는 의미입니다. row/column은 encode() 안에 쓰지만, facet()은 메서드로 마지막에 연결합니다. facet()이 더 유연하게 레이아웃을 조정할 수 있습니다.
 
@@ -321,24 +321,24 @@ sections:
     ).properties(width=100, height=80).facet('embarked:N', columns=3)
     chartFacet
   exercise:
-    prompt: 8단계. facet 메서드 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. facet 메서드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartFacet = alt.Chart(titanic).mark_bar().encode(
           x='survived:N', y='count()', color='survived:N'
       ).properties(width=100, height=80).facet('embarked:N', columns=3)
       chartFacet
     hints:
-    - 8단계. facet 메서드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. facet 메서드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. facet 메서드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. facet 메서드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. facet 메서드의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 타이타닉 생존 분석
   goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지 배운 개념을 종합해 타이타닉 생존 분석 차트를 완성합니다. 성별, 등급별 생존율을 한눈에 비교합니다.
 
@@ -354,7 +354,7 @@ sections:
     ).properties(width=100, height=80)
     chartFinal
   exercise:
-    prompt: 9단계. 최종 결과물 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartFinal = alt.Chart(titanic).mark_bar().encode(
           x=alt.X('survived:N', title='생존 여부', axis=alt.Axis(labelExpr="datum.value == 1 ? '생존' : '사망'")),
@@ -364,17 +364,17 @@ sections:
       ).properties(width=100, height=80)
       chartFinal
     hints:
-    - 9단계. 최종 결과물 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 최종 결과물에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 타이타닉 패싯 프로젝트
   goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리합니다. row와 column으로 차트를 행과 열로 분할했습니다. 2차원 그리드를 만들 수 있습니다. transform_filter()로 조건에 맞는 데이터만 필터링했습니다. alt.datum.컬럼명으로 조건을 지정하고, ==, &, | 연산자를 사용합니다. facet() 메서드로 유연하게 패싯 차트를 만들었습니다. columns로 레이아웃을 조정할 수 있습니다. 각 미션에서 이 개념들을 활용해봅시다.
 
@@ -387,18 +387,18 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     ship = loadLocalDataset("titanic")
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
       ship = loadLocalDataset("titanic")
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -414,12 +414,14 @@ sections:
     - .facet('컬럼:N', columns=n) - 유연한 패싯
   - type: text
     content: 다음 프로젝트에서는 항공편 데이터로 히트맵과 박스플롯을 배웁니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
 - id: workflow_validation
   title: 10단계. 타이타닉 Facet 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 10단계. 타이타닉 Facet 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     Facet 차트는 여러 집단을 동시에 비교하므로 생존 컬럼의 의미, 집단 표본, row/column 사양을 함께 확인해야 합니다.
 
@@ -438,7 +440,7 @@ sections:
     assert set(titanicFlow["survived"].unique()).issubset({0, 1})
     assert titanicFlow.groupby("sex")["survived"].mean()["female"] > titanicFlow.groupby("sex")["survived"].mean()["male"]
   exercise:
-    prompt: 10단계. 타이타닉 Facet 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 타이타닉 Facet 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -451,8 +453,8 @@ sections:
       assert set(titanicFlow["survived"].unique()).issubset({0, 1})
       assert titanicFlow.groupby("sex")["survived"].mean()["female"] > titanicFlow.groupby("sex")["survived"].mean()["male"]
     hints:
-    - 10단계. 타이타닉 Facet 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 타이타닉 Facet 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 타이타닉 Facet 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 타이타닉 Facet 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 타이타닉 Facet 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

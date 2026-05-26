@@ -50,7 +50,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 심장병예측 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 심장병예측 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: 심장병 데이터
   goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     심장병 예측 데이터를 로딩합니다. Codaro 로컬 데이터셋은 14개 특성과 심장병 유무(target)로 구성되어 있어 클래스 분포 확인, Boosting 학습, ROC-AUC 평가까지 같은 흐름으로 이어갑니다.
 
@@ -80,7 +80,7 @@ sections:
     heart = loadLocalDataset("heart")
     heart
   exercise:
-    prompt: 1단계. 데이터 로딩 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -94,17 +94,17 @@ sections:
       heart = loadLocalDataset("heart")
       heart
     hints:
-    - 1단계. 데이터 로딩 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 로딩 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 로딩에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_eda
   title: 2단계. 데이터 탐색
   structuredPrimary: true
   subtitle: 클래스 분포
   goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 심장병 유무 비율과 주요 특성의 분포를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -116,7 +116,7 @@ sections:
     axDist.set_title("Heart Disease Distribution")
     figDist
   exercise:
-    prompt: 2단계. 데이터 탐색 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figDist, axDist = plt.subplots(figsize=(6, 4))
       heart["target"].value_counts().plot(kind="bar", color=["steelblue", "coral"], ax=axDist)
@@ -125,17 +125,17 @@ sections:
       axDist.set_title("Heart Disease Distribution")
       figDist
     hints:
-    - 2단계. 데이터 탐색 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 탐색에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 탐색의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 2단계. 데이터 탐색 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step3_prep
   title: 3단계. 데이터 준비
   structuredPrimary: true
   subtitle: 분할 및 스케일링
   goal: 3단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 특성과 타깃을 분리하고 학습/테스트 데이터로 분할합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -146,7 +146,7 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 3단계. 데이터 준비 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 데이터 준비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       X = heart.drop("target", axis=1)
       y = heart["target"]
@@ -154,17 +154,17 @@ sections:
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
       xTrain.shape, xTest.shape
     hints:
-    - 3단계. 데이터 준비 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 데이터 준비 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 데이터 준비에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 데이터 준비에서 `X` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 데이터 준비 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_gb
   title: 4단계. GradientBoosting 학습
   structuredPrimary: true
   subtitle: Boosting 앙상블
   goal: 4단계. GradientBoosting 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     GradientBoosting은 이전 모델의 잔차(오차)를 학습하는 순차적 앙상블입니다. n_estimators로 트리 개수, learning_rate로 학습률을 조절합니다.
 
@@ -176,23 +176,23 @@ sections:
     gb.fit(xTrainSc, yTrain)
     gb
   exercise:
-    prompt: 4단계. GradientBoosting 학습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. GradientBoosting 학습 예제에서 `gb` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
       gb.fit(xTrainSc, yTrain)
       gb
     hints:
-    - 4단계. GradientBoosting 학습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `gb = ...` 오른쪽 값입니다.
+    - 실행 뒤 `gb` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. GradientBoosting 학습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. GradientBoosting 학습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. GradientBoosting 학습에서 `gb` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. GradientBoosting 학습 실행 뒤 `gb` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step5_eval
   title: 5단계. 기본 평가
   structuredPrimary: true
   subtitle: 정확도와 분류 리포트
   goal: 5단계. 기본 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: 테스트 데이터로 정확도와 상세 지표를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -201,23 +201,23 @@ sections:
     acc = accuracy_score(yTest, yPred)
     print(f"Accuracy: {acc:.4f}")
   exercise:
-    prompt: 5단계. 기본 평가 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 기본 평가 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       yPred = gb.predict(xTestSc)
       acc = accuracy_score(yTest, yPred)
       print(f"Accuracy: {acc:.4f}")
     hints:
-    - 5단계. 기본 평가 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 5단계. 기본 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 기본 평가에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 5단계. 기본 평가의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 5단계. 기본 평가 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step6_proba
   title: 6단계. 확률 예측
   structuredPrimary: true
   subtitle: predict_proba
   goal: 6단계. 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     predict_proba로 클래스별 확률을 얻습니다. 양성(심장병) 확률을 기준으로 ROC 분석을 수행합니다.
 
@@ -228,22 +228,22 @@ sections:
     yProba = gb.predict_proba(xTestSc)
     yProba[:5]
   exercise:
-    prompt: 6단계. 확률 예측 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 확률 예측 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       yProba = gb.predict_proba(xTestSc)
       yProba[:5]
     hints:
-    - 6단계. 확률 예측 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 확률 예측 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 확률 예측에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 확률 예측에서 `yProba` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 확률 예측 실행 뒤 `yProba` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step7_roc
   title: 7단계. ROC 곡선
   structuredPrimary: true
   subtitle: TPR vs FPR
   goal: 7단계. ROC 곡선에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     ROC 곡선은 다양한 임계값에서 TPR(민감도)과 FPR(1-특이도)의 관계를 보여줍니다.
 
@@ -262,7 +262,7 @@ sections:
     axRoc.legend()
     figRoc
   exercise:
-    prompt: 7단계. ROC 곡선 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. ROC 곡선 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fpr, tpr, thresholds = roc_curve(yTest, yProbaPos)
 
@@ -275,17 +275,17 @@ sections:
       axRoc.legend()
       figRoc
     hints:
-    - 7단계. ROC 곡선 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. ROC 곡선 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. ROC 곡선에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. ROC 곡선의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. ROC 곡선 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_auc
   title: 8단계. AUC 계산
   structuredPrimary: true
   subtitle: 곡선 아래 면적
   goal: 8단계. AUC 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     AUC(Area Under Curve)는 ROC 곡선 아래 면적입니다. 1에 가까울수록 좋은 분류 성능을 의미합니다.
 
@@ -296,22 +296,22 @@ sections:
     auc = roc_auc_score(yTest, yProbaPos)
     print(f"AUC: {auc:.4f}")
   exercise:
-    prompt: 8단계. AUC 계산 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. AUC 계산 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       auc = roc_auc_score(yTest, yProbaPos)
       print(f"AUC: {auc:.4f}")
     hints:
-    - 8단계. AUC 계산 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 8단계. AUC 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. AUC 계산에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 8단계. AUC 계산의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 8단계. AUC 계산 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step9_threshold
   title: 9단계. 임계값 조정
   structuredPrimary: true
   subtitle: 최적 임계값
   goal: 9단계. 임계값 조정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: 기본 임계값 0.5 대신 최적 임계값을 찾습니다. Youden's J statistic(TPR-FPR 최대화)을 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -322,7 +322,7 @@ sections:
     print(f"Optimal Threshold: {optThresh:.4f}")
     print(f"TPR: {tpr[optIdx]:.4f}, FPR: {fpr[optIdx]:.4f}")
   exercise:
-    prompt: 9단계. 임계값 조정 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 임계값 조정 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       jStat = tpr - fpr
       optIdx = np.argmax(jStat)
@@ -330,17 +330,17 @@ sections:
       print(f"Optimal Threshold: {optThresh:.4f}")
       print(f"TPR: {tpr[optIdx]:.4f}, FPR: {fpr[optIdx]:.4f}")
     hints:
-    - 9단계. 임계값 조정 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 9단계. 임계값 조정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 임계값 조정에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 9단계. 임계값 조정의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 9단계. 임계값 조정 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: step10_lr
   title: 10단계. 학습률 비교
   structuredPrimary: true
   subtitle: learning_rate
   goal: 10단계. 학습률 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     learning_rate는 각 트리의 기여도를 조절합니다. 낮을수록 많은 트리가 필요하지만 안정적입니다.
 
@@ -363,7 +363,7 @@ sections:
     axLr.set_title("AUC vs Learning Rate")
     figLr
   exercise:
-    prompt: 10단계. 학습률 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 학습률 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       lrList = [0.01, 0.05, 0.1, 0.2, 0.5]
       aucList = []
@@ -380,17 +380,17 @@ sections:
       axLr.set_title("AUC vs Learning Rate")
       figLr
     hints:
-    - 10단계. 학습률 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 학습률 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 학습률 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 학습률 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 학습률 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_importance
   title: 11단계. 특성 중요도
   structuredPrimary: true
   subtitle: feature_importances_
   goal: 11단계. 특성 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     GradientBoosting도 특성 중요도를 제공합니다. 심장병 예측에 중요한 요인을 확인합니다.
 
@@ -407,7 +407,7 @@ sections:
     axImp.set_title("GradientBoosting Feature Importances")
     figImp
   exercise:
-    prompt: 11단계. 특성 중요도 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 특성 중요도 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       impGb = pd.DataFrame({"feature": X.columns, "importance": gb.feature_importances_})
       impGb = impGb.sort_values("importance", ascending=True)
@@ -418,17 +418,17 @@ sections:
       axImp.set_title("GradientBoosting Feature Importances")
       figImp
     hints:
-    - 11단계. 특성 중요도 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 특성 중요도 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 특성 중요도에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 11단계. 특성 중요도의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 특성 중요도의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step12_compare
   title: 12단계. 앙상블 비교
   structuredPrimary: true
   subtitle: RF vs GB
   goal: 12단계. 앙상블 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     RandomForest(Bagging)와 GradientBoosting(Boosting)의 성능을 비교합니다.
 
@@ -457,7 +457,7 @@ sections:
     axComp.legend()
     figComp
   exercise:
-    prompt: 12단계. 앙상블 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 앙상블 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.ensemble import RandomForestClassifier
 
@@ -480,17 +480,17 @@ sections:
       axComp.legend()
       figComp
     hints:
-    - 12단계. 앙상블 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 12단계. 앙상블 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 앙상블 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 12단계. 앙상블 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 12단계. 앙상블 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: Boosting과 ROC-AUC
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -531,7 +531,7 @@ sections:
     axM1.set_title(f"Breast Cancer ROC (AUC = {aucC:.4f})")
     figM1
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -566,17 +566,17 @@ sections:
       axM1.set_title(f"Breast Cancer ROC (AUC = {aucC:.4f})")
       figM1
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -607,7 +607,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -652,8 +652,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

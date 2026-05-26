@@ -46,7 +46,7 @@ intro:
     - label: 업무 코드 환경
       detail: pandas, scipy, statsmodels 기준으로 로컬 Python 실행을 준비합니다.
     - label: statsmodels소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: statsmodels소개 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -69,6 +69,8 @@ sections:
       title: 가설 검정
     - emoji: 📊
       title: R 수준의 통계량
+  goal: statsmodels란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: what_is_statsmodels
   blocks:
   - type: sectionHeader
@@ -93,6 +95,8 @@ sections:
     - emoji: ⏱️
       title: 시계열 분석
       description: ARIMA, 계절성 분해
+  goal: 🤔 statsmodels가 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: why_statsmodels
   blocks:
   - type: sectionHeader
@@ -123,6 +127,8 @@ sections:
     - emoji: 📈
       title: 비즈니스 활용
       description: 매출 예측, A/B 테스트, 인과 분석
+  goal: 🌟 왜 statsmodels가 필요한가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: statsmodels_vs_others
   blocks:
   - type: sectionHeader
@@ -181,6 +187,8 @@ sections:
     title: 용도별 선택 가이드
     content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로
       유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
+  goal: 🆚 statsmodels vs 다른 라이브러리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -206,6 +214,8 @@ sections:
     - emoji: 6️⃣
       title: 가설 검정
       description: t-test, ANOVA, chi-square
+  goal: 🧩 핵심 개념에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: workflow
   blocks:
   - type: sectionHeader
@@ -242,6 +252,8 @@ sections:
     - emoji: 🔍
       title: 6. 진단
       description: 잔차 플롯, 정규성 검정
+  goal: 🔄 statsmodels 분석 흐름에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: key_outputs
   blocks:
   - type: sectionHeader
@@ -279,6 +291,8 @@ sections:
     title: p-value 해석
     content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면
       더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
+  goal: 📋 주요 출력물에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -304,6 +318,8 @@ sections:
     - emoji: 👔
       title: HR 분석
       description: 퇴사 요인, 급여 결정 요인 분석
+  goal: 💼 실전 활용 사례에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -361,6 +377,8 @@ sections:
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야
       할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
+  goal: 🗺️ 앞으로 배울 내용에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: statsmodels_vs_r
   blocks:
   - type: sectionHeader
@@ -392,6 +410,8 @@ sections:
     - - arima(y, order=c(1,0,1))
       - sm.tsa.ARIMA(y, order=(1,0,1)).fit()
       - ARIMA
+  goal: 🔄 R 사용자를 위한 안내에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: installation
   blocks:
   - type: sectionHeader
@@ -413,6 +433,8 @@ sections:
     - emoji: 🚀
       title: 바로 시작
       description: import statsmodels.api as sm
+  goal: 📦 설치 및 시작에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -429,18 +451,22 @@ sections:
     - text: statsmodels Examples
       url: https://www.statsmodels.org/stable/examples/index.html
       icon: 🔗
+  goal: 📚 참고 자료에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 광고비 매출 예측'
     subtitle: 단순선형회귀로 첫 번째 통계 모델을 만들어봅니다
+  goal: '다음: 광고비 매출 예측에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 회귀 리포트 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
     결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
   tips:
@@ -462,7 +488,7 @@ sections:
 
     marketingData[requiredColumns].head()
   exercise:
-    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       compactX = sm.add_constant(marketingData[["TV", "Radio"]])
       compactModel = sm.OLS(reportY, compactX).fit()
@@ -493,8 +519,8 @@ sections:
 
       marketingData[requiredColumns].head()
     hints:
-    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

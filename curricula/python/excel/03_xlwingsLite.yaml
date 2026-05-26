@@ -42,7 +42,7 @@ intro:
     - label: 엑셀 자동화 환경
       detail: openpyxl, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: Excel 리포트 자동 생성 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 저장 파일과 셀 값와 예외 상태를 확인합니다.
     - label: Excel 리포트 자동 생성 완료
       detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
 sections:
@@ -51,7 +51,7 @@ sections:
   structuredPrimary: true
   subtitle: 데이터 + 요약 + 차트
   goal: 1단계. 보고서 파일의 목표에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 자동화된 Excel 리포트는 원본 데이터, 요약 표, 차트가 한 파일 안에 일관되게 들어 있어야 합니다. 이번 레슨은 pandas와 openpyxl을 함께
     사용해 보고서 파일을 생성하고 구조를 검증합니다.
   tips:
@@ -75,7 +75,7 @@ sections:
     assert set(summary["time"]) == {"Lunch", "Dinner"}
     summary.round(3)
   exercise:
-    prompt: 1단계. 보고서 파일의 목표 예제에서 리스트 값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 보고서 파일의 목표 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from pathlib import Path
       from tempfile import TemporaryDirectory
@@ -95,17 +95,17 @@ sections:
       assert set(summary["time"]) == {"Lunch", "Dinner"}
       summary.round(3)
     hints:
-    - 1단계. 보고서 파일의 목표 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 보고서 파일의 목표 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 보고서 파일의 목표에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 1단계. 보고서 파일의 목표의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 보고서 파일의 목표의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: build_report
   title: 2단계. 리포트 파일 만들기
   structuredPrimary: true
   subtitle: 시트와 차트
   goal: 2단계. 리포트 파일 만들기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 2단계. 리포트 파일 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -118,7 +118,7 @@ sections:
     workbook = load_workbook(reportPath)
     assert workbook.sheetnames == ["raw_data", "summary"]
   exercise:
-    prompt: 2단계. 리포트 파일 만들기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 리포트 파일 만들기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
           tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
@@ -128,17 +128,17 @@ sections:
       workbook = load_workbook(reportPath)
       assert workbook.sheetnames == ["raw_data", "summary"]
     hints:
-    - 2단계. 리포트 파일 만들기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 리포트 파일 만들기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 리포트 파일 만들기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 리포트 파일 만들기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 리포트 파일 만들기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
   title: 3단계. 리포트 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 3단계. 리포트 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 리포트 자동화는 파일 생성보다 검증이 중요합니다. 시트 구성, 요약 행 수, 차트 존재를 확인하고, 잘못된 리포트 구조를 명확하게 실패시킵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -159,7 +159,7 @@ sections:
     assert reportValidation["summaryRows"] == 2
     reportValidation
   exercise:
-    prompt: 3단계. 리포트 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 리포트 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def validateExcelReport(path):
           workbook = load_workbook(path, data_only=True)
@@ -177,14 +177,16 @@ sections:
       assert reportValidation["summaryRows"] == 2
       reportValidation
     hints:
-    - 3단계. 리포트 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 3단계. 리포트 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 리포트 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 3단계. 리포트 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 리포트 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
   title: 정리
   subtitle: Excel 리포트 자동화 완주
   blocks:
   - type: text
     content: 이번 레슨에서는 로컬 데이터로 Excel 리포트 파일을 만들고, 여러 시트와 차트가 들어 있는지 검증하고, 집계 기준을 바꾸는 변주까지 완성했습니다.
+  goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.

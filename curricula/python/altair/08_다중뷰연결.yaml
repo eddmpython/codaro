@@ -46,7 +46,7 @@ intro:
     - label: 선언형 차트 환경
       detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 다중뷰연결 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
     - label: 다중뷰연결 완료
       detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
@@ -55,7 +55,7 @@ sections:
   structuredPrimary: true
   subtitle: seaborn-data
   goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: Codaro 로컬 데이터셋에서 iris(붓꽃) 데이터를 불러옵니다. 붓꽃 3가지 품종(setosa, versicolor, virginica)의 꽃잎과 꽃받침
     크기를 측정한 유명한 데이터셋입니다. sepal은 꽃받침(꽃잎을 감싸는 초록색 부분), petal은 꽃잎(색깔 있는 부분)입니다. length는 길이, width는 너비, species는
     품종입니다. 이 데이터로 여러 차트를 동시에 그리고 서로 연결하는 방법을 배웁니다. 한 차트를 조작하면 다른 차트도 함께 반응합니다.
@@ -70,7 +70,7 @@ sections:
 
     iris = loadLocalDataset("iris")
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -80,17 +80,17 @@ sections:
 
       iris = loadLocalDataset("iris")
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_hconcat
   title: 2단계. 가로 배치
   structuredPrimary: true
   subtitle: hconcat (|)
   goal: 2단계. 가로 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지는 차트를 하나씩 그렸습니다. 이번에는 여러 차트를 한 화면에 배치하는 방법을 배웁니다. | 연산자(파이프 기호)는 차트를 가로로 나란히 붙이는 역할을 합니다. chart1 | chart2는 "차트1 옆에 차트2를 배치하라"는 뜻입니다. hconcat()도 같은 기능입니다(h는 horizontal, 가로). 먼저 각 차트를 변수에 저장한 뒤, | 연산자로 연결하면 두 차트가 가로로 나란히 표시됩니다.
 
@@ -114,7 +114,7 @@ sections:
     chartHconcat = chartPetal | chartSepal
     chartHconcat
   exercise:
-    prompt: 2단계. 가로 배치 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 가로 배치 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartPetal = alt.Chart(iris).mark_point().encode(
           x='petal_length:Q',
@@ -131,17 +131,17 @@ sections:
       chartHconcat = chartPetal | chartSepal
       chartHconcat
     hints:
-    - 2단계. 가로 배치 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 가로 배치 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 가로 배치에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 가로 배치의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 가로 배치의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_vconcat
   title: 3단계. 세로 배치
   structuredPrimary: true
   subtitle: vconcat (&)
   goal: 3단계. 세로 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     가로 배치를 배웠으니 이번에는 세로 배치를 해봅니다. & 연산자는 차트를 위아래로 쌓는 역할을 합니다. chart1 & chart2는 "차트1 아래에 차트2를 배치하라"는 뜻입니다. vconcat()도 같은 기능입니다(v는 vertical, 세로). | 는 옆으로 붙이고, &는 아래로 쌓는다고 기억하면 됩니다.
 
@@ -152,22 +152,22 @@ sections:
     chartVconcat = chartPetal & chartSepal
     chartVconcat
   exercise:
-    prompt: 3단계. 세로 배치 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 세로 배치 예제에서 `chartVconcat` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       chartVconcat = chartPetal & chartSepal
       chartVconcat
     hints:
-    - 3단계. 세로 배치 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `chartVconcat = ...` 오른쪽 값입니다.
+    - 실행 뒤 `chartVconcat` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. 세로 배치 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 세로 배치에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 세로 배치에서 `chartVconcat` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 세로 배치 실행 뒤 `chartVconcat` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step4_grid
   title: 4단계. 그리드 배치
   structuredPrimary: true
   subtitle: 가로+세로 조합
   goal: 4단계. 그리드 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: '| 와 & 를 동시에 사용하면 복잡한 레이아웃을 만들 수 있습니다. 괄호로 순서를 정해주면 2x2, 3x3 같은 그리드를 만들 수 있습니다. (chart1
     | chart2)는 먼저 차트1과 차트2를 가로로 붙입니다. (chart3 | chart4)도 가로로 붙입니다. 그 다음 두 묶음을 & 로 세로로 쌓으면 2행 2열 그리드가 됩니다.
     괄호가 중요합니다. 수학 계산처럼 괄호 안을 먼저 처리합니다.'
@@ -193,7 +193,7 @@ sections:
     chartGrid = (chart1 | chart2) & (chart3 | chart4)
     chartGrid
   exercise:
-    prompt: 4단계. 그리드 배치 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 그리드 배치 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chart1 = alt.Chart(iris).mark_point().encode(
           x='sepal_length:Q', y='sepal_width:Q', color='species:N'
@@ -214,17 +214,17 @@ sections:
       chartGrid = (chart1 | chart2) & (chart3 | chart4)
       chartGrid
     hints:
-    - 4단계. 그리드 배치 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 그리드 배치 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 그리드 배치에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 그리드 배치의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 그리드 배치의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_linked_brush
   title: 5단계. 연결된 브러싱
   structuredPrimary: true
   subtitle: 선택 공유
   goal: 5단계. 연결된 브러싱에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     이제 핵심 기능을 배웁니다. 여러 차트가 서로 연결되어 동시에 반응하게 만드는 방법입니다. 같은 brush 변수(selection_interval)를 기준 차트에 add_params()로 추가하고, 다른 차트는 그 선택 값을 참조하면 한 차트에서 드래그한 선택이 다른 차트에도 적용됩니다. 왼쪽 차트에서 영역을 드래그하면, 오른쪽 차트에서도 똑같은 데이터 포인트가 강조됩니다. 마치 두 차트가 대화하는 것처럼 연동됩니다.
 
@@ -249,7 +249,7 @@ sections:
     chartLinked = linkedPetal | linkedSepal
     chartLinked
   exercise:
-    prompt: 5단계. 연결된 브러싱 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 연결된 브러싱 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       brush = alt.selection_interval(name='linkedBrush')
 
@@ -268,17 +268,17 @@ sections:
       chartLinked = linkedPetal | linkedSepal
       chartLinked
     hints:
-    - 5단계. 연결된 브러싱 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 연결된 브러싱 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 연결된 브러싱에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 연결된 브러싱의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 연결된 브러싱의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_repeat
   title: 6단계. repeat 차트
   structuredPrimary: true
   subtitle: 변수 조합 자동화
   goal: 6단계. repeat 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지는 차트를 하나하나 만들어서 조합했습니다. repeat()를 사용하면 변수 조합을 자동으로 만들어줍니다. repeat()는 "반복하다"라는 뜻입니다. row와 column에 변수 리스트를 지정하면, 모든 조합의 차트를 자동으로 생성합니다. alt.repeat('column')은 "column 리스트의 변수를 반복해서 사용하라"는 의미입니다. row에 2개, column에 2개 변수를 주면 2×2=4개 차트가 자동 생성됩니다.
 
@@ -301,7 +301,7 @@ sections:
     )
     chartRepeat
   exercise:
-    prompt: 6단계. repeat 차트 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. repeat 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartRepeat = alt.Chart(iris).mark_point().encode(
           alt.X(alt.repeat('column'), type='quantitative'),
@@ -316,17 +316,17 @@ sections:
       )
       chartRepeat
     hints:
-    - 6단계. repeat 차트 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. repeat 차트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. repeat 차트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. repeat 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. repeat 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_repeat_linked
   title: 7단계. repeat + 연결 브러싱
   structuredPrimary: true
   subtitle: 그리드 전체 연동
   goal: 7단계. repeat + 연결 브러싱에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: repeat 차트에도 연결된 브러싱을 적용할 수 있습니다. add_params(brush)를 추가하면 모든 패널에서 동일한 선택이 공유됩니다. 한 패널에서
     드래그하면 모든 패널이 동시에 연동되어 해당 데이터가 강조됩니다. 여러 변수 조합을 동시에 탐색할 때 매우 유용합니다.
   tips:
@@ -347,7 +347,7 @@ sections:
     )
     chartRepeatLinked
   exercise:
-    prompt: 7단계. repeat + 연결 브러싱 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. repeat + 연결 브러싱 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       brushRepeat = alt.selection_interval(name='repeatBrush')
 
@@ -364,17 +364,17 @@ sections:
       )
       chartRepeatLinked
     hints:
-    - 7단계. repeat + 연결 브러싱 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. repeat + 연결 브러싱 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. repeat + 연결 브러싱에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. repeat + 연결 브러싱의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. repeat + 연결 브러싱의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_scatter_matrix
   title: 8단계. 산점도 매트릭스
   structuredPrimary: true
   subtitle: SPLOM
   goal: 8단계. 산점도 매트릭스에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 같은 변수 리스트를 row와 column에 지정하면 산점도 매트릭스(SPLOM, Scatterplot Matrix)가 됩니다. 4개 변수를 지정하면 4×4=16개
     패널이 생성됩니다. 대각선은 같은 변수끼리의 조합이므로 점들이 일직선에 놓입니다. 나머지 패널에서는 모든 변수 쌍의 상관관계를 한눈에 파악할 수 있어 탐색적 데이터 분석에 유용합니다.
   tips:
@@ -397,7 +397,7 @@ sections:
     )
     chartMatrix
   exercise:
-    prompt: 8단계. 산점도 매트릭스 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 산점도 매트릭스 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       brushMatrix = alt.selection_interval(name='matrixBrush')
       variables = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
@@ -416,17 +416,17 @@ sections:
       )
       chartMatrix
     hints:
-    - 8단계. 산점도 매트릭스 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 산점도 매트릭스 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 산점도 매트릭스에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 산점도 매트릭스의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 산점도 매트릭스의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 다중 뷰 대시보드
   goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지 배운 모든 개념을 종합해 다중 뷰 대시보드를 완성합니다. 산점도와 막대 차트를 조합하고 연결된 브러싱을 적용합니다.
 
@@ -460,7 +460,7 @@ sections:
     chartFinal = scatterFinal & barFinal
     chartFinal
   exercise:
-    prompt: 9단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       brushFinal = alt.selection_interval(name='finalBrush')
 
@@ -488,17 +488,17 @@ sections:
       chartFinal = scatterFinal & barFinal
       chartFinal
     hints:
-    - 9단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 다중 뷰 프로젝트
   goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리하면: | 연산자로 가로 배치, & 연산자로 세로 배치, 괄호로 그리드 레이아웃, 같은 selection 변수를 공유해 차트 연동, repeat()로 변수 조합 자동화, alt.repeat()로 변수 참조입니다. 이제 배운 개념들을 조합해 다중 뷰 차트를 만들어봅시다.
 
@@ -512,7 +512,7 @@ sections:
     flower = loadLocalDataset("iris")
     brushLen = alt.selection_interval(name='lengthBrush')
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -520,11 +520,11 @@ sections:
       flower = loadLocalDataset("iris")
       brushLen = alt.selection_interval(name='lengthBrush')
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -540,12 +540,14 @@ sections:
     - 같은 selection 공유 - 연결된 브러싱
   - type: text
     content: 다음 프로젝트에서는 고급 데이터 변환 기법을 배웁니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
 - id: workflow_validation
   title: 10단계. 다중 뷰 연결 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 10단계. 다중 뷰 연결 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     다중 뷰는 한 차트의 선택이 다른 차트와 연결되는 구조입니다. concat 구조와 selection parameter가 spec에 남는지 확인해야 합니다.
 
@@ -564,7 +566,7 @@ sections:
     assert irisFlow["species"].nunique() == 3
     assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()
   exercise:
-    prompt: 10단계. 다중 뷰 연결 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 다중 뷰 연결 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -577,8 +579,8 @@ sections:
       assert irisFlow["species"].nunique() == 3
       assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()
     hints:
-    - 10단계. 다중 뷰 연결 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 다중 뷰 연결 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 다중 뷰 연결 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 다중 뷰 연결 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 다중 뷰 연결 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

@@ -52,7 +52,7 @@ intro:
     - label: 배열 계산 환경
       detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 심장병위험분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
     - label: 심장병위험분석 완료
       detail: 검증된 코드를 계산 파이프라인로 남깁니다.
 sections:
@@ -61,7 +61,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -69,22 +69,22 @@ sections:
     import numpy as np
     import pandas as pd
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: 심장병 데이터셋
   goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: UCI(캘리포니아 대학교)에서 제공하는 유명한 심장병 데이터셋입니다. 303명의 환자 데이터가 있으며, 콜레스테롤(chol, 혈중 지방 수치), 안정 시 혈압(trestbps),
     최대 심박수(thalach) 등 건강 지표와 함께 심장병 유무(target, 1이면 심장병 있음)가 기록되어 있습니다.
   tips:
@@ -95,18 +95,18 @@ sections:
     df = loadLocalDataset("heart")
     df.head()
   exercise:
-    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       df = loadLocalDataset("heart")
       df.head()
     hints:
-    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_columns
   title: 3단계. 컬럼 확인
   structuredPrimary: true
@@ -118,20 +118,20 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: df.columns.tolist()
   exercise:
-    prompt: 3단계. 컬럼 확인 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 컬럼 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: df.columns.tolist()
     hints:
-    - 3단계. 컬럼 확인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. 컬럼 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 컬럼 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 컬럼 확인의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 컬럼 확인 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step4_extract
   title: 4단계. 배열 추출
   structuredPrimary: true
   subtitle: 주요 변수
   goal: 4단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 주요 수치형 변수들을 NumPy 배열로 추출합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -143,7 +143,7 @@ sections:
     target = df['target'].values
     age.shape
   exercise:
-    prompt: 4단계. 배열 추출 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       age = df['age'].values
       chol = df['chol'].values
@@ -152,17 +152,17 @@ sections:
       target = df['target'].values
       age.shape
     hints:
-    - 4단계. 배열 추출 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. 배열 추출 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 배열 추출에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 배열 추출에서 `age` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 배열 추출 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_concat_1d
   title: 5단계. 1차원 배열 결합
   structuredPrimary: true
   subtitle: np.concatenate()
   goal: 5단계. 1차원 배열 결합에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     concatenate(연결하다)는 여러 배열을 하나로 이어붙이는 함수입니다. 기차 객차를 연결하듯이 배열들을 순서대로 붙입니다. 예를 들어 [1,2,3]과 [4,5]를 concatenate하면 [1,2,3,4,5]가 됩니다. 여러 소스의 데이터를 하나로 합칠 때 유용합니다.
 
@@ -173,22 +173,22 @@ sections:
     concat = np.concatenate([age, chol])
     concat.shape
   exercise:
-    prompt: 5단계. 1차원 배열 결합 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 1차원 배열 결합 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       concat = np.concatenate([age, chol])
       concat.shape
     hints:
-    - 5단계. 1차원 배열 결합 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 1차원 배열 결합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 1차원 배열 결합에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 1차원 배열 결합에서 `concat` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 1차원 배열 결합 실행 뒤 `concat` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step6_concat_2d
   title: 6단계. 2차원 열 결합
   structuredPrimary: true
   subtitle: axis=1
   goal: 6단계. 2차원 열 결합에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     여러 변수를 열로 나란히 붙여 2차원 테이블을 만듭니다. 각 1차원 배열을 reshape(-1, 1)로 열 벡터로 바꾼 뒤, axis=1(열 방향)로 결합합니다. -1은 '나머지 크기는 자동 계산해줘'라는 의미입니다. 결과적으로 303명 × 3개 변수의 테이블이 만들어집니다.
 
@@ -202,7 +202,7 @@ sections:
     features = np.concatenate([c1, c2, c3], axis=1)
     features.shape
   exercise:
-    prompt: 6단계. 2차원 열 결합 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 2차원 열 결합 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       c1 = age.reshape(-1, 1)
       c2 = chol.reshape(-1, 1)
@@ -210,17 +210,17 @@ sections:
       features = np.concatenate([c1, c2, c3], axis=1)
       features.shape
     hints:
-    - 6단계. 2차원 열 결합 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 2차원 열 결합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 2차원 열 결합에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 2차원 열 결합에서 `c1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 2차원 열 결합 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_vstack_hstack
   title: 7단계. vstack과 column_stack
   structuredPrimary: true
   subtitle: 편리한 결합
   goal: 7단계. vstack과 columnstack에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     vstack, hstack, column_stack은 concatenate보다 직관적인 결합 함수입니다. vstack은 vertical(수직) stack으로 배열들을 위아래로 쌓고, hstack은 horizontal(수평) stack으로 좌우로 붙입니다. column_stack은 1차원 배열들을 각각 하나의 열로 만들어 옆으로 붙여줍니다.
 
@@ -231,22 +231,22 @@ sections:
     v = np.vstack([age, chol, bp])
     v.shape
   exercise:
-    prompt: 7단계. vstack과 columnstack 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. vstack과 columnstack 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       v = np.vstack([age, chol, bp])
       v.shape
     hints:
-    - 7단계. vstack과 columnstack 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. vstack과 columnstack 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. vstack과 columnstack에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. vstack과 columnstack에서 `v` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. vstack과 columnstack 실행 뒤 `v` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step8_group_compare
   title: 8단계. 그룹별 비교
   structuredPrimary: true
   subtitle: 심장병 유무
   goal: 8단계. 그룹별 비교에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 심장병 유무(target)에 따른 평균 나이를 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -255,23 +255,23 @@ sections:
     well = target == 0
     f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
   exercise:
-    prompt: 8단계. 그룹별 비교 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 그룹별 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       sick = target == 1
       well = target == 0
       f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
     hints:
-    - 8단계. 그룹별 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 그룹별 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 그룹별 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 그룹별 비교에서 `sick` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 그룹별 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_any_all
   title: 9단계. any와 all
   structuredPrimary: true
   subtitle: 조건 검사
   goal: 9단계. any와 all에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     any()는 '하나라도 있으면 True', all()은 '전부 다 그래야 True'입니다. 예를 들어 np.any(chol > 240)은 콜레스테롤 240 초과인 환자가 한 명이라도 있는지 확인합니다. np.all(bp < 180)은 모든 환자의 혈압이 180 미만인지 검사합니다. 데이터 전체에 대한 조건 검증에 유용합니다.
 
@@ -285,7 +285,7 @@ sections:
     all1 = np.all(bp < 180)
     f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
   exercise:
-    prompt: 9단계. any와 all 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. any와 all 예제에서 `hi1`, `hi2`, `any1` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       hi1 = chol > 240
       hi2 = bp > 140
@@ -293,17 +293,17 @@ sections:
       all1 = np.all(bp < 180)
       f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
     hints:
-    - 9단계. any와 all 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `hi1 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `hi1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 9단계. any와 all 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. any와 all에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. any와 all에서 `hi1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. any와 all 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_any_axis
   title: 10단계. 행별 any/all
   structuredPrimary: true
   subtitle: axis=1
   goal: 10단계. 행별 any/all에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     각 환자별로 위험 요인이 있는지 확인합니다.
 
@@ -316,24 +316,24 @@ sections:
     all2 = np.all(risks, axis=1)
     f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
   exercise:
-    prompt: 10단계. 행별 any/all 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 행별 any/all 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       risks = np.column_stack([hi1, hi2, age > 60])
       any2 = np.any(risks, axis=1)
       all2 = np.all(risks, axis=1)
       f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
     hints:
-    - 10단계. 행별 any/all 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 10단계. 행별 any/all 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 행별 any/all에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 행별 any/all에서 `risks` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 행별 any/all 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step11_sort
   title: 11단계. 정렬
   structuredPrimary: true
   subtitle: np.sort()
   goal: 11단계. 정렬에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     나이순으로 데이터를 정렬합니다.
 
@@ -344,22 +344,22 @@ sections:
     sorted_ = np.sort(age)
     sorted_[:10]
   exercise:
-    prompt: 11단계. 정렬 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 정렬 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       sorted_ = np.sort(age)
       sorted_[:10]
     hints:
-    - 11단계. 정렬 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 11단계. 정렬 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 정렬에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 11단계. 정렬에서 `sorted_` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 정렬 실행 뒤 `sorted_` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step12_argsort
   title: 12단계. 정렬 인덱스
   structuredPrimary: true
   subtitle: np.argsort()
   goal: 12단계. 정렬 인덱스에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     argsort로 정렬 인덱스를 얻어 다른 배열도 같이 정렬합니다.
 
@@ -372,24 +372,24 @@ sections:
     arr2 = chol[order]
     pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
   exercise:
-    prompt: 12단계. 정렬 인덱스 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 정렬 인덱스 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       order = np.argsort(age)
       arr1 = age[order]
       arr2 = chol[order]
       pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
     hints:
-    - 12단계. 정렬 인덱스 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 12단계. 정렬 인덱스 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 정렬 인덱스에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 정렬 인덱스의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 정렬 인덱스의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step13_top10
   title: 13단계. 상위 N개 추출
   structuredPrimary: true
   subtitle: 내림차순
   goal: 13단계. 상위 N개 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 콜레스테롤 기준 상위 10명을 찾습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -402,7 +402,7 @@ sections:
         'HeartDisease': target[top]
     })
   exercise:
-    prompt: 13단계. 상위 N개 추출 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 13단계. 상위 N개 추출 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       idx = np.argsort(chol)[::-1]
       top = idx[:10]
@@ -412,17 +412,17 @@ sections:
           'HeartDisease': target[top]
       })
     hints:
-    - 13단계. 상위 N개 추출 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 13단계. 상위 N개 추출 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 13단계. 상위 N개 추출에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 13단계. 상위 N개 추출의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 상위 N개 추출의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step14_cumsum
   title: 14단계. 누적합
   structuredPrimary: true
   subtitle: np.cumsum()
   goal: 14단계. 누적합에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     cumsum(cumulative sum, 누적합)은 배열의 값을 순서대로 더해가는 함수입니다. [1,2,3]의 cumsum은 [1, 1+2, 1+2+3] = [1, 3, 6]입니다. 나이순 정렬된 심장병 유무(1 또는 0) 데이터에 cumsum을 적용하면, 각 나이까지 심장병 환자가 몇 명인지 누적 수를 볼 수 있습니다.
 
@@ -434,23 +434,23 @@ sections:
     cumsum = np.cumsum(t)
     cumsum[:20]
   exercise:
-    prompt: 14단계. 누적합 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 14단계. 누적합 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       t = target[order]
       cumsum = np.cumsum(t)
       cumsum[:20]
     hints:
-    - 14단계. 누적합 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 14단계. 누적합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 14단계. 누적합에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 14단계. 누적합에서 `t` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 14단계. 누적합 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step15_risk_score
   title: 15단계. 위험 점수 분석
   structuredPrimary: true
   subtitle: 종합 분석
   goal: 15단계. 위험 점수 분석에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 여러 위험 요인을 종합한 점수를 만들어 분석합니다. 불리언 배열에 .astype(int)를 적용하면 True는 1, False는 0으로 변환됩니다. 콜레스테롤
     > 200, 혈압 > 130, 나이 > 55 세 가지 조건을 더하면 0~3점의 위험 점수가 됩니다. 점수가 높을수록 심장병 발생률이 높아지는지 확인할 수 있습니다.
   tips:
@@ -465,7 +465,7 @@ sections:
         rows.append([r, np.sum(mask), round(rate * 100, 1)])
     pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
   exercise:
-    prompt: 15단계. 위험 점수 분석 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 15단계. 위험 점수 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
       levels, counts = np.unique(score, return_counts=True)
@@ -476,17 +476,17 @@ sections:
           rows.append([r, np.sum(mask), round(rate * 100, 1)])
       pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
     hints:
-    - 15단계. 위험 점수 분석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 15단계. 위험 점수 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 15단계. 위험 점수 분석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 15단계. 위험 점수 분석의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 15단계. 위험 점수 분석 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 심장병 위험 점수 배치 계산'
   structuredPrimary: true
   subtitle: 조건 배열, 정렬, cumsum, 실패 케이스
   goal: '현업 흐름 검증: 심장병 위험 점수 배치 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     위험 점수는 조건을 많이 더하는 만큼 기준을 잘못 잡기 쉽습니다. 각 조건 배열을 분리해 예측하고, 정렬 후 누적 환자 수가 의도대로 계산되는지 검증하세요.
 
@@ -510,7 +510,7 @@ sections:
     assert age[order].tolist() == [39, 45, 58, 62]
     assert cumulativeDisease.tolist() == [0, 0, 1, 2]
   exercise:
-    prompt: '현업 흐름 검증: 심장병 위험 점수 배치 계산 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 심장병 위험 점수 배치 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import numpy as np
 
@@ -527,17 +527,17 @@ sections:
       assert age[order].tolist() == [39, 45, 58, 62]
       assert cumulativeDisease.tolist() == [0, 0, 1, 2]
     hints:
-    - '현업 흐름 검증: 심장병 위험 점수 배치 계산 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 심장병 위험 점수 배치 계산 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 심장병 위험 점수 배치 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 심장병 위험 점수 배치 계산의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 심장병 위험 점수 배치 계산의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 심장병 위험 분석
   goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -565,7 +565,7 @@ sections:
     hr = data['thalach'].values
     target = data['target'].values
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
@@ -587,8 +587,8 @@ sections:
       hr = data['thalach'].values
       target = data['target'].values
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

@@ -46,7 +46,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: GeoJSON 활용 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: GeoJSON 활용 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -55,26 +55,26 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import folium
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_geojson_structure
   title: 2단계. GeoJSON 구조
   structuredPrimary: true
   subtitle: 기본 형식
   goal: 2단계. GeoJSON 구조에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     GeoJSON은 type, geometry, properties로 구성됩니다. geometry에 좌표 정보가 있고, properties에 속성 정보가 있습니다.
 
@@ -94,7 +94,7 @@ sections:
     }
     pointGeo
   exercise:
-    prompt: 2단계. GeoJSON 구조 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. GeoJSON 구조 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       pointGeo = {
           "type": "Feature",
@@ -108,17 +108,17 @@ sections:
       }
       pointGeo
     hints:
-    - 2단계. GeoJSON 구조 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. GeoJSON 구조 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. GeoJSON 구조에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. GeoJSON 구조에서 `pointGeo` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. GeoJSON 구조 실행 뒤 `pointGeo` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step3_polygon_geojson
   title: 3단계. 폴리곤 GeoJSON
   structuredPrimary: true
   subtitle: 영역 데이터
   goal: 3단계. 폴리곤 GeoJSON에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Polygon 타입으로 영역을 표현합니다. 좌표 리스트의 리스트 형태이고, 시작점과 끝점이 같아야 합니다.
 
@@ -150,7 +150,7 @@ sections:
 
     m1
   exercise:
-    prompt: 3단계. 폴리곤 GeoJSON 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 폴리곤 GeoJSON 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -176,17 +176,17 @@ sections:
 
       m1
     hints:
-    - 3단계. 폴리곤 GeoJSON 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 폴리곤 GeoJSON 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 폴리곤 GeoJSON에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 폴리곤 GeoJSON에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 폴리곤 GeoJSON 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_feature_collection
   title: 4단계. FeatureCollection
   structuredPrimary: true
   subtitle: 여러 도형 묶기
   goal: 4단계. FeatureCollection에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     FeatureCollection으로 여러 Feature를 하나로 묶습니다. 대부분의 GeoJSON 파일은 이 형태입니다.
 
@@ -248,7 +248,7 @@ sections:
 
     m2
   exercise:
-    prompt: 4단계. FeatureCollection 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. FeatureCollection 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -304,17 +304,17 @@ sections:
 
       m2
     hints:
-    - 4단계. FeatureCollection 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. FeatureCollection 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. FeatureCollection에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. FeatureCollection에서 `m2` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. FeatureCollection 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_style_function
   title: 5단계. 스타일 함수
   structuredPrimary: true
   subtitle: style_function
   goal: 5단계. 스타일 함수에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     style_function으로 GeoJSON 요소의 스타일을 지정합니다. 함수는 feature를 받아 스타일 딕셔너리를 반환합니다.
 
@@ -339,7 +339,7 @@ sections:
 
     m3
   exercise:
-    prompt: 5단계. 스타일 함수 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 스타일 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -358,17 +358,17 @@ sections:
 
       m3
     hints:
-    - 5단계. 스타일 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 5단계. 스타일 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 스타일 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 5단계. 스타일 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 5단계. 스타일 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step6_popup_tooltip
   title: 6단계. 팝업과 툴팁
   structuredPrimary: true
   subtitle: GeoJsonPopup, GeoJsonTooltip
   goal: 6단계. 팝업과 툴팁에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     GeoJsonPopup과 GeoJsonTooltip으로 클릭/호버 시 정보를 표시합니다. fields에 표시할 속성을 지정합니다.
 
@@ -386,7 +386,7 @@ sections:
 
     m5
   exercise:
-    prompt: 6단계. 팝업과 툴팁 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 팝업과 툴팁 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -398,17 +398,17 @@ sections:
 
       m5
     hints:
-    - 6단계. 팝업과 툴팁 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 팝업과 툴팁 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 팝업과 툴팁에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 팝업과 툴팁에서 `m5` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 팝업과 툴팁 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_highlight
   title: 7단계. 하이라이트 효과
   structuredPrimary: true
   subtitle: highlight_function
   goal: 7단계. 하이라이트 효과에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     highlight_function으로 마우스 호버 시 스타일을 변경합니다.
 
@@ -443,7 +443,7 @@ sections:
 
     m7
   exercise:
-    prompt: 7단계. 하이라이트 효과 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 하이라이트 효과 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -472,17 +472,17 @@ sections:
 
       m7
     hints:
-    - 7단계. 하이라이트 효과 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 하이라이트 효과 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 하이라이트 효과에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 하이라이트 효과의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 7단계. 하이라이트 효과 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step8_line_geojson
   title: 8단계. 라인 GeoJSON
   structuredPrimary: true
   subtitle: LineString
   goal: 8단계. 라인 GeoJSON에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     LineString 타입으로 선(경로, 도로)을 표현합니다.
 
@@ -521,7 +521,7 @@ sections:
 
     m8
   exercise:
-    prompt: 8단계. 라인 GeoJSON 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 라인 GeoJSON 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
 
@@ -554,17 +554,17 @@ sections:
 
       m8
     hints:
-    - 8단계. 라인 GeoJSON 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 라인 GeoJSON 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 라인 GeoJSON에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 라인 GeoJSON에서 `m8` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 라인 GeoJSON 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_seoul_gu
   title: 9단계. 서울 구 경계 예제
   structuredPrimary: true
   subtitle: 행정구역
   goal: 9단계. 서울 구 경계 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     서울의 구 경계를 간단한 GeoJSON으로 표현합니다.
 
@@ -642,7 +642,7 @@ sections:
 
     m9
   exercise:
-    prompt: 9단계. 서울 구 경계 예제 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 서울 구 경계 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
 
@@ -714,17 +714,17 @@ sections:
 
       m9
     hints:
-    - 9단계. 서울 구 경계 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 9단계. 서울 구 경계 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 서울 구 경계 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 9단계. 서울 구 경계 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 9단계. 서울 구 경계 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 구역별 정보 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: GeoJSON으로 구역을 표시하고 스타일, 팝업, 하이라이트를 모두 적용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -819,7 +819,7 @@ sections:
 
     zoneMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
 
@@ -911,17 +911,17 @@ sections:
 
       zoneMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 10단계. 완성 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step11_workflow
   title: 11단계. GeoJSON 경계 데이터 검증
   structuredPrimary: true
   subtitle: 좌표 순서와 속성 누락 확인
   goal: 11단계. GeoJSON 경계 데이터 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     GeoJSON 업무에서 가장 흔한 오류는 지도가 안 그려지는 문제가 아니라, 그럴듯하게 그려졌지만 좌표 순서나 속성 키가 틀린 상태입니다. 실행 전에 [경도, 위도] 순서를 예측하고, 폴리곤이 닫혔는지, 필수 속성이 있는지 검증해야 합니다.
 
@@ -966,7 +966,7 @@ sections:
     requiredProperties = {"zoneId", "name", "slaMinutes"}
     len(deliveryZonesGeo["features"]), requiredProperties
   exercise:
-    prompt: 11단계. GeoJSON 경계 데이터 검증 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. GeoJSON 경계 데이터 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       deliveryZonesGeo = {
           "type": "FeatureCollection",
@@ -1005,17 +1005,17 @@ sections:
       requiredProperties = {"zoneId", "name", "slaMinutes"}
       len(deliveryZonesGeo["features"]), requiredProperties
     hints:
-    - 11단계. GeoJSON 경계 데이터 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 11단계. GeoJSON 경계 데이터 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. GeoJSON 경계 데이터 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 11단계. GeoJSON 경계 데이터 검증에서 `deliveryZonesGeo` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. GeoJSON 경계 데이터 검증 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: GeoJSON 활용
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -1056,7 +1056,7 @@ sections:
     }
     deliveryZones
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       deliveryZones = {
@@ -1094,8 +1094,8 @@ sections:
       }
       deliveryZones
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `deliveryZones` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `deliveryZones` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.

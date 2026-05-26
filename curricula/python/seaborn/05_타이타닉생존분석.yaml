@@ -50,7 +50,7 @@ intro:
     - label: 통계 시각화 환경
       detail: matplotlib, numpy, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 타이타닉생존분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
     - label: 타이타닉생존분석 완료
       detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: seaborn과 matplotlib을 불러옵니다. titanic 데이터는 1912년 타이타닉호 침몰 사고의 승객 정보입니다. 생존 여부, 객실 등급, 성별,
     나이 등이 기록되어 있어 생존율 분석에 적합합니다.
   tips:
@@ -69,23 +69,23 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: titanic 데이터셋
   goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: titanic 데이터셋은 891명의 승객 정보입니다. survived(생존:1, 사망:0), pclass(객실등급:1,2,3), sex(성별), age(나이),
     sibsp(형제/배우자 수), parch(부모/자녀 수), fare(요금), embarked(탑승항) 등의 컬럼이 있습니다.
   tips:
@@ -96,24 +96,24 @@ sections:
     titanic = loadLocalDataset('titanic')
     titanic.head()
   exercise:
-    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       titanic = loadLocalDataset('titanic')
       titanic.head()
     hints:
-    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_countplot
   title: 3단계. 카운트 플롯
   structuredPrimary: true
   subtitle: countplot()
   goal: 3단계. 카운트 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     countplot()은 범주형 변수의 빈도를 막대 그래프로 표시합니다. 각 카테고리에 몇 개의 데이터가 있는지 한눈에 파악할 수 있습니다. 객실 등급별 승객 수를 확인해봅니다.
 
@@ -129,7 +129,7 @@ sections:
     ax.set_ylabel('Count')
     fig
   exercise:
-    prompt: 3단계. 카운트 플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 카운트 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(8, 6))
       sns.countplot(data=titanic, x='pclass', ax=ax)
@@ -138,17 +138,17 @@ sections:
       ax.set_ylabel('Count')
       fig
     hints:
-    - 3단계. 카운트 플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 카운트 플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 카운트 플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 카운트 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 카운트 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step4_countplot_hue
   title: 4단계. countplot + hue
   structuredPrimary: true
   subtitle: 생존 여부 구분
   goal: 4단계. countplot + hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: hue 파라미터로 생존 여부를 색상으로 구분합니다. 각 등급에서 생존자와 사망자의 비율을 시각적으로 비교할 수 있습니다. 1등급 승객이 3등급보다 생존율이
     높은 것을 볼 수 있습니다.
   tips:
@@ -162,7 +162,7 @@ sections:
     axHue.legend(title='Survived', labels=['No', 'Yes'])
     figHue
   exercise:
-    prompt: 4단계. countplot + hue 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. countplot + hue 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHue, axHue = plt.subplots(figsize=(8, 6))
       sns.countplot(data=titanic, x='pclass', hue='survived', palette='Set2', ax=axHue)
@@ -172,17 +172,17 @@ sections:
       axHue.legend(title='Survived', labels=['No', 'Yes'])
       figHue
     hints:
-    - 4단계. countplot + hue 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. countplot + hue 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. countplot + hue에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. countplot + hue의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. countplot + hue 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step5_barplot
   title: 5단계. 막대 그래프
   structuredPrimary: true
   subtitle: barplot()
   goal: 5단계. 막대 그래프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     barplot()은 범주별 평균값과 신뢰구간을 표시합니다. countplot이 개수를 세는 것과 달리, barplot은 연속형 변수의 통계량을 계산합니다. 등급별 평균 생존율을 확인해봅니다. survived는 0과 1이므로 평균이 곧 생존율입니다.
 
@@ -198,7 +198,7 @@ sections:
     axBar.set_ylabel('Survival Rate')
     figBar
   exercise:
-    prompt: 5단계. 막대 그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 막대 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figBar, axBar = plt.subplots(figsize=(8, 6))
       sns.barplot(data=titanic, x='pclass', y='survived', ax=axBar)
@@ -207,17 +207,17 @@ sections:
       axBar.set_ylabel('Survival Rate')
       figBar
     hints:
-    - 5단계. 막대 그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 막대 그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 막대 그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 막대 그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 막대 그래프 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step6_barplot_hue
   title: 6단계. barplot + hue
   structuredPrimary: true
   subtitle: 성별 추가
   goal: 6단계. barplot + hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: hue로 성별을 추가하면 등급과 성별의 교차 효과를 확인할 수 있습니다. 모든 등급에서 여성의 생존율이 남성보다 높은 것을 볼 수 있습니다. "여성과 어린이
     먼저" 원칙이 적용된 것으로 해석됩니다.
   tips:
@@ -231,7 +231,7 @@ sections:
     axSex.legend(title='Sex')
     figSex
   exercise:
-    prompt: 6단계. barplot + hue 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. barplot + hue 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figSex, axSex = plt.subplots(figsize=(10, 6))
       sns.barplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axSex)
@@ -241,17 +241,17 @@ sections:
       axSex.legend(title='Sex')
       figSex
     hints:
-    - 6단계. barplot + hue 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. barplot + hue 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. barplot + hue에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. barplot + hue의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. barplot + hue 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step7_estimator
   title: 7단계. estimator 변경
   structuredPrimary: true
   subtitle: 통계량 커스터마이징
   goal: 7단계. estimator 변경에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     estimator 파라미터로 평균 대신 다른 통계량을 사용할 수 있습니다. sum, median, count 등을 지정할 수 있습니다. errorbar 파라미터로 신뢰구간 대신 표준편차(sd)나 표준오차(se)를 표시할 수 있습니다.
 
@@ -275,7 +275,7 @@ sections:
     plt.tight_layout()
     figEst
   exercise:
-    prompt: 7단계. estimator 변경 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. estimator 변경 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       import numpy as np
 
@@ -292,17 +292,17 @@ sections:
       plt.tight_layout()
       figEst
     hints:
-    - 7단계. estimator 변경 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. estimator 변경 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. estimator 변경에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. estimator 변경의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. estimator 변경 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step8_pointplot
   title: 8단계. 포인트 플롯
   structuredPrimary: true
   subtitle: pointplot()
   goal: 8단계. 포인트 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     pointplot()은 barplot과 같은 통계량을 점과 선으로 표시합니다. 여러 그룹의 추세를 비교하기 좋습니다. 선으로 연결되어 있어 패턴을 파악하기 쉽습니다.
 
@@ -318,7 +318,7 @@ sections:
     axPoint.set_ylabel('Survival Rate')
     figPoint
   exercise:
-    prompt: 8단계. 포인트 플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 포인트 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figPoint, axPoint = plt.subplots(figsize=(10, 6))
       sns.pointplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axPoint)
@@ -327,17 +327,17 @@ sections:
       axPoint.set_ylabel('Survival Rate')
       figPoint
     hints:
-    - 8단계. 포인트 플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 포인트 플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 포인트 플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 포인트 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 포인트 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step9_catplot
   title: 9단계. catplot 다중 패널
   structuredPrimary: true
   subtitle: Figure-level 함수
   goal: 9단계. catplot 다중 패널에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     catplot()은 Figure-level 함수로, col과 row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. kind 파라미터로 strip, swarm, box, violin, bar, count, point 중 선택합니다. 탑승항별로 패널을 분할해봅니다.
 
@@ -352,7 +352,7 @@ sections:
     catEmbarked.set_titles('Embarked: {col_name}')
     catEmbarked.figure
   exercise:
-    prompt: 9단계. catplot 다중 패널 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. catplot 다중 패널 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       catEmbarked = sns.catplot(data=titanic, x='pclass', y='survived', hue='sex',
                       col='embarked', kind='bar', palette='Set1', height=4, aspect=1)
@@ -360,17 +360,17 @@ sections:
       catEmbarked.set_titles('Embarked: {col_name}')
       catEmbarked.figure
     hints:
-    - 9단계. catplot 다중 패널 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. catplot 다중 패널 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. catplot 다중 패널에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. catplot 다중 패널의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. catplot 다중 패널의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_catplot_count
   title: 10단계. catplot count
   structuredPrimary: true
   subtitle: 빈도 다중 패널
   goal: 10단계. catplot count에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: catplot에서 kind='count'를 사용하면 countplot의 다중 패널 버전을 만들 수 있습니다. 성별로 패널을 분할하여 남녀 승객의 등급별 분포를
     비교합니다.
   tips:
@@ -382,7 +382,7 @@ sections:
     catSex.set_titles('{col_name}')
     catSex.figure
   exercise:
-    prompt: 10단계. catplot count 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. catplot count 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       catSex = sns.catplot(data=titanic, x='pclass', hue='survived',
                       col='sex', kind='count', palette='Set2', height=4, aspect=1.2)
@@ -390,17 +390,17 @@ sections:
       catSex.set_titles('{col_name}')
       catSex.figure
     hints:
-    - 10단계. catplot count 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. catplot count 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. catplot count에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. catplot count의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. catplot count의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step11_final
   title: 11단계. 최종 분석 대시보드
   structuredPrimary: true
   subtitle: 종합 시각화
   goal: 11단계. 최종 분석 대시보드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 타이타닉 생존 분석 대시보드를 완성합니다. countplot, barplot, pointplot, boxplot을 조합하여
     다양한 관점에서 데이터를 분석합니다.
   tips:
@@ -424,7 +424,7 @@ sections:
     plt.tight_layout()
     figFinal
   exercise:
-    prompt: 11단계. 최종 분석 대시보드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 최종 분석 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
 
@@ -444,17 +444,17 @@ sections:
       plt.tight_layout()
       figFinal
     hints:
-    - 11단계. 최종 분석 대시보드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 최종 분석 대시보드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 최종 분석 대시보드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 최종 분석 대시보드의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 11단계. 최종 분석 대시보드 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 범주형 분석 프로젝트
   goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 barplot, countplot, pointplot, catplot을 활용해서 다양한 범주형 분석을 해봅시다.
 
@@ -468,7 +468,7 @@ sections:
 
     data = loadLocalDataset('tips')
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -476,11 +476,11 @@ sections:
 
       data = loadLocalDataset('tips')
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -496,12 +496,14 @@ sections:
     - sns.catplot() - Figure-level, col/row로 다중 패널
   - type: text
     content: 다음 시간에는 heatmap과 lineplot으로 항공편 시계열을 분석합니다.
+  goal: 정리에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: workflow_validation
   title: 12단계. 생존율 비교 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
   goal: 12단계. 생존율 비교 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     범주형 차트는 집단별 비율을 빠르게 보여 줍니다. 하지만 생존 여부가 0/1인지, 집단 표본이 충분한지 확인한 뒤에야 barplot 해석이 안전합니다.
 
@@ -522,7 +524,7 @@ sections:
     assert survivalBySex["female"] > survivalBySex["male"]
     survivalBySex.round(2)
   exercise:
-    prompt: 12단계. 생존율 비교 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 생존율 비교 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -537,8 +539,8 @@ sections:
       assert survivalBySex["female"] > survivalBySex["male"]
       survivalBySex.round(2)
     hints:
-    - 12단계. 생존율 비교 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 12단계. 생존율 비교 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 생존율 비교 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 생존율 비교 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 생존율 비교 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

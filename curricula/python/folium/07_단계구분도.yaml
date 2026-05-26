@@ -47,7 +47,7 @@ intro:
     - label: 지도 시각화 환경
       detail: branca, folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 단계구분도 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 단계구분도 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -56,26 +56,26 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import folium
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_choropleth_basics
   title: 2단계. Choropleth 기본
   structuredPrimary: true
   subtitle: Choropleth()
   goal: 2단계. Choropleth 기본에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Choropleth()는 GeoJSON과 데이터를 연결하여 색상을 자동 매핑합니다. key_on으로 GeoJSON 속성을, columns로 데이터 컬럼을 지정합니다.
 
@@ -131,7 +131,7 @@ sections:
     }
     guData
   exercise:
-    prompt: 2단계. Choropleth 기본 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. Choropleth 기본 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
 
@@ -181,17 +181,17 @@ sections:
       }
       guData
     hints:
-    - 2단계. Choropleth 기본 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. Choropleth 기본 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. Choropleth 기본에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. Choropleth 기본에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. Choropleth 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_simple_choropleth
   title: 3단계. 간단한 Choropleth
   structuredPrimary: true
   subtitle: GeoJson + style_function
   goal: 3단계. 간단한 Choropleth에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     Choropleth 클래스 대신 GeoJson에 style_function을 사용하면 더 유연하게 구현할 수 있습니다.
 
@@ -227,7 +227,7 @@ sections:
 
     m1
   exercise:
-    prompt: 3단계. 간단한 Choropleth 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 간단한 Choropleth 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m1 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -257,17 +257,17 @@ sections:
 
       m1
     hints:
-    - 3단계. 간단한 Choropleth 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 3단계. 간단한 Choropleth 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 간단한 Choropleth에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 3단계. 간단한 Choropleth의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 간단한 Choropleth 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step4_color_scale
   title: 4단계. 컬러 스케일
   structuredPrimary: true
   subtitle: 연속적 색상
   goal: 4단계. 컬러 스케일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     branca 라이브러리로 연속적인 컬러 스케일을 만들 수 있습니다. Folium에 포함되어 있습니다.
 
@@ -307,7 +307,7 @@ sections:
 
     m2
   exercise:
-    prompt: 4단계. 컬러 스케일 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 컬러 스케일 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import branca.colormap as cm
 
@@ -341,17 +341,17 @@ sections:
 
       m2
     hints:
-    - 4단계. 컬러 스케일 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 4단계. 컬러 스케일 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 컬러 스케일에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 4단계. 컬러 스케일의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 4단계. 컬러 스케일 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step5_add_legend
   title: 5단계. 범례 추가
   structuredPrimary: true
   subtitle: ColorMap 범례
   goal: 5단계. 범례 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     ColorMap에 caption을 추가하고 지도에 add_to()하면 범례가 표시됩니다.
 
@@ -388,7 +388,7 @@ sections:
 
     m3
   exercise:
-    prompt: 5단계. 범례 추가 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 범례 추가 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m3 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -419,17 +419,17 @@ sections:
 
       m3
     hints:
-    - 5단계. 범례 추가 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 5단계. 범례 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 범례 추가에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 5단계. 범례 추가의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 5단계. 범례 추가 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step6_step_colormap
   title: 6단계. 단계별 컬러맵
   structuredPrimary: true
   subtitle: StepColormap
   goal: 6단계. 단계별 컬러맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     StepColormap은 구간별로 색상을 나눕니다. 연속이 아닌 이산적인 범주에 적합합니다.
 
@@ -467,7 +467,7 @@ sections:
 
     m4
   exercise:
-    prompt: 6단계. 단계별 컬러맵 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 단계별 컬러맵 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -499,17 +499,17 @@ sections:
 
       m4
     hints:
-    - 6단계. 단계별 컬러맵 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 6단계. 단계별 컬러맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 단계별 컬러맵에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 6단계. 단계별 컬러맵의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 6단계. 단계별 컬러맵 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step7_tooltip_with_value
   title: 7단계. 값 표시 툴팁
   structuredPrimary: true
   subtitle: 데이터 포함
   goal: 7단계. 값 표시 툴팁에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     툴팁에 지역명과 데이터 값을 함께 표시합니다.
 
@@ -569,7 +569,7 @@ sections:
 
     m5
   exercise:
-    prompt: 7단계. 값 표시 툴팁 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 값 표시 툴팁 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -623,17 +623,17 @@ sections:
 
       m5
     hints:
-    - 7단계. 값 표시 툴팁 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 값 표시 툴팁 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 값 표시 툴팁에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 값 표시 툴팁의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 7단계. 값 표시 툴팁 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step8_highlight
   title: 8단계. 하이라이트 효과
   structuredPrimary: true
   subtitle: 인터랙션 추가
   goal: 8단계. 하이라이트 효과에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     highlight_function으로 마우스 호버 시 강조 효과를 추가합니다.
 
@@ -682,7 +682,7 @@ sections:
 
     m6
   exercise:
-    prompt: 8단계. 하이라이트 효과 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 하이라이트 효과 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       m6 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -725,17 +725,17 @@ sections:
 
       m6
     hints:
-    - 8단계. 하이라이트 효과 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 8단계. 하이라이트 효과 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 하이라이트 효과에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 8단계. 하이라이트 효과의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 8단계. 하이라이트 효과 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step9_multi_data
   title: 9단계. 다중 데이터 시각화
   structuredPrimary: true
   subtitle: 레이어 전환
   goal: 9단계. 다중 데이터 시각화에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     여러 종류의 데이터를 레이어로 구분하고 전환할 수 있게 합니다.
 
@@ -806,7 +806,7 @@ sections:
 
     m7
   exercise:
-    prompt: 9단계. 다중 데이터 시각화 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 다중 데이터 시각화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -871,17 +871,17 @@ sections:
 
       m7
     hints:
-    - 9단계. 다중 데이터 시각화 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 9단계. 다중 데이터 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 다중 데이터 시각화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 다중 데이터 시각화에서 `m7` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 다중 데이터 시각화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 지역 통계 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 완성된 단계구분도를 만듭니다. 컬러맵, 범례, 툴팁, 하이라이트를 모두 포함합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -957,7 +957,7 @@ sections:
 
     statMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       statMap = folium.Map(
           location=[37.555, 126.98],
@@ -1030,17 +1030,17 @@ sections:
 
       statMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 10단계. 완성 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step11_workflow
   title: 11단계. 단계구분도 검증 루프
   structuredPrimary: true
   subtitle: 지역 키 매칭과 구간 해석
   goal: 11단계. 단계구분도 검증 루프에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     단계구분도는 색이 칠해진다고 끝이 아닙니다. GeoJSON의 지역 키와 데이터 키가 정확히 맞는지, 임계값을 바꾸면 어떤 지역의 등급이 달라지는지 예측하고 검증해야 실무 리포트로 쓸 수 있습니다.
 
@@ -1081,7 +1081,7 @@ sections:
     }
     complaintDensity
   exercise:
-    prompt: 11단계. 단계구분도 검증 루프 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 단계구분도 검증 루프 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       serviceGeo = {
           "type": "FeatureCollection",
@@ -1116,17 +1116,17 @@ sections:
       }
       complaintDensity
     hints:
-    - 11단계. 단계구분도 검증 루프 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 단계구분도 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 단계구분도 검증 루프에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 11단계. 단계구분도 검증 루프의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 단계구분도 검증 루프 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 단계구분도
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -1164,7 +1164,7 @@ sections:
     }
     salesGeo
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       import branca.colormap as cm
@@ -1199,8 +1199,8 @@ sections:
       }
       salesGeo
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `salesGeo` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `salesGeo` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.

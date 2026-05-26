@@ -49,7 +49,7 @@ intro:
     - label: 통계 시각화 환경
       detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 항공편승객시계열 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
     - label: 항공편승객시계열 완료
       detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: seaborn과 matplotlib을 불러옵니다. flights 데이터셋은 1949년부터 1960년까지 월별 항공 승객 수를 담고 있습니다. 총 144행(12년
     × 12개월)의 시계열 데이터입니다.
   tips:
@@ -72,7 +72,7 @@ sections:
     flights = loadLocalDataset('flights')
     flights
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -82,17 +82,17 @@ sections:
       flights = loadLocalDataset('flights')
       flights
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_lineplot
   title: 2단계. 선 그래프
   structuredPrimary: true
   subtitle: sns.lineplot()
   goal: 2단계. 선 그래프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     연도별 승객 수 추이를 선 그래프로 확인합니다. 같은 x값에 여러 y값이 있으면 평균과 신뢰구간을 표시합니다.
 
@@ -105,24 +105,24 @@ sections:
     axLine.set_title('Annual Passenger Trend')
     figLine
   exercise:
-    prompt: 2단계. 선 그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 선 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figLine, axLine = plt.subplots(figsize=(10, 5))
       sns.lineplot(data=flights, x='year', y='passengers', ax=axLine)
       axLine.set_title('Annual Passenger Trend')
       figLine
     hints:
-    - 2단계. 선 그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 선 그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 선 그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 2단계. 선 그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 선 그래프 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step3_lineplot_hue
   title: 3단계. 월별 구분 선그래프
   structuredPrimary: true
   subtitle: hue 파라미터
   goal: 3단계. 월별 구분 선그래프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 월별로 구분하여 더 자세한 추이를 확인합니다. hue로 범주를 구분하면 각 그룹별 추세를 비교할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -133,7 +133,7 @@ sections:
     axLineHue.set_title('Monthly Passenger Trend by Year')
     figLineHue
   exercise:
-    prompt: 3단계. 월별 구분 선그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 월별 구분 선그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figLineHue, axLineHue = plt.subplots(figsize=(12, 6))
       sns.lineplot(data=flights, x='year', y='passengers', hue='month', palette='tab20', ax=axLineHue)
@@ -141,17 +141,17 @@ sections:
       axLineHue.set_title('Monthly Passenger Trend by Year')
       figLineHue
     hints:
-    - 3단계. 월별 구분 선그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 월별 구분 선그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 월별 구분 선그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 월별 구분 선그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 월별 구분 선그래프 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step4_pivot
   title: 4단계. 피벗 테이블
   structuredPrimary: true
   subtitle: pivot()
   goal: 4단계. 피벗 테이블에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     히트맵을 그리기 위해 피벗 테이블로 변환합니다. 피벗은 행-열 형태로 데이터를 재구성합니다.
 
@@ -162,22 +162,22 @@ sections:
     flightsPivot = flights.pivot(index='month', columns='year', values='passengers')
     flightsPivot
   exercise:
-    prompt: 4단계. 피벗 테이블 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 피벗 테이블 예제에서 `flightsPivot` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       flightsPivot = flights.pivot(index='month', columns='year', values='passengers')
       flightsPivot
     hints:
-    - 4단계. 피벗 테이블 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `flightsPivot = ...` 오른쪽 값입니다.
+    - 실행 뒤 `flightsPivot` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. 피벗 테이블 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 피벗 테이블에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 피벗 테이블에서 `flightsPivot` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 피벗 테이블 실행 뒤 `flightsPivot` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step5_heatmap_basic
   title: 5단계. 기본 히트맵
   structuredPrimary: true
   subtitle: sns.heatmap()
   goal: 5단계. 기본 히트맵에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     기본 히트맵을 그립니다. 값이 클수록 밝은 색, 작을수록 어두운 색으로 표시됩니다.
 
@@ -190,24 +190,24 @@ sections:
     axHeat.set_title('Flight Passengers Heatmap')
     figHeat
   exercise:
-    prompt: 5단계. 기본 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 기본 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHeat, axHeat = plt.subplots(figsize=(10, 8))
       sns.heatmap(flightsPivot, ax=axHeat)
       axHeat.set_title('Flight Passengers Heatmap')
       figHeat
     hints:
-    - 5단계. 기본 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 기본 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 기본 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 기본 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 기본 히트맵 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step6_heatmap_annot
   title: 6단계. 값 표시 히트맵
   structuredPrimary: true
   subtitle: annot, fmt
   goal: 6단계. 값 표시 히트맵에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     각 셀에 값을 표시하여 정확한 숫자를 확인합니다. annot으로 값을 표시하고 fmt로 형식을 지정합니다.
 
@@ -220,24 +220,24 @@ sections:
     axHeatAnnot.set_title('Flight Passengers with Values')
     figHeatAnnot
   exercise:
-    prompt: 6단계. 값 표시 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 값 표시 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHeatAnnot, axHeatAnnot = plt.subplots(figsize=(12, 8))
       sns.heatmap(flightsPivot, annot=True, fmt='d', ax=axHeatAnnot)
       axHeatAnnot.set_title('Flight Passengers with Values')
       figHeatAnnot
     hints:
-    - 6단계. 값 표시 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 값 표시 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 값 표시 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. 값 표시 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 값 표시 히트맵 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step7_heatmap_style
   title: 7단계. 스타일 지정
   structuredPrimary: true
   subtitle: cmap, linewidths
   goal: 7단계. 스타일 지정에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     색상 팔레트를 변경하고 구분선을 추가합니다. cmap으로 색상을 지정하고 linewidths로 셀 구분선을 추가합니다.
 
@@ -250,24 +250,24 @@ sections:
     axHeatStyle.set_title('Styled Heatmap')
     figHeatStyle
   exercise:
-    prompt: 7단계. 스타일 지정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 스타일 지정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHeatStyle, axHeatStyle = plt.subplots(figsize=(12, 8))
       sns.heatmap(flightsPivot, annot=True, fmt='d', cmap='YlOrRd', linewidths=0.5, ax=axHeatStyle)
       axHeatStyle.set_title('Styled Heatmap')
       figHeatStyle
     hints:
-    - 7단계. 스타일 지정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 스타일 지정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 스타일 지정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 스타일 지정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 스타일 지정 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step8_heatmap_range
   title: 8단계. 색상 범위 지정
   structuredPrimary: true
   subtitle: vmin, vmax, center
   goal: 8단계. 색상 범위 지정에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     색상 범위를 지정하여 특정 구간을 강조합니다. center로 기준점을 설정하면 발산형 팔레트가 효과적입니다.
 
@@ -281,24 +281,24 @@ sections:
     axHeatRange.set_title('Heatmap with Custom Range')
     figHeatRange
   exercise:
-    prompt: 8단계. 색상 범위 지정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 색상 범위 지정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHeatRange, axHeatRange = plt.subplots(figsize=(12, 8))
       sns.heatmap(flightsPivot, annot=True, fmt='d', cmap='coolwarm', vmin=100, vmax=500, center=300, linewidths=0.5, ax=axHeatRange)
       axHeatRange.set_title('Heatmap with Custom Range')
       figHeatRange
     hints:
-    - 8단계. 색상 범위 지정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 색상 범위 지정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 색상 범위 지정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 색상 범위 지정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 색상 범위 지정 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step9_barplot_year
   title: 9단계. 연도별 막대그래프
   structuredPrimary: true
   subtitle: 집계 후 시각화
   goal: 9단계. 연도별 막대그래프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 연도별 총 승객 수를 막대 그래프로 비교합니다. groupby로 집계한 후 barplot으로 시각화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -309,7 +309,7 @@ sections:
     axBar.set_title('Total Passengers by Year')
     figBar
   exercise:
-    prompt: 9단계. 연도별 막대그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 연도별 막대그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       yearlyPassengers = flights.groupby('year')['passengers'].sum().reset_index()
       figBar, axBar = plt.subplots(figsize=(10, 5))
@@ -317,17 +317,17 @@ sections:
       axBar.set_title('Total Passengers by Year')
       figBar
     hints:
-    - 9단계. 연도별 막대그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 연도별 막대그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 연도별 막대그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 연도별 막대그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 연도별 막대그래프의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_barplot_month
   title: 10단계. 월별 평균
   structuredPrimary: true
   subtitle: 계절성 분석
   goal: 10단계. 월별 평균에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     월별 평균 승객 수를 비교하여 계절성을 확인합니다. barplot은 기본적으로 평균과 95% 신뢰구간을 표시합니다.
 
@@ -341,7 +341,7 @@ sections:
     axMonthly.tick_params(axis='x', rotation=45)
     figMonthly
   exercise:
-    prompt: 10단계. 월별 평균 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 월별 평균 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figMonthly, axMonthly = plt.subplots(figsize=(10, 5))
       sns.barplot(data=flights, x='month', y='passengers', hue='month', palette='coolwarm', legend=False, ax=axMonthly)
@@ -349,17 +349,17 @@ sections:
       axMonthly.tick_params(axis='x', rotation=45)
       figMonthly
     hints:
-    - 10단계. 월별 평균 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 월별 평균 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 월별 평균에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 월별 평균의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 월별 평균 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step11_corr_heatmap
   title: 11단계. 상관관계 히트맵
   structuredPrimary: true
   subtitle: corr()
   goal: 11단계. 상관관계 히트맵에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     상관관계 히트맵을 위해 월별 피벗 데이터의 상관계수를 계산합니다. 인접한 달끼리 높은 상관관계를 보입니다.
 
@@ -373,7 +373,7 @@ sections:
     axCorr.set_title('Month Correlation Heatmap')
     figCorr
   exercise:
-    prompt: 11단계. 상관관계 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 상관관계 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       monthCorr = flightsPivot.T.corr()
       figCorr, axCorr = plt.subplots(figsize=(10, 8))
@@ -381,17 +381,17 @@ sections:
       axCorr.set_title('Month Correlation Heatmap')
       figCorr
     hints:
-    - 11단계. 상관관계 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 상관관계 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 상관관계 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 상관관계 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 상관관계 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 12단계. 항공편 시계열 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
   goal: 12단계. 항공편 시계열 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     시계열 히트맵은 계절성과 장기 추세를 동시에 보여 줍니다. 월과 연도가 빠짐없이 있는지 먼저 확인하고, 피크 시즌과 성장 흐름을 검증합니다.
 
@@ -414,7 +414,7 @@ sections:
     assert lastYearTotal > firstYearTotal
     (firstYearTotal, lastYearTotal)
   exercise:
-    prompt: 12단계. 항공편 시계열 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 항공편 시계열 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -431,17 +431,17 @@ sections:
       assert lastYearTotal > firstYearTotal
       (firstYearTotal, lastYearTotal)
     hints:
-    - 12단계. 항공편 시계열 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 12단계. 항공편 시계열 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 항공편 시계열 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 항공편 시계열 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 항공편 시계열 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 시계열 시각화
   goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -456,7 +456,7 @@ sections:
     data = loadLocalDataset('tips')
     matrix = data.pivot_table(index='day', columns='time', values='total_bill', aggfunc='mean')
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -465,8 +465,8 @@ sections:
       data = loadLocalDataset('tips')
       matrix = data.pivot_table(index='day', columns='time', values='total_bill', aggfunc='mean')
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

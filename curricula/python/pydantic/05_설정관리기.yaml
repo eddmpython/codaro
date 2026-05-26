@@ -47,7 +47,7 @@ intro:
     - label: 데이터 계약 환경
       detail: pydantic, pydanticsettings 기준으로 로컬 Python 실행을 준비합니다.
     - label: 설정관리기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
     - label: 설정관리기 완료
       detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
@@ -56,7 +56,7 @@ sections:
   structuredPrimary: true
   subtitle: pydantic-settings 설치
   goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: pydantic-settings는 Pydantic V2에서 별도 패키지로 분리되었습니다. BaseSettings를 상속하면 환경변수에서 자동으로 값을 읽어오고,
     타입 힌트에 맞게 변환합니다. 환경변수 → .env 파일 → 기본값 순서로 값을 찾아 유연하게 설정을 관리할 수 있습니다.
   tips:
@@ -65,22 +65,22 @@ sections:
     import pydantic
     import pydantic_settings
   exercise:
-    prompt: 라이브러리 로드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import pydantic
       import pydantic_settings
     hints:
-    - 라이브러리 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 라이브러리 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 라이브러리 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic
   title: 기본 설정 클래스
   structuredPrimary: true
   subtitle: BaseSettings 상속
   goal: 기본 설정 클래스에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     BaseSettings를 상속한 클래스는 필드명과 같은 이름의 환경변수에서 자동으로 값을 읽습니다. 필드에 기본값을 지정하면 환경변수가 없을 때 사용됩니다. 타입 힌트에 따라 문자열 환경변수가 자동으로 int, bool 등으로 변환됩니다.
 
@@ -96,7 +96,7 @@ sections:
     settings = AppSettings()
     settings
   exercise:
-    prompt: 기본 설정 클래스 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 기본 설정 클래스 예제에서 `settings` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class AppSettings(BaseSettings):
           appName: str = "MyApp"
@@ -106,17 +106,17 @@ sections:
       settings = AppSettings()
       settings
     hints:
-    - 기본 설정 클래스 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `settings = ...` 오른쪽 값입니다.
+    - 실행 뒤 `settings` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 기본 설정 클래스 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기본 설정 클래스에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 기본 설정 클래스에서 `settings` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 설정 클래스 실행 뒤 `settings` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: environ
   title: 환경변수 연동
   structuredPrimary: true
   subtitle: os.environ 시뮬레이션
   goal: 환경변수 연동에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 실제 서버에서는 환경변수로 설정을 주입합니다. os.environ으로 환경변수를 설정하면 BaseSettings가 자동으로 읽어옵니다. 이 패턴으로 Docker,
     Kubernetes 등에서 설정을 주입할 수 있습니다.
   tips:
@@ -129,7 +129,7 @@ sections:
     prodSettings = AppSettings()
     prodSettings
   exercise:
-    prompt: 환경변수 연동 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 환경변수 연동 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       os.environ["APPNAME"] = "ProductionApp"
       os.environ["DEBUG"] = "true"
@@ -138,17 +138,17 @@ sections:
       prodSettings = AppSettings()
       prodSettings
     hints:
-    - 환경변수 연동 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 환경변수 연동 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 환경변수 연동에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 환경변수 연동에서 `prodSettings` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 환경변수 연동 실행 뒤 `prodSettings` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: prefix
   title: 환경변수 접두사
   structuredPrimary: true
   subtitle: env_prefix 설정
   goal: 환경변수 접두사에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 여러 서비스가 같은 환경에서 실행될 때 환경변수 이름 충돌을 방지하려면 접두사를 사용합니다. model_config의 env_prefix로 모든 환경변수에
     공통 접두사를 적용합니다. DB_HOST, DB_PORT처럼 의미있는 네이밍이 가능해집니다.
   tips:
@@ -169,7 +169,7 @@ sections:
     dbSettings = DbSettings()
     dbSettings
   exercise:
-    prompt: 환경변수 접두사 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 환경변수 접두사 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class DbSettings(BaseSettings):
           model_config = {"env_prefix": "DB_"}
@@ -186,17 +186,17 @@ sections:
       dbSettings = DbSettings()
       dbSettings
     hints:
-    - 환경변수 접두사 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 환경변수 접두사 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 환경변수 접두사에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 환경변수 접두사의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 환경변수 접두사의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: nested
   title: 중첩 설정
   structuredPrimary: true
   subtitle: 설정 그룹화
   goal: 중첩 설정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 복잡한 애플리케이션은 설정을 논리적으로 그룹화해야 합니다. 데이터베이스 설정, 캐시 설정, 로깅 설정 등을 별도 모델로 분리하고 메인 설정에서 조합합니다.
     중첩된 BaseModel은 JSON 환경변수로 설정할 수 있습니다.
   tips:
@@ -221,7 +221,7 @@ sections:
     fullSettings = FullSettings()
     fullSettings
   exercise:
-    prompt: 중첩 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 중첩 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class DatabaseConfig(BaseModel):
           host: str = "localhost"
@@ -242,17 +242,17 @@ sections:
       fullSettings = FullSettings()
       fullSettings
     hints:
-    - 중첩 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 중첩 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 중첩 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 중첩 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 중첩 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: validation
   title: 설정 검증
   structuredPrimary: true
   subtitle: Field 제약조건
   goal: 설정 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: BaseSettings도 일반 Pydantic 모델처럼 Field와 validator를 사용한 검증을 지원합니다. 포트 번호 범위, 타임아웃 최소값, 워커
     수 제한 등 비즈니스 규칙을 설정 단계에서 강제할 수 있습니다.
   tips:
@@ -276,7 +276,7 @@ sections:
     serverSettings = ServerSettings()
     serverSettings
   exercise:
-    prompt: 설정 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 설정 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from pydantic import field_validator
 
@@ -296,17 +296,17 @@ sections:
       serverSettings = ServerSettings()
       serverSettings
     hints:
-    - 설정 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 설정 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 설정 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 설정 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 설정 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: secret
   title: 비밀 값 관리
   structuredPrimary: true
   subtitle: SecretStr
   goal: 비밀 값 관리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     비밀번호, API 키 같은 민감한 정보는 로그에 노출되면 안 됩니다. SecretStr 타입을 사용하면 출력 시 자동으로 마스킹되고, get_secret_value()로만 실제 값에 접근할 수 있습니다. 디버깅 로그에서 비밀이 노출되는 것을 방지합니다.
 
@@ -327,7 +327,7 @@ sections:
     authSettings = AuthSettings()
     authSettings
   exercise:
-    prompt: 비밀 값 관리 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 비밀 값 관리 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class AuthSettings(BaseSettings):
           model_config = {"env_prefix": "AUTH_"}
@@ -342,17 +342,17 @@ sections:
       authSettings = AuthSettings()
       authSettings
     hints:
-    - 비밀 값 관리 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 비밀 값 관리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 비밀 값 관리에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 비밀 값 관리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 비밀 값 관리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: json
   title: JSON 환경변수
   structuredPrimary: true
   subtitle: 복잡한 값
   goal: JSON 환경변수에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 리스트나 딕셔너리 같은 복잡한 값도 JSON 문자열로 환경변수에 넣을 수 있습니다. BaseSettings가 자동으로 파싱하여 Python 객체로 변환합니다.
     CORS 허용 도메인 목록, 기능 플래그 등에 유용합니다.
   tips:
@@ -370,7 +370,7 @@ sections:
     jsonSettings = JsonSettings()
     jsonSettings
   exercise:
-    prompt: JSON 환경변수 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: JSON 환경변수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class JsonSettings(BaseSettings):
           allowedHosts: list[str] = []
@@ -384,17 +384,17 @@ sections:
       jsonSettings = JsonSettings()
       jsonSettings
     hints:
-    - JSON 환경변수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: JSON 환경변수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: JSON 환경변수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: JSON 환경변수에서 `jsonSettings` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: JSON 환경변수 실행 뒤 `jsonSettings` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: singleton
   title: 싱글톤 패턴
   structuredPrimary: true
   subtitle: lru_cache 활용
   goal: 싱글톤 패턴에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     설정을 매번 새로 로드하면 성능이 낭비됩니다. functools.lru_cache를 사용하면 설정 객체를 캐싱하여 애플리케이션 전체에서 동일한 인스턴스를 재사용합니다. FastAPI 등 프레임워크에서 권장하는 패턴입니다.
 
@@ -417,7 +417,7 @@ sections:
     config2 = getSettings()
     config1 is config2
   exercise:
-    prompt: 싱글톤 패턴 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 싱글톤 패턴 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from functools import lru_cache
 
@@ -434,17 +434,17 @@ sections:
       config2 = getSettings()
       config1 is config2
     hints:
-    - 싱글톤 패턴 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 싱글톤 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 싱글톤 패턴에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 싱글톤 패턴의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 싱글톤 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: result
   title: 마이크로서비스 설정
   structuredPrimary: true
   subtitle: 종합 설정 시스템
   goal: 마이크로서비스 설정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 기법을 종합하여 실제 마이크로서비스에서 사용할 수 있는 설정 시스템을 완성합니다. 중첩 설정, 환경별 분리, 비밀 관리, 검증까지 모두
     포함한 완전한 설정 관리 시스템입니다.
   tips:
@@ -484,7 +484,7 @@ sections:
     svcSettings = ServiceSettings()
     svcSettings
   exercise:
-    prompt: 마이크로서비스 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 마이크로서비스 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -520,17 +520,17 @@ sections:
       svcSettings = ServiceSettings()
       svcSettings
     hints:
-    - 마이크로서비스 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 마이크로서비스 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 마이크로서비스 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 마이크로서비스 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 마이크로서비스 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 설정 관리 프로젝트
   goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지 배운 BaseSettings, 접두사, 중첩 설정, SecretStr, JSON 환경변수를 활용하여 실제 애플리케이션 설정 시스템을 구축합니다.
 
@@ -570,7 +570,7 @@ sections:
     webSettings = getWebAppSettings()
     webSettings
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from pydantic_settings import BaseSettings
       from pydantic import BaseModel, Field, SecretStr
@@ -604,17 +604,17 @@ sections:
       webSettings = getWebAppSettings()
       webSettings
     hints:
-    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
     잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
@@ -654,7 +654,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -690,8 +690,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'

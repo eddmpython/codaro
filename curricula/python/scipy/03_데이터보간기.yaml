@@ -50,7 +50,7 @@ intro:
     - label: 과학 계산 환경
       detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
     - label: 데이터보간기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
     - label: 데이터보간기 완료
       detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: scipy.interpolate
   goal: 라이브러리 및 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate 모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다.
 
@@ -77,7 +77,7 @@ sections:
     hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
     temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
   exercise:
-    prompt: 라이브러리 및 데이터 로드 예제에서 리스트 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 라이브러리 및 데이터 로드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import scipy
 
@@ -89,17 +89,17 @@ sections:
       hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
       temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
     hints:
-    - 라이브러리 및 데이터 로드 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 라이브러리 및 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 라이브러리 및 데이터 로드에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 라이브러리 및 데이터 로드에서 `hours` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 라이브러리 및 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: explore
   title: 데이터 탐색
   structuredPrimary: true
   subtitle: 측정 지점 시각화
   goal: 데이터 탐색에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의
     직선 연결은 실제 온도 변화의 부드러운 곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다.
   tips:
@@ -116,7 +116,7 @@ sections:
     axOrig.grid(True, alpha=0.3)
     figOrig
   exercise:
-    prompt: 데이터 탐색 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 데이터 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figOrig, axOrig = plt.subplots(figsize=(12, 6))
       axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
@@ -129,17 +129,17 @@ sections:
       axOrig.grid(True, alpha=0.3)
       figOrig
     hints:
-    - 데이터 탐색 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 데이터 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데이터 탐색에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 데이터 탐색의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 데이터 탐색 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: linear
   title: 선형 보간
   structuredPrimary: true
   subtitle: interp1d(kind='linear')
   goal: 선형 보간에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이 함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다.
 
@@ -153,7 +153,7 @@ sections:
     tempsLinear = linearFunc(hoursNew)
     tempsLinear
   exercise:
-    prompt: 선형 보간 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 선형 보간 예제에서 `linearFunc`, `hoursNew`, `tempsLinear` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       linearFunc = interpolate.interp1d(hours, temps, kind='linear')
 
@@ -161,17 +161,17 @@ sections:
       tempsLinear = linearFunc(hoursNew)
       tempsLinear
     hints:
-    - 선형 보간 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `linearFunc = ...` 오른쪽 값입니다.
+    - 실행 뒤 `linearFunc` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 선형 보간 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 선형 보간에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 선형 보간에서 `linearFunc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 선형 보간 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: cubic
   title: 3차 스플라인 보간
   structuredPrimary: true
   subtitle: kind='cubic'
   goal: 3차 스플라인 보간에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인 변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다.
 
@@ -193,7 +193,7 @@ sections:
     axCubic.grid(True, alpha=0.3)
     figCubic
   exercise:
-    prompt: 3차 스플라인 보간 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 3차 스플라인 보간 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
       tempsCubic = cubicFunc(hoursNew)
@@ -209,17 +209,17 @@ sections:
       axCubic.grid(True, alpha=0.3)
       figCubic
     hints:
-    - 3차 스플라인 보간 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3차 스플라인 보간 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3차 스플라인 보간에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3차 스플라인 보간의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3차 스플라인 보간의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: compare
   title: 보간 방법 비교
   structuredPrimary: true
   subtitle: linear vs cubic vs PCHIP
   goal: 보간 방법 비교에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다. 각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다.
 
@@ -231,23 +231,23 @@ sections:
     tempsPchip = pchipFunc(hoursNew)
     tempsPchip[:5]
   exercise:
-    prompt: 보간 방법 비교 예제에서 리스트 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 보간 방법 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       pchipFunc = interpolate.PchipInterpolator(hours, temps)
       tempsPchip = pchipFunc(hoursNew)
       tempsPchip[:5]
     hints:
-    - 보간 방법 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 보간 방법 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 보간 방법 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 보간 방법 비교에서 `pchipFunc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 보간 방법 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: missing
   title: 결측값 처리
   structuredPrimary: true
   subtitle: NaN 보간
   goal: 결측값 처리에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다.
     먼저 유효한 데이터만 추출하고, 이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다.
   tips:
@@ -259,7 +259,7 @@ sections:
     sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
     sensorDf
   exercise:
-    prompt: 결측값 처리 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 결측값 처리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
       timePoints = np.arange(len(sensorData))
@@ -267,17 +267,17 @@ sections:
       sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
       sensorDf
     hints:
-    - 결측값 처리 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 결측값 처리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 결측값 처리에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 결측값 처리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 결측값 처리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: result
   title: 최종 온도 분석 보고서
   structuredPrimary: true
   subtitle: 고해상도 온도 곡선
   goal: 최종 온도 분석 보고서에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수
     있습니다. 실무에서는 이런 고해상도 데이터가 에너지 관리, 농업, 기상 예보 등에 활용됩니다.
   tips:
@@ -295,7 +295,7 @@ sections:
     })
     analysisDf
   exercise:
-    prompt: 최종 온도 분석 보고서 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 최종 온도 분석 보고서 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       hoursHigh = np.arange(0, 24.1, 0.5)
       tempsHigh = pchipFunc(hoursHigh)
@@ -309,17 +309,17 @@ sections:
       })
       analysisDf
     hints:
-    - 최종 온도 분석 보고서 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 최종 온도 분석 보고서 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최종 온도 분석 보고서에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 최종 온도 분석 보고서의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 최종 온도 분석 보고서의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 보간 활용 프로젝트
   goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을 만듭니다.
 
@@ -340,7 +340,7 @@ sections:
     pricesWithNan = basePrices.copy()
     pricesWithNan[missingIdx] = np.nan
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import numpy as np
       from scipy import interpolate
@@ -355,17 +355,17 @@ sections:
       pricesWithNan = basePrices.copy()
       pricesWithNan[missingIdx] = np.nan
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `days` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
   goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
     신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
@@ -389,7 +389,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -424,8 +424,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

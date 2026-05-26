@@ -49,7 +49,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 신호탐지최적화 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 신호탐지최적화 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: 와인 데이터
   goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
 
@@ -81,7 +81,7 @@ sections:
     y = wine.target
     X.shape, np.unique(y)
   exercise:
-    prompt: 1단계. 데이터 로딩 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -98,17 +98,17 @@ sections:
       y = wine.target
       X.shape, np.unique(y)
     hints:
-    - 1단계. 데이터 로딩 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 로딩 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 로딩에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_prep
   title: 2단계. 데이터 준비
   structuredPrimary: true
   subtitle: 분할 및 스케일링
   goal: 2단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -116,22 +116,22 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 2단계. 데이터 준비 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 준비 예제에서 `xTrain`, `xTest`, `yTrain` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
       xTrain.shape, xTest.shape
     hints:
-    - 2단계. 데이터 준비 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 준비 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 준비에서 `xTrain`, `xTest`, `yTrain` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 2단계. 데이터 준비 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_baseline
   title: 3단계. 기본 모델
   structuredPrimary: true
   subtitle: 기본 SVM
   goal: 3단계. 기본 모델에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
 
@@ -145,7 +145,7 @@ sections:
     accBase = accuracy_score(yTest, yPredBase)
     print(f"Baseline Accuracy: {accBase:.4f}")
   exercise:
-    prompt: 3단계. 기본 모델 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 기본 모델 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       svcBase = SVC(random_state=42)
       svcBase.fit(xTrainSc, yTrain)
@@ -153,17 +153,17 @@ sections:
       accBase = accuracy_score(yTest, yPredBase)
       print(f"Baseline Accuracy: {accBase:.4f}")
     hints:
-    - 3단계. 기본 모델 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 3단계. 기본 모델 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 기본 모델에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 3단계. 기본 모델의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 3단계. 기본 모델 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step4_params
   title: 4단계. 파라미터 그리드
   structuredPrimary: true
   subtitle: 탐색 범위
   goal: 4단계. 파라미터 그리드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
 
@@ -179,7 +179,7 @@ sections:
     totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
     print(f"Total combinations: {totalComb}")
   exercise:
-    prompt: 4단계. 파라미터 그리드 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 파라미터 그리드 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       paramGrid = {
           "C": [0.1, 1, 10, 100],
@@ -189,17 +189,17 @@ sections:
       totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
       print(f"Total combinations: {totalComb}")
     hints:
-    - 4단계. 파라미터 그리드 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 4단계. 파라미터 그리드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 파라미터 그리드에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 4단계. 파라미터 그리드의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 4단계. 파라미터 그리드 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step5_gridsearch
   title: 5단계. GridSearchCV 실행
   structuredPrimary: true
   subtitle: 체계적 탐색
   goal: 5단계. GridSearchCV 실행에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
 
@@ -211,23 +211,23 @@ sections:
     gridSearch.fit(xTrainSc, yTrain)
     gridSearch
   exercise:
-    prompt: 5단계. GridSearchCV 실행 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. GridSearchCV 실행 예제에서 `gridSearch` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
       gridSearch.fit(xTrainSc, yTrain)
       gridSearch
     hints:
-    - 5단계. GridSearchCV 실행 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `gridSearch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `gridSearch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 5단계. GridSearchCV 실행 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. GridSearchCV 실행에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. GridSearchCV 실행에서 `gridSearch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. GridSearchCV 실행 실행 뒤 `gridSearch` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step6_results
   title: 6단계. 결과 분석
   structuredPrimary: true
   subtitle: cv_results_
   goal: 6단계. 결과 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -236,23 +236,23 @@ sections:
     cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
     resultsDf[cols].sort_values("rank_test_score").head(10)
   exercise:
-    prompt: 6단계. 결과 분석 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 결과 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       resultsDf = pd.DataFrame(gridSearch.cv_results_)
       cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
       resultsDf[cols].sort_values("rank_test_score").head(10)
     hints:
-    - 6단계. 결과 분석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 6단계. 결과 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 결과 분석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 결과 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 결과 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step7_best
   title: 7단계. 최적 모델 평가
   structuredPrimary: true
   subtitle: best_estimator_
   goal: 7단계. 최적 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -264,7 +264,7 @@ sections:
     print(f"Tuned Accuracy: {accBest:.4f}")
     print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
   exercise:
-    prompt: 7단계. 최적 모델 평가 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 최적 모델 평가 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       bestModel = gridSearch.best_estimator_
       yPredBest = bestModel.predict(xTestSc)
@@ -273,17 +273,17 @@ sections:
       print(f"Tuned Accuracy: {accBest:.4f}")
       print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
     hints:
-    - 7단계. 최적 모델 평가 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 7단계. 최적 모델 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 최적 모델 평가에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 7단계. 최적 모델 평가의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 7단계. 최적 모델 평가 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: step8_heatmap
   title: 8단계. 파라미터 히트맵
   structuredPrimary: true
   subtitle: C vs gamma
   goal: 8단계. 파라미터 히트맵에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -306,7 +306,7 @@ sections:
     plt.colorbar(im, ax=axHeat)
     figHeat
   exercise:
-    prompt: 8단계. 파라미터 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 파라미터 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
       pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
@@ -326,17 +326,17 @@ sections:
       plt.colorbar(im, ax=axHeat)
       figHeat
     hints:
-    - 8단계. 파라미터 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 파라미터 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 파라미터 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 파라미터 히트맵의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 파라미터 히트맵 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step9_rf
   title: 9단계. RandomForest 튜닝
   structuredPrimary: true
   subtitle: 다른 모델 적용
   goal: 9단계. RandomForest 튜닝에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -349,7 +349,7 @@ sections:
     rfTotalComb = 3 * 4 * 3
     print(f"Total combinations: {rfTotalComb}")
   exercise:
-    prompt: 9단계. RandomForest 튜닝 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. RandomForest 튜닝 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
       rfParamGrid = {
           "n_estimators": [50, 100, 150],
@@ -359,17 +359,17 @@ sections:
       rfTotalComb = 3 * 4 * 3
       print(f"Total combinations: {rfTotalComb}")
     hints:
-    - 9단계. RandomForest 튜닝 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
   check:
-    noError: 9단계. RandomForest 튜닝 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. RandomForest 튜닝에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 9단계. RandomForest 튜닝의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 9단계. RandomForest 튜닝 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: step10_compare
   title: 10단계. 모델 비교
   structuredPrimary: true
   subtitle: SVM vs RF
   goal: 10단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -390,7 +390,7 @@ sections:
         axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
     figComp
   exercise:
-    prompt: 10단계. 모델 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 모델 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       rfBest = rfGridSearch.best_estimator_
       rfPred = rfBest.predict(xTestSc)
@@ -408,17 +408,17 @@ sections:
           axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
       figComp
     hints:
-    - 10단계. 모델 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 모델 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 모델 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 모델 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 모델 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_cv
   title: 11단계. 교차검증 상세
   structuredPrimary: true
   subtitle: cv별 점수
   goal: 11단계. 교차검증 상세에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
 
@@ -430,23 +430,23 @@ sections:
     print(f"CV Scores: {cvScores}")
     print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
   exercise:
-    prompt: 11단계. 교차검증 상세 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 교차검증 상세 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
       print(f"CV Scores: {cvScores}")
       print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
     hints:
-    - 11단계. 교차검증 상세 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 11단계. 교차검증 상세 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 교차검증 상세에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 11단계. 교차검증 상세의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 11단계. 교차검증 상세 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: step12_time
   title: 12단계. 학습 시간
   structuredPrimary: true
   subtitle: 시간 비용
   goal: 12단계. 학습 시간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
 
@@ -461,7 +461,7 @@ sections:
     print(f"Total fit time: {totalTime:.2f}s")
     print(f"Mean time per combination: {meanTime:.4f}s")
   exercise:
-    prompt: 12단계. 학습 시간 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 학습 시간 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       totalTime = resultsDf["mean_fit_time"].sum()
       meanTime = resultsDf["mean_fit_time"].mean()
@@ -469,17 +469,17 @@ sections:
       print(f"Total fit time: {totalTime:.2f}s")
       print(f"Mean time per combination: {meanTime:.4f}s")
     hints:
-    - 12단계. 학습 시간 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 12단계. 학습 시간 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 학습 시간에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 12단계. 학습 시간의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 12단계. 학습 시간 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 하이퍼파라미터 튜닝
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -513,7 +513,7 @@ sections:
     predC = gridC.predict(xTeCsc)
     print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
   exercise:
-    prompt: 실습 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -541,17 +541,17 @@ sections:
       predC = gridC.predict(xTeCsc)
       print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
     hints:
-    - 실습 코드에서 먼저 출력 문자열 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
+    noError: 실습의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 실습 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -582,7 +582,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -627,8 +627,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

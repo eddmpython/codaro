@@ -49,7 +49,7 @@ intro:
     - label: 과학 계산 환경
       detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
     - label: 신호필터링 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
     - label: 신호필터링 완료
       detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: 노이즈가 섞인 신호
   goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고,
     필터링으로 원래 신호를 복원합니다. 실제 센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
   tips:
@@ -78,7 +78,7 @@ sections:
     noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
     noisySig = cleanSig + noise
   exercise:
-    prompt: 데이터 로드 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 데이터 로드 예제에서 `fs`, `t`, `cleanSig` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       import scipy
 
@@ -94,17 +94,17 @@ sections:
       noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
       noisySig = cleanSig + noise
     hints:
-    - 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `fs = ...` 오른쪽 값입니다.
+    - 실행 뒤 `fs` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 데이터 로드에서 `fs` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: butter
   title: 버터워스 필터 설계
   structuredPrimary: true
   subtitle: signal.butter
   goal: 버터워스 필터 설계에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     버터워스 필터는 통과대역에서 가장 평탄한 주파수 응답을 가집니다. butter 함수로 필터 계수(b, a)를 설계합니다. 차단 주파수는 나이퀴스트 주파수(샘플링 주파수의 절반)로 정규화해야 합니다.
 
@@ -125,7 +125,7 @@ sections:
     })
     filterDf
   exercise:
-    prompt: 버터워스 필터 설계 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 버터워스 필터 설계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       cutoff = 10
       nyquist = fs / 2
@@ -140,17 +140,17 @@ sections:
       })
       filterDf
     hints:
-    - 버터워스 필터 설계 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 버터워스 필터 설계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 버터워스 필터 설계에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 버터워스 필터 설계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 버터워스 필터 설계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: freqresp
   title: 주파수 응답
   structuredPrimary: true
   subtitle: 필터 특성 확인
   goal: 주파수 응답에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 설계된 필터가 각 주파수를 얼마나 통과시키는지 주파수 응답으로 확인합니다. -3dB 지점이 차단 주파수이며, 이 지점에서 신호 전력이 절반으로 감소합니다.
     차단 주파수 이상의 고주파는 급격히 감쇄됩니다.
   tips:
@@ -178,7 +178,7 @@ sections:
     plt.tight_layout()
     figFreq
   exercise:
-    prompt: 주파수 응답 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 주파수 응답 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       w, h = signal.freqz(b, a, worN=2000)
       freqs = w * fs / (2 * np.pi)
@@ -202,17 +202,17 @@ sections:
       plt.tight_layout()
       figFreq
     hints:
-    - 주파수 응답 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 주파수 응답 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 주파수 응답에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 주파수 응답의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 주파수 응답의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: filtfilt
   title: 제로위상 필터링
   structuredPrimary: true
   subtitle: signal.filtfilt
   goal: 제로위상 필터링에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: filtfilt은 신호를 정방향과 역방향으로 두 번 필터링하여 위상 왜곡을 제거합니다. 시간 지연 없이 깨끗한 필터링 결과를 얻습니다. 오프라인 분석에서는
     항상 filtfilt을 사용하는 것이 좋습니다.
   tips:
@@ -233,7 +233,7 @@ sections:
     axFilt.grid(True, alpha=0.3)
     figFilt
   exercise:
-    prompt: 제로위상 필터링 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 제로위상 필터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       filteredSig = signal.filtfilt(b, a, noisySig)
 
@@ -250,17 +250,17 @@ sections:
       axFilt.grid(True, alpha=0.3)
       figFilt
     hints:
-    - 제로위상 필터링 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 제로위상 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 제로위상 필터링에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 제로위상 필터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 제로위상 필터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: lfilter
   title: lfilter vs filtfilt
   structuredPrimary: true
   subtitle: 위상 지연 비교
   goal: lfilter vs filtfilt에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요.
 
@@ -284,7 +284,7 @@ sections:
     axLfilt.grid(True, alpha=0.3)
     figLfilt
   exercise:
-    prompt: lfilter vs filtfilt 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: lfilter vs filtfilt 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       lfilterResult = signal.lfilter(b, a, noisySig)
 
@@ -302,17 +302,17 @@ sections:
       axLfilt.grid(True, alpha=0.3)
       figLfilt
     hints:
-    - lfilter vs filtfilt 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: lfilter vs filtfilt 코드가 예외 없이 끝나야 합니다.
-    resultCheck: lfilter vs filtfilt에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: lfilter vs filtfilt의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: lfilter vs filtfilt의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: highpass
   title: 고역통과 필터
   structuredPrimary: true
   subtitle: 저주파 제거
   goal: 고역통과 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 고역통과 필터는 저주파 성분(드리프트, DC 오프셋)을 제거합니다. 심전도(ECG) 신호에서 기저선 변동을 제거하거나, 가속도계에서 중력 성분을 제거할 때
     사용합니다.
   tips:
@@ -321,22 +321,22 @@ sections:
     drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
     driftSig = cleanSig + drift
   exercise:
-    prompt: 고역통과 필터 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 고역통과 필터 예제에서 `drift`, `driftSig` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
       driftSig = cleanSig + drift
     hints:
-    - 고역통과 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `drift = ...` 오른쪽 값입니다.
+    - 실행 뒤 `drift` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 고역통과 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 고역통과 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 고역통과 필터에서 `drift` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 고역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: bandpass
   title: 대역통과 필터
   structuredPrimary: true
   subtitle: 특정 주파수 대역 추출
   goal: 대역통과 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만
     추출하거나, 특정 진동 주파수를 분석할 때 유용합니다.
   tips:
@@ -347,24 +347,24 @@ sections:
     comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
     complexSig = comp1 + comp2 + comp3
   exercise:
-    prompt: 대역통과 필터 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 대역통과 필터 예제에서 `comp1`, `comp2`, `comp3` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       comp1 = np.sin(2 * np.pi * 5 * t)
       comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
       comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
       complexSig = comp1 + comp2 + comp3
     hints:
-    - 대역통과 필터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `comp1 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `comp1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 대역통과 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 대역통과 필터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 대역통과 필터에서 `comp1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 대역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: notch
   title: 노치 필터
   structuredPrimary: true
   subtitle: 특정 주파수 제거
   goal: 노치 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 노치(대역저지) 필터는 특정 주파수만 제거합니다. 전력선 간섭(50Hz 또는 60Hz)을 제거할 때 주로 사용합니다. 생체신호(ECG, EEG) 분석에서 필수적인
     전처리 단계입니다.
   tips:
@@ -390,7 +390,7 @@ sections:
     axNotch.grid(True, alpha=0.3)
     figNotch
   exercise:
-    prompt: 노치 필터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 노치 필터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       notchFreq = 50
       quality = 30
@@ -412,17 +412,17 @@ sections:
       axNotch.grid(True, alpha=0.3)
       figNotch
     hints:
-    - 노치 필터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 노치 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 노치 필터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 노치 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 노치 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: sos
   title: SOS 형식 필터
   structuredPrimary: true
   subtitle: 수치 안정성
   goal: SOS 형식 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     높은 차수의 필터는 b/a 형식으로 불안정할 수 있습니다. SOS(Second-Order Sections) 형식이 더 안정적입니다. 고차 필터(order > 4)에서는 SOS를 권장합니다.
 
@@ -444,7 +444,7 @@ sections:
     axSos.grid(True, alpha=0.3)
     figSos
   exercise:
-    prompt: SOS 형식 필터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: SOS 형식 필터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       sos = signal.butter(8, normalCutoff, btype='low', output='sos')
       sosFiltered = signal.sosfiltfilt(sos, noisySig)
@@ -460,17 +460,17 @@ sections:
       axSos.grid(True, alpha=0.3)
       figSos
     hints:
-    - SOS 형식 필터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: SOS 형식 필터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: SOS 형식 필터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: SOS 형식 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: SOS 형식 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: result
   title: 필터 선택 가이드
   structuredPrimary: true
   subtitle: 상황별 권장
   goal: 필터 선택 가이드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다.
     필터 차수는 4-6차가 일반적이며, 높은 차수는 SOS 형식을 사용하세요.
   tips:
@@ -484,7 +484,7 @@ sections:
     })
     guideDf
   exercise:
-    prompt: 필터 선택 가이드 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 필터 선택 가이드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       guideDf = pd.DataFrame({
           'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
@@ -494,17 +494,17 @@ sections:
       })
       guideDf
     hints:
-    - 필터 선택 가이드 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 필터 선택 가이드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 필터 선택 가이드에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 필터 선택 가이드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 필터 선택 가이드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 신호처리 프로젝트
   goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
   tips:
   - 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
@@ -521,7 +521,7 @@ sections:
     muscle = 0.1 * np.random.randn(len(tEcg))
     ecgNoisy = ecgClean + baseline + powerline + muscle
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 `fsEcg`, `tEcg`, `nyqEcg` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       fsEcg = 360
       tEcg = np.linspace(0, 2, fsEcg * 2)
@@ -535,17 +535,17 @@ sections:
       muscle = 0.1 * np.random.randn(len(tEcg))
       ecgNoisy = ecgClean + baseline + powerline + muscle
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `fsEcg = ...` 오른쪽 값입니다.
+    - 실행 뒤 `fsEcg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `fsEcg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
   goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
     신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
@@ -569,7 +569,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -604,8 +604,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

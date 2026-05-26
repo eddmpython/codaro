@@ -48,7 +48,7 @@ intro:
     - label: 과학 계산 환경
       detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
     - label: 종합과학프로젝트 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
     - label: 종합과학프로젝트 완료
       detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 진동 센서 시뮬레이션
   goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 산업용 기계에서 수집한 진동 센서 데이터를 분석합니다. 정상 진동(50Hz 회전 주파수), 베어링 결함 신호(120Hz), 전력선 간섭(60Hz), 랜덤 노이즈가
     합성된 현실적인 센서 데이터를 생성합니다. 이런 데이터에서 결함을 감지하고 상태를 진단하는 것이 산업 현장의 핵심 과제입니다.
   tips:
@@ -88,7 +88,7 @@ sections:
 
     rawSignal = normalVib + defectVib + powerNoise + randomNoise
   exercise:
-    prompt: 데이터 로드 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 데이터 로드 예제에서 `fs`, `duration`, `t` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       import scipy
 
@@ -115,17 +115,17 @@ sections:
 
       rawSignal = normalVib + defectVib + powerNoise + randomNoise
     hints:
-    - 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `fs = ...` 오른쪽 값입니다.
+    - 실행 뒤 `fs` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 데이터 로드에서 `fs` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: filter
   title: 신호 필터링
   structuredPrimary: true
   subtitle: scipy.signal
   goal: 신호 필터링에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 전력선 간섭(60Hz)을 노치 필터로 제거하고, 관심 대역 외의 고주파 노이즈를 저역통과 필터로 줄입니다. 필터 순서가 중요합니다. 먼저 노치로 특정 간섭을
     제거한 후, 저역통과로 전체 대역을 정리합니다.
   tips:
@@ -137,7 +137,7 @@ sections:
     sosLow = signal.butter(4, 200 / (fs/2), btype='low', output='sos')
     filteredSignal = signal.sosfiltfilt(sosLow, afterNotch)
   exercise:
-    prompt: 신호 필터링 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 신호 필터링 예제에서 `bNotch`, `aNotch`, `afterNotch` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       bNotch, aNotch = signal.iirnotch(60 / (fs/2), 30)
       afterNotch = signal.filtfilt(bNotch, aNotch, rawSignal)
@@ -145,17 +145,17 @@ sections:
       sosLow = signal.butter(4, 200 / (fs/2), btype='low', output='sos')
       filteredSignal = signal.sosfiltfilt(sosLow, afterNotch)
     hints:
-    - 신호 필터링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `afterNotch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `afterNotch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 신호 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 신호 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 신호 필터링에서 `afterNotch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 신호 필터링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: spectrum
   title: 주파수 분석
   structuredPrimary: true
   subtitle: scipy.fft
   goal: 주파수 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: FFT로 신호의 주파수 성분을 분석하여 회전 주파수(50Hz)와 결함 주파수(120Hz)를 검출합니다. 정상 기계는 회전 주파수와 그 고조파만 나타나야 합니다.
     결함이 있으면 베어링 결함 주파수 등 비정상적인 피크가 나타납니다.
   tips:
@@ -179,7 +179,7 @@ sections:
     axFft.grid(True, alpha=0.3)
     figFft
   exercise:
-    prompt: 주파수 분석 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 주파수 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fftResult = fft.fft(filteredSignal)
       freqs = fft.fftfreq(n, 1/fs)
@@ -199,17 +199,17 @@ sections:
       axFft.grid(True, alpha=0.3)
       figFft
     hints:
-    - 주파수 분석 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 주파수 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 주파수 분석에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 주파수 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 주파수 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: statistics
   title: 통계 분석
   structuredPrimary: true
   subtitle: scipy.stats
   goal: 통계 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     진동 신호의 통계적 특성을 분석합니다. RMS(Root Mean Square)는 에너지 수준, 왜도(skewness)는 비대칭성, 첨도(kurtosis)는 충격성을 나타냅니다. 결함이 있으면 첨도가 높아지고 RMS가 증가하는 경향이 있습니다.
 
@@ -229,7 +229,7 @@ sections:
     })
     statsDf
   exercise:
-    prompt: 통계 분석 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 통계 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       rmsValue = np.sqrt(np.mean(filteredSignal**2))
       skewValue = stats.skew(filteredSignal)
@@ -243,17 +243,17 @@ sections:
       })
       statsDf
     hints:
-    - 통계 분석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 통계 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 통계 분석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 통계 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 통계 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: trend
   title: 시간 추이 분석
   structuredPrimary: true
   subtitle: 상태 변화 모니터링
   goal: 시간 추이 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 신호를 세그먼트로 나누어 시간에 따른 특성 변화를 분석합니다. 결함이 진행되면 RMS와 첨도가 점진적으로 증가하는 경향을 보입니다. 이 추이를 모니터링하면
     고장을 예측할 수 있습니다.
   tips:
@@ -271,7 +271,7 @@ sections:
 
     segmentTime = np.arange(nSegments) * (segmentLen / fs)
   exercise:
-    prompt: 시간 추이 분석 예제에서 반복 대상이나 범위을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 시간 추이 분석 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       segmentLen = 1000
       nSegments = n // segmentLen
@@ -285,17 +285,17 @@ sections:
 
       segmentTime = np.arange(nSegments) * (segmentLen / fs)
     hints:
-    - 시간 추이 분석 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 시간 추이 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 시간 추이 분석에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 시간 추이 분석의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 시간 추이 분석 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: fitting
   title: 진폭 피팅
   structuredPrimary: true
   subtitle: scipy.optimize
   goal: 진폭 피팅에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: RMS 값의 시간 변화에 지수함수를 피팅하여 결함 진행 속도를 추정합니다. 지수적 성장 모델은 베어링 결함의 전형적인 진행 패턴입니다. 피팅된 파라미터로 남은
     수명을 예측할 수 있습니다.
   tips:
@@ -327,7 +327,7 @@ sections:
     axFit.grid(True, alpha=0.3)
     figFit
   exercise:
-    prompt: 진폭 피팅 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 진폭 피팅 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       def expGrowth(tVal, a, b, c):
           return a * np.exp(b * tVal) + c
@@ -355,17 +355,17 @@ sections:
       axFit.grid(True, alpha=0.3)
       figFit
     hints:
-    - 진폭 피팅 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 진폭 피팅 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 진폭 피팅에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 진폭 피팅의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 진폭 피팅 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: energy
   title: 에너지 계산
   structuredPrimary: true
   subtitle: scipy.integrate
   goal: 에너지 계산에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 진동 에너지(신호 제곱의 적분)는 피로 손상과 관련됩니다. 누적 에너지를 계산하면 기계가 받은 총 스트레스를 추정할 수 있습니다. 이 값이 임계치를 넘으면
     부품 교체가 필요합니다.
   tips:
@@ -391,7 +391,7 @@ sections:
     plt.tight_layout()
     figEnergy
   exercise:
-    prompt: 에너지 계산 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 에너지 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       signalSquared = filteredSignal ** 2
       cumulativeEnergy = integrate.cumulative_trapezoid(signalSquared, t, initial=0)
@@ -413,17 +413,17 @@ sections:
       plt.tight_layout()
       figEnergy
     hints:
-    - 에너지 계산 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 에너지 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 에너지 계산에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 에너지 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 에너지 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: comparison
   title: 정상 vs 결함 비교
   structuredPrimary: true
   subtitle: 통계 검정
   goal: 정상 vs 결함 비교에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 정상 상태(결함 없음)와 결함 상태의 진동 특성을 비교합니다. t-검정으로 두 상태의 RMS 값에 유의미한 차이가 있는지 확인합니다. 이런 통계 검정은 자동
     이상 탐지 알고리즘의 기반이 됩니다.
   tips:
@@ -449,7 +449,7 @@ sections:
     })
     testDf
   exercise:
-    prompt: 정상 vs 결함 비교 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 정상 vs 결함 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       np.random.seed(123)
       tComp = np.linspace(0, 5, 5000)
@@ -471,17 +471,17 @@ sections:
       })
       testDf
     hints:
-    - 정상 vs 결함 비교 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 정상 vs 결함 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 정상 vs 결함 비교에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 정상 vs 결함 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 정상 vs 결함 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: result
   title: 분석 대시보드
   structuredPrimary: true
   subtitle: 종합 시각화
   goal: 분석 대시보드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 모든 분석 결과를 하나의 대시보드로 시각화합니다. 필터링된 신호, 주파수 스펙트럼, RMS 추이, 누적 에너지를 한눈에 볼 수 있습니다. 이런 대시보드는 기계
     상태 모니터링 시스템의 핵심입니다.
   tips:
@@ -523,7 +523,7 @@ sections:
     plt.tight_layout()
     figDash
   exercise:
-    prompt: 분석 대시보드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 분석 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figDash, axesDash = plt.subplots(2, 2, figsize=(14, 10))
 
@@ -561,17 +561,17 @@ sections:
       plt.tight_layout()
       figDash
     hints:
-    - 분석 대시보드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 분석 대시보드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 분석 대시보드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 분석 대시보드의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 분석 대시보드 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 종합 프로젝트
   goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 데이터 과학자가 되어 전체 분석 파이프라인을 직접 구축해보세요. 심전도(ECG) 분석이나 기상 데이터 분석처럼 다른 도메인의 데이터에 같은 기법을 적용해보세요.
   tips:
   - 데이터 과학자가 되어 전체 분석 파이프라인을 직접 구축해보세요. 심전도(ECG) 분석이나 기상 데이터 분석처럼 다른 도메인의 데이터에 같은 기법을 적용해보세요.
@@ -598,7 +598,7 @@ sections:
     sosEcg = signal.butter(4, [0.5 / (fsEcg/2), 40 / (fsEcg/2)], btype='band', output='sos')
     ecgFinal = signal.sosfiltfilt(sosEcg, ecgFiltered)
   exercise:
-    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       np.random.seed(456)
       fsEcg = 360
@@ -622,17 +622,17 @@ sections:
       sosEcg = signal.butter(4, [0.5 / (fsEcg/2), 40 / (fsEcg/2)], btype='band', output='sos')
       ecgFinal = signal.sosfiltfilt(sosEcg, ecgFiltered)
     hints:
-    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
   goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
     신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
@@ -656,7 +656,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -691,8 +691,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

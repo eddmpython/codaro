@@ -47,7 +47,7 @@ intro:
     - label: 배열 계산 환경
       detail: numpy 기준으로 로컬 Python 실행을 준비합니다.
     - label: NumPy소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
     - label: NumPy소개 완료
       detail: 검증된 코드를 계산 파이프라인로 남깁니다.
 sections:
@@ -70,6 +70,8 @@ sections:
       title: 데이터 과학의 기반
     - emoji: ⚙️
       title: 벡터화 연산
+  goal: NumPy에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: numpy_history
   blocks:
   - type: sectionHeader
@@ -90,6 +92,8 @@ sections:
     - emoji: 🔧
       title: 범용성
       description: 과학 계산, 데이터 분석, 머신러닝 등 모든 수치 연산의 기초입니다
+  goal: 🏛️ NumPy의 탄생에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: why_numpy
   blocks:
   - type: sectionHeader
@@ -101,6 +105,8 @@ sections:
     title: 벡터화(Vectorization)
     content: NumPy의 핵심 개념입니다. 반복문 없이 배열 전체에 연산을 적용하는 것을 벡터화라고 합니다. arr * 2라고 쓰면 배열의 모든 요소에 2가 곱해집니다. 이는
       코드를 간결하게 만들고, 내부적으로 최적화된 C 코드가 실행되어 매우 빠릅니다.
+  goal: 🚀 왜 NumPy인가?에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: ndarray
   blocks:
   - type: sectionHeader
@@ -113,6 +119,8 @@ sections:
     title: 파이썬 리스트 vs NumPy 배열
     content: 파이썬 리스트는 서로 다른 타입의 요소를 담을 수 있고 크기가 동적으로 변합니다. NumPy 배열은 동일 타입만 저장하고 크기가 고정됩니다. 이런 제약이 오히려
       장점이 되어, 연속된 메모리에 데이터를 저장하고 CPU 캐시를 효율적으로 활용할 수 있습니다.
+  goal: 📦 ndarray 자료구조에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -147,6 +155,8 @@ sections:
     - - 브로드캐스팅
       - 크기가 다른 배열 간 연산
       - 자동으로 크기 맞춤
+  goal: 🛠️ NumPy의 주요 기능에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: broadcasting
   blocks:
   - type: sectionHeader
@@ -159,6 +169,8 @@ sections:
     title: 브로드캐스팅 규칙
     content: 두 배열의 차원을 오른쪽부터 비교합니다. 각 차원이 같거나, 둘 중 하나가 1이면 브로드캐스팅이 가능합니다. 예를 들어 (5, 3)과 (3,)은 호환되고, (5,
       3)과 (1, 3)도 호환됩니다. 하지만 (5, 3)과 (4,)는 호환되지 않습니다.
+  goal: 📡 브로드캐스팅에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: datatype
   blocks:
   - type: sectionHeader
@@ -190,6 +202,8 @@ sections:
     - - complex128
       - 복소수
       - 실수부+허수부 각 64비트
+  goal: 🏷️ 데이터 타입에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: comparison
   blocks:
   - type: sectionHeader
@@ -224,6 +238,8 @@ sections:
       - 효율적
       - 보통
       - 비효율적
+  goal: ⚖️ NumPy vs Pandas vs 리스트에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: ecosystem
   blocks:
   - type: sectionHeader
@@ -246,6 +262,8 @@ sections:
       - NumPy 확장, 과학 계산 함수
     - - TensorFlow/PyTorch
       - 텐서와 NumPy 배열 상호 변환
+  goal: 🌐 NumPy 생태계에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: usecases
   blocks:
   - type: sectionHeader
@@ -270,6 +288,8 @@ sections:
       - 물리 시뮬레이션, 수치 해석, 미분방정식
     - - 금융
       - 포트폴리오 분석, 리스크 계산, 시계열 분석
+  goal: 💡 활용 분야에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: pandas_notice
   blocks:
   - type: sectionHeader
@@ -279,6 +299,8 @@ sections:
     title: pandas는 나중에 배워요
     content: 이 커리큘럼에서 pandas(pd)가 등장하지만, 데이터 로딩용으로만 사용합니다. pd.read_csv()로 CSV 파일을 불러온 뒤 .values로 NumPy
       배열을 추출합니다. pandas의 기능은 Pandas 코스에서 자세히 배우니, 지금은 '데이터 불러오는 도구'로만 이해하세요.
+  goal: 📋 pandas 사용 안내에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -322,6 +344,8 @@ sections:
     - - 10. 당뇨병 종합 분석
       - Pima Diabetes
       - 전체 개념 종합
+  goal: 📚 커리큘럼에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: start
   blocks:
   - type: sectionHeader
@@ -330,12 +354,14 @@ sections:
   - type: text
     content: NumPy를 배우면 파이썬으로 수치 계산을 효율적으로 수행할 수 있습니다. 반복문 없이 간결한 코드로 빠른 연산이 가능해지고, 데이터 과학과 머신러닝의 기초를
       탄탄하게 다질 수 있습니다. 첫 번째 프로젝트에서 포켓몬 스탯 데이터를 분석하며 NumPy 배열의 기본을 익혀봅시다.
+  goal: 🎯 시작하기에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기'
   structuredPrimary: true
   subtitle: 배열 생성, 브로드캐스팅, 실패 케이스, 변주 실험
   goal: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     NumPy 입문은 배열 문법 암기가 아니라 같은 업무 계산을 반복문 없이 안전하게 처리하는 감각에서 시작합니다. 매출과 할인율 배열의 shape을 예측하고, 브로드캐스팅 결과를 assert로 검증하세요.
 
@@ -359,7 +385,7 @@ sections:
     assert np.allclose(branchTotals, [344_700, 275_500])
     assert sales.dtype.kind in {"i", "u"}
   exercise:
-    prompt: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import numpy as np
 
@@ -376,8 +402,8 @@ sections:
       assert np.allclose(branchTotals, [344_700, 275_500])
       assert sales.dtype.kind in {"i", "u"}
     hints:
-    - '현업 흐름 검증: 매출 배열을 벡터화로 점검하기 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 `sales` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'

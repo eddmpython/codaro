@@ -48,7 +48,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 다양한마커표현 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 다양한마커표현 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -57,26 +57,26 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import folium
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_icon_colors
   title: 2단계. 아이콘 색상
   structuredPrimary: true
   subtitle: Icon(color=)
   goal: 2단계. 아이콘 색상에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     Icon()의 color 파라미터로 마커 색상을 지정합니다. 18가지 색상을 사용할 수 있습니다.
 
@@ -102,7 +102,7 @@ sections:
 
     m1
   exercise:
-    prompt: 2단계. 아이콘 색상 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 아이콘 색상 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       seoulLoc = [37.5665, 126.9780]
       colorList = ["red", "blue", "green", "purple", "orange",
@@ -122,17 +122,17 @@ sections:
 
       m1
     hints:
-    - 2단계. 아이콘 색상 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 아이콘 색상 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 아이콘 색상에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 2단계. 아이콘 색상의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 2단계. 아이콘 색상 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step3_icon_types
   title: 3단계. 아이콘 종류
   structuredPrimary: true
   subtitle: Icon(icon=)
   goal: 3단계. 아이콘 종류에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     icon 파라미터로 마커 안의 아이콘을 변경합니다. Glyphicon과 Font Awesome 아이콘을 사용할 수 있습니다.
 
@@ -155,7 +155,7 @@ sections:
 
     m2
   exercise:
-    prompt: 3단계. 아이콘 종류 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 아이콘 종류 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       glyphicons = ["home", "star", "heart", "cloud", "music",
                     "camera", "user", "glass", "flag", "gift"]
@@ -172,17 +172,17 @@ sections:
 
       m2
     hints:
-    - 3단계. 아이콘 종류 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 3단계. 아이콘 종류 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 아이콘 종류에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 3단계. 아이콘 종류의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 아이콘 종류 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step4_html_popup
   title: 4단계. HTML 팝업
   structuredPrimary: true
   subtitle: 풍부한 정보 표시
   goal: 4단계. HTML 팝업에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     popup에 HTML을 넣어 이미지, 링크, 표 등을 표시할 수 있습니다.
 
@@ -209,7 +209,7 @@ sections:
 
     m4
   exercise:
-    prompt: 4단계. HTML 팝업 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. HTML 팝업 예제에서 `htmlContent`, `m4`, `location` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       htmlContent = """
       <div style="font-family: Arial; width: 200px;">
@@ -230,17 +230,17 @@ sections:
 
       m4
     hints:
-    - 4단계. HTML 팝업 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `htmlContent = ...` 오른쪽 값입니다.
+    - 실행 뒤 `htmlContent` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. HTML 팝업 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. HTML 팝업에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. HTML 팝업에서 `htmlContent` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. HTML 팝업 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_tooltip_style
   title: 5단계. 툴팁 스타일
   structuredPrimary: true
   subtitle: Tooltip()
   goal: 5단계. 툴팁 스타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Tooltip() 객체로 툴팁을 더 세밀하게 제어할 수 있습니다.
 
@@ -264,7 +264,7 @@ sections:
 
     m5
   exercise:
-    prompt: 5단계. 툴팁 스타일 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 툴팁 스타일 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=seoulLoc, zoom_start=14)
 
@@ -282,17 +282,17 @@ sections:
 
       m5
     hints:
-    - 5단계. 툴팁 스타일 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 툴팁 스타일 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 툴팁 스타일에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 툴팁 스타일에서 `m5` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 툴팁 스타일 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_divicon
   title: 6단계. DivIcon
   structuredPrimary: true
   subtitle: 완전 커스텀 마커
   goal: 6단계. DivIcon에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     DivIcon()으로 HTML/CSS를 사용한 완전한 커스텀 마커를 만들 수 있습니다.
 
@@ -333,7 +333,7 @@ sections:
 
     m6
   exercise:
-    prompt: 6단계. DivIcon 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. DivIcon 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       spots = [
           {"name": "1번", "loc": [37.5665, 126.9780]},
@@ -368,17 +368,17 @@ sections:
 
       m6
     hints:
-    - 6단계. DivIcon 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 6단계. DivIcon 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. DivIcon에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 6단계. DivIcon의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. DivIcon 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step7_emoji_marker
   title: 7단계. 이모지 마커
   structuredPrimary: true
   subtitle: DivIcon으로 이모지 사용
   goal: 7단계. 이모지 마커에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     DivIcon으로 이모지를 마커로 사용할 수 있습니다.
 
@@ -407,7 +407,7 @@ sections:
 
     m7
   exercise:
-    prompt: 7단계. 이모지 마커 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 이모지 마커 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       emojiSpots = [
           {"name": "카페", "loc": [37.5665, 126.9780], "emoji": "☕"},
@@ -430,17 +430,17 @@ sections:
 
       m7
     hints:
-    - 7단계. 이모지 마커 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 7단계. 이모지 마커 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 이모지 마커에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 7단계. 이모지 마커의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 이모지 마커 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step8_circle_marker
   title: 8단계. CircleMarker
   structuredPrimary: true
   subtitle: 원형 마커
   goal: 8단계. CircleMarker에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     CircleMarker()는 크기가 고정된 원형 마커입니다. 줌 레벨에 상관없이 같은 크기로 표시됩니다.
 
@@ -482,7 +482,7 @@ sections:
 
     m8
   exercise:
-    prompt: 8단계. CircleMarker 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. CircleMarker 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulLoc, zoom_start=14)
 
@@ -518,17 +518,17 @@ sections:
 
       m8
     hints:
-    - 8단계. CircleMarker 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. CircleMarker 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. CircleMarker에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. CircleMarker에서 `m8` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. CircleMarker 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_data_driven
   title: 9단계. 데이터 기반 마커
   structuredPrimary: true
   subtitle: 값에 따른 시각화
   goal: 9단계. 데이터 기반 마커에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     데이터 값에 따라 마커 크기나 색상을 다르게 표시합니다.
 
@@ -559,7 +559,7 @@ sections:
 
     m9
   exercise:
-    prompt: 9단계. 데이터 기반 마커 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 데이터 기반 마커 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       stores = [
           {"name": "강남점", "loc": [37.4979, 127.0276], "sales": 100},
@@ -584,17 +584,17 @@ sections:
 
       m9
     hints:
-    - 9단계. 데이터 기반 마커 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 데이터 기반 마커 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 데이터 기반 마커에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 9단계. 데이터 기반 마커의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 데이터 기반 마커 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 맛집 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 다양한 마커 스타일을 종합하여 맛집 지도를 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -630,7 +630,7 @@ sections:
 
     foodMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       restaurants = [
           {"name": "한식당", "loc": [37.5665, 126.9780], "category": "한식", "rating": 4.5},
@@ -663,17 +663,17 @@ sections:
 
       foodMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 예제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 마커 설계 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 렌더 검증 → 수정 실험
   goal: 11단계. 실무 마커 설계 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     마커 커스터마이징은 예쁘게 보이는 것으로 끝나지 않습니다. 업무 지도에서는 지점 카테고리, 위험도, 팝업 정보가 빠짐없이 연결되어야 하고, 정의하지 않은 카테고리는 조용히 기본값으로 넘어가지 말고 오류로 확인해야 합니다.
 
@@ -698,7 +698,7 @@ sections:
     highRiskNames = [site["name"] for site in operationSites if site["riskScore"] >= 70]
     highRiskNames
   exercise:
-    prompt: 11단계. 실무 마커 설계 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 실무 마커 설계 검증 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       operationSites = [
           {"name": "강남 플래그십", "loc": [37.4979, 127.0276], "category": "store", "riskScore": 82, "owner": "영업"},
@@ -716,17 +716,17 @@ sections:
       highRiskNames = [site["name"] for site in operationSites if site["riskScore"] >= 70]
       highRiskNames
     hints:
-    - 11단계. 실무 마커 설계 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 실무 마커 설계 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 실무 마커 설계 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 11단계. 실무 마커 설계 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 실무 마커 설계 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 마커 표현
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
@@ -743,7 +743,7 @@ sections:
     ]
     tourCourse
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       tourCourse = [
@@ -754,8 +754,8 @@ sections:
       ]
       tourCourse
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `tourCourse` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `tourCourse` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.

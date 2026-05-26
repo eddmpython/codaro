@@ -30,33 +30,33 @@ intro:
   description: paste()로 이미지를 특정 위치에 붙이고, resize()로 크기를 맞춥니다. 좌표 계산을 통해 정렬된 레이아웃을 구성합니다.
   direction: 포토콜라주메이커에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 포토콜라주메이커 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
+  - 포토콜라주메이커 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
+  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 이미지 준비 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 콜라주 캔버스 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. 이미지 배치 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
     - label: 포토콜라주메이커 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 이미지 처리 환경
       detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 포토콜라주메이커 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
     - label: 포토콜라주메이커 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
 sections:
 - id: step1_images
   title: 1단계. 이미지 준비
   structuredPrimary: true
   subtitle: sklearn 샘플 이미지 활용
   goal: 1단계. 이미지 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     sklearn 샘플 이미지를 다양하게 변형하여 콜라주용 이미지를 만듭니다. flower와 china 이미지를 크롭하고 리사이즈하여 네 장의 이미지를 준비합니다.
 
@@ -71,7 +71,7 @@ sections:
     china = Image.fromarray(load_sample_image('china.jpg'))
     flower.size, china.size
   exercise:
-    prompt: 1단계. 이미지 준비 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 이미지 준비 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -80,17 +80,17 @@ sections:
       china = Image.fromarray(load_sample_image('china.jpg'))
       flower.size, china.size
     hints:
-    - 1단계. 이미지 준비 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 1단계. 이미지 준비 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 이미지 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 이미지 준비의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 이미지 준비 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step2_canvas
   title: 2단계. 콜라주 캔버스
   structuredPrimary: true
   subtitle: 전체 크기 계산
   goal: 2단계. 콜라주 캔버스에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 2x2 그리드의 콜라주 캔버스를 생성합니다. 각 이미지가 200x200이면 전체 캔버스는 400x400입니다. 여백을 추가하면 더 보기 좋습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -102,7 +102,7 @@ sections:
     totalH = rows * cellSize + (rows + 1) * gap
     totalW, totalH
   exercise:
-    prompt: 2단계. 콜라주 캔버스 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 콜라주 캔버스 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       cellSize = 200
       gap = 10
@@ -111,17 +111,17 @@ sections:
       totalH = rows * cellSize + (rows + 1) * gap
       totalW, totalH
     hints:
-    - 2단계. 콜라주 캔버스 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 콜라주 캔버스 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 콜라주 캔버스에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 콜라주 캔버스의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 콜라주 캔버스 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step3_paste
   title: 3단계. 이미지 배치
   structuredPrimary: true
   subtitle: paste()
   goal: 3단계. 이미지 배치에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     paste() 메서드로 이미지를 캔버스의 특정 위치에 붙입니다. 위치는 (x, y) 좌표로 지정하며, 붙일 이미지의 왼쪽 상단이 해당 좌표에 배치됩니다.
 
@@ -134,24 +134,24 @@ sections:
     collage.paste(img1, (x1, y1))
     collage
   exercise:
-    prompt: 3단계. 이미지 배치 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 이미지 배치 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       x1 = gap
       y1 = gap
       collage.paste(img1, (x1, y1))
       collage
     hints:
-    - 3단계. 이미지 배치 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 이미지 배치 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 이미지 배치에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 이미지 배치의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 이미지 배치 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step4_resize_fit
   title: 4단계. 크기 맞춤
   structuredPrimary: true
   subtitle: 다른 크기 이미지 처리
   goal: 4단계. 크기 맞춤에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     실제 이미지는 크기가 제각각입니다. sklearn 이미지를 콜라주에 넣으려면 resize()로 크기를 맞춰야 합니다.
 
@@ -165,7 +165,7 @@ sections:
     bloom = Image.fromarray(bloomArr)
     bloom.size
   exercise:
-    prompt: 4단계. 크기 맞춤 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 크기 맞춤 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_sample_image
 
@@ -173,17 +173,17 @@ sections:
       bloom = Image.fromarray(bloomArr)
       bloom.size
     hints:
-    - 4단계. 크기 맞춤 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 크기 맞춤 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 크기 맞춤에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 크기 맞춤의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 크기 맞춤 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step5_mixed
   title: 5단계. 혼합 콜라주
   structuredPrimary: true
   subtitle: 다양한 소스 조합
   goal: 5단계. 혼합 콜라주에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: sklearn 이미지와 Lorem Picsum 이미지를 섞어 콜라주를 만듭니다. 각 이미지를 셀 크기에 맞게 조절합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -193,24 +193,24 @@ sections:
     sceneResized = scene.resize((cellSize, cellSize))
     sceneResized.size
   exercise:
-    prompt: 5단계. 혼합 콜라주 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 혼합 콜라주 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       sceneArr = load_sample_image('china.jpg')
       scene = Image.fromarray(sceneArr)
       sceneResized = scene.resize((cellSize, cellSize))
       sceneResized.size
     hints:
-    - 5단계. 혼합 콜라주 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 혼합 콜라주 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 혼합 콜라주에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 혼합 콜라주의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 혼합 콜라주 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step6_border
   title: 6단계. 테두리 추가
   structuredPrimary: true
   subtitle: ImageDraw 활용
   goal: 6단계. 테두리 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: ImageDraw로 각 이미지 주변에 테두리를 그려 콜라주를 더 세련되게 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -232,7 +232,7 @@ sections:
 
     finalCollage
   exercise:
-    prompt: 6단계. 테두리 추가 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 테두리 추가 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import ImageDraw
 
@@ -251,17 +251,17 @@ sections:
 
       finalCollage
     hints:
-    - 6단계. 테두리 추가 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 6단계. 테두리 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 테두리 추가에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 6단계. 테두리 추가의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 테두리 추가 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 콜라주 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     다양한 레이아웃의 콜라주를 만들어봅시다. 위에서 배운 paste()와 좌표 계산을 활용하여 가로 스트립과 듀오 콜라주를 직접 구성합니다.
 
@@ -281,7 +281,7 @@ sections:
     strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
     strip1
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -295,17 +295,17 @@ sections:
       strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
       strip1
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 7단계. 콜라주 레이아웃 검증 루프
   structuredPrimary: true
   subtitle: grid, padding, paste 위치 확인
   goal: 7단계. 콜라주 레이아웃 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 콜라주는 이미지를 붙이는 과제가 아니라 레이아웃 계산 문제입니다. 이미지 개수와 그리드가 맞는지 검증하고, 각 타일이 의도한 좌표에 배치됐는지 픽셀로 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -324,7 +324,7 @@ sections:
 
     validateGrid(collageTiles, 2, 2)
   exercise:
-    prompt: 7단계. 콜라주 레이아웃 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 콜라주 레이아웃 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from PIL import Image, ImageOps
 
@@ -340,8 +340,8 @@ sections:
 
       validateGrid(collageTiles, 2, 2)
     hints:
-    - 7단계. 콜라주 레이아웃 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 콜라주 레이아웃 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 콜라주 레이아웃 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 콜라주 레이아웃 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 콜라주 레이아웃 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

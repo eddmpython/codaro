@@ -45,7 +45,7 @@ intro:
     - label: 선언형 차트 환경
       detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 고급데이터변환 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
     - label: 고급데이터변환 완료
       detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: seaborn-data
   goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: Codaro 로컬 데이터셋에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다. total_bill은 총 계산 금액,
     tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다. 이 프로젝트에서는 데이터를
     차트에 표시하기 전에 먼저 가공하는 방법을 배웁니다. 새로운 값을 계산하거나, 그룹별로 집계하거나, 순위를 매기는 등의 변환 작업을 수행합니다.
@@ -69,7 +69,7 @@ sections:
 
     tips = loadLocalDataset("tips")
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -79,17 +79,17 @@ sections:
 
       tips = loadLocalDataset("tips")
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_calculate
   title: 2단계. 계산 필드 생성
   structuredPrimary: true
   subtitle: transform_calculate
   goal: 2단계. 계산 필드 생성에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     데이터에 없는 새로운 값을 계산해서 추가할 수 있습니다. transform_calculate()는 "계산해서 변환하라"는 명령입니다. 팁 비율(tip_pct)을 계산합니다. tip_pct = 'datum.tip / datum.total_bill * 100'은 "팁을 총 금액으로 나누고 100을 곱하라(퍼센트로 만들기)"는 의미입니다. datum.컬럼명으로 각 행의 값에 접근합니다. 계산식은 JavaScript 문법으로 작성하며, 따옴표 안에 넣습니다. 계산된 tip_pct 필드를 마치 원래 있던 컬럼처럼 encode()에서 사용할 수 있습니다.
 
@@ -111,7 +111,7 @@ sections:
     )
     chartCalc
   exercise:
-    prompt: 2단계. 계산 필드 생성 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 계산 필드 생성 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartCalc = alt.Chart(tips).mark_point().encode(
           x='total_bill:Q',
@@ -126,17 +126,17 @@ sections:
       )
       chartCalc
     hints:
-    - 2단계. 계산 필드 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 계산 필드 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 계산 필드 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 계산 필드 생성의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 계산 필드 생성의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_calculate_condition
   title: 3단계. 조건부 계산
   structuredPrimary: true
   subtitle: 삼항 연산자
   goal: 3단계. 조건부 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 3단계. 조건부 계산의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -153,7 +153,7 @@ sections:
     )
     chartCondCalc
   exercise:
-    prompt: 3단계. 조건부 계산 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 조건부 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartCondCalc = alt.Chart(tips).mark_bar().encode(
           x='tip_category:N',
@@ -167,17 +167,17 @@ sections:
       )
       chartCondCalc
     hints:
-    - 3단계. 조건부 계산 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 조건부 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 조건부 계산에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 조건부 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 조건부 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_aggregate
   title: 4단계. 그룹별 집계
   structuredPrimary: true
   subtitle: transform_aggregate
   goal: 4단계. 그룹별 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     이번에는 데이터를 그룹으로 묶어서 요약하는 방법을 배웁니다. transform_aggregate()는 "집계해서 변환하라"는 명령입니다. aggregate는 "모으다, 합치다"라는 뜻입니다. 여러 행을 하나로 모아서 평균, 합계, 개수 등을 계산합니다. avg_tip='mean(tip)'은 "tip 컬럼의 평균(mean)을 계산해서 avg_tip이라는 이름으로 저장하라"는 뜻입니다. groupby=['day']는 "day(요일)별로 그룹을 나눠서 계산하라"는 의미입니다. 월요일 그룹, 화요일 그룹 등 각각의 평균을 구합니다.
 
@@ -200,7 +200,7 @@ sections:
     )
     chartAgg
   exercise:
-    prompt: 4단계. 그룹별 집계 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 그룹별 집계 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartAgg = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -215,17 +215,17 @@ sections:
       )
       chartAgg
     hints:
-    - 4단계. 그룹별 집계 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 그룹별 집계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 그룹별 집계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 그룹별 집계의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 그룹별 집계의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_multi_aggregate
   title: 5단계. 다중 그룹 집계
   structuredPrimary: true
   subtitle: 여러 기준으로 집계
   goal: 5단계. 다중 그룹 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 여러 컬럼으로 그룹화할 수 있습니다. 요일과 시간대별 평균 금액을 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -244,7 +244,7 @@ sections:
     )
     chartMultiAgg
   exercise:
-    prompt: 5단계. 다중 그룹 집계 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 다중 그룹 집계 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartMultiAgg = alt.Chart(tips).mark_rect().encode(
           x='day:O',
@@ -260,17 +260,17 @@ sections:
       )
       chartMultiAgg
     hints:
-    - 5단계. 다중 그룹 집계 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 다중 그룹 집계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 다중 그룹 집계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 다중 그룹 집계의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 다중 그룹 집계의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_window
   title: 6단계. 윈도우 함수
   structuredPrimary: true
   subtitle: transform_window
   goal: 6단계. 윈도우 함수에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     윈도우 함수는 각 행마다 주변 행들을 "창문(window)"처럼 보면서 계산하는 기능입니다. 순위, 누적합, 이동평균 등을 구할 때 사용합니다. transform_window()는 "윈도우 함수로 변환하라"는 명령입니다. rank='rank()'는 "순위를 매겨서 rank라는 필드에 저장하라"는 뜻입니다. sort=[alt.SortField('tip', order='descending')]은 "tip을 내림차순(descending, 큰 것부터)으로 정렬해서 순위를 매기라"는 의미입니다. groupby=['day']는 "각 요일 안에서 따로 순위를 매기라"입니다. transform_filter()로 상위 5개만 남깁니다.
 
@@ -295,7 +295,7 @@ sections:
     )
     chartWindow
   exercise:
-    prompt: 6단계. 윈도우 함수 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 윈도우 함수 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartWindow = alt.Chart(tips).mark_point().encode(
           x='rank:O',
@@ -312,17 +312,17 @@ sections:
       )
       chartWindow
     hints:
-    - 6단계. 윈도우 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 윈도우 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 윈도우 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 윈도우 함수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 윈도우 함수의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_cumulative
   title: 7단계. 누적 계산
   structuredPrimary: true
   subtitle: 누적합/누적평균
   goal: 7단계. 누적 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 윈도우 함수로 누적합이나 이동 평균을 계산할 수 있습니다. 금액순 누적 팁을 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -341,7 +341,7 @@ sections:
     )
     chartCumulative
   exercise:
-    prompt: 7단계. 누적 계산 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 누적 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartCumulative = alt.Chart(tips).mark_line().encode(
           x='row_num:Q',
@@ -357,17 +357,17 @@ sections:
       )
       chartCumulative
     hints:
-    - 7단계. 누적 계산 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 누적 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 누적 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 누적 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 누적 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_fold
   title: 8단계. 데이터 피벗
   structuredPrimary: true
   subtitle: transform_fold
   goal: 8단계. 데이터 피벗에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     데이터 구조를 변경하는 방법을 배웁니다. fold는 "접다"라는 뜻으로, 여러 컬럼을 하나의 긴 형태로 변환합니다. transform_fold(['total_bill', 'tip'], as_=['key', 'value'])는 "total_bill과 tip 두 컬럼을 key와 value 두 컬럼으로 변환하라"는 뜻입니다. 원래 데이터가 total_bill=10, tip=2 형태였다면, 변환 후에는 (key='total_bill', value=10), (key='tip', value=2) 두 행으로 나뉩니다. 이렇게 하면 두 컬럼을 하나의 차트에 나란히 비교할 수 있습니다. xOffset='key:N'으로 막대를 옆으로 배치합니다.
 
@@ -391,7 +391,7 @@ sections:
     )
     chartFold
   exercise:
-    prompt: 8단계. 데이터 피벗 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 데이터 피벗 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartFold = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -408,17 +408,17 @@ sections:
       )
       chartFold
     hints:
-    - 8단계. 데이터 피벗 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 데이터 피벗 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 데이터 피벗에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 데이터 피벗의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 데이터 피벗의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 복합 변환 차트
   goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지 배운 변환 기법을 종합해 분석 차트를 완성합니다. 팁 비율을 계산하고, 그룹별로 집계한 뒤 시각화합니다.
 
@@ -450,7 +450,7 @@ sections:
     )
     chartFinal
   exercise:
-    prompt: 9단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       chartFinal = alt.Chart(tips).mark_bar().encode(
           x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
@@ -476,17 +476,17 @@ sections:
       )
       chartFinal
     hints:
-    - 9단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 데이터 변환 프로젝트
   goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리하면: transform_calculate()로 새 필드 계산, 삼항 연산자(?:)로 조건부 값 지정, transform_aggregate()로 그룹별 집계, groupby로 그룹 기준 지정, transform_window()로 순위와 누적 계산, transform_fold()로 wide를 long으로 변환입니다. 이제 배운 변환 기법들을 조합해 데이터를 다양하게 분석해봅시다.
 
@@ -499,18 +499,18 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     bill = loadLocalDataset("tips")
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
       bill = loadLocalDataset("tips")
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -526,12 +526,14 @@ sections:
     - transform_fold([컬럼], as_) - wide to long 변환
   - type: text
     content: 다음 프로젝트에서는 모든 기법을 종합한 대시보드를 만듭니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
 - id: workflow_validation
   title: 10단계. 데이터 변환 spec 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 10단계. 데이터 변환 spec 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     Altair transform은 pandas 전처리와 Vega-Lite 사양의 경계입니다. calculate, aggregate, window가 spec에 정확히 들어갔는지 확인합니다.
 
@@ -550,7 +552,7 @@ sections:
     assert tipsTransform["total_bill"].gt(0).all()
     assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
   exercise:
-    prompt: 10단계. 데이터 변환 spec 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 데이터 변환 spec 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -563,8 +565,8 @@ sections:
       assert tipsTransform["total_bill"].gt(0).all()
       assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
     hints:
-    - 10단계. 데이터 변환 spec 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 데이터 변환 spec 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 데이터 변환 spec 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 데이터 변환 spec 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 데이터 변환 spec 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

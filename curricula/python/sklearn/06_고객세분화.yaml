@@ -49,7 +49,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 고객세분화 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 고객세분화 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: 클러스터링에 필요한 라이브러리를 불러옵니다. KMeans와 실루엣 점수를 추가로 임포트합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -72,7 +72,7 @@ sections:
     import numpy as np
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       from sklearn.datasets import make_blobs, make_moons
       from sklearn.preprocessing import StandardScaler
@@ -83,17 +83,17 @@ sections:
       import numpy as np
       import matplotlib.pyplot as plt
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_data
   title: 2단계. 합성 데이터 생성
   structuredPrimary: true
   subtitle: make_blobs
   goal: 2단계. 합성 데이터 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     make_blobs()로 군집이 있는 합성 데이터를 생성합니다. 실제 고객 데이터 대신 학습용으로 사용합니다. 4개의 군집, 각 군집당 200개 샘플을 생성합니다.
 
@@ -105,22 +105,22 @@ sections:
     X, yTrue = make_blobs(n_samples=800, centers=4, cluster_std=1.0, random_state=42)
     X.shape
   exercise:
-    prompt: 2단계. 합성 데이터 생성 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 합성 데이터 생성 예제에서 `X`, `yTrue` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       X, yTrue = make_blobs(n_samples=800, centers=4, cluster_std=1.0, random_state=42)
       X.shape
     hints:
-    - 2단계. 합성 데이터 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. 합성 데이터 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 합성 데이터 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 합성 데이터 생성에서 `X`, `yTrue` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 2단계. 합성 데이터 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_scale
   title: 3단계. 스케일링
   structuredPrimary: true
   subtitle: StandardScaler
   goal: 3단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: K-Means는 유클리드 거리를 사용하므로 스케일링이 중요합니다. 특성 간 스케일이 다르면 거리 계산이 왜곡됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -128,22 +128,22 @@ sections:
     scaler = StandardScaler()
     xSc = scaler.fit_transform(X)
   exercise:
-    prompt: 3단계. 스케일링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 스케일링 예제에서 `scaler`, `xSc` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       scaler = StandardScaler()
       xSc = scaler.fit_transform(X)
     hints:
-    - 3단계. 스케일링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `scaler = ...` 오른쪽 값입니다.
+    - 실행 뒤 `scaler` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. 스케일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 스케일링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 스케일링에서 `scaler` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_kmeans
   title: 4단계. K-Means 기본
   structuredPrimary: true
   subtitle: n_clusters=4
   goal: 4단계. KMeans 기본에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     K-Means는 K개의 군집 중심(centroid)을 찾아 데이터를 가장 가까운 중심에 할당합니다. n_clusters로 군집 수를 지정합니다. 실제로는 최적 K를 모르므로 여러 값을 시도해야 합니다.
 
@@ -155,23 +155,23 @@ sections:
     labels = kmeans.fit_predict(xSc)
     labels[:20]
   exercise:
-    prompt: 4단계. KMeans 기본 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. KMeans 기본 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
       labels = kmeans.fit_predict(xSc)
       labels[:20]
     hints:
-    - 4단계. KMeans 기본 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. KMeans 기본 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. KMeans 기본에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. KMeans 기본에서 `kmeans` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. KMeans 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_visualize
   title: 5단계. 결과 시각화
   structuredPrimary: true
   subtitle: 군집과 중심점
   goal: 5단계. 결과 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 클러스터링 결과를 시각화합니다. 군집 중심(centroid)도 함께 표시합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -186,7 +186,7 @@ sections:
     ax.legend()
     fig
   exercise:
-    prompt: 5단계. 결과 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 결과 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(8, 6))
       scatter = ax.scatter(xSc[:, 0], xSc[:, 1], c=labels, cmap='viridis', alpha=0.6)
@@ -198,17 +198,17 @@ sections:
       ax.legend()
       fig
     hints:
-    - 5단계. 결과 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 결과 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 결과 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 결과 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 결과 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_inertia
   title: 6단계. Inertia
   structuredPrimary: true
   subtitle: 군집 내 거리 합
   goal: 6단계. Inertia에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Inertia는 각 데이터 포인트와 해당 군집 중심 사이 거리의 제곱합입니다. 값이 작을수록 군집이 촘촘합니다. K가 증가하면 inertia는 항상 감소합니다.
 
@@ -219,22 +219,22 @@ sections:
     inertia = kmeans.inertia_
     f"Inertia: {inertia:.2f}"
   exercise:
-    prompt: 6단계. Inertia 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. Inertia 예제에서 `inertia` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       inertia = kmeans.inertia_
       f"Inertia: {inertia:.2f}"
     hints:
-    - 6단계. Inertia 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `inertia = ...` 오른쪽 값입니다.
+    - 실행 뒤 `inertia` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. Inertia 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. Inertia에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. Inertia에서 `inertia` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. Inertia 실행 뒤 `inertia` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_elbow
   title: 7단계. 엘보우 방법
   structuredPrimary: true
   subtitle: 최적 K 찾기
   goal: 7단계. 엘보우 방법에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     엘보우 방법은 K를 1부터 증가시키며 inertia를 그래프로 그립니다. 급격히 감소하다가 완만해지는 지점(팔꿈치)이 최적 K입니다.
 
@@ -257,7 +257,7 @@ sections:
     ax.set_title('Elbow Method')
     fig
   exercise:
-    prompt: 7단계. 엘보우 방법 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 엘보우 방법 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       inertias = []
       kRange = range(1, 11)
@@ -274,17 +274,17 @@ sections:
       ax.set_title('Elbow Method')
       fig
     hints:
-    - 7단계. 엘보우 방법 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 엘보우 방법 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 엘보우 방법에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 엘보우 방법의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 엘보우 방법 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step8_silhouette
   title: 8단계. 실루엣 점수
   structuredPrimary: true
   subtitle: 군집 품질 평가
   goal: 8단계. 실루엣 점수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     실루엣 점수는 군집이 얼마나 잘 분리되어 있는지 측정합니다. -1~1 사이 값으로, 1에 가까울수록 군집이 잘 나뉘어 있습니다. 0은 군집 경계에 있음, 음수는 잘못된 군집을 의미합니다.
 
@@ -295,22 +295,22 @@ sections:
     silScore = silhouette_score(xSc, labels)
     f"실루엣 점수: {silScore:.4f}"
   exercise:
-    prompt: 8단계. 실루엣 점수 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 실루엣 점수 예제에서 `silScore` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       silScore = silhouette_score(xSc, labels)
       f"실루엣 점수: {silScore:.4f}"
     hints:
-    - 8단계. 실루엣 점수 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `silScore = ...` 오른쪽 값입니다.
+    - 실행 뒤 `silScore` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 8단계. 실루엣 점수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 실루엣 점수에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. 실루엣 점수에서 `silScore` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 실루엣 점수 실행 뒤 `silScore` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step9_optimal
   title: 9단계. 최적 K 선택
   structuredPrimary: true
   subtitle: 종합 분석
   goal: 9단계. 최적 K 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 엘보우와 실루엣 결과를 종합하여 최적 K를 선택합니다. 두 방법이 같은 K를 제안하면 더 신뢰할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -322,7 +322,7 @@ sections:
     })
     resultDf
   exercise:
-    prompt: 9단계. 최적 K 선택 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 최적 K 선택 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       resultDf = pd.DataFrame({
           'K': list(kRange2),
@@ -331,17 +331,17 @@ sections:
       })
       resultDf
     hints:
-    - 9단계. 최적 K 선택 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 최적 K 선택 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 최적 K 선택에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 최적 K 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 최적 K 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step10_moons
   title: 10단계. 비선형 데이터
   structuredPrimary: true
   subtitle: make_moons
   goal: 10단계. 비선형 데이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     K-Means는 구형 군집에 적합합니다. 초승달 모양처럼 비선형 군집에는 잘 작동하지 않습니다. DBSCAN 같은 다른 알고리즘이 필요합니다.
 
@@ -364,7 +364,7 @@ sections:
     axes[1].set_title('K-Means Result')
     fig
   exercise:
-    prompt: 10단계. 비선형 데이터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 비선형 데이터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       xMoon, yMoon = make_moons(n_samples=500, noise=0.1, random_state=42)
       scMoon = StandardScaler()
@@ -380,17 +380,17 @@ sections:
       axes[1].set_title('K-Means Result')
       fig
     hints:
-    - 10단계. 비선형 데이터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 비선형 데이터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 비선형 데이터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 비선형 데이터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 비선형 데이터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step11_pca
   title: 11단계. 고차원 클러스터링
   structuredPrimary: true
   subtitle: PCA로 시각화
   goal: 11단계. 고차원 클러스터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 실제 데이터는 고차원인 경우가 많습니다. 클러스터링 결과를 PCA로 2차원에 투영하여 시각화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -413,7 +413,7 @@ sections:
     plt.colorbar(scatter, ax=ax)
     fig
   exercise:
-    prompt: 11단계. 고차원 클러스터링 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 고차원 클러스터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       xHigh, yHigh = make_blobs(n_samples=500, n_features=5, centers=3, random_state=42)
       scHigh = StandardScaler()
@@ -433,17 +433,17 @@ sections:
       plt.colorbar(scatter, ax=ax)
       fig
     hints:
-    - 11단계. 고차원 클러스터링 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 고차원 클러스터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 고차원 클러스터링에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 고차원 클러스터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 고차원 클러스터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step12_summary
   title: 12단계. 정리
   structuredPrimary: true
   subtitle: 클러스터링 완료
   goal: 12단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 이번 프로젝트에서는 K-Means 클러스터링으로 데이터를 군집화하는 방법을 배웠습니다. 엘보우 방법과 실루엣 점수로 최적 K를 찾고, PCA로 결과를 시각화했습니다.
     비지도 학습의 핵심 개념을 익혔습니다.
   tips:
@@ -455,7 +455,7 @@ sections:
     })
     summary
   exercise:
-    prompt: 12단계. 정리 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       summary = pd.DataFrame({
           'Item': ['Algorithm', 'Optimal K', 'Silhouette', 'Method'],
@@ -463,17 +463,17 @@ sections:
       })
       summary
     hints:
-    - 12단계. 정리 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 12단계. 정리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 정리에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 정리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 정리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 고객 세분화 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     마케팅 분석가가 되어 고객 세분화 시스템을 구축합니다. 각 미션은 데이터 생성부터 클러스터링, 평가까지 전 과정을 독립적으로 수행합니다. make_blobs, StandardScaler, KMeans, silhouette_score, PCA를 모두 활용합니다.
 
@@ -506,7 +506,7 @@ sections:
 
     pd.DataFrame(results)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.datasets import make_blobs
       from sklearn.preprocessing import StandardScaler
@@ -533,17 +533,17 @@ sections:
 
       pd.DataFrame(results)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -574,7 +574,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -619,8 +619,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

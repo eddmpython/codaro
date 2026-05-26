@@ -46,7 +46,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 히트맵 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 히트맵 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -55,7 +55,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 HeatMap 플러그인을 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -63,22 +63,22 @@ sections:
     import folium
     from folium.plugins import HeatMap
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_basic_heatmap
   title: 2단계. 기본 히트맵
   structuredPrimary: true
   subtitle: HeatMap()
   goal: 2단계. 기본 히트맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     HeatMap은 좌표 리스트를 받아 밀도를 시각화합니다. 좌표가 많이 모인 곳이 더 진하게 표시됩니다.
 
@@ -105,7 +105,7 @@ sections:
 
     m1
   exercise:
-    prompt: 2단계. 기본 히트맵 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 기본 히트맵 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=13)
@@ -126,17 +126,17 @@ sections:
 
       m1
     hints:
-    - 2단계. 기본 히트맵 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 기본 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 기본 히트맵에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 기본 히트맵에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 기본 히트맵 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_radius_blur
   title: 3단계. radius와 blur
   structuredPrimary: true
   subtitle: 크기 조절
   goal: 3단계. radius와 blur에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     radius는 각 포인트의 영향 범위, blur는 경계의 부드러움을 조절합니다.
 
@@ -153,7 +153,7 @@ sections:
 
     m2
   exercise:
-    prompt: 3단계. radius와 blur 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. radius와 blur 예제에서 `m2`, `radius` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -164,17 +164,17 @@ sections:
 
       m2
     hints:
-    - 3단계. radius와 blur 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m2 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m2` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. radius와 blur 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. radius와 blur에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. radius와 blur에서 `m2` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. radius와 blur 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_gradient
   title: 4단계. 색상 그라데이션
   structuredPrimary: true
   subtitle: gradient
   goal: 4단계. 색상 그라데이션에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     gradient로 색상 구간을 지정합니다. 0~1 사이 값에 색상을 매핑합니다.
 
@@ -200,7 +200,7 @@ sections:
 
     m4
   exercise:
-    prompt: 4단계. 색상 그라데이션 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 색상 그라데이션 예제에서 `m4`, `customGradient`, `gradient` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -220,17 +220,17 @@ sections:
 
       m4
     hints:
-    - 4단계. 색상 그라데이션 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m4 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m4` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. 색상 그라데이션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 색상 그라데이션에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 색상 그라데이션에서 `m4` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 색상 그라데이션 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_weighted_heatmap
   title: 5단계. 가중치 히트맵
   structuredPrimary: true
   subtitle: weight
   goal: 5단계. 가중치 히트맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     좌표에 가중치를 추가하면 특정 포인트를 더 강조할 수 있습니다. [위도, 경도, 가중치] 형태로 데이터를 전달합니다.
 
@@ -252,7 +252,7 @@ sections:
 
     m6
   exercise:
-    prompt: 5단계. 가중치 히트맵 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 가중치 히트맵 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m6 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -268,17 +268,17 @@ sections:
 
       m6
     hints:
-    - 5단계. 가중치 히트맵 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 가중치 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 가중치 히트맵에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 가중치 히트맵에서 `m6` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 가중치 히트맵 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_min_opacity
   title: 6단계. 최소 투명도
   structuredPrimary: true
   subtitle: min_opacity
   goal: 6단계. 최소 투명도에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     min_opacity로 낮은 밀도 영역의 최소 투명도를 설정합니다.
 
@@ -296,7 +296,7 @@ sections:
 
     m7
   exercise:
-    prompt: 6단계. 최소 투명도 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 최소 투명도 예제에서 `m7`, `min_opacity`, `radius` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -308,17 +308,17 @@ sections:
 
       m7
     hints:
-    - 6단계. 최소 투명도 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m7 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m7` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. 최소 투명도 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 최소 투명도에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 최소 투명도에서 `m7` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 최소 투명도 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_max_zoom
   title: 7단계. 줌 레벨 설정
   structuredPrimary: true
   subtitle: max_zoom
   goal: 7단계. 줌 레벨 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     max_zoom으로 히트맵이 표시되는 최대 줌 레벨을 설정합니다. 높은 줌에서는 포인트가 분산됩니다.
 
@@ -336,7 +336,7 @@ sections:
 
     m8
   exercise:
-    prompt: 7단계. 줌 레벨 설정 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 줌 레벨 설정 예제에서 `m8`, `max_zoom`, `radius` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -348,17 +348,17 @@ sections:
 
       m8
     hints:
-    - 7단계. 줌 레벨 설정 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m8 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m8` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 7단계. 줌 레벨 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 줌 레벨 설정에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 줌 레벨 설정에서 `m8` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 줌 레벨 설정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step8_large_data
   title: 8단계. 대량 데이터
   structuredPrimary: true
   subtitle: 많은 포인트
   goal: 8단계. 대량 데이터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     히트맵은 대량의 포인트 데이터에서 진가를 발휘합니다. 랜덤 데이터로 테스트합니다.
 
@@ -385,7 +385,7 @@ sections:
 
     m9
   exercise:
-    prompt: 8단계. 대량 데이터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 대량 데이터 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       import random
 
@@ -406,17 +406,17 @@ sections:
 
       m9
     hints:
-    - 8단계. 대량 데이터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 8단계. 대량 데이터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 대량 데이터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 8단계. 대량 데이터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 대량 데이터 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step9_with_markers
   title: 9단계. 마커와 조합
   structuredPrimary: true
   subtitle: 히트맵 + 마커
   goal: 9단계. 마커와 조합에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     히트맵 위에 마커를 추가하여 주요 위치를 강조합니다.
 
@@ -451,7 +451,7 @@ sections:
 
     m10
   exercise:
-    prompt: 9단계. 마커와 조합 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 마커와 조합 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
 
@@ -480,17 +480,17 @@ sections:
 
       m10
     hints:
-    - 9단계. 마커와 조합 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 마커와 조합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 마커와 조합에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 9단계. 마커와 조합의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 마커와 조합 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 인구 밀도 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 서울 주요 지역의 인구 밀도를 히트맵으로 시각화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -559,7 +559,7 @@ sections:
 
     densityMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       import random
 
@@ -625,17 +625,17 @@ sections:
 
       densityMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 예제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 히트맵 검증
   structuredPrimary: true
   subtitle: 예측 → 데이터 오류 확인 → 렌더 검증 → 기준 실험
   goal: 11단계. 실무 히트맵 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
   explanation: |-
     히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을 바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
 
@@ -660,7 +660,7 @@ sections:
     hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
     hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
   exercise:
-    prompt: 11단계. 실무 히트맵 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 실무 히트맵 검증 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
     starterCode: |-
       complaintHeatRows = [
           {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
@@ -679,17 +679,17 @@ sections:
       hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
       hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
     hints:
-    - 11단계. 실무 히트맵 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 실무 히트맵 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 실무 히트맵 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 11단계. 실무 히트맵 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 실무 히트맵 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 히트맵
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -712,7 +712,7 @@ sections:
 
     len(incidentData)
   exercise:
-    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap
@@ -732,8 +732,8 @@ sections:
 
       len(incidentData)
     hints:
-    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.

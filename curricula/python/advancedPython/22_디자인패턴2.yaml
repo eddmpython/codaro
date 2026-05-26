@@ -48,7 +48,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 디자인 패턴 2 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 디자인 패턴 2 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 상태 변화 통지
   goal: 옵저버 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 객체 상태 변화를 다른 객체에 통지하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -108,7 +108,7 @@ sections:
     observerResult = (emailSub.messages, smsSub.messages)
     observerResult
   exercise:
-    prompt: 옵저버 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 옵저버 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -156,17 +156,17 @@ sections:
       observerResult = (emailSub.messages, smsSub.messages)
       observerResult
     hints:
-    - 옵저버 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 옵저버 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 옵저버 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 옵저버 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 옵저버 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: strategy_pattern
   title: 전략 패턴
   structuredPrimary: true
   subtitle: 알고리즘 캡슐화
   goal: 전략 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 알고리즘을 캡슐화하여 교체 가능하게 하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -224,7 +224,7 @@ sections:
     strategyResult = (payResult1, payResult2)
     strategyResult
   exercise:
-    prompt: 전략 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 전략 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -279,17 +279,17 @@ sections:
       strategyResult = (payResult1, payResult2)
       strategyResult
     hints:
-    - 전략 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 전략 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 전략 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 전략 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 전략 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: command_pattern
   title: 커맨드 패턴
   structuredPrimary: true
   subtitle: 요청 캡슐화
   goal: 커맨드 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 요청을 객체로 캡슐화하여 매개변수화하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -359,7 +359,7 @@ sections:
     commandResult = (cmdResult1, cmdResult2, cmdResult3, light.isOn)
     commandResult
   exercise:
-    prompt: 커맨드 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 커맨드 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -426,17 +426,17 @@ sections:
       commandResult = (cmdResult1, cmdResult2, cmdResult3, light.isOn)
       commandResult
     hints:
-    - 커맨드 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 커맨드 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 커맨드 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 커맨드 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 커맨드 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: state_pattern
   title: 상태 패턴
   structuredPrimary: true
   subtitle: 상태에 따른 행동 변경
   goal: 상태 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 객체의 상태에 따라 행동을 변경하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -510,7 +510,7 @@ sections:
     stateResult = (vmResult1, vmResult2, vmResult3)
     stateResult
   exercise:
-    prompt: 상태 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 상태 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -581,17 +581,17 @@ sections:
       stateResult = (vmResult1, vmResult2, vmResult3)
       stateResult
     hints:
-    - 상태 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 상태 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 상태 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 상태 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 상태 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: template_method_pattern
   title: 템플릿 메서드 패턴
   structuredPrimary: true
   subtitle: 알고리즘 골격 정의
   goal: 템플릿 메서드 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 알고리즘 골격을 정의하고 일부 단계를 서브클래스에 위임
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -644,7 +644,7 @@ sections:
     templateResult = (pdfReport, csvReport)
     templateResult
   exercise:
-    prompt: 템플릿 메서드 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 템플릿 메서드 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -694,17 +694,17 @@ sections:
       templateResult = (pdfReport, csvReport)
       templateResult
     hints:
-    - 템플릿 메서드 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 템플릿 메서드 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 템플릿 메서드 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 템플릿 메서드 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 템플릿 메서드 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: chain_of_responsibility
   title: 책임 연쇄 패턴
   structuredPrimary: true
   subtitle: 핸들러 체인
   goal: 책임 연쇄 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 요청을 처리할 수 있는 핸들러를 연쇄적으로 연결
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -759,7 +759,7 @@ sections:
     chainResult = (chainResult1, chainResult2, chainResult3)
     chainResult
   exercise:
-    prompt: 책임 연쇄 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 책임 연쇄 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -811,17 +811,17 @@ sections:
       chainResult = (chainResult1, chainResult2, chainResult3)
       chainResult
     hints:
-    - 책임 연쇄 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 책임 연쇄 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 책임 연쇄 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 책임 연쇄 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 책임 연쇄 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 실무 행동 패턴 선택 루프
   structuredPrimary: true
   subtitle: 요구사항 → 패턴 선택 → 오류 확인 → 검증
   goal: 실무 행동 패턴 선택 루프에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     행동 패턴은 이름을 맞히는 문제가 아니라 변경 요구를 어디에 격리할지 정하는 도구입니다. 주문 처리 업무에서 알림은 옵저버, 배송비 정책은 전략, 상태 변경과 되돌리기는 커맨드가 어울립니다. 실행 전에 어떤 변경이 어디로 흘러갈지 예측하고, 빠진 정책 같은 오류를 검증해야 합니다.
 
@@ -861,7 +861,7 @@ sections:
     assert auditLog == ["audit O-1001"]
     assert observerResults == [None, None]
   exercise:
-    prompt: 실무 행동 패턴 선택 루프 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 실무 행동 패턴 선택 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class OrderEventBus:
           def __init__(self):
@@ -895,17 +895,17 @@ sections:
       assert auditLog == ["audit O-1001"]
       assert observerResults == [None, None]
     hints:
-    - 실무 행동 패턴 선택 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실무 행동 패턴 선택 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실무 행동 패턴 선택 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실무 행동 패턴 선택 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실무 행동 패턴 선택 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 행동 패턴 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 22에서 배운 행동 디자인 패턴을 난이도별로 복습합니다. 옵저버 패턴은 이벤트 시스템, 전략 패턴은 알고리즘 교체, 커맨드 패턴은 실행 취소/재실행에
     핵심입니다. 상태 패턴은 복잡한 상태 전이를 객체로 캡슐화하고, 템플릿 메서드는 알고리즘의 골격을 정의합니다. 🟢 기본 문제로 각 패턴의 핵심 인터페이스를 구현하고, 🟡 응용
     문제로 여러 패턴을 조합해봅니다. 🔴 심화 문제에서는 GUI 프레임워크, 게임 엔진 등에서 사용되는 복합 행동 패턴을 직접 설계합니다. 행동 패턴은 객체 간 책임 분배와 통신
@@ -946,7 +946,7 @@ sections:
     ex1Result = (reader1.news, reader2.news)
     ex1Result
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class NewsAgency:
           def __init__(self):
@@ -981,8 +981,8 @@ sections:
       ex1Result = (reader1.news, reader2.news)
       ex1Result
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

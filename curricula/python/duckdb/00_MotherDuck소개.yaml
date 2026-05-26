@@ -28,26 +28,26 @@ meta:
 intro:
   direction: MotherDuck소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - MotherDuck소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - MotherDuck소개 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 로컬 DuckDB 쿼리 품질 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
-    - label: 핵심 처리 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 출력과 상태 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
+    - label: SELECT/WHERE/GRO 처리 실행
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
+    - label: 쿼리 결과 행, 컬럼, 집계값 결과 검증
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
     - label: MotherDuck소개 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: SQL 분석 환경
       detail: duckdb 기준으로 로컬 Python 실행을 준비합니다.
     - label: MotherDuck소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
     - label: MotherDuck소개 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -70,6 +70,8 @@ sections:
       title: DuckDB 100% 호환
   - type: image
     src: https://motherduck.com/docs/assets/images/md-diagram_v1.3-ce2f25a6d54de87545934d324514c3e7.png
+  goal: MotherDuck??에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: what_is_motherduck
   blocks:
   - type: sectionHeader
@@ -94,6 +96,8 @@ sections:
     - emoji: 🤝
       title: 협업 기능
       description: 데이터 공유 및 팀 작업 지원
+  goal: 🤔 MotherDuck이 뭔가요?에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: dual_execution
   blocks:
   - type: sectionHeader
@@ -120,6 +124,8 @@ sections:
     - emoji: 💸
       title: 비용 절감
       description: 로컬 처리는 과금 없음
+  goal: ⚡ Dual Execution에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: architecture
   blocks:
   - type: sectionHeader
@@ -144,6 +150,8 @@ sections:
     - emoji: ⚡
       title: 빠른 시작
       description: 콜드 스타트 최소화
+  goal: 🏗️ 아키텍처에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: vs_others
   blocks:
   - type: sectionHeader
@@ -192,6 +200,8 @@ sections:
     - - Snowflake
       - 엔터프라이즈급, 복잡한 기능
       - 웨어하우스 시간당
+  goal: 🆚 다른 서비스와 비교에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: pricing
   blocks:
   - type: sectionHeader
@@ -220,6 +230,8 @@ sections:
     title: 비용 절감 사례
     content: Definite는 기존 데이터 웨어하우스에서 MotherDuck으로 전환 후 70% 비용 절감을 달성했습니다. DuckDB의 효율적인 쿼리 엔진과 Scale-Up
       아키텍처 덕분에 타 서비스 대비 10배 저렴한 경우도 있습니다.
+  goal: 💰 가격 정책에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -245,6 +257,8 @@ sections:
     - emoji: 🔗
       title: 하이브리드 분석
       description: 민감 데이터는 로컬, 나머지는 클라우드
+  goal: 🎯 활용 사례에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: getting_started
   blocks:
   - type: sectionHeader
@@ -271,6 +285,8 @@ sections:
     - emoji: 📊
       title: BI 도구
       description: ODBC/JDBC 드라이버 지원
+  goal: 🚀 시작하기에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: ecosystem
   blocks:
   - type: sectionHeader
@@ -290,6 +306,8 @@ sections:
     - emoji: 📁
       title: S3
       description: S3 버킷 직접 쿼리
+  goal: 🔌 생태계에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -312,18 +330,22 @@ sections:
     - text: MotherDuck 블로그
       url: https://motherduck.com/blog/
       icon: 🔗
+  goal: 📚 참고 자료에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 기본 SQL 쿼리'
     subtitle: DuckDB로 SELECT, WHERE를 실습해봅니다
+  goal: '다음: 기본 SQL 쿼리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.'
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
     결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
@@ -350,7 +372,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import duckdb
 
@@ -373,8 +395,8 @@ sections:
       assert rowCount == 5
       rowCount
     hints:
-    - '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'

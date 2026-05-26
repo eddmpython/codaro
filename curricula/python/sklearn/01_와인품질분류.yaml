@@ -49,7 +49,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, pandas, scikitlearn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 와인품질분류 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 와인품질분류 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: pip
   goal: 1단계. scikitlearn 설치에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
     scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비합니다. 처음 준비할 때 약간의 시간이 걸릴 수 있습니다.
 
@@ -67,20 +67,20 @@ sections:
   - scikit-learn 설치 시 약 10-20MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다.
   snippet: import sklearn
   exercise:
-    prompt: 1단계. scikitlearn 설치 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. scikitlearn 설치 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import sklearn
     hints:
-    - 1단계. scikitlearn 설치 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. scikitlearn 설치 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. scikitlearn 설치에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. scikitlearn 설치의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. scikitlearn 설치 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: load_wine()
   goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     sklearn.datasets에는 다양한 내장 데이터셋이 있습니다. load_wine()은 이탈리아 한 지역에서 재배한 세 가지 품종의 와인 178개 샘플을 제공합니다. 13가지 화학 성분(알코올, 산도, 마그네슘 등) 측정값이 특성입니다.
 
@@ -96,7 +96,7 @@ sections:
     y = wine.target
     X.shape
   exercise:
-    prompt: 2단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_wine
       import pandas as pd
@@ -106,11 +106,11 @@ sections:
       y = wine.target
       X.shape
     hints:
-    - 2단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_explore
   title: 3단계. 데이터 탐색
   structuredPrimary: true
@@ -122,20 +122,20 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: X.head()
   exercise:
-    prompt: 3단계. 데이터 탐색 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 데이터 탐색 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: X.head()
     hints:
-    - 3단계. 데이터 탐색 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. 데이터 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 데이터 탐색에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 데이터 탐색의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 데이터 탐색 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step4_split
   title: 4단계. 데이터 분할
   structuredPrimary: true
   subtitle: train_test_split
   goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     머신러닝의 핵심 원칙은 "학습에 사용하지 않은 데이터로 평가"입니다. train_test_split으로 데이터를 학습용(train)과 테스트용(test)으로 나눕니다. 보통 80:20 또는 70:30 비율로 분할합니다.
 
@@ -149,24 +149,24 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 4단계. 데이터 분할 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 데이터 분할 예제에서 `xTrain`, `xTest`, `yTrain` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       from sklearn.model_selection import train_test_split
 
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
     hints:
-    - 4단계. 데이터 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. 데이터 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 데이터 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 데이터 분할에서 `xTrain`, `xTest`, `yTrain` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 4단계. 데이터 분할 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_scale
   title: 5단계. 스케일링
   structuredPrimary: true
   subtitle: StandardScaler
   goal: 5단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     특성들의 스케일이 다르면 일부 알고리즘이 제대로 작동하지 않습니다. 예를 들어 알코올 도수(11~14)와 프롤린 함량(278~1680)을 함께 사용하면 프롤린이 모델을 지배합니다. StandardScaler는 각 특성을 평균 0, 표준편차 1로 변환합니다.
 
@@ -182,7 +182,7 @@ sections:
     xTestSc = scaler.transform(xTest)
     xTrainSc[:3]
   exercise:
-    prompt: 5단계. 스케일링 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 스케일링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.preprocessing import StandardScaler
 
@@ -191,17 +191,17 @@ sections:
       xTestSc = scaler.transform(xTest)
       xTrainSc[:3]
     hints:
-    - 5단계. 스케일링 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 스케일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 스케일링에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 스케일링에서 `scaler` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_model
   title: 6단계. 모델 학습
   structuredPrimary: true
   subtitle: LogisticRegression
   goal: 6단계. 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     LogisticRegression은 분류 문제의 기본 알고리즘입니다. 이름에 "회귀"가 있지만 실제로는 분류에 사용합니다. 각 클래스에 속할 확률을 계산하고, 가장 높은 확률의 클래스를 예측합니다.
 
@@ -215,24 +215,24 @@ sections:
     model = LogisticRegression(max_iter=1000)
     model.fit(xTrainSc, yTrain)
   exercise:
-    prompt: 6단계. 모델 학습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 모델 학습 예제에서 `model` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.linear_model import LogisticRegression
 
       model = LogisticRegression(max_iter=1000)
       model.fit(xTrainSc, yTrain)
     hints:
-    - 6단계. 모델 학습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `model = ...` 오른쪽 값입니다.
+    - 실행 뒤 `model` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. 모델 학습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 모델 학습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 모델 학습에서 `model` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 모델 학습 실행 뒤 `model` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_predict
   title: 7단계. 예측
   structuredPrimary: true
   subtitle: predict()
   goal: 7단계. 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     학습된 모델로 테스트 데이터의 품종을 예측합니다. predict()는 클래스 레이블을, predict_proba()는 각 클래스의 확률을 반환합니다.
 
@@ -243,22 +243,22 @@ sections:
     yPred = model.predict(xTestSc)
     yPred
   exercise:
-    prompt: 7단계. 예측 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 예측 예제에서 `yPred` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       yPred = model.predict(xTestSc)
       yPred
     hints:
-    - 7단계. 예측 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `yPred = ...` 오른쪽 값입니다.
+    - 실행 뒤 `yPred` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 7단계. 예측 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 예측에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 예측에서 `yPred` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 예측 실행 뒤 `yPred` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step8_accuracy
   title: 8단계. 정확도 평가
   structuredPrimary: true
   subtitle: accuracy_score
   goal: 8단계. 정확도 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     정확도(accuracy)는 전체 샘플 중 올바르게 예측한 비율입니다. 가장 직관적인 평가 지표이지만, 클래스 불균형이 있으면 오해를 줄 수 있습니다.
 
@@ -271,24 +271,24 @@ sections:
     acc = accuracy_score(yTest, yPred)
     f"정확도: {acc:.2%}"
   exercise:
-    prompt: 8단계. 정확도 평가 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 정확도 평가 예제에서 `acc` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.metrics import accuracy_score
 
       acc = accuracy_score(yTest, yPred)
       f"정확도: {acc:.2%}"
     hints:
-    - 8단계. 정확도 평가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `acc = ...` 오른쪽 값입니다.
+    - 실행 뒤 `acc` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 8단계. 정확도 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 정확도 평가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. 정확도 평가에서 `acc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 정확도 평가 실행 뒤 `acc` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step9_confusion
   title: 9단계. 혼동행렬
   structuredPrimary: true
   subtitle: confusion_matrix
   goal: 9단계. 혼동행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     혼동행렬(confusion matrix)은 실제 클래스와 예측 클래스의 교차표입니다. 대각선은 올바른 예측, 비대각선은 오분류를 나타냅니다. 어떤 클래스에서 오류가 많은지 파악할 수 있습니다.
 
@@ -302,24 +302,24 @@ sections:
     cm = confusion_matrix(yTest, yPred)
     pd.DataFrame(cm, index=wine.target_names, columns=wine.target_names)
   exercise:
-    prompt: 9단계. 혼동행렬 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 혼동행렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.metrics import confusion_matrix
 
       cm = confusion_matrix(yTest, yPred)
       pd.DataFrame(cm, index=wine.target_names, columns=wine.target_names)
     hints:
-    - 9단계. 혼동행렬 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 혼동행렬 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 혼동행렬에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 혼동행렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 혼동행렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step10_report
   title: 10단계. 상세 평가
   structuredPrimary: true
   subtitle: classification_report
   goal: 10단계. 상세 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     classification_report는 클래스별 정밀도(precision), 재현율(recall), F1 점수를 제공합니다. 정밀도는 "양성 예측 중 실제 양성 비율", 재현율은 "실제 양성 중 맞춘 비율"입니다.
 
@@ -333,24 +333,24 @@ sections:
     report = classification_report(yTest, yPred, target_names=wine.target_names)
     report
   exercise:
-    prompt: 10단계. 상세 평가 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 상세 평가 예제에서 `report` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.metrics import classification_report
 
       report = classification_report(yTest, yPred, target_names=wine.target_names)
       report
     hints:
-    - 10단계. 상세 평가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `report = ...` 오른쪽 값입니다.
+    - 실행 뒤 `report` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 10단계. 상세 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 상세 평가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. 상세 평가에서 `report` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 상세 평가 실행 뒤 `report` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step11_visualize
   title: 11단계. 시각화
   structuredPrimary: true
   subtitle: 혼동행렬 히트맵
   goal: 11단계. 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 혼동행렬을 히트맵으로 시각화하면 오분류 패턴을 더 직관적으로 파악할 수 있습니다. seaborn의 heatmap을 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -365,7 +365,7 @@ sections:
     ax.set_title('Confusion Matrix')
     fig
   exercise:
-    prompt: 11단계. 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -377,17 +377,17 @@ sections:
       ax.set_title('Confusion Matrix')
       fig
     hints:
-    - 11단계. 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 시각화 실행 결과가 출력과 상태 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step12_summary
   title: 12단계. 전체 워크플로우
   structuredPrimary: true
   subtitle: 정리
   goal: 12단계. 전체 워크플로우에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: sklearn의 기본 워크플로우를 정리합니다. 데이터 분할 → 전처리 → 모델 학습 → 예측 → 평가 순서입니다. 이 패턴은 모든 sklearn 모델에 동일하게
     적용됩니다.
   tips:
@@ -399,7 +399,7 @@ sections:
     })
     resultDf
   exercise:
-    prompt: 12단계. 전체 워크플로우 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 전체 워크플로우 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       resultDf = pd.DataFrame({
           'Step': ['Data Split', 'Scaling', 'Model', 'Accuracy'],
@@ -407,17 +407,17 @@ sections:
       })
       resultDf
     hints:
-    - 12단계. 전체 워크플로우 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 12단계. 전체 워크플로우 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 전체 워크플로우에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 전체 워크플로우의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 전체 워크플로우의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 와인 분류 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     품질 관리 담당자가 되어 와인 품종 분류 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, accuracy_score, confusion_matrix를 모두 활용합니다.
 
@@ -452,7 +452,7 @@ sections:
 
     pd.DataFrame({'Model': ['Raw', 'Scaled'], 'Accuracy': [accRaw, accSc]})
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_wine
       from sklearn.model_selection import train_test_split
@@ -481,17 +481,17 @@ sections:
 
       pd.DataFrame({'Model': ['Raw', 'Scaled'], 'Accuracy': [accRaw, accSc]})
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -522,7 +522,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -567,8 +567,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

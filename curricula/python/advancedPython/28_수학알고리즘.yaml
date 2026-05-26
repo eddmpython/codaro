@@ -44,7 +44,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 수학 알고리즘 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 수학 알고리즘 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -53,7 +53,7 @@ sections:
   structuredPrimary: true
   subtitle: 소수 판별과 생성
   goal: 소수 알고리즘에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 소수 판별은 √n까지만 확인하면 됩니다. 에라토스테네스의 체로 범위 내 모든 소수를 구합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -74,7 +74,7 @@ sections:
     primeResult = primeCheck
     primeResult
   exercise:
-    prompt: 소수 알고리즘 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 소수 알고리즘 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def isPrime(n):
           if n < 2:
@@ -92,17 +92,17 @@ sections:
       primeResult = primeCheck
       primeResult
     hints:
-    - 소수 알고리즘 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 소수 알고리즘 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 소수 알고리즘에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 소수 알고리즘의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 소수 알고리즘 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: gcd_lcm
   title: GCD와 LCM
   structuredPrimary: true
   subtitle: 유클리드 알고리즘
   goal: GCD와 LCM에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: '유클리드 알고리즘: gcd(a, b) = gcd(b, a % b), b가 0이면 a 반환.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -120,7 +120,7 @@ sections:
     glResult = (gcdVal, lcmVal)
     glResult
   exercise:
-    prompt: GCD와 LCM 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: GCD와 LCM 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def gcd(a, b):
           while b:
@@ -135,17 +135,17 @@ sections:
       glResult = (gcdVal, lcmVal)
       glResult
     hints:
-    - GCD와 LCM 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: GCD와 LCM 코드가 예외 없이 끝나야 합니다.
-    resultCheck: GCD와 LCM에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: GCD와 LCM의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: GCD와 LCM 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: combinatorics
   title: 조합론
   structuredPrimary: true
   subtitle: 순열, 조합, 이항계수
   goal: 조합론에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: nPr = n!/(n-r)!, nCr = n!/r!(n-r)!
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -170,7 +170,7 @@ sections:
     combResult = (factVal, permVal, combVal)
     combResult
   exercise:
-    prompt: 조합론 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 조합론 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def factorial(n):
           if n <= 1:
@@ -192,17 +192,17 @@ sections:
       combResult = (factVal, permVal, combVal)
       combResult
     hints:
-    - 조합론 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 조합론 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 조합론에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 조합론의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 조합론 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: modular
   title: 모듈러 연산
   structuredPrimary: true
   subtitle: 빠른 거듭제곱
   goal: 모듈러 연산에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 큰 수의 거듭제곱을 효율적으로 계산. O(log n).
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -221,7 +221,7 @@ sections:
     mpResult = modPow(2, 100, MOD)
     mpResult
   exercise:
-    prompt: 모듈러 연산 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 모듈러 연산 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def modPow(base, exp, mod):
           result = 1
@@ -237,17 +237,17 @@ sections:
       mpResult = modPow(2, 100, MOD)
       mpResult
     hints:
-    - 모듈러 연산 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 모듈러 연산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 모듈러 연산에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 모듈러 연산의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 모듈러 연산 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: matrix
   title: 행렬 연산
   structuredPrimary: true
   subtitle: 행렬 곱셈과 거듭제곱
   goal: 행렬 연산에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 행렬 거듭제곱으로 피보나치를 O(log n)에 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -268,7 +268,7 @@ sections:
     matMulResult = matMul(matA, matB)
     matMulResult
   exercise:
-    prompt: 행렬 연산 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 행렬 연산 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def matMul(a, b):
           rows = len(a)
@@ -286,17 +286,17 @@ sections:
       matMulResult = matMul(matA, matB)
       matMulResult
     hints:
-    - 행렬 연산 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 행렬 연산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 행렬 연산에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 행렬 연산의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 행렬 연산 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: geometry
   title: 기하학 기초
   structuredPrimary: true
   subtitle: 거리와 넓이
   goal: 기하학 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 좌표 기하의 기본 연산들.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -314,7 +314,7 @@ sections:
     geoResult = (distVal, triVal)
     geoResult
   exercise:
-    prompt: 기하학 기초 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 기하학 기초 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import math
 
@@ -329,17 +329,17 @@ sections:
       geoResult = (distVal, triVal)
       geoResult
     hints:
-    - 기하학 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 기하학 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기하학 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 기하학 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 기하학 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 배치 주기와 체크섬 계산'
   structuredPrimary: true
   subtitle: GCD/LCM, 빠른 거듭제곱, 입력 검증을 운영 계산에 적용합니다
   goal: '현업 흐름 검증: 배치 주기와 체크섬 계산에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     수학 알고리즘은 추상 문제가 아니라 운영 주기, 체크섬, 샤딩 같은 계산에 바로 쓰입니다. 정수론 함수가 경계값에서 틀리지 않는지 표준 함수와 비교하며 검증하세요.
 
@@ -364,7 +364,7 @@ sections:
     assert lcmMany(periods) == 30
     assert [30 % period for period in periods] == [0, 0, 0]
   exercise:
-    prompt: '현업 흐름 검증: 배치 주기와 체크섬 계산 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 배치 주기와 체크섬 계산 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from math import gcd
       from functools import reduce
@@ -382,17 +382,17 @@ sections:
       assert lcmMany(periods) == 30
       assert [30 % period for period in periods] == [0, 0, 0]
     hints:
-    - '현업 흐름 검증: 배치 주기와 체크섬 계산 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 배치 주기와 체크섬 계산 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 배치 주기와 체크섬 계산에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 배치 주기와 체크섬 계산의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 배치 주기와 체크섬 계산 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 수학 알고리즘 실습
   goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 28에서 배운 수학 알고리즘을 난이도별로 복습합니다. GCD, 소수 판별, 에라토스테네스의 체는 정수론의 기초이며, 모듈러 연산과 빠른 거듭제곱은 암호학의
     기반입니다. 조합론과 확률은 경우의 수 문제와 시뮬레이션에 필수적입니다. 🟢 기본 문제로 완전수, 약수 합, 소인수분해 등을 구현하고, 🟡 응용 문제로 확장 유클리드, 중국인의
     나머지 정리를 연습하세요. 🔴 심화 문제에서는 밀러-라빈 소수 판별, 폴라드 로 인수분해 등 고급 알고리즘을 직접 구현해봅니다. 수학 알고리즘은 코딩 테스트와 암호학에서 핵심
@@ -416,7 +416,7 @@ sections:
     ex1Result = [n for n in range(1, 1000) if isPerfect(n)]
     ex1Result
   exercise:
-    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 연습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def isPerfect(n):
           if n < 2:
@@ -434,8 +434,8 @@ sections:
       ex1Result = [n for n in range(1, 1000) if isPerfect(n)]
       ex1Result
     hints:
-    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

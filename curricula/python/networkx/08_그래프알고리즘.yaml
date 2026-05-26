@@ -48,7 +48,7 @@ intro:
     - label: 그래프 분석 환경
       detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
     - label: 그래프알고리즘 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
     - label: 그래프알고리즘 완료
       detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를
     해결합니다. 이 장에서는 그래프 순회(BFS, DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
   tips:
@@ -66,22 +66,22 @@ sections:
     import networkx as nx
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_bfs
   title: 2단계. 너비우선탐색
   structuredPrimary: true
   subtitle: BFS
   goal: 2단계. 너비우선탐색에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며, 가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
 
@@ -96,7 +96,7 @@ sections:
     ])
     G.number_of_nodes(), G.number_of_edges()
   exercise:
-    prompt: 2단계. 너비우선탐색 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 너비우선탐색 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       G = nx.Graph()
       G.add_edges_from([
@@ -105,17 +105,17 @@ sections:
       ])
       G.number_of_nodes(), G.number_of_edges()
     hints:
-    - 2단계. 너비우선탐색 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 너비우선탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 너비우선탐색에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 너비우선탐색에서 `G` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 너비우선탐색 실행 뒤 `G` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step3_dfs
   title: 3단계. 깊이우선탐색
   structuredPrimary: true
   subtitle: DFS
   goal: 3단계. 깊이우선탐색에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기, 퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
 
@@ -126,22 +126,22 @@ sections:
     dfsEdges = list(nx.dfs_edges(G, source=1))
     dfsEdges
   exercise:
-    prompt: 3단계. 깊이우선탐색 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 깊이우선탐색 예제에서 `dfsEdges` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       dfsEdges = list(nx.dfs_edges(G, source=1))
       dfsEdges
     hints:
-    - 3단계. 깊이우선탐색 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `dfsEdges = ...` 오른쪽 값입니다.
+    - 실행 뒤 `dfsEdges` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. 깊이우선탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 깊이우선탐색에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 깊이우선탐색에서 `dfsEdges` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 깊이우선탐색 실행 뒤 `dfsEdges` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step4_visualize_traversal
   title: 4단계. 탐색 시각화
   structuredPrimary: true
   subtitle: 방문 순서 표시
   goal: 4단계. 탐색 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다.
     BFS는 너비 방향으로 균등하게 퍼져나가고, DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
   tips:
@@ -160,7 +160,7 @@ sections:
     ax1.set_title('BFS Traversal Order')
     fig1
   exercise:
-    prompt: 4단계. 탐색 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 탐색 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       posG = nx.spring_layout(G, seed=42)
 
@@ -175,17 +175,17 @@ sections:
       ax1.set_title('BFS Traversal Order')
       fig1
     hints:
-    - 4단계. 탐색 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 탐색 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 탐색 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. 탐색 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 탐색 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step5_mst
   title: 5단계. 최소신장트리
   structuredPrimary: true
   subtitle: minimum_spanning_tree()
   goal: 5단계. 최소신장트리에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소 케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
 
@@ -205,7 +205,7 @@ sections:
     wG.add_edge("E", "F", weight=3)
     wG.edges(data=True)
   exercise:
-    prompt: 5단계. 최소신장트리 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 최소신장트리 예제에서 `wG` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       wG = nx.Graph()
       wG.add_edge("A", "B", weight=4)
@@ -219,17 +219,17 @@ sections:
       wG.add_edge("E", "F", weight=3)
       wG.edges(data=True)
     hints:
-    - 5단계. 최소신장트리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `wG = ...` 오른쪽 값입니다.
+    - 실행 뒤 `wG` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 5단계. 최소신장트리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 최소신장트리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 최소신장트리에서 `wG` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 최소신장트리 실행 뒤 `wG` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step6_mst_viz
   title: 6단계. MST 시각화
   structuredPrimary: true
   subtitle: 신장트리 강조
   goal: 6단계. MST 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의
     가중치를 표시합니다. MST는 항상 n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
   tips:
@@ -251,7 +251,7 @@ sections:
     ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
     fig3
   exercise:
-    prompt: 6단계. MST 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. MST 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       posW = nx.spring_layout(wG, seed=42)
 
@@ -269,17 +269,17 @@ sections:
       ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
       fig3
     hints:
-    - 6단계. MST 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. MST 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. MST 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. MST 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. MST 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step7_topological
   title: 7단계. 위상정렬
   structuredPrimary: true
   subtitle: topological_sort()
   goal: 7단계. 위상정렬에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를 반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
 
@@ -295,7 +295,7 @@ sections:
     ])
     dag.edges()
   exercise:
-    prompt: 7단계. 위상정렬 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 위상정렬 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       dag = nx.DiGraph()
       dag.add_edges_from([
@@ -305,17 +305,17 @@ sections:
       ])
       dag.edges()
     hints:
-    - 7단계. 위상정렬 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. 위상정렬 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 위상정렬에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 위상정렬에서 `dag` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 위상정렬 실행 뒤 `dag` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step8_dag_viz
   title: 8단계. DAG 시각화
   structuredPrimary: true
   subtitle: 의존성 그래프
   goal: 8단계. DAG 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며,
     A→B는 'A가 완료되어야 B를 시작할 수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
   tips:
@@ -329,7 +329,7 @@ sections:
     ax4.set_title('Directed Acyclic Graph (DAG)')
     fig4
   exercise:
-    prompt: 8단계. DAG 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. DAG 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       posDAG = nx.spring_layout(dag, seed=42)
 
@@ -339,17 +339,17 @@ sections:
       ax4.set_title('Directed Acyclic Graph (DAG)')
       fig4
     hints:
-    - 8단계. DAG 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. DAG 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. DAG 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. DAG 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. DAG 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_ancestors
   title: 9단계. 조상과 후손
   structuredPrimary: true
   subtitle: ancestors(), descendants()
   goal: 9단계. 조상과 후손에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다. 작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
 
@@ -360,22 +360,22 @@ sections:
     ancestorsE = nx.ancestors(dag, "E")
     ancestorsE
   exercise:
-    prompt: 9단계. 조상과 후손 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 조상과 후손 예제에서 `ancestorsE` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       ancestorsE = nx.ancestors(dag, "E")
       ancestorsE
     hints:
-    - 9단계. 조상과 후손 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `ancestorsE = ...` 오른쪽 값입니다.
+    - 실행 뒤 `ancestorsE` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 9단계. 조상과 후손 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 조상과 후손에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. 조상과 후손에서 `ancestorsE` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 조상과 후손 실행 뒤 `ancestorsE` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step10_practical
   title: 10단계. 실전 응용
   structuredPrimary: true
   subtitle: 작업 스케줄링
   goal: 10단계. 실전 응용에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API →
     통합 → 테스트 → 배포의 의존성을 그래프로 표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
   tips:
@@ -391,7 +391,7 @@ sections:
     project.add_edge("Testing", "Deploy")
     project.edges()
   exercise:
-    prompt: 10단계. 실전 응용 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 실전 응용 예제에서 `project` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       project = nx.DiGraph()
       project.add_edge("Design", "Frontend")
@@ -403,17 +403,17 @@ sections:
       project.add_edge("Testing", "Deploy")
       project.edges()
     hints:
-    - 10단계. 실전 응용 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `project = ...` 오른쪽 값입니다.
+    - 실행 뒤 `project` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 10단계. 실전 응용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 실전 응용에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. 실전 응용에서 `project` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 실전 응용 실행 뒤 `project` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 그래프 알고리즘
   goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 그래프 알고리즘을 활용하여 실전 미션을 수행해봅시다. 네트워크 케이블링 비용을 최소화하는 MST 문제와 소프트웨어 빌드 순서를 결정하는 위상정렬 문제를 해결합니다.
 
@@ -435,7 +435,7 @@ sections:
     data.add_edge("PC1", "PC2", weight=2)
     data.edges(data=True)
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 `data` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
@@ -451,17 +451,17 @@ sections:
       data.add_edge("PC1", "PC2", weight=2)
       data.edges(data=True)
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `data = ...` 오른쪽 값입니다.
+    - 실행 뒤 `data` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `data` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 인수인계 네트워크
   goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
     처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   tips:
@@ -489,7 +489,7 @@ sections:
 
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
-    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       experimentGraph = workflowGraph.copy()
       experimentGraph.add_edge("sales", "finance", weight=2)
@@ -529,8 +529,8 @@ sections:
 
       workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
     hints:
-    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

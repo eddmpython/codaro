@@ -32,33 +32,33 @@ intro:
     아트를 생성합니다.
   direction: 도형아트생성기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 도형아트생성기 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
+  - 도형아트생성기 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
+  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 캔버스 생성 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 사각형 그리기 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. 원과 타원 그리기 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
     - label: 도형아트생성기 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 이미지 처리 환경
       detail: numpy, pillow 기준으로 로컬 Python 실행을 준비합니다.
     - label: 도형아트생성기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
     - label: 도형아트생성기 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
 sections:
 - id: step1_canvas
   title: 1단계. 캔버스 생성
   structuredPrimary: true
   subtitle: Image.new()
   goal: 1단계. 캔버스 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     도형을 그릴 빈 캔버스를 생성합니다. Image.new()로 원하는 크기와 배경색의 이미지를 만듭니다. 모드, 크기, 색상 순서로 인자를 전달합니다.
 
@@ -72,24 +72,24 @@ sections:
     board = Image.new('RGB', (400, 300), color='white')
     board.size, board.mode
   exercise:
-    prompt: 1단계. 캔버스 생성 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 캔버스 생성 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
 
       board = Image.new('RGB', (400, 300), color='white')
       board.size, board.mode
     hints:
-    - 1단계. 캔버스 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 1단계. 캔버스 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 캔버스 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 캔버스 생성의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 캔버스 생성 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step2_rectangle
   title: 2단계. 사각형 그리기
   structuredPrimary: true
   subtitle: rectangle()
   goal: 2단계. 사각형 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     rectangle() 메서드는 사각형을 그립니다. xy 파라미터로 좌상단과 우하단 좌표를 지정하고, fill은 채우기 색, outline은 테두리 색입니다.
 
@@ -102,23 +102,23 @@ sections:
     artist = ImageDraw.Draw(canvas)
     type(artist)
   exercise:
-    prompt: 2단계. 사각형 그리기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 사각형 그리기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       canvas = Image.new('RGB', (400, 300), 'lightgray')
       artist = ImageDraw.Draw(canvas)
       type(artist)
     hints:
-    - 2단계. 사각형 그리기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 사각형 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 사각형 그리기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 사각형 그리기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 사각형 그리기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step3_ellipse
   title: 3단계. 원과 타원 그리기
   structuredPrimary: true
   subtitle: ellipse()
   goal: 3단계. 원과 타원 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     ellipse() 메서드는 원 또는 타원을 그립니다. 지정한 사각형에 내접하는 타원이 그려집니다. 정사각형을 지정하면 원이 됩니다.
 
@@ -130,23 +130,23 @@ sections:
     drawer = ImageDraw.Draw(circleCanvas)
     type(drawer)
   exercise:
-    prompt: 3단계. 원과 타원 그리기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 원과 타원 그리기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       circleCanvas = Image.new('RGB', (400, 300), 'white')
       drawer = ImageDraw.Draw(circleCanvas)
       type(drawer)
     hints:
-    - 3단계. 원과 타원 그리기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 원과 타원 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 원과 타원 그리기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 원과 타원 그리기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 원과 타원 그리기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step4_line
   title: 4단계. 선 그리기
   structuredPrimary: true
   subtitle: line()
   goal: 4단계. 선 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     line() 메서드는 여러 점을 연결하는 선을 그립니다. 두 점을 연결하면 직선, 여러 점을 연결하면 꺾은선이 됩니다.
 
@@ -159,24 +159,24 @@ sections:
     pen.line([(50, 50), (350, 50)], fill='blue', width=3)
     lineCanvas
   exercise:
-    prompt: 4단계. 선 그리기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 선 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       lineCanvas = Image.new('RGB', (400, 300), 'white')
       pen = ImageDraw.Draw(lineCanvas)
       pen.line([(50, 50), (350, 50)], fill='blue', width=3)
       lineCanvas
     hints:
-    - 4단계. 선 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. 선 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 선 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 선 그리기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 선 그리기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step5_polygon
   title: 5단계. 다각형 그리기
   structuredPrimary: true
   subtitle: polygon()
   goal: 5단계. 다각형 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     polygon() 메서드는 여러 점을 연결하여 닫힌 다각형을 그립니다. 삼각형, 오각형 등 원하는 모양을 만들 수 있습니다.
 
@@ -190,7 +190,7 @@ sections:
     brush.polygon(triangle, fill='yellow', outline='black')
     polyCanvas
   exercise:
-    prompt: 5단계. 다각형 그리기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 다각형 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       polyCanvas = Image.new('RGB', (400, 300), 'white')
       brush = ImageDraw.Draw(polyCanvas)
@@ -198,17 +198,17 @@ sections:
       brush.polygon(triangle, fill='yellow', outline='black')
       polyCanvas
     hints:
-    - 5단계. 다각형 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 다각형 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 다각형 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 다각형 그리기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 다각형 그리기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step6_art
   title: 6단계. 도형 아트 생성
   structuredPrimary: true
   subtitle: 종합 활용
   goal: 6단계. 도형 아트 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 다양한 도형을 조합하여 추상 아트를 만들어봅시다. 랜덤 요소를 추가하면 매번 다른 결과가 나옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -218,24 +218,24 @@ sections:
     artPen = ImageDraw.Draw(artBoard)
     artBoard
   exercise:
-    prompt: 6단계. 도형 아트 생성 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 도형 아트 생성 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       import random
       artBoard = Image.new('RGB', (400, 300), (30, 30, 50))
       artPen = ImageDraw.Draw(artBoard)
       artBoard
     hints:
-    - 6단계. 도형 아트 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 도형 아트 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 도형 아트 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 도형 아트 생성의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 도형 아트 생성 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 도형 아트 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     자신만의 도형 아트를 만들어봅시다.
 
@@ -249,7 +249,7 @@ sections:
     chessPen = ImageDraw.Draw(chessBoard)
     chessBoard.size
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
 
@@ -257,17 +257,17 @@ sections:
       chessPen = ImageDraw.Draw(chessBoard)
       chessBoard.size
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 7단계. 도형 렌더 검증 루프
   structuredPrimary: true
   subtitle: 좌표 계약과 픽셀 변화 확인
   goal: 7단계. 도형 렌더 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 도형 그리기는 좌표 계약을 잘못 잡으면 화면이 깨집니다. 사각형 박스와 다각형 점 개수를 검증하고, 그려진 픽셀 수와 주요 색상을 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -285,7 +285,7 @@ sections:
 
     validateBox((20, 20, 80, 70))
   exercise:
-    prompt: 7단계. 도형 렌더 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 도형 렌더 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
       import numpy as np
@@ -300,8 +300,8 @@ sections:
 
       validateBox((20, 20, 80, 70))
     hints:
-    - 7단계. 도형 렌더 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 도형 렌더 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 도형 렌더 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 도형 렌더 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 도형 렌더 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

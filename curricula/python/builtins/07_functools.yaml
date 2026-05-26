@@ -27,33 +27,33 @@ intro:
   - wraps로 데코레이터 작성
   direction: functools 함수형 프로그래밍에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - functools 함수형 프로그래밍 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - functools 함수형 프로그래밍 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: functools 모듈 불러오 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
     - label: partial 부분 적용 함수 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
     - label: reduce 누적 연산 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
     - label: functools 함수형 프로 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 표준 라이브러리 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: functools 함수형 프로 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
     - label: functools 함수형 프로 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
 sections:
 - id: module_import
   title: functools 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
   goal: functools 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표준 라이브러리는 외부 의존성 없이 파일, 시간, 문자열, 직렬화 같은 업무 코드를 구성하는 기반입니다.
   explanation: |-
     functools은 파이썬 표준 라이브러리입니다. 고차 함수와 함수형 프로그래밍 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -66,24 +66,24 @@ sections:
     # 모듈 로드 확인
     'functools 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: functools 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: functools 모듈 불러오기 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       from functools import partial, reduce, lru_cache, wraps, total_ordering, cmp_to_key
 
       # 모듈 로드 확인
       'functools 모듈이 정상적으로 로드되었습니다'
     hints:
-    - functools 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: functools 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: functools 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: functools 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: partial
   title: partial - 부분 적용 함수
   structuredPrimary: true
   subtitle: 인자를 미리 고정하기
   goal: partial 부분 적용 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     partial은 함수의 일부 인자를 미리 고정한 새 함수를 만듭니다. 같은 함수를 다른 기본값으로 여러 번 사용할 때 코드 중복을 줄이고, 콜백 함수나 이벤트 핸들러에서 추가 인자를 전달할 때 유용합니다.
 
@@ -98,7 +98,7 @@ sections:
     output = double(5)
     output
   exercise:
-    prompt: partial 부분 적용 함수 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: partial 부분 적용 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def multiply(x, y):
           return x * y
@@ -107,17 +107,17 @@ sections:
       output = double(5)
       output
     hints:
-    - partial 부분 적용 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: partial 부분 적용 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: partial 부분 적용 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: partial 부분 적용 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: partial 부분 적용 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: reduce
   title: reduce - 누적 연산
   structuredPrimary: true
   subtitle: 반복 가능한 객체 축소하기
   goal: reduce 누적 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     reduce는 이항 함수를 누적 적용하여 반복 가능한 객체를 단일 값으로 줄입니다. 리스트의 모든 요소를 합치거나, 곱하거나, 최댓값을 찾는 등 누적 연산에 사용됩니다. Python 3에서는 functools 모듈로 이동되었습니다.
 
@@ -129,23 +129,23 @@ sections:
     total = reduce(lambda x, y: x + y, seq)
     total
   exercise:
-    prompt: reduce 누적 연산 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: reduce 누적 연산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seq = [1, 2, 3, 4, 5]
       total = reduce(lambda x, y: x + y, seq)
       total
     hints:
-    - reduce 누적 연산 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: reduce 누적 연산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: reduce 누적 연산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: reduce 누적 연산에서 `seq` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: reduce 누적 연산 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: lru_cache
   title: lru_cache - 메모이제이션
   structuredPrimary: true
   subtitle: 함수 결과 캐싱하기
   goal: lrucache 메모이제이션에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     lru_cache는 함수 호출 결과를 캐싱하여 같은 인자로 다시 호출될 때 저장된 값을 반환합니다. LRU(Least Recently Used) 알고리즘으로 캐시 크기를 관리하며, 재귀 함수나 비용이 큰 계산의 성능을 크게 향상시킵니다.
 
@@ -162,7 +162,7 @@ sections:
     fib10 = fibonacci(10)
     fib10
   exercise:
-    prompt: lrucache 메모이제이션 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: lrucache 메모이제이션 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       @lru_cache(maxsize=128)
       def fibonacci(n):
@@ -173,17 +173,17 @@ sections:
       fib10 = fibonacci(10)
       fib10
     hints:
-    - lrucache 메모이제이션 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: lrucache 메모이제이션 코드가 예외 없이 끝나야 합니다.
-    resultCheck: lrucache 메모이제이션에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: lrucache 메모이제이션의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: lrucache 메모이제이션 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: wraps
   title: wraps - 데코레이터 작성
   structuredPrimary: true
   subtitle: 함수 메타데이터 보존하기
   goal: wraps 데코레이터 작성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     wraps는 데코레이터를 만들 때 원본 함수의 메타데이터(__name__, __doc__ 등)를 보존합니다. 데코레이터로 함수를 감쌀 때 함수의 이름과 문서가 바뀌는 것을 방지하여 디버깅과 문서화를 돕습니다.
 
@@ -208,7 +208,7 @@ sections:
 
     slowFunc.__name__
   exercise:
-    prompt: wraps 데코레이터 작성 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: wraps 데코레이터 작성 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import time
       def timer(func):
@@ -227,17 +227,17 @@ sections:
 
       slowFunc.__name__
     hints:
-    - wraps 데코레이터 작성 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: wraps 데코레이터 작성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: wraps 데코레이터 작성에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: wraps 데코레이터 작성의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: wraps 데코레이터 작성 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: ordering
   title: total_ordering - 비교 연산자
   structuredPrimary: true
   subtitle: 클래스에 순서 부여하기
   goal: totalordering 비교 연산자에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     total_ordering은 클래스에 __eq__와 하나의 비교 메서드만 정의하면 나머지 비교 연산자를 자동 생성합니다. <, <=, >, >= 중 하나와 ==만 구현하면 되므로 코드를 줄이고 일관성을 보장합니다.
 
@@ -259,7 +259,7 @@ sections:
     bob = Student('Bob', 85)
     alice > bob
   exercise:
-    prompt: totalordering 비교 연산자 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: totalordering 비교 연산자 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       @total_ordering
       class Student:
@@ -275,17 +275,17 @@ sections:
       bob = Student('Bob', 85)
       alice > bob
     hints:
-    - totalordering 비교 연산자 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: totalordering 비교 연산자 코드가 예외 없이 끝나야 합니다.
-    resultCheck: totalordering 비교 연산자에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: totalordering 비교 연산자의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: totalordering 비교 연산자 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: functools 실무 패턴
   goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     실무에서 자주 사용하는 functools 활용 패턴을 살펴봅니다. 성능 최적화, 데코레이터 체이닝, 함수 조합, 재사용 가능한 유틸리티 작성 등 다양한 문제를 functools로 해결할 수 있습니다.
 
@@ -313,7 +313,7 @@ sections:
 
     unstable()
   exercise:
-    prompt: 실전 활용 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실전 활용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def retry(times, exceptionTypes=(RuntimeError,)):
           def decorator(func):
@@ -335,17 +335,17 @@ sections:
 
       unstable()
     hints:
-    - 실전 활용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실전 활용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실전 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '검증 루프: 함수형 업무 파이프라인'
   structuredPrimary: true
   subtitle: partial, reduce, cache, wraps 검증
   goal: '검증 루프: 함수형 업무 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     functools는 함수형 문법 자체보다 재사용 가능한 업무 파이프라인을 만들 때 가치가 큽니다. 부분 적용으로 설정을 고정하고, reduce로 집계하고, lru_cache와 wraps가 실제로 기대한 효과를 내는지 검증합니다.
 
@@ -367,7 +367,7 @@ sections:
 
     {"usd": usdToKrwWithFee(10), "jpy": jpyToKrwWithoutFee(1000)}
   exercise:
-    prompt: '검증 루프: 함수형 업무 파이프라인 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '검증 루프: 함수형 업무 파이프라인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       exchangeRates = {"USD": 1350.0, "JPY": 9.0, "EUR": 1450.0}
 
@@ -382,17 +382,17 @@ sections:
 
       {"usd": usdToKrwWithFee(10), "jpy": jpyToKrwWithoutFee(1000)}
     hints:
-    - '검증 루프: 함수형 업무 파이프라인 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '검증 루프: 함수형 업무 파이프라인 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '검증 루프: 함수형 업무 파이프라인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '검증 루프: 함수형 업무 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 함수형 업무 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: functools 모듈 종합 복습
   structuredPrimary: true
   subtitle: 함수형 프로그래밍 마스터하기
   goal: functools 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: functools 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -403,7 +403,7 @@ sections:
     add5 = partial(add, 5)
     add5(3)
   exercise:
-    prompt: functools 모듈 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: functools 모듈 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def add(a, b):
           return a + b
@@ -411,8 +411,8 @@ sections:
       add5 = partial(add, 5)
       add5(3)
     hints:
-    - functools 모듈 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools 모듈 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools 모듈 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools 모듈 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

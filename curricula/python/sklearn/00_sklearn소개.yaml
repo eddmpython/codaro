@@ -45,7 +45,7 @@ intro:
     - label: 업무 코드 환경
       detail: numpy, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: sklearn소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: sklearn소개 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -68,6 +68,8 @@ sections:
       title: 클러스터링
     - emoji: ⚙️
       title: 통일된 API
+  goal: scikitlearn이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: what_is_sklearn
   blocks:
   - type: sectionHeader
@@ -93,6 +95,8 @@ sections:
     - emoji: 📉
       title: 차원 축소 (Dimensionality)
       description: 특성 압축 - PCA, 시각화
+  goal: 🤔 scikitlearn이 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: why_sklearn
   blocks:
   - type: sectionHeader
@@ -124,6 +128,8 @@ sections:
     - emoji: 🌐
       title: Codaro 로컬 Python 지원
       description: 로컬 Python에서 바로 실행 가능
+  goal: 🌟 왜 scikitlearn인가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: statsmodels_vs_sklearn
   blocks:
   - type: sectionHeader
@@ -159,6 +165,8 @@ sections:
     title: 학습 순서가 중요합니다
     content: statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다.
       통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
+  goal: 🆚 statsmodels vs scikitlearn에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: sklearn_workflow
   blocks:
   - type: sectionHeader
@@ -190,6 +198,8 @@ sections:
     - emoji: 🔄
       title: 6. 개선
       description: 하이퍼파라미터 튜닝, 교차검증
+  goal: 🔄 scikitlearn 워크플로우에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: algorithms
   blocks:
   - type: sectionHeader
@@ -243,6 +253,8 @@ sections:
     content: 분류 문제라면 LogisticRegression으로 시작하세요. 성능이 부족하면 RandomForest, GradientBoosting 순으로 시도합니다. 회귀
       문제는 LinearRegression 기본, 과적합 방지에는 Ridge/Lasso를 사용합니다. 클러스터링은 KMeans가 가장 직관적입니다. 어떤 알고리즘이든 fit/predict
       패턴은 동일합니다.
+  goal: 🧠 주요 알고리즘에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: key_concepts
   blocks:
   - type: sectionHeader
@@ -268,6 +280,8 @@ sections:
     - emoji: 🎯
       title: 타겟 (Target)
       description: 예측하려는 출력 변수
+  goal: 🧩 핵심 개념에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: metrics
   blocks:
   - type: sectionHeader
@@ -317,6 +331,8 @@ sections:
     title: 지표 선택 가이드
     content: 분류에서 클래스 불균형이 있다면 Accuracy보다 F1 Score를 사용하세요. 암 진단처럼 놓치면 안 되는 경우 Recall을 중시하고, 스팸 필터처럼 오탐이
       문제면 Precision을 중시합니다. 회귀에서는 MSE가 기본이고, 해석 편의를 위해 RMSE를 사용합니다. R²는 모델 설명력을 보여줍니다.
+  goal: 📋 평가 지표에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: preprocessing
   blocks:
   - type: sectionHeader
@@ -342,6 +358,8 @@ sections:
     - emoji: 📊
       title: OneHotEncoder
       description: 범주를 이진 벡터로 변환
+  goal: 🔧 전처리의 중요성에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -363,6 +381,8 @@ sections:
     - emoji: 📦
       title: 설치 방법
       description: meta.packages 기준으로 uv run 실행
+  goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -420,6 +440,8 @@ sections:
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 실제 데이터로 실제 문제를 해결합니다. 와인 품종 분류, 암 진단, 주택 가격 예측 등 현실적인 문제를 다룹니다. 프로젝트를 진행하면서 이전에 배운
       개념을 반복 사용하고, 새로운 개념을 추가로 학습합니다. 10개 프로젝트를 완료하면 데이터에서 예측 모델을 구축하는 전체 워크플로우를 마스터하게 됩니다.
+  goal: 🗺️ 앞으로 배울 내용에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: prerequisites
   blocks:
   - type: sectionHeader
@@ -444,6 +466,8 @@ sections:
     - emoji: 🐍
       title: Python 기초
       description: 함수, 리스트, 딕셔너리
+  goal: 📋 선수 지식에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -463,18 +487,22 @@ sections:
     - text: scikit-learn Tutorials
       url: https://scikit-learn.org/stable/tutorial/index.html
       icon: 🔗
+  goal: 📚 참고 자료에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 와인 품질 분류'
     subtitle: 첫 번째 머신러닝 모델을 만들어봅니다
+  goal: '다음: 와인 품질 분류에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -505,7 +533,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -550,8 +578,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

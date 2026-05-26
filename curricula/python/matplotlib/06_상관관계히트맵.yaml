@@ -51,7 +51,7 @@ intro:
     - label: 시각 리포트 환경
       detail: matplotlib, numpy, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 상관관계히트맵 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
     - label: 상관관계히트맵 완료
       detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
@@ -60,7 +60,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
     iris 데이터의 4가지 수치형 변수(꽃받침 길이/너비, 꽃잎 길이/너비) 간의 상관관계를 분석합니다. 상관계수는 -1에서 1 사이의 값으로, 1에 가까울수록 강한 양의 상관, -1에 가까울수록 강한 음의 상관을 나타냅니다.
 
@@ -74,24 +74,24 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import numpy as np
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import numpy as np
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
   goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
@@ -110,7 +110,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -122,17 +122,17 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드 및 상관행렬
   structuredPrimary: true
   subtitle: corr()
   goal: 2단계. 데이터 로드 및 상관행렬에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: iris 데이터를 불러오고 수치형 컬럼만 선택하여 상관행렬을 계산합니다. pandas의 corr() 메서드는 피어슨 상관계수를 계산합니다. 결과는 4x4 대칭
     행렬로, 대각선은 항상 1입니다(자기 자신과의 상관).
   tips:
@@ -145,7 +145,7 @@ sections:
     corrMatrix = iris[numericCols].corr()
     corrMatrix
   exercise:
-    prompt: 2단계. 데이터 로드 및 상관행렬 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 로드 및 상관행렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -154,17 +154,17 @@ sections:
       corrMatrix = iris[numericCols].corr()
       corrMatrix
     hints:
-    - 2단계. 데이터 로드 및 상관행렬 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 로드 및 상관행렬 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 로드 및 상관행렬에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 로드 및 상관행렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드 및 상관행렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_imshow
   title: 3단계. 기본 히트맵
   structuredPrimary: true
   subtitle: ax.imshow()
   goal: 3단계. 기본 히트맵에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     imshow()는 2차원 배열을 이미지로 표시하는 함수입니다. 상관행렬을 imshow()에 전달하면 각 셀의 값에 따라 색상이 지정됩니다. 기본 컬러맵은 viridis로, 낮은 값은 보라색, 높은 값은 노란색으로 표시됩니다.
 
@@ -177,24 +177,24 @@ sections:
     axHeat.set_title('Iris 변수 간 상관관계', fontsize=14)
     figHeat
   exercise:
-    prompt: 3단계. 기본 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 기본 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHeat, axHeat = plt.subplots(figsize=(8, 6))
       im = axHeat.imshow(corrMatrix)
       axHeat.set_title('Iris 변수 간 상관관계', fontsize=14)
       figHeat
     hints:
-    - 3단계. 기본 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 기본 히트맵 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 기본 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 기본 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 기본 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_cmap
   title: 4단계. 컬러맵 설정
   structuredPrimary: true
   subtitle: cmap 파라미터
   goal: 4단계. 컬러맵 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     컬러맵(colormap)은 수치를 색상으로 변환하는 규칙입니다. 상관관계에는 발산형(diverging) 컬러맵이 적합합니다. 'coolwarm'은 음수는 파란색, 양수는 빨간색으로 표시하여 상관관계의 방향을 직관적으로 보여줍니다.
 
@@ -208,24 +208,24 @@ sections:
     axCmap.set_title('Iris 변수 간 상관관계', fontsize=14)
     figCmap
   exercise:
-    prompt: 4단계. 컬러맵 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 컬러맵 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figCmap, axCmap = plt.subplots(figsize=(8, 6))
       im = axCmap.imshow(corrMatrix, cmap='coolwarm', vmin=-1, vmax=1)
       axCmap.set_title('Iris 변수 간 상관관계', fontsize=14)
       figCmap
     hints:
-    - 4단계. 컬러맵 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 컬러맵 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 컬러맵 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. 컬러맵 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 컬러맵 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_colorbar
   title: 5단계. 컬러바 추가
   structuredPrimary: true
   subtitle: plt.colorbar()
   goal: 5단계. 컬러바 추가에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     컬러바는 색상과 수치의 관계를 보여주는 범례입니다. 히트맵을 해석할 때 어떤 색이 어떤 값을 나타내는지 알 수 있습니다. plt.colorbar()에 이미지 객체와 축을 전달하여 추가합니다.
 
@@ -240,7 +240,7 @@ sections:
     axColorbar.set_title('Iris 변수 간 상관관계', fontsize=14)
     figColorbar
   exercise:
-    prompt: 5단계. 컬러바 추가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 컬러바 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figColorbar, axColorbar = plt.subplots(figsize=(9, 6))
       im = axColorbar.imshow(corrMatrix, cmap='coolwarm', vmin=-1, vmax=1)
@@ -248,17 +248,17 @@ sections:
       axColorbar.set_title('Iris 변수 간 상관관계', fontsize=14)
       figColorbar
     hints:
-    - 5단계. 컬러바 추가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 컬러바 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 컬러바 추가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 컬러바 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 컬러바 추가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_ticks
   title: 6단계. 축 눈금 설정
   structuredPrimary: true
   subtitle: set_xticks(), set_xticklabels()
   goal: 6단계. 축 눈금 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     히트맵의 x축과 y축에 변수명을 표시해야 어떤 변수 간의 상관관계인지 알 수 있습니다. set_xticks()로 눈금 위치를 설정하고, set_xticklabels()로 라벨을 지정합니다. 한글 라벨로 변경하면 가독성이 높아집니다.
 
@@ -272,24 +272,24 @@ sections:
     plt.colorbar(im, ax=axTicks, label='상관계수')
     figTicks
   exercise:
-    prompt: 6단계. 축 눈금 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 축 눈금 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figTicks, axTicks = plt.subplots(figsize=(9, 7))
       im = axTicks.imshow(corrMatrix, cmap='coolwarm', vmin=-1, vmax=1)
       plt.colorbar(im, ax=axTicks, label='상관계수')
       figTicks
     hints:
-    - 6단계. 축 눈금 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 축 눈금 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 축 눈금 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. 축 눈금 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 축 눈금 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_text
   title: 7단계. 셀에 값 표시
   structuredPrimary: true
   subtitle: ax.text()
   goal: 7단계. 셀에 값 표시에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 각 셀에 상관계수 값을 직접 표시하면 정확한 수치를 파악할 수 있습니다. 이중 for 루프로 모든 셀을 순회하며 text()로 값을 추가합니다. 배경색에 따라
     텍스트 색상을 조절하면 가독성이 높아집니다.
   tips:
@@ -306,7 +306,7 @@ sections:
     axText.set_yticklabels(labelsKr)
     figText
   exercise:
-    prompt: 7단계. 셀에 값 표시 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 셀에 값 표시 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figText, axText = plt.subplots(figsize=(9, 7))
       im = axText.imshow(corrMatrix, cmap='coolwarm', vmin=-1, vmax=1)
@@ -319,17 +319,17 @@ sections:
       axText.set_yticklabels(labelsKr)
       figText
     hints:
-    - 7단계. 셀에 값 표시 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 셀에 값 표시 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 셀에 값 표시에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 셀에 값 표시의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 셀에 값 표시의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_annotate
   title: 8단계. 상관관계 해석
   structuredPrimary: true
   subtitle: 패턴 분석
   goal: 8단계. 상관관계 해석에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 히트맵에서 발견한 패턴을 해석합니다. 꽃잎 길이와 너비는 0.96으로 매우 강한 양의 상관관계를 보입니다. 반면 꽃받침 너비는 다른 변수와 약한 상관(음의
     상관도 있음)을 보입니다. 이런 정보는 머신러닝에서 특성 선택에 활용됩니다.
   tips:
@@ -346,7 +346,7 @@ sections:
     axHighlight.set_yticklabels(labelsKr)
     figHighlight
   exercise:
-    prompt: 8단계. 상관관계 해석 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 상관관계 해석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHighlight, axHighlight = plt.subplots(figsize=(9, 7))
       im = axHighlight.imshow(corrMatrix, cmap='coolwarm', vmin=-1, vmax=1)
@@ -359,17 +359,17 @@ sections:
       axHighlight.set_yticklabels(labelsKr)
       figHighlight
     hints:
-    - 8단계. 상관관계 해석 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 상관관계 해석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 상관관계 해석에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 상관관계 해석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 상관관계 해석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_subplots
   title: 9단계. 상관관계 + 산점도 비교
   structuredPrimary: true
   subtitle: 시각화 조합
   goal: 9단계. 상관관계 + 산점도 비교에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 히트맵에서 발견한 강한 상관관계(꽃잎 길이-너비)를 산점도로 확인합니다. 이전에 배운 산점도 기법을 활용하여 실제 데이터 포인트가 어떻게 분포하는지 봅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -385,7 +385,7 @@ sections:
     axHeatCombine.set_yticklabels(labelsKr)
     figCombine
   exercise:
-    prompt: 9단계. 상관관계 + 산점도 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 상관관계 + 산점도 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figCombine, (axHeatCombine, axScatterCombine) = plt.subplots(1, 2, figsize=(14, 6))
 
@@ -398,17 +398,17 @@ sections:
       axHeatCombine.set_yticklabels(labelsKr)
       figCombine
     hints:
-    - 9단계. 상관관계 + 산점도 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 상관관계 + 산점도 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 상관관계 + 산점도 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 상관관계 + 산점도 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 상관관계 + 산점도 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 히트맵
   goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 상관관계 히트맵을 만듭니다. 깔끔한 스타일링과 명확한 라벨로 전문적인 분석 결과물을 완성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -420,7 +420,7 @@ sections:
     cbar.set_label('피어슨 상관계수', fontsize=11)
     figFinal
   exercise:
-    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(10, 8))
 
@@ -429,17 +429,17 @@ sections:
       cbar.set_label('피어슨 상관계수', fontsize=11)
       figFinal
     hints:
-    - 10단계. 최종 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 최종 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 최종 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 최종 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 상관관계 분석 프로젝트
   goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 다양한 데이터의 상관관계를 분석해봅시다. imshow, cmap, colorbar, text 등 모든 개념을 종합적으로 활용합니다.
 
@@ -455,7 +455,7 @@ sections:
     measureCols = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
     matrix = penguins[measureCols].corr()
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -465,11 +465,11 @@ sections:
       measureCols = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
       matrix = penguins[measureCols].corr()
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -486,12 +486,14 @@ sections:
     - df.corr() - pandas 상관행렬 계산
   - type: text
     content: 다음 시간에는 이중 축 차트로 시계열 데이터를 분석합니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
   goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
     제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
@@ -519,7 +521,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -550,8 +552,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

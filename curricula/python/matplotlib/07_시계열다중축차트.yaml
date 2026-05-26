@@ -49,7 +49,7 @@ intro:
     - label: 시각 리포트 환경
       detail: matplotlib, numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 시계열다중축차트 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
     - label: 시계열다중축차트 완료
       detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
     가상의 월별 날씨 데이터를 생성하여 시계열 분석을 연습합니다. 온도(°C)와 강수량(mm)은 단위와 스케일이 완전히 다르므로, 이중 축을 사용해야 두 변수를 효과적으로 비교할 수 있습니다.
 
@@ -71,23 +71,23 @@ sections:
     import numpy as np
     import pandas as pd
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import numpy as np
       import pandas as pd
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 시각화할 데이터을 만드는 첫 줄과 차트 구성 줄에서 찾으세요.
+    - 실행 뒤 축/범례/파일 출력 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
   goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
@@ -106,7 +106,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -118,17 +118,17 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step2_data
   title: 2단계. 날씨 데이터 생성
   structuredPrimary: true
   subtitle: 시뮬레이션 데이터
   goal: 2단계. 날씨 데이터 생성에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 한국의 전형적인 기후 패턴을 반영한 가상 데이터를 생성합니다. 여름(7-8월)에 고온다습하고, 겨울(12-2월)에 건조한 계절 변화를 담습니다. 실제 기상청
     데이터와 유사한 패턴입니다.
   tips:
@@ -147,7 +147,7 @@ sections:
     })
     weatherData
   exercise:
-    prompt: 2단계. 날씨 데이터 생성 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 날씨 데이터 생성 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       np.random.seed(42)
       months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
@@ -162,17 +162,17 @@ sections:
       })
       weatherData
     hints:
-    - 2단계. 날씨 데이터 생성 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 날씨 데이터 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 날씨 데이터 생성에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 날씨 데이터 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 날씨 데이터 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_single
   title: 3단계. 단일 축의 문제점
   structuredPrimary: true
   subtitle: 스케일 차이
   goal: 3단계. 단일 축의 문제점에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 온도와 강수량을 같은 y축에 표시하면 스케일 차이로 인해 제대로 비교할 수 없습니다. 온도는 -5~30 범위인데 강수량은 0~400 범위이므로, 온도 변화가
     거의 보이지 않게 됩니다.
   tips:
@@ -185,7 +185,7 @@ sections:
     axSingle.legend()
     figSingle
   exercise:
-    prompt: 3단계. 단일 축의 문제점 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 단일 축의 문제점 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figSingle, axSingle = plt.subplots(figsize=(10, 6))
       axSingle.plot(weatherData['month'], weatherData['temp'], 'o-', label='온도')
@@ -194,17 +194,17 @@ sections:
       axSingle.legend()
       figSingle
     hints:
-    - 3단계. 단일 축의 문제점 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 단일 축의 문제점 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 단일 축의 문제점에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 단일 축의 문제점의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 단일 축의 문제점 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step4_twinx
   title: 4단계. 이중 축 생성
   structuredPrimary: true
   subtitle: ax.twinx()
   goal: 4단계. 이중 축 생성에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     twinx()는 기존 Axes와 x축을 공유하는 새로운 Axes를 생성합니다. 이 새로운 축은 오른쪽에 y축을 가지며, 독립적인 스케일을 사용합니다. 이제 온도와 강수량을 각각의 적절한 스케일로 표시할 수 있습니다.
 
@@ -220,7 +220,7 @@ sections:
     ax1.tick_params(axis='y', labelcolor='#E74C3C')
     figTwin
   exercise:
-    prompt: 4단계. 이중 축 생성 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 이중 축 생성 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figTwin, ax1 = plt.subplots(figsize=(10, 6))
 
@@ -229,17 +229,17 @@ sections:
       ax1.tick_params(axis='y', labelcolor='#E74C3C')
       figTwin
     hints:
-    - 4단계. 이중 축 생성 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 이중 축 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 이중 축 생성에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. 이중 축 생성의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. 이중 축 생성 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step5_legend
   title: 5단계. 범례 통합
   structuredPrimary: true
   subtitle: 두 축의 범례 합치기
   goal: 5단계. 범례 통합에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 이중 축 차트에서 두 데이터의 범례를 하나로 합치려면 각 축에서 범례 정보를 가져와 합쳐야 합니다. get_legend_handles_labels()로 핸들과
     라벨을 추출한 후 합쳐서 legend()에 전달합니다.
   tips:
@@ -252,7 +252,7 @@ sections:
     ax1Legend.tick_params(axis='y', labelcolor='#E74C3C')
     figLegend
   exercise:
-    prompt: 5단계. 범례 통합 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 범례 통합 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figLegend, ax1Legend = plt.subplots(figsize=(10, 6))
 
@@ -261,17 +261,17 @@ sections:
       ax1Legend.tick_params(axis='y', labelcolor='#E74C3C')
       figLegend
     hints:
-    - 5단계. 범례 통합 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 범례 통합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 범례 통합에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 범례 통합의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 범례 통합 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step6_fill
   title: 6단계. 영역 채우기
   structuredPrimary: true
   subtitle: fill_between()
   goal: 6단계. 영역 채우기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     fill_between()은 선 그래프 아래 영역을 색상으로 채웁니다. 온도 변화를 영역으로 표시하면 시각적 임팩트가 커집니다. alpha로 투명도를 조절하여 뒤의 막대 그래프가 보이도록 합니다.
 
@@ -291,7 +291,7 @@ sections:
     ax1Fill.set_xticklabels(months)
     figFill
   exercise:
-    prompt: 6단계. 영역 채우기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 영역 채우기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFill, ax1Fill = plt.subplots(figsize=(10, 6))
       xPos = range(len(months))
@@ -304,17 +304,17 @@ sections:
       ax1Fill.set_xticklabels(months)
       figFill
     hints:
-    - 6단계. 영역 채우기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 영역 채우기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 영역 채우기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. 영역 채우기의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 영역 채우기의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_style
   title: 7단계. 스타일링
   structuredPrimary: true
   subtitle: 색상과 선 스타일
   goal: 7단계. 스타일링에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 차트의 가독성을 높이기 위해 스타일을 세밀하게 조정합니다. 그리드, 마커 스타일, 범례 위치 등을 설정하여 전문적인 시각화를 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -332,7 +332,7 @@ sections:
     ax1Style.set_xticklabels(months)
     figStyle
   exercise:
-    prompt: 7단계. 스타일링 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 스타일링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figStyle, ax1Style = plt.subplots(figsize=(12, 6))
       xPos = range(len(months))
@@ -347,17 +347,17 @@ sections:
       ax1Style.set_xticklabels(months)
       figStyle
     hints:
-    - 7단계. 스타일링 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 스타일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 스타일링에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 스타일링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 스타일링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_annotation
   title: 8단계. 주석 추가
   structuredPrimary: true
   subtitle: 최고/최저 표시
   goal: 8단계. 주석 추가에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 최고 온도, 최대 강수량 등 주요 포인트에 주석을 추가하면 차트의 정보 전달력이 높아집니다. annotate()로 화살표와 함께 텍스트를 배치합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -373,7 +373,7 @@ sections:
     ax1Annot.set_xticklabels(months)
     figAnnot
   exercise:
-    prompt: 8단계. 주석 추가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 주석 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figAnnot, ax1Annot = plt.subplots(figsize=(12, 7))
       xPos = range(len(months))
@@ -386,17 +386,17 @@ sections:
       ax1Annot.set_xticklabels(months)
       figAnnot
     hints:
-    - 8단계. 주석 추가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 주석 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 주석 추가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 주석 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 주석 추가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_subplots
   title: 9단계. 서브플롯 비교
   structuredPrimary: true
   subtitle: 이중 축 vs 분리
   goal: 9단계. 서브플롯 비교에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 이중 축 차트와 분리된 서브플롯을 비교합니다. 상황에 따라 어떤 방식이 더 효과적인지 판단할 수 있습니다. 분리된 서브플롯은 각 변수를 더 자세히 볼 수 있고,
     이중 축은 관계를 직접 비교할 수 있습니다.
   tips:
@@ -413,7 +413,7 @@ sections:
     axes[0].axhline(y=0, color='gray', linestyle='-', alpha=0.5)
     figCompare
   exercise:
-    prompt: 9단계. 서브플롯 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 서브플롯 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figCompare, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
       xPos = range(len(months))
@@ -426,17 +426,17 @@ sections:
       axes[0].axhline(y=0, color='gray', linestyle='-', alpha=0.5)
       figCompare
     hints:
-    - 9단계. 서브플롯 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 서브플롯 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 서브플롯 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 서브플롯 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 서브플롯 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 이중 축 차트
   goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 시계열 이중 축 차트를 만듭니다. 전문적인 스타일과 명확한 주석으로 기상 분석 보고서에 바로 사용할 수 있는
     품질입니다.
   tips:
@@ -456,7 +456,7 @@ sections:
     ax1Final.set_xticklabels(months, fontsize=11)
     figFinal
   exercise:
-    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal, ax1Final = plt.subplots(figsize=(13, 7))
       xPos = range(len(months))
@@ -472,17 +472,17 @@ sections:
       ax1Final.set_xticklabels(months, fontsize=11)
       figFinal
     hints:
-    - 10단계. 최종 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 최종 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 최종 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 최종 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 시계열 분석 프로젝트
   goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 다양한 시계열 데이터를 분석해봅시다. twinx, fill_between, annotate 등 모든 개념을 종합적으로 활용합니다.
 
@@ -500,7 +500,7 @@ sections:
     price = 50000 + np.random.randn(days).cumsum() * 500
     volume = np.random.randint(100000, 500000, days)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import numpy as np
@@ -512,11 +512,11 @@ sections:
       price = 50000 + np.random.randn(days).cumsum() * 500
       volume = np.random.randint(100000, 500000, days)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -532,12 +532,14 @@ sections:
     - tick_params(labelcolor) - 축 눈금 색상 설정
   - type: text
     content: 다음 시간에는 GridSpec으로 복잡한 다중 패널 대시보드를 만듭니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
   goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
     제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
@@ -565,7 +567,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -596,8 +598,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

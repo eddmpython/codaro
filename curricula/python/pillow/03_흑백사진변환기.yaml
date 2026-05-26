@@ -31,33 +31,33 @@ intro:
   description: convert() 메서드로 색상 모드를 변환하고, 픽셀 단위 연산으로 세피아 효과를 구현합니다. 이미지의 색상 구조를 이해합니다.
   direction: 흑백사진변환기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 흑백사진변환기 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
+  - 흑백사진변환기 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
+  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 이미지 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 흑백 변환 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. 이진화 (흑백 대비) 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
     - label: 흑백사진변환기 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 이미지 처리 환경
       detail: numpy, pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 흑백사진변환기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
     - label: 흑백사진변환기 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 샘플 이미지
   goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     네트워크 상태에 영향을 받지 않도록 sklearn에 내장된 샘플 이미지를 사용합니다. flower.jpg와 china.jpg 두 개의 샘플 이미지가 있습니다.
 
@@ -73,7 +73,7 @@ sections:
     pic = Image.fromarray(flowerArr)
     pic.size, pic.mode
   exercise:
-    prompt: 1단계. 이미지 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -82,17 +82,17 @@ sections:
       pic = Image.fromarray(flowerArr)
       pic.size, pic.mode
     hints:
-    - 1단계. 이미지 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 이미지 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step2_grayscale
   title: 2단계. 흑백 변환
   structuredPrimary: true
   subtitle: convert('L')
   goal: 2단계. 흑백 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     convert() 메서드는 이미지의 색상 모드를 변환합니다. 'L' 모드는 그레이스케일(흑백)을 의미합니다. RGB 세 채널이 하나의 밝기 채널로 합쳐집니다. 내부적으로 Y = 0.299R + 0.587G + 0.114B 공식이 사용됩니다.
 
@@ -103,22 +103,22 @@ sections:
     gray = pic.convert('L')
     gray.mode
   exercise:
-    prompt: 2단계. 흑백 변환 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 흑백 변환 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       gray = pic.convert('L')
       gray.mode
     hints:
-    - 2단계. 흑백 변환 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 흑백 변환 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 흑백 변환에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 흑백 변환의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 흑백 변환 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step3_threshold
   title: 3단계. 이진화 (흑백 대비)
   structuredPrimary: true
   subtitle: point()
   goal: 3단계. 이진화 (흑백 대비)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     point() 메서드는 각 픽셀에 함수를 적용합니다. 이진화는 특정 임계값을 기준으로 픽셀을 완전한 흑(0) 또는 백(255)으로 변환합니다. 마치 잉크 도장처럼 중간 톤이 없는 고대비 이미지가 됩니다.
 
@@ -130,23 +130,23 @@ sections:
     binary = gray.point(lambda x: 255 if x > threshold else 0)
     binary.mode
   exercise:
-    prompt: 3단계. 이진화 (흑백 대비) 예제에서 조건값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 이진화 (흑백 대비) 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
     starterCode: |-
       threshold = 128
       binary = gray.point(lambda x: 255 if x > threshold else 0)
       binary.mode
     hints:
-    - 3단계. 이진화 (흑백 대비) 코드에서 먼저 조건값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
-    noError: 3단계. 이진화 (흑백 대비) 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 이진화 (흑백 대비)에서 바꾼 조건값이 결과에 반영되어야 합니다.
+    noError: 3단계. 이진화 (흑백 대비)의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 3단계. 이진화 (흑백 대비) 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: step4_sepia
   title: 4단계. 세피아 효과
   structuredPrimary: true
   subtitle: 픽셀 연산
   goal: 4단계. 세피아 효과에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     세피아는 오래된 사진 느낌을 주는 갈색 톤입니다. 흑백 이미지를 RGB로 다시 변환한 뒤, R/G/B 각 채널에 다른 계수를 곱해 세피아 톤을 만듭니다. split()으로 채널을 분리하고 merge()로 합칩니다.
 
@@ -158,22 +158,22 @@ sections:
     grayRgb = gray.convert('RGB')
     grayRgb.mode
   exercise:
-    prompt: 4단계. 세피아 효과 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 세피아 효과 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       grayRgb = gray.convert('RGB')
       grayRgb.mode
     hints:
-    - 4단계. 세피아 효과 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 세피아 효과 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 세피아 효과에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 세피아 효과의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 세피아 효과 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step5_compare
   title: 5단계. 결과 비교
   structuredPrimary: true
   subtitle: 변환 전후
   goal: 5단계. 결과 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 원본, 흑백, 이진화, 세피아 네 가지 버전을 비교해봅시다. 각 변환이 이미지의 분위기를 어떻게 바꾸는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -186,7 +186,7 @@ sections:
     }
     modes
   exercise:
-    prompt: 5단계. 결과 비교 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 결과 비교 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       modes = {
           'original': pic.mode,
@@ -196,17 +196,17 @@ sections:
       }
       modes
     hints:
-    - 5단계. 결과 비교 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 결과 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 결과 비교에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 결과 비교의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 결과 비교 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 색상 변환 응용
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     sklearn 이미지에 흑백과 세피아 변환을 적용해봅시다.
 
@@ -221,7 +221,7 @@ sections:
     bloom = Image.fromarray(bloomArr)
     bloom.mode
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -230,17 +230,17 @@ sections:
       bloom = Image.fromarray(bloomArr)
       bloom.mode
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 6단계. 흑백 변환 검증 루프
   structuredPrimary: true
   subtitle: mode와 이진화 기준 확인
   goal: 6단계. 흑백 변환 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 흑백 변환은 convert('L') 한 줄로 끝나지 않습니다. 입력 mode를 확인하고, 이진화 결과가 실제로 0과 255만 가지는지, 임계값 변화가 전경
     비율을 어떻게 바꾸는지 검증합니다.
   tips:
@@ -261,7 +261,7 @@ sections:
 
     validateRgbSource(toneImage)
   exercise:
-    prompt: 6단계. 흑백 변환 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 흑백 변환 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
       import numpy as np
@@ -278,8 +278,8 @@ sections:
 
       validateRgbSource(toneImage)
     hints:
-    - 6단계. 흑백 변환 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 6단계. 흑백 변환 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 흑백 변환 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 6단계. 흑백 변환 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 흑백 변환 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

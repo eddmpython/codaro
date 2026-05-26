@@ -27,33 +27,33 @@ intro:
   - 객체지향 경로 처리
   direction: pathlib 객체지향 경로에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - pathlib 객체지향 경로 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - pathlib 객체지향 경로 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: pathlib 모듈 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
     - label: Path 객체 기초 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
     - label: 경로 조작 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
     - label: pathlib 객체지향 경로 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 표준 라이브러리 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: pathlib 객체지향 경로 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
     - label: pathlib 객체지향 경로 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
 sections:
 - id: module_import
   title: pathlib 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
   goal: pathlib 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     pathlib는 파이썬의 객체지향 경로 처리 라이브러리입니다. Path 클래스를 통해 os.path보다 직관적인 API를 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -67,7 +67,7 @@ sections:
     currentPath = Path('.')
     currentPath
   exercise:
-    prompt: pathlib 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: pathlib 모듈 불러오기 예제에서 `currentPath` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       import tempfile
       from pathlib import Path
@@ -75,17 +75,17 @@ sections:
       currentPath = Path('.')
       currentPath
     hints:
-    - pathlib 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `currentPath = ...` 오른쪽 값입니다.
+    - 실행 뒤 `currentPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: pathlib 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: pathlib 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: pathlib 모듈 불러오기에서 `currentPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: pathlib 모듈 불러오기 실행 뒤 `currentPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: path_basics
   title: Path 객체 기초
   structuredPrimary: true
   subtitle: 경로 생성과 변환
   goal: Path 객체 기초에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Path 객체는 경로를 문자열이 아닌 객체로 다룹니다. 절대 경로 변환, 경로 구성요소 분리, 파일명과 확장자 추출 등 다양한 속성과 메서드를 제공합니다.
 
@@ -96,22 +96,22 @@ sections:
     absolutePath = Path('.').resolve()
     absolutePath
   exercise:
-    prompt: Path 객체 기초 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: Path 객체 기초 예제에서 `absolutePath` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       absolutePath = Path('.').resolve()
       absolutePath
     hints:
-    - Path 객체 기초 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `absolutePath = ...` 오른쪽 값입니다.
+    - 실행 뒤 `absolutePath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: Path 객체 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Path 객체 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: Path 객체 기초에서 `absolutePath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Path 객체 기초 실행 뒤 `absolutePath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: path_operations
   title: 경로 조작
   structuredPrimary: true
   subtitle: 경로 결합과 변경
   goal: 경로 조작에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Path 객체는 / 연산자로 경로를 결합하고, with_name()과 with_suffix()로 파일명과 확장자를 변경할 수 있습니다. relative_to()로 상대 경로를 계산합니다.
 
@@ -123,23 +123,23 @@ sections:
     newPath = basePath / 'documents' / 'file.txt'
     newPath
   exercise:
-    prompt: 경로 조작 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 경로 조작 예제에서 `basePath`, `newPath` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       basePath = Path('/home/user')
       newPath = basePath / 'documents' / 'file.txt'
       newPath
     hints:
-    - 경로 조작 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `basePath = ...` 오른쪽 값입니다.
+    - 실행 뒤 `basePath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 경로 조작 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 경로 조작에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 경로 조작에서 `basePath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 경로 조작 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: path_checking
   title: 경로 확인
   structuredPrimary: true
   subtitle: 파일과 디렉토리 검증
   goal: 경로 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Path 객체는 경로의 존재 여부, 타입(파일/디렉토리), 절대 경로 여부 등을 확인하는 메서드를 제공합니다. 모든 메서드는 True/False를 반환합니다.
 
@@ -150,22 +150,22 @@ sections:
     checkPath = Path('.')
     checkPath.exists()
   exercise:
-    prompt: 경로 확인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 경로 확인 예제에서 `checkPath` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       checkPath = Path('.')
       checkPath.exists()
     hints:
-    - 경로 확인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `checkPath = ...` 오른쪽 값입니다.
+    - 실행 뒤 `checkPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 경로 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 경로 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 경로 확인에서 `checkPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 경로 확인 실행 뒤 `checkPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: directory_navigation
   title: 디렉토리 탐색
   structuredPrimary: true
   subtitle: 파일 검색과 필터링
   goal: 디렉토리 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     Path 객체는 디렉토리의 내용을 나열하고, 패턴에 맞는 파일을 검색하는 강력한 기능을 제공합니다. iterdir()은 현재 디렉토리를, glob()과 rglob()은 패턴 매칭 검색을 수행합니다.
 
@@ -176,22 +176,22 @@ sections:
     currentDir = Path('.')
     [item.name for item in currentDir.iterdir()][:10]
   exercise:
-    prompt: 디렉토리 탐색 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 디렉토리 탐색 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       currentDir = Path('.')
       [item.name for item in currentDir.iterdir()][:10]
     hints:
-    - 디렉토리 탐색 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 디렉토리 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 디렉토리 탐색에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 디렉토리 탐색의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 디렉토리 탐색 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: file_operations
   title: 파일 읽기/쓰기
   structuredPrimary: true
   subtitle: 간편한 파일 처리
   goal: 파일 읽기/쓰기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Path 객체는 read_text(), write_text()로 텍스트 파일을, read_bytes(), write_bytes()로 바이너리 파일을 간단히 처리합니다. 파일을 자동으로 열고 닫아 안전합니다.
 
@@ -205,7 +205,7 @@ sections:
     textFile.write_text('Hello from pathlib!')
     textFile.read_text()
   exercise:
-    prompt: 파일 읽기/쓰기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 파일 읽기/쓰기 예제에서 `pathlibScratch`, `textFile` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       pathlibScratch = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch'
       pathlibScratch.mkdir(parents=True, exist_ok=True)
@@ -213,17 +213,17 @@ sections:
       textFile.write_text('Hello from pathlib!')
       textFile.read_text()
     hints:
-    - 파일 읽기/쓰기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `pathlibScratch = ...` 오른쪽 값입니다.
+    - 실행 뒤 `pathlibScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 파일 읽기/쓰기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 파일 읽기/쓰기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 파일 읽기/쓰기에서 `pathlibScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 파일 읽기/쓰기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: '검증 루프: Path 기반 파일 파이프라인'
   structuredPrimary: true
   subtitle: 작업공간 격리, 파일 매니페스트, 경로 traversal 검증
   goal: '검증 루프: Path 기반 파일 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     pathlib는 경로를 객체로 다루기 때문에 파일 파이프라인을 읽기 쉽게 만들 수 있습니다. 임시 작업공간에 데이터를 만들고, 매니페스트를 검증하고, 사용자 입력 경로가 작업공간 밖으로 나가지 않는지 확인합니다.
 
@@ -258,7 +258,7 @@ sections:
 
     manifest
   exercise:
-    prompt: '검증 루프: Path 기반 파일 파이프라인 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '검증 루프: Path 기반 파일 파이프라인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       pipelineRoot = Path(tempfile.mkdtemp(prefix='codaro_pathlib_workflow_'))
       inputPath = pipelineRoot / 'input'
@@ -286,17 +286,17 @@ sections:
 
       manifest
     hints:
-    - '검증 루프: Path 기반 파일 파이프라인 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '검증 루프: Path 기반 파일 파이프라인 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '검증 루프: Path 기반 파일 파이프라인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '검증 루프: Path 기반 파일 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: Path 기반 파일 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: pathlib 모듈 종합 복습
   structuredPrimary: true
   subtitle: Path 객체 마스터하기
   goal: pathlib 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: pathlib 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -304,13 +304,13 @@ sections:
     currentWorkingDir = Path('.')
     currentWorkingDir
   exercise:
-    prompt: pathlib 모듈 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: pathlib 모듈 종합 복습 예제에서 `currentWorkingDir` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       currentWorkingDir = Path('.')
       currentWorkingDir
     hints:
-    - pathlib 모듈 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `currentWorkingDir = ...` 오른쪽 값입니다.
+    - 실행 뒤 `currentWorkingDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: pathlib 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: pathlib 모듈 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: pathlib 모듈 종합 복습에서 `currentWorkingDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: pathlib 모듈 종합 복습 실행 뒤 `currentWorkingDir` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

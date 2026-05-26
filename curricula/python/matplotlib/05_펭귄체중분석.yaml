@@ -52,7 +52,7 @@ intro:
     - label: 시각 리포트 환경
       detail: matplotlib, numpy, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 펭귄체중분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
     - label: 펭귄체중분석 완료
       detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
@@ -61,7 +61,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
     penguins(펭귄) 데이터셋은 남극 펭귄 3종의 신체 측정 데이터입니다. 아델리(Adelie), 친스트랩(Chinstrap), 젠투(Gentoo) 펭귄의 부리 길이, 부리 깊이, 날개 길이, 체중 등이 포함되어 있습니다. iris 데이터와 유사하게 분류 문제에 자주 사용됩니다.
 
@@ -75,24 +75,24 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import pandas as pd
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import pandas as pd
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
   goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
@@ -111,7 +111,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -123,17 +123,17 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: penguins 데이터
   goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: loadLocalDataset()으로 penguins 데이터를 불러옵니다. 펭귄 종, 섬, 부리 길이, 날개 길이, 체중 같은 컬럼을 포함합니다. 로컬 데이터라
     인터넷 연결과 무관하게 같은 분석 흐름을 재현할 수 있습니다.
   tips:
@@ -144,18 +144,18 @@ sections:
     penguins = loadLocalDataset('penguins').dropna()
     penguins.head()
   exercise:
-    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       penguins = loadLocalDataset('penguins').dropna()
       penguins.head()
     hints:
-    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_explore
   title: 3단계. 종별 통계
   structuredPrimary: true
@@ -168,20 +168,20 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins.groupby('species')['body_mass_g'].agg(['mean', 'std', 'min', 'max'])
   exercise:
-    prompt: 3단계. 종별 통계 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 종별 통계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: penguins.groupby('species')['body_mass_g'].agg(['mean', 'std', 'min', 'max'])
     hints:
-    - 3단계. 종별 통계 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 종별 통계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 종별 통계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 종별 통계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 종별 통계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step4_boxplot
   title: 4단계. 종별 박스플롯
   structuredPrimary: true
   subtitle: 그룹별 boxplot
   goal: 4단계. 종별 박스플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 이전에 배운 박스플롯을 종별로 그려봅니다. 여러 그룹의 박스플롯을 한 번에 그리려면 각 그룹의 데이터를 리스트로 전달합니다. labels로 각 박스에 라벨을
     지정합니다.
   tips:
@@ -199,7 +199,7 @@ sections:
     axBox.grid(True, axis='y', alpha=0.3)
     figBox
   exercise:
-    prompt: 4단계. 종별 박스플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 종별 박스플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figBox, axBox = plt.subplots(figsize=(10, 6))
 
@@ -213,17 +213,17 @@ sections:
       axBox.grid(True, axis='y', alpha=0.3)
       figBox
     hints:
-    - 4단계. 종별 박스플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 종별 박스플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 종별 박스플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. 종별 박스플롯의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 종별 박스플롯 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step5_violin
   title: 5단계. 바이올린 플롯
   structuredPrimary: true
   subtitle: ax.violinplot()
   goal: 5단계. 바이올린 플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     바이올린 플롯은 박스플롯과 커널 밀도 추정(KDE)을 결합한 차트입니다. 분포의 형태를 시각적으로 보여주어 박스플롯보다 더 풍부한 정보를 제공합니다. 데이터가 어디에 집중되어 있는지, 양봉 분포인지 등을 파악할 수 있습니다.
 
@@ -246,7 +246,7 @@ sections:
     axViolin.grid(True, axis='y', alpha=0.3)
     figViolin
   exercise:
-    prompt: 5단계. 바이올린 플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 바이올린 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figViolin, axViolin = plt.subplots(figsize=(10, 6))
 
@@ -262,17 +262,17 @@ sections:
       axViolin.grid(True, axis='y', alpha=0.3)
       figViolin
     hints:
-    - 5단계. 바이올린 플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 바이올린 플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 바이올린 플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 바이올린 플롯의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 바이올린 플롯 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step6_violin_style
   title: 6단계. 바이올린 플롯 스타일링
   structuredPrimary: true
   subtitle: 색상 커스터마이징
   goal: 6단계. 바이올린 플롯 스타일링에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 바이올린 플롯의 색상을 커스터마이징하면 더 보기 좋은 차트를 만들 수 있습니다. violinplot이 반환하는 딕셔너리의 'bodies' 키로 각 바이올린에
     접근하여 색상을 변경합니다.
   tips:
@@ -287,7 +287,7 @@ sections:
     partsColor = axViolinColor.violinplot(weightColor, positions=[1, 2, 3], showmeans=True)
     figViolinColor
   exercise:
-    prompt: 6단계. 바이올린 플롯 스타일링 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 바이올린 플롯 스타일링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figViolinColor, axViolinColor = plt.subplots(figsize=(10, 6))
 
@@ -298,17 +298,17 @@ sections:
       partsColor = axViolinColor.violinplot(weightColor, positions=[1, 2, 3], showmeans=True)
       figViolinColor
     hints:
-    - 6단계. 바이올린 플롯 스타일링 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 바이올린 플롯 스타일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 바이올린 플롯 스타일링에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. 바이올린 플롯 스타일링의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 바이올린 플롯 스타일링 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step7_sharex
   title: 7단계. 축 공유 서브플롯
   structuredPrimary: true
   subtitle: sharex, sharey
   goal: 7단계. 축 공유 서브플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     박스플롯과 바이올린 플롯을 같은 y축 범위로 비교하면 두 차트의 차이점을 명확하게 볼 수 있습니다. sharey=True로 y축을 공유하면 스케일이 동일하게 유지됩니다.
 
@@ -332,7 +332,7 @@ sections:
     axBoxShare.set_ylabel('체중 (g)')
     figShare
   exercise:
-    prompt: 7단계. 축 공유 서브플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 축 공유 서브플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figShare, (axBoxShare, axViolinShare) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
 
@@ -349,17 +349,17 @@ sections:
       axBoxShare.set_ylabel('체중 (g)')
       figShare
     hints:
-    - 7단계. 축 공유 서브플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 축 공유 서브플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 축 공유 서브플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 축 공유 서브플롯의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 축 공유 서브플롯 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step8_spines
   title: 8단계. 스파인 제거
   structuredPrimary: true
   subtitle: spines 설정
   goal: 8단계. 스파인 제거에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     스파인(spine)은 차트 영역의 테두리입니다. 불필요한 스파인을 제거하면 더 깔끔하고 현대적인 디자인이 됩니다. 보통 상단과 우측 스파인을 제거하고, 좌측과 하단만 남깁니다.
 
@@ -380,7 +380,7 @@ sections:
         body.set_alpha(0.7)
     figSpines
   exercise:
-    prompt: 8단계. 스파인 제거 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 스파인 제거 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figSpines, axSpines = plt.subplots(figsize=(10, 6))
 
@@ -394,17 +394,17 @@ sections:
           body.set_alpha(0.7)
       figSpines
     hints:
-    - 8단계. 스파인 제거 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 스파인 제거 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 스파인 제거에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 스파인 제거의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 스파인 제거 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step9_subplot_compare
   title: 9단계. 2x2 비교 차트
   structuredPrimary: true
   subtitle: 여러 특성 비교
   goal: 9단계. 2x2 비교 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 체중뿐만 아니라 다른 신체 특성도 함께 비교합니다. 2x2 서브플롯으로 체중, 부리 길이, 부리 깊이, 날개 길이를 한눈에 볼 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -416,7 +416,7 @@ sections:
     featuresMulti = ['body_mass_g', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm']
     titlesMulti = ['체중 (g)', '부리 길이 (mm)', '부리 깊이 (mm)', '날개 길이 (mm)']
   exercise:
-    prompt: 9단계. 2x2 비교 차트 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 2x2 비교 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figMulti, axesMulti = plt.subplots(2, 2, figsize=(12, 10))
 
@@ -425,17 +425,17 @@ sections:
       featuresMulti = ['body_mass_g', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm']
       titlesMulti = ['체중 (g)', '부리 길이 (mm)', '부리 깊이 (mm)', '날개 길이 (mm)']
     hints:
-    - 9단계. 2x2 비교 차트 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 2x2 비교 차트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 2x2 비교 차트에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 2x2 비교 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 2x2 비교 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 분포 비교
   goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 펭귄 체중 분석 차트를 만듭니다. 바이올린 플롯과 박스플롯의 장점을 모두 활용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -453,7 +453,7 @@ sections:
         body.set_alpha(0.7)
     figFinal
   exercise:
-    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(11, 7))
 
@@ -468,17 +468,17 @@ sections:
           body.set_alpha(0.7)
       figFinal
     hints:
-    - 10단계. 최종 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 최종 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 최종 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 최종 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 최종 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 펭귄 데이터 분석 프로젝트
   goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 펭귄 데이터를 다양한 관점에서 분석해봅시다. boxplot, violinplot, sharex/sharey, spines 등 모든 개념을 종합적으로 활용합니다.
 
@@ -498,7 +498,7 @@ sections:
     palette = ['#9B59B6', '#F39C12', '#1ABC9C']
     mass = [data[data['island'] == isl]['body_mass_g'] for isl in islands]
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -512,11 +512,11 @@ sections:
       palette = ['#9B59B6', '#F39C12', '#1ABC9C']
       mass = [data[data['island'] == isl]['body_mass_g'] for isl in islands]
     hints:
-    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -532,12 +532,14 @@ sections:
     - ax.spines[].set_visible(False) - 스파인 제거로 깔끔한 디자인
   - type: text
     content: 다음 시간에는 히트맵으로 상관관계를 시각화합니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
   goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
     제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
@@ -565,7 +567,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -596,8 +598,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

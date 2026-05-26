@@ -45,7 +45,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 추상 클래스와 프로토콜 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 추상 클래스와 프로토콜 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: 추상 클래스 기초
   goal: abc 모듈에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     ABC(Abstract Base Class)는 인스턴스화할 수 없는 추상 클래스입니다. abc 모듈의 ABC 클래스를 상속하거나 metaclass=ABCMeta를 지정합니다. @abstractmethod로 데코레이트된 메서드는 서브클래스에서 반드시 구현해야 합니다. 추상 메서드를 구현하지 않으면 서브클래스도 인스턴스화할 수 없습니다. ABC는 인터페이스 계약을 강제하여 API 일관성을 보장합니다. collections.abc에는 Iterable, Mapping 등 유용한 추상 클래스가 정의되어 있습니다.
 
@@ -86,7 +86,7 @@ sections:
 
     Rectangle(3, 4).area()
   exercise:
-    prompt: abc 모듈 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: abc 모듈 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -112,17 +112,17 @@ sections:
 
       Rectangle(3, 4).area()
     hints:
-    - abc 모듈 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: abc 모듈 코드가 예외 없이 끝나야 합니다.
-    resultCheck: abc 모듈에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: abc 모듈의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: abc 모듈 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: abstract_property
   title: 추상 프로퍼티
   structuredPrimary: true
   subtitle: '@property + @abstractmethod'
   goal: 추상 프로퍼티에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     추상 프로퍼티는 서브클래스에서 반드시 정의해야 하는 속성입니다. @property와 @abstractmethod를 함께 사용합니다. Python 3.3 이전에는 @abstractproperty가 있었지만 이제는 데코레이터를 조합합니다. @abstractmethod는 가장 안쪽(아래쪽)에 위치해야 합니다. 추상 classmethod와 staticmethod도 같은 방식으로 정의합니다. 추상 프로퍼티는 설정자(setter)나 삭제자(deleter)도 추상화할 수 있습니다.
 
@@ -148,7 +148,7 @@ sections:
 
     MyList([1, 2, 3]).size
   exercise:
-    prompt: 추상 프로퍼티 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 추상 프로퍼티 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -168,17 +168,17 @@ sections:
 
       MyList([1, 2, 3]).size
     hints:
-    - 추상 프로퍼티 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 추상 프로퍼티 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 추상 프로퍼티에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 추상 프로퍼티의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 추상 프로퍼티 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: interface_design
   title: 인터페이스 설계
   structuredPrimary: true
   subtitle: 명시적 계약
   goal: 인터페이스 설계에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     ABC를 사용한 인터페이스 설계는 명시적인 계약을 만듭니다. 인터페이스를 상속받는 클래스는 정해진 메서드를 반드시 구현해야 합니다. 이는 팀 협업이나 대규모 프로젝트에서 API 일관성을 보장합니다. 추상 클래스에 docstring을 작성하면 인터페이스 문서화도 됩니다. 기본 구현을 제공하면서 일부만 추상화할 수도 있습니다. 추상 메서드 안에도 코드를 작성할 수 있으며 super()로 호출할 수 있습니다.
 
@@ -222,7 +222,7 @@ sections:
     repo.save({"id": 1, "name": "test"})
     repo.find(1)
   exercise:
-    prompt: 인터페이스 설계 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 인터페이스 설계 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -260,17 +260,17 @@ sections:
       repo.save({"id": 1, "name": "test"})
       repo.find(1)
     hints:
-    - 인터페이스 설계 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 인터페이스 설계 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 인터페이스 설계에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 인터페이스 설계의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 인터페이스 설계 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: duck_typing
   title: 덕 타이핑
   structuredPrimary: true
   subtitle: 타입보다 행동
   goal: 덕 타이핑에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     덕 타이핑(duck typing)은 '오리처럼 걷고 꽥꽥거리면 오리다'라는 원칙입니다. 객체의 타입보다 객체가 어떤 메서드를 가지고 있는지가 중요합니다. 파이썬은 동적 타이핑 언어로 덕 타이핑을 자연스럽게 지원합니다. isinstance 검사 대신 hasattr이나 EAFP(허락보다 용서가 쉽다) 스타일을 사용합니다. 덕 타이핑은 유연하지만 런타임에 오류가 발생할 수 있습니다. ABC와 덕 타이핑은 상호 보완적입니다.
 
@@ -297,7 +297,7 @@ sections:
 
     makeQuack(Duck()), makeQuack(Person())
   exercise:
-    prompt: 덕 타이핑 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 덕 타이핑 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Duck:
           def quack(self):
@@ -318,17 +318,17 @@ sections:
 
       makeQuack(Duck()), makeQuack(Person())
     hints:
-    - 덕 타이핑 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 덕 타이핑 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 덕 타이핑에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 덕 타이핑의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 덕 타이핑 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: protocol_typing
   title: typing.Protocol
   structuredPrimary: true
   subtitle: 구조적 서브타이핑
   goal: typing.Protocol에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     typing.Protocol은 Python 3.8에서 도입된 구조적 서브타이핑입니다. 명시적으로 상속하지 않아도 필요한 메서드를 가지면 타입 검사를 통과합니다. 덕 타이핑을 정적 타입 검사와 결합합니다. runtime_checkable 데코레이터를 추가하면 isinstance로도 검사할 수 있습니다. Protocol은 ABC와 달리 상속이 필요 없어 기존 클래스와의 호환성이 좋습니다.
 
@@ -355,7 +355,7 @@ sections:
 
     render(Circle()), render(Square())
   exercise:
-    prompt: typing.Protocol 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: typing.Protocol 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from typing import Protocol
 
@@ -376,17 +376,17 @@ sections:
 
       render(Circle()), render(Square())
     hints:
-    - typing.Protocol 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: typing.Protocol 코드가 예외 없이 끝나야 합니다.
-    resultCheck: typing.Protocol에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: typing.Protocol의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: typing.Protocol 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practical_abc
   title: 실전 ABC
   structuredPrimary: true
   subtitle: 플러그인과 전략 패턴
   goal: 실전 ABC에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     ABC는 플러그인 시스템이나 전략 패턴 구현에 유용합니다. 플러그인 시스템에서 모든 플러그인이 구현해야 할 인터페이스를 ABC로 정의합니다. 전략 패턴에서 다양한 알고리즘을 같은 인터페이스로 교체할 수 있습니다. 의존성 주입(Dependency Injection)에서도 인터페이스를 ABC로 정의합니다. register 메서드로 기존 클래스를 가상 서브클래스로 등록할 수 있습니다.
 
@@ -430,7 +430,7 @@ sections:
         result = p.execute(result)
     result
   exercise:
-    prompt: 실전 ABC 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 실전 ABC 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -468,17 +468,17 @@ sections:
           result = p.execute(result)
       result
     hints:
-    - 실전 ABC 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실전 ABC 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실전 ABC에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실전 ABC의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 ABC 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 내보내기 인터페이스 설계하기'
   structuredPrimary: true
   subtitle: 예측 → 명시 계약 → 구조적 타입 → 실패 확인
   goal: '현업 흐름 검증: 내보내기 인터페이스 설계하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     ABC는 런타임 계약을 강제하고, Protocol은 구조적 타입으로 기존 객체와의 결합을 줄입니다. 리포트 내보내기 흐름에서 저장소는 ABC로 강제하고 포맷터는 Protocol로 유연하게 받습니다.
 
@@ -542,7 +542,7 @@ sections:
 
     print("ABC와 Protocol 내보내기 흐름 통과")
   exercise:
-    prompt: '현업 흐름 검증: 내보내기 인터페이스 설계하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 내보내기 인터페이스 설계하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from abc import ABC, abstractmethod
       from typing import Protocol, runtime_checkable
@@ -599,17 +599,17 @@ sections:
 
       print("ABC와 Protocol 내보내기 흐름 통과")
     hints:
-    - '현업 흐름 검증: 내보내기 인터페이스 설계하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 내보내기 인터페이스 설계하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 내보내기 인터페이스 설계하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 내보내기 인터페이스 설계하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 내보내기 인터페이스 설계하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: ABC와 Protocol 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 8에서 배운 추상 클래스와 프로토콜을 난이도별로 복습합니다. ABC(Abstract Base Class)는 인터페이스를 강제하는 명목적 서브타이핑을,
     Protocol은 구조적 서브타이핑(덕 타이핑)을 제공합니다. 둘 다 코드의 타입 안전성과 설계 명확성을 높이는 도구입니다. 🟢 기본 문제로 ABC와 abstractmethod,
     Protocol 정의를 익히고, 🟡 응용 문제로 추상 프로퍼티, runtime_checkable 패턴을 연습하세요. 🔴 심화 문제에서는 믹스인, 가상 서브클래스, 제네릭 Protocol
@@ -630,7 +630,7 @@ sections:
 
     Hello().greet()
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -645,8 +645,8 @@ sections:
 
       Hello().greet()
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

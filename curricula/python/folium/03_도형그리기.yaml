@@ -49,7 +49,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 도형 그리기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 도형 그리기 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -58,26 +58,26 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import folium
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_circle
   title: 2단계. Circle 그리기
   structuredPrimary: true
   subtitle: Circle()
   goal: 2단계. Circle 그리기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Circle()은 실제 거리(미터) 기준으로 원을 그립니다. radius는 미터 단위입니다.
 
@@ -98,7 +98,7 @@ sections:
 
     m1
   exercise:
-    prompt: 2단계. Circle 그리기 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. Circle 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -113,17 +113,17 @@ sections:
 
       m1
     hints:
-    - 2단계. Circle 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. Circle 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. Circle 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. Circle 그리기에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. Circle 그리기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_circle_marker
   title: 3단계. CircleMarker 그리기
   structuredPrimary: true
   subtitle: CircleMarker()
   goal: 3단계. CircleMarker 그리기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     CircleMarker()는 픽셀 기준으로 원을 그립니다. 줌 레벨이 바뀌어도 화면상 크기가 동일합니다.
 
@@ -145,7 +145,7 @@ sections:
 
     m2
   exercise:
-    prompt: 3단계. CircleMarker 그리기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. CircleMarker 그리기 예제에서 `m2`, `location`, `radius` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=14)
 
@@ -161,17 +161,17 @@ sections:
 
       m2
     hints:
-    - 3단계. CircleMarker 그리기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m2 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m2` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. CircleMarker 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. CircleMarker 그리기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. CircleMarker 그리기에서 `m2` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. CircleMarker 그리기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_circle_style
   title: 4단계. 원 스타일링
   structuredPrimary: true
   subtitle: color, fill, weight
   goal: 4단계. 원 스타일링에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     원의 외곽선과 채우기 색상, 투명도, 두께를 설정합니다.
 
@@ -203,7 +203,7 @@ sections:
 
     m4
   exercise:
-    prompt: 4단계. 원 스타일링 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 원 스타일링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -229,17 +229,17 @@ sections:
 
       m4
     hints:
-    - 4단계. 원 스타일링 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. 원 스타일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 원 스타일링에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 원 스타일링에서 `m4` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 원 스타일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_rectangle
   title: 5단계. Rectangle 그리기
   structuredPrimary: true
   subtitle: Rectangle()
   goal: 5단계. Rectangle 그리기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Rectangle()은 두 모서리 좌표로 사각형을 그립니다. bounds에 [[남서], [북동]] 좌표를 전달합니다.
 
@@ -263,7 +263,7 @@ sections:
 
     m5
   exercise:
-    prompt: 5단계. Rectangle 그리기 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. Rectangle 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=[37.5725, 126.9768], zoom_start=16)
 
@@ -281,17 +281,17 @@ sections:
 
       m5
     hints:
-    - 5단계. Rectangle 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. Rectangle 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. Rectangle 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. Rectangle 그리기에서 `m5` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. Rectangle 그리기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_polyline
   title: 6단계. PolyLine 그리기
   structuredPrimary: true
   subtitle: PolyLine()
   goal: 6단계. PolyLine 그리기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     PolyLine()은 좌표 리스트를 연결한 선을 그립니다. 경로, 도로, 노선 표시에 사용합니다.
 
@@ -319,7 +319,7 @@ sections:
 
     m7
   exercise:
-    prompt: 6단계. PolyLine 그리기 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. PolyLine 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=[37.5283, 126.9340], zoom_start=14)
 
@@ -341,17 +341,17 @@ sections:
 
       m7
     hints:
-    - 6단계. PolyLine 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. PolyLine 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. PolyLine 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. PolyLine 그리기에서 `m7` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. PolyLine 그리기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_polyline_style
   title: 7단계. PolyLine 스타일
   structuredPrimary: true
   subtitle: dash_array, weight
   goal: 7단계. PolyLine 스타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     선의 스타일을 다양하게 변경합니다. dash_array로 점선을 만들 수 있습니다.
 
@@ -390,7 +390,7 @@ sections:
 
     m9
   exercise:
-    prompt: 7단계. PolyLine 스타일 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. PolyLine 스타일 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -423,17 +423,17 @@ sections:
 
       m9
     hints:
-    - 7단계. PolyLine 스타일 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. PolyLine 스타일 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. PolyLine 스타일에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. PolyLine 스타일에서 `m9` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. PolyLine 스타일 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step8_polygon
   title: 8단계. Polygon 그리기
   structuredPrimary: true
   subtitle: Polygon()
   goal: 8단계. Polygon 그리기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Polygon()은 좌표 리스트로 닫힌 다각형을 그립니다. 시작점과 끝점이 자동으로 연결됩니다.
 
@@ -461,7 +461,7 @@ sections:
 
     m10
   exercise:
-    prompt: 8단계. Polygon 그리기 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. Polygon 그리기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=14)
 
@@ -483,17 +483,17 @@ sections:
 
       m10
     hints:
-    - 8단계. Polygon 그리기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. Polygon 그리기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. Polygon 그리기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. Polygon 그리기에서 `m10` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. Polygon 그리기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_multiple_shapes
   title: 9단계. 여러 도형 조합
   structuredPrimary: true
   subtitle: 도형 혼합 사용
   goal: 9단계. 여러 도형 조합에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     원, 사각형, 선, 다각형을 조합하여 복잡한 지도를 만듭니다.
 
@@ -538,7 +538,7 @@ sections:
 
     m12
   exercise:
-    prompt: 9단계. 여러 도형 조합 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 여러 도형 조합 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       storeLocation = [37.5665, 126.9780]
       m12 = folium.Map(location=storeLocation, zoom_start=14)
@@ -577,17 +577,17 @@ sections:
 
       m12
     hints:
-    - 9단계. 여러 도형 조합 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 9단계. 여러 도형 조합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 여러 도형 조합에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 9단계. 여러 도형 조합에서 `storeLocation` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 여러 도형 조합 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 조깅 코스 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 조깅 코스를 경로와 구간별 정보로 표시하는 지도를 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -647,7 +647,7 @@ sections:
 
     jogMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       startPoint = [37.5283, 126.9200]
       jogMap = folium.Map(location=[37.5300, 126.9350], zoom_start=14)
@@ -704,17 +704,17 @@ sections:
 
       jogMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제에서 `startPoint` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 완성 예제 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 도형 지도 검증
   structuredPrimary: true
   subtitle: 예측 → 도형 오류 확인 → 렌더 검증 → 기준 실험
   goal: 11단계. 실무 도형 지도 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     도형 지도는 영역이 그려졌다고 끝이 아닙니다. 업무용 구역, 경로, 반경 지도에서는 다각형 꼭짓점 수, 좌표 범위, 반경 기준, 렌더 결과를 코드로 검증해야 보고서와 운영 판단에 쓸 수 있습니다.
 
@@ -750,7 +750,7 @@ sections:
     priorityZoneNames = [zone["name"] for zone in serviceZones if zone["incidents"] >= 15]
     priorityZoneNames
   exercise:
-    prompt: 11단계. 실무 도형 지도 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 실무 도형 지도 검증 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       serviceZones = [
           {
@@ -780,17 +780,17 @@ sections:
       priorityZoneNames = [zone["name"] for zone in serviceZones if zone["incidents"] >= 15]
       priorityZoneNames
     hints:
-    - 11단계. 실무 도형 지도 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 11단계. 실무 도형 지도 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 실무 도형 지도 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 11단계. 실무 도형 지도 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 실무 도형 지도 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 도형 그리기
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -810,7 +810,7 @@ sections:
     ]
     facilities
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       parkCenter = [37.5512, 126.9882]
@@ -827,8 +827,8 @@ sections:
       ]
       facilities
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `parkCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

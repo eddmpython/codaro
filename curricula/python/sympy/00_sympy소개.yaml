@@ -25,26 +25,26 @@ meta:
 intro:
   direction: SymPy소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - SymPy소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - SymPy소개 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 손익분기 수식을 기호로 검증하 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
-    - label: 핵심 처리 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 출력과 상태 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 기호 계산 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 간소화식, 해, 미분/적분 결 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
     - label: SymPy소개 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 기호 계산 환경
       detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
     - label: SymPy소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
     - label: SymPy소개 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -65,6 +65,8 @@ sections:
       title: 행렬 연산
     - emoji: ∞
       title: 극한과 급수
+  goal: SymPy에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: sympy_history
   blocks:
   - type: sectionHeader
@@ -84,6 +86,8 @@ sections:
     - emoji: 🐍
       title: 순수 파이썬
       description: 외부 의존성 없이 어디서나 실행됩니다
+  goal: 🏛️ SymPy란?에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: numeric_vs_symbolic
   blocks:
   - type: sectionHeader
@@ -113,6 +117,8 @@ sections:
   - type: note
     title: 왜 기호 계산이 필요한가?
     content: 수치 계산은 반올림 오차가 누적됩니다. 기호 계산은 정확한 수식을 유지하므로 오차가 없습니다. 미분, 적분 같은 수학적 조작은 기호로 해야 정확한 결과를 얻습니다.
+  goal: ⚖️ 숫자 vs 기호에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -141,6 +147,8 @@ sections:
     - - 삼각함수
       - 항등식, 변환
       - trigsimp(sin²+cos²) → 1
+  goal: 🛠️ SymPy 주요 기능에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: comparison
   blocks:
   - type: sectionHeader
@@ -164,6 +172,8 @@ sections:
     - - WolframAlpha
       - 웹 서비스, 편리
       - 빠른 검색
+  goal: 🔄 SymPy vs 다른 도구에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -184,6 +194,8 @@ sections:
       - 제어 시스템, 신호 처리, 회로 해석
     - - 교육
       - 문제 자동 생성, 단계별 풀이 제공
+  goal: 💡 활용 분야에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -203,6 +215,8 @@ sections:
     - emoji: 📈
       title: 함수 (Function)
       description: sin, cos, exp, log 같은 수학 함수입니다
+  goal: 📌 핵심 개념에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: workflow
   blocks:
   - type: sectionHeader
@@ -229,6 +243,8 @@ sections:
     - - 5. 결과 확인
       - 값 대입, 수치화
       - expr.subs(x, 2).evalf()
+  goal: 🔄 작업 흐름에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -272,6 +288,8 @@ sections:
     - - 10. 종합 수학 문제
       - 응용
       - 최적화, 미분방정식
+  goal: 📚 커리큘럼에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: start
   blocks:
   - type: sectionHeader
@@ -280,12 +298,14 @@ sections:
   - type: text
     content: SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서
       기호를 정의하고 수식을 전개하는 것부터 시작합니다.
+  goal: 🎯 시작하기에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
   structuredPrimary: true
   subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
     구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
   tips:
@@ -307,7 +327,7 @@ sections:
     assert breakEvenQuantity == 40
     profitExpr, breakEvenQuantity
   exercise:
-    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import sympy as sp
 
@@ -325,8 +345,8 @@ sections:
       assert breakEvenQuantity == 40
       profitExpr, breakEvenQuantity
     hints:
-    - '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'

@@ -32,33 +32,33 @@ intro:
     배웁니다.
   direction: 히스토그램분석기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 히스토그램분석기 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
+  - 히스토그램분석기 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
+  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 이미지 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 히스토그램 계산 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. 히스토그램 평활화 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
     - label: 히스토그램분석기 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 컴퓨터 비전 환경
       detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 히스토그램분석기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
     - label: 히스토그램분석기 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: 히스토그램 분석 준비
   goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: sklearn의 flower 이미지를 불러옵니다. 히스토그램 분석은 이미지의 밝기 분포를 이해하는 데 도움이 됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -77,7 +77,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -93,17 +93,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 1단계. 이미지 불러오기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 이미지 불러오기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 1단계. 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step2_calc
   title: 2단계. 히스토그램 계산
   structuredPrimary: true
   subtitle: calcHist()
   goal: 2단계. 히스토그램 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     calcHist()는 히스토그램을 계산하는 함수입니다. 히스토그램의 각 빈(bin)은 특정 밝기 범위에 속하는 픽셀 수를 나타냅니다. 256개 빈을 사용하면 각 밝기 값(0-255)별 픽셀 수를 얻습니다. 히스토그램의 분포를 보면 이미지가 어두운지(왼쪽에 집중), 밝은지(오른쪽에 집중), 대비가 낮은지(좁은 범위에 집중) 파악할 수 있습니다.
 
@@ -121,7 +121,7 @@ sections:
     plt.xlim([0, 256])
     plt.tight_layout()
   exercise:
-    prompt: 2단계. 히스토그램 계산 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 히스토그램 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
       plt.figure(figsize=(10, 4))
@@ -132,17 +132,17 @@ sections:
       plt.xlim([0, 256])
       plt.tight_layout()
     hints:
-    - 2단계. 히스토그램 계산 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 2단계. 히스토그램 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 히스토그램 계산에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 2단계. 히스토그램 계산의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 히스토그램 계산 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step3_equalize
   title: 3단계. 히스토그램 평활화
   structuredPrimary: true
   subtitle: equalizeHist()
   goal: 3단계. 히스토그램 평활화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     equalizeHist()는 히스토그램 평활화(histogram equalization)를 수행합니다. 누적 분포 함수(CDF, Cumulative Distribution Function)를 이용해 픽셀 값을 재분배하여, 히스토그램이 0-255 전체 범위에 고르게 분포하도록 만듭니다. 이를 통해 대비(contrast)가 향상되어 어둡거나 흐릿한 이미지의 디테일이 살아납니다.
 
@@ -157,7 +157,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 3단계. 히스토그램 평활화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 히스토그램 평활화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       equalized = cv2.equalizeHist(gray)
       plt.figure(figsize=(8, 6))
@@ -166,17 +166,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 3단계. 히스토그램 평활화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 히스토그램 평활화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 히스토그램 평활화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 히스토그램 평활화의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 히스토그램 평활화 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step4_clahe
   title: 4단계. CLAHE
   structuredPrimary: true
   subtitle: 적응형 히스토그램 평활화
   goal: 4단계. CLAHE에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     CLAHE(Contrast Limited Adaptive Histogram Equalization, 대비 제한 적응형 히스토그램 평활화)는 이미지를 작은 타일(tile)로 나누어 각각 평활화합니다. 전역 평활화(equalizeHist)는 밝은 영역과 어두운 영역이 함께 있을 때 한쪽이 과도하게 변할 수 있지만, CLAHE는 지역별로 처리하므로 자연스럽습니다. clipLimit은 대비 증폭을 제한하여 노이즈 증가를 방지합니다.
 
@@ -187,22 +187,22 @@ sections:
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     type(clahe)
   exercise:
-    prompt: 4단계. CLAHE 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. CLAHE 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
     starterCode: |-
       clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
       type(clahe)
     hints:
-    - 4단계. CLAHE 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
+    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. CLAHE 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. CLAHE에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. CLAHE의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. CLAHE 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step5_color
   title: 5단계. 컬러 이미지 평활화
   structuredPrimary: true
   subtitle: LAB 색공간 활용
   goal: 5단계. 컬러 이미지 평활화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     컬러 이미지에 평활화를 적용하려면 LAB 색공간을 사용합니다. L 채널(밝기)만 평활화하면 색상이 왜곡되지 않습니다.
 
@@ -218,7 +218,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 5단계. 컬러 이미지 평활화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 컬러 이미지 평활화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       lab = cv2.cvtColor(original, cv2.COLOR_BGR2LAB)
       lCh, aCh, bCh = cv2.split(lab)
@@ -228,17 +228,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 5단계. 컬러 이미지 평활화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 컬러 이미지 평활화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 컬러 이미지 평활화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 컬러 이미지 평활화의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 컬러 이미지 평활화 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: step6_params
   title: 6단계. CLAHE 파라미터
   structuredPrimary: true
   subtitle: clipLimit와 tileGridSize
   goal: 6단계. CLAHE 파라미터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: CLAHE의 두 파라미터가 결과에 미치는 영향을 확인합니다. clipLimit은 대비 강도, tileGridSize는 지역성을 조절합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -261,7 +261,7 @@ sections:
     axCl[2].axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 6단계. CLAHE 파라미터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. CLAHE 파라미터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       claheLow = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8))
       claheMid = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
@@ -281,17 +281,17 @@ sections:
       axCl[2].axis('off')
       plt.tight_layout()
     hints:
-    - 6단계. CLAHE 파라미터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. CLAHE 파라미터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. CLAHE 파라미터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. CLAHE 파라미터의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. CLAHE 파라미터 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 히스토그램 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     china 이미지로 히스토그램 분석을 연습해봅시다.
 
@@ -310,7 +310,7 @@ sections:
     plt.imshow(china)
     plt.axis('off')
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -323,17 +323,17 @@ sections:
       plt.imshow(china)
       plt.axis('off')
     hints:
-    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
 - id: workflow_validation
   title: 7단계. 히스토그램 개선 검증 루프
   structuredPrimary: true
   subtitle: 대비 개선과 입력 채널 확인
   goal: 7단계. 히스토그램 개선 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 히스토그램 평활화는 대비가 좋아 보이는지보다 실제 동적 범위가 넓어졌는지 확인해야 합니다. 그레이스케일 입력을 검증하고 equalizeHist와 CLAHE
     결과를 수치로 비교합니다.
   tips:
@@ -352,7 +352,7 @@ sections:
 
     validateGrayImage(histGradient)
   exercise:
-    prompt: 7단계. 히스토그램 개선 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 히스토그램 개선 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -367,8 +367,8 @@ sections:
 
       validateGrayImage(histGradient)
     hints:
-    - 7단계. 히스토그램 개선 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 7단계. 히스토그램 개선 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 히스토그램 개선 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 7단계. 히스토그램 개선 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 히스토그램 개선 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

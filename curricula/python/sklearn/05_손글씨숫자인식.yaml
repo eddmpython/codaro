@@ -50,7 +50,7 @@ intro:
     - label: 업무 코드 환경
       detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 손글씨숫자인식 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 손글씨숫자인식 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: 손글씨 숫자 인식에 필요한 라이브러리를 불러옵니다. 차원 축소를 위해 PCA를 추가로 임포트합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -75,7 +75,7 @@ sections:
     import matplotlib.pyplot as plt
     import seaborn as sns
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_digits
       from sklearn.model_selection import train_test_split
@@ -88,17 +88,17 @@ sections:
       import matplotlib.pyplot as plt
       import seaborn as sns
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: load_digits()
   goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     손글씨 숫자 데이터셋은 8x8 픽셀 이미지 1,797개를 담고 있습니다. 각 픽셀은 0~16 사이의 밝기값입니다. 이미지가 64차원 벡터로 펼쳐져 있습니다.
 
@@ -111,24 +111,24 @@ sections:
     y = digits.target
     X.shape
   exercise:
-    prompt: 2단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 불러오기 예제에서 `digits`, `X`, `y` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       digits = load_digits()
       X = digits.data
       y = digits.target
       X.shape
     hints:
-    - 2단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `digits = ...` 오른쪽 값입니다.
+    - 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 2단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 불러오기에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 데이터 불러오기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_visualize
   title: 3단계. 이미지 시각화
   structuredPrimary: true
   subtitle: 샘플 확인
   goal: 3단계. 이미지 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: 실제 이미지가 어떻게 생겼는지 확인합니다. 8x8 해상도지만 사람이 숫자를 인식할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -141,7 +141,7 @@ sections:
     fig.suptitle('Sample Digit Images')
     fig
   exercise:
-    prompt: 3단계. 이미지 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 이미지 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fig, axes = plt.subplots(2, 5, figsize=(10, 5))
       for i, ax in enumerate(axes.flat):
@@ -151,17 +151,17 @@ sections:
       fig.suptitle('Sample Digit Images')
       fig
     hints:
-    - 3단계. 이미지 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 이미지 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 이미지 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 이미지 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 이미지 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step4_split
   title: 4단계. 데이터 분할
   structuredPrimary: true
   subtitle: train_test_split
   goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -169,22 +169,22 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 4단계. 데이터 분할 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 데이터 분할 예제에서 `xTrain`, `xTest`, `yTrain` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
     hints:
-    - 4단계. 데이터 분할 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. 데이터 분할 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 데이터 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 데이터 분할에서 `xTrain`, `xTest`, `yTrain` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 4단계. 데이터 분할 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_scale
   title: 5단계. 스케일링
   structuredPrimary: true
   subtitle: StandardScaler
   goal: 5단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 픽셀값은 0~16 범위이지만, 스케일링을 적용하면 LogisticRegression의 수렴이 빨라집니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -193,23 +193,23 @@ sections:
     xTrainSc = scaler.fit_transform(xTrain)
     xTestSc = scaler.transform(xTest)
   exercise:
-    prompt: 5단계. 스케일링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 스케일링 예제에서 `scaler`, `xTrainSc`, `xTestSc` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       scaler = StandardScaler()
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
     hints:
-    - 5단계. 스케일링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `scaler = ...` 오른쪽 값입니다.
+    - 실행 뒤 `scaler` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 5단계. 스케일링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 스케일링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 스케일링에서 `scaler` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_model
   title: 6단계. 모델 학습
   structuredPrimary: true
   subtitle: LogisticRegression
   goal: 6단계. 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     10개 클래스(0~9)를 분류하는 다중 분류 문제입니다. LogisticRegression은 자동으로 다중 분류를 처리합니다.
 
@@ -221,22 +221,22 @@ sections:
     model = LogisticRegression(max_iter=1000)
     model.fit(xTrainSc, yTrain)
   exercise:
-    prompt: 6단계. 모델 학습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 모델 학습 예제에서 `model` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       model = LogisticRegression(max_iter=1000)
       model.fit(xTrainSc, yTrain)
     hints:
-    - 6단계. 모델 학습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `model = ...` 오른쪽 값입니다.
+    - 실행 뒤 `model` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. 모델 학습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 모델 학습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 모델 학습에서 `model` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 모델 학습 실행 뒤 `model` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_evaluate
   title: 7단계. 평가
   structuredPrimary: true
   subtitle: 정확도와 분류 리포트
   goal: 7단계. 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 10개 클래스의 분류 성능을 평가합니다. 어떤 숫자가 인식하기 어려운지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -245,23 +245,23 @@ sections:
     acc = accuracy_score(yTest, yPred)
     f"정확도: {acc:.2%}"
   exercise:
-    prompt: 7단계. 평가 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 평가 예제에서 `yPred`, `acc` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       yPred = model.predict(xTestSc)
       acc = accuracy_score(yTest, yPred)
       f"정확도: {acc:.2%}"
     hints:
-    - 7단계. 평가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `yPred = ...` 오른쪽 값입니다.
+    - 실행 뒤 `yPred` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 7단계. 평가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 평가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 평가에서 `yPred` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 평가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step8_confusion
   title: 8단계. 혼동행렬
   structuredPrimary: true
   subtitle: 오분류 패턴
   goal: 8단계. 혼동행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 10x10 혼동행렬로 어떤 숫자가 어떤 숫자로 잘못 인식되는지 확인합니다. 예를 들어 8과 3이 혼동되는 경우가 많습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -274,7 +274,7 @@ sections:
     ax.set_title('Confusion Matrix - Digits')
     fig
   exercise:
-    prompt: 8단계. 혼동행렬 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 혼동행렬 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       cm = confusion_matrix(yTest, yPred)
       fig, ax = plt.subplots(figsize=(10, 8))
@@ -284,17 +284,17 @@ sections:
       ax.set_title('Confusion Matrix - Digits')
       fig
     hints:
-    - 8단계. 혼동행렬 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 혼동행렬 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 혼동행렬에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 혼동행렬의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 혼동행렬의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_errors
   title: 9단계. 오분류 분석
   structuredPrimary: true
   subtitle: 잘못 예측한 이미지
   goal: 9단계. 오분류 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 모델이 잘못 예측한 이미지를 확인합니다. 사람도 헷갈릴 수 있는 필체인지, 모델의 한계인지 파악합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -311,7 +311,7 @@ sections:
     fig.suptitle('Misclassified Samples')
     fig
   exercise:
-    prompt: 9단계. 오분류 분석 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 오분류 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       errors = np.where(yPred != yTest)[0]
       fig, axes = plt.subplots(2, 5, figsize=(12, 5))
@@ -325,17 +325,17 @@ sections:
       fig.suptitle('Misclassified Samples')
       fig
     hints:
-    - 9단계. 오분류 분석 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 오분류 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 오분류 분석에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 오분류 분석의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 오분류 분석 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_pca_intro
   title: 10단계. PCA 소개
   structuredPrimary: true
   subtitle: 차원 축소
   goal: 10단계. PCA 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     PCA(Principal Component Analysis)는 고차원 데이터를 저차원으로 압축합니다. 64차원 데이터를 2차원으로 축소하면 시각화할 수 있습니다. 정보 손실을 최소화하면서 차원을 줄입니다.
 
@@ -347,23 +347,23 @@ sections:
     xPca = pca.fit_transform(xTrainSc)
     xPca.shape
   exercise:
-    prompt: 10단계. PCA 소개 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. PCA 소개 예제에서 `pca`, `xPca` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       pca = PCA(n_components=2)
       xPca = pca.fit_transform(xTrainSc)
       xPca.shape
     hints:
-    - 10단계. PCA 소개 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `pca = ...` 오른쪽 값입니다.
+    - 실행 뒤 `pca` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 10단계. PCA 소개 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. PCA 소개에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. PCA 소개에서 `pca` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. PCA 소개 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step11_pca_visualize
   title: 11단계. PCA 시각화
   structuredPrimary: true
   subtitle: 2D 산점도
   goal: 11단계. PCA 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     2차원으로 축소된 데이터를 산점도로 시각화합니다. 같은 숫자끼리 군집을 이루는지, 어떤 숫자가 겹치는지 확인합니다.
 
@@ -381,7 +381,7 @@ sections:
     cbar.set_label('Digit')
     fig
   exercise:
-    prompt: 11단계. PCA 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. PCA 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(10, 8))
       scatter = ax.scatter(xPca[:, 0], xPca[:, 1], c=yTrain, cmap='tab10', alpha=0.6)
@@ -392,17 +392,17 @@ sections:
       cbar.set_label('Digit')
       fig
     hints:
-    - 11단계. PCA 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. PCA 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. PCA 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. PCA 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. PCA 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step12_pca_components
   title: 12단계. 적정 차원 수
   structuredPrimary: true
   subtitle: 분산 누적
   goal: 12단계. 적정 차원 수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 몇 개의 주성분으로 충분한 정보를 유지할 수 있는지 확인합니다. 보통 95% 분산을 유지하는 차원 수를 선택합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -420,7 +420,7 @@ sections:
     ax.legend()
     fig
   exercise:
-    prompt: 12단계. 적정 차원 수 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 적정 차원 수 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       pcaFull = PCA()
       pcaFull.fit(xTrainSc)
@@ -435,17 +435,17 @@ sections:
       ax.legend()
       fig
     hints:
-    - 12단계. 적정 차원 수 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 12단계. 적정 차원 수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 적정 차원 수에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 12단계. 적정 차원 수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 12단계. 적정 차원 수의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step13_summary
   title: 13단계. 정리
   structuredPrimary: true
   subtitle: 이미지 분류와 PCA 완료
   goal: 13단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 이번 프로젝트에서는 손글씨 숫자 인식 모델을 만들어 이미지 분류를 학습했습니다. 64차원 데이터를 PCA로 축소하여 시각화하는 방법을 배웠습니다. 고차원 데이터에서
     패턴을 파악하는 데 PCA가 유용합니다.
   tips:
@@ -457,7 +457,7 @@ sections:
     })
     summary
   exercise:
-    prompt: 13단계. 정리 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 13단계. 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       summary = pd.DataFrame({
           'Item': ['Dataset', 'Features', 'Classes', 'Accuracy', 'PCA for 95%'],
@@ -465,17 +465,17 @@ sections:
       })
       summary
     hints:
-    - 13단계. 정리 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 13단계. 정리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 13단계. 정리에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 13단계. 정리의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 13단계. 정리 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 숫자 인식 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     OCR 개발자가 되어 숫자 인식 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, PCA, confusion_matrix를 모두 활용합니다.
 
@@ -518,7 +518,7 @@ sections:
 
     pd.DataFrame(results)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_digits
       from sklearn.model_selection import train_test_split
@@ -555,17 +555,17 @@ sections:
 
       pd.DataFrame(results)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
     정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
@@ -596,7 +596,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -641,8 +641,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

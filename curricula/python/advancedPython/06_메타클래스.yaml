@@ -45,7 +45,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 메타클래스 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 메타클래스 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: 타입 계층 이해
   goal: 클래스도 객체에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     파이썬에서 모든 것은 객체입니다. 클래스도 예외가 아닙니다. 클래스는 type이라는 메타클래스의 인스턴스입니다. int, str, list 같은 내장 타입도 모두 type의 인스턴스입니다. type(클래스)를 호출하면 <class 'type'>이 반환됩니다. 클래스의 __class__ 속성도 type을 가리킵니다. 이 구조를 이해하면 메타클래스가 어떻게 클래스를 생성하고 제어하는지 알 수 있습니다. 재미있는 점은 type의 타입도 type이라는 것입니다. type(type)은 type 자신을 반환합니다.
 
@@ -69,7 +69,7 @@ sections:
 
     type(obj), type(MyClass), type(type)
   exercise:
-    prompt: 클래스도 객체 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 클래스도 객체 예제에서 `obj` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class MyClass:
           pass
@@ -78,17 +78,17 @@ sections:
 
       type(obj), type(MyClass), type(type)
     hints:
-    - 클래스도 객체 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `obj = ...` 오른쪽 값입니다.
+    - 실행 뒤 `obj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 클래스도 객체 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 클래스도 객체에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 클래스도 객체에서 `obj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 클래스도 객체 실행 뒤 `obj` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: type_function
   title: type()으로 클래스 생성
   structuredPrimary: true
   subtitle: 동적 클래스 생성
   goal: type()으로 클래스 생성에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     type 함수는 두 가지 용도로 사용됩니다. 인자가 하나면 객체의 타입을 반환합니다. 인자가 세 개면 새 클래스를 생성합니다. type(name, bases, dict)에서 name은 클래스 이름, bases는 부모 클래스들의 튜플, dict는 클래스 속성과 메서드를 담은 딕셔너리입니다. class 문법은 사실 type 호출의 문법적 설탕(syntactic sugar)입니다. 동적으로 클래스를 생성해야 할 때 type을 직접 사용할 수 있습니다.
 
@@ -100,23 +100,23 @@ sections:
     dog = Dog()
     dog.species
   exercise:
-    prompt: type()으로 클래스 생성 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: type()으로 클래스 생성 예제에서 `Dog`, `dog` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       Dog = type("Dog", (), {"species": "Canis familiaris"})
       dog = Dog()
       dog.species
     hints:
-    - type()으로 클래스 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `Dog = ...` 오른쪽 값입니다.
+    - 실행 뒤 `Dog` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: type()으로 클래스 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: type()으로 클래스 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: type()으로 클래스 생성에서 `Dog` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: type()으로 클래스 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: metaclass_basic
   title: 메타클래스 기초
   structuredPrimary: true
   subtitle: __new__와 __init__
   goal: 메타클래스 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     메타클래스는 클래스를 생성하는 클래스입니다. type을 상속받아 커스텀 메타클래스를 만들 수 있습니다. 메타클래스의 __new__는 클래스 객체를 생성할 때 호출됩니다. __init__은 생성된 클래스 객체를 초기화합니다. __call__은 클래스가 인스턴스를 생성할 때 호출됩니다. 메타클래스를 사용하면 클래스 생성 과정을 가로채 속성을 수정하거나 검증할 수 있습니다.
 
@@ -134,7 +134,7 @@ sections:
 
     MyClass.created_by
   exercise:
-    prompt: 메타클래스 기초 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메타클래스 기초 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Meta(type):
           def __new__(mcs, name, bases, namespace):
@@ -146,17 +146,17 @@ sections:
 
       MyClass.created_by
     hints:
-    - 메타클래스 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메타클래스 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메타클래스 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메타클래스 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메타클래스 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: metaclass_example
   title: 메타클래스 예제
   structuredPrimary: true
   subtitle: 실전 패턴
   goal: 메타클래스 예제에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     메타클래스의 대표적인 활용 사례를 살펴봅니다. 싱글톤 패턴은 클래스의 인스턴스가 하나만 존재하도록 보장합니다. 레지스트리 패턴은 생성된 모든 서브클래스를 자동으로 등록합니다. 검증 패턴은 클래스 정의 시 특정 조건을 강제합니다. 이런 패턴들은 프레임워크나 ORM에서 자주 사용됩니다. Django 모델, SQLAlchemy 테이블, pytest 플러그인 등이 메타클래스를 활용합니다.
 
@@ -180,7 +180,7 @@ sections:
     db2 = Database()
     db1 is db2
   exercise:
-    prompt: 메타클래스 예제 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메타클래스 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class SingletonMeta(type):
           _instances = {}
@@ -198,17 +198,17 @@ sections:
       db2 = Database()
       db1 is db2
     hints:
-    - 메타클래스 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메타클래스 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메타클래스 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메타클래스 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메타클래스 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: init_subclass
   title: __init_subclass__
   structuredPrimary: true
   subtitle: 가벼운 대안
   goal: initsubclass에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     __init_subclass__는 Python 3.6에서 도입된 클래스 메서드입니다. 서브클래스가 생성될 때 자동으로 호출됩니다. 메타클래스보다 간단하게 서브클래스 훅을 구현할 수 있습니다. 부모 클래스에 정의하면 모든 서브클래스에 적용됩니다. 클래스 정의 시 키워드 인자를 받을 수도 있습니다. 서브클래스 등록, 속성 검증, 자동 속성 추가 등 대부분의 메타클래스 사용 사례를 더 간단하게 구현할 수 있습니다.
 
@@ -231,7 +231,7 @@ sections:
 
     Base.subclasses
   exercise:
-    prompt: initsubclass 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: initsubclass 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Base:
           subclasses = []
@@ -248,17 +248,17 @@ sections:
 
       Base.subclasses
     hints:
-    - initsubclass 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: initsubclass 코드가 예외 없이 끝나야 합니다.
-    resultCheck: initsubclass에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: initsubclass의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: initsubclass 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: when_to_use
   title: 언제 사용하나
   structuredPrimary: true
   subtitle: 적절한 도구 선택
   goal: 언제 사용하나에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     메타클래스는 강력하지만 복잡합니다. 대부분의 경우 더 간단한 대안이 있습니다. 클래스 데코레이터는 클래스 생성 후 수정이 필요할 때 적합합니다. __init_subclass__는 서브클래스 훅에 적합합니다. 메타클래스는 클래스 생성 과정 자체를 제어해야 할 때만 사용합니다. 프레임워크 개발, ORM 구현, API 자동 생성 등 특수한 경우에 메타클래스가 필요합니다. 일반 애플리케이션 개발에서는 거의 사용하지 않습니다.
 
@@ -281,7 +281,7 @@ sections:
 
     Point(3, 4)
   exercise:
-    prompt: 언제 사용하나 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 언제 사용하나 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def addRepr(cls):
           def customRepr(self):
@@ -298,17 +298,17 @@ sections:
 
       Point(3, 4)
     hints:
-    - 언제 사용하나 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 언제 사용하나 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 언제 사용하나에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 언제 사용하나의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 언제 사용하나 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 명령 클래스 자동 등록하기'
   structuredPrimary: true
   subtitle: 예측 → 클래스 생성 훅 → 계약 위반 오류 → 레지스트리 검증
   goal: '현업 흐름 검증: 명령 클래스 자동 등록하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     메타클래스는 일반 애플리케이션 코드보다 프레임워크나 플러그인 시스템의 클래스 계약을 강제할 때 가치가 있습니다. 명령 클래스가 생성되는 순간 필수 속성과 메서드를 확인하고 자동 등록하는 흐름을 검증합니다.
 
@@ -366,7 +366,7 @@ sections:
 
     print("메타클래스 명령 등록 흐름 통과")
   exercise:
-    prompt: '현업 흐름 검증: 명령 클래스 자동 등록하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 명령 클래스 자동 등록하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       class CommandMeta(type):
           registry = {}
@@ -417,11 +417,11 @@ sections:
 
       print("메타클래스 명령 등록 흐름 통과")
     hints:
-    - '현업 흐름 검증: 명령 클래스 자동 등록하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 명령 클래스 자동 등록하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 명령 클래스 자동 등록하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 명령 클래스 자동 등록하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 명령 클래스 자동 등록하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
@@ -440,15 +440,15 @@ sections:
 
     type(Example), type(Example())
   exercise:
-    prompt: 종합 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       class Example:
           pass
 
       type(Example), type(Example())
     hints:
-    - 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
+    - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 종합 복습 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.

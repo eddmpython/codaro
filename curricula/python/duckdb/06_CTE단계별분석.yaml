@@ -31,33 +31,33 @@ intro:
     WITH 절로 임시 결과에 이름을 붙이고 여러 CTE를 연결하는 방법을 배웁니다.
   direction: CTE단계별분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - CTE단계별분석 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - CTE단계별분석 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 데이터 준비 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. CTE란? 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. CTE의 장점 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
     - label: CTE단계별분석 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: SQL 분석 환경
       detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: CTE단계별분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
     - label: CTE단계별분석 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 준비
   structuredPrimary: true
   subtitle: tips + titanic
   goal: 1단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 이번 프로젝트에서는 두 데이터셋을 불러와 CTE(Common Table Expression) 활용법을 학습합니다. tips 데이터는 레스토랑 팁 정보 244건,
     titanic 데이터는 타이타닉 승객 정보 891건을 담고 있습니다. DuckDB는 pandas DataFrame을 바로 SQL로 쿼리할 수 있어 데이터 분석이 매우 편리합니다.
     duckdb.from_df()로 DataFrame을 DuckDB 테이블로 변환하면 즉시 SQL 문법을 사용할 수 있습니다.
@@ -73,7 +73,7 @@ sections:
     tips = duckdb.from_df(dfTips)
     titanic = duckdb.from_df(dfTitanic)
   exercise:
-    prompt: 1단계. 데이터 준비 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 준비 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -84,17 +84,17 @@ sections:
       tips = duckdb.from_df(dfTips)
       titanic = duckdb.from_df(dfTitanic)
     hints:
-    - 1단계. 데이터 준비 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 준비 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 준비의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 1단계. 데이터 준비 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step2_cte_intro
   title: 2단계. CTE란?
   structuredPrimary: true
   subtitle: WITH 절 소개
   goal: 2단계. CTE란?에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     CTE(Common Table Expression)는 WITH 절로 시작하는 임시 결과 집합입니다. 복잡한 쿼리를 읽기 쉽게 만드는 핵심 도구로, 마치 요리할 때 재료를 미리 준비해두는 것과 같습니다. 서브쿼리는 괄호 안에 중첩되어 읽기 어렵지만, CTE는 위에서 아래로 단계별로 흐름이 명확합니다. 예를 들어 "팁이 5달러 이상인 데이터"를 highTips라는 이름으로 정의하면, 이후 쿼리에서 highTips를 일반 테이블처럼 사용할 수 있습니다. 디버깅할 때도 CTE 각 단계를 개별적으로 실행해볼 수 있어 문제를 찾기 쉽습니다.
 
@@ -116,7 +116,7 @@ sections:
         ORDER BY avgTip DESC
     """).show()
   exercise:
-    prompt: 2단계. CTE란? 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. CTE란? 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH highTips AS (
@@ -130,17 +130,17 @@ sections:
           ORDER BY avgTip DESC
       """).show()
     hints:
-    - 2단계. CTE란? 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. CTE란? 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. CTE란?에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. CTE란?의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. CTE란? 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step3_cte_benefits
   title: 3단계. CTE의 장점
   structuredPrimary: true
   subtitle: 왜 CTE를 사용하나?
   goal: 3단계. CTE의 장점에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     CTE는 다음 3가지 이유로 서브쿼리보다 훨씬 우수합니다. 첫째, 가독성입니다. 서브쿼리는 안쪽부터 읽어야 하지만 CTE는 위에서 아래로 자연스럽게 읽힙니다. 둘째, 재사용성입니다. 같은 서브쿼리를 여러 번 작성할 필요 없이 CTE를 한 번 정의하면 여러 곳에서 참조할 수 있습니다. 셋째, 디버깅 용이성입니다. 복잡한 쿼리가 에러를 내면 어디가 문제인지 찾기 어렵지만, CTE는 각 단계를 개별적으로 실행해서 중간 결과를 확인할 수 있습니다. 실무에서 팀원들과 협업할 때 CTE로 작성된 쿼리가 훨씬 이해하기 쉽고 유지보수가 편합니다.
 
@@ -158,7 +158,7 @@ sections:
         GROUP BY day
     """).show()
   exercise:
-    prompt: 3단계. CTE의 장점 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. CTE의 장점 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH highTips AS (
@@ -169,17 +169,17 @@ sections:
           GROUP BY day
       """).show()
     hints:
-    - 3단계. CTE의 장점 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. CTE의 장점 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. CTE의 장점에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. CTE의 장점의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. CTE의 장점 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step4_multi_cte
   title: 4단계. 여러 CTE 연결
   structuredPrimary: true
   subtitle: 콤마로 구분
   goal: 4단계. 여러 CTE 연결에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     한 번의 쿼리에서 여러 CTE를 콤마(,)로 구분하여 정의할 수 있습니다. 각 CTE는 독립적인 분석 단계를 나타내며, 마지막 SELECT에서 이들을 UNION이나 JOIN으로 결합합니다. 예를 들어 "요일별 통계"와 "시간대별 통계"를 각각 별도의 CTE로 만든 후, UNION ALL로 세로로 합쳐서 한 번에 비교할 수 있습니다. 이렇게 하면 같은 형식의 여러 집계 결과를 효율적으로 얻을 수 있습니다.
 
@@ -205,7 +205,7 @@ sections:
         ORDER BY category, sales DESC
     """).show()
   exercise:
-    prompt: 4단계. 여러 CTE 연결 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 여러 CTE 연결 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -225,17 +225,17 @@ sections:
           ORDER BY category, sales DESC
       """).show()
     hints:
-    - 4단계. 여러 CTE 연결 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. 여러 CTE 연결 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 여러 CTE 연결에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 여러 CTE 연결의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. 여러 CTE 연결 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step5_cte_chain
   title: 5단계. CTE 체이닝
   structuredPrimary: true
   subtitle: 이전 CTE 참조하기
   goal: 5단계. CTE 체이닝에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     앞에서 정의한 CTE를 다음 CTE에서 참조할 수 있습니다. 이를 CTE 체이닝(chaining)이라고 하며, 복잡한 분석을 단계별로 쪼개는 핵심 기법입니다. 마치 레고 블록을 쌓듯이 step1 결과를 step2에서 사용하고, step2 결과를 step3에서 사용하는 방식입니다. 예를 들어 "집계 → 비율 계산 → 순위 매기기" 3단계를 각각 CTE로 분리하면 각 단계가 무엇을 하는지 명확해지고, 중간 결과도 쉽게 확인할 수 있습니다. 실무에서 10단계 이상의 복잡한 분석도 CTE 체이닝으로 관리 가능합니다.
 
@@ -266,7 +266,7 @@ sections:
         ORDER BY avgTip DESC
     """).show()
   exercise:
-    prompt: 5단계. CTE 체이닝 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. CTE 체이닝 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -291,17 +291,17 @@ sections:
           ORDER BY avgTip DESC
       """).show()
     hints:
-    - 5단계. CTE 체이닝 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 5단계. CTE 체이닝 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. CTE 체이닝에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. CTE 체이닝의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. CTE 체이닝 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step6_join_intro
   title: 6단계. INNER JOIN 기본
   structuredPrimary: true
   subtitle: 두 테이블 합치기
   goal: 6단계. INNER JOIN 기본에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     INNER JOIN은 두 테이블을 공통 키(key)로 연결하여 합치는 연산입니다. 양쪽 테이블에 모두 존재하는 행만 결과에 포함되므로 교집합 개념과 같습니다. 예를 들어 "요일별 평균 결제금액" 테이블과 "요일별 평균 팁" 테이블을 요일(day) 컬럼으로 JOIN하면, 같은 요일의 두 통계를 나란히 비교할 수 있습니다. CTE와 함께 사용하면 각 집계를 별도 CTE로 만들고 JOIN으로 결합하여 복잡한 비교 분석이 가능합니다. LEFT JOIN, RIGHT JOIN도 있지만 INNER JOIN이 가장 기본이고 많이 사용됩니다.
 
@@ -329,7 +329,7 @@ sections:
         ORDER BY tipPercent DESC
     """).show()
   exercise:
-    prompt: 6단계. INNER JOIN 기본 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. INNER JOIN 기본 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -350,17 +350,17 @@ sections:
           ORDER BY tipPercent DESC
       """).show()
     hints:
-    - 6단계. INNER JOIN 기본 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 6단계. INNER JOIN 기본 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. INNER JOIN 기본에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. INNER JOIN 기본의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. INNER JOIN 기본 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step7_tips_analysis
   title: 7단계. Tips 성별 비교 분석
   structuredPrimary: true
   subtitle: CTE + JOIN 실전
   goal: 7단계. Tips 성별 비교 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     남성과 여성의 요일별 팁 패턴을 비교하는 실전 분석입니다. 각 성별의 통계를 별도 CTE로 만든 후 JOIN으로 합쳐 나란히 비교합니다. 이렇게 하면 "남성은 어느 요일에 팁을 많이 주는가?", "여성과 비교하면 어떤 차이가 있는가?"를 한눈에 파악할 수 있습니다. 두 그룹을 따로 집계한 후 합치는 패턴은 A/B 테스트, 실험군/대조군 비교 등 실무에서 매우 자주 사용됩니다.
 
@@ -397,7 +397,7 @@ sections:
         ORDER BY tipDiff DESC
     """).show()
   exercise:
-    prompt: 7단계. Tips 성별 비교 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. Tips 성별 비교 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -426,17 +426,17 @@ sections:
           ORDER BY tipDiff DESC
       """).show()
     hints:
-    - 7단계. Tips 성별 비교 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 7단계. Tips 성별 비교 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. Tips 성별 비교 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. Tips 성별 비교 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. Tips 성별 비교 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step8_titanic_survival
   title: 8단계. Titanic 생존율 분석
   structuredPrimary: true
   subtitle: 클래스별 생존 통계
   goal: 8단계. Titanic 생존율 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     타이타닉 데이터로 객실 등급(pclass)별 생존자와 사망자를 분석합니다. 전체 승객 수와 생존자 수를 각각 별도 CTE로 만든 후 JOIN하여 생존율을 계산하는 패턴입니다. 이 방식은 "전체 중 일부"를 분석할 때 매우 유용합니다. 예를 들어 전체 주문 중 완료된 주문, 전체 회원 중 활성 회원 등을 비율로 분석할 때 동일한 구조를 사용할 수 있습니다. CTE 덕분에 전체 집계와 조건부 집계를 명확히 분리하여 계산할 수 있습니다.
 
@@ -468,7 +468,7 @@ sections:
         ORDER BY t.pclass
     """).show()
   exercise:
-    prompt: 8단계. Titanic 생존율 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. Titanic 생존율 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -493,17 +493,17 @@ sections:
           ORDER BY t.pclass
       """).show()
     hints:
-    - 8단계. Titanic 생존율 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 8단계. Titanic 생존율 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. Titanic 생존율 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. Titanic 생존율 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. Titanic 생존율 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step9_complex_analysis
   title: 9단계. Titanic 복합 분석
   structuredPrimary: true
   subtitle: 클래스-성별 생존율
   goal: 9단계. Titanic 복합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     객실 등급과 성별을 동시에 고려한 복합 생존율 분석입니다. CTE 체이닝으로 "집계 → 비율 계산 → 순위 매기기" 3단계를 명확히 분리합니다. 첫 번째 CTE는 pclass와 sex로 그룹화하여 기본 집계를 수행하고, 두 번째 CTE는 생존율을 계산하며, 세 번째 CTE는 전체 순위를 매깁니다. 이렇게 단계를 나누면 각 단계의 로직이 단순해지고, 중간 결과를 확인하며 검증할 수 있습니다. 복잡한 비즈니스 로직을 CTE 체이닝으로 구조화하는 것이 실무의 핵심 패턴입니다.
 
@@ -537,7 +537,7 @@ sections:
         ORDER BY overallRank
     """).show()
   exercise:
-    prompt: 9단계. Titanic 복합 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. Titanic 복합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -563,17 +563,17 @@ sections:
           ORDER BY overallRank
       """).show()
     hints:
-    - 9단계. Titanic 복합 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 9단계. Titanic 복합 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. Titanic 복합 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. Titanic 복합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. Titanic 복합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step10_cte_join_combo
   title: 10단계. CTE와 JOIN 종합
   structuredPrimary: true
   subtitle: 모든 개념 결합
   goal: 10단계. CTE와 JOIN 종합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     CTE, 윈도우 함수, JOIN, CASE WHEN을 모두 활용한 종합 분석입니다. 요일+시간대별 팁 통계를 계산하고, 이를 요일 전체 평균과 비교하여 "평균 이상인지 이하인지" 판단합니다. 첫 번째 CTE는 요일+시간대로 집계하고, 두 번째 CTE는 요일별 평균을 계산한 후, JOIN으로 두 결과를 결합하여 비교합니다. 이런 패턴은 "개별 값 vs 그룹 평균" 비교에 자주 사용되며, 예를 들어 개인 성과 vs 팀 평균, 지점 매출 vs 전체 평균 등을 분석할 때 유용합니다.
 
@@ -607,7 +607,7 @@ sections:
         ORDER BY t.day, t.time
     """).show()
   exercise:
-    prompt: 10단계. CTE와 JOIN 종합 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. CTE와 JOIN 종합 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH
@@ -634,17 +634,17 @@ sections:
           ORDER BY t.day, t.time
       """).show()
     hints:
-    - 10단계. CTE와 JOIN 종합 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 10단계. CTE와 JOIN 종합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. CTE와 JOIN 종합에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. CTE와 JOIN 종합의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. CTE와 JOIN 종합 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step11_final
   title: 11단계. 최종 결과물
   structuredPrimary: true
   subtitle: CTE 실전 패턴
   goal: 11단계. 최종 결과물에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: CTE를 활용한 실전 분석 패턴을 완성했습니다! 복잡한 쿼리를 논리적 단계로 나누어 가독성과 유지보수성을 크게 높였습니다. 이제 단일 CTE, 다중 CTE,
     CTE 체이닝, CTE+JOIN 모든 패턴을 활용할 수 있습니다. 실무에서는 이런 패턴들을 조합하여 10단계 이상의 복잡한 분석 파이프라인도 구축할 수 있습니다. CTE는 SQL
     가독성을 높이는 가장 강력한 도구이며, 팀 협업과 코드 리뷰에서 필수적입니다.
@@ -673,7 +673,7 @@ sections:
             '복잡한 집계 결과 비교'
     """).show()
   exercise:
-    prompt: 11단계. 최종 결과물 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 최종 결과물 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -697,17 +697,17 @@ sections:
               '복잡한 집계 결과 비교'
       """).show()
     hints:
-    - 11단계. 최종 결과물 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 11단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 최종 결과물에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 11단계. 최종 결과물의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 최종 결과물의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: CTE 종합 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     CTE 패턴을 종합 활용하여 복잡한 분석 쿼리를 작성해봅시다.
 
@@ -728,7 +728,7 @@ sections:
     })
     tbl1 = duckdb.from_df(data)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import duckdb
@@ -743,11 +743,11 @@ sections:
       })
       tbl1 = duckdb.from_df(data)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -763,12 +763,14 @@ sections:
     - 디버깅 - 각 CTE를 개별 실행 가능
   - type: text
     content: 다음 시간에는 윈도우 함수로 순위와 누적 합계를 계산하는 방법을 배웁니다!
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
     결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
@@ -795,7 +797,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import duckdb
 
@@ -818,8 +820,8 @@ sections:
       assert rowCount == 5
       rowCount
     hints:
-    - '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'

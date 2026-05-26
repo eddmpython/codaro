@@ -50,7 +50,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 종합 문제 풀이 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 종합 문제 풀이 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: LRU 캐시 with TTL
   goal: 자료구조 + 알고리즘 통합에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 해시맵과 이중 연결 리스트를 결합하여 시간 제한 기능이 있는 LRU 캐시를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -126,7 +126,7 @@ sections:
     lruCache.put("d", 4)
     [lruCache.get(k) for k in ["a", "b", "c", "d"]]
   exercise:
-    prompt: 자료구조 + 알고리즘 통합 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 자료구조 + 알고리즘 통합 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from time import time as getTime
 
@@ -190,17 +190,17 @@ sections:
       lruCache.put("d", 4)
       [lruCache.get(k) for k in ["a", "b", "c", "d"]]
     hints:
-    - 자료구조 + 알고리즘 통합 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 자료구조 + 알고리즘 통합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 자료구조 + 알고리즘 통합에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 자료구조 + 알고리즘 통합의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 자료구조 + 알고리즘 통합 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: design-pattern-integration
   title: 디자인패턴 통합 적용
   structuredPrimary: true
   subtitle: 이벤트 기반 상태 머신
   goal: 디자인패턴 통합 적용에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Observer, State, Command 패턴을 결합한 이벤트 기반 상태 머신을 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -281,7 +281,7 @@ sections:
     fsm.dispatch("stop")
     logger.logs
   exercise:
-    prompt: 디자인패턴 통합 적용 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 디자인패턴 통합 적용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -359,17 +359,17 @@ sections:
       fsm.dispatch("stop")
       logger.logs
     hints:
-    - 디자인패턴 통합 적용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 디자인패턴 통합 적용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 디자인패턴 통합 적용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 디자인패턴 통합 적용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 디자인패턴 통합 적용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: functional-oop-integration
   title: 함수형 + 객체지향 통합
   structuredPrimary: true
   subtitle: 파이프라인 빌더
   goal: 함수형 + 객체지향 통합에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 함수형 파이프라인을 객체지향 빌더 패턴으로 구성하여 유연한 데이터 처리 시스템을 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -422,7 +422,7 @@ sections:
     pipelineResult = pipeline.execute(sampleData)
     pipelineResult
   exercise:
-    prompt: 함수형 + 객체지향 통합 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 함수형 + 객체지향 통합 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import reduce
 
@@ -472,17 +472,17 @@ sections:
       pipelineResult = pipeline.execute(sampleData)
       pipelineResult
     hints:
-    - 함수형 + 객체지향 통합 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 함수형 + 객체지향 통합 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 함수형 + 객체지향 통합에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 함수형 + 객체지향 통합의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 함수형 + 객체지향 통합 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: metaprogramming-practice
   title: 메타프로그래밍 실전
   structuredPrimary: true
   subtitle: 자동 검증 데이터 클래스
   goal: 메타프로그래밍 실전에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 메타클래스와 디스크립터를 활용하여 자동 타입 검증 기능이 있는 데이터 클래스를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -532,7 +532,7 @@ sections:
     validUser = UserModel(username="alice", age=25, email="alice@test.com")
     validUser.toDict()
   exercise:
-    prompt: 메타프로그래밍 실전 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메타프로그래밍 실전 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class TypedField:
           def __init__(self, fieldType, validator=None):
@@ -579,17 +579,17 @@ sections:
       validUser = UserModel(username="alice", age=25, email="alice@test.com")
       validUser.toDict()
     hints:
-    - 메타프로그래밍 실전 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메타프로그래밍 실전 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메타프로그래밍 실전에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메타프로그래밍 실전의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메타프로그래밍 실전 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: string-regex-integration
   title: 문자열 알고리즘 + 정규표현식
   structuredPrimary: true
   subtitle: 고급 텍스트 검색 엔진
   goal: 문자열 알고리즘 + 정규표현식에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: Trie 자료구조와 정규표현식을 결합한 고급 텍스트 검색 시스템을 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -665,7 +665,7 @@ sections:
     regexResult = searchEngine.searchRegex(r"python.*programming")
     {"word": wordResult, "prefix": prefixResult, "regex": regexResult}
   exercise:
-    prompt: 문자열 알고리즘 + 정규표현식 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 문자열 알고리즘 + 정규표현식 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import re
 
@@ -738,17 +738,17 @@ sections:
       regexResult = searchEngine.searchRegex(r"python.*programming")
       {"word": wordResult, "prefix": prefixResult, "regex": regexResult}
     hints:
-    - 문자열 알고리즘 + 정규표현식 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 문자열 알고리즘 + 정규표현식 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 문자열 알고리즘 + 정규표현식에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 문자열 알고리즘 + 정규표현식의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 문자열 알고리즘 + 정규표현식 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: optimization-dp
   title: 최적화 + 동적 프로그래밍
   structuredPrimary: true
   subtitle: 메모이제이션 데코레이터 고급 버전
   goal: 최적화 + 동적 프로그래밍에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: LRU 기반 메모이제이션에 통계 추적 기능을 추가한 고급 캐싱 데코레이터를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -803,7 +803,7 @@ sections:
     fibStats = fibonacci.stats()
     {"fib30": fibResult[-1], "stats": fibStats}
   exercise:
-    prompt: 최적화 + 동적 프로그래밍 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 최적화 + 동적 프로그래밍 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import wraps
       from collections import OrderedDict
@@ -855,17 +855,17 @@ sections:
       fibStats = fibonacci.stats()
       {"fib30": fibResult[-1], "stats": fibStats}
     hints:
-    - 최적화 + 동적 프로그래밍 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 최적화 + 동적 프로그래밍 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 최적화 + 동적 프로그래밍에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 최적화 + 동적 프로그래밍의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 최적화 + 동적 프로그래밍 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트'
   structuredPrimary: true
   subtitle: 정규식, 자료구조, 정렬, 집계를 하나의 검증 가능한 문제로 연결
   goal: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     종합 문제는 여러 개념을 나열하는 데서 끝나면 약합니다. 로그를 파싱하고, 실패 주문을 우선순위 큐로 정리하고, 결제 합계를 집계하는 작은 운영 리포트를 완성해보세요.
 
@@ -926,7 +926,7 @@ sections:
         "firstIncident": "O-102",
     }
   exercise:
-    prompt: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       import heapq
       import re
@@ -981,17 +981,17 @@ sections:
           "firstIncident": "O-102",
       }
     hints:
-    - '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice-exercises
   title: 종합 실습 문제
   structuredPrimary: true
   subtitle: 30일 과정 종합 문제
   goal: 종합 실습 문제에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 지금까지 학습한 모든 개념을 활용하여 문제를 해결하세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -1025,7 +1025,7 @@ sections:
     """
     EXERCISES
   exercise:
-    prompt: 종합 실습 문제 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 실습 문제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class TwoStackQueue:
           def __init__(self):
@@ -1053,8 +1053,8 @@ sections:
       ex1Result = [ex1Queue.dequeue() for _ in range(5)]
       ex1Result
     hints:
-    - 종합 실습 문제 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 실습 문제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 실습 문제에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 종합 실습 문제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 실습 문제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

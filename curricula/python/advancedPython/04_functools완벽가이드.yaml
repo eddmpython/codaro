@@ -46,7 +46,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: functools 완벽 가이드 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: functools 완벽 가이드 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -55,7 +55,7 @@ sections:
   structuredPrimary: true
   subtitle: 함수 인자 고정
   goal: functools.partial에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     partial은 함수의 일부 인자를 미리 고정하여 새로운 함수를 만드는 도구입니다. 원본 함수와 고정할 인자를 받아 partial 객체를 반환합니다. 이 객체는 함수처럼 호출할 수 있으며, 호출 시 나머지 인자만 전달하면 됩니다. 커링(currying)의 간편한 구현이며, 콜백 함수에 추가 인자를 전달하거나, 설정이 다른 여러 버전의 함수를 만들 때 유용합니다. 키워드 인자도 고정할 수 있어 유연하게 활용됩니다.
 
@@ -72,7 +72,7 @@ sections:
     triple = partial(multiply, 3)
     double(5), triple(5)
   exercise:
-    prompt: functools.partial 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.partial 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import partial
 
@@ -83,17 +83,17 @@ sections:
       triple = partial(multiply, 3)
       double(5), triple(5)
     hints:
-    - functools.partial 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.partial 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.partial에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.partial의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.partial 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: wraps_decorator
   title: functools.wraps
   structuredPrimary: true
   subtitle: 데코레이터 메타데이터 보존
   goal: functools.wraps에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     wraps는 데코레이터에서 원본 함수의 메타데이터(__name__, __doc__, __annotations__ 등)를 wrapper 함수로 복사하는 데코레이터입니다. wraps 없이 데코레이터를 만들면 래핑된 함수가 원본 함수의 정보를 잃어버려 디버깅과 문서화에 문제가 됩니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 합니다. 데코레이터를 작성할 때 항상 wraps를 사용하는 것이 모범 사례입니다.
 
@@ -116,7 +116,7 @@ sections:
 
     exampleFunc.__name__, exampleFunc.__doc__
   exercise:
-    prompt: functools.wraps 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.wraps 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import wraps
 
@@ -133,17 +133,17 @@ sections:
 
       exampleFunc.__name__, exampleFunc.__doc__
     hints:
-    - functools.wraps 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.wraps 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.wraps에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.wraps의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.wraps 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: lru_cache
   title: functools.lru_cache
   structuredPrimary: true
   subtitle: LRU 캐싱으로 성능 최적화
   goal: functools.lrucache에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     lru_cache는 함수의 호출 결과를 캐싱하여 동일한 인자로 다시 호출될 때 계산 없이 캐시된 결과를 반환하는 데코레이터입니다. LRU는 Least Recently Used의 약자로, 캐시가 가득 차면 가장 오래 사용되지 않은 항목을 제거합니다. maxsize 인자로 캐시 크기를 지정하며, None이면 무제한입니다. 피보나치, 팩토리얼 같은 재귀 함수나 비용이 큰 계산에 매우 효과적입니다. Python 3.9+에서는 @cache가 @lru_cache(maxsize=None)의 단축형으로 제공됩니다.
 
@@ -161,7 +161,7 @@ sections:
 
     fib(50), fib.cache_info()
   exercise:
-    prompt: functools.lrucache 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.lrucache 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import lru_cache
 
@@ -173,17 +173,17 @@ sections:
 
       fib(50), fib.cache_info()
     hints:
-    - functools.lrucache 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.lrucache 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.lrucache에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.lrucache의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.lrucache 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: cache
   title: functools.cache
   structuredPrimary: true
   subtitle: Python 3.9+ 무제한 캐시
   goal: functools.cache에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     Python 3.9에서 추가된 cache는 lru_cache(maxsize=None)의 간편한 별칭입니다. 캐시 크기 제한 없이 모든 호출 결과를 저장합니다. 메모리 사용량에 제한이 없으므로 주의가 필요하지만, 반복 호출이 많고 인자 조합이 제한된 경우에 최적입니다. lru_cache와 마찬가지로 cache_info()와 cache_clear() 메서드를 제공합니다.
 
@@ -201,7 +201,7 @@ sections:
 
     factorial(100), factorial.cache_info()
   exercise:
-    prompt: functools.cache 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.cache 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import cache
 
@@ -213,17 +213,17 @@ sections:
 
       factorial(100), factorial.cache_info()
     hints:
-    - functools.cache 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.cache 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.cache에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.cache의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.cache 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: singledispatch
   title: functools.singledispatch
   structuredPrimary: true
   subtitle: 타입 기반 함수 오버로딩
   goal: functools.singledispatch에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     singledispatch는 첫 번째 인자의 타입에 따라 다른 구현을 호출하는 제네릭 함수를 만드는 데코레이터입니다. 함수 오버로딩을 파이썬에서 구현하는 방법입니다. 기본 함수를 @singledispatch로 데코레이트하고, 각 타입별 구현을 @func.register로 등록합니다. 등록된 타입이 없으면 기본 함수가 호출됩니다. 다형성을 함수 수준에서 구현할 때 유용합니다.
 
@@ -247,7 +247,7 @@ sections:
 
     process(10), process("hello"), process([1, 2])
   exercise:
-    prompt: functools.singledispatch 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.singledispatch 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import singledispatch
 
@@ -265,17 +265,17 @@ sections:
 
       process(10), process("hello"), process([1, 2])
     hints:
-    - functools.singledispatch 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.singledispatch 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.singledispatch에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.singledispatch의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.singledispatch 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: total_ordering
   title: functools.total_ordering
   structuredPrimary: true
   subtitle: 비교 연산자 자동 생성
   goal: functools.totalordering에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     total_ordering은 __eq__와 하나의 순서 비교 메서드(__lt__, __le__, __gt__, __ge__ 중 하나)만 정의하면 나머지 비교 메서드를 자동으로 생성해주는 클래스 데코레이터입니다. 완전한 비교 지원을 위해 6개의 비교 메서드를 모두 작성하는 번거로움을 줄여줍니다. 다만 자동 생성된 메서드는 직접 구현한 것보다 약간 느릴 수 있으니, 성능이 중요하면 직접 구현을 고려하세요.
 
@@ -301,7 +301,7 @@ sections:
     s2 = Student("Bob", 90)
     s1 < s2, s1 <= s2, s1 > s2, s1 >= s2
   exercise:
-    prompt: functools.totalordering 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: functools.totalordering 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import total_ordering
 
@@ -321,17 +321,17 @@ sections:
       s2 = Student("Bob", 90)
       s1 < s2, s1 <= s2, s1 > s2, s1 >= s2
     hints:
-    - functools.totalordering 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: functools.totalordering 코드가 예외 없이 끝나야 합니다.
-    resultCheck: functools.totalordering에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: functools.totalordering의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.totalordering 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기'
   structuredPrimary: true
   subtitle: partial → cache → singledispatch → ordering 검증
   goal: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     functools는 작은 함수형 도구를 실무 유틸리티로 묶을 때 유용합니다. 인자 고정, 캐싱, 타입별 포맷팅, 정렬 가능한 객체를 하나의 리포트 흐름에서 검증합니다.
 
@@ -397,7 +397,7 @@ sections:
 
     print("functools 리포트 유틸리티 통과")
   exercise:
-    prompt: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from functools import lru_cache, partial, singledispatch, total_ordering
 
@@ -456,17 +456,17 @@ sections:
 
       print("functools 리포트 유틸리티 통과")
     hints:
-    - '현업 흐름 검증: functools로 리포트 유틸리티 구성하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: functools로 리포트 유틸리티 구성하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: functools 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 4에서 배운 functools 모듈을 난이도별로 복습합니다. functools는 고차 함수와 함수형 프로그래밍을 지원하는 표준 라이브러리의 핵심 모듈입니다.
     partial로 부분 적용, lru_cache로 메모이제이션, wraps로 데코레이터 메타데이터 보존, singledispatch로 제네릭 함수를 구현합니다. 🟢 기본 문제로
     각 함수의 기본 사용법을 익히고, 🟡 응용 문제로 조합 패턴을 연습하세요. 🔴 심화 문제에서는 reduce 활용, 캐시 전략, 멀티메서드 구현 등 고급 기법을 다룹니다. 이 모듈을
@@ -482,7 +482,7 @@ sections:
     square = partial(power, exp=2)
     square(5)
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from functools import partial
 
@@ -492,8 +492,8 @@ sections:
       square = partial(power, exp=2)
       square(5)
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

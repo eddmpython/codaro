@@ -48,7 +48,7 @@ intro:
     - label: 표 데이터 환경
       detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 교통사고원인분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
     - label: 교통사고원인분석 완료
       detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 51개 주 교통사고 통계
   goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요
     주 약자를 포함한 샘플 데이터를 함께 둡니다.
   tips:
@@ -69,7 +69,7 @@ sections:
     crashes = loadLocalDataset("car_crashes")
     crashes.shape
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -77,37 +77,37 @@ sections:
       crashes = loadLocalDataset("car_crashes")
       crashes.shape
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_head
   title: 2단계. 미리보기
   structuredPrimary: true
   subtitle: 데이터 구조 파악
   goal: 2단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: total(총 사고), speeding(과속), alcohol(음주), not_distracted(집중), ins_premium(보험료), abbrev(주
     약자)
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: crashes.head()
   exercise:
-    prompt: 2단계. 미리보기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: crashes.head()
     hints:
-    - 2단계. 미리보기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. 미리보기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 미리보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_set_index
   title: 3단계. 인덱스 설정
   structuredPrimary: true
   subtitle: 주 약자를 인덱스로
   goal: 3단계. 인덱스 설정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     주 약자(abbrev)를 인덱스로 설정하면 'CA', 'TX'처럼 이름으로 접근할 수 있습니다. 인덱스를 의미있는 값으로 설정하면 데이터 조회가 직관적이고 편리해집니다.
 
@@ -119,60 +119,60 @@ sections:
     indexed = crashes.set_index('abbrev')
     indexed.head()
   exercise:
-    prompt: 3단계. 인덱스 설정 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 인덱스 설정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       indexed = crashes.set_index('abbrev')
       indexed.head()
     hints:
-    - 3단계. 인덱스 설정 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 3단계. 인덱스 설정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 인덱스 설정에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 인덱스 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 인덱스 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step4_loc
   title: 4단계. 특정 주 조회
   structuredPrimary: true
   subtitle: loc으로 이름 접근
   goal: 4단계. 특정 주 조회에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 인덱스를 설정하면 주 이름으로 바로 조회할 수 있습니다. 인덱스 기반 조회는 속도도 빠릅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: indexed.loc['CA']
   exercise:
-    prompt: 4단계. 특정 주 조회 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 특정 주 조회 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: indexed.loc['CA']
     hints:
-    - 4단계. 특정 주 조회 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 4단계. 특정 주 조회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 특정 주 조회에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 4단계. 특정 주 조회의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. 특정 주 조회 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step5_multi_loc
   title: 5단계. 여러 주 비교
   structuredPrimary: true
   subtitle: 리스트로 여러 행 조회
   goal: 5단계. 여러 주 비교에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 리스트를 넣으면 여러 주를 동시에 비교할 수 있습니다. 관심있는 주들만 선택해서 볼 수 있어 편리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: indexed.loc[['CA', 'TX', 'NY']]
   exercise:
-    prompt: 5단계. 여러 주 비교 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 여러 주 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: indexed.loc[['CA', 'TX', 'NY']]
     hints:
-    - 5단계. 여러 주 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 여러 주 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 여러 주 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 여러 주 비교의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 여러 주 비교 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step6_rank
   title: 6단계. 순위 매기기
   structuredPrimary: true
   subtitle: rank()
   goal: 6단계. 순위 매기기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     rank()는 값의 순위를 매깁니다. ascending=False로 큰 값이 1위가 됩니다. 순위를 매기면 상대적인 위치를 쉽게 파악할 수 있습니다.
 
@@ -185,23 +185,23 @@ sections:
     ranked['totalRank'] = ranked['total'].rank(ascending=False)
     ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
   exercise:
-    prompt: 6단계. 순위 매기기 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 순위 매기기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       ranked = indexed.copy()
       ranked['totalRank'] = ranked['total'].rank(ascending=False)
       ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
     hints:
-    - 6단계. 순위 매기기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 6단계. 순위 매기기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 순위 매기기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 6단계. 순위 매기기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 순위 매기기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step7_alcohol_rank
   title: 7단계. 음주사고 순위
   structuredPrimary: true
   subtitle: 다른 지표에도 적용
   goal: 7단계. 음주사고 순위에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 음주사고율이 높은 주의 순위를 매깁니다. 여러 지표의 순위를 비교하면 주별 특성을 파악할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -209,41 +209,41 @@ sections:
     ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
     ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
   exercise:
-    prompt: 7단계. 음주사고 순위 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 음주사고 순위 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
       ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
     hints:
-    - 7단계. 음주사고 순위 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. 음주사고 순위 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 음주사고 순위에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 음주사고 순위의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 음주사고 순위 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_corr
   title: 8단계. 상관관계 분석
   structuredPrimary: true
   subtitle: 원인들 사이의 관계
   goal: 8단계. 상관관계 분석에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 음주사고가 총 사고율과 0.85로 높은 상관관계를 보입니다. 상관관계 분석으로 어떤 요인들이 함께 움직이는지 파악할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
   exercise:
-    prompt: 8단계. 상관관계 분석 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 상관관계 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
     hints:
-    - 8단계. 상관관계 분석 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 상관관계 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 상관관계 분석에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 상관관계 분석의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. 상관관계 분석 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step9_normalize_func
   title: 9단계. 정규화 함수
   structuredPrimary: true
   subtitle: 0~1 스케일로 변환
   goal: 9단계. 정규화 함수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다. Min-Max 정규화 방식을 사용합니다.
 
@@ -257,22 +257,22 @@ sections:
     def normalize(series):
         return (series - series.min()) / (series.max() - series.min())
   exercise:
-    prompt: 9단계. 정규화 함수 예제에서 인자나 반환값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 정규화 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def normalize(series):
           return (series - series.min()) / (series.max() - series.min())
     hints:
-    - 9단계. 정규화 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 9단계. 정규화 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 정규화 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 9단계. 정규화 함수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 정규화 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step10_danger_score
   title: 10단계. 위험도 점수 계산
   structuredPrimary: true
   subtitle: 여러 지표 종합
   goal: 10단계. 위험도 점수 계산에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를
     더한 뒤 3으로 나누면 평균 위험도 점수가 됩니다.
   tips:
@@ -286,7 +286,7 @@ sections:
     ) / 3
     danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
   exercise:
-    prompt: 10단계. 위험도 점수 계산 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 위험도 점수 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       danger = indexed.copy()
       danger['dangerScore'] = (
@@ -296,36 +296,36 @@ sections:
       ) / 3
       danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
     hints:
-    - 10단계. 위험도 점수 계산 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 10단계. 위험도 점수 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 위험도 점수 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 위험도 점수 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 위험도 점수 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step11_top_dangerous
   title: 11단계. 가장 위험한 주
   structuredPrimary: true
   subtitle: nlargest 활용
   goal: 11단계. 가장 위험한 주에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 종합 위험도 상위 5개 주를 확인합니다. nlargest는 가장 큰 값을 빠르게 찾습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
   exercise:
-    prompt: 11단계. 가장 위험한 주 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 가장 위험한 주 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
     hints:
-    - 11단계. 가장 위험한 주 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 11단계. 가장 위험한 주 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 가장 위험한 주에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 11단계. 가장 위험한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 11단계. 가장 위험한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step12_safest
   title: 12단계. 가장 안전한 주
   structuredPrimary: true
   subtitle: nsmallest 활용
   goal: 12단계. 가장 안전한 주에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     종합 위험도가 가장 낮은 5개 주입니다. nsmallest는 가장 작은 값을 빠르게 찾습니다.
 
@@ -335,20 +335,20 @@ sections:
     쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
   snippet: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
   exercise:
-    prompt: 12단계. 가장 안전한 주 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 가장 안전한 주 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
     hints:
-    - 12단계. 가장 안전한 주 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 12단계. 가장 안전한 주 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 가장 안전한 주에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 가장 안전한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 12단계. 가장 안전한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 지역별 사고 위험도 산정'
   structuredPrimary: true
   subtitle: rank, nlargest, nsmallest, 실패 케이스
   goal: '현업 흐름 검증: 지역별 사고 위험도 산정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요.
 
@@ -374,7 +374,7 @@ sections:
     assert safe.index.tolist() == ["B"]
     assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
   exercise:
-    prompt: '현업 흐름 검증: 지역별 사고 위험도 산정 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 지역별 사고 위험도 산정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -393,17 +393,17 @@ sections:
       assert safe.index.tolist() == ["B"]
       assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
     hints:
-    - '현업 흐름 검증: 지역별 사고 위험도 산정 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: '현업 흐름 검증: 지역별 사고 위험도 산정 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 지역별 사고 위험도 산정에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 지역별 사고 위험도 산정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 지역별 사고 위험도 산정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 교통안전 분석 프로젝트
   goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
 
@@ -417,7 +417,7 @@ sections:
     data = loadLocalDataset("car_crashes")
     dataIndexed = data.set_index("abbrev")
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -425,11 +425,11 @@ sections:
       data = loadLocalDataset("car_crashes")
       dataIndexed = data.set_index("abbrev")
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   subtitle: 중급 과정 완료!
@@ -444,3 +444,5 @@ sections:
     - 종합 점수 - 여러 지표를 하나로
   - type: text
     content: 다음 시간부터는 심화 과정입니다. 여러 데이터를 합치는 merge를 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.

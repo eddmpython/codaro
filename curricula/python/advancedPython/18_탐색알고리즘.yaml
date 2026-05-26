@@ -48,7 +48,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 탐색 알고리즘 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 탐색 알고리즘 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 순차 검색
   goal: 선형 탐색에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     선형 탐색(Linear Search)은 가장 기본적인 탐색 알고리즘입니다. 배열의 처음부터 끝까지 순차적으로 탐색하며 원하는 값을 찾습니다. 시간 복잡도는 O(n)이며, 공간 복잡도는 O(1)입니다. 정렬되지 않은 데이터에서도 사용할 수 있고 구현이 매우 간단합니다. 작은 데이터셋이나 정렬 비용이 높은 경우에 적합합니다.
 
@@ -75,7 +75,7 @@ sections:
     linearIdx = linearSearch(linearNums, 7)
     f"7의 인덱스: {linearIdx}"
   exercise:
-    prompt: 선형 탐색 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 선형 탐색 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def linearSearch(arr, target):
           for i, val in enumerate(arr):
@@ -87,17 +87,17 @@ sections:
       linearIdx = linearSearch(linearNums, 7)
       f"7의 인덱스: {linearIdx}"
     hints:
-    - 선형 탐색 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 선형 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 선형 탐색에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 선형 탐색의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 선형 탐색 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: binary_search
   title: 이진 탐색
   structuredPrimary: true
   subtitle: 분할 정복 O(log n)
   goal: 이진 탐색에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     이진 탐색(Binary Search)은 정렬된 데이터에서 절반씩 범위를 줄여나가는 효율적인 알고리즘입니다. 중간값과 비교하여 탐색 범위를 절반으로 줄입니다. 시간 복잡도는 O(log n)으로, 100만 개 데이터도 최대 20번 비교로 찾습니다. 반드시 정렬된 데이터에서만 사용해야 합니다. 반복문과 재귀 두 가지 방식으로 구현할 수 있습니다.
 
@@ -121,7 +121,7 @@ sections:
     bsIdx = binarySearchIterative(sortedNums, 11)
     f"11의 인덱스: {bsIdx}"
   exercise:
-    prompt: 이진 탐색 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 이진 탐색 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def binarySearchIterative(arr, target):
           lo, hi = 0, len(arr) - 1
@@ -139,17 +139,17 @@ sections:
       bsIdx = binarySearchIterative(sortedNums, 11)
       f"11의 인덱스: {bsIdx}"
     hints:
-    - 이진 탐색 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 이진 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 이진 탐색에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 이진 탐색의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 이진 탐색 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: bisect_module
   title: bisect 모듈
   structuredPrimary: true
   subtitle: 표준 라이브러리 이진 탐색
   goal: bisect 모듈에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     bisect 모듈은 정렬된 리스트에서 O(log n) 탐색과 삽입을 제공하는 표준 라이브러리입니다. bisect_left는 같은 값의 왼쪽 위치를, bisect_right는 오른쪽 위치를 반환합니다. insort 함수로 정렬을 유지하며 삽입할 수 있습니다. 직접 구현보다 빠르고 안정적이므로 실무에서는 bisect 사용을 권장합니다.
 
@@ -164,7 +164,7 @@ sections:
     rightPosition = bisect.bisect_right(gradeList, 80)
     f"bisect_left(80): {leftPosition}, bisect_right(80): {rightPosition}"
   exercise:
-    prompt: bisect 모듈 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: bisect 모듈 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import bisect
 
@@ -173,17 +173,17 @@ sections:
       rightPosition = bisect.bisect_right(gradeList, 80)
       f"bisect_left(80): {leftPosition}, bisect_right(80): {rightPosition}"
     hints:
-    - bisect 모듈 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: bisect 모듈 코드가 예외 없이 끝나야 합니다.
-    resultCheck: bisect 모듈에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: bisect 모듈에서 `gradeList` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: bisect 모듈 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: bfs
   title: 너비 우선 탐색 (BFS)
   structuredPrimary: true
   subtitle: 레벨 순서 탐색
   goal: 너비 우선 탐색 (BFS)에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     BFS(Breadth-First Search)는 시작 노드에서 가까운 노드부터 탐색하는 알고리즘입니다. 큐(Queue) 자료구조를 사용하여 레벨 순서로 탐색합니다. 시간 복잡도는 O(V + E)로 정점과 간선 수에 비례합니다. 가중치 없는 그래프에서 최단 경로를 보장합니다. 미로 탐색, 네트워크 분석, 레벨 순회 등에 사용됩니다.
 
@@ -218,7 +218,7 @@ sections:
     bfsOrder = bfsTraversal(graphBfs, 'A')
     f"BFS 순서: {' -> '.join(bfsOrder)}"
   exercise:
-    prompt: 너비 우선 탐색 (BFS) 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 너비 우선 탐색 (BFS) 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from collections import deque
 
@@ -247,17 +247,17 @@ sections:
       bfsOrder = bfsTraversal(graphBfs, 'A')
       f"BFS 순서: {' -> '.join(bfsOrder)}"
     hints:
-    - 너비 우선 탐색 (BFS) 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 너비 우선 탐색 (BFS) 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 너비 우선 탐색 (BFS)에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 너비 우선 탐색 (BFS)의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 너비 우선 탐색 (BFS) 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: dfs
   title: 깊이 우선 탐색 (DFS)
   structuredPrimary: true
   subtitle: 경로 우선 탐색
   goal: 깊이 우선 탐색 (DFS)에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     DFS(Depth-First Search)는 한 경로를 끝까지 탐색한 후 되돌아오는 알고리즘입니다. 스택 또는 재귀를 사용하여 구현합니다. 시간 복잡도는 O(V + E)로 BFS와 동일합니다. 최단 경로를 보장하지 않지만 모든 경로 탐색에 유리합니다. 사이클 탐지, 위상 정렬, 백트래킹 등에 사용됩니다.
 
@@ -282,7 +282,7 @@ sections:
     dfsResult = dfsRecursive(graphDfs, 'A')
     f"DFS 순서 (재귀): {' -> '.join(dfsResult)}"
   exercise:
-    prompt: 깊이 우선 탐색 (DFS) 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 깊이 우선 탐색 (DFS) 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def dfsRecursive(graph, node, visitedDfs=None):
           if visitedDfs is None:
@@ -301,17 +301,17 @@ sections:
       dfsResult = dfsRecursive(graphDfs, 'A')
       f"DFS 순서 (재귀): {' -> '.join(dfsResult)}"
     hints:
-    - 깊이 우선 탐색 (DFS) 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 깊이 우선 탐색 (DFS) 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 깊이 우선 탐색 (DFS)에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 깊이 우선 탐색 (DFS)의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 깊이 우선 탐색 (DFS) 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: hash_search
   title: 해시 탐색
   structuredPrimary: true
   subtitle: O(1) 상수 시간
   goal: 해시 탐색에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     해시 탐색은 해시 함수를 사용하여 평균 O(1) 시간에 탐색하는 방법입니다. 파이썬의 dict와 set이 해시 테이블로 구현되어 있습니다. 해시 충돌이 많으면 최악 O(n)이 될 수 있습니다. 키 존재 여부 확인, 빈도 카운팅, 중복 제거에 최적입니다. 메모리를 더 사용하지만 탐색 속도가 매우 빠릅니다.
 
@@ -327,7 +327,7 @@ sections:
     foundEmployee = employeeDict.get('E002')
     f"E002 정보: {foundEmployee}"
   exercise:
-    prompt: 해시 탐색 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 해시 탐색 예제에서 `employeeDict`, `foundEmployee` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       employeeDict = {
           'E001': {'name': '김철수', 'dept': '개발팀'},
@@ -337,17 +337,17 @@ sections:
       foundEmployee = employeeDict.get('E002')
       f"E002 정보: {foundEmployee}"
     hints:
-    - 해시 탐색 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `employeeDict = ...` 오른쪽 값입니다.
+    - 실행 뒤 `employeeDict` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 해시 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 해시 탐색에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 해시 탐색에서 `employeeDict` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 해시 탐색 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 재고 조회와 장애 경로 찾기'
   structuredPrimary: true
   subtitle: 정렬 데이터 이진 탐색과 그래프 BFS를 각각 맞는 문제에 적용합니다
   goal: '현업 흐름 검증: 재고 조회와 장애 경로 찾기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     탐색 알고리즘은 데이터 모양을 먼저 봐야 합니다. 정렬된 재고 목록은 이진 탐색으로 찾고, 서비스 의존성처럼 관계가 얽힌 문제는 BFS로 최단 경로를 찾습니다.
 
@@ -376,7 +376,7 @@ sections:
     assert findSku(inventory, "C-300")["stock"] == 12
     assert findSku(inventory, "D-400") is None
   exercise:
-    prompt: '현업 흐름 검증: 재고 조회와 장애 경로 찾기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 재고 조회와 장애 경로 찾기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from bisect import bisect_left
 
@@ -398,17 +398,17 @@ sections:
       assert findSku(inventory, "C-300")["stock"] == 12
       assert findSku(inventory, "D-400") is None
     hints:
-    - '현업 흐름 검증: 재고 조회와 장애 경로 찾기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 재고 조회와 장애 경로 찾기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 재고 조회와 장애 경로 찾기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 재고 조회와 장애 경로 찾기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 재고 조회와 장애 경로 찾기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 탐색 알고리즘 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 18에서 배운 탐색 알고리즘을 난이도별로 복습합니다. 탐색은 데이터에서 원하는 값을 찾는 기본 연산으로, 선형 탐색 O(n)과 이진 탐색 O(log
     n)의 성능 차이를 이해하는 것이 핵심입니다. 해시 탐색은 O(1)을 제공하며, 그래프 탐색(BFS, DFS)은 복잡한 구조 탐색의 기반입니다. 🟢 기본 문제로 선형 탐색, 최댓값/최솟값
     찾기를 익히고, 🟡 응용 문제로 이진 탐색, 해시 탐색을 연습하세요. 🔴 심화 문제에서는 BFS/DFS, 경로 찾기, bisect 모듈 활용 등 고급 탐색을 다룹니다. 탐색 알고리즘
@@ -429,7 +429,7 @@ sections:
     ex1Result = findMaxIndex(ex1Nums)
     f"최댓값 {ex1Nums[ex1Result]}의 인덱스: {ex1Result}"
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def findMaxIndex(arr):
           if not arr:
@@ -444,8 +444,8 @@ sections:
       ex1Result = findMaxIndex(ex1Nums)
       f"최댓값 {ex1Nums[ex1Result]}의 인덱스: {ex1Result}"
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

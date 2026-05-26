@@ -27,26 +27,26 @@ meta:
 intro:
   direction: OpenCV소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - OpenCV소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
+  - OpenCV소개 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
+  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 로컬 비전 검증 루프 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
-    - label: 핵심 처리 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 출력과 상태 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 색공간/필터/검출 처리 처리 실행
+      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: shape, dtype, 채널 결과 검증
+      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
     - label: OpenCV소개 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 컴퓨터 비전 환경
       detail: opencvpython, numpy 기준으로 로컬 Python 실행을 준비합니다.
     - label: OpenCV소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
     - label: OpenCV소개 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -67,6 +67,8 @@ sections:
       title: 색공간 변환
     - emoji: ⚙️
       title: 형태학적 연산
+  goal: OpenCV에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: opencv_history
   blocks:
   - type: sectionHeader
@@ -87,6 +89,8 @@ sections:
     - emoji: 🌐
       title: 크로스 플랫폼
       description: Windows, Linux, macOS, Android, iOS 등 다양한 플랫폼을 지원합니다
+  goal: 🏛️ OpenCV란?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: why_opencv
   blocks:
   - type: sectionHeader
@@ -99,6 +103,8 @@ sections:
     title: 컴퓨터 비전이란?
     content: 컴퓨터가 디지털 이미지나 비디오를 '보고' 이해하도록 하는 기술입니다. 단순히 픽셀 값을 조작하는 것을 넘어, 이미지에서 의미 있는 정보를 추출합니다. 예를 들어
       사진에서 얼굴 위치를 찾거나, 자동차 번호판 문자를 인식하거나, 불량품을 검출하는 것이 컴퓨터 비전입니다.
+  goal: 🚀 왜 OpenCV인가?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: bgr_order
   blocks:
   - type: sectionHeader
@@ -128,6 +134,8 @@ sections:
   - type: note
     title: 왜 BGR인가?
     content: OpenCV가 처음 개발될 당시(2000년경) 널리 사용되던 카메라와 비디오 장치들이 BGR 순서를 사용했기 때문입니다. 호환성을 위해 이 순서가 유지되고 있습니다.
+  goal: 🔴🟢🔵 BGR 색순서에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: ndarray
   blocks:
   - type: sectionHeader
@@ -154,6 +162,8 @@ sections:
     - - ndim
       - 차원 수
       - 3 (컬러), 2 (흑백)
+  goal: 📦 이미지 = NumPy 배열에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -191,6 +201,8 @@ sections:
     - - 히스토그램
       - 밝기 분포 분석
       - calcHist(), equalizeHist()
+  goal: 🛠️ OpenCV 주요 기능에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: edge_detection
   blocks:
   - type: sectionHeader
@@ -214,6 +226,8 @@ sections:
     - - Laplacian
       - 2차 미분, 모든 방향
       - 세밀한 에지 검출
+  goal: 📐 에지 검출에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: contour
   blocks:
   - type: sectionHeader
@@ -239,6 +253,8 @@ sections:
       - 컨투어를 감싸는 사각형
     - - minEnclosingCircle()
       - 컨투어를 감싸는 최소 원
+  goal: 🔲 컨투어에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: morphology
   blocks:
   - type: sectionHeader
@@ -265,6 +281,8 @@ sections:
     - - 닫기 (Closing)
       - 팽창 후 침식
       - 작은 구멍 채우기
+  goal: ⚙️ 모폴로지 연산에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: comparison
   blocks:
   - type: sectionHeader
@@ -300,6 +318,8 @@ sections:
     - - 학습 난이도
       - 중간
       - 쉬움
+  goal: ⚖️ OpenCV vs Pillow에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: usecases
   blocks:
   - type: sectionHeader
@@ -324,6 +344,8 @@ sections:
       - 작물 상태 분석, 수확 시기 판단
     - - 문서 처리
       - OCR 전처리, 문서 스캔 보정
+  goal: 💡 활용 분야에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -333,6 +355,8 @@ sections:
     title: matplotlib으로 출력
     content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 결과 확인은 배열 shape, 픽셀 통계, 저장 파일, matplotlib 출력처럼 재현 가능한
       방식으로 진행합니다. 컬러 이미지를 matplotlib으로 볼 때는 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다.
+  goal: 📋 시각화 안내에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -376,6 +400,8 @@ sections:
     - - 10. 종합 비전 프로젝트
       - 복합
       - 전체 개념 종합
+  goal: 📚 커리큘럼에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: start
   blocks:
   - type: sectionHeader
@@ -384,12 +410,14 @@ sections:
   - type: text
     content: OpenCV를 배우면 이미지를 단순히 보는 것을 넘어 분석하고 이해할 수 있습니다. 에지 검출로 물체의 경계를 찾고, 컨투어로 윤곽을 추출하고, 색상 필터링으로
       특정 영역을 분리하는 등 컴퓨터 비전의 핵심 기술을 익힐 수 있습니다. 첫 번째 프로젝트에서 이미지가 NumPy 배열로 어떻게 표현되는지 알아봅시다.
+  goal: 🎯 시작하기에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
 - id: workflow_validation
   title: 로컬 비전 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 로컬 비전 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
   explanation: |-
     OpenCV는 화면에 이미지를 띄우는 도구가 아니라, 배열을 입력받아 검증 가능한 결과를 만드는 로컬 비전 파이프라인입니다. 먼저 입력 이미지의 형태와 dtype을 확인하고, 의도적으로 잘못된 입력을 넣어 오류를 확인한 뒤, 에지 검출 결과를 수치로 검증합니다.
 
@@ -413,7 +441,7 @@ sections:
 
     validateBgrImage(introImage)
   exercise:
-    prompt: 로컬 비전 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 로컬 비전 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -431,8 +459,8 @@ sections:
 
       validateBgrImage(introImage)
     hints:
-    - 로컬 비전 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 로컬 비전 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 로컬 비전 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 로컬 비전 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    resultCheck: 로컬 비전 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

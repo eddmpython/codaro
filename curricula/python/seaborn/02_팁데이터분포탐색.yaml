@@ -49,7 +49,7 @@ intro:
     - label: 통계 시각화 환경
       detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 팁데이터분포탐색 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
     - label: 팁데이터분포탐색 완료
       detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: seaborn과 matplotlib을 불러옵니다. tips 데이터는 레스토랑에서 수집한 결제 정보와 팁 데이터입니다. 결제금액, 팁, 요일, 시간대, 테이블
     인원수 등 다양한 변수가 포함되어 있어 분포 분석에 적합합니다.
   tips:
@@ -68,23 +68,23 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: tips 데이터셋
   goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: tips 데이터셋은 244개의 식사 기록을 담고 있습니다. total_bill(결제금액), tip(팁), sex(성별), smoker(흡연여부), day(요일),
     time(시간대), size(인원수) 컬럼이 있습니다. 이 데이터로 팁에 영향을 미치는 요인을 분석할 수 있습니다.
   tips:
@@ -95,24 +95,24 @@ sections:
     tips = loadLocalDataset('tips')
     tips.head()
   exercise:
-    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       tips = loadLocalDataset('tips')
       tips.head()
     hints:
-    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_basic_hist
   title: 3단계. 기본 히스토그램
   structuredPrimary: true
   subtitle: histplot()
   goal: 3단계. 기본 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     histplot()은 연속형 변수의 분포를 막대 그래프로 표현합니다. bins 파라미터로 구간 개수를 조절하고, kde=True로 커널 밀도 추정 곡선을 함께 표시할 수 있습니다. 팁 금액의 분포를 확인해봅니다.
 
@@ -125,24 +125,24 @@ sections:
     ax.set_title('Tip Distribution')
     fig
   exercise:
-    prompt: 3단계. 기본 히스토그램 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 기본 히스토그램 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(8, 6))
       sns.histplot(data=tips, x='tip', bins=20, ax=ax)
       ax.set_title('Tip Distribution')
       fig
     hints:
-    - 3단계. 기본 히스토그램 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 3단계. 기본 히스토그램 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 기본 히스토그램에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 3단계. 기본 히스토그램의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 기본 히스토그램 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step4_kde
   title: 4단계. KDE 곡선 추가
   structuredPrimary: true
   subtitle: 커널 밀도 추정
   goal: 4단계. KDE 곡선 추가에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     kde=True를 설정하면 히스토그램 위에 부드러운 밀도 곡선이 그려집니다. KDE(Kernel Density Estimation)는 데이터의 확률 밀도 함수를 추정하는 방법입니다. 히스토그램의 계단 형태보다 분포의 모양을 더 잘 파악할 수 있습니다.
 
@@ -156,24 +156,24 @@ sections:
     axKde.set_title('Tip Distribution with KDE')
     figKde
   exercise:
-    prompt: 4단계. KDE 곡선 추가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. KDE 곡선 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figKde, axKde = plt.subplots(figsize=(8, 6))
       sns.histplot(data=tips, x='tip', bins=20, kde=True, ax=axKde)
       axKde.set_title('Tip Distribution with KDE')
       figKde
     hints:
-    - 4단계. KDE 곡선 추가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. KDE 곡선 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. KDE 곡선 추가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. KDE 곡선 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. KDE 곡선 추가 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step5_hue_hist
   title: 5단계. 그룹별 히스토그램
   structuredPrimary: true
   subtitle: hue 파라미터
   goal: 5단계. 그룹별 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: hue 파라미터로 범주형 변수에 따라 분포를 분리할 수 있습니다. 시간대(Lunch/Dinner)별로 팁 분포가 어떻게 다른지 비교해봅니다. 기본적으로 겹쳐서(layer)
     표시됩니다.
   tips:
@@ -184,24 +184,24 @@ sections:
     axHue.set_title('Tip by Time')
     figHue
   exercise:
-    prompt: 5단계. 그룹별 히스토그램 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 그룹별 히스토그램 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figHue, axHue = plt.subplots(figsize=(8, 6))
       sns.histplot(data=tips, x='tip', hue='time', bins=15, ax=axHue)
       axHue.set_title('Tip by Time')
       figHue
     hints:
-    - 5단계. 그룹별 히스토그램 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 5단계. 그룹별 히스토그램 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 그룹별 히스토그램에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 5단계. 그룹별 히스토그램의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 그룹별 히스토그램 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step6_multiple
   title: 6단계. multiple 파라미터
   structuredPrimary: true
   subtitle: 분포 표시 방식
   goal: 6단계. multiple 파라미터에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     multiple 파라미터로 여러 그룹의 분포를 어떻게 표시할지 결정합니다. 'layer'는 겹쳐서, 'stack'은 쌓아서, 'fill'은 전체를 100%로 채워서 표시합니다. 각 방식은 다른 관점의 비교를 가능하게 합니다.
 
@@ -215,24 +215,24 @@ sections:
     axStack.set_title('Tip by Time (Stacked)')
     figStack
   exercise:
-    prompt: 6단계. multiple 파라미터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. multiple 파라미터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figStack, axStack = plt.subplots(figsize=(8, 6))
       sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='stack', ax=axStack)
       axStack.set_title('Tip by Time (Stacked)')
       figStack
     hints:
-    - 6단계. multiple 파라미터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. multiple 파라미터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. multiple 파라미터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. multiple 파라미터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. multiple 파라미터 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step7_fill
   title: 7단계. fill 모드
   structuredPrimary: true
   subtitle: 비율 비교
   goal: 7단계. fill 모드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: multiple='fill'은 각 구간에서 그룹별 비율을 100%로 채워 표시합니다. 절대적인 빈도보다 상대적인 비율을 비교할 때 유용합니다. 팁 금액대별로
     Lunch와 Dinner의 비율이 어떻게 변하는지 확인할 수 있습니다.
   tips:
@@ -244,7 +244,7 @@ sections:
     axFill.set_ylabel('Proportion')
     figFill
   exercise:
-    prompt: 7단계. fill 모드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. fill 모드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFill, axFill = plt.subplots(figsize=(8, 6))
       sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='fill', ax=axFill)
@@ -252,17 +252,17 @@ sections:
       axFill.set_ylabel('Proportion')
       figFill
     hints:
-    - 7단계. fill 모드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. fill 모드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. fill 모드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. fill 모드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. fill 모드 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step8_stripplot
   title: 8단계. 스트립 플롯
   structuredPrimary: true
   subtitle: stripplot()
   goal: 8단계. 스트립 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     stripplot()은 범주형 변수와 연속형 변수의 관계를 개별 점으로 표시합니다. 히스토그램이 분포의 모양을 보여준다면, stripplot은 실제 데이터 포인트의 위치를 보여줍니다. 요일별 팁 분포를 점으로 확인해봅니다.
 
@@ -275,24 +275,24 @@ sections:
     axStrip.set_title('Tip by Day')
     figStrip
   exercise:
-    prompt: 8단계. 스트립 플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 스트립 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figStrip, axStrip = plt.subplots(figsize=(8, 6))
       sns.stripplot(data=tips, x='day', y='tip', ax=axStrip)
       axStrip.set_title('Tip by Day')
       figStrip
     hints:
-    - 8단계. 스트립 플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 스트립 플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 스트립 플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 스트립 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 스트립 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step9_swarmplot
   title: 9단계. 스웜 플롯
   structuredPrimary: true
   subtitle: swarmplot()
   goal: 9단계. 스웜 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     swarmplot()은 stripplot과 비슷하지만 점이 겹치지 않도록 자동으로 배치합니다. 데이터의 분포 모양과 밀집 정도를 동시에 파악할 수 있습니다. 단, 데이터가 많으면 계산 시간이 오래 걸릴 수 있습니다.
 
@@ -305,24 +305,24 @@ sections:
     axSwarm.set_title('Tip by Day (Swarm)')
     figSwarm
   exercise:
-    prompt: 9단계. 스웜 플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 스웜 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figSwarm, axSwarm = plt.subplots(figsize=(8, 6))
       sns.swarmplot(data=tips, x='day', y='tip', ax=axSwarm)
       axSwarm.set_title('Tip by Day (Swarm)')
       figSwarm
     hints:
-    - 9단계. 스웜 플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 스웜 플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 스웜 플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 스웜 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 스웜 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step10_hue_strip
   title: 10단계. hue로 그룹 구분
   structuredPrimary: true
   subtitle: 색상으로 추가 변수
   goal: 10단계. hue로 그룹 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: stripplot과 swarmplot에도 hue를 적용할 수 있습니다. 요일별로 점을 배치하면서 시간대(Lunch/Dinner)를 색상으로 구분하면 두 가지
     범주를 동시에 비교할 수 있습니다. dodge=True로 그룹을 나란히 배치할 수 있습니다.
   tips:
@@ -334,7 +334,7 @@ sections:
     axDodge.legend(title='Time')
     figDodge
   exercise:
-    prompt: 10단계. hue로 그룹 구분 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. hue로 그룹 구분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figDodge, axDodge = plt.subplots(figsize=(10, 6))
       sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axDodge)
@@ -342,17 +342,17 @@ sections:
       axDodge.legend(title='Time')
       figDodge
     hints:
-    - 10단계. hue로 그룹 구분 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. hue로 그룹 구분 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. hue로 그룹 구분에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. hue로 그룹 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. hue로 그룹 구분 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step11_comparison
   title: 11단계. 분포 시각화 비교
   structuredPrimary: true
   subtitle: 세 가지 방식
   goal: 11단계. 분포 시각화 비교에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 히스토그램, stripplot, swarmplot을 나란히 비교합니다. 같은 데이터를 다른 방식으로 시각화하면 각각 다른 인사이트를 얻을 수 있습니다. 히스토그램은
     전체 분포 모양을, stripplot은 개별 데이터와 이상치를, swarmplot은 밀집 정도를 보여줍니다.
   tips:
@@ -372,7 +372,7 @@ sections:
     plt.tight_layout()
     figCompare
   exercise:
-    prompt: 11단계. 분포 시각화 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 분포 시각화 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figCompare, (axHist, axStripSub, axSwarmSub) = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -388,17 +388,17 @@ sections:
       plt.tight_layout()
       figCompare
     hints:
-    - 11단계. 분포 시각화 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 분포 시각화 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 분포 시각화 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 분포 시각화 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 분포 시각화 비교 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: step12_final
   title: 12단계. 최종 분석 차트
   structuredPrimary: true
   subtitle: 종합 시각화
   goal: 12단계. 최종 분석 차트에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 팁 데이터의 분포를 완성도 높게 시각화합니다. 이전 프로젝트에서 배운 scatterplot도 함께 활용하여 다양한 관점에서
     데이터를 탐색합니다.
   tips:
@@ -421,7 +421,7 @@ sections:
     plt.tight_layout()
     figFinal
   exercise:
-    prompt: 12단계. 최종 분석 차트 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 최종 분석 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
 
@@ -440,17 +440,17 @@ sections:
       plt.tight_layout()
       figFinal
     hints:
-    - 12단계. 최종 분석 차트 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 12단계. 최종 분석 차트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 최종 분석 차트에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 12단계. 최종 분석 차트의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 12단계. 최종 분석 차트 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 분포 탐색 프로젝트
   goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     지금까지 배운 histplot, stripplot, swarmplot, hue, multiple을 활용해서 다양한 분포를 탐색해봅시다.
 
@@ -464,7 +464,7 @@ sections:
 
     data = loadLocalDataset('penguins').dropna()
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -472,11 +472,11 @@ sections:
 
       data = loadLocalDataset('penguins').dropna()
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -492,12 +492,14 @@ sections:
     - dodge=True로 그룹 나란히 배치
   - type: text
     content: 다음 시간에는 boxplot과 violinplot으로 분포를 비교합니다.
+  goal: 정리에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
 - id: workflow_validation
   title: 13단계. 팁 분포 분석 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
   goal: 13단계. 팁 분포 분석 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     분포 차트는 평균만 보는 습관을 깨기 위한 도구입니다. 팁 금액이 한쪽으로 치우쳐 있는지 예측하고, 히스토그램이 그 질문을 정확히 보여 주는지 검증합니다.
 
@@ -518,7 +520,7 @@ sections:
     assert timeTipMean["Dinner"] > timeTipMean["Lunch"]
     timeTipMean.round(2)
   exercise:
-    prompt: 13단계. 팁 분포 분석 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
+    prompt: 13단계. 팁 분포 분석 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -533,8 +535,8 @@ sections:
       assert timeTipMean["Dinner"] > timeTipMean["Lunch"]
       timeTipMean.round(2)
     hints:
-    - 13단계. 팁 분포 분석 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 13단계. 팁 분포 분석 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 13단계. 팁 분포 분석 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 13단계. 팁 분포 분석 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 팁 분포 분석 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

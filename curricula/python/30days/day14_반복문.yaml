@@ -30,33 +30,33 @@ intro:
   - 중첩 반복문 활용
   direction: 반복문에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
   benefits:
-  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
-  - 반복문 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 반복문 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: for 리스트 순회 입력 확인
-      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
     - label: for 문자열 순회 처리 실행
-      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
     - label: for 딕셔너리 순회 결과 검증
-      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
     - label: 반복문 재사용
-      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
     runtime:
     - label: 기초 자동화 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 반복문 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
     - label: 반복문 완료
-      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
 sections:
 - id: for_list
   title: for 리스트 순회
   structuredPrimary: true
   subtitle: 리스트의 모든 요소 처리
-  goal: for 리스트 순회에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: for 리스트 순회에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     for문은 리스트의 요소를 하나씩 꺼내서 처리합니다. for 변수 in 리스트: 형식으로 쓰며, 리스트의 모든 요소에 대해 반복합니다. 들여쓰기로 반복할 코드 블록을 구분합니다.
 
@@ -70,7 +70,7 @@ sections:
         total = total + num
     total
   exercise:
-    prompt: for 리스트 순회 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: for 리스트 순회 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       numbers = [1, 2, 3, 4, 5]
       total = 0
@@ -78,17 +78,17 @@ sections:
           total = total + num
       total
     hints:
-    - for 리스트 순회 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: for 리스트 순회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: for 리스트 순회에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: for 리스트 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: for 리스트 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_string
   title: for 문자열 순회
   structuredPrimary: true
   subtitle: 문자열의 각 문자 처리
-  goal: for 문자열 순회에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: for 문자열 순회에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     for문은 문자열의 각 문자를 하나씩 꺼낼 수 있습니다. 문자열도 시퀀스이므로 리스트처럼 순회할 수 있습니다. 각 문자에 대해 반복 작업을 수행합니다.
 
@@ -103,7 +103,7 @@ sections:
             found = found + 1
     found
   exercise:
-    prompt: for 문자열 순회 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: for 문자열 순회 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       msg = 'hello world'
       found = 0
@@ -112,17 +112,17 @@ sections:
               found = found + 1
       found
     hints:
-    - for 문자열 순회 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: for 문자열 순회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: for 문자열 순회에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: for 문자열 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: for 문자열 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_dict
   title: for 딕셔너리 순회
   structuredPrimary: true
   subtitle: 키, 값, 아이템 순회
-  goal: for 딕셔너리 순회에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: for 딕셔너리 순회에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     딕셔너리는 keys(), values(), items()로 순회할 수 있습니다. 기본적으로 for문은 키를 순회하며, items()를 사용하면 키-값 쌍을 튜플로 받을 수 있습니다.
 
@@ -136,7 +136,7 @@ sections:
         subjects = subjects + subject + ' '
     subjects
   exercise:
-    prompt: for 딕셔너리 순회 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: for 딕셔너리 순회 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       grades = {'math': 85, 'english': 90, 'science': 88}
       subjects = ''
@@ -144,16 +144,16 @@ sections:
           subjects = subjects + subject + ' '
       subjects
     hints:
-    - for 딕셔너리 순회 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: for 딕셔너리 순회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: for 딕셔너리 순회에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: for 딕셔너리 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: for 딕셔너리 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: range_basic
   title: range() 함수
   structuredPrimary: true
   subtitle: 숫자 시퀀스 생성
-  goal: range() 함수에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  goal: range() 함수에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
   why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     range() 함수는 숫자 시퀀스를 생성합니다. range(끝), range(시작, 끝), range(시작, 끝, 간격) 형식으로 사용하며, list()로 변환하면 리스트로 볼 수 있습니다. 끝 값은 포함되지 않습니다.
@@ -163,20 +163,20 @@ sections:
   - range()는 메모리 효율적입니다. 필요할 때만 값을 생성합니다.
   snippet: list(range(5))
   exercise:
-    prompt: range() 함수 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: range() 함수 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: list(range(5))
     hints:
-    - range() 함수 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
+    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: range() 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: range() 함수에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: range() 함수의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: range() 함수 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: for_range
   title: range()와 for
   structuredPrimary: true
   subtitle: 정해진 횟수만큼 반복
-  goal: range()와 for에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: range()와 for에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     range()와 for를 함께 사용하면 정해진 횟수만큼 반복할 수 있습니다. 인덱스를 이용한 순회나 n번 반복하는 작업에 유용합니다.
 
@@ -189,24 +189,24 @@ sections:
         rangeSum = rangeSum + i
     rangeSum
   exercise:
-    prompt: range()와 for 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: range()와 for 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       rangeSum = 0
       for i in range(1, 6):
           rangeSum = rangeSum + i
       rangeSum
     hints:
-    - range()와 for 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: range()와 for 코드가 예외 없이 끝나야 합니다.
-    resultCheck: range()와 for에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: range()와 for의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: range()와 for 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: while_basic
   title: while 기본
   structuredPrimary: true
   subtitle: 조건이 참인 동안 반복
-  goal: while 기본에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: while 기본에서 `idx` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     while문은 조건이 True인 동안 계속 반복합니다. while 조건: 형식으로 쓰며, 조건이 False가 되면 반복을 멈춥니다. 무한 루프에 주의해야 합니다.
 
@@ -221,7 +221,7 @@ sections:
         idx = idx + 1
     acc
   exercise:
-    prompt: while 기본 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: while 기본 예제에서 `idx`, `acc` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       idx = 0
       acc = 0
@@ -230,17 +230,17 @@ sections:
           idx = idx + 1
       acc
     hints:
-    - while 기본 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `idx = ...` 오른쪽 값입니다.
+    - 실행 뒤 `idx` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: while 기본 코드가 예외 없이 끝나야 합니다.
-    resultCheck: while 기본에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: while 기본에서 `idx` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: while 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: break_statement
   title: break 문
   structuredPrimary: true
   subtitle: 반복문 즉시 종료
-  goal: break 문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: break 문에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     break는 반복문을 즉시 종료합니다. 조건을 만족하면 더 이상 반복하지 않고 빠져나올 때 사용합니다. for와 while 모두에서 사용할 수 있습니다.
 
@@ -256,7 +256,7 @@ sections:
             break
     hit
   exercise:
-    prompt: break 문 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: break 문 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       seq = [1, 2, 3, 4, 5, 6, 7, 8]
       hit = 0
@@ -266,17 +266,17 @@ sections:
               break
       hit
     hints:
-    - break 문 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: break 문 코드가 예외 없이 끝나야 합니다.
-    resultCheck: break 문에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: break 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: break 문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: continue_statement
   title: continue 문
   structuredPrimary: true
   subtitle: 현재 반복 건너뛰기
-  goal: continue 문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: continue 문에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     continue는 현재 반복을 건너뛰고 다음 반복으로 넘어갑니다. 특정 조건에서 처리를 생략하고 싶을 때 사용합니다. 반복문 자체는 종료되지 않습니다.
 
@@ -291,7 +291,7 @@ sections:
         odd = odd + n
     odd
   exercise:
-    prompt: continue 문 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: continue 문 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       odd = 0
       for n in range(1, 11):
@@ -300,17 +300,17 @@ sections:
           odd = odd + n
       odd
     hints:
-    - continue 문 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: continue 문 코드가 예외 없이 끝나야 합니다.
-    resultCheck: continue 문에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: continue 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: continue 문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_else
   title: for-else 절
   structuredPrimary: true
   subtitle: 정상 종료시 실행
-  goal: forelse 절에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: forelse 절에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     for문은 else 절을 가질 수 있습니다. 반복이 break 없이 정상적으로 완료되면 else 블록이 실행됩니다. break로 중단되면 else는 실행되지 않습니다.
 
@@ -327,7 +327,7 @@ sections:
         flag = 'all small'
     flag
   exercise:
-    prompt: forelse 절 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: forelse 절 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       arr1 = [1, 2, 3, 4, 5]
       for a in arr1:
@@ -338,17 +338,17 @@ sections:
           flag = 'all small'
       flag
     hints:
-    - forelse 절 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: forelse 절 코드가 예외 없이 끝나야 합니다.
-    resultCheck: forelse 절에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: forelse 절의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: forelse 절 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: while_else
   title: while-else 절
   structuredPrimary: true
   subtitle: 조건 거짓시 실행
-  goal: whileelse 절에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: whileelse 절에서 `counter` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     while문도 else 절을 가질 수 있습니다. 조건이 False가 되어 정상 종료되면 else가 실행됩니다. break로 중단되면 else는 실행되지 않습니다.
 
@@ -363,7 +363,7 @@ sections:
         completion = 'done'
     completion
   exercise:
-    prompt: whileelse 절 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: whileelse 절 예제에서 `counter`, `completion` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       counter = 0
       while counter < 3:
@@ -372,17 +372,17 @@ sections:
           completion = 'done'
       completion
     hints:
-    - whileelse 절 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `counter = ...` 오른쪽 값입니다.
+    - 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: whileelse 절 코드가 예외 없이 끝나야 합니다.
-    resultCheck: whileelse 절에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: whileelse 절에서 `counter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: whileelse 절 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: nested_loop
   title: 중첩 반복문
   structuredPrimary: true
   subtitle: 반복문 안의 반복문
-  goal: 중첩 반복문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 중첩 반복문에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     반복문 안에 다시 반복문을 넣을 수 있습니다. 이를 중첩 반복문이라고 하며, 2차원 구조나 모든 조합을 처리할 때 사용합니다. 들여쓰기 단계가 늘어납니다.
 
@@ -398,7 +398,7 @@ sections:
             combinations = combinations + color + '-' + size + ' '
     combinations
   exercise:
-    prompt: 중첩 반복문 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 중첩 반복문 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       colors = ['red', 'blue']
       sizes = ['S', 'M']
@@ -408,17 +408,17 @@ sections:
               combinations = combinations + color + '-' + size + ' '
       combinations
     hints:
-    - 중첩 반복문 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 중첩 반복문 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 중첩 반복문에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 중첩 반복문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 중첩 반복문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: 실무 반복 처리 루프
   structuredPrimary: true
   subtitle: 예측 → 누적 → 오류 확인 → 검증
-  goal: 실무 반복 처리 루프에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 실무 반복 처리 루프에서 `dailyOrders` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     반복문은 리스트를 한 번 훑는 문법이 아니라, 업무 데이터를 규칙대로 걸러내고 누적하고 검증하는 도구입니다. 실행 전에는 어떤 주문이 합계에 들어갈지 예측하고, 누락된 컬럼이나 음수 금액 같은 오류를 반복문 안에서 확인해야 합니다.
 
@@ -436,7 +436,7 @@ sections:
 
     len(dailyOrders)
   exercise:
-    prompt: 실무 반복 처리 루프 예제에서 리스트 값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실무 반복 처리 루프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       dailyOrders = [
           {"id": "O-101", "status": "paid", "amount": 120000},
@@ -448,17 +448,17 @@ sections:
 
       len(dailyOrders)
     hints:
-    - 실무 반복 처리 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실무 반복 처리 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실무 반복 처리 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실무 반복 처리 루프에서 `dailyOrders` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실무 반복 처리 루프 실행 뒤 `dailyOrders` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: practice
   title: Day 14 종합 복습
   structuredPrimary: true
   subtitle: 반복문 마스터하기
-  goal: Day 14 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: Day 14 종합 복습에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: Day 14에서 배운 반복문을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
     순서로 해도 괜찮습니다.
   tips:
@@ -470,7 +470,7 @@ sections:
         evenSum = evenSum + e
     evenSum
   exercise:
-    prompt: Day 14 종합 복습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: Day 14 종합 복습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       evens = [2, 4, 6, 8, 10]
       evenSum = 0
@@ -478,8 +478,8 @@ sections:
           evenSum = evenSum + e
       evenSum
     hints:
-    - Day 14 종합 복습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: Day 14 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Day 14 종합 복습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: Day 14 종합 복습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: Day 14 종합 복습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.

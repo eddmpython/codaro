@@ -53,9 +53,11 @@
 #       hints:
 #         - "개념 힌트"
 #       check:
-#         noError: "실행 오류가 없어야 한다."
+#         noError: "할인율 계산식이 TypeError 없이 숫자 결과까지 계산되어야 한다."
+#         resultCheck: "result 값이 바꾼 가격과 할인율을 반영한 최종 금액과 일치해야 한다."
 #     check:
-#       noError: "실행 오류가 없어야 한다."
+#       noError: "섹션 예제의 입력 데이터, 처리 함수, 출력 확인 단계가 순서대로 실행되어야 한다."
+#       resultCheck: "출력 또는 변수 상태가 이 섹션에서 바꾼 업무 조건을 반영해야 한다."
 #     # blocks는 structured card 뒤에 붙는 보조 자료 또는 legacy curriculum 변환용이다.
 #     # 신규 레슨은 위 structured section fields를 우선하고, 표/영상/참고 링크만 blocks로 보조한다.
 #     blocks:

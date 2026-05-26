@@ -46,7 +46,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: itertools 마스터 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: itertools 마스터 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -55,7 +55,7 @@ sections:
   structuredPrimary: true
   subtitle: 끝없는 시퀀스 생성
   goal: 무한 이터레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     itertools는 무한히 값을 생성하는 세 가지 이터레이터를 제공합니다. count는 시작값부터 step씩 증가하는 무한 수열을 생성합니다. cycle은 iterable의 요소를 무한히 반복합니다. repeat은 같은 값을 무한히(또는 지정된 횟수만큼) 반복합니다. 이들은 지연 평가(lazy evaluation)되어 메모리를 거의 사용하지 않습니다. 무한 이터레이터를 사용할 때는 반드시 islice, takewhile 등으로 제한하거나 break로 루프를 종료해야 합니다.
 
@@ -68,24 +68,24 @@ sections:
     counter = count(10, 2)
     list(islice(counter, 5))
   exercise:
-    prompt: 무한 이터레이터 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 무한 이터레이터 예제에서 `counter` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import count, islice
 
       counter = count(10, 2)
       list(islice(counter, 5))
     hints:
-    - 무한 이터레이터 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `counter = ...` 오른쪽 값입니다.
+    - 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 무한 이터레이터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 무한 이터레이터에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 무한 이터레이터에서 `counter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 무한 이터레이터 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: terminating_iterators
   title: 종료 이터레이터
   structuredPrimary: true
   subtitle: 시퀀스 제어
   goal: 종료 이터레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     종료 이터레이터는 입력 iterable을 가공하여 유한한 결과를 생성합니다. takewhile은 조건이 참인 동안 요소를 가져옵니다. dropwhile은 조건이 참인 동안 요소를 건너뜁니다. islice는 시퀀스의 일부분을 슬라이싱합니다. filterfalse는 filter의 반대로 조건이 거짓인 요소를 반환합니다. 이들은 모두 지연 평가되어 효율적입니다.
 
@@ -100,7 +100,7 @@ sections:
     dropped = list(dropwhile(lambda x: x < 5, data))
     taken, dropped
   exercise:
-    prompt: 종료 이터레이터 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종료 이터레이터 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import takewhile, dropwhile
 
@@ -109,17 +109,17 @@ sections:
       dropped = list(dropwhile(lambda x: x < 5, data))
       taken, dropped
     hints:
-    - 종료 이터레이터 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 종료 이터레이터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종료 이터레이터에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 종료 이터레이터에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 종료 이터레이터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: combinatoric
   title: 조합 함수
   structuredPrimary: true
   subtitle: 순열, 조합, 곱집합
   goal: 조합 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     itertools는 수학적 조합을 생성하는 함수들을 제공합니다. product는 여러 iterable의 데카르트 곱(모든 조합)을 생성합니다. permutations는 순서가 있는 순열을 생성합니다. combinations는 순서 없는 조합을 생성합니다. combinations_with_replacement는 중복을 허용하는 조합입니다. 이들은 알고리즘 문제 해결이나 가능한 모든 경우를 탐색할 때 유용합니다.
 
@@ -133,7 +133,7 @@ sections:
     sizes = ["S", "M", "L"]
     list(product(colorList, sizes))
   exercise:
-    prompt: 조합 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 조합 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import product
 
@@ -141,17 +141,17 @@ sections:
       sizes = ["S", "M", "L"]
       list(product(colorList, sizes))
     hints:
-    - 조합 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 조합 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 조합 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 조합 함수에서 `colorList` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 조합 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: groupby
   title: groupby 함수
   structuredPrimary: true
   subtitle: 연속 요소 그룹화
   goal: groupby 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     groupby는 iterable의 연속된 동일한 키를 가진 요소들을 그룹화합니다. SQL의 GROUP BY와 다르게, 먼저 데이터를 정렬해야 원하는 그룹화가 됩니다. 정렬 없이 사용하면 같은 키라도 떨어져 있으면 별도의 그룹이 됩니다. groupby는 (키, 그룹 이터레이터) 쌍을 생성하며, 그룹 이터레이터는 한 번만 순회할 수 있습니다. 데이터 분류나 연속 구간 처리에 유용합니다.
 
@@ -165,7 +165,7 @@ sections:
     grouped = [(k, list(g)) for k, g in groupby(letters)]
     grouped
   exercise:
-    prompt: groupby 함수 예제에서 반복 대상이나 범위을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: groupby 함수 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       from itertools import groupby
 
@@ -173,17 +173,17 @@ sections:
       grouped = [(k, list(g)) for k, g in groupby(letters)]
       grouped
     hints:
-    - groupby 함수 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: groupby 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: groupby 함수에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: groupby 함수의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: groupby 함수 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: chain_zip
   title: chain과 zip_longest
   structuredPrimary: true
   subtitle: 이터레이터 연결과 병합
   goal: chain과 ziplongest에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     chain은 여러 iterable을 하나로 연결합니다. chain.from_iterable은 iterable의 iterable을 평탄화합니다. zip_longest는 길이가 다른 iterable들을 zip할 때 짧은 쪽을 fillvalue로 채웁니다. 일반 zip은 가장 짧은 iterable에서 멈추지만, zip_longest는 가장 긴 iterable까지 진행합니다. 이들은 데이터 병합이나 평탄화에 자주 사용됩니다.
 
@@ -198,7 +198,7 @@ sections:
     list3 = [7, 8, 9]
     list(chain(list1, list2, list3))
   exercise:
-    prompt: chain과 ziplongest 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: chain과 ziplongest 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import chain
 
@@ -207,17 +207,17 @@ sections:
       list3 = [7, 8, 9]
       list(chain(list1, list2, list3))
     hints:
-    - chain과 ziplongest 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: chain과 ziplongest 코드가 예외 없이 끝나야 합니다.
-    resultCheck: chain과 ziplongest에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: chain과 ziplongest에서 `list1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: chain과 ziplongest 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: accumulate
   title: accumulate 함수
   structuredPrimary: true
   subtitle: 누적 연산
   goal: accumulate 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     accumulate는 iterable의 누적 결과를 생성합니다. 기본적으로 누적 합계를 계산하지만, func 인자로 다른 연산(곱셈, 최대값 등)을 지정할 수 있습니다. Python 3.8부터는 initial 인자로 초기값을 지정할 수 있습니다. reduce와 비슷하지만, accumulate는 모든 중간 결과를 반환합니다. 누적 합계, 누적 곱, 러닝 맥스/민 등을 계산할 때 유용합니다.
 
@@ -230,24 +230,24 @@ sections:
     numbers = [1, 2, 3, 4, 5]
     list(accumulate(numbers))
   exercise:
-    prompt: accumulate 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: accumulate 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import accumulate
 
       numbers = [1, 2, 3, 4, 5]
       list(accumulate(numbers))
     hints:
-    - accumulate 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: accumulate 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: accumulate 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: accumulate 함수에서 `numbers` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: accumulate 함수 실행 뒤 `numbers` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: workflow_validation
   title: 실무 이터레이터 파이프라인
   structuredPrimary: true
   subtitle: 정렬, 그룹화, 조합 실험, 검증
   goal: 실무 이터레이터 파이프라인에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     itertools는 함수 이름을 외우는 것보다, 많은 데이터를 한 번에 만들지 않고 흘려보내며 필요한 결과만 검증하는 감각이 중요합니다. 특히 groupby는 SQL GROUP BY처럼 자동으로 같은 키를 모아주지 않으므로, 실행 전에 정렬 여부가 결과에 어떤 영향을 주는지 예측해야 합니다. 이 실수는 예외가 나지 않는 논리 버그라서 검증이 더 중요합니다.
 
@@ -283,7 +283,7 @@ sections:
     channelSummary = summarizeByChannel(salesEvents)
     channelSummary
   exercise:
-    prompt: 실무 이터레이터 파이프라인 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 실무 이터레이터 파이프라인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from itertools import groupby
 
@@ -313,17 +313,17 @@ sections:
       channelSummary = summarizeByChannel(salesEvents)
       channelSummary
     hints:
-    - 실무 이터레이터 파이프라인 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실무 이터레이터 파이프라인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실무 이터레이터 파이프라인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실무 이터레이터 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실무 이터레이터 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: itertools 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Day 5에서 배운 itertools 모듈을 난이도별로 복습합니다. itertools는 효율적인 이터레이터 생성을 위한 표준 라이브러리로, 메모리 효율적인
     데이터 처리의 핵심입니다. 무한 이터레이터(count, cycle, repeat), 종료 이터레이터(chain, groupby, islice), 조합 이터레이터(permutations,
     combinations, product)를 제공합니다. 🟢 기본 문제로 각 함수의 기본 사용법을 익히고, 🟡 응용 문제로 체이닝과 조합을 연습하세요. 🔴 심화 문제에서는 슬라이딩
@@ -336,15 +336,15 @@ sections:
     evens = count(0, 2)
     list(islice(evens, 5))
   exercise:
-    prompt: 종합 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 `evens` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from itertools import count, islice
 
       evens = count(0, 2)
       list(islice(evens, 5))
     hints:
-    - 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `evens = ...` 오른쪽 값입니다.
+    - 실행 뒤 `evens` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 종합 복습에서 `evens` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 종합 복습 실행 뒤 `evens` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

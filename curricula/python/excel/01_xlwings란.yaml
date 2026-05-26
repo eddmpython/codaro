@@ -41,7 +41,7 @@ intro:
     - label: 엑셀 자동화 환경
       detail: openpyxl 기준으로 로컬 Python 실행을 준비합니다.
     - label: Excel 로컬 자동화 입문 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 저장 파일과 셀 값와 예외 상태를 확인합니다.
     - label: Excel 로컬 자동화 입문 완료
       detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
 sections:
@@ -54,12 +54,14 @@ sections:
       재현 가능하고, 사용자가 같은 파일을 업무에 바로 가져갈 수 있습니다.
   - type: tip
     content: Excel 앱 제어가 필요한 특수 업무는 나중에 선택지로 다루고, 기본 커리큘럼은 openpyxl/pandas 파일 자동화를 기준으로 잡습니다.
+  goal: 1단계. 로컬 Excel 자동화의 기준에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
 - id: create_workbook
   title: 2단계. 워크북 만들기
   structuredPrimary: true
   subtitle: Workbook과 Worksheet
   goal: 2단계. 워크북 만들기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 2단계. 워크북 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -84,7 +86,7 @@ sections:
     assert salesPath.exists()
     salesPath
   exercise:
-    prompt: 2단계. 워크북 만들기 예제에서 리스트 값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 워크북 만들기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from pathlib import Path
       from tempfile import TemporaryDirectory
@@ -106,17 +108,17 @@ sections:
       assert salesPath.exists()
       salesPath
     hints:
-    - 2단계. 워크북 만들기 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 워크북 만들기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 워크북 만들기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 워크북 만들기에서 `excelTemp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 워크북 만들기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
 - id: workflow_validation
   title: 3단계. 워크북 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 3단계. 워크북 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을
     때 명확하게 실패시키는 흐름을 만듭니다.
   tips:
@@ -135,7 +137,7 @@ sections:
     assert salesValidation["rowCount"] == 3
     salesValidation
   exercise:
-    prompt: 3단계. 워크북 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 워크북 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def validateSalesWorksheet(worksheet):
           headers = [cell.value for cell in worksheet[1]]
@@ -150,14 +152,16 @@ sections:
       assert salesValidation["rowCount"] == 3
       salesValidation
     hints:
-    - 3단계. 워크북 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 3단계. 워크북 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 워크북 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 3단계. 워크북 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 워크북 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
   title: 정리
   subtitle: 파일 자동화의 기본 완주 조건
   blocks:
   - type: text
     content: 이번 레슨에서는 로컬 xlsx 파일을 만들고, 시트 구조와 금액 규칙을 검증하고, 기준을 바꿔 지역별 요약을 만드는 흐름을 완성했습니다.
+  goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.

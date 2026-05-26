@@ -48,7 +48,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 디자인 패턴 1 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 디자인 패턴 1 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: 인스턴스 하나만 생성
   goal: 싱글톤 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 인스턴스를 하나만 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -79,7 +79,7 @@ sections:
     singletonCheck = db1 is db2
     singletonCheck
   exercise:
-    prompt: 싱글톤 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 싱글톤 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class SingletonMeta(type):
           _instances = {}
@@ -98,17 +98,17 @@ sections:
       singletonCheck = db1 is db2
       singletonCheck
     hints:
-    - 싱글톤 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 싱글톤 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 싱글톤 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 싱글톤 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 싱글톤 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: factory
   title: 팩토리 패턴
   structuredPrimary: true
   subtitle: 객체 생성 위임
   goal: 팩토리 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 객체 생성을 서브클래스에 위임하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -142,7 +142,7 @@ sections:
     factoryResult = (factoryDog.speak(), factoryCat.speak())
     factoryResult
   exercise:
-    prompt: 팩토리 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 팩토리 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -173,17 +173,17 @@ sections:
       factoryResult = (factoryDog.speak(), factoryCat.speak())
       factoryResult
     hints:
-    - 팩토리 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 팩토리 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 팩토리 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 팩토리 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 팩토리 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: builder
   title: 빌더 패턴
   structuredPrimary: true
   subtitle: 복잡한 객체 단계적 생성
   goal: 빌더 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 복잡한 객체를 단계적으로 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -232,7 +232,7 @@ sections:
     pizzaStr = str(pizzaBuilt)
     pizzaStr
   exercise:
-    prompt: 빌더 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 빌더 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Pizza:
           def __init__(self):
@@ -278,17 +278,17 @@ sections:
       pizzaStr = str(pizzaBuilt)
       pizzaStr
     hints:
-    - 빌더 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 빌더 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 빌더 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 빌더 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 빌더 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: adapter
   title: 어댑터 패턴
   structuredPrimary: true
   subtitle: 인터페이스 연결
   goal: 어댑터 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 호환되지 않는 인터페이스를 연결하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -313,7 +313,7 @@ sections:
     adapterResult = adapter.printNew("Hello World")
     adapterResult
   exercise:
-    prompt: 어댑터 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 어댑터 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class OldPrinter:
           def printOld(self, text):
@@ -335,17 +335,17 @@ sections:
       adapterResult = adapter.printNew("Hello World")
       adapterResult
     hints:
-    - 어댑터 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 어댑터 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 어댑터 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 어댑터 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 어댑터 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: decorator_pattern
   title: 데코레이터 패턴
   structuredPrimary: true
   subtitle: 동적 기능 추가
   goal: 데코레이터 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 객체에 동적으로 기능을 추가하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -398,7 +398,7 @@ sections:
     coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
     coffeeResult
   exercise:
-    prompt: 데코레이터 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 데코레이터 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -448,17 +448,17 @@ sections:
       coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
       coffeeResult
     hints:
-    - 데코레이터 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 데코레이터 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데코레이터 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 데코레이터 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 데코레이터 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: prototype
   title: 프로토타입 패턴
   structuredPrimary: true
   subtitle: 객체 복제
   goal: 프로토타입 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 기존 객체를 복제하여 새 객체를 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -489,7 +489,7 @@ sections:
     protoResult = (str(originalDoc), str(clonedDoc))
     protoResult
   exercise:
-    prompt: 프로토타입 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 프로토타입 패턴 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import copy
 
@@ -517,17 +517,17 @@ sections:
       protoResult = (str(originalDoc), str(clonedDoc))
       protoResult
     hints:
-    - 프로토타입 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 프로토타입 패턴 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 프로토타입 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 프로토타입 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 프로토타입 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 리포트 내보내기 구조 설계하기'
   structuredPrimary: true
   subtitle: Factory, Builder, Adapter, Decorator를 변경 지점 기준으로 검증합니다
   goal: '현업 흐름 검증: 리포트 내보내기 구조 설계하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter, 로깅은 Decorator로 분리해보세요.
 
@@ -577,7 +577,7 @@ sections:
     assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
     assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
   exercise:
-    prompt: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       import json
 
@@ -620,17 +620,17 @@ sections:
       assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
       assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
     hints:
-    - '현업 흐름 검증: 리포트 내보내기 구조 설계하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 리포트 내보내기 구조 설계하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 리포트 내보내기 구조 설계하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 디자인 패턴 마스터하기
   goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에
     필수적입니다. 팩토리 패턴은 객체 생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡
     응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서 사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를
@@ -660,7 +660,7 @@ sections:
     ex1Result = (logger1 is logger2, logger1.getLogs())
     ex1Result
   exercise:
-    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 연습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Logger:
           _instance = None
@@ -684,8 +684,8 @@ sections:
       ex1Result = (logger1 is logger2, logger1.getLogs())
       ex1Result
     hints:
-    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

@@ -29,26 +29,26 @@ meta:
 intro:
   direction: Polars소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - Polars소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - Polars소개 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 업무 흐름 검증 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
-    - label: 핵심 처리 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 출력과 상태 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 컬럼 선택/필터/집계 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 행 수, 컬럼 값, 집계 결과 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
     - label: Polars소개 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 컬럼형 표 분석 환경
       detail: polars 기준으로 로컬 Python 실행을 준비합니다.
     - label: Polars소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
     - label: Polars소개 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -71,6 +71,8 @@ sections:
       title: Apache Arrow 기반 메모리 효율
   - type: image
     src: https://raw.githubusercontent.com/pola-rs/polars-static/master/banner/polars_github_banner.svg
+  goal: Polars란?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: why_polars
   blocks:
   - type: sectionHeader
@@ -101,6 +103,8 @@ sections:
       - 대용량에서도 빠름
       - GIL 우회
       infoBox: 대용량 데이터에 최적
+  goal: 🤔 pandas로 충분하지 않나요?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: key_features
   blocks:
   - type: sectionHeader
@@ -120,6 +124,8 @@ sections:
     - emoji: 🎨
       title: 표현식 API
       description: 직관적이고 읽기 쉬운 메서드 체이닝
+  goal: 🎯 Polars의 핵심 기능에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: expression_api
   blocks:
   - type: sectionHeader
@@ -144,6 +150,8 @@ sections:
     - emoji: 🔗
       title: join
       description: 테이블 결합
+  goal: 📝 표현식 API에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: lazy_vs_eager
   blocks:
   - type: sectionHeader
@@ -176,6 +184,8 @@ sections:
     style: tip
     title: Lazy 우선 권장
     content: 대용량 데이터를 다룰 때는 scan_csv로 Lazy하게 읽고, 필요한 연산을 정의한 후 collect()로 실행하세요. 쿼리 최적화로 성능이 크게 향상됩니다.
+  goal: 💤 Lazy vs Eager에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -221,6 +231,8 @@ sections:
     style: info
     title: 프로젝트 기반 학습
     content: 각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: local_python_support
   blocks:
   - type: sectionHeader
@@ -242,6 +254,8 @@ sections:
     - emoji: ⚡
       title: 네이티브급 성능
       description: 로컬 CPU에서도 빠른 처리
+  goal: 💻 로컬에서 빠르게 동작에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: comparison_table
   blocks:
   - type: sectionHeader
@@ -272,6 +286,8 @@ sections:
     style: info
     title: pandas 지식 활용
     content: Polars API는 pandas와 유사합니다. pandas를 알고 있다면 Polars 학습이 훨씬 수월합니다.
+  goal: 📊 DataFrame 라이브러리 비교에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: resources
   blocks:
   - type: sectionHeader
@@ -288,18 +304,22 @@ sections:
     - text: Polars Cheat Sheet
       url: https://franzdiebold.github.io/polars-cheat-sheet/Polars_cheat_sheet.pdf
       icon: 🔗
+  goal: 📚 참고 자료에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: next
   blocks:
   - type: hero
     emoji: 👉
     title: '다음: 영화 데이터 분석'
     subtitle: Polars 기본 문법으로 영화 데이터를 분석합니다
+  goal: '다음: 영화 데이터 분석에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.'
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 주문 매출 파이프라인
   goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
     집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
   tips:
@@ -329,7 +349,7 @@ sections:
     validateOrderFrame(orderFrame)
     orderFrame
   exercise:
-    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
@@ -365,8 +385,8 @@ sections:
       validateOrderFrame(orderFrame)
       orderFrame
     hints:
-    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

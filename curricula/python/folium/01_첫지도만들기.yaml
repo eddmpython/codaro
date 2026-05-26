@@ -47,7 +47,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: 첫지도만들기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: 첫지도만들기 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -56,26 +56,26 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: folium과 Codaro를 불러옵니다. Codaro는 지도를 화면에 표시할 때 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import folium
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_basic_map
   title: 2단계. 기본 지도 생성
   structuredPrimary: true
   subtitle: Map()
   goal: 2단계. 기본 지도 생성에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
 
@@ -87,23 +87,23 @@ sections:
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
     m1
   exercise:
-    prompt: 2단계. 기본 지도 생성 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 기본 지도 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=12)
       m1
     hints:
-    - 2단계. 기본 지도 생성 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 기본 지도 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 기본 지도 생성에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 기본 지도 생성에서 `seoulCenter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 기본 지도 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_zoom_levels
   title: 3단계. 줌 레벨 이해
   structuredPrimary: true
   subtitle: zoom_start 설정
   goal: 3단계. 줌 레벨 이해에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
 
@@ -114,22 +114,22 @@ sections:
     m2 = folium.Map(location=seoulCenter, zoom_start=10)
     m2
   exercise:
-    prompt: 3단계. 줌 레벨 이해 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 줌 레벨 이해 예제에서 `m2` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=10)
       m2
     hints:
-    - 3단계. 줌 레벨 이해 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m2 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m2` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 3단계. 줌 레벨 이해 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 줌 레벨 이해에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 줌 레벨 이해에서 `m2` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 줌 레벨 이해 실행 뒤 `m2` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step4_marker
   title: 4단계. 마커 추가
   structuredPrimary: true
   subtitle: Marker()
   goal: 4단계. 마커 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
 
@@ -141,23 +141,23 @@ sections:
     folium.Marker(location=seoulCenter).add_to(m4)
     m4
   exercise:
-    prompt: 4단계. 마커 추가 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 마커 추가 예제에서 `m4` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(location=seoulCenter).add_to(m4)
       m4
     hints:
-    - 4단계. 마커 추가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m4 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m4` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. 마커 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 마커 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 마커 추가에서 `m4` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 마커 추가 실행 뒤 `m4` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step5_multiple_markers
   title: 5단계. 여러 마커 추가
   structuredPrimary: true
   subtitle: 반복문 활용
   goal: 5단계. 여러 마커 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
 
@@ -181,7 +181,7 @@ sections:
         ).add_to(m6)
     m6
   exercise:
-    prompt: 5단계. 여러 마커 추가 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 여러 마커 추가 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       places = [
           {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -199,17 +199,17 @@ sections:
           ).add_to(m6)
       m6
     hints:
-    - 5단계. 여러 마커 추가 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 5단계. 여러 마커 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 여러 마커 추가에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 5단계. 여러 마커 추가의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 여러 마커 추가 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step6_tooltip
   title: 6단계. 툴팁 추가
   structuredPrimary: true
   subtitle: tooltip vs popup
   goal: 6단계. 툴팁 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
 
@@ -225,7 +225,7 @@ sections:
     ).add_to(m7)
     m7
   exercise:
-    prompt: 6단계. 툴팁 추가 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 툴팁 추가 예제에서 `m7`, `location`, `popup` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(
@@ -235,17 +235,17 @@ sections:
       ).add_to(m7)
       m7
     hints:
-    - 6단계. 툴팁 추가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `m7 = ...` 오른쪽 값입니다.
+    - 실행 뒤 `m7` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. 툴팁 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 툴팁 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 툴팁 추가에서 `m7` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 툴팁 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_marker_color
   title: 7단계. 마커 색상 변경
   structuredPrimary: true
   subtitle: icon 파라미터
   goal: 7단계. 마커 색상 변경에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     Icon()으로 마커 색상과 아이콘을 변경합니다. 기본 색상은 blue입니다.
 
@@ -265,7 +265,7 @@ sections:
         ).add_to(m8)
     m8
   exercise:
-    prompt: 7단계. 마커 색상 변경 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 마커 색상 변경 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -278,17 +278,17 @@ sections:
           ).add_to(m8)
       m8
     hints:
-    - 7단계. 마커 색상 변경 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 7단계. 마커 색상 변경 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 마커 색상 변경에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 7단계. 마커 색상 변경의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 마커 색상 변경 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step8_icon_type
   title: 8단계. 아이콘 모양 변경
   structuredPrimary: true
   subtitle: icon 파라미터
   goal: 8단계. 아이콘 모양 변경에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
 
@@ -318,7 +318,7 @@ sections:
 
     m9
   exercise:
-    prompt: 8단계. 아이콘 모양 변경 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 아이콘 모양 변경 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -342,17 +342,17 @@ sections:
 
       m9
     hints:
-    - 8단계. 아이콘 모양 변경 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 8단계. 아이콘 모양 변경 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 아이콘 모양 변경에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 8단계. 아이콘 모양 변경에서 `m9` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 아이콘 모양 변경 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_fit_bounds
   title: 9단계. 자동 줌 맞추기
   structuredPrimary: true
   subtitle: fit_bounds()
   goal: 9단계. 자동 줌 맞추기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: |-
     모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
 
@@ -372,7 +372,7 @@ sections:
     m10.fit_bounds(allLocs)
     m10
   exercise:
-    prompt: 9단계. 자동 줌 맞추기 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 자동 줌 맞추기 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -386,17 +386,17 @@ sections:
       m10.fit_bounds(allLocs)
       m10
     hints:
-    - 9단계. 자동 줌 맞추기 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 9단계. 자동 줌 맞추기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 자동 줌 맞추기에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 9단계. 자동 줌 맞추기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 자동 줌 맞추기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 서울 관광지 지도
   goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
   explanation: 지금까지 배운 내용을 종합하여 서울 관광지 지도를 완성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -421,7 +421,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
     starterCode: |-
       tourSpots = [
           {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
@@ -443,17 +443,17 @@ sections:
 
       tourMap
     hints:
-    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 10단계. 완성 예제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 예제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 위치 지도 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 검증
   goal: 11단계. 실무 위치 지도 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고 검증해야 합니다.
 
@@ -476,7 +476,7 @@ sections:
     validationResult = [validateKoreaCoordinate(site) for site in branchSites]
     validationResult
   exercise:
-    prompt: 11단계. 실무 위치 지도 검증 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 실무 위치 지도 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       branchSites = [
           {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
@@ -493,17 +493,17 @@ sections:
       validationResult = [validateKoreaCoordinate(site) for site in branchSites]
       validationResult
     hints:
-    - 11단계. 실무 위치 지도 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 11단계. 실무 위치 지도 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 실무 위치 지도 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 11단계. 실무 위치 지도 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 11단계. 실무 위치 지도 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 지도 만들기
   goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
@@ -520,7 +520,7 @@ sections:
     ]
     cafes
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       cafes = [
@@ -531,8 +531,8 @@ sections:
       ]
       cafes
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `cafes` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `cafes` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.

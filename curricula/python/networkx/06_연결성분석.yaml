@@ -48,7 +48,7 @@ intro:
     - label: 그래프 분석 환경
       detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
     - label: 연결성분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
     - label: 연결성분석 완료
       detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
 sections:
@@ -57,7 +57,7 @@ sections:
   structuredPrimary: true
   subtitle: import
   goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: NetworkX와 matplotlib을 불러옵니다. 연결성 분석은 네트워크의 구조적 안정성과 취약점을 파악하는 핵심 기법입니다. 통신망, 전력망, 교통망 등
     인프라 네트워크에서 어떤 부분이 고장나면 전체 시스템에 영향을 미치는지, 네트워크가 얼마나 견고한지를 분석합니다.
   tips:
@@ -66,22 +66,22 @@ sections:
     import networkx as nx
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
     hints:
-    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step2_connected
   title: 2단계. 연결 그래프
   structuredPrimary: true
   subtitle: is_connected()
   goal: 2단계. 연결 그래프에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     연결 그래프(Connected Graph)는 모든 노드 쌍 사이에 경로가 존재하는 그래프입니다. 어떤 두 노드를 선택해도 연결된 엣지를 따라 도달할 수 있습니다. is_connected()로 그래프가 연결되어 있는지 확인할 수 있으며, 연결되지 않은 그래프에서 경로 관련 함수를 호출하면 에러가 발생하므로 사전 확인이 중요합니다.
 
@@ -94,24 +94,24 @@ sections:
     isConn = nx.is_connected(connectedG)
     isConn
   exercise:
-    prompt: 2단계. 연결 그래프 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 연결 그래프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       connectedG = nx.Graph()
       connectedG.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 1)])
       isConn = nx.is_connected(connectedG)
       isConn
     hints:
-    - 2단계. 연결 그래프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 2단계. 연결 그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 연결 그래프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 2단계. 연결 그래프에서 `connectedG` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 연결 그래프 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step3_components
   title: 3단계. 연결 컴포넌트
   structuredPrimary: true
   subtitle: connected_components()
   goal: 3단계. 연결 컴포넌트에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     connected_components()는 각 연결 컴포넌트(서로 도달 가능한 노드 그룹)를 반환합니다. 연결 컴포넌트는 내부적으로는 모두 연결되어 있지만 다른 컴포넌트와는 분리된 부분그래프입니다. 소셜 네트워크에서 서로 교류가 없는 독립적인 그룹들, 인터넷에서 연결이 끊어진 네트워크 조각들을 식별하는 데 사용됩니다.
 
@@ -127,7 +127,7 @@ sections:
     components = list(nx.connected_components(multiCompG))
     components
   exercise:
-    prompt: 3단계. 연결 컴포넌트 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 연결 컴포넌트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       multiCompG = nx.Graph()
       multiCompG.add_edges_from([(1, 2), (2, 3), (3, 1)])
@@ -137,17 +137,17 @@ sections:
       components = list(nx.connected_components(multiCompG))
       components
     hints:
-    - 3단계. 연결 컴포넌트 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 3단계. 연결 컴포넌트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 연결 컴포넌트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 3단계. 연결 컴포넌트에서 `multiCompG` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 연결 컴포넌트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_visualize_comp
   title: 4단계. 컴포넌트 시각화
   structuredPrimary: true
   subtitle: 그룹별 색상
   goal: 4단계. 컴포넌트 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 각 연결 컴포넌트를 다른 색으로 시각화하면 네트워크의 분리된 영역을 쉽게 파악할 수 있습니다. 컴포넌트마다 고유한 색상을 지정하여 그래프를 그리면 어떤 노드들이
     같은 그룹에 속하는지, 몇 개의 독립된 네트워크가 존재하는지 한눈에 확인할 수 있습니다.
   tips:
@@ -170,7 +170,7 @@ sections:
     ax1.set_title('Connected Components')
     fig1
   exercise:
-    prompt: 4단계. 컴포넌트 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 컴포넌트 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       compList = list(nx.connected_components(multiCompG))
       colorList = ['skyblue', 'salmon', 'lightgreen', 'gold']
@@ -189,17 +189,17 @@ sections:
       ax1.set_title('Connected Components')
       fig1
     hints:
-    - 4단계. 컴포넌트 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 4단계. 컴포넌트 시각화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 컴포넌트 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 4단계. 컴포넌트 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 컴포넌트 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step5_bridges
   title: 5단계. 브릿지
   structuredPrimary: true
   subtitle: bridges()
   goal: 5단계. 브릿지에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     브릿지(Bridge)는 제거하면 그래프가 분리되는 엣지입니다. 두 컴포넌트를 연결하는 유일한 경로이므로, 이 연결이 끊어지면 네트워크가 둘로 쪼개집니다. 통신망에서 브릿지는 단일 장애점(Single Point of Failure)으로, 이 회선이 고장나면 일부 지역이 완전히 단절됩니다. 브릿지를 식별하여 백업 경로를 추가하는 것이 네트워크 안정성 향상의 핵심입니다.
 
@@ -213,7 +213,7 @@ sections:
     bridgeG.add_edges_from([(4, 5), (5, 6), (6, 4)])
     list(bridgeG.edges())
   exercise:
-    prompt: 5단계. 브릿지 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 브릿지 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       bridgeG = nx.Graph()
       bridgeG.add_edges_from([(1, 2), (2, 3), (3, 1)])
@@ -221,17 +221,17 @@ sections:
       bridgeG.add_edges_from([(4, 5), (5, 6), (6, 4)])
       list(bridgeG.edges())
     hints:
-    - 5단계. 브릿지 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 5단계. 브릿지 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 브릿지에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 5단계. 브릿지에서 `bridgeG` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 브릿지 실행 뒤 `bridgeG` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step6_articulation
   title: 6단계. 절단점
   structuredPrimary: true
   subtitle: articulation_points()
   goal: 6단계. 절단점에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     절단점(Articulation Point)은 제거하면 그래프가 분리되는 노드입니다. 이 노드가 네트워크에서 사라지면 다른 노드들이 서로 도달할 수 없게 됩니다. 조직에서 특정 사람이 없으면 부서 간 소통이 끊기는 경우, 라우터가 고장나면 네트워크가 분리되는 경우가 이에 해당합니다. 절단점을 파악하면 네트워크의 병목과 취약점을 알 수 있습니다.
 
@@ -242,22 +242,22 @@ sections:
     artPoints = list(nx.articulation_points(bridgeG))
     artPoints
   exercise:
-    prompt: 6단계. 절단점 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 절단점 예제에서 `artPoints` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       artPoints = list(nx.articulation_points(bridgeG))
       artPoints
     hints:
-    - 6단계. 절단점 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `artPoints = ...` 오른쪽 값입니다.
+    - 실행 뒤 `artPoints` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 6단계. 절단점 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 절단점에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. 절단점에서 `artPoints` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 절단점 실행 뒤 `artPoints` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_robustness
   title: 7단계. 네트워크 견고성
   structuredPrimary: true
   subtitle: 노드 제거 시뮬레이션
   goal: 7단계. 네트워크 견고성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     노드를 하나씩 제거하며 네트워크 견고성을 테스트합니다. 절단점을 제거하면 네트워크가 분리되지만, 절단점이 아닌 노드를 제거하면 연결성이 유지됩니다. 이런 시뮬레이션을 통해 어떤 노드가 시스템에 중요한지, 노드 장애 시 어떤 영향이 있는지를 사전에 파악할 수 있습니다.
 
@@ -272,7 +272,7 @@ sections:
     ])
     nx.is_connected(robustG)
   exercise:
-    prompt: 7단계. 네트워크 견고성 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 네트워크 견고성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       robustG = nx.Graph()
       robustG.add_edges_from([
@@ -281,17 +281,17 @@ sections:
       ])
       nx.is_connected(robustG)
     hints:
-    - 7단계. 네트워크 견고성 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 7단계. 네트워크 견고성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 네트워크 견고성에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 7단계. 네트워크 견고성에서 `robustG` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 네트워크 견고성 실행 뒤 `robustG` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step8_biconnected
   title: 8단계. 이중연결
   structuredPrimary: true
   subtitle: biconnected_components()
   goal: 8단계. 이중연결에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     이중연결 컴포넌트(Biconnected Component)는 어떤 한 노드를 제거해도 연결이 유지되는 부분그래프입니다. 절단점이 없는 최대 부분그래프로, 내부적으로 최소 두 개의 독립적인 경로가 존재합니다. 이중연결 그래프는 단일 노드 장애에 강건하므로, 고가용성이 필요한 네트워크 설계의 목표가 됩니다.
 
@@ -302,22 +302,22 @@ sections:
     biconnComps = list(nx.biconnected_components(bridgeG))
     biconnComps
   exercise:
-    prompt: 8단계. 이중연결 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 이중연결 예제에서 `biconnComps` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       biconnComps = list(nx.biconnected_components(bridgeG))
       biconnComps
     hints:
-    - 8단계. 이중연결 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `biconnComps = ...` 오른쪽 값입니다.
+    - 실행 뒤 `biconnComps` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 8단계. 이중연결 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 이중연결에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. 이중연결에서 `biconnComps` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 이중연결 실행 뒤 `biconnComps` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step9_k_connectivity
   title: 9단계. k-연결성
   structuredPrimary: true
   subtitle: node_connectivity()
   goal: 9단계. k연결성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     k-연결성(k-connectivity)은 그래프를 분리하려면 최소 몇 개의 노드(또는 엣지)를 제거해야 하는지를 나타냅니다. 노드 연결도가 k이면 k-1개의 노드가 동시에 장애를 일으켜도 네트워크가 연결을 유지합니다. 엣지 연결도도 마찬가지로 해석됩니다. 연결도가 높을수록 네트워크가 더 견고합니다.
 
@@ -328,22 +328,22 @@ sections:
     nodeConn = nx.node_connectivity(robustG)
     nodeConn
   exercise:
-    prompt: 9단계. k연결성 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. k연결성 예제에서 `nodeConn` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       nodeConn = nx.node_connectivity(robustG)
       nodeConn
     hints:
-    - 9단계. k연결성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `nodeConn = ...` 오른쪽 값입니다.
+    - 실행 뒤 `nodeConn` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 9단계. k연결성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. k연결성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. k연결성에서 `nodeConn` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. k연결성 실행 뒤 `nodeConn` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step10_practical
   title: 10단계. 실전 분석
   structuredPrimary: true
   subtitle: 네트워크 취약점 진단
   goal: 10단계. 실전 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 실제 네트워크의 취약점을 종합적으로 분석합니다. 기업의 통신 네트워크, 전력망, 교통망 등을 모델링하고 브릿지와 절단점을 식별합니다. 이 분석 결과를 바탕으로
     백업 연결을 추가하거나, 중요 노드에 이중화를 적용하여 네트워크 안정성을 높일 수 있습니다.
   tips:
@@ -359,7 +359,7 @@ sections:
     ])
     network.number_of_nodes(), network.number_of_edges()
   exercise:
-    prompt: 10단계. 실전 분석 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 실전 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       network = nx.Graph()
       network.add_edges_from([
@@ -371,17 +371,17 @@ sections:
       ])
       network.number_of_nodes(), network.number_of_edges()
     hints:
-    - 10단계. 실전 분석 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 10단계. 실전 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 실전 분석에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 10단계. 실전 분석에서 `network` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 실전 분석 실행 뒤 `network` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 연결성 분석
   goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 연결성 분석 기법을 활용하여 실전 미션을 수행해봅시다. 전력망의 취약점을 분석하고, 소셜 네트워크에서 브릿지 제거 시 어떻게 분리되는지 시뮬레이션합니다.
 
@@ -401,7 +401,7 @@ sections:
     ])
     power.number_of_nodes(), power.number_of_edges()
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
@@ -415,17 +415,17 @@ sections:
       ])
       power.number_of_nodes(), power.number_of_edges()
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `power` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `power` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 인수인계 네트워크
   goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
     처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   tips:
@@ -453,7 +453,7 @@ sections:
 
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
-    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       experimentGraph = workflowGraph.copy()
       experimentGraph.add_edge("sales", "finance", weight=2)
@@ -493,8 +493,8 @@ sections:
 
       workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
     hints:
-    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

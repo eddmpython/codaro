@@ -45,7 +45,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: dataclasses 마스터 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: dataclasses 마스터 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -54,7 +54,7 @@ sections:
   structuredPrimary: true
   subtitle: 자동 __init__, __repr__
   goal: '@dataclass 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     @dataclass 데코레이터는 __init__, __repr__, __eq__ 등의 특수 메서드를 자동 생성합니다. 클래스 속성에 타입 힌트를 추가하면 그것이 인스턴스 필드가 됩니다. 기본값이 있는 필드는 기본값 없는 필드 뒤에 와야 합니다. 데이터를 담는 클래스를 만들 때 보일러플레이트 코드를 크게 줄여줍니다. Python 3.7에서 도입되었으며, 이후 버전에서 기능이 계속 추가되었습니다.
 
@@ -72,7 +72,7 @@ sections:
     pt = Point(3.0, 4.0)
     pt
   exercise:
-    prompt: '@dataclass 기초 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '@dataclass 기초 예제에서 `pt` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.'
     starterCode: |-
       from dataclasses import dataclass
 
@@ -84,17 +84,17 @@ sections:
       pt = Point(3.0, 4.0)
       pt
     hints:
-    - '@dataclass 기초 코드에서 먼저 입력값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `pt = ...` 오른쪽 값입니다.
+    - 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: '@dataclass 기초 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '@dataclass 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.'
+    noError: '@dataclass 기초에서 `pt` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '@dataclass 기초 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.'
 - id: field_function
   title: field() 함수
   structuredPrimary: true
   subtitle: 세밀한 필드 제어
   goal: field() 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     field() 함수로 각 필드의 동작을 세밀하게 제어합니다. default_factory는 가변 기본값(리스트, 딕셔너리)을 안전하게 사용합니다. repr=False로 __repr__에서 필드를 숨길 수 있습니다. compare=False로 __eq__ 비교에서 제외합니다. init=False로 __init__ 파라미터에서 제외합니다. metadata로 추가 정보를 저장할 수 있습니다.
 
@@ -115,7 +115,7 @@ sections:
     cart1.items.append("apple")
     cart1.items, cart2.items
   exercise:
-    prompt: field() 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: field() 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass, field
       from typing import List
@@ -130,17 +130,17 @@ sections:
       cart1.items.append("apple")
       cart1.items, cart2.items
     hints:
-    - field() 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: field() 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: field() 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: field() 함수에서 `cart1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: field() 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: post_init
   title: __post_init__
   structuredPrimary: true
   subtitle: 초기화 후처리
   goal: postinit에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     __post_init__ 메서드는 __init__이 끝난 후 자동으로 호출됩니다. 필드 값을 기반으로 계산된 속성을 설정하거나 유효성 검사를 수행합니다. InitVar 타입을 사용하면 __init__에만 전달되고 필드로 저장되지 않는 값을 정의할 수 있습니다. __post_init__은 InitVar 값을 순서대로 인자로 받습니다. 복잡한 초기화 로직을 깔끔하게 분리할 수 있습니다.
 
@@ -163,7 +163,7 @@ sections:
 
     Rectangle(3, 4)
   exercise:
-    prompt: postinit 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: postinit 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass, field
 
@@ -180,17 +180,17 @@ sections:
 
       Rectangle(3, 4)
     hints:
-    - postinit 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: postinit 코드가 예외 없이 끝나야 합니다.
-    resultCheck: postinit에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: postinit의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: postinit 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: frozen_dataclass
   title: frozen=True
   structuredPrimary: true
   subtitle: 불변 인스턴스
   goal: frozen=True에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     frozen=True 옵션은 인스턴스를 불변(immutable)으로 만듭니다. 필드 값을 변경하려고 하면 FrozenInstanceError가 발생합니다. frozen 객체는 해시 가능(hashable)하여 딕셔너리 키나 집합 요소로 사용할 수 있습니다. 불변 객체는 함수형 프로그래밍 패턴과 잘 맞습니다. 변경이 필요하면 replace() 함수로 새 인스턴스를 만듭니다.
 
@@ -208,7 +208,7 @@ sections:
     pt = Point(3.0, 4.0)
     pt.x, pt.y
   exercise:
-    prompt: frozen=True 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: frozen=True 예제에서 `pt` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -220,17 +220,17 @@ sections:
       pt = Point(3.0, 4.0)
       pt.x, pt.y
     hints:
-    - frozen=True 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `pt = ...` 오른쪽 값입니다.
+    - 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: frozen=True 코드가 예외 없이 끝나야 합니다.
-    resultCheck: frozen=True에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: frozen=True에서 `pt` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: frozen=True 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: slots_dataclass
   title: slots=True
   structuredPrimary: true
   subtitle: 메모리 최적화
   goal: slots=True에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     Python 3.10+에서 slots=True 옵션이 추가되었습니다. __slots__를 자동 생성하여 메모리를 절약합니다. 많은 인스턴스를 생성할 때 효과적입니다. __dict__가 없어 동적 속성 추가가 불가능합니다. frozen=True와 함께 사용하면 불변 + 메모리 효율적인 객체가 됩니다. 상속 시 부모도 slots를 사용해야 합니다.
 
@@ -249,7 +249,7 @@ sections:
     p3d = Point3D(1.0, 2.0, 3.0)
     hasattr(p3d, '__dict__'), hasattr(p3d, '__slots__')
   exercise:
-    prompt: slots=True 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: slots=True 예제에서 `p3d` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -262,11 +262,11 @@ sections:
       p3d = Point3D(1.0, 2.0, 3.0)
       hasattr(p3d, '__dict__'), hasattr(p3d, '__slots__')
     hints:
-    - slots=True 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `p3d = ...` 오른쪽 값입니다.
+    - 실행 뒤 `p3d` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: slots=True 코드가 예외 없이 끝나야 합니다.
-    resultCheck: slots=True에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: slots=True에서 `p3d` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: slots=True 실행 뒤 `p3d` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: inheritance
   title: 상속
   structuredPrimary: true
@@ -293,7 +293,7 @@ sections:
 
     Dog("Buddy", 3, "Labrador")
   exercise:
-    prompt: 상속 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 상속 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -308,17 +308,17 @@ sections:
 
       Dog("Buddy", 3, "Labrador")
     hints:
-    - 상속 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
+    - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 상속 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 상속에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 상속의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 상속 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 라인 데이터 모델 만들기'
   structuredPrimary: true
   subtitle: field, default_factory, frozen, replace, asdict를 한 흐름에서 검증합니다
   goal: '현업 흐름 검증: 주문 라인 데이터 모델 만들기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     dataclass는 단순한 보일러플레이트 제거 도구가 아니라, 데이터 규칙을 한 곳에 모으는 모델링 도구입니다. 주문 라인의 금액 계산과 세금 규칙을 만들고, 잘못된 입력이 어디서 막히는지 확인하세요.
 
@@ -364,7 +364,7 @@ sections:
     assert rule.tax(updated.subtotal) == 15_000
     assert asdict(updated)["tags"] == ["office"]
   exercise:
-    prompt: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from dataclasses import asdict, dataclass, field, replace
 
@@ -403,11 +403,11 @@ sections:
       assert rule.tax(updated.subtotal) == 15_000
       assert asdict(updated)["tags"] == ["office"]
     hints:
-    - '현업 흐름 검증: 주문 라인 데이터 모델 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 라인 데이터 모델 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 라인 데이터 모델 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
@@ -432,7 +432,7 @@ sections:
 
     Book("Python Guide", "Alice", 300)
   exercise:
-    prompt: 종합 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -444,8 +444,8 @@ sections:
 
       Book("Python Guide", "Alice", 300)
     hints:
-    - 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
+    - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 종합 복습 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.

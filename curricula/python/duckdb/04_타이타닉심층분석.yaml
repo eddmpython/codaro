@@ -30,33 +30,33 @@ intro:
   description: GROUP BY로 그룹화한 결과를 HAVING으로 필터링하고, NULL 값을 올바르게 처리하는 방법을 배웁니다.
   direction: 타이타닉심층분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 타이타닉심층분석 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - 타이타닉심층분석 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 데이터 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. NULL 값 확인 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. IS NULL로 필터 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
     - label: 타이타닉심층분석 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: SQL 분석 환경
       detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 타이타닉심층분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
     - label: 타이타닉심층분석 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: 타이타닉 데이터 준비
   goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 891명의 타이타닉 승객 데이터를 불러옵니다. 이번 프로젝트에서는 HAVING과 NULL 처리라는 두 가지 핵심 개념을 배웁니다. HAVING은 GROUP
     BY 결과를 필터링할 때 사용하고, NULL 처리는 실무 데이터에서 필수적인 결측값 처리 기법입니다. survived, pclass, sex, age, fare 등의 컬럼을 활용합니다.
   tips:
@@ -69,7 +69,7 @@ sections:
     df = loadLocalDataset("titanic")
     titanic = duckdb.from_df(df)
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -78,17 +78,17 @@ sections:
       df = loadLocalDataset("titanic")
       titanic = duckdb.from_df(df)
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 1단계. 데이터 불러오기 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step2_null_check
   title: 2단계. NULL 값 확인
   structuredPrimary: true
   subtitle: 결측값 탐색
   goal: 2단계. NULL 값 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: age 컬럼에 NULL 값이 있는지 확인합니다. 실제 데이터에서 결측값(NULL)은 매우 흔하며, 데이터 품질을 평가하는 첫 번째 단계입니다. COUNT(*)는
     모든 행을 세고, COUNT(age)는 NULL을 제외한 행만 세므로 차이가 결측값 개수입니다. 타이타닉 데이터에서 약 177명의 나이 정보가 누락되어 있습니다.
   tips:
@@ -102,7 +102,7 @@ sections:
         FROM titanic
     """).show()
   exercise:
-    prompt: 2단계. NULL 값 확인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. NULL 값 확인 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -112,17 +112,17 @@ sections:
           FROM titanic
       """).show()
     hints:
-    - 2단계. NULL 값 확인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. NULL 값 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. NULL 값 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. NULL 값 확인의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. NULL 값 확인 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step3_is_null
   title: 3단계. IS NULL로 필터링
   structuredPrimary: true
   subtitle: NULL 값만 선택
   goal: 3단계. IS NULL로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     IS NULL로 age가 없는 승객만 조회합니다. =로는 NULL을 비교할 수 없습니다. NULL은 '알 수 없는 값'이므로 age = NULL은 항상 FALSE를 반환합니다. 반드시 IS NULL 구문을 사용해야 합니다.
 
@@ -137,7 +137,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: 3단계. IS NULL로 필터링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. IS NULL로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT pclass, sex, fare, embarked
@@ -146,17 +146,17 @@ sections:
           LIMIT 10
       """).show()
     hints:
-    - 3단계. IS NULL로 필터링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. IS NULL로 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. IS NULL로 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. IS NULL로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. IS NULL로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step4_is_not_null
   title: 4단계. IS NOT NULL로 필터링
   structuredPrimary: true
   subtitle: NULL 제외
   goal: 4단계. IS NOT NULL로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: IS NOT NULL로 age가 있는 승객만 조회합니다. 분석에서 결측값을 제외할 때 사용합니다. 평균, 최댓값 같은 통계 분석에서는 NULL을 제거하지 않으면
     왜곡된 결과가 나올 수 있습니다.
   tips:
@@ -170,7 +170,7 @@ sections:
         LIMIT 10
     """).show()
   exercise:
-    prompt: 4단계. IS NOT NULL로 필터링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. IS NOT NULL로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT pclass, sex, age, fare
@@ -180,17 +180,17 @@ sections:
           LIMIT 10
       """).show()
     hints:
-    - 4단계. IS NOT NULL로 필터링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. IS NOT NULL로 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. IS NOT NULL로 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. IS NOT NULL로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. IS NOT NULL로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step5_group_avg
   title: 5단계. 그룹별 평균 계산
   structuredPrimary: true
   subtitle: GROUP BY와 AVG
   goal: 5단계. 그룹별 평균 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 객실 등급(pclass)별 평균 나이와 평균 요금을 계산합니다. GROUP BY pclass로 등급별로 묶은 후 AVG 함수로 평균을 구합니다. WHERE
     age IS NOT NULL로 나이 정보가 있는 승객만 포함시켜 정확한 통계를 얻습니다.
   tips:
@@ -208,7 +208,7 @@ sections:
         ORDER BY pclass
     """).show()
   exercise:
-    prompt: 5단계. 그룹별 평균 계산 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 그룹별 평균 계산 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -222,17 +222,17 @@ sections:
           ORDER BY pclass
       """).show()
     hints:
-    - 5단계. 그룹별 평균 계산 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 5단계. 그룹별 평균 계산 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 그룹별 평균 계산에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 그룹별 평균 계산의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. 그룹별 평균 계산 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step6_having_intro
   title: 6단계. HAVING 소개
   structuredPrimary: true
   subtitle: 그룹 필터링
   goal: 6단계. HAVING 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     HAVING은 GROUP BY 결과를 필터링합니다. WHERE가 개별 행을 필터링한다면, HAVING은 그룹을 필터링합니다.
 
@@ -252,7 +252,7 @@ sections:
         ORDER BY avgFare DESC
     """).show()
   exercise:
-    prompt: 6단계. HAVING 소개 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. HAVING 소개 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -266,17 +266,17 @@ sections:
           ORDER BY avgFare DESC
       """).show()
     hints:
-    - 6단계. HAVING 소개 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 6단계. HAVING 소개 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. HAVING 소개에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. HAVING 소개의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. HAVING 소개 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step7_having_avg
   title: 7단계. 평균값으로 필터링
   structuredPrimary: true
   subtitle: HAVING과 AVG
   goal: 7단계. 평균값으로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 평균 요금이 30달러 이상인 그룹만 조회합니다. HAVING은 GROUP BY 이후 집계 결과로 필터링할 때 사용합니다. WHERE는 행 단위 필터이고, HAVING은
     그룹 단위 필터입니다.
   tips:
@@ -295,7 +295,7 @@ sections:
         ORDER BY avgFare DESC
     """).show()
   exercise:
-    prompt: 7단계. 평균값으로 필터링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 평균값으로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -310,17 +310,17 @@ sections:
           ORDER BY avgFare DESC
       """).show()
     hints:
-    - 7단계. 평균값으로 필터링 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 7단계. 평균값으로 필터링 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 평균값으로 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 평균값으로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. 평균값으로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step8_survival_analysis
   title: 8단계. 생존율 분석
   structuredPrimary: true
   subtitle: CASE WHEN과 AVG
   goal: 8단계. 생존율 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: survived는 1(생존) 또는 0(사망)입니다. AVG(survived)로 생존율을 계산합니다. 0과 1의 평균은 1의 비율과 같으므로, AVG(survived)에
     100을 곱하면 퍼센트 생존율이 됩니다. 이 트릭은 이진 데이터의 비율 계산에 자주 사용됩니다.
   tips:
@@ -338,7 +338,7 @@ sections:
         ORDER BY survivalRate DESC
     """).show()
   exercise:
-    prompt: 8단계. 생존율 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 생존율 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -352,17 +352,17 @@ sections:
           ORDER BY survivalRate DESC
       """).show()
     hints:
-    - 8단계. 생존율 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 8단계. 생존율 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 생존율 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. 생존율 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. 생존율 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step9_in_filter
   title: 9단계. IN으로 다중 조건
   structuredPrimary: true
   subtitle: 특정 값들 선택
   goal: 9단계. IN으로 다중 조건에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: IN을 사용해 특정 탑승지(embarked)만 분석합니다. S(Southampton), C(Cherbourg)에서 탑승한 승객만 조회합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -380,7 +380,7 @@ sections:
         ORDER BY embarked, pclass
     """).show()
   exercise:
-    prompt: 9단계. IN으로 다중 조건 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. IN으로 다중 조건 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -395,17 +395,17 @@ sections:
           ORDER BY embarked, pclass
       """).show()
     hints:
-    - 9단계. IN으로 다중 조건 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 9단계. IN으로 다중 조건 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. IN으로 다중 조건에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. IN으로 다중 조건의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. IN으로 다중 조건 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step10_complex_having
   title: 10단계. 복합 HAVING 조건
   structuredPrimary: true
   subtitle: AND로 다중 조건
   goal: 10단계. 복합 HAVING 조건에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: HAVING에 AND를 사용해 여러 조건을 동시에 적용합니다. 승객 수 30명 이상이면서 생존율 50% 이상인 그룹을 찾습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -424,7 +424,7 @@ sections:
         ORDER BY survivalRate DESC
     """).show()
   exercise:
-    prompt: 10단계. 복합 HAVING 조건 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 복합 HAVING 조건 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -440,17 +440,17 @@ sections:
           ORDER BY survivalRate DESC
       """).show()
     hints:
-    - 10단계. 복합 HAVING 조건 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 10단계. 복합 HAVING 조건 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 복합 HAVING 조건에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. 복합 HAVING 조건의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. 복합 HAVING 조건 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step11_case_category
   title: 11단계. CASE로 카테고리 생성
   structuredPrimary: true
   subtitle: 나이 그룹 분류
   goal: 11단계. CASE로 카테고리 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: CASE WHEN으로 나이를 그룹화하고, 그룹별 생존율을 분석합니다. 연속형 변수인 나이를 범주형으로 변환하면 패턴을 파악하기 쉬워집니다. 미성년자, 성인,
     노인 그룹의 생존율 차이를 명확히 비교할 수 있습니다.
   tips:
@@ -472,7 +472,7 @@ sections:
         ORDER BY survivalRate DESC
     """).show()
   exercise:
-    prompt: 11단계. CASE로 카테고리 생성 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. CASE로 카테고리 생성 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -490,17 +490,17 @@ sections:
           ORDER BY survivalRate DESC
       """).show()
     hints:
-    - 11단계. CASE로 카테고리 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 11단계. CASE로 카테고리 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. CASE로 카테고리 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 11단계. CASE로 카테고리 생성의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 11단계. CASE로 카테고리 생성 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step12_final
   title: 12단계. 종합 분석
   structuredPrimary: true
   subtitle: 모든 개념 활용
   goal: 12단계. 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 지금까지 배운 IS NOT NULL, GROUP BY, HAVING, CASE WHEN, IN을 모두 활용한 종합 분석입니다. 객실 등급, 연령대, 성별 세
     가지 기준으로 다중 그룹화하고, 결측치를 제외하며, 충분한 표본(10명 이상)이 있는 그룹만 필터링합니다. 이런 복합 조건 분석을 통해 타이타닉 생존의 핵심 패턴을 도출할 수
     있습니다.
@@ -526,7 +526,7 @@ sections:
         ORDER BY survivalRate DESC, passengerCount DESC
     """).show()
   exercise:
-    prompt: 12단계. 종합 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 종합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -547,17 +547,17 @@ sections:
           ORDER BY survivalRate DESC, passengerCount DESC
       """).show()
     hints:
-    - 12단계. 종합 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 12단계. 종합 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 종합 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 12단계. 종합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 12단계. 종합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 타이타닉 심층 분석 프로젝트
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     HAVING과 NULL 처리, CASE WHEN, IN 연산자를 활용해 타이타닉 데이터를 분석합니다. 실무에서는 결측치 처리와 그룹 필터링이 필수적이며, 이 미션을 통해 이러한 패턴을 연습합니다.
 
@@ -580,7 +580,7 @@ sections:
     })
     tbl1 = duckdb.from_df(data)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import duckdb
@@ -597,11 +597,11 @@ sections:
       })
       tbl1 = duckdb.from_df(data)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -617,12 +617,14 @@ sections:
     - WHERE vs HAVING - 행 필터 vs 그룹 필터
   - type: text
     content: 다음 시간에는 서브쿼리를 활용한 고급 필터링을 배웁니다.
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
     결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
@@ -649,7 +651,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import duckdb
 
@@ -672,8 +674,8 @@ sections:
       assert rowCount == 5
       rowCount
     hints:
-    - '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'

@@ -42,7 +42,7 @@ intro:
     - label: 지도 시각화 환경
       detail: folium 기준으로 로컬 Python 실행을 준비합니다.
     - label: Folium 소개 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
     - label: Folium 소개 완료
       detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
@@ -57,6 +57,8 @@ sections:
     content: 지도에 마커를 찍고, 경로를 그리고, 영역을 색칠하고, 히트맵을 만들 수 있습니다. 모든 지도는 줌, 패닝, 클릭 등 인터랙션이 가능합니다.
   - type: tip
     content: Leaflet.js는 OpenStreetMap 기반의 오픈소스 지도 라이브러리입니다. 구글맵 API와 달리 무료이고 API 키가 필요 없습니다.
+  goal: Folium이란?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: why_folium
   title: 왜 Folium인가?
   subtitle: matplotlib으로 지도 안 되나요?
@@ -70,6 +72,8 @@ sections:
     content: '**핵심 차이**: Folium은 HTML/JavaScript를 생성합니다. 브라우저에서 실제 지도처럼 동작합니다.'
   - type: tip
     content: Folium은 순수 파이썬으로 작성되어 Codaro 로컬 Python에서도 바로 실행할 수 있습니다. 결과는 HTML 지도 객체로 렌더링됩니다.
+  goal: 왜 Folium인가?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: what_can_do
   title: 무엇을 만들 수 있나?
   subtitle: Folium의 기능
@@ -84,6 +88,8 @@ sections:
     content: '**단계구분도(Choropleth)**: 지역별로 다른 색상을 칠합니다. 통계 데이터를 지도에 시각화합니다.'
   - type: text
     content: '**마커 클러스터**: 수천 개의 마커를 효율적으로 표시합니다. 줌 레벨에 따라 자동으로 그룹화됩니다.'
+  goal: 무엇을 만들 수 있나?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: real_world_examples
   title: 실제 활용 예시
   subtitle: 어디서 사용할까?
@@ -98,6 +104,8 @@ sections:
     content: '**여행/관광 지도**: 관광지, 맛집, 숙소를 카테고리별로 표시합니다.'
   - type: text
     content: '**재난/안전 지도**: 대피소 위치, 위험 지역, 사고 발생 현황을 표시합니다.'
+  goal: 실제 활용 예시에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: basic_concept
   title: 기본 개념
   subtitle: 지도의 구성 요소
@@ -114,6 +122,8 @@ sections:
     content: '**GeoJSON**: 지리 데이터의 표준 형식입니다. 지역 경계, 도로, 건물 등을 표현합니다.'
   - type: tip
     content: 위도(latitude)는 남북 위치(-90~90), 경도(longitude)는 동서 위치(-180~180)입니다. 서울은 약 [37.5, 127.0]입니다.
+  goal: 기본 개념에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: coordinates
   title: 좌표 이해하기
   subtitle: 위도와 경도
@@ -128,6 +138,8 @@ sections:
     content: '**좌표 찾기**: 구글맵에서 원하는 위치를 클릭하면 좌표가 표시됩니다. 또는 주소를 좌표로 변환하는 지오코딩 서비스를 사용합니다.'
   - type: tip
     content: 좌표 순서 주의! Folium은 [lat, lon], 구글맵 URL은 lat,lon, GeoJSON은 [lon, lat]입니다. 혼동하기 쉬우니 주의하세요.
+  goal: 좌표 이해하기에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: local_output
   title: Codaro에서 출력
   subtitle: object output 사용
@@ -140,6 +152,8 @@ sections:
     content: '**주의**: HTML output은 JavaScript를 실행하지 않습니다. 반드시 object output을 사용하세요.'
   - type: tip
     content: 모든 코드 블록 마지막에 m를 넣어야 지도가 표시됩니다.
+  goal: Codaro에서 출력에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: learning_path
   title: 학습 순서
   subtitle: 10개 프로젝트 로드맵
@@ -154,6 +168,8 @@ sections:
     content: '**심화 (09-10)**: 마커 클러스터, 종합 프로젝트로 실전 지도를 만듭니다.'
   - type: tip
     content: 각 프로젝트는 독립적으로 실행 가능합니다. 순서대로 진행하면 개념이 점진적으로 쌓입니다.
+  goal: 학습 순서에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: no_api_key
   title: API 키 불필요
   subtitle: 무료로 시작
@@ -166,12 +182,14 @@ sections:
     content: '**제한 없음**: 구글맵 API처럼 일일 요청 제한이 없습니다. 학습과 프로토타이핑에 적합합니다.'
   - type: tip
     content: 상업적 용도나 대량 트래픽의 경우 타일 제공자의 이용약관을 확인하세요.
+  goal: API 키 불필요에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
 - id: workflow_validation
   title: 로컬 지도 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 로컬 지도 검증 루프에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     Folium 입문은 지도 객체를 만드는 데서 끝나지 않습니다. 업무에서는 좌표가 맞는지, 이름이 렌더 결과에 들어갔는지, 새 지점을 추가해도 검증 기준이 유지되는지 코드로 확인해야 합니다.
 
@@ -198,7 +216,7 @@ sections:
     validationResult = [validateSite(site) for site in officeSites]
     validationResult
   exercise:
-    prompt: 로컬 지도 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
+    prompt: 로컬 지도 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import folium
 
@@ -219,8 +237,8 @@ sections:
       validationResult = [validateSite(site) for site in officeSites]
       validationResult
     hints:
-    - 로컬 지도 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 로컬 지도 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 로컬 지도 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 로컬 지도 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 로컬 지도 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

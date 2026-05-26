@@ -45,7 +45,7 @@ intro:
     - label: 데이터 계약 환경
       detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
     - label: JSON스키마생성 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
     - label: JSON스키마생성 완료
       detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
@@ -54,27 +54,27 @@ sections:
   structuredPrimary: true
   subtitle: Pydantic 설치 및 import
   goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로
     JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 라이브러리 로드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import pydantic
     hints:
-    - 라이브러리 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 라이브러리 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 라이브러리 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic
   title: 기본 스키마 생성
   structuredPrimary: true
   subtitle: model_json_schema
   goal: 기본 스키마 생성에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
 
@@ -90,7 +90,7 @@ sections:
     userSchema = User.model_json_schema()
     userSchema
   exercise:
-    prompt: 기본 스키마 생성 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 기본 스키마 생성 예제에서 `userSchema` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class User(BaseModel):
           name: str
@@ -100,17 +100,17 @@ sections:
       userSchema = User.model_json_schema()
       userSchema
     hints:
-    - 기본 스키마 생성 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `userSchema = ...` 오른쪽 값입니다.
+    - 실행 뒤 `userSchema` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 기본 스키마 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 기본 스키마 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 기본 스키마 생성에서 `userSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 스키마 생성 실행 뒤 `userSchema` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: description
   title: 필드 설명 추가
   structuredPrimary: true
   subtitle: Field description
   goal: 필드 설명 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를
     이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다.
   tips:
@@ -125,7 +125,7 @@ sections:
     productSchema = Product.model_json_schema()
     json.dumps(productSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 필드 설명 추가 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 필드 설명 추가 예제에서 `productSchema` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Product(BaseModel):
           productId: str = Field(description="고유 상품 식별자")
@@ -136,17 +136,17 @@ sections:
       productSchema = Product.model_json_schema()
       json.dumps(productSchema, indent=2, ensure_ascii=False)
     hints:
-    - 필드 설명 추가 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `productSchema = ...` 오른쪽 값입니다.
+    - 실행 뒤 `productSchema` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 필드 설명 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 필드 설명 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 필드 설명 추가에서 `productSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 필드 설명 추가 실행 뒤 `productSchema` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: examples
   title: 예시 값 추가
   structuredPrimary: true
   subtitle: examples 파라미터
   goal: 예시 값 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델
     전체에 예시 데이터를 추가할 수도 있습니다.
   tips:
@@ -160,7 +160,7 @@ sections:
     contactSchema = Contact.model_json_schema()
     contactSchema["properties"]["name"]
   exercise:
-    prompt: 예시 값 추가 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 예시 값 추가 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Contact(BaseModel):
           name: str = Field(description="이름", examples=["홍길동", "김철수"])
@@ -170,17 +170,17 @@ sections:
       contactSchema = Contact.model_json_schema()
       contactSchema["properties"]["name"]
     hints:
-    - 예시 값 추가 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 예시 값 추가 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 예시 값 추가에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 예시 값 추가에서 `contactSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 예시 값 추가 실행 뒤 `contactSchema` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: nested
   title: 중첩 모델 스키마
   structuredPrimary: true
   subtitle: $defs와 $ref
   goal: 중첩 모델 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서
     재사용할 때 중복을 피할 수 있습니다.
   tips:
@@ -198,7 +198,7 @@ sections:
     articleSchema = Article.model_json_schema()
     json.dumps(articleSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 중첩 모델 스키마 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 중첩 모델 스키마 예제에서 `articleSchema` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Author(BaseModel):
           authorId: str = Field(description="작성자 ID")
@@ -212,17 +212,17 @@ sections:
       articleSchema = Article.model_json_schema()
       json.dumps(articleSchema, indent=2, ensure_ascii=False)
     hints:
-    - 중첩 모델 스키마 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `articleSchema = ...` 오른쪽 값입니다.
+    - 실행 뒤 `articleSchema` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 중첩 모델 스키마 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 중첩 모델 스키마에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 중첩 모델 스키마에서 `articleSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 중첩 모델 스키마 실행 뒤 `articleSchema` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: optional
   title: Optional과 Union 스키마
   structuredPrimary: true
   subtitle: anyOf 표현
   goal: Optional과 Union 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -235,7 +235,7 @@ sections:
     profileSchema = Profile.model_json_schema()
     profileSchema["properties"]["bio"]
   exercise:
-    prompt: Optional과 Union 스키마 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: Optional과 Union 스키마 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -245,17 +245,17 @@ sections:
       profileSchema = Profile.model_json_schema()
       profileSchema["properties"]["bio"]
     hints:
-    - Optional과 Union 스키마 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: Optional과 Union 스키마 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Optional과 Union 스키마에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: Optional과 Union 스키마에서 `profileSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Optional과 Union 스키마 실행 뒤 `profileSchema` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: enum
   title: Enum과 Literal 스키마
   structuredPrimary: true
   subtitle: 허용값 목록
   goal: Enum과 Literal 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수
     있습니다.
   tips:
@@ -273,7 +273,7 @@ sections:
     taskSchema = Task.model_json_schema()
     taskSchema["$defs"]["Status"]
   exercise:
-    prompt: Enum과 Literal 스키마 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: Enum과 Literal 스키마 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class Status(str, Enum):
           PENDING = "pending"
@@ -287,17 +287,17 @@ sections:
       taskSchema = Task.model_json_schema()
       taskSchema["$defs"]["Status"]
     hints:
-    - Enum과 Literal 스키마 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: Enum과 Literal 스키마 코드가 예외 없이 끝나야 합니다.
-    resultCheck: Enum과 Literal 스키마에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: Enum과 Literal 스키마에서 `PENDING` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Enum과 Literal 스키마 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: list
   title: 리스트와 딕셔너리
   structuredPrimary: true
   subtitle: array와 object
   goal: 리스트와 딕셔너리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -310,7 +310,7 @@ sections:
     taggedSchema = TaggedItem.model_json_schema()
     taggedSchema["properties"]["tags"]
   exercise:
-    prompt: 리스트와 딕셔너리 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 리스트와 딕셔너리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       class TaggedItem(BaseModel):
           itemId: str
@@ -320,17 +320,17 @@ sections:
       taggedSchema = TaggedItem.model_json_schema()
       taggedSchema["properties"]["tags"]
     hints:
-    - 리스트와 딕셔너리 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 리스트와 딕셔너리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 리스트와 딕셔너리에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 리스트와 딕셔너리에서 `taggedSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트와 딕셔너리 실행 뒤 `taggedSchema` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: mode
   title: 스키마 생성 모드
   structuredPrimary: true
   subtitle: validation vs serialization
   goal: 스키마 생성 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다.
 
@@ -350,7 +350,7 @@ sections:
     validationSchema = Item.model_json_schema(mode='validation')
     "formattedPrice" in validationSchema.get("properties", {})
   exercise:
-    prompt: 스키마 생성 모드 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 스키마 생성 모드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Item(BaseModel):
           name: str
@@ -364,17 +364,17 @@ sections:
       validationSchema = Item.model_json_schema(mode='validation')
       "formattedPrice" in validationSchema.get("properties", {})
     hints:
-    - 스키마 생성 모드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 스키마 생성 모드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 스키마 생성 모드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 스키마 생성 모드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 스키마 생성 모드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: custom
   title: 커스텀 스키마 수정
   structuredPrimary: true
   subtitle: json_schema_extra
   goal: 커스텀 스키마 수정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는
     메타데이터를 추가할 때 유용합니다.
   tips:
@@ -394,7 +394,7 @@ sections:
     customSchema = CustomModel.model_json_schema()
     customSchema.get("x-api-version"), customSchema.get("x-tags")
   exercise:
-    prompt: 커스텀 스키마 수정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 커스텀 스키마 수정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class CustomModel(BaseModel):
           model_config = {
@@ -410,17 +410,17 @@ sections:
       customSchema = CustomModel.model_json_schema()
       customSchema.get("x-api-version"), customSchema.get("x-tags")
     hints:
-    - 커스텀 스키마 수정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 커스텀 스키마 수정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 커스텀 스키마 수정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 커스텀 스키마 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 커스텀 스키마 수정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: result
   title: REST API 스키마 시스템
   structuredPrimary: true
   subtitle: 요청/응답 스키마 완성
   goal: REST API 스키마 시스템에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로
     Swagger 문서를 생성합니다.
   tips:
@@ -443,7 +443,7 @@ sections:
     requestSchema = CreateUserRequest.model_json_schema()
     json.dumps(requestSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: REST API 스키마 시스템 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: REST API 스키마 시스템 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       class CreateUserRequest(BaseModel):
           model_config = {
@@ -462,17 +462,17 @@ sections:
       requestSchema = CreateUserRequest.model_json_schema()
       json.dumps(requestSchema, indent=2, ensure_ascii=False)
     hints:
-    - REST API 스키마 시스템 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: REST API 스키마 시스템 코드가 예외 없이 끝나야 합니다.
-    resultCheck: REST API 스키마 시스템에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: REST API 스키마 시스템의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: REST API 스키마 시스템의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: API 스키마 프로젝트
   goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
 
@@ -522,7 +522,7 @@ sections:
     blogReqSchema = BlogPostRequest.model_json_schema()
     blogReqSchema
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       from pydantic import BaseModel, Field
       from typing import Optional
@@ -566,17 +566,17 @@ sections:
       blogReqSchema = BlogPostRequest.model_json_schema()
       blogReqSchema
     hints:
-    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 실습의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
     잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
@@ -616,7 +616,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -652,8 +652,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'

@@ -44,7 +44,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: slots와 메모리 최적화 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: slots와 메모리 최적화 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -53,7 +53,7 @@ sections:
   structuredPrimary: true
   subtitle: __dict__ 제거
   goal: slots 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     __slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가 생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다.
 
@@ -71,7 +71,7 @@ sections:
     p = Point(3, 4)
     p.x, p.y
   exercise:
-    prompt: slots 기초 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: slots 기초 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Point:
           __slots__ = ('x', 'y')
@@ -83,17 +83,17 @@ sections:
       p = Point(3, 4)
       p.x, p.y
     hints:
-    - slots 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: slots 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: slots 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: slots 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: slots 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: memory_comparison
   title: 메모리 비교
   structuredPrimary: true
   subtitle: sys.getsizeof
   goal: 메모리 비교에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로 오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의 크기는 포함되지 않습니다.
 
@@ -123,7 +123,7 @@ sections:
     slottedSize = sys.getsizeof(slotted)
     regularSize, slottedSize
   exercise:
-    prompt: 메모리 비교 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메모리 비교 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import sys
 
@@ -147,17 +147,17 @@ sections:
       slottedSize = sys.getsizeof(slotted)
       regularSize, slottedSize
     hints:
-    - 메모리 비교 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메모리 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메모리 비교에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메모리 비교의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메모리 비교 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: slots_inheritance
   title: 상속과 __slots__
   structuredPrimary: true
   subtitle: 부모와 자식 슬롯
   goal: 상속과 slots에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다. 부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 문제가 됩니다.
 
@@ -180,7 +180,7 @@ sections:
     child = Child(1, 2, 3)
     child.a, child.b, child.c
   exercise:
-    prompt: 상속과 slots 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 상속과 slots 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Parent:
           __slots__ = ('a', 'b')
@@ -197,17 +197,17 @@ sections:
       child = Child(1, 2, 3)
       child.a, child.b, child.c
     hints:
-    - 상속과 slots 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 상속과 slots 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 상속과 slots에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 상속과 slots의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 상속과 slots 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: slots_limitations
   title: 제한사항
   structuredPrimary: true
   subtitle: 트레이드오프
   goal: 제한사항에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     __slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다. 기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에 추가해야 합니다.
 
@@ -223,7 +223,7 @@ sections:
     strict.y = 2
     strict.x, strict.y
   exercise:
-    prompt: 제한사항 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 제한사항 예제에서 `__slots__`, `strict` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       class Strict:
           __slots__ = ('x', 'y')
@@ -233,17 +233,17 @@ sections:
       strict.y = 2
       strict.x, strict.y
     hints:
-    - 제한사항 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `__slots__ = ...` 오른쪽 값입니다.
+    - 실행 뒤 `__slots__` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 제한사항 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 제한사항에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 제한사항에서 `__slots__` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 제한사항 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: weakref_support
   title: weakref 지원
   structuredPrimary: true
   subtitle: __weakref__ 슬롯
   goal: weakref 지원에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__ 클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다.
 
@@ -260,7 +260,7 @@ sections:
     ref = weakref.ref(obj)
     ref() is obj
   exercise:
-    prompt: weakref 지원 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: weakref 지원 예제에서 `obj`, `ref` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       import weakref
 
@@ -271,17 +271,17 @@ sections:
       ref = weakref.ref(obj)
       ref() is obj
     hints:
-    - weakref 지원 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `obj = ...` 오른쪽 값입니다.
+    - 실행 뒤 `obj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: weakref 지원 코드가 예외 없이 끝나야 합니다.
-    resultCheck: weakref 지원에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: weakref 지원에서 `obj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: weakref 지원 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: performance
   title: 성능 비교
   structuredPrimary: true
   subtitle: 속성 접근 속도
   goal: 성능 비교에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     __slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리 절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다.
 
@@ -308,7 +308,7 @@ sections:
 
     accessTest(norm, 10000), accessTest(slot, 10000)
   exercise:
-    prompt: 성능 비교 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 성능 비교 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Normal:
           def __init__(self, x):
@@ -329,17 +329,17 @@ sections:
 
       accessTest(norm, 10000), accessTest(slot, 10000)
     hints:
-    - 성능 비교 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 성능 비교 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 성능 비교에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 성능 비교의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 성능 비교 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기'
   structuredPrimary: true
   subtitle: 예측 → 메모리 모델 → 동적 속성 차단 → dataclass slots 검증
   goal: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     __slots__는 속도를 위한 마법이 아니라, 대량으로 생성되는 단순 객체의 메모리와 속성 계약을 고정하는 선택입니다. 동적 속성이 필요한 모델에는 맞지 않으므로 실패 조건까지 확인해야 합니다.
 
@@ -388,7 +388,7 @@ sections:
 
     print("slots 이벤트 모델 검증 흐름 통과")
   exercise:
-    prompt: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       from dataclasses import dataclass
       import sys
@@ -430,17 +430,17 @@ sections:
 
       print("slots 이벤트 모델 검증 흐름 통과")
     hints:
-    - '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: __slots__와 메모리 최적화 마스터하기
   goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 10에서 배운 __slots__와 메모리 최적화를 난이도별로 복습합니다. __slots__는 인스턴스 속성을 고정하여 __dict__ 생성을 막고 메모리를
     절약하는 기법입니다. 수만~수백만 개의 객체를 생성할 때 효과적이며, 속성 접근 속도도 약간 빨라집니다. 🟢 기본 문제로 __slots__ 정의와 메모리 비교를 익히고, 🟡 응용
     문제로 상속, weakref 지원 패턴을 연습하세요. 🔴 심화 문제에서는 pickle 직렬화, 동적 슬롯 클래스, dataclass(slots=True) 등 고급 기법을 다룹니다.
@@ -457,7 +457,7 @@ sections:
     pt = Point(3, 4)
     pt.x, pt.y
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class Point:
           __slots__ = ('x', 'y')
@@ -468,8 +468,8 @@ sections:
       pt = Point(3, 4)
       pt.x, pt.y
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

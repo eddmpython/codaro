@@ -50,7 +50,7 @@ intro:
     - label: 과학 계산 환경
       detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
     - label: 정규성검정기 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
     - label: 정규성검정기 완료
       detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
@@ -59,7 +59,7 @@ sections:
   structuredPrimary: true
   subtitle: scipy.stats
   goal: 라이브러리 및 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     정규성 검정은 데이터가 정규분포(종 모양 곡선)를 따르는지 확인하는 통계적 절차입니다. scipy.stats는 여러 정규성 검정 함수를 제공합니다. Shapiro-Wilk는 소표본에 강력하고, D'Agostino-Pearson은 왜도와 첨도를 기반으로 합니다. 실제 비즈니스 데이터는 정규분포를 따르지 않는 경우가 많으므로, 검정과 변환 기법을 모두 익혀야 합니다.
 
@@ -78,7 +78,7 @@ sections:
     normalData = np.random.normal(loc=50, scale=10, size=100)
     purchaseData = np.random.lognormal(mean=4, sigma=1, size=150)
   exercise:
-    prompt: 라이브러리 및 데이터 로드 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 라이브러리 및 데이터 로드 예제에서 `normalData`, `purchaseData` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       import scipy
 
@@ -91,17 +91,17 @@ sections:
       normalData = np.random.normal(loc=50, scale=10, size=100)
       purchaseData = np.random.lognormal(mean=4, sigma=1, size=150)
     hints:
-    - 라이브러리 및 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `normalData = ...` 오른쪽 값입니다.
+    - 실행 뒤 `normalData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 라이브러리 및 데이터 로드 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 라이브러리 및 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 라이브러리 및 데이터 로드에서 `normalData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 라이브러리 및 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: explore
   title: 데이터 탐색
   structuredPrimary: true
   subtitle: 분포 시각화
   goal: 데이터 탐색에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     정규성 검정 전에 히스토그램과 기술통계량으로 분포 형태를 파악합니다. 정규분포는 종 모양으로 대칭이고, 평균 주위에 데이터가 집중됩니다. 비정규분포는 한쪽으로 치우치거나 여러 개의 봉우리가 있을 수 있습니다. 시각적 탐색은 검정 결과를 해석하는 데 도움이 됩니다.
 
@@ -124,7 +124,7 @@ sections:
     axExplore2.grid(True, alpha=0.3)
     figExplore
   exercise:
-    prompt: 데이터 탐색 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 데이터 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -141,17 +141,17 @@ sections:
       axExplore2.grid(True, alpha=0.3)
       figExplore
     hints:
-    - 데이터 탐색 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 데이터 탐색 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 데이터 탐색에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 데이터 탐색의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 데이터 탐색 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: shapiro
   title: Shapiro-Wilk 검정
   structuredPrimary: true
   subtitle: stats.shapiro
   goal: ShapiroWilk 검정에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
     Shapiro-Wilk 검정은 가장 강력한 정규성 검정 중 하나입니다. 5000개 이하의 샘플에 적합하며, W 통계량과 p-value를 반환합니다. 귀무가설은 '데이터가 정규분포를 따른다'입니다. p-value가 0.05보다 크면 귀무가설을 기각하지 않으므로 정규분포를 따른다고 판단합니다.
 
@@ -170,7 +170,7 @@ sections:
     })
     shapiroDf
   exercise:
-    prompt: ShapiroWilk 검정 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: ShapiroWilk 검정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       statNormal, pNormal = stats.shapiro(normalData)
       statPurchase, pPurchase = stats.shapiro(purchaseData[:50])
@@ -183,17 +183,17 @@ sections:
       })
       shapiroDf
     hints:
-    - ShapiroWilk 검정 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: ShapiroWilk 검정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: ShapiroWilk 검정에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: ShapiroWilk 검정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: ShapiroWilk 검정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: qqplot
   title: QQ 플롯 분석
   structuredPrimary: true
   subtitle: 시각적 정규성 확인
   goal: QQ 플롯 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     QQ 플롯(Quantile-Quantile Plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교합니다. 점들이 대각선에 가까우면 정규분포입니다. S자 형태는 꼬리가 두껍거나 얇음을 의미하고, 위로 휘면 오른쪽 꼬리가 깁니다. 대규모 데이터에서는 통계 검정보다 QQ 플롯이 더 실용적입니다.
 
@@ -217,7 +217,7 @@ sections:
         ax.set_title(title)
         ax.grid(True, alpha=0.3)
   exercise:
-    prompt: QQ 플롯 분석 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: QQ 플롯 분석 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def qqPlot(data, ax, title):
           sortedData = np.sort(data)
@@ -235,17 +235,17 @@ sections:
           ax.set_title(title)
           ax.grid(True, alpha=0.3)
     hints:
-    - QQ 플롯 분석 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: QQ 플롯 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: QQ 플롯 분석에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: QQ 플롯 분석의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: QQ 플롯 분석 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: transform
   title: 정규성 달성을 위한 변환
   structuredPrimary: true
   subtitle: 로그 변환
   goal: 정규성 달성을 위한 변환에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     오른쪽으로 치우친 데이터는 로그 변환으로 정규분포에 가깝게 만들 수 있습니다. 금액, 소득, 인구 등 양수이면서 범위가 넓은 데이터에 효과적입니다. 변환 후 통계 분석을 수행하고, 결과 해석 시 원래 스케일로 역변환합니다.
 
@@ -269,7 +269,7 @@ sections:
     plt.tight_layout()
     figTransform
   exercise:
-    prompt: 정규성 달성을 위한 변환 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 정규성 달성을 위한 변환 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       logPurchase = np.log(purchaseData)
 
@@ -287,17 +287,17 @@ sections:
       plt.tight_layout()
       figTransform
     hints:
-    - 정규성 달성을 위한 변환 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 정규성 달성을 위한 변환 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 정규성 달성을 위한 변환에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 정규성 달성을 위한 변환의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 정규성 달성을 위한 변환의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: boxcox
   title: Box-Cox 변환
   structuredPrimary: true
   subtitle: 최적 변환 자동 탐색
   goal: BoxCox 변환에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     Box-Cox 변환은 데이터를 정규분포에 가장 가깝게 만드는 최적의 λ(람다) 값을 자동으로 찾습니다. λ=0이면 로그 변환, λ=1이면 변환 없음, λ=0.5면 제곱근 변환과 동일합니다. 양수 데이터에만 적용 가능합니다.
 
@@ -315,7 +315,7 @@ sections:
     qqPlot(boxcoxData, axBox2, 'QQ: Box-Cox Transformed')
     figBoxcox
   exercise:
-    prompt: BoxCox 변환 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: BoxCox 변환 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       boxcoxData, lambdaOpt = stats.boxcox(purchaseData)
 
@@ -327,17 +327,17 @@ sections:
       qqPlot(boxcoxData, axBox2, 'QQ: Box-Cox Transformed')
       figBoxcox
     hints:
-    - BoxCox 변환 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: BoxCox 변환 코드가 예외 없이 끝나야 합니다.
-    resultCheck: BoxCox 변환에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: BoxCox 변환의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: BoxCox 변환 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: result
   title: 정규성 검정 종합 보고서
   structuredPrimary: true
   subtitle: 분석 방법 선택 가이드
   goal: 정규성 검정 종합 보고서에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: 정규성 검정 결과를 종합하여 적절한 분석 방법을 선택합니다. 정규분포를 따르면 모수적 검정(t-test, ANOVA)을, 따르지 않으면 비모수적 검정(Mann-Whitney,
     Kruskal-Wallis)이나 변환 후 분석을 사용합니다. 표본 크기가 30 이상이면 중심극한정리에 의해 평균의 분포는 정규분포에 가까워집니다.
   tips:
@@ -360,7 +360,7 @@ sections:
     })
     resultDf
   exercise:
-    prompt: 정규성 검정 종합 보고서 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 정규성 검정 종합 보고서 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       dagK, dagP = stats.normaltest(normalData)
       dagKp, dagPp = stats.normaltest(purchaseData)
@@ -379,17 +379,17 @@ sections:
       })
       resultDf
     hints:
-    - 정규성 검정 종합 보고서 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 정규성 검정 종합 보고서 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 정규성 검정 종합 보고서에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 정규성 검정 종합 보고서의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 정규성 검정 종합 보고서 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 정규성 검정 프로젝트
   goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     지금까지 배운 Shapiro-Wilk 검정, QQ 플롯, 로그/Box-Cox 변환을 활용하여 실제 데이터의 정규성을 평가합니다. 미션1은 직원 급여 데이터 분석, 미션2는 종합 정규성 리포트 작성입니다.
 
@@ -405,7 +405,7 @@ sections:
     np.random.seed(456)
     salaries = np.random.lognormal(mean=11, sigma=0.5, size=150)
   exercise:
-    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 `salaries` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       import numpy as np
       from scipy import stats
@@ -415,17 +415,17 @@ sections:
       np.random.seed(456)
       salaries = np.random.lognormal(mean=11, sigma=0.5, size=150)
     hints:
-    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `salaries = ...` 오른쪽 값입니다.
+    - 실행 뒤 `salaries` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `salaries` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 `salaries` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
   goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
     신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
@@ -449,7 +449,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -484,8 +484,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
-    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

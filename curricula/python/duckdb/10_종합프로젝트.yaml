@@ -30,33 +30,33 @@ intro:
   description: CTE, 윈도우 함수, 서브쿼리, CASE WHEN, GROUP BY, 문자열 함수, JOIN까지 모든 개념을 종합합니다.
   direction: 종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - 종합프로젝트 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - 종합프로젝트 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 1단계. 데이터 불러오기 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 비즈니스 질문 정의 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
     - label: 3단계. CTE로 구조화 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
     - label: 종합프로젝트 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: SQL 분석 환경
       detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
     - label: 종합프로젝트 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
     - label: 종합프로젝트 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: tips + titanic
   goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 두 데이터셋을 불러옵니다. tips는 레스토랑 팁 데이터, titanic은 타이타닉 생존자 데이터입니다. 이 종합 프로젝트에서는 두 데이터로 CTE, 윈도우
     함수, 서브쿼리, CASE WHEN, GROUP BY 등 모든 SQL 개념을 통합하여 실전 분석 파이프라인을 구축합니다.
   tips:
@@ -79,7 +79,7 @@ sections:
     tips = duckdb.from_df(dfTips)
     titanic = duckdb.from_df(dfTitanic)
   exercise:
-    prompt: 1단계. 데이터 불러오기 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -98,17 +98,17 @@ sections:
       tips = duckdb.from_df(dfTips)
       titanic = duckdb.from_df(dfTitanic)
     hints:
-    - 1단계. 데이터 불러오기 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 불러오기에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 불러오기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 1단계. 데이터 불러오기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step2_business_question
   title: 2단계. 비즈니스 질문 정의
   structuredPrimary: true
   subtitle: 분석 목표 설정
   goal: 2단계. 비즈니스 질문 정의에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 복잡한 분석은 명확한 질문에서 시작합니다. tips 데이터로 다음을 분석합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -117,23 +117,23 @@ sections:
         SELECT * FROM tips LIMIT 5
     """)
   exercise:
-    prompt: 2단계. 비즈니스 질문 정의 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 비즈니스 질문 정의 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT * FROM tips LIMIT 5
       """)
     hints:
-    - 2단계. 비즈니스 질문 정의 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. 비즈니스 질문 정의 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 비즈니스 질문 정의에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 비즈니스 질문 정의의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. 비즈니스 질문 정의 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step3_cte_basic
   title: 3단계. CTE로 구조화
   structuredPrimary: true
   subtitle: WITH 절 활용
   goal: 3단계. CTE로 구조화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: CTE(Common Table Expression)로 복잡한 쿼리를 단계별로 분리합니다. WITH 절을 사용하면 쿼리를 논리적 단위로 나누어 가독성을 높이고
     재사용할 수 있습니다. 복잡한 비즈니스 로직을 명확하게 표현하는 핵심 기법입니다.
   tips:
@@ -158,7 +158,7 @@ sections:
         ORDER BY totalSales DESC
     """)
   exercise:
-    prompt: 3단계. CTE로 구조화 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. CTE로 구조화 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH dailyStats AS (
@@ -179,17 +179,17 @@ sections:
           ORDER BY totalSales DESC
       """)
     hints:
-    - 3단계. CTE로 구조화 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. CTE로 구조화 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. CTE로 구조화에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. CTE로 구조화의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. CTE로 구조화 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step4_multi_cte
   title: 4단계. 다중 CTE
   structuredPrimary: true
   subtitle: 여러 CTE 연결
   goal: 4단계. 다중 CTE에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 여러 CTE를 연결하여 단계별로 데이터를 가공합니다. 첫 번째 CTE에서 기본 집계를 하고, 두 번째 CTE에서 순위를 매기는 식으로 파이프라인을 구성합니다.
     각 단계가 명확히 분리되어 디버깅과 유지보수가 쉬워집니다.
   tips:
@@ -222,7 +222,7 @@ sections:
         ORDER BY time, salesRank
     """)
   exercise:
-    prompt: 4단계. 다중 CTE 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 다중 CTE 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH dailyStats AS (
@@ -251,17 +251,17 @@ sections:
           ORDER BY time, salesRank
       """)
     hints:
-    - 4단계. 다중 CTE 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 4단계. 다중 CTE 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 다중 CTE에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 다중 CTE의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. 다중 CTE 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step5_window_row_number
   title: 5단계. ROW_NUMBER 활용
   structuredPrimary: true
   subtitle: 순위 번호 부여
   goal: 5단계. ROWNUMBER 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: ROW_NUMBER로 각 그룹 내 순위를 매깁니다. ROW_NUMBER는 같은 값이라도 고유한 번호를 부여하며, PARTITION BY로 그룹을 나누고 ORDER
     BY로 정렬 기준을 정합니다. 각 요일별 팁 상위 3건만 추출하는 등의 분석에 유용합니다.
   tips:
@@ -277,7 +277,7 @@ sections:
         QUALIFY tipRank <= 3
     """)
   exercise:
-    prompt: 5단계. ROWNUMBER 활용 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. ROWNUMBER 활용 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -289,17 +289,17 @@ sections:
           QUALIFY tipRank <= 3
       """)
     hints:
-    - 5단계. ROWNUMBER 활용 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 5단계. ROWNUMBER 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. ROWNUMBER 활용에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. ROWNUMBER 활용의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. ROWNUMBER 활용 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step6_window_lag
   title: 6단계. LAG 함수
   structuredPrimary: true
   subtitle: 이전 값과 비교
   goal: 6단계. LAG 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: LAG로 이전 행과 비교 분석합니다. titanic 데이터로 나이별 생존율 변화를 봅니다. LAG(컬럼, n)은 n행 앞의 값을 가져오며, 시계열 분석이나
     연속된 그룹 간 차이를 계산할 때 매우 유용합니다.
   tips:
@@ -340,7 +340,7 @@ sections:
         ORDER BY ageRange
     """)
   exercise:
-    prompt: 6단계. LAG 함수 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. LAG 함수 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH ageGroup AS (
@@ -377,17 +377,17 @@ sections:
           ORDER BY ageRange
       """)
     hints:
-    - 6단계. LAG 함수 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 6단계. LAG 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. LAG 함수에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 6단계. LAG 함수의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. LAG 함수 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step7_subquery
   title: 7단계. 서브쿼리 활용
   structuredPrimary: true
   subtitle: 중첩 쿼리
   goal: 7단계. 서브쿼리 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 서브쿼리로 평균 이상인 데이터를 필터링합니다. WHERE tip > (SELECT AVG(tip) FROM tips)처럼 서브쿼리를 사용하면 하드코딩 없이
     동적 기준으로 필터링할 수 있습니다. 데이터가 변해도 쿼리를 수정할 필요가 없습니다.
   tips:
@@ -406,7 +406,7 @@ sections:
         LIMIT 10
     """)
   exercise:
-    prompt: 7단계. 서브쿼리 활용 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 서브쿼리 활용 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -421,17 +421,17 @@ sections:
           LIMIT 10
       """)
     hints:
-    - 7단계. 서브쿼리 활용 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 7단계. 서브쿼리 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 서브쿼리 활용에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 7단계. 서브쿼리 활용의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. 서브쿼리 활용 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step8_case_when
   title: 8단계. CASE WHEN 분류
   structuredPrimary: true
   subtitle: 조건부 분류
   goal: 8단계. CASE WHEN 분류에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: CASE WHEN으로 데이터를 분류하고 분석합니다. 연속형 변수를 범주형으로 변환하거나, 복잡한 비즈니스 규칙을 적용할 때 필수적입니다. VIP, 우수, 보통
     같은 고객 등급을 만들어 세그먼트별 분석을 수행할 수 있습니다.
   tips:
@@ -460,7 +460,7 @@ sections:
         ORDER BY avgTipRate DESC
     """)
   exercise:
-    prompt: 8단계. CASE WHEN 분류 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. CASE WHEN 분류 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH tipGrade AS (
@@ -485,17 +485,17 @@ sections:
           ORDER BY avgTipRate DESC
       """)
     hints:
-    - 8단계. CASE WHEN 분류 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 8단계. CASE WHEN 분류 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. CASE WHEN 분류에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 8단계. CASE WHEN 분류의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. CASE WHEN 분류 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step9_having
   title: 9단계. GROUP BY + HAVING
   structuredPrimary: true
   subtitle: 집계 후 필터
   goal: 9단계. GROUP BY + HAVING에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: HAVING으로 집계 결과를 필터링합니다. WHERE는 행 단위 필터이고, HAVING은 그룹 단위 필터입니다. COUNT(*) >= 5처럼 집계 함수 결과로
     조건을 걸 때는 반드시 HAVING을 사용해야 합니다.
   tips:
@@ -515,7 +515,7 @@ sections:
         ORDER BY totalSales DESC
     """)
   exercise:
-    prompt: 9단계. GROUP BY + HAVING 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. GROUP BY + HAVING 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           SELECT
@@ -531,17 +531,17 @@ sections:
           ORDER BY totalSales DESC
       """)
     hints:
-    - 9단계. GROUP BY + HAVING 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 9단계. GROUP BY + HAVING 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. GROUP BY + HAVING에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 9단계. GROUP BY + HAVING의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. GROUP BY + HAVING 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step10_string_function
   title: 10단계. 문자열 함수
   structuredPrimary: true
   subtitle: 텍스트 가공
   goal: 10단계. 문자열 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 문자열 함수로 데이터를 가공합니다. SPLIT_PART로 이름에서 호칭을 추출하고, TRIM으로 공백을 제거합니다. 텍스트 데이터를 정제하고 분석 가능한 형태로
     변환하는 것은 실무에서 매우 중요한 스킬입니다.
   tips:
@@ -568,7 +568,7 @@ sections:
         ORDER BY survivalRate DESC
     """)
   exercise:
-    prompt: 10단계. 문자열 함수 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 문자열 함수 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH titleExtract AS (
@@ -591,17 +591,17 @@ sections:
           ORDER BY survivalRate DESC
       """)
     hints:
-    - 10단계. 문자열 함수 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 10단계. 문자열 함수 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 문자열 함수에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 10단계. 문자열 함수의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. 문자열 함수 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step11_comprehensive_tips
   title: 11단계. Tips 종합 분석
   structuredPrimary: true
   subtitle: 모든 개념 결합
   goal: 11단계. Tips 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 모든 개념을 결합한 종합 분석 쿼리입니다. 다중 CTE로 기본 데이터 가공 → 세그먼트 집계 → 순위 매기기를 단계별로 수행합니다. 이런 구조화된 쿼리는 복잡한
     비즈니스 요구사항을 명확하게 구현하며, 협업 시 이해하기 쉽습니다.
   tips:
@@ -656,7 +656,7 @@ sections:
         ORDER BY day, salesRank
     """)
   exercise:
-    prompt: 11단계. Tips 종합 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. Tips 종합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH baseData AS (
@@ -707,17 +707,17 @@ sections:
           ORDER BY day, salesRank
       """)
     hints:
-    - 11단계. Tips 종합 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 11단계. Tips 종합 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. Tips 종합 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 11단계. Tips 종합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 11단계. Tips 종합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step12_comprehensive_titanic
   title: 12단계. Titanic 종합 분석
   structuredPrimary: true
   subtitle: 생존 분석 파이프라인
   goal: 12단계. Titanic 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: titanic 데이터로 생존 요인을 종합 분석합니다. 승객 프로필 생성 → 생존율 분석 → 순위 매기기를 3단계 CTE로 구성합니다. 호칭, 나이 그룹, 요금
     등급을 조합하여 생존율에 영향을 미친 복합 요인을 파악합니다.
   tips:
@@ -777,7 +777,7 @@ sections:
         ORDER BY pclass, classRank
     """)
   exercise:
-    prompt: 12단계. Titanic 종합 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. Titanic 종합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH passengerProfile AS (
@@ -833,17 +833,17 @@ sections:
           ORDER BY pclass, classRank
       """)
     hints:
-    - 12단계. Titanic 종합 분석 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 12단계. Titanic 종합 분석 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. Titanic 종합 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 12단계. Titanic 종합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 12단계. Titanic 종합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: step13_final_pipeline
   title: 13단계. 최종 파이프라인
   structuredPrimary: true
   subtitle: 분석 보고서 생성
   goal: 13단계. 최종 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: 최종 분석 결과를 보고서 형태로 출력합니다. UNION ALL로 전체 통계와 요일별 통계를 하나의 결과로 합치고, 서브쿼리로 매출 점유율을 계산합니다. 이런
     형태의 요약 보고서는 경영진 보고용으로 자주 활용됩니다.
   tips:
@@ -883,7 +883,7 @@ sections:
             totalSales DESC
     """)
   exercise:
-    prompt: 13단계. 최종 파이프라인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 13단계. 최종 파이프라인 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
     starterCode: |-
       duckdb.sql("""
           WITH summary AS (
@@ -919,17 +919,17 @@ sections:
               totalSales DESC
       """)
     hints:
-    - 13단계. 최종 파이프라인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 13단계. 최종 파이프라인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 13단계. 최종 파이프라인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 13단계. 최종 파이프라인의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 13단계. 최종 파이프라인 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 심화 미션
   goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
   explanation: |-
     모든 개념을 종합하여 복합 분석 쿼리를 작성해봅시다.
 
@@ -950,7 +950,7 @@ sections:
     })
     tbl1 = duckdb.from_df(data)
   exercise:
-    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import pandas as pd
       import duckdb
@@ -965,11 +965,11 @@ sections:
       })
       tbl1 = duckdb.from_df(data)
     hints:
-    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -985,12 +985,14 @@ sections:
     - '문자열 함수: SPLIT_PART, TRIM으로 텍스트 가공'
   - type: text
     content: 10개 프로젝트를 완료하며 DuckDB SQL의 핵심 개념을 모두 마스터했습니다. 이제 어떤 데이터든 효과적으로 분석할 수 있습니다!
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
   goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
     결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
@@ -1017,7 +1019,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
     starterCode: |-
       import duckdb
 
@@ -1040,8 +1042,8 @@ sections:
       assert rowCount == 5
       rowCount
     hints:
-    - '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드에서 먼저 리스트 값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'

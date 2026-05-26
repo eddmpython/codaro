@@ -24,33 +24,33 @@ intro:
   - 메타프로그래밍 지원
   direction: inspect 객체 검사에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
-  - inspect 객체 검사 결과를 출력과 상태 기준으로 즉시 점검합니다.
-  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - inspect 객체 검사 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
   diagram:
     steps:
     - label: 모듈 임포트 입력 확인
-      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
     - label: 타입 확인 처리 실행
-      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
     - label: 함수 시그니처 결과 검증
-      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
     - label: inspect 객체 검사 재사용
-      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 업무 코드 환경
+    - label: 표준 라이브러리 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: inspect 객체 검사 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
     - label: inspect 객체 검사 완료
-      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
 sections:
 - id: module_import
   title: 모듈 임포트
   structuredPrimary: true
   subtitle: inspect 시작하기
   goal: 모듈 임포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다.
 
@@ -66,7 +66,7 @@ sections:
     sig = inspect.signature(greet)
     str(sig)
   exercise:
-    prompt: 모듈 임포트 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 모듈 임포트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -76,17 +76,17 @@ sections:
       sig = inspect.signature(greet)
       str(sig)
     hints:
-    - 모듈 임포트 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 모듈 임포트 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 모듈 임포트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 모듈 임포트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 모듈 임포트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: type_checking
   title: 타입 확인
   structuredPrimary: true
   subtitle: 객체 종류 판별
   goal: 타입 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다.
 
@@ -107,7 +107,7 @@ sections:
 
     funcCheck, classCheck
   exercise:
-    prompt: 타입 확인 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 타입 확인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -122,17 +122,17 @@ sections:
 
       funcCheck, classCheck
     hints:
-    - 타입 확인 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 타입 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 타입 확인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 타입 확인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 타입 확인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: signatures
   title: 함수 시그니처
   structuredPrimary: true
   subtitle: 매개변수 정보
   goal: 함수 시그니처에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     signature()로 함수의 매개변수 정보를 추출할 수 있습니다.
 
@@ -150,7 +150,7 @@ sections:
 
     params
   exercise:
-    prompt: 함수 시그니처 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 함수 시그니처 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -162,17 +162,17 @@ sections:
 
       params
     hints:
-    - 함수 시그니처 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 함수 시그니처 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 함수 시그니처에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 함수 시그니처의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 함수 시그니처 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: members
   title: 멤버 조회
   structuredPrimary: true
   subtitle: getmembers 함수
   goal: 멤버 조회에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다.
 
@@ -197,7 +197,7 @@ sections:
     userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
     userDefined
   exercise:
-    prompt: 멤버 조회 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 멤버 조회 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -216,17 +216,17 @@ sections:
       userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
       userDefined
     hints:
-    - 멤버 조회 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 멤버 조회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 멤버 조회에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 멤버 조회의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 멤버 조회 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: source_code
   title: 소스 코드 조회
   structuredPrimary: true
   subtitle: getsource 함수
   goal: 소스 코드 조회에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다.
 
@@ -261,7 +261,7 @@ sections:
     assert 'def fibonacci' in source
     source
   exercise:
-    prompt: 소스 코드 조회 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 소스 코드 조회 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import importlib.util
       import inspect
@@ -290,17 +290,17 @@ sections:
       assert 'def fibonacci' in source
       source
     hints:
-    - 소스 코드 조회 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 소스 코드 조회 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 소스 코드 조회에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 소스 코드 조회의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 소스 코드 조회 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: advanced_inspection
   title: 고급 검사
   structuredPrimary: true
   subtitle: 프레임과 스택
   goal: 고급 검사에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다.
 
@@ -317,7 +317,7 @@ sections:
     funcName = currentFunction()
     funcName
   exercise:
-    prompt: 고급 검사 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 고급 검사 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -328,17 +328,17 @@ sections:
       funcName = currentFunction()
       funcName
     hints:
-    - 고급 검사 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 고급 검사 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 고급 검사에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 고급 검사의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 고급 검사 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: 실무 활용 사례
   goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: |-
     inspect 모듈을 활용한 실무 패턴들입니다.
 
@@ -364,7 +364,7 @@ sections:
 
     documentation
   exercise:
-    prompt: 실전 활용 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실전 활용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -384,17 +384,17 @@ sections:
 
       documentation
     hints:
-    - 실전 활용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실전 활용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 실전 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '검증 루프: 플러그인 계약 검사'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
   goal: '검증 루프: 플러그인 계약 검사에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: inspect의 실무 가치는 런타임 객체를 들여다본 뒤 계약을 자동 검증하는 데 있습니다. 함수 시그니처, 타입 힌트, docstring, 공개 메서드 목록을
     검사하면 플러그인이나 자동화 훅을 실행 전에 걸러낼 수 있습니다.
   tips:
@@ -429,7 +429,7 @@ sections:
     assert actionReport['requiredParameters'] == ['payload', 'context']
     actionReport
   exercise:
-    prompt: '검증 루프: 플러그인 계약 검사 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
+    prompt: '검증 루프: 플러그인 계약 검사 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       import inspect
       from typing import get_type_hints
@@ -460,17 +460,17 @@ sections:
       assert actionReport['requiredParameters'] == ['payload', 'context']
       actionReport
     hints:
-    - '검증 루프: 플러그인 계약 검사 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '검증 루프: 플러그인 계약 검사 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '검증 루프: 플러그인 계약 검사에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '검증 루프: 플러그인 계약 검사의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 플러그인 계약 검사 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
   goal: 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 종합 복습의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -483,7 +483,7 @@ sections:
     check1 = inspect.isfunction(test1)
     check1
   exercise:
-    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       import inspect
 
@@ -493,8 +493,8 @@ sections:
       check1 = inspect.isfunction(test1)
       check1
     hints:
-    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

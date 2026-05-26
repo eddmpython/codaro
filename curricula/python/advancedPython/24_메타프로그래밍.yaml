@@ -44,7 +44,7 @@ intro:
     - label: 고급 설계 환경
       detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
     - label: 메타프로그래밍 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
     - label: 메타프로그래밍 완료
       detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
@@ -53,7 +53,7 @@ sections:
   structuredPrimary: true
   subtitle: 클래스를 생성하는 클래스
   goal: 메타클래스 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 클래스를 생성하는 클래스 - 메타클래스
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -72,7 +72,7 @@ sections:
     metaResult = (metaCreatedBy, metaType.__name__)
     metaResult
   exercise:
-    prompt: 메타클래스 기초 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메타클래스 기초 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class SimpleMeta(type):
           def __new__(mcs, name, bases, namespace):
@@ -88,17 +88,17 @@ sections:
       metaResult = (metaCreatedBy, metaType.__name__)
       metaResult
     hints:
-    - 메타클래스 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메타클래스 기초 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메타클래스 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메타클래스 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메타클래스 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: metaclass_patterns
   title: 메타클래스 활용
   structuredPrimary: true
   subtitle: 싱글톤, 등록, 검증 패턴
   goal: 메타클래스 활용에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 싱글톤, 등록, 검증 등 메타클래스 활용 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -120,7 +120,7 @@ sections:
     singletonCheck = dbConn1 is dbConn2
     singletonCheck
   exercise:
-    prompt: 메타클래스 활용 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 메타클래스 활용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class SingletonMeta(type):
           _instances = {}
@@ -139,17 +139,17 @@ sections:
       singletonCheck = dbConn1 is dbConn2
       singletonCheck
     hints:
-    - 메타클래스 활용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 메타클래스 활용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 메타클래스 활용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 메타클래스 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메타클래스 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: descriptors
   title: 디스크립터
   structuredPrimary: true
   subtitle: 속성 접근 제어
   goal: 디스크립터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 속성 접근을 제어하는 디스크립터 프로토콜
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -183,7 +183,7 @@ sections:
     typedResult = (typedName, typedAge)
     typedResult
   exercise:
-    prompt: 디스크립터 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 디스크립터 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class TypedProperty:
           def __init__(self, name, expectedType):
@@ -214,17 +214,17 @@ sections:
       typedResult = (typedName, typedAge)
       typedResult
     hints:
-    - 디스크립터 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 디스크립터 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 디스크립터에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 디스크립터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 디스크립터 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: dynamic_attrs
   title: 동적 속성
   structuredPrimary: true
   subtitle: __getattr__, __setattr__ 활용
   goal: 동적 속성에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: __getattr__, __setattr__, __getattribute__ 활용
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -257,7 +257,7 @@ sections:
     dynamicResult = (dynamicFoo, dynamicCount, dynamicUndef)
     dynamicResult
   exercise:
-    prompt: 동적 속성 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 동적 속성 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class DynamicAttrs:
           def __init__(self):
@@ -287,17 +287,17 @@ sections:
       dynamicResult = (dynamicFoo, dynamicCount, dynamicUndef)
       dynamicResult
     hints:
-    - 동적 속성 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 동적 속성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 동적 속성에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 동적 속성의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 동적 속성 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: new_init
   title: __new__와 __init__
   structuredPrimary: true
   subtitle: 객체 생성 과정 제어
   goal: new와 init에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: 객체 생성 과정 제어하기
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -322,7 +322,7 @@ sections:
     immutableResult = (ptX, ptY, ptRepr)
     immutableResult
   exercise:
-    prompt: new와 init 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: new와 init 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class ImmutablePoint:
           def __new__(cls, x, y):
@@ -344,17 +344,17 @@ sections:
       immutableResult = (ptX, ptY, ptRepr)
       immutableResult
     hints:
-    - new와 init 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: new와 init 코드가 예외 없이 끝나야 합니다.
-    resultCheck: new와 init에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: new와 init의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: new와 init 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: dynamic_class
   title: 동적 클래스 생성
   structuredPrimary: true
   subtitle: type()으로 클래스 생성
   goal: 동적 클래스 생성에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: type()을 사용한 동적 클래스 생성
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -382,7 +382,7 @@ sections:
     dynamicClassResult = (dynUserRepr, dynUserRole)
     dynamicClassResult
   exercise:
-    prompt: 동적 클래스 생성 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 동적 클래스 생성 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       def makeClass(className, **attrs):
           def initMethod(self, **kwargs):
@@ -407,17 +407,17 @@ sections:
       dynamicClassResult = (dynUserRepr, dynUserRole)
       dynamicClassResult
     hints:
-    - 동적 클래스 생성 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 동적 클래스 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 동적 클래스 생성에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 동적 클래스 생성의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 동적 클래스 생성 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 선언형 주문 모델 만들기'
   structuredPrimary: true
   subtitle: descriptor와 metaclass로 필드 계약을 자동 수집하고 검증합니다
   goal: '현업 흐름 검증: 선언형 주문 모델 만들기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     메타프로그래밍은 신기한 문법이 아니라 프레임워크가 반복 규칙을 대신 적용하게 만드는 방법입니다. 필드 정의를 클래스 선언에 적으면 메타클래스가 필드를 모으고, 디스크립터가 타입 검증을 수행하는 흐름을 확인하세요.
 
@@ -471,7 +471,7 @@ sections:
     assert Order.fields == ("orderId", "amount")
     assert order.toDict() == {"orderId": "O-100", "amount": 12000}
   exercise:
-    prompt: '현업 흐름 검증: 선언형 주문 모델 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
+    prompt: '현업 흐름 검증: 선언형 주문 모델 만들기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
     starterCode: |-
       class Field:
           def __init__(self, expectedType):
@@ -518,17 +518,17 @@ sections:
       assert Order.fields == ("orderId", "amount")
       assert order.toDict() == {"orderId": "O-100", "amount": 12000}
     hints:
-    - '현업 흐름 검증: 선언형 주문 모델 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 선언형 주문 모델 만들기 코드가 예외 없이 끝나야 합니다.'
-    resultCheck: '현업 흐름 검증: 선언형 주문 모델 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
+    noError: '현업 흐름 검증: 선언형 주문 모델 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 선언형 주문 모델 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 메타프로그래밍 실습
   goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
   explanation: Day 24에서 배운 메타프로그래밍을 난이도별로 복습합니다. 메타클래스는 클래스 생성 과정을 제어하여 ORM, 검증 프레임워크 등의 기반이 됩니다. 디스크립터는
     속성 접근을 세밀하게 제어하고, 동적 속성은 런타임에 클래스를 조작합니다. 🟢 기본 문제로 메타클래스의 __new__와 __init__ 동작을 익히고, 🟡 응용 문제로 디스크립터와
     동적 속성 생성을 연습하세요. 🔴 심화 문제에서는 Django ORM, SQLAlchemy 스타일의 선언적 모델 정의를 직접 구현해봅니다. 메타프로그래밍은 프레임워크 설계자의
@@ -556,7 +556,7 @@ sections:
     ex1Result = (A.instanceNumber, B.instanceNumber, C.instanceNumber)
     ex1Result
   exercise:
-    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
+    prompt: 종합 연습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
     starterCode: |-
       class CounterMeta(type):
           count = 0
@@ -578,8 +578,8 @@ sections:
       ex1Result = (A.instanceNumber, B.instanceNumber, C.instanceNumber)
       ex1Result
     hints:
-    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
-    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
+    noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

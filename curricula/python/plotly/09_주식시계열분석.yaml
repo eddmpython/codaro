@@ -49,7 +49,7 @@ intro:
     - label: 인터랙티브 차트 환경
       detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
     - label: 주식시계열분석 실행
-      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
     - label: 주식시계열분석 완료
       detail: 검증된 코드를 공유 대시보드로 남깁니다.
 sections:
@@ -58,7 +58,7 @@ sections:
   structuredPrimary: true
   subtitle: 주식 가격 데이터 로드
   goal: 1단계. 데이터 준비에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: px.data.stocks()는 6개 기술주(GOOG, AAPL, AMZN, FB, NFLX, MSFT)의 2018~2020년 일별 주가 데이터입니다. 총
     505행, 7컬럼(date + 6종목)으로 구성되어 있습니다. 주가 데이터는 2018년 1월 1일을 기준(1.0)으로 정규화된 상대 가격으로, 각 종목의 수익률을 공정하게 비교할
     수 있게 합니다. 예를 들어 값이 1.5면 기준 시점 대비 50% 상승, 0.8이면 20% 하락을 의미합니다. 시계열 데이터 시각화는 금융, 판매, 웹 트래픽, 센서 데이터 등
@@ -74,7 +74,7 @@ sections:
     stocks = px.data.stocks()
     stocks.shape
   exercise:
-    prompt: 1단계. 데이터 준비 예제에서 입력값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 1단계. 데이터 준비 예제에서 `stocks` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       import plotly.express as px
       import plotly.graph_objects as go
@@ -84,11 +84,11 @@ sections:
       stocks = px.data.stocks()
       stocks.shape
     hints:
-    - 1단계. 데이터 준비 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `stocks = ...` 오른쪽 값입니다.
+    - 실행 뒤 `stocks` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 1단계. 데이터 준비 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 1단계. 데이터 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 1단계. 데이터 준비에서 `stocks` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 1단계. 데이터 준비 실행 뒤 `stocks` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step2_head
   title: 2단계. 데이터 확인
   structuredPrimary: true
@@ -103,14 +103,14 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: stocks.head(10)
   exercise:
-    prompt: 2단계. 데이터 확인 예제에서 입력값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 2단계. 데이터 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: stocks.head(10)
     hints:
-    - 2단계. 데이터 확인 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대시보드 데이터을 만드는 첫 줄과 인터랙티브 시각화 줄에서 찾으세요.
+    - 실행 뒤 툴팁과 선택 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 2단계. 데이터 확인 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 2단계. 데이터 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 2단계. 데이터 확인의 수정 코드가 인터랙티브 시각화 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 데이터 확인 실행 결과가 툴팁과 선택 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step3_basic_line
   title: 3단계. 기본 선 그래프
   structuredPrimary: true
@@ -126,20 +126,20 @@ sections:
   - px.line() 핵심 x축에 시간, y축에 값을 넣으면 시계열 차트가 됩니다. scatter와 달리 점을 선으로 연결합니다.
   snippet: px.line(stocks, x='date', y='GOOG', title='구글 주가 추이')
   exercise:
-    prompt: 3단계. 기본 선 그래프 예제에서 입력값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 3단계. 기본 선 그래프 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
     starterCode: px.line(stocks, x='date', y='GOOG', title='구글 주가 추이')
     hints:
-    - 3단계. 기본 선 그래프 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대시보드 데이터을 만드는 첫 줄과 인터랙티브 시각화 줄에서 찾으세요.
+    - 실행 뒤 툴팁과 선택 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
-    noError: 3단계. 기본 선 그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 3단계. 기본 선 그래프에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 3단계. 기본 선 그래프의 수정 코드가 인터랙티브 시각화 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 기본 선 그래프 실행 결과가 툴팁과 선택 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step4_multi_line
   title: 4단계. 다중 선 그래프
   structuredPrimary: true
   subtitle: 여러 종목 비교
   goal: 4단계. 다중 선 그래프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 여러 종목을 한 차트에 표시하려면 데이터를 긴 형태(long format)로 변환해야 합니다. pandas의 melt() 함수는 넓은 형태(wide format)의
     데이터프레임을 긴 형태로 재구조화하며, id_vars='date'는 유지할 컬럼, var_name='stock'은 종목명을 저장할 새 컬럼명, value_name='price'는
     주가를 저장할 새 컬럼명을 지정합니다. 변환 후 color='stock'을 지정하면 Plotly가 각 종목을 다른 색상의 선으로 자동 구분하여 그려줍니다. 이렇게 하면 6개 종목의
@@ -151,22 +151,22 @@ sections:
     stocksMelted = stocks.melt(id_vars='date', var_name='stock', value_name='price')
     px.line(stocksMelted, x='date', y='price', color='stock', title='6개 종목 주가 비교')
   exercise:
-    prompt: 4단계. 다중 선 그래프 예제에서 입력값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 4단계. 다중 선 그래프 예제에서 `stocksMelted` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       stocksMelted = stocks.melt(id_vars='date', var_name='stock', value_name='price')
       px.line(stocksMelted, x='date', y='price', color='stock', title='6개 종목 주가 비교')
     hints:
-    - 4단계. 다중 선 그래프 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `stocksMelted = ...` 오른쪽 값입니다.
+    - 실행 뒤 `stocksMelted` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 4단계. 다중 선 그래프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 4단계. 다중 선 그래프에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 4단계. 다중 선 그래프에서 `stocksMelted` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 다중 선 그래프 실행 뒤 `stocksMelted` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step5_facet
   title: 5단계. 패싯 분리
   structuredPrimary: true
   subtitle: facet_col 활용
   goal: 5단계. 패싯 분리에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 종목별로 차트를 분리하면 각 종목의 추세를 더 명확히 볼 수 있습니다. facet_col='stock'은 stock 컬럼의 각 고유값(종목)마다 별도의 차트를
     생성하여 가로로 배치하며, facet_col_wrap=3은 한 행에 최대 3개 차트를 배치한 후 다음 행으로 넘어가도록 설정합니다. 하나의 차트에 6개 선이 겹치면 개별 패턴이
     흐려지지만, 패싯으로 분리하면 각 종목의 고유한 변동성과 추세를 독립적으로 분석할 수 있습니다. 실무에서는 제품별, 지역별, 고객 세그먼트별 시계열을 비교할 때 패싯을 활용하며,
@@ -183,7 +183,7 @@ sections:
         title='종목별 주가 추이'
     )
   exercise:
-    prompt: 5단계. 패싯 분리 예제에서 입력값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 5단계. 패싯 분리 예제에서 `x`, `y`, `facet_col` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
     starterCode: |-
       px.line(
           stocksMelted,
@@ -194,17 +194,17 @@ sections:
           title='종목별 주가 추이'
       )
     hints:
-    - 5단계. 패싯 분리 코드에서 먼저 입력값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
+    - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
-    noError: 5단계. 패싯 분리 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 5단계. 패싯 분리에서 바꾼 입력값이 결과에 반영되어야 합니다.
+    noError: 5단계. 패싯 분리에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 패싯 분리 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_update_layout
   title: 6단계. 레이아웃 수정
   structuredPrimary: true
   subtitle: update_layout()
   goal: 6단계. 레이아웃 수정에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: update_layout()으로 차트 크기, 범례 위치, 배경색 등을 조정하여 가독성과 전문성을 높입니다. legend 파라미터를 딕셔너리로 전달하면 범례의
     방향(orientation='h'는 가로 배치), 세로 위치(yanchor='bottom', y=1.02는 차트 상단 바로 위), 가로 위치(xanchor='center', x=0.5는
     중앙 정렬)를 세밀하게 제어할 수 있습니다. 범례를 차트 외부 상단에 배치하면 차트 영역을 최대한 활용하면서도 종목 구분을 명확히 할 수 있으며, xaxis_title과 yaxis_title로
@@ -229,7 +229,7 @@ sections:
     )
     figLayout
   exercise:
-    prompt: 6단계. 레이아웃 수정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 6단계. 레이아웃 수정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figLayout = px.line(stocksMelted, x='date', y='price', color='stock')
       figLayout.update_layout(
@@ -247,17 +247,17 @@ sections:
       )
       figLayout
     hints:
-    - 6단계. 레이아웃 수정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 6단계. 레이아웃 수정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 6단계. 레이아웃 수정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 6단계. 레이아웃 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 레이아웃 수정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_update_traces
   title: 7단계. 트레이스 수정
   structuredPrimary: true
   subtitle: update_traces()
   goal: 7단계. 트레이스 수정에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     update_traces()로 선 스타일을 변경합니다. 선 두께, 점 표시 여부 등을 조정합니다.
 
@@ -275,7 +275,7 @@ sections:
     figTraces.update_layout(title='선 스타일 커스터마이징')
     figTraces
   exercise:
-    prompt: 7단계. 트레이스 수정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 7단계. 트레이스 수정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figTraces = px.line(stocksMelted, x='date', y='price', color='stock')
       figTraces.update_traces(
@@ -286,17 +286,17 @@ sections:
       figTraces.update_layout(title='선 스타일 커스터마이징')
       figTraces
     hints:
-    - 7단계. 트레이스 수정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 7단계. 트레이스 수정 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 7단계. 트레이스 수정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 7단계. 트레이스 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 트레이스 수정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_template
   title: 8단계. 템플릿 적용
   structuredPrimary: true
   subtitle: 차트 테마 변경
   goal: 8단계. 템플릿 적용에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: |-
     template으로 차트 전체 테마를 변경합니다. plotly_dark는 어두운 배경의 금융 차트 스타일입니다.
 
@@ -316,7 +316,7 @@ sections:
     )
     figDark
   exercise:
-    prompt: 8단계. 템플릿 적용 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 8단계. 템플릿 적용 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figDark = px.line(
           stocksMelted,
@@ -328,17 +328,17 @@ sections:
       )
       figDark
     hints:
-    - 8단계. 템플릿 적용 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 8단계. 템플릿 적용 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 8단계. 템플릿 적용에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 8단계. 템플릿 적용의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 템플릿 적용의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_subplots
   title: 9단계. 서브플롯 생성
   structuredPrimary: true
   subtitle: make_subplots()
   goal: 9단계. 서브플롯 생성에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: make_subplots()로 여러 개의 차트를 하나의 Figure에 배치하여 종합 대시보드를 만듭니다. rows=2, cols=3으로 2행 3열 격자를 정의하고,
     subplot_titles로 각 서브플롯의 제목(종목명)을 리스트로 지정합니다. enumerate()와 인덱스 계산(row = i // 3 + 1, col = i % 3 + 1)으로
     반복문 내에서 각 종목의 차트를 올바른 위치에 배치하며, go.Scatter는 px.line보다 세밀한 제어가 가능한 저수준 객체입니다. 이렇게 하면 6개 종목을 격자 형태로
@@ -361,7 +361,7 @@ sections:
     figSubplots.update_layout(height=600, title_text='종목별 주가 추이')
     figSubplots
   exercise:
-    prompt: 9단계. 서브플롯 생성 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 9단계. 서브플롯 생성 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       stockList = ['GOOG', 'AAPL', 'AMZN', 'FB', 'NFLX', 'MSFT']
 
@@ -378,17 +378,17 @@ sections:
       figSubplots.update_layout(height=600, title_text='종목별 주가 추이')
       figSubplots
     hints:
-    - 9단계. 서브플롯 생성 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 9단계. 서브플롯 생성 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 9단계. 서브플롯 생성에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 9단계. 서브플롯 생성의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 서브플롯 생성 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step10_subplots_styled
   title: 10단계. 스타일링된 서브플롯
   structuredPrimary: true
   subtitle: 템플릿 + 서브플롯
   goal: 10단계. 스타일링된 서브플롯에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 서브플롯에도 템플릿과 레이아웃 설정을 적용하여 전문적인 대시보드를 완성합니다. 각 종목마다 고유한 색상(colors 리스트)을 지정하여 시각적 구분을 명확히
     하고, line=dict(color=colors[i], width=2)로 선 색상과 두께를 개별 제어합니다. template='plotly_dark'는 어두운 배경의 금융 차트
     스타일을 적용하여 선이 더 선명하게 보이도록 하며, showlegend=False는 각 서브플롯에 제목이 있어 범례가 불필요하므로 공간을 절약합니다. vertical_spacing=0.12는
@@ -422,7 +422,7 @@ sections:
     )
     figStyled
   exercise:
-    prompt: 10단계. 스타일링된 서브플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 10단계. 스타일링된 서브플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       colors = ['#00D4FF', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
 
@@ -450,17 +450,17 @@ sections:
       )
       figStyled
     hints:
-    - 10단계. 스타일링된 서브플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 10단계. 스타일링된 서브플롯 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 10단계. 스타일링된 서브플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 10단계. 스타일링된 서브플롯의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 스타일링된 서브플롯 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step11_result
   title: 11단계. 최종 결과물
   structuredPrimary: true
   subtitle: 다중 주식 비교 차트
   goal: 11단계. 최종 결과물에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
   explanation: 모든 개념을 종합한 최종 비교 차트입니다. 정규화된 가격으로 수익률을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -507,7 +507,7 @@ sections:
     figFinal.update_yaxes(title_text='상대 가격', row=2, col=1)
     figFinal
   exercise:
-    prompt: 11단계. 최종 결과물 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 11단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
       figFinal = make_subplots(
           rows=2, cols=1,
@@ -551,17 +551,17 @@ sections:
       figFinal.update_yaxes(title_text='상대 가격', row=2, col=1)
       figFinal
     hints:
-    - 11단계. 최종 결과물 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
-    noError: 11단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 11단계. 최종 결과물에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
+    noError: 11단계. 최종 결과물의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 최종 결과물 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 주식 분석 프로젝트
   goal: 실습에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     배운 내용으로 주식 시계열 분석을 해봅시다. 각 미션은 템플릿 변경, 패싯 활용, 레이아웃 커스터마이징, 서브플롯 비교 등 실전에서 자주 사용하는 기법들을 종합합니다. 완성하면 다양한 스타일의 시계열 차트를 만들고, 여러 종목을 효과적으로 비교 분석할 수 있게 되며, 실무 금융 대시보드 제작에 필요한 모든 스킬을 갖추게 됩니다.
 
@@ -575,7 +575,7 @@ sections:
     priceData = px.data.stocks()
     twoStock = priceData.melt(id_vars='date', value_vars=['AAPL', 'MSFT'], var_name='stock', value_name='price')
   exercise:
-    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import plotly.express as px
       import pandas as pd
@@ -583,11 +583,11 @@ sections:
       priceData = px.data.stocks()
       twoStock = priceData.melt(id_vars='date', value_vars=['AAPL', 'MSFT'], var_name='stock', value_name='price')
     hints:
-    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 실습 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 실습에서 `priceData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -605,12 +605,14 @@ sections:
     - make_subplots() - 여러 차트 배치
   - type: text
     content: 다음 시간에는 모든 개념을 종합한 대시보드 프로젝트를 진행합니다.
+  goal: 정리에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
 - id: workflow_validation
   title: 12단계. 주식 시계열 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
   goal: 12단계. 주식 시계열 검증 루프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: |-
     시계열 선 그래프는 날짜 정렬과 종목 컬럼 검증이 먼저입니다. Figure trace가 종목 수와 맞는지 확인하고, 수익률 기준으로 변주합니다.
 
@@ -629,7 +631,7 @@ sections:
     assert stockFlow[stockColumns].gt(0).all().all()
     assert stockFlow["date"].is_monotonic_increasing
   exercise:
-    prompt: 12단계. 주식 시계열 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
+    prompt: 12단계. 주식 시계열 검증 루프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       import plotly.express as px
 
@@ -642,8 +644,8 @@ sections:
       assert stockFlow[stockColumns].gt(0).all().all()
       assert stockFlow["date"].is_monotonic_increasing
     hints:
-    - 12단계. 주식 시계열 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
-    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: 12단계. 주식 시계열 검증 루프 코드가 예외 없이 끝나야 합니다.
-    resultCheck: 12단계. 주식 시계열 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
+    noError: 12단계. 주식 시계열 검증 루프에서 `stockFlow` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 주식 시계열 검증 루프에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
