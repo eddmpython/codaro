@@ -250,7 +250,9 @@ const failed = await runtime.runNotebookBlock({{
   runtimePackages: [],
   sessionId: "session-1",
 }});
-assert.equal(failed.result, undefined);
+assert.equal(failed.result.status, "package-error");
+assert.equal(failed.result.blockId, "cell-1");
+assert.match(failed.result.stderr, /라이브러리 준비 실패\\ninstall failed/);
 assert.equal(failed.notice.title, "라이브러리 준비 실패");
 assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install"]);
 

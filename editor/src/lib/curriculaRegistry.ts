@@ -11,7 +11,7 @@ import type {
   ExecutionKind,
 } from "@/types";
 
-const rawCurricula = import.meta.glob("../../../curricula/python/**/*.yaml", {
+const rawCurricula = import.meta.glob("../../../curricula/python/*/*.yaml", {
   import: "default",
   query: "?raw",
 }) as Record<string, () => Promise<string>>;
@@ -181,6 +181,11 @@ const categoryLabels: Record<string, { title: string; track: string; description
     track: "자동화·실무",
     description: "실행 가능한 Python 셀로 작은 프로젝트를 만듭니다.",
   },
+  playwright: {
+    title: "Playwright",
+    track: "자동화·실무",
+    description: "브라우저 화면 점검, 폼 입력, 네트워크 mock, 증거 저장을 Python으로 자동화합니다.",
+  },
 };
 
 const categoryGroups: Record<string, string[]> = {
@@ -188,7 +193,7 @@ const categoryGroups: Record<string, string[]> = {
   "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-  "자동화·실무": ["excel", "regex", "practical"],
+  "자동화·실무": ["excel", "regex", "practical", "playwright"],
   "이미지·비전": ["pillow", "opencv"],
 };
 
@@ -853,10 +858,10 @@ function structuredCheckMarkdown(check: Record<string, string>) {
 
 function checkLabel(key: string) {
   const labels: Record<string, string> = {
-    noError: "오류 없이 실행",
-    resultCheck: "결과 확인",
-    assertCheck: "assert 통과",
-    outputCheck: "출력 확인",
+    noError: "실행 조건",
+    resultCheck: "확인할 것",
+    assertCheck: "assert",
+    outputCheck: "출력",
   };
   return labels[key] ?? key;
 }

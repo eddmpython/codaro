@@ -85,7 +85,7 @@ EVIDENCE = (
         "editor-runtime-cell-error-recovery",
         "editor/src/components/app/appPrimitives.tsx",
         (
-            "data-runtime-recovery=\"cell-error\"",
+            "data-runtime-recovery={packageError ? \"package-error\" : \"cell-error\"}",
             "system.recoverCellError.detail",
             "system.recoverCellError.title",
         ),

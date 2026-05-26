@@ -10,7 +10,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
-TRACKED_REMOVAL_BACKUP_ROOT = Path("_backup") / "removedTracked" / "marimoAndReactiveApp"
+TRACKED_REMOVAL_BACKUP_ROOT = "_trackedRemovalBackup"
+FORBIDDEN_BACKUP_ROOTS = ("_backup", "_archive", "_reference", TRACKED_REMOVAL_BACKUP_ROOT)
 WORKTREE_CHANGE_GROUPS = (
     ("root-release-docs", ("CHANGELOG.md", "README.md", "goalNinePlusChecklist.md", "objectiveNinePlusScorecard.md")),
     ("ops-docs", ("docs/skills/",)),
@@ -674,47 +675,29 @@ def evaluateFourAxisGoalChecklist() -> dict[str, Any]:
 def evaluateTrackedDeletionBackup() -> dict[str, Any]:
     evidence: list[str] = []
     missing: list[str] = []
-    backupRoot = ROOT / TRACKED_REMOVAL_BACKUP_ROOT
-    backupReadme = backupRoot / "README.md"
-    if backupReadme.is_file():
-        readmeText = backupReadme.read_text(encoding="utf-8")
-        for needle in (
-            "notebooks/python30DaysComplete/marimo/",
-            "src/codaro/document/reactiveAppFormat.py",
-        ):
-            if needle in readmeText:
-                evidence.append(f"{displayRelPath(backupReadme)}: {needle}")
-            else:
-                missing.append(f"{displayRelPath(backupReadme)}: missing {needle}")
-    else:
-        missing.append(f"{displayRelPath(backupReadme)}: missing backup README")
-
-    backupFiles = tuple(path for path in backupRoot.rglob("*") if path.is_file() and path.name != "README.md")
-    if len(backupFiles) >= 37:
-        evidence.append(f"{displayRelPath(backupRoot)}: {len(backupFiles)} backup files")
-    else:
-        missing.append(f"{displayRelPath(backupRoot)}: expected at least 37 backup files, found {len(backupFiles)}")
+    for rootName in FORBIDDEN_BACKUP_ROOTS:
+        root = ROOT / rootName
+        if root.exists():
+            missing.append(f"{displayRelPath(root)}: backup root must not remain")
+        else:
+            evidence.append(f"{rootName}/ absent")
 
     deletedPaths = currentTrackedDeletedPaths()
     if deletedPaths is None:
         missing.append("git: unable to inspect tracked deleted paths")
-    else:
+    elif deletedPaths:
         unexpectedDeleted = tuple(path for path in deletedPaths if not isExpectedTrackedRemoval(path))
         if unexpectedDeleted:
             missing.append(f"git: unexpected tracked deletions remain ({', '.join(str(path) for path in unexpectedDeleted[:5])})")
         else:
-            evidence.append(f"git tracked deletions are limited to expected migration paths: {len(deletedPaths)}")
-        for deletedPath in deletedPaths:
-            backupPath = backupRoot / deletedPath
-            if backupPath.is_file():
-                evidence.append(f"{displayRelPath(backupPath)}: backup for deleted tracked path")
-            else:
-                missing.append(f"{displayRelPath(backupPath)}: missing backup for deleted tracked path")
+            missing.append(f"git: tracked deletions require a first-class migration, not backup roots ({len(deletedPaths)})")
+    else:
+        evidence.append("git tracked deletions: none")
 
     return {
         "id": "tracked-deletion-backup-evidence",
         "passed": not missing,
-        "requirement": "Tracked removals are either absent or backed up under the local removal backup root.",
+        "requirement": "Backup roots do not remain; tracked removals require first-class migration instead of local backups.",
         "evidence": evidence,
         "missing": missing,
     }

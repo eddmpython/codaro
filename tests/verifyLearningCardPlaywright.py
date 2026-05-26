@@ -609,8 +609,11 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!snippetBox) throw new Error('snippet box missing');
   const copyButton = snippetBox.querySelector('[data-code-payload-copy="true"]');
   if (!copyButton) throw new Error('copy missing');
-  if (!(snippetBox.textContent || '').includes('예제 스니펫')) {{
-    throw new Error('snippet label missing');
+  if (!(snippet.textContent || '').includes('예제 스니펫')) {{
+    throw new Error('snippet section label missing');
+  }}
+  if (!(snippetBox.textContent || '').includes('코드')) {{
+    throw new Error('snippet code label missing');
   }}
   const exerciseInput = exercise.querySelector('[data-learning-exercise-input="editor"][data-learning-exercise-input-role="student-practice"]');
   if (!exerciseInput) throw new Error('student practice input missing');
@@ -620,11 +623,17 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!(exerciseInput.getAttribute('aria-label') || '').includes('직접 입력 실습 코드 편집기')) {{
     throw new Error('student practice aria label missing');
   }}
-  if (!(exercise.textContent || '').includes('Python 실습 코드')) {{
-    throw new Error('student practice label missing');
+  if (!(exercise.textContent || '').includes('직접 입력 실습')) {{
+    throw new Error('student practice section label missing');
   }}
-  if (!(exercise.textContent || '').includes('학습자가 작성')) {{
-    throw new Error('student authored badge missing');
+  if ((exercise.textContent || '').includes('Python 실습 코드')) {{
+    throw new Error('redundant practice code label leaked');
+  }}
+  if ((exercise.textContent || '').includes('학습자가 작성')) {{
+    throw new Error('student authored badge leaked');
+  }}
+  if ((exercise.textContent || '').includes('Ctrl+Enter 실행')) {{
+    throw new Error('keyboard shortcut badge leaked');
   }}
   const exerciseEditor = exerciseInput.querySelector('.cm-editor');
   if (!exerciseEditor) throw new Error('editor missing');

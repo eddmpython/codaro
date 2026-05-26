@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import json
 import re
+import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +45,8 @@ GENERIC_PHRASES = (
 
 
 def main() -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
     failures: list[dict[str, str]] = []
     checked = 0
     for path in curriculumYamlPaths():
@@ -49,6 +54,14 @@ def main() -> int:
         inspectCurriculum(path, failures)
 
     payload = {
+        "gate": "curriculum-workflow-architecture",
+        "passed": not failures,
+        "status": "passed" if not failures else "failed",
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "gitHead": currentGitHead(),
+        "reportPath": "output/test-runner/curriculum-workflow-architecture/curriculum-workflow-architecture-report.json",
         "checked": checked,
         "failureCount": len(failures),
         "failures": failures[:200],
@@ -71,7 +84,7 @@ def curriculumYamlPaths() -> list[Path]:
     return sorted(
         path
         for path in CURRICULA_ROOT.glob("**/*.yaml")
-        if "_backup" not in path.parts and path.name != "schema.yaml"
+        if path.name != "schema.yaml"
     )
 
 
@@ -161,6 +174,25 @@ def cleanText(value: Any) -> str:
     if value is None:
         return ""
     return re.sub(r"\s+", " ", str(value)).strip()
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def addFailure(path: Path, failures: list[dict[str, str]], message: str) -> None:

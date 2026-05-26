@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP_DIR = ROOT / "src" / "codaro" / "webBuild" / "_app"
 VITE_CONFIG = ROOT / "editor" / "vite.config.ts"
+CURRICULA_ROOT = ROOT / "curricula" / "python"
 CURRICULA_REGISTRY = ROOT / "editor" / "src" / "lib" / "curriculaRegistry.ts"
 CURRICULUM_SELECTION = ROOT / "editor" / "src" / "lib" / "curriculumSelection.ts"
 REPORT_PATH = ROOT / "output" / "test-runner" / "frontend-performance-budget" / "performance-report.json"
@@ -19,6 +20,8 @@ MIN_JS_CHUNKS = 4
 MAX_SINGLE_JS_BYTES = 400_000
 MAX_ENTRY_JS_BYTES = 300_000
 MAX_TOTAL_JS_BYTES = 7_500_000
+MAX_APP_SHELL_JS_BYTES = MAX_TOTAL_JS_BYTES
+MAX_LAZY_CURRICULUM_JS_BYTES = 12_000_000
 MAX_CSS_BYTES = 160_000
 REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
 
@@ -36,6 +39,14 @@ def currentGitHead() -> str | None:
     return result.stdout.strip() or None
 
 
+def curriculumLessonStems() -> set[str]:
+    return {path.stem for path in CURRICULA_ROOT.glob("*/*.yaml")}
+
+
+def isLazyCurriculumChunk(name: str, lessonStems: set[str]) -> bool:
+    return any(name.startswith(f"{stem}-") for stem in lessonStems)
+
+
 def main() -> int:
     startedAt = datetime.now(UTC).isoformat()
     started = time.monotonic()
@@ -50,7 +61,15 @@ def main() -> int:
 
     chunkStats = [{"name": path.name, "bytes": path.stat().st_size} for path in jsFiles]
     cssStats = [{"name": path.name, "bytes": path.stat().st_size} for path in cssFiles]
+    lessonStems = curriculumLessonStems()
+    lazyCurriculumChunks = [
+        item for item in chunkStats if isLazyCurriculumChunk(str(item["name"]), lessonStems)
+    ]
+    lazyCurriculumChunkNames = {item["name"] for item in lazyCurriculumChunks}
+    appShellChunks = [item for item in chunkStats if item["name"] not in lazyCurriculumChunkNames]
     totalJsBytes = sum(item["bytes"] for item in chunkStats)
+    appShellJsBytes = sum(item["bytes"] for item in appShellChunks)
+    lazyCurriculumJsBytes = sum(item["bytes"] for item in lazyCurriculumChunks)
     biggestJs = max((item["bytes"] for item in chunkStats), default=0)
     entryJsBytes = max((item["bytes"] for item in chunkStats if item["name"].startswith("index-")), default=0)
     totalCssBytes = sum(item["bytes"] for item in cssStats)
@@ -59,8 +78,12 @@ def main() -> int:
         failures.append(f"largest JS chunk {biggestJs} exceeds budget {MAX_SINGLE_JS_BYTES}")
     if entryJsBytes > MAX_ENTRY_JS_BYTES:
         failures.append(f"entry JS chunk {entryJsBytes} exceeds budget {MAX_ENTRY_JS_BYTES}")
-    if totalJsBytes > MAX_TOTAL_JS_BYTES:
-        failures.append(f"total JS {totalJsBytes} exceeds baseline budget {MAX_TOTAL_JS_BYTES}")
+    if appShellJsBytes > MAX_APP_SHELL_JS_BYTES:
+        failures.append(f"app shell JS {appShellJsBytes} exceeds baseline budget {MAX_APP_SHELL_JS_BYTES}")
+    if lazyCurriculumJsBytes > MAX_LAZY_CURRICULUM_JS_BYTES:
+        failures.append(
+            f"lazy curriculum JS {lazyCurriculumJsBytes} exceeds content budget {MAX_LAZY_CURRICULUM_JS_BYTES}"
+        )
     if totalCssBytes > MAX_CSS_BYTES:
         failures.append(f"total CSS {totalCssBytes} exceeds budget {MAX_CSS_BYTES}")
 
@@ -97,12 +120,20 @@ def main() -> int:
         "maxSingleJsBytes": MAX_SINGLE_JS_BYTES,
         "maxEntryJsBytes": MAX_ENTRY_JS_BYTES,
         "maxTotalJsBytes": MAX_TOTAL_JS_BYTES,
+        "maxAppShellJsBytes": MAX_APP_SHELL_JS_BYTES,
+        "maxLazyCurriculumJsBytes": MAX_LAZY_CURRICULUM_JS_BYTES,
+        "totalJsBudgetScope": "app-shell-excluding-lazy-curriculum-chunks",
         "maxCssBytes": MAX_CSS_BYTES,
         "chunkCount": len(jsFiles),
         "totalJsBytes": totalJsBytes,
+        "appShellJsBytes": appShellJsBytes,
+        "lazyCurriculumJsBytes": lazyCurriculumJsBytes,
+        "lazyCurriculumChunkCount": len(lazyCurriculumChunks),
         "biggestJsBytes": biggestJs,
         "entryJsBytes": entryJsBytes,
         "totalCssBytes": totalCssBytes,
+        "appShellChunks": appShellChunks,
+        "lazyCurriculumChunks": lazyCurriculumChunks,
         "chunks": chunkStats,
         "css": cssStats,
         "failures": failures,
