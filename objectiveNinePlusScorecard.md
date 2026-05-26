@@ -24,7 +24,7 @@
 | 분야 | 객관 기준 매핑 | 최소 점수 | 완료 증거 |
 |---|---|---:|---|
 | software-product-quality | ISO/IEC 25010 product quality, lifecycle evaluation | 9.0 | `quality-cycle`, `product-quality-audit`, backend/runtime/frontend/launcher gates |
-| education-ide | CAST UDL learner agency, engagement, representation, action/expression | 9.0 | structured YAML, section card, exercise/check, curriculum matrix, `curriculum-top-tier-audit`, browser rendering |
+| education-ide | CAST UDL learner agency, engagement, representation, action/expression | 9.0 | structured YAML, section card, exercise/check, curriculum matrix, `curriculum-top-tier-audit`, `playwright-curriculum-runtime`, browser rendering |
 | teacher-model-loop | NIST trustworthy characteristics: valid/reliable, transparent, explainable, safe | 9.0 | real provider smoke, clarification-before-provider, tool sequence, workloop evidence |
 | automation-ide | task/workflow/schedule/webhook/audit/E-Stop 제품 경계 | 9.0 | `automation-ide-audit`, task runner E-Stop, audit trail, frontend automation surface |
 | release-operations | ISO lifecycle acceptance/quality control, installer recovery | 9.0 | launcher doctor/state, rollback, exact artifact, landing/editor build, clean artifact freshness |
@@ -48,5 +48,6 @@
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle
 uv run python -X utf8 tests/run.py gate curriculum-top-tier-audit
+uv run python -X utf8 tests/run.py gate playwright-curriculum-runtime
 uv run python -X utf8 tests/run.py gate objective-nineplus-audit
 ```

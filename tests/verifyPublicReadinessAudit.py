@@ -12,7 +12,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "output" / "test-runner" / "public-readiness-audit" / "public-readiness-report.json"
 MINIMUM_DOMAIN_SCORE = 9.0
-PRODUCT_QUALITY_GATE_COUNT = 18
+PRODUCT_QUALITY_GATE_COUNT = 20
 
 REFERENCE_SOURCES = {
     "nistSsdf": "https://csrc.nist.gov/pubs/sp/800/218/final",
@@ -225,7 +225,7 @@ def qualityCyclePassed(context: AuditContext) -> CheckResult:
         and payload.get("completedGateCount") == PRODUCT_QUALITY_GATE_COUNT
         and payload.get("totalGateCount") == PRODUCT_QUALITY_GATE_COUNT
     )
-    return CheckResult("quality-cycle passed", passed, "quality-cycle 18/18 passed" if passed else "quality-cycle missing, stale, or incomplete")
+    return CheckResult("quality-cycle passed", passed, f"quality-cycle {PRODUCT_QUALITY_GATE_COUNT}/{PRODUCT_QUALITY_GATE_COUNT} passed" if passed else "quality-cycle missing, stale, or incomplete")
 
 
 def qualityCycleHeadMatches(context: AuditContext) -> CheckResult:

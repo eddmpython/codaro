@@ -24,6 +24,8 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-contract",
     "runtime-recovery-browser",
     "curriculum-quality-matrix",
+    "curriculum-top-tier-audit",
+    "playwright-curriculum-runtime",
     "onboarding-browser",
     "frontend-performance-budget",
     "landing-build",
@@ -299,6 +301,43 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
             )),
             ("docs/skills/ops/foundation/testing-and-gates.md", ("curriculum-quality-matrix/curriculum-quality-report.json", "payloadGitHead")),
+        ),
+    ),
+    ProductQualityRequirement(
+        requirementId="curriculum-runtime-and-top-tier-proof",
+        requirement="Curriculum quality-cycle includes top-tier design scoring and Playwright lesson runtime execution evidence.",
+        evidenceChecks=(
+            ("tests/run.py", (
+                "\"curriculum-top-tier-audit\"",
+                "\"playwright-curriculum-runtime\"",
+                "output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",
+                "output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
+            )),
+            ("tests/verifyCurriculumTopTierAudit.py", (
+                "curriculum-top-tier-report.json",
+                "minimumScore",
+                "actionableGaps",
+                "intro-onboarding-and-outcomes",
+            )),
+            ("tests/verifyPlaywrightCurriculumRuntime.py", (
+                "EXPECTED_LESSON_COUNT = 11",
+                "samplePassedCount",
+                "browserReady",
+                "chromium launch ok",
+                "exercise.get(\"solution\")",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "`curriculum-top-tier-audit`",
+                "`playwright-curriculum-runtime`",
+                "curriculum-top-tier-audit/curriculum-top-tier-report.json",
+                "playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "curriculum-top-tier-audit",
+                "playwright-curriculum-runtime",
+                "실제 Chromium",
+                "예제/정답 코드",
+            )),
         ),
     ),
     ProductQualityRequirement(

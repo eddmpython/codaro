@@ -318,6 +318,8 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-contract",
     "runtime-recovery-browser",
     "curriculum-quality-matrix",
+    "curriculum-top-tier-audit",
+    "playwright-curriculum-runtime",
     "onboarding-browser",
     "frontend-performance-budget",
     "landing-build",

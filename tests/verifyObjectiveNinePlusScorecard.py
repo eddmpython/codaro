@@ -27,6 +27,8 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-contract",
     "runtime-recovery-browser",
     "curriculum-quality-matrix",
+    "curriculum-top-tier-audit",
+    "playwright-curriculum-runtime",
     "onboarding-browser",
     "frontend-performance-budget",
     "landing-build",
@@ -106,6 +108,7 @@ class AuditContext:
         self.curriculumMatrix = readJson("output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json")
         self.curriculumFlow = readJson("output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json")
         self.curriculumTopTier = readJson("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json")
+        self.playwrightCurriculumRuntime = readJson("output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json")
         self.onboarding = readJson("output/test-runner/onboarding-browser/onboarding-report.json")
         self.frontendPerf = readJson("output/test-runner/frontend-performance-budget/performance-report.json")
 
@@ -135,9 +138,13 @@ def buildDomains(context: AuditContext) -> list[dict[str, Any]]:
             textCheck("CAST UDL source mapped", "objectiveNinePlusScorecard.md", "CAST UDL Guidelines 3.0"),
             gatePassed(context, "learning-system-readiness"),
             gatePassed(context, "curriculum-quality-matrix"),
+            gatePassed(context, "curriculum-top-tier-audit"),
+            gatePassed(context, "playwright-curriculum-runtime"),
             artifactPassed("curriculum matrix report", context.curriculumMatrix),
             artifactPassed("curriculum flow report", context.curriculumFlow),
             artifactPassed("curriculum top-tier report", context.curriculumTopTier),
+            artifactPassed("Playwright curriculum runtime report", context.playwrightCurriculumRuntime),
+            playwrightRuntimeSamplesPassed(context),
             scoreAtLeast("curriculum top-tier score", context.curriculumTopTier.get("score"), 9.0),
             textCheck("learning YAML section card SSOT", "docs/skills/architecture/learning-yaml-contract.md", "섹션 단위 학습카드"),
             textCheck("browser learning card proof", "tests/verifyLearningCardPlaywright.py", "desktopOverview"),
@@ -250,7 +257,7 @@ def qualityCycleCheck(context: AuditContext) -> CheckResult:
         and payload.get("totalGateCount") == len(PRODUCT_QUALITY_GATES)
         and payload.get("softFailureCount") == 0
     )
-    return CheckResult("quality-cycle summary passed", passed, "quality-cycle completed 18/18 with softFailureCount 0" if passed else "quality-cycle summary missing or not fully passed")
+    return CheckResult("quality-cycle summary passed", passed, f"quality-cycle completed {len(PRODUCT_QUALITY_GATES)}/{len(PRODUCT_QUALITY_GATES)} with softFailureCount 0" if passed else "quality-cycle summary missing or not fully passed")
 
 
 def gatePassed(context: AuditContext, gateName: str) -> CheckResult:
@@ -312,6 +319,25 @@ def artifactSignal(payload: dict[str, Any], key: str, expected: Any, label: str)
         actual = payload.get(key)
     passed = actual == expected
     return CheckResult(label, passed, f"{key}: {expected!r}" if passed else f"{key}: expected {expected!r}, got {actual!r}")
+
+
+def playwrightRuntimeSamplesPassed(context: AuditContext) -> CheckResult:
+    payload = context.playwrightCurriculumRuntime
+    sampleCount = payload.get("sampleCount")
+    passedCount = payload.get("samplePassedCount")
+    failureCount = payload.get("failureCount")
+    passed = (
+        isinstance(sampleCount, int)
+        and isinstance(passedCount, int)
+        and sampleCount >= 88
+        and passedCount == sampleCount
+        and failureCount == 0
+    )
+    if passed:
+        detail = f"{passedCount}/{sampleCount} Playwright curriculum samples passed"
+    else:
+        detail = f"samplePassedCount {passedCount!r}, sampleCount {sampleCount!r}, failureCount {failureCount!r}"
+    return CheckResult("Playwright curriculum samples executed", passed, detail)
 
 
 def qualityCycleLogsPresent(context: AuditContext) -> CheckResult:
