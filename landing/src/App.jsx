@@ -6,10 +6,17 @@ import {
   CheckCircle2,
   Download,
   FileCheck2,
+  GitBranch,
   Library,
+  Moon,
   PackageOpen,
+  PanelLeft,
+  Play,
+  Rss,
   Search,
+  Settings2,
   ShieldCheck,
+  Sun,
   Terminal,
   Workflow,
 } from "lucide-react";
@@ -67,6 +74,12 @@ const releaseLinks = [
   { href: brand.releaseUrl, label: "GitHub Releases" },
 ];
 
+const externalLinks = [
+  { href: brand.repoUrl, label: "GitHub", icon: GitBranch },
+  { href: brand.releaseUrl, label: "Releases", icon: Download },
+  { href: brand.toSiteUrl("/feed.xml"), label: "RSS", icon: Rss },
+];
+
 function appPath(path = "/") {
   return brand.appPath(path);
 }
@@ -89,6 +102,13 @@ function getBrowserPath() {
   return normalizePath(window.location.pathname);
 }
 
+function getInitialTheme() {
+  if (typeof window === "undefined") return "dark";
+  const stored = window.localStorage.getItem("codaroLandingTheme");
+  if (stored === "dark" || stored === "light") return stored;
+  return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
 function groupBy(items, key) {
   return items.reduce((groups, item) => {
     const group = item[key] || "기타";
@@ -106,7 +126,7 @@ function updateMeta(meta) {
   document.documentElement.lang = "ko";
   document.title = title;
   setMeta("description", description);
-  setMeta("theme-color", "#18181b");
+  setMeta("theme-color", document.documentElement.dataset.theme === "light" ? "#fafafa" : "#18181b");
   setLink("canonical", canonical);
   setProperty("og:type", meta.type || "website");
   setProperty("og:title", title);
@@ -150,6 +170,7 @@ function setLink(rel, href) {
 
 function App() {
   const [path, setPath] = useState(getBrowserPath);
+  const [themeMode, setThemeMode] = useState(getInitialTheme);
   const route = useMemo(() => resolveRoute(path), [path]);
 
   useEffect(() => {
@@ -157,6 +178,12 @@ function App() {
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = themeMode;
+    window.localStorage.setItem("codaroLandingTheme", themeMode);
+    setMeta("theme-color", themeMode === "light" ? "#fafafa" : "#18181b");
+  }, [themeMode]);
 
   useEffect(() => {
     updateMeta(route.meta);
@@ -181,14 +208,19 @@ function App() {
 
   return (
     <div className="appFrame">
-      <Header onNavigate={navigate} currentPath={path} />
+      <Header
+        onNavigate={navigate}
+        currentPath={path}
+        themeMode={themeMode}
+        onToggleTheme={() => setThemeMode((current) => (current === "dark" ? "light" : "dark"))}
+      />
       {route.element}
       <Footer />
     </div>
   );
 }
 
-function Header({ onNavigate, currentPath }) {
+function Header({ onNavigate, currentPath, themeMode, onToggleTheme }) {
   return (
     <header className="siteHeader">
       <a className="brandMark" href={appPath("/")} onClick={(event) => onNavigate(event, appPath("/"))}>
@@ -210,10 +242,25 @@ function Header({ onNavigate, currentPath }) {
           );
         })}
       </nav>
-      <a className="headerRepo" href={brand.repoUrl}>
-        <Boxes size={17} aria-hidden="true" />
-        GitHub
-      </a>
+      <div className="headerActions" aria-label="외부 링크">
+        {externalLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <a className="iconButton" href={item.href} key={item.label} title={item.label} aria-label={item.label}>
+              <Icon size={17} aria-hidden="true" />
+            </a>
+          );
+        })}
+        <button
+          className="iconButton"
+          type="button"
+          onClick={onToggleTheme}
+          title={themeMode === "dark" ? "라이트 모드" : "다크 모드"}
+          aria-label={themeMode === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+        >
+          {themeMode === "dark" ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
+        </button>
+      </div>
     </header>
   );
 }
@@ -283,71 +330,113 @@ function legacyRedirect(path) {
 
 function HomePage() {
   return (
-    <main>
-      <section className="heroSection">
+    <main className="homePage">
+      <section className="heroSection" aria-labelledby="home-title">
         <div className="heroCopy">
-          <p className="eyebrow">React 기반 GitHub Pages / Local-first / Python runtime</p>
-          <h1>배우는 코드가 실행되고, 실행한 코드가 자동화가 된다.</h1>
+          <div className="heroKicker">
+            <span>Local editor</span>
+            <span>Python runtime</span>
+            <span>GitHub Pages</span>
+          </div>
+          <h1 id="home-title">로컬 에디터처럼 시작하는 Python 학습 자동화 스튜디오.</h1>
           <p className="heroLead">
-            Codaro는 Python 학습, 노트북 셀 실행, 개인 자동화를 하나의 로컬 제품 흐름으로 묶는다.
-            공개 사이트는 문서와 블로그를 같은 React 정적 표면에서 제공한다.
+            Codaro는 채팅, 에디터, 커리큘럼, 자동화를 같은 문서 모델 위에 올린다.
+            공개 랜딩은 제품 셸의 밀도와 문서 배포 표면을 그대로 보여주는 React 정적 사이트다.
           </p>
           <div className="heroActions">
             <a className="primaryButton" href={brand.launcherDownloadUrl}>
+              <Download size={17} aria-hidden="true" />
               CodaroLauncher.exe
-              <ArrowRight size={17} aria-hidden="true" />
             </a>
             <a className="secondaryButton" href={appPath("/docs")}>
+              <BookOpen size={17} aria-hidden="true" />
               문서 보기
-            </a>
-            <a className="secondaryButton" href={appPath("/packs")}>
-              공유 팩
             </a>
             <a className="textLink" href={appPath("/docs/blog")}>
               Codaro 소식
+              <ArrowRight size={16} aria-hidden="true" />
             </a>
           </div>
-          <div className="releaseLinks" aria-label="릴리즈 검증 링크">
-            {releaseLinks.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.label}
-              </a>
-            ))}
+          <div className="heroMetrics" aria-label="Codaro 핵심 표면">
+            <span>Notebook cells</span>
+            <span>Dry-run tasks</span>
+            <span>Docs feed</span>
           </div>
         </div>
-        <div className="heroPanel" aria-label="Codaro 실행 흐름">
-          <div className="panelTop">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div className="editorShell" aria-label="Codaro 로컬 에디터 미리보기">
+          <div className="editorChrome">
+            <div className="windowDots" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
             <strong>codaro.local</strong>
+            <button type="button" aria-label="설정">
+              <Settings2 size={15} aria-hidden="true" />
+            </button>
           </div>
-          <div className="studioPreview">
-            <aside>
-              <b>채팅</b>
-              <b>에디터</b>
-              <b>커리큘럼</b>
-              <b>자동화</b>
+          <div className="editorWorkspace">
+            <aside className="editorSidebar">
+              <div className="sidebarBrand">
+                <img src={brand.mascotUrl} alt="" width="34" height="34" />
+                <div>
+                  <strong>Codaro</strong>
+                  <span>local studio</span>
+                </div>
+              </div>
+              <a className="active" href={appPath("/docs")}>
+                <PanelLeft size={16} aria-hidden="true" />
+                워크스페이스
+              </a>
+              <a href={appPath("/packs")}>
+                <PackageOpen size={16} aria-hidden="true" />
+                공유 팩
+              </a>
+              <a href={appPath("/tools")}>
+                <Workflow size={16} aria-hidden="true" />
+                자동화
+              </a>
             </aside>
-            <div>
-              <p className="chatBubble">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</p>
-              <p className="chatBubble muted">학습 셀 3개와 dry-run 자동화 계획을 만들었다.</p>
-              <pre>{`import pandas as pd
+            <section className="editorCanvas">
+              <div className="editorTopbar">
+                <div>
+                  <p>오늘의 작업</p>
+                  <strong>CSV 분석을 학습 셀과 자동화 계획으로 분리</strong>
+                </div>
+                <button type="button">
+                  <Play size={15} aria-hidden="true" />
+                  실행
+                </button>
+              </div>
+              <div className="workspaceGrid">
+                <div className="chatPane">
+                  <p className="paneLabel">채팅</p>
+                  <div className="message user">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</div>
+                  <div className="message system">학습 셀 3개, 검증 셀 1개, dry-run 태스크 1개로 나눴다.</div>
+                </div>
+                <div className="notebookPane">
+                  <div className="cellHeader">
+                    <span># %% Python</span>
+                    <strong>preview</strong>
+                  </div>
+                  <pre>{`import pandas as pd
 df = pd.read_csv("expenses.csv")
 summary = df.groupby("category").amount.sum()`}</pre>
-              <div className="runResult">실행 가능 / 검증 가능 / 태스크로 승격 가능</div>
-            </div>
+                  <div className="runResult">실행 가능 / 검증 가능 / 태스크 승격 가능</div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </section>
 
-      <section className="contentBand">
+      <section className="contentBand productBand">
         <div className="sectionIntro">
           <p className="eyebrow">Product surface</p>
-          <h2>장기 유지보수는 폴더보다 계약에서 나온다.</h2>
+          <h2>랜딩도 제품의 일부처럼 보이게 맞춘다.</h2>
           <p>
-            공개 사이트는 React, 제품 표면은 React + shadcn/ui, 콘텐츠 원천은 `docs/`로 나눈다.
-            문서와 글은 생성 파이프라인을 통해 검색, feed, sitemap까지 같이 갱신된다.
+            editor의 로컬 셸, 문서의 긴 호흡, 릴리즈 검증 링크가 같은 시각 체계에서 움직인다.
+            홈은 소개장이 아니라 실제 Codaro 작업 흐름의 축약판이어야 한다.
           </p>
         </div>
         <div className="surfaceGrid">
@@ -365,14 +454,21 @@ summary = df.groupby("category").amount.sum()`}</pre>
         </div>
       </section>
 
-      <section className="splitSection">
+      <section className="splitSection releaseSection">
         <div>
           <p className="eyebrow">Release trust</p>
-          <h2>GitHub Pages는 소개 표면, GitHub Releases는 실행물 배포 표면이다.</h2>
+          <h2>실행물은 릴리즈에서, 설명은 문서에서, 변경 기록은 Codaro 소식에서 확인한다.</h2>
           <p>
             사용자는 공개 문서에서 제품 방향을 확인하고, 릴리즈에서 launcher와 checksum,
             manifest, runtime, backend wheel 자산을 확인한 뒤 실행할 수 있다.
           </p>
+          <div className="releaseLinks" aria-label="릴리즈 검증 링크">
+            {releaseLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
         <div className="trustList">
           <TrustItem icon={ShieldCheck} title="로컬 우선" copy="기본 학습과 실행은 사용자의 로컬 런타임을 기준으로 한다." />
