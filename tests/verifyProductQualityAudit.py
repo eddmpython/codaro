@@ -724,6 +724,10 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("tests/verifyOnboardingPlaywright.py", ("repoLocalPlaywrightWorkspace",)),
             ("tests/verifyProviderSettingsPlaywright.py", ("repoLocalPlaywrightWorkspace",)),
             ("tests/verifyRuntimeRecoveryPlaywright.py", ("repoLocalPlaywrightWorkspace",)),
+            ("tests/verifyPlaywrightCurriculumRuntime.py", (
+                "PYTEST_ADDOPTS",
+                "-p no:cacheprovider",
+            )),
             ("launcher/codaro-launcher/src/self_update.rs", (
                 "use tempfile::tempdir;",
                 "let temp_dir = tempdir().unwrap();",

@@ -207,6 +207,9 @@ def sampleEnvironment() -> dict[str, str]:
     env["PYTHONUTF8"] = "1"
     env["CODARO_PLAYWRIGHT_OUTPUT_DIR"] = str(ARTIFACT_DIR)
     env["PLAYWRIGHT_BROWSERS_PATH"] = str(BROWSER_DIR)
+    pytestOpts = env.get("PYTEST_ADDOPTS", "").strip()
+    cacheOpt = "-p no:cacheprovider"
+    env["PYTEST_ADDOPTS"] = f"{pytestOpts} {cacheOpt}".strip() if cacheOpt not in pytestOpts else pytestOpts
     return env
 
 
