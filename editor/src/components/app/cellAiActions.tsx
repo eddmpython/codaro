@@ -62,7 +62,7 @@ export function CellAiActions({
         aria-expanded={open}
         aria-label="이 셀에서 AI 도움 요청"
         className={cn(
-          compact ? "h-5 gap-1 rounded-md px-1.5 text-[10px] font-semibold [&_svg]:size-3" : "h-7 gap-1.5 px-2 text-xs",
+          compact ? "h-6 gap-1 rounded-md px-1.5 text-[10px] font-semibold [&_svg]:size-3" : "h-7 gap-1.5 px-2 text-xs font-medium",
           open && "border-ring bg-muted",
         )}
         data-cell-ai-help-trigger="always-visible"
@@ -76,7 +76,7 @@ export function CellAiActions({
         }}
       >
         <Sparkles className={compact ? "size-3" : "size-3.5"} />
-        {compact ? <span>AI</span> : <span className="hidden sm:inline">도움 요청</span>}
+        <span>AI</span>
       </Button>
 
       {open ? (

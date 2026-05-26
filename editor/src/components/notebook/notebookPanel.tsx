@@ -417,11 +417,10 @@ function CellMetaBar({
         <span className="truncate">{title}</span>
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-1">
-        {lineCount ? <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">{lineCount}줄</span> : null}
         {status !== "idle" ? (
           <span
             className={cn(
-              "rounded-md px-1.5 py-0.5 text-[11px] font-medium",
+              "h-6 rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-5",
               status === "error" ? "bg-destructive text-destructive-foreground" : "border bg-background text-muted-foreground",
             )}
           >
@@ -431,7 +430,7 @@ function CellMetaBar({
         {type === "code" ? (
           <IconButton
             className={cn(
-              "size-5 rounded-md [&_svg]:size-3",
+              "size-6 rounded-md [&_svg]:size-3",
               selected && "bg-accent text-accent-foreground",
             )}
             disabled={!canRun}
@@ -447,7 +446,7 @@ function CellMetaBar({
         ) : null}
         <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
         <IconButton
-          className="size-5 rounded-md text-muted-foreground hover:text-destructive [&_svg]:size-3"
+          className="size-6 rounded-md text-muted-foreground hover:text-destructive [&_svg]:size-3"
           label="셀 삭제"
           variant="ghost"
           onClick={(event) => {

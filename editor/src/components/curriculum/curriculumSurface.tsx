@@ -847,9 +847,11 @@ function StructuredSectionLearningBody({
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
+              {exerciseRunning || exerciseResult ? (
               <Badge className="h-7 rounded-md px-2 text-xs" variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
                 {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
               </Badge>
+              ) : null}
               <IconButton
                 className="size-7 rounded-md [&_svg]:size-3.5"
                 disabled={!canRun}
@@ -1383,11 +1385,10 @@ function CurriculumLearningCell({
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
   const lineCount = block.type === "code" ? draft.split("\n").filter((line) => line.trim()).length : 0;
   const tone = curriculumCellTone(kind, role, block.displayKind);
-  const typeMeta = curriculumTypeMeta(block, kind);
-  const TypeIcon = typeMeta.Icon;
   const bodyFirst = block.displayKind === "hero";
   const isSnippetCode = block.type === "code" && role === "snippet";
   const embedded = variant === "embedded";
+  const showStatus = isRunning || Boolean(result);
 
   if (block.type === "markdown") {
     if (block.displayKind === "title") {
@@ -1429,10 +1430,6 @@ function CurriculumLearningCell({
               <Icon className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 truncate text-sm font-semibold">{blockLabel(block)}</span>
-            <Badge className="gap-1 bg-background/80" variant="outline">
-              <TypeIcon className="size-3" />
-              {typeMeta.label}
-            </Badge>
             <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
           </div>
           <CurriculumMarkdownBody block={block} hideRepeatedTitle />
@@ -1451,11 +1448,7 @@ function CurriculumLearningCell({
       >
         <div className="min-w-0">
           {bodyFirst ? (
-            <div className="flex items-center justify-end gap-2 px-3 pt-3">
-          <Badge className="gap-1 bg-background/80" variant="outline">
-            <TypeIcon className="size-3" />
-            {typeMeta.label}
-              </Badge>
+            <div className="flex items-center justify-end px-3 pt-3">
               <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
             </div>
           ) : (
@@ -1468,10 +1461,6 @@ function CurriculumLearningCell({
                   <span className="block truncate text-base font-semibold tracking-normal">{blockLabel(block)}</span>
                 </span>
               </button>
-              <Badge className="gap-1 bg-background/80" variant="outline">
-                <TypeIcon className="size-3" />
-                {typeMeta.label}
-              </Badge>
               <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
             </div>
           )}
@@ -1502,13 +1491,13 @@ function CurriculumLearningCell({
               <span className="block truncate text-base font-semibold tracking-normal">{blockLabel(block)}</span>
             </span>
           </button>
-          <Badge className="gap-1" variant="outline">
-            <TypeIcon className="size-3" />
-            {typeMeta.label}
-          </Badge>
-          <Badge variant={resultStatus === "error" ? "destructive" : "outline"}>{statusLabel(resultStatus)}</Badge>
+          {showStatus ? (
+            <Badge className="h-7 rounded-md px-2 text-xs" variant={resultStatus === "error" ? "destructive" : "outline"}>
+              {statusLabel(resultStatus)}
+            </Badge>
+          ) : null}
           <IconButton
-            className="size-7"
+            className="size-7 rounded-md [&_svg]:size-3.5"
             disabled={!canRun}
             label="셀 실행"
             variant="ghost"
@@ -1522,15 +1511,11 @@ function CurriculumLearningCell({
           <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
         </div>
         <div className={cn("space-y-3", embedded ? "px-4 pb-4" : "px-3 py-3")}>
-          {isSnippetCode ? <SnippetPracticeIntro block={block} /> : null}
+          {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
           {!isSnippetCode && block.guide ? <ExerciseBrief block={block} lineCount={lineCount} /> : null}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{isSnippetCode ? "Python 연습 코드" : "Python 코드"}</span>
-              <span className="flex items-center gap-1.5">
-                <Badge variant="outline">{isSnippetCode ? "학습자가 작성" : "직접 편집"}</Badge>
-                <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
-              </span>
             </div>
             <div
               aria-label={`${blockLabel(block)} 코드 편집기`}
