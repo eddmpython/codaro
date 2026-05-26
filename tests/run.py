@@ -330,8 +330,8 @@ TIER_ORDER = ("fast", "surface", "release")
 
 def runCommand(gateName: str, gateCommand: GateCommand) -> int:
     cwd = ROOT / gateCommand.cwd
-    env = localGateEnvironment(gateName)
     commandArgs = localGateArgs(gateName, gateCommand)
+    env = localGateEnvironment(gateName, commandArgs)
     executable = shutil.which(commandArgs[0])
     args = (executable, *commandArgs[1:]) if executable else commandArgs
     displayCwd = gateCommand.cwd
@@ -409,15 +409,22 @@ def printLogTail(logPath: Path, maxLines: int = 200) -> None:
         print(line)
 
 
-def localGateEnvironment(gateName: str) -> dict[str, str]:
+def localGateEnvironment(gateName: str, commandArgs: tuple[str, ...]) -> dict[str, str]:
     runRoot = localGateWorkspace(gateName)
     scratchDir = runRoot / "scratch"
     scratchDir.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    env["UV_NO_CACHE"] = "1"
     env["TMP"] = str(scratchDir)
     env["TEMP"] = str(scratchDir)
     env["TMPDIR"] = str(scratchDir)
+    if uvCommandUsesWith(commandArgs):
+        cacheDir = runRoot / "uv-cache"
+        cacheDir.mkdir(parents=True, exist_ok=True)
+        env.pop("UV_NO_CACHE", None)
+        env["UV_CACHE_DIR"] = str(cacheDir)
+        env["UV_LINK_MODE"] = "copy"
+    else:
+        env["UV_NO_CACHE"] = "1"
     return env
 
 
@@ -430,8 +437,14 @@ def localGateArgs(gateName: str, gateCommand: GateCommand) -> tuple[str, ...]:
 
 def normalizeUvArgs(args: tuple[str, ...]) -> tuple[str, ...]:
     if len(args) >= 2 and args[0] == "uv" and args[1] == "run":
+        if uvCommandUsesWith(args):
+            return args
         return ("uv", "--no-cache", *args[1:])
     return args
+
+
+def uvCommandUsesWith(args: tuple[str, ...]) -> bool:
+    return len(args) >= 3 and args[0] == "uv" and "run" in args[:3] and "--with" in args
 
 
 def normalizePytestArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:

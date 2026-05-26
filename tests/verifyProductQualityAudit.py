@@ -685,6 +685,9 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("tests/run.py", (
                 "GATE_WORK_ROOT",
                 "UV_NO_CACHE",
+                "UV_CACHE_DIR",
+                "UV_LINK_MODE",
+                "uvCommandUsesWith",
                 "normalizePytestArgs",
                 "localGatePytestBaseTemp",
                 "--basetemp",
@@ -703,6 +706,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "scratch",
             )),
             ("tests/testRunEntrypoint.py", (
+                "testUvWithCommandsUseRepoLocalCache",
                 "testRunCommandWritesRepoLocalFailureLog",
                 "testRunCommandTimesOutWithLog",
                 "testGateSequenceSummaryIncludesCommandLogs",
@@ -736,6 +740,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "`output/test-runner/<gate>/`",
                 "`uv --no-cache run`",
+                "`UV_CACHE_DIR=output/test-runner/<gate>/uv-cache`",
+                "`UV_LINK_MODE=copy`",
                 "`--basetemp output/test-runner/<gate>/pytest/run-<pid>-<time_ns>`",
                 "`--target-dir output/test-runner/<gate>/cargo-target`",
                 "`output/test-runner/<gate>/scratch`",
@@ -749,7 +755,9 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/product/service-candidate.md", (
                 "repo-local `output/test-runner/<gate>/`",
                 "브라우저 gate 직접 실행도 repo-local",
-                "uv/pytest cache는 비활성화",
+                "일반 uv/pytest cache는 비활성화",
+                "`output/test-runner/<gate>/uv-cache`",
+                "copy link mode",
                 "사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다",
                 "`output/test-runner/<gate>/logs`",
                 "`exit: 124`",

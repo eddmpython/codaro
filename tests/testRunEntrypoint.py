@@ -195,6 +195,34 @@ def testRunCommandWritesRepoLocalFailureLog(monkeypatch, capsys, tmp_path) -> No
     assert "exit: 3" in logText
 
 
+def testUvWithCommandsUseRepoLocalCache(monkeypatch, tmp_path) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+
+    withArgs = runner.localGateArgs(
+        "playwright-curriculum-runtime",
+        runner.GateCommand(args=("uv", "run", "--with", "playwright", "python", "-c", "pass")),
+    )
+    withEnv = runner.localGateEnvironment("playwright-curriculum-runtime", withArgs)
+
+    assert withArgs == ("uv", "run", "--with", "playwright", "python", "-c", "pass")
+    assert "UV_NO_CACHE" not in withEnv
+    assert withEnv["UV_CACHE_DIR"].endswith("output\\test-runner\\playwright-curriculum-runtime\\uv-cache") or withEnv[
+        "UV_CACHE_DIR"
+    ].endswith("output/test-runner/playwright-curriculum-runtime/uv-cache")
+    assert withEnv["UV_LINK_MODE"] == "copy"
+
+    regularArgs = runner.localGateArgs(
+        "backend",
+        runner.GateCommand(args=("uv", "run", "pytest", "tests/", "-q")),
+    )
+    regularEnv = runner.localGateEnvironment("backend", regularArgs)
+
+    assert regularArgs[:3] == ("uv", "--no-cache", "run")
+    assert regularEnv["UV_NO_CACHE"] == "1"
+
+
 def testRunCommandTimesOutWithLog(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
     monkeypatch.setattr(runner, "ROOT", tmp_path)
