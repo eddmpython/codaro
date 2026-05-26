@@ -443,8 +443,8 @@ function HomePage() {
                     <strong>preview</strong>
                   </div>
                   <pre>{`import pandas as pd
-df = pd.read_csv("expenses.csv")
-summary = df.groupby("category").sum()`}</pre>
+df = pd.read_csv("spend.csv")
+report = df.groupby("week").sum()`}</pre>
                   <div className="runResult">실행 가능 / 검증 가능 / 태스크 승격 가능</div>
                 </div>
               </div>
