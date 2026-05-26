@@ -368,11 +368,16 @@ def jsAssertFallbackOnboarding() -> str:
   const providerButton = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Provider 연결'));
   const avatar = [...document.querySelectorAll('img')].some((img) => img.getAttribute('src')?.includes('/brand/avatar-small.png'));
   const diagnosticExport = document.querySelector('[data-diagnostic-export-copy="true"]');
+  const accessibleSidebarTriggers = [...document.querySelectorAll('button')]
+    .filter((button) => button.textContent?.includes('사이드바 전환'));
+  const rail = document.querySelector('[data-sidebar="rail"]');
   const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', '진단 복사', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('fallback onboarding missing: ' + missing.join(', '));
   if (!providerButton || providerButton.disabled) throw new Error('Provider 연결 button is missing or disabled');
   if (!diagnosticExport) throw new Error('diagnostic export copy button is missing');
+  if (accessibleSidebarTriggers.length !== 1) throw new Error('expected one accessible sidebar trigger, found ' + accessibleSidebarTriggers.length);
+  if (!rail || rail.getAttribute('aria-hidden') !== 'true') throw new Error('sidebar rail must be hidden from accessibility tree');
   if (!avatar) throw new Error('Codaro avatar is missing on first screen');
   if (text.includes('provider 연결됨')) throw new Error('ready provider copy shown before provider connection');
   return 'fallback-onboarding-ok';

@@ -5,6 +5,7 @@ import {
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { ProductSidebar } from "@/components/app/productSidebar";
+import { TopBar } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
@@ -93,7 +94,7 @@ function App() {
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const { themeMode, toggleThemeMode } = useThemeMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const assistantCollapsed = false;
+  const [assistantCollapsed, setAssistantCollapsed] = useState(false);
   const {
     auditCount,
     automationSection,
@@ -264,6 +265,17 @@ function App() {
     setSurface(nextSurface);
   }, [categories, selectCurriculumCategory, selectedCategory, setSurface]);
 
+  const runActiveNotebookBlock = useCallback(() => {
+    if (selectedBlock) {
+      runBlock(selectedBlock);
+    }
+  }, [runBlock, selectedBlock]);
+
+  const copyDiagnosticExport = useCallback(async () => {
+    const payload = await codaroApi.systemDiagnosticsExport();
+    await writeClipboardText(JSON.stringify(payload, null, 2));
+  }, []);
+
   return (
     <LocaleProvider value={localeState}>
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -294,55 +306,71 @@ function App() {
       />
 
       <SidebarInset className="h-svh min-h-0 min-w-0 overflow-hidden">
-        <MainSurface
-          aiConnecting={aiConnecting}
-          aiProfile={aiProfile}
-          apiOnline={apiOnline}
-          auditCount={auditCount}
-          automationSection={automationSection}
-          assistantLoading={assistantLoading}
-          canRun={canRun}
-          cellHelpByBlockId={cellHelpByBlockId}
-          categories={filteredCategories}
-          contents={contents}
-          curriculumDocument={curriculumDocument}
-          document={document}
-          drafts={drafts}
-          eStop={eStop}
-          messages={messages}
-          pendingBlocks={pendingBlocks}
-          prompt={prompt}
-          referenceLoading={referenceLoading}
-          results={results}
-          runningBlockId={runningBlockId}
-          scheduler={scheduler}
-          selectedCategory={selectedCategory}
-          selectedBlockId={selectedBlockId}
-          selectedCurriculumBlockId={selectedCurriculumBlockId}
-          selectedContentId={selectedContentId}
-          surface={surface}
-          tasks={tasks}
-          loadState={loadState}
-          assistantCollapsed={assistantCollapsed}
-          onAddCell={addNotebookCell}
-          onAsk={askAssistant}
-          onAcceptPendingBlocks={acceptPendingBlocks}
-          onConnectAi={connectAiProvider}
-          onCellAsk={askCellAssistant}
-          onDraftChange={updateDraft}
-          onDeleteCell={deleteNotebookCell}
-          onNewChat={startNewChat}
-          onPromptChange={setPrompt}
-          onRejectPendingBlocks={rejectPendingBlocks}
-          onRefreshAutomation={refreshAutomation}
-          onRenameDocument={renameNotebookDocument}
-          onOpenSharePackCurriculum={openSharePackCurriculum}
-          onRunBlock={runBlock}
-          onRunTask={runTask}
-          onSelectBlock={selectBlock}
-          onSelectCurriculumBlock={setSelectedCurriculumBlockId}
-          onToggleEStop={toggleEStop}
-        />
+        <div className="flex h-full min-h-0 flex-col">
+          <TopBar
+            assistantCollapsed={assistantCollapsed}
+            canRun={canRun}
+            loadState={loadState}
+            notebookRunning={Boolean(runningBlockId)}
+            notice={notice}
+            showSidebarTrigger
+            surface={surface}
+            onCopyDiagnosticExport={copyDiagnosticExport}
+            onRunNotebook={runActiveNotebookBlock}
+            onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
+          />
+          <div className="min-h-0 flex-1">
+            <MainSurface
+              aiConnecting={aiConnecting}
+              aiProfile={aiProfile}
+              apiOnline={apiOnline}
+              auditCount={auditCount}
+              automationSection={automationSection}
+              assistantLoading={assistantLoading}
+              canRun={canRun}
+              cellHelpByBlockId={cellHelpByBlockId}
+              categories={filteredCategories}
+              contents={contents}
+              curriculumDocument={curriculumDocument}
+              document={document}
+              drafts={drafts}
+              eStop={eStop}
+              messages={messages}
+              pendingBlocks={pendingBlocks}
+              prompt={prompt}
+              referenceLoading={referenceLoading}
+              results={results}
+              runningBlockId={runningBlockId}
+              scheduler={scheduler}
+              selectedCategory={selectedCategory}
+              selectedBlockId={selectedBlockId}
+              selectedCurriculumBlockId={selectedCurriculumBlockId}
+              selectedContentId={selectedContentId}
+              surface={surface}
+              tasks={tasks}
+              loadState={loadState}
+              assistantCollapsed={assistantCollapsed}
+              onAddCell={addNotebookCell}
+              onAsk={askAssistant}
+              onAcceptPendingBlocks={acceptPendingBlocks}
+              onConnectAi={connectAiProvider}
+              onCellAsk={askCellAssistant}
+              onDraftChange={updateDraft}
+              onDeleteCell={deleteNotebookCell}
+              onNewChat={startNewChat}
+              onPromptChange={setPrompt}
+              onRejectPendingBlocks={rejectPendingBlocks}
+              onRefreshAutomation={refreshAutomation}
+              onRenameDocument={renameNotebookDocument}
+              onOpenSharePackCurriculum={openSharePackCurriculum}
+              onRunBlock={runBlock}
+              onRunTask={runTask}
+              onSelectBlock={selectBlock}
+              onSelectCurriculumBlock={setSelectedCurriculumBlockId}
+              onToggleEStop={toggleEStop}
+            />
+          </div>
+        </div>
       </SidebarInset>
 
       <ProviderSettingsSheet
@@ -373,3 +401,26 @@ function shouldKeepCurrentNotice(currentNotice: AppNotice, nextNotice: AppNotice
 }
 
 export default App;
+
+async function writeClipboardText(text: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "true");
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    const copied = document.execCommand("copy");
+    if (!copied) {
+      throw new Error("clipboard copy failed");
+    }
+  } finally {
+    document.body.removeChild(textArea);
+  }
+}
