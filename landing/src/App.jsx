@@ -32,27 +32,42 @@ const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
 const surfaces = [
   {
     label: "채팅",
-    title: "목표에서 시작",
-    copy: "학습 목표나 반복 업무를 말하면 노트북 기반 실행 계획으로 이어진다.",
+    title: "요청을 작업으로 정리",
+    copy: "학습 목표와 반복 업무를 셀, 검증, 자동화 후보로 나눠 시작한다.",
     icon: BookOpen,
   },
   {
     label: "에디터",
-    title: "셀에서 바로 실행",
-    copy: "Python과 Markdown 셀을 일반 파일처럼 유지하면서 실행 결과를 확인한다.",
+    title: "로컬에서 바로 실행",
+    copy: "Python과 Markdown 셀을 일반 파일처럼 유지하고 실행 결과를 옆에서 확인한다.",
     icon: Terminal,
   },
   {
     label: "커리큘럼",
-    title: "실습 중심 학습",
-    copy: "설명, 스니펫, 예측, 실행, 검증이 같은 학습 카드 안에서 움직인다.",
+    title: "학습을 실행 단위로 저장",
+    copy: "설명, 예측, 실행, 검증이 같은 학습 카드 안에서 끊기지 않는다.",
     icon: CheckCircle2,
   },
   {
     label: "자동화",
-    title: "반복 업무로 승격",
-    copy: "검증된 셀과 스크립트를 dry-run 계획, 태스크, 리포트로 키운다.",
+    title: "검증된 흐름을 태스크로 승격",
+    copy: "반복 가능한 셀과 스크립트를 dry-run 계획, 태스크, 리포트로 키운다.",
     icon: Workflow,
+  },
+];
+
+const proofItems = [
+  {
+    title: "로컬 런타임 기준",
+    copy: "학습과 실행의 기준을 브라우저 샌드박스가 아니라 사용자의 Python 환경에 둔다.",
+  },
+  {
+    title: "문서 모델 하나",
+    copy: "채팅, 에디터, 커리큘럼, 자동화가 같은 셀 흐름을 공유해 맥락 손실을 줄인다.",
+  },
+  {
+    title: "실행에서 자동화까지",
+    copy: "한 번 검증한 코드를 데모로 끝내지 않고 반복 가능한 개인 업무로 끌어올린다.",
   },
 ];
 
@@ -338,10 +353,10 @@ function HomePage() {
             <span>Python runtime</span>
             <span>GitHub Pages</span>
           </div>
-          <h1 id="home-title">로컬 에디터처럼 시작하는 Python 학습 자동화 스튜디오.</h1>
+          <h1 id="home-title">배우고 실행하고 자동화하는 로컬 Python 스튜디오.</h1>
           <p className="heroLead">
-            Codaro는 채팅, 에디터, 커리큘럼, 자동화를 같은 문서 모델 위에 올린다.
-            공개 랜딩은 제품 셸의 밀도와 문서 배포 표면을 그대로 보여주는 React 정적 사이트다.
+            Codaro는 Python 학습을 실행 가능한 셀로 만들고, 검증된 흐름을 개인 자동화로 키운다.
+            채팅, 에디터, 커리큘럼, 자동화가 하나의 로컬 작업공간 안에서 이어진다.
           </p>
           <div className="heroActions">
             <a className="primaryButton" href={brand.launcherDownloadUrl}>
@@ -358,9 +373,17 @@ function HomePage() {
             </a>
           </div>
           <div className="heroMetrics" aria-label="Codaro 핵심 표면">
-            <span>Notebook cells</span>
-            <span>Dry-run tasks</span>
-            <span>Docs feed</span>
+            <span>실행형 커리큘럼</span>
+            <span>로컬 셀 런타임</span>
+            <span>dry-run 자동화</span>
+          </div>
+          <div className="heroProofGrid" aria-label="Codaro 핵심 장점">
+            {proofItems.map((item) => (
+              <div className="proofTile" key={item.title}>
+                <strong>{item.title}</strong>
+                <span>{item.copy}</span>
+              </div>
+            ))}
           </div>
         </div>
         <div className="editorShell" aria-label="Codaro 로컬 에디터 미리보기">
@@ -401,18 +424,18 @@ function HomePage() {
               <div className="editorTopbar">
                 <div>
                   <p>오늘의 작업</p>
-                  <strong>CSV 분석을 학습 셀과 자동화 계획으로 분리</strong>
+                  <strong>학습 셀을 실행 가능한 리포트 자동화로 전환</strong>
                 </div>
                 <button type="button">
                   <Play size={15} aria-hidden="true" />
-                  실행
+                  검증 실행
                 </button>
               </div>
               <div className="workspaceGrid">
                 <div className="chatPane">
                   <p className="paneLabel">채팅</p>
                   <div className="message user">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</div>
-                  <div className="message system">학습 셀 3개, 검증 셀 1개, dry-run 태스크 1개로 나눴다.</div>
+                  <div className="message system">학습 셀, 검증 셀, dry-run 태스크로 흐름을 분리했다.</div>
                 </div>
                 <div className="notebookPane">
                   <div className="cellHeader">
@@ -433,11 +456,19 @@ summary = df.groupby("category").amount.sum()`}</pre>
       <section className="contentBand productBand">
         <div className="sectionIntro">
           <p className="eyebrow">Product surface</p>
-          <h2>랜딩도 제품의 일부처럼 보이게 맞춘다.</h2>
+          <h2>Codaro의 강점은 학습과 자동화가 갈라지지 않는 데 있다.</h2>
           <p>
-            editor의 로컬 셸, 문서의 긴 호흡, 릴리즈 검증 링크가 같은 시각 체계에서 움직인다.
-            홈은 소개장이 아니라 실제 Codaro 작업 흐름의 축약판이어야 한다.
+            튜토리얼을 읽고 끝내는 도구가 아니라, 배운 코드를 로컬에서 실행하고 반복 업무로 승격시키는
+            작업 표면이다. 공개 사이트는 이 제품 흐름을 문서와 글까지 같은 톤으로 보여준다.
           </p>
+        </div>
+        <div className="proofGrid">
+          {proofItems.map((item) => (
+            <article className="proofCard" key={item.title}>
+              <span>{item.title}</span>
+              <p>{item.copy}</p>
+            </article>
+          ))}
         </div>
         <div className="surfaceGrid">
           {surfaces.map((surface) => {
@@ -654,11 +685,17 @@ function blogIndexRoute() {
 }
 
 function BlogIndexPage() {
+  const [featuredPost, ...restPosts] = posts;
   return (
-    <main className="pageShell">
-      <PageHeader eyebrow="Writing" title="Codaro 소식" copy="제품 방향, 공개 출시 준비, 운영 판단을 긴 글로 남긴다." />
+    <main className="pageShell blogShell">
+      <PageHeader
+        eyebrow="Codaro 소식"
+        title="학습, 실행, 자동화가 어떻게 하나의 제품이 되는지 기록한다."
+        copy="Codaro 소식은 단순 공지가 아니라 제품 판단, 출시 준비, 로컬 런타임 운영 기준을 남기는 공개 기록이다."
+      />
+      {featuredPost ? <FeaturedPost post={featuredPost} /> : null}
       <TaxonomyBar categories={postCategories} series={postSeries} />
-      <PostGrid posts={posts} />
+      <PostGrid posts={restPosts.length ? restPosts : posts} />
     </main>
   );
 }
@@ -722,16 +759,40 @@ function BlogPostPage({ post }) {
         <a href={appPath(`/docs/blog/series/${post.series}`)}>{post.seriesLabel || post.series}</a>
       </aside>
       <article className="proseArticle">
-        <p className="eyebrow">{post.categoryLabel}</p>
-        <h1>{post.title}</h1>
-        <p className="articleDescription">{post.description}</p>
-        <div className="articleMeta">
-          <span>{post.date}</span>
-          <span>{post.seriesLabel || post.series}</span>
+        <div className="articleHero">
+          <p className="eyebrow">{post.categoryLabel}</p>
+          <h1>{post.title}</h1>
+          <p className="articleDescription">{post.description}</p>
+          <div className="articleMeta">
+            <span>{post.date}</span>
+            <span>{post.seriesLabel || post.series}</span>
+          </div>
         </div>
         <HTMLContent html={post.html} />
       </article>
     </main>
+  );
+}
+
+function FeaturedPost({ post }) {
+  return (
+    <section className="featuredPost" aria-label="대표 글">
+      <img src={post.cardPreview} alt="" />
+      <div className="featuredPostBody">
+        <p className="eyebrow">Featured writing</p>
+        <h2>{post.title}</h2>
+        <span>{post.description}</span>
+        <div className="featuredMeta">
+          <span>{post.categoryLabel}</span>
+          <span>{post.date}</span>
+          <span>{post.seriesLabel || post.series}</span>
+        </div>
+        <a href={appPath(post.url)}>
+          대표 글 읽기
+          <ArrowRight size={16} aria-hidden="true" />
+        </a>
+      </div>
+    </section>
   );
 }
 

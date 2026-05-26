@@ -266,6 +266,38 @@ input:focus-visible {
   margin-top: 18px;
 }
 
+.heroProofGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.proofTile {
+  min-height: 122px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.proofTile strong,
+.proofTile span {
+  display: block;
+}
+
+.proofTile strong {
+  color: var(--card-foreground);
+  font-size: 13px;
+}
+
+.proofTile span {
+  margin-top: 8px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .eyebrow {
   margin: 0 0 12px;
   color: var(--brand-emphasis);
@@ -575,6 +607,13 @@ input:focus-visible {
   border-top: 1px solid var(--border);
 }
 
+.proofGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
 .sectionIntro {
   max-width: 760px;
 }
@@ -604,6 +643,7 @@ input:focus-visible {
 }
 
 .surfaceCard,
+.proofCard,
 .postCard,
 .toolCard,
 .trustItem,
@@ -622,6 +662,23 @@ input:focus-visible {
 .surfaceCard {
   min-height: 204px;
   padding: 20px;
+}
+
+.proofCard {
+  padding: 18px;
+}
+
+.proofCard span {
+  display: block;
+  color: var(--card-foreground);
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.proofCard p {
+  margin: 10px 0 0;
+  color: var(--muted-foreground);
+  line-height: 1.65;
 }
 
 .surfaceCard svg,
@@ -813,6 +870,10 @@ input:focus-visible {
   margin-bottom: 28px;
 }
 
+.blogShell .pageHeader {
+  max-width: 900px;
+}
+
 .pageHeader h1,
 .proseArticle h1 {
   font-size: 50px;
@@ -906,6 +967,12 @@ input:focus-visible {
   min-width: 0;
 }
 
+.articleHero {
+  margin-bottom: 30px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--border);
+}
+
 .articleMeta {
   display: flex;
   flex-wrap: wrap;
@@ -992,6 +1059,76 @@ input:focus-visible {
 
 .taxonomyBar {
   margin-bottom: 20px;
+}
+
+.featuredPost {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
+  gap: 0;
+  overflow: hidden;
+  margin: 30px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.featuredPost img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+  background: var(--muted);
+}
+
+.featuredPostBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px;
+}
+
+.featuredPostBody h2 {
+  margin: 0;
+  color: var(--card-foreground);
+  font-size: 34px;
+  line-height: 1.12;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.featuredPostBody > span {
+  margin-top: 14px;
+  color: var(--muted-foreground);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.featuredMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.featuredMeta span {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.featuredPost a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  margin-top: 22px;
+  color: var(--brand-emphasis);
+  font-weight: 850;
 }
 
 .postGrid {
@@ -1148,6 +1285,14 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .featuredPost {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredPost img {
+    min-height: 230px;
+  }
+
   .editorWorkspace {
     grid-template-columns: 1fr;
   }
@@ -1203,8 +1348,18 @@ input:focus-visible {
   }
 
   .workspaceGrid,
+  .heroProofGrid,
+  .proofGrid,
   .surfaceGrid {
     grid-template-columns: 1fr;
+  }
+
+  .featuredPostBody {
+    padding: 22px;
+  }
+
+  .featuredPostBody h2 {
+    font-size: 28px;
   }
 
   .editorTopbar {
