@@ -23,7 +23,6 @@ from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywright
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STORAGE_KEY = "codaro-custom-curricula"
 PACKAGE_FAILURE_TITLE = "Runtime package recovery fixture"
 CELL_FAILURE_TITLE = "Runtime cell failure fixture"
 MISSING_PACKAGE = "codaro_missing_runtime_pkg"
@@ -67,20 +66,16 @@ def main(argv: list[str] | None = None) -> int:
         cli = PlaywrightCli(cliPath=cliPath, cwd=workspace, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
-        cli.run("localstorage-set", STORAGE_KEY, json.dumps([
-            customCurriculumEntry(PACKAGE_FAILURE_TITLE, customCurriculumDocument("package-failure")),
-            customCurriculumEntry(CELL_FAILURE_TITLE, customCurriculumDocument("cell-failure")),
-        ], ensure_ascii=False))
-        cli.run("reload")
-        cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "custom runtime recovery curriculum")
-        cli.eval(jsClickText(PACKAGE_FAILURE_TITLE))
+        cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "runtime recovery curriculum")
         cli.waitEval(jsTextPresent("직접 입력 실습"), "idle direct practice section")
         idle = recordCheck(checks, "idle-runtime-copy", cli.eval(jsAssertIdleRuntimeRecovery()))
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("라이브러리 준비 실패"), "package install failure notice")
         failure = recordCheck(checks, "package-install-failure", cli.eval(jsAssertPackageFailureRecovery()))
-        cli.eval(jsClickText(CELL_FAILURE_TITLE))
-        cli.waitEval(jsTextPresent("직접 입력 실습"), "cell failure direct practice section")
+
+        api.activeCase = "cell-failure"
+        cli.run("reload")
+        cli.waitEval(jsTextPresent(CELL_FAILURE_SYMBOL), "cell failure direct practice section")
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("셀 실행 실패"), "cell execution failure recovery")
         cellFailure = recordCheck(checks, "cell-execution-failure", cli.eval(jsAssertCellFailureRecovery()))
@@ -201,6 +196,7 @@ class RuntimeRecoveryStubApi:
         self.port = port
         self.baseUrl = f"http://127.0.0.1:{port}"
         self.calls: list[str] = []
+        self.activeCase = "package-failure"
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
 
@@ -248,9 +244,14 @@ class RuntimeRecoveryStubApi:
                         "learningPaths": {},
                     })
                 elif path.startswith("/api/curriculum/contents/"):
-                    self._sendJson({"category": "30days", "categoryName": "파이썬 기초", "contents": [{"contentId": "runtime-recovery", "title": PACKAGE_FAILURE_TITLE}]})
+                    title = CELL_FAILURE_TITLE if owner.activeCase == "cell-failure" else PACKAGE_FAILURE_TITLE
+                    self._sendJson({
+                        "category": "30days",
+                        "categoryName": "파이썬 기초",
+                        "contents": [{"contentId": f"runtime-recovery-{owner.activeCase}", "title": title}],
+                    })
                 elif path.startswith("/api/curriculum/content/"):
-                    self._sendJson({"document": customCurriculumDocument("package-failure"), "solutions": {}})
+                    self._sendJson({"document": customCurriculumDocument(owner.activeCase), "solutions": {}})
                 elif path == "/api/ai/tools":
                     self._sendJson({"groups": [], "lanes": [], "tools": [], "grouped": {}, "byLane": {}})
                 elif path == "/api/ai/profile":
@@ -369,17 +370,6 @@ def jsTextPresent(text: str) -> str:
     return f"document.body.innerText.includes({json.dumps(text, ensure_ascii=False)})"
 
 
-def jsClickText(text: str) -> str:
-    return compactJs(f"""
-(() => {{
-  const target = [...document.querySelectorAll('button,[role="button"],a')].find((element) => element.textContent?.includes({json.dumps(text, ensure_ascii=False)}));
-  if (!target) throw new Error('click target missing: {text}');
-  target.click();
-  return 'clicked';
-}})()
-""")
-
-
 def jsClickFirstRunButton() -> str:
     return compactJs("""
 (() => {
@@ -449,15 +439,6 @@ def debugPageState(cli: PlaywrightCli) -> str:
 
 def compactJs(source: str) -> str:
     return " ".join(line.strip() for line in source.strip().splitlines() if line.strip())
-
-
-def customCurriculumEntry(title: str, document: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "id": f"custom-{title.lower().replace(' ', '-')}",
-        "title": title,
-        "document": document,
-        "createdAt": 1_700_000_000_000,
-    }
 
 
 def customCurriculumDocument(caseId: str) -> dict[str, Any]:
