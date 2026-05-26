@@ -693,6 +693,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "commandLogPath",
                 "logs",
                 "subprocess.STDOUT",
+                "waitForLogFileStable",
                 "timeoutSeconds",
                 "terminateProcess",
                 "printLogTail",
