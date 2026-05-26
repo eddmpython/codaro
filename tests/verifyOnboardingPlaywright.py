@@ -70,7 +70,11 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsProviderSettingsClosed(), "provider settings closed after onboarding CTA")
         cli.eval(jsOpenSurface("커리큘럼"))
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
+        cli.waitEval(jsTextPresent("Hello World"), "default curriculum lesson")
+        defaultLesson = recordCheck(checks, "curriculum-default-lesson", cli.eval(jsAssertCurriculumDefaultLesson()))
         sidebar = recordCheck(checks, "curriculum-sidebar-groups", cli.eval(jsAssertCurriculumSidebarGroups()))
+        sidebarClearance = recordCheck(checks, "curriculum-sidebar-scrollbar-clearance", cli.eval(jsAssertCurriculumSidebarScrollbarClearance()))
+        sidebarToggle = recordCheck(checks, "curriculum-sidebar-toggle", cli.eval(jsAssertCurriculumSidebarToggle()))
         cli.eval(jsOpenSurface("채팅"))
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
         api.ready = True
@@ -95,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(
             f"ok: onboarding browser verified {fallback} {diagnosticExport} {providerCta} "
-            f"{fallbackSettings} {sidebar} {ready} {settings}"
+            f"{fallbackSettings} {defaultLesson} {sidebar} {sidebarClearance} {sidebarToggle} {ready} {settings}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
@@ -149,7 +153,9 @@ def onboardingSignals(apiCalls: list[str], checks: list[dict[str, Any]]) -> dict
         "providerCtaOpenedSettings": "provider-connect-cta" in checkIds,
         "providerFallbackBeforeReady": "provider-fallback-settings" in checkIds,
         "providerReadyAfterValidate": "provider-ready-settings" in checkIds,
+        "curriculumDefaultLesson": "curriculum-default-lesson" in checkIds,
         "curriculumGroupsVisible": "curriculum-sidebar-groups" in checkIds,
+        "curriculumScrollbarClearance": "curriculum-sidebar-scrollbar-clearance" in checkIds,
     }
 
 
@@ -460,6 +466,76 @@ def jsAssertCurriculumSidebarGroups() -> str:
   const groupButtons = [...document.querySelectorAll('button')].filter((button) => ['Python 기초', '데이터 분석', '자동화·실무'].some((label) => button.textContent?.includes(label)));
   if (groupButtons.length < 3) throw new Error('curriculum sidebar group buttons missing');
   return 'curriculum-sidebar-groups-ok';
+})()
+""")
+
+
+def jsAssertCurriculumDefaultLesson() -> str:
+    return compactJs("""
+(() => {
+  const text = document.body.innerText;
+  const required = ['Hello World', 'Hello World 실습'];
+  const missing = required.filter((item) => !text.includes(item));
+  if (missing.length) throw new Error('default curriculum lesson missing: ' + missing.join(', '));
+  if (text.includes('새 노트북')) throw new Error('curriculum surface fell back to blank notebook');
+  if (text.includes('화면을 불러오는 중')) throw new Error('curriculum surface is stuck on loading');
+  return 'curriculum-default-lesson-ok';
+})()
+""")
+
+
+def jsAssertCurriculumSidebarScrollbarClearance() -> str:
+    return compactJs("""
+(() => {
+  const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+  if (!sidebar) throw new Error('sidebar root missing');
+  sidebar.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+  const viewport = sidebar.querySelector('[data-slot="scroll-area-viewport"]');
+  if (!viewport) throw new Error('sidebar viewport missing');
+  const viewportRect = viewport.getBoundingClientRect();
+  const visibleBadges = [...sidebar.querySelectorAll('[data-sidebar="menu-badge"]')]
+    .filter((badge) => badge.getClientRects().length > 0);
+  const badgeTooClose = visibleBadges.find((badge) => badge.getBoundingClientRect().right > viewportRect.right - 10);
+  if (badgeTooClose) throw new Error('sidebar badge too close to scrollbar gutter: ' + badgeTooClose.textContent);
+  const scrollbar = sidebar.querySelector('[data-slot="scroll-area-scrollbar"]');
+  if (!scrollbar) return 'curriculum-sidebar-scrollbar-clearance-ok';
+  const scrollbarRect = scrollbar.getBoundingClientRect();
+  if (scrollbarRect.width <= 0) return 'curriculum-sidebar-scrollbar-clearance-ok';
+  const overlapped = visibleBadges.find((badge) => badge.getBoundingClientRect().right > scrollbarRect.left - 1);
+  if (overlapped) throw new Error('sidebar scrollbar overlaps badge: ' + overlapped.textContent);
+  return 'curriculum-sidebar-scrollbar-clearance-ok';
+})()
+""")
+
+
+def jsAssertCurriculumSidebarToggle() -> str:
+    return compactJs("""
+(async () => {
+  const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+  if (!sidebar) throw new Error('sidebar root missing');
+  const visibleButtons = () => [...sidebar.querySelectorAll('button')].filter((button) => button.getClientRects().length > 0);
+  const buttonByPrefix = (label) => visibleButtons().find((button) => button.textContent?.trim().startsWith(label));
+  const hasVisibleButton = (label) => visibleButtons().some((button) => button.textContent?.includes(label));
+  const waitForRender = () => new Promise((resolve) => setTimeout(resolve, 80));
+  const pythonGroup = buttonByPrefix('Python 기초');
+  if (!pythonGroup) throw new Error('Python 기초 group button missing');
+  if (!hasVisibleButton('파이썬 기초')) throw new Error('selected group should start expanded');
+  pythonGroup.click();
+  await waitForRender();
+  if (hasVisibleButton('파이썬 기초')) throw new Error('selected group did not collapse on second click');
+  pythonGroup.click();
+  await waitForRender();
+  if (!hasVisibleButton('파이썬 기초')) throw new Error('selected group did not expand again');
+  const pythonBasics = buttonByPrefix('파이썬 기초');
+  if (!pythonBasics) throw new Error('파이썬 기초 category button missing');
+  if (!hasVisibleButton('Hello World')) throw new Error('selected category should start expanded');
+  pythonBasics.click();
+  await waitForRender();
+  if (hasVisibleButton('Hello World')) throw new Error('selected category did not collapse on second click');
+  pythonBasics.click();
+  await waitForRender();
+  if (!hasVisibleButton('Hello World')) throw new Error('selected category did not expand again');
+  return 'curriculum-sidebar-toggle-ok';
 })()
 """)
 

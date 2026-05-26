@@ -15,10 +15,12 @@ import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { cn } from "@/lib/utils";
 
 export function CellAiActions({
+  compact = false,
   helpState,
   onAsk,
   selected,
 }: {
+  compact?: boolean;
   helpState?: CellAiHelpState;
   onAsk: (action: CellAiAction, question?: string) => void;
   selected: boolean;
@@ -60,7 +62,7 @@ export function CellAiActions({
         aria-expanded={open}
         aria-label="이 셀에서 AI 도움 요청"
         className={cn(
-          "h-7 gap-1.5 px-2 text-xs",
+          compact ? "h-5 gap-1 rounded-md px-1.5 text-[10px] font-semibold [&_svg]:size-3" : "h-7 gap-1.5 px-2 text-xs",
           open && "border-ring bg-muted",
         )}
         data-cell-ai-help-trigger="always-visible"
@@ -73,8 +75,8 @@ export function CellAiActions({
           setOpen((current) => !current);
         }}
       >
-        <Sparkles className="size-3.5" />
-        <span className="hidden sm:inline">도움 요청</span>
+        <Sparkles className={compact ? "size-3" : "size-3.5"} />
+        {compact ? <span>AI</span> : <span className="hidden sm:inline">도움 요청</span>}
       </Button>
 
       {open ? (

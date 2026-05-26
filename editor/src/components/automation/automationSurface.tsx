@@ -79,7 +79,7 @@ export function AutomationView({
   }, [activeSection]);
 
   return (
-    <ScrollArea className="h-[calc(100vh-40px)] min-h-0">
+    <ScrollArea className="h-full min-h-0">
       <div className="p-4">
         <div className="mx-auto max-w-6xl space-y-5">
           <div className="flex flex-wrap items-start justify-between gap-3">

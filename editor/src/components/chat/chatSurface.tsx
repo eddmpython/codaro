@@ -48,7 +48,7 @@ export function ChatSurface({
   const providerReady = apiOnline && aiProfileReady(aiProfile);
   if (isEmptyChat) {
     return (
-      <div className="grid h-[calc(100vh-40px)] min-h-0 place-items-center px-4">
+      <div className="grid h-full min-h-0 place-items-center px-4">
         <section className="w-full max-w-3xl">
           <img alt="" className="mx-auto mb-5 size-52 object-contain sm:size-56" src="/brand/avatar-small.png" />
           <div className="mb-5 text-center">
@@ -90,7 +90,7 @@ export function ChatSurface({
   }
 
   return (
-    <div className="h-[calc(100vh-40px)] min-h-0">
+    <div className="h-full min-h-0">
       <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_auto] pt-5">
         <AssistantMessages
           aiConnecting={aiConnecting}

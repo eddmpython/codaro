@@ -15,6 +15,7 @@ import {
   IconButton,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
+import { SocialLinks } from "@/components/app/socialLinks";
 import { AssistantMarkdown } from "@/components/assistant/assistantMarkdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -620,41 +621,46 @@ function AssistantHeader({
 }) {
   const { t } = useLocale();
   return (
-    <div className="mb-3 flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <CodaroAiAvatar className="size-4" />
-          Codaro AI
-        </div>
-        {compact ? (
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">{assistantStatusText(apiOnline, aiProfile)}</div>
-        ) : (
-          <div className="mt-1 flex flex-wrap gap-2">
-            <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-              {apiOnline && aiProfileReady(aiProfile) ? t("assistant.providerConnected") : t("provider.fallbackMode")}
-            </Badge>
-            <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
-          </div>
-        )}
+    <div className="mb-3 space-y-3">
+      <div className="flex justify-end">
+        <SocialLinks />
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        {compact ? (
-          apiOnline && !aiProfileReady(aiProfile) ? (
-            <Button className="h-8 gap-1.5 px-2 text-xs" disabled={aiConnecting} size="sm" variant="outline" onClick={onConnectAi}>
-              {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-              Provider
-            </Button>
-          ) : null
-        ) : (
-          <>
-            <IconButton disabled={aiConnecting} label={t("assistant.connectProvider")} onClick={onConnectAi}>
-              {aiConnecting ? <Loader2 className="animate-spin" /> : <CodaroAiAvatar className="size-4" />}
-            </IconButton>
-            <IconButton label="새 채팅" onClick={onNewChat}>
-              <RotateCcw />
-            </IconButton>
-          </>
-        )}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <CodaroAiAvatar className="size-4" />
+            Codaro AI
+          </div>
+          {compact ? (
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">{assistantStatusText(apiOnline, aiProfile)}</div>
+          ) : (
+            <div className="mt-1 flex flex-wrap gap-2">
+              <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
+                {apiOnline && aiProfileReady(aiProfile) ? t("assistant.providerConnected") : t("provider.fallbackMode")}
+              </Badge>
+              <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
+            </div>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {compact ? (
+            apiOnline && !aiProfileReady(aiProfile) ? (
+              <Button className="h-8 gap-1.5 px-2 text-xs" disabled={aiConnecting} size="sm" variant="outline" onClick={onConnectAi}>
+                {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
+                Provider
+              </Button>
+            ) : null
+          ) : (
+            <>
+              <IconButton disabled={aiConnecting} label={t("assistant.connectProvider")} onClick={onConnectAi}>
+                {aiConnecting ? <Loader2 className="animate-spin" /> : <CodaroAiAvatar className="size-4" />}
+              </IconButton>
+              <IconButton label="새 채팅" onClick={onNewChat}>
+                <RotateCcw />
+              </IconButton>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

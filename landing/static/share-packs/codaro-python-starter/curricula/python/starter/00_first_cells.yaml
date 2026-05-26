@@ -1,0 +1,32 @@
+meta:
+  id: codaro.python-starter.first-cells
+  title: Python 첫 셀 실행
+  category: imported
+  packages: []
+tags:
+  - starter
+  - official
+intro:
+  direction: 공유 팩으로 가져온 커리큘럼을 로컬에서 실행합니다.
+sections:
+  - id: predict-run-check
+    title: 예측하고 실행하기
+    goal: 작은 Python 값을 예측한 뒤 Codaro 셀에서 실행합니다.
+    why: 공유받은 커리큘럼도 built-in 커리큘럼처럼 실행 가능한 학습 문서로 열려야 합니다.
+    explanation: 먼저 `value`가 어떤 값이 될지 예측하고, 셀을 실행해 결과를 확인합니다.
+    snippet: |
+      value = 3 * 7
+      value
+    exercise:
+      prompt: "`value`가 21이 되도록 코드를 작성하세요."
+      starterCode: |
+        value = 3 * 7
+      solution: |
+        value = 21
+      hints:
+        - 3 곱하기 7의 결과를 생각해 보세요.
+      check:
+        variable: value
+    check:
+      noError: 오류 없이 실행되어야 합니다.
+      expectedVariable: value

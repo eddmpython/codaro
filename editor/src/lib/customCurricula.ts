@@ -91,6 +91,43 @@ export function createCustomCurriculumEntry(blocks: BlockConfig[], title?: strin
   };
 }
 
+export function createCustomCurriculumEntryFromDocument(
+  sourceDocument: CodaroDocument,
+  title?: string,
+): CustomCurriculumEntry {
+  const createdAt = Date.now();
+  const resolvedTitle = title?.trim() || sourceDocument.title || "나만의 커리큘럼";
+  const id = `custom-${createdAt}-${slugifyText(resolvedTitle)}`;
+  const normalizedBlocks = sourceDocument.blocks.map((block, index) => ({
+    ...block,
+    id: `${id}-${block.id || index}`.replace(/[^a-zA-Z0-9_-]/g, "-"),
+  }));
+  const document: CodaroDocument = {
+    ...sourceDocument,
+    id: `curriculum-${id}`,
+    title: resolvedTitle,
+    blocks: normalizedBlocks,
+    metadata: {
+      sourceFormat: sourceDocument.metadata?.sourceFormat ?? "custom-curriculum",
+      tags: [...new Set([...(sourceDocument.metadata?.tags ?? []), "custom", slugifyText(resolvedTitle)])],
+      createdAt: new Date(createdAt).toISOString(),
+      updatedAt: sourceDocument.metadata?.updatedAt,
+    },
+    app: {
+      title: resolvedTitle,
+      layout: sourceDocument.app?.layout ?? "learning",
+      hideCode: sourceDocument.app?.hideCode ?? false,
+      entryBlockIds: sourceDocument.app?.entryBlockIds ?? [],
+    },
+  };
+  return {
+    id,
+    title: resolvedTitle,
+    document,
+    createdAt,
+  };
+}
+
 export function upsertCustomCurriculumEntry(
   current: CustomCurriculumEntry[],
   entry: CustomCurriculumEntry,
@@ -103,7 +140,10 @@ export function buildCustomCurriculumApplication(
   options: { showNotice?: boolean } = {},
 ): CustomCurriculumApplication {
   return {
-    draftUpdates: draftsFromBlocks(entry.document.blocks, { emptySnippetDraft: true }),
+    draftUpdates: draftsFromBlocks(entry.document.blocks, {
+      emptyDuplicateSnippetExerciseDraft: true,
+      emptySnippetDraft: true,
+    }),
     document: entry.document,
     notice: options.showNotice
       ? {

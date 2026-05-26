@@ -19,7 +19,6 @@ import { useLocale } from "@/lib/localeContext";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 import type { AppNotice, LoadState } from "@/types";
-import { SocialLinks } from "./socialLinks";
 
 export function TopBar({
   assistantCollapsed,
@@ -77,7 +76,6 @@ export function TopBar({
       )}
 
       <div className="relative z-10 flex shrink-0 items-center gap-1">
-        <SocialLinks />
         {showStatusNotice && onCopyDiagnosticExport ? (
           <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
         ) : null}

@@ -4,10 +4,9 @@ import {
   initialBootstrapState,
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
-import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar } from "@/components/app/productSidebar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
-import type { AutomationSection } from "@/lib/surfaceModel";
+import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
@@ -22,6 +21,7 @@ import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLocaleState } from "@/hooks/useLocaleState";
 import { codaroApi } from "@/lib/api";
+import { buildCustomCurriculumApplication } from "@/lib/customCurricula";
 import { LocaleProvider } from "@/lib/localeContext";
 import {
   SidebarInset,
@@ -32,6 +32,8 @@ import type {
   CodaroDocument,
   LoadState,
 } from "@/types";
+
+const DEFAULT_CURRICULUM_CATEGORY = "30days";
 
 function App() {
   const localeState = useLocaleState();
@@ -48,8 +50,10 @@ function App() {
     addNotebookCell,
     applyDraftUpdates,
     applyNotebookDocument,
+    deleteNotebookCell,
     document,
     drafts,
+    renameNotebookDocument,
     replaceDocument,
     selectedBlockId,
     selectBlock,
@@ -77,6 +81,8 @@ function App() {
   const {
     customCurricula,
     findCustomCurriculum,
+    removeCustomCurriculumEntry,
+    saveCustomCurriculumDocumentEntry,
     saveCustomCurriculumEntry,
     selectedCustomCurriculumId,
     setSelectedCustomCurriculumId,
@@ -87,7 +93,7 @@ function App() {
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const { themeMode, toggleThemeMode } = useThemeMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [assistantCollapsed, setAssistantCollapsed] = useState(false);
+  const assistantCollapsed = false;
   const {
     auditCount,
     automationSection,
@@ -116,6 +122,7 @@ function App() {
 
   const {
     filteredCategories,
+    deleteCustomCurriculum,
     query,
     saveCustomCurriculum,
     selectCustomCurriculum,
@@ -128,6 +135,7 @@ function App() {
     categories,
     customCurricula,
     findCustomCurriculum,
+    removeCustomCurriculumEntry,
     saveCustomCurriculumEntry,
     selectCurriculumCategoryState,
     selectCurriculumContentState,
@@ -142,12 +150,9 @@ function App() {
   const {
     canRun,
     currentResult,
-    hasRunnableNotebook,
-    notebookRunning,
     resetRuntimeState,
     results,
     runBlock,
-    runNotebook,
     runningBlockId,
     sessionId,
     setSessionId,
@@ -197,10 +202,19 @@ function App() {
     refreshAutomation,
   });
 
-  const copyDiagnosticExport = useCallback(async () => {
-    const payload = await codaroApi.systemDiagnosticsExport();
-    await writeClipboardText(JSON.stringify(payload, null, 2));
-  }, []);
+  const openSharePackCurriculum = useCallback(async (packId: string, path: string, version?: string | null) => {
+    const payload = await codaroApi.sharePackCurriculum(packId, path, version);
+    const entry = saveCustomCurriculumDocumentEntry(payload.document, payload.document.title);
+    const application = buildCustomCurriculumApplication(entry, { showNotice: true });
+    applyCurriculumSelectionState(application);
+    setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
+    setSurface(application.surfaceToOpen);
+  }, [
+    applyCurriculumSelectionState,
+    saveCustomCurriculumDocumentEntry,
+    setSelectedCustomCurriculumId,
+    setSurface,
+  ]);
 
   const {
     askAssistant,
@@ -239,6 +253,17 @@ function App() {
     setSurface("automation");
   }
 
+  const selectSurface = useCallback((nextSurface: SurfaceMode) => {
+    if (nextSurface === "curriculum") {
+      const defaultCategory = categories.some((category) => category.key === DEFAULT_CURRICULUM_CATEGORY)
+        ? DEFAULT_CURRICULUM_CATEGORY
+        : categories[0]?.key ?? selectedCategory;
+      selectCurriculumCategory(defaultCategory);
+      return;
+    }
+    setSurface(nextSurface);
+  }, [categories, selectCurriculumCategory, selectedCategory, setSurface]);
+
   return (
     <LocaleProvider value={localeState}>
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -263,24 +288,12 @@ function App() {
         onSelectCategory={selectCurriculumCategory}
         onSelectContent={selectCurriculumContent}
         onSelectCustomCurriculum={selectCustomCurriculum}
-        onSurfaceChange={setSurface}
+        onDeleteCustomCurriculum={deleteCustomCurriculum}
+        onSurfaceChange={selectSurface}
         onToggleTheme={toggleThemeMode}
       />
 
-      <SidebarInset className="grid h-svh min-h-0 min-w-0 grid-rows-[40px_minmax(0,1fr)] overflow-hidden">
-        <TopBar
-          assistantCollapsed={assistantCollapsed}
-          canRun={canRun && hasRunnableNotebook}
-          loadState={loadState}
-          notice={notice}
-          showSidebarTrigger={!sidebarOpen}
-          surface={surface}
-          notebookRunning={notebookRunning}
-          onCopyDiagnosticExport={copyDiagnosticExport}
-          onRunNotebook={runNotebook}
-          onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
-        />
-
+      <SidebarInset className="h-svh min-h-0 min-w-0 overflow-hidden">
         <MainSurface
           aiConnecting={aiConnecting}
           aiProfile={aiProfile}
@@ -317,15 +330,17 @@ function App() {
           onConnectAi={connectAiProvider}
           onCellAsk={askCellAssistant}
           onDraftChange={updateDraft}
+          onDeleteCell={deleteNotebookCell}
           onNewChat={startNewChat}
           onPromptChange={setPrompt}
           onRejectPendingBlocks={rejectPendingBlocks}
           onRefreshAutomation={refreshAutomation}
+          onRenameDocument={renameNotebookDocument}
+          onOpenSharePackCurriculum={openSharePackCurriculum}
           onRunBlock={runBlock}
           onRunTask={runTask}
           onSelectBlock={selectBlock}
           onSelectCurriculumBlock={setSelectedCurriculumBlockId}
-          onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
           onToggleEStop={toggleEStop}
         />
       </SidebarInset>
@@ -355,25 +370,6 @@ function shouldKeepCurrentNotice(currentNotice: AppNotice, nextNotice: AppNotice
   const nextIsBackground =
     nextNotice.tone === "success" && backgroundNoticeTitles.has(nextNotice.title);
   return currentIsDiagnostic && nextIsBackground;
-}
-
-async function writeClipboardText(text: string) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-  const textArea = globalThis.document.createElement("textarea");
-  textArea.value = text;
-  textArea.setAttribute("readonly", "true");
-  textArea.style.position = "fixed";
-  textArea.style.left = "-9999px";
-  globalThis.document.body.appendChild(textArea);
-  textArea.select();
-  try {
-    globalThis.document.execCommand("copy");
-  } finally {
-    textArea.remove();
-  }
 }
 
 export default App;

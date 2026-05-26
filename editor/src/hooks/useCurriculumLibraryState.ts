@@ -73,6 +73,7 @@ export function useCurriculumLibraryState({
           setCurriculumDocument(result.document);
           onDraftUpdates(result.draftUpdates);
           setSelectedCurriculumBlockId(result.selectedBlockId);
+          setSelectedContentId((current) => current === result.selectedContentId ? current : result.selectedContentId);
           onNotice(result.notice);
         }
       } finally {
@@ -91,7 +92,12 @@ export function useCurriculumLibraryState({
     setCategories(bootstrap.categories);
     setCategoryGroups(bootstrap.categoryGroups);
     setContents(bootstrap.contents);
-    setCurriculumDocument(bootstrap.curriculumDocument);
+    setSelectedCategory(bootstrap.selectedCategory);
+    setSelectedContentId(bootstrap.selectedContentId);
+    if (bootstrap.curriculumDocument) {
+      setCurriculumDocument(bootstrap.curriculumDocument);
+      setSelectedCurriculumBlockId(bootstrap.curriculumDocument.blocks[0]?.id ?? "");
+    }
   }, []);
 
   const applyCurriculumSelectionState = useCallback((selection: CurriculumSelectionState) => {

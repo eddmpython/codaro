@@ -33,6 +33,7 @@ function absoluteUrl(pathValue) {
 const urls = [
   { loc: `${siteUrl}/`, changefreq: "weekly", priority: "1.0" },
   { loc: `${siteUrl}/docs`, changefreq: "weekly", priority: "0.9" },
+  { loc: `${siteUrl}/packs`, changefreq: "weekly", priority: "0.8" },
   { loc: `${siteUrl}/docs/blog`, changefreq: "weekly", priority: "0.8" },
   { loc: `${siteUrl}/search`, changefreq: "monthly", priority: "0.6" },
   ...posts.map((post) => ({ loc: absoluteUrl(post.url), changefreq: "monthly", priority: "0.8", lastmod: post.date })),

@@ -5,7 +5,7 @@ type SurfaceSetter = Dispatch<SetStateAction<SurfaceMode>>;
 
 function surfaceFromHash(hash: string): SurfaceMode {
   const value = hash.replace(/^#/, "");
-  if (value === "editor" || value === "curriculum" || value === "automation" || value === "chat") return value;
+  if (value === "editor" || value === "curriculum" || value === "automation" || value === "chat" || value === "share") return value;
   return "chat";
 }
 

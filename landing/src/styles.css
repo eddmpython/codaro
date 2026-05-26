@@ -424,6 +424,93 @@ input {
   color: #0f766e;
 }
 
+.shareHowTo {
+  display: flex;
+  gap: 16px;
+  max-width: 920px;
+  margin-bottom: 18px;
+  padding: 20px;
+  border: 1px solid rgba(39, 39, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.shareHowTo svg {
+  flex: 0 0 auto;
+  color: #0f766e;
+}
+
+.shareHowTo h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.shareHowTo p {
+  margin: 0;
+  color: #52525b;
+  line-height: 1.7;
+}
+
+.packGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.packCard {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid rgba(39, 39, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.packCardHeader,
+.packMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.packCardHeader {
+  justify-content: space-between;
+  color: #0f766e;
+}
+
+.packCardHeader span,
+.packMeta span {
+  padding: 6px 8px;
+  border: 1px solid #d4d4d8;
+  border-radius: 8px;
+  color: #3f3f46;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.packCard h2 {
+  margin: 0;
+  color: #18181b;
+  font-size: 24px;
+}
+
+.packCard p {
+  margin: 0;
+  color: #52525b;
+  line-height: 1.7;
+}
+
+.packCard code {
+  display: block;
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f4f4f5;
+  color: #18181b;
+  font-size: 13px;
+}
+
 .siteFooter {
   display: flex;
   align-items: center;
@@ -783,7 +870,8 @@ input {
   .docGroupGrid,
   .postGrid,
   .toolGrid,
-  .surfaceGrid {
+  .surfaceGrid,
+  .packGrid {
     grid-template-columns: 1fr;
   }
 

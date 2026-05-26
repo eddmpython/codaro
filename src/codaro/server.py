@@ -24,6 +24,7 @@ from .api import (
     createExtensionRouter,
     createKernelRouter,
     createServerState,
+    createShareRouter,
     createSpaRouter,
     createSystemRouter,
     createWorkspaceRouter,
@@ -225,11 +226,17 @@ def createServerApp(
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
     serverPort = os.environ.get("CODARO_PORT", "8765")
+    configuredOrigins = [
+        origin.strip().rstrip("/")
+        for origin in os.environ.get("CODARO_DEV_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
     allowedOrigins = [
         f"http://localhost:{serverPort}",
         f"http://127.0.0.1:{serverPort}",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        *configuredOrigins,
     ]
     app.add_middleware(
         CORSMiddleware,
@@ -290,6 +297,7 @@ def createServerApp(
     from .api.integrationRouter import createIntegrationRouter
     app.include_router(createIntegrationRouter(state))
     app.include_router(createKernelRouter(state))
+    app.include_router(createShareRouter(state))
     app.include_router(createSystemRouter(state))
     app.include_router(createWorkspaceRouter(state))
     app.include_router(createCurriculumRouter(state))

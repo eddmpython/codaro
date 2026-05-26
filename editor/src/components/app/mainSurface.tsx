@@ -29,6 +29,7 @@ const NotebookPanel = lazy(() => import("@/components/notebook/notebookPanel").t
 const CodeCellEditor = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.CodeCellEditor })));
 const CurriculumView = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumView })));
 const CurriculumCellToc = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumCellToc })));
+const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
 type MainSurfaceProps = {
   aiConnecting: boolean;
@@ -61,20 +62,22 @@ type MainSurfaceProps = {
   surface: SurfaceMode;
   tasks: TaskListPayload;
   onAcceptPendingBlocks: () => void;
-  onAddCell: (type: "code" | "markdown") => void;
+  onAddCell: (type: "code" | "markdown", referenceBlockId?: string, placement?: "before" | "after") => void;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onConnectAi: () => void;
+  onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNewChat: () => void;
   onPromptChange: (value: string) => void;
+  onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
   onRefreshAutomation: () => void;
+  onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
   onRunTask: (task: TaskDefinition) => void;
   onSelectBlock: (blockId: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
-  onToggleAssistant: () => void;
   onToggleEStop: () => void;
 };
 
@@ -112,7 +115,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     return (
       <div
         className={cn(
-          "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
+          "grid h-full min-h-0 grid-cols-1",
           !props.assistantCollapsed && "xl:grid-cols-[minmax(0,1fr)_380px]",
         )}
       >
@@ -129,6 +132,8 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           onDraftChange={props.onDraftChange}
           onAcceptPendingBlocks={props.onAcceptPendingBlocks}
           onCellAsk={props.onCellAsk}
+          onDeleteCell={props.onDeleteCell}
+          onRenameDocument={props.onRenameDocument}
           onRejectPendingBlocks={props.onRejectPendingBlocks}
           onRunBlock={props.onRunBlock}
           onSelectBlock={props.onSelectBlock}
@@ -156,7 +161,10 @@ function MainSurfaceContent(props: MainSurfaceProps) {
   }
 
   if (props.surface === "curriculum") {
-    const curriculumDoc = props.curriculumDocument ?? props.document;
+    if (!props.curriculumDocument) {
+      return <SurfaceLoading />;
+    }
+    const curriculumDoc = props.curriculumDocument;
     const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
     const selectedCategoryLabel =
       isCustomCurriculum
@@ -170,7 +178,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     return (
       <div
         className={cn(
-          "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
+          "grid h-full min-h-0 grid-cols-1",
           props.assistantCollapsed
             ? "2xl:grid-cols-[minmax(0,1fr)_44px]"
             : "xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_44px_360px]",
@@ -194,7 +202,13 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           renderCodeCellEditor={({ autoFocus = true, block, draft, onChange, onFocus, onRun }) => (
             <CodeCellEditor
               autoFocus={autoFocus}
-              placeholderText={block.role === "snippet" ? t("cell.placeholder.snippet") : t("cell.placeholder.code")}
+              placeholderText={
+                block.role === "snippet"
+                  ? t("cell.placeholder.snippet")
+                  : block.role === "exercise"
+                    ? "Python 코드를 입력하세요."
+                    : t("cell.placeholder.code")
+              }
               value={draft}
               onChange={onChange}
               onFocus={onFocus}
@@ -235,6 +249,16 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     );
   }
 
+  if (props.surface === "share") {
+    return (
+      <SharePackSurface
+        apiOnline={props.apiOnline}
+        onOpenCurriculum={props.onOpenSharePackCurriculum}
+        onTaskCreated={props.onRefreshAutomation}
+      />
+    );
+  }
+
   return (
     <AutomationView
       activeSection={props.automationSection}
@@ -252,7 +276,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
 function SurfaceLoading() {
   const { t } = useLocale();
   return (
-    <div className="grid h-[calc(100vh-40px)] min-h-0 place-items-center px-4 text-sm text-muted-foreground">
+    <div className="grid h-full min-h-0 place-items-center px-4 text-sm text-muted-foreground">
       {t("surface.loading")}
     </div>
   );

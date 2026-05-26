@@ -45,7 +45,7 @@ export function useNotebookRuntimeState({
   const codeBlocks = useMemo(() => document.blocks.filter((block) => block.type === "code"), [document.blocks]);
   const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
   const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
-  const canRun = apiOnline ? Boolean(sessionId) : true;
+  const canRun = true;
 
   const resetRuntimeState = useCallback(() => {
     setResults({});

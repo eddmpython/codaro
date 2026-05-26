@@ -7,14 +7,17 @@ import {
   Loader2,
   MessageSquare,
   Moon,
+  PackageOpen,
   Search,
   Settings,
   Sun,
   TerminalSquare,
+  Trash2,
   Workflow,
 } from "lucide-react";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
@@ -59,6 +62,7 @@ type ProductSidebarProps = {
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
+  onDeleteCustomCurriculum: (id: string) => void;
   onSurfaceChange: (surface: SurfaceMode) => void;
   onToggleTheme: () => void;
 };
@@ -91,6 +95,7 @@ export function ProductSidebar({
   onSelectCategory,
   onSelectContent,
   onSelectCustomCurriculum,
+  onDeleteCustomCurriculum,
   onSurfaceChange,
   onToggleTheme,
 }: ProductSidebarProps) {
@@ -101,6 +106,7 @@ export function ProductSidebar({
     { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap },
     { value: "automation", label: t("nav.automation"), Icon: Workflow },
   ];
+  navItems.push({ value: "share", label: t("nav.share"), Icon: PackageOpen });
   const themeLabel = themeMode === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode");
   const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
 
@@ -165,65 +171,68 @@ export function ProductSidebar({
 
       <SidebarContent className="overflow-hidden">
         <ScrollArea className="min-h-0 flex-1">
-          <SidebarGroup className="py-0.5">
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {navItems.map(({ Icon, label, value }) => (
-                  <SidebarMenuItem key={value}>
-                    <SidebarMenuButton
-                      className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
-                      isActive={surface === value}
-                      tooltip={label}
-                      onClick={() => onSurfaceChange(value)}
-                    >
-                      <Icon />
-                      <span>{label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <div className="min-w-0 pr-3 group-data-[collapsible=icon]:pr-0">
+            <SidebarGroup className="py-0.5">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {navItems.map(({ Icon, label, value }) => (
+                    <SidebarMenuItem key={value}>
+                      <SidebarMenuButton
+                        className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
+                        isActive={surface === value}
+                        tooltip={label}
+                        onClick={() => onSurfaceChange(value)}
+                      >
+                        <Icon />
+                        <span>{label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-          {surface === "curriculum" ? (
-            <div className="group-data-[collapsible=icon]:hidden">
-              <CurriculumTree
-                categories={categories}
-                categoryGroups={categoryGroups}
-                contents={contents}
-                contentsLoading={contentsLoading}
-                customCurricula={customCurricula}
-                referenceLoading={referenceLoading}
-                query={query}
-                selectedCategory={selectedCategory}
-                selectedCustomCurriculumId={selectedCustomCurriculumId}
-                selectedContentId={selectedContentId}
+            {surface === "curriculum" ? (
+              <div className="group-data-[collapsible=icon]:hidden">
+                <CurriculumTree
+                  categories={categories}
+                  categoryGroups={categoryGroups}
+                  contents={contents}
+                  contentsLoading={contentsLoading}
+                  customCurricula={customCurricula}
+                  referenceLoading={referenceLoading}
+                  query={query}
+                  selectedCategory={selectedCategory}
+                  selectedCustomCurriculumId={selectedCustomCurriculumId}
+                  selectedContentId={selectedContentId}
+                  text={{
+                    codaroCurriculum: t("sidebar.codaroCurriculum"),
+                    curriculumEmpty: t("sidebar.curriculumEmpty"),
+                    loading: t("sidebar.curriculumLoading"),
+                    myCurriculum: t("sidebar.myCurriculum"),
+                    other: locale === "en" ? "Other" : "기타",
+                  }}
+                  onSelectCategory={onSelectCategory}
+                  onSelectContent={onSelectContent}
+                  onSelectCustomCurriculum={onSelectCustomCurriculum}
+                  onDeleteCustomCurriculum={onDeleteCustomCurriculum}
+                />
+              </div>
+            ) : null}
+
+            {surface === "automation" ? (
+              <AutomationTree
+                selectedSection={selectedAutomationSection}
                 text={{
-                  codaroCurriculum: t("sidebar.codaroCurriculum"),
-                  curriculumEmpty: t("sidebar.curriculumEmpty"),
-                  loading: t("sidebar.curriculumLoading"),
-                  myCurriculum: t("sidebar.myCurriculum"),
-                  other: locale === "en" ? "Other" : "기타",
+                  automation: t("sidebar.automation"),
+                  codaro: t("automation.codaro.title"),
+                  custom: t("automation.custom.title"),
+                  tasks: t("automation.tasks.title"),
                 }}
-                onSelectCategory={onSelectCategory}
-                onSelectContent={onSelectContent}
-                onSelectCustomCurriculum={onSelectCustomCurriculum}
+                onSelectSection={onSelectAutomationSection}
               />
-            </div>
-          ) : null}
-
-          {surface === "automation" ? (
-            <AutomationTree
-              selectedSection={selectedAutomationSection}
-              text={{
-                automation: t("sidebar.automation"),
-                codaro: t("automation.codaro.title"),
-                custom: t("automation.custom.title"),
-                tasks: t("automation.tasks.title"),
-              }}
-              onSelectSection={onSelectAutomationSection}
-            />
-          ) : null}
+            ) : null}
+          </div>
         </ScrollArea>
       </SidebarContent>
 
@@ -246,6 +255,7 @@ function CurriculumTree({
   onSelectCategory,
   onSelectContent,
   onSelectCustomCurriculum,
+  onDeleteCustomCurriculum,
   text,
 }: {
   categories: CurriculumCategory[];
@@ -261,6 +271,7 @@ function CurriculumTree({
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
+  onDeleteCustomCurriculum: (id: string) => void;
   text: {
     codaroCurriculum: string;
     curriculumEmpty: string;
@@ -270,6 +281,9 @@ function CurriculumTree({
   };
 }) {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [deleteTarget, setDeleteTarget] = useState<SidebarCustomCurriculum | null>(null);
+  const hasQuery = Boolean(query.trim());
   const customItems = customCurricula.filter((item) => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return true;
@@ -285,11 +299,12 @@ function CurriculumTree({
           <SidebarMenu>
             {groupedCategories.map((group) => {
               const hasSelectedCategory = group.categories.some((category) => category.key === selectedCategory);
-              const isExpanded = Boolean(query.trim()) || hasSelectedCategory || expandedGroups[group.name] === true;
+              const isExpanded = hasQuery || (expandedGroups[group.name] ?? hasSelectedCategory);
               return (
                 <SidebarMenuItem key={group.name}>
                   <SidebarMenuButton
-                    className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                    aria-expanded={isExpanded}
+                    className="h-7 px-2 pr-10 text-[13px] [&>svg]:size-3.5"
                     isActive={hasSelectedCategory}
                     tooltip={group.name}
                     onClick={() => setExpandedGroups((current) => ({ ...current, [group.name]: !isExpanded }))}
@@ -297,11 +312,13 @@ function CurriculumTree({
                     <ChevronRight className={isExpanded ? "rotate-90 transition-transform" : "transition-transform"} />
                     <span>{group.name}</span>
                   </SidebarMenuButton>
-                  <SidebarMenuBadge>{group.count}</SidebarMenuBadge>
+                  <SidebarMenuBadge className="right-4">{group.count}</SidebarMenuBadge>
                   {isExpanded ? (
                     <SidebarMenuSub>
                       {group.categories.map((category) => {
                         const isSelectedCategory = category.key === selectedCategory;
+                        const isCategoryExpanded = hasQuery || (expandedCategories[category.key] ?? isSelectedCategory);
+                        const isCategoryOpen = isSelectedCategory && isCategoryExpanded;
                         const categoryLabel = category.name || categoryTitle(category.key);
                         return (
                           <SidebarMenuSubItem key={category.key}>
@@ -312,15 +329,26 @@ function CurriculumTree({
                             >
                               <button
                                 className="text-[12px]"
+                                aria-expanded={isCategoryOpen}
                                 type="button"
-                                onClick={() => onSelectCategory(category.key)}
+                                onClick={() => {
+                                  if (isSelectedCategory) {
+                                    setExpandedCategories((current) => ({
+                                      ...current,
+                                      [category.key]: !isCategoryExpanded,
+                                    }));
+                                    return;
+                                  }
+                                  setExpandedCategories((current) => ({ ...current, [category.key]: true }));
+                                  onSelectCategory(category.key);
+                                }}
                               >
-                                <ChevronRight className={isSelectedCategory ? "rotate-90 transition-transform" : "transition-transform"} />
+                                <ChevronRight className={isCategoryOpen ? "rotate-90 transition-transform" : "transition-transform"} />
                                 <span className="truncate">{categoryLabel}</span>
                                 <span className="ml-auto text-[11px] text-sidebar-foreground/55">{category.count}</span>
                               </button>
                             </SidebarMenuSubButton>
-                            {isSelectedCategory ? (
+                            {isCategoryOpen ? (
                               <SidebarMenuSub className="ml-2">
                                 {contentsLoading ? (
                                   <SidebarMenuSubItem>
@@ -368,9 +396,9 @@ function CurriculumTree({
         <SidebarGroupContent>
           <SidebarMenu>
             {customItems.length ? customItems.map((item) => (
-              <SidebarMenuItem key={item.id}>
+              <SidebarMenuItem className="group/custom relative" key={item.id}>
                 <SidebarMenuButton
-                  className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                  className="h-7 pr-8 px-2 text-[13px] [&>svg]:size-3.5"
                   isActive={item.id === selectedCustomCurriculumId}
                   tooltip={item.title}
                   onClick={() => onSelectCustomCurriculum(item.id)}
@@ -378,7 +406,19 @@ function CurriculumTree({
                   <GraduationCap />
                   <span>{item.title}</span>
                 </SidebarMenuButton>
-                <SidebarMenuBadge>{item.blockCount}</SidebarMenuBadge>
+                <button
+                  aria-label={`${item.title} 삭제`}
+                  className="absolute right-1 top-0.5 z-10 flex size-6 items-center justify-center rounded-md text-sidebar-foreground/45 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive focus:opacity-100 group-hover/custom:opacity-100"
+                  title="삭제"
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setDeleteTarget(item);
+                  }}
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
               </SidebarMenuItem>
             )) : (
               <SidebarMenuItem>
@@ -390,7 +430,63 @@ function CurriculumTree({
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
+      <CustomCurriculumDeleteDialog
+        item={deleteTarget}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (!deleteTarget) return;
+          onDeleteCustomCurriculum(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+      />
     </>
+  );
+}
+
+function CustomCurriculumDeleteDialog({
+  item,
+  onCancel,
+  onConfirm,
+}: {
+  item: SidebarCustomCurriculum | null;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  if (!item) return null;
+
+  return (
+    <div
+      aria-labelledby="delete-custom-curriculum-title"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/55 px-4 backdrop-blur-sm"
+      role="dialog"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-sm rounded-md border bg-popover p-4 text-popover-foreground shadow-lg"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-destructive/10 text-destructive">
+            <Trash2 className="size-4" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold" id="delete-custom-curriculum-title">나만의 커리큘럼 삭제</h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {item.title} 커리큘럼을 삭제할까요? 이 작업은 되돌릴 수 없습니다.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button size="sm" type="button" variant="outline" onClick={onCancel}>
+            취소
+          </Button>
+          <Button size="sm" type="button" variant="destructive" onClick={onConfirm}>
+            삭제
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

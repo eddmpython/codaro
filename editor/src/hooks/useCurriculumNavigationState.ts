@@ -18,6 +18,7 @@ type UseCurriculumNavigationStateOptions = {
   categories: CurriculumCategory[];
   customCurricula: CustomCurriculumEntry[];
   findCustomCurriculum: (id: string) => CustomCurriculumEntry | undefined;
+  removeCustomCurriculumEntry: (id: string) => void;
   saveCustomCurriculumEntry: (blocks: BlockConfig[], title?: string) => CustomCurriculumEntry | null;
   selectCurriculumCategoryState: (category: string) => {
     selectedCustomCurriculumId: string;
@@ -35,6 +36,7 @@ export function useCurriculumNavigationState({
   categories,
   customCurricula,
   findCustomCurriculum,
+  removeCustomCurriculumEntry,
   saveCustomCurriculumEntry,
   selectCurriculumCategoryState,
   selectCurriculumContentState,
@@ -96,7 +98,23 @@ export function useCurriculumNavigationState({
     applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry));
   }, [applyCustomCurriculumApplication, findCustomCurriculum]);
 
+  const deleteCustomCurriculum = useCallback((id: string) => {
+    const entry = findCustomCurriculum(id);
+    if (!entry) return;
+    removeCustomCurriculumEntry(id);
+    const fallbackCategory = categories[0]?.key ?? "30days";
+    const selection = selectCurriculumCategoryState(fallbackCategory);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    setSurface("curriculum");
+    onNotice({
+      tone: "success",
+      title: "나만의 커리큘럼 삭제됨",
+      detail: entry.title,
+    });
+  }, [categories, findCustomCurriculum, onNotice, removeCustomCurriculumEntry, selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
+
   return {
+    deleteCustomCurriculum,
     filteredCategories,
     query,
     saveCustomCurriculum,

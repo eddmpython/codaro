@@ -213,13 +213,48 @@ function extractStdout(code: string, assignmentMap: Record<string, string>) {
   const printMatches = [...code.matchAll(/print\(([^)]*)\)/g)];
   if (!printMatches.length) return translate("runtime.localDone");
   return printMatches
-    .map((match) => {
-      const raw = match[1].trim();
-      const text = raw.replace(/^f?["']|["']$/g, "");
-      return text.replace(/\{([A-Za-z_]\w*)\}/g, (_, name: string) => assignmentMap[name] ?? name).trim();
-    })
+    .map((match) => renderPrintArgs(match[1], assignmentMap))
     .filter(Boolean)
     .join("\n");
+}
+
+function renderPrintArgs(raw: string, assignmentMap: Record<string, string>) {
+  return splitPrintArgs(raw)
+    .map((part) => renderPrintArg(part, assignmentMap))
+    .join(" ")
+    .trim();
+}
+
+function splitPrintArgs(raw: string) {
+  const parts: string[] = [];
+  let quote = "";
+  let current = "";
+  for (const char of raw) {
+    if ((char === "'" || char === "\"") && !quote) {
+      quote = char;
+    } else if (char === quote) {
+      quote = "";
+    }
+    if (char === "," && !quote) {
+      parts.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  parts.push(current);
+  return parts;
+}
+
+function renderPrintArg(raw: string, assignmentMap: Record<string, string>) {
+  const trimmed = raw.trim();
+  const quoted = trimmed.match(/^f?(["'])(.*)\1$/s);
+  if (quoted) {
+    return quoted[2]
+      .replace(/\\n/g, "\n")
+      .replace(/\{([A-Za-z_]\w*)\}/g, (_, name: string) => assignmentMap[name] ?? name);
+  }
+  return assignmentMap[trimmed] ?? trimmed;
 }
 
 function collectAssignments(code: string) {

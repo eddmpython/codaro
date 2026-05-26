@@ -8,7 +8,9 @@ import {
   Loader2,
   MessageSquare,
   Play,
+  Plus,
   TerminalSquare,
+  Trash2,
 } from "lucide-react";
 
 import {
@@ -18,7 +20,8 @@ import {
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
 import { CellAiActions } from "@/components/app/cellAiActions";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import type { CellAiAction } from "@/lib/cellModel";
@@ -85,7 +88,9 @@ export function NotebookPanel({
   onAddCell,
   onAcceptPendingBlocks,
   onCellAsk,
+  onDeleteCell,
   onDraftChange,
+  onRenameDocument,
   onRejectPendingBlocks,
   onRunBlock,
   onSelectBlock,
@@ -98,30 +103,28 @@ export function NotebookPanel({
   results: ResultMap;
   runningBlockId: string | null;
   selectedBlockId: string;
-  onAddCell: (type: "code" | "markdown") => void;
+  onAddCell: (type: "code" | "markdown", referenceBlockId?: string, placement?: "before" | "after") => void;
   onAcceptPendingBlocks: () => void;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
+  onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   return (
-    <section className="grid h-full min-h-0 grid-rows-[auto_1fr] p-3">
-      <div className="mb-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold tracking-normal">{document.title}</h1>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <IconButton className="size-8" label="Python 셀 추가" onClick={() => onAddCell("code")}>
-              <TerminalSquare />
-            </IconButton>
-            <IconButton className="size-8" label="Markdown 셀 추가" onClick={() => onAddCell("markdown")}>
-              <MessageSquare />
-            </IconButton>
-          </div>
-        </div>
+    <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-3">
+      <div className="mb-2 flex min-h-8 items-center justify-end">
+        <Input
+          aria-label="노트북 파일명"
+          className="h-7 w-48 rounded-md bg-background px-2 text-right font-mono text-xs"
+          value={document.title}
+          onBlur={(event) => onRenameDocument(normalizeNotebookFilename(event.target.value))}
+          onChange={(event) => onRenameDocument(event.target.value)}
+        />
+      </div>
+      <div className="mb-1">
         <PendingNotebookBar
           pendingBlocks={pendingBlocks}
           onAccept={onAcceptPendingBlocks}
@@ -129,25 +132,28 @@ export function NotebookPanel({
         />
       </div>
 
-      <ScrollArea className="min-h-0">
-        <div className="space-y-2 pr-2">
-          {document.blocks.map((block, index) => (
+      <ScrollArea className="h-full min-h-0">
+        <div className="space-y-1 pr-2">
+          {document.blocks.length ? document.blocks.map((block) => (
             <DocumentBlock
               block={block}
               canRun={canRun && (block.type !== "code" || Boolean((drafts[block.id] ?? block.content).trim()))}
               draft={drafts[block.id] ?? block.content}
               isSelected={block.id === selectedBlockId}
               key={block.id}
-              ordinal={index + 1}
               result={results[block.id]}
               cellHelp={cellHelpByBlockId[block.id]}
               isRunning={runningBlockId === block.id}
               onCellAsk={(action, question) => onCellAsk(action, block, question)}
+              onDelete={() => onDeleteCell(block.id)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
+              onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
               onRun={() => onRunBlock(block)}
               onSelect={() => onSelectBlock(block.id)}
             />
-          ))}
+          )) : (
+            <EmptyNotebookActions onAddCell={(type) => onAddCell(type)} />
+          )}
         </div>
       </ScrollArea>
     </section>
@@ -257,7 +263,7 @@ export function CodeCellEditor({
 
   return (
     <div
-      className="overflow-hidden rounded-md bg-code text-code-foreground"
+      className="bg-transparent text-code-foreground"
       ref={hostRef}
     />
   );
@@ -269,10 +275,11 @@ function DocumentBlock({
   draft,
   isSelected,
   isRunning,
-  ordinal,
   result,
   cellHelp,
   onDraftChange,
+  onDelete,
+  onInsertCell,
   onRun,
   onSelect,
   onCellAsk,
@@ -282,165 +289,257 @@ function DocumentBlock({
   draft: string;
   isSelected: boolean;
   isRunning: boolean;
-  ordinal: number;
   result?: ExecutionResult;
   cellHelp?: CellAiHelpState;
   onCellAsk: (action: CellAiAction, question?: string) => void;
+  onDelete: () => void;
   onDraftChange: (value: string) => void;
+  onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
   onRun: () => void;
   onSelect: () => void;
 }) {
   const cellTitle = block.type === "markdown" ? "Markdown" : "Python";
-  const lineCount = countMeaningfulLines(block.type === "code" ? draft : block.content);
+  const lineCount = countMeaningfulLines(draft);
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
 
   if (block.type === "markdown") {
     return (
-      <section className={cn("group overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm", isSelected && "bg-muted/20 ring-1 ring-ring/30")}>
-        <div className="grid grid-cols-[40px_minmax(0,1fr)]">
-          <CellGutter ordinal={ordinal} selected={isSelected} onSelect={onSelect} />
-          <div className="min-w-0">
-            <CellHeader
-              lineCount={lineCount}
-              status={resultStatus}
-              title={cellTitle}
-              type="markdown"
-              selected={isSelected}
-              cellHelp={cellHelp}
-              onCellAsk={onCellAsk}
-              onSelect={onSelect}
-            />
-            <div className="px-3 pb-3">
-              <Textarea
-                className="min-h-24 resize-y bg-muted/20 font-sans text-sm leading-6"
-                placeholder="Markdown을 입력하세요."
-                value={draft}
-                onChange={(event) => onDraftChange(event.target.value)}
-                onFocus={onSelect}
-              />
-            </div>
-          </div>
+      <section className="group grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 py-1" data-notebook-cell="markdown">
+        <CellInsertRail onInsertCell={onInsertCell} />
+        <div className="min-w-0">
+          <CellMetaBar
+            lineCount={lineCount}
+            status={resultStatus}
+            title={cellTitle}
+            type="markdown"
+            selected={isSelected}
+            cellHelp={cellHelp}
+            onCellAsk={onCellAsk}
+            onDelete={onDelete}
+          />
+          <Textarea
+            className={cn(
+              "min-h-24 resize-y rounded-md bg-background font-sans text-sm leading-6 shadow-sm transition-colors",
+              isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
+            )}
+            placeholder="Markdown을 입력하세요."
+            value={draft}
+            onChange={(event) => onDraftChange(event.target.value)}
+            onFocus={onSelect}
+          />
         </div>
       </section>
     );
   }
 
   return (
-    <section className={cn("group overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm", isSelected && "bg-muted/20 ring-1 ring-ring/30")}>
-      <div className="grid grid-cols-[40px_minmax(0,1fr)]">
-        <CellGutter
+    <section className="group grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 py-1" data-notebook-cell="code">
+      <CellInsertRail onInsertCell={onInsertCell} />
+      <div className="min-w-0">
+        <CellMetaBar
           canRun={canRun}
-          ordinal={ordinal}
-          selected={isSelected}
-          onSelect={onSelect}
-          onRun={onRun}
+          lineCount={lineCount}
           running={isRunning}
+          status={resultStatus}
+          title={cellTitle}
+          type="code"
+          selected={isSelected}
+          cellHelp={cellHelp}
+          onCellAsk={onCellAsk}
+          onDelete={onDelete}
+          onRun={onRun}
         />
-        <div className="min-w-0">
-          <CellHeader
-            lineCount={lineCount}
-            status={resultStatus}
-            title={cellTitle}
-            type="code"
-            selected={isSelected}
-            cellHelp={cellHelp}
-            onCellAsk={onCellAsk}
-            onSelect={onSelect}
+        <div
+          className={cn(
+            "overflow-hidden rounded-md border bg-code shadow-sm transition-colors",
+            isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
+          )}
+          data-notebook-input="code"
+        >
+          <CodeCellEditor
+            value={draft}
+            onChange={onDraftChange}
+            onFocus={onSelect}
+            onRun={onRun}
           />
-          <div className="space-y-2 px-3 pb-3">
-            <CodeCellEditor
-              value={draft}
-              onChange={onDraftChange}
-              onFocus={onSelect}
-              onRun={onRun}
-            />
-            {result ? <div className="mt-3"><ExecutionOutput result={result} /></div> : null}
-            {isRunning && !result ? (
-              <div className="mt-2">
-                <LoadingInline label="셀 실행 중" />
-              </div>
-            ) : null}
-          </div>
         </div>
+        {result ? (
+          <div className="mt-1.5">
+            <ExecutionOutput result={result} />
+          </div>
+        ) : null}
+        {isRunning && !result ? (
+          <div className="mt-1.5">
+            <LoadingInline label="셀 실행 중" />
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-function CellGutter({
+function CellMetaBar({
   canRun = false,
-  ordinal,
-  running = false,
-  selected,
-  onSelect,
-  onRun,
-}: {
-  canRun?: boolean;
-  ordinal: number;
-  running?: boolean;
-  selected: boolean;
-  onSelect?: () => void;
-  onRun?: () => void;
-}) {
-  return (
-    <div className={cn("flex min-h-full flex-col items-center gap-1.5 bg-muted/20 py-2 text-muted-foreground", selected && "bg-accent")}>
-      <button
-        className="flex size-6 items-center justify-center rounded-md text-[11px] font-medium tabular-nums hover:bg-accent hover:text-accent-foreground"
-        type="button"
-        onClick={onSelect}
-      >
-        {String(ordinal).padStart(2, "0")}
-      </button>
-      {onRun ? (
-        <IconButton className="size-6" disabled={!canRun} label="셀 실행" size="icon" variant="ghost" onClick={onRun}>
-          {running ? <Loader2 className="animate-spin" /> : <Play />}
-        </IconButton>
-      ) : null}
-    </div>
-  );
-}
-
-function CellHeader({
   lineCount,
+  running = false,
   status,
   title,
   type,
   selected,
   cellHelp,
   onCellAsk,
-  onSelect,
+  onDelete,
+  onRun,
 }: {
+  canRun?: boolean;
   lineCount: number;
+  running?: boolean;
   status: string;
   title: string;
   type: "code" | "markdown";
   selected: boolean;
   cellHelp?: CellAiHelpState;
   onCellAsk: (action: CellAiAction, question?: string) => void;
-  onSelect: () => void;
+  onDelete: () => void;
+  onRun?: () => void;
 }) {
   const Icon = type === "code" ? TerminalSquare : MessageSquare;
 
   return (
-    <div className="flex min-h-10 w-full min-w-0 items-center gap-2 px-3 py-1.5">
-      <button
-        className="flex min-w-0 flex-1 items-center gap-2 text-left"
-        type="button"
-        onClick={onSelect}
+    <div className="mb-1 flex min-h-7 w-full min-w-0 items-center gap-2">
+      <div
+        className={cn(
+          "inline-flex min-w-0 items-center gap-1.5 px-0.5 text-left text-[11px] text-muted-foreground",
+          selected && "text-foreground",
+        )}
       >
-        <Badge className="gap-1" variant="secondary">
-          <Icon className="size-3" />
-          {title}
-        </Badge>
-        <span className="min-w-0 flex-1 truncate text-sm font-medium">{type === "code" ? "파이썬 셀" : "마크다운 셀"}</span>
-        {lineCount ? <span className="hidden text-xs text-muted-foreground sm:inline">{lineCount}줄</span> : null}
-        {status !== "idle" ? <Badge variant={status === "error" ? "destructive" : "outline"}>{statusLabel(status)}</Badge> : null}
+        <Icon className="size-3.5 shrink-0" />
+        <span className="truncate">{title}</span>
+      </div>
+      <div className="ml-auto flex shrink-0 items-center gap-1">
+        {lineCount ? <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">{lineCount}줄</span> : null}
+        {status !== "idle" ? (
+          <span
+            className={cn(
+              "rounded-md px-1.5 py-0.5 text-[11px] font-medium",
+              status === "error" ? "bg-destructive text-destructive-foreground" : "border bg-background text-muted-foreground",
+            )}
+          >
+            {statusLabel(status)}
+          </span>
+        ) : null}
+        {type === "code" ? (
+          <IconButton
+            className={cn(
+              "size-5 rounded-md [&_svg]:size-3",
+              selected && "bg-accent text-accent-foreground",
+            )}
+            disabled={!canRun}
+            label="셀 실행"
+            variant="ghost"
+            onClick={(event) => {
+              event.stopPropagation();
+              onRun?.();
+            }}
+          >
+            {running ? <Loader2 className="animate-spin" /> : <Play />}
+          </IconButton>
+        ) : null}
+        <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
+        <IconButton
+          className="size-5 rounded-md text-muted-foreground hover:text-destructive [&_svg]:size-3"
+          label="셀 삭제"
+          variant="ghost"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete();
+          }}
+        >
+          <Trash2 />
+        </IconButton>
+      </div>
+    </div>
+  );
+}
+
+function CellInsertRail({
+  onInsertCell,
+}: {
+  onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
+}) {
+  return (
+    <div className="flex min-h-full flex-col items-center justify-between py-6 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100">
+      <InsertCellButton placement="before" onInsertCell={onInsertCell} />
+      <InsertCellButton placement="after" onInsertCell={onInsertCell} />
+    </div>
+  );
+}
+
+function InsertCellButton({
+  placement,
+  onInsertCell,
+}: {
+  placement: "before" | "after";
+  onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
+}) {
+  const placementLabel = placement === "before" ? "위에" : "아래에";
+
+  return (
+    <div className="group/insert relative">
+      <button
+        aria-label={`${placementLabel} Python 셀 추가`}
+        className="flex size-5 items-center justify-center rounded-full border bg-background shadow-sm hover:border-ring hover:text-foreground"
+        title={`${placementLabel} Python 셀 추가`}
+        type="button"
+        onClick={() => onInsertCell("code", placement)}
+      >
+        <Plus className="size-3" />
       </button>
-      <CellAiActions helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
+      <div className="absolute left-6 top-1/2 z-20 hidden -translate-y-1/2 items-center gap-1 rounded-md border bg-popover p-1 shadow-md group-focus-within/insert:flex group-hover/insert:flex">
+        <button
+          className="h-5 rounded px-1.5 font-mono text-[10px] text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+          type="button"
+          onClick={() => onInsertCell("code", placement)}
+        >
+          Py
+        </button>
+        <button
+          className="h-5 rounded px-1.5 text-[10px] text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+          type="button"
+          onClick={() => onInsertCell("markdown", placement)}
+        >
+          Md
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EmptyNotebookActions({
+  onAddCell,
+}: {
+  onAddCell: (type: "code" | "markdown") => void;
+}) {
+  return (
+    <div className="flex min-h-32 items-center justify-center gap-2 rounded-md border border-dashed bg-muted/20">
+      <Button className="h-7 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => onAddCell("code")}>
+        <TerminalSquare className="size-3.5" />
+        Python 셀
+      </Button>
+      <Button className="h-7 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => onAddCell("markdown")}>
+        <MessageSquare className="size-3.5" />
+        Markdown 셀
+      </Button>
     </div>
   );
 }
 
 function countMeaningfulLines(value: string) {
   return value.split("\n").filter((line) => line.trim()).length;
+}
+
+function normalizeNotebookFilename(value: string) {
+  const trimmed = value.trim() || "notebook.py";
+  if (trimmed.toLowerCase().endsWith(".py")) return trimmed;
+  return `${trimmed.replace(/\.[^/.]+$/, "")}.py`;
 }

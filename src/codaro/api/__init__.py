@@ -7,6 +7,7 @@ from .curriculumRouter import createCurriculumRouter
 from .documentRouter import createDocumentRouter
 from .errors import ApiError, apiErrorHandler, fail, httpExceptionHandler, unhandledExceptionHandler, validationExceptionHandler
 from .kernelRouter import createKernelRouter
+from .shareRouter import createShareRouter
 from .requestModels import (
     CheckExerciseRequest,
     CurriculumProgressRequest,
@@ -47,6 +48,7 @@ __all__ = [
     "createExtensionRouter",
     "createKernelRouter",
     "createServerState",
+    "createShareRouter",
     "createSpaRouter",
     "createSystemRouter",
     "createWorkspaceRouter",

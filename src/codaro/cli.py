@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 import sys
 import webbrowser
@@ -18,7 +19,8 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro\n"
             "  codaro notebook.py\n"
             "  codaro app notebook.py\n"
-            "  codaro export notebook.py --format ipynb"
+            "  codaro export notebook.py --format ipynb\n"
+            "  codaro pack inspect ./my-pack"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -53,6 +55,22 @@ def buildParser() -> argparse.ArgumentParser:
     taskListParser = taskSubparsers.add_parser("list", help="List registered tasks.")
     taskListParser.add_argument("--verbose", action="store_true")
 
+    packParser = subparsers.add_parser("pack", help="Inspect, install, and export Codaro share packs.")
+    packSubparsers = packParser.add_subparsers(dest="pack_command", required=True)
+
+    packInspectParser = packSubparsers.add_parser("inspect", help="Inspect a local or remote pack.")
+    packInspectParser.add_argument("source", help="Pack directory, zip, or manifest URL.")
+
+    packInstallParser = packSubparsers.add_parser("install", help="Install a validated pack into CODARO_HOME.")
+    packInstallParser.add_argument("source", help="Pack directory, zip, or manifest URL.")
+
+    packListParser = packSubparsers.add_parser("list", help="List installed packs.")
+    packListParser.add_argument("--json", action="store_true", help="Print the installed pack index as JSON.")
+
+    packExportParser = packSubparsers.add_parser("export", help="Build a zip archive from a pack directory.")
+    packExportParser.add_argument("source_dir", help="Pack directory containing codaroPack.yaml.")
+    packExportParser.add_argument("--output", required=True, help="Output zip path.")
+
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-browser", action="store_true")
@@ -77,6 +95,10 @@ def main() -> None:
 
     if command == "task":
         _handleTask(args, logger)
+        return
+
+    if command == "pack":
+        _handlePack(args)
         return
 
     if command == "export":
@@ -170,12 +192,49 @@ def _handleTask(args, logger) -> None:
             print(f"  {t.id}  {t.name}  [{status}]  schedule={schedule}")
 
 
+def _handlePack(args) -> None:
+    from .share import PackService
+
+    service = PackService()
+
+    if args.pack_command == "inspect":
+        preview = service.inspect(args.source)
+        print(json.dumps(preview.payload(), ensure_ascii=False, indent=2))
+        if not preview.installable:
+            raise SystemExit(1)
+        return
+
+    if args.pack_command == "install":
+        record = service.install(args.source)
+        print(json.dumps({"pack": record.payload()}, ensure_ascii=False, indent=2))
+        return
+
+    if args.pack_command == "list":
+        records = service.listInstalled()
+        if args.json:
+            print(json.dumps({"packs": [record.payload() for record in records]}, ensure_ascii=False, indent=2))
+            return
+        if not records:
+            print("No installed packs.")
+            return
+        for record in records:
+            print(f"  {record.id}  {record.version}  {record.title}")
+        return
+
+    if args.pack_command == "export":
+        outputPath = service.exportArchive(args.source_dir, args.output)
+        print(f"Exported pack archive to {outputPath}")
+        return
+
+    raise ValueError(f"Unsupported pack command: {args.pack_command}")
+
+
 def normalizeArgs(rawArgs: list[str]) -> list[str]:
     if not rawArgs:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "task"}
+    knownCommands = {"edit", "run", "app", "export", "task", "pack"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]
@@ -197,3 +256,7 @@ def openBrowser(url: str, logger) -> None:
         return
     status = "opened" if opened else "not-confirmed"
     logger.info("browser %s", formatLogFields(action="open", status=status, url=url))
+
+
+if __name__ == "__main__":
+    main()

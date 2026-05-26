@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { docsPages } from "../src/lib/generated/docsNav.js";
 import { posts, postCategories, postSeries } from "../src/lib/generated/posts.js";
 import { searchEntries } from "../src/lib/generated/searchIndex.js";
+import { sharePacks } from "../src/lib/sharePacks.js";
 import { tools } from "../src/lib/tools/registry.js";
 import { brand } from "../src/lib/brand.js";
 
@@ -34,6 +35,12 @@ const routes = [
     title: "문서",
     description: "Codaro 아키텍처, 제품 원칙, 운영 기준 문서.",
     body: docsIndexBody(),
+  },
+  {
+    path: "/packs",
+    title: "공유 팩",
+    description: "Codaro 커리큘럼과 자동화 recipe를 내려받아 로컬에서 시작하는 공유 갤러리.",
+    body: packsBody(),
   },
   ...docsPages.map((page) => ({
     path: sitePath(page.url),
@@ -186,8 +193,12 @@ function writeRoute(routePath, html) {
 }
 
 function homeBody() {
-  return `<main><section class="heroSection"><div class="heroCopy"><p class="eyebrow">React 기반 GitHub Pages / Local-first / Python runtime</p><h1>배우는 코드가 실행되고, 실행한 코드가 자동화가 된다.</h1><p class="heroLead">Codaro는 Python 학습, 노트북 셀 실행, 개인 자동화를 하나의 로컬 제품 흐름으로 묶는다.</p><div class="heroActions"><a class="primaryButton" href="${brand.launcherDownloadUrl}">CodaroLauncher.exe</a><a class="secondaryButton" href="${appPath("/docs")}">문서 보기</a><a class="textLink" href="${appPath("/docs/blog")}">Codaro 소식</a></div><div class="releaseLinks" aria-label="릴리즈 검증 링크"><a href="${brand.launcherChecksumUrl}">체크섬</a><a href="${brand.launcherSbomUrl}">SBOM</a><a href="${brand.releaseManifestUrl}">manifest</a><a href="${brand.releaseUrl}">GitHub Releases</a></div></div><div class="heroPanel"><div class="panelTop"><span></span><span></span><span></span><strong>codaro.local</strong></div><div class="studioPreview"><aside><b>채팅</b><b>에디터</b><b>커리큘럼</b><b>자동화</b></aside><div><p class="chatBubble">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</p><p class="chatBubble muted">학습 셀과 dry-run 자동화 계획을 만들었다.</p><pre>import pandas as pd
+  return `<main><section class="heroSection"><div class="heroCopy"><p class="eyebrow">React 기반 GitHub Pages / Local-first / Python runtime</p><h1>배우는 코드가 실행되고, 실행한 코드가 자동화가 된다.</h1><p class="heroLead">Codaro는 Python 학습, 노트북 셀 실행, 개인 자동화를 하나의 로컬 제품 흐름으로 묶는다.</p><div class="heroActions"><a class="primaryButton" href="${brand.launcherDownloadUrl}">CodaroLauncher.exe</a><a class="secondaryButton" href="${appPath("/docs")}">문서 보기</a><a class="secondaryButton" href="${appPath("/packs")}">공유 팩</a><a class="textLink" href="${appPath("/docs/blog")}">Codaro 소식</a></div><div class="releaseLinks" aria-label="릴리즈 검증 링크"><a href="${brand.launcherChecksumUrl}">체크섬</a><a href="${brand.launcherSbomUrl}">SBOM</a><a href="${brand.releaseManifestUrl}">manifest</a><a href="${brand.releaseUrl}">GitHub Releases</a></div></div><div class="heroPanel"><div class="panelTop"><span></span><span></span><span></span><strong>codaro.local</strong></div><div class="studioPreview"><aside><b>채팅</b><b>에디터</b><b>커리큘럼</b><b>자동화</b></aside><div><p class="chatBubble">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</p><p class="chatBubble muted">학습 셀과 dry-run 자동화 계획을 만들었다.</p><pre>import pandas as pd
 df = pd.read_csv("expenses.csv")</pre><div class="runResult">실행 가능 / 검증 가능 / 태스크로 승격 가능</div></div></div></div></section></main>`;
+}
+
+function packsBody() {
+  return `<main class="pageShell"><header class="pageHeader"><p class="eyebrow">Share packs</p><h1>공유 팩 갤러리</h1><p>커리큘럼과 자동화 recipe를 manifest URL로 받아 Codaro 로컬 저장소에 설치합니다.</p></header><section class="shareHowTo"><div><h2>로컬에서 시작하는 방법</h2><p>Codaro 앱의 왼쪽 사이드바에서 공유 팩을 열고 아래 codaroPack.yaml URL을 붙여넣은 뒤 검사와 설치를 진행하세요.</p></div></section><div class="packGrid">${sharePacks.map((pack) => `<article class="packCard"><div class="packCardHeader"><strong>${escapeHtml(pack.id)}</strong><span>${escapeHtml(pack.version)}</span></div><h2>${escapeHtml(pack.title)}</h2><p>${escapeHtml(pack.description)}</p><div class="packMeta"><span>커리큘럼 ${pack.contents.curricula}</span><span>자동화 ${pack.contents.automations}</span><span>${escapeHtml(pack.license)}</span></div><code>${escapeHtml(pack.manifestUrl)}</code><div class="downloadActions"><a class="primaryButton" href="${escapeHtml(pack.manifestUrl)}">manifest 열기</a><a class="secondaryButton" href="${escapeHtml(pack.packRootUrl)}">파일 보기</a></div></article>`).join("")}</div></main>`;
 }
 
 function docsIndexBody() {

@@ -1,0 +1,25 @@
+kind: codaroPack
+specVersion: 1
+id: codaro.python-starter
+version: 0.1.0
+title: Python 첫 실행 공유 팩
+description: Codaro 공유 팩 설치와 실행 흐름을 확인하는 공식 예제입니다.
+author: Codaro
+license: MIT
+codaro:
+  minVersion: "0.1.0"
+contents:
+  curricula:
+    - path: curricula/python/starter/00_first_cells.yaml
+      title: Python 첫 셀 실행
+      description: 예측, 실행, 확인을 한 번에 경험하는 짧은 레슨입니다.
+  automations:
+    - path: automations/dailyCheck.py
+      title: Daily dry-run check
+      description: 공유 자동화 recipe의 dry-run 기본값을 확인합니다.
+packages: []
+permissions:
+  filesystem: read
+tags:
+  - starter
+  - official

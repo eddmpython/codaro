@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   createCustomCurriculumEntry,
+  createCustomCurriculumEntryFromDocument,
   customCurriculaStorageKey,
   loadCustomCurricula,
   upsertCustomCurriculumEntry,
   type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
 import { translate } from "@/lib/localeCopy";
-import type { AppNotice, BlockConfig } from "@/types";
+import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 
 type UseCustomCurriculaStateOptions = {
   initialSelectedCustomCurriculumId: string;
@@ -45,9 +46,22 @@ export function useCustomCurriculaState({
     return entry;
   }, []);
 
+  const saveCustomCurriculumDocumentEntry = useCallback((document: CodaroDocument, title?: string) => {
+    const entry = createCustomCurriculumEntryFromDocument(document, title);
+    setCustomCurricula((current) => upsertCustomCurriculumEntry(current, entry));
+    return entry;
+  }, []);
+
+  const removeCustomCurriculumEntry = useCallback((id: string) => {
+    setCustomCurricula((current) => current.filter((item) => item.id !== id));
+    setSelectedCustomCurriculumId((current) => current === id ? "" : current);
+  }, []);
+
   return {
     customCurricula,
     findCustomCurriculum,
+    removeCustomCurriculumEntry,
+    saveCustomCurriculumDocumentEntry,
     saveCustomCurriculumEntry,
     selectedCustomCurriculumId,
     setSelectedCustomCurriculumId,

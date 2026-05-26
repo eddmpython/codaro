@@ -4,8 +4,10 @@ import {
   BookOpen,
   Boxes,
   CheckCircle2,
+  Download,
   FileCheck2,
   Library,
+  PackageOpen,
   Search,
   ShieldCheck,
   Terminal,
@@ -15,6 +17,7 @@ import { brand, basePath } from "./lib/brand.js";
 import { docsPages } from "./lib/generated/docsNav.js";
 import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
 import { searchEntries } from "./lib/generated/searchIndex.js";
+import { sharePacks } from "./lib/sharePacks.js";
 import { tools } from "./lib/tools/registry.js";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
@@ -49,6 +52,7 @@ const surfaces = [
 const navItems = [
   { href: "/", label: "홈" },
   { href: "/docs", label: "문서" },
+  { href: "/packs", label: "팩" },
   { href: "/docs/blog", label: "소식" },
   { href: "/tools", label: "도구" },
   { href: "/search", label: "검색" },
@@ -56,8 +60,10 @@ const navItems = [
 
 const releaseLinks = [
   { href: brand.launcherChecksumUrl, label: "체크섬" },
-  { href: brand.launcherSbomUrl, label: "SBOM" },
   { href: brand.releaseManifestUrl, label: "manifest" },
+  { href: brand.pythonRuntimeUrl, label: "Python runtime" },
+  { href: brand.pythonRuntimeChecksumUrl, label: "runtime checksum" },
+  { href: brand.launcherSbomUrl, label: "SBOM" },
   { href: brand.releaseUrl, label: "GitHub Releases" },
 ];
 
@@ -240,6 +246,7 @@ function resolveRoute(path) {
     };
   }
   if (path === "/docs") return docsIndexRoute();
+  if (path === "/packs") return packsRoute();
   if (path === "/docs/blog") return blogIndexRoute();
   if (path.startsWith("/docs/blog/category/")) {
     return blogCategoryRoute(path.replace("/docs/blog/category/", ""));
@@ -292,6 +299,9 @@ function HomePage() {
             </a>
             <a className="secondaryButton" href={appPath("/docs")}>
               문서 보기
+            </a>
+            <a className="secondaryButton" href={appPath("/packs")}>
+              공유 팩
             </a>
             <a className="textLink" href={appPath("/docs/blog")}>
               Codaro 소식
@@ -361,7 +371,7 @@ summary = df.groupby("category").amount.sum()`}</pre>
           <h2>GitHub Pages는 소개 표면, GitHub Releases는 실행물 배포 표면이다.</h2>
           <p>
             사용자는 공개 문서에서 제품 방향을 확인하고, 릴리즈에서 launcher와 checksum,
-            manifest, runtime 자산을 확인한 뒤 실행할 수 있다.
+            manifest, runtime, backend wheel 자산을 확인한 뒤 실행할 수 있다.
           </p>
         </div>
         <div className="trustList">
@@ -383,6 +393,66 @@ function TrustItem({ icon: Icon, title, copy }) {
         <p>{copy}</p>
       </div>
     </article>
+  );
+}
+
+function packsRoute() {
+  return {
+    meta: {
+      title: "공유 팩",
+      description: "Codaro 커리큘럼과 자동화 recipe를 내려받아 로컬에서 시작하는 공유 갤러리.",
+      url: "/packs",
+    },
+    element: <PacksPage />,
+  };
+}
+
+function PacksPage() {
+  return (
+    <main className="pageShell">
+      <PageHeader
+        eyebrow="Share packs"
+        title="공유 팩 갤러리"
+        copy="커리큘럼과 자동화 recipe를 manifest URL로 받아 Codaro 로컬 저장소에 설치합니다."
+      />
+      <section className="shareHowTo">
+        <PackageOpen size={22} aria-hidden="true" />
+        <div>
+          <h2>로컬에서 시작하는 방법</h2>
+          <p>
+            Codaro 앱의 왼쪽 사이드바에서 공유 팩을 열고, 아래 `codaroPack.yaml` URL을 붙여넣은 뒤
+            검사와 설치를 진행하세요. 설치된 커리큘럼은 나만의 커리큘럼으로 열리고, 자동화 recipe는 dry-run 태스크로 등록됩니다.
+          </p>
+        </div>
+      </section>
+      <div className="packGrid">
+        {sharePacks.map((pack) => (
+          <article className="packCard" key={`${pack.id}@${pack.version}`}>
+            <div className="packCardHeader">
+              <PackageOpen size={22} aria-hidden="true" />
+              <span>{pack.version}</span>
+            </div>
+            <h2>{pack.title}</h2>
+            <p>{pack.description}</p>
+            <div className="packMeta">
+              <span>커리큘럼 {pack.contents.curricula}</span>
+              <span>자동화 {pack.contents.automations}</span>
+              <span>{pack.license}</span>
+            </div>
+            <code>{pack.manifestUrl}</code>
+            <div className="downloadActions">
+              <a className="primaryButton" href={pack.manifestUrl}>
+                manifest 열기
+                <Download size={16} aria-hidden="true" />
+              </a>
+              <a className="secondaryButton" href={pack.packRootUrl}>
+                파일 보기
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </main>
   );
 }
 
