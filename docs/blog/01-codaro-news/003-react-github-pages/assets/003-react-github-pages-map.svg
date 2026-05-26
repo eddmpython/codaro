@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Codaro React GitHub Pages map</title>
+  <desc id="desc">A static publishing flow connecting docs, blog, search, feed, sitemap, and GitHub Pages.</desc>
+  <rect width="1200" height="630" rx="36" fill="#fafafa"/>
+  <rect x="72" y="70" width="1056" height="490" rx="30" fill="#ffffff" stroke="#e4e4e7" stroke-width="2"/>
+  <text x="118" y="150" fill="#18181b" font-size="52" font-family="Segoe UI, Arial" font-weight="700">Codaro React Pages</text>
+  <text x="118" y="196" fill="#52525b" font-size="24" font-family="Segoe UI, Arial">Landing, docs, blog, and search from one static publishing surface.</text>
+  <g font-family="Segoe UI, Arial">
+    <rect x="118" y="270" width="190" height="116" rx="20" fill="#f4f4f5" stroke="#d4d4d8" stroke-width="2"/>
+    <text x="150" y="324" fill="#18181b" font-size="27" font-weight="700">Docs</text>
+    <text x="150" y="358" fill="#52525b" font-size="18">source files</text>
+    <rect x="352" y="270" width="190" height="116" rx="20" fill="#ecfeff" stroke="#a5f3fc" stroke-width="2"/>
+    <text x="384" y="324" fill="#155e75" font-size="27" font-weight="700">Blog</text>
+    <text x="384" y="358" fill="#0e7490" font-size="18">Codaro 소식</text>
+    <rect x="586" y="270" width="190" height="116" rx="20" fill="#eef2ff" stroke="#c7d2fe" stroke-width="2"/>
+    <text x="618" y="324" fill="#3730a3" font-size="27" font-weight="700">Search</text>
+    <text x="618" y="358" fill="#4338ca" font-size="18">shared index</text>
+    <rect x="820" y="270" width="190" height="116" rx="20" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
+    <text x="852" y="324" fill="#14532d" font-size="27" font-weight="700">Pages</text>
+    <text x="852" y="358" fill="#166534" font-size="18">/codaro/</text>
+    <path d="M316 328h28" stroke="#71717a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M550 328h28" stroke="#71717a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M784 328h28" stroke="#71717a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <rect x="222" y="445" width="756" height="58" rx="18" fill="#18181b"/>
+  <text x="300" y="482" fill="#fafafa" font-size="23" font-family="Segoe UI, Arial">feed.xml · sitemap.xml · canonical URL · static HTML routes</text>
+</svg>
