@@ -26,13 +26,35 @@ intro:
   - __len__으로 길이 정의
   - __add__, __eq__로 연산자 구현
   - __getitem__으로 인덱싱 지원
+  direction: 특수 메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 특수 메서드 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: str 메서드 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: repr 메서드 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: len 메서드 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 특수 메서드 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 특수 메서드 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 특수 메서드 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: str_method
   title: __str__ 메서드
   structuredPrimary: true
   subtitle: 사람이 읽기 쉬운 문자열 표현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: str 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __str__ 메서드는 객체를 문자열로 변환할 때 호출됩니다. str(객체)나 print(객체)를 사용하면 자동으로 __str__이 호출되어 사람이 읽기 쉬운 형태로 출력됩니다. 이 메서드를 정의하지 않으면 기본적으로 객체의 메모리 주소가 출력됩니다.
 
@@ -51,7 +73,7 @@ sections:
     book = Book('Python Guide', 'Kim')
     str(book)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: str 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Book:
           def __init__(self, title, author):
@@ -64,16 +86,17 @@ sections:
       book = Book('Python Guide', 'Kim')
       str(book)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - str 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: str 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: str 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: repr_method
   title: __repr__ 메서드
   structuredPrimary: true
   subtitle: 개발자를 위한 명확한 표현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: repr 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __repr__ 메서드는 객체의 공식적인 문자열 표현을 정의합니다. repr(객체)를 호출하거나 인터프리터에서 객체를 직접 입력하면 호출됩니다. 주로 디버깅이나 로깅에 사용되며, 가능하면 객체를 재생성할 수 있는 형태의 문자열을 반환해야 합니다.
 
@@ -92,7 +115,7 @@ sections:
     pt = Point(3, 4)
     repr(pt)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: repr 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Point:
           def __init__(self, x, y):
@@ -105,16 +128,17 @@ sections:
       pt = Point(3, 4)
       repr(pt)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - repr 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: repr 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: repr 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: len_method
   title: __len__ 메서드
   structuredPrimary: true
   subtitle: 객체의 길이 정의
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: len 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __len__ 메서드는 객체의 길이를 정의합니다. len(객체)를 호출하면 자동으로 __len__이 호출되어 정수값을 반환합니다. 컬렉션 타입 클래스를 만들 때 매우 유용하며, 반드시 음이 아닌 정수를 반환해야 합니다.
 
@@ -137,7 +161,7 @@ sections:
     pl.add('Song B')
     len(pl)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: len 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Playlist:
           def __init__(self):
@@ -154,16 +178,17 @@ sections:
       pl.add('Song B')
       len(pl)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - len 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: len 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: len 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: add_method
   title: __add__ 메서드
   structuredPrimary: true
   subtitle: + 연산자 구현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: add 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __add__ 메서드는 + 연산자의 동작을 정의합니다. a + b를 실행하면 a.__add__(b)가 호출됩니다. 이를 통해 사용자 정의 클래스에서도 덧셈 연산을 의미있게 구현할 수 있습니다. 새로운 객체를 반환하는 것이 일반적입니다.
 
@@ -187,7 +212,7 @@ sections:
     v3 = v1 + v2
     repr(v3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: add 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Vector:
           def __init__(self, x, y):
@@ -205,16 +230,17 @@ sections:
       v3 = v1 + v2
       repr(v3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - add 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: add 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: add 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: eq_method
   title: __eq__ 메서드
   structuredPrimary: true
   subtitle: == 연산자 구현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: eq 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __eq__ 메서드는 == 연산자의 동작을 정의합니다. a == b를 실행하면 a.__eq__(b)가 호출됩니다. 기본적으로 객체는 같은 메모리 주소일 때만 같다고 판단하지만, __eq__를 정의하면 값 기반 비교가 가능합니다. True나 False를 반환해야 합니다.
 
@@ -234,7 +260,7 @@ sections:
     loc2 = Location(1, 2)
     loc1 == loc2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: eq 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Location:
           def __init__(self, x, y):
@@ -248,16 +274,17 @@ sections:
       loc2 = Location(1, 2)
       loc1 == loc2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - eq 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: eq 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: eq 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: getitem_method
   title: __getitem__ 메서드
   structuredPrimary: true
   subtitle: 인덱싱과 슬라이싱 지원
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: getitem 메서드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     __getitem__ 메서드는 객체[키] 형태의 인덱싱을 가능하게 합니다. obj[key]를 실행하면 obj.__getitem__(key)가 호출됩니다. 리스트처럼 동작하는 커스텀 컨테이너를 만들 때 필수적이며, 슬라이싱도 지원할 수 있습니다.
 
@@ -280,7 +307,7 @@ sections:
     items.add('second')
     items[0]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: getitem 메서드 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Items:
           def __init__(self):
@@ -297,16 +324,17 @@ sections:
       items.add('second')
       items[0]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - getitem 메서드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: getitem 메서드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: getitem 메서드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: special_methods_practice
   title: 특수 메서드 실전
   structuredPrimary: true
   subtitle: 여러 특수 메서드 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 특수 메서드 실전에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     실제 클래스는 여러 특수 메서드를 함께 구현하여 파이썬 내장 타입처럼 동작하게 만듭니다. __str__, __len__, __getitem__ 등을 조합하면 강력하고 직관적인 인터페이스를 제공할 수 있습니다.
 
@@ -335,7 +363,7 @@ sections:
     todo.add('Code')
     len(todo), str(todo), todo[0]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 특수 메서드 실전 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TodoList:
           def __init__(self):
@@ -358,16 +386,17 @@ sections:
       todo.add('Code')
       len(todo), str(todo), todo[0]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 특수 메서드 실전 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 특수 메서드 실전 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 특수 메서드 실전에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 장바구니를 파이썬답게 다루기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 장바구니를 파이썬답게 다루기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 특수 메서드는 객체를 len(), 인덱싱, 비교, 더하기 같은 파이썬 기본 문법과 자연스럽게 연결합니다. 장바구니 예제로 동작을 검증해봅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -427,7 +456,7 @@ sections:
 
     print("장바구니 특수 메서드 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 장바구니를 파이썬답게 다루기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       class Money:
           def __init__(self, amount):
@@ -484,16 +513,17 @@ sections:
 
       print("장바구니 특수 메서드 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 장바구니를 파이썬답게 다루기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 장바구니를 파이썬답게 다루기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 장바구니를 파이썬답게 다루기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 24 종합 복습
   structuredPrimary: true
   subtitle: 특수 메서드 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Day 24 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: Day 24에서 배운 특수 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -509,7 +539,7 @@ sections:
     p = Person('Alice', 25)
     str(p)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 24 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Person:
           def __init__(self, name, age):
@@ -522,7 +552,8 @@ sections:
       p = Person('Alice', 25)
       str(p)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 24 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 24 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 24 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

@@ -26,216 +26,260 @@ intro:
   emoji: 🍽️
   goal: 레스토랑 팁 데이터에서 "평균 팁은 얼마일까?"를 알아봅니다.
   description: pandas는 엑셀처럼 표 데이터를 다루는 도구입니다. 불러오기 → 구조 파악 → 컬럼 선택 → 통계의 흐름을 익힙니다.
+  direction: 레스토랑팁분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 레스토랑팁분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. pandas 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. CSV 불러오기 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 표 확인하기 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 레스토랑팁분석 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 레스토랑팁분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 레스토랑팁분석 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. pandas 불러오기
   structuredPrimary: true
   subtitle: import pandas as pd
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. pandas 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     pandas는 파이썬에서 표(DataFrame) 형태의 데이터를 다루는 강력한 도구입니다. 엑셀의 시트와 비슷하게 행과 열로 구성된 데이터를 쉽게 분석할 수 있습니다. 데이터 과학과 분석 작업의 핵심 라이브러리로, CSV, 엑셀, 데이터베이스 등 다양한 형식의 데이터를 불러오고 처리할 수 있습니다.
 
     import pandas as pd는 pandas 라이브러리를 pd라는 짧은 이름으로 불러오는 관례입니다. pd.read_csv()처럼 매번 pandas.read_csv()라고 쓰지 않고 짧게 pd로 사용할 수 있습니다. 거의 모든 pandas 코드에서 이렇게 시작합니다. 참고로 as pd를 붙이지 않고 import pandas 상태에서는 pandas.read_csv같이 사용할 수 있습니다. 이때 pandas.read_csv가 너무 길어지니 줄여서 pd로 사용하겠단 의미로 import pandas as pd를 합니다.
   tips:
-  - import pandas as pd는 pandas 라이브러리를 pd라는 짧은 이름으로 불러오는 관례입니다. pd.read_csv()처럼 매번 pandas.read_csv()라고 쓰지 않고 짧게 pd로 사용할 수 있습니다. 거의 모든 pandas 코드에서 이렇게 시작합니다. 참고로 as pd를 붙이지 않고 import pandas 상태에서는 pandas.read_csv같이 사용할 수 있습니다. 이때 pandas.read_csv가 너무 길어지니 줄여서 pd로 사용하겠단 의미로 import pandas as pd를 합니다.
+  - import pandas as pd는 pandas 라이브러리를 pd라는 짧은 이름으로 불러오는 관례입니다. pd.read_csv()처럼 매번 pandas.read_csv()라고
+    쓰지 않고 짧게 pd로 사용할 수 있습니다. 거의 모든 pandas 코드에서 이렇게 시작합니다. 참고로 as pd를 붙이지 않고 import pandas 상태에서는 pandas.read_csv같이
+    사용할 수 있습니다. 이때 pandas.read_csv가 너무 길어지니 줄여서 pd로 사용하겠단 의미로 import pandas as pd를 합니다.
   snippet: import pandas as pd
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. pandas 불러오기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: import pandas as pd
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. pandas 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. pandas 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. pandas 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_load
   title: 2단계. CSV 불러오기
   structuredPrimary: true
   subtitle: pd.read_csv()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. CSV 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     CSV(Comma-Separated Values)는 콤마로 구분된 텍스트 파일이며, pandas는 이런 표 데이터를 DataFrame으로 다룹니다. 이 레슨에서는 Codaro가 제공하는 로컬 예제 DataFrame으로 분석 흐름을 안정적으로 연습합니다.
 
     pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 이번 실습은 Codaro 로컬 데이터셋을 쓰므로 인터넷 연결과 무관하게 이후 셀을 그대로 실행할 수 있습니다.
   tips:
-  - pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 이번 실습은 Codaro 로컬 데이터셋을 쓰므로 인터넷 연결과 무관하게 이후 셀을 그대로 실행할 수 있습니다.
+  - pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 이번 실습은 Codaro 로컬 데이터셋을 쓰므로 인터넷 연결과 무관하게 이후 셀을 그대로 실행할 수
+    있습니다.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset
 
     tips = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. CSV 불러오기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
 
       tips = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. CSV 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. CSV 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. CSV 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_preview
   title: 3단계. 표 확인하기
   structuredPrimary: true
   subtitle: 변수명만 입력
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Jupyter나 Codaro 같은 노트북 환경에서는 변수명만 입력하면 자동으로 표 형태로 예쁘게 출력됩니다. 로컬 데이터셋은 레스토랑 손님 기록과 같은 7개 컬럼을 가진 표입니다. 각 행에는 결제 금액, 팁, 성별, 흡연 여부, 요일, 시간대, 일행 수가 담겨 있습니다.
+  goal: 3단계. 표 확인하기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: Jupyter나 Codaro 같은 노트북 환경에서는 변수명만 입력하면 자동으로 표 형태로 예쁘게 출력됩니다. 로컬 데이터셋은 레스토랑 손님 기록과 같은 7개
+    컬럼을 가진 표입니다. 각 행에는 결제 금액, 팁, 성별, 흡연 여부, 요일, 시간대, 일행 수가 담겨 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: tips
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 표 확인하기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 표 확인하기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 표 확인하기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 표 확인하기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_shape
   title: 4단계. 크기 확인
   structuredPrimary: true
   subtitle: .shape
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 크기 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     shape 속성은 DataFrame의 크기를 (행 수, 열 수) 튜플 형태로 반환합니다. 로컬 데이터셋을 읽으면 행과 열 개수를 바로 확인할 수 있습니다. 데이터 분석을 시작할 때 전체 데이터의 규모를 파악하는 것이 중요합니다.
 
     .shape는 함수가 아니라 속성이므로 괄호 ()를 붙이지 않습니다. tips.shape()라고 쓰면 에러가 발생합니다. 속성은 값을 저장하고 있고, 메서드(함수)는 어떤 동작을 수행합니다.
   tips:
-  - .shape는 함수가 아니라 속성이므로 괄호 ()를 붙이지 않습니다. tips.shape()라고 쓰면 에러가 발생합니다. 속성은 값을 저장하고 있고, 메서드(함수)는 어떤 동작을 수행합니다.
+  - .shape는 함수가 아니라 속성이므로 괄호 ()를 붙이지 않습니다. tips.shape()라고 쓰면 에러가 발생합니다. 속성은 값을 저장하고 있고, 메서드(함수)는 어떤 동작을
+    수행합니다.
   snippet: tips.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 크기 확인 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 크기 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 크기 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 크기 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_head
   title: 5단계. 처음 5행 보기
   structuredPrimary: true
   subtitle: .head()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: head() 메서드는 DataFrame의 처음 5행만 보여줍니다. 전체 데이터를 다 출력하면 화면이 너무 길어지므로, 데이터의 구조와 형태를 빠르게 파악할 때 매우 유용합니다. 괄호 안에 숫자를 넣으면 원하는 개수만큼 볼 수 있습니다. 예를 들어 head(10)은 처음 10행을 출력합니다.
+  goal: 5단계. 처음 5행 보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: head() 메서드는 DataFrame의 처음 5행만 보여줍니다. 전체 데이터를 다 출력하면 화면이 너무 길어지므로, 데이터의 구조와 형태를 빠르게 파악할
+    때 매우 유용합니다. 괄호 안에 숫자를 넣으면 원하는 개수만큼 볼 수 있습니다. 예를 들어 head(10)은 처음 10행을 출력합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: tips.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 처음 5행 보기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 처음 5행 보기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 처음 5행 보기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 처음 5행 보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_columns
   title: 6단계. 컬럼 목록
   structuredPrimary: true
   subtitle: .columns
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: columns 속성은 DataFrame에 어떤 컬럼(열)들이 있는지 이름 목록을 보여줍니다. 데이터를 분석하기 전에 어떤 정보들이 포함되어 있는지 확인하는 것이 중요합니다. 이 데이터에는 total_bill(총 결제 금액), tip(팁), sex(성별), smoker(흡연 여부), day(요일), time(시간대), size(일행 수) 등이 있습니다.
+  goal: 6단계. 컬럼 목록에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: columns 속성은 DataFrame에 어떤 컬럼(열)들이 있는지 이름 목록을 보여줍니다. 데이터를 분석하기 전에 어떤 정보들이 포함되어 있는지 확인하는
+    것이 중요합니다. 이 데이터에는 total_bill(총 결제 금액), tip(팁), sex(성별), smoker(흡연 여부), day(요일), time(시간대), size(일행
+    수) 등이 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: tips.columns
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 컬럼 목록 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips.columns
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 컬럼 목록 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 컬럼 목록 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 컬럼 목록에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_select
   title: 7단계. tip 컬럼 선택
   structuredPrimary: true
   subtitle: 대괄호로 선택
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. tip 컬럼 선택에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     DataFrame에서 특정 컬럼만 선택하려면 대괄호 []를 사용합니다. DataFrame['컬럼명'] 형태로 작성하면 해당 컬럼의 모든 값들을 Series 형태로 가져올 수 있습니다. Series는 pandas의 1차원 데이터 구조로, 하나의 열을 나타냅니다. 여기서는 로컬 예제 데이터에 담긴 손님의 팁 금액만 선택합니다.
 
     컬럼 선택 시 컬럼명은 반드시 따옴표로 감싸야 합니다. tips['tip']처럼 작은따옴표나 큰따옴표 모두 사용 가능합니다. 공백이나 특수문자가 포함된 컬럼명도 동일하게 선택할 수 있습니다.
   tips:
-  - 컬럼 선택 시 컬럼명은 반드시 따옴표로 감싸야 합니다. tips['tip']처럼 작은따옴표나 큰따옴표 모두 사용 가능합니다. 공백이나 특수문자가 포함된 컬럼명도 동일하게 선택할 수 있습니다.
+  - 컬럼 선택 시 컬럼명은 반드시 따옴표로 감싸야 합니다. tips['tip']처럼 작은따옴표나 큰따옴표 모두 사용 가능합니다. 공백이나 특수문자가 포함된 컬럼명도 동일하게 선택할
+    수 있습니다.
   snippet: tips['tip']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. tip 컬럼 선택 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips['tip']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. tip 컬럼 선택 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. tip 컬럼 선택 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. tip 컬럼 선택에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_mean
   title: 8단계. 평균 팁 구하기
   structuredPrimary: true
   subtitle: .mean()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Series나 DataFrame의 숫자 컬럼에 .mean() 메서드를 붙이면 평균값을 계산합니다. 이 프로젝트의 목표인 "평균 팁은 얼마일까?"의 답을 드디어 구할 수 있습니다! 현재 불러온 모든 행의 팁을 더해서 개수로 나눈 값이 자동으로 계산됩니다.
+  goal: 8단계. 평균 팁 구하기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: Series나 DataFrame의 숫자 컬럼에 .mean() 메서드를 붙이면 평균값을 계산합니다. 이 프로젝트의 목표인 "평균 팁은 얼마일까?"의 답을 드디어
+    구할 수 있습니다! 현재 불러온 모든 행의 팁을 더해서 개수로 나눈 값이 자동으로 계산됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: tips['tip'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 평균 팁 구하기 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips['tip'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 평균 팁 구하기 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 평균 팁 구하기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 평균 팁 구하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_maxmin
   title: 9단계. 최대/최소 팁
   structuredPrimary: true
   subtitle: .max(), .min()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: mean()과 마찬가지로 max()는 최대값, min()은 최소값을 구하는 메서드입니다. 평균뿐만 아니라 데이터의 범위(최소~최대)를 파악하면 데이터를 더 잘 이해할 수 있습니다. 실행할 때마다 같은 로컬 데이터셋을 사용하므로 결과를 안정적으로 비교할 수 있습니다. 두 값을 콤마로 연결하면 한 번에 볼 수 있습니다.
+  goal: 9단계. 최대/최소 팁에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: mean()과 마찬가지로 max()는 최대값, min()은 최소값을 구하는 메서드입니다. 평균뿐만 아니라 데이터의 범위(최소~최대)를 파악하면 데이터를 더
+    잘 이해할 수 있습니다. 실행할 때마다 같은 로컬 데이터셋을 사용하므로 결과를 안정적으로 비교할 수 있습니다. 두 값을 콤마로 연결하면 한 번에 볼 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: tips['tip'].max(), tips['tip'].min()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 최대/최소 팁 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips['tip'].max(), tips['tip'].min()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 최대/최소 팁 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 최대/최소 팁 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 최대/최소 팁에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_describe
   title: 10단계. 한번에 통계 보기
   structuredPrimary: true
   subtitle: .describe()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 한번에 통계 보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     describe() 메서드는 숫자 컬럼들의 주요 통계량을 한 번에 보여주는 매우 유용한 함수입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위수), 50%(중앙값), 75%(3사분위수), max(최대)가 자동으로 계산됩니다. 데이터 분석의 첫 단계에서 전체적인 데이터 분포를 파악하는 데 필수적입니다.
 
     describe()는 숫자형 컬럼만 자동으로 선택해서 통계를 보여줍니다. 문자형 컬럼(sex, day 등)은 제외됩니다. 만약 문자형 컬럼의 통계를 보고 싶다면 describe(include='object')를 사용하면 됩니다.
   tips:
-  - describe()는 숫자형 컬럼만 자동으로 선택해서 통계를 보여줍니다. 문자형 컬럼(sex, day 등)은 제외됩니다. 만약 문자형 컬럼의 통계를 보고 싶다면 describe(include='object')를 사용하면 됩니다.
+  - describe()는 숫자형 컬럼만 자동으로 선택해서 통계를 보여줍니다. 문자형 컬럼(sex, day 등)은 제외됩니다. 만약 문자형 컬럼의 통계를 보고 싶다면 describe(include='object')를
+    사용하면 됩니다.
   snippet: tips.describe()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 한번에 통계 보기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: tips.describe()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 한번에 통계 보기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 한번에 통계 보기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 한번에 통계 보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 11단계. 실무 팁 리포트 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 검증 → 기준 실험
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 실무 팁 리포트 검증에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     평균 팁 하나만 보면 업무에 쓰기 어렵습니다. 실제 분석에서는 필수 컬럼을 확인하고, 잘못된 데이터가 들어왔을 때 바로 실패시키고, 계산 결과가 원본 행 수와 맞는지 검증해야 합니다. 이번 단계에서는 팁 비율이 가장 높은 요일을 먼저 예상하고, 컬럼이 빠진 데이터를 일부러 검사에 실패시킵니다. 그다음 요일별 리포트를 만들고, 결제 금액 기준을 바꿔 결과가 어떻게 달라지는지 실험합니다.
 
@@ -265,7 +309,7 @@ sections:
     else:
         raise AssertionError("tip 컬럼이 빠진 데이터를 통과시키면 안 됩니다.")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 실무 팁 리포트 검증 예제에서 인자나 반환값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def prepareTipMetrics(data):
           requiredColumns = {"total_bill", "tip", "day", "time", "size"}
@@ -288,16 +332,17 @@ sections:
       else:
           raise AssertionError("tip 컬럼이 빠진 데이터를 통과시키면 안 됩니다.")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 실무 팁 리포트 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 실무 팁 리포트 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 실무 팁 리포트 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 팁 데이터 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     레스토랑 매니저가 되어 배운 모든 개념을 활용해서 팁 데이터를 분석해봅시다. 데이터 불러오기, 컬럼 선택, 통계 계산(mean, max, min, describe) 등 지금까지 배운 내용을 모두 사용합니다.
 
@@ -310,17 +355,18 @@ sections:
 
     data = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
 
       data = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:

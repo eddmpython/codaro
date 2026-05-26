@@ -27,28 +27,28 @@ meta:
     - OLS
     - ARIMA
 intro:
-  direction: statsmodels소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: statsmodels소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - statsmodels소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - statsmodels소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: statsmodels소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: pandas, scipy, statsmodels 기준으로 로컬 Python 실행을 준비합니다.
+    - label: statsmodels소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: statsmodels소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -77,7 +77,8 @@ sections:
   - type: note
     style: info
     title: 예측 vs 추론
-    content: 머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?", "이 변수는 통계적으로 유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
+    content: 머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?",
+      "이 변수는 통계적으로 유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
   - type: featureCards
     cards:
     - emoji: 📐
@@ -100,7 +101,8 @@ sections:
   - type: note
     style: info
     title: sklearn vs statsmodels
-    content: sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량 등 30개 이상의 통계량을 제공합니다. "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
+    content: sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량
+      등 30개 이상의 통계량을 제공합니다. "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
   - type: featureCards
     cards:
     - emoji: 📋
@@ -177,7 +179,8 @@ sections:
   - type: note
     style: tip
     title: 용도별 선택 가이드
-    content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로 유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
+    content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로
+      유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -274,7 +277,8 @@ sections:
   - type: note
     style: tip
     title: p-value 해석
-    content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면 더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
+    content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면
+      더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -355,7 +359,8 @@ sections:
   - type: note
     style: info
     title: 프로젝트 기반 학습
-    content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야 할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
+    content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야
+      할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
 - id: statsmodels_vs_r
   blocks:
   - type: sectionHeader
@@ -364,7 +369,8 @@ sections:
   - type: note
     style: info
     title: R과의 호환성
-    content: statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도 거의 동일합니다. R 경험자라면 쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
+    content: statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도
+      거의 동일합니다. R 경험자라면 쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
   - type: table
     headers:
     - R
@@ -394,7 +400,8 @@ sections:
   - type: note
     style: info
     title: 로컬에서 바로 실행
-    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨 안에서는 import가 성공하는지 확인합니다.
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨
+      안에서는 import가 성공하는지 확인합니다.
   - type: featureCards
     cards:
     - emoji: 🌐
@@ -432,9 +439,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 회귀 리포트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -454,7 +462,7 @@ sections:
 
     marketingData[requiredColumns].head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       compactX = sm.add_constant(marketingData[["TV", "Radio"]])
       compactModel = sm.OLS(reportY, compactX).fit()
@@ -485,7 +493,8 @@ sections:
 
       marketingData[requiredColumns].head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

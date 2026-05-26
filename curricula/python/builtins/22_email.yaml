@@ -22,13 +22,35 @@ intro:
   - MIME 타입 처리
   - 첨부 파일 추가
   - 이메일 파싱
+  direction: email 이메일 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - email 이메일 처리 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: email 모듈 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 이메일 메시지 기본 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: MIME 타입 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: email 이메일 처리 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: email 이메일 처리 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: email 이메일 처리 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: module_import
   title: email 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: email 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     email은 파이썬 표준 라이브러리입니다. 이메일 메시지를 생성하고 파싱하는 기능을 제공합니다. MIME 형식 지원, 첨부 파일 처리, 헤더 관리 등 이메일 작업에 필요한 모든 기능을 포함합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -43,7 +65,7 @@ sections:
     # 정상 로드 확인
     'email 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: email 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from email.message import EmailMessage
       from email.mime.text import MIMEText
@@ -52,16 +74,17 @@ sections:
       # 정상 로드 확인
       'email 모듈이 정상적으로 로드되었습니다'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - email 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: email 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: email 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: message_basics
   title: 이메일 메시지 기본
   structuredPrimary: true
   subtitle: EmailMessage 클래스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 이메일 메시지 기본에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     EmailMessage는 이메일 메시지를 표현하는 기본 클래스입니다. 발신자, 수신자, 제목, 본문 등 이메일의 모든 요소를 관리합니다. 간단한 텍스트 이메일부터 복잡한 MIME 메시지까지 생성할 수 있습니다.
 
@@ -77,7 +100,7 @@ sections:
 
     len(simpleMsg.as_string())
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 이메일 메시지 기본 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       simpleMsg = EmailMessage()
       simpleMsg['From'] = 'sender@example.com'
@@ -87,16 +110,17 @@ sections:
 
       len(simpleMsg.as_string())
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 이메일 메시지 기본 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 이메일 메시지 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 이메일 메시지 기본에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: mime_types
   title: MIME 타입
   structuredPrimary: true
   subtitle: MIMEText, MIMEMultipart
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: MIME 타입에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     MIME(Multipurpose Internet Mail Extensions)는 다양한 형식의 콘텐츠를 이메일로 전송할 수 있게 합니다. MIMEText는 텍스트, MIMEMultipart는 여러 파트로 구성된 메시지, MIMEImage는 이미지를 다룹니다. HTML 이메일, 첨부 파일 등에 필수적입니다.
 
@@ -110,7 +134,7 @@ sections:
 
     textMsg.get_content_type()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: MIME 타입 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       textMsg = MIMEText('Hello, this is plain text.')
       textMsg['Subject'] = 'Plain Text'
@@ -118,16 +142,17 @@ sections:
 
       textMsg.get_content_type()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - MIME 타입 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: MIME 타입 코드가 예외 없이 끝나야 합니다.
+    resultCheck: MIME 타입에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: headers
   title: 헤더 관리
   structuredPrimary: true
   subtitle: From, To, Subject, Date
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 헤더 관리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     이메일 헤더는 메시지의 메타데이터를 담습니다. From은 발신자, To는 수신자, Subject는 제목, Date는 날짜를 나타냅니다. Cc(참조), Bcc(숨은 참조), Reply-To 등 다양한 헤더를 설정할 수 있습니다.
 
@@ -145,7 +170,7 @@ sections:
 
     headerMsg['Subject']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 헤더 관리 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from email.utils import formatdate
 
@@ -157,16 +182,17 @@ sections:
 
       headerMsg['Subject']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 헤더 관리 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 헤더 관리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 헤더 관리에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: attachments
   title: 첨부 파일
   structuredPrimary: true
   subtitle: add_attachment, get_content
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 첨부 파일에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     첨부 파일은 이메일과 함께 전송되는 파일입니다. add_attachment()로 파일을 첨부하고, maintype과 subtype으로 파일 타입을 지정합니다. 텍스트, 이미지, PDF, ZIP 등 모든 형식의 파일을 첨부할 수 있습니다.
 
@@ -188,7 +214,7 @@ sections:
 
     len(list(attachMsg.iter_attachments()))
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 첨부 파일 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       attachMsg = EmailMessage()
       attachMsg['Subject'] = 'File Attached'
@@ -204,16 +230,17 @@ sections:
 
       len(list(attachMsg.iter_attachments()))
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 첨부 파일 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 첨부 파일 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 첨부 파일에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: parsing
   title: 이메일 파싱
   structuredPrimary: true
   subtitle: message_from_string, message_from_bytes
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 이메일 파싱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     이메일 파싱은 문자열이나 바이트에서 EmailMessage 객체를 생성합니다. message_from_string()은 문자열을, message_from_bytes()는 바이트를 파싱합니다. 수신한 이메일을 분석하고 헤더와 본문을 추출할 수 있습니다.
 
@@ -228,7 +255,7 @@ sections:
     parsedMsg = message_from_string(emailStr)
     parsedMsg['Subject']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 이메일 파싱 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from email import message_from_string
 
@@ -237,16 +264,17 @@ sections:
       parsedMsg = message_from_string(emailStr)
       parsedMsg['Subject']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 이메일 파싱 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 이메일 파싱 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 이메일 파싱에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practical
   title: 실전 활용 예제
   structuredPrimary: true
   subtitle: 실무 이메일 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 활용 예제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: email 모듈을 활용한 실전 이메일 처리 예제를 다룹니다. HTML 뉴스레터, 파일 첨부 이메일, 템플릿 메일 등 실무에서 자주 사용하는 패턴을 배웁니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -268,7 +296,7 @@ sections:
     newsMsg = createNewsletter('user@example.com', 'Weekly Update', 'Latest News')
     newsMsg['Subject']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 활용 예제 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def createNewsletter(recipient, subject, content):
           newsletter = MIMEMultipart('alternative')
@@ -287,16 +315,17 @@ sections:
       newsMsg = createNewsletter('user@example.com', 'Weekly Update', 'Latest News')
       newsMsg['Subject']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 활용 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 활용 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 활용 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 발송 전 이메일 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '검증 루프: 발송 전 이메일 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실무 이메일은 생성보다 발송 전 검증이 중요합니다. 필수 헤더, 수신자 주소, 첨부 파일 개수, 직렬화 후 재파싱을 한 번에 확인해야 실제 발송 단계에서 사고를 줄일 수 있습니다.
 
@@ -333,7 +362,7 @@ sections:
     assert len(list(reportMsg.iter_attachments())) == 1
     reportMsg['To']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 발송 전 이메일 품질 게이트 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from email import message_from_bytes
       from email.utils import parseaddr
@@ -364,16 +393,17 @@ sections:
       assert len(list(reportMsg.iter_attachments())) == 1
       reportMsg['To']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 발송 전 이메일 품질 게이트 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 발송 전 이메일 품질 게이트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 발송 전 이메일 품질 게이트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: email 모듈 종합 복습
   structuredPrimary: true
   subtitle: 이메일 처리 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: email 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: email 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -382,13 +412,14 @@ sections:
     basicMsg['Subject'] = 'Test'
     basicMsg['Subject']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: email 모듈 종합 복습 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       basicMsg = EmailMessage()
       basicMsg['Subject'] = 'Test'
       basicMsg['Subject']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - email 모듈 종합 복습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: email 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: email 모듈 종합 복습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

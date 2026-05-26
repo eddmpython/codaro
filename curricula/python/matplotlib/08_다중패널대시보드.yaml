@@ -30,20 +30,44 @@ meta:
 intro:
   emoji: 📋
   goal: 4개 차트로 구성된 팁 데이터 분석 대시보드를 만듭니다.
-  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie, subplots 개념을 모두 활용합니다.
+  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie,
+    subplots 개념을 모두 활용합니다.
+  direction: 다중패널대시보드에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 다중패널대시보드 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 다중패널대시보드 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, numpy, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다중패널대시보드 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 다중패널대시보드 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     tips 데이터를 사용하여 레스토랑 팁 분석 대시보드를 만듭니다. GridSpec은 서브플롯보다 더 유연한 레이아웃을 구성할 수 있습니다. 스타일 시트를 적용하면 기본 디자인이 크게 개선됩니다.
 
     import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
   tips:
-  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을
+    구성할 때 사용합니다.
   snippet: |-
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
@@ -51,7 +75,7 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import numpy as np
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       from matplotlib.gridspec import GridSpec
@@ -59,22 +83,24 @@ sections:
       from codaro.curriculum.localData import loadLocalDataset
       import numpy as np
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
     font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
   tips:
-  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
   snippet: |-
     from matplotlib import font_manager
 
@@ -86,7 +112,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -98,16 +124,17 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: tips 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: tips 데이터를 불러오고 기본 통계를 확인합니다. 대시보드에는 총 결제금액, 팁, 요일, 시간대, 인원수 등 다양한 변수를 활용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -117,50 +144,54 @@ sections:
     tips = loadLocalDataset('tips')
     tips.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       tips = loadLocalDataset('tips')
       tips.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_style
   title: 3단계. 스타일 시트 적용
   structuredPrimary: true
   subtitle: plt.style.use()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 스타일 시트 적용에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에 적합합니다.
 
     plt.style.use('스타일명')으로 스타일을 적용합니다. 주요 스타일: 'seaborn-v0_8-whitegrid'(깔끔한 격자), 'ggplot'(R 스타일), 'dark_background'(어두운 배경), 'fivethirtyeight'(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.
   tips:
-  - 'plt.style.use(''스타일명'')으로 스타일을 적용합니다. 주요 스타일: ''seaborn-v0_8-whitegrid''(깔끔한 격자), ''ggplot''(R 스타일), ''dark_background''(어두운 배경), ''fivethirtyeight''(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.'
+  - 'plt.style.use(''스타일명'')으로 스타일을 적용합니다. 주요 스타일: ''seaborn-v0_8-whitegrid''(깔끔한 격자), ''ggplot''(R 스타일),
+    ''dark_background''(어두운 배경), ''fivethirtyeight''(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.'
   snippet: plt.style.available[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 스타일 시트 적용 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: plt.style.available[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 스타일 시트 적용 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 스타일 시트 적용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 스타일 시트 적용에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_gridspec
   title: 4단계. GridSpec 기본
   structuredPrimary: true
   subtitle: 그리드 레이아웃
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. GridSpec 기본에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     GridSpec은 Figure를 그리드로 분할하고, 각 셀에 차트를 배치합니다. 2x2 그리드를 만들고 각 위치에 다른 차트를 배치해봅니다. subplots보다 더 유연한 레이아웃이 가능합니다.
 
     GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
   tips:
-  - GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
+  - GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2,
+    0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
   snippet: |-
     figGrid = plt.figure(figsize=(12, 10))
     gs = GridSpec(2, 2, figure=figGrid)
@@ -178,7 +209,7 @@ sections:
     plt.tight_layout()
     figGrid
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. GridSpec 기본 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figGrid = plt.figure(figsize=(12, 10))
       gs = GridSpec(2, 2, figure=figGrid)
@@ -196,16 +227,17 @@ sections:
       plt.tight_layout()
       figGrid
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. GridSpec 기본 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. GridSpec 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. GridSpec 기본에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_hist_box
   title: 5단계. 히스토그램과 박스플롯
   structuredPrimary: true
   subtitle: 분포 시각화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 히스토그램과 박스플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 첫 번째 행에 팁 금액의 분포를 히스토그램과 박스플롯으로 표시합니다. 이전에 배운 기법들을 적용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -220,7 +252,7 @@ sections:
     axHist.set_ylabel('빈도')
     figDist
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 히스토그램과 박스플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figDist = plt.figure(figsize=(14, 5))
       gs = GridSpec(1, 2, figure=figDist)
@@ -232,16 +264,17 @@ sections:
       axHist.set_ylabel('빈도')
       figDist
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 히스토그램과 박스플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 히스토그램과 박스플롯 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 히스토그램과 박스플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_scatter_bar
   title: 6단계. 산점도와 막대 그래프
   structuredPrimary: true
   subtitle: 관계와 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 산점도와 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 두 번째 행에 결제금액-팁 관계 산점도와 시간대별 평균 팁 막대 그래프를 배치합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -261,7 +294,7 @@ sections:
     axScatter.legend()
     figRelation
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 산점도와 막대 그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figRelation = plt.figure(figsize=(14, 5))
       gs = GridSpec(1, 2, figure=figRelation)
@@ -278,22 +311,24 @@ sections:
       axScatter.legend()
       figRelation
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 산점도와 막대 그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 산점도와 막대 그래프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 산점도와 막대 그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_pie
   title: 7단계. 파이 차트
   structuredPrimary: true
   subtitle: 비율 시각화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 파이 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     파이 차트는 전체 대비 각 부분의 비율을 보여줍니다. 요일별 주문 비율을 파이 차트로 시각화합니다. autopct로 퍼센트를 표시하고, explode로 특정 조각을 강조할 수 있습니다.
 
     ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
   tips:
-  - ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
+  - ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를
+    줍니다. startangle로 시작 각도를 조절합니다.
   snippet: |-
     figPie, axPie = plt.subplots(figsize=(8, 8))
 
@@ -307,7 +342,7 @@ sections:
 
     figPie
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 파이 차트 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figPie, axPie = plt.subplots(figsize=(8, 8))
 
@@ -321,16 +356,17 @@ sections:
 
       figPie
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 파이 차트 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 파이 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 파이 차트에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_dashboard
   title: 8단계. 4패널 대시보드
   structuredPrimary: true
   subtitle: 모든 차트 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 4패널 대시보드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 지금까지 만든 4가지 차트를 하나의 대시보드로 조합합니다. 2x2 GridSpec으로 레이아웃을 구성하고, 각 위치에 적절한 차트를 배치합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -347,7 +383,7 @@ sections:
     ax1Dash.spines['right'].set_visible(False)
     figDash
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 4패널 대시보드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figDash = plt.figure(figsize=(14, 12))
       gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
@@ -361,16 +397,17 @@ sections:
       ax1Dash.spines['right'].set_visible(False)
       figDash
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 4패널 대시보드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 4패널 대시보드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 4패널 대시보드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_advanced
   title: 9단계. 고급 레이아웃
   structuredPrimary: true
   subtitle: 불균등 그리드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 고급 레이아웃에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: GridSpec으로 불균등한 크기의 셀을 만들 수 있습니다. 위쪽에 큰 차트, 아래쪽에 작은 차트 3개를 배치하는 등 다양한 레이아웃이 가능합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -391,7 +428,7 @@ sections:
     axMain.grid(True, alpha=0.3)
     figAdvanced
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 고급 레이아웃 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figAdvanced = plt.figure(figsize=(14, 10))
       gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
@@ -409,16 +446,17 @@ sections:
       axMain.grid(True, alpha=0.3)
       figAdvanced
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 고급 레이아웃 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 고급 레이아웃 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 고급 레이아웃에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_final
   title: 10단계. 최종 대시보드
   structuredPrimary: true
   subtitle: 완성된 분석 리포트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 최종 대시보드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 분석 대시보드를 만듭니다. 일관된 스타일, 명확한 제목, 적절한 여백으로 전문적인 리포트를 완성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -442,7 +480,7 @@ sections:
     axFinal1.spines['right'].set_visible(False)
     figFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 최종 대시보드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFinal = plt.figure(figsize=(16, 12))
       gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
@@ -463,16 +501,17 @@ sections:
       axFinal1.spines['right'].set_visible(False)
       figFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 최종 대시보드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 최종 대시보드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 최종 대시보드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 대시보드 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
 
@@ -493,7 +532,7 @@ sections:
     kinds = data['species'].unique()
     palette = ['#E74C3C', '#27AE60', '#3498DB']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       from matplotlib.gridspec import GridSpec
@@ -508,10 +547,11 @@ sections:
       kinds = data['species'].unique()
       palette = ['#E74C3C', '#27AE60', '#3498DB']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -532,9 +572,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -560,7 +601,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -591,7 +632,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

@@ -24,32 +24,57 @@ meta:
 intro:
   emoji: ⚡
   goal: Pydantic 모델로 완전한 REST API 모델 세트를 설계합니다.
-  description: FastAPI는 Pydantic을 핵심 검증 엔진으로 사용하는 현대적인 웹 프레임워크입니다. 요청 본문, 응답 스키마, 쿼리 파라미터를 모두 Pydantic 모델로 정의하면 자동 검증, 타입 변환, API 문서화까지 한번에 해결됩니다. 이 프로젝트에서는 실제 API에서 사용하는 CRUD 모델 패턴을 설계합니다.
+  description: FastAPI는 Pydantic을 핵심 검증 엔진으로 사용하는 현대적인 웹 프레임워크입니다. 요청 본문, 응답 스키마, 쿼리 파라미터를 모두 Pydantic
+    모델로 정의하면 자동 검증, 타입 변환, API 문서화까지 한번에 해결됩니다. 이 프로젝트에서는 실제 API에서 사용하는 CRUD 모델 패턴을 설계합니다.
+  direction: FastAPI통합에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - FastAPI통합 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 요청 모델 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 응답 모델 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: FastAPI통합 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: FastAPI통합 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: FastAPI통합 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
 - id: load
   title: 라이브러리 로드
   structuredPrimary: true
   subtitle: Pydantic 설치 및 import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다.
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로
+    정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 라이브러리 로드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: import pydantic
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 라이브러리 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 라이브러리 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 라이브러리 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: request
   title: 요청 모델
   structuredPrimary: true
   subtitle: Request Body
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 요청 모델에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다. 모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다.
 
@@ -72,7 +97,7 @@ sections:
     createReq = CreateUserRequest.model_validate(requestData)
     createReq
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 요청 모델 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class CreateUserRequest(BaseModel):
           username: str = Field(min_length=3, max_length=50, description="사용자명")
@@ -89,17 +114,19 @@ sections:
       createReq = CreateUserRequest.model_validate(requestData)
       createReq
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 요청 모델 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 요청 모델 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 요청 모델에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: response
   title: 응답 모델
   structuredPrimary: true
   subtitle: Response Schema
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는 제외됩니다. FastAPI는 응답 모델에 맞게 자동으로 JSON 직렬화합니다.
+  goal: 응답 모델에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는
+    제외됩니다. FastAPI는 응답 모델에 맞게 자동으로 JSON 직렬화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -122,7 +149,7 @@ sections:
     userResp = UserResponse.model_validate(responseData)
     userResp
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 응답 모델 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class UserResponse(BaseModel):
           userId: str = Field(description="사용자 고유 ID")
@@ -143,17 +170,19 @@ sections:
       userResp = UserResponse.model_validate(responseData)
       userResp
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 응답 모델 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 응답 모델 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 응답 모델에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: crud
   title: CRUD 모델 세트
   structuredPrimary: true
   subtitle: 생성/읽기/수정 분리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update 모델은 모든 필드를 Optional로 하여 부분 수정(PATCH)을 지원합니다.
+  goal: CRUD 모델 세트에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update
+    모델은 모든 필드를 Optional로 하여 부분 수정(PATCH)을 지원합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -178,7 +207,7 @@ sections:
         createdAt: datetime
         updatedAt: Optional[datetime] = None
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: CRUD 모델 세트 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ProductBase(BaseModel):
           name: str = Field(min_length=2, max_length=100)
@@ -201,17 +230,19 @@ sections:
           createdAt: datetime
           updatedAt: Optional[datetime] = None
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - CRUD 모델 세트 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: CRUD 모델 세트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: CRUD 모델 세트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: query
   title: 쿼리 파라미터
   structuredPrimary: true
   subtitle: 검색과 필터링
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가 자동화됩니다. Literal로 정렬 옵션을 제한하면 API 문서에도 반영됩니다.
+  goal: 쿼리 파라미터에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가
+    자동화됩니다. Literal로 정렬 옵션을 제한하면 API 문서에도 반영됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -234,7 +265,7 @@ sections:
     )
     searchParams.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 쿼리 파라미터 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class SearchParams(BaseModel):
           query: Optional[str] = Field(default=None, min_length=1, description="검색어")
@@ -255,17 +286,19 @@ sections:
       )
       searchParams.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 쿼리 파라미터 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 쿼리 파라미터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 쿼리 파라미터에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: pagination
   title: 페이지네이션 응답
   structuredPrimary: true
   subtitle: 목록 래퍼
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들 수 있습니다. 전체 개수, 현재 페이지, 다음/이전 페이지 존재 여부 등을 포함합니다.
+  goal: 페이지네이션 응답에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들
+    수 있습니다. 전체 개수, 현재 페이지, 다음/이전 페이지 존재 여부 등을 포함합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -301,7 +334,7 @@ sections:
     )
     paginatedResp.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 페이지네이션 응답 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       T = TypeVar('T')
 
@@ -335,17 +368,19 @@ sections:
       )
       paginatedResp.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 페이지네이션 응답 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 페이지네이션 응답 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 페이지네이션 응답에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: error
   title: 에러 응답
   structuredPrimary: true
   subtitle: 표준 에러 형식
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의 HTTPException과 함께 사용하면 표준화된 에러 응답을 반환할 수 있습니다.
+  goal: 에러 응답에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의
+    HTTPException과 함께 사용하면 표준화된 에러 응답을 반환할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -371,7 +406,7 @@ sections:
     )
     errorResp.model_dump_json(indent=2)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 에러 응답 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ErrorDetail(BaseModel):
           field: str = Field(description="에러 필드")
@@ -395,17 +430,19 @@ sections:
       )
       errorResp.model_dump_json(indent=2)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 에러 응답 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 에러 응답 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 에러 응답에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: nested
   title: 중첩 API 모델
   structuredPrimary: true
   subtitle: 복잡한 요청/응답
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면 전체가 자동으로 검증됩니다.
+  goal: 중첩 API 모델에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면
+    전체가 자동으로 검증됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -441,7 +478,7 @@ sections:
     )
     orderRequest.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 중첩 API 모델 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class OrderItemRequest(BaseModel):
           productId: str
@@ -475,17 +512,19 @@ sections:
       )
       orderRequest.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 중첩 API 모델 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 중첩 API 모델 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 중첩 API 모델에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: filter
   title: 응답 필터링
   structuredPrimary: true
   subtitle: include/exclude
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의 include/exclude 옵션으로 유연하게 제어할 수 있습니다.
+  goal: 응답 필터링에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의
+    include/exclude 옵션으로 유연하게 제어할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -516,7 +555,7 @@ sections:
     basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
     publicView, basicView
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 응답 필터링 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class FullUserProfile(BaseModel):
           userId: str
@@ -545,17 +584,19 @@ sections:
       basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
       publicView, basicView
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 응답 필터링 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 응답 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 응답 필터링에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: computed
   title: 계산 필드 응답
   structuredPrimary: true
   subtitle: computed_field
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로 직렬화에 포함시킬 수 있습니다.
+  goal: 계산 필드 응답에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로
+    직렬화에 포함시킬 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -593,7 +634,7 @@ sections:
     )
     cart.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 계산 필드 응답 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class CartItem(BaseModel):
           productId: str
@@ -629,17 +670,19 @@ sections:
       )
       cart.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 계산 필드 응답 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 계산 필드 응답 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 계산 필드 응답에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: result
   title: 완전한 API 모델 세트
   structuredPrimary: true
   subtitle: 종합 설계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지 모두 포함합니다.
+  goal: 완전한 API 모델 세트에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지
+    모두 포함합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -651,7 +694,7 @@ sections:
     successResp = ApiResponse[UserResponse](data=userResp)
     successResp.model_dump_json(indent=2)[:300]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 완전한 API 모델 세트 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ApiResponse(BaseModel, Generic[T]):
           success: bool = True
@@ -661,16 +704,17 @@ sections:
       successResp = ApiResponse[UserResponse](data=userResp)
       successResp.model_dump_json(indent=2)[:300]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 완전한 API 모델 세트 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 완전한 API 모델 세트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 완전한 API 모델 세트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: API 모델 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다.
 
@@ -723,7 +767,7 @@ sections:
     )
     createReq.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import BaseModel, Field, computed_field
       from typing import Optional, Literal
@@ -770,17 +814,19 @@ sections:
       )
       createReq.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -818,7 +864,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -854,7 +900,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'

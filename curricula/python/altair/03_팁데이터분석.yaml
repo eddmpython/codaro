@@ -27,14 +27,37 @@ intro:
   emoji: 💵
   goal: 레스토랑 팁 데이터를 막대 차트로 시각화하고 집계 함수를 활용합니다.
   description: mark_bar()로 막대 차트를 만들고, count(), mean() 등 집계 함수로 데이터를 요약합니다.
+  direction: 팁데이터분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 팁데이터분석 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 개수 세기 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 평균 계산 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 팁데이터분석 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 팁데이터분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 팁데이터분석 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: seaborn-data
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Codaro 로컬 데이터셋에서 tips 데이터를 불러옵니다. 레스토랑 결제와 팁 패턴을 담은 예제 데이터입니다. total_bill(총 금액), tip(팁), sex(성별), smoker(흡연여부), day(요일), time(시간대), size(인원수) 컬럼이 있습니다.
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: Codaro 로컬 데이터셋에서 tips 데이터를 불러옵니다. 레스토랑 결제와 팁 패턴을 담은 예제 데이터입니다. total_bill(총 금액), tip(팁),
+    sex(성별), smoker(흡연여부), day(요일), time(시간대), size(인원수) 컬럼이 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -46,7 +69,7 @@ sections:
 
     tips = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -56,22 +79,24 @@ sections:
 
       tips = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_count_bar
   title: 2단계. 개수 세기
   structuredPrimary: true
   subtitle: count() 집계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 개수 세기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     막대 차트의 기본은 카테고리별 개수를 세는 것입니다. mark_bar()를 사용하면 막대 그래프를 그립니다. 요일(day)별로 데이터가 몇 건인지 막대 차트로 표현합니다. x축에 요일, y축에 개수를 배치합니다. y에 'count()'를 사용하면 자동으로 개수를 셉니다. count()는 집계 함수로, 데이터를 세어주는 역할을 합니다. 괄호 안이 비어있는 것은 "전체 개수를 세라"는 의미입니다.
 
     집계 함수는 여러 데이터를 하나로 요약하는 함수입니다. count()는 개수를 세고, mean()은 평균을 구하고, sum()은 합계를 구합니다. 'count()'는 작은따옴표로 감싸야 합니다. 문자열(텍스트)로 전달해야 Altair가 이것을 집계 함수로 인식합니다.
   tips:
-  - 집계 함수는 여러 데이터를 하나로 요약하는 함수입니다. count()는 개수를 세고, mean()은 평균을 구하고, sum()은 합계를 구합니다. 'count()'는 작은따옴표로 감싸야 합니다. 문자열(텍스트)로 전달해야 Altair가 이것을 집계 함수로 인식합니다.
+  - 집계 함수는 여러 데이터를 하나로 요약하는 함수입니다. count()는 개수를 세고, mean()은 평균을 구하고, sum()은 합계를 구합니다. 'count()'는 작은따옴표로
+    감싸야 합니다. 문자열(텍스트)로 전달해야 Altair가 이것을 집계 함수로 인식합니다.
   snippet: |-
     chartCount = alt.Chart(tips).mark_bar().encode(
         x='day:N',
@@ -79,7 +104,7 @@ sections:
     )
     chartCount
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 개수 세기 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartCount = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -87,16 +112,17 @@ sections:
       )
       chartCount
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 개수 세기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 개수 세기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 개수 세기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_mean_bar
   title: 3단계. 평균 계산
   structuredPrimary: true
   subtitle: mean() 집계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 평균 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     count() 외에도 mean(), sum(), median() 등 다양한 집계 함수를 사용할 수 있습니다. 요일별 평균 팁을 계산해봅니다. y에 'mean(tip)'을 지정하면 tip 컬럼의 평균값을 구합니다. mean() 괄호 안에 컬럼명을 넣으면 그 컬럼의 평균을 계산합니다. 'mean(tip):Q'처럼 :Q를 붙여 수량형 데이터임을 명시합니다.
 
@@ -110,7 +136,7 @@ sections:
     )
     chartMean
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 평균 계산 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartMean = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -118,16 +144,17 @@ sections:
       )
       chartMean
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 평균 계산 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 평균 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 평균 계산에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_color_group
   title: 4단계. 색상으로 그룹 분리
   structuredPrimary: true
   subtitle: color 인코딩
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 색상으로 그룹 분리에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     막대 차트에도 color 인코딩을 적용할 수 있습니다. 요일별 건수를 성별(sex)로 구분해봅니다. 같은 요일 안에서 남녀 비율을 확인할 수 있습니다.
 
@@ -142,7 +169,7 @@ sections:
     )
     chartGrouped
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 색상으로 그룹 분리 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartGrouped = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -151,22 +178,24 @@ sections:
       )
       chartGrouped
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 색상으로 그룹 분리 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 색상으로 그룹 분리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 색상으로 그룹 분리에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_ordinal
   title: 5단계. 순서형 데이터
   structuredPrimary: true
   subtitle: :O 타입
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 순서형 데이터에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     요일에는 자연스러운 순서가 있습니다. Thur → Fri → Sat → Sun 순으로 정렬하면 더 직관적입니다. :O(Ordinal, 순서형) 타입을 사용하면 순서가 있는 카테고리를 표현할 수 있습니다. :N(명목형)과 달리 :O는 순서를 지정할 수 있습니다. 먼저 dayOrder라는 변수에 요일 순서를 리스트로 저장합니다. 그다음 alt.X() 함수에서 sort=dayOrder로 이 순서를 적용합니다.
 
     같은 셀 안에서 변수를 여러 개 만들 수 있습니다. dayOrder = [...] 후 chartOrdered = alt.Chart(...)처럼 두 변수를 선언합니다. 하지만 마지막 줄에는 하나의 변수(chartOrdered)만 써야 그것이 출력됩니다. dayOrder를 쓰면 요일 리스트가, chartOrdered를 쓰면 차트가 출력됩니다.
   tips:
-  - 같은 셀 안에서 변수를 여러 개 만들 수 있습니다. dayOrder = [...] 후 chartOrdered = alt.Chart(...)처럼 두 변수를 선언합니다. 하지만 마지막 줄에는 하나의 변수(chartOrdered)만 써야 그것이 출력됩니다. dayOrder를 쓰면 요일 리스트가, chartOrdered를 쓰면 차트가 출력됩니다.
+  - 같은 셀 안에서 변수를 여러 개 만들 수 있습니다. dayOrder = [...] 후 chartOrdered = alt.Chart(...)처럼 두 변수를 선언합니다. 하지만 마지막
+    줄에는 하나의 변수(chartOrdered)만 써야 그것이 출력됩니다. dayOrder를 쓰면 요일 리스트가, chartOrdered를 쓰면 차트가 출력됩니다.
   snippet: |-
     dayOrder = ['Thur', 'Fri', 'Sat', 'Sun']
     chartOrdered = alt.Chart(tips).mark_bar().encode(
@@ -176,7 +205,7 @@ sections:
     )
     chartOrdered
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 순서형 데이터 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dayOrder = ['Thur', 'Fri', 'Sat', 'Sun']
       chartOrdered = alt.Chart(tips).mark_bar().encode(
@@ -186,17 +215,19 @@ sections:
       )
       chartOrdered
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 순서형 데이터 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 순서형 데이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 순서형 데이터에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_horizontal
   title: 6단계. 가로 막대 차트
   structuredPrimary: true
   subtitle: x와 y 교환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: x와 y를 바꾸면 가로 막대 차트가 됩니다. x축에 숫자(평균 금액)를, y축에 카테고리(요일)를 배치합니다. 카테고리 이름이 길거나 항목이 많을 때 가로 막대가 읽기 쉽습니다. 여기서는 'mean(total_bill):Q'로 총 금액의 평균을 계산하고, time(시간대)으로 색상을 구분합니다.
+  goal: 6단계. 가로 막대 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: x와 y를 바꾸면 가로 막대 차트가 됩니다. x축에 숫자(평균 금액)를, y축에 카테고리(요일)를 배치합니다. 카테고리 이름이 길거나 항목이 많을 때 가로
+    막대가 읽기 쉽습니다. 여기서는 'mean(total_bill):Q'로 총 금액의 평균을 계산하고, time(시간대)으로 색상을 구분합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -207,7 +238,7 @@ sections:
     )
     chartHorizontal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 가로 막대 차트 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartHorizontal = alt.Chart(tips).mark_bar().encode(
           x='mean(total_bill):Q',
@@ -216,17 +247,20 @@ sections:
       )
       chartHorizontal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 가로 막대 차트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 가로 막대 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 가로 막대 차트에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_properties
   title: 7단계. 차트 속성 설정
   structuredPrimary: true
   subtitle: properties()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: properties()로 차트 제목, 너비, 높이를 설정합니다. properties()는 차트 전체 속성을 조정하는 함수입니다. title 파라미터로 차트 상단에 표시될 제목을 지정합니다. 문자열(작은따옴표로 감싼 텍스트)로 전달합니다. width는 차트 너비, height는 차트 높이를 픽셀 단위로 지정합니다. 숫자만 쓰면 됩니다(따옴표 없이). 여기서는 alt.X()의 title 파라미터로 축 제목도 한글로 바꿨습니다.
+  goal: 7단계. 차트 속성 설정에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: properties()로 차트 제목, 너비, 높이를 설정합니다. properties()는 차트 전체 속성을 조정하는 함수입니다. title 파라미터로 차트
+    상단에 표시될 제목을 지정합니다. 문자열(작은따옴표로 감싼 텍스트)로 전달합니다. width는 차트 너비, height는 차트 높이를 픽셀 단위로 지정합니다. 숫자만 쓰면 됩니다(따옴표
+    없이). 여기서는 alt.X()의 title 파라미터로 축 제목도 한글로 바꿨습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -241,7 +275,7 @@ sections:
     )
     chartStyled
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 차트 속성 설정 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartStyled = alt.Chart(tips).mark_bar().encode(
           x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
@@ -254,16 +288,17 @@ sections:
       )
       chartStyled
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 차트 속성 설정 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 차트 속성 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 차트 속성 설정에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_final
   title: 8단계. 최종 결과물
   structuredPrimary: true
   subtitle: 팁 분석 대시보드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     지금까지 배운 내용을 종합해 팁 데이터 분석 차트를 완성합니다. 시간대(Lunch/Dinner)와 흡연 여부별 평균 금액을 비교합니다.
 
@@ -279,7 +314,7 @@ sections:
     ).properties(title='시간대별 평균 금액 (흡연 여부)', width=350, height=300)
     chartFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartFinal = alt.Chart(tips).mark_bar().encode(
           x=alt.X('time:N', title='시간대'),
@@ -289,16 +324,17 @@ sections:
       ).properties(title='시간대별 평균 금액 (흡연 여부)', width=350, height=300)
       chartFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 9단계. 실무 집계 검증 루프
   structuredPrimary: true
   subtitle: 예측 → spec 검증 → 오류 수정 → 기준 실험
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 실무 집계 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     업무용 차트는 막대가 그려졌다는 사실만으로 충분하지 않습니다. 원본 데이터 구조가 맞는지, 집계 결과가 예상한 방향인지, Altair spec에 집계 함수와 그룹 인코딩이 들어갔는지 확인해야 합니다. 이 단계에서는 Dinner의 평균 결제 금액이 Lunch보다 높을 것이라고 먼저 예측합니다. 그런 다음 pandas 집계와 Altair spec을 함께 검증해, 보고서에 넣을 수 있는 차트인지 확인합니다.
 
@@ -323,7 +359,7 @@ sections:
 
     timeSummary
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 실무 집계 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
       missingColumns = requiredColumns - set(tips.columns)
@@ -342,16 +378,17 @@ sections:
 
       timeSummary
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 실무 집계 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 실무 집계 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 실무 집계 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 팁 데이터 막대 차트 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리합니다. mark_bar()로 막대 차트를 그렸습니다. count()로 개수를, mean()으로 평균을 계산했습니다. 집계 함수는 여러 데이터를 하나의 값으로 요약합니다. :O(순서형) 타입과 sort로 카테고리 순서를 지정했습니다. properties()로 차트 제목과 크기를 설정했습니다. 각 미션에서 이 개념들을 활용해봅시다.
 
@@ -364,17 +401,18 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     bill = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
       bill = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:

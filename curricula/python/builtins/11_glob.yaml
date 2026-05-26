@@ -23,13 +23,35 @@ intro:
   - 재귀적 파일 검색
   - 확장자별 필터링
   - 메모리 효율적 탐색
+  direction: glob 파일 패턴 매칭에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - glob 파일 패턴 매칭 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: glob 모듈 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 패턴 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 재귀 검색 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: glob 파일 패턴 매칭 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: glob 파일 패턴 매칭 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: glob 파일 패턴 매칭 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: module_import
   title: glob 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: glob 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: glob 모듈 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 이 섹션을 먼저 실행하면 아래 모든 예제에서 glob 모듈을 사용할 수 있습니다.
@@ -38,22 +60,23 @@ sections:
     import os
     import tempfile
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: glob 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import glob
       import os
       import tempfile
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - glob 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: glob 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: glob 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: basic_patterns
   title: 기본 패턴
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 기본 패턴에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 기본 패턴의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - Codaro 로컬 커널에서는 현재 작업 디렉터리와 지정한 로컬 경로를 검색합니다. 패턴에 맞는 파일이 없으면 빈 리스트가 반환됩니다.
@@ -62,22 +85,23 @@ sections:
     resultFiles = glob.glob(patternPy)
     resultFiles
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 기본 패턴 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       patternPy = '*.py'
       resultFiles = glob.glob(patternPy)
       resultFiles
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 기본 패턴 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 기본 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 기본 패턴에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: recursive_search
   title: 재귀 검색
   structuredPrimary: true
   subtitle: 하위 디렉토리까지 검색
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 재귀 검색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     **/ 패턴과 recursive=True 옵션을 사용하면 현재 디렉토리뿐만 아니라 모든 하위 디렉토리까지 검색할 수 있습니다. 대규모 프로젝트에서 특정 확장자 파일을 모두 찾을 때 유용합니다.
 
@@ -89,22 +113,23 @@ sections:
     allPyFiles = glob.glob(recursivePattern, recursive=True)
     allPyFiles
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 재귀 검색 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       recursivePattern = '**/*.py'
       allPyFiles = glob.glob(recursivePattern, recursive=True)
       allPyFiles
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 재귀 검색 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 재귀 검색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 재귀 검색에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: iglob
   title: 이터레이터 버전
   structuredPrimary: true
   subtitle: 메모리 효율적인 검색
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 이터레이터 버전에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     glob.iglob()는 glob.glob()의 이터레이터 버전입니다. 파일 목록을 한 번에 메모리에 로드하지 않고 순차적으로 처리할 수 있어 메모리 효율적입니다. 대량의 파일을 다룰 때 유용합니다.
 
@@ -116,22 +141,23 @@ sections:
     logIterator = glob.iglob(logPattern)
     logIterator
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 이터레이터 버전 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       logPattern = '*.log'
       logIterator = glob.iglob(logPattern)
       logIterator
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 이터레이터 버전 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 이터레이터 버전 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 이터레이터 버전에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: advanced_patterns
   title: 고급 패턴
   structuredPrimary: true
   subtitle: 문자 범위와 복합 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 고급 패턴에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     문자 범위([a-z], [0-9])와 복합 패턴을 사용하여 더 정교한 파일 검색이 가능합니다. 특정 명명 규칙을 따르는 파일을 찾거나 정규식처럼 패턴을 조합할 수 있습니다.
 
@@ -143,22 +169,23 @@ sections:
     lowerFiles = glob.glob(lowerPattern)
     lowerFiles
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 고급 패턴 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lowerPattern = '[a-z]*.txt'
       lowerFiles = glob.glob(lowerPattern)
       lowerFiles
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 고급 패턴 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 고급 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 고급 패턴에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practical_use
   title: 실전 활용
   structuredPrimary: true
   subtitle: 실무 파일 검색 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     glob를 실전에서 활용하는 방법을 살펴봅니다. 여러 확장자 동시 검색, 파일 개수 확인, 최신 파일 찾기 등 실무에서 자주 사용하는 패턴을 학습합니다.
 
@@ -170,22 +197,23 @@ sections:
     multiFiles = [f for ext in extensions for f in glob.glob(ext)]
     multiFiles
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 활용 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       extensions = ['*.py', '*.yaml']
       multiFiles = [f for ext in extensions for f in glob.glob(ext)]
       multiFiles
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 활용 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 활용에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 파일 패턴 수집 리포트'
   structuredPrimary: true
   subtitle: 임시 작업공간, 재귀 검색, 패턴 누락 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '검증 루프: 파일 패턴 수집 리포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     glob 검색은 현재 디렉터리 상태에 영향을 받기 쉽습니다. 실습용 임시 작업공간을 만들고 기대 파일을 고정하면, 패턴이 정확히 무엇을 포함하고 제외하는지 검증할 수 있습니다.
 
@@ -221,7 +249,7 @@ sections:
 
     {"csv": csvFiles, "logs": logFiles}
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 파일 패턴 수집 리포트 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       globRoot = tempfile.mkdtemp(prefix='codaro_glob_workflow_')
       dataDir = os.path.join(globRoot, 'data')
@@ -250,25 +278,27 @@ sections:
 
       {"csv": csvFiles, "logs": logFiles}
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 파일 패턴 수집 리포트 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 파일 패턴 수집 리포트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 파일 패턴 수집 리포트에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.'
 - id: practice
   title: glob 모듈 종합 복습
   structuredPrimary: true
   subtitle: 파일 패턴 매칭 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: glob 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: glob 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: '''*.html'''
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: glob 모듈 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: '''*.html'''
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - glob 모듈 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: glob 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: glob 모듈 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

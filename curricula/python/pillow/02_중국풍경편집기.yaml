@@ -28,14 +28,37 @@ intro:
   emoji: 🏯
   goal: sklearn의 china 이미지를 자르고 회전하여 편집합니다.
   description: crop()으로 원하는 영역을 추출하고, rotate()로 각도 회전, transpose()로 뒤집기를 수행합니다. 이미지 편집의 기본 작업들을 익힙니다.
+  direction: 중국풍경편집기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 중국풍경편집기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 이미지 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 이미지 자르기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 이미지 회전 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 중국풍경편집기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 중국풍경편집기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 중국풍경편집기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: china.jpg 로드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: sklearn의 china.jpg 이미지를 불러옵니다. 이전 프로젝트에서 배운 대로 NumPy 배열을 Pillow Image로 변환합니다. 중국 풍경 이미지로 자르기, 회전, 뒤집기 같은 편집 작업을 연습해봅니다.
+  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: sklearn의 china.jpg 이미지를 불러옵니다. 이전 프로젝트에서 배운 대로 NumPy 배열을 Pillow Image로 변환합니다. 중국 풍경 이미지로
+    자르기, 회전, 뒤집기 같은 편집 작업을 연습해봅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -46,7 +69,7 @@ sections:
     photo = Image.fromarray(chinaArr)
     photo.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -55,22 +78,24 @@ sections:
       photo = Image.fromarray(chinaArr)
       photo.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 이미지 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 이미지 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_crop
   title: 2단계. 이미지 자르기
   structuredPrimary: true
   subtitle: crop()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 이미지 자르기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     crop() 메서드는 이미지의 특정 영역을 잘라냅니다. (left, upper, right, lower) 튜플로 사각형 영역을 지정합니다. 좌표는 왼쪽 상단이 (0, 0)이고, right와 lower는 포함되지 않는 경계입니다.
 
     crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left, lower-upper)입니다.
   tips:
-  - crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의 크기는 (right-left, lower-upper)입니다.
+  - crop()은 (left, upper, right, lower) 순서입니다. left부터 right-1까지, upper부터 lower-1까지의 픽셀이 포함됩니다. 잘라낸 이미지의
+    크기는 (right-left, lower-upper)입니다.
   snippet: |-
     width, height = photo.size
     left = width // 4
@@ -79,7 +104,7 @@ sections:
     lower = height * 3 // 4
     left, upper, right, lower
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 이미지 자르기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       width, height = photo.size
       left = width // 4
@@ -88,16 +113,17 @@ sections:
       lower = height * 3 // 4
       left, upper, right, lower
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 이미지 자르기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 이미지 자르기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 이미지 자르기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_rotate
   title: 3단계. 이미지 회전
   structuredPrimary: true
   subtitle: rotate()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 이미지 회전에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     rotate() 메서드는 이미지를 시계 반대 방향으로 회전합니다. 기본적으로 원본 크기를 유지하므로 모서리가 잘릴 수 있습니다. expand=True를 주면 회전된 이미지 전체가 보이도록 캔버스가 확장됩니다.
 
@@ -108,46 +134,49 @@ sections:
     rotated = cropped.rotate(45)
     rotated.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 이미지 회전 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rotated = cropped.rotate(45)
       rotated.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 이미지 회전 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 이미지 회전 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 이미지 회전에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_transpose
   title: 4단계. 이미지 뒤집기
   structuredPrimary: true
   subtitle: transpose()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 이미지 뒤집기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     transpose() 메서드는 이미지를 뒤집거나 90도 단위로 회전합니다. 미리 정의된 상수를 사용하며, FLIP_LEFT_RIGHT(좌우 반전), FLIP_TOP_BOTTOM(상하 반전), ROTATE_90(90도 회전) 등이 있습니다.
 
     transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이 없습니다.
   tips:
-  - transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와 달리 모서리 잘림이 없습니다.
+  - transpose()는 정확한 변환을 수행합니다. ROTATE_90은 정확히 90도, ROTATE_180은 180도, ROTATE_270은 270도 회전입니다. rotate()와
+    달리 모서리 잘림이 없습니다.
   snippet: |-
     flipped = photo.transpose(Image.FLIP_LEFT_RIGHT)
     flipped
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 이미지 뒤집기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       flipped = photo.transpose(Image.FLIP_LEFT_RIGHT)
       flipped
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 이미지 뒤집기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 이미지 뒤집기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 이미지 뒤집기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_combine
   title: 5단계. 변환 조합
   structuredPrimary: true
   subtitle: 메서드 체이닝
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 변환 조합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: Pillow의 변환 메서드들은 새 이미지를 반환하므로 체이닝이 가능합니다. 자르기 → 회전 → 리사이즈를 한 번에 연결할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -158,7 +187,7 @@ sections:
         .resize((200, 200)))
     final.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 변환 조합 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       final = (photo
           .crop((100, 50, 500, 350))
@@ -166,16 +195,17 @@ sections:
           .resize((200, 200)))
       final.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 변환 조합 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 변환 조합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 변환 조합에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 다양한 편집 적용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     flower 이미지에 자르기와 회전을 적용해봅시다. 위에서 배운 crop(), rotate(), transpose() 메서드를 조합하여 다양한 편집을 수행합니다.
 
@@ -190,7 +220,7 @@ sections:
     flower = Image.fromarray(flowerData)
     flower.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -199,17 +229,19 @@ sections:
       flower = Image.fromarray(flowerData)
       flower.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 6단계. crop과 회전 검증 루프
   structuredPrimary: true
   subtitle: 편집 좌표와 출력 크기 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: crop, rotate, flip은 눈으로 보면 쉬워 보이지만 좌표가 한 칸만 틀려도 결과물이 달라집니다. crop 박스가 원본 안에 있는지 먼저 검증하고, 회전과 뒤집기 결과의 size를 확인합니다.
+  goal: 6단계. crop과 회전 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: crop, rotate, flip은 눈으로 보면 쉬워 보이지만 좌표가 한 칸만 틀려도 결과물이 달라집니다. crop 박스가 원본 안에 있는지 먼저 검증하고,
+    회전과 뒤집기 결과의 size를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -230,7 +262,7 @@ sections:
     cropBox = (40, 20, 160, 100)
     validateCropBox(landscapeImage, cropBox)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. crop과 회전 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
 
@@ -249,7 +281,8 @@ sections:
       cropBox = (40, 20, 160, 100)
       validateCropBox(landscapeImage, cropBox)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. crop과 회전 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. crop과 회전 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. crop과 회전 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

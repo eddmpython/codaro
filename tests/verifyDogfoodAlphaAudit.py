@@ -133,7 +133,7 @@ DOGFOOD_REQUIREMENTS = (
                 "예제 스니펫",
                 "해당 셀 안의 도움 요청 팝오버",
                 "브랜드 아바타",
-                "학습 아키텍처 캔버스",
+                "레슨마다 다른 실무 흐름",
             )),
             ("tests/verifyLearningSectionCardContract.py", (
                 "data-learning-exercise-input-role",

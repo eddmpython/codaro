@@ -27,28 +27,28 @@ meta:
     - Figure
     - Axes
 intro:
-  direction: Matplotlib소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Matplotlib소개에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
   benefits:
-  - Matplotlib소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - Matplotlib소개 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 차트 구성 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 축/범례/파일 출력 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: Matplotlib소개 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Matplotlib소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Matplotlib소개 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -99,7 +99,8 @@ sections:
     title: 🗺️ 파이썬 시각화 생태계
     subtitle: 다양한 도구들의 역할
   - type: text
-    content: 파이썬에는 다양한 시각화 라이브러리가 있습니다. 각각 장단점이 있어서 용도에 맞게 선택하면 됩니다. Matplotlib을 먼저 배우면 다른 라이브러리를 이해하기 쉬워집니다.
+    content: 파이썬에는 다양한 시각화 라이브러리가 있습니다. 각각 장단점이 있어서 용도에 맞게 선택하면 됩니다. Matplotlib을 먼저 배우면 다른 라이브러리를 이해하기
+      쉬워집니다.
   - type: table
     headers:
     - 라이브러리
@@ -127,7 +128,8 @@ sections:
   - type: note
     style: info
     title: Matplotlib이 먼저인 이유
-    content: Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes 개념을 이해하면 다른 라이브러리도 쉽게 배울 수 있습니다.
+    content: Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes
+      개념을 이해하면 다른 라이브러리도 쉽게 배울 수 있습니다.
 - id: figure_axes
   blocks:
   - type: sectionHeader
@@ -155,7 +157,8 @@ sections:
   - type: note
     style: info
     title: pyplot vs 객체 지향
-    content: plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게 제어할 때 사용합니다. 이 과정에서는 두 방식 모두 배웁니다.
+    content: plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게
+      제어할 때 사용합니다. 이 과정에서는 두 방식 모두 배웁니다.
 - id: chart_types
   blocks:
   - type: sectionHeader
@@ -366,9 +369,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -394,7 +398,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -425,7 +429,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

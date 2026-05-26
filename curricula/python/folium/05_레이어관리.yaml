@@ -25,32 +25,56 @@ meta:
 intro:
   emoji: 📚
   goal: 여러 레이어를 그룹으로 관리하고 토글합니다.
-  description: 지도에 많은 요소가 있으면 관리가 어렵습니다. FeatureGroup으로 요소를 그룹화하고 LayerControl로 켜고 끌 수 있게 합니다. 카테고리별로 마커를 분류하고 사용자가 원하는 것만 표시합니다.
+  description: 지도에 많은 요소가 있으면 관리가 어렵습니다. FeatureGroup으로 요소를 그룹화하고 LayerControl로 켜고 끌 수 있게 합니다. 카테고리별로
+    마커를 분류하고 사용자가 원하는 것만 표시합니다.
+  direction: 레이어 관리에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 레이어 관리 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. FeatureGrou 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 여러 그룹 만들기 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 레이어 관리 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 레이어 관리 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 레이어 관리 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: import folium
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_feature_group
   title: 2단계. FeatureGroup 생성
   structuredPrimary: true
   subtitle: FeatureGroup()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. FeatureGroup 생성에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     FeatureGroup()은 여러 요소를 하나의 그룹으로 묶습니다. 그룹 단위로 표시/숨김을 제어할 수 있습니다.
 
@@ -79,7 +103,7 @@ sections:
 
     m1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. FeatureGroup 생성 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=13)
@@ -102,16 +126,17 @@ sections:
 
       m1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. FeatureGroup 생성 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. FeatureGroup 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. FeatureGroup 생성에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step3_multiple_groups
   title: 3단계. 여러 그룹 만들기
   structuredPrimary: true
   subtitle: 카테고리별 분류
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 여러 그룹 만들기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     여러 FeatureGroup을 만들어 카테고리별로 마커를 분류합니다.
 
@@ -155,7 +180,7 @@ sections:
 
     m2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 여러 그룹 만들기 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -193,16 +218,17 @@ sections:
 
       m2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 여러 그룹 만들기 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 여러 그룹 만들기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 여러 그룹 만들기에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step4_layer_control
   title: 4단계. LayerControl 추가
   structuredPrimary: true
   subtitle: LayerControl()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. LayerControl 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     LayerControl()을 추가하면 우측 상단에 레이어 토글 버튼이 생깁니다.
 
@@ -236,7 +262,7 @@ sections:
 
     m3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. LayerControl 추가 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -264,16 +290,17 @@ sections:
 
       m3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. LayerControl 추가 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. LayerControl 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. LayerControl 추가에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step5_overlay_vs_base
   title: 5단계. 오버레이 vs 베이스 레이어
   structuredPrimary: true
   subtitle: 레이어 종류
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 오버레이 vs 베이스 레이어에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     베이스 레이어는 라디오 버튼(하나만 선택), 오버레이는 체크박스(다중 선택)입니다. FeatureGroup은 기본적으로 오버레이입니다.
 
@@ -298,7 +325,7 @@ sections:
 
     m4
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 오버레이 vs 베이스 레이어 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=13, tiles=None)
 
@@ -317,16 +344,17 @@ sections:
 
       m4
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 오버레이 vs 베이스 레이어 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 오버레이 vs 베이스 레이어 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 오버레이 vs 베이스 레이어에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_show_option
   title: 6단계. 기본 표시 설정
   structuredPrimary: true
   subtitle: show 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 기본 표시 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     show=False로 설정하면 처음에는 숨겨진 상태로 시작합니다.
 
@@ -358,7 +386,7 @@ sections:
 
     m5
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 기본 표시 설정 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -384,16 +412,17 @@ sections:
 
       m5
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 기본 표시 설정 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 기본 표시 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 기본 표시 설정에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_shapes_grouping
   title: 7단계. 도형 그룹화
   structuredPrimary: true
   subtitle: 도형별 레이어
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 도형 그룹화에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     마커뿐 아니라 원, 폴리곤 등 모든 요소를 그룹에 넣을 수 있습니다.
 
@@ -434,7 +463,7 @@ sections:
 
     m6
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 도형 그룹화 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m6 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -469,16 +498,17 @@ sections:
 
       m6
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 도형 그룹화 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 도형 그룹화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 도형 그룹화에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step8_collapsed
   title: 8단계. 컨트롤 옵션
   structuredPrimary: true
   subtitle: collapsed
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 컨트롤 옵션에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     LayerControl의 collapsed 옵션으로 기본 펼침/접힘 상태를 설정합니다.
 
@@ -501,7 +531,7 @@ sections:
 
     m7
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 컨트롤 옵션 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -518,16 +548,17 @@ sections:
 
       m7
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 컨트롤 옵션 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 컨트롤 옵션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 컨트롤 옵션에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_complex_example
   title: 9단계. 복잡한 레이어 구조
   structuredPrimary: true
   subtitle: 다중 카테고리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 복잡한 레이어 구조에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     여러 카테고리와 타일을 조합한 복잡한 레이어 구조를 만듭니다.
 
@@ -588,7 +619,7 @@ sections:
 
     m8
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 복잡한 레이어 구조 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
@@ -643,16 +674,17 @@ sections:
 
       m8
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 복잡한 레이어 구조 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 복잡한 레이어 구조 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 복잡한 레이어 구조에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 관광지 필터 지도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 카테고리별 필터 기능이 있는 서울 관광 지도를 완성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -717,7 +749,7 @@ sections:
 
     filterMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       filterMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
@@ -779,16 +811,17 @@ sections:
 
       filterMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step11_workflow
   title: 11단계. 운영 레이어 검증
   structuredPrimary: true
   subtitle: 카테고리 누락과 표시 상태 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 운영 레이어 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     레이어 지도는 정보가 많아질수록 누락과 과표시가 생기기 쉽습니다. 업무용 운영 지도에서는 시설, 리스크, 고객 접점을 분리하고, 어떤 레이어가 기본으로 보일지 예측한 뒤 HTML 렌더 결과로 검증합니다.
 
@@ -812,7 +845,7 @@ sections:
 
     sorted(layerConfig)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 운영 레이어 검증 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       operationSites = [
           {"name": "강남 고객센터", "category": "support", "loc": [37.4979, 127.0276]},
@@ -830,16 +863,17 @@ sections:
 
       sorted(layerConfig)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 운영 레이어 검증 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 운영 레이어 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 운영 레이어 검증에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 레이어 관리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -856,7 +890,7 @@ sections:
     data = {"toilets": toilets, "parking": parking}
     data
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       toilets = [
@@ -870,7 +904,8 @@ sections:
       data = {"toilets": toilets, "parking": parking}
       data
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

@@ -125,12 +125,10 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-exercise-input",
                 "data-learning-exercise-input-role",
                 "data-learning-section-contract-gaps",
-                "data-learning-flow-canvas",
-                "data-learning-flow-blueprint",
-                "data-learning-flow-runtime-node",
-                "data-learning-flow-track",
-                "diagramRuntimeNodes",
-                "diagram.runtime",
+                "data-learning-workflow-diagram",
+                "data-learning-workflow-step",
+                "WorkflowArchitectureDiagram",
+                "workflowArchitectureSteps",
             )),
             ("editor/src/components/app/appPrimitives.tsx", (
                 "data-code-payload=\"snippet\"",
@@ -349,8 +347,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "write-curriculum-yaml.exerciseCellCount",
                 "write-curriculum-yaml.contractGapCount",
                 "provider received curriculum tool result with contract gaps",
-                "uv 사전 확인",
-                "검증 결과",
+                "pandas 환경",
+                "DataFrame 완료",
             )),
             ("docs/skills/architecture/teacher-tool-loop.md", (
                 "role: tool",
@@ -402,12 +400,9 @@ OBJECTIVE_REQUIREMENTS = (
                 "mobileOverview",
                 "jsAssertLearningVisualIntegrity",
                 "visualIntegrity",
-                "data-learning-flow-canvas",
-                "data-learning-flow-blueprint",
-                "data-learning-flow-runtime-node",
-                "data-learning-flow-track",
-                "uv 사전 확인",
-                "검증 결과",
+                "data-learning-workflow-step",
+                "DataFrame 입력 확인",
+                "sales 결과 검증",
                 "jsAssertContractGapWarning",
                 "부분 구조화 섹션",
                 "data-learning-section-contract-gaps",
@@ -706,7 +701,7 @@ def evaluateTrackedDeletionBackup() -> dict[str, Any]:
     else:
         unexpectedDeleted = tuple(path for path in deletedPaths if not isExpectedTrackedRemoval(path))
         if unexpectedDeleted:
-            missing.append(f"git: unexpected tracked deletions remain ({', '.join(unexpectedDeleted[:5])})")
+            missing.append(f"git: unexpected tracked deletions remain ({', '.join(str(path) for path in unexpectedDeleted[:5])})")
         else:
             evidence.append(f"git tracked deletions are limited to expected migration paths: {len(deletedPaths)}")
         for deletedPath in deletedPaths:

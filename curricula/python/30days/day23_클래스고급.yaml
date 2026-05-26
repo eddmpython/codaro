@@ -26,13 +26,35 @@ intro:
   - super()로 부모 메서드 호출
   - 메서드 오버라이딩으로 재정의
   - 다중 상속으로 여러 부모 활용
+  direction: 클래스 고급에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 클래스 고급 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 상속 기초 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 상속과 init 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: super() 함수 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 클래스 고급 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 클래스 고급 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 클래스 고급 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: inheritance_basic
   title: 상속 기초
   structuredPrimary: true
   subtitle: 부모 클래스로부터 확장
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상속 기초에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     상속은 기존 클래스를 확장하여 새로운 클래스를 만드는 기능입니다. class 자식클래스(부모클래스): 형식으로 정의하며, 자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받습니다. 코드 재사용성이 높아지고 계층 구조를 표현할 수 있습니다.
 
@@ -53,7 +75,7 @@ sections:
     myDog = Dog('Buddy')
     myDog.name
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상속 기초 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Animal:
           def __init__(self, name):
@@ -68,16 +90,17 @@ sections:
       myDog = Dog('Buddy')
       myDog.name
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상속 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상속 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상속 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: inheritance_init
   title: 상속과 __init__
   structuredPrimary: true
   subtitle: 자식 클래스의 초기화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상속과 init에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     자식 클래스에서 __init__을 정의하지 않으면 부모의 __init__을 자동으로 사용합니다. 자식이 __init__을 정의하면 부모의 __init__은 자동으로 호출되지 않으므로 명시적으로 호출해야 합니다.
 
@@ -95,7 +118,7 @@ sections:
     sq = Square('red')
     sq.color
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상속과 init 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Shape:
           def __init__(self, color):
@@ -107,16 +130,17 @@ sections:
       sq = Square('red')
       sq.color
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상속과 init 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상속과 init 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상속과 init에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: super_function
   title: super() 함수
   structuredPrimary: true
   subtitle: 부모 클래스 참조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: super() 함수에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     super()는 부모 클래스를 참조하는 함수입니다. super().__init__() 형태로 부모의 __init__을 호출할 수 있으며, 부모 클래스명을 직접 쓰는 것보다 유연하고 권장됩니다. 다중 상속 시 특히 유용합니다.
 
@@ -136,7 +160,7 @@ sections:
     mgr = Manager('Bob', 'IT')
     mgr.name, mgr.department
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: super() 함수 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Employee:
           def __init__(self, name):
@@ -150,16 +174,17 @@ sections:
       mgr = Manager('Bob', 'IT')
       mgr.name, mgr.department
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - super() 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: super() 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: super() 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: method_override
   title: 메서드 오버라이딩
   structuredPrimary: true
   subtitle: 부모 메서드 재정의
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 메서드 오버라이딩에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     메서드 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 재정의하는 것입니다. 같은 이름의 메서드를 자식 클래스에 정의하면 부모의 메서드를 덮어씁니다. 필요하면 super()로 부모 메서드를 호출한 후 추가 기능을 구현할 수 있습니다.
 
@@ -178,7 +203,7 @@ sections:
     myBird = Parrot()
     myBird.sound()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 메서드 오버라이딩 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Bird:
           def sound(self):
@@ -191,16 +216,17 @@ sections:
       myBird = Parrot()
       myBird.sound()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 메서드 오버라이딩 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 메서드 오버라이딩 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 메서드 오버라이딩에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: multiple_inheritance
   title: 다중 상속
   structuredPrimary: true
   subtitle: 여러 부모 클래스 상속
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 다중 상속에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     다중 상속은 여러 부모 클래스를 동시에 상속받는 것입니다. class 자식(부모1, 부모2): 형식으로 정의하며, 모든 부모의 속성과 메서드를 상속받습니다. 메서드 이름이 겹치면 MRO 순서에 따라 왼쪽 부모가 우선입니다.
 
@@ -222,7 +248,7 @@ sections:
     myDuck = Duck()
     myDuck.fly(), myDuck.swim()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 다중 상속 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Flyer:
           def fly(self):
@@ -238,16 +264,17 @@ sections:
       myDuck = Duck()
       myDuck.fly(), myDuck.swim()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 다중 상속 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 다중 상속 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 다중 상속에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: inheritance_example
   title: 상속 실전 예제
   structuredPrimary: true
   subtitle: 계층 구조 설계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상속 실전 예제에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     상속을 활용하여 실제 문제를 해결하는 예제를 살펴봅니다. 기본 클래스를 정의하고 여러 자식 클래스로 확장하여 코드 재사용성을 높입니다.
 
@@ -266,7 +293,7 @@ sections:
     tri = Triangle()
     tri.sides
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상속 실전 예제 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Polygon:
           def __init__(self, sides):
@@ -279,16 +306,17 @@ sections:
       tri = Triangle()
       tri.sides
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상속 실전 예제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상속 실전 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상속 실전 예제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -352,7 +380,7 @@ sections:
 
     print("알림 다형성 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       class Notification:
           def __init__(self, recipient):
@@ -413,16 +441,17 @@ sections:
 
       print("알림 다형성 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 23 종합 복습
   structuredPrimary: true
   subtitle: 클래스 고급 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Day 23 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: Day 23에서 배운 클래스 고급 개념을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -437,7 +466,7 @@ sections:
     apple = Fruit('Apple')
     apple.name
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 23 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Food:
           def __init__(self, name):
@@ -449,7 +478,8 @@ sections:
       apple = Fruit('Apple')
       apple.name
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 23 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 23 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 23 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

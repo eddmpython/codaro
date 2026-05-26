@@ -27,13 +27,35 @@ intro:
   - 파일 읽고 쓰기
   - with문으로 안전하게
   - 파일 모드 이해
+  direction: 파일입출력에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 파일입출력 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 파일 열기 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 파일 읽기 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 파일 쓰기 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 파일입출력 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 파일입출력 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 파일입출력 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: open_file
   title: 파일 열기
   structuredPrimary: true
   subtitle: open() 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 파일 열기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     open() 함수로 파일을 엽니다. open(파일경로, 모드) 형식으로 쓰며, 파일 객체를 반환합니다. 사용 후에는 close()로 닫아야 합니다. 기본 모드는 읽기('r')입니다.
 
@@ -46,23 +68,24 @@ sections:
     f.close()
     'File created'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 파일 열기 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       f = open('test.txt', 'w')
       f.write('Hello World')
       f.close()
       'File created'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 파일 열기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 파일 열기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 파일 열기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: read_file
   title: 파일 읽기
   structuredPrimary: true
   subtitle: read() 메서드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 파일 읽기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     read() 메서드로 파일 내용을 읽습니다. 전체 내용을 문자열로 반환합니다. readline()은 한 줄씩, readlines()는 모든 줄을 리스트로 반환합니다.
 
@@ -79,7 +102,7 @@ sections:
     reader.close()
     text
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 파일 읽기 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       writer = open('data.txt', 'w')
       writer.write('Line 1\nLine 2\nLine 3')
@@ -90,16 +113,17 @@ sections:
       reader.close()
       text
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 파일 읽기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 파일 읽기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 파일 읽기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: write_file
   title: 파일 쓰기
   structuredPrimary: true
   subtitle: write() 메서드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 파일 쓰기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     write() 메서드로 파일에 문자열을 씁니다. 'w' 모드는 기존 내용을 지우고, 'a' 모드는 끝에 추가합니다. write()는 쓴 문자 수를 반환합니다.
 
@@ -112,23 +136,24 @@ sections:
     fileObj.close()
     count
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 파일 쓰기 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       fileObj = open('message.txt', 'w')
       count = fileObj.write('Hello Python')
       fileObj.close()
       count
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 파일 쓰기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 파일 쓰기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 파일 쓰기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: with_statement
   title: with 문
   structuredPrimary: true
   subtitle: 자동으로 닫기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: with 문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     with 문을 사용하면 파일을 자동으로 닫아줍니다. with open(경로, 모드) as 변수: 형식으로 쓰며, 블록이 끝나면 자동으로 close()가 호출됩니다. 안전하고 권장되는 방법입니다.
 
@@ -144,7 +169,7 @@ sections:
 
     data
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: with 문 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       with open('test.txt', 'w') as outFile:
           outFile.write('With statement')
@@ -154,16 +179,17 @@ sections:
 
       data
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - with 문 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: with 문 코드가 예외 없이 끝나야 합니다.
+    resultCheck: with 문에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: file_modes
   title: 파일 모드
   structuredPrimary: true
   subtitle: 읽기/쓰기/추가
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 파일 모드에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     파일 모드는 파일을 어떻게 열지 결정합니다. 'r'(읽기), 'w'(쓰기), 'a'(추가), 'r+'(읽기/쓰기) 등이 있습니다. 텍스트 모드가 기본이며, 'b'를 붙이면 바이너리 모드입니다.
 
@@ -179,7 +205,7 @@ sections:
 
     readData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 파일 모드 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       with open('test.txt', 'w') as wf:
           wf.write('Read mode test')
@@ -189,16 +215,17 @@ sections:
 
       readData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 파일 모드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 파일 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 파일 모드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: line_iteration
   title: 줄 단위 순회
   structuredPrimary: true
   subtitle: for문으로 읽기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 줄 단위 순회에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     파일 객체는 for문으로 순회할 수 있습니다. 각 줄을 하나씩 가져오므로 메모리 효율적입니다. 큰 파일을 처리할 때 유용합니다.
 
@@ -216,7 +243,7 @@ sections:
 
     lineCount
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 줄 단위 순회 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       with open('items.txt', 'w') as creator:
           creator.write('Apple\nBanana\nCherry')
@@ -228,17 +255,19 @@ sections:
 
       lineCount
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 줄 단위 순회 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 줄 단위 순회 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 줄 단위 순회에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기'
   structuredPrimary: true
   subtitle: 로컬 파일을 안전하게 쓰고 읽고 검증하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 로컬 Python에서는 파일 입출력 제약이 줄어드는 대신, 현재 작업 폴더를 지저분하게 만들 위험이 생깁니다. 실습과 자동화 코드는 임시 작업 폴더나 명시한 출력 폴더를 쓰고, 파일 내용까지 검증해야 합니다.
+  goal: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 로컬 Python에서는 파일 입출력 제약이 줄어드는 대신, 현재 작업 폴더를 지저분하게 만들 위험이 생깁니다. 실습과 자동화 코드는 임시 작업 폴더나 명시한
+    출력 폴더를 쓰고, 파일 내용까지 검증해야 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -257,7 +286,7 @@ sections:
         assert lines[0] == 'orderId,total'
         assert len(lines) == 3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 예제에서 리스트 값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -276,17 +305,19 @@ sections:
           assert resultPath.read_text(encoding='utf-8') == 'HELLO\nPYTHON'
           resultPath.name
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 19 종합 복습
   structuredPrimary: true
   subtitle: 파일 입출력 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 19에서 배운 파일 입출력을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  goal: Day 19 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 19에서 배운 파일 입출력을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -295,14 +326,15 @@ sections:
 
     'File created'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 19 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       with open('hello.txt', 'w') as dest:
           dest.write('Hello World')
 
       'File created'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 19 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 19 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 19 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

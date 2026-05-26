@@ -18,17 +18,34 @@ meta:
   - indent
   - shorten
 intro:
-- type: content
-  title: textwrap 모듈이란?
-  content: |-
-    textwrap 모듈은 텍스트를 특정 너비로 래핑하거나 들여쓰기를 조정하는 기능을 제공합니다.
-    터미널 출력, 문서 생성, 코드 포맷팅 등에서 유용하게 사용됩니다.
+  direction: textwrap 텍스트 래핑과 포맷팅에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - textwrap 텍스트 래핑과 포맷팅 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: textwrap 모듈 임포트 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 텍스트 래핑 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 들여쓰기 제거 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: textwrap 텍스트 래핑과 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: textwrap 텍스트 래핑과 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: textwrap 텍스트 래핑과 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - title: ⚠️ textwrap 모듈 임포트
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: ⚠️ textwrap 모듈 임포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     표준 라이브러리 임포트
     textwrap는 Python 표준 라이브러리이므로 별도 설치 없이 사용할 수 있습니다.
@@ -36,19 +53,20 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import textwrap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: ⚠️ textwrap 모듈 임포트 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: import textwrap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - ⚠️ textwrap 모듈 임포트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: ⚠️ textwrap 모듈 임포트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: ⚠️ textwrap 모듈 임포트에서 바꾼 입력값이 결과에 반영되어야 합니다.
   name: module_import
 - title: 기본 텍스트 래핑
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 기본 텍스트 래핑에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     wrap()과 fill() 함수
     wrap()는 텍스트를 리스트로 반환하고, fill()은 하나의 문자열로 반환합니다.
@@ -62,22 +80,23 @@ sections:
     wrappedLines = textwrap.wrap(longText, width=40)
     wrappedLines
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 기본 텍스트 래핑 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       longText = "Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the use of significant indentation."
       wrappedLines = textwrap.wrap(longText, width=40)
       wrappedLines
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 기본 텍스트 래핑 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 기본 텍스트 래핑 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 기본 텍스트 래핑에서 바꾼 입력값이 결과에 반영되어야 합니다.
   name: basic_wrapping
 - title: 들여쓰기 제거
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 들여쓰기 제거에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     dedent() 함수
     dedent()는 모든 줄에서 공통 선행 공백을 제거합니다. 주로 함수 내 docstring이나 여러 줄 문자열에서 사용됩니다.
@@ -95,7 +114,7 @@ sections:
     dedentedText = textwrap.dedent(indentedText)
     dedentedText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 들여쓰기 제거 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       indentedText = """
           Hello World
@@ -105,16 +124,17 @@ sections:
       dedentedText = textwrap.dedent(indentedText)
       dedentedText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 들여쓰기 제거 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 들여쓰기 제거 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 들여쓰기 제거에서 바꾼 입력값이 결과에 반영되어야 합니다.
   name: text_dedenting
 - title: 들여쓰기 추가
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 들여쓰기 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     indent() 함수
     indent()는 각 줄의 시작 부분에 지정된 문자열을 추가합니다.
@@ -128,22 +148,23 @@ sections:
     indentedText = textwrap.indent(text, "    ")
     indentedText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 들여쓰기 추가 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       text = "Line 1\nLine 2\nLine 3"
       indentedText = textwrap.indent(text, "    ")
       indentedText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 들여쓰기 추가 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 들여쓰기 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 들여쓰기 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
   name: text_indenting
 - title: 텍스트 축약
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 텍스트 축약에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     shorten() 함수
     shorten()은 텍스트를 지정된 너비로 축약하고 말줄임표를 추가합니다.
@@ -157,22 +178,23 @@ sections:
     shortText = textwrap.shorten(longText, width=30)
     shortText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 텍스트 축약 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       longText = "This is a very long text that needs to be shortened for display purposes."
       shortText = textwrap.shorten(longText, width=30)
       shortText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 텍스트 축약 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 텍스트 축약 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 텍스트 축약에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
   name: text_shortening
 - title: TextWrapper 클래스
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: TextWrapper 클래스에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     고급 래핑 제어
     TextWrapper 클래스를 사용하면 래핑 동작을 세밀하게 제어할 수 있습니다.
@@ -187,23 +209,24 @@ sections:
     wrappedText = wrapper.fill(text)
     wrappedText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: TextWrapper 클래스 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       wrapper = textwrap.TextWrapper(width=40)
       text = "Python is a high-level programming language. It emphasizes code readability."
       wrappedText = wrapper.fill(text)
       wrappedText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - TextWrapper 클래스 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: TextWrapper 클래스 코드가 예외 없이 끝나야 합니다.
+    resultCheck: TextWrapper 클래스에서 바꾼 입력값이 결과에 반영되어야 합니다.
   name: textwrapper_class
 - title: 실전 활용 예제
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 활용 예제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실무 시나리오
     textwrap를 활용한 실전 텍스트 포맷팅 예제를 다룹니다.
@@ -231,7 +254,7 @@ sections:
 
     helpText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 활용 예제 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def formatHelpMessage(command, description, width=70):
           wrapper = textwrap.TextWrapper(
@@ -254,16 +277,17 @@ sections:
 
       helpText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 활용 예제 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 활용 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 활용 예제에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
   name: practical
 - title: '검증 루프: CLI 출력 품질 게이트'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '검증 루프: CLI 출력 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     출력 품질을 테스트하는 흐름
     textwrap는 보기 좋은 출력만 만드는 도구가 아닙니다. 터미널 폭을 넘지 않는지, 들여쓰기가 깨지지 않는지, 너무 긴 설명을 안전하게 줄이는지 검증하면 실제 CLI/리포트 출력 품질을 안정화할 수 있습니다.
@@ -291,7 +315,7 @@ sections:
     assert all(len(line) <= 56 for line in helpOutput.splitlines())
     helpOutput
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: CLI 출력 품질 게이트 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       def renderCliHelp(commands, width=56):
           assert width >= 36, "도움말 폭은 최소 36 이상이어야 합니다"
@@ -314,16 +338,17 @@ sections:
       assert all(len(line) <= 56 for line in helpOutput.splitlines())
       helpOutput
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: CLI 출력 품질 게이트 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: CLI 출력 품질 게이트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: CLI 출력 품질 게이트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
   name: workflow_validation
 - title: 연습 문제
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 연습 문제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 연습 문제의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -332,14 +357,15 @@ sections:
     result = textwrap.fill(text, width=30)
     result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 연습 문제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       text = "Python textwrap module provides convenient functions for formatting text."
       result = textwrap.fill(text, width=30)
       result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 연습 문제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 연습 문제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 연습 문제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
   name: practice

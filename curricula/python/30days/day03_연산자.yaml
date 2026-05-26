@@ -26,13 +26,35 @@ intro:
   - 비교 연산자로 값 비교하기
   - 논리 연산자로 조건 조합하기
   - 멤버십 연산자로 포함 여부 확인하기
+  direction: 연산자에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 연산자 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 덧셈 연산자 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 뺄셈 연산자 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 곱셈 연산자 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 연산자 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 연산자 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 연산자 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: add_operator
   title: 덧셈 연산자
   structuredPrimary: true
   subtitle: + 기호로 더하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 덧셈 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
 
@@ -44,22 +66,23 @@ sections:
     itemB = 20
     itemA + itemB
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 덧셈 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       itemA = 10
       itemB = 20
       itemA + itemB
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 덧셈 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 덧셈 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 덧셈 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: sub_operator
   title: 뺄셈 연산자
   structuredPrimary: true
   subtitle: '- 기호로 빼기'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 뺄셈 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -68,22 +91,23 @@ sections:
     spent = 35
     budget - spent
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 뺄셈 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       budget = 100
       spent = 35
       budget - spent
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 뺄셈 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 뺄셈 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 뺄셈 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: mul_operator
   title: 곱셈 연산자
   structuredPrimary: true
   subtitle: '* 기호로 곱하기'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 곱셈 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -92,22 +116,23 @@ sections:
     height = 8
     width * height
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 곱셈 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       width = 7
       height = 8
       width * height
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 곱셈 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 곱셈 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 곱셈 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: div_operator
   title: 나눗셈 연산자
   structuredPrimary: true
   subtitle: / 기호로 나누기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 나눗셈 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
 
@@ -119,22 +144,23 @@ sections:
     divisor = 3
     dividend / divisor
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 나눗셈 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dividend = 10
       divisor = 3
       dividend / divisor
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 나눗셈 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 나눗셈 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 나눗셈 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: floordiv_operator
   title: 몫 연산자
   structuredPrimary: true
   subtitle: // 기호로 몫 구하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 몫 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -143,22 +169,23 @@ sections:
     boxes = 5
     items // boxes
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 몫 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       items = 17
       boxes = 5
       items // boxes
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 몫 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 몫 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 몫 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: mod_operator
   title: 나머지 연산자
   structuredPrimary: true
   subtitle: '% 기호로 나머지 구하기'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 나머지 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
 
@@ -170,22 +197,23 @@ sections:
     slots = 5
     coins % slots
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 나머지 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       coins = 17
       slots = 5
       coins % slots
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 나머지 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 나머지 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 나머지 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: pow_operator
   title: 거듭제곱 연산자
   structuredPrimary: true
   subtitle: '** 기호로 제곱 계산'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 거듭제곱 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -194,22 +222,23 @@ sections:
     power = 10
     base ** power
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 거듭제곱 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       base = 2
       power = 10
       base ** power
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 거듭제곱 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 거듭제곱 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 거듭제곱 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: compare_equal
   title: 같음 비교 연산자
   structuredPrimary: true
   subtitle: == 기호로 같은지 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 같음 비교 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!
 
@@ -221,22 +250,23 @@ sections:
     right = 10
     left == right
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 같음 비교 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       left = 10
       right = 10
       left == right
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 같음 비교 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 같음 비교 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 같음 비교 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: compare_notequal
   title: 다름 비교 연산자
   structuredPrimary: true
   subtitle: '!= 기호로 다른지 확인'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 다름 비교 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -245,22 +275,23 @@ sections:
     second = 8
     first != second
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 다름 비교 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       first = 5
       second = 8
       first != second
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 다름 비교 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 다름 비교 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 다름 비교 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: compare_greater
   title: 크기 비교 연산자
   structuredPrimary: true
   subtitle: '> < >= <= 기호로 크기 비교'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 크기 비교 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -269,22 +300,23 @@ sections:
     target = 10
     val > target
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 크기 비교 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       val = 15
       target = 10
       val > target
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 크기 비교 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 크기 비교 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 크기 비교 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: logical_and
   title: and 논리 연산자
   structuredPrimary: true
   subtitle: 모두 참이어야 참
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: and 논리 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -293,22 +325,23 @@ sections:
     valid = True
     adult and valid
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: and 논리 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       adult = True
       valid = True
       adult and valid
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - and 논리 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: and 논리 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: and 논리 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: logical_or
   title: or 논리 연산자
   structuredPrimary: true
   subtitle: 하나만 참이어도 참
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: or 논리 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -317,22 +350,23 @@ sections:
     card = False
     cash or card
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: or 논리 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cash = True
       card = False
       cash or card
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - or 논리 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: or 논리 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: or 논리 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: logical_not
   title: not 논리 연산자
   structuredPrimary: true
   subtitle: 참과 거짓 반전
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: not 논리 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -340,21 +374,22 @@ sections:
     rain = True
     not rain
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: not 논리 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rain = True
       not rain
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - not 논리 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: not 논리 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: not 논리 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: membership_in
   title: in 멤버십 연산자
   structuredPrimary: true
   subtitle: 포함 여부 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: in 멤버십 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
 
@@ -365,21 +400,22 @@ sections:
     lang = 'Python'
     'th' in lang
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: in 멤버십 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lang = 'Python'
       'th' in lang
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - in 멤버십 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: in 멤버십 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: in 멤버십 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: compound_assign
   title: 복합 대입 연산자
   structuredPrimary: true
   subtitle: 연산과 대입을 한번에
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 복합 대입 연산자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -388,22 +424,23 @@ sections:
     balance += 10
     balance
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 복합 대입 연산자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       balance = 50
       balance += 10
       balance
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 복합 대입 연산자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 복합 대입 연산자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 복합 대입 연산자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: operator_priority
   title: 연산자 우선순위
   structuredPrimary: true
   subtitle: 계산 순서 이해하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 연산자 우선순위에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
 
@@ -416,24 +453,26 @@ sections:
     print('without_paren:', raw)
     print('with_paren:', grouped)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 연산자 우선순위 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       raw = 2 + 3 * 4
       grouped = (2 + 3) * 4
       print('without_paren:', raw)
       print('with_paren:', grouped)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 연산자 우선순위 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 연산자 우선순위 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 연산자 우선순위에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 주문 계산식과 승인 조건'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저 예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
+  goal: '검증 루프: 주문 계산식과 승인 조건에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저
+    예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -453,7 +492,7 @@ sections:
     assert total == 46656
     total
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 주문 계산식과 승인 조건 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       unitPrice = 12000
       quantity = 4
@@ -471,17 +510,19 @@ sections:
       assert total == 46656
       total
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 주문 계산식과 승인 조건 코드에서 먼저 입력값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 주문 계산식과 승인 조건 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 주문 계산식과 승인 조건에서 바꾼 입력값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 3 종합 복습
   structuredPrimary: true
   subtitle: 연산자 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  goal: Day 3 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -490,13 +531,14 @@ sections:
     total = math + english
     print('total:', total)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 3 종합 복습 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       apples = 15
       oranges = 25
       apples + oranges
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 3 종합 복습 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 3 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 3 종합 복습에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.

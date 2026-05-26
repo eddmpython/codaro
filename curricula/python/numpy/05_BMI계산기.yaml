@@ -29,13 +29,35 @@ intro:
   emoji: ⚖️
   goal: 10,000명의 키/몸무게 데이터로 BMI를 계산합니다.
   description: 브로드캐스팅을 활용한 벡터 연산으로 반복문 없이 대량의 데이터를 빠르게 처리하는 방법을 배웁니다.
+  direction: BMI계산기에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - BMI계산기 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 구조 확인 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: BMI계산기 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: BMI계산기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: BMI계산기 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -43,22 +65,24 @@ sections:
     import numpy as np
     import pandas as pd
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: 키/몸무게 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 10,000명의 키와 몸무게 데이터를 로드합니다. 데이터가 미국 단위로 되어 있어서 키는 인치(inch, 1인치=2.54cm), 몸무게는 파운드(pound, 1파운드=0.45kg)입니다. 나중에 우리가 익숙한 미터와 킬로그램으로 변환할 예정입니다.
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 10,000명의 키와 몸무게 데이터를 로드합니다. 데이터가 미국 단위로 되어 있어서 키는 인치(inch, 1인치=2.54cm), 몸무게는 파운드(pound,
+    1파운드=0.45kg)입니다. 나중에 우리가 익숙한 미터와 킬로그램으로 변환할 예정입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -67,41 +91,43 @@ sections:
     df = loadLocalDataset("weight_height")
     df.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       df = loadLocalDataset("weight_height")
       df.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_shape
   title: 3단계. 데이터 구조 확인
   structuredPrimary: true
   subtitle: shape
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 데이터 구조 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 데이터의 크기를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: df.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 데이터 구조 확인 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: df.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 데이터 구조 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 데이터 구조 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 데이터 구조 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_extract
   title: 4단계. 배열 추출
   structuredPrimary: true
   subtitle: Height, Weight
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 키(인치)와 몸무게(파운드) 데이터를 NumPy 배열로 추출합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -110,22 +136,23 @@ sections:
     lbs = df['Weight'].values
     inch[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 배열 추출 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       inch = df['Height'].values
       lbs = df['Weight'].values
       inch[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 배열 추출 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 배열 추출 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 배열 추출에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_convert_height
   title: 5단계. 키 단위 변환
   structuredPrimary: true
   subtitle: 인치 → 미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 키 단위 변환에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     브로드캐스팅(Broadcasting)은 NumPy의 핵심 기능입니다. 배열에 하나의 숫자(스칼라)를 곱하면, NumPy가 자동으로 배열의 모든 요소에 그 연산을 적용합니다. inch * 0.0254 한 줄로 10,000개 값 모두가 인치에서 미터로 변환됩니다. for문을 쓸 필요가 없습니다.
 
@@ -136,21 +163,22 @@ sections:
     meter = inch * 0.0254
     meter[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 키 단위 변환 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       meter = inch * 0.0254
       meter[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 키 단위 변환 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 키 단위 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 키 단위 변환에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_convert_weight
   title: 6단계. 몸무게 단위 변환
   structuredPrimary: true
   subtitle: 파운드 → 킬로그램
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 몸무게 단위 변환에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 몸무게를 파운드에서 킬로그램으로 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -158,21 +186,22 @@ sections:
     kg = lbs * 0.453592
     kg[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 몸무게 단위 변환 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       kg = lbs * 0.453592
       kg[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 몸무게 단위 변환 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 몸무게 단위 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 몸무게 단위 변환에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_bmi
   title: 7단계. BMI 계산
   structuredPrimary: true
   subtitle: 벡터 연산
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. BMI 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     BMI(Body Mass Index, 체질량지수)는 비만도를 측정하는 지표입니다. 공식은 체중(kg) ÷ 키(m)²입니다. NumPy에서는 배열끼리의 연산도 요소별로 자동 적용됩니다. kg 배열과 meter 배열의 같은 위치 값들끼리 계산되어 10,000명의 BMI가 한 번에 계산됩니다. 이를 벡터 연산(vectorization)이라 합니다.
 
@@ -183,40 +212,43 @@ sections:
     bmi = kg / (meter ** 2)
     bmi[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. BMI 계산 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       bmi = kg / (meter ** 2)
       bmi[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. BMI 계산 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. BMI 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. BMI 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_stats
   title: 8단계. BMI 통계
   structuredPrimary: true
   subtitle: 기본 통계량
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. BMI 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: BMI의 평균, 최소, 최대, 표준편차를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: 'f"평균: {np.mean(bmi):.2f}, 최소: {np.min(bmi):.2f}, 최대: {np.max(bmi):.2f}, 표준편차: {np.std(bmi):.2f}"'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. BMI 통계 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: 'f"평균: {np.mean(bmi):.2f}, 최소: {np.min(bmi):.2f}, 최대: {np.max(bmi):.2f}, 표준편차: {np.std(bmi):.2f}"'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. BMI 통계 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. BMI 통계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. BMI 통계에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_category
   title: 9단계. BMI 분류
   structuredPrimary: true
   subtitle: 중첩 where
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 세계보건기구(WHO) 기준으로 BMI를 분류합니다. 18.5 미만은 저체중(Underweight), 18.5~25는 정상(Normal), 25~30은 과체중(Overweight), 30 이상은 비만(Obese)입니다. np.where를 중첩하면 4개 이상의 카테고리로 분류할 수 있습니다.
+  goal: 9단계. BMI 분류에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 세계보건기구(WHO) 기준으로 BMI를 분류합니다. 18.5 미만은 저체중(Underweight), 18.5~25는 정상(Normal), 25~30은 과체중(Overweight),
+    30 이상은 비만(Obese)입니다. np.where를 중첩하면 4개 이상의 카테고리로 분류할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -225,23 +257,24 @@ sections:
                np.where(bmi < 30, 'Overweight', 'Obese')))
     category[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. BMI 분류 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       category = np.where(bmi < 18.5, 'Underweight',
                  np.where(bmi < 25, 'Normal',
                  np.where(bmi < 30, 'Overweight', 'Obese')))
       category[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. BMI 분류 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. BMI 분류 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. BMI 분류에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_count
   title: 10단계. 카테고리별 집계
   structuredPrimary: true
   subtitle: np.unique()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 카테고리별 집계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 각 카테고리별 인원수와 비율을 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -249,21 +282,22 @@ sections:
     labels, counts = np.unique(category, return_counts=True)
     pd.DataFrame({'Category': labels, 'Count': counts, 'Ratio': np.round(counts / len(bmi) * 100, 1)})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 카테고리별 집계 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       labels, counts = np.unique(category, return_counts=True)
       pd.DataFrame({'Category': labels, 'Count': counts, 'Ratio': np.round(counts / len(bmi) * 100, 1)})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 카테고리별 집계 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 카테고리별 집계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 카테고리별 집계에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step11_gender
   title: 11단계. 성별 데이터 추출
   structuredPrimary: true
   subtitle: Gender
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 성별 데이터 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 성별 데이터를 추출하여 남녀별 분석을 준비합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -271,22 +305,24 @@ sections:
     sex = df['Gender'].values
     sex[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 성별 데이터 추출 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sex = df['Gender'].values
       sex[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 성별 데이터 추출 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 성별 데이터 추출 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 성별 데이터 추출에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step12_gender_bmi
   title: 12단계. 성별 BMI 비교
   structuredPrimary: true
   subtitle: 불리언 마스크
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 불리언 마스크를 활용해 남녀 데이터를 분리합니다. sex == 'Male'은 남성이면 True, 아니면 False인 배열을 만듭니다. 이 True/False 배열로 bmi[male]처럼 인덱싱하면 남성의 BMI만 추출됩니다. 성별에 따른 BMI 차이를 쉽게 비교할 수 있습니다.
+  goal: 12단계. 성별 BMI 비교에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 불리언 마스크를 활용해 남녀 데이터를 분리합니다. sex == 'Male'은 남성이면 True, 아니면 False인 배열을 만듭니다. 이 True/False
+    배열로 bmi[male]처럼 인덱싱하면 남성의 BMI만 추출됩니다. 성별에 따른 BMI 차이를 쉽게 비교할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -296,7 +332,7 @@ sections:
     f_ = bmi[female]
     f"남성 평균 BMI: {np.mean(m):.2f}, 여성 평균 BMI: {np.mean(f_):.2f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 성별 BMI 비교 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       male = sex == 'Male'
       female = sex == 'Female'
@@ -304,16 +340,17 @@ sections:
       f_ = bmi[female]
       f"남성 평균 BMI: {np.mean(m):.2f}, 여성 평균 BMI: {np.mean(f_):.2f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 성별 BMI 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 성별 BMI 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 성별 BMI 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step13_gender_stats
   title: 13단계. 성별 종합 통계
   structuredPrimary: true
   subtitle: DataFrame 정리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. 성별 종합 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 성별에 따른 키, 몸무게, BMI 차이를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -325,7 +362,7 @@ sections:
         'BMI': [np.mean(m), np.mean(f_)]
     }).round(2)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 성별 종합 통계 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pd.DataFrame({
           'Gender': ['Male', 'Female'],
@@ -334,16 +371,17 @@ sections:
           'BMI': [np.mean(m), np.mean(f_)]
       }).round(2)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 성별 종합 통계 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 성별 종합 통계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 성별 종합 통계에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step14_digitize
   title: 14단계. 키 구간화
   structuredPrimary: true
   subtitle: np.digitize()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 14단계. 키 구간화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     np.digitize()는 연속적인 숫자 데이터를 구간(bin)으로 나눕니다. 예를 들어 bins=[150, 155, 160]이면 150 미만은 0, 150~155는 1, 155~160은 2, 160 이상은 3으로 분류됩니다. 키 데이터를 5cm 단위로 그룹화하면 구간별 분석이 가능해집니다.
 
@@ -356,23 +394,24 @@ sections:
     groups = np.digitize(cm, bins)
     np.unique(groups)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 14단계. 키 구간화 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cm = meter * 100
       bins = np.arange(150, 200, 5)
       groups = np.digitize(cm, bins)
       np.unique(groups)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 14단계. 키 구간화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 14단계. 키 구간화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 14단계. 키 구간화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step15_ideal_weight
   title: 15단계. 이상적 체중 범위
   structuredPrimary: true
   subtitle: BMI 18.5~25
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 15단계. 이상적 체중 범위에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 각 사람의 이상적인 체중 범위를 계산합니다. BMI 18.5~25 기준입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -382,23 +421,24 @@ sections:
     ideal = (kg >= lo) & (kg <= hi)
     f"정상 체중 비율: {np.mean(ideal) * 100:.1f}%"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 15단계. 이상적 체중 범위 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lo = 18.5 * (meter ** 2)
       hi = 25 * (meter ** 2)
       ideal = (kg >= lo) & (kg <= hi)
       f"정상 체중 비율: {np.mean(ideal) * 100:.1f}%"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 15단계. 이상적 체중 범위 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 15단계. 이상적 체중 범위 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 15단계. 이상적 체중 범위에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 건강검진 BMI 벡터화'
   structuredPrimary: true
   subtitle: 브로드캐스팅, where, digitize, 실패 케이스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 건강검진 BMI 벡터화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     BMI 계산은 한 명씩 반복문으로 처리하기보다 배열 단위로 검증하는 연습에 좋습니다. 키와 몸무게 배열 shape을 맞추고, 분류 기준이 기대대로 적용되는지 확인하세요.
 
@@ -420,7 +460,7 @@ sections:
     assert labels.tolist() == ["normal", "review", "review"]
     assert groups.tolist() == [1, 3, 3]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 건강검진 BMI 벡터화 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import numpy as np
 
@@ -435,16 +475,17 @@ sections:
       assert labels.tolist() == ["normal", "review", "review"]
       assert groups.tolist() == [1, 3, 3]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 건강검진 BMI 벡터화 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 건강검진 BMI 벡터화 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 건강검진 BMI 벡터화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: BMI 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -464,7 +505,7 @@ sections:
     height = data['Height'].values * 0.0254
     weight = data['Weight'].values * 0.453592
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
@@ -478,7 +519,8 @@ sections:
       height = data['Height'].values * 0.0254
       weight = data['Weight'].values * 0.453592
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

@@ -29,13 +29,35 @@ intro:
   emoji: ☀️
   goal: ImageEnhance 모듈로 이미지의 밝기, 대비, 채도, 선명도를 조절합니다.
   description: Brightness, Contrast, Color, Sharpness 네 가지 조정기를 사용해봅니다. 각 조정기의 enhance() 메서드로 수치를 조절합니다.
+  direction: 밝기대비조절기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 밝기대비조절기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 이미지 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 밝기 조절 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 대비 조절 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 밝기대비조절기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 밝기대비조절기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 밝기대비조절기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: ImageEnhance 준비
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: sklearn의 china 이미지를 불러옵니다. ImageEnhance 모듈의 각 클래스는 이미지를 받아 조정기 객체를 생성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -47,7 +69,7 @@ sections:
     frame = Image.fromarray(chinaArr)
     frame.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageEnhance
       from sklearn.datasets import load_sample_image
@@ -56,41 +78,44 @@ sections:
       frame = Image.fromarray(chinaArr)
       frame.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 이미지 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 이미지 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_brightness
   title: 2단계. 밝기 조절
   structuredPrimary: true
   subtitle: Brightness
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 밝기 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Brightness 클래스는 이미지의 밝기를 조절합니다. enhance(1.0)은 원본, 0.0은 완전히 검은색, 2.0은 두 배 밝습니다. 어두운 사진을 밝게 보정하거나, 과노출 사진을 어둡게 할 때 사용합니다.
 
     enhance()의 factor가 1.0보다 작으면 어두워지고, 크면 밝아집니다. 0.0은 완전한 검정, 1.0은 원본, 2.0은 두 배 밝기입니다. 보통 0.7~1.3 범위에서 자연스러운 조절이 가능합니다.
   tips:
-  - enhance()의 factor가 1.0보다 작으면 어두워지고, 크면 밝아집니다. 0.0은 완전한 검정, 1.0은 원본, 2.0은 두 배 밝기입니다. 보통 0.7~1.3 범위에서 자연스러운 조절이 가능합니다.
+  - enhance()의 factor가 1.0보다 작으면 어두워지고, 크면 밝아집니다. 0.0은 완전한 검정, 1.0은 원본, 2.0은 두 배 밝기입니다. 보통 0.7~1.3 범위에서
+    자연스러운 조절이 가능합니다.
   snippet: |-
     brightener = ImageEnhance.Brightness(frame)
     type(brightener)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 밝기 조절 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       brightener = ImageEnhance.Brightness(frame)
       type(brightener)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 밝기 조절 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 밝기 조절 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 밝기 조절에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_contrast
   title: 3단계. 대비 조절
   structuredPrimary: true
   subtitle: Contrast
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 대비 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Contrast 클래스는 이미지의 대비(명암 차이)를 조절합니다. 대비가 높으면 밝은 곳은 더 밝고 어두운 곳은 더 어두워집니다. 대비가 낮으면 전체적으로 회색빛이 됩니다.
 
@@ -101,68 +126,73 @@ sections:
     contraster = ImageEnhance.Contrast(frame)
     type(contraster)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 대비 조절 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       contraster = ImageEnhance.Contrast(frame)
       type(contraster)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 대비 조절 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 대비 조절 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 대비 조절에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_color
   title: 4단계. 채도 조절
   structuredPrimary: true
   subtitle: Color
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 채도 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Color 클래스는 이미지의 채도(색상의 선명함)를 조절합니다. 채도가 0이면 흑백, 높으면 색이 더 선명해집니다. 빈티지 효과나 팝아트 효과에 활용됩니다.
 
     Color.enhance(0.0)은 convert('L').convert('RGB')와 비슷한 결과를 줍니다. 채도 1.3~1.5 정도로 올리면 사진이 더 생동감 있어 보입니다. SNS 필터에서 자주 쓰이는 기법입니다.
   tips:
-  - Color.enhance(0.0)은 convert('L').convert('RGB')와 비슷한 결과를 줍니다. 채도 1.3~1.5 정도로 올리면 사진이 더 생동감 있어 보입니다. SNS 필터에서 자주 쓰이는 기법입니다.
+  - Color.enhance(0.0)은 convert('L').convert('RGB')와 비슷한 결과를 줍니다. 채도 1.3~1.5 정도로 올리면 사진이 더 생동감 있어 보입니다.
+    SNS 필터에서 자주 쓰이는 기법입니다.
   snippet: |-
     saturator = ImageEnhance.Color(frame)
     type(saturator)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 채도 조절 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       saturator = ImageEnhance.Color(frame)
       type(saturator)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 채도 조절 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 채도 조절 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 채도 조절에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_sharpness
   title: 5단계. 선명도 조절
   structuredPrimary: true
   subtitle: Sharpness
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Sharpness 클래스는 이미지의 선명도를 조절합니다. 0.0은 블러 효과, 1.0은 원본, 2.0 이상은 샤프 효과입니다. ImageFilter.SHARPEN보다 정교한 조절이 가능합니다.
+  goal: 5단계. 선명도 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: Sharpness 클래스는 이미지의 선명도를 조절합니다. 0.0은 블러 효과, 1.0은 원본, 2.0 이상은 샤프 효과입니다. ImageFilter.SHARPEN보다
+    정교한 조절이 가능합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     sharpener = ImageEnhance.Sharpness(frame)
     type(sharpener)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 선명도 조절 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sharpener = ImageEnhance.Sharpness(frame)
       type(sharpener)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 선명도 조절 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 선명도 조절 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 선명도 조절에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_combine
   title: 6단계. 조합 적용
   structuredPrimary: true
   subtitle: 여러 조정 연결
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 조합 적용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     여러 조정을 순차적으로 적용하여 원하는 효과를 만들 수 있습니다. 각 enhance()가 새 이미지를 반환하므로 체이닝이 가능합니다.
 
@@ -175,23 +205,24 @@ sections:
     final = ImageEnhance.Color(step2).enhance(1.1)
     final
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 조합 적용 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       step1 = ImageEnhance.Brightness(frame).enhance(1.2)
       step2 = ImageEnhance.Contrast(step1).enhance(1.3)
       final = ImageEnhance.Color(step2).enhance(1.1)
       final
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 조합 적용 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 조합 적용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 조합 적용에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 사진 보정 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     flower 이미지에 다양한 보정을 적용해봅시다.
 
@@ -206,7 +237,7 @@ sections:
     flower = Image.fromarray(flowerArr)
     flower
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageEnhance
       from sklearn.datasets import load_sample_image
@@ -215,17 +246,19 @@ sections:
       flower = Image.fromarray(flowerArr)
       flower
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 7단계. 보정 품질 검증 루프
   structuredPrimary: true
   subtitle: 밝기, 대비, 채도 factor 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 밝기와 대비 조정은 보기 좋은 값을 찾는 작업이지만, 자동화에서는 factor 범위와 평균 밝기 변화가 먼저 검증되어야 합니다. 잘못된 factor를 잡고 보정 전후 통계를 비교합니다.
+  goal: 7단계. 보정 품질 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 밝기와 대비 조정은 보기 좋은 값을 찾는 작업이지만, 자동화에서는 factor 범위와 평균 밝기 변화가 먼저 검증되어야 합니다. 잘못된 factor를 잡고
+    보정 전후 통계를 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -242,7 +275,7 @@ sections:
 
     validateEnhanceFactor(1.2)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 보정 품질 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageEnhance, ImageStat
 
@@ -257,7 +290,8 @@ sections:
 
       validateEnhanceFactor(1.2)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 보정 품질 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 보정 품질 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 보정 품질 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

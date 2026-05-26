@@ -25,28 +25,28 @@ meta:
     - 인터랙티브
     - 데이터 시각화
 intro:
-  direction: Plotly소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Plotly소개에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.
   benefits:
-  - Plotly소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.
+  - Plotly소개 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 10단계. Plotly 학습 입력 확인
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 인터랙티브 시각화 처리 실행
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.
+    - label: 툴팁과 선택 상태 결과 검증
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.
+    - label: Plotly소개 재사용
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 인터랙티브 차트 환경
+      detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Plotly소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Plotly소개 완료
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -107,7 +107,8 @@ sections:
   - type: note
     style: info
     title: Plotly vs Plotly Express
-    content: Plotly는 저수준 라이브러리이고, Plotly Express는 고수준 래퍼입니다. seaborn이 matplotlib을 쉽게 만들어준 것처럼, Plotly Express가 Plotly를 쉽게 만들어줍니다.
+    content: Plotly는 저수준 라이브러리이고, Plotly Express는 고수준 래퍼입니다. seaborn이 matplotlib을 쉽게 만들어준 것처럼, Plotly
+      Express가 Plotly를 쉽게 만들어줍니다.
   - type: featureCards
     cards:
     - emoji: 🎯
@@ -290,8 +291,8 @@ sections:
   title: 10단계. Plotly 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. Plotly 학습 흐름 검증에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
   explanation: |-
     Plotly 입문은 인터랙티브라는 특징을 말로 아는 데서 끝나지 않습니다. 로컬 데이터로 Figure를 만들고, trace와 layout이 분석 질문을 제대로 담는지 확인해야 합니다.
 
@@ -313,7 +314,7 @@ sections:
     assert billTipCorrelation > 0.6
     round(float(billTipCorrelation), 3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. Plotly 학습 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 툴팁과 선택 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import plotly.express as px
       from codaro.curriculum.localData import loadLocalDataset
@@ -329,10 +330,11 @@ sections:
       assert billTipCorrelation > 0.6
       round(float(billTipCorrelation), 3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. Plotly 학습 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 툴팁과 선택 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. Plotly 학습 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. Plotly 학습 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: next
   blocks:
   - type: hero

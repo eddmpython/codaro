@@ -22,13 +22,35 @@ intro:
   - 중첩 구조 들여쓰기
   - 폭과 깊이 제어
   - 디버깅과 로깅에 유용
+  direction: pprint 예쁜 출력에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - pprint 예쁜 출력 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 모듈 임포트 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 출력 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 폭과 깊이 제어 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: pprint 예쁜 출력 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: pprint 예쁜 출력 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: pprint 예쁜 출력 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: module_import
   title: 모듈 임포트
   structuredPrimary: true
   subtitle: pprint 시작하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 모듈 임포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     pprint는 파이썬 표준 라이브러리입니다. 복잡한 데이터 구조를 읽기 쉽게 포맷팅하여 출력합니다.
 
@@ -43,7 +65,7 @@ sections:
     formatted = pprint.pformat(data)
     formatted
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 모듈 임포트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -52,16 +74,17 @@ sections:
       formatted = pprint.pformat(data)
       formatted
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 모듈 임포트 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 모듈 임포트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 모듈 임포트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: basic_pprint
   title: 기본 출력
   structuredPrimary: true
   subtitle: pformat 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 기본 출력에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     pformat()은 데이터 구조를 보기 좋게 포맷팅한 문자열을 반환합니다.
 
@@ -75,7 +98,7 @@ sections:
     prettyList = pprint.pformat(numbers)
     prettyList
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 기본 출력 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -83,16 +106,17 @@ sections:
       prettyList = pprint.pformat(numbers)
       prettyList
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 기본 출력 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 기본 출력 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 기본 출력에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: width_depth
   title: 폭과 깊이 제어
   structuredPrimary: true
   subtitle: 출력 형식 조정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 폭과 깊이 제어에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     width와 depth 파라미터로 출력 형식을 세밀하게 제어할 수 있습니다.
 
@@ -109,7 +133,7 @@ sections:
 
     narrow, wide
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 폭과 깊이 제어 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -120,16 +144,17 @@ sections:
 
       narrow, wide
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 폭과 깊이 제어 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 폭과 깊이 제어 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 폭과 깊이 제어에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: prettyprinter
   title: PrettyPrinter 클래스
   structuredPrimary: true
   subtitle: 재사용 가능한 프린터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: PrettyPrinter 클래스에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     PrettyPrinter 객체를 생성하면 동일한 설정으로 여러 번 사용할 수 있습니다.
 
@@ -149,7 +174,7 @@ sections:
 
     result1, result2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: PrettyPrinter 클래스 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -163,16 +188,17 @@ sections:
 
       result1, result2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - PrettyPrinter 클래스 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: PrettyPrinter 클래스 코드가 예외 없이 끝나야 합니다.
+    resultCheck: PrettyPrinter 클래스에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: sorting
   title: 정렬과 정리
   structuredPrimary: true
   subtitle: 키 정렬
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 정렬과 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     딕셔너리 키를 정렬하여 출력하면 일관된 순서로 데이터를 확인할 수 있습니다.
 
@@ -189,7 +215,7 @@ sections:
 
     sortedOutput, unsorted
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 정렬과 정리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -200,16 +226,17 @@ sections:
 
       sortedOutput, unsorted
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 정렬과 정리 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 정렬과 정리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 정렬과 정리에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: debugging
   title: 디버깅 활용
   structuredPrimary: true
   subtitle: 실무 활용 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 디버깅 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     pprint는 복잡한 데이터 구조를 디버깅하고 로그에 기록할 때 매우 유용합니다.
 
@@ -233,7 +260,7 @@ sections:
     readable = pprint.pformat(apiResponse, indent=2)
     readable
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 디버깅 활용 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -251,16 +278,17 @@ sections:
       readable = pprint.pformat(apiResponse, indent=2)
       readable
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 디버깅 활용 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 디버깅 활용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 디버깅 활용에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: 실무 사용 사례
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실제 프로젝트에서 pprint를 활용하는 다양한 패턴들입니다.
 
@@ -284,7 +312,7 @@ sections:
     envDump = pprint.pformat(environment, indent=2, width=70)
     envDump
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 활용 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -302,17 +330,19 @@ sections:
       envDump = pprint.pformat(environment, indent=2, width=70)
       envDump
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 활용 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 활용에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 안전한 진단 리포트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: pprint는 보기 좋은 출력만 만드는 도구가 아닙니다. 운영 진단 리포트에서는 읽기 쉬운 줄 길이, 안정적인 키 순서, 민감정보 마스킹까지 검증해야 업무 로그로 쓸 수 있습니다.
+  goal: '검증 루프: 안전한 진단 리포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: pprint는 보기 좋은 출력만 만드는 도구가 아닙니다. 운영 진단 리포트에서는 읽기 쉬운 줄 길이, 안정적인 키 순서, 민감정보 마스킹까지 검증해야 업무
+    로그로 쓸 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -352,7 +382,7 @@ sections:
     assert "'password': '***'" in reportText
     reportText
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 안전한 진단 리포트 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import pprint
 
@@ -390,16 +420,17 @@ sections:
       assert "'password': '***'" in reportText
       reportText
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 안전한 진단 리포트 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 안전한 진단 리포트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 안전한 진단 리포트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 종합 복습의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -410,7 +441,7 @@ sections:
     output1 = pprint.pformat(nums)
     output1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pprint
 
@@ -418,7 +449,8 @@ sections:
       output1 = pprint.pformat(nums)
       output1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

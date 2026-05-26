@@ -28,14 +28,38 @@ intro:
   emoji: 🐧
   goal: 펭귄 3종의 신체 데이터에서 "어떤 종이 가장 클까?"를 비교 분석합니다.
   description: groupby를 사용하면 한번에 그룹별 통계를 구할 수 있습니다. 종마다 필터링하고 평균을 구하는 반복 작업을 한 줄로!
+  direction: 펭귄종비교분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 펭귄종비교분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 종별 개수 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 미리보기 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 펭귄종비교분석 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 펭귄종비교분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 펭귄종비교분석 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: 펭귄 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈) 3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로 자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 로컬 실행에서는 네트워크가 없어도 종별 비교 흐름을 유지하도록 같은 컬럼의 샘플 데이터를 함께 둡니다.
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈)
+    3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로
+    자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 로컬 실행에서는 네트워크가 없어도 종별 비교 흐름을 유지하도록 같은 컬럼의 샘플 데이터를 함께 둡니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -45,7 +69,7 @@ sections:
     penguins = loadLocalDataset("penguins")
     penguins.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -53,73 +77,78 @@ sections:
       penguins = loadLocalDataset("penguins")
       penguins.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_value_counts
   title: 2단계. 종별 개수
   structuredPrimary: true
   subtitle: value_counts로 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 종별 개수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: Adelie 152, Gentoo 124, Chinstrap 68마리입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins['species'].value_counts()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 종별 개수 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins['species'].value_counts()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 종별 개수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 종별 개수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 종별 개수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_head
   title: 3단계. 미리보기
   structuredPrimary: true
   subtitle: 데이터 구조 파악
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: body_mass_g(체중), flipper_length_mm(날개 길이), bill_length_mm(부리 길이) 등이 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 미리보기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 미리보기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 미리보기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 미리보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_5_describe
   title: 3.5단계. 전체 통계 복습
   structuredPrimary: true
   subtitle: describe()로 숫자 요약
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3.5단계. 전체 통계 복습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     이전 프로젝트(01번, 02번)에서 배운 describe()를 다시 활용합니다. 펭귄의 체중, 날개 길이, 부리 치수 등 모든 숫자 컬럼의 통계를 한 번에 확인할 수 있습니다. 체중은 평균 약 4200g, 최소 2700g, 최대 6300g입니다. 날개 길이는 평균 약 201mm입니다. describe()는 데이터를 처음 접할 때 전체적인 범위와 분포를 빠르게 파악하는 데 필수적입니다.
 
     describe()는 pandas의 가장 기본적이면서도 강력한 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값), 75%(3사분위), max(최대)를 자동으로 계산합니다. 이전 프로젝트에서 배운 개념을 계속 반복하면서 익숙해지는 것이 중요합니다.
   tips:
-  - describe()는 pandas의 가장 기본적이면서도 강력한 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값), 75%(3사분위), max(최대)를 자동으로 계산합니다. 이전 프로젝트에서 배운 개념을 계속 반복하면서 익숙해지는 것이 중요합니다.
+  - describe()는 pandas의 가장 기본적이면서도 강력한 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값),
+    75%(3사분위), max(최대)를 자동으로 계산합니다. 이전 프로젝트에서 배운 개념을 계속 반복하면서 익숙해지는 것이 중요합니다.
   snippet: penguins.describe()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3.5단계. 전체 통계 복습 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.describe()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3.5단계. 전체 통계 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3.5단계. 전체 통계 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3.5단계. 전체 통계 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_filter_problem
   title: 4단계. 필터링의 문제
   structuredPrimary: true
   subtitle: 종마다 반복 작업
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 필터링의 문제에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: 4단계. 필터링의 문제의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -127,255 +156,275 @@ sections:
     adelie = penguins[penguins['species'] == 'Adelie']
     adelie['body_mass_g'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 필터링의 문제 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       adelie = penguins[penguins['species'] == 'Adelie']
       adelie['body_mass_g'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 필터링의 문제 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 필터링의 문제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 필터링의 문제에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_groupby
   title: 5단계. groupby 기본
   structuredPrimary: true
   subtitle: 한 줄로 그룹별 통계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. groupby 기본에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     groupby는 데이터를 특정 기준으로 그룹으로 묶어서 각 그룹별로 계산을 수행하는 강력한 메서드입니다. "species 컬럼을 기준으로 그룹을 만들고, 각 그룹의 body_mass_g 평균을 계산해줘"라는 의미입니다. SQL의 GROUP BY와 동일한 개념으로, Split(분할) - Apply(적용) - Combine(결합) 세 단계를 자동으로 처리합니다. 3종의 평균 체중을 단 한 줄로 계산할 수 있습니다. Gentoo가 가장 무겁고(약 5076g), Chinstrap과 Adelie는 비슷합니다.
 
     groupby('컬럼')은 해당 컬럼의 고유한 값들로 그룹을 만듭니다. species에는 Adelie, Gentoo, Chinstrap 3개 값이 있으므로 3개 그룹이 생성됩니다. 각 그룹에 대해 뒤에 오는 집계 함수(mean, sum 등)가 적용됩니다.
   tips:
-  - groupby('컬럼')은 해당 컬럼의 고유한 값들로 그룹을 만듭니다. species에는 Adelie, Gentoo, Chinstrap 3개 값이 있으므로 3개 그룹이 생성됩니다. 각 그룹에 대해 뒤에 오는 집계 함수(mean, sum 등)가 적용됩니다.
+  - groupby('컬럼')은 해당 컬럼의 고유한 값들로 그룹을 만듭니다. species에는 Adelie, Gentoo, Chinstrap 3개 값이 있으므로 3개 그룹이 생성됩니다.
+    각 그룹에 대해 뒤에 오는 집계 함수(mean, sum 등)가 적용됩니다.
   snippet: penguins.groupby('species')['body_mass_g'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. groupby 기본 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby('species')['body_mass_g'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. groupby 기본 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. groupby 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. groupby 기본에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_max
   title: 6단계. 다른 통계 함수
   structuredPrimary: true
   subtitle: max, min, sum, count
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 다른 통계 함수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: mean() 대신 max(), min(), sum(), count() 등을 사용할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins.groupby('species')['body_mass_g'].max()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 다른 통계 함수 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby('species')['body_mass_g'].max()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 다른 통계 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 다른 통계 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 다른 통계 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_size
   title: 7단계. 그룹 크기
   structuredPrimary: true
   subtitle: size()로 개수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 그룹 크기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: size()는 각 그룹의 행 수를 세어줍니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins.groupby('species').size()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 그룹 크기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby('species').size()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 그룹 크기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 그룹 크기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 그룹 크기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_reset_index
   title: 8단계. 인덱스 복원
   structuredPrimary: true
   subtitle: reset_index()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 인덱스 복원에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     groupby 결과는 기본적으로 그룹 기준 컬럼이 인덱스가 됩니다. 즉, species가 행 이름이 되어버립니다. 이 결과를 일반 DataFrame처럼 다시 컬럼으로 만들려면 reset_index()를 사용합니다. 인덱스를 컬럼으로 복원하면 추가 분석이나 시각화를 할 때 더 편리합니다. 예를 들어 그래프를 그릴 때 species를 x축으로 사용하려면 컬럼이어야 합니다. reset_index()는 인덱스를 0, 1, 2...로 초기화하고, 기존 인덱스를 새 컬럼으로 추가합니다.
 
     reset_index()를 사용하지 않으면 결과가 Series 형태로 나옵니다. DataFrame으로 만들려면 reset_index()를 붙이거나, 처음부터 groupby('species')[['body_mass_g']].mean()처럼 2겹 대괄호를 사용하면 됩니다.
   tips:
-  - reset_index()를 사용하지 않으면 결과가 Series 형태로 나옵니다. DataFrame으로 만들려면 reset_index()를 붙이거나, 처음부터 groupby('species')[['body_mass_g']].mean()처럼 2겹 대괄호를 사용하면 됩니다.
+  - reset_index()를 사용하지 않으면 결과가 Series 형태로 나옵니다. DataFrame으로 만들려면 reset_index()를 붙이거나, 처음부터 groupby('species')[['body_mass_g']].mean()처럼
+    2겹 대괄호를 사용하면 됩니다.
   snippet: penguins.groupby('species')['body_mass_g'].mean().reset_index()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 인덱스 복원 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby('species')['body_mass_g'].mean().reset_index()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 인덱스 복원 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 인덱스 복원 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 인덱스 복원에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_multi_group
   title: 9단계. 여러 컬럼으로 그룹핑
   structuredPrimary: true
   subtitle: 종 + 성별
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 여러 컬럼으로 그룹핑에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     groupby는 하나의 컬럼뿐만 아니라 여러 컬럼을 동시에 기준으로 사용할 수 있습니다. 리스트 형태로 여러 컬럼을 전달하면 해당 컬럼들의 조합으로 그룹이 만들어집니다. 예를 들어 ['species', 'sex']로 그룹핑하면 (Adelie, MALE), (Adelie, FEMALE), (Gentoo, MALE), (Gentoo, FEMALE)... 이렇게 종과 성별의 모든 조합별로 그룹이 생성됩니다. 교차 분석이 필요할 때 매우 유용합니다. 같은 종 내에서도 수컷과 암컷의 체중 차이를 비교할 수 있습니다.
 
     여러 컬럼으로 그룹핑하면 결과의 인덱스가 MultiIndex(다층 인덱스)가 됩니다. reset_index()로 평평하게 만들거나, as_index=False 파라미터를 추가하면 처음부터 평평한 DataFrame을 얻을 수 있습니다.
   tips:
-  - 여러 컬럼으로 그룹핑하면 결과의 인덱스가 MultiIndex(다층 인덱스)가 됩니다. reset_index()로 평평하게 만들거나, as_index=False 파라미터를 추가하면 처음부터 평평한 DataFrame을 얻을 수 있습니다.
+  - 여러 컬럼으로 그룹핑하면 결과의 인덱스가 MultiIndex(다층 인덱스)가 됩니다. reset_index()로 평평하게 만들거나, as_index=False 파라미터를 추가하면
+    처음부터 평평한 DataFrame을 얻을 수 있습니다.
   snippet: penguins.groupby(['species', 'sex'])['body_mass_g'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 여러 컬럼으로 그룹핑 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby(['species', 'sex'])['body_mass_g'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 여러 컬럼으로 그룹핑 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 여러 컬럼으로 그룹핑 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 여러 컬럼으로 그룹핑에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_agg_list
   title: 10단계. 여러 통계 한번에
   structuredPrimary: true
   subtitle: agg() 리스트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 여러 통계 한번에에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     지금까지는 mean(), max() 같은 함수를 하나씩만 적용했습니다. 하지만 agg(aggregate, 집계) 메서드를 사용하면 여러 통계 함수를 동시에 적용할 수 있습니다. 함수 이름을 리스트로 전달하면 각 함수의 결과가 컬럼으로 나란히 출력됩니다. 예를 들어 ['mean', 'min', 'max']를 전달하면 평균, 최소, 최대값을 한 번에 볼 수 있습니다. 데이터의 전체적인 분포를 파악하는 데 매우 효율적입니다. 한 줄로 종별 체중의 평균, 최소, 최대를 모두 확인할 수 있습니다.
 
     agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할 수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다.
   tips:
-  - agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할 수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다.
+  - agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할
+    수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다.
   snippet: penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 여러 통계 한번에 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 여러 통계 한번에 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 여러 통계 한번에 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 여러 통계 한번에에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step11_agg_dict
   title: 11단계. 컬럼별 다른 함수
   structuredPrimary: true
   subtitle: agg() 딕셔너리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 컬럼별 다른 함수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     agg()의 진정한 강력함은 컬럼마다 다른 집계 함수를 적용할 수 있다는 것입니다. 딕셔너리 형태로 {'컬럼명': '함수'} 또는 {'컬럼명': ['함수1', '함수2']}처럼 작성하면 됩니다. 예를 들어 체중은 평균을 보고 싶고, 부리 길이는 최대값을 보고 싶다면 각각 다른 함수를 지정할 수 있습니다. 각 컬럼의 특성에 맞는 통계량을 선택적으로 계산할 수 있어 매우 유연합니다. 실무에서 리포트를 만들 때 자주 사용하는 패턴입니다.
 
     딕셔너리의 값으로 리스트를 주면 한 컬럼에 여러 함수를 적용할 수 있습니다. 예: {'body_mass_g': ['mean', 'std'], 'bill_length_mm': 'max'}처럼 작성하면 체중은 평균과 표준편차, 부리는 최대값을 계산합니다.
   tips:
-  - '딕셔너리의 값으로 리스트를 주면 한 컬럼에 여러 함수를 적용할 수 있습니다. 예: {''body_mass_g'': [''mean'', ''std''], ''bill_length_mm'': ''max''}처럼 작성하면 체중은 평균과 표준편차, 부리는 최대값을 계산합니다.'
+  - '딕셔너리의 값으로 리스트를 주면 한 컬럼에 여러 함수를 적용할 수 있습니다. 예: {''body_mass_g'': [''mean'', ''std''], ''bill_length_mm'':
+    ''max''}처럼 작성하면 체중은 평균과 표준편차, 부리는 최대값을 계산합니다.'
   snippet: |-
     penguins.groupby('species').agg({
         'body_mass_g': 'mean',
         'bill_length_mm': 'max'
     })
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 컬럼별 다른 함수 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       penguins.groupby('species').agg({
           'body_mass_g': 'mean',
           'bill_length_mm': 'max'
       })
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 컬럼별 다른 함수 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 컬럼별 다른 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 컬럼별 다른 함수에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step12_query
   title: 12단계. query 필터링
   structuredPrimary: true
   subtitle: 간결한 조건문
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. query 필터링에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     query() 메서드는 기존의 DataFrame[조건] 방식보다 더 간결하고 읽기 쉬운 필터링을 제공합니다. 조건을 문자열로 작성하기 때문에 대괄호 중첩이 줄어들고, SQL의 WHERE 절처럼 직관적입니다. penguins[penguins['body_mass_g'] > 5000] 대신 penguins.query('body_mass_g > 5000')처럼 작성할 수 있습니다. 컬럼명을 따옴표로 감싸지 않아도 되고, 복잡한 조건을 and, or로 연결할 때 특히 편리합니다.
 
     query()는 내부적으로 문자열을 파싱해서 조건을 평가합니다. 비교 연산자(>, <, ==, !=)뿐만 아니라 and, or, not 같은 논리 연산자도 사용할 수 있습니다. 예: query('body_mass_g > 4000 and sex == "MALE"')
   tips:
-  - 'query()는 내부적으로 문자열을 파싱해서 조건을 평가합니다. 비교 연산자(>, <, ==, !=)뿐만 아니라 and, or, not 같은 논리 연산자도 사용할 수 있습니다. 예: query(''body_mass_g > 4000 and sex == "MALE"'')'
+  - 'query()는 내부적으로 문자열을 파싱해서 조건을 평가합니다. 비교 연산자(>, <, ==, !=)뿐만 아니라 and, or, not 같은 논리 연산자도 사용할 수 있습니다.
+    예: query(''body_mass_g > 4000 and sex == "MALE"'')'
   snippet: penguins.query('body_mass_g > 5000')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. query 필터링 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.query('body_mass_g > 5000')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. query 필터링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. query 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. query 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step13_query_string
   title: 13단계. query 문자열 조건
   structuredPrimary: true
   subtitle: 따옴표 사용법
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. query 문자열 조건에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     query()에서 문자열 값을 비교할 때는 따옴표 중첩에 주의해야 합니다. query 전체를 작은따옴표로 감싸고, 비교할 문자열 값은 큰따옴표로 감싸는 것이 일반적입니다. 즉, query('species == "Gentoo"') 형태입니다. 반대로 바깥을 큰따옴표, 안을 작은따옴표로 해도 되지만, 파이썬에서는 바깥 작은따옴표가 관례입니다. 이렇게 하면 문자열 비교 조건을 명확하게 작성할 수 있습니다.
 
     query() 안에서 여러 조건을 연결할 때: query('species == "Gentoo" and body_mass_g > 5000')처럼 and로 연결하거나, query('sex == "MALE" or sex == "FEMALE"')처럼 or를 사용할 수 있습니다. &, |도 가능하지만 and, or가 더 읽기 쉽습니다.
   tips:
-  - 'query() 안에서 여러 조건을 연결할 때: query(''species == "Gentoo" and body_mass_g > 5000'')처럼 and로 연결하거나, query(''sex == "MALE" or sex == "FEMALE"'')처럼 or를 사용할 수 있습니다. &, |도 가능하지만 and, or가 더 읽기 쉽습니다.'
+  - 'query() 안에서 여러 조건을 연결할 때: query(''species == "Gentoo" and body_mass_g > 5000'')처럼 and로 연결하거나, query(''sex
+    == "MALE" or sex == "FEMALE"'')처럼 or를 사용할 수 있습니다. &, |도 가능하지만 and, or가 더 읽기 쉽습니다.'
   snippet: penguins.query('species == "Gentoo"')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. query 문자열 조건 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.query('species == "Gentoo"')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. query 문자열 조건 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. query 문자열 조건 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. query 문자열 조건에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step14_filter_groupby
   title: 14단계. 필터링 + 그룹핑
   structuredPrimary: true
   subtitle: 조합해서 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 14단계. 필터링 + 그룹핑에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: 필터링과 그룹핑을 조합하면 더 정교한 분석이 가능합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: penguins.query('sex == "FEMALE"').groupby('species')['body_mass_g'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 14단계. 필터링 + 그룹핑 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: penguins.query('sex == "FEMALE"').groupby('species')['body_mass_g'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 14단계. 필터링 + 그룹핑 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 14단계. 필터링 + 그룹핑 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 14단계. 필터링 + 그룹핑에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step15_idxmax
   title: 15단계. 최대값 위치 찾기
   structuredPrimary: true
   subtitle: idxmax() 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 15단계. 최대값 위치 찾기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     max()는 최대값 자체를 반환하지만, idxmax()는 최대값이 위치한 인덱스(행 번호)를 반환합니다. 이 인덱스를 loc과 함께 사용하면 최대값을 가진 행 전체를 가져올 수 있습니다. 예를 들어 가장 무거운 펭귄의 체중뿐만 아니라 그 펭귄의 종, 성별, 부리 길이 등 모든 정보를 확인할 수 있습니다. 데이터에서 극값(최대/최소)을 가진 케이스의 전체 정보를 파악할 때 매우 유용한 패턴입니다. 반대로 idxmin()은 최소값의 위치를 찾습니다.
 
     idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예: penguins['body_mass_g'].idxmax(skipna=False)
   tips:
-  - 'idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예: penguins[''body_mass_g''].idxmax(skipna=False)'
+  - 'idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예:
+    penguins[''body_mass_g''].idxmax(skipna=False)'
   snippet: |-
     maxIdx = penguins['body_mass_g'].idxmax()
     penguins.loc[maxIdx]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 15단계. 최대값 위치 찾기 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       maxIdx = penguins['body_mass_g'].idxmax()
       penguins.loc[maxIdx]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 15단계. 최대값 위치 찾기 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 15단계. 최대값 위치 찾기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 15단계. 최대값 위치 찾기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 종별 펭귄 특성 리포트'
   structuredPrimary: true
   subtitle: query, groupby, agg, idxmax, 실패 케이스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 종별 펭귄 특성 리포트에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     그룹 비교는 평균만 보고 끝내면 약합니다. 필터링 조건, 그룹별 표본 수, 극값 행이 모두 기대와 맞는지 확인해야 리포트로 쓸 수 있습니다.
 
@@ -403,7 +452,7 @@ sections:
     assert report.loc["Gentoo", "avgMass"] == 4950
     assert maxRow["species"] == "Gentoo"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 종별 펭귄 특성 리포트 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -424,16 +473,17 @@ sections:
       assert report.loc["Gentoo", "avgMass"] == 4950
       assert maxRow["species"] == "Gentoo"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 종별 펭귄 특성 리포트 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 종별 펭귄 특성 리포트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 종별 펭귄 특성 리포트에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 펭귄 종 비교 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     펭귄 연구원이 되어 종별 특성을 분석해봅시다.
 
@@ -446,22 +496,24 @@ sections:
 
     data = loadLocalDataset("penguins")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
 
       data = loadLocalDataset("penguins")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
   - type: text
-    content: groupby의 핵심 개념을 배웠습니다. 반복적인 필터링 없이 그룹별 통계를 한 번에 계산하고, agg로 여러 함수를 조합하며, query로 간결한 필터링을 수행하는 방법을 익혔습니다. 이 기술들은 실무 데이터 분석에서 필수적인 스킬입니다.
+    content: groupby의 핵심 개념을 배웠습니다. 반복적인 필터링 없이 그룹별 통계를 한 번에 계산하고, agg로 여러 함수를 조합하며, query로 간결한 필터링을 수행하는
+      방법을 익혔습니다. 이 기술들은 실무 데이터 분석에서 필수적인 스킬입니다.
   - type: list
     items:
     - df.groupby('컬럼').mean() - 그룹별 평균 (Split-Apply-Combine)

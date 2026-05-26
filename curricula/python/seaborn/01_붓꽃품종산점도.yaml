@@ -28,98 +28,126 @@ intro:
   emoji: 🌸
   goal: 붓꽃 품종별 꽃잎/꽃받침 특성을 산점도로 시각화합니다.
   description: Seaborn의 가장 기본적인 함수인 scatterplot을 배웁니다. hue 파라미터로 품종별 색상을 구분하고, palette로 색상 팔레트를 변경합니다.
+  direction: 붓꽃품종산점도에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 붓꽃품종산점도 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 산점도 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 붓꽃품종산점도 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 붓꽃품종산점도 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 붓꽃품종산점도 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     Seaborn은 통계 시각화에 특화된 라이브러리입니다. matplotlib.pyplot과 함께 사용하면 더 세밀한 조정이 가능합니다. seaborn은 관례적으로 sns라는 별칭을 사용합니다. 이 별칭은 미국 드라마 The West Wing의 등장인물 Samuel Norman Seaborn에서 따왔다고 합니다.
 
     import seaborn as sns는 seaborn을 sns라는 짧은 이름으로 불러오는 관례입니다. sns.scatterplot(), sns.histplot()처럼 간결하게 사용할 수 있습니다.
   tips:
-  - import seaborn as sns는 seaborn을 sns라는 짧은 이름으로 불러오는 관례입니다. sns.scatterplot(), sns.histplot()처럼 간결하게 사용할 수 있습니다.
+  - import seaborn as sns는 seaborn을 sns라는 짧은 이름으로 불러오는 관례입니다. sns.scatterplot(), sns.histplot()처럼 간결하게
+    사용할 수 있습니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: iris 데이터셋
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     iris(붓꽃) 데이터셋은 머신러닝과 시각화에서 가장 유명한 데이터입니다. 1936년 통계학자 Ronald Fisher가 발표했습니다. 3가지 품종(setosa, versicolor, virginica)의 꽃잎(petal)과 꽃받침(sepal) 길이/너비를 측정한 150개 샘플로 구성되어 있습니다.
 
     loadLocalDataset('iris')처럼 Codaro가 함께 제공하는 로컬 샘플 데이터를 DataFrame으로 반환합니다. 인터넷 연결 없이 같은 분석 흐름을 재현할 수 있습니다.
   tips:
-  - loadLocalDataset('iris')처럼 Codaro가 함께 제공하는 로컬 샘플 데이터를 DataFrame으로 반환합니다. 인터넷 연결 없이 같은 분석 흐름을 재현할 수 있습니다.
+  - loadLocalDataset('iris')처럼 Codaro가 함께 제공하는 로컬 샘플 데이터를 DataFrame으로 반환합니다. 인터넷 연결 없이 같은 분석 흐름을 재현할 수
+    있습니다.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 
     iris = loadLocalDataset('iris')
     iris.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       iris = loadLocalDataset('iris')
       iris.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_basic_scatter
   title: 3단계. 기본 산점도
   structuredPrimary: true
   subtitle: scatterplot()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 기본 산점도에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     scatterplot()은 두 연속 변수의 관계를 점으로 표현합니다. data에 DataFrame을 전달하고, x와 y에 컬럼명을 문자열로 지정합니다. Matplotlib과 달리 데이터를 직접 전달하는 방식으로 코드가 더 직관적입니다.
 
     sns.scatterplot(data=df, x='컬럼명', y='컬럼명')으로 산점도를 그립니다. ax 파라미터로 기존 Matplotlib Axes에 그릴 수 있어 서브플롯과 조합이 가능합니다.
   tips:
-  - sns.scatterplot(data=df, x='컬럼명', y='컬럼명')으로 산점도를 그립니다. ax 파라미터로 기존 Matplotlib Axes에 그릴 수 있어 서브플롯과 조합이 가능합니다.
+  - sns.scatterplot(data=df, x='컬럼명', y='컬럼명')으로 산점도를 그립니다. ax 파라미터로 기존 Matplotlib Axes에 그릴 수 있어 서브플롯과
+    조합이 가능합니다.
   snippet: |-
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.scatterplot(data=iris, x='petal_length', y='petal_width', ax=ax)
     ax.set_title('Petal Length vs Width')
     fig
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 기본 산점도 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='petal_length', y='petal_width', ax=ax)
       ax.set_title('Petal Length vs Width')
       fig
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 기본 산점도 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 기본 산점도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 기본 산점도에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_hue
   title: 4단계. hue로 색상 구분
   structuredPrimary: true
   subtitle: 범주별 색상
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. hue로 색상 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     hue 파라미터는 Seaborn의 핵심 기능입니다. 세 번째 변수(보통 범주형)를 색상으로 매핑하여 그룹별 패턴을 한눈에 파악할 수 있습니다. 범례는 자동으로 생성됩니다. 품종별로 색상을 다르게 하면 각 품종의 특성 차이가 명확하게 보입니다.
 
@@ -132,53 +160,57 @@ sections:
     axHue.set_title('Petal by Species')
     figHue
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. hue로 색상 구분 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figHue, axHue = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', ax=axHue)
       axHue.set_title('Petal by Species')
       figHue
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. hue로 색상 구분 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. hue로 색상 구분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. hue로 색상 구분에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_palette
   title: 5단계. 색상 팔레트 변경
   structuredPrimary: true
   subtitle: palette
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 색상 팔레트 변경에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     palette 파라미터로 색상 체계를 변경할 수 있습니다. Seaborn은 다양한 내장 팔레트를 제공합니다. deep, muted, bright, pastel, dark, colorblind 등이 있으며, matplotlib의 컬러맵(Set1, Set2, tab10 등)도 사용할 수 있습니다.
 
     palette='팔레트명'으로 색상을 변경합니다. 주요 팔레트: 'deep'(기본), 'Set1', 'Set2', 'husl', 'colorblind'(색맹 친화적). 리스트로 직접 색상을 지정할 수도 있습니다: palette=['red', 'green', 'blue']
   tips:
-  - 'palette=''팔레트명''으로 색상을 변경합니다. 주요 팔레트: ''deep''(기본), ''Set1'', ''Set2'', ''husl'', ''colorblind''(색맹 친화적). 리스트로 직접 색상을 지정할 수도 있습니다: palette=[''red'', ''green'', ''blue'']'
+  - 'palette=''팔레트명''으로 색상을 변경합니다. 주요 팔레트: ''deep''(기본), ''Set1'', ''Set2'', ''husl'', ''colorblind''(색맹
+    친화적). 리스트로 직접 색상을 지정할 수도 있습니다: palette=[''red'', ''green'', ''blue'']'
   snippet: |-
     figPalette, axPalette = plt.subplots(figsize=(8, 6))
     sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', palette='Set2', ax=axPalette)
     axPalette.set_title('Petal by Species (Set2)')
     figPalette
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 색상 팔레트 변경 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figPalette, axPalette = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', palette='Set2', ax=axPalette)
       axPalette.set_title('Petal by Species (Set2)')
       figPalette
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 색상 팔레트 변경 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 색상 팔레트 변경 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 색상 팔레트 변경에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_sepal
   title: 6단계. 꽃받침 데이터 시각화
   structuredPrimary: true
   subtitle: 다른 변수 탐색
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 같은 방식으로 꽃받침(sepal) 데이터도 시각화해봅니다. 꽃잎 데이터와 비교하면 품종 간 분리 정도가 다른 것을 알 수 있습니다. setosa는 꽃잎에서 더 명확하게 구분되지만, versicolor와 virginica는 꽃받침에서도 겹치는 영역이 있습니다.
+  goal: 6단계. 꽃받침 데이터 시각화에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 같은 방식으로 꽃받침(sepal) 데이터도 시각화해봅니다. 꽃잎 데이터와 비교하면 품종 간 분리 정도가 다른 것을 알 수 있습니다. setosa는 꽃잎에서
+    더 명확하게 구분되지만, versicolor와 virginica는 꽃받침에서도 겹치는 영역이 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -187,24 +219,26 @@ sections:
     axSepal.set_title('Sepal by Species')
     figSepal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 꽃받침 데이터 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figSepal, axSepal = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='sepal_length', y='sepal_width', hue='species', palette='Set2', ax=axSepal)
       axSepal.set_title('Sepal by Species')
       figSepal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 꽃받침 데이터 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 꽃받침 데이터 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 꽃받침 데이터 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_style
   title: 7단계. 스타일 추가
   structuredPrimary: true
   subtitle: 마커와 크기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: s 파라미터로 점 크기를, alpha로 투명도를 조절할 수 있습니다. 점이 많이 겹칠 때 alpha를 낮추면 밀집 영역을 파악하기 쉽습니다. edgecolor로 점 테두리 색상도 지정할 수 있습니다.
+  goal: 7단계. 스타일 추가에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: s 파라미터로 점 크기를, alpha로 투명도를 조절할 수 있습니다. 점이 많이 겹칠 때 alpha를 낮추면 밀집 영역을 파악하기 쉽습니다. edgecolor로
+    점 테두리 색상도 지정할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -214,7 +248,7 @@ sections:
     axStyle.set_title('Styled Scatter')
     figStyle
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 스타일 추가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figStyle, axStyle = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
@@ -222,17 +256,19 @@ sections:
       axStyle.set_title('Styled Scatter')
       figStyle
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 스타일 추가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 스타일 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 스타일 추가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_comparison
   title: 8단계. 두 차트 비교
   structuredPrimary: true
   subtitle: 서브플롯 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Matplotlib의 subplots와 조합하면 여러 차트를 한 그림에 배치할 수 있습니다. ax 파라미터로 각 Axes에 Seaborn 차트를 그립니다. 꽃잎과 꽃받침을 나란히 비교하면 품종별 특성 차이를 더 명확하게 파악할 수 있습니다.
+  goal: 8단계. 두 차트 비교에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: Matplotlib의 subplots와 조합하면 여러 차트를 한 그림에 배치할 수 있습니다. ax 파라미터로 각 Axes에 Seaborn 차트를 그립니다.
+    꽃잎과 꽃받침을 나란히 비교하면 품종별 특성 차이를 더 명확하게 파악할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -249,7 +285,7 @@ sections:
     plt.tight_layout()
     figCompare
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 두 차트 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figCompare, (axPetal, axSepalSub) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -264,17 +300,19 @@ sections:
       plt.tight_layout()
       figCompare
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 두 차트 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 두 차트 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 두 차트 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_legend
   title: 9단계. 범례 커스터마이징
   structuredPrimary: true
   subtitle: legend 조정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Seaborn이 자동 생성한 범례를 Matplotlib 메서드로 조정할 수 있습니다. ax.legend()로 위치, 제목, 크기 등을 변경합니다. bbox_to_anchor로 범례를 차트 밖으로 배치할 수도 있습니다.
+  goal: 9단계. 범례 커스터마이징에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: Seaborn이 자동 생성한 범례를 Matplotlib 메서드로 조정할 수 있습니다. ax.legend()로 위치, 제목, 크기 등을 변경합니다. bbox_to_anchor로
+    범례를 차트 밖으로 배치할 수도 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -287,7 +325,7 @@ sections:
     axLegend.set_title('Iris Petal Dimensions by Species')
     figLegend
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 범례 커스터마이징 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figLegend, axLegend = plt.subplots(figsize=(8, 6))
       sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
@@ -298,17 +336,19 @@ sections:
       axLegend.set_title('Iris Petal Dimensions by Species')
       figLegend
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 범례 커스터마이징 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 범례 커스터마이징 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 범례 커스터마이징에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_final
   title: 10단계. 최종 차트
   structuredPrimary: true
   subtitle: 완성된 시각화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 차트를 만듭니다. 적절한 제목, 축 라벨, 범례, 스타일을 적용하면 발표나 보고서에 바로 사용할 수 있는 차트가 됩니다.
+  goal: 10단계. 최종 차트에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 차트를 만듭니다. 적절한 제목, 축 라벨, 범례, 스타일을 적용하면 발표나 보고서에 바로 사용할 수 있는 차트가
+    됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -328,7 +368,7 @@ sections:
 
     figFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 최종 차트 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(10, 7))
 
@@ -346,16 +386,17 @@ sections:
 
       figFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 최종 차트 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 최종 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 최종 차트에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 11단계. 산점도 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 산점도 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     산점도는 보기 좋게 그리는 것만으로 끝나지 않습니다. 데이터가 기대한 구조인지 확인하고, 차트가 실제로 세 품종을 색으로 구분했는지 검증해야 합니다. 이 단계에서는 setosa가 꽃잎 길이만으로도 다른 품종과 분리될 것이라고 먼저 예측한 뒤, 차트와 데이터 요약이 그 예측을 뒷받침하는지 확인합니다.
 
@@ -377,7 +418,7 @@ sections:
 
     iris.groupby("species")[["petal_length", "petal_width", "sepal_length", "sepal_width"]].mean().round(2)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 산점도 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
       missingColumns = requiredColumns - set(iris.columns)
@@ -393,16 +434,17 @@ sections:
 
       iris.groupby("species")[["petal_length", "petal_width", "sepal_length", "sepal_width"]].mean().round(2)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 산점도 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 산점도 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 산점도 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 산점도 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     지금까지 배운 scatterplot, hue, palette를 활용해서 다양한 산점도를 만들어봅시다.
 
@@ -416,7 +458,7 @@ sections:
 
     data = loadLocalDataset('penguins').dropna()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -424,10 +466,11 @@ sections:
 
       data = loadLocalDataset('penguins').dropna()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:

@@ -24,28 +24,28 @@ meta:
     - BaseModel
     - 직렬화
 intro:
-  direction: pydantic소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: pydantic소개에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
   benefits:
-  - pydantic소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - pydantic소개 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 주문 입력 계약과 배치 검증 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 스키마 검증 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 성공 모델과 오류 메시지 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: pydantic소개 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: pydantic소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: pydantic소개 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -74,7 +74,9 @@ sections:
   - type: note
     style: info
     title: 왜 데이터 검증이 필요한가?
-    content: 외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고 오류가 발생하기 쉽습니다. Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러 메시지를 제공합니다.
+    content: 외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고
+      오류가 발생하기 쉽습니다. Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러
+      메시지를 제공합니다.
   - type: featureCards
     cards:
     - emoji: 📝
@@ -97,7 +99,8 @@ sections:
   - type: note
     style: info
     title: 수동 검증의 문제점
-    content: 수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다. 새 필드가 추가되면 검증 코드도 수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
+    content: 수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다.
+      새 필드가 추가되면 검증 코드도 수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
   - type: featureCards
     cards:
     - emoji: ⚡
@@ -166,7 +169,8 @@ sections:
   - type: note
     style: tip
     title: 선택 가이드
-    content: 단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를 사용한다면 Pydantic은 필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
+    content: 단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를
+      사용한다면 Pydantic은 필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
 - id: core_concepts
   blocks:
   - type: sectionHeader
@@ -200,11 +204,13 @@ sections:
   - type: note
     style: info
     title: 사용자 모델 정의
-    content: Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면 ValidationError가 발생합니다.
+    content: Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면
+      ValidationError가 발생합니다.
   - type: note
     style: tip
     title: 코드 예시
-    content: 'class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25", email="a@b.com") 호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.'
+    content: 'class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25",
+      email="a@b.com") 호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.'
 - id: use_cases
   blocks:
   - type: sectionHeader
@@ -285,7 +291,8 @@ sections:
   - type: note
     style: info
     title: 프로젝트 기반 학습
-    content: 각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면 Pydantic을 활용한 견고한 데이터 모델을 설계할 수 있습니다.
+    content: 각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면
+      Pydantic을 활용한 견고한 데이터 모델을 설계할 수 있습니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -314,7 +321,8 @@ sections:
   - type: note
     style: info
     title: 로컬에서 바로 실행
-    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 Codaro가 uv로 준비하고, 터미널에서는 uv run --with pydantic으로 바로 실행할 수 있습니다.
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 Codaro가 uv로 준비하고, 터미널에서는 uv run --with pydantic으로
+      바로 실행할 수 있습니다.
   - type: featureCards
     cards:
     - emoji: 🌐
@@ -352,9 +360,10 @@ sections:
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -392,7 +401,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -428,7 +437,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'

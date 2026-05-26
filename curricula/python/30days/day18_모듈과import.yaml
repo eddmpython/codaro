@@ -27,13 +27,35 @@ intro:
   - from, as로 유연하게
   - math, random, datetime 활용
   - 표준 라이브러리 사용
+  direction: 모듈과import에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 모듈과import 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: import 기본 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: from import 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: as 별칭 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 모듈과import 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 모듈과import 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 모듈과import 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: import_basic
   title: import 기본
   structuredPrimary: true
   subtitle: 모듈 가져오기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: import 기본에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
 
@@ -45,22 +67,23 @@ sections:
 
     math.sqrt(16)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: import 기본 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import math
 
       math.sqrt(16)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - import 기본 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: import 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: import 기본에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: from_import
   title: from import
   structuredPrimary: true
   subtitle: 특정 함수만 가져오기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: from import에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
 
@@ -72,22 +95,23 @@ sections:
 
     sqrt(25)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: from import 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from math import sqrt
 
       sqrt(25)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - from import 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: from import 코드가 예외 없이 끝나야 합니다.
+    resultCheck: from import에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: import_as
   title: as 별칭
   structuredPrimary: true
   subtitle: 모듈/함수 이름 바꾸기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: as 별칭에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
 
@@ -99,22 +123,23 @@ sections:
 
     m.sqrt(36)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: as 별칭 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import math as m
 
       m.sqrt(36)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - as 별칭 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: as 별칭 코드가 예외 없이 끝나야 합니다.
+    resultCheck: as 별칭에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: math_module
   title: math 모듈
   structuredPrimary: true
   subtitle: 수학 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: math 모듈에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
 
@@ -126,22 +151,23 @@ sections:
 
     sqrt(144)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: math 모듈 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from math import sqrt
 
       sqrt(144)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - math 모듈 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: math 모듈 코드가 예외 없이 끝나야 합니다.
+    resultCheck: math 모듈에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: random_module
   title: random 모듈
   structuredPrimary: true
   subtitle: 난수 생성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: random 모듈에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
 
@@ -153,22 +179,23 @@ sections:
 
     randint(1, 100)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: random 모듈 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from random import randint
 
       randint(1, 100)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - random 모듈 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: random 모듈 코드가 예외 없이 끝나야 합니다.
+    resultCheck: random 모듈에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: datetime_module
   title: datetime 모듈
   structuredPrimary: true
   subtitle: 날짜와 시간
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: datetime 모듈에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
 
@@ -181,23 +208,24 @@ sections:
     now = datetime.now()
     now.year, now.month, now.day
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: datetime 모듈 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from datetime import datetime
 
       now = datetime.now()
       now.year, now.month, now.day
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - datetime 모듈 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: datetime 모듈 코드가 예외 없이 끝나야 합니다.
+    resultCheck: datetime 모듈에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 실무 import 조합 루프
   structuredPrimary: true
   subtitle: 필요한 도구를 고르고 오류를 읽기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실무 import 조합 루프에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다.
 
@@ -233,7 +261,7 @@ sections:
     workSummary = summarizeWorkLogs(workLogs)
     workSummary
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실무 import 조합 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from datetime import datetime
       from pathlib import Path
@@ -263,17 +291,19 @@ sections:
       workSummary = summarizeWorkLogs(workLogs)
       workSummary
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실무 import 조합 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실무 import 조합 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실무 import 조합 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: Day 18 종합 복습
   structuredPrimary: true
   subtitle: 모듈과 import 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  goal: Day 18 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -281,13 +311,14 @@ sections:
 
     math.sqrt(81)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 18 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import math  # 첫 번째 셀에서 import
 
       math.sqrt(81)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 18 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 18 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 18 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

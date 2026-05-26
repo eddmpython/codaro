@@ -26,28 +26,28 @@ meta:
     - 인메모리DB
     - 분석용데이터베이스
 intro:
-  direction: DuckDB소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: DuckDB소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - DuckDB소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - DuckDB소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 로컬 DuckDB 쿼리 품질 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: DuckDB소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: duckdb 기준으로 로컬 Python 실행을 준비합니다.
+    - label: DuckDB소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: DuckDB소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -76,7 +76,8 @@ sections:
   - type: note
     style: info
     title: OLAP vs OLTP
-    content: 데이터베이스는 크게 두 종류입니다. OLTP는 주문, 결제처럼 빠른 트랜잭션 처리용(MySQL, PostgreSQL). OLAP는 집계, 통계처럼 대량 데이터 분석용(DuckDB, BigQuery). DuckDB는 OLAP에 특화된 데이터베이스입니다.
+    content: 데이터베이스는 크게 두 종류입니다. OLTP는 주문, 결제처럼 빠른 트랜잭션 처리용(MySQL, PostgreSQL). OLAP는 집계, 통계처럼 대량 데이터
+      분석용(DuckDB, BigQuery). DuckDB는 OLAP에 특화된 데이터베이스입니다.
   - type: featureCards
     cards:
     - emoji: 📊
@@ -149,7 +150,8 @@ sections:
   - type: note
     style: tip
     title: 둘 다 쓰면 됩니다!
-    content: DuckDB는 pandas DataFrame을 직접 쿼리할 수 있습니다. pandas로 전처리하고 DuckDB로 분석하는 조합도 강력합니다. 상황에 맞게 섞어 쓰세요!
+    content: DuckDB는 pandas DataFrame을 직접 쿼리할 수 있습니다. pandas로 전처리하고 DuckDB로 분석하는 조합도 강력합니다. 상황에 맞게 섞어
+      쓰세요!
 - id: sql_intro
   blocks:
   - type: sectionHeader
@@ -158,7 +160,8 @@ sections:
   - type: note
     style: info
     title: SQL이란?
-    content: Structured Query Language의 약자로, 데이터베이스와 대화하는 언어입니다. 1970년대 만들어져 지금도 표준으로 사용됩니다. 배워두면 모든 DB에서 쓸 수 있어요.
+    content: Structured Query Language의 약자로, 데이터베이스와 대화하는 언어입니다. 1970년대 만들어져 지금도 표준으로 사용됩니다. 배워두면 모든 DB에서
+      쓸 수 있어요.
   - type: featureCards
     cards:
     - emoji: 🔍
@@ -227,7 +230,8 @@ sections:
   - type: note
     style: info
     title: 로컬 DuckDB란?
-    content: DuckDB는 별도 데이터베이스 서버 없이 Python 프로세스 안에서 실행되는 분석 엔진입니다. CSV, Parquet, pandas DataFrame을 로컬에서 바로 SQL로 다룰 수 있습니다.
+    content: DuckDB는 별도 데이터베이스 서버 없이 Python 프로세스 안에서 실행되는 분석 엔진입니다. CSV, Parquet, pandas DataFrame을 로컬에서
+      바로 SQL로 다룰 수 있습니다.
   - type: featureCards
     cards:
     - emoji: 🚫
@@ -334,9 +338,10 @@ sections:
   title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
   structuredPrimary: true
   subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다.
+  goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
+    결과와 기준 변경 실험을 assert로 고정합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -361,7 +366,7 @@ sections:
     assert rowCount == 5
     rowCount
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import duckdb
 
@@ -384,7 +389,8 @@ sections:
       assert rowCount == 5
       rowCount
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'

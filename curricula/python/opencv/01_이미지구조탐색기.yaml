@@ -32,13 +32,35 @@ intro:
   emoji: 🔬
   goal: OpenCV에서 이미지가 NumPy 배열로 어떻게 표현되는지 탐색합니다.
   description: 이미지의 shape, dtype을 확인하고 BGR과 RGB의 차이를 이해합니다. matplotlib으로 이미지를 출력하는 방법도 배웁니다.
+  direction: 이미지구조탐색기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 이미지구조탐색기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 이미지 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 이미지 shape 확 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 타입 확인 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 이미지구조탐색기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 이미지구조탐색기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 이미지구조탐색기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 이미지를 OpenCV로
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     sklearn의 샘플 이미지는 RGB 순서의 NumPy 배열입니다. OpenCV는 BGR 순서를 사용하므로, 두 형식 간 변환을 이해하는 것이 중요합니다. 먼저 이미지를 로드하고 구조를 살펴봅시다.
 
@@ -58,7 +80,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -72,68 +94,74 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 이미지 불러오기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 이미지 불러오기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step2_shape
   title: 2단계. 이미지 shape 확인
   structuredPrimary: true
   subtitle: 높이, 너비, 채널
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 이미지 shape 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     NumPy 배열의 shape은 이미지의 구조를 알려줍니다. (높이, 너비, 채널) 순서로, 채널이 3이면 컬러, 2차원이면 흑백입니다. 주의할 점은 높이가 먼저 온다는 것입니다.
 
     shape은 (높이, 너비, 채널) 순서입니다. (427, 640, 3)이면 세로 427픽셀, 가로 640픽셀, 3채널(RGB 또는 BGR)입니다. Pillow의 size는 (너비, 높이)로 순서가 반대입니다.
   tips:
-  - shape은 (높이, 너비, 채널) 순서입니다. (427, 640, 3)이면 세로 427픽셀, 가로 640픽셀, 3채널(RGB 또는 BGR)입니다. Pillow의 size는 (너비, 높이)로 순서가 반대입니다.
+  - shape은 (높이, 너비, 채널) 순서입니다. (427, 640, 3)이면 세로 427픽셀, 가로 640픽셀, 3채널(RGB 또는 BGR)입니다. Pillow의 size는 (너비,
+    높이)로 순서가 반대입니다.
   snippet: |-
     height, width, channels = img.shape
     f"높이: {height}px, 너비: {width}px, 채널: {channels}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 이미지 shape 확인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       height, width, channels = img.shape
       f"높이: {height}px, 너비: {width}px, 채널: {channels}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 이미지 shape 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 이미지 shape 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 이미지 shape 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_dtype
   title: 3단계. 데이터 타입 확인
   structuredPrimary: true
   subtitle: dtype과 값 범위
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 데이터 타입 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     이미지 배열의 dtype(data type)은 보통 uint8입니다. uint8은 unsigned integer 8-bit의 약자로, 부호 없는 8비트 정수를 의미합니다. 8비트는 2^8 = 256가지 값(0~255)을 표현할 수 있어 픽셀 밝기를 저장하기에 적합합니다. 0은 완전한 검정, 255는 완전한 흰색(또는 해당 채널의 최대 강도)입니다.
 
     uint8은 unsigned 8-bit integer로 0-255 범위입니다. 일부 연산은 float32(0.0-1.0)를 사용하기도 합니다. dtype을 확인하고 필요시 변환해야 합니다.
   tips:
-  - uint8은 unsigned 8-bit integer로 0-255 범위입니다. 일부 연산은 float32(0.0-1.0)를 사용하기도 합니다. dtype을 확인하고 필요시 변환해야 합니다.
+  - uint8은 unsigned 8-bit integer로 0-255 범위입니다. 일부 연산은 float32(0.0-1.0)를 사용하기도 합니다. dtype을 확인하고 필요시 변환해야
+    합니다.
   snippet: img.dtype
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 데이터 타입 확인 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: img.dtype
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 데이터 타입 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 데이터 타입 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 데이터 타입 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_bgr
   title: 4단계. BGR vs RGB
   structuredPrimary: true
   subtitle: 색순서 이해하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. BGR vs RGB에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     OpenCV는 역사적 이유로 BGR(Blue-Green-Red) 순서를 사용합니다. 초기 카메라 하드웨어가 이 순서를 사용했기 때문입니다. 반면 sklearn, matplotlib, Pillow 등 대부분의 라이브러리는 RGB(Red-Green-Blue) 순서를 사용합니다. cvtColor()(convert color의 약자) 함수로 색상 순서를 변환합니다. 변환 없이 출력하면 빨강과 파랑이 뒤바뀌어 이상한 색으로 보입니다.
 
     cv2.COLOR_RGB2BGR는 RGB를 BGR로 변환합니다. 반대는 cv2.COLOR_BGR2RGB입니다. OpenCV 함수에 전달할 때는 BGR, matplotlib으로 출력할 때는 RGB를 사용합니다.
   tips:
-  - cv2.COLOR_RGB2BGR는 RGB를 BGR로 변환합니다. 반대는 cv2.COLOR_BGR2RGB입니다. OpenCV 함수에 전달할 때는 BGR, matplotlib으로 출력할 때는 RGB를 사용합니다.
+  - cv2.COLOR_RGB2BGR는 RGB를 BGR로 변환합니다. 반대는 cv2.COLOR_BGR2RGB입니다. OpenCV 함수에 전달할 때는 BGR, matplotlib으로
+    출력할 때는 RGB를 사용합니다.
   snippet: |-
     plt.figure(figsize=(8, 6))
     plt.imshow(img)
@@ -141,7 +169,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. BGR vs RGB 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       plt.figure(figsize=(8, 6))
       plt.imshow(img)
@@ -149,16 +177,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. BGR vs RGB 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. BGR vs RGB 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. BGR vs RGB에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_pixel
   title: 5단계. 픽셀 접근
   structuredPrimary: true
   subtitle: 배열 인덱싱
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 픽셀 접근에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     NumPy 배열이므로 인덱싱으로 특정 픽셀에 접근할 수 있습니다. img[y, x]로 (x, y) 위치의 픽셀 값을 얻습니다. 주의할 점은 y(행)가 먼저 온다는 것입니다.
 
@@ -169,21 +198,22 @@ sections:
     pixel = img[100, 200]
     pixel
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 픽셀 접근 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pixel = img[100, 200]
       pixel
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 픽셀 접근 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 픽셀 접근 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 픽셀 접근에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_slice
   title: 6단계. 영역 슬라이싱
   structuredPrimary: true
   subtitle: 이미지 일부 추출
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 영역 슬라이싱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     NumPy 슬라이싱으로 이미지의 일부 영역을 추출할 수 있습니다. img[y1:y2, x1:x2]로 사각형 영역을 잘라냅니다. 이렇게 추출한 관심 영역을 ROI(Region of Interest)라고 부릅니다. ROI는 얼굴 인식에서 얼굴 영역, 문서 스캔에서 문서 영역처럼 분석하고자 하는 특정 부분을 의미합니다.
 
@@ -200,7 +230,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 영역 슬라이싱 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       centerY = height // 2
       centerX = width // 2
@@ -211,16 +241,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 영역 슬라이싱 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 영역 슬라이싱 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 영역 슬라이싱에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_draw
   title: 7단계. 기본 그리기
   structuredPrimary: true
   subtitle: 도형과 텍스트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 기본 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     OpenCV의 그리기 함수들은 이미지를 직접 수정합니다. 복사본을 만들어서 작업하는 것이 좋습니다. BGR 색상을 사용해야 합니다.
 
@@ -236,7 +267,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 기본 그리기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       canvas = bgr.copy()
       canvasRgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
@@ -246,16 +277,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 기본 그리기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 기본 그리기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 기본 그리기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 이미지 구조 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     china 이미지를 분석하고 그리기를 연습해봅시다.
 
@@ -275,7 +307,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -289,17 +321,19 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 8단계. 이미지 구조 검증 루프
   structuredPrimary: true
   subtitle: shape, dtype, 채널 순서 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이미지 구조를 배울 때는 shape를 출력하는 데서 멈추지 말고, 업무 입력이 정말 BGR uint8 3채널인지 검증해야 합니다. 잘못된 흑백 입력을 일부러 넣고 실패를 확인한 뒤, 채널 통계와 crop 결과를 assert로 점검합니다.
+  goal: 8단계. 이미지 구조 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 이미지 구조를 배울 때는 shape를 출력하는 데서 멈추지 말고, 업무 입력이 정말 BGR uint8 3채널인지 검증해야 합니다. 잘못된 흑백 입력을 일부러
+    넣고 실패를 확인한 뒤, 채널 통계와 crop 결과를 assert로 점검합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -320,7 +354,7 @@ sections:
 
     validateStructureImage(structureImage)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 이미지 구조 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -339,7 +373,8 @@ sections:
 
       validateStructureImage(structureImage)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 이미지 구조 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 이미지 구조 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 이미지 구조 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

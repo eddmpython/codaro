@@ -30,48 +30,73 @@ intro:
   emoji: 🌸
   goal: 붓꽃 품종별 꽃잎/꽃받침 특성을 산점도로 시각화합니다.
   description: 산점도로 두 변수 간의 관계를 파악하고, 색상과 마커로 그룹을 구분합니다. 이전에 배운 plot, hist, subplots 개념을 함께 활용합니다.
+  direction: 붓꽃품종산점도에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 붓꽃품종산점도 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 붓꽃품종산점도 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 붓꽃품종산점도 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 붓꽃품종산점도 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     iris(붓꽃) 데이터셋은 머신러닝의 가장 유명한 예제 데이터입니다. 3가지 품종(setosa, versicolor, virginica)의 꽃잎(petal)과 꽃받침(sepal)의 길이와 너비를 담고 있습니다. 품종 분류 문제의 대표적인 데이터셋으로, 시각화를 통해 품종별 특성 차이를 명확하게 파악할 수 있습니다.
 
     import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
   tips:
-  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는
+    pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
   snippet: |-
     import matplotlib.pyplot as plt
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
     import pandas as pd
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import pandas as pd
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
     font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
   tips:
-  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
   snippet: |-
     from matplotlib import font_manager
 
@@ -83,7 +108,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -95,17 +120,19 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: iris 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: loadLocalDataset()으로 iris 데이터를 불러옵니다. 150개의 샘플이 있으며, 각 품종당 50개씩 균등하게 분포되어 있습니다. 4개의 수치형 특성과 1개의 범주형 특성(species)으로 구성됩니다. 로컬 데이터라 인터넷 연결과 무관하게 재현됩니다.
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: loadLocalDataset()으로 iris 데이터를 불러옵니다. 150개의 샘플이 있으며, 각 품종당 50개씩 균등하게 분포되어 있습니다. 4개의 수치형
+    특성과 1개의 범주형 특성(species)으로 구성됩니다. 로컬 데이터라 인터넷 연결과 무관하게 재현됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -114,41 +141,43 @@ sections:
     iris = loadLocalDataset('iris')
     iris.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       iris = loadLocalDataset('iris')
       iris.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_explore
   title: 3단계. 품종 확인
   structuredPrimary: true
   subtitle: unique()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 품종 확인에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: species 컬럼의 고유값을 확인하여 어떤 품종이 있는지 파악합니다. 3가지 품종이 있으며, 각각 다른 특성을 가지고 있어 산점도에서 군집으로 나타납니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris['species'].unique()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 품종 확인 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: iris['species'].unique()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 품종 확인 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 품종 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 품종 확인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_scatter
   title: 4단계. 기본 산점도
   structuredPrimary: true
   subtitle: ax.scatter()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 기본 산점도에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     산점도는 두 변수 간의 관계를 점으로 표시하는 차트입니다. x축에 꽃받침 길이, y축에 꽃받침 너비를 배치하면 두 변수의 상관관계를 파악할 수 있습니다. 점들이 어떤 패턴을 보이는지 관찰해봅시다.
 
@@ -163,7 +192,7 @@ sections:
     axScatter.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
     figScatter
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 기본 산점도 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figScatter, axScatter = plt.subplots(figsize=(10, 7))
       axScatter.scatter(iris['sepal_length'], iris['sepal_width'])
@@ -172,17 +201,19 @@ sections:
       axScatter.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
       figScatter
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 기본 산점도 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 기본 산점도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 기본 산점도에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_color
   title: 5단계. 품종별 색상 구분
   structuredPrimary: true
   subtitle: c 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 품종별로 다른 색상을 지정하면 그룹 간 차이를 명확하게 볼 수 있습니다. 각 품종을 순서대로 플롯하고 다른 색상과 라벨을 지정합니다. 이렇게 하면 setosa가 다른 품종과 명확히 구분되는 것을 알 수 있습니다.
+  goal: 5단계. 품종별 색상 구분에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 품종별로 다른 색상을 지정하면 그룹 간 차이를 명확하게 볼 수 있습니다. 각 품종을 순서대로 플롯하고 다른 색상과 라벨을 지정합니다. 이렇게 하면 setosa가
+    다른 품종과 명확히 구분되는 것을 알 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -191,29 +222,31 @@ sections:
     speciesColor = ['setosa', 'versicolor', 'virginica']
     colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 품종별 색상 구분 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figColor, axColor = plt.subplots(figsize=(10, 7))
 
       speciesColor = ['setosa', 'versicolor', 'virginica']
       colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 품종별 색상 구분 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 품종별 색상 구분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 품종별 색상 구분에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_marker
   title: 6단계. 마커 스타일 변경
   structuredPrimary: true
   subtitle: marker 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 마커 스타일 변경에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     색상뿐만 아니라 마커 모양도 다르게 설정하면 흑백 인쇄에서도 구분이 가능합니다. 'o'(원), 's'(사각형), '^'(삼각형), 'd'(다이아몬드) 등 다양한 마커를 사용할 수 있습니다. 학술 논문에서는 색상과 마커를 함께 사용하는 것이 권장됩니다.
 
     marker 파라미터로 점의 모양을 지정합니다. 주요 마커: 'o'(원), 's'(사각형), '^'(위 삼각형), 'v'(아래 삼각형), 'd'(다이아몬드), 'x'(X표), '+'(플러스). s 파라미터는 마커 크기입니다.
   tips:
-  - 'marker 파라미터로 점의 모양을 지정합니다. 주요 마커: ''o''(원), ''s''(사각형), ''^''(위 삼각형), ''v''(아래 삼각형), ''d''(다이아몬드), ''x''(X표), ''+''(플러스). s 파라미터는 마커 크기입니다.'
+  - 'marker 파라미터로 점의 모양을 지정합니다. 주요 마커: ''o''(원), ''s''(사각형), ''^''(위 삼각형), ''v''(아래 삼각형), ''d''(다이아몬드),
+    ''x''(X표), ''+''(플러스). s 파라미터는 마커 크기입니다.'
   snippet: |-
     figMarker, axMarker = plt.subplots(figsize=(10, 7))
 
@@ -221,7 +254,7 @@ sections:
     colorsMarker = ['#E74C3C', '#27AE60', '#3498DB']
     markersMarker = ['o', 's', '^']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 마커 스타일 변경 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figMarker, axMarker = plt.subplots(figsize=(10, 7))
 
@@ -229,22 +262,24 @@ sections:
       colorsMarker = ['#E74C3C', '#27AE60', '#3498DB']
       markersMarker = ['o', 's', '^']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 마커 스타일 변경 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 마커 스타일 변경 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 마커 스타일 변경에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_text
   title: 7단계. 텍스트 추가
   structuredPrimary: true
   subtitle: ax.text()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 텍스트 추가에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     차트에 텍스트를 추가하면 중요한 정보를 직접 표시할 수 있습니다. 예를 들어 각 품종 군집의 중심에 품종명을 표시하거나, 특이값에 주석을 달 수 있습니다. text() 함수로 원하는 위치에 텍스트를 배치합니다.
 
     ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bbox로 텍스트 배경 상자를 추가할 수 있습니다.
   tips:
-  - ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bbox로 텍스트 배경 상자를 추가할 수 있습니다.
+  - ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다.
+    bbox로 텍스트 배경 상자를 추가할 수 있습니다.
   snippet: |-
     figText, axText = plt.subplots(figsize=(10, 7))
 
@@ -252,7 +287,7 @@ sections:
     colorsText = ['#E74C3C', '#27AE60', '#3498DB']
     markersText = ['o', 's', '^']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 텍스트 추가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figText, axText = plt.subplots(figsize=(10, 7))
 
@@ -260,17 +295,19 @@ sections:
       colorsText = ['#E74C3C', '#27AE60', '#3498DB']
       markersText = ['o', 's', '^']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 텍스트 추가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 텍스트 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 텍스트 추가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_petal
   title: 8단계. 꽃잎 특성 산점도
   structuredPrimary: true
   subtitle: 다른 변수 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 꽃받침(sepal) 대신 꽃잎(petal) 특성으로 산점도를 그려봅니다. 꽃잎 특성에서는 품종 간 구분이 더 명확하게 나타납니다. 특히 setosa는 꽃잎이 작아서 다른 품종과 완전히 분리됩니다.
+  goal: 8단계. 꽃잎 특성 산점도에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 꽃받침(sepal) 대신 꽃잎(petal) 특성으로 산점도를 그려봅니다. 꽃잎 특성에서는 품종 간 구분이 더 명확하게 나타납니다. 특히 setosa는 꽃잎이
+    작아서 다른 품종과 완전히 분리됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -280,7 +317,7 @@ sections:
     colorsPetal = ['#E74C3C', '#27AE60', '#3498DB']
     markersPetal = ['o', 's', '^']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 꽃잎 특성 산점도 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figPetal, axPetal = plt.subplots(figsize=(10, 7))
 
@@ -288,17 +325,19 @@ sections:
       colorsPetal = ['#E74C3C', '#27AE60', '#3498DB']
       markersPetal = ['o', 's', '^']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 꽃잎 특성 산점도 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 꽃잎 특성 산점도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 꽃잎 특성 산점도에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_subplot
   title: 9단계. 2개 산점도 비교
   structuredPrimary: true
   subtitle: subplots로 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 꽃받침과 꽃잎 특성을 나란히 비교하면 어느 특성이 품종 구분에 더 유용한지 파악할 수 있습니다. 이전에 배운 subplots를 활용하여 두 차트를 한 Figure에 배치합니다.
+  goal: 9단계. 2개 산점도 비교에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 꽃받침과 꽃잎 특성을 나란히 비교하면 어느 특성이 품종 구분에 더 유용한지 파악할 수 있습니다. 이전에 배운 subplots를 활용하여 두 차트를 한 Figure에
+    배치합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -307,24 +346,26 @@ sections:
     speciesCompare = ['setosa', 'versicolor', 'virginica']
     colorsCompare = ['#E74C3C', '#27AE60', '#3498DB']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 2개 산점도 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figCompare, (axSepal, axPetalCompare) = plt.subplots(1, 2, figsize=(14, 6))
 
       speciesCompare = ['setosa', 'versicolor', 'virginica']
       colorsCompare = ['#E74C3C', '#27AE60', '#3498DB']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 2개 산점도 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 2개 산점도 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 2개 산점도 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 산점도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 품종 분류 산점도를 만듭니다. 그리드, 범례, 마커 스타일을 모두 적용하고 tight_layout으로 레이아웃을 정리합니다.
+  goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 품종 분류 산점도를 만듭니다. 그리드, 범례, 마커 스타일을 모두 적용하고 tight_layout으로 레이아웃을
+    정리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -335,7 +376,7 @@ sections:
     markersFinal = ['o', 's', '^']
     labelsFinal = ['Setosa', 'Versicolor', 'Virginica']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(11, 8))
 
@@ -344,16 +385,17 @@ sections:
       markersFinal = ['o', 's', '^']
       labelsFinal = ['Setosa', 'Versicolor', 'Virginica']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 최종 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 최종 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 최종 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 붓꽃 데이터 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 붓꽃 데이터를 다양한 관점에서 분석해봅시다. scatter, marker, text, legend, subplots 등 모든 개념을 종합적으로 활용합니다.
 
@@ -367,7 +409,7 @@ sections:
 
     iris2 = loadLocalDataset('iris')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
@@ -375,10 +417,11 @@ sections:
 
       iris2 = loadLocalDataset('iris')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -399,9 +442,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -427,7 +471,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -458,7 +502,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

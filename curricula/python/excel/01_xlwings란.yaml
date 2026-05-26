@@ -22,43 +22,44 @@ meta:
     - 로컬Python
     - 자동화
 intro:
-  direction: Excel 로컬 자동화 입문에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Excel 로컬 자동화 입문에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.
   benefits:
-  - Excel 로컬 자동화 입문 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 워크북과 시트 확인 후 셀/범위 조작에 맞는 코드 입력을 고릅니다.
+  - Excel 로컬 자동화 입문 결과를 저장 파일과 셀 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 파일 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 1단계. 로컬 Excel 자동 입력 확인
+      detail: 입력 기준(워크북과 시트)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 워크북 만들기 처리 실행
+      detail: 셀/범위 조작 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 워크북 검증 루프 결과 검증
+      detail: 저장 파일과 셀 값 기준으로 실행 결과를 비교합니다.
+    - label: Excel 로컬 자동화 입문 재사용
+      detail: 완성 코드를 업무 파일 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 엑셀 자동화 환경
+      detail: openpyxl 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Excel 로컬 자동화 입문 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Excel 로컬 자동화 입문 완료
+      detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
 sections:
 - id: intro
   title: 1단계. 로컬 Excel 자동화의 기준
   subtitle: 앱 제어 대신 파일 기반 자동화
   blocks:
   - type: text
-    content: 로컬 Python 커리큘럼에서는 Excel 프로그램을 직접 조종하기보다, xlsx 파일을 코드로 생성하고 검증하는 흐름을 먼저 배웁니다. 이 방식은 CI와 서버에서도 재현 가능하고, 사용자가 같은 파일을 업무에 바로 가져갈 수 있습니다.
+    content: 로컬 Python 커리큘럼에서는 Excel 프로그램을 직접 조종하기보다, xlsx 파일을 코드로 생성하고 검증하는 흐름을 먼저 배웁니다. 이 방식은 CI와 서버에서도
+      재현 가능하고, 사용자가 같은 파일을 업무에 바로 가져갈 수 있습니다.
   - type: tip
     content: Excel 앱 제어가 필요한 특수 업무는 나중에 선택지로 다루고, 기본 커리큘럼은 openpyxl/pandas 파일 자동화를 기준으로 잡습니다.
 - id: create_workbook
   title: 2단계. 워크북 만들기
   structuredPrimary: true
   subtitle: Workbook과 Worksheet
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 워크북 만들기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
   explanation: 2단계. 워크북 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -83,7 +84,7 @@ sections:
     assert salesPath.exists()
     salesPath
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 워크북 만들기 예제에서 리스트 값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pathlib import Path
       from tempfile import TemporaryDirectory
@@ -105,17 +106,19 @@ sections:
       assert salesPath.exists()
       salesPath
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 워크북 만들기 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 워크북 만들기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 워크북 만들기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 3단계. 워크북 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을 때 명확하게 실패시키는 흐름을 만듭니다.
+  goal: 3단계. 워크북 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+  explanation: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을
+    때 명확하게 실패시키는 흐름을 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -132,7 +135,7 @@ sections:
     assert salesValidation["rowCount"] == 3
     salesValidation
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 워크북 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 저장 파일과 셀 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def validateSalesWorksheet(worksheet):
           headers = [cell.value for cell in worksheet[1]]
@@ -147,10 +150,11 @@ sections:
       assert salesValidation["rowCount"] == 3
       salesValidation
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 워크북 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 저장 파일과 셀 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 워크북 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 워크북 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   subtitle: 파일 자동화의 기본 완주 조건

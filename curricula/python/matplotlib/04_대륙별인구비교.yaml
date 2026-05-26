@@ -17,7 +17,8 @@ meta:
   - gapminder
   seo:
     title: Matplotlib 막대 그래프 - 대륙별 인구 비교
-    description: Matplotlib으로 gapminder 데이터의 대륙별 인구를 막대 그래프로 시각화합니다. bar, barh, xticks, annotate 사용법을 배웁니다.
+    description: Matplotlib으로 gapminder 데이터의 대륙별 인구를 막대 그래프로 시각화합니다. bar, barh, xticks, annotate 사용법을
+      배웁니다.
     keywords:
     - matplotlib
     - bar
@@ -28,45 +29,71 @@ meta:
 intro:
   emoji: 🌍
   goal: 대륙별 인구를 막대 그래프로 비교 분석합니다.
-  description: 막대 그래프로 카테고리별 수치를 비교하고, annotate로 주석을 추가합니다. 이전에 배운 plot, hist, scatter, subplots 개념을 함께 활용합니다.
+  description: 막대 그래프로 카테고리별 수치를 비교하고, annotate로 주석을 추가합니다. 이전에 배운 plot, hist, scatter, subplots 개념을 함께
+    활용합니다.
+  direction: 대륙별인구비교에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 대륙별인구비교 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 대륙별인구비교 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 대륙별인구비교 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 대륙별인구비교 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, Codaro 로컬 데이터셋에서 직접 불러와 인터넷 연결 없이 실행할 수 있습니다.
 
     import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
   tips:
-  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는
+    것이 데이터 과학 커뮤니티의 표준입니다.
   snippet: |-
     import matplotlib.pyplot as plt
     import pandas as pd
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import pandas as pd
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
   structuredPrimary: true
   subtitle: Codaro 로컬 Python 환경 폰트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
 
     font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
   tips:
-  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
   snippet: |-
     from matplotlib import font_manager
 
@@ -78,7 +105,7 @@ sections:
             break
     plt.rcParams["axes.unicode_minus"] = False
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from matplotlib import font_manager
 
@@ -90,17 +117,19 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 한글 폰트 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 한글 폰트 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: Codaro 로컬 데이터셋에서 로드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에 적합합니다.
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에
+    적합합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -109,23 +138,24 @@ sections:
     gapminder = loadLocalDataset("gapminder")
     gapminder.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       gapminder = loadLocalDataset("gapminder")
       gapminder.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_filter
   title: 3단계. 2007년 데이터 필터링
   structuredPrimary: true
   subtitle: 최근 연도 선택
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 2007년 데이터 필터링에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 대륙별 비교를 위해 가장 최근 연도인 2007년 데이터만 추출합니다. 불리언 인덱싱으로 year 컬럼이 2007인 행만 선택합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -133,22 +163,24 @@ sections:
     data2007 = gapminder[gapminder['year'] == 2007]
     data2007.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 2007년 데이터 필터링 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       data2007 = gapminder[gapminder['year'] == 2007]
       data2007.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 2007년 데이터 필터링 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 2007년 데이터 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 2007년 데이터 필터링에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_groupby
   title: 4단계. 대륙별 인구 집계
   structuredPrimary: true
   subtitle: groupby().sum()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame 형태로 변환합니다. 억 단위로 표시하기 위해 10억으로 나눕니다.
+  goal: 4단계. 대륙별 인구 집계에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame
+    형태로 변환합니다. 억 단위로 표시하기 위해 10억으로 나눕니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -156,28 +188,30 @@ sections:
     popByContinent['popBillion'] = popByContinent['pop'] / 1e9
     popByContinent
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 대륙별 인구 집계 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
       popByContinent['popBillion'] = popByContinent['pop'] / 1e9
       popByContinent
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 대륙별 인구 집계 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 대륙별 인구 집계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 대륙별 인구 집계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_bar
   title: 5단계. 기본 막대 그래프
   structuredPrimary: true
   subtitle: ax.bar()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 기본 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     ax.bar()로 수직 막대 그래프를 그립니다. 첫 번째 인자는 x축 위치(카테고리), 두 번째 인자는 막대 높이(수치)입니다. 대륙별 인구를 한눈에 비교할 수 있습니다.
 
     ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
   tips:
-  - ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
+  - ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할
+    수 있습니다(기본값 0.8).
   snippet: |-
     figBar, axBar = plt.subplots(figsize=(10, 6))
     axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
@@ -186,7 +220,7 @@ sections:
     axBar.set_ylabel('인구 (10억 명)', fontsize=12)
     figBar
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 기본 막대 그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figBar, axBar = plt.subplots(figsize=(10, 6))
       axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
@@ -195,16 +229,17 @@ sections:
       axBar.set_ylabel('인구 (10억 명)', fontsize=12)
       figBar
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 기본 막대 그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 기본 막대 그래프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 기본 막대 그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_color
   title: 6단계. 색상 설정
   structuredPrimary: true
   subtitle: color 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 색상 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 각 막대에 다른 색상을 지정하면 시각적 구분이 명확해집니다. color 파라미터에 색상 리스트를 전달하면 각 막대에 순서대로 색상이 적용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -217,7 +252,7 @@ sections:
     axColor.set_ylabel('인구 (10억 명)', fontsize=12)
     figColor
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 색상 설정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figColor, axColor = plt.subplots(figsize=(10, 6))
       colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -227,22 +262,24 @@ sections:
       axColor.set_ylabel('인구 (10억 명)', fontsize=12)
       figColor
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 색상 설정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 색상 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 색상 설정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_xticks
   title: 7단계. x축 눈금 조정
   structuredPrimary: true
   subtitle: set_xticks(), rotation
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. x축 눈금 조정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     x축 라벨이 길거나 많을 때는 회전시키면 겹침을 방지할 수 있습니다. tick_params의 rotation으로 라벨 각도를 조정합니다. 한글 라벨로 변경하여 가독성을 높입니다.
 
     ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
   tips:
-  - ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
+  - ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로
+    라벨 텍스트를 직접 지정할 수도 있습니다.
   snippet: |-
     figTicks, axTicks = plt.subplots(figsize=(10, 6))
     colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -255,7 +292,7 @@ sections:
     axTicks.tick_params(axis='x', rotation=0)
     figTicks
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. x축 눈금 조정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figTicks, axTicks = plt.subplots(figsize=(10, 6))
       colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -268,22 +305,24 @@ sections:
       axTicks.tick_params(axis='x', rotation=0)
       figTicks
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. x축 눈금 조정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. x축 눈금 조정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. x축 눈금 조정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_annotate
   title: 8단계. 막대 위에 값 표시
   structuredPrimary: true
   subtitle: ax.annotate()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 막대 위에 값 표시에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     각 막대 위에 정확한 수치를 표시하면 정보 전달력이 높아집니다. annotate()로 지정한 위치에 텍스트를 추가합니다. 막대의 x좌표와 높이를 이용해 위치를 계산합니다.
 
     ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
   tips:
-  - ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
+  - ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로
+    정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
   snippet: |-
     figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
     colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -293,7 +332,7 @@ sections:
     barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
     figAnnotate
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 막대 위에 값 표시 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
       colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
@@ -303,22 +342,24 @@ sections:
       barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
       figAnnotate
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 막대 위에 값 표시 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 막대 위에 값 표시 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 막대 위에 값 표시에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_barh
   title: 9단계. 수평 막대 그래프
   structuredPrimary: true
   subtitle: ax.barh()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 수평 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     카테고리명이 길거나 비교 항목이 많을 때는 수평 막대 그래프가 더 읽기 쉽습니다. barh()를 사용하면 막대가 수평으로 그려집니다. 인구가 많은 순서로 정렬하면 순위를 쉽게 파악할 수 있습니다.
 
     ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
   tips:
-  - ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
+  - ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할
+    수 있습니다.
   snippet: |-
     figBarh, axBarh = plt.subplots(figsize=(10, 6))
 
@@ -329,7 +370,7 @@ sections:
     barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
     figBarh
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 수평 막대 그래프 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figBarh, axBarh = plt.subplots(figsize=(10, 6))
 
@@ -340,16 +381,17 @@ sections:
       barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
       figBarh
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 수평 막대 그래프 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 수평 막대 그래프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 수평 막대 그래프에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_final
   title: 10단계. 최종 시각화
   structuredPrimary: true
   subtitle: 완성된 막대 그래프
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 대륙별 인구 비교 차트를 만듭니다. 그리드, 스파인 제거, 값 레이블을 모두 적용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -363,7 +405,7 @@ sections:
     barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
     figFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFinal, axFinal = plt.subplots(figsize=(11, 7))
 
@@ -374,16 +416,17 @@ sections:
       barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
       figFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 최종 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 최종 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 최종 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 대륙별 데이터 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
   explanation: |-
     지금까지 배운 내용을 활용해서 gapminder 데이터를 다양한 관점에서 분석해봅시다. bar, barh, xticks, annotate 등 모든 개념을 종합적으로 활용합니다.
 
@@ -401,7 +444,7 @@ sections:
     lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
     lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import matplotlib.pyplot as plt
       import pandas as pd
@@ -413,10 +456,11 @@ sections:
       lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
       lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -437,9 +481,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 보고서 차트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -465,7 +510,7 @@ sections:
     validateChartFrame(reportData)
     reportData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 축/범례/파일 출력 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
           monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
@@ -496,7 +541,8 @@ sections:
       validateChartFrame(reportData)
       reportData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 축/범례/파일 출력 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

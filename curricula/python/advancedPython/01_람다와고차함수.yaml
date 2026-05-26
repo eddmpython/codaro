@@ -28,13 +28,35 @@ intro:
   - map()으로 데이터 일괄 변환
   - filter()로 조건에 맞는 데이터 추출
   - reduce()로 데이터를 하나의 값으로 축약
+  direction: 람다와 고차 함수에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 람다와 고차 함수 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 람다 표현식 기초 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: map() 함수 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: filter() 함수 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 람다와 고차 함수 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 람다와 고차 함수 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 람다와 고차 함수 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: lambda_basics
   title: 람다 표현식 기초
   structuredPrimary: true
   subtitle: 익명 함수의 힘
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 람다 표현식 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     람다(lambda)는 이름 없는 함수를 한 줄로 정의하는 파이썬의 강력한 기능입니다. 일반 함수가 def 키워드로 여러 줄에 걸쳐 정의되는 것과 달리, 람다는 lambda 인자: 표현식 형태로 단 한 줄에 작성됩니다. 람다는 단일 표현식만 허용하며, 그 표현식의 결과가 자동으로 반환됩니다. return 키워드를 사용할 수 없고, if문이나 for문 같은 복합문도 사용할 수 없습니다. 람다는 주로 다른 함수의 인자로 전달되는 일회성 함수가 필요할 때 사용합니다. 예를 들어 sorted()의 key 인자나 map(), filter()에 전달하는 함수로 자주 활용됩니다.
 
@@ -45,21 +67,22 @@ sections:
     add = lambda x, y: x + y
     add(3, 5)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 람다 표현식 기초 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       add = lambda x, y: x + y
       add(3, 5)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 람다 표현식 기초 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 람다 표현식 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 람다 표현식 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: map_function
   title: map() 함수
   structuredPrimary: true
   subtitle: 데이터 일괄 변환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: map() 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     map() 함수는 iterable의 모든 요소에 함수를 적용하여 새로운 map 객체를 반환합니다. map(함수, iterable) 형태로 사용하며, 원본 데이터를 변경하지 않고 각 요소를 변환한 결과를 생성합니다. map은 지연 평가(lazy evaluation)를 수행하여 실제로 값이 필요할 때까지 계산을 미룹니다. 따라서 메모리 효율적이며, 무한 시퀀스에도 적용할 수 있습니다. 결과를 리스트로 얻으려면 list()로 변환해야 합니다. map은 여러 iterable을 동시에 받을 수 있어서 zip과 유사하게 병렬 처리가 가능합니다.
 
@@ -71,22 +94,23 @@ sections:
     squared = map(lambda x: x ** 2, nums)
     list(squared)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: map() 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       nums = [1, 2, 3, 4, 5]
       squared = map(lambda x: x ** 2, nums)
       list(squared)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - map() 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: map() 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: map() 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: filter_function
   title: filter() 함수
   structuredPrimary: true
   subtitle: 조건부 데이터 추출
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: filter() 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     filter() 함수는 iterable에서 조건을 만족하는 요소만 걸러내는 함수입니다. filter(함수, iterable) 형태로 사용하며, 함수가 True를 반환하는 요소만 포함하는 filter 객체를 생성합니다. map과 마찬가지로 지연 평가를 수행합니다. 첫 번째 인자로 None을 전달하면 요소 자체의 참/거짓을 기준으로 필터링합니다. 즉, filter(None, iterable)은 falsy 값(0, '', None, [], {} 등)을 제거하고 truthy 값만 남깁니다. 데이터 정제나 조건부 추출에 매우 유용합니다.
 
@@ -98,22 +122,23 @@ sections:
     evens = filter(lambda x: x % 2 == 0, numbers)
     list(evens)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: filter() 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       evens = filter(lambda x: x % 2 == 0, numbers)
       list(evens)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - filter() 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: filter() 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: filter() 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: reduce_function
   title: reduce() 함수
   structuredPrimary: true
   subtitle: 데이터 축약
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: reduce() 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     reduce() 함수는 iterable의 요소들을 누적하여 하나의 값으로 축약합니다. functools 모듈에서 import해야 사용할 수 있습니다. reduce(함수, iterable, 초기값) 형태로 사용하며, 함수는 두 개의 인자(누적값, 현재값)를 받아 새로운 누적값을 반환합니다. 초기값을 지정하지 않으면 iterable의 첫 번째 요소가 초기값이 됩니다. 합계, 곱셈, 최댓값/최솟값 찾기, 문자열 연결 등 다양한 축약 연산에 활용됩니다. 그러나 sum(), max(), min() 같은 내장 함수가 있는 경우에는 그것을 사용하는 것이 더 명확합니다.
 
@@ -126,23 +151,24 @@ sections:
     total = reduce(lambda acc, x: acc + x, vals)
     total
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: reduce() 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from functools import reduce
       vals = [1, 2, 3, 4, 5]
       total = reduce(lambda acc, x: acc + x, vals)
       total
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - reduce() 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: reduce() 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: reduce() 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: higher_order
   title: 고차 함수
   structuredPrimary: true
   subtitle: 함수를 다루는 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 고차 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     고차 함수(Higher-Order Function)는 함수를 인자로 받거나 함수를 반환하는 함수입니다. 파이썬에서 함수는 일급 객체(first-class object)이므로 변수에 할당하거나, 다른 함수에 전달하거나, 함수에서 반환할 수 있습니다. map, filter, reduce, sorted의 key 인자 등이 모두 고차 함수입니다. 고차 함수를 활용하면 코드 재사용성이 높아지고, 함수형 프로그래밍 스타일로 간결하게 로직을 표현할 수 있습니다. 함수를 반환하는 패턴은 팩토리, 데코레이터, 클로저 등에서 핵심적으로 사용됩니다.
 
@@ -156,7 +182,7 @@ sections:
     double = lambda n: n * 2
     applyTwice(double, 3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 고차 함수 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def applyTwice(func, x):
           return func(func(x))
@@ -164,16 +190,17 @@ sections:
       double = lambda n: n * 2
       applyTwice(double, 3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 고차 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 고차 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 고차 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practical_patterns
   title: 실전 패턴
   structuredPrimary: true
   subtitle: 함수형 프로그래밍 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     함수형 프로그래밍에서는 map, filter, reduce를 조합하여 데이터 처리 파이프라인을 구성합니다. 원본 데이터를 변경하지 않고 변환과 필터링을 연쇄적으로 적용하여 최종 결과를 얻습니다. 이 방식은 부수 효과(side effect)가 없어 코드의 예측 가능성과 테스트 용이성이 높아집니다. 다만 파이썬에서는 리스트 컴프리헨션이나 제너레이터 표현식이 더 파이썬다운(Pythonic) 방식으로 여겨집니다. 상황에 따라 가독성이 좋은 방식을 선택하세요.
 
@@ -188,7 +215,7 @@ sections:
     step3 = reduce(lambda a, b: a + b, step2)
     step3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 패턴 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from functools import reduce
       data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -197,16 +224,17 @@ sections:
       step3 = reduce(lambda a, b: a + b, step2)
       step3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 패턴 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 패턴에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기'
   structuredPrimary: true
   subtitle: 예측 → 변환 → 필터링 → 축약 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     람다와 고차 함수는 문법 묘기가 아니라, 규칙이 짧고 명확한 데이터 파이프라인에서 힘을 발휘합니다. 아래 흐름은 결제 이벤트를 정제하고, 성공 결제만 골라 매출을 계산한 뒤, 잘못된 금액 입력까지 검증합니다.
 
@@ -250,7 +278,7 @@ sections:
 
     print("고차 함수 결제 파이프라인 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from functools import reduce
 
@@ -287,29 +315,34 @@ sections:
 
       print("고차 함수 결제 파이프라인 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 람다와 고차 함수 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 1에서 배운 람다, map, filter, reduce, 고차 함수를 난이도별로 복습합니다. 람다 표현식은 간결한 일회성 함수가 필요할 때 강력한 도구이며, map과 filter는 데이터 변환과 필터링의 기본입니다. reduce는 누적 연산에, 고차 함수는 코드 재사용성을 높이는 패턴입니다. 🟢 기본 문제로 각 함수의 기본 사용법을 익히고, 🟡 응용 문제로 조합 패턴을 연습하세요. 🔴 심화 문제에서는 함수 합성, 커링, 파이프라인 등 고급 함수형 패턴을 직접 구현해봅니다. 실무에서는 리스트 컴프리헨션과 적절히 혼용하는 것이 파이썬다운 코드 작성의 핵심입니다.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 1에서 배운 람다, map, filter, reduce, 고차 함수를 난이도별로 복습합니다. 람다 표현식은 간결한 일회성 함수가 필요할 때 강력한 도구이며,
+    map과 filter는 데이터 변환과 필터링의 기본입니다. reduce는 누적 연산에, 고차 함수는 코드 재사용성을 높이는 패턴입니다. 🟢 기본 문제로 각 함수의 기본 사용법을
+    익히고, 🟡 응용 문제로 조합 패턴을 연습하세요. 🔴 심화 문제에서는 함수 합성, 커링, 파이프라인 등 고급 함수형 패턴을 직접 구현해봅니다. 실무에서는 리스트 컴프리헨션과 적절히
+    혼용하는 것이 파이썬다운 코드 작성의 핵심입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     cube = lambda x: x ** 3
     cube(4)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cube = lambda x: x ** 3
       cube(4)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

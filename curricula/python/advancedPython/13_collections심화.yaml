@@ -13,7 +13,8 @@ meta:
   - 자료구조선택
   seo:
     title: 파이썬 collections 모듈 완벽 가이드 - 특수 자료구조
-    description: collections 모듈을 마스터합니다. namedtuple, defaultdict, Counter, deque, OrderedDict, ChainMap 완벽 이해.
+    description: collections 모듈을 마스터합니다. namedtuple, defaultdict, Counter, deque, OrderedDict, ChainMap
+      완벽 이해.
     keywords:
     - namedtuple
     - defaultdict
@@ -27,13 +28,35 @@ intro:
   - defaultdict로 KeyError 없는 딕셔너리
   - Counter로 빈도 계산
   - deque로 양방향 큐
+  direction: collections 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - collections 심화 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: namedtuple 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: defaultdict 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: Counter 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: collections 심화 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: collections 심화 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: collections 심화 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: namedtuple
   title: namedtuple
   structuredPrimary: true
   subtitle: 이름 있는 튜플
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: namedtuple에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     namedtuple은 인덱스 대신 이름으로 요소에 접근할 수 있는 튜플입니다. 일반 튜플처럼 불변(immutable)이고 해시 가능합니다. 메모리 효율적이며 일반 클래스보다 가볍습니다. _fields, _asdict(), _replace() 등 유용한 메서드를 제공합니다. 간단한 데이터 구조에 적합하며, 더 복잡한 경우 dataclass를 사용합니다. Python 3.6+에서는 typing.NamedTuple로 타입 힌트를 추가할 수 있습니다.
 
@@ -47,7 +70,7 @@ sections:
     pt = Point(3, 4)
     pt.x, pt.y, pt[0], pt[1]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: namedtuple 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import namedtuple
 
@@ -55,16 +78,17 @@ sections:
       pt = Point(3, 4)
       pt.x, pt.y, pt[0], pt[1]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - namedtuple 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: namedtuple 코드가 예외 없이 끝나야 합니다.
+    resultCheck: namedtuple에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: defaultdict
   title: defaultdict
   structuredPrimary: true
   subtitle: 기본값 딕셔너리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: defaultdict에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     defaultdict는 존재하지 않는 키에 접근할 때 자동으로 기본값을 생성합니다. 생성자에 팩토리 함수를 전달합니다. list, int, set 등을 팩토리로 자주 사용합니다. 그룹화, 카운팅, 집계 등의 패턴에서 if 키 존재 검사를 제거합니다. 일반 딕셔너리처럼 모든 메서드를 사용할 수 있습니다. 중첩 defaultdict로 다차원 구조도 만들 수 있습니다.
 
@@ -82,7 +106,7 @@ sections:
 
     dict(grouped)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: defaultdict 예제에서 반복 대상이나 범위을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import defaultdict
 
@@ -94,16 +118,17 @@ sections:
 
       dict(grouped)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - defaultdict 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: defaultdict 코드가 예외 없이 끝나야 합니다.
+    resultCheck: defaultdict에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: counter
   title: Counter
   structuredPrimary: true
   subtitle: 빈도 계산
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Counter에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     Counter는 해시 가능한 객체의 개수를 세는 특수 딕셔너리입니다. iterable을 전달하면 자동으로 빈도를 계산합니다. most_common(n)으로 가장 흔한 n개를 가져옵니다. Counter끼리 +, -, &, | 연산이 가능합니다. elements()로 개수만큼 요소를 반복합니다. 텍스트 분석, 투표 집계 등에 유용합니다.
 
@@ -117,7 +142,7 @@ sections:
     counts = Counter(text)
     counts, counts.most_common(3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Counter 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import Counter
 
@@ -125,16 +150,17 @@ sections:
       counts = Counter(text)
       counts, counts.most_common(3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Counter 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Counter 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Counter에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: deque
   title: deque
   structuredPrimary: true
   subtitle: 양방향 큐
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: deque에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     deque(double-ended queue)는 양 끝에서 O(1) 시간에 추가/삭제가 가능합니다. 리스트의 왼쪽 삽입/삭제는 O(n)이지만 deque는 O(1)입니다. maxlen을 지정하면 고정 크기 버퍼로 동작합니다. rotate(n)으로 요소를 회전할 수 있습니다. 큐, 스택, 슬라이딩 윈도우 등에 사용합니다. appendleft, popleft, extendleft 등 왼쪽 연산을 지원합니다.
 
@@ -149,7 +175,7 @@ sections:
     queue.appendleft(0)
     queue.pop(), queue.popleft(), list(queue)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: deque 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import deque
 
@@ -158,16 +184,17 @@ sections:
       queue.appendleft(0)
       queue.pop(), queue.popleft(), list(queue)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - deque 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: deque 코드가 예외 없이 끝나야 합니다.
+    resultCheck: deque에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: ordereddict
   title: OrderedDict
   structuredPrimary: true
   subtitle: 순서 보장 딕셔너리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: OrderedDict에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     OrderedDict는 삽입 순서를 보장하는 딕셔너리입니다. Python 3.7+에서 일반 dict도 순서를 보장하지만, OrderedDict는 추가 기능이 있습니다. move_to_end()로 요소를 끝으로 이동할 수 있습니다. 순서까지 고려하여 동등성을 비교합니다. popitem(last=False)로 첫 번째 항목을 제거할 수 있습니다. LRU 캐시 구현 등에 유용합니다.
 
@@ -183,7 +210,7 @@ sections:
     od['c'] = 3
     list(od.items())
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: OrderedDict 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import OrderedDict
 
@@ -193,16 +220,17 @@ sections:
       od['c'] = 3
       list(od.items())
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - OrderedDict 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: OrderedDict 코드가 예외 없이 끝나야 합니다.
+    resultCheck: OrderedDict에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: chainmap
   title: ChainMap
   structuredPrimary: true
   subtitle: 딕셔너리 체인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: ChainMap에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     ChainMap은 여러 딕셔너리를 하나처럼 연결합니다. 키 검색은 첫 번째 딕셔너리부터 순서대로 진행됩니다. 쓰기 작업은 첫 번째 딕셔너리에만 적용됩니다. 설정 계층(기본값 → 사용자 설정 → 환경변수)에 유용합니다. new_child()로 새 계층을 추가할 수 있습니다. maps 속성으로 원본 딕셔너리 리스트에 접근합니다.
 
@@ -218,7 +246,7 @@ sections:
     config = ChainMap(userSettings, defaults)
     config['theme'], config['language']
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: ChainMap 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import ChainMap
 
@@ -228,16 +256,17 @@ sections:
       config = ChainMap(userSettings, defaults)
       config['theme'], config['language']
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - ChainMap 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: ChainMap 코드가 예외 없이 끝나야 합니다.
+    resultCheck: ChainMap에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 지원 티켓 큐 정리하기'
   structuredPrimary: true
   subtitle: namedtuple, defaultdict, Counter, deque, ChainMap을 하나의 운영 흐름으로 묶습니다
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 지원 티켓 큐 정리하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     collections는 암기할 모듈이 아니라 문제에 맞는 자료구조를 고르는 연습입니다. 지원 티켓을 분류하고, 우선순위 큐를 만들고, 설정 우선순위를 합치며 각 선택이 왜 필요한지 확인하세요.
 
@@ -276,7 +305,7 @@ sections:
     assert config["slaHours"] == 4
     assert config["assignee"] == "support"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 지원 티켓 큐 정리하기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from collections import ChainMap, Counter, defaultdict, deque, namedtuple
 
@@ -308,17 +337,21 @@ sections:
       assert config["slaHours"] == 4
       assert config["assignee"] == "support"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 지원 티켓 큐 정리하기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 지원 티켓 큐 정리하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 지원 티켓 큐 정리하기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: collections 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 13에서 배운 collections 모듈을 난이도별로 복습합니다. collections는 내장 자료구조를 확장한 특수 컨테이너를 제공하는 표준 라이브러리입니다. namedtuple로 이름 있는 튜플, defaultdict로 기본값 딕셔너리, Counter로 빈도 계산, deque로 양방향 큐를 구현합니다. 🟢 기본 문제로 각 자료구조의 기본 사용법을 익히고, 🟡 응용 문제로 중첩 defaultdict, Counter 연산을 연습하세요. 🔴 심화 문제에서는 LRU 캐시, 슬라이딩 윈도우, 복합 자료구조 등 실무 패턴을 다룹니다. 적절한 자료구조 선택은 코드 가독성과 성능 모두에 큰 영향을 미칩니다.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 13에서 배운 collections 모듈을 난이도별로 복습합니다. collections는 내장 자료구조를 확장한 특수 컨테이너를 제공하는 표준 라이브러리입니다.
+    namedtuple로 이름 있는 튜플, defaultdict로 기본값 딕셔너리, Counter로 빈도 계산, deque로 양방향 큐를 구현합니다. 🟢 기본 문제로 각 자료구조의
+    기본 사용법을 익히고, 🟡 응용 문제로 중첩 defaultdict, Counter 연산을 연습하세요. 🔴 심화 문제에서는 LRU 캐시, 슬라이딩 윈도우, 복합 자료구조 등 실무
+    패턴을 다룹니다. 적절한 자료구조 선택은 코드 가독성과 성능 모두에 큰 영향을 미칩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -328,7 +361,7 @@ sections:
     red = Color(255, 0, 0)
     red.r, red.g, red.b
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from collections import namedtuple
 
@@ -336,7 +369,8 @@ sections:
       red = Color(255, 0, 0)
       red.r, red.g, red.b
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

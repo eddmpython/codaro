@@ -25,14 +25,37 @@ meta:
 intro:
   emoji: 🔢
   goal: 대량의 마커를 클러스터로 효율적으로 표시합니다.
-  description: 마커가 많으면 지도가 느려지고 보기 어렵습니다. MarkerCluster는 가까운 마커들을 숫자로 그룹화하고, 줌인하면 개별 마커가 나타납니다. 수천 개의 위치도 깔끔하게 표시할 수 있습니다.
+  description: 마커가 많으면 지도가 느려지고 보기 어렵습니다. MarkerCluster는 가까운 마커들을 숫자로 그룹화하고, 줌인하면 개별 마커가 나타납니다. 수천 개의
+    위치도 깔끔하게 표시할 수 있습니다.
+  direction: 마커 클러스터에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 마커 클러스터 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 클러스터 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 대량 데이터 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 마커 클러스터 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 마커 클러스터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 마커 클러스터 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: folium과 MarkerCluster 플러그인을 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -40,21 +63,22 @@ sections:
     import folium
     from folium.plugins import MarkerCluster
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import MarkerCluster
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_basic_cluster
   title: 2단계. 기본 클러스터
   structuredPrimary: true
   subtitle: MarkerCluster()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     MarkerCluster를 생성하고 마커를 추가합니다. 마커들이 자동으로 그룹화됩니다.
 
@@ -84,7 +108,7 @@ sections:
 
     m1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=12)
@@ -108,16 +132,17 @@ sections:
 
       m1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 클러스터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step3_large_data
   title: 3단계. 대량 데이터
   structuredPrimary: true
   subtitle: 많은 마커
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 대량 데이터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     수백 개의 마커를 클러스터로 효율적으로 표시합니다.
 
@@ -137,7 +162,7 @@ sections:
 
     m2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 대량 데이터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import random
 
@@ -151,16 +176,17 @@ sections:
 
       m2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 대량 데이터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 대량 데이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 대량 데이터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step4_popup_tooltip
   title: 4단계. 팝업과 툴팁
   structuredPrimary: true
   subtitle: 마커 정보
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 팝업과 툴팁에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     클러스터 내 마커에도 팝업과 툴팁을 추가할 수 있습니다.
 
@@ -189,7 +215,7 @@ sections:
 
     m3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 팝업과 툴팁 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m3 = folium.Map(location=seoulCenter, zoom_start=13)
       cluster3 = MarkerCluster().add_to(m3)
@@ -212,16 +238,17 @@ sections:
 
       m3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 팝업과 툴팁 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 팝업과 툴팁 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 팝업과 툴팁에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step5_custom_icon
   title: 5단계. 커스텀 아이콘
   structuredPrimary: true
   subtitle: Icon 적용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 커스텀 아이콘에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     클러스터 내 마커에 커스텀 아이콘을 적용합니다.
 
@@ -249,7 +276,7 @@ sections:
 
     m4
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 커스텀 아이콘 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=12)
       cluster4 = MarkerCluster().add_to(m4)
@@ -271,16 +298,17 @@ sections:
 
       m4
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 커스텀 아이콘 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 커스텀 아이콘 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 커스텀 아이콘에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_multiple_clusters
   title: 6단계. 여러 클러스터
   structuredPrimary: true
   subtitle: 카테고리별 분류
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 여러 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     카테고리별로 별도의 클러스터를 만들어 분류합니다.
 
@@ -323,7 +351,7 @@ sections:
 
     m5
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 여러 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -360,16 +388,17 @@ sections:
 
       m5
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 여러 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 여러 클러스터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 여러 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step7_cluster_options
   title: 7단계. 클러스터 옵션
   structuredPrimary: true
   subtitle: 동작 설정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 클러스터 옵션에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     MarkerCluster에 다양한 옵션을 설정할 수 있습니다.
 
@@ -396,7 +425,7 @@ sections:
 
     m6
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 클러스터 옵션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import random
 
@@ -417,16 +446,17 @@ sections:
 
       m6
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 클러스터 옵션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 클러스터 옵션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 클러스터 옵션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step8_show_coverage
   title: 8단계. 커버리지 표시
   structuredPrimary: true
   subtitle: 클러스터 범위
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 커버리지 표시에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     showCoverageOnHover 옵션으로 클러스터의 범위를 시각화합니다.
 
@@ -451,7 +481,7 @@ sections:
 
     m7
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 커버리지 표시 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import random
 
@@ -470,16 +500,17 @@ sections:
 
       m7
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 커버리지 표시 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 커버리지 표시 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 커버리지 표시에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step9_with_other_elements
   title: 9단계. 다른 요소와 조합
   structuredPrimary: true
   subtitle: 클러스터 + 도형
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 다른 요소와 조합에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     클러스터와 일반 마커, 도형을 함께 사용합니다.
 
@@ -520,7 +551,7 @@ sections:
 
     m8
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 다른 요소와 조합 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import random
 
@@ -555,16 +586,17 @@ sections:
 
       m8
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 다른 요소와 조합 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 다른 요소와 조합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 다른 요소와 조합에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 전국 매장 지도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 전국 매장 위치를 클러스터로 표시하는 완성 예제입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -620,7 +652,7 @@ sections:
 
     storeMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import random
 
@@ -673,22 +705,24 @@ sections:
 
       storeMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 클러스터 검증
   structuredPrimary: true
   subtitle: 예측 → 분류 오류 확인 → 렌더 검증 → 임계값 실험
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 실무 클러스터 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     마커 클러스터는 대량 위치를 빠르게 보여주지만, 데이터 분류가 틀리면 숫자가 그럴듯해도 업무 판단은 틀립니다. 클러스터에 넣기 전에 좌표와 카테고리를 검증하고, 렌더된 HTML에 지점명과 레이어 이름이 들어갔는지 확인해야 합니다.
 
     클러스터 지도는 마커 수를 줄이는 기술이 아니라 대량 위치 데이터를 운영 단위로 묶는 방법입니다. 좌표, 카테고리, 레이어, 렌더 결과를 검증해야 숫자를 믿고 업무 판단을 내릴 수 있습니다.
   tips:
-  - 클러스터 지도는 마커 수를 줄이는 기술이 아니라 대량 위치 데이터를 운영 단위로 묶는 방법입니다. 좌표, 카테고리, 레이어, 렌더 결과를 검증해야 숫자를 믿고 업무 판단을 내릴 수 있습니다.
+  - 클러스터 지도는 마커 수를 줄이는 기술이 아니라 대량 위치 데이터를 운영 단위로 묶는 방법입니다. 좌표, 카테고리, 레이어, 렌더 결과를 검증해야 숫자를 믿고 업무 판단을 내릴
+    수 있습니다.
   snippet: |-
     fieldTickets = [
         {"id": "T-101", "name": "강남 설치", "loc": [37.4979, 127.0276], "category": "install", "priority": "high"},
@@ -712,7 +746,7 @@ sections:
     busiestCategory = max(ticketCountByCategory, key=ticketCountByCategory.get)
     busiestCategory, ticketCountByCategory
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 실무 클러스터 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       fieldTickets = [
           {"id": "T-101", "name": "강남 설치", "loc": [37.4979, 127.0276], "category": "install", "priority": "high"},
@@ -736,16 +770,17 @@ sections:
       busiestCategory = max(ticketCountByCategory, key=ticketCountByCategory.get)
       busiestCategory, ticketCountByCategory
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 실무 클러스터 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 실무 클러스터 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 실무 클러스터 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 마커 클러스터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -762,7 +797,7 @@ sections:
 
     len(convenienceStores)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import MarkerCluster
@@ -776,7 +811,8 @@ sections:
 
       len(convenienceStores)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

@@ -180,10 +180,20 @@ def _hasStructuredExercise(section: LearningSectionContract) -> bool:
 
 
 def _formatStructuredCheck(check: dict[str, str]) -> str:
-    lines = ["### 검증/피드백"]
+    lines = ["### 검증 기준"]
     for key, value in check.items():
-        lines.append(f"- **{key}**: {value}")
+        lines.append(f"- **{_checkLabel(key)}**: {value}")
     return "\n".join(lines)
+
+
+def _checkLabel(key: str) -> str:
+    labels = {
+        "noError": "오류 없이 실행",
+        "resultCheck": "결과 확인",
+        "assertCheck": "assert 통과",
+        "outputCheck": "출력 확인",
+    }
+    return labels.get(key, key)
 
 
 def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: str | None = None) -> list[BlockConfig]:
@@ -266,6 +276,20 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
         ]
 
     if sourceType in MEDIA_TYPES:
+        src = _textValue(
+            block.get("src")
+            or block.get("url")
+            or block.get("href")
+            or block.get("imageUrl")
+            or block.get("videoUrl")
+            or block.get("buttonLink")
+            or block.get("youtubeId")
+            or block.get("videoId")
+            or block.get("youtube")
+        )
+        items = _firstMaps(block, "items", "videos")
+        if not any([src, items, title, subtitle, description]):
+            return []
         return [
             _markdownBlock(
                 _formatMedia(block, sourceType, title, subtitle, description),
@@ -654,7 +678,17 @@ def _formatCompare(block: dict[str, Any], fallbackTitle: str) -> str:
 
 
 def _formatMedia(block: dict[str, Any], sourceType: str, title: str, subtitle: str, description: str) -> str:
-    src = _textValue(block.get("src") or block.get("url") or block.get("href") or block.get("youtube"))
+    src = _textValue(
+        block.get("src")
+        or block.get("url")
+        or block.get("href")
+        or block.get("imageUrl")
+        or block.get("videoUrl")
+        or block.get("buttonLink")
+        or block.get("youtubeId")
+        or block.get("videoId")
+        or block.get("youtube")
+    )
     if sourceType == "image" and src:
         return f"![{title or subtitle or 'Image'}]({src})"
     items = _firstMaps(block, "items", "videos")

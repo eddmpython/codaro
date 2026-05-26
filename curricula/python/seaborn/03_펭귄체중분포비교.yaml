@@ -27,15 +27,39 @@ meta:
 intro:
   emoji: 🐧
   goal: 펭귄 종별/성별 체중 분포를 박스플롯과 바이올린플롯으로 비교합니다.
-  description: boxplot으로 분포의 요약 통계량을, violinplot으로 분포의 모양을 시각화합니다. hue로 성별을 추가하여 다중 그룹을 비교합니다. 이전에 배운 scatterplot, histplot, stripplot 개념을 함께 활용합니다.
+  description: boxplot으로 분포의 요약 통계량을, violinplot으로 분포의 모양을 시각화합니다. hue로 성별을 추가하여 다중 그룹을 비교합니다. 이전에 배운
+    scatterplot, histplot, stripplot 개념을 함께 활용합니다.
+  direction: 펭귄체중분포비교에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 펭귄체중분포비교 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 박스플롯 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 펭귄체중분포비교 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 펭귄체중분포비교 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 펭귄체중분포비교 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: seaborn과 matplotlib을 불러옵니다. penguins 데이터는 남극 팔머 군도에서 수집한 펭귄 데이터입니다. Adelie, Chinstrap, Gentoo 세 종의 부리 크기, 날개 길이, 체중 등이 측정되어 있습니다.
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: seaborn과 matplotlib을 불러옵니다. penguins 데이터는 남극 팔머 군도에서 수집한 펭귄 데이터입니다. Adelie, Chinstrap,
+    Gentoo 세 종의 부리 크기, 날개 길이, 체중 등이 측정되어 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -43,23 +67,25 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: penguins 데이터셋
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: penguins 데이터셋은 344개의 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리 깊이), flipper_length_mm(날개 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다. 결측값이 있으므로 dropna()로 제거합니다.
+  goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: penguins 데이터셋은 344개의 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리
+    깊이), flipper_length_mm(날개 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다. 결측값이 있으므로 dropna()로 제거합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -68,29 +94,31 @@ sections:
     penguins = loadLocalDataset('penguins').dropna()
     penguins.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       penguins = loadLocalDataset('penguins').dropna()
       penguins.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_basic_box
   title: 3단계. 기본 박스플롯
   structuredPrimary: true
   subtitle: boxplot()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 기본 박스플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     boxplot()은 분포의 5가지 요약 통계량을 시각화합니다. 박스의 아래/위는 1사분위수(Q1)와 3사분위수(Q3), 중앙선은 중앙값(median), 수염은 1.5*IQR 범위, 그 밖의 점은 이상치입니다. 종별 체중 분포를 비교해봅니다.
 
     sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR 범위를, 점은 이상치를 나타냅니다.
   tips:
-  - sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR 범위를, 점은 이상치를 나타냅니다.
+  - sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR
+    범위를, 점은 이상치를 나타냅니다.
   snippet: |-
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.boxplot(data=penguins, x='species', y='body_mass_g', ax=ax)
@@ -98,7 +126,7 @@ sections:
     ax.set_ylabel('Body Mass (g)')
     fig
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 기본 박스플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       fig, ax = plt.subplots(figsize=(8, 6))
       sns.boxplot(data=penguins, x='species', y='body_mass_g', ax=ax)
@@ -106,17 +134,19 @@ sections:
       ax.set_ylabel('Body Mass (g)')
       fig
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 기본 박스플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 기본 박스플롯 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 기본 박스플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_hue_box
   title: 4단계. hue로 성별 구분
   structuredPrimary: true
   subtitle: 다중 그룹 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: hue 파라미터로 두 번째 범주형 변수를 추가할 수 있습니다. 종별로 나누고 성별로 색상을 구분하면 두 가지 요인의 효과를 동시에 비교할 수 있습니다. 같은 종에서도 수컷과 암컷의 체중 차이를 확인할 수 있습니다.
+  goal: 4단계. hue로 성별 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: hue 파라미터로 두 번째 범주형 변수를 추가할 수 있습니다. 종별로 나누고 성별로 색상을 구분하면 두 가지 요인의 효과를 동시에 비교할 수 있습니다. 같은
+    종에서도 수컷과 암컷의 체중 차이를 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -127,7 +157,7 @@ sections:
     axHue.legend(title='Sex')
     figHue
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. hue로 성별 구분 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figHue, axHue = plt.subplots(figsize=(10, 6))
       sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axHue)
@@ -136,16 +166,17 @@ sections:
       axHue.legend(title='Sex')
       figHue
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. hue로 성별 구분 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. hue로 성별 구분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. hue로 성별 구분에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_violin
   title: 5단계. 바이올린플롯
   structuredPrimary: true
   subtitle: violinplot()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 바이올린플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     violinplot()은 박스플롯과 KDE를 결합한 형태입니다. 양쪽으로 대칭인 KDE 곡선으로 분포의 모양을 보여줍니다. 박스플롯보다 분포의 세부적인 형태(다봉분포, 비대칭 등)를 파악하기 좋습니다.
 
@@ -159,7 +190,7 @@ sections:
     axViolin.set_ylabel('Body Mass (g)')
     figViolin
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 바이올린플롯 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figViolin, axViolin = plt.subplots(figsize=(8, 6))
       sns.violinplot(data=penguins, x='species', y='body_mass_g', ax=axViolin)
@@ -167,16 +198,17 @@ sections:
       axViolin.set_ylabel('Body Mass (g)')
       figViolin
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 바이올린플롯 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 바이올린플롯 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 바이올린플롯에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_violin_hue
   title: 6단계. 바이올린플롯 hue
   structuredPrimary: true
   subtitle: split 옵션
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 바이올린플롯 hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     violinplot에 hue를 적용하면 두 그룹의 분포를 나란히 비교할 수 있습니다. split=True를 설정하면 한 바이올린을 반으로 나누어 두 그룹을 좌우에 표시합니다. 공간을 절약하면서 직접 비교가 가능합니다.
 
@@ -192,7 +224,7 @@ sections:
     axSplit.legend(title='Sex')
     figSplit
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 바이올린플롯 hue 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figSplit, axSplit = plt.subplots(figsize=(10, 6))
       sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
@@ -202,17 +234,19 @@ sections:
       axSplit.legend(title='Sex')
       figSplit
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 바이올린플롯 hue 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 바이올린플롯 hue 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 바이올린플롯 hue에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_inner
   title: 7단계. inner 파라미터
   structuredPrimary: true
   subtitle: 내부 표시 옵션
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: inner 파라미터로 바이올린 내부에 표시할 내용을 지정합니다. 'box'는 미니 박스플롯, 'quartile'은 사분위선, 'point'는 개별 점, 'stick'은 막대, None은 빈 공간입니다. 목적에 따라 선택합니다.
+  goal: 7단계. inner 파라미터에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: inner 파라미터로 바이올린 내부에 표시할 내용을 지정합니다. 'box'는 미니 박스플롯, 'quartile'은 사분위선, 'point'는 개별 점, 'stick'은
+    막대, None은 빈 공간입니다. 목적에 따라 선택합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -227,7 +261,7 @@ sections:
     plt.tight_layout()
     figInner
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. inner 파라미터 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figInner, (axQuartile, axPoint) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -240,17 +274,19 @@ sections:
       plt.tight_layout()
       figInner
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. inner 파라미터 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. inner 파라미터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. inner 파라미터에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_comparison
   title: 8단계. 박스 vs 바이올린
   structuredPrimary: true
   subtitle: 두 방식 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 박스플롯과 바이올린플롯을 나란히 비교합니다. 박스플롯은 요약 통계량을 명확히 보여주고, 바이올린플롯은 분포의 세부 형태를 보여줍니다. 두 차트를 함께 보면 데이터를 더 완전하게 이해할 수 있습니다.
+  goal: 8단계. 박스 vs 바이올린에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 박스플롯과 바이올린플롯을 나란히 비교합니다. 박스플롯은 요약 통계량을 명확히 보여주고, 바이올린플롯은 분포의 세부 형태를 보여줍니다. 두 차트를 함께 보면
+    데이터를 더 완전하게 이해할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -268,7 +304,7 @@ sections:
     plt.tight_layout()
     figCompare
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 박스 vs 바이올린 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figCompare, (axBox, axViol) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -284,17 +320,19 @@ sections:
       plt.tight_layout()
       figCompare
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 박스 vs 바이올린 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 박스 vs 바이올린 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 박스 vs 바이올린에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_strip_overlay
   title: 9단계. 점 오버레이
   structuredPrimary: true
   subtitle: 박스플롯 + 스트립플롯
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 박스플롯 위에 stripplot을 겹쳐서 개별 데이터 포인트를 함께 표시할 수 있습니다. 요약 통계량과 실제 데이터를 동시에 보여주어 분포의 특성을 더 잘 파악할 수 있습니다. dodge 파라미터를 맞춰야 점이 올바른 위치에 표시됩니다.
+  goal: 9단계. 점 오버레이에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 박스플롯 위에 stripplot을 겹쳐서 개별 데이터 포인트를 함께 표시할 수 있습니다. 요약 통계량과 실제 데이터를 동시에 보여주어 분포의 특성을 더 잘
+    파악할 수 있습니다. dodge 파라미터를 맞춰야 점이 올바른 위치에 표시됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -309,7 +347,7 @@ sections:
     axOverlay.legend(title='Sex')
     figOverlay
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 점 오버레이 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figOverlay, axOverlay = plt.subplots(figsize=(10, 6))
 
@@ -322,17 +360,19 @@ sections:
       axOverlay.legend(title='Sex')
       figOverlay
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 점 오버레이 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 점 오버레이 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 점 오버레이에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_flipper
   title: 10단계. 다른 변수 탐색
   structuredPrimary: true
   subtitle: 날개 길이 분포
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 같은 방식으로 날개 길이(flipper_length_mm) 분포도 탐색해봅니다. 이전에 배운 scatterplot으로 체중과 날개 길이의 관계도 함께 확인하면 더 풍부한 인사이트를 얻을 수 있습니다.
+  goal: 10단계. 다른 변수 탐색에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 같은 방식으로 날개 길이(flipper_length_mm) 분포도 탐색해봅니다. 이전에 배운 scatterplot으로 체중과 날개 길이의 관계도 함께 확인하면
+    더 풍부한 인사이트를 얻을 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -349,7 +389,7 @@ sections:
     plt.tight_layout()
     figFlipper
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 다른 변수 탐색 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFlipper, (axFlipBox, axFlipScatter) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -364,17 +404,19 @@ sections:
       plt.tight_layout()
       figFlipper
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 다른 변수 탐색 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 다른 변수 탐색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 다른 변수 탐색에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step11_final
   title: 11단계. 최종 종합 분석
   structuredPrimary: true
   subtitle: 네 가지 관점
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 모든 차트 유형을 종합하여 펭귄 데이터를 다각도로 분석합니다. 히스토그램으로 전체 분포, 박스플롯으로 요약 통계, 바이올린플롯으로 분포 형태, 산점도로 변수 관계를 함께 확인합니다.
+  goal: 11단계. 최종 종합 분석에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 지금까지 배운 모든 차트 유형을 종합하여 펭귄 데이터를 다각도로 분석합니다. 히스토그램으로 전체 분포, 박스플롯으로 요약 통계, 바이올린플롯으로 분포 형태,
+    산점도로 변수 관계를 함께 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -397,7 +439,7 @@ sections:
     plt.tight_layout()
     figFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 최종 종합 분석 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
 
@@ -418,16 +460,17 @@ sections:
       plt.tight_layout()
       figFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 최종 종합 분석 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 최종 종합 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 최종 종합 분석에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 분포 비교 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     지금까지 배운 boxplot, violinplot, hue, split, inner를 활용해서 다양한 분포를 비교해봅시다.
 
@@ -441,7 +484,7 @@ sections:
 
     data = loadLocalDataset('tips')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -449,10 +492,11 @@ sections:
 
       data = loadLocalDataset('tips')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -472,8 +516,8 @@ sections:
   title: 12단계. 펭귄 분포 비교 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. 펭귄 분포 비교 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     boxplot과 violinplot은 집단 간 차이를 빠르게 비교하지만, 결측값과 범주 수를 먼저 확인하지 않으면 차트 해석이 흔들립니다. Gentoo가 더 무겁다는 예측을 데이터와 차트 양쪽에서 확인합니다.
 
@@ -494,7 +538,7 @@ sections:
     assert massBySpecies["Gentoo"] == massBySpecies.max()
     massBySpecies.round(1)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 펭귄 분포 비교 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -509,7 +553,8 @@ sections:
       assert massBySpecies["Gentoo"] == massBySpecies.max()
       massBySpecies.round(1)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 펭귄 분포 비교 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 펭귄 분포 비교 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 펭귄 분포 비교 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

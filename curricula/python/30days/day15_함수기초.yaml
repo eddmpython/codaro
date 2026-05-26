@@ -26,13 +26,35 @@ intro:
   - return으로 값 반환
   - 매개변수로 값 전달
   - 함수로 코드 재사용
+  direction: 함수기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 함수기초 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 함수 정의 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: return 문 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 매개변수 1개 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 함수기초 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 함수기초 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 함수기초 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: def_basic
   title: 함수 정의
   structuredPrimary: true
   subtitle: def로 함수 만들기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 함수 정의에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수는 특정 작업을 수행하는 코드 블록입니다. def 함수명(): 형식으로 정의하며, 들여쓰기로 함수 본문을 작성합니다. 함수를 정의한 후 함수명()으로 호출하여 실행합니다.
 
@@ -46,7 +68,7 @@ sections:
 
     greet()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수 정의 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def greet():
           msg = 'Hello'
@@ -54,16 +76,17 @@ sections:
 
       greet()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수 정의 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수 정의 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수 정의에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: return_statement
   title: return 문
   structuredPrimary: true
   subtitle: 값 반환하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: return 문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     return은 함수의 결과값을 반환합니다. return 값 형식으로 사용하며, 함수 실행을 즉시 종료하고 값을 호출한 곳으로 돌려줍니다. return이 없으면 None을 반환합니다.
 
@@ -77,7 +100,7 @@ sections:
 
     add()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: return 문 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def add():
           answer = 10 + 20
@@ -85,16 +108,17 @@ sections:
 
       add()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - return 문 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: return 문 코드가 예외 없이 끝나야 합니다.
+    resultCheck: return 문에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: parameter_one
   title: 매개변수 1개
   structuredPrimary: true
   subtitle: 값을 받는 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 매개변수 1개에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     매개변수는 함수가 받는 입력값입니다. def 함수명(매개변수): 형식으로 정의하며, 호출시 전달하는 값을 인자라고 합니다. 매개변수를 사용하면 함수를 더 유연하게 만들 수 있습니다.
 
@@ -107,23 +131,24 @@ sections:
 
     double(5)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 매개변수 1개 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def double(num):
           return num * 2
 
       double(5)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 매개변수 1개 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 매개변수 1개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 매개변수 1개에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: parameter_multiple
   title: 매개변수 여러 개
   structuredPrimary: true
   subtitle: 여러 값 받기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 매개변수 여러 개에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수는 여러 개의 매개변수를 받을 수 있습니다. 쉼표로 구분하여 나열하며, 호출시에도 같은 순서로 인자를 전달해야 합니다.
 
@@ -136,23 +161,24 @@ sections:
 
     addTwo(10, 20)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 매개변수 여러 개 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def addTwo(a, b):
           return a + b
 
       addTwo(10, 20)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 매개변수 여러 개 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 매개변수 여러 개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 매개변수 여러 개에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: return_multiple
   title: 여러 값 반환
   structuredPrimary: true
   subtitle: 튜플로 반환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 여러 값 반환에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수는 여러 값을 반환할 수 있습니다. 쉼표로 구분하여 반환하면 튜플로 묶여서 반환됩니다. 호출한 곳에서 여러 변수로 받을 수 있습니다.
 
@@ -168,7 +194,7 @@ sections:
 
     minMax(10, 5)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 여러 값 반환 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def minMax(a, b):
           if a < b:
@@ -178,16 +204,17 @@ sections:
 
       minMax(10, 5)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 여러 값 반환 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 여러 값 반환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 여러 값 반환에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: no_parameter
   title: 매개변수 없는 함수
   structuredPrimary: true
   subtitle: 입력 없이 실행
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 매개변수 없는 함수에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수는 매개변수가 없어도 됩니다. 항상 같은 값을 반환하거나 내부 로직만 실행하는 함수에 사용합니다. 호출시에도 괄호만 씁니다.
 
@@ -200,23 +227,24 @@ sections:
 
     getPi()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 매개변수 없는 함수 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def getPi():
           return 3.14159
 
       getPi()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 매개변수 없는 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 매개변수 없는 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 매개변수 없는 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: no_return
   title: return 없는 함수
   structuredPrimary: true
   subtitle: 작업만 수행
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: return 없는 함수에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수는 return이 없어도 됩니다. return이 없으면 None을 반환합니다. 주로 작업만 수행하고 결과가 필요없을 때 사용합니다.
 
@@ -230,7 +258,7 @@ sections:
     output = doSomething()
     output
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: return 없는 함수 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def doSomething():
           x = 10 + 20
@@ -238,16 +266,17 @@ sections:
       output = doSomething()
       output
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - return 없는 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: return 없는 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: return 없는 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: function_conditional
   title: 함수와 조건문
   structuredPrimary: true
   subtitle: 조건에 따른 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 함수와 조건문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수 안에서 조건문을 사용하여 매개변수에 따라 다른 결과를 반환할 수 있습니다. 함수의 유연성이 크게 증가합니다.
 
@@ -267,7 +296,7 @@ sections:
 
     getGrade(85)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수와 조건문 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def getGrade(score):
           if score >= 90:
@@ -281,16 +310,17 @@ sections:
 
       getGrade(85)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수와 조건문 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수와 조건문 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수와 조건문에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: function_loop
   title: 함수와 반복문
   structuredPrimary: true
   subtitle: 반복 처리 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 함수와 반복문에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수 안에서 반복문을 사용하여 리스트나 문자열을 처리할 수 있습니다. 반복 로직을 함수로 만들면 재사용이 쉬워집니다.
 
@@ -306,7 +336,7 @@ sections:
 
     sumList([1, 2, 3, 4, 5])
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수와 반복문 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def sumList(numbers):
           acc = 0
@@ -316,16 +346,17 @@ sections:
 
       sumList([1, 2, 3, 4, 5])
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수와 반복문 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수와 반복문 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수와 반복문에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: function_reuse
   title: 함수 재사용
   structuredPrimary: true
   subtitle: 같은 함수 여러 번 사용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 함수 재사용에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     함수의 가장 큰 장점은 재사용입니다. 한 번 정의한 함수를 여러 곳에서 다른 인자로 호출할 수 있습니다. 코드 중복을 줄이고 유지보수가 쉬워집니다.
 
@@ -341,7 +372,7 @@ sections:
     sq7 = square(7)
     sq3, sq5, sq7
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수 재사용 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def square(n):
           return n * n
@@ -351,16 +382,17 @@ sections:
       sq7 = square(7)
       sq3, sq5, sq7
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수 재사용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수 재사용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수 재사용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 실무 함수 설계 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실무 함수 설계 루프에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     업무 코드는 보통 숫자 하나를 출력하는 데서 끝나지 않습니다. 주문 금액처럼 규칙이 있는 계산을 함수로 감싸고, 실행 전에 결과를 예측한 뒤, 오류 메시지를 읽고 호출을 고치고, 마지막에 검증합니다.
 
@@ -386,7 +418,7 @@ sections:
 
     estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실무 함수 설계 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       order = {
           "items": [12000, 8000, 5000],
@@ -406,17 +438,19 @@ sections:
 
       estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실무 함수 설계 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실무 함수 설계 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실무 함수 설계 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: Day 15 종합 복습
   structuredPrimary: true
   subtitle: 함수 기초 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 15에서 배운 함수 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  goal: Day 15 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 15에서 배운 함수 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -425,14 +459,15 @@ sections:
 
     sayHello()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 15 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def sayHello():
           return 'Hello'
 
       sayHello()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 15 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 15 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 15 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

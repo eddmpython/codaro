@@ -32,13 +32,35 @@ intro:
   emoji: 🌈
   goal: cvtColor()로 다양한 색공간(Gray, HSV, LAB)을 변환하고 비교합니다.
   description: 색공간 변환은 이미지 처리의 기본입니다. 흑백 변환, HSV를 이용한 색상 분리, LAB 색공간의 특징을 배웁니다.
+  direction: 색공간변환기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 색공간변환기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 이미지 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 그레이스케일 변환 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. HSV 색공간 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 색공간변환기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 색공간변환기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 색공간변환기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: BGR 변환 준비
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: sklearn의 china 이미지를 불러와 BGR로 변환합니다. OpenCV의 cvtColor() 함수는 BGR 이미지를 기준으로 다양한 색공간으로 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -55,7 +77,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -69,16 +91,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 이미지 불러오기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 이미지 불러오기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step2_gray
   title: 2단계. 그레이스케일 변환
   structuredPrimary: true
   subtitle: COLOR_BGR2GRAY
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 그레이스케일 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     그레이스케일(grayscale, 흑백) 변환은 가장 기본적인 색공간 변환입니다. 컬러 이미지의 3채널(R, G, B)을 1채널(밝기)로 변환합니다. 단순 평균이 아닌 Y = 0.299R + 0.587G + 0.114B 공식을 사용하는데, 이는 인간의 눈이 녹색에 가장 민감하고 파란색에 가장 둔감하기 때문입니다. 에지 검출, 이진화, 히스토그램 분석 등 많은 이미지 처리가 그레이스케일에서 수행됩니다.
 
@@ -93,7 +116,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 그레이스케일 변환 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gray = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2GRAY)
       plt.figure(figsize=(10, 6))
@@ -102,16 +125,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 그레이스케일 변환 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 그레이스케일 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 그레이스케일 변환에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step3_hsv
   title: 3단계. HSV 색공간
   structuredPrimary: true
   subtitle: 색상, 채도, 명도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. HSV 색공간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     HSV는 Hue(색상), Saturation(채도), Value(명도)로 색을 표현하는 색공간입니다. Hue는 색의 종류(빨강, 노랑, 초록 등)를 각도로 표현하고, Saturation은 색의 선명도(회색~원색), Value는 밝기(검정~밝음)를 나타냅니다. RGB에서는 "빨간색 계열"을 찾으려면 복잡한 조건이 필요하지만, HSV에서는 H 값만 보면 됩니다. 색상 기반 객체 추적, 크로마키(배경 제거) 등에 널리 사용됩니다.
 
@@ -126,7 +150,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. HSV 색공간 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       hsv = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2HSV)
       plt.figure(figsize=(10, 6))
@@ -135,16 +159,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. HSV 색공간 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. HSV 색공간 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. HSV 색공간에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_lab
   title: 4단계. LAB 색공간
   structuredPrimary: true
   subtitle: 밝기와 색 분리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. LAB 색공간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     LAB(또는 L*a*b*) 색공간은 L(Lightness, 밝기), A(녹색-빨강 축), B(파랑-노랑 축)로 구성됩니다. CIE(국제조명위원회)가 인간의 색 인지를 모델링하여 만든 색공간으로, 모든 인간이 볼 수 있는 색을 포함합니다. L 채널은 밝기만, A와 B 채널은 색상만 담당하여 완전히 분리됩니다. 이 특성 덕분에 L 채널에만 히스토그램 평활화를 적용하면 색상 왜곡 없이 대비를 개선할 수 있습니다.
 
@@ -159,7 +184,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. LAB 색공간 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lab = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2LAB)
       plt.figure(figsize=(10, 6))
@@ -168,16 +193,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. LAB 색공간 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. LAB 색공간 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. LAB 색공간에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_compare
   title: 5단계. 색공간 비교
   structuredPrimary: true
   subtitle: 변환 결과 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 색공간 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 원본과 각 색공간 변환 결과를 나란히 비교해봅시다. 각 색공간이 이미지 정보를 어떻게 다르게 표현하는지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -197,7 +223,7 @@ sections:
     axCompare[1, 1].axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 색공간 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figCompare, axCompare = plt.subplots(2, 2, figsize=(10, 8))
       axCompare[0, 0].imshow(photo)
@@ -214,16 +240,17 @@ sections:
       axCompare[1, 1].axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 색공간 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 색공간 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 색공간 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_back
   title: 6단계. 역변환
   structuredPrimary: true
   subtitle: 색공간 복원
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 역변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     HSV나 LAB에서 수정 후 다시 BGR/RGB로 변환할 수 있습니다. 변환 과정에서 약간의 정보 손실이 있을 수 있습니다.
 
@@ -239,7 +266,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 역변환 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       backBgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
       backRgb = cv2.cvtColor(backBgr, cv2.COLOR_BGR2RGB)
@@ -249,16 +276,17 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 역변환 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 역변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 역변환에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 색공간 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     flower 이미지로 색공간 변환을 연습해봅시다.
 
@@ -279,7 +307,7 @@ sections:
     plt.axis('off')
     plt.tight_layout()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -294,17 +322,19 @@ sections:
       plt.axis('off')
       plt.tight_layout()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 8단계. 색공간 변환 검증 루프
   structuredPrimary: true
   subtitle: BGR → HSV → 마스크 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 색공간 변환은 결과 이미지가 예쁘게 보이는지보다, 원하는 색이 안정적으로 분리되는지가 중요합니다. 기준 색 패치를 만들고 HSV 마스크 면적을 검증한 뒤, 변환 코드 오류와 임계값 변주를 확인합니다.
+  goal: 8단계. 색공간 변환 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 색공간 변환은 결과 이미지가 예쁘게 보이는지보다, 원하는 색이 안정적으로 분리되는지가 중요합니다. 기준 색 패치를 만들고 HSV 마스크 면적을 검증한 뒤,
+    변환 코드 오류와 임계값 변주를 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -322,7 +352,7 @@ sections:
 
     validateColorImage(colorImage)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 색공간 변환 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -338,7 +368,8 @@ sections:
 
       validateColorImage(colorImage)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 색공간 변환 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 색공간 변환 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 색공간 변환 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

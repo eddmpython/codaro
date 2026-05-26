@@ -25,13 +25,35 @@ intro:
   - 조합과 순열 계산
   - 이터레이터 체이닝과 병합
   - 그룹화와 필터링
+  direction: itertools 이터레이터 도구에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - itertools 이터레이터 도구 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: itertools 모듈 불러오 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 무한 이터레이터 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 조합과 순열 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: itertools 이터레이터 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: itertools 이터레이터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: itertools 이터레이터 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: module_import
   title: itertools 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: itertools 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     itertools은 파이썬 표준 라이브러리입니다. 효율적인 반복과 조합을 위한 이터레이터 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -44,23 +66,24 @@ sections:
     # 모듈 로드 확인
     'itertools 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: itertools 모듈 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from itertools import count, cycle, repeat, islice, combinations, permutations, product, chain, zip_longest, tee, filterfalse, takewhile, dropwhile, groupby, accumulate, combinations_with_replacement
 
       # 모듈 로드 확인
       'itertools 모듈이 정상적으로 로드되었습니다'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - itertools 모듈 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: itertools 모듈 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: itertools 모듈 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: infinite_iterators
   title: 무한 이터레이터
   structuredPrimary: true
   subtitle: count, cycle, repeat
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 무한 이터레이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     itertools는 메모리 효율적인 이터레이터를 제공합니다. count()는 무한 카운터, cycle()은 순환 반복, repeat()는 값 반복을 생성합니다. 무한 시퀀스를 다룰 때는 반드시 종료 조건이나 제한이 필요합니다.
 
@@ -72,22 +95,23 @@ sections:
     first5 = list(islice(counter, 5))
     first5
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 무한 이터레이터 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       counter = count(0)
       first5 = list(islice(counter, 5))
       first5
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 무한 이터레이터 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 무한 이터레이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 무한 이터레이터에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: combinatorics
   title: 조합과 순열
   structuredPrimary: true
   subtitle: combinations, permutations, product
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 조합과 순열에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     조합론 함수로 모든 가능한 조합과 순열을 생성합니다. combinations()는 순서 무관 조합, permutations()는 순서 있는 순열, product()는 데카르트 곱을 반환합니다. 경우의 수 계산, 완전 탐색에 활용됩니다.
 
@@ -99,22 +123,23 @@ sections:
     pairs = list(combinations(choices, 2))
     pairs
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 조합과 순열 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       choices = ['A', 'B', 'C']
       pairs = list(combinations(choices, 2))
       pairs
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 조합과 순열 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 조합과 순열 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 조합과 순열에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: chaining
   title: 이터레이터 연결
   structuredPrimary: true
   subtitle: chain, zip_longest, tee
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 이터레이터 연결에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     여러 이터레이터를 연결하거나 복제할 수 있습니다. chain()은 여러 이터레이터를 순차 연결하고, zip_longest()는 길이가 다른 이터레이터를 짝짓습니다. tee()는 하나의 이터레이터를 여러 개로 복제합니다.
 
@@ -127,23 +152,24 @@ sections:
     combined = list(chain(list1, list2))
     combined
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 이터레이터 연결 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       list1 = [1, 2, 3]
       list2 = [4, 5, 6]
       combined = list(chain(list1, list2))
       combined
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 이터레이터 연결 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 이터레이터 연결 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 이터레이터 연결에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: filtering
   title: 필터링과 슬라이싱
   structuredPrimary: true
   subtitle: islice, filterfalse, takewhile, dropwhile
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 필터링과 슬라이싱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     이터레이터를 조건에 따라 필터링하거나 슬라이싱할 수 있습니다. islice()는 인덱스 범위로 자르고, filterfalse()는 조건을 만족하지 않는 것만, takewhile()은 조건이 참인 동안만 가져옵니다.
 
@@ -155,22 +181,23 @@ sections:
     sliced = list(islice(numbers, 2, 6))
     sliced
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 필터링과 슬라이싱 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       numbers = range(10)
       sliced = list(islice(numbers, 2, 6))
       sliced
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 필터링과 슬라이싱 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 필터링과 슬라이싱 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 필터링과 슬라이싱에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: grouping
   title: 그룹화와 누적
   structuredPrimary: true
   subtitle: groupby, accumulate
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 그룹화와 누적에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     연속된 동일 요소를 그룹화하거나 누적값을 계산합니다. groupby()는 정렬된 데이터에서 연속된 같은 값을 묶고, accumulate()는 누적 합계나 누적 연산을 수행합니다. 데이터 집계, 통계 분석에 유용합니다.
 
@@ -182,22 +209,23 @@ sections:
     grouped = [(k, len(list(g))) for k, g in groupby(data)]
     grouped
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 그룹화와 누적 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       data = [1, 1, 2, 2, 2, 3, 1]
       grouped = [(k, len(list(g))) for k, g in groupby(data)]
       grouped
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 그룹화와 누적 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 그룹화와 누적 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 그룹화와 누적에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: itertools 실무 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실무에서 자주 사용하는 itertools 활용 패턴을 살펴봅니다. 배치 처리, 윈도우 슬라이딩, 페이지네이션, 조합 탐색 등 다양한 문제를 itertools로 효율적으로 해결할 수 있습니다.
 
@@ -217,7 +245,7 @@ sections:
     batches = list(chunk(dataset, 3))
     batches
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 활용 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def chunk(iterable, size):
           iterator = iter(iterable)
@@ -231,16 +259,17 @@ sections:
       batches = list(chunk(dataset, 3))
       batches
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 활용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 활용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 활용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 이터레이터 데이터 파이프라인'
   structuredPrimary: true
   subtitle: 배치, groupby 정렬, 조합 탐색 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '검증 루프: 이터레이터 데이터 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     itertools는 메모리를 아끼는 대신 이터레이터가 한 번 소비된다는 점과 groupby의 정렬 조건을 반드시 이해해야 합니다. 여기서는 작은 주문 데이터를 배치 처리하고, 일부러 정렬 누락 버그를 잡은 뒤, 조합 탐색을 제한해 안전하게 검증합니다.
 
@@ -276,7 +305,7 @@ sections:
 
     orderBatches
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 이터레이터 데이터 파이프라인 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       orderRows = [
           {"orderId": "O-101", "region": "KR", "amount": 120},
@@ -305,16 +334,17 @@ sections:
 
       orderBatches
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 이터레이터 데이터 파이프라인 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 이터레이터 데이터 파이프라인 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 이터레이터 데이터 파이프라인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: itertools 모듈 종합 복습
   structuredPrimary: true
   subtitle: 이터레이터 도구 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: itertools 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: itertools 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -323,13 +353,14 @@ sections:
     first3 = list(islice(countUp, 3))
     first3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: itertools 모듈 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       countUp = count(1)
       first3 = list(islice(countUp, 3))
       first3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - itertools 모듈 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: itertools 모듈 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: itertools 모듈 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

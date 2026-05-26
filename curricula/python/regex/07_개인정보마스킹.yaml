@@ -24,38 +24,62 @@ intro:
   emoji: 🔐
   goal: 주민번호, 카드번호, 계좌번호를 자동으로 마스킹합니다.
   description: GDPR, 개인정보보호법 준수를 위한 필수 기술입니다. 역참조로 일부만 남기고 나머지를 마스킹하는 방법을 배웁니다.
+  direction: 개인정보마스킹에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 개인정보마스킹 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 개인정보 샘플 데이터 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 주민번호 마스킹 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 개인정보마스킹 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 개인정보마스킹 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 개인정보마스킹 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: import re
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_sample_data
   title: 2단계. 개인정보 샘플 데이터
   structuredPrimary: true
   subtitle: 가상의 개인정보
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 개인정보 샘플 데이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실습을 위한 가상의 개인정보 데이터를 준비합니다. 실제 서비스에서는 절대 실제 개인정보를 사용하면 안 됩니다. 로그 파일, 개발 환경, 테스트 데이터에도 가상의 정보만 사용해야 개인정보보호법을 준수할 수 있습니다.
 
     개인정보 보호의 중요성
     실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다. - 로그 파일에 기록 전 자동 마스킹 - 화면 표시 시 일부만 표시 - 개발/테스트 환경에서도 실제 데이터 사용 금지
   tips:
-  - 개인정보 보호의 중요성 실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다. - 로그 파일에 기록 전 자동 마스킹 - 화면 표시 시 일부만 표시 - 개발/테스트 환경에서도 실제 데이터 사용 금지
+  - 개인정보 보호의 중요성 실제 서비스에서는 개인정보를 로그, 화면에 노출하면 안 됩니다. - 로그 파일에 기록 전 자동 마스킹 - 화면 표시 시 일부만 표시 - 개발/테스트 환경에서도
+    실제 데이터 사용 금지
   snippet: |-
     personalData = """
     이름: 김철수
@@ -72,7 +96,7 @@ sections:
     """
     personalData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 개인정보 샘플 데이터 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       personalData = """
       이름: 김철수
@@ -89,16 +113,17 @@ sections:
       """
       personalData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 개인정보 샘플 데이터 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 개인정보 샘플 데이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 개인정보 샘플 데이터에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_mask_resident
   title: 3단계. 주민번호 마스킹
   structuredPrimary: true
   subtitle: 뒷자리 전체 숨기기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 주민번호 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     주민번호 뒷자리 7자리를 모두 *로 마스킹합니다. 주민번호는 XXXXXX-YYYYYYY 형식으로, 앞 6자리는 생년월일, 뒷 7자리는 성별과 고유번호입니다. 뒷자리를 마스킹하면 생년월일 정보는 유지하면서 개인 식별을 방지할 수 있습니다.
 
@@ -112,23 +137,24 @@ sections:
     test = "주민번호: 901225-1234567"
     re.findall(pattern, test)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 주민번호 마스킹 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pattern = r"(\d{6})-(\d{7})"
 
       test = "주민번호: 901225-1234567"
       re.findall(pattern, test)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 주민번호 마스킹 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 주민번호 마스킹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 주민번호 마스킹에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_mask_card
   title: 4단계. 카드번호 마스킹
   structuredPrimary: true
   subtitle: 중간 2개 그룹 숨기기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 카드번호 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     카드번호는 첫 4자리와 마지막 4자리만 표시합니다. 카드번호는 16자리로, 처음 6자리는 카드사 식별번호(BIN), 마지막 4자리는 확인용으로 노출해도 비교적 안전합니다. 중간 8자리를 마스킹하면 결제 영수증이나 알림에 사용할 수 있습니다.
 
@@ -143,7 +169,7 @@ sections:
     test = "카드: 1234-5678-9012-3456"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 카드번호 마스킹 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pattern = r"(\d{4})-(\d{4})-(\d{4})-(\d{4})"
       replacement = r"\1-****-****-\4"
@@ -151,16 +177,17 @@ sections:
       test = "카드: 1234-5678-9012-3456"
       re.sub(pattern, replacement, test)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 카드번호 마스킹 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 카드번호 마스킹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 카드번호 마스킹에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_mask_account
   title: 5단계. 계좌번호 마스킹
   structuredPrimary: true
   subtitle: 마지막 3자리만 표시
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 계좌번호 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     계좌번호는 마지막 3자리만 남기고 마스킹합니다.
 
@@ -174,7 +201,7 @@ sections:
     test = "계좌: 110-123-456789"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 계좌번호 마스킹 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pattern = r"(\d{3})-(\d{3})-(\d{3})(\d{3})"
       replacement = r"***-***-***\4"
@@ -182,23 +209,25 @@ sections:
       test = "계좌: 110-123-456789"
       re.sub(pattern, replacement, test)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 계좌번호 마스킹 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 계좌번호 마스킹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 계좌번호 마스킹에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_backreference
   title: 6단계. 역참조 심화
   structuredPrimary: true
   subtitle: 반복 패턴 찾기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 역참조 심화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     역참조는 같은 패턴이 반복될 때도 사용할 수 있습니다.
 
     역참조 사용
     **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한** 단어 - `\b` : 단어 경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!
   tips:
-  - '역참조 사용 **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한** 단어 - `\b` : 단어 경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!'
+  - '역참조 사용 **패턴: \\1** `\b(\w+)\s+\1\b`: - `(\w+)` : 단어를 그룹 1로 캡처 - `\s+` : 공백 1개 이상 - `\1` : 그룹 1과 **동일한**
+    단어 - `\b` : 단어 경계 "정말 정말", "반드시 반드시" 같은 반복을 찾습니다!'
   snippet: |-
     pattern = r"\b(\w+)\s+\1\b"
 
@@ -206,7 +235,7 @@ sections:
     matches = re.findall(pattern, test)
     matches
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 역참조 심화 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pattern = r"\b(\w+)\s+\1\b"
 
@@ -214,16 +243,17 @@ sections:
       matches = re.findall(pattern, test)
       matches
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 역참조 심화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 역참조 심화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 역참조 심화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_complete_masking
   title: 7단계. 완성된 마스킹 함수
   structuredPrimary: true
   subtitle: 모든 개인정보 자동 마스킹
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 완성된 마스킹 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 배운 패턴을 모두 합쳐 완성된 마스킹 함수를 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -242,7 +272,7 @@ sections:
     maskedData = maskPersonalInfo(personalData)
     maskedData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 완성된 마스킹 함수 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def maskPersonalInfo(text):
           text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
@@ -258,16 +288,17 @@ sections:
       maskedData = maskPersonalInfo(personalData)
       maskedData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 완성된 마스킹 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 완성된 마스킹 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 완성된 마스킹 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: step8_selective_masking
   title: 8단계. 선택적 마스킹
   structuredPrimary: true
   subtitle: 필요한 부분만 마스킹
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 선택적 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     상황에 따라 다르게 마스킹할 수 있습니다.
 
@@ -281,7 +312,7 @@ sections:
     test = "이름: 김철수"
     re.sub(pattern, replacement, test)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 선택적 마스킹 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pattern = r"이름: (\S)(\S+)"
       replacement = r"이름: \1" + "*" * 2
@@ -289,16 +320,17 @@ sections:
       test = "이름: 김철수"
       re.sub(pattern, replacement, test)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 선택적 마스킹 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 선택적 마스킹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 선택적 마스킹에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_log_masking
   title: 9단계. 로그 자동 마스킹
   structuredPrimary: true
   subtitle: 실전 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 로그 자동 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     로그 파일에 개인정보가 실수로 기록되는 것을 방지합니다.
 
@@ -319,7 +351,7 @@ sections:
     safeLogs = [safeLog(msg) for msg in logMessages]
     safeLogs
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 로그 자동 마스킹 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def safeLog(message):
           masked = maskPersonalInfo(message)
@@ -334,16 +366,17 @@ sections:
       safeLogs = [safeLog(msg) for msg in logMessages]
       safeLogs
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 로그 자동 마스킹 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 로그 자동 마스킹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 로그 자동 마스킹에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 10단계. 보안 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 잔존 탐지 → 오류 수정 → 운영 정책
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 보안 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     개인정보 마스킹은 화면에 별표가 보인다고 끝나는 작업이 아닙니다. 원문 주민번호, 카드번호, 계좌번호, 전화번호가 결과에 남아 있지 않은지 자동으로 검사해야 합니다. 이번 단계에서는 마스킹 후 원문 패턴이 0개 남을 것이라고 먼저 예측합니다. 그다음 일부러 깨진 마스킹 결과를 넣어 검증 함수가 실패하는지 확인하고, 운영 로그 정책에 맞게 재사용 가능한 함수로 고칩니다.
 
@@ -371,7 +404,7 @@ sections:
     assert len(leaks) == predictedLeakCount, leaks
     leaks
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 보안 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sensitivePatterns = {
           "residentNumber": r"\d{6}-\d{7}",
@@ -393,16 +426,17 @@ sections:
       assert len(leaks) == predictedLeakCount, leaks
       leaks
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 보안 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 보안 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 보안 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 개인정보 마스킹 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     보안 담당자가 되어 개인정보를 안전하게 마스킹합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
@@ -431,7 +465,7 @@ sections:
     result = pat.sub(mask, text)
     result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -454,10 +488,11 @@ sections:
       result = pat.sub(mask, text)
       result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   subtitle: 일곱 번째 프로젝트 완료!

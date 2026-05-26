@@ -25,15 +25,41 @@ meta:
 intro:
   emoji: 🏆
   goal: 영화, 배우, 수익 데이터를 통합하여 "영화 산업 종합 분석 대시보드"를 완성합니다.
-  description: 모든 Polars 개념(read_csv, select, filter, with_columns, group_by, join, concat, window, lazy, pivot)을 종합하여 실전 데이터 파이프라인을 구축합니다.
+  description: 모든 Polars 개념(read_csv, select, filter, with_columns, group_by, join, concat, window, lazy,
+    pivot)을 종합하여 실전 데이터 파이프라인을 구축합니다.
+  direction: 실전종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 실전종합프로젝트 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 프로젝트 목표 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 생성 및 로드 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 전처리 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 실전종합프로젝트 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 실전종합프로젝트 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 실전종합프로젝트 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_goal
   title: 1단계. 프로젝트 목표
   structuredPrimary: true
   subtitle: 다중 소스 통합 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 10개의 Polars 프로젝트를 마무리하는 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나의 데이터 파이프라인에 통합하여 실전 분석 능력을 완성합니다. 실무 데이터 분석에서는 단일 테이블이 아닌 여러 소스의 데이터를 결합하여 분석하는 경우가 대부분입니다. 이 프로젝트에서는 영화 정보, 배우 정보, 수익 데이터라는 3개의 독립적인 데이터셋을 movieId라는 공통 키로 조인하여 영화 산업 전반을 분석합니다. 데이터 로드부터 전처리, 결합, 변환, 집계, 윈도우 함수, 피벗, Lazy 최적화까지 모든 단계를 경험하며, 종합 대시보드를 만드는 완전한 데이터 파이프라인을 구축합니다. 이 프로젝트를 완료하면 Polars로 어떤 분석 업무도 수행할 수 있는 역량을 갖추게 됩니다.
+  goal: 1단계. 프로젝트 목표에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 10개의 Polars 프로젝트를 마무리하는 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나의 데이터 파이프라인에 통합하여 실전 분석 능력을 완성합니다.
+    실무 데이터 분석에서는 단일 테이블이 아닌 여러 소스의 데이터를 결합하여 분석하는 경우가 대부분입니다. 이 프로젝트에서는 영화 정보, 배우 정보, 수익 데이터라는 3개의 독립적인
+    데이터셋을 movieId라는 공통 키로 조인하여 영화 산업 전반을 분석합니다. 데이터 로드부터 전처리, 결합, 변환, 집계, 윈도우 함수, 피벗, Lazy 최적화까지 모든 단계를
+    경험하며, 종합 대시보드를 만드는 완전한 데이터 파이프라인을 구축합니다. 이 프로젝트를 완료하면 Polars로 어떤 분석 업무도 수행할 수 있는 역량을 갖추게 됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -46,7 +72,7 @@ sections:
     })
     projectPlan
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 프로젝트 목표 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import polars as pl
 
@@ -57,17 +83,22 @@ sections:
       })
       projectPlan
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 프로젝트 목표 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 프로젝트 목표 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 프로젝트 목표에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 생성 및 로드
   structuredPrimary: true
   subtitle: 세 개의 DataFrame (A1, A3 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실전 분석을 시뮬레이션하기 위해 3개의 독립적인 DataFrame을 생성합니다. 실무 환경에서는 영화 정보는 영화사 데이터베이스에서, 배우 정보는 인사 시스템에서, 수익 데이터는 재무 시스템에서 각각 추출하여 pl.read_csv()나 pl.read_database()로 불러옵니다. 이렇게 분산된 데이터 소스를 하나로 통합하는 것이 데이터 엔지니어링의 핵심입니다. dfMovies는 영화 제목, 장르, 개봉연도, 평점, 국가 정보를 담고 있고, dfActors는 배우명과 출연료를, dfRevenue는 제작비와 흥행 수익을 포함합니다. 세 테이블은 모두 movieId라는 공통 식별자를 가지고 있어 조인이 가능합니다. 스키마를 확인하면 각 테이블의 구조와 데이터 타입을 파악할 수 있으며, 이는 조인 전략을 수립하는 첫 단계입니다. 실무에서는 수백만 건의 데이터를 다루지만, 여기서는 학습을 위해 10건의 대표적인 영화를 사용합니다.
+  goal: 2단계. 데이터 생성 및 로드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 실전 분석을 시뮬레이션하기 위해 3개의 독립적인 DataFrame을 생성합니다. 실무 환경에서는 영화 정보는 영화사 데이터베이스에서, 배우 정보는 인사 시스템에서,
+    수익 데이터는 재무 시스템에서 각각 추출하여 pl.read_csv()나 pl.read_database()로 불러옵니다. 이렇게 분산된 데이터 소스를 하나로 통합하는 것이 데이터
+    엔지니어링의 핵심입니다. dfMovies는 영화 제목, 장르, 개봉연도, 평점, 국가 정보를 담고 있고, dfActors는 배우명과 출연료를, dfRevenue는 제작비와 흥행
+    수익을 포함합니다. 세 테이블은 모두 movieId라는 공통 식별자를 가지고 있어 조인이 가능합니다. 스키마를 확인하면 각 테이블의 구조와 데이터 타입을 파악할 수 있으며, 이는
+    조인 전략을 수립하는 첫 단계입니다. 실무에서는 수백만 건의 데이터를 다루지만, 여기서는 학습을 위해 10건의 대표적인 영화를 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -83,7 +114,7 @@ sections:
     })
     dfMovies
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 생성 및 로드 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import polars as pl
 
@@ -97,17 +128,22 @@ sections:
       })
       dfMovies
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 생성 및 로드 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 생성 및 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 생성 및 로드에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step3_preprocess
   title: 3단계. 전처리
   structuredPrimary: true
   subtitle: null 처리, 타입 변환 (C5, D3, D5 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 원시 데이터(raw data)는 그대로 분석에 사용할 수 없는 경우가 많습니다. 전처리(preprocessing) 단계에서 데이터 타입을 변환하고, 결측치를 처리하고, 이상치를 제거하는 등의 작업을 수행합니다. 여기서는 releaseDate가 문자열("2012-05-04")로 저장되어 있어 날짜 연산이 불가능합니다. str.to_date()로 Date 타입으로 변환하면 연도, 월, 요일 추출, 날짜 차이 계산 등의 시계열 분석이 가능해집니다. null 값 확인은 데이터 품질 점검의 필수 단계입니다. null이 있으면 집계 결과가 왜곡되거나 조인 실패가 발생할 수 있습니다. 실무에서는 전처리 단계에서 데이터 품질 리포트를 생성하고, 문제가 있는 데이터는 소스 시스템에 피드백하거나 규칙에 따라 처리합니다. 좋은 분석의 80%는 전처리에서 결정됩니다.
+  goal: 3단계. 전처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 원시 데이터(raw data)는 그대로 분석에 사용할 수 없는 경우가 많습니다. 전처리(preprocessing) 단계에서 데이터 타입을 변환하고, 결측치를
+    처리하고, 이상치를 제거하는 등의 작업을 수행합니다. 여기서는 releaseDate가 문자열("2012-05-04")로 저장되어 있어 날짜 연산이 불가능합니다. str.to_date()로
+    Date 타입으로 변환하면 연도, 월, 요일 추출, 날짜 차이 계산 등의 시계열 분석이 가능해집니다. null 값 확인은 데이터 품질 점검의 필수 단계입니다. null이 있으면
+    집계 결과가 왜곡되거나 조인 실패가 발생할 수 있습니다. 실무에서는 전처리 단계에서 데이터 품질 리포트를 생성하고, 문제가 있는 데이터는 소스 시스템에 피드백하거나 규칙에 따라
+    처리합니다. 좋은 분석의 80%는 전처리에서 결정됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -116,24 +152,29 @@ sections:
     )
     dfRevenue
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 전처리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfRevenue = dfRevenue.with_columns(
           pl.col("releaseDate").str.to_date("%Y-%m-%d").alias("releaseDate")
       )
       dfRevenue
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 전처리 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 전처리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 전처리에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_join
   title: 4단계. 데이터 결합
   structuredPrimary: true
   subtitle: join, concat (F1, F4 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 분산된 데이터를 하나의 분석 테이블로 통합하는 것이 데이터 결합(join)입니다. SQL의 JOIN과 동일한 개념으로, 공통 키(movieId)를 기준으로 여러 테이블의 정보를 결합합니다. left join을 사용하면 왼쪽 테이블(dfMovies)의 모든 행을 유지하고, 오른쪽 테이블에서 매칭되는 정보를 가져옵니다. 먼저 영화와 배우 데이터를 결합하고(dfMovieActor), 그 결과에 수익 데이터를 추가로 결합합니다(dfFull). 단계별로 조인하면 각 단계의 결과를 확인하며 진행할 수 있습니다. 조인 후에는 영화 제목, 배우명, 출연료, 제작비, 흥행 수익 등 모든 정보가 하나의 행에 모이므로 종합적인 분석이 가능해집니다. 실무에서는 수십 개의 테이블을 조인하는 경우도 있으며, 조인 키 선택, 조인 방식(inner/left/outer), 중복 처리 등이 중요한 이슈입니다. Polars의 조인은 pandas보다 훨씬 빠른 성능을 제공합니다.
+  goal: 4단계. 데이터 결합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 분산된 데이터를 하나의 분석 테이블로 통합하는 것이 데이터 결합(join)입니다. SQL의 JOIN과 동일한 개념으로, 공통 키(movieId)를 기준으로
+    여러 테이블의 정보를 결합합니다. left join을 사용하면 왼쪽 테이블(dfMovies)의 모든 행을 유지하고, 오른쪽 테이블에서 매칭되는 정보를 가져옵니다. 먼저 영화와
+    배우 데이터를 결합하고(dfMovieActor), 그 결과에 수익 데이터를 추가로 결합합니다(dfFull). 단계별로 조인하면 각 단계의 결과를 확인하며 진행할 수 있습니다.
+    조인 후에는 영화 제목, 배우명, 출연료, 제작비, 흥행 수익 등 모든 정보가 하나의 행에 모이므로 종합적인 분석이 가능해집니다. 실무에서는 수십 개의 테이블을 조인하는 경우도
+    있으며, 조인 키 선택, 조인 방식(inner/left/outer), 중복 처리 등이 중요한 이슈입니다. Polars의 조인은 pandas보다 훨씬 빠른 성능을 제공합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -144,7 +185,7 @@ sections:
     )
     dfMovieActor
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 데이터 결합 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfMovieActor = dfMovies.join(
           dfActors,
@@ -153,17 +194,22 @@ sections:
       )
       dfMovieActor
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 데이터 결합 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 데이터 결합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 데이터 결합에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_transform
   title: 5단계. 파생 컬럼 생성
   structuredPrimary: true
   subtitle: with_columns, alias, when-then (D1, D2, D6 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 원본 데이터에는 없지만 분석에 필요한 파생 변수(derived variable)를 생성합니다. 수익률(ROI)은 "(흥행 수익 - 제작비) / 제작비 * 100"으로 계산하며, 투자 대비 수익을 백분율로 표현합니다. ROI가 200%면 투자금의 3배를 벌었다는 의미입니다. 날짜에서 연도(releaseYear)와 월(releaseMonth)을 추출하면 시계열 분석과 계절성 분석이 가능합니다. when-then-otherwise 구문으로 수익률을 기준으로 "대박", "성공", "보통", "실패" 등급을 부여하면 영화를 범주화할 수 있습니다. 이렇게 연속형 변수를 범주화하면 그룹별 비교가 쉬워집니다. 파생 변수는 원본 데이터에는 없지만 비즈니스 인사이트를 얻는 데 핵심적인 역할을 합니다. 실무에서는 도메인 지식을 바탕으로 의미 있는 파생 변수를 설계하는 것이 데이터 분석가의 중요한 역량입니다. with_columns()로 여러 파생 변수를 한 번에 생성할 수 있습니다.
+  goal: 5단계. 파생 컬럼 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 원본 데이터에는 없지만 분석에 필요한 파생 변수(derived variable)를 생성합니다. 수익률(ROI)은 "(흥행 수익 - 제작비) / 제작비 * 100"으로
+    계산하며, 투자 대비 수익을 백분율로 표현합니다. ROI가 200%면 투자금의 3배를 벌었다는 의미입니다. 날짜에서 연도(releaseYear)와 월(releaseMonth)을
+    추출하면 시계열 분석과 계절성 분석이 가능합니다. when-then-otherwise 구문으로 수익률을 기준으로 "대박", "성공", "보통", "실패" 등급을 부여하면 영화를
+    범주화할 수 있습니다. 이렇게 연속형 변수를 범주화하면 그룹별 비교가 쉬워집니다. 파생 변수는 원본 데이터에는 없지만 비즈니스 인사이트를 얻는 데 핵심적인 역할을 합니다. 실무에서는
+    도메인 지식을 바탕으로 의미 있는 파생 변수를 설계하는 것이 데이터 분석가의 중요한 역량입니다. with_columns()로 여러 파생 변수를 한 번에 생성할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -174,7 +220,7 @@ sections:
     ])
     dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth"])
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 파생 컬럼 생성 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfFull = dfFull.with_columns([
           ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"),
@@ -183,17 +229,22 @@ sections:
       ])
       dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth"])
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 파생 컬럼 생성 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 파생 컬럼 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 파생 컬럼 생성에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_filter
   title: 6단계. 필터링
   structuredPrimary: true
   subtitle: filter, 비교/논리연산, str.contains (C1, C2, C3, C4 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 전체 데이터에서 분석 목적에 맞는 부분집합을 추출하는 것이 필터링입니다. 평점 8점 이상이면서 수익률 200% 이상인 영화만 추출하면 "흥행과 작품성을 모두 갖춘 히트작"을 선별할 수 있습니다. &(and), |(or) 같은 논리 연산자로 복합 조건을 만들 수 있습니다. 문자열 필터에서는 str.contains()로 장르가 "Sci-Fi"를 포함하는 영화를 찾을 수 있습니다. 정규표현식도 지원하므로 복잡한 패턴 매칭도 가능합니다. 필터링은 데이터 탐색의 기본이며, 적절한 필터링으로 노이즈를 제거하고 핵심 데이터에 집중할 수 있습니다. Lazy 모드에서는 Predicate Pushdown으로 필터가 최우선으로 적용되어 성능이 극대화됩니다. 실무에서는 비즈니스 규칙에 따라 복잡한 필터 조건을 설계합니다.
+  goal: 6단계. 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 전체 데이터에서 분석 목적에 맞는 부분집합을 추출하는 것이 필터링입니다. 평점 8점 이상이면서 수익률 200% 이상인 영화만 추출하면 "흥행과 작품성을 모두
+    갖춘 히트작"을 선별할 수 있습니다. &(and), |(or) 같은 논리 연산자로 복합 조건을 만들 수 있습니다. 문자열 필터에서는 str.contains()로 장르가 "Sci-Fi"를
+    포함하는 영화를 찾을 수 있습니다. 정규표현식도 지원하므로 복잡한 패턴 매칭도 가능합니다. 필터링은 데이터 탐색의 기본이며, 적절한 필터링으로 노이즈를 제거하고 핵심 데이터에
+    집중할 수 있습니다. Lazy 모드에서는 Predicate Pushdown으로 필터가 최우선으로 적용되어 성능이 극대화됩니다. 실무에서는 비즈니스 규칙에 따라 복잡한 필터 조건을
+    설계합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -202,24 +253,29 @@ sections:
     )
     dfHits.select(["title", "rating", "roi", "successLevel"])
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 필터링 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfHits = dfFull.filter(
           (pl.col("rating") >= 8.0) & (pl.col("roi") >= 200)
       )
       dfHits.select(["title", "rating", "roi", "successLevel"])
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 필터링 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 필터링에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_select
   title: 7단계. 열 선택
   structuredPrimary: true
   subtitle: select, pl.col, 다중열, exclude (B1, B2, B4, B5 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 분석 목적에 맞는 핵심 컬럼만 선택하여 데이터를 간결하게 만듭니다. 전체 테이블에는 수십 개의 컬럼이 있을 수 있지만, 특정 분석에서는 그 중 일부만 필요합니다. select()로 title, genre, rating, boxOffice 등 필요한 컬럼만 선택하면 데이터 크기가 줄어들어 메모리 효율이 높아지고 가독성도 향상됩니다. alias()로 컬럼명을 변경하여 더 명확하게 표현할 수 있습니다. 반대로 exclude()를 사용하면 특정 컬럼만 제외하고 나머지를 선택할 수 있습니다. 예를 들어 movieId, actorId 같은 내부 식별자는 분석 결과에서 제외하는 것이 좋습니다. Projection Pushdown 최적화에서는 select가 일찍 적용되어 불필요한 컬럼을 읽지 않으므로 I/O 비용이 크게 감소합니다. 실무에서는 리포트마다 필요한 컬럼 세트가 다르므로 적절한 선택이 중요합니다.
+  goal: 7단계. 열 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 분석 목적에 맞는 핵심 컬럼만 선택하여 데이터를 간결하게 만듭니다. 전체 테이블에는 수십 개의 컬럼이 있을 수 있지만, 특정 분석에서는 그 중 일부만 필요합니다.
+    select()로 title, genre, rating, boxOffice 등 필요한 컬럼만 선택하면 데이터 크기가 줄어들어 메모리 효율이 높아지고 가독성도 향상됩니다. alias()로
+    컬럼명을 변경하여 더 명확하게 표현할 수 있습니다. 반대로 exclude()를 사용하면 특정 컬럼만 제외하고 나머지를 선택할 수 있습니다. 예를 들어 movieId, actorId
+    같은 내부 식별자는 분석 결과에서 제외하는 것이 좋습니다. Projection Pushdown 최적화에서는 select가 일찍 적용되어 불필요한 컬럼을 읽지 않으므로 I/O 비용이
+    크게 감소합니다. 실무에서는 리포트마다 필요한 컬럼 세트가 다르므로 적절한 선택이 중요합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -234,7 +290,7 @@ sections:
     ])
     dfCore
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 열 선택 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfCore = dfFull.select([
           pl.col("title"),
@@ -247,17 +303,22 @@ sections:
       ])
       dfCore
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 열 선택 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 열 선택 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 열 선택에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_group
   title: 8단계. 집계 분석
   structuredPrimary: true
   subtitle: group_by, agg, 다중그룹 (E1, E2, E3, E4, E5 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 개별 데이터를 그룹별로 요약하여 전체적인 패턴을 파악하는 것이 집계 분석입니다. group_by("genre")로 장르별로 그룹화하고, agg()로 각 그룹의 총 수익, 평균 수익, 평균 평점, 영화 수를 계산하면 "어떤 장르가 가장 수익성이 높은지" 한눈에 알 수 있습니다. 다중 그룹 집계에서는 ["genre", "successLevel"]처럼 여러 컬럼으로 그룹화하여 교차 분석을 수행합니다. 예를 들어 "Sci-Fi 장르의 대박 영화는 몇 편인지"를 확인할 수 있습니다. sum, mean, count, first, n_unique 등 다양한 집계 함수를 조합하면 풍부한 통계를 산출할 수 있습니다. 집계 결과를 정렬하면 상위/하위 그룹을 빠르게 파악할 수 있습니다. Polars의 group_by는 pandas보다 월등히 빠르며, 수백만 건의 데이터도 초 단위로 집계합니다. 실무에서는 집계 데이터를 대시보드나 리포트에 활용합니다.
+  goal: 8단계. 집계 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 개별 데이터를 그룹별로 요약하여 전체적인 패턴을 파악하는 것이 집계 분석입니다. group_by("genre")로 장르별로 그룹화하고, agg()로 각 그룹의
+    총 수익, 평균 수익, 평균 평점, 영화 수를 계산하면 "어떤 장르가 가장 수익성이 높은지" 한눈에 알 수 있습니다. 다중 그룹 집계에서는 ["genre", "successLevel"]처럼
+    여러 컬럼으로 그룹화하여 교차 분석을 수행합니다. 예를 들어 "Sci-Fi 장르의 대박 영화는 몇 편인지"를 확인할 수 있습니다. sum, mean, count, first,
+    n_unique 등 다양한 집계 함수를 조합하면 풍부한 통계를 산출할 수 있습니다. 집계 결과를 정렬하면 상위/하위 그룹을 빠르게 파악할 수 있습니다. Polars의 group_by는
+    pandas보다 월등히 빠르며, 수백만 건의 데이터도 초 단위로 집계합니다. 실무에서는 집계 데이터를 대시보드나 리포트에 활용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -269,7 +330,7 @@ sections:
     ]).sort("totalRevenue", descending=True)
     genreStats
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 집계 분석 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       genreStats = dfFull.group_by("genre").agg([
           pl.col("boxOffice").sum().alias("totalRevenue"),
@@ -279,17 +340,22 @@ sections:
       ]).sort("totalRevenue", descending=True)
       genreStats
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 집계 분석 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 집계 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 집계 분석에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_window
   title: 9단계. 윈도우 함수
   structuredPrimary: true
   subtitle: over, rank, rolling, cum_sum, shift (I1, I2, I3, I4, I5 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 윈도우 함수는 집계와 달리 행을 줄이지 않고 각 행에 그룹 내 통계를 추가하는 고급 기법입니다. rank().over("genre")는 각 장르 내에서 흥행 순위를 계산합니다. 예를 들어 Sci-Fi 장르 안에서 Avatar가 1위, Dune이 2위처럼 매기는 것입니다. 이렇게 하면 "각 장르의 최고 흥행작"을 쉽게 찾을 수 있습니다. 시계열 분석에서는 cum_sum()으로 누적 합계를 계산하여 "시간에 따른 총 수익 증가 추세"를 볼 수 있고, shift()로 이전 값과 비교하여 증가율을 계산할 수 있습니다. rolling()로 이동 평균을 계산하면 단기 트렌드를 파악할 수 있습니다. 윈도우 함수는 SQL의 OVER 절, pandas의 transform()과 유사하지만 Polars가 더 빠릅니다. 실무에서는 순위, 비율, 증가율, 이동 평균 등 복잡한 비즈니스 로직을 윈도우 함수로 구현합니다.
+  goal: 9단계. 윈도우 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 윈도우 함수는 집계와 달리 행을 줄이지 않고 각 행에 그룹 내 통계를 추가하는 고급 기법입니다. rank().over("genre")는 각 장르 내에서 흥행
+    순위를 계산합니다. 예를 들어 Sci-Fi 장르 안에서 Avatar가 1위, Dune이 2위처럼 매기는 것입니다. 이렇게 하면 "각 장르의 최고 흥행작"을 쉽게 찾을 수 있습니다.
+    시계열 분석에서는 cum_sum()으로 누적 합계를 계산하여 "시간에 따른 총 수익 증가 추세"를 볼 수 있고, shift()로 이전 값과 비교하여 증가율을 계산할 수 있습니다.
+    rolling()로 이동 평균을 계산하면 단기 트렌드를 파악할 수 있습니다. 윈도우 함수는 SQL의 OVER 절, pandas의 transform()과 유사하지만 Polars가
+    더 빠릅니다. 실무에서는 순위, 비율, 증가율, 이동 평균 등 복잡한 비즈니스 로직을 윈도우 함수로 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -298,46 +364,56 @@ sections:
     ).select(["title", "genre", "boxOffice", "genreRank"]).sort(["genre", "genreRank"])
     dfRanked
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 윈도우 함수 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dfRanked = dfFull.with_columns(
           pl.col("boxOffice").rank(descending=True).over("genre").alias("genreRank")
       ).select(["title", "genre", "boxOffice", "genreRank"]).sort(["genre", "genreRank"])
       dfRanked
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 윈도우 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 윈도우 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 윈도우 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_sort
   title: 10단계. 정렬 및 상위 N개
   structuredPrimary: true
   subtitle: sort, head/tail (G1, G5 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 데이터를 특정 기준으로 순서대로 배열하는 것이 정렬입니다. sort("roi", descending=True)는 수익률 내림차순 정렬로, 가장 수익성이 높은 영화가 맨 위에 옵니다. head(5)와 조합하면 Top 5를 추출할 수 있습니다. 반대로 rating 오름차순 정렬 후 head(3)하면 평점이 낮은 하위 3개 영화를 찾을 수 있습니다. 다중 정렬도 가능하여 ["genre", "rating"]으로 정렬하면 "장르별로 그룹화되고, 각 장르 내에서는 평점 순"으로 정렬됩니다. tail()은 하위 N개를 추출합니다. 정렬은 데이터 탐색과 리포트 생성에 필수적이며, 상위/하위 항목을 찾는 것은 의사결정에 직접 활용됩니다. 실무에서는 "Top 10 고객", "하위 5% 제품" 같은 분석을 자주 수행합니다.
+  goal: 10단계. 정렬 및 상위 N개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 데이터를 특정 기준으로 순서대로 배열하는 것이 정렬입니다. sort("roi", descending=True)는 수익률 내림차순 정렬로, 가장 수익성이 높은
+    영화가 맨 위에 옵니다. head(5)와 조합하면 Top 5를 추출할 수 있습니다. 반대로 rating 오름차순 정렬 후 head(3)하면 평점이 낮은 하위 3개 영화를 찾을
+    수 있습니다. 다중 정렬도 가능하여 ["genre", "rating"]으로 정렬하면 "장르별로 그룹화되고, 각 장르 내에서는 평점 순"으로 정렬됩니다. tail()은 하위 N개를
+    추출합니다. 정렬은 데이터 탐색과 리포트 생성에 필수적이며, 상위/하위 항목을 찾는 것은 의사결정에 직접 활용됩니다. 실무에서는 "Top 10 고객", "하위 5% 제품" 같은
+    분석을 자주 수행합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     top5Roi = dfFull.sort("roi", descending=True).head(5).select(["title", "genre", "roi", "successLevel"])
     top5Roi
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 정렬 및 상위 N개 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       top5Roi = dfFull.sort("roi", descending=True).head(5).select(["title", "genre", "roi", "successLevel"])
       top5Roi
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 정렬 및 상위 N개 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 정렬 및 상위 N개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 정렬 및 상위 N개에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step11_pivot
   title: 11단계. 피벗
   structuredPrimary: true
   subtitle: pivot, unpivot, 체이닝 (J1, J2, J3 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 피벗은 데이터의 형태를 바꾸어 교차표(cross-tabulation)를 만드는 기법입니다. 행 데이터를 열로 펼치면 가독성이 높은 매트릭스 형태가 됩니다. 장르별, 성공등급별 수익을 계산한 후 pivot(on="successLevel", index="genre", values="revenue")하면 장르가 행, 성공등급(대박/성공/보통/실패)이 열이 되는 테이블이 생성됩니다. 이렇게 하면 "Sci-Fi 장르의 대박 영화 수익은 얼마인지" 한눈에 볼 수 있습니다. fill_null(0)로 값이 없는 셀을 0으로 채웁니다. Excel의 피벗 테이블, pandas의 pivot_table()과 동일한 기능입니다. unpivot()은 반대로 넓은 형태를 긴 형태로 변환합니다. 메서드 체이닝으로 filter, group_by, pivot, sort를 한 줄로 연결하면 복잡한 분석도 간결하게 표현할 수 있습니다. 실무에서는 피벗 테이블을 리포트나 대시보드의 핵심 뷰로 사용합니다.
+  goal: 11단계. 피벗에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 피벗은 데이터의 형태를 바꾸어 교차표(cross-tabulation)를 만드는 기법입니다. 행 데이터를 열로 펼치면 가독성이 높은 매트릭스 형태가 됩니다.
+    장르별, 성공등급별 수익을 계산한 후 pivot(on="successLevel", index="genre", values="revenue")하면 장르가 행, 성공등급(대박/성공/보통/실패)이
+    열이 되는 테이블이 생성됩니다. 이렇게 하면 "Sci-Fi 장르의 대박 영화 수익은 얼마인지" 한눈에 볼 수 있습니다. fill_null(0)로 값이 없는 셀을 0으로 채웁니다.
+    Excel의 피벗 테이블, pandas의 pivot_table()과 동일한 기능입니다. unpivot()은 반대로 넓은 형태를 긴 형태로 변환합니다. 메서드 체이닝으로 filter,
+    group_by, pivot, sort를 한 줄로 연결하면 복잡한 분석도 간결하게 표현할 수 있습니다. 실무에서는 피벗 테이블을 리포트나 대시보드의 핵심 뷰로 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -350,7 +426,7 @@ sections:
     ).fill_null(0)
     pivotTable
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 피벗 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pivotTable = dfFull.group_by(["genre", "successLevel"]).agg(
           pl.col("boxOffice").sum().alias("revenue")
@@ -361,17 +437,23 @@ sections:
       ).fill_null(0)
       pivotTable
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 피벗 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 피벗 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 피벗에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step12_lazy
   title: 12단계. Lazy 최적화
   structuredPrimary: true
   subtitle: lazy, collect, explain (H1, H2, H3 반복)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 복잡한 데이터 파이프라인을 Lazy 모드로 작성하면 Polars가 자동으로 쿼리를 최적화합니다. lazy()로 시작하여 filter, group_by, agg, sort 등을 체이닝하면 쿼리 계획이 수집됩니다. explain()으로 최적화된 실행 계획을 확인하면 Predicate Pushdown, Projection Pushdown 등이 적용된 것을 볼 수 있습니다. 예를 들어 "ROI > 100 필터링"이 맨 앞으로 이동하여 불필요한 데이터 처리를 건너뜁니다. collect()를 호출하면 최적화된 계획이 실제로 실행되어 DataFrame을 반환합니다. 실무에서는 대부분의 분석을 Lazy 모드로 작성하여 성능을 극대화합니다. 특히 수백만 건 이상의 대용량 데이터나 복잡한 조인이 포함된 쿼리에서 Lazy 모드의 성능 이점이 두드러집니다. 쿼리 개발 시에는 fetch(100)으로 상위 100개만 빠르게 테스트하고, 최종 실행 시 collect()를 사용하는 것이 효율적입니다.
+  goal: 12단계. Lazy 최적화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 복잡한 데이터 파이프라인을 Lazy 모드로 작성하면 Polars가 자동으로 쿼리를 최적화합니다. lazy()로 시작하여 filter, group_by, agg,
+    sort 등을 체이닝하면 쿼리 계획이 수집됩니다. explain()으로 최적화된 실행 계획을 확인하면 Predicate Pushdown, Projection Pushdown 등이
+    적용된 것을 볼 수 있습니다. 예를 들어 "ROI > 100 필터링"이 맨 앞으로 이동하여 불필요한 데이터 처리를 건너뜁니다. collect()를 호출하면 최적화된 계획이 실제로
+    실행되어 DataFrame을 반환합니다. 실무에서는 대부분의 분석을 Lazy 모드로 작성하여 성능을 극대화합니다. 특히 수백만 건 이상의 대용량 데이터나 복잡한 조인이 포함된
+    쿼리에서 Lazy 모드의 성능 이점이 두드러집니다. 쿼리 개발 시에는 fetch(100)으로 상위 100개만 빠르게 테스트하고, 최종 실행 시 collect()를 사용하는 것이
+    효율적입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -387,7 +469,7 @@ sections:
     )
     lazyQuery.explain()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. Lazy 최적화 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lazyQuery = (
           dfFull.lazy()
@@ -401,17 +483,22 @@ sections:
       )
       lazyQuery.explain()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. Lazy 최적화 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. Lazy 최적화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. Lazy 최적화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step13_dashboard
   title: 13단계. 종합 대시보드
   structuredPrimary: true
   subtitle: 최종 결과물
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 데이터 파이프라인의 최종 산출물은 의사결정에 활용할 수 있는 인사이트입니다. 종합 대시보드는 여러 관점의 집계 데이터를 한곳에 모아 전체 상황을 조망할 수 있게 합니다. 장르별 요약에서는 영화 수, 총수익, 평균수익, 평균ROI, 평균평점을 계산하여 "어떤 장르가 가장 수익성이 높고 안정적인지" 파악합니다. 연도별 요약은 시계열 트렌드를 보여주어 "영화 산업이 성장하는지, 제작비 대비 수익이 개선되는지" 분석할 수 있습니다. 배우별 요약은 "어떤 배우가 출연료 대비 흥행 효율이 높은지" 평가하여 캐스팅 의사결정에 활용할 수 있습니다. round()로 소수점을 정리하고 한글 컬럼명을 사용하면 리포트 가독성이 향상됩니다. 실무에서는 이런 집계 데이터를 Tableau, Power BI, Grafana 같은 BI 도구에 연결하거나, CSV로 저장하여 공유합니다. 데이터 분석의 최종 목표는 비즈니스 가치를 창출하는 것입니다.
+  goal: 13단계. 종합 대시보드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 데이터 파이프라인의 최종 산출물은 의사결정에 활용할 수 있는 인사이트입니다. 종합 대시보드는 여러 관점의 집계 데이터를 한곳에 모아 전체 상황을 조망할 수
+    있게 합니다. 장르별 요약에서는 영화 수, 총수익, 평균수익, 평균ROI, 평균평점을 계산하여 "어떤 장르가 가장 수익성이 높고 안정적인지" 파악합니다. 연도별 요약은 시계열
+    트렌드를 보여주어 "영화 산업이 성장하는지, 제작비 대비 수익이 개선되는지" 분석할 수 있습니다. 배우별 요약은 "어떤 배우가 출연료 대비 흥행 효율이 높은지" 평가하여 캐스팅
+    의사결정에 활용할 수 있습니다. round()로 소수점을 정리하고 한글 컬럼명을 사용하면 리포트 가독성이 향상됩니다. 실무에서는 이런 집계 데이터를 Tableau, Power
+    BI, Grafana 같은 BI 도구에 연결하거나, CSV로 저장하여 공유합니다. 데이터 분석의 최종 목표는 비즈니스 가치를 창출하는 것입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -424,7 +511,7 @@ sections:
     ]).sort("총수익", descending=True)
     dashboardGenre
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 종합 대시보드 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dashboardGenre = dfFull.group_by("genre").agg([
           pl.len().alias("영화수"),
@@ -435,16 +522,17 @@ sections:
       ]).sort("총수익", descending=True)
       dashboardGenre
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 종합 대시보드 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 종합 대시보드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 종합 대시보드에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 고급 확장 과제
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     10개 프로젝트에서 배운 모든 Polars 개념을 종합하여 실전 수준의 심화 분석을 수행합니다. 복잡한 필터 조건, 다중 조인, 윈도우 함수, 피벗, Lazy 최적화를 모두 활용합니다.
 
@@ -468,7 +556,7 @@ sections:
         ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"))
     movieRevenue.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import polars as pl
 
@@ -486,15 +574,19 @@ sections:
           ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"))
       movieRevenue.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
   - type: text
-    content: 10개 프로젝트를 완주하며 Polars의 모든 핵심 개념을 마스터했습니다! 다중 데이터 소스를 통합하고, 전처리하고, 변환하고, 집계하고, 시각화 준비까지 완료하는 완전한 데이터 파이프라인을 구축할 수 있는 능력을 갖추었습니다. 이제 실무 환경에서 어떤 데이터 분석 과제가 주어져도 Polars로 효율적으로 처리할 수 있습니다. pandas보다 수십 배 빠른 성능, Lazy Evaluation을 통한 자동 최적화, 풍부한 표현식 API는 Polars를 현대 데이터 분석의 필수 도구로 만들어줍니다. 계속해서 실전 프로젝트를 경험하며 역량을 키워나가시기 바랍니다!
+    content: 10개 프로젝트를 완주하며 Polars의 모든 핵심 개념을 마스터했습니다! 다중 데이터 소스를 통합하고, 전처리하고, 변환하고, 집계하고, 시각화 준비까지 완료하는
+      완전한 데이터 파이프라인을 구축할 수 있는 능력을 갖추었습니다. 이제 실무 환경에서 어떤 데이터 분석 과제가 주어져도 Polars로 효율적으로 처리할 수 있습니다. pandas보다
+      수십 배 빠른 성능, Lazy Evaluation을 통한 자동 최적화, 풍부한 표현식 API는 Polars를 현대 데이터 분석의 필수 도구로 만들어줍니다. 계속해서 실전 프로젝트를
+      경험하며 역량을 키워나가시기 바랍니다!
   - type: list
     items:
     - 'A. 데이터 로드: read_csv, schema 확인'
@@ -508,14 +600,19 @@ sections:
     - 'I. 윈도우: over, rank, rolling, cum_sum, shift'
     - 'J. 피벗: pivot, unpivot, 체이닝'
   - type: text
-    content: 10개 프로젝트를 완료하며 Polars의 모든 핵심 개념을 마스터했습니다! 영화 평점 분석부터 시작하여 날씨 데이터, 게임 판매, 주식 시계열, 음악 스트리밍, 부동산 가격, 스포츠 통계, 소셜 미디어, 대용량 로그, 그리고 이 종합 프로젝트까지 다양한 도메인의 데이터를 다루며 실전 감각을 익혔습니다. 이제 pandas를 대체하여 월등히 빠른 성능으로 대용량 데이터를 처리할 수 있고, Lazy Evaluation으로 쿼리를 자동 최적화하며, 윈도우 함수와 표현식 API로 복잡한 분석도 간결하게 수행할 수 있습니다. 실전 데이터 파이프라인을 자유롭게 구축할 수 있는 역량을 갖추셨습니다. 다음 단계로 DuckDB, Altair 등 다른 도구와 함께 사용하며 데이터 분석 능력을 더욱 확장해나가세요!
+    content: 10개 프로젝트를 완료하며 Polars의 모든 핵심 개념을 마스터했습니다! 영화 평점 분석부터 시작하여 날씨 데이터, 게임 판매, 주식 시계열, 음악 스트리밍,
+      부동산 가격, 스포츠 통계, 소셜 미디어, 대용량 로그, 그리고 이 종합 프로젝트까지 다양한 도메인의 데이터를 다루며 실전 감각을 익혔습니다. 이제 pandas를 대체하여
+      월등히 빠른 성능으로 대용량 데이터를 처리할 수 있고, Lazy Evaluation으로 쿼리를 자동 최적화하며, 윈도우 함수와 표현식 API로 복잡한 분석도 간결하게 수행할
+      수 있습니다. 실전 데이터 파이프라인을 자유롭게 구축할 수 있는 역량을 갖추셨습니다. 다음 단계로 DuckDB, Altair 등 다른 도구와 함께 사용하며 데이터 분석 능력을
+      더욱 확장해나가세요!
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 주문 매출 파이프라인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -543,7 +640,7 @@ sections:
     validateOrderFrame(orderFrame)
     orderFrame
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
@@ -579,7 +676,8 @@ sections:
       validateOrderFrame(orderFrame)
       orderFrame
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

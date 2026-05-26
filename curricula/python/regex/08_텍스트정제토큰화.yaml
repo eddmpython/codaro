@@ -24,31 +24,54 @@ intro:
   emoji: 🧹
   goal: 로컬 노이즈 텍스트를 정제하고 토큰화하여 LLM 입력을 준비합니다.
   description: LLM 전처리의 핵심 단계입니다. 노이즈 제거, 정규화, 토큰화를 통해 토큰 수를 최소화하고 품질을 높입니다.
+  direction: 텍스트정제토큰화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 텍스트정제토큰화 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 텍스트 데이터 로드 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특수문자 제거 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 텍스트정제토큰화 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 텍스트정제토큰화 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 텍스트정제토큰화 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import re
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: import re
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_load_text
   title: 2단계. 텍스트 데이터 로드
   structuredPrimary: true
   subtitle: 로컬 노이즈 텍스트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 텍스트 데이터 로드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실제 고객 피드백, 지원 티켓, 검색 로그처럼 노이즈가 섞인 로컬 문단을 준비합니다. 특수문자, 반복 단어, 줄바꿈, 대소문자 혼재가 들어 있어 텍스트 정제와 토큰화 흐름을 네트워크 없이 안정적으로 연습할 수 있습니다.
 
@@ -67,7 +90,7 @@ sections:
     rawText = " ".join(textData)
     rawText[:300]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 텍스트 데이터 로드 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       textData = [
           "Customer feedback!!!  Delivery was fast, but packaging   had extra spaces.",
@@ -80,42 +103,45 @@ sections:
       rawText = " ".join(textData)
       rawText[:300]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 텍스트 데이터 로드 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 텍스트 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 텍스트 데이터 로드에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_remove_special_chars
   title: 3단계. 특수문자 제거
   structuredPrimary: true
   subtitle: 알파벳과 공백만 남기기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 특수문자 제거에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     LLM 입력에 불필요한 특수문자를 제거합니다. 쉼표, 마침표, 느낌표 등의 구두점과 특수 기호는 대부분의 분석에서 불필요합니다. 부정 문자 클래스 [^...]를 사용하면 유지할 문자만 지정하고 나머지는 모두 제거할 수 있습니다.
 
     [^...] 부정 문자 클래스
     - `[a-zA-Z\s]` : 알파벳과 공백만 - `[^a-zA-Z\s]` : 알파벳과 공백이 **아닌** 모든 것 - `^` 가 [ ] 안에 있으면 부정의 의미!
   tips:
-  - '[^...] 부정 문자 클래스 - `[a-zA-Z\s]` : 알파벳과 공백만 - `[^a-zA-Z\s]` : 알파벳과 공백이 **아닌** 모든 것 - `^` 가 [ ] 안에 있으면 부정의 의미!'
+  - '[^...] 부정 문자 클래스 - `[a-zA-Z\s]` : 알파벳과 공백만 - `[^a-zA-Z\s]` : 알파벳과 공백이 **아닌** 모든 것 - `^` 가 [ ] 안에
+    있으면 부정의 의미!'
   snippet: |-
     cleanedText = re.sub(r"[^a-zA-Z\s]", "", rawText)
     cleanedText[:200]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 특수문자 제거 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cleanedText = re.sub(r"[^a-zA-Z\s]", "", rawText)
       cleanedText[:200]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 특수문자 제거 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 특수문자 제거 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 특수문자 제거에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_normalize_whitespace
   title: 4단계. 공백 정규화
   structuredPrimary: true
   subtitle: 연속 공백을 하나로
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 공백 정규화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     연속된 공백을 하나로 통일하여 토큰 낭비를 줄입니다. 웹에서 수집한 텍스트에는 종종 탭, 줄바꿈, 연속 공백 등이 포함됩니다. \\s+ 패턴으로 모든 종류의 공백 문자를 하나의 공백으로 정규화하면 깔끔한 텍스트를 얻을 수 있습니다.
 
@@ -127,74 +153,79 @@ sections:
     normalizedText = normalizedText.strip()
     normalizedText[:200]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 공백 정규화 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       normalizedText = re.sub(r"\s+", " ", cleanedText)
       normalizedText = normalizedText.strip()
       normalizedText[:200]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 공백 정규화 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 공백 정규화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 공백 정규화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_lowercase
   title: 5단계. 소문자 변환
   structuredPrimary: true
   subtitle: 대소문자 통일
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 소문자 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     대소문자를 통일하여 일관성을 높이고 토큰 수를 줄입니다. LLM의 토크나이저는 대소문자를 구분하여 Hello와 hello를 다른 토큰으로 처리합니다. 소문자로 통일하면 어휘 크기가 줄어 효율성이 높아지고, 검색이나 비교도 쉬워집니다.
 
     대소문자와 토큰
     LLM 토크나이저는 대소문자를 다른 토큰으로 인식: - "Bacon" : 1 토큰 - "bacon" : 1 토큰 - "BACON" : 1 토큰 소문자로 통일하면 어휘 크기 감소!
   tips:
-  - '대소문자와 토큰 LLM 토크나이저는 대소문자를 다른 토큰으로 인식: - "Bacon" : 1 토큰 - "bacon" : 1 토큰 - "BACON" : 1 토큰 소문자로 통일하면 어휘 크기 감소!'
+  - '대소문자와 토큰 LLM 토크나이저는 대소문자를 다른 토큰으로 인식: - "Bacon" : 1 토큰 - "bacon" : 1 토큰 - "BACON" : 1 토큰 소문자로 통일하면
+    어휘 크기 감소!'
   snippet: |-
     lowercaseText = normalizedText.lower()
     lowercaseText[:200]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 소문자 변환 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lowercaseText = normalizedText.lower()
       lowercaseText[:200]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 소문자 변환 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 소문자 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 소문자 변환에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_tokenization
   title: 6단계. 토큰화
   structuredPrimary: true
   subtitle: re.split()으로 단어 분리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 토큰화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     텍스트를 단어 단위로 분리합니다.
 
     re.split(패턴, 텍스트)
     **re.split()**: - 패턴을 구분자로 텍스트 분리 - str.split()보다 유연함 - 여러 구분자 동시 사용 가능 예: `re.split(r"[,;\s]+", text)` → 쉼표, 세미콜론, 공백으로 분리
   tips:
-  - 're.split(패턴, 텍스트) **re.split()**: - 패턴을 구분자로 텍스트 분리 - str.split()보다 유연함 - 여러 구분자 동시 사용 가능 예: `re.split(r"[,;\s]+", text)` → 쉼표, 세미콜론, 공백으로 분리'
+  - 're.split(패턴, 텍스트) **re.split()**: - 패턴을 구분자로 텍스트 분리 - str.split()보다 유연함 - 여러 구분자 동시 사용 가능 예: `re.split(r"[,;\s]+",
+    text)` → 쉼표, 세미콜론, 공백으로 분리'
   snippet: |-
     tokens = lowercaseText.split()
     tokens[:20]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 토큰화 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       tokens = lowercaseText.split()
       tokens[:20]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 토큰화 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 토큰화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 토큰화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_advanced_tokenization
   title: 7단계. 고급 토큰화
   structuredPrimary: true
   subtitle: 여러 구분자 동시 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 고급 토큰화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     실제 텍스트는 공백 외에도 쉼표, 마침표 등으로 구분됩니다.
 
@@ -208,7 +239,7 @@ sections:
     tokens = [t for t in tokens if t]
     tokens
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 고급 토큰화 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       testText = "Hello, world! How are you? Fine, thanks."
 
@@ -216,46 +247,49 @@ sections:
       tokens = [t for t in tokens if t]
       tokens
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 고급 토큰화 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 고급 토큰화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 고급 토큰화에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step8_ngrams
   title: 8단계. N-gram 추출
   structuredPrimary: true
   subtitle: 연속된 단어 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. Ngram 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     문맥 분석을 위해 연속된 2~3개 단어를 추출합니다.
 
     N-gram의 활용
     N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용: - Bigram (2-gram): 연속된 2개 단어 - Trigram (3-gram): 연속된 3개 단어 검색, 추천, 자동 완성 등에 활용
   tips:
-  - 'N-gram의 활용 N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용: - Bigram (2-gram): 연속된 2개 단어 - Trigram (3-gram): 연속된 3개 단어 검색, 추천, 자동 완성 등에 활용'
+  - 'N-gram의 활용 N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용: - Bigram (2-gram): 연속된 2개 단어 - Trigram (3-gram): 연속된
+    3개 단어 검색, 추천, 자동 완성 등에 활용'
   snippet: |-
     words = lowercaseText.split()[:50]
 
     bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
     bigrams[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. Ngram 추출 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       words = lowercaseText.split()[:50]
 
       bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
       bigrams[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. Ngram 추출 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. Ngram 추출 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. Ngram 추출에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step9_complete_pipeline
   title: 9단계. 완성된 전처리 파이프라인
   structuredPrimary: true
   subtitle: 모든 단계 통합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 완성된 전처리 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 배운 모든 기법을 합쳐 완성된 파이프라인을 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -279,7 +313,7 @@ sections:
     result = preprocessText(rawText)
     f"토큰 수: {result['token_count']}\n처음 10개 토큰: {result['tokens'][:10]}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 완성된 전처리 파이프라인 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def preprocessText(text):
           text = re.sub(r"[^a-zA-Z\s]", "", text)
@@ -300,23 +334,25 @@ sections:
       result = preprocessText(rawText)
       f"토큰 수: {result['token_count']}\n처음 10개 토큰: {result['tokens'][:10]}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 완성된 전처리 파이프라인 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 완성된 전처리 파이프라인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 완성된 전처리 파이프라인에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: step10_comparison
   title: 10단계. 전처리 전후 비교
   structuredPrimary: true
   subtitle: 토큰 절약 효과
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 전처리 전후 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     전처리 전후의 토큰 수를 비교합니다.
 
     LLM API 비용 절감
     평균 20~40% 토큰 절약: - 특수문자 제거: 10% - 공백 정규화: 5% - 소문자 변환: 5~10% - 불필요한 반복 제거: 10% **실제 효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!
   tips:
-  - 'LLM API 비용 절감 평균 20~40% 토큰 절약: - 특수문자 제거: 10% - 공백 정규화: 5% - 소문자 변환: 5~10% - 불필요한 반복 제거: 10% **실제 효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!'
+  - 'LLM API 비용 절감 평균 20~40% 토큰 절약: - 특수문자 제거: 10% - 공백 정규화: 5% - 소문자 변환: 5~10% - 불필요한 반복 제거: 10% **실제
+    효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!'
   snippet: |-
     original = preprocessText(rawText)
     originalLen = len(rawText)
@@ -325,7 +361,7 @@ sections:
 
     f"원본 길이: {originalLen}자\n정제 후: {cleanedLen}자\n절약: {saved:.1f}%\n\n원본 토큰 수 (추정): {originalLen // 4}\n정제 후 토큰: {original['token_count']}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 전처리 전후 비교 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       original = preprocessText(rawText)
       originalLen = len(rawText)
@@ -334,16 +370,17 @@ sections:
 
       f"원본 길이: {originalLen}자\n정제 후: {cleanedLen}자\n절약: {saved:.1f}%\n\n원본 토큰 수 (추정): {originalLen // 4}\n정제 후 토큰: {original['token_count']}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 전처리 전후 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 전처리 전후 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 전처리 전후 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 텍스트 정제 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     데이터 엔지니어가 되어 텍스트를 정제하고 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
 
@@ -362,7 +399,7 @@ sections:
     emails = re.findall(r"[\w.]+@[\w.]+\.\w+", text)
     emails
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -375,10 +412,11 @@ sections:
       emails = re.findall(r"[\w.]+@[\w.]+\.\w+", text)
       emails
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   subtitle: 여덟 번째 프로젝트 완료!
@@ -397,9 +435,10 @@ sections:
   title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
   structuredPrimary: true
   subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -421,7 +460,7 @@ sections:
     assert phones == ['010-1234-5678', '02-987-6543']
     emails, phones
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import re
 
@@ -441,7 +480,8 @@ sections:
       assert phones == ['010-1234-5678', '02-987-6543']
       emails, phones
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'

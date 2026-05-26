@@ -27,28 +27,28 @@ meta:
     - Python차트
     - 선언적시각화
 intro:
-  direction: Altair소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Altair소개에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
   benefits:
-  - Altair소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - Altair소개 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 10단계. Altair 학습 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 채널 인코딩 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 스케일과 마크 매핑 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: Altair소개 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Altair소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Altair소개 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -81,7 +81,8 @@ sections:
   - type: note
     style: info
     title: 선언적(Declarative) 프로그래밍이란?
-    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에, 저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다.
+    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에,
+      저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다.
   - type: featureCards
     cards:
     - emoji: 📝
@@ -188,7 +189,8 @@ sections:
   - type: note
     style: info
     title: 시각화 문법(Grammar of Graphics)
-    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의 어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.
+    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의
+      어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.
   - type: featureCards
     cards:
     - emoji: 📦
@@ -206,7 +208,8 @@ sections:
   - type: note
     style: tip
     title: 생각의 흐름대로 코딩
-    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을 찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다.
+    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을
+      찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다.
 - id: local_integration
   blocks:
   - type: sectionHeader
@@ -215,7 +218,8 @@ sections:
   - type: note
     style: info
     title: Altair chart selection
-    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택, 줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다.
+    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택,
+      줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다.
   - type: featureCards
     cards:
     - emoji: 🎯
@@ -233,7 +237,8 @@ sections:
   - type: note
     style: tip
     title: 분석과 시각화의 통합
-    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할 수 있습니다. 코드와 시각화가 하나로 연결됩니다.
+    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할
+      수 있습니다. 코드와 시각화가 하나로 연결됩니다.
 - id: data_types
   blocks:
   - type: sectionHeader
@@ -242,7 +247,8 @@ sections:
   - type: note
     style: info
     title: 왜 타입이 중요한가?
-    content: Altair는 데이터 타입에 따라 축, 색상, 범례를 자동으로 결정합니다. 숫자형(Q)은 연속 색상, 범주형(N)은 개별 색상을 사용합니다. 타입을 명시하면 원하는 시각화를 정확히 얻을 수 있습니다.
+    content: Altair는 데이터 타입에 따라 축, 색상, 범례를 자동으로 결정합니다. 숫자형(Q)은 연속 색상, 범주형(N)은 개별 색상을 사용합니다. 타입을 명시하면 원하는
+      시각화를 정확히 얻을 수 있습니다.
   - type: table
     headers:
     - 타입
@@ -269,7 +275,8 @@ sections:
   - type: note
     style: tip
     title: 타입 지정 방법
-    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다. 숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다.
+    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다.
+      숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다.
 - id: interaction_intro
   blocks:
   - type: sectionHeader
@@ -298,7 +305,8 @@ sections:
   - type: note
     style: info
     title: 코드 몇 줄로 인터랙션 추가
-    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다. Codaro에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다.
+    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다.
+      Codaro에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다.
 - id: projects_preview
   blocks:
   - type: sectionHeader
@@ -361,8 +369,8 @@ sections:
   title: 10단계. Altair 학습 흐름 검증
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. Altair 학습 흐름 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
 
@@ -381,7 +389,7 @@ sections:
     assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
     assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. Altair 학습 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -394,10 +402,11 @@ sections:
       assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
       assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. Altair 학습 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. Altair 학습 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. Altair 학습 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: next
   blocks:
   - type: hero

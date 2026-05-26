@@ -29,20 +29,44 @@ meta:
 intro:
   emoji: 💎
   goal: diamonds 데이터로 캐럿, 컷 등급별 가격 분포를 다양한 분포 차트로 분석합니다.
-  description: diamonds 로컬 데이터셋은 약 5,400개 다이아몬드의 캐럿, 컷, 색상, 투명도, 가격 정보를 담고 있습니다. displot()과 kdeplot()을 활용하여 분포를 분석합니다. 이전에 배운 relplot, heatmap, lineplot 개념을 함께 활용합니다.
+  description: diamonds 로컬 데이터셋은 약 5,400개 다이아몬드의 캐럿, 컷, 색상, 투명도, 가격 정보를 담고 있습니다. displot()과 kdeplot()을
+    활용하여 분포를 분석합니다. 이전에 배운 relplot, heatmap, lineplot 개념을 함께 활용합니다.
+  direction: 다이아몬드가격분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 다이아몬드가격분석 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 히스토그램 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 컷 등급별 구분 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 다이아몬드가격분석 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다이아몬드가격분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 다이아몬드가격분석 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     seaborn과 matplotlib을 불러옵니다. diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다.
 
     diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium < Ideal 순서입니다.
   tips:
-  - diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium < Ideal 순서입니다.
+  - diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good
+    < Very Good < Premium < Ideal 순서입니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
@@ -52,7 +76,7 @@ sections:
     diamonds = loadLocalDataset('diamonds')
     diamonds
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -62,16 +86,17 @@ sections:
       diamonds = loadLocalDataset('diamonds')
       diamonds
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_histplot_basic
   title: 2단계. 기본 히스토그램
   structuredPrimary: true
   subtitle: sns.histplot()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: 가격 분포를 히스토그램으로 확인합니다. bins 파라미터로 구간 수를 조절합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -81,23 +106,24 @@ sections:
     axHist.set_title('Diamond Price Distribution')
     figHist
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 히스토그램 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figHist, axHist = plt.subplots(figsize=(10, 5))
       sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
       axHist.set_title('Diamond Price Distribution')
       figHist
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 히스토그램 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 히스토그램 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 히스토그램에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step3_histplot_hue
   title: 3단계. 컷 등급별 구분
   structuredPrimary: true
   subtitle: hue 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 컷 등급별 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: 컷 등급별로 색상을 구분합니다. 여러 그룹의 분포를 한 차트에서 비교할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -107,81 +133,86 @@ sections:
     axHistHue.set_title('Price Distribution by Cut')
     figHistHue
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 컷 등급별 구분 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figHistHue, axHistHue = plt.subplots(figsize=(10, 5))
       sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
       axHistHue.set_title('Price Distribution by Cut')
       figHistHue
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 컷 등급별 구분 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 컷 등급별 구분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 컷 등급별 구분에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_multiple
   title: 4단계. 누적 히스토그램
   structuredPrimary: true
   subtitle: multiple 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 누적 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     multiple 파라미터로 히스토그램 표시 방식을 변경합니다. 'stack'은 그룹을 누적하여 표시합니다.
 
     multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다.
   tips:
-  - multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다.
+  - multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움)
+    중 선택할 수 있습니다.
   snippet: |-
     figStack, axStack = plt.subplots(figsize=(10, 5))
     sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
     axStack.set_title('Stacked Price Distribution by Cut')
     figStack
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 누적 히스토그램 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figStack, axStack = plt.subplots(figsize=(10, 5))
       sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
       axStack.set_title('Stacked Price Distribution by Cut')
       figStack
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 누적 히스토그램 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 누적 히스토그램 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 누적 히스토그램에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_kdeplot
   title: 5단계. KDE 분포
   structuredPrimary: true
   subtitle: sns.kdeplot()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. KDE 분포에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     KDE(커널 밀도 추정)로 부드러운 분포를 그립니다. 히스토그램보다 연속적인 분포 형태를 파악하기 좋습니다.
 
     kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
   tips:
-  - kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
+  - kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교
+    가능합니다.
   snippet: |-
     figKde, axKde = plt.subplots(figsize=(10, 5))
     sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
     axKde.set_title('Price KDE by Cut')
     figKde
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. KDE 분포 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figKde, axKde = plt.subplots(figsize=(10, 5))
       sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
       axKde.set_title('Price KDE by Cut')
       figKde
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. KDE 분포 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. KDE 분포 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. KDE 분포에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step6_kdeplot_fill
   title: 6단계. 영역 채우기
   structuredPrimary: true
   subtitle: fill 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 영역 채우기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: KDE에서 fill로 영역을 채웁니다. alpha로 투명도를 조절하여 겹치는 영역을 구분합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -191,50 +222,53 @@ sections:
     axKdeFill.set_title('Filled KDE by Cut')
     figKdeFill
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 영역 채우기 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figKdeFill, axKdeFill = plt.subplots(figsize=(10, 5))
       sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
       axKdeFill.set_title('Filled KDE by Cut')
       figKdeFill
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 영역 채우기 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 영역 채우기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 영역 채우기에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step7_displot
   title: 7단계. displot 기본
   structuredPrimary: true
   subtitle: Figure-level 분포
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. displot 기본에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     displot()으로 Figure-level 분포 차트를 그립니다. kind로 히스토그램, KDE, ECDF 중 선택합니다.
 
     displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수 있습니다.
   tips:
-  - displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수 있습니다.
+  - displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col,
+    row로 다중 패널을 만들 수 있습니다.
   snippet: |-
     gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
     gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
     gDis.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. displot 기본 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
       gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
       gDis.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. displot 기본 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. displot 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. displot 기본에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_displot_col
   title: 8단계. 패널 분리
   structuredPrimary: true
   subtitle: col 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 패널 분리에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: 컷 등급별로 패널을 분리합니다. 각 그룹의 분포를 독립적으로 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -243,22 +277,23 @@ sections:
     gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
     gDisCol.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 패널 분리 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
       gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
       gDisCol.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 패널 분리 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 패널 분리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 패널 분리에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_2d_kde
   title: 9단계. 2차원 KDE
   structuredPrimary: true
   subtitle: x, y 동시 지정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 2차원 KDE에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     캐럿과 가격의 2차원 분포를 확인합니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다.
 
@@ -271,23 +306,24 @@ sections:
     gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
     gDis2d.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 2차원 KDE 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       diamondsSample = diamonds.sample(n=5000, random_state=42)
       gDis2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='kde', height=6)
       gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
       gDis2d.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 2차원 KDE 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 2차원 KDE 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 2차원 KDE에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step10_2d_hist
   title: 10단계. 2차원 히스토그램
   structuredPrimary: true
   subtitle: 히트맵 형태
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 2차원 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: 2차원 히스토그램과 주변 분포를 함께 표시합니다. cbar로 컬러바를 추가합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -296,49 +332,52 @@ sections:
     gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
     gDisHist2d.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 2차원 히스토그램 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
       gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
       gDisHist2d.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 2차원 히스토그램 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 2차원 히스토그램 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 2차원 히스토그램에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step11_ecdf
   title: 11단계. 누적분포
   structuredPrimary: true
   subtitle: kind='ecdf'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 누적분포에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     색상 등급별 가격 분포를 누적분포(ECDF)로 비교합니다. y축은 해당 x값 이하인 데이터의 비율입니다.
 
     ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
   tips:
-  - ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
+  - ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나
+    사분위수를 쉽게 비교할 수 있습니다.
   snippet: |-
     gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
     gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
     gEcdf.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 누적분포 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
       gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
       gEcdf.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 누적분포 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 누적분포 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 누적분포에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step12_col_row
   title: 12단계. 2차원 패널
   structuredPrimary: true
   subtitle: col과 row
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. 2차원 패널에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     컷과 색상 조합별 가격 분포를 비교합니다. col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다.
 
@@ -351,23 +390,24 @@ sections:
     gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
     gDisColRow.figure
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 2차원 패널 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       diamondsTop = diamonds[diamonds['cut'].isin(['Ideal', 'Premium'])].copy()
       gDisColRow = sns.displot(data=diamondsTop, x='price', col='cut', row='color', kind='kde', height=2.5, aspect=1.5)
       gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
       gDisColRow.figure
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 2차원 패널 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 2차원 패널 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 2차원 패널에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 13단계. 다이아몬드 분포 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. 다이아몬드 분포 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     가격 분포는 긴 꼬리와 등급별 차이를 함께 봐야 합니다. 가격과 캐럿이 양수인지 확인하고, 등급별 가격 차이가 차트와 수치에서 같은 방향인지 검증합니다.
 
@@ -388,7 +428,7 @@ sections:
     assert priceByCut.index[-1] == "Ideal"
     priceByCut.round(0)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 다이아몬드 분포 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
@@ -403,16 +443,17 @@ sections:
       assert priceByCut.index[-1] == "Ideal"
       priceByCut.round(0)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 다이아몬드 분포 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 다이아몬드 분포 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 다이아몬드 분포 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 분포 시각화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -426,7 +467,7 @@ sections:
 
     data = loadLocalDataset('tips')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 분포, 그룹, 관계 패턴 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       from codaro.curriculum.localData import loadLocalDataset
@@ -434,7 +475,8 @@ sections:
 
       data = loadLocalDataset('tips')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 분포, 그룹, 관계 패턴 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.

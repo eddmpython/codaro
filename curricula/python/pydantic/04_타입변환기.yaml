@@ -26,37 +26,61 @@ intro:
   emoji: 🔄
   goal: Pydantic의 타입 변환과 직렬화를 제어합니다.
   description: 자동 타입 강제 변환의 동작을 이해하고, 엄격 모드와 커스텀 직렬화기로 세밀하게 제어합니다.
+  direction: 타입변환기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - 타입변환기 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 패키지 설치 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 자동 타입 변환 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 엄격 모드 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: 타입변환기 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타입변환기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 타입변환기 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
 - id: step1_install
   title: 1단계. 패키지 설치
   structuredPrimary: true
   subtitle: pip
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 패키지 설치에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 패키지 설치 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: import pydantic
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 패키지 설치 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 패키지 설치 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 패키지 설치에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_auto_coercion
   title: 2단계. 자동 타입 변환
   structuredPrimary: true
   subtitle: 기본 동작
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 자동 타입 변환에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     Pydantic v2는 문자열 숫자를 int/float로, 1/0 같은 값을 bool로 변환하지만 숫자를 문자열로 자동 변환하지는 않습니다. 문자열 필드는 실제 문자열을 넣어야 합니다.
 
     1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
   tips:
-  - 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
+  - 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접
+    str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
   snippet: |-
     from pydantic import BaseModel
 
@@ -69,7 +93,7 @@ sections:
     data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
     data1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 자동 타입 변환 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import BaseModel
 
@@ -82,16 +106,17 @@ sections:
       data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
       data1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 자동 타입 변환 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 자동 타입 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 자동 타입 변환에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_strict_mode
   title: 3단계. 엄격 모드
   structuredPrimary: true
   subtitle: strict=True
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 엄격 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
 
@@ -107,7 +132,7 @@ sections:
     strictData = StrictData(intVal=123, strVal="hello")
     strictData
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 엄격 모드 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class StrictData(BaseModel):
           model_config = {"strict": True}
@@ -117,16 +142,17 @@ sections:
       strictData = StrictData(intVal=123, strVal="hello")
       strictData
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 엄격 모드 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 엄격 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 엄격 모드에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step4_field_strict
   title: 4단계. 필드별 엄격 모드
   structuredPrimary: true
   subtitle: Field(strict=True)
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 필드별 엄격 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: 특정 필드만 엄격 모드로 설정할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -141,7 +167,7 @@ sections:
     mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
     mixed1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 필드별 엄격 모드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import Field
 
@@ -153,16 +179,17 @@ sections:
       mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
       mixed1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 필드별 엄격 모드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 필드별 엄격 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 필드별 엄격 모드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_datetime
   title: 5단계. 날짜/시간 변환
   structuredPrimary: true
   subtitle: datetime 타입
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 날짜/시간 변환에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: Pydantic은 문자열을 datetime, date, time 객체로 자동 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -183,7 +210,7 @@ sections:
     )
     event1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 날짜/시간 변환 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from datetime import datetime, date, time
 
@@ -201,16 +228,17 @@ sections:
       )
       event1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 날짜/시간 변환 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 날짜/시간 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 날짜/시간 변환에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_enum
   title: 6단계. Enum 타입
   structuredPrimary: true
   subtitle: 열거형 변환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. Enum 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: Enum 타입은 문자열이나 값으로 자동 변환됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -229,7 +257,7 @@ sections:
     task1 = Task(taskId="T001", status="active")
     task1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. Enum 타입 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from enum import Enum
 
@@ -245,16 +273,17 @@ sections:
       task1 = Task(taskId="T001", status="active")
       task1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. Enum 타입 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. Enum 타입 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. Enum 타입에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_literal
   title: 7단계. Literal 타입
   structuredPrimary: true
   subtitle: 특정 값만 허용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. Literal 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: Literal로 필드가 가질 수 있는 값을 제한합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -268,7 +297,7 @@ sections:
     priority1 = Priority(level="high", score=5)
     priority1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. Literal 타입 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -279,16 +308,17 @@ sections:
       priority1 = Priority(level="high", score=5)
       priority1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. Literal 타입 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. Literal 타입 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. Literal 타입에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_serializer
   title: 8단계. 필드 직렬화기
   structuredPrimary: true
   subtitle: field_serializer
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 필드 직렬화기에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: field_serializer로 필드의 직렬화 방식을 커스터마이즈합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -306,7 +336,7 @@ sections:
     article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
     article1.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 필드 직렬화기 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import field_serializer
 
@@ -321,16 +351,17 @@ sections:
       article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
       article1.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 필드 직렬화기 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 필드 직렬화기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 필드 직렬화기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: step9_computed
   title: 9단계. 계산 필드 직렬화
   structuredPrimary: true
   subtitle: computed_field
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 계산 필드 직렬화에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: computed_field로 다른 필드에서 계산된 값을 직렬화에 포함합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -360,7 +391,7 @@ sections:
     invoice1 = Invoice(itemPrice=10000, quantity=3)
     invoice1.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 계산 필드 직렬화 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import computed_field
 
@@ -387,16 +418,17 @@ sections:
       invoice1 = Invoice(itemPrice=10000, quantity=3)
       invoice1.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 계산 필드 직렬화 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 계산 필드 직렬화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 계산 필드 직렬화에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: step10_mode
   title: 10단계. 직렬화 모드
   structuredPrimary: true
   subtitle: mode 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 직렬화 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
 
@@ -412,7 +444,7 @@ sections:
     pythonMode = sample1.model_dump(mode='python')
     pythonMode
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 직렬화 모드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Sample(BaseModel):
           createdAt: datetime
@@ -422,16 +454,17 @@ sections:
       pythonMode = sample1.model_dump(mode='python')
       pythonMode
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 직렬화 모드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 직렬화 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 직렬화 모드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step11_exclude
   title: 11단계. 필드 제외
   structuredPrimary: true
   subtitle: exclude, include
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 필드 제외에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: model_dump에서 특정 필드를 제외하거나 포함할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -446,7 +479,7 @@ sections:
     safeProfile = profile1.model_dump(exclude={"password"})
     safeProfile
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 필드 제외 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class UserProfile(BaseModel):
           userId: str
@@ -458,16 +491,17 @@ sections:
       safeProfile = profile1.model_dump(exclude={"password"})
       safeProfile
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 필드 제외 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 필드 제외 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 필드 제외에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step12_alias_serial
   title: 12단계. 별칭 직렬화
   structuredPrimary: true
   subtitle: by_alias
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. 별칭 직렬화에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: by_alias=True로 직렬화 시 별칭을 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -482,7 +516,7 @@ sections:
     aliasDump = apiData1.model_dump(by_alias=True)
     normalDump, aliasDump
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 별칭 직렬화 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ApiData(BaseModel):
           userId: int = Field(alias="user_id")
@@ -494,16 +528,17 @@ sections:
       aliasDump = apiData1.model_dump(by_alias=True)
       normalDump, aliasDump
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 별칭 직렬화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 별칭 직렬화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 별칭 직렬화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 타입 변환 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: 다양한 타입 변환과 직렬화를 적용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -539,7 +574,7 @@ sections:
     }
     respOutput
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import BaseModel, Field, field_serializer, computed_field
       from datetime import datetime
@@ -572,17 +607,19 @@ sections:
       }
       respOutput
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -620,7 +657,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -656,7 +693,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'

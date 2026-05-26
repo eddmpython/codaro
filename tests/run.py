@@ -23,6 +23,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "curriculum-quality-matrix": (
         "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
         "output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json",
+        "output/test-runner/curriculum-workflow-architecture/curriculum-workflow-architecture-report.json",
     ),
     "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
@@ -196,6 +197,7 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumFlowQuality.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumWorkflowArchitecture.py")),
         ),
         ci_required=False,
     ),

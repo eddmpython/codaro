@@ -27,15 +27,39 @@ meta:
 intro:
   emoji: 👥
   goal: 그래프에서 커뮤니티(밀접하게 연결된 그룹)를 찾습니다.
-  description: 커뮤니티 탐지는 네트워크에서 밀접하게 연결된 노드 그룹을 찾는 것입니다. 소셜 네트워크의 친구 그룹, 웹의 주제별 페이지 등을 발견합니다. 모듈성(modularity)을 최적화하는 그리디 알고리즘으로 커뮤니티를 탐지합니다.
+  description: 커뮤니티 탐지는 네트워크에서 밀접하게 연결된 노드 그룹을 찾는 것입니다. 소셜 네트워크의 친구 그룹, 웹의 주제별 페이지 등을 발견합니다. 모듈성(modularity)을
+    최적화하는 그리디 알고리즘으로 커뮤니티를 탐지합니다.
+  direction: 커뮤니티탐지에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 커뮤니티탐지 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 모듈성 개념 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 그리디 모듈성 최적화 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 커뮤니티탐지 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 커뮤니티탐지 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 커뮤니티탐지 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: NetworkX와 커뮤니티 탐지 알고리즘을 불러옵니다. 커뮤니티 탐지(Community Detection)는 네트워크에서 밀접하게 연결된 노드들의 그룹을 자동으로 찾는 기법입니다. 소셜 네트워크의 친구 그룹, 생물학 네트워크의 기능적 모듈, 웹 페이지의 주제별 클러스터 등을 발견하는 데 활용됩니다.
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: NetworkX와 커뮤니티 탐지 알고리즘을 불러옵니다. 커뮤니티 탐지(Community Detection)는 네트워크에서 밀접하게 연결된 노드들의 그룹을 자동으로
+    찾는 기법입니다. 소셜 네트워크의 친구 그룹, 생물학 네트워크의 기능적 모듈, 웹 페이지의 주제별 클러스터 등을 발견하는 데 활용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -43,22 +67,23 @@ sections:
     from networkx.algorithms import community
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       from networkx.algorithms import community
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_modularity
   title: 2단계. 모듈성 개념
   structuredPrimary: true
   subtitle: modularity
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 모듈성 개념에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     모듈성(Modularity)은 2004년 Newman과 Girvan이 제안한 커뮤니티 분할의 품질 지표입니다. 커뮤니티 내부의 실제 연결 수가 무작위 그래프에서 기대되는 연결 수보다 얼마나 많은지를 측정합니다. -0.5 ~ 1 범위이며, 0.3 이상이면 유의미한 커뮤니티 구조가 있고, 0.7 이상이면 매우 강한 구조입니다. 대부분의 커뮤니티 탐지 알고리즘은 이 모듈성을 최대화하려고 합니다.
 
@@ -72,7 +97,7 @@ sections:
     G.add_edge(4, 5)
     G.number_of_nodes(), G.number_of_edges()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 모듈성 개념 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       G = nx.Graph()
       G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
@@ -80,16 +105,17 @@ sections:
       G.add_edge(4, 5)
       G.number_of_nodes(), G.number_of_edges()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 모듈성 개념 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 모듈성 개념 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 모듈성 개념에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_greedy
   title: 3단계. 그리디 모듈성 최적화
   structuredPrimary: true
   subtitle: greedy_modularity_communities()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 그리디 모듈성 최적화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     그리디 모듈성 최적화 알고리즘은 처음에 각 노드를 개별 커뮤니티로 시작하여, 모듈성이 가장 많이 증가하는 방향으로 커뮤니티를 병합해 나갑니다. Clauset, Newman, Moore가 2004년에 제안한 이 방법은 O(n log² n)의 시간 복잡도로 빠르면서도 효과적입니다. 커뮤니티 수를 미리 지정할 필요가 없으며, 알고리즘이 최적의 분할을 자동으로 찾습니다.
 
@@ -101,23 +127,25 @@ sections:
     commList = [set(c) for c in communities]
     commList
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 그리디 모듈성 최적화 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       communities = community.greedy_modularity_communities(G)
       commList = [set(c) for c in communities]
       commList
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 그리디 모듈성 최적화 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 그리디 모듈성 최적화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 그리디 모듈성 최적화에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step4_visualize
   title: 4단계. 커뮤니티 시각화
   structuredPrimary: true
   subtitle: 그룹별 색상
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 탐지된 커뮤니티를 서로 다른 색으로 시각화하면 네트워크의 그룹 구조를 직관적으로 파악할 수 있습니다. 각 노드가 속한 커뮤니티에 따라 색상을 지정하고, spring_layout으로 배치하면 같은 커뮤니티의 노드들이 자연스럽게 가깝게 모이는 것을 볼 수 있습니다.
+  goal: 4단계. 커뮤니티 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 탐지된 커뮤니티를 서로 다른 색으로 시각화하면 네트워크의 그룹 구조를 직관적으로 파악할 수 있습니다. 각 노드가 속한 커뮤니티에 따라 색상을 지정하고, spring_layout으로
+    배치하면 같은 커뮤니티의 노드들이 자연스럽게 가깝게 모이는 것을 볼 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -137,7 +165,7 @@ sections:
     ax1.set_title('Detected Communities')
     fig1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 커뮤니티 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       colorPalette = ['skyblue', 'salmon', 'lightgreen', 'gold', 'plum']
 
@@ -155,16 +183,17 @@ sections:
       ax1.set_title('Detected Communities')
       fig1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 커뮤니티 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 커뮤니티 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 커뮤니티 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step5_les_miserables
   title: 5단계. 레미제라블 네트워크
   structuredPrimary: true
   subtitle: les_miserables_graph()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 레미제라블 네트워크에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     레미제라블(Les Misérables) 네트워크는 Victor Hugo의 소설에 등장하는 인물들 간의 관계를 나타냅니다. 77명의 인물과 254개의 관계로 구성되며, 같은 장면에 함께 등장하면 연결됩니다. 이 데이터셋은 네트워크 분석의 대표적인 벤치마크로, 장발장(Valjean), 코제트(Cosette), 마리우스(Marius) 등 스토리라인별로 자연스러운 커뮤니티가 형성되어 있습니다.
 
@@ -177,24 +206,26 @@ sections:
     numEdgesLM = lesmis.number_of_edges()
     numNodesLM, numEdgesLM
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 레미제라블 네트워크 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lesmis = nx.les_miserables_graph()
       numNodesLM = lesmis.number_of_nodes()
       numEdgesLM = lesmis.number_of_edges()
       numNodesLM, numEdgesLM
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 레미제라블 네트워크 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 레미제라블 네트워크 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 레미제라블 네트워크에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_lesmis_community
   title: 6단계. 레미제라블 커뮤니티
   structuredPrimary: true
   subtitle: 등장인물 그룹
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 레미제라블 네트워크에 커뮤니티 탐지를 적용하면 소설의 스토리라인과 일치하는 그룹들이 발견됩니다. 주교와 관련된 초반부 인물들, 팡틴과 코제트 관련 인물들, 바리케이드 혁명가들 등이 각각 커뮤니티를 형성합니다. 이는 알고리즘이 네트워크 구조만으로 의미 있는 그룹을 찾아낼 수 있음을 보여줍니다.
+  goal: 6단계. 레미제라블 커뮤니티에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 레미제라블 네트워크에 커뮤니티 탐지를 적용하면 소설의 스토리라인과 일치하는 그룹들이 발견됩니다. 주교와 관련된 초반부 인물들, 팡틴과 코제트 관련 인물들,
+    바리케이드 혁명가들 등이 각각 커뮤니티를 형성합니다. 이는 알고리즘이 네트워크 구조만으로 의미 있는 그룹을 찾아낼 수 있음을 보여줍니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -203,24 +234,26 @@ sections:
     numComms = len(lmCommList)
     numComms
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 레미제라블 커뮤니티 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lmComms = community.greedy_modularity_communities(lesmis)
       lmCommList = [set(c) for c in lmComms]
       numComms = len(lmCommList)
       numComms
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 레미제라블 커뮤니티 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 레미제라블 커뮤니티 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 레미제라블 커뮤니티에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step7_lesmis_viz
   title: 7단계. 레미제라블 시각화
   structuredPrimary: true
   subtitle: 커뮤니티별 색상
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 레미제라블 네트워크를 커뮤니티별로 시각화합니다. 77개의 노드가 있으므로 레이블 대신 색상으로 커뮤니티를 구분합니다. k 파라미터를 조정하여 노드 간 간격을 넓히면 구조가 더 잘 보입니다. 시각화를 통해 소설의 스토리 구조와 인물 관계를 한눈에 파악할 수 있습니다.
+  goal: 7단계. 레미제라블 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 레미제라블 네트워크를 커뮤니티별로 시각화합니다. 77개의 노드가 있으므로 레이블 대신 색상으로 커뮤니티를 구분합니다. k 파라미터를 조정하여 노드 간 간격을
+    넓히면 구조가 더 잘 보입니다. 시각화를 통해 소설의 스토리 구조와 인물 관계를 한눈에 파악할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -238,7 +271,7 @@ sections:
     ax2.set_title(f'Les Miserables Communities ({numComms} groups)')
     fig2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 레미제라블 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lmColors = []
       for n in lesmis.nodes():
@@ -254,16 +287,17 @@ sections:
       ax2.set_title(f'Les Miserables Communities ({numComms} groups)')
       fig2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 레미제라블 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 레미제라블 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 레미제라블 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step8_louvain
   title: 8단계. 루뱅 알고리즘
   structuredPrimary: true
   subtitle: louvain_communities()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 루뱅 알고리즘에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     루뱅(Louvain) 알고리즘은 2008년 벨기에 루뱅 대학에서 개발된 대규모 네트워크용 커뮤니티 탐지 방법입니다. 2단계 과정을 반복합니다. 먼저 각 노드를 이웃 커뮤니티로 이동시켜 로컬 모듈성을 최적화하고, 그 다음 커뮤니티들을 하나의 노드로 축약하여 새 그래프를 만듭니다. 이 과정을 모듈성 증가가 없을 때까지 반복합니다. 수백만 노드의 네트워크도 처리할 수 있으며, 그리디보다 높은 모듈성을 달성하는 경우가 많습니다.
 
@@ -276,24 +310,27 @@ sections:
     numLouvain = len(louvainList)
     numLouvain
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 루뱅 알고리즘 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       louvainComms = community.louvain_communities(lesmis, seed=42)
       louvainList = [set(c) for c in louvainComms]
       numLouvain = len(louvainList)
       numLouvain
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 루뱅 알고리즘 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 루뱅 알고리즘 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 루뱅 알고리즘에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step9_label_propagation
   title: 9단계. 레이블 전파
   structuredPrimary: true
   subtitle: label_propagation_communities()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 레이블 전파(Label Propagation)는 2007년 Raghavan 등이 제안한 간단하면서 빠른 알고리즘입니다. 처음에 각 노드에 고유 레이블을 부여한 뒤, 반복적으로 각 노드가 이웃들 중 가장 많이 가진 레이블을 채택하게 합니다. 안정 상태에 도달하면 같은 레이블을 가진 노드들이 커뮤니티를 형성합니다. O(n + m) 시간으로 매우 빠르지만, 비결정적이라 실행마다 결과가 달라질 수 있습니다.
+  goal: 9단계. 레이블 전파에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 레이블 전파(Label Propagation)는 2007년 Raghavan 등이 제안한 간단하면서 빠른 알고리즘입니다. 처음에 각 노드에 고유 레이블을 부여한
+    뒤, 반복적으로 각 노드가 이웃들 중 가장 많이 가진 레이블을 채택하게 합니다. 안정 상태에 도달하면 같은 레이블을 가진 노드들이 커뮤니티를 형성합니다. O(n + m) 시간으로
+    매우 빠르지만, 비결정적이라 실행마다 결과가 달라질 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -302,23 +339,24 @@ sections:
     numLP = len(lpList)
     numLP
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 레이블 전파 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lpComms = community.label_propagation_communities(lesmis)
       lpList = [set(c) for c in lpComms]
       numLP = len(lpList)
       numLP
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 레이블 전파 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 레이블 전파 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 레이블 전파에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step10_karate_community
   title: 10단계. 가라테 클럽 커뮤니티
   structuredPrimary: true
   subtitle: 실제 분리와 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 가라테 클럽 커뮤니티에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     가라테 클럽은 실제 분리 결과가 알려진 유일한 벤치마크 데이터입니다. 1977년 Zachary가 관찰한 실제 분열과 알고리즘이 탐지한 커뮤니티를 비교하여 알고리즘의 정확도를 검증할 수 있습니다. 네트워크 구조만으로 실제 사회적 분열을 얼마나 정확하게 예측할 수 있는지 확인해봅니다.
 
@@ -332,7 +370,7 @@ sections:
     actualOfficer = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer'}
     actualHi, actualOfficer
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 가라테 클럽 커뮤니티 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       karate = nx.karate_club_graph()
 
@@ -340,16 +378,17 @@ sections:
       actualOfficer = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer'}
       actualHi, actualOfficer
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 가라테 클럽 커뮤니티 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 가라테 클럽 커뮤니티 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 가라테 클럽 커뮤니티에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 커뮤니티 탐지
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     지금까지 배운 커뮤니티 탐지 알고리즘을 활용하여 실전 미션을 수행해봅시다. 여러 알고리즘의 결과를 비교하고, 피렌체 가문 네트워크에서 역사적 동맹 관계를 탐지해봅니다.
 
@@ -364,7 +403,7 @@ sections:
     data = nx.karate_club_graph()
     data.number_of_nodes(), data.number_of_edges()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       from networkx.algorithms import community
@@ -373,17 +412,19 @@ sections:
       data = nx.karate_club_graph()
       data.number_of_nodes(), data.number_of_edges()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 인수인계 네트워크
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -409,7 +450,7 @@ sections:
 
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       experimentGraph = workflowGraph.copy()
       experimentGraph.add_edge("sales", "finance", weight=2)
@@ -449,7 +490,8 @@ sections:
 
       workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

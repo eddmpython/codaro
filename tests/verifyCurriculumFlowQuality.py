@@ -33,7 +33,7 @@ STDLIB_MODULES = set(getattr(sys, "stdlib_module_names", set())) | {
 }
 IMPORT_RE = re.compile(r"^\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import\s+)", re.M)
 COMPLETION_MARKERS = ("정리", "종합", "완성", "최종", "결과", "프로젝트", "복습", "실습", "미션", "연습")
-ORIENTATION_CATEGORIES = {"main", "excel", "practical"}
+ORIENTATION_CATEGORIES = {"excel", "practical"}
 
 
 def main() -> int:

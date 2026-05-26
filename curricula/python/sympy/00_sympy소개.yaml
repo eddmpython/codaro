@@ -23,28 +23,28 @@ meta:
     - 적분
     - 방정식
 intro:
-  direction: SymPy소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: SymPy소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - SymPy소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - SymPy소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 손익분기 수식을 기호로 검증하 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: SymPy소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: SymPy소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: SymPy소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -71,7 +71,8 @@ sections:
     title: 🏛️ SymPy란?
     subtitle: 기호 수학의 세계
   - type: text
-    content: SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를 주는 것과 달리, SymPy는 x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
+    content: SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를
+      주는 것과 달리, SymPy는 x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
   - type: featureCards
     cards:
     - emoji: 🔣
@@ -89,7 +90,8 @@ sections:
     title: ⚖️ 숫자 vs 기호
     subtitle: 근본적인 차이
   - type: text
-    content: 숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은 √2 그 자체를 유지하며, 정확한 값을 보존합니다.
+    content: 숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은
+      √2 그 자체를 유지하며, 정확한 값을 보존합니다.
   - type: table
     headers:
     - 구분
@@ -276,14 +278,16 @@ sections:
     title: 🎯 시작하기
     subtitle: 첫 번째 프로젝트로
   - type: text
-    content: SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서 기호를 정의하고 수식을 전개하는 것부터 시작합니다.
+    content: SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서
+      기호를 정의하고 수식을 전개하는 것부터 시작합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
   structuredPrimary: true
   subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -303,7 +307,7 @@ sections:
     assert breakEvenQuantity == 40
     profitExpr, breakEvenQuantity
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import sympy as sp
 
@@ -321,7 +325,8 @@ sections:
       assert breakEvenQuantity == 40
       profitExpr, breakEvenQuantity
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'

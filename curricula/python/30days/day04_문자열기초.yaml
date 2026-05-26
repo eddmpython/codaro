@@ -26,13 +26,35 @@ intro:
   - f-string으로 간편한 포맷팅
   - 이스케이프 문자로 특수 문자 표현하기
   - 여러 줄 문자열 작성하기
+  direction: 문자열 기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 문자열 기초 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 문자열 연결 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 문자열 반복 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 문자열 길이 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 문자열 기초 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 문자열 기초 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 문자열 기초 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: string_concat
   title: 문자열 연결
   structuredPrimary: true
   subtitle: + 기호로 문자열 합치기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 연결에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     문자열은 + 연산자로 연결할 수 있습니다. 두 개 이상의 문자열을 하나로 합칠 때 사용합니다. 숫자의 덧셈과 같은 기호지만 문자열에서는 연결의 의미입니다.
 
@@ -44,22 +66,23 @@ sections:
     second = 'World'
     first + ' ' + second
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 연결 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       first = 'Hello'
       second = 'World'
       first + ' ' + second
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 연결 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 연결 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 연결에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: string_repeat
   title: 문자열 반복
   structuredPrimary: true
   subtitle: '* 기호로 문자열 반복하기'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 반복에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     문자열에 * 연산자를 사용하면 문자열을 반복할 수 있습니다. 숫자를 곱하면 그 횟수만큼 문자열이 반복됩니다. 같은 문자를 여러 번 출력할 때 유용합니다.
 
@@ -70,21 +93,22 @@ sections:
     word = 'Python'
     word * 3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 반복 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       word = 'Python'
       word * 3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 반복 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 반복 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 반복에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: string_length
   title: 문자열 길이
   structuredPrimary: true
   subtitle: len() 함수로 길이 구하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 길이에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: len() 함수는 문자열의 길이를 반환합니다. 문자열에 포함된 문자의 개수를 세어줍니다. 공백과 특수문자도 모두 포함됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -92,21 +116,22 @@ sections:
     text = 'Hello Python'
     len(text)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 길이 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       text = 'Hello Python'
       len(text)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 길이 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 길이 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 길이에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: fstring
   title: f-string 포맷팅
   structuredPrimary: true
   subtitle: f-string으로 간편하게 문자열 만들기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: fstring 포맷팅에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     f-string은 문자열 앞에 f를 붙여 변수를 직접 넣을 수 있는 방법입니다. + 연결이나 str() 변환 없이도 변수와 문자를 자연스럽게 조합할 수 있습니다. 중괄호 {} 안에 변수명이나 표현식을 넣으면 자동으로 문자열로 변환됩니다.
 
@@ -118,44 +143,47 @@ sections:
     age = 25
     f'{name}님의 나이는 {age}세입니다'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: fstring 포맷팅 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       name = '김철수'
       age = 25
       f'{name}님의 나이는 {age}세입니다'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - fstring 포맷팅 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: fstring 포맷팅 코드가 예외 없이 끝나야 합니다.
+    resultCheck: fstring 포맷팅에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: escape_newline
   title: 줄바꿈 문자
   structuredPrimary: true
   subtitle: \n으로 줄 바꾸기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이스케이프 문자는 백슬래시(\)로 시작하는 특수 문자입니다. \n은 줄바꿈을 의미하며, 문자열 중간에 사용하면 그 지점에서 줄이 바뀝니다. 여러 줄 출력에 유용합니다.
+  goal: 줄바꿈 문자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 이스케이프 문자는 백슬래시(\)로 시작하는 특수 문자입니다. \n은 줄바꿈을 의미하며, 문자열 중간에 사용하면 그 지점에서 줄이 바뀝니다. 여러 줄 출력에
+    유용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄'
     print(lines)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 줄바꿈 문자 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄'
       print(lines)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 줄바꿈 문자 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 줄바꿈 문자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 줄바꿈 문자에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: escape_tab
   title: 탭 문자
   structuredPrimary: true
   subtitle: \t로 간격 넣기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 탭 문자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: \t는 탭 문자로, 일정한 간격을 만듭니다. 텍스트를 정렬할 때 유용하며, 보통 4칸 또는 8칸의 공백과 같은 효과를 냅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -163,43 +191,46 @@ sections:
     row = '이름\t나이\t도시'
     print(row)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 탭 문자 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       row = '이름\t나이\t도시'
       print(row)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 탭 문자 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 탭 문자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 탭 문자에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: escape_quote
   title: 따옴표 문자
   structuredPrimary: true
   subtitle: \'와 \"로 따옴표 넣기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 문자열 안에 따옴표를 넣으려면 백슬래시를 앞에 붙입니다. \'는 작은따옴표, \"는 큰따옴표를 문자로 표현합니다. 또는 작은따옴표 문자열 안에 큰따옴표를 사용할 수도 있습니다.
+  goal: 따옴표 문자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 문자열 안에 따옴표를 넣으려면 백슬래시를 앞에 붙입니다. \'는 작은따옴표, \"는 큰따옴표를 문자로 표현합니다. 또는 작은따옴표 문자열 안에 큰따옴표를 사용할
+    수도 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     quote = "It's a beautiful day"
     quote
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 따옴표 문자 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       quote = "It's a beautiful day"
       quote
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 따옴표 문자 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 따옴표 문자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 따옴표 문자에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: escape_backslash
   title: 백슬래시 문자
   structuredPrimary: true
   subtitle: \\로 백슬래시 표현하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 백슬래시 문자에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 백슬래시 자체를 문자로 표현하려면 \\처럼 두 번 사용합니다. Windows 경로(C:\Users)나 정규표현식에서 자주 사용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -207,21 +238,22 @@ sections:
     path = 'C:\\\\Users\\\\Documents'
     print(path)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 백슬래시 문자 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       path = 'C:\\\\Users\\\\Documents'
       print(path)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 백슬래시 문자 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 백슬래시 문자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 백슬래시 문자에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: multiline_string
   title: 여러 줄 문자열
   structuredPrimary: true
   subtitle: 삼중 따옴표로 여러 줄 작성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 여러 줄 문자열에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 삼중 따옴표(''' 또는 \"\"\")를 사용하면 여러 줄에 걸친 문자열을 쉽게 작성할 수 있습니다. 줄바꿈이 자동으로 포함되며, \n을 사용하지 않아도 됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -231,23 +263,24 @@ sections:
     세 번째 줄'''
     print(block)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 여러 줄 문자열 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       block = '''첫 번째 줄
       두 번째 줄
       세 번째 줄'''
       print(block)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 여러 줄 문자열 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 여러 줄 문자열 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 여러 줄 문자열에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: raw_string
   title: 원시 문자열
   structuredPrimary: true
   subtitle: r 접두사로 이스케이프 무시하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 원시 문자열에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 문자열 앞에 r을 붙이면 이스케이프 문자를 무시합니다. \n이 줄바꿈이 아닌 문자 그대로 표시됩니다. 정규표현식이나 파일 경로 작성에 유용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -255,21 +288,22 @@ sections:
     raw = r'C:\Users\Documents'
     print(raw)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 원시 문자열 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       raw = r'C:\Users\Documents'
       print(raw)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 원시 문자열 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 원시 문자열 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 원시 문자열에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: string_in
   title: 문자열 포함 확인
   structuredPrimary: true
   subtitle: in 연산자로 부분 문자열 찾기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 포함 확인에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     in 연산자는 문자열 안에 특정 문자나 단어가 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다.
 
@@ -280,21 +314,22 @@ sections:
     phrase = 'Python Programming'
     'Python' in phrase
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 포함 확인 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       phrase = 'Python Programming'
       'Python' in phrase
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 포함 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 포함 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 포함 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: string_not_in
   title: 문자열 미포함 확인
   structuredPrimary: true
   subtitle: not in 연산자로 확인하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 미포함 확인에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: not in 연산자는 문자열에 특정 문자나 단어가 포함되지 않았는지 확인합니다. 포함되지 않으면 True, 포함되어 있으면 False를 반환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -302,22 +337,24 @@ sections:
     sentence = 'Hello World'
     'Python' not in sentence
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 미포함 확인 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sentence = 'Hello World'
       'Python' not in sentence
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 미포함 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 미포함 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 미포함 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '검증 루프: 영수증 문자열을 안전하게 만들기'
   structuredPrimary: true
   subtitle: 문자열을 업무 출력물로 조립하고 검증하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된 변환이 없는지 검증해야 합니다.
+  goal: '검증 루프: 영수증 문자열을 안전하게 만들기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된
+    변환이 없는지 검증해야 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -342,7 +379,7 @@ sections:
     assert receipt.count('\n') == 5
     print(receipt)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '검증 루프: 영수증 문자열을 안전하게 만들기 예제에서 출력 문자열을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       level = 'INFO'
       action = 'order_created'
@@ -354,30 +391,33 @@ sections:
       assert 'ERROR' not in logLine
       logLine
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '검증 루프: 영수증 문자열을 안전하게 만들기 코드에서 먼저 출력 문자열 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '검증 루프: 영수증 문자열을 안전하게 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '검증 루프: 영수증 문자열을 안전하게 만들기에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 4 종합 복습
   structuredPrimary: true
   subtitle: 문자열 기초 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 4에서 배운 문자열 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+  goal: Day 4 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 4에서 배운 문자열 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     path = 'C:\\Users\\Documents\\file.txt'
     path
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 4 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       first = 'Hello'
       second = 'Python'
       first + ' ' + second
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 4 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 4 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 4 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

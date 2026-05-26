@@ -26,13 +26,35 @@ intro:
   - 그룹과 백레퍼런스 활용
   - 복잡한 패턴 작성
   - 성능 최적화
+  direction: 정규표현식 고급에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 정규표현식 고급 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 기본 패턴 복습 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 그룹 기초 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 룩어헤드 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 정규표현식 고급 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 정규표현식 고급 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 정규표현식 고급 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: basic_review
   title: 기본 패턴 복습
   structuredPrimary: true
   subtitle: 정규표현식 기초 문법
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 기본 패턴 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 정규표현식 기본 문법 복습
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -46,7 +68,7 @@ sections:
     reviewResult = (reviewDigits, reviewWords, reviewSplit)
     reviewResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 기본 패턴 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -57,16 +79,17 @@ sections:
       reviewResult = (reviewDigits, reviewWords, reviewSplit)
       reviewResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 기본 패턴 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 기본 패턴 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 기본 패턴 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: groups_basic
   title: 그룹 기초
   structuredPrimary: true
   subtitle: 캡처 그룹으로 부분 추출
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 그룹 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 괄호로 그룹을 만들면 매칭된 부분을 개별적으로 추출할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -82,7 +105,7 @@ sections:
     dateResult = (dateYear, dateMonth, dateDay, dateAll)
     dateResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 그룹 기초 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -95,16 +118,17 @@ sections:
       dateResult = (dateYear, dateMonth, dateDay, dateAll)
       dateResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 그룹 기초 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 그룹 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 그룹 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: lookahead
   title: 룩어헤드
   structuredPrimary: true
   subtitle: 전방 탐색으로 조건부 매칭
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 룩어헤드에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: '(?=...) 긍정 룩어헤드: 뒤에 패턴이 있어야 매칭. (?!...) 부정 룩어헤드: 뒤에 패턴이 없어야 매칭.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -117,7 +141,7 @@ sections:
     laResult = laFound
     laResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 룩어헤드 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -127,16 +151,17 @@ sections:
       laResult = laFound
       laResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 룩어헤드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 룩어헤드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 룩어헤드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: lookbehind
   title: 룩비하인드
   structuredPrimary: true
   subtitle: 후방 탐색으로 조건부 매칭
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 룩비하인드에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: '(?<=...) 긍정 룩비하인드: 앞에 패턴이 있어야 매칭. (?<!...) 부정 룩비하인드: 앞에 패턴이 없어야 매칭.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -149,7 +174,7 @@ sections:
     lbResult = (lbDollar, lbEuro)
     lbResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 룩비하인드 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -159,16 +184,17 @@ sections:
       lbResult = (lbDollar, lbEuro)
       lbResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 룩비하인드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 룩비하인드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 룩비하인드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: backreference
   title: 백레퍼런스
   structuredPrimary: true
   subtitle: 캡처한 그룹을 다시 참조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 백레퍼런스에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: \1, \2 등으로 앞서 캡처한 그룹을 다시 매칭에 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -181,7 +207,7 @@ sections:
     dupResult = dupFound
     dupResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 백레퍼런스 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -191,16 +217,17 @@ sections:
       dupResult = dupFound
       dupResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 백레퍼런스 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 백레퍼런스 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 백레퍼런스에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: non_capture
   title: 비캡처 그룹
   structuredPrimary: true
   subtitle: 그룹화만 하고 캡처하지 않음
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 비캡처 그룹에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: '(?:...) 비캡처 그룹: 그룹화는 하지만 결과에 포함되지 않습니다. 성능과 가독성 향상.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -213,7 +240,7 @@ sections:
     ncResult = (ncCapture, ncNonCapture)
     ncResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 비캡처 그룹 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -223,16 +250,17 @@ sections:
       ncResult = (ncCapture, ncNonCapture)
       ncResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 비캡처 그룹 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 비캡처 그룹 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 비캡처 그룹에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: flags
   title: 플래그
   structuredPrimary: true
   subtitle: 매칭 동작 변경
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 플래그에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: (?i) 대소문자 무시, (?m) 멀티라인, (?s) 점이 줄바꿈도 매칭, (?x) 확장 모드
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -246,7 +274,7 @@ sections:
     flagResult = (flagCaseInsensitive, flagMultiline)
     flagResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 플래그 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -257,16 +285,17 @@ sections:
       flagResult = (flagCaseInsensitive, flagMultiline)
       flagResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 플래그 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 플래그 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 플래그에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: substitution
   title: 치환
   structuredPrimary: true
   subtitle: 패턴 기반 문자열 변환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 치환에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: re.sub()로 패턴에 매칭되는 부분을 치환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -280,7 +309,7 @@ sections:
     subResult = (subReplaced, subStripped)
     subResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 치환 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -291,16 +320,17 @@ sections:
       subResult = (subReplaced, subStripped)
       subResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 치환 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 치환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 치환에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 로그 파싱과 마스킹'
   structuredPrimary: true
   subtitle: 명명 그룹, 룩어라운드, 치환 콜백을 검증 가능한 로그 처리로 연결합니다
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 주문 로그 파싱과 마스킹에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     정규표현식은 한 줄 마술이 아니라 실패를 드러내야 하는 파서입니다. 주문 로그에서 필드를 추출하고, 잘못된 라인을 거절하고, 개인정보를 마스킹하는 과정을 작은 함수로 나누어 검증하세요.
 
@@ -335,7 +365,7 @@ sections:
     assert parsed["amount"] == 12000
     assert parsed["service"] == "checkout"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 로그 파싱과 마스킹 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import re
 
@@ -363,17 +393,20 @@ sections:
       assert parsed["amount"] == 12000
       assert parsed["service"] == "checkout"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 로그 파싱과 마스킹 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 로그 파싱과 마스킹 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 로그 파싱과 마스킹에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 정규표현식 실습
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 25에서 배운 고급 정규표현식을 난이도별로 복습합니다. 룩어헤드와 룩비하인드는 패턴의 앞뒤 문맥을 검사하는 강력한 도구입니다. 그룹과 백레퍼런스는 복잡한 텍스트 파싱과 치환에 필수적이며, 명명된 그룹은 가독성을 높입니다. 🟢 기본 문제로 이메일, 전화번호 등 실용적인 검증 패턴을 작성하고, 🟡 응용 문제로 룩어라운드와 조건부 매칭을 연습하세요. 🔴 심화 문제에서는 프로그래밍 언어 토크나이저, 로그 파서 등 복잡한 파싱기를 직접 구현해봅니다. 정규표현식 숙달은 텍스트 처리 생산성을 10배 이상 높여줍니다.
+  goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 25에서 배운 고급 정규표현식을 난이도별로 복습합니다. 룩어헤드와 룩비하인드는 패턴의 앞뒤 문맥을 검사하는 강력한 도구입니다. 그룹과 백레퍼런스는 복잡한
+    텍스트 파싱과 치환에 필수적이며, 명명된 그룹은 가독성을 높입니다. 🟢 기본 문제로 이메일, 전화번호 등 실용적인 검증 패턴을 작성하고, 🟡 응용 문제로 룩어라운드와 조건부 매칭을
+    연습하세요. 🔴 심화 문제에서는 프로그래밍 언어 토크나이저, 로그 파서 등 복잡한 파싱기를 직접 구현해봅니다. 정규표현식 숙달은 텍스트 처리 생산성을 10배 이상 높여줍니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -387,7 +420,7 @@ sections:
     ex1Result = [validateMail(e) for e in ex1Emails]
     ex1Result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -399,7 +432,8 @@ sections:
       ex1Result = [validateMail(e) for e in ex1Emails]
       ex1Result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

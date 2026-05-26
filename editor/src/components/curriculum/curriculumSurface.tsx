@@ -1,11 +1,7 @@
 import {
   AlertTriangle,
-  ArrowRight,
   BookOpen,
-  Boxes,
   CheckCircle2,
-  Code2,
-  GitBranch,
   GraduationCap,
   Layers3,
   Lightbulb,
@@ -15,11 +11,9 @@ import {
   Package,
   Play,
   RefreshCw,
-  Route,
   Sparkles,
   Target,
   TerminalSquare,
-  Wrench,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
 
@@ -225,10 +219,10 @@ function LearningOverviewHeader({
       />
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 left-0 w-1 bg-emerald-500"
+        className="absolute inset-y-0 left-0 w-1 bg-zinc-300 dark:bg-zinc-700"
         data-learning-overview-rail="true"
       />
-      <div className="relative z-10 grid gap-5 p-5 xl:grid-cols-[minmax(0,1fr)_430px]">
+      <div className="relative z-10 p-5">
         <div className="flex min-w-0 flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">커리큘럼</Badge>
@@ -240,17 +234,7 @@ function LearningOverviewHeader({
           {overview.direction ? (
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground" data-learning-overview-part="direction">{overview.direction}</p>
           ) : null}
-          <div
-            className="mt-5 grid gap-2 text-xs text-muted-foreground sm:grid-cols-[auto_minmax(20px,1fr)_auto_minmax(20px,1fr)_auto]"
-            data-learning-flow-track="overview-route"
-            data-learning-overview-part="route"
-          >
-            <LearningRouteStep Icon={GitBranch} label="YAML 설계" tone="text-sky-500" />
-            <LearningRouteConnector />
-            <LearningRouteStep Icon={Layers3} label="섹션 카드" tone="text-amber-500" />
-            <LearningRouteConnector />
-            <LearningRouteStep Icon={TerminalSquare} label="직접 실행" tone="text-emerald-500" />
-          </div>
+          <WorkflowArchitectureDiagram diagram={overview.diagram} />
           {overview.benefits.length ? (
             <div className="mt-5 grid gap-x-5 gap-y-2 border-t pt-4 sm:grid-cols-2">
               {overview.benefits.slice(0, 4).map((benefit, index) => (
@@ -269,7 +253,6 @@ function LearningOverviewHeader({
             <CurriculumDependencyPanel apiOnline={apiOnline} document={document} />
           </div>
         </div>
-        <LearningFlowDiagram diagram={overview.diagram} />
       </div>
       <PendingNotebookBar
         pendingBlocks={pendingBlocks}
@@ -280,171 +263,36 @@ function LearningOverviewHeader({
   );
 }
 
-function LearningRouteStep({
-  Icon,
-  label,
-  tone,
-}: {
-  Icon: ComponentType<{ className?: string }>;
-  label: string;
-  tone: string;
-}) {
-  return (
-    <span className="inline-flex min-w-0 items-center gap-1.5 font-medium text-foreground">
-      <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md bg-muted ring-1 ring-border", tone)}>
-        <Icon className="size-3.5" />
-      </span>
-      <span className="truncate">{label}</span>
-    </span>
-  );
-}
-
-function LearningRouteConnector() {
-  return (
-    <span className="hidden items-center sm:flex" data-learning-flow-connector="true">
-      <span className="h-px w-full min-w-6 bg-border" />
-      <ArrowRight className="-ml-1 size-3.5 shrink-0 text-muted-foreground" />
-    </span>
-  );
-}
-
-function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
-  const customSteps = diagramSteps(diagram);
-  const customRuntimeNodes = diagramRuntimeNodes(diagram);
-  const fallbackSteps = [
-    { label: "목표", detail: "무슨 공부", Icon: Route, tone: "text-sky-500" },
-    { label: "개념", detail: "설명과 팁", Icon: BookOpen, tone: "text-amber-500" },
-    { label: "스니펫", detail: "따라 칠 코드", Icon: Code2, tone: "text-emerald-500" },
-    { label: "실행", detail: "입력과 검증", Icon: Play, tone: "text-rose-500" },
-  ];
-  const stepIcons = [Route, BookOpen, Code2, Play];
-  const stepTones = ["text-sky-500", "text-amber-500", "text-emerald-500", "text-rose-500"];
-  const steps = customSteps.length
-    ? customSteps.map((step, index) => ({
-      ...step,
-      Icon: stepIcons[index % stepIcons.length],
-      tone: stepTones[index % stepTones.length],
-    }))
-    : fallbackSteps;
-  const visibleSteps = steps.slice(0, 4);
-  const runtimeIcons = [GitBranch, Package, CheckCircle2];
-  const fallbackRuntimeNodes = [
-    { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
-    { label: "환경", detail: "uv 패키지", Icon: Package },
-    { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
-  ];
-  const runtimeNodes = customRuntimeNodes.length
-    ? customRuntimeNodes.map((node, index) => ({
-      ...node,
-      Icon: runtimeIcons[index % runtimeIcons.length],
-    }))
-    : fallbackRuntimeNodes;
+function WorkflowArchitectureDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
+  const steps = workflowArchitectureSteps(diagram);
+  if (steps.length < 3) return null;
 
   return (
-    <div
-      className="relative min-h-[286px] overflow-hidden rounded-md bg-background/75 p-4 ring-1 ring-border/80"
-      data-learning-flow-diagram="true"
-      data-learning-overview-part="diagram"
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-45"
-        data-learning-flow-blueprint="true"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute left-[35px] top-[118px] bottom-[92px] w-px bg-border sm:inset-x-7 sm:top-[122px] sm:bottom-auto sm:h-px sm:w-auto"
-        data-learning-flow-track="spine"
-      />
-      <div className="relative z-10 flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Boxes className="size-4 text-muted-foreground" />
-            학습 아키텍처
-          </div>
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">
-            YAML 계약에서 입력 셀과 검증까지 한 흐름으로 이어집니다
-          </div>
-        </div>
-        <Badge className="gap-1" variant="outline">
-          <Wrench className="size-3" />
-          uv
-        </Badge>
+    <section className="mt-5 border-t pt-4" data-learning-overview-part="workflow" data-learning-workflow-diagram="true">
+      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <ListChecks className="size-3.5" />
+        <span>실무 흐름</span>
       </div>
-      <div
-        className="relative z-10 mt-4"
-        data-learning-flow-canvas="true"
-      >
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-          {visibleSteps.map(({ Icon, detail, label, tone }, index) => (
-            <div className="contents" key={label}>
-              <div
-                className="relative z-10 flex min-h-28 min-w-0 flex-1 flex-col justify-between rounded-md bg-card/95 px-3 py-3 shadow-sm ring-1 ring-border"
-                data-learning-flow-node="true"
-                data-learning-flow-step={label}
-              >
-                <span
-                  className="absolute -top-2 left-3 rounded-md border bg-background px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground"
-                  data-learning-flow-node-index="true"
-                >
-                  {index + 1}
-                </span>
-                <div className="flex items-start gap-2 pt-1">
-                  <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-md bg-muted/50 ring-1 ring-border", tone)}>
-                    <Icon className="size-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">{label}</span>
-                    <span className="mt-1 block text-xs leading-5 text-muted-foreground">{detail}</span>
-                  </span>
-                </div>
-                <span className="mt-3 h-1 rounded-full bg-muted" data-learning-flow-node-accent="true">
-                  <span
-                    className={cn(
-                      "block h-full rounded-full",
-                      index === 0 && "bg-sky-500",
-                      index === 1 && "bg-amber-500",
-                      index === 2 && "bg-emerald-500",
-                      index === 3 && "bg-rose-500",
-                    )}
-                    style={{ width: `${Math.round(((index + 1) / visibleSteps.length) * 100)}%` }}
-                  />
-                </span>
-              </div>
-              {index < visibleSteps.length - 1 ? (
-                <div
-                  aria-hidden="true"
-                  className="flex items-center justify-center text-muted-foreground sm:w-7"
-                  data-learning-flow-connector="true"
-                >
-                  <ArrowRight className="hidden size-4 sm:block" />
-                  <span className="h-4 w-px bg-border sm:hidden" />
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 rounded-md border bg-card/80 px-3 py-3" data-learning-flow-runtime="true">
-          <div className="mb-2 text-xs font-medium text-muted-foreground">런타임 레이어</div>
-          <div className="grid gap-2 sm:grid-cols-3">
-          {runtimeNodes.slice(0, 3).map(({ Icon, detail, label }) => (
-            <div className="flex min-w-0 items-center gap-2 text-xs" data-learning-flow-runtime-node="true" key={label}>
-              <Icon className="size-3.5 shrink-0 text-muted-foreground" />
-              <span className="min-w-0">
-                <span className="mr-1 font-medium">{label}</span>
-                <span className="text-muted-foreground">{detail}</span>
+      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+        {steps.map((step, index) => (
+          <div
+            className="min-w-0 rounded-md border bg-background/70 px-3 py-2"
+            data-learning-workflow-step="true"
+            key={`${step.label}-${index}`}
+          >
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border bg-muted text-[11px] font-semibold text-muted-foreground">
+                {index + 1}
               </span>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold tracking-normal">{step.label}</div>
+                {step.detail ? <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{step.detail}</p> : null}
+              </div>
             </div>
-          ))}
           </div>
-        </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -642,21 +490,21 @@ function CurriculumSectionCard({
       id={cellDomId(section.anchorBlockId)}
     >
       <button
-        className="flex w-full min-w-0 items-stretch gap-3 border-b bg-muted/15 px-4 py-3 text-left"
+        className="flex w-full min-w-0 items-stretch gap-3 border-b border-zinc-200 bg-zinc-100/80 px-4 py-3 text-left transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900/85 dark:hover:bg-zinc-900"
         type="button"
         onClick={() => onSelectBlock(section.anchorBlockId)}
       >
         <span
-          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-background text-sm font-semibold tabular-nums text-muted-foreground"
+          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-sm font-semibold tabular-nums text-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
           data-learning-section-index="true"
         >
           {index + 1}
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center" data-learning-section-heading="true">
-          <span className="block text-lg font-semibold tracking-normal">{section.title}</span>
-          {section.subtitle ? <span className="mt-1 block text-sm leading-6 text-muted-foreground">{section.subtitle}</span> : null}
+          <span className="block text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">{section.title}</span>
+          {section.subtitle ? <span className="mt-1 block text-sm leading-6 text-zinc-600 dark:text-zinc-300">{section.subtitle}</span> : null}
         </span>
-        <Badge className="mt-1 gap-1" variant="outline">
+        <Badge className="mt-1 gap-1 border-zinc-300 bg-background/80 text-zinc-800 dark:border-zinc-700 dark:bg-zinc-950/70 dark:text-zinc-200" variant="outline">
           <Layers3 className="size-3" />
           섹션
         </Badge>
@@ -785,7 +633,7 @@ function curriculumOverview(document: CodaroDocument, introBlock?: BlockConfig) 
     : inferBenefits(document.blocks);
   return {
     title: stripMarkdown(title),
-    direction: stripMarkdown(goal || description || "한 섹션씩 개념, 예제, 직접 입력, 실행 결과를 연결해 학습합니다."),
+    direction: stripMarkdown(goal || description),
     benefits,
     diagram: isRecord(intro.diagram) ? intro.diagram : undefined,
   };
@@ -816,10 +664,10 @@ function sectionInfo(block: BlockConfig) {
 
 function SectionContractOverview({ contract }: { contract?: CurriculumSectionContract }) {
   if (!contract) return null;
-  const goal = stripMarkdown(readPayloadText(contract.goal));
-  const why = stripMarkdown(readPayloadText(contract.why));
-  const explanation = stripMarkdown(readPayloadText(contract.explanation));
-  const tips = payloadTextList(contract.tips).map(stripMarkdown).slice(0, 4);
+  const goal = specificLearningCopy(readPayloadText(contract.goal));
+  const why = specificLearningCopy(readPayloadText(contract.why));
+  const explanation = specificLearningCopy(readPayloadText(contract.explanation));
+  const tips = payloadTextList(contract.tips).map(specificLearningCopy).filter(Boolean).slice(0, 4);
   const gapLabels = sectionContractGapLabels(contract.contractGaps);
   if (!goal && !why && !explanation && !tips.length && !gapLabels.length) return null;
 
@@ -911,7 +759,7 @@ function sectionContractGapLabels(value: unknown) {
     snippet: "예제 스니펫",
     "exercise.prompt": "실습 안내",
     "exercise.starterCode": "실습 시작 코드",
-    check: "검증/피드백",
+    check: "검증 기준",
   };
   return value
     .map((item) => typeof item === "string" ? (labels[item] ?? item) : "")
@@ -951,6 +799,10 @@ function StructuredSectionLearningBody({
   const exerciseResult = exercise ? results[exercise.id] : undefined;
   const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
   const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
+  const exerciseDescription = specificPracticeCopy(exercise?.guide?.description || exercise?.description || "");
+  const exerciseCheck = exercise
+    ? preferredValidationEntry(validationEntriesFromCheckConfig(exercise.guide?.checkConfig))
+    : null;
 
   return (
     <div className="divide-y">
@@ -981,18 +833,25 @@ function StructuredSectionLearningBody({
                 {exercise.guide ? <Badge variant="outline">{difficultyLabel(exercise.guide.difficulty)}</Badge> : null}
               </div>
               <h3 className="mt-1 text-base font-semibold tracking-normal">{blockLabel(exercise)}</h3>
-              {exercise.guide?.description || exercise.description ? (
+              {exerciseDescription ? (
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-                  {stripMarkdown(exercise.guide?.description || exercise.description || "")}
+                  {exerciseDescription}
+                </p>
+              ) : null}
+              {exerciseCheck ? (
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  <span className="font-medium text-foreground">확인할 것</span>
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  {exerciseCheck.text}
                 </p>
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
-              <Badge variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
+              <Badge className="h-7 rounded-md px-2 text-xs" variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
                 {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
               </Badge>
               <IconButton
-                className="size-8"
+                className="size-7 rounded-md [&_svg]:size-3.5"
                 disabled={!canRun}
                 label="셀 실행"
                 variant="outline"
@@ -1011,24 +870,9 @@ function StructuredSectionLearningBody({
             </div>
           </div>
 
-          {exercise.guide?.hints?.length ? (
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {exercise.guide.hints.slice(0, 4).map((hint, index) => (
-                <div className="flex min-w-0 items-start gap-2 text-xs leading-5 text-muted-foreground" key={`${hint}-${index}`}>
-                  <Lightbulb className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
-                  <span className="min-w-0">{stripBullet(stripMarkdown(hint))}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
           <div className="mt-3 space-y-1.5">
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">Python 실습 코드</span>
-              <span className="flex items-center gap-1.5">
-                <Badge variant="outline">학습자가 작성</Badge>
-                <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
-              </span>
             </div>
             <div
               aria-label={`${blockLabel(exercise)} 직접 입력 실습 코드 편집기`}
@@ -1051,32 +895,26 @@ function StructuredSectionLearningBody({
             </div>
           </div>
 
-          <div className="mt-3" data-learning-section-part="result">
-            <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-              <CheckCircle2 className="size-3.5" />
-              실행 결과
-            </div>
-            {exerciseResult ? (
-              <ExecutionOutput result={exerciseResult} />
-            ) : exerciseRunning ? (
-              <LoadingInline label="셀 실행 중" />
-            ) : (
-              <div className="rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs leading-5 text-muted-foreground">
-                셀을 실행하면 결과와 오류가 여기에 표시됩니다.
+          {exerciseResult || exerciseRunning ? (
+            <div className="mt-3" data-learning-section-part="result">
+              <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <CheckCircle2 className="size-3.5" />
+                실행 결과
               </div>
-            )}
-          </div>
+              {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
       {parts.check ? (
         <StructuredSectionBand
           icon={<CheckCircle2 className="size-3.5" />}
-          label="검증/피드백"
+          label="검증 기준"
           part="check"
           title={blockLabel(parts.check)}
         >
-          <CurriculumMarkdownBody block={parts.check} />
+          <ValidationCriteriaBody block={parts.check} />
         </StructuredSectionBand>
       ) : null}
 
@@ -1136,6 +974,102 @@ function StructuredSectionBand({
   );
 }
 
+type ValidationEntry = {
+  key: string;
+  label: string;
+  text: string;
+};
+
+function ValidationCriteriaBody({ block }: { block: BlockConfig }) {
+  const entries = validationEntriesFromBlock(block);
+  if (!entries.length) return <CurriculumMarkdownBody block={block} />;
+
+  return (
+    <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-background/80 text-amber-600 dark:text-amber-300">
+          <CheckCircle2 className="size-4" />
+        </span>
+        <dl className="min-w-0 flex-1 space-y-2">
+          {entries.map((entry) => (
+            <div className="grid min-w-0 gap-1 sm:grid-cols-[7.5rem_minmax(0,1fr)]" key={`${entry.key}-${entry.text}`}>
+              <dt className="text-sm font-semibold leading-6 text-foreground">{entry.label}</dt>
+              <dd className="min-w-0 whitespace-normal break-words text-sm leading-6 text-muted-foreground">
+                {entry.text}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
+function validationEntriesFromBlock(block: BlockConfig): ValidationEntry[] {
+  const payload = isRecord(block.payload) ? block.payload : undefined;
+  const payloadCheck = payload && isRecord(payload.check) ? payload.check : undefined;
+  const payloadEntries = validationEntriesFromCheckConfig(payloadCheck);
+  if (payloadEntries.length) return payloadEntries;
+  return validationEntriesFromMarkdown(block.content);
+}
+
+function validationEntriesFromCheckConfig(checkConfig?: Record<string, unknown>): ValidationEntry[] {
+  if (!checkConfig) return [];
+  return Object.entries(checkConfig)
+    .map(([key, value]) => ({
+      key,
+      label: validationLabel(key),
+      text: readPayloadText(value),
+    }))
+    .filter((entry) => entry.text)
+    .sort((left, right) => validationOrder(left.key) - validationOrder(right.key));
+}
+
+function validationEntriesFromMarkdown(content: string): ValidationEntry[] {
+  return content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .map((line, index) => {
+      const boldMatch = line.match(/^\s*[-*]\s*\*\*(.+?)\*\*\s*:?\s*(.+)$/);
+      if (boldMatch) {
+        const label = stripMarkdown(boldMatch[1]);
+        return { key: `line-${index}`, label, text: stripMarkdown(boldMatch[2]) };
+      }
+      const stripped = stripBullet(stripMarkdown(line));
+      if (!stripped || stripped === "검증 기준") return null;
+      const [label, ...rest] = stripped.split(":");
+      if (!rest.length) return null;
+      return { key: `line-${index}`, label: label.trim(), text: rest.join(":").trim() };
+    })
+    .filter((entry): entry is ValidationEntry => Boolean(entry?.label && entry.text));
+}
+
+function preferredValidationEntry(entries: ValidationEntry[]) {
+  return entries.find((entry) => entry.key === "resultCheck" || entry.key === "outputCheck" || entry.key === "assertCheck")
+    ?? entries[0]
+    ?? null;
+}
+
+function validationLabel(key: string) {
+  const labels: Record<string, string> = {
+    noError: "오류 없이 실행",
+    resultCheck: "결과 확인",
+    assertCheck: "assert 통과",
+    outputCheck: "출력 확인",
+  };
+  return labels[key] ?? key;
+}
+
+function validationOrder(key: string) {
+  const order: Record<string, number> = {
+    noError: 0,
+    assertCheck: 1,
+    outputCheck: 2,
+    resultCheck: 3,
+  };
+  return order[key] ?? 10;
+}
+
 function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
   return section.blocks.some((block) => block.sourceType?.startsWith("sectionContract:"));
 }
@@ -1151,6 +1085,44 @@ function structuredSectionParts(section: CurriculumSectionGroup) {
     && block.sourceType !== "sectionContract:check"
   ));
   return { snippet, exercise, check, extraBlocks };
+}
+
+function specificLearningCopy(value: string) {
+  const text = stripMarkdown(value);
+  return isGenericLearningCopy(text) ? "" : text;
+}
+
+function specificPracticeCopy(value: string) {
+  const text = stripMarkdown(value);
+  return isGenericPracticeCopy(text) ? "" : text;
+}
+
+function isGenericLearningCopy(value: string) {
+  const normalized = normalizeCopy(value);
+  return [
+    "예제를 실행하고 핵심 동작을 직접 변형한다.",
+    "작은 실행과 검증 흐름이 실무 코드의 기본이다.",
+    "한 섹션씩 개념, 예제, 직접 입력, 실행 결과를 연결해 학습합니다.",
+  ].includes(normalized);
+}
+
+function isGenericPracticeCopy(value: string) {
+  const normalized = normalizeCopy(value);
+  return [
+    /^예제를 실행한 뒤.*값 하나.*결과를 비교하세요\.$/,
+    /^기준 실행 후.*값 하나.*결과를 비교하세요\.$/,
+    /^위 예제 스니펫을 참고해.*값 하나를 바꾼 뒤 실행하세요\.$/,
+    /^아래 코드 영역을 클릭해.*입력하세요\.$/,
+    /^예제와 다르게.*결과 변화를 볼 수 있습니다\.$/,
+  ].some((pattern) => pattern.test(normalized)) || (
+    normalized.includes("값 하나") &&
+    normalized.includes("결과") &&
+    (normalized.includes("비교") || normalized.includes("변화"))
+  );
+}
+
+function normalizeCopy(value: string) {
+  return stripBullet(stripMarkdown(value)).replace(/\s+/g, " ").trim();
 }
 
 function inferBenefits(blocks: BlockConfig[]) {
@@ -1193,7 +1165,7 @@ function payloadTextList(value: unknown): string[] {
     .filter(Boolean);
 }
 
-function diagramSteps(diagram?: Record<string, unknown>) {
+function workflowArchitectureSteps(diagram?: Record<string, unknown>) {
   if (!diagram || !Array.isArray(diagram.steps)) return [];
   return diagram.steps
     .map((item) => {
@@ -1206,30 +1178,38 @@ function diagramSteps(diagram?: Record<string, unknown>) {
       return label ? { label, detail } : null;
     })
     .filter((item): item is { label: string; detail: string } => Boolean(item))
-    .slice(0, 5);
+    .filter(isSpecificWorkflowStep)
+    .slice(0, 4);
 }
 
-function diagramRuntimeNodes(diagram?: Record<string, unknown>) {
-  if (!diagram) return [];
-  const source = Array.isArray(diagram.runtime)
-    ? diagram.runtime
-    : Array.isArray(diagram.runtimeLayer)
-      ? diagram.runtimeLayer
-      : Array.isArray(diagram.layers)
-        ? diagram.layers
-        : [];
-  return source
-    .map((item) => {
-      if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
-        return { label: String(item), detail: "" };
-      }
-      if (!isRecord(item)) return null;
-      const label = readPayloadText(item.label ?? item.title ?? item.name);
-      const detail = readPayloadText(item.detail ?? item.description ?? item.content);
-      return label ? { label, detail } : null;
-    })
-    .filter((item): item is { label: string; detail: string } => Boolean(item))
-    .slice(0, 3);
+function isSpecificWorkflowStep(step: { label: string; detail: string }) {
+  const label = normalizeCopy(step.label).replace(/\s+/g, "");
+  const combined = normalizeCopy(`${step.label} ${step.detail}`);
+  const genericLabels = new Set([
+    "목표",
+    "준비",
+    "개념",
+    "스니펫",
+    "실습",
+    "실행",
+    "검증",
+    "완료",
+    "패키지",
+    "첫실행",
+    "환경",
+  ]);
+  if (genericLabels.has(label)) return false;
+  if (combined.length < 8) return false;
+  return ![
+    "무슨 공부",
+    "설명과 팁",
+    "따라 칠 코드",
+    "입력과 검증",
+    "YAML 계약",
+    "uv 패키지",
+    "assert와 결과 비교",
+    "결과 확인",
+  ].some((phrase) => combined.includes(phrase));
 }
 
 function readSectionContract(value: unknown): CurriculumSectionContract | undefined {
@@ -1284,10 +1264,10 @@ export function CurriculumCellToc({
   return (
     <aside
       aria-label="셀 목차"
-      className="group/toc hidden h-full min-h-0 w-12 shrink-0 overflow-hidden border-l bg-background/95 transition-[width] duration-150 hover:w-72 2xl:block"
+      className="group/toc relative z-30 hidden h-full min-h-0 w-12 shrink-0 justify-self-end overflow-hidden border-l bg-background transition-[width,box-shadow] duration-150 hover:w-72 hover:border hover:border-border hover:bg-popover hover:shadow-2xl 2xl:block"
       data-learning-toc="push"
     >
-      <div className="flex h-full min-h-0 w-72 flex-col py-3">
+      <div className="flex h-full min-h-0 w-72 flex-col bg-inherit py-3">
         <div className="flex h-8 items-center gap-2 px-2">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
           <ListChecks className="size-3.5" />

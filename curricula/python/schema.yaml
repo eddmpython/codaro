@@ -23,11 +23,11 @@
 #     - "과정 후 할 수 있는 일"
 #   diagram:
 #     steps:
-#       - label: "목표"
-#         detail: "무슨 공부"
+#       - label: "DataFrame 입력 확인"
+#         detail: "sales 열과 행 값을 먼저 고정"
 #     runtime:
-#       - label: "환경"
-#         detail: "uv로 필요한 패키지만 준비"
+#       - label: "pandas 환경"
+#         detail: "pandas 기준으로 로컬 Python 실행 준비"
 
 # ============================================
 # Sections

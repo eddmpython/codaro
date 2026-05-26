@@ -33,7 +33,6 @@ class StudyData(BaseModel):
 
 
 CATEGORY_MAPPING = {
-    "main": "Python 입문",
     "30days": "30일완성",
     "advancedPython": "고급파이썬",
     "builtins": "표준라이브러리",
@@ -60,7 +59,6 @@ CATEGORY_MAPPING = {
 }
 
 CATEGORY_META = {
-    "main": {"description": "Codaro 로컬 학습을 시작하는 짧은 Python 입문"},
     "30days": {"description": "30일 만에 완성하는 체계적인 Python 기초"},
     "advancedPython": {"description": "고급 문법과 패턴으로 레벨업"},
     "builtins": {"description": "Python 표준 라이브러리를 로컬 환경에서 익히는 경로"},
@@ -87,7 +85,7 @@ CATEGORY_META = {
 }
 
 CATEGORY_GROUPS = {
-    "Python 기초": ["main", "30days", "advancedPython", "builtins"],
+    "Python 기초": ["30days", "advancedPython", "builtins"],
     "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
     "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
     "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
@@ -96,7 +94,7 @@ CATEGORY_GROUPS = {
 }
 
 LEARNING_PATHS = {
-    "초급": {"categories": ["main", "30days"], "description": "프로그래밍이 처음이라면"},
+    "초급": {"categories": ["30days"], "description": "프로그래밍이 처음이라면"},
     "중급": {"categories": ["advancedPython", "builtins", "pandas", "numpy"], "description": "기초를 마쳤다면"},
     "실무": {"categories": ["duckdb", "pydantic", "excel", "regex", "practical"], "description": "로컬 자동화와 데이터 작업으로 확장"},
     "고급": {"categories": ["scipy", "statsmodels", "sklearn", "networkx"], "description": "모델링과 분석을 깊게 다룬다면"},

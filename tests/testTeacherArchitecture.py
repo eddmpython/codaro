@@ -322,14 +322,14 @@ def _structuredCurriculumDocumentPayload() -> dict:
                             "direction": "DataFrame 흐름을 익힌다.",
                             "diagram": {
                                 "steps": [
-                                    {"label": "목표", "detail": "무슨 공부"},
-                                    {"label": "스니펫", "detail": "따라 칠 코드"},
-                                    {"label": "실행", "detail": "입력과 검증"},
+                                    {"label": "DataFrame 입력 확인", "detail": "sales 열과 행 값을 먼저 고정합니다."},
+                                    {"label": "DataFrame 처리 실행", "detail": "pandas 생성 코드를 실행해 중간 결과를 확인합니다."},
+                                    {"label": "sales 결과 검증", "detail": "행/열 수와 요약값 기준으로 실행 결과를 비교합니다."},
                                 ],
                                 "runtime": [
-                                    {"label": "계약", "detail": "YAML SSOT"},
-                                    {"label": "준비", "detail": "uv 사전 확인"},
-                                    {"label": "피드백", "detail": "검증 결과"},
+                                    {"label": "pandas 환경", "detail": "pandas 기준으로 로컬 Python 실행을 준비합니다."},
+                                    {"label": "DataFrame 실행", "detail": "셀을 실행해 출력, 변수, 예외 상태를 확인합니다."},
+                                    {"label": "DataFrame 완료", "detail": "검증된 코드를 데이터 리포트 자동화로 남깁니다."},
                                 ],
                             },
                         },
@@ -370,7 +370,7 @@ def _structuredCurriculumDocumentPayload() -> dict:
                 "type": "markdown",
                 "role": "check",
                 "sourceType": "sectionContract:check",
-                "content": "### 검증/피드백\n- **noError**: 실행 오류가 없어야 한다.",
+                "content": "### 검증 기준\n- **오류 없이 실행**: 실행 오류가 없어야 한다.",
             },
         ]
     }
@@ -999,7 +999,7 @@ def testEvalHarnessRequiresDiagramRuntimeContract() -> None:
     report = evaluateToolTracePayload(case, tracePayload)
 
     assert not report.passed
-    assert "missing diagram runtime detail: uv 사전 확인, 검증 결과" in report.failures
+    assert "missing diagram runtime detail: pandas 환경, DataFrame 완료" in report.failures
 
 
 def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
@@ -1246,19 +1246,19 @@ intro:
     - 표 데이터를 코드로 만들 수 있다.
   diagram:
     steps:
-      - label: 목표
-        detail: 무슨 공부
-      - label: 스니펫
-        detail: 따라 칠 코드
-      - label: 실행
-        detail: 입력과 검증
+      - label: DataFrame 입력 확인
+        detail: sales 열과 행 값을 먼저 고정합니다.
+      - label: DataFrame 처리 실행
+        detail: pandas 생성 코드를 실행해 중간 결과를 확인합니다.
+      - label: sales 결과 검증
+        detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
     runtime:
-      - label: 계약
-        detail: YAML SSOT
-      - label: 준비
-        detail: uv 사전 확인
-      - label: 피드백
-        detail: 검증 결과
+      - label: pandas 환경
+        detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+      - label: DataFrame 실행
+        detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      - label: DataFrame 완료
+        detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
   - id: dataframe-basics
     title: DataFrame 만들기

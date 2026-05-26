@@ -28,20 +28,45 @@ meta:
 intro:
   emoji: 📐
   goal: 스타트업 사용자 증가 데이터를 지수 성장 모델로 피팅하여 미래 사용자를 예측합니다.
-  description: 스타트업에서 12개월간 사용자 수를 기록했습니다. 이 데이터가 지수 성장을 따르는지 확인하고, 수학 모델 y = a × e^(bx)의 파라미터 a와 b를 찾아 18개월 후 사용자 수를 예측합니다. scipy.optimize.curve_fit은 비선형 최소제곱법으로 데이터에 가장 잘 맞는 곡선의 파라미터를 자동으로 찾아줍니다. 성장률 추정, 모델 검증, 예측까지 전체 워크플로우를 완성합니다.
+  description: 스타트업에서 12개월간 사용자 수를 기록했습니다. 이 데이터가 지수 성장을 따르는지 확인하고, 수학 모델 y = a × e^(bx)의 파라미터 a와 b를 찾아
+    18개월 후 사용자 수를 예측합니다. scipy.optimize.curve_fit은 비선형 최소제곱법으로 데이터에 가장 잘 맞는 곡선의 파라미터를 자동으로 찾아줍니다. 성장률
+    추정, 모델 검증, 예측까지 전체 워크플로우를 완성합니다.
+  direction: 곡선피팅마스터에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 곡선피팅마스터 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 및 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 데이터 탐색 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 지수 성장 모델 정의 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 곡선피팅마스터 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 곡선피팅마스터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 곡선피팅마스터 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
 sections:
 - id: load
   title: 라이브러리 및 데이터 로드
   structuredPrimary: true
   subtitle: scipy.optimize
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 라이브러리 및 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     곡선 피팅(Curve Fitting)은 데이터에 가장 잘 맞는 수학 함수의 파라미터를 찾는 과정입니다. 사용자 증가율, 약물 농도 감소, 온도 냉각 등 자연 현상을 수학 모델로 표현하면 미래 예측이 가능해집니다. scipy.optimize.curve_fit은 비선형 함수도 피팅할 수 있어 선형 회귀보다 훨씬 유연합니다. 이 프로젝트에서는 가상의 스타트업 사용자 증가 데이터를 분석합니다.
 
     이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다.
   tips:
-  - 이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다.
+  - 이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘
+    찾아내는지 확인합니다.
   snippet: |-
     import scipy
 
@@ -55,7 +80,7 @@ sections:
     users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
     users = np.maximum(users, 0).astype(int)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 라이브러리 및 데이터 로드 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import scipy
 
@@ -69,16 +94,17 @@ sections:
       users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
       users = np.maximum(users, 0).astype(int)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 라이브러리 및 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 라이브러리 및 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 라이브러리 및 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: explore
   title: 데이터 탐색
   structuredPrimary: true
   subtitle: 성장 패턴 시각화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 데이터 탐색에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     피팅 전에 데이터를 시각화하여 어떤 모델이 적합한지 파악합니다. 사용자 수가 선형으로 증가하는지, 지수적으로 증가하는지에 따라 적용할 함수가 달라집니다. 그래프에서 증가 속도가 점점 빨라지면 지수 성장, 일정하면 선형 성장입니다. 로그 스케일로 그렸을 때 직선이면 지수 성장의 확실한 증거입니다.
 
@@ -102,7 +128,7 @@ sections:
     axExplore2.grid(True, alpha=0.3)
     figExplore
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 데이터 탐색 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -120,16 +146,17 @@ sections:
       axExplore2.grid(True, alpha=0.3)
       figExplore
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 데이터 탐색 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 데이터 탐색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 데이터 탐색에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: define_model
   title: 지수 성장 모델 정의
   structuredPrimary: true
   subtitle: curve_fit용 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 지수 성장 모델 정의에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     curve_fit에 사용할 함수를 정의합니다. 함수의 첫 번째 인자는 반드시 독립변수(x)이고, 나머지 인자들이 찾을 파라미터입니다. 지수 성장 모델 y = a × e^(bx)에서 a는 초기 사용자 수, b는 성장률입니다. 함수는 numpy 배열을 입력받아 numpy 배열을 반환해야 합니다.
 
@@ -140,21 +167,22 @@ sections:
     def expGrowth(x, a, b):
         return a * np.exp(b * x)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 지수 성장 모델 정의 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def expGrowth(x, a, b):
           return a * np.exp(b * x)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 지수 성장 모델 정의 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 지수 성장 모델 정의 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 지수 성장 모델 정의에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: fitting
   title: 곡선 피팅 실행
   structuredPrimary: true
   subtitle: curve_fit
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 곡선 피팅 실행에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     curve_fit(함수, x데이터, y데이터)를 호출하면 최적 파라미터와 공분산 행렬을 반환합니다. p0 인자로 초기 추정값을 제공하면 수렴이 빠르고 안정적입니다. 비선형 최적화는 초기값에 따라 결과가 달라질 수 있으므로, 도메인 지식을 활용하여 합리적인 초기값을 설정하는 것이 중요합니다.
 
@@ -166,22 +194,23 @@ sections:
     aFit, bFit = params
     aFit, bFit
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 곡선 피팅 실행 예제에서 리스트 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       params, covariance = optimize.curve_fit(expGrowth, months, users, p0=[1000, 0.1])
       aFit, bFit = params
       aFit, bFit
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 곡선 피팅 실행 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 곡선 피팅 실행 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 곡선 피팅 실행에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: validate
   title: 피팅 검증
   structuredPrimary: true
   subtitle: R² 및 잔차 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 피팅 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     피팅 품질을 평가하기 위해 R²(결정계수)와 잔차를 분석합니다. R²는 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. 잔차(실제값 - 예측값)가 무작위로 분포하면 좋은 모델이고, 패턴이 있으면 모델이 데이터의 특성을 놓치고 있다는 의미입니다.
 
@@ -195,7 +224,7 @@ sections:
     rSquared = 1 - (ssRes / ssTot)
     rSquared
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 피팅 검증 예제에서 입력값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       usersPred = expGrowth(months, aFit, bFit)
       ssRes = np.sum((users - usersPred) ** 2)
@@ -203,17 +232,19 @@ sections:
       rSquared = 1 - (ssRes / ssTot)
       rSquared
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 피팅 검증 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 피팅 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 피팅 검증에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: predict
   title: 미래 예측
   structuredPrimary: true
   subtitle: 18개월 후 사용자
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도 계산합니다. 공분산 행렬의 대각 원소 제곱근이 각 파라미터의 표준오차입니다.
+  goal: 미래 예측에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  explanation: 피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도
+    계산합니다. 공분산 행렬의 대각 원소 제곱근이 각 파라미터의 표준오차입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -226,7 +257,7 @@ sections:
     })
     predDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 미래 예측 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       futureMonths = np.arange(1, 19)
       futureUsers = expGrowth(futureMonths, aFit, bFit)
@@ -237,17 +268,19 @@ sections:
       })
       predDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 미래 예측 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 미래 예측 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 미래 예측에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: result
   title: 최종 분석 보고서
   structuredPrimary: true
   subtitle: 성장률 및 예측 요약
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는 투자자 보고, 사업 계획, 인프라 확장 계획에 활용됩니다.
+  goal: 최종 분석 보고서에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  explanation: 곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는
+    투자자 보고, 사업 계획, 인프라 확장 계획에 활용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -261,7 +294,7 @@ sections:
     })
     growthDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 최종 분석 보고서 예제에서 열 이름이나 행 값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       monthlyGrowthRate = bFit
       doublingTime = np.log(2) / bFit
@@ -273,16 +306,17 @@ sections:
       })
       growthDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 최종 분석 보고서 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 최종 분석 보고서 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 최종 분석 보고서에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 곡선 피팅 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
   explanation: |-
     지금까지 배운 curve_fit, 파라미터 해석, R² 계산, 예측을 활용하여 다양한 현상을 모델링합니다. 미션1은 배터리 방전 곡선(지수 감쇠), 미션2는 로지스틱 성장 모델(S자 곡선)입니다. 각 미션은 함수 정의, 피팅, 검증, 시각화를 포함합니다.
 
@@ -302,7 +336,7 @@ sections:
     hours = np.arange(0, 25, 2)
     voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import numpy as np
       from scipy import optimize
@@ -316,17 +350,19 @@ sections:
       hours = np.arange(0, 25, 2)
       voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: SLA 지연시간 통계 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -348,7 +384,7 @@ sections:
     cleanLatency = validateLatencySamples(latencySamples)
     cleanLatency.mean(), cleanLatency.std(ddof=1)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 인자나 반환값을 바꿔 실행하고, 오차와 결과 범위 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       allowedMean = 264
       capThreshold = optimize.brentq(
@@ -383,7 +419,8 @@ sections:
       cleanLatency = validateLatencySamples(latencySamples)
       cleanLatency.mean(), cleanLatency.std(ddof=1)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 오차와 결과 범위 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

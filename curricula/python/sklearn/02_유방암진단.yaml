@@ -28,15 +28,39 @@ meta:
 intro:
   emoji: 🏥
   goal: 이진 분류 모델로 유방암 양성/악성을 판별합니다.
-  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을 익힙니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler, LogisticRegression을 복습합니다.
+  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을
+    익힙니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler, LogisticRegression을 복습합니다.
+  direction: 유방암진단에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 유방암진단 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 불러오기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 분할과 스케일링 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 유방암진단 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, pandas, scikitlearn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 유방암진단 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 유방암진단 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을 제공합니다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을
+    제공합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -50,7 +74,7 @@ sections:
     import matplotlib.pyplot as plt
     import seaborn as sns
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_breast_cancer
       from sklearn.model_selection import train_test_split
@@ -62,45 +86,48 @@ sections:
       import matplotlib.pyplot as plt
       import seaborn as sns
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: load_breast_cancer()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     유방암 데이터셋을 불러옵니다. 세포핵의 반지름, 질감, 둘레, 면적 등 30개의 특성으로 양성(benign)과 악성(malignant)을 구분합니다. 타겟 0은 악성, 1은 양성입니다.
 
     target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
   tips:
-  - target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
+  - target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1
+    숫자로 작업하는 것이 좋습니다.
   snippet: |-
     cancer = load_breast_cancer()
     X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
     y = cancer.target
     X.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cancer = load_breast_cancer()
       X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
       y = cancer.target
       X.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step3_split_scale
   title: 3단계. 분할과 스케일링
   structuredPrimary: true
   subtitle: 전처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 분할과 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 이전 프로젝트에서 배운 대로 데이터를 분할하고 스케일링합니다. 30개의 특성이 모두 다른 스케일이므로 StandardScaler가 필수입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -112,7 +139,7 @@ sections:
     xTestSc = scaler.transform(xTest)
     xTrainSc.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 분할과 스케일링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -121,38 +148,41 @@ sections:
       xTestSc = scaler.transform(xTest)
       xTrainSc.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 분할과 스케일링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 분할과 스케일링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 분할과 스케일링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_train
   title: 4단계. 모델 학습
   structuredPrimary: true
   subtitle: LogisticRegression
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고 합니다.
+  goal: 4단계. 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고
+    합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     model = LogisticRegression(max_iter=1000)
     model.fit(xTrainSc, yTrain)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 모델 학습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       model = LogisticRegression(max_iter=1000)
       model.fit(xTrainSc, yTrain)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 모델 학습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 모델 학습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 모델 학습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_predict
   title: 5단계. 예측
   structuredPrimary: true
   subtitle: predict
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 테스트 데이터로 예측을 수행합니다. 의료 진단에서는 악성(0)을 놓치지 않는 것이 중요합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -160,21 +190,22 @@ sections:
     yPred = model.predict(xTestSc)
     yPred[:10]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 예측 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       yPred = model.predict(xTestSc)
       yPred[:10]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 예측 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 예측 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 예측에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_accuracy
   title: 6단계. 정확도
   structuredPrimary: true
   subtitle: accuracy_score
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 정확도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 전체 정확도를 확인합니다. 하지만 의료 진단에서는 정확도만으로는 부족합니다. 악성을 양성으로 잘못 판단하면 치명적이기 때문입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -182,98 +213,105 @@ sections:
     acc = accuracy_score(yTest, yPred)
     f"정확도: {acc:.2%}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 정확도 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       acc = accuracy_score(yTest, yPred)
       f"정확도: {acc:.2%}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 정확도 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 정확도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 정확도에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_precision_recall
   title: 7단계. 정밀도와 재현율
   structuredPrimary: true
   subtitle: precision, recall
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 정밀도와 재현율에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
 
     암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
   tips:
-  - 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
+  - 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False
+    Positive)하면 안 되므로 정밀도가 더 중요합니다.
   snippet: |-
     prec = precision_score(yTest, yPred)
     f"정밀도: {prec:.2%}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 정밀도와 재현율 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       prec = precision_score(yTest, yPred)
       f"정밀도: {prec:.2%}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 정밀도와 재현율 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 정밀도와 재현율 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 정밀도와 재현율에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_f1
   title: 8단계. F1 점수
   structuredPrimary: true
   subtitle: 조화평균
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. F1 점수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     F1 점수는 정밀도와 재현율의 조화평균입니다. 두 지표 중 하나만 높으면 F1이 낮아집니다. 정밀도와 재현율의 균형을 평가할 때 사용합니다.
 
     F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
   tips:
-  - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
+  - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9,
+    recall=0.1이면 F1은 0.18에 불과합니다.
   snippet: |-
     f1 = f1_score(yTest, yPred)
     f"F1 점수: {f1:.2%}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. F1 점수 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       f1 = f1_score(yTest, yPred)
       f"F1 점수: {f1:.2%}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. F1 점수 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. F1 점수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. F1 점수에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_confusion
   title: 9단계. 혼동행렬 분석
   structuredPrimary: true
   subtitle: TP, TN, FP, FN
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 혼동행렬 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     혼동행렬을 통해 True Positive(TP), True Negative(TN), False Positive(FP), False Negative(FN)를 확인합니다. 의료에서 FN(실제 악성을 양성으로 예측)이 가장 위험합니다.
 
     혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.
   tips:
-  - '혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.'
+  - '혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을
+    양성으로 정확히 예측.'
   snippet: |-
     cm = confusion_matrix(yTest, yPred)
     cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
     cmDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 혼동행렬 분석 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cm = confusion_matrix(yTest, yPred)
       cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
       cmDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 혼동행렬 분석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 혼동행렬 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 혼동행렬 분석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step10_report
   title: 10단계. 상세 리포트
   structuredPrimary: true
   subtitle: classification_report
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 상세 리포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: classification_report로 클래스별 상세 평가를 확인합니다. 악성(0)과 양성(1) 각각의 precision, recall, f1을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -281,21 +319,22 @@ sections:
     report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
     report
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 상세 리포트 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
       report
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 상세 리포트 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 상세 리포트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 상세 리포트에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step11_proba
   title: 11단계. 확률 예측
   structuredPrimary: true
   subtitle: predict_proba
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     predict_proba()로 각 클래스의 확률을 얻을 수 있습니다. 의료에서는 확률값을 활용하여 위험도를 세분화하거나, 임계값을 조정할 수 있습니다.
 
@@ -307,23 +346,25 @@ sections:
     probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
     probaDf.head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 확률 예측 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       proba = model.predict_proba(xTestSc)
       probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
       probaDf.head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 확률 예측 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 확률 예측 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 확률 예측에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step12_summary
   title: 12단계. 정리
   structuredPrimary: true
   subtitle: 이진 분류 완료
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다. 의료처럼 오분류 비용이 다른 경우 상황에 맞는 지표를 선택해야 합니다.
+  goal: 12단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다.
+    의료처럼 오분류 비용이 다른 경우 상황에 맞는 지표를 선택해야 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -333,7 +374,7 @@ sections:
     })
     summary
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 정리 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       summary = pd.DataFrame({
           'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
@@ -341,16 +382,17 @@ sections:
       })
       summary
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 정리 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 정리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 정리에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 유방암 진단 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     의료 AI 개발자가 되어 진단 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. 이전 프로젝트의 train_test_split, StandardScaler와 이번 프로젝트의 precision, recall, F1을 모두 활용합니다.
 
@@ -392,7 +434,7 @@ sections:
         'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
     })
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sklearn.datasets import load_breast_cancer
       from sklearn.model_selection import train_test_split
@@ -428,17 +470,19 @@ sections:
           'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
       })
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -467,7 +511,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -512,7 +556,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

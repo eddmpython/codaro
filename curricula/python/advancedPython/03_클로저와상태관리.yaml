@@ -26,13 +26,35 @@ intro:
   - nonlocal 키워드로 외부 스코프 변수 수정
   - 클로저를 이용한 상태 캡슐화 패턴
   - 메모이제이션으로 성능 최적화
+  direction: 클로저와 상태 관리에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 클로저와 상태 관리 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 클로저 정의 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 상태 캡슐화 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 팩토리 패턴 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 클로저와 상태 관리 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 클로저와 상태 관리 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 클로저와 상태 관리 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: closure_definition
   title: 클로저 정의
   structuredPrimary: true
   subtitle: 자유 변수를 기억하는 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 클로저 정의에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클로저(Closure)는 자신이 정의된 스코프의 변수를 기억하는 함수입니다. 내부 함수가 외부 함수의 지역 변수를 참조하면, 외부 함수가 종료되어도 그 변수가 메모리에 유지됩니다. 이렇게 내부 함수에 의해 참조되는 외부 변수를 '자유 변수(free variable)'라고 합니다. 파이썬에서 클로저는 함수 객체의 __closure__ 속성에 셀(cell) 객체로 자유 변수를 저장합니다. 클로저는 데이터를 함수와 함께 묶어두는 방법으로, 객체지향의 인스턴스와 유사한 역할을 할 수 있습니다.
 
@@ -48,7 +70,7 @@ sections:
     addFive = outer(5)
     addFive(3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 클로저 정의 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def outer(x):
           def inner(y):
@@ -58,16 +80,17 @@ sections:
       addFive = outer(5)
       addFive(3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 클로저 정의 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 클로저 정의 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 클로저 정의에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: state_encapsulation
   title: 상태 캡슐화
   structuredPrimary: true
   subtitle: 프라이빗 변수 흉내내기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상태 캡슐화에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클로저를 사용하면 외부에서 직접 접근할 수 없는 '프라이빗' 상태를 만들 수 있습니다. 외부 함수의 지역 변수는 반환된 내부 함수를 통해서만 접근하거나 수정할 수 있습니다. 이 패턴은 데이터 은닉(data hiding)을 구현하는 함수형 프로그래밍 방식입니다. 클래스의 프라이빗 속성과 유사하지만 더 간결하게 표현할 수 있습니다. 카운터, 누산기, 토글 등 간단한 상태 관리에 자주 사용됩니다.
 
@@ -86,7 +109,7 @@ sections:
     counter1 = makeCounter()
     counter1(), counter1(), counter1()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상태 캡슐화 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def makeCounter():
           count = 0
@@ -99,16 +122,17 @@ sections:
       counter1 = makeCounter()
       counter1(), counter1(), counter1()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상태 캡슐화 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상태 캡슐화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상태 캡슐화에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: factory_pattern
   title: 팩토리 패턴
   structuredPrimary: true
   subtitle: 함수 생성기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 팩토리 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클로저는 특정 설정이 적용된 함수를 생성하는 팩토리로 활용됩니다. 외부 함수가 설정값을 받아 그 값이 적용된 함수를 반환합니다. 이 패턴은 비슷한 동작을 하지만 세부 설정이 다른 여러 함수를 만들 때 유용합니다. 예를 들어 특정 진법으로 변환하는 함수, 특정 형식으로 포맷팅하는 함수 등을 팩토리로 생성할 수 있습니다. 팩토리 패턴은 코드 재사용성을 높이고 설정의 분리를 가능하게 합니다.
 
@@ -125,7 +149,7 @@ sections:
     percentFormat = makeFormatter("{value:.1%}")
     dollarFormat(1234.5), percentFormat(0.856)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 팩토리 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def makeFormatter(template):
           def formatter(value):
@@ -136,16 +160,17 @@ sections:
       percentFormat = makeFormatter("{value:.1%}")
       dollarFormat(1234.5), percentFormat(0.856)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 팩토리 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 팩토리 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 팩토리 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: memoization
   title: 메모이제이션
   structuredPrimary: true
   subtitle: 결과 캐싱으로 성능 최적화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 메모이제이션에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     메모이제이션(Memoization)은 함수 호출 결과를 저장하여 같은 인자로 다시 호출될 때 저장된 결과를 반환하는 최적화 기법입니다. 클로저를 사용하면 캐시를 함수와 함께 캡슐화할 수 있습니다. 재귀 함수에서 특히 효과적이며, 피보나치 수열 같은 중복 계산이 많은 알고리즘의 성능을 극적으로 향상시킵니다. 실제로는 functools.lru_cache를 사용하는 것이 더 편리하지만, 원리를 이해하는 것이 중요합니다.
 
@@ -168,7 +193,7 @@ sections:
 
     slowAdd(1, 2), slowAdd(1, 2), slowAdd.cache
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 메모이제이션 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def memoize(func):
           cache = {}
@@ -185,16 +210,17 @@ sections:
 
       slowAdd(1, 2), slowAdd(1, 2), slowAdd.cache
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 메모이제이션 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 메모이제이션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 메모이제이션에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: nonlocal_keyword
   title: nonlocal 키워드
   structuredPrimary: true
   subtitle: 외부 스코프 변수 수정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: nonlocal 키워드에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     nonlocal 키워드는 내부 함수에서 외부 함수의 지역 변수를 수정할 때 사용합니다. 파이썬에서 변수에 값을 할당하면 기본적으로 가장 가까운 스코프에 새 변수를 생성합니다. nonlocal을 사용하면 바깥 스코프의 기존 변수를 참조하여 수정할 수 있습니다. global은 모듈 수준의 전역 변수를, nonlocal은 감싸고 있는 함수의 지역 변수를 수정합니다. 클로저에서 상태를 변경해야 할 때 필수적입니다.
 
@@ -215,7 +241,7 @@ sections:
     except UnboundLocalError as e:
         str(e)[:50]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: nonlocal 키워드 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def outerBad():
           count = 0
@@ -230,16 +256,17 @@ sections:
       except UnboundLocalError as e:
           str(e)[:50]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - nonlocal 키워드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: nonlocal 키워드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: nonlocal 키워드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: closure_vs_class
   title: 클로저 vs 클래스
   structuredPrimary: true
   subtitle: 언제 무엇을 사용할까
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 클로저 vs 클래스에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클로저와 클래스는 둘 다 상태를 캡슐화할 수 있습니다. 클로저는 단일 동작과 간단한 상태에 적합하고, 클래스는 여러 메서드와 복잡한 상태에 적합합니다. 클로저는 코드가 더 간결하고 함수형 스타일에 맞지만, 디버깅이 어려울 수 있습니다. 클래스는 명시적이고 확장성이 좋으며, 타입 힌팅과 IDE 지원이 더 좋습니다. 콜백이나 데코레이터처럼 함수를 인자로 전달해야 하는 경우에는 클로저가 자연스럽습니다.
 
@@ -260,7 +287,7 @@ sections:
     inc, get = makeClosureCounter()
     inc(), inc(), get()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 클로저 vs 클래스 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def makeClosureCounter():
           value = 0
@@ -275,16 +302,17 @@ sections:
       inc, get = makeClosureCounter()
       inc(), inc(), get()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 클로저 vs 클래스 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 클로저 vs 클래스 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 클로저 vs 클래스에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기'
   structuredPrimary: true
   subtitle: 예측 → 상태 캡슐화 → 초과 오류 → 캐시 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클로저는 간단한 상태를 함수 안에 숨기고, 외부에서는 정해진 동작으로만 상태를 바꾸게 할 때 좋습니다. 요청 제한기와 계산 캐시를 만들어 상태가 기대대로 유지되는지 확인합니다.
 
@@ -344,7 +372,7 @@ sections:
 
     print("클로저 상태 관리 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       def makeRateLimiter(limit):
           if limit <= 0:
@@ -397,17 +425,21 @@ sections:
 
       print("클로저 상태 관리 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 클로저와 상태 관리 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 3에서 배운 클로저와 상태 관리를 난이도별로 복습합니다. 클로저는 외부 함수의 변수를 기억하는 내부 함수로, 상태를 캡슐화하는 핵심 메커니즘입니다. nonlocal 키워드로 외부 변수를 수정하고, 이를 활용해 카운터, 캐시, 팩토리 등을 만들 수 있습니다. 🟢 기본 문제로 클로저 생성과 변수 캡처를 익히고, 🟡 응용 문제로 상태 관리 패턴을 연습하세요. 🔴 심화 문제에서는 메모이제이션, 지연 평가, 데코레이터 구현 등 고급 활용법을 다룹니다. 클로저를 이해하면 데코레이터, 콜백, 이벤트 핸들러 등 고급 패턴의 동작 원리가 명확해집니다.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 3에서 배운 클로저와 상태 관리를 난이도별로 복습합니다. 클로저는 외부 함수의 변수를 기억하는 내부 함수로, 상태를 캡슐화하는 핵심 메커니즘입니다.
+    nonlocal 키워드로 외부 변수를 수정하고, 이를 활용해 카운터, 캐시, 팩토리 등을 만들 수 있습니다. 🟢 기본 문제로 클로저 생성과 변수 캡처를 익히고, 🟡 응용 문제로
+    상태 관리 패턴을 연습하세요. 🔴 심화 문제에서는 메모이제이션, 지연 평가, 데코레이터 구현 등 고급 활용법을 다룹니다. 클로저를 이해하면 데코레이터, 콜백, 이벤트 핸들러 등
+    고급 패턴의 동작 원리가 명확해집니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -419,7 +451,7 @@ sections:
     sayHello = greetMaker("Hello")
     sayHello("World")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def greetMaker(greeting):
           def greet(name):
@@ -429,7 +461,8 @@ sections:
       sayHello = greetMaker("Hello")
       sayHello("World")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

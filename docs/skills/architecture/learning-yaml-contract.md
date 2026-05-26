@@ -30,19 +30,17 @@ intro:
     - 표 데이터를 코드로 만들고 검증할 수 있다.
   diagram:
     steps:
-      - label: 목표
-        detail: 무슨 공부
-      - label: 개념
-        detail: 설명과 팁
-      - label: 스니펫
-        detail: 따라 칠 코드
-      - label: 실행
-        detail: 입력과 검증
+      - label: DataFrame 입력 확인
+        detail: sales 열과 행 값을 먼저 고정한다.
+      - label: DataFrame 처리 실행
+        detail: pandas 생성 코드를 실행해 중간 결과를 확인한다.
+      - label: sales 결과 검증
+        detail: 행/열 수와 요약값 기준으로 실행 결과를 비교한다.
+      - label: DataFrame 재사용
+        detail: 검증된 코드를 작은 리포트 자동화에 붙일 수 있게 정리한다.
     runtime:
-      - label: 계약
-        detail: YAML SSOT
-      - label: 환경
-        detail: uv 패키지
+      - label: pandas 환경
+        detail: pandas 기준으로 로컬 Python 실행을 준비한다.
       - label: 검증
         detail: 실행 결과
 sections:
@@ -78,7 +76,7 @@ sections:
 ## 렌더링 원칙
 
 - 레슨 상단은 `intro.direction`, `intro.benefits`, `intro.diagram`을 읽어 무엇을 공부하는지, 왜 유용한지, 전체 흐름을 보여준다.
-- `intro.diagram`은 제품 화면에서 blueprint 질감, 좌측 overview rail, 번호가 있는 노드, 연결선, 흐름 트랙, 런타임 스트립을 가진 학습 아키텍처 캔버스로 렌더링한다. `diagram.steps`는 상단 학습 흐름, `diagram.runtime`은 계약/환경/검증 같은 런타임 레이어를 정의한다. 단순 목록 박스로 축소하지 않고, 상단 benefit은 작은 박스 반복이 아니라 흐름을 보조하는 체크 리스트로 둔다.
+- `intro.diagram.steps`는 제품 화면에서 레슨별 `실무 흐름`으로 렌더링한다. `목표/개념/스니펫/실행` 같은 고정 단계가 아니라 해당 YAML의 섹션 제목과 실제 작업 흐름을 반영해야 한다. `diagram.runtime`은 로컬 실행 환경과 완료 기준을 보존하는 데이터 계약이며, 화면은 필요한 경우에만 이를 보조 정보로 사용한다.
 - 섹션 하나가 학습카드 하나다. 이 섹션 단위 학습카드 원칙 때문에 `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
 - 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
@@ -88,7 +86,7 @@ sections:
 - 섹션 헤더 번호는 타이틀/서브타이틀 묶음과 높이를 맞춘다. 셀 도움 요청 액션은 hover-only가 아니라 항상 보이는 control로 둔다.
 - 셀 TOC는 push rail이다. overlay flyout으로 같은 아이콘 목록을 한 번 더 띄우지 않는다.
 - structured 섹션의 `exercise` band는 클릭해야 열리는 preview가 아니라 바로 보이는 실제 입력 editor를 가진다. `learning-card-browser` gate는 이 editor가 desktop/mobile에서 보이고 starter code를 렌더링하는지 확인한다.
-- 레슨 overview는 `data-learning-overview`, `data-learning-overview-blueprint`, `data-learning-overview-rail`, `data-learning-overview-part`, `data-learning-flow-diagram`, `data-learning-flow-blueprint`, `data-learning-flow-track`, `data-learning-flow-step`, `data-learning-flow-runtime-node` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, 플로우 track/step/runtime node가 실제 desktop/mobile 화면에 보이는지 확인하고, runtime node 문구가 YAML의 `intro.diagram.runtime`에서 온다는 점을 검증한다.
+- 레슨 overview는 `data-learning-overview`, `data-learning-overview-blueprint`, `data-learning-overview-rail`, `data-learning-overview-part`, `data-learning-workflow-diagram`, `data-learning-workflow-step` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, YAML 기반 실무 흐름 step이 desktop/mobile 화면에 보이는지 확인한다.
 - structured section card는 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, `check`다.
 - marker 계약과 editor build는 `uv run python -X utf8 tests/run.py gate learning-card-contract`로 확인한다. 실제 데스크톱/모바일 브라우저 렌더링은 `uv run python -X utf8 tests/run.py gate learning-card-browser`로 확인한다.
 - `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다. 렌더러는 이 영역을 `Python 실습 코드`와 `학습자가 작성` 상태로 명확히 표시하고 `data-learning-exercise-input-role="student-practice"`를 유지한다.

@@ -26,14 +26,37 @@ meta:
 intro:
   emoji: 🏆
   goal: 모든 기능을 종합한 인터랙티브 지도를 제작합니다.
-  description: 지금까지 배운 모든 내용을 활용합니다. 마커, 클러스터, 히트맵, GeoJSON, 레이어 컨트롤을 조합하여 완성도 높은 지도를 만듭니다. 서울 관광 종합 지도를 예제로 구현합니다.
+  description: 지금까지 배운 모든 내용을 활용합니다. 마커, 클러스터, 히트맵, GeoJSON, 레이어 컨트롤을 조합하여 완성도 높은 지도를 만듭니다. 서울 관광 종합 지도를
+    예제로 구현합니다.
+  direction: 종합 지도 프로젝트에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 종합 지도 프로젝트 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 베이스 맵 설정 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 주요 랜드마크 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 종합 지도 프로젝트 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: branca, folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합 지도 프로젝트 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 종합 지도 프로젝트 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: 모든 플러그인 import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 필요한 모든 라이브러리와 플러그인을 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -43,23 +66,24 @@ sections:
     import branca.colormap as cm
     import random
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
       import branca.colormap as cm
       import random
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_base_map
   title: 2단계. 베이스 맵 설정
   structuredPrimary: true
   subtitle: 기본 지도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 베이스 맵 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     다중 타일 레이어를 지원하는 베이스 맵을 만듭니다.
 
@@ -92,7 +116,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 베이스 맵 설정 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
 
@@ -119,16 +143,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 베이스 맵 설정 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 베이스 맵 설정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 베이스 맵 설정에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_landmark_markers
   title: 3단계. 주요 랜드마크
   structuredPrimary: true
   subtitle: 개별 마커
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 주요 랜드마크에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     주요 랜드마크는 개별 마커로 강조합니다.
 
@@ -144,7 +169,7 @@ sections:
     ]
     landmarks
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 주요 랜드마크 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       landmarks = [
           {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
@@ -154,16 +179,17 @@ sections:
       ]
       landmarks
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 주요 랜드마크 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 주요 랜드마크 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 주요 랜드마크에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_cafe_cluster
   title: 4단계. 카페 클러스터
   structuredPrimary: true
   subtitle: MarkerCluster
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 카페 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     카페 위치를 클러스터로 표시합니다. 대량 데이터를 효율적으로 관리합니다.
 
@@ -194,7 +220,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 카페 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cafeCluster = MarkerCluster(name="카페")
 
@@ -219,16 +245,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 카페 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 카페 클러스터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 카페 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step5_restaurant_cluster
   title: 5단계. 음식점 클러스터
   structuredPrimary: true
   subtitle: 별도 클러스터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 음식점 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     음식점용 별도 클러스터를 만들어 카테고리를 분리합니다.
 
@@ -258,7 +285,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 음식점 클러스터 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       restaurantCluster = MarkerCluster(name="음식점", show=False)
 
@@ -282,16 +309,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 음식점 클러스터 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 음식점 클러스터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 음식점 클러스터에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_heatmap
   title: 6단계. 관광객 밀도 히트맵
   structuredPrimary: true
   subtitle: HeatMap
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 관광객 밀도 히트맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     관광객 밀도를 히트맵으로 시각화합니다.
 
@@ -327,7 +355,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 관광객 밀도 히트맵 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
 
@@ -357,16 +385,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 관광객 밀도 히트맵 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 관광객 밀도 히트맵 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 관광객 밀도 히트맵에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step7_gu_boundaries
   title: 7단계. 구 경계 GeoJSON
   structuredPrimary: true
   subtitle: 행정구역
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 구 경계 GeoJSON에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     서울의 주요 구 경계를 GeoJSON으로 표시합니다.
 
@@ -425,7 +454,7 @@ sections:
     }
     guBoundaries
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 구 경계 GeoJSON 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       guBoundaries = {
           "type": "FeatureCollection",
@@ -478,16 +507,17 @@ sections:
       }
       guBoundaries
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 구 경계 GeoJSON 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 구 경계 GeoJSON 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 구 경계 GeoJSON에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_routes
   title: 8단계. 관광 코스
   structuredPrimary: true
   subtitle: PolyLine
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 관광 코스에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     추천 관광 코스를 경로로 표시합니다.
 
@@ -531,7 +561,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 관광 코스 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
 
@@ -569,16 +599,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 관광 코스 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 관광 코스 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 관광 코스에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_layer_control
   title: 9단계. 레이어 컨트롤
   structuredPrimary: true
   subtitle: LayerControl
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 레이어 컨트롤에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     LayerControl을 추가하여 모든 레이어를 제어합니다.
 
@@ -590,22 +621,23 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 레이어 컨트롤 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       folium.LayerControl(collapsed=False).add_to(tourMap)
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 레이어 컨트롤 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 레이어 컨트롤 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 레이어 컨트롤에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_complete
   title: 10단계. 완성 코드
   structuredPrimary: true
   subtitle: 전체 종합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 완성 코드에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 작성한 모든 코드를 하나로 합친 완성 버전입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -710,7 +742,7 @@ sections:
 
     finalMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 완성 코드 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -812,16 +844,17 @@ sections:
 
       finalMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 완성 코드 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 완성 코드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 완성 코드에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 11단계. 종합 지도 품질 검증
   structuredPrimary: true
   subtitle: 데이터 계약과 레이어 렌더 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 종합 지도 품질 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
 
@@ -877,7 +910,7 @@ sections:
 
     len(projectSites), len(projectGeo["features"]), len(routePoints)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 종합 지도 품질 검증 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -927,16 +960,17 @@ sections:
 
       len(projectSites), len(projectGeo["features"]), len(routePoints)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 종합 지도 품질 검증 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 종합 지도 품질 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 종합 지도 품질 검증에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 종합 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 나만의 종합 지도를 만들어봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -1020,7 +1054,7 @@ sections:
 
     realEstateMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -1101,7 +1135,8 @@ sections:
 
       realEstateMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

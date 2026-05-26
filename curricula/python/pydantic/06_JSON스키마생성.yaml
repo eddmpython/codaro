@@ -24,32 +24,57 @@ meta:
 intro:
   emoji: 📋
   goal: Pydantic 모델에서 REST API 문서화용 JSON Schema를 자동 생성합니다.
-  description: API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를 생성하여 코드와 문서가 항상 동기화됩니다. FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다.
+  description: API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를
+    생성하여 코드와 문서가 항상 동기화됩니다. FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다.
+  direction: JSON스키마생성에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - JSON스키마생성 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 스키마 생성 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 필드 설명 추가 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: JSON스키마생성 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: JSON스키마생성 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: JSON스키마생성 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
 - id: load
   title: 라이브러리 로드
   structuredPrimary: true
   subtitle: Pydantic 설치 및 import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로 JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로
+    JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 라이브러리 로드 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: import pydantic
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 라이브러리 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 라이브러리 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 라이브러리 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: basic
   title: 기본 스키마 생성
   structuredPrimary: true
   subtitle: model_json_schema
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 기본 스키마 생성에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
 
@@ -65,7 +90,7 @@ sections:
     userSchema = User.model_json_schema()
     userSchema
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 기본 스키마 생성 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class User(BaseModel):
           name: str
@@ -75,17 +100,19 @@ sections:
       userSchema = User.model_json_schema()
       userSchema
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 기본 스키마 생성 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 기본 스키마 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 기본 스키마 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: description
   title: 필드 설명 추가
   structuredPrimary: true
   subtitle: Field description
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를 이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다.
+  goal: 필드 설명 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를
+    이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -98,7 +125,7 @@ sections:
     productSchema = Product.model_json_schema()
     json.dumps(productSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 필드 설명 추가 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Product(BaseModel):
           productId: str = Field(description="고유 상품 식별자")
@@ -109,17 +136,19 @@ sections:
       productSchema = Product.model_json_schema()
       json.dumps(productSchema, indent=2, ensure_ascii=False)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 필드 설명 추가 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 필드 설명 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 필드 설명 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: examples
   title: 예시 값 추가
   structuredPrimary: true
   subtitle: examples 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델 전체에 예시 데이터를 추가할 수도 있습니다.
+  goal: 예시 값 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델
+    전체에 예시 데이터를 추가할 수도 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -131,7 +160,7 @@ sections:
     contactSchema = Contact.model_json_schema()
     contactSchema["properties"]["name"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 예시 값 추가 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Contact(BaseModel):
           name: str = Field(description="이름", examples=["홍길동", "김철수"])
@@ -141,17 +170,19 @@ sections:
       contactSchema = Contact.model_json_schema()
       contactSchema["properties"]["name"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 예시 값 추가 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 예시 값 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 예시 값 추가에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: nested
   title: 중첩 모델 스키마
   structuredPrimary: true
   subtitle: $defs와 $ref
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서 재사용할 때 중복을 피할 수 있습니다.
+  goal: 중첩 모델 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서
+    재사용할 때 중복을 피할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -167,7 +198,7 @@ sections:
     articleSchema = Article.model_json_schema()
     json.dumps(articleSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 중첩 모델 스키마 예제에서 입력값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Author(BaseModel):
           authorId: str = Field(description="작성자 ID")
@@ -181,16 +212,17 @@ sections:
       articleSchema = Article.model_json_schema()
       json.dumps(articleSchema, indent=2, ensure_ascii=False)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 중첩 모델 스키마 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 중첩 모델 스키마 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 중첩 모델 스키마에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: optional
   title: Optional과 Union 스키마
   structuredPrimary: true
   subtitle: anyOf 표현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Optional과 Union 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -203,7 +235,7 @@ sections:
     profileSchema = Profile.model_json_schema()
     profileSchema["properties"]["bio"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Optional과 Union 스키마 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -213,17 +245,19 @@ sections:
       profileSchema = Profile.model_json_schema()
       profileSchema["properties"]["bio"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Optional과 Union 스키마 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Optional과 Union 스키마 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Optional과 Union 스키마에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: enum
   title: Enum과 Literal 스키마
   structuredPrimary: true
   subtitle: 허용값 목록
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수 있습니다.
+  goal: Enum과 Literal 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수
+    있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -239,7 +273,7 @@ sections:
     taskSchema = Task.model_json_schema()
     taskSchema["$defs"]["Status"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Enum과 Literal 스키마 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Status(str, Enum):
           PENDING = "pending"
@@ -253,16 +287,17 @@ sections:
       taskSchema = Task.model_json_schema()
       taskSchema["$defs"]["Status"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Enum과 Literal 스키마 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Enum과 Literal 스키마 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Enum과 Literal 스키마에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: list
   title: 리스트와 딕셔너리
   structuredPrimary: true
   subtitle: array와 object
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 리스트와 딕셔너리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -275,7 +310,7 @@ sections:
     taggedSchema = TaggedItem.model_json_schema()
     taggedSchema["properties"]["tags"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 리스트와 딕셔너리 예제에서 리스트 값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TaggedItem(BaseModel):
           itemId: str
@@ -285,16 +320,17 @@ sections:
       taggedSchema = TaggedItem.model_json_schema()
       taggedSchema["properties"]["tags"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 리스트와 딕셔너리 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 리스트와 딕셔너리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 리스트와 딕셔너리에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: mode
   title: 스키마 생성 모드
   structuredPrimary: true
   subtitle: validation vs serialization
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 스키마 생성 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다.
 
@@ -314,7 +350,7 @@ sections:
     validationSchema = Item.model_json_schema(mode='validation')
     "formattedPrice" in validationSchema.get("properties", {})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 스키마 생성 모드 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Item(BaseModel):
           name: str
@@ -328,17 +364,19 @@ sections:
       validationSchema = Item.model_json_schema(mode='validation')
       "formattedPrice" in validationSchema.get("properties", {})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 스키마 생성 모드 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 스키마 생성 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 스키마 생성 모드에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: custom
   title: 커스텀 스키마 수정
   structuredPrimary: true
   subtitle: json_schema_extra
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는 메타데이터를 추가할 때 유용합니다.
+  goal: 커스텀 스키마 수정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는
+    메타데이터를 추가할 때 유용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -356,7 +394,7 @@ sections:
     customSchema = CustomModel.model_json_schema()
     customSchema.get("x-api-version"), customSchema.get("x-tags")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 커스텀 스키마 수정 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class CustomModel(BaseModel):
           model_config = {
@@ -372,17 +410,19 @@ sections:
       customSchema = CustomModel.model_json_schema()
       customSchema.get("x-api-version"), customSchema.get("x-tags")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 커스텀 스키마 수정 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 커스텀 스키마 수정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 커스텀 스키마 수정에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: result
   title: REST API 스키마 시스템
   structuredPrimary: true
   subtitle: 요청/응답 스키마 완성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로 Swagger 문서를 생성합니다.
+  goal: REST API 스키마 시스템에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로
+    Swagger 문서를 생성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -403,7 +443,7 @@ sections:
     requestSchema = CreateUserRequest.model_json_schema()
     json.dumps(requestSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: REST API 스키마 시스템 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class CreateUserRequest(BaseModel):
           model_config = {
@@ -422,16 +462,17 @@ sections:
       requestSchema = CreateUserRequest.model_json_schema()
       json.dumps(requestSchema, indent=2, ensure_ascii=False)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - REST API 스키마 시스템 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: REST API 스키마 시스템 코드가 예외 없이 끝나야 합니다.
+    resultCheck: REST API 스키마 시스템에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: API 스키마 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
   explanation: |-
     지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
 
@@ -481,7 +522,7 @@ sections:
     blogReqSchema = BlogPostRequest.model_json_schema()
     blogReqSchema
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from pydantic import BaseModel, Field
       from typing import Optional
@@ -525,17 +566,19 @@ sections:
       blogReqSchema = BlogPostRequest.model_json_schema()
       blogReqSchema
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
   structuredPrimary: true
   subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -573,7 +616,7 @@ sections:
     assert validOrder.isRevenue is True
     validOrder.model_dump()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 인자나 반환값을 바꿔 실행하고, 성공 모델과 오류 메시지 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from typing import Literal
       from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
@@ -609,7 +652,8 @@ sections:
       assert validOrder.isRevenue is True
       validOrder.model_dump()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 성공 모델과 오류 메시지 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'

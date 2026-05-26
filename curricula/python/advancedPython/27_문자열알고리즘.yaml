@@ -26,13 +26,35 @@ intro:
   - 문자열 검색 최적화
   - Trie 자료구조
   - 문자열 처리 기법
+  direction: 문자열 알고리즘에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 문자열 알고리즘 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 브루트 포스 매칭 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: KMP 알고리즘 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: RabinKarp 알고리즘 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 문자열 알고리즘 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 문자열 알고리즘 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 문자열 알고리즘 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: brute_force
   title: 브루트 포스 매칭
   structuredPrimary: true
   subtitle: 기본 문자열 패턴 매칭
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 브루트 포스 매칭에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 가장 단순한 방법은 모든 위치에서 패턴을 비교하는 것입니다. O(nm) 시간복잡도.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -56,7 +78,7 @@ sections:
     bfResult = bfSearch(bfText, bfPattern)
     bfResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 브루트 포스 매칭 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def bfSearch(text, pattern):
           textLen = len(text)
@@ -77,16 +99,17 @@ sections:
       bfResult = bfSearch(bfText, bfPattern)
       bfResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 브루트 포스 매칭 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 브루트 포스 매칭 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 브루트 포스 매칭에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: kmp
   title: KMP 알고리즘
   structuredPrimary: true
   subtitle: O(n+m) 패턴 매칭
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: KMP 알고리즘에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 실패 함수(LPS)를 이용해 불필요한 비교를 건너뜁니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -113,7 +136,7 @@ sections:
     lpsResult = computeLps(lpsPattern)
     lpsResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: KMP 알고리즘 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def computeLps(pattern):
           patLen = len(pattern)
@@ -137,16 +160,17 @@ sections:
       lpsResult = computeLps(lpsPattern)
       lpsResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - KMP 알고리즘 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: KMP 알고리즘 코드가 예외 없이 끝나야 합니다.
+    resultCheck: KMP 알고리즘에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: rabin_karp
   title: Rabin-Karp 알고리즘
   structuredPrimary: true
   subtitle: 해시 기반 패턴 매칭
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: RabinKarp 알고리즘에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 롤링 해시로 O(n+m) 평균 시간복잡도. 다중 패턴 검색에 유리.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -178,7 +202,7 @@ sections:
     rkResult = rabinKarp(rkText, rkPattern)
     rkResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: RabinKarp 알고리즘 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def rabinKarp(text, pattern, prime=101):
           textLen = len(text)
@@ -207,16 +231,17 @@ sections:
       rkResult = rabinKarp(rkText, rkPattern)
       rkResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - RabinKarp 알고리즘 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: RabinKarp 알고리즘 코드가 예외 없이 끝나야 합니다.
+    resultCheck: RabinKarp 알고리즘에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: trie
   title: Trie 자료구조
   structuredPrimary: true
   subtitle: 접두사 트리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Trie 자료구조에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 문자열 삽입/검색 O(m). 자동완성, 사전 검색에 활용.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -264,7 +289,7 @@ sections:
     trieResult = (trieSearch, triePrefix, trieMiss)
     trieResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Trie 자료구조 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TrieNode:
           def __init__(self):
@@ -309,16 +334,17 @@ sections:
       trieResult = (trieSearch, triePrefix, trieMiss)
       trieResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Trie 자료구조 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Trie 자료구조 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Trie 자료구조에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: string_processing
   title: 문자열 처리
   structuredPrimary: true
   subtitle: 실용적인 문자열 알고리즘
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 처리에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 공통 접두사, 팰린드롬 등 자주 사용되는 문자열 처리 기법.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -337,7 +363,7 @@ sections:
     lcpResult = longestCommonPrefix(lcpStrs)
     lcpResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 처리 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def longestCommonPrefix(strs):
           if not strs:
@@ -353,16 +379,17 @@ sections:
       lcpResult = longestCommonPrefix(lcpStrs)
       lcpResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 처리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 처리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 처리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성'
   structuredPrimary: true
   subtitle: KMP와 Trie를 실제 검색 문제에 적용하고 결과를 검증합니다
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     문자열 알고리즘은 검색, 자동완성, 로그 분석처럼 실제 텍스트 업무에서 바로 쓰입니다. 패턴이 어디서 발견되는지와 접두어 검색 결과가 맞는지 작은 데이터로 먼저 확인하세요.
 
@@ -410,7 +437,7 @@ sections:
     assert kmpSearch(logText, "payment failed") == [0, 26]
     assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       def buildLps(pattern):
           if not pattern:
@@ -451,17 +478,21 @@ sections:
       assert kmpSearch(logText, "payment failed") == [0, 26]
       assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 문자열 알고리즘 실습
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 27에서 배운 문자열 알고리즘을 난이도별로 복습합니다. KMP, 라빈-카프, 보이어-무어는 효율적인 패턴 매칭의 기초이며, 트라이는 문자열 검색과 자동완성에 필수입니다. 접미사 배열과 LCP 배열은 대용량 텍스트 처리의 핵심 자료구조입니다. 🟢 기본 문제로 애너그램, 회문 등 기초 문자열 처리를 익히고, 🟡 응용 문제로 패턴 매칭 알고리즘을 직접 구현해봅니다. 🔴 심화 문제에서는 트라이 기반 자동완성, 접미사 배열을 활용한 최장 공통 부분 문자열 등을 구현합니다. 문자열 알고리즘은 검색 엔진, 에디터, 컴파일러의 핵심입니다.
+  goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 27에서 배운 문자열 알고리즘을 난이도별로 복습합니다. KMP, 라빈-카프, 보이어-무어는 효율적인 패턴 매칭의 기초이며, 트라이는 문자열 검색과 자동완성에
+    필수입니다. 접미사 배열과 LCP 배열은 대용량 텍스트 처리의 핵심 자료구조입니다. 🟢 기본 문제로 애너그램, 회문 등 기초 문자열 처리를 익히고, 🟡 응용 문제로 패턴 매칭
+    알고리즘을 직접 구현해봅니다. 🔴 심화 문제에서는 트라이 기반 자동완성, 접미사 배열을 활용한 최장 공통 부분 문자열 등을 구현합니다. 문자열 알고리즘은 검색 엔진, 에디터,
+    컴파일러의 핵심입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -473,7 +504,7 @@ sections:
     ex1Result = areAnagrams(ex1A, ex1B)
     ex1Result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def areAnagrams(s1, s2):
           return sorted(s1.lower()) == sorted(s2.lower())
@@ -483,7 +514,8 @@ sections:
       ex1Result = areAnagrams(ex1A, ex1B)
       ex1Result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

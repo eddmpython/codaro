@@ -27,15 +27,40 @@ meta:
 intro:
   emoji: 📐
   goal: diff()로 함수를 미분하고 접선의 방정식을 구합니다.
-  description: 미분은 함수의 순간 변화율을 구하는 연산으로, 미적분학의 핵심입니다. 속도, 가속도, 기울기, 최적화 등 수많은 응용이 있습니다. SymPy의 diff()는 x²을 2x로, sin(x)를 cos(x)로 정확하게 미분합니다. 손으로 계산하면 연쇄법칙, 곱의 미분에서 실수하기 쉬운데, SymPy는 어떤 복잡한 함수도 정확하게 처리합니다. 이 프로젝트를 완료하면 도함수 계산, 접선의 방정식, 극값 찾기까지 할 수 있게 됩니다.
+  description: 미분은 함수의 순간 변화율을 구하는 연산으로, 미적분학의 핵심입니다. 속도, 가속도, 기울기, 최적화 등 수많은 응용이 있습니다. SymPy의 diff()는
+    x²을 2x로, sin(x)를 cos(x)로 정확하게 미분합니다. 손으로 계산하면 연쇄법칙, 곱의 미분에서 실수하기 쉬운데, SymPy는 어떤 복잡한 함수도 정확하게 처리합니다.
+    이 프로젝트를 완료하면 도함수 계산, 접선의 방정식, 극값 찾기까지 할 수 있게 됩니다.
+  direction: 미분기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 미분기초 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 미분 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 미분 규칙 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 미분기초 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 미분기초 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 미분기초 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 미분에 필요한 함수들을 불러옵니다. diff()가 핵심 함수이며, sin, cos, tan은 삼각함수, exp는 지수함수 eˣ, log는 자연로그 ln(x)입니다. 이 함수들의 미분은 미적분학에서 가장 기본적인 공식으로, SymPy가 모두 정확하게 처리합니다. simplify와 expand는 미분 결과를 정리할 때 사용합니다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 미분에 필요한 함수들을 불러옵니다. diff()가 핵심 함수이며, sin, cos, tan은 삼각함수, exp는 지수함수 eˣ, log는 자연로그 ln(x)입니다.
+    이 함수들의 미분은 미적분학에서 가장 기본적인 공식으로, SymPy가 모두 정확하게 처리합니다. simplify와 expand는 미분 결과를 정리할 때 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -44,23 +69,24 @@ sections:
     from sympy import init_printing
     init_printing()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sympy import symbols, diff, simplify, expand, solve, Eq
       from sympy import sin, cos, tan, exp, log, sqrt, pi
       from sympy import init_printing
       init_printing()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_diff_basic
   title: 2단계. 기본 미분
   structuredPrimary: true
   subtitle: diff()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     diff()는 differentiate(미분하다)의 줄임말로, 함수의 도함수를 구합니다. diff(f, x)는 f를 x에 대해 미분합니다. 기본 공식 xⁿ의 미분은 n×xⁿ⁻¹입니다. x²을 미분하면 2x, x³을 미분하면 3x²가 됩니다. 상수의 미분은 0입니다. 이 규칙들을 diff()가 자동으로 적용합니다.
 
@@ -69,19 +95,20 @@ sections:
   - diff(수식, 변수)로 미분합니다. 다항식 xⁿ의 미분은 n×xⁿ⁻¹입니다. 상수의 미분은 0입니다.
   snippet: x = symbols('x')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 미분 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: x = symbols('x')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 미분 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 미분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 미분에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_rules
   title: 3단계. 미분 규칙
   structuredPrimary: true
   subtitle: 합, 곱, 몫
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 미분 규칙에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     SymPy는 미분의 기본 규칙들을 자동으로 적용합니다. 합의 미분 (f+g)' = f'+g'는 각 항을 따로 미분합니다. 곱의 미분 (fg)' = f'g + fg'는 라이프니츠 규칙입니다. 몫의 미분 (f/g)' = (f'g - fg')/g²도 자동 적용됩니다. 손으로 계산하면 부호 실수가 잦은 이 규칙들을 SymPy가 정확하게 처리합니다.
 
@@ -93,22 +120,23 @@ sections:
     dh = diff(h, x)
     dh
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 미분 규칙 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       h = x**2 + 3*x + 1
       dh = diff(h, x)
       dh
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 미분 규칙 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 미분 규칙 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 미분 규칙에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_special
   title: 4단계. 특수 함수 미분
   structuredPrimary: true
   subtitle: sin, cos, exp, log
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 특수 함수 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     삼각함수, 지수함수, 로그함수는 특별한 미분 공식을 가집니다. (sin x)' = cos x, (cos x)' = -sin x로 삼각함수끼리 순환합니다. (eˣ)' = eˣ로 지수함수는 자기 자신이 도함수입니다. (ln x)' = 1/x로 로그함수는 역수가 됩니다. 이 공식들은 미적분학의 기본으로, 반드시 암기해야 합니다. SymPy로 검증하면서 익히세요.
 
@@ -120,23 +148,26 @@ sections:
     dcos = diff(cos(x), x)
     dsin, dcos
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 특수 함수 미분 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dsin = diff(sin(x), x)
       dcos = diff(cos(x), x)
       dsin, dcos
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 특수 함수 미분 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 특수 함수 미분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 특수 함수 미분에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_chain
   title: 5단계. 연쇄 법칙
   structuredPrimary: true
   subtitle: 합성함수 미분
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 연쇄 법칙(chain rule)은 합성함수 f(g(x))를 미분하는 규칙입니다. 바깥 함수를 미분하고 안쪽 함수의 미분을 곱합니다. sin(x²)의 미분은 cos(x²)×2x = 2x·cos(x²)입니다. e^(3x)의 미분은 e^(3x)×3 = 3e^(3x)입니다. 복잡한 합성함수일수록 연쇄 법칙을 손으로 적용하기 어려운데, SymPy는 아무리 복잡해도 정확하게 처리합니다.
+  goal: 5단계. 연쇄 법칙에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 연쇄 법칙(chain rule)은 합성함수 f(g(x))를 미분하는 규칙입니다. 바깥 함수를 미분하고 안쪽 함수의 미분을 곱합니다. sin(x²)의 미분은
+    cos(x²)×2x = 2x·cos(x²)입니다. e^(3x)의 미분은 e^(3x)×3 = 3e^(3x)입니다. 복잡한 합성함수일수록 연쇄 법칙을 손으로 적용하기 어려운데, SymPy는
+    아무리 복잡해도 정확하게 처리합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -144,22 +175,23 @@ sections:
     dcomp1 = diff(comp1, x)
     dcomp1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 연쇄 법칙 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       comp1 = sin(x**2)
       dcomp1 = diff(comp1, x)
       dcomp1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 연쇄 법칙 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 연쇄 법칙 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 연쇄 법칙에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_higher
   title: 6단계. 고차 미분
   structuredPrimary: true
   subtitle: 2차, 3차 미분
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 고차 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     고차 미분은 도함수를 다시 미분하는 것입니다. diff(f, x, 2)는 f를 x로 두 번 미분하여 2차 도함수 f''를 구합니다. x³을 미분하면 3x², 한 번 더 미분하면 6x, 세 번째는 6, 네 번째는 0입니다. 물리학에서 위치의 1차 미분은 속도, 2차 미분은 가속도입니다. sin(x)는 4번 미분하면 다시 sin(x)로 돌아오는 재미있는 패턴이 있습니다.
 
@@ -172,23 +204,24 @@ sections:
     d2 = diff(func, x, 2)
     d1, d2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 고차 미분 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       func = x**3
       d1 = diff(func, x)
       d2 = diff(func, x, 2)
       d1, d2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 고차 미분 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 고차 미분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 고차 미분에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_partial
   title: 7단계. 편미분
   structuredPrimary: true
   subtitle: 다변수 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 편미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     편미분(partial derivative)은 여러 변수가 있는 함수에서 특정 변수만 미분하고 나머지는 상수로 취급하는 것입니다. f(x,y) = x²y + xy²에서 x로 편미분하면 y를 상수로 보고 2xy + y²가 됩니다. y로 편미분하면 x를 상수로 보고 x² + 2xy가 됩니다. 다변수 함수의 그래디언트, 경제학의 한계효용, 열역학의 상태방정식 등에서 편미분이 필수입니다.
 
@@ -200,22 +233,23 @@ sections:
     fxy = x**2 * y + x * y**2
     fxy
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 편미분 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       y = symbols('y')
       fxy = x**2 * y + x * y**2
       fxy
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 편미분 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 편미분 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 편미분에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_tangent
   title: 8단계. 접선의 방정식
   structuredPrimary: true
   subtitle: 미분의 응용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 접선의 방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     접선의 방정식은 미분의 가장 대표적인 응용입니다. 곡선 y=f(x) 위의 점 (a, f(a))에서 접선의 기울기는 그 점에서의 미분값 f'(a)입니다. 접선의 방정식은 y = f'(a)(x-a) + f(a)입니다. 예를 들어 y=x²에서 x=2일 때, f(2)=4, f'(2)=4이므로 접선은 y=4(x-2)+4=4x-4입니다. 물리학의 순간 속도, 경제학의 한계 비용 등이 모두 이 개념입니다.
 
@@ -227,22 +261,23 @@ sections:
     dfunc = diff(func, x)
     func, dfunc
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 접선의 방정식 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       func = x**2
       dfunc = diff(func, x)
       func, dfunc
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 접선의 방정식 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 접선의 방정식 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 접선의 방정식에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_extrema
   title: 9단계. 극값 찾기
   structuredPrimary: true
   subtitle: 미분으로 최대/최소
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 극값 찾기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     함수의 극대점(local maximum)과 극소점(local minimum)은 도함수가 0인 점에서 발생합니다. 먼저 solve(f', x)로 임계점(critical point)을 찾습니다. 그 다음 2차 도함수 f''를 이용해 판별합니다. f''(a) > 0이면 아래로 볼록하여 극소, f''(a) < 0이면 위로 볼록하여 극대입니다. 최적화 문제에서 비용을 최소화하거나 수익을 최대화하는 점을 찾을 때 이 방법을 사용합니다.
 
@@ -254,23 +289,26 @@ sections:
     dcubic = diff(cubic, x)
     cubic, dcubic
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 극값 찾기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cubic = x**3 - 3*x
       dcubic = diff(cubic, x)
       cubic, dcubic
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 극값 찾기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 극값 찾기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 극값 찾기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_velocity
   title: 10단계. 속도와 가속도
   structuredPrimary: true
   subtitle: 물리적 의미
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 물리학에서 미분의 가장 직관적인 응용은 운동입니다. 위치 함수 s(t)를 시간 t로 미분하면 순간 속도 v(t) = ds/dt가 됩니다. 속도를 한 번 더 미분하면 가속도 a(t) = dv/dt = d²s/dt²가 됩니다. s(t) = t³-6t²+9t일 때 속도 v(t) = 3t²-12t+9, 가속도 a(t) = 6t-12입니다. v(t)=0인 시점에서 물체가 정지합니다.
+  goal: 10단계. 속도와 가속도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 물리학에서 미분의 가장 직관적인 응용은 운동입니다. 위치 함수 s(t)를 시간 t로 미분하면 순간 속도 v(t) = ds/dt가 됩니다. 속도를 한 번 더
+    미분하면 가속도 a(t) = dv/dt = d²s/dt²가 됩니다. s(t) = t³-6t²+9t일 때 속도 v(t) = 3t²-12t+9, 가속도 a(t) = 6t-12입니다.
+    v(t)=0인 시점에서 물체가 정지합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -278,22 +316,23 @@ sections:
     position = t**3 - 6*t**2 + 9*t
     position
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 속도와 가속도 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       t = symbols('t')
       position = t**3 - 6*t**2 + 9*t
       position
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 속도와 가속도 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 속도와 가속도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 속도와 가속도에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 미분 연습
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     지금까지 배운 diff, solve, subs를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 다항식, 삼각함수, 지수로그함수를 미분하는 기본 연습입니다. 미션2는 접선의 방정식을 구하고 임계점을 찾아 극값을 판별합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요.
 
@@ -309,7 +348,7 @@ sections:
     dpoly = diff(poly, v)
     dpoly
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sympy import symbols, diff, sin, cos, exp, log, simplify
 
@@ -319,17 +358,19 @@ sections:
       dpoly = diff(poly, v)
       dpoly
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
   structuredPrimary: true
   subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -349,7 +390,7 @@ sections:
     assert breakEvenQuantity == 40
     profitExpr, breakEvenQuantity
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import sympy as sp
 
@@ -367,7 +408,8 @@ sections:
       assert breakEvenQuantity == 40
       profitExpr, breakEvenQuantity
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'

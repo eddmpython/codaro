@@ -24,28 +24,28 @@ meta:
     - DataFrame
     - 데이터프레임
 intro:
-  direction: 판다스소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: 판다스소개에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
   benefits:
-  - 판다스소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 판다스소개 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 주문 DataFrame 기본 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 정제와 집계 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 행/열 수와 요약값 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 판다스소개 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 판다스소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 판다스소개 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -309,7 +309,8 @@ sections:
   - type: note
     style: info
     title: 이 커리큘럼의 방식
-    content: 아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약 체계적으로 공부하고 싶다면 Pandas공식문서를 우선 공부하면 도움됩니다.
+    content: 아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약
+      체계적으로 공부하고 싶다면 Pandas공식문서를 우선 공부하면 도움됩니다.
   - type: links
     items:
     - text: pandas 공식 문서
@@ -325,8 +326,8 @@ sections:
   title: '현업 흐름 검증: 주문 DataFrame 기본 점검'
   structuredPrimary: true
   subtitle: DataFrame 생성, 컬럼 검증, 집계, 실패 케이스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 주문 DataFrame 기본 점검에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다.
 
@@ -349,7 +350,7 @@ sections:
     assert daily.set_index("day").loc["Mon", "amount"] == 20000
     assert daily["amount"].sum() == orders["amount"].sum()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 DataFrame 기본 점검 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -365,7 +366,8 @@ sections:
       assert daily.set_index("day").loc["Mon", "amount"] == 20000
       assert daily["amount"].sum() == orders["amount"].sum()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 DataFrame 기본 점검 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 DataFrame 기본 점검 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 DataFrame 기본 점검에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'

@@ -46,6 +46,10 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("localstorage-set", STORAGE_KEY, json.dumps([customCurriculumEntry()], ensure_ascii=False))
         cli.run("reload")
         cli.waitEval(jsTextPresent(FIXTURE_TITLE), "custom curriculum item")
+        deleteDialog = cli.eval(jsAssertCustomCurriculumDeleteDialog())
+        cli.run("localstorage-set", STORAGE_KEY, json.dumps([customCurriculumEntry()], ensure_ascii=False))
+        cli.run("reload")
+        cli.waitEval(jsTextPresent(FIXTURE_TITLE), "custom curriculum item after delete reset")
         cli.waitEval(jsReferenceLessonIdle(), "reference lesson loading to settle")
         clickCustomCurriculum(cli)
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
@@ -69,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
         mobileContractGaps = cli.eval(jsAssertContractGapWarning("mobile"))
         print(
             "ok: Playwright structured learning card verified "
-            f"{desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
+            f"{deleteDialog} {desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
             f"{toc} {mobileOverview} {mobileDependency} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps}"
         )
         return 0
@@ -318,19 +322,19 @@ intro:
     - 작은 카드 반복 없이 섹션 흐름을 유지합니다.
   diagram:
     steps:
-      - label: 목표
-        detail: 무슨 공부
-      - label: 스니펫
-        detail: 따라 칠 코드
-      - label: 실행
-        detail: 입력과 검증
+      - label: DataFrame 입력 확인
+        detail: sales 열과 행 값을 먼저 고정합니다.
+      - label: DataFrame 처리 실행
+        detail: pandas 생성 코드를 실행해 중간 결과를 확인합니다.
+      - label: sales 결과 검증
+        detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
     runtime:
-      - label: 계약
-        detail: YAML SSOT
-      - label: 준비
-        detail: uv 사전 확인
-      - label: 피드백
-        detail: 검증 결과
+      - label: pandas 환경
+        detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+      - label: DataFrame 실행
+        detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+      - label: DataFrame 완료
+        detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
   - id: dataframe
     title: DataFrame 만들기
@@ -398,7 +402,7 @@ def jsStructuredCardReady() -> str:
 
 
 def jsLearningOverviewReady() -> str:
-    return "Boolean(document.querySelector('[data-learning-overview=\"true\"] [data-learning-flow-diagram=\"true\"]'))"
+    return "Boolean(document.querySelector('[data-learning-overview=\"true\"] [data-learning-workflow-diagram=\"true\"]'))"
 
 
 def jsAssertLearningOverview(viewport: str) -> str:
@@ -414,9 +418,12 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (!benefits.some((item) => (item.textContent || '').includes('작은 카드 반복 없이 섹션 흐름'))) {{
     throw new Error('learning benefit is missing');
   }}
-  const diagram = overview.querySelector('[data-learning-flow-diagram="true"]');
-  if (!diagram || !(diagram.textContent || '').includes('학습 아키텍처')) {{
-    throw new Error('learning architecture diagram is missing');
+  const diagram = overview.querySelector('[data-learning-workflow-diagram="true"]');
+  if (!diagram || !(diagram.textContent || '').includes('실무 흐름')) {{
+    throw new Error('workflow diagram is missing');
+  }}
+  if ((diagram.textContent || '').includes('학습 아키텍처')) {{
+    throw new Error('old generic architecture label remains');
   }}
   if (!overview.querySelector('[data-learning-overview-blueprint="true"]')) {{
     throw new Error('learning overview blueprint texture is missing');
@@ -424,42 +431,17 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (!overview.querySelector('[data-learning-overview-rail="true"]')) {{
     throw new Error('learning overview rail is missing');
   }}
-  if (!diagram.querySelector('[data-learning-flow-blueprint="true"]')) {{
-    throw new Error('learning architecture blueprint canvas is missing');
-  }}
-  const canvas = diagram.querySelector('[data-learning-flow-canvas="true"]');
-  if (!canvas) throw new Error('learning architecture canvas is missing');
-  const track = diagram.querySelector('[data-learning-flow-track="spine"]');
-  if (!track) throw new Error('learning architecture track is missing');
-  const trackRect = track.getBoundingClientRect();
-  if (trackRect.width <= 0 || trackRect.height <= 0) throw new Error('learning architecture track has no visible size');
-  const nodes = Array.from(canvas.querySelectorAll('[data-learning-flow-node="true"]'));
-  if (nodes.length < 3) throw new Error('learning architecture nodes are missing');
-  if (canvas.querySelectorAll('[data-learning-flow-node-index="true"]').length !== nodes.length) {{
-    throw new Error('learning architecture node numbers are missing');
-  }}
-  if (canvas.querySelectorAll('[data-learning-flow-node-accent="true"]').length !== nodes.length) {{
-    throw new Error('learning architecture node accents are missing');
-  }}
-  const connectors = Array.from(canvas.querySelectorAll('[data-learning-flow-connector="true"]'));
-  if (connectors.length < 2) throw new Error('learning architecture connectors are missing');
-  const runtime = canvas.querySelector('[data-learning-flow-runtime="true"]');
-  if (!runtime) {{
-    throw new Error('learning architecture runtime strip is missing');
-  }}
-  if (runtime.querySelectorAll('[data-learning-flow-runtime-node="true"]').length < 3) {{
-    throw new Error('learning architecture runtime nodes are missing');
-  }}
-  const runtimeText = runtime.textContent || '';
-  if (!runtimeText.includes('uv 사전 확인') || !runtimeText.includes('검증 결과')) {{
-    throw new Error('learning architecture runtime nodes did not render YAML contract data');
-  }}
-  const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>
-    item.getAttribute('data-learning-flow-step')
-  );
-  const requiredSteps = ['목표', '스니펫', '실행'];
-  const missingSteps = requiredSteps.filter((step) => !steps.includes(step));
-  if (missingSteps.length) throw new Error('missing learning flow steps: ' + missingSteps.join(', '));
+  const steps = Array.from(diagram.querySelectorAll('[data-learning-workflow-step="true"]'));
+  if (steps.length < 3) throw new Error('workflow steps are missing');
+  const workflowText = diagram.textContent || '';
+  const requiredSteps = ['DataFrame 입력 확인', 'DataFrame 처리 실행', 'sales 결과 검증'];
+  const missingSteps = requiredSteps.filter((step) => !workflowText.includes(step));
+  if (missingSteps.length) throw new Error('missing workflow steps: ' + missingSteps.join(', '));
+  ['목표', '스니펫', '실행'].forEach((genericStep) => {{
+    if (steps.some((step) => (step.textContent || '').trim() === genericStep)) {{
+      throw new Error('generic workflow step rendered: ' + genericStep);
+    }}
+  }});
 
   const overviewRect = overview.getBoundingClientRect();
   const diagramRect = diagram.getBoundingClientRect();
@@ -472,10 +454,6 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (diagramRect.left < overviewRect.left - 1 || diagramRect.right > overviewRect.right + 1) {{
     throw new Error('learning diagram escapes overview');
   }}
-  const canvasRect = canvas.getBoundingClientRect();
-  if (canvasRect.width <= 0 || canvasRect.height <= 0) {{
-    throw new Error('learning architecture canvas has no visible size');
-  }}
 
   const visibleBands = [direction, ...benefits, diagram].filter(Boolean).map((item) => item.getBoundingClientRect());
   visibleBands.forEach((rect, index) => {{
@@ -486,7 +464,7 @@ def jsAssertLearningOverview(viewport: str) -> str:
     viewport: {json.dumps(viewport)},
     title: (overview.querySelector('[data-learning-overview-part="title"]')?.textContent || '').trim(),
     benefitCount: benefits.length,
-    steps,
+    steps: steps.length,
   }});
 }})()
 """)
@@ -525,9 +503,10 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
   const parts = Array.from(card.querySelectorAll('[data-learning-section-part]')).map((item) =>
     item.getAttribute('data-learning-section-part')
   );
-  const required = ['overview', 'snippet', 'exercise', 'result', 'check'];
+  const required = ['overview', 'snippet', 'exercise', 'check'];
   const missing = required.filter((part) => !parts.includes(part));
   if (missing.length) throw new Error('missing parts: ' + missing.join(', '));
+  if (parts.includes('result')) throw new Error('empty result part should stay hidden before execution');
 
   const cardRect = card.getBoundingClientRect();
   if (cardRect.width < Math.min(320, window.innerWidth - 24)) {{
@@ -579,13 +558,52 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
 """)
 
 
+def jsAssertCustomCurriculumDeleteDialog() -> str:
+    return compactJs(f"""
+(async () => {{
+  const wait = () => new Promise((resolve) => setTimeout(resolve, 80));
+  const itemTitle = {json.dumps(FIXTURE_TITLE)};
+  const deleteButton = () => [...document.querySelectorAll('button')]
+    .find((button) => button.getAttribute('aria-label') === `${{itemTitle}} 삭제`);
+  let button = deleteButton();
+  if (!button) throw new Error('custom curriculum delete button missing');
+  button.click();
+  await wait();
+  let dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+  if (!dialog) throw new Error('delete confirmation dialog missing');
+  if (!(dialog.textContent || '').includes('나만의 커리큘럼 삭제')) throw new Error('delete dialog title missing');
+  if (!(dialog.textContent || '').includes(itemTitle)) throw new Error('delete dialog item title missing');
+  const cancel = [...dialog.querySelectorAll('button')].find((item) => item.textContent?.trim() === '취소');
+  if (!cancel) throw new Error('delete cancel button missing');
+  cancel.click();
+  await wait();
+  if (document.querySelector('[role="dialog"][aria-modal="true"]')) throw new Error('delete dialog did not close on cancel');
+  if (!deleteButton()) throw new Error('custom curriculum disappeared after cancel');
+  button = deleteButton();
+  button.click();
+  await wait();
+  dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+  if (!dialog) throw new Error('delete confirmation dialog missing after reopen');
+  const confirm = [...dialog.querySelectorAll('button')].find((item) => item.textContent?.trim() === '삭제');
+  if (!confirm) throw new Error('delete confirm button missing');
+  confirm.click();
+  await wait();
+  if (deleteButton()) throw new Error('custom curriculum still visible after delete');
+  const stored = JSON.parse(localStorage.getItem({json.dumps(STORAGE_KEY)}) || '[]');
+  if (stored.some((item) => item.id === 'custom-playwright-structured-section-card')) {{
+    throw new Error('custom curriculum remained in storage');
+  }}
+  return 'custom-curriculum-delete-dialog-ok';
+}})()
+""")
+
+
 def jsAssertStructuredCardControls(viewport: str) -> str:
     return compactJs(f"""
 (async () => {{
   const card = document.querySelector('[data-learning-section-card][data-learning-section-structured="true"]');
   if (!card) throw new Error('card missing');
   const exercise = card.querySelector('[data-learning-section-part="exercise"]');
-  const result = card.querySelector('[data-learning-section-part="result"]');
   const snippet = card.querySelector('[data-learning-section-part="snippet"]');
   const snippetBox = snippet.querySelector('[data-code-payload="snippet"]');
   if (!snippetBox) throw new Error('snippet box missing');
@@ -642,12 +660,11 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
     throw new Error('popover title missing');
   }}
   const exerciseRect = exercise.getBoundingClientRect();
-  const resultRect = result.getBoundingClientRect();
   if (exerciseEditorRect.left < exerciseRect.left - 1 || exerciseEditorRect.right > exerciseRect.right + 1) {{
     throw new Error('editor escapes');
   }}
-  if (resultRect.top < exerciseRect.top || resultRect.bottom > exerciseRect.bottom + 1) {{
-    throw new Error('result position');
+  if (card.querySelector('[data-learning-section-part="result"]')) {{
+    throw new Error('result should be hidden before execution');
   }}
 
   return JSON.stringify({{
@@ -675,8 +692,7 @@ def jsAssertLearningVisualIntegrity(viewport: str) -> str:
     '[data-learning-overview-part="title"]',
     '[data-learning-overview-part="direction"]',
     '[data-learning-overview-part="benefit"]',
-    '[data-learning-flow-node="true"]',
-    '[data-learning-flow-runtime-node="true"]',
+    '[data-learning-workflow-step="true"]',
     '[data-learning-section-index="true"]',
     '[data-learning-section-heading="true"]',
     '[data-code-payload-copy="true"]',
@@ -737,7 +753,7 @@ def jsAssertContractGapWarning(viewport: str) -> str:
   const warning = gapCard.querySelector('[data-learning-section-contract-gaps="true"]');
   if (!warning) throw new Error('contract gap warning missing');
   const text = warning.textContent || '';
-  for (const expected of ['YAML 계약 보강 필요', '보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증/피드백']) {{
+  for (const expected of ['YAML 계약 보강 필요', '보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증 기준']) {{
     if (!text.includes(expected)) throw new Error('contract gap label missing: ' + expected);
   }}
   const cardRect = gapCard.getBoundingClientRect();
@@ -748,7 +764,7 @@ def jsAssertContractGapWarning(viewport: str) -> str:
   }}
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
-    labels: ['보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증/피드백'],
+    labels: ['보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증 기준'],
   }});
 }})()
 """)

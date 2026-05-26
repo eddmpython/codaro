@@ -24,28 +24,28 @@ meta:
     - 필터
     - 리사이즈
 intro:
-  direction: Pillow소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Pillow소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - Pillow소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - Pillow소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 로컬 이미지 검증 루프 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: Pillow소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: pillow 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Pillow소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Pillow소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -72,7 +72,8 @@ sections:
     title: 🏛️ Pillow란?
     subtitle: PIL의 현대적 계승자
   - type: text
-    content: Pillow는 PIL(Python Imaging Library)의 친화적인 포크(fork)입니다. 원본 PIL은 2009년 이후 업데이트가 중단되었지만, Pillow가 이를 이어받아 현재까지 활발히 개발되고 있습니다. 파이썬에서 이미지를 다룰 때 가장 널리 사용되는 라이브러리이며, 설치도 간단하고 사용법도 직관적입니다.
+    content: Pillow는 PIL(Python Imaging Library)의 친화적인 포크(fork)입니다. 원본 PIL은 2009년 이후 업데이트가 중단되었지만, Pillow가
+      이를 이어받아 현재까지 활발히 개발되고 있습니다. 파이썬에서 이미지를 다룰 때 가장 널리 사용되는 라이브러리이며, 설치도 간단하고 사용법도 직관적입니다.
   - type: featureCards
     cards:
     - emoji: 📂
@@ -90,17 +91,20 @@ sections:
     title: 🚀 왜 Pillow인가?
     subtitle: 이미지 처리의 시작점
   - type: text
-    content: 이미지는 본질적으로 픽셀의 2차원 배열입니다. Pillow는 이 픽셀 데이터에 쉽게 접근하고 조작할 수 있게 해줍니다. 웹 개발에서 썸네일 생성, 데이터 분석에서 이미지 전처리, 자동화 스크립트에서 일괄 변환 등 다양한 곳에서 활용됩니다.
+    content: 이미지는 본질적으로 픽셀의 2차원 배열입니다. Pillow는 이 픽셀 데이터에 쉽게 접근하고 조작할 수 있게 해줍니다. 웹 개발에서 썸네일 생성, 데이터 분석에서
+      이미지 전처리, 자동화 스크립트에서 일괄 변환 등 다양한 곳에서 활용됩니다.
   - type: note
     title: OpenCV와의 차이
-    content: OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입 같은 작업은 Pillow가 더 간단합니다. 얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다.
+    content: OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입
+      같은 작업은 Pillow가 더 간단합니다. 얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다.
 - id: image_basics
   blocks:
   - type: sectionHeader
     title: 📦 이미지의 구조
     subtitle: 픽셀과 채널
   - type: text
-    content: 디지털 이미지는 픽셀(pixel)의 격자입니다. 각 픽셀은 색상 값을 가지며, 이 값의 구성 방식을 색상 모드(mode)라고 합니다. RGB 모드는 빨강, 초록, 파랑 세 채널로 색을 표현하고, L 모드는 밝기 하나로 흑백을 표현합니다.
+    content: 디지털 이미지는 픽셀(pixel)의 격자입니다. 각 픽셀은 색상 값을 가지며, 이 값의 구성 방식을 색상 모드(mode)라고 합니다. RGB 모드는 빨강, 초록,
+      파랑 세 채널로 색을 표현하고, L 모드는 밝기 하나로 흑백을 표현합니다.
   - type: table
     headers:
     - 모드
@@ -126,7 +130,8 @@ sections:
       - 인쇄용
   - type: note
     title: 픽셀 좌표계
-    content: Pillow에서 좌표 (0, 0)은 이미지의 왼쪽 상단입니다. x는 오른쪽으로, y는 아래쪽으로 증가합니다. (100, 50)은 왼쪽에서 100픽셀, 위에서 50픽셀 떨어진 위치입니다.
+    content: Pillow에서 좌표 (0, 0)은 이미지의 왼쪽 상단입니다. x는 오른쪽으로, y는 아래쪽으로 증가합니다. (100, 50)은 왼쪽에서 100픽셀, 위에서 50픽셀
+      떨어진 위치입니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -196,7 +201,8 @@ sections:
     title: ✨ ImageEnhance
     subtitle: 색상 조정
   - type: text
-    content: ImageEnhance 모듈은 밝기, 대비, 색상, 선명도를 조절합니다. 각 조정기의 enhance() 메서드에 배율을 전달합니다. 1.0은 원본, 0.0은 최소, 2.0은 두 배입니다.
+    content: ImageEnhance 모듈은 밝기, 대비, 색상, 선명도를 조절합니다. 각 조정기의 enhance() 메서드에 배율을 전달합니다. 1.0은 원본, 0.0은 최소,
+      2.0은 두 배입니다.
   - type: table
     headers:
     - 조정기
@@ -295,7 +301,8 @@ sections:
     subtitle: Codaro 로컬 Python 환경에서의 이미지
   - type: note
     title: 이미지 데이터 소스
-    content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는 내장 이미지와 Image.new() 합성 이미지를 함께 사용합니다.
+    content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는
+      내장 이미지와 Image.new() 합성 이미지를 함께 사용합니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -345,13 +352,14 @@ sections:
     title: 🎯 시작하기
     subtitle: 첫 번째 프로젝트로
   - type: text
-    content: Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게 됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
+    content: Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게
+      됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
 - id: workflow_validation
   title: 로컬 이미지 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 로컬 이미지 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Pillow 입문은 이미지를 열고 저장하는 문법보다, 이미지의 mode, size, alpha, 픽셀 변화가 의도대로 유지되는지 확인하는 습관이 중요합니다. 로컬에서 이미지를 직접 만들고 잘못된 입력을 넣어 실패를 확인한 뒤, 결과를 수치로 검증합니다.
 
@@ -375,7 +383,7 @@ sections:
 
     validateRgbImage(introImage)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 로컬 이미지 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageFilter, ImageStat
 
@@ -393,7 +401,8 @@ sections:
 
       validateRgbImage(introImage)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 로컬 이미지 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 로컬 이미지 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 로컬 이미지 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

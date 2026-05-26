@@ -381,11 +381,15 @@ intro:
     - 표 데이터를 코드로 확인합니다.
   diagram:
     steps:
-      - label: 목표
-      - label: 실습
+      - label: DataFrame 입력 확인
+        detail: name 열과 행 값을 먼저 고정합니다.
+      - label: DataFrame 처리 실행
+        detail: pandas 생성 코드를 실행합니다.
+      - label: DataFrame 결과 검증
+        detail: 행/열 기준으로 실행 결과를 확인합니다.
     runtime:
-      - label: uv
-        detail: pandas 준비
+      - label: pandas 환경
+        detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
 sections:
   - title: DataFrame 만들기
     subtitle: dict에서 표로

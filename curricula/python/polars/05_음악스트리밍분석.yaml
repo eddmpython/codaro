@@ -27,13 +27,35 @@ intro:
   emoji: 🎵
   goal: Spotify 차트 데이터에서 "아티스트별 인기도 순위"를 분석합니다.
   description: 문자열 처리와 윈도우 함수를 배웁니다. str.contains로 특정 키워드를 찾고, over + rank로 그룹 내 순위를 계산합니다.
+  direction: 음악스트리밍분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 음악스트리밍분석 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 인기도 필터링 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 음악스트리밍분석 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 음악스트리밍분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 음악스트리밍분석 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: Spotify 차트 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Spotify 음악 스트리밍 데이터를 분석합니다. 수천 개의 트랙에 대한 정보가 담겨 있으며, 곡명, 아티스트, 장르, 인기도(popularity) 등의 정보를 포함합니다. 이번 프로젝트에서는 문자열 처리(str.contains, str.to_lowercase)와 윈도우 함수(over, rank)를 배웁니다. over()는 그룹별 계산을 하되 원본 행을 유지하는 강력한 기능이고, rank()는 순위를 매기는 함수입니다. 이 두 개를 조합하면 "아티스트별로 가장 인기 있는 곡"처럼 그룹 내 순위를 구할 수 있습니다.
 
@@ -49,7 +71,7 @@ sections:
     spotify = pl.read_csv(StringIO(spotifyCsv))
     spotify.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import polars as pl
       from io import StringIO
@@ -59,53 +81,60 @@ sections:
       spotify = pl.read_csv(StringIO(spotifyCsv))
       spotify.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_head
   title: 2단계. 미리보기
   structuredPrimary: true
   subtitle: 데이터 구조 파악
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: track_name(곡명), track_artist(아티스트), track_popularity(인기도), playlist_genre(장르) 등이 있습니다. track_popularity는 0~100 사이의 값으로, 높을수록 최근에 많이 재생된 인기곡입니다. 이 데이터는 실제 Spotify 차트 데이터를 기반으로 합니다.
+  goal: 2단계. 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: track_name(곡명), track_artist(아티스트), track_popularity(인기도), playlist_genre(장르) 등이 있습니다.
+    track_popularity는 0~100 사이의 값으로, 높을수록 최근에 많이 재생된 인기곡입니다. 이 데이터는 실제 Spotify 차트 데이터를 기반으로 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: spotify.select("track_name", "track_artist", "track_popularity", "playlist_genre").head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 미리보기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: spotify.select("track_name", "track_artist", "track_popularity", "playlist_genre").head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 미리보기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 미리보기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 미리보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_filter
   title: 3단계. 인기도 필터링
   structuredPrimary: true
   subtitle: 복습 - filter
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 인기도 80 이상인 곡만 필터링합니다. 이전에 배운 filter를 복습하며, 비교 연산자(>=)를 사용해 조건을 만듭니다. 80점 이상이면 상위 약 20%에 해당하는 인기곡입니다.
+  goal: 3단계. 인기도 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 인기도 80 이상인 곡만 필터링합니다. 이전에 배운 filter를 복습하며, 비교 연산자(>=)를 사용해 조건을 만듭니다. 80점 이상이면 상위 약 20%에
+    해당하는 인기곡입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: spotify.filter(pl.col("track_popularity") >= 80).select("track_name", "track_artist", "track_popularity")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
-    starterCode: spotify.filter(pl.col("track_popularity") >= 80).select("track_name", "track_artist", "track_popularity")
+    prompt: 3단계. 인기도 필터링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
+    starterCode: spotify.filter(pl.col("track_popularity") >= 80).select("track_name", "track_artist",
+      "track_popularity")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 인기도 필터링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 인기도 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 인기도 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_groupby
   title: 4단계. 아티스트별 평균 인기도
   structuredPrimary: true
   subtitle: 복습 - group_by + mean
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 아티스트별 평균 인기도를 계산합니다. 이전에 배운 group_by와 mean을 복습하며, sort로 내림차순 정렬하면 가장 인기 있는 아티스트 순으로 볼 수 있습니다. 꾸준히 높은 인기도를 유지하는 아티스트가 상위에 위치합니다.
+  goal: 4단계. 아티스트별 평균 인기도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 아티스트별 평균 인기도를 계산합니다. 이전에 배운 group_by와 mean을 복습하며, sort로 내림차순 정렬하면 가장 인기 있는 아티스트 순으로 볼 수
+    있습니다. 꾸준히 높은 인기도를 유지하는 아티스트가 상위에 위치합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -113,49 +142,52 @@ sections:
         pl.col("track_popularity").mean().alias("avgPopularity")
     ).sort("avgPopularity", descending=True).head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 아티스트별 평균 인기도 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.group_by("track_artist").agg(
           pl.col("track_popularity").mean().alias("avgPopularity")
       ).sort("avgPopularity", descending=True).head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 아티스트별 평균 인기도 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 아티스트별 평균 인기도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 아티스트별 평균 인기도에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_str_contains
   title: 5단계. 문자열 포함 검색
   structuredPrimary: true
   subtitle: str.contains
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 문자열 포함 검색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     데이터 분석에서 문자열 검색은 매우 자주 사용됩니다. "Love"라는 단어가 들어간 곡만 찾고 싶을 때 str.contains()를 사용합니다. str은 문자열(string) 관련 메서드에 접근하는 accessor이고, contains()는 "포함하다"의 의미입니다. pl.col("track_name").str.contains("Love")는 track_name 컬럼에서 "Love"가 포함된 행은 True, 아니면 False를 반환합니다. filter()와 함께 사용하면 True인 행만 선택됩니다.
 
     str.contains("키워드")는 해당 키워드가 포함된 행을 찾습니다. "Love Story"처럼 단어 전체가 아니라 일부만 일치해도 찾습니다. 정규표현식(regex)도 지원하여 복잡한 패턴 검색이 가능합니다. 대소문자를 구분하므로 주의하세요.
   tips:
-  - str.contains("키워드")는 해당 키워드가 포함된 행을 찾습니다. "Love Story"처럼 단어 전체가 아니라 일부만 일치해도 찾습니다. 정규표현식(regex)도 지원하여 복잡한 패턴 검색이 가능합니다. 대소문자를 구분하므로 주의하세요.
+  - str.contains("키워드")는 해당 키워드가 포함된 행을 찾습니다. "Love Story"처럼 단어 전체가 아니라 일부만 일치해도 찾습니다. 정규표현식(regex)도 지원하여
+    복잡한 패턴 검색이 가능합니다. 대소문자를 구분하므로 주의하세요.
   snippet: |-
     spotify.filter(
         pl.col("track_name").str.contains("Love")
     ).select("track_name", "track_artist", "track_popularity").head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 문자열 포함 검색 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.filter(
           pl.col("track_name").str.contains("Love")
       ).select("track_name", "track_artist", "track_popularity").head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 문자열 포함 검색 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 문자열 포함 검색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 문자열 포함 검색에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_str_lowercase
   title: 6단계. 소문자 변환
   structuredPrimary: true
   subtitle: str.to_lowercase
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 소문자 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     대소문자 구분 없이 검색하려면 소문자로 변환 후 비교합니다. "Love", "LOVE", "love"를 모두 찾으려면 먼저 str.to_lowercase()로 소문자로 통일한 뒤 str.contains("love")를 적용합니다.
 
@@ -168,23 +200,25 @@ sections:
         pl.col("track_name").str.to_lowercase().str.contains("love")
     ).select("track_name", "track_artist", "track_popularity").head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 소문자 변환 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.filter(
           pl.col("track_name").str.to_lowercase().str.contains("love")
       ).select("track_name", "track_artist", "track_popularity").head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 소문자 변환 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 소문자 변환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 소문자 변환에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_genre_filter
   title: 7단계. 장르별 필터링
   structuredPrimary: true
   subtitle: 문자열 조건 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: pop 장르에서 dance가 포함된 곡을 찾습니다. 장르 조건과 문자열 조건을 &(AND)로 연결하여 복합 필터를 만듭니다. 이렇게 여러 조건을 조합하면 원하는 데이터를 정확하게 추출할 수 있습니다.
+  goal: 7단계. 장르별 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: pop 장르에서 dance가 포함된 곡을 찾습니다. 장르 조건과 문자열 조건을 &(AND)로 연결하여 복합 필터를 만듭니다. 이렇게 여러 조건을 조합하면 원하는
+    데이터를 정확하게 추출할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -193,29 +227,31 @@ sections:
         (pl.col("track_name").str.to_lowercase().str.contains("dance"))
     ).select("track_name", "track_artist", "track_popularity")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 장르별 필터링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.filter(
           (pl.col("playlist_genre") == "pop") &
           (pl.col("track_name").str.to_lowercase().str.contains("dance"))
       ).select("track_name", "track_artist", "track_popularity")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 장르별 필터링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 장르별 필터링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 장르별 필터링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_over
   title: 8단계. 윈도우 함수 소개
   structuredPrimary: true
   subtitle: over()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 윈도우 함수 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     over()는 이번 프로젝트의 핵심 개념입니다. group_by()는 그룹별 통계를 계산하지만 행 수가 줄어듭니다(그룹 개수만큼만 남음). 하지만 때로는 "그룹별 평균을 계산하되, 원본 데이터는 그대로 유지"하고 싶을 때가 있습니다. over()는 이 문제를 해결합니다. pl.col("값").mean().over("그룹")은 그룹별 평균을 계산한 후 그 값을 해당 그룹의 모든 행에 붙여줍니다. SQL의 윈도우 함수(Window Function)와 동일한 개념으로, 매우 강력한 기능입니다.
 
     over("그룹")은 그룹별 계산을 하되 행 수를 유지합니다. group_by()는 그룹 개수만큼 행이 줄지만, over()는 원본 행 수 그대로 유지하면서 각 행에 그룹 통계를 추가합니다. "개별 값과 그룹 평균을 동시에 보고 싶을 때" 필수적인 기능입니다.
   tips:
-  - over("그룹")은 그룹별 계산을 하되 행 수를 유지합니다. group_by()는 그룹 개수만큼 행이 줄지만, over()는 원본 행 수 그대로 유지하면서 각 행에 그룹 통계를 추가합니다. "개별 값과 그룹 평균을 동시에 보고 싶을 때" 필수적인 기능입니다.
+  - over("그룹")은 그룹별 계산을 하되 행 수를 유지합니다. group_by()는 그룹 개수만큼 행이 줄지만, over()는 원본 행 수 그대로 유지하면서 각 행에 그룹 통계를
+    추가합니다. "개별 값과 그룹 평균을 동시에 보고 싶을 때" 필수적인 기능입니다.
   snippet: |-
     spotify.select(
         "track_name",
@@ -224,7 +260,7 @@ sections:
         pl.col("track_popularity").mean().over("playlist_genre").alias("genreAvg")
     ).head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 윈도우 함수 소개 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.select(
           "track_name",
@@ -233,17 +269,19 @@ sections:
           pl.col("track_popularity").mean().over("playlist_genre").alias("genreAvg")
       ).head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 윈도우 함수 소개 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 윈도우 함수 소개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 윈도우 함수 소개에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_over_vs_groupby
   title: 9단계. over vs group_by 비교
   structuredPrimary: true
   subtitle: 차이점 이해
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: group_by는 그룹 수만큼 행이 줄어들고, over는 원본 행 수를 유지합니다. 아래 코드에서 group_by 결과는 장르 수(6개 정도)만큼의 행이 되지만, over를 사용한 이전 예제에서는 수만 개의 원본 행이 그대로 유지됩니다.
+  goal: 9단계. over vs groupby 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: group_by는 그룹 수만큼 행이 줄어들고, over는 원본 행 수를 유지합니다. 아래 코드에서 group_by 결과는 장르 수(6개 정도)만큼의 행이 되지만,
+    over를 사용한 이전 예제에서는 수만 개의 원본 행이 그대로 유지됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -251,28 +289,30 @@ sections:
         pl.col("track_popularity").mean().alias("genreAvg")
     )
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. over vs groupby 비교 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.group_by("playlist_genre").agg(
           pl.col("track_popularity").mean().alias("genreAvg")
       )
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. over vs groupby 비교 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. over vs groupby 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. over vs groupby 비교에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_rank
   title: 10단계. 순위 계산
   structuredPrimary: true
   subtitle: rank()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 순위 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     rank()는 값에 순위를 매기는 함수입니다. 인기도가 높은 곡부터 1위, 2위, 3위... 순으로 번호를 매기는 것입니다. method="ordinal"은 같은 값이어도 다른 순위를 부여하는 방식입니다(동점 처리 안 함). descending=True는 내림차순 정렬로, 큰 값이 1위가 됩니다. 인기도가 100인 곡이 1위, 99인 곡이 2위가 되는 식입니다. 이 함수는 다음 단계에서 over()와 조합하여 더욱 강력해집니다.
 
     rank()는 순위를 매깁니다. method="ordinal"은 동점도 다른 순위, "dense"는 동점은 같은 순위지만 다음 순위가 연속, "min"은 동점은 같은 순위이고 다음 순위는 건너뛰기입니다. descending=True는 큰 값이 상위 순위(1위)가 됩니다.
   tips:
-  - rank()는 순위를 매깁니다. method="ordinal"은 동점도 다른 순위, "dense"는 동점은 같은 순위지만 다음 순위가 연속, "min"은 동점은 같은 순위이고 다음 순위는 건너뛰기입니다. descending=True는 큰 값이 상위 순위(1위)가 됩니다.
+  - rank()는 순위를 매깁니다. method="ordinal"은 동점도 다른 순위, "dense"는 동점은 같은 순위지만 다음 순위가 연속, "min"은 동점은 같은 순위이고
+    다음 순위는 건너뛰기입니다. descending=True는 큰 값이 상위 순위(1위)가 됩니다.
   snippet: |-
     spotify.select(
         "track_name",
@@ -281,7 +321,7 @@ sections:
         pl.col("track_popularity").rank(method="ordinal", descending=True).alias("overallRank")
     ).sort("overallRank").head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 순위 계산 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.select(
           "track_name",
@@ -290,22 +330,24 @@ sections:
           pl.col("track_popularity").rank(method="ordinal", descending=True).alias("overallRank")
       ).sort("overallRank").head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 순위 계산 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 순위 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 순위 계산에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step11_rank_over
   title: 11단계. 그룹 내 순위
   structuredPrimary: true
   subtitle: rank + over 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 그룹 내 순위에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     드디어 rank()와 over()를 조합합니다. pl.col("값").rank().over("그룹")은 "각 그룹 내에서의 순위"를 매깁니다. 예를 들어 아티스트별로 곡에 순위를 매기면, "아티스트 A의 1위 곡, 2위 곡", "아티스트 B의 1위 곡, 2위 곡"을 구할 수 있습니다. 이것은 "각 아티스트의 대표곡(1위 곡)만 추출"하는 등 실전에서 매우 유용한 기법입니다. Polars와 SQL의 가장 강력한 기능 중 하나입니다.
 
     rank().over("그룹")은 그룹별로 독립적인 순위를 매깁니다. 아티스트별, 장르별, 연도별 TOP N을 구할 때 필수입니다. filter(artistRank == 1)로 각 그룹의 1위만 추출하는 패턴은 실전에서 매우 자주 사용됩니다.
   tips:
-  - rank().over("그룹")은 그룹별로 독립적인 순위를 매깁니다. 아티스트별, 장르별, 연도별 TOP N을 구할 때 필수입니다. filter(artistRank == 1)로 각 그룹의 1위만 추출하는 패턴은 실전에서 매우 자주 사용됩니다.
+  - rank().over("그룹")은 그룹별로 독립적인 순위를 매깁니다. 아티스트별, 장르별, 연도별 TOP N을 구할 때 필수입니다. filter(artistRank == 1)로
+    각 그룹의 1위만 추출하는 패턴은 실전에서 매우 자주 사용됩니다.
   snippet: |-
     spotify.select(
         "track_name",
@@ -314,7 +356,7 @@ sections:
         pl.col("track_popularity").rank(method="ordinal", descending=True).over("track_artist").alias("artistRank")
     ).filter(pl.col("artistRank") == 1).sort("track_popularity", descending=True).head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 그룹 내 순위 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.select(
           "track_name",
@@ -323,17 +365,19 @@ sections:
           pl.col("track_popularity").rank(method="ordinal", descending=True).over("track_artist").alias("artistRank")
       ).filter(pl.col("artistRank") == 1).sort("track_popularity", descending=True).head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 그룹 내 순위 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 그룹 내 순위 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 그룹 내 순위에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step12_genre_rank
   title: 12단계. 장르별 TOP 3
   structuredPrimary: true
   subtitle: 실전 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 각 장르에서 인기도 TOP 3 곡을 뽑습니다. rank().over("playlist_genre")로 장르별 순위를 계산한 뒤 filter로 3위 이하만 선택하면 각 장르의 대표곡을 추출할 수 있습니다.
+  goal: 12단계. 장르별 TOP 3에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 각 장르에서 인기도 TOP 3 곡을 뽑습니다. rank().over("playlist_genre")로 장르별 순위를 계산한 뒤 filter로 3위 이하만 선택하면
+    각 장르의 대표곡을 추출할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -345,7 +389,7 @@ sections:
         pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
     ).filter(pl.col("genreRank") <= 3).sort("playlist_genre", "genreRank")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 장르별 TOP 3 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.select(
           "track_name",
@@ -355,17 +399,19 @@ sections:
           pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
       ).filter(pl.col("genreRank") <= 3).sort("playlist_genre", "genreRank")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 장르별 TOP 3 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 장르별 TOP 3 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 장르별 TOP 3에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step13_complex
   title: 13단계. 종합 분석
   structuredPrimary: true
   subtitle: 모든 개념 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: love가 포함된 곡 중 장르별 인기도 1위를 찾습니다. 먼저 filter로 "love"가 포함된 곡을 추출하고, rank().over()로 그 중에서 장르별 순위를 계산합니다. str.contains, over, rank를 모두 조합하는 고급 기법입니다.
+  goal: 13단계. 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: love가 포함된 곡 중 장르별 인기도 1위를 찾습니다. 먼저 filter로 "love"가 포함된 곡을 추출하고, rank().over()로 그 중에서 장르별
+    순위를 계산합니다. str.contains, over, rank를 모두 조합하는 고급 기법입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -379,7 +425,7 @@ sections:
         pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
     ).filter(pl.col("genreRank") == 1).sort("track_popularity", descending=True)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 종합 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       spotify.filter(
           pl.col("track_name").str.to_lowercase().str.contains("love")
@@ -391,16 +437,17 @@ sections:
           pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
       ).filter(pl.col("genreRank") == 1).sort("track_popularity", descending=True)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 종합 분석 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 종합 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 종합 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 음악 스트리밍 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     배운 모든 내용을 활용해서 분석해봅시다.
 
@@ -414,7 +461,7 @@ sections:
 
     tracks = pl.read_csv(StringIO(loadLocalDataset("spotify_songs").to_csv(index=False)))
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import polars as pl
       from io import StringIO
@@ -422,10 +469,11 @@ sections:
 
       tracks = pl.read_csv(StringIO(loadLocalDataset("spotify_songs").to_csv(index=False)))
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -443,9 +491,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 주문 매출 파이프라인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -473,7 +522,7 @@ sections:
     validateOrderFrame(orderFrame)
     orderFrame
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
@@ -509,7 +558,8 @@ sections:
       validateOrderFrame(orderFrame)
       orderFrame
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

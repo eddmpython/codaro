@@ -29,13 +29,35 @@ intro:
   emoji: 🔴🟢🔵
   goal: 이미지의 RGB 채널을 분리하고 히스토그램으로 색상 분포를 분석합니다.
   description: split()으로 채널을 분리하고, merge()로 합성합니다. histogram()으로 픽셀 값 분포를 확인합니다. 이미지의 색상 구조를 깊이 이해합니다.
+  direction: RGB채널분석기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - RGB채널분석기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 이미지 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 채널 분리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 채널 시각화 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: RGB채널분석기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: RGB채널분석기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: RGB채널분석기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 이미지 불러오기
   structuredPrimary: true
   subtitle: sklearn 샘플 이미지
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: sklearn에 내장된 샘플 이미지를 사용합니다. RGB 채널 분석에는 색상이 풍부한 china 이미지가 적합합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -47,7 +69,7 @@ sections:
     source = Image.fromarray(chinaArr)
     source.size, source.mode
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 이미지 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -56,16 +78,17 @@ sections:
       source = Image.fromarray(chinaArr)
       source.size, source.mode
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 이미지 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 이미지 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 이미지 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_split
   title: 2단계. 채널 분리
   structuredPrimary: true
   subtitle: split()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 채널 분리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     split() 메서드는 RGB 이미지를 세 개의 단일 채널(L 모드) 이미지로 분리합니다. 각 채널은 해당 색상의 밝기만 담고 있습니다. R 채널이 밝으면 그 부분에 빨간색이 많다는 의미입니다.
 
@@ -76,21 +99,22 @@ sections:
     red, green, blue = source.split()
     red.mode, green.mode, blue.mode
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 채널 분리 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       red, green, blue = source.split()
       red.mode, green.mode, blue.mode
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 채널 분리 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 채널 분리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 채널 분리에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_visualize
   title: 3단계. 채널 시각화
   structuredPrimary: true
   subtitle: 색상으로 채널 표현
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 채널 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     분리된 채널을 해당 색상으로 시각화하려면 다른 채널을 0으로 채운 이미지를 만들어야 합니다. Image.new()로 검은 이미지를 만들고 merge()로 합성합니다.
 
@@ -101,21 +125,22 @@ sections:
     empty = Image.new('L', source.size, 0)
     empty.mode, empty.size
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 채널 시각화 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       empty = Image.new('L', source.size, 0)
       empty.mode, empty.size
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 채널 시각화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 채널 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 채널 시각화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_histogram
   title: 4단계. 히스토그램 분석
   structuredPrimary: true
   subtitle: histogram()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 히스토그램 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     histogram() 메서드는 각 밝기 값(0-255)에 해당하는 픽셀 수를 반환합니다. RGB 이미지는 768개(256×3) 값을 반환하며, 처음 256개가 R, 다음 256개가 G, 마지막 256개가 B입니다.
 
@@ -126,21 +151,22 @@ sections:
     hist = source.histogram()
     len(hist)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 히스토그램 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       hist = source.histogram()
       len(hist)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 히스토그램 분석 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 히스토그램 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 히스토그램 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_analysis
   title: 5단계. 색상 분포 분석
   structuredPrimary: true
   subtitle: 통계 추출
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 색상 분포 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     히스토그램에서 평균 밝기, 가장 많은 픽셀의 밝기 등을 계산할 수 있습니다. 이를 통해 이미지의 전반적인 색조를 파악합니다.
 
@@ -154,7 +180,7 @@ sections:
     avgB = sum(i * histB[i] for i in range(256)) / totalPixels
     round(avgR, 1), round(avgG, 1), round(avgB, 1)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 색상 분포 분석 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       totalPixels = source.size[0] * source.size[1]
       avgR = sum(i * histR[i] for i in range(256)) / totalPixels
@@ -162,16 +188,17 @@ sections:
       avgB = sum(i * histB[i] for i in range(256)) / totalPixels
       round(avgR, 1), round(avgG, 1), round(avgB, 1)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 색상 분포 분석 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 색상 분포 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 색상 분포 분석에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_swap
   title: 6단계. 채널 교환
   structuredPrimary: true
   subtitle: 색상 효과
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 채널 교환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 채널 순서를 바꿔 독특한 색상 효과를 만들 수 있습니다. R↔B를 교환하면 파란 하늘이 주황색으로 바뀌는 등의 효과가 나타납니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -179,21 +206,22 @@ sections:
     swapped = Image.merge('RGB', (blue, green, red))
     swapped
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 채널 교환 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       swapped = Image.merge('RGB', (blue, green, red))
       swapped
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 채널 교환 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 채널 교환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 채널 교환에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 채널 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     sklearn 이미지의 채널을 분석하고 조작해봅시다.
 
@@ -208,7 +236,7 @@ sections:
     flower = Image.fromarray(flowerArr)
     flower
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
@@ -217,17 +245,19 @@ sections:
       flower = Image.fromarray(flowerArr)
       flower
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 7단계. RGB 채널 검증 루프
   structuredPrimary: true
   subtitle: split, histogram, merge 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: RGB 채널 분석은 채널을 분리해 보는 데서 끝나지 않습니다. 각 채널의 평균과 histogram 총합이 이미지 크기와 맞는지 확인하고, 채널 교환 결과가 의도대로 바뀌는지 검증합니다.
+  goal: 7단계. RGB 채널 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: RGB 채널 분석은 채널을 분리해 보는 데서 끝나지 않습니다. 각 채널의 평균과 histogram 총합이 이미지 크기와 맞는지 확인하고, 채널 교환 결과가
+    의도대로 바뀌는지 검증합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -250,7 +280,7 @@ sections:
 
     validateRgbMode(channelImage)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. RGB 채널 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageStat
 
@@ -271,7 +301,8 @@ sections:
 
       validateRgbMode(channelImage)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. RGB 채널 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. RGB 채널 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. RGB 채널 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

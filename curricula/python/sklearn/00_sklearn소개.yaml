@@ -26,28 +26,28 @@ meta:
     - 클러스터링
     - 예측
 intro:
-  direction: sklearn소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: sklearn소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - sklearn소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 필요한 라이브러리는 레슨을 열 때 uv로 준비하고, 첫 실행에서 import와 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - sklearn소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: meta.packages 기반 uv 준비와 import 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: sklearn소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: packages-check -> packages-install(누락 시) -> cell-call
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: numpy, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: sklearn소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: sklearn소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: intro
   blocks:
@@ -76,7 +76,9 @@ sections:
   - type: note
     style: info
     title: 머신러닝이란?
-    content: 머신러닝은 데이터에서 패턴을 학습하여 새로운 데이터를 예측하는 기술입니다. "이 이메일이 스팸인가?", "이 환자가 당뇨병일 확률은?", "이 집의 가격은 얼마일까?" 같은 질문에 답합니다. scikit-learn은 이런 머신러닝 알고리즘을 쉽게 사용할 수 있게 만든 Python 라이브러리입니다. fit/predict/transform이라는 일관된 인터페이스로 수십 개의 알고리즘을 동일한 방식으로 사용할 수 있습니다.
+    content: 머신러닝은 데이터에서 패턴을 학습하여 새로운 데이터를 예측하는 기술입니다. "이 이메일이 스팸인가?", "이 환자가 당뇨병일 확률은?", "이 집의 가격은 얼마일까?"
+      같은 질문에 답합니다. scikit-learn은 이런 머신러닝 알고리즘을 쉽게 사용할 수 있게 만든 Python 라이브러리입니다. fit/predict/transform이라는
+      일관된 인터페이스로 수십 개의 알고리즘을 동일한 방식으로 사용할 수 있습니다.
   - type: featureCards
     cards:
     - emoji: 🏷️
@@ -99,7 +101,9 @@ sections:
   - type: note
     style: info
     title: 산업 표준
-    content: scikit-learn은 가장 많이 사용되는 Python ML 라이브러리입니다. 수천 개의 기업과 연구기관에서 사용합니다. 문서화가 잘 되어 있고, 커뮤니티가 활발합니다. 취업 시장에서도 sklearn 경험은 필수입니다. TensorFlow, PyTorch 같은 딥러닝 프레임워크를 배우기 전에 sklearn으로 ML 기초를 다지는 것이 좋습니다.
+    content: scikit-learn은 가장 많이 사용되는 Python ML 라이브러리입니다. 수천 개의 기업과 연구기관에서 사용합니다. 문서화가 잘 되어 있고, 커뮤니티가
+      활발합니다. 취업 시장에서도 sklearn 경험은 필수입니다. TensorFlow, PyTorch 같은 딥러닝 프레임워크를 배우기 전에 sklearn으로 ML 기초를 다지는
+      것이 좋습니다.
   - type: featureCards
     cards:
     - emoji: 🔄
@@ -153,7 +157,8 @@ sections:
   - type: note
     style: tip
     title: 학습 순서가 중요합니다
-    content: statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다. 통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
+    content: statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다.
+      통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
 - id: sklearn_workflow
   blocks:
   - type: sectionHeader
@@ -162,7 +167,9 @@ sections:
   - type: note
     style: info
     title: 일관된 5단계 프로세스
-    content: '모든 sklearn 모델은 동일한 패턴을 따릅니다. 1) 데이터 분할: train_test_split으로 학습/테스트 분리. 2) 전처리: StandardScaler, LabelEncoder로 데이터 변환. 3) 모델 학습: model.fit(X_train, y_train). 4) 예측: model.predict(X_test). 5) 평가: accuracy_score, MSE 등으로 성능 측정. 이 패턴을 익히면 어떤 알고리즘이든 동일하게 적용할 수 있습니다.'
+    content: '모든 sklearn 모델은 동일한 패턴을 따릅니다. 1) 데이터 분할: train_test_split으로 학습/테스트 분리. 2) 전처리: StandardScaler,
+      LabelEncoder로 데이터 변환. 3) 모델 학습: model.fit(X_train, y_train). 4) 예측: model.predict(X_test). 5) 평가:
+      accuracy_score, MSE 등으로 성능 측정. 이 패턴을 익히면 어떤 알고리즘이든 동일하게 적용할 수 있습니다.'
   - type: featureCards
     cards:
     - emoji: ✂️
@@ -233,7 +240,9 @@ sections:
   - type: note
     style: tip
     title: 알고리즘 선택 가이드
-    content: 분류 문제라면 LogisticRegression으로 시작하세요. 성능이 부족하면 RandomForest, GradientBoosting 순으로 시도합니다. 회귀 문제는 LinearRegression 기본, 과적합 방지에는 Ridge/Lasso를 사용합니다. 클러스터링은 KMeans가 가장 직관적입니다. 어떤 알고리즘이든 fit/predict 패턴은 동일합니다.
+    content: 분류 문제라면 LogisticRegression으로 시작하세요. 성능이 부족하면 RandomForest, GradientBoosting 순으로 시도합니다. 회귀
+      문제는 LinearRegression 기본, 과적합 방지에는 Ridge/Lasso를 사용합니다. 클러스터링은 KMeans가 가장 직관적입니다. 어떤 알고리즘이든 fit/predict
+      패턴은 동일합니다.
 - id: key_concepts
   blocks:
   - type: sectionHeader
@@ -306,7 +315,8 @@ sections:
   - type: note
     style: info
     title: 지표 선택 가이드
-    content: 분류에서 클래스 불균형이 있다면 Accuracy보다 F1 Score를 사용하세요. 암 진단처럼 놓치면 안 되는 경우 Recall을 중시하고, 스팸 필터처럼 오탐이 문제면 Precision을 중시합니다. 회귀에서는 MSE가 기본이고, 해석 편의를 위해 RMSE를 사용합니다. R²는 모델 설명력을 보여줍니다.
+    content: 분류에서 클래스 불균형이 있다면 Accuracy보다 F1 Score를 사용하세요. 암 진단처럼 놓치면 안 되는 경우 Recall을 중시하고, 스팸 필터처럼 오탐이
+      문제면 Precision을 중시합니다. 회귀에서는 MSE가 기본이고, 해석 편의를 위해 RMSE를 사용합니다. R²는 모델 설명력을 보여줍니다.
 - id: preprocessing
   blocks:
   - type: sectionHeader
@@ -315,7 +325,9 @@ sections:
   - type: note
     style: info
     title: 왜 전처리가 필요한가?
-    content: 대부분의 ML 알고리즘은 숫자만 처리할 수 있습니다. 범주형 데이터(성별, 지역)는 숫자로 변환해야 합니다. 또한 특성 간 스케일이 다르면 일부 알고리즘이 제대로 작동하지 않습니다. 예를 들어 나이(0~100)와 수입(0~10000000)을 함께 사용하면 수입이 모델을 지배합니다. StandardScaler로 모든 특성을 같은 스케일로 맞추면 이 문제를 해결합니다.
+    content: 대부분의 ML 알고리즘은 숫자만 처리할 수 있습니다. 범주형 데이터(성별, 지역)는 숫자로 변환해야 합니다. 또한 특성 간 스케일이 다르면 일부 알고리즘이 제대로
+      작동하지 않습니다. 예를 들어 나이(0~100)와 수입(0~10000000)을 함께 사용하면 수입이 모델을 지배합니다. StandardScaler로 모든 특성을 같은 스케일로
+      맞추면 이 문제를 해결합니다.
   - type: featureCards
     cards:
     - emoji: 📏
@@ -338,7 +350,8 @@ sections:
   - type: note
     style: warning
     title: 제한사항
-    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. scikit-learn의 병렬 처리, 모델 평가, 파이프라인 기능을 로컬 CPU와 메모리 기준으로 실습할 수 있습니다. 대용량 데이터셋은 실행 시간을 고려해 샘플링하면서 다룹니다.
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. scikit-learn의 병렬 처리, 모델 평가, 파이프라인 기능을 로컬 CPU와 메모리 기준으로
+      실습할 수 있습니다. 대용량 데이터셋은 실행 시간을 고려해 샘플링하면서 다룹니다.
   - type: featureCards
     cards:
     - emoji: ✅
@@ -405,7 +418,8 @@ sections:
   - type: note
     style: info
     title: 프로젝트 기반 학습
-    content: 각 프로젝트는 실제 데이터로 실제 문제를 해결합니다. 와인 품종 분류, 암 진단, 주택 가격 예측 등 현실적인 문제를 다룹니다. 프로젝트를 진행하면서 이전에 배운 개념을 반복 사용하고, 새로운 개념을 추가로 학습합니다. 10개 프로젝트를 완료하면 데이터에서 예측 모델을 구축하는 전체 워크플로우를 마스터하게 됩니다.
+    content: 각 프로젝트는 실제 데이터로 실제 문제를 해결합니다. 와인 품종 분류, 암 진단, 주택 가격 예측 등 현실적인 문제를 다룹니다. 프로젝트를 진행하면서 이전에 배운
+      개념을 반복 사용하고, 새로운 개념을 추가로 학습합니다. 10개 프로젝트를 완료하면 데이터에서 예측 모델을 구축하는 전체 워크플로우를 마스터하게 됩니다.
 - id: prerequisites
   blocks:
   - type: sectionHeader
@@ -414,7 +428,8 @@ sections:
   - type: note
     style: tip
     title: 권장 선수 과목
-    content: pandas 기초 (데이터 로딩, 필터링, 그룹화), NumPy 기초 (배열 연산), statsmodels 기초 (회귀 개념, R² 해석)를 미리 학습하는 것을 권장합니다. 특히 statsmodels에서 배운 회귀 개념은 sklearn에서도 그대로 활용됩니다. Python 기본 문법(함수, 리스트, 딕셔너리)도 알아야 합니다.
+    content: pandas 기초 (데이터 로딩, 필터링, 그룹화), NumPy 기초 (배열 연산), statsmodels 기초 (회귀 개념, R² 해석)를 미리 학습하는 것을
+      권장합니다. 특히 statsmodels에서 배운 회귀 개념은 sklearn에서도 그대로 활용됩니다. Python 기본 문법(함수, 리스트, 딕셔너리)도 알아야 합니다.
   - type: featureCards
     cards:
     - emoji: 🐼
@@ -458,9 +473,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -489,7 +505,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -534,7 +550,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

@@ -29,14 +29,37 @@ intro:
   emoji: 🌸
   goal: 붓꽃 데이터에서 "품종별 꽃잎 면적"을 계산하고 비교합니다.
   description: 결측치 처리와 새로운 컬럼을 만드는 방법을 배웁니다. 기존에 없던 값을 계산해서 추가합니다.
+  direction: 붓꽃품종분류에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 붓꽃품종분류 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 결측치 확인 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 붓꽃품종분류 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 붓꽃품종분류 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 붓꽃품종분류 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: 붓꽃 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 150송이 붓꽃, 3품종(setosa, versicolor, virginica) 각 50송이씩입니다. 로컬 실행에서는 네트워크가 없어도 결측치 처리, 새 컬럼, apply/map 흐름을 연습할 수 있도록 같은 컬럼 구조의 샘플 데이터를 함께 둡니다.
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: 150송이 붓꽃, 3품종(setosa, versicolor, virginica) 각 50송이씩입니다. 로컬 실행에서는 네트워크가 없어도 결측치 처리, 새 컬럼,
+    apply/map 흐름을 연습할 수 있도록 같은 컬럼 구조의 샘플 데이터를 함께 둡니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -46,7 +69,7 @@ sections:
     iris = loadLocalDataset("iris")
     iris.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
@@ -54,163 +77,175 @@ sections:
       iris = loadLocalDataset("iris")
       iris.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_head
   title: 2단계. 미리보기
   structuredPrimary: true
   subtitle: 데이터 구조 파악
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: petal_length(꽃잎 길이)와 petal_width(꽃잎 너비)로 면적을 계산할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 미리보기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 미리보기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 미리보기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 미리보기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_isna
   title: 3단계. 결측치 확인
   structuredPrimary: true
   subtitle: isna().sum()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 결측치 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     실제 데이터에는 종종 결측치(Missing Value, NaN)가 포함되어 있습니다. 결측치는 측정 실패, 입력 누락 등 다양한 이유로 발생합니다. isna()는 각 값이 결측치인지 True/False로 반환하고, sum()을 붙이면 컬럼별로 결측치 개수를 세어줍니다. 데이터 분석 전에 반드시 확인해야 하는 중요한 단계입니다.
 
     isna()와 isnull()은 같은 기능입니다. 둘 다 사용 가능하며, 결측치를 True로 표시합니다. 반대로 notna()나 notnull()은 결측치가 아닌 값을 True로 표시합니다.
   tips:
-  - isna()와 isnull()은 같은 기능입니다. 둘 다 사용 가능하며, 결측치를 True로 표시합니다. 반대로 notna()나 notnull()은 결측치가 아닌 값을 True로 표시합니다.
+  - isna()와 isnull()은 같은 기능입니다. 둘 다 사용 가능하며, 결측치를 True로 표시합니다. 반대로 notna()나 notnull()은 결측치가 아닌 값을 True로
+    표시합니다.
   snippet: iris.isna().sum()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 결측치 확인 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris.isna().sum()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 결측치 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 결측치 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 결측치 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_info
   title: 4단계. 전체 정보
   structuredPrimary: true
   subtitle: info()로 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 전체 정보에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: info()의 Non-Null Count가 150이면 결측치가 없다는 뜻입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris.info()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 전체 정보 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris.info()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 전체 정보 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 전체 정보 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 전체 정보에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_dropna
   title: 5단계. 결측치 삭제
   structuredPrimary: true
   subtitle: dropna()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 결측치 삭제에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     dropna() 메서드는 결측치가 있는 행을 삭제합니다. 기본적으로 한 행에 하나라도 결측치가 있으면 그 행 전체를 제거합니다. 이 데이터는 결측치가 없어서 삭제되는 행이 없지만, 실제 데이터에서는 자주 사용하는 전처리 방법입니다. 원본은 유지되고 새로운 DataFrame을 반환합니다.
 
     dropna()는 기본적으로 행(row)을 삭제하지만, axis=1을 추가하면 열(column)을 삭제합니다. 또한 subset=['컬럼명']을 지정하면 특정 컬럼의 결측치만 기준으로 삼을 수 있습니다.
   tips:
-  - dropna()는 기본적으로 행(row)을 삭제하지만, axis=1을 추가하면 열(column)을 삭제합니다. 또한 subset=['컬럼명']을 지정하면 특정 컬럼의 결측치만 기준으로 삼을 수 있습니다.
+  - dropna()는 기본적으로 행(row)을 삭제하지만, axis=1을 추가하면 열(column)을 삭제합니다. 또한 subset=['컬럼명']을 지정하면 특정 컬럼의 결측치만
+    기준으로 삼을 수 있습니다.
   snippet: |-
     clean = iris.dropna()
     len(iris), len(clean)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 결측치 삭제 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       clean = iris.dropna()
       len(iris), len(clean)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 결측치 삭제 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 결측치 삭제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 결측치 삭제에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_fillna
   title: 6단계. 결측치 채우기
   structuredPrimary: true
   subtitle: fillna()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: fillna() 메서드는 결측치를 특정 값으로 대체합니다. 삭제하는 대신 채우는 방식으로 처리할 수 있습니다. 0으로 채우거나, 평균값(fillna(df.mean())), 중앙값(fillna(df.median())), 최빈값 등 다양한 전략을 사용할 수 있습니다. 데이터의 특성에 맞는 방법을 선택하는 것이 중요합니다.
+  goal: 6단계. 결측치 채우기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: fillna() 메서드는 결측치를 특정 값으로 대체합니다. 삭제하는 대신 채우는 방식으로 처리할 수 있습니다. 0으로 채우거나, 평균값(fillna(df.mean())),
+    중앙값(fillna(df.median())), 최빈값 등 다양한 전략을 사용할 수 있습니다. 데이터의 특성에 맞는 방법을 선택하는 것이 중요합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     filled = iris.fillna(0)
     filled.isna().sum()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 결측치 채우기 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       filled = iris.fillna(0)
       filled.isna().sum()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 결측치 채우기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 결측치 채우기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 결측치 채우기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_assign
   title: 7단계. 새 컬럼 추가
   structuredPrimary: true
   subtitle: assign()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 새 컬럼 추가에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     assign() 메서드는 기존 DataFrame에 새로운 컬럼을 추가한 DataFrame을 반환합니다. 원본은 변경하지 않고 새로운 DataFrame을 만들기 때문에 Codaro 환경에서 안전하게 사용할 수 있습니다. 꽃잎 길이와 너비를 곱해서 면적을 계산하는 것처럼, 기존 컬럼들을 조합해서 새로운 의미 있는 데이터를 만들 수 있습니다.
 
     assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼'] = 값 방식도 가능하지만, Codaro에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다.
   tips:
-  - assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼'] = 값 방식도 가능하지만, Codaro에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다.
+  - assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼']
+    = 값 방식도 가능하지만, Codaro에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다.
   snippet: |-
     withArea = iris.assign(petalArea=iris['petal_length'] * iris['petal_width'])
     withArea.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 새 컬럼 추가 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       withArea = iris.assign(petalArea=iris['petal_length'] * iris['petal_width'])
       withArea.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 새 컬럼 추가 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 새 컬럼 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 새 컬럼 추가에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_groupby_area
   title: 8단계. 품종별 평균 면적
   structuredPrimary: true
   subtitle: 목표 달성!
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 품종별 평균 면적에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: 이제 품종별 평균 면적을 구할 수 있습니다! virginica가 가장 큽니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: withArea.groupby('species')['petalArea'].mean()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 품종별 평균 면적 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: withArea.groupby('species')['petalArea'].mean()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 품종별 평균 면적 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 품종별 평균 면적 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 품종별 평균 면적에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_5_filter_species
   title: 8.5단계. 조건 필터링 복습
   structuredPrimary: true
   subtitle: 특정 품종만 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8.5단계. 조건 필터링 복습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     이전에 배운 조건 필터링을 복습합니다. virginica 품종만 선택해서 꽃잎 면적의 통계를 확인해봅니다. DataFrame[조건] 형태로 필터링하는 방법은 이전 프로젝트(02번)에서 배웠습니다. 필터링 후 describe()로 통계를 보면 해당 품종의 분포를 상세히 파악할 수 있습니다.
 
@@ -221,139 +256,149 @@ sections:
     virginica = withArea[withArea['species'] == 'virginica']
     virginica['petalArea'].describe()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8.5단계. 조건 필터링 복습 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       virginica = withArea[withArea['species'] == 'virginica']
       virginica['petalArea'].describe()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8.5단계. 조건 필터링 복습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8.5단계. 조건 필터링 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8.5단계. 조건 필터링 복습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_apply
   title: 9단계. apply 기본
   structuredPrimary: true
   subtitle: 모든 값에 함수 적용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. apply 기본에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     apply() 메서드는 Series나 DataFrame의 모든 값에 특정 함수를 적용합니다. 복잡한 계산이나 변환이 필요할 때 매우 유용합니다. lambda는 이름 없는 익명 함수를 한 줄로 정의하는 방법으로, apply()와 자주 함께 사용됩니다. lambda x: x * 2는 "x를 받아서 x * 2를 반환하는 함수"라는 뜻입니다.
 
     lambda x: 표현식은 def 함수의 간단 버전입니다. 'lambda x: x * 2'는 'def double(x): return x * 2'와 같습니다. 간단한 변환에는 lambda가 편리하지만, 복잡한 로직에는 def로 함수를 정의하는 것이 좋습니다.
   tips:
-  - 'lambda x: 표현식은 def 함수의 간단 버전입니다. ''lambda x: x * 2''는 ''def double(x): return x * 2''와 같습니다. 간단한 변환에는 lambda가 편리하지만, 복잡한 로직에는 def로 함수를 정의하는 것이 좋습니다.'
+  - 'lambda x: 표현식은 def 함수의 간단 버전입니다. ''lambda x: x * 2''는 ''def double(x): return x * 2''와 같습니다. 간단한
+    변환에는 lambda가 편리하지만, 복잡한 로직에는 def로 함수를 정의하는 것이 좋습니다.'
   snippet: 'iris[''sepal_length''].apply(lambda x: x * 2).head()'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. apply 기본 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: 'iris[''sepal_length''].apply(lambda x: x * 2).head()'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. apply 기본 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. apply 기본 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. apply 기본에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_apply_condition
   title: 10단계. 조건 분류
   structuredPrimary: true
   subtitle: if-else 적용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 조건 분류에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: '''large'' if x > 3 else ''small''은 x가 3보다 크면 large, 아니면 small입니다.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: 'iris[''petal_length''].apply(lambda x: ''large'' if x > 3 else ''small'').value_counts()'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 조건 분류 예제에서 조건값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: 'iris[''petal_length''].apply(lambda x: ''large'' if x > 3 else ''small'').value_counts()'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 조건 분류 코드에서 먼저 조건값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 조건 분류 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 조건 분류에서 바꾼 조건값이 결과에 반영되어야 합니다.
 - id: step11_map
   title: 11단계. map 값 치환
   structuredPrimary: true
   subtitle: 딕셔너리로 변환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. map 값 치환에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     map() 메서드는 값을 다른 값으로 매핑(치환)합니다. 딕셔너리를 넣으면 키를 찾아서 대응하는 값으로 바꿔줍니다. 코드 값을 의미 있는 이름으로 바꾸거나, 영어를 한글로 변환하는 등 다양하게 활용할 수 있습니다. apply보다 간단하고 빠르게 값을 변환할 수 있습니다.
 
     map()과 apply()의 차이: map()은 딕셔너리나 Series로 1:1 매핑만 가능하지만 빠릅니다. apply()는 복잡한 로직도 처리할 수 있지만 느립니다. 단순 치환은 map(), 조건문/계산은 apply()를 사용하세요.
   tips:
-  - 'map()과 apply()의 차이: map()은 딕셔너리나 Series로 1:1 매핑만 가능하지만 빠릅니다. apply()는 복잡한 로직도 처리할 수 있지만 느립니다. 단순 치환은 map(), 조건문/계산은 apply()를 사용하세요.'
+  - 'map()과 apply()의 차이: map()은 딕셔너리나 Series로 1:1 매핑만 가능하지만 빠릅니다. apply()는 복잡한 로직도 처리할 수 있지만 느립니다. 단순
+    치환은 map(), 조건문/계산은 apply()를 사용하세요.'
   snippet: |-
     nameMap = {'setosa': '세토사', 'versicolor': '버시컬러', 'virginica': '버지니카'}
     iris['species'].map(nameMap).head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. map 값 치환 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       nameMap = {'setosa': '세토사', 'versicolor': '버시컬러', 'virginica': '버지니카'}
       iris['species'].map(nameMap).head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. map 값 치환 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. map 값 치환 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. map 값 치환에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step12_str_upper
   title: 12단계. 문자열 대문자
   structuredPrimary: true
   subtitle: str.upper()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: pandas에서 문자열 컬럼을 다룰 때는 .str 접근자를 사용합니다. .str을 붙이면 파이썬의 모든 문자열 메서드를 사용할 수 있습니다. upper()는 대문자로, lower()는 소문자로 변환합니다. 그 외에도 split(), replace(), strip() 등 다양한 문자열 처리 기능을 제공합니다.
+  goal: 12단계. 문자열 대문자에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
+  explanation: pandas에서 문자열 컬럼을 다룰 때는 .str 접근자를 사용합니다. .str을 붙이면 파이썬의 모든 문자열 메서드를 사용할 수 있습니다. upper()는
+    대문자로, lower()는 소문자로 변환합니다. 그 외에도 split(), replace(), strip() 등 다양한 문자열 처리 기능을 제공합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris['species'].str.upper().head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 문자열 대문자 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris['species'].str.upper().head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 문자열 대문자 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 문자열 대문자 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 문자열 대문자에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step13_str_contains
   title: 13단계. 포함 여부
   structuredPrimary: true
   subtitle: str.contains()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. 포함 여부에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: str.contains()는 특정 문자가 포함되어 있는지 True/False로 반환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris['species'].str.contains('a').value_counts()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 포함 여부 예제에서 리스트 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris['species'].str.contains('a').value_counts()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 포함 여부 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 포함 여부 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 포함 여부에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step14_duplicated
   title: 14단계. 중복 확인
   structuredPrimary: true
   subtitle: duplicated()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 14단계. 중복 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: duplicated()는 중복 행을 True로 표시합니다. sum()으로 개수를 셉니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: iris.duplicated().sum()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 14단계. 중복 확인 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: iris.duplicated().sum()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 14단계. 중복 확인 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 14단계. 중복 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 14단계. 중복 확인에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step15_drop_duplicates
   title: 15단계. 중복 제거
   structuredPrimary: true
   subtitle: drop_duplicates()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 15단계. 중복 제거에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: drop_duplicates()로 중복 행을 제거합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -361,21 +406,22 @@ sections:
     unique = iris.drop_duplicates()
     len(iris), len(unique)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 15단계. 중복 제거 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       unique = iris.drop_duplicates()
       len(iris), len(unique)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 15단계. 중복 제거 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 15단계. 중복 제거 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 15단계. 중복 제거에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼'
   structuredPrimary: true
   subtitle: 결측 처리, apply/map, 중복 제거, 실패 케이스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     데이터 정제는 값을 채우는 것보다 정제 전후 행 수와 파생 컬럼 의미를 검증하는 것이 중요합니다. 결측, 중복, 분류 컬럼을 한 흐름에서 확인하세요.
 
@@ -400,7 +446,7 @@ sections:
     assert iris["species_label"].tolist() == ["S", "V", "S"]
     assert len(unique) == 2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼 예제에서 열 이름이나 행 값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import pandas as pd
 
@@ -418,16 +464,17 @@ sections:
       assert iris["species_label"].tolist() == ["S", "V", "S"]
       assert len(unique) == 2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.'
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 붓꽃 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터 처리는 리포트, 정산, 운영 지표 자동화의 기본 흐름입니다.
   explanation: |-
     배운 내용으로 붓꽃 데이터를 분석해봅시다.
 
@@ -440,17 +487,18 @@ sections:
 
     data = loadLocalDataset("iris")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 행/열 수와 요약값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
 
       data = loadLocalDataset("iris")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 행/열 수와 요약값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:

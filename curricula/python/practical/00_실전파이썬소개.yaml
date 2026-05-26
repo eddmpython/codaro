@@ -8,35 +8,36 @@ meta:
   - 앱
   - 자동화
 intro:
-  direction: 실전파이썬 소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: 실전파이썬 소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
   benefits:
-  - 실전파이썬 소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 추가 패키지 없이 로컬 Python에서 바로 실행하고, 첫 실행에서 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 실전파이썬 소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: 표준 라이브러리 또는 기본 Python 실행 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: 실전파이썬이란? 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 왜 실전파이썬인가? 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 왜 Codaro 로컬 셀인가? 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 실전파이썬 소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: 표준 라이브러리 확인 -> cell-call -> assert 검증
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 업무 코드 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 실전파이썬 소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 실전파이썬 소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: concept
   title: 실전파이썬이란?
   subtitle: 학습과 실용을 동시에
   blocks:
   - type: text
-    content: 실전파이썬은 실제 업무에서 마주치는 반복 작업을 Python으로 자동화하는 프로젝트 모음입니다. 각 프로젝트는 두 가지를 제공합니다. 첫째, 바로 실행할 수 있는 Codaro 로컬 도구. 둘째, 그 도구를 어떻게 만드는지 배우는 학습 콘텐츠. 도구가 필요하면 앱을 쓰고, 원리가 궁금하면 학습 페이지에서 배우세요.
+    content: 실전파이썬은 실제 업무에서 마주치는 반복 작업을 Python으로 자동화하는 프로젝트 모음입니다. 각 프로젝트는 두 가지를 제공합니다. 첫째, 바로 실행할 수 있는
+      Codaro 로컬 도구. 둘째, 그 도구를 어떻게 만드는지 배우는 학습 콘텐츠. 도구가 필요하면 앱을 쓰고, 원리가 궁금하면 학습 페이지에서 배우세요.
   - type: compare
     left:
       icon: 🎓
@@ -61,7 +62,8 @@ sections:
   subtitle: 학습과 실용의 연결
   blocks:
   - type: text
-    content: 많은 Python 강의가 문법과 개념에 집중합니다. 리스트, 딕셔너리, 함수를 배우지만 '그래서 뭘 만들지?'라는 질문에 답하기 어렵습니다. 실전파이썬은 반대로 접근합니다. 먼저 실제로 유용한 도구를 보여주고, 그 도구를 만드는 과정에서 필요한 개념을 자연스럽게 배웁니다.
+    content: 많은 Python 강의가 문법과 개념에 집중합니다. 리스트, 딕셔너리, 함수를 배우지만 '그래서 뭘 만들지?'라는 질문에 답하기 어렵습니다. 실전파이썬은 반대로
+      접근합니다. 먼저 실제로 유용한 도구를 보여주고, 그 도구를 만드는 과정에서 필요한 개념을 자연스럽게 배웁니다.
   - type: featureCards
     cards:
     - emoji: 🎯
@@ -78,7 +80,8 @@ sections:
   subtitle: 로컬에서 실행되는 Python
   blocks:
   - type: text
-    content: Codaro는 로컬 Python을 기반으로 하는 반응형 노트북입니다. Jupyter와 비슷하지만 순수 Python 파일로 저장해 Git 관리가 쉽고, 셀 간 의존성을 추적해 값이 바뀌면 관련 셀을 다시 실행할 수 있습니다.
+    content: Codaro는 로컬 Python을 기반으로 하는 반응형 노트북입니다. Jupyter와 비슷하지만 순수 Python 파일로 저장해 Git 관리가 쉽고, 셀 간 의존성을
+      추적해 값이 바뀌면 관련 셀을 다시 실행할 수 있습니다.
   - type: featureCards
     cards:
     - emoji: 🌐
@@ -92,13 +95,15 @@ sections:
       description: .py 파일로 저장. Git diff가 깔끔하고 코드 리뷰가 가능
   - type: note
     title: Codaro 로컬 Python 환경의 특징
-    content: Codaro 로컬 Python는 사용자의 작업공간에서 Python을 실행합니다. glob, pathlib, 로컬 파일 읽기/쓰기, 패키지 설치, 네트워크 요청, 데이터 처리, 시각화를 모두 로컬 기준으로 실습할 수 있습니다.
+    content: Codaro 로컬 Python는 사용자의 작업공간에서 Python을 실행합니다. glob, pathlib, 로컬 파일 읽기/쓰기, 패키지 설치, 네트워크 요청,
+      데이터 처리, 시각화를 모두 로컬 기준으로 실습할 수 있습니다.
 - id: tools
   title: 제공하는 도구들
   subtitle: 실무에서 바로 사용하세요
   blocks:
   - type: text
-    content: 실전파이썬은 파일 처리, 데이터 변환, 텍스트 처리 등 다양한 분야의 도구를 제공합니다. 각 도구는 실제 업무에서 자주 마주치는 반복 작업을 자동화합니다. 아래는 현재 제공 중이거나 준비 중인 도구 목록입니다.
+    content: 실전파이썬은 파일 처리, 데이터 변환, 텍스트 처리 등 다양한 분야의 도구를 제공합니다. 각 도구는 실제 업무에서 자주 마주치는 반복 작업을 자동화합니다. 아래는
+      현재 제공 중이거나 준비 중인 도구 목록입니다.
   - type: featureCards
     cards:
     - emoji: 📊
@@ -118,7 +123,8 @@ sections:
   subtitle: 두 가지 경로
   blocks:
   - type: text
-    content: 실전파이썬은 두 가지 방식으로 사용할 수 있습니다. 도구가 당장 필요하다면 Codaro 로컬 도구로 바로 이동하세요. 원리를 이해하고 싶거나 비슷한 도구를 직접 만들고 싶다면 학습 페이지를 먼저 살펴보세요.
+    content: 실전파이썬은 두 가지 방식으로 사용할 수 있습니다. 도구가 당장 필요하다면 Codaro 로컬 도구로 바로 이동하세요. 원리를 이해하고 싶거나 비슷한 도구를 직접
+      만들고 싶다면 학습 페이지를 먼저 살펴보세요.
   - type: compare
     left:
       icon: 🚀
@@ -142,9 +148,10 @@ sections:
   title: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제 학습으로 이어집니다.
+  goal: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 입문 과정도 소개에서 끝나면 안 됩니다. 아주 작은 업무 규칙을 함수로 만들고, 잘못된 입력을 먼저 실패시킨 뒤, 예상 결과를 assert로 고정해야 실제
+    학습으로 이어집니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -171,7 +178,7 @@ sections:
     assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
     task
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       def normalizeTask(rawTask):
           title = rawTask.get('title', '').strip()
@@ -196,7 +203,8 @@ sections:
       assert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}
       task
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 작은 업무 규칙을 Python으로 고정하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'

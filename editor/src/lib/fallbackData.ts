@@ -11,11 +11,6 @@ import type {
 } from "@/types";
 
 export const categoryMeta: Record<string, { title: string; subtitle: string; track: string }> = {
-  main: {
-    title: "파이썬 시작",
-    subtitle: "Codaro에서 바로 시작하는 짧은 파이썬 입문 경로입니다.",
-    track: "Python 기초",
-  },
   "30days": {
     title: "파이썬 기초",
     subtitle: "값, 흐름, 컬렉션, 파일, 작은 도구를 차례로 익히는 첫 경로입니다.",
@@ -222,7 +217,7 @@ export const fallbackDocument: CodaroDocument = {
       id: "intro",
       type: "markdown",
       content:
-        "# 값을 보이게 만들기\n\nCodaro 레슨은 실행 가능한 작은 생각에서 시작합니다. 출력을 예측하고, 셀을 실행한 뒤, 값 하나를 바꿔 다시 실행해보세요.",
+        "# 값을 보이게 만들기\n\nCodaro 레슨은 실행 가능한 작은 생각에서 시작합니다. 출력할 이름과 메시지를 정한 뒤 셀을 실행해 결과를 확인하세요.",
     },
     {
       id: "concept",

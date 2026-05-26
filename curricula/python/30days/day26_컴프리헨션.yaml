@@ -25,13 +25,35 @@ intro:
   - 딕셔너리 컴프리헨션으로 변환
   - 집합 컴프리헨션으로 중복 제거
   - 중첩 컴프리헨션으로 다차원 처리
+  direction: 컴프리헨션에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 컴프리헨션 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 리스트 컴프리헨션 기초 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 조건부 컴프리헨션 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 고급 리스트 컴프리헨션 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 컴프리헨션 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 컴프리헨션 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 컴프리헨션 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: list_comprehension_basic
   title: 리스트 컴프리헨션 기초
   structuredPrimary: true
   subtitle: 간결한 리스트 생성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 리스트 컴프리헨션 기초에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     리스트 컴프리헨션은 for 반복문을 한 줄로 압축하여 새로운 리스트를 만드는 방법입니다. [표현식 for 변수 in 시퀀스] 형태로 작성하며, 기존 반복문보다 간결하고 읽기 쉬운 코드를 만들 수 있습니다. 파이썬스러운 코드 작성의 핵심 기법입니다.
 
@@ -43,22 +65,23 @@ sections:
     squared = [x ** 2 for x in nums]
     squared
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 리스트 컴프리헨션 기초 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       nums = [1, 2, 3, 4, 5]
       squared = [x ** 2 for x in nums]
       squared
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 리스트 컴프리헨션 기초 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 리스트 컴프리헨션 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 리스트 컴프리헨션 기초에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: list_comprehension_condition
   title: 조건부 컴프리헨션
   structuredPrimary: true
   subtitle: 필터링과 조건문
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 조건부 컴프리헨션에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     리스트 컴프리헨션에 if 조건을 추가하여 특정 요소만 선택할 수 있습니다. [표현식 for 변수 in 시퀀스 if 조건] 형태로 작성하며, 조건을 만족하는 요소만 결과에 포함됩니다. 필터링과 변환을 동시에 수행할 수 있어 매우 강력합니다.
 
@@ -70,22 +93,23 @@ sections:
     evens = [n for n in range10 if n % 2 == 0]
     evens
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 조건부 컴프리헨션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       range10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       evens = [n for n in range10 if n % 2 == 0]
       evens
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 조건부 컴프리헨션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 조건부 컴프리헨션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 조건부 컴프리헨션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: list_comprehension_advanced
   title: 고급 리스트 컴프리헨션
   structuredPrimary: true
   subtitle: 복잡한 표현식과 다중 조건
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 고급 리스트 컴프리헨션에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     리스트 컴프리헨션은 복잡한 표현식, if-else 구문, 다중 조건을 모두 지원합니다. 삼항 연산자를 활용하거나 여러 조건을 and/or로 연결할 수 있습니다. 다만 너무 복잡해지면 일반 반복문이 더 읽기 쉬울 수 있습니다.
 
@@ -97,22 +121,23 @@ sections:
     result = [x if x % 2 == 1 else x * 2 for x in data]
     result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 고급 리스트 컴프리헨션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       data = [1, 2, 3, 4, 5]
       result = [x if x % 2 == 1 else x * 2 for x in data]
       result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 고급 리스트 컴프리헨션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 고급 리스트 컴프리헨션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 고급 리스트 컴프리헨션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: dict_comprehension
   title: 딕셔너리 컴프리헨션
   structuredPrimary: true
   subtitle: 딕셔너리 생성과 변환
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 딕셔너리 컴프리헨션에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     딕셔너리 컴프리헨션은 리스트 컴프리헨션과 비슷하지만 중괄호를 사용하고 key: value 쌍을 생성합니다. {key: value for 변수 in 시퀀스} 형태로 작성하며, 기존 데이터를 딕셔너리로 변환하거나 딕셔너리를 필터링할 때 유용합니다.
 
@@ -123,21 +148,22 @@ sections:
     squares = {n: n ** 2 for n in range(5)}
     squares
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 딕셔너리 컴프리헨션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       squares = {n: n ** 2 for n in range(5)}
       squares
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 딕셔너리 컴프리헨션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 딕셔너리 컴프리헨션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 딕셔너리 컴프리헨션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: set_comprehension
   title: 집합 컴프리헨션
   structuredPrimary: true
   subtitle: 중복 없는 집합 생성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 집합 컴프리헨션에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     집합 컴프리헨션은 중괄호를 사용하지만 key: value가 아닌 단일 값만 생성합니다. {표현식 for 변수 in 시퀀스} 형태로 작성하며, 자동으로 중복이 제거된 집합을 만듭니다. 유일한 값만 필요할 때 매우 유용합니다.
 
@@ -149,22 +175,23 @@ sections:
     unique = {n for n in digits}
     unique
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 집합 컴프리헨션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       digits = [1, 2, 2, 3, 3, 3, 4, 4, 5]
       unique = {n for n in digits}
       unique
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 집합 컴프리헨션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 집합 컴프리헨션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 집합 컴프리헨션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: nested_comprehension
   title: 중첩 컴프리헨션
   structuredPrimary: true
   subtitle: 다차원 데이터 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 중첩 컴프리헨션에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     중첩 컴프리헨션은 여러 개의 for 문을 하나의 컴프리헨션에 작성하는 것입니다. 2차원 리스트를 평탄화하거나, 중첩 반복문을 간결하게 표현할 때 사용합니다. 다만 너무 복잡하면 가독성이 떨어지므로 2중 정도까지만 사용하는 것이 좋습니다.
 
@@ -176,22 +203,23 @@ sections:
     flat = [num for row in matrix for num in row]
     flat
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 중첩 컴프리헨션 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
       flat = [num for row in matrix for num in row]
       flat
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 중첩 컴프리헨션 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 중첩 컴프리헨션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 중첩 컴프리헨션에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: comprehension_practice
   title: 컴프리헨션 실전
   structuredPrimary: true
   subtitle: 실용적인 활용 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 컴프리헨션 실전에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     컴프리헨션은 데이터 변환, 필터링, 집계 등 다양한 실무 작업을 간결하게 처리할 수 있습니다. 리스트 처리, 딕셔너리 변환, 데이터 정제 등에서 자주 사용되는 패턴을 익히면 효율적인 코드를 작성할 수 있습니다.
 
@@ -203,23 +231,25 @@ sections:
     trimmed = [d.strip().lower() for d in rawData]
     trimmed
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 컴프리헨션 실전 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rawData = ['  Apple  ', '  BANANA  ', '  Cherry  ']
       trimmed = [d.strip().lower() for d in rawData]
       trimmed
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 컴프리헨션 실전 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 컴프리헨션 실전 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 컴프리헨션 실전에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기'
   structuredPrimary: true
   subtitle: 예측 → 변환 → 필터링 → 오류 확인 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 컴프리헨션은 짧게 쓰는 문법이 아니라, 입력 데이터에서 필요한 행을 고르고 같은 규칙으로 변환할 때 강력합니다. 다만 검증 로직이 복잡해지면 작은 함수와 함께 써야 흐름이 읽힙니다.
+  goal: '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 컴프리헨션은 짧게 쓰는 문법이 아니라, 입력 데이터에서 필요한 행을 고르고 같은 규칙으로 변환할 때 강력합니다. 다만 검증 로직이 복잡해지면 작은 함수와 함께
+    써야 흐름이 읽힙니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -264,7 +294,7 @@ sections:
 
     print("컴프리헨션 정제 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       rawRows = [
           {"id": " A-100 ", "status": " PAID ", "amount": "50,000", "customer": "kim"},
@@ -307,16 +337,17 @@ sections:
 
       print("컴프리헨션 정제 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 26 종합 복습
   structuredPrimary: true
   subtitle: 컴프리헨션 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Day 26 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: Day 26에서 배운 컴프리헨션을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -325,13 +356,14 @@ sections:
     doubled = [n * 2 for n in baseNums]
     doubled
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 26 종합 복습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       baseNums = [1, 2, 3, 4, 5]
       doubled = [n * 2 for n in baseNums]
       doubled
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 26 종합 복습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 26 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 26 종합 복습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

@@ -32,14 +32,37 @@ meta:
 intro:
   emoji: 🩺
   goal: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 분석합니다.
-  description: Pima 인디언 당뇨병 데이터셋으로 지금까지 배운 모든 NumPy 개념을 종합 활용합니다. 배열 생성, 인덱싱, 통계, 선형대수, 결측값 처리, 상관분석을 모두 다룹니다.
+  description: Pima 인디언 당뇨병 데이터셋으로 지금까지 배운 모든 NumPy 개념을 종합 활용합니다. 배열 생성, 인덱싱, 통계, 선형대수, 결측값 처리, 상관분석을
+    모두 다룹니다.
+  direction: 당뇨병종합분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - 당뇨병종합분석 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 배열 추출 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: 당뇨병종합분석 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 당뇨병종합분석 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 당뇨병종합분석 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -47,22 +70,24 @@ sections:
     import numpy as np
     import pandas as pd
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: 당뇨병 데이터셋
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다. Glucose(혈당), BloodPressure(혈압), BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다.
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다.
+    Glucose(혈당), BloodPressure(혈압), BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -71,23 +96,24 @@ sections:
     df = loadLocalDataset("diabetes")
     df.head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from codaro.curriculum.localData import loadLocalDataset
 
       df = loadLocalDataset("diabetes")
       df.head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_extract
   title: 3단계. 배열 추출
   structuredPrimary: true
   subtitle: 전체 특성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 모든 특성과 타겟을 NumPy 배열로 추출합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -97,24 +123,26 @@ sections:
     y = df['Outcome'].values
     X.shape, y.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 배열 추출 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
       X = df[cols].values
       y = df['Outcome'].values
       X.shape, y.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 배열 추출 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 배열 추출 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 배열 추출에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_zero_check
   title: 4단계. 결측값 확인
   structuredPrimary: true
   subtitle: 0값 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은 생물학적으로 불가능합니다. 살아있는 사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다.
+  goal: 4단계. 결측값 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은
+    생물학적으로 불가능합니다. 살아있는 사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -122,22 +150,23 @@ sections:
     ratio = zeros / len(X) * 100
     pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 결측값 확인 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       zeros = np.sum(X == 0, axis=0)
       ratio = zeros / len(X) * 100
       pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 결측값 확인 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 결측값 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 결측값 확인에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step5_replace_nan
   title: 5단계. 0을 NaN으로
   structuredPrimary: true
   subtitle: np.where()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 0을 NaN으로에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: Glucose, BloodPressure, SkinThickness, Insulin, BMI의 0값은 결측값이므로 NaN으로 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -148,7 +177,7 @@ sections:
         clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
     np.sum(np.isnan(clean), axis=0)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 0을 NaN으로 예제에서 반복 대상이나 범위을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       idx = [1, 2, 3, 4, 5]
       clean = X.astype(float).copy()
@@ -156,16 +185,17 @@ sections:
           clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
       np.sum(np.isnan(clean), axis=0)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 0을 NaN으로 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 0을 NaN으로 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 0을 NaN으로에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_impute
   title: 6단계. 결측값 대체
   structuredPrimary: true
   subtitle: nanmean
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 결측값 대체에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 결측값을 각 컬럼의 평균으로 대체합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -176,7 +206,7 @@ sections:
     clean[mask] = avg[ci]
     np.sum(np.isnan(clean))
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 결측값 대체 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       avg = np.nanmean(clean, axis=0)
       mask = np.isnan(clean)
@@ -184,16 +214,17 @@ sections:
       clean[mask] = avg[ci]
       np.sum(np.isnan(clean))
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 결측값 대체 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 결측값 대체 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 결측값 대체에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_histogram
   title: 7단계. 히스토그램
   structuredPrimary: true
   subtitle: np.histogram()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 히스토그램에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다.
 
@@ -205,22 +236,23 @@ sections:
     hist, edges = np.histogram(glucose, bins=10)
     pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 히스토그램 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       glucose = clean[:, 1]
       hist, edges = np.histogram(glucose, bins=10)
       pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 히스토그램 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 히스토그램 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 히스토그램에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step8_bincount
   title: 8단계. 빈도 계산
   structuredPrimary: true
   subtitle: np.bincount()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 빈도 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다.
 
@@ -231,21 +263,22 @@ sections:
     counts = np.bincount(y)
     f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 빈도 계산 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       counts = np.bincount(y)
       f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 빈도 계산 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 빈도 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 빈도 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_cov
   title: 9단계. 공분산 행렬
   structuredPrimary: true
   subtitle: np.cov()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 공분산 행렬에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다.
 
@@ -256,21 +289,22 @@ sections:
     cov = np.cov(clean.T)
     cov.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 공분산 행렬 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cov = np.cov(clean.T)
       cov.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 공분산 행렬 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 공분산 행렬 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 공분산 행렬에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_corr_target
   title: 10단계. 타겟 상관관계
   structuredPrimary: true
   subtitle: corrcoef
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 타겟 상관관계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 각 특성과 당뇨병 유무의 상관계수를 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -283,7 +317,7 @@ sections:
     result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
     result.sort_values('Correlation', ascending=False)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 타겟 상관관계 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       corrs = []
       for i in range(clean.shape[1]):
@@ -293,16 +327,17 @@ sections:
       result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
       result.sort_values('Correlation', ascending=False)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 타겟 상관관계 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 타겟 상관관계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 타겟 상관관계에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step11_group_stats
   title: 11단계. 그룹별 통계
   structuredPrimary: true
   subtitle: 당뇨/비당뇨
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 그룹별 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 당뇨병 유무에 따른 각 특성의 평균을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -319,7 +354,7 @@ sections:
         'Diff(%)': diff.round(1)
     })
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 그룹별 통계 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sick = y == 1
       well = y == 0
@@ -333,16 +368,17 @@ sections:
           'Diff(%)': diff.round(1)
       })
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 그룹별 통계 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 그룹별 통계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 그룹별 통계에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step12_standardize
   title: 12단계. 표준화
   structuredPrimary: true
   subtitle: Z-score
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. 표준화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: 모든 특성을 Z-score로 표준화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -352,23 +388,24 @@ sections:
     z = (clean - mu) / sigma
     f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 표준화 예제에서 입력값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       mu = np.mean(clean, axis=0)
       sigma = np.std(clean, axis=0)
       z = (clean - mu) / sigma
       f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 표준화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 표준화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 표준화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step13_eig
   title: 13단계. 고유값 분해
   structuredPrimary: true
   subtitle: np.linalg.eig()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. 고유값 분해에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다.
 
@@ -383,7 +420,7 @@ sections:
     var = eig / np.sum(eig) * 100
     pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. 고유값 분해 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       c = np.cov(z.T)
       eig, vec = np.linalg.eig(c)
@@ -392,16 +429,17 @@ sections:
       var = eig / np.sum(eig) * 100
       pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. 고유값 분해 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. 고유값 분해 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. 고유값 분해에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step14_apply_along
   title: 14단계. 축 따라 적용
   structuredPrimary: true
   subtitle: np.apply_along_axis()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 14단계. 축 따라 적용에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다.
 
@@ -415,7 +453,7 @@ sections:
     vals = np.apply_along_axis(iqr, axis=0, arr=clean)
     pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 14단계. 축 따라 적용 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def iqr(x):
           return np.percentile(x, 75) - np.percentile(x, 25)
@@ -423,17 +461,19 @@ sections:
       vals = np.apply_along_axis(iqr, axis=0, arr=clean)
       pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 14단계. 축 따라 적용 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 14단계. 축 따라 적용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 14단계. 축 따라 적용에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step15_risk_score
   title: 15단계. 위험 점수 계산
   structuredPrimary: true
   subtitle: 종합 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가 높은 특성일수록 가중치가 크고, 그 특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다.
+  goal: 15단계. 위험 점수 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가
+    높은 특성일수록 가중치가 크고, 그 특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -452,7 +492,7 @@ sections:
         ]
     }).round(1)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 15단계. 위험 점수 계산 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       w = np.abs(corrs) / np.sum(np.abs(corrs))
       score = np.sum(z * w, axis=1)
@@ -469,16 +509,17 @@ sections:
           ]
       }).round(1)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 15단계. 위험 점수 계산 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 15단계. 위험 점수 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 15단계. 위험 점수 계산에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 당뇨 위험 점수 파이프라인'
   structuredPrimary: true
   subtitle: 표준화, 공분산, 히스토그램, 위험군 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 당뇨 위험 점수 파이프라인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     종합 분석은 여러 NumPy 기능을 이어 붙이는 만큼 중간 산출물을 검증해야 합니다. 표준화 평균, 위험 점수 shape, 구간별 환자 수를 단계별로 확인하세요.
 
@@ -508,7 +549,7 @@ sections:
     assert counts.sum() == len(y)
     assert covariance.shape == (3, 3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 당뇨 위험 점수 파이프라인 예제에서 리스트 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import numpy as np
 
@@ -531,16 +572,17 @@ sections:
       assert counts.sum() == len(y)
       assert covariance.shape == (3, 3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 당뇨 위험 점수 파이프라인 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 당뇨 위험 점수 파이프라인 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 당뇨 위험 점수 파이프라인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 당뇨병 종합 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -571,7 +613,7 @@ sections:
     glucose = data['Glucose'].values
     bmi = data['BMI'].values
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, shape와 수치 결과 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import numpy as np
       import pandas as pd
@@ -596,7 +638,8 @@ sections:
       glucose = data['Glucose'].values
       bmi = data['BMI'].values
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 shape와 수치 결과 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.

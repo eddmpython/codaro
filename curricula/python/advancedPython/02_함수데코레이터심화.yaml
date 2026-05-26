@@ -26,13 +26,35 @@ intro:
   - 인자를 받는 데코레이터 구현
   - 다중 데코레이터의 실행 순서
   - functools.wraps로 메타데이터 보존
+  direction: 함수 데코레이터 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 함수 데코레이터 심화 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데코레이터 복습 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 인자 있는 데코레이터 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 다중 데코레이터 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 함수 데코레이터 심화 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 함수 데코레이터 심화 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 함수 데코레이터 심화 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: decorator_review
   title: 데코레이터 복습
   structuredPrimary: true
   subtitle: 기본 패턴 이해
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 데코레이터 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     데코레이터는 함수를 인자로 받아 새로운 함수를 반환하는 고차 함수입니다. @decorator 문법은 func = decorator(func)의 문법적 설탕(syntactic sugar)입니다. 데코레이터는 원본 함수를 감싸는 wrapper 함수를 만들어 원본 함수 호출 전후에 추가 동작을 수행합니다. 이 패턴으로 로깅, 인증, 캐싱, 타이밍 측정 등 다양한 횡단 관심사(cross-cutting concerns)를 구현할 수 있습니다. 데코레이터는 함수를 수정하지 않고 기능을 확장하는 개방-폐쇄 원칙(OCP)의 좋은 예입니다.
 
@@ -52,7 +74,7 @@ sections:
 
     greet("Python")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 데코레이터 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def simpleDecorator(func):
           def wrapper(*args, **kwargs):
@@ -66,16 +88,17 @@ sections:
 
       greet("Python")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 데코레이터 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 데코레이터 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 데코레이터 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: parameterized
   title: 인자 있는 데코레이터
   structuredPrimary: true
   subtitle: 데코레이터 팩토리 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 인자 있는 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     인자를 받는 데코레이터는 3중 중첩 함수 구조로 구현합니다. 가장 바깥 함수가 데코레이터 인자를 받고, 중간 함수가 실제 데코레이터(함수를 받음), 가장 안쪽 함수가 wrapper입니다. @decorator(arg)는 decorator(arg)를 먼저 호출하여 실제 데코레이터를 얻고, 그 데코레이터가 함수에 적용됩니다. 이 패턴을 '데코레이터 팩토리'라고 부릅니다. 데코레이터에 설정값을 전달하거나 동작을 커스터마이징할 때 사용합니다.
 
@@ -99,7 +122,7 @@ sections:
 
     sayHello()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 인자 있는 데코레이터 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def repeat(times):
           def decorator(func):
@@ -117,16 +140,17 @@ sections:
 
       sayHello()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 인자 있는 데코레이터 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 인자 있는 데코레이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 인자 있는 데코레이터에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: multiple_decorators
   title: 다중 데코레이터
   structuredPrimary: true
   subtitle: 데코레이터 스택
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 다중 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     하나의 함수에 여러 데코레이터를 적용할 수 있습니다. 데코레이터는 아래에서 위로 적용되고, 호출은 위에서 아래로 진행됩니다. @A @B @C def func()는 A(B(C(func)))와 같습니다. 즉 C가 먼저 func를 감싸고, B가 그 결과를 감싸고, A가 최종적으로 감쌉니다. 실행 시에는 A의 wrapper가 먼저 시작하고, 그 안에서 B의 wrapper, 그 안에서 C의 wrapper가 호출됩니다. 이 순서를 이해하는 것이 다중 데코레이터를 올바르게 사용하는 핵심입니다.
 
@@ -161,7 +185,7 @@ sections:
     testFunc()
     executionOrder
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 다중 데코레이터 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       executionOrder = []
 
@@ -190,16 +214,17 @@ sections:
       testFunc()
       executionOrder
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 다중 데코레이터 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 다중 데코레이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 다중 데코레이터에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: functools_wraps
   title: functools.wraps
   structuredPrimary: true
   subtitle: 메타데이터 보존
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: functools.wraps에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     데코레이터로 함수를 감싸면 원본 함수의 __name__, __doc__, __annotations__ 등의 메타데이터가 wrapper 함수의 것으로 덮어씌워집니다. 이는 디버깅, 문서화, 인트로스펙션에서 문제가 됩니다. functools.wraps 데코레이터를 wrapper 함수에 적용하면 원본 함수의 메타데이터를 wrapper로 복사합니다. 이것은 데코레이터를 작성할 때 반드시 적용해야 하는 모범 사례입니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 해줍니다.
 
@@ -219,7 +244,7 @@ sections:
 
     originalFunc.__name__, originalFunc.__doc__
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: functools.wraps 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def badDecorator(func):
           def wrapper(*args, **kwargs):
@@ -233,16 +258,17 @@ sections:
 
       originalFunc.__name__, originalFunc.__doc__
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - functools.wraps 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: functools.wraps 코드가 예외 없이 끝나야 합니다.
+    resultCheck: functools.wraps에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: class_decorator
   title: 클래스 데코레이터
   structuredPrimary: true
   subtitle: 클래스를 수정하는 데코레이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 클래스 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     데코레이터는 함수뿐만 아니라 클래스에도 적용할 수 있습니다. 클래스 데코레이터는 클래스를 인자로 받아 수정된 클래스나 새로운 클래스를 반환합니다. 클래스에 메서드를 추가하거나, 속성을 수정하거나, 클래스를 래핑하는 등의 작업을 할 수 있습니다. @dataclass, @total_ordering 같은 표준 라이브러리 데코레이터가 클래스 데코레이터의 예입니다. 메타클래스보다 간단하고 직관적인 방법으로 클래스를 수정할 수 있습니다.
 
@@ -266,7 +292,7 @@ sections:
     p = Person("Alice", 30)
     repr(p)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 클래스 데코레이터 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def addRepr(cls):
           def customRepr(self):
@@ -284,16 +310,17 @@ sections:
       p = Person("Alice", 30)
       repr(p)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 클래스 데코레이터 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 클래스 데코레이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 클래스 데코레이터에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: method_decorator
   title: 메서드 데코레이터
   structuredPrimary: true
   subtitle: self 처리하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 메서드 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     클래스의 메서드에 데코레이터를 적용할 때는 self 인자를 올바르게 처리해야 합니다. 일반 함수 데코레이터와 동일하게 *args, **kwargs를 사용하면 self도 자동으로 전달됩니다. 그러나 self에 접근해야 하는 경우에는 첫 번째 인자를 명시적으로 self로 받을 수 있습니다. classmethod나 staticmethod와 함께 사용할 때는 데코레이터 순서에 주의해야 합니다. 일반적으로 @classmethod나 @staticmethod가 가장 안쪽(함수에 가장 가깝게)에 위치해야 합니다.
 
@@ -318,7 +345,7 @@ sections:
     calc = Calculator()
     calc.add(3, 5)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 메서드 데코레이터 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from functools import wraps
 
@@ -337,16 +364,17 @@ sections:
       calc = Calculator()
       calc.add(3, 5)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 메서드 데코레이터 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 메서드 데코레이터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 메서드 데코레이터에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기'
   structuredPrimary: true
   subtitle: 예측 → 래핑 → 오류 확인 → 메타데이터 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     데코레이터는 반복되는 운영 규칙을 함수 바깥으로 분리하는 도구입니다. 권한 확인, 감사 로그, 입력 검증처럼 여러 함수에 공통으로 붙는 규칙을 한 번에 검증합니다.
 
@@ -413,7 +441,7 @@ sections:
 
     print("데코레이터 운영 규칙 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from functools import wraps
 
@@ -473,17 +501,21 @@ sections:
 
       print("데코레이터 운영 규칙 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 데코레이터 심화 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 2에서 배운 데코레이터 심화 내용을 난이도별로 복습합니다. 데코레이터는 함수나 클래스의 동작을 수정하는 강력한 메타프로그래밍 도구입니다. 기본 데코레이터부터 인자를 받는 데코레이터, 클래스 데코레이터까지 단계별로 학습했습니다. 🟢 기본 문제로 래퍼 함수 작성법을 익히고, 🟡 응용 문제로 functools.wraps와 다중 데코레이터를 연습하세요. 🔴 심화 문제에서는 메모이제이션, 검증, 로깅 등 실무 패턴을 직접 구현해봅니다. 프레임워크와 라이브러리에서 데코레이터는 핵심 API이므로 완벽히 이해해두면 코드 품질이 크게 향상됩니다.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 2에서 배운 데코레이터 심화 내용을 난이도별로 복습합니다. 데코레이터는 함수나 클래스의 동작을 수정하는 강력한 메타프로그래밍 도구입니다. 기본 데코레이터부터
+    인자를 받는 데코레이터, 클래스 데코레이터까지 단계별로 학습했습니다. 🟢 기본 문제로 래퍼 함수 작성법을 익히고, 🟡 응용 문제로 functools.wraps와 다중 데코레이터를
+    연습하세요. 🔴 심화 문제에서는 메모이제이션, 검증, 로깅 등 실무 패턴을 직접 구현해봅니다. 프레임워크와 라이브러리에서 데코레이터는 핵심 API이므로 완벽히 이해해두면 코드
+    품질이 크게 향상됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -498,7 +530,7 @@ sections:
 
     getText()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def addBrackets(func):
           def wrapper(*args, **kwargs):
@@ -511,7 +543,8 @@ sections:
 
       getText()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

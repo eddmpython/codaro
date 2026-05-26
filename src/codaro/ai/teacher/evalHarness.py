@@ -156,7 +156,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedNoContractGaps=True,
         expectedLoadedInEditor=True,
         expectedRuntimePackages=("pandas",),
-        expectedDiagramRuntimeDetails=("uv 사전 확인", "검증 결과"),
+        expectedDiagramRuntimeDetails=("pandas 환경", "DataFrame 완료"),
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",

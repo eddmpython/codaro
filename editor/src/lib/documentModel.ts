@@ -2,7 +2,7 @@ import type { BlockConfig, CodaroDocument } from "@/types";
 
 export const starterDocument: CodaroDocument = {
   id: "new-notebook",
-  title: "새 노트북",
+  title: "새노트북.py",
   blocks: [
     {
       id: "cell-1",
@@ -27,16 +27,59 @@ export function draftsFromDocument(document: CodaroDocument) {
 
 export function draftsFromBlocks(
   blocks: BlockConfig[],
-  options: { emptySnippetDraft?: boolean; includeMarkdown?: boolean } = {},
+  options: { emptyDuplicateSnippetExerciseDraft?: boolean; emptySnippetDraft?: boolean; includeMarkdown?: boolean } = {},
 ) {
+  const duplicateExerciseBlockIds = options.emptyDuplicateSnippetExerciseDraft
+    ? duplicateSnippetExerciseBlockIds(blocks)
+    : new Set<string>();
+
   return Object.fromEntries(
     blocks
       .filter((block) => block.type === "code" || (options.includeMarkdown && block.type === "markdown"))
       .map((block) => [
         block.id,
-        options.emptySnippetDraft && block.role === "snippet" ? "" : block.content,
+        draftValueForBlock(block, options, duplicateExerciseBlockIds),
       ]),
   );
+}
+
+function draftValueForBlock(
+  block: BlockConfig,
+  options: { emptyDuplicateSnippetExerciseDraft?: boolean; emptySnippetDraft?: boolean },
+  duplicateExerciseBlockIds: Set<string>,
+) {
+  if (options.emptySnippetDraft && block.role === "snippet") return "";
+  if (
+    options.emptyDuplicateSnippetExerciseDraft
+    && duplicateExerciseBlockIds.has(block.id)
+  ) {
+    return "";
+  }
+  return block.content;
+}
+
+function duplicateSnippetExerciseBlockIds(blocks: BlockConfig[]) {
+  const result = new Set<string>();
+  let activeSnippetContent = "";
+  blocks.forEach((block) => {
+    if (block.sourceType === "section") {
+      activeSnippetContent = "";
+    }
+    if (block.type !== "code") return;
+    const content = normalizeDraftCode(block.content);
+    if (block.role === "snippet") {
+      activeSnippetContent = content;
+      return;
+    }
+    if (block.role === "exercise" && content && content === activeSnippetContent) {
+      result.add(block.id);
+    }
+  });
+  return result;
+}
+
+function normalizeDraftCode(value: string) {
+  return value.replace(/\r\n/g, "\n").trim();
 }
 
 export function appendUniqueBlocks(
@@ -151,5 +194,5 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function shouldUseGeneratedTitle(title: string) {
-  return title === "새 노트북" || title === "생성 노트북";
+  return title === "새 노트북" || title === "새노트북.py" || title === "생성 노트북";
 }

@@ -11,7 +11,6 @@ BASE_URL = "https://eddmpython.com"
 DEFAULT_OG_IMAGE = f"{BASE_URL}/assets/og/eddmpythonOg.png"
 
 categoryMapping = {
-    'main': 'Python 입문',
     '30days': '30일완성',
     'advancedPython': '고급파이썬',
     'builtins': '표준라이브러리',
@@ -38,12 +37,6 @@ categoryMapping = {
 }
 
 categoryMeta = {
-    'main': {
-        'icon': 'play_circle',
-        'color': 'emerald',
-        'description': 'Codaro 로컬 학습을 시작하는 짧은 Python 입문',
-        'imageUrl': None,
-    },
     '30days': {
         'icon': 'calendar_month',
         'color': 'blue',
@@ -186,7 +179,7 @@ categoryMeta = {
 
 categoryGroups = {
     '전체': None,
-    'Python 기초': ['main', '30days', 'advancedPython', 'builtins'],
+    'Python 기초': ['30days', 'advancedPython', 'builtins'],
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
@@ -200,7 +193,7 @@ learningPaths = {
     '초급': {
         'icon': 'school',
         'color': 'emerald',
-        'categories': ['main', '30days'],
+        'categories': ['30days'],
         'description': '프로그래밍이 처음이라면',
     },
     '중급': {
@@ -517,8 +510,6 @@ def getAllContentForSitemap() -> list:
     sitemapItems = []
 
     for category in getAllCategories():
-        if category == 'main':
-            continue
         contents = listContents(category)
 
         for contentId in contents:

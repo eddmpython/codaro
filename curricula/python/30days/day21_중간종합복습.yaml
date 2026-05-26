@@ -27,58 +27,85 @@ intro:
   - 자료구조와 제어문 통합
   - 함수와 모듈 실전 활용
   - 종합 실전 문제
+  direction: 중간 종합 복습에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 중간 종합 복습 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 자료구조 복습 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 제어문 복습 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: 함수 복습 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 중간 종합 복습 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 중간 종합 복습 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 중간 종합 복습 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: data_structures_review
   title: 자료구조 복습
   structuredPrimary: true
   subtitle: 문자열, 리스트, 튜플, 집합, 딕셔너리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 파이썬의 5가지 핵심 자료구조를 복습합니다. 문자열(str), 리스트(list), 튜플(tuple), 집합(set), 딕셔너리(dict)의 특징과 메서드를 다시 확인합니다.
+  goal: 자료구조 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 파이썬의 5가지 핵심 자료구조를 복습합니다. 문자열(str), 리스트(list), 튜플(tuple), 집합(set), 딕셔너리(dict)의 특징과 메서드를
+    다시 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     phrase = "Python Programming"
     phrase.lower().replace('p', 'J')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 자료구조 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       phrase = "Python Programming"
       phrase.lower().replace('p', 'J')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 자료구조 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 자료구조 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 자료구조 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: control_flow_review
   title: 제어문 복습
   structuredPrimary: true
   subtitle: 조건문과 반복문
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 조건문(if, elif, else)과 반복문(for, while)을 복습합니다. break, continue, else절을 활용하여 프로그램의 흐름을 제어할 수 있습니다.
+  goal: 제어문 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 조건문(if, elif, else)과 반복문(for, while)을 복습합니다. break, continue, else절을 활용하여 프로그램의 흐름을 제어할
+    수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     score = 85
     'A' if score >= 90 else 'B' if score >= 80 else 'C'
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 제어문 복습 예제에서 조건값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       score = 85
       'A' if score >= 90 else 'B' if score >= 80 else 'C'
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 제어문 복습 코드에서 먼저 조건값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 제어문 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 제어문 복습에서 바꾼 조건값이 결과에 반영되어야 합니다.
 - id: function_review
   title: 함수 복습
   structuredPrimary: true
   subtitle: def, return, 매개변수, 인자
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 함수의 정의(def), 반환(return), 매개변수와 인자를 복습합니다. 기본 매개변수, 키워드 인자, *args, **kwargs, lambda까지 다양한 함수 기법을 활용할 수 있습니다.
+  goal: 함수 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 함수의 정의(def), 반환(return), 매개변수와 인자를 복습합니다. 기본 매개변수, 키워드 인자, *args, **kwargs, lambda까지 다양한
+    함수 기법을 활용할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -87,24 +114,26 @@ sections:
 
     multiply(7, 8)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def multiply(a, b):
           return a * b
 
       multiply(7, 8)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: module_file_review
   title: 모듈과 파일 복습
   structuredPrimary: true
   subtitle: import, 파일 입출력
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 모듈 가져오기(import, from, as)와 파일 입출력(open, read, write, with)을 복습합니다. math, random, datetime 같은 표준 모듈을 활용할 수 있습니다.
+  goal: 모듈과 파일 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 모듈 가져오기(import, from, as)와 파일 입출력(open, read, write, with)을 복습합니다. math, random, datetime
+    같은 표준 모듈을 활용할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -114,7 +143,7 @@ sections:
     area = pi * radius ** 2
     area
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 모듈과 파일 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from math import sqrt, pi
 
@@ -122,16 +151,17 @@ sections:
       area = pi * radius ** 2
       area
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 모듈과 파일 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 모듈과 파일 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 모듈과 파일 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: exception_review
   title: 예외 처리 복습
   structuredPrimary: true
   subtitle: try, except, finally, raise
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 예외 처리 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 예외 처리를 통해 오류를 안전하게 처리하는 방법을 복습합니다. try, except, finally, raise를 활용하여 안정적인 프로그램을 작성할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -144,7 +174,7 @@ sections:
 
     safeDivide(10, 0)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 예외 처리 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def safeDivide(a, b):
           try:
@@ -154,16 +184,17 @@ sections:
 
       safeDivide(10, 0)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 예외 처리 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 예외 처리 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 예외 처리 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: integrated_practice
   title: 통합 실전 문제
   structuredPrimary: true
   subtitle: 여러 개념을 종합적으로 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 통합 실전 문제에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     여러 개념을 함께 활용하는 실전 문제들입니다. 자료구조, 제어문, 함수, 모듈을 통합적으로 사용하여 문제를 해결합니다.
 
@@ -178,7 +209,7 @@ sections:
         freq[word] = freq.get(word, 0) + 1
     freq
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 통합 실전 문제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sentence = "python is fun python is powerful"
       words = sentence.split()
@@ -187,17 +218,19 @@ sections:
           freq[word] = freq.get(word, 0) + 1
       freq
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 통합 실전 문제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 통합 실전 문제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 통합 실전 문제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 중간 복습에서는 문법을 따로따로 외우는 것보다, 작은 업무 흐름을 끝까지 통과시키는지가 중요합니다. 아래 코드는 문자열 정제, 딕셔너리 검증, 함수 분리, 반복문, 예외 처리, 파일 입출력을 한 번에 연결합니다.
+  goal: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: 중간 복습에서는 문법을 따로따로 외우는 것보다, 작은 업무 흐름을 끝까지 통과시키는지가 중요합니다. 아래 코드는 문자열 정제, 딕셔너리 검증, 함수 분리,
+    반복문, 예외 처리, 파일 입출력을 한 번에 연결합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -266,7 +299,7 @@ sections:
     assert "paidAmount=27000" in loadedReport
     print("중간 복습 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -333,29 +366,32 @@ sections:
       assert "paidAmount=27000" in loadedReport
       print("중간 복습 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 21 종합 복습
   structuredPrimary: true
   subtitle: 중간 점검 완전 정복
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 1~20까지 배운 모든 개념을 종합적으로 복습합니다. 🟢 기본 미션으로 핵심 개념을 확인하고, 🟡 응용 미션으로 활용 능력을 키우고, 🔴 심화 미션으로 통합 사고력을 키웁니다.
+  goal: Day 21 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  explanation: Day 1~20까지 배운 모든 개념을 종합적으로 복습합니다. 🟢 기본 미션으로 핵심 개념을 확인하고, 🟡 응용 미션으로 활용 능력을 키우고, 🔴 심화 미션으로
+    통합 사고력을 키웁니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     text = "  Hello World  "
     text.strip().upper()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 21 종합 복습 예제에서 입력값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       text = "  Hello World  "
       text.strip().upper()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 21 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 21 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 21 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

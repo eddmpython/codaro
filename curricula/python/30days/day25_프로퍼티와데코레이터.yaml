@@ -27,13 +27,35 @@ intro:
   - setter/deleter로 값 제어
   - '@staticmethod, @classmethod 활용'
   - 데코레이터로 기능 확장
+  direction: 프로퍼티와 데코레이터에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문제에 필요한 값 확인 후 문법 요소에 맞는 코드 입력을 고릅니다.
+  - 프로퍼티와 데코레이터 결과를 출력과 변수 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 반복 업무 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 프로퍼티 기초 입력 확인
+      detail: 입력 기준(문제에 필요한 값)과 필요한 조건을 먼저 고정합니다.
+    - label: setter와 deleter 처리 실행
+      detail: 문법 요소 코드를 실행해 중간 결과를 확인합니다.
+    - label: staticmethod 결과 검증
+      detail: 출력과 변수 상태 기준으로 실행 결과를 비교합니다.
+    - label: 프로퍼티와 데코레이터 재사용
+      detail: 완성 코드를 반복 업무 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 프로퍼티와 데코레이터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 프로퍼티와 데코레이터 완료
+      detail: 검증된 코드를 반복 업무 스크립트로 남깁니다.
 sections:
 - id: property_basic
   title: 프로퍼티 기초
   structuredPrimary: true
   subtitle: '@property 데코레이터'
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 프로퍼티 기초에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     프로퍼티는 메서드를 속성처럼 사용할 수 있게 해주는 기능입니다. @property 데코레이터를 메서드에 붙이면 obj.method() 대신 obj.method로 접근할 수 있습니다. 이를 통해 계산된 값을 속성처럼 제공하거나, 내부 속성에 대한 접근을 제어할 수 있습니다.
 
@@ -52,7 +74,7 @@ sections:
     cir = Circle(5)
     cir.area
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 프로퍼티 기초 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Circle:
           def __init__(self, radius):
@@ -65,16 +87,17 @@ sections:
       cir = Circle(5)
       cir.area
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 프로퍼티 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 프로퍼티 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 프로퍼티 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: setter_deleter
   title: setter와 deleter
   structuredPrimary: true
   subtitle: 값 설정과 삭제 제어
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: setter와 deleter에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     프로퍼티는 getter뿐만 아니라 setter와 deleter도 정의할 수 있습니다. @프로퍼티명.setter는 값을 설정할 때, @프로퍼티명.deleter는 값을 삭제할 때 호출됩니다. 이를 통해 값의 유효성 검사나 부가 작업을 수행할 수 있습니다.
 
@@ -101,7 +124,7 @@ sections:
     temp.celsius = -300
     temp.celsius
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: setter와 deleter 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Temperature:
           def __init__(self):
@@ -122,16 +145,17 @@ sections:
       temp.celsius = -300
       temp.celsius
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - setter와 deleter 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: setter와 deleter 코드가 예외 없이 끝나야 합니다.
+    resultCheck: setter와 deleter에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: staticmethod
   title: '@staticmethod'
   structuredPrimary: true
   subtitle: 정적 메서드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '@staticmethod에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     정적 메서드는 클래스나 인스턴스와 무관하게 독립적으로 동작하는 메서드입니다. @staticmethod 데코레이터를 사용하며, self나 cls 매개변수를 받지 않습니다. 주로 유틸리티 함수나 헬퍼 함수를 클래스 내부에 정의할 때 사용합니다.
 
@@ -150,7 +174,7 @@ sections:
 
     Math.add(3, 4)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '@staticmethod 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       class Math:
           @staticmethod
@@ -163,16 +187,17 @@ sections:
 
       Math.add(3, 4)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '@staticmethod 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '@staticmethod 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '@staticmethod에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: classmethod
   title: '@classmethod'
   structuredPrimary: true
   subtitle: 클래스 메서드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '@classmethod에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     클래스 메서드는 클래스 자체를 첫 번째 매개변수로 받는 메서드입니다. @classmethod 데코레이터를 사용하며, 첫 매개변수는 관례적으로 cls로 명명합니다. 주로 팩토리 메서드나 클래스 레벨의 작업을 수행할 때 사용합니다.
 
@@ -193,7 +218,7 @@ sections:
     p = Person.fromBirthYear('Alice', 2000)
     p.age
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '@classmethod 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       class Person:
           def __init__(self, name, age):
@@ -208,16 +233,17 @@ sections:
       p = Person.fromBirthYear('Alice', 2000)
       p.age
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '@classmethod 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '@classmethod 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '@classmethod에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: decorator_basic
   title: 데코레이터 기초
   structuredPrimary: true
   subtitle: 함수를 꾸미는 함수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 데코레이터 기초에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     데코레이터는 다른 함수를 감싸서 기능을 추가하는 함수입니다. @데코레이터명 형태로 함수 위에 붙여 사용하며, 원래 함수의 동작을 변경하거나 확장할 수 있습니다. 로깅, 타이밍, 캐싱 등 다양한 용도로 활용됩니다.
 
@@ -238,7 +264,7 @@ sections:
 
     greet()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 데코레이터 기초 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def logger(func):
           def wrapper():
@@ -253,16 +279,17 @@ sections:
 
       greet()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 데코레이터 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 데코레이터 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 데코레이터 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practical_patterns
   title: 실전 패턴
   structuredPrimary: true
   subtitle: 프로퍼티와 데코레이터 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실전 패턴에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: |-
     프로퍼티와 데코레이터를 함께 사용하면 깔끔하고 유지보수하기 쉬운 코드를 작성할 수 있습니다. 캐싱, 유효성 검사, 접근 제어 등 다양한 패턴을 구현할 수 있습니다.
 
@@ -288,7 +315,7 @@ sections:
     fib = Fibonacci()
     fib.tenth
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실전 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Fibonacci:
           def __init__(self):
@@ -308,16 +335,17 @@ sections:
       fib = Fibonacci()
       fib.tenth
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실전 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실전 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실전 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: 프로퍼티와 데코레이터는 문법 장식이 아니라, 객체의 규칙을 코드 안에 고정하는 도구입니다. 상품 행 데이터를 객체로 만들고 가격 규칙을 검증해봅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -387,7 +415,7 @@ sections:
 
     print("상품 객체 검증 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from functools import wraps
 
@@ -454,16 +482,17 @@ sections:
 
       print("상품 객체 검증 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: Day 25 종합 복습
   structuredPrimary: true
   subtitle: 프로퍼티와 데코레이터 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Day 25 종합 복습에서 문법 요소 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
   explanation: Day 25에서 배운 프로퍼티와 데코레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -479,7 +508,7 @@ sections:
     sq = Square(4)
     sq.area
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Day 25 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 변수 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Square:
           def __init__(self, side):
@@ -492,7 +521,8 @@ sections:
       sq = Square(4)
       sq.area
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Day 25 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 변수 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Day 25 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Day 25 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

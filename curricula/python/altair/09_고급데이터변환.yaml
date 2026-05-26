@@ -26,14 +26,38 @@ intro:
   emoji: 🔄
   goal: 팁 데이터를 다양한 방식으로 변환하고 집계하여 고급 분석 차트를 만듭니다.
   description: transform_calculate, transform_aggregate, transform_window, transform_fold로 데이터를 가공합니다.
+  direction: 고급데이터변환에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 고급데이터변환 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 계산 필드 생성 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 조건부 계산 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 고급데이터변환 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 고급데이터변환 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 고급데이터변환 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: seaborn-data
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Codaro 로컬 데이터셋에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다. total_bill은 총 계산 금액, tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다. 이 프로젝트에서는 데이터를 차트에 표시하기 전에 먼저 가공하는 방법을 배웁니다. 새로운 값을 계산하거나, 그룹별로 집계하거나, 순위를 매기는 등의 변환 작업을 수행합니다.
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: Codaro 로컬 데이터셋에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다. total_bill은 총 계산 금액,
+    tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다. 이 프로젝트에서는 데이터를
+    차트에 표시하기 전에 먼저 가공하는 방법을 배웁니다. 새로운 값을 계산하거나, 그룹별로 집계하거나, 순위를 매기는 등의 변환 작업을 수행합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -45,7 +69,7 @@ sections:
 
     tips = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -55,22 +79,24 @@ sections:
 
       tips = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_calculate
   title: 2단계. 계산 필드 생성
   structuredPrimary: true
   subtitle: transform_calculate
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 계산 필드 생성에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     데이터에 없는 새로운 값을 계산해서 추가할 수 있습니다. transform_calculate()는 "계산해서 변환하라"는 명령입니다. 팁 비율(tip_pct)을 계산합니다. tip_pct = 'datum.tip / datum.total_bill * 100'은 "팁을 총 금액으로 나누고 100을 곱하라(퍼센트로 만들기)"는 의미입니다. datum.컬럼명으로 각 행의 값에 접근합니다. 계산식은 JavaScript 문법으로 작성하며, 따옴표 안에 넣습니다. 계산된 tip_pct 필드를 마치 원래 있던 컬럼처럼 encode()에서 사용할 수 있습니다.
 
     transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로 이어집니다. 계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.
   tips:
-  - 'transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로 이어집니다. 계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.'
+  - 'transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로
+    이어집니다. 계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.'
   snippet: |-
     chartCalc = alt.Chart(tips).mark_point().encode(
         x='total_bill:Q',
@@ -85,7 +111,7 @@ sections:
     )
     chartCalc
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 계산 필드 생성 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartCalc = alt.Chart(tips).mark_point().encode(
           x='total_bill:Q',
@@ -100,16 +126,17 @@ sections:
       )
       chartCalc
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 계산 필드 생성 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 계산 필드 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 계산 필드 생성에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_calculate_condition
   title: 3단계. 조건부 계산
   structuredPrimary: true
   subtitle: 삼항 연산자
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 조건부 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 3단계. 조건부 계산의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -126,7 +153,7 @@ sections:
     )
     chartCondCalc
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 조건부 계산 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartCondCalc = alt.Chart(tips).mark_bar().encode(
           x='tip_category:N',
@@ -140,22 +167,25 @@ sections:
       )
       chartCondCalc
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 조건부 계산 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 조건부 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 조건부 계산에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_aggregate
   title: 4단계. 그룹별 집계
   structuredPrimary: true
   subtitle: transform_aggregate
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 그룹별 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이번에는 데이터를 그룹으로 묶어서 요약하는 방법을 배웁니다. transform_aggregate()는 "집계해서 변환하라"는 명령입니다. aggregate는 "모으다, 합치다"라는 뜻입니다. 여러 행을 하나로 모아서 평균, 합계, 개수 등을 계산합니다. avg_tip='mean(tip)'은 "tip 컬럼의 평균(mean)을 계산해서 avg_tip이라는 이름으로 저장하라"는 뜻입니다. groupby=['day']는 "day(요일)별로 그룹을 나눠서 계산하라"는 의미입니다. 월요일 그룹, 화요일 그룹 등 각각의 평균을 구합니다.
 
     사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다. groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=['day', 'time']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심, 월요일 저녁, 화요일 점심...
   tips:
-  - '사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다. groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=[''day'', ''time'']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심, 월요일 저녁, 화요일 점심...'
+  - '사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다.
+    groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=[''day'', ''time'']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심,
+    월요일 저녁, 화요일 점심...'
   snippet: |-
     chartAgg = alt.Chart(tips).mark_bar().encode(
         x='day:N',
@@ -170,7 +200,7 @@ sections:
     )
     chartAgg
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 그룹별 집계 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartAgg = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -185,16 +215,17 @@ sections:
       )
       chartAgg
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 그룹별 집계 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 그룹별 집계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 그룹별 집계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_multi_aggregate
   title: 5단계. 다중 그룹 집계
   structuredPrimary: true
   subtitle: 여러 기준으로 집계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 다중 그룹 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 여러 컬럼으로 그룹화할 수 있습니다. 요일과 시간대별 평균 금액을 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -213,7 +244,7 @@ sections:
     )
     chartMultiAgg
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 다중 그룹 집계 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartMultiAgg = alt.Chart(tips).mark_rect().encode(
           x='day:O',
@@ -229,22 +260,25 @@ sections:
       )
       chartMultiAgg
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 다중 그룹 집계 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 다중 그룹 집계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 다중 그룹 집계에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_window
   title: 6단계. 윈도우 함수
   structuredPrimary: true
   subtitle: transform_window
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 윈도우 함수에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     윈도우 함수는 각 행마다 주변 행들을 "창문(window)"처럼 보면서 계산하는 기능입니다. 순위, 누적합, 이동평균 등을 구할 때 사용합니다. transform_window()는 "윈도우 함수로 변환하라"는 명령입니다. rank='rank()'는 "순위를 매겨서 rank라는 필드에 저장하라"는 뜻입니다. sort=[alt.SortField('tip', order='descending')]은 "tip을 내림차순(descending, 큰 것부터)으로 정렬해서 순위를 매기라"는 의미입니다. groupby=['day']는 "각 요일 안에서 따로 순위를 매기라"입니다. transform_filter()로 상위 5개만 남깁니다.
 
     윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점 다음이 바로 이어짐)입니다. transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만 차트에 표시됩니다.
   tips:
-  - '윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점 다음이 바로 이어짐)입니다. transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만 차트에 표시됩니다.'
+  - '윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점
+    다음이 바로 이어짐)입니다. transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만
+    차트에 표시됩니다.'
   snippet: |-
     chartWindow = alt.Chart(tips).mark_point().encode(
         x='rank:O',
@@ -261,7 +295,7 @@ sections:
     )
     chartWindow
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 윈도우 함수 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartWindow = alt.Chart(tips).mark_point().encode(
           x='rank:O',
@@ -278,16 +312,17 @@ sections:
       )
       chartWindow
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 윈도우 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 윈도우 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 윈도우 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_cumulative
   title: 7단계. 누적 계산
   structuredPrimary: true
   subtitle: 누적합/누적평균
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 누적 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 윈도우 함수로 누적합이나 이동 평균을 계산할 수 있습니다. 금액순 누적 팁을 계산합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -306,7 +341,7 @@ sections:
     )
     chartCumulative
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 누적 계산 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartCumulative = alt.Chart(tips).mark_line().encode(
           x='row_num:Q',
@@ -322,22 +357,24 @@ sections:
       )
       chartCumulative
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 누적 계산 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 누적 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 누적 계산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_fold
   title: 8단계. 데이터 피벗
   structuredPrimary: true
   subtitle: transform_fold
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 데이터 피벗에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     데이터 구조를 변경하는 방법을 배웁니다. fold는 "접다"라는 뜻으로, 여러 컬럼을 하나의 긴 형태로 변환합니다. transform_fold(['total_bill', 'tip'], as_=['key', 'value'])는 "total_bill과 tip 두 컬럼을 key와 value 두 컬럼으로 변환하라"는 뜻입니다. 원래 데이터가 total_bill=10, tip=2 형태였다면, 변환 후에는 (key='total_bill', value=10), (key='tip', value=2) 두 행으로 나뉩니다. 이렇게 하면 두 컬럼을 하나의 차트에 나란히 비교할 수 있습니다. xOffset='key:N'으로 막대를 옆으로 배치합니다.
 
     wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다. as_=['key', 'value']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=['항목', '값']).
   tips:
-  - 'wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다. as_=[''key'', ''value'']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=[''항목'', ''값'']).'
+  - 'wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다. as_=[''key'',
+    ''value'']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=[''항목'', ''값'']).'
   snippet: |-
     chartFold = alt.Chart(tips).mark_bar().encode(
         x='day:N',
@@ -354,7 +391,7 @@ sections:
     )
     chartFold
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 데이터 피벗 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartFold = alt.Chart(tips).mark_bar().encode(
           x='day:N',
@@ -371,16 +408,17 @@ sections:
       )
       chartFold
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 데이터 피벗 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 데이터 피벗 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 데이터 피벗에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 복합 변환 차트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     지금까지 배운 변환 기법을 종합해 분석 차트를 완성합니다. 팁 비율을 계산하고, 그룹별로 집계한 뒤 시각화합니다.
 
@@ -412,7 +450,7 @@ sections:
     )
     chartFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartFinal = alt.Chart(tips).mark_bar().encode(
           x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
@@ -438,16 +476,17 @@ sections:
       )
       chartFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 데이터 변환 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리하면: transform_calculate()로 새 필드 계산, 삼항 연산자(?:)로 조건부 값 지정, transform_aggregate()로 그룹별 집계, groupby로 그룹 기준 지정, transform_window()로 순위와 누적 계산, transform_fold()로 wide를 long으로 변환입니다. 이제 배운 변환 기법들을 조합해 데이터를 다양하게 분석해봅시다.
 
@@ -460,17 +499,18 @@ sections:
     from codaro.curriculum.localData import loadLocalDataset
     bill = loadLocalDataset("tips")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
       from codaro.curriculum.localData import loadLocalDataset
       bill = loadLocalDataset("tips")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -490,8 +530,8 @@ sections:
   title: 10단계. 데이터 변환 spec 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 데이터 변환 spec 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     Altair transform은 pandas 전처리와 Vega-Lite 사양의 경계입니다. calculate, aggregate, window가 spec에 정확히 들어갔는지 확인합니다.
 
@@ -510,7 +550,7 @@ sections:
     assert tipsTransform["total_bill"].gt(0).all()
     assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 데이터 변환 spec 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -523,7 +563,8 @@ sections:
       assert tipsTransform["total_bill"].gt(0).all()
       assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 데이터 변환 spec 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 데이터 변환 spec 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 데이터 변환 spec 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

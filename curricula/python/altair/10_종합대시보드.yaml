@@ -27,14 +27,38 @@ intro:
   emoji: 🎯
   goal: 지금까지 배운 모든 Altair 기능을 종합해 완성된 인터랙티브 대시보드를 만듭니다.
   description: 마크, 인코딩, 변환, 선택, 레이어, 연결을 모두 활용한 종합 프로젝트입니다.
+  direction: 종합대시보드에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 종합대시보드 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 대시보드 구조 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 메인 산점도 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 종합대시보드 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합대시보드 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 종합대시보드 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: seaborn-data
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 'Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. 이 프로젝트는 Altair 과정의 최종 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나로 합칩니다: 마크(mark), 인코딩(encode), 인터랙션(selection), 차트 조합(|, &), 데이터 변환(transform), 레이어(layer) 등 모든 기능을 사용합니다. 완성된 대시보드에는 여러 차트가 동시에 표시되고, 사용자가 드롭다운과 브러싱으로 데이터를 필터링하며, 모든 차트가 서로 연동됩니다.'
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 'Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. 이 프로젝트는 Altair 과정의 최종 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나로
+    합칩니다: 마크(mark), 인코딩(encode), 인터랙션(selection), 차트 조합(|, &), 데이터 변환(transform), 레이어(layer) 등 모든 기능을
+    사용합니다. 완성된 대시보드에는 여러 차트가 동시에 표시되고, 사용자가 드롭다운과 브러싱으로 데이터를 필터링하며, 모든 차트가 서로 연동됩니다.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -46,7 +70,7 @@ sections:
 
     mpg = loadLocalDataset("mpg")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -56,17 +80,20 @@ sections:
 
       mpg = loadLocalDataset("mpg")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_overview
   title: 2단계. 대시보드 구조
   structuredPrimary: true
   subtitle: 컴포넌트 설계
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: '대시보드를 만들기 전에 먼저 전체 구조를 설계합니다. 4개의 차트를 배치할 것입니다: 1. 산점도: 마력 vs 연비 (중심 차트, 가장 크게) 2. 막대 차트: 생산국별 평균 연비 (비교용) 3. 라인 차트: 연도별 추이 (시간 흐름 보기) 4. 히스토그램: 연비 분포 (전체 분포 파악) 공통 selection을 먼저 만들어둡니다. brush는 드래그 선택, dropdown은 생산국 필터입니다. 이 두 가지를 모든 차트에서 공유하면 차트들이 연동됩니다.'
+  goal: 2단계. 대시보드 구조에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: '대시보드를 만들기 전에 먼저 전체 구조를 설계합니다. 4개의 차트를 배치할 것입니다: 1. 산점도: 마력 vs 연비 (중심 차트, 가장 크게) 2. 막대
+    차트: 생산국별 평균 연비 (비교용) 3. 라인 차트: 연도별 추이 (시간 흐름 보기) 4. 히스토그램: 연비 분포 (전체 분포 파악) 공통 selection을 먼저 만들어둡니다.
+    brush는 드래그 선택, dropdown은 생산국 필터입니다. 이 두 가지를 모든 차트에서 공유하면 차트들이 연동됩니다.'
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -76,7 +103,7 @@ sections:
     dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
     originSelect = alt.param(name='origin_filter', bind=dropdown)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 대시보드 구조 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       brush = alt.selection_interval(name='overviewBrush')
 
@@ -84,16 +111,17 @@ sections:
       dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
       originSelect = alt.param(name='origin_filter', bind=dropdown)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 대시보드 구조 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 대시보드 구조 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 대시보드 구조에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_scatter
   title: 3단계. 메인 산점도
   structuredPrimary: true
   subtitle: 마력 vs 연비
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 메인 산점도에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 메인 차트로 마력과 연비의 관계를 산점도로 표현합니다. 브러싱과 드롭다운 필터가 모두 적용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -113,7 +141,7 @@ sections:
     )
     scatterMain
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 메인 산점도 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       scatterMain = alt.Chart(mpg).mark_circle(size=60).encode(
           x=alt.X('horsepower:Q', title='마력'),
@@ -130,16 +158,17 @@ sections:
       )
       scatterMain
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 메인 산점도 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 메인 산점도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 메인 산점도에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_bar
   title: 4단계. 생산국별 막대 차트
   structuredPrimary: true
   subtitle: 평균 연비 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 생산국별 막대 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 생산국별 평균 연비를 막대 차트로 표현합니다. 산점도의 브러싱에 연동됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -155,7 +184,7 @@ sections:
     )
     barOrigin
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 생산국별 막대 차트 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       barOrigin = alt.Chart(mpg).mark_bar().encode(
           x=alt.X('origin:N', title='생산국'),
@@ -168,16 +197,17 @@ sections:
       )
       barOrigin
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 생산국별 막대 차트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 생산국별 막대 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 생산국별 막대 차트에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_line
   title: 5단계. 연도별 라인 차트
   structuredPrimary: true
   subtitle: 연비 추이
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 연도별 라인 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 연도별 평균 연비 추이를 라인 차트로 표현합니다. 시간에 따른 연비 개선 추세를 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -196,7 +226,7 @@ sections:
     )
     lineYear
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 연도별 라인 차트 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       lineYear = alt.Chart(mpg).mark_line(point=True).encode(
           x=alt.X('model_year:O', title='연도'),
@@ -212,16 +242,17 @@ sections:
       )
       lineYear
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 연도별 라인 차트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 연도별 라인 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 연도별 라인 차트에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_histogram
   title: 6단계. 연비 히스토그램
   structuredPrimary: true
   subtitle: 분포 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 연비 히스토그램에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: 연비 분포를 히스토그램으로 표현합니다. 브러싱으로 선택된 데이터의 분포를 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -237,7 +268,7 @@ sections:
     )
     histMpg
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 연비 히스토그램 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       histMpg = alt.Chart(mpg).mark_bar().encode(
           x=alt.X('mpg:Q', bin=alt.Bin(maxbins=20), title='연비'),
@@ -250,17 +281,20 @@ sections:
       )
       histMpg
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 연비 히스토그램 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 연비 히스토그램 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 연비 히스토그램에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_layer
   title: 7단계. 레이어 추가
   structuredPrimary: true
   subtitle: 평균선 표시
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 차트에 추가 정보를 겹쳐서 표시하는 방법을 배웁니다. 레이어(layer)는 "층"이라는 뜻으로, 여러 차트를 겹쳐 그립니다. mark_rule()은 기준선(수평선 또는 수직선)을 그리는 마크입니다. strokeDash=[5, 5]는 점선 스타일(5픽셀 그리고 5픽셀 비우기 반복)입니다. + 연산자로 두 차트를 겹칩니다. scatterMain + avgLine은 "산점도 위에 평균선을 겹쳐서 그려라"는 뜻입니다. 기준선이 있으면 데이터가 평균보다 높은지 낮은지 쉽게 비교할 수 있습니다.
+  goal: 7단계. 레이어 추가에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 차트에 추가 정보를 겹쳐서 표시하는 방법을 배웁니다. 레이어(layer)는 "층"이라는 뜻으로, 여러 차트를 겹쳐 그립니다. mark_rule()은 기준선(수평선
+    또는 수직선)을 그리는 마크입니다. strokeDash=[5, 5]는 점선 스타일(5픽셀 그리고 5픽셀 비우기 반복)입니다. + 연산자로 두 차트를 겹칩니다. scatterMain
+    + avgLine은 "산점도 위에 평균선을 겹쳐서 그려라"는 뜻입니다. 기준선이 있으면 데이터가 평균보다 높은지 낮은지 쉽게 비교할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -271,7 +305,7 @@ sections:
     scatterWithLine = scatterMain + avgLine
     scatterWithLine
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 레이어 추가 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       avgLine = alt.Chart(mpg).mark_rule(color='red', strokeDash=[5, 5]).encode(
           y='mean(mpg):Q'
@@ -280,17 +314,20 @@ sections:
       scatterWithLine = scatterMain + avgLine
       scatterWithLine
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 레이어 추가 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 레이어 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 레이어 추가에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_compose
   title: 8단계. 대시보드 조합
   structuredPrimary: true
   subtitle: hconcat + vconcat
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이제 만든 차트들을 모두 조합해서 최종 레이아웃을 만듭니다. | 와 & 연산자를 사용합니다. topRow는 윗줄입니다. scatterWithLine(산점도+평균선)을 왼쪽에, barOrigin과 histMpg를 세로로 쌓아(&) 오른쪽에 배치합니다. 괄호 안을 먼저 계산하므로 막대와 히스토그램이 먼저 세로로 쌓이고, 그것이 산점도 옆에 붙습니다. bottomRow는 아랫줄로 lineYear(라인 차트)를 배치합니다. topRow & bottomRow로 윗줄과 아랫줄을 세로로 쌓으면 완성입니다.
+  goal: 8단계. 대시보드 조합에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 이제 만든 차트들을 모두 조합해서 최종 레이아웃을 만듭니다. | 와 & 연산자를 사용합니다. topRow는 윗줄입니다. scatterWithLine(산점도+평균선)을
+    왼쪽에, barOrigin과 histMpg를 세로로 쌓아(&) 오른쪽에 배치합니다. 괄호 안을 먼저 계산하므로 막대와 히스토그램이 먼저 세로로 쌓이고, 그것이 산점도 옆에 붙습니다.
+    bottomRow는 아랫줄로 lineYear(라인 차트)를 배치합니다. topRow & bottomRow로 윗줄과 아랫줄을 세로로 쌓으면 완성입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -300,7 +337,7 @@ sections:
     dashboard = topRow & bottomRow
     dashboard
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 대시보드 조합 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       topRow = scatterWithLine | (barOrigin & histMpg)
       bottomRow = lineYear
@@ -308,16 +345,17 @@ sections:
       dashboard = topRow & bottomRow
       dashboard
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 대시보드 조합 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 대시보드 조합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 대시보드 조합에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 완성된 대시보드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     모든 기능을 통합한 최종 대시보드를 완성합니다. 드롭다운, 브러싱, 레이어, 다중 차트가 모두 연동됩니다.
 
@@ -330,23 +368,24 @@ sections:
     dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
     originFinal = alt.param(name='origin', bind=dropdownFinal)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       brushFinal = alt.selection_interval(name='dashboardBrush')
       originsFinal = ['usa', 'europe', 'japan']
       dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
       originFinal = alt.param(name='origin', bind=dropdownFinal)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 대시보드 확장 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리하면: selection_interval/binding_select로 인터랙션, when().then().otherwise()로 조건부 스타일, + 연산자로 레이어 겹치기, | 와 & 로 차트 배치, add_params()로 여러 파라미터 추가, 공통 selection을 공유해 차트 연동입니다. 이제 Altair의 모든 기능을 마스터했습니다. 배운 개념들을 자유롭게 조합해 나만의 대시보드를 만들어봅시다.
 
@@ -360,7 +399,7 @@ sections:
     car = loadLocalDataset("mpg")
     drag = alt.selection_interval(name='missionDrag')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -368,10 +407,11 @@ sections:
       car = loadLocalDataset("mpg")
       drag = alt.selection_interval(name='missionDrag')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:
@@ -395,8 +435,8 @@ sections:
   title: 10단계. Altair 대시보드 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. Altair 대시보드 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     대시보드는 여러 차트를 묶는 만큼 입력 데이터, selection, concat 구조가 모두 맞아야 합니다. 완성 spec을 검사하는 루프를 추가합니다.
 
@@ -415,7 +455,7 @@ sections:
     assert mpgDashboard[["mpg", "horsepower", "weight"]].gt(0).all().all()
     assert mpgDashboard["origin"].nunique() == 3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. Altair 대시보드 검증 루프 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       from codaro.curriculum.localData import loadLocalDataset
@@ -428,7 +468,8 @@ sections:
       assert mpgDashboard[["mpg", "horsepower", "weight"]].gt(0).all().all()
       assert mpgDashboard["origin"].nunique() == 3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. Altair 대시보드 검증 루프 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. Altair 대시보드 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. Altair 대시보드 검증 루프에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

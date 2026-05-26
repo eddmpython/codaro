@@ -30,13 +30,35 @@ intro:
   emoji: 💧
   goal: 이미지에 반투명 텍스트 워터마크를 추가합니다.
   description: ImageDraw.text()로 텍스트를 그리고, RGBA 모드와 paste()로 반투명 워터마크를 합성합니다. 저작권 표시나 브랜딩에 활용되는 기법입니다.
+  direction: 워터마크생성기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 워터마크생성기 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 기본 이미지 준비 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 텍스트 삽입 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. RGBA 모드 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 워터마크생성기 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 워터마크생성기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 워터마크생성기 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 기본 이미지 준비
   structuredPrimary: true
   subtitle: 워터마크를 적용할 이미지
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 기본 이미지 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: sklearn의 flower 이미지를 불러옵니다. 워터마크는 보통 사진의 저작권을 표시하거나 브랜드를 각인시키는 데 사용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -48,7 +70,7 @@ sections:
     base = Image.fromarray(flowerArr)
     base.size, base.mode
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 기본 이미지 준비 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
       from sklearn.datasets import load_sample_image
@@ -57,68 +79,73 @@ sections:
       base = Image.fromarray(flowerArr)
       base.size, base.mode
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 기본 이미지 준비 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 기본 이미지 준비 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 기본 이미지 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_simple_text
   title: 2단계. 기본 텍스트 삽입
   structuredPrimary: true
   subtitle: ImageDraw.text()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 텍스트 삽입에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     ImageDraw.Draw()로 그리기 객체를 생성하고 text() 메서드로 텍스트를 삽입합니다. 좌표, 텍스트, 색상을 지정할 수 있습니다. 기본 폰트를 사용하면 크기가 작습니다.
 
     text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255, 255) RGB 튜플로 지정합니다.
   tips:
-  - text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255, 255) RGB 튜플로 지정합니다.
+  - text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255,
+    255) RGB 튜플로 지정합니다.
   snippet: |-
     baseCopy = base.copy()
     draw = ImageDraw.Draw(baseCopy)
     type(draw)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 텍스트 삽입 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       baseCopy = base.copy()
       draw = ImageDraw.Draw(baseCopy)
       type(draw)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 텍스트 삽입 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 텍스트 삽입 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 텍스트 삽입에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_rgba
   title: 3단계. RGBA 모드
   structuredPrimary: true
   subtitle: 투명도 채널
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. RGBA 모드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     반투명 워터마크를 만들려면 RGBA 모드를 사용해야 합니다. RGBA는 RGB에 Alpha(투명도) 채널이 추가된 것입니다. Alpha 값이 0이면 완전 투명, 255면 완전 불투명입니다.
 
     Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에 워터마크를 그립니다.
   tips:
-  - Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에 워터마크를 그립니다.
+  - Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에
+    워터마크를 그립니다.
   snippet: |-
     baseRgba = base.convert('RGBA')
     baseRgba.mode
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. RGBA 모드 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       baseRgba = base.convert('RGBA')
       baseRgba.mode
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. RGBA 모드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. RGBA 모드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. RGBA 모드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_watermark_text
   title: 4단계. 워터마크 텍스트 그리기
   structuredPrimary: true
   subtitle: 반투명 텍스트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 워터마크 텍스트 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     투명 레이어에 반투명 색상으로 텍스트를 그립니다. 색상의 네 번째 값이 Alpha입니다. (255, 255, 255, 128)은 50% 투명한 흰색입니다.
 
@@ -130,76 +157,81 @@ sections:
     artist.text((50, 50), "WATERMARK", fill=(255, 255, 255, 128))
     watermark
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 워터마크 텍스트 그리기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       artist = ImageDraw.Draw(watermark)
       artist.text((50, 50), "WATERMARK", fill=(255, 255, 255, 128))
       watermark
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 워터마크 텍스트 그리기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 워터마크 텍스트 그리기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 워터마크 텍스트 그리기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_composite
   title: 5단계. 이미지 합성
   structuredPrimary: true
   subtitle: alpha_composite()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 이미지 합성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     alpha_composite()는 두 RGBA 이미지를 투명도를 고려하여 합성합니다. paste()와 달리 Alpha 채널을 올바르게 처리합니다.
 
     alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더 직관적입니다.
   tips:
-  - alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더 직관적입니다.
+  - alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더
+    직관적입니다.
   snippet: |-
     combined = Image.alpha_composite(baseRgba, watermark)
     combined
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 이미지 합성 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       combined = Image.alpha_composite(baseRgba, watermark)
       combined
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 이미지 합성 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 이미지 합성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 이미지 합성에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_corner
   title: 6단계. 코너 워터마크
   structuredPrimary: true
   subtitle: 위치 계산
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 코너 워터마크에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     워터마크를 오른쪽 하단 같은 특정 위치에 배치하려면 좌표를 계산해야 합니다. 이미지 크기와 텍스트 크기를 고려하여 위치를 정합니다.
 
     텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Codaro 로컬 Python에서는 기본 폰트만 사용 가능하므로 대략적인 추정치로 위치를 정합니다.
   tips:
-  - 텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Codaro 로컬 Python에서는 기본 폰트만 사용 가능하므로 대략적인 추정치로 위치를 정합니다.
+  - 텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Codaro 로컬 Python에서는 기본 폰트만 사용 가능하므로 대략적인
+    추정치로 위치를 정합니다.
   snippet: |-
     cornerMark = Image.new('RGBA', base.size, (0, 0, 0, 0))
     pencil = ImageDraw.Draw(cornerMark)
     w, h = base.size
     w, h
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 코너 워터마크 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cornerMark = Image.new('RGBA', base.size, (0, 0, 0, 0))
       pencil = ImageDraw.Draw(cornerMark)
       w, h = base.size
       w, h
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 코너 워터마크 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 코너 워터마크 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 코너 워터마크에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 워터마크 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     china 이미지에 다양한 워터마크를 적용해봅시다.
 
@@ -214,7 +246,7 @@ sections:
     china = Image.fromarray(chinaArr).convert('RGBA')
     china
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw
       from sklearn.datasets import load_sample_image
@@ -223,17 +255,19 @@ sections:
       china = Image.fromarray(chinaArr).convert('RGBA')
       china
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 7단계. 워터마크 합성 검증 루프
   structuredPrimary: true
   subtitle: alpha와 위치 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 워터마크는 글자가 보이는지보다 원본 크기를 유지하면서 지정 위치의 픽셀이 실제로 변했는지 확인해야 합니다. alpha 범위를 검증하고 합성 전후 픽셀 차이를 비교합니다.
+  goal: 7단계. 워터마크 합성 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 워터마크는 글자가 보이는지보다 원본 크기를 유지하면서 지정 위치의 픽셀이 실제로 변했는지 확인해야 합니다. alpha 범위를 검증하고 합성 전후 픽셀 차이를
+    비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -250,7 +284,7 @@ sections:
 
     validateAlpha(120)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 워터마크 합성 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from PIL import Image, ImageDraw, ImageChops
 
@@ -265,7 +299,8 @@ sections:
 
       validateAlpha(120)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 워터마크 합성 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 워터마크 합성 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 워터마크 합성 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

@@ -23,35 +23,36 @@ meta:
     - 파이썬
     - 인터랙티브
 intro:
-  direction: Folium 소개에서 실제 코드 흐름을 작게 실행하고 검증하는 능력을 만든다.
+  direction: Folium 소개에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
   benefits:
-  - Folium 소개 핵심 기능으로 데이터를 처리, 분석, 자동화할 수 있다.
-  - 추가 패키지 없이 로컬 Python에서 바로 실행하고, 첫 실행에서 assert로 확인한다.
-  - 완료 후 작은 리포트, 검증 루틴, 자동화 조각으로 재사용할 수 있다.
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - Folium 소개 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 목표
-      detail: 완료 후 만들 산출물을 먼저 확인
-    - label: 준비
-      detail: 표준 라이브러리 또는 기본 Python 실행 확인
-    - label: 실습
-      detail: 예제 스니펫을 바꿔 직접 실행
-    - label: 검증
-      detail: assert와 결과 비교로 완료 판단
+    - label: Folium이란? 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 왜 Folium인가? 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 무엇을 만들 수 있나? 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: Folium 소개 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
     runtime:
-    - label: 패키지
-      detail: 표준 라이브러리 확인 -> cell-call -> assert 검증
-    - label: 첫 실행
-      detail: import 확인과 assert 검증
-    - label: 완료
-      detail: 리포트/자동화/검증 루틴으로 재사용
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Folium 소개 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: Folium 소개 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: what_is_folium
   title: Folium이란?
   subtitle: 파이썬 지도 라이브러리
   blocks:
   - type: text
-    content: Folium은 파이썬에서 인터랙티브 지도를 만드는 라이브러리입니다. JavaScript 라이브러리인 Leaflet.js를 파이썬에서 쉽게 사용할 수 있게 해줍니다. 2013년에 시작되어 현재 가장 인기 있는 파이썬 지도 라이브러리입니다.
+    content: Folium은 파이썬에서 인터랙티브 지도를 만드는 라이브러리입니다. JavaScript 라이브러리인 Leaflet.js를 파이썬에서 쉽게 사용할 수 있게 해줍니다.
+      2013년에 시작되어 현재 가장 인기 있는 파이썬 지도 라이브러리입니다.
   - type: text
     content: 지도에 마커를 찍고, 경로를 그리고, 영역을 색칠하고, 히트맵을 만들 수 있습니다. 모든 지도는 줌, 패닝, 클릭 등 인터랙션이 가능합니다.
   - type: tip
@@ -63,7 +64,8 @@ sections:
   - type: text
     content: '**matplotlib으로 지도를 그리면**: 정적 이미지입니다. 확대/축소가 안 되고, 마커 클릭도 안 됩니다. 지도 타일을 직접 관리해야 합니다.'
   - type: text
-    content: '**Folium으로 지도를 그리면**: 줌인/줌아웃이 자유롭습니다. 마커를 클릭하면 팝업이 뜹니다. 드래그로 지도를 이동할 수 있습니다. 전 세계 어디든 탐색 가능합니다.'
+    content: '**Folium으로 지도를 그리면**: 줌인/줌아웃이 자유롭습니다. 마커를 클릭하면 팝업이 뜹니다. 드래그로 지도를 이동할 수 있습니다. 전 세계 어디든 탐색
+      가능합니다.'
   - type: text
     content: '**핵심 차이**: Folium은 HTML/JavaScript를 생성합니다. 브라우저에서 실제 지도처럼 동작합니다.'
   - type: tip
@@ -168,8 +170,8 @@ sections:
   title: 로컬 지도 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 로컬 지도 검증 루프에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     Folium 입문은 지도 객체를 만드는 데서 끝나지 않습니다. 업무에서는 좌표가 맞는지, 이름이 렌더 결과에 들어갔는지, 새 지점을 추가해도 검증 기준이 유지되는지 코드로 확인해야 합니다.
 
@@ -196,7 +198,7 @@ sections:
     validationResult = [validateSite(site) for site in officeSites]
     validationResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 로컬 지도 검증 루프 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
 
@@ -217,7 +219,8 @@ sections:
       validationResult = [validateSite(site) for site in officeSites]
       validationResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 로컬 지도 검증 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 로컬 지도 검증 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 로컬 지도 검증 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

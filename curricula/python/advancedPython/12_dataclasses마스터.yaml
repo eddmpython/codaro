@@ -26,13 +26,35 @@ intro:
   - field()로 세밀한 필드 제어
   - __post_init__으로 초기화 후처리
   - frozen=True로 불변 객체 생성
+  direction: dataclasses 마스터에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - dataclasses 마스터 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: dataclass 기초 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: field() 함수 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: postinit 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: dataclasses 마스터 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: dataclasses 마스터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: dataclasses 마스터 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: dataclass_basic
   title: '@dataclass 기초'
   structuredPrimary: true
   subtitle: 자동 __init__, __repr__
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '@dataclass 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     @dataclass 데코레이터는 __init__, __repr__, __eq__ 등의 특수 메서드를 자동 생성합니다. 클래스 속성에 타입 힌트를 추가하면 그것이 인스턴스 필드가 됩니다. 기본값이 있는 필드는 기본값 없는 필드 뒤에 와야 합니다. 데이터를 담는 클래스를 만들 때 보일러플레이트 코드를 크게 줄여줍니다. Python 3.7에서 도입되었으며, 이후 버전에서 기능이 계속 추가되었습니다.
 
@@ -50,7 +72,7 @@ sections:
     pt = Point(3.0, 4.0)
     pt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '@dataclass 기초 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from dataclasses import dataclass
 
@@ -62,16 +84,17 @@ sections:
       pt = Point(3.0, 4.0)
       pt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '@dataclass 기초 코드에서 먼저 입력값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '@dataclass 기초 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '@dataclass 기초에서 바꾼 입력값이 결과에 반영되어야 합니다.'
 - id: field_function
   title: field() 함수
   structuredPrimary: true
   subtitle: 세밀한 필드 제어
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: field() 함수에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     field() 함수로 각 필드의 동작을 세밀하게 제어합니다. default_factory는 가변 기본값(리스트, 딕셔너리)을 안전하게 사용합니다. repr=False로 __repr__에서 필드를 숨길 수 있습니다. compare=False로 __eq__ 비교에서 제외합니다. init=False로 __init__ 파라미터에서 제외합니다. metadata로 추가 정보를 저장할 수 있습니다.
 
@@ -92,7 +115,7 @@ sections:
     cart1.items.append("apple")
     cart1.items, cart2.items
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: field() 함수 예제에서 리스트 값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass, field
       from typing import List
@@ -107,16 +130,17 @@ sections:
       cart1.items.append("apple")
       cart1.items, cart2.items
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - field() 함수 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: field() 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: field() 함수에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: post_init
   title: __post_init__
   structuredPrimary: true
   subtitle: 초기화 후처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: postinit에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     __post_init__ 메서드는 __init__이 끝난 후 자동으로 호출됩니다. 필드 값을 기반으로 계산된 속성을 설정하거나 유효성 검사를 수행합니다. InitVar 타입을 사용하면 __init__에만 전달되고 필드로 저장되지 않는 값을 정의할 수 있습니다. __post_init__은 InitVar 값을 순서대로 인자로 받습니다. 복잡한 초기화 로직을 깔끔하게 분리할 수 있습니다.
 
@@ -139,7 +163,7 @@ sections:
 
     Rectangle(3, 4)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: postinit 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass, field
 
@@ -156,16 +180,17 @@ sections:
 
       Rectangle(3, 4)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - postinit 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: postinit 코드가 예외 없이 끝나야 합니다.
+    resultCheck: postinit에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: frozen_dataclass
   title: frozen=True
   structuredPrimary: true
   subtitle: 불변 인스턴스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: frozen=True에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     frozen=True 옵션은 인스턴스를 불변(immutable)으로 만듭니다. 필드 값을 변경하려고 하면 FrozenInstanceError가 발생합니다. frozen 객체는 해시 가능(hashable)하여 딕셔너리 키나 집합 요소로 사용할 수 있습니다. 불변 객체는 함수형 프로그래밍 패턴과 잘 맞습니다. 변경이 필요하면 replace() 함수로 새 인스턴스를 만듭니다.
 
@@ -183,7 +208,7 @@ sections:
     pt = Point(3.0, 4.0)
     pt.x, pt.y
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: frozen=True 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -195,16 +220,17 @@ sections:
       pt = Point(3.0, 4.0)
       pt.x, pt.y
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - frozen=True 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: frozen=True 코드가 예외 없이 끝나야 합니다.
+    resultCheck: frozen=True에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: slots_dataclass
   title: slots=True
   structuredPrimary: true
   subtitle: 메모리 최적화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: slots=True에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     Python 3.10+에서 slots=True 옵션이 추가되었습니다. __slots__를 자동 생성하여 메모리를 절약합니다. 많은 인스턴스를 생성할 때 효과적입니다. __dict__가 없어 동적 속성 추가가 불가능합니다. frozen=True와 함께 사용하면 불변 + 메모리 효율적인 객체가 됩니다. 상속 시 부모도 slots를 사용해야 합니다.
 
@@ -223,7 +249,7 @@ sections:
     p3d = Point3D(1.0, 2.0, 3.0)
     hasattr(p3d, '__dict__'), hasattr(p3d, '__slots__')
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: slots=True 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -236,16 +262,17 @@ sections:
       p3d = Point3D(1.0, 2.0, 3.0)
       hasattr(p3d, '__dict__'), hasattr(p3d, '__slots__')
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - slots=True 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: slots=True 코드가 예외 없이 끝나야 합니다.
+    resultCheck: slots=True에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: inheritance
   title: 상속
   structuredPrimary: true
   subtitle: dataclass 상속
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상속에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     dataclass는 다른 dataclass를 상속할 수 있습니다. 자식 클래스의 필드가 부모 필드 뒤에 추가됩니다. 부모의 기본값 있는 필드 뒤에 자식의 기본값 없는 필드가 오면 오류가 발생합니다. 이 문제는 field(default=...)나 kw_only=True로 해결합니다. Python 3.10+에서는 kw_only 옵션으로 키워드 전용 인자를 지정할 수 있습니다.
 
@@ -266,7 +293,7 @@ sections:
 
     Dog("Buddy", 3, "Labrador")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상속 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -281,16 +308,17 @@ sections:
 
       Dog("Buddy", 3, "Labrador")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상속 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상속 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상속에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 라인 데이터 모델 만들기'
   structuredPrimary: true
   subtitle: field, default_factory, frozen, replace, asdict를 한 흐름에서 검증합니다
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 주문 라인 데이터 모델 만들기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     dataclass는 단순한 보일러플레이트 제거 도구가 아니라, 데이터 규칙을 한 곳에 모으는 모델링 도구입니다. 주문 라인의 금액 계산과 세금 규칙을 만들고, 잘못된 입력이 어디서 막히는지 확인하세요.
 
@@ -336,7 +364,7 @@ sections:
     assert rule.tax(updated.subtotal) == 15_000
     assert asdict(updated)["tags"] == ["office"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       from dataclasses import asdict, dataclass, field, replace
 
@@ -375,17 +403,22 @@ sections:
       assert rule.tax(updated.subtotal) == 15_000
       assert asdict(updated)["tags"] == ["office"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 라인 데이터 모델 만들기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 라인 데이터 모델 만들기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: dataclasses 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 12에서 배운 dataclasses를 난이도별로 복습합니다. @dataclass는 __init__, __repr__, __eq__ 등 보일러플레이트 코드를 자동 생성하여 데이터 클래스 작성을 크게 단순화합니다. field()로 세밀한 필드 제어, __post_init__으로 초기화 후처리, frozen=True로 불변 객체를 만들 수 있습니다. 🟢 기본 문제로 dataclass 정의와 기본값 설정을 익히고, 🟡 응용 문제로 default_factory, InitVar 패턴을 연습하세요. 🔴 심화 문제에서는 상속, slots=True, asdict/astuple 변환 등 고급 기법을 다룹니다. 데이터 중심 클래스에는 dataclass를 기본으로 사용하고, 더 복잡한 검증이 필요하면 Pydantic을 고려하세요.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 12에서 배운 dataclasses를 난이도별로 복습합니다. @dataclass는 __init__, __repr__, __eq__ 등 보일러플레이트
+    코드를 자동 생성하여 데이터 클래스 작성을 크게 단순화합니다. field()로 세밀한 필드 제어, __post_init__으로 초기화 후처리, frozen=True로 불변 객체를
+    만들 수 있습니다. 🟢 기본 문제로 dataclass 정의와 기본값 설정을 익히고, 🟡 응용 문제로 default_factory, InitVar 패턴을 연습하세요. 🔴 심화 문제에서는
+    상속, slots=True, asdict/astuple 변환 등 고급 기법을 다룹니다. 데이터 중심 클래스에는 dataclass를 기본으로 사용하고, 더 복잡한 검증이 필요하면
+    Pydantic을 고려하세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -399,7 +432,7 @@ sections:
 
     Book("Python Guide", "Alice", 300)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from dataclasses import dataclass
 
@@ -411,7 +444,8 @@ sections:
 
       Book("Python Guide", "Alice", 300)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 입력값이 결과에 반영되어야 합니다.

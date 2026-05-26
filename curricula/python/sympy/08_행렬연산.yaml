@@ -27,15 +27,40 @@ meta:
 intro:
   emoji: 🔢
   goal: Matrix()로 행렬을 다루고 선형대수 계산을 수행합니다.
-  description: 행렬은 선형대수의 핵심으로, 데이터 과학, 머신러닝, 컴퓨터 그래픽스의 기초입니다. 2×2 행렬 [[a,b],[c,d]]는 2차원 공간의 선형 변환을 표현하고, 3×3 행렬은 3D 회전과 스케일링에 사용됩니다. 역행렬 A⁻¹은 변환의 취소, 행렬식 det(A)는 변환의 스케일 팩터를 의미합니다. 고유값과 고유벡터는 주성분 분석(PCA)의 기초가 됩니다. 이 프로젝트를 완료하면 행렬 연산, 연립방정식 풀이, 고유값 분석까지 다룰 수 있게 됩니다.
+  description: 행렬은 선형대수의 핵심으로, 데이터 과학, 머신러닝, 컴퓨터 그래픽스의 기초입니다. 2×2 행렬 [[a,b],[c,d]]는 2차원 공간의 선형 변환을 표현하고,
+    3×3 행렬은 3D 회전과 스케일링에 사용됩니다. 역행렬 A⁻¹은 변환의 취소, 행렬식 det(A)는 변환의 스케일 팩터를 의미합니다. 고유값과 고유벡터는 주성분 분석(PCA)의
+    기초가 됩니다. 이 프로젝트를 완료하면 행렬 연산, 연립방정식 풀이, 고유값 분석까지 다룰 수 있게 됩니다.
+  direction: 행렬연산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 행렬연산 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 행렬 생성 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특수 행렬 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 행렬연산 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 행렬연산 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 행렬연산 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 행렬 작업에 필요한 함수들을 불러옵니다. Matrix()는 행렬을 생성하는 핵심 클래스입니다. eye(n)은 n×n 단위행렬, zeros(m,n)은 m×n 영행렬, ones(m,n)은 모든 원소가 1인 행렬입니다. diag()는 대각행렬을 생성합니다. 이 함수들은 NumPy와 유사하지만 기호 연산이 가능합니다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 행렬 작업에 필요한 함수들을 불러옵니다. Matrix()는 행렬을 생성하는 핵심 클래스입니다. eye(n)은 n×n 단위행렬, zeros(m,n)은 m×n
+    영행렬, ones(m,n)은 모든 원소가 1인 행렬입니다. diag()는 대각행렬을 생성합니다. 이 함수들은 NumPy와 유사하지만 기호 연산이 가능합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -44,23 +69,24 @@ sections:
     from sympy import init_printing
     init_printing()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sympy import Matrix, eye, zeros, ones, diag
       from sympy import symbols, solve, Eq, sqrt, Rational
       from sympy import init_printing
       init_printing()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_create
   title: 2단계. 행렬 생성
   structuredPrimary: true
   subtitle: Matrix()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 행렬 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Matrix()는 중첩 리스트로 행렬을 생성합니다. Matrix([[1,2],[3,4]])는 2×2 행렬로, 첫 번째 리스트 [1,2]가 첫 번째 행, [3,4]가 두 번째 행입니다. Matrix([1,2,3])처럼 1차원 리스트를 전달하면 3×1 열벡터가 됩니다. 행렬의 크기는 .shape으로, 개별 원소는 [i,j] 인덱싱으로 접근합니다.
 
@@ -71,43 +97,46 @@ sections:
     mat1 = Matrix([[1, 2], [3, 4]])
     mat1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 행렬 생성 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       mat1 = Matrix([[1, 2], [3, 4]])
       mat1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 행렬 생성 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 행렬 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 행렬 생성에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_special
   title: 3단계. 특수 행렬
   structuredPrimary: true
   subtitle: eye, zeros, ones
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 특수 행렬은 선형대수에서 중요한 역할을 합니다. 단위행렬 I = eye(n)은 곱해도 원래 행렬이 변하지 않는 항등원입니다. AI = IA = A입니다. zeros(m,n)은 영행렬로 덧셈의 항등원입니다. diag(1,2,3)은 대각선에만 값이 있는 대각행렬로, 스케일링 변환을 표현합니다. 대각행렬의 행렬식은 대각 원소의 곱입니다.
+  goal: 3단계. 특수 행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 특수 행렬은 선형대수에서 중요한 역할을 합니다. 단위행렬 I = eye(n)은 곱해도 원래 행렬이 변하지 않는 항등원입니다. AI = IA = A입니다. zeros(m,n)은
+    영행렬로 덧셈의 항등원입니다. diag(1,2,3)은 대각선에만 값이 있는 대각행렬로, 스케일링 변환을 표현합니다. 대각행렬의 행렬식은 대각 원소의 곱입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     identity = eye(3)
     identity
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 특수 행렬 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       identity = eye(3)
       identity
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 특수 행렬 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 특수 행렬 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 특수 행렬에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_operations
   title: 4단계. 기본 연산
   structuredPrimary: true
   subtitle: 덧셈, 곱셈
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 기본 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     행렬 연산은 원소별이 아닌 선형대수 규칙을 따릅니다. 덧셈 A+B는 같은 크기의 행렬끼리만 가능하고 원소별로 더합니다. 스칼라곱 2A는 모든 원소에 2를 곱합니다. 행렬곱 AB는 A의 열 수와 B의 행 수가 같아야 합니다. 중요한 것은 AB ≠ BA로 교환법칙이 성립하지 않습니다. 이 비교환성이 행렬만의 특성입니다.
 
@@ -119,23 +148,25 @@ sections:
     matB = Matrix([[5, 6], [7, 8]])
     matA, matB
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 기본 연산 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       matA = Matrix([[1, 2], [3, 4]])
       matB = Matrix([[5, 6], [7, 8]])
       matA, matB
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 기본 연산 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 기본 연산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 기본 연산에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_transpose
   title: 5단계. 전치와 거듭제곱
   structuredPrimary: true
   subtitle: T, **n
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 전치행렬 Aᵀ는 행과 열을 바꾼 행렬입니다. 2×3 행렬의 전치는 3×2가 됩니다. .T 속성으로 접근합니다. (AB)ᵀ = BᵀAᵀ 규칙이 중요합니다. 거듭제곱 A²는 A*A, A³는 A*A*A입니다. 정사각행렬만 거듭제곱이 가능합니다. A⁻¹은 역행렬로 A*A⁻¹ = I입니다.
+  goal: 5단계. 전치와 거듭제곱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 전치행렬 Aᵀ는 행과 열을 바꾼 행렬입니다. 2×3 행렬의 전치는 3×2가 됩니다. .T 속성으로 접근합니다. (AB)ᵀ = BᵀAᵀ 규칙이 중요합니다. 거듭제곱
+    A²는 A*A, A³는 A*A*A입니다. 정사각행렬만 거듭제곱이 가능합니다. A⁻¹은 역행렬로 A*A⁻¹ = I입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -143,22 +174,23 @@ sections:
     transposed = mat3.T
     transposed
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 전치와 거듭제곱 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       mat3 = Matrix([[1, 2, 3], [4, 5, 6]])
       transposed = mat3.T
       transposed
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 전치와 거듭제곱 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 전치와 거듭제곱 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 전치와 거듭제곱에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_det_inv
   title: 6단계. 행렬식과 역행렬
   structuredPrimary: true
   subtitle: det(), inv()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 행렬식과 역행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     행렬식 det(A)는 행렬이 나타내는 선형 변환의 스케일 팩터입니다. 2×2 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc입니다. det(A)≠0이면 역행렬이 존재하고, det(A)=0이면 특이행렬로 역행렬이 없습니다. 역행렬 A⁻¹은 A*A⁻¹ = A⁻¹*A = I를 만족합니다. 연립방정식 Ax=b의 해는 x=A⁻¹b로 구할 수 있습니다.
 
@@ -169,21 +201,22 @@ sections:
     detA = matA.det()
     detA
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 행렬식과 역행렬 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       detA = matA.det()
       detA
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 행렬식과 역행렬 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 행렬식과 역행렬 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 행렬식과 역행렬에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_eigenvalue
   title: 7단계. 고유값과 고유벡터
   structuredPrimary: true
   subtitle: eigenvals(), eigenvects()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 고유값과 고유벡터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     고유값 λ와 고유벡터 v는 Av = λv를 만족합니다. 이는 행렬 A가 벡터 v를 λ배로 스케일링만 한다는 의미입니다. 고유값은 특성방정식 det(A-λI)=0을 풀어 구합니다. eigenvals()는 고유값과 중복도를, eigenvects()는 고유벡터까지 반환합니다. diagonalize()는 P⁻¹AP=D 형태로 대각화하여 거듭제곱 계산을 간단하게 합니다. 이 개념은 PCA, 진동 분석에 핵심입니다.
 
@@ -195,22 +228,23 @@ sections:
     evals = emat.eigenvals()
     evals
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 고유값과 고유벡터 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       emat = Matrix([[4, 1], [2, 3]])
       evals = emat.eigenvals()
       evals
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 고유값과 고유벡터 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 고유값과 고유벡터 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 고유값과 고유벡터에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_solve
   title: 8단계. 연립방정식 풀이
   structuredPrimary: true
   subtitle: Ax = b
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 연립방정식 풀이에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     연립일차방정식은 행렬로 체계적으로 풀 수 있습니다. 2x+y=5, x+3y=8을 행렬로 표현하면 [[2,1],[1,3]][x,y]ᵀ = [5,8]ᵀ입니다. 해는 x = A⁻¹b로 구합니다. 변수가 많아져도 같은 방법으로 풀 수 있습니다. 역행렬이 존재하면(det≠0) 유일한 해가 있고, 존재하지 않으면 무한히 많거나 해가 없습니다.
 
@@ -222,23 +256,25 @@ sections:
     const = Matrix([5, 8])
     coeff, const
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 연립방정식 풀이 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       coeff = Matrix([[2, 1], [1, 3]])
       const = Matrix([5, 8])
       coeff, const
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 연립방정식 풀이 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 연립방정식 풀이 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 연립방정식 풀이에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_symbolic
   title: 9단계. 기호 행렬
   structuredPrimary: true
   subtitle: 변수 포함 행렬
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: SymPy의 장점은 숫자 대신 기호를 사용할 수 있다는 것입니다. 2×2 기호 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc, 역행렬은 (1/(ad-bc))[[d,-b],[-c,a]]입니다. 이런 일반 공식은 수치 계산으로는 얻을 수 없습니다. 기호 행렬로 패턴을 파악하고, 실제 값을 대입하여 검증할 수 있습니다.
+  goal: 9단계. 기호 행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: SymPy의 장점은 숫자 대신 기호를 사용할 수 있다는 것입니다. 2×2 기호 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc, 역행렬은 (1/(ad-bc))[[d,-b],[-c,a]]입니다.
+    이런 일반 공식은 수치 계산으로는 얻을 수 없습니다. 기호 행렬로 패턴을 파악하고, 실제 값을 대입하여 검증할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -246,23 +282,25 @@ sections:
     smat = Matrix([[a, b], [c, d]])
     smat
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 기호 행렬 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       a, b, c, d = symbols('a b c d')
       smat = Matrix([[a, b], [c, d]])
       smat
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 기호 행렬 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 기호 행렬 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 기호 행렬에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_rank
   title: 10단계. 계수와 영공간
   structuredPrimary: true
   subtitle: rank(), nullspace()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 행렬의 계수(rank)는 선형 독립인 행(또는 열)의 최대 개수입니다. 3×3 행렬의 rank가 2라면 한 행이 다른 행들의 조합으로 표현됩니다. nullspace()는 Ax=0의 해집합으로, 영벡터가 아닌 해가 있으면 행렬은 특이(singular)합니다. rref()는 기약행사다리꼴로 변환하여 rank와 영공간을 직접 확인할 수 있습니다.
+  goal: 10단계. 계수와 영공간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 행렬의 계수(rank)는 선형 독립인 행(또는 열)의 최대 개수입니다. 3×3 행렬의 rank가 2라면 한 행이 다른 행들의 조합으로 표현됩니다. nullspace()는
+    Ax=0의 해집합으로, 영벡터가 아닌 해가 있으면 행렬은 특이(singular)합니다. rref()는 기약행사다리꼴로 변환하여 rank와 영공간을 직접 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -270,22 +308,23 @@ sections:
     rk = mat4.rank()
     rk
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 계수와 영공간 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       mat4 = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
       rk = mat4.rank()
       rk
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 계수와 영공간 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 계수와 영공간 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 계수와 영공간에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 행렬 연습
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     이제 행렬의 기본 연산과 고급 기능을 종합적으로 연습합니다. 미션1에서는 두 행렬 P, Q의 곱 PQ와 QP가 다름을 확인하고, 행렬식과 역행렬을 계산합니다. 미션2에서는 대칭행렬의 고유값을 구하고, 3×3 연립방정식을 행렬로 풉니다. 이 연습들은 데이터 분석, 머신러닝 알고리즘 이해에 직접 활용됩니다.
 
@@ -302,7 +341,7 @@ sections:
     prodQP = matQ * matP
     prodPQ, prodQP
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sympy import Matrix, eye
 
@@ -313,17 +352,19 @@ sections:
       prodQP = matQ * matP
       prodPQ, prodQP
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
   structuredPrimary: true
   subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -343,7 +384,7 @@ sections:
     assert breakEvenQuantity == 40
     profitExpr, breakEvenQuantity
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import sympy as sp
 
@@ -361,7 +402,8 @@ sections:
       assert breakEvenQuantity == 40
       profitExpr, breakEvenQuantity
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드에서 먼저 리스트 값 위치를 찾으세요.'
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.'

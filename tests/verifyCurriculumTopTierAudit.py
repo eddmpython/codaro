@@ -85,7 +85,7 @@ RUNTIME_PREP_TERMS = (
     "설치",
 )
 COMPLETION_TERMS = ("완료", "프로젝트", "검증", "산출물", "리포트", "자동화", "체크")
-ORIENTATION_CATEGORIES = {"main", "excel", "practical"}
+ORIENTATION_CATEGORIES = {"excel", "practical"}
 STRUCTURED_SECTION_FIELDS = (
     "subtitle",
     "goal",

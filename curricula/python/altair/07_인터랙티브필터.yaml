@@ -26,14 +26,38 @@ intro:
   emoji: 🎮
   goal: 마우스 클릭과 드래그로 데이터를 동적으로 필터링하는 인터랙티브 차트를 만듭니다.
   description: selection_interval, selection_point, when().then().otherwise(), bind로 인터랙션을 구현합니다.
+  direction: 인터랙티브필터에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 인터랙티브필터 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 차트 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 영역 선택 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 인터랙티브필터 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 인터랙티브필터 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 인터랙티브필터 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: seaborn-data
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Codaro 로컬 데이터셋에서 mpg(Miles Per Gallon, 연비) 데이터를 불러옵니다. 1970-1980년대 자동차들의 연비 정보가 담긴 데이터입니다. horsepower는 마력(엔진 힘), mpg는 연비(갤런당 주행거리), origin은 생산국(usa, europe, japan)을 나타냅니다. 이 데이터로 사용자가 클릭하고 드래그해서 조작할 수 있는 인터랙티브 차트를 만들어봅니다. 인터랙티브는 "상호작용하는"이라는 뜻으로, 마우스로 차트를 조작하면 차트가 반응하는 것을 의미합니다.
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: Codaro 로컬 데이터셋에서 mpg(Miles Per Gallon, 연비) 데이터를 불러옵니다. 1970-1980년대 자동차들의 연비 정보가 담긴 데이터입니다.
+    horsepower는 마력(엔진 힘), mpg는 연비(갤런당 주행거리), origin은 생산국(usa, europe, japan)을 나타냅니다. 이 데이터로 사용자가 클릭하고
+    드래그해서 조작할 수 있는 인터랙티브 차트를 만들어봅니다. 인터랙티브는 "상호작용하는"이라는 뜻으로, 마우스로 차트를 조작하면 차트가 반응하는 것을 의미합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -45,7 +69,7 @@ sections:
 
     mpg = loadLocalDataset("mpg")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 열 이름이나 행 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -55,17 +79,20 @@ sections:
 
       mpg = loadLocalDataset("mpg")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_basic_chart
   title: 2단계. 기본 차트
   structuredPrimary: true
   subtitle: 인터랙션 없는 상태
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 먼저 인터랙션이 없는 기본 산점도를 만들어 비교 기준을 마련합니다. 나중에 이 차트에 인터랙션을 추가할 것입니다. 마력(x축)과 연비(y축)의 관계를 점으로 표시하고, 생산국(origin)마다 다른 색상을 부여합니다. 일반적으로 마력이 높을수록 연비는 낮아지는 경향을 볼 수 있습니다. properties()로 차트 크기를 지정합니다. width는 가로 길이, height는 세로 길이입니다.
+  goal: 2단계. 기본 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 먼저 인터랙션이 없는 기본 산점도를 만들어 비교 기준을 마련합니다. 나중에 이 차트에 인터랙션을 추가할 것입니다. 마력(x축)과 연비(y축)의 관계를 점으로
+    표시하고, 생산국(origin)마다 다른 색상을 부여합니다. 일반적으로 마력이 높을수록 연비는 낮아지는 경향을 볼 수 있습니다. properties()로 차트 크기를 지정합니다.
+    width는 가로 길이, height는 세로 길이입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -79,7 +106,7 @@ sections:
     )
     chartBasic
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 차트 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       chartBasic = alt.Chart(mpg).mark_point().encode(
           x='horsepower:Q',
@@ -91,22 +118,25 @@ sections:
       )
       chartBasic
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 차트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 차트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 차트에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_interval_selection
   title: 3단계. 영역 선택
   structuredPrimary: true
   subtitle: selection_interval
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 영역 선택에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이제 차트에 인터랙션을 추가합니다. selection_interval()은 "마우스 드래그로 사각형 영역을 선택할 수 있게 하라"는 명령입니다. interval은 "구간"이라는 뜻으로, 차트에서 특정 구간을 드래그해서 선택할 수 있습니다. 이것을 브러싱(brushing, 붓질하듯 영역을 칠한다)이라고 부릅니다. brush 변수에 선택 기능을 저장한 뒤, add_params(brush)로 차트에 추가하면 드래그 기능이 활성화됩니다.
 
     alt.when().then().otherwise()는 조건문입니다. "만약 ~이면 이렇게 하고, 아니면 저렇게 하라"는 뜻입니다. when(brush)는 "brush로 선택되었으면", then('origin:N')은 "생산국 색상을 표시하고", otherwise(alt.value('lightgray'))는 "아니면 회색으로 표시하라"입니다. 결과적으로 드래그한 영역의 점만 색상이 유지되고, 나머지는 모두 회색으로 바뀌어 선택된 부분이 강조됩니다.
   tips:
-  - alt.when().then().otherwise()는 조건문입니다. "만약 ~이면 이렇게 하고, 아니면 저렇게 하라"는 뜻입니다. when(brush)는 "brush로 선택되었으면", then('origin:N')은 "생산국 색상을 표시하고", otherwise(alt.value('lightgray'))는 "아니면 회색으로 표시하라"입니다. 결과적으로 드래그한 영역의 점만 색상이 유지되고, 나머지는 모두 회색으로 바뀌어 선택된 부분이 강조됩니다.
+  - alt.when().then().otherwise()는 조건문입니다. "만약 ~이면 이렇게 하고, 아니면 저렇게 하라"는 뜻입니다. when(brush)는 "brush로 선택되었으면",
+    then('origin:N')은 "생산국 색상을 표시하고", otherwise(alt.value('lightgray'))는 "아니면 회색으로 표시하라"입니다. 결과적으로 드래그한
+    영역의 점만 색상이 유지되고, 나머지는 모두 회색으로 바뀌어 선택된 부분이 강조됩니다.
   snippet: |-
     brush = alt.selection_interval()
 
@@ -121,7 +151,7 @@ sections:
     )
     chartBrush
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 영역 선택 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       brush = alt.selection_interval()
 
@@ -136,16 +166,17 @@ sections:
       )
       chartBrush
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 영역 선택 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 영역 선택 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 영역 선택에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_point_selection
   title: 4단계. 클릭 선택
   structuredPrimary: true
   subtitle: selection_point
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 클릭 선택에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     앞에서는 드래그로 영역을 선택했습니다. 이번에는 클릭으로 항목을 선택하는 방법을 배웁니다. selection_point()는 "마우스 클릭으로 개별 항목을 선택하게 하라"는 명령입니다. point는 "점"이라는 뜻입니다. fields=['origin'] 파라미터는 "origin(생산국) 필드 기준으로 선택하라"는 의미입니다. 범례에서 'usa'를 클릭하면 usa 자동차만 선택되고, 'japan'을 클릭하면 일본 자동차만 선택됩니다.
 
@@ -167,7 +198,7 @@ sections:
     )
     chartClick
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 클릭 선택 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       click = alt.selection_point(fields=['origin'])
 
@@ -183,17 +214,20 @@ sections:
       )
       chartClick
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 클릭 선택 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 클릭 선택 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 클릭 선택에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_conditional
   title: 5단계. 조건부 스타일링
   structuredPrimary: true
   subtitle: 다중 속성 변경
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: when().then().otherwise()는 색상뿐만 아니라 크기(size), 투명도(opacity) 등 여러 속성에 동시에 적용할 수 있습니다. opacity는 "불투명도"를 의미합니다. 값이 1이면 완전히 불투명(진하게), 0이면 완전히 투명(안 보임), 0.3이면 반투명(흐릿하게) 표시됩니다. 이 코드는 선택된 영역의 점을 크게(size=100), 진하게(opacity=1) 만들고, 선택되지 않은 점은 작게(size=30), 흐릿하게(opacity=0.3) 만들어 대비를 극대화합니다.
+  goal: 5단계. 조건부 스타일링에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: when().then().otherwise()는 색상뿐만 아니라 크기(size), 투명도(opacity) 등 여러 속성에 동시에 적용할 수 있습니다. opacity는
+    "불투명도"를 의미합니다. 값이 1이면 완전히 불투명(진하게), 0이면 완전히 투명(안 보임), 0.3이면 반투명(흐릿하게) 표시됩니다. 이 코드는 선택된 영역의 점을 크게(size=100),
+    진하게(opacity=1) 만들고, 선택되지 않은 점은 작게(size=30), 흐릿하게(opacity=0.3) 만들어 대비를 극대화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -212,7 +246,7 @@ sections:
     )
     chartCondition
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 조건부 스타일링 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       brushStyle = alt.selection_interval()
 
@@ -229,22 +263,25 @@ sections:
       )
       chartCondition
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 조건부 스타일링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 조건부 스타일링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 조건부 스타일링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_slider
   title: 6단계. 슬라이더 바인딩
   structuredPrimary: true
   subtitle: binding_range
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 슬라이더 바인딩에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     지금까지는 마우스로 직접 차트를 클릭하거나 드래그했습니다. 이번에는 슬라이더라는 UI 위젯을 만들어봅니다. binding_range()는 "범위(range) 슬라이더를 만들어 연결(binding)하라"는 뜻입니다. min은 최솟값, max는 최댓값, step은 한 칸의 간격, name은 슬라이더 옆에 표시될 이름입니다. alt.param()으로 파라미터를 만듭니다. name은 파라미터 이름, value는 초기값(50), bind는 어떤 위젯과 연결할지 지정합니다. alt.datum.horsepower >= selectHp는 "각 데이터의 마력이 슬라이더 값 이상인가?"를 검사합니다.
 
     alt.datum은 "각각의 데이터"를 의미합니다. alt.datum.horsepower는 "각 데이터 행의 horsepower 값"을 가리킵니다. >= 기호는 "크거나 같다"는 의미입니다. alt.datum.horsepower >= selectHp는 "이 데이터의 마력이 슬라이더 값 이상인가?"를 묻는 조건식입니다. 참이면 opacity=1(진하게), 거짓이면 opacity=0.1(거의 투명)로 표시됩니다.
   tips:
-  - alt.datum은 "각각의 데이터"를 의미합니다. alt.datum.horsepower는 "각 데이터 행의 horsepower 값"을 가리킵니다. >= 기호는 "크거나 같다"는 의미입니다. alt.datum.horsepower >= selectHp는 "이 데이터의 마력이 슬라이더 값 이상인가?"를 묻는 조건식입니다. 참이면 opacity=1(진하게), 거짓이면 opacity=0.1(거의 투명)로 표시됩니다.
+  - alt.datum은 "각각의 데이터"를 의미합니다. alt.datum.horsepower는 "각 데이터 행의 horsepower 값"을 가리킵니다. >= 기호는 "크거나 같다"는
+    의미입니다. alt.datum.horsepower >= selectHp는 "이 데이터의 마력이 슬라이더 값 이상인가?"를 묻는 조건식입니다. 참이면 opacity=1(진하게),
+    거짓이면 opacity=0.1(거의 투명)로 표시됩니다.
   snippet: |-
     sliderHp = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
     selectHp = alt.param(name='minHorsepower', value=50, bind=sliderHp)
@@ -263,7 +300,7 @@ sections:
     )
     chartSlider
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 슬라이더 바인딩 예제에서 입력값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       sliderHp = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
       selectHp = alt.param(name='minHorsepower', value=50, bind=sliderHp)
@@ -282,17 +319,21 @@ sections:
       )
       chartSlider
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 슬라이더 바인딩 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 슬라이더 바인딩 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 슬라이더 바인딩에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_dropdown
   title: 7단계. 드롭다운 바인딩
   structuredPrimary: true
   subtitle: binding_select
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 슬라이더는 숫자 범위를 조절하는 위젯이었습니다. 이번에는 카테고리를 선택하는 드롭다운 메뉴를 만들어봅니다. binding_select()는 "선택(select) 메뉴를 만들어 연결(binding)하라"는 뜻입니다. options는 선택지 목록, labels는 화면에 표시될 이름, name은 드롭다운 이름입니다. [None] + origins는 리스트 합치기입니다. None(전체)을 첫 번째 항목으로 추가하고, 그 뒤에 usa, europe, japan을 붙입니다. | 기호는 "또는"이라는 뜻으로, (조건1) | (조건2)는 "조건1이거나 조건2이면"을 의미합니다.
+  goal: 7단계. 드롭다운 바인딩에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 슬라이더는 숫자 범위를 조절하는 위젯이었습니다. 이번에는 카테고리를 선택하는 드롭다운 메뉴를 만들어봅니다. binding_select()는 "선택(select)
+    메뉴를 만들어 연결(binding)하라"는 뜻입니다. options는 선택지 목록, labels는 화면에 표시될 이름, name은 드롭다운 이름입니다. [None] + origins는
+    리스트 합치기입니다. None(전체)을 첫 번째 항목으로 추가하고, 그 뒤에 usa, europe, japan을 붙입니다. | 기호는 "또는"이라는 뜻으로, (조건1) | (조건2)는
+    "조건1이거나 조건2이면"을 의미합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -314,7 +355,7 @@ sections:
     )
     chartDropdown
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 드롭다운 바인딩 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       origins = ['usa', 'europe', 'japan']
       dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
@@ -334,17 +375,20 @@ sections:
       )
       chartDropdown
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 드롭다운 바인딩 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 드롭다운 바인딩 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 드롭다운 바인딩에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_combined
   title: 8단계. 복합 인터랙션
   structuredPrimary: true
   subtitle: 여러 컨트롤 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지금까지 배운 슬라이더와 드롭다운을 하나의 차트에 동시에 적용해봅니다. 두 가지 조건을 모두 만족하는 데이터만 강조됩니다. & 기호는 "그리고"라는 뜻입니다. (조건1) & (조건2)는 "조건1이면서 동시에 조건2도 만족해야"를 의미합니다. 앞에서 배운 | (또는)와 반대입니다. 이 코드는 "드롭다운에서 선택한 생산국이면서, 동시에 슬라이더 값 이상의 마력을 가진" 자동차만 opacity=0.8로 진하게 표시하고, 나머지는 opacity=0.1로 거의 투명하게 만듭니다.
+  goal: 8단계. 복합 인터랙션에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 지금까지 배운 슬라이더와 드롭다운을 하나의 차트에 동시에 적용해봅니다. 두 가지 조건을 모두 만족하는 데이터만 강조됩니다. & 기호는 "그리고"라는 뜻입니다.
+    (조건1) & (조건2)는 "조건1이면서 동시에 조건2도 만족해야"를 의미합니다. 앞에서 배운 | (또는)와 반대입니다. 이 코드는 "드롭다운에서 선택한 생산국이면서, 동시에
+    슬라이더 값 이상의 마력을 가진" 자동차만 opacity=0.8로 진하게 표시하고, 나머지는 opacity=0.1로 거의 투명하게 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -370,7 +414,7 @@ sections:
     )
     chartCombined
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 복합 인터랙션 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       originList = ['usa', 'europe', 'japan']
       dropdownCombined = alt.binding_select(options=[None] + originList, labels=['전체'] + originList, name='생산국: ')
@@ -394,16 +438,17 @@ sections:
       )
       chartCombined
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 복합 인터랙션 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 복합 인터랙션 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 복합 인터랙션에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_final
   title: 9단계. 최종 결과물
   structuredPrimary: true
   subtitle: 인터랙티브 대시보드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이제 지금까지 배운 모든 인터랙션 기능을 하나로 합쳐봅니다. 브러싱(드래그), 드롭다운, 슬라이더가 모두 포함된 대시보드입니다. 세 가지 파라미터(brushFinal, paramOriginFinal, paramHpFinal)를 add_params()에 쉼표로 구분해서 모두 추가합니다. 사용자는 드롭다운으로 생산국을 고르고, 슬라이더로 최소 마력을 조절하고, 마우스로 차트를 드래그해서 원하는 데이터를 찾을 수 있습니다. 세 가지 필터가 동시에 작동합니다.
 
@@ -440,7 +485,7 @@ sections:
     )
     chartFinal
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 최종 결과물 예제에서 리스트 값을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       originsFinal = ['usa', 'europe', 'japan']
       dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
@@ -471,17 +516,20 @@ sections:
       )
       chartFinal
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 최종 결과물 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 최종 결과물 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 최종 결과물에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step10_workflow
   title: 10단계. 실무 인터랙션 검증
   structuredPrimary: true
   subtitle: 예측 → 파라미터 오류 확인 → 사양 검증 → 기준 실험
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 인터랙티브 차트는 눈으로만 확인하면 놓치는 부분이 많습니다. 슬라이더와 드롭다운이 실제 차트 사양에 연결됐는지, 브러싱 파라미터가 색상 조건에 들어갔는지, 툴팁에 필요한 필드가 있는지 코드로 검사해야 합니다. 이번 단계에서는 생산국별 연비를 먼저 예측하고, 파라미터가 빠진 차트를 일부러 실패시킨 뒤, 완성 차트의 인터랙션 사양을 검증합니다. 마지막에는 마력 기준을 바꿔 필터 결과가 어떻게 줄어드는지 실험합니다.
+  goal: 10단계. 실무 인터랙션 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 인터랙티브 차트는 눈으로만 확인하면 놓치는 부분이 많습니다. 슬라이더와 드롭다운이 실제 차트 사양에 연결됐는지, 브러싱 파라미터가 색상 조건에 들어갔는지,
+    툴팁에 필요한 필드가 있는지 코드로 검사해야 합니다. 이번 단계에서는 생산국별 연비를 먼저 예측하고, 파라미터가 빠진 차트를 일부러 실패시킨 뒤, 완성 차트의 인터랙션 사양을
+    검증합니다. 마지막에는 마력 기준을 바꿔 필터 결과가 어떻게 줄어드는지 실험합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -508,7 +556,7 @@ sections:
     print("예상: 평균 연비가 가장 높은 생산국은", bestMpgOrigin)
     print("120마력 이상 차량 수:", highPowerCountByOrigin)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 실무 인터랙션 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       requiredColumns = {"name", "origin", "horsepower", "mpg", "cylinders"}
       missingColumns = requiredColumns - set(mpg.columns)
@@ -533,16 +581,17 @@ sections:
       print("예상: 평균 연비가 가장 높은 생산국은", bestMpgOrigin)
       print("120마력 이상 차량 수:", highPowerCountByOrigin)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 실무 인터랙션 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 실무 인터랙션 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 실무 인터랙션 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 인터랙티브 차트 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
   explanation: |-
     이 프로젝트에서 배운 내용을 정리하면: selection_interval()로 드래그 선택, selection_point()로 클릭 선택, when().then().otherwise()로 조건부 스타일, binding_range()로 슬라이더, binding_select()로 드롭다운, alt.datum으로 데이터 접근, & (그리고)와 | (또는) 연산자입니다. 이제 배운 개념들을 조합해 새로운 인터랙티브 차트를 만들어봅시다.
 
@@ -558,7 +607,7 @@ sections:
     selectCyl = alt.binding_select(options=[None] + kinds, labels=['전체'] + [str(c) for c in kinds], name='실린더: ')
     filterCyl = alt.param(name='cylFilter', bind=selectCyl)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 스케일과 마크 매핑 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
       import pandas as pd
@@ -568,10 +617,11 @@ sections:
       selectCyl = alt.binding_select(options=[None] + kinds, labels=['전체'] + [str(c) for c in kinds], name='실린더: ')
       filterCyl = alt.param(name='cylFilter', bind=selectCyl)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 스케일과 마크 매핑 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   blocks:

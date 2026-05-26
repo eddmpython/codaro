@@ -26,32 +26,56 @@ meta:
 intro:
   emoji: 🎨
   goal: 다양한 타일 레이어로 지도 스타일을 변경합니다.
-  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, attribution을 명시한 커스텀 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
+  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, attribution을 명시한 커스텀 타일을 사용할 수 있습니다.
+    용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
+  direction: 지도 스타일 변경에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 지도 스타일 변경 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 타일 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. CartoDB 타일 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 지도 스타일 변경 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 지도 스타일 변경 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 지도 스타일 변경 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: folium과 Codaro를 불러옵니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: import folium
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_default_tiles
   title: 2단계. 기본 타일
   structuredPrimary: true
   subtitle: OpenStreetMap
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     기본 타일은 OpenStreetMap입니다. tiles 파라미터를 지정하지 않으면 자동 적용됩니다.
 
@@ -63,22 +87,23 @@ sections:
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
     m1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 타일 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=12)
       m1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 타일 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 타일 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 타일에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_cartodb
   title: 3단계. CartoDB 타일
   structuredPrimary: true
   subtitle: Positron, DarkMatter
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. CartoDB 타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     CartoDB는 깔끔한 스타일의 타일을 제공합니다. Positron은 밝은 테마, DarkMatter는 어두운 테마입니다.
 
@@ -93,7 +118,7 @@ sections:
     )
     m3
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. CartoDB 타일 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m3 = folium.Map(
           location=seoulCenter,
@@ -102,16 +127,17 @@ sections:
       )
       m3
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. CartoDB 타일 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. CartoDB 타일 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. CartoDB 타일에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_custom_tiles
   title: 4단계. 커스텀 타일
   structuredPrimary: true
   subtitle: attribution 있는 외부 타일
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 커스텀 타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     외부 타일 서버를 사용할 때는 URL과 attribution을 함께 지정합니다. attribution이 없으면 최신 Folium에서는 실행 오류가 납니다.
 
@@ -129,7 +155,7 @@ sections:
 
     m5
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 커스텀 타일 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
 
@@ -141,16 +167,17 @@ sections:
 
       m5
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 커스텀 타일 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 커스텀 타일 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 커스텀 타일에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_tile_comparison
   title: 5단계. 타일 비교
   structuredPrimary: true
   subtitle: 같은 위치 다른 스타일
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 타일 비교에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     동일한 위치를 여러 타일 스타일로 비교해봅니다.
 
@@ -166,7 +193,7 @@ sections:
     ]
     tiles
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 타일 비교 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       tiles = [
           "OpenStreetMap",
@@ -176,16 +203,17 @@ sections:
       ]
       tiles
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 타일 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 타일 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 타일 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_tilelayer
   title: 6단계. TileLayer 추가
   structuredPrimary: true
   subtitle: TileLayer()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. TileLayer 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     TileLayer()로 지도에 타일 레이어를 추가합니다. 여러 타일을 겹쳐 사용하거나 전환할 수 있습니다.
 
@@ -199,7 +227,7 @@ sections:
 
     m10
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. TileLayer 추가 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
@@ -207,16 +235,17 @@ sections:
 
       m10
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. TileLayer 추가 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. TileLayer 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. TileLayer 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_custom_tile
   title: 7단계. 커스텀 타일 URL
   structuredPrimary: true
   subtitle: 외부 타일 서버
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 커스텀 타일 URL에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     URL 템플릿으로 외부 타일 서버를 사용할 수 있습니다. {z}, {x}, {y}는 줌 레벨과 타일 좌표입니다.
 
@@ -234,7 +263,7 @@ sections:
 
     m12
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 커스텀 타일 URL 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
 
@@ -246,16 +275,17 @@ sections:
 
       m12
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 커스텀 타일 URL 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 커스텀 타일 URL 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 커스텀 타일 URL에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step8_tile_opacity
   title: 8단계. 타일 투명도
   structuredPrimary: true
   subtitle: opacity
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 타일 투명도에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     타일의 투명도를 조절하여 여러 타일을 겹쳐 볼 수 있습니다.
 
@@ -274,7 +304,7 @@ sections:
 
     m13
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 타일 투명도 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m13 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -287,16 +317,17 @@ sections:
 
       m13
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 타일 투명도 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 타일 투명도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 타일 투명도에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_use_cases
   title: 9단계. 용도별 추천
   structuredPrimary: true
   subtitle: 상황에 맞는 타일
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 용도별 추천에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     용도에 따라 적합한 타일을 선택합니다.
 
@@ -327,7 +358,7 @@ sections:
 
     dataMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 용도별 추천 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       dataMap = folium.Map(
           location=seoulCenter,
@@ -352,16 +383,17 @@ sections:
 
       dataMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 용도별 추천 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 용도별 추천 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 용도별 추천에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 낮/밤 모드 지도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     LayerControl로 낮/밤 모드를 전환할 수 있는 지도를 만듭니다.
 
@@ -400,7 +432,7 @@ sections:
 
     themeMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       places = [
           {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -433,22 +465,24 @@ sections:
 
       themeMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 타일 선택 검증
   structuredPrimary: true
   subtitle: 예측 → attribution 오류 확인 → 렌더 검증 → 용도 실험
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 실무 타일 선택 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     지도 스타일은 취향 문제가 아니라 데이터가 잘 읽히는지와 라이선스 표시가 맞는지의 문제입니다. 업무용 지도에서는 타일 프로필을 정의하고, 커스텀 URL에는 attribution이 있는지 검증한 뒤, 레이어 이름이 HTML에 렌더링되는지 확인해야 합니다.
 
     타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
   tips:
-  - 타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
+  - 타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도
+    커리큘럼이 됩니다.
   snippet: |-
     tileProfiles = {
         "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
@@ -465,7 +499,7 @@ sections:
     recommendedProfile = tileProfiles["report"]
     recommendedProfile["name"], recommendedProfile["useCase"]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 실무 타일 선택 검증 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       tileProfiles = {
           "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
@@ -482,16 +516,17 @@ sections:
       recommendedProfile = tileProfiles["report"]
       recommendedProfile["name"], recommendedProfile["useCase"]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 실무 타일 선택 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 실무 타일 선택 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 실무 타일 선택 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 타일 스타일
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -504,7 +539,7 @@ sections:
     ]
     mountains
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       mountains = [
@@ -514,7 +549,8 @@ sections:
       ]
       mountains
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

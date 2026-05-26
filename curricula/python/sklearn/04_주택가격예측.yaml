@@ -28,14 +28,37 @@ meta:
 intro:
   emoji: 🏠
   goal: 교차검증으로 모델의 일반화 성능을 평가합니다.
-  description: Codaro 로컬 주택 가격 데이터로 회귀 모델을 학습합니다. 교차검증(cross-validation)으로 모델이 새로운 데이터에도 잘 작동하는지 확인합니다. 이전 프로젝트의 train_test_split, StandardScaler, LinearRegression, R²를 복습하고 cross_val_score를 새로 배웁니다.
+  description: Codaro 로컬 주택 가격 데이터로 회귀 모델을 학습합니다. 교차검증(cross-validation)으로 모델이 새로운 데이터에도 잘 작동하는지 확인합니다.
+    이전 프로젝트의 train_test_split, StandardScaler, LinearRegression, R²를 복습하고 cross_val_score를 새로 배웁니다.
+  direction: 주택가격예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 주택가격예측 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 불러오기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 탐색 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 주택가격예측 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 주택가격예측 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 주택가격예측 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 로컬 주택 가격 예측에 필요한 라이브러리를 불러옵니다. 교차검증을 위해 cross_val_score를 추가로 임포트합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -49,7 +72,7 @@ sections:
     import numpy as np
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sklearn.model_selection import train_test_split, cross_val_score
       from sklearn.preprocessing import StandardScaler
@@ -60,22 +83,24 @@ sections:
       import numpy as np
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: loadLocalDataset()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Codaro 로컬 주택 데이터셋은 방 개수, 범죄율, 세금, 학생-교사 비율, 저소득층 비율 같은 특성으로 주택 가격 중앙값을 예측합니다. 외부 다운로드 없이 실행되므로 로컬 Python 학습 흐름에 맞습니다.
 
     rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를 막을 수 있습니다.
   tips:
-  - rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서 제외해야 데이터 누수를 막을 수 있습니다.
+  - rm은 평균 방 개수, lstat은 저소득층 비율, tax는 재산세율, ptratio는 학생-교사 비율, medv는 주택 가격 중앙값입니다. 타겟 컬럼 medv는 학습 입력에서
+    제외해야 데이터 누수를 막을 수 있습니다.
   snippet: |-
     housing = loadLocalDataset("boston_housing")
     X = housing.drop(columns=["medv"])
@@ -83,7 +108,7 @@ sections:
     featureNames = X.columns.tolist()
     X.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 불러오기 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       housing = loadLocalDataset("boston_housing")
       X = housing.drop(columns=["medv"])
@@ -91,34 +116,36 @@ sections:
       featureNames = X.columns.tolist()
       X.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 불러오기 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 불러오기에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_explore
   title: 3단계. 데이터 탐색
   structuredPrimary: true
   subtitle: 분포 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 대규모 데이터셋의 특성과 타겟 분포를 확인합니다. 이상치나 스케일 차이를 파악합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: X.describe()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 데이터 탐색 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: X.describe()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 데이터 탐색 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 데이터 탐색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 데이터 탐색에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_split
   title: 4단계. 데이터 분할
   structuredPrimary: true
   subtitle: train_test_split
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 데이터가 작을수록 분할 운에 성능이 흔들릴 수 있습니다. 그래서 단일 테스트 성능만 보지 않고 뒤에서 교차검증 평균과 표준편차를 함께 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -126,21 +153,22 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 데이터 분할 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 데이터 분할 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 데이터 분할 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 데이터 분할에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_scale
   title: 5단계. 스케일링
   structuredPrimary: true
   subtitle: StandardScaler
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 특성들의 스케일이 서로 다릅니다. 방 개수, 세금, 저소득층 비율처럼 단위가 다른 변수를 함께 쓰므로 StandardScaler로 표준화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -149,22 +177,23 @@ sections:
     xTrainSc = scaler.fit_transform(xTrain)
     xTestSc = scaler.transform(xTest)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 스케일링 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       scaler = StandardScaler()
       xTrainSc = scaler.fit_transform(xTrain)
       xTestSc = scaler.transform(xTest)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 스케일링 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 스케일링 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 스케일링에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_baseline
   title: 6단계. 기본 모델
   structuredPrimary: true
   subtitle: LinearRegression
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 기본 모델에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 먼저 LinearRegression으로 기본 성능을 확인합니다. 이 성능을 기준(baseline)으로 다른 모델과 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -175,7 +204,7 @@ sections:
     r2Lr = r2_score(yTest, predLr)
     f"LinearRegression R²: {r2Lr:.4f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 기본 모델 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       modelLr = LinearRegression()
       modelLr.fit(xTrainSc, yTrain)
@@ -183,41 +212,44 @@ sections:
       r2Lr = r2_score(yTest, predLr)
       f"LinearRegression R²: {r2Lr:.4f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 기본 모델 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 기본 모델 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 기본 모델에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_cv_intro
   title: 7단계. 교차검증 소개
   structuredPrimary: true
   subtitle: 왜 필요한가?
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 교차검증 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증(cross-validation)은 데이터를 K개로 나눠 K번 반복 평가합니다. 모든 데이터가 한 번씩 테스트에 사용되므로 더 신뢰할 수 있는 성능 추정이 가능합니다.
 
     cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
   tips:
-  - cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
+  - cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도
+    많이 사용합니다.
   snippet: |-
     cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
     cvScores
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 교차검증 소개 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
       cvScores
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 교차검증 소개 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 교차검증 소개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 교차검증 소개에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_cv_analysis
   title: 8단계. 교차검증 분석
   structuredPrimary: true
   subtitle: 평균과 표준편차
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 교차검증 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     교차검증 결과의 평균과 표준편차를 확인합니다. 표준편차가 작으면 모델이 안정적입니다. 표준편차가 크면 데이터 분할에 따라 성능이 크게 달라지는 것입니다.
 
@@ -229,22 +261,23 @@ sections:
     cvStd = cvScores.std()
     f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 교차검증 분석 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cvMean = cvScores.mean()
       cvStd = cvScores.std()
       f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 교차검증 분석 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 교차검증 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 교차검증 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_ridge
   title: 9단계. Ridge 회귀
   structuredPrimary: true
   subtitle: 정규화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. Ridge 회귀에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Ridge 회귀는 LinearRegression에 L2 정규화를 추가한 것입니다. 과적합을 방지하고 모델을 더 안정적으로 만듭니다. alpha 파라미터로 정규화 강도를 조절합니다.
 
@@ -258,7 +291,7 @@ sections:
     r2Ridge = r2_score(yTest, predRidge)
     f"Ridge R²: {r2Ridge:.4f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. Ridge 회귀 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       modelRidge = Ridge(alpha=1.0)
       modelRidge.fit(xTrainSc, yTrain)
@@ -266,16 +299,17 @@ sections:
       r2Ridge = r2_score(yTest, predRidge)
       f"Ridge R²: {r2Ridge:.4f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. Ridge 회귀 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. Ridge 회귀 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. Ridge 회귀에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_compare
   title: 10단계. 모델 비교
   structuredPrimary: true
   subtitle: 성능 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: LinearRegression과 Ridge의 성능을 비교합니다. 교차검증 결과와 테스트 결과를 함께 확인합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -288,7 +322,7 @@ sections:
     })
     comparison
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 모델 비교 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       comparison = pd.DataFrame({
           'Model': ['LinearRegression', 'Ridge'],
@@ -298,16 +332,17 @@ sections:
       })
       comparison
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 모델 비교 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 모델 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 모델 비교에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step11_feature_importance
   title: 11단계. 특성 중요도
   structuredPrimary: true
   subtitle: 회귀 계수 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 특성 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     회귀 계수의 절대값을 비교하여 어떤 특성이 주택 가격에 가장 큰 영향을 미치는지 확인합니다.
 
@@ -322,7 +357,7 @@ sections:
     importance['Abs'] = importance['Coefficient'].abs()
     importance.sort_values('Abs', ascending=False)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 특성 중요도 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       importance = pd.DataFrame({
           'Feature': featureNames,
@@ -331,17 +366,19 @@ sections:
       importance['Abs'] = importance['Coefficient'].abs()
       importance.sort_values('Abs', ascending=False)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 특성 중요도 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 특성 중요도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 특성 중요도에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step12_summary
   title: 12단계. 정리
   structuredPrimary: true
   subtitle: 교차검증 완료
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 이번 프로젝트에서는 로컬 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge 회귀로 정규화의 효과를 확인했습니다. 다운로드 없는 로컬 회귀 분석 워크플로우를 익혔습니다.
+  goal: 12단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 이번 프로젝트에서는 로컬 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge
+    회귀로 정규화의 효과를 확인했습니다. 다운로드 없는 로컬 회귀 분석 워크플로우를 익혔습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -351,7 +388,7 @@ sections:
     })
     summary
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 정리 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       summary = pd.DataFrame({
           'Item': ['Dataset', 'Best Model', 'Test R²', 'CV R²', 'Key Feature'],
@@ -359,16 +396,17 @@ sections:
       })
       summary
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 정리 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 정리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 정리에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 주택 가격 예측 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
 
@@ -400,7 +438,7 @@ sections:
 
     pd.DataFrame(results)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sklearn.model_selection import train_test_split, cross_val_score
       from sklearn.preprocessing import StandardScaler
@@ -426,17 +464,19 @@ sections:
 
       pd.DataFrame(results)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -465,7 +505,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -510,7 +550,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

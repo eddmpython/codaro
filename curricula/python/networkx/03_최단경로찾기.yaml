@@ -27,36 +27,61 @@ meta:
 intro:
   emoji: 🛤️
   goal: 두 노드 사이 최단 경로를 찾고 경로 관련 함수를 활용합니다.
-  description: 최단 경로는 네트워크 분석의 핵심입니다. shortest_path()로 경로를 찾고, has_path()로 연결 여부를 확인합니다. 가중치가 있으면 다익스트라 알고리즘이 적용됩니다. 지하철 노선도 예제로 실습합니다.
+  description: 최단 경로는 네트워크 분석의 핵심입니다. shortest_path()로 경로를 찾고, has_path()로 연결 여부를 확인합니다. 가중치가 있으면 다익스트라
+    알고리즘이 적용됩니다. 지하철 노선도 예제로 실습합니다.
+  direction: 최단경로찾기에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 최단경로찾기 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 최단 경로 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 연결 확인 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 최단경로찾기 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 최단경로찾기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 최단경로찾기 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: NetworkX와 matplotlib을 불러옵니다. NetworkX는 그래프 알고리즘을 제공하고, matplotlib은 경로 시각화에 사용됩니다. 최단 경로 알고리즘은 네트워크 분석의 핵심으로, 내비게이션, 소셜 네트워크의 관계 거리, 통신망 라우팅 등 다양한 분야에서 활용됩니다.
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. NetworkX는 그래프 알고리즘을 제공하고, matplotlib은 경로 시각화에 사용됩니다. 최단 경로
+    알고리즘은 네트워크 분석의 핵심으로, 내비게이션, 소셜 네트워크의 관계 거리, 통신망 라우팅 등 다양한 분야에서 활용됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     import networkx as nx
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_simple_path
   title: 2단계. 기본 최단 경로
   structuredPrimary: true
   subtitle: shortest_path()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     shortest_path(G, source, target)로 두 노드 사이 최단 경로를 찾습니다. 가중치가 없으면 BFS(너비 우선 탐색)를 사용하여 엣지 수가 가장 적은 경로를 반환합니다. 최단 경로는 출발 노드부터 도착 노드까지 거쳐가는 노드들의 리스트로 반환됩니다. shortest_path_length()는 경로의 길이(엣지 수)만 반환하여 메모리를 절약할 수 있습니다.
 
@@ -71,7 +96,7 @@ sections:
     ])
     list(G.edges())
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 최단 경로 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       G = nx.Graph()
       G.add_edges_from([
@@ -80,16 +105,17 @@ sections:
       ])
       list(G.edges())
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 최단 경로 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 최단 경로 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 최단 경로에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_has_path
   title: 3단계. 연결 확인
   structuredPrimary: true
   subtitle: has_path()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 연결 확인에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     has_path()로 두 노드가 연결되어 있는지 확인합니다. 그래프가 여러 컴포넌트로 분리된 경우, 서로 다른 컴포넌트에 속한 노드 사이에는 경로가 존재하지 않습니다. shortest_path()를 호출하기 전에 has_path()로 연결 여부를 먼저 확인하면 NetworkXNoPath 예외를 방지할 수 있습니다. 대규모 네트워크에서는 이 확인이 중요합니다.
 
@@ -102,23 +128,24 @@ sections:
     G2.add_edges_from([(4, 5), (5, 6)])
     list(G2.edges())
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 연결 확인 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       G2 = nx.Graph()
       G2.add_edges_from([(1, 2), (2, 3)])
       G2.add_edges_from([(4, 5), (5, 6)])
       list(G2.edges())
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 연결 확인 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 연결 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 연결 확인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_all_paths
   title: 4단계. 모든 경로 찾기
   structuredPrimary: true
   subtitle: all_simple_paths()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 모든 경로 찾기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     all_simple_paths()로 두 노드 사이의 모든 단순 경로를 찾습니다. 단순 경로(simple path)는 같은 노드를 두 번 방문하지 않는 경로입니다. 이 함수는 제너레이터를 반환하므로 메모리 효율적입니다. 큰 그래프에서는 경로 수가 기하급수적으로 증가할 수 있어 cutoff 파라미터로 최대 경로 길이를 제한하는 것이 권장됩니다.
 
@@ -129,21 +156,22 @@ sections:
     allPaths = list(nx.all_simple_paths(G, source=1, target=6))
     allPaths
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 모든 경로 찾기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       allPaths = list(nx.all_simple_paths(G, source=1, target=6))
       allPaths
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 모든 경로 찾기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 모든 경로 찾기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 모든 경로 찾기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_weighted
   title: 5단계. 가중치 최단 경로
   structuredPrimary: true
   subtitle: 다익스트라 알고리즘
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 가중치 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     가중치 그래프에서는 엣지 수가 아닌 가중치 합이 최소인 경로를 찾습니다. weight 파라미터로 엣지 속성 이름을 지정하면 다익스트라(Dijkstra) 알고리즘이 자동으로 적용됩니다. 다익스트라 알고리즘은 1956년 에츠허르 다익스트라가 개발한 알고리즘으로, 음수가 아닌 가중치를 가진 그래프에서 최적의 경로를 보장합니다. GPS 내비게이션, 네트워크 라우팅 프로토콜(OSPF) 등에서 핵심적으로 사용됩니다.
 
@@ -160,7 +188,7 @@ sections:
     cities.add_edge("Daejeon", "Gwangju", weight=150)
     cities.edges(data=True)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 가중치 최단 경로 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cities = nx.Graph()
       cities.add_edge("Seoul", "Daejeon", weight=140)
@@ -171,16 +199,17 @@ sections:
       cities.add_edge("Daejeon", "Gwangju", weight=150)
       cities.edges(data=True)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 가중치 최단 경로 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 가중치 최단 경로 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 가중치 최단 경로에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_visualize_path
   title: 6단계. 경로 시각화
   structuredPrimary: true
   subtitle: 경로 강조 표시
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 경로 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     최단 경로를 시각화에서 강조하면 결과를 직관적으로 이해할 수 있습니다. 노드 리스트로 된 경로를 엣지 리스트로 변환한 뒤, draw_networkx_edges()로 해당 엣지만 다른 색상이나 두께로 그립니다. 배경 그래프는 연한 색으로, 경로는 눈에 띄는 색으로 표현하는 것이 효과적입니다.
 
@@ -191,21 +220,22 @@ sections:
     pathEdges = list(zip(pathSB[:-1], pathSB[1:]))
     pathEdges
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 경로 시각화 예제에서 리스트 값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       pathEdges = list(zip(pathSB[:-1], pathSB[1:]))
       pathEdges
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 경로 시각화 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 경로 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 경로 시각화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step7_all_shortest
   title: 7단계. 모든 최단 경로
   structuredPrimary: true
   subtitle: 한 노드에서 모든 노드로
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 모든 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     source만 지정하고 target을 생략하면 해당 노드에서 도달 가능한 모든 노드까지의 최단 경로를 한 번에 계산합니다. 결과는 딕셔너리 형태로 반환되어 각 목적지별 경로를 쉽게 조회할 수 있습니다. 이 방식은 개별적으로 여러 번 호출하는 것보다 효율적이며, 한 지점에서 전체 네트워크로의 접근성을 분석할 때 유용합니다.
 
@@ -216,22 +246,24 @@ sections:
     allFromSeoul = nx.shortest_path(cities, source="Seoul", weight="weight")
     allFromSeoul
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 모든 최단 경로 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       allFromSeoul = nx.shortest_path(cities, source="Seoul", weight="weight")
       allFromSeoul
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 모든 최단 경로 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 모든 최단 경로 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 모든 최단 경로에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_subway
   title: 8단계. 지하철 노선도
   structuredPrimary: true
   subtitle: 실제 예제
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 지하철 노선도를 그래프로 모델링합니다. 각 역은 노드로, 역 사이 구간은 엣지로, 이동 소요시간은 엣지의 가중치로 표현합니다. 이런 모델링을 통해 최단 시간 경로, 최소 환승 경로 등 다양한 경로 탐색 문제를 해결할 수 있습니다. 실제 지하철 앱들도 이와 유사한 그래프 알고리즘을 사용하여 경로를 추천합니다.
+  goal: 8단계. 지하철 노선도에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 지하철 노선도를 그래프로 모델링합니다. 각 역은 노드로, 역 사이 구간은 엣지로, 이동 소요시간은 엣지의 가중치로 표현합니다. 이런 모델링을 통해 최단 시간
+    경로, 최소 환승 경로 등 다양한 경로 탐색 문제를 해결할 수 있습니다. 실제 지하철 앱들도 이와 유사한 그래프 알고리즘을 사용하여 경로를 추천합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -251,7 +283,7 @@ sections:
         subway.add_edge(u, v, time=t)
     subway.edges(data=True)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 지하철 노선도 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       subway = nx.Graph()
       subwayEdges = [
@@ -269,16 +301,17 @@ sections:
           subway.add_edge(u, v, time=t)
       subway.edges(data=True)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 지하철 노선도 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 지하철 노선도 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 지하철 노선도에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step9_diameter
   title: 9단계. 그래프 지름
   structuredPrimary: true
   subtitle: 가장 먼 두 노드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 그래프 지름에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     그래프의 지름(diameter)은 모든 노드 쌍 중 최단 경로가 가장 긴 것의 길이입니다. 네트워크의 '최대 거리'를 나타내며, 두 노드가 최악의 경우에도 몇 단계 내에 연결되는지를 의미합니다. 반지름(radius)은 중심 노드에서 가장 먼 노드까지의 거리입니다. 중심(center)은 이심률이 반지름과 같은 노드들로, 네트워크에서 가장 접근성이 좋은 위치입니다.
 
@@ -289,21 +322,22 @@ sections:
     diameter = nx.diameter(G)
     diameter
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 그래프 지름 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       diameter = nx.diameter(G)
       diameter
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 그래프 지름 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 그래프 지름 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 그래프 지름에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_eccentricity
   title: 10단계. 이심률
   structuredPrimary: true
   subtitle: eccentricity
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 이심률에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     이심률(eccentricity)은 한 노드에서 가장 먼 노드까지의 최단 경로 길이입니다. 각 노드가 네트워크에서 얼마나 중심에 있는지 또는 외곽에 있는지를 나타냅니다. 모든 노드의 이심률 중 최대가 지름(diameter), 최소가 반지름(radius)입니다. periphery(주변부)는 이심률이 지름과 같은 노드들로, 네트워크의 가장 바깥에 위치합니다.
 
@@ -314,21 +348,22 @@ sections:
     ecc = nx.eccentricity(G)
     ecc
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 이심률 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       ecc = nx.eccentricity(G)
       ecc
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 이심률 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 이심률 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 이심률에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 경로 탐색
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     지금까지 배운 최단 경로 알고리즘을 활용하여 실전 미션을 수행해봅시다. 항공 네트워크에서 최적 경로를 찾고, 게임 맵에서 보스까지의 경로를 탐색합니다. 실제 응용에서 어떻게 활용되는지 경험해보세요.
 
@@ -355,7 +390,7 @@ sections:
         flight.add_edge(u, v, hours=h)
     flight.edges(data=True)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       import matplotlib.pyplot as plt
@@ -376,17 +411,19 @@ sections:
           flight.add_edge(u, v, hours=h)
       flight.edges(data=True)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 인수인계 네트워크
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -412,7 +449,7 @@ sections:
 
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       experimentGraph = workflowGraph.copy()
       experimentGraph.add_edge("sales", "finance", weight=2)
@@ -452,7 +489,8 @@ sections:
 
       workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

@@ -26,32 +26,56 @@ meta:
 intro:
   emoji: 📍
   goal: 기본 지도를 생성하고 마커를 추가합니다.
-  description: Folium의 기본인 지도 생성을 배웁니다. Map()으로 지도를 만들고 location과 zoom_start로 초기 화면을 설정합니다. Marker()로 특정 위치에 점을 찍고 popup으로 정보를 표시합니다.
+  description: Folium의 기본인 지도 생성을 배웁니다. Map()으로 지도를 만들고 location과 zoom_start로 초기 화면을 설정합니다. Marker()로
+    특정 위치에 점을 찍고 popup으로 정보를 표시합니다.
+  direction: 첫지도만들기에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 첫지도만들기 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 지도 생성 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 줌 레벨 이해 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 첫지도만들기 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 첫지도만들기 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 첫지도만들기 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: folium과 Codaro를 불러옵니다. Codaro는 지도를 화면에 표시할 때 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import folium
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: import folium
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_basic_map
   title: 2단계. 기본 지도 생성
   structuredPrimary: true
   subtitle: Map()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 기본 지도 생성에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
 
@@ -63,22 +87,23 @@ sections:
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
     m1
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 기본 지도 생성 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       seoulCenter = [37.5665, 126.9780]
       m1 = folium.Map(location=seoulCenter, zoom_start=12)
       m1
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 기본 지도 생성 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 기본 지도 생성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 기본 지도 생성에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step3_zoom_levels
   title: 3단계. 줌 레벨 이해
   structuredPrimary: true
   subtitle: zoom_start 설정
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 줌 레벨 이해에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
 
@@ -89,21 +114,22 @@ sections:
     m2 = folium.Map(location=seoulCenter, zoom_start=10)
     m2
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 줌 레벨 이해 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m2 = folium.Map(location=seoulCenter, zoom_start=10)
       m2
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 줌 레벨 이해 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 줌 레벨 이해 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 줌 레벨 이해에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step4_marker
   title: 4단계. 마커 추가
   structuredPrimary: true
   subtitle: Marker()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 마커 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
 
@@ -115,22 +141,23 @@ sections:
     folium.Marker(location=seoulCenter).add_to(m4)
     m4
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 마커 추가 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m4 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(location=seoulCenter).add_to(m4)
       m4
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 마커 추가 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 마커 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 마커 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_multiple_markers
   title: 5단계. 여러 마커 추가
   structuredPrimary: true
   subtitle: 반복문 활용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. 여러 마커 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
 
@@ -154,7 +181,7 @@ sections:
         ).add_to(m6)
     m6
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 여러 마커 추가 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       places = [
           {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -172,16 +199,17 @@ sections:
           ).add_to(m6)
       m6
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 여러 마커 추가 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 여러 마커 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 여러 마커 추가에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_tooltip
   title: 6단계. 툴팁 추가
   structuredPrimary: true
   subtitle: tooltip vs popup
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 툴팁 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
 
@@ -197,7 +225,7 @@ sections:
     ).add_to(m7)
     m7
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 툴팁 추가 예제에서 입력값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m7 = folium.Map(location=seoulCenter, zoom_start=14)
       folium.Marker(
@@ -207,22 +235,24 @@ sections:
       ).add_to(m7)
       m7
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 툴팁 추가 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 툴팁 추가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 툴팁 추가에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step7_marker_color
   title: 7단계. 마커 색상 변경
   structuredPrimary: true
   subtitle: icon 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 마커 색상 변경에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     Icon()으로 마커 색상과 아이콘을 변경합니다. 기본 색상은 blue입니다.
 
     사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
   tips:
-  - 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
+  - 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue,
+    darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
   snippet: |-
     m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -235,7 +265,7 @@ sections:
         ).add_to(m8)
     m8
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 마커 색상 변경 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m8 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -248,16 +278,17 @@ sections:
           ).add_to(m8)
       m8
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 마커 색상 변경 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 마커 색상 변경 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 마커 색상 변경에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step8_icon_type
   title: 8단계. 아이콘 모양 변경
   structuredPrimary: true
   subtitle: icon 파라미터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 아이콘 모양 변경에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
 
@@ -287,7 +318,7 @@ sections:
 
     m9
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 아이콘 모양 변경 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -311,16 +342,17 @@ sections:
 
       m9
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 아이콘 모양 변경 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 아이콘 모양 변경 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 아이콘 모양 변경에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step9_fit_bounds
   title: 9단계. 자동 줌 맞추기
   structuredPrimary: true
   subtitle: fit_bounds()
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 자동 줌 맞추기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
 
@@ -340,7 +372,7 @@ sections:
     m10.fit_bounds(allLocs)
     m10
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 자동 줌 맞추기 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       m10 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -354,16 +386,17 @@ sections:
       m10.fit_bounds(allLocs)
       m10
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 자동 줌 맞추기 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 자동 줌 맞추기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 자동 줌 맞추기에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step10_complete
   title: 10단계. 완성 예제
   structuredPrimary: true
   subtitle: 서울 관광지 지도
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: 지금까지 배운 내용을 종합하여 서울 관광지 지도를 완성합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -388,7 +421,7 @@ sections:
 
     tourMap
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 완성 예제 예제에서 반복 대상이나 범위을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       tourSpots = [
           {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
@@ -410,16 +443,17 @@ sections:
 
       tourMap
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 완성 예제 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 완성 예제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 완성 예제에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step11_workflow
   title: 11단계. 실무 위치 지도 검증
   structuredPrimary: true
   subtitle: 예측 → 오류 확인 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 실무 위치 지도 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고 검증해야 합니다.
 
@@ -442,7 +476,7 @@ sections:
     validationResult = [validateKoreaCoordinate(site) for site in branchSites]
     validationResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 실무 위치 지도 검증 예제에서 인자나 반환값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       branchSites = [
           {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
@@ -459,16 +493,17 @@ sections:
       validationResult = [validateKoreaCoordinate(site) for site in branchSites]
       validationResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 실무 위치 지도 검증 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 실무 위치 지도 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 실무 위치 지도 검증에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 지도 만들기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
   explanation: |-
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
@@ -485,7 +520,7 @@ sections:
     ]
     cafes
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 마커와 저장 HTML 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import folium
       cafes = [
@@ -496,7 +531,8 @@ sections:
       ]
       cafes
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 마커와 저장 HTML 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

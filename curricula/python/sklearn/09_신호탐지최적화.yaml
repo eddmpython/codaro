@@ -28,14 +28,37 @@ meta:
 intro:
   emoji: 🎯
   goal: GridSearchCV로 하이퍼파라미터를 체계적으로 탐색하고 최적의 모델을 찾습니다.
-  description: 하이퍼파라미터는 학습 전에 설정하는 값으로 모델 성능에 큰 영향을 줍니다. GridSearchCV는 지정한 파라미터 조합을 모두 시도하여 최적의 조합을 찾습니다. 교차검증으로 과적합을 방지합니다.
+  description: 하이퍼파라미터는 학습 전에 설정하는 값으로 모델 성능에 큰 영향을 줍니다. GridSearchCV는 지정한 파라미터 조합을 모두 시도하여 최적의 조합을 찾습니다.
+    교차검증으로 과적합을 방지합니다.
+  direction: 신호탐지최적화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 신호탐지최적화 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 로딩 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 준비 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 모델 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 신호탐지최적화 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 신호탐지최적화 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 신호탐지최적화 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_data
   title: 1단계. 데이터 로딩
   structuredPrimary: true
   subtitle: 와인 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
 
@@ -58,7 +81,7 @@ sections:
     y = wine.target
     X.shape, np.unique(y)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 로딩 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -75,16 +98,17 @@ sections:
       y = wine.target
       X.shape, np.unique(y)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 로딩 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 로딩 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 로딩에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step2_prep
   title: 2단계. 데이터 준비
   structuredPrimary: true
   subtitle: 분할 및 스케일링
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -92,21 +116,22 @@ sections:
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 준비 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 준비 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 준비 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 준비에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_baseline
   title: 3단계. 기본 모델
   structuredPrimary: true
   subtitle: 기본 SVM
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 기본 모델에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
 
@@ -120,7 +145,7 @@ sections:
     accBase = accuracy_score(yTest, yPredBase)
     print(f"Baseline Accuracy: {accBase:.4f}")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 기본 모델 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       svcBase = SVC(random_state=42)
       svcBase.fit(xTrainSc, yTrain)
@@ -128,16 +153,17 @@ sections:
       accBase = accuracy_score(yTest, yPredBase)
       print(f"Baseline Accuracy: {accBase:.4f}")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 기본 모델 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 기본 모델 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 기본 모델에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: step4_params
   title: 4단계. 파라미터 그리드
   structuredPrimary: true
   subtitle: 탐색 범위
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 파라미터 그리드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
 
@@ -153,7 +179,7 @@ sections:
     totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
     print(f"Total combinations: {totalComb}")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 파라미터 그리드 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       paramGrid = {
           "C": [0.1, 1, 10, 100],
@@ -163,16 +189,17 @@ sections:
       totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
       print(f"Total combinations: {totalComb}")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 파라미터 그리드 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 파라미터 그리드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 파라미터 그리드에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: step5_gridsearch
   title: 5단계. GridSearchCV 실행
   structuredPrimary: true
   subtitle: 체계적 탐색
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. GridSearchCV 실행에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
 
@@ -184,22 +211,23 @@ sections:
     gridSearch.fit(xTrainSc, yTrain)
     gridSearch
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. GridSearchCV 실행 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
       gridSearch.fit(xTrainSc, yTrain)
       gridSearch
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. GridSearchCV 실행 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. GridSearchCV 실행 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. GridSearchCV 실행에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step6_results
   title: 6단계. 결과 분석
   structuredPrimary: true
   subtitle: cv_results_
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. 결과 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -208,22 +236,23 @@ sections:
     cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
     resultsDf[cols].sort_values("rank_test_score").head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 결과 분석 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       resultsDf = pd.DataFrame(gridSearch.cv_results_)
       cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
       resultsDf[cols].sort_values("rank_test_score").head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 결과 분석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 결과 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 결과 분석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step7_best
   title: 7단계. 최적 모델 평가
   structuredPrimary: true
   subtitle: best_estimator_
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 최적 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -235,7 +264,7 @@ sections:
     print(f"Tuned Accuracy: {accBest:.4f}")
     print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 최적 모델 평가 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       bestModel = gridSearch.best_estimator_
       yPredBest = bestModel.predict(xTestSc)
@@ -244,16 +273,17 @@ sections:
       print(f"Tuned Accuracy: {accBest:.4f}")
       print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 최적 모델 평가 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 최적 모델 평가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 최적 모델 평가에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: step8_heatmap
   title: 8단계. 파라미터 히트맵
   structuredPrimary: true
   subtitle: C vs gamma
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 8단계. 파라미터 히트맵에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -276,7 +306,7 @@ sections:
     plt.colorbar(im, ax=axHeat)
     figHeat
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 파라미터 히트맵 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
       pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
@@ -296,16 +326,17 @@ sections:
       plt.colorbar(im, ax=axHeat)
       figHeat
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 파라미터 히트맵 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 파라미터 히트맵 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 파라미터 히트맵에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step9_rf
   title: 9단계. RandomForest 튜닝
   structuredPrimary: true
   subtitle: 다른 모델 적용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. RandomForest 튜닝에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -318,7 +349,7 @@ sections:
     rfTotalComb = 3 * 4 * 3
     print(f"Total combinations: {rfTotalComb}")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. RandomForest 튜닝 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rfParamGrid = {
           "n_estimators": [50, 100, 150],
@@ -328,16 +359,17 @@ sections:
       rfTotalComb = 3 * 4 * 3
       print(f"Total combinations: {rfTotalComb}")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. RandomForest 튜닝 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. RandomForest 튜닝 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. RandomForest 튜닝에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: step10_compare
   title: 10단계. 모델 비교
   structuredPrimary: true
   subtitle: SVM vs RF
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -358,7 +390,7 @@ sections:
         axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
     figComp
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 모델 비교 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       rfBest = rfGridSearch.best_estimator_
       rfPred = rfBest.predict(xTestSc)
@@ -376,16 +408,17 @@ sections:
           axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
       figComp
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 모델 비교 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 모델 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 모델 비교에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step11_cv
   title: 11단계. 교차검증 상세
   structuredPrimary: true
   subtitle: cv별 점수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. 교차검증 상세에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
 
@@ -397,28 +430,30 @@ sections:
     print(f"CV Scores: {cvScores}")
     print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. 교차검증 상세 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
       print(f"CV Scores: {cvScores}")
       print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. 교차검증 상세 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. 교차검증 상세 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. 교차검증 상세에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: step12_time
   title: 12단계. 학습 시간
   structuredPrimary: true
   subtitle: 시간 비용
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. 학습 시간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
 
     시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)
   tips:
-  - '시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)'
+  - '시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early
+    stopping)'
   snippet: |-
     totalTime = resultsDf["mean_fit_time"].sum()
     meanTime = resultsDf["mean_fit_time"].mean()
@@ -426,7 +461,7 @@ sections:
     print(f"Total fit time: {totalTime:.2f}s")
     print(f"Mean time per combination: {meanTime:.4f}s")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. 학습 시간 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       totalTime = resultsDf["mean_fit_time"].sum()
       meanTime = resultsDf["mean_fit_time"].mean()
@@ -434,16 +469,17 @@ sections:
       print(f"Total fit time: {totalTime:.2f}s")
       print(f"Mean time per combination: {meanTime:.4f}s")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. 학습 시간 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. 학습 시간 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. 학습 시간에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 하이퍼파라미터 튜닝
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
@@ -477,7 +513,7 @@ sections:
     predC = gridC.predict(xTeCsc)
     print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 출력 문자열을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -505,17 +541,19 @@ sections:
       predC = gridC.predict(xTeCsc)
       print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 출력 문자열 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 출력 문자열이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 예측 모델 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -544,7 +582,7 @@ sections:
     ])
     xTrain.shape, xTest.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       conservativePipeline = Pipeline([
           ("scaler", StandardScaler()),
@@ -589,7 +627,8 @@ sections:
       ])
       xTrain.shape, xTest.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 리스트 값이 결과에 반영되어야 합니다.

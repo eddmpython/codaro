@@ -30,13 +30,35 @@ intro:
   - '연결 리스트: 단일/이중 연결'
   - 이진 트리와 BST 구현
   - 힙과 해시 테이블 구현
+  direction: 자료구조 구현에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 자료구조 구현 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 스택 구현 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 큐 구현 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 연결 리스트 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 자료구조 구현 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 자료구조 구현 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 자료구조 구현 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: stack
   title: 스택 구현
   structuredPrimary: true
   subtitle: LIFO 구조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 스택 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     스택은 후입선출(LIFO) 구조입니다. push로 삽입하고 pop으로 제거합니다. 함수 호출 스택, 괄호 검사, Undo 기능 등에 사용됩니다. O(1) 시간에 삽입/삭제가 가능합니다.
 
@@ -76,7 +98,7 @@ sections:
     stkSize = stk.size()
     (stkPeek, stkPop, stkSize)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 스택 구현 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Stack:
           def __init__(self):
@@ -110,16 +132,17 @@ sections:
       stkSize = stk.size()
       (stkPeek, stkPop, stkSize)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 스택 구현 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 스택 구현 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 스택 구현에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: queue
   title: 큐 구현
   structuredPrimary: true
   subtitle: FIFO 구조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 큐 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     큐는 선입선출(FIFO) 구조입니다. enqueue로 삽입하고 dequeue로 제거합니다. BFS, 작업 스케줄링, 버퍼 등에 사용됩니다. 덱(Deque)은 양쪽 끝에서 삽입/삭제가 가능합니다.
 
@@ -159,7 +182,7 @@ sections:
     queSize = que.size()
     (queFront, queDeq, queSize)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 큐 구현 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Queue:
           def __init__(self):
@@ -193,16 +216,17 @@ sections:
       queSize = que.size()
       (queFront, queDeq, queSize)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 큐 구현 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 큐 구현 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 큐 구현에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: linkedlist
   title: 연결 리스트
   structuredPrimary: true
   subtitle: 노드 기반 구조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 연결 리스트에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     연결 리스트는 노드들이 포인터로 연결된 구조입니다. 삽입/삭제가 O(1)이지만 탐색은 O(n)입니다. 단일 연결 리스트는 다음 노드만, 이중 연결 리스트는 이전/다음 노드를 모두 참조합니다.
 
@@ -263,7 +287,7 @@ sections:
     llistResult = llist.toList()
     llistResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 연결 리스트 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ListNode:
           def __init__(self, val):
@@ -318,16 +342,17 @@ sections:
       llistResult = llist.toList()
       llistResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 연결 리스트 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 연결 리스트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 연결 리스트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: binarytree
   title: 이진 트리
   structuredPrimary: true
   subtitle: 트리 구조의 기본
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 이진 트리에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     이진 트리는 각 노드가 최대 2개의 자식을 가지는 구조입니다. 전위/중위/후위 순회로 트리를 탐색합니다. 이진 탐색 트리(BST)는 왼쪽 < 부모 < 오른쪽 규칙을 따릅니다. BST에서 탐색/삽입은 평균 O(log n)입니다.
 
@@ -377,7 +402,7 @@ sections:
     btPostorder = btree.postorder(btree.root, [])
     (btInorder, btPreorder, btPostorder)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 이진 트리 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TreeNode:
           def __init__(self, val):
@@ -421,16 +446,17 @@ sections:
       btPostorder = btree.postorder(btree.root, [])
       (btInorder, btPreorder, btPostorder)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 이진 트리 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 이진 트리 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 이진 트리에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: heap
   title: 힙 구현
   structuredPrimary: true
   subtitle: 우선순위 기반 구조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 힙 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     힙은 완전 이진 트리 기반의 우선순위 구조입니다. 최소 힙은 부모가 자식보다 작고, 최대 힙은 부모가 자식보다 큽니다. 삽입과 삭제는 O(log n), 최솟값/최댓값 조회는 O(1)입니다. 우선순위 큐, 힙 정렬에 사용됩니다.
 
@@ -496,7 +522,7 @@ sections:
     heapMinAfter = minHeap.peek()
     (heapMin, heapExtract, heapMinAfter)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 힙 구현 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class MinHeap:
           def __init__(self):
@@ -556,16 +582,17 @@ sections:
       heapMinAfter = minHeap.peek()
       (heapMin, heapExtract, heapMinAfter)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 힙 구현 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 힙 구현 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 힙 구현에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: hashtable
   title: 해시 테이블
   structuredPrimary: true
   subtitle: 키-값 저장소
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 해시 테이블에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     해시 테이블은 키를 해시 함수로 변환하여 값을 저장합니다. 평균 O(1) 시간에 조회/삽입/삭제가 가능합니다. 충돌은 체이닝 또는 개방 주소법으로 해결합니다. LRU 캐시는 해시 테이블과 연결 리스트를 조합합니다.
 
@@ -614,7 +641,7 @@ sections:
     htGet3 = htable.get("age")
     (htGet1, htGet2, htGet3)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 해시 테이블 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class HashTable:
           def __init__(self, size=10):
@@ -657,16 +684,17 @@ sections:
       htGet3 = htable.get("age")
       (htGet1, htGet2, htGet3)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 해시 테이블 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 해시 테이블 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 해시 테이블에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 실무 자료구조 선택 루프
   structuredPrimary: true
   subtitle: 예측 → 구현 → 오류 확인 → 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실무 자료구조 선택 루프에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     자료구조는 구현 시험 문제가 아니라 업무 흐름의 병목을 줄이는 선택입니다. 티켓 처리처럼 순서, 우선순위, 되돌리기가 섞인 문제에서는 큐, 힙, 스택을 각각 어디에 써야 하는지 먼저 예측하고, 작은 데이터로 검증한 뒤 수정 실험을 해야 합니다.
 
@@ -703,7 +731,7 @@ sections:
     secondTicket = ticketQueue.dequeue()
     assert (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == ("T-101", "T-102", 1)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실무 자료구조 선택 루프 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TicketQueue:
           def __init__(self):
@@ -734,17 +762,21 @@ sections:
       secondTicket = ticketQueue.dequeue()
       assert (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == ("T-101", "T-102", 1)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실무 자료구조 선택 루프 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실무 자료구조 선택 루프 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실무 자료구조 선택 루프에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 자료구조 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 20에서 배운 자료구조를 난이도별로 복습합니다. 자료구조는 데이터를 효율적으로 저장하고 접근하기 위한 구조로, 알고리즘 성능의 핵심 요소입니다. 스택(LIFO), 큐(FIFO), 힙(우선순위), 트리(계층), 그래프(관계)는 각각 다른 문제 유형에 최적화되어 있습니다. 🟢 기본 문제로 스택과 큐를 구현하고 괄호 검사, BFS 등에 적용해보세요. 🟡 응용 문제로 힙 정렬, 이진 탐색 트리를 연습하세요. 🔴 심화 문제에서는 트라이, 그래프 알고리즘 등 고급 자료구조를 다룹니다. 적절한 자료구조 선택이 알고리즘 효율성을 결정하므로 각 자료구조의 시간복잡도를 숙지하세요.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 20에서 배운 자료구조를 난이도별로 복습합니다. 자료구조는 데이터를 효율적으로 저장하고 접근하기 위한 구조로, 알고리즘 성능의 핵심 요소입니다. 스택(LIFO),
+    큐(FIFO), 힙(우선순위), 트리(계층), 그래프(관계)는 각각 다른 문제 유형에 최적화되어 있습니다. 🟢 기본 문제로 스택과 큐를 구현하고 괄호 검사, BFS 등에 적용해보세요.
+    🟡 응용 문제로 힙 정렬, 이진 탐색 트리를 연습하세요. 🔴 심화 문제에서는 트라이, 그래프 알고리즘 등 고급 자료구조를 다룹니다. 적절한 자료구조 선택이 알고리즘 효율성을 결정하므로
+    각 자료구조의 시간복잡도를 숙지하세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -775,7 +807,7 @@ sections:
     ex1Result = isValidParens("({[]})")
     ex1Result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class ParenStack:
           def __init__(self):
@@ -804,7 +836,8 @@ sections:
       ex1Result = isValidParens("({[]})")
       ex1Result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

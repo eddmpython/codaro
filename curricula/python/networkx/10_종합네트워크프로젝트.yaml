@@ -27,15 +27,39 @@ meta:
 intro:
   emoji: 🎓
   goal: 지금까지 배운 모든 개념을 활용하여 종합 네트워크 분석을 수행합니다.
-  description: 이 프로젝트에서는 레미제라블 네트워크를 완전히 분석합니다. 기본 통계, 중심성, 경로, 클러스터링, 커뮤니티, 연결성을 모두 분석하고 종합 시각화합니다. 분석 파이프라인을 구축하여 어떤 네트워크에도 적용할 수 있게 합니다.
+  description: 이 프로젝트에서는 레미제라블 네트워크를 완전히 분석합니다. 기본 통계, 중심성, 경로, 클러스터링, 커뮤니티, 연결성을 모두 분석하고 종합 시각화합니다. 분석
+    파이프라인을 구축하여 어떤 네트워크에도 적용할 수 있게 합니다.
+  direction: 종합네트워크프로젝트에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 종합네트워크프로젝트 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 통계 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 종합네트워크프로젝트 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합네트워크프로젝트 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 종합네트워크프로젝트 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
 sections:
 - id: step1_import
   title: 1단계. 라이브러리 불러오기
   structuredPrimary: true
   subtitle: import
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 종합 분석에 필요한 모든 라이브러리를 불러옵니다. 이 프로젝트에서는 지금까지 배운 NetworkX의 모든 기능을 활용합니다. 기본 통계, 중심성 분석, 경로 분석, 클러스터링, 커뮤니티 탐지, 연결성 분석을 통합하여 하나의 네트워크를 완전히 분석하는 파이프라인을 구축합니다.
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 종합 분석에 필요한 모든 라이브러리를 불러옵니다. 이 프로젝트에서는 지금까지 배운 NetworkX의 모든 기능을 활용합니다. 기본 통계, 중심성 분석, 경로
+    분석, 클러스터링, 커뮤니티 탐지, 연결성 분석을 통합하여 하나의 네트워크를 완전히 분석하는 파이프라인을 구축합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -43,22 +67,23 @@ sections:
     from networkx.algorithms import community
     import matplotlib.pyplot as plt
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 라이브러리 불러오기 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       from networkx.algorithms import community
       import matplotlib.pyplot as plt
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 라이브러리 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 라이브러리 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_load_data
   title: 2단계. 데이터 로드
   structuredPrimary: true
   subtitle: 레미제라블 네트워크
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 2단계. 데이터 로드에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     Victor Hugo의 소설 '레미제라블'에 등장하는 인물들의 관계 네트워크를 로드합니다. 77명의 인물과 254개의 관계로 구성되며, 엣지의 weight 속성은 두 인물이 같은 장면에 함께 등장한 횟수를 나타냅니다. 이 데이터셋은 규모가 적당하면서도 풍부한 구조를 가지고 있어 네트워크 분석 학습에 이상적입니다.
 
@@ -71,24 +96,26 @@ sections:
     numEdges = G.number_of_edges()
     numNodes, numEdges
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 로드 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       G = nx.les_miserables_graph()
       numNodes = G.number_of_nodes()
       numEdges = G.number_of_edges()
       numNodes, numEdges
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 로드 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 로드 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 로드에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_basic_stats
   title: 3단계. 기본 통계
   structuredPrimary: true
   subtitle: 네트워크 개요
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 네트워크의 기본 통계량을 계산합니다. 밀도는 전체 가능한 연결 중 실제 연결의 비율, 평균 차수는 인물당 평균 관계 수, 지름은 가장 먼 두 인물 사이의 거리, 클러스터링은 친구의 친구가 친구인 정도를 나타냅니다. 이 지표들로 네트워크의 전반적인 특성을 파악합니다.
+  goal: 3단계. 기본 통계에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 네트워크의 기본 통계량을 계산합니다. 밀도는 전체 가능한 연결 중 실제 연결의 비율, 평균 차수는 인물당 평균 관계 수, 지름은 가장 먼 두 인물 사이의 거리,
+    클러스터링은 친구의 친구가 친구인 정도를 나타냅니다. 이 지표들로 네트워크의 전반적인 특성을 파악합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -99,7 +126,7 @@ sections:
     maxDeg = max(degrees)
     density, avgDegree, minDeg, maxDeg
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 기본 통계 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       density = nx.density(G)
       degrees = [d for n, d in G.degree()]
@@ -108,17 +135,19 @@ sections:
       maxDeg = max(degrees)
       density, avgDegree, minDeg, maxDeg
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 기본 통계 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 기본 통계 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 기본 통계에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step4_centrality
   title: 4단계. 중심성 분석
   structuredPrimary: true
   subtitle: 주요 인물 찾기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 다양한 중심성 지표로 소설의 핵심 인물들을 찾습니다. 연결 중심성은 가장 많은 인물과 관계를 가진 사람, 매개 중심성은 서로 다른 그룹을 연결하는 중요한 위치의 인물, 근접 중심성은 모든 인물에게 빠르게 도달할 수 있는 중앙에 위치한 인물, 고유벡터 중심성은 중요한 인물들과 연결된 인물을 찾아냅니다.
+  goal: 4단계. 중심성 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 다양한 중심성 지표로 소설의 핵심 인물들을 찾습니다. 연결 중심성은 가장 많은 인물과 관계를 가진 사람, 매개 중심성은 서로 다른 그룹을 연결하는 중요한 위치의
+    인물, 근접 중심성은 모든 인물에게 빠르게 도달할 수 있는 중앙에 위치한 인물, 고유벡터 중심성은 중요한 인물들과 연결된 인물을 찾아냅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -127,24 +156,26 @@ sections:
     closeCent = nx.closeness_centrality(G)
     eigCent = nx.eigenvector_centrality(G)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 중심성 분석 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       degCent = nx.degree_centrality(G)
       betCent = nx.betweenness_centrality(G)
       closeCent = nx.closeness_centrality(G)
       eigCent = nx.eigenvector_centrality(G)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 중심성 분석 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 중심성 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 중심성 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step5_community
   title: 5단계. 커뮤니티 탐지
   structuredPrimary: true
   subtitle: 그룹 발견
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 커뮤니티 탐지 알고리즘으로 등장인물 그룹을 찾습니다. 소설에서 함께 등장하는 인물들은 자연스럽게 스토리라인별로 그룹을 형성합니다. 알고리즘이 발견한 커뮤니티가 소설의 실제 스토리 구조와 어떻게 일치하는지 확인할 수 있습니다.
+  goal: 5단계. 커뮤니티 탐지에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 커뮤니티 탐지 알고리즘으로 등장인물 그룹을 찾습니다. 소설에서 함께 등장하는 인물들은 자연스럽게 스토리라인별로 그룹을 형성합니다. 알고리즘이 발견한 커뮤니티가
+    소설의 실제 스토리 구조와 어떻게 일치하는지 확인할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -153,45 +184,48 @@ sections:
     numComms = len(commList)
     numComms
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. 커뮤니티 탐지 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       communities = community.louvain_communities(G, seed=42)
       commList = [set(c) for c in communities]
       numComms = len(commList)
       numComms
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. 커뮤니티 탐지 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. 커뮤니티 탐지 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. 커뮤니티 탐지에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step6_path_analysis
   title: 6단계. 경로 분석
   structuredPrimary: true
   subtitle: 주요 인물 간 거리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 주요 등장인물 사이의 최단 경로를 분석합니다. 중심성이 높은 주요 인물들 간의 거리 행렬을 계산하면 소설의 인물 관계 구조를 이해할 수 있습니다. 장발장과 미리엘 주교, 코제트와 마리우스 등 중요한 인물들이 어떻게 연결되어 있는지 경로를 추적합니다.
+  goal: 6단계. 경로 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 주요 등장인물 사이의 최단 경로를 분석합니다. 중심성이 높은 주요 인물들 간의 거리 행렬을 계산하면 소설의 인물 관계 구조를 이해할 수 있습니다. 장발장과
+    미리엘 주교, 코제트와 마리우스 등 중요한 인물들이 어떻게 연결되어 있는지 경로를 추적합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     mainChars = [n for n, v in sorted(degCent.items(), key=lambda x: x[1], reverse=True)[:5]]
     mainChars
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. 경로 분석 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       mainChars = [n for n, v in sorted(degCent.items(), key=lambda x: x[1], reverse=True)[:5]]
       mainChars
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. 경로 분석 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. 경로 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. 경로 분석에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: step7_connectivity
   title: 7단계. 연결성 분석
   structuredPrimary: true
   subtitle: 네트워크 구조
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 7단계. 연결성 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     네트워크의 연결 구조와 취약점을 분석합니다. 노드 연결도는 네트워크를 분리하기 위해 제거해야 하는 최소 노드 수, 엣지 연결도는 최소 엣지 수를 나타냅니다. 절단점(articulation point)은 제거 시 네트워크가 분리되는 중요 노드입니다. 소설에서 이 절단점들이 어떤 역할을 하는지 분석합니다.
 
@@ -203,41 +237,45 @@ sections:
     edgeConn = nx.edge_connectivity(G)
     nodeConn, edgeConn
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. 연결성 분석 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       nodeConn = nx.node_connectivity(G)
       edgeConn = nx.edge_connectivity(G)
       nodeConn, edgeConn
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. 연결성 분석 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. 연결성 분석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. 연결성 분석에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step8_visualization
   title: 8단계. 종합 시각화
   structuredPrimary: true
   subtitle: 대시보드
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 분석 결과를 종합하여 다중 패널 대시보드를 생성합니다. 커뮤니티+연결중심성, 커뮤니티+매개중심성, 클러스터링 계수, 차수 분포의 네 가지 뷰를 하나의 그림에 배치합니다. 이런 종합 시각화는 네트워크의 다양한 측면을 한눈에 파악할 수 있게 해줍니다.
+  goal: 8단계. 종합 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 분석 결과를 종합하여 다중 패널 대시보드를 생성합니다. 커뮤니티+연결중심성, 커뮤니티+매개중심성, 클러스터링 계수, 차수 분포의 네 가지 뷰를 하나의 그림에
+    배치합니다. 이런 종합 시각화는 네트워크의 다양한 측면을 한눈에 파악할 수 있게 해줍니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: pos = nx.spring_layout(G, seed=42, k=0.5)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. 종합 시각화 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: pos = nx.spring_layout(G, seed=42, k=0.5)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. 종합 시각화 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. 종합 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. 종합 시각화에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step9_summary_report
   title: 9단계. 분석 리포트
   structuredPrimary: true
   subtitle: 결과 정리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 분석 결과를 정리하여 리포트를 생성합니다. 데이터 분석에서 리포트는 단순한 결과 나열이 아니라, 발견한 패턴과 인사이트를 체계적으로 전달하는 중요한 산출물입니다. 네트워크 분석 리포트에는 기본 통계, 구조적 특성, 핵심 노드, 커뮤니티 정보를 포함합니다. Python의 딕셔너리를 활용하면 계층적이고 구조화된 리포트를 쉽게 만들 수 있습니다.
+  goal: 9단계. 분석 리포트에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 분석 결과를 정리하여 리포트를 생성합니다. 데이터 분석에서 리포트는 단순한 결과 나열이 아니라, 발견한 패턴과 인사이트를 체계적으로 전달하는 중요한 산출물입니다.
+    네트워크 분석 리포트에는 기본 통계, 구조적 특성, 핵심 노드, 커뮤니티 정보를 포함합니다. Python의 딕셔너리를 활용하면 계층적이고 구조화된 리포트를 쉽게 만들 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -267,7 +305,7 @@ sections:
     }
     report
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 분석 리포트 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       report = {
           'Basic Stats': {
@@ -295,17 +333,20 @@ sections:
       }
       report
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 분석 리포트 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 분석 리포트 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 분석 리포트에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step10_function
   title: 10단계. 재사용 함수
   structuredPrimary: true
   subtitle: 분석 파이프라인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 분석 과정을 함수로 정리하여 어떤 네트워크에도 적용할 수 있게 합니다. 소프트웨어 공학에서 반복되는 작업을 함수화하는 것은 재사용성, 유지보수성, 일관성을 높이는 핵심 원칙입니다. 네트워크 분석 함수를 만들어두면 새로운 데이터셋에 동일한 분석을 즉시 적용할 수 있습니다. 가라테 클럽과 레미제라블 네트워크를 비교 분석하며 함수의 활용법을 익힙니다.
+  goal: 10단계. 재사용 함수에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 분석 과정을 함수로 정리하여 어떤 네트워크에도 적용할 수 있게 합니다. 소프트웨어 공학에서 반복되는 작업을 함수화하는 것은 재사용성, 유지보수성, 일관성을
+    높이는 핵심 원칙입니다. 네트워크 분석 함수를 만들어두면 새로운 데이터셋에 동일한 분석을 즉시 적용할 수 있습니다. 가라테 클럽과 레미제라블 네트워크를 비교 분석하며 함수의 활용법을
+    익힙니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -339,7 +380,7 @@ sections:
 
     analyzeNetwork(G)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. 재사용 함수 예제에서 인자나 반환값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       def analyzeNetwork(graph):
           result = {}
@@ -371,16 +412,17 @@ sections:
 
       analyzeNetwork(G)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. 재사용 함수 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. 재사용 함수 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. 재사용 함수에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: 종합 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
   explanation: |-
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다. 미션1에서는 르네상스 시대 피렌체 주요 가문들의 정치적 혼인 관계를 분석합니다. 이 데이터는 사회학 연구의 고전으로, 메디치 가문이 어떻게 네트워크 중심에서 권력을 장악했는지 보여줍니다. 미션2에서는 실제 네트워크와 랜덤 그래프 모델을 비교하여 어떤 모델이 현실을 가장 잘 설명하는지 분석합니다.
 
@@ -397,7 +439,7 @@ sections:
     numE = data.number_of_edges()
     numN, numE
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 입력값을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import networkx as nx
       from networkx.algorithms import community
@@ -408,17 +450,19 @@ sections:
       numE = data.number_of_edges()
       numN, numE
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 인수인계 네트워크
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로 처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -444,7 +488,7 @@ sections:
 
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 노드/엣지와 지표 값 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       experimentGraph = workflowGraph.copy()
       experimentGraph.add_edge("sales", "finance", weight=2)
@@ -484,7 +528,8 @@ sections:
 
       workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 노드/엣지와 지표 값 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

@@ -26,13 +26,35 @@ intro:
   - MRO(Method Resolution Order) 이해
   - 다이아몬드 문제와 해결책
   - Mixin 패턴으로 기능 조합
+  direction: 다중 상속과 MRO에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 다중 상속과 MRO 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 다중 상속 기초 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: MRO 알고리즘 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 다이아몬드 문제 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 다중 상속과 MRO 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다중 상속과 MRO 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 다중 상속과 MRO 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: multiple_inheritance
   title: 다중 상속 기초
   structuredPrimary: true
   subtitle: 여러 부모 클래스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 다중 상속 기초에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     파이썬은 다중 상속을 지원합니다. 클래스 정의 시 여러 부모 클래스를 쉼표로 구분하여 지정합니다. 자식 클래스는 모든 부모 클래스의 속성과 메서드를 상속받습니다. 같은 이름의 메서드가 여러 부모에 있으면 MRO에 따라 첫 번째 발견된 것이 사용됩니다. 다중 상속은 강력하지만 복잡성을 증가시킬 수 있습니다. 올바르게 사용하면 코드 재사용성을 높이고 유연한 설계가 가능합니다.
 
@@ -55,7 +77,7 @@ sections:
     duck = Duck()
     duck.fly(), duck.swim(), duck.quack()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 다중 상속 기초 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Flyable:
           def fly(self):
@@ -72,16 +94,17 @@ sections:
       duck = Duck()
       duck.fly(), duck.swim(), duck.quack()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 다중 상속 기초 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 다중 상속 기초 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 다중 상속 기초에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: mro_algorithm
   title: MRO 알고리즘
   structuredPrimary: true
   subtitle: C3 선형화
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: MRO 알고리즘에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     MRO(Method Resolution Order)는 메서드를 찾는 순서입니다. 파이썬은 C3 선형화 알고리즘을 사용합니다. C3는 단조성(부모-자식 순서 유지)과 지역 우선(왼쪽 부모 우선)을 보장합니다. 클래스.__mro__ 또는 클래스.mro()로 MRO를 확인할 수 있습니다. MRO는 클래스 정의 시 계산되며, 유효하지 않은 상속 구조는 TypeError를 발생시킵니다. super()는 MRO의 다음 클래스를 호출합니다.
 
@@ -103,7 +126,7 @@ sections:
 
     [cls.__name__ for cls in D.__mro__]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: MRO 알고리즘 예제에서 반복 대상이나 범위을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class A:
           pass
@@ -119,16 +142,17 @@ sections:
 
       [cls.__name__ for cls in D.__mro__]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - MRO 알고리즘 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: MRO 알고리즘 코드가 예외 없이 끝나야 합니다.
+    resultCheck: MRO 알고리즘에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.
 - id: diamond_problem
   title: 다이아몬드 문제
   structuredPrimary: true
   subtitle: 공통 조상 처리
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 다이아몬드 문제에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     다이아몬드 문제는 두 부모가 같은 조상을 가질 때 발생합니다. 조상의 메서드가 두 번 호출될 수 있는 문제입니다. 파이썬의 MRO와 super()는 이 문제를 해결합니다. C3 선형화는 각 클래스가 MRO에서 한 번만 나타나도록 보장합니다. super()를 사용하면 MRO를 따라 각 클래스의 메서드가 한 번씩만 호출됩니다. 협력적 다중 상속(cooperative multiple inheritance)이라고 합니다.
 
@@ -157,7 +181,7 @@ sections:
 
     D().value
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 다이아몬드 문제 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class A:
           def __init__(self):
@@ -180,16 +204,17 @@ sections:
 
       D().value
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 다이아몬드 문제 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 다이아몬드 문제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 다이아몬드 문제에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: super_function
   title: super() 심화
   structuredPrimary: true
   subtitle: 협력적 상속
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: super() 심화에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     super()는 MRO에서 현재 클래스 다음의 클래스를 반환합니다. super(Type, obj)처럼 인자를 지정할 수도 있습니다. 메서드 내에서 super()를 호출하면 자동으로 현재 클래스와 인스턴스가 사용됩니다. super()는 프록시 객체를 반환하며, 이 프록시가 MRO의 다음 클래스의 메서드를 호출합니다. 협력적 다중 상속에서는 모든 클래스가 super()를 호출해야 체인이 완성됩니다.
 
@@ -208,7 +233,7 @@ sections:
 
     Child().greet()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: super() 심화 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Parent:
           def greet(self):
@@ -221,16 +246,17 @@ sections:
 
       Child().greet()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - super() 심화 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: super() 심화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: super() 심화에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: mixin_pattern
   title: Mixin 패턴
   structuredPrimary: true
   subtitle: 기능 조합
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: Mixin 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     Mixin은 독립적인 기능을 제공하는 작은 클래스입니다. 단독으로 사용하지 않고 다른 클래스와 조합합니다. Mixin은 보통 특정 기능만 추가하고 인스턴스 상태는 최소화합니다. 이름에 Mixin 접미사를 붙여 용도를 명확히 합니다. 여러 Mixin을 조합해 다양한 기능을 가진 클래스를 만들 수 있습니다. Mixin은 is-a 관계보다 has-a 기능에 가깝습니다.
 
@@ -256,7 +282,7 @@ sections:
     data = Data("test", 42)
     data.toJSON(), data.toXML()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: Mixin 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class JSONMixin:
           def toJSON(self):
@@ -276,16 +302,17 @@ sections:
       data = Data("test", 42)
       data.toJSON(), data.toXML()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - Mixin 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: Mixin 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: Mixin 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: composition
   title: 상속 vs 합성
   structuredPrimary: true
   subtitle: 언제 무엇을 사용할지
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 상속 vs 합성에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     상속보다 합성을 선호하라(Favor composition over inheritance)는 유명한 설계 원칙입니다. 상속은 is-a 관계를 표현하고, 합성은 has-a 관계를 표현합니다. 상속은 부모의 구현에 강하게 결합되어 변경에 취약합니다. 합성은 객체를 멤버로 포함하여 느슨한 결합을 유지합니다. 상속이 적합한 경우: 명확한 is-a 관계, 부모 인터페이스 재사용. 합성이 적합한 경우: 구현 재사용, 유연한 조합이 필요할 때.
 
@@ -303,7 +330,7 @@ sections:
 
     Car().drive()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 상속 vs 합성 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Engine:
           def start(self):
@@ -315,16 +342,17 @@ sections:
 
       Car().drive()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 상속 vs 합성 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 상속 vs 합성 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 상속 vs 합성에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 믹스인 처리 순서 고정하기'
   structuredPrimary: true
   subtitle: 예측 → MRO 확인 → super 체인 → 오류 검증
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 믹스인 처리 순서 고정하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     다중 상속은 믹스인이 모두 cooperative super를 지킬 때만 안전합니다. 처리 파이프라인에서 검증, 감사, 기본 처리 순서가 MRO와 일치하는지 확인합니다.
 
@@ -371,7 +399,7 @@ sections:
 
     print("다중 상속 MRO 검증 흐름 통과")
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 믹스인 처리 순서 고정하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       class BaseProcessor:
           def process(self, payload):
@@ -411,17 +439,21 @@ sections:
 
       print("다중 상속 MRO 검증 흐름 통과")
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 믹스인 처리 순서 고정하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 믹스인 처리 순서 고정하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 믹스인 처리 순서 고정하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 복습
   structuredPrimary: true
   subtitle: 다중 상속과 MRO 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 9에서 배운 다중 상속과 MRO를 난이도별로 복습합니다. 파이썬의 다중 상속은 C3 선형화 알고리즘으로 MRO(Method Resolution Order)를 결정하여 다이아몬드 문제를 해결합니다. super()는 MRO를 따라 다음 클래스를 호출하므로 협력적 다중 상속이 가능합니다. 🟢 기본 문제로 MRO 확인과 super() 기본 사용법을 익히고, 🟡 응용 문제로 Mixin 패턴과 협력적 super() 체인을 연습하세요. 🔴 심화 문제에서는 복잡한 상속 구조, 인터페이스 분리, 합성 vs 상속 판단 등을 다룹니다. 다중 상속은 강력하지만 남용하면 복잡해지므로 Mixin 패턴 위주로 사용하는 것이 권장됩니다.
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 9에서 배운 다중 상속과 MRO를 난이도별로 복습합니다. 파이썬의 다중 상속은 C3 선형화 알고리즘으로 MRO(Method Resolution Order)를
+    결정하여 다이아몬드 문제를 해결합니다. super()는 MRO를 따라 다음 클래스를 호출하므로 협력적 다중 상속이 가능합니다. 🟢 기본 문제로 MRO 확인과 super() 기본
+    사용법을 익히고, 🟡 응용 문제로 Mixin 패턴과 협력적 super() 체인을 연습하세요. 🔴 심화 문제에서는 복잡한 상속 구조, 인터페이스 분리, 합성 vs 상속 판단 등을
+    다룹니다. 다중 상속은 강력하지만 남용하면 복잡해지므로 Mixin 패턴 위주로 사용하는 것이 권장됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -439,7 +471,7 @@ sections:
     obj = C()
     obj.methodA(), obj.methodB()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 복습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class A:
           def methodA(self):
@@ -455,7 +487,8 @@ sections:
       obj = C()
       obj.methodA(), obj.methodB()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 복습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 복습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 복습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

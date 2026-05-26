@@ -29,13 +29,35 @@ intro:
   - 팩토리 패턴으로 객체 생성 위임
   - 빌더 패턴으로 복잡한 객체 단계적 생성
   - 어댑터와 데코레이터로 구조 확장
+  direction: 디자인 패턴 1에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 디자인 패턴 1 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 싱글톤 패턴 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 팩토리 패턴 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 빌더 패턴 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 디자인 패턴 1 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 디자인 패턴 1 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 디자인 패턴 1 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: singleton
   title: 싱글톤 패턴
   structuredPrimary: true
   subtitle: 인스턴스 하나만 생성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 싱글톤 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 인스턴스를 하나만 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -57,7 +79,7 @@ sections:
     singletonCheck = db1 is db2
     singletonCheck
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 싱글톤 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class SingletonMeta(type):
           _instances = {}
@@ -76,16 +98,17 @@ sections:
       singletonCheck = db1 is db2
       singletonCheck
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 싱글톤 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 싱글톤 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 싱글톤 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: factory
   title: 팩토리 패턴
   structuredPrimary: true
   subtitle: 객체 생성 위임
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 팩토리 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 객체 생성을 서브클래스에 위임하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -119,7 +142,7 @@ sections:
     factoryResult = (factoryDog.speak(), factoryCat.speak())
     factoryResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 팩토리 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -150,16 +173,17 @@ sections:
       factoryResult = (factoryDog.speak(), factoryCat.speak())
       factoryResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 팩토리 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 팩토리 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 팩토리 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: builder
   title: 빌더 패턴
   structuredPrimary: true
   subtitle: 복잡한 객체 단계적 생성
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 빌더 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 복잡한 객체를 단계적으로 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -208,7 +232,7 @@ sections:
     pizzaStr = str(pizzaBuilt)
     pizzaStr
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 빌더 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Pizza:
           def __init__(self):
@@ -254,16 +278,17 @@ sections:
       pizzaStr = str(pizzaBuilt)
       pizzaStr
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 빌더 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 빌더 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 빌더 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: adapter
   title: 어댑터 패턴
   structuredPrimary: true
   subtitle: 인터페이스 연결
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 어댑터 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 호환되지 않는 인터페이스를 연결하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -288,7 +313,7 @@ sections:
     adapterResult = adapter.printNew("Hello World")
     adapterResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 어댑터 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class OldPrinter:
           def printOld(self, text):
@@ -310,16 +335,17 @@ sections:
       adapterResult = adapter.printNew("Hello World")
       adapterResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 어댑터 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 어댑터 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 어댑터 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: decorator_pattern
   title: 데코레이터 패턴
   structuredPrimary: true
   subtitle: 동적 기능 추가
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 데코레이터 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 객체에 동적으로 기능을 추가하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -372,7 +398,7 @@ sections:
     coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
     coffeeResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 데코레이터 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -422,16 +448,17 @@ sections:
       coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
       coffeeResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 데코레이터 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 데코레이터 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 데코레이터 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: prototype
   title: 프로토타입 패턴
   structuredPrimary: true
   subtitle: 객체 복제
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 프로토타입 패턴에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 기존 객체를 복제하여 새 객체를 생성하는 패턴
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -462,7 +489,7 @@ sections:
     protoResult = (str(originalDoc), str(clonedDoc))
     protoResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 프로토타입 패턴 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import copy
 
@@ -490,16 +517,17 @@ sections:
       protoResult = (str(originalDoc), str(clonedDoc))
       protoResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 프로토타입 패턴 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 프로토타입 패턴 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 프로토타입 패턴에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 리포트 내보내기 구조 설계하기'
   structuredPrimary: true
   subtitle: Factory, Builder, Adapter, Decorator를 변경 지점 기준으로 검증합니다
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 리포트 내보내기 구조 설계하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter, 로깅은 Decorator로 분리해보세요.
 
@@ -549,7 +577,7 @@ sections:
     assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
     assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import json
 
@@ -592,17 +620,21 @@ sections:
       assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
       assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 리포트 내보내기 구조 설계하기 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 리포트 내보내기 구조 설계하기 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 리포트 내보내기 구조 설계하기에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice
   title: 종합 연습
   structuredPrimary: true
   subtitle: 디자인 패턴 마스터하기
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에 필수적입니다. 팩토리 패턴은 객체 생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡 응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서 사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를 이해하는 것이 중요합니다.
+  goal: 종합 연습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
+  explanation: Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에
+    필수적입니다. 팩토리 패턴은 객체 생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡
+    응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서 사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를
+    이해하는 것이 중요합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -628,7 +660,7 @@ sections:
     ex1Result = (logger1 is logger2, logger1.getLogs())
     ex1Result
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 연습 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class Logger:
           _instance = None
@@ -652,7 +684,8 @@ sections:
       ex1Result = (logger1 is logger2, logger1.getLogs())
       ex1Result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 연습 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 연습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 연습에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.

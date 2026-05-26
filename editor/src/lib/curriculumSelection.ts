@@ -37,6 +37,7 @@ export type CurriculumLessonState = {
   draftUpdates: Record<string, string>;
   notice: AppNotice;
   selectedBlockId: string;
+  selectedContentId: string;
 };
 
 export function defaultCurriculumState(): DefaultCurriculumState {
@@ -88,10 +89,12 @@ export async function loadCurriculumContentsState(
 }
 
 export async function lessonFallback(category: string, contentId: string): Promise<CurriculumLessonPayload> {
-  return (await registryLesson(category, contentId)) ?? {
+  const contents = curriculumContentsFallback(category);
+  const resolvedContentId = selectedContentOrFirst(contents, contentId);
+  return (await registryLesson(category, resolvedContentId)) ?? {
     ...fallbackLesson,
     category,
-    contentId,
+    contentId: resolvedContentId,
   };
 }
 
@@ -103,18 +106,23 @@ export async function loadCurriculumLessonState(
   if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) return null;
 
   const fallback = await lessonFallback(selectedCategory, selectedContentId);
+  const resolvedContentId = fallback.contentId || selectedContentId;
   const result = shouldUseApi()
-    ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), fallback)
+    ? await optional(() => codaroApi.curriculumLesson(selectedCategory, resolvedContentId), fallback)
     : { data: fallback, online: false };
   return {
     document: result.data.document,
-    draftUpdates: draftsFromBlocks(result.data.document.blocks, { emptySnippetDraft: true }),
+    draftUpdates: draftsFromBlocks(result.data.document.blocks, {
+      emptyDuplicateSnippetExerciseDraft: true,
+      emptySnippetDraft: true,
+    }),
     notice: {
       tone: result.online ? "success" : "warning",
       title: translate("curriculum.opened"),
       detail: result.data.document.title,
     },
     selectedBlockId: result.data.document.blocks[0]?.id ?? "",
+    selectedContentId: result.data.contentId || resolvedContentId,
   };
 }
 

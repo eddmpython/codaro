@@ -66,11 +66,6 @@ type LearningLessonContract = {
 };
 
 const categoryLabels: Record<string, { title: string; track: string; description: string }> = {
-  main: {
-    title: "파이썬 시작",
-    track: "Python 기초",
-    description: "Codaro에서 바로 시작하는 짧은 파이썬 입문 경로입니다.",
-  },
   "30days": {
     title: "파이썬 기초",
     track: "Python 기초",
@@ -189,7 +184,7 @@ const categoryLabels: Record<string, { title: string; track: string; description
 };
 
 const categoryGroups: Record<string, string[]> = {
-  "Python 기초": ["main", "30days", "advancedPython", "builtins"],
+  "Python 기초": ["30days", "advancedPython", "builtins"],
   "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
@@ -461,8 +456,9 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   }
 
   if (["image", "video", "youtube", "videoCarousel", "pdf", "MIME"].includes(sourceType)) {
-    const src = textValue(block.src ?? block.url ?? block.href ?? block.imageUrl ?? block.videoUrl ?? block.buttonLink ?? block.youtubeId);
+    const src = textValue(block.src ?? block.url ?? block.href ?? block.imageUrl ?? block.videoUrl ?? block.buttonLink ?? block.youtubeId ?? block.videoId ?? block.youtube);
     const items = arrayOfMaps(block.items ?? block.videos);
+    if (!src && !items.length && !title && !subtitle && !description) return [];
     return [markdownBlock({
       content: formatMedia({ sourceType, src, title, subtitle, description, items }),
       displayKind: "media",
@@ -852,7 +848,17 @@ function labeledMarkdown(label: string, content: string) {
 }
 
 function structuredCheckMarkdown(check: Record<string, string>) {
-  return ["### 검증/피드백", ...Object.entries(check).map(([key, value]) => `- **${key}**: ${value}`)].join("\n");
+  return ["### 검증 기준", ...Object.entries(check).map(([key, value]) => `- **${checkLabel(key)}**: ${value}`)].join("\n");
+}
+
+function checkLabel(key: string) {
+  const labels: Record<string, string> = {
+    noError: "오류 없이 실행",
+    resultCheck: "결과 확인",
+    assertCheck: "assert 통과",
+    outputCheck: "출력 확인",
+  };
+  return labels[key] ?? key;
 }
 
 function snippetText(value: unknown) {

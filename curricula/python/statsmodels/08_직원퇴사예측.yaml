@@ -37,15 +37,40 @@ meta:
 intro:
   emoji: 👔
   goal: 가설 검정으로 퇴사 요인을 분석하고 퇴사 확률을 예측합니다
-  description: IBM HR Analytics 데이터로 어떤 요인이 직원 퇴사에 영향을 미치는지 통계적으로 검증합니다. t-test, ANOVA로 그룹 간 차이를 검정하고, 로지스틱 회귀로 퇴사 확률을 예측합니다.
+  description: IBM HR Analytics 데이터로 어떤 요인이 직원 퇴사에 영향을 미치는지 통계적으로 검증합니다. t-test, ANOVA로 그룹 간 차이를 검정하고,
+    로지스틱 회귀로 퇴사 확률을 예측합니다.
+  direction: 직원퇴사예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 직원퇴사예측 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 탐색 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 퇴사율 확인 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 직원퇴사예측 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: altair, matplotlib, numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 직원퇴사예측 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 직원퇴사예측 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
 - id: step1_load
   title: 1단계. 데이터 불러오기
   structuredPrimary: true
   subtitle: IBM HR Analytics 데이터
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: IBM HR Analytics 데이터셋은 1,470명 직원의 35개 특성과 퇴사 여부(Attrition)를 담고 있습니다. 나이, 급여, 근속연수, 만족도, 출장빈도, 초과근무 여부 등 HR 분석에 필요한 풍부한 변수가 포함됩니다. 이 데이터로 어떤 요인이 퇴사에 영향을 미치는지 분석하면, 기업은 핵심 인재 유지 전략을 수립하고 채용 비용을 절감할 수 있습니다. 평균 채용 비용이 연봉의 30-50%에 달하므로 퇴사 예방은 큰 비용 절감 효과가 있습니다.
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: IBM HR Analytics 데이터셋은 1,470명 직원의 35개 특성과 퇴사 여부(Attrition)를 담고 있습니다. 나이, 급여, 근속연수, 만족도,
+    출장빈도, 초과근무 여부 등 HR 분석에 필요한 풍부한 변수가 포함됩니다. 이 데이터로 어떤 요인이 퇴사에 영향을 미치는지 분석하면, 기업은 핵심 인재 유지 전략을 수립하고 채용
+    비용을 절감할 수 있습니다. 평균 채용 비용이 연봉의 30-50%에 달하므로 퇴사 예방은 큰 비용 절감 효과가 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -60,7 +85,7 @@ sections:
     hrData = loadLocalDataset("hr_attrition")
     hrData.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 1단계. 데이터 불러오기 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -73,34 +98,38 @@ sections:
       hrData = loadLocalDataset("hr_attrition")
       hrData.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 1단계. 데이터 불러오기 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 1단계. 데이터 불러오기 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 1단계. 데이터 불러오기에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step2_explore
   title: 2단계. 데이터 탐색
   structuredPrimary: true
   subtitle: 컬럼 구조 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: Age(나이), MonthlyIncome(월급), YearsAtCompany(근속연수), JobSatisfaction(직무만족도), Attrition(퇴사여부) 등 35개 컬럼을 확인합니다. HR 데이터는 수치형(나이, 급여)과 범주형(부서, 직급)이 섞여 있어 각각 다른 분석 방법이 필요합니다. 컬럼명이 영어로 되어 있지만 직관적인 이름이라 의미를 파악하기 쉽습니다. 데이터 탐색 단계에서 각 변수의 타입과 의미를 정확히 파악하는 것이 분석의 기초입니다.
+  goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: Age(나이), MonthlyIncome(월급), YearsAtCompany(근속연수), JobSatisfaction(직무만족도), Attrition(퇴사여부)
+    등 35개 컬럼을 확인합니다. HR 데이터는 수치형(나이, 급여)과 범주형(부서, 직급)이 섞여 있어 각각 다른 분석 방법이 필요합니다. 컬럼명이 영어로 되어 있지만 직관적인
+    이름이라 의미를 파악하기 쉽습니다. 데이터 탐색 단계에서 각 변수의 타입과 의미를 정확히 파악하는 것이 분석의 기초입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: hrData.columns.tolist()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 2단계. 데이터 탐색 예제에서 입력값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: hrData.columns.tolist()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 2단계. 데이터 탐색 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 2단계. 데이터 탐색 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 2단계. 데이터 탐색에서 바꾼 입력값이 결과에 반영되어야 합니다.
 - id: step3_attrition_rate
   title: 3단계. 퇴사율 확인
   structuredPrimary: true
   subtitle: 전체 퇴사 비율
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 3단계. 퇴사율 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     전체 직원 중 몇 퍼센트가 퇴사했는지 확인합니다. 퇴사율은 HR의 핵심 지표로, 산업 평균과 비교하여 우리 회사의 인재 관리 수준을 판단할 수 있습니다. 일반적으로 15% 이상이면 높은 편입니다. Attrition이 Yes/No 문자열이므로 통계 분석을 위해 0/1 숫자로 변환합니다. 이런 이진 변환은 로지스틱 회귀와 t-test 수행에 필수적인 전처리 단계입니다.
 
@@ -112,22 +141,23 @@ sections:
     attritionRate = hrData['AttritionBinary'].mean()
     f"퇴사율: {attritionRate:.1%}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 3단계. 퇴사율 확인 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       hrData['AttritionBinary'] = (hrData['Attrition'] == 'Yes').astype(int)
       attritionRate = hrData['AttritionBinary'].mean()
       f"퇴사율: {attritionRate:.1%}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 3단계. 퇴사율 확인 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 3단계. 퇴사율 확인 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 3단계. 퇴사율 확인에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step4_hypothesis_intro
   title: 4단계. 가설 검정 소개
   structuredPrimary: true
   subtitle: 통계적 유의성 판단
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 4단계. 가설 검정 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     가설 검정은 두 그룹 간 차이가 우연인지 실제인지 통계적으로 판단하는 방법입니다. 예를 들어 퇴사자 평균 급여가 재직자보다 낮다면, 이 차이가 표본의 우연한 변동인지 실제 모집단에서도 존재하는 차이인지 검정합니다. p-value가 0.05 미만이면 '우연일 확률이 5% 미만'이므로 차이가 유의미하다고 결론짓습니다. 가설 검정은 HR 의사결정에 통계적 근거를 제공합니다.
 
@@ -139,28 +169,30 @@ sections:
     attritionNo = hrData[hrData['AttritionBinary'] == 0]
     f"퇴사자: {len(attritionYes)}명, 재직자: {len(attritionNo)}명"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 4단계. 가설 검정 소개 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       attritionYes = hrData[hrData['AttritionBinary'] == 1]
       attritionNo = hrData[hrData['AttritionBinary'] == 0]
       f"퇴사자: {len(attritionYes)}명, 재직자: {len(attritionNo)}명"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 4단계. 가설 검정 소개 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 4단계. 가설 검정 소개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 4단계. 가설 검정 소개에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step5_ttest_income
   title: 5단계. t-test 급여 비교
   structuredPrimary: true
   subtitle: 퇴사자 vs 재직자 급여
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 5단계. ttest 급여 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     독립표본 t-test로 퇴사자와 재직자의 평균 급여를 비교합니다. t-test의 귀무가설(H0)은 '두 그룹의 평균이 같다'입니다. 검정 결과 p-value가 0.05 미만이면 귀무가설을 기각하고, '급여 차이가 통계적으로 유의미하다'고 결론짓습니다. 급여가 낮은 직원이 더 많이 퇴사한다면, 급여 인상이나 복지 개선이 퇴사 방지 전략이 될 수 있습니다.
 
     stats.ttest_ind()는 독립표본 t-test를 수행합니다. ind는 independent(독립)의 약자입니다. 두 그룹이 서로 독립적일 때 사용합니다. 동일한 사람의 전후 비교는 paired t-test(ttest_rel)를 사용합니다.
   tips:
-  - stats.ttest_ind()는 독립표본 t-test를 수행합니다. ind는 independent(독립)의 약자입니다. 두 그룹이 서로 독립적일 때 사용합니다. 동일한 사람의 전후 비교는 paired t-test(ttest_rel)를 사용합니다.
+  - stats.ttest_ind()는 독립표본 t-test를 수행합니다. ind는 independent(독립)의 약자입니다. 두 그룹이 서로 독립적일 때 사용합니다. 동일한 사람의
+    전후 비교는 paired t-test(ttest_rel)를 사용합니다.
   snippet: |-
     incomeYes = attritionYes['MonthlyIncome']
     incomeNo = attritionNo['MonthlyIncome']
@@ -168,7 +200,7 @@ sections:
     tStatIncome, pValueIncome = stats.ttest_ind(incomeYes, incomeNo)
     f"t-statistic: {tStatIncome:.3f}, p-value: {pValueIncome:.4f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 5단계. ttest 급여 비교 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       incomeYes = attritionYes['MonthlyIncome']
       incomeNo = attritionNo['MonthlyIncome']
@@ -176,16 +208,17 @@ sections:
       tStatIncome, pValueIncome = stats.ttest_ind(incomeYes, incomeNo)
       f"t-statistic: {tStatIncome:.3f}, p-value: {pValueIncome:.4f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 5단계. ttest 급여 비교 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 5단계. ttest 급여 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 5단계. ttest 급여 비교에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step6_ttest_interpret
   title: 6단계. t-test 결과 해석
   structuredPrimary: true
   subtitle: 급여 차이 확인
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 6단계. ttest 결과 해석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     p-value와 함께 실제 평균 차이도 확인해야 합니다. 표본이 크면 작은 차이도 통계적으로 유의미하게 나올 수 있지만, 실제 비즈니스 의미가 없을 수 있습니다. 예를 들어 퇴사자가 재직자보다 월급이 1만원 낮고 p-value가 0.01이어도, 이 차이로 퇴사를 설명하기는 어렵습니다. 통계적 유의성(p-value)과 실질적 유의성(효과 크기)을 함께 고려해야 의미 있는 결론을 얻습니다.
 
@@ -203,7 +236,7 @@ sections:
     })
     incomeDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 6단계. ttest 결과 해석 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       meanIncomeYes = incomeYes.mean()
       meanIncomeNo = incomeNo.mean()
@@ -215,17 +248,20 @@ sections:
       })
       incomeDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 6단계. ttest 결과 해석 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 6단계. ttest 결과 해석 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 6단계. ttest 결과 해석에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step7_ttest_age
   title: 7단계. t-test 나이 비교
   structuredPrimary: true
   subtitle: 연령대별 퇴사 패턴
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 퇴사자와 재직자의 평균 나이를 비교합니다. 일반적으로 젊은 직원은 경력 개발, 더 좋은 기회 탐색 등의 이유로 이직률이 높습니다. 반면 경력이 쌓인 직원은 안정성을 선호하여 퇴사율이 낮을 수 있습니다. t-test 결과가 유의미하다면 연령대별 맞춤 인재 관리 전략이 필요합니다. 예를 들어 젊은 직원에게는 성장 기회를, 경력 직원에게는 안정성을 강조하는 접근이 효과적일 수 있습니다.
+  goal: 7단계. ttest 나이 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 퇴사자와 재직자의 평균 나이를 비교합니다. 일반적으로 젊은 직원은 경력 개발, 더 좋은 기회 탐색 등의 이유로 이직률이 높습니다. 반면 경력이 쌓인 직원은
+    안정성을 선호하여 퇴사율이 낮을 수 있습니다. t-test 결과가 유의미하다면 연령대별 맞춤 인재 관리 전략이 필요합니다. 예를 들어 젊은 직원에게는 성장 기회를, 경력 직원에게는
+    안정성을 강조하는 접근이 효과적일 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -242,7 +278,7 @@ sections:
     })
     ageDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 7단계. ttest 나이 비교 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       ageYes = attritionYes['Age']
       ageNo = attritionNo['Age']
@@ -257,17 +293,20 @@ sections:
       })
       ageDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 7단계. ttest 나이 비교 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 7단계. ttest 나이 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 7단계. ttest 나이 비교에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step8_ttest_years
   title: 8단계. t-test 근속연수 비교
   structuredPrimary: true
   subtitle: 재직 기간 분석
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 근속연수(YearsAtCompany)가 퇴사에 영향을 미치는지 검정합니다. 신입 직원은 조직 적응 실패, 기대와 현실의 괴리 등으로 퇴사율이 높은 경향이 있습니다. 반면 장기 근속자는 회사에 대한 충성도가 높고 퇴직금 등의 이유로 퇴사를 꺼릴 수 있습니다. 근속연수와 퇴사의 관계를 파악하면 온보딩 프로그램 강화, 신입 멘토링 제도 등 적절한 시기에 개입하는 전략을 수립할 수 있습니다.
+  goal: 8단계. ttest 근속연수 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 근속연수(YearsAtCompany)가 퇴사에 영향을 미치는지 검정합니다. 신입 직원은 조직 적응 실패, 기대와 현실의 괴리 등으로 퇴사율이 높은 경향이 있습니다.
+    반면 장기 근속자는 회사에 대한 충성도가 높고 퇴직금 등의 이유로 퇴사를 꺼릴 수 있습니다. 근속연수와 퇴사의 관계를 파악하면 온보딩 프로그램 강화, 신입 멘토링 제도 등 적절한
+    시기에 개입하는 전략을 수립할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -284,7 +323,7 @@ sections:
     })
     yearsDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 8단계. ttest 근속연수 비교 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       yearsYes = attritionYes['YearsAtCompany']
       yearsNo = attritionNo['YearsAtCompany']
@@ -299,16 +338,17 @@ sections:
       })
       yearsDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 8단계. ttest 근속연수 비교 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 8단계. ttest 근속연수 비교 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 8단계. ttest 근속연수 비교에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step9_multiple_ttest
   title: 9단계. 여러 변수 t-test
   structuredPrimary: true
   subtitle: 종합 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 9단계. 여러 변수 ttest에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     여러 수치형 변수에 대해 한번에 t-test를 수행하여 퇴사와 가장 관련 있는 요인을 찾습니다. 나이, 급여, 근속연수, 총 경력, 출퇴근 거리, 이전 직장 수, 워라밸 점수 등을 비교합니다. p-value로 정렬하면 퇴사자와 재직자 간 차이가 가장 큰 변수가 무엇인지 한눈에 파악할 수 있습니다. 이는 로지스틱 회귀 모델에 어떤 변수를 넣을지 결정하는 근거가 됩니다.
 
@@ -336,7 +376,7 @@ sections:
     ttestDf = pd.DataFrame(ttestResults).sort_values('p-value')
     ttestDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 9단계. 여러 변수 ttest 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       numericVars = ['Age', 'MonthlyIncome', 'YearsAtCompany', 'TotalWorkingYears',
                      'DistanceFromHome', 'NumCompaniesWorked', 'WorkLifeBalance']
@@ -358,16 +398,17 @@ sections:
       ttestDf = pd.DataFrame(ttestResults).sort_values('p-value')
       ttestDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 9단계. 여러 변수 ttest 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 9단계. 여러 변수 ttest 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 9단계. 여러 변수 ttest에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step10_ttest_viz
   title: 10단계. t-test 결과 시각화
   structuredPrimary: true
   subtitle: 변수별 차이 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 10단계. ttest 결과 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     여러 변수의 t-test 결과를 막대 그래프로 시각화하면 어떤 요인이 퇴사에 가장 큰 영향을 미치는지 직관적으로 파악할 수 있습니다. 유의미한 변수(p < 0.05)와 그렇지 않은 변수를 색상으로 구분합니다.
 
@@ -385,7 +426,7 @@ sections:
     ).properties(width=500, height=300, title='Mean Difference by Variable (Attrition Yes vs No)')
     ttestViz
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 10단계. ttest 결과 시각화 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import altair as alt
 
@@ -397,16 +438,17 @@ sections:
       ).properties(width=500, height=300, title='Mean Difference by Variable (Attrition Yes vs No)')
       ttestViz
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 10단계. ttest 결과 시각화 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 10단계. ttest 결과 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 10단계. ttest 결과 시각화에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step11_anova_intro
   title: 11단계. ANOVA 소개
   structuredPrimary: true
   subtitle: 3개 이상 그룹 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 11단계. ANOVA 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     t-test는 2개 그룹만 비교할 수 있습니다. 3개 이상 그룹을 비교하려면 ANOVA(Analysis of Variance, 분산분석)를 사용합니다. 직무만족도는 1(매우 낮음)에서 4(매우 높음)까지 4단계로 측정되므로 ANOVA가 적합합니다. ANOVA는 '모든 그룹의 평균이 같다'는 귀무가설을 검정하며, p-value가 0.05 미만이면 최소 한 그룹은 다른 그룹과 유의미하게 다르다고 결론짓습니다.
 
@@ -418,22 +460,23 @@ sections:
     satisfactionGroups.columns = ['퇴사율', '인원수']
     satisfactionGroups
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 11단계. ANOVA 소개 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       satisfactionGroups = hrData.groupby('JobSatisfaction')['AttritionBinary'].agg(['mean', 'count'])
       satisfactionGroups.columns = ['퇴사율', '인원수']
       satisfactionGroups
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 11단계. ANOVA 소개 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 11단계. ANOVA 소개 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 11단계. ANOVA 소개에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step12_anova_test
   title: 12단계. ANOVA 검정
   structuredPrimary: true
   subtitle: 만족도별 퇴사율 차이
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 12단계. ANOVA 검정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     One-way ANOVA로 직무만족도 4개 그룹 간 퇴사율 차이를 검정합니다. F-statistic은 그룹 간 분산을 그룹 내 분산으로 나눈 값으로, 클수록 그룹 간 차이가 뚜렷합니다. 만족도 1인 그룹의 퇴사율이 만족도 4인 그룹보다 높다면, 직무 만족도 개선이 퇴사 방지에 효과적이라는 통계적 근거가 됩니다. ANOVA 결과가 유의미하면 어떤 그룹 간에 차이가 있는지 사후검정으로 추가 분석할 수 있습니다.
 
@@ -449,7 +492,7 @@ sections:
     fStat, pValueAnova = stats.f_oneway(group1, group2, group3, group4)
     f"F-statistic: {fStat:.3f}, p-value: {pValueAnova:.4f}"
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 12단계. ANOVA 검정 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       group1 = hrData[hrData['JobSatisfaction'] == 1]['AttritionBinary']
       group2 = hrData[hrData['JobSatisfaction'] == 2]['AttritionBinary']
@@ -459,16 +502,17 @@ sections:
       fStat, pValueAnova = stats.f_oneway(group1, group2, group3, group4)
       f"F-statistic: {fStat:.3f}, p-value: {pValueAnova:.4f}"
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 12단계. ANOVA 검정 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 12단계. ANOVA 검정 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 12단계. ANOVA 검정에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step13_anova_boxplot
   title: 13단계. ANOVA Boxplot 시각화
   structuredPrimary: true
   subtitle: 만족도별 급여 분포
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 13단계. ANOVA Boxplot 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     Boxplot은 ANOVA 분석에 적합한 시각화로, 각 그룹의 중앙값, 사분위수, 이상치를 한눈에 보여줍니다. 직무만족도별 급여 분포를 비교하면 어떤 그룹이 급여가 낮은지 파악할 수 있습니다.
 
@@ -486,7 +530,7 @@ sections:
     boxAx.set_title('Monthly Income by Job Satisfaction and Attrition')
     boxFig
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 13단계. ANOVA Boxplot 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import seaborn as sns
       import matplotlib.pyplot as plt
@@ -498,17 +542,20 @@ sections:
       boxAx.set_title('Monthly Income by Job Satisfaction and Attrition')
       boxFig
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 13단계. ANOVA Boxplot 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 13단계. ANOVA Boxplot 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 13단계. ANOVA Boxplot 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step14_anova_viz
   title: 14단계. ANOVA 시각화
   structuredPrimary: true
   subtitle: 만족도별 퇴사율 비교
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 직무만족도별 퇴사율을 막대그래프로 시각화합니다. 시각화는 통계 검정 결과를 직관적으로 이해하게 해주며, 경영진에게 보고할 때 설득력을 높입니다. 막대 높이가 일정하지 않고 만족도가 낮을수록 퇴사율이 높은 패턴이 보인다면, 직무 만족도 개선의 필요성을 시각적으로 증명할 수 있습니다. 숫자와 그래프를 함께 제시하면 분석 결과의 신뢰성이 높아집니다.
+  goal: 14단계. ANOVA 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 직무만족도별 퇴사율을 막대그래프로 시각화합니다. 시각화는 통계 검정 결과를 직관적으로 이해하게 해주며, 경영진에게 보고할 때 설득력을 높입니다. 막대 높이가
+    일정하지 않고 만족도가 낮을수록 퇴사율이 높은 패턴이 보인다면, 직무 만족도 개선의 필요성을 시각적으로 증명할 수 있습니다. 숫자와 그래프를 함께 제시하면 분석 결과의 신뢰성이
+    높아집니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -522,7 +569,7 @@ sections:
                              color_continuous_scale='Reds')
     satisfactionFig.show()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 14단계. ANOVA 시각화 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       satisfactionDf = hrData.groupby('JobSatisfaction')['AttritionBinary'].mean().reset_index()
       satisfactionDf.columns = ['JobSatisfaction', 'AttritionRate']
@@ -534,17 +581,20 @@ sections:
                                color_continuous_scale='Reds')
       satisfactionFig.show()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 14단계. ANOVA 시각화 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 14단계. ANOVA 시각화 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 14단계. ANOVA 시각화에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: step15_logit_model
   title: 15단계. 로지스틱 회귀
   structuredPrimary: true
   subtitle: 퇴사 확률 예측
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: 로지스틱 회귀로 여러 요인을 동시에 고려하여 퇴사 확률을 예측합니다. t-test는 한 번에 하나의 변수만 분석하지만, 로지스틱 회귀는 나이, 급여, 근속연수 등 여러 변수의 영향을 동시에 분석합니다. 이렇게 하면 '다른 조건이 같을 때' 각 변수가 퇴사에 미치는 순수한 영향력을 파악할 수 있습니다. 예를 들어 급여가 낮아서 퇴사하는지, 근속연수가 짧아서 퇴사하는지 구분할 수 있습니다.
+  goal: 15단계. 로지스틱 회귀에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 로지스틱 회귀로 여러 요인을 동시에 고려하여 퇴사 확률을 예측합니다. t-test는 한 번에 하나의 변수만 분석하지만, 로지스틱 회귀는 나이, 급여, 근속연수
+    등 여러 변수의 영향을 동시에 분석합니다. 이렇게 하면 '다른 조건이 같을 때' 각 변수가 퇴사에 미치는 순수한 영향력을 파악할 수 있습니다. 예를 들어 급여가 낮아서 퇴사하는지,
+    근속연수가 짧아서 퇴사하는지 구분할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -555,7 +605,7 @@ sections:
     logitModel = sm.Logit(yLogit, XLogit).fit(disp=0)
     logitModel.summary()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 15단계. 로지스틱 회귀 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       XLogit = hrData[['Age', 'MonthlyIncome', 'YearsAtCompany', 'DistanceFromHome', 'NumCompaniesWorked']].copy()
       XLogit = sm.add_constant(XLogit)
@@ -564,16 +614,17 @@ sections:
       logitModel = sm.Logit(yLogit, XLogit).fit(disp=0)
       logitModel.summary()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 15단계. 로지스틱 회귀 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 15단계. 로지스틱 회귀 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 15단계. 로지스틱 회귀에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step16_odds_ratio
   title: 16단계. 승산비 계산
   structuredPrimary: true
   subtitle: 변수별 영향력
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 16단계. 승산비 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     승산비(Odds Ratio)로 각 변수의 영향력을 해석합니다. 승산비는 로지스틱 회귀 계수를 exp() 함수로 변환한 값으로, 해당 변수가 1 증가할 때 퇴사 '승산'이 몇 배로 바뀌는지 나타냅니다. 승산비가 1.1이면 10% 증가, 0.9이면 10% 감소입니다. 예를 들어 DistanceFromHome의 승산비가 1.05면 출퇴근 거리가 1km 증가할 때마다 퇴사 승산이 5% 증가한다는 의미입니다.
 
@@ -592,7 +643,7 @@ sections:
     })
     orDf
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 16단계. 승산비 계산 예제에서 열 이름이나 행 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       oddsRatio = np.exp(logitModel.params)
       pvals = logitModel.pvalues
@@ -605,17 +656,20 @@ sections:
       })
       orDf
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 16단계. 승산비 계산 코드에서 먼저 열 이름이나 행 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 16단계. 승산비 계산 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 16단계. 승산비 계산에서 바꾼 열 이름이나 행 값이 결과에 반영되어야 합니다.
 - id: step17_prediction
   title: 17단계. 퇴사 확률 예측
   structuredPrimary: true
   subtitle: 개인별 리스크 점수
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: predict()로 각 직원의 퇴사 확률을 계산합니다. 확률이 30% 이상인 직원을 고위험군으로 분류하면, HR 팀이 선제적으로 면담을 진행하거나 맞춤형 복지를 제공할 수 있습니다. 모든 직원에게 동일한 자원을 투입하는 것보다, 퇴사 위험이 높은 직원에게 집중 관리하는 것이 비용 대비 효과적입니다. 이런 예측 기반 HR 관리를 People Analytics라고 합니다.
+  goal: 17단계. 퇴사 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: predict()로 각 직원의 퇴사 확률을 계산합니다. 확률이 30% 이상인 직원을 고위험군으로 분류하면, HR 팀이 선제적으로 면담을 진행하거나 맞춤형 복지를
+    제공할 수 있습니다. 모든 직원에게 동일한 자원을 투입하는 것보다, 퇴사 위험이 높은 직원에게 집중 관리하는 것이 비용 대비 효과적입니다. 이런 예측 기반 HR 관리를 People
+    Analytics라고 합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -625,7 +679,7 @@ sections:
     f"고위험군 직원 수: {len(highRisk)}명"
     highRisk.head(10)
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 17단계. 퇴사 확률 예측 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       hrData['AttritionProb'] = logitModel.predict(XLogit)
 
@@ -633,17 +687,20 @@ sections:
       f"고위험군 직원 수: {len(highRisk)}명"
       highRisk.head(10)
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 17단계. 퇴사 확률 예측 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 17단계. 퇴사 확률 예측 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 17단계. 퇴사 확률 예측에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: step18_roc_auc
   title: 18단계. 모델 평가
   structuredPrimary: true
   subtitle: ROC-AUC 계산
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: ROC-AUC로 모델 성능을 평가합니다. AUC(Area Under Curve)는 모델이 퇴사자와 재직자를 얼마나 잘 구분하는지 나타내며, 0.5는 무작위 추측, 1.0은 완벽한 분류입니다. 실무에서는 AUC 0.7 이상이면 사용 가능한 수준으로 봅니다. ROC 곡선이 대각선(무작위 기준선)에서 멀리 위쪽으로 휘어질수록 좋은 모델입니다. 모델 성능이 낮다면 더 많은 변수를 추가하거나 다른 알고리즘을 시도해볼 수 있습니다.
+  goal: 18단계. 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: ROC-AUC로 모델 성능을 평가합니다. AUC(Area Under Curve)는 모델이 퇴사자와 재직자를 얼마나 잘 구분하는지 나타내며, 0.5는 무작위
+    추측, 1.0은 완벽한 분류입니다. 실무에서는 AUC 0.7 이상이면 사용 가능한 수준으로 봅니다. ROC 곡선이 대각선(무작위 기준선)에서 멀리 위쪽으로 휘어질수록 좋은 모델입니다.
+    모델 성능이 낮다면 더 많은 변수를 추가하거나 다른 알고리즘을 시도해볼 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -662,7 +719,7 @@ sections:
                          yaxis_title='True Positive Rate')
     rocFig.show()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 18단계. 모델 평가 예제에서 데이터 값이나 축 설정을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from sklearn.metrics import roc_auc_score, roc_curve
 
@@ -679,16 +736,17 @@ sections:
                            yaxis_title='True Positive Rate')
       rocFig.show()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 18단계. 모델 평가 코드에서 먼저 데이터 값이나 축 설정 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 18단계. 모델 평가 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 18단계. 모델 평가에서 바꾼 데이터 값이나 축 설정이 결과에 반영되어야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
   subtitle: HR 분석 프로젝트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
   explanation: |-
     HR 분석가가 되어 직원 퇴사 요인을 분석합니다. 실제 HR 분석에서는 여러 가설을 검정하고, 유의미한 변수를 조합하여 예측 모델을 만듭니다. 각 미션은 데이터 로딩부터 가설 검정, 로지스틱 회귀까지 전체 과정을 독립적으로 수행합니다. 본 프로젝트에서 배운 t-test, ANOVA, 승산비 해석을 실습을 통해 체화해봅니다.
 
@@ -706,7 +764,7 @@ sections:
     wlbData['AttritionBinary'] = (wlbData['Attrition'] == 'Yes').astype(int)
     wlbData.shape
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 실습 예제에서 리스트 값을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import pandas as pd
       import numpy as np
@@ -718,16 +776,19 @@ sections:
       wlbData['AttritionBinary'] = (wlbData['Attrition'] == 'Yes').astype(int)
       wlbData.shape
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 실습 코드에서 먼저 리스트 값 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 실습 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 실습에서 바꾼 리스트 값이 결과에 반영되어야 합니다.
 - id: summary
   title: 정리
   subtitle: 여덟 번째 프로젝트 완료!
   blocks:
   - type: text
-    content: 이번 프로젝트에서는 IBM HR 데이터로 직원 퇴사 요인을 분석했습니다. t-test로 퇴사자와 재직자의 급여, 나이, 근속연수 차이를 검정하고, ANOVA로 직무만족도별 퇴사율을 비교했습니다. 로지스틱 회귀로 퇴사 확률을 예측하고, 고위험군 직원을 식별했습니다. 이제 HR 분석, 인재 유지 전략, 채용 계획에 통계적 근거를 제공할 수 있습니다.
+    content: 이번 프로젝트에서는 IBM HR 데이터로 직원 퇴사 요인을 분석했습니다. t-test로 퇴사자와 재직자의 급여, 나이, 근속연수 차이를 검정하고, ANOVA로
+      직무만족도별 퇴사율을 비교했습니다. 로지스틱 회귀로 퇴사 확률을 예측하고, 고위험군 직원을 식별했습니다. 이제 HR 분석, 인재 유지 전략, 채용 계획에 통계적 근거를 제공할
+      수 있습니다.
   - type: list
     items:
     - t-test - 두 그룹 평균 비교
@@ -742,9 +803,10 @@ sections:
   title: 업무 흐름 검증
   structuredPrimary: true
   subtitle: 회귀 리포트 품질 게이트
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
-  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
@@ -764,7 +826,7 @@ sections:
 
     marketingData[requiredColumns].head()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 업무 흐름 검증 예제에서 반복 대상이나 범위을 바꿔 실행하고, 출력과 상태 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       compactX = sm.add_constant(marketingData[["TV", "Radio"]])
       compactModel = sm.OLS(reportY, compactX).fit()
@@ -795,7 +857,8 @@ sections:
 
       marketingData[requiredColumns].head()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 업무 흐름 검증 코드에서 먼저 반복 대상이나 범위 위치를 찾으세요.
+    - 실행 후 출력과 상태 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 업무 흐름 검증 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 업무 흐름 검증에서 바꾼 반복 대상이나 범위이 결과에 반영되어야 합니다.

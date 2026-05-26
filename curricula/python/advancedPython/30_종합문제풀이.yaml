@@ -31,13 +31,35 @@ intro:
   - 함수형 + 객체지향 혼합 문제
   - 메타프로그래밍 활용 문제
   - 정규표현식 + 문자열 알고리즘 통합
+  direction: 종합 문제 풀이에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 종합 문제 풀이 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 자료구조 + 알고리즘 통합 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 디자인패턴 통합 적용 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 함수형 + 객체지향 통합 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 종합 문제 풀이 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합 문제 풀이 실행
+      detail: 셀을 실행해 출력, 변수, 예외 상태를 확인합니다.
+    - label: 종합 문제 풀이 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
 sections:
 - id: data-structure-algorithm
   title: 자료구조 + 알고리즘 통합
   structuredPrimary: true
   subtitle: LRU 캐시 with TTL
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 자료구조 + 알고리즘 통합에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 해시맵과 이중 연결 리스트를 결합하여 시간 제한 기능이 있는 LRU 캐시를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -104,7 +126,7 @@ sections:
     lruCache.put("d", 4)
     [lruCache.get(k) for k in ["a", "b", "c", "d"]]
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 자료구조 + 알고리즘 통합 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from time import time as getTime
 
@@ -168,16 +190,17 @@ sections:
       lruCache.put("d", 4)
       [lruCache.get(k) for k in ["a", "b", "c", "d"]]
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 자료구조 + 알고리즘 통합 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 자료구조 + 알고리즘 통합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 자료구조 + 알고리즘 통합에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: design-pattern-integration
   title: 디자인패턴 통합 적용
   structuredPrimary: true
   subtitle: 이벤트 기반 상태 머신
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 디자인패턴 통합 적용에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: Observer, State, Command 패턴을 결합한 이벤트 기반 상태 머신을 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -258,7 +281,7 @@ sections:
     fsm.dispatch("stop")
     logger.logs
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 디자인패턴 통합 적용 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from abc import ABC, abstractmethod
 
@@ -336,16 +359,17 @@ sections:
       fsm.dispatch("stop")
       logger.logs
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 디자인패턴 통합 적용 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 디자인패턴 통합 적용 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 디자인패턴 통합 적용에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: functional-oop-integration
   title: 함수형 + 객체지향 통합
   structuredPrimary: true
   subtitle: 파이프라인 빌더
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 함수형 + 객체지향 통합에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 함수형 파이프라인을 객체지향 빌더 패턴으로 구성하여 유연한 데이터 처리 시스템을 만듭니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -398,7 +422,7 @@ sections:
     pipelineResult = pipeline.execute(sampleData)
     pipelineResult
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 함수형 + 객체지향 통합 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from functools import reduce
 
@@ -448,16 +472,17 @@ sections:
       pipelineResult = pipeline.execute(sampleData)
       pipelineResult
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 함수형 + 객체지향 통합 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 함수형 + 객체지향 통합 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 함수형 + 객체지향 통합에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: metaprogramming-practice
   title: 메타프로그래밍 실전
   structuredPrimary: true
   subtitle: 자동 검증 데이터 클래스
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 메타프로그래밍 실전에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 메타클래스와 디스크립터를 활용하여 자동 타입 검증 기능이 있는 데이터 클래스를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -507,7 +532,7 @@ sections:
     validUser = UserModel(username="alice", age=25, email="alice@test.com")
     validUser.toDict()
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 메타프로그래밍 실전 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TypedField:
           def __init__(self, fieldType, validator=None):
@@ -554,16 +579,17 @@ sections:
       validUser = UserModel(username="alice", age=25, email="alice@test.com")
       validUser.toDict()
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 메타프로그래밍 실전 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 메타프로그래밍 실전 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 메타프로그래밍 실전에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: string-regex-integration
   title: 문자열 알고리즘 + 정규표현식
   structuredPrimary: true
   subtitle: 고급 텍스트 검색 엔진
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 문자열 알고리즘 + 정규표현식에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: Trie 자료구조와 정규표현식을 결합한 고급 텍스트 검색 시스템을 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -639,7 +665,7 @@ sections:
     regexResult = searchEngine.searchRegex(r"python.*programming")
     {"word": wordResult, "prefix": prefixResult, "regex": regexResult}
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 문자열 알고리즘 + 정규표현식 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       import re
 
@@ -712,16 +738,17 @@ sections:
       regexResult = searchEngine.searchRegex(r"python.*programming")
       {"word": wordResult, "prefix": prefixResult, "regex": regexResult}
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 문자열 알고리즘 + 정규표현식 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 문자열 알고리즘 + 정규표현식 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 문자열 알고리즘 + 정규표현식에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: optimization-dp
   title: 최적화 + 동적 프로그래밍
   structuredPrimary: true
   subtitle: 메모이제이션 데코레이터 고급 버전
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 최적화 + 동적 프로그래밍에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: LRU 기반 메모이제이션에 통계 추적 기능을 추가한 고급 캐싱 데코레이터를 구현합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -776,7 +803,7 @@ sections:
     fibStats = fibonacci.stats()
     {"fib30": fibResult[-1], "stats": fibStats}
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 최적화 + 동적 프로그래밍 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       from functools import wraps
       from collections import OrderedDict
@@ -828,16 +855,17 @@ sections:
       fibStats = fibonacci.stats()
       {"fib30": fibResult[-1], "stats": fibStats}
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 최적화 + 동적 프로그래밍 코드에서 먼저 인자나 반환값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 최적화 + 동적 프로그래밍 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 최적화 + 동적 프로그래밍에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트'
   structuredPrimary: true
   subtitle: 정규식, 자료구조, 정렬, 집계를 하나의 검증 가능한 문제로 연결
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: |-
     종합 문제는 여러 개념을 나열하는 데서 끝나면 약합니다. 로그를 파싱하고, 실패 주문을 우선순위 큐로 정리하고, 결제 합계를 집계하는 작은 운영 리포트를 완성해보세요.
 
@@ -898,7 +926,7 @@ sections:
         "firstIncident": "O-102",
     }
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 예제에서 인자나 반환값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.'
     starterCode: |-
       import heapq
       import re
@@ -953,16 +981,17 @@ sections:
           "firstIncident": "O-102",
       }
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 코드에서 먼저 인자나 반환값 위치를 찾으세요.'
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트 코드가 예외 없이 끝나야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 운영 리포트 미니 프로젝트에서 바꾼 인자나 반환값이 결과에 반영되어야 합니다.'
 - id: practice-exercises
   title: 종합 실습 문제
   structuredPrimary: true
   subtitle: 30일 과정 종합 문제
-  goal: 예제를 실행하고 핵심 동작을 직접 변형한다.
-  why: 작은 실행과 검증 흐름이 실무 코드의 기본이다.
+  goal: 종합 실습 문제에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 고급 문법은 복잡한 코드를 더 작고 검증 가능한 단위로 나누는 데 필요합니다.
   explanation: 지금까지 학습한 모든 개념을 활용하여 문제를 해결하세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -996,7 +1025,7 @@ sections:
     """
     EXERCISES
   exercise:
-    prompt: 예제를 실행한 뒤 값 하나를 바꿔 결과를 비교하세요.
+    prompt: 종합 실습 문제 예제에서 입력값을 바꿔 실행하고, 호출 결과와 예외 경계 기준으로 달라진 결과를 확인하세요.
     starterCode: |-
       class TwoStackQueue:
           def __init__(self):
@@ -1024,7 +1053,8 @@ sections:
       ex1Result = [ex1Queue.dequeue() for _ in range(5)]
       ex1Result
     hints:
-    - 기준 실행 후 값 하나를 바꿔 결과를 비교하세요.
+    - 종합 실습 문제 코드에서 먼저 입력값 위치를 찾으세요.
+    - 실행 후 호출 결과와 예외 경계 기준이 바뀐 입력을 반영하는지 확인하세요.
   check:
-    noError: 오류 없이 실행
-    resultCheck: 출력 또는 assert 확인
+    noError: 종합 실습 문제 코드가 예외 없이 끝나야 합니다.
+    resultCheck: 종합 실습 문제에서 바꾼 입력값이 결과에 반영되어야 합니다.
