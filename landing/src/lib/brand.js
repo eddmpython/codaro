@@ -1,4 +1,8 @@
-import { base } from "$app/paths";
+const viteBase = typeof import.meta !== "undefined" && import.meta.env?.BASE_URL
+  ? import.meta.env.BASE_URL
+  : "/codaro/";
+
+export const basePath = viteBase === "/" ? "" : viteBase.replace(/\/$/, "");
 
 export const brand = {
   name: "Codaro",
@@ -15,8 +19,21 @@ export const brand = {
     "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
   launcherSbomUrl:
     "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
-  get mascotUrl() { return `${base}/brand/codaro-character.png`; },
-  get faviconUrl() { return `${base}/favicon.png`; },
+  releaseManifestUrl:
+    "https://github.com/eddmpython/codaro/releases/latest/download/release-manifest.json",
+  pythonRuntimeUrl:
+    "https://github.com/eddmpython/codaro/releases/latest/download/python-runtime-win-x64.zip",
+  pythonRuntimeChecksumUrl:
+    "https://github.com/eddmpython/codaro/releases/latest/download/python-runtime-win-x64.zip.sha256",
+  get mascotUrl() { return `${basePath}/brand/codaro-character.png`; },
+  get faviconUrl() { return `${basePath}/favicon.png`; },
+  appPath(path = "/") {
+    const resolvedPath = path || "/";
+    const withoutBase = resolvedPath.startsWith(this.basePath)
+      ? resolvedPath.slice(this.basePath.length) || "/"
+      : resolvedPath;
+    return `${basePath}${withoutBase.startsWith("/") ? withoutBase : `/${withoutBase}`}`;
+  },
   toSiteUrl(path = "/") {
     const resolvedPath = path || "/";
     const pathWithoutBase = resolvedPath.startsWith(this.basePath)
@@ -29,7 +46,7 @@ export const brand = {
       {
         title: "Documentation",
         description: "Installation, concepts, operating notes, and public writing.",
-        href: `${base}/docs`,
+        href: `${basePath}/docs`,
       },
       {
         title: "GitHub",
@@ -39,12 +56,12 @@ export const brand = {
       {
         title: "Writing",
         description: "Runtime, learning workflow, and automation notes inside docs.",
-        href: `${base}/docs/blog`,
+        href: `${basePath}/docs/blog`,
       },
       {
         title: "Search",
         description: "Find Codaro documentation and writing from one place.",
-        href: `${base}/search`,
+        href: `${basePath}/search`,
       },
     ];
   },

@@ -16,11 +16,11 @@ Source of truth:
 - brand assets: `../assets/brand/mascot/work/`
 
 Rules:
-- public UI language is English only
+- public UI language is Korean by default
 - public tone is zinc-based and calm
 - `landing/` must stay separate from the local editor `editor/`
-- `landing/src/app.css` mirrors the editor shadcn token names for color, radius, border, and ring values
-- framework parity is visual/token parity here; React product code stays in `editor/`, while public docs and writing stay in the Svelte static site
+- `landing/src/styles.css` keeps the public site visual system compact and token-like
+- framework parity is visual/token parity here; product code stays in `editor/`, while public docs and writing stay in the React static site
 - launcher download CTAs must point to GitHub Release assets, not repo-internal build paths
 - `.github/workflows/launcher-release.yml` is responsible for publishing `CodaroLauncher.exe`, checksum, and SBOM with stable asset names
 - writing asset URLs are flattened to `/docs/blog/assets/*` during build
@@ -34,6 +34,7 @@ Current State:
 - writing is generated from `../docs/blog/` and published under `/docs/blog/...`
 - legacy `/blog/...` routes redirect to `/docs/blog/...`
 - public install docs no longer expose internal launcher design documents by path
+- Vite builds React into `landing/build`, then `scripts/prerenderReact.js` writes route-level HTML for GitHub Pages
 
 Next Action:
 - keep public docs end-user facing and strip any future internal design references from docs writing content
@@ -41,4 +42,4 @@ Next Action:
 
 Verification Left:
 - spot-check future generated search index and `llms*.txt` outputs whenever docs content changes
-- confirm GitHub Pages routing still behaves correctly for `/docs` and `/docs/...` after any SvelteKit adapter change
+- confirm GitHub Pages routing still behaves correctly for `/docs`, `/docs/...`, `/docs/blog/...`, and legacy `/blog/...` paths after route changes

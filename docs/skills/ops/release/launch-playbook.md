@@ -1,7 +1,7 @@
 ---
 id: launch-playbook
 title: Launch Playbook
-description: Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.
+description: Public launch playbook for positioning, demos, video, release notes, and first-user feedback.
 category: ops
 section: release
 order: 308

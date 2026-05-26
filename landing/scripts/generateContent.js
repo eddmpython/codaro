@@ -14,10 +14,11 @@ const generatedDocsPageRoot = resolve(generatedRoot, "docsPages");
 const basePath = process.env.NODE_ENV === "development" ? "" : "/codaro";
 
 const blogCategoryMeta = new Map([
-  ["01-product-and-runtime", { slug: "product-and-runtime", label: "Product and Runtime" }],
-  ["02-editor-and-notebooks", { slug: "editor-and-notebooks", label: "Editor and Notebooks" }],
-  ["03-learning-and-workflows", { slug: "learning-and-workflows", label: "Learning and Workflows" }],
-  ["04-automation-and-apps", { slug: "automation-and-apps", label: "Automation and Apps" }],
+  ["01-codaro-news", { slug: "codaro-news", label: "Codaro 소식" }],
+]);
+
+const blogSeriesMeta = new Map([
+  ["codaro-news", { slug: "codaro-news", label: "Codaro 소식" }],
 ]);
 
 const docsSectionMeta = new Map([
@@ -45,6 +46,16 @@ function stripMarkdown(markdown) {
 
 function sortByDateDesc(items) {
   return [...items].sort((left, right) => String(right.date).localeCompare(String(left.date)));
+}
+
+function normalizeDate(value, filePath) {
+  const date = value instanceof Date
+    ? value.toISOString().slice(0, 10)
+    : String(value).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error(`Invalid blog date "${date}" in ${filePath}`);
+  }
+  return date;
 }
 
 function escapeForModule(value) {
@@ -82,6 +93,13 @@ function collectBlogPosts() {
           throw new Error(`Missing blog frontmatter "${field}" in ${filePath}`);
         }
       }
+      const category = String(fileMeta.category);
+      if (category !== categoryMeta.slug) {
+        throw new Error(`Blog category "${category}" does not match folder "${categoryEntry.name}" in ${filePath}`);
+      }
+      const series = String(fileMeta.series);
+      const seriesMeta = blogSeriesMeta.get(series);
+      const date = normalizeDate(fileMeta.date, filePath);
       const previewValue = String(fileMeta.cardPreview);
       const cardPreview = previewValue.startsWith("./assets/")
         ? `${basePath}/docs/blog/assets/${previewValue.split("/").pop()}`
@@ -89,13 +107,14 @@ function collectBlogPosts() {
       posts.push({
         slug,
         title: String(fileMeta.title),
-        date: String(fileMeta.date),
+        date,
         description: String(fileMeta.description),
-        category: String(fileMeta.category),
+        category,
         categoryLabel: categoryMeta.label,
         categoryFolder: categoryEntry.name,
         categoryPath: `${basePath}/docs/blog/category/${String(fileMeta.category)}`,
-        series: String(fileMeta.series),
+        series,
+        seriesLabel: seriesMeta?.label || series,
         seriesOrder: Number(fileMeta.seriesOrder),
         thumbnail: `${basePath}${String(fileMeta.thumbnail)}`,
         cardPreview,
@@ -277,7 +296,7 @@ const docsPages = collectDocsPages();
 const docsNavPages = docsPages.map(toDocsNavPage);
 const docsSections = buildDocsSections(docsNavPages);
 const postCategories = [...new Map(posts.map((post) => [post.category, { slug: post.category, label: post.categoryLabel }])).values()];
-const postSeries = [...new Map(posts.map((post) => [post.series, { slug: post.series, label: post.series }])).values()];
+const postSeries = [...new Map(posts.map((post) => [post.series, { slug: post.series, label: post.seriesLabel }])).values()];
 const searchEntries = [
   ...posts.map((post) => ({
     kind: "writing",

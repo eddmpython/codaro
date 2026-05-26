@@ -1,4 +1,8 @@
-# Codaro
+<p align="right">
+  <a href="https://eddmpython.github.io/codaro/"><strong>GitHub Pages: eddmpython.github.io/codaro</strong></a>
+</p>
+
+# Codaro - Python 학습과 개인 자동화 스튜디오
 
 <p align="center">
   <img src="assets/brand/mascot/codaro-character.png" width="170" alt="Codaro avatar" />
@@ -9,7 +13,8 @@
   <a href="https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb"><img alt="Open Day 01 in Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 </p>
 
-Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜디오**입니다.
+Codaro는 Python 학습, 로컬 코드 실행, 노트북 셀, 개인 자동화를 하나의 흐름으로 잇는 **local-first 개인 학습 + 자동화 스튜디오**입니다.
+공식 공개 사이트는 [GitHub Pages](https://eddmpython.github.io/codaro/)에서 확인할 수 있습니다.
 
 제품 표면은 네 가지로 정리합니다.
 
@@ -18,12 +23,26 @@ Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜
 - **커리큘럼** — `curricula/` YAML을 학습 셀 카드로 펼쳐 공부하는 순수 학습 공간
 - **자동화** — 에디터에서 만든 셀 조합과 스크립트를 태스크로 예약 실행하는 공간
 
-상세 제품 사상과 프론트 구조 기준은 [Codaro Skills](docs/skills/README.md)와 [프론트 제품 표면](docs/skills/architecture/frontend-product-surface.md)에 둡니다. 이 README는 외부 진입점으로, 현재 공개 학습 콘텐츠와 핵심 구조만 짧게 안내합니다.
+상세 제품 사상과 프론트 구조 기준은 [Codaro Skills](docs/skills/README.md)와 [프론트 제품 표면](docs/skills/architecture/frontend-product-surface.md)에 둡니다. 이 README는 검색과 외부 공유를 위한 진입점으로, Codaro의 Python 학습, 로컬 런타임, 실행형 커리큘럼, 개인 자동화 구조를 짧게 안내합니다.
+
+## 다운로드
+
+Windows 사용자는 최신 GitHub Release에서 런처를 내려받아 실행합니다. 런처는 릴리즈 manifest가 지정한 Python runtime과 정확한 `codaro` wheel 조합만 설치하고, 이후 업데이트도 같은 manifest 경로로 확인합니다.
+
+| 항목 | 링크 |
+|---|---|
+| Codaro Launcher | [CodaroLauncher.exe](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe) |
+| 체크섬 | [CodaroLauncher.exe.sha256](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256) |
+| 릴리즈 manifest | [release-manifest.json](https://github.com/eddmpython/codaro/releases/latest/download/release-manifest.json) |
+| 관리형 Python runtime | [python-runtime-win-x64.zip](https://github.com/eddmpython/codaro/releases/latest/download/python-runtime-win-x64.zip) |
+| SBOM | [CodaroLauncher.spdx.json](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json) |
+| 전체 릴리즈 | [GitHub Releases](https://github.com/eddmpython/codaro/releases/latest) |
 
 ## 바로 시작
 
 | 시작점 | 설명 |
 |---|---|
+| [공식 GitHub Pages](https://eddmpython.github.io/codaro/) | React 기반 공개 랜딩, 문서, Codaro 소식 |
 | [제품 사상](docs/skills/README.md) | 채팅, 에디터, 커리큘럼, 자동화 네 표면 기준 |
 | [프론트 구조 기준](docs/skills/architecture/frontend-product-surface.md) | `editor/` 제품 표면과 UI 판단 기준 |
 | [공개 준비 체크리스트](publicReadinessChecklist.md) | 보안, 개인정보, 지원, 공급망, 객관 gate 완료 조건 |

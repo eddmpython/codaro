@@ -1,17 +1,19 @@
 # Codaro Topic Roadmap
 
-This document tracks the next public writing topics for Codaro.
+This document tracks the public writing queue. Rules live in [BLOG.md](BLOG.md).
 
-## Initial queue
+## Current Category
 
-1. Why Codaro uses a public site separate from the local editor
-2. Block model versus notebook cell compatibility
-3. Reactive runtime boundaries for learning and automation
-4. Why guided workflows belong inside the editor runtime
+- `codaro-news` — Codaro 소식
+
+## Initial Queue
+
+1. Codaro가 무엇을 만들고 있는가
+2. 공개 출시 준비와 첫 5분 데모
+3. 에디터, 커리큘럼, 자동화가 한 모델을 공유하는 이유
+4. 로컬 우선 실행 환경이 필요한 이유
+5. 반복 작업을 안전한 자동화 계획으로 바꾸는 흐름
 
 ## Series
 
-- `codaro-foundations`
-- `notebook-mechanics`
-- `learning-runtime`
-- `app-automation`
+- `codaro-news` — 출시 준비, 기능 소개, 제품 방향, 데모 기록

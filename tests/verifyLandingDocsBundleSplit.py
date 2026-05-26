@@ -105,16 +105,16 @@ def generatedDocsPageText() -> str:
 
 
 def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:
-    path = ROOT / "landing" / "src" / "routes" / "docs" / "[...slug]" / "+page.js"
+    path = ROOT / "landing" / "src" / "App.jsx"
     return requireNeedles(
         "docs-route-on-demand-content",
         path,
         (
             "import.meta.glob",
-            "../../../lib/generated/docsPages/*.js",
+            "./lib/generated/docsPages/*.js",
             "contentModule",
             "pageContent",
-            "await loadContent()",
+            "setContent(module.pageContent)",
         ),
     )
 
@@ -122,12 +122,14 @@ def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:
 def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
     checks = (
         (
-            "landing/src/routes/+page.svelte",
+            "landing/src/App.jsx",
             (
-                "Download CodaroLauncher.exe",
-                "Codaro - Local Python learning and automation studio",
+                "CodaroLauncher.exe",
+                "Python 학습과 개인 자동화 스튜디오",
                 "GitHub Releases",
                 "brand.launcherDownloadUrl",
+                "brand.launcherChecksumUrl",
+                "brand.launcherSbomUrl",
             ),
         ),
         (
@@ -150,14 +152,14 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
             ),
         ),
         (
-            "landing/src/app.css",
+            "landing/src/styles.css",
             (
-                "--foreground: oklch(0.141 0.005 285.823);",
-                "--card: oklch(1 0 0);",
-                "--muted: oklch(0.967 0.001 286.375);",
-                "--primary: oklch(0.21 0.006 285.885);",
-                "--ring: oklch(0.705 0.015 286.067);",
-                "--brand-accent: var(--primary);",
+                ".heroSection",
+                ".heroActions",
+                ".releaseLinks",
+                ".pageShell",
+                ".proseArticle",
+                ".siteFooter",
             ),
         ),
         (
@@ -190,7 +192,7 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
     sourceText = "\n".join(
         path.read_text(encoding="utf-8")
         for path in (ROOT / "landing" / "src").rglob("*")
-        if path.suffix in {".css", ".svelte"} and path.is_file()
+        if path.suffix in {".css", ".jsx"} and path.is_file()
     )
     if "var(--accent)" in sourceText:
         missing.append("landing source still uses shadcn accent token as the brand emphasis color")
@@ -222,7 +224,7 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
         "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe",
         "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
         "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
-        "Codaro - Local Python learning and automation studio",
+        "Python 학습과 개인 자동화 스튜디오 - Codaro",
         'rel="canonical" href="https://eddmpython.github.io/codaro"',
     ):
         if needle not in text:
@@ -233,14 +235,16 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
 
 
 def verifyBuiltDocsNavChunk() -> dict[str, Any]:
-    path = ROOT / "landing" / ".svelte-kit" / "output" / "server" / "chunks" / "docsNav.js"
+    path = ROOT / "landing" / "build" / "assets"
     missing: list[str] = []
-    if not path.exists():
-        missing.append("missing built docsNav server chunk; run landing build first")
+    files = sorted(path.glob("page*.js")) if path.exists() else []
+    if len(files) < MIN_DOC_PAGE_MODULES:
+        missing.append(f"expected at least {MIN_DOC_PAGE_MODULES} built docs page chunks, found {len(files)}")
         return result("built-docs-nav-chunk", missing)
-    if path.stat().st_size > MAX_BUILT_DOCS_NAV_BYTES:
-        missing.append(f"built docsNav chunk exceeds {MAX_BUILT_DOCS_NAV_BYTES} bytes")
-    return result("built-docs-nav-chunk", missing, {"bytes": path.stat().st_size})
+    largest = max((file.stat().st_size for file in files), default=0)
+    if largest > MAX_BUILT_DOCS_NAV_BYTES:
+        missing.append(f"largest built docs page chunk exceeds {MAX_BUILT_DOCS_NAV_BYTES} bytes")
+    return result("built-docs-nav-chunk", missing, {"moduleCount": len(files), "largestBytes": largest})
 
 
 def requireNeedles(name: str, path: Path, needles: tuple[str, ...]) -> dict[str, Any]:

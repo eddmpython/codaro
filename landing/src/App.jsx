@@ -1,0 +1,747 @@
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Boxes,
+  CheckCircle2,
+  FileCheck2,
+  Library,
+  Search,
+  ShieldCheck,
+  Terminal,
+  Workflow,
+} from "lucide-react";
+import { brand, basePath } from "./lib/brand.js";
+import { docsPages } from "./lib/generated/docsNav.js";
+import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
+import { searchEntries } from "./lib/generated/searchIndex.js";
+import { tools } from "./lib/tools/registry.js";
+
+const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
+
+const surfaces = [
+  {
+    label: "채팅",
+    title: "목표에서 시작",
+    copy: "학습 목표나 반복 업무를 말하면 노트북 기반 실행 계획으로 이어진다.",
+    icon: BookOpen,
+  },
+  {
+    label: "에디터",
+    title: "셀에서 바로 실행",
+    copy: "Python과 Markdown 셀을 일반 파일처럼 유지하면서 실행 결과를 확인한다.",
+    icon: Terminal,
+  },
+  {
+    label: "커리큘럼",
+    title: "실습 중심 학습",
+    copy: "설명, 스니펫, 예측, 실행, 검증이 같은 학습 카드 안에서 움직인다.",
+    icon: CheckCircle2,
+  },
+  {
+    label: "자동화",
+    title: "반복 업무로 승격",
+    copy: "검증된 셀과 스크립트를 dry-run 계획, 태스크, 리포트로 키운다.",
+    icon: Workflow,
+  },
+];
+
+const navItems = [
+  { href: "/", label: "홈" },
+  { href: "/docs", label: "문서" },
+  { href: "/docs/blog", label: "소식" },
+  { href: "/tools", label: "도구" },
+  { href: "/search", label: "검색" },
+];
+
+const releaseLinks = [
+  { href: brand.launcherChecksumUrl, label: "체크섬" },
+  { href: brand.launcherSbomUrl, label: "SBOM" },
+  { href: brand.releaseManifestUrl, label: "manifest" },
+  { href: brand.releaseUrl, label: "GitHub Releases" },
+];
+
+function appPath(path = "/") {
+  return brand.appPath(path);
+}
+
+function stripBase(pathname) {
+  if (!pathname || pathname === basePath) return "/";
+  if (basePath && pathname.startsWith(`${basePath}/`)) {
+    return pathname.slice(basePath.length) || "/";
+  }
+  return pathname || "/";
+}
+
+function normalizePath(pathname) {
+  const value = stripBase(pathname).replace(/\/index\.html$/, "");
+  return value.length > 1 ? value.replace(/\/$/, "") : "/";
+}
+
+function getBrowserPath() {
+  if (typeof window === "undefined") return "/";
+  return normalizePath(window.location.pathname);
+}
+
+function groupBy(items, key) {
+  return items.reduce((groups, item) => {
+    const group = item[key] || "기타";
+    groups[group] = groups[group] || [];
+    groups[group].push(item);
+    return groups;
+  }, {});
+}
+
+function updateMeta(meta) {
+  if (typeof document === "undefined") return;
+  const title = meta.title ? `${meta.title} - Codaro` : "Codaro - Python 학습과 개인 자동화 스튜디오";
+  const description = meta.description || brand.description;
+  const canonical = brand.toSiteUrl(meta.url || "/");
+  document.documentElement.lang = "ko";
+  document.title = title;
+  setMeta("description", description);
+  setMeta("theme-color", "#18181b");
+  setLink("canonical", canonical);
+  setProperty("og:type", meta.type || "website");
+  setProperty("og:title", title);
+  setProperty("og:description", description);
+  setProperty("og:url", canonical);
+  setProperty("og:image", brand.toSiteUrl("/brand/codaro-character.png"));
+  setMeta("twitter:card", "summary");
+  setMeta("twitter:title", title);
+  setMeta("twitter:description", description);
+}
+
+function setMeta(name, content) {
+  let tag = document.querySelector(`meta[name="${name}"]`);
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute("name", name);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("content", content);
+}
+
+function setProperty(property, content) {
+  let tag = document.querySelector(`meta[property="${property}"]`);
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute("property", property);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("content", content);
+}
+
+function setLink(rel, href) {
+  let tag = document.querySelector(`link[rel="${rel}"]`);
+  if (!tag) {
+    tag = document.createElement("link");
+    tag.setAttribute("rel", rel);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("href", href);
+}
+
+function App() {
+  const [path, setPath] = useState(getBrowserPath);
+  const route = useMemo(() => resolveRoute(path), [path]);
+
+  useEffect(() => {
+    const onPopState = () => setPath(getBrowserPath());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  useEffect(() => {
+    updateMeta(route.meta);
+  }, [route.meta]);
+
+  useEffect(() => {
+    const redirected = legacyRedirect(path);
+    if (redirected) {
+      window.location.replace(appPath(redirected));
+    }
+  }, [path]);
+
+  function navigate(event, href) {
+    if (!href.startsWith(basePath || "/")) return;
+    const url = new URL(href, window.location.origin);
+    if (url.origin !== window.location.origin) return;
+    event.preventDefault();
+    window.history.pushState({}, "", href);
+    setPath(getBrowserPath());
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  return (
+    <div className="appFrame">
+      <Header onNavigate={navigate} currentPath={path} />
+      {route.element}
+      <Footer />
+    </div>
+  );
+}
+
+function Header({ onNavigate, currentPath }) {
+  return (
+    <header className="siteHeader">
+      <a className="brandMark" href={appPath("/")} onClick={(event) => onNavigate(event, appPath("/"))}>
+        <img src={brand.mascotUrl} alt="" width="36" height="36" />
+        <span>Codaro</span>
+      </a>
+      <nav aria-label="주요 경로">
+        {navItems.map((item) => {
+          const active = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href));
+          return (
+            <a
+              key={item.href}
+              href={appPath(item.href)}
+              aria-current={active ? "page" : undefined}
+              onClick={(event) => onNavigate(event, appPath(item.href))}
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </nav>
+      <a className="headerRepo" href={brand.repoUrl}>
+        <Boxes size={17} aria-hidden="true" />
+        GitHub
+      </a>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="siteFooter">
+      <div>
+        <strong>Codaro</strong>
+        <p>Python 학습, 실행, 개인 자동화를 하나의 로컬 흐름으로 잇는 스튜디오.</p>
+      </div>
+      <div className="footerLinks">
+        <a href={appPath("/docs")}>문서</a>
+        <a href={appPath("/docs/blog")}>Codaro 소식</a>
+        <a href={brand.repoUrl}>저장소</a>
+      </div>
+    </footer>
+  );
+}
+
+function resolveRoute(path) {
+  if (path === "/") {
+    return {
+      meta: {
+        title: "Python 학습과 개인 자동화 스튜디오",
+        description: "배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오.",
+        url: "/",
+      },
+      element: <HomePage />,
+    };
+  }
+  if (path === "/docs") return docsIndexRoute();
+  if (path === "/docs/blog") return blogIndexRoute();
+  if (path.startsWith("/docs/blog/category/")) {
+    return blogCategoryRoute(path.replace("/docs/blog/category/", ""));
+  }
+  if (path.startsWith("/docs/blog/series/")) {
+    return blogSeriesRoute(path.replace("/docs/blog/series/", ""));
+  }
+  if (path.startsWith("/docs/blog/")) {
+    return blogPostRoute(path.replace("/docs/blog/", ""));
+  }
+  if (path === "/search") return searchRoute();
+  if (path === "/tools") return toolsRoute();
+  if (path.startsWith("/tools/")) return toolRoute(path.replace("/tools/", ""));
+  if (path.startsWith("/docs/")) return docsPageRoute(path.replace("/docs/", ""));
+  return {
+    meta: {
+      title: "페이지를 찾을 수 없음",
+      description: "요청한 Codaro 페이지를 찾을 수 없습니다.",
+      url: path,
+    },
+    element: <NotFoundPage />,
+  };
+}
+
+function legacyRedirect(path) {
+  if (path === "/blog") return "/docs/blog";
+  if (path.startsWith("/blog/category/")) return path.replace("/blog/category/", "/docs/blog/category/");
+  if (path.startsWith("/blog/series/")) return path.replace("/blog/series/", "/docs/blog/series/");
+  if (path === "/blog/codaro-public-launch-skeleton") return "/docs/blog/codaro-public-launch";
+  if (path === "/docs/blog/codaro-public-launch-skeleton") return "/docs/blog/codaro-public-launch";
+  if (path.startsWith("/blog/")) return path.replace("/blog/", "/docs/blog/");
+  return null;
+}
+
+function HomePage() {
+  return (
+    <main>
+      <section className="heroSection">
+        <div className="heroCopy">
+          <p className="eyebrow">React 기반 GitHub Pages / Local-first / Python runtime</p>
+          <h1>배우는 코드가 실행되고, 실행한 코드가 자동화가 된다.</h1>
+          <p className="heroLead">
+            Codaro는 Python 학습, 노트북 셀 실행, 개인 자동화를 하나의 로컬 제품 흐름으로 묶는다.
+            공개 사이트는 문서와 블로그를 같은 React 정적 표면에서 제공한다.
+          </p>
+          <div className="heroActions">
+            <a className="primaryButton" href={brand.launcherDownloadUrl}>
+              CodaroLauncher.exe
+              <ArrowRight size={17} aria-hidden="true" />
+            </a>
+            <a className="secondaryButton" href={appPath("/docs")}>
+              문서 보기
+            </a>
+            <a className="textLink" href={appPath("/docs/blog")}>
+              Codaro 소식
+            </a>
+          </div>
+          <div className="releaseLinks" aria-label="릴리즈 검증 링크">
+            {releaseLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div className="heroPanel" aria-label="Codaro 실행 흐름">
+          <div className="panelTop">
+            <span></span>
+            <span></span>
+            <span></span>
+            <strong>codaro.local</strong>
+          </div>
+          <div className="studioPreview">
+            <aside>
+              <b>채팅</b>
+              <b>에디터</b>
+              <b>커리큘럼</b>
+              <b>자동화</b>
+            </aside>
+            <div>
+              <p className="chatBubble">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</p>
+              <p className="chatBubble muted">학습 셀 3개와 dry-run 자동화 계획을 만들었다.</p>
+              <pre>{`import pandas as pd
+df = pd.read_csv("expenses.csv")
+summary = df.groupby("category").amount.sum()`}</pre>
+              <div className="runResult">실행 가능 / 검증 가능 / 태스크로 승격 가능</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="contentBand">
+        <div className="sectionIntro">
+          <p className="eyebrow">Product surface</p>
+          <h2>장기 유지보수는 폴더보다 계약에서 나온다.</h2>
+          <p>
+            공개 사이트는 React, 제품 표면은 React + shadcn/ui, 콘텐츠 원천은 `docs/`로 나눈다.
+            문서와 글은 생성 파이프라인을 통해 검색, feed, sitemap까지 같이 갱신된다.
+          </p>
+        </div>
+        <div className="surfaceGrid">
+          {surfaces.map((surface) => {
+            const Icon = surface.icon;
+            return (
+              <article className="surfaceCard" key={surface.label}>
+                <Icon size={22} aria-hidden="true" />
+                <p>{surface.label}</p>
+                <h3>{surface.title}</h3>
+                <span>{surface.copy}</span>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="splitSection">
+        <div>
+          <p className="eyebrow">Release trust</p>
+          <h2>GitHub Pages는 소개 표면, GitHub Releases는 실행물 배포 표면이다.</h2>
+          <p>
+            사용자는 공개 문서에서 제품 방향을 확인하고, 릴리즈에서 launcher와 checksum,
+            manifest, runtime 자산을 확인한 뒤 실행할 수 있다.
+          </p>
+        </div>
+        <div className="trustList">
+          <TrustItem icon={ShieldCheck} title="로컬 우선" copy="기본 학습과 실행은 사용자의 로컬 런타임을 기준으로 한다." />
+          <TrustItem icon={FileCheck2} title="검증 가능한 배포" copy="릴리즈 자산, checksum, manifest를 함께 확인한다." />
+          <TrustItem icon={Library} title="문서 일원화" copy="문서, 블로그, 검색 색인은 같은 원천에서 나온다." />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function TrustItem({ icon: Icon, title, copy }) {
+  return (
+    <article className="trustItem">
+      <Icon size={21} aria-hidden="true" />
+      <div>
+        <h3>{title}</h3>
+        <p>{copy}</p>
+      </div>
+    </article>
+  );
+}
+
+function docsIndexRoute() {
+  return {
+    meta: {
+      title: "문서",
+      description: "Codaro 아키텍처, 제품 원칙, 운영 기준 문서.",
+      url: "/docs",
+    },
+    element: <DocsIndexPage />,
+  };
+}
+
+function DocsIndexPage() {
+  const groups = groupBy(docsPages, "sectionLabel");
+  return (
+    <main className="pageShell">
+      <PageHeader eyebrow="Documentation" title="Codaro 문서" copy="제품 사상, 아키텍처, 운영 기준을 한 곳에서 확인한다." />
+      <div className="docGroupGrid">
+        {Object.entries(groups).map(([label, pages]) => (
+          <section className="docGroup" key={label}>
+            <h2>{label}</h2>
+            <div className="linkList">
+              {pages.map((page) => (
+                <a href={appPath(page.url)} key={page.path}>
+                  <strong>{page.title}</strong>
+                  <span>{page.description}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+function docsPageRoute(slug) {
+  const page = docsPages.find((candidate) => candidate.path === slug);
+  if (!page) {
+    return {
+      meta: { title: "문서를 찾을 수 없음", description: "요청한 Codaro 문서를 찾을 수 없습니다.", url: `/docs/${slug}` },
+      element: <NotFoundPage />,
+    };
+  }
+  return {
+    meta: { title: page.title, description: page.description, url: page.url, type: "article" },
+    element: <DocsPage page={page} />,
+  };
+}
+
+function DocsPage({ page }) {
+  const [content, setContent] = useState(null);
+  const related = docsPages.filter((candidate) => candidate.sectionLabel === page.sectionLabel).slice(0, 12);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loader = docsModules[`./lib/generated/docsPages/${page.contentModule}.js`];
+    if (!loader) {
+      setContent({ html: "<p>문서 내용을 불러오지 못했습니다.</p>" });
+      return () => {
+        cancelled = true;
+      };
+    }
+    loader().then((module) => {
+      if (!cancelled) setContent(module.pageContent);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [page.contentModule]);
+
+  return (
+    <main className="articleLayout">
+      <aside className="articleRail">
+        <a href={appPath("/docs")}>문서 전체</a>
+        {related.map((item) => (
+          <a href={appPath(item.url)} className={item.path === page.path ? "active" : ""} key={item.path}>
+            {item.title}
+          </a>
+        ))}
+      </aside>
+      <article className="proseArticle">
+        <p className="eyebrow">{page.sectionLabel}</p>
+        <h1>{page.title}</h1>
+        <p className="articleDescription">{page.description}</p>
+        <HTMLContent html={content?.html || "<p>문서 내용을 불러오는 중입니다.</p>"} />
+      </article>
+    </main>
+  );
+}
+
+function blogIndexRoute() {
+  return {
+    meta: {
+      title: "Codaro 소식",
+      description: "Codaro 제품 방향, 출시 준비, 운영 기록을 담은 글.",
+      url: "/docs/blog",
+    },
+    element: <BlogIndexPage />,
+  };
+}
+
+function BlogIndexPage() {
+  return (
+    <main className="pageShell">
+      <PageHeader eyebrow="Writing" title="Codaro 소식" copy="제품 방향, 공개 출시 준비, 운영 판단을 긴 글로 남긴다." />
+      <TaxonomyBar categories={postCategories} series={postSeries} />
+      <PostGrid posts={posts} />
+    </main>
+  );
+}
+
+function blogCategoryRoute(category) {
+  const matched = posts.filter((post) => post.category === category);
+  const label = matched[0]?.categoryLabel || category;
+  return {
+    meta: {
+      title: `${label} 글`,
+      description: `${label} 카테고리의 Codaro 글 목록.`,
+      url: `/docs/blog/category/${category}`,
+    },
+    element: (
+      <main className="pageShell">
+        <PageHeader eyebrow="Category" title={label} copy="같은 카테고리의 공개 글을 모았다." />
+        <PostGrid posts={matched} />
+      </main>
+    ),
+  };
+}
+
+function blogSeriesRoute(series) {
+  const matched = posts.filter((post) => post.series === series);
+  const label = matched[0]?.seriesLabel || series;
+  return {
+    meta: {
+      title: `${label} 시리즈`,
+      description: `${label} 시리즈 글 목록.`,
+      url: `/docs/blog/series/${series}`,
+    },
+    element: (
+      <main className="pageShell">
+        <PageHeader eyebrow="Series" title={label} copy="같은 흐름으로 이어지는 글을 모았다." />
+        <PostGrid posts={matched} />
+      </main>
+    ),
+  };
+}
+
+function blogPostRoute(slug) {
+  const post = posts.find((candidate) => candidate.slug === slug);
+  if (!post) {
+    return {
+      meta: { title: "글을 찾을 수 없음", description: "요청한 Codaro 글을 찾을 수 없습니다.", url: `/docs/blog/${slug}` },
+      element: <NotFoundPage />,
+    };
+  }
+  return {
+    meta: { title: post.title, description: post.description, url: post.url, type: "article" },
+    element: <BlogPostPage post={post} />,
+  };
+}
+
+function BlogPostPage({ post }) {
+  return (
+    <main className="articleLayout compact">
+      <aside className="articleRail">
+        <a href={appPath("/docs/blog")}>Codaro 소식</a>
+        <a href={appPath(`/docs/blog/category/${post.category}`)}>{post.categoryLabel}</a>
+        <a href={appPath(`/docs/blog/series/${post.series}`)}>{post.seriesLabel || post.series}</a>
+      </aside>
+      <article className="proseArticle">
+        <p className="eyebrow">{post.categoryLabel}</p>
+        <h1>{post.title}</h1>
+        <p className="articleDescription">{post.description}</p>
+        <div className="articleMeta">
+          <span>{post.date}</span>
+          <span>{post.seriesLabel || post.series}</span>
+        </div>
+        <HTMLContent html={post.html} />
+      </article>
+    </main>
+  );
+}
+
+function TaxonomyBar({ categories, series }) {
+  return (
+    <div className="taxonomyBar">
+      {categories.map((category) => (
+        <a href={appPath(`/docs/blog/category/${category.slug}`)} key={category.slug}>
+          {category.label}
+        </a>
+      ))}
+      {series.map((item) => (
+        <a href={appPath(`/docs/blog/series/${item.slug}`)} key={item.slug}>
+          {item.label} 시리즈
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function PostGrid({ posts: visiblePosts }) {
+  if (!visiblePosts.length) return <p className="emptyState">아직 공개된 글이 없습니다.</p>;
+  return (
+    <div className="postGrid">
+      {visiblePosts.map((post) => (
+        <article className="postCard" key={post.slug}>
+          <img src={post.cardPreview} alt="" />
+          <div>
+            <p>{post.categoryLabel}</p>
+            <h2>{post.title}</h2>
+            <span>{post.description}</span>
+            <a href={appPath(post.url)}>
+              읽기
+              <ArrowRight size={15} aria-hidden="true" />
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function searchRoute() {
+  return {
+    meta: {
+      title: "검색",
+      description: "Codaro 문서와 글을 한 번에 검색한다.",
+      url: "/search",
+    },
+    element: <SearchPage />,
+  };
+}
+
+function SearchPage() {
+  const initialQuery = typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("q") || "";
+  const [query, setQuery] = useState(initialQuery);
+  const normalized = query.trim().toLowerCase();
+  const results = normalized
+    ? searchEntries.filter((entry) => `${entry.title} ${entry.description} ${entry.text}`.toLowerCase().includes(normalized)).slice(0, 30)
+    : searchEntries.slice(0, 12);
+
+  return (
+    <main className="pageShell">
+      <PageHeader eyebrow="Search" title="Codaro 검색" copy="문서, 운영 기준, 블로그 글을 같은 색인에서 찾는다." />
+      <label className="searchBox">
+        <Search size={19} aria-hidden="true" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="검색어를 입력하세요" />
+      </label>
+      <div className="searchResults">
+        {results.map((entry) => (
+          <a href={appPath(entry.url)} key={`${entry.kind}-${entry.url}`}>
+            <span>{entry.kind === "writing" ? "글" : "문서"}</span>
+            <strong>{entry.title}</strong>
+            <p>{entry.description}</p>
+          </a>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+function toolsRoute() {
+  return {
+    meta: {
+      title: "도구",
+      description: "Codaro 공개 사이트의 브라우저 도구 모음.",
+      url: "/tools",
+    },
+    element: <ToolsPage />,
+  };
+}
+
+function ToolsPage() {
+  const groups = groupBy(tools, "category");
+  return (
+    <main className="pageShell">
+      <PageHeader eyebrow="Tools" title="브라우저 도구" copy="공개 사이트에서 함께 제공하는 작은 유틸리티 목록." />
+      <div className="toolGroups">
+        {Object.entries(groups).map(([category, group]) => (
+          <section key={category}>
+            <h2>{category}</h2>
+            <div className="toolGrid">
+              {group.map((tool) => (
+                <a className="toolCard" href={appPath(`/tools/${tool.slug}`)} key={tool.slug}>
+                  <span>{tool.icon}</span>
+                  <strong>{tool.title}</strong>
+                  <p>{tool.description}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+function toolRoute(slug) {
+  const tool = tools.find((candidate) => candidate.slug === slug);
+  if (!tool) {
+    return {
+      meta: { title: "도구를 찾을 수 없음", description: "요청한 도구를 찾을 수 없습니다.", url: `/tools/${slug}` },
+      element: <NotFoundPage />,
+    };
+  }
+  return {
+    meta: { title: tool.title, description: tool.description, url: `/tools/${tool.slug}` },
+    element: <ToolDetailPage tool={tool} />,
+  };
+}
+
+function ToolDetailPage({ tool }) {
+  return (
+    <main className="pageShell narrow">
+      <PageHeader eyebrow={tool.category} title={tool.title} copy={tool.description} />
+      <section className="toolDetail">
+        <Boxes size={28} aria-hidden="true" />
+        <h2>React 전환 기준 도구 표면</h2>
+        <p>
+          이 경로는 React 기반 GitHub Pages 라우트로 유지된다. 개별 도구의 고급 상호작용은
+          공개 사이트 도구 표면의 다음 개선 단위로 붙일 수 있게 URL과 메타데이터를 보존했다.
+        </p>
+        <div className="tagRow">
+          {tool.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function PageHeader({ eyebrow, title, copy }) {
+  return (
+    <header className="pageHeader">
+      <p className="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      <p>{copy}</p>
+    </header>
+  );
+}
+
+function HTMLContent({ html }) {
+  return <div className="htmlContent" dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+function NotFoundPage() {
+  return (
+    <main className="pageShell narrow">
+      <PageHeader eyebrow="404" title="페이지를 찾을 수 없습니다" copy="경로가 바뀌었거나 아직 공개되지 않은 페이지입니다." />
+      <a className="primaryButton" href={appPath("/")}>
+        홈으로 이동
+        <ArrowRight size={16} aria-hidden="true" />
+      </a>
+    </main>
+  );
+}
+
+export default App;

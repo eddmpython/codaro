@@ -11,9 +11,23 @@ const { docsPages } = await import(pathToFileURL(resolve(landingRoot, "src", "li
 const docsPagesWithContent = await Promise.all(docsPages.map(loadDocsPageContent));
 
 const siteUrl = "https://eddmpython.github.io/codaro";
+const basePath = "/codaro";
 
 function stripHtml(value) {
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function sitePath(pathValue) {
+  const value = pathValue || "/";
+  const withoutBase = value.startsWith(basePath)
+    ? value.slice(basePath.length) || "/"
+    : value;
+  return withoutBase.startsWith("/") ? withoutBase : `/${withoutBase}`;
+}
+
+function absoluteUrl(pathValue) {
+  const path = sitePath(pathValue);
+  return path === "/" ? siteUrl : `${siteUrl}${path}`;
 }
 
 const urls = [
@@ -21,8 +35,8 @@ const urls = [
   { loc: `${siteUrl}/docs`, changefreq: "weekly", priority: "0.9" },
   { loc: `${siteUrl}/docs/blog`, changefreq: "weekly", priority: "0.8" },
   { loc: `${siteUrl}/search`, changefreq: "monthly", priority: "0.6" },
-  ...posts.map((post) => ({ loc: `${siteUrl}${post.url}`, changefreq: "monthly", priority: "0.8", lastmod: post.date })),
-  ...docsPages.map((page) => ({ loc: `${siteUrl}${page.url}`, changefreq: "monthly", priority: "0.7" })),
+  ...posts.map((post) => ({ loc: absoluteUrl(post.url), changefreq: "monthly", priority: "0.8", lastmod: post.date })),
+  ...docsPages.map((page) => ({ loc: absoluteUrl(page.url), changefreq: "monthly", priority: "0.7" })),
 ];
 
 let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
@@ -46,8 +60,8 @@ atom += `  <updated>${(posts[0]?.date || "2026-03-17")}T00:00:00Z</updated>\n`;
 for (const post of posts) {
   atom += "  <entry>\n";
   atom += `    <title>${post.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</title>\n`;
-  atom += `    <link href="${siteUrl}${post.url}" rel="alternate" type="text/html"/>\n`;
-  atom += `    <id>${siteUrl}${post.url}</id>\n`;
+  atom += `    <link href="${absoluteUrl(post.url)}" rel="alternate" type="text/html"/>\n`;
+  atom += `    <id>${absoluteUrl(post.url)}</id>\n`;
   atom += `    <published>${post.date}T00:00:00Z</published>\n`;
   atom += `    <updated>${post.date}T00:00:00Z</updated>\n`;
   atom += `    <summary>${post.description.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</summary>\n`;
@@ -56,8 +70,8 @@ for (const post of posts) {
 atom += "</feed>\n";
 writeFileSync(resolve(buildRoot, "feed.xml"), atom, "utf-8");
 
-const docsMirror = docsPages.map((page) => `- [${page.title}](${siteUrl}${page.url}) — ${page.description}`);
-const blogMirror = posts.map((post) => `- [${post.title}](${siteUrl}${post.url}) — ${post.description}`);
+const docsMirror = docsPages.map((page) => `- [${page.title}](${absoluteUrl(page.url)}) — ${page.description}`);
+const blogMirror = posts.map((post) => `- [${post.title}](${absoluteUrl(post.url)}) — ${post.description}`);
 writeFileSync(
   resolve(buildRoot, "llms.txt"),
   ["# Codaro", "", "> Interactive editor runtime for code, learning, and automation.", "", "## Docs", ...docsMirror, "", "## Writing", ...blogMirror, ""].join("\n"),
@@ -66,7 +80,7 @@ writeFileSync(
 
 writeFileSync(
   resolve(buildRoot, "llms-full.txt"),
-  ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${siteUrl}${post.url}\n\n${stripHtml(post.html)}`), ...docsPagesWithContent.map((page) => `## ${page.title}\n\nURL: ${siteUrl}${page.url}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
+  ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${absoluteUrl(post.url)}\n\n${stripHtml(post.html)}`), ...docsPagesWithContent.map((page) => `## ${page.title}\n\nURL: ${absoluteUrl(page.url)}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
   "utf-8",
 );
 

@@ -1,6 +1,6 @@
 # Public Launch Demos
 
-이 폴더는 Codaro 공개 영상과 첫 사용자 quickstart에 쓰는 데모 skeleton이다. 모든 demo는 안전한 dry-run 또는 읽기 전용 흐름으로 시작한다.
+이 폴더는 Codaro 공개 영상과 첫 사용자 quickstart에 쓰는 데모 묶음이다. 모든 demo는 안전한 dry-run 또는 읽기 전용 흐름으로 시작한다.
 
 ## Run
 
