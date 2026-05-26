@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import base64
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from codaro.ai.secrets import SecretStore, SecretStoreError
+from codaro.ai import oauthToken
+from codaro.ai import secrets as secretsModule
+from codaro.ai.providerSpec import oauthSecretName
+from codaro.ai.secrets import SecretStore, SecretStoreDecodeError, SecretStoreError
 
 
 @pytest.fixture
@@ -108,3 +111,40 @@ class TestSecretStore:
         store.set("key", "value")
         assert store.get("key") == "value"
         assert path.exists()
+
+    def test_decode_failure_is_reported_without_claiming_secret_exists(self, tmp_path, monkeypatch):
+        path = tmp_path / "secrets.json"
+        path.write_text(json.dumps({
+            "broken": {
+                "backend": "dpapi",
+                "value": base64.b64encode(b"not-decryptable").decode("ascii"),
+            },
+        }), encoding="utf-8")
+        store = SecretStore(path=path)
+
+        def failUnprotect(_data: bytes) -> bytes:
+            raise OSError("dpapi unavailable")
+
+        monkeypatch.setattr(secretsModule, "_unprotectWindows", failUnprotect)
+
+        with pytest.raises(SecretStoreDecodeError, match="decrypt failed"):
+            store.get("broken")
+        assert store.has("broken") is False
+
+    def test_oauth_token_decode_failure_is_missing_token(self, tmp_path, monkeypatch):
+        path = tmp_path / "secrets.json"
+        path.write_text(json.dumps({
+            oauthSecretName("oauth-chatgpt"): {
+                "backend": "dpapi",
+                "value": base64.b64encode(b"not-decryptable").decode("ascii"),
+            },
+        }), encoding="utf-8")
+        store = SecretStore(path=path)
+
+        def failUnprotect(_data: bytes) -> bytes:
+            raise OSError("dpapi unavailable")
+
+        monkeypatch.setattr(secretsModule, "_unprotectWindows", failUnprotect)
+        monkeypatch.setattr(oauthToken, "getSecretStore", lambda: store)
+
+        assert oauthToken.loadToken() is None

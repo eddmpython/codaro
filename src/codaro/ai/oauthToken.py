@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 
 from .providerSpec import oauthSecretName
 from .providerErrors import safeProviderDetail
-from .secrets import getSecretStore
+from .secrets import SecretStoreDecodeError, getSecretStore
 
 CHATGPT_AUTH_URL = "https://auth.openai.com/oauth/authorize"
 CHATGPT_TOKEN_URL = "https://auth.openai.com/oauth/token"
@@ -164,7 +164,10 @@ def isAuthenticated() -> bool:
 
 def loadToken() -> dict[str, Any] | None:
     store = getSecretStore()
-    data = store.getJson(_TOKEN_SECRET_NAME)
+    try:
+        data = store.getJson(_TOKEN_SECRET_NAME)
+    except SecretStoreDecodeError:
+        return None
     if isinstance(data, dict):
         return data
     return None

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import json
 import os
 import tempfile
@@ -28,6 +29,10 @@ class SecretEntry:
 
 
 class SecretStoreError(RuntimeError):
+    pass
+
+
+class SecretStoreDecodeError(SecretStoreError):
     pass
 
 
@@ -88,7 +93,10 @@ class SecretStore:
             self._save(data)
 
     def has(self, name: str) -> bool:
-        return self.get(name) is not None
+        try:
+            return self.get(name) is not None
+        except SecretStoreDecodeError:
+            return False
 
     def getJson(self, name: str) -> dict[str, Any] | None:
         raw = self.get(name)
@@ -111,12 +119,24 @@ class SecretStore:
         return SecretEntry(backend="plain", value=base64.b64encode(raw).decode("ascii"))
 
     def _decodeEntry(self, entry: SecretEntry) -> str:
-        raw = base64.b64decode(entry.value.encode("ascii"))
+        try:
+            raw = base64.b64decode(entry.value.encode("ascii"), validate=True)
+        except (binascii.Error, ValueError) as exc:
+            raise SecretStoreDecodeError("Secret entry base64 decode failed") from exc
         if entry.backend == "dpapi":
-            decrypted = _unprotectWindows(raw)
-            return decrypted.decode("utf-8")
+            try:
+                decrypted = _unprotectWindows(raw)
+            except OSError as exc:
+                raise SecretStoreDecodeError("Secret entry decrypt failed") from exc
+            try:
+                return decrypted.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise SecretStoreDecodeError("Secret entry UTF-8 decode failed") from exc
         if entry.backend == "plain":
-            return raw.decode("utf-8")
+            try:
+                return raw.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise SecretStoreDecodeError("Secret entry UTF-8 decode failed") from exc
         raise SecretStoreError(f"Unsupported secret backend: {entry.backend}")
 
 
