@@ -19,7 +19,7 @@
     "fflate": "^0.8.2",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.16.0",
-    "marked": "^16.4.1",
+    "marked": "^18.0.4",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.7.76",
     "react": "^19.2.6",
