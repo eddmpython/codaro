@@ -51,7 +51,7 @@ impl Default for UpdateConfig {
     fn default() -> Self {
         Self {
             channel: "stable".into(),
-            auto_update_on_launch: false,
+            auto_update_on_launch: true,
             manifest_source: None,
             github_repo: "eddmpython/codaro".into(),
             github_manifest_asset_name: "release-manifest.json".into(),

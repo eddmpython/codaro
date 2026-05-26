@@ -45,7 +45,7 @@ launcher가 들어오면 아래가 가능해진다.
 
 - Python 없는 설치 경험
 - silent bootstrap
-- GitHub Releases + PyPI 기반 자동 업데이트
+- GitHub Releases manifest 기반 자동 업데이트
 - stable / beta channel
 - runtime rollback
 - desktop/full 과 mobile/learn capability 분리
@@ -68,7 +68,7 @@ launcher가 들어오면 아래가 가능해진다.
 - Codaro backend managed install
 - editor asset managed install via backend wheel
 - GitHub manifest 기반 업데이트
-- PyPI wheel 기반 backend 배포
+- GitHub Release exact wheel asset 기반 backend 배포
 - rollback
 - channel 분리
 
@@ -130,7 +130,7 @@ launcher가 들어오면 아래가 가능해진다.
 - embedded Python runtime
   - launcher가 관리하는 앱 전용 Python
 - backend runtime
-  - PyPI wheel 또는 signed artifact로 설치되는 Codaro backend
+  - GitHub Release wheel 또는 signed artifact로 설치되는 Codaro backend
 - editor assets
   - 기본 경로는 `codaro` wheel 내부 `codaro/webBuild`
   - legacy archive release에서만 별도 editor zip 사용
@@ -178,12 +178,12 @@ launcher가 들어오면 아래가 가능해진다.
 - GitHub Releases
   - 어떤 조합을 사용자에게 배포할지 결정
   - launcher artifact와 manifest를 제공
-- PyPI
+- GitHub Release assets
   - backend wheel과 선택 bundle wheel을 저장
 
 중요:
 
-- launcher는 GitHub와 PyPI의 최신 버전을 각각 따로 조합하지 않는다
+- launcher는 최신 tag만 보고 임의 조합하지 않고 release manifest가 지정한 artifact만 설치한다
 - launcher는 반드시 manifest가 지정한 정확한 버전을 설치한다
 - release validity는 manifest와 해시 검증으로 보장한다
 
@@ -456,7 +456,7 @@ launcher는 최소 아래 로그를 남긴다.
 
 ### M3
 
-- PyPI wheel install into managed runtime
+- exact wheel install into managed runtime
 - editor asset resolution from backend wheel
 - crash recovery
 - health check and restart policy
@@ -497,7 +497,10 @@ launcher는 최소 아래 로그를 남긴다.
 - launcher는 explicit manifest source가 없으면 configured manifest source를 우선 사용하고, 그것도 없으면 GitHub Releases API에서 채널에 맞는 latest manifest asset을 찾는다
 - `update config show/set`으로 channel, direct manifest source, GitHub repo, manifest asset name을 저장할 수 있다
 - `update sync`는 check와 apply를 한 번에 수행하고, update config가 허용하면 launcher startup에서도 같은 경로를 재사용한다
-- `autoUpdateOnLaunch`가 켜지면 `launch-active`는 active release를 읽기 전에 먼저 update sync를 수행한다
+- `autoUpdateOnLaunch` 기본값은 true이며, `launch`와 `launch-active`는 active release 실행 전에 update sync를 시도한다
+- startup auto-update 실패는 기존 active release 실행을 막지 않는 best-effort 경로로 처리한다
+- normal `vX.Y.Z` tag workflow는 exact `codaro` wheel, `release-manifest.json`, managed Windows Python runtime archive, launcher binary, checksums, SPDX SBOM을 같은 GitHub Release에 올린다
+- launcher self-update helper는 launcher-only tag뿐 아니라 `CodaroLauncher.exe` asset을 가진 product release tag도 후보로 본다
 - backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed editor build root를 받을 수 있다
 - launcher는 staged archive editor가 없으면 `site-packages/<backend-package>/webBuild`를 `CODARO_WEB_BUILD_ROOT`로 전달한다
 - package distribution과 bundle 분리 정책은 `launcher/PACKAGING.md`에 정리됐다
@@ -513,6 +516,7 @@ launcher는 최소 아래 로그를 남긴다.
 - launcher update와 backend update의 서명/무결성 검증 레이어를 분리한다
 - background update loop와 foreground startup sync의 역할을 분리한다
 - crash restart/freeze 상태를 launcher log file과 user-facing diagnostics에 연결한다
+- Windows에서 실행 중인 launcher exe를 교체하는 foreground UX 또는 restart helper를 결정한다
 
 ## Verification Left
 

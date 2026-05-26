@@ -36,7 +36,7 @@
 - `../launcher/`
   - 로컬 배포 계층
   - Rust launcher, embedded Python, install/update/rollback PRD
-  - package artifact, PyPI, bundle 분리 전략
+  - package artifact, GitHub Release asset, optional PyPI, bundle 분리 전략
 - `runtime/`
   - 실행 엔진 인터페이스
   - `LocalEngine` 실제 구현
@@ -133,15 +133,15 @@
 - worker IPC는 단순 최종 응답 외에 실행 이벤트 스트림도 전달한다
 - HTTP와 WebSocket kernel API는 변수 delta와 이벤트를 함께 노출한다
 - `systemRouter`도 workspace 전용 `LocalEngine` capability를 사용한다
-- launcher PRD는 embedded Python, GitHub manifest, PyPI wheel, rollback 구조를 기준으로 한다
+- launcher PRD는 embedded Python, GitHub manifest, exact wheel asset, rollback 구조를 기준으로 한다
 - `launcher/codaro-launcher` Rust workspace가 생성됐고 path resolution, manifest/state 모델, backend health check 최소 경로가 있다
 - launcher는 exact artifact download, sha256 검증, staged release layout, archive unpack, exact wheel install, active release activation까지 지원한다
 - launcher는 `last-known-good`와 `rollback-marker` 상태를 관리하고 backend health failure 시 자동 rollback supervisor를 수행한다
 - launcher는 `update check/apply` CLI로 manifest compatibility 판정과 health-gated release switch를 수행한다
 - launcher는 persisted `update-config`와 GitHub Releases manifest discovery를 지원한다
-- launcher는 `update sync`와 `autoUpdateOnLaunch`를 통해 startup 전 update apply까지 수행할 수 있다
+- launcher는 기본 `autoUpdateOnLaunch`와 `update sync`를 통해 startup 전 best-effort update apply까지 수행할 수 있다
 - launcher는 healthy 이후 backend crash를 자동 재시작하고 repeated crash 시 `crash-state` freeze 후 rollback supervisor로 넘긴다
-- package 분리와 PyPI publish 정책은 `launcher/PACKAGING.md`를 source of truth로 둔다
+- package 분리와 product release asset 정책은 `launcher/PACKAGING.md`를 source of truth로 둔다
 - 프론트 기본 실행 경로는 아직 WebSocket이 아니라 HTTP kernel route 중심이다
 - source checkout에서는 editor build가 선행되어야 하며, 서버는 빌드를 수행하지 않는다
 

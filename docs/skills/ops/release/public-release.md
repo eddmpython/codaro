@@ -65,8 +65,8 @@ Source URLs:
 
 - Dependabot은 GitHub Actions, root Python, `editor`, `landing`, `launcher/codaro-launcher` dependency를 감시한다.
 - Security workflow는 CodeQL, dependency review, OpenSSF Scorecard를 실행한다.
-- PyPI workflow는 trusted publishing (`id-token: write`)을 유지한다.
-- Release artifact에는 wheel, launcher artifact, checksum, rollback path, SPDX SBOM을 함께 둔다.
+- Product release workflow는 exact wheel, launcher artifact, runtime archive, checksum, rollback path, SPDX SBOM을 함께 둔다.
+- PyPI publish는 launcher update 필수 경로가 아니며, 필요 시 별도 trusted publishing workflow로 분리한다.
 - SBOM을 자동 생성하지 못하는 release는 최소한 생성 명령과 누락 사유를 release note에 남긴다.
 
 ## Support and Incident Response

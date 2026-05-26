@@ -61,12 +61,17 @@ pub fn check_launcher_update(
             None => continue,
         };
 
-        let version_str = tag.strip_prefix('v').unwrap_or(tag);
-        if !version_str.contains("launcher") {
+        let exe_asset_name = launcher_asset_name();
+        let assets = release.get("assets").and_then(|v| v.as_array());
+        if !assets.is_some_and(|list| {
+            list.iter()
+                .any(|a| a.get("name").and_then(|n| n.as_str()) == Some(&exe_asset_name))
+        }) {
             continue;
         }
 
-        let clean = version_str.replace("-launcher", "");
+        let version_str = tag.strip_prefix('v').unwrap_or(tag);
+        let clean = version_str.strip_suffix("-launcher").unwrap_or(version_str);
         let version = match Version::parse(&clean) {
             Ok(v) => v,
             Err(_) => continue,

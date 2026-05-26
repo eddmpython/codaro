@@ -108,7 +108,7 @@ EVIDENCE = (
     ),
     Evidence(
         "packaged-editor-wheel-publish-gate",
-        ".github/workflows/pypi-publish.yml",
+        ".github/workflows/product-release.yml",
         (
             "Verify wheel includes editor frontend",
             "codaro/webBuild/index.html",
@@ -234,7 +234,7 @@ def verifyLauncherCliSmoke() -> dict[str, Any]:
     updateConfig = doctor.get("updateConfig") or {}
     expectedUpdateConfig = {
         "channel": "stable",
-        "autoUpdateOnLaunch": False,
+        "autoUpdateOnLaunch": True,
         "manifestSource": None,
         "githubRepo": "eddmpython/codaro",
         "githubManifestAssetName": "release-manifest.json",

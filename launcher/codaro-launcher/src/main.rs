@@ -14,6 +14,7 @@ use clap::{Args, Parser, Subcommand};
 use github::{GitHubManifestDiscovery, discover_manifest_for_repo};
 use paths::LauncherPaths;
 use provision::{activate_release, load_manifest_from_source, stage_release};
+use self_update::{apply_self_update, check_launcher_update, download_launcher_update};
 use serde::Serialize;
 use state::{
     ActiveReleaseState, ActiveReleaseStore, CrashState, CrashStateStore, CrashStatus,
@@ -48,6 +49,7 @@ enum Command {
     State(StateCommand),
     Release(ReleaseCommand),
     Update(UpdateCommand),
+    SelfUpdate(SelfUpdateCommand),
     Backend(BackendCommand),
 }
 
@@ -203,6 +205,44 @@ struct UpdateConfigSetArgs {
     manifest_asset_name: Option<String>,
 }
 
+#[derive(Args, Debug)]
+struct SelfUpdateCommand {
+    #[command(subcommand)]
+    command: SelfUpdateSubcommand,
+}
+
+#[derive(Subcommand, Debug)]
+enum SelfUpdateSubcommand {
+    Check(SelfUpdateCheckArgs),
+    Download(SelfUpdateDownloadArgs),
+    Apply(SelfUpdateApplyArgs),
+}
+
+#[derive(Args, Debug)]
+struct SelfUpdateCheckArgs {
+    #[arg(long, default_value = "eddmpython/codaro")]
+    repo: String,
+    #[arg(long)]
+    include_prerelease: bool,
+}
+
+#[derive(Args, Debug)]
+struct SelfUpdateDownloadArgs {
+    #[arg(long, default_value = "eddmpython/codaro")]
+    repo: String,
+    #[arg(long)]
+    include_prerelease: bool,
+    #[arg(long)]
+    download_dir: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+struct SelfUpdateApplyArgs {
+    downloaded: PathBuf,
+    #[arg(long)]
+    current_exe: Option<PathBuf>,
+}
+
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 struct UpdateCheckReport {
@@ -289,6 +329,7 @@ fn main() -> Result<()> {
         Command::State(command) => run_state(&paths, command)?,
         Command::Release(command) => run_release(&paths, command)?,
         Command::Update(command) => run_update(&paths, command)?,
+        Command::SelfUpdate(command) => run_self_update(&paths, command)?,
         Command::Backend(command) => run_backend(&paths, command)?,
     }
 
@@ -353,6 +394,58 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         } else if let Some(manifest_source) = source {
             let summary = stage_release(paths, &manifest_source)?;
             activate_release(paths, &summary.release_id)?;
+        }
+    } else {
+        let update_config = load_update_config(&stores)?;
+        if update_config.auto_update_on_launch {
+            println!(
+                "{}",
+                encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                    stage: "update".into(),
+                    message: "Checking for release updates...".into(),
+                    percent: Some(5.0),
+                }))
+            );
+            match sync_updates(
+                paths,
+                UpdateSyncArgs {
+                    manifest: None,
+                    host: args.host.clone(),
+                    port: launch_probe_port(args.port),
+                    workspace_root: args.workspace_root.clone(),
+                },
+            ) {
+                Ok(report) => {
+                    let message = match report.applied {
+                        Some(applied) => format!("Activated release {}.", applied.release_id),
+                        None if report.checked.update_available => {
+                            format!("Release {} is already staged.", report.checked.release_id)
+                        }
+                        None => "No release update available.".into(),
+                    };
+                    println!(
+                        "{}",
+                        encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                            stage: "update".into(),
+                            message,
+                            percent: Some(100.0),
+                        }))
+                    );
+                }
+                Err(error) => {
+                    eprintln!(
+                        "Codaro auto-update check failed; continuing with active release: {error:#}"
+                    );
+                    println!(
+                        "{}",
+                        encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                            stage: "update".into(),
+                            message: "Update check failed. Continuing with active release.".into(),
+                            percent: Some(100.0),
+                        }))
+                    );
+                }
+            }
         }
     }
 
@@ -423,6 +516,10 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     let _ = child.wait();
     Ok(())
+}
+
+fn launch_probe_port(port: u16) -> Option<u16> {
+    if port == 0 { None } else { Some(port) }
 }
 
 fn run_doctor(paths: &LauncherPaths) -> Result<()> {
@@ -561,11 +658,67 @@ fn run_update_config(paths: &LauncherPaths, command: UpdateConfigCommand) -> Res
     Ok(())
 }
 
+fn run_self_update(paths: &LauncherPaths, command: SelfUpdateCommand) -> Result<()> {
+    match command.command {
+        SelfUpdateSubcommand::Check(args) => {
+            let release =
+                check_launcher_update(&args.repo, LAUNCHER_VERSION, args.include_prerelease)?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&serde_json::json!({
+                    "currentVersion": LAUNCHER_VERSION,
+                    "updateAvailable": release.is_some(),
+                    "release": release.map(|release| serde_json::json!({
+                        "version": release.version,
+                        "downloadUrl": release.download_url,
+                        "sha256": release.sha256,
+                        "releaseNotes": release.release_notes,
+                    })),
+                }))?
+            );
+        }
+        SelfUpdateSubcommand::Download(args) => {
+            let release =
+                check_launcher_update(&args.repo, LAUNCHER_VERSION, args.include_prerelease)?
+                    .context("No launcher update is available.")?;
+            let download_dir = args
+                .download_dir
+                .unwrap_or_else(|| paths.downloads_dir().join("launcher"));
+            let result = download_launcher_update(&release, &download_dir)?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&serde_json::json!({
+                    "fromVersion": result.from_version,
+                    "toVersion": result.to_version,
+                    "downloadedPath": result.downloaded_path,
+                    "verified": result.verified,
+                }))?
+            );
+        }
+        SelfUpdateSubcommand::Apply(args) => {
+            let current_exe = args.current_exe.unwrap_or(
+                std::env::current_exe()
+                    .context("Failed to resolve current launcher executable.")?,
+            );
+            let backup = apply_self_update(&args.downloaded, &current_exe)?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&serde_json::json!({
+                    "currentExe": current_exe,
+                    "downloaded": args.downloaded,
+                    "backup": backup,
+                }))?
+            );
+        }
+    }
+    Ok(())
+}
+
 fn launch_active_backend(paths: &LauncherPaths, args: LaunchActiveArgs) -> Result<()> {
     let stores = LauncherStateStores::new(paths);
     let update_config = load_update_config(&stores)?;
-    if args.sync_updates || update_config.auto_update_on_launch {
-        let _ = sync_updates(
+    if args.sync_updates {
+        let _report = sync_updates(
             paths,
             UpdateSyncArgs {
                 manifest: None,
@@ -574,6 +727,18 @@ fn launch_active_backend(paths: &LauncherPaths, args: LaunchActiveArgs) -> Resul
                 workspace_root: args.workspace_root.clone(),
             },
         )?;
+    } else if update_config.auto_update_on_launch {
+        if let Err(error) = sync_updates(
+            paths,
+            UpdateSyncArgs {
+                manifest: None,
+                host: args.host.clone(),
+                port: Some(args.port),
+                workspace_root: args.workspace_root.clone(),
+            },
+        ) {
+            eprintln!("Codaro auto-update check failed; continuing with active release: {error:#}");
+        }
     }
     let state = stores
         .active_release

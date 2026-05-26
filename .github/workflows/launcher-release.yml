@@ -58,9 +58,13 @@ jobs:
           body: |
             Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher.
 
+            This launcher-only release is for manual binary verification. Product releases are created from normal `vX.Y.Z` tags and include `release-manifest.json`, managed Python runtime assets, and the exact backend wheel asset.
+
             The release also includes `CodaroLauncher.spdx.json` for dependency transparency.
           files: |
             launcher/target/release/CodaroLauncher.exe
             launcher/target/release/CodaroLauncher.exe.sha256
             launcher/target/release/CodaroLauncher.spdx.json
           generate_release_notes: true
+          prerelease: true
+          make_latest: false

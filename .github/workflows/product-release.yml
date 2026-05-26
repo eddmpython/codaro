@@ -1,0 +1,260 @@
+name: Product Release
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-launcher"
+
+env:
+  PYTHON_VERSION: "3.12"
+  PYTHON_RUNTIME_VERSION: "3.12.12"
+  PYTHON_RUNTIME_ASSET: python-runtime-win-x64.zip
+  RELEASE_MANIFEST_ASSET: release-manifest.json
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      package_version: ${{ steps.package.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Build editor
+        working-directory: editor
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify packaged editor build
+        run: |
+          test -f src/codaro/webBuild/index.html
+          test -d src/codaro/webBuild/_app
+
+      - name: Run tests
+        run: uv run --extra dev pytest tests/ -v --tb=short
+
+      - name: Build wheel
+        run: uv build
+
+      - name: Read package version
+        id: package
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import tomllib
+          with open("pyproject.toml", "rb") as handle:
+              version = tomllib.load(handle)["project"]["version"]
+          print(f"version={version}")
+          PY
+
+      - name: Verify tag matches package version
+        run: |
+          if [ "${GITHUB_REF_NAME}" != "v${{ steps.package.outputs.version }}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match package version v${{ steps.package.outputs.version }}" >&2
+            exit 1
+          fi
+
+      - name: Prepare package release assets
+        run: mkdir -p release-assets
+
+      - name: Generate package SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: release-assets/codaro.spdx.json
+
+      - name: Verify wheel includes editor frontend
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          wheel = next(Path("dist").glob("codaro-*.whl"))
+          with zipfile.ZipFile(wheel) as archive:
+              names = set(archive.namelist())
+          if "codaro/webBuild/index.html" not in names:
+              raise SystemExit("codaro/webBuild/index.html missing from wheel")
+          if not any(name.startswith("codaro/webBuild/_app/") for name in names):
+              raise SystemExit("codaro/webBuild/_app/ assets missing from wheel")
+          print(f"verified packaged editor frontend in {wheel}")
+          PY
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Upload package release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-release-assets
+          path: release-assets/
+
+  windows-release-assets:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install managed Python runtime
+        shell: pwsh
+        run: uv python install $env:PYTHON_RUNTIME_VERSION
+
+      - name: Package managed Python runtime
+        shell: pwsh
+        run: |
+          $python = (uv python find $env:PYTHON_RUNTIME_VERSION).Trim()
+          $runtimeRoot = Split-Path -Parent $python
+          $stage = Join-Path $env:RUNNER_TEMP "codaro-python-runtime"
+          $pythonStage = Join-Path $stage "python"
+          if (Test-Path $stage) {
+            Remove-Item -Recurse -Force $stage
+          }
+          New-Item -ItemType Directory -Force -Path $pythonStage | Out-Null
+          Copy-Item -Path (Join-Path $runtimeRoot "*") -Destination $pythonStage -Recurse -Force
+          New-Item -ItemType Directory -Force -Path "launcher/target/release" | Out-Null
+          $runtimeArchive = "launcher/target/release/$($env:PYTHON_RUNTIME_ASSET)"
+          Compress-Archive -Path (Join-Path $stage "python") -DestinationPath $runtimeArchive -Force
+          $hash = (Get-FileHash $runtimeArchive -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($env:PYTHON_RUNTIME_ASSET)" | Out-File -FilePath "$runtimeArchive.sha256" -Encoding utf8
+
+      - name: Build launcher release binary
+        working-directory: launcher/codaro-launcher
+        run: cargo build --release
+
+      - name: Rename launcher binary
+        shell: pwsh
+        run: |
+          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/CodaroLauncher.exe"
+
+      - name: Compute launcher SHA256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "launcher/target/release/CodaroLauncher.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
+
+      - name: Generate launcher SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: launcher/codaro-launcher
+          format: spdx-json
+          output-file: launcher/target/release/CodaroLauncher.spdx.json
+
+      - name: Upload Windows release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-assets
+          path: |
+            launcher/target/release/CodaroLauncher.exe
+            launcher/target/release/CodaroLauncher.exe.sha256
+            launcher/target/release/CodaroLauncher.spdx.json
+            launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}
+            launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}.sha256
+
+  release:
+    needs: [build, windows-release-assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-release-assets
+          path: release-assets/
+
+      - name: Download package release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: package-release-assets
+          path: release-assets/
+
+      - name: Download backend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Prepare backend wheel release asset
+        id: backend_wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheel_count="$(find dist -maxdepth 1 -name 'codaro-*.whl' | wc -l | tr -d ' ')"
+          if [ "$wheel_count" != "1" ]; then
+            echo "expected exactly one codaro wheel in dist, found $wheel_count" >&2
+            find dist -maxdepth 1 -type f -print >&2
+            exit 1
+          fi
+          wheel_path="$(find dist -maxdepth 1 -name 'codaro-*.whl' -print -quit)"
+          wheel_name="$(basename "$wheel_path")"
+          wheel_sha="$(sha256sum "$wheel_path" | awk '{print $1}')"
+          cp "$wheel_path" "release-assets/$wheel_name"
+          printf '%s  %s\n' "$wheel_sha" "$wheel_name" > "release-assets/$wheel_name.sha256"
+          echo "name=$wheel_name" >> "$GITHUB_OUTPUT"
+          echo "sha256=$wheel_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Build release manifest
+        run: |
+          python docs/skills/ops/tools/buildReleaseManifest.py \
+            --tag "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --package-version "${{ needs.build.outputs.package_version }}" \
+            --backend-wheel-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${{ steps.backend_wheel.outputs.name }}" \
+            --backend-sha256 "${{ steps.backend_wheel.outputs.sha256 }}" \
+            --python-runtime-version "${PYTHON_RUNTIME_VERSION}" \
+            --python-runtime-asset-name "${PYTHON_RUNTIME_ASSET}" \
+            --python-runtime-archive "release-assets/${PYTHON_RUNTIME_ASSET}" \
+            --output "release-assets/${RELEASE_MANIFEST_ASSET}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: Codaro ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          body: |
+            Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher.
+
+            The release includes `release-manifest.json`, the exact `codaro` backend wheel, a managed Windows Python runtime archive, checksums, and SPDX SBOM assets. The manifest pins the wheel asset and sha256 from this GitHub Release.
+          files: |
+            release-assets/CodaroLauncher.exe
+            release-assets/CodaroLauncher.exe.sha256
+            release-assets/CodaroLauncher.spdx.json
+            release-assets/python-runtime-win-x64.zip
+            release-assets/python-runtime-win-x64.zip.sha256
+            release-assets/codaro-*.whl
+            release-assets/codaro-*.whl.sha256
+            release-assets/release-manifest.json
+            release-assets/codaro.spdx.json
+          generate_release_notes: true
