@@ -639,7 +639,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     executor = LiveSmokeExecutor()
     convManager = ConversationManager()
     conversation = convManager.create(role="teacher")
-    orchestrator = TeacherOrchestrator.fromContext({})
+    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["pandas"]}})
     provider = createProvider(config)
     messages = [
         {"role": "system", "content": buildSystemPrompt(role="teacher")},
@@ -647,10 +647,11 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "role": "user",
             "content": (
                 "초급 pandas 실습 중심 아주 짧은 레슨을 만들어줘. "
+                "정확히 먼저 packages-check tool을 names=[\"pandas\"]로 한 번 호출해 런타임 준비를 확인한 뒤, "
                 "반드시 structured Codaro YAML 계약으로 작성하세요: meta, intro.direction, intro.benefits, "
                 "intro.diagram.steps, intro.diagram.runtime, sections[0].title/subtitle/goal/why/explanation/"
                 "tips/snippet/exercise.prompt/exercise.starterCode/exercise.hints/exercise.check/check. "
-                "섹션은 1개만 만들고, 답변만 하지 말고 write-curriculum-yaml tool을 호출해 반영하세요."
+                "섹션은 1개만 만들고, 답변만 하지 말고 packages-check 다음 write-curriculum-yaml tool을 호출해 반영하세요."
             ),
         },
     ]
@@ -672,6 +673,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     trace = traceFromPayload(payload)
     workloopSignals = workloopSignal(trace)
     networkSignals = providerNetworkFailureSignals(trace, payload)
+    executorCalls = [call["tool"] for call in executor.calls]
     yamlResults = toolResultsByName(executor.results, "write-curriculum-yaml")
     yamlResult = yamlResults[-1] if yamlResults else {}
     contractGapCount = intSignal(yamlResult, "contractGapCount")
@@ -679,9 +681,13 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     exerciseCellCount = intSignal(yamlResult, "exerciseCellCount")
     snippetCellCount = intSignal(yamlResult, "snippetCellCount")
     yamlContractObserved = bool(trace.get("yamlContractObserved"))
-    usedCurriculumTool = "write-curriculum-yaml" in toolNames
+    usedCurriculumTool = "write-curriculum-yaml" in executorCalls or "write-curriculum-yaml" in toolNames
+    usedPackageCheck = "packages-check" in executorCalls
+    orderedPreflight = toolsInOrder(executorCalls, "packages-check", "write-curriculum-yaml")
     passed = (
         usedCurriculumTool
+        and usedPackageCheck
+        and orderedPreflight
         and str(payload.get("provider") or "") != ""
         and contractGapCount == 0
         and sectionCount >= 1
@@ -697,6 +703,22 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         error = "live provider network error interrupted write-curriculum-yaml continuation"
         failureStatus = "provider_network_error"
         failureSignals = networkSignals
+    elif usedCurriculumTool and not usedPackageCheck:
+        error = "live provider did not call packages-check before write-curriculum-yaml"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-preflight-tool",
+            requiredTools=("packages-check", "write-curriculum-yaml"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
+    elif usedCurriculumTool and not orderedPreflight:
+        error = "live provider called write-curriculum-yaml before packages-check"
+        failureSignals = toolLoopTuningSignals(
+            reason="tool-order-violation",
+            requiredTools=("packages-check", "write-curriculum-yaml"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif not usedCurriculumTool:
         error = "live provider did not call write-curriculum-yaml; prompt/tool schema tuning required"
         failureSignals = toolLoopTuningSignals(
@@ -755,9 +777,9 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         provider=str(payload.get("provider") or config.provider),
         model=str(payload.get("model") or provider.resolvedModel),
         signals={
-            "toolSequence": trace.get("toolSequence") or toolNames,
-            "toolCount": len(toolNames),
-            "executorCalls": [call["tool"] for call in executor.calls],
+            "toolSequence": executorCalls or trace.get("toolSequence") or toolNames,
+            "toolCount": len(executorCalls or toolNames),
+            "executorCalls": executorCalls,
             "contractGapCount": contractGapCount,
             "sectionCount": sectionCount,
             "exerciseCellCount": exerciseCellCount,
