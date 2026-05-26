@@ -45,7 +45,13 @@ function stripMarkdown(markdown) {
 }
 
 function sortByDateDesc(items) {
-  return [...items].sort((left, right) => String(right.date).localeCompare(String(left.date)));
+  return [...items].sort((left, right) => {
+    const dateOrder = String(right.date).localeCompare(String(left.date));
+    if (dateOrder !== 0) {
+      return dateOrder;
+    }
+    return Number(right.seriesOrder || 0) - Number(left.seriesOrder || 0);
+  });
 }
 
 function normalizeDate(value, filePath) {
