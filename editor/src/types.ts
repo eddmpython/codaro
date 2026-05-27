@@ -260,6 +260,8 @@ export type MasterPlanPayload = {
   gaps: MasterPlanGap[];
   totalMinutes: number;
   summary: string;
+  nextStepKey: string | null;
+  completedCount: number;
 };
 
 export type CurriculumGapsPayload = {

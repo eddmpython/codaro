@@ -1,9 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Compass, Loader2, MapPinned, RefreshCw, Sparkles, Target } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Compass,
+  Loader2,
+  MapPinned,
+  Play,
+  RefreshCw,
+  Sparkles,
+  Target,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { codaroApi } from "@/lib/api";
@@ -91,6 +102,17 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
     return taxonomy.domains.find((domain) => domain.id === selectedDomain) ?? null;
   }, [taxonomy, selectedDomain]);
 
+  const totalLessons = plan ? plan.steps.length + plan.completedCount : 0;
+  const progressPercent = useMemo(() => {
+    if (!plan || totalLessons === 0) return 0;
+    return Math.round((plan.completedCount / totalLessons) * 100);
+  }, [plan, totalLessons]);
+
+  const nextStep = useMemo(() => {
+    if (!plan?.nextStepKey) return null;
+    return plan.steps.find((step) => step.key === plan.nextStepKey) ?? null;
+  }, [plan]);
+
   return (
     <div className="flex h-full flex-col gap-3 px-4 py-3">
       <header className="flex items-center justify-between">
@@ -140,6 +162,35 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         </div>
       )}
 
+      {plan && !loadingPlan && totalLessons > 0 && (
+        <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs">
+          <div className="flex items-center justify-between text-zinc-300">
+            <span>
+              진도{" "}
+              <span className="text-zinc-100">
+                {plan.completedCount} / {totalLessons}
+              </span>
+              {plan.totalMinutes > 0 && (
+                <span className="ml-2 text-zinc-500">
+                  · 남은 시간 약 {plan.totalMinutes}분
+                </span>
+              )}
+            </span>
+            {nextStep && onSelectLesson && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-6 px-2 text-[10px] border-zinc-600 text-zinc-200 hover:bg-zinc-800"
+                onClick={() => onSelectLesson(nextStep.category, nextStep.contentId)}
+              >
+                <Play className="mr-1 h-3 w-3" /> 다음 단계
+              </Button>
+            )}
+          </div>
+          <Progress className="h-1.5 bg-zinc-800" value={progressPercent} />
+        </div>
+      )}
+
       <Separator className="bg-zinc-800" />
 
       <ScrollArea className="flex-1">
@@ -161,6 +212,56 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   );
 }
 
+const DOMAIN_GROUPS: Array<{ label: string; domains: string[] }> = [
+  {
+    label: "기초",
+    domains: ["pythonFoundation", "standardLibraryMastery"],
+  },
+  {
+    label: "데이터",
+    domains: [
+      "dataReporting",
+      "sqlAnalysis",
+      "bigDataPipelines",
+      "dataContracts",
+      "timeSeriesAnalysis",
+    ],
+  },
+  {
+    label: "시각화",
+    domains: [
+      "dataVisualization",
+      "interactiveDashboards",
+      "geoVisualization",
+    ],
+  },
+  {
+    label: "통계·ML",
+    domains: [
+      "statisticalAnalysis",
+      "machineLearning",
+      "timeSeriesForecasting",
+      "graphAnalysis",
+      "scientificComputing",
+    ],
+  },
+  {
+    label: "이미지·텍스트",
+    domains: ["imageProcessing", "computerVision", "textProcessing"],
+  },
+  {
+    label: "자동화",
+    domains: [
+      "officeAutomation",
+      "webMonitoring",
+      "desktopAutomation",
+      "fileAutomation",
+      "systemMonitoring",
+      "scriptingAutomation",
+    ],
+  },
+];
+
 function DomainPicker({
   taxonomy,
   selected,
@@ -177,23 +278,51 @@ function DomainPicker({
       </div>
     );
   }
+  const knownIds = new Set(DOMAIN_GROUPS.flatMap((group) => group.domains));
+  const fallbackGroup = {
+    label: "기타",
+    domains: taxonomy.domains
+      .filter((domain) => !knownIds.has(domain.id))
+      .map((domain) => domain.id),
+  };
+  const groups = fallbackGroup.domains.length > 0
+    ? [...DOMAIN_GROUPS, fallbackGroup]
+    : DOMAIN_GROUPS;
+  const domainsById = new Map(
+    taxonomy.domains.map((domain) => [domain.id, domain]),
+  );
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {taxonomy.domains.map((domain) => (
-        <button
-          key={domain.id}
-          type="button"
-          onClick={() => onSelect(domain.id)}
-          className={cn(
-            "rounded-full border px-3 py-1 text-xs transition-colors",
-            selected === domain.id
-              ? "border-zinc-400 bg-zinc-100 text-zinc-900"
-              : "border-zinc-700 bg-zinc-900/40 text-zinc-300 hover:border-zinc-500",
-          )}
-        >
-          {domain.label}
-        </button>
-      ))}
+    <div className="space-y-2">
+      {groups.map((group) => {
+        const visible = group.domains
+          .map((id) => domainsById.get(id))
+          .filter((domain): domain is CurriculumDomain => Boolean(domain));
+        if (visible.length === 0) return null;
+        return (
+          <div key={group.label} className="space-y-1">
+            <div className="text-[10px] uppercase tracking-wide text-zinc-500">
+              {group.label}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {visible.map((domain) => (
+                <button
+                  key={domain.id}
+                  type="button"
+                  onClick={() => onSelect(domain.id)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs transition-colors",
+                    selected === domain.id
+                      ? "border-zinc-400 bg-zinc-100 text-zinc-900"
+                      : "border-zinc-700 bg-zinc-900/40 text-zinc-300 hover:border-zinc-500",
+                  )}
+                >
+                  {domain.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -229,14 +358,26 @@ function PlanBody({
               <Card
                 className={cn(
                   "border border-zinc-800 bg-zinc-900/40 px-3 py-2.5 transition-colors",
+                  step.completed && "border-emerald-900/40 bg-emerald-950/15 opacity-80",
                   onSelectLesson && "cursor-pointer hover:border-zinc-600",
                 )}
                 onClick={() => onSelectLesson?.(step.category, step.contentId)}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2 text-xs">
-                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-medium text-zinc-300">
-                      {step.order}
+                    <span
+                      className={cn(
+                        "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-medium",
+                        step.completed
+                          ? "bg-emerald-900/60 text-emerald-200"
+                          : "bg-zinc-800 text-zinc-300",
+                      )}
+                    >
+                      {step.completed ? (
+                        <CheckCircle2 className="h-3 w-3" />
+                      ) : (
+                        step.order
+                      )}
                     </span>
                     <div className="flex-1">
                       <div className="font-medium text-zinc-100">{step.title}</div>

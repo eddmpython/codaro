@@ -88,6 +88,8 @@ class MasterPlan(BaseModel):
     gaps: list[PlanGap]
     totalMinutes: int
     summary: str
+    nextStepKey: str | None = None
+    completedCount: int = 0
 
 
 def _categoryRank(category: str) -> int:
@@ -103,7 +105,10 @@ def _selectLessonForOutcome(
 ) -> LessonNode | None:
     """outcome을 제공하는 레슨 중 학습 경로에 가장 적합한 한 개를 고른다.
 
-    휴리스틱: 카테고리 우선순위(기초가 앞) → sortKey 순.
+    휴리스틱:
+    1. prerequisite이 적은 레슨 우선 (더 입문에 가까움)
+    2. 같으면 카테고리 우선순위(기초가 앞)
+    3. 같으면 sortKey 순
     """
     candidates = [
         lesson
@@ -112,7 +117,11 @@ def _selectLessonForOutcome(
     ]
     if not candidates:
         return None
-    candidates.sort(key=lambda lesson: (_categoryRank(lesson.category), lesson.sortKey))
+    candidates.sort(key=lambda lesson: (
+        len(lesson.prerequisites),
+        _categoryRank(lesson.category),
+        lesson.sortKey,
+    ))
     return candidates[0]
 
 
@@ -252,8 +261,9 @@ def composeMasterPlan(
 
     selected, unresolved = _expandWithPrerequisites(targetOutcomes, graph, excludeKeys)
 
+    # completed는 항상 조회한다 — excludeCompleted=False여도 진도/다음단계 표시에 필요.
     completed: set[str] = set()
-    if progressTracker is not None and goal.excludeCompleted:
+    if progressTracker is not None:
         completed = _completedKeys(progressTracker)
 
     ordered = _topologicalSort(selected)
@@ -262,12 +272,18 @@ def composeMasterPlan(
     steps: list[PlanStep] = []
     visibleOrder = 0
     totalMinutes = 0
+    completedCount = 0
+    nextStepKey: str | None = None
     for lesson in ordered:
         isCompleted = lesson.key in completed
-        if isCompleted and goal.excludeCompleted:
-            continue
+        if isCompleted:
+            completedCount += 1
+            if goal.excludeCompleted:
+                continue
         visibleOrder += 1
         totalMinutes += lesson.estimatedMinutes
+        if nextStepKey is None and not isCompleted:
+            nextStepKey = lesson.key
         steps.append(PlanStep(
             order=visibleOrder,
             category=lesson.category,
@@ -299,6 +315,8 @@ def composeMasterPlan(
         gaps=gaps,
         totalMinutes=totalMinutes,
         summary=summary,
+        nextStepKey=nextStepKey,
+        completedCount=completedCount,
     )
 
 

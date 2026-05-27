@@ -308,6 +308,26 @@
       "prerequisites": [],
       "keywords": ["inspect", "introspection", "메타", "시그니처"],
       "description": "객체 정보 검사, 함수 시그니처, 소스 코드"
+    },
+    {
+      "id": "31_subprocess",
+      "title": "subprocess - 외부 명령 실행",
+      "file": "31_subprocess.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["subprocess", "외부명령", "프로세스", "쉘"],
+      "description": "외부 프로그램 호출, stdout/stderr 처리"
+    },
+    {
+      "id": "32_contextlib",
+      "title": "contextlib - 컨텍스트 매니저",
+      "file": "32_contextlib.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["contextlib", "with", "컨텍스트매니저", "자원관리"],
+      "description": "with 문, 사용자 정의 컨텍스트 매니저"
     }
   ]
 }

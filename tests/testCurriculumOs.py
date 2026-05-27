@@ -342,6 +342,89 @@ def testResolveLearningGoalRequiresText() -> None:
 # ---------------------------------------------------------------------------
 
 
+def testEveryDomainProducesPlan() -> None:
+    """모든 도메인이 실제 repo에서 비어있지 않은 plan을 만들어야 한다.
+
+    Curriculum OS의 완성도 게이트: 카탈로그에 등록된 모든 도메인이
+    실제 backfill로 작동해야 한다.
+    """
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+
+    loader = StudyLoader(str(CURRICULA_DIR))
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(loader, taxonomy)
+
+    failures: list[str] = []
+    for domain in taxonomy.domains:
+        plan = composeMasterPlan(
+            PlanGoal(domain=domain.id, excludeCompleted=False),
+            graph, taxonomy,
+        )
+        if not plan.steps:
+            failures.append(f"{domain.id}: empty plan")
+        if plan.gaps:
+            failures.append(f"{domain.id}: gaps - {[g.outcomeId for g in plan.gaps]}")
+    assert not failures, "\n".join(failures)
+
+
+def testTaxonomyCoversAllOutcomes() -> None:
+    """모든 outcome이 어딘가의 레슨에서 제공되어야 한다."""
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+
+    loader = StudyLoader(str(CURRICULA_DIR))
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(loader, taxonomy)
+    covered = graph.coveredOutcomes()
+    uncovered = {o.id for o in taxonomy.outcomes} - covered
+    assert not uncovered, f"uncovered outcomes: {sorted(uncovered)}"
+
+
+def testComposerEmitsNextStepKey() -> None:
+    plan = composeMasterPlan(
+        PlanGoal(domain="goalC"),
+        _smallGraph(),
+        _smallTaxonomy(),
+    )
+    assert plan.nextStepKey == "cat/01_a"
+
+
+def testComposerCountsCompleted(tmp_path: Path) -> None:
+    from codaro.curriculum.progress import ProgressTracker
+
+    tracker = ProgressTracker(tmp_path / "progress.json")
+    tracker.completeMission("cat", "01_a", "m1", totalMissions=1)
+    plan = composeMasterPlan(
+        PlanGoal(domain="goalC", excludeCompleted=False),
+        _smallGraph(),
+        _smallTaxonomy(),
+        progressTracker=tracker,
+    )
+    assert plan.completedCount == 1
+    assert plan.nextStepKey == "cat/02_b"
+
+
+def testComposerDeterministicSnapshot() -> None:
+    """같은 입력은 같은 plan을 낸다 — 알고리즘 결정성 보장."""
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+
+    loader = StudyLoader(str(CURRICULA_DIR))
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(loader, taxonomy)
+
+    plan1 = composeMasterPlan(
+        PlanGoal(domain="dataReporting", excludeCompleted=False),
+        graph, taxonomy,
+    )
+    plan2 = composeMasterPlan(
+        PlanGoal(domain="dataReporting", excludeCompleted=False),
+        graph, taxonomy,
+    )
+    keys1 = [step.key for step in plan1.steps]
+    keys2 = [step.key for step in plan2.steps]
+    assert keys1 == keys2
+    assert plan1.totalMinutes == plan2.totalMinutes
+
+
 def testCurriculumOsApiEndpoints(tmp_path) -> None:
     from fastapi.testclient import TestClient
 

@@ -68,6 +68,114 @@ outcomes:
     label: 디자인 패턴
     description: Strategy, Factory, Singleton 등
 
+  # === 표준 라이브러리 ===
+  - id: builtins.numericMath
+    label: math와 random
+    description: 수학 함수, 난수 생성, 통계 보조
+  - id: builtins.datetime
+    label: 날짜와 시간
+    description: datetime, time, timedelta로 시간 계산
+  - id: builtins.collections
+    label: collections·itertools
+    description: defaultdict, Counter, deque, chain, groupby
+  - id: builtins.fileSystem
+    label: 파일 시스템
+    description: os, pathlib, glob, shutil로 경로/파일 다루기
+  - id: builtins.dataFormats
+    label: 데이터 직렬화
+    description: json, csv, pickle, struct로 데이터 입출력
+  - id: builtins.textProcessing
+    label: 텍스트 처리 보조
+    description: string, textwrap, difflib, base64
+  - id: builtins.cli
+    label: 명령행 도구
+    description: argparse, sys.argv, 환경 통합
+  - id: builtins.async
+    label: asyncio 기초
+    description: async/await, 이벤트 루프
+  - id: builtins.logging
+    label: 로깅과 디버깅
+    description: logging, pprint, inspect, timeit
+  - id: builtins.testing
+    label: 표준 테스트 라이브러리
+    description: unittest, 표준 테스트 패턴
+  - id: builtins.subprocess
+    label: 외부 명령 실행
+    description: subprocess로 외부 도구 호출
+  - id: builtins.contextManagers
+    label: 컨텍스트 매니저
+    description: contextlib, with 문 활용
+  - id: builtins.networking
+    label: 표준 네트워크
+    description: urllib, email
+
+  # === 수치/심볼릭 ===
+  - id: numpy.intro
+    label: NumPy 소개
+    description: ndarray 개념, 기본 생성/속성
+  - id: numpy.arrayOps
+    label: NumPy 배열 연산
+    description: 인덱싱, 슬라이싱, 브로드캐스팅
+  - id: numpy.statistics
+    label: NumPy 통계
+    description: mean, std, percentile, axis 집계
+  - id: numpy.linearAlgebra
+    label: NumPy 선형대수
+    description: dot, solve, eig, 행렬 분해
+
+  - id: sympy.symbolic
+    label: 기호 수식
+    description: Symbol, 식 단순화, substitution
+  - id: sympy.equations
+    label: 방정식 풀이
+    description: solve, equation systems
+  - id: sympy.calculus
+    label: 미적분
+    description: 미분, 적분, 극한, 급수
+  - id: sympy.matrices
+    label: 기호 행렬
+    description: Matrix, 행렬 연산, 고유값
+
+  # === 데이터 엔진 ===
+  - id: duckdb.intro
+    label: DuckDB 소개
+    description: 임베디드 OLAP 엔진, Python 통합
+  - id: duckdb.basicQueries
+    label: SQL 기본
+    description: SELECT, WHERE, JOIN
+  - id: duckdb.aggregation
+    label: 집계 분석
+    description: GROUP BY, HAVING, 집계 함수
+  - id: duckdb.window
+    label: 윈도우 함수
+    description: OVER, PARTITION BY, CTE, 서브쿼리
+
+  - id: polars.intro
+    label: Polars 소개
+    description: 컬럼 기반 DataFrame, lazy/eager
+  - id: polars.transform
+    label: Polars 변환
+    description: select, filter, with_columns
+  - id: polars.aggregate
+    label: Polars 집계
+    description: group_by, agg, 윈도우
+  - id: polars.bigData
+    label: Polars 대용량
+    description: lazy, streaming, 메모리 효율
+
+  - id: pydantic.intro
+    label: Pydantic 소개
+    description: BaseModel, 타입 안전 데이터
+  - id: pydantic.validation
+    label: Pydantic 검증
+    description: 필드 검증기, 사용자 정의 validator
+  - id: pydantic.schemas
+    label: Pydantic 스키마
+    description: 중첩 모델, JSON Schema, 커스텀 타입
+  - id: pydantic.integration
+    label: Pydantic 통합
+    description: 설정 관리, FastAPI, 파이프라인
+
   # === 데이터 분석 ===
   - id: pandas.intro
     label: pandas 소개
@@ -95,12 +203,110 @@ outcomes:
   - id: matplotlib.basics
     label: matplotlib 기본 차트
     description: pyplot, figure, axes, 기본 차트 종류
+  - id: matplotlib.advanced
+    label: matplotlib 고급 차트
+    description: 다중 축, 주석, 대시보드 패널
   - id: viz.statistical
     label: 통계 시각화
     description: 분포, 박스플롯, 회귀선
+  - id: viz.distribution
+    label: 분포 시각화
+    description: 히스토그램, KDE, violin, boxen
+  - id: viz.regression
+    label: 회귀/관계 시각화
+    description: regplot, residual, lmplot
+  - id: viz.heatmap
+    label: 히트맵·상관관계
+    description: heatmap, clustermap, 매트릭스
   - id: viz.interactive
     label: 인터랙티브 시각화
     description: 줌, 호버, 인터랙티브 대시보드 요소
+  - id: viz.interactiveAdvanced
+    label: 인터랙티브 대시보드
+    description: 멀티뷰 연결, 동적 필터, dashboard 합성
+  - id: viz.declarative
+    label: 선언적 시각화 (Vega)
+    description: Altair 인코딩, 차트 합성
+  - id: viz.geoMaps
+    label: 지도 시각화
+    description: 마커, 폴리곤, choropleth, heatmap, 클러스터
+
+  # === 과학·통계·ML ===
+  - id: scipy.intro
+    label: SciPy 소개
+    description: scipy 패키지 구조와 진입점
+  - id: scipy.statistics
+    label: 확률·검정
+    description: 분포, AB 테스트, 정규성 검정
+  - id: scipy.optimization
+    label: 최적화·피팅
+    description: curve_fit, minimize, 보간
+  - id: scipy.signal
+    label: 신호 처리
+    description: 필터, 스펙트럼, 변환
+  - id: scipy.integration
+    label: 수치 적분
+    description: quad, dblquad, 수치 계산
+
+  - id: stats.regression
+    label: 회귀 분석
+    description: OLS, 다중 회귀, 가정 진단
+  - id: stats.timeSeries
+    label: 시계열 모델
+    description: ARIMA, 계절성, 예측
+  - id: stats.diagnostics
+    label: 모델 진단
+    description: 잔차, 영향력, 검정
+
+  - id: ml.intro
+    label: 머신러닝 입문
+    description: train/test split, 평가 지표
+  - id: ml.classification
+    label: 분류
+    description: 로지스틱, 트리, SVM, 평가 지표
+  - id: ml.regression
+    label: ML 회귀
+    description: 선형, 트리 기반 회귀, 평가
+  - id: ml.clustering
+    label: 군집화
+    description: K-means, 계층, 차원 축소
+  - id: ml.pipeline
+    label: ML 파이프라인
+    description: Pipeline, GridSearch, cross_val
+
+  - id: graph.intro
+    label: 그래프 분석 소개
+    description: NetworkX 노드/엣지, 방향/가중치
+  - id: graph.paths
+    label: 경로·중심성
+    description: 최단경로, degree/betweenness 중심성
+  - id: graph.community
+    label: 커뮤니티 탐지
+    description: modularity, 클러스터링
+  - id: graph.algorithms
+    label: 그래프 알고리즘
+    description: 연결성, 랜덤 모델, 고급 알고리즘
+
+  # === 이미지·비전 ===
+  - id: image.pillowBasics
+    label: Pillow 기본
+    description: 이미지 열기, 저장, 회전, 리사이즈
+  - id: image.filters
+    label: 이미지 필터
+    description: 블러, 샤픈, 흑백, 채널 분리
+  - id: image.composition
+    label: 이미지 합성·생성
+    description: 도형 그리기, 워터마크, 콜라주
+
+  - id: vision.opencvBasics
+    label: OpenCV 기본
+    description: 이미지 구조, 색공간, 기하 변환
+  - id: vision.filters
+    label: 비전 필터
+    description: 블러, 에지, 이진화, 모폴로지
+  - id: vision.features
+    label: 비전 특징
+    description: 히스토그램, 컨투어, 키포인트
 
   # === 자동화 ===
   - id: automation.browser.basics
@@ -129,19 +335,37 @@ outcomes:
   - id: automation.fileOps
     label: 파일 자동화
     description: pathlib, glob, 파일 이동/복사/정리
+  - id: automation.fileBackup
+    label: 백업·동기화
+    description: zip, 백업 정책, 폴더 정리
   - id: automation.procCtl
     label: 프로세스 자동화
     description: subprocess, 외부 명령 실행
+  - id: automation.procMonitoring
+    label: 시스템 자원 감시
+    description: psutil로 프로세스/리소스 조회
   - id: automation.watchSched
     label: 감시·스케줄
     description: watchdog, schedule, 주기 실행
+  - id: automation.scheduling
+    label: 스케줄 운영
+    description: APScheduler, cron, 영속·재시도
   - id: automation.inputCtl
     label: GUI/입력 자동화
     description: 키보드, 마우스, OS 입력 제어
+  - id: automation.screenInteraction
+    label: 화면 상호작용
+    description: 스크린샷, 클립보드, 이미지 매치
 
   - id: automation.regex
     label: 정규표현식
     description: 비정형 문자열에서 패턴 추출
+  - id: automation.textExtraction
+    label: 텍스트 추출·변환
+    description: 이메일/URL/날짜/HTML 정제
+  - id: automation.llmPreprocess
+    label: LLM 전처리
+    description: 토큰화, 마스킹, 정제 파이프라인
 
 # 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
 domains:
@@ -220,6 +444,201 @@ domains:
       - pandas.aggregate
       - pandas.timeSeries
       - matplotlib.basics
+
+  - id: dataVisualization
+    label: 데이터 시각화
+    description: 정적·통계·관계 그래프로 데이터 인사이트를 시각화한다.
+    targetOutcomes:
+      - python.variables
+      - python.controlFlow
+      - pandas.loadFrame
+      - matplotlib.basics
+      - matplotlib.advanced
+      - viz.statistical
+      - viz.distribution
+      - viz.regression
+      - viz.heatmap
+
+  - id: interactiveDashboards
+    label: 인터랙티브 대시보드
+    description: 호버·필터 가능한 인터랙티브 차트와 대시보드를 만든다.
+    targetOutcomes:
+      - pandas.loadFrame
+      - pandas.aggregate
+      - viz.interactive
+      - viz.interactiveAdvanced
+      - viz.declarative
+
+  - id: geoVisualization
+    label: 지도 시각화
+    description: 지도에 데이터를 마커, 폴리곤, 히트맵으로 표시한다.
+    targetOutcomes:
+      - python.variables
+      - pandas.loadFrame
+      - viz.geoMaps
+
+  - id: statisticalAnalysis
+    label: 통계 분석·검정
+    description: 분포·검정·회귀로 데이터의 통계적 의미를 끌어낸다.
+    targetOutcomes:
+      - numpy.intro
+      - numpy.statistics
+      - pandas.loadFrame
+      - scipy.intro
+      - scipy.statistics
+      - stats.regression
+      - stats.diagnostics
+
+  - id: machineLearning
+    label: 머신러닝 (분류·회귀·군집)
+    description: 학습/평가 흐름으로 분류·회귀·군집 모델을 만든다.
+    targetOutcomes:
+      - python.functions
+      - pandas.loadFrame
+      - pandas.filterSelect
+      - numpy.intro
+      - numpy.arrayOps
+      - ml.intro
+      - ml.classification
+      - ml.regression
+      - ml.clustering
+      - ml.pipeline
+
+  - id: timeSeriesForecasting
+    label: 시계열 예측
+    description: ARIMA·계절성으로 시계열 예측 모델을 만든다.
+    targetOutcomes:
+      - pandas.timeSeries
+      - matplotlib.basics
+      - stats.timeSeries
+      - scipy.statistics
+
+  - id: graphAnalysis
+    label: 그래프·네트워크 분석
+    description: 노드/엣지 데이터를 그래프 알고리즘으로 분석한다.
+    targetOutcomes:
+      - python.functions
+      - graph.intro
+      - graph.paths
+      - graph.community
+      - graph.algorithms
+
+  - id: imageProcessing
+    label: 이미지 처리
+    description: Pillow로 이미지 편집·필터·합성한다.
+    targetOutcomes:
+      - python.variables
+      - python.modulesAndIo
+      - image.pillowBasics
+      - image.filters
+      - image.composition
+
+  - id: computerVision
+    label: 컴퓨터 비전
+    description: OpenCV로 이미지 분석·특징 추출한다.
+    targetOutcomes:
+      - python.variables
+      - numpy.arrayOps
+      - vision.opencvBasics
+      - vision.filters
+      - vision.features
+
+  - id: textProcessing
+    label: 비정형 텍스트 처리
+    description: 정규표현식과 텍스트 도구로 데이터를 정제한다.
+    targetOutcomes:
+      - python.strings
+      - automation.regex
+      - automation.textExtraction
+      - automation.llmPreprocess
+      - builtins.textProcessing
+
+  - id: scientificComputing
+    label: 과학·수치 계산
+    description: NumPy/SciPy/SymPy로 수치·기호 계산을 다룬다.
+    targetOutcomes:
+      - numpy.intro
+      - numpy.arrayOps
+      - numpy.statistics
+      - numpy.linearAlgebra
+      - sympy.symbolic
+      - sympy.equations
+      - sympy.calculus
+
+  - id: sqlAnalysis
+    label: SQL 기반 데이터 분석
+    description: DuckDB로 SQL을 활용해 표 데이터를 분석한다.
+    targetOutcomes:
+      - python.variables
+      - duckdb.intro
+      - duckdb.basicQueries
+      - duckdb.aggregation
+      - duckdb.window
+
+  - id: bigDataPipelines
+    label: 대용량 데이터 처리
+    description: Polars로 메모리 효율적인 데이터 파이프라인을 만든다.
+    targetOutcomes:
+      - pandas.intro
+      - polars.intro
+      - polars.transform
+      - polars.aggregate
+      - polars.bigData
+
+  - id: dataContracts
+    label: 데이터 계약·검증
+    description: Pydantic으로 타입 안전한 데이터 모델을 정의한다.
+    targetOutcomes:
+      - python.oop
+      - python.typing
+      - pydantic.intro
+      - pydantic.validation
+      - pydantic.schemas
+      - pydantic.integration
+
+  - id: desktopAutomation
+    label: 데스크톱·GUI 자동화
+    description: 키보드/마우스/화면 자동화로 반복 GUI 작업을 처리한다.
+    targetOutcomes:
+      - python.functions
+      - python.errorHandling
+      - automation.inputCtl
+      - automation.screenInteraction
+
+  - id: fileAutomation
+    label: 파일·폴더 자동화
+    description: 파일 시스템과 감시·스케줄로 폴더 작업을 자동화한다.
+    targetOutcomes:
+      - python.modulesAndIo
+      - builtins.fileSystem
+      - automation.fileOps
+      - automation.fileBackup
+      - automation.watchSched
+      - automation.scheduling
+
+  - id: systemMonitoring
+    label: 시스템 감시·운영
+    description: 프로세스·리소스를 감시하고 운영 자동화를 만든다.
+    targetOutcomes:
+      - python.errorHandling
+      - automation.procCtl
+      - automation.procMonitoring
+      - automation.watchSched
+      - builtins.logging
+
+  - id: standardLibraryMastery
+    label: 표준 라이브러리 마스터
+    description: 외부 의존 없이 표준 라이브러리로 실무 도구를 만든다.
+    targetOutcomes:
+      - python.functions
+      - python.modulesAndIo
+      - builtins.datetime
+      - builtins.collections
+      - builtins.fileSystem
+      - builtins.dataFormats
+      - builtins.cli
+      - builtins.logging
+      - builtins.subprocess
 
 # 기존 레슨 backfill. 레슨 YAML meta.outcomes/prerequisites가 있으면 그쪽이 우선.
 lessonOutcomes:
@@ -460,3 +879,1047 @@ lessonOutcomes:
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.intro]
     estimatedMinutes: 45
+
+  # builtins 트랙
+  "builtins/01_math":
+    outcomes: [builtins.numericMath]
+    prerequisites: [python.functions]
+    estimatedMinutes: 30
+  "builtins/02_random":
+    outcomes: [builtins.numericMath]
+    prerequisites: [python.functions]
+    estimatedMinutes: 30
+  "builtins/03_datetime":
+    outcomes: [builtins.datetime]
+    prerequisites: [python.oop]
+    estimatedMinutes: 40
+  "builtins/04_time":
+    outcomes: [builtins.datetime]
+    prerequisites: [builtins.datetime]
+    estimatedMinutes: 30
+  "builtins/05_collections":
+    outcomes: [builtins.collections]
+    prerequisites: [python.dictsAndSets]
+    estimatedMinutes: 40
+  "builtins/06_itertools":
+    outcomes: [builtins.collections]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 40
+  "builtins/07_functools":
+    outcomes: [python.functools]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "builtins/08_os":
+    outcomes: [builtins.fileSystem]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 35
+  "builtins/09_pathlib":
+    outcomes: [builtins.fileSystem]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 40
+  "builtins/10_sys":
+    outcomes: [builtins.cli]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 30
+  "builtins/11_glob":
+    outcomes: [builtins.fileSystem]
+    prerequisites: [builtins.fileSystem]
+    estimatedMinutes: 30
+  "builtins/12_shutil":
+    outcomes: [builtins.fileSystem]
+    prerequisites: [builtins.fileSystem]
+    estimatedMinutes: 35
+  "builtins/13_json":
+    outcomes: [builtins.dataFormats]
+    prerequisites: [python.dictsAndSets]
+    estimatedMinutes: 35
+  "builtins/14_csv":
+    outcomes: [builtins.dataFormats]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 35
+  "builtins/15_pickle":
+    outcomes: [builtins.dataFormats]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 30
+  "builtins/16_struct":
+    outcomes: [builtins.dataFormats]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 30
+  "builtins/17_string":
+    outcomes: [builtins.textProcessing]
+    prerequisites: [python.strings]
+    estimatedMinutes: 30
+  "builtins/18_textwrap":
+    outcomes: [builtins.textProcessing]
+    prerequisites: [python.strings]
+    estimatedMinutes: 25
+  "builtins/19_difflib":
+    outcomes: [builtins.textProcessing]
+    prerequisites: [python.strings]
+    estimatedMinutes: 30
+  "builtins/20_base64":
+    outcomes: [builtins.textProcessing]
+    prerequisites: [python.strings]
+    estimatedMinutes: 25
+  "builtins/21_urllib":
+    outcomes: [builtins.networking]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 35
+  "builtins/22_email":
+    outcomes: [builtins.networking]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 35
+  "builtins/23_asyncio":
+    outcomes: [builtins.async]
+    prerequisites: [python.functions]
+    estimatedMinutes: 50
+  "builtins/24_argparse":
+    outcomes: [builtins.cli]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "builtins/25_logging":
+    outcomes: [builtins.logging]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "builtins/26_unittest":
+    outcomes: [builtins.testing]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "builtins/27_timeit":
+    outcomes: [builtins.logging]
+    prerequisites: [python.functions]
+    estimatedMinutes: 25
+  "builtins/28_copy":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.oop]
+    estimatedMinutes: 25
+  "builtins/29_pprint":
+    outcomes: [builtins.logging]
+    prerequisites: [python.dictsAndSets]
+    estimatedMinutes: 20
+  "builtins/30_inspect":
+    outcomes: [builtins.logging]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 30
+  "builtins/31_subprocess":
+    outcomes: [builtins.subprocess]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 40
+  "builtins/32_contextlib":
+    outcomes: [builtins.contextManagers]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 35
+
+  # numpy 트랙
+  "numpy/00_NumPy소개":
+    outcomes: [numpy.intro]
+    prerequisites: [python.lists, python.functions]
+    estimatedMinutes: 35
+  "numpy/01_포켓몬스탯분석":
+    outcomes: [numpy.arrayOps]
+    prerequisites: [numpy.intro]
+    estimatedMinutes: 50
+  "numpy/02_기온데이터탐색":
+    outcomes: [numpy.statistics]
+    prerequisites: [numpy.arrayOps]
+    estimatedMinutes: 50
+  "numpy/03_지진발생패턴":
+    outcomes: [numpy.statistics]
+    prerequisites: [numpy.statistics]
+    estimatedMinutes: 50
+  "numpy/04_음악특성분석":
+    outcomes: [numpy.arrayOps, numpy.statistics]
+    prerequisites: [numpy.statistics]
+    estimatedMinutes: 55
+  "numpy/05_BMI계산기":
+    outcomes: [numpy.arrayOps]
+    prerequisites: [numpy.intro]
+    estimatedMinutes: 40
+  "numpy/06_심장병위험분석":
+    outcomes: [numpy.statistics]
+    prerequisites: [numpy.statistics]
+    estimatedMinutes: 55
+  "numpy/07_대기질시계열":
+    outcomes: [numpy.statistics]
+    prerequisites: [numpy.statistics]
+    estimatedMinutes: 55
+  "numpy/08_행복지수국가비교":
+    outcomes: [numpy.statistics]
+    prerequisites: [numpy.statistics]
+    estimatedMinutes: 50
+  "numpy/09_전복나이예측":
+    outcomes: [numpy.linearAlgebra]
+    prerequisites: [numpy.arrayOps]
+    estimatedMinutes: 60
+  "numpy/10_당뇨병종합분석":
+    outcomes: [numpy.linearAlgebra, numpy.statistics]
+    prerequisites: [numpy.linearAlgebra]
+    estimatedMinutes: 70
+
+  # sympy 트랙
+  "sympy/00_sympy소개":
+    outcomes: [sympy.symbolic]
+    prerequisites: [python.functions]
+    estimatedMinutes: 30
+  "sympy/01_기초수식계산":
+    outcomes: [sympy.symbolic]
+    prerequisites: [sympy.symbolic]
+    estimatedMinutes: 35
+  "sympy/02_대입과계산":
+    outcomes: [sympy.symbolic]
+    prerequisites: [sympy.symbolic]
+    estimatedMinutes: 35
+  "sympy/03_방정식풀이":
+    outcomes: [sympy.equations]
+    prerequisites: [sympy.symbolic]
+    estimatedMinutes: 45
+  "sympy/04_미분기초":
+    outcomes: [sympy.calculus]
+    prerequisites: [sympy.symbolic]
+    estimatedMinutes: 40
+  "sympy/05_적분기초":
+    outcomes: [sympy.calculus]
+    prerequisites: [sympy.calculus]
+    estimatedMinutes: 40
+  "sympy/06_극한과급수":
+    outcomes: [sympy.calculus]
+    prerequisites: [sympy.calculus]
+    estimatedMinutes: 40
+  "sympy/07_삼각함수활용":
+    outcomes: [sympy.symbolic]
+    prerequisites: [sympy.calculus]
+    estimatedMinutes: 40
+  "sympy/08_행렬연산":
+    outcomes: [sympy.matrices]
+    prerequisites: [sympy.symbolic]
+    estimatedMinutes: 45
+  "sympy/09_수식시각화":
+    outcomes: [sympy.symbolic]
+    prerequisites: [sympy.calculus, matplotlib.basics]
+    estimatedMinutes: 45
+  "sympy/10_종합수학문제":
+    outcomes: []
+    prerequisites: [sympy.equations, sympy.calculus, sympy.matrices]
+    estimatedMinutes: 70
+
+  # duckdb 트랙
+  "duckdb/00_DuckDB소개":
+    outcomes: [duckdb.intro]
+    prerequisites: [python.functions]
+    estimatedMinutes: 30
+  "duckdb/01_레스토랑팁기초":
+    outcomes: [duckdb.basicQueries]
+    prerequisites: [duckdb.intro]
+    estimatedMinutes: 45
+  "duckdb/02_타이타닉생존통계":
+    outcomes: [duckdb.basicQueries, duckdb.aggregation]
+    prerequisites: [duckdb.basicQueries]
+    estimatedMinutes: 50
+  "duckdb/03_팁패턴분석":
+    outcomes: [duckdb.aggregation]
+    prerequisites: [duckdb.basicQueries]
+    estimatedMinutes: 50
+  "duckdb/04_타이타닉심층분석":
+    outcomes: [duckdb.aggregation]
+    prerequisites: [duckdb.aggregation]
+    estimatedMinutes: 55
+  "duckdb/05_팁서브쿼리분석":
+    outcomes: [duckdb.window]
+    prerequisites: [duckdb.aggregation]
+    estimatedMinutes: 55
+  "duckdb/06_CTE단계별분석":
+    outcomes: [duckdb.window]
+    prerequisites: [duckdb.window]
+    estimatedMinutes: 55
+  "duckdb/07_윈도우함수기초":
+    outcomes: [duckdb.window]
+    prerequisites: [duckdb.aggregation]
+    estimatedMinutes: 55
+  "duckdb/08_고급윈도우분석":
+    outcomes: [duckdb.window]
+    prerequisites: [duckdb.window]
+    estimatedMinutes: 60
+  "duckdb/09_문자열과패턴":
+    outcomes: [duckdb.basicQueries]
+    prerequisites: [duckdb.basicQueries]
+    estimatedMinutes: 45
+  "duckdb/10_종합프로젝트":
+    outcomes: []
+    prerequisites: [duckdb.window]
+    estimatedMinutes: 80
+
+  # polars 트랙
+  "polars/00_Polars소개":
+    outcomes: [polars.intro]
+    prerequisites: [pandas.intro]
+    estimatedMinutes: 35
+  "polars/01_영화평점분석":
+    outcomes: [polars.transform]
+    prerequisites: [polars.intro]
+    estimatedMinutes: 50
+  "polars/02_날씨데이터분석":
+    outcomes: [polars.transform]
+    prerequisites: [polars.transform]
+    estimatedMinutes: 50
+  "polars/03_게임판매분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.transform]
+    estimatedMinutes: 55
+  "polars/04_주식데이터분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 55
+  "polars/05_음악스트리밍분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 60
+  "polars/06_부동산가격분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 55
+  "polars/07_스포츠통계분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 60
+  "polars/08_소셜미디어분석":
+    outcomes: [polars.aggregate]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 60
+  "polars/09_대용량로그분석":
+    outcomes: [polars.bigData]
+    prerequisites: [polars.aggregate]
+    estimatedMinutes: 70
+  "polars/10_실전종합프로젝트":
+    outcomes: [polars.bigData]
+    prerequisites: [polars.bigData]
+    estimatedMinutes: 90
+
+  # pydantic 트랙
+  "pydantic/00_pydantic소개":
+    outcomes: [pydantic.intro]
+    prerequisites: [python.oop, python.typing]
+    estimatedMinutes: 35
+  "pydantic/01_사용자모델만들기":
+    outcomes: [pydantic.intro]
+    prerequisites: [pydantic.intro]
+    estimatedMinutes: 40
+  "pydantic/02_필드검증기":
+    outcomes: [pydantic.validation]
+    prerequisites: [pydantic.intro]
+    estimatedMinutes: 50
+  "pydantic/03_중첩모델설계":
+    outcomes: [pydantic.schemas]
+    prerequisites: [pydantic.intro]
+    estimatedMinutes: 45
+  "pydantic/04_타입변환기":
+    outcomes: [pydantic.validation]
+    prerequisites: [pydantic.validation]
+    estimatedMinutes: 45
+  "pydantic/05_설정관리기":
+    outcomes: [pydantic.integration]
+    prerequisites: [pydantic.intro]
+    estimatedMinutes: 45
+  "pydantic/06_JSON스키마생성":
+    outcomes: [pydantic.schemas]
+    prerequisites: [pydantic.schemas]
+    estimatedMinutes: 40
+  "pydantic/07_커스텀타입정의":
+    outcomes: [pydantic.schemas]
+    prerequisites: [pydantic.schemas]
+    estimatedMinutes: 50
+  "pydantic/08_에러처리기법":
+    outcomes: [pydantic.validation]
+    prerequisites: [pydantic.validation]
+    estimatedMinutes: 40
+  "pydantic/09_FastAPI통합":
+    outcomes: [pydantic.integration]
+    prerequisites: [pydantic.integration]
+    estimatedMinutes: 60
+  "pydantic/10_종합데이터파이프라인":
+    outcomes: [pydantic.integration]
+    prerequisites: [pydantic.integration]
+    estimatedMinutes: 80
+
+  # matplotlib 트랙
+  "matplotlib/00_Matplotlib소개":
+    outcomes: [matplotlib.basics]
+    prerequisites: [pandas.loadFrame]
+    estimatedMinutes: 35
+  "matplotlib/01_주가추세분석":
+    outcomes: [matplotlib.basics]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 50
+  "matplotlib/02_팁데이터분포탐색":
+    outcomes: [matplotlib.basics, viz.distribution]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 50
+  "matplotlib/03_붓꽃품종산점도":
+    outcomes: [matplotlib.basics]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 50
+  "matplotlib/04_대륙별인구비교":
+    outcomes: [matplotlib.basics]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 50
+  "matplotlib/05_펭귄체중분석":
+    outcomes: [viz.distribution]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 55
+  "matplotlib/06_상관관계히트맵":
+    outcomes: [viz.heatmap]
+    prerequisites: [matplotlib.basics, pandas.aggregate]
+    estimatedMinutes: 55
+  "matplotlib/07_시계열다중축차트":
+    outcomes: [matplotlib.advanced]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 55
+  "matplotlib/08_다중패널대시보드":
+    outcomes: [matplotlib.advanced]
+    prerequisites: [matplotlib.advanced]
+    estimatedMinutes: 60
+  "matplotlib/09_고급주석차트":
+    outcomes: [matplotlib.advanced]
+    prerequisites: [matplotlib.advanced]
+    estimatedMinutes: 55
+  "matplotlib/10_종합분석리포트":
+    outcomes: [matplotlib.advanced]
+    prerequisites: [matplotlib.advanced]
+    estimatedMinutes: 80
+
+  # seaborn 트랙
+  "seaborn/00_Seaborn소개":
+    outcomes: [viz.statistical]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 35
+  "seaborn/01_붓꽃품종산점도":
+    outcomes: [viz.statistical]
+    prerequisites: [viz.statistical]
+    estimatedMinutes: 50
+  "seaborn/02_팁데이터분포탐색":
+    outcomes: [viz.distribution]
+    prerequisites: [viz.statistical]
+    estimatedMinutes: 50
+  "seaborn/03_펭귄체중분포비교":
+    outcomes: [viz.distribution]
+    prerequisites: [viz.distribution]
+    estimatedMinutes: 50
+  "seaborn/04_광고비판매액회귀":
+    outcomes: [viz.regression]
+    prerequisites: [viz.statistical]
+    estimatedMinutes: 55
+  "seaborn/05_타이타닉생존분석":
+    outcomes: [viz.distribution, viz.statistical]
+    prerequisites: [viz.statistical]
+    estimatedMinutes: 55
+  "seaborn/06_항공편승객시계열":
+    outcomes: [viz.statistical]
+    prerequisites: [viz.statistical, pandas.timeSeries]
+    estimatedMinutes: 55
+  "seaborn/07_세계기대수명분석":
+    outcomes: [viz.regression]
+    prerequisites: [viz.regression]
+    estimatedMinutes: 60
+  "seaborn/08_다이아몬드가격분석":
+    outcomes: [viz.heatmap, viz.distribution]
+    prerequisites: [viz.distribution]
+    estimatedMinutes: 60
+  "seaborn/09_자동차연비종합분석":
+    outcomes: [viz.regression, viz.heatmap]
+    prerequisites: [viz.regression]
+    estimatedMinutes: 65
+  "seaborn/10_종합EDA리포트":
+    outcomes: []
+    prerequisites: [viz.regression, viz.heatmap, viz.distribution]
+    estimatedMinutes: 90
+
+  # plotly 트랙
+  "plotly/00_Plotly소개":
+    outcomes: [viz.interactive]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 35
+  "plotly/01_세계기대수명비교":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 50
+  "plotly/02_팁데이터분포분석":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 50
+  "plotly/03_붓꽃품종분류":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 50
+  "plotly/04_GDP기대수명관계":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 55
+  "plotly/05_세계인구지도":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 55
+  "plotly/06_시간에따른세계변화":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 55
+  "plotly/07_레스토랑매출분석":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 55
+  "plotly/08_대륙별계층구조":
+    outcomes: [viz.interactive]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 55
+  "plotly/09_주식시계열분석":
+    outcomes: [viz.interactive, viz.interactiveAdvanced]
+    prerequisites: [viz.interactive]
+    estimatedMinutes: 60
+  "plotly/10_종합대시보드":
+    outcomes: [viz.interactiveAdvanced]
+    prerequisites: [viz.interactiveAdvanced]
+    estimatedMinutes: 80
+
+  # altair 트랙
+  "altair/00_Altair소개":
+    outcomes: [viz.declarative]
+    prerequisites: [matplotlib.basics]
+    estimatedMinutes: 35
+  "altair/01_자동차연비탐색":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 50
+  "altair/02_붓꽃품종구분":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 50
+  "altair/07_인터랙티브필터":
+    outcomes: [viz.interactiveAdvanced]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 55
+  "altair/08_다중뷰연결":
+    outcomes: [viz.interactiveAdvanced]
+    prerequisites: [viz.interactiveAdvanced]
+    estimatedMinutes: 60
+  "altair/09_고급데이터변환":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 55
+  "altair/10_종합대시보드":
+    outcomes: [viz.interactiveAdvanced]
+    prerequisites: [viz.interactiveAdvanced]
+    estimatedMinutes: 80
+
+  # folium 트랙
+  "folium/00_folium소개":
+    outcomes: [viz.geoMaps]
+    prerequisites: [pandas.loadFrame]
+    estimatedMinutes: 30
+  "folium/01_첫지도만들기":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 35
+  "folium/02_다양한마커표현":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 40
+  "folium/07_단계구분도":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 50
+  "folium/08_히트맵":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 45
+  "folium/10_종합지도프로젝트":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 80
+
+  # scipy 트랙
+  "scipy/00_scipy소개":
+    outcomes: [scipy.intro]
+    prerequisites: [numpy.arrayOps]
+    estimatedMinutes: 35
+  "scipy/01_확률분포탐색기":
+    outcomes: [scipy.statistics]
+    prerequisites: [scipy.intro]
+    estimatedMinutes: 50
+  "scipy/02_AB테스트분석":
+    outcomes: [scipy.statistics]
+    prerequisites: [scipy.statistics]
+    estimatedMinutes: 55
+  "scipy/03_데이터보간기":
+    outcomes: [scipy.optimization]
+    prerequisites: [scipy.intro]
+    estimatedMinutes: 45
+  "scipy/04_곡선피팅마스터":
+    outcomes: [scipy.optimization]
+    prerequisites: [scipy.optimization]
+    estimatedMinutes: 55
+  "scipy/05_정규성검정기":
+    outcomes: [scipy.statistics]
+    prerequisites: [scipy.statistics]
+    estimatedMinutes: 50
+  "scipy/06_포트폴리오최적화":
+    outcomes: [scipy.optimization]
+    prerequisites: [scipy.optimization]
+    estimatedMinutes: 60
+  "scipy/07_신호필터링":
+    outcomes: [scipy.signal]
+    prerequisites: [scipy.intro]
+    estimatedMinutes: 55
+  "scipy/08_수치적분기":
+    outcomes: [scipy.integration]
+    prerequisites: [scipy.intro]
+    estimatedMinutes: 45
+  "scipy/09_스펙트럼분석기":
+    outcomes: [scipy.signal]
+    prerequisites: [scipy.signal]
+    estimatedMinutes: 60
+  "scipy/10_종합과학프로젝트":
+    outcomes: []
+    prerequisites: [scipy.statistics, scipy.optimization, scipy.signal]
+    estimatedMinutes: 90
+
+  # statsmodels 트랙
+  "statsmodels/00_statsmodels소개":
+    outcomes: [stats.regression]
+    prerequisites: [pandas.loadFrame, numpy.intro]
+    estimatedMinutes: 40
+  "statsmodels/01_광고비매출예측":
+    outcomes: [stats.regression]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 55
+  "statsmodels/02_부동산가격예측":
+    outcomes: [stats.regression]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 60
+  "statsmodels/03_의료보험비용예측":
+    outcomes: [stats.regression]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 55
+  "statsmodels/04_항공수요예측":
+    outcomes: [stats.timeSeries]
+    prerequisites: [stats.regression, pandas.timeSeries]
+    estimatedMinutes: 65
+  "statsmodels/05_고객이탈예측":
+    outcomes: [stats.regression]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 55
+  "statsmodels/06_다중회귀심화":
+    outcomes: [stats.regression, stats.diagnostics]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 60
+  "statsmodels/07_경제지표회귀분석":
+    outcomes: [stats.regression]
+    prerequisites: [stats.regression]
+    estimatedMinutes: 55
+  "statsmodels/08_직원퇴사예측":
+    outcomes: [stats.diagnostics]
+    prerequisites: [stats.diagnostics]
+    estimatedMinutes: 55
+  "statsmodels/09_자전거수요예측":
+    outcomes: [stats.timeSeries]
+    prerequisites: [stats.timeSeries]
+    estimatedMinutes: 60
+  "statsmodels/10_종합프로젝트":
+    outcomes: []
+    prerequisites: [stats.regression, stats.diagnostics, stats.timeSeries]
+    estimatedMinutes: 90
+
+  # sklearn 트랙
+  "sklearn/00_sklearn소개":
+    outcomes: [ml.intro]
+    prerequisites: [pandas.loadFrame, numpy.arrayOps]
+    estimatedMinutes: 40
+  "sklearn/01_와인품질분류":
+    outcomes: [ml.classification]
+    prerequisites: [ml.intro]
+    estimatedMinutes: 55
+  "sklearn/02_유방암진단":
+    outcomes: [ml.classification]
+    prerequisites: [ml.classification]
+    estimatedMinutes: 55
+  "sklearn/03_당뇨병진행도예측":
+    outcomes: [ml.regression]
+    prerequisites: [ml.intro]
+    estimatedMinutes: 55
+  "sklearn/04_주택가격예측":
+    outcomes: [ml.regression]
+    prerequisites: [ml.regression]
+    estimatedMinutes: 55
+  "sklearn/05_손글씨숫자인식":
+    outcomes: [ml.classification]
+    prerequisites: [ml.classification]
+    estimatedMinutes: 60
+  "sklearn/06_고객세분화":
+    outcomes: [ml.clustering]
+    prerequisites: [ml.intro]
+    estimatedMinutes: 60
+  "sklearn/07_소나신호분류":
+    outcomes: [ml.classification]
+    prerequisites: [ml.classification]
+    estimatedMinutes: 55
+  "sklearn/08_심장병예측":
+    outcomes: [ml.classification]
+    prerequisites: [ml.classification]
+    estimatedMinutes: 55
+  "sklearn/09_신호탐지최적화":
+    outcomes: [ml.pipeline]
+    prerequisites: [ml.classification]
+    estimatedMinutes: 65
+  "sklearn/10_종합ML파이프라인":
+    outcomes: [ml.pipeline]
+    prerequisites: [ml.pipeline]
+    estimatedMinutes: 90
+
+  # networkx 트랙
+  "networkx/00_networkx소개":
+    outcomes: [graph.intro]
+    prerequisites: [python.dictsAndSets]
+    estimatedMinutes: 35
+  "networkx/01_첫그래프만들기":
+    outcomes: [graph.intro]
+    prerequisites: [graph.intro]
+    estimatedMinutes: 40
+  "networkx/02_방향그래프와가중치":
+    outcomes: [graph.intro]
+    prerequisites: [graph.intro]
+    estimatedMinutes: 40
+  "networkx/03_최단경로찾기":
+    outcomes: [graph.paths]
+    prerequisites: [graph.intro]
+    estimatedMinutes: 50
+  "networkx/04_중심성분석":
+    outcomes: [graph.paths]
+    prerequisites: [graph.paths]
+    estimatedMinutes: 50
+  "networkx/05_소셜네트워크분석":
+    outcomes: [graph.paths, graph.community]
+    prerequisites: [graph.paths]
+    estimatedMinutes: 60
+  "networkx/06_연결성분석":
+    outcomes: [graph.algorithms]
+    prerequisites: [graph.paths]
+    estimatedMinutes: 50
+  "networkx/07_커뮤니티탐지":
+    outcomes: [graph.community]
+    prerequisites: [graph.paths]
+    estimatedMinutes: 55
+  "networkx/08_그래프알고리즘":
+    outcomes: [graph.algorithms]
+    prerequisites: [graph.algorithms]
+    estimatedMinutes: 55
+  "networkx/09_랜덤그래프모델":
+    outcomes: [graph.algorithms]
+    prerequisites: [graph.algorithms]
+    estimatedMinutes: 50
+  "networkx/10_종합네트워크프로젝트":
+    outcomes: []
+    prerequisites: [graph.community, graph.algorithms]
+    estimatedMinutes: 80
+
+  # regex 트랙
+  "regex/00_정규표현식소개":
+    outcomes: [automation.regex]
+    prerequisites: [python.strings]
+    estimatedMinutes: 35
+  "regex/01_이메일주소추출":
+    outcomes: [automation.regex, automation.textExtraction]
+    prerequisites: [automation.regex]
+    estimatedMinutes: 45
+  "regex/02_전화번호형식통일":
+    outcomes: [automation.textExtraction]
+    prerequisites: [automation.regex]
+    estimatedMinutes: 45
+  "regex/03_URL구조분해":
+    outcomes: [automation.textExtraction]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 45
+  "regex/04_HTML태그제거":
+    outcomes: [automation.textExtraction]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 40
+  "regex/05_로그파일분석":
+    outcomes: [automation.textExtraction]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 55
+  "regex/06_날짜형식변환":
+    outcomes: [automation.textExtraction]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 45
+  "regex/07_개인정보마스킹":
+    outcomes: [automation.llmPreprocess]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 50
+  "regex/08_텍스트정제토큰화":
+    outcomes: [automation.llmPreprocess]
+    prerequisites: [automation.llmPreprocess]
+    estimatedMinutes: 55
+  "regex/09_고급패턴매칭":
+    outcomes: [automation.regex]
+    prerequisites: [automation.textExtraction]
+    estimatedMinutes: 60
+  "regex/10_LLM전처리파이프라인":
+    outcomes: [automation.llmPreprocess]
+    prerequisites: [automation.llmPreprocess]
+    estimatedMinutes: 80
+
+  # fileOps 트랙
+  "fileOps/01_pathlib경로감각":
+    outcomes: [automation.fileOps]
+    prerequisites: [builtins.fileSystem]
+    estimatedMinutes: 35
+  "fileOps/02_파일읽고쓰기":
+    outcomes: [automation.fileOps]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 35
+  "fileOps/03_디렉터리탐색":
+    outcomes: [automation.fileOps]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 40
+  "fileOps/04_복사이동이름변경":
+    outcomes: [automation.fileOps]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 40
+  "fileOps/05_안전삭제":
+    outcomes: [automation.fileOps]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 35
+  "fileOps/06_zip압축":
+    outcomes: [automation.fileBackup]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 40
+  "fileOps/07_백업과동기화":
+    outcomes: [automation.fileBackup]
+    prerequisites: [automation.fileBackup]
+    estimatedMinutes: 50
+  "fileOps/08_디렉터리정리":
+    outcomes: [automation.fileBackup]
+    prerequisites: [automation.fileBackup]
+    estimatedMinutes: 50
+  "fileOps/09_파일메타데이터":
+    outcomes: [automation.fileOps]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 35
+  "fileOps/10_종합다운로드폴더정리":
+    outcomes: [automation.fileBackup]
+    prerequisites: [automation.fileBackup]
+    estimatedMinutes: 70
+
+  # procCtl 트랙
+  "procCtl/01_subprocess기초":
+    outcomes: [automation.procCtl]
+    prerequisites: [builtins.subprocess]
+    estimatedMinutes: 35
+  "procCtl/02_인자전달과인용":
+    outcomes: [automation.procCtl]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 35
+  "procCtl/03_타임아웃과예외":
+    outcomes: [automation.procCtl]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 40
+  "procCtl/04_파이프와스트리밍":
+    outcomes: [automation.procCtl]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 45
+  "procCtl/05_환경변수와CWD":
+    outcomes: [automation.procCtl]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 35
+  "procCtl/06_외부도구래퍼":
+    outcomes: [automation.procCtl]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 45
+  "procCtl/07_psutil프로세스조회":
+    outcomes: [automation.procMonitoring]
+    prerequisites: [automation.procCtl]
+    estimatedMinutes: 40
+  "procCtl/08_시스템자원모니터링":
+    outcomes: [automation.procMonitoring]
+    prerequisites: [automation.procMonitoring]
+    estimatedMinutes: 45
+  "procCtl/09_프로세스종료와시그널":
+    outcomes: [automation.procMonitoring]
+    prerequisites: [automation.procMonitoring]
+    estimatedMinutes: 45
+  "procCtl/10_종합빌드러너":
+    outcomes: []
+    prerequisites: [automation.procCtl, automation.procMonitoring]
+    estimatedMinutes: 75
+
+  # watchSched 트랙
+  "watchSched/01_watchdog첫감시":
+    outcomes: [automation.watchSched]
+    prerequisites: [python.functions, builtins.fileSystem]
+    estimatedMinutes: 40
+  "watchSched/02_이벤트타입구분":
+    outcomes: [automation.watchSched]
+    prerequisites: [automation.watchSched]
+    estimatedMinutes: 35
+  "watchSched/03_디바운스와안정화":
+    outcomes: [automation.watchSched]
+    prerequisites: [automation.watchSched]
+    estimatedMinutes: 40
+  "watchSched/04_재귀감시와필터":
+    outcomes: [automation.watchSched]
+    prerequisites: [automation.watchSched]
+    estimatedMinutes: 40
+  "watchSched/05_schedule간단스케줄":
+    outcomes: [automation.scheduling]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "watchSched/06_APScheduler소개":
+    outcomes: [automation.scheduling]
+    prerequisites: [automation.scheduling]
+    estimatedMinutes: 40
+  "watchSched/07_cron표현식":
+    outcomes: [automation.scheduling]
+    prerequisites: [automation.scheduling]
+    estimatedMinutes: 35
+  "watchSched/08_영속스케줄":
+    outcomes: [automation.scheduling]
+    prerequisites: [automation.scheduling]
+    estimatedMinutes: 40
+  "watchSched/09_실패와재시도":
+    outcomes: [automation.scheduling]
+    prerequisites: [automation.scheduling]
+    estimatedMinutes: 40
+  "watchSched/10_종합폴더감시리포터":
+    outcomes: []
+    prerequisites: [automation.watchSched, automation.scheduling]
+    estimatedMinutes: 75
+
+  # inputCtl 트랙
+  "inputCtl/01_pyautogui안전장치":
+    outcomes: [automation.inputCtl]
+    prerequisites: [python.errorHandling]
+    estimatedMinutes: 35
+  "inputCtl/02_화면크기와좌표":
+    outcomes: [automation.inputCtl]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 30
+  "inputCtl/03_마우스이동과클릭":
+    outcomes: [automation.inputCtl]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 40
+  "inputCtl/04_키보드입력":
+    outcomes: [automation.inputCtl]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 40
+  "inputCtl/05_스크린샷영역":
+    outcomes: [automation.screenInteraction]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 35
+  "inputCtl/06_이미지매치":
+    outcomes: [automation.screenInteraction]
+    prerequisites: [automation.screenInteraction]
+    estimatedMinutes: 50
+  "inputCtl/07_클립보드":
+    outcomes: [automation.screenInteraction]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 25
+  "inputCtl/08_pynput리스너":
+    outcomes: [automation.inputCtl]
+    prerequisites: [automation.inputCtl]
+    estimatedMinutes: 45
+  "inputCtl/09_상태기반자동화":
+    outcomes: [automation.screenInteraction]
+    prerequisites: [automation.screenInteraction]
+    estimatedMinutes: 55
+  "inputCtl/10_종합화면점검":
+    outcomes: []
+    prerequisites: [automation.inputCtl, automation.screenInteraction]
+    estimatedMinutes: 75
+
+  # pillow 트랙
+  "pillow/00_Pillow소개":
+    outcomes: [image.pillowBasics]
+    prerequisites: [python.modulesAndIo]
+    estimatedMinutes: 30
+  "pillow/01_꽃사진탐색기":
+    outcomes: [image.pillowBasics]
+    prerequisites: [image.pillowBasics]
+    estimatedMinutes: 40
+  "pillow/02_중국풍경편집기":
+    outcomes: [image.pillowBasics]
+    prerequisites: [image.pillowBasics]
+    estimatedMinutes: 45
+  "pillow/03_흑백사진변환기":
+    outcomes: [image.filters]
+    prerequisites: [image.pillowBasics]
+    estimatedMinutes: 40
+  "pillow/04_사진필터스튜디오":
+    outcomes: [image.filters]
+    prerequisites: [image.filters]
+    estimatedMinutes: 50
+  "pillow/05_밝기대비조절기":
+    outcomes: [image.filters]
+    prerequisites: [image.filters]
+    estimatedMinutes: 45
+  "pillow/06_RGB채널분석기":
+    outcomes: [image.filters]
+    prerequisites: [image.filters]
+    estimatedMinutes: 45
+  "pillow/07_워터마크생성기":
+    outcomes: [image.composition]
+    prerequisites: [image.pillowBasics]
+    estimatedMinutes: 50
+  "pillow/08_도형아트생성기":
+    outcomes: [image.composition]
+    prerequisites: [image.composition]
+    estimatedMinutes: 50
+  "pillow/09_포토콜라주메이커":
+    outcomes: [image.composition]
+    prerequisites: [image.composition]
+    estimatedMinutes: 55
+  "pillow/10_종합이미지에디터":
+    outcomes: []
+    prerequisites: [image.filters, image.composition]
+    estimatedMinutes: 80
+
+  # opencv 트랙
+  "opencv/00_OpenCV소개":
+    outcomes: [vision.opencvBasics]
+    prerequisites: [numpy.arrayOps]
+    estimatedMinutes: 35
+  "opencv/01_이미지구조탐색기":
+    outcomes: [vision.opencvBasics]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 45
+  "opencv/02_색공간변환기":
+    outcomes: [vision.opencvBasics]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 45
+  "opencv/03_기하학적변환기":
+    outcomes: [vision.opencvBasics]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 45
+  "opencv/04_이미지필터랩":
+    outcomes: [vision.filters]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 50
+  "opencv/05_에지검출기":
+    outcomes: [vision.filters]
+    prerequisites: [vision.filters]
+    estimatedMinutes: 50
+  "opencv/06_이진화스튜디오":
+    outcomes: [vision.filters]
+    prerequisites: [vision.filters]
+    estimatedMinutes: 45
+  "opencv/07_모폴로지연산기":
+    outcomes: [vision.filters]
+    prerequisites: [vision.filters]
+    estimatedMinutes: 50
+  "opencv/08_히스토그램분석기":
+    outcomes: [vision.features]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 50
+  "opencv/09_컨투어탐지기":
+    outcomes: [vision.features]
+    prerequisites: [vision.filters]
+    estimatedMinutes: 55
+  "opencv/10_종합비전프로젝트":
+    outcomes: []
+    prerequisites: [vision.features, vision.filters]
+    estimatedMinutes: 90
