@@ -4,7 +4,6 @@ meta:
   - numpy
   - pandas
   - plotly
-  - scikit-learn
   - seaborn
   - statsmodels
   id: statsmodels_10

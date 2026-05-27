@@ -1,6 +1,5 @@
 meta:
   packages:
-  - numpy
   - scikit-learn
   id: sklearn_00
   title: sklearn소개

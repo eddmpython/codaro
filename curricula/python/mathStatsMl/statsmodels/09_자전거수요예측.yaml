@@ -3,7 +3,6 @@ meta:
   - numpy
   - pandas
   - plotly
-  - scikit-learn
   - statsmodels
   id: statsmodels_09
   title: 자전거수요예측

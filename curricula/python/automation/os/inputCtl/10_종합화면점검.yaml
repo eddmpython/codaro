@@ -7,7 +7,6 @@ meta:
   audience: GUI 자동화에 입문하는 Python 학습자
   packages:
     - pyautogui
-    - pillow
     - pyperclip
   tags:
     - capstone
@@ -31,8 +30,8 @@ intro:
       - label: 종합 보고 + 클립보드
         detail: 결과 dict를 JSON 직렬화해 클립보드에 올리고 다시 받아 보고의 라운드트립을 검증한다.
     runtime:
-      - label: pyautogui, pillow, pyperclip 패키지 필요
-        detail: meta.packages의 세 라이브러리가 로컬에 준비돼야 한다.
+      - label: pyautogui와 pyperclip 패키지 필요
+        detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
       - label: GUI 세션과 시스템 클립보드
         detail: 실 호출이 마우스/화면/클립보드를 잠시 사용하므로 다른 작업과 겹치지 않게 한다.
 sections:

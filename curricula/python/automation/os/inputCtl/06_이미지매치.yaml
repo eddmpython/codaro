@@ -8,7 +8,6 @@ meta:
   packages:
     - pyautogui
     - pillow
-    - opencv-python
   tags:
     - pyautogui
     - locate
@@ -33,8 +32,8 @@ intro:
     runtime:
       - label: pyautogui와 pillow 패키지 필요
         detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
-      - label: opencv-python 권장
-        detail: pyautogui.locate는 opencv-python이 있을 때 더 빠르게 동작한다.
+      - label: 메모리 안 매치
+        detail: snippet은 파일 입출력 없이 PIL.Image 객체끼리 매치해 학습 결정성을 유지한다.
 sections:
   - id: build-haystack
     title: 합성 haystack 만들기

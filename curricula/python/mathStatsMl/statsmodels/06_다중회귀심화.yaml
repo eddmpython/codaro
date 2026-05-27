@@ -4,7 +4,6 @@ meta:
   - matplotlib
   - numpy
   - pandas
-  - plotly
   - seaborn
   - statsmodels
   id: statsmodels_06

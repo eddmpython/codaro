@@ -1,6 +1,5 @@
 meta:
   packages:
-  - matplotlib
   - numpy
   - opencv-python
   - scikit-learn

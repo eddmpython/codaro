@@ -2,7 +2,6 @@ meta:
   packages:
   - pandas
   - plotly
-  - statsmodels
   id: plotly_10
   title: 종합대시보드
   order: 10

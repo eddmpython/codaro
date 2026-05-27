@@ -7,7 +7,6 @@ meta:
   audience: GUI 자동화에 입문하는 Python 학습자
   packages:
     - pyautogui
-    - pillow
   tags:
     - pyautogui
     - screenshot
@@ -30,8 +29,8 @@ intro:
       - label: 종합 캡처 함수
         detail: 영역, 저장 경로, 파일 크기를 한 dict로 묶어 자동화 캡처 결과를 보고한다.
     runtime:
-      - label: pyautogui와 pillow 패키지 필요
-        detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 설치되면 PIL은 의존성으로 함께 들어온다.
       - label: GUI 세션 필요
         detail: 실제 디스플레이가 연결돼야 screenshot이 의미 있는 이미지를 돌려준다.
 sections:

@@ -2,7 +2,6 @@ meta:
   packages:
   - pandas
   - plotly
-  - statsmodels
   id: plotly_03
   title: 붓꽃품종분류
   order: 3

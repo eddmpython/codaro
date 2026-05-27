@@ -1,7 +1,6 @@
 meta:
   packages:
   - matplotlib
-  - numpy
   - pandas
   - seaborn
   id: matplotlib_05
