@@ -1,0 +1,363 @@
+meta:
+  id: inputCtl_10
+  title: 종합 화면 점검 매크로
+  order: 10
+  category: inputCtl
+  difficulty: medium
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - macro
+    - project
+    - report
+intro:
+  direction: GUI 자동화의 안전 설정, 좌표, 입력 시퀀스, 결정 분기, 결과 영속화를 한 매크로 함수에 모아 종합 화면 점검 프로젝트를 완성한다.
+  benefits:
+    - 안전 설정과 시퀀스를 한 함수에서 함께 다룬다.
+    - 상태에 따른 시퀀스 결정을 매크로 안에 흡수한다.
+    - 종합 결과를 JSON 리포트로 영속화해 사이클을 마무리한다.
+    - 같은 사이클을 두 번 실행해도 같은 보고 구조를 유지한다.
+  diagram:
+    steps:
+      - label: 안전 설정 적용
+        detail: PAUSE와 FAILSAFE 설정 dict를 매크로 시작 시 만든다.
+      - label: 상태 분기 시퀀스
+        detail: 상태에 따라 다른 시퀀스를 결정해 결과 dict에 모은다.
+      - label: 결과 dict 정리
+        detail: settings, sequence, generatedAt 세 키로 종합 결과를 표현한다.
+      - label: JSON 리포트 저장
+        detail: tempfile 안의 reports/last.json에 결과를 저장하고 다시 읽어 검증한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: json, tempfile, pathlib, datetime 외에는 외부 패키지가 필요 없다.
+      - label: assert 기반 종합 검증
+        detail: 매크로 결과와 복원된 JSON dict를 assert로 비교한다.
+sections:
+  - id: settings-snapshot
+    title: 안전 설정 스냅샷
+    structuredPrimary: true
+    subtitle: PAUSE, FAILSAFE 표기
+    goal: 매크로 시작 시 사용할 안전 설정을 dict 스냅샷으로 만든다.
+    why: 자동화 매크로는 시작 시점 설정을 영구적으로 기록해야 사고 후 진단이 빠르다.
+    explanation: 설정 스냅샷은 pause와 failsafe 두 키를 가진 dict다. 매크로 안에서는 이 dict를 그대로 결과에 포함한다. 같은 dict 형태를 두 번 사용해도 안전하다.
+    tips:
+      - 설정 스냅샷은 사이클 마지막에 다시 비교해 변경 여부를 확인할 수 있다.
+      - 운영자에게 보여 줄 보고서의 첫 줄로 가장 자주 사용된다.
+    snippet: |-
+      settings = {"pause": 0.05, "failsafe": True}
+
+      assert settings == {"pause": 0.05, "failsafe": True}
+      settings
+    exercise:
+      prompt: PAUSE=0.3과 FAILSAFE=True 설정 스냅샷 dict를 만들고 두 키 값이 정확한지 검증하세요.
+      starterCode: |-
+        settings = {"pause": ___, "failsafe": True}
+
+        assert settings == {"pause": 0.3, "failsafe": True}
+        settings
+      solution: |-
+        settings = {"pause": 0.3, "failsafe": True}
+
+        assert settings == {"pause": 0.3, "failsafe": True}
+        settings
+      hints:
+        - pause 값은 부동소수 0.3이다.
+        - dict 키는 영문 소문자다.
+      check:
+        noError: dict 구성이 끝나야 한다.
+        resultCheck: settings의 pause가 0.3, failsafe가 True여야 한다.
+    check:
+      noError: 설정 스냅샷 dict 구성이 끝나야 한다.
+      resultCheck: settings dict가 pause와 failsafe를 정확히 담아야 한다.
+  - id: macro-function
+    title: 매크로 함수 정의
+    structuredPrimary: true
+    subtitle: 상태 분기 흡수
+    goal: 상태에 따라 시퀀스를 만들고 결과 dict를 돌려주는 매크로 함수를 정의한다.
+    why: 매크로 함수가 한 곳에서 모든 분기를 흡수해야 자동화 코드가 한 줄로 운영된다.
+    explanation: macroDecide 함수는 상태 dict와 설정 스냅샷을 받아 status에 따라 시퀀스를 만들고 settings, sequence를 한 dict로 돌려준다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다.
+    tips:
+      - 매크로 함수의 인자는 짧고 명확한 이름으로 둔다.
+      - 결과 dict는 자동화 보고서의 한 행이 된다.
+    snippet: |-
+      def macroDecide(state: dict, settings: dict) -> dict:
+          if state["status"] == "ready":
+              sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+          elif state["status"] == "error":
+              sequence = [{"type": "press", "key": "esc"}]
+          else:
+              sequence = []
+          return {"settings": settings, "sequence": sequence}
+
+
+      result = macroDecide({"status": "ready"}, {"pause": 0.05, "failsafe": True})
+
+      assert result["settings"] == {"pause": 0.05, "failsafe": True}
+      assert result["sequence"][0] == {"type": "click"}
+      result
+    exercise:
+      prompt: macroDecide를 status="error" 상태로 호출하면 sequence가 [press esc] 한 항목이 되는지 검증하세요.
+      starterCode: |-
+        def macroDecide(state: dict, settings: dict) -> dict:
+            if state["status"] == "ready":
+                sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+            elif state["status"] == "error":
+                sequence = [{"type": "press", "key": "___"}]
+            else:
+                sequence = []
+            return {"settings": settings, "sequence": sequence}
+
+
+        result = macroDecide({"status": "error"}, {"pause": 0.1, "failsafe": True})
+
+        assert result["sequence"] == [{"type": "press", "key": "esc"}]
+        result
+      solution: |-
+        def macroDecide(state: dict, settings: dict) -> dict:
+            if state["status"] == "ready":
+                sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+            elif state["status"] == "error":
+                sequence = [{"type": "press", "key": "esc"}]
+            else:
+                sequence = []
+            return {"settings": settings, "sequence": sequence}
+
+
+        result = macroDecide({"status": "error"}, {"pause": 0.1, "failsafe": True})
+
+        assert result["sequence"] == [{"type": "press", "key": "esc"}]
+        result
+      hints:
+        - error 상태의 press 키는 esc다.
+        - sequence는 한 항목짜리 리스트다.
+      check:
+        noError: macroDecide 호출이 정상적으로 끝나야 한다.
+        resultCheck: result.sequence가 [press esc] 한 항목이어야 한다.
+    check:
+      noError: macroDecide 호출이 끝나야 한다.
+      resultCheck: result가 settings와 sequence 두 키를 정확히 담아야 한다.
+  - id: persist-report
+    title: JSON 리포트 영속화
+    structuredPrimary: true
+    subtitle: tempfile reports 폴더
+    goal: 매크로 결과를 reports/last.json에 저장하고 다시 읽어 영속성을 확인한다.
+    why: 종합 자동화 보고는 디스크에 남아야 사고 후 추적과 운영 모니터링이 가능하다.
+    explanation: persistMacro 함수는 매크로 결과 dict와 base 폴더를 받아 reports/last.json에 JSON으로 저장한다. payload에 generatedAt이 추가되어 시각 정보가 함께 보존된다. 같은 셀에서 다시 읽으면 원본 dict가 그대로 복원된다.
+    tips:
+      - generatedAt 값은 항상 UTC ISO로 두어 자동화 표준을 따른다.
+      - reports 디렉터리는 매번 새로 만들어 다른 사이클과 충돌하지 않게 한다.
+    snippet: |-
+      import json
+      import tempfile
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+
+      def persistMacro(result: dict, base: Path) -> dict:
+          reportsDir = base / "reports"
+          reportsDir.mkdir(parents=True, exist_ok=True)
+          payload = {**result, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+          target = reportsDir / "last.json"
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          return json.loads(target.read_text(encoding="utf-8"))
+
+
+      with tempfile.TemporaryDirectory() as td:
+          restored = persistMacro(
+              {"settings": {"pause": 0.05, "failsafe": True}, "sequence": [{"type": "click"}]},
+              Path(td),
+          )
+
+      assert restored["sequence"] == [{"type": "click"}]
+      assert "generatedAt" in restored
+      restored["sequence"]
+    exercise:
+      prompt: persistMacro에 빈 sequence와 안전 설정 dict를 넘기면 restored가 같은 sequence와 generatedAt 키를 가지는지 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def persistMacro(result: dict, base: Path) -> dict:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = {**result, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return json.loads(target.read_text(encoding="utf-8"))
+
+
+        with tempfile.TemporaryDirectory() as td:
+            restored = persistMacro(
+                {"settings": {"pause": 0.1, "failsafe": True}, "sequence": ___},
+                Path(td),
+            )
+
+        assert restored["sequence"] == []
+        assert "generatedAt" in restored
+        restored
+      solution: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def persistMacro(result: dict, base: Path) -> dict:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = {**result, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return json.loads(target.read_text(encoding="utf-8"))
+
+
+        with tempfile.TemporaryDirectory() as td:
+            restored = persistMacro(
+                {"settings": {"pause": 0.1, "failsafe": True}, "sequence": []},
+                Path(td),
+            )
+
+        assert restored["sequence"] == []
+        assert "generatedAt" in restored
+        restored
+      hints:
+        - 빈 리스트는 그냥 []로 표현한다.
+        - generatedAt 키가 항상 추가되어야 한다.
+      check:
+        noError: persistMacro 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: restored.sequence가 빈 리스트이고 generatedAt 키가 포함되어야 한다.
+    check:
+      noError: persistMacro 호출과 JSON 왕복이 끝나야 한다.
+      resultCheck: restored가 sequence와 generatedAt을 모두 담아야 한다.
+  - id: macro-cycle
+    title: 종합 매크로 사이클
+    structuredPrimary: true
+    subtitle: 결정 + 영속화
+    goal: 결정 함수와 JSON 영속화를 한 사이클로 묶어 종합 화면 점검 매크로 프로젝트를 완성한다.
+    why: 종합 사이클은 한 줄 호출로 시작과 끝이 명확해야 운영자가 신뢰하고 매크로를 운영에 올릴 수 있다.
+    explanation: runMacro 함수는 상태와 설정 스냅샷, base 폴더를 받아 macroDecide와 persistMacro를 차례로 호출한다. 결과 dict는 settings, sequence, reportPath를 포함한 자동화 표준 보고 형태다. 같은 입력으로 두 번 호출해도 같은 결과 dict 형태를 유지한다.
+    tips:
+      - 종합 사이클은 한 함수에서 모든 단계를 호출해 호출자가 단순해진다.
+      - reportPath 키는 자동화 보고서의 영속 위치를 직접 가리킨다.
+    snippet: |-
+      import json
+      import tempfile
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+
+      def runMacro(state: dict, settings: dict, base: Path) -> dict:
+          if state["status"] == "ready":
+              sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+          elif state["status"] == "error":
+              sequence = [{"type": "press", "key": "esc"}]
+          else:
+              sequence = []
+          payload = {
+              "settings": settings,
+              "sequence": sequence,
+              "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+          }
+          reportsDir = base / "reports"
+          reportsDir.mkdir(parents=True, exist_ok=True)
+          target = reportsDir / "last.json"
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          return {"settings": settings, "sequence": sequence, "reportPath": str(target.relative_to(base))}
+
+
+      with tempfile.TemporaryDirectory() as td:
+          report = runMacro(
+              {"status": "ready"},
+              {"pause": 0.05, "failsafe": True},
+              Path(td),
+          )
+
+      assert report["sequence"][0] == {"type": "click"}
+      assert report["reportPath"].endswith("last.json")
+      report
+    exercise:
+      prompt: runMacro를 status="error" 상태로 호출해 종합 결과 sequence가 [press esc]이고 reportPath가 last.json으로 끝나는지 종합 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def runMacro(state: dict, settings: dict, base: Path) -> dict:
+            if state["status"] == "ready":
+                sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+            elif state["status"] == "error":
+                sequence = [{"type": "press", "key": "esc"}]
+            else:
+                sequence = []
+            payload = {
+                "settings": settings,
+                "sequence": sequence,
+                "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+            }
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return {"settings": settings, "sequence": sequence, "reportPath": str(target.relative_to(base))}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = runMacro(
+                {"status": "error"},
+                {"pause": 0.1, "failsafe": True},
+                Path(td),
+            )
+
+        assert report["sequence"] == [{"type": "press", "key": "esc"}]
+        assert report["reportPath"].endswith("___")
+        report
+      solution: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def runMacro(state: dict, settings: dict, base: Path) -> dict:
+            if state["status"] == "ready":
+                sequence = [{"type": "click"}, {"type": "text", "text": "ok"}]
+            elif state["status"] == "error":
+                sequence = [{"type": "press", "key": "esc"}]
+            else:
+                sequence = []
+            payload = {
+                "settings": settings,
+                "sequence": sequence,
+                "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+            }
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return {"settings": settings, "sequence": sequence, "reportPath": str(target.relative_to(base))}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = runMacro(
+                {"status": "error"},
+                {"pause": 0.1, "failsafe": True},
+                Path(td),
+            )
+
+        assert report["sequence"] == [{"type": "press", "key": "esc"}]
+        assert report["reportPath"].endswith("last.json")
+        report
+      hints:
+        - reportPath는 reports/last.json 형태로 끝난다.
+        - error 상태의 sequence는 [press esc] 한 항목이다.
+      check:
+        noError: runMacro 호출이 종합 사이클로 끝나야 한다.
+        resultCheck: report의 sequence가 [press esc]이고 reportPath가 last.json으로 끝나야 한다.
+    check:
+      noError: 종합 매크로 사이클이 격리 공간에서 끝나야 한다.
+      resultCheck: report dict가 settings, sequence, reportPath 세 키를 정확히 담아야 한다.

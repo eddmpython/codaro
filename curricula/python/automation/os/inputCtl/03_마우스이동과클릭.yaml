@@ -1,0 +1,220 @@
+meta:
+  id: inputCtl_03
+  title: 마우스 이동과 클릭 계획
+  order: 3
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - mouse
+    - planning
+    - automation
+intro:
+  direction: 마우스 자동화의 입력을 dict로 표현하고 이동, 클릭, 드래그 시나리오를 시퀀스로 구성해 실행 전에 시각화한다.
+  benefits:
+    - 마우스 명령을 type, point, button 키를 가진 dict로 표준화한다.
+    - 이동, 클릭, 더블 클릭, 드래그 명령을 시퀀스로 만든다.
+    - 시퀀스를 사전 검토한 뒤에만 실제 자동화에 넘긴다.
+    - 종합 시퀀스 dict로 자동화 의도를 운영자에게 명시한다.
+  diagram:
+    steps:
+      - label: 명령 dict 표기
+        detail: type 키와 좌표, 버튼 정보를 가진 dict로 명령 한 개를 표현한다.
+      - label: 이동 명령 시퀀스
+        detail: moveTo 명령을 리스트에 담아 단계적으로 이동을 표현한다.
+      - label: 클릭과 더블 클릭
+        detail: click과 doubleClick 명령에 button 키를 더해 좌우 버튼을 구분한다.
+      - label: 종합 시나리오 정리
+        detail: 이동, 클릭, 드래그를 한 시퀀스로 묶고 운영자가 검토하는 dict를 만든다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: 명령 표현은 dict만 사용하므로 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 시퀀스 길이와 각 명령 dict를 assert로 비교한다.
+sections:
+  - id: command-shape
+    title: 마우스 명령 dict 모양
+    structuredPrimary: true
+    subtitle: type, point, button 키
+    goal: moveTo 명령을 type과 point 두 키로 가진 dict로 표현한다.
+    why: 명령 dict 표기를 통일하면 시퀀스 생성과 실행 단계를 분리해 운영 안전성이 높아진다.
+    explanation: 명령 dict는 항상 type 키를 첫 줄에 두고 추가 키로 인자를 표현한다. moveTo는 point 키를, click은 button 키를 추가로 갖는다. 자동화 코드가 같은 키 이름을 신뢰할 수 있도록 사전에 표기를 합의한다.
+    tips:
+      - 명령 키 이름은 짧고 명확하게 둔다.
+      - 자동화 시퀀스는 사람이 검토할 수 있는 형식으로 두는 편이 안전하다.
+    snippet: |-
+      command = {"type": "moveTo", "point": {"x": 120, "y": 80}}
+
+      assert command["type"] == "moveTo"
+      assert command["point"] == {"x": 120, "y": 80}
+      command
+    exercise:
+      prompt: type=moveTo, point x=300, y=240 인 명령 dict를 만들고 두 키 값을 검증하세요.
+      starterCode: |-
+        command = {"type": "moveTo", "point": {"x": ___, "y": 240}}
+
+        assert command["type"] == "moveTo"
+        assert command["point"] == {"x": 300, "y": 240}
+        command
+      solution: |-
+        command = {"type": "moveTo", "point": {"x": 300, "y": 240}}
+
+        assert command["type"] == "moveTo"
+        assert command["point"] == {"x": 300, "y": 240}
+        command
+      hints:
+        - x 좌표는 정수 300이다.
+        - command dict는 두 키 type와 point를 가진다.
+      check:
+        noError: dict 구성과 키 접근이 끝나야 한다.
+        resultCheck: command의 type과 point가 본문 기대값과 같아야 한다.
+    check:
+      noError: 명령 dict 구성과 키 접근이 끝나야 한다.
+      resultCheck: command의 type이 moveTo이고 point가 (120, 80)이어야 한다.
+  - id: click-button
+    title: 클릭 명령과 버튼 구분
+    structuredPrimary: true
+    subtitle: button 키 사용
+    goal: click 명령에 button 키를 더해 좌클릭과 우클릭을 구분한다.
+    why: 자동화 시나리오는 보통 좌우 버튼을 명확히 분리해야 컨텍스트 메뉴 동작과 일반 선택이 구분된다.
+    explanation: click 명령은 type 키 외에 point와 button 키를 가진다. button 값은 "left", "right", "middle" 중 하나다. 자동화 코드는 button 키가 없으면 좌클릭으로 가정한다.
+    tips:
+      - 좌클릭은 button 키 생략 또는 "left"가 표준이다.
+      - 우클릭은 컨텍스트 메뉴 호출 같은 상황에서 사용된다.
+    snippet: |-
+      command = {"type": "click", "point": {"x": 50, "y": 60}, "button": "right"}
+
+      assert command["button"] == "right"
+      command
+    exercise:
+      prompt: 좌클릭 명령을 만들되 button 키 값을 "left"로 명시하고 두 좌표 (100, 200)이 정확한지 검증하세요.
+      starterCode: |-
+        command = {"type": "click", "point": {"x": 100, "y": 200}, "button": "___"}
+
+        assert command["button"] == "left"
+        assert command["point"] == {"x": 100, "y": 200}
+        command
+      solution: |-
+        command = {"type": "click", "point": {"x": 100, "y": 200}, "button": "left"}
+
+        assert command["button"] == "left"
+        assert command["point"] == {"x": 100, "y": 200}
+        command
+      hints:
+        - button 값은 짧은 영문 문자열 left, right, middle 중 하나다.
+        - 명시적으로 left를 적으면 자동화 의도가 더 분명해진다.
+      check:
+        noError: click 명령 dict 구성이 정상적으로 끝나야 한다.
+        resultCheck: button이 "left"이고 point가 정확히 (100, 200)이어야 한다.
+    check:
+      noError: click 명령 dict 구성이 끝나야 한다.
+      resultCheck: button이 "right"이고 point 좌표가 본문 기대값과 같아야 한다.
+  - id: sequence
+    title: 이동과 클릭 시퀀스
+    structuredPrimary: true
+    subtitle: 리스트로 단계 표현
+    goal: 이동 후 클릭하는 시나리오를 dict 리스트로 표현한다.
+    why: 시퀀스로 표현된 시나리오는 운영자가 실행 전에 검토할 수 있어 GUI 자동화의 안전성을 크게 높인다.
+    explanation: 시퀀스는 dict 리스트다. 첫 항목이 이동, 두 번째가 클릭처럼 단계 순서를 명확히 한다. 같은 시퀀스를 함수에 넘기면 실행 흐름을 한 함수가 책임지므로 호출 측이 단순해진다.
+    tips:
+      - 시퀀스는 운영자 검토와 자동화 실행을 분리하는 표준 도구다.
+      - 한 시퀀스는 보통 한 화면 안의 단위 작업을 표현한다.
+    snippet: |-
+      sequence = [
+          {"type": "moveTo", "point": {"x": 100, "y": 100}},
+          {"type": "click", "point": {"x": 100, "y": 100}, "button": "left"},
+      ]
+      types = [step["type"] for step in sequence]
+
+      assert types == ["moveTo", "click"]
+      types
+    exercise:
+      prompt: 이동 두 번과 마지막 클릭으로 구성된 시퀀스를 만들고 types 리스트가 ["moveTo", "moveTo", "click"]인지 검증하세요.
+      starterCode: |-
+        sequence = [
+            {"type": "moveTo", "point": {"x": 50, "y": 50}},
+            {"type": "moveTo", "point": {"x": 100, "y": 100}},
+            {"type": "___", "point": {"x": 100, "y": 100}, "button": "left"},
+        ]
+        types = [step["type"] for step in sequence]
+
+        assert types == ["moveTo", "moveTo", "click"]
+        types
+      solution: |-
+        sequence = [
+            {"type": "moveTo", "point": {"x": 50, "y": 50}},
+            {"type": "moveTo", "point": {"x": 100, "y": 100}},
+            {"type": "click", "point": {"x": 100, "y": 100}, "button": "left"},
+        ]
+        types = [step["type"] for step in sequence]
+
+        assert types == ["moveTo", "moveTo", "click"]
+        types
+      hints:
+        - 마지막 단계 type 값은 click이다.
+        - 시퀀스 리스트 컴프리헨션이 type 값을 모은다.
+      check:
+        noError: 시퀀스 구성이 끝나야 한다.
+        resultCheck: types 리스트가 본문 기대값과 같아야 한다.
+    check:
+      noError: 시퀀스 구성이 끝나야 한다.
+      resultCheck: types 리스트가 ["moveTo", "click"]이어야 한다.
+  - id: scenario-summary
+    title: 종합 시나리오 정리
+    structuredPrimary: true
+    subtitle: 드래그 포함 검토 dict
+    goal: 이동, 더블 클릭, 드래그를 묶은 시나리오 dict를 운영자 검토용으로 정리한다.
+    why: 종합 자동화 시나리오는 사람이 실행 전에 한눈에 검토할 수 있어야 사고를 막을 수 있어 표준 dict 형태가 필요하다.
+    explanation: scenario dict는 name과 steps 두 키를 가진다. steps는 type, point, button, duration 같은 키를 가진 dict 리스트다. 드래그는 type=dragTo와 toPoint 키로 표현한다. 같은 dict는 자동화 실행기에 그대로 입력된다.
+    tips:
+      - 시나리오 이름은 사람이 읽기 쉬운 짧은 문장으로 둔다.
+      - 시간 인자는 duration 키 부동소수로 표현한다.
+    snippet: |-
+      scenario = {
+          "name": "주문 더블 클릭과 드래그",
+          "steps": [
+              {"type": "moveTo", "point": {"x": 100, "y": 200}, "duration": 0.3},
+              {"type": "doubleClick", "point": {"x": 100, "y": 200}, "button": "left"},
+              {"type": "dragTo", "point": {"x": 100, "y": 200}, "toPoint": {"x": 300, "y": 400}, "duration": 0.5},
+          ],
+      }
+      summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+      assert summary == {"name": "주문 더블 클릭과 드래그", "stepCount": 3}
+      summary
+    exercise:
+      prompt: 같은 형식으로 "검토 사이클" 이름과 두 단계를 가진 scenario dict를 만들고 stepCount가 2인지 종합 검증하세요.
+      starterCode: |-
+        scenario = {
+            "name": "___",
+            "steps": [
+                {"type": "moveTo", "point": {"x": 10, "y": 20}, "duration": 0.2},
+                {"type": "click", "point": {"x": 10, "y": 20}, "button": "left"},
+            ],
+        }
+        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+        assert summary == {"name": "검토 사이클", "stepCount": 2}
+        summary
+      solution: |-
+        scenario = {
+            "name": "검토 사이클",
+            "steps": [
+                {"type": "moveTo", "point": {"x": 10, "y": 20}, "duration": 0.2},
+                {"type": "click", "point": {"x": 10, "y": 20}, "button": "left"},
+            ],
+        }
+        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+        assert summary == {"name": "검토 사이클", "stepCount": 2}
+        summary
+      hints:
+        - 시나리오 이름 문자열은 검토 사이클이다.
+        - steps 리스트 길이가 2이면 stepCount도 2다.
+      check:
+        noError: scenario dict 구성과 summary 추출이 끝나야 한다.
+        resultCheck: summary가 종합 검토 결과로 이름과 단계 수를 정확히 담아야 한다.
+    check:
+      noError: 종합 시나리오 dict 구성과 summary 추출이 끝나야 한다.
+      resultCheck: summary가 본문 시나리오 이름과 단계 수를 정확히 담아야 한다.

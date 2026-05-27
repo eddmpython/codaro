@@ -1,0 +1,314 @@
+meta:
+  id: inputCtl_08
+  title: pynput 리스너 패턴
+  order: 8
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - listener
+    - events
+    - automation
+intro:
+  direction: 키 이벤트 시퀀스를 dict 리스트로 정의하고 핸들러 함수에 전달해 리스너 패턴의 분류와 종합 결과 흐름을 학습한다.
+  benefits:
+    - 키 이벤트를 type과 key 키를 가진 dict로 표준화한다.
+    - 핸들러 함수가 같은 시그니처로 모든 이벤트를 받는다.
+    - 특정 키 시퀀스에서 리스너를 중단하는 분기를 만든다.
+    - 종합 결과 dict로 자동화 보고 표준 형태를 완성한다.
+  diagram:
+    steps:
+      - label: 이벤트 dict 표기
+        detail: type과 key 키로 이벤트 한 개를 표현한다.
+      - label: 이벤트 시퀀스 처리
+        detail: 시퀀스 리스트를 핸들러에 한 번에 넘긴다.
+      - label: 정지 키 분기
+        detail: 특정 키가 들어오면 break로 시퀀스 처리를 멈춘다.
+      - label: 종합 결과 정리
+        detail: 처리한 이벤트 리스트와 정지 여부를 dict로 보고한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: 이벤트 표현과 처리는 dict, list 연산만 사용한다.
+      - label: assert 기반 검증
+        detail: 처리 결과와 정지 여부를 assert로 비교한다.
+sections:
+  - id: event-shape
+    title: 이벤트 dict 표기
+    structuredPrimary: true
+    subtitle: type, key 두 키
+    goal: 키 이벤트를 type과 key 두 키로 표현한다.
+    why: 이벤트 표기를 통일하면 후속 자동화 함수가 같은 형태를 신뢰할 수 있다.
+    explanation: 키 이벤트는 type 값에 press 또는 release, key 값에 키 이름 문자열을 갖는다. 자동화 코드는 type을 기준으로 분기한다.
+    tips:
+      - press 이벤트와 release 이벤트는 짝으로 발생하는 것이 일반적이다.
+      - key 이름은 짧은 영문 표준이어야 자동화 코드가 안정적이다.
+    snippet: |-
+      event = {"type": "press", "key": "a"}
+
+      assert event["type"] == "press"
+      assert event["key"] == "a"
+      event
+    exercise:
+      prompt: type=release, key="esc"인 이벤트 dict를 만들고 두 키 값을 검증하세요.
+      starterCode: |-
+        event = {"type": "___", "key": "esc"}
+
+        assert event["type"] == "release"
+        assert event["key"] == "esc"
+        event
+      solution: |-
+        event = {"type": "release", "key": "esc"}
+
+        assert event["type"] == "release"
+        assert event["key"] == "esc"
+        event
+      hints:
+        - type 값은 release다.
+        - key 값은 짧은 영문 esc다.
+      check:
+        noError: 이벤트 dict 구성이 끝나야 한다.
+        resultCheck: event의 type이 release, key가 esc여야 한다.
+    check:
+      noError: dict 구성이 끝나야 한다.
+      resultCheck: event의 type이 press이고 key가 a여야 한다.
+  - id: handle-sequence
+    title: 이벤트 시퀀스 처리
+    structuredPrimary: true
+    subtitle: 핸들러 함수 호출
+    goal: 이벤트 dict 리스트를 핸들러 함수가 처리해 결과 리스트에 누적한다.
+    why: 자동화는 보통 이벤트 시퀀스를 한 번에 다루므로 핸들러 패턴이 표준 도구다.
+    explanation: handleEvents 함수는 이벤트 리스트와 핸들러를 받아 차례로 호출한다. 핸들러는 외부 리스트에 결과를 append한다. 같은 패턴은 pynput 리스너에서도 동일하게 적용된다.
+    tips:
+      - 핸들러는 부수효과로 결과를 모으는 단순한 형태가 좋다.
+      - 시퀀스를 함수로 분리하면 단위 테스트가 쉬워진다.
+    snippet: |-
+      events = [
+          {"type": "press", "key": "a"},
+          {"type": "press", "key": "b"},
+          {"type": "release", "key": "a"},
+      ]
+      processed: list[str] = []
+
+
+      def handle(event: dict) -> None:
+          processed.append(f"{event['type']}:{event['key']}")
+
+
+      for event in events:
+          handle(event)
+
+      assert processed == ["press:a", "press:b", "release:a"]
+      processed
+    exercise:
+      prompt: 같은 패턴으로 press:x, press:y, release:y 세 이벤트가 processed 리스트에 정확한 순서로 들어가는지 검증하세요.
+      starterCode: |-
+        events = [
+            {"type": "press", "key": "x"},
+            {"type": "press", "key": "y"},
+            {"type": "release", "key": "y"},
+        ]
+        processed: list[str] = []
+
+
+        def handle(event: dict) -> None:
+            processed.append(f"{event['___']}:{event['key']}")
+
+
+        for event in events:
+            handle(event)
+
+        assert processed == ["press:x", "press:y", "release:y"]
+        processed
+      solution: |-
+        events = [
+            {"type": "press", "key": "x"},
+            {"type": "press", "key": "y"},
+            {"type": "release", "key": "y"},
+        ]
+        processed: list[str] = []
+
+
+        def handle(event: dict) -> None:
+            processed.append(f"{event['type']}:{event['key']}")
+
+
+        for event in events:
+            handle(event)
+
+        assert processed == ["press:x", "press:y", "release:y"]
+        processed
+      hints:
+        - dict 키 이름은 type이다.
+        - 세 이벤트가 본문 순서대로 processed 리스트에 들어간다.
+      check:
+        noError: handle 함수 세 번 호출이 끝나야 한다.
+        resultCheck: processed 리스트가 세 문자열을 본문 순서대로 담아야 한다.
+    check:
+      noError: 이벤트 시퀀스 처리가 끝나야 한다.
+      resultCheck: processed 리스트가 세 이벤트를 본문 순서대로 담아야 한다.
+  - id: stop-key
+    title: 정지 키 분기
+    structuredPrimary: true
+    subtitle: 특정 키에서 break
+    goal: 특정 키가 들어오면 break로 시퀀스 처리를 멈춘다.
+    why: 자동화 리스너는 사용자가 정지 키를 눌렀을 때 즉시 멈춰야 안전한 통제 흐름이 만들어진다.
+    explanation: stopKey 인자는 정지 키 이름이다. 같은 키가 press 이벤트로 들어오면 핸들러는 더 이상 처리하지 않고 루프를 종료한다. 종료 이유는 결과 dict의 stopped 키로 표시한다.
+    tips:
+      - 정지 키는 보통 esc 또는 ctrl+c와 매핑된다.
+      - break는 같은 루프를 즉시 종료해 후속 이벤트가 처리되지 않게 한다.
+    snippet: |-
+      events = [
+          {"type": "press", "key": "a"},
+          {"type": "press", "key": "esc"},
+          {"type": "press", "key": "b"},
+      ]
+      processed: list[str] = []
+      stopped = False
+      for event in events:
+          if event["type"] == "press" and event["key"] == "esc":
+              stopped = True
+              break
+          processed.append(event["key"])
+
+      assert processed == ["a"]
+      assert stopped is True
+      processed
+    exercise:
+      prompt: 정지 키를 "esc"로 두고 (x, y, esc, z) 시퀀스를 처리하면 processed가 ["x", "y"]가 되고 stopped가 True인지 검증하세요.
+      starterCode: |-
+        events = [
+            {"type": "press", "key": "x"},
+            {"type": "press", "key": "y"},
+            {"type": "press", "key": "esc"},
+            {"type": "press", "key": "z"},
+        ]
+        processed: list[str] = []
+        stopped = False
+        for event in events:
+            if event["type"] == "press" and event["key"] == "___":
+                stopped = True
+                break
+            processed.append(event["key"])
+
+        assert processed == ["x", "y"]
+        assert stopped is True
+        processed
+      solution: |-
+        events = [
+            {"type": "press", "key": "x"},
+            {"type": "press", "key": "y"},
+            {"type": "press", "key": "esc"},
+            {"type": "press", "key": "z"},
+        ]
+        processed: list[str] = []
+        stopped = False
+        for event in events:
+            if event["type"] == "press" and event["key"] == "esc":
+                stopped = True
+                break
+            processed.append(event["key"])
+
+        assert processed == ["x", "y"]
+        assert stopped is True
+        processed
+      hints:
+        - 정지 키 이름은 esc 문자열이다.
+        - esc 이후 z 이벤트는 처리되지 않는다.
+      check:
+        noError: 정지 분기 루프가 정상적으로 끝나야 한다.
+        resultCheck: processed 리스트가 두 키만 담고 stopped가 True여야 한다.
+    check:
+      noError: 정지 분기 루프가 정상적으로 끝나야 한다.
+      resultCheck: processed가 ["a"]이고 stopped가 True여야 한다.
+  - id: listener-summary
+    title: 종합 리스너 결과 정리
+    structuredPrimary: true
+    subtitle: 함수로 묶기
+    goal: 시퀀스 처리와 정지 분기를 한 함수로 묶어 자동화 표준 dict 보고를 만든다.
+    why: 종합 결과는 운영자가 자동화 한 사이클을 한눈에 검토할 수 있게 만든다.
+    explanation: runListener 함수는 이벤트 리스트와 정지 키를 받아 processed 리스트와 stopped 여부를 dict로 돌려준다. 결과 dict 키 이름은 자동화 보고 표준에 맞춘다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다.
+    tips:
+      - 종합 dict는 자동화 화면에 한 줄로 표시할 수 있을 만큼 단순하게 둔다.
+      - stopped 값을 운영자가 보면 자동화 통제 흐름이 명확해진다.
+    snippet: |-
+      def runListener(events: list, stopKey: str) -> dict:
+          processed: list[str] = []
+          stopped = False
+          for event in events:
+              if event["type"] == "press" and event["key"] == stopKey:
+                  stopped = True
+                  break
+              processed.append(event["key"])
+          return {"processed": processed, "stopped": stopped}
+
+
+      report = runListener(
+          [
+              {"type": "press", "key": "a"},
+              {"type": "press", "key": "esc"},
+          ],
+          stopKey="esc",
+      )
+
+      assert report == {"processed": ["a"], "stopped": True}
+      report
+    exercise:
+      prompt: runListener를 stopKey="q"로 호출해 (a, b, q, c) 시퀀스 종합 결과가 processed ["a", "b"]와 stopped True가 되는지 검증하세요.
+      starterCode: |-
+        def runListener(events: list, stopKey: str) -> dict:
+            processed: list[str] = []
+            stopped = False
+            for event in events:
+                if event["type"] == "press" and event["key"] == ___:
+                    stopped = True
+                    break
+                processed.append(event["key"])
+            return {"processed": processed, "stopped": stopped}
+
+
+        report = runListener(
+            [
+                {"type": "press", "key": "a"},
+                {"type": "press", "key": "b"},
+                {"type": "press", "key": "q"},
+                {"type": "press", "key": "c"},
+            ],
+            stopKey="q",
+        )
+
+        assert report == {"processed": ["a", "b"], "stopped": True}
+        report
+      solution: |-
+        def runListener(events: list, stopKey: str) -> dict:
+            processed: list[str] = []
+            stopped = False
+            for event in events:
+                if event["type"] == "press" and event["key"] == stopKey:
+                    stopped = True
+                    break
+                processed.append(event["key"])
+            return {"processed": processed, "stopped": stopped}
+
+
+        report = runListener(
+            [
+                {"type": "press", "key": "a"},
+                {"type": "press", "key": "b"},
+                {"type": "press", "key": "q"},
+                {"type": "press", "key": "c"},
+            ],
+            stopKey="q",
+        )
+
+        assert report == {"processed": ["a", "b"], "stopped": True}
+        report
+      hints:
+        - 정지 키 비교는 함수 인자 stopKey와 한다.
+        - 정지 후 c 이벤트는 무시된다.
+      check:
+        noError: runListener 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: report가 processed ["a", "b"], stopped True를 정확히 담아야 한다.
+    check:
+      noError: 종합 리스너 함수가 끝나야 한다.
+      resultCheck: report가 처리한 키 리스트와 정지 여부를 종합 결과로 보여야 한다.

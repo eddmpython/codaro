@@ -1,0 +1,245 @@
+meta:
+  id: inputCtl_06
+  title: 이미지 매치 점수
+  order: 6
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - matching
+    - score
+    - automation
+intro:
+  direction: 이미지 매치 결과를 score와 box dict로 표현하고 임계값으로 확정 여부를 판정해 자동화 흐름의 신뢰 결정을 만든다.
+  benefits:
+    - 매치 결과 dict 표기를 표준화한다.
+    - confidence 임계값으로 확정과 미확정을 분기한다.
+    - 같은 임계값으로 여러 매치 결과를 일괄 처리한다.
+    - 종합 매치 결과 dict로 자동화 보고를 만든다.
+  diagram:
+    steps:
+      - label: 매치 결과 dict
+        detail: score, box 두 키로 한 매치 결과를 표현한다.
+      - label: 임계값 판정
+        detail: score가 임계값 이상이면 confirmed, 미만이면 rejected로 분류한다.
+      - label: 일괄 분류
+        detail: 매치 결과 리스트를 한 번에 분기 처리한다.
+      - label: 종합 매치 보고
+        detail: confirmed와 rejected 리스트를 가진 dict로 자동화 보고를 만든다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: dict와 list 연산만 사용한다.
+      - label: assert 기반 검증
+        detail: 매치 분류 결과와 임계값 비교를 assert로 확인한다.
+sections:
+  - id: match-shape
+    title: 매치 결과 dict 모양
+    structuredPrimary: true
+    subtitle: score, box 두 키
+    goal: 한 매치 결과를 score 부동소수와 box dict로 표현한다.
+    why: 매치 결과 표기를 통일하면 후속 자동화 흐름이 같은 키를 신뢰할 수 있다.
+    explanation: score는 0과 1 사이 부동소수다. box는 left, top, width, height 키를 가진 영역 dict다. 자동화 코드는 score와 box를 함께 받아 다음 클릭이나 보고에 사용한다.
+    tips:
+      - score 값이 1에 가까울수록 매치가 확실하다.
+      - 영역 dict 형식은 이전 레슨과 동일하게 유지한다.
+    snippet: |-
+      match = {"score": 0.92, "box": {"left": 100, "top": 50, "width": 80, "height": 40}}
+
+      assert match["score"] > 0.5
+      match
+    exercise:
+      prompt: score 0.85, box left=20, top=30, width=50, height=25인 매치 결과를 만들고 score가 0.5보다 큰지 검증하세요.
+      starterCode: |-
+        match = {"score": ___, "box": {"left": 20, "top": 30, "width": 50, "height": 25}}
+
+        assert match["score"] > 0.5
+        match
+      solution: |-
+        match = {"score": 0.85, "box": {"left": 20, "top": 30, "width": 50, "height": 25}}
+
+        assert match["score"] > 0.5
+        match
+      hints:
+        - score 값은 부동소수 0.85다.
+        - box dict의 키는 left, top, width, height다.
+      check:
+        noError: dict 구성이 끝나야 한다.
+        resultCheck: match의 score가 0.85여야 한다.
+    check:
+      noError: dict 구성이 끝나야 한다.
+      resultCheck: match의 score가 0.5 초과여야 한다.
+  - id: threshold
+    title: 임계값 판정 분기
+    structuredPrimary: true
+    subtitle: confirmed vs rejected
+    goal: 한 매치 결과를 임계값과 비교해 confirmed 또는 rejected 상태로 분류한다.
+    why: 자동화 흐름은 매치 점수에 따라 다음 단계로 갈지 다시 시도할지 결정해야 하므로 임계값 분기가 핵심이다.
+    explanation: classify 함수는 매치 dict와 임계값을 받아 score가 임계값 이상이면 status를 confirmed로 두고 아니면 rejected로 둔다. 결과 dict는 score, status, box 세 키를 가진 표준 형태다.
+    tips:
+      - 임계값은 일반적으로 0.8 정도가 안전하다.
+      - rejected 매치는 운영자 검토 큐로 보낸다.
+    snippet: |-
+      def classifyMatch(match: dict, threshold: float) -> dict:
+          status = "confirmed" if match["score"] >= threshold else "rejected"
+          return {"score": match["score"], "status": status, "box": match["box"]}
+
+
+      result = classifyMatch({"score": 0.92, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
+
+      assert result["status"] == "confirmed"
+      result
+    exercise:
+      prompt: score 0.65 매치를 임계값 0.8로 분류하면 status가 rejected가 되는지 검증하세요.
+      starterCode: |-
+        def classifyMatch(match: dict, threshold: float) -> dict:
+            status = "confirmed" if match["score"] >= threshold else "___"
+            return {"score": match["score"], "status": status, "box": match["box"]}
+
+
+        result = classifyMatch({"score": 0.65, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
+
+        assert result["status"] == "rejected"
+        result
+      solution: |-
+        def classifyMatch(match: dict, threshold: float) -> dict:
+            status = "confirmed" if match["score"] >= threshold else "rejected"
+            return {"score": match["score"], "status": status, "box": match["box"]}
+
+
+        result = classifyMatch({"score": 0.65, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
+
+        assert result["status"] == "rejected"
+        result
+      hints:
+        - rejected 상태는 임계값 미만 매치에 부여된다.
+        - 두 상태 이름은 confirmed와 rejected 두 값이다.
+      check:
+        noError: classifyMatch 호출이 정상적으로 끝나야 한다.
+        resultCheck: result의 status가 rejected여야 한다.
+    check:
+      noError: classifyMatch 호출이 정상적으로 끝나야 한다.
+      resultCheck: result의 status가 confirmed여야 한다.
+  - id: bulk-classify
+    title: 일괄 매치 분류
+    structuredPrimary: true
+    subtitle: 리스트 전체 처리
+    goal: 매치 결과 리스트를 한 번에 분류해 status별 카운트를 dict로 만든다.
+    why: 자동화는 동시에 여러 매치 결과를 다루는 경우가 많아 일괄 분류가 표준 도구다.
+    explanation: bulkClassify 함수는 매치 리스트와 임계값을 받아 confirmed와 rejected 카운트를 세고 같은 키 dict를 돌려준다. 결과는 자동화 화면에 그대로 표시된다.
+    tips:
+      - 결과 dict 키는 항상 두 상태 모두 두어 후속 코드가 KeyError 없이 동작한다.
+      - 카운트가 0이면 명시적으로 빈 값을 보여 운영 화면이 일관된다.
+    snippet: |-
+      def bulkClassify(matches: list, threshold: float) -> dict:
+          counts = {"confirmed": 0, "rejected": 0}
+          for match in matches:
+              status = "confirmed" if match["score"] >= threshold else "rejected"
+              counts[status] += 1
+          return counts
+
+
+      summary = bulkClassify(
+          [{"score": 0.9}, {"score": 0.6}, {"score": 0.85}],
+          threshold=0.8,
+      )
+
+      assert summary == {"confirmed": 2, "rejected": 1}
+      summary
+    exercise:
+      prompt: 네 매치 (0.95, 0.4, 0.7, 0.85)를 임계값 0.75로 분류하면 confirmed 2, rejected 2가 되는지 검증하세요.
+      starterCode: |-
+        def bulkClassify(matches: list, threshold: float) -> dict:
+            counts = {"confirmed": 0, "rejected": 0}
+            for match in matches:
+                status = "confirmed" if match["score"] >= threshold else "rejected"
+                counts[status] += ___
+            return counts
+
+
+        summary = bulkClassify(
+            [{"score": 0.95}, {"score": 0.4}, {"score": 0.7}, {"score": 0.85}],
+            threshold=0.75,
+        )
+
+        assert summary == {"confirmed": 2, "rejected": 2}
+        summary
+      solution: |-
+        def bulkClassify(matches: list, threshold: float) -> dict:
+            counts = {"confirmed": 0, "rejected": 0}
+            for match in matches:
+                status = "confirmed" if match["score"] >= threshold else "rejected"
+                counts[status] += 1
+            return counts
+
+
+        summary = bulkClassify(
+            [{"score": 0.95}, {"score": 0.4}, {"score": 0.7}, {"score": 0.85}],
+            threshold=0.75,
+        )
+
+        assert summary == {"confirmed": 2, "rejected": 2}
+        summary
+      hints:
+        - 카운트는 매 매치마다 1씩 늘어난다.
+        - 임계값 0.75 기준으로 0.95와 0.85가 confirmed로 분류된다.
+      check:
+        noError: bulkClassify 호출이 정상적으로 끝나야 한다.
+        resultCheck: summary가 confirmed 2와 rejected 2를 정확히 담아야 한다.
+    check:
+      noError: 일괄 분류 함수 호출이 끝나야 한다.
+      resultCheck: summary가 confirmed 2와 rejected 1을 정확히 담아야 한다.
+  - id: report-summary
+    title: 종합 매치 보고 정리
+    structuredPrimary: true
+    subtitle: 임계값과 매치 dict 묶기
+    goal: 임계값과 매치 분류 결과를 한 dict로 묶어 자동화 표준 보고 형태를 완성한다.
+    why: 종합 보고는 같은 임계값을 기준으로 결과가 분류되었음을 운영자에게 명확히 알리는 역할을 한다.
+    explanation: matchReport 함수는 매치 리스트와 임계값을 받아 threshold, confirmedCount, rejectedCount를 dict로 돌려준다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다. 자동화 다음 단계는 confirmedCount를 보고 분기한다.
+    tips:
+      - threshold 키는 운영자가 사용한 기준값을 명시한다.
+      - rejected 항목이 많으면 임계값 또는 매치 알고리즘을 재검토해야 한다.
+    snippet: |-
+      def matchReport(matches: list, threshold: float) -> dict:
+          confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
+          rejectedCount = len(matches) - confirmedCount
+          return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+
+
+      report = matchReport([{"score": 0.91}, {"score": 0.45}, {"score": 0.8}], threshold=0.75)
+
+      assert report == {"threshold": 0.75, "confirmedCount": 2, "rejectedCount": 1}
+      report
+    exercise:
+      prompt: 임계값 0.9를 사용해 같은 함수에 (0.95, 0.85, 0.7) 세 매치를 넘기면 confirmedCount 1, rejectedCount 2가 되는지 종합 검증하세요.
+      starterCode: |-
+        def matchReport(matches: list, threshold: float) -> dict:
+            confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
+            rejectedCount = len(matches) - ___
+            return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+
+
+        report = matchReport([{"score": 0.95}, {"score": 0.85}, {"score": 0.7}], threshold=0.9)
+
+        assert report == {"threshold": 0.9, "confirmedCount": 1, "rejectedCount": 2}
+        report
+      solution: |-
+        def matchReport(matches: list, threshold: float) -> dict:
+            confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
+            rejectedCount = len(matches) - confirmedCount
+            return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+
+
+        report = matchReport([{"score": 0.95}, {"score": 0.85}, {"score": 0.7}], threshold=0.9)
+
+        assert report == {"threshold": 0.9, "confirmedCount": 1, "rejectedCount": 2}
+        report
+      hints:
+        - rejectedCount는 전체 길이에서 confirmedCount를 뺀 값이다.
+        - 임계값 0.9에서 0.95만 confirmed로 분류된다.
+      check:
+        noError: matchReport 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: report가 threshold 0.9, confirmedCount 1, rejectedCount 2를 담아야 한다.
+    check:
+      noError: 종합 보고 함수가 정상적으로 끝나야 한다.
+      resultCheck: report dict가 threshold, confirmedCount, rejectedCount 세 키를 정확히 담아야 한다.

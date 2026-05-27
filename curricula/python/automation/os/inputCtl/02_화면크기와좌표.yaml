@@ -1,0 +1,228 @@
+meta:
+  id: inputCtl_02
+  title: 화면 크기와 좌표 다루기
+  order: 2
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - coordinates
+    - geometry
+    - automation
+intro:
+  direction: 화면 좌표 시스템을 dict로 정의하고 영역 안 좌표 검사, 중앙 좌표 계산을 직접 구현해 GUI 자동화의 좌표 감각을 만든다.
+  benefits:
+    - x와 y 좌표 표기 약속을 dict로 통일한다.
+    - 영역(rect)의 좌상단과 우하단 좌표를 다룬다.
+    - 좌표가 영역 안에 있는지 boolean으로 판정한다.
+    - 영역 중앙 좌표를 한 함수로 계산한다.
+  diagram:
+    steps:
+      - label: 좌표 dict 표기
+        detail: x와 y 키를 가진 dict로 한 점 좌표를 표현한다.
+      - label: 영역 dict 표기
+        detail: left, top, width, height 네 키로 사각형 영역을 표현한다.
+      - label: 영역 내부 판정
+        detail: 좌표가 영역 경계 안에 있는지 boolean으로 판정한다.
+      - label: 종합 중앙 좌표 계산
+        detail: 영역의 중앙 좌표 dict를 자동화 표준 형태로 만든다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: dict 연산만으로 좌표를 다루므로 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 좌표 dict와 boolean 결과를 assert로 비교한다.
+sections:
+  - id: point-dict
+    title: 좌표 dict 표기
+    structuredPrimary: true
+    subtitle: x, y 두 키
+    goal: 한 점의 좌표를 x와 y 두 키로 가진 dict로 표현한다.
+    why: GUI 자동화 코드 전반에서 좌표 표기를 통일하면 함수 사이의 결합이 단순해진다.
+    explanation: 점 좌표는 정수 또는 부동소수 x, y로 표현된다. dict 키 이름을 x, y로 고정하면 다른 자동화 함수가 같은 표기를 신뢰할 수 있다. tuple 표기보다 dict가 가독성에 유리하다.
+    tips:
+      - 좌표 dict는 모듈 전반에서 동일 키로 두어 자동화 코드가 깔끔해진다.
+      - 정수 좌표가 일반적이지만 부동소수도 허용된다.
+    snippet: |-
+      point = {"x": 100, "y": 200}
+
+      assert point["x"] == 100
+      assert point["y"] == 200
+      point
+    exercise:
+      prompt: x=300, y=450인 좌표 dict를 만들고 두 키 값이 정확한지 검증하세요.
+      starterCode: |-
+        point = {"x": ___, "y": 450}
+
+        assert point["x"] == 300
+        assert point["y"] == 450
+        point
+      solution: |-
+        point = {"x": 300, "y": 450}
+
+        assert point["x"] == 300
+        assert point["y"] == 450
+        point
+      hints:
+        - x 값은 정수 300이다.
+        - dict 키는 영문 소문자 x와 y로 통일한다.
+      check:
+        noError: dict 구성과 키 접근이 끝나야 한다.
+        resultCheck: point의 x가 300, y가 450이어야 한다.
+    check:
+      noError: 좌표 dict 구성과 키 접근이 끝나야 한다.
+      resultCheck: point의 x와 y 값이 본문 기대값과 같아야 한다.
+  - id: rect-dict
+    title: 영역 dict 표기
+    structuredPrimary: true
+    subtitle: left, top, width, height
+    goal: 한 사각형 영역을 left, top, width, height 네 키로 표현한다.
+    why: GUI 자동화의 영역은 보통 좌상단과 크기로 표현되므로 표준 키를 정해 두면 함수 호환이 좋아진다.
+    explanation: 영역 dict는 left와 top이 좌상단 좌표를, width와 height가 크기를 표현한다. 우하단 좌표는 left + width와 top + height로 계산된다. 같은 dict는 pyautogui의 region 인자에 풀어 넘길 수도 있다.
+    tips:
+      - 키 이름은 left/top/width/height로 두어 다른 자동화 코드와 일관성을 가진다.
+      - 영역 비교는 키 단위로 == 연산자로 수행한다.
+    snippet: |-
+      rect = {"left": 50, "top": 60, "width": 200, "height": 150}
+      bottomRight = {"x": rect["left"] + rect["width"], "y": rect["top"] + rect["height"]}
+
+      assert bottomRight == {"x": 250, "y": 210}
+      bottomRight
+    exercise:
+      prompt: 영역 dict left=0, top=0, width=400, height=300의 우하단 좌표가 (400, 300)인지 검증하세요.
+      starterCode: |-
+        rect = {"left": 0, "top": 0, "width": ___, "height": 300}
+        bottomRight = {"x": rect["left"] + rect["width"], "y": rect["top"] + rect["height"]}
+
+        assert bottomRight == {"x": 400, "y": 300}
+        bottomRight
+      solution: |-
+        rect = {"left": 0, "top": 0, "width": 400, "height": 300}
+        bottomRight = {"x": rect["left"] + rect["width"], "y": rect["top"] + rect["height"]}
+
+        assert bottomRight == {"x": 400, "y": 300}
+        bottomRight
+      hints:
+        - width 값은 정수 400이다.
+        - 우하단 x 좌표는 left + width다.
+      check:
+        noError: dict 연산이 끝나야 한다.
+        resultCheck: bottomRight가 정확히 (400, 300)이어야 한다.
+    check:
+      noError: 영역 dict와 우하단 좌표 계산이 끝나야 한다.
+      resultCheck: bottomRight가 정확히 (250, 210)이어야 한다.
+  - id: in-rect
+    title: 영역 내부 판정
+    structuredPrimary: true
+    subtitle: boolean 결과
+    goal: 점 좌표가 영역 안에 있는지 boolean으로 판정하는 함수를 만든다.
+    why: 자동화는 마우스 위치가 의도한 영역 안에 있는지 자주 확인하므로 단순한 inRect 함수가 표준 도구다.
+    explanation: 점이 영역 내부에 있으려면 x가 left 이상이고 left + width 미만이며, y도 같은 조건을 만족해야 한다. 함수는 boolean을 돌려준다. 경계 포함 여부는 자동화 정책에 따라 정의한다.
+    tips:
+      - 경계를 포함하면 좌상단은 in으로 우하단은 out으로 두는 편이 흔하다.
+      - 함수가 단순할수록 다른 자동화 코드에서 안심하고 호출할 수 있다.
+    snippet: |-
+      def inRect(point: dict, rect: dict) -> bool:
+          return (
+              rect["left"] <= point["x"] < rect["left"] + rect["width"]
+              and rect["top"] <= point["y"] < rect["top"] + rect["height"]
+          )
+
+
+      rect = {"left": 10, "top": 10, "width": 100, "height": 50}
+
+      assert inRect({"x": 50, "y": 30}, rect) is True
+      assert inRect({"x": 200, "y": 30}, rect) is False
+      [inRect({"x": 50, "y": 30}, rect), inRect({"x": 200, "y": 30}, rect)]
+    exercise:
+      prompt: inRect 함수에 점 (60, 80)과 영역 left=0, top=0, width=100, height=100을 넘기면 True가 나오는지 검증하세요.
+      starterCode: |-
+        def inRect(point: dict, rect: dict) -> bool:
+            return (
+                rect["left"] <= point["x"] < rect["left"] + rect["width"]
+                and rect["top"] <= point["y"] < rect["top"] + rect["___"]
+            )
+
+
+        rect = {"left": 0, "top": 0, "width": 100, "height": 100}
+
+        assert inRect({"x": 60, "y": 80}, rect) is True
+        inRect({"x": 60, "y": 80}, rect)
+      solution: |-
+        def inRect(point: dict, rect: dict) -> bool:
+            return (
+                rect["left"] <= point["x"] < rect["left"] + rect["width"]
+                and rect["top"] <= point["y"] < rect["top"] + rect["height"]
+            )
+
+
+        rect = {"left": 0, "top": 0, "width": 100, "height": 100}
+
+        assert inRect({"x": 60, "y": 80}, rect) is True
+        inRect({"x": 60, "y": 80}, rect)
+      hints:
+        - 영역 dict의 높이 키는 height다.
+        - 60, 80은 100x100 영역 안의 점이다.
+      check:
+        noError: inRect 함수 호출이 정상적으로 끝나야 한다.
+        resultCheck: 결과가 True여야 한다.
+    check:
+      noError: inRect 함수 두 호출이 끝나야 한다.
+      resultCheck: 첫 호출이 True, 두 번째는 False여야 한다.
+  - id: rect-center
+    title: 종합 중앙 좌표 계산
+    structuredPrimary: true
+    subtitle: 한 함수로 표준화
+    goal: 영역 dict의 중앙 좌표를 dict로 돌려주는 함수를 만들어 자동화 클릭 흐름의 표준 입력을 제공한다.
+    why: GUI 자동화에서 영역의 중앙을 클릭하는 패턴은 가장 흔하므로 한 함수에 정리해 두면 매우 자주 재사용된다.
+    explanation: rectCenter 함수는 영역 dict를 받아 left와 width로부터 중앙 x, top과 height로부터 중앙 y를 계산해 dict로 돌려준다. 결과 dict는 점 좌표 표기와 동일한 키 구조를 가져 다른 함수의 입력으로 그대로 사용된다.
+    tips:
+      - 정수 중앙 좌표가 일반적이므로 // 연산자로 정수 나눗셈을 한다.
+      - 종합 함수는 한 줄 표현이 가능해 가독성과 재사용성이 좋다.
+    snippet: |-
+      def rectCenter(rect: dict) -> dict:
+          return {
+              "x": rect["left"] + rect["width"] // 2,
+              "y": rect["top"] + rect["height"] // 2,
+          }
+
+
+      center = rectCenter({"left": 10, "top": 20, "width": 100, "height": 50})
+
+      assert center == {"x": 60, "y": 45}
+      center
+    exercise:
+      prompt: rectCenter에 left=0, top=0, width=200, height=100을 넘기면 중앙 좌표가 (100, 50)이 되는지 종합 검증하세요.
+      starterCode: |-
+        def rectCenter(rect: dict) -> dict:
+            return {
+                "x": rect["left"] + rect["width"] // 2,
+                "y": rect["top"] + rect["height"] // ___,
+            }
+
+
+        center = rectCenter({"left": 0, "top": 0, "width": 200, "height": 100})
+
+        assert center == {"x": 100, "y": 50}
+        center
+      solution: |-
+        def rectCenter(rect: dict) -> dict:
+            return {
+                "x": rect["left"] + rect["width"] // 2,
+                "y": rect["top"] + rect["height"] // 2,
+            }
+
+
+        center = rectCenter({"left": 0, "top": 0, "width": 200, "height": 100})
+
+        assert center == {"x": 100, "y": 50}
+        center
+      hints:
+        - 중앙 계산의 정수 나눗셈 분모는 2다.
+        - 200을 2로 나누면 100, 100을 2로 나누면 50이다.
+      check:
+        noError: rectCenter 호출이 정상적으로 끝나야 한다.
+        resultCheck: center가 정확히 (100, 50)이어야 한다.
+    check:
+      noError: 종합 중앙 좌표 함수가 끝나야 한다.
+      resultCheck: center가 정확히 (60, 45)여야 한다.

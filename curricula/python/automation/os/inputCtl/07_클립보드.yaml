@@ -1,0 +1,220 @@
+meta:
+  id: inputCtl_07
+  title: 클립보드 자동화 흐름
+  order: 7
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - clipboard
+    - text
+    - automation
+intro:
+  direction: 클립보드 자동화의 시나리오를 dict로 표현하고 임시 폴더에서 텍스트 왕복을 모의 실험해 클립보드 입력 흐름의 표준 형태를 만든다.
+  benefits:
+    - 복사와 붙여넣기 명령을 dict로 표준화한다.
+    - 파일에 저장한 텍스트로 클립보드 왕복을 흉내 낸다.
+    - 클립보드 명령 시퀀스를 사람이 읽기 좋게 정리한다.
+    - 종합 시나리오 dict로 자동화 보고를 완성한다.
+  diagram:
+    steps:
+      - label: 복사 명령 dict
+        detail: type=copy와 text 키로 클립보드 복사 명령을 표현한다.
+      - label: 붙여넣기 명령 dict
+        detail: type=paste 명령으로 클립보드 내용을 화면에 입력한다.
+      - label: 파일 왕복 모의 실험
+        detail: tempfile 안의 파일에 텍스트를 저장하고 다시 읽어 왕복을 모의 실험한다.
+      - label: 종합 클립보드 시나리오
+        detail: 복사와 붙여넣기 명령을 묶은 dict로 자동화 표준 입력을 만든다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: tempfile, pathlib 외에는 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 왕복 결과와 dict 구조를 assert로 비교한다.
+sections:
+  - id: copy-command
+    title: 복사 명령 dict
+    structuredPrimary: true
+    subtitle: type=copy
+    goal: 복사 명령을 type과 text 두 키로 표현한다.
+    why: 클립보드 자동화는 복사 시점의 텍스트가 명확해야 사고 추적이 가능하다.
+    explanation: copy 명령은 type 키와 text 키를 가진다. text 값은 복사할 문자열이다. 자동화 실행기는 이 dict를 받아 시스템 클립보드에 텍스트를 올린다.
+    tips:
+      - 복사 명령은 사용 직후 다른 자동화가 클립보드를 덮을 수 있으므로 즉시 활용한다.
+      - 한글 문자열도 클립보드에 문제없이 들어간다.
+    snippet: |-
+      command = {"type": "copy", "text": "주문 번호 1234"}
+
+      assert command["text"] == "주문 번호 1234"
+      command
+    exercise:
+      prompt: '"Codaro Test" 문자열을 복사하는 명령을 만들고 text 키 값이 정확한지 검증하세요.'
+      starterCode: |-
+        command = {"type": "copy", "text": "___"}
+
+        assert command["text"] == "Codaro Test"
+        command
+      solution: |-
+        command = {"type": "copy", "text": "Codaro Test"}
+
+        assert command["text"] == "Codaro Test"
+        command
+      hints:
+        - text 값은 "Codaro Test" 문자열이다.
+        - 대소문자와 공백을 정확히 일치시킨다.
+      check:
+        noError: 복사 명령 dict 구성이 끝나야 한다.
+        resultCheck: command의 text가 본문 기대값과 같아야 한다.
+    check:
+      noError: dict 구성이 끝나야 한다.
+      resultCheck: command의 text가 본문에서 지정한 한국어 문자열과 같아야 한다.
+  - id: paste-command
+    title: 붙여넣기 명령 dict
+    structuredPrimary: true
+    subtitle: type=paste
+    goal: 붙여넣기 명령을 type 한 키로 표현하고 시퀀스에 포함시킨다.
+    why: 자동화는 복사와 붙여넣기를 짝으로 다루므로 단순한 paste 명령 표기가 자주 필요하다.
+    explanation: paste 명령은 type 키 하나만 가진다. 실행기는 시스템 클립보드 내용을 화면 입력으로 보낸다. 단순한 dict라 시퀀스 안에서 가독성이 좋다.
+    tips:
+      - paste 명령에 별도 인자가 필요 없는 점이 자동화 시퀀스를 단순하게 만든다.
+      - 붙여넣기 전 짧은 대기를 두면 클립보드 동기화가 안정적이다.
+    snippet: |-
+      command = {"type": "paste"}
+
+      assert command == {"type": "paste"}
+      command
+    exercise:
+      prompt: 같은 paste 명령 dict를 만들고 키와 값이 정확히 type 한 개만 가진 dict인지 검증하세요.
+      starterCode: |-
+        command = {"type": "___"}
+
+        assert command == {"type": "paste"}
+        assert list(command.keys()) == ["type"]
+        command
+      solution: |-
+        command = {"type": "paste"}
+
+        assert command == {"type": "paste"}
+        assert list(command.keys()) == ["type"]
+        command
+      hints:
+        - type 값은 짧은 영문 문자열 paste다.
+        - paste 명령은 dict 키 한 개만 가진다.
+      check:
+        noError: paste 명령 dict 구성이 끝나야 한다.
+        resultCheck: command가 type paste 한 키만 가져야 한다.
+    check:
+      noError: paste 명령 dict 구성이 끝나야 한다.
+      resultCheck: command가 type paste 한 키만 가진 dict여야 한다.
+  - id: file-roundtrip
+    title: 파일 왕복 모의 실험
+    structuredPrimary: true
+    subtitle: tempfile로 클립보드 흉내
+    goal: 임시 파일에 텍스트를 저장하고 다시 읽어 클립보드 왕복을 흉내 낸다.
+    why: 실제 클립보드 없이도 왕복 흐름을 학습하면 다양한 환경에서도 자동화 코드를 설계할 수 있다.
+    explanation: clipboard.txt 파일에 텍스트를 저장하고 다시 read_text로 받으면 클립보드 왕복과 동일한 모양이 된다. tempfile 컨텍스트 안에서 동작해 사용자 환경에 영향을 주지 않는다.
+    tips:
+      - 실제 자동화는 pyperclip.copy와 pyperclip.paste가 같은 패턴으로 동작한다.
+      - 파일 왕복은 클립보드가 없는 환경에서도 동일한 검증이 가능하다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          target = Path(td) / "clipboard.txt"
+          target.write_text("주문 1234", encoding="utf-8")
+          restored = target.read_text(encoding="utf-8")
+
+      assert restored == "주문 1234"
+      restored
+    exercise:
+      prompt: 같은 흐름으로 "복사된 텍스트" 문자열을 저장하고 read_text로 받아 동일한지 검증하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "clipboard.txt"
+            target.write_text("___", encoding="utf-8")
+            restored = target.read_text(encoding="utf-8")
+
+        assert restored == "복사된 텍스트"
+        restored
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "clipboard.txt"
+            target.write_text("복사된 텍스트", encoding="utf-8")
+            restored = target.read_text(encoding="utf-8")
+
+        assert restored == "복사된 텍스트"
+        restored
+      hints:
+        - 한국어 문자열은 utf-8 인코딩으로 저장한다.
+        - 저장과 읽기 인코딩은 동일하게 utf-8을 사용한다.
+      check:
+        noError: write_text와 read_text 호출이 끝나야 한다.
+        resultCheck: restored 문자열이 저장한 문자열과 같아야 한다.
+    check:
+      noError: 파일 왕복 호출이 끝나야 한다.
+      resultCheck: restored가 저장한 한국어 문자열과 같아야 한다.
+  - id: clip-summary
+    title: 종합 클립보드 시나리오
+    structuredPrimary: true
+    subtitle: 복사와 붙여넣기 묶기
+    goal: 복사와 붙여넣기 두 명령을 한 시나리오 dict로 묶어 자동화 표준 입력을 만든다.
+    why: 종합 시나리오는 운영자가 한눈에 자동화 의도를 검토할 수 있게 만들어 사고를 줄인다.
+    explanation: scenario dict는 name과 steps 두 키를 가진다. steps 리스트의 첫 항목은 복사, 두 번째는 붙여넣기다. 같은 dict는 자동화 실행기에 그대로 들어간다.
+    tips:
+      - 시나리오 이름은 짧고 명확하게 둔다.
+      - steps 길이가 길면 단계별로 name 키를 추가할 수 있다.
+    snippet: |-
+      scenario = {
+          "name": "주문 번호 복사 후 폼 입력",
+          "steps": [
+              {"type": "copy", "text": "1234"},
+              {"type": "paste"},
+          ],
+      }
+      summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+      assert summary == {"name": "주문 번호 복사 후 폼 입력", "stepCount": 2}
+      summary
+    exercise:
+      prompt: "\"검토 사이클 복사\" 이름으로 두 단계 시나리오를 만들고 stepCount가 2인지 종합 검증하세요."
+      starterCode: |-
+        scenario = {
+            "name": "___",
+            "steps": [
+                {"type": "copy", "text": "주문"},
+                {"type": "paste"},
+            ],
+        }
+        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+        assert summary == {"name": "검토 사이클 복사", "stepCount": 2}
+        summary
+      solution: |-
+        scenario = {
+            "name": "검토 사이클 복사",
+            "steps": [
+                {"type": "copy", "text": "주문"},
+                {"type": "paste"},
+            ],
+        }
+        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+
+        assert summary == {"name": "검토 사이클 복사", "stepCount": 2}
+        summary
+      hints:
+        - 이름 문자열은 "검토 사이클 복사"다.
+        - steps 길이가 2이면 stepCount도 2다.
+      check:
+        noError: scenario dict 구성과 summary 추출이 끝나야 한다.
+        resultCheck: summary가 종합 검토 결과로 이름과 단계 수를 정확히 담아야 한다.
+    check:
+      noError: 종합 시나리오 dict 구성이 끝나야 한다.
+      resultCheck: summary가 본문 시나리오 이름과 stepCount 2를 정확히 담아야 한다.
