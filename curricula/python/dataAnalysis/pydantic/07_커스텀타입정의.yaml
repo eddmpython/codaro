@@ -326,7 +326,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 제약 타입의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 제약 타입의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 제약 타입의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: string
   title: 문자열 제약
   structuredPrimary: true
@@ -376,7 +376,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 문자열 제약의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 문자열 제약의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 문자열 제약의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: domain
   title: 도메인 타입
   structuredPrimary: true

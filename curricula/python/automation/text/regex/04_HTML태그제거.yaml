@@ -153,7 +153,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 2단계. 데이터 불러오기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 데이터 불러오기의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step3_wrong_pattern
   title: 3단계. 잘못된 패턴 (탐욕적 매칭)
   structuredPrimary: true
@@ -184,7 +184,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 3단계. 잘못된 패턴 (탐욕적 매칭)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 잘못된 패턴 (탐욕적 매칭)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 3단계. 잘못된 패턴 (탐욕적 매칭)의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step4_non_greedy
   title: 4단계. 올바른 패턴 (비탐욕적 매칭)
   structuredPrimary: true
@@ -211,7 +211,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 4단계. 올바른 패턴 (비탐욕적 매칭)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 올바른 패턴 (비탐욕적 매칭)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 4단계. 올바른 패턴 (비탐욕적 매칭)의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step5_remove_tags
   title: 5단계. HTML 태그 제거
   structuredPrimary: true
@@ -251,7 +251,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 5단계. HTML 태그 제거의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. HTML 태그 제거의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 5단계. HTML 태그 제거의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step6_clean_whitespace
   title: 6단계. 공백 정리
   structuredPrimary: true
@@ -281,7 +281,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 6단계. 공백 정리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 공백 정리의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 6단계. 공백 정리의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step7_dotall_flag
   title: 7단계. re.DOTALL 플래그
   structuredPrimary: true
@@ -319,7 +319,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 7단계. re.DOTALL 플래그의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 7단계. re.DOTALL 플래그의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 7단계. re.DOTALL 플래그의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step8_complete_function
   title: 8단계. 완성된 HTML 정제 함수
   structuredPrimary: true
@@ -386,7 +386,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 9단계. LLM 토큰 절약 효과의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 9단계. LLM 토큰 절약 효과의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 9단계. LLM 토큰 절약 효과의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
@@ -521,5 +521,5 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.'
-    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.'
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'

@@ -553,7 +553,7 @@ sections:
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
     noError: 11단계. 최종 결과물의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 11단계. 최종 결과물의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 11단계. 최종 결과물의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: workflow_validation
   title: 12단계. 실무 서브쿼리 검증
   structuredPrimary: true

@@ -117,7 +117,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 2단계. 개인정보 샘플 데이터의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 개인정보 샘플 데이터의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 2단계. 개인정보 샘플 데이터의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step3_mask_resident
   title: 3단계. 주민번호 마스킹
   structuredPrimary: true
@@ -148,7 +148,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 3단계. 주민번호 마스킹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 주민번호 마스킹의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 3단계. 주민번호 마스킹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step4_mask_card
   title: 4단계. 카드번호 마스킹
   structuredPrimary: true
@@ -181,7 +181,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 4단계. 카드번호 마스킹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 카드번호 마스킹의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 4단계. 카드번호 마스킹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step5_mask_account
   title: 5단계. 계좌번호 마스킹
   structuredPrimary: true
@@ -213,7 +213,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 5단계. 계좌번호 마스킹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 계좌번호 마스킹의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 5단계. 계좌번호 마스킹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step6_backreference
   title: 6단계. 역참조 심화
   structuredPrimary: true
@@ -247,7 +247,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 6단계. 역참조 심화의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 역참조 심화의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 6단계. 역참조 심화의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step7_complete_masking
   title: 7단계. 완성된 마스킹 함수
   structuredPrimary: true
@@ -324,7 +324,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 8단계. 선택적 마스킹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 8단계. 선택적 마스킹의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 8단계. 선택적 마스킹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step9_log_masking
   title: 9단계. 로그 자동 마스킹
   structuredPrimary: true
@@ -491,7 +491,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    noError: 실습의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
     resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
   title: 정리

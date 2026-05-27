@@ -95,7 +95,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 기본 패턴의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 기본 패턴의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 기본 패턴의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: recursive_search
   title: 재귀 검색
   structuredPrimary: true
@@ -123,7 +123,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 재귀 검색의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 재귀 검색의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 재귀 검색의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: iglob
   title: 이터레이터 버전
   structuredPrimary: true
@@ -151,7 +151,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 이터레이터 버전의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 이터레이터 버전의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 이터레이터 버전의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: advanced_patterns
   title: 고급 패턴
   structuredPrimary: true
@@ -179,7 +179,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 고급 패턴의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 고급 패턴의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 고급 패턴의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: practical_use
   title: 실전 활용
   structuredPrimary: true

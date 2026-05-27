@@ -125,7 +125,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 2단계. 데이터 불러오기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 데이터 불러오기의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step3_explore
   title: 3단계. 이메일 형식 탐색
   structuredPrimary: true
@@ -181,7 +181,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 4단계. 기본 패턴 만들기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 기본 패턴 만들기의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 4단계. 기본 패턴 만들기의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step5_pattern_improved
   title: 5단계. 패턴 개선하기
   structuredPrimary: true
@@ -213,7 +213,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 5단계. 패턴 개선하기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 패턴 개선하기의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 5단계. 패턴 개선하기의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step6_extract_all
   title: 6단계. 모든 이메일 추출
   structuredPrimary: true
@@ -242,7 +242,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 6단계. 모든 이메일 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 모든 이메일 추출의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 6단계. 모든 이메일 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step7_result
   title: 7단계. 결과 확인
   structuredPrimary: true
@@ -264,7 +264,7 @@ sections:
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
     noError: 7단계. 결과 확인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 7단계. 결과 확인의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 7단계. 결과 확인의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step8_workflow
   title: 8단계. 실무 이메일 추출 검증
   structuredPrimary: true
@@ -317,7 +317,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 8단계. 실무 이메일 추출 검증의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 8단계. 실무 이메일 추출 검증의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 8단계. 실무 이메일 추출 검증의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: practice
   title: 실습
   structuredPrimary: true
@@ -365,7 +365,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 실습의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 실습의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: summary
   title: 정리
   subtitle: 첫 번째 프로젝트 완료!
@@ -436,5 +436,5 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.'
-    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.'
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'

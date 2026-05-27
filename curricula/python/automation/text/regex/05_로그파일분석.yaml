@@ -107,7 +107,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 2단계. 로그 데이터 준비의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 로그 데이터 준비의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 2단계. 로그 데이터 준비의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step3_extract_errors
   title: 3단계. 에러 로그만 추출
   structuredPrimary: true
@@ -137,7 +137,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 3단계. 에러 로그만 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 에러 로그만 추출의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 3단계. 에러 로그만 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step4_line_anchors
   title: 4단계. 줄 앵커 사용하기
   structuredPrimary: true
@@ -165,7 +165,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 4단계. 줄 앵커 사용하기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 줄 앵커 사용하기의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 4단계. 줄 앵커 사용하기의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step5_parse_timestamp
   title: 5단계. 타임스탬프 추출
   structuredPrimary: true
@@ -197,7 +197,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 5단계. 타임스탬프 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 타임스탬프 추출의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 5단계. 타임스탬프 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step6_structured_parsing
   title: 6단계. 구조화된 로그 파싱
   structuredPrimary: true
@@ -419,7 +419,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: 10단계. 운영 로그 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
+    noError: 10단계. 운영 로그 검증 루프의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
     resultCheck: 10단계. 운영 로그 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: 실습

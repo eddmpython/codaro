@@ -83,7 +83,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 기본 패턴 복습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 기본 패턴 복습의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 기본 패턴 복습의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: groups_basic
   title: 그룹 기초
   structuredPrimary: true
@@ -122,7 +122,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 그룹 기초의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 그룹 기초의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 그룹 기초의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: lookahead
   title: 룩어헤드
   structuredPrimary: true
@@ -155,7 +155,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 룩어헤드의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 룩어헤드의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 룩어헤드의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: lookbehind
   title: 룩비하인드
   structuredPrimary: true
@@ -188,7 +188,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 룩비하인드의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 룩비하인드의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 룩비하인드의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: backreference
   title: 백레퍼런스
   structuredPrimary: true
@@ -221,7 +221,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 백레퍼런스의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 백레퍼런스의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 백레퍼런스의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: non_capture
   title: 비캡처 그룹
   structuredPrimary: true
@@ -254,7 +254,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 비캡처 그룹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 비캡처 그룹의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 비캡처 그룹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: flags
   title: 플래그
   structuredPrimary: true
@@ -289,7 +289,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 플래그의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 플래그의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 플래그의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: substitution
   title: 치환
   structuredPrimary: true
@@ -324,7 +324,7 @@ sections:
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
     noError: 치환의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 치환의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 치환의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 로그 파싱과 마스킹'
   structuredPrimary: true
@@ -396,7 +396,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
-    noError: '현업 흐름 검증: 주문 로그 파싱과 마스킹의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.'
+    noError: '현업 흐름 검증: 주문 로그 파싱과 마스킹의 입력 데이터와 처리 인자가 다음 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 로그 파싱과 마스킹 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
   title: 종합 연습

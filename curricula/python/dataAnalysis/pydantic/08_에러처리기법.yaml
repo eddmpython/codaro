@@ -184,7 +184,7 @@ sections:
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
     noError: 중첩 모델 에러의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
-    resultCheck: 중첩 모델 에러의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+    resultCheck: 중첩 모델 에러의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: json
   title: JSON 에러 응답
   structuredPrimary: true
