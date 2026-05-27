@@ -35,6 +35,10 @@ categoryMapping = {
     'pydantic': 'Pydantic 데이터검증',
     'practical': '실전파이썬',
     'playwright': 'Playwright 브라우저자동화',
+    'fileOps': '파일자동화',
+    'procCtl': '프로세스자동화',
+    'watchSched': '감시·스케줄',
+    'inputCtl': '입력·GUI자동화',
 }
 
 categoryMeta = {
@@ -182,6 +186,30 @@ categoryMeta = {
         'description': '브라우저 화면 점검과 웹 자동화',
         'imageUrl': None,
     },
+    'fileOps': {
+        'icon': 'folder_zip',
+        'color': 'amber',
+        'description': '파일·폴더·아카이브 작업을 로컬 Python으로 자동화한다',
+        'imageUrl': None,
+    },
+    'procCtl': {
+        'icon': 'terminal',
+        'color': 'slate',
+        'description': '외부 명령과 프로세스를 안전하게 실행하고 감시한다',
+        'imageUrl': None,
+    },
+    'watchSched': {
+        'icon': 'schedule',
+        'color': 'cyan',
+        'description': '폴더 이벤트 감시와 시간 기반 자동 실행을 배운다',
+        'imageUrl': None,
+    },
+    'inputCtl': {
+        'icon': 'mouse',
+        'color': 'rose',
+        'description': '키보드·마우스·화면 입력으로 GUI 작업을 자동화한다',
+        'imageUrl': None,
+    },
 }
 
 categoryGroups = {
@@ -190,7 +218,7 @@ categoryGroups = {
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
-    '자동화': ['playwright', 'excel', 'regex', 'practical'],
+    '자동화': ['playwright', 'excel', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
     '이미지·비전': ['pillow', 'opencv'],
 }
 
@@ -253,9 +281,9 @@ categoryTree = [
             {
                 'id': 'os-automation',
                 'name': 'OS 자동화',
-                'description': '파일, 프로세스, 입력, 창 제어 트랙을 위한 자리다.',
+                'description': '파일, 프로세스, 이벤트, 입력을 로컬 Python으로 다룬다.',
                 'folder': 'os',
-                'categories': [],
+                'categories': ['fileOps', 'procCtl', 'watchSched', 'inputCtl'],
             },
             {
                 'id': 'test-automation',
@@ -317,7 +345,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {

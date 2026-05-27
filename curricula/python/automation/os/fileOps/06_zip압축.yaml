@@ -1,0 +1,371 @@
+meta:
+  id: fileOps_06
+  title: zip 압축과 해제
+  order: 6
+  category: fileOps
+  difficulty: easy
+  audience: 파일 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - zipfile
+    - pathlib
+    - compression
+intro:
+  direction: zipfile 모듈로 격리 폴더 안에서 zip을 만들고 풀고 압축률과 무결성을 검증한다.
+  benefits:
+    - ZipFile 컨텍스트 매니저로 파일을 안전하게 묶는다.
+    - DEFLATED와 STORED 모드의 크기 차이를 직접 비교한다.
+    - extractall로 압축을 해제하고 원본과 같은 내용을 복원한다.
+    - testzip으로 zip 내부 손상 여부를 확인한다.
+  diagram:
+    steps:
+      - label: zip 컨테이너 생성
+        detail: ZipFile에 "w" 모드를 주고 write 메서드로 파일을 한 개씩 추가한다.
+      - label: 압축률 비교
+        detail: STORED와 DEFLATED 두 방식으로 같은 입력을 압축해 크기를 본다.
+      - label: 압축 풀기
+        detail: extractall로 별도 폴더에 풀고 read_text로 내용을 비교한다.
+      - label: 무결성 종합 점검
+        detail: testzip 결과와 사이즈, 파일 목록을 한 dict로 묶는다.
+    runtime:
+      - label: 표준 라이브러리만 사용
+        detail: zipfile, pathlib, tempfile 외에는 추가 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 크기, 내용, testzip 결과를 assert로 비교한다.
+sections:
+  - id: create-zip
+    title: zip 컨테이너 만들기
+    structuredPrimary: true
+    subtitle: ZipFile.write로 파일 추가
+    goal: 두 개의 파일을 모아 격리 폴더 안에 하나의 zip 파일로 만든다.
+    why: 자동화 산출물을 단일 zip으로 묶어 보관하면 전달과 백업이 단순해지므로 zip 작성 흐름이 첫 단계다.
+    explanation: ZipFile은 컨텍스트 매니저로 동작하며 "w" 모드는 새 zip을 만들고 "a"는 기존 zip에 추가한다. write 메서드는 외부 파일을 zip 안의 arcname 위치로 저장한다. arcname을 지정하면 zip 내부 폴더 구조를 자유롭게 설계할 수 있다.
+    tips:
+      - arcname을 지정하지 않으면 원본 절대 경로가 그대로 zip에 들어가 보안 위험이 된다.
+      - 같은 arcname이 두 번 들어가면 zip 안에 중복 항목이 생긴다.
+    snippet: |-
+      import tempfile
+      import zipfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          (base / "a.txt").write_text("hello", encoding="utf-8")
+          (base / "b.txt").write_text("world", encoding="utf-8")
+          target = base / "bundle.zip"
+          with zipfile.ZipFile(target, "w") as zf:
+              zf.write(base / "a.txt", arcname="a.txt")
+              zf.write(base / "b.txt", arcname="b.txt")
+          with zipfile.ZipFile(target) as zf:
+              names = sorted(zf.namelist())
+
+      assert names == ["a.txt", "b.txt"]
+      names
+    exercise:
+      prompt: docs 폴더에 first.md와 second.md를 만들고 두 파일을 docs/ 접두어로 묶은 archive.zip을 만들어 namelist에 두 이름이 모이는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "docs").mkdir()
+            (base / "docs" / "first.md").write_text("# first", encoding="utf-8")
+            (base / "docs" / "second.md").write_text("# second", encoding="utf-8")
+            target = base / "archive.zip"
+            with zipfile.ZipFile(target, "___") as zf:
+                zf.write(base / "docs" / "first.md", arcname="docs/first.md")
+                zf.write(base / "docs" / "second.md", arcname="docs/second.md")
+            with zipfile.ZipFile(target) as zf:
+                names = sorted(zf.namelist())
+
+        assert names == ["docs/first.md", "docs/second.md"]
+        names
+      solution: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "docs").mkdir()
+            (base / "docs" / "first.md").write_text("# first", encoding="utf-8")
+            (base / "docs" / "second.md").write_text("# second", encoding="utf-8")
+            target = base / "archive.zip"
+            with zipfile.ZipFile(target, "w") as zf:
+                zf.write(base / "docs" / "first.md", arcname="docs/first.md")
+                zf.write(base / "docs" / "second.md", arcname="docs/second.md")
+            with zipfile.ZipFile(target) as zf:
+                names = sorted(zf.namelist())
+
+        assert names == ["docs/first.md", "docs/second.md"]
+        names
+      hints:
+        - 새 zip을 만들 때 mode 인자는 문자열 "w"다.
+        - arcname을 docs/ 접두어로 시작해야 zip 내부에 docs 폴더 구조가 생긴다.
+      check:
+        noError: ZipFile 컨텍스트 두 번 호출이 BadZipFile 없이 끝나야 한다.
+        resultCheck: namelist 정렬 결과가 두 docs 하위 파일 이름을 정확히 포함해야 한다.
+    check:
+      noError: zip 생성과 namelist 호출이 격리 공간에서 정상 끝나야 한다.
+      resultCheck: 만든 zip의 namelist가 a.txt와 b.txt 두 이름을 포함해야 한다.
+  - id: compression-ratio
+    title: 압축률 직접 비교
+    structuredPrimary: true
+    subtitle: STORED와 DEFLATED
+    goal: 같은 입력을 두 가지 방식으로 압축해 결과 파일 크기 차이를 측정한다.
+    why: 자동화 보관 정책은 저장 공간과 압축 시간을 절충해야 하므로 두 모드의 차이를 측정해 두면 결정이 빠르다.
+    explanation: ZipFile의 compression 인자는 zipfile.ZIP_STORED로 두면 압축하지 않고, zipfile.ZIP_DEFLATED는 일반 zip 압축을 사용한다. compresslevel은 0부터 9까지 받는다. 동일 입력을 두 모드로 압축하면 DEFLATED 결과가 일반적으로 더 작다.
+    tips:
+      - DEFLATED는 zlib을 사용하며 텍스트에서 효과가 크다.
+      - 압축 효과가 거의 없는 이미 압축된 파일은 STORED가 빠르다.
+    snippet: |-
+      import tempfile
+      import zipfile
+      from pathlib import Path
+
+      payload = ("codaro " * 500).encode("utf-8")
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "input.txt"
+          source.write_bytes(payload)
+          storedPath = base / "stored.zip"
+          deflatedPath = base / "deflated.zip"
+          with zipfile.ZipFile(storedPath, "w", compression=zipfile.ZIP_STORED) as zf:
+              zf.write(source, arcname="input.txt")
+          with zipfile.ZipFile(deflatedPath, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+              zf.write(source, arcname="input.txt")
+          sizes = {"stored": storedPath.stat().st_size, "deflated": deflatedPath.stat().st_size}
+
+      assert sizes["deflated"] < sizes["stored"]
+      sizes
+    exercise:
+      prompt: 같은 payload를 사용해 STORED 결과 크기가 DEFLATED 결과보다 큰지 확인하고 차이를 ratio 변수로 계산해 0.5 이하로 줄어들었는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        payload = ("codaro " * 500).encode("utf-8")
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "input.txt"
+            source.write_bytes(payload)
+            storedPath = base / "stored.zip"
+            deflatedPath = base / "deflated.zip"
+            with zipfile.ZipFile(storedPath, "w", compression=zipfile.___) as zf:
+                zf.write(source, arcname="input.txt")
+            with zipfile.ZipFile(deflatedPath, "w", compression=zipfile.___) as zf:
+                zf.write(source, arcname="input.txt")
+            ratio = deflatedPath.stat().st_size / storedPath.stat().st_size
+
+        assert ratio < 0.5
+        ratio
+      solution: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        payload = ("codaro " * 500).encode("utf-8")
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "input.txt"
+            source.write_bytes(payload)
+            storedPath = base / "stored.zip"
+            deflatedPath = base / "deflated.zip"
+            with zipfile.ZipFile(storedPath, "w", compression=zipfile.ZIP_STORED) as zf:
+                zf.write(source, arcname="input.txt")
+            with zipfile.ZipFile(deflatedPath, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.write(source, arcname="input.txt")
+            ratio = deflatedPath.stat().st_size / storedPath.stat().st_size
+
+        assert ratio < 0.5
+        ratio
+      hints:
+        - 첫 번째 압축은 STORED 상수를 두 번째 압축은 DEFLATED 상수를 쓴다.
+        - 반복되는 짧은 단어는 DEFLATED에서 크게 줄어 ratio가 매우 작아진다.
+      check:
+        noError: 두 ZipFile 컨텍스트가 BadZipFile 없이 끝나야 한다.
+        resultCheck: ratio가 0.5보다 작아 두 모드의 크기 차이가 명확해야 한다.
+    check:
+      noError: 두 압축 방식 모두 한 셀에서 끝나야 한다.
+      resultCheck: deflated 결과 크기가 stored보다 작아 sizes 딕셔너리가 그 사실을 반영해야 한다.
+  - id: extract-roundtrip
+    title: 압축 풀기와 내용 비교
+    structuredPrimary: true
+    subtitle: extractall로 복원 검증
+    goal: 만든 zip을 다른 폴더에 풀어 원본과 동일한 텍스트가 복원되는지 확인한다.
+    why: 압축은 풀었을 때 100퍼센트 복원되어야 자동화에서 신뢰할 수 있으므로 왕복 검증이 필수다.
+    explanation: ZipFile.extractall은 인자로 받은 폴더에 zip 내부 구조를 그대로 복원한다. 인자가 없으면 현재 작업 디렉터리에 푸는데 자동화에서는 항상 명시적 폴더를 넘긴다. 복원 후 같은 파일을 read_text로 비교하면 왕복 정합성을 확인할 수 있다.
+    tips:
+      - extractall 인자에 Path를 넘기면 폴더가 자동으로 만들어진다.
+      - 동일 폴더에 두 번 풀면 기존 파일이 덮어쓰여진다.
+    snippet: |-
+      import tempfile
+      import zipfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "summary.txt"
+          source.write_text("최종 결과", encoding="utf-8")
+          bundle = base / "bundle.zip"
+          with zipfile.ZipFile(bundle, "w") as zf:
+              zf.write(source, arcname="summary.txt")
+          extractDir = base / "out"
+          with zipfile.ZipFile(bundle) as zf:
+              zf.extractall(extractDir)
+          restored = (extractDir / "summary.txt").read_text(encoding="utf-8")
+
+      assert restored == "최종 결과"
+      restored
+    exercise:
+      prompt: notes/today.md를 묶은 zip을 만든 뒤 out 폴더에 풀고 복원된 텍스트가 원본과 같은지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "notes").mkdir()
+            source = base / "notes" / "today.md"
+            source.write_text("일일 보고", encoding="utf-8")
+            bundle = base / "notes.zip"
+            with zipfile.ZipFile(bundle, "w") as zf:
+                zf.write(source, arcname="notes/today.md")
+            extractDir = base / "out"
+            with zipfile.ZipFile(bundle) as zf:
+                zf.___(extractDir)
+            restored = (extractDir / "notes" / "today.md").read_text(encoding="utf-8")
+
+        assert restored == "일일 보고"
+        restored
+      solution: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "notes").mkdir()
+            source = base / "notes" / "today.md"
+            source.write_text("일일 보고", encoding="utf-8")
+            bundle = base / "notes.zip"
+            with zipfile.ZipFile(bundle, "w") as zf:
+                zf.write(source, arcname="notes/today.md")
+            extractDir = base / "out"
+            with zipfile.ZipFile(bundle) as zf:
+                zf.extractall(extractDir)
+            restored = (extractDir / "notes" / "today.md").read_text(encoding="utf-8")
+
+        assert restored == "일일 보고"
+        restored
+      hints:
+        - extractall 한 호출만 부르면 zip 내부 폴더 구조까지 같이 복원된다.
+        - 복원된 파일은 extractDir 아래 같은 상대 경로로 존재해야 한다.
+      check:
+        noError: extractall 호출이 BadZipFile 없이 끝나야 한다.
+        resultCheck: restored 변수가 원본 source의 텍스트와 정확히 같아야 한다.
+    check:
+      noError: zip 만들기와 extractall이 격리 공간에서 끝나야 한다.
+      resultCheck: 복원된 summary.txt 내용이 원본과 정확히 같아야 한다.
+  - id: integrity-summary
+    title: 무결성 종합 점검
+    structuredPrimary: true
+    subtitle: testzip 결과 종합
+    goal: 만든 zip의 손상 여부와 항목 수, 압축 크기를 한 dict로 묶어 자동화 리포트의 표준 항목으로 정리한다.
+    why: 백업이나 배포용 zip은 손상되면 복구가 어렵기 때문에 testzip 결과를 표준 검증 항목으로 두는 습관이 중요하다.
+    explanation: ZipFile.testzip은 손상된 첫 파일 이름을 돌려주며 손상이 없으면 None이다. infolist는 각 항목의 file_size와 compress_size를 보여준다. 마지막 섹션은 이 세 값을 한 dict로 묶어 자동화 리포트에 항상 같은 형태로 들어가게 한다.
+    tips:
+      - testzip은 zip을 끝까지 읽으므로 큰 파일에서는 시간이 걸린다.
+      - infolist의 compress_size 합이 0이면 STORED 모드만 사용했음을 의미한다.
+    snippet: |-
+      import tempfile
+      import zipfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          (base / "report.txt").write_text("ok" * 200, encoding="utf-8")
+          (base / "log.txt").write_text("alert" * 100, encoding="utf-8")
+          bundle = base / "evidence.zip"
+          with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+              zf.write(base / "report.txt", arcname="report.txt")
+              zf.write(base / "log.txt", arcname="log.txt")
+          with zipfile.ZipFile(bundle) as zf:
+              integrity = {
+                  "corrupted": zf.testzip(),
+                  "entries": len(zf.infolist()),
+                  "sizes": [(info.filename, info.compress_size < info.file_size) for info in zf.infolist()],
+              }
+
+      assert integrity["corrupted"] is None
+      assert integrity["entries"] == 2
+      assert all(reduced for _, reduced in integrity["sizes"])
+      integrity
+    exercise:
+      prompt: docs/a.txt와 docs/b.txt를 묶은 zip을 만들고 testzip이 None, entries가 2, sizes의 reduced 값이 모두 True인지 종합 검증하세요.
+      starterCode: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "docs").mkdir()
+            (base / "docs" / "a.txt").write_text("kkk" * 200, encoding="utf-8")
+            (base / "docs" / "b.txt").write_text("vvv" * 200, encoding="utf-8")
+            bundle = base / "docs.zip"
+            with zipfile.ZipFile(bundle, "w", compression=zipfile.___) as zf:
+                zf.write(base / "docs" / "a.txt", arcname="docs/a.txt")
+                zf.write(base / "docs" / "b.txt", arcname="docs/b.txt")
+            with zipfile.ZipFile(bundle) as zf:
+                integrity = {
+                    "corrupted": zf.___(),
+                    "entries": len(zf.infolist()),
+                    "sizes": [(info.filename, info.compress_size < info.file_size) for info in zf.infolist()],
+                }
+
+        assert integrity["corrupted"] is None
+        assert integrity["entries"] == 2
+        assert all(reduced for _, reduced in integrity["sizes"])
+        integrity
+      solution: |-
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "docs").mkdir()
+            (base / "docs" / "a.txt").write_text("kkk" * 200, encoding="utf-8")
+            (base / "docs" / "b.txt").write_text("vvv" * 200, encoding="utf-8")
+            bundle = base / "docs.zip"
+            with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.write(base / "docs" / "a.txt", arcname="docs/a.txt")
+                zf.write(base / "docs" / "b.txt", arcname="docs/b.txt")
+            with zipfile.ZipFile(bundle) as zf:
+                integrity = {
+                    "corrupted": zf.testzip(),
+                    "entries": len(zf.infolist()),
+                    "sizes": [(info.filename, info.compress_size < info.file_size) for info in zf.infolist()],
+                }
+
+        assert integrity["corrupted"] is None
+        assert integrity["entries"] == 2
+        assert all(reduced for _, reduced in integrity["sizes"])
+        integrity
+      hints:
+        - compression 인자에는 zipfile.ZIP_DEFLATED를 넘겨야 압축률이 줄어든다.
+        - testzip 메서드는 손상 없는 경우 None을 돌려준다.
+      check:
+        noError: testzip과 infolist 호출이 BadZipFile 없이 끝나야 한다.
+        resultCheck: integrity의 corrupted가 None, entries가 2, sizes의 모든 reduced 값이 True여야 한다.
+    check:
+      noError: 두 파일 압축과 무결성 검사가 한 흐름에서 끝나야 한다.
+      resultCheck: integrity dict가 종합 결과로 corrupted None과 entries 2를 정확히 보고해야 한다.

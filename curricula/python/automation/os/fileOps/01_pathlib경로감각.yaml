@@ -1,0 +1,295 @@
+meta:
+  id: fileOps_01
+  title: pathlib 경로 감각
+  order: 1
+  category: fileOps
+  difficulty: easy
+  audience: 파일 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - pathlib
+    - tempfile
+    - path
+intro:
+  direction: tempfile 기반 작업 폴더에서 pathlib.Path로 경로를 만들고 조각으로 분해해 파일 시스템을 다룰 감각을 잡는다.
+  benefits:
+    - 문자열 경로 대신 Path 객체로 안전하게 경로를 조합할 수 있다.
+    - 운영체제마다 다른 구분자를 신경 쓰지 않고 자동화 코드를 작성한다.
+    - 절대 경로와 상대 경로의 차이를 의도적으로 사용한다.
+    - 실습 코드가 사용자 홈을 건드리지 않도록 tempfile 안에 격리한다.
+  diagram:
+    steps:
+      - label: 임시 작업 폴더 확보
+        detail: tempfile.TemporaryDirectory로 자동 정리되는 격리 폴더를 만든다.
+      - label: Path 조합과 분해
+        detail: Path 객체에 / 연산자, parts, suffix, stem을 적용해 경로를 분리한다.
+      - label: 절대 경로 변환
+        detail: Path.resolve로 상대 경로를 절대 경로로 바꿔 모호함을 없앤다.
+      - label: 결과 딕셔너리 정리
+        detail: 같은 파일을 가리키는 다양한 경로 표현을 한 객체로 묶어 다음 레슨에서 재사용한다.
+    runtime:
+      - label: 로컬 표준 라이브러리
+        detail: pathlib과 tempfile만 사용하므로 별도 패키지 설치가 필요 없다.
+      - label: assert 기반 검증
+        detail: 각 섹션은 expected 값과 actual 값을 assert로 비교한다.
+sections:
+  - id: temp-base
+    title: 임시 작업 폴더 만들기
+    structuredPrimary: true
+    subtitle: tempfile로 안전한 실험 공간 확보
+    goal: 사용자 홈을 건드리지 않는 격리된 폴더 안에서 파일 자동화 실습을 시작한다.
+    why: 자동화 코드를 작성하다 실수로 실제 사용자 파일을 덮어쓰는 사고를 막으려면 매번 일회용 작업 폴더를 쓰는 습관이 핵심이다.
+    explanation: tempfile.TemporaryDirectory는 컨텍스트가 끝나면 폴더와 안의 모든 파일을 자동으로 정리한다. with 블록 안에서 Path 객체로 감싸 두면 이후 모든 경로 조작이 Path API로 일관된다. base 경로를 변수에 보관해 두면 섹션 사이에서 같은 격리 공간을 이어 쓸 수 있다.
+    tips:
+      - tempfile은 OS의 임시 디렉터리에 폴더를 만들고 with가 끝날 때 즉시 삭제한다.
+      - Path(td)로 감싸야 이후에 / 연산자로 자연스럽게 하위 경로를 만들 수 있다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          (base / "주문").mkdir()
+          createdNames = sorted(item.name for item in base.iterdir())
+
+      assert createdNames == ["주문"]
+      createdNames
+    exercise:
+      prompt: 임시 폴더 안에 주문과 배송 두 개의 하위 폴더를 만들고 createdNames에 정렬된 두 이름이 들어가도록 코드를 완성하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "___").mkdir()
+            (base / "___").mkdir()
+            createdNames = sorted(item.name for item in base.iterdir())
+
+        assert createdNames == ["배송", "주문"]
+        createdNames
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "주문").mkdir()
+            (base / "배송").mkdir()
+            createdNames = sorted(item.name for item in base.iterdir())
+
+        assert createdNames == ["배송", "주문"]
+        createdNames
+      hints:
+        - 한국어 "주문"과 "배송"은 가나다 순으로 정렬하면 "배송"이 먼저 온다.
+        - mkdir 두 번을 호출한 뒤 iterdir로 자식 이름을 모두 읽어 정렬해야 한다.
+      check:
+        noError: tempfile 컨텍스트 안에서 두 개의 하위 폴더 생성과 iterdir 호출이 오류 없이 끝나야 한다.
+        resultCheck: createdNames 결과가 사전 순으로 정렬된 두 폴더 이름과 정확히 일치해야 한다.
+    check:
+      noError: tempfile.TemporaryDirectory가 정상적으로 진입과 종료를 마치고 base.iterdir가 항목을 반환해야 한다.
+      resultCheck: createdNames에 본문에서 만든 하위 폴더 이름이 정렬된 상태로 담겨 있어야 한다.
+  - id: path-parts
+    title: 경로 조각으로 분해하기
+    structuredPrimary: true
+    subtitle: name, stem, suffix, parts
+    goal: 파일 이름의 본체와 확장자를 분리해 자동화 규칙에 활용할 수 있게 한다.
+    why: 파일을 확장자별로 분류하거나 이름 일부만 바꿔 다른 폴더로 옮기는 작업은 이름 분해가 첫걸음이다.
+    explanation: Path.name은 마지막 경로 요소, Path.stem은 확장자를 뺀 본체, Path.suffix는 마지막 점 이하의 확장자를 돌려준다. with_suffix는 확장자만 바꾼 새 Path를 만든다. parts는 경로를 디렉터리 단위로 나눠 튜플로 보여준다.
+    tips:
+      - 점이 두 개인 .tar.gz 같은 경우 suffix는 .gz, suffixes는 [".tar", ".gz"]가 된다.
+      - with_suffix("")를 호출하면 확장자가 사라진 Path를 만들 수 있다.
+    snippet: |-
+      from pathlib import Path
+
+      sample = Path("reports/2024/orderSummary.csv")
+      decomposed = {
+          "name": sample.name,
+          "stem": sample.stem,
+          "suffix": sample.suffix,
+          "parts": list(sample.parts),
+      }
+
+      assert decomposed == {
+          "name": "orderSummary.csv",
+          "stem": "orderSummary",
+          "suffix": ".csv",
+          "parts": ["reports", "2024", "orderSummary.csv"],
+      }
+      decomposed
+    exercise:
+      prompt: invoice.json 파일을 reports/2025 폴더에 두고, 같은 이름의 yaml 확장자로 바꾼 Path를 jsonPath와 yamlPath 변수에 담아 검증하세요.
+      starterCode: |-
+        from pathlib import Path
+
+        jsonPath = Path("___") / "___" / "___"
+        yamlPath = jsonPath.___("___")
+        result = {"jsonName": jsonPath.name, "yamlName": yamlPath.name}
+
+        assert result == {"jsonName": "invoice.json", "yamlName": "invoice.yaml"}
+        result
+      solution: |-
+        from pathlib import Path
+
+        jsonPath = Path("reports") / "2025" / "invoice.json"
+        yamlPath = jsonPath.with_suffix(".yaml")
+        result = {"jsonName": jsonPath.name, "yamlName": yamlPath.name}
+
+        assert result == {"jsonName": "invoice.json", "yamlName": "invoice.yaml"}
+        result
+      hints:
+        - / 연산자는 좌측 Path와 우측 문자열을 합쳐 새 Path를 만든다.
+        - 확장자를 바꿀 때는 with_suffix 메서드를 쓰고 점을 포함해 ".yaml"처럼 넘긴다.
+      check:
+        noError: Path 조합과 with_suffix 호출이 TypeError 없이 끝나야 한다.
+        resultCheck: result 딕셔너리의 jsonName과 yamlName이 각각 invoice.json, invoice.yaml과 같아야 한다.
+    check:
+      noError: snippet의 Path 분해 코드가 AttributeError 없이 끝나야 한다.
+      resultCheck: decomposed 딕셔너리가 본문에서 정의한 네 키를 모두 채운 상태여야 한다.
+  - id: relative-absolute
+    title: 상대 경로와 절대 경로
+    structuredPrimary: true
+    subtitle: resolve로 모호함 제거
+    goal: 같은 파일을 상대 경로와 절대 경로 두 표현으로 다루고 서로 변환한다.
+    why: 자동화 스크립트가 어디서 실행되든 같은 파일을 가리키게 하려면 상대 경로를 절대 경로로 고정하는 절차가 필요하다.
+    explanation: Path.cwd는 현재 작업 디렉터리를 절대 경로로 돌려준다. Path("a/b")는 상대 경로지만 Path("a/b").resolve를 호출하면 cwd를 기준으로 절대 경로가 된다. 절대 경로끼리 비교하면 다른 두 표현이 같은 파일을 가리키는지 확실히 알 수 있다.
+    tips:
+      - Path.is_absolute로 경로가 이미 절대 경로인지 먼저 확인할 수 있다.
+      - resolve는 존재하지 않는 경로에도 호출할 수 있으며 cwd만 사용해 변환한다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td).resolve()
+          target = base / "boards" / "weekly.txt"
+          target.parent.mkdir()
+          target.write_text("ok", encoding="utf-8")
+          relative = target.relative_to(base)
+          recovered = (base / relative).resolve()
+          comparison = {"sameFile": recovered == target, "asPosix": relative.as_posix()}
+
+      assert comparison == {"sameFile": True, "asPosix": "boards/weekly.txt"}
+      comparison
+    exercise:
+      prompt: 상대 경로 reports/today.log를 base에 합쳐 절대 경로로 만들고, 원본 target과 같은 파일을 가리키는지 verified 딕셔너리에 담아 검증하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td).resolve()
+            target = base / "reports" / "today.log"
+            target.parent.mkdir()
+            target.write_text("daily", encoding="utf-8")
+            relative = Path("___") / "___"
+            recovered = (base / relative).___()
+            verified = {"matches": recovered == target, "posix": relative.as_posix()}
+
+        assert verified == {"matches": True, "posix": "reports/today.log"}
+        verified
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td).resolve()
+            target = base / "reports" / "today.log"
+            target.parent.mkdir()
+            target.write_text("daily", encoding="utf-8")
+            relative = Path("reports") / "today.log"
+            recovered = (base / relative).resolve()
+            verified = {"matches": recovered == target, "posix": relative.as_posix()}
+
+        assert verified == {"matches": True, "posix": "reports/today.log"}
+        verified
+      hints:
+        - reports와 today.log 두 조각을 / 로 이어 상대 경로를 만든다.
+        - resolve를 호출해야 cwd 기반의 절대 경로가 되고 target과 비교가 가능하다.
+      check:
+        noError: 상대 경로를 base와 합친 뒤 resolve가 OSError 없이 끝나야 한다.
+        resultCheck: verified 딕셔너리에서 matches가 True이고 posix가 reports/today.log여야 한다.
+    check:
+      noError: 임시 폴더 안의 파일 생성과 relative_to 변환이 오류 없이 끝나야 한다.
+      resultCheck: comparison 딕셔너리의 sameFile이 True이고 asPosix가 boards/weekly.txt여야 한다.
+  - id: identity-summary
+    title: 경로 정체성 종합 정리
+    structuredPrimary: true
+    subtitle: 같은 파일을 여러 표현으로 묶기
+    goal: 한 파일을 가리키는 절대 경로, 상대 경로, 이름 조각을 한 딕셔너리로 정리해 다음 자동화 단계에 넘긴다.
+    why: 자동화는 경로 표현을 자주 바꾸므로 정체성 정보를 한 객체로 묶어 두면 이후 복사나 이름 변경 단계에서 안전하게 재사용할 수 있다.
+    explanation: 마지막 섹션은 앞 세 섹션에서 익힌 메서드를 모아 결과 객체를 만든다. 절대 경로는 자동화 결과 보고에 쓰고, 상대 경로는 사용자에게 보여줄 때 쓰며, stem과 suffix는 분류 규칙을 만들 때 쓴다. 이 패턴은 다음 레슨의 파일 읽기와 쓰기 흐름에서 같은 키 이름으로 이어진다.
+    tips:
+      - 결과 딕셔너리 키 이름은 자동화 리포트의 열 이름이 되므로 의미 있게 고른다.
+      - 검증할 때 expected 딕셔너리를 먼저 만들어 두면 실패 지점을 빨리 찾을 수 있다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td).resolve()
+          target = base / "snapshots" / "march" / "report.json"
+          target.parent.mkdir(parents=True)
+          target.write_text("{}", encoding="utf-8")
+          identity = {
+              "absolute": str(target),
+              "relative": target.relative_to(base).as_posix(),
+              "stem": target.stem,
+              "suffix": target.suffix,
+          }
+
+      assert identity["relative"] == "snapshots/march/report.json"
+      assert identity["stem"] == "report"
+      assert identity["suffix"] == ".json"
+      identity
+    exercise:
+      prompt: archives/april 폴더 안에 finalSummary.txt 파일을 만들고 absolute, relative, stem, suffix를 묶은 identity 딕셔너리로 정리해 검증하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td).resolve()
+            target = base / "___" / "___" / "___"
+            target.parent.mkdir(parents=True)
+            target.write_text("done", encoding="utf-8")
+            identity = {
+                "absolute": str(target),
+                "relative": target.relative_to(base).as_posix(),
+                "stem": target.___,
+                "suffix": target.___,
+            }
+
+        assert identity["relative"] == "archives/april/finalSummary.txt"
+        assert identity["stem"] == "finalSummary"
+        assert identity["suffix"] == ".txt"
+        identity
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td).resolve()
+            target = base / "archives" / "april" / "finalSummary.txt"
+            target.parent.mkdir(parents=True)
+            target.write_text("done", encoding="utf-8")
+            identity = {
+                "absolute": str(target),
+                "relative": target.relative_to(base).as_posix(),
+                "stem": target.stem,
+                "suffix": target.suffix,
+            }
+
+        assert identity["relative"] == "archives/april/finalSummary.txt"
+        assert identity["stem"] == "finalSummary"
+        assert identity["suffix"] == ".txt"
+        identity
+      hints:
+        - parents=True를 mkdir에 넘겨야 archives/april 두 단계가 한 번에 생긴다.
+        - stem은 메서드가 아니라 속성이므로 괄호 없이 target.stem으로 접근한다.
+      check:
+        noError: mkdir(parents=True)와 write_text 호출이 오류 없이 끝나야 한다.
+        resultCheck: identity의 relative, stem, suffix가 각각 archives/april/finalSummary.txt, finalSummary, .txt여야 한다.
+    check:
+      noError: 마지막 섹션의 mkdir, write_text, 딕셔너리 구성이 순서대로 실행되어야 한다.
+      resultCheck: identity 딕셔너리에 absolute, relative, stem, suffix 네 키가 모두 채워져 있어야 한다.

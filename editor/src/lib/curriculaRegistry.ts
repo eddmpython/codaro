@@ -187,6 +187,26 @@ const categoryLabels: Record<string, { title: string; track: string; description
     track: "자동화",
     description: "브라우저 화면 점검, 폼 입력, 네트워크 mock, 증거 저장을 Python으로 자동화합니다.",
   },
+  fileOps: {
+    title: "파일 자동화",
+    track: "자동화",
+    description: "파일과 폴더, 아카이브 작업을 로컬 Python으로 자동화합니다.",
+  },
+  procCtl: {
+    title: "프로세스 자동화",
+    track: "자동화",
+    description: "외부 명령과 프로세스를 안전하게 호출하고 감시합니다.",
+  },
+  watchSched: {
+    title: "감시·스케줄",
+    track: "자동화",
+    description: "폴더 이벤트 감시와 시간 기반 자동 실행을 다룹니다.",
+  },
+  inputCtl: {
+    title: "입력·GUI 자동화",
+    track: "자동화",
+    description: "키보드와 마우스, 화면 입력으로 GUI 작업을 자동화합니다.",
+  },
 };
 
 const categoryGroups: Record<string, string[]> = {
@@ -194,7 +214,7 @@ const categoryGroups: Record<string, string[]> = {
   "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-  "자동화": ["playwright", "excel", "regex", "practical"],
+  "자동화": ["playwright", "excel", "regex", "practical", "fileOps", "procCtl", "watchSched", "inputCtl"],
   "이미지·비전": ["pillow", "opencv"],
 };
 
@@ -249,8 +269,8 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
       {
         id: "os-automation",
         name: "OS 자동화",
-        description: "파일, 프로세스, 입력, 창 제어 트랙을 위한 자리다.",
-        categories: [],
+        description: "파일, 프로세스, 이벤트, 입력을 로컬 Python으로 다룬다.",
+        categories: ["fileOps", "procCtl", "watchSched", "inputCtl"],
       },
       {
         id: "test-automation",
