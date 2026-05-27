@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.2",
-    "@codemirror/commands": "^6.8.1",
+    "@codemirror/commands": "^6.10.3",
     "@codemirror/lang-python": "^6.2.1",
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
