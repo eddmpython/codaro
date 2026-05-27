@@ -1,0 +1,294 @@
+meta:
+  id: '33'
+  title: tempfile
+  day: 33
+  category: builtins
+  tags:
+  - tempfile
+  - TemporaryDirectory
+  - NamedTemporaryFile
+  - 안전한IO
+  - 학습실습
+  seo:
+    title: 파이썬 tempfile 표준 라이브러리 - 임시 파일·디렉터리 안전 사용
+    description: TemporaryDirectory, NamedTemporaryFile, mkdtemp, mkstemp 차이와 자동 정리 패턴.
+    keywords:
+    - tempfile
+    - TemporaryDirectory
+    - NamedTemporaryFile
+    - mkdtemp
+    - 자동 정리
+intro:
+  emoji: 🗃
+  points:
+  - TemporaryDirectory로 컨텍스트 단위 임시 폴더 만들기
+  - NamedTemporaryFile로 임시 파일 + 자동 삭제
+  - mkstemp/mkdtemp로 명시적 라이프사이클 다루기
+  - delete=False와 try/finally 패턴
+  - 안전한 학습 실습/테스트 IO 패턴
+  direction: tempfile에서 자원 정리가 보장된 임시 파일·디렉터리를 만들어 실습/테스트 IO가 워크스페이스를 더럽히지 않도록 합니다.
+  benefits:
+  - 학습 실습이 저장소 루트나 사용자 폴더를 더럽히지 않게 합니다.
+  - 테스트 데이터를 격리된 임시 폴더에서 생성·검증·정리합니다.
+  - 임시 파일의 자동 삭제와 명시 정리 두 패턴을 선택할 수 있습니다.
+  diagram:
+    steps:
+    - label: 작업 분류 입력 확인
+      detail: 한 함수 안에서 끝나는 작업인지(컨텍스트) 또는 라이프사이클이 긴지(mk*) 먼저 판단합니다.
+    - label: tempfile 호출 처리 실행
+      detail: TemporaryDirectory/NamedTemporaryFile을 with 문에서 사용하거나 mkdtemp/mkstemp로 명시 생성합니다.
+    - label: 정리 결과 검증
+      detail: with 블록 종료 후 폴더/파일이 정말 삭제되었는지 확인합니다.
+    - label: tempfile 패턴 재사용
+      detail: 같은 패턴을 단위 테스트와 학습 실습에 그대로 붙입니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: tempfile과 pathlib만 사용해 추가 패키지 없이 실행합니다.
+    - label: tempfile 실행
+      detail: 셀을 실행해 임시 자원 생성/사용/정리 흐름을 확인합니다.
+    - label: tempfile 완료
+      detail: 검증된 패턴을 IO 실습 유틸리티로 남깁니다.
+sections:
+- id: temp-directory
+  title: TemporaryDirectory로 컨텍스트 단위 폴더
+  structuredPrimary: true
+  subtitle: with 블록 종료 시 자동 삭제
+  goal: tempfile.TemporaryDirectory로 임시 폴더를 만들고 with 블록 종료 후 폴더가 자동으로 삭제됨을 확인합니다.
+  why: 학습 실습이나 테스트가 만든 파일을 사용자 작업 폴더에 흘리면 정리가 어렵고 root-clean 게이트가 깨집니다. 임시 폴더는 정리 비용을 0으로 만듭니다.
+  explanation: TemporaryDirectory는 OS 임시 폴더 안에 고유 이름의 디렉터리를 만들고 with 종료 시 트리 전체를 삭제합니다. 폴더 경로는 with as 절로 받습니다. Path로 감싸 사용하면 자식 파일 경로를 깔끔하게 조합할 수 있습니다.
+  tips:
+  - with 블록 안에서만 폴더가 존재합니다. 블록 바깥에서 경로를 참조하면 FileNotFoundError가 납니다.
+  - 같은 폴더 경로를 자식 프로세스에 넘기는 경우에는 mkdtemp로 명시 라이프사이클이 더 안전합니다.
+  snippet: |-
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.TemporaryDirectory() as workspace:
+        root = Path(workspace)
+        (root / "input.txt").write_text("hello", encoding="utf-8")
+        (root / "result.txt").write_text("ok", encoding="utf-8")
+        snapshot = sorted(p.name for p in root.iterdir())
+
+    cleanedUp = not Path(workspace).exists()
+    {"snapshot": snapshot, "cleanedUp": cleanedUp}
+  exercise:
+    prompt: TemporaryDirectory 안에 하위 폴더 sub와 그 안의 파일을 만들고 with 종료 후 root.exists()가 False인지 검증하세요.
+    starterCode: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as workspace:
+          root = Path(workspace)
+          subDir = root / "sub"
+          subDir.mkdir()
+          (subDir / "note.txt").write_text("nested", encoding="utf-8")
+          nestedExists = (subDir / "note.txt").exists()
+
+      cleanedUp = not root.exists()
+      {"nestedExists": nestedExists, "cleanedUp": cleanedUp}
+    hints:
+    - mkdir로 하위 폴더를 만든 뒤 write_text로 파일을 씁니다.
+    - with 종료 시 트리 전체가 삭제되므로 root.exists()는 False입니다.
+  check:
+    noError: TemporaryDirectory와 Path 조합이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
+    resultCheck: nestedExists가 True이고 cleanedUp이 True여야 with 블록 안에서는 파일이 있고 종료 후 삭제된 것입니다.
+- id: named-temp-file
+  title: NamedTemporaryFile로 임시 파일
+  structuredPrimary: true
+  subtitle: 이름이 있는 임시 파일과 자동 정리
+  goal: NamedTemporaryFile로 임시 파일을 만들어 외부 프로세스나 다른 함수에 경로를 넘기는 흐름을 확인합니다.
+  why: 외부 명령(subprocess) 같은 코드는 파일 경로를 요구합니다. NamedTemporaryFile은 이름이 있는 임시 파일을 보장하면서 정리도 자동으로 처리합니다.
+  explanation: 'NamedTemporaryFile(mode="w+", delete=True, suffix=".log")로 파일을 만들면 with 블록 종료 시 자동 삭제됩니다. delete=False로 두면 호출자가 명시적으로 unlink해야 합니다(Windows에서는 다른 프로세스가 동시에 열어야 할 때 필요).'
+  tips:
+  - Windows에서 다른 프로세스가 동시에 같은 파일을 열려면 delete=False가 필요한 경우가 있습니다.
+  - mode와 encoding을 명시하면 텍스트 IO가 안전합니다.
+  snippet: |-
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".log", encoding="utf-8") as handle:
+        handle.write("line 1\n")
+        handle.write("line 2\n")
+        handle.flush()
+        handle.seek(0)
+        readBack = handle.read().splitlines()
+        path = Path(handle.name)
+        existsDuring = path.exists()
+
+    cleanedUp = not path.exists()
+    {"readBack": readBack, "existsDuring": existsDuring, "cleanedUp": cleanedUp}
+  exercise:
+    prompt: delete=False로 임시 파일을 만들고 with 종료 후에도 파일이 남는지 확인한 뒤 명시적으로 unlink하세요.
+    starterCode: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".log", encoding="utf-8") as handle:
+          handle.write("persist after block\n")
+          path = Path(handle.name)
+
+      existsAfterBlock = path.exists()
+      path.unlink()
+      cleanedUp = not path.exists()
+      {"existsAfterBlock": existsAfterBlock, "cleanedUp": cleanedUp}
+    hints:
+    - delete=False로 두면 with 종료 후에도 파일이 남습니다.
+    - 호출자가 unlink로 명시 삭제해야 정리가 끝납니다.
+  check:
+    noError: NamedTemporaryFile과 Path.unlink가 NameError나 FileNotFoundError 없이 실행되어야 합니다.
+    resultCheck: existsAfterBlock이 True이고 cleanedUp이 True여야 delete=False의 의도와 명시 정리가 맞는 것입니다.
+- id: mkdtemp-mkstemp
+  title: mkdtemp / mkstemp로 명시 라이프사이클
+  structuredPrimary: true
+  subtitle: with 컨텍스트가 맞지 않는 경우의 대안
+  goal: mkdtemp와 mkstemp로 임시 자원을 만들어 호출자가 정리 시점을 직접 제어하는 흐름을 확인합니다.
+  why: 자원 라이프사이클이 한 함수 호출 범위를 넘어서면(예 - 서버 시작 시 임시 폴더 생성, 종료 시 정리) with 블록이 맞지 않습니다. mk* 함수가 그 경우의 표준 도구입니다.
+  explanation: 'tempfile.mkdtemp(prefix=...)는 임시 폴더 경로를 문자열로 돌려주고 호출자가 shutil.rmtree로 정리합니다. tempfile.mkstemp(suffix=...)는 (fd, path) 튜플을 돌려주고, fd를 os.close로 닫고 path를 os.unlink로 정리합니다. try/finally가 표준 패턴입니다.'
+  tips:
+  - mk* 함수는 자동 정리가 없습니다. try/finally를 잊으면 임시 자원이 누적됩니다.
+  - prefix 인자로 디버깅 가독성을 높일 수 있습니다(예 - codaro_test_).
+  snippet: |-
+    import os
+    import shutil
+    import tempfile
+    from pathlib import Path
+
+    workspace = tempfile.mkdtemp(prefix="codaro_demo_")
+    try:
+        target = Path(workspace) / "note.txt"
+        target.write_text("manual cleanup", encoding="utf-8")
+        existsDuring = target.exists()
+    finally:
+        shutil.rmtree(workspace)
+
+    cleanedUp = not Path(workspace).exists()
+    {"existsDuring": existsDuring, "cleanedUp": cleanedUp, "prefixMatched": "codaro_demo_" in workspace}
+  exercise:
+    prompt: mkstemp로 임시 파일을 만들어 fd로 한 줄을 쓰고 os.close + os.unlink로 명시 정리하는 흐름을 만들어 보세요.
+    starterCode: |-
+      import os
+      import tempfile
+
+      fd, path = tempfile.mkstemp(suffix=".tmp", prefix="codaro_")
+      try:
+          with os.fdopen(fd, mode="w", encoding="utf-8") as handle:
+              handle.write("manual fd write\n")
+          existsDuring = os.path.exists(path)
+      finally:
+          os.unlink(path)
+
+      cleanedUp = not os.path.exists(path)
+      {"existsDuring": existsDuring, "cleanedUp": cleanedUp}
+    hints:
+    - os.fdopen으로 fd를 파이썬 파일 객체로 감싸면 with 블록을 쓸 수 있습니다.
+    - try/finally가 없으면 예외 경로에서 파일이 남습니다.
+  check:
+    noError: mkstemp와 os.fdopen 호출이 NameError나 OSError 없이 실행되어야 합니다.
+    resultCheck: existsDuring이 True이고 cleanedUp이 True여야 명시 라이프사이클 패턴이 동작하는 것입니다.
+- id: failure-cleanup
+  title: 예외 경로의 정리 보장
+  structuredPrimary: true
+  subtitle: 작업 실패해도 자원 누수 없이
+  goal: with 블록 안에서 의도적으로 예외를 발생시키고도 임시 자원이 정리되는 흐름을 확인합니다.
+  why: 자동화 코드의 실패 경로가 임시 자원을 누적시키면 디스크가 가득 차거나 후속 실행이 더러워집니다. 컨텍스트 매니저의 예외 안전성을 코드로 확인해야 안심할 수 있습니다.
+  explanation: TemporaryDirectory와 NamedTemporaryFile의 __exit__는 with 블록 안 예외와 무관하게 자원을 정리합니다. mkdtemp/mkstemp 패턴은 try/finally로 같은 보장을 만듭니다. 두 패턴 모두 호출자가 예외를 잡고 보고하는 분리된 책임을 가져야 합니다.
+  tips:
+  - 컨텍스트 매니저의 정리 코드는 예외 경로에서도 항상 실행됩니다.
+  - mk* 패턴은 try/finally 안의 정리 코드 자체가 실패할 수 있으므로 좁힌 except로 로깅을 권장합니다.
+  snippet: |-
+    import tempfile
+    from pathlib import Path
+
+    capturedPath = None
+    raised = None
+    try:
+        with tempfile.TemporaryDirectory() as workspace:
+            capturedPath = Path(workspace)
+            (capturedPath / "partial.txt").write_text("started", encoding="utf-8")
+            raise RuntimeError("simulated failure")
+    except RuntimeError as exc:
+        raised = str(exc)
+
+    cleanedUpAfterError = not capturedPath.exists()
+    {"raised": raised, "cleanedUpAfterError": cleanedUpAfterError}
+  exercise:
+    prompt: mkdtemp 패턴에 try/finally를 적용하고 예외가 발생해도 폴더가 정리되는지, finally가 빠진 경우와 비교하세요.
+    starterCode: |-
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+      workspace = tempfile.mkdtemp(prefix="codaro_fail_")
+      capturedPath = Path(workspace)
+      raised = None
+      try:
+          (capturedPath / "partial.txt").write_text("started", encoding="utf-8")
+          raise RuntimeError("simulated failure")
+      except RuntimeError as exc:
+          raised = str(exc)
+      finally:
+          shutil.rmtree(workspace, ignore_errors=True)
+
+      cleanedUpAfterError = not capturedPath.exists()
+      {"raised": raised, "cleanedUpAfterError": cleanedUpAfterError}
+    hints:
+    - try 본문에서 예외가 나도 finally가 실행됩니다.
+    - shutil.rmtree(ignore_errors=True)는 부분적으로 만들어진 폴더도 안전하게 정리합니다.
+  check:
+    noError: TemporaryDirectory와 try/finally가 NameError나 OSError 없이 실행되어야 합니다.
+    resultCheck: raised가 simulated failure이고 cleanedUpAfterError가 True여야 예외 안전성이 보장된 것입니다.
+- id: practice-pattern
+  title: 학습 실습/테스트의 표준 IO 패턴
+  structuredPrimary: true
+  subtitle: 워크스페이스를 더럽히지 않는 작업 흐름
+  goal: 학습 실습/단위 테스트에서 표준이 되는 tempfile + Path 조합 패턴을 적용해 입력 준비, 작업 실행, 결과 검증을 한 자리에 모읍니다.
+  why: 저장소 루트와 사용자 폴더를 깨끗하게 유지하는 것이 자동화/학습 도구의 기본 전제입니다. 임시 자원 안에서 입력 준비와 검증까지 끝내면 사고를 사전에 막을 수 있습니다.
+  explanation: 입력 데이터를 TemporaryDirectory 안에 쓰고, 처리 함수를 호출하고, 결과 파일을 같은 폴더에서 검증합니다. 호출자가 결과를 호출 결과로 받아 들이면 with 블록 종료 후 폴더는 자동으로 정리됩니다.
+  tips:
+  - 입력/출력 폴더를 분리하지 않고 한 폴더에서 단계별 파일 이름으로 구분하는 것도 가능합니다.
+  - 결과 데이터를 함수 반환으로 호출자에 노출하면 with 종료 후에도 검증할 수 있습니다.
+  snippet: |-
+    import tempfile
+    from pathlib import Path
+
+    def summarizeLog(rootPath, logName):
+        logPath = rootPath / logName
+        lines = logPath.read_text(encoding="utf-8").splitlines()
+        warnings = sum(1 for line in lines if "WARN" in line)
+        errors = sum(1 for line in lines if "ERROR" in line)
+        return {"warnings": warnings, "errors": errors, "total": len(lines)}
+
+    with tempfile.TemporaryDirectory() as workspace:
+        root = Path(workspace)
+        (root / "today.log").write_text("INFO ok\nWARN slow\nERROR boom\nINFO done\n", encoding="utf-8")
+        summary = summarizeLog(root, "today.log")
+
+    summary
+  exercise:
+    prompt: 같은 패턴으로 두 로그 파일(yesterday.log, today.log)을 만들고, 두 파일을 합쳐 처리한 결과 dict를 돌려주는 흐름을 만들어 보세요.
+    starterCode: |-
+      import tempfile
+      from pathlib import Path
+
+      def summarizeAll(rootPath):
+          totals = {"warnings": 0, "errors": 0, "total": 0}
+          for logPath in sorted(rootPath.glob("*.log")):
+              lines = logPath.read_text(encoding="utf-8").splitlines()
+              totals["warnings"] += sum(1 for line in lines if "WARN" in line)
+              totals["errors"] += sum(1 for line in lines if "ERROR" in line)
+              totals["total"] += len(lines)
+          return totals
+
+      with tempfile.TemporaryDirectory() as workspace:
+          root = Path(workspace)
+          (root / "yesterday.log").write_text("INFO\nERROR x\n", encoding="utf-8")
+          (root / "today.log").write_text("WARN y\nWARN z\nINFO ok\n", encoding="utf-8")
+          summary = summarizeAll(root)
+
+      summary
+    hints:
+    - glob으로 같은 패턴의 파일을 한 번에 모읍니다.
+    - 결과 dict를 함수 반환으로 받아두면 with 종료 후에도 검증할 수 있습니다.
+  check:
+    noError: summarizeAll과 TemporaryDirectory 조합이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
+    resultCheck: summary가 warnings 2, errors 1, total 5를 정확히 담아야 두 파일이 합쳐 처리된 것입니다.

@@ -1,0 +1,344 @@
+meta:
+  id: '35'
+  title: 동시성 — threading, multiprocessing, futures
+  day: 35
+  category: advancedPython
+  tags:
+  - threading
+  - multiprocessing
+  - concurrent.futures
+  - GIL
+  - race-condition
+  - 동시성
+  seo:
+    title: 파이썬 동시성 기초 - threading, multiprocessing, concurrent.futures
+    description: 스레드와 프로세스의 사용 시점, GIL, ThreadPoolExecutor와 ProcessPoolExecutor, Lock으로 race condition 방지.
+    keywords:
+    - threading
+    - multiprocessing
+    - ThreadPoolExecutor
+    - ProcessPoolExecutor
+    - GIL
+    - race condition
+intro:
+  emoji: 🧵
+  points:
+  - GIL의 의미와 IO 바운드 vs CPU 바운드 구분
+  - threading.Thread와 join으로 스레드 실행
+  - ThreadPoolExecutor로 IO 작업 병렬화
+  - ProcessPoolExecutor로 CPU 작업 병렬화
+  - Lock으로 공유 자원 race condition 방지
+  direction: 동시성에서 IO/CPU 부하를 어떤 도구로 병렬화해야 하는지 코드로 확인하고 race condition을 직접 재현/수정합니다.
+  benefits:
+  - 작업의 종류(IO vs CPU)에 맞는 동시성 도구를 고를 수 있습니다.
+  - 공유 자원 race condition을 Lock으로 방지하는 표준 패턴을 익힙니다.
+  - concurrent.futures 인터페이스로 스레드와 프로세스를 같은 호출 형태로 다룹니다.
+  diagram:
+    steps:
+    - label: 작업 분류 입력 확인
+      detail: 작업이 IO 바운드인지 CPU 바운드인지 먼저 판단합니다.
+    - label: 동시성 도구 처리 실행
+      detail: IO면 스레드/asyncio, CPU면 프로세스를 사용합니다.
+    - label: 공유 자원 결과 검증
+      detail: 결과 합산이 의도한 값과 일치하는지 race 없이 끝났는지 확인합니다.
+    - label: 동시성 패턴 재사용
+      detail: 검증된 호출 흐름을 다른 작업에 그대로 붙입니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: threading, multiprocessing, concurrent.futures만 사용해 추가 패키지 없이 실행합니다.
+    - label: 동시성 실행
+      detail: 셀을 실행해 병렬 처리 시간과 결과 합산을 확인합니다.
+    - label: 동시성 완료
+      detail: 검증된 코드를 동시성 패턴 유틸리티로 남깁니다.
+sections:
+- id: gil-io-vs-cpu
+  title: GIL과 IO vs CPU 구분
+  structuredPrimary: true
+  subtitle: 스레드가 빨라지는 경우와 빨라지지 않는 경우
+  goal: 동일한 작업을 IO 부하/CPU 부하 두 형태로 만들고 스레드가 어느 쪽에서만 빨라지는지 시간으로 확인합니다.
+  why: CPython의 GIL은 한 번에 하나의 스레드만 Python 바이트코드를 실행시킵니다. IO 대기 중에는 GIL이 풀려 다른 스레드가 진행되지만 CPU 작업은 스레드가 늘어도 거의 빨라지지 않습니다. 이 차이를 모르면 잘못된 도구를 쓰게 됩니다.
+  explanation: time.sleep으로 모의하는 IO 작업은 GIL을 풀고 잠들기 때문에 스레드 병렬화로 시간이 줄어듭니다. CPU 작업은 GIL을 잡고 계산하므로 스레드를 늘려도 직렬 실행과 비슷한 시간이 걸립니다. 이 경우 ProcessPoolExecutor가 정답입니다.
+  tips:
+  - IO 바운드 → 스레드 또는 asyncio.
+  - CPU 바운드 → 프로세스(또는 numpy/C 확장으로 GIL 풀린 라이브러리).
+  snippet: |-
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    def ioJob(seconds):
+        time.sleep(seconds)
+        return seconds
+
+    def cpuJob(n):
+        total = 0
+        for index in range(n):
+            total += index * index
+        return total
+
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        ioResults = list(pool.map(ioJob, [0.05] * 4))
+    ioElapsed = time.perf_counter() - start
+
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        cpuResults = list(pool.map(cpuJob, [200_000] * 4))
+    cpuElapsed = time.perf_counter() - start
+
+    {"ioElapsed": ioElapsed, "cpuElapsed": cpuElapsed}
+  exercise:
+    prompt: ioJob을 동일하게 4번 직렬 실행한 시간과 스레드풀 결과 ioElapsed를 비교해 IO 작업에서 스레드가 얼마나 빨라지는지 확인하세요.
+    starterCode: |-
+      import time
+      from concurrent.futures import ThreadPoolExecutor
+
+      def ioJob(seconds):
+          time.sleep(seconds)
+          return seconds
+
+      start = time.perf_counter()
+      for _ in range(4):
+          ioJob(0.05)
+      sequentialElapsed = time.perf_counter() - start
+
+      start = time.perf_counter()
+      with ThreadPoolExecutor(max_workers=4) as pool:
+          list(pool.map(ioJob, [0.05] * 4))
+      parallelElapsed = time.perf_counter() - start
+
+      {"sequential": sequentialElapsed, "parallel": parallelElapsed}
+    hints:
+    - 순차 실행은 약 0.2초, 4-스레드 병렬은 약 0.05초 근처입니다.
+    - 두 시간 비율이 4에 가까우면 IO 병렬화 효과가 보이는 것입니다.
+  check:
+    noError: ioJob과 ThreadPoolExecutor 호출이 NameError나 RuntimeError 없이 실행되어야 합니다.
+    resultCheck: sequential이 parallel의 2배 이상이어야 IO 작업이 스레드 병렬화로 줄어들었음을 보여줍니다.
+- id: thread-basic
+  title: threading.Thread와 join
+  structuredPrimary: true
+  subtitle: 저수준 스레드 직접 다루기
+  goal: threading.Thread로 작업을 직접 띄우고 join으로 끝날 때까지 기다리는 흐름을 확인합니다.
+  why: 풀이 아닌 단일 백그라운드 작업이나 데몬 스레드를 띄울 때는 Thread 객체를 직접 사용하는 편이 자연스럽습니다.
+  explanation: threading.Thread(target=callable, args=(...))로 스레드 객체를 만들고 start로 시작합니다. join은 그 스레드가 끝날 때까지 호출자를 막습니다. daemon=True로 만들면 메인 프로그램 종료 시 자동으로 정리됩니다.
+  tips:
+  - join 없이 끝내면 결과가 준비되지 않은 시점에 코드가 진행될 수 있습니다.
+  - 데몬 스레드는 정리 보장이 없으므로 자원 해제가 필요한 작업에는 부적절합니다.
+  snippet: |-
+    import threading
+    import time
+
+    results = {}
+
+    def worker(name, delay):
+        time.sleep(delay)
+        results[name] = f"done:{name}"
+
+    threads = [
+        threading.Thread(target=worker, args=("a", 0.03)),
+        threading.Thread(target=worker, args=("b", 0.05)),
+        threading.Thread(target=worker, args=("c", 0.01)),
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    sorted(results.items())
+  exercise:
+    prompt: worker를 두 번 더 추가하고, 마지막 한 스레드만 join하지 않으면 결과 dict에 누락이 생길 수 있는지 확인하세요.
+    starterCode: |-
+      import threading
+      import time
+
+      results = {}
+
+      def worker(name, delay):
+          time.sleep(delay)
+          results[name] = f"done:{name}"
+
+      threads = [
+          threading.Thread(target=worker, args=(name, delay))
+          for name, delay in [("a", 0.03), ("b", 0.05), ("c", 0.01), ("d", 0.04)]
+      ]
+      for thread in threads:
+          thread.start()
+      for thread in threads:
+          thread.join()
+
+      sorted(results.items())
+    hints:
+    - 모든 스레드를 join하면 결과 dict에 모든 항목이 들어 있습니다.
+    - join을 빼면 race로 일부 항목이 비어 있을 수 있습니다.
+  check:
+    noError: Thread 생성과 join 호출이 NameError나 RuntimeError 없이 실행되어야 합니다.
+    resultCheck: 결과 리스트가 4개 항목을 가지고 각 값이 done:<name> 형태여야 합니다.
+- id: lock-race
+  title: Lock으로 race condition 방지
+  structuredPrimary: true
+  subtitle: 공유 변수 안전한 갱신
+  goal: 여러 스레드가 같은 변수를 갱신할 때 발생하는 race condition을 직접 재현하고 Lock으로 수정합니다.
+  why: Python의 += 같은 연산은 원자적이지 않습니다. 여러 스레드가 동시에 갱신하면 일부 갱신이 사라집니다. Lock이 그 구간을 직렬화합니다.
+  explanation: threading.Lock 객체를 만들고 with lock 블록으로 임계 구간을 보호합니다. 같은 코드를 Lock 없이 실행하면 결과가 예상보다 작게 나올 수 있습니다. Lock은 가장 단순한 동기화 기본형이고, RLock/Semaphore/Event 등이 더 정교한 패턴을 제공합니다.
+  tips:
+  - 임계 구간은 가능한 짧게 유지해야 동시성 이득이 큽니다.
+  - += 같은 단순 연산도 원자적이지 않을 수 있다는 점이 함정입니다.
+  snippet: |-
+    import threading
+
+    counter = {"value": 0}
+    lock = threading.Lock()
+
+    def increment(times):
+        for _ in range(times):
+            with lock:
+                counter["value"] += 1
+
+    threads = [threading.Thread(target=increment, args=(10_000,)) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    counter["value"]
+  exercise:
+    prompt: 같은 코드에서 Lock을 빼고 실행하면 결과가 의도한 40_000보다 작게 나올 수 있는지 직접 확인하세요(환경에 따라 결과가 다를 수 있음).
+    starterCode: |-
+      import threading
+
+      lockedCounter = {"value": 0}
+      lock = threading.Lock()
+
+      def incrementLocked(times):
+          for _ in range(times):
+              with lock:
+                  lockedCounter["value"] += 1
+
+      threads = [threading.Thread(target=incrementLocked, args=(5_000,)) for _ in range(4)]
+      for thread in threads:
+          thread.start()
+      for thread in threads:
+          thread.join()
+
+      lockedCounter["value"]
+    hints:
+    - 4개 스레드 x 5000회 = 20000이 기대값입니다.
+    - Lock이 있으면 결과가 정확히 20000이어야 합니다.
+  check:
+    noError: Lock과 Thread 호출이 NameError나 RuntimeError 없이 실행되어야 합니다.
+    resultCheck: 결과 값이 정확히 20000이어야 Lock이 race condition을 막은 것입니다.
+- id: thread-pool
+  title: ThreadPoolExecutor 표준 사용
+  structuredPrimary: true
+  subtitle: submit / map / as_completed
+  goal: ThreadPoolExecutor로 작업을 제출하고 결과를 받는 세 가지 표준 흐름(map, submit, as_completed)을 비교합니다.
+  why: 직접 Thread를 다루기보다 풀과 future 객체를 통해 결과 수집/예외 처리를 표준화하는 편이 대부분의 경우 안전하고 가독성이 좋습니다.
+  explanation: 'pool.map(func, iterable)은 입력 순서대로 결과를 돌려줍니다. pool.submit(func, *args)는 Future를 돌려주고, as_completed로 완료된 순서대로 결과를 받습니다. with 블록을 빠져나갈 때 풀이 자동으로 shutdown되어 안전합니다.'
+  tips:
+  - 결과 순서가 중요하면 map, 빨리 끝난 것부터 처리하려면 as_completed.
+  - submit이 돌려준 Future의 result()에서 예외가 발생하면 호출자에게 그대로 전파됩니다.
+  snippet: |-
+    import time
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def fetch(name, delay):
+        time.sleep(delay)
+        return f"done:{name}"
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        mapResults = list(pool.map(fetch, ["a", "b", "c"], [0.03, 0.01, 0.02]))
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = [pool.submit(fetch, name, delay) for name, delay in [("a", 0.03), ("b", 0.01), ("c", 0.02)]]
+        completedOrder = [future.result() for future in as_completed(futures)]
+
+    {"mapOrder": mapResults, "completedOrder": completedOrder}
+  exercise:
+    prompt: submit과 as_completed로 받은 결과 순서가 작업 종료 시간 순서를 따르는지(b가 가장 빨리 끝나므로 첫 번째인지) 확인하세요.
+    starterCode: |-
+      import time
+      from concurrent.futures import ThreadPoolExecutor, as_completed
+
+      def fetch(name, delay):
+          time.sleep(delay)
+          return f"done:{name}"
+
+      with ThreadPoolExecutor(max_workers=3) as pool:
+          futures = [pool.submit(fetch, name, delay) for name, delay in [("a", 0.05), ("b", 0.01), ("c", 0.03)]]
+          completedOrder = [future.result() for future in as_completed(futures)]
+
+      completedOrder
+    hints:
+    - as_completed는 완료된 순서대로 yield합니다.
+    - b가 가장 짧으므로 첫 번째 항목이 done:b여야 합니다.
+  check:
+    noError: ThreadPoolExecutor와 as_completed 호출이 NameError나 RuntimeError 없이 실행되어야 합니다.
+    resultCheck: 결과 리스트의 첫 항목이 done:b이고 마지막 항목이 done:a여야 완료 순서대로 결과가 나온 것입니다.
+- id: process-pool
+  title: ProcessPoolExecutor로 CPU 작업
+  structuredPrimary: true
+  subtitle: GIL 우회와 직렬화 제약
+  goal: ProcessPoolExecutor로 CPU 작업을 병렬화해 ThreadPool과 시간 차이를 확인합니다.
+  why: CPU 바운드 작업은 GIL 때문에 스레드로는 빨라지지 않습니다. 별개 프로세스가 각자 GIL을 가져 진정한 병렬 실행이 됩니다.
+  explanation: 'ProcessPoolExecutor는 인자/반환값을 pickle로 직렬화하므로 작업 함수와 데이터가 pickleable이어야 합니다. 모듈 최상위에 정의된 함수만 자식 프로세스에서 임포트 가능하기 때문에, 스크립트 가드(if __name__ == "__main__":)가 일반적입니다. 노트북/셀 환경에서는 사용 가능 여부가 환경에 따라 다릅니다.'
+  tips:
+  - 함수는 모듈 최상위에 두어야 직렬화/임포트가 안전합니다.
+  - 입력/출력이 크면 프로세스 간 IPC 비용이 병렬화 이득을 상쇄할 수 있습니다.
+  snippet: |-
+    import time
+    from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+
+    def heavyJob(n):
+        total = 0
+        for index in range(n):
+            total += index * index
+        return total
+
+    workload = [400_000, 400_000, 400_000, 400_000]
+
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        threadResults = list(pool.map(heavyJob, workload))
+    threadElapsed = time.perf_counter() - start
+
+    try:
+        start = time.perf_counter()
+        with ProcessPoolExecutor(max_workers=4) as pool:
+            processResults = list(pool.map(heavyJob, workload))
+        processElapsed = time.perf_counter() - start
+    except Exception as exc:
+        processElapsed = None
+        processResults = []
+
+    {"threadElapsed": threadElapsed, "processElapsed": processElapsed, "sameResults": threadResults == processResults}
+  exercise:
+    prompt: heavyJob의 결과가 ThreadPool과 ProcessPool에서 동일한지 확인하고, 환경에 따라 processElapsed가 threadElapsed보다 작거나 비슷하게 나오는지 검증하세요.
+    starterCode: |-
+      import time
+      from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+
+      def heavyJob(n):
+          total = 0
+          for index in range(n):
+              total += index * index
+          return total
+
+      workload = [200_000] * 4
+
+      with ThreadPoolExecutor(max_workers=4) as pool:
+          threadResults = list(pool.map(heavyJob, workload))
+
+      try:
+          with ProcessPoolExecutor(max_workers=4) as pool:
+              processResults = list(pool.map(heavyJob, workload))
+          processAvailable = True
+      except Exception:
+          processResults = []
+          processAvailable = False
+
+      {"sameResults": threadResults == processResults, "processAvailable": processAvailable}
+    hints:
+    - 결과 리스트는 두 풀에서 동일해야 합니다(같은 함수, 같은 입력).
+    - 노트북 환경에 따라 ProcessPoolExecutor가 사용 불가일 수 있습니다.
+  check:
+    noError: heavyJob과 풀 호출이 NameError나 ImportError 없이 실행되어야 합니다.
+    resultCheck: sameResults가 True이고 processAvailable가 True이면 두 풀의 결과가 일치한 것입니다.
