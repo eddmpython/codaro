@@ -18,7 +18,7 @@ meta:
   - 색상필터
   seo:
     title: OpenCV 심화 - 종합 비전 프로젝트
-    description: OpenCV 전체 개념을 종합하여 색상 필터링과 객체 분석을 수행합니다.
+    description: 색공간 변환·inRange·모폴로지·컨투어를 한 함수로 묶어 색상 기반 객체 검출 파이프라인을 만듭니다.
     keywords:
     - OpenCV
     - inRange
@@ -27,396 +27,619 @@ meta:
     - 컴퓨터비전
 intro:
   emoji: 🎯
-  goal: 색상 기반 객체 검출, 마스킹, 컨투어 분석을 종합적으로 수행합니다.
-  description: 지금까지 배운 OpenCV 개념을 종합합니다. 색상 필터링 파이프라인(HSV 변환 → inRange 마스킹 → 모폴로지 정제 → 컨투어 검출)을 구축합니다.
-  direction: 종합비전프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: HSV 변환 → inRange 마스킹 → 모폴로지 정제 → 컨투어 분석 → 외접 사각형 시각화까지 색상 기반 객체 검출 파이프라인을 함수 한 개로 묶어 만듭니다.
+  description: 02~09에서 익힌 색공간, 모폴로지, 컨투어를 결합해 "특정 색의 객체를 찾아 위치와 크기를 알려주는" 한 함수를 완성합니다.
+  direction: 합성 입력에서 정답을 미리 계산하고 파이프라인 결과를 dict로 검증한 뒤, flower 사진에 일반화하는 흐름.
   benefits:
-  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
-  - 종합비전프로젝트 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
-  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
+  - HSV inRange 마스크의 결과를 픽셀 수로 검증합니다.
+  - 모폴로지 OPEN으로 점 노이즈를 정리하고 변화량을 측정합니다.
+  - findContours + boundingRect로 객체 위치/크기를 정량 추출합니다.
+  - detectColorObjects 종합 함수가 dict 한 개로 검출 결과를 보고합니다.
   diagram:
     steps:
-    - label: 1단계. 이미지 불러오기 입력 확인
-      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. HSV 변환 처리 실행
-      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. 색상 마스킹 결과 검증
-      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
-    - label: 종합비전프로젝트 재사용
-      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
+    - label: 합성 입력 만들기
+      detail: 어두운 배경 + 빨강 원 두 개 + 점 노이즈로 검출 정답을 정합니다.
+    - label: HSV 변환과 inRange
+      detail: 빨강 범위 (0, 80, 80)~(10, 255, 255)로 색 마스크를 만듭니다.
+    - label: 모폴로지 정제
+      detail: OPEN으로 점 노이즈를 제거해 정답 객체 두 개만 남깁니다.
+    - label: 컨투어 + 외접 사각형
+      detail: findContours + boundingRect로 객체 위치와 크기를 추출합니다.
+    - label: 종합 함수
+      detail: detectColorObjects 함수 한 개에 위 흐름을 묶어 새 입력에 바로 적용 가능하게 만듭니다.
     runtime:
-    - label: 컴퓨터 비전 환경
-      detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 종합비전프로젝트 실행
-      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
-    - label: 종합비전프로젝트 완료
-      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
+    - label: opencv-python 패키지
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 cv2 호출이 가능합니다.
+    - label: 합성 → 사진 일반화
+      detail: 합성 입력에서 알고리즘을 검증한 뒤 실제 사진(flower)에 같은 함수를 적용합니다.
+    - label: 함수 인터페이스 통일
+      detail: detectColorObjects가 dict 한 개로 결과를 돌려줘 자동화 코드에서 그대로 활용 가능.
 sections:
 - id: step1_load
-  title: 1단계. 이미지 불러오기
+  title: 1단계. 합성 비전 입력
   structuredPrimary: true
-  subtitle: 분석 대상 이미지
-  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: sklearn의 flower 이미지를 불러옵니다. 꽃의 주황색 영역을 검출하는 파이프라인을 구축합니다.
+  subtitle: 빨강 두 객체 + 점 노이즈
+  goal: 어두운 배경에 빨강 원과 사각형 두 객체, 그리고 작은 점 노이즈가 있는 BGR 합성 입력을 만듭니다.
+  why: 종합 파이프라인의 정답(객체 수 2개, 노이즈 1개)을 사람이 미리 알 수 있어야 검증이 됩니다. 합성 입력은 이런 정답을 명확히 가집니다.
+  explanation: |-
+    어두운 회색([35, 35, 35]) 배경에 BGR 빨강([0, 0, 255]) 두 도형을 그리고, 한쪽에 작은 점 노이즈([0, 0, 255])를 박습니다. 이렇게 만든 입력은 "큰 빨강 객체 2개 + 작은 빨강 점 1개" 정답을 가집니다.
+    종합 파이프라인의 목표는 "큰 빨강 객체 2개"를 정확히 찾아내고 점 노이즈는 모폴로지로 정리하는 것입니다.
+    이 입력 한 개가 이후 모든 셀의 공통 입력이라 변수 이름을 정확히 지정해 둡니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 배경을 완전한 검정이 아닌 회색으로 둬서 색상 마스크가 배경에 영향받지 않는지 검증합니다.
+  - 점 노이즈는 단일 픽셀이라 (3, 3) 또는 (5, 5) OPEN으로 충분히 정리됩니다.
   snippet: |-
     import cv2
     import numpy as np
-    from sklearn.datasets import load_sample_image
-    import matplotlib.pyplot as plt
 
-    flower = load_sample_image('flower.jpg')
-    scene = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-    plt.figure(figsize=(10, 6))
-    plt.imshow(flower)
-    plt.title(f'Scene: {scene.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    sceneCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(sceneCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(sceneCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(sceneCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    {
+        'shape': sceneCanvas.shape,
+        'dtype': str(sceneCanvas.dtype),
+        'isBgr': sceneCanvas.shape[2] == 3,
+        'cornerColor': sceneCanvas[5, 5].tolist(),
+    }
   exercise:
-    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 같은 캔버스에 점 노이즈를 한 개 더 추가하고(예 (130, 5) 위치) shape와 cornerColor가 그대로인지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
 
-      flower = load_sample_image('flower.jpg')
-      scene = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(flower)
-      plt.title(f'Scene: {scene.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      addCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(addCanvas, (55, 70), 24, (0, 0, 255), -1)
+      cv2.rectangle(addCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+      cv2.circle(addCanvas, (20, 20), 3, (0, 0, 255), -1)
+      cv2.circle(addCanvas, (130, 5), 3, (0, 0, ___), -1)
+
+      {'shape': addCanvas.shape, 'cornerColor': addCanvas[5, 5].tolist()}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - BGR 빨강은 (0, 0, 255)입니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: cv2.circle 추가 호출이 끝나야 합니다.
+      resultCheck: shape가 (140, 180, 3)이고 cornerColor가 [35, 35, 35]여야 합니다.
   check:
-    noError: 1단계. 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 합성 입력 생성과 dict 구성이 끝나야 합니다.
+    resultCheck: shape가 (140, 180, 3), isBgr이 True, cornerColor가 [35, 35, 35]여야 합니다.
 - id: step2_hsv
-  title: 2단계. HSV 변환
+  title: 2단계. BGR → HSV 변환
   structuredPrimary: true
-  subtitle: 색상 기반 분석 준비
-  goal: 2단계. HSV 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 색상 기반 필터링 준비
+  goal: 합성 입력을 cv2.COLOR_BGR2HSV로 변환하고 H/S/V 채널별 통계로 입력의 색 분포를 점검합니다.
+  why: 색상 기반 객체 검출은 HSV에서 H 채널 하나만 필터링하면 끝납니다. 변환 후 H 값 분포를 확인하면 어느 임계값이 의미 있는지가 명확해집니다.
   explanation: |-
-    RGB에서는 "빨간색 계열"을 찾으려면 R, G, B 세 채널을 복잡하게 조합해야 하지만, HSV에서는 Hue(색상) 채널 하나만 보면 됩니다. Hue 값이 비슷하면 밝기나 채도와 관계없이 같은 색 계열입니다. 이러한 특성 때문에 HSV는 색상 기반 객체 검출에 널리 사용됩니다.
-
-    OpenCV HSV에서 H는 0-179 범위입니다. 주황색은 대략 5-25, 노란색은 25-35, 녹색은 35-85 정도입니다. 정확한 값은 이미지마다 다르므로 확인이 필요합니다.
+    cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)는 (H, W, 3) HSV uint8을 돌려줍니다. OpenCV의 H는 0~179 범위로 압축되어 있습니다.
+    BGR 빨강(0, 0, 255)은 HSV에서 H=0, S=255, V=255가 됩니다. 어두운 회색(35, 35, 35)은 H=0(아무 색이나 가능), S=0, V=35입니다.
+    H 채널만 보면 빨강과 회색이 둘 다 H=0이라 구분이 안 됩니다. 그래서 inRange로 S와 V 하한도 함께 줘야 합니다. S>=80, V>=80 정도가 일반적인 시작점입니다.
   tips:
-  - OpenCV HSV에서 H는 0-179 범위입니다. 주황색은 대략 5-25, 노란색은 25-35, 녹색은 35-85 정도입니다. 정확한 값은 이미지마다 다르므로 확인이 필요합니다.
+  - HSV의 H 값은 0~179이고 S, V는 0~255입니다. 다른 라이브러리(matplotlib 등)와 H 범위가 달라 헷갈리기 쉽습니다.
+  - 무채색(회색, 흰색, 검정) 픽셀의 H 값은 의미가 없습니다. S가 0이라 모든 H 값이 같은 색을 가리킵니다.
   snippet: |-
-    hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
-    hue, sat, val = cv2.split(hsv)
-    plt.figure(figsize=(10, 6))
-    plt.imshow(hsv)
-    plt.title(f'HSV: {hsv.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    import cv2
+    import numpy as np
+
+    hsvCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(hsvCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(hsvCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+
+    hsvImage = cv2.cvtColor(hsvCanvas, cv2.COLOR_BGR2HSV)
+
+    {
+        'shape': hsvImage.shape,
+        'redCirclePixel': hsvImage[70, 55].tolist(),
+        'rectPixel': hsvImage[70, 130].tolist(),
+        'backgroundPixel': hsvImage[5, 5].tolist(),
+    }
   exercise:
-    prompt: 2단계. HSV 변환 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 빨강 영역의 평균 H 값을 측정하고 0 근처(0~10)에 있는지 확인하세요. cv2.inRange로 H<=10 마스크를 만들어 빨강 픽셀만 골라낼 수 있습니다.
     starterCode: |-
-      hsv = cv2.cvtColor(scene, cv2.COLOR_BGR2HSV)
-      hue, sat, val = cv2.split(hsv)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(hsv)
-      plt.title(f'HSV: {hsv.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      import cv2
+      import numpy as np
+
+      meanCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(meanCanvas, (55, 70), 24, (0, 0, 255), -1)
+
+      meanHsv = cv2.cvtColor(meanCanvas, cv2.COLOR_BGR2HSV)
+      redMask = (meanHsv[..., 2] >= 200)
+      redHueMean = float(meanHsv[..., 0][redMask].mean()) if redMask.any() else -1.0
+      {'redHueMean': round(redHueMean, 1), 'isNearZero': redHueMean ___ 10.0}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - "빨강의 H 값은 0 근처이므로 redHueMean이 10보다 작아야 합니다."
+    - 빈칸에는 < 또는 <= 부등호가 들어갑니다.
+    check:
+      noError: cvtColor와 마스크 계산이 끝나야 합니다.
+      resultCheck: isNearZero가 True여야 합니다.
   check:
-    noError: 2단계. HSV 변환의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. HSV 변환 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: cvtColor와 픽셀 조회가 끝나야 합니다.
+    resultCheck: shape가 (140, 180, 3)이고 redCirclePixel의 S, V가 모두 80 이상이어야 합니다.
 - id: step3_mask
-  title: 3단계. 색상 마스킹
+  title: 3단계. inRange로 빨강 마스크
   structuredPrimary: true
-  subtitle: inRange()
-  goal: 3단계. 색상 마스킹에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 색상 범위 필터
+  goal: HSV 입력에 (0, 80, 80)~(10, 255, 255) 범위 inRange를 적용해 빨강 픽셀만 255인 단채널 마스크를 만들고 픽셀 수가 도형 면적의 합 정도인지 확인합니다.
+  why: inRange는 색공간에서 색 추출의 표준 도구입니다. lower/upper 범위 안의 픽셀만 255로 표시한 단채널 마스크가 후속 모폴로지/컨투어의 입력이 됩니다.
   explanation: |-
-    inRange()는 범위 필터링 함수로, 지정한 하한(lower)과 상한(upper) 사이의 픽셀만 흰색(255)으로, 나머지는 검은색(0)으로 만드는 이진 마스크를 생성합니다. HSV에서 [H_min, S_min, V_min]과 [H_max, S_max, V_max]를 지정하면 해당 색상 범위의 픽셀만 추출됩니다. 색상 기반 객체 분할의 핵심 함수입니다.
-
-    inRange(src, lowerb, upperb)는 lowerb <= pixel <= upperb인 픽셀을 255로, 나머지를 0으로 설정합니다. HSV에서 [H, S, V] 순서로 범위를 지정합니다.
+    cv2.inRange(image, lower, upper)는 각 채널이 동시에 lower~upper 범위 안에 있는 픽셀만 255로 표시합니다. HSV에서 lower=[H_min, S_min, V_min], upper=[H_max, S_max, V_max] 형식입니다.
+    빨강은 H가 0과 179 양 끝에 있어, 정확히 다루려면 두 범위(0~10과 170~179)의 마스크를 따로 만들어 OR로 합쳐야 합니다. 본 예제는 단순화를 위해 0~10 한쪽만 사용합니다.
+    S_min, V_min을 함께 둬야 회색 픽셀이 잘못 잡히지 않습니다. S>=80, V>=80은 채색이 강하고 어둡지 않은 영역만 통과시키는 안전 기준입니다.
   tips:
-  - inRange(src, lowerb, upperb)는 lowerb <= pixel <= upperb인 픽셀을 255로, 나머지를 0으로 설정합니다. HSV에서 [H, S, V]
-    순서로 범위를 지정합니다.
+  - 결과 마스크의 픽셀 수는 도형 면적의 합과 거의 같지만 약간 차이가 납니다. 도형 가장자리 픽셀이 보간되어 색이 살짝 달라질 수 있어서입니다.
+  - inRange는 ndarray뿐 아니라 튜플도 lower/upper로 받습니다. (0, 80, 80) 같은 형식도 가능.
   snippet: |-
-    lowerOrange = np.array([5, 100, 100])
-    upperOrange = np.array([25, 255, 255])
-    mask = cv2.inRange(hsv, lowerOrange, upperOrange)
-    plt.figure(figsize=(10, 6))
-    plt.imshow(mask, cmap='gray')
-    plt.title(f'Mask: {mask.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    import cv2
+    import numpy as np
+
+    maskCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(maskCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(maskCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(maskCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    maskHsv = cv2.cvtColor(maskCanvas, cv2.COLOR_BGR2HSV)
+    redMask = cv2.inRange(maskHsv, (0, 80, 80), (10, 255, 255))
+
+    expectedRedArea = round(3.14159 * 24 * 24) + (155 - 110) * (95 - 45) + round(3.14159 * 3 * 3)
+
+    {
+        'maskShape': redMask.shape,
+        'maskedPixels': int((redMask == 255).sum()),
+        'expectedApprox': expectedRedArea,
+        'closeToExpected': abs(int((redMask == 255).sum()) - expectedRedArea) < 100,
+    }
   exercise:
-    prompt: 3단계. 색상 마스킹 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: S와 V 하한을 (200, 200)으로 매우 엄격하게 주면 두 도형 모두 잡히는지 확인하세요. 도형 색이 진하므로 통과해야 합니다.
     starterCode: |-
-      lowerOrange = np.array([5, 100, 100])
-      upperOrange = np.array([25, 255, 255])
-      mask = cv2.inRange(hsv, lowerOrange, upperOrange)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(mask, cmap='gray')
-      plt.title(f'Mask: {mask.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      import cv2
+      import numpy as np
+
+      strictCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(strictCanvas, (55, 70), 24, (0, 0, 255), -1)
+      cv2.rectangle(strictCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+
+      strictHsv = cv2.cvtColor(strictCanvas, cv2.COLOR_BGR2HSV)
+      strictMask = cv2.inRange(strictHsv, (0, ___, 200), (10, 255, 255))
+      {'strictPixels': int((strictMask == 255).sum()), 'hasMatches': int((strictMask == 255).sum()) > 0}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - S 하한 200을 넣습니다.
+    - 빈칸에는 200이 들어갑니다.
+    check:
+      noError: inRange 호출이 끝나야 합니다.
+      resultCheck: hasMatches가 True이고 strictPixels가 양의 정수여야 합니다.
   check:
-    noError: 3단계. 색상 마스킹의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 색상 마스킹 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: HSV 변환과 inRange 호출이 끝나야 합니다.
+    resultCheck: maskShape가 (140, 180), closeToExpected가 True여야 합니다.
 - id: step4_morph
-  title: 4단계. 마스크 정제
+  title: 4단계. 모폴로지로 마스크 정제
   structuredPrimary: true
-  subtitle: 모폴로지 연산
-  goal: 4단계. 마스크 정제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 마스크에 노이즈가 있을 수 있습니다. 모폴로지 연산으로 작은 노이즈를 제거하고 구멍을 채웁니다.
+  subtitle: OPEN으로 점 노이즈 제거
+  goal: 빨강 마스크에 (5, 5) MORPH_OPEN을 적용해 점 노이즈를 제거하고, 정제 후 객체 수가 정확히 2(큰 도형 두 개)가 되는지 findContours로 확인합니다.
+  why: inRange만으로는 점 노이즈가 마스크에 그대로 남습니다. OPEN으로 점 노이즈를 정리하면 다음 단계의 findContours가 정답 객체 수만 잡습니다.
+  explanation: |-
+    cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)는 erode → dilate를 한 번에 적용합니다. 점 노이즈는 erode에서 사라지고 큰 도형은 dilate로 원래 크기에 가까워집니다.
+    합성 입력의 점 노이즈는 단일 픽셀과 작은 원(반지름 3)이라 (5, 5) OPEN으로 충분히 정리됩니다.
+    정제 효과는 findContours 결과의 객체 수로 검증합니다. 정제 전에는 3 (큰 두 개 + 점 노이즈), 정제 후에는 2가 나와야 합니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - OPEN 커널 크기가 너무 크면 큰 객체도 사라질 수 있습니다. 노이즈 크기보다 약간 큰 정도가 적절합니다.
+  - OPEN 후 CLOSE를 추가로 적용하면 큰 객체의 내부 구멍도 메워집니다. 본 합성 입력에는 구멍이 없어 CLOSE는 생략합니다.
   snippet: |-
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    maskClean = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, kernel)
-    plt.figure(figsize=(10, 6))
-    plt.imshow(maskClean, cmap='gray')
-    plt.title(f'Mask Clean: {maskClean.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    import cv2
+    import numpy as np
+
+    morphCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(morphCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(morphCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(morphCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    morphHsv = cv2.cvtColor(morphCanvas, cv2.COLOR_BGR2HSV)
+    rawMask = cv2.inRange(morphHsv, (0, 80, 80), (10, 255, 255))
+    morphKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    cleanMask = cv2.morphologyEx(rawMask, cv2.MORPH_OPEN, morphKernel)
+
+    rawContours, _ = cv2.findContours(rawMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cleanContours, _ = cv2.findContours(cleanMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    {
+        'rawObjectCount': len(rawContours),
+        'cleanObjectCount': len(cleanContours),
+        'noiseRemoved': len(cleanContours) == 2,
+        'rawWhite': int((rawMask == 255).sum()),
+        'cleanWhite': int((cleanMask == 255).sum()),
+    }
   exercise:
-    prompt: 4단계. 마스크 정제 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: OPEN 대신 더 큰 (9, 9) 커널을 쓰면 정제 후 객체 수가 변하는지 확인하세요. 큰 도형은 여전히 살아남는지가 핵심입니다.
     starterCode: |-
-      kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-      maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-      maskClean = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, kernel)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(maskClean, cmap='gray')
-      plt.title(f'Mask Clean: {maskClean.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      import cv2
+      import numpy as np
+
+      bigKernelCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(bigKernelCanvas, (55, 70), 24, (0, 0, 255), -1)
+      cv2.rectangle(bigKernelCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+      cv2.circle(bigKernelCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+      bigHsv = cv2.cvtColor(bigKernelCanvas, cv2.COLOR_BGR2HSV)
+      bigRaw = cv2.inRange(bigHsv, (0, 80, 80), (10, 255, 255))
+      bigKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (___, 9))
+      bigClean = cv2.morphologyEx(bigRaw, cv2.MORPH_OPEN, bigKernel)
+      bigCounts, _ = cv2.findContours(bigClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+      {'bigObjectCount': len(bigCounts), 'isTwo': len(bigCounts) == 2}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 정사각 커널이므로 두 인자 모두 9입니다.
+    - 빈칸에는 9가 들어갑니다.
+    check:
+      noError: morphologyEx와 findContours가 끝나야 합니다.
+      resultCheck: isTwo가 True여야 합니다.
   check:
-    noError: 4단계. 마스크 정제의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 마스크 정제 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 모폴로지와 findContours 호출이 끝나야 합니다.
+    resultCheck: rawObjectCount가 3, cleanObjectCount가 2, noiseRemoved가 True여야 합니다.
 - id: step5_apply
-  title: 5단계. 마스크 적용
+  title: 5단계. bitwise_and로 ROI 추출
   structuredPrimary: true
-  subtitle: bitwise_and()
-  goal: 5단계. 마스크 적용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 마스크 영역만 원본 색 유지
+  goal: cv2.bitwise_and로 원본 이미지의 빨강 영역만 색이 유지된 결과를 만들고, 마스크 밖 픽셀이 검정인지 확인합니다.
+  why: 마스크 적용은 객체 영역만 추출해 다음 단계로 넘기는 표준 패턴입니다. 색이 유지된 ROI 이미지는 분류 모델의 입력이나 사용자에게 보여줄 시각화에 그대로 활용됩니다.
   explanation: |-
-    bitwise_and()는 비트 단위 AND 연산을 수행합니다. mask 파라미터를 사용하면 마스크가 흰색(255)인 픽셀만 연산 결과가 유지되고, 검은색(0)인 픽셀은 0이 됩니다. 이를 통해 원본 이미지에서 특정 영역만 추출하는 마스킹(masking) 효과를 얻습니다.
-
-    bitwise_and(src1, src2, mask=mask)는 mask가 0이 아닌 픽셀에서만 연산을 수행합니다. src1과 src2가 같으면 마스킹 효과가 됩니다.
+    cv2.bitwise_and(src1, src2, mask)는 mask가 0인 픽셀의 결과를 0으로 만듭니다. src1과 src2가 같은 이미지면 mask 영역의 원본 색이 그대로 유지되고 나머지는 검정이 됩니다.
+    결과 이미지의 모양은 (H, W, 3)으로 입력과 같습니다. 마스크는 단채널이지만 OpenCV가 자동으로 채널마다 같은 마스크를 적용합니다.
+    검증은 마스크 밖 픽셀(예 코너 [5, 5])이 [0, 0, 0]인지로 합니다. 마스크 안 픽셀은 원본의 빨강 색이 그대로 유지되어야 합니다.
   tips:
-  - bitwise_and(src1, src2, mask=mask)는 mask가 0이 아닌 픽셀에서만 연산을 수행합니다. src1과 src2가 같으면 마스킹 효과가 됩니다.
+  - "bitwise_and의 mask 인자는 키워드로 줘야 합니다: cv2.bitwise_and(src1, src2, mask=mask)."
+  - 마스크 적용 결과를 사진처럼 보려면 BGR을 RGB로 변환해 plt.imshow에 넘기는 게 표준입니다.
   snippet: |-
-    masked = cv2.bitwise_and(scene, scene, mask=maskClean)
-    plt.figure(figsize=(10, 6))
-    plt.imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-    plt.title(f'Masked: {masked.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    import cv2
+    import numpy as np
+
+    bitCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(bitCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(bitCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(bitCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    bitHsv = cv2.cvtColor(bitCanvas, cv2.COLOR_BGR2HSV)
+    bitMask = cv2.inRange(bitHsv, (0, 80, 80), (10, 255, 255))
+    bitKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    bitClean = cv2.morphologyEx(bitMask, cv2.MORPH_OPEN, bitKernel)
+
+    bitMasked = cv2.bitwise_and(bitCanvas, bitCanvas, mask=bitClean)
+
+    {
+        'maskedShape': bitMasked.shape,
+        'cornerOutsideMask': bitMasked[5, 5].tolist(),
+        'centerOfCircle': bitMasked[70, 55].tolist(),
+        'cornerIsBlack': bitMasked[5, 5].tolist() == [0, 0, 0],
+        'circleColorPreserved': bitMasked[70, 55].tolist() == [0, 0, 255],
+    }
   exercise:
-    prompt: 5단계. 마스크 적용 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: bitwise_not으로 마스크를 반전한 뒤 같은 bitwise_and를 적용하면 빨강 객체는 검정이 되고 배경은 원본 색이 유지되는지 확인하세요.
     starterCode: |-
-      masked = cv2.bitwise_and(scene, scene, mask=maskClean)
-      plt.figure(figsize=(10, 6))
-      plt.imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      plt.title(f'Masked: {masked.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      import cv2
+      import numpy as np
+
+      invCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(invCanvas, (55, 70), 24, (0, 0, 255), -1)
+
+      invHsv = cv2.cvtColor(invCanvas, cv2.COLOR_BGR2HSV)
+      invMask = cv2.inRange(invHsv, (0, 80, 80), (10, 255, 255))
+      notMask = cv2.bitwise___(invMask)
+      invMasked = cv2.bitwise_and(invCanvas, invCanvas, mask=notMask)
+
+      {'circleAreaPixel': invMasked[70, 55].tolist(), 'backgroundPixel': invMasked[5, 5].tolist()}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 비트 NOT 함수는 cv2.bitwise_not입니다.
+    - 빈칸에는 _not이 들어갑니다.
+    check:
+      noError: bitwise_not과 bitwise_and 호출이 끝나야 합니다.
+      resultCheck: circleAreaPixel이 [0, 0, 0]이고 backgroundPixel이 [35, 35, 35]여야 합니다.
   check:
-    noError: 5단계. 마스크 적용의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 마스크 적용 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 모든 호출이 끝나야 합니다.
+    resultCheck: cornerIsBlack과 circleColorPreserved 모두 True여야 합니다.
 - id: step6_contour
-  title: 6단계. 컨투어 분석
+  title: 6단계. 컨투어 + 외접 사각형
   structuredPrimary: true
-  subtitle: 객체 검출
-  goal: 6단계. 컨투어 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 마스크에서 컨투어를 검출하여 객체를 분석합니다. 면적 기준으로 유의미한 영역만 필터링합니다.
+  subtitle: 위치와 크기 추출
+  goal: 정제된 마스크에 findContours + boundingRect를 적용해 객체별 (x, y, w, h)를 추출하고 면적순으로 정렬한 리스트를 만듭니다.
+  why: 객체의 위치와 크기는 검출 결과의 표준 출력 형식입니다. (x, y, w, h) 4-tuple은 그대로 자동화 보고서, 시각화, 후속 분류 모델의 입력이 됩니다.
+  explanation: |-
+    findContours로 객체별 점 리스트를 얻고, 각각에 boundingRect로 외접 사각형을 계산합니다. boundingRect는 (x, y, w, h) 4-tuple을 돌려줍니다.
+    면적은 w * h로 계산할 수도, contourArea로 정확히 계산할 수도 있습니다. boundingRect의 면적은 사각형이라 컨투어 면적보다 약간 크고, 정렬에는 둘 다 쓸 수 있습니다.
+    면적순 정렬은 "가장 큰 객체가 가장 중요"라는 가정에 기반합니다. 작은 객체가 더 중요한 경우에는 다른 정렬 기준이 필요합니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - "sorted(boxes, key=lambda b: b[2] * b[3], reverse=True)로 면적순 내림차순 정렬합니다."
+  - 객체 ID를 만들고 싶다면 정렬 후 enumerate로 인덱스를 붙입니다. 이 ID는 추적/연결에 활용됩니다.
   snippet: |-
-    contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    len(contours)
+    import cv2
+    import numpy as np
+
+    rectCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(rectCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(rectCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(rectCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    rectHsv = cv2.cvtColor(rectCanvas, cv2.COLOR_BGR2HSV)
+    rectMask = cv2.inRange(rectHsv, (0, 80, 80), (10, 255, 255))
+    rectKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    rectClean = cv2.morphologyEx(rectMask, cv2.MORPH_OPEN, rectKernel)
+
+    rectContours, _ = cv2.findContours(rectClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    boxes = [tuple(int(v) for v in cv2.boundingRect(c)) for c in rectContours]
+    sortedBoxes = sorted(boxes, key=lambda b: b[2] * b[3], reverse=True)
+
+    {
+        'objectCount': len(sortedBoxes),
+        'sortedBoxes': sortedBoxes,
+        'biggestArea': sortedBoxes[0][2] * sortedBoxes[0][3] if sortedBoxes else 0,
+        'foundTwo': len(sortedBoxes) == 2,
+    }
   exercise:
-    prompt: 6단계. 컨투어 분석 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: 같은 흐름에서 contourArea를 정렬 기준으로 사용해 큰 도형 두 개의 면적이 어떻게 다른지 확인하세요.
     starterCode: |-
-      contours, hierarchy = cv2.findContours(maskClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-      len(contours)
+      import cv2
+      import numpy as np
+
+      areaCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+      cv2.circle(areaCanvas, (55, 70), 24, (0, 0, 255), -1)
+      cv2.rectangle(areaCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+      cv2.circle(areaCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+      areaHsv = cv2.cvtColor(areaCanvas, cv2.COLOR_BGR2HSV)
+      areaMask = cv2.inRange(areaHsv, (0, 80, 80), (10, 255, 255))
+      areaKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+      areaClean = cv2.morphologyEx(areaMask, cv2.MORPH_OPEN, areaKernel)
+
+      areaContours, _ = cv2.findContours(areaClean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      areas = sorted([float(cv2.contourArea(c)) for c in areaContours], reverse=___)
+      {'areas': [round(a, 0) for a in areas], 'topCount': len(areas)}
     hints:
-    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
-    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 내림차순 정렬은 reverse=True입니다.
+    - 빈칸에는 True가 들어갑니다.
+    check:
+      noError: contourArea와 sorted 호출이 끝나야 합니다.
+      resultCheck: topCount가 2이고 areas의 첫 값이 두 번째 값보다 크거나 같아야 합니다.
   check:
-    noError: 6단계. 컨투어 분석의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 컨투어 분석 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 컨투어와 boundingRect 호출이 끝나야 합니다.
+    resultCheck: foundTwo가 True이고 sortedBoxes 길이가 2여야 합니다.
 - id: step7_result
-  title: 7단계. 최종 결과
+  title: 7단계. detectColorObjects 종합 함수
   structuredPrimary: true
-  subtitle: 파이프라인 결과
-  goal: 7단계. 최종 결과에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 한 함수로 파이프라인 묶기
+  goal: 위 단계 5개를 detectColorObjects(bgr, lower, upper) 한 함수로 묶고, 합성 입력에서 결과 dict가 객체 수 2와 정렬된 boxes를 돌려주는지 확인합니다.
+  why: 검출 파이프라인은 매번 같은 흐름이라 함수로 묶어야 재사용 가능합니다. 한 함수가 lower/upper만 받으면 빨강/녹색/파랑 등 어떤 색이든 같은 인터페이스로 검출할 수 있습니다.
   explanation: |-
-    전체 파이프라인 결과를 확인합니다. 색상 변환 → 마스킹 → 정제 → 컨투어 검출까지 완료되었습니다.
-
-    이 파이프라인은 색상 기반 객체 검출의 기본 패턴입니다. 다른 색상 범위를 지정하거나, 에지 검출을 추가하는 등 확장할 수 있습니다.
+    detectColorObjects 함수는 BGR 이미지와 HSV 범위를 받아 보고용 dict를 돌려줍니다. dict 내부 키는 일관되게 두어 어떤 색 검출 결과든 같은 형식으로 사용할 수 있습니다.
+    함수 안에서 BGR→HSV 변환, inRange, OPEN, findContours, boundingRect를 순서대로 수행합니다. 5단계의 흐름과 정확히 같습니다.
+    결과 dict에는 objectCount, boxes(정렬된), maskPixels 세 키가 들어가 자동화 코드에서 즉시 활용 가능합니다.
   tips:
-  - 이 파이프라인은 색상 기반 객체 검출의 기본 패턴입니다. 다른 색상 범위를 지정하거나, 에지 검출을 추가하는 등 확장할 수 있습니다.
+  - 함수 시그니처를 (bgr, lower, upper, minArea=0)으로 두면 면적 필터링도 함께 처리할 수 있어 실무에서 유연합니다.
+  - 결과 dict 형식을 일관되게 유지하면 두 검출기의 결과를 같은 코드로 비교할 수 있습니다.
   snippet: |-
-    figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
-    axFinal[0, 0].imshow(flower)
-    axFinal[0, 0].set_title('1. Original')
-    axFinal[0, 0].axis('off')
-    axFinal[0, 1].imshow(hue, cmap='hsv')
-    axFinal[0, 1].set_title('2. HSV Hue')
-    axFinal[0, 1].axis('off')
-    axFinal[0, 2].imshow(mask, cmap='gray')
-    axFinal[0, 2].set_title('3. Raw Mask')
-    axFinal[0, 2].axis('off')
-    axFinal[1, 0].imshow(maskClean, cmap='gray')
-    axFinal[1, 0].set_title('4. Cleaned Mask')
-    axFinal[1, 0].axis('off')
-    axFinal[1, 1].imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-    axFinal[1, 1].set_title('5. Masked')
-    axFinal[1, 1].axis('off')
-    axFinal[1, 2].imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-    axFinal[1, 2].set_title(f'6. Detected ({len(shapes)} objects)')
-    axFinal[1, 2].axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 7단계. 최종 결과 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      figFinal, axFinal = plt.subplots(2, 3, figsize=(14, 8))
-      axFinal[0, 0].imshow(flower)
-      axFinal[0, 0].set_title('1. Original')
-      axFinal[0, 0].axis('off')
-      axFinal[0, 1].imshow(hue, cmap='hsv')
-      axFinal[0, 1].set_title('2. HSV Hue')
-      axFinal[0, 1].axis('off')
-      axFinal[0, 2].imshow(mask, cmap='gray')
-      axFinal[0, 2].set_title('3. Raw Mask')
-      axFinal[0, 2].axis('off')
-      axFinal[1, 0].imshow(maskClean, cmap='gray')
-      axFinal[1, 0].set_title('4. Cleaned Mask')
-      axFinal[1, 0].axis('off')
-      axFinal[1, 1].imshow(cv2.cvtColor(masked, cv2.COLOR_BGR2RGB))
-      axFinal[1, 1].set_title('5. Masked')
-      axFinal[1, 1].axis('off')
-      axFinal[1, 2].imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      axFinal[1, 2].set_title(f'6. Detected ({len(shapes)} objects)')
-      axFinal[1, 2].axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 7단계. 최종 결과의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
-    resultCheck: 7단계. 최종 결과 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: 종합 프로젝트
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    china 이미지로 녹색 영역을 검출해봅시다.
+    import cv2
+    import numpy as np
 
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+
+    def detectColorObjects(bgr: np.ndarray, lower: tuple, upper: tuple) -> dict:
+        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower, upper)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        boxes = sorted(
+            [tuple(int(v) for v in cv2.boundingRect(c)) for c in contours],
+            key=lambda b: b[2] * b[3],
+            reverse=True,
+        )
+        return {
+            'objectCount': len(boxes),
+            'boxes': boxes,
+            'maskPixels': int((clean == 255).sum()),
+        }
+
+
+    finalCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(finalCanvas, (55, 70), 24, (0, 0, 255), -1)
+    cv2.rectangle(finalCanvas, (110, 45), (155, 95), (0, 0, 230), -1)
+    cv2.circle(finalCanvas, (20, 20), 3, (0, 0, 255), -1)
+
+    detection = detectColorObjects(finalCanvas, (0, 80, 80), (10, 255, 255))
+    detection
+  exercise:
+    prompt: 같은 함수를 녹색 객체가 있는 합성 입력에 적용해 녹색 범위 (50, 80, 80)~(70, 255, 255)로 객체를 검출하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+
+      def detectColorObjects(bgr, lower, upper):
+          hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+          mask = cv2.inRange(hsv, lower, upper)
+          kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+          clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+          contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+          boxes = sorted(
+              [tuple(int(v) for v in cv2.boundingRect(c)) for c in contours],
+              key=lambda b: b[2] * b[3],
+              reverse=True,
+          )
+          return {'objectCount': len(boxes), 'boxes': boxes}
+
+
+      greenCanvas = np.full((100, 130, 3), 35, dtype=np.uint8)
+      cv2.circle(greenCanvas, (40, 50), 20, (0, 255, 0), -1)
+      cv2.rectangle(greenCanvas, (80, 30), (110, 70), (0, 230, 0), -1)
+
+      greenResult = detectColorObjects(greenCanvas, (50, 80, 80), (___, 255, 255))
+      greenResult
+    hints:
+    - 녹색 H 상한은 70입니다.
+    - 빈칸에는 70이 들어갑니다.
+    check:
+      noError: detectColorObjects 정의와 호출이 끝나야 합니다.
+      resultCheck: greenResult의 objectCount가 1 이상이어야 합니다.
+  check:
+    noError: detectColorObjects 정의와 호출이 끝나야 합니다.
+    resultCheck: detection의 objectCount가 2여야 합니다.
+- id: practice
+  title: 실습 — flower 사진 빨강 검출
+  structuredPrimary: true
+  subtitle: 실제 사진 일반화
+  goal: flower 사진에 detectColorObjects를 적용해 빨강 영역(0, 80, 80)~(10, 255, 255)을 찾고, 결과 boxes 중 가장 큰 객체의 면적을 정수로 확인합니다.
+  why: 합성 입력에서 검증한 함수가 실제 사진에서 어떻게 동작하는지 보는 마지막 단계입니다. flower 사진은 꽃 일부가 분홍-빨강 계열이라 일부 빨강 객체가 검출됩니다.
+  explanation: |-
+    flower 사진은 분홍과 빨강이 섞인 꽃이 가운데에 있고 배경은 녹색입니다. 빨강 마스크는 꽃잎 일부만 잡고 큰 객체로 보고됩니다.
+    함수 인터페이스가 합성 입력과 동일해 새 사진을 받아도 결과 dict의 키와 형식이 같습니다. 자동화 코드에서 if-else 없이 같은 처리 흐름이 적용됩니다.
+    가장 큰 객체의 면적을 확인해 검출이 합리적 결과를 냈는지 sanity check합니다. 면적이 0이면 임계값을 다시 조정해야 한다는 신호입니다.
   tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 실제 사진의 빨강 범위는 합성 입력보다 폭을 넓혀야 잘 잡힙니다. (0, 60, 60)~(15, 255, 255) 같은 완화된 범위가 시작점입니다.
+  - 빨강은 H가 양 끝(0과 179)에 있어 정확한 검출에는 두 마스크의 OR이 필요합니다.
   snippet: |-
     import cv2
     import numpy as np
     from sklearn.datasets import load_sample_image
-    import matplotlib.pyplot as plt
 
-    china = load_sample_image('china.jpg')
-    chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
-    chinaHsv = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2HSV)
-    plt.imshow(china)
-    plt.axis('off')
+
+    def detectColorObjects(bgr: np.ndarray, lower: tuple, upper: tuple, minArea: int = 0) -> dict:
+        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower, upper)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        boxes = sorted(
+            [
+                tuple(int(v) for v in cv2.boundingRect(c))
+                for c in contours
+                if cv2.contourArea(c) >= minArea
+            ],
+            key=lambda b: b[2] * b[3],
+            reverse=True,
+        )
+        return {'objectCount': len(boxes), 'boxes': boxes}
+
+
+    flowerBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+    flowerResult = detectColorObjects(flowerBgr, (0, 60, 60), (15, 255, 255), minArea=100)
+
+    {
+        'objectCount': flowerResult['objectCount'],
+        'biggestBox': flowerResult['boxes'][0] if flowerResult['boxes'] else None,
+        'biggestArea': flowerResult['boxes'][0][2] * flowerResult['boxes'][0][3] if flowerResult['boxes'] else 0,
+    }
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: minArea를 1000으로 키워 작은 객체를 필터링하면 객체 수가 줄어드는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
       from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
 
-      china = load_sample_image('china.jpg')
-      chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
-      chinaHsv = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2HSV)
-      plt.imshow(china)
-      plt.axis('off')
+
+      def detectColorObjects(bgr, lower, upper, minArea=0):
+          hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+          mask = cv2.inRange(hsv, lower, upper)
+          kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+          clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+          contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+          boxes = sorted(
+              [tuple(int(v) for v in cv2.boundingRect(c)) for c in contours if cv2.contourArea(c) >= minArea],
+              key=lambda b: b[2] * b[3],
+              reverse=True,
+          )
+          return {'objectCount': len(boxes), 'boxes': boxes}
+
+
+      strictFlower = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      strictResult = detectColorObjects(strictFlower, (0, 60, 60), (15, 255, 255), minArea=___)
+      {'strictCount': strictResult['objectCount']}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 큰 minArea는 1000이 됩니다.
+    - 빈칸에는 1000이 들어갑니다.
+    check:
+      noError: detectColorObjects 정의와 호출이 끝나야 합니다.
+      resultCheck: strictCount가 0 이상의 정수여야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: detectColorObjects 정의와 호출이 끝나야 합니다.
+    resultCheck: objectCount가 양의 정수이고 biggestArea가 양수여야 합니다.
 - id: workflow_validation
-  title: 8단계. 종합 비전 파이프라인 검증
+  title: 8단계. HSV 범위 가드 + 결과 sanity
   structuredPrimary: true
-  subtitle: 색상 마스크 → 형태 정제 → 컨투어 분석
-  goal: 8단계. 종합 비전 파이프라인 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 종합 비전 프로젝트는 색상 필터링, 마스크 정제, 컨투어 분석이 한 번에 이어지는 파이프라인입니다. HSV 범위 계약을 검증하고, 마스크 픽셀 수와 객체 면적을
-    확인한 뒤, 기준을 바꾸는 실무 변주까지 점검합니다.
+  subtitle: validateHsvRange + 결과 검증
+  goal: validateHsvRange 함수가 잘못된 길이나 반전된 범위를 ValueError로 차단하고, detectColorObjects의 결과 dict가 정상 형식을 가지는지 회귀 테스트로 확인합니다.
+  why: HSV 범위는 사람이 자주 실수합니다. 길이 2 튜플을 잘못 넣거나, lower와 upper를 바꾸어 넣는 경우 inRange는 조용히 빈 결과를 돌려줍니다. 함수 입구에서 차단하면 디버깅 시간이 크게 줄어듭니다.
+  explanation: |-
+    validateHsvRange는 (1) 두 튜플 모두 길이 3, (2) lower의 모든 채널이 upper 이하라는 두 조건을 검사합니다. 둘 중 하나라도 깨지면 ValueError를 던집니다.
+    회귀 테스트는 detectColorObjects의 결과 dict가 'objectCount', 'boxes' 두 키를 모두 가지는지 확인합니다. dict 구조가 바뀌면 자동화 코드가 깨질 수 있어 인터페이스 유지의 회귀 테스트로 쓰입니다.
+    이 가드 두 가지를 결합하면 잘못된 호출과 잘못된 결과 모두 한 셀에서 감지됩니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - HSV의 H는 0~179, S/V는 0~255라는 범위도 함께 검증할 수 있습니다. 본 예제는 단순화를 위해 길이와 순서만 검증합니다.
+  - dict 키 검증은 sorted(result.keys()) 같은 결정적 비교가 회귀 테스트로 좋습니다.
   snippet: |-
     import cv2
     import numpy as np
 
-    visionImage = np.zeros((140, 180, 3), dtype=np.uint8)
-    visionImage[:] = [35, 35, 35]
-    cv2.circle(visionImage, (55, 70), 24, (0, 0, 255), -1)
-    cv2.rectangle(visionImage, (110, 45), (155, 95), (0, 0, 230), -1)
-    cv2.circle(visionImage, (20, 20), 3, (0, 0, 255), -1)
 
-    def validateHsvRange(lower, upper):
+    def validateHsvRange(lower: tuple, upper: tuple) -> bool:
         if len(lower) != 3 or len(upper) != 3:
-            raise ValueError("HSV 범위는 길이 3이어야 합니다")
+            raise ValueError(f"HSV 범위는 길이 3이어야 합니다: lower={lower}, upper={upper}")
         if any(lo > hi for lo, hi in zip(lower, upper)):
-            raise ValueError(f"HSV lower가 upper보다 큽니다: {lower} > {upper}")
+            raise ValueError(f"HSV lower가 upper보다 큼: lower={lower}, upper={upper}")
         return True
 
-    validateHsvRange((0, 80, 80), (10, 255, 255))
+
+    def safeDetect(bgr: np.ndarray, lower: tuple, upper: tuple) -> dict:
+        validateHsvRange(lower, upper)
+        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower, upper)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        return {'objectCount': len(contours), 'boxes': [tuple(int(v) for v in cv2.boundingRect(c)) for c in contours]}
+
+
+    safeCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)
+    cv2.circle(safeCanvas, (55, 70), 24, (0, 0, 255), -1)
+
+    okResult = safeDetect(safeCanvas, (0, 80, 80), (10, 255, 255))
+
+    try:
+        safeDetect(safeCanvas, (50, 80), (60, 255, 255))
+        shortMessage = 'unexpected pass'
+    except ValueError as exc:
+        shortMessage = str(exc)
+
+    try:
+        safeDetect(safeCanvas, (60, 80, 80), (50, 255, 255))
+        reversedMessage = 'unexpected pass'
+    except ValueError as exc:
+        reversedMessage = str(exc)
+
+    {
+        'okKeys': sorted(okResult.keys()),
+        'shortMessage': shortMessage,
+        'reversedMessage': reversedMessage,
+    }
   exercise:
-    prompt: 8단계. 종합 비전 파이프라인 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: validateHsvRange에 lower=(0, 80, 80, 80) 같은 길이 4 튜플을 넘기면 길이 오류가 잡히는지 확인하세요.
     starterCode: |-
-      import cv2
-      import numpy as np
-
-      visionImage = np.zeros((140, 180, 3), dtype=np.uint8)
-      visionImage[:] = [35, 35, 35]
-      cv2.circle(visionImage, (55, 70), 24, (0, 0, 255), -1)
-      cv2.rectangle(visionImage, (110, 45), (155, 95), (0, 0, 230), -1)
-      cv2.circle(visionImage, (20, 20), 3, (0, 0, 255), -1)
-
       def validateHsvRange(lower, upper):
           if len(lower) != 3 or len(upper) != 3:
-              raise ValueError("HSV 범위는 길이 3이어야 합니다")
+              raise ValueError(f"HSV 범위는 길이 3이어야 합니다: lower={lower}, upper={upper}")
           if any(lo > hi for lo, hi in zip(lower, upper)):
-              raise ValueError(f"HSV lower가 upper보다 큽니다: {lower} > {upper}")
+              raise ValueError(f"HSV lower가 upper보다 큼: lower={lower}, upper={upper}")
           return True
 
-      validateHsvRange((0, 80, 80), (10, 255, 255))
+
+      try:
+          validateHsvRange((0, 80, 80, ___), (10, 255, 255))
+          longMessage = 'unexpected pass'
+      except ValueError as exc:
+          longMessage = str(exc)
+
+      {'longMessage': longMessage, 'hasLengthHint': '길이 3' in longMessage}
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 4번째 요소로 어떤 값이든 들어갈 수 있습니다.
+    - 빈칸에는 80이 들어갑니다.
+    check:
+      noError: validateHsvRange 정의가 끝나야 합니다.
+      resultCheck: hasLengthHint가 True여야 합니다.
   check:
-    noError: 8단계. 종합 비전 파이프라인 검증의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 8단계. 종합 비전 파이프라인 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: validateHsvRange와 safeDetect 정의가 끝나야 합니다.
+    resultCheck: okKeys가 ['boxes', 'objectCount']이고 shortMessage에 '길이 3', reversedMessage에 'lower가 upper보다' 단서가 포함되어야 합니다.
