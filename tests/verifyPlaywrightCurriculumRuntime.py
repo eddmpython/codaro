@@ -18,7 +18,7 @@ from codaro.curriculum.sectionContract import lessonContractFromYaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CURRICULUM_DIR = ROOT / "curricula" / "python" / "playwright"
+CURRICULUM_DIR = ROOT / "curricula" / "python" / "automation" / "browser" / "playwright"
 REPORT_PATH = ROOT / "output" / "test-runner" / "playwright-curriculum-runtime" / "playwright-curriculum-runtime-report.json"
 WORK_ROOT = ROOT / "output" / "test-runner" / "playwright-curriculum-runtime"
 SAMPLE_DIR = WORK_ROOT / "scratch" / "samples"

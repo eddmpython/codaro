@@ -12,7 +12,7 @@ import type {
   ExecutionKind,
 } from "@/types";
 
-const rawCurricula = import.meta.glob("../../../curricula/python/*/*.yaml", {
+const rawCurricula = import.meta.glob("../../../curricula/python/**/*.yaml", {
   import: "default",
   query: "?raw",
 }) as Record<string, () => Promise<string>>;
@@ -271,10 +271,11 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
 const lessons = Object.entries(rawCurricula)
   .map(([path, loadRaw]) => {
     const normalized = path.replace(/\\/g, "/");
-    const match = normalized.match(/\/curricula\/python\/([^/]+)\/([^/]+\.yaml)$/);
+    const match = normalized.match(/\/curricula\/python\/(?:.+\/)?([^/]+)\/([^/]+\.yaml)$/);
     if (!match) return null;
 
     const [, category, fileName] = match;
+    if (fileName === "schema.yaml") return null;
     const contentId = fileName.replace(/\.yaml$/, "");
     return {
       category,

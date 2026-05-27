@@ -52,9 +52,15 @@ _CURRICULA_CATEGORY_META = getattr(_CURRICULA_REGISTRY, "categoryMeta", {})
 _CURRICULA_CATEGORY_GROUPS = getattr(_CURRICULA_REGISTRY, "categoryGroups", {})
 _CURRICULA_CATEGORY_TREE = getattr(_CURRICULA_REGISTRY, "categoryTree", [])
 _CURRICULA_LEARNING_PATHS = getattr(_CURRICULA_REGISTRY, "learningPaths", {})
+_CURRICULA_CATEGORY_FOLDER_MAP = getattr(_CURRICULA_REGISTRY, "categoryFolderMap", {})
 
 
 CATEGORY_MAPPING = {str(key): str(value) for key, value in _CURRICULA_CATEGORY_MAPPING.items()}
+CATEGORY_FOLDER_MAP = {
+    str(key): str(value)
+    for key, value in _CURRICULA_CATEGORY_FOLDER_MAP.items()
+    if isinstance(value, str) and value
+}
 CATEGORY_META = {
     str(key): {"description": str(value.get("description") or "")}
     for key, value in _CURRICULA_CATEGORY_META.items()
@@ -97,7 +103,7 @@ class StudyLoader:
     def listCategories(self) -> list[CategoryInfo]:
         result: list[CategoryInfo] = []
         for key, name in CATEGORY_MAPPING.items():
-            categoryDir = self._studyDir / key
+            categoryDir = self._categoryDir(key)
             if not categoryDir.exists():
                 continue
             count = len(self._listContentIds(key))
@@ -112,6 +118,10 @@ class StudyLoader:
                 path=path,
             ))
         return result
+
+    def _categoryDir(self, category: str) -> Path:
+        relative = CATEGORY_FOLDER_MAP.get(category, category)
+        return self._studyDir / relative
 
     def listContents(self, category: str) -> list[StudySummary]:
         if category in self._summaryCache:
@@ -178,7 +188,7 @@ class StudyLoader:
             ids = [item["contentId"] for item in categoryIndex]
             self._contentIdCache[category] = ids
             return list(ids)
-        categoryDir = self._studyDir / category
+        categoryDir = self._categoryDir(category)
         if not categoryDir.exists():
             return []
         ids: list[str] = []
@@ -193,11 +203,12 @@ class StudyLoader:
         return list(ids)
 
     def _getStudyPath(self, category: str, contentId: str) -> Path:
+        categoryDir = self._categoryDir(category)
         if category == "practical":
-            subPath = self._studyDir / category / contentId / "study.yaml"
+            subPath = categoryDir / contentId / "study.yaml"
             if subPath.exists():
                 return subPath
-        return self._studyDir / category / f"{contentId}.yaml"
+        return categoryDir / f"{contentId}.yaml"
 
     def _loadMetaOnly(self, category: str, contentId: str) -> dict:
         cacheKey = f"{category}/{contentId}"
@@ -222,7 +233,7 @@ class StudyLoader:
         if category in self._categoryIndexCache:
             cached = self._categoryIndexCache[category]
             return list(cached) if cached else None
-        indexPath = self._studyDir / category / "curriculum.json"
+        indexPath = self._categoryDir(category) / "curriculum.json"
         if not indexPath.exists():
             self._categoryIndexCache[category] = None
             return None

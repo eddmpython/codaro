@@ -2,7 +2,7 @@
 
 ## 원본과 산출물
 
-- 원본: `curricula/python/30days/curriculum.json` 및 Day별 YAML
+- 원본: `curricula/python/basics/30days/curriculum.json` 및 Day별 YAML
 - 산출물: `notebooks/python30DaysComplete/colab`
 - 생성기: `notebooks/python30DaysComplete/tools/createNotebooks.py`
 - 검증기: `notebooks/python30DaysComplete/tools/validateCourse.py`

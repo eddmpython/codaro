@@ -113,7 +113,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 `curriculum-top-tier-audit`는 위 matrix를 통과한 뒤에도 남는 완성도 격차를 본다. 작성 절차가 `docs/skills/architecture/curriculum-authoring.md`와 teacher skill registry에 연결됐는지, 기본 의존성이 학습 패키지로 무거워지지 않는지, 소개 레슨이 과정 후 할 수 있는 일과 uv 준비/첫 assert/완료 산출물을 보여주는지, built-in YAML 원본이 structured section contract로 충분히 이관됐는지 점수화하고 `output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json`에 `score`, `summary`, `actionableGaps`를 남긴다. 9.0 미만이면 학습 시스템은 동작 가능해도 최상위 커리큘럼 완성도는 아직 아니다.
 
-`playwright-curriculum-runtime`은 Playwright 트랙을 문구 검사가 아니라 실제 Chromium 실행으로 본다. `curricula/python/playwright/*.yaml`의 모든 예제/정답 코드를 Python 파일로 추출해 브라우저를 띄우고, `output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`에 레슨 수, 샘플 수, 통과 수, 실패 원인을 남긴다. 웹 자동화 커리큘럼은 이 gate가 최신 `quality-cycle` 안에서 통과해야 “실습 코드가 깨지지 않았다”고 말할 수 있다.
+`playwright-curriculum-runtime`은 Playwright 트랙을 문구 검사가 아니라 실제 Chromium 실행으로 본다. `curricula/python/automation/browser/playwright/*.yaml`의 모든 예제/정답 코드를 Python 파일로 추출해 브라우저를 띄우고, `output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`에 레슨 수, 샘플 수, 통과 수, 실패 원인을 남긴다. 웹 자동화 커리큘럼은 이 gate가 최신 `quality-cycle` 안에서 통과해야 “실습 코드가 깨지지 않았다”고 말할 수 있다.
 
 ## 온보딩/첫 화면
 

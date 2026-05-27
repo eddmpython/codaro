@@ -56,6 +56,9 @@ uv run python -X utf8 tests/run.py gate launcher-check
 uv run python -X utf8 tests/run.py gate launcher-test
 uv run python -X utf8 tests/run.py gate objective-nineplus-audit
 uv run python -X utf8 tests/run.py gate public-readiness-audit
+uv run python -X utf8 tests/run.py gate widget-bridge
+uv run python -X utf8 tests/run.py gate app-runtime
+uv run python -X utf8 tests/run.py gate mobile-layout
 ```
 
 직접 `pytest tests/ -v`를 금지하지는 않는다. 다만 PR 전 확인, CI, 세션 종료 검증은 gate 이름으로 남긴다. `quality-cycle`은 “서비스 출시 라벨”이 아니라 제품이 잘 만들어졌는지 보는 묶음 실행 단위다.
@@ -87,6 +90,9 @@ uv run python -X utf8 tests/run.py gate public-readiness-audit
 | `editor-runtime-preflight` | fast | editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다. |
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
 | `learning-goal-audit` | surface | 목표 완료 전 docs, product quality audit, readiness, backend, landing build를 묶어 확인한다. |
+| `widget-bridge` | fast | Python ui descriptor + 콜백 registry + traceback parser 회귀를 확인한다. |
+| `app-runtime` | fast | App 라이프사이클 hook, 포트 회피, 사용자 정의 컴포넌트 + teacher tool registry 회귀를 확인한다. |
+| `mobile-layout` | fast | PWA manifest, service worker, viewport meta, 모바일 hook 회귀를 확인한다. |
 | `dogfood-alpha-audit` | surface | 사용자 플로우 audit으로 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구의 증거를 확인한다. |
 | `product-quality-audit` | surface | 제품 품질 기준과 새 내구성 gate wiring을 확인한다. |
 | `automation-ide-audit` | surface | 자동화 IDE의 task/schedule/webhook/workflow/E-Stop/audit/frontend surface 연결을 확인한다. |
@@ -142,7 +148,7 @@ uv run python -X utf8 tests/run.py gate public-readiness-audit
 - `runtime-recovery-contract`는 backend runtime 테스트, editor runtime preflight, workloop copy를 묶어 worker crash, package delay/failure, cell execution failure가 한 오류로 뭉개지지 않는지 확인한다. `runtime-recovery-browser`는 이 계약이 실제 learning surface에서 셀 근처 문구로 보이는지 확인하고 `output/test-runner/runtime-recovery-browser/runtime-recovery-report.json`에 `cellCallBlockedAfterPackageFailure`, `cellCallExecutedForRuntimeFailure`, `packageFailureShownNearCell`, `cellFailureShownNearCell` signal을 남긴다. `quality-cycle` summary는 이 report를 `payloadGitHead` evidence로 대조한다.
 - `curriculum-quality-matrix`는 pandas 하나가 아니라 Python 기초, 파일 처리, 데이터 분석, 시각화, 웹 자동화 대표 주제를 실제 `yamlToDocument`로 materialize한다. `contractGapCount`가 0이 아니거나 섹션 흐름이 `section → explanation → snippet → exercise → check`를 벗어나면 실패한다. 이어서 실제 `curricula/python/**/*.yaml` 전체를 읽어 외부 import가 `meta.packages`에 선언됐는지, practice expansion이 blank exercise cell과 solution으로 materialize되는지, 비-orientation 레슨이 코드 흐름과 실습/완료 신호를 갖는지 확인한다. 이 gate는 `output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json`과 `output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json`을 남기고, `quality-cycle` summary는 이 report들을 `payloadGitHead` evidence로 대조한다.
 - `curriculum-top-tier-audit`는 `curriculum-quality-matrix`보다 높은 평가층이다. `docs/skills/architecture/curriculum-authoring.md`와 teacher skill registry가 실제 작성 절차로 연결됐는지, 기본 의존성이 학습 패키지로 무거워지지 않는지, built-in YAML의 import가 `meta.packages`와 document runtime으로 보존되는지, 소개 레슨이 "무엇을 할 수 있는지/uv 준비/첫 assert/완료 산출물"을 보여주는지, built-in source가 structured section contract로 충분히 이관됐는지를 점수화한다. 결과는 `output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json`에 `score`, `minimumScore`, `summary`, `actionableGaps`로 남긴다. 9.0 미만이면 현재 커리큘럼은 "동작은 하지만 최상위 완성도는 아님"으로 판정한다.
-- `playwright-curriculum-runtime`는 Playwright 전용 학습 트랙을 실제 브라우저에서 검증한다. `curricula/python/playwright/*.yaml`의 structured contract, `meta.packages`, `meta.tags`, `yamlToDocument` 변환을 확인한 뒤 모든 `snippet`과 `exercise.solution`을 `output/test-runner/playwright-curriculum-runtime/scratch` 아래 Python 파일로 추출해 Chromium에서 실행한다. 결과는 `output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`에 lesson/sample/failure 단위로 남긴다.
+- `playwright-curriculum-runtime`는 Playwright 전용 학습 트랙을 실제 브라우저에서 검증한다. `curricula/python/automation/browser/playwright/*.yaml`의 structured contract, `meta.packages`, `meta.tags`, `yamlToDocument` 변환을 확인한 뒤 모든 `snippet`과 `exercise.solution`을 `output/test-runner/playwright-curriculum-runtime/scratch` 아래 Python 파일로 추출해 Chromium에서 실행한다. 결과는 `output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`에 lesson/sample/failure 단위로 남긴다.
 - `onboarding-browser`는 첫 화면에서 provider 연결 전 fallback이 명확하고, 첫 화면의 `Provider 연결` CTA가 provider 설정으로 실제 연결되며, provider 연결 후 실제 응답 사용 상태가 분명한지 본다. 이 gate는 `output/test-runner/onboarding-browser/onboarding-report.json`에 case별 결과와 `providerFallbackBeforeReady`, `providerReadyAfterValidate`, `diagnosticExportCopied` signal을 남기고, `quality-cycle` summary는 이 report를 `payloadGitHead` evidence로 대조한다. product surface 기준이며 landing page 상태를 대체하지 않는다.
 - `frontend-performance-budget`는 `editor/vite.config.ts`의 chunk split과 build output을 함께 본다. 큰 bundle 경고를 baseline 없이 방치하지 않고, 가장 큰 JS chunk와 전체 JS/CSS 크기를 `output/test-runner/frontend-performance-budget/performance-report.json`에 남긴다. 이 report의 `gitHead`, `startedAt`, `completedAt`, `durationMs`, `payloadGitHead` evidence는 `quality-cycle` artifact freshness 검증에 들어간다.
 - `landing-build`는 공개 문서 surface가 generated docs 본문 HTML을 nav chunk에 싣지 않는지도 확인한다. `docsNav.js`는 metadata와 `contentModule`만 담고, 각 문서 본문은 `landing/src/lib/generated/docsPages/page*.js`로 분리되어 slug route에서 동적 로딩되어야 한다. `docs/skills` 핵심 SSOT 문구가 generated docs에 반영되지 않은 stale 상태도 실패로 본다.

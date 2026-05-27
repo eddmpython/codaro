@@ -93,7 +93,7 @@ def testCategoryTreeCoversListedCategoriesAndAutomationBranch() -> None:
 
 
 def testBuiltinsRuntimeCompatibilityDocsUseLocalContract() -> None:
-    builtinsDir = CURRICULA_DIR / "builtins"
+    builtinsDir = CURRICULA_DIR / "basics" / "builtins"
     localGuide = builtinsDir / "LOCAL_RUNTIME_COMPATIBILITY.md"
     legacyGuide = builtinsDir / "PYODIDE_COMPATIBILITY.md"
     registryDoc = ROOT / "docs" / "skills" / "architecture" / "curriculum-registry.md"
