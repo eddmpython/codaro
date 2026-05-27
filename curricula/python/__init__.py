@@ -32,6 +32,10 @@ categoryMapping = {
     'regex': 'regex 비정형데이터',
     'pillow': 'Pillow 이미지처리',
     'opencv': 'OpenCV 컴퓨터비전',
+    'visionBasics': '이미지비전 기초',
+    'visionFeatures': '이미지비전 특징점',
+    'deepVision': '딥러닝 비전',
+    'visionApps': '이미지비전 응용',
     'pydantic': 'Pydantic 데이터검증',
     'practical': '실전파이썬',
     'playwright': 'Playwright 브라우저자동화',
@@ -174,6 +178,30 @@ categoryMeta = {
         'description': '컴퓨터 비전의 세계',
         'imageUrl': None,
     },
+    'visionBasics': {
+        'icon': 'grid_view',
+        'color': 'orange',
+        'description': '픽셀, 좌표, 색공간, 통계로 이미지 비전의 직관을 만드는 기초 트랙',
+        'imageUrl': None,
+    },
+    'visionFeatures': {
+        'icon': 'scatter_plot',
+        'color': 'amber',
+        'description': '특징점, 매칭, 호모그래피, 비디오, 트래킹으로 시간/공간 매칭 학습',
+        'imageUrl': None,
+    },
+    'deepVision': {
+        'icon': 'psychology',
+        'color': 'violet',
+        'description': 'torchvision 사전학습 모델로 분류, 탐지, 세그멘테이션, 포즈 추론',
+        'imageUrl': None,
+    },
+    'visionApps': {
+        'icon': 'apps',
+        'color': 'pink',
+        'description': '문서 스캐너, OCR, 모자이크, 중복 검출 등 실전 비전 응용',
+        'imageUrl': None,
+    },
     'practical': {
         'icon': 'rocket_launch',
         'color': 'fuchsia',
@@ -219,7 +247,7 @@ categoryGroups = {
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
     '자동화': ['playwright', 'excel', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
-    '이미지·비전': ['pillow', 'opencv'],
+    '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
 }
 
 categoryTree = [
@@ -297,9 +325,9 @@ categoryTree = [
     {
         'id': 'image-vision',
         'name': '이미지·비전',
-        'description': '이미지 처리와 화면 인식 기반 자동화를 다룬다.',
+        'description': '픽셀 기초부터 사전학습 딥러닝 모델, 실전 응용까지 이미지 비전 전 영역을 다룬다.',
         'folder': 'imageVision',
-        'categories': ['pillow', 'opencv'],
+        'categories': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     },
 ]
 

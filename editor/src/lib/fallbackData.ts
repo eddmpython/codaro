@@ -121,6 +121,26 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
     subtitle: "화면과 이미지 자동화를 위한 컴퓨터 비전 기초를 다룹니다.",
     track: "이미지·비전",
   },
+  visionBasics: {
+    title: "이미지비전 기초",
+    subtitle: "픽셀과 numpy로 이미지 비전의 직관을 만듭니다.",
+    track: "이미지·비전",
+  },
+  visionFeatures: {
+    title: "이미지비전 특징점",
+    subtitle: "특징점, 매칭, 호모그래피, 비디오, 트래킹을 다룹니다.",
+    track: "이미지·비전",
+  },
+  deepVision: {
+    title: "딥러닝 비전",
+    subtitle: "torchvision 사전학습 모델로 분류, 탐지, 세그멘테이션을 추론합니다.",
+    track: "이미지·비전",
+  },
+  visionApps: {
+    title: "이미지비전 응용",
+    subtitle: "문서 스캐너, OCR, 모자이크 등 실전 비전 응용을 만듭니다.",
+    track: "이미지·비전",
+  },
   practical: {
     title: "실전 파이썬",
     subtitle: "반복 가능한 도구가 되는 작은 프로젝트를 만듭니다.",

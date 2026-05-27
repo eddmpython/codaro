@@ -10,6 +10,12 @@ const PACKAGE_ALIASES: Record<string, string> = {
   pydantic_settings: "pydantic-settings",
   sklearn: "scikit-learn",
   yaml: "pyyaml",
+  torch: "torch",
+  torchvision: "torchvision",
+  imagehash: "imagehash",
+  pytesseract: "pytesseract",
+  easyocr: "easyocr",
+  mss: "mss",
 };
 
 const PYTHON_STDLIB_MODULES = new Set([

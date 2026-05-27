@@ -1,0 +1,249 @@
+meta:
+  id: visionApps_01
+  title: 문서 스캐너
+  order: 1
+  category: visionApps
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  tags:
+  - opencv
+  - 문서스캐너
+  - 호모그래피
+  - 정렬
+  - 응용
+  seo:
+    title: 비전 응용 - 문서 스캐너
+    description: 비스듬히 찍힌 문서 사진을 호모그래피로 정렬해 스캔 결과처럼 만듭니다.
+    keywords:
+    - 문서스캐너
+    - 호모그래피
+    - 정렬
+    - opencv
+intro:
+  emoji: 📄
+  goal: 비스듬히 찍힌 문서 사진을 호모그래피로 정렬해 스캔 결과처럼 만듭니다.
+  description: |-
+    카메라로 찍은 문서는 항상 약간 기울어져 있습니다. 호모그래피 한 번이면 네 모서리를 골라 사각형으로 정렬한 스캔 이미지를 얻을 수 있습니다. 이 강의는 합성 입력으로 그 흐름을 끝까지 실행합니다.
+  direction: 합성된 비스듬한 문서 이미지를 만들고, 네 모서리를 골라 호모그래피로 직사각형 좌표계로 정렬합니다.
+  benefits:
+  - 호모그래피를 응용에 그대로 적용할 수 있습니다.
+  - cv2.getPerspectiveTransform과 warpPerspective 한 줄을 익힙니다.
+  - 결과 이미지를 흑백 + 임곗값 처리로 스캔 결과처럼 만드는 후처리를 배웁니다.
+  diagram:
+    steps:
+    - label: 1단계. 합성 문서 만들기
+      detail: 흰색 사각형 위에 텍스트와 도형을 그립니다.
+    - label: 2단계. 비스듬한 사진 만들기
+      detail: warpPerspective로 기울어진 사진 합성.
+    - label: 3단계. 네 모서리 좌표
+      detail: 합성에 사용한 좌표를 그대로 사용합니다.
+    - label: 4단계. 호모그래피 + 정렬
+      detail: getPerspectiveTransform 한 줄.
+    - label: 5단계. 스캔 후처리
+      detail: 그레이 + 적응 임곗값.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python, numpy, matplotlib 만으로 동작.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: synth_doc
+  title: 1단계. 합성 문서 만들기
+  structuredPrimary: true
+  subtitle: 흰색 캔버스 + 텍스트
+  goal: 흰색 사각형 위에 텍스트와 도형을 그려 학습용 문서를 만듭니다.
+  why: 외부 데이터 없이 모든 강의 흐름을 즉시 실행할 수 있도록 합성을 사용합니다.
+  explanation: |-
+    `np.full((H, W, 3), 255, dtype=np.uint8)` 가 흰 캔버스입니다. cv2.putText로 텍스트, cv2.rectangle로 도형을 그립니다.
+
+    텍스트는 영문만 사용합니다(cv2의 한글 폰트 지원이 까다롭습니다). 한국어 OCR 학습은 4강에서 다룹니다.
+  tips:
+  - cv2.putText의 좌표는 텍스트의 좌하단입니다. 좌상단이 아닌 점에 주의하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    document = np.full((400, 300, 3), 255, dtype=np.uint8)
+    cv2.putText(document, "Codaro Doc Scanner", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (10, 10, 10), 2)
+    cv2.putText(document, "Lesson 01 - homography", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (40, 40, 40), 1)
+    cv2.rectangle(document, (20, 180), (280, 380), (40, 40, 40), 1)
+    cv2.putText(document, "BODY TEXT", (40, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (40, 40, 40), 2)
+    document.shape
+  exercise:
+    prompt: document를 시각화하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(4, 5))
+      plt.imshow(document)
+      plt.axis('___')
+      fig
+    hints:
+    - 빈칸은 'off' 입니다.
+    - 텍스트가 화면에 보여야 합니다.
+  check:
+    noError: 합성 문서 생성이 오류 없이 끝나야 합니다.
+    resultCheck: document.shape이 (400, 300, 3) 이어야 합니다.
+- id: warp_doc
+  title: 2단계. 비스듬한 사진 만들기
+  structuredPrimary: true
+  subtitle: 카메라가 기울어진 효과
+  goal: 합성 문서를 warpPerspective로 기울여 학습 입력 사진을 만듭니다.
+  why: 학습 환경에서 실제 비스듬 사진을 얻기 어려우므로 합성으로 통제 가능한 입력을 만듭니다.
+  explanation: |-
+    원본의 네 모서리 좌표와 그것이 옮겨질 비스듬한 좌표를 정해 호모그래피 행렬을 만듭니다. 그 행렬로 warpPerspective를 호출하면 합성된 비스듬 사진이 나옵니다.
+
+    캔버스를 크게 잡고 가운데에 문서를 두면 시각적으로 자연스럽습니다.
+  tips:
+  - 합성에 사용한 모서리 좌표는 다음 단계에서 그대로 정답으로 사용합니다.
+  snippet: |-
+    canvasH, canvasW = 500, 600
+    photo = np.full((canvasH, canvasW, 3), 200, dtype=np.uint8)
+    sourceCorners = np.array([[0, 0], [300, 0], [300, 400], [0, 400]], dtype=np.float32)
+    targetCorners = np.array([[120, 80], [520, 60], [540, 460], [80, 440]], dtype=np.float32)
+    warpMatrix = cv2.getPerspectiveTransform(sourceCorners, targetCorners)
+    photo = cv2.warpPerspective(document, warpMatrix, (canvasW, canvasH), dst=photo, borderMode=cv2.BORDER_TRANSPARENT)
+    photo.shape
+  exercise:
+    prompt: photo를 시각화하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(6, 5))
+      plt.imshow(photo)
+      plt.axis('off')
+      fig
+    hints:
+    - 문서가 비스듬하게 보여야 합니다.
+    - 캔버스 색은 기본 200으로 회색 입니다.
+  check:
+    noError: 합성 사진 만들기가 오류 없이 끝나야 합니다.
+    resultCheck: photo.shape이 (500, 600, 3) 이어야 합니다.
+- id: corners
+  title: 3단계. 네 모서리 좌표
+  structuredPrimary: true
+  subtitle: 정답 좌표 사용
+  goal: 합성에 쓴 네 모서리 좌표를 그대로 정답으로 사용합니다.
+  why: 학습 환경에서는 사람이 클릭하지 않고 즉시 학습이 가능해야 합니다.
+  explanation: |-
+    실제 응용에서는 코너 검출(visionFeatures 1강) 이나 GUI 클릭으로 네 점을 얻지만, 학습에서는 합성에 사용한 좌표를 그대로 사용합니다.
+
+    네 점의 순서는 좌상-우상-우하-좌하 시계 방향이 표준입니다.
+  tips:
+  - 모서리 좌표 순서가 어긋나면 결과가 거꾸로 뒤집힌 이미지가 됩니다.
+  snippet: |-
+    detectedCorners = targetCorners.copy()
+    detectedCorners
+  exercise:
+    prompt: detectedCorners를 photo 위에 점으로 표시하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(6, 5))
+      plt.imshow(photo)
+      plt.scatter(detectedCorners[:, 0], detectedCorners[:, 1], s=80, c='red', edgecolors='___')
+      plt.axis('off')
+      fig
+    hints:
+    - 빈칸은 'black' 입니다.
+    - 네 모서리 점이 문서 네 모서리에 정확히 있어야 합니다.
+  check:
+    noError: 좌표 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: detectedCorners.shape이 (4, 2) 이어야 합니다.
+- id: align
+  title: 4단계. 호모그래피 + 정렬
+  structuredPrimary: true
+  subtitle: getPerspectiveTransform
+  goal: 네 모서리를 직사각형으로 옮기는 호모그래피로 사진을 정렬합니다.
+  why: 정렬된 결과가 스캔 이미지의 기본입니다.
+  explanation: |-
+    원본 사진의 네 모서리 → 목표 직사각형의 네 모서리로 가는 호모그래피를 만들고 warpPerspective로 변환합니다. 결과 캔버스 크기는 (300, 400) 정도가 적당합니다.
+  tips:
+  - 결과 캔버스의 가로:세로 비율이 원본 문서의 비율과 비슷해야 정렬 결과가 자연스럽습니다.
+  snippet: |-
+    outW, outH = 300, 400
+    rect = np.array([[0, 0], [outW, 0], [outW, outH], [0, outH]], dtype=np.float32)
+    alignMatrix = cv2.getPerspectiveTransform(detectedCorners, rect)
+    aligned = cv2.warpPerspective(photo, alignMatrix, (outW, outH))
+    fig = plt.figure(figsize=(4, 5))
+    plt.imshow(aligned)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 결과 크기를 (600, 800) 으로 키운 alignedBig을 만드세요.
+    starterCode: |-
+      bigW, bigH = ___, ___
+      bigRect = np.array([[0, 0], [bigW, 0], [bigW, bigH], [0, bigH]], dtype=np.float32)
+      bigMatrix = cv2.getPerspectiveTransform(detectedCorners, bigRect)
+      alignedBig = cv2.warpPerspective(photo, bigMatrix, (bigW, bigH))
+      alignedBig.shape
+    hints:
+    - 두 빈칸은 정수 600, 800 입니다.
+    - 결과는 더 큰 크기의 스캔처럼 보입니다.
+  check:
+    noError: 정렬이 오류 없이 끝나야 합니다.
+    resultCheck: aligned.shape의 첫 두 차원이 (400, 300) 이어야 합니다.
+- id: post_process
+  title: 5단계. 스캔 후처리
+  structuredPrimary: true
+  subtitle: 그레이 + 적응 임곗값
+  goal: 정렬 결과를 흑백 + 임곗값 처리로 스캔 이미지처럼 만듭니다.
+  why: 종이 스캐너가 만드는 결과와 비슷한 가독성 좋은 흑백 이미지를 만듭니다.
+  explanation: |-
+    `cv2.adaptiveThreshold` 가 종이 텍스트 분리에 잘 맞습니다. 블록 크기를 너무 작게 두면 텍스트가 끊어지고 너무 크게 두면 배경이 검게 보일 수 있습니다.
+  tips:
+  - 임곗값 후처리 전 cv2.GaussianBlur로 약간 흐리게 만들면 노이즈가 줄어듭니다.
+  snippet: |-
+    gray = cv2.cvtColor(aligned, cv2.COLOR_RGB2GRAY)
+    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 10)
+    fig = plt.figure(figsize=(4, 5))
+    plt.imshow(binary, cmap='gray')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 블록 크기를 51, 상수 5로 바꿔 binarySoft을 만드세요.
+    starterCode: |-
+      binarySoft = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, ___, 5)
+      fig2 = plt.figure(figsize=(4, 5))
+      plt.imshow(binarySoft, cmap='gray')
+      plt.axis('off')
+      fig2
+    hints:
+    - 빈칸은 정수 51 입니다.
+    - 결과가 더 부드러워야 합니다.
+  check:
+    noError: 후처리가 오류 없이 끝나야 합니다.
+    resultCheck: binary.dtype이 uint8여야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 함수화
+  goal: 입력 사진 + 네 모서리 → 스캔 결과 한 함수에 모읍니다.
+  why: 함수로 묶어 두면 새 사진에 같은 변환을 즉시 적용할 수 있습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 함수 시그니처는 (이미지, 좌표) → 정렬 흑백 이미지 가 표준입니다.
+  snippet: |-
+    def scanDocument(img, corners, outW=300, outH=400, block=25, constant=10):
+        rectLocal = np.array([[0, 0], [outW, 0], [outW, outH], [0, outH]], dtype=np.float32)
+        matrix = cv2.getPerspectiveTransform(corners, rectLocal)
+        alignedLocal = cv2.warpPerspective(img, matrix, (outW, outH))
+        grayLocal = cv2.cvtColor(alignedLocal, cv2.COLOR_RGB2GRAY)
+        return cv2.adaptiveThreshold(grayLocal, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block, constant)
+
+    scanResult = scanDocument(photo, detectedCorners)
+    scanResult.shape
+  exercise:
+    prompt: "미션1: 위 함수에 다른 출력 크기 (200, 280) 을 적용한 thumbnail 결과를 만들고 시각화하세요. 미션2: 정렬 결과(컬러) 와 스캔 후처리 결과를 1x2 그리드로 비교 출력하세요."
+    starterCode: |-
+      thumbnail = scanDocument(photo, detectedCorners, outW=___, outH=___)
+      fig = plt.figure(figsize=(3, 4))
+      plt.imshow(thumbnail, cmap='gray')
+      plt.axis('off')
+      fig
+    hints:
+    - 두 빈칸은 정수 200, 280 입니다.
+    - 결과는 더 작은 흑백 스캔입니다.
+  check:
+    noError: 함수 호출이 오류 없이 끝나야 합니다.
+    resultCheck: scanResult.shape이 (400, 300) 이어야 합니다.

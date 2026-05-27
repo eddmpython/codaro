@@ -177,6 +177,26 @@ const categoryLabels: Record<string, { title: string; track: string; description
     track: "이미지·비전",
     description: "컴퓨터 비전의 기본 흐름을 익힙니다.",
   },
+  visionBasics: {
+    title: "이미지비전 기초",
+    track: "이미지·비전",
+    description: "픽셀과 numpy로 이미지 비전의 직관을 만듭니다.",
+  },
+  visionFeatures: {
+    title: "이미지비전 특징점",
+    track: "이미지·비전",
+    description: "특징점, 매칭, 호모그래피, 비디오, 트래킹을 다룹니다.",
+  },
+  deepVision: {
+    title: "딥러닝 비전",
+    track: "이미지·비전",
+    description: "torchvision 사전학습 모델로 분류, 탐지, 세그멘테이션을 추론합니다.",
+  },
+  visionApps: {
+    title: "이미지비전 응용",
+    track: "이미지·비전",
+    description: "문서 스캐너, OCR, 모자이크 등 실전 비전 응용을 만듭니다.",
+  },
   practical: {
     title: "실전 파이썬",
     track: "자동화",
@@ -215,7 +235,7 @@ const categoryGroups: Record<string, string[]> = {
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
   "자동화": ["playwright", "excel", "regex", "practical", "fileOps", "procCtl", "watchSched", "inputCtl"],
-  "이미지·비전": ["pillow", "opencv"],
+  "이미지·비전": ["visionBasics", "pillow", "opencv", "visionFeatures", "deepVision", "visionApps"],
 };
 
 const categoryTree: CurriculumCategoryTreeNode[] = [
@@ -283,8 +303,8 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
   {
     id: "image-vision",
     name: "이미지·비전",
-    description: "이미지 처리와 화면 인식 기반 자동화를 다룬다.",
-    categories: ["pillow", "opencv"],
+    description: "픽셀 기초부터 사전학습 딥러닝 모델, 실전 응용까지 이미지 비전 전 영역을 다룬다.",
+    categories: ["visionBasics", "pillow", "opencv", "visionFeatures", "deepVision", "visionApps"],
   },
 ];
 
