@@ -1,5 +1,6 @@
 meta:
   packages:
+  - numpy
   - pillow
   - scikit-learn
   id: pillow_10
@@ -17,7 +18,7 @@ meta:
   - 합성
   seo:
     title: Pillow 심화 - 종합 이미지 에디터
-    description: Pillow의 모든 기능을 활용하여 종합 이미지 에디터를 만듭니다. 필터, 조정, 텍스트, 합성을 종합합니다.
+    description: Pillow 모든 기능을 결합해 crop→filter→enhance→watermark→save 파이프라인 한 함수를 만듭니다.
     keywords:
     - Pillow
     - 이미지에디터
@@ -27,325 +28,453 @@ meta:
     - 텍스트
 intro:
   emoji: 🎬
-  goal: 지금까지 배운 모든 Pillow 기능을 종합하여 이미지 에디터를 만듭니다.
-  description: 이미지 로드, 크기 조절, 필터, 색상 조정, 텍스트 삽입, 합성까지 전체 편집 파이프라인을 구현합니다. 모든 개념을 실전에서 활용합니다.
-  direction: 종합이미지에디터에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: 01~09에서 익힌 Pillow 기능들을 editPhoto 함수 한 개로 결합해 crop→filter→enhance→watermark 흐름을 합성 입력 검증 후 실제 사진에 일반화합니다.
+  description: 종합 강의는 각 강의의 단편을 한 함수에 묶는 작업입니다. 인터페이스가 일관되면 자동화 파이프라인이 됩니다.
+  direction: 각 단계를 dict로 보고하는 editPhoto 함수 → 합성 입력 검증 → china/flower 일반화 → 가드 함수.
   benefits:
-  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
-  - 종합이미지에디터 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
-  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
+  - crop/resize/filter/enhance/watermark 다섯 작업을 한 함수에 결합합니다.
+  - 단계별 통계 dict로 자동화 보고 형식을 만듭니다.
+  - 함수의 인자 인터페이스로 유연한 보정 흐름을 제공합니다.
+  - validateEditConfig로 잘못된 인자 차단.
   diagram:
     steps:
-    - label: 1단계. 이미지 로드 입력 확인
-      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. 크기 편집 처리 실행
-      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. 필터 적용 결과 검증
-      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
-    - label: 종합이미지에디터 재사용
-      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
+    - label: 원본 로드
+      detail: china를 Image로 변환.
+    - label: editPhoto 한 줄
+      detail: crop→resize→filter→enhance→watermark.
+    - label: 단계별 통계
+      detail: 각 단계 후 표준편차/평균 변화 보고.
+    - label: 다른 입력 적용
+      detail: flower에 같은 함수 적용해 일반화 검증.
+    - label: 가드 함수
+      detail: validateEditConfig로 dict 인자 안전성 확인.
     runtime:
-    - label: 이미지 처리 환경
-      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 종합이미지에디터 실행
-      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
-    - label: 종합이미지에디터 완료
-      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
+    - label: pillow + numpy
+      detail: 단계별 통계 계산.
+    - label: 함수형 흐름
+      detail: 각 단계가 새 Image를 돌려줘 원본 보존.
 sections:
 - id: step1_load
-  title: 1단계. 이미지 로드
+  title: 1단계. 종합 입력 준비
   structuredPrimary: true
-  subtitle: 편집할 원본 준비
-  goal: 1단계. 이미지 로드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: sklearn의 china 이미지를 원본으로 사용합니다. 편집 과정에서 원본을 보존하기 위해 copy()로 작업 이미지를 생성합니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
-    from sklearn.datasets import load_sample_image
-
-    originalArr = load_sample_image('china.jpg')
-    original = Image.fromarray(originalArr)
-    original.size, original.mode
-  exercise:
-    prompt: 1단계. 이미지 로드 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
-      from sklearn.datasets import load_sample_image
-
-      originalArr = load_sample_image('china.jpg')
-      original = Image.fromarray(originalArr)
-      original.size, original.mode
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 1단계. 이미지 로드의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 이미지 로드 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step2_crop_resize
-  title: 2단계. 크기 편집
-  structuredPrimary: true
-  subtitle: 자르기와 리사이즈
-  goal: 2단계. 크기 편집에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 이미지의 특정 영역을 추출하고 원하는 크기로 조절합니다. 이전 프로젝트에서 배운 crop()과 resize()를 활용합니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    w, h = working.size
-    marginW = int(w * 0.1)
-    marginH = int(h * 0.1)
-    cropped = working.crop((marginW, marginH, w - marginW, h - marginH))
-    cropped.size
-  exercise:
-    prompt: 2단계. 크기 편집 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      w, h = working.size
-      marginW = int(w * 0.1)
-      marginH = int(h * 0.1)
-      cropped = working.crop((marginW, marginH, w - marginW, h - marginH))
-      cropped.size
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 2단계. 크기 편집의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 크기 편집 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step3_filter
-  title: 3단계. 필터 적용
-  structuredPrimary: true
-  subtitle: ImageFilter 활용
-  goal: 3단계. 필터 적용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 이미지에 필터를 적용하여 분위기를 바꿉니다. 여러 필터를 순차적으로 적용할 수도 있습니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    filtered = resized.filter(ImageFilter.UnsharpMask(radius=2, percent=120))
-    filtered
-  exercise:
-    prompt: 3단계. 필터 적용 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      filtered = resized.filter(ImageFilter.UnsharpMask(radius=2, percent=120))
-      filtered
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 3단계. 필터 적용의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 필터 적용 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step4_color
-  title: 4단계. 색상 조정
-  structuredPrimary: true
-  subtitle: ImageEnhance 활용
-  goal: 4단계. 색상 조정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 밝기, 대비, 채도를 조절하여 이미지를 보정합니다. 각 조정은 순차적으로 적용됩니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    brighter = ImageEnhance.Brightness(enhanced).enhance(1.1)
-    brighter
-  exercise:
-    prompt: 4단계. 색상 조정 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      brighter = ImageEnhance.Brightness(enhanced).enhance(1.1)
-      brighter
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 4단계. 색상 조정의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 색상 조정 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step5_text
-  title: 5단계. 텍스트 추가
-  structuredPrimary: true
-  subtitle: ImageDraw 활용
-  goal: 5단계. 텍스트 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 이미지에 제목이나 설명 텍스트를 추가합니다. RGBA 모드로 변환하여 반투명 배경을 적용합니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    textReady = saturated.convert('RGBA')
-    textReady.mode
-  exercise:
-    prompt: 5단계. 텍스트 추가 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      textReady = saturated.convert('RGBA')
-      textReady.mode
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 5단계. 텍스트 추가의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 텍스트 추가 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step6_overlay
-  title: 6단계. 로고/워터마크 추가
-  structuredPrimary: true
-  subtitle: 이미지 합성
-  goal: 6단계. 로고/워터마크 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 작은 로고나 워터마크를 추가합니다. 직접 도형으로 간단한 로고를 만들어봅니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    logo = Image.new('RGBA', (50, 50), (0, 0, 0, 0))
-    logoDraw = ImageDraw.Draw(logo)
-    logoDraw.ellipse([5, 5, 45, 45], fill=(255, 100, 100, 200))
-    logoDraw.text((15, 18), "PY", fill=(255, 255, 255, 255))
-    logo
-  exercise:
-    prompt: 6단계. 로고/워터마크 추가 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
-    starterCode: |-
-      logo = Image.new('RGBA', (50, 50), (0, 0, 0, 0))
-      logoDraw = ImageDraw.Draw(logo)
-      logoDraw.ellipse([5, 5, 45, 45], fill=(255, 100, 100, 200))
-      logoDraw.text((15, 18), "PY", fill=(255, 255, 255, 255))
-      logo
-    hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-  check:
-    noError: 6단계. 로고/워터마크 추가의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 로고/워터마크 추가 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step7_compare
-  title: 7단계. 결과 비교
-  structuredPrimary: true
-  subtitle: 원본과 편집본
-  goal: 7단계. 결과 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 원본 이미지와 최종 편집 결과를 비교합니다. 여러 단계의 편집이 적용된 결과를 확인합니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    edits = [
-        "1. 10% 마진 자르기",
-        "2. 800x600 리사이즈",
-        "3. UnsharpMask + EdgeEnhance 필터",
-        "4. 밝기 1.1x, 대비 1.15x, 채도 1.2x",
-        "5. 하단 텍스트 배너",
-        "6. 로고 워터마크"
-    ]
-    edits
-  exercise:
-    prompt: 7단계. 결과 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
-    starterCode: |-
-      edits = [
-          "1. 10% 마진 자르기",
-          "2. 800x600 리사이즈",
-          "3. UnsharpMask + EdgeEnhance 필터",
-          "4. 밝기 1.1x, 대비 1.15x, 채도 1.2x",
-          "5. 하단 텍스트 배너",
-          "6. 로고 워터마크"
-      ]
-      edits
-    hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-  check:
-    noError: 7단계. 결과 비교의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 7단계. 결과 비교 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: 종합 에디터 프로젝트
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: china 원본
+  goal: china 샘플을 Pillow Image로 만들고 baseline 통계를 측정해 이후 모든 편집 단계의 비교 기준값을 정합니다.
+  why: 종합 에디터는 여러 단계가 누적됩니다. baseline 통계를 먼저 잡으면 각 단계의 효과를 정확히 비교할 수 있습니다.
   explanation: |-
-    flower 이미지에 전체 편집 파이프라인을 적용해봅시다. 위에서 배운 크기 조절, 필터, 색상 보정, 텍스트, 합성을 종합하여 완성도 높은 이미지를 만듭니다.
-
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+    china는 풍경 사진이라 여러 보정 효과가 잘 드러납니다.
+    baseline mean과 std를 NumPy로 측정해 둡니다. 이 값들이 이후 편집 단계의 비교 기준입니다.
   tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - "from PIL import Image, ImageFilter, ImageEnhance, ImageDraw로 한꺼번에 import."
+  - "ndarray ↔ Image 변환은 비용이 적습니다. 자주 써도 안전."
   snippet: |-
+    import numpy as np
     from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
     from sklearn.datasets import load_sample_image
 
-    vintageArr = load_sample_image('flower.jpg')
-    vintageBase = Image.fromarray(vintageArr)
-    vintageBase
+    original = Image.fromarray(load_sample_image('china.jpg'))
+    originalArr = np.asarray(original)
+
+    {
+        'mode': original.mode,
+        'size': original.size,
+        'baseMean': round(float(originalArr.mean()), 2),
+        'baseStd': round(float(originalArr.std()), 2),
+    }
   exercise:
-    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: flower 입력으로 같은 baseline을 측정하세요.
     starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flower = Image.fromarray(load_sample_image('___'))
+      {'mean': round(float(np.asarray(flower).mean()), 2)}
+    hints:
+    - flower 파일.
+    - 빈칸에는 flower.jpg가 들어갑니다.
+    check:
+      noError: load_sample_image가 끝나야 합니다.
+      resultCheck: mean이 양수여야 합니다.
+  check:
+    noError: load와 통계 계산이 끝나야 합니다.
+    resultCheck: mode가 'RGB', size가 (640, 427)이어야 합니다.
+- id: step2_crop_resize
+  title: 2단계. crop과 resize 단계
+  structuredPrimary: true
+  subtitle: 가운데 영역 + 표준 크기
+  goal: china 가운데 절반 영역을 crop으로 자르고 (320, 240) 표준 크기로 resize한 결과의 size가 정확한지 확인합니다.
+  why: 종합 에디터의 첫 단계는 보통 입력 정규화(crop + resize)입니다. 표준 크기로 통일하면 다음 단계 처리가 일관됩니다.
+  explanation: |-
+    crop ((left, upper, right, lower) 4-tuple)으로 가운데 영역만 추출.
+    resize ((width, height) 2-tuple)로 표준 크기로 통일.
+    두 단계는 메서드 체이닝이 자연스럽습니다.
+  tips:
+  - 입력 사진의 비율이 다르면 letterbox나 center crop이 필요합니다.
+  - 표준 크기는 도메인에 따라 다릅니다. 모바일 썸네일은 (300, 300), 인쇄용은 더 큰 크기.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    cropResize = Image.fromarray(load_sample_image('china.jpg'))
+    w, h = cropResize.size
+    centerCrop = cropResize.crop((w // 4, h // 4, w * 3 // 4, h * 3 // 4))
+    standardSize = centerCrop.resize((320, 240))
+
+    {
+        'originalSize': cropResize.size,
+        'cropSize': centerCrop.size,
+        'standardSize': standardSize.size,
+        'isStandard': standardSize.size == (320, 240),
+    }
+  exercise:
+    prompt: 같은 흐름을 (200, 150) 작은 표준 크기에 적용해 결과 size를 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      small = Image.fromarray(load_sample_image('china.jpg')).crop((100, 50, 500, 350)).resize((200, ___))
+      {'size': small.size}
+    hints:
+    - 높이 150.
+    - 빈칸에는 150이 들어갑니다.
+    check:
+      noError: crop과 resize가 끝나야 합니다.
+      resultCheck: size가 (200, 150)이어야 합니다.
+  check:
+    noError: crop과 resize가 끝나야 합니다.
+    resultCheck: isStandard가 True여야 합니다.
+- id: step3_filter_enhance
+  title: 3단계. filter와 enhance 결합
+  structuredPrimary: true
+  subtitle: GaussianBlur + Sharpness
+  goal: 표준 크기 이미지에 GaussianBlur(radius=1)로 노이즈를 살짝 줄이고 Sharpness.enhance(1.3)으로 선명도를 강화한 뒤 표준편차 변화로 효과를 확인합니다.
+  why: 노이즈 제거(약한 blur) + 선명도 강화는 사진 보정의 흔한 조합입니다. 두 단계를 결합해 표준편차 변화를 측정하면 효과의 균형을 확인할 수 있습니다.
+  explanation: |-
+    약한 GaussianBlur(radius=1)는 미세 노이즈를 줄이지만 디테일은 거의 보존합니다.
+    Sharpness.enhance(1.3)으로 약하게 선명도를 강화하면 보정 후 결과가 자연스럽습니다.
+    두 단계의 결과 표준편차를 baseline과 비교합니다. 합산 효과로 std는 약간 늘어나는 경향이 일반적입니다.
+  tips:
+  - blur radius=1과 Sharpness 1.3은 거의 모든 사진에 안전한 시작값입니다.
+  - 더 강한 보정이 필요하면 radius=3, Sharpness=1.5 정도까지 시도.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageFilter, ImageEnhance
+    from sklearn.datasets import load_sample_image
+
+    filterFrame = Image.fromarray(load_sample_image('china.jpg')).resize((320, 240))
+    baseStd = float(np.asarray(filterFrame).std())
+
+    blurred = filterFrame.filter(ImageFilter.GaussianBlur(radius=1))
+    sharpened = ImageEnhance.Sharpness(blurred).enhance(1.3)
+
+    {
+        'baseStd': round(baseStd, 2),
+        'blurStd': round(float(np.asarray(blurred).std()), 2),
+        'sharpStd': round(float(np.asarray(sharpened).std()), 2),
+    }
+  exercise:
+    prompt: GaussianBlur radius=3으로 더 강하게 적용해 결과 std가 radius=1보다 작은지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      strongBlurred = Image.fromarray(load_sample_image('china.jpg')).resize((320, 240)).filter(ImageFilter.GaussianBlur(radius=___))
+      {'strongStd': round(float(np.asarray(strongBlurred).std()), 2)}
+    hints:
+    - radius 3.
+    - 빈칸에는 3이 들어갑니다.
+    check:
+      noError: filter 호출이 끝나야 합니다.
+      resultCheck: strongStd가 양수여야 합니다.
+  check:
+    noError: filter/enhance 호출이 끝나야 합니다.
+    resultCheck: blurStd가 baseStd 이하여야 합니다.
+- id: step4_watermark
+  title: 4단계. 텍스트 워터마크
+  structuredPrimary: true
+  subtitle: RGBA + paste
+  goal: 보정된 이미지에 RGBA 변환 후 ImageDraw로 우측 하단 워터마크를 그리고 alpha 합성으로 자연스럽게 통합합니다.
+  why: 워터마크는 종합 에디터의 마지막 단계가 흔합니다. 알파 합성으로 자연스럽게 통합되도록 RGBA 흐름이 필요합니다.
+  explanation: |-
+    convert('RGBA')로 알파 채널 추가.
+    텍스트 레이어를 만들고 paste(layer, (0, 0), mask=layer)로 합성.
+    "@codaro" 같은 짧은 워터마크가 우측 하단에 그려집니다.
+  tips:
+  - 워터마크는 보통 alpha=128~200 정도가 자연스럽습니다.
+  - 우측 하단 좌표는 (canvas.size[0] - padding - textWidth, canvas.size[1] - padding - textHeight).
+  snippet: |-
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+    waterFrame = Image.fromarray(load_sample_image('china.jpg')).resize((320, 240)).convert('RGBA').copy()
+    waterLayer = Image.new('RGBA', waterFrame.size, (0, 0, 0, 0))
+    waterDraw = ImageDraw.Draw(waterLayer)
+    waterDraw.text((220, 220), '@codaro', fill=(255, 255, 255, 160))
+    waterFrame.paste(waterLayer, (0, 0), mask=waterLayer)
+
+    {
+        'mode': waterFrame.mode,
+        'size': waterFrame.size,
+        'isRGBA': waterFrame.mode == 'RGBA',
+    }
+  exercise:
+    prompt: 워터마크 텍스트를 'edit'로 바꿔 같은 흐름을 실행하세요.
+    starterCode: |-
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      editFrame = Image.fromarray(load_sample_image('china.jpg')).resize((320, 240)).convert('RGBA').copy()
+      editLayer = Image.new('RGBA', editFrame.size, (0, 0, 0, 0))
+      ImageDraw.Draw(editLayer).text((220, 220), '___', fill=(255, 255, 255, 160))
+      editFrame.paste(editLayer, (0, 0), mask=editLayer)
+      {'mode': editFrame.mode}
+    hints:
+    - 워터마크 텍스트 edit.
+    - 빈칸에는 edit가 들어갑니다.
+    check:
+      noError: paste 호출이 끝나야 합니다.
+      resultCheck: mode가 'RGBA'여야 합니다.
+  check:
+    noError: paste 호출이 끝나야 합니다.
+    resultCheck: isRGBA가 True여야 합니다.
+- id: step5_editphoto
+  title: 5단계. editPhoto 종합 함수
+  structuredPrimary: true
+  subtitle: 모든 단계 결합
+  goal: editPhoto(image, config) 함수가 crop→resize→filter→enhance→watermark를 한 번에 적용하고 단계별 통계를 dict로 보고합니다.
+  why: 종합 함수가 자동화 파이프라인의 표준 도구입니다. 같은 함수를 다양한 입력에 적용해 일관된 결과를 얻을 수 있습니다.
+  explanation: |-
+    editPhoto는 RGB Image와 config dict를 받아 보정된 RGBA Image와 단계별 통계를 돌려줍니다.
+    config는 cropBox, standardSize, blurRadius, sharpness, watermarkText 키를 가집니다.
+    각 단계 결과의 통계(mean, std)를 함께 보고하면 자동화 로그로 활용 가능합니다.
+  tips:
+  - config 키에 기본값을 두면 호출자가 일부만 지정해도 됩니다.
+  - 결과 Image와 함께 단계별 통계를 보고하는 dict 패턴이 자동화 보고서에 표준입니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+
+    def editPhoto(image: Image.Image, config: dict) -> dict:
+        cropped = image.crop(config['cropBox'])
+        resized = cropped.resize(config['standardSize'])
+        blurred = resized.filter(ImageFilter.GaussianBlur(radius=config['blurRadius']))
+        sharpened = ImageEnhance.Sharpness(blurred).enhance(config['sharpness'])
+        rgba = sharpened.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text((rgba.size[0] - 100, rgba.size[1] - 20), config['watermarkText'], fill=(255, 255, 255, 160))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return {
+            'finalSize': rgba.size,
+            'finalMode': rgba.mode,
+            'baseMean': round(float(np.asarray(image).mean()), 2),
+            'finalMean': round(float(np.asarray(rgba).mean()), 2),
+        }
+
+
+    chinaInput = Image.fromarray(load_sample_image('china.jpg'))
+    config = {
+        'cropBox': (100, 50, 500, 350),
+        'standardSize': (320, 240),
+        'blurRadius': 1,
+        'sharpness': 1.3,
+        'watermarkText': '@codaro',
+    }
+    editPhoto(chinaInput, config)
+  exercise:
+    prompt: editPhoto에 다른 standardSize (200, 150)을 넘기면 finalSize가 그대로 (200, 150)인지 확인하세요.
+    starterCode: |-
+      import numpy as np
       from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
       from sklearn.datasets import load_sample_image
 
-      vintageArr = load_sample_image('flower.jpg')
-      vintageBase = Image.fromarray(vintageArr)
-      vintageBase
+
+      def editPhoto(image, config):
+          cropped = image.crop(config['cropBox'])
+          resized = cropped.resize(config['standardSize'])
+          return {'finalSize': resized.size}
+
+
+      smallConfig = {
+          'cropBox': (100, 50, 500, 350),
+          'standardSize': (200, ___),
+      }
+      result = editPhoto(Image.fromarray(load_sample_image('china.jpg')), smallConfig)
+      {'finalSize': result['finalSize'], 'isExact': result['finalSize'] == (200, 150)}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - 높이 150.
+    - 빈칸에는 150이 들어갑니다.
+    check:
+      noError: editPhoto 정의와 호출이 끝나야 합니다.
+      resultCheck: isExact가 True여야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: workflow_validation
-  title: 8단계. 종합 이미지 편집 검증 루프
+    noError: editPhoto 정의와 호출이 끝나야 합니다.
+    resultCheck: finalSize가 (320, 240), finalMode가 'RGBA'여야 합니다.
+- id: practice
+  title: 실습 — flower에 같은 함수
   structuredPrimary: true
-  subtitle: crop → resize → enhance → watermark
-  goal: 8단계. 종합 이미지 편집 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 종합 이미지 에디터는 여러 기능을 이어 붙이는 데서 끝나지 않습니다. 편집 설정의 입력 계약을 검증하고, 최종 이미지 크기와 픽셀 변화, 워터마크 위치가 의도대로
-    나오는지 확인해야 합니다.
+  subtitle: 일반화 검증
+  goal: 같은 editPhoto 함수와 config를 flower 입력에 적용해 결과 dict가 같은 형식으로 돌아오는지 확인합니다.
+  why: 함수가 다양한 입력에 같은 형식으로 결과를 돌려준다는 것이 자동화 도구의 핵심 가치입니다.
+  explanation: |-
+    flower 입력은 china와 같은 (640, 427) 크기지만 색조가 다릅니다.
+    같은 config로 editPhoto를 호출하면 결과 dict 키는 동일하고 값(평균/std)만 다른 결과가 나옵니다.
+    이 일관성이 자동화 코드에서 입력별 분기 없이 같은 처리 흐름을 가능하게 합니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 결과 dict 형식이 같으면 단위 테스트와 비교 분석이 쉬워집니다.
+  - 함수가 인자 검증을 함수 입구에서 하면 잘못된 호출이 조기 차단됩니다(6단계 참고).
   snippet: |-
-    from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageChops
+    import numpy as np
+    from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+    from sklearn.datasets import load_sample_image
 
-    editorSource = Image.new("RGB", (220, 140), (90, 120, 150))
-    editorDraw = ImageDraw.Draw(editorSource)
-    editorDraw.rectangle((35, 30, 185, 110), fill=(160, 140, 100))
-    editorDraw.ellipse((82, 42, 138, 98), fill=(230, 210, 130))
 
-    editConfig = {
-        "crop": (30, 20, 190, 120),
-        "size": (160, 100),
-        "brightness": 1.15,
-        "contrast": 1.25,
-        "watermarkAlpha": 110,
+    def editPhoto(image: Image.Image, config: dict) -> dict:
+        cropped = image.crop(config['cropBox'])
+        resized = cropped.resize(config['standardSize'])
+        blurred = resized.filter(ImageFilter.GaussianBlur(radius=config['blurRadius']))
+        sharpened = ImageEnhance.Sharpness(blurred).enhance(config['sharpness'])
+        rgba = sharpened.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text((rgba.size[0] - 100, rgba.size[1] - 20), config['watermarkText'], fill=(255, 255, 255, 160))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return {
+            'finalSize': rgba.size,
+            'finalMode': rgba.mode,
+            'baseMean': round(float(np.asarray(image).mean()), 2),
+            'finalMean': round(float(np.asarray(rgba).mean()), 2),
+        }
+
+
+    config = {
+        'cropBox': (100, 50, 500, 350),
+        'standardSize': (320, 240),
+        'blurRadius': 1,
+        'sharpness': 1.3,
+        'watermarkText': '@codaro',
     }
+    flowerResult = editPhoto(Image.fromarray(load_sample_image('flower.jpg')), config)
+    chinaResult = editPhoto(Image.fromarray(load_sample_image('china.jpg')), config)
+    [flowerResult, chinaResult]
+  exercise:
+    prompt: 두 결과가 모두 같은 키를 가지는지 sorted(dict.keys()) 비교로 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+      from sklearn.datasets import load_sample_image
 
-    def validateEditConfig(image, config):
-        left, top, right, bottom = config["crop"]
-        if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
-            raise ValueError(f"crop 설정 오류: {config['crop']}")
-        if config["watermarkAlpha"] < 0 or config["watermarkAlpha"] > 255:
-            raise ValueError(f"watermarkAlpha 범위 오류: {config['watermarkAlpha']}")
+
+      def editPhoto(image, config):
+          cropped = image.crop(config['cropBox'])
+          resized = cropped.resize(config['standardSize'])
+          return {'finalSize': resized.size, 'baseMean': round(float(np.asarray(image).mean()), 2)}
+
+
+      config = {'cropBox': (100, 50, 500, 350), 'standardSize': (320, 240)}
+      r1 = editPhoto(Image.fromarray(load_sample_image('china.jpg')), config)
+      r2 = editPhoto(Image.fromarray(load_sample_image('flower.jpg')), config)
+      {'sameKeys': sorted(r1.keys()) == sorted(r2.___())}
+    hints:
+    - dict.keys() 메서드.
+    - 빈칸에는 keys가 들어갑니다.
+    check:
+      noError: editPhoto와 두 호출이 끝나야 합니다.
+      resultCheck: sameKeys가 True여야 합니다.
+  check:
+    noError: editPhoto와 두 호출이 끝나야 합니다.
+    resultCheck: 두 결과 모두 4개 키 (finalSize, finalMode, baseMean, finalMean)를 가져야 합니다.
+- id: workflow_validation
+  title: 6단계. config 가드 함수
+  structuredPrimary: true
+  subtitle: validateEditConfig
+  goal: validateEditConfig 함수가 필수 키 누락이나 잘못된 타입을 ValueError로 차단하는지 검증합니다.
+  why: config dict는 자주 손으로 쓰는 인자라 키 오타나 누락이 흔합니다. 함수 입구에서 검증하면 그 사고가 즉시 차단됩니다.
+  explanation: |-
+    validateEditConfig는 (1) 필수 키가 모두 있는지, (2) cropBox가 4-tuple인지, (3) standardSize가 2-tuple인지 검사합니다.
+    누락이나 타입 오류면 ValueError에 실제 받은 값을 메시지에 포함시킵니다.
+    호출자가 config를 작성할 때 즉시 피드백을 받아 디버깅이 빨라집니다.
+  tips:
+  - "필수 키 검증은 set 차집합(set(required) - set(config))으로 간단히 표현할 수 있습니다."
+  - "validateEditConfig는 editPhoto 함수의 첫 줄에서 호출해 입력 안전을 보장하는 게 표준."
+  snippet: |-
+    REQUIRED_KEYS = {'cropBox', 'standardSize', 'blurRadius', 'sharpness', 'watermarkText'}
+
+
+    def validateEditConfig(config: dict) -> bool:
+        missing = REQUIRED_KEYS - set(config.keys())
+        if missing:
+            raise ValueError(f"필수 키 누락: {sorted(missing)}")
+        if not isinstance(config['cropBox'], tuple) or len(config['cropBox']) != 4:
+            raise ValueError(f"cropBox는 4-tuple이어야 합니다: {config['cropBox']}")
+        if not isinstance(config['standardSize'], tuple) or len(config['standardSize']) != 2:
+            raise ValueError(f"standardSize는 2-tuple이어야 합니다: {config['standardSize']}")
         return True
 
-    validateEditConfig(editorSource, editConfig)
+
+    okConfig = {
+        'cropBox': (100, 50, 500, 350),
+        'standardSize': (320, 240),
+        'blurRadius': 1,
+        'sharpness': 1.3,
+        'watermarkText': '@codaro',
+    }
+    okResult = validateEditConfig(okConfig)
+
+    try:
+        validateEditConfig({'cropBox': (1, 2, 3, 4)})
+        missingMessage = 'unexpected pass'
+    except ValueError as exc:
+        missingMessage = str(exc)
+
+    try:
+        validateEditConfig({**okConfig, 'cropBox': (1, 2, 3)})
+        cropMessage = 'unexpected pass'
+    except ValueError as exc:
+        cropMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'missingMessage': missingMessage,
+        'cropMessage': cropMessage,
+    }
   exercise:
-    prompt: 8단계. 종합 이미지 편집 검증 루프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: validateEditConfig에 standardSize가 길이 3 tuple인 잘못된 config를 넘기면 오류가 잡히는지 확인하세요.
     starterCode: |-
-      from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageChops
+      REQUIRED_KEYS = {'cropBox', 'standardSize', 'blurRadius', 'sharpness', 'watermarkText'}
 
-      editorSource = Image.new("RGB", (220, 140), (90, 120, 150))
-      editorDraw = ImageDraw.Draw(editorSource)
-      editorDraw.rectangle((35, 30, 185, 110), fill=(160, 140, 100))
-      editorDraw.ellipse((82, 42, 138, 98), fill=(230, 210, 130))
 
-      editConfig = {
-          "crop": (30, 20, 190, 120),
-          "size": (160, 100),
-          "brightness": 1.15,
-          "contrast": 1.25,
-          "watermarkAlpha": 110,
-      }
-
-      def validateEditConfig(image, config):
-          left, top, right, bottom = config["crop"]
-          if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
-              raise ValueError(f"crop 설정 오류: {config['crop']}")
-          if config["watermarkAlpha"] < 0 or config["watermarkAlpha"] > 255:
-              raise ValueError(f"watermarkAlpha 범위 오류: {config['watermarkAlpha']}")
+      def validateEditConfig(config):
+          missing = REQUIRED_KEYS - set(config.keys())
+          if missing:
+              raise ValueError(f"필수 키 누락: {sorted(missing)}")
+          if not isinstance(config['cropBox'], tuple) or len(config['cropBox']) != 4:
+              raise ValueError(f"cropBox는 4-tuple이어야 합니다: {config['cropBox']}")
+          if not isinstance(config['standardSize'], tuple) or len(config['standardSize']) != 2:
+              raise ValueError(f"standardSize는 2-tuple이어야 합니다: {config['standardSize']}")
           return True
 
-      validateEditConfig(editorSource, editConfig)
+
+      badConfig = {
+          'cropBox': (1, 2, 3, 4),
+          'standardSize': (320, 240, ___),
+          'blurRadius': 1,
+          'sharpness': 1.3,
+          'watermarkText': '@x',
+      }
+      try:
+          validateEditConfig(badConfig)
+          msg = 'unexpected pass'
+      except ValueError as exc:
+          msg = str(exc)
+      {'msg': msg, 'caught': 'standardSize' in msg}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 3원소 standardSize의 세 번째 값.
+    - 빈칸에는 1이 들어갑니다.
+    check:
+      noError: validateEditConfig 정의가 끝나야 합니다.
+      resultCheck: caught가 True여야 합니다.
   check:
-    noError: 8단계. 종합 이미지 편집 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 8단계. 종합 이미지 편집 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: validateEditConfig 정의와 세 호출이 끝나야 합니다.
+    resultCheck: okResult가 True, missingMessage에 '누락', cropMessage에 'cropBox' 단서가 포함되어야 합니다.
