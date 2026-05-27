@@ -229,12 +229,14 @@ sections:
   - re.findall() 사용법 re.findall(패턴, 텍스트)는 패턴과 일치하는 모든 문자열을 리스트로 반환합니다. 가장 많이 사용하는 정규표현식 함수입니다.
   snippet: |-
     allText = json.dumps(usersData)
-    allText[:200]
+    extractedEmails = re.findall(pattern, allText)
+    extractedEmails
   exercise:
     prompt: 6단계. 모든 이메일 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
       allText = json.dumps(usersData)
-      allText[:200]
+      extractedEmails = re.findall(pattern, allText)
+      extractedEmails
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.

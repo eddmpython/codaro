@@ -45,7 +45,7 @@ sections:
       - 패턴은 글로브 스타일이며 대소문자 구분은 case_sensitive 인자로 제어한다.
       - ignore_patterns는 patterns 매칭 후 다시 한 번 거르는 단계다.
     snippet: |-
-      from watchdog.events import PatternMatchingEventHandler
+      from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
       collected: list[str] = []
@@ -57,15 +57,15 @@ sections:
 
 
       handler = CsvCollector(patterns=["*.csv"], ignore_patterns=["*.tmp"], ignore_directories=True)
-      handler.on_created(type("E", (), {"src_path": "report.csv", "is_directory": False})())
-      handler.on_created(type("E", (), {"src_path": "scratch.tmp", "is_directory": False})())
+      handler.dispatch(FileCreatedEvent("report.csv"))
+      handler.dispatch(FileCreatedEvent("scratch.tmp"))
 
       assert collected == ["report.csv"]
       collected
     exercise:
       prompt: CsvCollector에 두 csv 이벤트를 보내 collected 리스트가 두 경로를 본문 순서대로 담는지 검증하세요.
       starterCode: |-
-        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
         collected: list[str] = []
@@ -77,13 +77,13 @@ sections:
 
 
         handler = CsvCollector(patterns=["___"], ignore_patterns=["*.tmp"], ignore_directories=True)
-        handler.on_created(type("E", (), {"src_path": "first.csv", "is_directory": False})())
-        handler.on_created(type("E", (), {"src_path": "second.csv", "is_directory": False})())
+        handler.dispatch(FileCreatedEvent("first.csv"))
+        handler.dispatch(FileCreatedEvent("second.csv"))
 
         assert collected == ["first.csv", "second.csv"]
         collected
       solution: |-
-        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
         collected: list[str] = []
@@ -95,8 +95,8 @@ sections:
 
 
         handler = CsvCollector(patterns=["*.csv"], ignore_patterns=["*.tmp"], ignore_directories=True)
-        handler.on_created(type("E", (), {"src_path": "first.csv", "is_directory": False})())
-        handler.on_created(type("E", (), {"src_path": "second.csv", "is_directory": False})())
+        handler.dispatch(FileCreatedEvent("first.csv"))
+        handler.dispatch(FileCreatedEvent("second.csv"))
 
         assert collected == ["first.csv", "second.csv"]
         collected
@@ -249,7 +249,7 @@ sections:
       - 흔한 무시 패턴은 *.tmp, *.lock, *~, .DS_Store다.
       - 무시 규칙은 한 곳에 모아 자동화 정책으로 관리한다.
     snippet: |-
-      from watchdog.events import PatternMatchingEventHandler
+      from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
       collected: list[str] = []
@@ -261,16 +261,16 @@ sections:
 
 
       handler = CsvCollector(patterns=["*.csv"], ignore_patterns=["*.tmp", "*.lock"], ignore_directories=True)
-      handler.on_created(type("E", (), {"src_path": "report.csv", "is_directory": False})())
-      handler.on_created(type("E", (), {"src_path": "scratch.tmp", "is_directory": False})())
-      handler.on_created(type("E", (), {"src_path": "session.lock", "is_directory": False})())
+      handler.dispatch(FileCreatedEvent("report.csv"))
+      handler.dispatch(FileCreatedEvent("scratch.tmp"))
+      handler.dispatch(FileCreatedEvent("session.lock"))
 
       assert collected == ["report.csv"]
       collected
     exercise:
       prompt: 같은 핸들러에 csv 이벤트 한 개와 lock 이벤트 한 개를 보내 csv만 남는지 검증하세요.
       starterCode: |-
-        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
         collected: list[str] = []
@@ -282,13 +282,13 @@ sections:
 
 
         handler = CsvCollector(patterns=["*.csv"], ignore_patterns=["*.tmp", "*.___"], ignore_directories=True)
-        handler.on_created(type("E", (), {"src_path": "data.csv", "is_directory": False})())
-        handler.on_created(type("E", (), {"src_path": "ignore.lock", "is_directory": False})())
+        handler.dispatch(FileCreatedEvent("data.csv"))
+        handler.dispatch(FileCreatedEvent("ignore.lock"))
 
         assert collected == ["data.csv"]
         collected
       solution: |-
-        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler
 
 
         collected: list[str] = []
@@ -300,8 +300,8 @@ sections:
 
 
         handler = CsvCollector(patterns=["*.csv"], ignore_patterns=["*.tmp", "*.lock"], ignore_directories=True)
-        handler.on_created(type("E", (), {"src_path": "data.csv", "is_directory": False})())
-        handler.on_created(type("E", (), {"src_path": "ignore.lock", "is_directory": False})())
+        handler.dispatch(FileCreatedEvent("data.csv"))
+        handler.dispatch(FileCreatedEvent("ignore.lock"))
 
         assert collected == ["data.csv"]
         collected

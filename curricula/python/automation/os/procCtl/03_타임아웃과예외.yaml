@@ -54,7 +54,7 @@ sections:
               timeout=0.3,
           )
       except subprocess.TimeoutExpired as exc:
-          events.append({"timeout": exc.timeout, "cmd": exc.cmd[-1]})
+          events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
 
       assert events == [{"timeout": 0.3, "cmd": "import time; time.sleep(5)"}]
       events
@@ -71,7 +71,7 @@ sections:
                 timeout=___,
             )
         except subprocess.TimeoutExpired as exc:
-            events.append({"timeout": exc.timeout, "cmd": exc.cmd[-1]})
+            events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
 
         assert events == [{"timeout": 0.2, "cmd": "import time; time.sleep(2)"}]
         events
@@ -86,7 +86,7 @@ sections:
                 timeout=0.2,
             )
         except subprocess.TimeoutExpired as exc:
-            events.append({"timeout": exc.timeout, "cmd": exc.cmd[-1]})
+            events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
 
         assert events == [{"timeout": 0.2, "cmd": "import time; time.sleep(2)"}]
         events

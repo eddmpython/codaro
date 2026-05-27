@@ -48,9 +48,10 @@ sections:
       import sys
 
       completed = subprocess.run(
-          [sys.executable, "-c", "import sys; print(sys.argv[1])", "hello world"],
+          [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "hello world"],
           capture_output=True,
           text=True,
+          encoding="utf-8",
       )
 
       assert completed.stdout.strip() == "hello world"
@@ -62,9 +63,10 @@ sections:
         import sys
 
         completed = subprocess.run(
-            [sys.executable, "-c", "import sys; print(sys.argv[1])", "___"],
+            [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "___"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert completed.stdout.strip() == "안녕 하세요"
@@ -74,9 +76,10 @@ sections:
         import sys
 
         completed = subprocess.run(
-            [sys.executable, "-c", "import sys; print(sys.argv[1])", "안녕 하세요"],
+            [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "안녕 하세요"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert completed.stdout.strip() == "안녕 하세요"

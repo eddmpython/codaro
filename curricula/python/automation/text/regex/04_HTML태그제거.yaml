@@ -227,6 +227,11 @@ sections:
   snippet: |-
     pattern = r"<.*?>"
 
+    htmlText = (
+        "<article><h1>HTML cleaning checklist</h1>"
+        "<p>Remove tags, normalize <b>whitespace</b>, "
+        "and keep the meaningful <i>text</i>.</p></article>"
+    )
     cleanText = re.sub(pattern, "", htmlText)
     cleanText
   exercise:
@@ -234,6 +239,11 @@ sections:
     starterCode: |-
       pattern = r"<.*?>"
 
+      htmlText = (
+          "<article><h1>HTML cleaning checklist</h1>"
+          "<p>Remove tags, normalize <b>whitespace</b>, "
+          "and keep the meaningful <i>text</i>.</p></article>"
+      )
       cleanText = re.sub(pattern, "", htmlText)
       cleanText
     hints:

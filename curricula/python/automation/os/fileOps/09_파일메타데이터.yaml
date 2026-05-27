@@ -112,7 +112,7 @@ sections:
       assert modified == "2023-11-14T22:13:20+00:00"
       modified
     exercise:
-      prompt: 같은 흐름으로 mtime을 1_710_000_000 초로 맞춘 뒤 ISO 문자열이 "2024-03-09T15:00:00+00:00"으로 나오는지 검증하세요.
+      prompt: 같은 흐름으로 mtime을 1_710_000_000 초로 맞춘 뒤 ISO 문자열이 "2024-03-09T16:00:00+00:00"으로 나오는지 검증하세요.
       starterCode: |-
         import os
         import tempfile
@@ -125,7 +125,7 @@ sections:
             os.utime(target, (___, ___))
             modified = datetime.fromtimestamp(target.stat().st_mtime, tz=UTC).isoformat(timespec="seconds")
 
-        assert modified == "2024-03-09T15:00:00+00:00"
+        assert modified == "2024-03-09T16:00:00+00:00"
         modified
       solution: |-
         import os
@@ -139,7 +139,7 @@ sections:
             os.utime(target, (1_710_000_000, 1_710_000_000))
             modified = datetime.fromtimestamp(target.stat().st_mtime, tz=UTC).isoformat(timespec="seconds")
 
-        assert modified == "2024-03-09T15:00:00+00:00"
+        assert modified == "2024-03-09T16:00:00+00:00"
         modified
       hints:
         - os.utime의 두 번째 인자는 (atime, mtime) 두 값을 같은 timestamp로 채워야 한다.
@@ -263,7 +263,7 @@ sections:
       assert record["mode"].endswith("644") or record["mode"].endswith("666")
       record
     exercise:
-      prompt: describeFile을 호출해 final.txt 파일이 크기 5바이트, ISO 시각 "2024-03-09T15:00:00+00:00", 모드 600 또는 666인지 종합 검증하세요.
+      prompt: describeFile을 호출해 final.txt 파일이 크기 5바이트, ISO 시각 "2024-03-09T16:00:00+00:00", 모드 600 또는 666인지 종합 검증하세요.
       starterCode: |-
         import os
         import stat
@@ -291,7 +291,7 @@ sections:
             record = describeFile(target)
 
         assert record["size"] == 5
-        assert record["modifiedAt"] == "2024-03-09T15:00:00+00:00"
+        assert record["modifiedAt"] == "2024-03-09T16:00:00+00:00"
         assert record["mode"].endswith("600") or record["mode"].endswith("666")
         record
       solution: |-
@@ -321,7 +321,7 @@ sections:
             record = describeFile(target)
 
         assert record["size"] == 5
-        assert record["modifiedAt"] == "2024-03-09T15:00:00+00:00"
+        assert record["modifiedAt"] == "2024-03-09T16:00:00+00:00"
         assert record["mode"].endswith("600") or record["mode"].endswith("666")
         record
       hints:
