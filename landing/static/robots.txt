@@ -67,4 +67,5 @@ Allow: /
 Disallow: /pdf-worker/
 Disallow: /*.map$
 
+Host: eddmpython.github.io
 Sitemap: https://eddmpython.github.io/codaro/sitemap.xml

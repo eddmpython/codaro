@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js",
+    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js",
     "build": "vite build",
     "postbuild": "node scripts/prerenderReact.js && node scripts/postbuild.js",
-    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
+    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@vitejs/plugin-react": "^5.2.0",
     "vite": "^7.3.1"
   },

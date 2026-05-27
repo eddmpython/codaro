@@ -85,6 +85,8 @@ const routes = [
     description: post.description,
     body: blogPostBody(post),
     jsonLd: blogPostJsonLd(post),
+    imageAlt: post.title,
+    ogType: "article",
   })),
   {
     path: "/search",
@@ -155,11 +157,38 @@ function siteUrl(pathValue) {
   return brand.toSiteUrl(pathValue);
 }
 
+function normalizeCanonical(path) {
+  if (!path || path === "/") return `${brand.siteUrl}/`;
+  const url = siteUrl(path);
+  return url.endsWith("/") ? url : url;
+}
+
+function resolveRouteImage(route) {
+  if (route.image) {
+    return route.image.startsWith("http") ? route.image : brand.toSiteUrl(route.image);
+  }
+  return brand.toSiteUrl("/brand/codaro-og.png");
+}
+
+function resolveRouteOgType(route) {
+  if (route.ogType) return route.ogType;
+  if (route.path && (route.path.startsWith("/docs/blog/") && !route.path.includes("/category/") && !route.path.includes("/series/") && route.path !== "/docs/blog")) {
+    return "article";
+  }
+  if (route.path && route.path.startsWith("/docs/") && route.path !== "/docs" && route.path !== "/docs/blog") {
+    return "article";
+  }
+  return "website";
+}
+
 function renderShell(route) {
-  const title = `${route.title} - Codaro`;
+  const baseTitle = `${route.title} - Codaro`;
   const description = route.description || brand.description;
-  const canonical = siteUrl(route.path);
-  const image = brand.toSiteUrl("/brand/codaro-character.png");
+  const canonical = normalizeCanonical(route.path);
+  const image = resolveRouteImage(route);
+  const ogType = resolveRouteOgType(route);
+  const imageAlt = route.imageAlt || `${route.title} — Codaro`;
+  const twitterCard = image.endsWith(".png") || image.endsWith(".jpg") || image.endsWith(".jpeg") || image.endsWith(".webp") ? "summary_large_image" : "summary";
   const breadcrumb = buildBreadcrumb(route.path, route.title);
   const jsonLdBlocks = [breadcrumb, route.jsonLd]
     .filter(Boolean)
@@ -167,13 +196,22 @@ function renderShell(route) {
     .join("");
   return shell
     .replace(/<html lang="[^"]*"/, `<html lang="ko"`)
-    .replace(/<title>.*?<\/title>/s, `<title>${escapeHtml(title)}</title>`)
+    .replace(/<title>.*?<\/title>/s, `<title>${escapeHtml(baseTitle)}</title>`)
     .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?>/s, `<meta name="description" content="${escapeHtml(description)}" />`)
     .replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/s, `<link rel="canonical" href="${escapeHtml(canonical)}" />`)
-    .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:title" content="${escapeHtml(title)}" />`)
+    .replace(/<link\s+rel="alternate"\s+hreflang="ko"\s+href="[^"]*"\s*\/?>/s, `<link rel="alternate" hreflang="ko" href="${escapeHtml(canonical)}" />`)
+    .replace(/<link\s+rel="alternate"\s+hreflang="x-default"\s+href="[^"]*"\s*\/?>/s, `<link rel="alternate" hreflang="x-default" href="${escapeHtml(canonical)}" />`)
+    .replace(/<meta\s+property="og:type"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:type" content="${escapeHtml(ogType)}" />`)
+    .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:title" content="${escapeHtml(baseTitle)}" />`)
     .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:description" content="${escapeHtml(description)}" />`)
     .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:url" content="${escapeHtml(canonical)}" />`)
     .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image" content="${escapeHtml(image)}" />`)
+    .replace(/<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`)
+    .replace(/<meta\s+name="twitter:card"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:card" content="${escapeHtml(twitterCard)}" />`)
+    .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:title" content="${escapeHtml(baseTitle)}" />`)
+    .replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
+    .replace(/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:image" content="${escapeHtml(image)}" />`)
+    .replace(/<meta\s+name="twitter:image:alt"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}" />`)
     .replace(/<\/head>/, `${jsonLdBlocks}</head>`)
     .replace(/<div id="root"><\/div>/, `<div id="root">${route.body}</div>`);
 }

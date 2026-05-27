@@ -23,7 +23,6 @@ import {
 import { brand, basePath } from "./lib/brand.js";
 import { docsPages } from "./lib/generated/docsNav.js";
 import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
-import { searchEntries } from "./lib/generated/searchIndex.js";
 import { sharePacks } from "./lib/sharePacks.js";
 import { tools } from "./lib/tools/registry.js";
 
@@ -849,10 +848,23 @@ function searchRoute() {
 function SearchPage() {
   const initialQuery = typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("q") || "";
   const [query, setQuery] = useState(initialQuery);
+  const [searchEntries, setSearchEntries] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    import("./lib/generated/searchIndex.js").then((module) => {
+      if (!cancelled) setSearchEntries(module.searchEntries);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const normalized = query.trim().toLowerCase();
+  const entries = searchEntries || [];
   const results = normalized
-    ? searchEntries.filter((entry) => `${entry.title} ${entry.description} ${entry.text}`.toLowerCase().includes(normalized)).slice(0, 30)
-    : searchEntries.slice(0, 12);
+    ? entries.filter((entry) => `${entry.title} ${entry.description} ${entry.text}`.toLowerCase().includes(normalized)).slice(0, 30)
+    : entries.slice(0, 12);
 
   return (
     <main className="pageShell">
@@ -862,6 +874,7 @@ function SearchPage() {
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="검색어를 입력하세요" />
       </label>
       <div className="searchResults">
+        {searchEntries === null ? <p className="emptyState">검색 색인을 불러오는 중입니다…</p> : null}
         {results.map((entry) => (
           <a href={appPath(entry.url)} key={`${entry.kind}-${entry.url}`}>
             <span>{entry.kind === "writing" ? "글" : "문서"}</span>

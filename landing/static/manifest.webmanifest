@@ -1,0 +1,64 @@
+{
+  "name": "Codaro — 로컬 Python 학습·실행·자동화 스튜디오",
+  "short_name": "Codaro",
+  "description": "로컬 Python 위에서 학습, 노트북 실행, 개인 자동화를 한 흐름으로 잇는 local-first programmable studio.",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "/codaro/",
+  "scope": "/codaro/",
+  "id": "/codaro/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#09090b",
+  "theme_color": "#18181b",
+  "categories": ["education", "productivity", "developer"],
+  "icons": [
+    {
+      "src": "/codaro/brand/codaro-character.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/codaro/brand/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/codaro/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/codaro/brand/codaro-og.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Codaro 공식 미리보기"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "문서",
+      "short_name": "Docs",
+      "url": "/codaro/docs",
+      "description": "Codaro 제품 사상과 아키텍처 문서"
+    },
+    {
+      "name": "공유 팩",
+      "short_name": "Packs",
+      "url": "/codaro/packs",
+      "description": "커리큘럼과 자동화 recipe 공유 갤러리"
+    },
+    {
+      "name": "Codaro 소식",
+      "short_name": "News",
+      "url": "/codaro/docs/blog",
+      "description": "제품 출시와 운영 기록"
+    }
+  ]
+}
