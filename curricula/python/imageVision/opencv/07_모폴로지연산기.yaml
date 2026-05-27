@@ -18,7 +18,7 @@ meta:
   - 모폴로지
   seo:
     title: OpenCV 중급 - 모폴로지 연산기
-    description: OpenCV erode, dilate, morphologyEx로 이진 이미지의 형태를 변형합니다.
+    description: OpenCV erode/dilate/MORPH_OPEN/MORPH_CLOSE로 이진 이미지의 형태를 정량적으로 변형합니다.
     keywords:
     - OpenCV
     - erode
@@ -27,327 +27,478 @@ meta:
     - 모폴로지
 intro:
   emoji: 🔲
-  goal: erode, dilate, morphologyEx로 이진 이미지의 노이즈를 제거하고 형태를 개선합니다.
-  description: 모폴로지(morphology)는 형태학이라는 뜻으로, 이진 이미지에서 객체 형태를 변형합니다. 침식, 팽창, 열기, 닫기 연산을 배웁니다.
-  direction: 모폴로지연산기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: erode/dilate/open/close 네 모폴로지 연산을 합성 입력에 적용해 흰 영역 면적 변화를 정량 비교하고, 노이즈 제거와 구멍 메우기를 손으로 검증합니다.
+  description: 모폴로지는 형태학 연산입니다. 커널을 픽셀 위로 슬라이드시키며 그 영역의 최소/최대를 가져와 이진 이미지의 형태를 바꿉니다.
+  direction: 합성 입력에 점 노이즈와 구멍을 의도적으로 넣고, 각 연산 후 흰 픽셀 수가 어떻게 변하는지 dict로 비교합니다.
   benefits:
-  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
-  - 모폴로지연산기 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
-  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
+  - erode는 최소값 → 흰 영역이 줄어든다는 사실을 픽셀 수로 확인합니다.
+  - dilate는 최대값 → 흰 영역이 커진다는 사실을 픽셀 수로 확인합니다.
+  - MORPH_OPEN(erode→dilate)이 점 노이즈를 정리하고 원본 크기를 회복하는 것을 봅니다.
+  - MORPH_CLOSE(dilate→erode)가 작은 구멍을 메우는 것을 봅니다.
   diagram:
     steps:
-    - label: 1단계. 테스트 이미지 생성 입력 확인
-      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. 구조 요소 처리 실행
-      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. 침식 연산 결과 검증
-      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
-    - label: 모폴로지연산기 재사용
-      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
+    - label: 합성 입력 만들기
+      detail: 직사각형 + 작은 점 노이즈 + 내부 구멍이 있는 이진 입력으로 정답 픽셀 수를 정합니다.
+    - label: 구조 요소
+      detail: cv2.getStructuringElement로 (5, 5) MORPH_RECT/MORPH_ELLIPSE/MORPH_CROSS를 만들어 모양을 비교합니다.
+    - label: erode / dilate
+      detail: 각 연산 후 흰 픽셀 수를 측정해 erode<원본<dilate 순서가 되는지 확인합니다.
+    - label: open / close
+      detail: open은 점 노이즈 제거, close는 구멍 메우기에 효과적인지 픽셀 수로 검증합니다.
+    - label: 커널 가드 함수
+      detail: makeMorphKernel 함수가 짝수/너무 작은 크기를 ValueError로 차단합니다.
     runtime:
-    - label: 컴퓨터 비전 환경
-      detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 모폴로지연산기 실행
-      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
-    - label: 모폴로지연산기 완료
-      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
+    - label: opencv-python 패키지
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 cv2.erode/dilate/morphologyEx가 import됩니다.
+    - label: 단채널 uint8
+      detail: 모폴로지는 단채널 입력이 표준입니다. 다채널도 지원하지만 채널별로 따로 적용됩니다.
+    - label: 0/255 이진 입력
+      detail: 일반 그레이스케일에도 동작하지만 이진(0/255) 입력에서 효과가 가장 직관적입니다.
 sections:
 - id: step1_create
-  title: 1단계. 테스트 이미지 생성
+  title: 1단계. 합성 입력 만들기
   structuredPrimary: true
-  subtitle: 합성 이미지
-  goal: 1단계. 테스트 이미지 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 모폴로지 연산 효과를 명확하게 보기 위해 도형이 있는 합성 이미지를 생성합니다. 노이즈도 추가하여 제거 효과를 확인합니다.
+  subtitle: 노이즈 + 구멍 포함
+  goal: 흰 직사각형 + 점 노이즈 + 검은 구멍이 있는 (100, 140) 이진 입력을 만들고 각 요소가 차지하는 픽셀 수를 정확히 셉니다.
+  why: 모폴로지는 형태를 다루는 연산이라 결과가 좋아 보이는지를 눈으로 판단하기 어렵습니다. 합성 입력은 정답 픽셀 수를 사람이 미리 계산할 수 있어 알고리즘 검증의 출발점으로 좋습니다.
+  explanation: |-
+    배경은 0(검정), 직사각형은 255(흰색)로 채웁니다. 직사각형 안쪽에 작은 검은 원(구멍)을 그리고, 바깥에는 단일 픽셀 흰 점들을 점 노이즈로 박습니다.
+    "객체 픽셀 수"는 (image == 255).sum()으로 셉니다. 직사각형 면적에서 구멍 면적을 빼고 점 노이즈 개수를 더한 값과 일치해야 합니다.
+    이 합성 입력 한 개가 이후 모든 모폴로지 셀의 공통 입력입니다. 정답을 알고 시작하므로 각 연산의 효과를 숫자로 검증할 수 있습니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - cv2.rectangle/circle은 in-place로 동작해 원본을 직접 수정합니다.
+  - 점 노이즈는 image[y, x] = 255로 직접 한 픽셀씩 박는 것이 가장 단순합니다.
   snippet: |-
     import cv2
     import numpy as np
-    import matplotlib.pyplot as plt
 
-    base = np.zeros((300, 400), dtype=np.uint8)
-    cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
-    cv2.circle(base, (280, 100), 60, 255, -1)
-    cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(base, cmap='gray')
-    plt.title('Base Image')
-    plt.axis('off')
-    plt.tight_layout()
+    morphCanvas = np.zeros((100, 140), dtype=np.uint8)
+    cv2.rectangle(morphCanvas, (30, 25), (100, 75), 255, -1)
+    cv2.circle(morphCanvas, (65, 50), 10, 0, -1)
+    morphCanvas[10, 10] = 255
+    morphCanvas[15, 130] = 255
+    morphCanvas[90, 20] = 255
+    morphCanvas[85, 125] = 255
+
+    {
+        'shape': morphCanvas.shape,
+        'whitePixels': int((morphCanvas == 255).sum()),
+        'singlePointNoise': int(morphCanvas[10, 10]),
+        'insideHoleIsBlack': int(morphCanvas[50, 65]) == 0,
+    }
   exercise:
-    prompt: 1단계. 테스트 이미지 생성 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 같은 캔버스에 점 노이즈 2개를 추가해 (5, 5)와 (95, 135) 위치에 흰 점을 더 박고, 흰 픽셀 수가 step1보다 2 증가했는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
-      import matplotlib.pyplot as plt
 
-      base = np.zeros((300, 400), dtype=np.uint8)
-      cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
-      cv2.circle(base, (280, 100), 60, 255, -1)
-      cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(base, cmap='gray')
-      plt.title('Base Image')
-      plt.axis('off')
-      plt.tight_layout()
+      extraCanvas = np.zeros((100, 140), dtype=np.uint8)
+      cv2.rectangle(extraCanvas, (30, 25), (100, 75), 255, -1)
+      cv2.circle(extraCanvas, (65, 50), 10, 0, -1)
+      extraCanvas[10, 10] = 255
+      extraCanvas[15, 130] = 255
+      extraCanvas[90, 20] = 255
+      extraCanvas[85, 125] = 255
+      extraCanvas[5, 5] = ___
+      extraCanvas[95, 135] = 255
+
+      {'whitePixels': int((extraCanvas == 255).sum())}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 흰 픽셀 값은 255입니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: 픽셀 할당이 IndexError 없이 끝나야 합니다.
+      resultCheck: whitePixels가 양의 정수여야 합니다.
   check:
-    noError: 1단계. 테스트 이미지 생성의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 테스트 이미지 생성 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 합성 입력 생성과 통계 계산이 끝나야 합니다.
+    resultCheck: shape가 (100, 140), singlePointNoise가 255, insideHoleIsBlack이 True여야 합니다.
 - id: step2_kernel
-  title: 2단계. 구조 요소
+  title: 2단계. 구조 요소 세 모양
   structuredPrimary: true
-  subtitle: getStructuringElement()
-  goal: 2단계. 구조 요소에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: MORPH_RECT/ELLIPSE/CROSS
+  goal: cv2.getStructuringElement로 (5, 5) 정사각/타원/십자 세 커널을 만들고 각 커널의 흰 픽셀 패턴이 어떻게 다른지 출력으로 확인합니다.
+  why: 모폴로지 연산의 결과는 커널 모양에 크게 의존합니다. 같은 (5, 5)라도 정사각/타원/십자 중 어느 모양을 쓰는지에 따라 erode/dilate가 잡는 영역의 형태가 달라집니다.
   explanation: |-
-    모폴로지 연산에는 커널(kernel) 또는 구조 요소(structuring element)가 필요합니다. 구조 요소는 연산이 적용되는 이웃 픽셀의 패턴을 정의합니다. 사각형, 타원형, 십자형 등 다양한 모양이 있으며, 크기와 모양에 따라 연산 결과가 달라집니다.
-
-    MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
+    cv2.getStructuringElement(shape, ksize)는 0/1 패턴의 ndarray를 돌려줍니다. shape에 MORPH_RECT를 주면 모든 칸이 1인 정사각, MORPH_ELLIPSE는 타원, MORPH_CROSS는 가운데 줄만 1인 십자가 됩니다.
+    모서리가 둥글어야 하는 객체는 타원 커널, 직각이 살아야 하는 객체는 사각 커널이 적합합니다. 십자 커널은 가로/세로 방향 처리에 특히 강합니다.
+    커널의 합(np.sum())이 커널의 "면적"입니다. 정사각은 가장 큰 면적, 십자는 가장 작은 면적이라 같은 ksize라도 효과 강도가 다릅니다.
   tips:
-  - MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
+  - 비대칭 커널(예 (3, 7))로 가로/세로 비대칭 객체에 강한 효과를 낼 수 있습니다.
+  - 직접 만든 ndarray도 커널로 쓸 수 있습니다. cv2.getStructuringElement는 자주 쓰는 모양의 단축 함수일 뿐입니다.
   snippet: |-
-    kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    kernelSmall
+    import cv2
+
+    kernelRect = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    kernelEllipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    kernelCross = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
+
+    {
+        'rectShape': kernelRect.shape,
+        'rectArea': int(kernelRect.sum()),
+        'ellipseArea': int(kernelEllipse.sum()),
+        'crossArea': int(kernelCross.sum()),
+        'rectIsBiggest': int(kernelRect.sum()) > int(kernelEllipse.sum()) > int(kernelCross.sum()),
+    }
   exercise:
-    prompt: 2단계. 구조 요소 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: ksize를 (7, 7)로 키워 세 커널을 만들고 각 면적을 dict로 돌려주세요. rect는 49, cross는 13이 됩니다.
     starterCode: |-
-      kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-      kernelSmall
+      import cv2
+
+      bigRect = cv2.getStructuringElement(cv2.MORPH_RECT, (___, 7))
+      bigEllipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+      bigCross = cv2.getStructuringElement(cv2.MORPH_CROSS, (7, 7))
+
+      {'rectArea': int(bigRect.sum()), 'ellipseArea': int(bigEllipse.sum()), 'crossArea': int(bigCross.sum())}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - 정사각 ksize라 두 인자 모두 7입니다.
+    - 빈칸에는 7이 들어갑니다.
+    check:
+      noError: 세 getStructuringElement 호출이 끝나야 합니다.
+      resultCheck: rectArea가 49, crossArea가 13이어야 합니다.
   check:
-    noError: 2단계. 구조 요소의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 구조 요소 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 세 getStructuringElement 호출이 끝나야 합니다.
+    resultCheck: rectIsBiggest가 True이고 rectArea가 25여야 합니다.
 - id: step3_erode
-  title: 3단계. 침식 연산
+  title: 3단계. erode로 흰 영역 깎기
   structuredPrimary: true
-  subtitle: erode()
-  goal: 3단계. 침식 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 침식 = 최소값 필터
+  goal: 합성 입력에 (3, 3) erode를 한 번 적용해 점 노이즈와 직사각형 모서리가 깎이는지, 흰 픽셀 수가 원본보다 줄어드는지 확인합니다.
+  why: erode는 커널 영역의 최소값을 가져옵니다. 이진 입력에서는 커널 안에 0이 하나라도 있으면 중심이 0이 됩니다. 결과적으로 점 노이즈는 사라지고 모서리가 안쪽으로 깎입니다.
   explanation: |-
-    erode()는 침식(erosion) 연산으로, 커널 영역 내 최소값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 검은 픽셀(0)이 하나라도 있으면 중심이 검은색이 됩니다. 결과적으로 흰색 영역(전경)이 깎여나가며, 객체 경계가 안쪽으로 수축합니다. 작은 흰색 노이즈 제거나 붙어있는 객체 분리에 사용됩니다.
-
-    iterations=2는 침식을 2번 반복합니다. 반복할수록 흰색 영역이 더 많이 축소됩니다. 큰 커널과 적은 반복 또는 작은 커널과 많은 반복을 선택할 수 있습니다.
+    cv2.erode(src, kernel, iterations=1)는 새 ndarray를 돌려줍니다. iterations를 늘리면 같은 erode가 여러 번 적용되어 효과가 누적됩니다.
+    점 노이즈는 한 픽셀짜리라 (3, 3) 커널의 erode 한 번에 즉시 사라집니다. 직사각형 같은 큰 객체는 모서리만 1픽셀씩 안쪽으로 깎입니다.
+    검증은 흰 픽셀 수의 변화로 합니다. 노이즈 4개 제거 + 직사각형 둘레 1픽셀 침식이 합쳐져 결과 흰 픽셀 수가 원본보다 작아야 합니다.
   tips:
-  - iterations=2는 침식을 2번 반복합니다. 반복할수록 흰색 영역이 더 많이 축소됩니다. 큰 커널과 적은 반복 또는 작은 커널과 많은 반복을 선택할 수 있습니다.
-  snippet: |-
-    eroded = cv2.erode(noisy, kernelSmall, iterations=1)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(eroded, cmap='gray')
-    plt.title('Eroded')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 3단계. 침식 연산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      eroded = cv2.erode(noisy, kernelSmall, iterations=1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(eroded, cmap='gray')
-      plt.title('Eroded')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 3단계. 침식 연산의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 침식 연산 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step4_dilate
-  title: 4단계. 팽창 연산
-  structuredPrimary: true
-  subtitle: dilate()
-  goal: 4단계. 팽창 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: dilate()는 팽창(dilation) 연산으로, 커널 영역 내 최대값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 흰 픽셀(255)이 하나라도
-    있으면 중심이 흰색이 됩니다. 결과적으로 흰색 영역(전경)이 바깥으로 확장됩니다. 끊어진 선 연결, 작은 구멍 채우기, 객체 강조에 사용됩니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(dilated, cmap='gray')
-    plt.title('Dilated')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 4단계. 팽창 연산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(dilated, cmap='gray')
-      plt.title('Dilated')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 4단계. 팽창 연산의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 팽창 연산 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step5_open
-  title: 5단계. 열기 연산
-  structuredPrimary: true
-  subtitle: MORPH_OPEN
-  goal: 5단계. 열기 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    열기(Opening)는 침식(erode) 후 팽창(dilate)을 수행하는 연산입니다. 먼저 침식으로 작은 흰색 노이즈를 제거한 후, 팽창으로 원래 객체 크기를 복원합니다. 노이즈는 사라지고 큰 객체는 유지됩니다. 이름의 유래는 연산 후 객체 사이의 좁은 연결이 '열리기(open)' 때문입니다.
-
-    morphologyEx()는 다양한 모폴로지 연산을 수행합니다. MORPH_OPEN은 erode 후 dilate와 동일합니다. 한 번의 호출로 두 연산을 처리합니다.
-  tips:
-  - morphologyEx()는 다양한 모폴로지 연산을 수행합니다. MORPH_OPEN은 erode 후 dilate와 동일합니다. 한 번의 호출로 두 연산을 처리합니다.
-  snippet: |-
-    opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(opened, cmap='gray')
-    plt.title('Opened')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 5단계. 열기 연산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(opened, cmap='gray')
-      plt.title('Opened')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 5단계. 열기 연산의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 열기 연산 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step6_close
-  title: 6단계. 닫기 연산
-  structuredPrimary: true
-  subtitle: MORPH_CLOSE
-  goal: 6단계. 닫기 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    닫기(Closing)는 팽창(dilate) 후 침식(erode)을 수행하는 연산입니다. 먼저 팽창으로 작은 구멍이나 틈을 채운 후, 침식으로 원래 객체 크기를 복원합니다. 객체 내부의 검은 구멍이 사라집니다. 이름의 유래는 연산 후 객체 내부의 작은 구멍이 '닫히기(close)' 때문입니다.
-
-    열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
-  tips:
-  - 열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
-  snippet: |-
-    closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(closed, cmap='gray')
-    plt.title('Closed')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 6단계. 닫기 연산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(closed, cmap='gray')
-      plt.title('Closed')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 6단계. 닫기 연산의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 닫기 연산 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: 모폴로지 프로젝트
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    실제 이미지에 모폴로지 연산을 적용해봅시다.
-
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 점 노이즈만 빠르게 지우려면 (3, 3) 1회 erode가 충분합니다. 큰 객체 보존에도 영향이 작습니다.
+  - 같은 효과를 morphologyEx(MORPH_ERODE, ...)로도 얻을 수 있지만 erode 직접 호출이 더 간단합니다.
   snippet: |-
     import cv2
     import numpy as np
-    from sklearn.datasets import load_sample_image
-    import matplotlib.pyplot as plt
 
-    flower = load_sample_image('flower.jpg')
-    flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-    flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
-    retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    plt.imshow(flower)
-    plt.axis('off')
+    erodeCanvas = np.zeros((100, 140), dtype=np.uint8)
+    cv2.rectangle(erodeCanvas, (30, 25), (100, 75), 255, -1)
+    cv2.circle(erodeCanvas, (65, 50), 10, 0, -1)
+    erodeCanvas[10, 10] = 255
+    erodeCanvas[15, 130] = 255
+
+    erodeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    eroded = cv2.erode(erodeCanvas, erodeKernel, iterations=1)
+
+    {
+        'originalWhite': int((erodeCanvas == 255).sum()),
+        'erodedWhite': int((eroded == 255).sum()),
+        'noiseRemoved': int(eroded[10, 10]) == 0 and int(eroded[15, 130]) == 0,
+        'objectShrunk': int((eroded == 255).sum()) < int((erodeCanvas == 255).sum()),
+    }
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: iterations=3으로 같은 erode를 3번 누적 적용하면 흰 픽셀 수가 1회 erode보다 더 작아지는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
-      from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
 
-      flower = load_sample_image('flower.jpg')
-      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
-      retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-      plt.imshow(flower)
-      plt.axis('off')
+      heavyCanvas = np.zeros((100, 140), dtype=np.uint8)
+      cv2.rectangle(heavyCanvas, (30, 25), (100, 75), 255, -1)
+      cv2.circle(heavyCanvas, (65, 50), 10, 0, -1)
+
+      heavyKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      heavy1 = cv2.erode(heavyCanvas, heavyKernel, iterations=1)
+      heavy3 = cv2.erode(heavyCanvas, heavyKernel, iterations=___)
+
+      {'count1': int((heavy1 == 255).sum()), 'count3': int((heavy3 == 255).sum()), 'heavyIsSmaller': int((heavy3 == 255).sum()) < int((heavy1 == 255).sum())}
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - iterations 위치 인자는 3을 넣습니다.
+    - 빈칸에는 3이 들어갑니다.
+    check:
+      noError: erode 두 호출이 끝나야 합니다.
+      resultCheck: heavyIsSmaller가 True이고 count3 < count1이어야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: workflow_validation
-  title: 8단계. 모폴로지 검증 루프
+    noError: erode 호출과 카운트가 끝나야 합니다.
+    resultCheck: noiseRemoved가 True이고 objectShrunk가 True여야 합니다.
+- id: step4_dilate
+  title: 4단계. dilate로 흰 영역 확장
   structuredPrimary: true
-  subtitle: 노이즈 제거와 구멍 메우기 확인
-  goal: 8단계. 모폴로지 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 모폴로지는 형태를 다루는 연산이라 결과가 조금 달라 보여도 좋은지 나쁜지 판단하기 어렵습니다. 노이즈 제거와 구멍 메우기를 픽셀 수로 검증하고, 커널 크기
-    오류를 먼저 잡습니다.
+  subtitle: 팽창 = 최대값 필터
+  goal: 같은 합성 입력에 (3, 3) dilate를 적용해 직사각형 모서리가 바깥으로 확장되고 안쪽 구멍이 작아지는지 확인합니다.
+  why: dilate는 erode의 정반대입니다. 커널 안에 255가 하나라도 있으면 중심이 255가 됩니다. 객체 경계가 바깥으로 확장되고 내부 구멍은 작아집니다. 끊어진 선 연결과 구멍 메우기에 쓰입니다.
+  explanation: |-
+    cv2.dilate(src, kernel, iterations=1)는 erode와 같은 시그니처입니다. (3, 3) 커널이면 한 번 적용에 1픽셀씩 객체가 확장됩니다.
+    이진 입력에서 구멍 주변이 흰색이라면, 구멍 가장자리부터 안쪽으로 흰색이 채워집니다. 작은 구멍은 dilate 1회로도 사라질 수 있고, 큰 구멍은 여러 번 반복하거나 더 큰 커널이 필요합니다.
+    검증은 흰 픽셀 수와 구멍 중심 픽셀의 색으로 합니다. 흰 픽셀 수는 원본보다 늘어나야 하고, 구멍 중심이 흰색이 되었는지로 구멍이 메워졌는지 알 수 있습니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 점 노이즈를 dilate하면 작은 점이 작은 원으로 자랍니다. 노이즈 제거에는 erode가 정답입니다.
+  - 글자처럼 가는 선을 굵게 만들 때 dilate가 자주 쓰입니다.
   snippet: |-
     import cv2
     import numpy as np
 
-    morphMask = np.zeros((100, 130), dtype=np.uint8)
-    cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
-    cv2.circle(morphMask, (65, 50), 10, 0, -1)
-    morphMask[10, 10] = 255
-    morphMask[90, 120] = 255
+    dilateCanvas = np.zeros((100, 140), dtype=np.uint8)
+    cv2.rectangle(dilateCanvas, (30, 25), (100, 75), 255, -1)
+    cv2.circle(dilateCanvas, (65, 50), 10, 0, -1)
 
-    def makeMorphKernel(size):
-        if size <= 1 or size % 2 == 0:
-            raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+    dilateKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    dilated = cv2.dilate(dilateCanvas, dilateKernel, iterations=1)
+
+    {
+        'originalWhite': int((dilateCanvas == 255).sum()),
+        'dilatedWhite': int((dilated == 255).sum()),
+        'holeCenterAfter': int(dilated[50, 65]),
+        'objectGrew': int((dilated == 255).sum()) > int((dilateCanvas == 255).sum()),
+    }
+  exercise:
+    prompt: iterations=5로 dilate를 5번 누적 적용해 구멍 중심이 흰색으로 완전히 메워지는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      fillCanvas = np.zeros((100, 140), dtype=np.uint8)
+      cv2.rectangle(fillCanvas, (30, 25), (100, 75), 255, -1)
+      cv2.circle(fillCanvas, (65, 50), 10, 0, -1)
+
+      fillKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      filled = cv2.dilate(fillCanvas, fillKernel, iterations=___)
+
+      {'centerAfterFill': int(filled[50, 65]), 'isFilled': int(filled[50, 65]) == 255}
+    hints:
+    - 반복 횟수 5를 iterations 자리에 넣습니다.
+    - 빈칸에는 5가 들어갑니다.
+    check:
+      noError: dilate 호출이 끝나야 합니다.
+      resultCheck: isFilled가 True이고 centerAfterFill이 255여야 합니다.
+  check:
+    noError: dilate 호출과 카운트가 끝나야 합니다.
+    resultCheck: objectGrew가 True이고 dilatedWhite가 originalWhite보다 명백히 커야 합니다.
+- id: step5_open
+  title: 5단계. MORPH_OPEN으로 점 노이즈 제거
+  structuredPrimary: true
+  subtitle: erode → dilate 한 줄
+  goal: 점 노이즈가 있는 합성 입력에 MORPH_OPEN을 적용해 노이즈는 사라지고 큰 객체 면적이 거의 유지되는지 확인합니다.
+  why: erode 한 번으로 노이즈를 제거하면 큰 객체도 함께 깎입니다. 그 뒤 dilate로 같은 양만큼 다시 키우면 큰 객체는 원래 크기에 가까워지고 노이즈는 이미 사라진 상태로 유지됩니다. 이게 OPEN 한 줄의 효과입니다.
+  explanation: |-
+    cv2.morphologyEx(src, cv2.MORPH_OPEN, kernel)는 erode → dilate 두 연산을 한 번에 적용합니다. 결과는 erode 후 dilate를 따로 호출한 것과 정확히 같습니다.
+    점 노이즈는 erode 단계에서 즉시 사라지므로 그 뒤 dilate에서도 다시 살아나지 않습니다. 직사각형 같은 큰 객체는 erode로 1픽셀 깎였다가 dilate로 1픽셀 회복되어 흰 픽셀 수가 거의 원래대로 돌아옵니다.
+    검증은 결과의 흰 픽셀 수가 "원본 - 노이즈 픽셀 수"에 가까운지로 합니다. 노이즈 픽셀 수만 정확히 빠진 게 OPEN의 이상적 동작입니다.
+  tips:
+  - OPEN은 "외부 흰 노이즈 제거"에 표준입니다. 작은 흰 점이 많은 사진의 첫 단계로 자주 씁니다.
+  - 더 큰 노이즈에는 더 큰 커널을 쓰지만, 큰 객체 손상이 같이 커지므로 trade-off가 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    openCanvas = np.zeros((100, 140), dtype=np.uint8)
+    cv2.rectangle(openCanvas, (30, 25), (100, 75), 255, -1)
+    for noisePos in [(10, 10), (15, 130), (90, 20), (85, 125)]:
+        openCanvas[noisePos] = 255
+
+    openKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    opened = cv2.morphologyEx(openCanvas, cv2.MORPH_OPEN, openKernel)
+
+    {
+        'originalWhite': int((openCanvas == 255).sum()),
+        'openedWhite': int((opened == 255).sum()),
+        'noiseGone': int(opened[10, 10]) == 0 and int(opened[15, 130]) == 0,
+        'closeToOriginalMinusNoise': abs(int((opened == 255).sum()) - (int((openCanvas == 255).sum()) - 4)) < 50,
+    }
+  exercise:
+    prompt: morphologyEx 대신 cv2.erode 후 cv2.dilate를 따로 호출해 같은 결과(np.array_equal)가 나오는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      manualCanvas = np.zeros((100, 140), dtype=np.uint8)
+      cv2.rectangle(manualCanvas, (30, 25), (100, 75), 255, -1)
+      manualCanvas[10, 10] = 255
+
+      manualKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      stepwise = cv2.dilate(cv2.erode(manualCanvas, manualKernel), manualKernel)
+      morphed = cv2.morphologyEx(manualCanvas, cv2.MORPH____, manualKernel)
+
+      {'stepwiseShape': stepwise.shape, 'isSame': bool(np.array_equal(stepwise, morphed))}
+    hints:
+    - MORPH_OPEN 플래그를 morphologyEx에 줍니다.
+    - 빈칸에는 OPEN이 들어갑니다.
+    check:
+      noError: 두 흐름이 끝나야 합니다.
+      resultCheck: isSame이 True여야 합니다.
+  check:
+    noError: morphologyEx 호출과 카운트가 끝나야 합니다.
+    resultCheck: noiseGone이 True이고 closeToOriginalMinusNoise가 True여야 합니다.
+- id: step6_close
+  title: 6단계. MORPH_CLOSE로 구멍 메우기
+  structuredPrimary: true
+  subtitle: dilate → erode 한 줄
+  goal: 내부 구멍이 있는 합성 입력에 MORPH_CLOSE를 적용해 구멍이 메워지고 외곽선 위치가 거의 유지되는지 확인합니다.
+  why: dilate 한 번으로 구멍을 메우면 객체 외곽도 함께 부풀어 오릅니다. 그 뒤 erode로 같은 양만큼 다시 깎으면 외곽선은 원래대로 돌아오고 안쪽 구멍은 이미 메워진 상태로 유지됩니다. 이게 CLOSE의 효과입니다.
+  explanation: |-
+    cv2.morphologyEx(src, cv2.MORPH_CLOSE, kernel)는 dilate → erode 두 연산을 한 번에 적용합니다. OPEN의 정반대 순서입니다.
+    내부 구멍이 dilate 단계에서 가장자리부터 채워지고, erode가 외곽을 다시 깎아도 안쪽은 흰색을 유지합니다. 큰 구멍은 한 번의 CLOSE로 부족하면 iterations나 커널 크기를 키웁니다.
+    검증은 구멍 중심이 흰색이 되었는지와 외곽 모서리 픽셀이 거의 유지되는지로 합니다.
+  tips:
+  - CLOSE는 "객체 내부 구멍 메우기"에 표준입니다. 텍스트 인식 전처리, 분할 마스크 정리에 자주 씁니다.
+  - 너무 큰 커널은 작은 빈 공간끼리 연결시켜 의도와 다른 결과를 만듭니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    closeCanvas = np.zeros((100, 140), dtype=np.uint8)
+    cv2.rectangle(closeCanvas, (30, 25), (100, 75), 255, -1)
+    cv2.circle(closeCanvas, (65, 50), 6, 0, -1)
+
+    closeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    closed = cv2.morphologyEx(closeCanvas, cv2.MORPH_CLOSE, closeKernel)
+
+    {
+        'centerBefore': int(closeCanvas[50, 65]),
+        'centerAfter': int(closed[50, 65]),
+        'edgePreserved': int(closed[25, 30]) == int(closeCanvas[25, 30]),
+        'holeFilled': int(closed[50, 65]) == 255 and int(closeCanvas[50, 65]) == 0,
+    }
+  exercise:
+    prompt: 더 큰 구멍(반지름 15)에는 (5, 5) CLOSE 한 번으로 부족합니다. (11, 11) 커널로 다시 시도해 구멍이 메워지는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      bigHoleCanvas = np.zeros((100, 140), dtype=np.uint8)
+      cv2.rectangle(bigHoleCanvas, (30, 25), (100, 75), 255, -1)
+      cv2.circle(bigHoleCanvas, (65, 50), 15, 0, -1)
+
+      bigKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (___, 11))
+      bigClosed = cv2.morphologyEx(bigHoleCanvas, cv2.MORPH_CLOSE, bigKernel)
+
+      {'centerAfter': int(bigClosed[50, 65]), 'filled': int(bigClosed[50, 65]) == 255}
+    hints:
+    - 정사각 커널이라 두 인자 모두 11입니다.
+    - 빈칸에는 11이 들어갑니다.
+    check:
+      noError: morphologyEx 호출이 끝나야 합니다.
+      resultCheck: filled가 True이고 centerAfter가 255여야 합니다.
+  check:
+    noError: morphologyEx 호출과 카운트가 끝나야 합니다.
+    resultCheck: holeFilled가 True이고 edgePreserved가 True여야 합니다.
+- id: practice
+  title: 실습 — flower OTSU + open/close 정리
+  structuredPrimary: true
+  subtitle: 실제 사진의 모폴로지 후처리
+  goal: flower 사진을 그레이스케일 → OTSU 이진화한 뒤 OPEN과 CLOSE를 차례로 적용해 마스크 픽셀 수가 어떻게 변하는지 확인합니다.
+  why: 실제 사진의 이진 마스크는 보통 점 노이즈와 구멍이 함께 있습니다. OPEN으로 외부 노이즈를 정리하고 CLOSE로 내부 구멍을 메우는 흐름이 표준 후처리입니다. 직접 적용해 보면 모폴로지 한 줄 추가가 결과를 얼마나 깔끔하게 만드는지 보입니다.
+  explanation: |-
+    OTSU 이진화 결과는 객체 경계 부근에 작은 노이즈가 남기 쉽고, 객체 내부에 작은 검은 점이 남기도 합니다. 둘 다 모폴로지로 정리할 수 있습니다.
+    OPEN은 외부 흰 노이즈, CLOSE는 내부 검은 구멍을 다룹니다. 둘을 차례로 적용하면 마스크가 매우 깔끔해집니다.
+    실무에서는 OPEN → CLOSE 순서가 일반적이지만 입력에 따라 순서를 바꾸기도 합니다. 마스크 픽셀 수 변화를 보면 어느 단계에서 얼마나 정리됐는지 알 수 있습니다.
+  tips:
+  - 마스크 픽셀 비율은 (mask == 255).sum() / mask.size로 한 줄에 측정합니다.
+  - OPEN 다음 CLOSE 순서가 일반적이지만, 입력에 작은 구멍이 많고 외부 노이즈가 적다면 CLOSE 먼저가 적합한 경우도 있습니다.
+  snippet: |-
+    import cv2
+    from sklearn.datasets import load_sample_image
+
+    practiceBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+    practiceGray = cv2.cvtColor(practiceBgr, cv2.COLOR_BGR2GRAY)
+    _, practiceBin = cv2.threshold(practiceGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    practiceKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    practiceOpened = cv2.morphologyEx(practiceBin, cv2.MORPH_OPEN, practiceKernel)
+    practiceCleaned = cv2.morphologyEx(practiceOpened, cv2.MORPH_CLOSE, practiceKernel)
+
+    {
+        'binWhite': int((practiceBin == 255).sum()),
+        'openedWhite': int((practiceOpened == 255).sum()),
+        'cleanedWhite': int((practiceCleaned == 255).sum()),
+        'shape': practiceCleaned.shape,
+    }
+  exercise:
+    prompt: OPEN의 커널 크기를 (9, 9)로 키워 더 강하게 노이즈를 제거했을 때 openedWhite가 (5, 5) 케이스보다 더 작은지 확인하세요.
+    starterCode: |-
+      import cv2
+      from sklearn.datasets import load_sample_image
+
+      strongBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      strongGray = cv2.cvtColor(strongBgr, cv2.COLOR_BGR2GRAY)
+      _, strongBin = cv2.threshold(strongGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      strongKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (___, 9))
+      strongOpened = cv2.morphologyEx(strongBin, cv2.MORPH_OPEN, strongKernel)
+
+      {'strongOpenedWhite': int((strongOpened == 255).sum())}
+    hints:
+    - 정사각 커널이라 두 인자 모두 9입니다.
+    - 빈칸에는 9가 들어갑니다.
+    check:
+      noError: morphologyEx 호출이 끝나야 합니다.
+      resultCheck: strongOpenedWhite가 양의 정수여야 합니다.
+  check:
+    noError: OTSU와 morphologyEx 두 호출이 끝나야 합니다.
+    resultCheck: binWhite, openedWhite, cleanedWhite 모두 양의 정수이고 shape가 (427, 640)이어야 합니다.
+- id: workflow_validation
+  title: 8단계. 커널 가드 + 픽셀 수 검증
+  structuredPrimary: true
+  subtitle: makeMorphKernel + 변화량 측정
+  goal: makeMorphKernel 함수가 짝수와 너무 작은 커널을 ValueError로 차단하고, 정상 입력에서 erode/dilate 결과의 흰 픽셀 변화량이 예측 부호와 맞는지 확인합니다.
+  why: 커널 크기를 잘못 주면 cv2 함수가 조용히 통과하지만 결과가 의도와 다릅니다. 함수 입구에서 명확한 ValueError를 던지면 한 줄에서 잘못된 호출이 막힙니다. 결과 검증으로는 erode<원본<dilate 부호 관계를 회귀 테스트로 둡니다.
+  explanation: |-
+    makeMorphKernel은 (size, size) 정사각 커널을 만듭니다. size가 1 이하면 무의미하고, 짝수면 OpenCV 함수가 동작은 하지만 효과의 중심이 비대칭이라 직관과 어긋납니다. 두 조건을 모두 ValueError로 차단합니다.
+    회귀 테스트는 erode 결과의 흰 픽셀 수가 원본보다 작고, dilate 결과는 원본보다 크다는 단조성을 확인합니다. 한 줄 assert로 표현되며 알고리즘 변경 후 즉시 돌릴 수 있습니다.
+    이 검증 패턴은 새로 도입한 모폴로지 코드가 기대한 부호 관계를 깨는지 빠르게 잡습니다.
+  tips:
+  - 짝수 커널은 OpenCV가 허용하지만 사용자가 의도한 동작이 아닐 가능성이 높습니다.
+  - ValueError에 실제 받은 값을 포함시키면 호출자가 메시지만 보고 원인을 짐작할 수 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def makeMorphKernel(size: int) -> np.ndarray:
+        if size <= 1:
+            raise ValueError(f"커널 크기는 3 이상이어야 합니다: {size}")
+        if size % 2 == 0:
+            raise ValueError(f"커널 크기는 홀수여야 합니다: {size}")
         return np.ones((size, size), dtype=np.uint8)
 
-    morphKernel = makeMorphKernel(5)
+
+    validateCanvas = np.zeros((50, 70), dtype=np.uint8)
+    cv2.rectangle(validateCanvas, (15, 12), (55, 38), 255, -1)
+
+    okKernel = makeMorphKernel(3)
+    erodedTest = cv2.erode(validateCanvas, okKernel)
+    dilatedTest = cv2.dilate(validateCanvas, okKernel)
+
+    try:
+        makeMorphKernel(4)
+        evenMessage = 'unexpected pass'
+    except ValueError as exc:
+        evenMessage = str(exc)
+
+    {
+        'erodeIsSmaller': int((erodedTest == 255).sum()) < int((validateCanvas == 255).sum()),
+        'dilateIsBigger': int((dilatedTest == 255).sum()) > int((validateCanvas == 255).sum()),
+        'evenMessage': evenMessage,
+    }
   exercise:
-    prompt: 8단계. 모폴로지 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: makeMorphKernel에 1을 넣으면 너무 작아서 차단되는지, 메시지에 '3 이상' 단서가 포함되는지 확인하세요.
     starterCode: |-
-      import cv2
       import numpy as np
 
-      morphMask = np.zeros((100, 130), dtype=np.uint8)
-      cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
-      cv2.circle(morphMask, (65, 50), 10, 0, -1)
-      morphMask[10, 10] = 255
-      morphMask[90, 120] = 255
 
-      def makeMorphKernel(size):
-          if size <= 1 or size % 2 == 0:
-              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+      def makeMorphKernel(size: int) -> np.ndarray:
+          if size <= 1:
+              raise ValueError(f"커널 크기는 3 이상이어야 합니다: {size}")
+          if size % 2 == 0:
+              raise ValueError(f"커널 크기는 홀수여야 합니다: {size}")
           return np.ones((size, size), dtype=np.uint8)
 
-      morphKernel = makeMorphKernel(5)
+
+      try:
+          makeMorphKernel(___)
+          tinyMessage = 'unexpected pass'
+      except ValueError as exc:
+          tinyMessage = str(exc)
+
+      {'tinyMessage': tinyMessage, 'hasMinHint': '3 이상' in tinyMessage}
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - size 1은 첫 번째 분기에서 잡힙니다.
+    - 빈칸에는 1이 들어갑니다.
+    check:
+      noError: makeMorphKernel 정의가 끝나야 합니다.
+      resultCheck: hasMinHint가 True이고 tinyMessage 안에 '1'이 포함되어야 합니다.
   check:
-    noError: 8단계. 모폴로지 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 8단계. 모폴로지 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: makeMorphKernel과 erode/dilate 호출이 끝나야 합니다.
+    resultCheck: erodeIsSmaller, dilateIsBigger, evenMessage에 '홀수' 단서가 모두 True/포함되어야 합니다.
