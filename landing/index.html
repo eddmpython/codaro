@@ -2,28 +2,150 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+
+    <title>Codaro — 로컬 Python 학습·실행·자동화 스튜디오 | Reactive Notebook</title>
     <meta
       name="description"
-      content="Codaro는 Python 학습, 로컬 코드 실행, 개인 자동화를 하나의 흐름으로 잇는 local-first 스튜디오입니다."
+      content="Codaro는 로컬 Python 위에서 학습, 노트북 실행, 개인 자동화를 한 흐름으로 잇는 local-first 스튜디오입니다. AST 기반 reactive 셀, percent format `.py`, 그리고 셀이 곧 태스크가 되는 워크플로우를 제공합니다."
     />
-    <meta name="theme-color" content="#18181b" />
+    <meta
+      name="keywords"
+      content="Codaro, Python 노트북, 리액티브 노트북, reactive notebook, Jupyter 대안, marimo 대안, Python 자동화, local-first, percent format, 학습 커리큘럼, AI 코드 교사, 데스크톱 자동화, Python IDE, programmable studio"
+    />
+    <meta name="author" content="Codaro" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="application-name" content="Codaro" />
+    <meta name="generator" content="Codaro Landing" />
+
     <link rel="icon" href="/codaro/favicon.png" />
     <link rel="apple-touch-icon" href="/codaro/brand/apple-touch-icon.png" />
     <link rel="canonical" href="https://eddmpython.github.io/codaro/" />
+    <link rel="alternate" hreflang="ko" href="https://eddmpython.github.io/codaro/" />
+    <link rel="alternate" hreflang="x-default" href="https://eddmpython.github.io/codaro/" />
+    <link rel="alternate" type="application/atom+xml" title="Codaro 소식" href="https://eddmpython.github.io/codaro/feed.xml" />
+    <link rel="sitemap" type="application/xml" href="https://eddmpython.github.io/codaro/sitemap.xml" />
+
+    <link rel="preconnect" href="https://github.com" crossorigin />
+    <link rel="dns-prefetch" href="https://github.com" />
+    <link rel="dns-prefetch" href="https://colab.research.google.com" />
+
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Codaro - Python 학습과 개인 자동화 스튜디오" />
+    <meta property="og:site_name" content="Codaro" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:title" content="Codaro — 로컬 Python 학습·실행·자동화 스튜디오" />
     <meta
       property="og:description"
-      content="배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오."
+      content="배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오. AST 기반 reactive 셀과 percent format `.py`로 채팅·에디터·커리큘럼·자동화 네 표면을 잇습니다."
     />
     <meta property="og:url" content="https://eddmpython.github.io/codaro/" />
     <meta property="og:image" content="https://eddmpython.github.io/codaro/brand/codaro-character.png" />
+    <meta property="og:image:alt" content="Codaro 마스코트 캐릭터 — 로컬 Python 학습과 자동화를 잇는 개인 스튜디오" />
+
     <meta name="twitter:card" content="summary" />
-    <title>Codaro - Python 학습과 개인 자동화 스튜디오</title>
+    <meta name="twitter:title" content="Codaro — 로컬 Python 학습·실행·자동화 스튜디오" />
+    <meta
+      name="twitter:description"
+      content="배우는 코드가 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오. Reactive 셀 + percent format + 4 표면."
+    />
+    <meta name="twitter:image" content="https://eddmpython.github.io/codaro/brand/codaro-character.png" />
+    <meta name="twitter:image:alt" content="Codaro 마스코트 캐릭터" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://eddmpython.github.io/codaro/#website",
+            "url": "https://eddmpython.github.io/codaro/",
+            "name": "Codaro",
+            "inLanguage": "ko",
+            "description": "로컬 Python 학습, 노트북 실행, 개인 자동화를 한 흐름으로 잇는 local-first programmable studio.",
+            "publisher": { "@id": "https://eddmpython.github.io/codaro/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://eddmpython.github.io/codaro/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://eddmpython.github.io/codaro/#organization",
+            "name": "Codaro",
+            "url": "https://eddmpython.github.io/codaro/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://eddmpython.github.io/codaro/brand/codaro-character.png"
+            },
+            "sameAs": [
+              "https://github.com/eddmpython/codaro"
+            ]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://eddmpython.github.io/codaro/#software",
+            "name": "Codaro",
+            "applicationCategory": "DeveloperApplication",
+            "applicationSubCategory": "IDE",
+            "operatingSystem": "Windows 10, Windows 11",
+            "softwareVersion": "latest",
+            "description": "Local-first programmable studio for Python learning, reactive notebook execution, and personal desktop automation.",
+            "url": "https://eddmpython.github.io/codaro/",
+            "downloadUrl": "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe",
+            "installUrl": "https://github.com/eddmpython/codaro/releases/latest",
+            "image": "https://eddmpython.github.io/codaro/brand/codaro-character.png",
+            "author": { "@id": "https://eddmpython.github.io/codaro/#organization" },
+            "publisher": { "@id": "https://eddmpython.github.io/codaro/#organization" },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            },
+            "featureList": [
+              "AST 기반 reactive 셀 재실행",
+              "투명 스코프 격리 (사용자는 평범한 Python 작성)",
+              "Percent Format .py — python file.py로 그대로 실행",
+              "채팅·에디터·커리큘럼·자동화 4 제품 표면",
+              "AI tool_use 기반 셀 단위 학습/검증",
+              "스케줄·Webhook 트리거 + DAG 워크플로우 + E-Stop",
+              "AI 감각계 (Vision/Voice/Input) tool 노출"
+            ]
+          }
+        ]
+      }
+    </script>
+
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="max-width:760px;margin:80px auto;padding:0 24px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#e4e4e7;background:#09090b">
+        <h1>Codaro — 로컬 Python 학습·실행·자동화 스튜디오</h1>
+        <p>
+          Codaro는 로컬 Python 위에서 <strong>학습 → 실행 → 자동화</strong>를 하나의 문서 모델로 잇는
+          local-first programmable studio입니다. AST 기반 reactive 셀 엔진과 percent format
+          <code>.py</code>로 채팅·에디터·커리큘럼·자동화 네 표면을 같은 셀, 같은 엔진, 같은 API 위에 둡니다.
+        </p>
+        <p>
+          이 사이트는 JavaScript 기반 SPA로 렌더링됩니다. 정적 콘텐츠는 다음 위치에서 확인할 수 있습니다.
+        </p>
+        <ul>
+          <li><a href="https://github.com/eddmpython/codaro">GitHub 저장소</a></li>
+          <li><a href="https://github.com/eddmpython/codaro/releases/latest">최신 릴리즈 (Windows 런처)</a></li>
+          <li><a href="https://eddmpython.github.io/codaro/feed.xml">Atom 피드 — Codaro 소식</a></li>
+          <li><a href="https://eddmpython.github.io/codaro/sitemap.xml">Sitemap</a></li>
+          <li><a href="https://eddmpython.github.io/codaro/llms.txt">llms.txt (AI 검색용 사이트 요약)</a></li>
+        </ul>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

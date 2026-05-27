@@ -1,4 +1,70 @@
+# robots.txt for Codaro — https://eddmpython.github.io/codaro/
+# Codaro is an open educational project. Search and AI crawlers are welcome
+# so learners can discover the curriculum, runtime concepts, and release notes.
+
 User-agent: *
 Allow: /
+
+# Major AI / generative-search crawlers — explicitly allowed.
+# Codaro wants to be discoverable via ChatGPT search, Perplexity, Gemini,
+# Claude, and Copilot. Citation back to the canonical URL is appreciated.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+# Static or generated assets that don't add value to indexing.
+Disallow: /pdf-worker/
+Disallow: /*.map$
 
 Sitemap: https://eddmpython.github.io/codaro/sitemap.xml

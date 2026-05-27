@@ -29,30 +29,35 @@ const routes = [
     title: "Python 학습과 개인 자동화 스튜디오",
     description: "배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오.",
     body: homeBody(),
+    jsonLd: null,
   },
   {
     path: "/docs",
     title: "문서",
     description: "Codaro 아키텍처, 제품 원칙, 운영 기준 문서.",
     body: docsIndexBody(),
+    jsonLd: collectionJsonLd("/docs", "Codaro 문서", "제품 사상, 아키텍처, 운영 기준 문서.", docsPages.map((page) => ({ name: page.title, url: page.url }))),
   },
   {
     path: "/packs",
     title: "공유 팩",
     description: "Codaro 커리큘럼과 자동화 recipe를 내려받아 로컬에서 시작하는 공유 갤러리.",
     body: packsBody(),
+    jsonLd: collectionJsonLd("/packs", "Codaro 공유 팩", "커리큘럼과 자동화 recipe 공유 갤러리.", sharePacks.map((pack) => ({ name: pack.title, url: pack.manifestUrl }))),
   },
   ...docsPages.map((page) => ({
     path: sitePath(page.url),
     title: page.title,
     description: page.description,
     body: docBody(page, docsContentByModule[page.contentModule]),
+    jsonLd: techArticleJsonLd(page),
   })),
   {
     path: "/docs/blog",
     title: "Codaro 소식",
     description: "Codaro 제품 방향, 출시 준비, 운영 기록을 담은 글.",
     body: blogIndexBody(posts),
+    jsonLd: blogIndexJsonLd(posts),
   },
   ...postCategories.map((category) => {
     const categoryPosts = posts.filter((post) => post.category === category.slug);
@@ -61,6 +66,7 @@ const routes = [
       title: `${category.label} 글`,
       description: `${category.label} 카테고리의 Codaro 글 목록.`,
       body: postListBody(category.label, "Category", categoryPosts),
+      jsonLd: collectionJsonLd(`/docs/blog/category/${category.slug}`, `${category.label} 글`, `${category.label} 카테고리의 Codaro 글 목록.`, categoryPosts.map((post) => ({ name: post.title, url: post.url }))),
     };
   }),
   ...postSeries.map((series) => {
@@ -70,6 +76,7 @@ const routes = [
       title: `${series.label} 시리즈`,
       description: `${series.label} 시리즈 글 목록.`,
       body: postListBody(series.label, "Series", seriesPosts),
+      jsonLd: collectionJsonLd(`/docs/blog/series/${series.slug}`, `${series.label} 시리즈`, `${series.label} 시리즈 글 목록.`, seriesPosts.map((post) => ({ name: post.title, url: post.url }))),
     };
   }),
   ...posts.map((post) => ({
@@ -77,6 +84,7 @@ const routes = [
     title: post.title,
     description: post.description,
     body: blogPostBody(post),
+    jsonLd: blogPostJsonLd(post),
   })),
   {
     path: "/search",
@@ -152,6 +160,11 @@ function renderShell(route) {
   const description = route.description || brand.description;
   const canonical = siteUrl(route.path);
   const image = brand.toSiteUrl("/brand/codaro-character.png");
+  const breadcrumb = buildBreadcrumb(route.path, route.title);
+  const jsonLdBlocks = [breadcrumb, route.jsonLd]
+    .filter(Boolean)
+    .map((data) => `<script type="application/ld+json">${JSON.stringify(data)}</script>`)
+    .join("");
   return shell
     .replace(/<html lang="[^"]*"/, `<html lang="ko"`)
     .replace(/<title>.*?<\/title>/s, `<title>${escapeHtml(title)}</title>`)
@@ -161,7 +174,128 @@ function renderShell(route) {
     .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:description" content="${escapeHtml(description)}" />`)
     .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:url" content="${escapeHtml(canonical)}" />`)
     .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image" content="${escapeHtml(image)}" />`)
+    .replace(/<\/head>/, `${jsonLdBlocks}</head>`)
     .replace(/<div id="root"><\/div>/, `<div id="root">${route.body}</div>`);
+}
+
+function organizationRef() {
+  return { "@id": `${brand.siteUrl}/#organization` };
+}
+
+function imageObject(url) {
+  return { "@type": "ImageObject", url };
+}
+
+function techArticleJsonLd(page) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: page.title,
+    description: page.description || "",
+    inLanguage: "ko",
+    url: siteUrl(page.url),
+    image: brand.toSiteUrl("/brand/codaro-character.png"),
+    author: organizationRef(),
+    publisher: organizationRef(),
+    isPartOf: { "@id": `${brand.siteUrl}/#website` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": siteUrl(page.url) },
+  };
+}
+
+function blogPostJsonLd(post) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description || "",
+    inLanguage: "ko",
+    url: siteUrl(post.url),
+    datePublished: post.date ? `${post.date}T00:00:00Z` : undefined,
+    dateModified: post.date ? `${post.date}T00:00:00Z` : undefined,
+    image: post.cardPreview ? brand.toSiteUrl(post.cardPreview) : brand.toSiteUrl("/brand/codaro-character.png"),
+    articleSection: post.categoryLabel,
+    keywords: [post.categoryLabel, post.seriesLabel || post.series, "Codaro"].filter(Boolean).join(", "),
+    author: organizationRef(),
+    publisher: organizationRef(),
+    isPartOf: { "@id": `${brand.siteUrl}/#website` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": siteUrl(post.url) },
+  };
+}
+
+function blogIndexJsonLd(allPosts) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Codaro 소식",
+    description: "Codaro 제품 방향, 출시 준비, 운영 기록을 담은 글.",
+    inLanguage: "ko",
+    url: siteUrl("/docs/blog"),
+    publisher: organizationRef(),
+    isPartOf: { "@id": `${brand.siteUrl}/#website` },
+    blogPost: allPosts.slice(0, 20).map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      url: siteUrl(post.url),
+      datePublished: post.date ? `${post.date}T00:00:00Z` : undefined,
+      description: post.description,
+    })),
+  };
+}
+
+function collectionJsonLd(path, name, description, items) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    description,
+    inLanguage: "ko",
+    url: siteUrl(path),
+    isPartOf: { "@id": `${brand.siteUrl}/#website` },
+    publisher: organizationRef(),
+    hasPart: items.slice(0, 50).map((item) => ({
+      "@type": "WebPage",
+      name: item.name,
+      url: item.url && item.url.startsWith("http") ? item.url : siteUrl(item.url || path),
+    })),
+  };
+}
+
+function buildBreadcrumb(path, title) {
+  const segments = path.split("/").filter(Boolean);
+  if (segments.length === 0) return null;
+  const items = [{ name: "홈", url: siteUrl("/") }];
+  let accum = "";
+  segments.forEach((segment, index) => {
+    accum += `/${segment}`;
+    const isLast = index === segments.length - 1;
+    items.push({
+      name: isLast ? title : segmentLabel(segment),
+      url: siteUrl(accum),
+    });
+  });
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+function segmentLabel(segment) {
+  const map = {
+    docs: "문서",
+    blog: "Codaro 소식",
+    packs: "공유 팩",
+    tools: "도구",
+    search: "검색",
+    category: "카테고리",
+    series: "시리즈",
+  };
+  return map[segment] || segment;
 }
 
 function redirectHtml(targetPath) {
