@@ -49,7 +49,7 @@ curricula/
 ## 카테고리 트리 계약
 
 - 커리큘럼 목록은 평면 카테고리 나열이 아니라 카테고리 트리로 노출한다.
-- backend SSOT는 `src/codaro/curriculum/studyLoader.py`의 `CATEGORY_TREE`다. `CATEGORY_GROUPS`는 기존 클라이언트와 단순 group fallback을 위한 호환 레이어다.
+- built-in 카테고리 트리의 SSOT는 `curricula/python/__init__.py`의 `categoryTree`다. backend `studyLoader.py`의 `CATEGORY_TREE`와 editor fallback/bundled registry는 이 값을 소비하거나 미러링하는 호환 레이어다.
 - editor fallback/bundled registry는 같은 트리 이름을 유지한다: `Python 기초`, `데이터 분석`, `시각화`, `수학·통계·ML`, `자동화`, `이미지·비전`.
 - `/api/curriculum/categories`는 `categories[].track`, `categories[].path`, `groups`, `tree`를 함께 내려준다.
 - 제품 사이드바는 `tree`를 먼저 렌더링하고, 없을 때만 `groups`를 fallback으로 쓴다. 선택된 leaf category 안에서 lesson을 펼친다.

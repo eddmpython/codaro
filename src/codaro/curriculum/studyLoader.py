@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -34,144 +36,47 @@ class StudyData(BaseModel):
     sections: list = Field(default_factory=list)
 
 
-CATEGORY_MAPPING = {
-    "30days": "30일완성",
-    "advancedPython": "고급파이썬",
-    "builtins": "표준라이브러리",
-    "excel": "엑셀자동화",
-    "numpy": "NumPy 수치연산",
-    "sympy": "SymPy 기호수학",
-    "pandas": "Pandas 데이터분석",
-    "duckdb": "Duckdb 데이터분석",
-    "polars": "Polars 데이터분석",
-    "matplotlib": "matplotlib 시각화",
-    "seaborn": "seaborn 시각화",
-    "plotly": "plotly 시각화",
-    "altair": "altair 시각화",
-    "folium": "folium 지도시각화",
-    "statsmodels": "statsmodels 통계모델",
-    "sklearn": "sklearn 머신러닝",
-    "scipy": "SciPy 과학계산",
-    "networkx": "NetworkX 그래프분석",
-    "regex": "regex 비정형데이터",
-    "pillow": "Pillow 이미지처리",
-    "opencv": "OpenCV 컴퓨터비전",
-    "pydantic": "Pydantic 데이터검증",
-    "practical": "실전파이썬",
-    "playwright": "Playwright 브라우저자동화",
-}
+def _loadCurriculaRegistry() -> Any:
+    registryPath = Path(__file__).resolve().parents[3] / "curricula" / "python" / "__init__.py"
+    spec = importlib.util.spec_from_file_location("_codaroCurriculaPythonRegistry", registryPath)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load curriculum registry: {registryPath}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
+
+_CURRICULA_REGISTRY = _loadCurriculaRegistry()
+_CURRICULA_CATEGORY_MAPPING = getattr(_CURRICULA_REGISTRY, "categoryMapping", {})
+_CURRICULA_CATEGORY_META = getattr(_CURRICULA_REGISTRY, "categoryMeta", {})
+_CURRICULA_CATEGORY_GROUPS = getattr(_CURRICULA_REGISTRY, "categoryGroups", {})
+_CURRICULA_CATEGORY_TREE = getattr(_CURRICULA_REGISTRY, "categoryTree", [])
+_CURRICULA_LEARNING_PATHS = getattr(_CURRICULA_REGISTRY, "learningPaths", {})
+
+
+CATEGORY_MAPPING = {str(key): str(value) for key, value in _CURRICULA_CATEGORY_MAPPING.items()}
 CATEGORY_META = {
-    "30days": {"description": "30일 만에 완성하는 체계적인 Python 기초"},
-    "advancedPython": {"description": "고급 문법과 패턴으로 레벨업"},
-    "builtins": {"description": "Python 표준 라이브러리를 로컬 환경에서 익히는 경로"},
-    "excel": {"description": "엑셀 반복 작업을 자동화하세요"},
-    "numpy": {"description": "고성능 수치 연산의 기초"},
-    "sympy": {"description": "기호 수학과 방정식 풀이"},
-    "pandas": {"description": "데이터 분석의 필수 도구"},
-    "duckdb": {"description": "로컬 SQL 분석 엔진으로 데이터 탐색"},
-    "polars": {"description": "초고속 데이터프레임 처리"},
-    "matplotlib": {"description": "Python 시각화의 기본"},
-    "seaborn": {"description": "통계 시각화를 쉽고 예쁘게"},
-    "plotly": {"description": "인터랙티브 차트 만들기"},
-    "altair": {"description": "선언적 시각화 문법"},
-    "folium": {"description": "지도와 위치 데이터를 Python으로 시각화"},
-    "statsmodels": {"description": "통계 모델링과 검정"},
-    "sklearn": {"description": "머신러닝 입문과 실전"},
-    "scipy": {"description": "과학 계산과 최적화"},
-    "networkx": {"description": "그래프와 네트워크 분석"},
-    "regex": {"description": "정규표현식으로 텍스트 처리"},
-    "pillow": {"description": "이미지 편집과 처리"},
-    "opencv": {"description": "컴퓨터 비전의 세계"},
-    "pydantic": {"description": "타입 기반 데이터 검증"},
-    "practical": {"description": "실전 프로젝트로 배우는 Python"},
-    "playwright": {"description": "브라우저 화면 점검과 웹 자동화"},
+    str(key): {"description": str(value.get("description") or "")}
+    for key, value in _CURRICULA_CATEGORY_META.items()
+    if isinstance(value, dict)
 }
-
 CATEGORY_GROUPS = {
-    "Python 기초": ["30days", "advancedPython", "builtins"],
-    "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
-    "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
-    "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-    "자동화": ["playwright", "excel", "regex", "practical"],
-    "이미지·비전": ["pillow", "opencv"],
+    str(groupName): [category for category in categories if isinstance(category, str) and category]
+    for groupName, categories in _CURRICULA_CATEGORY_GROUPS.items()
+    if isinstance(categories, list)
 }
-
-CATEGORY_TREE = [
-    {
-        "id": "python-basics",
-        "name": "Python 기초",
-        "description": "언어 기본기와 표준 라이브러리로 로컬 Python 감각을 만든다.",
-        "categories": ["30days", "advancedPython", "builtins"],
-    },
-    {
-        "id": "data-analysis",
-        "name": "데이터 분석",
-        "description": "표 데이터, SQL, 데이터 계약을 다루는 분석 경로다.",
-        "categories": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
-    },
-    {
-        "id": "visualization",
-        "name": "시각화",
-        "description": "정적·통계·인터랙티브·지도 시각화를 구분한다.",
-        "categories": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
-    },
-    {
-        "id": "math-stat-ml",
-        "name": "수학·통계·ML",
-        "description": "수학 계산, 통계 모델, 머신러닝과 그래프 분석 경로다.",
-        "categories": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-    },
-    {
-        "id": "automation",
-        "name": "자동화",
-        "description": "반복 작업을 로컬 실행, 브라우저, 업무 도구 단위로 나눈다.",
-        "children": [
-            {
-                "id": "browser-automation",
-                "name": "브라우저 자동화",
-                "description": "화면 점검, 폼 입력, 증거 저장, E2E 흐름을 다룬다.",
-                "categories": ["playwright"],
-            },
-            {
-                "id": "office-automation",
-                "name": "업무 자동화",
-                "description": "워크북, 작은 도구, 반복 업무를 실행 가능한 Python으로 만든다.",
-                "categories": ["excel", "practical"],
-            },
-            {
-                "id": "text-automation",
-                "name": "텍스트 자동화",
-                "description": "비정형 문자열 추출과 변환을 자동화한다.",
-                "categories": ["regex"],
-            },
-            {
-                "id": "os-automation",
-                "name": "OS 자동화",
-                "description": "파일, 프로세스, 입력, 창 제어 트랙을 위한 자리다.",
-                "categories": [],
-            },
-            {
-                "id": "test-automation",
-                "name": "테스트 자동화",
-                "description": "단위, 통합, E2E, 회귀 테스트 트랙을 위한 자리다.",
-                "categories": [],
-            },
-        ],
-    },
-    {
-        "id": "image-vision",
-        "name": "이미지·비전",
-        "description": "이미지 처리와 화면 인식 기반 자동화를 다룬다.",
-        "categories": ["pillow", "opencv"],
-    },
-]
-
+CATEGORY_TREE = deepcopy(_CURRICULA_CATEGORY_TREE) if isinstance(_CURRICULA_CATEGORY_TREE, list) else []
 LEARNING_PATHS = {
-    "초급": {"categories": ["30days"], "description": "프로그래밍이 처음이라면"},
-    "중급": {"categories": ["advancedPython", "builtins", "pandas", "numpy"], "description": "기초를 마쳤다면"},
-    "실무": {"categories": ["duckdb", "pydantic", "excel", "regex", "practical", "playwright"], "description": "로컬 자동화와 데이터 작업으로 확장"},
-    "고급": {"categories": ["scipy", "statsmodels", "sklearn", "networkx"], "description": "모델링과 분석을 깊게 다룬다면"},
+    str(pathName): {
+        "categories": [
+            category
+            for category in pathPayload.get("categories", [])
+            if isinstance(category, str) and category
+        ],
+        "description": str(pathPayload.get("description") or ""),
+    }
+    for pathName, pathPayload in _CURRICULA_LEARNING_PATHS.items()
+    if isinstance(pathPayload, dict)
 }
 
 

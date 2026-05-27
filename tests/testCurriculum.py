@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import re
 from pathlib import Path
 
@@ -77,6 +78,8 @@ def testCategoryTreeCoversListedCategoriesAndAutomationBranch() -> None:
     loader = StudyLoader(str(CURRICULA_DIR))
     categories = loader.listCategories()
 
+    assert CATEGORY_TREE == _loadSourceCategoryTree()
+
     categoryKeys = {category.key for category in categories}
     treeKeys = set(_treeCategoryKeys(curriculumCategoryTree()))
     assert categoryKeys.issubset(treeKeys)
@@ -105,7 +108,7 @@ def testBuiltinsRuntimeCompatibilityDocsUseLocalContract() -> None:
     assert "로컬 Python" in localText
     assert "LOCAL_RUNTIME_COMPATIBILITY.md" in legacyText
     assert "source of truth" in legacyText
-    assert "CATEGORY_GROUPS" in registryText
+    assert "categoryTree" in registryText
     assert "LOCAL_RUNTIME_COMPATIBILITY.md" in registryText
 
 
@@ -119,6 +122,17 @@ def _treeCategoryKeys(nodes: list[dict]) -> list[str]:
         if isinstance(children, list):
             keys.extend(_treeCategoryKeys([child for child in children if isinstance(child, dict)]))
     return keys
+
+
+def _loadSourceCategoryTree() -> list[dict]:
+    registryPath = CURRICULA_DIR / "__init__.py"
+    spec = importlib.util.spec_from_file_location("_testCurriculaPythonRegistry", registryPath)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load curriculum registry: {registryPath}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    value = getattr(module, "categoryTree", [])
+    return value if isinstance(value, list) else []
 
 
 def _treeNodeByPath(nodes: list[dict], path: tuple[str, ...]) -> dict | None:
