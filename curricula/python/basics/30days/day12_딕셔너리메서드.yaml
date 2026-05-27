@@ -54,8 +54,8 @@ sections:
   title: get() 메서드
   structuredPrimary: true
   subtitle: 안전한 값 접근
-  goal: get() 메서드에서 데이터와 축 설정이 차트 결과에 어떻게 반영되는지 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: dict[key]와 dict.get(key, default)의 동작 차이를 손으로 비교해 키 부재 안전 패턴을 익힙니다.
+  why: 대괄호 접근은 키가 없으면 KeyError로 즉시 멈춥니다. 설정/옵션 처리에서는 누락 시 기본값으로 부드럽게 진행해야 하므로 dict.get이 표준 패턴입니다.
   explanation: |-
     get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다.
 

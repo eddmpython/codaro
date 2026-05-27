@@ -281,8 +281,8 @@ sections:
   title: 실전 활용
   structuredPrimary: true
   subtitle: 실무 복사 패턴
-  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: 설정 dict를 입력으로 받는 함수에서 copy.deepcopy로 원본을 보존하면서 변경된 새 dict를 돌려주는 안전 패턴을 만듭니다.
+  why: 함수가 인자로 받은 dict/list를 직접 수정하면 호출자가 모르는 사이 원본이 바뀌어 추적 어려운 버그가 생깁니다. 입력은 read-only, 출력은 새 객체가 표준 룰입니다.
   explanation: |-
     실제 프로그래밍에서 자주 사용되는 복사 패턴들입니다.
 

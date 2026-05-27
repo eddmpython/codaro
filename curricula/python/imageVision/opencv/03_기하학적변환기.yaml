@@ -19,7 +19,7 @@ meta:
   - 기하변환
   seo:
     title: OpenCV 기초 - 기하학적 변환기
-    description: OpenCV로 이미지 크기 조절, 회전, 뒤집기, 자르기를 수행합니다.
+    description: OpenCV로 이미지 크기 조절, 회전, 뒤집기, 자르기 같은 기하 변환을 다룹니다.
     keywords:
     - OpenCV
     - resize
@@ -28,344 +28,486 @@ meta:
     - 이미지변환
 intro:
   emoji: 📐
-  goal: resize, rotate, flip으로 이미지의 기하학적 변환을 수행합니다.
-  description: 이미지 크기 조절, 회전, 뒤집기, 자르기 등 기본적인 기하학적 변환을 배웁니다. 보간법의 차이도 이해합니다.
-  direction: 기하학적변환기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: resize/rotate/flip/crop과 임의 각도 회전을 한 강의에서 손으로 다 다뤄 기하 변환의 좌표 사고를 굳힙니다.
+  description: 모든 기하 변환은 "출력 픽셀이 입력 픽셀의 어느 위치에서 왔는가"를 결정합니다. 좌표 변환과 보간법이 두 축이고, 이 강의에서 둘을 모두 정리합니다.
+  direction: resize의 dsize, rotate의 90° 회전, getRotationMatrix2D + warpAffine로 임의 각도, NumPy 슬라이싱으로 crop, flip 한 줄로 거울 변환까지 진행합니다.
   benefits:
-  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
-  - 기하학적변환기 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
-  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
+  - resize의 dsize=(width, height) 순서가 ndarray.shape와 반대라는 점을 손으로 확인합니다.
+  - 보간법(NEAREST/LINEAR/CUBIC/AREA)의 화질과 사용처를 한 함수에서 비교합니다.
+  - cv2.rotate 3종 옵션과 getRotationMatrix2D + warpAffine 임의 각도 회전을 모두 다룹니다.
+  - 크롭은 NumPy 슬라이스 한 줄이라는 점과 view vs copy 차이를 잡습니다.
   diagram:
     steps:
-    - label: 1단계. 이미지 불러오기 입력 확인
-      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. 크기 조절 처리 실행
-      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. 이미지 회전 결과 검증
-      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
-    - label: 기하학적변환기 재사용
-      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
+    - label: 기준 BGR 로드
+      detail: sklearn 샘플 RGB를 BGR로 변환해 OpenCV 입력 형식을 준비합니다.
+    - label: resize 변환
+      detail: dsize (width, height)와 fx/fy 스케일 두 인자 방식을 모두 다룹니다.
+    - label: 90° 회전 / 임의 각도 회전
+      detail: cv2.rotate와 cv2.warpAffine 두 경로를 비교합니다.
+    - label: flip
+      detail: flipCode 1/0/-1을 모두 돌려 픽셀이 어디로 가는지 확인합니다.
+    - label: crop과 검증
+      detail: NumPy 슬라이싱으로 ROI를 떼고, resizeByScale 함수의 출력 shape를 assert합니다.
     runtime:
-    - label: 컴퓨터 비전 환경
-      detail: matplotlib, numpy, opencvpython, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 기하학적변환기 실행
-      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
-    - label: 기하학적변환기 완료
-      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
+    - label: opencv-python 패키지
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 cv2 호출이 가능합니다.
+    - label: 한 노트북 변수 공유
+      detail: 첫 셀에서 만든 baseBgr 변수를 다음 셀들에서 그대로 참조합니다.
+    - label: matplotlib 표시
+      detail: BGR을 그리려면 cvtColor로 RGB로 바꾼 뒤 imshow 합니다.
 sections:
 - id: step1_load
-  title: 1단계. 이미지 불러오기
+  title: 1단계. 기준 이미지 만들기
   structuredPrimary: true
-  subtitle: sklearn 샘플 이미지
-  goal: 1단계. 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: BGR 한 줄로 통일
+  goal: flower 샘플을 RGB로 읽고 cvtColor로 BGR로 변환해 baseBgr 변수에 담은 뒤 shape를 확인합니다.
+  why: 이후 모든 셀이 baseBgr을 입력으로 씁니다. 변수 이름과 채널 순서를 처음에 고정해 두면 셀 사이를 오가는 동안 헷갈리지 않습니다.
   explanation: |-
-    네트워크 상태에 영향을 받지 않도록 sklearn에 내장된 샘플 이미지를 사용합니다.
-
-    sklearn 샘플 이미지는 RGB 형식입니다. OpenCV는 BGR을 사용하므로 cvtColor()로 변환합니다. flower.jpg와 china.jpg 두 개의 샘플이 있습니다.
+    sklearn 샘플은 RGB 순서고 OpenCV는 BGR을 가정합니다. 매번 cvtColor를 부르는 대신, 첫 셀에서 한 번 BGR로 만들어 두는 게 표준입니다.
+    flower 샘플의 shape는 (427, 640, 3)입니다. 가로 640 × 세로 427 픽셀이라 가로가 긴 풍경 비율입니다. 다음 단계에서 resize와 회전 결과의 shape가 이 값과 어떻게 달라지는지가 학습 포인트입니다.
+    baseBgr은 이 강의 전체의 단일 입력이라 다른 셀에서 baseBgr이라는 이름을 절대 재할당하지 않습니다(Codaro 노트북 규칙).
   tips:
-  - sklearn 샘플 이미지는 RGB 형식입니다. OpenCV는 BGR을 사용하므로 cvtColor()로 변환합니다. flower.jpg와 china.jpg 두 개의 샘플이 있습니다.
+  - load_sample_image는 sklearn 패키지에 묶여 배포되는 이미지라 네트워크 없이도 즉시 사용 가능합니다.
+  - cv2.imread로 파일에서 직접 읽으면 처음부터 BGR입니다. cvtColor가 필요 없어집니다.
   snippet: |-
     import cv2
-    import numpy as np
     from sklearn.datasets import load_sample_image
-    import matplotlib.pyplot as plt
 
-    flowerArr = load_sample_image('flower.jpg')
-    frame = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(flowerArr)
-    plt.title(f'Original: {frame.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    baseBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+
+    {
+        'shape': baseBgr.shape,
+        'dtype': str(baseBgr.dtype),
+        'width': baseBgr.shape[1],
+        'height': baseBgr.shape[0],
+    }
   exercise:
-    prompt: 1단계. 이미지 불러오기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: china 샘플로 chinaBgr을 만들고 같은 dict 형태로 shape, width, height를 돌려주세요. width/height 두 값의 합이 1067인지 확인하세요.
     starterCode: |-
       import cv2
-      import numpy as np
       from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
 
-      flowerArr = load_sample_image('flower.jpg')
-      frame = cv2.cvtColor(flowerArr, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(flowerArr)
-      plt.title(f'Original: {frame.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      chinaBgr = cv2.cvtColor(load_sample_image('___'), cv2.COLOR_RGB2BGR)
+
+      {
+          'shape': chinaBgr.shape,
+          'width': chinaBgr.shape[1],
+          'height': chinaBgr.shape[0],
+          'sumEquals1067': chinaBgr.shape[1] + chinaBgr.shape[0] == 1067,
+      }
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 빈칸에 들어갈 파일명은 'china.jpg'입니다.
+    - china 샘플은 (427, 640, 3) 모양이라 width+height가 1067입니다.
+    check:
+      noError: load_sample_image와 cvtColor 호출이 NameError 없이 끝나야 합니다.
+      resultCheck: shape가 (427, 640, 3)이고 sumEquals1067이 True여야 합니다.
   check:
-    noError: 1단계. 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: load_sample_image와 cvtColor 호출이 끝나야 합니다.
+    resultCheck: shape가 (427, 640, 3), width 640, height 427이어야 합니다.
 - id: step2_resize
-  title: 2단계. 크기 조절
+  title: 2단계. resize와 dsize 순서
   structuredPrimary: true
-  subtitle: resize()
-  goal: 2단계. 크기 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: (width, height)가 함정
+  goal: baseBgr을 절대 크기 (300, 200)으로 한 번, 0.5배 스케일로 또 한 번 줄여 두 결과의 shape를 비교합니다.
+  why: cv2.resize의 dsize는 (width, height) 순서라 ndarray.shape의 (height, width)와 정반대입니다. 이 한 가지가 OpenCV 초보자가 가장 자주 틀리는 부분이라 두 방법을 동시에 보여 줘 감각을 굳혀야 합니다.
   explanation: |-
-    resize()는 이미지 크기를 변경합니다. 크기를 바꿀 때 새로운 픽셀 값을 계산해야 하는데, 이 계산 방법을 보간법(interpolation)이라고 합니다. 이미지를 확대하면 원래 없던 픽셀을 만들어야 하고, 축소하면 여러 픽셀을 하나로 합쳐야 합니다. 보간법에 따라 처리 속도와 화질이 달라집니다.
-
-    resize()의 dsize는 (너비, 높이) 순서입니다. shape은 (높이, 너비, 채널)이므로 순서가 반대입니다. 주의하세요.
+    cv2.resize(src, dsize)는 dsize=(width, height)를 기대합니다. 결과의 shape는 (height, width, 채널) 형식으로 다시 정렬됩니다. 같은 함수가 입력과 출력에서 다른 순서를 쓴다는 게 핵심 함정입니다.
+    절대 크기 대신 스케일로 줄이려면 dsize=None, fx=가로비, fy=세로비를 씁니다. 가로세로 비율이 다른 스케일도 가능하지만 보통은 같은 값을 둡니다.
+    interpolation 인자는 보간법입니다. INTER_LINEAR(기본), INTER_CUBIC(고품질 확대), INTER_AREA(축소에 권장), INTER_NEAREST(픽셀 그대로) 네 가지가 자주 쓰입니다.
   tips:
-  - resize()의 dsize는 (너비, 높이) 순서입니다. shape은 (높이, 너비, 채널)이므로 순서가 반대입니다. 주의하세요.
+  - 축소(downscale)에는 INTER_AREA가 권장입니다. 평균을 내서 모아레가 적게 나타납니다.
+  - 확대(upscale)에는 INTER_CUBIC이나 INTER_LANCZOS4가 화질이 좋지만 속도는 느립니다.
   snippet: |-
-    resized = cv2.resize(frame, (300, 200))
-    plt.figure(figsize=(6, 4))
-    plt.imshow(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB))
-    plt.title(f'Resized: {resized.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    import cv2
+    from sklearn.datasets import load_sample_image
+
+    resizeBase = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+
+    explicitResized = cv2.resize(resizeBase, (300, 200), interpolation=cv2.INTER_AREA)
+    scaledResized = cv2.resize(resizeBase, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+
+    {
+        'inputShape': resizeBase.shape,
+        'explicitShape': explicitResized.shape,
+        'scaledShape': scaledResized.shape,
+    }
   exercise:
-    prompt: 2단계. 크기 조절 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 가로는 그대로 두고 세로만 절반으로 줄이는 resize를 fx/fy로 구현해 결과 shape가 (213, 640, 3)인지 확인하세요. (427//2 = 213)
     starterCode: |-
-      resized = cv2.resize(frame, (300, 200))
-      plt.figure(figsize=(6, 4))
-      plt.imshow(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB))
-      plt.title(f'Resized: {resized.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      import cv2
+      from sklearn.datasets import load_sample_image
+
+      verticalSource = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      verticalShrunk = cv2.resize(verticalSource, None, fx=1.0, fy=___, interpolation=cv2.INTER_AREA)
+
+      {
+          'shape': verticalShrunk.shape,
+          'isHalfHeight': verticalShrunk.shape[0] == 213,
+      }
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 세로만 절반으로 줄이려면 fx=1.0, fy=0.5가 됩니다.
+    - 빈칸에는 0.5가 들어갑니다.
+    check:
+      noError: resize 호출이 TypeError 없이 끝나야 합니다.
+      resultCheck: shape의 첫 요소가 213이고 isHalfHeight가 True여야 합니다.
   check:
-    noError: 2단계. 크기 조절의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 크기 조절 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: 두 resize 호출이 NameError 없이 끝나야 합니다.
+    resultCheck: explicitShape가 (200, 300, 3), scaledShape가 (213, 320, 3)이어야 합니다.
 - id: step3_rotate
-  title: 3단계. 이미지 회전
+  title: 3단계. 90° 회전과 임의 각도 회전
   structuredPrimary: true
-  subtitle: rotate()
-  goal: 3단계. 이미지 회전에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: cv2.rotate vs warpAffine
+  goal: cv2.rotate로 90° 단위 회전을, getRotationMatrix2D + warpAffine으로 임의 각도(30°) 회전을 각각 적용하고 shape 변화를 비교합니다.
+  why: cv2.rotate는 빠르지만 90° 단위뿐입니다. 30° 같은 임의 각도는 warpAffine이 표준이고, 이 두 경로를 한 셀에서 직접 비교해 둬야 어떤 상황에 무엇을 쓸지 명확해집니다.
   explanation: |-
-    cv2.rotate()는 90도 단위 회전을 수행합니다. 임의 각도 회전은 getRotationMatrix2D()와 warpAffine()을 사용합니다.
-
-    cv2.rotate()는 ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE 세 가지 옵션만 제공합니다. 임의 각도 회전은 아핀 변환을 사용해야 합니다.
+    cv2.rotate(src, code)의 code는 cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE 셋뿐입니다. 90°와 270° 회전은 shape의 가로세로가 뒤바뀝니다.
+    임의 각도는 getRotationMatrix2D(center, angle, scale)로 2×3 affine 행렬을 만들고 warpAffine(src, matrix, dsize)로 적용합니다. 회전 후 검은 여백이 생기는 게 보통이며, dsize를 늘려 잡으면 잘림이 줄어듭니다.
+    회전 후 shape가 자동으로 늘어나지 않는 점이 함정입니다. 원본 크기를 그대로 쓰면 모서리가 잘리니, 정확히 보존하려면 회전 후 bounding box 크기를 계산해 dsize에 넣어야 합니다.
   tips:
-  - cv2.rotate()는 ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE 세 가지 옵션만 제공합니다. 임의 각도 회전은
-    아핀 변환을 사용해야 합니다.
-  snippet: |-
-    rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-    plt.figure(figsize=(6, 8))
-    plt.imshow(cv2.cvtColor(rotatedCw, cv2.COLOR_BGR2RGB))
-    plt.title(f'90° CW: {rotatedCw.shape}')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 3단계. 이미지 회전 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      rotatedCw = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 8))
-      plt.imshow(cv2.cvtColor(rotatedCw, cv2.COLOR_BGR2RGB))
-      plt.title(f'90° CW: {rotatedCw.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 3단계. 이미지 회전의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 이미지 회전 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step4_flip
-  title: 4단계. 이미지 뒤집기
-  structuredPrimary: true
-  subtitle: flip()
-  goal: 4단계. 이미지 뒤집기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    flip()은 이미지를 거울처럼 뒤집는 함수입니다. 수평 뒤집기(좌우 반전)는 셀카를 거울처럼 보이게 할 때, 수직 뒤집기(상하 반전)는 물에 비친 반사 효과를 만들 때 사용합니다. flipCode 파라미터로 방향을 지정합니다.
-
-    flipCode가 1이면 수평(좌우), 0이면 수직(상하), -1이면 양방향 뒤집기입니다. 양방향 뒤집기는 180도 회전과 동일한 결과입니다.
-  tips:
-  - flipCode가 1이면 수평(좌우), 0이면 수직(상하), -1이면 양방향 뒤집기입니다. 양방향 뒤집기는 180도 회전과 동일한 결과입니다.
-  snippet: |-
-    flippedH = cv2.flip(frame, 1)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(cv2.cvtColor(flippedH, cv2.COLOR_BGR2RGB))
-    plt.title('Horizontal Flip')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 4단계. 이미지 뒤집기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      flippedH = cv2.flip(frame, 1)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(flippedH, cv2.COLOR_BGR2RGB))
-      plt.title('Horizontal Flip')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 4단계. 이미지 뒤집기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 이미지 뒤집기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step5_crop
-  title: 5단계. 이미지 자르기
-  structuredPrimary: true
-  subtitle: 배열 슬라이싱
-  goal: 5단계. 이미지 자르기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    OpenCV에서 자르기는 NumPy 슬라이싱으로 수행합니다. img[y1:y2, x1:x2]로 사각형 영역을 추출합니다. y(행)가 먼저, x(열)가 나중입니다.
-
-    슬라이싱은 뷰를 반환합니다. 원본을 수정하지 않으려면 .copy()를 사용하세요. cropped = frame[y1:y2, x1:x2].copy()
-  tips:
-  - 슬라이싱은 뷰를 반환합니다. 원본을 수정하지 않으려면 .copy()를 사용하세요. cropped = frame[y1:y2, x1:x2].copy()
-  snippet: |-
-    h, w = frame.shape[:2]
-    y1, y2 = h // 4, h * 3 // 4
-    x1, x2 = w // 4, w * 3 // 4
-    cropped = frame[y1:y2, x1:x2]
-    plt.figure(figsize=(8, 6))
-    plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-    plt.title(f'Cropped: {cropped.shape}')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 5단계. 이미지 자르기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      h, w = frame.shape[:2]
-      y1, y2 = h // 4, h * 3 // 4
-      x1, x2 = w // 4, w * 3 // 4
-      cropped = frame[y1:y2, x1:x2]
-      plt.figure(figsize=(8, 6))
-      plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-      plt.title(f'Cropped: {cropped.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 5단계. 이미지 자르기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 이미지 자르기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step6_combine
-  title: 6단계. 변환 조합
-  structuredPrimary: true
-  subtitle: 여러 변환 연결
-  goal: 6단계. 변환 조합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 여러 기하학적 변환을 순차적으로 적용할 수 있습니다. 자르기 → 리사이즈 → 회전 순서로 적용해봅시다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    step1 = frame[50:350, 100:400]
-    step2 = cv2.resize(step1, (200, 200))
-    final = cv2.rotate(step2, cv2.ROTATE_90_CLOCKWISE)
-    plt.figure(figsize=(6, 6))
-    plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-    plt.title(f'Final: {final.shape}')
-    plt.axis('off')
-    plt.tight_layout()
-  exercise:
-    prompt: 6단계. 변환 조합 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
-    starterCode: |-
-      step1 = frame[50:350, 100:400]
-      step2 = cv2.resize(step1, (200, 200))
-      final = cv2.rotate(step2, cv2.ROTATE_90_CLOCKWISE)
-      plt.figure(figsize=(6, 6))
-      plt.imshow(cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
-      plt.title(f'Final: {final.shape}')
-      plt.axis('off')
-      plt.tight_layout()
-    hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
-  check:
-    noError: 6단계. 변환 조합의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 변환 조합 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: 기하 변환 프로젝트
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    sklearn 이미지에 다양한 기하학적 변환을 적용해봅시다.
-
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - cv2.ROTATE_90_CLOCKWISE 결과는 shape가 (W, H, 3)로 바뀝니다. 원본 (H, W, 3)와 가로세로가 뒤집힙니다.
+  - "warpAffine의 dsize는 (width, height)입니다. resize와 같은 순서라 일관성이 있습니다."
   snippet: |-
     import cv2
     import numpy as np
     from sklearn.datasets import load_sample_image
-    import matplotlib.pyplot as plt
 
-    flower = load_sample_image('flower.jpg')
-    flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-    plt.figure(figsize=(8, 6))
-    plt.imshow(flower)
-    plt.title(f'Flower: {flower.shape}')
-    plt.axis('off')
-    plt.tight_layout()
+    rotateBase = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+
+    rotated90 = cv2.rotate(rotateBase, cv2.ROTATE_90_CLOCKWISE)
+
+    rotateCenter = (rotateBase.shape[1] / 2.0, rotateBase.shape[0] / 2.0)
+    rotateMatrix = cv2.getRotationMatrix2D(rotateCenter, 30.0, 1.0)
+    rotated30 = cv2.warpAffine(rotateBase, rotateMatrix, (rotateBase.shape[1], rotateBase.shape[0]))
+
+    {
+        'baseShape': rotateBase.shape,
+        'rotated90Shape': rotated90.shape,
+        'rotated30Shape': rotated30.shape,
+        'rotated30CornerIsBlack': rotated30[0, 0].tolist() == [0, 0, 0],
+    }
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 같은 베이스에 -45° 회전을 warpAffine으로 적용해 결과 shape가 입력과 같은지 확인하고, 모서리 픽셀이 검정인지 함께 검사하세요.
     starterCode: |-
       import cv2
-      import numpy as np
       from sklearn.datasets import load_sample_image
-      import matplotlib.pyplot as plt
 
-      flower = load_sample_image('flower.jpg')
-      flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
-      plt.figure(figsize=(8, 6))
-      plt.imshow(flower)
-      plt.title(f'Flower: {flower.shape}')
-      plt.axis('off')
-      plt.tight_layout()
+      diagBase = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      diagCenter = (diagBase.shape[1] / 2.0, diagBase.shape[0] / 2.0)
+      diagMatrix = cv2.getRotationMatrix2D(diagCenter, ___, 1.0)
+      diagRotated = cv2.warpAffine(diagBase, diagMatrix, (diagBase.shape[1], diagBase.shape[0]))
+
+      {
+          'shape': diagRotated.shape,
+          'sameShape': diagRotated.shape == diagBase.shape,
+          'cornerBlack': diagRotated[0, 0].tolist() == [0, 0, 0],
+      }
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 각도 인자에 -45.0을 넣으면 반시계 방향 45° 회전이 됩니다.
+    - 빈칸에는 -45.0이 들어갑니다.
+    check:
+      noError: getRotationMatrix2D와 warpAffine 호출이 끝나야 합니다.
+      resultCheck: sameShape와 cornerBlack 둘 다 True여야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: workflow_validation
-  title: 7단계. 기하 변환 검증 루프
+    noError: cv2.rotate와 warpAffine 호출이 끝나야 합니다.
+    resultCheck: rotated90Shape의 가로세로가 baseShape와 뒤바뀌고, rotated30Shape가 baseShape와 같아야 합니다.
+- id: step4_flip
+  title: 4단계. flip 세 가지 방향
   structuredPrimary: true
-  subtitle: 크기, 회전, crop 계약 확인
-  goal: 7단계. 기하 변환 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 기하학적 변환은 화면에 맞춰 보정하는 작업이지만, 실무에서는 출력 크기와 관심 영역이 정확한지가 더 중요합니다. 스케일 오류를 먼저 잡고 resize, rotate,
-    crop 결과를 수치로 검증합니다.
+  subtitle: flipCode 1 / 0 / -1
+  goal: 같은 baseBgr에 세 가지 flipCode를 적용한 뒤 특정 픽셀 위치의 값이 어떻게 이동했는지 인덱싱으로 직접 확인합니다.
+  why: flip은 한 함수에 세 방향이 압축되어 있어 헷갈리기 쉽습니다. 픽셀 한 점이 어디로 이동했는지 직접 보면 flipCode 의미가 한 번에 머리에 들어옵니다.
+  explanation: |-
+    cv2.flip(src, flipCode)는 in-place가 아니라 새 배열을 돌려줍니다. flipCode가 1이면 좌우(가로), 0이면 상하(세로), -1이면 양방향(180° 회전과 동치)입니다.
+    검증은 픽셀 위치 추적이 직관적입니다. 예제는 5×5 작은 캔버스에 (0, 0)만 흰색으로 두고 세 방향 flip 후 흰 픽셀의 위치를 확인합니다.
+    실무에서는 좌우 flip이 데이터 증강(data augmentation)에 자주 쓰입니다. 모델 학습 시 같은 사진을 좌우로 뒤집은 두 버전을 모두 보여 줘 일반화 능력을 늘립니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 좌우 flip은 텍스트가 들어간 이미지에서 글자가 거울처럼 뒤집힙니다. 데이터 증강에서 글자 검출에는 쓰지 않습니다.
+  - flipCode 음수는 모두 양방향으로 해석합니다. -1, -2가 같은 결과를 줍니다.
   snippet: |-
     import cv2
     import numpy as np
 
-    geoImage = np.zeros((80, 120, 3), dtype=np.uint8)
-    cv2.rectangle(geoImage, (30, 20), (90, 60), (0, 255, 0), -1)
+    flipCanvas = np.zeros((5, 5, 3), dtype=np.uint8)
+    flipCanvas[0, 0] = [255, 255, 255]
 
-    def resizeByScale(image, scale):
+    horizontalFlip = cv2.flip(flipCanvas, 1)
+    verticalFlip = cv2.flip(flipCanvas, 0)
+    bothFlip = cv2.flip(flipCanvas, -1)
+
+
+    def whitePos(image: np.ndarray) -> tuple:
+        ys, xs = np.where(image[..., 0] == 255)
+        return (int(ys[0]), int(xs[0]))
+
+
+    {
+        'original': whitePos(flipCanvas),
+        'horizontal': whitePos(horizontalFlip),
+        'vertical': whitePos(verticalFlip),
+        'both': whitePos(bothFlip),
+    }
+  exercise:
+    prompt: 좌우 flip을 두 번 연속 적용하면 원본과 정확히 같아야 합니다. np.array_equal로 검증해 isIdentity를 dict로 돌려주세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      identityCanvas = np.arange(75).reshape((5, 5, 3)).astype(np.uint8)
+      doubleFlipped = cv2.flip(cv2.flip(identityCanvas, 1), ___)
+
+      {
+          'isIdentity': bool(np.array_equal(identityCanvas, doubleFlipped)),
+          'shape': doubleFlipped.shape,
+      }
+    hints:
+    - 두 번째 flip의 flipCode에는 다시 1을 넣어 같은 좌우 변환을 적용합니다.
+    - 빈칸에는 1이 들어갑니다.
+    check:
+      noError: cv2.flip 두 번 호출이 NameError 없이 끝나야 합니다.
+      resultCheck: isIdentity가 True이고 shape가 (5, 5, 3)이어야 합니다.
+  check:
+    noError: 세 flip 호출과 whitePos 함수 호출이 끝나야 합니다.
+    resultCheck: original이 (0, 0), horizontal이 (0, 4), vertical이 (4, 0), both가 (4, 4)여야 합니다.
+- id: step5_crop
+  title: 5단계. crop과 view vs copy
+  structuredPrimary: true
+  subtitle: 슬라이스는 view
+  goal: NumPy 슬라이싱으로 가운데 사각형을 떼어내고, view에 값을 쓸 때 원본이 함께 변하는지를 .copy() 유무를 비교해 확인합니다.
+  why: crop은 슬라이스 한 줄이지만 view 동작 때문에 미묘한 버그가 생깁니다. 이 한 셀에서 view와 copy 차이를 손으로 확인해 두지 않으면 나중에 ROI에 값을 썼다가 원본이 바뀐 채로 디버깅하느라 시간을 낭비합니다.
+  explanation: |-
+    img[y1:y2, x1:x2]는 새 ndarray를 만들지 않고 원본의 buffer를 공유하는 view를 돌려줍니다. view에 값을 대입하면 원본 같은 위치의 값도 바뀝니다.
+    원본을 보존하려면 .copy()를 명시적으로 호출해 떨어진 ndarray를 만들어야 합니다. 예제는 같은 슬라이스를 view로 한 번, copy로 한 번 만든 뒤 값을 다르게 쓰고 원본을 비교합니다.
+    파일 출력, ROI 분석처럼 읽기만 한다면 view로 충분하고 메모리 절약 효과가 있습니다. 추가 처리로 ROI에 값을 쓰는 경우만 copy를 씁니다.
+  tips:
+  - "id(view.base)와 id(original)이 같으면 같은 버퍼를 공유하는 view입니다. copy 결과는 base가 None입니다."
+  - "ROI 슬라이싱 후 cv2 함수에 넘기면 일부 함수는 메모리 연속성을 요구해서 .copy()를 자동으로 만들기도 합니다(예: cv2.boxFilter)."
+  snippet: |-
+    import numpy as np
+
+    cropOriginal = np.zeros((10, 10), dtype=np.uint8)
+    cropViewSlice = cropOriginal[2:6, 2:6]
+    cropCopySlice = cropOriginal[2:6, 2:6].copy()
+
+    cropViewSlice[:] = 200
+    cropCopySlice[:] = 50
+
+    {
+        'originalCenter': int(cropOriginal[3, 3]),
+        'viewCenter': int(cropViewSlice[1, 1]),
+        'copyCenter': int(cropCopySlice[1, 1]),
+        'viewSharesBuffer': cropViewSlice.base is cropOriginal,
+    }
+  exercise:
+    prompt: 8×8 zeros 배열에서 [2:6, 2:6] view를 만들어 30을 채우고, 그 뒤 [4:8, 4:8] copy를 만들어 70을 채운 다음 원본 [5, 5] 값과 [7, 7] 값을 dict로 돌려주세요.
+    starterCode: |-
+      import numpy as np
+
+      practiceArr = np.zeros((8, 8), dtype=np.uint8)
+      practiceView = practiceArr[2:6, 2:6]
+      practiceView[:] = 30
+      practiceCopy = practiceArr[4:8, 4:8].___()
+      practiceCopy[:] = 70
+
+      {
+          'at5_5': int(practiceArr[5, 5]),
+          'at7_7': int(practiceArr[7, 7]),
+      }
+    hints:
+    - copy 메서드 이름은 .copy()입니다.
+    - "[5, 5]는 view 범위 안이라 30, [7, 7]은 view/copy 모두 손대지 않은 위치라 원본 0입니다."
+    check:
+      noError: 슬라이싱과 copy 호출이 ValueError 없이 끝나야 합니다.
+      resultCheck: at5_5가 30, at7_7이 0이어야 합니다.
+  check:
+    noError: 슬라이싱과 copy 호출이 끝나야 합니다.
+    resultCheck: originalCenter가 200, copyCenter가 50, viewSharesBuffer가 True여야 합니다.
+- id: step6_combine
+  title: 6단계. 변환 체인
+  structuredPrimary: true
+  subtitle: crop → resize → rotate
+  goal: 한 셀에서 crop → resize → 90° 회전을 차례로 적용해 단계마다 shape가 어떻게 바뀌는지 dict로 모아 봅니다.
+  why: 실무 변환 파이프라인은 보통 두세 단계가 묶여 있습니다. 단계별 shape를 한 번에 보면 잘못된 dsize나 회전 방향을 즉시 찾을 수 있습니다.
+  explanation: |-
+    crop은 ndarray 슬라이스로 직접 자릅니다. resize 다음에 회전을 넣으면 보통 가로세로가 한 번 더 뒤집힙니다.
+    단계마다 임시 변수를 두면 중간 shape를 출력해 디버깅하기 쉽습니다. 한 줄로 chaining한 코드는 짧지만 어디서 잘못됐는지 보기 어렵습니다.
+    예제는 (200, 300) crop → (100, 100) resize → 90° CW 회전 순으로 진행해 마지막 결과 shape가 (100, 100, 3)임을 확인합니다(회전 전후 정사각형 유지).
+  tips:
+  - 정사각형 결과를 90° 회전해도 shape는 그대로입니다. 직사각형이라면 가로세로가 뒤집힙니다.
+  - 같은 함수 호출을 chaining하면 중간 결과를 검사하기 어렵습니다. 디버깅 단계에서는 변수에 따로 담는 게 안전합니다.
+  snippet: |-
+    import cv2
+    from sklearn.datasets import load_sample_image
+
+    chainBase = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+
+    chainCropped = chainBase[50:250, 100:400]
+    chainResized = cv2.resize(chainCropped, (100, 100), interpolation=cv2.INTER_AREA)
+    chainRotated = cv2.rotate(chainResized, cv2.ROTATE_90_CLOCKWISE)
+
+    {
+        'baseShape': chainBase.shape,
+        'croppedShape': chainCropped.shape,
+        'resizedShape': chainResized.shape,
+        'rotatedShape': chainRotated.shape,
+    }
+  exercise:
+    prompt: 같은 흐름에서 resize 크기를 (80, 120) (width=80, height=120)로 바꾸고 마지막 회전 결과 shape가 (80, 120, 3)이 되는지 확인하세요. 90° 회전은 가로세로를 뒤바꿉니다.
+    starterCode: |-
+      import cv2
+      from sklearn.datasets import load_sample_image
+
+      altBase = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      altCropped = altBase[50:250, 100:400]
+      altResized = cv2.resize(altCropped, (___, 120), interpolation=cv2.INTER_AREA)
+      altRotated = cv2.rotate(altResized, cv2.ROTATE_90_CLOCKWISE)
+
+      {
+          'resizedShape': altResized.shape,
+          'rotatedShape': altRotated.shape,
+      }
+    hints:
+    - "resize dsize=(width=80, height=120)이라 결과 shape는 (120, 80, 3)이 됩니다."
+    - 90° CW 회전 후 shape는 (가로, 세로, 채널) 순서가 되어 (80, 120, 3)이 됩니다.
+    check:
+      noError: crop/resize/rotate 호출이 끝나야 합니다.
+      resultCheck: resizedShape가 (120, 80, 3), rotatedShape가 (80, 120, 3)이어야 합니다.
+  check:
+    noError: crop/resize/rotate 호출이 끝나야 합니다.
+    resultCheck: croppedShape가 (200, 300, 3), resizedShape가 (100, 100, 3), rotatedShape가 (100, 100, 3)이어야 합니다.
+- id: practice
+  title: 실습 — 보간법 비교
+  structuredPrimary: true
+  subtitle: NEAREST vs LINEAR vs CUBIC
+  goal: 같은 이미지를 4배 확대할 때 세 가지 보간법의 결과 shape, 표준편차, 인접 픽셀 차이를 한 dict로 비교해 화질 감각을 정량적으로 잡습니다.
+  why: 보간법은 "예쁘게 보인다"로 끝내지 말고 숫자로 비교하는 습관이 필요합니다. NEAREST는 인접 픽셀 차이가 0, LINEAR/CUBIC은 0보다 큰 게 핵심 차이입니다.
+  explanation: |-
+    INTER_NEAREST는 가장 가까운 원본 픽셀을 그대로 복제합니다. 결과를 보면 같은 색의 사각형 블록이 보입니다. 인접 픽셀 차이는 0이라 표준편차로 잡힙니다.
+    INTER_LINEAR는 주변 4개 픽셀의 가중 평균입니다. 부드러운 그라데이션이 만들어지고 인접 픽셀이 다른 값을 가집니다.
+    INTER_CUBIC은 16개 픽셀의 3차 보간으로 LINEAR보다 더 부드럽고 디테일 보존이 좋습니다. 속도는 가장 느립니다.
+    수치 비교는 작은 2×2 패치를 8×8로 확대한 뒤 인접 픽셀 차이의 합으로 합니다. NEAREST는 0, 나머지는 양수입니다.
+  tips:
+  - 축소에는 INTER_AREA, 확대에는 INTER_CUBIC이 화질 기준 표준입니다.
+  - INTER_NEAREST는 화질 손해를 보지만 라벨 마스크나 정확한 값 보존이 필요한 데이터에 적합합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def neighborSpread(image: np.ndarray) -> int:
+        gradient = np.diff(image.astype(int), axis=1)
+        return int(np.abs(gradient).sum())
+
+
+    smallSrc = np.array([[10, 200], [200, 10]], dtype=np.uint8)
+    enlargedNearest = cv2.resize(smallSrc, (8, 8), interpolation=cv2.INTER_NEAREST)
+    enlargedLinear = cv2.resize(smallSrc, (8, 8), interpolation=cv2.INTER_LINEAR)
+    enlargedCubic = cv2.resize(smallSrc, (8, 8), interpolation=cv2.INTER_CUBIC)
+
+    {
+        'NEAREST': {'shape': enlargedNearest.shape, 'spread': neighborSpread(enlargedNearest)},
+        'LINEAR': {'shape': enlargedLinear.shape, 'spread': neighborSpread(enlargedLinear)},
+        'CUBIC': {'shape': enlargedCubic.shape, 'spread': neighborSpread(enlargedCubic)},
+    }
+  exercise:
+    prompt: 같은 비교에 INTER_LANCZOS4 결과를 추가해 dict의 'LANCZOS4' 키로 spread와 shape를 함께 돌려주세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+
+      def neighborSpread(image: np.ndarray) -> int:
+          gradient = np.diff(image.astype(int), axis=1)
+          return int(np.abs(gradient).sum())
+
+
+      lanczosSrc = np.array([[10, 200], [200, 10]], dtype=np.uint8)
+      lanczosResult = cv2.resize(lanczosSrc, (8, 8), interpolation=cv2.INTER____)
+
+      {
+          'shape': lanczosResult.shape,
+          'spread': neighborSpread(lanczosResult),
+      }
+    hints:
+    - 빈칸에는 LANCZOS4가 들어갑니다.
+    - LANCZOS4의 spread는 LINEAR보다 보통 큽니다.
+    check:
+      noError: cv2.resize 호출이 끝나야 합니다.
+      resultCheck: shape가 (8, 8)이고 spread가 양수여야 합니다.
+  check:
+    noError: 세 resize 호출과 spread 계산이 끝나야 합니다.
+    resultCheck: NEAREST의 spread가 0보다 매우 작거나 같고 LINEAR/CUBIC의 spread가 그보다 커야 합니다.
+- id: workflow_validation
+  title: 7단계. 기하 변환 검증 함수
+  structuredPrimary: true
+  subtitle: scale 인자 안전성 + 출력 shape assert
+  goal: resizeByScale 함수가 잘못된 scale에 ValueError를 던지고 정상 scale에 정확한 shape를 돌려주는지 한 셀에서 정상/실패 두 케이스를 함께 검증합니다.
+  why: 자동화 파이프라인의 첫 단계는 거의 항상 resize입니다. 함수 입구에서 잘못된 입력을 차단하는 패턴을 손으로 짜 봐야 운영에서 "왜 결과 shape가 이상하지"를 디버깅하느라 쓰는 시간이 줄어듭니다.
+  explanation: |-
+    resizeByScale은 scale 인자만 받습니다. 0 이하 값에 즉시 ValueError를 던져 다음 단계로 잘못된 입력이 흘러가지 않게 합니다.
+    출력 shape는 round(height*scale), round(width*scale)로 결정됩니다. cv2.resize는 내부에서 반올림하므로 같은 공식을 assert에 그대로 쓰면 검증이 안정적입니다.
+    정상 케이스(0.5)와 실패 케이스(0)를 한 셀에 함께 두어 두 경로의 결과를 한 번에 확인합니다. try/except로 실패 메시지를 잡아 dict에 함께 담아 두는 게 좋은 진단 패턴입니다.
+  tips:
+  - INTER_NEAREST를 쓰면 모서리에서 색이 튀지 않아 라벨 마스크 검증에 좋습니다.
+  - ValueError에 실제 받은 값과 기대 조건을 함께 적어 두면 운영에서 곧장 원인 추적이 가능합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def resizeByScale(image: np.ndarray, scale: float) -> np.ndarray:
         if scale <= 0:
             raise ValueError(f"scale은 양수여야 합니다: {scale}")
         return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
 
-    resizedGeo = resizeByScale(geoImage, 0.5)
-    resizedGeo.shape
+
+    geoCanvas = np.zeros((80, 120, 3), dtype=np.uint8)
+    cv2.rectangle(geoCanvas, (30, 20), (90, 60), (0, 255, 0), -1)
+
+    halfGeo = resizeByScale(geoCanvas, 0.5)
+
+    try:
+        resizeByScale(geoCanvas, 0)
+        failureMessage = 'unexpected pass'
+    except ValueError as exc:
+        failureMessage = str(exc)
+
+    {
+        'inputShape': geoCanvas.shape,
+        'halfShape': halfGeo.shape,
+        'failureMessage': failureMessage,
+    }
   exercise:
-    prompt: 7단계. 기하 변환 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: resizeByScale에 minSide 인자를 추가해 결과의 최소 변이 minSide보다 작으면 ValueError를 던지도록 확장하세요. 0.1 scale에 minSide=10을 주면 실패합니다.
     starterCode: |-
       import cv2
       import numpy as np
 
-      geoImage = np.zeros((80, 120, 3), dtype=np.uint8)
-      cv2.rectangle(geoImage, (30, 20), (90, 60), (0, 255, 0), -1)
 
-      def resizeByScale(image, scale):
+      def resizeByScaleGuarded(image: np.ndarray, scale: float, minSide: int) -> np.ndarray:
           if scale <= 0:
               raise ValueError(f"scale은 양수여야 합니다: {scale}")
-          return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+          height, width = image.shape[:2]
+          newHeight = max(1, round(height * scale))
+          newWidth = max(1, round(width * scale))
+          if min(newHeight, newWidth) < ___:
+              raise ValueError(f"최소 변 {minSide} 미만: {(newHeight, newWidth)}")
+          return cv2.resize(image, (newWidth, newHeight), interpolation=cv2.INTER_NEAREST)
 
-      resizedGeo = resizeByScale(geoImage, 0.5)
-      resizedGeo.shape
+
+      guardCanvas = np.zeros((80, 120, 3), dtype=np.uint8)
+      try:
+          resizeByScaleGuarded(guardCanvas, 0.1, 10)
+          guardMessage = 'unexpected pass'
+      except ValueError as exc:
+          guardMessage = str(exc)
+
+      {'guardMessage': guardMessage}
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 빈칸에 들어갈 변수 이름은 minSide입니다.
+    - 0.1 scale은 (80, 120)을 (8, 12)로 줄여 8이 minSide 10보다 작아 실패합니다.
+    check:
+      noError: 함수 정의와 try/except가 끝나야 합니다.
+      resultCheck: guardMessage 안에 '최소 변 10 미만' 메시지 단서가 포함되어야 합니다.
   check:
-    noError: 7단계. 기하 변환 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 7단계. 기하 변환 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: resizeByScale 정의와 두 호출이 끝나야 합니다.
+    resultCheck: halfShape가 (40, 60, 3)이고 failureMessage 안에 '양수' 단서가 포함되어야 합니다.

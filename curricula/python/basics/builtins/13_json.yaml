@@ -117,8 +117,8 @@ sections:
   title: 파일 읽기와 쓰기
   structuredPrimary: true
   subtitle: dump와 load
-  goal: 파일 읽기와 쓰기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: json.dump로 파일에 저장하고 json.load로 같은 파일을 읽어 왕복한 결과가 원본과 같은지 확인합니다.
+  why: 설정 파일, 캐시, 영속 데이터는 거의 항상 파일 기반입니다. dumps/loads 문자열 왕복 대신 파일 왕복을 한 번 직접 해 봐야 운영 코드의 절반이 자연스럽게 짜입니다.
   explanation: |-
     dump()는 Python 객체를 JSON 파일로 저장하고, load()는 JSON 파일을 Python 객체로 읽어옵니다. 설정 파일, 데이터 캐싱, 영속성 저장에 활용됩니다. 파일 핸들을 직접 전달하여 효율적으로 처리합니다.
 

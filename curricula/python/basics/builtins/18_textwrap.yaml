@@ -225,8 +225,8 @@ sections:
 - title: 실전 활용 예제
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: 실전 활용 예제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: textwrap.TextWrapper로 CLI 도움말 메시지를 너비 70자로 정렬해 한 함수에서 들여쓰기와 줄바꿈 정책을 통일합니다.
+  why: 운영 도구의 help 출력은 터미널 너비가 들쭉날쭉해 가독성이 깨지기 쉽습니다. textwrap는 width/indent/subsequent_indent를 한 객체로 묶어 일관된 포맷을 보장합니다.
   explanation: |-
     실무 시나리오
     textwrap를 활용한 실전 텍스트 포맷팅 예제를 다룹니다.

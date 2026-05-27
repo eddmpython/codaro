@@ -327,28 +327,51 @@ sections:
   title: 다양한 키 타입
   structuredPrimary: true
   subtitle: 문자열, 숫자, 튜플
-  goal: 다양한 키 타입에서 데이터와 축 설정이 차트 결과에 어떻게 반영되는지 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: 문자열·숫자·튜플 세 종류의 immutable 키로 딕셔너리를 만들고 각각 정상 동작하는지 확인합니다.
+  why: 딕셔너리 키는 hash 가능한 immutable 타입이어야 합니다. 어떤 타입이 키로 가능한지 손으로 한 번 확인해 두면 list/dict를 잘못 키로 쓰는 흔한 실수를 피할 수 있습니다.
   explanation: |-
-    딕셔너리의 키는 변경 불가능한(immutable) 타입이면 모두 사용 가능합니다. 문자열이 가장 많이 사용되지만, 숫자나 튜플도 키로 사용할 수 있습니다. 리스트, 딕셔너리, 집합은 변경 가능(mutable)하므로 키로 사용할 수 없습니다.
-
-    튜플 키는 좌표나 날짜 같은 복합 키에 유용합니다.
+    딕셔너리 키는 immutable이고 hash 가능해야 합니다. 가장 흔한 건 문자열이지만, 정수와 튜플도 키가 됩니다. 튜플 키는 (x, y) 좌표나 (year, month) 같은 복합 키에 자주 쓰입니다.
+    list, dict, set은 mutable이라 hash가 안 됩니다. 키로 넣으면 TypeError가 납니다. frozenset은 immutable이라 키로 쓸 수 있습니다.
+    한 딕셔너리 안에서 여러 종류의 키 타입을 섞어도 됩니다. 단, 같은 값(예: 1과 True)이 같은 해시를 갖는 경우 같은 키로 취급되는 함정이 있습니다.
   tips:
-  - 튜플 키는 좌표나 날짜 같은 복합 키에 유용합니다.
+  - "튜플 키 활용 — `coords = {(0, 0): 'origin', (1, 0): 'right'}` 같은 좌표 매핑."
+  - "1과 True는 같은 키로 취급됩니다. d = {1: 'a', True: 'b'}는 결과적으로 {1: 'b'}가 됩니다."
   snippet: |-
-    config = {'name': 'Python', 'version': '3.9'}
-    config
+    mixedKeyDict = {
+        'name': 'Python',
+        2026: 'year',
+        ('x', 'y'): 'coordinate',
+    }
+    {
+        'lookupString': mixedKeyDict['name'],
+        'lookupInt': mixedKeyDict[2026],
+        'lookupTuple': mixedKeyDict[('x', 'y')],
+    }
   exercise:
-    prompt: 다양한 키 타입 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: list를 키로 넣으면 TypeError가 난다는 점을 try/except로 확인하고, frozenset은 키로 사용 가능한지 함께 검증하세요.
     starterCode: |-
-      config = {'name': 'Python', 'version': '3.9'}
-      config
+      keyTestDict = {}
+      try:
+          keyTestDict[[1, 2]] = 'list key'
+          listMessage = 'unexpected pass'
+      except TypeError as exc:
+          listMessage = str(exc)
+
+      keyTestDict[frozenset({1, 2})] = 'frozenset ___'
+
+      {
+          'listMessage': listMessage,
+          'frozensetValue': keyTestDict[frozenset({1, 2})],
+      }
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 빈칸에 들어갈 단어는 ok입니다.
+    - frozenset은 immutable이라 키로 쓸 수 있습니다.
+    check:
+      noError: try/except와 frozenset 할당이 NameError 없이 끝나야 합니다.
+      resultCheck: listMessage 안에 'unhashable' 단서가 있고 frozensetValue가 'frozenset ok'여야 합니다.
   check:
-    noError: 다양한 키 타입의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
-    resultCheck: 다양한 키 타입의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+    noError: 세 가지 키 타입 딕셔너리 정의가 TypeError 없이 끝나야 합니다.
+    resultCheck: lookupString이 'Python', lookupInt가 'year', lookupTuple이 'coordinate'여야 합니다.
 - id: workflow_validation
   title: '검증 루프: 주문 레코드 만들고 필수 필드 확인'
   structuredPrimary: true
