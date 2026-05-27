@@ -127,6 +127,7 @@ TOOL_METADATA: dict[str, ToolManifestMetadata] = {
     "wait-for": ToolManifestMetadata("safety", "safety", "guarded-input"),
     "emergency-stop": ToolManifestMetadata("safety", "safety", "automation-safety", "safety"),
     "list-curriculum-domains": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "resolve-learning-goal": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "search-curricula": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "compose-master-plan": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "inspect-curriculum": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),

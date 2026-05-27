@@ -22,6 +22,32 @@ TOOL_LIST_CURRICULUM_DOMAINS = ToolDef(
 )
 
 
+TOOL_RESOLVE_GOAL = ToolDef(
+    name="resolve-learning-goal",
+    description=(
+        "Map a user's free-text learning goal (e.g. '엑셀 보고서 자동화 배우고 싶어요') "
+        "to ranked domain candidates from the Curriculum OS taxonomy. Returns a list of "
+        "domains scored by keyword overlap and outcome coverage. The caller should pick "
+        "the top match (or confirm with the user) and then call compose-master-plan."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "goalText": {
+                "type": "string",
+                "description": "Free-text statement of what the learner wants to do.",
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Max candidates to return (default 3).",
+            },
+        },
+        "required": ["goalText"],
+    },
+    handler="resolveLearningGoal",
+)
+
+
 TOOL_SEARCH_CURRICULA = ToolDef(
     name="search-curricula",
     description=(

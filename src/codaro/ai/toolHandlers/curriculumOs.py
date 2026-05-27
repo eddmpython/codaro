@@ -55,12 +55,77 @@ def _graph() -> LessonGraph:
     return _graphCache
 
 
+def _scoreGoalForDomain(goalTokens: set[str], domain, taxonomy) -> float:
+    """도메인/outcome 라벨/설명에 대한 토큰 일치 점수.
+
+    완전 결정적 — 같은 입력이면 같은 순위가 나온다. 한국어/영어 라벨 모두 기여.
+    """
+    haystack: list[str] = []
+    haystack.append(domain.label.lower())
+    haystack.append(domain.description.lower())
+    for outcomeId in domain.targetOutcomes:
+        outcome = taxonomy.outcomeById(outcomeId)
+        if outcome:
+            haystack.append(outcome.label.lower())
+            haystack.append(outcome.description.lower())
+    blob = " ".join(haystack)
+    score = 0.0
+    for token in goalTokens:
+        if token and token in blob:
+            score += 1.0
+    # 짧은 토큰(< 2자)은 노이즈가 되기 쉬워 가중 낮춤
+    return score
+
+
+def _tokenize(text: str) -> set[str]:
+    cleaned = text.lower()
+    for ch in ",.!?():;\"'":
+        cleaned = cleaned.replace(ch, " ")
+    return {token for token in cleaned.split() if len(token) >= 2}
+
+
 class CurriculumOsToolHandlers:
     async def _handle_listCurriculumDomains(self, args: dict[str, Any]) -> dict[str, Any]:
         taxonomy = _taxonomy()
         return {
             "outcomes": [outcome.model_dump() for outcome in taxonomy.outcomes],
             "domains": [domain.model_dump() for domain in taxonomy.domains],
+        }
+
+    async def _handle_resolveLearningGoal(self, args: dict[str, Any]) -> dict[str, Any]:
+        goalText = str(args.get("goalText") or "").strip()
+        if not goalText:
+            return {"error": "goalText is required"}
+        limit = args.get("limit") or 3
+        if not isinstance(limit, int) or limit <= 0:
+            limit = 3
+        taxonomy = _taxonomy()
+        tokens = _tokenize(goalText)
+        scored = []
+        for domain in taxonomy.domains:
+            score = _scoreGoalForDomain(tokens, domain, taxonomy)
+            scored.append((score, domain))
+        scored.sort(key=lambda pair: (-pair[0], pair[1].id))
+        candidates = [
+            {
+                "domainId": domain.id,
+                "domainLabel": domain.label,
+                "description": domain.description,
+                "score": score,
+                "matchedOutcomes": [
+                    taxonomy.outcomeLabel(outcomeId)
+                    for outcomeId in domain.targetOutcomes[:5]
+                ],
+            }
+            for score, domain in scored[:limit]
+        ]
+        return {
+            "goalText": goalText,
+            "candidates": candidates,
+            "next": (
+                "최상위 후보가 만족스러우면 그 domainId로 compose-master-plan을 호출하세요. "
+                "두 후보 점수가 비슷하면 사용자에게 확인을 요청하세요."
+            ),
         }
 
     async def _handle_searchCurricula(self, args: dict[str, Any]) -> dict[str, Any]:

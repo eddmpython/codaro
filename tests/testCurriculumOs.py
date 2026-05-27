@@ -302,3 +302,74 @@ def testProposeCurriculumDraftReturnsDraftOnly() -> None:
     assert "draft" in result
     assert result["draft"]["title"] == "테스트 강의"
     assert "사용자가 검토" in result["next"]
+
+
+def testResolveLearningGoalRanksCandidates() -> None:
+    import asyncio
+
+    from codaro.ai.toolHandlers.curriculumOs import CurriculumOsToolHandlers
+
+    class Holder(CurriculumOsToolHandlers):
+        pass
+
+    handler = Holder()
+    result = asyncio.run(
+        handler._handle_resolveLearningGoal({"goalText": "엑셀 자동화로 보고서를 만들고 싶어요"})
+    )
+    assert "candidates" in result
+    candidates = result["candidates"]
+    assert candidates, "expected at least one candidate"
+    # officeAutomation 도메인이 후보에 등장해야 한다
+    domainIds = [c["domainId"] for c in candidates]
+    assert "officeAutomation" in domainIds
+
+
+def testResolveLearningGoalRequiresText() -> None:
+    import asyncio
+
+    from codaro.ai.toolHandlers.curriculumOs import CurriculumOsToolHandlers
+
+    class Holder(CurriculumOsToolHandlers):
+        pass
+
+    handler = Holder()
+    result = asyncio.run(handler._handle_resolveLearningGoal({"goalText": ""}))
+    assert "error" in result
+
+
+# ---------------------------------------------------------------------------
+# API integration (FastAPI TestClient)
+# ---------------------------------------------------------------------------
+
+
+def testCurriculumOsApiEndpoints(tmp_path) -> None:
+    from fastapi.testclient import TestClient
+
+    from codaro.server import createServerApp
+
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    taxonomy = client.get("/api/curriculum/taxonomy").json()
+    assert taxonomy["outcomes"]
+    assert taxonomy["domains"]
+
+    plan = client.post(
+        "/api/curriculum/master-plan",
+        json={"domain": "dataReporting", "excludeCompleted": False},
+    )
+    assert plan.status_code == 200
+    payload = plan.json()
+    assert payload["steps"], "plan must produce steps for dataReporting"
+    assert any(
+        "pandas.intro" in step["outcomes"]
+        for step in payload["steps"]
+    ), "pandas.intro should appear in the plan"
+
+    gaps = client.get("/api/curriculum/gaps").json()
+    assert "gaps" in gaps
+
+    unknown = client.post(
+        "/api/curriculum/master-plan",
+        json={"domain": "nonexistent"},
+    )
+    assert unknown.status_code == 400

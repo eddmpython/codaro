@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Compass, Loader2, MapPinned, RefreshCw, Target } from "lucide-react";
+import { AlertTriangle, Compass, Loader2, MapPinned, RefreshCw, Sparkles, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,15 +16,30 @@ import type {
 
 type MasterPlanPanelProps = {
   onSelectLesson?: (category: string, contentId: string) => void;
+  onRequestGapDraft?: (gap: { outcomeId: string; outcomeLabel: string }) => void;
 };
 
-export function MasterPlanPanel({ onSelectLesson }: MasterPlanPanelProps) {
+export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPlanPanelProps) {
   const [taxonomy, setTaxonomy] = useState<CurriculumTaxonomyPayload | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [excludeCompleted, setExcludeCompleted] = useState(true);
   const [plan, setPlan] = useState<MasterPlanPayload | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const outcomeLabels = useMemo<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    if (taxonomy) {
+      for (const outcome of taxonomy.outcomes) {
+        map[outcome.id] = outcome.label;
+      }
+    }
+    return map;
+  }, [taxonomy]);
+  const labelFor = useCallback(
+    (outcomeId: string) => outcomeLabels[outcomeId] ?? outcomeId,
+    [outcomeLabels],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -133,7 +148,14 @@ export function MasterPlanPanel({ onSelectLesson }: MasterPlanPanelProps) {
             <Loader2 className="h-3 w-3 animate-spin" /> 학습 경로를 짜는 중…
           </div>
         )}
-        {plan && !loadingPlan && <PlanBody plan={plan} onSelectLesson={onSelectLesson} />}
+        {plan && !loadingPlan && (
+          <PlanBody
+            plan={plan}
+            labelFor={labelFor}
+            onSelectLesson={onSelectLesson}
+            onRequestGapDraft={onRequestGapDraft}
+          />
+        )}
       </ScrollArea>
     </div>
   );
@@ -178,10 +200,14 @@ function DomainPicker({
 
 function PlanBody({
   plan,
+  labelFor,
   onSelectLesson,
+  onRequestGapDraft,
 }: {
   plan: MasterPlanPayload;
+  labelFor: (outcomeId: string) => string;
   onSelectLesson?: (category: string, contentId: string) => void;
+  onRequestGapDraft?: (gap: { outcomeId: string; outcomeLabel: string }) => void;
 }) {
   return (
     <div className="space-y-3 px-1 pb-4">
@@ -224,8 +250,9 @@ function PlanBody({
                               key={outcomeId}
                               variant="outline"
                               className="text-[10px] font-normal text-zinc-400 border-zinc-700"
+                              title={outcomeId}
                             >
-                              {outcomeId}
+                              {labelFor(outcomeId)}
                             </Badge>
                           ))}
                         </div>
@@ -249,16 +276,33 @@ function PlanBody({
           <div className="flex items-center gap-1 text-xs font-medium text-amber-200">
             <MapPinned className="h-3 w-3" /> 미충족 능력
           </div>
-          <ul className="mt-1.5 space-y-1 text-xs text-amber-100/80">
+          <ul className="mt-1.5 space-y-2 text-xs text-amber-100/80">
             {plan.gaps.map((gap) => (
-              <li key={gap.outcomeId}>
-                <span className="font-medium">{gap.outcomeLabel}</span>{" "}
-                <span className="text-amber-200/60">— {gap.reason}</span>
+              <li key={gap.outcomeId} className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-medium">{gap.outcomeLabel}</span>{" "}
+                  <span className="text-amber-200/60">— {gap.reason}</span>
+                </div>
+                {onRequestGapDraft && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 shrink-0 px-2 text-[10px] text-amber-200 hover:bg-amber-900/40"
+                    onClick={() =>
+                      onRequestGapDraft({
+                        outcomeId: gap.outcomeId,
+                        outcomeLabel: gap.outcomeLabel,
+                      })
+                    }
+                  >
+                    <Sparkles className="mr-1 h-3 w-3" /> 초안 요청
+                  </Button>
+                )}
               </li>
             ))}
           </ul>
           <div className="mt-1.5 text-[11px] text-amber-200/60">
-            이 능력을 가르치는 강의가 아직 없습니다. AI가 propose-curriculum-draft 도구로 초안을 만들 수 있습니다.
+            propose-curriculum-draft 도구가 초안만 만들어 줍니다. 실제 강의는 사람이 검토·작성합니다.
           </div>
         </div>
       )}

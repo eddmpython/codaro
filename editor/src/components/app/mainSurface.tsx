@@ -80,6 +80,7 @@ type MainSurfaceProps = {
   onSelectBlock: (blockId: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
   onSelectCurriculumLesson: (category: string, contentId: string) => void;
+  onRequestGapDraft: (gap: { outcomeId: string; outcomeLabel: string }) => void;
   onToggleEStop: () => void;
 };
 
@@ -177,7 +178,10 @@ function MainSurfaceContent(props: MainSurfaceProps) {
       return (
         <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
           <div className="w-full max-w-3xl">
-            <MasterPlanPanel onSelectLesson={props.onSelectCurriculumLesson} />
+            <MasterPlanPanel
+              onSelectLesson={props.onSelectCurriculumLesson}
+              onRequestGapDraft={props.onRequestGapDraft}
+            />
           </div>
         </div>
       );
