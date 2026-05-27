@@ -26,6 +26,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/curriculum-workflow-architecture/curriculum-workflow-architecture-report.json",
     ),
     "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
+    "curriculum-weakness-audit": ("output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json",),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
@@ -239,6 +240,12 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, 의존성, 소개 레슨, structured source 채택률로 점수화한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumTopTierAudit.py")),),
+        ci_required=False,
+    ),
+    "curriculum-weakness-audit": Gate(
+        tier="fast",
+        description="레슨 단위 약점(plan orphan, exercise/check 누락, hint 부재 등)을 Curriculum OS taxonomy 위에서 점검한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumWeakness.py")),),
         ci_required=False,
     ),
     "playwright-curriculum-runtime": Gate(

@@ -85,15 +85,23 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 
 ## 무결성 게이트
 
-`tests/testCurriculumOs.py`에 18개 케이스:
+`tests/testCurriculumOs.py`에 24개 케이스:
 - 모든 domain.targetOutcomes가 outcome 카탈로그에 존재
 - 모든 lessonOutcomes의 outcomes/prerequisites가 카탈로그에 존재
 - 레슨 메타의 outcomes가 taxonomy backfill보다 우선
 - 합성기가 prerequisite 순서를 지킴
 - 완료된 레슨이 plan에서 제외됨
 - gap이 정확히 리포트됨
-- 실제 repo에서 `dataReporting` plan이 pandas + python 기초를 끌어옴
+- 모든 레슨이 plan 그래프에서 보임 (orphan 0개)
+- 모든 outcome이 어떤 레슨에서 제공됨 (115/115)
+- 모든 도메인이 비어있지 않은 plan을 만듦 (27/27 도메인, gap 0)
+- 같은 입력은 같은 plan을 낸다 (결정성 스냅샷)
 - API 엔드포인트 통합 테스트 (FastAPI TestClient)
+
+`tests/auditCurriculumWeakness.py`가 영구 게이트로 등록되어 있다 (`tests/run.py gate curriculum-weakness-audit`):
+- orphanInPlan, noExercise, exerciseWithoutCheck, noHint, shortGoal 신호를 lesson 단위로 점검
+- 각 신호별 임계치(현재 모두 0)를 넘으면 게이트 실패
+- 리포트: `output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json`
 
 ## 확장 가이드
 

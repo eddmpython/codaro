@@ -307,6 +307,27 @@ outcomes:
   - id: vision.features
     label: 비전 특징
     description: 히스토그램, 컨투어, 키포인트
+  - id: vision.pixelFoundations
+    label: 픽셀 기초
+    description: 좌표계, 채널, 슬라이싱, 룩업, 마스크, ROI
+  - id: vision.featureMatching
+    label: 특징점 매칭
+    description: 코너, ORB, 매칭, 호모그래피, 스티칭
+  - id: vision.video
+    label: 비디오 처리
+    description: 비디오 입출력, 배경차분, 광학흐름, 트래커
+  - id: deepVision.classification
+    label: 사전학습 분류
+    description: torchvision, ResNet, 임베딩, 유사도검색, 전이학습
+  - id: deepVision.detection
+    label: 객체 탐지·세그멘테이션
+    description: 객체 탐지, 세그멘테이션, 포즈 추정
+  - id: visionApps.documents
+    label: 문서·코드 인식
+    description: 문서 스캐너, QR/바코드, OCR
+  - id: visionApps.faceMedia
+    label: 얼굴·미디어 자동화
+    description: 얼굴 검출/모자이크/임베딩, 영상 썸네일, 화면 캡처, 사진 정리
 
   # === 자동화 ===
   - id: automation.browser.basics
@@ -542,6 +563,34 @@ domains:
       - vision.opencvBasics
       - vision.filters
       - vision.features
+
+  - id: visionAdvanced
+    label: 고급 비전 (매칭·비디오)
+    description: 특징점 매칭, 호모그래피, 비디오 처리까지 다룬다.
+    targetOutcomes:
+      - vision.pixelFoundations
+      - vision.opencvBasics
+      - vision.features
+      - vision.featureMatching
+      - vision.video
+
+  - id: deepLearningVision
+    label: 딥러닝 비전
+    description: 사전학습 모델로 분류·탐지·세그멘테이션을 다룬다.
+    targetOutcomes:
+      - numpy.arrayOps
+      - vision.opencvBasics
+      - deepVision.classification
+      - deepVision.detection
+
+  - id: visionAutomation
+    label: 비전 응용 자동화
+    description: OCR·얼굴·화면 인식을 묶어 실무 자동화에 활용한다.
+    targetOutcomes:
+      - vision.opencvBasics
+      - vision.features
+      - visionApps.documents
+      - visionApps.faceMedia
 
   - id: textProcessing
     label: 비정형 텍스트 처리
@@ -1923,3 +1972,363 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [vision.features, vision.filters]
     estimatedMinutes: 90
+
+  # visionBasics 트랙
+  "visionBasics/01_픽셀과ndarray":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [numpy.arrayOps]
+    estimatedMinutes: 35
+  "visionBasics/02_좌표계함정":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 35
+  "visionBasics/03_채널구조분해":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 40
+  "visionBasics/04_색공간직관":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 40
+  "visionBasics/05_슬라이싱과ROI":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 35
+  "visionBasics/06_픽셀산술":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 40
+  "visionBasics/07_룩업테이블":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 40
+  "visionBasics/08_마스크사고":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 45
+  "visionBasics/09_이미지통계":
+    outcomes: [vision.pixelFoundations]
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 40
+  "visionBasics/10_종합미니보정기":
+    outcomes: []
+    prerequisites: [vision.pixelFoundations]
+    estimatedMinutes: 70
+
+  # visionFeatures 트랙
+  "visionFeatures/01_코너검출":
+    outcomes: [vision.featureMatching]
+    prerequisites: [vision.opencvBasics, vision.features]
+    estimatedMinutes: 45
+  "visionFeatures/02_ORB특징점":
+    outcomes: [vision.featureMatching]
+    prerequisites: [vision.featureMatching]
+    estimatedMinutes: 50
+  "visionFeatures/03_특징점매칭":
+    outcomes: [vision.featureMatching]
+    prerequisites: [vision.featureMatching]
+    estimatedMinutes: 55
+  "visionFeatures/04_호모그래피정렬":
+    outcomes: [vision.featureMatching]
+    prerequisites: [vision.featureMatching]
+    estimatedMinutes: 55
+  "visionFeatures/05_파노라마스티칭":
+    outcomes: [vision.featureMatching]
+    prerequisites: [vision.featureMatching]
+    estimatedMinutes: 60
+  "visionFeatures/06_비디오입출력":
+    outcomes: [vision.video]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 45
+  "visionFeatures/07_배경차분":
+    outcomes: [vision.video]
+    prerequisites: [vision.video]
+    estimatedMinutes: 50
+  "visionFeatures/08_광학흐름":
+    outcomes: [vision.video]
+    prerequisites: [vision.video]
+    estimatedMinutes: 55
+  "visionFeatures/09_객체트래커":
+    outcomes: [vision.video]
+    prerequisites: [vision.video]
+    estimatedMinutes: 55
+  "visionFeatures/10_종합영상ROI추적기":
+    outcomes: []
+    prerequisites: [vision.video, vision.featureMatching]
+    estimatedMinutes: 80
+
+  # deepVision 트랙
+  "deepVision/01_torchvision입문":
+    outcomes: [deepVision.classification]
+    prerequisites: [numpy.arrayOps, vision.opencvBasics]
+    estimatedMinutes: 45
+  "deepVision/02_ResNet분류":
+    outcomes: [deepVision.classification]
+    prerequisites: [deepVision.classification]
+    estimatedMinutes: 55
+  "deepVision/03_임베딩벡터":
+    outcomes: [deepVision.classification]
+    prerequisites: [deepVision.classification]
+    estimatedMinutes: 50
+  "deepVision/04_유사도검색":
+    outcomes: [deepVision.classification]
+    prerequisites: [deepVision.classification]
+    estimatedMinutes: 50
+  "deepVision/05_객체탐지":
+    outcomes: [deepVision.detection]
+    prerequisites: [deepVision.classification]
+    estimatedMinutes: 60
+  "deepVision/06_세그멘테이션":
+    outcomes: [deepVision.detection]
+    prerequisites: [deepVision.detection]
+    estimatedMinutes: 60
+  "deepVision/07_포즈추정":
+    outcomes: [deepVision.detection]
+    prerequisites: [deepVision.detection]
+    estimatedMinutes: 55
+  "deepVision/08_전이학습":
+    outcomes: [deepVision.classification]
+    prerequisites: [deepVision.classification, ml.intro]
+    estimatedMinutes: 65
+  "deepVision/09_모델비교":
+    outcomes: [deepVision.classification]
+    prerequisites: [deepVision.classification]
+    estimatedMinutes: 50
+  "deepVision/10_종합사진태깅기":
+    outcomes: []
+    prerequisites: [deepVision.detection]
+    estimatedMinutes: 90
+
+  # visionApps 트랙
+  "visionApps/01_문서스캐너":
+    outcomes: [visionApps.documents]
+    prerequisites: [vision.opencvBasics, vision.filters]
+    estimatedMinutes: 55
+  "visionApps/02_QR바코드리더":
+    outcomes: [visionApps.documents]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 45
+  "visionApps/03_OCR기초":
+    outcomes: [visionApps.documents]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 55
+  "visionApps/04_한국어OCR":
+    outcomes: [visionApps.documents]
+    prerequisites: [visionApps.documents]
+    estimatedMinutes: 50
+  "visionApps/05_얼굴검출모자이크":
+    outcomes: [visionApps.faceMedia]
+    prerequisites: [vision.opencvBasics]
+    estimatedMinutes: 55
+  "visionApps/06_얼굴임베딩비교":
+    outcomes: [visionApps.faceMedia]
+    prerequisites: [visionApps.faceMedia]
+    estimatedMinutes: 55
+  "visionApps/07_이미지중복검출":
+    outcomes: [visionApps.faceMedia]
+    prerequisites: [visionApps.faceMedia]
+    estimatedMinutes: 50
+  "visionApps/08_영상자동썸네일":
+    outcomes: [visionApps.faceMedia]
+    prerequisites: [vision.video]
+    estimatedMinutes: 50
+  "visionApps/09_화면캡처분석":
+    outcomes: [visionApps.faceMedia]
+    prerequisites: [visionApps.faceMedia]
+    estimatedMinutes: 55
+  "visionApps/10_종합사진정리기":
+    outcomes: []
+    prerequisites: [visionApps.faceMedia, visionApps.documents]
+    estimatedMinutes: 90
+
+  # advancedPython 트랙 — 나머지 백필
+  "advancedPython/03_클로저와상태관리":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functions]
+    estimatedMinutes: 45
+  "advancedPython/06_메타클래스":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.oop]
+    estimatedMinutes: 60
+  "advancedPython/07_디스크립터":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.oop]
+    estimatedMinutes: 55
+  "advancedPython/08_추상클래스와프로토콜":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.oop, python.typing]
+    estimatedMinutes: 50
+  "advancedPython/09_다중상속과MRO":
+    outcomes: [python.oop]
+    prerequisites: [python.oop]
+    estimatedMinutes: 50
+  "advancedPython/10_slots와메모리최적화":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.oop]
+    estimatedMinutes: 40
+  "advancedPython/13_collections심화":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 45
+  "advancedPython/14_enum과상수관리":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.oop]
+    estimatedMinutes: 35
+  "advancedPython/15_typing고급":
+    outcomes: [python.typing]
+    prerequisites: [python.typing]
+    estimatedMinutes: 50
+  "advancedPython/16_재귀와분할정복":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functions]
+    estimatedMinutes: 50
+  "advancedPython/17_정렬알고리즘":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 50
+  "advancedPython/18_탐색알고리즘":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 45
+  "advancedPython/19_동적프로그래밍":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 60
+  "advancedPython/20_자료구조구현":
+    outcomes: [python.oop, python.advancedSyntax]
+    prerequisites: [python.oop]
+    estimatedMinutes: 60
+  "advancedPython/23_함수형패턴":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functools]
+    estimatedMinutes: 45
+  "advancedPython/24_메타프로그래밍":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.designPatterns]
+    estimatedMinutes: 55
+  "advancedPython/25_정규표현식고급":
+    outcomes: [automation.regex]
+    prerequisites: [automation.regex]
+    estimatedMinutes: 50
+  "advancedPython/26_코드최적화":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 45
+  "advancedPython/27_문자열알고리즘":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.strings]
+    estimatedMinutes: 50
+  "advancedPython/28_수학알고리즘":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 50
+  "advancedPython/29_클린코드":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.functions, python.oop]
+    estimatedMinutes: 45
+  "advancedPython/30_종합문제풀이":
+    outcomes: []
+    prerequisites: [python.advancedSyntax, python.designPatterns]
+    estimatedMinutes: 90
+  "advancedPython/31_컨텍스트매니저":
+    outcomes: [builtins.contextManagers]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 45
+  "advancedPython/32_제너레이터심화":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 50
+  "advancedPython/33_async와코루틴":
+    outcomes: [builtins.async]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 60
+  "advancedPython/34_match와패턴매칭":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.controlFlow]
+    estimatedMinutes: 40
+  "advancedPython/35_동시성":
+    outcomes: [builtins.async]
+    prerequisites: [builtins.async]
+    estimatedMinutes: 60
+
+  # folium 잔여
+  "folium/03_도형그리기":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 40
+  "folium/04_지도스타일변경":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 40
+  "folium/05_레이어관리":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 45
+  "folium/06_GeoJSON활용":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 45
+  "folium/09_마커클러스터":
+    outcomes: [viz.geoMaps]
+    prerequisites: [viz.geoMaps]
+    estimatedMinutes: 45
+
+  # altair 잔여
+  "altair/03_팁데이터분석":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 50
+  "altair/04_펭귄서식지분석":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 55
+  "altair/05_타이타닉생존분석":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative]
+    estimatedMinutes: 55
+  "altair/06_항공편분석":
+    outcomes: [viz.declarative]
+    prerequisites: [viz.declarative, pandas.timeSeries]
+    estimatedMinutes: 55
+
+  # playwright 잔여
+  "playwright/05_네트워크모킹":
+    outcomes: [automation.browser.testFlow]
+    prerequisites: [automation.browser.formInput]
+    estimatedMinutes: 50
+  "playwright/07_페이지객체와재사용":
+    outcomes: [automation.browser.testFlow]
+    prerequisites: [automation.browser.formInput, python.oop]
+    estimatedMinutes: 55
+  "playwright/09_트레이스와디버깅":
+    outcomes: [automation.browser.evidence]
+    prerequisites: [automation.browser.evidence]
+    estimatedMinutes: 50
+  "playwright/10_종합브라우저점검프로젝트":
+    outcomes: []
+    prerequisites: [automation.browser.testFlow, automation.browser.evidence]
+    estimatedMinutes: 80
+
+  # pandas 잔여
+  "pandas/04_붓꽃품종분류":
+    outcomes: [pandas.aggregate]
+    prerequisites: [pandas.aggregate]
+    estimatedMinutes: 55
+  "pandas/07_다이아몬드가격분석":
+    outcomes: [pandas.aggregate]
+    prerequisites: [pandas.aggregate]
+    estimatedMinutes: 55
+  "pandas/08_교통사고원인분석":
+    outcomes: [pandas.aggregate]
+    prerequisites: [pandas.aggregate]
+    estimatedMinutes: 55
+
+  # 기타
+  "duckdb/00_MotherDuck소개":
+    outcomes: [duckdb.intro]
+    prerequisites: [duckdb.intro]
+    estimatedMinutes: 30
+  "practical/00_실전파이썬소개":
+    outcomes: []
+    prerequisites: [python.functions]
+    estimatedMinutes: 30

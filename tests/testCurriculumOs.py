@@ -342,6 +342,25 @@ def testResolveLearningGoalRequiresText() -> None:
 # ---------------------------------------------------------------------------
 
 
+def testNoOrphanLessons() -> None:
+    """모든 레슨이 plan 그래프에서 보여야 한다 — outcomes 또는 prerequisites가 비어있지 않아야.
+
+    Curriculum OS 약점 audit과 동일한 무결성 게이트: 레슨이 존재하는데
+    plan에서 보이지 않으면 학습 경로 합성이 그 레슨을 활용하지 못한다.
+    """
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+
+    loader = StudyLoader(str(CURRICULA_DIR))
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(loader, taxonomy)
+    orphans = [
+        lesson.key
+        for lesson in graph.lessons
+        if not lesson.outcomes and not lesson.prerequisites
+    ]
+    assert not orphans, f"orphan lessons (no outcomes nor prereqs): {orphans}"
+
+
 def testEveryDomainProducesPlan() -> None:
     """모든 도메인이 실제 repo에서 비어있지 않은 plan을 만들어야 한다.
 

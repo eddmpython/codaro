@@ -140,7 +140,7 @@ When creating lessons:
 4. Call write-curriculum-yaml to materialize the YAML as runnable editor cells
 5. Treat each section as one learning card, not several small blocks
 6. Put read-only examples in snippet and learner input in exercise.starterCode
-7. Always provide 3 levels of hints in exercise.hints
+7. Provide 2-3 hints in exercise.hints. The Codaro convention is 2 hints by default — a locate hint (어디를 바꿔야 하는지) and a verify hint (어떻게 결과를 확인하는지). Add a third answer-level hint only when the locate+verify pair would still leave the learner stuck (rare for well-scoped exercises).
 8. Use real-world contexts (cafe menu, grade calculator, weather data)
 9. Keep explanations under 3 sentences
 10. One concept per section card
