@@ -10,11 +10,15 @@ import type {
   CodaroDocument,
   CurriculumCategoriesPayload,
   CurriculumContentsPayload,
+  CurriculumGapsPayload,
   CurriculumLessonPayload,
+  CurriculumTaxonomyPayload,
   DiagnosticExportPayload,
   DiagnosticSummary,
   EStopStatus,
   ExecutionResult,
+  MasterPlanPayload,
+  MasterPlanRequestBody,
   OauthAuthorizePayload,
   OauthStatusPayload,
   PackageInfo,
@@ -206,6 +210,37 @@ export const codaroApi = {
   ),
   variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
   resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),
+  complete: (payload: {
+    prefix: string;
+    suffix?: string;
+    context?: { variables?: Array<{ name: string; type?: string }>; blocks?: Array<{ type: string; content: string }> };
+    provider?: string | null;
+  }) => postJson<{ completions: string[]; provider: string; model: string | null }>("/api/ai/complete", {
+    prefix: payload.prefix,
+    suffix: payload.suffix ?? "",
+    context: payload.context ?? null,
+    provider: payload.provider ?? null,
+  }),
+  sendUiEvent: (
+    sessionId: string,
+    payload: { callbackId: string; eventType?: string; payload?: unknown; blockId?: string | null },
+  ) => postJson<{
+    status: string;
+    callbackId: string;
+    eventType: string;
+    result?: unknown;
+    error?: string | null;
+    reactiveTrigger?: string[];
+    affectedVariables?: string[];
+  }>(
+    `/api/kernel/${sessionId}/ui-event`,
+    {
+      callbackId: payload.callbackId,
+      eventType: payload.eventType ?? "invoke",
+      payload: payload.payload ?? null,
+      blockId: payload.blockId ?? null,
+    },
+  ),
   packagesList: () => requestJson<PackageInfo[]>("/api/packages/list"),
   packageInstall: (name: string) => postJson<PackageInstallResult>("/api/packages/install", { name }),
   sessionPackagesList: (sessionId: string) => requestJson<PackageInfo[]>(`/api/kernel/${sessionId}/packages/list`),
@@ -217,6 +252,14 @@ export const codaroApi = {
   ),
   curriculumLesson: (category: string, contentId: string) => requestJson<CurriculumLessonPayload>(
     `/api/curriculum/content/${encodeURIComponent(category)}/${encodeURIComponent(contentId)}`,
+  ),
+  curriculumTaxonomy: () => requestJson<CurriculumTaxonomyPayload>("/api/curriculum/taxonomy"),
+  curriculumMasterPlan: (payload: MasterPlanRequestBody) =>
+    postJson<MasterPlanPayload>("/api/curriculum/master-plan", payload),
+  curriculumGaps: (domain?: string) => requestJson<CurriculumGapsPayload>(
+    domain
+      ? `/api/curriculum/gaps?domain=${encodeURIComponent(domain)}`
+      : "/api/curriculum/gaps",
   ),
   progress: () => requestJson<ProgressSummary>("/api/curriculum/progress"),
   updateProgress: (category: string, contentId: string, missionId: string, totalMissions: number) =>

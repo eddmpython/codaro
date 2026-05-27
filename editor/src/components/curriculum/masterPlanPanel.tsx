@@ -1,0 +1,267 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AlertTriangle, Compass, Loader2, MapPinned, RefreshCw, Target } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { codaroApi } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import type {
+  CurriculumDomain,
+  CurriculumTaxonomyPayload,
+  MasterPlanPayload,
+} from "@/types";
+
+type MasterPlanPanelProps = {
+  onSelectLesson?: (category: string, contentId: string) => void;
+};
+
+export function MasterPlanPanel({ onSelectLesson }: MasterPlanPanelProps) {
+  const [taxonomy, setTaxonomy] = useState<CurriculumTaxonomyPayload | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const [excludeCompleted, setExcludeCompleted] = useState(true);
+  const [plan, setPlan] = useState<MasterPlanPayload | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    codaroApi
+      .curriculumTaxonomy()
+      .then((payload) => {
+        if (!mounted) return;
+        setTaxonomy(payload);
+        if (payload.domains.length > 0 && selectedDomain === null) {
+          setSelectedDomain(payload.domains[0].id);
+        }
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : String(err));
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const composePlan = useCallback(
+    async (domainId: string) => {
+      setLoadingPlan(true);
+      setError(null);
+      try {
+        const next = await codaroApi.curriculumMasterPlan({
+          domain: domainId,
+          excludeCompleted,
+        });
+        setPlan(next);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoadingPlan(false);
+      }
+    },
+    [excludeCompleted],
+  );
+
+  useEffect(() => {
+    if (selectedDomain) {
+      void composePlan(selectedDomain);
+    }
+  }, [selectedDomain, composePlan]);
+
+  const activeDomain = useMemo<CurriculumDomain | null>(() => {
+    if (!taxonomy || !selectedDomain) return null;
+    return taxonomy.domains.find((domain) => domain.id === selectedDomain) ?? null;
+  }, [taxonomy, selectedDomain]);
+
+  return (
+    <div className="flex h-full flex-col gap-3 px-4 py-3">
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Compass className="h-5 w-5 text-zinc-500" />
+          <h2 className="text-sm font-semibold text-zinc-100">마스터 플랜</h2>
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={!selectedDomain || loadingPlan}
+          onClick={() => selectedDomain && composePlan(selectedDomain)}
+          aria-label="플랜 다시 짜기"
+        >
+          <RefreshCw className={cn("h-4 w-4", loadingPlan && "animate-spin")} />
+        </Button>
+      </header>
+
+      <DomainPicker
+        taxonomy={taxonomy}
+        selected={selectedDomain}
+        onSelect={setSelectedDomain}
+      />
+
+      <div className="flex items-center gap-2 text-xs text-zinc-400">
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input
+            type="checkbox"
+            className="rounded"
+            checked={excludeCompleted}
+            onChange={(event) => setExcludeCompleted(event.target.checked)}
+          />
+          이미 끝낸 레슨 제외
+        </label>
+      </div>
+
+      {error && (
+        <div className="rounded-md border border-amber-700/40 bg-amber-950/40 px-3 py-2 text-xs text-amber-200">
+          <AlertTriangle className="mr-1 inline h-3 w-3" /> {error}
+        </div>
+      )}
+
+      {activeDomain && (
+        <div className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-400">
+          <div className="text-zinc-200">{activeDomain.label}</div>
+          <div className="mt-1 text-zinc-500">{activeDomain.description}</div>
+        </div>
+      )}
+
+      <Separator className="bg-zinc-800" />
+
+      <ScrollArea className="flex-1">
+        {loadingPlan && (
+          <div className="flex items-center gap-2 px-1 py-3 text-xs text-zinc-400">
+            <Loader2 className="h-3 w-3 animate-spin" /> 학습 경로를 짜는 중…
+          </div>
+        )}
+        {plan && !loadingPlan && <PlanBody plan={plan} onSelectLesson={onSelectLesson} />}
+      </ScrollArea>
+    </div>
+  );
+}
+
+function DomainPicker({
+  taxonomy,
+  selected,
+  onSelect,
+}: {
+  taxonomy: CurriculumTaxonomyPayload | null;
+  selected: string | null;
+  onSelect: (domainId: string) => void;
+}) {
+  if (!taxonomy) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-zinc-500">
+        <Loader2 className="h-3 w-3 animate-spin" /> 분류 체계 로딩 중…
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {taxonomy.domains.map((domain) => (
+        <button
+          key={domain.id}
+          type="button"
+          onClick={() => onSelect(domain.id)}
+          className={cn(
+            "rounded-full border px-3 py-1 text-xs transition-colors",
+            selected === domain.id
+              ? "border-zinc-400 bg-zinc-100 text-zinc-900"
+              : "border-zinc-700 bg-zinc-900/40 text-zinc-300 hover:border-zinc-500",
+          )}
+        >
+          {domain.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function PlanBody({
+  plan,
+  onSelectLesson,
+}: {
+  plan: MasterPlanPayload;
+  onSelectLesson?: (category: string, contentId: string) => void;
+}) {
+  return (
+    <div className="space-y-3 px-1 pb-4">
+      <div className="text-xs text-zinc-400">
+        <Target className="mr-1 inline h-3 w-3 text-zinc-500" />
+        {plan.summary}
+      </div>
+
+      {plan.steps.length === 0 && plan.gaps.length === 0 && (
+        <div className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-3 text-xs text-zinc-400">
+          이미 모든 목표 능력을 완료했습니다. 다음 도메인을 골라 보세요.
+        </div>
+      )}
+
+      {plan.steps.length > 0 && (
+        <ol className="space-y-2">
+          {plan.steps.map((step) => (
+            <li key={step.key}>
+              <Card
+                className={cn(
+                  "border border-zinc-800 bg-zinc-900/40 px-3 py-2.5 transition-colors",
+                  onSelectLesson && "cursor-pointer hover:border-zinc-600",
+                )}
+                onClick={() => onSelectLesson?.(step.category, step.contentId)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2 text-xs">
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-medium text-zinc-300">
+                      {step.order}
+                    </span>
+                    <div className="flex-1">
+                      <div className="font-medium text-zinc-100">{step.title}</div>
+                      <div className="mt-0.5 text-[11px] text-zinc-500">
+                        {step.category} · {step.rationale}
+                      </div>
+                      {step.outcomes.length > 0 && (
+                        <div className="mt-1.5 flex flex-wrap gap-1">
+                          {step.outcomes.map((outcomeId) => (
+                            <Badge
+                              key={outcomeId}
+                              variant="outline"
+                              className="text-[10px] font-normal text-zinc-400 border-zinc-700"
+                            >
+                              {outcomeId}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {step.estimatedMinutes > 0 && (
+                    <span className="text-[10px] text-zinc-500 shrink-0">
+                      ~{step.estimatedMinutes}분
+                    </span>
+                  )}
+                </div>
+              </Card>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {plan.gaps.length > 0 && (
+        <div className="rounded-md border border-amber-700/40 bg-amber-950/30 px-3 py-2.5">
+          <div className="flex items-center gap-1 text-xs font-medium text-amber-200">
+            <MapPinned className="h-3 w-3" /> 미충족 능력
+          </div>
+          <ul className="mt-1.5 space-y-1 text-xs text-amber-100/80">
+            {plan.gaps.map((gap) => (
+              <li key={gap.outcomeId}>
+                <span className="font-medium">{gap.outcomeLabel}</span>{" "}
+                <span className="text-amber-200/60">— {gap.reason}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-1.5 text-[11px] text-amber-200/60">
+            이 능력을 가르치는 강의가 아직 없습니다. AI가 propose-curriculum-draft 도구로 초안을 만들 수 있습니다.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

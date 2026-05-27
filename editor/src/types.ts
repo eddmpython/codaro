@@ -210,6 +210,73 @@ export type ProgressSummary = {
   updatedAt?: string;
 };
 
+export type CurriculumOutcome = {
+  id: string;
+  label: string;
+  description: string;
+};
+
+export type CurriculumDomain = {
+  id: string;
+  label: string;
+  description: string;
+  targetOutcomes: string[];
+};
+
+export type CurriculumTaxonomyPayload = {
+  outcomes: CurriculumOutcome[];
+  domains: CurriculumDomain[];
+};
+
+export type MasterPlanStep = {
+  order: number;
+  category: string;
+  contentId: string;
+  key: string;
+  title: string;
+  outcomes: string[];
+  prerequisites: string[];
+  rationale: string;
+  estimatedMinutes: number;
+  completed: boolean;
+};
+
+export type MasterPlanGap = {
+  outcomeId: string;
+  outcomeLabel: string;
+  reason: string;
+  suggestedCategory?: string | null;
+};
+
+export type MasterPlanPayload = {
+  goal: {
+    domain: string | null;
+    outcomes: string[];
+    excludeCompleted: boolean;
+    excludeKeys: string[];
+  };
+  targetOutcomes: string[];
+  steps: MasterPlanStep[];
+  gaps: MasterPlanGap[];
+  totalMinutes: number;
+  summary: string;
+};
+
+export type CurriculumGapsPayload = {
+  gaps: Array<{
+    domainId: string;
+    domainLabel: string;
+    missing: Array<{ outcomeId: string; outcomeLabel: string }>;
+  }>;
+};
+
+export type MasterPlanRequestBody = {
+  domain?: string | null;
+  outcomes?: string[];
+  excludeCompleted?: boolean;
+  excludeKeys?: string[];
+};
+
 export type CheckResult = {
   passed: boolean;
   feedback: string;

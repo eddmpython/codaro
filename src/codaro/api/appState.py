@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..curriculum.osCache import CurriculumOsCache
 from ..curriculum.studyLoader import StudyLoader
 from ..curriculum.progress import ProgressTracker
 from ..kernel.manager import SessionManager
@@ -22,6 +23,7 @@ class ServerState:
     workspaceEngine: ExecutionEngine
     studyLoader: StudyLoader | None
     progressTracker: ProgressTracker
+    curriculumOs: CurriculumOsCache
 
 
 def createServerState(
@@ -49,4 +51,5 @@ def createServerState(
         ),
         studyLoader=studyLoader,
         progressTracker=ProgressTracker(),
+        curriculumOs=CurriculumOsCache(studyLoader),
     )

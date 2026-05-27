@@ -15,6 +15,10 @@ class ToolManifestMetadata:
 
 
 TOOL_GROUPS: dict[str, dict[str, str]] = {
+    "curriculumOs": {
+        "label": "Curriculum OS",
+        "description": "Compose master plans, search curricula, and identify gaps.",
+    },
     "workbench": {
         "label": "Workbench",
         "description": "Create and edit the live notebook surface.",
@@ -47,6 +51,10 @@ TOOL_GROUPS: dict[str, dict[str, str]] = {
 
 
 TOOL_LANE_GROUPS: dict[str, dict[str, str]] = {
+    "planning": {
+        "label": "Planning",
+        "description": "Compose learning master plans and inspect curriculum coverage.",
+    },
     "curriculum": {
         "label": "Curriculum",
         "description": "Author YAML learning specs and materialize them as editor cells.",
@@ -118,6 +126,12 @@ TOOL_METADATA: dict[str, ToolManifestMetadata] = {
     "press-hotkey": ToolManifestMetadata("safety", "safety", "guarded-input", "input"),
     "wait-for": ToolManifestMetadata("safety", "safety", "guarded-input"),
     "emergency-stop": ToolManifestMetadata("safety", "safety", "automation-safety", "safety"),
+    "list-curriculum-domains": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "search-curricula": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "compose-master-plan": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "inspect-curriculum": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "list-curriculum-gaps": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "propose-curriculum-draft": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
 }
 
 

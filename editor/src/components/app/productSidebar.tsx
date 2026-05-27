@@ -1,6 +1,7 @@
 import {
   ChevronRight,
   Clock3,
+  Compass,
   FileCode2,
   GraduationCap,
   Languages,
@@ -106,6 +107,7 @@ export function ProductSidebar({
     { value: "chat", label: t("nav.chat"), Icon: MessageSquare },
     { value: "editor", label: t("nav.editor"), Icon: FileCode2 },
     { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap },
+    { value: "plan", label: t("nav.plan"), Icon: Compass },
     { value: "automation", label: t("nav.automation"), Icon: Workflow },
   ];
   navItems.push({ value: "share", label: t("nav.share"), Icon: PackageOpen });
@@ -115,7 +117,7 @@ export function ProductSidebar({
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
               <SidebarMenuButton className="h-10 px-2 text-[13px] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!" size="lg" tooltip="Codaro">

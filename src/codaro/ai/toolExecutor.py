@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from .toolHandlers.automation import AutomationToolHandlers
+from .toolHandlers.curriculumOs import CurriculumOsToolHandlers
 from .toolHandlers.learning import LearningToolHandlers
 from .toolHandlers.runtime import RuntimeToolHandlers
 from .toolHandlers.workbench import WorkbenchToolHandlers
@@ -16,6 +17,7 @@ class ToolExecutionError(RuntimeError):
 
 class ToolExecutor(
     AutomationToolHandlers,
+    CurriculumOsToolHandlers,
     LearningToolHandlers,
     RuntimeToolHandlers,
     WorkbenchToolHandlers,

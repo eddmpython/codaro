@@ -4,12 +4,13 @@ from fastapi import APIRouter
 
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.contentCache import CurriculumContentCache
+from ..curriculum.planComposer import PlanGoal, composeMasterPlan
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
-from .requestModels import CheckExerciseRequest, CurriculumProgressRequest
+from .requestModels import CheckExerciseRequest, CurriculumProgressRequest, MasterPlanRequest
 
 
 def createCurriculumRouter(state: ServerState) -> APIRouter:
@@ -139,6 +140,82 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             ),
         )
         return result.payload()
+
+    @router.get("/api/curriculum/taxonomy")
+    def apiCurriculumTaxonomy() -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="taxonomy",
+                outcomes=len(taxonomy.outcomes),
+                domains=len(taxonomy.domains),
+            ),
+        )
+        return {
+            "outcomes": [outcome.model_dump() for outcome in taxonomy.outcomes],
+            "domains": [domain.model_dump() for domain in taxonomy.domains],
+        }
+
+    @router.post("/api/curriculum/master-plan")
+    def apiCurriculumMasterPlan(request: MasterPlanRequest) -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        if request.domain and not taxonomy.domainById(request.domain):
+            fail(400, "curriculum_unknown_domain", f"Unknown domain: {request.domain}")
+        for outcomeId in request.outcomes:
+            if not taxonomy.hasOutcome(outcomeId):
+                fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {outcomeId}")
+        graph = state.curriculumOs.graph()
+        goal = PlanGoal(
+            domain=request.domain,
+            outcomes=request.outcomes,
+            excludeCompleted=request.excludeCompleted,
+            excludeKeys=request.excludeKeys,
+        )
+        plan = composeMasterPlan(goal, graph, taxonomy, state.progressTracker)
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="master-plan",
+                domain=request.domain,
+                outcomes=len(request.outcomes),
+                steps=len(plan.steps),
+                gaps=len(plan.gaps),
+            ),
+        )
+        return plan.model_dump()
+
+    @router.get("/api/curriculum/gaps")
+    def apiCurriculumGaps(domain: str | None = None) -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        graph = state.curriculumOs.graph()
+        covered = graph.coveredOutcomes()
+        domainsOfInterest = taxonomy.domains
+        if domain:
+            singleDomain = taxonomy.domainById(domain)
+            if singleDomain is None:
+                fail(400, "curriculum_unknown_domain", f"Unknown domain: {domain}")
+            domainsOfInterest = [singleDomain]
+        gaps: list[dict[str, object]] = []
+        for dom in domainsOfInterest:
+            missing = [outcomeId for outcomeId in dom.targetOutcomes if outcomeId not in covered]
+            if missing:
+                gaps.append({
+                    "domainId": dom.id,
+                    "domainLabel": dom.label,
+                    "missing": [
+                        {
+                            "outcomeId": outcomeId,
+                            "outcomeLabel": taxonomy.outcomeLabel(outcomeId),
+                        }
+                        for outcomeId in missing
+                    ],
+                })
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(action="gaps", domain=domain, gapDomains=len(gaps)),
+        )
+        return {"gaps": gaps}
 
     @router.get("/api/curriculum/learning-spec")
     def apiLearningSpec() -> dict[str, object]:

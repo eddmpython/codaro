@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   initialAppNotice,
   initialBootstrapState,
@@ -21,9 +21,11 @@ import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLocaleState } from "@/hooks/useLocaleState";
+import { useViewportInsets } from "@/hooks/useViewportInsets";
 import { codaroApi } from "@/lib/api";
 import { buildCustomCurriculumApplication } from "@/lib/customCurricula";
 import { LocaleProvider } from "@/lib/localeContext";
+import { WidgetSessionProvider } from "@/lib/widgetSession";
 import {
   SidebarInset,
   SidebarProvider,
@@ -38,6 +40,28 @@ const DEFAULT_CURRICULUM_CATEGORY = "30days";
 
 function App() {
   const localeState = useLocaleState();
+  const viewportInsets = useViewportInsets();
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.dataset.keyboardOpen = viewportInsets.isKeyboardOpen ? "true" : "false";
+    root.style.setProperty("--keyboard-height", `${viewportInsets.keyboardHeight}px`);
+  }, [viewportInsets.isKeyboardOpen, viewportInsets.keyboardHeight]);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ blockIds?: string[]; sessionId?: string }>).detail;
+      if (!detail || !Array.isArray(detail.blockIds)) return;
+      const knownBlocks = activeDocumentRef.current.blocks;
+      for (const blockId of detail.blockIds) {
+        const target = knownBlocks.find((block) => block.id === blockId);
+        if (target && target.type === "code") {
+          void runBlockRef.current?.(target);
+        }
+      }
+    };
+    window.addEventListener("codaro:reactive-trigger", handler);
+    return () => window.removeEventListener("codaro:reactive-trigger", handler);
+  }, []);
   const [surface, setSurface] = useSurfaceRoute();
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
@@ -192,6 +216,13 @@ function App() {
     clearPendingChanges();
   }, [applyNotebookDocument, clearPendingChanges, resetRuntimeState]);
 
+  const activeDocumentRef = useRef(activeDocument);
+  const runBlockRef = useRef(runBlock);
+  useEffect(() => {
+    activeDocumentRef.current = activeDocument;
+    runBlockRef.current = runBlock;
+  }, [activeDocument, runBlock]);
+
   useAppBootstrapEffect({
     applyBootstrapCurriculumState,
     applyDocument,
@@ -279,6 +310,7 @@ function App() {
 
   return (
     <LocaleProvider value={localeState}>
+    <WidgetSessionProvider sessionId={sessionId}>
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <ProductSidebar
         categories={filteredCategories}
@@ -369,6 +401,10 @@ function App() {
               onRunTask={runTask}
               onSelectBlock={selectBlock}
               onSelectCurriculumBlock={setSelectedCurriculumBlockId}
+              onSelectCurriculumLesson={(category, contentId) => {
+                selectCurriculumCategory(category);
+                selectCurriculumContent(contentId);
+              }}
               onToggleEStop={toggleEStop}
             />
           </div>
@@ -389,6 +425,7 @@ function App() {
         onValidateProvider={validateAiProvider}
       />
     </SidebarProvider>
+    </WidgetSessionProvider>
     </LocaleProvider>
   );
 }

@@ -1,0 +1,462 @@
+# Curriculum OS 분류 체계 (controlled vocabulary)
+#
+# - outcomes: 학생이 한 레슨을 마치고 얻는 능력 단위 (atomic capability).
+#   ID 규칙: <도메인 prefix>.<능력명>, lowerCamelCase.
+# - domains: 사용자가 실제로 달성하고자 하는 실무 목표.
+#   targetOutcomes: 그 목표를 충족하기 위해 필요한 outcome 집합.
+# - lessonOutcomes: <category>/<contentId> -> { outcomes, prerequisites, estimatedMinutes, practicalDomain }
+#   레슨 YAML의 meta.outcomes/meta.prerequisites가 있으면 그쪽이 우선이고, 여기는 backfill 용도다.
+#
+# 새 레슨을 만들 때:
+# 1) outcomes/domains에 없는 능력/목표가 필요하면 여기에 먼저 등록.
+# 2) 레슨 meta에 outcomes/prerequisites/estimatedMinutes 등록(권장) 또는 lessonOutcomes에 등록.
+# 3) tests/testCurriculumOs.py가 그래프 무결성을 검증한다.
+
+outcomes:
+  # === Python 기초 ===
+  - id: python.intro
+    label: Python 첫걸음
+    description: Python 실행, print, 주석, REPL 감각
+  - id: python.variables
+    label: 변수와 데이터 타입
+    description: 변수 선언, int/float/str/bool, 형변환
+  - id: python.operators
+    label: 연산자
+    description: 산술, 비교, 논리, 대입 연산자 사용
+  - id: python.strings
+    label: 문자열 다루기
+    description: 인덱싱, 슬라이싱, 메서드, f-string
+  - id: python.lists
+    label: 리스트와 튜플
+    description: 시퀀스 자료형 생성, 인덱싱, 메서드
+  - id: python.dictsAndSets
+    label: 딕셔너리와 집합
+    description: 키-값 매핑과 집합 연산
+  - id: python.controlFlow
+    label: 조건문과 반복문
+    description: if/elif/else, for, while, break/continue
+  - id: python.functions
+    label: 함수
+    description: def, 인자, 반환, 스코프
+  - id: python.modulesAndIo
+    label: 모듈과 파일 입출력
+    description: import, open, read/write
+  - id: python.errorHandling
+    label: 예외 처리
+    description: try/except/else/finally, raise, 사용자 정의 예외
+  - id: python.oop
+    label: 객체지향 기초
+    description: 클래스, 인스턴스, 상속, 메서드
+  - id: python.advancedSyntax
+    label: 고급 문법
+    description: 컴프리헨션, 제너레이터, 데코레이터, 클로저
+
+  # === 표준 라이브러리/고급 ===
+  - id: python.functools
+    label: functools 활용
+    description: partial, reduce, lru_cache, wraps
+  - id: python.itertools
+    label: itertools 활용
+    description: chain, combinations, groupby
+  - id: python.dataclasses
+    label: dataclasses
+    description: "@dataclass, field, frozen"
+  - id: python.typing
+    label: 타입 힌팅
+    description: Optional, Union, Generic, Protocol
+  - id: python.designPatterns
+    label: 디자인 패턴
+    description: Strategy, Factory, Singleton 등
+
+  # === 데이터 분석 ===
+  - id: pandas.intro
+    label: pandas 소개
+    description: Series, DataFrame 개념
+  - id: pandas.loadFrame
+    label: 데이터프레임 로딩
+    description: read_csv, read_excel, 기본 탐색
+  - id: pandas.filterSelect
+    label: 필터링과 선택
+    description: loc, iloc, 불리언 마스킹
+  - id: pandas.aggregate
+    label: 집계와 그룹화
+    description: groupby, agg, pivot
+  - id: pandas.merge
+    label: 데이터 결합
+    description: merge, join, concat
+  - id: pandas.timeSeries
+    label: 시계열 분석
+    description: datetime, resample, rolling
+  - id: pandas.report
+    label: 분석 보고서 작성
+    description: 분석 결과를 표/그래프/요약으로 정리
+
+  # === 시각화 ===
+  - id: matplotlib.basics
+    label: matplotlib 기본 차트
+    description: pyplot, figure, axes, 기본 차트 종류
+  - id: viz.statistical
+    label: 통계 시각화
+    description: 분포, 박스플롯, 회귀선
+  - id: viz.interactive
+    label: 인터랙티브 시각화
+    description: 줌, 호버, 인터랙티브 대시보드 요소
+
+  # === 자동화 ===
+  - id: automation.browser.basics
+    label: 브라우저 자동화 기초
+    description: Playwright로 페이지 열고 요소 클릭
+  - id: automation.browser.formInput
+    label: 폼 입력과 검증
+    description: locator로 input 채우고 결과 검증
+  - id: automation.browser.evidence
+    label: 스크린샷/증거 캡처
+    description: 자동화 산출물로 스크린샷, HTML 저장
+  - id: automation.browser.session
+    label: 로그인 세션 관리
+    description: storage_state 저장/복원
+  - id: automation.browser.testFlow
+    label: pytest로 브라우저 흐름
+    description: pytest fixture로 E2E 테스트 구성
+
+  - id: automation.excel.intro
+    label: 엑셀 자동화 입문
+    description: 워크북 열기, 셀 읽기/쓰기 기본
+  - id: automation.excel.workbook
+    label: 워크북 조작
+    description: 시트, 범위, 수식 다루기
+
+  - id: automation.fileOps
+    label: 파일 자동화
+    description: pathlib, glob, 파일 이동/복사/정리
+  - id: automation.procCtl
+    label: 프로세스 자동화
+    description: subprocess, 외부 명령 실행
+  - id: automation.watchSched
+    label: 감시·스케줄
+    description: watchdog, schedule, 주기 실행
+  - id: automation.inputCtl
+    label: GUI/입력 자동화
+    description: 키보드, 마우스, OS 입력 제어
+
+  - id: automation.regex
+    label: 정규표현식
+    description: 비정형 문자열에서 패턴 추출
+
+# 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
+domains:
+  - id: dataReporting
+    label: 데이터 분석 보고서
+    description: 표 데이터를 불러와 가공·요약하고 분석 보고서로 정리한다.
+    targetOutcomes:
+      - python.variables
+      - python.controlFlow
+      - python.functions
+      - pandas.intro
+      - pandas.loadFrame
+      - pandas.filterSelect
+      - pandas.aggregate
+      - pandas.report
+
+  - id: officeAutomation
+    label: 사무 자동화 (엑셀/문서)
+    description: 엑셀 반복 작업을 Python으로 자동화하고 보고서를 만든다.
+    targetOutcomes:
+      - python.variables
+      - python.controlFlow
+      - python.functions
+      - python.modulesAndIo
+      - automation.excel.intro
+      - automation.excel.workbook
+      - pandas.loadFrame
+      - pandas.aggregate
+
+  - id: webMonitoring
+    label: 웹 자동화·모니터링
+    description: 브라우저로 사이트를 점검하고 스크린샷·결과를 저장한다.
+    targetOutcomes:
+      - python.variables
+      - python.controlFlow
+      - python.functions
+      - automation.browser.basics
+      - automation.browser.formInput
+      - automation.browser.evidence
+
+  - id: scriptingAutomation
+    label: OS·파일·프로세스 자동화
+    description: 로컬 파일과 외부 프로그램을 묶어 반복 작업을 자동화한다.
+    targetOutcomes:
+      - python.variables
+      - python.controlFlow
+      - python.functions
+      - python.modulesAndIo
+      - python.errorHandling
+      - automation.fileOps
+      - automation.procCtl
+
+  - id: pythonFoundation
+    label: Python 기초 완주
+    description: 30일 커리큘럼으로 Python 기본기를 끝까지 다진다.
+    targetOutcomes:
+      - python.intro
+      - python.variables
+      - python.operators
+      - python.strings
+      - python.lists
+      - python.dictsAndSets
+      - python.controlFlow
+      - python.functions
+      - python.modulesAndIo
+      - python.errorHandling
+      - python.oop
+      - python.advancedSyntax
+
+  - id: timeSeriesAnalysis
+    label: 시계열 데이터 분석
+    description: 시간 흐름을 가진 데이터를 분석하고 시각화한다.
+    targetOutcomes:
+      - pandas.loadFrame
+      - pandas.filterSelect
+      - pandas.aggregate
+      - pandas.timeSeries
+      - matplotlib.basics
+
+# 기존 레슨 backfill. 레슨 YAML meta.outcomes/prerequisites가 있으면 그쪽이 우선.
+lessonOutcomes:
+  # 30days 기본기 트랙
+  "30days/day01_헬로월드":
+    outcomes: [python.intro]
+    prerequisites: []
+    estimatedMinutes: 25
+  "30days/day02_변수와데이터타입":
+    outcomes: [python.variables]
+    prerequisites: [python.intro]
+    estimatedMinutes: 40
+  "30days/day03_연산자":
+    outcomes: [python.operators]
+    prerequisites: [python.variables]
+    estimatedMinutes: 35
+  "30days/day04_문자열기초":
+    outcomes: [python.strings]
+    prerequisites: [python.variables]
+    estimatedMinutes: 35
+  "30days/day05_문자열인덱싱슬라이싱":
+    outcomes: [python.strings]
+    prerequisites: [python.strings]
+    estimatedMinutes: 35
+  "30days/day06_문자열메서드":
+    outcomes: [python.strings]
+    prerequisites: [python.strings]
+    estimatedMinutes: 40
+  "30days/day07_리스트기초":
+    outcomes: [python.lists]
+    prerequisites: [python.variables]
+    estimatedMinutes: 40
+  "30days/day08_리스트메서드":
+    outcomes: [python.lists]
+    prerequisites: [python.lists]
+    estimatedMinutes: 35
+  "30days/day09_튜플":
+    outcomes: [python.lists]
+    prerequisites: [python.lists]
+    estimatedMinutes: 25
+  "30days/day10_집합":
+    outcomes: [python.dictsAndSets]
+    prerequisites: [python.lists]
+    estimatedMinutes: 30
+  "30days/day11_딕셔너리기초":
+    outcomes: [python.dictsAndSets]
+    prerequisites: [python.lists]
+    estimatedMinutes: 35
+  "30days/day12_딕셔너리메서드":
+    outcomes: [python.dictsAndSets]
+    prerequisites: [python.dictsAndSets]
+    estimatedMinutes: 35
+  "30days/day13_조건문":
+    outcomes: [python.controlFlow]
+    prerequisites: [python.operators]
+    estimatedMinutes: 40
+  "30days/day14_반복문":
+    outcomes: [python.controlFlow]
+    prerequisites: [python.controlFlow, python.lists]
+    estimatedMinutes: 45
+  "30days/day15_함수기초":
+    outcomes: [python.functions]
+    prerequisites: [python.controlFlow]
+    estimatedMinutes: 45
+  "30days/day16_함수고급":
+    outcomes: [python.functions]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "30days/day17_스코프와클로저":
+    outcomes: [python.functions]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "30days/day18_모듈과import":
+    outcomes: [python.modulesAndIo]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "30days/day19_파일입출력":
+    outcomes: [python.modulesAndIo]
+    prerequisites: [python.modulesAndIo, python.strings]
+    estimatedMinutes: 45
+  "30days/day20_예외처리":
+    outcomes: [python.errorHandling]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "30days/day21_중간종합복습":
+    outcomes: []
+    prerequisites:
+      - python.controlFlow
+      - python.functions
+      - python.modulesAndIo
+      - python.errorHandling
+    estimatedMinutes: 60
+  "30days/day22_클래스기초":
+    outcomes: [python.oop]
+    prerequisites: [python.functions]
+    estimatedMinutes: 45
+  "30days/day23_클래스고급":
+    outcomes: [python.oop]
+    prerequisites: [python.oop]
+    estimatedMinutes: 45
+  "30days/day24_특수메서드":
+    outcomes: [python.oop]
+    prerequisites: [python.oop]
+    estimatedMinutes: 40
+  "30days/day25_프로퍼티와데코레이터":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.oop]
+    estimatedMinutes: 45
+  "30days/day26_컴프리헨션":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.lists, python.controlFlow]
+    estimatedMinutes: 35
+  "30days/day27_제너레이터와이터레이터":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functions]
+    estimatedMinutes: 45
+  "30days/day28_고급문법종합":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 50
+  "30days/day29_알고리즘연습":
+    outcomes: []
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 60
+  "30days/day30_최종프로젝트":
+    outcomes: []
+    prerequisites: [python.advancedSyntax, python.oop, python.errorHandling]
+    estimatedMinutes: 90
+
+  # advancedPython 트랙 (선택적 보강)
+  "advancedPython/01_람다와고차함수":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functions]
+    estimatedMinutes: 35
+  "advancedPython/02_함수데코레이터심화":
+    outcomes: [python.advancedSyntax]
+    prerequisites: [python.functions]
+    estimatedMinutes: 45
+  "advancedPython/04_functools완벽가이드":
+    outcomes: [python.functools]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "advancedPython/05_itertools마스터":
+    outcomes: [python.itertools]
+    prerequisites: [python.advancedSyntax]
+    estimatedMinutes: 40
+  "advancedPython/11_타입힌팅심화":
+    outcomes: [python.typing]
+    prerequisites: [python.functions]
+    estimatedMinutes: 40
+  "advancedPython/12_dataclasses마스터":
+    outcomes: [python.dataclasses]
+    prerequisites: [python.oop, python.typing]
+    estimatedMinutes: 35
+  "advancedPython/21_디자인패턴1":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.oop]
+    estimatedMinutes: 50
+  "advancedPython/22_디자인패턴2":
+    outcomes: [python.designPatterns]
+    prerequisites: [python.designPatterns]
+    estimatedMinutes: 50
+
+  # pandas 트랙
+  "pandas/00_판다스소개":
+    outcomes: [pandas.intro]
+    prerequisites: [python.lists, python.functions]
+    estimatedMinutes: 30
+  "pandas/01_레스토랑팁분석":
+    outcomes: [pandas.loadFrame, pandas.filterSelect]
+    prerequisites: [pandas.intro]
+    estimatedMinutes: 50
+  "pandas/02_타이타닉생존분석":
+    outcomes: [pandas.filterSelect, pandas.aggregate]
+    prerequisites: [pandas.loadFrame]
+    estimatedMinutes: 60
+  "pandas/03_펭귄종비교분석":
+    outcomes: [pandas.aggregate]
+    prerequisites: [pandas.filterSelect]
+    estimatedMinutes: 50
+  "pandas/05_자동차연비분석":
+    outcomes: [pandas.aggregate, pandas.report]
+    prerequisites: [pandas.aggregate]
+    estimatedMinutes: 60
+  "pandas/06_항공편시계열분석":
+    outcomes: [pandas.timeSeries]
+    prerequisites: [pandas.loadFrame, pandas.aggregate]
+    estimatedMinutes: 65
+  "pandas/09_두데이터합치기":
+    outcomes: [pandas.merge]
+    prerequisites: [pandas.loadFrame]
+    estimatedMinutes: 45
+  "pandas/10_실전종합프로젝트":
+    outcomes: [pandas.report]
+    prerequisites: [pandas.aggregate, pandas.merge]
+    estimatedMinutes: 90
+
+  # playwright 트랙
+  "playwright/00_playwright소개":
+    outcomes: [automation.browser.basics]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 35
+  "playwright/01_첫브라우저실행":
+    outcomes: [automation.browser.basics]
+    prerequisites: [automation.browser.basics]
+    estimatedMinutes: 40
+  "playwright/02_locator와폼입력":
+    outcomes: [automation.browser.formInput]
+    prerequisites: [automation.browser.basics]
+    estimatedMinutes: 45
+  "playwright/03_기다림과검증":
+    outcomes: [automation.browser.formInput]
+    prerequisites: [automation.browser.formInput]
+    estimatedMinutes: 45
+  "playwright/04_스크린샷과증거":
+    outcomes: [automation.browser.evidence]
+    prerequisites: [automation.browser.basics]
+    estimatedMinutes: 40
+  "playwright/06_로그인상태와스토리지":
+    outcomes: [automation.browser.session]
+    prerequisites: [automation.browser.formInput]
+    estimatedMinutes: 45
+  "playwright/08_pytest흐름":
+    outcomes: [automation.browser.testFlow]
+    prerequisites: [automation.browser.formInput, automation.browser.evidence]
+    estimatedMinutes: 55
+
+  # excel 트랙
+  "excel/01_xlwings란":
+    outcomes: [automation.excel.intro]
+    prerequisites: [python.functions]
+    estimatedMinutes: 30
+  "excel/02_xlwings설치":
+    outcomes: [automation.excel.intro]
+    prerequisites: [automation.excel.intro]
+    estimatedMinutes: 25
+  "excel/03_xlwingsLite":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.intro]
+    estimatedMinutes: 45

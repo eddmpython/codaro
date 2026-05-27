@@ -80,3 +80,10 @@ class CheckExerciseRequest(BaseModel):
     requiredPatterns: list[str] = Field(default_factory=list)
     hints: list[str] = Field(default_factory=list)
     currentHintLevel: int = 0
+
+
+class MasterPlanRequest(BaseModel):
+    domain: str | None = None
+    outcomes: list[str] = Field(default_factory=list)
+    excludeCompleted: bool = True
+    excludeKeys: list[str] = Field(default_factory=list)
