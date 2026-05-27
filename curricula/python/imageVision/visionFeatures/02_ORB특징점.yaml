@@ -49,7 +49,7 @@ intro:
       detail: 회전 후에도 유사한 키포인트가 잡히는지 봅니다.
     runtime:
     - label: 비전 환경
-      detail: opencv-python의 ORB는 별도 설치 없이 기본 패키지에 포함됩니다.
+      detail: opencv-python을 meta.packages에 선언하면 ORB가 모듈에 그대로 포함됩니다.
     - label: 검증 흐름
       detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
 sections:
