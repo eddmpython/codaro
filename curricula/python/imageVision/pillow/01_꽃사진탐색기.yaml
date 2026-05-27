@@ -17,7 +17,7 @@ meta:
   - thumbnail
   seo:
     title: Pillow 입문 - 꽃 사진 탐색기
-    description: Pillow로 이미지를 열고 기본 정보를 확인합니다. 크기, 모드, 포맷을 파악하고 썸네일을 생성합니다.
+    description: Pillow Image 객체로 sklearn 샘플 이미지를 열고 size/mode/format을 손으로 확인합니다.
     keywords:
     - Pillow
     - Image.open
@@ -27,253 +27,417 @@ meta:
     - 이미지처리
 intro:
   emoji: 🌸
-  goal: sklearn의 꽃 이미지를 열어 기본 정보를 확인하고 썸네일을 생성합니다.
-  description: 이미지 파일을 열고, 크기(size), 색상 모드(mode), 포맷(format)을 확인합니다. 또한 thumbnail() 메서드로 작은 미리보기 이미지를
-    만들어봅니다.
-  direction: 꽃사진탐색기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: sklearn 샘플을 Pillow Image로 변환해 size/mode/format을 dict로 검증하고, thumbnail vs resize 차이를 손으로 비교합니다.
+  description: Pillow Image는 ndarray와 다른 추상화입니다. size는 (W, H) 순서로 NumPy의 (H, W, C)와 정반대이고, mode는 색공간을 문자열로 표현합니다.
+  direction: load_sample_image → Image.fromarray → size/mode 점검 → thumbnail/resize 비교 → 메타데이터 검증 함수 흐름.
   benefits:
-  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
-  - 꽃사진탐색기 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
-  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
+  - Pillow size가 (width, height)고 NumPy shape의 (height, width)와 반대임을 확인합니다.
+  - mode 문자열(RGB, L, RGBA)이 색공간을 어떻게 표현하는지 봅니다.
+  - thumbnail은 비율 유지 + in-place, resize는 정확 크기 + 새 객체임을 직접 비교합니다.
+  - validateImageInfo로 입력 안전을 함수 입구에서 강제합니다.
   diagram:
     steps:
-    - label: 1단계. 라이브러리와 이미지 입력 확인
-      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. 이미지 정보 확인 처리 실행
-      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. 썸네일 생성 결과 검증
-      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
-    - label: 꽃사진탐색기 재사용
-      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
+    - label: ndarray → Image
+      detail: load_sample_image로 받은 ndarray를 Image.fromarray로 Pillow 객체로 변환합니다.
+    - label: size/mode/format
+      detail: size, mode, format 세 속성으로 객체 식별 정보를 얻습니다.
+    - label: thumbnail
+      detail: 비율 유지 + in-place 동작을 .copy() 사본에 적용해 원본 보존을 확인합니다.
+    - label: resize
+      detail: 정확한 크기 지정 + 새 객체 반환을 thumbnail과 비교합니다.
+    - label: 메타데이터 검증
+      detail: mode와 size 조건을 만족하지 않으면 ValueError로 차단하는 함수를 만듭니다.
     runtime:
-    - label: 이미지 처리 환경
-      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 꽃사진탐색기 실행
-      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
-    - label: 꽃사진탐색기 완료
-      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
+    - label: pillow 패키지
+      detail: meta.packages의 pillow가 가상환경에 있어야 from PIL import Image가 통과합니다.
+    - label: scikit-learn 샘플
+      detail: load_sample_image는 네트워크 없이 메모리에 RGB ndarray를 로드합니다.
+    - label: 단일 노트북 변수 공유
+      detail: 첫 셀에서 만든 flowerImage가 이후 모든 셀의 공통 입력입니다.
 sections:
 - id: step1_import
-  title: 1단계. 라이브러리와 이미지 불러오기
+  title: 1단계. ndarray → Pillow Image
   structuredPrimary: true
-  subtitle: sklearn 내장 이미지
-  goal: 1단계. 라이브러리와 이미지 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: load_sample_image + fromarray
+  goal: sklearn load_sample_image로 받은 ndarray를 Image.fromarray로 Pillow Image 객체로 변환하고 객체 타입을 확인합니다.
+  why: Pillow는 ndarray와 별개의 객체 표현입니다. fromarray로 변환하는 한 줄을 손으로 적어 두면 두 객체 간 변환 흐름이 자연스러워집니다.
   explanation: |-
-    sklearn에는 학습용 샘플 이미지가 내장되어 있습니다. load_sample_image() 함수로 china.jpg와 flower.jpg를 불러올 수 있습니다. 이 이미지는 NumPy 배열로 반환되므로 Pillow의 Image.fromarray()로 변환합니다.
-
-    load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB 3채널입니다.
+    sklearn load_sample_image('flower.jpg')는 (H, W, 3) RGB ndarray를 돌려줍니다. Image.fromarray(arr)는 같은 데이터를 Pillow Image 객체로 감싸 줍니다. 둘은 메모리를 공유합니다.
+    Image 객체는 .size, .mode 같은 메서드 호출에 적합한 표현이고, ndarray는 픽셀 인덱싱과 NumPy 산술에 적합한 표현입니다. 작업에 따라 둘 사이를 자유롭게 오가는 게 표준입니다.
+    type 확인은 dict 한 키로 단순 검증할 수 있습니다.
   tips:
-  - load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB
-    3채널입니다.
+  - Image.open(path)는 파일 경로에서 직접 Image를 만듭니다. sklearn 샘플은 ndarray라 fromarray가 필요합니다.
+  - np.asarray(image)로 Image를 다시 ndarray로 만들 수 있습니다. 메모리는 공유됩니다.
   snippet: |-
     from PIL import Image
     from sklearn.datasets import load_sample_image
 
-    flowerArr = load_sample_image('flower.jpg')
-    flowerArr.shape
+    flowerArray = load_sample_image('flower.jpg')
+    flowerImage = Image.fromarray(flowerArray)
+
+    {
+        'arrayType': type(flowerArray).__name__,
+        'imageType': type(flowerImage).__name__,
+        'arrayShape': flowerArray.shape,
+    }
   exercise:
-    prompt: 1단계. 라이브러리와 이미지 불러오기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: china 샘플로 chinaImage를 만들고 type 이름이 'JpegImageFile'가 아니라 'Image'인지 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
 
-      flowerArr = load_sample_image('flower.jpg')
-      flowerArr.shape
+      chinaArray = load_sample_image('china.jpg')
+      chinaImage = Image.___(chinaArray)
+
+      {'type': type(chinaImage).__name__, 'shape': chinaArray.shape}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - ndarray로 Image를 만드는 클래스 메서드는 fromarray입니다.
+    - 빈칸에는 fromarray가 들어갑니다.
+    check:
+      noError: load_sample_image와 Image.fromarray가 NameError 없이 끝나야 합니다.
+      resultCheck: shape가 (427, 640, 3)이어야 합니다.
   check:
-    noError: 1단계. 라이브러리와 이미지 불러오기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 라이브러리와 이미지 불러오기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: load_sample_image와 fromarray가 끝나야 합니다.
+    resultCheck: arrayType이 'ndarray', imageType이 'Image' 계열이어야 합니다.
 - id: step2_info
-  title: 2단계. 이미지 정보 확인
+  title: 2단계. size, mode, format
   structuredPrimary: true
-  subtitle: size, mode, format
-  goal: 2단계. 이미지 정보 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: Pillow Image 객체는 여러 속성을 제공합니다. size는 (너비, 높이) 튜플, mode는 색상 모드(RGB, L 등), format은 파일 포맷입니다.
-    배열에서 변환한 이미지는 format이 None입니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    width, height = img.size
-    width, height
-  exercise:
-    prompt: 2단계. 이미지 정보 확인 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      width, height = img.size
-      width, height
-    hints:
-    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
-    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
-  check:
-    noError: 2단계. 이미지 정보 확인의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 이미지 정보 확인 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step3_thumbnail
-  title: 3단계. 썸네일 생성
-  structuredPrimary: true
-  subtitle: thumbnail()
-  goal: 3단계. 썸네일 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 세 속성 한 번에
+  goal: Pillow Image의 size, mode, format 세 속성을 dict로 묶어 NumPy shape (427, 640, 3)이 Pillow에서 (640, 427)으로 표현됨을 확인합니다.
+  why: Pillow size의 (width, height) 순서는 NumPy shape의 (height, width, channels) 순서와 정반대입니다. 이 한 가지가 두 라이브러리를 섞을 때 가장 자주 헷갈리는 함정이라 한 번 명확히 잡고 가야 합니다.
   explanation: |-
-    thumbnail() 메서드는 이미지를 지정한 크기 내에 맞게 축소합니다. 원본 비율을 유지하면서 최대 크기를 제한합니다. 주의할 점은 thumbnail()이 원본 이미지를 직접 수정한다는 것입니다. 원본을 보존하려면 copy()로 복사본을 만들어야 합니다.
-
-    thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를 사용하세요.
+    Image.size는 항상 (width, height) 2-tuple입니다. ndarray.shape의 첫 두 축과 순서가 뒤집힙니다.
+    Image.mode는 색공간 문자열입니다. 일반 컬러는 'RGB', 그레이스케일은 'L', 알파 포함은 'RGBA', 32-bit float 라벨 마스크는 'I' 등이 있습니다.
+    Image.format은 원본 파일 포맷('JPEG', 'PNG' 등)을 돌려주지만, fromarray로 만든 Image는 파일에서 온 게 아니라 None입니다.
   tips:
-  - thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를
-    사용하세요.
-  snippet: |-
-    thumb = img.copy()
-    thumb.size
-  exercise:
-    prompt: 3단계. 썸네일 생성 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      thumb = img.copy()
-      thumb.size
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 3단계. 썸네일 생성의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. 썸네일 생성 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step4_resize
-  title: 4단계. 리사이즈
-  structuredPrimary: true
-  subtitle: resize()
-  goal: 4단계. 리사이즈에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    resize()는 정확한 크기로 이미지를 변환합니다. thumbnail()과 달리 비율을 무시하고 지정한 크기로 변환합니다. resize()는 새 이미지를 반환하고 원본은 유지됩니다.
-
-    resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율 계산 후 resize()를 사용하세요.
-  tips:
-  - resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율
-    계산 후 resize()를 사용하세요.
-  snippet: |-
-    square = img.resize((200, 200))
-    square.size
-  exercise:
-    prompt: 4단계. 리사이즈 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      square = img.resize((200, 200))
-      square.size
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 4단계. 리사이즈의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 리사이즈 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step5_display
-  title: 5단계. 나란히 비교
-  structuredPrimary: true
-  subtitle: 원본과 썸네일
-  goal: 5단계. 나란히 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 원본 이미지와 생성한 썸네일, 리사이즈 이미지를 비교해봅시다. 각각의 크기 차이를 확인할 수 있습니다.
-  tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: |-
-    original = img.size
-    thumbSize = thumb.size
-    squareSize = square.size
-    original, thumbSize, squareSize
-  exercise:
-    prompt: 5단계. 나란히 비교 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      original = img.size
-      thumbSize = thumb.size
-      squareSize = square.size
-      original, thumbSize, squareSize
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 5단계. 나란히 비교의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 나란히 비교 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: china 이미지 탐색
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    sklearn의 china.jpg 이미지를 불러와 정보를 확인하고 썸네일을 생성해봅시다. 위에서 배운 size, mode 속성 확인과 thumbnail(), resize() 메서드를 직접 적용해봅니다.
-
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - Image.size[0]은 너비(가로 픽셀 수), Image.size[1]은 높이(세로 픽셀 수)입니다.
+  - mode 'L'은 8-bit 그레이스케일, '1'은 1-bit 흑백입니다. 'L'이 일반적입니다.
   snippet: |-
     from PIL import Image
     from sklearn.datasets import load_sample_image
 
-    chinaArr = load_sample_image('china.jpg')
-    china = Image.fromarray(chinaArr)
-    china.size, china.mode
+    infoImage = Image.fromarray(load_sample_image('flower.jpg'))
+
+    {
+        'size': infoImage.size,
+        'sizeIsWidthHeight': infoImage.size == (640, 427),
+        'mode': infoImage.mode,
+        'format': infoImage.format,
+    }
   exercise:
-    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: 같은 이미지의 size를 height/width 분해해 NumPy shape의 첫 두 축이 거꾸로 나오는지 한 줄에 확인하세요.
     starterCode: |-
       from PIL import Image
       from sklearn.datasets import load_sample_image
 
-      chinaArr = load_sample_image('china.jpg')
-      china = Image.fromarray(chinaArr)
-      china.size, china.mode
+      flipImage = Image.fromarray(load_sample_image('flower.jpg'))
+      flipArr = load_sample_image('flower.jpg')
+
+      width, height = flipImage.size
+      {'width': width, 'height': height, 'matchesArray': (height, width) == flipArr.shape[:___]}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - shape의 앞 두 축만 비교하므로 슬라이스 끝은 2입니다.
+    - 빈칸에는 2가 들어갑니다.
+    check:
+      noError: Image.fromarray와 size 분해가 끝나야 합니다.
+      resultCheck: matchesArray가 True여야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: workflow_validation
-  title: 6단계. 이미지 메타데이터 검증 루프
+    noError: Image.fromarray와 속성 호출이 끝나야 합니다.
+    resultCheck: sizeIsWidthHeight가 True, mode가 'RGB', format이 None이어야 합니다.
+- id: step3_thumbnail
+  title: 3단계. thumbnail (비율 유지 + in-place)
   structuredPrimary: true
-  subtitle: size, mode, thumbnail 확인
-  goal: 6단계. 이미지 메타데이터 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 이미지를 여는 법을 배웠다면 다음 단계는 입력 이미지가 기대한 크기와 mode인지 검증하는 것입니다. 로컬에서 꽃 모양 이미지를 만들고 썸네일 생성 규칙을
-    assert로 확인합니다.
+  subtitle: 원본 보존을 위해 .copy() 필수
+  goal: copy로 만든 사본에 thumbnail((150, 150))을 적용해 비율이 유지된 크기로 줄어들고, 원본 size는 변하지 않는지 확인합니다.
+  why: thumbnail은 원본 객체를 직접 수정하는 in-place 메서드입니다. 호출 후 원본을 더 못 쓰게 되므로 사본 패턴을 손으로 한 번 굳히지 않으면 운영에서 의도치 않게 원본이 망가집니다.
+  explanation: |-
+    Image.thumbnail((maxWidth, maxHeight))는 원본 비율을 유지하면서 두 변이 max값 이하가 되도록 축소합니다. 원본 비율 640:427인 이미지에 (150, 150)을 주면 결과는 150:100 정도가 됩니다.
+    이 메서드는 None을 돌려주고 호출 객체를 직접 수정합니다. 원본을 보존하려면 .copy() 사본을 먼저 만들고 그 사본에 thumbnail을 호출해야 합니다.
+    검증은 원본과 사본의 size가 다르고, 사본의 size가 (150, 150) 안에 들어가는지로 합니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 같은 비율을 정확한 크기로 만들려면 resize를 쓰는 게 더 안전합니다. thumbnail은 "이하"만 보장합니다.
+  - thumbnail에 Image.Resampling.LANCZOS 같은 리샘플링 옵션을 줄 수 있습니다. 기본은 BICUBIC입니다.
   snippet: |-
-    from PIL import Image, ImageDraw, ImageStat
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
 
-    flowerImage = Image.new("RGB", (180, 120), (235, 245, 255))
-    flowerDraw = ImageDraw.Draw(flowerImage)
-    for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
-        flowerDraw.ellipse(box, fill=(238, 90, 150))
-    flowerDraw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
+    thumbnailOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    thumbnailCopy = thumbnailOriginal.copy()
+    thumbnailCopy.thumbnail((150, 150))
 
-    def validateImageInfo(image):
-        if image.mode != "RGB":
-            raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-        if image.size[0] < 100 or image.size[1] < 80:
-            raise ValueError(f"이미지가 너무 작습니다: {image.size}")
+    {
+        'originalSize': thumbnailOriginal.size,
+        'thumbnailSize': thumbnailCopy.size,
+        'originalUnchanged': thumbnailOriginal.size == (640, 427),
+        'thumbnailFitsBox': thumbnailCopy.size[0] <= 150 and thumbnailCopy.size[1] <= 150,
+        'ratioPreserved': abs(thumbnailCopy.size[0] / thumbnailCopy.size[1] - 640 / 427) < 0.05,
+    }
+  exercise:
+    prompt: thumbnail을 사본 없이 원본에 직접 호출하면 원본 size가 바뀌는지 확인하세요. 다음 셀에서 원본을 다시 쓰면 안 됨을 명심합니다.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      mutateImage = Image.fromarray(load_sample_image('flower.jpg'))
+      beforeSize = mutateImage.size
+      mutateImage.___((100, 100))
+      afterSize = mutateImage.size
+
+      {'beforeSize': beforeSize, 'afterSize': afterSize, 'mutated': beforeSize != afterSize}
+    hints:
+    - thumbnail 메서드 이름은 그대로 thumbnail입니다.
+    - 빈칸에는 thumbnail이 들어갑니다.
+    check:
+      noError: thumbnail 호출이 끝나야 합니다.
+      resultCheck: mutated가 True이고 beforeSize가 (640, 427), afterSize의 두 값이 모두 100 이하여야 합니다.
+  check:
+    noError: copy와 thumbnail 호출이 끝나야 합니다.
+    resultCheck: originalUnchanged, thumbnailFitsBox, ratioPreserved 모두 True여야 합니다.
+- id: step4_resize
+  title: 4단계. resize (정확 크기 + 새 객체)
+  structuredPrimary: true
+  subtitle: 비율 무시 가능
+  goal: resize((200, 200))으로 정확한 정사각형 이미지를 만들고, 원본 size가 그대로인지(thumbnail과 달리)를 확인합니다.
+  why: thumbnail과 resize의 두 가지 차이가 핵심입니다. 비율 유지 여부와 in-place 여부. 이 둘을 한 셀에서 직접 비교해야 어느 상황에 무엇을 쓸지 명확해집니다.
+  explanation: |-
+    Image.resize((width, height))는 비율을 무시하고 지정 크기로 변환합니다. 결과는 새 Image 객체이고 원본은 그대로 유지됩니다.
+    정사각형이 아닌 입력을 정사각형으로 resize하면 가로/세로가 다르게 압축되어 찌그러진 결과가 나옵니다. 비율을 유지하면서 정확한 크기로 만들려면 letterbox(공백 채우기) 기법이 필요합니다.
+    resize도 thumbnail처럼 리샘플링 옵션을 받습니다. 축소에는 LANCZOS, 확대에는 BICUBIC이 일반적입니다.
+  tips:
+  - "Image.Resampling.LANCZOS는 Pillow 9.1+에서 권장됩니다. 이전에는 Image.LANCZOS였습니다."
+  - 정사각 비율로 padding하려면 ImageOps.fit이나 ImageOps.pad가 편합니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    resizeOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    resizeSquare = resizeOriginal.resize((200, 200))
+
+    {
+        'originalSize': resizeOriginal.size,
+        'squareSize': resizeSquare.size,
+        'originalUnchanged': resizeOriginal.size == (640, 427),
+        'isExactlySquare': resizeSquare.size == (200, 200),
+        'ratioChanged': resizeSquare.size[0] / resizeSquare.size[1] != resizeOriginal.size[0] / resizeOriginal.size[1],
+    }
+  exercise:
+    prompt: 비율을 유지하면서 width=300으로 resize하려면 height를 어떻게 계산해야 하는지 직접 짜 보세요. 결과 height가 200 ~ 202 범위여야 합니다.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      ratioImage = Image.fromarray(load_sample_image('flower.jpg'))
+      newWidth = 300
+      newHeight = round(newWidth * ratioImage.size[1] / ratioImage.size[___])
+      ratioResized = ratioImage.resize((newWidth, newHeight))
+
+      {'size': ratioResized.size, 'heightInRange': 200 <= newHeight <= 202}
+    hints:
+    - 원본 너비는 size 인덱스 0에 있습니다.
+    - 빈칸에는 0이 들어갑니다.
+    check:
+      noError: resize 호출이 끝나야 합니다.
+      resultCheck: size의 첫 값이 300, heightInRange가 True여야 합니다.
+  check:
+    noError: resize 호출과 dict 구성이 끝나야 합니다.
+    resultCheck: originalUnchanged, isExactlySquare 모두 True여야 합니다.
+- id: step5_display
+  title: 5단계. 세 크기 비교 dict
+  structuredPrimary: true
+  subtitle: 원본 vs thumbnail vs resize
+  goal: 한 셀에서 원본/thumbnail/resize 세 크기를 dict로 묶어 한 번에 비교하고, 비율 유지 여부와 영역 크기 차이를 정량 확인합니다.
+  why: 세 결과의 size를 한 dict에 모아 두면 비율 유지(thumbnail)와 비율 무시(resize)의 차이가 한눈에 보입니다. 자동화 코드에서 어떤 결과가 적합한지 판단하는 표준 출력 형식입니다.
+  explanation: |-
+    같은 원본 이미지를 두 가지 방식으로 줄여 보면 결과 size의 형태가 다릅니다. thumbnail은 비율 유지로 직사각형이 유지되고, resize는 지정한 정사각 크기 그대로입니다.
+    dict 키를 'original'/'thumbnail'/'resize'로 통일하면 다른 입력에 같은 함수를 돌려도 같은 형식의 결과를 얻을 수 있습니다.
+    pixelCount도 함께 비교하면 두 방식의 결과가 픽셀 수에서 얼마나 다른지 정량 확인할 수 있습니다.
+  tips:
+  - dict 형식의 비교 결과는 노트북뿐 아니라 단위 테스트 입력으로도 그대로 활용됩니다.
+  - 픽셀 수 = size[0] * size[1]로 단순 계산합니다. mode가 RGB라면 총 byte는 ×3입니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    compareOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    compareThumbnail = compareOriginal.copy()
+    compareThumbnail.thumbnail((150, 150))
+    compareResize = compareOriginal.resize((200, 200))
+
+    {
+        'original': {'size': compareOriginal.size, 'pixels': compareOriginal.size[0] * compareOriginal.size[1]},
+        'thumbnail': {'size': compareThumbnail.size, 'pixels': compareThumbnail.size[0] * compareThumbnail.size[1]},
+        'resize': {'size': compareResize.size, 'pixels': compareResize.size[0] * compareResize.size[1]},
+        'thumbnailKeepsRatio': abs(compareThumbnail.size[0] / compareThumbnail.size[1] - compareOriginal.size[0] / compareOriginal.size[1]) < 0.05,
+        'resizeIgnoresRatio': compareResize.size[0] == compareResize.size[1],
+    }
+  exercise:
+    prompt: china 샘플로 같은 비교를 만들어 thumbnailKeepsRatio가 True인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaCompare = Image.fromarray(load_sample_image('___'))
+      chinaThumb = chinaCompare.copy()
+      chinaThumb.thumbnail((100, 100))
+
+      {'originalSize': chinaCompare.size, 'thumbSize': chinaThumb.size, 'keepsRatio': abs(chinaThumb.size[0] / chinaThumb.size[1] - chinaCompare.size[0] / chinaCompare.size[1]) < 0.05}
+    hints:
+    - china 샘플 파일명은 'china.jpg'입니다.
+    - 빈칸에는 china.jpg가 들어갑니다.
+    check:
+      noError: load_sample_image와 thumbnail 호출이 끝나야 합니다.
+      resultCheck: keepsRatio가 True여야 합니다.
+  check:
+    noError: 세 객체 생성과 dict 구성이 끝나야 합니다.
+    resultCheck: thumbnailKeepsRatio가 True이고 resizeIgnoresRatio가 True여야 합니다.
+- id: practice
+  title: 실습 — china 메타데이터 진단
+  structuredPrimary: true
+  subtitle: describeImage 함수
+  goal: describeImage(image) 함수가 size/mode/format/pixelCount 네 키를 가진 진단 dict를 돌려주도록 만들고, flower와 china 두 입력에 같은 형식으로 적용합니다.
+  why: 진단 함수는 새 이미지가 들어왔을 때 "이게 어떤 데이터인지" 한 번에 보고받는 도구입니다. 일관된 dict 형식으로 두면 비교와 단위 테스트가 모두 쉬워집니다.
+  explanation: |-
+    describeImage 함수는 Image 객체를 받아 4개 키 dict를 돌려줍니다. size, mode, format은 속성 그대로, pixelCount는 size 두 값의 곱으로 계산합니다.
+    flower와 china 두 입력에 같은 함수를 돌리면 같은 형식의 결과 dict가 두 개 나옵니다. 이 형식은 자동화 보고서, 단위 테스트, CSV 출력 모두에 그대로 활용됩니다.
+    실무에서는 함수에 더 많은 키(mtime, file_size 등)를 추가할 수 있습니다. 단, 한 번 정의한 키는 일관되게 유지해야 후속 처리가 깨지지 않습니다.
+  tips:
+  - format=None이 의미 있게 표시되도록 그대로 두는 게 좋습니다. fromarray로 만든 객체는 항상 None입니다.
+  - 진단 함수는 read-only로 동작합니다. .copy() 없이도 원본을 건드리지 않습니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def describeImage(image: Image.Image) -> dict:
+        width, height = image.size
+        return {
+            'size': image.size,
+            'mode': image.mode,
+            'format': image.format,
+            'pixelCount': width * height,
+        }
+
+
+    flowerSample = Image.fromarray(load_sample_image('flower.jpg'))
+    chinaSample = Image.fromarray(load_sample_image('china.jpg'))
+
+    {
+        'flower': describeImage(flowerSample),
+        'china': describeImage(chinaSample),
+    }
+  exercise:
+    prompt: describeImage에 'isRgb' 키를 추가해 mode == 'RGB' 결과를 함께 돌려주고, flower 결과에서 True인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def describeImageExtended(image):
+          width, height = image.size
+          return {
+              'size': image.size,
+              'mode': image.mode,
+              'pixelCount': width * height,
+              'isRgb': image.mode == '___',
+          }
+
+
+      flowerExt = Image.fromarray(load_sample_image('flower.jpg'))
+      describeImageExtended(flowerExt)
+    hints:
+    - mode 값은 'RGB'입니다.
+    - 빈칸에는 RGB가 들어갑니다.
+    check:
+      noError: describeImageExtended 정의와 호출이 끝나야 합니다.
+      resultCheck: 결과 dict의 isRgb가 True여야 합니다.
+  check:
+    noError: describeImage 정의와 두 호출이 끝나야 합니다.
+    resultCheck: flower와 china 모두 size, mode, format, pixelCount 네 키를 가져야 합니다.
+- id: workflow_validation
+  title: 6단계. 입력 메타데이터 가드 함수
+  structuredPrimary: true
+  subtitle: validateImageInfo + thumbnail 결과 검증
+  goal: validateImageInfo 함수가 mode != 'RGB'나 너무 작은 이미지를 ValueError로 차단하고, 정상 입력에서는 thumbnail 결과가 기대 크기 안에 있는지 회귀 테스트로 확인합니다.
+  why: 자동화 파이프라인에서 입력 이미지의 mode와 size가 가정과 다르면 후속 처리가 조용히 잘못된 결과를 냅니다. 함수 입구에서 명확한 ValueError로 차단하면 운영에서 디버깅 시간이 크게 줄어듭니다.
+  explanation: |-
+    validateImageInfo는 (1) mode == 'RGB', (2) size[0] >= minWidth, (3) size[1] >= minHeight 세 조건을 검사합니다. 하나라도 깨지면 실제 받은 값을 메시지에 포함한 ValueError를 던집니다.
+    Pillow ImageDraw로 만든 합성 입력은 정답 size를 정확히 알 수 있어 검증에 적합합니다. (180, 120) 캔버스에 도형을 그린 결과는 size (180, 120) RGB가 보장됩니다.
+    thumbnail 결과의 size가 (60, 60) 이하인지 검증해 thumbnail이 기대대로 축소했는지 회귀 테스트로 둡니다.
+  tips:
+  - validateImageInfo는 다른 함수의 첫 줄에서 호출해 입력을 한 번에 보호하는 패턴이 표준입니다.
+  - "ValueError 메시지에 실제 받은 값을 포함시키면 호출자가 즉시 원인을 알 수 있습니다."
+  snippet: |-
+    from PIL import Image, ImageDraw
+
+
+    def validateImageInfo(image: Image.Image, minWidth: int = 100, minHeight: int = 80) -> bool:
+        if image.mode != 'RGB':
+            raise ValueError(f"RGB 이미지가 아닙니다: mode={image.mode}")
+        if image.size[0] < minWidth or image.size[1] < minHeight:
+            raise ValueError(f"이미지가 너무 작습니다: size={image.size}, 기대 {(minWidth, minHeight)} 이상")
         return True
 
-    validateImageInfo(flowerImage)
+
+    syntheticImage = Image.new('RGB', (180, 120), (235, 245, 255))
+    draw = ImageDraw.Draw(syntheticImage)
+    for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
+        draw.ellipse(box, fill=(238, 90, 150))
+    draw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
+
+    okResult = validateImageInfo(syntheticImage)
+
+    grayscaleImage = syntheticImage.convert('L')
+    try:
+        validateImageInfo(grayscaleImage)
+        grayMessage = 'unexpected pass'
+    except ValueError as exc:
+        grayMessage = str(exc)
+
+    tinyImage = syntheticImage.resize((50, 50))
+    try:
+        validateImageInfo(tinyImage)
+        tinyMessage = 'unexpected pass'
+    except ValueError as exc:
+        tinyMessage = str(exc)
+
+    thumbnailed = syntheticImage.copy()
+    thumbnailed.thumbnail((60, 60))
+
+    {
+        'okResult': okResult,
+        'grayMessage': grayMessage,
+        'tinyMessage': tinyMessage,
+        'thumbnailedSize': thumbnailed.size,
+        'thumbnailFitsBox': thumbnailed.size[0] <= 60 and thumbnailed.size[1] <= 60,
+    }
   exercise:
-    prompt: 6단계. 이미지 메타데이터 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: validateImageInfo에 RGBA 이미지를 넘기면 mode 오류가 나오는지 확인하세요. syntheticImage.convert('RGBA')로 RGBA 사본을 만들 수 있습니다.
     starterCode: |-
-      from PIL import Image, ImageDraw, ImageStat
+      from PIL import Image, ImageDraw
 
-      flowerImage = Image.new("RGB", (180, 120), (235, 245, 255))
-      flowerDraw = ImageDraw.Draw(flowerImage)
-      for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
-          flowerDraw.ellipse(box, fill=(238, 90, 150))
-      flowerDraw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
 
-      def validateImageInfo(image):
-          if image.mode != "RGB":
-              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
-          if image.size[0] < 100 or image.size[1] < 80:
-              raise ValueError(f"이미지가 너무 작습니다: {image.size}")
+      def validateImageInfo(image, minWidth=100, minHeight=80):
+          if image.mode != 'RGB':
+              raise ValueError(f"RGB 이미지가 아닙니다: mode={image.mode}")
+          if image.size[0] < minWidth or image.size[1] < minHeight:
+              raise ValueError(f"이미지가 너무 작습니다: size={image.size}")
           return True
 
-      validateImageInfo(flowerImage)
+
+      rgbaImage = Image.new('___', (180, 120), (235, 245, 255, 200))
+      try:
+          validateImageInfo(rgbaImage)
+          rgbaMessage = 'unexpected pass'
+      except ValueError as exc:
+          rgbaMessage = str(exc)
+
+      {'rgbaMessage': rgbaMessage, 'hasRgbaHint': 'RGBA' in rgbaMessage}
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 4채널 RGBA 모드 문자열은 'RGBA'입니다.
+    - 빈칸에는 RGBA가 들어갑니다.
+    check:
+      noError: validateImageInfo 정의가 끝나야 합니다.
+      resultCheck: hasRgbaHint가 True여야 합니다.
   check:
-    noError: 6단계. 이미지 메타데이터 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 이미지 메타데이터 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: validateImageInfo 정의와 세 호출이 끝나야 합니다.
+    resultCheck: okResult가 True, grayMessage에 'RGB' 단서, tinyMessage에 'size' 단서, thumbnailFitsBox가 True여야 합니다.
