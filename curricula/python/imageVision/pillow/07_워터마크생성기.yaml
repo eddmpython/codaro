@@ -1,5 +1,6 @@
 meta:
   packages:
+  - numpy
   - pillow
   - scikit-learn
   id: pillow_07
@@ -18,7 +19,7 @@ meta:
   - 워터마크
   seo:
     title: Pillow 중급 - 워터마크 생성기
-    description: Pillow로 이미지에 텍스트 워터마크를 추가합니다. ImageDraw와 투명도 처리를 배웁니다.
+    description: Pillow ImageDraw로 텍스트 그리기, RGBA 알파 채널로 반투명 워터마크를 합성합니다.
     keywords:
     - Pillow
     - 워터마크
@@ -28,279 +29,445 @@ meta:
     - alpha
 intro:
   emoji: 💧
-  goal: 이미지에 반투명 텍스트 워터마크를 추가합니다.
-  description: ImageDraw.text()로 텍스트를 그리고, RGBA 모드와 paste()로 반투명 워터마크를 합성합니다. 저작권 표시나 브랜딩에 활용되는 기법입니다.
-  direction: 워터마크생성기에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  goal: ImageDraw로 텍스트를 그리고 RGBA mode + paste(mask=alpha)로 반투명 워터마크를 합성하는 흐름을 정량 검증합니다.
+  description: 워터마크는 RGBA 알파 채널로 투명도를 다루는 표준 사례입니다. ImageDraw.text와 paste의 mask 인자 두 도구가 핵심입니다.
+  direction: ImageDraw.text → RGBA 변환 → alpha 마스크로 paste → 위치 정렬 흐름.
   benefits:
-  - 이미지 파일과 픽셀 값 확인 후 이미지 변환/합성/저장에 맞는 코드 입력을 고릅니다.
-  - 워터마크생성기 결과를 이미지 크기, 모드, 채널, 저장 파일 기준으로 즉시 점검합니다.
-  - 완료한 코드를 이미지 일괄 처리 자동화에 다시 사용할 수 있습니다.
+  - ImageDraw.text의 (x, y)와 fill 인자 동작을 확인합니다.
+  - convert('RGBA')로 알파 채널을 추가하는 흐름을 봅니다.
+  - paste(image, position, mask)의 mask가 픽셀별 합성 강도를 결정함을 검증합니다.
+  - textbbox로 텍스트 크기를 측정해 위치를 자동 정렬합니다.
   diagram:
     steps:
-    - label: 1단계. 기본 이미지 준비 입력 확인
-      detail: 입력 기준(이미지 파일과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 2단계. 기본 텍스트 삽입 처리 실행
-      detail: 이미지 변환/합성/저장 코드를 실행해 중간 결과를 확인합니다.
-    - label: 3단계. RGBA 모드 결과 검증
-      detail: 이미지 크기, 모드, 채널, 저장 파일 기준으로 실행 결과를 비교합니다.
-    - label: 워터마크생성기 재사용
-      detail: 완성 코드를 이미지 일괄 처리 자동화에 붙일 수 있게 정리합니다.
+    - label: 베이스 이미지
+      detail: flower 샘플을 RGBA로 변환해 알파 합성에 적합한 형식으로 준비.
+    - label: ImageDraw.text
+      detail: 텍스트를 RGBA Image에 그려 워터마크 레이어 생성.
+    - label: 알파 채널로 합성
+      detail: paste(layer, position, mask=layer)로 반투명 합성.
+    - label: 텍스트 박스 정렬
+      detail: textbbox로 텍스트 크기를 재 우측 하단에 자동 배치.
+    - label: 가드 함수
+      detail: alpha 값이 0~255 범위인지 검증.
     runtime:
-    - label: 이미지 처리 환경
-      detail: pillow, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
-    - label: 워터마크생성기 실행
-      detail: 셀을 실행해 이미지 크기, 모드, 채널, 저장 파일와 예외 상태를 확인합니다.
-    - label: 워터마크생성기 완료
-      detail: 검증된 코드를 이미지 일괄 처리 자동화로 남깁니다.
+    - label: pillow + numpy
+      detail: 합성 결과 픽셀을 NumPy로 검증.
+    - label: RGBA 모드 필수
+      detail: 알파 합성은 RGBA에서만 동작. RGB는 convert('RGBA')로 변환.
 sections:
 - id: step1_load
-  title: 1단계. 기본 이미지 준비
+  title: 1단계. RGBA 베이스 만들기
   structuredPrimary: true
-  subtitle: 워터마크를 적용할 이미지
-  goal: 1단계. 기본 이미지 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: sklearn의 flower 이미지를 불러옵니다. 워터마크는 보통 사진의 저작권을 표시하거나 브랜드를 각인시키는 데 사용됩니다.
+  subtitle: convert('RGBA')
+  goal: flower 샘플을 RGB로 받아 convert('RGBA')로 알파 채널 추가 후 mode가 'RGBA', 채널이 4개인지 확인합니다.
+  why: 알파 합성은 RGBA 모드에서만 안전하게 동작합니다. RGB 베이스에 직접 paste(mask=...)를 호출하면 의도와 다른 결과가 나옵니다. 첫 셀에서 변환을 명시적으로 해 둡니다.
+  explanation: |-
+    sklearn flower는 (640, 427, 3) RGB ndarray입니다. Image.fromarray로 RGB Image를 만들고 convert('RGBA')로 알파 채널을 추가합니다.
+    결과 mode는 'RGBA', size는 그대로 (640, 427), 채널이 4개로 늘어납니다. 알파 채널의 초기값은 255 (완전 불투명).
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - convert('RGBA')는 알파 채널을 255로 채웁니다. RGB 정보는 그대로 유지됩니다.
+  - 알파 합성 후 RGB로 다시 돌리려면 convert('RGB')를 호출합니다.
   snippet: |-
-    from PIL import Image, ImageDraw
+    import numpy as np
+    from PIL import Image
     from sklearn.datasets import load_sample_image
 
-    flowerArr = load_sample_image('flower.jpg')
-    base = Image.fromarray(flowerArr)
-    base.size, base.mode
+    base = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA')
+    baseArr = np.asarray(base)
+
+    {
+        'mode': base.mode,
+        'size': base.size,
+        'channelCount': baseArr.shape[2],
+        'alphaInitial': int(baseArr[..., 3].mean()),
+    }
   exercise:
-    prompt: 1단계. 기본 이미지 준비 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: china 입력을 같은 흐름으로 RGBA로 변환해 channelCount가 4인지 확인하세요.
     starterCode: |-
-      from PIL import Image, ImageDraw
+      import numpy as np
+      from PIL import Image
       from sklearn.datasets import load_sample_image
 
-      flowerArr = load_sample_image('flower.jpg')
-      base = Image.fromarray(flowerArr)
-      base.size, base.mode
+      chinaBase = Image.fromarray(load_sample_image('china.jpg')).convert('___')
+      {'mode': chinaBase.mode, 'channelCount': np.asarray(chinaBase).shape[2]}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - 알파 포함 mode는 'RGBA'.
+    - 빈칸에는 RGBA가 들어갑니다.
+    check:
+      noError: convert 호출이 끝나야 합니다.
+      resultCheck: channelCount가 4여야 합니다.
   check:
-    noError: 1단계. 기본 이미지 준비의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 1단계. 기본 이미지 준비 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
+    noError: convert와 통계 계산이 끝나야 합니다.
+    resultCheck: mode가 'RGBA', channelCount가 4, alphaInitial이 255여야 합니다.
 - id: step2_simple_text
-  title: 2단계. 기본 텍스트 삽입
+  title: 2단계. ImageDraw.text
   structuredPrimary: true
-  subtitle: ImageDraw.text()
-  goal: 2단계. 기본 텍스트 삽입에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  subtitle: 좌표와 fill 색상
+  goal: ImageDraw.Draw(rgba)로 그리기 객체를 만들고 .text((x, y), msg, fill=color)로 텍스트를 그린 뒤 그 영역 픽셀이 색이 바뀌었는지 확인합니다.
+  why: ImageDraw.text는 모든 텍스트 워터마크의 출발점입니다. (x, y) 좌표가 텍스트 왼쪽 위 모서리이고 fill이 색상이라는 두 인자의 동작을 손으로 확인하면 워터마크 위치 정렬이 자연스러워집니다.
   explanation: |-
-    ImageDraw.Draw()로 그리기 객체를 생성하고 text() 메서드로 텍스트를 삽입합니다. 좌표, 텍스트, 색상을 지정할 수 있습니다. 기본 폰트를 사용하면 크기가 작습니다.
-
-    text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255, 255) RGB 튜플로 지정합니다.
+    ImageDraw.Draw(image)는 image에 in-place 그리기를 가능하게 합니다. 결과는 별도 객체 없이 원본이 직접 수정됩니다.
+    .text((x, y), text, fill=(r, g, b, a))로 텍스트를 그립니다. (x, y)는 텍스트 시작 위치(왼쪽 상단), fill은 (R, G, B, A) 튜플.
+    검증은 텍스트가 그려진 영역의 픽셀이 원본과 다른지로 합니다. text 그린 위치 근처의 픽셀 색이 fill 인자 색으로 바뀌어야 정상 동작입니다.
   tips:
-  - text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255,
-    255) RGB 튜플로 지정합니다.
+  - 기본 폰트는 매우 작습니다. ImageFont.truetype으로 폰트와 크기를 명시하는 게 표준입니다.
+  - ImageDraw는 in-place라 .copy()를 먼저 만들어야 원본이 보존됩니다.
   snippet: |-
-    baseCopy = base.copy()
-    draw = ImageDraw.Draw(baseCopy)
-    type(draw)
-  exercise:
-    prompt: 2단계. 기본 텍스트 삽입 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      baseCopy = base.copy()
-      draw = ImageDraw.Draw(baseCopy)
-      type(draw)
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 2단계. 기본 텍스트 삽입의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 2단계. 기본 텍스트 삽입 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step3_rgba
-  title: 3단계. RGBA 모드
-  structuredPrimary: true
-  subtitle: 투명도 채널
-  goal: 3단계. RGBA 모드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    반투명 워터마크를 만들려면 RGBA 모드를 사용해야 합니다. RGBA는 RGB에 Alpha(투명도) 채널이 추가된 것입니다. Alpha 값이 0이면 완전 투명, 255면 완전 불투명입니다.
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
 
-    Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에 워터마크를 그립니다.
+    textCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    textDraw = ImageDraw.Draw(textCanvas)
+    textDraw.text((10, 10), '워터마크 테스트', fill=(255, 255, 255, 255))
+
+    textArr = np.asarray(textCanvas)
+    {
+        'size': textCanvas.size,
+        'pixelAt12_12': textArr[12, 12].tolist(),
+        'isLightFromWhiteText': textArr[12, 12, 0] > 200 or textArr[12, 12, 1] > 200,
+    }
+  exercise:
+    prompt: 빨강 텍스트를 (100, 100)에 그리고 그 픽셀의 R 채널이 200 이상인지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      redCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      redDraw = ImageDraw.Draw(redCanvas)
+      redDraw.text((100, 100), 'RED', fill=(___, 0, 0, 255))
+
+      redArr = np.asarray(redCanvas)
+      {'rPixel': int(redArr[102, 105, 0]), 'isRed': int(redArr[102, 105, 0]) > 50}
+    hints:
+    - 빨강 채널 값 255를 넣습니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: text 호출이 끝나야 합니다.
+      resultCheck: isRed가 True여야 합니다.
+  check:
+    noError: ImageDraw.text 호출이 끝나야 합니다.
+    resultCheck: isLightFromWhiteText가 True여야 합니다.
+- id: step3_alpha_layer
+  title: 3단계. 알파 레이어와 paste
+  structuredPrimary: true
+  subtitle: paste(layer, position, mask=layer)
+  goal: 투명한 RGBA 레이어에 반투명 텍스트를 그리고 base.paste(layer, (0, 0), mask=layer)로 합성한 뒤 워터마크 영역의 픽셀이 베이스와 텍스트의 블렌딩으로 바뀌었는지 확인합니다.
+  why: paste의 mask 인자가 알파 합성을 결정합니다. layer 자체를 mask로 주면 알파 채널 값에 따라 픽셀별 합성 강도가 정해집니다. 이 패턴이 반투명 워터마크의 표준 구현입니다.
+  explanation: |-
+    Image.new('RGBA', size, (0, 0, 0, 0))으로 완전 투명한 빈 레이어를 만듭니다. 모든 픽셀이 (0, 0, 0, 0).
+    ImageDraw.Draw(layer).text(..., fill=(255, 255, 255, 128))로 반투명 흰 텍스트를 그립니다. 알파=128은 50% 투명.
+    base.paste(layer, (0, 0), mask=layer)는 layer의 알파에 비례한 합성을 base에 적용합니다. base는 in-place 변경됩니다.
+    결과 픽셀이 base와 다른지로 합성이 일어났는지 확인할 수 있습니다.
   tips:
-  - Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에
-    워터마크를 그립니다.
+  - paste의 mask 인자는 L 모드(단채널) 또는 RGBA(알파 채널만) Image를 받습니다. RGBA를 그대로 주면 알파 채널만 사용됩니다.
+  - paste는 in-place로 동작합니다. base.copy()를 먼저 만들어야 원본이 보존됩니다.
   snippet: |-
-    baseRgba = base.convert('RGBA')
-    baseRgba.mode
-  exercise:
-    prompt: 3단계. RGBA 모드 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      baseRgba = base.convert('RGBA')
-      baseRgba.mode
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 3단계. RGBA 모드의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 3단계. RGBA 모드 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step4_watermark_text
-  title: 4단계. 워터마크 텍스트 그리기
-  structuredPrimary: true
-  subtitle: 반투명 텍스트
-  goal: 4단계. 워터마크 텍스트 그리기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    투명 레이어에 반투명 색상으로 텍스트를 그립니다. 색상의 네 번째 값이 Alpha입니다. (255, 255, 255, 128)은 50% 투명한 흰색입니다.
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
 
-    Alpha 값 128은 약 50% 투명입니다. 값을 낮추면 더 투명해지고(흐릿), 높이면 더 불투명해집니다(선명). 워터마크는 보통 80~150 정도의 Alpha가 적당합니다.
-  tips:
-  - Alpha 값 128은 약 50% 투명입니다. 값을 낮추면 더 투명해지고(흐릿), 높이면 더 불투명해집니다(선명). 워터마크는 보통 80~150 정도의 Alpha가 적당합니다.
-  snippet: |-
-    artist = ImageDraw.Draw(watermark)
-    artist.text((50, 50), "WATERMARK", fill=(255, 255, 255, 128))
-    watermark
-  exercise:
-    prompt: 4단계. 워터마크 텍스트 그리기 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      artist = ImageDraw.Draw(watermark)
-      artist.text((50, 50), "WATERMARK", fill=(255, 255, 255, 128))
-      watermark
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 4단계. 워터마크 텍스트 그리기의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 4단계. 워터마크 텍스트 그리기 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step5_composite
-  title: 5단계. 이미지 합성
-  structuredPrimary: true
-  subtitle: alpha_composite()
-  goal: 5단계. 이미지 합성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    alpha_composite()는 두 RGBA 이미지를 투명도를 고려하여 합성합니다. paste()와 달리 Alpha 채널을 올바르게 처리합니다.
+    pasteBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    pasteLayer = Image.new('RGBA', pasteBase.size, (0, 0, 0, 0))
+    pasteDraw = ImageDraw.Draw(pasteLayer)
+    pasteDraw.text((50, 50), 'WATERMARK', fill=(255, 255, 255, 128))
 
-    alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더 직관적입니다.
-  tips:
-  - alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더
-    직관적입니다.
-  snippet: |-
-    combined = Image.alpha_composite(baseRgba, watermark)
-    combined
-  exercise:
-    prompt: 5단계. 이미지 합성 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
-    starterCode: |-
-      combined = Image.alpha_composite(baseRgba, watermark)
-      combined
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 5단계. 이미지 합성의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 5단계. 이미지 합성 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: step6_corner
-  title: 6단계. 코너 워터마크
-  structuredPrimary: true
-  subtitle: 위치 계산
-  goal: 6단계. 코너 워터마크에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    워터마크를 오른쪽 하단 같은 특정 위치에 배치하려면 좌표를 계산해야 합니다. 이미지 크기와 텍스트 크기를 고려하여 위치를 정합니다.
+    baseBefore = np.asarray(pasteBase).copy()
+    pasteBase.paste(pasteLayer, (0, 0), mask=pasteLayer)
+    baseAfter = np.asarray(pasteBase)
 
-    텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Codaro 로컬 Python에서는 기본 폰트만 사용 가능하므로 대략적인 추정치로 위치를 정합니다.
-  tips:
-  - 텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Codaro 로컬 Python에서는 기본 폰트만 사용 가능하므로 대략적인
-    추정치로 위치를 정합니다.
-  snippet: |-
-    cornerMark = Image.new('RGBA', base.size, (0, 0, 0, 0))
-    pencil = ImageDraw.Draw(cornerMark)
-    w, h = base.size
-    w, h
+    diff = np.abs(baseAfter.astype(int) - baseBefore.astype(int))
+    {
+        'shape': baseAfter.shape,
+        'pixelChanged': int(diff.sum()) > 0,
+        'maxDiff': int(diff.max()),
+    }
   exercise:
-    prompt: 6단계. 코너 워터마크 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: 알파 값을 64(더 투명)로 낮춰 합성하면 변화량 합이 알파=128 케이스보다 작은지 확인하세요.
     starterCode: |-
-      cornerMark = Image.new('RGBA', base.size, (0, 0, 0, 0))
-      pencil = ImageDraw.Draw(cornerMark)
-      w, h = base.size
-      w, h
-    hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
-  check:
-    noError: 6단계. 코너 워터마크의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 6단계. 코너 워터마크 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: practice
-  title: 실습
-  structuredPrimary: true
-  subtitle: 워터마크 프로젝트
-  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: |-
-    china 이미지에 다양한 워터마크를 적용해봅시다.
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
 
-    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+      sheerBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      sheerLayer = Image.new('RGBA', sheerBase.size, (0, 0, 0, 0))
+      ImageDraw.Draw(sheerLayer).text((50, 50), 'SHEER', fill=(255, 255, 255, ___))
+      before = np.asarray(sheerBase).copy()
+      sheerBase.paste(sheerLayer, (0, 0), mask=sheerLayer)
+      diff = int(np.abs(np.asarray(sheerBase).astype(int) - before.astype(int)).sum())
+      {'diffSum': diff}
+    hints:
+    - 알파 64는 더 투명.
+    - 빈칸에는 64가 들어갑니다.
+    check:
+      noError: paste 호출이 끝나야 합니다.
+      resultCheck: diffSum이 0 이상이어야 합니다.
+  check:
+    noError: paste 호출과 비교가 끝나야 합니다.
+    resultCheck: pixelChanged가 True여야 합니다.
+- id: step4_textbbox
+  title: 4단계. textbbox로 자동 정렬
+  structuredPrimary: true
+  subtitle: 우측 하단 배치
+  goal: ImageDraw.textbbox로 텍스트 박스 크기를 측정해 우측 하단에서 padding 만큼 떨어진 위치에 자동 정렬해 그립니다.
+  why: 워터마크는 보통 우측 하단에 배치합니다. 텍스트 크기와 이미지 크기가 다르므로 자동 정렬이 필요합니다. textbbox가 그 계산을 가능하게 합니다.
+  explanation: |-
+    ImageDraw.textbbox((x, y), text, font=font)는 텍스트가 차지할 (left, top, right, bottom) 박스를 돌려줍니다. 박스 크기 = (right-left, bottom-top).
+    이미지 크기와 박스 크기, padding을 사용해 우측 하단 (이미지.W - 박스.W - padding, 이미지.H - 박스.H - padding) 좌표를 계산합니다.
+    이 계산을 함수로 묶어 두면 다양한 텍스트 길이에 자동 적용 가능합니다.
   tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - 기본 폰트의 textbbox는 폰트 크기에 따라 다른 결과를 줍니다. truetype 폰트를 쓰면 더 안정적입니다.
+  - getbbox는 deprecated 메서드입니다. textbbox 사용이 표준입니다.
   snippet: |-
     from PIL import Image, ImageDraw
     from sklearn.datasets import load_sample_image
 
-    chinaArr = load_sample_image('china.jpg')
-    china = Image.fromarray(chinaArr).convert('RGBA')
-    china
+    bboxBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    bboxDraw = ImageDraw.Draw(bboxBase)
+    bboxText = '@codaro'
+    bboxPadding = 20
+
+    bbox = bboxDraw.textbbox((0, 0), bboxText)
+    textWidth = bbox[2] - bbox[0]
+    textHeight = bbox[3] - bbox[1]
+    posX = bboxBase.size[0] - textWidth - bboxPadding
+    posY = bboxBase.size[1] - textHeight - bboxPadding
+
+    bboxDraw.text((posX, posY), bboxText, fill=(255, 255, 255, 200))
+
+    {
+        'imageSize': bboxBase.size,
+        'textBbox': bbox,
+        'textWidth': textWidth,
+        'textHeight': textHeight,
+        'position': (posX, posY),
+        'isInBottomRight': posX > bboxBase.size[0] // 2 and posY > bboxBase.size[1] // 2,
+    }
   exercise:
-    prompt: 실습 예제에서 이미지 크기, 색상, 임계값, 필터 설정 중 하나를 바꾸고 결과 배열을 확인하세요.
+    prompt: 같은 함수로 좌측 상단 (padding, padding) 위치에 워터마크를 그리세요. 박스 좌표 계산 없이 padding 두 값만 위치로 줍니다.
     starterCode: |-
       from PIL import Image, ImageDraw
       from sklearn.datasets import load_sample_image
 
-      chinaArr = load_sample_image('china.jpg')
-      china = Image.fromarray(chinaArr).convert('RGBA')
-      china
+      topLeftBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      topLeftDraw = ImageDraw.Draw(topLeftBase)
+      topLeftDraw.text((___, 20), 'top-left', fill=(255, 255, 255, 200))
+      {'topLeftCorner': (20, 20)}
     hints:
-    - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
-    - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
+    - 좌측 padding 20.
+    - 빈칸에는 20이 들어갑니다.
+    check:
+      noError: text 호출이 끝나야 합니다.
+      resultCheck: topLeftCorner가 (20, 20)이어야 합니다.
   check:
-    noError: 실습의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 실습 결과의 크기, 모드, 채널, 검출 개수, 저장 파일이 바꾼 설정을 반영해야 합니다.
-- id: workflow_validation
-  title: 7단계. 워터마크 합성 검증 루프
+    noError: textbbox와 text 호출이 끝나야 합니다.
+    resultCheck: isInBottomRight가 True여야 합니다.
+- id: step5_compose
+  title: 5단계. 합성 함수
   structuredPrimary: true
-  subtitle: alpha와 위치 확인
-  goal: 7단계. 워터마크 합성 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
-  explanation: 워터마크는 글자가 보이는지보다 원본 크기를 유지하면서 지정 위치의 픽셀이 실제로 변했는지 확인해야 합니다. alpha 범위를 검증하고 합성 전후 픽셀 차이를
-    비교합니다.
+  subtitle: addWatermark
+  goal: addWatermark(image, text, alpha, position) 함수가 입력 RGB Image에 반투명 워터마크를 합성한 RGBA 결과를 돌려주도록 만들고, alpha 값에 따라 합성 강도가 달라지는지 확인합니다.
+  why: 워터마크 합성을 함수로 묶어 두면 어떤 이미지에든 같은 인터페이스로 적용할 수 있습니다. alpha 인자로 투명도를 조절 가능합니다.
+  explanation: |-
+    addWatermark는 RGB 입력을 받아 RGBA로 변환 → 텍스트 레이어 그리기 → paste 합성을 순차적으로 수행합니다. 결과는 RGBA Image.
+    alpha 인자(0~255)로 워터마크의 투명도를 제어합니다. alpha=0은 보이지 않음, alpha=255는 완전 불투명.
+    검증은 같은 입력에 alpha=128과 alpha=64를 적용해 결과 픽셀 변화량이 alpha에 비례하는지로 합니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 함수 인터페이스에 fontSize 인자를 추가하면 더 유연합니다. truetype 폰트 경로도 함께.
+  - 결과를 파일로 저장할 때는 convert('RGB')로 알파 채널을 제거합니다(JPG는 알파 불지원).
   snippet: |-
-    from PIL import Image, ImageDraw, ImageChops
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
 
-    watermarkBase = Image.new("RGBA", (180, 110), (80, 120, 170, 255))
-    baseDraw = ImageDraw.Draw(watermarkBase)
-    baseDraw.rectangle((20, 20, 160, 90), fill=(120, 170, 210, 255))
 
-    def validateAlpha(alpha):
+    def addWatermark(image: Image.Image, text: str, alpha: int, position: tuple) -> Image.Image:
+        rgba = image.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return rgba
+
+
+    composeBase = Image.fromarray(load_sample_image('flower.jpg'))
+    weak = addWatermark(composeBase, 'WEAK', alpha=64, position=(50, 50))
+    strong = addWatermark(composeBase, 'STRONG', alpha=200, position=(50, 50))
+
+    baseArr = np.asarray(composeBase.convert('RGBA'))
+    weakDiff = int(np.abs(np.asarray(weak).astype(int) - baseArr.astype(int)).sum())
+    strongDiff = int(np.abs(np.asarray(strong).astype(int) - baseArr.astype(int)).sum())
+
+    {
+        'weakDiff': weakDiff,
+        'strongDiff': strongDiff,
+        'strongerHasMoreDiff': strongDiff > weakDiff,
+        'resultMode': weak.mode,
+    }
+  exercise:
+    prompt: alpha=255 (완전 불투명) 워터마크의 변화량이 alpha=200보다 더 큰지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+
+      def addWatermark(image, text, alpha, position):
+          rgba = image.convert('RGBA').copy()
+          layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+          ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+          rgba.paste(layer, (0, 0), mask=layer)
+          return rgba
+
+
+      maxBase = Image.fromarray(load_sample_image('flower.jpg'))
+      maxResult = addWatermark(maxBase, 'MAX', alpha=___, position=(50, 50))
+      maxDiff = int(np.abs(np.asarray(maxResult).astype(int) - np.asarray(maxBase.convert('RGBA')).astype(int)).sum())
+      {'maxDiff': maxDiff}
+    hints:
+    - 완전 불투명은 255.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: addWatermark 정의와 호출이 끝나야 합니다.
+      resultCheck: maxDiff가 양의 정수여야 합니다.
+  check:
+    noError: addWatermark 정의와 두 호출이 끝나야 합니다.
+    resultCheck: strongerHasMoreDiff가 True여야 합니다.
+- id: practice
+  title: 실습 — china에 워터마크
+  structuredPrimary: true
+  subtitle: 다른 입력 일반화
+  goal: 같은 addWatermark 함수를 china 사진에 적용해 결과 dict가 같은 형식으로 돌아오는지 확인합니다.
+  why: 함수 재사용은 자동화의 핵심입니다. 같은 함수를 다른 입력에 돌려도 같은 형식 결과가 나오면 후속 처리가 일관됩니다.
+  explanation: |-
+    addWatermark는 입력 size에 무관하게 동작합니다. flower (640, 427)나 china (640, 427) 모두 같은 흐름을 따라 결과가 만들어집니다.
+    실무에서는 함수에 폰트 경로, fontSize, color 인자를 추가해 유연성을 높입니다. 본 예제는 핵심 로직만 다룹니다.
+    함수 결과는 RGBA Image이므로 PNG로 저장하면 알파가 유지됩니다. JPG로 저장하려면 convert('RGB')로 알파를 합쳐야 합니다.
+  tips:
+  - "워터마크 위치는 우측 하단이 표준입니다. 좌측 상단은 사용자 작업 영역을 가리는 경우가 많습니다."
+  - 알파를 너무 작게(예 30 이하) 주면 워터마크가 거의 안 보입니다. 100~180이 적정선.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+
+    def addWatermark(image: Image.Image, text: str, alpha: int, position: tuple) -> Image.Image:
+        rgba = image.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return rgba
+
+
+    chinaBase = Image.fromarray(load_sample_image('china.jpg'))
+    chinaResult = addWatermark(chinaBase, '@photo', alpha=150, position=(500, 400))
+
+    {
+        'mode': chinaResult.mode,
+        'size': chinaResult.size,
+        'isRGBA': chinaResult.mode == 'RGBA',
+        'sizeMatches': chinaResult.size == chinaBase.size,
+    }
+  exercise:
+    prompt: addWatermark에 alpha=0을 넘기면 입력과 거의 동일한 결과(변화량 0)가 나오는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+
+      def addWatermark(image, text, alpha, position):
+          rgba = image.convert('RGBA').copy()
+          layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+          ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+          rgba.paste(layer, (0, 0), mask=layer)
+          return rgba
+
+
+      invisibleBase = Image.fromarray(load_sample_image('flower.jpg'))
+      invisibleResult = addWatermark(invisibleBase, 'INVISIBLE', alpha=___, position=(100, 100))
+      diff = int(np.abs(np.asarray(invisibleResult).astype(int) - np.asarray(invisibleBase.convert('RGBA')).astype(int)).sum())
+      {'diff': diff, 'isInvisible': diff == 0}
+    hints:
+    - 완전 투명은 0.
+    - 빈칸에는 0이 들어갑니다.
+    check:
+      noError: addWatermark 호출이 끝나야 합니다.
+      resultCheck: isInvisible이 True여야 합니다.
+  check:
+    noError: addWatermark 정의와 호출이 끝나야 합니다.
+    resultCheck: isRGBA와 sizeMatches 모두 True여야 합니다.
+- id: workflow_validation
+  title: 6단계. alpha 가드 + 합성 검증
+  structuredPrimary: true
+  subtitle: validateAlpha + 합성 강도 회귀
+  goal: validateAlpha 함수가 0~255 범위 밖 alpha를 ValueError로 차단하고, alpha 변화에 따라 합성 강도가 단조 변화하는지 회귀 테스트로 확인합니다.
+  why: alpha는 정확히 0~255 정수여야 의미가 있습니다. 음수나 256 이상은 paste가 조용히 잘못된 결과를 줍니다. 함수 입구 가드가 그 사고를 차단합니다.
+  explanation: |-
+    validateAlpha는 (1) 0 <= alpha <= 255, (2) 정수형 두 조건을 검사합니다. 둘 중 하나라도 깨지면 ValueError.
+    회귀 테스트는 alpha=50과 alpha=200의 합성 변화량을 비교합니다. 큰 alpha가 더 큰 변화를 줘야 정상.
+  tips:
+  - "alpha=0은 보이지 않는 워터마크입니다. 의미 없지만 차단 대상은 아닙니다."
+  - "ValueError 메시지에 실제 alpha를 포함시키면 호출자가 즉시 원인을 알 수 있습니다."
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+
+    def validateAlpha(alpha: int) -> bool:
+        if not isinstance(alpha, int):
+            raise ValueError(f"alpha는 정수여야 합니다: type={type(alpha).__name__}")
         if not (0 <= alpha <= 255):
             raise ValueError(f"alpha는 0~255 범위여야 합니다: {alpha}")
         return True
 
-    validateAlpha(120)
+
+    validImage = Image.new('RGBA', (100, 80), (255, 255, 255, 255))
+
+    okResult = validateAlpha(128)
+
+    try:
+        validateAlpha(300)
+        outOfRangeMessage = 'unexpected pass'
+    except ValueError as exc:
+        outOfRangeMessage = str(exc)
+
+    try:
+        validateAlpha(1.5)
+        floatMessage = 'unexpected pass'
+    except ValueError as exc:
+        floatMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'outOfRangeMessage': outOfRangeMessage,
+        'floatMessage': floatMessage,
+    }
   exercise:
-    prompt: 7단계. 워터마크 합성 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: validateAlpha에 -10을 넘기면 ValueError가 잡히는지 확인하세요.
     starterCode: |-
-      from PIL import Image, ImageDraw, ImageChops
-
-      watermarkBase = Image.new("RGBA", (180, 110), (80, 120, 170, 255))
-      baseDraw = ImageDraw.Draw(watermarkBase)
-      baseDraw.rectangle((20, 20, 160, 90), fill=(120, 170, 210, 255))
-
       def validateAlpha(alpha):
+          if not isinstance(alpha, int):
+              raise ValueError(f"alpha는 정수여야 합니다: type={type(alpha).__name__}")
           if not (0 <= alpha <= 255):
               raise ValueError(f"alpha는 0~255 범위여야 합니다: {alpha}")
           return True
 
-      validateAlpha(120)
+
+      try:
+          validateAlpha(___)
+          negMessage = 'unexpected pass'
+      except ValueError as exc:
+          negMessage = str(exc)
+
+      {'negMessage': negMessage, 'caught': '범위' in negMessage}
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 음수 -10.
+    - 빈칸에는 -10이 들어갑니다.
+    check:
+      noError: validateAlpha 정의가 끝나야 합니다.
+      resultCheck: caught가 True여야 합니다.
   check:
-    noError: 7단계. 워터마크 합성 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 7단계. 워터마크 합성 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: validateAlpha와 세 호출이 끝나야 합니다.
+    resultCheck: okResult가 True이고 outOfRangeMessage에 '300', floatMessage에 'type' 단서가 포함되어야 합니다.
