@@ -24,6 +24,7 @@ import { brand, basePath } from "./lib/brand.js";
 import { docsPages } from "./lib/generated/docsNav.js";
 import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
 import { sharePacks } from "./lib/sharePacks.js";
+import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
@@ -504,6 +505,25 @@ report = df.groupby("week").sum()`}</pre>
           <TrustItem icon={ShieldCheck} title="로컬 우선" copy="기본 학습과 실행은 사용자의 로컬 런타임을 기준으로 한다." />
           <TrustItem icon={FileCheck2} title="검증 가능한 배포" copy="릴리즈 자산, checksum, manifest를 함께 확인한다." />
           <TrustItem icon={Library} title="문서 일원화" copy="문서, 블로그, 검색 색인은 같은 원천에서 나온다." />
+        </div>
+      </section>
+
+      <section className="contentBand faqBand" aria-labelledby="home-faq-title">
+        <div className="sectionIntro">
+          <p className="eyebrow">FAQ</p>
+          <h2 id="home-faq-title">자주 묻는 질문</h2>
+          <p>
+            Jupyter·marimo와의 차이, AI 사용 여부, 라이선스, 프라이버시까지 — 처음 Codaro를 접할 때
+            가장 많이 나오는 8개 질문을 한 곳에 정리했다.
+          </p>
+        </div>
+        <div className="faqList">
+          {faqEntries.map((entry, index) => (
+            <details key={entry.question} className="faqItem" open={index === 0}>
+              <summary>{entry.question}</summary>
+              <p>{entry.answer}</p>
+            </details>
+          ))}
         </div>
       </section>
     </main>

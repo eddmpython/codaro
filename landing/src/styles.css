@@ -1389,3 +1389,69 @@ input:focus-visible {
     flex-direction: column;
   }
 }
+
+.faqBand {
+  border-top: 1px solid var(--border);
+}
+
+.faqList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 32px;
+  max-width: 920px;
+}
+
+.faqItem {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.faqItem[open] {
+  border-color: var(--border-strong);
+  background: color-mix(in oklab, var(--card) 92%, var(--background));
+}
+
+.faqItem > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.faqItem > summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem > summary::after {
+  content: "+";
+  font-size: 1.2rem;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.faqItem[open] > summary::after {
+  content: "−";
+  transform: rotate(0deg);
+}
+
+.faqItem > p {
+  padding: 0 22px 20px;
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+  font-size: 0.96rem;
+}
+

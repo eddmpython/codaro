@@ -7,6 +7,7 @@ import { searchEntries } from "../src/lib/generated/searchIndex.js";
 import { sharePacks } from "../src/lib/sharePacks.js";
 import { tools } from "../src/lib/tools/registry.js";
 import { brand } from "../src/lib/brand.js";
+import { faqEntries } from "../src/lib/faq.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const landingRoot = resolve(__dirname, "..");
@@ -29,7 +30,7 @@ const routes = [
     title: "Python 학습과 개인 자동화 스튜디오",
     description: "배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오.",
     body: homeBody(),
-    jsonLd: null,
+    jsonLd: faqPageJsonLd(faqEntries),
   },
   {
     path: "/docs",
@@ -85,6 +86,7 @@ const routes = [
     description: post.description,
     body: blogPostBody(post),
     jsonLd: blogPostJsonLd(post),
+    image: `/brand/og/${post.slug}.png`,
     imageAlt: post.title,
     ogType: "article",
   })),
@@ -206,6 +208,7 @@ function renderShell(route) {
     .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:description" content="${escapeHtml(description)}" />`)
     .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:url" content="${escapeHtml(canonical)}" />`)
     .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image" content="${escapeHtml(image)}" />`)
+    .replace(/<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image:secure_url" content="${escapeHtml(image)}" />`)
     .replace(/<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/s, `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`)
     .replace(/<meta\s+name="twitter:card"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:card" content="${escapeHtml(twitterCard)}" />`)
     .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/s, `<meta name="twitter:title" content="${escapeHtml(baseTitle)}" />`)
@@ -276,6 +279,22 @@ function blogIndexJsonLd(allPosts) {
       url: siteUrl(post.url),
       datePublished: post.date ? `${post.date}T00:00:00Z` : undefined,
       description: post.description,
+    })),
+  };
+}
+
+function faqPageJsonLd(entries) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    inLanguage: "ko",
+    mainEntity: entries.map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: entry.answer,
+      },
     })),
   };
 }
@@ -366,7 +385,7 @@ function writeRoute(routePath, html) {
 
 function homeBody() {
   return `<main><section class="heroSection"><div class="heroCopy"><p class="eyebrow">React 기반 GitHub Pages / Local-first / Python runtime</p><h1>배우는 코드가 실행되고, 실행한 코드가 자동화가 된다.</h1><p class="heroLead">Codaro는 Python 학습, 노트북 셀 실행, 개인 자동화를 하나의 로컬 제품 흐름으로 묶는다.</p><div class="heroActions"><a class="primaryButton" href="${brand.launcherDownloadUrl}">CodaroLauncher.exe</a><a class="secondaryButton" href="${appPath("/docs")}">문서 보기</a><a class="secondaryButton" href="${appPath("/packs")}">공유 팩</a><a class="textLink" href="${appPath("/docs/blog")}">Codaro 소식</a></div><div class="releaseLinks" aria-label="릴리즈 검증 링크"><a href="${brand.launcherChecksumUrl}">체크섬</a><a href="${brand.launcherSbomUrl}">SBOM</a><a href="${brand.releaseManifestUrl}">manifest</a><a href="${brand.releaseUrl}">GitHub Releases</a></div></div><div class="heroPanel"><div class="panelTop"><span></span><span></span><span></span><strong>codaro.local</strong></div><div class="studioPreview"><aside><b>채팅</b><b>에디터</b><b>커리큘럼</b><b>자동화</b></aside><div><p class="chatBubble">CSV 정리법을 배우고 매주 리포트로 만들고 싶다.</p><p class="chatBubble muted">학습 셀과 dry-run 자동화 계획을 만들었다.</p><pre>import pandas as pd
-df = pd.read_csv("expenses.csv")</pre><div class="runResult">실행 가능 / 검증 가능 / 태스크로 승격 가능</div></div></div></div></section></main>`;
+df = pd.read_csv("expenses.csv")</pre><div class="runResult">실행 가능 / 검증 가능 / 태스크로 승격 가능</div></div></div></div></section><section class="contentBand faqBand" aria-labelledby="home-faq-title"><div class="sectionIntro"><p class="eyebrow">FAQ</p><h2 id="home-faq-title">자주 묻는 질문</h2><p>Jupyter·marimo와의 차이, AI 사용 여부, 라이선스, 프라이버시까지 — 처음 Codaro를 접할 때 가장 많이 나오는 8개 질문을 한 곳에 정리했다.</p></div><div class="faqList">${faqEntries.map((entry, index) => `<details class="faqItem"${index === 0 ? " open" : ""}><summary>${escapeHtml(entry.question)}</summary><p>${escapeHtml(entry.answer)}</p></details>`).join("")}</div></section></main>`;
 }
 
 function packsBody() {
