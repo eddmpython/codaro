@@ -115,8 +115,8 @@ sections:
   title: 3단계. 엄격 모드
   structuredPrimary: true
   subtitle: strict=True
-  goal: 3단계. 엄격 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: model_config의 strict=True로 타입 강제 변환을 끄고, 문자열 "5"가 int 필드에 들어갈 때 ValidationError가 나는지 확인합니다.
+  why: 자동 변환은 편하지만 운영에서 "5"가 의도된 입력인지 실수인지 구분하지 못합니다. 엄격 모드는 입력 타입을 명시적으로 요구해 데이터 계약을 더 강하게 만듭니다.
   explanation: |-
     model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
 

@@ -147,8 +147,8 @@ sections:
   title: 환경변수 접두사
   structuredPrimary: true
   subtitle: env_prefix 설정
-  goal: 환경변수 접두사에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: model_config의 env_prefix='DB_'를 설정해 환경변수 DB_HOST/DB_PORT가 각각 host/port 필드로 자동 매핑되는지 확인합니다.
+  why: 같은 환경에서 여러 서비스가 돌 때 환경변수 이름이 충돌합니다. prefix를 두면 서비스마다 네임스페이스가 명확해져 운영 사고가 줄어듭니다.
   explanation: 여러 서비스가 같은 환경에서 실행될 때 환경변수 이름 충돌을 방지하려면 접두사를 사용합니다. model_config의 env_prefix로 모든 환경변수에
     공통 접두사를 적용합니다. DB_HOST, DB_PORT처럼 의미있는 네이밍이 가능해집니다.
   tips:
@@ -195,8 +195,8 @@ sections:
   title: 중첩 설정
   structuredPrimary: true
   subtitle: 설정 그룹화
-  goal: 중첩 설정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: DatabaseSettings/CacheSettings/LoggingSettings 세 모델을 분리해 메인 Settings에 중첩 필드로 묶고, JSON 환경변수로 그룹 단위 설정을 주입합니다.
+  why: 모든 설정을 한 평면 모델에 두면 100개 넘는 필드가 한 클래스에 쌓여 가독성이 무너집니다. 도메인별 모델로 쪼개면 변경 영향이 한 모델로 제한됩니다.
   explanation: 복잡한 애플리케이션은 설정을 논리적으로 그룹화해야 합니다. 데이터베이스 설정, 캐시 설정, 로깅 설정 등을 별도 모델로 분리하고 메인 설정에서 조합합니다.
     중첩된 BaseModel은 JSON 환경변수로 설정할 수 있습니다.
   tips:
@@ -305,8 +305,8 @@ sections:
   title: 비밀 값 관리
   structuredPrimary: true
   subtitle: SecretStr
-  goal: 비밀 값 관리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: SecretStr 필드를 가진 설정 모델을 만들고, repr/print에서 마스킹되며 get_secret_value()로만 원본을 꺼낼 수 있는지 확인합니다.
+  why: 비밀번호와 API 키가 stdout/로그에 평문으로 새는 사고는 흔합니다. SecretStr은 출력 경로 전체에 자동 마스킹을 강제해 사람의 실수를 막아 줍니다.
   explanation: |-
     비밀번호, API 키 같은 민감한 정보는 로그에 노출되면 안 됩니다. SecretStr 타입을 사용하면 출력 시 자동으로 마스킹되고, get_secret_value()로만 실제 값에 접근할 수 있습니다. 디버깅 로그에서 비밀이 노출되는 것을 방지합니다.
 
@@ -393,8 +393,8 @@ sections:
   title: 싱글톤 패턴
   structuredPrimary: true
   subtitle: lru_cache 활용
-  goal: 싱글톤 패턴에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: functools.lru_cache로 감싼 getSettings 함수가 여러 호출에서 같은 인스턴스를 돌려주는지 is 비교로 확인합니다.
+  why: 설정 로드는 환경변수/파일 읽기를 동반해 매 호출이 비쌉니다. lru_cache 싱글톤 패턴은 첫 호출 결과를 재사용해 앱 전체에서 일관된 설정 객체를 보장합니다.
   explanation: |-
     설정을 매번 새로 로드하면 성능이 낭비됩니다. functools.lru_cache를 사용하면 설정 객체를 캐싱하여 애플리케이션 전체에서 동일한 인스턴스를 재사용합니다. FastAPI 등 프레임워크에서 권장하는 패턴입니다.
 
@@ -443,8 +443,8 @@ sections:
   title: 마이크로서비스 설정
   structuredPrimary: true
   subtitle: 종합 설정 시스템
-  goal: 마이크로서비스 설정에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: 환경별 분리(dev/prod), 중첩 모델, SecretStr, lru_cache, 검증을 결합한 마이크로서비스 설정 시스템 한 개를 종합 구성합니다.
+  why: 운영 마이크로서비스의 설정 시스템은 강의 단편을 합쳐 만들어진 형태입니다. 한 번 완성된 베이스 모델이 새 서비스의 출발점이 됩니다.
   explanation: 지금까지 배운 모든 기법을 종합하여 실제 마이크로서비스에서 사용할 수 있는 설정 시스템을 완성합니다. 중첩 설정, 환경별 분리, 비밀 관리, 검증까지 모두
     포함한 완전한 설정 관리 시스템입니다.
   tips:
@@ -529,8 +529,8 @@ sections:
   title: 실습
   structuredPrimary: true
   subtitle: 설정 관리 프로젝트
-  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: BaseSettings, env_prefix, 중첩, SecretStr, JSON 환경변수를 실제 애플리케이션 설정 모델 한 개로 결합해 직접 실습합니다.
+  why: 강의 본문은 한 기법씩 분리해 익혔습니다. 실습에서는 그 기법들을 한 모델로 합쳐 봐야 운영 시나리오에서 어떻게 결합되는지 손에 익습니다.
   explanation: |-
     지금까지 배운 BaseSettings, 접두사, 중첩 설정, SecretStr, JSON 환경변수를 활용하여 실제 애플리케이션 설정 시스템을 구축합니다.
 

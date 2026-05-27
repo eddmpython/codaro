@@ -60,10 +60,14 @@ sections:
     여러 필드를 동시에 검증합니다. 이들을 조합하면 복잡한 비즈니스 규칙도 우아하게 표현할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
-  snippet: import pydantic
+  snippet: |-
+    import pydantic
+    from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator, computed_field
   exercise:
     prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
-    starterCode: import pydantic
+    starterCode: |-
+      import pydantic
+      from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator, computed_field
     hints:
     - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
     - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
@@ -144,8 +148,8 @@ sections:
   title: 필드 설명과 기본값
   structuredPrimary: true
   subtitle: description, default
-  goal: 필드 설명과 기본값에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  goal: Field(description=..., default=...)로 필드에 설명과 기본값을 동시에 부여하고, model_json_schema 출력에 정말 description이 포함되는지 확인합니다.
+  why: API 문서 자동 생성을 위해서는 모델이 곧 스키마여야 합니다. Field의 description은 OpenAPI 문서에 그대로 노출되므로, 코드와 문서가 한 곳에서 같이 자랍니다.
   explanation: Field의 description 파라미터로 필드에 설명을 추가할 수 있습니다. 이 설명은 JSON Schema에 포함되어 API 문서화에 활용됩니다. default로
     기본값을 지정하면서 동시에 제약조건도 적용할 수 있어, 유연하면서도 안전한 모델을 설계할 수 있습니다.
   tips:
