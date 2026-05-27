@@ -1,3 +1,14 @@
+---
+id: curriculum-os
+title: Curriculum OS — 학습 경로 합성
+description: 학습 커리큘럼을 outcome 그래프 + prerequisite DAG로 끌어올려 학습 경로를 합성하는 레이어.
+category: architecture
+section: reference
+order: 215
+purpose: 사용자/teacher가 도메인을 지정하면 prerequisite을 따라 레슨 순서를 짜고, 커버되지 않는 outcome은 gap으로 리포트한다.
+whenToUse: 새 학습 도메인을 정의하거나, 자동 학습 경로 합성/teacher tool을 추가/검토할 때.
+---
+
 # Curriculum OS
 
 학습 커리큘럼을 단순 카테고리 트리에서 **outcome 그래프**로 끌어올린 레이어다. 사용자/teacher가 도메인(목적)을 지정하면 prerequisite을 따라 레슨 순서를 짜고, 커버되지 않는 outcome은 gap으로 리포트한다. Skill OS가 "도구 선택"이라면, Curriculum OS는 "학습 경로 합성"이다.

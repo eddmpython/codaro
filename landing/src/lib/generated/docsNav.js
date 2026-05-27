@@ -225,6 +225,21 @@ export const docsPages = [
     "contentModule": "page25598b3d6e81"
   },
   {
+    "path": "skills/architecture/curriculum-os",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "curriculum-os"
+    ],
+    "title": "Curriculum OS — 학습 경로 합성",
+    "description": "학습 커리큘럼을 outcome 그래프 + prerequisite DAG로 끌어올려 학습 경로를 합성하는 레이어.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 215,
+    "url": "/codaro/docs/skills/architecture/curriculum-os",
+    "contentModule": "page09a62c1f41c7"
+  },
+  {
     "path": "skills/identity/transparent-scope-isolation",
     "slugSegments": [
       "skills",
@@ -1108,6 +1123,21 @@ export const docsSections = [
         "order": 210,
         "url": "/codaro/docs/skills/architecture/share-pack-distribution",
         "contentModule": "page25598b3d6e81"
+      },
+      {
+        "path": "skills/architecture/curriculum-os",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "curriculum-os"
+        ],
+        "title": "Curriculum OS — 학습 경로 합성",
+        "description": "학습 커리큘럼을 outcome 그래프 + prerequisite DAG로 끌어올려 학습 경로를 합성하는 레이어.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 215,
+        "url": "/codaro/docs/skills/architecture/curriculum-os",
+        "contentModule": "page09a62c1f41c7"
       }
     ]
   },
