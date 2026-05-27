@@ -31,6 +31,10 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { codaroApi } from "@/lib/api";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
+import { useWidgetSession } from "@/lib/widgetSession";
+import { CheckResultPanel } from "./checkResultPanel";
+import { CurriculumProgressBadge } from "./curriculumProgressBadge";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import {
   blockLabel,
   classifyLearningCell,
@@ -43,7 +47,7 @@ import {
 import { statusLabel } from "@/lib/displayFormat";
 import { inferDocumentPackages, normalizePackageName } from "@/lib/packageInference";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
+import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
 import {
   CurriculumMarkdownBody,
   curriculumCellTone,
@@ -64,6 +68,7 @@ export function CurriculumView({
   apiOnline,
   canRun,
   cellHelpByBlockId,
+  contents = [],
   document,
   drafts,
   pendingBlocks,
@@ -86,6 +91,7 @@ export function CurriculumView({
   apiOnline: boolean;
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
+  contents?: Array<{ contentId: string; title: string }>;
   document: CodaroDocument;
   drafts: Record<string, string>;
   pendingBlocks: BlockConfig[];
@@ -114,6 +120,7 @@ export function CurriculumView({
         <div className="mx-auto min-w-0 max-w-5xl space-y-4">
           <LearningOverviewHeader
             apiOnline={apiOnline}
+            contents={contents}
             document={document}
             introBlock={introBlock}
             pendingBlocks={pendingBlocks}
@@ -176,6 +183,7 @@ type StructuredSectionPart = "snippet" | "check";
 
 function LearningOverviewHeader({
   apiOnline,
+  contents = [],
   document,
   introBlock,
   pendingBlocks,
@@ -188,6 +196,7 @@ function LearningOverviewHeader({
   onRejectPendingBlocks,
 }: {
   apiOnline: boolean;
+  contents?: Array<{ contentId: string; title: string }>;
   document: CodaroDocument;
   introBlock?: BlockConfig;
   pendingBlocks: BlockConfig[];
@@ -228,6 +237,7 @@ function LearningOverviewHeader({
             <Badge variant="secondary">커리큘럼</Badge>
             <Badge variant="outline">{selectedCategoryLabel || selectedCategory}</Badge>
             {selectedContentLabel || selectedContentId ? <Badge variant="outline">{selectedContentLabel || selectedContentId}</Badge> : null}
+            <CurriculumHeaderProgress contents={contents} loading={referenceLoading} />
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
           </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-normal" data-learning-overview-part="title">{overview.title}</h1>
@@ -899,6 +909,14 @@ function StructuredSectionLearningBody({
                 실행 결과
               </div>
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
+              {exerciseResult && exercise && exerciseCheck ? (
+                <div className="mt-2">
+                  <ExerciseCheckPanel
+                    exercise={exercise}
+                    studentCode={exerciseDraft}
+                  />
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -1670,4 +1688,86 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function cellDomId(blockId: string) {
   return `curriculum-cell-${blockId.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function ExerciseCheckPanel({
+  exercise,
+  studentCode,
+}: {
+  exercise: BlockConfig;
+  studentCode: string;
+}) {
+  const sessionId = useWidgetSession();
+  const [result, setResult] = useState<CheckResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
+
+  const runCheck = async (nextHintLevel: number = hintLevel) => {
+    if (!sessionId) return;
+    const guide = exercise.guide;
+    if (!guide) return;
+    setLoading(true);
+    try {
+      const next = await codaroApi.checkExercise({
+        sessionId,
+        studentCode,
+        expectedCode: guide.solution ?? undefined,
+        checkType: guide.checkConfig?.type ?? undefined,
+        variableName: guide.checkConfig?.variableName ?? undefined,
+        expectedValue: guide.checkConfig?.expectedValue ?? undefined,
+        requiredPatterns: guide.checkConfig?.requiredPatterns
+          ? Object.values(guide.checkConfig).filter((value): value is string => typeof value === "string")
+          : undefined,
+        hints: guide.hints ?? [],
+        currentHintLevel: nextHintLevel,
+      });
+      setResult(next);
+      setHintLevel(next.hintLevel);
+    } catch (error) {
+      console.warn("check failed", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2" data-check-panel="exercise">
+      <div className="flex items-center gap-2">
+        <Button
+          className="h-7 px-2 text-[11px]"
+          size="sm"
+          type="button"
+          variant="outline"
+          disabled={loading || !sessionId}
+          onClick={() => void runCheck(hintLevel)}
+        >
+          {loading ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3" />}
+          검증하기
+        </Button>
+      </div>
+      <CheckResultPanel
+        result={result}
+        loading={loading}
+        onNextHint={() => void runCheck(hintLevel + 1)}
+      />
+    </div>
+  );
+}
+
+export function CurriculumHeaderProgress({
+  contents,
+  loading,
+}: {
+  contents: Array<{ contentId: string; title: string }>;
+  loading?: boolean;
+}) {
+  const { summary } = useCurriculumProgress();
+  if (loading) return null;
+  return (
+    <CurriculumProgressBadge
+      completed={summary?.totalCompleted ?? 0}
+      total={contents.length}
+      label="레슨"
+    />
+  );
 }

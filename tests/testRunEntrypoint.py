@@ -56,8 +56,20 @@ def testGateNamesAreStable() -> None:
         "launcher-test",
         "objective-nineplus-audit",
         "public-readiness-audit",
+        "widget-bridge",
+        "app-runtime",
+        "mobile-layout",
     }
-    assert runner.PREFLIGHT_GATES == ("root-clean", "docs", "backend")
+    assert runner.PREFLIGHT_GATES == (
+        "root-clean",
+        "docs",
+        "backend",
+        "widget-bridge",
+        "app-runtime",
+        "mobile-layout",
+        "editor-build",
+        "curriculum-quality-matrix",
+    )
     assert runner.PRODUCT_QUALITY_GATES == (
         "root-clean",
         "docs",

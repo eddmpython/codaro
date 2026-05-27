@@ -81,7 +81,38 @@ GATES: dict[str, Gate] = {
     "backend": Gate(
         tier="fast",
         description="Python backend 전체 테스트를 실행한다.",
-        commands=(command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/", "-q", "--tb=short")),),
+    ),
+    "widget-bridge": Gate(
+        tier="fast",
+        description="Python ui descriptor + 콜백 registry + traceback parser + widget TS 타입 동기 + React round-trip + chromium E2E.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/testWidgetBridge.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/testTracebackParser.py")),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genWidgetTypes.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyWidgetBridgeRoundTrip.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightAppRuntime.py")),
+        ),
+    ),
+    "app-runtime": Gate(
+        tier="fast",
+        description="App 라이프사이클 hook, 포트 회피, 사용자 정의 컴포넌트, teacher tool registry, OAuth refresh, dogfood.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/testAppRuntime.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/testTeacherToolBridge.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/testOauthTokenRefresh.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightDogfood.py")),
+        ),
+    ),
+    "mobile-layout": Gate(
+        tier="fast",
+        description="PWA manifest, service worker, viewport meta, 모바일 hook + chromium viewport 회귀.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/testMobileShell.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyMobileLayout.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyPwaArtifacts.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightMobile.py")),
+        ),
     ),
     "teacher-eval": Gate(
         tier="fast",
@@ -302,7 +333,16 @@ GATES: dict[str, Gate] = {
     ),
 }
 
-PREFLIGHT_GATES = ("root-clean", "docs", "backend")
+PREFLIGHT_GATES = (
+    "root-clean",
+    "docs",
+    "backend",
+    "widget-bridge",
+    "app-runtime",
+    "mobile-layout",
+    "editor-build",
+    "curriculum-quality-matrix",
+)
 PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
@@ -414,9 +454,13 @@ def localGateEnvironment(gateName: str, commandArgs: tuple[str, ...]) -> dict[st
     scratchDir = runRoot / "scratch"
     scratchDir.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    env["TMP"] = str(scratchDir)
-    env["TEMP"] = str(scratchDir)
-    env["TMPDIR"] = str(scratchDir)
+    # TMP/TEMP override는 backend(전체 pytest) gate에서는 끄고, 그 외만 격리.
+    if gateName != "backend":
+        env["TMP"] = str(scratchDir)
+        env["TEMP"] = str(scratchDir)
+        env["TMPDIR"] = str(scratchDir)
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
     if uvCommandUsesWith(commandArgs):
         cacheDir = runRoot / "uv-cache"
         cacheDir.mkdir(parents=True, exist_ok=True)
@@ -824,8 +868,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 32:
-        failures.append(f"expected 32 gates, found {len(GATES)}")
+    if len(GATES) != 35:
+        failures.append(f"expected 35 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

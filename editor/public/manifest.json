@@ -1,0 +1,46 @@
+{
+  "name": "Codaro",
+  "short_name": "Codaro",
+  "description": "코드가 인터페이스가 되는 개인 자동화 스튜디오",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "ko",
+  "categories": ["productivity", "developer", "education"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "노트북",
+      "url": "/",
+      "description": "기본 편집 모드"
+    },
+    {
+      "name": "커리큘럼",
+      "url": "/?surface=curriculum",
+      "description": "커리큘럼 학습 진입"
+    }
+  ]
+}

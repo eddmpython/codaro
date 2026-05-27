@@ -112,6 +112,16 @@ def runLocalWorker(
                 _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
                 continue
 
+            if action == "resetVariables":
+                import types as _types
+                for name in list(registry.keys()):
+                    value = registry[name]
+                    if callable(value) or isinstance(value, (type, _types.ModuleType)):
+                        continue
+                    registry.pop(name, None)
+                _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
+                continue
+
             if action == "getVariables":
                 _workerSend(
                     connection,

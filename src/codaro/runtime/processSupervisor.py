@@ -17,6 +17,8 @@ class ResourceLimits:
     maxCpuPercent: int = 80
     maxExecutionSeconds: int = 300
     maxChildProcesses: int = 3
+    heartbeatTimeoutSeconds: float = 0.0
+    idleZombieCheckSeconds: float = 1.0
 
 
 @dataclass(slots=True)
@@ -43,6 +45,7 @@ class ProcessSupervisor:
         self._startedAt: float = 0.0
         self._monitorThread: threading.Thread | None = None
         self._stopEvent = threading.Event()
+        self._lastHeartbeat: float = 0.0
 
     @property
     def limits(self) -> ResourceLimits:
@@ -52,6 +55,7 @@ class ProcessSupervisor:
         self.detach()
         self._process = process
         self._startedAt = time.monotonic()
+        self._lastHeartbeat = time.monotonic()
         self._stopEvent.clear()
         self._monitorThread = threading.Thread(
             target=self._monitorLoop,
@@ -76,16 +80,41 @@ class ProcessSupervisor:
 
     def _monitorLoop(self) -> None:
         while not self._stopEvent.is_set():
-            self._stopEvent.wait(timeout=1.0)
+            self._stopEvent.wait(timeout=max(0.1, self._limits.idleZombieCheckSeconds))
             if self._stopEvent.is_set():
                 break
             process = self._process
-            if process is None or not process.is_alive():
+            if process is None:
+                break
+            if not process.is_alive():
+                self._emitEvent("process-dead", {
+                    "exitcode": getattr(process, "exitcode", None),
+                    "uptime": round(time.monotonic() - self._startedAt, 1),
+                })
+                self._process = None
                 break
             self._checkLimits(process)
 
+    def heartbeat(self) -> None:
+        self._lastHeartbeat = time.monotonic()
+
+    def isHeartbeatStale(self) -> bool:
+        timeout = self._limits.heartbeatTimeoutSeconds
+        if timeout <= 0 or self._lastHeartbeat == 0:
+            return False
+        return (time.monotonic() - self._lastHeartbeat) > timeout
+
     def _checkLimits(self, process: Process) -> None:
         snap = self._readProcessStats(process)
+
+        if self.isHeartbeatStale():
+            self._emitEvent("resource-exceeded", {
+                "reason": "heartbeat-stale",
+                "sinceHeartbeatSeconds": round(time.monotonic() - self._lastHeartbeat, 1),
+                "limit": self._limits.heartbeatTimeoutSeconds,
+            })
+            self._killProcess(process)
+            return
 
         uptime = time.monotonic() - self._startedAt
         if uptime > self._limits.maxExecutionSeconds:

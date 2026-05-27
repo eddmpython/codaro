@@ -364,7 +364,33 @@ def runServer(
                 editorIndexPath=_displayPath(editorStatus.indexPath),
             ),
         )
-    uvicorn.run(app, host=host, port=port, log_level="warning")
+    resolvedPort = resolveBindablePort(host, port, logger=logger)
+    if resolvedPort != port:
+        logger.info(
+            "startup %s",
+            formatLogFields(action="port-fallback", requested=port, bound=resolvedPort, host=host),
+        )
+    uvicorn.run(app, host=host, port=resolvedPort, log_level="warning")
+
+
+def resolveBindablePort(host: str, port: int, *, maxAttempts: int = 10, logger: Any = None) -> int:
+    import socket
+
+    candidate = port
+    for _ in range(max(1, maxAttempts)):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            try:
+                probe.bind((host, candidate))
+                probe.listen(1)
+                return candidate
+            except OSError:
+                if logger is not None:
+                    logger.debug(
+                        "startup %s",
+                        formatLogFields(action="port-busy", host=host, port=candidate),
+                    )
+                candidate += 1
+    return port
 
 
 def shouldLogRequest(request: Request, statusCode: int) -> bool:

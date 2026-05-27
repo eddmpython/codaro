@@ -1,9 +1,29 @@
 import { useEffect, useRef } from "react";
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  type CompletionContext,
+  type CompletionResult,
+} from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
 import { bracketMatching, defaultHighlightStyle, syntaxHighlighting } from "@codemirror/language";
-import { EditorState, Prec } from "@codemirror/state";
-import { EditorView, highlightActiveLine, keymap, lineNumbers, placeholder } from "@codemirror/view";
+import { EditorState, Prec, RangeSet, StateEffect, StateField } from "@codemirror/state";
+import {
+  Decoration,
+  type DecorationSet,
+  EditorView,
+  GutterMarker,
+  gutter,
+  highlightActiveLine,
+  keymap,
+  lineNumbers,
+  placeholder,
+} from "@codemirror/view";
+import { codaroApi } from "@/lib/api";
+import { combineErrorSources } from "@/lib/tracebackParser";
 import {
   Loader2,
   MessageSquare,
@@ -74,6 +94,13 @@ const codeCellEditorTheme = EditorView.theme({
   ".cm-selectionBackground": {
     backgroundColor: "color-mix(in oklch, var(--ring) 35%, transparent) !important",
   },
+  ".cm-codaroErrorLine": {
+    backgroundColor: "color-mix(in oklch, var(--destructive) 18%, transparent)",
+  },
+  ".cm-codaroErrorGutter": {
+    width: "0.875rem",
+    textAlign: "center",
+  },
 });
 
 export function NotebookPanel({
@@ -114,7 +141,7 @@ export function NotebookPanel({
   onSelectBlock: (blockId: string) => void;
 }) {
   return (
-    <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-3">
+    <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-2 sm:p-3">
       <div className="mb-2 flex min-h-8 items-center justify-end">
         <Input
           aria-label="노트북 파일명"
@@ -160,6 +187,71 @@ export function NotebookPanel({
   );
 }
 
+export type CompletionContextProvider = () => {
+  variables?: Array<{ name: string; type?: string }>;
+  blocks?: Array<{ type: string; content: string }>;
+};
+
+class ErrorGutterMarker extends GutterMarker {
+  override toDOM() {
+    const node = document.createElement("span");
+    node.textContent = "●";
+    node.title = "이 줄에서 에러가 발생했습니다";
+    node.style.color = "var(--destructive)";
+    node.style.fontSize = "10px";
+    return node;
+  }
+}
+
+const errorMarkerInstance = new ErrorGutterMarker();
+
+const setErrorLinesEffect = StateEffect.define<number[]>();
+
+const errorMarkerField = StateField.define<RangeSet<GutterMarker>>({
+  create: () => RangeSet.empty,
+  update(value, tr) {
+    let next = value.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setErrorLinesEffect)) {
+        const totalLines = tr.state.doc.lines;
+        const markers = effect.value
+          .filter((line) => Number.isInteger(line) && line > 0 && line <= totalLines)
+          .map((line) => errorMarkerInstance.range(tr.state.doc.line(line).from));
+        next = RangeSet.of(markers, true);
+      }
+    }
+    return next;
+  },
+});
+
+const errorLineHighlight = Decoration.line({
+  attributes: { class: "cm-codaroErrorLine" },
+});
+
+const errorLineDecorationField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(value, tr) {
+    let next = value.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setErrorLinesEffect)) {
+        const totalLines = tr.state.doc.lines;
+        const ranges = effect.value
+          .filter((line) => Number.isInteger(line) && line > 0 && line <= totalLines)
+          .map((line) => errorLineHighlight.range(tr.state.doc.line(line).from));
+        next = Decoration.set(ranges, true);
+      }
+    }
+    return next;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
+const errorGutter = gutter({
+  class: "cm-codaroErrorGutter",
+  markers: (view) => view.state.field(errorMarkerField),
+  initialSpacer: () => errorMarkerInstance,
+});
+
 export function CodeCellEditor({
   autoFocus = false,
   placeholderText = "Python 코드를 입력하세요.",
@@ -167,6 +259,8 @@ export function CodeCellEditor({
   onChange,
   onFocus,
   onRun,
+  completionContext,
+  errorLines,
 }: {
   autoFocus?: boolean;
   placeholderText?: string;
@@ -174,18 +268,50 @@ export function CodeCellEditor({
   onChange: (value: string) => void;
   onFocus: () => void;
   onRun?: () => void;
+  completionContext?: CompletionContextProvider;
+  errorLines?: number[];
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   const onFocusRef = useRef(onFocus);
   const onRunRef = useRef(onRun);
+  const completionContextRef = useRef(completionContext);
 
   useEffect(() => {
     onChangeRef.current = onChange;
     onFocusRef.current = onFocus;
     onRunRef.current = onRun;
-  }, [onChange, onFocus, onRun]);
+    completionContextRef.current = completionContext;
+  }, [onChange, onFocus, onRun, completionContext]);
+
+  const aiCompletionSource = async (context: CompletionContext): Promise<CompletionResult | null> => {
+    const word = context.matchBefore(/[\w.]*/);
+    if (!word) return null;
+    if (word.from === word.to && !context.explicit) return null;
+    const prefix = context.state.doc.sliceString(0, context.pos);
+    const suffix = context.state.doc.sliceString(context.pos);
+    if (prefix.trim().length < 2 && !context.explicit) return null;
+    const extra = completionContextRef.current ? completionContextRef.current() : undefined;
+    try {
+      const response = await codaroApi.complete({ prefix, suffix, context: extra });
+      const completions = response.completions.filter((text) => text && text.length > 0);
+      if (!completions.length) return null;
+      return {
+        from: word.from,
+        to: context.pos,
+        options: completions.map((text) => ({
+          label: word.text + text,
+          apply: word.text + text,
+          type: "function",
+          detail: "AI",
+        })),
+        validFor: /^[\w.]*$/,
+      };
+    } catch {
+      return null;
+    }
+  };
 
   useEffect(() => {
     if (!hostRef.current || viewRef.current) return;
@@ -196,11 +322,21 @@ export function CodeCellEditor({
         lineNumbers(),
         history(),
         bracketMatching(),
+        closeBrackets(),
         python(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         highlightActiveLine(),
         placeholder(placeholderText),
         EditorView.lineWrapping,
+        autocompletion({
+          override: [aiCompletionSource],
+          activateOnTyping: true,
+          maxRenderedOptions: 6,
+          defaultKeymap: true,
+        }),
+        errorMarkerField,
+        errorLineDecorationField,
+        errorGutter,
         Prec.high(keymap.of([
           {
             key: "Mod-Enter",
@@ -217,7 +353,7 @@ export function CodeCellEditor({
             },
           },
         ])),
-        keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
+        keymap.of([indentWithTab, ...closeBracketsKeymap, ...completionKeymap, ...defaultKeymap, ...historyKeymap]),
         codeCellEditorTheme,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
@@ -261,6 +397,12 @@ export function CodeCellEditor({
     });
   }, [value]);
 
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.dispatch({ effects: setErrorLinesEffect.of(errorLines ?? []) });
+  }, [errorLines]);
+
   return (
     <div
       className="bg-transparent text-code-foreground"
@@ -303,7 +445,7 @@ function DocumentBlock({
 
   if (block.type === "markdown") {
     return (
-      <section className="group grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 py-1" data-notebook-cell="markdown">
+      <section className="group grid grid-cols-[1.25rem_minmax(0,1fr)] gap-1.5 py-1 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-2" data-notebook-cell="markdown">
         <CellInsertRail onInsertCell={onInsertCell} />
         <div className="min-w-0">
           <CellMetaBar
@@ -331,7 +473,7 @@ function DocumentBlock({
   }
 
   return (
-    <section className="group grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 py-1" data-notebook-cell="code">
+    <section className="group grid grid-cols-[1.25rem_minmax(0,1fr)] gap-1.5 py-1 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-2" data-notebook-cell="code">
       <CellInsertRail onInsertCell={onInsertCell} />
       <div className="min-w-0">
         <CellMetaBar
@@ -358,6 +500,10 @@ function DocumentBlock({
             onChange={onDraftChange}
             onFocus={onSelect}
             onRun={onRun}
+            errorLines={combineErrorSources(
+              typeof result?.data === "string" ? result?.data : null,
+              result?.stderr,
+            )}
           />
         </div>
         {result ? (

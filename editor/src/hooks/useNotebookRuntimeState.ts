@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { blockLabel } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
@@ -108,6 +108,22 @@ export function useNotebookRuntimeState({
       setNotebookRunning(false);
     }
   }, [apiOnline, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        sessionId?: string | null;
+        blockIds?: string[];
+        sourceBlockId?: string | null;
+      }>).detail;
+      if (!sessionId || (detail?.sessionId && detail.sessionId !== sessionId)) return;
+      if (notebookRunning) return;
+      void runNotebook();
+    };
+    window.addEventListener("codaro:reactive-trigger", handler);
+    return () => window.removeEventListener("codaro:reactive-trigger", handler);
+  }, [sessionId, notebookRunning, runNotebook]);
 
   return {
     canRun,

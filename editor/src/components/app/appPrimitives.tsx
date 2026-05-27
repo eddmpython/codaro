@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { WidgetHost, isWidgetDescriptor } from "@/components/widgets/widgetHost";
 import { blockLabel } from "@/lib/cellModel";
 import { statusLabel, stringifyData } from "@/lib/displayFormat";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
+import { useWidgetSession } from "@/lib/widgetSession";
 import type { BlockConfig, ExecutionResult } from "@/types";
 
 export function IconButton({
@@ -91,10 +93,19 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
   );
 }
 
-export function ExecutionOutput({ result }: { result: ExecutionResult }) {
+export function ExecutionOutput({
+  result,
+  sessionId: sessionIdOverride,
+}: {
+  result: ExecutionResult;
+  sessionId?: string | null;
+}) {
   const { t } = useLocale();
+  const contextSessionId = useWidgetSession();
+  const sessionId = sessionIdOverride !== undefined ? sessionIdOverride : contextSessionId;
   const packageError = result.status === "package-error";
   const hasError = packageError || result.status === "error" || Boolean(result.stderr);
+  const widgetDescriptor = !hasError && isWidgetDescriptor(result.data) ? result.data : null;
   const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   return (
     <div
@@ -108,9 +119,19 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
           {statusLabel(result.status || "done")} #{result.executionCount}
         </Badge>
       </div>
+      {widgetDescriptor ? (
+        <div data-execution-output-mode="widget">
+          <WidgetHost
+            sessionId={sessionId}
+            blockId={result.blockId ?? null}
+            descriptor={widgetDescriptor}
+          />
+        </div>
+      ) : (
       <ScrollArea className="max-h-72">
         <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
       </ScrollArea>
+      )}
       {hasError ? (
         <div
           className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"

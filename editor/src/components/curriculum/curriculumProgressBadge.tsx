@@ -1,0 +1,39 @@
+import { Trophy } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+export function CurriculumProgressBadge({
+  completed,
+  total,
+  label = "진행",
+}: {
+  completed: number;
+  total: number;
+  label?: string;
+}) {
+  const safeTotal = Math.max(total, 0);
+  const safeCompleted = Math.max(Math.min(completed, safeTotal || completed), 0);
+  const percent = safeTotal > 0 ? Math.round((safeCompleted / safeTotal) * 100) : 0;
+  const tone = percent >= 100 ? "complete" : percent > 0 ? "active" : "idle";
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "gap-1 px-2 py-0.5 text-[10px] font-medium",
+        tone === "complete" && "border-emerald-400/50 bg-emerald-100/30 text-emerald-700",
+        tone === "active" && "border-ring/40 bg-accent/30 text-foreground",
+        tone === "idle" && "text-muted-foreground",
+      )}
+      data-progress-badge={tone}
+      title={`${label} ${safeCompleted}/${safeTotal || "-"} (${percent}%)`}
+    >
+      <Trophy className="size-3" />
+      <span data-progress-fraction="true">
+        {safeCompleted}
+        <span className="text-muted-foreground">/{safeTotal || "-"}</span>
+      </span>
+      <span className="ml-1 text-muted-foreground">{percent}%</span>
+    </Badge>
+  );
+}

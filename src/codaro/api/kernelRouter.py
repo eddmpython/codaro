@@ -9,8 +9,11 @@ from ..kernel.protocol import (
     CreateSessionRequest,
     CreateSessionResponse,
     ExecuteRequest,
+    UiEventRequest,
+    UiEventResponse,
 )
 from ..serverLog import formatLogFields, getServerLogger
+from ..uiCallbacks import hasCallback, invokeCallback, resetCallbacks
 from ..system.fileOps import MoveRequest, WorkspacePathError, WriteFileRequest
 from ..system.packageOps import PackageEnvironmentError
 from .appState import ServerState
@@ -89,8 +92,61 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     def apiResetSession(sessionId: str) -> dict[str, str]:
         session = requireSession(state, sessionId)
         session.reset()
+        resetCallbacks()
         logger.info("kernel-reset %s", formatLogFields(sessionId=sessionId))
         return {"status": "reset"}
+
+    @router.post("/api/kernel/{sessionId}/ui-event", response_model=UiEventResponse)
+    def apiUiEvent(sessionId: str, request: UiEventRequest) -> UiEventResponse:
+        requireSession(state, sessionId)
+        callbackId = request.callbackId
+        if not hasCallback(callbackId):
+            logger.warning(
+                "ui-event %s",
+                formatLogFields(action="missing", sessionId=sessionId, callbackId=callbackId),
+            )
+            fail(404, "ui_callback_not_found", "UI callback not found.")
+        try:
+            result = invokeCallback(callbackId, request.payload)
+        except (TypeError, ValueError, RuntimeError, AttributeError, KeyError) as error:
+            logger.exception(
+                "ui-event %s",
+                formatLogFields(
+                    action="error",
+                    sessionId=sessionId,
+                    callbackId=callbackId,
+                    eventType=request.eventType,
+                ),
+            )
+            return UiEventResponse(
+                status="error",
+                callbackId=callbackId,
+                eventType=request.eventType,
+                error=str(error),
+            )
+        logger.debug(
+            "ui-event %s",
+            formatLogFields(
+                action="invoke",
+                sessionId=sessionId,
+                callbackId=callbackId,
+                eventType=request.eventType,
+                blockId=request.blockId,
+            ),
+        )
+        reactiveTrigger: list[str] = []
+        safeResult = _jsonSafeResult(result)
+        if isinstance(safeResult, dict):
+            triggerRaw = safeResult.get("reactiveTrigger")
+            if isinstance(triggerRaw, list):
+                reactiveTrigger = [str(item) for item in triggerRaw if str(item).strip()]
+        return UiEventResponse(
+            status="ok",
+            callbackId=callbackId,
+            eventType=request.eventType,
+            result=safeResult,
+            reactiveTrigger=reactiveTrigger,
+        )
 
     @router.delete("/api/kernel/{sessionId}")
     def apiDestroySession(sessionId: str) -> dict[str, bool]:
@@ -311,3 +367,13 @@ def requireSession(state: ServerState, sessionId: str):
     if session is None:
         fail(404, "session_not_found", "Session not found.")
     return session
+
+
+def _jsonSafeResult(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, dict):
+        return {str(key): _jsonSafeResult(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonSafeResult(item) for item in value]
+    return repr(value)

@@ -110,6 +110,28 @@ def testReset() -> None:
     session.dispose()
 
 
+def testPartialResetPreservesDefinitions() -> None:
+    session = KernelSession()
+    _run(session.execute("import math", blockId="b1"))
+    _run(session.execute("def double(n):\n    return n * 2", blockId="b2"))
+    _run(session.execute("value = 99", blockId="b3"))
+
+    session.reset(preserveDefinitions=True)
+
+    valueResult = _run(session.execute("value", blockId="b4"))
+    assert valueResult.status == "error"
+
+    callResult = _run(session.execute("double(7)", blockId="b5", injectedVars=["double"]))
+    assert callResult.status == "done"
+    assert "14" in callResult.data
+
+    importResult = _run(session.execute("math.pi", blockId="b6", injectedVars=["math"]))
+    assert importResult.status == "done"
+    assert "3.14" in importResult.data
+
+    session.dispose()
+
+
 def testGetVariables() -> None:
     session = KernelSession()
     _run(session.execute("name = 'codaro'\nversion = 1", blockId="cell1"))

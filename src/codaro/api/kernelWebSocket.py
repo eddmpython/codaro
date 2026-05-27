@@ -6,6 +6,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from pydantic import ValidationError
 
 from ..kernel.executionPayload import executeKernelBlock, executeKernelReactive
+from ..uiCallbacks import resetCallbacks
 from ..kernel.protocol import (
     WsErrorMessage,
     WsExecuteMessage,
@@ -90,6 +91,7 @@ async def handleKernelWsMessage(websocket: WebSocket, session: Any, message: Any
         await handleReactiveMessage(websocket, session, message, logger)
     elif isinstance(message, WsResetMessage):
         session.reset()
+        resetCallbacks()
         await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
         logger.debug("kernel-reset %s", formatLogFields(transport="ws", sessionId=session.sessionId))
 

@@ -354,7 +354,11 @@ def testAllCurriculaConvertToLocalDocuments() -> None:
     for path in CURRICULA_DIR.rglob("*.yaml"):
         if path.name == "schema.yaml":
             continue
-        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        try:
+            raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except yaml.YAMLError as exc:  # pragma: no cover - reports failing path
+            failures.append(f"{path} (yaml parse): {str(exc)[:200]}")
+            continue
         if not isinstance(raw, dict) or not isinstance(raw.get("sections"), list):
             continue
         try:

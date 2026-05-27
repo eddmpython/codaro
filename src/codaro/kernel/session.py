@@ -143,8 +143,8 @@ class KernelSession:
             payload=event.payload,
         )
 
-    def reset(self) -> None:
-        self._engine.reset()
+    def reset(self, *, preserveDefinitions: bool = False) -> None:
+        self._engine.reset(preserveDefinitions=preserveDefinitions)
 
     def dispose(self) -> None:
         self._engine.dispose()

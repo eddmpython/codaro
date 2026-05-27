@@ -44,6 +44,23 @@ class ExecuteRequest(BaseModel):
     blockId: str | None = None
 
 
+class UiEventRequest(BaseModel):
+    callbackId: str
+    eventType: str = "invoke"
+    payload: Any = None
+    blockId: str | None = None
+
+
+class UiEventResponse(BaseModel):
+    status: str
+    callbackId: str
+    eventType: str
+    result: Any = None
+    error: str | None = None
+    affectedVariables: list[str] = Field(default_factory=list)
+    reactiveTrigger: list[str] = Field(default_factory=list)
+
+
 class ReactiveBlockPayload(BaseModel):
     id: str
     type: Literal["code", "markdown"]

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import textwrap
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
+
+from .uiCallbacks import registerCallback
 
 
 DESCRIPTOR_TYPES = {
     "accordion",
     "callout",
+    "custom",
     "hstack",
     "html",
     "markdown",
@@ -18,6 +21,15 @@ DESCRIPTOR_TYPES = {
     "ui",
     "vstack",
 }
+
+
+def custom(name: str, props: dict[str, Any] | None = None) -> dict[str, Any]:
+    if not name or not isinstance(name, str):
+        raise ValueError("custom component name must be a non-empty string")
+    descriptor: dict[str, Any] = {"type": "custom", "name": name}
+    if props:
+        descriptor["props"] = _sanitizeValue(dict(props))
+    return descriptor
 
 UI_COMPONENTS = {
     "button",
@@ -200,12 +212,14 @@ class _UiNamespace:
         *,
         label: str = "",
         placeholder: str = "",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "text",
             value=value,
             label=label,
             placeholder=placeholder,
+            events=_bindEvents(change=onChange),
         )
 
     def textarea(
@@ -215,6 +229,7 @@ class _UiNamespace:
         label: str = "",
         placeholder: str = "",
         rows: int = 5,
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "textarea",
@@ -222,6 +237,7 @@ class _UiNamespace:
             label=label,
             placeholder=placeholder,
             rows=rows,
+            events=_bindEvents(change=onChange),
         )
 
     def number(
@@ -232,6 +248,7 @@ class _UiNamespace:
         min: int | float | None = None,
         max: int | float | None = None,
         step: int | float | None = None,
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "number",
@@ -240,6 +257,7 @@ class _UiNamespace:
             min=min,
             max=max,
             step=step,
+            events=_bindEvents(change=onChange),
         )
 
     def slider(
@@ -250,6 +268,7 @@ class _UiNamespace:
         value: int | float | None = None,
         step: int | float = 1,
         label: str = "",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "slider",
@@ -258,6 +277,7 @@ class _UiNamespace:
             min=start,
             max=stop,
             step=step,
+            events=_bindEvents(change=onChange),
         )
 
     def checkbox(
@@ -265,11 +285,13 @@ class _UiNamespace:
         value: bool = False,
         *,
         label: str = "",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "checkbox",
             value=bool(value),
             label=label,
+            events=_bindEvents(change=onChange),
         )
 
     def dropdown(
@@ -278,6 +300,7 @@ class _UiNamespace:
         *,
         value: object | None = None,
         label: str = "",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         normalizedOptions = [str(option) for option in options]
         selected = str(value) if value is not None else (normalizedOptions[0] if normalizedOptions else "")
@@ -286,6 +309,7 @@ class _UiNamespace:
             value=selected,
             label=label,
             options=normalizedOptions,
+            events=_bindEvents(change=onChange),
         )
 
     def button(
@@ -293,11 +317,13 @@ class _UiNamespace:
         label: str,
         *,
         kind: str = "neutral",
+        onClick: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "button",
             label=label,
             kind=kind,
+            events=_bindEvents(click=onClick),
         )
 
     def codeEditor(
@@ -306,12 +332,14 @@ class _UiNamespace:
         *,
         label: str = "",
         language: str = "python",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "code_editor",
             value=value,
             label=label,
             language=language,
+            events=_bindEvents(change=onChange),
         )
 
     def table(
@@ -368,11 +396,13 @@ class _UiNamespace:
         value: bool = False,
         *,
         label: str = "",
+        onChange: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         return _uiDescriptor(
             "toggle",
             value=bool(value),
             label=label,
+            events=_bindEvents(change=onChange),
         )
 
     def progress(
@@ -401,6 +431,8 @@ def isDescriptorPayload(value: object) -> bool:
         return False
     if payloadType == "ui":
         return isinstance(value.get("component"), str) and value.get("component") in UI_COMPONENTS
+    if payloadType == "custom":
+        return isinstance(value.get("name"), str) and bool(value.get("name"))
     return payloadType in DESCRIPTOR_TYPES
 
 
@@ -431,12 +463,27 @@ def _serializeCell(value: Any) -> Any:
     return str(value)
 
 
+def _bindEvents(**handlers: Callable[..., Any] | None) -> dict[str, str]:
+    bindings: dict[str, str] = {}
+    for eventName, handler in handlers.items():
+        if handler is None:
+            continue
+        if not callable(handler):
+            raise TypeError(f"Event handler for '{eventName}' must be callable.")
+        bindings[eventName] = registerCallback(handler)
+    return bindings
+
+
 def _uiDescriptor(component: str, **props: object) -> dict[str, Any]:
-    return {
+    events = props.pop("events", None)
+    descriptor: dict[str, Any] = {
         "type": "ui",
         "component": component,
         **_sanitizeValue(props),
     }
+    if events:
+        descriptor["events"] = dict(events)
+    return descriptor
 
 
 def _sanitizeValue(value: object) -> Any:

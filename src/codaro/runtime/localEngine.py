@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing.connection import Connection
 import multiprocessing as mp
@@ -49,7 +50,7 @@ class LocalEngine(ExecutionEngine):
         self._commandLock = threading.Lock()
         self._workerBusy = threading.Event()
         self._interruptCount = 0
-        self._resourceLimits = resourceLimits or ResourceLimits()
+        self._resourceLimits = resourceLimits or _defaultResourceLimits()
         self._supervisor = ProcessSupervisor(self._resourceLimits)
 
         self._registry: dict[str, object] = {}
@@ -282,22 +283,26 @@ class LocalEngine(ExecutionEngine):
             self._replaceWorker()
             self._cellDefinitions.pop(blockId, None)
 
-    def reset(self) -> None:
+    def reset(self, *, preserveDefinitions: bool = False) -> None:
         if self._hasLiveWorker():
+            action = "resetVariables" if preserveDefinitions else "reset"
             try:
-                response = self._sendCommand({"action": "reset"})
+                response = self._sendCommand({"action": action})
                 self._applyWorkerState(response)
             except (BrokenPipeError, EOFError, OSError):
                 self._replaceWorker()
+                if not preserveDefinitions:
+                    self._registry.clear()
+                    self._cellDefinitions.clear()
+                self._variableStates = []
+                if not preserveDefinitions:
+                    self.executionCount = 0
+        else:
+            if not preserveDefinitions:
                 self._registry.clear()
                 self._cellDefinitions.clear()
-                self._variableStates = []
                 self.executionCount = 0
-        else:
-            self._registry.clear()
-            self._cellDefinitions.clear()
             self._variableStates = []
-            self.executionCount = 0
         self.status = "idle"
 
     def dispose(self) -> None:
@@ -376,6 +381,7 @@ class LocalEngine(ExecutionEngine):
         connection.send(command)
         while True:
             response = connection.recv()
+            self._supervisor.heartbeat()
             if isinstance(response, dict) and response.get("kind") == "event":
                 if eventSink is not None:
                     eventSink(dict(response.get("event", {})))
@@ -535,3 +541,16 @@ def _resolvePath(pathLike: str | Path | None) -> Path | None:
     if pathLike is None:
         return None
     return Path(pathLike).expanduser().resolve()
+
+
+def _defaultResourceLimits() -> ResourceLimits:
+    # 기본 heartbeat timeout은 셀 실행 hard timeout(300s)의 2배.
+    # 정상 셀은 IPC 응답마다 heartbeat 갱신되므로, 600초 이상 무응답인 worker만 좀비로 회수.
+    limits = ResourceLimits(heartbeatTimeoutSeconds=600.0)
+    raw = os.environ.get("CODARO_WORKER_HEARTBEAT_TIMEOUT")
+    if raw:
+        try:
+            limits.heartbeatTimeoutSeconds = max(0.0, float(raw))
+        except ValueError:
+            pass
+    return limits
