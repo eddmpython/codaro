@@ -1,0 +1,333 @@
+meta:
+  id: watchSched_05
+  title: schedule 라이브러리 기본
+  order: 5
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+    - schedule
+  tags:
+    - schedule
+    - jobs
+    - interval
+intro:
+  direction: schedule 라이브러리로 인터벌과 시간 기반 작업을 정의하고 run_pending으로 셀에서 직접 실행 흐름을 확인한다.
+  benefits:
+    - schedule.every로 인터벌 작업을 등록한다.
+    - run_pending과 run_all로 셀에서 즉시 실행한다.
+    - 작업 단위 함수에서 결과 리스트를 누적한다.
+    - 종합 결과 dict로 실행 횟수와 마지막 실행 시각을 보고한다.
+  diagram:
+    steps:
+      - label: 작업 함수 정의
+        detail: 결과 리스트에 값을 추가하는 작은 작업을 정의한다.
+      - label: 인터벌 등록
+        detail: schedule.every().seconds.do(job)으로 등록한다.
+      - label: run_pending과 run_all
+        detail: 셀에서 직접 작업을 실행해 누적 결과를 확인한다.
+      - label: 종합 결과 정리
+        detail: 누적 횟수와 결과 리스트를 dict로 묶어 자동화 보고에 사용한다.
+    runtime:
+      - label: schedule 패키지 필요
+        detail: meta.packages의 schedule이 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 검증
+        detail: 작업 실행 횟수와 결과 리스트를 assert로 비교한다.
+sections:
+  - id: job-skeleton
+    title: 작업 함수 정의
+    structuredPrimary: true
+    subtitle: 결과 리스트에 누적
+    goal: 호출될 때마다 결과 리스트에 카운터를 추가하는 단순 작업 함수를 만든다.
+    why: 스케줄러 학습은 작업 함수가 단순할 때 실행 흐름을 가장 명확히 보여 준다.
+    explanation: '작업 함수는 인자 없이 호출되며 외부 상태(예: results 리스트)에 부수효과를 남기는 단순 형태다. 함수 자체는 import schedule과 무관하게 정의되고, 등록은 별도 단계에서 한다. 함수가 결과 리스트에 append만 하므로 동작 검증이 쉽다.'
+    tips:
+      - 외부 리스트는 함수 호출 사이에 상태를 유지한다.
+      - 작업 결과는 가능한 한 dict로 두어 다음 단계에서 의미를 가진다.
+    snippet: |-
+      results: list[int] = []
+
+
+      def runJob() -> None:
+          results.append(len(results) + 1)
+
+
+      runJob()
+      runJob()
+
+      assert results == [1, 2]
+      results
+    exercise:
+      prompt: 같은 형태로 호출될 때마다 results에 카운터를 추가하는 함수가 세 번 호출되면 [1, 2, 3]이 되는지 검증하세요.
+      starterCode: |-
+        results: list[int] = []
+
+
+        def runJob() -> None:
+            results.append(len(results) + ___)
+
+
+        runJob()
+        runJob()
+        runJob()
+
+        assert results == [1, 2, 3]
+        results
+      solution: |-
+        results: list[int] = []
+
+
+        def runJob() -> None:
+            results.append(len(results) + 1)
+
+
+        runJob()
+        runJob()
+        runJob()
+
+        assert results == [1, 2, 3]
+        results
+      hints:
+        - 카운터는 현재 리스트 길이에 1을 더한 값으로 계산된다.
+        - 세 번 호출은 [1, 2, 3]을 만든다.
+      check:
+        noError: runJob 세 번 호출이 정상적으로 끝나야 한다.
+        resultCheck: results 리스트가 [1, 2, 3]이어야 한다.
+    check:
+      noError: 작업 함수 정의와 호출이 끝나야 한다.
+      resultCheck: results 리스트가 [1, 2]여야 한다.
+  - id: schedule-register
+    title: schedule.every 등록
+    structuredPrimary: true
+    subtitle: 인터벌 작업 만들기
+    goal: schedule.every().seconds.do로 작업을 등록하고 schedule.jobs 리스트가 한 개의 Job을 가진다는 것을 확인한다.
+    why: 자동화는 작업 등록과 실행을 분리해야 같은 함수를 다른 주기로 등록하기 쉬워진다.
+    explanation: schedule.every()는 Job 객체를 만들고 seconds, minutes, hours 같은 속성과 do(callable)로 등록을 마친다. schedule.jobs는 등록된 모든 Job 리스트다. clear()로 등록을 모두 비우면 다음 셀에 영향을 주지 않는다.
+    tips:
+      - schedule.clear는 모든 등록을 비우므로 셀 시작 시 호출하면 안전하다.
+      - Job 객체의 interval 속성은 인자로 받은 정수를 그대로 보여 준다.
+    snippet: |-
+      import schedule
+
+
+      def runJob() -> None:
+          pass
+
+
+      schedule.clear()
+      schedule.every(2).seconds.do(runJob)
+      registered = len(schedule.jobs)
+
+      assert registered == 1
+      schedule.clear()
+      registered
+    exercise:
+      prompt: schedule.clear를 호출한 뒤 schedule.every(5).seconds.do(runJob)을 두 번 등록해 jobs 리스트 길이가 2가 되는지 검증하세요.
+      starterCode: |-
+        import schedule
+
+
+        def runJob() -> None:
+            pass
+
+
+        schedule.clear()
+        schedule.every(___).seconds.do(runJob)
+        schedule.every(5).seconds.do(runJob)
+        registered = len(schedule.jobs)
+
+        assert registered == 2
+        schedule.clear()
+        registered
+      solution: |-
+        import schedule
+
+
+        def runJob() -> None:
+            pass
+
+
+        schedule.clear()
+        schedule.every(5).seconds.do(runJob)
+        schedule.every(5).seconds.do(runJob)
+        registered = len(schedule.jobs)
+
+        assert registered == 2
+        schedule.clear()
+        registered
+      hints:
+        - schedule.every에 5를 두 번 넘기면 두 Job이 만들어진다.
+        - schedule.clear는 다음 검사를 위해 마지막에 호출해 셀 상태를 정리한다.
+      check:
+        noError: schedule.every 호출과 jobs 카운트가 정상적으로 끝나야 한다.
+        resultCheck: registered가 정확히 2여야 한다.
+    check:
+      noError: schedule.every와 jobs 접근이 끝나야 한다.
+      resultCheck: registered가 정확히 1이어야 한다.
+  - id: run-now
+    title: 셀에서 즉시 실행
+    structuredPrimary: true
+    subtitle: schedule.run_all
+    goal: 등록된 모든 작업을 셀에서 즉시 실행해 누적 결과를 확인한다.
+    why: 자동화 학습 환경은 보통 백그라운드 루프를 돌리지 않으므로 run_all로 동작을 즉시 검증한다.
+    explanation: schedule.run_all은 등록된 모든 Job을 즉시 호출한다. 인자로 delay_seconds를 주면 작업 사이에 대기를 두지만 학습에서는 0이 기본이다. 동일 작업을 여러 번 등록하면 같은 횟수만큼 호출된다.
+    tips:
+      - run_all은 즉시 모든 등록 작업을 실행하므로 학습 검증에 편리하다.
+      - 실제 운영에서는 schedule.run_pending을 루프 안에서 호출한다.
+    snippet: |-
+      import schedule
+
+
+      results: list[int] = []
+
+
+      def runJob() -> None:
+          results.append(len(results) + 1)
+
+
+      schedule.clear()
+      schedule.every(1).seconds.do(runJob)
+      schedule.every(1).seconds.do(runJob)
+      schedule.run_all()
+      schedule.clear()
+
+      assert results == [1, 2]
+      results
+    exercise:
+      prompt: 같은 작업을 세 번 등록하고 run_all을 호출해 results가 [1, 2, 3]이 되는지 검증하세요.
+      starterCode: |-
+        import schedule
+
+
+        results: list[int] = []
+
+
+        def runJob() -> None:
+            results.append(len(results) + 1)
+
+
+        schedule.clear()
+        schedule.every(1).seconds.do(runJob)
+        schedule.every(1).seconds.do(runJob)
+        schedule.every(1).seconds.do(runJob)
+        schedule.___()
+        schedule.clear()
+
+        assert results == [1, 2, 3]
+        results
+      solution: |-
+        import schedule
+
+
+        results: list[int] = []
+
+
+        def runJob() -> None:
+            results.append(len(results) + 1)
+
+
+        schedule.clear()
+        schedule.every(1).seconds.do(runJob)
+        schedule.every(1).seconds.do(runJob)
+        schedule.every(1).seconds.do(runJob)
+        schedule.run_all()
+        schedule.clear()
+
+        assert results == [1, 2, 3]
+        results
+      hints:
+        - 모든 작업을 즉시 실행하는 함수 이름은 run_all이다.
+        - 등록 세 번이면 카운터가 1부터 3까지 차례로 늘어난다.
+      check:
+        noError: schedule.run_all 호출이 정상적으로 끝나야 한다.
+        resultCheck: results 리스트가 [1, 2, 3]이어야 한다.
+    check:
+      noError: schedule.run_all 호출이 정상적으로 끝나야 한다.
+      resultCheck: results 리스트가 [1, 2]여야 한다.
+  - id: tick-summary
+    title: 종합 실행 결과 정리
+    structuredPrimary: true
+    subtitle: 횟수와 마지막 값 보고
+    goal: 셀에서 일정 횟수만큼 작업을 호출한 뒤 종합 결과 dict로 통계를 정리한다.
+    why: 종합 보고는 다음 자동화 단계가 같은 dict 구조를 신뢰할 수 있도록 표준 형태로 둔다.
+    explanation: 마지막 섹션은 작업 함수와 등록을 함수에 묶어 호출 횟수와 결과 리스트를 dict로 돌려준다. 같은 함수는 두 번 호출해도 같은 dict 형태를 유지한다. 자동화에서는 이 dict가 대시보드 입력이 된다.
+    tips:
+      - dict 키 이름은 count와 lastValue처럼 짧게 두어 자동화 코드가 단순해진다.
+      - schedule.clear는 함수 시작 시 호출해 외부 상태가 새 사이클에 영향을 주지 않게 한다.
+    snippet: |-
+      import schedule
+
+
+      def runCycle(count: int) -> dict:
+          schedule.clear()
+          results: list[int] = []
+
+          def job() -> None:
+              results.append(len(results) + 1)
+
+          for _ in range(count):
+              schedule.every(1).seconds.do(job)
+          schedule.run_all()
+          schedule.clear()
+          return {"count": count, "lastValue": results[-1] if results else None, "all": results}
+
+
+      report = runCycle(4)
+
+      assert report == {"count": 4, "lastValue": 4, "all": [1, 2, 3, 4]}
+      report
+    exercise:
+      prompt: runCycle을 5로 호출해 종합 결과 dict가 count 5와 lastValue 5, all 리스트 [1,2,3,4,5]를 담는지 검증하세요.
+      starterCode: |-
+        import schedule
+
+
+        def runCycle(count: int) -> dict:
+            schedule.clear()
+            results: list[int] = []
+
+            def job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(job)
+            schedule.run_all()
+            schedule.clear()
+            return {"count": count, "lastValue": results[-___] if results else None, "all": results}
+
+
+        report = runCycle(5)
+
+        assert report == {"count": 5, "lastValue": 5, "all": [1, 2, 3, 4, 5]}
+        report
+      solution: |-
+        import schedule
+
+
+        def runCycle(count: int) -> dict:
+            schedule.clear()
+            results: list[int] = []
+
+            def job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(job)
+            schedule.run_all()
+            schedule.clear()
+            return {"count": count, "lastValue": results[-1] if results else None, "all": results}
+
+
+        report = runCycle(5)
+
+        assert report == {"count": 5, "lastValue": 5, "all": [1, 2, 3, 4, 5]}
+        report
+      hints:
+        - 마지막 항목은 results 리스트의 -1 인덱스다.
+        - 카운트 5이면 all 리스트가 1부터 5까지 다섯 정수를 담는다.
+      check:
+        noError: runCycle 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: report dict가 count 5, lastValue 5, all 다섯 정수를 정확히 담아야 한다.
+    check:
+      noError: 종합 사이클 함수와 작업 등록이 끝나야 한다.
+      resultCheck: report dict의 count, lastValue, all 세 값이 본문 기대값과 일치해야 한다.
