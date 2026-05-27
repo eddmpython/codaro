@@ -1,245 +1,299 @@
 meta:
   id: inputCtl_06
-  title: 이미지 매치 점수
+  title: 이미지 매치로 위치 찾기
   order: 6
   category: inputCtl
-  difficulty: easy
+  difficulty: medium
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pyautogui
+    - pillow
+    - opencv-python
   tags:
-    - matching
-    - score
+    - pyautogui
+    - locate
     - automation
 intro:
-  direction: 이미지 매치 결과를 score와 box dict로 표현하고 임계값으로 확정 여부를 판정해 자동화 흐름의 신뢰 결정을 만든다.
+  direction: PIL로 합성 이미지를 만들고 pyautogui.locate로 부분 이미지를 찾아 GUI 자동화의 이미지 매치 흐름을 실제로 실행해 본다.
   benefits:
-    - 매치 결과 dict 표기를 표준화한다.
-    - confidence 임계값으로 확정과 미확정을 분기한다.
-    - 같은 임계값으로 여러 매치 결과를 일괄 처리한다.
-    - 종합 매치 결과 dict로 자동화 보고를 만든다.
+    - PIL.Image.new와 draw로 검색 대상 이미지를 합성한다.
+    - 합성 이미지에서 needle 영역을 잘라 검색 대상으로 사용한다.
+    - pyautogui.locate로 needle을 haystack에서 찾는다.
+    - 종합 검색 함수가 매치 결과 Box를 dict로 보고한다.
   diagram:
     steps:
-      - label: 매치 결과 dict
-        detail: score, box 두 키로 한 매치 결과를 표현한다.
-      - label: 임계값 판정
-        detail: score가 임계값 이상이면 confirmed, 미만이면 rejected로 분류한다.
-      - label: 일괄 분류
-        detail: 매치 결과 리스트를 한 번에 분기 처리한다.
-      - label: 종합 매치 보고
-        detail: confirmed와 rejected 리스트를 가진 dict로 자동화 보고를 만든다.
+      - label: 합성 haystack 만들기
+        detail: PIL.Image.new로 단색 캔버스에 표식을 그려 큰 이미지를 만든다.
+      - label: needle 자르기
+        detail: Image.crop으로 haystack에서 알려진 좌표의 작은 영역을 잘라낸다.
+      - label: 매치 실행
+        detail: pyautogui.locate(needle, haystack)을 호출해 Box namedtuple을 받는다.
+      - label: 종합 검색 함수
+        detail: 매치 결과의 좌표와 크기를 dict로 묶어 자동화 보고를 만든다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: dict와 list 연산만 사용한다.
-      - label: assert 기반 검증
-        detail: 매치 분류 결과와 임계값 비교를 assert로 확인한다.
+      - label: pyautogui와 pillow 패키지 필요
+        detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
+      - label: opencv-python 권장
+        detail: pyautogui.locate는 opencv-python이 있을 때 더 빠르게 동작한다.
 sections:
-  - id: match-shape
-    title: 매치 결과 dict 모양
+  - id: build-haystack
+    title: 합성 haystack 만들기
     structuredPrimary: true
-    subtitle: score, box 두 키
-    goal: 한 매치 결과를 score 부동소수와 box dict로 표현한다.
-    why: 매치 결과 표기를 통일하면 후속 자동화 흐름이 같은 키를 신뢰할 수 있다.
-    explanation: score는 0과 1 사이 부동소수다. box는 left, top, width, height 키를 가진 영역 dict다. 자동화 코드는 score와 box를 함께 받아 다음 클릭이나 보고에 사용한다.
+    subtitle: PIL.Image.new
+    goal: PIL.Image.new와 ImageDraw로 단색 배경에 사각형 표식을 가진 haystack 이미지를 합성한다.
+    why: 실제 자동화 학습에서는 외부 이미지 의존성을 피하면서도 매치 흐름을 검증할 수 있는 합성 이미지가 가장 안전한 입력이다.
+    explanation: PIL.Image.new(mode, size, color)는 단색 이미지를 만든다. ImageDraw.Draw(image)로 그리기 객체를 얻고 rectangle으로 색이 다른 사각형을 그리면 매치 알고리즘이 식별할 수 있는 표식이 생긴다. 결과 이미지는 메모리에만 존재해 디스크를 어지럽히지 않는다.
     tips:
-      - score 값이 1에 가까울수록 매치가 확실하다.
-      - 영역 dict 형식은 이전 레슨과 동일하게 유지한다.
+      - 표식은 배경과 충분히 대비되는 색으로 둬야 매치 정확도가 높다.
+      - 합성 이미지 학습은 외부 스크린샷 없이도 매치 흐름을 검증한다.
     snippet: |-
-      match = {"score": 0.92, "box": {"left": 100, "top": 50, "width": 80, "height": 40}}
+      from PIL import Image, ImageDraw
 
-      assert match["score"] > 0.5
-      match
+      haystack = Image.new("RGB", (120, 80), "white")
+      drawer = ImageDraw.Draw(haystack)
+      drawer.rectangle((20, 20, 40, 40), fill="black")
+
+      assert haystack.size == (120, 80)
+      assert haystack.getpixel((30, 30)) == (0, 0, 0)
+      haystack.size
     exercise:
-      prompt: score 0.85, box left=20, top=30, width=50, height=25인 매치 결과를 만들고 score가 0.5보다 큰지 검증하세요.
+      prompt: 200x150 흰색 캔버스에 (50, 50)-(70, 70) 검정 사각형을 그리고 (60, 60) 픽셀이 검정인지 검증하세요.
       starterCode: |-
-        match = {"score": ___, "box": {"left": 20, "top": 30, "width": 50, "height": 25}}
+        from PIL import Image, ImageDraw
 
-        assert match["score"] > 0.5
-        match
+        haystack = Image.new("RGB", (200, 150), "white")
+        drawer = ImageDraw.Draw(haystack)
+        drawer.___((50, 50, 70, 70), fill="black")
+
+        assert haystack.size == (200, 150)
+        assert haystack.getpixel((60, 60)) == (0, 0, 0)
+        haystack.size
       solution: |-
-        match = {"score": 0.85, "box": {"left": 20, "top": 30, "width": 50, "height": 25}}
+        from PIL import Image, ImageDraw
 
-        assert match["score"] > 0.5
-        match
+        haystack = Image.new("RGB", (200, 150), "white")
+        drawer = ImageDraw.Draw(haystack)
+        drawer.rectangle((50, 50, 70, 70), fill="black")
+
+        assert haystack.size == (200, 150)
+        assert haystack.getpixel((60, 60)) == (0, 0, 0)
+        haystack.size
       hints:
-        - score 값은 부동소수 0.85다.
-        - box dict의 키는 left, top, width, height다.
+        - ImageDraw 메서드 이름은 rectangle이다.
+        - 사각형 인자는 (left, top, right, bottom) 형식이다.
       check:
-        noError: dict 구성이 끝나야 한다.
-        resultCheck: match의 score가 0.85여야 한다.
+        noError: PIL 이미지 합성이 끝나야 한다.
+        resultCheck: haystack의 (60, 60) 픽셀이 검정이어야 한다.
     check:
-      noError: dict 구성이 끝나야 한다.
-      resultCheck: match의 score가 0.5 초과여야 한다.
-  - id: threshold
-    title: 임계값 판정 분기
+      noError: PIL 이미지 합성이 끝나야 한다.
+      resultCheck: haystack의 (30, 30) 픽셀이 검정이고 크기가 (120, 80)이어야 한다.
+  - id: crop-needle
+    title: needle 자르기
     structuredPrimary: true
-    subtitle: confirmed vs rejected
-    goal: 한 매치 결과를 임계값과 비교해 confirmed 또는 rejected 상태로 분류한다.
-    why: 자동화 흐름은 매치 점수에 따라 다음 단계로 갈지 다시 시도할지 결정해야 하므로 임계값 분기가 핵심이다.
-    explanation: classify 함수는 매치 dict와 임계값을 받아 score가 임계값 이상이면 status를 confirmed로 두고 아니면 rejected로 둔다. 결과 dict는 score, status, box 세 키를 가진 표준 형태다.
+    subtitle: Image.crop()
+    goal: 합성 haystack에서 표식을 포함한 작은 영역을 Image.crop으로 잘라 검색에 쓸 needle 이미지를 만든다.
+    why: 검색 대상 needle은 haystack 안에 정확히 존재하는 이미지여야 매치가 보장된다.
+    explanation: Image.crop((left, top, right, bottom))은 사각 영역을 잘라 새 Image를 돌려준다. 자른 needle 안에 표식이 포함되면 같은 haystack에서 다시 찾을 수 있다. 좌표는 픽셀 단위 정수다.
     tips:
-      - 임계값은 일반적으로 0.8 정도가 안전하다.
-      - rejected 매치는 운영자 검토 큐로 보낸다.
+      - crop의 인자는 (left, top, right, bottom) tuple이며 right, bottom이 결과 크기를 결정한다.
+      - needle이 너무 크면 매치 시간이 늘어나므로 필요한 만큼만 자른다.
     snippet: |-
-      def classifyMatch(match: dict, threshold: float) -> dict:
-          status = "confirmed" if match["score"] >= threshold else "rejected"
-          return {"score": match["score"], "status": status, "box": match["box"]}
+      from PIL import Image, ImageDraw
 
+      haystack = Image.new("RGB", (120, 80), "white")
+      ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+      needle = haystack.crop((18, 18, 42, 42))
 
-      result = classifyMatch({"score": 0.92, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
-
-      assert result["status"] == "confirmed"
-      result
+      assert needle.size == (24, 24)
+      assert needle.getpixel((12, 12)) == (0, 0, 0)
+      needle.size
     exercise:
-      prompt: score 0.65 매치를 임계값 0.8로 분류하면 status가 rejected가 되는지 검증하세요.
+      prompt: 같은 패턴으로 (18, 18, 42, 42) 영역을 needle로 잘라 needle.size가 (24, 24)이고 중앙 픽셀이 검정인지 검증하세요.
       starterCode: |-
-        def classifyMatch(match: dict, threshold: float) -> dict:
-            status = "confirmed" if match["score"] >= threshold else "___"
-            return {"score": match["score"], "status": status, "box": match["box"]}
+        from PIL import Image, ImageDraw
 
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+        needle = haystack.___((18, 18, 42, 42))
 
-        result = classifyMatch({"score": 0.65, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
-
-        assert result["status"] == "rejected"
-        result
+        assert needle.size == (24, 24)
+        assert needle.getpixel((12, 12)) == (0, 0, 0)
+        needle.size
       solution: |-
-        def classifyMatch(match: dict, threshold: float) -> dict:
-            status = "confirmed" if match["score"] >= threshold else "rejected"
-            return {"score": match["score"], "status": status, "box": match["box"]}
+        from PIL import Image, ImageDraw
 
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+        needle = haystack.crop((18, 18, 42, 42))
 
-        result = classifyMatch({"score": 0.65, "box": {"left": 0, "top": 0, "width": 10, "height": 10}}, 0.8)
-
-        assert result["status"] == "rejected"
-        result
+        assert needle.size == (24, 24)
+        assert needle.getpixel((12, 12)) == (0, 0, 0)
+        needle.size
       hints:
-        - rejected 상태는 임계값 미만 매치에 부여된다.
-        - 두 상태 이름은 confirmed와 rejected 두 값이다.
+        - PIL.Image 메서드 이름은 crop이다.
+        - crop tuple의 right-left가 결과 너비다.
       check:
-        noError: classifyMatch 호출이 정상적으로 끝나야 한다.
-        resultCheck: result의 status가 rejected여야 한다.
+        noError: crop 호출이 끝나야 한다.
+        resultCheck: needle.size가 (24, 24)이어야 한다.
     check:
-      noError: classifyMatch 호출이 정상적으로 끝나야 한다.
-      resultCheck: result의 status가 confirmed여야 한다.
-  - id: bulk-classify
-    title: 일괄 매치 분류
+      noError: crop 호출이 끝나야 한다.
+      resultCheck: needle.size가 (24, 24)여야 한다.
+  - id: locate-needle
+    title: needle 찾기
     structuredPrimary: true
-    subtitle: 리스트 전체 처리
-    goal: 매치 결과 리스트를 한 번에 분류해 status별 카운트를 dict로 만든다.
-    why: 자동화는 동시에 여러 매치 결과를 다루는 경우가 많아 일괄 분류가 표준 도구다.
-    explanation: bulkClassify 함수는 매치 리스트와 임계값을 받아 confirmed와 rejected 카운트를 세고 같은 키 dict를 돌려준다. 결과는 자동화 화면에 그대로 표시된다.
+    subtitle: pyautogui.locate()
+    goal: pyautogui.locate(needle, haystack)으로 needle을 haystack 안에서 찾고 Box의 좌표가 자른 위치와 일치하는지 확인한다.
+    why: 자동화는 화면 안 특정 요소를 좌표로 잡아야 클릭이나 입력 위치를 정할 수 있어 이미지 매치가 핵심 도구다.
+    explanation: pyautogui.locate(needle, haystack)는 Box(left, top, width, height) namedtuple을 돌려주며 매치가 없으면 None이 돌아온다. Box.left와 top은 needle을 찾은 좌표다. 합성 이미지처럼 정확한 매치가 보장되면 Box가 반드시 돌아온다.
     tips:
-      - 결과 dict 키는 항상 두 상태 모두 두어 후속 코드가 KeyError 없이 동작한다.
-      - 카운트가 0이면 명시적으로 빈 값을 보여 운영 화면이 일관된다.
+      - locate는 needle과 haystack 모두 PIL.Image 객체로 받을 수 있다.
+      - 실제 자동화에서는 locateOnScreen이 화면에서 직접 찾는다.
     snippet: |-
-      def bulkClassify(matches: list, threshold: float) -> dict:
-          counts = {"confirmed": 0, "rejected": 0}
-          for match in matches:
-              status = "confirmed" if match["score"] >= threshold else "rejected"
-              counts[status] += 1
-          return counts
+      import pyautogui
+      from PIL import Image, ImageDraw
 
+      haystack = Image.new("RGB", (120, 80), "white")
+      ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+      needle = haystack.crop((18, 18, 42, 42))
+      box = pyautogui.locate(needle, haystack)
 
-      summary = bulkClassify(
-          [{"score": 0.9}, {"score": 0.6}, {"score": 0.85}],
-          threshold=0.8,
-      )
-
-      assert summary == {"confirmed": 2, "rejected": 1}
-      summary
+      assert box is not None
+      assert (box.left, box.top) == (18, 18)
+      (box.left, box.top, box.width, box.height)
     exercise:
-      prompt: 네 매치 (0.95, 0.4, 0.7, 0.85)를 임계값 0.75로 분류하면 confirmed 2, rejected 2가 되는지 검증하세요.
+      prompt: pyautogui.locate로 needle을 haystack에서 찾고 Box의 left, top이 (18, 18)인지 검증하세요.
       starterCode: |-
-        def bulkClassify(matches: list, threshold: float) -> dict:
-            counts = {"confirmed": 0, "rejected": 0}
-            for match in matches:
-                status = "confirmed" if match["score"] >= threshold else "rejected"
-                counts[status] += ___
-            return counts
+        import pyautogui
+        from PIL import Image, ImageDraw
 
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+        needle = haystack.crop((18, 18, 42, 42))
+        box = pyautogui.___(needle, haystack)
 
-        summary = bulkClassify(
-            [{"score": 0.95}, {"score": 0.4}, {"score": 0.7}, {"score": 0.85}],
-            threshold=0.75,
-        )
-
-        assert summary == {"confirmed": 2, "rejected": 2}
-        summary
+        assert box is not None
+        assert (box.left, box.top) == (18, 18)
+        (box.left, box.top)
       solution: |-
-        def bulkClassify(matches: list, threshold: float) -> dict:
-            counts = {"confirmed": 0, "rejected": 0}
-            for match in matches:
-                status = "confirmed" if match["score"] >= threshold else "rejected"
-                counts[status] += 1
-            return counts
+        import pyautogui
+        from PIL import Image, ImageDraw
 
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((20, 20, 40, 40), fill="black")
+        needle = haystack.crop((18, 18, 42, 42))
+        box = pyautogui.locate(needle, haystack)
 
-        summary = bulkClassify(
-            [{"score": 0.95}, {"score": 0.4}, {"score": 0.7}, {"score": 0.85}],
-            threshold=0.75,
-        )
-
-        assert summary == {"confirmed": 2, "rejected": 2}
-        summary
+        assert box is not None
+        assert (box.left, box.top) == (18, 18)
+        (box.left, box.top)
       hints:
-        - 카운트는 매 매치마다 1씩 늘어난다.
-        - 임계값 0.75 기준으로 0.95와 0.85가 confirmed로 분류된다.
+        - 매치 함수 이름은 locate다.
+        - Box 객체는 left, top, width, height 네 필드를 가진다.
       check:
-        noError: bulkClassify 호출이 정상적으로 끝나야 한다.
-        resultCheck: summary가 confirmed 2와 rejected 2를 정확히 담아야 한다.
+        noError: locate 호출이 끝나야 한다.
+        resultCheck: box의 left, top이 (18, 18)이어야 한다.
     check:
-      noError: 일괄 분류 함수 호출이 끝나야 한다.
-      resultCheck: summary가 confirmed 2와 rejected 1을 정확히 담아야 한다.
-  - id: report-summary
-    title: 종합 매치 보고 정리
+      noError: pyautogui.locate 호출이 끝나야 한다.
+      resultCheck: box가 None이 아니고 좌표가 자른 위치와 같아야 한다.
+  - id: locate-report
+    title: 종합 매치 보고
     structuredPrimary: true
-    subtitle: 임계값과 매치 dict 묶기
-    goal: 임계값과 매치 분류 결과를 한 dict로 묶어 자동화 표준 보고 형태를 완성한다.
-    why: 종합 보고는 같은 임계값을 기준으로 결과가 분류되었음을 운영자에게 명확히 알리는 역할을 한다.
-    explanation: matchReport 함수는 매치 리스트와 임계값을 받아 threshold, confirmedCount, rejectedCount를 dict로 돌려준다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다. 자동화 다음 단계는 confirmedCount를 보고 분기한다.
+    subtitle: Box를 dict로
+    goal: 매치 결과 Box를 dict로 변환해 found, left, top, width, height 키를 가진 자동화 보고를 만든다.
+    why: 종합 매치 보고는 자동화가 어떤 좌표에서 요소를 찾았는지 운영자가 한눈에 검토하게 만들고 매치 실패도 명확히 드러낸다.
+    explanation: locateOrReport 함수는 needle과 haystack을 받아 pyautogui.locate를 호출하고 결과 Box를 dict로 풀어 돌려준다. 매치가 없으면 found 키를 False로, 좌표 키들은 None으로 채워 호출 측이 단일 형태로 분기할 수 있다. 같은 함수는 매치 성공과 실패 모두 안전한 dict 구조를 보장한다.
     tips:
-      - threshold 키는 운영자가 사용한 기준값을 명시한다.
-      - rejected 항목이 많으면 임계값 또는 매치 알고리즘을 재검토해야 한다.
+      - 보고 dict의 found 키는 자동화 분기의 표준 신호다.
+      - 매치 실패 시 좌표 키를 None으로 두면 다음 단계 코드가 단순해진다.
     snippet: |-
-      def matchReport(matches: list, threshold: float) -> dict:
-          confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
-          rejectedCount = len(matches) - confirmedCount
-          return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+      import pyautogui
+      from PIL import Image, ImageDraw
 
 
-      report = matchReport([{"score": 0.91}, {"score": 0.45}, {"score": 0.8}], threshold=0.75)
+      def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
+          box = pyautogui.locate(needle, haystack)
+          if box is None:
+              return {"found": False, "left": None, "top": None, "width": None, "height": None}
+          return {
+              "found": True,
+              "left": box.left,
+              "top": box.top,
+              "width": box.width,
+              "height": box.height,
+          }
 
-      assert report == {"threshold": 0.75, "confirmedCount": 2, "rejectedCount": 1}
-      report
+
+      haystack = Image.new("RGB", (120, 80), "white")
+      ImageDraw.Draw(haystack).rectangle((30, 30, 50, 50), fill="black")
+      needle = haystack.crop((28, 28, 52, 52))
+      missing = Image.new("RGB", (10, 10), "red")
+      hit = locateOrReport(needle, haystack)
+      miss = locateOrReport(missing, haystack)
+
+      assert hit["found"] is True
+      assert hit["left"] == 28 and hit["top"] == 28
+      assert miss["found"] is False
+      (hit["found"], miss["found"])
     exercise:
-      prompt: 임계값 0.9를 사용해 같은 함수에 (0.95, 0.85, 0.7) 세 매치를 넘기면 confirmedCount 1, rejectedCount 2가 되는지 종합 검증하세요.
+      prompt: locateOrReport에 needle과 haystack을 넘기면 found=True이고 left/top이 needle을 자른 좌표와 같은지 종합 검증하세요.
       starterCode: |-
-        def matchReport(matches: list, threshold: float) -> dict:
-            confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
-            rejectedCount = len(matches) - ___
-            return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+        import pyautogui
+        from PIL import Image, ImageDraw
 
 
-        report = matchReport([{"score": 0.95}, {"score": 0.85}, {"score": 0.7}], threshold=0.9)
+        def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
+            box = pyautogui.locate(needle, haystack)
+            if box is None:
+                return {"found": False, "left": None, "top": None, "width": None, "height": None}
+            return {
+                "found": True,
+                "left": box.left,
+                "top": box.top,
+                "width": box.width,
+                "height": box.height,
+            }
 
-        assert report == {"threshold": 0.9, "confirmedCount": 1, "rejectedCount": 2}
-        report
+
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((30, 30, 50, 50), fill="black")
+        needle = haystack.crop((28, 28, 52, 52))
+        hit = locateOrReport(needle, haystack)
+
+        assert hit["___"] is True
+        assert (hit["left"], hit["top"]) == (28, 28)
+        hit
       solution: |-
-        def matchReport(matches: list, threshold: float) -> dict:
-            confirmedCount = sum(1 for m in matches if m["score"] >= threshold)
-            rejectedCount = len(matches) - confirmedCount
-            return {"threshold": threshold, "confirmedCount": confirmedCount, "rejectedCount": rejectedCount}
+        import pyautogui
+        from PIL import Image, ImageDraw
 
 
-        report = matchReport([{"score": 0.95}, {"score": 0.85}, {"score": 0.7}], threshold=0.9)
+        def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
+            box = pyautogui.locate(needle, haystack)
+            if box is None:
+                return {"found": False, "left": None, "top": None, "width": None, "height": None}
+            return {
+                "found": True,
+                "left": box.left,
+                "top": box.top,
+                "width": box.width,
+                "height": box.height,
+            }
 
-        assert report == {"threshold": 0.9, "confirmedCount": 1, "rejectedCount": 2}
-        report
+
+        haystack = Image.new("RGB", (120, 80), "white")
+        ImageDraw.Draw(haystack).rectangle((30, 30, 50, 50), fill="black")
+        needle = haystack.crop((28, 28, 52, 52))
+        hit = locateOrReport(needle, haystack)
+
+        assert hit["found"] is True
+        assert (hit["left"], hit["top"]) == (28, 28)
+        hit
       hints:
-        - rejectedCount는 전체 길이에서 confirmedCount를 뺀 값이다.
-        - 임계값 0.9에서 0.95만 confirmed로 분류된다.
+        - dict 키 이름은 found다.
+        - 잘라낸 좌표 (28, 28)이 매치 결과의 left, top과 같다.
       check:
-        noError: matchReport 호출이 종합 정리 흐름으로 끝나야 한다.
-        resultCheck: report가 threshold 0.9, confirmedCount 1, rejectedCount 2를 담아야 한다.
+        noError: locateOrReport 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: hit의 found가 True이고 (left, top)이 (28, 28)이어야 한다.
     check:
-      noError: 종합 보고 함수가 정상적으로 끝나야 한다.
-      resultCheck: report dict가 threshold, confirmedCount, rejectedCount 세 키를 정확히 담아야 한다.
+      noError: locateOrReport 두 호출이 끝나야 한다.
+      resultCheck: hit는 found True, miss는 found False여야 한다.

@@ -1,264 +1,286 @@
 meta:
   id: inputCtl_05
-  title: 스크린샷 영역 정의
+  title: 스크린샷 영역 캡처
   order: 5
   category: inputCtl
   difficulty: easy
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pyautogui
+    - pillow
   tags:
+    - pyautogui
     - screenshot
-    - region
     - automation
 intro:
-  direction: 스크린샷 영역을 사전 정의 dict로 정리하고 tempfile 안에 PNG 파일을 직접 만들어 영역 기반 저장 흐름을 학습한다.
+  direction: pyautogui.screenshot으로 화면 전체와 부분 영역을 실제로 캡처해 임시 파일에 저장하고 PIL.Image로 결과를 검증하는 흐름을 만든다.
   benefits:
-    - region tuple과 영역 dict 표기를 자유롭게 변환한다.
-    - 화면 한 영역을 PNG 파일로 저장하는 시나리오를 표현한다.
-    - 같은 영역에 대해 여러 번 캡처해도 같은 파일 이름이 생성된다.
-    - 종합 시나리오로 영역 캡처 자동화를 표준화한다.
+    - pyautogui.screenshot()으로 화면 전체를 PIL Image로 받는다.
+    - region 인자로 사각 영역만 잘라 캡처한다.
+    - 캡처 결과를 tempfile 안 PNG 파일로 저장한다.
+    - 종합 캡처 함수가 경로와 크기를 dict로 보고한다.
   diagram:
     steps:
-      - label: 영역 dict 정의
-        detail: left, top, width, height 네 키로 영역을 표현한다.
-      - label: region tuple 변환
-        detail: 영역 dict를 (left, top, width, height) tuple로 바꾼다.
-      - label: 가상 PNG 만들기
-        detail: tempfile 안에 작은 PNG 바이트를 직접 저장해 캡처 결과를 흉내 낸다.
-      - label: 종합 시나리오
-        detail: 영역 정의와 저장 경로를 한 dict로 묶어 자동화 표준 입력을 만든다.
+      - label: 화면 전체 캡처
+        detail: pyautogui.screenshot()을 호출해 PIL.Image 객체를 받는다.
+      - label: 영역 캡처
+        detail: region=(left, top, width, height) 인자로 부분 영역만 잘라 받는다.
+      - label: 파일로 저장
+        detail: Image.save로 tempfile 안 PNG 파일을 만든다.
+      - label: 종합 캡처 함수
+        detail: 영역, 저장 경로, 파일 크기를 한 dict로 묶어 자동화 캡처 결과를 보고한다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: tempfile, pathlib만 사용한다.
-      - label: assert 기반 검증
-        detail: region tuple과 저장 결과 파일 크기를 assert로 비교한다.
+      - label: pyautogui와 pillow 패키지 필요
+        detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
+      - label: GUI 세션 필요
+        detail: 실제 디스플레이가 연결돼야 screenshot이 의미 있는 이미지를 돌려준다.
 sections:
-  - id: region-dict
-    title: 영역 dict 정의
+  - id: full-screenshot
+    title: 화면 전체 캡처
     structuredPrimary: true
-    subtitle: 네 키 표기
-    goal: 영역을 left, top, width, height 네 키로 정의해 자동화 시나리오 입력의 표준 형태를 만든다.
-    why: 자동화 시나리오는 영역 표기를 통일해 호출자와 실행기 사이의 결합을 단순화해야 한다.
-    explanation: 영역 dict는 단일 사각형을 표현한다. left와 top은 좌상단 좌표, width와 height는 크기다. 이 표기는 pyautogui screenshot의 region 인자와 호환된다.
+    subtitle: pyautogui.screenshot()
+    goal: pyautogui.screenshot()을 호출해 PIL.Image 객체를 받고 size 속성으로 해상도를 확인한다.
+    why: 자동화의 시각 검증은 캡처에서 시작하므로 화면 전체 캡처 흐름을 먼저 익혀야 다음 단계가 단순해진다.
+    explanation: pyautogui.screenshot()은 인자 없이 호출하면 화면 전체를 PIL.Image 객체로 돌려준다. Image.size는 (width, height) tuple이며 화면 해상도와 일치한다. 같은 호출을 두 번 해도 화면이 바뀌지 않았다면 같은 크기의 이미지가 돌아온다.
     tips:
-      - 영역 dict는 사람이 읽기 좋고 자동화 코드에서 쉽게 다룰 수 있다.
-      - 키 이름은 영문 소문자로 통일해 직렬화 호환성을 유지한다.
+      - screenshot 결과는 PIL.Image라 save, crop, resize 등의 PIL API를 그대로 활용할 수 있다.
+      - 화면 전체 캡처는 RAM 사용이 크므로 자주 호출하지 않는다.
     snippet: |-
-      region = {"left": 100, "top": 50, "width": 300, "height": 200}
+      import pyautogui
 
-      assert region["width"] == 300
-      assert region["height"] == 200
-      region
+      screenshot = pyautogui.screenshot()
+      width, height = screenshot.size
+
+      assert width > 0
+      assert height > 0
+      screenshot.size
     exercise:
-      prompt: left=0, top=0, width=1920, height=1080 영역 dict를 만들고 두 크기 값이 정확한지 검증하세요.
+      prompt: pyautogui.screenshot으로 화면 전체를 캡처하고 size tuple의 두 값이 양수인지 검증하세요.
       starterCode: |-
-        region = {"left": 0, "top": 0, "width": ___, "height": 1080}
+        import pyautogui
 
-        assert region["width"] == 1920
-        assert region["height"] == 1080
-        region
+        screenshot = pyautogui.___()
+        width, height = screenshot.size
+
+        assert width > 0
+        assert height > 0
+        screenshot.size
       solution: |-
-        region = {"left": 0, "top": 0, "width": 1920, "height": 1080}
+        import pyautogui
 
-        assert region["width"] == 1920
-        assert region["height"] == 1080
-        region
+        screenshot = pyautogui.screenshot()
+        width, height = screenshot.size
+
+        assert width > 0
+        assert height > 0
+        screenshot.size
       hints:
-        - width 값은 정수 1920이다.
-        - 1920과 1080은 흔한 모니터 해상도 값이다.
+        - 캡처 함수 이름은 screenshot이다.
+        - 결과는 PIL.Image이며 size 속성으로 해상도를 확인한다.
       check:
-        noError: dict 구성이 끝나야 한다.
-        resultCheck: region의 width와 height가 본문 기대값과 같아야 한다.
+        noError: screenshot 호출이 끝나야 한다.
+        resultCheck: size의 두 값이 양수여야 한다.
     check:
-      noError: 영역 dict 구성이 끝나야 한다.
-      resultCheck: region의 width 300, height 200이 정확해야 한다.
-  - id: to-tuple
-    title: region tuple 변환
+      noError: pyautogui.screenshot 호출이 끝나야 한다.
+      resultCheck: size 튜플의 width와 height가 양수여야 한다.
+  - id: region-capture
+    title: 영역만 잘라 캡처
     structuredPrimary: true
-    subtitle: pyautogui 호환 형식
-    goal: 영역 dict를 (left, top, width, height) tuple로 바꿔 외부 API 호출에 사용한다.
-    why: pyautogui 같은 외부 라이브러리는 region 인자를 tuple로 받으므로 두 표기 사이의 변환이 빈번하다.
-    explanation: regionTuple 함수는 영역 dict를 받아 키 순서대로 정수 tuple을 만든다. 결과는 길이 4의 tuple이며 외부 API가 그대로 받는다. 같은 함수의 역방향 변환도 단순한 분해 할당으로 가능하다.
+    subtitle: region 인자
+    goal: pyautogui.screenshot(region=(left, top, width, height))로 부분 영역만 캡처한다.
+    why: 자동화는 화면 일부만 보면 충분한 경우가 많아 영역 캡처가 메모리와 처리 시간을 크게 줄인다.
+    explanation: region 인자는 (left, top, width, height) tuple이다. 결과 Image.size는 정확히 (width, height)다. 영역이 화면 밖으로 일부 나가도 pyautogui가 보정해 준다.
     tips:
-      - tuple 순서는 항상 left, top, width, height다.
-      - 함수가 단순할수록 호출 측에서 안심하고 사용할 수 있다.
+      - 영역 좌표는 항상 정수로 둔다.
+      - 좁은 영역만 캡처하면 자동화 사이클이 빨라진다.
     snippet: |-
-      def regionTuple(rect: dict) -> tuple:
-          return (rect["left"], rect["top"], rect["width"], rect["height"])
+      import pyautogui
 
+      region = (0, 0, 100, 80)
+      patch = pyautogui.screenshot(region=region)
 
-      packed = regionTuple({"left": 10, "top": 20, "width": 100, "height": 50})
-
-      assert packed == (10, 20, 100, 50)
-      packed
+      assert patch.size == (100, 80)
+      patch.size
     exercise:
-      prompt: left=5, top=15, width=300, height=200 영역을 tuple로 바꿔 (5, 15, 300, 200)이 나오는지 검증하세요.
+      prompt: region=(0, 0, 50, 40)로 영역 캡처하면 결과 size가 정확히 (50, 40)인지 검증하세요.
       starterCode: |-
-        def regionTuple(rect: dict) -> tuple:
-            return (rect["left"], rect["top"], rect["width"], rect["___"])
+        import pyautogui
 
+        region = (0, 0, 50, 40)
+        patch = pyautogui.screenshot(___=region)
 
-        packed = regionTuple({"left": 5, "top": 15, "width": 300, "height": 200})
-
-        assert packed == (5, 15, 300, 200)
-        packed
+        assert patch.size == (50, 40)
+        patch.size
       solution: |-
-        def regionTuple(rect: dict) -> tuple:
-            return (rect["left"], rect["top"], rect["width"], rect["height"])
+        import pyautogui
 
+        region = (0, 0, 50, 40)
+        patch = pyautogui.screenshot(region=region)
 
-        packed = regionTuple({"left": 5, "top": 15, "width": 300, "height": 200})
-
-        assert packed == (5, 15, 300, 200)
-        packed
+        assert patch.size == (50, 40)
+        patch.size
       hints:
-        - 마지막 키 이름은 height다.
-        - tuple 순서는 left, top, width, height다.
+        - 인자 이름은 region이다.
+        - region tuple의 마지막 두 값이 결과 이미지 크기다.
       check:
-        noError: regionTuple 함수 호출이 끝나야 한다.
-        resultCheck: packed가 정확히 (5, 15, 300, 200)이어야 한다.
+        noError: 영역 screenshot 호출이 끝나야 한다.
+        resultCheck: patch.size가 정확히 (50, 40)이어야 한다.
     check:
-      noError: 변환 함수 호출이 끝나야 한다.
-      resultCheck: packed가 (10, 20, 100, 50)이어야 한다.
-  - id: save-stub
-    title: 가상 PNG 저장
+      noError: 영역 screenshot 호출이 끝나야 한다.
+      resultCheck: patch.size가 (100, 80)이어야 한다.
+  - id: save-png
+    title: 캡처를 파일로 저장
     structuredPrimary: true
-    subtitle: tempfile 안 작은 파일
-    goal: 임시 폴더 안에 작은 PNG 바이트를 직접 저장해 실제 캡처 없이도 저장 흐름을 학습한다.
-    why: 실제 스크린샷 없이도 저장 경로와 파일 크기를 직접 검증할 수 있어야 자동화 시나리오를 학습할 수 있다.
-    explanation: 8바이트 PNG signature와 짧은 가짜 데이터를 write_bytes로 저장하면 실제 캡처 라이브러리가 없는 환경에서도 흐름을 검증할 수 있다. tempfile 컨텍스트가 끝나면 자동으로 정리된다.
+    subtitle: tempfile + Image.save
+    goal: 캡처한 이미지를 tempfile 안 PNG 파일로 저장하고 파일 크기가 양수인지 확인한다.
+    why: 자동화 보고에는 캡처 시점의 이미지를 파일로 남기는 것이 표준이라 저장 흐름을 정확히 익혀야 한다.
+    explanation: PIL.Image.save(path)는 파일 확장자로 포맷을 결정한다. .png 확장자는 자동으로 PNG 인코딩을 적용한다. tempfile.TemporaryDirectory 컨텍스트가 끝나면 폴더가 자동 삭제돼 디스크가 어지러워지지 않는다.
     tips:
-      - PNG 시그니처는 b"\x89PNG\r\n\x1a\n"으로 표준화되어 있다.
-      - 실제 자동화에서는 pyautogui.screenshot이 같은 경로에 저장한다.
+      - 파일 이름에 타임스탬프를 넣으면 자동화 사이클마다 캡처를 보존할 수 있다.
+      - .png 외에 .jpg, .bmp 등 PIL이 지원하는 포맷을 그대로 쓸 수 있다.
     snippet: |-
       import tempfile
       from pathlib import Path
 
+      import pyautogui
+
       with tempfile.TemporaryDirectory() as td:
           target = Path(td) / "snap.png"
-          target.write_bytes(b"\x89PNG\r\n\x1a\nfake")
+          pyautogui.screenshot(region=(0, 0, 60, 40)).save(target)
           size = target.stat().st_size
 
       assert size > 0
       size
     exercise:
-      prompt: 같은 폴더에 region_capture.png를 만들어 파일 크기가 양수이고 PNG 시그니처가 포함되는지 검증하세요.
+      prompt: tempfile 안에 region_snap.png 파일로 (0, 0, 40, 30) 영역 캡처를 저장하고 파일 크기가 양수인지 검증하세요.
       starterCode: |-
         import tempfile
         from pathlib import Path
 
+        import pyautogui
+
         with tempfile.TemporaryDirectory() as td:
-            target = Path(td) / "region_capture.png"
-            target.write_bytes(b"\x89PNG\r\n\x1a\nstub")
-            data = target.read_bytes()
-            size = target.stat().___
+            target = Path(td) / "region_snap.png"
+            pyautogui.screenshot(region=(0, 0, 40, 30)).___(target)
+            size = target.stat().st_size
 
         assert size > 0
-        assert data.startswith(b"\x89PNG")
         size
       solution: |-
         import tempfile
         from pathlib import Path
 
+        import pyautogui
+
         with tempfile.TemporaryDirectory() as td:
-            target = Path(td) / "region_capture.png"
-            target.write_bytes(b"\x89PNG\r\n\x1a\nstub")
-            data = target.read_bytes()
+            target = Path(td) / "region_snap.png"
+            pyautogui.screenshot(region=(0, 0, 40, 30)).save(target)
             size = target.stat().st_size
 
         assert size > 0
-        assert data.startswith(b"\x89PNG")
         size
       hints:
-        - stat 객체의 크기 속성 이름은 st_size다.
-        - PNG 파일은 \x89PNG로 시작한다.
+        - PIL.Image 메서드 이름은 save다.
+        - .png 확장자가 인코딩 포맷을 결정한다.
       check:
-        noError: write_bytes와 stat 호출이 정상적으로 끝나야 한다.
-        resultCheck: size가 0 초과이고 PNG 시그니처가 포함되어야 한다.
+        noError: screenshot과 save 호출이 끝나야 한다.
+        resultCheck: 저장된 파일의 크기가 0보다 커야 한다.
     check:
-      noError: 임시 PNG 작성과 stat 조회가 끝나야 한다.
-      resultCheck: size 변수가 0 초과여야 한다.
-  - id: scenario-summary
-    title: 종합 영역 시나리오
+      noError: screenshot과 save 호출이 끝나야 한다.
+      resultCheck: 저장된 PNG 파일의 크기가 양수여야 한다.
+  - id: capture-report
+    title: 종합 캡처 보고
     structuredPrimary: true
-    subtitle: 영역과 경로를 묶기
-    goal: 영역 dict와 저장 경로를 한 dict로 묶어 자동화 실행기의 표준 입력을 만든다.
-    why: 종합 자동화 시나리오는 사람이 한눈에 검토할 수 있어야 GUI 작업에서 사고를 줄일 수 있다.
-    explanation: regionPlan 함수는 영역 dict와 파일 이름을 받아 region tuple, savePath, generatedAt을 묶어 dict로 돌려준다. 결과 dict는 자동화 실행기에 그대로 들어가는 표준 입력 형태다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다.
+    subtitle: 경로와 크기 dict
+    goal: 영역 캡처와 저장을 한 함수로 묶어 path, size, fileBytes를 dict로 돌려주는 종합 보고를 만든다.
+    why: 종합 캡처 함수는 자동화 사이클이 어떤 영역을 어디에 얼마만큼 저장했는지 한눈에 보여 사고 추적에 결정적이다.
+    explanation: captureRegion 함수는 영역 tuple과 저장 폴더, 파일 이름을 받아 screenshot + save를 수행한 뒤 path 문자열, size tuple, fileBytes 정수를 dict로 돌려준다. 결과 dict는 그대로 자동화 보고서에 들어간다.
     tips:
-      - savePath는 tempfile.TemporaryDirectory가 만든 절대 경로를 그대로 사용한다.
-      - 종합 함수의 dict는 자동화 보고서의 한 행으로 그대로 들어간다.
+      - 보고 dict는 JSON 직렬화에 안전한 기본 타입만 담아 운영 환경 로그가 단순해진다.
+      - 캡처 영역이 작아도 PNG 헤더 오버헤드 때문에 fileBytes는 항상 0보다 크다.
     snippet: |-
       import tempfile
-      from datetime import UTC, datetime
       from pathlib import Path
 
+      import pyautogui
 
-      def regionPlan(rect: dict, filename: str, base: Path) -> dict:
+
+      def captureRegion(region: tuple, base: Path, filename: str) -> dict:
+          target = base / filename
+          image = pyautogui.screenshot(region=region)
+          image.save(target)
           return {
-              "region": (rect["left"], rect["top"], rect["width"], rect["height"]),
-              "savePath": str(base / filename),
-              "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+              "path": str(target),
+              "size": image.size,
+              "fileBytes": target.stat().st_size,
           }
 
 
       with tempfile.TemporaryDirectory() as td:
-          plan = regionPlan({"left": 0, "top": 0, "width": 200, "height": 150}, "snap.png", Path(td))
+          report = captureRegion((0, 0, 80, 60), Path(td), "capture.png")
 
-      assert plan["region"] == (0, 0, 200, 150)
-      assert plan["savePath"].endswith("snap.png")
-      assert "generatedAt" in plan
-      plan["region"]
+      assert report["size"] == (80, 60)
+      assert report["fileBytes"] > 0
+      assert report["path"].endswith("capture.png")
+      report["size"]
     exercise:
-      prompt: regionPlan에 left=10, top=20, width=300, height=400 영역과 capture.png 이름을 넘기면 region tuple과 savePath가 정확히 본문 기대값을 담는지 종합 검증하세요.
+      prompt: captureRegion에 (0, 0, 50, 50) 영역과 sample.png 이름을 넘기면 size가 (50, 50)이고 fileBytes가 양수이고 path가 sample.png로 끝나는지 종합 검증하세요.
       starterCode: |-
         import tempfile
-        from datetime import UTC, datetime
         from pathlib import Path
 
+        import pyautogui
 
-        def regionPlan(rect: dict, filename: str, base: Path) -> dict:
+
+        def captureRegion(region: tuple, base: Path, filename: str) -> dict:
+            target = base / filename
+            image = pyautogui.screenshot(region=region)
+            image.save(target)
             return {
-                "region": (rect["left"], rect["top"], rect["width"], rect["height"]),
-                "savePath": str(base / filename),
-                "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+                "path": str(target),
+                "size": image.size,
+                "fileBytes": target.stat().___,
             }
 
 
         with tempfile.TemporaryDirectory() as td:
-            plan = regionPlan({"left": 10, "top": 20, "width": 300, "height": 400}, "___", Path(td))
+            report = captureRegion((0, 0, 50, 50), Path(td), "sample.png")
 
-        assert plan["region"] == (10, 20, 300, 400)
-        assert plan["savePath"].endswith("capture.png")
-        assert "generatedAt" in plan
-        plan["region"]
+        assert report["size"] == (50, 50)
+        assert report["fileBytes"] > 0
+        assert report["path"].endswith("sample.png")
+        report["size"]
       solution: |-
         import tempfile
-        from datetime import UTC, datetime
         from pathlib import Path
 
+        import pyautogui
 
-        def regionPlan(rect: dict, filename: str, base: Path) -> dict:
+
+        def captureRegion(region: tuple, base: Path, filename: str) -> dict:
+            target = base / filename
+            image = pyautogui.screenshot(region=region)
+            image.save(target)
             return {
-                "region": (rect["left"], rect["top"], rect["width"], rect["height"]),
-                "savePath": str(base / filename),
-                "generatedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+                "path": str(target),
+                "size": image.size,
+                "fileBytes": target.stat().st_size,
             }
 
 
         with tempfile.TemporaryDirectory() as td:
-            plan = regionPlan({"left": 10, "top": 20, "width": 300, "height": 400}, "capture.png", Path(td))
+            report = captureRegion((0, 0, 50, 50), Path(td), "sample.png")
 
-        assert plan["region"] == (10, 20, 300, 400)
-        assert plan["savePath"].endswith("capture.png")
-        assert "generatedAt" in plan
-        plan["region"]
+        assert report["size"] == (50, 50)
+        assert report["fileBytes"] > 0
+        assert report["path"].endswith("sample.png")
+        report["size"]
       hints:
-        - 파일 이름은 capture.png다.
-        - region tuple은 (10, 20, 300, 400)이 된다.
+        - stat 객체의 크기 속성 이름은 st_size다.
+        - size 튜플은 region의 마지막 두 값과 같다.
       check:
-        noError: regionPlan 호출이 종합 결과를 만들어야 한다.
-        resultCheck: plan의 region이 본문 기대값이고 savePath가 capture.png로 끝나야 한다.
+        noError: captureRegion 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: size, fileBytes, path가 본문 기대값과 같아야 한다.
     check:
-      noError: 종합 시나리오 함수 호출이 끝나야 한다.
-      resultCheck: plan의 region이 (0, 0, 200, 150)이고 savePath가 snap.png로 끝나야 한다.
+      noError: captureRegion 호출이 끝나야 한다.
+      resultCheck: size가 (80, 60)이고 fileBytes가 양수이고 path가 capture.png로 끝나야 한다.

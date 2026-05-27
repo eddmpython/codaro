@@ -1,314 +1,311 @@
 meta:
   id: inputCtl_08
-  title: pynput 리스너 패턴
+  title: pynput 키보드 리스너
   order: 8
   category: inputCtl
-  difficulty: easy
+  difficulty: medium
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pynput
   tags:
+    - pynput
     - listener
-    - events
     - automation
 intro:
-  direction: 키 이벤트 시퀀스를 dict 리스트로 정의하고 핸들러 함수에 전달해 리스너 패턴의 분류와 종합 결과 흐름을 학습한다.
+  direction: pynput.keyboard의 Key 상수와 KeyCode, Listener 클래스를 직접 다뤄 키 이벤트 수집과 정지 키 분기를 실 코드로 구현한다.
   benefits:
-    - 키 이벤트를 type과 key 키를 가진 dict로 표준화한다.
-    - 핸들러 함수가 같은 시그니처로 모든 이벤트를 받는다.
-    - 특정 키 시퀀스에서 리스너를 중단하는 분기를 만든다.
-    - 종합 결과 dict로 자동화 보고 표준 형태를 완성한다.
+    - pynput.keyboard.Key 상수로 특수 키를 표현한다.
+    - KeyCode.from_char로 일반 글자 키를 표현한다.
+    - on_press 콜백을 정의해 키 이벤트를 리스트에 누적한다.
+    - 종합 리스너 빌더가 정지 키와 콜백을 묶어 안전한 시퀀스를 만든다.
   diagram:
     steps:
-      - label: 이벤트 dict 표기
-        detail: type과 key 키로 이벤트 한 개를 표현한다.
-      - label: 이벤트 시퀀스 처리
-        detail: 시퀀스 리스트를 핸들러에 한 번에 넘긴다.
-      - label: 정지 키 분기
-        detail: 특정 키가 들어오면 break로 시퀀스 처리를 멈춘다.
-      - label: 종합 결과 정리
-        detail: 처리한 이벤트 리스트와 정지 여부를 dict로 보고한다.
+      - label: Key 상수 사용
+        detail: Key.enter, Key.esc 같은 특수 키 상수는 pynput.keyboard.Key 열거형에서 얻는다.
+      - label: KeyCode 생성
+        detail: KeyCode.from_char('a')로 일반 문자 키 객체를 만든다.
+      - label: on_press 콜백
+        detail: 콜백 함수가 매 이벤트마다 키 정보를 외부 리스트에 누적한다.
+      - label: 종합 리스너 빌더
+        detail: 정지 키와 콜백을 받아 Listener 객체를 만들어 자동화 표준 형태로 돌려준다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: 이벤트 표현과 처리는 dict, list 연산만 사용한다.
-      - label: assert 기반 검증
-        detail: 처리 결과와 정지 여부를 assert로 비교한다.
+      - label: pynput 패키지 필요
+        detail: meta.packages의 pynput이 로컬 가상환경에 준비돼야 한다.
+      - label: 콜백 직접 호출
+        detail: snippet은 시스템 키보드 이벤트 대신 콜백을 직접 호출해 학습 결정성을 유지한다.
 sections:
-  - id: event-shape
-    title: 이벤트 dict 표기
+  - id: key-constants
+    title: 특수 키 상수
     structuredPrimary: true
-    subtitle: type, key 두 키
-    goal: 키 이벤트를 type과 key 두 키로 표현한다.
-    why: 이벤트 표기를 통일하면 후속 자동화 함수가 같은 형태를 신뢰할 수 있다.
-    explanation: 키 이벤트는 type 값에 press 또는 release, key 값에 키 이름 문자열을 갖는다. 자동화 코드는 type을 기준으로 분기한다.
+    subtitle: pynput.keyboard.Key
+    goal: pynput.keyboard.Key 열거형에서 enter, esc, tab 상수를 확인한다.
+    why: 자동화 리스너는 특수 키를 enum 상수로 표현해야 다른 키와 안전하게 비교할 수 있다.
+    explanation: pynput.keyboard.Key는 열거형이며 enter, esc, tab, shift 같은 특수 키를 상수로 제공한다. 같은 상수는 콜백 안에서 == 연산으로 비교할 수 있고 .name 속성으로 문자열 이름을 얻을 수 있다.
     tips:
-      - press 이벤트와 release 이벤트는 짝으로 발생하는 것이 일반적이다.
-      - key 이름은 짧은 영문 표준이어야 자동화 코드가 안정적이다.
+      - Key 상수는 모듈 간에 동일성을 유지해 비교가 안전하다.
+      - Key.esc는 자동화 리스너의 표준 정지 키로 흔히 쓰인다.
     snippet: |-
-      event = {"type": "press", "key": "a"}
+      from pynput.keyboard import Key
 
-      assert event["type"] == "press"
-      assert event["key"] == "a"
-      event
+      enter = Key.enter
+      esc = Key.esc
+
+      assert enter.name == "enter"
+      assert esc is Key.esc
+      (enter.name, esc.name)
     exercise:
-      prompt: type=release, key="esc"인 이벤트 dict를 만들고 두 키 값을 검증하세요.
+      prompt: pynput.keyboard.Key에서 tab과 shift 상수를 얻어 .name 속성이 'tab'과 'shift'인지 검증하세요.
       starterCode: |-
-        event = {"type": "___", "key": "esc"}
+        from pynput.keyboard import Key
 
-        assert event["type"] == "release"
-        assert event["key"] == "esc"
-        event
+        tab = Key.tab
+        shift = Key.___
+
+        assert tab.name == "tab"
+        assert shift.name == "shift"
+        (tab.name, shift.name)
       solution: |-
-        event = {"type": "release", "key": "esc"}
+        from pynput.keyboard import Key
 
-        assert event["type"] == "release"
-        assert event["key"] == "esc"
-        event
+        tab = Key.tab
+        shift = Key.shift
+
+        assert tab.name == "tab"
+        assert shift.name == "shift"
+        (tab.name, shift.name)
       hints:
-        - type 값은 release다.
-        - key 값은 짧은 영문 esc다.
+        - 상수 이름은 소문자 shift다.
+        - 열거형 상수는 .name으로 문자열 이름을 얻는다.
       check:
-        noError: 이벤트 dict 구성이 끝나야 한다.
-        resultCheck: event의 type이 release, key가 esc여야 한다.
+        noError: Key 상수 접근이 끝나야 한다.
+        resultCheck: tab.name과 shift.name이 본문 기대값이어야 한다.
     check:
-      noError: dict 구성이 끝나야 한다.
-      resultCheck: event의 type이 press이고 key가 a여야 한다.
-  - id: handle-sequence
-    title: 이벤트 시퀀스 처리
+      noError: Key 상수 접근이 끝나야 한다.
+      resultCheck: enter.name이 'enter'이고 esc가 Key.esc여야 한다.
+  - id: key-code
+    title: 일반 문자 키
     structuredPrimary: true
-    subtitle: 핸들러 함수 호출
-    goal: 이벤트 dict 리스트를 핸들러 함수가 처리해 결과 리스트에 누적한다.
-    why: 자동화는 보통 이벤트 시퀀스를 한 번에 다루므로 핸들러 패턴이 표준 도구다.
-    explanation: handleEvents 함수는 이벤트 리스트와 핸들러를 받아 차례로 호출한다. 핸들러는 외부 리스트에 결과를 append한다. 같은 패턴은 pynput 리스너에서도 동일하게 적용된다.
+    subtitle: KeyCode.from_char()
+    goal: KeyCode.from_char('a')로 일반 문자 키 객체를 만들고 char 속성을 확인한다.
+    why: 일반 글자 키는 enum이 아닌 KeyCode 객체라 별도 생성 방식과 비교 패턴을 알아 둬야 한다.
+    explanation: pynput.keyboard.KeyCode는 문자 키 한 개를 표현하며 from_char(letter) 클래스 메서드로 만든다. .char 속성으로 원래 문자를 얻을 수 있고 같은 문자에서 만든 두 객체는 == 비교가 True다.
     tips:
-      - 핸들러는 부수효과로 결과를 모으는 단순한 형태가 좋다.
-      - 시퀀스를 함수로 분리하면 단위 테스트가 쉬워진다.
+      - 일반 영문 글자는 KeyCode, 특수 키는 Key 상수로 표기한다.
+      - 콜백 안에서는 isinstance로 두 타입을 구분한다.
     snippet: |-
-      events = [
-          {"type": "press", "key": "a"},
-          {"type": "press", "key": "b"},
-          {"type": "release", "key": "a"},
-      ]
-      processed: list[str] = []
+      from pynput.keyboard import KeyCode
 
+      a = KeyCode.from_char("a")
+      bAgain = KeyCode.from_char("b")
 
-      def handle(event: dict) -> None:
-          processed.append(f"{event['type']}:{event['key']}")
-
-
-      for event in events:
-          handle(event)
-
-      assert processed == ["press:a", "press:b", "release:a"]
-      processed
+      assert a.char == "a"
+      assert a == KeyCode.from_char("a")
+      assert a != bAgain
+      (a.char, bAgain.char)
     exercise:
-      prompt: 같은 패턴으로 press:x, press:y, release:y 세 이벤트가 processed 리스트에 정확한 순서로 들어가는지 검증하세요.
+      prompt: KeyCode.from_char로 'x'와 'y' 객체를 만들고 .char 속성이 각각 'x'와 'y'인지 검증하세요.
       starterCode: |-
-        events = [
-            {"type": "press", "key": "x"},
-            {"type": "press", "key": "y"},
-            {"type": "release", "key": "y"},
-        ]
-        processed: list[str] = []
+        from pynput.keyboard import KeyCode
 
+        x = KeyCode.___("x")
+        y = KeyCode.from_char("y")
 
-        def handle(event: dict) -> None:
-            processed.append(f"{event['___']}:{event['key']}")
-
-
-        for event in events:
-            handle(event)
-
-        assert processed == ["press:x", "press:y", "release:y"]
-        processed
+        assert x.char == "x"
+        assert y.char == "y"
+        (x.char, y.char)
       solution: |-
-        events = [
-            {"type": "press", "key": "x"},
-            {"type": "press", "key": "y"},
-            {"type": "release", "key": "y"},
-        ]
-        processed: list[str] = []
+        from pynput.keyboard import KeyCode
 
+        x = KeyCode.from_char("x")
+        y = KeyCode.from_char("y")
 
-        def handle(event: dict) -> None:
-            processed.append(f"{event['type']}:{event['key']}")
-
-
-        for event in events:
-            handle(event)
-
-        assert processed == ["press:x", "press:y", "release:y"]
-        processed
+        assert x.char == "x"
+        assert y.char == "y"
+        (x.char, y.char)
       hints:
-        - dict 키 이름은 type이다.
-        - 세 이벤트가 본문 순서대로 processed 리스트에 들어간다.
+        - 생성 메서드 이름은 from_char다.
+        - char 속성은 원래 문자를 그대로 돌려준다.
       check:
-        noError: handle 함수 세 번 호출이 끝나야 한다.
-        resultCheck: processed 리스트가 세 문자열을 본문 순서대로 담아야 한다.
+        noError: KeyCode.from_char 호출이 끝나야 한다.
+        resultCheck: x.char가 'x', y.char가 'y'여야 한다.
     check:
-      noError: 이벤트 시퀀스 처리가 끝나야 한다.
-      resultCheck: processed 리스트가 세 이벤트를 본문 순서대로 담아야 한다.
-  - id: stop-key
-    title: 정지 키 분기
+      noError: KeyCode.from_char 두 호출이 끝나야 한다.
+      resultCheck: a.char가 'a'이고 a와 b가 다른 객체여야 한다.
+  - id: press-callback
+    title: on_press 콜백
     structuredPrimary: true
-    subtitle: 특정 키에서 break
-    goal: 특정 키가 들어오면 break로 시퀀스 처리를 멈춘다.
-    why: 자동화 리스너는 사용자가 정지 키를 눌렀을 때 즉시 멈춰야 안전한 통제 흐름이 만들어진다.
-    explanation: stopKey 인자는 정지 키 이름이다. 같은 키가 press 이벤트로 들어오면 핸들러는 더 이상 처리하지 않고 루프를 종료한다. 종료 이유는 결과 dict의 stopped 키로 표시한다.
+    subtitle: 키 이벤트 누적
+    goal: 키 이벤트를 받아 외부 리스트에 누적하는 on_press 콜백을 정의하고 직접 호출해 동작을 검증한다.
+    why: 리스너의 핵심은 콜백 함수의 신뢰성이므로 콜백 함수가 단독으로 정확히 동작하는지 먼저 검증한다.
+    explanation: on_press 콜백은 키 객체(Key 또는 KeyCode) 한 개를 인자로 받는다. 자동화 학습에서는 시스템 이벤트 대신 콜백을 직접 호출해 결정성을 유지한다. 같은 콜백을 그대로 Listener에 넘기면 운영 환경에서도 동작한다.
     tips:
-      - 정지 키는 보통 esc 또는 ctrl+c와 매핑된다.
-      - break는 같은 루프를 즉시 종료해 후속 이벤트가 처리되지 않게 한다.
+      - 콜백을 직접 호출해 단위 테스트하면 자동화 디버깅이 쉬워진다.
+      - 누적 리스트는 클로저로 안전하게 보존된다.
     snippet: |-
-      events = [
-          {"type": "press", "key": "a"},
-          {"type": "press", "key": "esc"},
-          {"type": "press", "key": "b"},
-      ]
-      processed: list[str] = []
-      stopped = False
-      for event in events:
-          if event["type"] == "press" and event["key"] == "esc":
-              stopped = True
-              break
-          processed.append(event["key"])
+      from pynput.keyboard import Key, KeyCode
 
-      assert processed == ["a"]
-      assert stopped is True
-      processed
+      pressed: list[str] = []
+
+
+      def onPress(key) -> None:
+          if isinstance(key, Key):
+              pressed.append(key.name)
+          else:
+              pressed.append(key.char)
+
+
+      onPress(KeyCode.from_char("a"))
+      onPress(Key.enter)
+      onPress(KeyCode.from_char("b"))
+
+      assert pressed == ["a", "enter", "b"]
+      pressed
     exercise:
-      prompt: 정지 키를 "esc"로 두고 (x, y, esc, z) 시퀀스를 처리하면 processed가 ["x", "y"]가 되고 stopped가 True인지 검증하세요.
+      prompt: 같은 콜백 패턴으로 'x', Key.tab, 'y' 세 이벤트를 직접 호출해 pressed 리스트가 ['x', 'tab', 'y']인지 검증하세요.
       starterCode: |-
-        events = [
-            {"type": "press", "key": "x"},
-            {"type": "press", "key": "y"},
-            {"type": "press", "key": "esc"},
-            {"type": "press", "key": "z"},
-        ]
-        processed: list[str] = []
-        stopped = False
-        for event in events:
-            if event["type"] == "press" and event["key"] == "___":
-                stopped = True
-                break
-            processed.append(event["key"])
+        from pynput.keyboard import Key, KeyCode
 
-        assert processed == ["x", "y"]
-        assert stopped is True
-        processed
+        pressed: list[str] = []
+
+
+        def onPress(key) -> None:
+            if isinstance(key, Key):
+                pressed.append(key.name)
+            else:
+                pressed.append(key.___)
+
+
+        onPress(KeyCode.from_char("x"))
+        onPress(Key.tab)
+        onPress(KeyCode.from_char("y"))
+
+        assert pressed == ["x", "tab", "y"]
+        pressed
       solution: |-
-        events = [
-            {"type": "press", "key": "x"},
-            {"type": "press", "key": "y"},
-            {"type": "press", "key": "esc"},
-            {"type": "press", "key": "z"},
-        ]
-        processed: list[str] = []
-        stopped = False
-        for event in events:
-            if event["type"] == "press" and event["key"] == "esc":
-                stopped = True
-                break
-            processed.append(event["key"])
+        from pynput.keyboard import Key, KeyCode
 
-        assert processed == ["x", "y"]
-        assert stopped is True
-        processed
+        pressed: list[str] = []
+
+
+        def onPress(key) -> None:
+            if isinstance(key, Key):
+                pressed.append(key.name)
+            else:
+                pressed.append(key.char)
+
+
+        onPress(KeyCode.from_char("x"))
+        onPress(Key.tab)
+        onPress(KeyCode.from_char("y"))
+
+        assert pressed == ["x", "tab", "y"]
+        pressed
       hints:
-        - 정지 키 이름은 esc 문자열이다.
-        - esc 이후 z 이벤트는 처리되지 않는다.
+        - KeyCode 속성 이름은 char다.
+        - Key 상수는 .name 속성으로 이름을 얻는다.
       check:
-        noError: 정지 분기 루프가 정상적으로 끝나야 한다.
-        resultCheck: processed 리스트가 두 키만 담고 stopped가 True여야 한다.
+        noError: onPress 세 호출이 끝나야 한다.
+        resultCheck: pressed 리스트가 ['x', 'tab', 'y']여야 한다.
     check:
-      noError: 정지 분기 루프가 정상적으로 끝나야 한다.
-      resultCheck: processed가 ["a"]이고 stopped가 True여야 한다.
-  - id: listener-summary
-    title: 종합 리스너 결과 정리
+      noError: onPress 세 호출이 끝나야 한다.
+      resultCheck: pressed가 ['a', 'enter', 'b']여야 한다.
+  - id: listener-builder
+    title: 종합 리스너 빌더
     structuredPrimary: true
-    subtitle: 함수로 묶기
-    goal: 시퀀스 처리와 정지 분기를 한 함수로 묶어 자동화 표준 dict 보고를 만든다.
-    why: 종합 결과는 운영자가 자동화 한 사이클을 한눈에 검토할 수 있게 만든다.
-    explanation: runListener 함수는 이벤트 리스트와 정지 키를 받아 processed 리스트와 stopped 여부를 dict로 돌려준다. 결과 dict 키 이름은 자동화 보고 표준에 맞춘다. 같은 함수는 두 번 호출해도 같은 dict 구조를 유지한다.
+    subtitle: Listener 인스턴스
+    goal: 정지 키와 콜백을 받아 Listener 인스턴스를 만들고 사이즈 검증과 정지 분기를 함수로 묶는다.
+    why: 종합 빌더는 자동화 코드가 일관된 형태로 Listener를 만들고 정지 키 분기를 결정성 있게 검증하게 한다.
+    explanation: buildKeyboardListener 함수는 정지 키와 외부 누적 리스트를 받아 on_press 콜백과 Listener 인스턴스를 만들어 dict로 돌려준다. 콜백을 직접 호출하면 정지 키 도달 시 False를 돌려주고 그 외에는 None을 돌려준다. 같은 인스턴스를 .start()로 백그라운드 스레드에서 동작시키면 운영 자동화가 시작된다.
     tips:
-      - 종합 dict는 자동화 화면에 한 줄로 표시할 수 있을 만큼 단순하게 둔다.
-      - stopped 값을 운영자가 보면 자동화 통제 흐름이 명확해진다.
+      - 콜백이 False를 돌려주면 Listener는 즉시 정지된다.
+      - 빌더는 인스턴스를 만들기만 하므로 실제 시작은 호출자가 책임진다.
     snippet: |-
-      def runListener(events: list, stopKey: str) -> dict:
-          processed: list[str] = []
-          stopped = False
-          for event in events:
-              if event["type"] == "press" and event["key"] == stopKey:
-                  stopped = True
-                  break
-              processed.append(event["key"])
-          return {"processed": processed, "stopped": stopped}
+      from pynput.keyboard import Key, KeyCode, Listener
 
 
-      report = runListener(
-          [
-              {"type": "press", "key": "a"},
-              {"type": "press", "key": "esc"},
-          ],
-          stopKey="esc",
-      )
+      def buildKeyboardListener(stopKey, pressed: list) -> dict:
+          def onPress(key):
+              if key == stopKey:
+                  return False
+              if isinstance(key, Key):
+                  pressed.append(key.name)
+              else:
+                  pressed.append(key.char)
+              return None
 
-      assert report == {"processed": ["a"], "stopped": True}
-      report
+          return {"listener": Listener(on_press=onPress), "callback": onPress}
+
+
+      pressed: list[str] = []
+      bundle = buildKeyboardListener(Key.esc, pressed)
+      kept = bundle["callback"](KeyCode.from_char("a"))
+      stopped = bundle["callback"](Key.esc)
+
+      assert isinstance(bundle["listener"], Listener)
+      assert kept is None
+      assert stopped is False
+      assert pressed == ["a"]
+      (kept, stopped, pressed)
     exercise:
-      prompt: runListener를 stopKey="q"로 호출해 (a, b, q, c) 시퀀스 종합 결과가 processed ["a", "b"]와 stopped True가 되는지 검증하세요.
+      prompt: buildKeyboardListener에 Key.tab을 정지 키로 넘기고 'x'와 Key.tab을 차례로 호출하면 pressed가 ['x']이고 두 번째 호출이 False를 돌려주는지 종합 검증하세요.
       starterCode: |-
-        def runListener(events: list, stopKey: str) -> dict:
-            processed: list[str] = []
-            stopped = False
-            for event in events:
-                if event["type"] == "press" and event["key"] == ___:
-                    stopped = True
-                    break
-                processed.append(event["key"])
-            return {"processed": processed, "stopped": stopped}
+        from pynput.keyboard import Key, KeyCode, Listener
 
 
-        report = runListener(
-            [
-                {"type": "press", "key": "a"},
-                {"type": "press", "key": "b"},
-                {"type": "press", "key": "q"},
-                {"type": "press", "key": "c"},
-            ],
-            stopKey="q",
-        )
+        def buildKeyboardListener(stopKey, pressed: list) -> dict:
+            def onPress(key):
+                if key == stopKey:
+                    return False
+                if isinstance(key, Key):
+                    pressed.append(key.name)
+                else:
+                    pressed.append(key.char)
+                return None
 
-        assert report == {"processed": ["a", "b"], "stopped": True}
-        report
+            return {"listener": Listener(on_press=onPress), "callback": onPress}
+
+
+        pressed: list[str] = []
+        bundle = buildKeyboardListener(Key.tab, pressed)
+        kept = bundle["callback"](KeyCode.from_char("x"))
+        stopped = bundle["callback"](Key.___)
+
+        assert kept is None
+        assert stopped is False
+        assert pressed == ["x"]
+        (kept, stopped, pressed)
       solution: |-
-        def runListener(events: list, stopKey: str) -> dict:
-            processed: list[str] = []
-            stopped = False
-            for event in events:
-                if event["type"] == "press" and event["key"] == stopKey:
-                    stopped = True
-                    break
-                processed.append(event["key"])
-            return {"processed": processed, "stopped": stopped}
+        from pynput.keyboard import Key, KeyCode, Listener
 
 
-        report = runListener(
-            [
-                {"type": "press", "key": "a"},
-                {"type": "press", "key": "b"},
-                {"type": "press", "key": "q"},
-                {"type": "press", "key": "c"},
-            ],
-            stopKey="q",
-        )
+        def buildKeyboardListener(stopKey, pressed: list) -> dict:
+            def onPress(key):
+                if key == stopKey:
+                    return False
+                if isinstance(key, Key):
+                    pressed.append(key.name)
+                else:
+                    pressed.append(key.char)
+                return None
 
-        assert report == {"processed": ["a", "b"], "stopped": True}
-        report
+            return {"listener": Listener(on_press=onPress), "callback": onPress}
+
+
+        pressed: list[str] = []
+        bundle = buildKeyboardListener(Key.tab, pressed)
+        kept = bundle["callback"](KeyCode.from_char("x"))
+        stopped = bundle["callback"](Key.tab)
+
+        assert kept is None
+        assert stopped is False
+        assert pressed == ["x"]
+        (kept, stopped, pressed)
       hints:
-        - 정지 키 비교는 함수 인자 stopKey와 한다.
-        - 정지 후 c 이벤트는 무시된다.
+        - 정지 키는 Key.tab이다.
+        - 정지 키 도달 시 콜백이 False를 돌려준다.
       check:
-        noError: runListener 호출이 종합 정리 흐름으로 끝나야 한다.
-        resultCheck: report가 processed ["a", "b"], stopped True를 정확히 담아야 한다.
+        noError: buildKeyboardListener 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: pressed가 ['x']이고 두 번째 호출이 False여야 한다.
     check:
-      noError: 종합 리스너 함수가 끝나야 한다.
-      resultCheck: report가 처리한 키 리스트와 정지 여부를 종합 결과로 보여야 한다.
+      noError: buildKeyboardListener 호출과 콜백 두 호출이 끝나야 한다.
+      resultCheck: pressed가 ['a']이고 두 번째 호출이 False여야 한다.

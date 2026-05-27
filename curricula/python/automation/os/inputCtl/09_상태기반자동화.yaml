@@ -3,245 +3,303 @@ meta:
   title: 상태 기반 자동화 분기
   order: 9
   category: inputCtl
-  difficulty: easy
+  difficulty: medium
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pyautogui
   tags:
+    - pyautogui
     - state
-    - branch
     - automation
 intro:
-  direction: 현재 상태 dict를 받아 다음 액션 시퀀스를 결정하는 결정 함수를 만들어 GUI 자동화의 분기 흐름을 학습한다.
+  direction: pyautogui.position과 size로 화면 상태를 직접 읽고 마우스 위치 영역에 따라 자동화 액션을 분기하는 결정 함수를 만든다.
   benefits:
-    - 상태 dict를 입력으로 받는 결정 함수를 표준화한다.
-    - if/elif로 상태에 따라 다른 시퀀스를 선택한다.
-    - 알 수 없는 상태는 안전한 기본 분기로 처리한다.
-    - 종합 결정 결과를 dict로 보고해 자동화 표준 입력을 만든다.
+    - pyautogui.size로 얻은 해상도를 4분면 경계로 나눈다.
+    - pyautogui.position의 좌표를 사분면 이름으로 분류한다.
+    - FAILSAFE 모서리 근처일 때는 보호 분기로 작업을 멈춘다.
+    - 종합 결정 함수가 상태와 액션, 시퀀스를 dict로 보고한다.
   diagram:
     steps:
-      - label: 상태 dict 정의
-        detail: status 키로 현재 화면 상태를 표현한다.
-      - label: 분기 함수 작성
-        detail: if/elif로 상태에 따라 다른 시퀀스를 돌려준다.
-      - label: 기본 분기 처리
-        detail: 알 수 없는 상태는 빈 시퀀스로 안전하게 처리한다.
-      - label: 종합 결정 dict
-        detail: 결정 결과를 status, action, sequence 키를 가진 dict로 묶는다.
+      - label: 상태 읽기
+        detail: pyautogui.position과 size를 한 번에 받아 좌표와 해상도를 묶는다.
+      - label: 사분면 분류
+        detail: 좌표를 좌상/우상/좌하/우하 네 사분면 중 하나로 분류한다.
+      - label: FAILSAFE 보호 분기
+        detail: 좌상단 5x5 영역 안이면 자동화가 곧 멈출 수 있으므로 hold 액션을 돌려준다.
+      - label: 종합 결정 보고
+        detail: 상태, 액션, 시퀀스를 한 dict로 묶어 운영자가 검토할 수 있게 만든다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: dict와 list 연산만 사용한다.
-      - label: assert 기반 검증
-        detail: 분기별 결과 시퀀스를 assert로 비교한다.
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 로컬 가상환경에 준비돼야 한다.
+      - label: 실제 화면과 마우스
+        detail: snippet은 실 환경의 해상도와 마우스 위치를 읽으므로 GUI 세션이 필요하다.
 sections:
-  - id: state-shape
-    title: 상태 dict 정의
+  - id: read-state
+    title: 상태 읽기
     structuredPrimary: true
-    subtitle: status, payload 두 키
-    goal: 현재 화면 상태를 status와 payload 두 키로 표현한다.
-    why: 상태 표기를 통일하면 결정 함수가 같은 dict 형태를 신뢰하고 자동화 코드가 깨끗해진다.
-    explanation: 상태 dict는 status에 짧은 영문 이름, payload에 부가 정보를 둔다. payload는 빈 dict일 수도 있다. 자동화 결정 함수는 status 값만 보고 분기한다.
+    subtitle: position + size
+    goal: pyautogui.position과 size를 한 번에 호출해 좌표와 해상도를 dict로 묶는다.
+    why: 상태 기반 자동화는 결정 함수가 외부 환경을 한 번에 관측한 결과로 분기해야 디버깅이 쉽다.
+    explanation: readState 함수는 pyautogui.position과 size를 호출해 cursor, screen 두 키를 가진 dict를 돌려준다. 두 값은 같은 시점에 읽혀 결정 함수가 일관된 입력을 받는다. 결과 dict는 정수 좌표만 담아 JSON 직렬화에 안전하다.
     tips:
-      - status 이름은 idle, ready, error 같은 짧은 영문이 표준이다.
-      - payload는 후속 함수에 추가 정보를 전달하는 자유로운 영역이다.
+      - 상태는 한 번 읽어 결정 함수에 넘기는 편이 분기 추적에 좋다.
+      - 다중 모니터 환경에서는 size가 주 모니터 해상도를 돌려준다.
     snippet: |-
-      state = {"status": "ready", "payload": {"target": "orderForm"}}
+      import pyautogui
 
-      assert state["status"] == "ready"
-      state
+
+      def readState() -> dict:
+          cursor = pyautogui.position()
+          screen = pyautogui.size()
+          return {
+              "cursor": {"x": cursor.x, "y": cursor.y},
+              "screen": {"width": screen.width, "height": screen.height},
+          }
+
+
+      state = readState()
+
+      assert set(state.keys()) == {"cursor", "screen"}
+      assert state["screen"]["width"] > 0
+      state["screen"]
     exercise:
-      prompt: 'status="error", payload={"message": "timeout"}인 상태 dict를 만들고 status가 error인지 검증하세요.'
+      prompt: readState를 호출해 cursor, screen 두 키와 screen.width가 양수인지 검증하세요.
       starterCode: |-
-        state = {"status": "___", "payload": {"message": "timeout"}}
+        import pyautogui
 
-        assert state["status"] == "error"
-        state
+
+        def readState() -> dict:
+            cursor = pyautogui.position()
+            screen = pyautogui.___()
+            return {
+                "cursor": {"x": cursor.x, "y": cursor.y},
+                "screen": {"width": screen.width, "height": screen.height},
+            }
+
+
+        state = readState()
+
+        assert set(state.keys()) == {"cursor", "screen"}
+        assert state["screen"]["width"] > 0
+        state["screen"]
       solution: |-
-        state = {"status": "error", "payload": {"message": "timeout"}}
+        import pyautogui
 
-        assert state["status"] == "error"
-        state
+
+        def readState() -> dict:
+            cursor = pyautogui.position()
+            screen = pyautogui.size()
+            return {
+                "cursor": {"x": cursor.x, "y": cursor.y},
+                "screen": {"width": screen.width, "height": screen.height},
+            }
+
+
+        state = readState()
+
+        assert set(state.keys()) == {"cursor", "screen"}
+        assert state["screen"]["width"] > 0
+        state["screen"]
       hints:
-        - status 값은 짧은 영문 error다.
-        - payload는 message 키를 가진 dict다.
+        - 해상도 함수 이름은 size다.
+        - 결과 dict는 cursor와 screen 두 키만 가진다.
       check:
-        noError: 상태 dict 구성이 끝나야 한다.
-        resultCheck: state의 status가 "error"여야 한다.
+        noError: readState 호출이 끝나야 한다.
+        resultCheck: state의 키가 cursor와 screen이고 screen.width가 양수여야 한다.
     check:
-      noError: dict 구성이 끝나야 한다.
-      resultCheck: state의 status가 "ready"여야 한다.
-  - id: branch-function
-    title: 분기 결정 함수
+      noError: readState 호출이 끝나야 한다.
+      resultCheck: state에 cursor와 screen 두 키가 있어야 한다.
+  - id: classify-quadrant
+    title: 사분면 분류
     structuredPrimary: true
-    subtitle: if elif 분기
-    goal: 상태에 따라 다른 액션 시퀀스를 돌려주는 결정 함수를 만든다.
-    why: 자동화 결정 함수가 같은 시그니처로 여러 상태를 다루면 후속 단계가 단순해진다.
-    explanation: decideAction 함수는 상태 dict를 받아 status에 따라 다른 시퀀스 리스트를 돌려준다. ready 상태는 폼 입력 시퀀스, error 상태는 재시도 시퀀스를 만든다. 함수의 결과는 자동화 실행기에 그대로 입력된다.
+    subtitle: 좌상/우상/좌하/우하
+    goal: 마우스 좌표를 해상도 기준 사분면 이름으로 분류하는 함수를 만든다.
+    why: 자동화 결정 함수는 화면 영역을 의미 있는 이름으로 바꿔야 다음 단계 분기가 가독성을 가진다.
+    explanation: classifyQuadrant 함수는 cursor와 screen dict를 받아 'topLeft', 'topRight', 'bottomLeft', 'bottomRight' 중 하나를 돌려준다. 절반 경계는 너비/높이의 정수 나눗셈으로 정한다. 같은 입력은 같은 결과를 돌려주는 결정적 함수다.
     tips:
-      - elif는 자동화 결정 함수에서 가장 명확한 분기 도구다.
-      - 각 분기는 빈 리스트라도 명시적으로 돌려주면 호출 측이 안전하다.
+      - 사분면 이름은 운영자가 결정 결과를 즉시 읽을 수 있게 만든다.
+      - 좌표가 경계에 정확히 걸리면 좌/상이 우선 매치된다.
     snippet: |-
-      def decideAction(state: dict) -> list:
-          if state["status"] == "ready":
-              return [{"type": "click"}, {"type": "text", "text": "ok"}]
-          if state["status"] == "error":
-              return [{"type": "press", "key": "esc"}]
-          return []
+      def classifyQuadrant(cursor: dict, screen: dict) -> str:
+          horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+          vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+          return f"{vertical}{horizontal}"
 
 
-      ready = decideAction({"status": "ready", "payload": {}})
-      error = decideAction({"status": "error", "payload": {}})
+      screen = {"width": 1000, "height": 800}
 
-      assert ready[0] == {"type": "click"}
-      assert error[0] == {"type": "press", "key": "esc"}
-      [len(ready), len(error)]
+      assert classifyQuadrant({"x": 100, "y": 100}, screen) == "topLeft"
+      assert classifyQuadrant({"x": 900, "y": 700}, screen) == "bottomRight"
+      classifyQuadrant({"x": 100, "y": 100}, screen)
     exercise:
-      prompt: decideAction을 status="ready" 상태로 호출하면 두 액션이 돌아오는지 검증하세요.
+      prompt: classifyQuadrant에 cursor (900, 100), screen 1000x800을 넘기면 결과가 'topRight'인지 검증하세요.
       starterCode: |-
-        def decideAction(state: dict) -> list:
-            if state["status"] == "ready":
-                return [{"type": "click"}, {"type": "text", "text": "ok"}]
-            if state["status"] == "error":
-                return [{"type": "press", "key": "esc"}]
-            return ___
+        def classifyQuadrant(cursor: dict, screen: dict) -> str:
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "___"
+            return f"{vertical}{horizontal}"
 
 
-        actions = decideAction({"status": "ready", "payload": {}})
+        screen = {"width": 1000, "height": 800}
 
-        assert len(actions) == 2
-        actions
+        assert classifyQuadrant({"x": 900, "y": 100}, screen) == "topRight"
+        classifyQuadrant({"x": 900, "y": 100}, screen)
       solution: |-
-        def decideAction(state: dict) -> list:
-            if state["status"] == "ready":
-                return [{"type": "click"}, {"type": "text", "text": "ok"}]
-            if state["status"] == "error":
-                return [{"type": "press", "key": "esc"}]
-            return []
+        def classifyQuadrant(cursor: dict, screen: dict) -> str:
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            return f"{vertical}{horizontal}"
 
 
-        actions = decideAction({"status": "ready", "payload": {}})
+        screen = {"width": 1000, "height": 800}
 
-        assert len(actions) == 2
-        actions
+        assert classifyQuadrant({"x": 900, "y": 100}, screen) == "topRight"
+        classifyQuadrant({"x": 900, "y": 100}, screen)
       hints:
-        - 기본 분기는 빈 리스트 []를 돌려준다.
-        - ready 상태는 두 액션을 돌려준다.
+        - 화면 아래 절반 키워드는 'bottom'이다.
+        - x=900은 width 1000의 절반을 넘으므로 Right다.
       check:
-        noError: decideAction 호출이 정상적으로 끝나야 한다.
-        resultCheck: actions 길이가 2여야 한다.
+        noError: classifyQuadrant 호출이 끝나야 한다.
+        resultCheck: 결과가 'topRight'여야 한다.
     check:
-      noError: decideAction 두 번 호출이 끝나야 한다.
-      resultCheck: 두 결과의 첫 액션이 본문 기대값과 같아야 한다.
-  - id: default-branch
-    title: 알 수 없는 상태 기본 분기
+      noError: classifyQuadrant 두 호출이 끝나야 한다.
+      resultCheck: 두 결과가 'topLeft'와 'bottomRight'여야 한다.
+  - id: failsafe-guard
+    title: FAILSAFE 보호 분기
     structuredPrimary: true
-    subtitle: 안전한 빈 시퀀스
-    goal: 알 수 없는 status는 빈 시퀀스를 돌려 자동화가 잘못된 동작을 하지 않게 한다.
-    why: 새 상태가 등장했을 때 자동화 코드가 임의의 액션을 실행하지 않고 빈 시퀀스로 안전하게 정지해야 사고가 적다.
-    explanation: 결정 함수는 if/elif로 알려진 상태를 처리한 뒤 마지막 return []으로 안전 분기를 둔다. 빈 시퀀스를 받은 호출 측은 운영자에게 알림을 보낼 수 있다. 자동화 정책으로 이 패턴이 표준이다.
+    subtitle: 좌상단 5x5 영역
+    goal: 좌상단 모서리 5x5 영역 안이면 hold 액션을 돌려주는 보호 분기를 만든다.
+    why: pyautogui FAILSAFE가 좌상단 모서리에서 발동하므로 자동화는 그 영역 근처에서 추가 동작을 멈춰야 안전하다.
+    explanation: protectiveAction 함수는 cursor dict를 받아 (0, 0) 기준 5x5 영역 안이면 'hold', 아니면 'continue'를 돌려준다. 같은 함수가 결정 흐름의 가장 앞에 들어가 위험 영역을 먼저 거른다. 5x5는 pyautogui 기본 FAILSAFE 임계값과 잘 어울리는 안전 마진이다.
     tips:
-      - 빈 시퀀스는 다음 단계의 조용한 NOP을 의미한다.
-      - 알 수 없는 상태가 자주 등장하면 분기를 보강한다.
+      - 안전 분기는 결정 함수의 가장 앞에 두는 편이 사고 예방에 좋다.
+      - 임계값 5는 작은 모니터에서도 안전한 마진이다.
     snippet: |-
-      def decideAction(state: dict) -> list:
-          if state["status"] == "ready":
-              return [{"type": "click"}]
-          return []
+      def protectiveAction(cursor: dict) -> str:
+          if cursor["x"] < 5 and cursor["y"] < 5:
+              return "hold"
+          return "continue"
 
 
-      unknown = decideAction({"status": "loading", "payload": {}})
-
-      assert unknown == []
-      unknown
+      assert protectiveAction({"x": 0, "y": 0}) == "hold"
+      assert protectiveAction({"x": 100, "y": 100}) == "continue"
+      protectiveAction({"x": 2, "y": 2})
     exercise:
-      prompt: 같은 함수에 status="paused" 상태를 넘기면 빈 리스트가 돌아오는지 검증하세요.
+      prompt: protectiveAction에 cursor (3, 3)을 넘기면 'hold'가, (6, 6)을 넘기면 'continue'가 돌아오는지 검증하세요.
       starterCode: |-
-        def decideAction(state: dict) -> list:
-            if state["status"] == "ready":
-                return [{"type": "click"}]
-            return ___
+        def protectiveAction(cursor: dict) -> str:
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return "hold"
+            return "___"
 
 
-        unknown = decideAction({"status": "paused", "payload": {}})
-
-        assert unknown == []
-        unknown
+        assert protectiveAction({"x": 3, "y": 3}) == "hold"
+        assert protectiveAction({"x": 6, "y": 6}) == "continue"
+        protectiveAction({"x": 3, "y": 3})
       solution: |-
-        def decideAction(state: dict) -> list:
-            if state["status"] == "ready":
-                return [{"type": "click"}]
-            return []
+        def protectiveAction(cursor: dict) -> str:
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return "hold"
+            return "continue"
 
 
-        unknown = decideAction({"status": "paused", "payload": {}})
-
-        assert unknown == []
-        unknown
+        assert protectiveAction({"x": 3, "y": 3}) == "hold"
+        assert protectiveAction({"x": 6, "y": 6}) == "continue"
+        protectiveAction({"x": 3, "y": 3})
       hints:
-        - 기본 분기는 빈 리스트 [] 를 그대로 돌려준다.
-        - 정의되지 않은 상태도 안전한 NOP으로 처리된다.
+        - 안전 영역 밖 액션 이름은 'continue'다.
+        - (3, 3)은 5x5 영역 안이라 hold를 돌려준다.
       check:
-        noError: decideAction 호출이 KeyError 없이 끝나야 한다.
-        resultCheck: unknown이 빈 리스트여야 한다.
+        noError: protectiveAction 두 호출이 끝나야 한다.
+        resultCheck: 좌상단 영역은 'hold', 그 외는 'continue'여야 한다.
     check:
-      noError: decideAction 호출이 끝나야 한다.
-      resultCheck: unknown이 빈 리스트여야 한다.
-  - id: decision-summary
+      noError: protectiveAction 호출이 끝나야 한다.
+      resultCheck: (0, 0)은 hold, (100, 100)은 continue여야 한다.
+  - id: decision-report
     title: 종합 결정 보고
     structuredPrimary: true
-    subtitle: status, action, sequence 묶기
-    goal: 결정 함수의 입력 상태와 결과 시퀀스를 한 dict로 묶어 자동화 표준 결정 보고를 만든다.
-    why: 종합 결정 보고는 운영자가 자동화 분기의 의도와 실제 결과를 한눈에 검토할 수 있게 만든다.
-    explanation: decideReport 함수는 상태 dict를 받아 status, action 카테고리, sequence 결과를 dict로 돌려준다. action 키는 inputForm 또는 retry 같은 사람이 읽기 좋은 이름이다. 같은 입력은 같은 결정 결과를 만든다.
+    subtitle: state, action, sequence
+    goal: 보호 분기와 사분면 분류를 결합한 결정 함수가 state, action, sequence 세 키를 가진 dict를 돌려준다.
+    why: 종합 결정 보고는 자동화 사이클의 의도와 결과를 운영자가 한눈에 검토할 수 있게 만들어 사고를 줄인다.
+    explanation: decideReport 함수는 readState 결과를 받아 보호 분기를 먼저 점검한 뒤 사분면 분류로 액션을 정하고 액션에 맞는 시퀀스를 dict로 묶어 돌려준다. action 이름은 'hold', 'focusTopLeft' 같은 사람이 읽기 좋은 단어다. 같은 입력은 같은 결정 결과를 만드는 결정적 함수다.
     tips:
-      - 종합 보고는 자동화 화면에 한 줄로 표시되도록 짧게 둔다.
-      - action 이름은 운영자가 의미를 즉시 알 수 있는 단어로 둔다.
+      - 결정 보고 dict는 자동화 로그의 한 행으로 그대로 들어간다.
+      - sequence가 빈 리스트라면 호출 측이 'NOP'으로 안전하게 처리한다.
     snippet: |-
       def decideReport(state: dict) -> dict:
-          if state["status"] == "ready":
-              return {"status": state["status"], "action": "inputForm", "sequence": [{"type": "click"}]}
-          if state["status"] == "error":
-              return {"status": state["status"], "action": "retry", "sequence": [{"type": "press", "key": "esc"}]}
-          return {"status": state["status"], "action": "noop", "sequence": []}
+          cursor = state["cursor"]
+          screen = state["screen"]
+          if cursor["x"] < 5 and cursor["y"] < 5:
+              return {"state": "failsafeZone", "action": "hold", "sequence": []}
+          horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+          vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+          quadrant = f"{vertical}{horizontal}"
+          return {
+              "state": quadrant,
+              "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+              "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+          }
 
 
-      report = decideReport({"status": "ready", "payload": {}})
+      sample = {"cursor": {"x": 0, "y": 0}, "screen": {"width": 800, "height": 600}}
+      report = decideReport(sample)
 
-      assert report == {"status": "ready", "action": "inputForm", "sequence": [{"type": "click"}]}
+      assert report == {"state": "failsafeZone", "action": "hold", "sequence": []}
       report
     exercise:
-      prompt: decideReport를 status="error" 상태로 호출하면 action이 "retry"이고 sequence가 [press esc] 한 항목이 되는지 종합 검증하세요.
+      prompt: decideReport에 cursor (700, 100), screen 800x600 상태를 넘기면 state가 'topRight'이고 action이 'focusTopRight'이고 sequence가 한 항목인지 종합 검증하세요.
       starterCode: |-
         def decideReport(state: dict) -> dict:
-            if state["status"] == "ready":
-                return {"status": state["status"], "action": "inputForm", "sequence": [{"type": "click"}]}
-            if state["status"] == "error":
-                return {"status": state["status"], "action": "___", "sequence": [{"type": "press", "key": "esc"}]}
-            return {"status": state["status"], "action": "noop", "sequence": []}
+            cursor = state["cursor"]
+            screen = state["screen"]
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return {"state": "failsafeZone", "action": "hold", "sequence": []}
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            quadrant = f"{vertical}{horizontal}"
+            return {
+                "state": quadrant,
+                "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+                "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+            }
 
 
-        report = decideReport({"status": "error", "payload": {}})
+        sample = {"cursor": {"x": 700, "y": 100}, "screen": {"width": 800, "height": 600}}
+        report = decideReport(sample)
 
-        assert report == {"status": "error", "action": "retry", "sequence": [{"type": "press", "key": "esc"}]}
+        assert report["state"] == "topRight"
+        assert report["action"] == "___"
+        assert len(report["sequence"]) == 1
         report
       solution: |-
         def decideReport(state: dict) -> dict:
-            if state["status"] == "ready":
-                return {"status": state["status"], "action": "inputForm", "sequence": [{"type": "click"}]}
-            if state["status"] == "error":
-                return {"status": state["status"], "action": "retry", "sequence": [{"type": "press", "key": "esc"}]}
-            return {"status": state["status"], "action": "noop", "sequence": []}
+            cursor = state["cursor"]
+            screen = state["screen"]
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return {"state": "failsafeZone", "action": "hold", "sequence": []}
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            quadrant = f"{vertical}{horizontal}"
+            return {
+                "state": quadrant,
+                "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+                "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+            }
 
 
-        report = decideReport({"status": "error", "payload": {}})
+        sample = {"cursor": {"x": 700, "y": 100}, "screen": {"width": 800, "height": 600}}
+        report = decideReport(sample)
 
-        assert report == {"status": "error", "action": "retry", "sequence": [{"type": "press", "key": "esc"}]}
+        assert report["state"] == "topRight"
+        assert report["action"] == "focusTopRight"
+        assert len(report["sequence"]) == 1
         report
       hints:
-        - error 상태의 action 이름은 retry다.
-        - 시퀀스는 press esc 한 항목을 가진다.
+        - quadrant가 'topRight'이면 action 이름은 'focusTopRight'다.
+        - 빈칸은 action 문자열이다.
       check:
-        noError: decideReport 호출이 종합 정리 흐름으로 끝나야 한다.
-        resultCheck: report가 status, action, sequence 세 키를 본문 기대값으로 담아야 한다.
+        noError: decideReport 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: state가 'topRight', action이 'focusTopRight'여야 한다.
     check:
-      noError: 종합 결정 보고 함수 호출이 끝나야 한다.
-      resultCheck: report dict가 status, action, sequence 세 키를 정확히 담아야 한다.
+      noError: decideReport 호출이 끝나야 한다.
+      resultCheck: report가 state, action, sequence 세 키를 가져야 한다.

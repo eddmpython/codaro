@@ -1,200 +1,265 @@
 meta:
   id: inputCtl_04
-  title: 키보드 입력 계획
+  title: 키보드 입력 기초
   order: 4
   category: inputCtl
   difficulty: easy
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pyautogui
   tags:
+    - pyautogui
     - keyboard
-    - hotkey
     - automation
 intro:
-  direction: 키보드 자동화 입력을 명령 dict로 표현해 단일 키, 문자열 입력, 단축키 조합, 종합 시퀀스를 단계적으로 만든다.
+  direction: pyautogui의 키보드 API에서 유효 키 집합과 write/press/hotkey 시그니처를 직접 다뤄 키 입력 자동화의 표준 래퍼를 만든다.
   benefits:
-    - type, key, text 같은 표준 키로 키보드 명령을 표현한다.
-    - 한 줄 문자열 입력을 type=text 명령으로 표현한다.
-    - 단축키 조합을 keys 리스트로 표현한다.
-    - 종합 시퀀스가 자동화 의도를 사람이 읽기 좋게 정리한다.
+    - pyautogui.KEYBOARD_KEYS로 지원 키 이름을 확인한다.
+    - pyautogui.isValidKey로 임의 키 이름의 유효성을 검사한다.
+    - write/press/hotkey 시그니처를 inspect로 직접 확인한다.
+    - 종합 입력 계획 함수가 유효 키만 받아 안전한 시퀀스를 만든다.
   diagram:
     steps:
-      - label: 단일 키 명령
-        detail: type=press와 key 값을 가진 dict로 한 키 입력을 표현한다.
-      - label: 문자열 입력 명령
-        detail: type=text와 text 값으로 여러 글자를 한 번에 입력한다.
-      - label: 단축키 조합
-        detail: type=hotkey와 keys 리스트로 ctrl+s 같은 조합을 표현한다.
-      - label: 종합 시퀀스
-        detail: 위 명령들을 리스트로 묶어 자동화 의도를 명시한다.
+      - label: 유효 키 집합 확인
+        detail: pyautogui.KEYBOARD_KEYS는 자동화가 사용할 수 있는 키 이름 리스트다.
+      - label: 키 이름 검사
+        detail: pyautogui.isValidKey("enter")가 True인지 확인해 잘못된 키 호출을 막는다.
+      - label: 입력 API 시그니처 확인
+        detail: inspect.signature로 write/press/hotkey의 인자를 직접 본다.
+      - label: 종합 입력 계획
+        detail: 유효 키만 통과시키는 함수가 자동화 시퀀스의 잘못된 키 사고를 막는다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: 명령 표현은 dict만 사용하므로 외부 패키지가 필요 없다.
-      - label: assert 기반 검증
-        detail: 시퀀스 구조와 키 값을 assert로 비교한다.
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 로컬 가상환경에 설치돼 있어야 한다.
+      - label: 키 입력 호출 미실행
+        detail: snippet은 키 입력을 실제로 보내지 않고 시그니처 검증과 계획 dict 구성으로만 학습한다.
 sections:
-  - id: press-key
-    title: 단일 키 명령
+  - id: keyboard-keys
+    title: 유효 키 집합
     structuredPrimary: true
-    subtitle: type=press
-    goal: 한 키 입력 명령을 type과 key 두 키로 표현한다.
-    why: 단일 키 입력은 키보드 자동화의 가장 작은 단위이므로 첫 단계로 표기 합의가 필요하다.
-    explanation: press 명령은 type 키와 key 키를 가진다. key 값은 "enter", "tab", "esc" 같은 표준 이름이다. 자동화 코드는 이 표기를 신뢰해 실행기에 그대로 넘긴다.
+    subtitle: pyautogui.KEYBOARD_KEYS
+    goal: pyautogui.KEYBOARD_KEYS에 'enter', 'tab', 'esc' 같은 필수 키가 포함돼 있는지 확인한다.
+    why: 자동화가 잘못된 키 이름을 호출하면 pyautogui가 조용히 무시할 수 있으므로 사전에 유효 키 집합을 알아 둬야 한다.
+    explanation: pyautogui.KEYBOARD_KEYS는 모듈 단위 리스트로 모든 지원 키 이름을 소문자 문자열로 담는다. 'enter', 'tab', 'esc', 'space', 'ctrl', 'shift' 등이 표준이다. 같은 이름이 press 함수의 키 인자에 그대로 들어간다.
     tips:
-      - key 이름은 표준 영문 이름으로 통일한다.
-      - enter는 줄바꿈, tab은 다음 칸 이동에 가장 흔히 쓰인다.
+      - 키 이름은 항상 소문자 영문이다.
+      - 특수 키 이름이 기억나지 않으면 KEYBOARD_KEYS를 직접 출력해 확인한다.
     snippet: |-
-      command = {"type": "press", "key": "enter"}
+      import pyautogui
 
-      assert command["type"] == "press"
-      assert command["key"] == "enter"
-      command
+      keys = set(pyautogui.KEYBOARD_KEYS)
+      required = {"enter", "tab", "esc"}
+
+      assert required.issubset(keys)
+      sorted(required & keys)
     exercise:
-      prompt: tab 키 입력 명령을 만들고 두 키 값이 정확한지 검증하세요.
+      prompt: "'shift', 'ctrl', 'space' 세 키가 pyautogui.KEYBOARD_KEYS 안에 모두 들어 있는지 검증하세요."
       starterCode: |-
-        command = {"type": "press", "key": "___"}
+        import pyautogui
 
-        assert command["type"] == "press"
-        assert command["key"] == "tab"
-        command
+        keys = set(pyautogui.___)
+        required = {"shift", "ctrl", "space"}
+
+        assert required.issubset(keys)
+        sorted(required & keys)
       solution: |-
-        command = {"type": "press", "key": "tab"}
+        import pyautogui
 
-        assert command["type"] == "press"
-        assert command["key"] == "tab"
-        command
+        keys = set(pyautogui.KEYBOARD_KEYS)
+        required = {"shift", "ctrl", "space"}
+
+        assert required.issubset(keys)
+        sorted(required & keys)
       hints:
-        - key 값은 짧은 영문 문자열 tab이다.
-        - press 타입은 단일 키 입력을 의미한다.
+        - 모듈 상수 이름은 KEYBOARD_KEYS 대문자다.
+        - 세 키는 모두 소문자 영문 문자열로 등록돼 있다.
       check:
-        noError: 단일 키 명령 dict 구성이 끝나야 한다.
-        resultCheck: command의 key가 "tab"이어야 한다.
+        noError: KEYBOARD_KEYS 접근이 끝나야 한다.
+        resultCheck: required 세 키가 모두 keys 안에 있어야 한다.
     check:
-      noError: dict 구성이 끝나야 한다.
-      resultCheck: command의 type이 press이고 key가 enter여야 한다.
-  - id: type-text
-    title: 문자열 입력 명령
+      noError: KEYBOARD_KEYS 접근이 끝나야 한다.
+      resultCheck: required 키 세 개가 모두 KEYBOARD_KEYS 안에 있어야 한다.
+  - id: validate-key
+    title: 키 이름 검사
     structuredPrimary: true
-    subtitle: type=text
-    goal: 여러 글자를 한 번에 입력하는 명령을 type=text와 text 값으로 표현한다.
-    why: 문자열 입력은 폼 자동화에서 가장 자주 쓰이는 명령이므로 표준 형태로 정리한다.
-    explanation: text 명령은 type과 text 두 키를 가진다. text 값은 입력할 문자열이다. 자동화 실행기는 이 문자열을 한 글자씩 키보드로 보낸다. 한글도 입력 가능하지만 일부 환경에서는 IME 동작에 따라 결과가 달라질 수 있다.
+    subtitle: pyautogui.isValidKey()
+    goal: pyautogui.isValidKey로 임의 문자열이 유효한 키 이름인지 boolean으로 확인한다.
+    why: 자동화 시퀀스에 잘못된 키 이름이 섞이면 디버깅이 어려워지므로 사전 검사로 막는 패턴이 표준이다.
+    explanation: pyautogui.isValidKey(name)는 name이 KEYBOARD_KEYS에 있으면 True, 없으면 False를 돌려준다. 단일 문자 키 ('a', 'b')는 True, 멀티문자 'enter'도 True, 임의 문자열 'hello'는 False다. 검사는 대소문자에 민감하다.
     tips:
-      - 한글 입력은 운영체제 IME 설정에 따라 달라질 수 있으므로 운영 환경에서 사전 검증한다.
-      - 매우 긴 문자열은 짧은 단위로 나누어 입력하는 편이 안전하다.
+      - 자동화 입력은 isValidKey로 한 번 거른 뒤 press나 hotkey에 넘기는 편이 안전하다.
+      - 대문자 'A'는 키 이름이 아니라 텍스트라 isValidKey가 False를 돌려준다.
     snippet: |-
-      command = {"type": "text", "text": "codaro automation"}
+      import pyautogui
 
-      assert command["type"] == "text"
-      assert command["text"] == "codaro automation"
-      command
+      good = pyautogui.isValidKey("enter")
+      bad = pyautogui.isValidKey("nope")
+
+      assert good is True
+      assert bad is False
+      (good, bad)
     exercise:
-      prompt: '"Hello Codaro" 문자열을 입력하는 text 명령을 만들고 키 값이 정확한지 검증하세요.'
+      prompt: pyautogui.isValidKey로 'tab'은 True, 'fakekey'는 False가 돌아오는지 검증하세요.
       starterCode: |-
-        command = {"type": "text", "text": "___"}
+        import pyautogui
 
-        assert command["type"] == "text"
-        assert command["text"] == "Hello Codaro"
-        command
+        good = pyautogui.isValidKey("tab")
+        bad = pyautogui.___("fakekey")
+
+        assert good is True
+        assert bad is False
+        (good, bad)
       solution: |-
-        command = {"type": "text", "text": "Hello Codaro"}
+        import pyautogui
 
-        assert command["type"] == "text"
-        assert command["text"] == "Hello Codaro"
-        command
+        good = pyautogui.isValidKey("tab")
+        bad = pyautogui.isValidKey("fakekey")
+
+        assert good is True
+        assert bad is False
+        (good, bad)
       hints:
-        - text 값은 "Hello Codaro" 문자열이다.
-        - 대소문자와 공백을 정확히 일치시킨다.
+        - 검사 함수 이름은 isValidKey다.
+        - 임의 문자열 'fakekey'는 등록된 키 이름이 아니다.
       check:
-        noError: text 명령 dict 구성이 끝나야 한다.
-        resultCheck: command의 text가 "Hello Codaro"여야 한다.
+        noError: isValidKey 두 호출이 끝나야 한다.
+        resultCheck: good이 True, bad가 False여야 한다.
     check:
-      noError: text 명령 dict 구성이 끝나야 한다.
-      resultCheck: command의 text 값이 본문에서 지정한 문자열과 같아야 한다.
-  - id: hotkey-combo
-    title: 단축키 조합
+      noError: isValidKey 두 호출이 끝나야 한다.
+      resultCheck: 유효 키는 True, 잘못된 이름은 False여야 한다.
+  - id: write-signature
+    title: 입력 API 시그니처
     structuredPrimary: true
-    subtitle: type=hotkey
-    goal: ctrl+s 같은 단축키 조합을 keys 리스트로 표현한다.
-    why: 자동화는 단축키를 자주 사용하므로 조합 표기를 명확히 합의해 둔다.
-    explanation: hotkey 명령은 type 키와 keys 리스트를 가진다. keys 리스트의 순서는 동시에 누르는 키 목록이다. 자동화 실행기는 첫 키를 누른 채 다음 키들을 차례로 누른 뒤 모두 놓는다.
+    subtitle: inspect로 인자 보기
+    goal: inspect.signature로 pyautogui.write의 인자 이름을 확인해 자동화 호출 시 어떤 인자를 넘겨야 하는지 파악한다.
+    why: 자동화 코드는 라이브러리 시그니처를 직접 확인해 둬야 인자를 잘못 넘기는 사고를 막을 수 있다.
+    explanation: pyautogui.write(message, interval, ...)는 문자열을 한 글자씩 입력하는 함수다. interval 인자는 글자 사이 대기 시간이다. inspect.signature로 호출 형태를 확인하면 자동화 코드 작성이 빨라진다.
     tips:
-      - 키 이름은 항상 소문자 영문 표준으로 둔다.
-      - 단축키는 대상 앱마다 동작이 다를 수 있어 사전 검증이 중요하다.
+      - inspect.signature는 모든 함수에서 동작해 라이브러리 학습에 자주 쓰인다.
+      - 자동화 코드는 키워드 인자로 호출하면 가독성이 좋다.
     snippet: |-
-      command = {"type": "hotkey", "keys": ["ctrl", "s"]}
+      import inspect
+      import pyautogui
 
-      assert command["keys"] == ["ctrl", "s"]
-      command
+      signature = inspect.signature(pyautogui.write)
+      params = list(signature.parameters)
+
+      assert "message" in params
+      assert "interval" in params
+      params[:2]
     exercise:
-      prompt: ctrl+shift+t 단축키 조합을 만들고 keys 리스트가 정확히 세 키를 본문 순서대로 담는지 검증하세요.
+      prompt: inspect.signature로 pyautogui.write의 첫 인자 이름이 'message'이고 두 번째가 'interval'인지 검증하세요.
       starterCode: |-
-        command = {"type": "hotkey", "keys": ["ctrl", "___", "t"]}
+        import inspect
+        import pyautogui
 
-        assert command["keys"] == ["ctrl", "shift", "t"]
-        command
+        signature = inspect.___(pyautogui.write)
+        params = list(signature.parameters)
+
+        assert params[0] == "message"
+        assert params[1] == "interval"
+        params[:2]
       solution: |-
-        command = {"type": "hotkey", "keys": ["ctrl", "shift", "t"]}
+        import inspect
+        import pyautogui
 
-        assert command["keys"] == ["ctrl", "shift", "t"]
-        command
+        signature = inspect.signature(pyautogui.write)
+        params = list(signature.parameters)
+
+        assert params[0] == "message"
+        assert params[1] == "interval"
+        params[:2]
       hints:
-        - 가운데 키 이름은 shift다.
-        - 키 리스트 순서는 자동화 실행기가 그대로 따른다.
+        - inspect 모듈 함수 이름은 signature다.
+        - write의 첫 인자는 입력할 문자열을 받는 message다.
       check:
-        noError: hotkey 명령 dict 구성이 끝나야 한다.
-        resultCheck: keys 리스트가 세 키를 본문 순서대로 담아야 한다.
+        noError: inspect.signature 호출이 끝나야 한다.
+        resultCheck: params의 앞 두 인자가 message, interval이어야 한다.
     check:
-      noError: hotkey 명령 구성이 끝나야 한다.
-      resultCheck: keys 리스트가 ctrl과 s 두 키를 정확히 담아야 한다.
-  - id: keyboard-summary
-    title: 종합 키보드 시퀀스
+      noError: inspect.signature 호출이 끝나야 한다.
+      resultCheck: pyautogui.write의 인자에 message와 interval이 있어야 한다.
+  - id: input-plan
+    title: 종합 입력 계획
     structuredPrimary: true
-    subtitle: 자동화 의도를 묶기
-    goal: 단일 키, 문자열, 단축키를 한 시퀀스로 묶어 자동화 실행기 입력의 표준 형태를 완성한다.
-    why: 종합 키보드 시퀀스는 운영자가 검토하기 쉽고 실행기가 단순한 입력 형태로 받아 실행이 안정적이다.
-    explanation: 마지막 섹션은 위 세 명령을 한 시퀀스 리스트로 묶는다. 시퀀스는 자동화 실행기에 그대로 들어가는 입력이며 같은 형태를 두 번 사용해도 안전하다. types 리스트로 전체 흐름을 운영자가 한눈에 확인할 수 있다.
+    subtitle: 유효 키만 통과
+    goal: 입력 계획 함수가 isValidKey로 거른 유효 키만 시퀀스에 담아 자동화 표준 입력을 만든다.
+    why: 자동화 실행 전 유효 키만 통과시키는 게이트를 두면 잘못된 키가 운영 환경에서 실패하는 사고를 막을 수 있다.
+    explanation: planKeyboardSequence 함수는 키 이름 리스트와 텍스트를 받아 유효 키는 press 명령, 텍스트는 write 명령으로 묶어 dict 리스트로 돌려준다. 결과 dict 안의 모든 key는 isValidKey 검사를 통과한 값만 들어간다. 잘못된 키는 skipped 키에 모아 보고한다.
     tips:
-      - 시퀀스 길이가 길어지면 단계별 주석이나 name 키를 더할 수 있다.
-      - 종합 시퀀스는 자동화의 영속 형태로 JSON에 그대로 저장된다.
+      - skipped 리스트가 비어 있어야 자동화 실행이 안전하다.
+      - 입력 계획 함수가 실행 단계와 검증 단계를 분리해 사고 추적이 쉽다.
     snippet: |-
-      sequence = [
-          {"type": "text", "text": "주문 1234"},
-          {"type": "press", "key": "tab"},
-          {"type": "hotkey", "keys": ["ctrl", "s"]},
-      ]
-      types = [step["type"] for step in sequence]
+      import pyautogui
 
-      assert types == ["text", "press", "hotkey"]
-      types
+
+      def planKeyboardSequence(keys: list, message: str) -> dict:
+          accepted = []
+          skipped = []
+          for name in keys:
+              if pyautogui.isValidKey(name):
+                  accepted.append({"action": "press", "key": name})
+              else:
+                  skipped.append(name)
+          accepted.append({"action": "write", "message": message, "interval": 0.0})
+          return {"sequence": accepted, "skipped": skipped}
+
+
+      plan = planKeyboardSequence(["enter", "fakekey", "tab"], "ok")
+
+      assert plan["skipped"] == ["fakekey"]
+      assert plan["sequence"][0] == {"action": "press", "key": "enter"}
+      assert plan["sequence"][-1]["action"] == "write"
+      plan
     exercise:
-      prompt: 같은 형식으로 password 입력, enter 입력, ctrl+r 단축키를 한 종합 시퀀스로 만들고 types 리스트가 ["text", "press", "hotkey"]인지 검증하세요.
+      prompt: planKeyboardSequence에 ['enter', 'bogus']와 'hi'를 넘기면 skipped가 ['bogus']이고 sequence의 첫 항목이 enter press인지 종합 검증하세요.
       starterCode: |-
-        sequence = [
-            {"type": "text", "text": "password"},
-            {"type": "press", "key": "enter"},
-            {"type": "hotkey", "keys": ["ctrl", "___"]},
-        ]
-        types = [step["type"] for step in sequence]
+        import pyautogui
 
-        assert types == ["text", "press", "hotkey"]
-        types
+
+        def planKeyboardSequence(keys: list, message: str) -> dict:
+            accepted = []
+            skipped = []
+            for name in keys:
+                if pyautogui.___(name):
+                    accepted.append({"action": "press", "key": name})
+                else:
+                    skipped.append(name)
+            accepted.append({"action": "write", "message": message, "interval": 0.0})
+            return {"sequence": accepted, "skipped": skipped}
+
+
+        plan = planKeyboardSequence(["enter", "bogus"], "hi")
+
+        assert plan["skipped"] == ["bogus"]
+        assert plan["sequence"][0] == {"action": "press", "key": "enter"}
+        plan
       solution: |-
-        sequence = [
-            {"type": "text", "text": "password"},
-            {"type": "press", "key": "enter"},
-            {"type": "hotkey", "keys": ["ctrl", "r"]},
-        ]
-        types = [step["type"] for step in sequence]
+        import pyautogui
 
-        assert types == ["text", "press", "hotkey"]
-        types
+
+        def planKeyboardSequence(keys: list, message: str) -> dict:
+            accepted = []
+            skipped = []
+            for name in keys:
+                if pyautogui.isValidKey(name):
+                    accepted.append({"action": "press", "key": name})
+                else:
+                    skipped.append(name)
+            accepted.append({"action": "write", "message": message, "interval": 0.0})
+            return {"sequence": accepted, "skipped": skipped}
+
+
+        plan = planKeyboardSequence(["enter", "bogus"], "hi")
+
+        assert plan["skipped"] == ["bogus"]
+        assert plan["sequence"][0] == {"action": "press", "key": "enter"}
+        plan
       hints:
-        - 단축키 두 번째 키는 r이다.
-        - 시퀀스 type 값은 각각 text, press, hotkey 순이다.
+        - 검사 함수 이름은 isValidKey다.
+        - "'bogus'는 KEYBOARD_KEYS에 없어 skipped로 분류된다."
       check:
-        noError: 종합 시퀀스 구성과 types 추출이 끝나야 한다.
-        resultCheck: types 리스트가 ["text", "press", "hotkey"]여야 한다.
+        noError: planKeyboardSequence 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: "skipped가 ['bogus']이고 sequence 첫 항목이 enter press여야 한다."
     check:
-      noError: 종합 시퀀스 구성이 끝나야 한다.
-      resultCheck: types 리스트가 ["text", "press", "hotkey"]로 종합 흐름을 보여야 한다.
+      noError: planKeyboardSequence 호출이 끝나야 한다.
+      resultCheck: skipped 리스트가 유효하지 않은 키를 담고 sequence가 enter press로 시작해야 한다.

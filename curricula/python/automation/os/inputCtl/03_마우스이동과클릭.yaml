@@ -1,220 +1,296 @@
 meta:
   id: inputCtl_03
-  title: 마우스 이동과 클릭 계획
+  title: 마우스 이동과 클릭
   order: 3
   category: inputCtl
   difficulty: easy
   audience: GUI 자동화에 입문하는 Python 학습자
-  packages: []
+  packages:
+    - pyautogui
   tags:
+    - pyautogui
     - mouse
-    - planning
     - automation
 intro:
-  direction: 마우스 자동화의 입력을 dict로 표현하고 이동, 클릭, 드래그 시나리오를 시퀀스로 구성해 실행 전에 시각화한다.
+  direction: pyautogui.moveTo와 click을 실제 호출하면서 현재 좌표 복귀 패턴과 안전 래퍼를 만들어 마우스 자동화의 기본 동작을 익힌다.
   benefits:
-    - 마우스 명령을 type, point, button 키를 가진 dict로 표준화한다.
-    - 이동, 클릭, 더블 클릭, 드래그 명령을 시퀀스로 만든다.
-    - 시퀀스를 사전 검토한 뒤에만 실제 자동화에 넘긴다.
-    - 종합 시퀀스 dict로 자동화 의도를 운영자에게 명시한다.
+    - pyautogui.moveTo로 마우스를 정해진 좌표로 옮기고 position()으로 확인한다.
+    - 작업 전후 좌표를 기록해 마우스를 원위치로 복귀시킨다.
+    - 안전 클릭 래퍼로 onScreen 검사를 통과한 좌표만 클릭한다.
+    - 종합 시나리오 함수가 이동과 클릭 흐름을 한 번에 보고한다.
   diagram:
     steps:
-      - label: 명령 dict 표기
-        detail: type 키와 좌표, 버튼 정보를 가진 dict로 명령 한 개를 표현한다.
-      - label: 이동 명령 시퀀스
-        detail: moveTo 명령을 리스트에 담아 단계적으로 이동을 표현한다.
-      - label: 클릭과 더블 클릭
-        detail: click과 doubleClick 명령에 button 키를 더해 좌우 버튼을 구분한다.
-      - label: 종합 시나리오 정리
-        detail: 이동, 클릭, 드래그를 한 시퀀스로 묶고 운영자가 검토하는 dict를 만든다.
+      - label: 현재 좌표 보관
+        detail: pyautogui.position()으로 시작 좌표를 받아 변수에 보관한다.
+      - label: moveTo로 이동
+        detail: pyautogui.moveTo(x, y, duration)로 마우스를 옮기고 position()으로 확인한다.
+      - label: 원위치 복귀
+        detail: 보관한 좌표로 다시 moveTo해 자동화가 사용자 상태를 어지럽히지 않게 한다.
+      - label: 안전 클릭 래퍼
+        detail: onScreen으로 검사한 좌표만 click 호출해 화면 밖 클릭을 막는다.
     runtime:
-      - label: 표준 라이브러리만
-        detail: 명령 표현은 dict만 사용하므로 외부 패키지가 필요 없다.
-      - label: assert 기반 검증
-        detail: 시퀀스 길이와 각 명령 dict를 assert로 비교한다.
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 로컬 환경에 준비돼야 한다.
+      - label: 실제 마우스 움직임
+        detail: snippet 실행 시 마우스가 잠시 움직이므로 다른 작업과 겹치지 않게 한다.
 sections:
-  - id: command-shape
-    title: 마우스 명령 dict 모양
+  - id: move-and-restore
+    title: 이동과 원위치 복귀
     structuredPrimary: true
-    subtitle: type, point, button 키
-    goal: moveTo 명령을 type과 point 두 키로 가진 dict로 표현한다.
-    why: 명령 dict 표기를 통일하면 시퀀스 생성과 실행 단계를 분리해 운영 안전성이 높아진다.
-    explanation: 명령 dict는 항상 type 키를 첫 줄에 두고 추가 키로 인자를 표현한다. moveTo는 point 키를, click은 button 키를 추가로 갖는다. 자동화 코드가 같은 키 이름을 신뢰할 수 있도록 사전에 표기를 합의한다.
+    subtitle: position 보관 패턴
+    goal: 시작 좌표를 보관한 뒤 moveTo로 이동하고 다시 보관 좌표로 돌아가는 안전 패턴을 익힌다.
+    why: 자동화가 마우스를 옮긴 뒤 사용자 작업을 방해하지 않으려면 시작 좌표로 복귀하는 패턴이 표준이다.
+    explanation: pyautogui.moveTo(x, y, duration)는 마우스를 절대 좌표로 옮긴다. duration은 이동 시간이며 0이면 즉시 이동한다. position()을 호출하면 이동 결과를 확인할 수 있다.
     tips:
-      - 명령 키 이름은 짧고 명확하게 둔다.
-      - 자동화 시퀀스는 사람이 검토할 수 있는 형식으로 두는 편이 안전하다.
+      - duration을 짧게 두면 자동화가 빠르고, 길게 두면 사용자가 흐름을 눈으로 따라가기 좋다.
+      - 시작 좌표를 변수에 보관하는 습관이 사고 복구를 쉽게 만든다.
     snippet: |-
-      command = {"type": "moveTo", "point": {"x": 120, "y": 80}}
+      import pyautogui
 
-      assert command["type"] == "moveTo"
-      assert command["point"] == {"x": 120, "y": 80}
-      command
+      origin = pyautogui.position()
+      pyautogui.moveTo(origin.x, origin.y, duration=0.0)
+      moved = pyautogui.position()
+      pyautogui.moveTo(origin.x, origin.y, duration=0.0)
+
+      assert moved.x == origin.x
+      assert moved.y == origin.y
+      (origin.x, origin.y)
     exercise:
-      prompt: type=moveTo, point x=300, y=240 인 명령 dict를 만들고 두 키 값을 검증하세요.
+      prompt: 시작 좌표를 보관한 뒤 같은 좌표로 moveTo해 position이 원래대로 유지되는지 검증하세요.
       starterCode: |-
-        command = {"type": "moveTo", "point": {"x": ___, "y": 240}}
+        import pyautogui
 
-        assert command["type"] == "moveTo"
-        assert command["point"] == {"x": 300, "y": 240}
-        command
+        origin = pyautogui.position()
+        pyautogui.___(origin.x, origin.y, duration=0.0)
+        moved = pyautogui.position()
+
+        assert moved.x == origin.x
+        assert moved.y == origin.y
+        (moved.x, moved.y)
       solution: |-
-        command = {"type": "moveTo", "point": {"x": 300, "y": 240}}
+        import pyautogui
 
-        assert command["type"] == "moveTo"
-        assert command["point"] == {"x": 300, "y": 240}
-        command
+        origin = pyautogui.position()
+        pyautogui.moveTo(origin.x, origin.y, duration=0.0)
+        moved = pyautogui.position()
+
+        assert moved.x == origin.x
+        assert moved.y == origin.y
+        (moved.x, moved.y)
       hints:
-        - x 좌표는 정수 300이다.
-        - command dict는 두 키 type와 point를 가진다.
+        - 절대 좌표 이동 함수 이름은 moveTo다.
+        - duration=0이면 마우스가 즉시 이동한다.
       check:
-        noError: dict 구성과 키 접근이 끝나야 한다.
-        resultCheck: command의 type과 point가 본문 기대값과 같아야 한다.
+        noError: moveTo와 position 호출이 끝나야 한다.
+        resultCheck: moved의 좌표가 origin과 같아야 한다.
     check:
-      noError: 명령 dict 구성과 키 접근이 끝나야 한다.
-      resultCheck: command의 type이 moveTo이고 point가 (120, 80)이어야 한다.
-  - id: click-button
-    title: 클릭 명령과 버튼 구분
+      noError: moveTo와 position 두 호출이 끝나야 한다.
+      resultCheck: moved와 origin 좌표가 같아야 한다.
+  - id: move-rel
+    title: 상대 이동
     structuredPrimary: true
-    subtitle: button 키 사용
-    goal: click 명령에 button 키를 더해 좌클릭과 우클릭을 구분한다.
-    why: 자동화 시나리오는 보통 좌우 버튼을 명확히 분리해야 컨텍스트 메뉴 동작과 일반 선택이 구분된다.
-    explanation: click 명령은 type 키 외에 point와 button 키를 가진다. button 값은 "left", "right", "middle" 중 하나다. 자동화 코드는 button 키가 없으면 좌클릭으로 가정한다.
+    subtitle: pyautogui.moveRel()
+    goal: pyautogui.moveRel로 현재 좌표 기준 상대 이동을 수행하고 결과 좌표를 검증한다.
+    why: 상대 이동은 화면 해상도에 의존하지 않는 자동화 패턴이라 다른 모니터에서도 안전하게 동작한다.
+    explanation: pyautogui.moveRel(dx, dy, duration)은 현재 좌표에 (dx, dy)를 더한 위치로 이동한다. moveRel(0, 0)은 마우스를 움직이지 않으면서 호출 흐름을 검증할 수 있는 안전한 no-op이다. 이동 후 좌표는 position()으로 다시 확인할 수 있다.
     tips:
-      - 좌클릭은 button 키 생략 또는 "left"가 표준이다.
-      - 우클릭은 컨텍스트 메뉴 호출 같은 상황에서 사용된다.
+      - moveRel(0, 0)은 자동화 코드의 흐름 검증용으로 유용하다.
+      - 상대 이동은 해상도가 바뀌어도 깨지지 않는다.
     snippet: |-
-      command = {"type": "click", "point": {"x": 50, "y": 60}, "button": "right"}
+      import pyautogui
 
-      assert command["button"] == "right"
-      command
+      before = pyautogui.position()
+      pyautogui.moveRel(0, 0, duration=0.0)
+      after = pyautogui.position()
+
+      assert after.x == before.x
+      assert after.y == before.y
+      (before.x, after.x)
     exercise:
-      prompt: 좌클릭 명령을 만들되 button 키 값을 "left"로 명시하고 두 좌표 (100, 200)이 정확한지 검증하세요.
+      prompt: moveRel(0, 0)을 호출한 뒤 좌표가 그대로 유지되는지 검증하세요.
       starterCode: |-
-        command = {"type": "click", "point": {"x": 100, "y": 200}, "button": "___"}
+        import pyautogui
 
-        assert command["button"] == "left"
-        assert command["point"] == {"x": 100, "y": 200}
-        command
+        before = pyautogui.position()
+        pyautogui.___(0, 0, duration=0.0)
+        after = pyautogui.position()
+
+        assert after.x == before.x
+        assert after.y == before.y
+        (before.x, after.x)
       solution: |-
-        command = {"type": "click", "point": {"x": 100, "y": 200}, "button": "left"}
+        import pyautogui
 
-        assert command["button"] == "left"
-        assert command["point"] == {"x": 100, "y": 200}
-        command
+        before = pyautogui.position()
+        pyautogui.moveRel(0, 0, duration=0.0)
+        after = pyautogui.position()
+
+        assert after.x == before.x
+        assert after.y == before.y
+        (before.x, after.x)
       hints:
-        - button 값은 짧은 영문 문자열 left, right, middle 중 하나다.
-        - 명시적으로 left를 적으면 자동화 의도가 더 분명해진다.
+        - 상대 이동 함수 이름은 moveRel이다.
+        - (0, 0) 인자는 마우스를 움직이지 않는다.
       check:
-        noError: click 명령 dict 구성이 정상적으로 끝나야 한다.
-        resultCheck: button이 "left"이고 point가 정확히 (100, 200)이어야 한다.
+        noError: moveRel 호출이 끝나야 한다.
+        resultCheck: after와 before의 x 값이 같아야 한다.
     check:
-      noError: click 명령 dict 구성이 끝나야 한다.
-      resultCheck: button이 "right"이고 point 좌표가 본문 기대값과 같아야 한다.
-  - id: sequence
-    title: 이동과 클릭 시퀀스
+      noError: moveRel 호출이 끝나야 한다.
+      resultCheck: 이동 전후 좌표가 같아야 한다.
+  - id: safe-click
+    title: 안전 클릭 래퍼
     structuredPrimary: true
-    subtitle: 리스트로 단계 표현
-    goal: 이동 후 클릭하는 시나리오를 dict 리스트로 표현한다.
-    why: 시퀀스로 표현된 시나리오는 운영자가 실행 전에 검토할 수 있어 GUI 자동화의 안전성을 크게 높인다.
-    explanation: 시퀀스는 dict 리스트다. 첫 항목이 이동, 두 번째가 클릭처럼 단계 순서를 명확히 한다. 같은 시퀀스를 함수에 넘기면 실행 흐름을 한 함수가 책임지므로 호출 측이 단순해진다.
+    subtitle: onScreen 검사 후 click
+    goal: onScreen 검사를 통과한 좌표만 pyautogui.click을 호출하는 래퍼 함수를 만든다.
+    why: 화면 밖 좌표 클릭은 무시되거나 FAILSAFE 모서리를 잘못 건드릴 수 있어 사전 검사가 안전한 자동화의 표준이다.
+    explanation: safeClick 함수는 (x, y, button)을 받아 onScreen 검사 후에만 pyautogui.click을 호출한다. 검사를 통과하지 않으면 False를 돌려주고 클릭을 건너뛴다. button 인자는 "left", "right", "middle" 중 하나다.
     tips:
-      - 시퀀스는 운영자 검토와 자동화 실행을 분리하는 표준 도구다.
-      - 한 시퀀스는 보통 한 화면 안의 단위 작업을 표현한다.
+      - 래퍼 함수는 호출자가 화면 밖 좌표를 만들어도 사고가 나지 않게 보호한다.
+      - 클릭 결과는 boolean으로 돌려줘 호출 측이 분기를 만들 수 있다.
     snippet: |-
-      sequence = [
-          {"type": "moveTo", "point": {"x": 100, "y": 100}},
-          {"type": "click", "point": {"x": 100, "y": 100}, "button": "left"},
-      ]
-      types = [step["type"] for step in sequence]
+      import pyautogui
 
-      assert types == ["moveTo", "click"]
-      types
+
+      def safeClick(x: int, y: int, button: str = "left") -> bool:
+          if not pyautogui.onScreen(x, y):
+              return False
+          pyautogui.click(x=x, y=y, button=button, _pause=False)
+          return True
+
+
+      blocked = safeClick(-100, -100)
+
+      assert blocked is False
+      assert callable(safeClick)
+      blocked
     exercise:
-      prompt: 이동 두 번과 마지막 클릭으로 구성된 시퀀스를 만들고 types 리스트가 ["moveTo", "moveTo", "click"]인지 검증하세요.
+      prompt: safeClick에 화면 밖 좌표 (-200, -200)을 넘기면 False가 돌아오고 click이 호출되지 않는지 검증하세요.
       starterCode: |-
-        sequence = [
-            {"type": "moveTo", "point": {"x": 50, "y": 50}},
-            {"type": "moveTo", "point": {"x": 100, "y": 100}},
-            {"type": "___", "point": {"x": 100, "y": 100}, "button": "left"},
-        ]
-        types = [step["type"] for step in sequence]
+        import pyautogui
 
-        assert types == ["moveTo", "moveTo", "click"]
-        types
+
+        def safeClick(x: int, y: int, button: str = "left") -> bool:
+            if not pyautogui.___(x, y):
+                return False
+            pyautogui.click(x=x, y=y, button=button, _pause=False)
+            return True
+
+
+        blocked = safeClick(-200, -200)
+
+        assert blocked is False
+        blocked
       solution: |-
-        sequence = [
-            {"type": "moveTo", "point": {"x": 50, "y": 50}},
-            {"type": "moveTo", "point": {"x": 100, "y": 100}},
-            {"type": "click", "point": {"x": 100, "y": 100}, "button": "left"},
-        ]
-        types = [step["type"] for step in sequence]
+        import pyautogui
 
-        assert types == ["moveTo", "moveTo", "click"]
-        types
+
+        def safeClick(x: int, y: int, button: str = "left") -> bool:
+            if not pyautogui.onScreen(x, y):
+                return False
+            pyautogui.click(x=x, y=y, button=button, _pause=False)
+            return True
+
+
+        blocked = safeClick(-200, -200)
+
+        assert blocked is False
+        blocked
       hints:
-        - 마지막 단계 type 값은 click이다.
-        - 시퀀스 리스트 컴프리헨션이 type 값을 모은다.
+        - 화면 안 여부를 검사하는 함수 이름은 onScreen이다.
+        - 화면 밖 좌표는 False를 돌려주고 클릭을 생략한다.
       check:
-        noError: 시퀀스 구성이 끝나야 한다.
-        resultCheck: types 리스트가 본문 기대값과 같아야 한다.
+        noError: safeClick 호출이 끝나야 한다.
+        resultCheck: blocked가 False여야 한다.
     check:
-      noError: 시퀀스 구성이 끝나야 한다.
-      resultCheck: types 리스트가 ["moveTo", "click"]이어야 한다.
-  - id: scenario-summary
-    title: 종합 시나리오 정리
+      noError: safeClick 함수 호출이 끝나야 한다.
+      resultCheck: blocked가 False여야 한다.
+  - id: trip-report
+    title: 종합 이동 보고
     structuredPrimary: true
-    subtitle: 드래그 포함 검토 dict
-    goal: 이동, 더블 클릭, 드래그를 묶은 시나리오 dict를 운영자 검토용으로 정리한다.
-    why: 종합 자동화 시나리오는 사람이 실행 전에 한눈에 검토할 수 있어야 사고를 막을 수 있어 표준 dict 형태가 필요하다.
-    explanation: scenario dict는 name과 steps 두 키를 가진다. steps는 type, point, button, duration 같은 키를 가진 dict 리스트다. 드래그는 type=dragTo와 toPoint 키로 표현한다. 같은 dict는 자동화 실행기에 그대로 입력된다.
+    subtitle: 이동과 복귀 한 함수로
+    goal: 시작 좌표 저장, 이동, 복귀를 한 함수로 묶어 이동 거리와 복귀 성공 여부를 dict로 돌려준다.
+    why: 종합 보고 함수는 자동화 사이클이 사용자 상태를 어지럽히지 않았다는 사실을 운영자가 검증하게 만든다.
+    explanation: mouseTrip 함수는 (dx, dy)만큼 상대 이동한 뒤 원위치로 복귀하고 origin, destination, restored 세 좌표와 returnedHome boolean을 dict로 돌려준다. duration 인자로 이동 속도를 조절한다. 결과 dict는 자동화 로그에 그대로 기록된다.
     tips:
-      - 시나리오 이름은 사람이 읽기 쉬운 짧은 문장으로 둔다.
-      - 시간 인자는 duration 키 부동소수로 표현한다.
+      - 이동 거리가 0이면 mouseTrip은 마우스를 건드리지 않으면서도 함수 구조를 검증한다.
+      - returnedHome 값이 True여야 자동화가 사용자 상태를 보존했다고 본다.
     snippet: |-
-      scenario = {
-          "name": "주문 더블 클릭과 드래그",
-          "steps": [
-              {"type": "moveTo", "point": {"x": 100, "y": 200}, "duration": 0.3},
-              {"type": "doubleClick", "point": {"x": 100, "y": 200}, "button": "left"},
-              {"type": "dragTo", "point": {"x": 100, "y": 200}, "toPoint": {"x": 300, "y": 400}, "duration": 0.5},
-          ],
-      }
-      summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+      import pyautogui
 
-      assert summary == {"name": "주문 더블 클릭과 드래그", "stepCount": 3}
-      summary
+
+      def mouseTrip(dx: int, dy: int, duration: float = 0.0) -> dict:
+          origin = pyautogui.position()
+          pyautogui.moveRel(dx, dy, duration=duration)
+          destination = pyautogui.position()
+          pyautogui.moveTo(origin.x, origin.y, duration=duration)
+          restored = pyautogui.position()
+          return {
+              "origin": {"x": origin.x, "y": origin.y},
+              "destination": {"x": destination.x, "y": destination.y},
+              "restored": {"x": restored.x, "y": restored.y},
+              "returnedHome": restored.x == origin.x and restored.y == origin.y,
+          }
+
+
+      report = mouseTrip(0, 0)
+
+      assert report["returnedHome"] is True
+      assert report["origin"] == report["restored"]
+      report
     exercise:
-      prompt: 같은 형식으로 "검토 사이클" 이름과 두 단계를 가진 scenario dict를 만들고 stepCount가 2인지 종합 검증하세요.
+      prompt: mouseTrip(0, 0)을 호출해 returnedHome이 True이고 origin과 restored 좌표가 동일한지 종합 검증하세요.
       starterCode: |-
-        scenario = {
-            "name": "___",
-            "steps": [
-                {"type": "moveTo", "point": {"x": 10, "y": 20}, "duration": 0.2},
-                {"type": "click", "point": {"x": 10, "y": 20}, "button": "left"},
-            ],
-        }
-        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+        import pyautogui
 
-        assert summary == {"name": "검토 사이클", "stepCount": 2}
-        summary
+
+        def mouseTrip(dx: int, dy: int, duration: float = 0.0) -> dict:
+            origin = pyautogui.position()
+            pyautogui.moveRel(dx, dy, duration=duration)
+            destination = pyautogui.position()
+            pyautogui.moveTo(origin.x, origin.y, duration=duration)
+            restored = pyautogui.position()
+            return {
+                "origin": {"x": origin.x, "y": origin.y},
+                "destination": {"x": destination.x, "y": destination.y},
+                "restored": {"x": restored.x, "y": restored.y},
+                "returnedHome": restored.x == origin.x and restored.y == ___.y,
+            }
+
+
+        report = mouseTrip(0, 0)
+
+        assert report["returnedHome"] is True
+        assert report["origin"] == report["restored"]
+        report
       solution: |-
-        scenario = {
-            "name": "검토 사이클",
-            "steps": [
-                {"type": "moveTo", "point": {"x": 10, "y": 20}, "duration": 0.2},
-                {"type": "click", "point": {"x": 10, "y": 20}, "button": "left"},
-            ],
-        }
-        summary = {"name": scenario["name"], "stepCount": len(scenario["steps"])}
+        import pyautogui
 
-        assert summary == {"name": "검토 사이클", "stepCount": 2}
-        summary
+
+        def mouseTrip(dx: int, dy: int, duration: float = 0.0) -> dict:
+            origin = pyautogui.position()
+            pyautogui.moveRel(dx, dy, duration=duration)
+            destination = pyautogui.position()
+            pyautogui.moveTo(origin.x, origin.y, duration=duration)
+            restored = pyautogui.position()
+            return {
+                "origin": {"x": origin.x, "y": origin.y},
+                "destination": {"x": destination.x, "y": destination.y},
+                "restored": {"x": restored.x, "y": restored.y},
+                "returnedHome": restored.x == origin.x and restored.y == origin.y,
+            }
+
+
+        report = mouseTrip(0, 0)
+
+        assert report["returnedHome"] is True
+        assert report["origin"] == report["restored"]
+        report
       hints:
-        - 시나리오 이름 문자열은 검토 사이클이다.
-        - steps 리스트 길이가 2이면 stepCount도 2다.
+        - 복귀 좌표는 origin 변수에 보관돼 있다.
+        - returnedHome 비교 대상은 origin.y다.
       check:
-        noError: scenario dict 구성과 summary 추출이 끝나야 한다.
-        resultCheck: summary가 종합 검토 결과로 이름과 단계 수를 정확히 담아야 한다.
+        noError: mouseTrip 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: report의 returnedHome이 True이고 origin과 restored가 같아야 한다.
     check:
-      noError: 종합 시나리오 dict 구성과 summary 추출이 끝나야 한다.
-      resultCheck: summary가 본문 시나리오 이름과 단계 수를 정확히 담아야 한다.
+      noError: mouseTrip 함수 호출이 끝나야 한다.
+      resultCheck: report의 returnedHome이 True여야 한다.
