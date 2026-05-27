@@ -25,29 +25,29 @@ meta:
     - Canny
     - 컨투어
 intro:
-  direction: OpenCV소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  direction: OpenCV는 이미지를 NumPy 배열로 다루는 컴퓨터 비전 라이브러리입니다. 이 트랙은 배열 shape/dtype/채널을 매 단계마다 확인하면서 검출 결과까지 검증하는 흐름을 배웁니다.
   benefits:
-  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
-  - 이미지 배열과 픽셀 값 확인 후 색공간/필터/검출 처리에 맞는 코드 입력을 고릅니다.
-  - OpenCV소개 결과를 shape, dtype, 채널, 검출 개수 기준으로 즉시 점검합니다.
-  - 완료한 코드를 비전 처리 파이프라인에 다시 사용할 수 있습니다.
+  - 이미지가 (높이, 너비, 채널) ndarray로 표현된다는 사실을 코드로 확인합니다.
+  - BGR/Gray/HSV 색공간 차이와 변환 시 채널 수가 어떻게 달라지는지 파악합니다.
+  - Canny 에지, findContours 컨투어, morphologyEx 모폴로지 같은 핵심 함수의 입력/출력 계약을 이해합니다.
+  - 검출 결과를 픽셀 수, 컨투어 개수처럼 수치로 검증하는 습관을 들입니다.
   diagram:
     steps:
-    - label: 로컬 비전 검증 루프 입력 확인
-      detail: 입력 기준(이미지 배열과 픽셀 값)과 필요한 조건을 먼저 고정합니다.
-    - label: 색공간/필터/검출 처리 처리 실행
-      detail: 색공간/필터/검출 처리 코드를 실행해 중간 결과를 확인합니다.
-    - label: shape, dtype, 채널 결과 검증
-      detail: shape, dtype, 채널, 검출 개수 기준으로 실행 결과를 비교합니다.
-    - label: OpenCV소개 재사용
-      detail: 완성 코드를 비전 처리 파이프라인에 붙일 수 있게 정리합니다.
+    - label: 합성 이미지로 입력 만들기
+      detail: np.zeros + cv2.rectangle 등으로 정답을 알고 있는 입력을 만듭니다.
+    - label: cv2 함수 실행
+      detail: cvtColor / Canny / findContours 같은 핵심 함수를 적용합니다.
+    - label: 수치로 결과 검증
+      detail: shape, dtype, 채널 수, 검출된 컨투어 개수로 결과를 비교합니다.
+    - label: 파이프라인 재사용
+      detail: 검증된 처리 단계를 다음 강의에서 그대로 호출합니다.
     runtime:
     - label: 컴퓨터 비전 환경
-      detail: opencvpython, numpy 기준으로 로컬 Python 실행을 준비합니다.
-    - label: OpenCV소개 실행
-      detail: 셀을 실행해 shape, dtype, 채널, 검출 개수와 예외 상태를 확인합니다.
-    - label: OpenCV소개 완료
-      detail: 검증된 코드를 비전 처리 파이프라인로 남깁니다.
+      detail: opencv-python, numpy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: OpenCV 셀 실행
+      detail: 셀을 실행해 shape, dtype, 채널 수와 예외 상태를 확인합니다.
+    - label: 다음 강의로 연결
+      detail: 검증된 결과를 다음 비전 처리 단계의 입력으로 넘깁니다.
 sections:
 - id: intro
   blocks:
@@ -68,8 +68,8 @@ sections:
       title: 색공간 변환
     - emoji: ⚙️
       title: 형태학적 연산
-  goal: OpenCV에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 트랙 전체에서 다룰 네 가지 축(에지/컨투어/색공간/모폴로지)을 한눈에 정리한다.
+  why: OpenCV는 함수 수가 많아 처음에는 어디서 무엇을 쓰는지 헷갈리기 쉽습니다. 네 영역으로 묶어두면 새 함수를 만났을 때 어디에 속하는지 빠르게 분류할 수 있습니다.
 - id: opencv_history
   blocks:
   - type: sectionHeader
@@ -90,8 +90,8 @@ sections:
     - emoji: 🌐
       title: 크로스 플랫폼
       description: Windows, Linux, macOS, Android, iOS 등 다양한 플랫폼을 지원합니다
-  goal: 🏛️ OpenCV란?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: cv2 모듈이 어떤 배경에서 만들어졌고 왜 C++ 백엔드에 Python 바인딩이 얹힌 구조인지 이해한다.
+  why: 동일 연산을 NumPy로 직접 짜는 것보다 cv2 함수가 수십 배 빠른 이유를 알아야 어떤 작업을 직접 짜고 어떤 작업을 cv2에 위임할지 판단할 수 있습니다.
 - id: why_opencv
   blocks:
   - type: sectionHeader
@@ -104,8 +104,8 @@ sections:
     title: 컴퓨터 비전이란?
     content: 컴퓨터가 디지털 이미지나 비디오를 '보고' 이해하도록 하는 기술입니다. 단순히 픽셀 값을 조작하는 것을 넘어, 이미지에서 의미 있는 정보를 추출합니다. 예를 들어
       사진에서 얼굴 위치를 찾거나, 자동차 번호판 문자를 인식하거나, 불량품을 검출하는 것이 컴퓨터 비전입니다.
-  goal: 🚀 왜 OpenCV인가?에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 편집(Pillow) vs 분석(OpenCV)의 경계를 구분한다.
+  why: 같은 작업도 어떤 라이브러리로 푸는 게 자연스러운지 미리 알면 도구 선택에 시간을 낭비하지 않습니다. 워터마크는 Pillow가, 객체 검출은 OpenCV가 한 줄 차이로 갈립니다.
 - id: bgr_order
   blocks:
   - type: sectionHeader
@@ -135,8 +135,8 @@ sections:
   - type: note
     title: 왜 BGR인가?
     content: OpenCV가 처음 개발될 당시(2000년경) 널리 사용되던 카메라와 비디오 장치들이 BGR 순서를 사용했기 때문입니다. 호환성을 위해 이 순서가 유지되고 있습니다.
-  goal: 🔴🟢🔵 BGR 색순서에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: cv2의 채널 순서가 다른 라이브러리와 반대라는 사실과 변환 지점을 미리 익혀둔다.
+  why: BGR/RGB 혼동은 OpenCV 초보가 가장 흔히 겪는 버그입니다. 빨간 사과가 파랗게 표시되면 거의 색순서 문제이며, cvtColor(image, cv2.COLOR_BGR2RGB) 한 줄로 해결됩니다.
 - id: ndarray
   blocks:
   - type: sectionHeader
@@ -163,8 +163,8 @@ sections:
     - - ndim
       - 차원 수
       - 3 (컬러), 2 (흑백)
-  goal: 📦 이미지 = NumPy 배열에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: cv2 이미지가 곧 ndarray라는 사실과 (height, width) 순서가 Pillow의 (width, height)와 반대인 점을 분명히 한다.
+  why: shape이 (h, w)이고 size가 (w, h)인 차이는 자르기 좌표, 리사이즈 인자, 회전 행렬에서 매번 등장합니다. 처음에 한 번 외워두면 이후 모든 강의에서 인덱싱 오류가 줄어듭니다.
 - id: features
   blocks:
   - type: sectionHeader
@@ -202,8 +202,8 @@ sections:
     - - 히스토그램
       - 밝기 분포 분석
       - calcHist(), equalizeHist()
-  goal: 🛠️ OpenCV 주요 기능에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 트랙의 10개 강의에서 다룰 주요 함수 카테고리를 한 표로 본다.
+  why: 함수가 어느 카테고리에 속하는지 알면 모르는 함수를 만났을 때 비슷한 카테고리의 다른 함수에서 사용법을 유추할 수 있습니다.
 - id: edge_detection
   blocks:
   - type: sectionHeader
@@ -227,8 +227,8 @@ sections:
     - - Laplacian
       - 2차 미분, 모든 방향
       - 세밀한 에지 검출
-  goal: 📐 에지 검출에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 에지 검출 3대장(Canny/Sobel/Laplacian)이 어떻게 다른지 미리 파악한다.
+  why: 같은 입력 이미지에서 알고리즘마다 결과가 완전히 다릅니다. 어떤 알고리즘을 언제 쓰는지 알면 시행착오 횟수가 줄어듭니다 — Canny는 윤곽선, Sobel은 방향, Laplacian은 노이즈에 민감.
 - id: contour
   blocks:
   - type: sectionHeader
@@ -254,8 +254,8 @@ sections:
       - 컨투어를 감싸는 사각형
     - - minEnclosingCircle()
       - 컨투어를 감싸는 최소 원
-  goal: 🔲 컨투어에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 컨투어가 단순한 점 리스트가 아니라 면적/둘레/형태 분석으로 이어진다는 사실을 본다.
+  why: findContours로 끝나는 게 아니라 그 뒤의 contourArea, boundingRect까지가 한 세트입니다. 객체 개수 세기, 크기 필터링은 모두 이 조합으로 해결됩니다.
 - id: morphology
   blocks:
   - type: sectionHeader
@@ -282,8 +282,8 @@ sections:
     - - 닫기 (Closing)
       - 팽창 후 침식
       - 작은 구멍 채우기
-  goal: ⚙️ 모폴로지 연산에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 침식/팽창의 조합으로 열기/닫기가 만들어진다는 구조를 파악한다.
+  why: 모폴로지는 이진화 결과의 노이즈를 정리하는 마무리 단계입니다. 점 노이즈는 열기로, 구멍은 닫기로 — 이 두 패턴만 알아도 컨투어 검출 품질이 크게 개선됩니다.
 - id: comparison
   blocks:
   - type: sectionHeader
@@ -319,8 +319,8 @@ sections:
     - - 학습 난이도
       - 중간
       - 쉬움
-  goal: ⚖️ OpenCV vs Pillow에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 두 라이브러리의 강점이 정확히 반대 영역이라는 점을 표로 확인한다.
+  why: 둘 다 쓸 일이 많고 함께 쓰는 일도 많습니다. cv2로 검출하고 Pillow로 텍스트 박는 식의 조합이 흔합니다 — 어느 단계에서 어느 도구를 쓸지 미리 결정해두면 코드가 단순해집니다.
 - id: usecases
   blocks:
   - type: sectionHeader
@@ -345,8 +345,8 @@ sections:
       - 작물 상태 분석, 수확 시기 판단
     - - 문서 처리
       - OCR 전처리, 문서 스캔 보정
-  goal: 💡 활용 분야에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 학습한 함수들이 어떤 실제 시스템에서 어떻게 결합되는지 머릿속에 그린다.
+  why: 트랙을 마친 뒤 자기 프로젝트를 떠올릴 때 출발점이 됩니다. 불량품 검출이라면 이진화 → 모폴로지 → 컨투어 → 면적 필터링 같은 식으로 함수 조합이 떠오릅니다.
 - id: local_runtime_note
   blocks:
   - type: sectionHeader
@@ -356,8 +356,8 @@ sections:
     title: matplotlib으로 출력
     content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 결과 확인은 배열 shape, 픽셀 통계, 저장 파일, matplotlib 출력처럼 재현 가능한
       방식으로 진행합니다. 컬러 이미지를 matplotlib으로 볼 때는 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다.
-  goal: 📋 시각화 안내에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 결과 확인은 imshow GUI가 아니라 수치 + matplotlib + 저장 파일로 한다는 학습 방식을 짚는다.
+  why: cv2.imshow는 로컬 데스크톱 환경에서 동작하지만 노트북에서는 일관되지 않습니다. shape/통계/저장으로 검증하는 습관이 자동화·테스트로 그대로 이어집니다.
 - id: curriculum
   blocks:
   - type: sectionHeader
@@ -401,8 +401,8 @@ sections:
     - - 10. 종합 비전 프로젝트
       - 복합
       - 전체 개념 종합
-  goal: 📚 커리큘럼에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 10개 강의가 입력 구조 → 변환 → 필터 → 검출 → 종합 순서로 쌓이는 흐름을 확인한다.
+  why: 강의 순서는 무작위가 아니라 의존성 그래프입니다. 02 색공간이 05 에지의 입력, 06 이진화가 07 모폴로지의 입력, 모든 과정이 10 종합 프로젝트로 모입니다.
 - id: start
   blocks:
   - type: sectionHeader
@@ -411,20 +411,24 @@ sections:
   - type: text
     content: OpenCV를 배우면 이미지를 단순히 보는 것을 넘어 분석하고 이해할 수 있습니다. 에지 검출로 물체의 경계를 찾고, 컨투어로 윤곽을 추출하고, 색상 필터링으로
       특정 영역을 분리하는 등 컴퓨터 비전의 핵심 기술을 익힐 수 있습니다. 첫 번째 프로젝트에서 이미지가 NumPy 배열로 어떻게 표현되는지 알아봅시다.
-  goal: 🎯 시작하기에서 이미지 입력과 처리 인자가 결과 배열에 어떻게 반영되는지 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 다음 강의(01 이미지 구조 탐색기)로 자연스럽게 넘어갈 마음의 준비를 한다.
+  why: 첫 번째 강의는 shape/dtype/픽셀 인덱싱부터 시작합니다. OpenCV의 모든 기능은 결국 ndarray 위에서 일어난다는 사실을 잡고 들어가야 이후 강의가 빨라집니다.
 - id: workflow_validation
   title: 로컬 비전 검증 루프
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
-  goal: 로컬 비전 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 이미지 처리는 크기, 채널, 저장 결과를 바로 확인해야 잘못된 변환을 빨리 찾을 수 있습니다.
+  goal: 합성 이미지를 만들고 cv2 함수를 통과시킨 뒤 결과 shape/dtype/검출 개수를 assert로 확정한다.
+  why: OpenCV 학습의 핵심은 함수 결과를 눈으로만 확인하지 않고 수치로 검증하는 습관입니다. 입력 조건을 알고 있는 합성 이미지를 쓰면 회귀 테스트처럼 결과를 고정할 수 있습니다.
   explanation: |-
-    OpenCV는 화면에 이미지를 띄우는 도구가 아니라, 배열을 입력받아 검증 가능한 결과를 만드는 로컬 비전 파이프라인입니다. 먼저 입력 이미지의 형태와 dtype을 확인하고, 의도적으로 잘못된 입력을 넣어 오류를 확인한 뒤, 에지 검출 결과를 수치로 검증합니다.
+    OpenCV는 화면에 이미지를 띄우는 도구가 아니라 배열을 입력받아 검증 가능한 결과를 만드는 로컬 비전 파이프라인입니다. 이 트랙의 모든 강의는 합성 입력을 만들고, cv2 함수를 통과시킨 다음, shape/dtype/픽셀 합/검출 개수 같은 수치로 결과를 확정합니다.
 
-    OpenCV 학습의 핵심은 이미지를 눈으로만 확인하지 않고 배열 계약과 결과 지표로 검증하는 습관입니다.
+    예제에서는 96x144 검정 캔버스에 흰 사각형을 그리고, validateBgrImage 가드로 입력 계약(uint8 + 3채널)을 확인합니다. 그다음 BGR을 그레이로 변환해 채널 수가 3에서 사라지는지, Canny로 에지를 뽑아 흰색 픽셀이 0보다 많은지를 assert로 확인합니다.
+
+    이 패턴은 다음 강의들에서 그대로 반복됩니다 — 입력 만들기 → cv2 함수 → assert로 결과 확정.
   tips:
-  - OpenCV 학습의 핵심은 이미지를 눈으로만 확인하지 않고 배열 계약과 결과 지표로 검증하는 습관입니다.
+  - 합성 이미지(np.zeros + cv2.rectangle 등)는 정답을 알고 있어 회귀 테스트로 쓰기 좋습니다.
+  - shape이 (h, w, c)인지 (h, w)인지 매번 확인하면 채널 수 실수를 미리 잡을 수 있습니다.
+  - cv2 함수는 dtype에 민감합니다. Canny 같은 함수는 uint8을 요구하므로 dtype을 먼저 확인하세요.
   snippet: |-
     import cv2
     import numpy as np
@@ -441,8 +445,23 @@ sections:
         return True
 
     validateBgrImage(introImage)
+
+    gray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 80, 160)
+
+    assert gray.shape == (96, 144), f"gray shape: {gray.shape}"
+    assert gray.ndim == 2, f"gray ndim: {gray.ndim}"
+    assert edges.dtype == np.uint8, f"edges dtype: {edges.dtype}"
+    assert int((edges > 0).sum()) > 0, "에지 픽셀이 검출되지 않았습니다"
+
+    report = {
+        "inputShape": tuple(introImage.shape),
+        "grayShape": tuple(gray.shape),
+        "edgePixelCount": int((edges > 0).sum()),
+    }
+    report
   exercise:
-    prompt: 로컬 비전 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: 사각형 좌표나 Canny 임계값을 바꾸고 edgePixelCount가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
@@ -459,9 +478,23 @@ sections:
           return True
 
       validateBgrImage(introImage)
+
+      gray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)
+      edges = cv2.Canny(gray, ___, ___)
+
+      assert gray.shape == (96, 144)
+      assert gray.ndim == 2
+      assert int((edges > 0).sum()) > 0
+
+      report = {
+          "edgePixelCount": int((edges > 0).sum()),
+          "low": ___,
+          "high": ___,
+      }
+      report
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - Canny는 low/high 두 임계값을 받습니다. 보통 high가 low의 2~3배입니다.
+    - 임계값을 낮추면 약한 에지도 잡혀 edgePixelCount가 늘어납니다.
   check:
-    noError: 로컬 비전 검증 루프의 이미지 입력, 배열 shape, 처리 인자가 변환 단계까지 도달해야 합니다.
-    resultCheck: 로컬 비전 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    noError: 합성 이미지가 uint8 BGR 3채널이고 Canny가 정상적으로 에지를 반환해야 합니다.
+    resultCheck: edgePixelCount가 0보다 크고, 임계값을 바꾸면 그 값이 달라져야 합니다.
