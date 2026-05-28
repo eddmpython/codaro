@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   ChevronRight,
   Clock3,
   Compass,
@@ -108,6 +109,7 @@ export function ProductSidebar({
     { value: "editor", label: t("nav.editor"), Icon: FileCode2 },
     { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap },
     { value: "plan", label: t("nav.plan"), Icon: Compass },
+    { value: "analytics", label: t("nav.analytics"), Icon: BarChart3 },
     { value: "automation", label: t("nav.automation"), Icon: Workflow },
   ];
   navItems.push({ value: "share", label: t("nav.share"), Icon: PackageOpen });

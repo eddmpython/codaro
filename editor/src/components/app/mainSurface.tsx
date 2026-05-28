@@ -30,6 +30,7 @@ const CodeCellEditor = lazy(() => import("@/components/notebook/notebookPanel").
 const CurriculumView = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumView })));
 const CurriculumCellToc = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumCellToc })));
 const MasterPlanPanel = lazy(() => import("@/components/curriculum/masterPlanPanel").then((module) => ({ default: module.MasterPlanPanel })));
+const AnalyticsPanel = lazy(() => import("@/components/curriculum/analyticsPanel").then((module) => ({ default: module.AnalyticsPanel })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
 type MainSurfaceProps = {
@@ -168,6 +169,16 @@ function MainSurfaceContent(props: MainSurfaceProps) {
       <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
         <div className="w-full max-w-3xl">
           <MasterPlanPanel onSelectLesson={props.onSelectCurriculumLesson} />
+        </div>
+      </div>
+    );
+  }
+
+  if (props.surface === "analytics") {
+    return (
+      <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
+        <div className="w-full max-w-3xl">
+          <AnalyticsPanel />
         </div>
       </div>
     );

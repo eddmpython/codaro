@@ -361,6 +361,38 @@ export type ReviewStatePayload = {
   lastReviewedAt: string | null;
 };
 
+export type DailySnapshot = {
+  date: string;
+  masteredCount: number;
+  totalOutcomes: number;
+  lessonsCompletedToday: number;
+  sectionsCompletedToday: number;
+  creditsToday: number;
+  domainsTouched: string[];
+  hintLevelHistogram: Record<string, number>;
+};
+
+export type AnalyticsListPayload = {
+  snapshots: DailySnapshot[];
+  totalSnapshots: number;
+};
+
+export type AnalyticsSummaryPayload = {
+  available: boolean;
+  firstDate?: string;
+  latestDate?: string;
+  currentMastered?: number;
+  totalOutcomes?: number;
+  recent30?: {
+    lessons: number;
+    sections: number;
+    credits: number;
+    hintHistogram: Record<string, number>;
+    domainTouches: Record<string, number>;
+  };
+  totalSnapshots?: number;
+};
+
 // Predict-Run-Reconcile-Adapt 루프 — 학습자 상태 (LearnerStateStore HTTP surface)
 export type LearnerOutcomeMastery = {
   outcomeId: string;

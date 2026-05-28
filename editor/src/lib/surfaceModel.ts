@@ -1,6 +1,6 @@
 import { getActiveLocale } from "@/lib/localeCopy";
 
-export type SurfaceMode = "chat" | "editor" | "curriculum" | "plan" | "automation" | "share";
+export type SurfaceMode = "chat" | "editor" | "curriculum" | "plan" | "analytics" | "automation" | "share";
 export type ThemeMode = "dark" | "light";
 export type AutomationSection = "codaro" | "custom" | "tasks";
 
@@ -9,6 +9,7 @@ export function surfaceTitle(surface: SurfaceMode) {
   if (surface === "editor") return en ? "Editor" : "에디터";
   if (surface === "curriculum") return en ? "Curriculum" : "커리큘럼";
   if (surface === "plan") return en ? "Master Plan" : "마스터 플랜";
+  if (surface === "analytics") return en ? "Analytics" : "학습 분석";
   if (surface === "automation") return en ? "Automation" : "자동화";
   if (surface === "share") return en ? "Share Packs" : "공유 팩";
   return en ? "Chat" : "채팅";

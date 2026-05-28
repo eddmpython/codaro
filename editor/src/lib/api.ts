@@ -13,6 +13,8 @@ import type {
   CurriculumGapsPayload,
   CurriculumLessonPayload,
   CurriculumTaxonomyPayload,
+  AnalyticsListPayload,
+  AnalyticsSummaryPayload,
   MasteryReportPayload,
   ReviewListPayload,
   ReviewStatePayload,
@@ -283,6 +285,10 @@ export const codaroApi = {
       `/api/curriculum/reviews/${encodeURIComponent(category)}/${encodeURIComponent(contentId)}`,
       { success },
     ),
+  curriculumAnalytics: (days: number = 30) =>
+    requestJson<AnalyticsListPayload>(`/api/curriculum/analytics?days=${days}`),
+  curriculumAnalyticsSummary: () =>
+    requestJson<AnalyticsSummaryPayload>("/api/curriculum/analytics/summary"),
   progress: () => requestJson<ProgressSummary>("/api/curriculum/progress"),
   updateProgress: (category: string, contentId: string, missionId: string, totalMissions: number) =>
     postJson<Record<string, unknown>>("/api/curriculum/progress", {
