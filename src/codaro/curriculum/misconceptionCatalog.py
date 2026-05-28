@@ -209,3 +209,39 @@ def matchErrorPattern(catalog: MisconceptionCatalog, errorText: str) -> list[Mis
                 hits.append(entry)
                 break
     return hits
+
+
+def matchOutcomes(
+    outcomeIds: Iterable[str],
+    *,
+    code: str = "",
+    errorText: str = "",
+    catalogDir: Path | None = None,
+) -> list[tuple[str, MisconceptionEntry]]:
+    """outcomeId 목록에 대해 catalog를 로드해 code/error에서 misconception을 매칭한다.
+
+    반환: [(outcomeId, MisconceptionEntry), ...]. 같은 entry는 중복 없이 한 번만.
+    catalog 파일이 없는 outcome은 조용히 skip — 카탈로그 작성 진행 중인 outcome이 있을 수 있다.
+    """
+    base = catalogDir or DEFAULT_CATALOG_DIR
+    if not base.exists():
+        return []
+
+    hits: list[tuple[str, MisconceptionEntry]] = []
+    seen: set[str] = set()
+    for outcomeId in outcomeIds:
+        path = base / f"{outcomeId}.yml"
+        if not path.exists():
+            continue
+        catalog = loadCatalog(path)
+        candidates: list[MisconceptionEntry] = []
+        if code:
+            candidates.extend(matchCodePattern(catalog, code))
+        if errorText:
+            candidates.extend(matchErrorPattern(catalog, errorText))
+        for entry in candidates:
+            if entry.id in seen:
+                continue
+            seen.add(entry.id)
+            hits.append((outcomeId, entry))
+    return hits

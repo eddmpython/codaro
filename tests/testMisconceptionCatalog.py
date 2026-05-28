@@ -180,3 +180,51 @@ def testCodePatternMatchesBareExcept() -> None:
     hits = matchCodePattern(catalog, code)
     ids = {hit.id for hit in hits}
     assert "python.errorHandling.bareExcept" in ids
+
+
+def testMatchOutcomesMixesCodeAndError() -> None:
+    from codaro.curriculum.misconceptionCatalog import matchOutcomes
+
+    hits = matchOutcomes(
+        ["python.variables", "python.lists"],
+        code="5 = x",
+        errorText="",
+    )
+    ids = {entry.id for _, entry in hits}
+    assert "python.variables.assignmentReversal" in ids
+
+
+def testMatchOutcomesAcrossMultipleOutcomes() -> None:
+    from codaro.curriculum.misconceptionCatalog import matchOutcomes
+
+    hits = matchOutcomes(
+        ["python.variables", "python.dictsAndSets"],
+        code="",
+        errorText="KeyError: 'banana'",
+    )
+    ids = {(outcomeId, entry.id) for outcomeId, entry in hits}
+    assert ("python.dictsAndSets", "python.dictsAndSets.missingKeyError") in ids
+
+
+def testMatchOutcomesSkipsUnknownCatalog() -> None:
+    from codaro.curriculum.misconceptionCatalog import matchOutcomes
+
+    hits = matchOutcomes(
+        ["nonexistent.outcome", "python.variables"],
+        code="5 = x",
+    )
+    # 존재하지 않는 catalog는 조용히 skip, 존재하는 것만 매칭
+    assert any(entry.id.startswith("python.variables.") for _, entry in hits)
+
+
+def testMatchOutcomesDeduplicatesEntries() -> None:
+    from codaro.curriculum.misconceptionCatalog import matchOutcomes
+
+    hits = matchOutcomes(
+        ["python.variables"],
+        code="5 = x",
+        errorText="SyntaxError: cannot assign to literal",
+    )
+    # 같은 entry 가 code/error 양쪽으로 매칭되더라도 한 번만
+    ids = [entry.id for _, entry in hits]
+    assert len(ids) == len(set(ids))

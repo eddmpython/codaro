@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.contentCache import CurriculumContentCache
+from ..curriculum.misconceptionCatalog import matchOutcomes
 from ..curriculum.outcomeMastery import computeMastery
 from ..curriculum.planComposer import PlanGoal, composeMasterPlan
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
@@ -135,6 +136,65 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         except InvalidExerciseCheck as error:
             fail(400, "curriculum_invalid_check", str(error))
 
+        payload = result.payload()
+        creditedOutcomes: list[str] = []
+        autoValidatedOutcomes: list[str] = []
+        sectionOutcomes: list[str] = []
+        if request.category and request.contentId and request.sectionId:
+            state.progressTracker.recordSectionResult(
+                request.category,
+                request.contentId,
+                request.sectionId,
+                passed=result.passed,
+                hintLevel=result.hintLevel,
+            )
+            graph = state.curriculumOs.graph()
+            lesson = graph.byKey(f"{request.category}/{request.contentId}")
+            sectionOutcomes = list(
+                lesson.outcomesForSection(request.sectionId) if lesson else []
+            )
+            if result.passed and sectionOutcomes:
+                creditedOutcomes, autoValidatedOutcomes = state.progressTracker.creditCheckPass(
+                    request.category,
+                    request.contentId,
+                    request.sectionId,
+                    sectionOutcomes,
+                    hintLevel=result.hintLevel,
+                )
+        payload["creditedOutcomes"] = creditedOutcomes
+        payload["autoValidatedOutcomes"] = autoValidatedOutcomes
+
+        # Predict-Run-Reconcile-Adapt 루프 — 매 check 마다 learnerState 갱신.
+        # 진단을 AI tool call이 아니라 런타임에서 deterministic하게 박는다.
+        misconceptionPayload: list[dict[str, object]] = []
+        doneCriterionViolated = False
+        if sectionOutcomes:
+            store = state.learnerStateStore
+            errorText = payload.get("detail") or payload.get("studentOutput") or ""
+            for outcomeId in sectionOutcomes:
+                store.recordOutcomeAttempt(outcomeId, success=result.passed)
+            if not result.passed:
+                for outcomeId, entry in matchOutcomes(
+                    sectionOutcomes,
+                    code=request.studentCode or "",
+                    errorText=str(errorText),
+                ):
+                    hit, repeatStatus = store.recordMisconception(entry.id, outcomeId)
+                    if repeatStatus == "repeat":
+                        doneCriterionViolated = True
+                    misconceptionPayload.append({
+                        "misconceptionId": entry.id,
+                        "outcomeId": outcomeId,
+                        "label": entry.label,
+                        "summary": entry.summary,
+                        "diagnostic": entry.diagnostic.model_dump(),
+                        "correction": entry.correction.model_dump(),
+                        "repeatStatus": repeatStatus,
+                        "hitCount": hit.hitCount,
+                    })
+        payload["misconceptionMatches"] = misconceptionPayload
+        payload["doneCriterionViolated"] = doneCriterionViolated
+
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -143,9 +203,13 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 checkType=request.checkType,
                 passed=result.passed,
                 hintLevel=result.hintLevel,
+                creditedCount=len(creditedOutcomes),
+                autoValidatedCount=len(autoValidatedOutcomes),
+                misconceptionMatches=len(misconceptionPayload),
+                doneCriterionViolated=doneCriterionViolated,
             ),
         )
-        return result.payload()
+        return payload
 
     @router.get("/api/curriculum/taxonomy")
     def apiCurriculumTaxonomy() -> dict[str, object]:
