@@ -83,6 +83,7 @@ sections:
     - 바꿀 지점은 `csvScratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `csvScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: csv 모듈 불러오기에서 `csvScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: csv 모듈 불러오기 실행 뒤 `csvScratch` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: basic_reading
