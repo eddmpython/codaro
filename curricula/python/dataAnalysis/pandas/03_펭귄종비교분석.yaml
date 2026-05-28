@@ -468,6 +468,7 @@ sections:
     - female 결과는 sex == FEMALE인 1번째와 3번째 행입니다.
     - avgMass 4950은 (4700 + 5200) / 2 = 4950에서 나옵니다.
   check:
+    type: noError
     noError: query/groupby/idxmax 세 호출이 모두 정상 실행되어야 합니다.
     resultCheck: 세 assert 모두 통과해야 하며, 데이터 값을 바꾸면 그에 맞춰 assert도 갱신되어야 합니다.
 - id: practice
