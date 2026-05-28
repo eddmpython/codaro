@@ -41,6 +41,27 @@ class LessonIntroContract(BaseModel):
     diagram: dict[str, Any] = Field(default_factory=dict)
 
 
+class LearningPredictContract(BaseModel):
+    """Predict-Run-Reconcile-Adapt 루프 1단계 — 실행 전 학습자가 적는 예측.
+
+    각 필드는 선택. 비어 있으면 해당 차원은 비교에서 제외된다.
+    """
+    prompt: str = ""
+    expectedShape: str = ""
+    expectedDtype: str = ""
+    expectedValue: str = ""
+    expectedError: str = ""
+
+    def isEmpty(self) -> bool:
+        return not any([
+            self.prompt,
+            self.expectedShape,
+            self.expectedDtype,
+            self.expectedValue,
+            self.expectedError,
+        ])
+
+
 class LearningExerciseContract(BaseModel):
     prompt: str = ""
     starterCode: str = ""
@@ -48,6 +69,7 @@ class LearningExerciseContract(BaseModel):
     check: dict[str, str] = Field(default_factory=dict)
     hints: list[str] = Field(default_factory=list)
     difficulty: str = "easy"
+    predict: LearningPredictContract = Field(default_factory=LearningPredictContract)
 
 
 class LearningSectionContract(BaseModel):
@@ -168,6 +190,19 @@ def _exerciseContract(value: Any) -> LearningExerciseContract:
         check=check,
         hints=_uniqueTextList(value.get("hints") or value.get("tips")),
         difficulty=_textValue(value.get("difficulty")) or "easy",
+        predict=_predictContract(value.get("predict")),
+    )
+
+
+def _predictContract(value: Any) -> LearningPredictContract:
+    if not isinstance(value, dict):
+        return LearningPredictContract()
+    return LearningPredictContract(
+        prompt=_textValue(value.get("prompt") or value.get("question")),
+        expectedShape=_textValue(value.get("expectedShape") or value.get("shape")),
+        expectedDtype=_textValue(value.get("expectedDtype") or value.get("dtype") or value.get("type")),
+        expectedValue=_textValue(value.get("expectedValue") or value.get("value") or value.get("result")),
+        expectedError=_textValue(value.get("expectedError") or value.get("error") or value.get("errorClass")),
     )
 
 
