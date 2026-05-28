@@ -100,7 +100,7 @@ sections:
     - 매번 ok가 나오기도 하고 fail이 나오기도 합니다. 그게 강제가 필요한 이유입니다.
     - 응답 변수명은 호출마다 다른 이름을 사용해야 합니다.
   check:
-    noError: 호출과 파싱 시도가 오류 없이 실행되어야 합니다.
+    noError: 호출과 파싱 시도가 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: rawText가 비어있지 않은 문자열이고 parseStatus가 "ok" 또는 "fail:..."이어야 합니다.
 - id: strict_system
   title: 2단계. JSON 강제 system 프롬프트

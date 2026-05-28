@@ -92,7 +92,7 @@ sections:
     - 응답이 길어지면 elapsed가 거의 그대로 길어집니다.
     - 사용자에게 보이는 시간은 첫 글자가 보일 때부터 마지막 글자가 보일 때까지의 합입니다.
   check:
-    noError: 동기 호출이 오류 없이 실행되어야 합니다.
+    noError: 동기 호출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: syncElapsed가 양수이고 syncAnswer가 비어있지 않아야 합니다.
 - id: text_stream
   title: 2단계. text_stream으로 청크 누적
@@ -244,10 +244,10 @@ sections:
     - len(finalMessage.content)와 finalMessage.content[0].type을 출력합니다.
     - 일반 텍스트 응답이면 type은 "text"입니다.
   check:
-    noError: 스트림과 final 메시지 접근이 오류 없이 실행되어야 합니다.
+    noError: 스트림과 final 메시지 접근이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: stop_reason이 "end_turn" 또는 "max_tokens"이고 토큰 값이 양수여야 합니다.
 - id: workflow_validation
-  title: '현업 흐름 검증: 스트리밍 ChatSession'
+  title: '현업 흐름 검증: 스트리밍 ChatSession 종합 결과'
   structuredPrimary: true
   subtitle: 스트리밍을 ChatSession에 합성
   goal: 3강의 ChatSession을 확장해 sendStreaming(question) 메서드로 텍스트와 final usage를 함께 돌려준다.
@@ -335,5 +335,5 @@ sections:
     - 메서드 시그니처에 onChunk 인자를 추가하고 청크 루프에서 onChunk가 None이 아니면 호출합니다.
     - 콜백은 텍스트 청크를 누적 출력하거나 길이 카운트를 갱신할 때 쓸 수 있습니다.
   check:
-    noError: 스트리밍 메서드 호출이 오류 없이 실행되어야 합니다.
+    noError: 스트리밍 메서드 호출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: answer가 비어 있지 않고 두 토큰 값이 모두 양수여야 합니다.

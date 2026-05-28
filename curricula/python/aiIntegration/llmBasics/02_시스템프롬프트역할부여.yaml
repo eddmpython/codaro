@@ -86,7 +86,7 @@ sections:
     - 두 번째 호출은 secondResponse 같은 이름으로 새 변수를 만듭니다.
     - 모델 응답은 결정론적이지 않아 표현이 달라질 수 있습니다.
   check:
-    noError: 호출과 텍스트 추출이 오류 없이 실행되어야 합니다.
+    noError: 호출과 텍스트 추출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: baseAnswer가 비어있지 않은 문자열이어야 합니다.
 - id: tone_system
   title: 2단계. 어조 지시 system
@@ -172,7 +172,7 @@ sections:
     - 모델이 형식 명령을 따르지 않으면 system 문장을 명확히 끝에 두는지 확인합니다.
     - bulletCount가 정확히 일치하지 않을 수 있으니 ±1 정도의 여유로 검증합니다.
   check:
-    noError: 호출과 카운팅이 오류 없이 실행되어야 합니다.
+    noError: 호출과 카운팅이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: bulletCount가 양의 정수이고 formatAnswer가 불릿 문자열을 포함해야 합니다.
 - id: system_builder
   title: 4단계. system 빌더 함수
@@ -232,7 +232,7 @@ sections:
     - parts 리스트 마지막에 emoji 같은 추가 슬롯을 합치는 인자를 추가합니다.
     - 빈 슬롯은 if section and section.strip() 조건으로 자동 제외됩니다.
   check:
-    noError: 함수 정의와 호출이 모두 오류 없이 실행되어야 합니다.
+    noError: 함수 정의와 호출이 모두 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: composed가 줄바꿈으로 합쳐진 문자열이고 builderAnswer가 비어 있지 않아야 합니다.
 - id: workflow_validation
   title: '현업 흐름 검증: 동일 질문 다중 페르소나 비교'

@@ -96,7 +96,7 @@ sections:
     - 모델이 추측해서 답하더라도 첫 호출의 정보를 정확히 재현하기 어렵습니다.
     - 모델이 정보가 없다고 답하면 stateless를 정확히 보여준 것입니다.
   check:
-    noError: 두 번의 독립 호출이 오류 없이 실행되어야 합니다.
+    noError: 두 번의 독립 호출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: secondAnswer가 비어있지 않은 문자열이어야 합니다.
 - id: accumulate
   title: 2단계. assistant 응답을 messages에 누적
@@ -224,7 +224,7 @@ sections:
     - 새 질문을 추가하면 history 길이가 늘어나 input_tokens가 증가합니다.
     - 매 호출마다 history.append가 두 번씩 실행되는 흐름을 머릿속에 그리면 디버깅이 쉽습니다.
   check:
-    noError: 반복 호출이 오류 없이 실행되어야 합니다.
+    noError: 반복 호출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: inputTokensHistory가 단조 증가하는 양의 정수 리스트여야 합니다.
 - id: chat_session
   title: 4단계. ChatSession 클래스로 캡슐화

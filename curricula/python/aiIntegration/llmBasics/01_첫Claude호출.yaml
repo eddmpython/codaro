@@ -108,7 +108,7 @@ sections:
     - Anthropic 객체는 repr이 짧게 정의되어 클래스명만 보이거나 메서드 안내가 보일 수 있습니다.
     - client.messages 처럼 점 표기법으로 하위 자원을 노출합니다.
   check:
-    noError: anthropic.Anthropic() 호출이 인증 오류 없이 실행되어야 합니다.
+    noError: anthropic.Anthropic() 호출이 인증 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: 결과가 "Anthropic" 같은 클래스명 문자열 또는 동등한 표현이어야 합니다.
 - id: first_call
   title: 3단계. messages.create로 첫 호출
@@ -150,7 +150,7 @@ sections:
     - 정상 종료는 stop_reason이 "end_turn"입니다.
     - 토큰 한도로 끊기면 stop_reason이 "max_tokens"가 됩니다.
   check:
-    noError: messages.create 호출이 인증·요청 오류 없이 실행되어야 합니다.
+    noError: messages.create 호출이 인증·요청 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: stop_reason이 "end_turn" 또는 "max_tokens" 등 SDK 정의값이어야 합니다.
 - id: parse_text
   title: 4단계. 응답 텍스트 꺼내기

@@ -299,10 +299,10 @@ sections:
     - entry 사전에 "timestamp" 키와 datetime.utcnow().isoformat() 값을 추가합니다.
     - datetime은 from datetime import datetime으로 가져옵니다.
   check:
-    noError: 반복 호출과 로깅이 오류 없이 실행되어야 합니다.
+    noError: 반복 호출과 로깅이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: summary가 calls=3 이상과 양수 토큰/비용 값을 돌려줘야 합니다.
 - id: workflow_validation
-  title: '현업 흐름 검증: 비용 비교 실험'
+  title: '현업 흐름 검증: 비용 비교 실험 결과 종합'
   structuredPrimary: true
   subtitle: 두 max_tokens 설정 비용을 데이터로 비교
   goal: 동일 질문에 max_tokens 64와 256 두 설정으로 호출해 비용 차이가 데이터로 드러나는지 확인한다.
