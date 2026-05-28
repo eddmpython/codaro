@@ -83,6 +83,7 @@ sections:
     - 바꿀 지점은 `jsonScratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `jsonScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: json 모듈 불러오기에서 `jsonScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: json 모듈 불러오기 실행 뒤 `jsonScratch` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: basic_serialization
@@ -111,6 +112,7 @@ sections:
     - 바꿀 지점은 `userData = ...` 오른쪽 값입니다.
     - 실행 뒤 `userData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 직렬화에서 `userData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 직렬화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: file_operations
