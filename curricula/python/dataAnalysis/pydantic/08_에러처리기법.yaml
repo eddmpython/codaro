@@ -71,6 +71,7 @@ sections:
     - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
     - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic
@@ -113,6 +114,7 @@ sections:
     - 바꿀 지점은 `invalidUser = ...` 오른쪽 값입니다.
     - 실행 뒤 `invalidUser` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 에러 구조에서 `invalidUser` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 에러 구조 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: structure
@@ -137,6 +139,7 @@ sections:
     - 바꿀 지점은 `errorList = ...` 오른쪽 값입니다.
     - 실행 뒤 `errorList` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 에러 상세 분석에서 `errorList` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 에러 상세 분석 실행 뒤 `errorList` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: nested
@@ -183,6 +186,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 중첩 모델 에러의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 중첩 모델 에러의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: json
@@ -209,6 +213,7 @@ sections:
     - 바꿀 지점은 `errorJson = ...` 오른쪽 값입니다.
     - 실행 뒤 `errorJson` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: JSON 에러 응답에서 `errorJson` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: JSON 에러 응답 실행 뒤 `errorJson` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: custom
@@ -285,6 +290,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 커스텀 에러 메시지의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 커스텀 에러 메시지 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: safe
@@ -345,6 +351,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 안전한 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 안전한 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: batch
@@ -413,6 +420,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: logging
@@ -513,6 +521,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 에러 로깅의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 에러 로깅 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: result
@@ -693,6 +702,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -779,5 +789,6 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
