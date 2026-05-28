@@ -10,6 +10,8 @@ solutions가 있는지). 이 audit은 한 단계 더 들어가서 plan 가시성
 3. **exerciseWithoutCheck**: exercise는 있는데 check 블록이 없음
 4. **shortGoal**: section.goal이 20자 미만
 5. **noHint**: exercise.hints가 비어 있음
+6. **sectionIdMissing**: taxonomy.sectionOutcomes 에 매핑된 section id 가 YAML 의
+   실제 section id 와 불일치 — credit 흐름이 무효 section id 를 신뢰하는 위험.
 
 체크 (runtime, 정보성):
 6. **runtimeWeakOutcomes**: 학습자 학습자 상태(`learnerState.db`)에서 mastery<0.3 또는
@@ -47,6 +49,7 @@ THRESHOLDS: dict[str, int] = {
     "noExercise": 0,
     "exerciseWithoutCheck": 0,
     "noHint": 0,
+    "sectionIdMissing": 0,
 }
 
 # runtime mastery 임계 — Predict-Run-Reconcile-Adapt 루프와 동일.
@@ -98,9 +101,13 @@ def auditCurriculum() -> dict[str, Any]:
             checkSections = 0
             hintMissing = 0
             shortGoals = 0
+            sectionIds: set[str] = set()
             for section in sections:
                 if not isinstance(section, dict):
                     continue
+                sectionId = section.get("id")
+                if isinstance(sectionId, str) and sectionId:
+                    sectionIds.add(sectionId)
                 goal = (section.get("goal") or "").strip()
                 if goal and len(goal) < 20:
                     shortGoals += 1
@@ -113,8 +120,19 @@ def auditCurriculum() -> dict[str, Any]:
                 if section.get("check") or section.get("checks"):
                     checkSections += 1
 
+            taxonomyRecord = taxonomy.lessonOutcomes.get(key)
+            if taxonomyRecord and taxonomyRecord.sectionOutcomes:
+                unknownSectionIds = [
+                    sid for sid in taxonomyRecord.sectionOutcomes.keys()
+                    if sid not in sectionIds
+                ]
+                if unknownSectionIds:
+                    flags.append("sectionIdMissing")
+
             # 2. noExercise: section은 있는데 exercise가 하나도 없음
-            if sections and exerciseSections == 0:
+            #    (intro convention `00_*` 는 개념 소개 전용으로 exercise 가 없는 게 정상)
+            isIntroLesson = summary.contentId.startswith("00_")
+            if sections and exerciseSections == 0 and not isIntroLesson:
                 flags.append("noExercise")
 
             # 3. exerciseWithoutCheck: exercise는 있는데 check가 하나도 없음
