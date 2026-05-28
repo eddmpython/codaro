@@ -87,6 +87,9 @@ sections:
     hints:
     - 바꿀 지점은 `day28Scratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `day28Scratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: with 문 기초에서 `day28Scratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: with 문 기초 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -129,6 +132,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 컨텍스트 매니저 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 컨텍스트 매니저 프로토콜 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -187,6 +193,10 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
+      expectedValue: 'completed'
+      expectedDtype: str
   check:
     noError: 리소스 관리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 리소스 관리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -235,6 +245,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 예외 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -271,6 +284,9 @@ sections:
     hints:
     - 바꿀 지점은 `sourceFile = ...` 오른쪽 값입니다.
     - 실행 뒤 `sourceFile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 다중 컨텍스트에서 `sourceFile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 다중 컨텍스트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -323,6 +339,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실전 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -419,6 +438,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
+      expectedError: ValueError
   check:
     noError: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
@@ -456,6 +478,9 @@ sections:
     hints:
     - 바꿀 지점은 `basicScratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `basicScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: Day 28 종합 복습에서 `basicScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 28 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

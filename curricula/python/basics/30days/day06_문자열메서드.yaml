@@ -71,6 +71,9 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 대문자 변환에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -95,6 +98,9 @@ sections:
     hints:
     - 바꿀 지점은 `msg = ...` 오른쪽 값입니다.
     - 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 소문자 변환에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -119,6 +125,9 @@ sections:
     hints:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 첫 글자 대문자에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -143,6 +152,9 @@ sections:
     hints:
     - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
     - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제목 형식에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -168,6 +180,9 @@ sections:
     hints:
     - 바꿀 지점은 `raw = ...` 오른쪽 값입니다.
     - 실행 뒤 `raw` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 양쪽 공백 제거에서 `raw` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -193,6 +208,9 @@ sections:
     hints:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 한쪽 공백 제거에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -218,6 +236,9 @@ sections:
     hints:
     - 바꿀 지점은 `greeting = ...` 오른쪽 값입니다.
     - 실행 뒤 `greeting` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 치환에서 `greeting` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -243,6 +264,9 @@ sections:
     hints:
     - 바꿀 지점은 `allText = ...` 오른쪽 값입니다.
     - 실행 뒤 `allText` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 개 치환에서 `allText` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -268,6 +292,9 @@ sections:
     hints:
     - 바꿀 지점은 `row = ...` 오른쪽 값입니다.
     - 실행 뒤 `row` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 나누기에서 `row` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -293,6 +320,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 합치기에서 `fields` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -317,6 +347,9 @@ sections:
     hints:
     - 바꿀 지점은 `words = ...` 오른쪽 값입니다.
     - 실행 뒤 `words` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 개수 세기에서 `words` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -342,6 +375,9 @@ sections:
     hints:
     - 바꿀 지점은 `code = ...` 오른쪽 값입니다.
     - 실행 뒤 `code` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 위치 찾기에서 `code` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -369,6 +405,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 찾기 실패의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -394,6 +433,9 @@ sections:
     hints:
     - 바꿀 지점은 `title = ...` 오른쪽 값입니다.
     - 실행 뒤 `title` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 시작 문자 확인에서 `title` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -418,6 +460,9 @@ sections:
     hints:
     - 바꿀 지점은 `file = ...` 오른쪽 값입니다.
     - 실행 뒤 `file` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 끝 문자 확인에서 `file` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -458,6 +503,9 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 고객 행 정제하기에서 `rawFileName` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -484,6 +532,9 @@ sections:
     hints:
     - 바꿀 지점은 `greet = ...` 오른쪽 값입니다.
     - 실행 뒤 `greet` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 6 종합 복습에서 `greet` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

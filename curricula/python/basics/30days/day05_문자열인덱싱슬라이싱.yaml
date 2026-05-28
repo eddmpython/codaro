@@ -70,6 +70,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 인덱싱 기초에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -94,6 +97,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 마지막 문자 접근에서 `greet` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -119,6 +125,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 음수 인덱싱에서 `word` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -146,6 +155,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 슬라이싱 기초에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -170,6 +182,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 시작 생략 슬라이싱에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -194,6 +209,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 끝 생략 슬라이싱에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -218,6 +236,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 전체 슬라이싱에서 `source` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -242,6 +263,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 음수 슬라이싱에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -267,6 +291,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 스텝 슬라이싱에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -292,6 +319,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 역순 슬라이싱에서 `title` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -317,6 +347,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 슬라이싱 패턴에서 `alpha` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -362,6 +395,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 주문코드와 전화번호 파싱하기에서 `fileName` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -387,6 +423,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 5 종합 복습에서 `hello` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

@@ -83,6 +83,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제너레이터 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -110,6 +113,9 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제너레이터 표현식의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -139,6 +145,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 이터레이터 기초에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -194,6 +203,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
+      expectedError: StopIteration
   check:
     type: noError
     noError: 이터레이터 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -241,6 +253,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 고급 제너레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -290,6 +305,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -331,6 +349,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 실무 스트리밍 처리 루프에서 `eventRows` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -365,6 +386,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 27 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.

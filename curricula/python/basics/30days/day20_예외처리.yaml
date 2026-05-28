@@ -80,6 +80,9 @@ sections:
     hints:
     - 바꿀 지점은 `result = ...` 오른쪽 값입니다.
     - 실행 뒤 `result` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: tryexcept 기본에서 `result` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -115,6 +118,9 @@ sections:
     hints:
     - 바꿀 지점은 `num = ...` 오른쪽 값입니다.
     - 실행 뒤 `num` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 특정 예외 처리에서 `num` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -156,6 +162,9 @@ sections:
     hints:
     - 바꿀 지점은 `val = ...` 오른쪽 값입니다.
     - 실행 뒤 `val` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 여러 예외 처리에서 `val` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -195,6 +204,9 @@ sections:
     hints:
     - 바꿀 지점은 `calc = ...` 오른쪽 값입니다.
     - 실행 뒤 `calc` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: finally 절에서 `calc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -240,6 +252,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
+      expectedError: ValueError
   check:
     type: noError
     noError: raise로 예외 발생의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -275,6 +290,9 @@ sections:
     hints:
     - 바꿀 지점은 `bad = ...` 오른쪽 값입니다.
     - 실행 뒤 `bad` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 예외 정보에서 `bad` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -334,6 +352,9 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
+      expectedError: ValueError
   check:
     type: noError
     noError: '검증 루프: 실패를 설명하는 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
@@ -367,6 +388,9 @@ sections:
     hints:
     - 바꿀 지점은 `divResult = ...` 오른쪽 값입니다.
     - 실행 뒤 `divResult` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 20 종합 복습에서 `divResult` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

@@ -74,6 +74,9 @@ sections:
     hints:
     - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
     - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 연결에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -101,6 +104,9 @@ sections:
     hints:
     - 바꿀 지점은 `word = ...` 오른쪽 값입니다.
     - 실행 뒤 `word` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 반복에서 `word` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -125,6 +131,9 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 길이에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -154,6 +163,9 @@ sections:
     hints:
     - 바꿀 지점은 `name = ...` 오른쪽 값입니다.
     - 실행 뒤 `name` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: fstring 포맷팅에서 `name` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -179,6 +191,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 줄바꿈 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -203,6 +218,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 탭 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -228,6 +246,9 @@ sections:
     hints:
     - 바꿀 지점은 `quote = ...` 오른쪽 값입니다.
     - 실행 뒤 `quote` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 따옴표 문자에서 `quote` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -252,6 +273,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 백슬래시 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -280,6 +304,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 줄 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -304,6 +331,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 원시 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -331,6 +361,9 @@ sections:
     hints:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 포함 확인에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -355,6 +388,9 @@ sections:
     hints:
     - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
     - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 미포함 확인에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -405,6 +441,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 영수증 문자열을 안전하게 만들기에서 `level` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -431,6 +470,9 @@ sections:
     hints:
     - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
     - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 4 종합 복습에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

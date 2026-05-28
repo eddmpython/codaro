@@ -77,6 +77,10 @@ sections:
     hints:
     - 바꿀 지점은 `f = ...` 오른쪽 값입니다.
     - 실행 뒤 `f` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
+      expectedValue: 'File created'
+      expectedDtype: str
   check:
     noError: 파일 열기에서 `f` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 열기 실행 뒤 `f` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -115,6 +119,9 @@ sections:
     hints:
     - 바꿀 지점은 `writer = ...` 오른쪽 값입니다.
     - 실행 뒤 `writer` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 읽기에서 `writer` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 읽기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -145,6 +152,9 @@ sections:
     hints:
     - 바꿀 지점은 `fileObj = ...` 오른쪽 값입니다.
     - 실행 뒤 `fileObj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 쓰기에서 `fileObj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 쓰기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -181,6 +191,9 @@ sections:
     hints:
     - 바꿀 지점은 `data = ...` 오른쪽 값입니다.
     - 실행 뒤 `data` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: with 문에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: with 문 실행 뒤 `data` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -217,6 +230,9 @@ sections:
     hints:
     - 바꿀 지점은 `readData = ...` 오른쪽 값입니다.
     - 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 모드에서 `readData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 모드 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -257,6 +273,9 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 줄 단위 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 줄 단위 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
@@ -307,6 +326,9 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     noError: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.'
     resultCheck: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.'
@@ -335,6 +357,10 @@ sections:
     hints:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    predict:
+      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
+      expectedValue: 'File created'
+      expectedDtype: str
   check:
     noError: Day 19 종합 복습의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: Day 19 종합 복습 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.

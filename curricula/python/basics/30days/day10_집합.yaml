@@ -73,6 +73,9 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 집합이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -100,6 +103,9 @@ sections:
     hints:
     - 바꿀 지점은 `direct = ...` 오른쪽 값입니다.
     - 실행 뒤 `direct` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 집합 생성하기에서 `direct` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -127,6 +133,9 @@ sections:
     hints:
     - 바꿀 지점은 `dups = ...` 오른쪽 값입니다.
     - 실행 뒤 `dups` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 중복 제거 특성에서 `dups` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -158,6 +167,9 @@ sections:
     hints:
     - 바꿀 지점은 `fruits = ...` 오른쪽 값입니다.
     - 실행 뒤 `fruits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: add() 메서드에서 `fruits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -187,6 +199,9 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: remove()와 discard()에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -216,6 +231,9 @@ sections:
     hints:
     - 바꿀 지점은 `items = ...` 오른쪽 값입니다.
     - 실행 뒤 `items` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: clear() 메서드에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -245,6 +263,9 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 합집합 (union)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -274,6 +295,9 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 교집합 (intersection)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -303,6 +327,9 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 차집합 (difference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -332,6 +359,9 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 대칭차집합 (symmetricdifference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -359,6 +389,9 @@ sections:
     hints:
     - 바꿀 지점은 `colors = ...` 오른쪽 값입니다.
     - 실행 뒤 `colors` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `colors` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -386,6 +419,9 @@ sections:
     hints:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 집합 길이에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -427,6 +463,9 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 권한과 참석자 집합 비교하기에서 `dayOne` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -452,6 +491,9 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 10 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

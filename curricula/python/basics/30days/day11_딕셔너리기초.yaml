@@ -72,6 +72,9 @@ sections:
     hints:
     - 바꿀 지점은 `lang = ...` 오른쪽 값입니다.
     - 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 딕셔너리란?에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -99,6 +102,9 @@ sections:
     hints:
     - 바꿀 지점은 `person = ...` 오른쪽 값입니다.
     - 실행 뒤 `person` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 딕셔너리 생성하기에서 `person` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -126,6 +132,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 키로 값 접근하기에서 `dev` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -155,6 +164,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 키로 값 수정하기에서 `laptop` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -184,6 +196,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 새 키값 쌍 추가하기에서 `member` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -213,6 +228,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: del로 키값 삭제에서 `alpha` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -240,6 +258,9 @@ sections:
     hints:
     - 바꿀 지점은 `grades = ...` 오른쪽 값입니다.
     - 실행 뒤 `grades` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `grades` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -267,6 +288,9 @@ sections:
     hints:
     - 바꿀 지점은 `profile = ...` 오른쪽 값입니다.
     - 실행 뒤 `profile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 딕셔너리 길이에서 `profile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -296,6 +320,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 여러 키값 접근에서 `full` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -329,6 +356,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 중첩 딕셔너리에서 `team` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -379,6 +409,9 @@ sections:
     check:
       noError: try/except와 frozenset 할당이 NameError 없이 끝나야 합니다.
       resultCheck: listMessage 안에 'unhashable' 단서가 있고 frozensetValue가 'frozenset ok'여야 합니다.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 세 가지 키 타입 딕셔너리 정의가 TypeError 없이 끝나야 합니다.
@@ -424,6 +457,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 주문 레코드 만들고 필수 필드 확인에서 `storesByCoord` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -449,6 +485,9 @@ sections:
     hints:
     - 바꿀 지점은 `info = ...` 오른쪽 값입니다.
     - 실행 뒤 `info` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 11 종합 복습에서 `info` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

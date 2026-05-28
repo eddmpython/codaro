@@ -76,6 +76,9 @@ sections:
     hints:
     - 바꿀 지점은 `msg = ...` 오른쪽 값입니다.
     - 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 변수란?에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -105,6 +108,9 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 변수명 작성 스타일의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -134,6 +140,9 @@ sections:
     hints:
     - 바꿀 지점은 `score = ...` 오른쪽 값입니다.
     - 실행 뒤 `score` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 변수 값 변경하기에서 `score` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -159,6 +168,9 @@ sections:
     hints:
     - 바꿀 지점은 `years = ...` 오른쪽 값입니다.
     - 실행 뒤 `years` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 정수 타입에서 `years` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -184,6 +196,9 @@ sections:
     hints:
     - 바꿀 지점은 `pi = ...` 오른쪽 값입니다.
     - 실행 뒤 `pi` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 실수 타입에서 `pi` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -209,6 +224,9 @@ sections:
     hints:
     - 바꿀 지점은 `town = ...` 오른쪽 값입니다.
     - 실행 뒤 `town` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 문자열 타입에서 `town` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -234,6 +252,9 @@ sections:
     hints:
     - 바꿀 지점은 `active = ...` 오른쪽 값입니다.
     - 실행 뒤 `active` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 불린 타입에서 `active` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -259,6 +280,9 @@ sections:
     hints:
     - 바꿀 지점은 `point = ...` 오른쪽 값입니다.
     - 실행 뒤 `point` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: type() 함수에서 `point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -286,6 +310,9 @@ sections:
     hints:
     - 바꿀 지점은 `email = ...` 오른쪽 값입니다.
     - 실행 뒤 `email` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: len() 함수에서 `email` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -311,6 +338,9 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: int() 변환에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -335,6 +365,9 @@ sections:
     hints:
     - 바꿀 지점은 `val = ...` 오른쪽 값입니다.
     - 실행 뒤 `val` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: float() 변환에서 `val` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -359,6 +392,9 @@ sections:
     hints:
     - 바꿀 지점은 `code = ...` 오른쪽 값입니다.
     - 실행 뒤 `code` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: str() 변환에서 `code` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -383,6 +419,9 @@ sections:
     hints:
     - 바꿀 지점은 = 오른쪽 값들의 순서와 개수입니다.
     - 실행 뒤 각 변수와 마지막 표시값이 같은 순서로 바뀌었는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 다중 변수 할당에서 `name`, `age`, `city` 할당 개수와 값 순서가 맞아야 합니다.
@@ -407,6 +446,9 @@ sections:
     hints:
     - 바꿀 지점은 `a = ...` 오른쪽 값입니다.
     - 실행 뒤 `a` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 같은 값 할당에서 `a` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -462,6 +504,9 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 `rawProduct` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -486,6 +531,9 @@ sections:
     hints:
     - 바꿀 지점은 `lang = ...` 오른쪽 값입니다.
     - 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 2 종합 복습에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

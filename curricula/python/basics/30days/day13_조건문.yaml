@@ -77,6 +77,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: if 기본의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -112,6 +115,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: ifelse의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -155,6 +161,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: ifelifelse의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -190,6 +199,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 비교 연산자와 조건문의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -227,6 +239,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 논리 연산자 and의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -264,6 +279,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 논리 연산자 or의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -299,6 +317,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 논리 연산자 not의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -336,6 +357,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: in 연산자와 조건문의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -379,6 +403,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 중첩 조건문의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -408,6 +435,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 삼항 연산자의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -455,6 +485,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 주문 승인 규칙 만들기의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.'
@@ -484,6 +517,9 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 13 종합 복습의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.

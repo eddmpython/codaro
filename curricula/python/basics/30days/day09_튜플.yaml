@@ -72,6 +72,9 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 튜플이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -99,6 +102,9 @@ sections:
     hints:
     - 바꿀 지점은 `digits = ...` 오른쪽 값입니다.
     - 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 다양한 튜플 생성에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -126,6 +132,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 인덱싱에서 `palette` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -153,6 +162,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 슬라이싱에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -188,6 +200,9 @@ sections:
     hints:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플의 불변성의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
@@ -217,6 +232,9 @@ sections:
     hints:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 연결과 반복에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -244,6 +262,9 @@ sections:
     hints:
     - 바꿀 지점은 `weekdays = ...` 오른쪽 값입니다.
     - 실행 뒤 `weekdays` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `weekdays` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -271,6 +292,9 @@ sections:
     hints:
     - 바꿀 지점은 `coords = ...` 오른쪽 값입니다.
     - 실행 뒤 `coords` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 튜플 패킹에서 `coords` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -300,6 +324,9 @@ sections:
     hints:
     - 바꿀 지점은 `point = ...` 오른쪽 값입니다.
     - 실행 뒤 `point` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 언패킹에서 `point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -327,6 +354,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플과 리스트 변환에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -354,6 +384,9 @@ sections:
     hints:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 메서드에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -381,6 +414,9 @@ sections:
     hints:
     - 바꿀 지점은 `week = ...` 오른쪽 값입니다.
     - 실행 뒤 `week` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 길이에서 `week` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -422,6 +458,9 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 변경되면 안 되는 설정값 다루기에서 `topLeft` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -447,6 +486,9 @@ sections:
     hints:
     - 바꿀 지점은 `tpl = ...` 오른쪽 값입니다.
     - 실행 뒤 `tpl` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 9 종합 복습에서 `tpl` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

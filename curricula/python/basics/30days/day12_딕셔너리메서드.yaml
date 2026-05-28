@@ -73,6 +73,9 @@ sections:
     hints:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: get() 메서드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
@@ -100,6 +103,9 @@ sections:
     hints:
     - 바꿀 지점은 `grade = ...` 오른쪽 값입니다.
     - 실행 뒤 `grade` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: keys() 메서드에서 `grade` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -127,6 +133,9 @@ sections:
     hints:
     - 바꿀 지점은 `exam = ...` 오른쪽 값입니다.
     - 실행 뒤 `exam` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: values() 메서드에서 `exam` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -154,6 +163,9 @@ sections:
     hints:
     - 바꿀 지점은 `product = ...` 오른쪽 값입니다.
     - 실행 뒤 `product` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: items() 메서드에서 `product` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -185,6 +197,9 @@ sections:
     hints:
     - 바꿀 지점은 `user = ...` 오른쪽 값입니다.
     - 실행 뒤 `user` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: update() 메서드에서 `user` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -212,6 +227,9 @@ sections:
     hints:
     - 바꿀 지점은 `stock = ...` 오른쪽 값입니다.
     - 실행 뒤 `stock` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: pop() 메서드에서 `stock` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -239,6 +257,9 @@ sections:
     hints:
     - 바꿀 지점은 `queue = ...` 오른쪽 값입니다.
     - 실행 뒤 `queue` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: popitem() 메서드에서 `queue` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -268,6 +289,9 @@ sections:
     hints:
     - 바꿀 지점은 `temp = ...` 오른쪽 값입니다.
     - 실행 뒤 `temp` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: clear() 메서드에서 `temp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -295,6 +319,9 @@ sections:
     hints:
     - 바꿀 지점은 `cache = ...` 오른쪽 값입니다.
     - 실행 뒤 `cache` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: setdefault() 메서드에서 `cache` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -326,6 +353,9 @@ sections:
     hints:
     - 바꿀 지점은 `setting = ...` 오른쪽 값입니다.
     - 실행 뒤 `setting` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 메서드 비교에서 `setting` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -368,6 +398,9 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 기본 설정과 사용자 설정 병합하기에서 `counters` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -393,6 +426,9 @@ sections:
     hints:
     - 바꿀 지점은 `cfg = ...` 오른쪽 값입니다.
     - 실행 뒤 `cfg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 12 종합 복습에서 `cfg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
