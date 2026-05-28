@@ -94,6 +94,7 @@ sections:
       noError: Image.new 호출이 끝나야 합니다.
       resultCheck: isBlack이 True여야 합니다.
   check:
+    type: noError
     noError: Image.new와 통계 계산이 끝나야 합니다.
     resultCheck: size가 (400, 300), mode가 'RGB', isAllWhite가 True여야 합니다.
 - id: step2_rectangle
@@ -142,6 +143,7 @@ sections:
       noError: rectangle 호출이 끝나야 합니다.
       resultCheck: greenPixels가 양의 정수여야 합니다.
   check:
+    type: noError
     noError: rectangle 호출과 마스크 계산이 끝나야 합니다.
     resultCheck: closeToExpected가 True여야 합니다.
 - id: step3_ellipse
@@ -191,6 +193,7 @@ sections:
       noError: ellipse 호출이 끝나야 합니다.
       resultCheck: redPixels가 양의 정수여야 합니다.
   check:
+    type: noError
     noError: ellipse 호출과 마스크 계산이 끝나야 합니다.
     resultCheck: closeToExpected가 True여야 합니다.
 - id: step4_line
@@ -242,6 +245,7 @@ sections:
       noError: polygon 호출이 끝나야 합니다.
       resultCheck: polyPixels가 양의 정수여야 합니다.
   check:
+    type: noError
     noError: line/polygon 호출이 끝나야 합니다.
     resultCheck: bothPresent가 True여야 합니다.
 - id: step5_compose
@@ -306,6 +310,7 @@ sections:
       noError: drawArt 정의와 호출이 끝나야 합니다.
       resultCheck: smallerOnBigger가 True여야 합니다.
   check:
+    type: noError
     noError: drawArt 정의와 호출이 끝나야 합니다.
     resultCheck: shapeCount가 4이고 nonBgRatio가 0~1 사이여야 합니다.
 - id: practice
@@ -373,6 +378,7 @@ sections:
       noError: randomArt 정의와 두 호출이 끝나야 합니다.
       resultCheck: biggerCovers가 True여야 합니다.
   check:
+    type: noError
     noError: randomArt 정의와 두 호출이 끝나야 합니다.
     resultCheck: 두 결과가 같은 형식 dict이고 shapeCount가 10이어야 합니다.
 - id: workflow_validation
@@ -447,5 +453,6 @@ sections:
       noError: validateShapeCoords 정의가 끝나야 합니다.
       resultCheck: hasLengthHint가 True여야 합니다.
   check:
+    type: noError
     noError: validateShapeCoords와 rectangle 호출이 끝나야 합니다.
     resultCheck: closeToArea가 True이고 reversedMessage에 '순서' 단서가 포함되어야 합니다.

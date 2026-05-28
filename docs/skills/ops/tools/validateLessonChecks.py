@@ -220,15 +220,19 @@ async def _processFile(
             )]
 
     async def _runAll() -> list[SectionFinding]:
-        session = KernelSession()
-        try:
-            results: list[SectionFinding] = []
-            for section in sections:
-                sectionFindings = await _evaluateSection(session, file, section)
-                results.extend(sectionFindings)
-            return results
-        finally:
-            session.dispose()
+        # Use a temp directory as cwd so file-I/O lessons (open, pathlib, etc.)
+        # don't pollute the repo and don't depend on a specific layout.
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="codaro_lesson_") as tmpdir:
+            session = KernelSession(workingDirectory=tmpdir)
+            try:
+                results: list[SectionFinding] = []
+                for section in sections:
+                    sectionFindings = await _evaluateSection(session, file, section)
+                    results.extend(sectionFindings)
+                return results
+            finally:
+                session.dispose()
 
     try:
         return await asyncio.wait_for(_runAll(), timeout=timeoutSeconds)
