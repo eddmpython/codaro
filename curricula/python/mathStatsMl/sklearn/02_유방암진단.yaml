@@ -89,6 +89,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_load
@@ -120,6 +121,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 2단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_split_scale
@@ -151,6 +153,7 @@ sections:
     - 바꿀 지점은 `scaler = ...` 오른쪽 값입니다.
     - 실행 뒤 `scaler` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 3단계. 분할과 스케일링에서 `scaler` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 3단계. 분할과 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step4_train
@@ -175,6 +178,7 @@ sections:
     - 바꿀 지점은 `model = ...` 오른쪽 값입니다.
     - 실행 뒤 `model` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 4단계. 모델 학습에서 `model` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 4단계. 모델 학습 실행 뒤 `model` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step5_predict
@@ -198,6 +202,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 5단계. 예측에서 `yPred` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 5단계. 예측 실행 뒤 `yPred` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step6_accuracy
@@ -221,6 +226,7 @@ sections:
     - 바꿀 지점은 `acc = ...` 오른쪽 값입니다.
     - 실행 뒤 `acc` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 정확도에서 `acc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 6단계. 정확도 실행 뒤 `acc` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_precision_recall
@@ -248,6 +254,7 @@ sections:
     - 바꿀 지점은 `prec = ...` 오른쪽 값입니다.
     - 실행 뒤 `prec` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 정밀도와 재현율에서 `prec` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 7단계. 정밀도와 재현율 실행 뒤 `prec` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step8_f1
@@ -275,6 +282,7 @@ sections:
     - 바꿀 지점은 `f1 = ...` 오른쪽 값입니다.
     - 실행 뒤 `f1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. F1 점수에서 `f1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 8단계. F1 점수 실행 뒤 `f1` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step9_confusion
@@ -304,6 +312,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 9단계. 혼동행렬 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 9단계. 혼동행렬 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step10_report
@@ -327,6 +336,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 상세 리포트에서 `report` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 10단계. 상세 리포트 실행 뒤 `report` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step11_proba
@@ -355,6 +365,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 11단계. 확률 예측의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 11단계. 확률 예측의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step12_summary
@@ -473,6 +484,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
@@ -559,5 +571,6 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
