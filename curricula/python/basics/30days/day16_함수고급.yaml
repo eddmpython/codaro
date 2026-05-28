@@ -78,6 +78,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본값 매개변수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 기본값 매개변수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: keyword_argument
@@ -108,6 +109,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 키워드 인자의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 키워드 인자 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: positional_keyword_mix
@@ -144,6 +146,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 위치 인자와 키워드 혼용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 위치 인자와 키워드 혼용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: args_basic
@@ -180,6 +183,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: args 기본의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: args 기본 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: args_advanced
@@ -216,6 +220,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: args 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: args 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: kwargs_basic
@@ -252,6 +257,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: kwargs 기본의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: kwargs 기본 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: kwargs_advanced
@@ -292,6 +298,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: kwargs 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: kwargs 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: args_kwargs_together
@@ -326,6 +333,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: args와 kwargs 함께의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: args와 kwargs 함께 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: lambda_basic
@@ -352,6 +360,7 @@ sections:
     - 바꿀 지점은 `square = ...` 오른쪽 값입니다.
     - 실행 뒤 `square` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: lambda 기본에서 `square` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: lambda 기본 실행 뒤 `square` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: lambda_advanced
@@ -378,6 +387,7 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
+    type: noError
     noError: lambda 활용의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
     resultCheck: lambda 활용 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: workflow_validation
@@ -459,5 +469,6 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: Day 16 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: Day 16 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
