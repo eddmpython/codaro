@@ -86,6 +86,7 @@ sections:
     - 바꿀 지점은 `RED = ...` 오른쪽 값입니다.
     - 실행 뒤 `RED` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Enum 기초에서 `RED` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Enum 기초 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: intenum
@@ -124,6 +125,7 @@ sections:
     - 바꿀 지점은 `OK = ...` 오른쪽 값입니다.
     - 실행 뒤 `OK` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: IntEnum에서 `OK` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: IntEnum 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: strenum
@@ -162,6 +164,7 @@ sections:
     - 바꿀 지점은 `JSON = ...` 오른쪽 값입니다.
     - 실행 뒤 `JSON` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: StrEnum에서 `JSON` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: StrEnum 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: flag
@@ -200,6 +203,7 @@ sections:
     - 바꿀 지점은 `READ = ...` 오른쪽 값입니다.
     - 실행 뒤 `READ` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Flag에서 `READ` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Flag 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: auto
@@ -240,6 +244,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: auto()의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: auto() 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: practical_enum
@@ -296,6 +301,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실전 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -431,5 +437,6 @@ sections:
     - 바꿀 지점은 `MON = ...` 오른쪽 값입니다.
     - 실행 뒤 `MON` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 종합 복습에서 `MON` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
