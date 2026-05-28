@@ -91,7 +91,7 @@ async def _evaluateSection(
     if solutionCode:
         prewarmResult = await session.execute(solutionCode, blockId=f"_warm_{section.id}")
         if prewarmResult.status == "error":
-            preview = repr(prewarmResult.data)[:200]
+            preview = repr(prewarmResult.data)[:800]
             print(
                 f"  [warn] prewarm 실패 {section.id}: {preview}",
                 file=sys.stderr,
