@@ -877,6 +877,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [python.advancedSyntax, python.oop, python.errorHandling]
     estimatedMinutes: 90
+    lessonRole: project
 
   # advancedPython 트랙 (선택적 보강)
   "advancedPython/01_람다와고차함수":
@@ -990,6 +991,7 @@ lessonOutcomes:
     outcomes: [pandas.report]
     prerequisites: [pandas.aggregate, pandas.merge]
     estimatedMinutes: 90
+    lessonRole: project
 
   # playwright 트랙
   "playwright/00_playwright소개":
@@ -1034,6 +1036,53 @@ lessonOutcomes:
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.intro]
     estimatedMinutes: 45
+
+  # xlwings 트랙 (라이브 Excel 제어, Excel 본체 필요)
+  "xlwings/00_xlwings소개":
+    outcomes: [automation.excel.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 30
+  "xlwings/01_첫엑셀연결":
+    outcomes: [automation.excel.intro, automation.excel.workbook]
+    prerequisites: [automation.excel.intro, python.errorHandling]
+    estimatedMinutes: 45
+  "xlwings/02_가격표일괄입력":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 50
+  "xlwings/03_시트탐색과확장":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "xlwings/04_DataFrame왕복":
+    outcomes: [automation.excel.workbook, pandas.intro]
+    prerequisites: [automation.excel.workbook, pandas.intro]
+    estimatedMinutes: 55
+  "xlwings/05_수식과서식":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "xlwings/06_막대차트자동생성":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook, pandas.intro]
+    estimatedMinutes: 60
+  "xlwings/07_표와동적합계":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 60
+  "xlwings/08_월별파일분기합치기":
+    outcomes: [automation.excel.workbook, pandas.merge]
+    prerequisites: [automation.excel.workbook, pandas.loadFrame]
+    estimatedMinutes: 70
+  "xlwings/09_VBA매크로호출":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 65
+  "xlwings/10_UDF가격계산기":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 90
+    lessonRole: project
 
   # builtins 트랙
   "builtins/01_math":
@@ -1244,6 +1293,7 @@ lessonOutcomes:
       workflow_validation: [numpy.linearAlgebra, numpy.statistics]
     prerequisites: [numpy.linearAlgebra]
     estimatedMinutes: 70
+    lessonRole: project
 
   # sympy 트랙
   "sympy/00_sympy소개":
@@ -1290,6 +1340,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [sympy.equations, sympy.calculus, sympy.matrices]
     estimatedMinutes: 70
+    lessonRole: project
 
   # duckdb 트랙
   "duckdb/00_DuckDB소개":
@@ -1351,6 +1402,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [duckdb.window]
     estimatedMinutes: 80
+    lessonRole: project
 
   # polars 트랙
   "polars/00_Polars소개":
@@ -1397,6 +1449,7 @@ lessonOutcomes:
     outcomes: [polars.bigData]
     prerequisites: [polars.bigData]
     estimatedMinutes: 90
+    lessonRole: project
 
   # pydantic 트랙
   "pydantic/00_pydantic소개":
@@ -1443,6 +1496,7 @@ lessonOutcomes:
     outcomes: [pydantic.integration]
     prerequisites: [pydantic.integration]
     estimatedMinutes: 80
+    lessonRole: project
 
   # matplotlib 트랙
   "matplotlib/00_Matplotlib소개":
@@ -1502,6 +1556,7 @@ lessonOutcomes:
     outcomes: [matplotlib.advanced]
     prerequisites: [matplotlib.advanced]
     estimatedMinutes: 80
+    lessonRole: project
 
   # seaborn 트랙
   "seaborn/00_Seaborn소개":
@@ -1590,6 +1645,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [viz.regression, viz.heatmap, viz.distribution]
     estimatedMinutes: 90
+    lessonRole: project
 
   # plotly 트랙
   "plotly/00_Plotly소개":
@@ -1649,6 +1705,7 @@ lessonOutcomes:
     outcomes: [viz.interactiveAdvanced]
     prerequisites: [viz.interactiveAdvanced]
     estimatedMinutes: 80
+    lessonRole: project
 
   # altair 트랙
   "altair/00_Altair소개":
@@ -1679,6 +1736,7 @@ lessonOutcomes:
     outcomes: [viz.interactiveAdvanced]
     prerequisites: [viz.interactiveAdvanced]
     estimatedMinutes: 80
+    lessonRole: project
 
   # folium 트랙
   "folium/00_folium소개":
@@ -1705,6 +1763,7 @@ lessonOutcomes:
     outcomes: [viz.geoMaps]
     prerequisites: [viz.geoMaps]
     estimatedMinutes: 80
+    lessonRole: project
 
   # scipy 트랙
   "scipy/00_scipy소개":
@@ -1751,6 +1810,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [scipy.statistics, scipy.optimization, scipy.signal]
     estimatedMinutes: 90
+    lessonRole: project
 
   # statsmodels 트랙
   "statsmodels/00_statsmodels소개":
@@ -1811,6 +1871,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [stats.regression, stats.diagnostics, stats.timeSeries]
     estimatedMinutes: 90
+    lessonRole: project
 
   # sklearn 트랙
   "sklearn/00_sklearn소개":
@@ -1857,6 +1918,7 @@ lessonOutcomes:
     outcomes: [ml.pipeline]
     prerequisites: [ml.pipeline]
     estimatedMinutes: 90
+    lessonRole: project
 
   # networkx 트랙
   "networkx/00_networkx소개":
@@ -1915,6 +1977,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [graph.community, graph.algorithms]
     estimatedMinutes: 80
+    lessonRole: project
 
   # regex 트랙
   "regex/00_정규표현식소개":
@@ -1971,6 +2034,7 @@ lessonOutcomes:
     outcomes: [automation.llmPreprocess]
     prerequisites: [automation.llmPreprocess]
     estimatedMinutes: 80
+    lessonRole: project
 
   # fileOps 트랙
   "fileOps/01_pathlib경로감각":
@@ -2013,6 +2077,7 @@ lessonOutcomes:
     outcomes: [automation.fileBackup]
     prerequisites: [automation.fileBackup]
     estimatedMinutes: 70
+    lessonRole: project
 
   # procCtl 트랙
   "procCtl/01_subprocess기초":
@@ -2055,6 +2120,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [automation.procCtl, automation.procMonitoring]
     estimatedMinutes: 75
+    lessonRole: project
 
   # watchSched 트랙
   "watchSched/01_watchdog첫감시":
@@ -2097,6 +2163,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [automation.watchSched, automation.scheduling]
     estimatedMinutes: 75
+    lessonRole: project
 
   # inputCtl 트랙
   "inputCtl/01_pyautogui안전장치":
@@ -2139,6 +2206,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [automation.inputCtl, automation.screenInteraction]
     estimatedMinutes: 75
+    lessonRole: project
 
   # pillow 트랙
   "pillow/00_Pillow소개":
@@ -2185,6 +2253,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [image.filters, image.composition]
     estimatedMinutes: 80
+    lessonRole: project
 
   # opencv 트랙
   "opencv/00_OpenCV소개":
@@ -2231,6 +2300,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [vision.features, vision.filters]
     estimatedMinutes: 90
+    lessonRole: project
 
   # visionBasics 트랙
   "visionBasics/01_픽셀과ndarray":
@@ -2273,6 +2343,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [vision.pixelFoundations]
     estimatedMinutes: 70
+    lessonRole: project
 
   # visionFeatures 트랙
   "visionFeatures/01_코너검출":
@@ -2315,6 +2386,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [vision.video, vision.featureMatching]
     estimatedMinutes: 80
+    lessonRole: project
 
   # deepVision 트랙
   "deepVision/01_torchvision입문":
@@ -2357,6 +2429,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [deepVision.detection]
     estimatedMinutes: 90
+    lessonRole: project
 
   # visionApps 트랙
   "visionApps/01_문서스캐너":
@@ -2399,6 +2472,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [visionApps.faceMedia, visionApps.documents]
     estimatedMinutes: 90
+    lessonRole: project
 
   # advancedPython 트랙 — 나머지 백필
   "advancedPython/03_클로저와상태관리":
@@ -2518,6 +2592,7 @@ lessonOutcomes:
     outcomes: [builtins.async]
     prerequisites: [builtins.async]
     estimatedMinutes: 60
+    lessonRole: project
 
   # folium 잔여
   "folium/03_도형그리기":
@@ -2576,6 +2651,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [automation.browser.testFlow, automation.browser.evidence]
     estimatedMinutes: 80
+    lessonRole: project
 
   # pandas 잔여
   "pandas/04_붓꽃품종분류":
@@ -2646,6 +2722,7 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [llm.toolUse, llm.caching, llm.structuredOutput]
     estimatedMinutes: 90
+    lessonRole: project
 
   # openpyxl 트랙 — 파일 기반 엑셀 자동화
   "openpyxl/00_openpyxl소개":
@@ -2705,6 +2782,7 @@ lessonOutcomes:
       - automation.excel.charts
       - automation.excel.tables
     estimatedMinutes: 90
+    lessonRole: project
 
   # xlwings 트랙 — 라이브 Excel 자동화
   "xlwings/00_xlwings소개":

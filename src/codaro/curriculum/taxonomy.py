@@ -32,6 +32,7 @@ class LessonOutcomeRecord(BaseModel):
     estimatedMinutes: int = 0
     practicalDomain: list[str] = Field(default_factory=list)
     sectionOutcomes: dict[str, list[str]] = Field(default_factory=dict)
+    lessonRole: str = "concept"
 
 
 class CurriculumTaxonomy(BaseModel):
@@ -155,10 +156,18 @@ def mergeLessonRecord(
         sectionOutcomes = {k: list(v) for k, v in fromTaxonomy.sectionOutcomes.items()}
     else:
         sectionOutcomes = {}
+    metaLessonRole = metaPayload.get("lessonRole")
+    if isinstance(metaLessonRole, str) and metaLessonRole in {"concept", "practice", "project"}:
+        lessonRole = metaLessonRole
+    elif fromTaxonomy:
+        lessonRole = fromTaxonomy.lessonRole
+    else:
+        lessonRole = "concept"
     return LessonOutcomeRecord(
         outcomes=[str(o) for o in outcomes if isinstance(o, str)],
         prerequisites=[str(p) for p in prerequisites if isinstance(p, str)],
         estimatedMinutes=int(estimatedMinutes or 0),
         practicalDomain=[str(d) for d in practicalDomain if isinstance(d, str)],
         sectionOutcomes=sectionOutcomes,
+        lessonRole=lessonRole,
     )

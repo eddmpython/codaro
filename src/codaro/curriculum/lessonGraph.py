@@ -23,6 +23,7 @@ class LessonNode(BaseModel):
     estimatedMinutes: int = 0
     practicalDomain: list[str] = Field(default_factory=list)
     sectionOutcomes: dict[str, list[str]] = Field(default_factory=dict)
+    lessonRole: str = "concept"
 
     @property
     def key(self) -> str:
@@ -55,6 +56,12 @@ class LessonGraph(BaseModel):
         for lesson in self.lessons:
             covered.update(lesson.outcomes)
         return covered
+
+    def projectLessons(self) -> list[LessonNode]:
+        return [lesson for lesson in self.lessons if lesson.lessonRole == "project"]
+
+    def lessonsInRole(self, role: str) -> list[LessonNode]:
+        return [lesson for lesson in self.lessons if lesson.lessonRole == role]
 
 
 def buildLessonGraph(
@@ -89,5 +96,6 @@ def buildLessonGraph(
                 estimatedMinutes=record.estimatedMinutes,
                 practicalDomain=record.practicalDomain,
                 sectionOutcomes=record.sectionOutcomes,
+                lessonRole=record.lessonRole,
             ))
     return LessonGraph(lessons=nodes)
