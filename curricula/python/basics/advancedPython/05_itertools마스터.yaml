@@ -78,6 +78,7 @@ sections:
     - 바꿀 지점은 `counter = ...` 오른쪽 값입니다.
     - 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 무한 이터레이터에서 `counter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 무한 이터레이터 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: terminating_iterators
@@ -112,6 +113,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 종료 이터레이터에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종료 이터레이터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: combinatoric
@@ -144,6 +146,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 조합 함수에서 `colorList` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 조합 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: groupby
@@ -176,6 +179,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: groupby 함수의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: groupby 함수 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: chain_zip
@@ -210,6 +214,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: chain과 ziplongest에서 `list1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: chain과 ziplongest 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: accumulate
@@ -240,6 +245,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: accumulate 함수에서 `numbers` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: accumulate 함수 실행 뒤 `numbers` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: workflow_validation
@@ -316,6 +322,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실무 이터레이터 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실무 이터레이터 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
@@ -346,5 +353,6 @@ sections:
     - 바꿀 지점은 `evens = ...` 오른쪽 값입니다.
     - 실행 뒤 `evens` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 종합 복습에서 `evens` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 `evens` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

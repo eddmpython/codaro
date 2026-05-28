@@ -102,6 +102,7 @@ sections:
     - StopIteration은 제너레이터가 끝났을 때 발생하고 .value에 return 값이 담깁니다.
     - yield from은 하위의 return 값을 위 단계의 표현식에 그대로 전달합니다.
   check:
+    type: noError
     noError: innerRange와 chained 정의가 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: yielded 리스트는 [0,1,2,10,11]이고 final 리스트는 [inner:0-3, inner:10-12]로 두 단계의 return 값이 모두 보존되어야 합니다.
 - id: send-coroutine
@@ -152,6 +153,7 @@ sections:
     - send 직후 yield 표현식이 받은 값으로 평가되고 다음 yield가 새 평균을 돌려줍니다.
     - primed는 첫 next의 반환값으로 yield의 초기 표현식(average=None)이 보여야 합니다.
   check:
+    type: noError
     noError: runningAverage와 send 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: primed가 None이고 results가 [10.0, 15.0, 30.0, 22.5]처럼 누적 평균이 정확히 갱신되어야 합니다.
 - id: throw-close
@@ -215,6 +217,7 @@ sections:
     - 잡지 못한 예외는 throw 호출자에게 그대로 전파됩니다.
     - try/except 가 ValueError만 잡으므로 KeyError는 빠져나옵니다.
   check:
+    type: noError
     noError: streamProcessor 정의와 throw/close 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: log 리스트가 start, got:apple, escaped 순서로 채워져 잡히지 않은 예외가 호출자로 빠져나오는 흐름이 보여야 합니다.
 - id: pipeline
@@ -281,6 +284,7 @@ sections:
     - 각 단계는 호출 즉시 데이터를 만들지 않고, list()로 소비할 때 평가됩니다.
     - offset 단계가 빠지면 결과가 100씩 작아집니다.
   check:
+    type: noError
     noError: keepWhen, transformBy, takeFirst 정의와 파이프라인 합성이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: list 결과가 [101, 109, 125, 149, 181]처럼 홀수 제곱에 100을 더한 5개 값이어야 lazy 합성이 맞는 것입니다.
 - id: itertools-combine
@@ -337,5 +341,6 @@ sections:
     - groupby는 인접한 동일 키만 묶기 때문에 정렬되지 않은 입력에서는 같은 키가 여러 그룹으로 쪼개집니다.
     - sortedGroups는 [(a, 60), (b, 20), (c, 100)]가 되어야 의도한 결과입니다.
   check:
+    type: noError
     noError: groupSums와 itertools 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: sortedGroups가 [(a, 60), (b, 20), (c, 100)]이고 rawGroups는 키별 합이 분산되어 sorted를 앞에 두는 것이 왜 필요한지 보여야 합니다.

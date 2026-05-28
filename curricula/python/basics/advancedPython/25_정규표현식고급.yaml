@@ -82,6 +82,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 패턴 복습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 기본 패턴 복습의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: groups_basic
@@ -121,6 +122,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 그룹 기초의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 그룹 기초의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: lookahead
@@ -154,6 +156,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 룩어헤드의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 룩어헤드의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: lookbehind
@@ -187,6 +190,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 룩비하인드의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 룩비하인드의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: backreference
@@ -220,6 +224,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 백레퍼런스의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 백레퍼런스의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: non_capture
@@ -253,6 +258,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 비캡처 그룹의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 비캡처 그룹의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: flags
@@ -288,6 +294,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 플래그의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 플래그의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: substitution
@@ -323,6 +330,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 치환의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 치환의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: workflow_validation
@@ -396,6 +404,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 주문 로그 파싱과 마스킹의 입력 데이터와 처리 인자가 다음 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 로그 파싱과 마스킹 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -435,5 +444,6 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 종합 연습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

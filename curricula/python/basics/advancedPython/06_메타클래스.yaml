@@ -81,6 +81,7 @@ sections:
     - 바꿀 지점은 `obj = ...` 오른쪽 값입니다.
     - 실행 뒤 `obj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 클래스도 객체에서 `obj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 클래스도 객체 실행 뒤 `obj` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: type_function
@@ -109,6 +110,7 @@ sections:
     - 바꿀 지점은 `Dog = ...` 오른쪽 값입니다.
     - 실행 뒤 `Dog` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: type()으로 클래스 생성에서 `Dog` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: type()으로 클래스 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: metaclass_basic
@@ -149,6 +151,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 메타클래스 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 메타클래스 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: metaclass_example
@@ -201,6 +204,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 메타클래스 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 메타클래스 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: init_subclass
@@ -251,6 +255,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: initsubclass의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: initsubclass 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: when_to_use
@@ -301,6 +306,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 언제 사용하나의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 언제 사용하나 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -420,6 +426,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 명령 클래스 자동 등록하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 명령 클래스 자동 등록하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -450,5 +457,6 @@ sections:
     - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
     - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 종합 복습의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 종합 복습 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.

@@ -75,6 +75,7 @@ sections:
     - 바꿀 지점은 `add = ...` 오른쪽 값입니다.
     - 실행 뒤 `add` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 람다 표현식 기초에서 `add` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 람다 표현식 기초 실행 뒤 `add` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: map_function
@@ -103,6 +104,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: map() 함수에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: map() 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: filter_function
@@ -131,6 +133,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: filter() 함수에서 `numbers` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: filter() 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: reduce_function
@@ -161,6 +164,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: reduce() 함수에서 `vals` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: reduce() 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: higher_order
@@ -193,6 +197,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 고차 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 고차 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practical_patterns
@@ -227,6 +232,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 패턴에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실전 패턴 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -318,6 +324,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -344,5 +351,6 @@ sections:
     - 바꿀 지점은 `cube = ...` 오른쪽 값입니다.
     - 실행 뒤 `cube` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 종합 복습에서 `cube` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 `cube` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

@@ -107,6 +107,7 @@ sections:
     - __exit__의 excType은 ValueError 클래스이고, excValue.args에 메시지가 들어 있습니다.
     - 반환값을 True로 바꾸면 예외가 with 바깥으로 나가지 않습니다.
   check:
+    type: noError
     noError: TraceContext 클래스 정의와 with 블록이 NameError나 TypeError 없이 끝까지 실행되어야 합니다.
     resultCheck: events 리스트가 enter, body, exit 순서로 쌓이고 예외 경로에서는 exit 항목에 ValueError가 기록되어야 합니다.
 - id: contextmanager-decorator
@@ -162,6 +163,7 @@ sections:
     - finally 안의 end 로그는 예외가 나도 항상 기록됩니다.
     - try를 빼면 예외 경로에서 end가 누락되는지 확인해 보세요.
   check:
+    type: noError
     noError: timedSection 데코레이터와 with 블록이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: log 리스트가 start, read, end, caught 순으로 채워져 예외 경로에서도 end가 보존되어야 합니다.
 - id: exitstack-dynamic
@@ -215,6 +217,7 @@ sections:
     - callback은 with 블록을 빠져나갈 때 등록 역순으로 호출됩니다.
     - 정리 순서를 출력해 LIFO인지 직접 확인하세요.
   check:
+    type: noError
     noError: ExitStack과 labeled 매니저가 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: events 리스트의 close 항목이 등록 역순(c, b, a)이고 callback이 가장 먼저 실행되어 cleanup이 close보다 앞에 보여야 합니다.
 - id: exception-suppression
@@ -278,6 +281,7 @@ sections:
     - __exit__이 False를 돌려주면 예외가 그대로 전파됩니다.
     - guard.suppressed는 KeyError에만 True가 되어야 합니다.
   check:
+    type: noError
     noError: SwallowKeyError 정의와 with 블록이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: KeyError는 흡수되어 suppressed가 True이고, ValueError는 흡수되지 않아 except 절에서 메시지가 captured에 담겨야 합니다.
 - id: async-context
@@ -337,5 +341,6 @@ sections:
     - asyncio.sleep(0)은 이벤트 루프에 제어를 양보하지만 즉시 돌아옵니다.
     - close는 finally 블록에서 호출되므로 마지막에 추가됩니다.
   check:
+    type: noError
     noError: asyncSection과 asyncio.run이 NameError, TypeError, RuntimeError 없이 실행되어야 합니다.
     resultCheck: events 리스트가 open, before-await, after-await, close 순서로 쌓여 async with가 setup/teardown을 올바른 위치에 배치하는지 보여야 합니다.

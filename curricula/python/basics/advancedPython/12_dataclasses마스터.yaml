@@ -87,6 +87,7 @@ sections:
     - 바꿀 지점은 `pt = ...` 오른쪽 값입니다.
     - 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: '@dataclass 기초에서 `pt` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
     resultCheck: '@dataclass 기초 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.'
 - id: field_function
@@ -133,6 +134,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: field() 함수에서 `cart1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: field() 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: post_init
@@ -183,6 +185,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: postinit의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: postinit 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: frozen_dataclass
@@ -223,6 +226,7 @@ sections:
     - 바꿀 지점은 `pt = ...` 오른쪽 값입니다.
     - 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: frozen=True에서 `pt` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: frozen=True 실행 뒤 `pt` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: slots_dataclass
@@ -265,6 +269,7 @@ sections:
     - 바꿀 지점은 `p3d = ...` 오른쪽 값입니다.
     - 실행 뒤 `p3d` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: slots=True에서 `p3d` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: slots=True 실행 뒤 `p3d` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: inheritance
@@ -311,6 +316,7 @@ sections:
     - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
     - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 상속의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 상속 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -406,6 +412,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 주문 라인 데이터 모델 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 라인 데이터 모델 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -447,5 +454,6 @@ sections:
     - 바꿀 지점은 작은 함수와 상태을 만드는 첫 줄과 추상화 패턴 줄에서 찾으세요.
     - 실행 뒤 호출 결과와 예외 경계 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 종합 복습의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 종합 복습 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.
