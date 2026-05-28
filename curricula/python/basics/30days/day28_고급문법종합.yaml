@@ -136,6 +136,7 @@ sections:
       prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
       expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
+    type: noError
     noError: 컨텍스트 매니저 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 컨텍스트 매니저 프로토콜 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: resource_management
@@ -249,6 +250,7 @@ sections:
       prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
       expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
+    type: noError
     noError: 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 예외 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: multiple_context
@@ -343,6 +345,7 @@ sections:
       prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
       expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
+    type: noError
     noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실전 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -442,6 +445,7 @@ sections:
       prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
       expectedError: ValueError
   check:
+    type: noError
     noError: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -484,3 +488,17 @@ sections:
   check:
     noError: Day 28 종합 복습에서 `basicScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 28 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: reflection
+  title: Day 28 회고 — 고급 문법을 실무에 잇기
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 26-28의 컴프리헨션/제너레이터/고급 문법 중에서 자신의 업무 코드에 어디 끼울지 결정한다.
+  why: 고급 문법은 짧지만 깊이가 있어 자기 코드에 한 번 끼워본 뒤에야 진짜 손에 붙습니다.
+  explanation: 컴프리헨션, 제너레이터, 람다, args/kwargs 중에서 가장 인상 깊었던 한 가지를 골라, 자신의 업무 코드(엑셀 자동화, 데이터 정리, 텍스트 처리 등)에 어디에 끼울 수 있을지 한 단락으로 적어보세요.
+  reflection:
+    prompt: 인상 깊었던 고급 문법 1개 + 그것을 적용할 자기 업무 코드 위치 1개를 적어주세요.
+    expectedKeywords:
+    - 컴프리헨션
+    - 제너레이터
+    - 자동화
+    aiFollowup: 학습자가 고른 문법과 업무 위치를 짧게 정리하고, 다음 사이클에서 실제로 그 적용을 보고할 수 있게 한 줄로 다짐을 만든다.
