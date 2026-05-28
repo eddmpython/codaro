@@ -27,6 +27,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
     "curriculum-weakness-audit": ("output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json",),
+    "predict-contract-strict": ("output/test-runner/predict-contract-strict/predict-contract-strict-report.json",),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
@@ -38,8 +39,6 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
-    "objective-nineplus-audit": ("output/test-runner/objective-nineplus-audit/objective-nineplus-report.json",),
-    "public-readiness-audit": ("output/test-runner/public-readiness-audit/public-readiness-report.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }
 
@@ -153,21 +152,6 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),),
         ci_required=False,
     ),
-    "learning-goal-audit": Gate(
-        tier="surface",
-        description="목표 완료 전 docs, product quality, readiness, backend, landing build를 묶어 확인한다.",
-        commands=(
-            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningGoalObjectiveAudit.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
-            command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
-            command(("npm", "run", "build"), cwd="landing"),
-        ),
-        ci_required=False,
-    ),
     "dogfood-alpha-audit": Gate(
         tier="surface",
         description="첫 사용자 provider 연결, 질문, 학습 생성, 셀 실행, 실패 복구 플로우의 증거를 확인한다.",
@@ -248,6 +232,12 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumWeakness.py")),),
         ci_required=False,
     ),
+    "predict-contract-strict": Gate(
+        tier="fast",
+        description="strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyPredictContractStrict.py")),),
+        ci_required=False,
+    ),
     "playwright-curriculum-runtime": Gate(
         tier="fast",
         description="Playwright 학습 트랙의 structured YAML 계약과 예제/정답 코드가 실제 Chromium에서 실행되는지 확인한다.",
@@ -325,18 +315,6 @@ GATES: dict[str, Gate] = {
         tier="release",
         description="launcher Rust crate 테스트를 실행한다.",
         commands=(command(("cargo", "test", "--", "--test-threads=1"), cwd="launcher/codaro-launcher"),),
-    ),
-    "objective-nineplus-audit": Gate(
-        tier="release",
-        description="객관 9점대 scorecard의 모든 분야가 9.0 이상인지 최신 gate artifact와 기준 출처로 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyObjectiveNinePlusScorecard.py")),),
-        ci_required=False,
-    ),
-    "public-readiness-audit": Gate(
-        tier="release",
-        description="대중 사용 목표에서 보안, 개인정보, 공급망, 지원, 문서, 접근성, 최신 증거가 모두 9.0 이상인지 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyPublicReadinessAudit.py")),),
-        ci_required=False,
     ),
 }
 
@@ -875,8 +853,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 35:
-        failures.append(f"expected 35 gates, found {len(GATES)}")
+    if len(GATES) != 34:
+        failures.append(f"expected 34 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -422,6 +422,56 @@ class CurriculumOsToolHandlers:
             ),
         }
 
+    async def _handle_proposePredictPrompts(self, args: dict[str, Any]) -> dict[str, Any]:
+        category = str(args.get("category") or "").strip()
+        contentId = str(args.get("contentId") or "").strip()
+        if not category or not contentId:
+            return {"error": "category and contentId are required"}
+        maxProposals = args.get("maxProposals") or 20
+        if not isinstance(maxProposals, int) or maxProposals <= 0:
+            maxProposals = 20
+
+        loader = _studyLoader()
+        if loader is None:
+            return {"error": "study loader unavailable — curricula path missing"}
+        try:
+            rawDict = loader.loadStudy(category, contentId)
+        except FileNotFoundError:
+            return {"error": f"lesson not found: {category}/{contentId}"}
+
+        from ...curriculum.sectionContract import lessonContractFromYaml
+
+        lesson = lessonContractFromYaml(rawDict or {}, fallbackTitle=contentId)
+
+        drafts: list[dict[str, Any]] = []
+        skipped: list[dict[str, str]] = []
+        for section in lesson.sections:
+            exercise = section.exercise
+            if not (exercise.prompt or exercise.starterCode or exercise.solution):
+                continue
+            existing = exercise.predict
+            if existing.prompt and any([
+                existing.expectedShape, existing.expectedDtype,
+                existing.expectedValue, existing.expectedError,
+            ]):
+                skipped.append({"sectionId": section.id, "reason": "predict already filled"})
+                continue
+            drafts.append(_predictDraftFromSection(section))
+            if len(drafts) >= maxProposals:
+                break
+
+        return {
+            "category": category,
+            "contentId": contentId,
+            "sectionCount": len(lesson.sections),
+            "drafts": drafts,
+            "skipped": skipped,
+            "next": (
+                "사람이 각 draft를 검토한 뒤 해당 section의 exercise.predict 블록에 채워주세요. "
+                "draft 의 expectedValue/expectedError는 휴리스틱 초안이라 정답이 아닐 수 있습니다."
+            ),
+        }
+
     async def _handle_proposeCurriculumDraft(self, args: dict[str, Any]) -> dict[str, Any]:
         outcomeId = str(args.get("outcomeId") or "")
         title = str(args.get("title") or "")
@@ -452,6 +502,61 @@ class CurriculumOsToolHandlers:
                 "'커리큘럼 YAML은 한 강의씩 직접 작성' 원칙을 지키세요."
             ),
         }
+
+
+def _predictDraftFromSection(section: Any) -> dict[str, Any]:
+    """결정적 휴리스틱으로 한 section에 대한 predict draft를 만든다.
+
+    실제 정답값은 사람이 채워야 한다 — 이 함수는 어떤 차원이 비교 의미를 갖는지
+    제안하는 시드 역할만 한다.
+    """
+    exercise = section.exercise
+    solution = (exercise.solution or "").strip()
+    starter = (exercise.starterCode or "").strip()
+    referenceCode = solution or starter
+
+    suggestions: dict[str, str] = {
+        "prompt": "이 코드의 출력이 어떻게 될까요? 실행 전에 예측해 보세요.",
+    }
+
+    if not referenceCode:
+        return {
+            "sectionId": section.id,
+            "sectionTitle": section.title,
+            "predict": suggestions,
+            "rationale": "exercise 코드가 비어 있어 prompt 만 기본값으로 제안.",
+        }
+
+    rationale: list[str] = []
+
+    if "raise " in referenceCode or "raise\n" in referenceCode:
+        suggestions["expectedError"] = "(예외 종류를 적어주세요, 예: ValueError)"
+        rationale.append("raise 문 감지 → expectedError 후보")
+
+    pandasMethodHints = (".head(", ".tail(", ".shape", ".describe(", "DataFrame(", "pd.Series(")
+    if any(hint in referenceCode for hint in pandasMethodHints):
+        suggestions["expectedShape"] = "(행 x 열 형태로 적어주세요, 예: (3, 2))"
+        rationale.append("pandas 객체 조작 감지 → expectedShape 후보")
+
+    numpyMethodHints = ("np.array(", "np.zeros(", "np.ones(", ".dtype", ".astype(")
+    if any(hint in referenceCode for hint in numpyMethodHints):
+        suggestions["expectedDtype"] = "(예: int64, float64, object)"
+        rationale.append("numpy/dtype 조작 감지 → expectedDtype 후보")
+
+    if "print(" in referenceCode:
+        suggestions["expectedValue"] = "(셀 마지막 출력값을 한 줄로 적어주세요)"
+        rationale.append("print() 호출 감지 → expectedValue 후보")
+
+    if "expectedValue" not in suggestions and "expectedError" not in suggestions:
+        suggestions["expectedValue"] = "(셀 마지막 표현식의 결과를 적어주세요)"
+        rationale.append("기본 expectedValue 슬롯 제안")
+
+    return {
+        "sectionId": section.id,
+        "sectionTitle": section.title,
+        "predict": suggestions,
+        "rationale": "; ".join(rationale) if rationale else "기본 prompt 만 제안",
+    }
 
 
 def resetCurriculumOsCache() -> None:

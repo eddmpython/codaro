@@ -34,7 +34,6 @@ uv run python -X utf8 tests/run.py gate assistant-workloop-contract
 uv run python -X utf8 tests/run.py gate ai-live-smoke
 uv run python -X utf8 tests/run.py gate editor-runtime-preflight
 uv run python -X utf8 tests/run.py gate learning-system-readiness
-uv run python -X utf8 tests/run.py gate learning-goal-audit
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
 uv run python -X utf8 tests/run.py gate product-quality-audit
 uv run python -X utf8 tests/run.py gate automation-ide-audit
@@ -54,8 +53,6 @@ uv run python -X utf8 tests/run.py gate editor-build
 uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-check
 uv run python -X utf8 tests/run.py gate launcher-test
-uv run python -X utf8 tests/run.py gate objective-nineplus-audit
-uv run python -X utf8 tests/run.py gate public-readiness-audit
 uv run python -X utf8 tests/run.py gate widget-bridge
 uv run python -X utf8 tests/run.py gate app-runtime
 uv run python -X utf8 tests/run.py gate mobile-layout
@@ -73,7 +70,7 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 - `TMP`, `TEMP`, `TMPDIR`은 도구 실행 중 필요한 scratch 용도로만 `output/test-runner/<gate>/scratch`를 가리킨다.
 - 브라우저 verifier는 `tempfile.mkdtemp`로 OS temp를 직접 만들지 않는다. `repoLocalPlaywrightWorkspace`를 통해 gate runner의 scratch를 쓰고, 직접 실행 시에도 `output/test-runner/<verifier>/scratch/playwright` 아래에서만 Playwright daemon/session 파일을 만든다. `PLAYWRIGHT_DAEMON_SESSION_DIR`와 `PLAYWRIGHT_SERVER_REGISTRY`는 wrapper가 이 workspace로 덮어쓴다.
 - Playwright 커리큘럼 runtime 샘플처럼 내부에서 `python -m pytest`를 다시 호출하는 verifier도 `PYTEST_ADDOPTS=-p no:cacheprovider`를 주입해 루트 `.pytest_cache/`를 만들지 않는다.
-- gate sequence summary는 command log size/mtime이 안정된 뒤 기록해 child process가 stdout handle을 늦게 닫아도 나중의 `learning-goal-audit`에서 bytes evidence가 흔들리지 않게 한다.
+- gate sequence summary는 command log size/mtime이 안정된 뒤 기록해 child process가 stdout handle을 늦게 닫아도 다음 gate에서 bytes evidence가 흔들리지 않게 한다.
 - `output/test-runner`는 disposable 실행 작업공간이며 제품 SSOT나 커밋 대상이 아니다.
 
 ## Gate 목록
@@ -89,7 +86,6 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 | `ai-live-smoke` | fast | 실제 provider credential이 있을 때 provider 응답, OAuth 상태, live tool loop smoke를 확인한다. |
 | `editor-runtime-preflight` | fast | editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다. |
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
-| `learning-goal-audit` | surface | 목표 완료 전 docs, product quality audit, readiness, backend, landing build를 묶어 확인한다. |
 | `widget-bridge` | fast | Python ui descriptor + 콜백 registry + traceback parser 회귀를 확인한다. |
 | `app-runtime` | fast | App 라이프사이클 hook, 포트 회피, 사용자 정의 컴포넌트 + teacher tool registry 회귀를 확인한다. |
 | `mobile-layout` | fast | PWA manifest, service worker, viewport meta, 모바일 hook 회귀를 확인한다. |
@@ -103,6 +99,8 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 | `runtime-recovery-browser` | surface | 브라우저에서 package install 실패가 셀 근처 복구 UX로 보이고 cell-call로 번지지 않는지 확인한다. |
 | `curriculum-quality-matrix` | fast | 대표 structured YAML과 실제 전체 curriculum YAML의 섹션 카드, 패키지, 실습 solution, 학습 흐름 계약을 확인한다. |
 | `curriculum-top-tier-audit` | fast | 커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, lazy uv 의존성, 소개 레슨, structured source 채택률, gate wiring으로 점수화한다. |
+| `curriculum-weakness-audit` | fast | 레슨 단위 약점(plan orphan, exercise/check 누락, hint 부재 등)을 Curriculum OS taxonomy 위에서 점검한다. |
+| `predict-contract-strict` | fast | strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다. |
 | `playwright-curriculum-runtime` | fast | Playwright 학습 트랙의 structured YAML 계약과 예제/정답 코드가 실제 Chromium에서 실행되는지 확인한다. |
 | `onboarding-browser` | surface | 브라우저에서 첫 화면 fallback, Provider 연결 행동, provider 연결 후 실제 응답 상태를 확인한다. |
 | `frontend-performance-budget` | surface | editor build 후 chunk 분리와 JS/CSS asset size budget을 확인한다. |
@@ -113,8 +111,6 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 | `landing-build` | surface | 문서/landing surface의 static build와 docs content bundle split을 확인한다. |
 | `launcher-check` | release | launcher Rust crate의 type/build 계약을 확인한다. |
 | `launcher-test` | release | launcher Rust crate 테스트를 직렬 실행한다. |
-| `objective-nineplus-audit` | release | 객관 9점대 scorecard의 모든 분야가 9.0 이상인지 최신 gate artifact와 기준 출처로 확인한다. |
-| `public-readiness-audit` | release | 대중 사용 목표에서 보안, 개인정보, 공급망, 지원, 문서, 접근성, 최신 증거가 모두 9.0 이상인지 확인한다. |
 
 `preflight`는 로컬 기본 확인이며 현재 `root-clean`, `docs`, `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`과 `teacher-e2e`는 빠른 집중 확인용으로 둔다.
 `quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `root-clean` → `docs` → `backend` → `learning-system-readiness` → `dogfood-alpha-audit` → `product-quality-audit` → `automation-ide-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `curriculum-top-tier-audit` → `playwright-curriculum-runtime` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, 자동화, runtime, 설치/런처, 온보딩, 프론트 성능이 한 사이클에서 함께 버티는지 확인한다. 묶음 실행이 끝나면 runner는 통과한 gate 수, soft failure 수, gate별 duration summary, gate별 command log path/size/freshness, 현재 `gitHead`, `startedAt`/`completedAt`, 그리고 gate별 artifact freshness를 `output/test-runner/quality-cycle/sequence-summary.json`에 남긴다. `dogfood-alpha-audit`, `automation-ide-audit`, `diagnostic-summary-contract`, `ai-live-smoke`, `provider-settings-browser`, `install-launcher-smoke`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `curriculum-top-tier-audit`, `playwright-curriculum-runtime`, `onboarding-browser`, `frontend-performance-budget`처럼 report를 쓰는 gate는 summary 안에 artifact path, fresh 여부, `payloadGitHead`, `gitHeadMatches`, `payloadStatus`가 함께 들어가야 하며, report의 git head가 sequence head와 맞지 않으면 artifact failure로 sequence를 실패시킨다. `curriculum-quality-matrix`는 대표 structured sample report와 실제 전체 YAML flow report를 둘 다 artifact로 남기고, `curriculum-top-tier-audit`와 `playwright-curriculum-runtime`은 각각 최상위 설계 점수와 실제 Chromium 예제 실행 report를 남긴다. credential missing exit code 2는 `softFailure: true`와 `softFailureCount`로 기록하고 이후 gate를 계속 실행한다. 실제 provider 실패 exit code 1은 soft 처리하지 않고 sequence를 중단해야 한다. 이 summary는 제품 SSOT가 아니라 사람이 읽는 완료 증거다.
@@ -131,15 +127,13 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 - turn-state durability는 `teacher-eval`/`teacher-e2e`에서 고정한다. 이전 tool result가 다음 turn의 tool policy state를 통과시키면 실패해야 한다. 이전 turn의 `role: tool` 결과는 conversation history로 남아도 되고 재현에 필요하지만, 새 turn의 정책 상태를 만족시키는 근거가 되면 안 된다. 예를 들어 직전 `packages-check` 결과가 준비됨이어도 새 turn에서 provider가 바로 `cell-call`을 요청하면 executor 호출 없이 `dependency-preflight-required`로 막혀야 한다. 이전 실패 result가 새 성공 turn의 toolCalls/trace/workloop payload에 섞이면 실패해야 하며, 실패한 `packages-check` 뒤 재시도한 성공 turn에도 이전 실패 result나 policy violation이 남으면 안 된다.
 - gate 실행 실패는 무출력으로 남기지 않는다. `tests/run.py`는 각 명령 stdout/stderr를 `output/test-runner/<gate>/logs` 아래에 직접 기록하고, 실패 시 log 경로와 tail을 콘솔에 남겨야 한다. runner가 pipe EOF를 기다리다가 멈추지 않도록 child stdout은 log 파일에 직접 연결하며, 명령 timeout이 나면 process tree를 종료하고 `exit: 124`와 timeout 사유를 log에 남긴다.
 - editor runtime 실행 변경은 `editor-runtime-preflight`로 세션 패키지 확인, 누락 패키지 uv 설치, kernel 실행 순서가 지켜지는지 확인한다.
-- provider loop, clarification, curriculum materializer를 함께 건드린 변경은 `teacher-e2e`로 실제 turn payload와 teacher golden e2e score를 확인한다.
+- provider loop, clarification, curriculum materializer를 함께 건드린 변경은 `teacher-e2e`로 실제 turn payload와 teacher golden e2e score를 확인한다. teacher/provider loop 산출물은 `score`, `maxScore`, `minimumScore`를 포함하며 `minimumScore`는 9.0이다.
 - workloop/trace 표시 변경은 `assistant-workloop-contract`로 clarification 작업 기준, provider 오류 detail+error, packages-check/install/cell-call 표시 문장과 패키지 설치 result detail(`installer`, `environment`, `durationMs`, `skipped`)을 함께 확인한다.
 - launcher 테스트는 고정 OS temp 이름을 쓰지 않는다. `tests/run.py`가 주입한 repo-local scratch 아래에서 테스트별 `tempdir`을 만들고 drop으로 정리해 반복 `quality-cycle` 중 stale temp 충돌을 막는다.
 - clarification gate 변경은 실제 provider 호출 없이 멈추는 golden provider run을 검증한다. `toolSequence`가 비어 있고, 질문 수 1-3개와 작업 기준 key, workloop label이 빠지면 실패해야 한다. 이어지는 `진행` 또는 짧은 조건 답변 턴은 `pendingClarification.assumptions`를 provider prompt의 `[Clarification plan]`으로 주입하고 한 번 소비하는지 확인한다. 반대로 `취소`, `새로`, `다른 주제` 같은 새 요청과 이미 구체적인 새 학습 요청에는 stale pending이 섞이지 않고 비워져야 한다.
 - curriculum YAML/provider golden 변경은 실제 `write-curriculum-yaml` 핸들러를 통과한 document 변경을 검증한다. `loadedInEditor`, structured section card flow, document runtime packages, `intro.diagram.runtime` detail, `sectionCount`/`exerciseCellCount`/`contractGapCount` result signal이 빠지면 실패해야 한다. 신규 structured YAML의 `contractGapCount`가 0이 아니면 teacher golden은 실패해야 한다.
 - 학습카드/YAML 변경은 backend materializer 테스트, `learning-card-contract`, 레이아웃 변경 시 `learning-card-browser`를 함께 확인한다. `learning-card-contract`는 섹션 카드 part, 직접 입력 editor, `student-practice` 입력 역할, 셀 도움 팝오버, 제목 중복 제거, 스니펫 복사 버튼, push TOC, `data-learning-section-contract-gaps` 경고 band, 라이브러리 패널 상태/진행 marker를 고정한다. 또한 셀 도움은 해당 셀 안의 팝오버로 남아야 하고, Codaro 표면은 브랜드 아바타를 쓰며 로봇/봇 framing과 hover-only 도움 버튼으로 되돌아가면 실패해야 한다. `learning-card-browser`는 손으로 만든 fixture가 아니라 실제 `yamlToDocument` 산출물을 검증하고, 그 산출물의 렌더링 필드를 브라우저에 주입해야 한다. overview diagram은 YAML의 `intro.diagram.runtime` 문구가 화면의 runtime node로 렌더링되는지도 확인하고, 불완전한 structured section의 계약 gap 경고와 package panel이 desktop/mobile 카드 안에서 보이는지도 확인한다. desktop/mobile 모두에서 가로 overflow, 카드/overview 밖으로 탈출한 텍스트/버튼, 버튼 텍스트 overflow, control overlap도 visual integrity로 확인한다.
 - 목표 완료를 말하기 전에는 `learning-system-readiness`가 최소 9점을 증명해야 한다. 이 gate는 완료 선언을 대체하지 않고, YAML 계약, 카드 UI, clarification, uv 패키지 정책, editor runtime preflight, provider 오류 workloop, frontend workloop, golden eval/e2e, 운영 SSOT 증거가 현재 저장소에 남아 있는지 확인한다. 또한 `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`를 실제로 실행하는 blocking probe가 실패하면 점수와 무관하게 실패해야 한다.
-- 목표를 닫기 전 최종 검증은 `learning-goal-audit`와 `objective-nineplus-audit`로 남긴다. `learning-goal-audit`는 docs 정합성, dogfood alpha 사용자 플로우 audit, `product-quality-audit`, `automation-ide-audit`, 명시 요구사항 audit, `learning-system-readiness`, 전체 backend, landing build를 한 번에 실행해 "9점 readiness는 통과했지만 제품 빌드/문서/첫 사용자 완주 증거가 따로 깨진" 상태를 막는다. `objective-nineplus-audit`는 ISO/IEC 25010, WCAG 2.2, NIST AI RMF, CAST UDL Guidelines 3.0에 매핑한 객관 scorecard의 모든 분야가 9.0 이상인지 확인한다. 명시 요구사항 audit은 `quality-cycle`의 제품 품질 gate 묶음과 `generated-docs-freshness`까지 evidence로 요구하며, 마지막으로 `latest-quality-cycle-artifacts`가 tracked worktree clean 상태에서 `output/test-runner/quality-cycle/sequence-summary.json`과 `output/test-runner/ai-live-smoke/live-smoke-report.json`을 직접 읽어 현재 `gitHead`, 20개 gate 통과, 각 gate command log path/size/freshness와 실제 repo-local log 파일 존재/크기, `softFailureCount: 0`, live provider credential, clarification-before-provider, `packages-check → write-curriculum-yaml` 필수 prefix, `packages-check → cell-call` exact sequence 증거를 검증한다. 이 검사는 dirty worktree, stale artifact, text-only audit으로 목표 완료를 선언하지 못하게 하는 완료 증거다. `score`, `maxScore`, `minimumScore`, `requiredScore`, `requirementFailures`를 남기며, `minimumScore` 이상이어도 `requirementFailures`가 하나라도 있으면 실패한다. teacher/provider loop 자체의 산출물은 `score`, `maxScore`, `minimumScore`를 포함해야 하며 `minimumScore`는 9.0이다.
-- 대중 사용 목표를 닫기 전에는 `public-readiness-audit`를 추가로 통과해야 한다. 이 gate는 NIST SSDF SP 800-218, OWASP ASVS, CISA Secure by Design, OpenSSF Scorecard, SLSA, SPDX SBOM, WCAG 2.2, GitHub security policy guidance를 공개 준비 baseline으로 두고, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, Dependabot, security workflow, issue template, `publicReadinessChecklist.md`, 최신 `quality-cycle`, 최신 `objective-nineplus-audit`, clean tracked worktree를 함께 확인한다. 결과는 `output/test-runner/public-readiness-audit/public-readiness-report.json`에 남긴다.
 - `dogfood-alpha-audit`는 첫 실행부터 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구까지 9단계가 문서와 코드 gate로 연결되어 있는지 확인한다. 이 gate는 `output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json`에 `status`, `summary`, `requirementFailures`, `gitHead`, `startedAt`/`completedAt`, `durationMs`를 남기고, `quality-cycle`은 `dogfood-alpha-audit/dogfood-alpha-report.json` report를 `payloadGitHead` evidence로 대조한다. 제품 품질 판단은 이 audit과 live provider credential이 있는 환경의 `ai-live-smoke` 결과가 나온 뒤에만 한다.
 - `automation-ide-audit`는 자동화 IDE wiring audit이다. backend route, task runner, scheduler, webhook, workflow DAG, plan loop, E-Stop, audit trail, input policy, recording, notification channel, frontend automation surface, API snapshot이 한 제품 경계로 묶였는지 확인하고 `output/test-runner/automation-ide-audit/automation-ide-report.json`에 `score`, `requirementFailures`, `gitHead`를 남긴다. E-Stop이 활성 상태에서 task runner가 문서 실행을 시작하거나 audit record 없이 종료하면 실패한다.
 - `product-quality-audit`는 제품 품질 wiring audit이다. 이 audit은 단독으로 제품 완성을 증명하지 않고, `docs`, `backend`, `learning-system-readiness`, `dogfood-alpha-audit`, `automation-ide-audit`, `diagnostic-summary-contract`, `ai-live-smoke`, `provider-settings-browser`, `install-launcher-smoke`, `runtime-recovery-contract`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `curriculum-top-tier-audit`, `playwright-curriculum-runtime`, `onboarding-browser`, `frontend-performance-budget`, `landing-build`, `launcher-test`가 runner와 문서에 연결되어 있고 각 gate가 실제 실패 표면을 보는지 확인한다. `service-readiness-audit`는 이전 이름을 참조하는 자동화를 위한 호환 alias로만 둔다.

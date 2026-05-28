@@ -44,6 +44,7 @@ def testGateNamesAreStable() -> None:
         "curriculum-quality-matrix",
         "curriculum-top-tier-audit",
         "curriculum-weakness-audit",
+        "predict-contract-strict",
         "playwright-curriculum-runtime",
         "onboarding-browser",
         "frontend-performance-budget",

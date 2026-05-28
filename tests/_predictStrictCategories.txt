@@ -1,0 +1,4 @@
+# Predict-strict 카테고리 목록 — 한 줄에 하나, # 주석 허용.
+# 여기 등록된 카테고리는 모든 exercise step에 predict.prompt + 최소 1개 expected 필드 필수.
+# 신규 카테고리는 30days 백필 완료 후 추가 (PRD C6 종료 시점에 30days 추가 예정).
+# 변경 사유는 커밋 메시지에 명시할 것.
