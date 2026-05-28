@@ -995,6 +995,18 @@ type ValidationEntry = {
   text: string;
 };
 
+// Keep in sync with EVAL_RESERVED_KEYS in src/codaro/curriculum/exerciseCheck.py.
+// These keys are consumed by the backend evaluator (runExerciseCheck) and must
+// not appear in the display panel.
+const EVAL_RESERVED_KEYS: ReadonlySet<string> = new Set([
+  "type",
+  "expectedCode",
+  "variableName",
+  "expectedValue",
+  "requiredPatterns",
+  "hints",
+]);
+
 function ValidationCriteriaBody({ block }: { block: BlockConfig }) {
   const entries = validationEntriesFromBlock(block);
   if (!entries.length) return <CurriculumMarkdownBody block={block} />;
@@ -1031,6 +1043,7 @@ function validationEntriesFromBlock(block: BlockConfig): ValidationEntry[] {
 function validationEntriesFromCheckConfig(checkConfig?: Record<string, unknown>): ValidationEntry[] {
   if (!checkConfig) return [];
   return Object.entries(checkConfig)
+    .filter(([key]) => !EVAL_RESERVED_KEYS.has(key))
     .map(([key, value]) => ({
       key,
       label: validationLabel(key),
@@ -1715,8 +1728,10 @@ function ExerciseCheckPanel({
         checkType: guide.checkConfig?.type ?? undefined,
         variableName: guide.checkConfig?.variableName ?? undefined,
         expectedValue: guide.checkConfig?.expectedValue ?? undefined,
-        requiredPatterns: guide.checkConfig?.requiredPatterns
-          ? Object.values(guide.checkConfig).filter((value): value is string => typeof value === "string")
+        requiredPatterns: Array.isArray(guide.checkConfig?.requiredPatterns)
+          ? (guide.checkConfig?.requiredPatterns as unknown[]).filter(
+              (value): value is string => typeof value === "string",
+            )
           : undefined,
         hints: guide.hints ?? [],
         currentHintLevel: nextHintLevel,

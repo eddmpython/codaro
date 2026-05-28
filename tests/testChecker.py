@@ -177,8 +177,16 @@ def testExerciseCheckDispatchesByType() -> None:
 
 def testExerciseCheckRejectsInvalidContract() -> None:
     session = KernelSession()
-    with pytest.raises(InvalidExerciseCheck, match="Invalid check type"):
+    with pytest.raises(InvalidExerciseCheck, match="expectedCode"):
         _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="output")))
+    with pytest.raises(InvalidExerciseCheck, match="variableName"):
+        _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="x = 1", checkType="variable")))
+    with pytest.raises(InvalidExerciseCheck, match="requiredPatterns"):
+        _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="contains")))
+    with pytest.raises(InvalidExerciseCheck, match="type 키가 비어"):
+        _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="")))
+    with pytest.raises(InvalidExerciseCheck, match="알 수 없는"):
+        _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="wibble")))
     session.dispose()
 
 

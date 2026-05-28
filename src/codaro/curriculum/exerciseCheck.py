@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Mapping
 
 from .checker import (
     CheckResult,
@@ -13,6 +13,16 @@ from .checker import (
     checkOutputContains,
     checkVariableSnapshotContains,
 )
+
+
+EVAL_RESERVED_KEYS: frozenset[str] = frozenset({
+    "type",
+    "expectedCode",
+    "variableName",
+    "expectedValue",
+    "requiredPatterns",
+    "hints",
+})
 
 
 class InvalidExerciseCheck(ValueError):
@@ -38,6 +48,36 @@ class ToolExerciseCheckInput:
     expected: str = ""
 
 
+def exerciseCheckInputFromConfig(
+    studentCode: str,
+    checkConfig: Mapping[str, Any],
+    *,
+    currentHintLevel: int = 0,
+) -> ExerciseCheckInput:
+    """Build ExerciseCheckInput from a curriculum YAML check dict.
+
+    Only EVAL_RESERVED_KEYS are read; display-only keys (noError, resultCheck, ...)
+    are ignored. Returns input with empty checkType if `type` missing — caller
+    should treat that as 'evaluation disabled'.
+    """
+    requiredPatterns = checkConfig.get("requiredPatterns") or []
+    if not isinstance(requiredPatterns, list):
+        requiredPatterns = []
+    hints = checkConfig.get("hints") or []
+    if not isinstance(hints, list):
+        hints = []
+    return ExerciseCheckInput(
+        studentCode=studentCode,
+        expectedCode=str(checkConfig.get("expectedCode") or ""),
+        checkType=str(checkConfig.get("type") or ""),
+        variableName=str(checkConfig.get("variableName") or ""),
+        expectedValue=str(checkConfig.get("expectedValue") or ""),
+        requiredPatterns=[str(p) for p in requiredPatterns],
+        hints=[str(h) for h in hints],
+        currentHintLevel=currentHintLevel,
+    )
+
+
 async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckResult:
     if request.checkType == "output" and request.expectedCode:
         return await checkByOutput(
@@ -60,7 +100,15 @@ async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckRe
         return await checkContains(request.studentCode, request.requiredPatterns)
     if request.checkType == "noError":
         return await checkNoError(session, request.studentCode)
-    raise InvalidExerciseCheck("Invalid check type or missing parameters.")
+    if not request.checkType:
+        raise InvalidExerciseCheck("check.type 키가 비어 있습니다. type=output/variable/contains/noError 중 하나를 지정하세요.")
+    if request.checkType == "output":
+        raise InvalidExerciseCheck("check.type=output 에는 expectedCode 또는 solution이 필요합니다.")
+    if request.checkType == "variable":
+        raise InvalidExerciseCheck("check.type=variable 에는 variableName이 필요합니다.")
+    if request.checkType == "contains":
+        raise InvalidExerciseCheck("check.type=contains 에는 requiredPatterns(리스트)가 필요합니다.")
+    raise InvalidExerciseCheck(f"알 수 없는 check.type: {request.checkType!r}")
 
 
 async def runToolExerciseCheck(session: Any, request: ToolExerciseCheckInput) -> dict[str, Any]:

@@ -120,6 +120,11 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
     if _hasStructuredExercise(section):
         starterCode = _normalizeCode(exercise.starterCode)
         solutionCode = _normalizeCode(exercise.solution)
+        checkConfig = _structuredCheckConfig(
+            checkSource=exercise.check or section.check,
+            solutionCode=solutionCode,
+            starterCode=starterCode,
+        )
         exerciseCell = _codeBlock(
             starterCode,
             role="exercise",
@@ -130,7 +135,7 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
             guide=GuideConfig(
                 exerciseType="sectionPractice",
                 hints=exercise.hints or section.tips,
-                checkConfig=exercise.check or section.check,
+                checkConfig=checkConfig,
                 difficulty=exercise.difficulty or "easy",
                 solution=solutionCode,
                 description=exercise.prompt or section.goal or "직접 코드를 입력하고 실행하세요.",
@@ -809,6 +814,32 @@ def _difficultyFromTitle(title: str) -> str:
 def _checkConfig(block: dict[str, Any]) -> dict[str, str]:
     check = _mapValue(block.get("check") or block.get("checkConfig"))
     return {str(key): _textValue(value) for key, value in check.items()}
+
+
+def _structuredCheckConfig(
+    *,
+    checkSource: Any,
+    solutionCode: str,
+    starterCode: str,
+) -> dict[str, Any]:
+    """Build the checkConfig dict for a structured section's exercise.
+
+    Reads YAML check dict and, when type=output but expectedCode missing,
+    falls back to the section's solution (provided it differs from the
+    starter — otherwise student code would always match expected).
+    """
+    if isinstance(checkSource, dict):
+        config: dict[str, Any] = {str(k): v for k, v in checkSource.items()}
+    else:
+        config = {}
+    if (
+        config.get("type") == "output"
+        and not config.get("expectedCode")
+        and solutionCode
+        and solutionCode != starterCode
+    ):
+        config["expectedCode"] = solutionCode
+    return config
 
 
 def _blockTypeLabel(sourceType: str) -> str:
