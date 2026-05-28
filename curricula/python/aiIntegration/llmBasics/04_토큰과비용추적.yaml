@@ -1,0 +1,405 @@
+meta:
+  packages:
+  - anthropic
+  id: llmBasics_04
+  title: 토큰과비용추적
+  order: 4
+  category: llmBasics
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - anthropic
+  - usage
+  - tokens
+  - 비용
+  seo:
+    title: Claude 토큰과 비용 추적 - usage 객체로 비용 가시화
+    description: response.usage로 input·output 토큰을 추적하고 호출 단위 비용을 추정해 자동화 실험의 비용 가시성을 만듭니다.
+    keywords:
+    - 토큰 추적
+    - LLM 비용
+    - input_tokens
+    - output_tokens
+    - usage
+intro:
+  emoji: 💰
+  goal: usage 객체로 호출별 토큰과 추정 비용을 가시화하는 패턴을 만든다.
+  description: 자동화 실험을 늘릴수록 비용 직감이 중요해집니다. usage를 다루는 함수와 로그 패턴을 정리해 두면 실험이 부담 없어집니다.
+  direction: usage 구조 확인 → 가격표 함수 → 호출 단위 비용 계산기 → 누적 로거 순으로 비용 인프라를 만든다.
+  benefits:
+  - usage 객체의 필드(input_tokens, output_tokens, cache 관련)를 정확히 익힌다.
+  - 모델별 단가를 사전으로 관리하고 호출 비용을 계산하는 함수를 만든다.
+  - 누적 비용을 추적하는 로거 패턴을 익힌다.
+  - 비용 비교 실험 데이터를 깔끔하게 모으는 흐름을 잡는다.
+  diagram:
+    steps:
+    - label: 1단계. usage 객체 구조 확인
+      detail: 응답에서 usage의 어떤 필드가 채워지는지 본다.
+    - label: 2단계. 가격표 사전
+      detail: 모델별 입력/출력 토큰 단가를 사전으로 관리한다.
+    - label: 3단계. 비용 계산 함수
+      detail: usage와 모델명을 받아 USD 비용을 계산한다.
+    - label: 4단계. 누적 로거
+      detail: 호출 시점/모델/토큰/비용을 한 줄씩 누적하는 로거를 만든다.
+    runtime:
+    - label: LLM 호출 환경
+      detail: anthropic 패키지와 ANTHROPIC_API_KEY가 준비된 로컬 Python에서 실행한다.
+    - label: 토큰과비용추적 실행
+      detail: 비용 함수를 통과시켜 호출별 비용을 출력한다.
+    - label: 토큰과비용추적 완료
+      detail: 7번 강의의 캐싱 효과 측정에 직접 재사용된다.
+sections:
+- id: inspect_usage
+  title: 1단계. usage 객체 둘러보기
+  structuredPrimary: true
+  subtitle: 어떤 필드가 있나
+  goal: response.usage가 가진 필드를 한 번 출력해 토큰 추적의 시작점을 잡는다.
+  why: usage는 input/output 토큰 외에도 캐싱·도구 사용 시 추가 필드를 노출합니다. 한 번 구조를 확인하면 이후 필드 확장이 자연스럽습니다.
+  explanation: usage 객체는 dataclass 비슷한 구조로, model_dump() 호출로 사전 형태를 얻을 수 있습니다. 일반 호출에서는 input_tokens와 output_tokens
+    두 값이 채워지고, 캐시 관련 필드는 0 또는 None이 들어 있습니다. 7번 강의에서 cache_read_input_tokens 필드를 다시 보게 됩니다.
+  tips:
+  - model_dump()로 사전을 만들어 두면 로그/JSON 직렬화에 그대로 쓸 수 있습니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=128,
+        messages=[{"role": "user", "content": "오늘의 한 줄 격언을 들려줘."}],
+    )
+    usageDict = response.usage.model_dump()
+    usageDict
+  exercise:
+    prompt: max_tokens를 32로 줄여 같은 호출을 다시 보내고 output_tokens가 그만큼 작아지는지 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      response = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=128,
+          messages=[{"role": "user", "content": "오늘의 한 줄 격언을 들려줘."}],
+      )
+      usageDict = response.usage.model_dump()
+      usageDict
+    hints:
+    - output_tokens는 모델 응답 길이에 비례합니다.
+    - max_tokens가 작으면 응답이 잘리고 output_tokens가 그만큼 작아집니다.
+  check:
+    noError: 호출과 model_dump 호출이 정상 실행되어야 합니다.
+    resultCheck: usageDict가 input_tokens와 output_tokens 키를 포함해야 합니다.
+- id: price_table
+  title: 2단계. 모델별 가격표 만들기
+  structuredPrimary: true
+  subtitle: 사전 한 개에 단가 정리
+  goal: claude-haiku-4-5와 비교 모델 한 개의 단가를 가진 가격 사전을 만든다.
+  why: 가격은 모델마다 다르고 가끔 갱신됩니다. 코드에서 한 곳에 모아두면 모델을 교체할 때 검색·수정이 한 줄로 끝납니다.
+  explanation: 가격은 보통 1M(백만) 토큰당 USD로 표시됩니다. 가격 사전을 만든 뒤 1M 단위를 1 토큰 단위로 환산해 호출 비용을 계산합니다. 가격은 학습 시점의 공식
+    가격을 그대로 옮기고, 실전에서는 공식 문서로 확인하는 단계를 거치는 것이 안전합니다.
+  tips:
+  - 가격 사전 키는 모델 ID와 정확히 같아야 model 인자로 그대로 검색할 수 있습니다.
+  snippet: |-
+    pricing = {
+        "claude-haiku-4-5": {
+            "input_per_million": 1.0,
+            "output_per_million": 5.0,
+        },
+        "claude-sonnet-4-6": {
+            "input_per_million": 3.0,
+            "output_per_million": 15.0,
+        },
+    }
+    pricing["claude-haiku-4-5"]
+  exercise:
+    prompt: pricing 사전에 claude-opus-4-7 항목을 추가하세요. 정확한 단가는 공식 문서를 참조한다고 가정하고 0과 0을 임시값으로 둡니다.
+    starterCode: |-
+      pricing = {
+          "claude-haiku-4-5": {
+              "input_per_million": 1.0,
+              "output_per_million": 5.0,
+          },
+          "claude-sonnet-4-6": {
+              "input_per_million": 3.0,
+              "output_per_million": 15.0,
+          },
+      }
+      pricing["claude-haiku-4-5"]
+    hints:
+    - 새 키 "claude-opus-4-7"에 input_per_million과 output_per_million을 가진 사전을 할당합니다.
+    - 임시값으로 두더라도 키가 있으면 계산 함수가 KeyError 없이 동작합니다.
+  check:
+    noError: 사전 정의가 오류 없이 평가되어야 합니다.
+    resultCheck: pricing이 두 모델 키를 포함해야 합니다.
+- id: cost_function
+  title: 3단계. 호출 단위 비용 계산
+  structuredPrimary: true
+  subtitle: usage와 model을 받아 USD 비용을 돌려주기
+  goal: estimateCost(usage, modelName, pricing) 함수로 호출 한 번의 추정 비용(USD)을 계산한다.
+  why: 호출 단위 비용을 코드로 만들면 실험 데이터 옆에 비용 컬럼을 붙일 수 있습니다. 비용 비교가 수치로 끝나기 때문에 실험 결정이 빨라집니다.
+  explanation: 단가는 1M 토큰당이므로 input_tokens * input_per_million / 1_000_000 + output_tokens * output_per_million
+    / 1_000_000 형태로 계산합니다. 캐싱이 적용되면 입력 토큰 일부가 cache_read_input_tokens로 빠지고 보통 더 싼 단가로 청구되지만, 여기서는 기본 계산만
+    다룹니다. 캐싱 단가 분기는 7번 강의에서 확장합니다.
+  tips:
+  - 가격 사전에 없는 모델이 들어오면 명시적 KeyError를 던지도록 두는 게 디버깅하기 좋습니다.
+  snippet: |-
+    import anthropic
+
+    pricing = {
+        "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+        "claude-sonnet-4-6": {"input_per_million": 3.0, "output_per_million": 15.0},
+    }
+
+    def estimateCost(usage, modelName: str, table: dict) -> float:
+        rate = table[modelName]
+        inputCost = usage.input_tokens * rate["input_per_million"] / 1_000_000
+        outputCost = usage.output_tokens * rate["output_per_million"] / 1_000_000
+        return round(inputCost + outputCost, 6)
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=200,
+        messages=[{"role": "user", "content": "한 줄로 자기소개해 줘."}],
+    )
+    cost = estimateCost(response.usage, "claude-haiku-4-5", pricing)
+    (response.usage.input_tokens, response.usage.output_tokens, cost)
+  exercise:
+    prompt: estimateCost를 호출할 때 모델명을 "claude-sonnet-4-6"으로 바꿔 가상의 sonnet 비용을 계산해 보세요.
+    starterCode: |-
+      import anthropic
+
+      pricing = {
+          "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+          "claude-sonnet-4-6": {"input_per_million": 3.0, "output_per_million": 15.0},
+      }
+
+      def estimateCost(usage, modelName: str, table: dict) -> float:
+          rate = table[modelName]
+          inputCost = usage.input_tokens * rate["input_per_million"] / 1_000_000
+          outputCost = usage.output_tokens * rate["output_per_million"] / 1_000_000
+          return round(inputCost + outputCost, 6)
+
+      client = anthropic.Anthropic()
+      response = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=200,
+          messages=[{"role": "user", "content": "한 줄로 자기소개해 줘."}],
+      )
+      cost = estimateCost(response.usage, "claude-haiku-4-5", pricing)
+      (response.usage.input_tokens, response.usage.output_tokens, cost)
+    hints:
+    - estimateCost 두 번째 인자만 "claude-sonnet-4-6"으로 바꿉니다.
+    - 같은 usage라도 단가가 다르면 비용이 달라지는 것을 확인합니다.
+  check:
+    noError: 함수 정의와 호출이 정상 실행되어야 합니다.
+    resultCheck: cost가 0보다 큰 float 값이어야 합니다.
+- id: cost_logger
+  title: 4단계. 누적 비용 로거
+  structuredPrimary: true
+  subtitle: 호출별 비용을 로그로 누적
+  goal: CostLogger 클래스로 매 호출의 토큰/비용을 한 줄씩 기록하고 총합을 돌려준다.
+  why: 자동화 실험에서는 한 번의 비용보다 누적 비용이 중요합니다. 로거 한 개를 만들어 두면 실험 보고서로 그대로 옮길 수 있습니다.
+  explanation: CostLogger는 record(model, usage) 호출마다 사전 한 줄을 entries 리스트에 추가하고 총합을 함께 추적합니다. summary
+    메서드는 총 호출 수, 총 토큰, 총 비용을 사전으로 돌려줍니다. JSON으로 직렬화해 파일로 남길 수 있도록 dataclass 대신 사전 기반으로 만듭니다.
+  tips:
+  - 로거가 비용 사전을 인자로 받게 두면 다른 가격표(예: 캐싱 가격)도 같은 로거를 재사용할 수 있습니다.
+  snippet: |-
+    import anthropic
+
+    pricing = {
+        "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+    }
+
+    class CostLogger:
+        def __init__(self, table: dict) -> None:
+            self.table = table
+            self.entries: list[dict] = []
+
+        def record(self, modelName: str, usage) -> dict:
+            rate = self.table[modelName]
+            inputCost = usage.input_tokens * rate["input_per_million"] / 1_000_000
+            outputCost = usage.output_tokens * rate["output_per_million"] / 1_000_000
+            entry = {
+                "model": modelName,
+                "input_tokens": usage.input_tokens,
+                "output_tokens": usage.output_tokens,
+                "cost_usd": round(inputCost + outputCost, 6),
+            }
+            self.entries.append(entry)
+            return entry
+
+        def summary(self) -> dict:
+            return {
+                "calls": len(self.entries),
+                "input_tokens": sum(item["input_tokens"] for item in self.entries),
+                "output_tokens": sum(item["output_tokens"] for item in self.entries),
+                "cost_usd": round(sum(item["cost_usd"] for item in self.entries), 6),
+            }
+
+    logger = CostLogger(pricing)
+    client = anthropic.Anthropic()
+    for question in ["1+1은?", "2의 제곱은?", "원주율 소수점 둘째 자리는?"]:
+        result = client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=64,
+            messages=[{"role": "user", "content": question}],
+        )
+        logger.record("claude-haiku-4-5", result.usage)
+
+    logger.summary()
+  exercise:
+    prompt: CostLogger.record가 호출 시각(datetime.utcnow().isoformat())을 함께 저장하도록 entry에 timestamp 필드를 추가하세요.
+    starterCode: |-
+      import anthropic
+      from datetime import datetime
+
+      pricing = {
+          "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+      }
+
+      class CostLogger:
+          def __init__(self, table: dict) -> None:
+              self.table = table
+              self.entries: list[dict] = []
+
+          def record(self, modelName: str, usage) -> dict:
+              rate = self.table[modelName]
+              inputCost = usage.input_tokens * rate["input_per_million"] / 1_000_000
+              outputCost = usage.output_tokens * rate["output_per_million"] / 1_000_000
+              entry = {
+                  "model": modelName,
+                  "input_tokens": usage.input_tokens,
+                  "output_tokens": usage.output_tokens,
+                  "cost_usd": round(inputCost + outputCost, 6),
+              }
+              self.entries.append(entry)
+              return entry
+
+          def summary(self) -> dict:
+              return {
+                  "calls": len(self.entries),
+                  "input_tokens": sum(item["input_tokens"] for item in self.entries),
+                  "output_tokens": sum(item["output_tokens"] for item in self.entries),
+                  "cost_usd": round(sum(item["cost_usd"] for item in self.entries), 6),
+              }
+
+      logger = CostLogger(pricing)
+      client = anthropic.Anthropic()
+      for question in ["1+1은?", "2의 제곱은?", "원주율 소수점 둘째 자리는?"]:
+          result = client.messages.create(
+              model="claude-haiku-4-5",
+              max_tokens=64,
+              messages=[{"role": "user", "content": question}],
+          )
+          logger.record("claude-haiku-4-5", result.usage)
+
+      logger.summary()
+    hints:
+    - entry 사전에 "timestamp" 키와 datetime.utcnow().isoformat() 값을 추가합니다.
+    - datetime은 from datetime import datetime으로 가져옵니다.
+  check:
+    noError: 반복 호출과 로깅이 오류 없이 실행되어야 합니다.
+    resultCheck: summary가 calls=3 이상과 양수 토큰/비용 값을 돌려줘야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 비용 비교 실험'
+  structuredPrimary: true
+  subtitle: 두 max_tokens 설정 비용을 데이터로 비교
+  goal: 동일 질문에 max_tokens 64와 256 두 설정으로 호출해 비용 차이가 데이터로 드러나는지 확인한다.
+  why: 자동화 비용 절감은 보통 max_tokens·system 길이·캐싱에서 옵니다. 비용 차이를 코드로 측정하는 흐름이 모든 절감 결정의 기반입니다.
+  explanation: 같은 질문을 짧은 응답(64) 설정과 긴 응답(256) 설정으로 보냅니다. output_tokens가 크게 다르면 비용이 비례해 차이가 납니다. 결과를 사전 한
+    개로 묶어 한눈에 비교합니다.
+  tips:
+  - 한 셀에서 두 번 호출할 때는 결과 변수명을 short/long처럼 의미 있게 분리합니다.
+  snippet: |-
+    import anthropic
+
+    pricing = {
+        "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+    }
+
+    def costOf(usage, modelName: str, table: dict) -> float:
+        rate = table[modelName]
+        return round(
+            usage.input_tokens * rate["input_per_million"] / 1_000_000
+            + usage.output_tokens * rate["output_per_million"] / 1_000_000,
+            6,
+        )
+
+    client = anthropic.Anthropic()
+    question = "Python의 리스트 컴프리헨션을 자세히 설명해 줘."
+
+    shortResult = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=64,
+        messages=[{"role": "user", "content": question}],
+    )
+    longResult = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=256,
+        messages=[{"role": "user", "content": question}],
+    )
+
+    comparison = {
+        "short": {
+            "output_tokens": shortResult.usage.output_tokens,
+            "cost_usd": costOf(shortResult.usage, "claude-haiku-4-5", pricing),
+        },
+        "long": {
+            "output_tokens": longResult.usage.output_tokens,
+            "cost_usd": costOf(longResult.usage, "claude-haiku-4-5", pricing),
+        },
+    }
+    assert comparison["short"]["output_tokens"] <= comparison["long"]["output_tokens"]
+    assert comparison["short"]["cost_usd"] <= comparison["long"]["cost_usd"]
+    comparison
+  exercise:
+    prompt: comparison에 max_tokens=512인 "extraLong" 항목을 추가하고 short ≤ long ≤ extraLong 비용 관계를 assertion으로 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      pricing = {
+          "claude-haiku-4-5": {"input_per_million": 1.0, "output_per_million": 5.0},
+      }
+
+      def costOf(usage, modelName: str, table: dict) -> float:
+          rate = table[modelName]
+          return round(
+              usage.input_tokens * rate["input_per_million"] / 1_000_000
+              + usage.output_tokens * rate["output_per_million"] / 1_000_000,
+              6,
+          )
+
+      client = anthropic.Anthropic()
+      question = "Python의 리스트 컴프리헨션을 자세히 설명해 줘."
+
+      shortResult = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=64,
+          messages=[{"role": "user", "content": question}],
+      )
+      longResult = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=256,
+          messages=[{"role": "user", "content": question}],
+      )
+
+      comparison = {
+          "short": {
+              "output_tokens": shortResult.usage.output_tokens,
+              "cost_usd": costOf(shortResult.usage, "claude-haiku-4-5", pricing),
+          },
+          "long": {
+              "output_tokens": longResult.usage.output_tokens,
+              "cost_usd": costOf(longResult.usage, "claude-haiku-4-5", pricing),
+          },
+      }
+      assert comparison["short"]["output_tokens"] <= comparison["long"]["output_tokens"]
+      assert comparison["short"]["cost_usd"] <= comparison["long"]["cost_usd"]
+      comparison
+    hints:
+    - 추가 호출 변수명은 extraLongResult 같은 새 이름을 사용합니다.
+    - 같은 질문이라도 max_tokens 상한이 충분하면 응답 길이가 비슷해질 수 있으므로 비용 관계가 ≤로 적힌다는 점을 기억합니다.
+  check:
+    noError: 두 번의 호출과 비용 계산이 정상 실행되어야 합니다.
+    resultCheck: short cost ≤ long cost 관계가 assertion을 통과해야 합니다.
