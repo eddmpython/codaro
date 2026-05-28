@@ -1,9 +1,9 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Lightbulb, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { CheckResult } from "@/types";
+import type { CheckResult, MisconceptionMatch } from "@/types";
 
 export function CheckResultPanel({
   result,
@@ -79,6 +79,69 @@ export function CheckResultPanel({
           </pre>
         </details>
       ) : null}
+      {result.misconceptionMatches && result.misconceptionMatches.length > 0 ? (
+        <MisconceptionList
+          matches={result.misconceptionMatches}
+          doneCriterionViolated={result.doneCriterionViolated ?? false}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function MisconceptionList({
+  matches,
+  doneCriterionViolated,
+}: {
+  matches: MisconceptionMatch[];
+  doneCriterionViolated: boolean;
+}) {
+  return (
+    <div className="space-y-2" data-check-result-misconceptions="true">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase text-foreground/70">
+        <AlertTriangle className="size-3.5" />
+        <span>오개념 진단</span>
+        {doneCriterionViolated ? (
+          <Badge variant="destructive" className="text-[10px]">
+            반복
+          </Badge>
+        ) : null}
+      </div>
+      {matches.map((match) => (
+        <div
+          key={match.misconceptionId}
+          className="rounded border border-amber-400/40 bg-amber-50/60 px-2 py-2 text-foreground/90"
+          data-misconception-id={match.misconceptionId}
+          data-misconception-repeat={match.repeatStatus}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-medium">{match.label}</div>
+            <Badge variant="outline" className="text-[10px]">
+              {match.repeatStatus === "repeat" ? `${match.hitCount}회째` : "처음"}
+            </Badge>
+          </div>
+          <p className="mt-1 text-[11px] leading-5 text-foreground/75">{match.summary}</p>
+          {match.diagnostic.message ? (
+            <p className="mt-1 text-[11px] leading-5 text-foreground/80">
+              {match.diagnostic.message}
+            </p>
+          ) : null}
+          {match.correction.hint ? (
+            <div className="mt-2 flex items-start gap-1.5 text-[11px] leading-5 text-foreground/80">
+              <Lightbulb className="mt-0.5 size-3 text-amber-600" />
+              <span>{match.correction.hint}</span>
+            </div>
+          ) : null}
+          {match.correction.miniExercise ? (
+            <details className="mt-1 text-[10px] text-muted-foreground">
+              <summary className="cursor-pointer">교정 코드 보기</summary>
+              <pre className="mt-1 whitespace-pre-wrap rounded bg-background/70 p-2 font-mono leading-4">
+                {match.correction.miniExercise}
+              </pre>
+            </details>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 }
