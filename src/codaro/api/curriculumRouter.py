@@ -14,6 +14,7 @@ from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, H
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
+from ..curriculum.analyticsTimeline import buildSnapshot
 from ..curriculum.reviewScheduler import daysOverdue
 from .requestModels import (
     CheckExerciseRequest,
@@ -456,6 +457,65 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             formatLogFields(action="reviews-list", dueCount=len(items)),
         )
         return {"reviews": items, "totalDue": len(items)}
+
+    def _refreshAnalyticsSnapshot() -> None:
+        taxonomy = state.curriculumOs.taxonomy()
+        graph = state.curriculumOs.graph()
+        validated = state.progressTracker.listValidatedOutcomes()
+        report = computeMastery(graph, taxonomy, state.progressTracker, validated)
+        snapshot = buildSnapshot(state.progressTracker, report)
+        state.analyticsTimeline.append(snapshot)
+
+    @router.get("/api/curriculum/analytics")
+    def apiCurriculumAnalytics(days: int = 30) -> dict[str, object]:
+        _refreshAnalyticsSnapshot()
+        snapshots = state.analyticsTimeline.loadRange()
+        if days > 0 and len(snapshots) > days:
+            snapshots = snapshots[-days:]
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(action="analytics", snapshotCount=len(snapshots), days=days),
+        )
+        return {
+            "snapshots": [snap.model_dump() for snap in snapshots],
+            "totalSnapshots": len(snapshots),
+        }
+
+    @router.get("/api/curriculum/analytics/summary")
+    def apiCurriculumAnalyticsSummary() -> dict[str, object]:
+        _refreshAnalyticsSnapshot()
+        snapshots = state.analyticsTimeline.loadRange()
+        if not snapshots:
+            return {"available": False}
+        latest = snapshots[-1]
+        first = snapshots[0]
+        recent30 = snapshots[-30:] if len(snapshots) > 30 else snapshots
+        lessonsRecent = sum(s.lessonsCompletedToday for s in recent30)
+        sectionsRecent = sum(s.sectionsCompletedToday for s in recent30)
+        creditsRecent = sum(s.creditsToday for s in recent30)
+        hintHistogram: dict[str, int] = {}
+        for snap in recent30:
+            for k, v in snap.hintLevelHistogram.items():
+                hintHistogram[k] = hintHistogram.get(k, 0) + v
+        domainTouches: dict[str, int] = {}
+        for snap in recent30:
+            for dom in snap.domainsTouched:
+                domainTouches[dom] = domainTouches.get(dom, 0) + 1
+        return {
+            "available": True,
+            "firstDate": first.date,
+            "latestDate": latest.date,
+            "currentMastered": latest.masteredCount,
+            "totalOutcomes": latest.totalOutcomes,
+            "recent30": {
+                "lessons": lessonsRecent,
+                "sections": sectionsRecent,
+                "credits": creditsRecent,
+                "hintHistogram": hintHistogram,
+                "domainTouches": dict(sorted(domainTouches.items(), key=lambda kv: -kv[1])),
+            },
+            "totalSnapshots": len(snapshots),
+        }
 
     @router.post("/api/curriculum/reviews/{category}/{contentId}")
     def apiRecordReviewResult(category: str, contentId: str, request: ReviewResultRequest) -> dict[str, object]:
