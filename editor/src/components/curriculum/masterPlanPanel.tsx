@@ -476,10 +476,29 @@ function PlanBody({
         </div>
       )}
 
+      {plan.dynamicGaps && plan.dynamicGaps.length > 0 && (
+        <div className="rounded-md border border-sky-700/40 bg-sky-950/30 px-3 py-2.5">
+          <div className="flex items-center gap-1 text-xs font-medium text-sky-200">
+            <MapPinned className="h-3 w-3" /> 보강 필요 능력 (학습자 mastery 낮음)
+          </div>
+          <ul className="mt-1.5 space-y-1.5 text-xs text-sky-100/80">
+            {plan.dynamicGaps.map((gap) => (
+              <li key={`dyn-${gap.outcomeId}`}>
+                <span className="font-medium">{gap.outcomeLabel}</span>{" "}
+                <span className="text-sky-200/60">— {gap.reason}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-1.5 text-[11px] text-sky-200/60">
+            Predict-Run-Reconcile-Adapt 루프가 잡아낸 약점입니다. 같은 outcome으로 다시 연습하세요.
+          </div>
+        </div>
+      )}
+
       {plan.gaps.length > 0 && (
         <div className="rounded-md border border-amber-700/40 bg-amber-950/30 px-3 py-2.5">
           <div className="flex items-center gap-1 text-xs font-medium text-amber-200">
-            <MapPinned className="h-3 w-3" /> 미충족 능력
+            <MapPinned className="h-3 w-3" /> 미충족 능력 (커리큘럼에 강의 없음)
           </div>
           <ul className="mt-1.5 space-y-2 text-xs text-amber-100/80">
             {plan.gaps.map((gap) => (
