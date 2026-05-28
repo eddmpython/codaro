@@ -43,6 +43,7 @@ categoryMapping = {
     'procCtl': '프로세스자동화',
     'watchSched': '감시·스케줄',
     'inputCtl': '입력·GUI자동화',
+    'llmBasics': 'LLM 통합 기초',
 }
 
 categoryMeta = {
@@ -238,6 +239,12 @@ categoryMeta = {
         'description': '키보드·마우스·화면 입력으로 GUI 작업을 자동화한다',
         'imageUrl': None,
     },
+    'llmBasics': {
+        'icon': 'auto_awesome',
+        'color': 'violet',
+        'description': 'Claude API로 대화·도구·캐싱·구조화 출력을 실무 자동화에 붙인다',
+        'imageUrl': None,
+    },
 }
 
 categoryGroups = {
@@ -248,6 +255,7 @@ categoryGroups = {
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
     '자동화': ['playwright', 'excel', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
     '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
+    'AI 통합': ['llmBasics'],
 }
 
 categoryTree = [
@@ -329,6 +337,13 @@ categoryTree = [
         'folder': 'imageVision',
         'categories': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     },
+    {
+        'id': 'ai-integration',
+        'name': 'AI 통합',
+        'description': 'Claude API로 대화·도구·캐싱·구조화 출력을 실무 자동화 흐름에 붙인다.',
+        'folder': 'aiIntegration',
+        'categories': ['llmBasics'],
+    },
 ]
 
 
@@ -373,7 +388,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {

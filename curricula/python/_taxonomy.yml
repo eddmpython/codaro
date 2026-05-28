@@ -388,6 +388,26 @@ outcomes:
     label: LLM 전처리
     description: 토큰화, 마스킹, 정제 파이프라인
 
+  # === LLM API 통합 ===
+  - id: llm.intro
+    label: LLM API 첫 호출
+    description: anthropic SDK 초기화, Messages API 기본 호출, 응답 파싱
+  - id: llm.conversations
+    label: 대화와 비용 추적
+    description: 시스템 프롬프트, 멀티턴 히스토리, usage 토큰 추적
+  - id: llm.streaming
+    label: 스트리밍 응답
+    description: 스트림 이벤트 처리, 점진적 출력, 부분 응답 누적
+  - id: llm.structuredOutput
+    label: 구조화 출력
+    description: JSON 강제, 스키마 지시, 파싱 검증과 재시도
+  - id: llm.caching
+    label: 프롬프트 캐싱
+    description: cache_control, 시스템 프롬프트 캐시, 비용 절감 측정
+  - id: llm.toolUse
+    label: 도구 사용
+    description: 도구 정의, tool_use 루프, 결과 전달, 멀티 도구 라우팅
+
 # 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
 domains:
   - id: dataReporting
@@ -688,6 +708,20 @@ domains:
       - builtins.cli
       - builtins.logging
       - builtins.subprocess
+
+  - id: aiIntegration
+    label: AI/LLM 통합
+    description: Claude API로 대화·도구·캐싱·구조화 출력을 묶어 자동화 흐름에 LLM을 붙인다.
+    targetOutcomes:
+      - python.functions
+      - python.errorHandling
+      - python.modulesAndIo
+      - llm.intro
+      - llm.conversations
+      - llm.streaming
+      - llm.structuredOutput
+      - llm.caching
+      - llm.toolUse
 
 # 기존 레슨 backfill. 레슨 YAML meta.outcomes/prerequisites가 있으면 그쪽이 우선.
 lessonOutcomes:
@@ -2332,3 +2366,49 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [python.functions]
     estimatedMinutes: 30
+
+  # llmBasics 트랙
+  "llmBasics/00_LLM통합소개":
+    outcomes: []
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "llmBasics/01_첫Claude호출":
+    outcomes: [llm.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 40
+  "llmBasics/02_시스템프롬프트역할부여":
+    outcomes: [llm.intro]
+    prerequisites: [llm.intro]
+    estimatedMinutes: 40
+  "llmBasics/03_멀티턴대화만들기":
+    outcomes: [llm.conversations]
+    prerequisites: [llm.intro]
+    estimatedMinutes: 45
+  "llmBasics/04_토큰과비용추적":
+    outcomes: [llm.conversations]
+    prerequisites: [llm.conversations]
+    estimatedMinutes: 40
+  "llmBasics/05_스트리밍응답":
+    outcomes: [llm.streaming]
+    prerequisites: [llm.intro]
+    estimatedMinutes: 50
+  "llmBasics/06_JSON구조화출력":
+    outcomes: [llm.structuredOutput]
+    prerequisites: [llm.conversations, python.errorHandling]
+    estimatedMinutes: 55
+  "llmBasics/07_프롬프트캐싱":
+    outcomes: [llm.caching]
+    prerequisites: [llm.conversations]
+    estimatedMinutes: 55
+  "llmBasics/08_도구사용기초":
+    outcomes: [llm.toolUse]
+    prerequisites: [llm.structuredOutput]
+    estimatedMinutes: 60
+  "llmBasics/09_멀티도구라우팅":
+    outcomes: [llm.toolUse]
+    prerequisites: [llm.toolUse]
+    estimatedMinutes: 60
+  "llmBasics/10_데이터분석봇":
+    outcomes: []
+    prerequisites: [llm.toolUse, llm.caching, llm.structuredOutput]
+    estimatedMinutes: 90
