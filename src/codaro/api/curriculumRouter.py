@@ -14,11 +14,13 @@ from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, H
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
+from ..curriculum.reviewScheduler import daysOverdue
 from .requestModels import (
     CheckExerciseRequest,
     CurriculumProgressRequest,
     MasterPlanRequest,
     OutcomeValidationRequest,
+    ReviewResultRequest,
 )
 
 
@@ -427,5 +429,46 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             "mastery": mastery.model_dump(),
             "misconceptionHits": related,
         }
+
+    @router.get("/api/curriculum/reviews")
+    def apiCurriculumReviews() -> dict[str, object]:
+        dueStates = state.progressTracker.listDueReviews()
+        graph = state.curriculumOs.graph()
+        items: list[dict[str, object]] = []
+        for review in dueStates:
+            lesson = graph.byKey(review.lessonKey)
+            items.append({
+                "lessonKey": review.lessonKey,
+                "title": lesson.title if lesson else review.lessonKey,
+                "category": lesson.category if lesson else "",
+                "contentId": lesson.contentId if lesson else "",
+                "interval": review.interval,
+                "ease": review.ease,
+                "streak": review.streak,
+                "lastResult": review.lastResult,
+                "nextReviewAt": review.nextReviewAt,
+                "daysOverdue": daysOverdue(review),
+            })
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(action="reviews-list", dueCount=len(items)),
+        )
+        return {"reviews": items, "totalDue": len(items)}
+
+    @router.post("/api/curriculum/reviews/{category}/{contentId}")
+    def apiRecordReviewResult(category: str, contentId: str, request: ReviewResultRequest) -> dict[str, object]:
+        key = f"{category}/{contentId}"
+        updated = state.progressTracker.recordReviewResult(key, request.success)
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="review-result",
+                lessonKey=key,
+                success=request.success,
+                streak=updated.streak,
+                interval=updated.interval,
+            ),
+        )
+        return updated.model_dump()
 
     return router

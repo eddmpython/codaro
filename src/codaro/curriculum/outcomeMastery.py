@@ -18,19 +18,42 @@ mastery > MASTERY_THRESHOLD인 outcome은 plan에서 제외된다.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from math import prod
 
 from pydantic import BaseModel, Field
 
 from .lessonGraph import LessonGraph
 from .outcomeCredit import OutcomeCreditEntry, creditContribution
-from .progress import ProgressTracker
+from .progress import LessonProgress, ProgressTracker
 from .taxonomy import CurriculumTaxonomy
 
 
 COMPLETED_CONTRIB = 0.6
 ACCESSED_CONTRIB = 0.2
 MASTERY_THRESHOLD = 0.8
+DECAY_HALFLIFE_DAYS = 30.0
+DECAY_FLOOR = 0.25
+
+
+def _decayedContribution(baseContrib: float, isoTimestamp: str | None) -> float:
+    """ISO timestamp 의 마지막 접촉 이후 시간을 반영해 contribution 을 줄인다.
+
+    half-life = DECAY_HALFLIFE_DAYS. 30 일 지나면 0.5 배, 60 일 0.25 배.
+    floor 는 DECAY_FLOOR — 학습 흔적은 완전히 사라지지 않게.
+    """
+    if not isoTimestamp:
+        return baseContrib
+    try:
+        ts = datetime.fromisoformat(isoTimestamp)
+    except ValueError:
+        return baseContrib
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    delta = datetime.now(timezone.utc) - ts
+    days = max(0.0, delta.total_seconds() / 86400.0)
+    factor = max(DECAY_FLOOR, 0.5 ** (days / DECAY_HALFLIFE_DAYS))
+    return baseContrib * factor
 
 
 class OutcomeMastery(BaseModel):
@@ -65,15 +88,13 @@ class MasteryReport(BaseModel):
     totalOutcomeCount: int
 
 
-def _lessonStateMap(progressTracker: ProgressTracker) -> dict[str, str]:
-    """레슨 키 -> 'completed' | 'inProgress' | 'untouched'."""
+def _lessonStateMap(progressTracker: ProgressTracker) -> dict[str, tuple[str, LessonProgress]]:
+    """레슨 키 -> ('completed' | 'inProgress', LessonProgress) — decay 계산에 쓸 timestamp 동봉."""
     state = progressTracker.load()
-    out: dict[str, str] = {}
+    out: dict[str, tuple[str, LessonProgress]] = {}
     for key, lesson in state.lessons.items():
-        if lesson.completedAt:
-            out[key] = "completed"
-        else:
-            out[key] = "inProgress"
+        status = "completed" if lesson.completedAt else "inProgress"
+        out[key] = (status, lesson)
     return out
 
 
@@ -105,16 +126,25 @@ def computeMastery(
         inProgress: list[str] = []
         contributions: list[float] = []
         for lesson in providers:
-            state = lessonStates.get(lesson.key)
-            if state == "completed":
+            entry = lessonStates.get(lesson.key)
+            if entry is None:
+                continue
+            status, lessonProgress = entry
+            if status == "completed":
                 completed.append(lesson.key)
-                contributions.append(COMPLETED_CONTRIB)
-            elif state == "inProgress":
+                contributions.append(
+                    _decayedContribution(COMPLETED_CONTRIB, lessonProgress.lastAccessedAt or lessonProgress.completedAt)
+                )
+            elif status == "inProgress":
                 inProgress.append(lesson.key)
-                contributions.append(ACCESSED_CONTRIB)
+                contributions.append(
+                    _decayedContribution(ACCESSED_CONTRIB, lessonProgress.lastAccessedAt)
+                )
         credits = creditMap.get(outcome.id, [])
         for credit in credits:
-            contributions.append(creditContribution(credit.weight))
+            contributions.append(
+                _decayedContribution(creditContribution(credit.weight), credit.creditedAt)
+            )
         lastCreditAt = credits[-1].creditedAt if credits else None
         if outcome.id in validated:
             level = 1.0

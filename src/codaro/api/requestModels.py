@@ -105,3 +105,7 @@ class MasterPlanRequest(BaseModel):
 class OutcomeValidationRequest(BaseModel):
     outcomeId: str
     validated: bool = True
+
+
+class ReviewResultRequest(BaseModel):
+    success: bool = True
