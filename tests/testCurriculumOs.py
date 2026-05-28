@@ -475,3 +475,153 @@ def testCurriculumOsApiEndpoints(tmp_path) -> None:
         json={"domain": "nonexistent"},
     )
     assert unknown.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# Phase 2b — Outcome credit & section-level outcomes
+# ---------------------------------------------------------------------------
+
+
+def _miniTaxonomyWithSections(tmp_path):
+    yamlText = (
+        "outcomes:\n"
+        "  - id: a.intro\n    label: A intro\n"
+        "  - id: a.advanced\n    label: A advanced\n"
+        "domains:\n"
+        "  - id: dom\n    label: Dom\n    targetOutcomes: [a.intro, a.advanced]\n"
+        "lessonOutcomes:\n"
+        "  cat/lessonA:\n"
+        "    outcomes: [a.intro, a.advanced]\n"
+        "    sectionOutcomes:\n"
+        "      sec1: [a.intro]\n"
+        "      sec2: [a.advanced]\n"
+    )
+    path = tmp_path / "tax.yml"
+    path.write_text(yamlText, encoding="utf-8")
+    return path
+
+
+def testTaxonomySectionOutcomesParsed(tmp_path) -> None:
+    path = _miniTaxonomyWithSections(tmp_path)
+    taxonomy = loadTaxonomy(path)
+    record = taxonomy.lessonRecord("cat", "lessonA")
+    assert record is not None
+    assert record.sectionOutcomes == {"sec1": ["a.intro"], "sec2": ["a.advanced"]}
+
+
+def testTaxonomySectionOutcomesMustBeSubset(tmp_path) -> None:
+    yamlText = (
+        "outcomes:\n"
+        "  - id: a.intro\n    label: A\n"
+        "domains: []\n"
+        "lessonOutcomes:\n"
+        "  cat/lessonA:\n"
+        "    outcomes: [a.intro]\n"
+        "    sectionOutcomes:\n"
+        "      sec1: [a.intro, a.unrelated]\n"
+    )
+    path = tmp_path / "tax.yml"
+    path.write_text(yamlText, encoding="utf-8")
+    with pytest.raises(ValueError, match="a.unrelated"):
+        loadTaxonomy(path)
+
+
+def testProgressRecordsSectionResult(tmp_path) -> None:
+    from codaro.curriculum.progress import ProgressTracker
+
+    storage = tmp_path / "progress.json"
+    tracker = ProgressTracker(storagePath=storage)
+    result = tracker.recordSectionResult("cat", "lesson", "sec1", passed=False, hintLevel=1)
+    assert result.attemptCount == 1
+    assert not result.passed
+    result2 = tracker.recordSectionResult("cat", "lesson", "sec1", passed=True, hintLevel=2)
+    assert result2.attemptCount == 2
+    assert result2.passed
+    assert result2.firstPassAt is not None
+
+
+def testCheckPassCreditsOutcome(tmp_path) -> None:
+    from codaro.curriculum.progress import ProgressTracker
+
+    storage = tmp_path / "progress.json"
+    tracker = ProgressTracker(storagePath=storage)
+    credited, auto = tracker.creditCheckPass(
+        "cat", "lesson", "sec1", ["a.intro"], hintLevel=0,
+    )
+    assert credited == ["a.intro"]
+    assert auto == []
+    credits = tracker.listOutcomeCredits("a.intro")
+    assert len(credits) == 1
+    assert credits[0].weight == 1.0
+    assert credits[0].hintLevel == 0
+
+
+def testHintLevelReducesCreditWeight(tmp_path) -> None:
+    from codaro.curriculum.outcomeCredit import hintWeight
+
+    assert hintWeight(0) == 1.0
+    assert hintWeight(1) == 0.7
+    assert hintWeight(2) == 0.5
+    assert hintWeight(3) == 0.3
+    assert hintWeight(10) == 0.2  # min floor
+
+
+def testAutoValidatedAfterThreshold(tmp_path) -> None:
+    from codaro.curriculum.progress import ProgressTracker
+
+    storage = tmp_path / "progress.json"
+    tracker = ProgressTracker(storagePath=storage)
+    for sectionId in ("sec1", "sec2", "sec3"):
+        credited, auto = tracker.creditCheckPass(
+            "cat", "lesson", sectionId, ["a.intro"], hintLevel=0,
+        )
+    assert credited == ["a.intro"]
+    assert auto == ["a.intro"], "3 first-try credits should auto-validate"
+    assert "a.intro" in tracker.listAutoValidatedOutcomes()
+    assert "a.intro" in tracker.listValidatedOutcomes()
+
+
+def testAutoValidatedRespectsAverageWeight(tmp_path) -> None:
+    from codaro.curriculum.progress import ProgressTracker
+
+    storage = tmp_path / "progress.json"
+    tracker = ProgressTracker(storagePath=storage)
+    # 3 credits at hintLevel=2 → weight 0.5 average → below 0.7 threshold
+    for sectionId in ("a", "b", "c"):
+        tracker.creditCheckPass("cat", "lesson", sectionId, ["a.intro"], hintLevel=2)
+    assert "a.intro" not in tracker.listAutoValidatedOutcomes()
+
+
+def testComputeMasteryIncludesCredits(tmp_path) -> None:
+    from codaro.curriculum.lessonGraph import LessonGraph, LessonNode
+    from codaro.curriculum.outcomeMastery import computeMastery
+    from codaro.curriculum.progress import ProgressTracker
+    from codaro.curriculum.taxonomy import CurriculumTaxonomy, OutcomeDef
+
+    storage = tmp_path / "progress.json"
+    tracker = ProgressTracker(storagePath=storage)
+    tracker.creditCheckPass("cat", "lesson", "sec1", ["a.intro"], hintLevel=0)
+    graph = LessonGraph(lessons=[LessonNode(
+        category="cat", contentId="lesson", title="L",
+        outcomes=["a.intro"],
+        sectionOutcomes={"sec1": ["a.intro"]},
+    )])
+    taxonomy = CurriculumTaxonomy(outcomes=[OutcomeDef(id="a.intro", label="A")])
+    report = computeMastery(graph, taxonomy, tracker)
+    entry = next(o for o in report.outcomes if o.outcomeId == "a.intro")
+    # credit weight 1.0 → 0.5 contribution
+    assert entry.level >= 0.5
+    assert entry.creditCount == 1
+
+
+def testLessonNodeOutcomesForSection() -> None:
+    from codaro.curriculum.lessonGraph import LessonNode
+
+    node = LessonNode(
+        category="cat", contentId="lesson", title="L",
+        outcomes=["a", "b"],
+        sectionOutcomes={"sec1": ["a"]},
+    )
+    assert node.outcomesForSection("sec1") == ["a"]
+    # 매핑 없는 섹션은 lesson outcomes 전체 fallback
+    assert node.outcomesForSection("unknown") == ["a", "b"]

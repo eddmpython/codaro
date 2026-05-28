@@ -31,6 +31,7 @@ class LessonOutcomeRecord(BaseModel):
     prerequisites: list[str] = Field(default_factory=list)
     estimatedMinutes: int = 0
     practicalDomain: list[str] = Field(default_factory=list)
+    sectionOutcomes: dict[str, list[str]] = Field(default_factory=dict)
 
 
 class CurriculumTaxonomy(BaseModel):
@@ -81,6 +82,17 @@ class CurriculumTaxonomy(BaseModel):
                     errors.append(
                         f"lesson {key}: unknown prerequisite '{outcomeId}'"
                     )
+            ownOutcomes = set(record.outcomes)
+            for sectionId, sectionOutcomes in record.sectionOutcomes.items():
+                for outcomeId in sectionOutcomes:
+                    if outcomeId not in knownOutcomes:
+                        errors.append(
+                            f"lesson {key} §{sectionId}: unknown outcome '{outcomeId}'"
+                        )
+                    elif outcomeId not in ownOutcomes:
+                        errors.append(
+                            f"lesson {key} §{sectionId}: section outcome '{outcomeId}' not in lesson outcomes"
+                        )
         return errors
 
 
@@ -132,9 +144,21 @@ def mergeLessonRecord(
         if isinstance(metaPayload.get("practicalDomain"), list)
         else None
     ) or (fromTaxonomy.practicalDomain if fromTaxonomy else [])
+    metaSectionOutcomes = metaPayload.get("sectionOutcomes")
+    if isinstance(metaSectionOutcomes, dict):
+        sectionOutcomes = {
+            str(sid): [str(o) for o in sids if isinstance(o, str)]
+            for sid, sids in metaSectionOutcomes.items()
+            if isinstance(sids, list)
+        }
+    elif fromTaxonomy:
+        sectionOutcomes = {k: list(v) for k, v in fromTaxonomy.sectionOutcomes.items()}
+    else:
+        sectionOutcomes = {}
     return LessonOutcomeRecord(
         outcomes=[str(o) for o in outcomes if isinstance(o, str)],
         prerequisites=[str(p) for p in prerequisites if isinstance(p, str)],
         estimatedMinutes=int(estimatedMinutes or 0),
         practicalDomain=[str(d) for d in practicalDomain if isinstance(d, str)],
+        sectionOutcomes=sectionOutcomes,
     )

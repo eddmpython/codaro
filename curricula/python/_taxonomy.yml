@@ -352,6 +352,27 @@ outcomes:
   - id: automation.excel.workbook
     label: 워크북 조작
     description: 시트, 범위, 수식 다루기
+  - id: automation.excel.formulas
+    label: 엑셀 수식과 이름 영역
+    description: SUM/IF/VLOOKUP 수식 입력과 DefinedName 활용
+  - id: automation.excel.styles
+    label: 셀 서식과 숫자 포맷
+    description: Font/Fill/Border/Alignment, number_format, NamedStyle 재사용
+  - id: automation.excel.conditional
+    label: 조건부 서식
+    description: ColorScale, DataBar, CellIs, FormulaRule
+  - id: automation.excel.charts
+    label: 엑셀 차트 삽입
+    description: BarChart/LineChart/PieChart, Reference, anchor 배치
+  - id: automation.excel.images
+    label: 이미지와 하이퍼링크
+    description: add_image, cell.hyperlink, Comment
+  - id: automation.excel.tables
+    label: 표와 데이터 검증
+    description: Table/TableStyleInfo, DataValidation, freeze_panes
+  - id: automation.excel.report
+    label: 엑셀 리포트 생성기
+    description: 다중 시트 + 수식 + 서식 + 차트 결합 자동 보고서
 
   - id: automation.fileOps
     label: 파일 자동화
@@ -433,6 +454,12 @@ domains:
       - python.modulesAndIo
       - automation.excel.intro
       - automation.excel.workbook
+      - automation.excel.formulas
+      - automation.excel.styles
+      - automation.excel.conditional
+      - automation.excel.charts
+      - automation.excel.tables
+      - automation.excel.report
       - pandas.loadFrame
       - pandas.aggregate
 
@@ -2412,3 +2439,85 @@ lessonOutcomes:
     outcomes: []
     prerequisites: [llm.toolUse, llm.caching, llm.structuredOutput]
     estimatedMinutes: 90
+
+  # openpyxl 트랙 — 파일 기반 엑셀 자동화
+  "openpyxl/00_openpyxl소개":
+    outcomes: [automation.excel.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "openpyxl/01_워크북과시트만들기":
+    outcomes: [automation.excel.intro, automation.excel.workbook]
+    prerequisites: [automation.excel.intro]
+    estimatedMinutes: 40
+  "openpyxl/02_셀읽기와쓰기":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 45
+  "openpyxl/03_범위와다중시트":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 50
+  "openpyxl/04_수식과이름영역":
+    outcomes: [automation.excel.formulas]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "openpyxl/05_셀서식과숫자포맷":
+    outcomes: [automation.excel.styles]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "openpyxl/06_조건부서식":
+    outcomes: [automation.excel.conditional]
+    prerequisites: [automation.excel.styles]
+    estimatedMinutes: 55
+  "openpyxl/07_차트삽입":
+    outcomes: [automation.excel.charts]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 60
+  "openpyxl/08_이미지와하이퍼링크":
+    outcomes: [automation.excel.images]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 50
+  "openpyxl/09_표와데이터검증":
+    outcomes: [automation.excel.tables]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "openpyxl/10_월간매출리포트생성기":
+    outcomes: [automation.excel.report]
+    prerequisites:
+      - automation.excel.workbook
+      - automation.excel.formulas
+      - automation.excel.styles
+      - automation.excel.conditional
+      - automation.excel.charts
+      - automation.excel.tables
+    estimatedMinutes: 90
+
+  # xlwings 트랙 — 라이브 Excel 자동화
+  "xlwings/00_xlwings소개":
+    outcomes: [automation.excel.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "xlwings/01_첫엑셀연결":
+    outcomes: [automation.excel.intro, automation.excel.workbook]
+    prerequisites: [automation.excel.intro]
+    estimatedMinutes: 40
+  "xlwings/02_가격표일괄입력":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 45
+  "xlwings/03_시트탐색과확장":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 50
+  "xlwings/04_DataFrame왕복":
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook, pandas.loadFrame]
+    estimatedMinutes: 55
+  "xlwings/05_수식과서식":
+    outcomes: [automation.excel.formulas, automation.excel.styles]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "xlwings/06_막대차트자동생성":
+    outcomes: [automation.excel.charts]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55

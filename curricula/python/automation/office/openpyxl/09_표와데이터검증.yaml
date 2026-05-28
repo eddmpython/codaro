@@ -1,0 +1,414 @@
+meta:
+  id: openpyxl_09
+  title: 표와 데이터 검증
+  order: 9
+  category: openpyxl
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+  - openpyxl
+  tags:
+  - openpyxl
+  - Table
+  - DataValidation
+  - AutoFilter
+  - freeze_panes
+  seo:
+    title: openpyxl 표와 데이터 검증 - Table·DataValidation·freeze_panes·AutoFilter
+    description: 정렬 가능한 표, 드롭다운 데이터 검증, 행 고정, 자동 필터까지 — 입력 양식의 무결성을 코드로 잠그는 패턴을 정리합니다.
+    keywords:
+    - openpyxl Table
+    - TableStyleInfo
+    - DataValidation
+    - freeze_panes
+intro:
+  direction: 입력 양식의 무결성을 표·데이터 검증·고정창·자동 필터로 잠가, 사람이 잘못된 값을 넣을 수 없는 보고서 양식을 만듭니다.
+  benefits:
+  - Table + TableStyleInfo로 정렬·필터·줄무늬가 한 번에 적용되는 표를 만듭니다.
+  - DataValidation으로 셀에 드롭다운, 숫자 범위, 날짜 제약을 부여합니다.
+  - freeze_panes로 헤더가 따라다니는 보고서를 만듭니다.
+  diagram:
+    steps:
+    - label: Table
+      detail: 영역을 정식 Table 객체로 등록.
+    - label: TableStyleInfo
+      detail: 줄무늬·헤더 강조·필터 토글.
+    - label: DataValidation
+      detail: list/decimal/date로 입력 제약.
+    - label: freeze_panes / auto_filter
+      detail: 사용 편의성을 코드로 보장.
+    runtime:
+    - label: openpyxl 패키지 준비
+      detail: openpyxl.worksheet.table의 Table/TableStyleInfo와 openpyxl.worksheet.datavalidation의 DataValidation을 import해 사용한다.
+    - label: 표·검증 재오픈 보존 확인
+      detail: load_workbook으로 다시 열어 ws.tables 키, freeze_panes, data_validations.dataValidation 종류가 보존됐는지 assert로 확인한다.
+sections:
+- id: step1_table
+  title: 1단계. 정식 Table 등록
+  structuredPrimary: true
+  subtitle: openpyxl.worksheet.table.Table
+  goal: 데이터 영역을 정식 Table 객체로 등록해 정렬·필터 가능한 표로 만든다.
+  why: '"단순 셀 영역"과 "표"는 다릅니다. 표는 자동 줄무늬, 헤더 강조, 자동 필터, 정렬이 따라옵니다. 사용자 경험이 즉시 달라집니다.'
+  explanation: |-
+    `from openpyxl.worksheet.table import Table`. `Table(displayName="orders", ref="A1:D10")`로 만들어 `ws.add_table(table)`로 추가합니다. displayName은 워크북 안에서 유일해야 합니다. ref는 헤더를 포함한 전체 영역입니다.
+  tips:
+  - 같은 워크북에 같은 displayName으로 표를 두 개 만들면 ValueError가 납니다. 시트 이름과 결합해 prefix를 두는 식으로 충돌을 피하세요.
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    for row in [
+        ("A001", "Seoul", 120000, "ok"),
+        ("A002", "Busan", 80000, "refund"),
+        ("A003", "Daegu", 30000, "ok"),
+    ]:
+        sheet.append(list(row))
+
+    table = Table(displayName="ordersTable", ref="A1:D4")
+    sheet.add_table(table)
+    sheet.tables["ordersTable"].ref
+  exercise:
+    prompt: 데이터 행을 한 줄 더 추가한 뒤 Table의 ref를 "A1:D5"로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.table import Table
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      for row in [
+          ("A001", "Seoul", 120000, "ok"),
+          ("A002", "Busan", 80000, "refund"),
+          ("A003", "Daegu", 30000, "ok"),
+          ___,
+      ]:
+          sheet.append(list(row))
+
+      table = Table(displayName="ordersTable", ref=___)
+      sheet.add_table(table)
+      sheet.tables["ordersTable"].ref
+    hints:
+    - "4-튜플 (id, region, amount, status). ref는 헤더 포함 'A1:D5'."
+  check:
+    noError: Table의 ref는 헤더 포함 실제 데이터 영역과 정확히 일치해야 합니다.
+    resultCheck: tables 등록 후 ref가 "A1:D5"여야 합니다.
+- id: step2_table_style
+  title: 2단계. TableStyleInfo로 스타일
+  structuredPrimary: true
+  subtitle: 줄무늬·필터 토글
+  goal: TableStyleInfo로 표에 줄무늬와 필터 가시화를 적용한다.
+  why: 표 스타일은 사람이 표를 표로 인식하게 만드는 시각 신호입니다. Excel 기본 스타일 이름을 그대로 쓸 수 있어 한 줄에 끝납니다.
+  explanation: |-
+    `from openpyxl.worksheet.table import TableStyleInfo`. `TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)`. name은 Excel 내장 표 스타일 이름(Light/Medium/Dark1~21).
+  tips:
+  - "TableStyleMedium9 (파란 헤더 + 회색 줄무늬)가 가장 자주 쓰는 무난한 선택입니다. 디자인 시스템을 통일하려면 워크북 전체에서 같은 name을 쓰세요."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    for row in [("A001", "Seoul", 120000, "ok"), ("A002", "Busan", 80000, "refund")]:
+        sheet.append(list(row))
+
+    table = Table(displayName="ordersTable", ref="A1:D3")
+    table.tableStyleInfo = TableStyleInfo(
+        name="TableStyleMedium9",
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
+    sheet.add_table(table)
+    table.tableStyleInfo.name, table.tableStyleInfo.showRowStripes
+  exercise:
+    prompt: 컬럼 줄무늬도 보이도록 showColumnStripes를 True로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      for row in [("A001", "Seoul", 120000, "ok"), ("A002", "Busan", 80000, "refund")]:
+          sheet.append(list(row))
+
+      table = Table(displayName="ordersTable", ref="A1:D3")
+      table.tableStyleInfo = TableStyleInfo(
+          name="TableStyleMedium9",
+          showRowStripes=True,
+          showColumnStripes=___,
+      )
+      sheet.add_table(table)
+      table.tableStyleInfo.showColumnStripes
+    hints:
+    - 불리언 True입니다.
+  check:
+    noError: TableStyleInfo의 name이 유효한 내장 스타일 이름이어야 합니다.
+    resultCheck: showColumnStripes가 True여야 합니다.
+- id: step3_dv_list
+  title: 3단계. 드롭다운 DataValidation
+  structuredPrimary: true
+  subtitle: list 타입
+  goal: status 컬럼에 고정된 값들로만 입력되도록 드롭다운을 부여한다.
+  why: 자유 입력은 항상 오타를 만듭니다. "ok"/"refund"/"pending" 같이 정해진 값만 받으면 보고서의 신뢰도가 올라갑니다.
+  explanation: |-
+    `from openpyxl.worksheet.datavalidation import DataValidation`. `DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)`. formula1의 인용 부호 한 쌍이 Excel 문자열 리스트 문법입니다. 만든 DataValidation을 `ws.add_data_validation(dv)` 한 뒤, `dv.add("D2:D100")`처럼 적용 영역을 추가합니다.
+  tips:
+  - "값이 많거나 동적이면 같은 워크북의 별도 시트 영역을 가리키게 할 수도 있습니다. formula1='Codes!$A$2:$A$10'."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+
+    statusDv = DataValidation(
+        type="list",
+        formula1='"ok,refund,pending"',
+        allow_blank=True,
+    )
+    sheet.add_data_validation(statusDv)
+    statusDv.add("D2:D100")
+    sheet.data_validations.dataValidation[0].type, sheet.data_validations.dataValidation[0].sqref
+  exercise:
+    prompt: region 컬럼(B)에도 "Seoul,Busan,Daegu,Incheon" 드롭다운을 한 줄 추가해 같은 시트에 두 개의 DataValidation이 들어가도록 만드세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+
+      statusDv = DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)
+      sheet.add_data_validation(statusDv)
+      statusDv.add("D2:D100")
+
+      regionDv = DataValidation(type="list", formula1=___, allow_blank=True)
+      sheet.add_data_validation(regionDv)
+      regionDv.add(___)
+
+      len(sheet.data_validations.dataValidation)
+    hints:
+    - "formula1 문자열은 큰따옴표 안에 콤마 구분. region 영역은 'B2:B100'."
+  check:
+    noError: DataValidation type "list"는 formula1에 인용된 값 목록이 필요합니다.
+    resultCheck: 시트의 data_validations.dataValidation 길이가 2여야 합니다.
+- id: step4_dv_decimal
+  title: 4단계. 숫자 범위 DataValidation
+  structuredPrimary: true
+  subtitle: decimal 타입
+  goal: amount 컬럼에 음수와 0 이하 값이 들어가지 못하도록 범위 제약을 부여한다.
+  why: 금액 컬럼에 음수가 들어가면 합계가 엉뚱해집니다. 입력 단계에서 막는 것이 가장 싸고 안전합니다.
+  explanation: |-
+    `DataValidation(type="decimal", operator="greaterThan", formula1=0, allow_blank=False)`. operator는 between, greaterThan, lessThanOrEqual 등 Excel 비교 키워드. 사용자가 잘못 입력하면 errorTitle/error 문자열로 안내 메시지를 띄울 수 있습니다.
+  tips:
+  - 에러 메시지는 보고서를 받는 사람이 실수 후 처음 보는 가이드입니다. 무성의한 기본 문구 대신 어떤 값이 허용되는지 명확히 적으세요.
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+
+    amountDv = DataValidation(
+        type="decimal",
+        operator="greaterThan",
+        formula1=0,
+        allow_blank=False,
+        errorTitle="잘못된 금액",
+        error="amount는 0보다 커야 합니다.",
+    )
+    sheet.add_data_validation(amountDv)
+    amountDv.add("C2:C100")
+    amountDv.type, amountDv.operator, amountDv.error
+  exercise:
+    prompt: between 연산자로 0보다 크고 10,000,000 이하만 허용하도록 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+
+      amountDv = DataValidation(
+          type="decimal",
+          operator=___,
+          formula1=0,
+          formula2=___,
+          allow_blank=False,
+          errorTitle="잘못된 금액",
+          error="amount는 0 초과 10,000,000 이하여야 합니다.",
+      )
+      sheet.add_data_validation(amountDv)
+      amountDv.add("C2:C100")
+      amountDv.operator, amountDv.formula1, amountDv.formula2
+    hints:
+    - "between은 formula1=하한, formula2=상한 두 값이 필요합니다."
+  check:
+    noError: between 연산자는 formula1과 formula2 모두 있어야 합니다.
+    resultCheck: 결과 튜플의 operator가 "between"이어야 합니다.
+- id: step5_freeze_filter
+  title: 5단계. freeze_panes와 auto_filter
+  structuredPrimary: true
+  subtitle: 헤더 고정 + 자동 필터 토글
+  goal: 헤더가 스크롤 시 따라다니도록 고정하고, 자동 필터 화살표를 헤더에 켠다.
+  why: 행이 많은 보고서에서 헤더가 사라지면 컬럼이 무슨 의미인지 잊습니다. 자동 필터는 사용자가 직접 정렬/필터하는 비용을 0으로 만듭니다.
+  explanation: |-
+    `ws.freeze_panes = "A2"`는 1행을 위에 고정합니다. `ws.freeze_panes = "B2"`는 1행+A열을 모두 고정합니다. `ws.auto_filter.ref = "A1:D100"`은 헤더에 자동 필터 화살표를 켭니다.
+  tips:
+  - "Table을 등록하면 자동 필터가 표 영역에 자동으로 켜집니다. 표를 안 쓰는 시트에만 auto_filter.ref를 따로 지정하세요."
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = "A1:D100"
+    sheet.freeze_panes, sheet.auto_filter.ref
+  exercise:
+    prompt: freeze_panes를 "B2"로 바꿔 A열도 고정하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      sheet.freeze_panes = ___
+      sheet.auto_filter.ref = "A1:D100"
+      sheet.freeze_panes
+    hints:
+    - "freeze_panes는 셀 좌표 문자열입니다. 좌상단부터 그 좌표 이전 행/열이 모두 고정됩니다."
+  check:
+    noError: freeze_panes는 유효한 셀 좌표 문자열이어야 합니다.
+    resultCheck: freeze_panes가 "B2"여야 합니다.
+- id: validation
+  title: 6단계. 검증 루프 — 주문 양식 무결성
+  structuredPrimary: true
+  subtitle: 저장 → 재오픈 → 양식 계약
+  goal: 표·드롭다운·금액 범위·헤더 고정을 모두 결합한 주문 입력 양식을 만들고, 재오픈 후 각 제약이 보존됐는지 확인한다.
+  why: 입력 양식의 신뢰는 "코드로 만든 제약이 파일 안에서도 살아 있는가"로 결정됩니다. 재오픈으로 검증하지 않으면 사용자에게 깨진 양식을 전달할 수 있습니다.
+  explanation: |-
+    `buildOrderForm`은 표 + 드롭다운 + 금액 검증 + 헤더 고정을 한 시트에 묶어 만듭니다. 재오픈 후 tables, data_validations, freeze_panes를 모두 확인합니다.
+  tips:
+  - "openpyxl이 보존하는 제약과 그렇지 않은 제약(예 일부 사용자 정의 표 스타일)을 알면, 양식을 더 안전하게 설계할 수 있습니다."
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    def buildOrderForm(path):
+        book = Workbook()
+        sheet = book.active
+        sheet.title = "orders"
+        sheet.append(["order_id", "region", "amount", "status"])
+        sheet.append(["A001", "Seoul", 120000, "ok"])
+        sheet.append(["A002", "Busan", 80000, "refund"])
+
+        table = Table(displayName="ordersTable", ref="A1:D3")
+        table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium9", showRowStripes=True)
+        sheet.add_table(table)
+
+        statusDv = DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)
+        sheet.add_data_validation(statusDv)
+        statusDv.add("D2:D100")
+
+        amountDv = DataValidation(
+            type="decimal",
+            operator="greaterThan",
+            formula1=0,
+            allow_blank=False,
+            errorTitle="잘못된 금액",
+            error="amount는 0보다 커야 합니다.",
+        )
+        sheet.add_data_validation(amountDv)
+        amountDv.add("C2:C100")
+
+        sheet.freeze_panes = "A2"
+        book.save(path)
+        return path
+
+    workdir = TemporaryDirectory()
+    formPath = buildOrderForm(Path(workdir.name) / "order_form.xlsx")
+
+    reopened = load_workbook(formPath)
+    orders = reopened["orders"]
+    assert "ordersTable" in orders.tables
+    assert orders.freeze_panes == "A2"
+    dvTypes = {dv.type for dv in orders.data_validations.dataValidation}
+    assert "list" in dvTypes
+    assert "decimal" in dvTypes
+    list(orders.tables), orders.freeze_panes, sorted(dvTypes)
+  exercise:
+    prompt: priority 컬럼(E)을 추가해 "high,normal,low" 드롭다운을 더하고 ref/freeze/검증 모두 확장하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      def buildOrderForm(path):
+          book = Workbook()
+          sheet = book.active
+          sheet.title = "orders"
+          sheet.append(["order_id", "region", "amount", "status", "priority"])
+          sheet.append(["A001", "Seoul", 120000, "ok", "high"])
+          sheet.append(["A002", "Busan", 80000, "refund", "low"])
+
+          table = Table(displayName="ordersTable", ref=___)
+          table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium9", showRowStripes=True)
+          sheet.add_table(table)
+
+          priorityDv = DataValidation(type="list", formula1='"high,normal,low"', allow_blank=True)
+          sheet.add_data_validation(priorityDv)
+          priorityDv.add("E2:E100")
+
+          sheet.freeze_panes = "A2"
+          book.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      formPath = buildOrderForm(Path(workdir.name) / "order_form.xlsx")
+      reopened = load_workbook(formPath)
+      assert "ordersTable" in reopened["orders"].tables
+      reopened["orders"].tables["ordersTable"].ref
+    hints:
+    - "헤더 포함 'A1:E3' 영역. priority 추가로 컬럼이 5개."
+  check:
+    noError: Table의 ref가 헤더 포함 데이터 영역과 정확히 일치해야 합니다.
+    resultCheck: ref가 "A1:E3"이어야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 양식의 무결성을 코드로
+  blocks:
+  - type: text
+    content: |-
+      입력 양식의 무결성을 표·검증·고정창으로 잠그면, 사용자의 실수는 자연스럽게 줄어듭니다. 다음 강의에서는 모든 강의의 기술을 한 워크북에 통합해 월간 매출 리포트 자동 생성기를 완성합니다.
+  - type: list
+    style: bullet
+    items:
+    - "Table(displayName, ref) + TableStyleInfo로 정렬·필터·줄무늬"
+    - "DataValidation type=list/decimal/date로 입력 제약, add(range)로 영역 적용"
+    - "errorTitle/error 문자열로 사용자에게 친절한 가이드"
+    - "freeze_panes = 'A2'로 헤더 고정, 'B2'면 A열까지 고정"
+    - "Table을 쓰면 auto_filter가 자동으로 켜진다 — 일반 영역에만 auto_filter.ref 따로 지정"

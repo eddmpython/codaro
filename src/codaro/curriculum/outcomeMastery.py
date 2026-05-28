@@ -23,6 +23,7 @@ from math import prod
 from pydantic import BaseModel, Field
 
 from .lessonGraph import LessonGraph
+from .outcomeCredit import OutcomeCreditEntry, creditContribution
 from .progress import ProgressTracker
 from .taxonomy import CurriculumTaxonomy
 
@@ -39,11 +40,14 @@ class OutcomeMastery(BaseModel):
     completedLessonKeys: list[str] = Field(default_factory=list)
     inProgressLessonKeys: list[str] = Field(default_factory=list)
     sourceLessonCount: int = 0
+    creditCount: int = 0
+    lastCreditAt: str | None = None
     validated: bool = False
+    autoValidated: bool = False
 
     @property
     def mastered(self) -> bool:
-        return self.validated or self.level >= MASTERY_THRESHOLD
+        return self.validated or self.autoValidated or self.level >= MASTERY_THRESHOLD
 
 
 class DomainMastery(BaseModel):
@@ -79,9 +83,20 @@ def computeMastery(
     progressTracker: ProgressTracker | None,
     validatedOutcomes: set[str] | None = None,
 ) -> MasteryReport:
-    """진도 + 그래프 + (선택) validated 표시로부터 mastery 리포트 합성."""
+    """진도 + 그래프 + credit + (선택) validated 표시로부터 mastery 리포트 합성."""
     lessonStates = _lessonStateMap(progressTracker) if progressTracker is not None else {}
-    validated = validatedOutcomes or set()
+    creditMap: dict[str, list[OutcomeCreditEntry]] = (
+        progressTracker.outcomeCreditMap() if progressTracker is not None else {}
+    )
+    manualValidated: set[str] = (
+        progressTracker.listManuallyValidatedOutcomes() if progressTracker is not None else set()
+    )
+    autoValidated: set[str] = (
+        progressTracker.listAutoValidatedOutcomes() if progressTracker is not None else set()
+    )
+    if validatedOutcomes is not None:
+        manualValidated = manualValidated | (validatedOutcomes - autoValidated)
+    validated = manualValidated | autoValidated
 
     outcomeMap: dict[str, OutcomeMastery] = {}
     for outcome in taxonomy.outcomes:
@@ -97,6 +112,10 @@ def computeMastery(
             elif state == "inProgress":
                 inProgress.append(lesson.key)
                 contributions.append(ACCESSED_CONTRIB)
+        credits = creditMap.get(outcome.id, [])
+        for credit in credits:
+            contributions.append(creditContribution(credit.weight))
+        lastCreditAt = credits[-1].creditedAt if credits else None
         if outcome.id in validated:
             level = 1.0
         elif contributions:
@@ -110,7 +129,10 @@ def computeMastery(
             completedLessonKeys=completed,
             inProgressLessonKeys=inProgress,
             sourceLessonCount=len(providers),
-            validated=outcome.id in validated,
+            creditCount=len(credits),
+            lastCreditAt=lastCreditAt,
+            validated=outcome.id in manualValidated,
+            autoValidated=outcome.id in autoValidated,
         )
 
     domains: list[DomainMastery] = []

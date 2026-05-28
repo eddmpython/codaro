@@ -22,10 +22,17 @@ class LessonNode(BaseModel):
     prerequisites: list[str] = Field(default_factory=list)
     estimatedMinutes: int = 0
     practicalDomain: list[str] = Field(default_factory=list)
+    sectionOutcomes: dict[str, list[str]] = Field(default_factory=dict)
 
     @property
     def key(self) -> str:
         return f"{self.category}/{self.contentId}"
+
+    def outcomesForSection(self, sectionId: str) -> list[str]:
+        explicit = self.sectionOutcomes.get(sectionId)
+        if explicit:
+            return list(explicit)
+        return list(self.outcomes)
 
 
 class LessonGraph(BaseModel):
@@ -81,5 +88,6 @@ def buildLessonGraph(
                 prerequisites=record.prerequisites,
                 estimatedMinutes=record.estimatedMinutes,
                 practicalDomain=record.practicalDomain,
+                sectionOutcomes=record.sectionOutcomes,
             ))
     return LessonGraph(lessons=nodes)

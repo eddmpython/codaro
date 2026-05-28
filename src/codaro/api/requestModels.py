@@ -80,6 +80,9 @@ class CheckExerciseRequest(BaseModel):
     requiredPatterns: list[str] = Field(default_factory=list)
     hints: list[str] = Field(default_factory=list)
     currentHintLevel: int = 0
+    category: str = ""
+    contentId: str = ""
+    sectionId: str = ""
 
 
 class MasterPlanRequest(BaseModel):
