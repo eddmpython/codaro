@@ -62,6 +62,14 @@ export type BlockExecution = {
   lastOutput?: string | null;
 };
 
+export type PredictConfig = {
+  prompt?: string;
+  expectedShape?: string;
+  expectedDtype?: string;
+  expectedValue?: string;
+  expectedError?: string;
+};
+
 export type GuideConfig = {
   exerciseType: string;
   hints: string[];
@@ -70,6 +78,7 @@ export type GuideConfig = {
   solution: string;
   description: string;
   studentAnswer: string;
+  predict?: PredictConfig | null;
 };
 
 export type BlockConfig = {
@@ -294,7 +303,10 @@ export type OutcomeMasteryEntry = {
   completedLessonKeys: string[];
   inProgressLessonKeys: string[];
   sourceLessonCount: number;
+  creditCount: number;
+  lastCreditAt: string | null;
   validated: boolean;
+  autoValidated: boolean;
 };
 
 export type DomainMasteryEntry = {

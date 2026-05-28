@@ -4,8 +4,21 @@ import re
 from typing import Any
 import uuid
 
-from ..document.models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, GuideConfig, RuntimeConfig
-from .sectionContract import LearningSectionContract, lessonContractFromYaml, sectionHasStructuredFields
+from ..document.models import (
+    AppConfig,
+    BlockConfig,
+    CodaroDocument,
+    DocumentMetadata,
+    GuideConfig,
+    PredictConfig,
+    RuntimeConfig,
+)
+from .sectionContract import (
+    LearningPredictContract,
+    LearningSectionContract,
+    lessonContractFromYaml,
+    sectionHasStructuredFields,
+)
 
 
 TITLE_TYPES = {"mainHeader", "sectionHeader", "sectionTitle"}
@@ -139,6 +152,7 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
                 difficulty=exercise.difficulty or "easy",
                 solution=solutionCode,
                 description=exercise.prompt or section.goal or "직접 코드를 입력하고 실행하세요.",
+                predict=_predictConfig(exercise.predict),
             ),
         )
         result.append(exerciseCell)
@@ -814,6 +828,19 @@ def _difficultyFromTitle(title: str) -> str:
 def _checkConfig(block: dict[str, Any]) -> dict[str, str]:
     check = _mapValue(block.get("check") or block.get("checkConfig"))
     return {str(key): _textValue(value) for key, value in check.items()}
+
+
+def _predictConfig(predict: LearningPredictContract | None) -> PredictConfig | None:
+    """exercise.predict 가 비어있으면 None — 프론트 페이로드를 깨끗하게 유지한다."""
+    if predict is None or predict.isEmpty():
+        return None
+    return PredictConfig(
+        prompt=predict.prompt,
+        expectedShape=predict.expectedShape,
+        expectedDtype=predict.expectedDtype,
+        expectedValue=predict.expectedValue,
+        expectedError=predict.expectedError,
+    )
 
 
 def _structuredCheckConfig(

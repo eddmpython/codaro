@@ -33,6 +33,7 @@ import { codaroApi } from "@/lib/api";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { useWidgetSession } from "@/lib/widgetSession";
 import { CheckResultPanel } from "./checkResultPanel";
+import { PredictCard, type LearnerPrediction } from "./predictCard";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import {
@@ -137,7 +138,9 @@ export function CurriculumView({
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}
+                category={selectedCategory}
                 cellHelpByBlockId={cellHelpByBlockId}
+                contentId={selectedContentId}
                 drafts={drafts}
                 index={index}
                 key={section.id}
@@ -458,7 +461,9 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
 
 function CurriculumSectionCard({
   canRun,
+  category,
   cellHelpByBlockId,
+  contentId,
   drafts,
   index,
   renderCodeCellEditor,
@@ -472,7 +477,9 @@ function CurriculumSectionCard({
   onSelectBlock,
 }: {
   canRun: boolean;
+  category: string;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
+  contentId: string;
   drafts: Record<string, string>;
   index: number;
   renderCodeCellEditor: RenderCodeCellEditor;
@@ -525,7 +532,9 @@ function CurriculumSectionCard({
       {structured ? (
         <StructuredSectionLearningBody
           canRun={canRun}
+          category={category}
           cellHelpByBlockId={cellHelpByBlockId}
+          contentId={contentId}
           drafts={drafts}
           renderCodeCellEditor={renderCodeCellEditor}
           results={results}
@@ -625,6 +634,18 @@ function isSectionTitleBlock(block: BlockConfig) {
   if (block.sourceType === "section") return true;
   if (block.displayKind !== "title") return false;
   return block.role === "title" && block.sourceType !== "intro";
+}
+
+function extractSectionYamlId(section: CurriculumSectionGroup): string | undefined {
+  const titlePayload = isRecord(section.titleBlock?.payload) ? section.titleBlock?.payload : undefined;
+  const fromTitle = readPayloadText(titlePayload?.id);
+  if (fromTitle) return fromTitle;
+  for (const block of section.blocks) {
+    const payload = isRecord(block.payload) ? block.payload : undefined;
+    const sectionId = readPayloadText(payload?.sectionId);
+    if (sectionId) return sectionId;
+  }
+  return undefined;
 }
 
 function curriculumOverview(document: CodaroDocument, introBlock?: BlockConfig) {
@@ -778,7 +799,9 @@ function sectionContractGapLabels(value: unknown) {
 
 function StructuredSectionLearningBody({
   canRun,
+  category,
   cellHelpByBlockId,
+  contentId,
   drafts,
   renderCodeCellEditor,
   results,
@@ -791,7 +814,9 @@ function StructuredSectionLearningBody({
   onSelectBlock,
 }: {
   canRun: boolean;
+  category: string;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
+  contentId: string;
   drafts: Record<string, string>;
   renderCodeCellEditor: RenderCodeCellEditor;
   results: ResultMap;
@@ -912,7 +937,10 @@ function StructuredSectionLearningBody({
               {exerciseResult && exercise && exerciseCheck ? (
                 <div className="mt-2">
                   <ExerciseCheckPanel
+                    category={category}
+                    contentId={contentId}
                     exercise={exercise}
+                    sectionId={extractSectionYamlId(section)}
                     studentCode={exerciseDraft}
                   />
                 </div>
@@ -1704,16 +1732,29 @@ function cellDomId(blockId: string) {
 }
 
 function ExerciseCheckPanel({
+  category,
+  contentId,
   exercise,
+  sectionId,
   studentCode,
 }: {
+  category?: string;
+  contentId?: string;
   exercise: BlockConfig;
+  sectionId?: string;
   studentCode: string;
 }) {
   const sessionId = useWidgetSession();
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [hintLevel, setHintLevel] = useState(0);
+  const [prediction, setPrediction] = useState<LearnerPrediction | null>(null);
+
+  const predict = exercise.guide?.predict ?? null;
+  // predict 가 정의되어 있고 예측 잠금 전이면 검증을 막는다 — 학습자가 mental model을
+  // 먼저 외부화하도록 강제하는 게 Predict-Run-Reconcile-Adapt 핵심.
+  const predictRequired = predict !== null;
+  const predictReady = !predictRequired || prediction !== null;
 
   const runCheck = async (nextHintLevel: number = hintLevel) => {
     if (!sessionId) return;
@@ -1735,6 +1776,9 @@ function ExerciseCheckPanel({
           : undefined,
         hints: guide.hints ?? [],
         currentHintLevel: nextHintLevel,
+        category: category || undefined,
+        contentId: contentId || undefined,
+        sectionId: sectionId || undefined,
       });
       setResult(next);
       setHintLevel(next.hintLevel);
@@ -1747,18 +1791,34 @@ function ExerciseCheckPanel({
 
   return (
     <div className="space-y-2" data-check-panel="exercise">
+      {predict ? (
+        <PredictCard
+          predict={predict}
+          locked={prediction}
+          onLock={(next) => setPrediction(next)}
+          onUnlock={() => setPrediction(null)}
+        />
+      ) : null}
       <div className="flex items-center gap-2">
         <Button
           className="h-7 px-2 text-[11px]"
           size="sm"
           type="button"
           variant="outline"
-          disabled={loading || !sessionId}
+          disabled={loading || !sessionId || !predictReady}
           onClick={() => void runCheck(hintLevel)}
+          title={
+            predictRequired && !predictReady
+              ? "예측을 먼저 잠그세요 — 그래야 결과와 비교할 수 있습니다."
+              : undefined
+          }
         >
           {loading ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3" />}
           검증하기
         </Button>
+        {predictRequired && !predictReady ? (
+          <span className="text-[11px] text-foreground/60">예측 잠금 필요</span>
+        ) : null}
       </div>
       <CheckResultPanel
         result={result}
