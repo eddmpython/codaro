@@ -921,10 +921,39 @@ lessonOutcomes:
     outcomes: [pandas.loadFrame, pandas.filterSelect]
     prerequisites: [pandas.intro]
     estimatedMinutes: 50
+    sectionOutcomes:
+      step1_import: [pandas.loadFrame]
+      step2_load: [pandas.loadFrame]
+      step3_preview: [pandas.loadFrame]
+      step4_shape: [pandas.loadFrame]
+      step5_head: [pandas.loadFrame]
+      step6_columns: [pandas.loadFrame]
+      step7_select: [pandas.filterSelect]
+      step8_mean: [pandas.filterSelect]
+      step9_maxmin: [pandas.filterSelect]
+      step10_describe: [pandas.filterSelect]
+      workflow_validation: [pandas.loadFrame, pandas.filterSelect]
   "pandas/02_타이타닉생존분석":
     outcomes: [pandas.filterSelect, pandas.aggregate]
     prerequisites: [pandas.loadFrame]
     estimatedMinutes: 60
+    sectionOutcomes:
+      step1_load: [pandas.filterSelect]
+      step2_head: [pandas.filterSelect]
+      step3_single: [pandas.filterSelect]
+      step4_multi: [pandas.filterSelect]
+      step5_condition: [pandas.filterSelect]
+      step6_filter: [pandas.filterSelect]
+      step7_firstclass: [pandas.filterSelect]
+      step8_value_counts: [pandas.aggregate]
+      step8_5_describe: [pandas.aggregate]
+      step9_normalize: [pandas.aggregate]
+      step10_survival_rate: [pandas.aggregate]
+      step11_female: [pandas.aggregate]
+      step12_loc: [pandas.filterSelect]
+      step13_iloc: [pandas.filterSelect]
+      step14_iloc_range: [pandas.filterSelect]
+      workflow_validation: [pandas.filterSelect, pandas.aggregate]
   "pandas/03_펭귄종비교분석":
     outcomes: [pandas.aggregate]
     prerequisites: [pandas.filterSelect]
@@ -933,6 +962,22 @@ lessonOutcomes:
     outcomes: [pandas.aggregate, pandas.report]
     prerequisites: [pandas.aggregate]
     estimatedMinutes: 60
+    sectionOutcomes:
+      step1_load: [pandas.aggregate]
+      step2_head: [pandas.aggregate]
+      step3_value_counts: [pandas.aggregate]
+      step4_sort_asc: [pandas.aggregate]
+      step5_sort_desc: [pandas.aggregate]
+      step6_nlargest: [pandas.aggregate]
+      step7_nsmallest: [pandas.aggregate]
+      step7_5_assign_grade: [pandas.aggregate]
+      step8_groupby_year: [pandas.aggregate]
+      step9_groupby_origin: [pandas.aggregate]
+      step10_pivot: [pandas.aggregate]
+      step11_pivot_year: [pandas.aggregate]
+      step12_filter_groupby: [pandas.aggregate]
+      step13_complex: [pandas.aggregate]
+      workflow_validation: [pandas.report]
   "pandas/06_항공편시계열분석":
     outcomes: [pandas.timeSeries]
     prerequisites: [pandas.loadFrame, pandas.aggregate]
@@ -1139,6 +1184,23 @@ lessonOutcomes:
     estimatedMinutes: 50
   "numpy/04_음악특성분석":
     outcomes: [numpy.arrayOps, numpy.statistics]
+    sectionOutcomes:
+      step1_import: [numpy.arrayOps]
+      step2_data: [numpy.arrayOps]
+      step3_extract: [numpy.arrayOps]
+      step4_stats: [numpy.statistics]
+      step5_nan_check: [numpy.arrayOps]
+      step6_nan_remove: [numpy.arrayOps]
+      step7_minmax: [numpy.arrayOps]
+      step8_norm_verify: [numpy.arrayOps]
+      step9_zscore: [numpy.statistics]
+      step10_zscore_verify: [numpy.statistics]
+      step11_corr_two: [numpy.statistics]
+      step12_corr_value: [numpy.statistics]
+      step13_corr_all: [numpy.statistics]
+      step14_corr_display: [numpy.statistics]
+      step15_corr_extreme: [numpy.statistics]
+      workflow_validation: [numpy.arrayOps, numpy.statistics]
     prerequisites: [numpy.statistics]
     estimatedMinutes: 55
   "numpy/05_BMI계산기":
@@ -1163,6 +1225,23 @@ lessonOutcomes:
     estimatedMinutes: 60
   "numpy/10_당뇨병종합분석":
     outcomes: [numpy.linearAlgebra, numpy.statistics]
+    sectionOutcomes:
+      step1_import: [numpy.statistics]
+      step2_data: [numpy.statistics]
+      step3_extract: [numpy.statistics]
+      step4_zero_check: [numpy.statistics]
+      step5_replace_nan: [numpy.statistics]
+      step6_impute: [numpy.statistics]
+      step7_histogram: [numpy.statistics]
+      step8_bincount: [numpy.statistics]
+      step9_cov: [numpy.linearAlgebra]
+      step10_corr_target: [numpy.statistics]
+      step11_group_stats: [numpy.statistics]
+      step12_standardize: [numpy.statistics]
+      step13_eig: [numpy.linearAlgebra]
+      step14_apply_along: [numpy.statistics]
+      step15_risk_score: [numpy.statistics]
+      workflow_validation: [numpy.linearAlgebra, numpy.statistics]
     prerequisites: [numpy.linearAlgebra]
     estimatedMinutes: 70
 
@@ -1223,6 +1302,21 @@ lessonOutcomes:
     estimatedMinutes: 45
   "duckdb/02_타이타닉생존통계":
     outcomes: [duckdb.basicQueries, duckdb.aggregation]
+    sectionOutcomes:
+      step1_load: [duckdb.basicQueries]
+      step2_explore: [duckdb.basicQueries]
+      step3_count_basic: [duckdb.basicQueries]
+      step4_count_column: [duckdb.basicQueries]
+      step5_distinct: [duckdb.basicQueries]
+      step6_groupby_basic: [duckdb.aggregation]
+      step7_sum: [duckdb.aggregation]
+      step8_avg: [duckdb.aggregation]
+      step9_minmax: [duckdb.aggregation]
+      step10_orderby: [duckdb.aggregation]
+      step11_desc: [duckdb.aggregation]
+      step12_groupby_multi: [duckdb.aggregation]
+      step13_final: [duckdb.aggregation]
+      workflow_validation: [duckdb.basicQueries, duckdb.aggregation]
     prerequisites: [duckdb.basicQueries]
     estimatedMinutes: 50
   "duckdb/03_팁패턴분석":
@@ -1361,6 +1455,19 @@ lessonOutcomes:
     estimatedMinutes: 50
   "matplotlib/02_팁데이터분포탐색":
     outcomes: [matplotlib.basics, viz.distribution]
+    sectionOutcomes:
+      step1_import: [matplotlib.basics]
+      step1_font: [matplotlib.basics]
+      step2_data: [matplotlib.basics]
+      step3_explore: [matplotlib.basics]
+      step4_hist: [viz.distribution]
+      step5_hist_color: [viz.distribution]
+      step6_boxplot: [viz.distribution]
+      step7_subplots: [viz.distribution]
+      step8_bill_hist: [viz.distribution]
+      step9_xlim: [matplotlib.basics]
+      step10_final: [viz.distribution]
+      workflow_validation: [matplotlib.basics, viz.distribution]
     prerequisites: [matplotlib.basics]
     estimatedMinutes: 50
   "matplotlib/03_붓꽃품종산점도":
@@ -1419,6 +1526,19 @@ lessonOutcomes:
     estimatedMinutes: 55
   "seaborn/05_타이타닉생존분석":
     outcomes: [viz.distribution, viz.statistical]
+    sectionOutcomes:
+      step1_import: [viz.distribution]
+      step2_data: [viz.distribution]
+      step3_countplot: [viz.distribution]
+      step4_countplot_hue: [viz.distribution]
+      step5_barplot: [viz.distribution]
+      step6_barplot_hue: [viz.distribution]
+      step7_estimator: [viz.statistical]
+      step8_pointplot: [viz.statistical]
+      step9_catplot: [viz.statistical]
+      step10_catplot_count: [viz.statistical]
+      step11_final: [viz.distribution, viz.statistical]
+      workflow_validation: [viz.distribution, viz.statistical]
     prerequisites: [viz.statistical]
     estimatedMinutes: 55
   "seaborn/06_항공편승객시계열":
@@ -1431,10 +1551,39 @@ lessonOutcomes:
     estimatedMinutes: 60
   "seaborn/08_다이아몬드가격분석":
     outcomes: [viz.heatmap, viz.distribution]
+    sectionOutcomes:
+      step1_import: [viz.distribution]
+      step2_histplot_basic: [viz.distribution]
+      step3_histplot_hue: [viz.distribution]
+      step4_multiple: [viz.distribution]
+      step5_kdeplot: [viz.distribution]
+      step6_kdeplot_fill: [viz.distribution]
+      step7_displot: [viz.distribution]
+      step8_displot_col: [viz.distribution]
+      step9_2d_kde: [viz.heatmap]
+      step10_2d_hist: [viz.heatmap]
+      step11_ecdf: [viz.distribution]
+      step12_col_row: [viz.distribution]
+      workflow_validation: [viz.heatmap, viz.distribution]
     prerequisites: [viz.distribution]
     estimatedMinutes: 60
   "seaborn/09_자동차연비종합분석":
     outcomes: [viz.regression, viz.heatmap]
+    sectionOutcomes:
+      step1_import: [viz.regression]
+      step2_pairplot_basic: [viz.regression]
+      step3_pairplot_hue: [viz.regression]
+      step4_pairplot_reg: [viz.regression]
+      step5_jointplot_basic: [viz.regression]
+      step6_jointplot_reg: [viz.regression]
+      step7_jointplot_kde: [viz.regression]
+      step8_jointplot_hue: [viz.regression]
+      step9_lmplot_basic: [viz.regression]
+      step10_lmplot_col: [viz.regression]
+      step11_lmplot_poly: [viz.regression]
+      step12_lmplot_grid: [viz.regression]
+      step13_corr_heatmap: [viz.heatmap]
+      workflow_validation: [viz.regression, viz.heatmap]
     prerequisites: [viz.regression]
     estimatedMinutes: 65
   "seaborn/10_종합EDA리포트":
@@ -1481,6 +1630,19 @@ lessonOutcomes:
     estimatedMinutes: 55
   "plotly/09_주식시계열분석":
     outcomes: [viz.interactive, viz.interactiveAdvanced]
+    sectionOutcomes:
+      step1_import: [viz.interactive]
+      step2_head: [viz.interactive]
+      step3_basic_line: [viz.interactive]
+      step4_multi_line: [viz.interactive]
+      step5_facet: [viz.interactive]
+      step6_update_layout: [viz.interactive]
+      step7_update_traces: [viz.interactive]
+      step8_template: [viz.interactiveAdvanced]
+      step9_subplots: [viz.interactiveAdvanced]
+      step10_subplots_styled: [viz.interactiveAdvanced]
+      step11_result: [viz.interactiveAdvanced]
+      workflow_validation: [viz.interactive, viz.interactiveAdvanced]
     prerequisites: [viz.interactive]
     estimatedMinutes: 60
   "plotly/10_종합대시보드":
@@ -1617,6 +1779,20 @@ lessonOutcomes:
     estimatedMinutes: 55
   "statsmodels/06_다중회귀심화":
     outcomes: [stats.regression, stats.diagnostics]
+    sectionOutcomes:
+      step1_load: [stats.regression]
+      step2_correlation: [stats.regression]
+      step3_multiple_regression: [stats.regression]
+      step4_interpret_coefficients: [stats.regression]
+      step5_rsquared_comparison: [stats.regression]
+      step6_vif: [stats.diagnostics]
+      step7_vif_viz: [stats.diagnostics]
+      step8_pvalues: [stats.diagnostics]
+      step9_remove_newspaper: [stats.diagnostics]
+      step10_interaction: [stats.regression]
+      step11_coef_comparison: [stats.regression]
+      step12_predict: [stats.regression]
+      workflow_validation: [stats.regression, stats.diagnostics]
     prerequisites: [stats.regression]
     estimatedMinutes: 60
   "statsmodels/07_경제지표회귀분석":
@@ -1705,6 +1881,18 @@ lessonOutcomes:
     estimatedMinutes: 50
   "networkx/05_소셜네트워크분석":
     outcomes: [graph.paths, graph.community]
+    sectionOutcomes:
+      step1_import: [graph.paths]
+      step2_karate: [graph.paths]
+      step3_visualize: [graph.paths]
+      step4_basic_stats: [graph.paths]
+      step5_clustering: [graph.community]
+      step6_triangles: [graph.community]
+      step7_centrality: [graph.paths]
+      step8_path_analysis: [graph.paths]
+      step9_group_analysis: [graph.community]
+      step10_clustering_viz: [graph.community]
+      workflow_validation: [graph.paths, graph.community]
     prerequisites: [graph.paths]
     estimatedMinutes: 60
   "networkx/06_연결성분석":
@@ -1735,6 +1923,16 @@ lessonOutcomes:
     estimatedMinutes: 35
   "regex/01_이메일주소추출":
     outcomes: [automation.regex, automation.textExtraction]
+    sectionOutcomes:
+      step1_import: [automation.regex]
+      step2_load: [automation.textExtraction]
+      step3_explore: [automation.textExtraction]
+      step4_pattern_basic: [automation.regex]
+      step5_pattern_improved: [automation.regex]
+      step6_extract_all: [automation.textExtraction]
+      step7_result: [automation.textExtraction]
+      step8_workflow: [automation.textExtraction]
+      workflow_validation: [automation.regex, automation.textExtraction]
     prerequisites: [automation.regex]
     estimatedMinutes: 45
   "regex/02_전화번호형식통일":
@@ -2257,6 +2455,15 @@ lessonOutcomes:
     estimatedMinutes: 60
   "advancedPython/20_자료구조구현":
     outcomes: [python.oop, python.advancedSyntax]
+    sectionOutcomes:
+      stack: [python.oop]
+      queue: [python.oop]
+      linkedlist: [python.oop, python.advancedSyntax]
+      binarytree: [python.oop]
+      heap: [python.oop, python.advancedSyntax]
+      hashtable: [python.oop, python.advancedSyntax]
+      workflow_validation: [python.oop, python.advancedSyntax]
+      practice: [python.oop, python.advancedSyntax]
     prerequisites: [python.oop]
     estimatedMinutes: 60
   "advancedPython/23_함수형패턴":
@@ -2449,6 +2656,13 @@ lessonOutcomes:
     outcomes: [automation.excel.intro, automation.excel.workbook]
     prerequisites: [automation.excel.intro]
     estimatedMinutes: 40
+    sectionOutcomes:
+      step1_create_workbook: [automation.excel.intro]
+      step2_add_sheets: [automation.excel.workbook]
+      step3_remove_sheet: [automation.excel.workbook]
+      step4_save_and_load: [automation.excel.workbook]
+      step5_default_sheet_pitfall: [automation.excel.intro]
+      validation: [automation.excel.workbook]
   "openpyxl/02_셀읽기와쓰기":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
@@ -2501,6 +2715,10 @@ lessonOutcomes:
     outcomes: [automation.excel.intro, automation.excel.workbook]
     prerequisites: [automation.excel.intro]
     estimatedMinutes: 40
+    sectionOutcomes:
+      lesson-contract: [automation.excel.intro]
+      open-and-write: [automation.excel.workbook]
+      save-and-reopen: [automation.excel.workbook]
   "xlwings/02_가격표일괄입력":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
@@ -2517,7 +2735,23 @@ lessonOutcomes:
     outcomes: [automation.excel.formulas, automation.excel.styles]
     prerequisites: [automation.excel.workbook]
     estimatedMinutes: 55
+    sectionOutcomes:
+      formula-write: [automation.excel.formulas]
+      number-format: [automation.excel.styles]
+      color-and-autofit: [automation.excel.styles]
   "xlwings/06_막대차트자동생성":
     outcomes: [automation.excel.charts]
+    prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "xlwings/07_표와동적합계":
+    outcomes: [automation.excel.tables]
+    prerequisites: [automation.excel.workbook, automation.excel.formulas]
+    estimatedMinutes: 60
+  "xlwings/08_월별파일분기합치기":
+    outcomes: [automation.excel.report]
+    prerequisites: [automation.excel.workbook, automation.excel.tables]
+    estimatedMinutes: 70
+  "xlwings/09_VBA매크로호출":
+    outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
     estimatedMinutes: 55
