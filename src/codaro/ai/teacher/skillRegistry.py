@@ -86,9 +86,11 @@ teacherSkills: tuple[TeacherSkill, ...] = (
             "suggest-next-step",
         ),
         policy=(
-            "Predict-Run-Reconcile-Adapt 루프: predict가 있으면 record-prediction-result로 diff를 mastery 신호로 바꾸고, "
-            "에러/이상한 코드가 보이면 match-misconception으로 catalog와 매칭한다. "
-            "그 다음 suggest-next-step으로 applyCorrection/replayOutcome/advance/continuePractice 중 하나를 골라 학습자에게 다음 행동을 제시한다. "
+            "Predict-Run-Reconcile-Adapt 루프. /api/curriculum/check 는 매 답안 제출마다 misconception을 자동으로 매칭하고 "
+            "mastery EMA를 갱신한다. 그러므로 학습자가 에러를 호소할 때는 가장 먼저 read-learner-state로 최근 hit을 확인한다 — "
+            "보통 이미 매칭되어 있다. catalog에 없는 새 오개념일 때만 match-misconception을 직접 부른다. "
+            "predict 셀이 있고 학습자가 예측을 적었다면 record-prediction-result로 diff를 mastery 신호로 변환한다. "
+            "다음 행동은 suggest-next-step이 applyCorrection/replayOutcome/advance/continuePractice 중 하나를 결정한다. "
             "같은 misconception이 두 번 매칭되면 doneCriterionViolated가 떠 강의 보강이 필요한 신호다."
         ),
     ),
