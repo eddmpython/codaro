@@ -250,6 +250,7 @@ export type MasterPlanStep = {
   completed: boolean;
   learnerMastery?: number | null;
   learnerConfidence?: number | null;
+  lessonRole?: "concept" | "practice" | "project";
 };
 
 export type MasterPlanGap = {
@@ -267,6 +268,8 @@ export type MasterPlanPayload = {
     excludeKeys: string[];
     skipMasteredOutcomes?: boolean;
     maxMinutes?: number;
+    projectIntent?: string;
+    deliverableOnly?: boolean;
   };
   targetOutcomes: string[];
   steps: MasterPlanStep[];
@@ -277,6 +280,10 @@ export type MasterPlanPayload = {
   summary: string;
   nextStepKey: string | null;
   completedCount: number;
+  conceptSteps?: MasterPlanStep[];
+  practiceSteps?: MasterPlanStep[];
+  projectSteps?: MasterPlanStep[];
+  projectMatches?: string[];
 };
 
 export type CurriculumGapsPayload = {
@@ -294,6 +301,8 @@ export type MasterPlanRequestBody = {
   excludeKeys?: string[];
   skipMasteredOutcomes?: boolean;
   maxMinutes?: number;
+  projectIntent?: string;
+  deliverableOnly?: boolean;
 };
 
 export type OutcomeMasteryEntry = {

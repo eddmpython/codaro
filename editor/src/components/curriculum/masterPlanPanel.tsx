@@ -23,6 +23,7 @@ import type {
   CurriculumDomain,
   CurriculumTaxonomyPayload,
   MasterPlanPayload,
+  MasterPlanStep,
 } from "@/types";
 import { MasteryPanel } from "./masteryPanel";
 import { TodayReviewsCard } from "./todayReviewsCard";
@@ -42,6 +43,8 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [masteryRefreshKey, setMasteryRefreshKey] = useState(0);
+  const [projectIntent, setProjectIntent] = useState<string>("");
+  const [showTieredView, setShowTieredView] = useState(false);
 
   const outcomeLabels = useMemo<Record<string, string>>(() => {
     const map: Record<string, string> = {};
@@ -78,7 +81,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   }, []);
 
   const composePlan = useCallback(
-    async (domainId: string) => {
+    async (domainId: string | null) => {
       setLoadingPlan(true);
       setError(null);
       try {
@@ -87,19 +90,25 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           excludeCompleted,
           skipMasteredOutcomes: skipMastered,
           maxMinutes: maxMinutes > 0 ? maxMinutes : undefined,
+          projectIntent: projectIntent || undefined,
+          deliverableOnly: projectIntent ? true : undefined,
         });
         setPlan(next);
+        // projectIntent 가 매칭하면 3 단 뷰 자동 활성화
+        if (projectIntent && next.projectMatches && next.projectMatches.length > 0) {
+          setShowTieredView(true);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
         setLoadingPlan(false);
       }
     },
-    [excludeCompleted, skipMastered, maxMinutes],
+    [excludeCompleted, skipMastered, maxMinutes, projectIntent],
   );
 
   useEffect(() => {
-    if (selectedDomain) {
+    if (selectedDomain || projectIntent) {
       void composePlan(selectedDomain);
     }
   }, [selectedDomain, composePlan, masteryRefreshKey]);
@@ -143,6 +152,38 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         selected={selectedDomain}
         onSelect={setSelectedDomain}
       />
+
+      <div className="space-y-1.5">
+        <input
+          type="text"
+          className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none"
+          placeholder="만들고 싶은 것 (예: 매출 대시보드, 보고서 자동화, 데이터 정리 봇)"
+          value={projectIntent}
+          onChange={(event) => setProjectIntent(event.target.value)}
+          onBlur={() => selectedDomain && composePlan(selectedDomain)}
+        />
+        {plan?.projectMatches && plan.projectMatches.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1 text-[10px] text-zinc-500">
+            <span>매칭 키워드:</span>
+            {plan.projectMatches.map((kw) => (
+              <Badge
+                key={kw}
+                variant="outline"
+                className="h-4 border-emerald-700/40 px-1.5 text-[9px] text-emerald-300"
+              >
+                {kw}
+              </Badge>
+            ))}
+            <button
+              type="button"
+              className="ml-2 text-[10px] text-zinc-400 hover:text-zinc-200 underline"
+              onClick={() => setShowTieredView((s) => !s)}
+            >
+              {showTieredView ? "단일 흐름" : "3단 흐름"}
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
         <label className="flex items-center gap-1 cursor-pointer">
@@ -252,12 +293,20 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           </div>
         )}
         {plan && !loadingPlan && (
-          <PlanBody
-            plan={plan}
-            labelFor={labelFor}
-            onSelectLesson={onSelectLesson}
-            onRequestGapDraft={onRequestGapDraft}
-          />
+          showTieredView && plan.projectSteps && plan.projectSteps.length > 0 ? (
+            <TieredPlanBody
+              plan={plan}
+              labelFor={labelFor}
+              onSelectLesson={onSelectLesson}
+            />
+          ) : (
+            <PlanBody
+              plan={plan}
+              labelFor={labelFor}
+              onSelectLesson={onSelectLesson}
+              onRequestGapDraft={onRequestGapDraft}
+            />
+          )
         )}
       </ScrollArea>
     </div>
@@ -535,6 +584,128 @@ function PlanBody({
             propose-curriculum-draft 도구가 초안만 만들어 줍니다. 실제 강의는 사람이 검토·작성합니다.
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+function TieredPlanBody({
+  plan,
+  labelFor,
+  onSelectLesson,
+}: {
+  plan: MasterPlanPayload;
+  labelFor: (outcomeId: string) => string;
+  onSelectLesson?: (category: string, contentId: string) => void;
+}) {
+  const concept = plan.conceptSteps ?? [];
+  const practice = plan.practiceSteps ?? [];
+  const project = plan.projectSteps ?? [];
+  return (
+    <div className="space-y-3 px-1 pb-4">
+      <div className="text-xs text-zinc-400">
+        <Target className="mr-1 inline h-3 w-3 text-zinc-500" /> {plan.summary}
+      </div>
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        <TierColumn
+          label="개념 학습"
+          tone="zinc"
+          steps={concept}
+          labelFor={labelFor}
+          onSelectLesson={onSelectLesson}
+        />
+        <TierColumn
+          label="실습 적용"
+          tone="sky"
+          steps={practice}
+          labelFor={labelFor}
+          onSelectLesson={onSelectLesson}
+        />
+        <TierColumn
+          label="프로젝트"
+          tone="emerald"
+          steps={project}
+          labelFor={labelFor}
+          onSelectLesson={onSelectLesson}
+        />
+      </div>
+    </div>
+  );
+}
+
+function TierColumn({
+  label,
+  tone,
+  steps,
+  labelFor,
+  onSelectLesson,
+}: {
+  label: string;
+  tone: "zinc" | "sky" | "emerald";
+  steps: MasterPlanStep[];
+  labelFor: (outcomeId: string) => string;
+  onSelectLesson?: (category: string, contentId: string) => void;
+}) {
+  const headerColor: Record<typeof tone, string> = {
+    zinc: "text-zinc-300 border-zinc-700",
+    sky: "text-sky-300 border-sky-800",
+    emerald: "text-emerald-300 border-emerald-800",
+  };
+  return (
+    <div className="space-y-1.5">
+      <div className={cn("rounded border bg-zinc-900/30 px-2 py-1 text-[10px] font-semibold uppercase", headerColor[tone])}>
+        {label} <span className="ml-1 text-zinc-500">({steps.length})</span>
+      </div>
+      {steps.length === 0 ? (
+        <div className="rounded border border-dashed border-zinc-800 px-2 py-3 text-center text-[10px] text-zinc-600">
+          비어 있음
+        </div>
+      ) : (
+        <ol className="space-y-1.5">
+          {steps.map((step) => (
+            <li key={step.key}>
+              <Card
+                className={cn(
+                  "border border-zinc-800 bg-zinc-900/40 px-2 py-2 text-[11px] transition-colors",
+                  step.completed && "border-emerald-900/40 bg-emerald-950/15 opacity-80",
+                  onSelectLesson && "cursor-pointer hover:border-zinc-600",
+                )}
+                onClick={() => onSelectLesson?.(step.category, step.contentId)}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate font-medium text-zinc-100">{step.title}</div>
+                    <div className="mt-0.5 text-[10px] text-zinc-500">
+                      {step.category} · {step.estimatedMinutes}분
+                    </div>
+                    {step.outcomes.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {step.outcomes.slice(0, 2).map((outcomeId) => (
+                          <Badge
+                            key={outcomeId}
+                            variant="outline"
+                            className="text-[9px] font-normal text-zinc-400 border-zinc-700"
+                            title={outcomeId}
+                          >
+                            {labelFor(outcomeId)}
+                          </Badge>
+                        ))}
+                        {step.outcomes.length > 2 && (
+                          <Badge
+                            variant="outline"
+                            className="text-[9px] font-normal text-zinc-500 border-zinc-700"
+                          >
+                            +{step.outcomes.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </li>
+          ))}
+        </ol>
       )}
     </div>
   );
