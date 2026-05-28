@@ -324,6 +324,34 @@ export type MasteryReportPayload = {
   totalOutcomeCount: number;
 };
 
+export type ReviewItem = {
+  lessonKey: string;
+  title: string;
+  category: string;
+  contentId: string;
+  interval: number;
+  ease: number;
+  streak: number;
+  lastResult: "fresh" | "success" | "lapse";
+  nextReviewAt: string;
+  daysOverdue: number;
+};
+
+export type ReviewListPayload = {
+  reviews: ReviewItem[];
+  totalDue: number;
+};
+
+export type ReviewStatePayload = {
+  lessonKey: string;
+  interval: number;
+  ease: number;
+  streak: number;
+  nextReviewAt: string;
+  lastResult: "fresh" | "success" | "lapse";
+  lastReviewedAt: string | null;
+};
+
 // Predict-Run-Reconcile-Adapt 루프 — 학습자 상태 (LearnerStateStore HTTP surface)
 export type LearnerOutcomeMastery = {
   outcomeId: string;

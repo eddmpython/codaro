@@ -14,6 +14,8 @@ import type {
   CurriculumLessonPayload,
   CurriculumTaxonomyPayload,
   MasteryReportPayload,
+  ReviewListPayload,
+  ReviewStatePayload,
   LearnerSnapshotPayload,
   LearnerOutcomePayload,
   DiagnosticExportPayload,
@@ -274,6 +276,12 @@ export const codaroApi = {
     postJson<{ outcomeId: string; validated: boolean }>(
       "/api/curriculum/outcomes/validate",
       { outcomeId, validated },
+    ),
+  curriculumReviews: () => requestJson<ReviewListPayload>("/api/curriculum/reviews"),
+  curriculumRecordReview: (category: string, contentId: string, success: boolean) =>
+    postJson<ReviewStatePayload>(
+      `/api/curriculum/reviews/${encodeURIComponent(category)}/${encodeURIComponent(contentId)}`,
+      { success },
     ),
   progress: () => requestJson<ProgressSummary>("/api/curriculum/progress"),
   updateProgress: (category: string, contentId: string, missionId: string, totalMissions: number) =>

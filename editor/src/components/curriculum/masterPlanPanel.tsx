@@ -25,6 +25,7 @@ import type {
   MasterPlanPayload,
 } from "@/types";
 import { MasteryPanel } from "./masteryPanel";
+import { TodayReviewsCard } from "./todayReviewsCard";
 
 type MasterPlanPanelProps = {
   onSelectLesson?: (category: string, contentId: string) => void;
@@ -191,6 +192,11 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           <div className="mt-1 text-zinc-500">{activeDomain.description}</div>
         </div>
       )}
+
+      <TodayReviewsCard
+        onSelectLesson={onSelectLesson}
+        onChange={() => setMasteryRefreshKey((k) => k + 1)}
+      />
 
       <MasteryPanel
         taxonomy={taxonomy}
