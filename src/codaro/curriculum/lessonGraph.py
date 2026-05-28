@@ -35,6 +35,18 @@ class LessonNode(BaseModel):
             return list(explicit)
         return list(self.outcomes)
 
+    def effectiveMinutes(self, progressTracker=None) -> int:
+        """학습자 실측 표본이 2 개 이상이면 EWMA, 아니면 정적 추정값.
+
+        progressTracker 가 None 이면 static 값. plan composer 가 시간 예산 계산에 사용.
+        """
+        if progressTracker is None:
+            return self.estimatedMinutes
+        lesson = progressTracker.getLesson(self.category, self.contentId)
+        if lesson.observedSampleCount >= 2 and lesson.observedMinutesEwma > 0:
+            return int(round(lesson.observedMinutesEwma))
+        return self.estimatedMinutes
+
 
 class LessonGraph(BaseModel):
     lessons: list[LessonNode] = Field(default_factory=list)

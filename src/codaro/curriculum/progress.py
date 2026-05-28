@@ -10,6 +10,41 @@ from .outcomeCredit import OutcomeCreditEntry, hintWeight, shouldAutoValidate
 from .reviewScheduler import ReviewState, initState as initReviewState, isDue as reviewIsDue, updateOnLapse as reviewOnLapse, updateOnSuccess as reviewOnSuccess
 
 
+_EWMA_ALPHA = 0.3  # 새 표본의 가중치 — 0.3 → 신호 빠른 적응 + 노이즈 완충
+_STALE_HOURS = 48.0  # 한 세션 만에 끝낸 게 아니면 표본에서 제외
+_SAMPLE_MIN_MINUTES = 1.0
+_SAMPLE_MAX_MINUTES = 480.0
+
+
+def _parseIsoToDatetime(iso: str | None) -> datetime | None:
+    if not iso:
+        return None
+    try:
+        return datetime.fromisoformat(iso)
+    except ValueError:
+        return None
+
+
+def _updateObservedMinutes(lesson: "LessonProgress") -> None:
+    """완료 시점에 호출되어 EWMA 갱신. firstAccessedAt 없으면 skip,
+    elapsed 가 48h 초과면 stale 로 보고 skip.
+    """
+    firstAt = _parseIsoToDatetime(lesson.firstAccessedAt)
+    completedAt = _parseIsoToDatetime(lesson.completedAt)
+    if firstAt is None or completedAt is None:
+        return
+    elapsedMinutes = (completedAt - firstAt).total_seconds() / 60.0
+    if elapsedMinutes > _STALE_HOURS * 60:
+        return  # 며칠 걸쳐 학습한 lesson 은 실측 신호로 부적합
+    sample = max(_SAMPLE_MIN_MINUTES, min(elapsedMinutes, _SAMPLE_MAX_MINUTES))
+    if lesson.observedSampleCount <= 0:
+        lesson.observedMinutesEwma = sample
+    else:
+        prev = lesson.observedMinutesEwma
+        lesson.observedMinutesEwma = (1 - _EWMA_ALPHA) * prev + _EWMA_ALPHA * sample
+    lesson.observedSampleCount += 1
+
+
 class SectionResult(BaseModel):
     sectionId: str
     passed: bool = False
@@ -27,6 +62,10 @@ class LessonProgress(BaseModel):
     completedAt: str | None = None
     lastAccessedAt: str | None = None
     sectionResults: dict[str, SectionResult] = Field(default_factory=dict)
+    # Phase 5 — 실측 학습 시간 EWMA. 첫 진입 시점부터 완료까지의 elapsed 를 누적.
+    firstAccessedAt: str | None = None
+    observedMinutesEwma: float = 0.0
+    observedSampleCount: int = 0
 
 
 class UserProgress(BaseModel):
@@ -76,7 +115,10 @@ class ProgressTracker:
         key = f"{category}/{contentId}"
         if key not in progress.lessons:
             progress.lessons[key] = LessonProgress(category=category, contentId=contentId)
-        return progress.lessons[key]
+        lesson = progress.lessons[key]
+        if lesson.firstAccessedAt is None:
+            lesson.firstAccessedAt = datetime.now(timezone.utc).isoformat()
+        return lesson
 
     def completeMission(self, category: str, contentId: str, missionId: str, totalMissions: int = 0) -> LessonProgress:
         lesson = self.getLesson(category, contentId)
@@ -95,6 +137,7 @@ class ProgressTracker:
             progress = self.load()
             if key not in progress.lessonReviews:
                 progress.lessonReviews[key] = initReviewState(key, lesson.completedAt)
+            _updateObservedMinutes(lesson)
         self.save()
         return lesson
 
@@ -233,9 +276,20 @@ class ProgressTracker:
 
         Caller is responsible for `recordSectionResult` — this method only handles credits.
         Batched: N credits 가 들어와도 disk write 는 1회.
+        Phase 6 — hint 0 + 첫 시도 통과면 entry.fastTrack=True 로 표시.
         """
+        from .outcomeCredit import FAST_TRACK_ATTEMPT_MAX, FAST_TRACK_HINT_MAX
+
         weight = hintWeight(hintLevel)
         lessonKey = f"{category}/{contentId}"
+        # section.attemptCount 가 1 이고 hintLevel 이 0 이면 fast-track
+        lesson = self.getLesson(category, contentId)
+        sectionResult = lesson.sectionResults.get(sectionId)
+        attemptCount = sectionResult.attemptCount if sectionResult else 0
+        isFastTrack = (
+            hintLevel <= FAST_TRACK_HINT_MAX
+            and 0 < attemptCount <= FAST_TRACK_ATTEMPT_MAX
+        )
         creditedIds: list[str] = []
         autoValidatedIds: list[str] = []
         for outcomeId in outcomes:
@@ -245,6 +299,7 @@ class ProgressTracker:
                 sectionId=sectionId,
                 hintLevel=hintLevel,
                 weight=weight,
+                fastTrack=isFastTrack,
             )
             became = self.recordOutcomeCredit(entry, save=False)
             creditedIds.append(outcomeId)

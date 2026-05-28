@@ -278,6 +278,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             maxMinutes=request.maxMinutes,
             projectIntent=request.projectIntent,
             deliverableOnly=request.deliverableOnly,
+            adaptiveSkip=request.adaptiveSkip,
         )
         plan = composeMasterPlan(
             goal,
@@ -313,6 +314,42 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             ),
         )
         return report.model_dump()
+
+    @router.get("/api/curriculum/lesson-stats")
+    def apiCurriculumLessonStats() -> dict[str, object]:
+        """학습자 실측 학습 시간 통계.
+
+        작가가 estimatedMinutes 보정에 사용. observed 표본이 있는 lesson 만 반환.
+        """
+        graph = state.curriculumOs.graph()
+        progress = state.progressTracker.load()
+        rows: list[dict[str, object]] = []
+        for key, lesson in progress.lessons.items():
+            if lesson.observedSampleCount < 1:
+                continue
+            node = graph.byKey(key)
+            if node is None:
+                continue
+            static = node.estimatedMinutes
+            observed = lesson.observedMinutesEwma
+            deviation = ""
+            if static > 0 and observed > 0:
+                pct = (observed - static) / static * 100
+                deviation = f"{pct:+.1f}%"
+            rows.append({
+                "key": key,
+                "title": node.title,
+                "static": static,
+                "observedEwma": round(observed, 2),
+                "sampleCount": lesson.observedSampleCount,
+                "deviation": deviation,
+            })
+        rows.sort(key=lambda r: (-int(r["sampleCount"]), str(r["key"])))
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(action="lesson-stats", count=len(rows)),
+        )
+        return {"lessons": rows}
 
     @router.post("/api/curriculum/outcomes/validate")
     def apiCurriculumValidateOutcome(request: OutcomeValidationRequest) -> dict[str, object]:

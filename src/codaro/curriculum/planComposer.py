@@ -23,6 +23,8 @@ from .outcomeMastery import computeMastery, masteredOutcomeIds
 from .progress import ProgressTracker
 from .taxonomy import CurriculumTaxonomy
 
+# 순환 import 방지를 위해 _composeMasterPlan 내부에서 lazy import.
+
 
 # 학습자 mastery가 이 임계 이하면 dynamic gap으로 표시한다.
 # learnerState EMA 기본 0.3 (한 번 성공 시 0.3 도달) — 그 아래면 신뢰할 수 없는 상태로 본다.
@@ -74,6 +76,8 @@ class PlanGoal(BaseModel):
     projectIntent: str = ""
     # True 면 mastery >=0.6 인 concept lesson은 droppedSteps로 분리 (project 위주 plan).
     deliverableOnly: bool = False
+    # Phase 6 — fast-track 통과한 outcome 은 후속 plan 에서 자동 스킵 (default on).
+    adaptiveSkip: bool = True
 
 
 class PlanStep(BaseModel):
@@ -90,6 +94,9 @@ class PlanStep(BaseModel):
     learnerMastery: float | None = None
     learnerConfidence: float | None = None
     lessonRole: str = "concept"
+    # Phase 5 — "static" (작가가 적은 추정값) or "observed" (학습자 실측 EWMA).
+    estimatedSource: str = "static"
+    observedSampleCount: int = 0
 
 
 class PlanGap(BaseModel):
@@ -115,6 +122,10 @@ class MasterPlan(BaseModel):
     practiceSteps: list[PlanStep] = Field(default_factory=list)
     projectSteps: list[PlanStep] = Field(default_factory=list)
     projectMatches: list[str] = Field(default_factory=list)  # projectIntent 토큰 매칭 결과
+    # Phase 4 — projectIntent 해석 결과 (키워드 + 선택적 AI ranking). frontend 가 "AI 해석" 박스로 렌더.
+    goalResolution: dict | None = None
+    # Phase 6 — adaptive skip 으로 자동 제외된 outcome.
+    adaptiveSkipped: list[dict] = Field(default_factory=list)
 
 
 def _categoryRank(category: str) -> int:
@@ -342,13 +353,28 @@ def composeMasterPlan(
     taxonomy: CurriculumTaxonomy,
     progressTracker: ProgressTracker | None = None,
     learnerStateStore: LearnerStateStore | None = None,
+    aiProvider=None,
 ) -> MasterPlan:
     targetOutcomes = _resolveTargetOutcomes(goal, taxonomy)
     excludeKeys: set[str] = set(goal.excludeKeys or [])
 
     # projectIntent — deliverable-driven 목표. 매칭된 project lesson 의 outcome 을
     # target 에 강제 포함시키고, project lesson 자체를 selected 로 forced 추가.
-    boostedCategories, matchedKeywords = _matchProjectIntent(goal.projectIntent)
+    goalResolution = None
+    matchedKeywords: list[str] = []
+    boostedCategories: set[str] = set()
+    if goal.projectIntent:
+        # Lazy import — planComposer ↔ goalResolver 순환 의존 피한다.
+        from .goalResolver import resolveGoal as _resolveGoal
+
+        resolution = _resolveGoal(goal.projectIntent, taxonomy, aiProvider=aiProvider)
+        goalResolution = resolution.model_dump()
+        matchedKeywords = resolution.matchedKeywords
+        boostedCategories = set(resolution.boostedCategories)
+        # AI 가 추천한 outcome 을 target 에 추가 — 키워드 매칭 없을 때도 ranking 으로 target 확장.
+        for suggestion in resolution.aiSuggestedOutcomes[:5]:
+            if suggestion.outcomeId not in targetOutcomes:
+                targetOutcomes.append(suggestion.outcomeId)
     projectAnchors = _projectLessonsForIntent(graph, boostedCategories) if goal.projectIntent else []
     forcedProjects = projectAnchors[:3]  # 너무 많이 묶이면 plan 폭주 — 상위 3 개로 제한
     for project in forcedProjects:
@@ -359,10 +385,24 @@ def composeMasterPlan(
     # skipMasteredOutcomes — mastery >= MASTERY_THRESHOLD인 outcome은 plan에서 제외.
     # target 단계뿐 아니라 prerequisite expansion에서도 차단되어야 한다.
     masteredOutcomes: set[str] = set()
-    if goal.skipMasteredOutcomes and progressTracker is not None:
+    adaptiveSkippedOutcomes: list[dict] = []
+    if (goal.skipMasteredOutcomes or goal.adaptiveSkip) and progressTracker is not None:
         validated = progressTracker.listValidatedOutcomes()
         report = computeMastery(graph, taxonomy, progressTracker, validated)
-        masteredOutcomes = masteredOutcomeIds(report)
+        if goal.skipMasteredOutcomes:
+            masteredOutcomes = masteredOutcomeIds(report)
+        if goal.adaptiveSkip:
+            # Phase 6 — fast-track 으로 mastery >= FAST_TRACK_MASTERY_BOOST 도달한 outcome.
+            from .outcomeCredit import FAST_TRACK_MASTERY_BOOST as _FT_BOOST
+
+            for entry in report.outcomes:
+                if entry.fastTracked and entry.level >= _FT_BOOST and entry.outcomeId not in masteredOutcomes:
+                    masteredOutcomes.add(entry.outcomeId)
+                    adaptiveSkippedOutcomes.append({
+                        "outcomeId": entry.outcomeId,
+                        "outcomeLabel": entry.label,
+                        "reason": f"빠른 통과 — mastery {entry.level:.2f}",
+                    })
         targetOutcomes = [oid for oid in targetOutcomes if oid not in masteredOutcomes]
 
     selected, unresolved = _expandWithPrerequisites(
@@ -417,7 +457,16 @@ def composeMasterPlan(
             if goal.excludeCompleted:
                 continue
         visibleOrder += 1
-        totalMinutes += lesson.estimatedMinutes
+        # Phase 5 — 학습자가 같은 lesson 을 여러 번 했으면 실측 EWMA 가 더 정확.
+        stepMinutes = lesson.effectiveMinutes(progressTracker)
+        observedCount = 0
+        estimatedSource = "static"
+        if progressTracker is not None:
+            stored = progressTracker.getLesson(lesson.category, lesson.contentId)
+            observedCount = stored.observedSampleCount
+            if observedCount >= 2 and stored.observedMinutesEwma > 0:
+                estimatedSource = "observed"
+        totalMinutes += stepMinutes
         if nextStepKey is None and not isCompleted:
             nextStepKey = lesson.key
 
@@ -438,11 +487,13 @@ def composeMasterPlan(
             outcomes=lesson.outcomes,
             prerequisites=lesson.prerequisites,
             rationale=_buildRationale(lesson, targetSet, taxonomy),
-            estimatedMinutes=lesson.estimatedMinutes,
+            estimatedMinutes=stepMinutes,
             completed=isCompleted,
             learnerMastery=learnerMastery,
             learnerConfidence=learnerConfidence,
             lessonRole=lesson.lessonRole,
+            estimatedSource=estimatedSource,
+            observedSampleCount=observedCount,
         ))
 
     droppedSteps: list[PlanStep] = []
@@ -531,6 +582,8 @@ def composeMasterPlan(
         practiceSteps=practiceSteps,
         projectSteps=projectSteps,
         projectMatches=matchedKeywords,
+        goalResolution=goalResolution,
+        adaptiveSkipped=adaptiveSkippedOutcomes,
     )
 
 

@@ -21,6 +21,11 @@ CREDIT_HINT_FACTOR_MIN = 0.2
 CERTIFY_THRESHOLD = 3
 CERTIFY_WEIGHT = 0.7
 
+# Phase 6 — Fast-track: hint 0 + 첫 시도 통과 시 즉시 강한 mastery 신호.
+FAST_TRACK_HINT_MAX = 0
+FAST_TRACK_ATTEMPT_MAX = 1
+FAST_TRACK_MASTERY_BOOST = 0.85  # 단일 credit 이지만 mastery 합성에서 이만큼 contribution.
+
 
 class OutcomeCreditEntry(BaseModel):
     outcomeId: str
@@ -29,6 +34,7 @@ class OutcomeCreditEntry(BaseModel):
     hintLevel: int = 0
     weight: float = 1.0
     creditedAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    fastTrack: bool = False
 
 
 def hintWeight(hintLevel: int) -> float:

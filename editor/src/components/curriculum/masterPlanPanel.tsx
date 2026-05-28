@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import type {
   CurriculumDomain,
   CurriculumTaxonomyPayload,
+  GoalResolutionPayload,
   MasterPlanPayload,
   MasterPlanStep,
 } from "@/types";
@@ -45,6 +46,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   const [masteryRefreshKey, setMasteryRefreshKey] = useState(0);
   const [projectIntent, setProjectIntent] = useState<string>("");
   const [showTieredView, setShowTieredView] = useState(false);
+  const [adaptiveSkip, setAdaptiveSkip] = useState(true);
 
   const outcomeLabels = useMemo<Record<string, string>>(() => {
     const map: Record<string, string> = {};
@@ -92,6 +94,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           maxMinutes: maxMinutes > 0 ? maxMinutes : undefined,
           projectIntent: projectIntent || undefined,
           deliverableOnly: projectIntent ? true : undefined,
+          adaptiveSkip,
         });
         setPlan(next);
         // projectIntent 가 매칭하면 3 단 뷰 자동 활성화
@@ -104,7 +107,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         setLoadingPlan(false);
       }
     },
-    [excludeCompleted, skipMastered, maxMinutes, projectIntent],
+    [excludeCompleted, skipMastered, maxMinutes, projectIntent, adaptiveSkip],
   );
 
   useEffect(() => {
@@ -183,6 +186,12 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
             </button>
           </div>
         )}
+        {plan?.goalResolution && plan.goalResolution.source !== "none" && (
+          <GoalResolutionBox
+            resolution={plan.goalResolution}
+            outcomeLabels={outcomeLabels}
+          />
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
@@ -203,6 +212,15 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
             onChange={(event) => setSkipMastered(event.target.checked)}
           />
           이미 익힌 능력 건너뛰기
+        </label>
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input
+            type="checkbox"
+            className="rounded"
+            checked={adaptiveSkip}
+            onChange={(event) => setAdaptiveSkip(event.target.checked)}
+          />
+          빠른 통과 자동 스킵
         </label>
         <label className="flex items-center gap-1">
           시간 예산
@@ -254,6 +272,10 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           숙련도 새로고침
         </Button>
       </div>
+
+      {plan?.adaptiveSkipped && plan.adaptiveSkipped.length > 0 && (
+        <AdaptiveSkippedBadge skipped={plan.adaptiveSkipped} />
+      )}
 
       {plan && !loadingPlan && totalLessons > 0 && (
         <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs">
@@ -502,9 +524,20 @@ function PlanBody({
                     </div>
                   </div>
                   {step.estimatedMinutes > 0 && (
-                    <span className="text-[10px] text-zinc-500 shrink-0">
-                      ~{step.estimatedMinutes}분
-                    </span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className="text-[10px] text-zinc-500">
+                        ~{step.estimatedMinutes}분
+                      </span>
+                      {step.estimatedSource === "observed" && (
+                        <Badge
+                          variant="outline"
+                          className="h-3.5 border-amber-700/40 px-1 text-[8px] text-amber-300"
+                          title={`실측 EWMA · 표본 ${step.observedSampleCount ?? 0}회`}
+                        >
+                          실측
+                        </Badge>
+                      )}
+                    </div>
                   )}
                 </div>
               </Card>
@@ -675,8 +708,17 @@ function TierColumn({
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="truncate font-medium text-zinc-100">{step.title}</div>
-                    <div className="mt-0.5 text-[10px] text-zinc-500">
-                      {step.category} · {step.estimatedMinutes}분
+                    <div className="mt-0.5 flex items-center gap-1 text-[10px] text-zinc-500">
+                      <span>{step.category} · {step.estimatedMinutes}분</span>
+                      {step.estimatedSource === "observed" && (
+                        <Badge
+                          variant="outline"
+                          className="h-3.5 border-amber-700/40 px-1 text-[8px] text-amber-300"
+                          title={`실측 · 표본 ${step.observedSampleCount ?? 0}회`}
+                        >
+                          실측
+                        </Badge>
+                      )}
                     </div>
                     {step.outcomes.length > 0 && (
                       <div className="mt-1 flex flex-wrap gap-1">
@@ -706,6 +748,83 @@ function TierColumn({
             </li>
           ))}
         </ol>
+      )}
+    </div>
+  );
+}
+
+function AdaptiveSkippedBadge({
+  skipped,
+}: {
+  skipped: Array<{ outcomeId: string; outcomeLabel: string; reason: string }>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="rounded-md border border-emerald-700/40 bg-emerald-950/30 px-2.5 py-2 text-[11px] text-emerald-200">
+      <button
+        type="button"
+        className="flex items-center gap-1.5 font-medium hover:text-emerald-100"
+        onClick={() => setExpanded((s) => !s)}
+      >
+        <CheckCircle2 className="h-3 w-3" />
+        <span>{skipped.length}개 능력 빠른 통과로 자동 스킵</span>
+        <span className="text-emerald-400/70">{expanded ? "▴" : "▾"}</span>
+      </button>
+      {expanded && (
+        <ul className="mt-1.5 space-y-0.5 text-[10px] text-emerald-300/80">
+          {skipped.map((item) => (
+            <li key={item.outcomeId}>
+              · {item.outcomeLabel} <span className="text-emerald-500/60">({item.reason})</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function GoalResolutionBox({
+  resolution,
+  outcomeLabels,
+}: {
+  resolution: GoalResolutionPayload;
+  outcomeLabels: Record<string, string>;
+}) {
+  const sourceBadge =
+    resolution.source === "ai"
+      ? { label: "AI 해석", tone: "border-violet-700/40 text-violet-300" }
+      : resolution.source === "blended"
+      ? { label: "키워드 + AI", tone: "border-sky-700/40 text-sky-300" }
+      : { label: "키워드 매칭", tone: "border-emerald-700/40 text-emerald-300" };
+  const topOutcomes = resolution.aiSuggestedOutcomes.slice(0, 5);
+  return (
+    <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-900/40 px-2.5 py-2 text-[10px] text-zinc-400">
+      <div className="flex items-center gap-1.5">
+        <Sparkles className="h-3 w-3 text-violet-400" />
+        <Badge variant="outline" className={cn("h-4 px-1.5 text-[9px]", sourceBadge.tone)}>
+          {sourceBadge.label}
+        </Badge>
+        {resolution.reasoning && (
+          <span className="text-zinc-300">{resolution.reasoning}</span>
+        )}
+      </div>
+      {topOutcomes.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="text-zinc-500">추천 능력:</span>
+          {topOutcomes.map((s) => (
+            <Badge
+              key={s.outcomeId ?? s.label}
+              variant="outline"
+              className="h-4 border-violet-700/40 px-1.5 text-[9px] text-violet-200"
+              title={s.reason}
+            >
+              {outcomeLabels[s.outcomeId ?? ""] ?? s.label}
+              <span className="ml-1 text-violet-400/70">
+                {(s.score * 100).toFixed(0)}
+              </span>
+            </Badge>
+          ))}
+        </div>
       )}
     </div>
   );

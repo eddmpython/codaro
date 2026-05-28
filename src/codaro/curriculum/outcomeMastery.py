@@ -24,7 +24,7 @@ from math import prod
 from pydantic import BaseModel, Field
 
 from .lessonGraph import LessonGraph
-from .outcomeCredit import OutcomeCreditEntry, creditContribution
+from .outcomeCredit import FAST_TRACK_MASTERY_BOOST, OutcomeCreditEntry, creditContribution
 from .progress import LessonProgress, ProgressTracker
 from .taxonomy import CurriculumTaxonomy
 
@@ -67,6 +67,7 @@ class OutcomeMastery(BaseModel):
     lastCreditAt: str | None = None
     validated: bool = False
     autoValidated: bool = False
+    fastTracked: bool = False  # Phase 6 — hint 0 첫 시도 통과 credit 보유
 
     @property
     def mastered(self) -> bool:
@@ -141,10 +142,18 @@ def computeMastery(
                     _decayedContribution(ACCESSED_CONTRIB, lessonProgress.lastAccessedAt)
                 )
         credits = creditMap.get(outcome.id, [])
+        hasFastTrack = False
         for credit in credits:
-            contributions.append(
-                _decayedContribution(creditContribution(credit.weight), credit.creditedAt)
-            )
+            if credit.fastTrack:
+                hasFastTrack = True
+                # Phase 6 — fast-track 은 강한 단일 신호로 별도 contribution 추가.
+                contributions.append(
+                    _decayedContribution(FAST_TRACK_MASTERY_BOOST, credit.creditedAt)
+                )
+            else:
+                contributions.append(
+                    _decayedContribution(creditContribution(credit.weight), credit.creditedAt)
+                )
         lastCreditAt = credits[-1].creditedAt if credits else None
         if outcome.id in validated:
             level = 1.0
@@ -163,6 +172,7 @@ def computeMastery(
             lastCreditAt=lastCreditAt,
             validated=outcome.id in manualValidated,
             autoValidated=outcome.id in autoValidated,
+            fastTracked=hasFastTrack,
         )
 
     domains: list[DomainMastery] = []

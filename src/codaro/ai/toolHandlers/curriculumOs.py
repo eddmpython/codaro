@@ -8,6 +8,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
+from ...curriculum.goalResolver import resolveGoal
 from ...curriculum.lessonGraph import LessonGraph, buildLessonGraph
 from ...curriculum.outcomeMastery import computeMastery, masteredOutcomeIds
 from ...curriculum.planComposer import PlanGoal, composeMasterPlan
@@ -112,28 +113,61 @@ class CurriculumOsToolHandlers:
         if not isinstance(limit, int) or limit <= 0:
             limit = 3
         taxonomy = _taxonomy()
-        tokens = _tokenize(goalText)
-        scored = []
-        for domain in taxonomy.domains:
-            score = _scoreGoalForDomain(tokens, domain, taxonomy)
-            scored.append((score, domain))
-        scored.sort(key=lambda pair: (-pair[0], pair[1].id))
-        candidates = [
-            {
+        # Phase 4 — goalResolver 가 키워드 매칭 + (있으면) AI ranking 합성.
+        # 핸들러 자신은 결정적: AI provider 는 self 가 노출하면 사용, 없으면 None.
+        innerProvider = getattr(self, "innerAiProvider", None)
+        resolution = resolveGoal(goalText, taxonomy, aiProvider=innerProvider)
+        # 도메인 후보는 boostedCategories + AI ranking 결과를 합성. 부족하면 기존
+        # token scoring 으로 보강해 결과가 비지 않게 한다 (회귀 방지).
+        candidates: list[dict[str, Any]] = []
+        seenDomains: set[str] = set()
+        for suggestion in resolution.aiSuggestedDomains[:limit]:
+            domain = taxonomy.domainById(suggestion.domainId)
+            if domain is None or domain.id in seenDomains:
+                continue
+            seenDomains.add(domain.id)
+            candidates.append({
                 "domainId": domain.id,
                 "domainLabel": domain.label,
                 "description": domain.description,
-                "score": score,
+                "score": suggestion.score,
+                "reason": suggestion.reason,
                 "matchedOutcomes": [
                     taxonomy.outcomeLabel(outcomeId)
                     for outcomeId in domain.targetOutcomes[:5]
                 ],
-            }
-            for score, domain in scored[:limit]
-        ]
+            })
+        if len(candidates) < limit:
+            tokens = _tokenize(goalText)
+            scored = []
+            for domain in taxonomy.domains:
+                if domain.id in seenDomains:
+                    continue
+                score = _scoreGoalForDomain(tokens, domain, taxonomy)
+                scored.append((score, domain))
+            scored.sort(key=lambda pair: (-pair[0], pair[1].id))
+            for score, domain in scored:
+                if len(candidates) >= limit:
+                    break
+                if score <= 0 and resolution.aiSuggestedDomains:
+                    break  # AI 결과가 이미 있으면 score 0 후보로 채우지 않음
+                candidates.append({
+                    "domainId": domain.id,
+                    "domainLabel": domain.label,
+                    "description": domain.description,
+                    "score": score,
+                    "matchedOutcomes": [
+                        taxonomy.outcomeLabel(outcomeId)
+                        for outcomeId in domain.targetOutcomes[:5]
+                    ],
+                })
         return {
             "goalText": goalText,
+            "source": resolution.source,
+            "reasoning": resolution.reasoning,
+            "matchedKeywords": resolution.matchedKeywords,
             "candidates": candidates,
+            "aiSuggestedOutcomes": [s.model_dump() for s in resolution.aiSuggestedOutcomes[:limit]],
             "next": (
                 "최상위 후보가 만족스러우면 그 domainId로 compose-master-plan을 호출하세요. "
                 "두 후보 점수가 비슷하면 사용자에게 확인을 요청하세요."

@@ -251,6 +251,8 @@ export type MasterPlanStep = {
   learnerMastery?: number | null;
   learnerConfidence?: number | null;
   lessonRole?: "concept" | "practice" | "project";
+  estimatedSource?: "static" | "observed";
+  observedSampleCount?: number;
 };
 
 export type MasterPlanGap = {
@@ -284,6 +286,26 @@ export type MasterPlanPayload = {
   practiceSteps?: MasterPlanStep[];
   projectSteps?: MasterPlanStep[];
   projectMatches?: string[];
+  goalResolution?: GoalResolutionPayload | null;
+  adaptiveSkipped?: Array<{ outcomeId: string; outcomeLabel: string; reason: string }>;
+};
+
+export type GoalResolutionSuggestion = {
+  outcomeId?: string;
+  domainId?: string;
+  label: string;
+  score: number;
+  reason?: string;
+};
+
+export type GoalResolutionPayload = {
+  intentText: string;
+  matchedKeywords: string[];
+  boostedCategories: string[];
+  aiSuggestedOutcomes: GoalResolutionSuggestion[];
+  aiSuggestedDomains: GoalResolutionSuggestion[];
+  source: "keyword" | "ai" | "blended" | "none";
+  reasoning: string;
 };
 
 export type CurriculumGapsPayload = {
@@ -303,6 +325,7 @@ export type MasterPlanRequestBody = {
   maxMinutes?: number;
   projectIntent?: string;
   deliverableOnly?: boolean;
+  adaptiveSkip?: boolean;
 };
 
 export type OutcomeMasteryEntry = {
@@ -316,6 +339,7 @@ export type OutcomeMasteryEntry = {
   lastCreditAt: string | null;
   validated: boolean;
   autoValidated: boolean;
+  fastTracked?: boolean;
 };
 
 export type DomainMasteryEntry = {
@@ -375,6 +399,19 @@ export type DailySnapshot = {
 export type AnalyticsListPayload = {
   snapshots: DailySnapshot[];
   totalSnapshots: number;
+};
+
+export type LessonStatsRow = {
+  key: string;
+  title: string;
+  static: number;
+  observedEwma: number;
+  sampleCount: number;
+  deviation: string;
+};
+
+export type LessonStatsPayload = {
+  lessons: LessonStatsRow[];
 };
 
 export type AnalyticsSummaryPayload = {

@@ -102,6 +102,7 @@ class MasterPlanRequest(BaseModel):
     maxMinutes: int = 0
     projectIntent: str = ""
     deliverableOnly: bool = False
+    adaptiveSkip: bool = True
 
 
 class OutcomeValidationRequest(BaseModel):
