@@ -296,6 +296,12 @@ export const codaroApi = {
     category?: string;
     contentId?: string;
     sectionId?: string;
+    prediction?: {
+      expectedShape: string;
+      expectedDtype: string;
+      expectedValue: string;
+      expectedError: string;
+    } | null;
   }) => postJson<CheckResult>("/api/curriculum/check", payload),
   tasks: () => requestJson<TaskListPayload>("/api/tasks"),
   runTask: (taskId: string) => postJson<TaskRun>(`/api/tasks/${encodeURIComponent(taskId)}/run`, {}),

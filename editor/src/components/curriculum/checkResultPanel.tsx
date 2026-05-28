@@ -1,9 +1,9 @@
-import { AlertTriangle, CheckCircle2, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Eye, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { CheckResult, MisconceptionMatch } from "@/types";
+import type { CheckResult, MisconceptionMatch, PredictionDiffPayload } from "@/types";
 
 export function CheckResultPanel({
   result,
@@ -79,6 +79,9 @@ export function CheckResultPanel({
           </pre>
         </details>
       ) : null}
+      {result.predictionDiff ? (
+        <PredictionDiffPanel diff={result.predictionDiff} />
+      ) : null}
       {result.misconceptionMatches && result.misconceptionMatches.length > 0 ? (
         <MisconceptionList
           matches={result.misconceptionMatches}
@@ -131,6 +134,69 @@ function CreditNotice({
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function PredictionDiffPanel({ diff }: { diff: PredictionDiffPayload }) {
+  const labelByField: Record<string, string> = {
+    shape: "모양",
+    dtype: "타입",
+    value: "값",
+    error: "에러",
+  };
+  const visibleFields = diff.fields.filter((field) => field.status !== "skipped");
+  if (visibleFields.length === 0) return null;
+  const allMatch = diff.overall === "match";
+  return (
+    <div
+      className={cn(
+        "space-y-1.5 rounded border px-2 py-2",
+        allMatch
+          ? "border-violet-300/50 bg-violet-50/50"
+          : "border-rose-300/50 bg-rose-50/50",
+      )}
+      data-prediction-diff={diff.overall}
+    >
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase text-foreground/70">
+        <Eye className="size-3.5" />
+        <span>예측 vs 실측</span>
+        <Badge variant={allMatch ? "secondary" : "destructive"} className="text-[10px]">
+          {allMatch ? "일치" : "어긋남"}
+        </Badge>
+      </div>
+      <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+        {visibleFields.map((field) => (
+          <div
+            key={field.field}
+            className={cn(
+              "rounded border bg-background/70 px-2 py-1 text-[11px]",
+              field.status === "match"
+                ? "border-emerald-300/50"
+                : "border-rose-300/60",
+            )}
+            data-prediction-field={field.field}
+            data-prediction-status={field.status}
+          >
+            <div className="text-[10px] font-medium uppercase text-foreground/60">
+              {labelByField[field.field] ?? field.field}
+            </div>
+            <div className="mt-0.5 grid grid-cols-2 gap-1 font-mono text-[10px]">
+              <span className="text-foreground/70">예측: {field.expected || "—"}</span>
+              <span
+                className={cn(
+                  field.status === "match" ? "text-emerald-700" : "text-rose-700",
+                )}
+              >
+                실측: {field.actual || "—"}
+              </span>
+            </div>
+            {field.note ? (
+              <p className="mt-0.5 text-[10px] text-foreground/60">{field.note}</p>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

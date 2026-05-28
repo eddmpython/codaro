@@ -7,6 +7,8 @@ from ..curriculum.contentCache import CurriculumContentCache
 from ..curriculum.misconceptionCatalog import matchOutcomes
 from ..curriculum.outcomeMastery import computeMastery
 from ..curriculum.planComposer import PlanGoal, composeMasterPlan
+from ..curriculum.predictionDiff import ActualResult, comparePrediction, extractErrorClass
+from ..curriculum.sectionContract import LearningPredictContract
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
@@ -168,11 +170,37 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         # 진단을 AI tool call이 아니라 런타임에서 deterministic하게 박는다.
         misconceptionPayload: list[dict[str, object]] = []
         doneCriterionViolated = False
+        predictionDiffPayload: dict[str, object] | None = None
         if sectionOutcomes:
             store = state.learnerStateStore
             errorText = payload.get("detail") or payload.get("studentOutput") or ""
-            for outcomeId in sectionOutcomes:
-                store.recordOutcomeAttempt(outcomeId, success=result.passed)
+
+            # 학습자 예측이 잠겨 있으면 실측과 4차원 diff 를 계산해 mastery 신호로 변환.
+            # prediction-based 신호가 있으면 그것을 우선; 없으면 check pass/fail 만으로 갱신.
+            usedPredictionSignal = False
+            if request.prediction is not None:
+                predict = LearningPredictContract(
+                    expectedShape=request.prediction.expectedShape,
+                    expectedDtype=request.prediction.expectedDtype,
+                    expectedValue=request.prediction.expectedValue,
+                    expectedError=request.prediction.expectedError,
+                )
+                if not predict.isEmpty():
+                    actual = ActualResult(
+                        value=str(payload.get("studentOutput") or ""),
+                        errorClass=extractErrorClass(str(payload.get("detail") or "")),
+                    )
+                    diff = comparePrediction(predict, actual)
+                    predictionDiffPayload = diff.model_dump()
+                    if diff.overall != "skipped":
+                        for outcomeId in sectionOutcomes:
+                            store.recordPredictionResult(outcomeId, diff)
+                        usedPredictionSignal = True
+
+            if not usedPredictionSignal:
+                for outcomeId in sectionOutcomes:
+                    store.recordOutcomeAttempt(outcomeId, success=result.passed)
+
             if not result.passed:
                 for outcomeId, entry in matchOutcomes(
                     sectionOutcomes,
@@ -194,6 +222,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                     })
         payload["misconceptionMatches"] = misconceptionPayload
         payload["doneCriterionViolated"] = doneCriterionViolated
+        payload["predictionDiff"] = predictionDiffPayload
 
         logger.debug(
             "curriculum %s",

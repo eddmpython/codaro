@@ -385,6 +385,19 @@ export type MisconceptionMatch = {
   hitCount: number;
 };
 
+export type PredictionFieldDiff = {
+  field: "shape" | "dtype" | "value" | "error";
+  status: "match" | "mismatch" | "skipped";
+  expected: string;
+  actual: string;
+  note?: string;
+};
+
+export type PredictionDiffPayload = {
+  overall: "match" | "mismatch" | "skipped";
+  fields: PredictionFieldDiff[];
+};
+
 export type CheckResult = {
   passed: boolean;
   feedback: string;
@@ -398,6 +411,7 @@ export type CheckResult = {
   autoValidatedOutcomes?: string[];
   misconceptionMatches?: MisconceptionMatch[];
   doneCriterionViolated?: boolean;
+  predictionDiff?: PredictionDiffPayload | null;
 };
 
 export type TaskDefinition = {

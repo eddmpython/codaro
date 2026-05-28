@@ -1779,6 +1779,7 @@ function ExerciseCheckPanel({
         category: category || undefined,
         contentId: contentId || undefined,
         sectionId: sectionId || undefined,
+        prediction: prediction ?? undefined,
       });
       setResult(next);
       setHintLevel(next.hintLevel);

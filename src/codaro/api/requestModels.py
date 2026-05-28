@@ -70,6 +70,13 @@ class CurriculumProgressRequest(BaseModel):
     totalMissions: int = 0
 
 
+class LearnerPredictionPayload(BaseModel):
+    expectedShape: str = ""
+    expectedDtype: str = ""
+    expectedValue: str = ""
+    expectedError: str = ""
+
+
 class CheckExerciseRequest(BaseModel):
     sessionId: str
     studentCode: str
@@ -83,6 +90,7 @@ class CheckExerciseRequest(BaseModel):
     category: str = ""
     contentId: str = ""
     sectionId: str = ""
+    prediction: LearnerPredictionPayload | None = None
 
 
 class MasterPlanRequest(BaseModel):
