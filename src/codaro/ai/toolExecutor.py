@@ -5,6 +5,7 @@ from typing import Any
 
 from .toolHandlers.automation import AutomationToolHandlers
 from .toolHandlers.curriculumOs import CurriculumOsToolHandlers
+from .toolHandlers.diagnostics import DiagnosticsToolHandlers
 from .toolHandlers.learning import LearningToolHandlers
 from .toolHandlers.runtime import RuntimeToolHandlers
 from .toolHandlers.workbench import WorkbenchToolHandlers
@@ -18,6 +19,7 @@ class ToolExecutionError(RuntimeError):
 class ToolExecutor(
     AutomationToolHandlers,
     CurriculumOsToolHandlers,
+    DiagnosticsToolHandlers,
     LearningToolHandlers,
     RuntimeToolHandlers,
     WorkbenchToolHandlers,

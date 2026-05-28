@@ -75,6 +75,10 @@ TOOL_LANE_GROUPS: dict[str, dict[str, str]] = {
         "label": "Progress",
         "description": "Record completion, mastery, and learner state.",
     },
+    "diagnosis": {
+        "label": "Diagnosis",
+        "description": "Read learner state, match misconceptions, and derive the next step.",
+    },
     "automation": {
         "label": "Automation",
         "description": "Record or execute multi-step external workflows.",
@@ -128,11 +132,17 @@ TOOL_METADATA: dict[str, ToolManifestMetadata] = {
     "emergency-stop": ToolManifestMetadata("safety", "safety", "automation-safety", "safety"),
     "list-curriculum-domains": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "resolve-learning-goal": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "get-outcome-mastery": ToolManifestMetadata("curriculumOs", "planning", "learner-progress"),
+    "mark-outcome-validated": ToolManifestMetadata("curriculumOs", "progress", "learner-progress", "writes"),
     "search-curricula": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "compose-master-plan": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "inspect-curriculum": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "list-curriculum-gaps": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "propose-curriculum-draft": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "read-learner-state": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state"),
+    "record-prediction-result": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state", "writes"),
+    "match-misconception": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state", "writes"),
+    "suggest-next-step": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state"),
 }
 
 
