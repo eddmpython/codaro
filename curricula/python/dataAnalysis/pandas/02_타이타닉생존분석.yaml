@@ -83,6 +83,7 @@ sections:
     - dtypes는 각 컬럼의 NumPy 타입을 Series로 반환합니다.
     - 숫자 컬럼은 int64 또는 float64, 문자열 컬럼은 object입니다.
   check:
+    type: noError
     noError: loadLocalDataset과 shape 호출이 정상 실행되어야 합니다.
     resultCheck: shape 결과가 (891, n) 형태의 튜플이거나 그에 준해야 합니다.
 - id: step2_head
@@ -104,6 +105,7 @@ sections:
     - head(n)은 처음 n행, tail(n)은 마지막 n행을 반환합니다.
     - 인자를 주지 않으면 기본 5행입니다.
   check:
+    type: noError
     noError: head() 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame이 원본 컬럼을 모두 포함하고 행 수가 5(또는 호출 인자)여야 합니다.
 - id: step3_single
@@ -126,6 +128,7 @@ sections:
     - sex는 object(문자열), age는 float64(결측치 포함 가능)일 것입니다.
     - 결과에 .dtype을 붙이면 타입을 확인할 수 있습니다.
   check:
+    type: noError
     noError: 단일 컬럼 선택이 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과가 Series이고 길이가 891 또는 그에 준해야 합니다.
 - id: step4_multi
@@ -148,6 +151,7 @@ sections:
     - 결과 DataFrame의 .columns 길이가 리스트의 길이와 같아야 합니다.
     - 존재하지 않는 컬럼명을 넣으면 KeyError가 발생합니다.
   check:
+    type: noError
     noError: 다중 컬럼 선택이 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과가 DataFrame이고 컬럼 수가 리스트 길이와 같아야 합니다.
 - id: step5_condition
@@ -170,6 +174,7 @@ sections:
     - 부등호 연산자(!=)는 다르다는 뜻이고 ==와 정확히 반대 결과를 줍니다.
     - sum()을 붙이면 True 개수를 셀 수 있습니다.
   check:
+    type: noError
     noError: 비교 연산이 정상 실행되어 Boolean Series를 반환해야 합니다.
     resultCheck: 결과가 Series이고 dtype이 bool이어야 합니다.
 - id: step6_filter
@@ -196,6 +201,7 @@ sections:
     - 생존자 수 + 사망자 수가 전체 행 수와 같아야 합니다.
     - 결측이 있으면 합이 전체보다 작을 수 있습니다.
   check:
+    type: noError
     noError: Boolean Indexing이 KeyError 없이 실행되어야 합니다.
     resultCheck: len(survivors)가 0보다 큰 정수여야 합니다.
 - id: step7_firstclass
@@ -220,6 +226,7 @@ sections:
     - 3등석은 약 491명으로 가장 많습니다.
     - 1등석 + 2등석 + 3등석이 891이 되어야 합니다.
   check:
+    type: noError
     noError: Boolean Indexing이 정상 실행되어야 합니다.
     resultCheck: len(first)가 0과 891 사이의 정수여야 합니다.
 - id: step8_value_counts
@@ -242,6 +249,7 @@ sections:
     - pclass는 3개 고유 값, sex는 2개 고유 값을 가집니다.
     - 결과의 sum()이 결측치 제외 전체 행 수와 같아야 합니다.
   check:
+    type: noError
     noError: value_counts가 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 값이 모두 정수 빈도여야 합니다.
 - id: step8_5_describe
@@ -264,6 +272,7 @@ sections:
     - include=all을 주면 unique/top/freq 같은 범주형 통계도 함께 표시됩니다.
     - 컬럼이 늘어나면 결과 DataFrame의 shape도 함께 늘어납니다.
   check:
+    type: noError
     noError: describe() 호출이 정상 실행되어 통계 DataFrame을 반환해야 합니다.
     resultCheck: 결과 인덱스에 count, mean, std, min, max가 모두 포함되어야 합니다.
 - id: step9_normalize
@@ -286,6 +295,7 @@ sections:
     - sex는 male이 약 65%, female이 약 35%입니다.
     - survived는 0이 약 62%, 1이 약 38%입니다.
   check:
+    type: noError
     noError: normalize 옵션 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 sum()이 1.0에 가까운 값이어야 합니다.
 - id: step10_survival_rate
@@ -308,6 +318,7 @@ sections:
     - 3등석 생존율은 약 0.24로 1등석의 1/3 수준입니다.
     - 두 결과의 차이가 객실 등급의 영향력을 보여줍니다.
   check:
+    type: noError
     noError: 필터링 + mean 체인이 정상 실행되어야 합니다.
     resultCheck: 결과가 0과 1 사이의 float여야 합니다.
 - id: step11_female
@@ -329,6 +340,7 @@ sections:
     - 남성 생존율은 약 0.19로 여성의 1/4 수준입니다.
     - 74% vs 19%의 압도적인 차이가 성별 우선순위를 보여줍니다.
   check:
+    type: noError
     noError: 문자열 비교 필터링이 정상 실행되어야 합니다.
     resultCheck: 결과가 0과 1 사이의 float여야 합니다.
 - id: step12_loc
@@ -351,6 +363,7 @@ sections:
     - 단일 컬럼이면 Series, 컬럼 리스트면 DataFrame이 반환됩니다.
     - 컬럼 리스트의 예는 [age, sex, pclass]입니다.
   check:
+    type: noError
     noError: .loc 호출이 정상 실행되어야 합니다.
     resultCheck: 결과가 Series 또는 DataFrame이고 행 수가 생존자 수와 같아야 합니다.
 - id: step13_iloc
@@ -373,6 +386,7 @@ sections:
     - iloc[5]는 인덱스 5인 행(여섯 번째)을, iloc[-1]은 마지막 행을 반환합니다.
     - 결과는 Series이고 인덱스가 컬럼 이름입니다.
   check:
+    type: noError
     noError: iloc 호출이 IndexError 없이 실행되어야 합니다.
     resultCheck: 결과가 Series이고 인덱스가 원본 DataFrame의 컬럼 이름이어야 합니다.
 - id: step14_iloc_range
@@ -395,6 +409,7 @@ sections:
     - 결과 shape는 (행 슬라이스 길이, 열 슬라이스 길이)입니다.
     - 음수 시작 인덱스(예 minus 3 콜론)는 마지막 3행을 의미합니다.
   check:
+    type: noError
     noError: iloc 범위 선택이 정상 실행되어야 합니다.
     resultCheck: 결과 shape가 슬라이스 범위와 일치해야 합니다.
 - id: workflow_validation
@@ -448,6 +463,7 @@ sections:
     - pclass 1 두 명 모두 survived 1이라 평균은 1.0입니다.
     - childRate는 age < 13인 2명(10, 8) 모두 survived 1이라 1.0입니다.
   check:
+    type: noError
     noError: groupby/loc/iloc 모든 호출이 정상 실행되어야 합니다.
     resultCheck: 네 assert 모두 통과해야 하며, 데이터를 바꾸면 그에 맞춰 우변도 갱신되어야 합니다.
 - id: practice
@@ -478,6 +494,7 @@ sections:
     - 어린이 필터링은 data[data['age'] < 13]['survived'].mean() 형태입니다.
     - 성인은 age >= 13으로 필터링하면 됩니다.
   check:
+    type: noError
     noError: loadLocalDataset과 그 뒤 분석 코드가 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과가 0과 1 사이의 생존율 값들이어야 합니다.
 - id: summary

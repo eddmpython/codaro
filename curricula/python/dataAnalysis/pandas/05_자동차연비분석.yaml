@@ -82,6 +82,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_head
@@ -103,6 +104,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_value_counts
@@ -122,6 +124,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 3단계. 제조국별 개수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 3단계. 제조국별 개수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step4_sort_asc
@@ -145,6 +148,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 4단계. 오름차순 정렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 4단계. 오름차순 정렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step5_sort_desc
@@ -164,6 +168,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 5단계. 내림차순 정렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 5단계. 내림차순 정렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step6_nlargest
@@ -186,6 +191,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. TOP N 뽑기의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 6단계. TOP N 뽑기 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step7_nsmallest
@@ -205,6 +211,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 하위 N개의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 7단계. 하위 N개 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step7_5_assign_grade
@@ -240,6 +247,7 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
+    type: noError
     noError: 7.5단계. 연비 등급 추가의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
     resultCheck: 7.5단계. 연비 등급 추가 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: step8_groupby_year
@@ -259,6 +267,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 연도별 평균 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 8단계. 연도별 평균 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step9_groupby_origin
@@ -278,6 +287,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 제조국별 평균 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 9단계. 제조국별 평균 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step10_pivot
@@ -301,6 +311,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 10단계. 피벗테이블 기본의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 10단계. 피벗테이블 기본의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step11_pivot_year
@@ -324,6 +335,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 11단계. 연도 × 제조국의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 11단계. 연도 × 제조국의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step12_filter_groupby
@@ -347,6 +359,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 12단계. 80년대 제조국별 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 12단계. 80년대 제조국별 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step13_complex
@@ -370,6 +383,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 13단계. 6기통 이상 연비 TOP 5의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 13단계. 6기통 이상 연비 TOP 5 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -423,6 +437,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 연비 리포트와 피벗 점검의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
     resultCheck: '현업 흐름 검증: 연비 리포트와 피벗 점검의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
 - id: practice
@@ -453,6 +468,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary

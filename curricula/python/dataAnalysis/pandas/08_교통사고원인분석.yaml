@@ -80,6 +80,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_head
@@ -100,6 +101,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_set_index
@@ -127,6 +129,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 인덱스 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 3단계. 인덱스 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step4_loc
@@ -146,6 +149,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 4단계. 특정 주 조회의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 4단계. 특정 주 조회 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step5_multi_loc
@@ -165,6 +169,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 5단계. 여러 주 비교의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 5단계. 여러 주 비교 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step6_rank
@@ -194,6 +199,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 순위 매기기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 6단계. 순위 매기기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step7_alcohol_rank
@@ -217,6 +223,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 음주사고 순위의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 7단계. 음주사고 순위 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_corr
@@ -236,6 +243,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 상관관계 분석의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 8단계. 상관관계 분석 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step9_normalize_func
@@ -265,6 +273,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 정규화 함수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 9단계. 정규화 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step10_danger_score
@@ -299,6 +308,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 위험도 점수 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 10단계. 위험도 점수 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step11_top_dangerous
@@ -318,6 +328,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 11단계. 가장 위험한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 11단계. 가장 위험한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step12_safest
@@ -341,6 +352,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 12단계. 가장 안전한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 12단계. 가장 안전한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -396,6 +408,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 지역별 사고 위험도 산정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
     resultCheck: '현업 흐름 검증: 지역별 사고 위험도 산정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
 - id: practice
@@ -428,6 +441,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary

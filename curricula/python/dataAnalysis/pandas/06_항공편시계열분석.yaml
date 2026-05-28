@@ -83,6 +83,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_head
@@ -104,6 +105,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step3_dtypes
@@ -127,6 +129,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 데이터 타입 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 3단계. 데이터 타입 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step4_datetime
@@ -157,6 +160,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 4단계. 날짜 컬럼 만들기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 4단계. 날짜 컬럼 만들기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step5_set_index
@@ -185,6 +189,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 5단계. 날짜를 인덱스로 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 5단계. 날짜를 인덱스로 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step6_month_pattern
@@ -208,6 +213,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 월별 평균 승객수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 6단계. 월별 평균 승객수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step7_year_pattern
@@ -231,6 +237,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 연도별 총 승객수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 7단계. 연도별 총 승객수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_pct_change
@@ -258,6 +265,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 연도별 증가율의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 8단계. 연도별 증가율의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step9_rolling
@@ -288,6 +296,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 이동평균 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 9단계. 이동평균 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step10_pivot
@@ -312,6 +321,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 10단계. 월×연도 피벗 테이블의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 10단계. 월×연도 피벗 테이블의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step11_compare_years
@@ -337,6 +347,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 11단계. 특정 연도 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 11단계. 특정 연도 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step12_monthly_max
@@ -360,6 +371,7 @@ sections:
     - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
     - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 12단계. 월별 최대 승객수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 12단계. 월별 최대 승객수의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
@@ -409,6 +421,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 월별 승객 시계열 리포트의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
     resultCheck: '현업 흐름 검증: 월별 승객 시계열 리포트의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
 - id: practice
@@ -439,6 +452,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary

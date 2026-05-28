@@ -81,6 +81,7 @@ sections:
     - dtypes는 각 컬럼의 NumPy 타입을 Series로 반환합니다.
     - 숫자 컬럼은 float64, species는 object(문자열)일 것입니다.
   check:
+    type: noError
     noError: loadLocalDataset 호출과 그 뒤 shape 호출이 정상 실행되어야 합니다.
     resultCheck: shape 결과가 (150, 5) 또는 그에 준하는 튜플이어야 합니다.
 - id: step2_head
@@ -100,6 +101,7 @@ sections:
     - sample(n)은 매번 다른 행을 무작위로 반환합니다.
     - 재현이 필요하면 sample(5, random_state=42)처럼 시드를 고정하세요.
   check:
+    type: noError
     noError: head() 호출이 정상 실행되어 DataFrame을 반환해야 합니다.
     resultCheck: 결과 DataFrame이 원본 컬럼을 모두 포함하고 5행이어야 합니다.
 - id: step3_isna
@@ -122,6 +124,7 @@ sections:
     - notna는 결측이 아닌 값을 True로 표시합니다.
     - isna 합계 + notna 합계 = 전체 셀 수가 됩니다.
   check:
+    type: noError
     noError: isna().sum() 호출이 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 인덱스가 컬럼 이름이고 값이 0 이상의 정수여야 합니다.
 - id: step4_info
@@ -141,6 +144,7 @@ sections:
     - 보통 species 같은 문자열 컬럼만 object입니다.
     - object 컬럼이 숫자여야 하는데 object로 잡혀 있다면 정제가 필요합니다.
   check:
+    type: noError
     noError: info() 호출이 정상 실행되어야 합니다 (출력은 화면에 표시됨).
     resultCheck: info 출력에 RangeIndex, Data columns, Non-Null Count, Dtype 항목이 모두 나와야 합니다.
 - id: step5_dropna
@@ -167,6 +171,7 @@ sections:
     - axis=1이면 결측이 하나라도 있는 컬럼을 삭제합니다.
     - 결측이 없는 iris에서는 axis=1이어도 컬럼 수가 그대로입니다.
   check:
+    type: noError
     noError: dropna 호출이 정상 실행되어 DataFrame을 반환해야 합니다.
     resultCheck: len(clean) <= len(iris) 관계가 성립해야 합니다.
 - id: step6_fillna
@@ -191,6 +196,7 @@ sections:
     - mean(numeric_only=True)은 숫자 컬럼의 평균만 Series로 반환합니다.
     - fillna에 Series를 넘기면 컬럼 이름이 일치하는 곳에만 적용됩니다.
   check:
+    type: noError
     noError: fillna 호출이 정상 실행되어야 합니다.
     resultCheck: filled.isna().sum()의 모든 값이 0이어야 합니다.
 - id: step7_assign
@@ -217,6 +223,7 @@ sections:
     - assign(컬럼1=식1, 컬럼2=식2) 형태로 여러 컬럼을 동시에 만들 수 있습니다.
     - 결과 DataFrame의 columns에 petalArea와 sepalArea가 모두 있는지 확인하세요.
   check:
+    type: noError
     noError: assign 호출이 정상 실행되어 DataFrame을 반환해야 합니다.
     resultCheck: withArea의 컬럼 수가 원본보다 1 이상 많고 petalArea가 포함되어야 합니다.
 - id: step8_groupby_area
@@ -236,6 +243,7 @@ sections:
     - sepal_length의 그룹 평균은 비슷한 값들이라 분류력이 약합니다.
     - petalArea가 더 좋은 특성임을 수치로 확인할 수 있습니다.
   check:
+    type: noError
     noError: groupby + mean 체인이 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스에 setosa, versicolor, virginica 3종이 모두 있어야 합니다.
 - id: step8_5_filter_species
@@ -262,6 +270,7 @@ sections:
     - setosa의 std는 매우 작아 균일한 분포임을 보여줍니다.
     - virginica는 max - min 폭이 가장 큽니다.
   check:
+    type: noError
     noError: 필터링 + describe 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스에 count, mean, std, min, 25%, 50%, 75%, max가 모두 있어야 합니다.
 - id: step9_apply
@@ -284,6 +293,7 @@ sections:
     - 결과가 원본 Series와 같은 길이여야 합니다.
     - round(x, 1)은 5.1 → 5.1, 5.123 → 5.1로 반올림합니다.
   check:
+    type: noError
     noError: apply 호출이 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 길이가 원본 컬럼 길이와 같아야 합니다.
 - id: step10_apply_condition
@@ -305,6 +315,7 @@ sections:
     - 임계값을 너무 낮추면 거의 모두 large가 되고, 너무 높이면 거의 모두 small이 됩니다.
     - setosa의 petal_length는 모두 2.0 이하라 임계값 2 근처에서 분리가 잘 됩니다.
   check:
+    type: noError
     noError: apply + value_counts 체인이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스에 large 또는 small이 포함되어야 합니다.
 - id: step11_map
@@ -331,6 +342,7 @@ sections:
     - dict에 없는 값은 NaN으로 변환됩니다.
     - 모든 행이 매핑되는지는 결과의 isna().sum()으로 검증할 수 있습니다.
   check:
+    type: noError
     noError: map 호출이 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 첫 값이 dict의 매핑된 한글 값이어야 합니다.
 - id: step12_str_upper
@@ -351,6 +363,7 @@ sections:
     - title은 단어 첫 글자를, capitalize는 전체 첫 글자만 대문자로 만듭니다.
     - setosa.title() → Setosa, setosa.capitalize() → Setosa (한 단어라 동일).
   check:
+    type: noError
     noError: str.upper 체인이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 모든 값이 대문자(예 SETOSA)여야 합니다.
 - id: step13_str_contains
@@ -370,6 +383,7 @@ sections:
     - sa는 setosa와 versicolor에만, vir은 virginica에만 매치됩니다.
     - 결과 True 개수가 매치되는 행 수와 같아야 합니다.
   check:
+    type: noError
     noError: str.contains + value_counts 체인이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스가 boolean(True/False)이어야 합니다.
 - id: step14_duplicated
@@ -390,6 +404,7 @@ sections:
     - species만 기준으로 하면 150 - 3 = 147개가 중복으로 잡힙니다(각 종 50개 중 첫 번째만 unique).
     - 기본(전체 컬럼 기준)은 거의 모든 행이 unique라 중복이 매우 적습니다.
   check:
+    type: noError
     noError: duplicated + sum 체인이 정상 실행되어야 합니다.
     resultCheck: 결과가 0 이상의 정수여야 합니다.
 - id: step15_drop_duplicates
@@ -413,6 +428,7 @@ sections:
     - keep='first'(기본)와 keep='last'는 길이는 같지만 어떤 행이 남는지가 다릅니다.
     - keep=False는 중복된 모든 행을 삭제하므로 결과 길이가 가장 짧습니다.
   check:
+    type: noError
     noError: drop_duplicates 호출이 정상 실행되어야 합니다.
     resultCheck: len(unique) <= len(iris) 관계가 성립해야 합니다.
 - id: workflow_validation
@@ -466,6 +482,7 @@ sections:
     - 17.85는 5.1 × 3.5에서 나옵니다.
     - drop_duplicates 후 길이 2는 1번째와 3번째 행이 같기 때문입니다.
   check:
+    type: noError
     noError: apply/map/drop_duplicates 세 호출이 모두 정상 실행되어야 합니다.
     resultCheck: 세 assert가 모두 통과해야 하며, 데이터를 바꾸면 그에 맞춰 우변도 갱신되어야 합니다.
 - id: practice
@@ -496,6 +513,7 @@ sections:
     - assign(sepalRatio=data['sepal_length'] / data['sepal_width']) 형태입니다.
     - 결과에 .groupby('species')['sepalRatio'].mean()을 붙여보세요.
   check:
+    type: noError
     noError: loadLocalDataset과 분석 코드가 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과가 품종별 평균 Series이거나 새 컬럼이 포함된 DataFrame이어야 합니다.
 - id: summary
