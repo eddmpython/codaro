@@ -66,7 +66,7 @@ class LearningExerciseContract(BaseModel):
     prompt: str = ""
     starterCode: str = ""
     solution: str = ""
-    check: dict[str, str] = Field(default_factory=dict)
+    check: dict[str, Any] = Field(default_factory=dict)
     hints: list[str] = Field(default_factory=list)
     difficulty: str = "easy"
     predict: LearningPredictContract = Field(default_factory=LearningPredictContract)
@@ -82,7 +82,7 @@ class LearningSectionContract(BaseModel):
     tips: list[str] = Field(default_factory=list)
     snippet: str = ""
     exercise: LearningExerciseContract = Field(default_factory=LearningExerciseContract)
-    check: dict[str, str] = Field(default_factory=dict)
+    check: dict[str, Any] = Field(default_factory=dict)
     rawBlocks: list[dict[str, Any]] = Field(default_factory=list)
     contractGaps: list[str] = Field(default_factory=list)
 
@@ -268,13 +268,30 @@ def _tipsFromBlocks(blocks: list[dict[str, Any]]) -> list[str]:
     return _unique(tips)
 
 
-def _checkMap(value: Any) -> dict[str, str]:
+_CHECK_PRESERVE_KEYS = frozenset({
+    "type",
+    "expectedCode",
+    "variableName",
+    "expectedValue",
+    "requiredPatterns",
+    "hints",
+})
+
+
+def _checkMap(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
-        return {
-            str(key): _textValue(item)
-            for key, item in value.items()
-            if _textValue(item)
-        }
+        result: dict[str, Any] = {}
+        for key, item in value.items():
+            keyStr = str(key)
+            if keyStr in _CHECK_PRESERVE_KEYS:
+                if item is None:
+                    continue
+                result[keyStr] = item
+            else:
+                text = _textValue(item)
+                if text:
+                    result[keyStr] = text
+        return result
     text = _textValue(value)
     return {"description": text} if text else {}
 

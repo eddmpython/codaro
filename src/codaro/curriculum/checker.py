@@ -298,9 +298,24 @@ def _composeOutput(result) -> str:
     parts = []
     if result.stdout:
         parts.append(result.stdout.strip())
-    if result.data:
-        parts.append(result.data.strip())
+    dataText = _dataAsText(result.data)
+    if dataText:
+        parts.append(dataText)
     return "\n".join(parts)
+
+
+def _dataAsText(data) -> str:
+    if not data:
+        return ""
+    if isinstance(data, str):
+        return data.strip()
+    if isinstance(data, dict):
+        for key in ("text/plain", "text/markdown", "text/html"):
+            value = data.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        return ""
+    return str(data).strip()
 
 
 def _variablesSnapshot(variables: dict[str, str]) -> str:

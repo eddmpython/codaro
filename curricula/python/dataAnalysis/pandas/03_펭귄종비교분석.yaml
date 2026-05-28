@@ -81,6 +81,7 @@ sections:
     - shape는 튜플(행, 열), columns는 Index 객체를 반환합니다.
     - loadLocalDataset의 첫 인자만 다른 문자열로 바꿔도 같은 호출 형태를 확인할 수 있습니다.
   check:
+    type: noError
     noError: penguins가 DataFrame으로 정상 생성되고 shape 호출이 IndexError 없이 실행되어야 합니다.
     resultCheck: shape 결과가 (행 수, 열 수) 튜플 형태이고 행 수가 0보다 커야 합니다.
 - id: step2_value_counts
@@ -100,6 +101,7 @@ sections:
     - species, sex, island는 모두 범주형 컬럼이라 value_counts가 의미 있는 결과를 줍니다.
     - body_mass_g 같은 연속형 컬럼에 쓰면 거의 모든 행이 unique라 결과가 길어집니다.
   check:
+    type: noError
     noError: value_counts가 KeyError 없이 실행되고 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 인덱스가 컬럼의 고유 값들이고 값이 정수 빈도여야 합니다.
 - id: step3_head
@@ -119,6 +121,7 @@ sections:
     - head(n)는 처음 n행, tail(n)은 마지막 n행을 반환합니다.
     - 결과 DataFrame의 shape[0]가 호출에 넘긴 n과 같아야 합니다.
   check:
+    type: noError
     noError: head() 호출이 정상 실행되어 DataFrame을 반환해야 합니다.
     resultCheck: 결과 DataFrame의 컬럼이 원본 컬럼과 같고 행 수가 인자(또는 기본값 5)와 일치해야 합니다.
 - id: step3_5_describe
@@ -141,6 +144,7 @@ sections:
     - include='all'을 주면 unique, top, freq 같은 범주형 통계도 함께 나옵니다.
     - 결과 DataFrame의 컬럼 수가 늘어나는지 확인하세요.
   check:
+    type: noError
     noError: describe()가 정상 실행되어 통계 DataFrame을 반환해야 합니다.
     resultCheck: 결과 인덱스에 count, mean, std, min, 25%, 50%, 75%, max가 모두 포함되어야 합니다.
 - id: step4_filter_problem
@@ -164,6 +168,7 @@ sections:
     - 종 이름은 'Adelie', 'Gentoo', 'Chinstrap' 세 가지입니다.
     - Gentoo가 가장 크고 Adelie와 Chinstrap은 비슷한 크기입니다.
   check:
+    type: noError
     noError: 필터링과 평균 호출이 정상 실행되어 숫자를 반환해야 합니다.
     resultCheck: 결과가 float 평균값이고 2700~6300 사이여야 합니다.
 - id: step5_groupby
@@ -186,6 +191,9 @@ sections:
     - 숫자 컬럼이면 mean을 호출할 수 있습니다 — bill_length_mm, bill_depth_mm도 시도해보세요.
     - 결과는 Series이고 인덱스는 항상 'Adelie', 'Chinstrap', 'Gentoo' 알파벳 순입니다.
   check:
+    type: contains
+    requiredPatterns:
+    - groupby
     noError: groupby + 컬럼 선택 + mean이 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스가 3개 종을 모두 포함하고 값이 양수 평균이어야 합니다.
 - id: step6_max
@@ -205,6 +213,7 @@ sections:
     - sum은 같은 종 펭귄들의 체중을 모두 더한 값이라 매우 큽니다(수십만 단위).
     - std는 그룹 내 체중의 표준편차로 분산 정도를 보여줍니다.
   check:
+    type: noError
     noError: max/min/sum/count 호출이 정상 실행되어야 합니다.
     resultCheck: max는 mean보다 크고, min은 mean보다 작은 값이어야 합니다.
 - id: step7_size
@@ -224,6 +233,7 @@ sections:
     - size()는 Series를 반환하므로 .sum()을 바로 붙일 수 있습니다.
     - penguins.shape는 튜플이고 [0]이 행 수입니다.
   check:
+    type: noError
     noError: size() 호출이 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 sum이 원본 DataFrame의 행 수와 같아야 합니다.
 - id: step8_reset_index
@@ -246,6 +256,7 @@ sections:
     - type(결과)로 pandas.Series인지 pandas.DataFrame인지 구분할 수 있습니다.
     - DataFrame은 .columns 속성이 있고, Series는 .name 속성이 있습니다.
   check:
+    type: noError
     noError: groupby + mean + reset_index 체인이 정상 실행되어야 합니다.
     resultCheck: 결과가 DataFrame이고 'species'와 'body_mass_g' 두 컬럼을 포함해야 합니다.
 - id: step9_multi_group
@@ -268,6 +279,7 @@ sections:
     - island 컬럼에는 'Biscoe', 'Dream', 'Torgersen' 세 값이 있습니다.
     - 결과 인덱스는 (island, species) 두 단계의 MultiIndex입니다.
   check:
+    type: noError
     noError: 리스트로 그룹핑이 정상 실행되어 Series를 반환해야 합니다.
     resultCheck: 결과 Series의 인덱스가 MultiIndex이고 두 개의 level을 가져야 합니다.
 - id: step10_agg_list
@@ -290,6 +302,9 @@ sections:
     - std가 클수록 그룹 내 체중 편차가 큽니다 — Gentoo가 std가 가장 큰 종입니다.
     - median과 mean이 차이가 크면 분포가 한쪽으로 치우쳐 있다는 신호입니다.
   check:
+    type: contains
+    requiredPatterns:
+    - agg
     noError: agg에 리스트를 넘기는 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame의 컬럼이 리스트에 넣은 함수 이름과 같아야 합니다.
 - id: step11_agg_dict
@@ -320,6 +335,9 @@ sections:
     - 한 컬럼에 리스트를 주면 결과 DataFrame의 컬럼이 MultiIndex가 됩니다.
     - dict 키는 원본 컬럼명과 정확히 일치해야 합니다.
   check:
+    type: contains
+    requiredPatterns:
+    - agg
     noError: agg에 dict를 넘기는 호출이 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과 DataFrame의 컬럼이 dict 키와 같고, 각 셀이 지정한 함수의 계산 결과여야 합니다.
 - id: step12_query
@@ -342,6 +360,9 @@ sections:
     - query는 파이썬 chained comparison(a < x < b)을 지원합니다 — DataFrame[] 방식보다 자연스럽습니다.
     - 결과 shape의 행 수가 조건에 맞는 행 수와 같아야 합니다.
   check:
+    type: contains
+    requiredPatterns:
+    - query
     noError: query 호출이 SyntaxError 없이 실행되고 DataFrame을 반환해야 합니다.
     resultCheck: 결과 DataFrame의 모든 body_mass_g 값이 조건을 만족해야 합니다.
 - id: step13_query_string
@@ -364,6 +385,9 @@ sections:
     - and로 연결하면 두 조건 모두 참인 행만 남습니다.
     - 결과 shape의 행 수가 줄어드는지 확인하세요.
   check:
+    type: contains
+    requiredPatterns:
+    - query
     noError: 문자열 비교 query가 SyntaxError 없이 실행되어야 합니다.
     resultCheck: 결과 DataFrame의 species 컬럼 값이 모두 'Gentoo'여야 합니다.
 - id: step14_filter_groupby
@@ -383,6 +407,10 @@ sections:
     - 펭귄은 일반적으로 수컷이 암컷보다 큽니다.
     - 두 결과를 변수에 저장해 차이(maleMeans - femaleMeans)를 계산해볼 수도 있습니다.
   check:
+    type: contains
+    requiredPatterns:
+    - query
+    - groupby
     noError: query + groupby + 컬럼 + mean 체인이 정상 실행되어야 합니다.
     resultCheck: 결과 Series의 인덱스가 species의 고유 값을 포함해야 합니다.
 - id: step15_idxmax
@@ -409,6 +437,7 @@ sections:
     - idxmin은 가장 작은 값의 행 번호를 반환합니다.
     - .loc[정수]는 단일 행을 Series로 반환합니다.
   check:
+    type: noError
     noError: idxmax + loc 호출이 정상 실행되어야 합니다.
     resultCheck: 결과가 Series이고 body_mass_g 값이 컬럼 전체 max와 같아야 합니다.
 - id: workflow_validation
@@ -499,6 +528,7 @@ sections:
     - groupby('species')['bill_depth_mm'].mean()으로 시작하세요.
     - idxmin()을 붙이면 가장 작은 평균의 종 이름을 바로 얻을 수 있습니다.
   check:
+    type: noError
     noError: loadLocalDataset 호출과 그 뒤 분석 코드가 KeyError 없이 실행되어야 합니다.
     resultCheck: 최종 결과가 species 중 하나의 이름이거나 그룹별 통계 Series여야 합니다.
 - id: summary

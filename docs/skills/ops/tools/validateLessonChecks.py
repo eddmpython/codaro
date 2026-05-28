@@ -11,8 +11,15 @@ fires. Exits non-zero if any expected case diverges.
 
 Usage:
     uv run python -X utf8 docs/skills/ops/tools/validateLessonChecks.py [PATH ...]
+    uv run python -X utf8 docs/skills/ops/tools/validateLessonChecks.py <file> --section step1_load
+    uv run python -X utf8 docs/skills/ops/tools/validateLessonChecks.py <dir> --dry-run
 
 PATH may be a YAML file or a directory; without arguments scans curricula/python.
+
+Flags:
+    --section <id>   Only evaluate the section with this id (per file).
+    --dry-run        List sections + current check.type without invoking kernel.
+    --timeout <sec>  Per-file kernel timeout (default 120).
 """
 from __future__ import annotations
 
@@ -72,11 +79,23 @@ async def _evaluateSection(
     findings: list[SectionFinding] = []
     exercise = section.exercise
     checkConfig = exercise.check or section.check or {}
-    if not isinstance(checkConfig, dict) or not checkConfig.get("type"):
-        return findings  # No evaluation requested, skip silently.
-
     starterCode = _normalizeCode(exercise.starterCode)
     solutionCode = _normalizeCode(exercise.solution)
+
+    # Prewarm: execute the section's solution as its OWN block so any variables
+    # it defines persist into subsequent sections' checks. Without this, the
+    # checker's fixed `_check_noerr` blockId would overwrite prior state.
+    if solutionCode:
+        prewarmResult = await session.execute(solutionCode, blockId=f"_warm_{section.id}")
+        if prewarmResult.status == "error":
+            preview = repr(prewarmResult.data)[:200]
+            print(
+                f"  [warn] prewarm 실패 {section.id}: {preview}",
+                file=sys.stderr,
+            )
+
+    if not isinstance(checkConfig, dict) or not checkConfig.get("type"):
+        return findings  # No evaluation requested, skip silently.
 
     if not solutionCode:
         findings.append(SectionFinding(
@@ -159,7 +178,12 @@ async def _evaluateSection(
     return findings
 
 
-async def _processFile(file: Path) -> list[SectionFinding]:
+async def _processFile(
+    file: Path,
+    *,
+    sectionFilter: str | None = None,
+    timeoutSeconds: float = 120.0,
+) -> list[SectionFinding]:
     try:
         rawContent = yaml.safe_load(file.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
@@ -183,15 +207,80 @@ async def _processFile(file: Path) -> list[SectionFinding]:
     if not lesson.sections:
         return []
 
-    session = KernelSession()
+    sections = lesson.sections
+    if sectionFilter:
+        sections = [s for s in sections if s.id == sectionFilter]
+        if not sections:
+            return [SectionFinding(
+                file=file,
+                sectionId=sectionFilter,
+                sectionTitle="",
+                status="skip",
+                message=f"--section {sectionFilter}: 해당 id 섹션 없음.",
+            )]
+
+    async def _runAll() -> list[SectionFinding]:
+        session = KernelSession()
+        try:
+            results: list[SectionFinding] = []
+            for section in sections:
+                sectionFindings = await _evaluateSection(session, file, section)
+                results.extend(sectionFindings)
+            return results
+        finally:
+            session.dispose()
+
     try:
-        findings: list[SectionFinding] = []
-        for section in lesson.sections:
-            sectionFindings = await _evaluateSection(session, file, section)
-            findings.extend(sectionFindings)
-        return findings
-    finally:
-        session.dispose()
+        return await asyncio.wait_for(_runAll(), timeout=timeoutSeconds)
+    except asyncio.TimeoutError:
+        return [SectionFinding(
+            file=file,
+            sectionId="(file)",
+            sectionTitle="",
+            status="error",
+            message=f"kernel timeout {timeoutSeconds:.0f}s 초과 — 강의 평가 중단.",
+        )]
+
+
+def _dryRunFile(file: Path) -> list[SectionFinding]:
+    try:
+        rawContent = yaml.safe_load(file.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        return [SectionFinding(
+            file=file,
+            sectionId="(file)",
+            sectionTitle="",
+            status="error",
+            message=f"YAML 파싱 실패: {exc}",
+        )]
+    if not isinstance(rawContent, dict):
+        return []
+    lesson = lessonContractFromYaml(rawContent, fallbackTitle=file.stem)
+    findings: list[SectionFinding] = []
+    for section in lesson.sections:
+        exercise = section.exercise
+        checkConfig = exercise.check or section.check or {}
+        if not isinstance(checkConfig, dict):
+            continue
+        currentType = checkConfig.get("type")
+        starter = _normalizeCode(exercise.starterCode)
+        solution = _normalizeCode(exercise.solution)
+        hasBlank = bool(starter and starter != solution)
+        if currentType:
+            note = f"활성: type={currentType}"
+        elif solution:
+            blankMark = " · 빈칸있음" if hasBlank else ""
+            note = f"후보 (solution 존재{blankMark})"
+        else:
+            note = "skip — solution 없음"
+        findings.append(SectionFinding(
+            file=file,
+            sectionId=section.id,
+            sectionTitle=section.title,
+            status="ok" if currentType else "skip",
+            message=note,
+        ))
+    return findings
 
 
 def _collectFiles(paths: Iterable[Path]) -> list[Path]:
@@ -207,7 +296,13 @@ def _collectFiles(paths: Iterable[Path]) -> list[Path]:
     return result
 
 
-async def _main(targets: list[Path]) -> int:
+async def _main(
+    targets: list[Path],
+    *,
+    sectionFilter: str | None,
+    timeoutSeconds: float,
+    dryRun: bool,
+) -> int:
     files = _collectFiles(targets)
     if not files:
         print("처리할 YAML 파일이 없습니다.", file=sys.stderr)
@@ -218,17 +313,28 @@ async def _main(targets: list[Path]) -> int:
     errorCount = 0
     skipped = 0
     evaluated = 0
+    total = len(files)
 
-    for file in files:
-        findings = await _processFile(file)
+    for index, file in enumerate(files, start=1):
+        rel = file.relative_to(ROOT).as_posix() if file.is_absolute() else file.as_posix()
+        prefix = f"[{index}/{total}]"
+        print(f"{prefix} {rel}", file=sys.stderr, flush=True)
+        if dryRun:
+            findings = _dryRunFile(file)
+        else:
+            findings = await _processFile(
+                file,
+                sectionFilter=sectionFilter,
+                timeoutSeconds=timeoutSeconds,
+            )
         if not findings:
             skipped += 1
             continue
         for finding in findings:
             evaluated += 1
-            rel = finding.file.relative_to(ROOT).as_posix() if finding.file.is_absolute() else finding.file.as_posix()
             tag = {"ok": "OK", "fail": "FAIL", "skip": "SKIP", "error": "ERROR"}[finding.status]
-            print(f"[{tag}] {rel} :: {finding.sectionId} — {finding.message}")
+            findingRel = finding.file.relative_to(ROOT).as_posix() if finding.file.is_absolute() else finding.file.as_posix()
+            print(f"[{tag}] {findingRel} :: {finding.sectionId} — {finding.message}")
             if finding.status == "ok":
                 okCount += 1
             elif finding.status == "fail":
@@ -237,8 +343,15 @@ async def _main(targets: list[Path]) -> int:
                 errorCount += 1
 
     print()
-    print(f"검사 파일 {len(files)}개 · check 정의 섹션 {evaluated // 2 if evaluated else 0}개 · "
-          f"ok {okCount} · fail {failCount} · error {errorCount} · 평가 없는 파일 {skipped}개")
+    mode = "dry-run" if dryRun else "평가"
+    sectionSummary = (
+        f"check 정의 섹션 {evaluated // 2 if evaluated else 0}개 ·"
+        if not dryRun else f"섹션 {evaluated}개 보고 ·"
+    )
+    print(
+        f"[{mode}] 검사 파일 {len(files)}개 · {sectionSummary} "
+        f"ok {okCount} · fail {failCount} · error {errorCount} · 평가 없는 파일 {skipped}개"
+    )
 
     return 0 if (failCount == 0 and errorCount == 0) else 1
 
@@ -251,9 +364,30 @@ def main() -> int:
         type=Path,
         help="YAML 파일 또는 디렉토리. 비우면 curricula/python 전체를 검사.",
     )
+    parser.add_argument(
+        "--section",
+        default=None,
+        help="이 id를 가진 섹션만 평가 (파일 단위 필터).",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=120.0,
+        help="강의 1개의 kernel 평가 timeout (초). 기본 120.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="kernel 실행 없이 활성화된/후보 섹션 목록만 출력.",
+    )
     args = parser.parse_args()
     targets = args.paths or [CURRICULA_ROOT]
-    return asyncio.run(_main(targets))
+    return asyncio.run(_main(
+        targets,
+        sectionFilter=args.section,
+        timeoutSeconds=args.timeout,
+        dryRun=args.dry_run,
+    ))
 
 
 if __name__ == "__main__":
