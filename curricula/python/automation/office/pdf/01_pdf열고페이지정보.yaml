@@ -57,7 +57,7 @@ sections:
     structuredPrimary: true
     subtitle: "PdfReader(path), len(reader.pages)"
     goal: "임시 PDF를 하나 만들고 PdfReader로 열어 페이지 수를 확인한다."
-    why: "PDF 자동화의 첫걸음은 객체를 정확히 만드는 것입니다. PdfReader가 잘 열렸다는 사실 하나가 이후 모든 작업의 전제입니다."
+    why: "협력사·정부·내부 PDF 점검의 모든 후속 작업이 PdfReader 객체 위에서 일어납니다. 객체가 잘 만들어졌다는 사실 하나로 페이지 수, 메타데이터, 본문, 표 추출이 전부 열립니다. 이 한 줄이 막히면 01-10강 모든 자동화가 멈춥니다."
     explanation: |-
       reportlab의 Canvas로 3페이지 PDF를 임시 폴더에 만든 뒤 PdfReader(path)로 엽니다. reader.pages는 인덱싱 가능한 시퀀스이고 len()으로 페이지 수를 즉시 알 수 있습니다.
     tips:
@@ -293,7 +293,7 @@ sections:
       assert {row["author"] for row in rows} == {"김대리", "박과장", "이주임", "윤대리"}
       rows
     exercise:
-      prompt: "샘플을 7개로 늘리고, 작성자 집합 크기가 5가 되도록 한 명을 추가해 assert를 통과시키세요."
+      prompt: "inspectPdfFolder의 본문을 직접 작성하세요. 폴더의 모든 PDF를 순회하며 파일명·페이지수·제목·작성자 dict 리스트를 돌려줘야 합니다. metadata가 None인 PDF도 안전하게 처리해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -312,27 +312,22 @@ sections:
         def inspectPdfFolder(folder):
             rows = []
             for path in sorted(Path(folder).glob("*.pdf")):
-                reader = PdfReader(path)
-                meta = reader.metadata
-                rows.append({
-                    "file": path.name,
-                    "pages": len(reader.pages),
-                    "title": meta.title if meta else None,
-                    "author": meta.author if meta else None,
-                })
+                ___  # PdfReader 열고 metadata None 가드 후 dict append
             return rows
 
         vault = TemporaryDirectory()
         base = Path(vault.name)
-        for idx, author in enumerate(["김대리", "박과장", "이주임", "윤대리", "최팀장", ___, ___], start=1):
-            makeSample(base / f"{idx:02d}.pdf", 1, f"T{idx}", author)
+        for idx, author in enumerate(["김대리", "박과장", "이주임", "윤대리", "최팀장", "김대리", "박과장"], start=1):
+            makeSample(base / f"{idx:02d}.pdf", idx, f"T{idx}", author)
 
         rows = inspectPdfFolder(base)
         assert len(rows) == 7
+        assert sum(row["pages"] for row in rows) == 28
         assert len({row["author"] for row in rows}) == 5
         rows
       hints:
-        - "리스트에 작성자 이름 두 명 추가. 중복도 OK — 작성자 집합 크기는 unique 개수입니다."
+        - "reader = PdfReader(path), meta = reader.metadata, meta is None 가드 후 rows.append(dict)."
+        - "dict 키: file, pages, title, author (snippet과 동일 구조)."
     check:
       noError: "리스트 길이와 enumerate 인자 수가 맞아야 합니다."
       resultCheck: "len(rows)가 7, 작성자 unique 수가 5여야 합니다."

@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "canvas.acroForm.textfield"
     goal: "이름·전화 두 텍스트 필드가 있는 한 페이지 신청서 PDF를 만든다."
-    why: "양식 채우기를 실험하려면 양식이 먼저 필요합니다. reportlab으로 즉석 생성해 외부 의존을 없앱니다."
+    why: "근로계약서, 출장 신청서, 휴가 신청서, 정부 보조금 신청서 — 인사·총무는 같은 양식 PDF에 사람별 정보만 바꿔 N장 만드는 작업을 매주 합니다. 양식 채우기를 코드로 풀려면 우선 채울 양식이 있어야 하므로, 회사 양식 PDF를 받기 전 학습용으로 reportlab AcroForm으로 즉석 만듭니다. 실무에서는 templatePath만 회사 양식 경로로 바꾸면 같은 코드가 그대로 돌아갑니다."
     explanation: |-
       Canvas의 acroForm.textfield(name='...', x, y, width, height)가 텍스트 입력 필드를 추가합니다. name이 채우기 단계에서 key가 됩니다.
     tips:
@@ -354,7 +354,7 @@ sections:
               assert fields.get(key, {}).get("/V") == value, f"{path.name}의 {key} mismatch"
       [p.name for p in paths]
     exercise:
-      prompt: "신청자를 3명으로 늘리고 모든 PDF가 검증을 통과하는지 확인하세요."
+      prompt: "fillForm 함수의 본문을 직접 작성하세요. templatePath의 PDF를 PdfWriter(clone_from=...)로 복제한 뒤 update_page_form_field_values로 첫 페이지에 data를 채우고 outPath로 저장해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -371,10 +371,7 @@ sections:
             canvas.save()
 
         def fillForm(templatePath, outPath, data):
-            reader = PdfReader(templatePath)
-            writer = PdfWriter(clone_from=reader)
-            writer.update_page_form_field_values(writer.pages[0], data)
-            writer.write(str(outPath))
+            ___  # reader 로드 + PdfWriter(clone_from=reader) + update_page_form_field_values + write
 
         def generateForms(templatePath, outFolder, applicants):
             Path(outFolder).mkdir(exist_ok=True)
@@ -392,7 +389,7 @@ sections:
         applicants = [
             {"applicantName": "Kim", "applicantPhone": "010-1"},
             {"applicantName": "Park", "applicantPhone": "010-2"},
-            {"applicantName": ___, "applicantPhone": ___},
+            {"applicantName": "Lee", "applicantPhone": "010-3"},
         ]
         paths = generateForms(base / "tpl.pdf", base / "out", applicants)
         for path, applicant in zip(paths, applicants):
@@ -401,7 +398,8 @@ sections:
                 assert fields.get(key, {}).get("/V") == value
         len(paths)
       hints:
-        - "두 문자열을 추가, 예: 'Lee', '010-3'."
+        - "reader = PdfReader(templatePath); writer = PdfWriter(clone_from=reader)"
+        - "writer.update_page_form_field_values(writer.pages[0], data); writer.write(str(outPath))"
     check:
       noError: "applicants 리스트의 각 dict 키가 양식 필드 name과 같아야 합니다."
       resultCheck: "출력 3."
@@ -474,34 +472,34 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 1개"
-    subtitle: "신청서 일괄 생성기"
-    goal: "양식 PDF + 신청자 CSV → 채워진 PDF 묶음을 한 함수로 만든다."
-    why: "양식 자동 입력의 끝은 데이터 소스(CSV)에서 시작해 결과 PDF 폴더로 끝나는 한 파이프라인입니다."
+    title: "실습 — 종합 미션 2개"
+    subtitle: "신청서 일괄 생성기 + 양식 필드 자동 탐색"
+    goal: "양식 PDF + 신청자 CSV → 채워진 PDF 묶음, 그리고 받은 양식의 필드 이름을 자동 추출하는 두 도구를 만든다."
+    why: "양식 자동 입력의 끝은 데이터 소스(CSV)에서 시작해 결과 PDF 폴더로 끝나는 한 파이프라인입니다. 회사 양식이 새로 오면 필드 이름을 먼저 알아야 입력 dict를 짤 수 있어, 필드 자동 탐색이 짝패로 따라옵니다."
     explanation: |-
-      미션은 신청자 dict 리스트로 양식 PDF를 일괄 채우는 함수입니다. 결과 PDF의 필드 값이 입력과 일치하는지 검증까지 포함합니다.
+      미션1은 신청자 dict 리스트로 양식 PDF를 일괄 채우는 함수, 미션2는 받은 양식 PDF의 모든 필드 이름과 기본값을 dict로 돌려주는 탐색 함수입니다.
     tips:
-      - "이 강의는 미션 1개로 충분합니다. AcroForm 자체가 niche 영역이고 더 많은 변주는 확장에서."
+      - "변수 prefix: bulk*(미션1), probe*(미션2)."
     snippet: |-
       from pathlib import Path
       from tempfile import TemporaryDirectory
       from pypdf import PdfReader, PdfWriter
       from reportlab.pdfgen.canvas import Canvas
     exercise:
-      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
       starterCode: |-
         ___
       hints:
-        - "미션: bulkFillForms(templatePath, outFolder, applicants) -> list[Path]"
-        - "각 PDF를 다시 열어 필드 값이 입력값과 같은지 assert."
+        - "미션1: bulkFillForms(templatePath, outFolder, applicants) -> list[Path]"
+        - "미션2: probeFormFields(templatePath) -> dict[str, str] (필드명 → 현재값 또는 빈 문자열)"
     check:
       noError: "함수 정의 + 결과 검증."
-      resultCheck: "리스트 길이가 applicants 길이와 같아야 합니다."
+      resultCheck: "미션1 리스트 길이 == applicants 길이, 미션2 dict 키 == 양식 필드명."
     blocks:
       - type: tip
         content: "실무에서는 양식 파일이 이미 존재합니다. buildForm 단계는 학습용이고, 실제 코드는 templatePath를 회사 양식 PDF 경로로 받게 합니다."
       - type: expansion
-        title: "미션: 양식 일괄 채우기 + 검증"
+        title: "미션1: 양식 일괄 채우기 + 검증"
         blocks:
           - type: code
             title: "함수 정의와 검증"
@@ -549,6 +547,43 @@ sections:
                   for key, value in applicant.items():
                       assert fields.get(key, {}).get("/V") == value
               [p.name for p in filledPaths]
+      - type: expansion
+        title: "미션2: 양식 필드 자동 탐색"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.pdfgen.canvas import Canvas
+
+              def buildProbeForm(path):
+                  canvas = Canvas(str(path))
+                  canvas.drawString(72, 750, "Vacation Request")
+                  canvas.acroForm.textfield(name="employeeName", x=140, y=720, width=200, height=20)
+                  canvas.acroForm.textfield(name="department", x=140, y=690, width=200, height=20)
+                  canvas.acroForm.textfield(name="startDate", x=140, y=660, width=200, height=20)
+                  canvas.acroForm.textfield(name="endDate", x=140, y=630, width=200, height=20)
+                  canvas.showPage()
+                  canvas.save()
+
+              def probeFormFields(templatePath):
+                  reader = PdfReader(templatePath)
+                  fields = reader.get_fields() or {}
+                  result = {}
+                  for name, spec in fields.items():
+                      value = spec.get("/V") if isinstance(spec, dict) else None
+                      result[name] = value if value is not None else ""
+                  return result
+
+              probeDir = TemporaryDirectory()
+              probePath = Path(probeDir.name) / "vacation.pdf"
+              buildProbeForm(probePath)
+              discovered = probeFormFields(probePath)
+              assert set(discovered.keys()) == {"employeeName", "department", "startDate", "endDate"}
+              assert all(value == "" for value in discovered.values())
+              sorted(discovered.keys())
 
   - id: extensions
     title: "확장 변주"

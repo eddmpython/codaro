@@ -124,7 +124,7 @@ sections:
       body = bodyTemplate.substitute(name="김대리", role="대리", topic="월간 보고서")
       body
     exercise:
-      prompt: "substitute 인자를 박과장/과장/주간 보고서로 바꿔 결과 본문 첫 줄이 '박과장 님 안녕하세요.'인지 확인하세요."
+      prompt: "renderBody(recipient) 함수를 직접 작성하세요. dict 하나를 받아 위 Template을 safe_substitute로 채워 문자열을 반환해야 합니다. (safe_substitute는 키가 없으면 자리표시자를 그대로 두므로 부분 데이터에도 안전합니다.) 박과장 데이터로 호출해 첫 줄이 '박과장 님 안녕하세요.'인지 검증합니다."
       starterCode: |-
         from string import Template
 
@@ -132,10 +132,14 @@ sections:
             "$name 님 안녕하세요.\n\n"
             "$role 자리에 보고드릴 $topic 자료를 첨부합니다."
         )
-        body = bodyTemplate.substitute(name=___, role=___, topic=___)
+
+        def renderBody(recipient):
+            ___
+
+        body = renderBody({"name": "박과장", "role": "과장", "topic": "주간 보고서"})
         body.splitlines()[0]
       hints:
-        - "세 문자열: '박과장', '과장', '주간 보고서'."
+        - "return bodyTemplate.safe_substitute(**recipient)."
     check:
       noError: "substitute 인자는 키워드."
       resultCheck: "출력 '박과장 님 안녕하세요.'."

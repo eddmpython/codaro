@@ -215,7 +215,7 @@ sections:
       saved = saveAttachments(restored, base / "downloads")
       [p.name for p in saved]
     exercise:
-      prompt: "첨부 파일명을 '청구서_5월.pdf'와 '계약서.pdf'로 바꿔 저장 후 파일 수가 2인지 확인하세요."
+      prompt: "saveAttachments를 빈 함수로 직접 작성하세요. 폴더 생성, iter_attachments 순회, filename이 None인 파트 건너뛰기, payload를 폴더에 쓰고 Path 리스트 반환까지 본인이 채워야 합니다. 한글 파일명 두 개로 검증합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -225,16 +225,7 @@ sections:
         from reportlab.pdfgen.canvas import Canvas
 
         def saveAttachments(msg, outFolder):
-            Path(outFolder).mkdir(exist_ok=True)
-            saved = []
-            for part in msg.iter_attachments():
-                name = part.get_filename()
-                if not name:
-                    continue
-                outPath = Path(outFolder) / name
-                outPath.write_bytes(part.get_payload(decode=True) or b"")
-                saved.append(outPath)
-            return saved
+            ___
 
         workdir = TemporaryDirectory()
         base = Path(workdir.name)
@@ -249,14 +240,14 @@ sections:
         original["To"] = "you@example.com"
         original["Subject"] = "s"
         original.set_content("body", charset="utf-8")
-        original.add_attachment(pdfPath1.read_bytes(), maintype="application", subtype="pdf", filename=___)
-        original.add_attachment(pdfPath2.read_bytes(), maintype="application", subtype="pdf", filename=___)
+        original.add_attachment(pdfPath1.read_bytes(), maintype="application", subtype="pdf", filename="청구서_5월.pdf")
+        original.add_attachment(pdfPath2.read_bytes(), maintype="application", subtype="pdf", filename="계약서.pdf")
 
         restored = BytesParser(policy=default).parsebytes(original.as_bytes())
         saved = saveAttachments(restored, base / "out")
         len(saved)
       hints:
-        - "두 한글 파일명."
+        - "본체 골자: Path(outFolder).mkdir(exist_ok=True) → for part in msg.iter_attachments(): name=part.get_filename(); if not name: continue; (outFolder/name).write_bytes(part.get_payload(decode=True) or b'') → 리스트에 모아 반환."
     check:
       noError: "한글 파일명도 문자열."
       resultCheck: "출력 2."
@@ -265,7 +256,7 @@ sections:
     title: "실습 — 종합 미션"
     subtitle: "월별 자동 정리 도구"
     goal: "첨부를 첨부 종류별 (PDF/CSV/이미지) 폴더로 자동 분류 저장한다."
-    why: "사장님의 매월 첨부 정리 자동화의 완성 단계입니다."
+    why: "1인 사장님이 매월 받는 세금계산서·견적서·계약서 PDF가 100개를 넘으면 손으로 폴더 분류만 한 시간이 사라집니다. Content-Type 기반 분류 + 발신자/월별 분류 두 패턴이 한 함수에 모이면 inbox만 비워도 회계·법무 자료가 자동 정리됩니다. 07강 IMAP 자동 이동과 결합되면 사람이 직접 메일을 열 필요가 사라집니다."
     explanation: |-
       미션: sortAttachmentsByType(msg, outFolder) -> dict[type, list[Path]] 함수. PDF는 pdf/, CSV는 csv/, 이미지는 image/ 하위 폴더로 분류.
     tips:
@@ -341,6 +332,55 @@ sections:
               assert len(result["pdf"]) == 1
               assert len(result["csv"]) == 1
               {k: len(v) for k, v in result.items()}
+      - type: expansion
+        title: "미션2: 발신자·월별 폴더 분류"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import re
+              from datetime import datetime
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+              from email.parser import BytesParser
+              from email.policy import default
+              from email.utils import parseaddr
+              from reportlab.pdfgen.canvas import Canvas
+
+              def sortAttachmentsBySender(msg, outFolder, receivedAt=None):
+                  receivedAt = receivedAt or datetime.utcnow()
+                  _, address = parseaddr(msg.get("From", ""))
+                  domain = address.split("@", 1)[-1].lower() if "@" in address else "unknown"
+                  bucket = Path(outFolder) / re.sub(r"[^a-z0-9.-]", "_", domain) / receivedAt.strftime("%Y-%m")
+                  bucket.mkdir(parents=True, exist_ok=True)
+                  saved = []
+                  for part in msg.iter_attachments():
+                      name = part.get_filename()
+                      if not name:
+                          continue
+                      target = bucket / name
+                      target.write_bytes(part.get_payload(decode=True) or b"")
+                      saved.append(target)
+                  return saved
+
+              workdir = TemporaryDirectory()
+              base = Path(workdir.name)
+              pdfPath = base / "p.pdf"
+              c = Canvas(str(pdfPath)); c.showPage(); c.save()
+
+              original = EmailMessage()
+              original["From"] = "Vendor Bot <billing@vendor.com>"
+              original["To"] = "me@example.com"
+              original["Subject"] = "월간 청구서"
+              original.set_content("body", charset="utf-8")
+              original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="청구서.pdf")
+
+              restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+              saved = sortAttachmentsBySender(restored, base / "by_sender", datetime(2026, 5, 1))
+              assert saved[0].parts[-3] == "vendor.com"
+              assert saved[0].parts[-2] == "2026-05"
+              saved[0].name
 
   - id: extensions
     title: "확장 변주"

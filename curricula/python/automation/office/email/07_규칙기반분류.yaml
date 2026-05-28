@@ -73,25 +73,22 @@ sections:
 
       matchRule(rules, "office@nts.go.kr", "민원 통보"), matchRule(rules, "billing@vendor.com", "월간 세금계산서 첨부")
     exercise:
-      prompt: "룰을 추가해 발신자 '@codaro.dev' → 'Codaro' 폴더로 분류하세요."
+      prompt: "matchRule 함수를 직접 작성하세요. rules 리스트를 순회하며 field='from'이면 sender, field='subject'이면 subject에 keyword가 포함되는지 검사하고, 첫 매치의 folder를 반환합니다. 매치가 없으면 None. 두 룰과 세 케이스로 검증합니다."
       starterCode: |-
         rules = [
             {"keyword": "@nts.go.kr", "field": "from", "folder": "TaxOffice"},
-            {"keyword": "세금계산서", "field": "subject", "folder": "Invoices"},
-            {"keyword": ___, "field": "from", "folder": ___},
+            {"keyword": "@codaro.dev", "field": "from", "folder": "Codaro"},
         ]
 
         def matchRule(rules, sender, subject):
-            for rule in rules:
-                if rule["field"] == "from" and rule["keyword"] in sender:
-                    return rule["folder"]
-                if rule["field"] == "subject" and rule["keyword"] in subject:
-                    return rule["folder"]
-            return None
+            ___
 
+        assert matchRule(rules, "office@nts.go.kr", "x") == "TaxOffice"
+        assert matchRule(rules, "team@codaro.dev", "x") == "Codaro"
+        assert matchRule(rules, "stranger@example.com", "x") is None
         matchRule(rules, "team@codaro.dev", "안내")
       hints:
-        - "두 문자열: '@codaro.dev', 'Codaro'."
+        - "for rule in rules: 안에서 field 분기 후 keyword in sender/subject 시 folder 반환. 끝까지 못 찾으면 return None."
     check:
       noError: "dict 키는 문자열."
       resultCheck: "출력 'Codaro'."
@@ -228,7 +225,7 @@ sections:
     title: "실습 — 종합 미션"
     subtitle: "발신자 도메인별 자동 분류 도구"
     goal: "발신자 도메인을 자동 추출해 폴더로 분류하는 함수를 만든다."
-    why: "한 룰 데이터로 수십 개 분류가 가능한 패턴입니다."
+    why: "1인 사장님이 매일 30분씩 손으로 받은 메일을 폴더로 옮기는 사이클이 사라집니다. 발신자 도메인 → 폴더 룰 하나로 거래처·관공서·뉴스레터 분류가 한 번에 끝나고, 본 트랙 후반의 dryRun → 실행 패턴과 결합하면 inbox zero가 코드로 매일 자동 유지됩니다."
     explanation: |-
       미션: classifyByDomain(rules, sender) -> str. 발신자 이메일의 @ 뒤 도메인을 추출해 룰 dict와 매칭.
     tips:
@@ -274,6 +271,34 @@ sections:
               for sender, expected in cases:
                   assert classifyByDomain(rules, sender) == expected
               [classifyByDomain(rules, s) for s, _ in cases]
+      - type: expansion
+        title: "미션2: dryRun 분류 플랜 생성기"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from email.utils import parseaddr
+
+              def planMoves(messages, rules, default="Inbox/Misc"):
+                  plan = []
+                  for entry in messages:
+                      _, address = parseaddr(entry.get("from", ""))
+                      domain = address.split("@", 1)[-1].lower() if "@" in address else ""
+                      folder = rules.get(domain, default)
+                      plan.append({"uid": entry["uid"], "from": entry["from"], "target": folder})
+                  return plan
+
+              rules = {"nts.go.kr": "TaxOffice", "vendor.com": "Vendors"}
+              sample = [
+                  {"uid": "101", "from": "office@nts.go.kr"},
+                  {"uid": "102", "from": "Vendor <billing@vendor.com>"},
+                  {"uid": "103", "from": "friend@example.com"},
+              ]
+              plan = planMoves(sample, rules)
+              assert plan[0]["target"] == "TaxOffice"
+              assert plan[1]["target"] == "Vendors"
+              assert plan[2]["target"] == "Inbox/Misc"
+              [(p["uid"], p["target"]) for p in plan]
 
   - id: extensions
     title: "확장 변주"

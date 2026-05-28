@@ -53,7 +53,7 @@ sections:
     structuredPrimary: true
     subtitle: "Document(), add_paragraph, save"
     goal: "단락 두 개가 있는 docx 파일을 임시 폴더에 만든다."
-    why: "python-docx 모든 자동화의 출발점입니다. 한 함수 호출 안에 Document → 단락 → save 흐름이 들어가는 패턴이 모든 후속 강의의 기본."
+    why: "python-docx 모든 자동화의 출발점입니다. 한 함수 호출 안에 Document → 단락 → save 흐름이 들어가는 패턴이 모든 후속 강의의 기본이며, 보고서·계약서·회의록 등 어떤 한국 사무 양식이든 결국 이 세 줄에서 확장됩니다."
     explanation: |-
       Document()는 빈 워드 문서 객체. add_paragraph(text)는 새 단락을 추가하고 Paragraph 객체를 돌려줍니다. save(path)는 .docx 파일을 디스크에 씁니다.
     tips:
@@ -177,27 +177,28 @@ sections:
       assert reopened.paragraphs[2].text == "gamma"
       [p.text for p in reopened.paragraphs]
     exercise:
-      prompt: "lines 리스트에 한 줄(예: 'delta') 더 추가해 길이가 4인지 확인하세요."
+      prompt: "buildLabeledDoc 함수를 완성하세요 — 각 줄 앞에 '[N] '(1부터 시작하는 번호) 접두사를 붙여 단락으로 저장."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
         from docx import Document
 
-        def buildHelloDoc(path, lines):
+        def buildLabeledDoc(path, lines):
             doc = Document()
-            for line in lines:
-                doc.add_paragraph(line)
+            for idx, line in enumerate(lines, start=1):
+                ___  # 단락 추가: f"[{idx}] {line}"
             doc.save(path)
 
         vault = TemporaryDirectory()
         docxPath = Path(vault.name) / "h.docx"
-        buildHelloDoc(docxPath, ["alpha", "beta", "gamma", ___])
-        len(Document(docxPath).paragraphs)
+        buildLabeledDoc(docxPath, ["alpha", "beta", "gamma"])
+        [p.text for p in Document(docxPath).paragraphs]
       hints:
-        - "문자열 'delta'."
+        - "doc.add_paragraph(f'[{idx}] {line}')"
+        - "f-string으로 번호와 본문을 하나의 문자열로."
     check:
-      noError: "리스트 원소는 문자열."
-      resultCheck: "출력 4."
+      noError: "doc.add_paragraph 호출 한 번."
+      resultCheck: "출력 ['[1] alpha', '[2] beta', '[3] gamma']."
 
   - id: practice
     title: "실습 — 종합 미션"

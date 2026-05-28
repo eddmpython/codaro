@@ -131,7 +131,7 @@ sections:
       reopened = Document(docxPath)
       reopened.paragraphs[0].runs[0].font.name
     exercise:
-      prompt: "applyKoreanFont에 'NanumGothic'을 전달하고 폰트 이름을 확인하세요."
+      prompt: "applyKoreanFont의 함수 본체를 직접 작성하세요 — East Asian font까지 정확히 설정해야 한글이 깨지지 않습니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -140,23 +140,26 @@ sections:
 
         def applyKoreanFont(run, fontName="맑은 고딕"):
             run.font.name = fontName
-            run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+            ___  # East Asian font 적용: qn('w:eastAsia') 설정
 
         workdir = TemporaryDirectory()
         docxPath = Path(workdir.name) / "k.docx"
 
         doc = Document()
         p = doc.add_paragraph()
-        run = p.add_run("text")
-        applyKoreanFont(run, ___)
+        run = p.add_run("한글 본문")
+        applyKoreanFont(run, "NanumGothic")
         doc.save(docxPath)
 
-        Document(docxPath).paragraphs[0].runs[0].font.name == "NanumGothic"
+        run0 = Document(docxPath).paragraphs[0].runs[0]
+        eastAsia = run0._element.rPr.rFonts.get(qn("w:eastAsia"))
+        run0.font.name == "NanumGothic" and eastAsia == "NanumGothic"
       hints:
-        - "문자열 'NanumGothic'."
+        - "run._element.rPr.rFonts.set(qn('w:eastAsia'), fontName)"
+        - "rPr는 font.name 설정 직후 자동 생성됩니다."
     check:
-      noError: "applyKoreanFont 인자는 문자열."
-      resultCheck: "True 출력."
+      noError: "qn('w:eastAsia') 키로 rFonts 설정."
+      resultCheck: "True 출력 (이름과 East Asian 둘 다 적용)."
 
   - id: validation
     title: "3단계. 검증 — 한글 강조 단락 통합"
@@ -200,7 +203,7 @@ sections:
       assert runs[1].font.size == Pt(14)
       [(r.text, r.bold) for r in runs]
     exercise:
-      prompt: "buildEmphasis를 호출해 normalText='보고서 ', boldText='월간'으로 검증하세요."
+      prompt: "buildEmphasis 본체를 완성하세요 — boldText는 Bold + Pt(14) 크기 + 빨강(0xC0,0x39,0x2B)을 모두 적용하고, 두 run 모두 한글 폰트가 들어가야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -218,20 +221,20 @@ sections:
             n = p.add_run(normalText)
             applyKoreanFont(n)
             b = p.add_run(boldText)
-            b.bold = True
-            applyKoreanFont(b)
+            ___  # b에 bold/size Pt(14)/color RGBColor(0xC0,0x39,0x2B) 적용 + applyKoreanFont(b)
             doc.save(path)
 
         vault = TemporaryDirectory()
         docxPath = Path(vault.name) / "e.docx"
-        buildEmphasis(docxPath, ___, ___)
+        buildEmphasis(docxPath, "보고서 ", "월간")
         runs = Document(docxPath).paragraphs[0].runs
-        runs[1].bold
+        runs[1].bold, runs[1].font.size, runs[1].font.color.rgb
       hints:
-        - "두 문자열: '보고서 ', '월간'."
+        - "b.bold = True; b.font.size = Pt(14); b.font.color.rgb = RGBColor(0xC0,0x39,0x2B); applyKoreanFont(b)"
+        - "네 줄 모두 빠뜨리지 않아야 검증 통과."
     check:
-      noError: "buildEmphasis 인자는 문자열 두 개."
-      resultCheck: "True 출력."
+      noError: "Bold + size + color + 한글 폰트 동시 적용."
+      resultCheck: "(True, 177800, RGBColor(0xC0, 0x39, 0x2B)) 출력."
 
   - id: practice
     title: "실습 — 종합 미션"

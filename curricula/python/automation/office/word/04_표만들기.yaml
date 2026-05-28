@@ -213,7 +213,7 @@ sections:
       assert tbl.cell(3, 1).text == "60000"
       tbl.cell(0, 0).text, tbl.cell(3, 0).text
     exercise:
-      prompt: "한 행 더 추가해 표 행 수가 5인지 확인하세요."
+      prompt: "buildComparisonTable 본체를 직접 작성하세요 — 헤더 행 + 데이터 행을 모두 채우는 add_table 흐름."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -223,28 +223,30 @@ sections:
             doc = Document()
             tbl = doc.add_table(rows=len(rows) + 1, cols=len(headers), style="Table Grid")
             for colIdx, header in enumerate(headers):
-                tbl.cell(0, colIdx).text = header
+                ___  # tbl.cell(0, colIdx)에 header 텍스트
             for rowIdx, rowData in enumerate(rows, start=1):
                 for colIdx, value in enumerate(rowData):
-                    tbl.cell(rowIdx, colIdx).text = str(value)
+                    ___  # tbl.cell(rowIdx, colIdx)에 str(value)
             doc.save(path)
 
         vault = TemporaryDirectory()
         docxPath = Path(vault.name) / "v.docx"
-        data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000], ___]
+        data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000]]
         buildComparisonTable(docxPath, ["region", "amount"], data)
-        len(Document(docxPath).tables[0].rows)
+        tbl = Document(docxPath).tables[0]
+        tbl.cell(0, 0).text, tbl.cell(3, 1).text
       hints:
-        - "리스트 ['Incheon', 55000]."
+        - "tbl.cell(0, colIdx).text = header"
+        - "tbl.cell(rowIdx, colIdx).text = str(value)"
     check:
-      noError: "리스트 원소는 리스트."
-      resultCheck: "출력 5."
+      noError: "헤더와 데이터 셀을 모두 채워야 함."
+      resultCheck: "('region', '60000') 출력."
 
   - id: practice
     title: "실습 — 종합 미션"
     subtitle: "한국식 결재라인 표"
     goal: "담당·검토·승인 결재라인 표 함수를 만든다."
-    why: "한국 보고서의 표준 구성요소입니다."
+    why: "결재라인 표는 한국 보고서·기안서·품의서의 99%에 들어가는 표준 구성요소입니다. 담당·검토·승인 3컬럼이 손에 익으면 사내 양식 자동화의 절반이 끝납니다."
     explanation: |-
       미션: buildApprovalLine(doc, names) 함수. 'roles → names' 3컬럼 표.
     snippet: |-
@@ -287,6 +289,45 @@ sections:
               assert tbl.cell(0, 0).text == "담당"
               assert tbl.cell(1, 2).text == "이팀장"
               [tbl.cell(0, i).text for i in range(3)], [tbl.cell(1, i).text for i in range(3)]
+      - type: expansion
+        title: "미션 2: 직원 명단 → N행 표 자동 생성"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def buildEmployeeRoster(path, employees):
+                  doc = Document()
+                  headers = ["이름", "부서", "직급", "내선"]
+                  tbl = doc.add_table(rows=len(employees) + 1, cols=len(headers), style="Table Grid")
+                  for colIdx, header in enumerate(headers):
+                      tbl.cell(0, colIdx).text = header
+                  for rowIdx, emp in enumerate(employees, start=1):
+                      tbl.cell(rowIdx, 0).text = emp["name"]
+                      tbl.cell(rowIdx, 1).text = emp["team"]
+                      tbl.cell(rowIdx, 2).text = emp["role"]
+                      tbl.cell(rowIdx, 3).text = emp["ext"]
+                  doc.save(path)
+                  return tbl
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "roster.docx"
+              employees = [
+                  {"name": "김대리", "team": "기획", "role": "대리", "ext": "1201"},
+                  {"name": "박과장", "team": "개발", "role": "과장", "ext": "1305"},
+                  {"name": "이팀장", "team": "개발", "role": "팀장", "ext": "1306"},
+              ]
+              buildEmployeeRoster(docxPath, employees)
+
+              reopened = Document(docxPath)
+              tbl = reopened.tables[0]
+              assert len(tbl.rows) == 4
+              assert tbl.cell(0, 2).text == "직급"
+              assert tbl.cell(2, 3).text == "1305"
+              [(tbl.cell(i, 0).text, tbl.cell(i, 3).text) for i in range(len(tbl.rows))]
 
   - id: extensions
     title: "확장 변주"

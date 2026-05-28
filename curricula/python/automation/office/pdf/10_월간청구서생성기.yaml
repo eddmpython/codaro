@@ -138,7 +138,7 @@ sections:
     structuredPrimary: true
     subtitle: "한글 폰트 + Platypus 표 + 합계"
     goal: "한 고객의 청구서 dict로 한글 PDF를 생성하는 buildInvoice 함수를 만든다."
-    why: "본 강의의 핵심 함수입니다. 06강(한글)·07강(Platypus)이 한 함수에 결합되어 회계팀이 그대로 쓸 수 있는 청구서가 나옵니다."
+    why: "한국 회계팀의 월간 청구서는 공급가액·부가세·합계 세 줄과 품목 명세표가 한국 사업자 청구서 표준 양식의 핵심입니다. buildInvoice 한 함수가 06강 한글 폰트 헬퍼와 07강 Platypus Table을 한 자리에서 결합해 회계팀이 그대로 쓸 수 있는 청구서를 만듭니다. 3단계의 일괄 생성과 4단계의 합계 검증이 모두 이 함수 위에서 돌아가므로, 여기서 만든 모양이 트랙 전체의 산출물을 결정합니다."
     explanation: |-
       buildInvoice(path, invoice)는 등록한 한글 폰트로 표지(고객명, 청구일), 항목 표, 합계 행을 한 페이지 PDF로 그립니다. 부가세 10% 별도 처리도 포함합니다.
     tips:
@@ -213,7 +213,7 @@ sections:
       body = PdfReader(pdfPath).pages[0].extract_text() or ""
       "Codaro Lab" in body and "300,000" in body and "30,000" in body
     exercise:
-      prompt: "subtotal을 500000으로 바꿔 buildInvoice를 호출하고 합계가 550,000인지 확인하세요."
+      prompt: "buildInvoice 함수 안에서 한국 청구서 표준 3행(공급가액·부가세·합계)을 만드는 로직을 직접 작성하세요. subtotal에 10% VAT를 더한 합계를 계산하고 rows에 천 단위 구분자 포맷으로 누적해야 합니다."
       starterCode: |-
         import sys
         from pathlib import Path
@@ -244,12 +244,10 @@ sections:
             for style in styles.byName.values():
                 style.fontName = fontName
             subtotal = invoice["subtotal"]
-            vat = int(subtotal * 0.1)
-            total = subtotal + vat
             rows = [["품목", "수량", "단가", "금액"]]
             for item in invoice["items"]:
                 rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
-            rows.append(["합계", "", "", f"{total:,}"])
+            ___  # VAT 계산 + 공급가액/부가세/합계 3행을 rows에 추가
             doc = SimpleDocTemplate(str(path), pagesize=A4)
             doc.build([
                 Paragraph("청구서", styles["Title"]),
@@ -260,13 +258,18 @@ sections:
         pdfPath = Path(workdir.name) / "inv.pdf"
         sample = {
             "customer": "Acme",
-            "items": [{"item": "Sub", "qty": 1, "unit_price": ___, "amount": ___}],
-            "subtotal": ___,
+            "items": [{"item": "Sub", "qty": 1, "unit_price": 500000, "amount": 500000}],
+            "subtotal": 500000,
         }
         buildInvoice(pdfPath, sample)
-        "550,000" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+        body = PdfReader(pdfPath).pages[0].extract_text() or ""
+        assert "500,000" in body  # 공급가액
+        assert "50,000" in body   # 부가세
+        assert "550,000" in body  # 합계
+        "550,000" in body
       hints:
-        - "unit_price 500000, amount 500000, subtotal 500000."
+        - "vat = int(subtotal * 0.1); total = subtotal + vat"
+        - "rows.append(['공급가액', '', '', f'{subtotal:,}']); rows.append(['부가세', '', '', f'{vat:,}']); rows.append(['합계', '', '', f'{total:,}'])"
     check:
       noError: "dict 값이 정수여야 합니다."
       resultCheck: "True 출력."

@@ -225,7 +225,7 @@ sections:
       assert "{{" not in combined
       combined.strip().splitlines()[:5]
     exercise:
-      prompt: "context에 'discount' 항목 추가하고 양식·검증에서 사용하세요."
+      prompt: "buildProposalTemplate과 renderProposal 본체를 완성하세요 — 양식에는 {% for %} 루프로 items를 출력하고, render는 합계까지 계산해 context에 주입."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -235,12 +235,16 @@ sections:
         def buildProposalTemplate(path):
             seed = Document()
             seed.add_paragraph("고객: {{ customer }}")
-            seed.add_paragraph("할인: {{ discount }}")
+            seed.add_paragraph("{% for item in items %}")
+            seed.add_paragraph("- {{ item.name }}: {{ item.price }}원")
+            seed.add_paragraph("{% endfor %}")
+            seed.add_paragraph("합계: {{ total }}원")
             seed.save(path)
 
-        def renderProposal(templatePath, context, outPath):
+        def renderProposalWithTotal(templatePath, customer, items, outPath):
+            total = ___  # items의 각 price(int) 합을 천 단위 구분자 포함 문자열로
             tpl = DocxTemplate(str(templatePath))
-            tpl.render(context)
+            ___  # tpl.render에 customer/items/total dict 전달
             tpl.save(outPath)
 
         vault = TemporaryDirectory()
@@ -248,14 +252,17 @@ sections:
         tplPath = base / "t.docx"
         buildProposalTemplate(tplPath)
         outPath = base / "f.docx"
-        renderProposal(tplPath, {"customer": "Acme", "discount": ___}, outPath)
+
+        items = [{"name": "구독", "price": 50000}, {"name": "온보딩", "price": 200000}]
+        renderProposalWithTotal(tplPath, "Acme", items, outPath)
         combined = "\n".join(p.text for p in Document(outPath).paragraphs)
-        "10%" in combined
+        "Acme" in combined, "250,000" in combined, "{{" not in combined
       hints:
-        - "문자열 '10%'."
+        - "total = f'{sum(item[\"price\"] for item in items):,}'"
+        - "tpl.render({'customer': customer, 'items': items, 'total': total})"
     check:
-      noError: "render context dict."
-      resultCheck: "True 출력."
+      noError: "sum + f-string의 천 단위 포맷 + render dict."
+      resultCheck: "(True, True, True) 출력."
 
   - id: practice
     title: "실습 — 종합 미션"

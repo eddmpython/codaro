@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "PdfWriter(), writer.write(path)"
     goal: "PdfWriter 객체를 만들고 한 페이지짜리 결과 PDF를 임시 폴더에 저장한다."
-    why: "PdfWriter는 결과 PDF의 빈 그릇입니다. add_page로 채워야 PDF가 됩니다. 빈 그릇만 만들 수 있어도 이후 모든 합치기·자르기의 기반이 됩니다."
+    why: "총무·결재 부서는 협력사 PDF 다섯 장을 한 묶음 결재용 PDF로 합치는 작업을 매주 반복합니다. PdfWriter는 그 결재용 PDF의 빈 그릇이고, add_page로 페이지를 누적해야 의미가 생깁니다. 빈 그릇만 정확히 만들 수 있어도 02강의 병합·분할·발췌가 전부 같은 패턴으로 풀립니다."
     explanation: |-
       reportlab으로 1페이지 PDF를 만들고, 그 페이지를 PdfReader로 읽어 PdfWriter에 넘긴 뒤 writer.write(outPath)로 저장합니다. write 인자는 파일 핸들 또는 경로 문자열입니다.
     tips:
@@ -301,7 +301,7 @@ sections:
       assert mergedTotal == originalTotal == 10
       mergedTotal, originalTotal
     exercise:
-      prompt: "PDF 5개의 페이지 합과 병합 결과가 일치하는지 직접 작성한 assert로 확인하세요."
+      prompt: "mergePdfs 함수 본문을 직접 작성하세요. sources 리스트의 모든 PDF 페이지를 한 PdfWriter에 누적해 outPath에 저장해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -317,10 +317,7 @@ sections:
 
         def mergePdfs(sources, outPath):
             writer = PdfWriter()
-            for source in sources:
-                for page in PdfReader(source).pages:
-                    writer.add_page(page)
-            writer.write(str(outPath))
+            ___  # 각 source의 모든 페이지를 writer.add_page로 누적 후 writer.write(str(outPath))
 
         vault = TemporaryDirectory()
         vaultBase = Path(vault.name)
@@ -332,10 +329,11 @@ sections:
         mergePdfs(sorted(vaultBase.glob("*.pdf")), mergedPath)
 
         merged = len(PdfReader(mergedPath).pages)
-        assert merged == sum(___)
+        assert merged == sum(sizes) == 16
         merged
       hints:
-        - "sizes 리스트 그대로 합치면 됨."
+        - "for source in sources: for page in PdfReader(source).pages: writer.add_page(page)"
+        - "마지막에 writer.write(str(outPath))."
     check:
       noError: "리스트 합산이 정수여야 assert가 통과합니다."
       resultCheck: "출력이 16이어야 합니다."

@@ -88,7 +88,7 @@ sections:
     structuredPrimary: true
     subtitle: "dryRun=True 기본값, 실 발송은 명시"
     goal: "buildMessage 함수와 sendMessage 함수를 분리하고, sendMessage는 기본 dryRun=True."
-    why: "본 트랙의 핵심 안전 패턴입니다. 학습 중 100명 명단에 실수로 메일이 나가는 사고를 사전에 차단합니다."
+    why: "본 트랙의 핵심 안전 패턴입니다. 마케팅 정주임이 100명 명단으로 dryRun 없이 발송 코드를 돌리면 사고 회수가 불가능합니다. dryRun=True 기본값과 buildMessage/sendMessage 분리가 학습 중 오발송과 실무 사고를 모두 사전 차단하는 같은 패턴이 됩니다."
     explanation: |-
       buildMessage(to, subject, body) -> EmailMessage가 메시지를 만들고, sendMessage(msg, dryRun=True)가 dryRun이면 메시지 객체만 돌려주고 실 발송은 dryRun=False 명시 시에만 수행합니다.
     tips:
@@ -118,7 +118,7 @@ sections:
       dryResult = sendMessage(built, dryRun=True)
       dryResult["Subject"], dryResult.get_content().strip()
     exercise:
-      prompt: "sendMessage를 dryRun=True로 호출하고 결과가 EmailMessage 객체인지 isinstance로 확인하세요."
+      prompt: "sendMessage 본문을 직접 완성하세요. dryRun=True이면 (사고 차단을 위해) 즉시 msg를 반환하고, dryRun=False이면 SMTP 연결을 시도해야 한다는 표식으로 RuntimeError('실 발송 경로')를 raise하세요. dryRun=True 호출이 EmailMessage 객체를 돌려주는지 검증합니다."
       starterCode: |-
         from email.message import EmailMessage
 
@@ -131,17 +131,23 @@ sections:
             return msg
 
         def sendMessage(msg, dryRun=True):
-            if dryRun:
-                return msg
-            return msg
+            if ___:
+                return ___
+            ___
 
         built = buildMessage("a@b.com", "s", "b")
         result = sendMessage(built, dryRun=True)
-        isinstance(result, ___)
+        assert isinstance(result, EmailMessage)
+        try:
+            sendMessage(built, dryRun=False)
+            blocked = False
+        except RuntimeError:
+            blocked = True
+        isinstance(result, EmailMessage) and blocked
       hints:
-        - "타입 EmailMessage."
+        - "if 조건은 dryRun, return은 msg, 마지막 줄은 raise RuntimeError('실 발송 경로')."
     check:
-      noError: "isinstance 두 번째 인자는 클래스."
+      noError: "두 분기 모두 정의돼야 합니다."
       resultCheck: "True 출력."
 
   - id: step3_send

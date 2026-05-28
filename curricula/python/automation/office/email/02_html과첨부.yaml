@@ -265,7 +265,7 @@ sections:
       assert attachments[0].get_content_type() == "application/pdf"
       msg["Subject"], attachments[0].get_filename()
     exercise:
-      prompt: "메시지에 두 번째 첨부(text/csv, 'data.csv')를 추가해 첨부 수가 2가 되도록 함수를 호출하세요."
+      prompt: "함수에 csv 인자가 들어왔을 때만 두 번째 첨부를 추가하는 분기를 직접 작성하세요. 빈 자리에 if 가드와 add_attachment 호출(maintype='text', subtype='csv', filename=csvFilename)을 채워 첨부 수가 정확히 2가 되도록 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -280,8 +280,7 @@ sections:
             msg.set_content("text", charset="utf-8")
             msg.add_alternative(htmlBody, subtype="html")
             msg.add_attachment(Path(pdfPath).read_bytes(), maintype="application", subtype="pdf", filename=filename)
-            if csvPath:
-                msg.add_attachment(Path(csvPath).read_bytes(), maintype="text", subtype="csv", filename=csvFilename)
+            ___
             return msg
 
         vault = TemporaryDirectory()
@@ -294,10 +293,10 @@ sections:
         csvPath = base / "d.csv"
         csvPath.write_text("a,b\n1,2\n", encoding="utf-8")
 
-        msg = buildEmailWithAttachment("p@x.com", "s", "<p>h</p>", pdfPath, "r.pdf", csvPath, ___)
+        msg = buildEmailWithAttachment("p@x.com", "s", "<p>h</p>", pdfPath, "r.pdf", csvPath, "data.csv")
         len(list(msg.iter_attachments()))
       hints:
-        - "csvFilename 문자열 'data.csv'."
+        - "빈 자리: if csvPath: msg.add_attachment(Path(csvPath).read_bytes(), maintype='text', subtype='csv', filename=csvFilename)."
     check:
       noError: "함수 인자가 모두 채워져야 합니다."
       resultCheck: "출력 2."

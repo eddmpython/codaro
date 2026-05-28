@@ -51,7 +51,7 @@ sections:
     structuredPrimary: true
     subtitle: "Document(path)"
     goal: "Document에 path를 넘겨 기존 docx를 객체로 연다."
-    why: "본 강의의 출발점. 만들기와 다른 점은 첫 줄에서 끝납니다."
+    why: "본 강의의 출발점. 만들기와 다른 점은 첫 줄에서 끝납니다. 디자인팀이 만든 사내 표준 양식을 그대로 사용하면서 데이터만 코드로 채우는 패턴 — Word 자동화 현장에서 가장 자주 쓰이는 흐름입니다."
     explanation: |-
       Document() 인자 없이는 빈 새 문서. Document(path)는 기존 docx 객체로 로드. paragraphs/tables/sections 모두 그대로 접근 가능.
     snippet: |-
@@ -208,8 +208,9 @@ sections:
       assert "김대리" in combined
       combined
     exercise:
-      prompt: "치환에서 role 키만 빼서 잔여 자리표시자 발견 시 assert가 실패하는 것을 확인하세요(직접 catch)."
+      prompt: "findMissingPlaceholders 함수를 작성하세요 — 치환 후 결과 docx에서 남아 있는 모든 자리표시자(예: '{{role}}')를 set으로 반환."
       starterCode: |-
+        import re
         from pathlib import Path
         from tempfile import TemporaryDirectory
         from docx import Document
@@ -224,23 +225,28 @@ sections:
                             run.text = run.text.replace(placeholder, value)
             doc.save(outPath)
 
+        def findMissingPlaceholders(docPath):
+            doc = Document(docPath)
+            combined = "\n".join(p.text for p in doc.paragraphs)
+            ___  # re.findall로 r"\{\{[^{}]+\}\}" 패턴을 찾아 set으로 반환
+
         vault = TemporaryDirectory()
         base = Path(vault.name)
         tplPath = base / "t.docx"
         seed = Document()
-        for line in ["성명: {{name}}", "직급: {{role}}"]:
+        for line in ["성명: {{name}}", "직급: {{role}}", "부서: {{team}}"]:
             seed.add_paragraph(line)
         seed.save(tplPath)
         outPath = base / "f.docx"
 
-        replaceInDoc(tplPath, {"name": ___}, outPath)
-        combined = "\n".join(p.text for p in Document(outPath).paragraphs)
-        "{{role}}" in combined
+        replaceInDoc(tplPath, {"name": "김대리"}, outPath)
+        sorted(findMissingPlaceholders(outPath))
       hints:
-        - "문자열 '김대리'."
+        - "return set(re.findall(r'\\{\\{[^{}]+\\}\\}', combined))"
+        - "정규식으로 '{{...}}' 형태 모두 모아 set 반환."
     check:
-      noError: "dict 빈 자리는 자리표시자로 남음."
-      resultCheck: "True 출력 (role 치환 안 됨)."
+      noError: "re.findall + set 반환."
+      resultCheck: "['{{role}}', '{{team}}'] 출력."
 
   - id: practice
     title: "실습 — 종합 미션"

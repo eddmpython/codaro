@@ -296,7 +296,7 @@ sections:
       assert len(decisions) == 2
       reopened.paragraphs[0].text, attendeesTable.cell(2, 0).text
     exercise:
-      prompt: "attendees 4명으로 늘리고 검증을 통과시키세요."
+      prompt: "buildMinutes에 액션 아이템 표(3컬럼: 담당/내용/마감)를 추가하는 로직을 작성하세요. 헤더 행 + actions 각 dict를 행으로 채워야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -320,31 +320,33 @@ sections:
             doc = Document()
             applyCodaroStyles(doc)
             doc.add_heading(note["title"], level=0)
-            tbl = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
-            tbl.cell(0, 0).text = "성명"
-            tbl.cell(0, 1).text = "역할"
-            for idx, attendee in enumerate(note["attendees"], start=1):
-                tbl.cell(idx, 0).text = attendee["name"]
-                tbl.cell(idx, 1).text = attendee["role"]
+            doc.add_heading("액션 아이템", level=1)
+            actions = note["actions"]
+            actionTable = doc.add_table(rows=len(actions) + 1, cols=3, style="Table Grid")
+            for colIdx, header in enumerate(["담당", "내용", "마감"]):
+                actionTable.cell(0, colIdx).text = header
+            for idx, action in enumerate(actions, start=1):
+                ___  # action['who']/['what']/['due']를 각 셀에 채우기 (3줄)
             doc.save(path)
 
         vault = TemporaryDirectory()
         docxPath = Path(vault.name) / "v.docx"
         buildMinutes(docxPath, {
             "title": "주간",
-            "attendees": [
-                {"name": "김대리", "role": "기획"},
-                {"name": "박과장", "role": "개발"},
-                {"name": "이팀장", "role": "리드"},
-                ___,
+            "actions": [
+                {"who": "김대리", "what": "PRD 작성", "due": "2026-05-30"},
+                {"who": "박과장", "what": "QA 진행", "due": "2026-05-31"},
             ],
         })
-        len(Document(docxPath).tables[0].rows)
+        tbl = Document(docxPath).tables[0]
+        tbl.cell(1, 0).text, tbl.cell(2, 1).text, tbl.cell(2, 2).text
       hints:
-        - "dict {'name': '윤주임', 'role': '디자인'}."
+        - "actionTable.cell(idx, 0).text = action['who']"
+        - "actionTable.cell(idx, 1).text = action['what']"
+        - "actionTable.cell(idx, 2).text = action['due']"
     check:
-      noError: "리스트 원소는 dict."
-      resultCheck: "출력 5."
+      noError: "세 셀을 모두 채우는 3줄 로직."
+      resultCheck: "('김대리', 'QA 진행', '2026-05-31') 출력."
 
   - id: practice
     title: "실습 — 종합 미션"

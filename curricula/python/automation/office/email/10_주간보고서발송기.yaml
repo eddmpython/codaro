@@ -266,26 +266,28 @@ sections:
       mail = buildWeeklyMail("팀장@example.com", df, chartPath, pdfPath)
       mail["Subject"], [p.get_filename() for p in mail.iter_attachments()]
     exercise:
-      prompt: "buildWeeklyMail에 'CC' 인자를 추가해 'lead@example.com'을 CC로 받으세요."
+      prompt: "buildWeeklyMail을 직접 작성하세요. ccAddr이 리스트면 콤마 결합, 문자열이면 그대로 'Cc' 헤더에 넣고, None이면 Cc 헤더를 만들지 마세요. 세 경우(list/str/None)를 한 번에 검증합니다."
       starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
         from email.message import EmailMessage
 
         def buildWeeklyMail(toAddr, ccAddr=None):
             msg = EmailMessage()
             msg["From"] = "ops@example.com"
             msg["To"] = toAddr
-            if ccAddr:
-                msg[___] = ccAddr
+            ___
             msg["Subject"] = "주간"
             msg.set_content("body", charset="utf-8")
             return msg
 
-        mail = buildWeeklyMail("lead@example.com", ccAddr="cc@example.com")
-        mail["Cc"]
+        listMail = buildWeeklyMail("lead@example.com", ccAddr=["a@x.com", "b@x.com"])
+        strMail = buildWeeklyMail("lead@example.com", ccAddr="cc@example.com")
+        noneMail = buildWeeklyMail("lead@example.com")
+        assert listMail["Cc"] == "a@x.com, b@x.com"
+        assert strMail["Cc"] == "cc@example.com"
+        assert noneMail["Cc"] is None
+        (listMail["Cc"], strMail["Cc"], noneMail["Cc"])
       hints:
-        - "문자열 'Cc'."
+        - "if ccAddr: msg['Cc'] = ', '.join(ccAddr) if isinstance(ccAddr, list) else ccAddr."
     check:
       noError: "헤더 키는 'Cc'."
       resultCheck: "출력 'cc@example.com'."

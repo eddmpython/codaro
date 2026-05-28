@@ -212,7 +212,7 @@ sections:
       assert reopened.sections[0].top_margin == Inches(0.8)
       reopened.paragraphs[0].style.name
     exercise:
-      prompt: "applyCodaroStyles의 marginInches를 1.0으로 호출하고 top_margin이 Inches(1.0)인지 확인하세요."
+      prompt: "applyCodaroStyles 본체를 완성하세요 — CodaroBody 스타일 등록(East Asian font까지) + 네 면 여백을 모두 marginInches로 설정."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -226,21 +226,25 @@ sections:
                 style = doc.styles.add_style("CodaroBody", WD_STYLE_TYPE.PARAGRAPH)
                 style.font.name = "맑은 고딕"
                 style.font.size = Pt(11)
-                style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+                ___  # East Asian font: qn('w:eastAsia') = '맑은 고딕'
             section = doc.sections[0]
-            section.top_margin = Inches(marginInches)
+            for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+                ___  # setattr로 section의 각 면 여백을 Inches(marginInches)로
             return doc
 
         vault = TemporaryDirectory()
         docxPath = Path(vault.name) / "v.docx"
         doc = Document()
-        applyCodaroStyles(doc, ___)
+        applyCodaroStyles(doc, 1.0)
+        doc.add_paragraph("본문", style="CodaroBody")
         doc.save(docxPath)
-        Document(docxPath).sections[0].top_margin == Inches(1.0)
+        s = Document(docxPath).sections[0]
+        s.top_margin == Inches(1.0) and s.left_margin == Inches(1.0) and s.right_margin == Inches(1.0)
       hints:
-        - "숫자 1.0."
+        - "style.element.rPr.rFonts.set(qn('w:eastAsia'), '맑은 고딕')"
+        - "setattr(section, side, Inches(marginInches))"
     check:
-      noError: "Inches 인자는 숫자."
+      noError: "East Asian font + 네 면 여백 모두 설정."
       resultCheck: "True 출력."
 
   - id: practice
@@ -305,6 +309,45 @@ sections:
               assert reopened.paragraphs[0].style.name == "CodaroHeading"
               assert reopened.paragraphs[1].style.name == "CodaroBody"
               [(p.text, p.style.name) for p in reopened.paragraphs]
+      - type: expansion
+        title: "미션 2: 줄간격·들여쓰기 포함 풀 스타일 함수"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.enum.style import WD_STYLE_TYPE
+              from docx.oxml.ns import qn
+              from docx.shared import Inches, Pt
+
+              def applyCodaroStylesFull(doc, marginInches=0.8, lineSpacing=1.5, firstLineIndent=0.3):
+                  if "CodaroBody" not in doc.styles:
+                      style = doc.styles.add_style("CodaroBody", WD_STYLE_TYPE.PARAGRAPH)
+                      style.font.name = "맑은 고딕"
+                      style.font.size = Pt(11)
+                      style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+                      pf = style.paragraph_format
+                      pf.line_spacing = lineSpacing
+                      pf.first_line_indent = Inches(firstLineIndent)
+                  section = doc.sections[0]
+                  for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+                      setattr(section, side, Inches(marginInches))
+                  return doc
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "full.docx"
+              doc = Document()
+              applyCodaroStylesFull(doc, marginInches=0.8, lineSpacing=1.5, firstLineIndent=0.3)
+              doc.add_paragraph("한국 보고서 본문 첫 줄이 들여쓰기됩니다.", style="CodaroBody")
+              doc.save(docxPath)
+
+              reopened = Document(docxPath)
+              style = reopened.styles["CodaroBody"]
+              assert style.paragraph_format.line_spacing == 1.5
+              assert style.paragraph_format.first_line_indent == Inches(0.3)
+              style.font.name, style.paragraph_format.line_spacing
 
   - id: extensions
     title: "확장 변주"

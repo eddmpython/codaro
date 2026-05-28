@@ -80,26 +80,31 @@ sections:
           alert = buildNotification("nightly_etl", exc, traceback.format_exc())
       alert["Subject"], "DB connection" in alert.get_content()
     exercise:
-      prompt: "Subject 접두를 '[CRITICAL]'로 바꾸고 traceback이 본문에 포함되는지 확인하세요."
+      prompt: "buildNotification을 직접 작성하세요. Subject는 심각도(severity)에 따라 '[CRITICAL] script' 또는 '[WARN] script' 형식으로, 본문에는 예외 클래스명/메시지/traceback이 모두 들어가야 합니다. severity='critical' 호출 결과로 검증합니다."
       starterCode: |-
         import traceback
         from email.message import EmailMessage
 
-        def buildNotification(scriptName, exc, tb=None, toAddr="ops@example.com"):
+        def buildNotification(scriptName, exc, tb=None, severity="critical", toAddr="ops@example.com"):
             msg = EmailMessage()
             msg["From"] = "alerts@example.com"
             msg["To"] = toAddr
-            msg["Subject"] = f"{___} {scriptName}"
-            msg.set_content(f"err: {exc}\ntb: {tb}", charset="utf-8")
+            prefix = ___
+            msg["Subject"] = f"{prefix} {scriptName}"
+            body = ___
+            msg.set_content(body, charset="utf-8")
             return msg
 
         try:
-            raise ValueError("x")
+            raise ValueError("DB down")
         except Exception as exc:
-            alert = buildNotification("etl", exc, traceback.format_exc())
-        alert["Subject"].startswith("[CRITICAL]")
+            alert = buildNotification("etl", exc, traceback.format_exc(), severity="critical")
+        assert alert["Subject"].startswith("[CRITICAL]")
+        assert "ValueError" in alert.get_content()
+        assert "DB down" in alert.get_content()
+        alert["Subject"]
       hints:
-        - "문자열 '[CRITICAL]'."
+        - "prefix: '[CRITICAL]' if severity == 'critical' else '[WARN]'. body: f'{type(exc).__name__}: {exc}\\n\\n{tb}'."
     check:
       noError: "f-string 안의 변수 정의."
       resultCheck: "True 출력."
@@ -293,7 +298,7 @@ sections:
     title: "실습 — 종합 미션"
     subtitle: "야간 배치 알림 래퍼"
     goal: "기존 함수에 알림 데코레이터를 적용해 예외 시 자동 알림 흐름을 완성한다."
-    why: "본 강의 패턴을 실무 스크립트에 한 줄 추가만으로 적용."
+    why: "DevOps 박과장이 야간 ETL 실패를 다음 날 아침에야 발견하던 사이클이 즉시 알림으로 바뀝니다. 데코레이터 한 줄 추가로 어떤 스크립트든 알림 흐름이 붙고, 실패 본문에 traceback이 함께 도착해 새벽 호출 없이도 원인을 즉시 파악합니다. 본 패턴은 10강 주간 발송기에서 실패 시 fallback 알림으로 그대로 재사용됩니다."
     explanation: |-
       미션: 야간 ETL 함수를 데코레이터로 감싸고 예외 시 알림 메시지가 만들어지는지 검증.
     tips:
@@ -364,6 +369,66 @@ sections:
               assert "DB unreachable" in alertsLog[0].get_content()
               assert "[FAIL] nightlyEtl" == alertsLog[0]["Subject"]
               alertsLog[0]["Subject"]
+      - type: expansion
+        title: "미션2: 로그 첨부 + 재시도 게이트"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import traceback
+              from email.message import EmailMessage
+              from functools import wraps
+
+              def buildLogAlert(scriptName, exc, tb, logLines, toAddr):
+                  msg = EmailMessage()
+                  msg["From"] = "alerts@example.com"
+                  msg["To"] = toAddr
+                  msg["Subject"] = f"[FAIL] {scriptName}"
+                  msg.set_content(f"{type(exc).__name__}: {exc}\n\n{tb}", charset="utf-8")
+                  logBlob = "\n".join(logLines).encode("utf-8")
+                  msg.add_attachment(logBlob, maintype="text", subtype="plain", filename=f"{scriptName}.log")
+                  return msg
+
+              def retryWithAlert(maxAttempts, toAddr, onAlert):
+                  def decorator(func):
+                      @wraps(func)
+                      def wrapper(*args, **kwargs):
+                          logLines = []
+                          for attempt in range(1, maxAttempts + 1):
+                              try:
+                                  logLines.append(f"attempt {attempt}: start")
+                                  result = func(*args, **kwargs)
+                                  logLines.append(f"attempt {attempt}: ok")
+                                  return result
+                              except Exception as exc:
+                                  logLines.append(f"attempt {attempt}: {type(exc).__name__}: {exc}")
+                                  if attempt == maxAttempts:
+                                      alert = buildLogAlert(func.__name__, exc, traceback.format_exc(), logLines, toAddr)
+                                      onAlert(alert)
+                                      raise
+                      return wrapper
+                  return decorator
+
+              captured = []
+              attemptsSeen = []
+
+              @retryWithAlert(maxAttempts=3, toAddr="devops@example.com", onAlert=captured.append)
+              def flakyJob():
+                  attemptsSeen.append(1)
+                  raise ConnectionError("upstream timeout")
+
+              try:
+                  flakyJob()
+              except ConnectionError:
+                  pass
+
+              assert len(attemptsSeen) == 3
+              assert len(captured) == 1
+              attachments = list(captured[0].iter_attachments())
+              assert attachments[0].get_filename() == "flakyJob.log"
+              logText = attachments[0].get_payload(decode=True).decode("utf-8")
+              assert "attempt 3" in logText
+              captured[0]["Subject"], attachments[0].get_filename()
 
   - id: extensions
     title: "확장 변주"

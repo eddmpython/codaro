@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "투명 배경 + 큰 회색 텍스트"
     goal: "'사내전용' 텍스트가 페이지 중앙에 큰 회색으로 그려진 한 페이지 PDF를 만든다."
-    why: "overlay 합성을 하려면 합성할 워터마크 PDF가 먼저 필요합니다. 한 번 만들어두면 모든 원본 PDF에 재사용 가능합니다."
+    why: "사외 보내는 견적서·제안서·내부 보고서에 '사내전용' 또는 '대외비' 표시를 박는 작업은 마케팅·전략실에서 매주 반복됩니다. 워터마크 PDF를 한 번 만들어두면 원본 50개에 재사용할 수 있고, 발송 직전에 한 줄 호출로 표식이 박힙니다. 본 단계가 02강의 add_page 패턴과 결합되어 08강 끝의 일괄 보안 파이프라인이 만들어집니다."
     explanation: |-
       Canvas로 한 페이지 PDF를 만들고, setFillColorRGB로 회색을 지정한 뒤 큰 폰트로 'CONFIDENTIAL' 또는 '사내전용'을 중앙에 그립니다. 텍스트가 클수록 워터마크 효과가 강합니다.
     tips:
@@ -329,7 +329,7 @@ sections:
       reader = PdfReader(outPath)
       reader.is_encrypted, reader.decrypt("share2026"), len(reader.pages)
     exercise:
-      prompt: "원본 페이지 수를 7로 늘리고 secureExport 결과가 7페이지인지 확인하세요."
+      prompt: "secureExport 함수의 본문을 직접 작성하세요. 워터마크 PDF 첫 페이지를 원본의 모든 페이지에 merge_page로 합성하고, PdfWriter에 누적한 뒤 encrypt(user/owner)로 비밀번호를 걸어 저장해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -352,27 +352,25 @@ sections:
             canvas.save()
 
         def secureExport(srcPath, watermarkPath, outPath, password):
-            watermark = PdfReader(watermarkPath).pages[0]
-            writer = PdfWriter()
-            for page in PdfReader(srcPath).pages:
-                page.merge_page(watermark)
-                writer.add_page(page)
-            writer.encrypt(user_password=password, owner_password="admin")
-            writer.write(str(outPath))
+            ___  # watermark page 로드 + writer에 merge_page 후 add_page + encrypt + write
 
         workdir = TemporaryDirectory()
         base = Path(workdir.name)
         srcPath = base / "src.pdf"
         wmPath = base / "wm.pdf"
         outPath = base / "out.pdf"
-        makeSource(srcPath, ___)
+        makeSource(srcPath, 7)
         makeWatermark(wmPath, "INTERNAL")
-        secureExport(srcPath, wmPath, outPath, "x")
+        secureExport(srcPath, wmPath, outPath, "share2026")
         reader = PdfReader(outPath)
-        reader.decrypt("x")
+        assert reader.is_encrypted is True
+        reader.decrypt("share2026")
+        assert len(reader.pages) == 7
         len(reader.pages)
       hints:
-        - "정수 7."
+        - "watermark = PdfReader(watermarkPath).pages[0]; writer = PdfWriter()"
+        - "for page in PdfReader(srcPath).pages: page.merge_page(watermark); writer.add_page(page)"
+        - "writer.encrypt(user_password=password, owner_password='admin'); writer.write(str(outPath))"
     check:
       noError: "함수 인자가 모두 채워져야 합니다."
       resultCheck: "출력 7."

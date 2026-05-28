@@ -55,7 +55,7 @@ sections:
     structuredPrimary: true
     subtitle: "sys.platform 분기 + pdfmetrics.registerFont"
     goal: "OS별로 시스템 한글 폰트를 찾아 'Korean' 이름으로 등록하는 헬퍼를 만든다."
-    why: "한 곳에서 한글 폰트 문제를 끝내야 후속 강의들이 깔끔합니다. 헬퍼 하나가 트랙 절반의 폰트 문제를 해소합니다."
+    why: "월간보고서, 청구서, 정부 공문, 사내 결재 문서 — 한국에서 만드는 거의 모든 PDF는 한글이 본문입니다. reportlab 기본 폰트로 한글을 그리면 □로 깨지는데, 한 번 만든 registerKoreanFont 헬퍼가 OS를 가리지 않고 같은 함수 호출로 그 문제를 끝냅니다. 06~10강 다섯 강의가 이 헬퍼 한 줄 위에서 돌아가므로 가장 먼저, 가장 정확히 손에 익혀야 합니다."
     explanation: |-
       sys.platform이 'win32'면 맑은 고딕, 'darwin'이면 AppleSDGothicNeo, 'linux'면 NanumGothic 후보 경로를 순회합니다. 첫 발견된 파일을 TTFont로 등록하고 이름 'Korean'을 돌려줍니다. 모두 못 찾으면 명확한 FileNotFoundError를 발생시킵니다.
     tips:
@@ -93,7 +93,7 @@ sections:
           fontName = None
       fontName
     exercise:
-      prompt: "candidates 딕셔너리에 'linux' 항목에 한 경로를 더 추가하세요. 예: '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc'."
+      prompt: "registerKoreanFont 함수의 본문을 직접 작성하세요. candidates에서 현재 OS(sys.platform)에 맞는 경로 리스트를 가져와, 존재하는 첫 파일을 TTFont('Korean', path)로 등록하고 'Korean' 문자열을 돌려줘야 합니다. 모두 못 찾으면 FileNotFoundError를 raise합니다."
       starterCode: |-
         import sys
         from pathlib import Path
@@ -103,25 +103,26 @@ sections:
         def registerKoreanFont():
             candidates = {
                 "win32": [r"C:\Windows\Fonts\malgun.ttf"],
-                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "darwin": [
+                    "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+                    "/Library/Fonts/AppleSDGothicNeo.ttc",
+                ],
                 "linux": [
                     "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-                    ___,
+                    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
                 ],
             }
-            for path in candidates.get(sys.platform, []):
-                if Path(path).exists():
-                    pdfmetrics.registerFont(TTFont("Korean", path))
-                    return "Korean"
-            raise FileNotFoundError("font missing")
+            ___  # 후보 경로 순회 + 존재 확인 + TTFont 등록 + 'Korean' 반환, 모두 실패 시 FileNotFoundError
 
         try:
             fontName = registerKoreanFont()
         except FileNotFoundError:
             fontName = None
+        assert fontName in ("Korean", None)
         fontName
       hints:
-        - "문자열 경로 한 줄."
+        - "for path in candidates.get(sys.platform, []): if Path(path).exists(): pdfmetrics.registerFont(TTFont('Korean', path)); return 'Korean'"
+        - "루프 끝나면 raise FileNotFoundError('한글 폰트 없음 — apt install fonts-nanum')."
     check:
       noError: "TTFont 등록 시 두 번째 인자는 파일 경로 문자열."
       resultCheck: "fontName이 'Korean' 또는 None."

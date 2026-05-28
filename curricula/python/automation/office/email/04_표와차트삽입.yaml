@@ -176,7 +176,7 @@ sections:
 
       [(p.get_content_type(), p.get("Content-ID")) for p in msg.iter_parts() if p.get("Content-ID")]
     exercise:
-      prompt: "cid를 'daily-chart'로 바꾸고 본문 img src도 'cid:daily-chart'로 맞추세요."
+      prompt: "attachInlineChart(msg, pngPath, cidName) 함수를 직접 작성하세요. HTML 본문을 add_alternative로 추가하고 같은 cidName으로 PNG를 add_attachment해야 합니다. cid 헤더는 항상 '<...>' 형식이 필요한 점이 함정입니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -197,11 +197,15 @@ sections:
         msg["To"] = "you@example.com"
         msg["Subject"] = "Chart"
         msg.set_content("text", charset="utf-8")
-        msg.add_alternative(f'<img src="cid:{___}">', subtype="html")
-        msg.add_attachment(pngPath.read_bytes(), maintype="image", subtype="png", cid=___)
+
+        def attachInlineChart(msg, pngPath, cidName):
+            msg.add_alternative(___, subtype="html")
+            msg.add_attachment(Path(pngPath).read_bytes(), maintype="image", subtype="png", cid=___)
+
+        attachInlineChart(msg, pngPath, "daily-chart")
         any("daily-chart" in (p.get("Content-ID") or "") for p in msg.iter_parts())
       hints:
-        - "문자열 'daily-chart'와 '<daily-chart>'."
+        - "HTML: f'<img src=\"cid:{cidName}\">'. cid 인자: f'<{cidName}>'."
     check:
       noError: "cid는 '<>' 안에."
       resultCheck: "True 출력."
@@ -302,7 +306,7 @@ sections:
     title: "실습 — 종합 미션"
     subtitle: "일일 보고서 발송기"
     goal: "운영팀 일일 보고서를 직접 작성한다."
-    why: "운영 김대리의 실무 도구 그대로입니다."
+    why: "운영 김대리가 매일 아침 매출 집계를 엑셀로 정리하고 캡쳐해서 팀장에게 메일 보내던 100분/주 작업이 사라집니다. 표 HTML + 인라인 차트 + (선택) PDF 첨부를 한 함수에 묶으면 데이터만 바꿔 매일 같은 메일을 자동 발송할 수 있고, 본 함수가 10강 주간 발송기의 메일 빌더로 그대로 재사용됩니다."
     explanation: |-
       미션: dailyReportEmail(toAddr, df, chartPath, dryRun=True) -> EmailMessage. 표 + 차트 + 일일 요약 텍스트.
     tips:

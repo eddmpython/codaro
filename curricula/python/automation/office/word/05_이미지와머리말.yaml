@@ -53,7 +53,7 @@ sections:
     structuredPrimary: true
     subtitle: "doc.add_picture(path, width)"
     goal: "단색 PNG를 본문에 삽입한다."
-    why: "보고서 상단 로고는 사내 표준의 표지입니다."
+    why: "보고서 상단 로고는 사내 표준의 표지이자 외부 발송 시 첫인상입니다. 코드 한 줄로 모든 문서에 일관된 로고가 박히면 디자인팀 의존 없이 양식 통일이 가능합니다."
     explanation: |-
       doc.add_picture(path, width=Inches(2))로 폭 2인치 이미지 삽입. height 미지정 시 비율 유지.
     tips:
@@ -182,7 +182,7 @@ sections:
       assert len(reopened.inline_shapes) == 1
       len(reopened.inline_shapes)
     exercise:
-      prompt: "company를 'Codaro Lab'으로 호출하고 검증을 통과시키세요."
+      prompt: "buildBrandedDoc 본체를 직접 작성하세요 — 머리말 회사명 + 로고(width Inches(2)) + 본문 단락이 모두 들어가야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -192,9 +192,9 @@ sections:
 
         def buildBrandedDoc(path, company, logoPath, body):
             doc = Document()
-            doc.sections[0].header.paragraphs[0].text = company
-            doc.add_picture(str(logoPath), width=Inches(2))
-            doc.add_paragraph(body)
+            ___  # 1) 머리말 첫 단락 text를 company로
+            ___  # 2) logoPath를 width=Inches(2)로 add_picture
+            ___  # 3) body를 단락으로 추가
             doc.save(path)
 
         vault = TemporaryDirectory()
@@ -202,13 +202,17 @@ sections:
         imgPath = base / "logo.png"
         PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
         docxPath = base / "b.docx"
-        buildBrandedDoc(docxPath, ___, imgPath, "본문")
-        Document(docxPath).sections[0].header.paragraphs[0].text == "Codaro Lab"
+        buildBrandedDoc(docxPath, "Codaro Lab", imgPath, "월간 보고서")
+
+        reopened = Document(docxPath)
+        reopened.sections[0].header.paragraphs[0].text, len(reopened.inline_shapes)
       hints:
-        - "문자열 'Codaro Lab'."
+        - "doc.sections[0].header.paragraphs[0].text = company"
+        - "doc.add_picture(str(logoPath), width=Inches(2))"
+        - "doc.add_paragraph(body)"
     check:
-      noError: "함수 인자는 문자열."
-      resultCheck: "True 출력."
+      noError: "세 줄을 모두 채워야 검증 통과."
+      resultCheck: "('Codaro Lab', 1) 출력."
 
   - id: practice
     title: "실습 — 종합 미션"
@@ -262,6 +266,42 @@ sections:
               assert "사내전용" in reopened.sections[0].footer.paragraphs[0].text
               assert len(reopened.inline_shapes) == 1
               reopened.sections[0].footer.paragraphs[0].text
+      - type: expansion
+        title: "미션 2: 머리말에 로고 직접 삽입 (텍스트 옆 로고)"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.shared import Inches
+              from PIL import Image as PILImage
+
+              def buildHeaderLogoDoc(path, company, logoPath, body):
+                  doc = Document()
+                  headerPara = doc.sections[0].header.paragraphs[0]
+                  logoRun = headerPara.add_run()
+                  logoRun.add_picture(str(logoPath), width=Inches(0.8))
+                  textRun = headerPara.add_run(f"  {company}")
+                  textRun.bold = True
+                  doc.add_paragraph(body)
+                  doc.save(path)
+                  return path
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              imgPath = base / "logo.png"
+              PILImage.new("RGB", (80, 30), color=(48, 84, 150)).save(imgPath)
+              docxPath = base / "header_logo.docx"
+              buildHeaderLogoDoc(docxPath, "주식회사 Codaro", imgPath, "본문")
+
+              reopened = Document(docxPath)
+              header = reopened.sections[0].header
+              assert "주식회사 Codaro" in header.paragraphs[0].text
+              headerRuns = header.paragraphs[0].runs
+              assert len(headerRuns) >= 2
+              header.paragraphs[0].text
 
   - id: extensions
     title: "확장 변주"

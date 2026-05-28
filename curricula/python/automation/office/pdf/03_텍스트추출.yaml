@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "PdfReader(path).pages[i].extract_text()"
     goal: "한 페이지 PDF에서 본문 문자열을 추출한다."
-    why: "PDF 자동화에서 가장 자주 쓰는 동작입니다. 한 줄로 되는 동시에, 한국어·폰트 임베드 PDF에서 결과 품질이 케이스마다 다른 영역입니다."
+    why: "회의록·계약서·정부 공문에서 본문을 코드로 뽑아내는 작업은 사무 자동화에서 빈도가 가장 높습니다. extract_text() 한 줄이 본문을 돌려주지만, 한국어 PDF·이미지 임베드 PDF·정부 공문은 결과 품질이 케이스마다 달라집니다. 첫 단계에서 정상 동작 PDF로 패턴을 굳히면, 이후 어긋난 PDF가 와도 어디를 봐야 할지 바로 보입니다."
     explanation: |-
       reportlab으로 한 페이지짜리 PDF를 만들고, PdfReader로 열어 첫 페이지의 extract_text()를 호출합니다. 결과는 줄바꿈을 포함한 문자열입니다.
     tips:
@@ -261,7 +261,7 @@ sections:
       markdown = toMarkdown(pdfPath)
       markdown
     exercise:
-      prompt: "회의록 본문에 'DECISION:' 시작 줄을 추가하고, toMarkdown이 그 줄을 '> 결정: ' 인용으로 변환하도록 확장하세요."
+      prompt: "toMarkdown 함수의 루프 본문을 직접 작성하세요. 첫 줄은 '# 제목', 'ACTION:' 시작 줄은 '- [ ] ...' 체크박스, 'DECISION:' 시작 줄은 '> 결정: ...' 인용, 그 외 줄은 그대로 보존해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -273,6 +273,7 @@ sections:
             canvas.drawString(72, 750, "Weekly Sync 2026-05-28")
             canvas.drawString(72, 730, "ACTION: Kim draft proposal")
             canvas.drawString(72, 710, "DECISION: ship on Friday")
+            canvas.drawString(72, 690, "Notes: review roadmap")
             canvas.showPage()
             canvas.save()
 
@@ -281,22 +282,20 @@ sections:
             lines = [line.strip() for line in body.splitlines() if line.strip()]
             out = []
             for idx, line in enumerate(lines):
-                if idx == 0:
-                    out.append(f"# {line}")
-                elif line.startswith("ACTION:"):
-                    out.append(f"- [ ] {line[len('ACTION:'):].strip()}")
-                elif line.startswith(___):
-                    out.append(f"> 결정: {line[len('DECISION:'):].strip()}")
-                else:
-                    out.append(line)
+                ___  # 첫 줄 H1, ACTION/DECISION/그 외 4-갈래 분기로 out.append
             return "\n".join(out)
 
         workdir = TemporaryDirectory()
         pdfPath = Path(workdir.name) / "minutes.pdf"
         buildSampleMinutes(pdfPath)
-        toMarkdown(pdfPath)
+        result = toMarkdown(pdfPath)
+        assert result.startswith("# Weekly Sync")
+        assert "- [ ] Kim draft proposal" in result
+        assert "> 결정: ship on Friday" in result
+        result
       hints:
-        - "startswith 인자는 'DECISION:' 문자열."
+        - "if idx == 0: '# {line}', elif startswith('ACTION:'): '- [ ] ...', elif startswith('DECISION:'): '> 결정: ...', else: line."
+        - "ACTION/DECISION 본문은 line[len(prefix):].strip()으로 떼어냅니다."
     check:
       noError: "startswith 인자는 따옴표로 감싼 문자열."
       resultCheck: "출력에 '> 결정:' 줄이 포함되어야 합니다."

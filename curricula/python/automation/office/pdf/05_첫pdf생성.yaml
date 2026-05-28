@@ -55,7 +55,7 @@ sections:
     structuredPrimary: true
     subtitle: "Canvas, drawString, showPage, save"
     goal: "Hello PDF 한 줄이 들어간 한 페이지 PDF를 만든다."
-    why: "PDF 생성의 첫 다섯 함수를 한 번에 보는 게 본 강의의 시작점입니다. 이 다섯 함수가 모든 reportlab 코드의 기본 형태입니다."
+    why: "사외 견적서, 사내 주간보고, 협력사 발주서 — 사무에서 만드는 모든 PDF는 결국 'Canvas 만들기 → 텍스트 그리기 → showPage → save' 네 동작의 변주입니다. 다섯 함수를 한 번에 손에 익히면 06강 한글 폰트, 07강 표·이미지, 10강 청구서 빌더까지 같은 형태로 자연스럽게 확장됩니다."
     explanation: |-
       Canvas(str(path)) 호출로 PDF 작성용 객체를 만들고, drawString(x, y, text)로 좌표에 문자열을 그립니다. showPage()는 현재 페이지를 닫고 다음 페이지를 시작합니다. 마지막에 save()를 호출해야 파일이 디스크에 쓰입니다.
     tips:
@@ -297,7 +297,7 @@ sections:
           assert title in bodies[idx], f"missing on page {idx + 1}"
       [body.strip() for body in bodies]
     exercise:
-      prompt: "섹션 리스트에 'Action'을 추가해 5페이지가 되고 검증을 통과하는지 확인하세요."
+      prompt: "buildReport 함수의 본문을 직접 작성하세요. sections 리스트의 각 항목을 한 페이지에 16pt 폰트로 그리고 showPage로 닫은 뒤 마지막에 save해야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -306,15 +306,11 @@ sections:
 
         def buildReport(path, sections):
             canvas = Canvas(str(path))
-            for title in sections:
-                canvas.setFont("Helvetica", 16)
-                canvas.drawString(72, 720, title)
-                canvas.showPage()
-            canvas.save()
+            ___  # 각 title을 한 페이지에 그리고 showPage, 마지막에 save
 
         vault = TemporaryDirectory()
         pdfPath = Path(vault.name) / "rpt.pdf"
-        titles = ["Summary", "Sales", "Cost", "Outlook", ___]
+        titles = ["Summary", "Sales", "Cost", "Outlook", "Action"]
         buildReport(pdfPath, titles)
         reader = PdfReader(pdfPath)
         assert len(reader.pages) == 5
@@ -323,7 +319,8 @@ sections:
             assert title in bodies[idx]
         len(reader.pages)
       hints:
-        - "마지막 원소는 'Action' 문자열."
+        - "for title in sections: canvas.setFont('Helvetica', 16); canvas.drawString(72, 720, title); canvas.showPage()"
+        - "루프 끝나면 canvas.save()."
     check:
       noError: "리스트 원소는 모두 문자열."
       resultCheck: "출력 5."

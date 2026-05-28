@@ -240,25 +240,27 @@ sections:
               os.environ["IMAP_APP_PASS"] = savedPass
       result
     exercise:
-      prompt: "recentSubjects 호출 후 빈 리스트가 맞는지 한 줄 assert로 확인하세요."
+      prompt: "recentSubjects 본체를 직접 작성하세요. IMAP_USER가 비어있으면 빈 리스트를 반환하고, 있으면 (실제 IMAP 호출 자리표시로) ['stub-subject']를 반환해야 합니다. 본 트랙의 안전 가드 패턴이 함수에 묶이는 흐름을 직접 짭니다."
       starterCode: |-
         import os
 
         def recentSubjects(days=7):
-            if not os.environ.get("IMAP_USER"):
-                return []
-            return ["x"]
+            ___
 
         savedUser = os.environ.pop("IMAP_USER", None)
         try:
-            result = recentSubjects()
-            assert result == ___
+            withoutEnv = recentSubjects()
+            os.environ["IMAP_USER"] = "demo@example.com"
+            withEnv = recentSubjects()
+            assert withoutEnv == []
+            assert withEnv == ["stub-subject"]
         finally:
+            os.environ.pop("IMAP_USER", None)
             if savedUser is not None:
                 os.environ["IMAP_USER"] = savedUser
-        result
+        (withoutEnv, withEnv)
       hints:
-        - "빈 리스트 []."
+        - "본체: if not os.environ.get('IMAP_USER'): return []  / 그 뒤 return ['stub-subject']."
     check:
       noError: "빈 리스트 []."
       resultCheck: "출력 []."
@@ -267,7 +269,7 @@ sections:
     title: "실습 — 종합 미션"
     subtitle: "최근 메일 제목 모으기 도구"
     goal: "IMAP 패턴을 함수로 묶어 본인 계정 또는 환경 가드 동작을 검증한다."
-    why: "검색 + 조회 + 안전 가드가 한 함수에 모이면 06·07강 분류·이동의 기반이 됩니다."
+    why: "검색 + 조회 + 환경 가드 세 가지가 한 함수에 모이면 06강 첨부 자동 저장과 07강 룰 기반 분류가 같은 진입점에서 시작합니다. 환경변수가 없는 CI에서는 자동 skip, 본인 계정에서는 실 IMAP 호출이 같은 코드 경로로 흐르는 게 본 강의의 도착점입니다."
     explanation: |-
       미션: fetchRecentSubjects(days, host, folder) -> list[str]. 환경 가드, 폴더 안전 처리, SINCE 검색, fetch까지.
     tips:

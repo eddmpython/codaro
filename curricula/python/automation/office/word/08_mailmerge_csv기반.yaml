@@ -266,7 +266,7 @@ sections:
           assert "{{" not in combined
       [p.name for p in outputs]
     exercise:
-      prompt: "outputs 길이를 5로 만들어 검증을 통과시키세요(CSV에 두 줄 추가)."
+      prompt: "verifyAllFilled 함수를 작성하세요 — outputs 리스트의 모든 docx에서 자리표시자 잔여 여부를 검사해 (잔여 없는 파일 수, 잔여 있는 파일 수)를 튜플로 반환."
       starterCode: |-
         import csv
         from pathlib import Path
@@ -289,37 +289,40 @@ sections:
         def mailMerge(templatePath, csvPath, outFolder):
             Path(outFolder).mkdir(exist_ok=True)
             with open(csvPath, "r", encoding="utf-8") as f:
-                students = list(csv.DictReader(f))
+                rows = list(csv.DictReader(f))
             outputs = []
-            for student in students:
-                safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
-                outPath = Path(outFolder) / f"{safeName}.docx"
-                fillTemplate(templatePath, student, outPath)
+            for row in rows:
+                outPath = Path(outFolder) / f"{row['name']}.docx"
+                fillTemplate(templatePath, row, outPath)
                 outputs.append(outPath)
             return outputs
+
+        def verifyAllFilled(outputs):
+            clean, dirty = 0, 0
+            for path in outputs:
+                combined = "\n".join(p.text for p in Document(path).paragraphs)
+                ___  # '{{' in combined 면 dirty += 1, 아니면 clean += 1
+            return clean, dirty
 
         vault = TemporaryDirectory()
         base = Path(vault.name)
         tplPath = base / "t.docx"
         seed = Document()
-        seed.add_paragraph("학생: {{name}}")
+        seed.add_paragraph("학생: {{name}}, 부모: {{parent}}")
         seed.save(tplPath)
         csvPath = base / "s.csv"
         csvPath.write_text(
-            "name,grade,classroom,number,parent\n"
-            "김민수,3,1,12,김부모\n"
-            "박지영,3,1,13,박부모\n"
-            "이수진,3,2,5,이부모\n"
-            ___,
+            "name,parent\n김민수,김부모\n박지영,\n이수진,이부모\n",
             encoding="utf-8",
         )
         outputs = mailMerge(tplPath, csvPath, base / "o")
-        len(outputs)
+        verifyAllFilled(outputs)
       hints:
-        - "CSV 두 줄 추가."
+        - "if '{{' in combined: dirty += 1\\nelse: clean += 1"
+        - "빈 문자열은 치환되지만 키 자체가 빠지면 잔여 발생."
     check:
-      noError: "CSV 마지막 줄바꿈."
-      resultCheck: "출력 5."
+      noError: "조건 분기로 clean/dirty 카운트."
+      resultCheck: "(3, 0) 출력 (빈 값이라도 키만 있으면 모두 치환됨)."
 
   - id: practice
     title: "실습 — 종합 미션"
