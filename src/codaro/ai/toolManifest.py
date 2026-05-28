@@ -141,6 +141,8 @@ TOOL_METADATA: dict[str, ToolManifestMetadata] = {
     "propose-curriculum-draft": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "propose-knowledge-checks": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
     "propose-predict-prompts": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "propose-variation": ToolManifestMetadata("curriculumOs", "planning", "curriculum-taxonomy"),
+    "get-lesson-stats": ToolManifestMetadata("curriculumOs", "planning", "learner-progress"),
     "analyze-curriculum-quality": ToolManifestMetadata("curriculumOs", "planning", "learner-progress"),
     "read-learner-state": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state"),
     "record-prediction-result": ToolManifestMetadata("curriculumOs", "diagnosis", "learner-state", "writes"),

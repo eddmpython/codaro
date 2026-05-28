@@ -70,6 +70,13 @@ sections:
     predict:
       prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
       expectedValue: Hello World
+    variations:
+    - prompt: 작은따옴표 대신 큰따옴표로 바꿔도 같은 결과가 나오는지 확인하세요.
+      starterCode: print("Hello Codaro")
+      parameterization: 따옴표 종류 변경 — 동일 출력 검증
+    - prompt: print() 안에 쉼표로 두 값을 넣으면 어떻게 표시되는지 확인하세요.
+      starterCode: print('Hello', 'World')
+      parameterization: 인자 개수 변경 — 공백 구분자 검증
   check:
     type: noError
     noError: Hello World의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.

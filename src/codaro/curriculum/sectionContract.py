@@ -70,6 +70,23 @@ class LearningExerciseContract(BaseModel):
     hints: list[str] = Field(default_factory=list)
     difficulty: str = "easy"
     predict: LearningPredictContract = Field(default_factory=LearningPredictContract)
+    variations: list[LearningVariationContract] = Field(default_factory=list)
+
+
+class LearningVariationContract(BaseModel):
+    """같은 outcome 을 검증하는 변주 문제 — 사상 5 (predict→run→fix→verify→variation) 의 마지막.
+
+    학습자가 메인 exercise 통과 후 "한 번 더 확인" 으로 호출. parameterization 은 수치/
+    타입/순서 변형 메타로, AI 도구 propose-variation 이 채우는 슬롯이다.
+    """
+    prompt: str = ""
+    starterCode: str = ""
+    solution: str = ""
+    check: dict[str, Any] = Field(default_factory=dict)
+    parameterization: str = ""
+
+    def isEmpty(self) -> bool:
+        return not any([self.prompt, self.starterCode, self.solution, bool(self.check)])
 
 
 class LearningReflectionContract(BaseModel):
@@ -209,7 +226,25 @@ def _exerciseContract(value: Any) -> LearningExerciseContract:
         hints=_uniqueTextList(value.get("hints") or value.get("tips")),
         difficulty=_textValue(value.get("difficulty")) or "easy",
         predict=_predictContract(value.get("predict")),
+        variations=_variationsContract(value.get("variations")),
     )
+
+
+def _variationsContract(value: Any) -> list[LearningVariationContract]:
+    if not isinstance(value, list):
+        return []
+    result: list[LearningVariationContract] = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        result.append(LearningVariationContract(
+            prompt=_textValue(item.get("prompt") or item.get("question")),
+            starterCode=_textValue(item.get("starterCode") or item.get("starter")),
+            solution=_textValue(item.get("solution") or item.get("answer")),
+            check=_checkMap(item.get("check")),
+            parameterization=_textValue(item.get("parameterization") or item.get("varying")),
+        ))
+    return result
 
 
 def _reflectionContract(value: Any) -> LearningReflectionContract:

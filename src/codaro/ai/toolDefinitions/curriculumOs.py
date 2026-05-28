@@ -82,9 +82,13 @@ TOOL_SEARCH_CURRICULA = ToolDef(
 TOOL_COMPOSE_MASTER_PLAN = ToolDef(
     name="compose-master-plan",
     description=(
-        "Compose an ordered learning master plan for the user's goal. "
-        "Accepts a domain id and/or explicit outcome ids. Returns ordered lesson steps "
-        "and a gap report for outcomes the curriculum doesn't yet cover."
+        "Compose an ordered learning master plan for the user's goal. Accepts a domain id "
+        "and/or explicit outcome ids. Returns ordered lesson steps, gaps, 3-tier split "
+        "(concept/practice/project), goalResolution (keyword + AI ranking of intent), and "
+        "adaptiveSkipped (outcomes auto-skipped from fast-track mastery). Use projectIntent "
+        "for deliverable-driven goals like '대시보드 만들기', maxMinutes to constrain time "
+        "budget, skipMasteredOutcomes to remove already-mastered topics, and adaptiveSkip "
+        "(default on) to honor fast-track mastery signals."
     ),
     parameters={
         "type": "object",
@@ -101,6 +105,26 @@ TOOL_COMPOSE_MASTER_PLAN = ToolDef(
             "excludeCompleted": {
                 "type": "boolean",
                 "description": "If true (default), filter out lessons the user has already completed.",
+            },
+            "skipMasteredOutcomes": {
+                "type": "boolean",
+                "description": "If true, remove outcomes the learner has already mastered (mastery >= 0.8 or validated).",
+            },
+            "maxMinutes": {
+                "type": "integer",
+                "description": "Time budget in minutes. Lessons beyond the budget are split into droppedSteps. 0 = unlimited.",
+            },
+            "projectIntent": {
+                "type": "string",
+                "description": "Free-text deliverable target (e.g. '판매 대시보드', '엑셀 보고서 자동화'). Triggers goalResolver and forces project lessons matching the intent.",
+            },
+            "deliverableOnly": {
+                "type": "boolean",
+                "description": "If true with projectIntent, demote concept lessons with mastery>=0.6 into droppedSteps so the plan focuses on the deliverable.",
+            },
+            "adaptiveSkip": {
+                "type": "boolean",
+                "description": "If true (default), auto-skip outcomes where the learner already has a fast-track (hint 0 + first attempt) pass. Returned as adaptiveSkipped[].",
             },
         },
     },
@@ -197,6 +221,28 @@ TOOL_MARK_OUTCOME_VALIDATED = ToolDef(
 )
 
 
+TOOL_GET_LESSON_STATS = ToolDef(
+    name="get-lesson-stats",
+    description=(
+        "Return per-lesson observed-vs-static time statistics for lessons the learner has "
+        "actually completed. Each row shows the author's estimatedMinutes, the learner's "
+        "observed EWMA minutes, sample count, and deviation. Use this when planning time "
+        "budgets, advising the learner on pace, or surfacing lessons whose static estimate "
+        "drifts far from reality."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "minSamples": {
+                "type": "integer",
+                "description": "Drop rows with sampleCount < minSamples (default 1).",
+            },
+        },
+    },
+    handler="getLessonStats",
+)
+
+
 TOOL_ANALYZE_CURRICULUM_QUALITY = ToolDef(
     name="analyze-curriculum-quality",
     description=(
@@ -240,6 +286,28 @@ TOOL_PROPOSE_KNOWLEDGE_CHECKS = ToolDef(
         },
     },
     handler="proposeKnowledgeChecks",
+)
+
+
+TOOL_PROPOSE_VARIATION = ToolDef(
+    name="propose-variation",
+    description=(
+        "Propose variation drafts for one lesson section's exercise — same outcome verified via "
+        "different numbers/types/order. Returns drafts ONLY — does not write YAML. Use when "
+        "learner mastery is low and a retest is needed, or to seed the lesson author's variation "
+        "block."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "category": {"type": "string", "description": "Lesson category id."},
+            "contentId": {"type": "string", "description": "Lesson content id."},
+            "sectionId": {"type": "string", "description": "Section id within the lesson."},
+            "count": {"type": "integer", "description": "Number of variation drafts to produce (default 2, max 4)."},
+        },
+        "required": ["category", "contentId", "sectionId"],
+    },
+    handler="proposeVariation",
 )
 
 

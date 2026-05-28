@@ -216,12 +216,31 @@ class CurriculumOsToolHandlers:
         for outcomeId in outcomes:
             if not taxonomy.hasOutcome(str(outcomeId)):
                 return {"error": f"Unknown outcome: {outcomeId}"}
+        maxMinutes = args.get("maxMinutes")
+        if not isinstance(maxMinutes, int) or maxMinutes < 0:
+            maxMinutes = 0
+        adaptiveSkip = args.get("adaptiveSkip")
+        if adaptiveSkip is None:
+            adaptiveSkip = True
         goal = PlanGoal(
             domain=domain,
             outcomes=[str(o) for o in outcomes if isinstance(o, str)],
             excludeCompleted=bool(excludeCompleted),
+            skipMasteredOutcomes=bool(args.get("skipMasteredOutcomes") or False),
+            maxMinutes=int(maxMinutes),
+            projectIntent=str(args.get("projectIntent") or ""),
+            deliverableOnly=bool(args.get("deliverableOnly") or False),
+            adaptiveSkip=bool(adaptiveSkip),
         )
-        plan = composeMasterPlan(goal, _graph(), taxonomy, None)
+        # Phase 4 — LLM 이 명시적으로 plan 합성을 호출했을 때 goalResolver 가
+        # 다시 inner provider 로 ranking 하지 않게 한다 (이미 LLM 컨텍스트 안).
+        plan = composeMasterPlan(
+            goal,
+            _graph(),
+            taxonomy,
+            progressTracker=_progressTracker(),
+            aiProvider=None,
+        )
         return plan.model_dump()
 
     async def _handle_inspectCurriculum(self, args: dict[str, Any]) -> dict[str, Any]:
@@ -337,6 +356,36 @@ class CurriculumOsToolHandlers:
             "reason": args.get("reason"),
         }
 
+    async def _handle_getLessonStats(self, args: dict[str, Any]) -> dict[str, Any]:
+        graph = _graph()
+        progress = _progressTracker().load()
+        minSamples = args.get("minSamples")
+        if not isinstance(minSamples, int) or minSamples < 1:
+            minSamples = 1
+        rows: list[dict[str, Any]] = []
+        for key, lesson in progress.lessons.items():
+            if lesson.observedSampleCount < minSamples:
+                continue
+            node = graph.byKey(key)
+            if node is None:
+                continue
+            static = node.estimatedMinutes
+            observed = lesson.observedMinutesEwma
+            deviation = ""
+            if static > 0 and observed > 0:
+                pct = (observed - static) / static * 100
+                deviation = f"{pct:+.1f}%"
+            rows.append({
+                "key": key,
+                "title": node.title,
+                "static": static,
+                "observedEwma": round(observed, 2),
+                "sampleCount": lesson.observedSampleCount,
+                "deviation": deviation,
+            })
+        rows.sort(key=lambda r: (-int(r["sampleCount"]), str(r["key"])))
+        return {"lessons": rows}
+
     async def _handle_analyzeCurriculumQuality(self, args: dict[str, Any]) -> dict[str, Any]:
         from ...curriculum.qualityAnalytics import computeQualityReport
 
@@ -422,6 +471,49 @@ class CurriculumOsToolHandlers:
             ),
         }
 
+    async def _handle_proposeVariation(self, args: dict[str, Any]) -> dict[str, Any]:
+        category = str(args.get("category") or "").strip()
+        contentId = str(args.get("contentId") or "").strip()
+        sectionId = str(args.get("sectionId") or "").strip()
+        if not category or not contentId or not sectionId:
+            return {"error": "category, contentId, and sectionId are required"}
+        count = args.get("count") or 2
+        if not isinstance(count, int) or count <= 0:
+            count = 2
+        count = min(count, 4)
+
+        loader = _studyLoader()
+        if loader is None:
+            return {"error": "study loader unavailable"}
+        try:
+            rawDict = loader.loadStudy(category, contentId)
+        except FileNotFoundError:
+            return {"error": f"lesson not found: {category}/{contentId}"}
+
+        from ...curriculum.sectionContract import lessonContractFromYaml
+
+        lesson = lessonContractFromYaml(rawDict or {}, fallbackTitle=contentId)
+        section = next((s for s in lesson.sections if s.id == sectionId), None)
+        if section is None:
+            return {"error": f"section not found: {sectionId}"}
+        exercise = section.exercise
+        if not (exercise.solution or exercise.starterCode):
+            return {"error": "section has no exercise code to base a variation on"}
+
+        baseCode = exercise.solution or exercise.starterCode
+        drafts = _generateVariationDrafts(baseCode, count)
+        return {
+            "category": category,
+            "contentId": contentId,
+            "sectionId": sectionId,
+            "baseSnippet": baseCode,
+            "drafts": drafts,
+            "next": (
+                "사람이 각 draft 의 입력값/예상결과를 검토해 section.exercise.variations 배열에 채워주세요. "
+                "draft 의 parameterization 은 변형 차원을 짧게 묘사한 메모입니다."
+            ),
+        }
+
     async def _handle_proposePredictPrompts(self, args: dict[str, Any]) -> dict[str, Any]:
         category = str(args.get("category") or "").strip()
         contentId = str(args.get("contentId") or "").strip()
@@ -502,6 +594,70 @@ class CurriculumOsToolHandlers:
                 "'커리큘럼 YAML은 한 강의씩 직접 작성' 원칙을 지키세요."
             ),
         }
+
+
+def _generateVariationDrafts(baseCode: str, count: int) -> list[dict[str, Any]]:
+    """base 코드에서 숫자/문자열 리터럴을 찾아 변주 draft 를 생성한다.
+
+    실제 정답값과 예외 동작은 사람이 채워야 한다 — 휴리스틱은 변형 차원의 시드일 뿐.
+    """
+    import re
+
+    drafts: list[dict[str, Any]] = []
+
+    numberLiterals = re.findall(r"\b\d+(?:\.\d+)?\b", baseCode)
+    stringLiterals = re.findall(r"'([^'\n]*)'|\"([^\"\n]*)\"", baseCode)
+    stringFlat = [s for pair in stringLiterals for s in pair if s]
+
+    if numberLiterals:
+        original = numberLiterals[0]
+        try:
+            doubled = str(int(original) * 2) if "." not in original else str(round(float(original) * 2, 4))
+            zero = "0"
+            negative = "-" + original
+            drafts.append({
+                "parameterization": f"수치 리터럴 {original} → {doubled} (두 배)",
+                "starterCode": baseCode.replace(original, doubled, 1),
+                "solution": "(작성자 확정 필요)",
+                "promptHint": "두 배 입력에서 결과가 어떻게 변하는지 예측하고 비교하세요.",
+            })
+            if len(drafts) < count:
+                drafts.append({
+                    "parameterization": f"경계값 {original} → {zero}",
+                    "starterCode": baseCode.replace(original, zero, 1),
+                    "solution": "(작성자 확정 필요)",
+                    "promptHint": "0 입력에서 흐름이 어떻게 분기하는지 확인하세요.",
+                })
+            if len(drafts) < count:
+                drafts.append({
+                    "parameterization": f"부호 반전 {original} → {negative}",
+                    "starterCode": baseCode.replace(original, negative, 1),
+                    "solution": "(작성자 확정 필요)",
+                    "promptHint": "음수 입력에서 같은 코드가 어떻게 동작하는지 비교하세요.",
+                })
+        except ValueError:
+            pass
+
+    if stringFlat and len(drafts) < count:
+        original = stringFlat[0]
+        replacement = original.upper() if original.lower() == original else original.lower()
+        if replacement and replacement != original:
+            drafts.append({
+                "parameterization": f"문자열 '{original}' → '{replacement}' (대소문자)",
+                "starterCode": baseCode.replace(original, replacement, 1),
+                "solution": "(작성자 확정 필요)",
+                "promptHint": "대소문자 변경이 비교/검색 결과를 어떻게 바꾸는지 확인하세요.",
+            })
+
+    if not drafts:
+        drafts.append({
+            "parameterization": "동일 흐름 재호출 (입력값 변경 미감지)",
+            "starterCode": baseCode,
+            "solution": "(작성자가 새 입력/예상결과를 정의)",
+            "promptHint": "이 코드를 다른 입력으로 실행한 결과를 비교하세요.",
+        })
+
+    return drafts[:count]
 
 
 def _predictDraftFromSection(section: Any) -> dict[str, Any]:
