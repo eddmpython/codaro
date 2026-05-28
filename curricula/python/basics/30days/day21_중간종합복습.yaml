@@ -72,6 +72,7 @@ sections:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 자료구조 복습에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 자료구조 복습 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: control_flow_review
@@ -96,6 +97,7 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
+    type: noError
     noError: 제어문 복습의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
     resultCheck: 제어문 복습 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: function_review
@@ -124,6 +126,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 함수 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 함수 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: module_file_review
@@ -154,6 +157,7 @@ sections:
     - 바꿀 지점은 `radius = ...` 오른쪽 값입니다.
     - 실행 뒤 `radius` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 모듈과 파일 복습에서 `radius` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 모듈과 파일 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: exception_review
@@ -187,6 +191,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 예외 처리 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 예외 처리 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: integrated_practice
@@ -221,6 +226,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 통합 실전 문제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 통합 실전 문제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -369,6 +375,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -393,5 +400,6 @@ sections:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Day 21 종합 복습에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 21 종합 복습 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
