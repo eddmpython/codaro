@@ -1,0 +1,301 @@
+meta:
+  id: word_04
+  title: 표 만들기
+  order: 4
+  category: word
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+    - python-docx
+    - docx
+  tags:
+    - add_table
+    - cell
+    - merge_cells
+  outcomes:
+    - automation.word.tables
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 45
+  seo:
+    title: "Word 표 만들기 — add_table, cell, merge_cells"
+    description: "보고서에 들어가는 비교표를 코드로 만든다. 셀 병합·헤더 강조 패턴 포함."
+    keywords:
+      - python-docx add_table
+      - merge_cells
+      - 보고서 표 자동화
+
+intro:
+  direction: "보고서·계약서에 들어가는 비교표를 코드로 만든다. 셀 병합과 헤더 강조까지."
+  benefits:
+    - "직원 명단·결재라인·견적 항목 표 자동 생성 — 30분 손작업이 5초."
+    - "table.cell(i, j).text 패턴으로 모든 셀 데이터를 깔끔히 채움."
+    - "10강 회의록의 참석자·결정사항 표 패턴이 본 강의에서 정착."
+  diagram:
+    steps:
+      - label: "1. add_table"
+        detail: "doc.add_table(rows, cols, style)로 빈 표 생성."
+      - label: "2. cell 채우기"
+        detail: "table.cell(i, j).text = value 또는 cell의 paragraphs[0].add_run."
+      - label: "3. merge_cells"
+        detail: "cell1.merge(cell2)로 셀 병합."
+    runtime:
+      - label: "표준 스타일"
+        detail: "'Table Grid' 스타일이 검은 선 적용된 표준 양식."
+      - label: "검증"
+        detail: "재오픈 후 table.rows[i].cells[j].text 단위 assert."
+
+sections:
+  - id: step1_add_table
+    title: "1단계. add_table로 표 만들기"
+    structuredPrimary: true
+    subtitle: "doc.add_table(rows, cols, style='Table Grid')"
+    goal: "3×4 비교표를 만들고 모든 셀에 데이터를 채운다."
+    why: "보고서의 가장 흔한 콘텐츠가 표입니다. add_table 한 줄로 시작."
+    explanation: |-
+      doc.add_table(rows=N, cols=M, style='Table Grid')로 검은 선이 있는 빈 표 생성. table.cell(i, j).text = value로 셀 채우기.
+    tips:
+      - "style 인자 없이 만들면 선이 보이지 않는 빈 표가 됩니다. 'Table Grid' 권장."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "table.docx"
+
+      doc = Document()
+      tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+
+      headers = ["region", "q1", "q2", "q3"]
+      for colIdx, value in enumerate(headers):
+          tbl.cell(0, colIdx).text = value
+
+      rows = [["Seoul", "120", "135", "150"], ["Busan", "80", "78", "92"]]
+      for rowIdx, rowData in enumerate(rows, start=1):
+          for colIdx, value in enumerate(rowData):
+              tbl.cell(rowIdx, colIdx).text = value
+
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      tbl2 = reopened.tables[0]
+      tbl2.cell(0, 0).text, tbl2.cell(1, 1).text
+    exercise:
+      prompt: "4행 표로 늘려 'Daegu, 60, 65, 70' 행을 추가하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "t.docx"
+
+        doc = Document()
+        tbl = doc.add_table(rows=___, cols=4, style="Table Grid")
+
+        headers = ["region", "q1", "q2", "q3"]
+        for colIdx, value in enumerate(headers):
+            tbl.cell(0, colIdx).text = value
+
+        rows = [["Seoul", "120", "135", "150"], ["Busan", "80", "78", "92"], ["Daegu", "60", "65", "70"]]
+        for rowIdx, rowData in enumerate(rows, start=1):
+            for colIdx, value in enumerate(rowData):
+                tbl.cell(rowIdx, colIdx).text = value
+
+        doc.save(docxPath)
+        Document(docxPath).tables[0].cell(3, 0).text
+      hints:
+        - "정수 4."
+    check:
+      noError: "rows는 정수."
+      resultCheck: "출력 'Daegu'."
+
+  - id: step2_merge
+    title: "2단계. merge_cells로 셀 병합"
+    structuredPrimary: true
+    subtitle: "cell1.merge(cell2)"
+    goal: "헤더 행에 두 컬럼을 병합한 부제목을 만든다."
+    why: "한국 보고서의 결재라인 표는 거의 모두 헤더 병합 구조입니다. merge_cells가 필수입니다."
+    explanation: |-
+      cell1.merge(cell2)는 두 셀과 사이의 모든 셀을 병합. 결과 셀에 text 입력.
+    tips:
+      - "병합된 셀의 .text는 결과 셀에 적용. 병합 전 각 셀의 텍스트는 합쳐집니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "merged.docx"
+
+      doc = Document()
+      tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+
+      # 상위 헤더: 두 셀 병합
+      tbl.cell(0, 0).merge(tbl.cell(0, 1)).text = "지역 정보"
+      tbl.cell(0, 2).merge(tbl.cell(0, 3)).text = "매출"
+
+      # 하위 헤더
+      sub = ["region", "code", "q1", "q2"]
+      for colIdx, value in enumerate(sub):
+          tbl.cell(1, colIdx).text = value
+
+      # 데이터
+      tbl.cell(2, 0).text = "Seoul"
+      tbl.cell(2, 1).text = "S01"
+      tbl.cell(2, 2).text = "120"
+      tbl.cell(2, 3).text = "135"
+
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      reopened.tables[0].cell(0, 0).text
+    exercise:
+      prompt: "tbl.cell(2, 0).merge(tbl.cell(2, 1))로 데이터 행도 병합하고 텍스트를 'Seoul S01'으로."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "m.docx"
+
+        doc = Document()
+        tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+        tbl.cell(0, 0).merge(tbl.cell(0, 1)).text = "지역 정보"
+        tbl.cell(0, 2).merge(tbl.cell(0, 3)).text = "매출"
+        for colIdx, value in enumerate(["region", "code", "q1", "q2"]):
+            tbl.cell(1, colIdx).text = value
+        tbl.cell(2, 0).merge(tbl.cell(2, 1)).text = ___
+        tbl.cell(2, 2).text = "120"
+        doc.save(docxPath)
+        Document(docxPath).tables[0].cell(2, 0).text
+      hints:
+        - "문자열 'Seoul S01'."
+    check:
+      noError: "merge 후 .text 대입."
+      resultCheck: "출력 'Seoul S01'."
+
+  - id: validation
+    title: "3단계. 검증 — 비교표 빌더"
+    structuredPrimary: true
+    subtitle: "buildComparisonTable + cell 검증"
+    goal: "비교표 빌더 함수의 결과를 셀 단위로 한 번에 검증한다."
+    why: "표는 데이터 정확성이 가장 중요합니다. 셀 단위 assert가 사고 사전 차단."
+    explanation: |-
+      buildComparisonTable(path, headers, rows)이 표를 만들고, 재오픈 후 모든 셀이 입력 데이터와 일치하는지 확인.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def buildComparisonTable(path, headers, rows):
+          doc = Document()
+          tbl = doc.add_table(rows=len(rows) + 1, cols=len(headers), style="Table Grid")
+          for colIdx, header in enumerate(headers):
+              tbl.cell(0, colIdx).text = header
+          for rowIdx, rowData in enumerate(rows, start=1):
+              for colIdx, value in enumerate(rowData):
+                  tbl.cell(rowIdx, colIdx).text = str(value)
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "v.docx"
+      headers = ["region", "amount"]
+      data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000]]
+      buildComparisonTable(docxPath, headers, data)
+
+      reopened = Document(docxPath)
+      tbl = reopened.tables[0]
+      assert tbl.cell(0, 0).text == "region"
+      assert tbl.cell(1, 0).text == "Seoul"
+      assert tbl.cell(3, 1).text == "60000"
+      tbl.cell(0, 0).text, tbl.cell(3, 0).text
+    exercise:
+      prompt: "한 행 더 추가해 표 행 수가 5인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def buildComparisonTable(path, headers, rows):
+            doc = Document()
+            tbl = doc.add_table(rows=len(rows) + 1, cols=len(headers), style="Table Grid")
+            for colIdx, header in enumerate(headers):
+                tbl.cell(0, colIdx).text = header
+            for rowIdx, rowData in enumerate(rows, start=1):
+                for colIdx, value in enumerate(rowData):
+                    tbl.cell(rowIdx, colIdx).text = str(value)
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "v.docx"
+        data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000], ___]
+        buildComparisonTable(docxPath, ["region", "amount"], data)
+        len(Document(docxPath).tables[0].rows)
+      hints:
+        - "리스트 ['Incheon', 55000]."
+    check:
+      noError: "리스트 원소는 리스트."
+      resultCheck: "출력 5."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "한국식 결재라인 표"
+    goal: "담당·검토·승인 결재라인 표 함수를 만든다."
+    why: "한국 보고서의 표준 구성요소입니다."
+    explanation: |-
+      미션: buildApprovalLine(doc, names) 함수. 'roles → names' 3컬럼 표.
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: buildApprovalLine(doc, approvers: dict) -> Table"
+    check:
+      noError: "함수 정의."
+      resultCheck: "표의 헤더와 데이터가 정확히 매핑."
+    blocks:
+      - type: expansion
+        title: "미션: 결재라인 표"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def buildApprovalLine(doc, approvers):
+                  tbl = doc.add_table(rows=2, cols=len(approvers), style="Table Grid")
+                  for colIdx, (role, name) in enumerate(approvers.items()):
+                      tbl.cell(0, colIdx).text = role
+                      tbl.cell(1, colIdx).text = name
+                  return tbl
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "a.docx"
+              doc = Document()
+              buildApprovalLine(doc, {"담당": "김대리", "검토": "박과장", "승인": "이팀장"})
+              doc.save(docxPath)
+
+              reopened = Document(docxPath)
+              tbl = reopened.tables[0]
+              assert tbl.cell(0, 0).text == "담당"
+              assert tbl.cell(1, 2).text == "이팀장"
+              [tbl.cell(0, i).text for i in range(3)], [tbl.cell(1, i).text for i in range(3)]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "표 헤더 행에 배경색 (cell._tc XML 조작)"
+          - "셀 안 텍스트를 run 단위로 굵게 (3강 패턴 결합)"
+          - "행 자동 stripe (짝수 행 회색)"
+          - "표 너비를 width 인자로 명시 (Inches(6))"
+          - "직원 명단 dict 리스트 → N행 표 자동"

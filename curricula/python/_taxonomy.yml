@@ -374,6 +374,93 @@ outcomes:
     label: 엑셀 리포트 생성기
     description: 다중 시트 + 수식 + 서식 + 차트 결합 자동 보고서
 
+  - id: automation.pdf.intro
+    label: PDF 자동화 입문
+    description: pypdf, pdfplumber, reportlab의 역할 구분
+  - id: automation.pdf.read
+    label: PDF 읽기와 메타데이터
+    description: PdfReader, pages, metadata, 텍스트 추출
+  - id: automation.pdf.merge
+    label: PDF 병합·분할
+    description: PdfWriter로 페이지 합치고 자르기
+  - id: automation.pdf.extract
+    label: 표·텍스트 추출
+    description: pdfplumber로 구조 추출
+  - id: automation.pdf.create
+    label: PDF 생성 기초
+    description: reportlab Canvas, 한글 폰트 등록
+  - id: automation.pdf.layout
+    label: 표·이미지 레이아웃
+    description: Platypus, SimpleDocTemplate
+  - id: automation.pdf.security
+    label: 워터마크·암호화
+    description: encrypt, overlay 워터마크
+  - id: automation.pdf.forms
+    label: 양식 채우기
+    description: AcroForm 필드 조작
+  - id: automation.pdf.report
+    label: PDF 리포트 생성기
+    description: 데이터 → 다중 페이지 한글 보고서
+
+  - id: automation.email.intro
+    label: 이메일 자동화 입문
+    description: SMTP/IMAP, 앱 비밀번호 모델
+  - id: automation.email.send
+    label: 메일 발송 기초
+    description: smtplib, EmailMessage
+  - id: automation.email.attachments
+    label: HTML·첨부·인라인 이미지
+    description: MIMEMultipart, Content-ID
+  - id: automation.email.bulk
+    label: 다수 수신자·개인화
+    description: 템플릿 치환, CSV 기반 발송
+  - id: automation.email.receive
+    label: IMAP 수신·검색
+    description: imaplib search, fetch
+  - id: automation.email.classify
+    label: 규칙 기반 분류·이동
+    description: 발신자/제목 기반 폴더 룰
+  - id: automation.email.notify
+    label: 스크립트 알림 봇
+    description: 예외 발생 시 메일 알림
+  - id: automation.email.credentials
+    label: 안전한 자격증명
+    description: 환경변수, dry-run
+  - id: automation.email.report
+    label: 주간 보고서 발송기
+    description: 데이터 + PDF + 다수 발송 통합
+
+  - id: automation.word.intro
+    label: Word 자동화 입문
+    description: python-docx vs docxtpl 경계
+  - id: automation.word.paragraphs
+    label: 단락·제목·목록
+    description: Document, add_paragraph, add_heading
+  - id: automation.word.runs
+    label: 텍스트 스타일링
+    description: Run 단위 font·color·bold
+  - id: automation.word.tables
+    label: 표 작성·셀 병합
+    description: add_table, merge_cells
+  - id: automation.word.media
+    label: 이미지·머리말·꼬리말
+    description: add_picture, sections, header
+  - id: automation.word.styles
+    label: 스타일과 페이지 설정
+    description: styles, page_margins
+  - id: automation.word.edit
+    label: 기존 문서 수정
+    description: 자리표시자 치환
+  - id: automation.word.mailMerge
+    label: CSV 기반 mail merge
+    description: 다수 docx 생성
+  - id: automation.word.template
+    label: docxtpl 템플릿 엔진
+    description: Jinja2 기반 채우기
+  - id: automation.word.report
+    label: 양식 문서 자동 생성기
+    description: 데이터 → 회의록·계약서 docx
+
   - id: automation.fileOps
     label: 파일 자동화
     description: pathlib, glob, 파일 이동/복사/정리
@@ -462,6 +549,57 @@ domains:
       - automation.excel.report
       - pandas.loadFrame
       - pandas.aggregate
+
+  - id: pdfAutomation
+    label: PDF 자동화
+    description: PDF 읽기·생성·병합·보안·리포트 자동화
+    targetOutcomes:
+      - python.functions
+      - python.errorHandling
+      - python.modulesAndIo
+      - automation.pdf.intro
+      - automation.pdf.read
+      - automation.pdf.merge
+      - automation.pdf.extract
+      - automation.pdf.create
+      - automation.pdf.layout
+      - automation.pdf.security
+      - automation.pdf.forms
+      - automation.pdf.report
+
+  - id: emailAutomation
+    label: 이메일 자동화
+    description: SMTP/IMAP으로 메일 발송·수신·분류·알림을 자동화
+    targetOutcomes:
+      - python.functions
+      - python.errorHandling
+      - python.modulesAndIo
+      - automation.email.intro
+      - automation.email.send
+      - automation.email.attachments
+      - automation.email.bulk
+      - automation.email.receive
+      - automation.email.classify
+      - automation.email.notify
+      - automation.email.credentials
+      - automation.email.report
+
+  - id: documentAutomation
+    label: 문서 자동화 (Word)
+    description: python-docx로 보고서·계약서·회의록을 자동 생성
+    targetOutcomes:
+      - python.functions
+      - python.modulesAndIo
+      - automation.word.intro
+      - automation.word.paragraphs
+      - automation.word.runs
+      - automation.word.tables
+      - automation.word.media
+      - automation.word.styles
+      - automation.word.edit
+      - automation.word.mailMerge
+      - automation.word.template
+      - automation.word.report
 
   - id: webMonitoring
     label: 웹 자동화·모니터링

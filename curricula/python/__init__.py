@@ -15,6 +15,11 @@ categoryMapping = {
     'advancedPython': '고급파이썬',
     'builtins': '표준라이브러리',
     'excel': '엑셀자동화',
+    'openpyxl': 'openpyxl 엑셀파일자동화',
+    'xlwings': 'xlwings 라이브 자동화',
+    'pdf': 'PDF 자동화',
+    'email': '이메일 자동화',
+    'word': 'Word 문서자동화',
     'numpy': 'NumPy 수치연산',
     'sympy': 'SymPy 기호수학',
     'pandas': 'Pandas 데이터분석',
@@ -69,6 +74,36 @@ categoryMeta = {
         'icon': 'table_chart',
         'color': 'green',
         'description': '엑셀 반복 작업을 자동화하세요',
+        'imageUrl': None,
+    },
+    'openpyxl': {
+        'icon': 'description',
+        'color': 'emerald',
+        'description': 'Excel 앱 없이 .xlsx 파일 자체를 코드로 생성·서식·수식·차트까지 다룬다',
+        'imageUrl': None,
+    },
+    'xlwings': {
+        'icon': 'sync_alt',
+        'color': 'teal',
+        'description': '실행 중인 Excel을 Python으로 라이브 제어 — 셀, 차트, VBA, UDF까지',
+        'imageUrl': None,
+    },
+    'pdf': {
+        'icon': 'picture_as_pdf',
+        'color': 'red',
+        'description': 'pypdf로 읽고 pdfplumber로 추출하고 reportlab으로 한글 PDF를 생성한다',
+        'imageUrl': None,
+    },
+    'email': {
+        'icon': 'mail',
+        'color': 'sky',
+        'description': '표준 라이브러리로 메일 발송·수신·분류·알림 자동화',
+        'imageUrl': None,
+    },
+    'word': {
+        'icon': 'article',
+        'color': 'blue',
+        'description': 'python-docx로 보고서·계약서·회의록 자동 생성과 mail merge',
         'imageUrl': None,
     },
     'numpy': {
@@ -253,7 +288,7 @@ categoryGroups = {
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
-    '자동화': ['playwright', 'excel', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
+    '자동화': ['playwright', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
     '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     'AI 통합': ['llmBasics'],
 }
@@ -305,7 +340,7 @@ categoryTree = [
                 'name': '업무 자동화',
                 'description': '워크북, 작은 도구, 반복 업무를 실행 가능한 Python으로 만든다.',
                 'folder': 'office',
-                'categories': ['excel', 'practical'],
+                'categories': ['excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'practical'],
             },
             {
                 'id': 'text-automation',
@@ -388,7 +423,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {

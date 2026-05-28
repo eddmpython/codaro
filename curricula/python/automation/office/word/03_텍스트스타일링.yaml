@@ -1,0 +1,306 @@
+meta:
+  id: word_03
+  title: 텍스트 스타일링
+  order: 3
+  category: word
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+    - python-docx
+    - docx
+  tags:
+    - run
+    - font
+    - East Asian
+  outcomes:
+    - automation.word.runs
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 40
+  seo:
+    title: "Word 텍스트 스타일링 — run, font, East Asian font 패턴"
+    description: "Bold·색상·크기를 run 단위로 적용. 한글 East Asian font 의무 패턴으로 폰트 깨짐 차단."
+    keywords:
+      - python-docx run font
+      - East Asian font
+      - 한글 폰트 docx
+
+intro:
+  direction: "단락을 run 단위로 쪼개 굵기·색·크기를 적용한다. 한글 East Asian font 의무 패턴을 본 강의에서 정착시킨다."
+  benefits:
+    - "Bold·색·크기를 run 단위로 제어 — docx 모든 강조 표현이 가능."
+    - "East Asian font 패턴 한 번 익히면 한글 폰트 깨짐이 트랙 끝까지 없음."
+    - "06강 스타일 정의 함수의 베이스가 되는 함수 형태 정착."
+  diagram:
+    steps:
+      - label: "1. Paragraph.add_run"
+        detail: "단락 안에 run을 추가해 부분별로 다른 스타일."
+      - label: "2. run.font.bold/size/color"
+        detail: "Bold, 크기, 색 적용."
+      - label: "3. East Asian font 의무"
+        detail: "qn('w:eastAsia') 설정으로 한글 폰트 적용."
+    runtime:
+      - label: "python-docx"
+        detail: "docx.oxml.ns.qn 임포트 필요."
+      - label: "검증"
+        detail: "Document 재오픈 후 paragraphs[i].runs[j]의 속성 검증."
+
+sections:
+  - id: step1_runs
+    title: "1단계. add_run으로 부분 스타일"
+    structuredPrimary: true
+    subtitle: "p.add_run(text)"
+    goal: "한 단락 안에 일반 텍스트 + Bold 텍스트가 섞인 구조를 만든다."
+    why: "단락 전체에 단일 스타일을 적용하면 강조가 안 됩니다. run 단위로 쪼개야 부분 굵기·색·크기 적용이 가능합니다."
+    explanation: |-
+      p = doc.add_paragraph()로 빈 단락. p.add_run('일반 텍스트') 후 run = p.add_run(' 강조'); run.bold = True로 일부만 굵게.
+    tips:
+      - "add_paragraph(text)는 첫 run을 자동 추가합니다. 빈 단락에 add_run을 여러 번 호출하는 게 더 유연."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "runs.docx"
+
+      doc = Document()
+      p = doc.add_paragraph()
+      p.add_run("일반 텍스트 ")
+      bold = p.add_run("강조 부분")
+      bold.bold = True
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      runs = reopened.paragraphs[0].runs
+      [(r.text, r.bold) for r in runs]
+    exercise:
+      prompt: "세 번째 run으로 ' 마지막'을 추가하고 모두 색을 빨강(0xFF0000)으로 바꾸세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.shared import RGBColor
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "r.docx"
+
+        doc = Document()
+        p = doc.add_paragraph()
+        for text in ["일반 ", "강조", ___]:
+            run = p.add_run(text)
+            run.font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
+        doc.save(docxPath)
+
+        len(Document(docxPath).paragraphs[0].runs)
+      hints:
+        - "문자열 ' 마지막'."
+    check:
+      noError: "add_run 인자는 문자열."
+      resultCheck: "출력 3."
+
+  - id: step2_east_asian
+    title: "2단계. East Asian font 의무 패턴"
+    structuredPrimary: true
+    subtitle: "qn('w:eastAsia') 설정"
+    goal: "한글 폰트를 East Asian font 설정까지 포함해 정확히 적용한다."
+    why: "run.font.name만 설정하면 한글 부분이 기본 영문 폰트로 렌더링됩니다. East Asian font 설정이 빠지면 한글이 깨끗하게 안 보입니다."
+    explanation: |-
+      from docx.oxml.ns import qn; run.font.name='맑은 고딕'; run._element.rPr.rFonts.set(qn('w:eastAsia'), '맑은 고딕'). 두 줄이 한 묶음.
+    tips:
+      - "rPr이 없는 run에 .rFonts 접근하면 AttributeError. 한 번 font.name을 설정하면 rPr이 자동 생성됩니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.oxml.ns import qn
+
+      def applyKoreanFont(run, fontName="맑은 고딕"):
+          run.font.name = fontName
+          run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "ko.docx"
+
+      doc = Document()
+      p = doc.add_paragraph()
+      run = p.add_run("한글 본문이 맑은 고딕으로 보입니다.")
+      applyKoreanFont(run, "맑은 고딕")
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      reopened.paragraphs[0].runs[0].font.name
+    exercise:
+      prompt: "applyKoreanFont에 'NanumGothic'을 전달하고 폰트 이름을 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.oxml.ns import qn
+
+        def applyKoreanFont(run, fontName="맑은 고딕"):
+            run.font.name = fontName
+            run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "k.docx"
+
+        doc = Document()
+        p = doc.add_paragraph()
+        run = p.add_run("text")
+        applyKoreanFont(run, ___)
+        doc.save(docxPath)
+
+        Document(docxPath).paragraphs[0].runs[0].font.name == "NanumGothic"
+      hints:
+        - "문자열 'NanumGothic'."
+    check:
+      noError: "applyKoreanFont 인자는 문자열."
+      resultCheck: "True 출력."
+
+  - id: validation
+    title: "3단계. 검증 — 한글 강조 단락 통합"
+    structuredPrimary: true
+    subtitle: "Bold + 한글 폰트 + 크기"
+    goal: "강조된 한글 단락 함수의 결과를 단위 assert로 검증한다."
+    why: "본 패턴이 06강 스타일 함수의 첫 번째 빌딩 블록입니다."
+    explanation: |-
+      buildEmphasis 함수가 한 단락에 일반/강조/한글 폰트를 한 번에 적용. 재오픈 후 runs.font 속성 검증.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.oxml.ns import qn
+      from docx.shared import Pt, RGBColor
+
+      def applyKoreanFont(run, fontName="맑은 고딕"):
+          run.font.name = fontName
+          run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+      def buildEmphasis(path, normalText, boldText):
+          doc = Document()
+          p = doc.add_paragraph()
+          n = p.add_run(normalText)
+          applyKoreanFont(n)
+          b = p.add_run(boldText)
+          b.bold = True
+          b.font.size = Pt(14)
+          b.font.color.rgb = RGBColor(0xC0, 0x39, 0x2B)
+          applyKoreanFont(b)
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "emp.docx"
+      buildEmphasis(docxPath, "본문은 ", "여기가 강조")
+
+      reopened = Document(docxPath)
+      runs = reopened.paragraphs[0].runs
+      assert len(runs) == 2
+      assert runs[1].bold is True
+      assert runs[1].font.size == Pt(14)
+      [(r.text, r.bold) for r in runs]
+    exercise:
+      prompt: "buildEmphasis를 호출해 normalText='보고서 ', boldText='월간'으로 검증하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.oxml.ns import qn
+        from docx.shared import Pt, RGBColor
+
+        def applyKoreanFont(run, fontName="맑은 고딕"):
+            run.font.name = fontName
+            run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+        def buildEmphasis(path, normalText, boldText):
+            doc = Document()
+            p = doc.add_paragraph()
+            n = p.add_run(normalText)
+            applyKoreanFont(n)
+            b = p.add_run(boldText)
+            b.bold = True
+            applyKoreanFont(b)
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "e.docx"
+        buildEmphasis(docxPath, ___, ___)
+        runs = Document(docxPath).paragraphs[0].runs
+        runs[1].bold
+      hints:
+        - "두 문자열: '보고서 ', '월간'."
+    check:
+      noError: "buildEmphasis 인자는 문자열 두 개."
+      resultCheck: "True 출력."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "한글 강조 단락 생성기"
+    goal: "단락 빌더 함수를 직접 작성한다."
+    why: "본 패턴이 트랙 후반의 모든 단락 생성 함수에 재사용됩니다."
+    explanation: |-
+      미션: buildKoreanParagraph(doc, normalText, boldText, color) 함수. 한 단락에 두 run, Bold + 색 적용.
+    snippet: |-
+      from docx import Document
+      from docx.oxml.ns import qn
+      from docx.shared import Pt, RGBColor
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: buildKoreanParagraph(doc, normalText, boldText, color=(0x33, 0x33, 0x33))"
+    check:
+      noError: "함수 정의."
+      resultCheck: "run 2개와 색 검증."
+    blocks:
+      - type: expansion
+        title: "미션: 한글 강조 단락"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.oxml.ns import qn
+              from docx.shared import Pt, RGBColor
+
+              def applyKoreanFont(run, fontName="맑은 고딕"):
+                  run.font.name = fontName
+                  run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+              def buildKoreanParagraph(doc, normalText, boldText, color=(0x33, 0x33, 0x33)):
+                  p = doc.add_paragraph()
+                  n = p.add_run(normalText)
+                  applyKoreanFont(n)
+                  b = p.add_run(boldText)
+                  b.bold = True
+                  b.font.color.rgb = RGBColor(*color)
+                  applyKoreanFont(b)
+                  return p
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "p.docx"
+              doc = Document()
+              buildKoreanParagraph(doc, "이번 주 ", "매출 1.2억", color=(0xC0, 0x39, 0x2B))
+              doc.save(docxPath)
+
+              reopened = Document(docxPath)
+              runs = reopened.paragraphs[0].runs
+              assert len(runs) == 2
+              assert runs[1].bold is True
+              assert runs[1].font.color.rgb == RGBColor(0xC0, 0x39, 0x2B)
+              [(r.text, r.bold) for r in runs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "굵기·기울임·밑줄·취소선을 한 함수에서 다중 인자"
+          - "한 단락에 여러 색 (긍정 녹색, 부정 빨강)"
+          - "RGBColor를 16진수 문자열로 받는 헬퍼 (예: '#C0392B')"
+          - "기본 폰트를 '나눔고딕'으로 바꿔 본문 분위기 전환"
+          - "06강 스타일 정의 함수에 본 패턴 흡수"

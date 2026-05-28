@@ -1,0 +1,344 @@
+meta:
+  id: email_05
+  title: IMAP으로 받기
+  order: 5
+  category: email
+  difficulty: ⭐⭐
+  badge: 기초
+  packages: []
+  tags:
+    - imaplib
+    - IMAP4_SSL
+    - select
+    - search
+  outcomes:
+    - automation.email.receive
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 50
+  seo:
+    title: "imaplib로 메일 받기 — IMAP4_SSL, select, search, fetch"
+    description: "imaplib.IMAP4_SSL로 메일함을 코드로 다룬다. 최근 N일 메일 검색 후 제목 목록을 만든다. 본인 메일 계정 환경변수 필수."
+    keywords:
+      - imaplib
+      - IMAP4_SSL
+      - 메일 받기 자동화
+
+intro:
+  direction: "imaplib.IMAP4_SSL로 메일함에 접속해 검색·조회한다. 본인 메일 계정 환경변수가 필요하며, 항상 별도 폴더(INBOX/CodaroTest)에서만 작업."
+  benefits:
+    - "사장님의 매일 30분 메일 분류를 위한 첫 단계 — 받은 메일 목록을 코드로 다루기."
+    - "imaplib는 표준. 외부 패키지 0개로 IMAP 전 흐름 처리."
+    - "Gmail·Naver·Outlook IMAP4 모두 같은 패턴으로 접속."
+  diagram:
+    steps:
+      - label: "1. 연결과 로그인"
+        detail: "IMAP4_SSL(host) + login(user, appPass)."
+      - label: "2. 폴더 선택"
+        detail: "select('INBOX') 또는 select('INBOX/CodaroTest')."
+      - label: "3. 검색"
+        detail: "search(None, criteria)로 UID 리스트 반환."
+      - label: "4. 본문 조회"
+        detail: "fetch(uid, '(RFC822)')로 메시지 바이트 가져오기."
+    runtime:
+      - label: "본인 메일 계정 필요"
+        detail: "환경변수 IMAP_USER, IMAP_APP_PASS 미설정 시 본 강의는 skip. 코드 패턴만 학습 가능."
+      - label: "안전 정책"
+        detail: "항상 별도 폴더에서만 작업. INBOX 직접 삭제 절대 금지."
+
+sections:
+  - id: step1_connect
+    title: "1단계. IMAP 연결과 로그인"
+    structuredPrimary: true
+    subtitle: "imaplib.IMAP4_SSL(host), login(user, appPass)"
+    goal: "환경변수가 설정된 경우에만 IMAP4_SSL로 연결하고 로그인한다."
+    why: "IMAP 모든 작업의 출발점입니다. 환경변수 가드를 두면 CI나 다른 환경에서 안전하게 skip 됩니다."
+    explanation: |-
+      IMAP4_SSL은 SSL로 직결합니다 (포트 993). login은 (이메일, 앱비밀번호) 형태. 환경변수 미설정 시 명확한 메시지로 skip.
+    tips:
+      - "Naver는 imap.naver.com, Gmail은 imap.gmail.com. 호스트 상수 사용."
+    snippet: |-
+      import imaplib
+      import os
+
+      IMAP_HOST = "imap.gmail.com"
+
+      def connectImap():
+          user = os.environ.get("IMAP_USER")
+          appPass = os.environ.get("IMAP_APP_PASS")
+          if not user or not appPass:
+              return None
+          conn = imaplib.IMAP4_SSL(IMAP_HOST)
+          conn.login(user, appPass)
+          return conn
+
+      conn = connectImap()
+      state = "connected" if conn else "skipped (no env vars)"
+      if conn:
+          conn.logout()
+      state
+    exercise:
+      prompt: "IMAP_HOST를 'imap.naver.com'으로 바꿔 Naver IMAP 준비를 하세요."
+      starterCode: |-
+        import imaplib
+        import os
+
+        IMAP_HOST = ___
+
+        def connectImap():
+            user = os.environ.get("IMAP_USER")
+            if not user:
+                return None
+            return imaplib.IMAP4_SSL(IMAP_HOST)
+
+        IMAP_HOST
+      hints:
+        - "문자열 'imap.naver.com'."
+    check:
+      noError: "IMAP_HOST는 문자열."
+      resultCheck: "출력 'imap.naver.com'."
+
+  - id: step2_select
+    title: "2단계. 폴더 선택과 안전 정책"
+    structuredPrimary: true
+    subtitle: "conn.select('INBOX/CodaroTest')"
+    goal: "INBOX/CodaroTest 폴더만 선택해 실수로 inbox 본문에 접근하지 않게 한다."
+    why: "본 트랙 안전 정책 — IMAP 작업은 항상 별도 폴더에서. 학습 중 inbox 메일을 실수로 삭제하는 사고를 사전 차단합니다."
+    explanation: |-
+      conn.select(폴더명)을 호출하면 그 폴더가 활성화됩니다. 없는 폴더면 자동 생성되지 않으므로 conn.create('INBOX.CodaroTest')로 미리 생성. Gmail은 INBOX/CodaroTest, 일반 IMAP은 INBOX.CodaroTest 표기 차이.
+    tips:
+      - "Gmail의 라벨은 IMAP 폴더로 매핑됩니다. 라벨 'CodaroTest'를 만들면 IMAP에서 그 폴더에 접근 가능."
+    snippet: |-
+      import imaplib
+      import os
+
+      IMAP_HOST = "imap.gmail.com"
+      SAFE_FOLDER = "INBOX/CodaroTest"
+
+      def selectSafeFolder():
+          user = os.environ.get("IMAP_USER")
+          appPass = os.environ.get("IMAP_APP_PASS")
+          if not user or not appPass:
+              return "skipped"
+          conn = imaplib.IMAP4_SSL(IMAP_HOST)
+          conn.login(user, appPass)
+          try:
+              conn.create(SAFE_FOLDER)
+          except imaplib.IMAP4.error:
+              pass
+          status, _ = conn.select(SAFE_FOLDER)
+          conn.logout()
+          return status
+
+      selectSafeFolder()
+    exercise:
+      prompt: "SAFE_FOLDER를 'INBOX/CodaroLesson'으로 바꾸세요."
+      starterCode: |-
+        SAFE_FOLDER = ___
+        SAFE_FOLDER.endswith("Lesson")
+      hints:
+        - "문자열 'INBOX/CodaroLesson'."
+    check:
+      noError: "문자열."
+      resultCheck: "True 출력."
+
+  - id: step3_search
+    title: "3단계. 검색과 조회"
+    structuredPrimary: true
+    subtitle: "search(None, criteria), fetch(uid, '(RFC822)')"
+    goal: "최근 N일 메일을 검색해 제목 목록을 만드는 함수의 형태를 정의한다."
+    why: "검색 → 조회는 IMAP의 가장 흔한 흐름입니다. SINCE 기준 검색 패턴을 손에 익혀야 후속 강의 분류·이동이 자연스럽습니다."
+    explanation: |-
+      conn.search(None, 'SINCE', date)는 (status, [uid_string]) 튜플 반환. uid_string을 split해 UID 리스트로 만들고, conn.fetch(uid, '(RFC822)')로 각 메시지를 가져옵니다.
+    tips:
+      - "SINCE 날짜 형식은 '15-Jan-2026' 같은 영문 월. datetime.strftime('%d-%b-%Y')로 변환."
+    snippet: |-
+      import imaplib
+      import os
+      from datetime import datetime, timedelta
+
+      IMAP_HOST = "imap.gmail.com"
+      SAFE_FOLDER = "INBOX/CodaroTest"
+
+      def recentSubjects(days=7):
+          user = os.environ.get("IMAP_USER")
+          appPass = os.environ.get("IMAP_APP_PASS")
+          if not user or not appPass:
+              return []
+          conn = imaplib.IMAP4_SSL(IMAP_HOST)
+          conn.login(user, appPass)
+          try:
+              conn.create(SAFE_FOLDER)
+          except imaplib.IMAP4.error:
+              pass
+          conn.select(SAFE_FOLDER)
+          since = (datetime.utcnow() - timedelta(days=days)).strftime("%d-%b-%Y")
+          status, uidData = conn.search(None, "SINCE", since)
+          subjects = []
+          if status == "OK":
+              for uid in uidData[0].split():
+                  fStatus, fData = conn.fetch(uid, "(BODY[HEADER.FIELDS (SUBJECT)])")
+                  if fStatus == "OK":
+                      subjects.append(fData[0][1].decode("utf-8", errors="replace").strip())
+          conn.logout()
+          return subjects
+
+      "function defined: recentSubjects"
+    exercise:
+      prompt: "days 인자 기본값을 14로 바꾸세요."
+      starterCode: |-
+        import imaplib
+        import os
+        from datetime import datetime, timedelta
+
+        def recentSubjects(days=___):
+            user = os.environ.get("IMAP_USER")
+            if not user:
+                return []
+            return []
+
+        recentSubjects()
+      hints:
+        - "정수 14."
+    check:
+      noError: "기본값은 정수."
+      resultCheck: "빈 리스트 출력."
+
+  - id: validation
+    title: "4단계. 검증 루프 — 환경 가드 자동 검증"
+    structuredPrimary: true
+    subtitle: "환경변수 가드 + 함수 시그니처 단위 검증"
+    goal: "환경변수가 없을 때 함수가 안전하게 빈 리스트를 돌려주는지 한 셀에서 검증한다."
+    why: "IMAP 본문 검증은 실 환경 의존이지만, 환경 가드 자체는 단위 검증 가능합니다. CI에서도 통과합니다."
+    explanation: |-
+      환경변수 IMAP_USER가 없는 상태에서 recentSubjects 호출이 [] 반환하는지 확인. 이 가드가 본 트랙 안전 정책의 일관 검증입니다.
+    tips:
+      - "테스트 안에서 os.environ.pop으로 변수를 잠시 제거하면 환경 가드를 격리 검증할 수 있습니다."
+    snippet: |-
+      import imaplib
+      import os
+      from datetime import datetime, timedelta
+
+      IMAP_HOST = "imap.gmail.com"
+
+      def recentSubjects(days=7):
+          user = os.environ.get("IMAP_USER")
+          appPass = os.environ.get("IMAP_APP_PASS")
+          if not user or not appPass:
+              return []
+          return ["would-call-imap"]
+
+      savedUser = os.environ.pop("IMAP_USER", None)
+      savedPass = os.environ.pop("IMAP_APP_PASS", None)
+      try:
+          result = recentSubjects()
+          assert result == []
+      finally:
+          if savedUser is not None:
+              os.environ["IMAP_USER"] = savedUser
+          if savedPass is not None:
+              os.environ["IMAP_APP_PASS"] = savedPass
+      result
+    exercise:
+      prompt: "recentSubjects 호출 후 빈 리스트가 맞는지 한 줄 assert로 확인하세요."
+      starterCode: |-
+        import os
+
+        def recentSubjects(days=7):
+            if not os.environ.get("IMAP_USER"):
+                return []
+            return ["x"]
+
+        savedUser = os.environ.pop("IMAP_USER", None)
+        try:
+            result = recentSubjects()
+            assert result == ___
+        finally:
+            if savedUser is not None:
+                os.environ["IMAP_USER"] = savedUser
+        result
+      hints:
+        - "빈 리스트 []."
+    check:
+      noError: "빈 리스트 []."
+      resultCheck: "출력 []."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "최근 메일 제목 모으기 도구"
+    goal: "IMAP 패턴을 함수로 묶어 본인 계정 또는 환경 가드 동작을 검증한다."
+    why: "검색 + 조회 + 안전 가드가 한 함수에 모이면 06·07강 분류·이동의 기반이 됩니다."
+    explanation: |-
+      미션: fetchRecentSubjects(days, host, folder) -> list[str]. 환경 가드, 폴더 안전 처리, SINCE 검색, fetch까지.
+    tips:
+      - "본인 계정으로 시도하려면 환경변수 IMAP_USER, IMAP_APP_PASS 설정."
+    snippet: |-
+      import imaplib
+      import os
+      from datetime import datetime, timedelta
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: fetchRecentSubjects(days=7, host='imap.gmail.com', folder='INBOX/CodaroTest') -> list[str]"
+    check:
+      noError: "환경 가드 + IMAP 흐름."
+      resultCheck: "환경변수 없으면 [], 있으면 제목 리스트."
+    blocks:
+      - type: expansion
+        title: "미션: 최근 메일 제목 도구"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import imaplib
+              import os
+              from datetime import datetime, timedelta
+
+              def fetchRecentSubjects(days=7, host="imap.gmail.com", folder="INBOX/CodaroTest"):
+                  user = os.environ.get("IMAP_USER")
+                  appPass = os.environ.get("IMAP_APP_PASS")
+                  if not user or not appPass:
+                      return []
+                  conn = imaplib.IMAP4_SSL(host)
+                  conn.login(user, appPass)
+                  try:
+                      conn.create(folder)
+                  except imaplib.IMAP4.error:
+                      pass
+                  conn.select(folder)
+                  since = (datetime.utcnow() - timedelta(days=days)).strftime("%d-%b-%Y")
+                  status, uidData = conn.search(None, "SINCE", since)
+                  subjects = []
+                  if status == "OK":
+                      for uid in uidData[0].split():
+                          fStatus, fData = conn.fetch(uid, "(BODY[HEADER.FIELDS (SUBJECT)])")
+                          if fStatus == "OK":
+                              subjects.append(fData[0][1].decode("utf-8", errors="replace").strip())
+                  conn.logout()
+                  return subjects
+
+              savedUser = os.environ.pop("IMAP_USER", None)
+              savedPass = os.environ.pop("IMAP_APP_PASS", None)
+              try:
+                  result = fetchRecentSubjects()
+                  assert result == []
+              finally:
+                  if savedUser is not None:
+                      os.environ["IMAP_USER"] = savedUser
+                  if savedPass is not None:
+                      os.environ["IMAP_APP_PASS"] = savedPass
+              result
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "검색 조건 확장 (FROM, SUBJECT, UNSEEN 조합)"
+          - "결과 캐싱 (UID 기록 후 다음 호출에 SEEN 표시)"
+          - "여러 폴더 동시 조회 (CodaroTest + Archive)"
+          - "Naver IMAP으로 동일 패턴 전환"
+          - "06강 결합 — 검색 결과를 첨부 저장 함수로 넘기기"

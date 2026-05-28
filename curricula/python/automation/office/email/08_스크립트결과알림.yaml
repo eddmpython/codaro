@@ -1,0 +1,378 @@
+meta:
+  id: email_08
+  title: 스크립트 결과 알림
+  order: 8
+  category: email
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages: []
+  tags:
+    - try/except
+    - 알림 봇
+    - 스택트레이스
+  outcomes:
+    - automation.email.notify
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 45
+  seo:
+    title: "스크립트 실패 → SMTP 알림 봇 패턴"
+    description: "야간 배치 스크립트가 실패하면 즉시 알림 메일을 받는다. 새벽 30분 대응 지연이 즉시 통보로 줄어든다."
+    keywords:
+      - 스크립트 실패 알림
+      - SMTP 알림 봇
+      - 스택트레이스 첨부
+
+intro:
+  direction: "야간 배치 스크립트의 예외를 잡아 즉시 알림 메일을 보낸다. 평균 30분 대응 지연이 즉시 통보로 줄어든다."
+  benefits:
+    - "DevOps 박과장의 야간 장애 대응 지연을 즉시 통보로 줄인다."
+    - "try/except + sendNotification 패턴이 어떤 스크립트에도 한 줄 추가로 적용."
+    - "스택트레이스를 본문 또는 첨부로 함께 전송해 디버깅 즉시 가능."
+  diagram:
+    steps:
+      - label: "1. 스크립트 본체"
+        detail: "원래 하던 일을 함수로 캡슐화."
+      - label: "2. 예외 캐치"
+        detail: "try: ... except Exception as exc: sendNotification(exc)."
+      - label: "3. 스택트레이스 전송"
+        detail: "traceback.format_exc()로 전체 스택을 본문 또는 첨부."
+      - label: "4. 데코레이터화"
+        detail: "@notifyOnFailure 데코레이터로 한 줄 추가만으로 적용."
+    runtime:
+      - label: "표준 라이브러리"
+        detail: "traceback + smtplib + email."
+      - label: "검증"
+        detail: "예외 발생 시 알림 함수 호출 여부와 본문 내용 단위 assert."
+
+sections:
+  - id: step1_notify
+    title: "1단계. 알림 함수 정의"
+    structuredPrimary: true
+    subtitle: "예외 정보 → EmailMessage"
+    goal: "예외 객체와 스크립트 이름을 받아 알림 메시지를 만드는 함수를 작성한다."
+    why: "본 강의의 핵심 함수입니다. 어떤 스크립트에서도 같은 함수를 호출해 알림 발송."
+    explanation: |-
+      buildNotification(scriptName, exc, traceback)이 Subject에 '[FAIL] {script}', 본문에 예외 메시지 + 스택트레이스를 담은 EmailMessage 반환.
+    tips:
+      - "예외 메시지가 비어있을 수도 있으니 type(exc).__name__로 클래스명을 함께 표시."
+    snippet: |-
+      import traceback
+      from email.message import EmailMessage
+
+      def buildNotification(scriptName, exc, tb=None, toAddr="ops@example.com"):
+          msg = EmailMessage()
+          msg["From"] = "alerts@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = f"[FAIL] {scriptName}"
+          body = (
+              f"Script: {scriptName}\n"
+              f"Error type: {type(exc).__name__}\n"
+              f"Error message: {exc}\n\n"
+              f"Traceback:\n{tb or 'no traceback'}"
+          )
+          msg.set_content(body, charset="utf-8")
+          return msg
+
+      try:
+          raise ValueError("DB connection failed")
+      except Exception as exc:
+          alert = buildNotification("nightly_etl", exc, traceback.format_exc())
+      alert["Subject"], "DB connection" in alert.get_content()
+    exercise:
+      prompt: "Subject 접두를 '[CRITICAL]'로 바꾸고 traceback이 본문에 포함되는지 확인하세요."
+      starterCode: |-
+        import traceback
+        from email.message import EmailMessage
+
+        def buildNotification(scriptName, exc, tb=None, toAddr="ops@example.com"):
+            msg = EmailMessage()
+            msg["From"] = "alerts@example.com"
+            msg["To"] = toAddr
+            msg["Subject"] = f"{___} {scriptName}"
+            msg.set_content(f"err: {exc}\ntb: {tb}", charset="utf-8")
+            return msg
+
+        try:
+            raise ValueError("x")
+        except Exception as exc:
+            alert = buildNotification("etl", exc, traceback.format_exc())
+        alert["Subject"].startswith("[CRITICAL]")
+      hints:
+        - "문자열 '[CRITICAL]'."
+    check:
+      noError: "f-string 안의 변수 정의."
+      resultCheck: "True 출력."
+
+  - id: step2_decorator
+    title: "2단계. notifyOnFailure 데코레이터"
+    structuredPrimary: true
+    subtitle: "한 줄 추가로 어디든 적용"
+    goal: "함수에 @notifyOnFailure를 붙이면 예외 발생 시 자동 알림."
+    why: "기존 스크립트 코드를 거의 안 건드리고 알림을 추가하는 방법입니다."
+    explanation: |-
+      notifyOnFailure(toAddr) 데코레이터 팩토리. 내부 wrapper가 try/except로 함수를 감싸고 예외 발생 시 buildNotification → sendMessage 흐름.
+    tips:
+      - "데코레이터에서 발생한 예외를 다시 raise해서 호출자도 실패를 인지하도록 하는 게 안전."
+    snippet: |-
+      import traceback
+      from email.message import EmailMessage
+      from functools import wraps
+
+      def buildNotification(scriptName, exc, tb, toAddr):
+          msg = EmailMessage()
+          msg["From"] = "alerts@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = f"[FAIL] {scriptName}"
+          msg.set_content(f"{type(exc).__name__}: {exc}\n\n{tb}", charset="utf-8")
+          return msg
+
+      def notifyOnFailure(toAddr, dryRun=True):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  try:
+                      return func(*args, **kwargs)
+                  except Exception as exc:
+                      alert = buildNotification(func.__name__, exc, traceback.format_exc(), toAddr)
+                      if not dryRun:
+                          pass
+                      raise
+              return wrapper
+          return decorator
+
+      collectedMessages = []
+      def captureMessage(msg):
+          collectedMessages.append(msg)
+
+      @notifyOnFailure("ops@example.com", dryRun=True)
+      def riskyJob(value):
+          if value < 0:
+              raise ValueError("negative input")
+          return value * 2
+
+      try:
+          riskyJob(-1)
+      except ValueError:
+          pass
+
+      "decorator ready"
+    exercise:
+      prompt: "데코레이터 인자 toAddr를 'devops@example.com'으로 바꾸세요."
+      starterCode: |-
+        from functools import wraps
+
+        def notifyOnFailure(toAddr, dryRun=True):
+            def decorator(func):
+                @wraps(func)
+                def wrapper(*args, **kwargs):
+                    try:
+                        return func(*args, **kwargs)
+                    except Exception:
+                        raise
+                return wrapper
+            return decorator
+
+        @notifyOnFailure(___, dryRun=True)
+        def job():
+            return 1
+
+        job()
+      hints:
+        - "문자열 'devops@example.com'."
+    check:
+      noError: "toAddr는 문자열."
+      resultCheck: "출력 1."
+
+  - id: validation
+    title: "3단계. 검증 루프 — 예외 시 알림 메시지 검증"
+    structuredPrimary: true
+    subtitle: "알림 호출 + 본문 내용 단위 assert"
+    goal: "예외가 발생했을 때 buildNotification이 호출되고 본문에 예외 정보가 들어가는지 검증한다."
+    why: "알림 누락은 운영 장애의 큰 원인입니다. 데코레이터가 알림을 정확히 호출하는지 단위 검증이 본 강의의 핵심."
+    explanation: |-
+      알림 함수를 모킹해서 호출 여부와 본문을 직접 확인. 외부 SMTP 의존 0.
+    tips:
+      - "테스트에서는 알림 함수를 callback으로 주입하면 호출을 쉽게 추적할 수 있습니다."
+    snippet: |-
+      import traceback
+      from email.message import EmailMessage
+      from functools import wraps
+
+      def buildNotification(scriptName, exc, tb, toAddr):
+          msg = EmailMessage()
+          msg["From"] = "alerts@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = f"[FAIL] {scriptName}"
+          msg.set_content(f"{type(exc).__name__}: {exc}\n{tb}", charset="utf-8")
+          return msg
+
+      collected = []
+      def captureMessage(msg):
+          collected.append(msg)
+
+      def notifyOnFailure(toAddr, onAlert=None):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  try:
+                      return func(*args, **kwargs)
+                  except Exception as exc:
+                      alert = buildNotification(func.__name__, exc, traceback.format_exc(), toAddr)
+                      if onAlert:
+                          onAlert(alert)
+                      raise
+              return wrapper
+          return decorator
+
+      @notifyOnFailure("ops@example.com", onAlert=captureMessage)
+      def job(value):
+          if value < 0:
+              raise ValueError("negative")
+          return value
+
+      try:
+          job(-5)
+      except ValueError:
+          pass
+
+      assert len(collected) == 1
+      assert collected[0]["Subject"] == "[FAIL] job"
+      assert "negative" in collected[0].get_content()
+      collected[0]["Subject"]
+    exercise:
+      prompt: "job(-10)에서 예외 메시지 'too negative'를 발생시키고 본문에 포함되는지 확인하세요."
+      starterCode: |-
+        import traceback
+        from email.message import EmailMessage
+        from functools import wraps
+
+        def buildNotification(scriptName, exc, tb, toAddr):
+            msg = EmailMessage()
+            msg["From"] = "alerts@example.com"
+            msg["To"] = toAddr
+            msg["Subject"] = f"[FAIL] {scriptName}"
+            msg.set_content(f"{exc}\n{tb}", charset="utf-8")
+            return msg
+
+        collected = []
+        def captureMessage(msg):
+            collected.append(msg)
+
+        def notifyOnFailure(toAddr, onAlert=None):
+            def decorator(func):
+                @wraps(func)
+                def wrapper(*args, **kwargs):
+                    try:
+                        return func(*args, **kwargs)
+                    except Exception as exc:
+                        alert = buildNotification(func.__name__, exc, traceback.format_exc(), toAddr)
+                        if onAlert:
+                            onAlert(alert)
+                        raise
+                return wrapper
+            return decorator
+
+        @notifyOnFailure("ops@example.com", onAlert=captureMessage)
+        def job(value):
+            raise ValueError(___)
+
+        try:
+            job(-10)
+        except ValueError:
+            pass
+
+        "too negative" in collected[0].get_content()
+      hints:
+        - "문자열 'too negative'."
+    check:
+      noError: "raise는 클래스 인스턴스."
+      resultCheck: "True 출력."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "야간 배치 알림 래퍼"
+    goal: "기존 함수에 알림 데코레이터를 적용해 예외 시 자동 알림 흐름을 완성한다."
+    why: "본 강의 패턴을 실무 스크립트에 한 줄 추가만으로 적용."
+    explanation: |-
+      미션: 야간 ETL 함수를 데코레이터로 감싸고 예외 시 알림 메시지가 만들어지는지 검증.
+    tips:
+      - "실 발송은 sendMessage(alert, dryRun=False)로 전환만 하면 됩니다."
+    snippet: |-
+      import traceback
+      from email.message import EmailMessage
+      from functools import wraps
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "@notifyOnFailure로 ETL 함수 감싸고 예외 시 알림 호출 검증."
+    check:
+      noError: "데코레이터 적용."
+      resultCheck: "알림 본문에 예외 메시지 포함."
+    blocks:
+      - type: expansion
+        title: "미션: 야간 ETL 알림"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import traceback
+              from email.message import EmailMessage
+              from functools import wraps
+
+              def buildNotification(scriptName, exc, tb, toAddr):
+                  msg = EmailMessage()
+                  msg["From"] = "alerts@example.com"
+                  msg["To"] = toAddr
+                  msg["Subject"] = f"[FAIL] {scriptName}"
+                  msg.set_content(f"{type(exc).__name__}: {exc}\n\n{tb}", charset="utf-8")
+                  return msg
+
+              alertsLog = []
+              def captureAlert(msg):
+                  alertsLog.append(msg)
+
+              def notifyOnFailure(toAddr, onAlert=None):
+                  def decorator(func):
+                      @wraps(func)
+                      def wrapper(*args, **kwargs):
+                          try:
+                              return func(*args, **kwargs)
+                          except Exception as exc:
+                              alert = buildNotification(func.__name__, exc, traceback.format_exc(), toAddr)
+                              if onAlert:
+                                  onAlert(alert)
+                              raise
+                      return wrapper
+                  return decorator
+
+              @notifyOnFailure("devops@example.com", onAlert=captureAlert)
+              def nightlyEtl(source):
+                  if source == "broken":
+                      raise ConnectionError("DB unreachable")
+                  return "ok"
+
+              assert nightlyEtl("good") == "ok"
+              try:
+                  nightlyEtl("broken")
+              except ConnectionError:
+                  pass
+
+              assert len(alertsLog) == 1
+              assert "DB unreachable" in alertsLog[0].get_content()
+              assert "[FAIL] nightlyEtl" == alertsLog[0]["Subject"]
+              alertsLog[0]["Subject"]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "성공 시에도 요약 알림 (매일 정상 동작 확인)"
+          - "Slack 웹훅과 동시 전송 (SMTP + HTTP POST)"
+          - "심각도별 다른 수신자 (Critical → 팀장, Warning → 팀)"
+          - "재시도 3회 실패 시에만 알림 (false positive 줄이기)"
+          - "10강 결합 — 주간 발송기 결과에 본 알림 패턴 결합"

@@ -1,0 +1,329 @@
+meta:
+  id: word_09
+  title: docxtpl 템플릿 엔진
+  order: 9
+  category: word
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages:
+    - python-docx
+    - docx
+    - docxtpl
+  tags:
+    - docxtpl
+    - Jinja
+    - for-loop
+    - 영업 제안서
+  outcomes:
+    - automation.word.template
+  prerequisites:
+    - automation.word.edit
+  estimatedMinutes: 60
+  seo:
+    title: "docxtpl로 Jinja 템플릿 채우기 — 영업 제안서 for-loop"
+    description: "docxtpl로 {{ }}, {% for %} 같은 Jinja 문법을 docx 안에 직접 사용. 견적 항목 for-loop이 압권."
+    keywords:
+      - docxtpl
+      - Jinja docx
+      - 영업 제안서 자동화
+
+intro:
+  direction: "docxtpl로 Jinja2 문법을 docx 안에 직접 사용한다. {{ }} 단일 치환부터 {% for %} 루프까지."
+  benefits:
+    - "영업 박과장의 제안서 5건 × 30분이 5건 × 10초로 줄어든다."
+    - "견적 항목 표를 Jinja for-loop으로 동적 생성 — python-docx로는 복잡한 작업."
+    - "07강 단순 치환 한계(같은 단락 안 두 run 분리 자리표시자)도 docxtpl이 자동 처리."
+  diagram:
+    steps:
+      - label: "1. docxtpl 양식"
+        detail: "Word에서 {{ name }}, {% for %} 같은 Jinja 문법을 그대로 적기."
+      - label: "2. render(context)"
+        detail: "DocxTemplate(path).render(context dict)로 채움."
+      - label: "3. save"
+        detail: "tpl.save(outPath)로 결과 저장."
+    runtime:
+      - label: "uv add docxtpl"
+        detail: "LGPL 라이선스."
+      - label: "검증"
+        detail: "결과 docx에 자리표시자 잔여 없고 데이터가 정확히 반영됐는지 assert."
+
+sections:
+  - id: step1_simple
+    title: "1단계. 단순 치환"
+    structuredPrimary: true
+    subtitle: "DocxTemplate.render(context)"
+    goal: "{{ name }} 단순 자리표시자 양식을 docxtpl로 채운다."
+    why: "docxtpl의 가장 단순한 동작입니다. 같은 자리표시자가 여러 run으로 쪼개져 있어도 안전히 처리."
+    explanation: |-
+      Word(또는 python-docx)로 양식을 만들고 {{ name }} 자리표시자 삽입. DocxTemplate(path).render({'name': '김대리'}) 후 save.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docxtpl import DocxTemplate
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      tplPath = base / "tpl.docx"
+
+      seed = Document()
+      seed.add_paragraph("계약자: {{ name }}")
+      seed.add_paragraph("직급: {{ role }}")
+      seed.save(tplPath)
+
+      tpl = DocxTemplate(str(tplPath))
+      tpl.render({"name": "김대리", "role": "대리"})
+      outPath = base / "filled.docx"
+      tpl.save(outPath)
+
+      [p.text for p in Document(outPath).paragraphs]
+    exercise:
+      prompt: "context를 박과장/과장으로 바꾸고 결과 단락에 '박과장'이 들어가는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docxtpl import DocxTemplate
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        tplPath = base / "tpl.docx"
+
+        seed = Document()
+        seed.add_paragraph("계약자: {{ name }}")
+        seed.add_paragraph("직급: {{ role }}")
+        seed.save(tplPath)
+
+        tpl = DocxTemplate(str(tplPath))
+        tpl.render({"name": ___, "role": ___})
+        outPath = base / "f.docx"
+        tpl.save(outPath)
+        "박과장" in "\n".join(p.text for p in Document(outPath).paragraphs)
+      hints:
+        - "두 문자열: '박과장', '과장'."
+    check:
+      noError: "render 인자는 dict."
+      resultCheck: "True 출력."
+
+  - id: step2_for_loop
+    title: "2단계. {% for %} 루프"
+    structuredPrimary: true
+    subtitle: "Jinja for-loop으로 견적 항목"
+    goal: "items 리스트를 for-loop으로 단락마다 출력한다."
+    why: "영업 제안서의 견적 항목은 N개입니다. 단순 자리표시자로는 표현 불가. Jinja for-loop이 핵심."
+    explanation: |-
+      양식에 {% for item in items %}{{ item.name }}: {{ item.price }}{% endfor %} 패턴. context의 items 리스트가 자동 반복.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docxtpl import DocxTemplate
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      tplPath = base / "tpl.docx"
+
+      seed = Document()
+      seed.add_paragraph("견적서")
+      seed.add_paragraph("{% for item in items %}")
+      seed.add_paragraph("{{ item.name }}: {{ item.price }}원")
+      seed.add_paragraph("{% endfor %}")
+      seed.save(tplPath)
+
+      tpl = DocxTemplate(str(tplPath))
+      tpl.render({"items": [
+          {"name": "구독", "price": "50,000"},
+          {"name": "온보딩", "price": "200,000"},
+          {"name": "지원", "price": "30,000"},
+      ]})
+      outPath = base / "filled.docx"
+      tpl.save(outPath)
+
+      [p.text for p in Document(outPath).paragraphs]
+    exercise:
+      prompt: "items에 하나(Service A, 100,000)를 더 추가해 결과 단락 수가 늘어나는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docxtpl import DocxTemplate
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        tplPath = base / "tpl.docx"
+
+        seed = Document()
+        seed.add_paragraph("{% for item in items %}")
+        seed.add_paragraph("{{ item.name }}: {{ item.price }}원")
+        seed.add_paragraph("{% endfor %}")
+        seed.save(tplPath)
+
+        tpl = DocxTemplate(str(tplPath))
+        tpl.render({"items": [
+            {"name": "구독", "price": "50,000"},
+            {"name": "온보딩", "price": "200,000"},
+            ___,
+        ]})
+        outPath = base / "f.docx"
+        tpl.save(outPath)
+        "Service A" in "\n".join(p.text for p in Document(outPath).paragraphs)
+      hints:
+        - "dict {'name': 'Service A', 'price': '100,000'}."
+    check:
+      noError: "items 리스트 원소는 dict."
+      resultCheck: "True 출력."
+
+  - id: validation
+    title: "3단계. 검증 — 영업 제안서 자동 생성"
+    structuredPrimary: true
+    subtitle: "단순 + for-loop 결합"
+    goal: "고객사·담당자·견적 항목이 모두 들어간 제안서가 정확히 만들어지는지 검증."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docxtpl import DocxTemplate
+
+      def buildProposalTemplate(path):
+          seed = Document()
+          seed.add_heading("영업 제안서", level=0)
+          seed.add_paragraph("고객사: {{ customer }}")
+          seed.add_paragraph("담당자: {{ contact }}")
+          seed.add_paragraph("견적 항목:")
+          seed.add_paragraph("{% for item in items %}")
+          seed.add_paragraph("- {{ item.name }}: {{ item.price }}원")
+          seed.add_paragraph("{% endfor %}")
+          seed.add_paragraph("합계: {{ total }}원")
+          seed.save(path)
+
+      def renderProposal(templatePath, context, outPath):
+          tpl = DocxTemplate(str(templatePath))
+          tpl.render(context)
+          tpl.save(outPath)
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      tplPath = base / "proposal_tpl.docx"
+      buildProposalTemplate(tplPath)
+
+      outPath = base / "proposal.docx"
+      renderProposal(tplPath, {
+          "customer": "Acme Corp",
+          "contact": "홍대표",
+          "items": [
+              {"name": "구독", "price": "50,000"},
+              {"name": "온보딩", "price": "200,000"},
+          ],
+          "total": "250,000",
+      }, outPath)
+
+      combined = "\n".join(p.text for p in Document(outPath).paragraphs)
+      assert "Acme Corp" in combined
+      assert "홍대표" in combined
+      assert "구독" in combined and "온보딩" in combined
+      assert "250,000" in combined
+      assert "{{" not in combined
+      combined.strip().splitlines()[:5]
+    exercise:
+      prompt: "context에 'discount' 항목 추가하고 양식·검증에서 사용하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docxtpl import DocxTemplate
+
+        def buildProposalTemplate(path):
+            seed = Document()
+            seed.add_paragraph("고객: {{ customer }}")
+            seed.add_paragraph("할인: {{ discount }}")
+            seed.save(path)
+
+        def renderProposal(templatePath, context, outPath):
+            tpl = DocxTemplate(str(templatePath))
+            tpl.render(context)
+            tpl.save(outPath)
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        tplPath = base / "t.docx"
+        buildProposalTemplate(tplPath)
+        outPath = base / "f.docx"
+        renderProposal(tplPath, {"customer": "Acme", "discount": ___}, outPath)
+        combined = "\n".join(p.text for p in Document(outPath).paragraphs)
+        "10%" in combined
+      hints:
+        - "문자열 '10%'."
+    check:
+      noError: "render context dict."
+      resultCheck: "True 출력."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "다수 제안서 일괄 생성"
+    goal: "여러 고객사용 제안서를 한 번에 만든다."
+    snippet: |-
+      from docxtpl import DocxTemplate
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: bulkRenderProposals(templatePath, customers, outFolder) -> list[Path]"
+    check:
+      noError: "함수 정의."
+      resultCheck: "고객사별 docx 생성."
+    blocks:
+      - type: expansion
+        title: "미션: 다수 제안서"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docxtpl import DocxTemplate
+
+              def bulkRenderProposals(templatePath, customers, outFolder):
+                  Path(outFolder).mkdir(exist_ok=True)
+                  outputs = []
+                  for customer in customers:
+                      tpl = DocxTemplate(str(templatePath))
+                      tpl.render(customer)
+                      outPath = Path(outFolder) / f"{customer['customer']}.docx"
+                      tpl.save(outPath)
+                      outputs.append(outPath)
+                  return outputs
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              tplPath = base / "tpl.docx"
+
+              seed = Document()
+              seed.add_paragraph("고객: {{ customer }}")
+              seed.add_paragraph("{% for item in items %}{{ item.name }}: {{ item.price }}원{% endfor %}")
+              seed.save(tplPath)
+
+              customers = [
+                  {"customer": "AcmeCorp", "items": [{"name": "Sub", "price": "50,000"}]},
+                  {"customer": "BetaInc", "items": [{"name": "Sub", "price": "50,000"}, {"name": "Sup", "price": "30,000"}]},
+              ]
+
+              outputs = bulkRenderProposals(tplPath, customers, base / "proposals")
+              assert len(outputs) == 2
+              for path in outputs:
+                  combined = "\n".join(p.text for p in Document(path).paragraphs)
+                  assert "{{" not in combined
+              [p.name for p in outputs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "{% if %} 조건부 단락 (특정 고객에게만 보이는 안내)"
+          - "필터 (date 포맷, 천 단위 구분자)"
+          - "표 행 동적 추가 ({% tr for %})"
+          - "이미지 동적 삽입 ({{ logo | image }})"
+          - "08강 mailMerge와 결합 — docxtpl 기반 N장 생성"

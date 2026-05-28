@@ -1,0 +1,702 @@
+meta:
+  id: pdf_06
+  title: 한글 폰트와 스타일
+  order: 6
+  category: pdf
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+    - reportlab
+    - pypdf
+  tags:
+    - 한글폰트
+    - TTFont
+    - Paragraph
+    - getSampleStyleSheet
+  outcomes:
+    - automation.pdf.create
+  prerequisites:
+    - automation.pdf.create
+  estimatedMinutes: 55
+  seo:
+    title: "reportlab 한글 PDF — TTFont 등록과 Paragraph 스타일"
+    description: "한글이 □로 깨지는 PDF를 시스템 폰트 등록으로 해결한다. OS별 폴백 헬퍼와 Paragraph·getSampleStyleSheet로 단락 스타일까지 다룬다."
+    keywords:
+      - reportlab 한글
+      - TTFont 등록
+      - Paragraph 스타일
+      - 한글 PDF 폰트 폴백
+
+intro:
+  direction: "reportlab 기본 폰트는 한글이 □로 깨진다. 시스템에 설치된 한글 폰트를 OS별로 찾아 등록하는 헬퍼를 만들고, Paragraph로 단락 스타일까지 다룬다."
+  benefits:
+    - "Windows·macOS·Linux 어디서든 같은 함수 호출로 한글 PDF가 나온다."
+    - "한 번 만든 registerKoreanFont 헬퍼를 06·07·08·10에서 모두 재사용한다."
+    - "Paragraph와 getSampleStyleSheet로 줄바꿈 자동 처리와 단락 스타일을 함께 익힌다."
+  diagram:
+    steps:
+      - label: "1. registerKoreanFont 헬퍼"
+        detail: "sys.platform 분기로 시스템 한글 폰트를 찾고 TTFont로 등록한다."
+      - label: "2. drawString으로 한글"
+        detail: "등록한 폰트로 setFont 후 한글 본문 그리기."
+      - label: "3. Paragraph + Style"
+        detail: "긴 문장의 자동 줄바꿈은 Paragraph가, 정렬·색·여백은 ParagraphStyle이 처리."
+      - label: "4. getSampleStyleSheet 재사용"
+        detail: "기본 스타일 라이브러리에 한글 폰트만 갈아끼워 빠르게 보고서 표지를 만든다."
+    runtime:
+      - label: "시스템 폰트 의존"
+        detail: "Windows 맑은 고딕, macOS AppleSDGothicNeo, Linux NanumGothic 중 첫 발견을 사용. 저장소에 .ttf 미동봉."
+      - label: "재오픈 검증"
+        detail: "PdfReader로 다시 열어 한글 본문이 깨지지 않고 추출되는지 assert."
+
+sections:
+  - id: step1_register
+    title: "1단계. registerKoreanFont 헬퍼"
+    structuredPrimary: true
+    subtitle: "sys.platform 분기 + pdfmetrics.registerFont"
+    goal: "OS별로 시스템 한글 폰트를 찾아 'Korean' 이름으로 등록하는 헬퍼를 만든다."
+    why: "한 곳에서 한글 폰트 문제를 끝내야 후속 강의들이 깔끔합니다. 헬퍼 하나가 트랙 절반의 폰트 문제를 해소합니다."
+    explanation: |-
+      sys.platform이 'win32'면 맑은 고딕, 'darwin'이면 AppleSDGothicNeo, 'linux'면 NanumGothic 후보 경로를 순회합니다. 첫 발견된 파일을 TTFont로 등록하고 이름 'Korean'을 돌려줍니다. 모두 못 찾으면 명확한 FileNotFoundError를 발생시킵니다.
+    tips:
+      - "Linux에 폰트가 없으면 apt install fonts-nanum 명령으로 설치. 학습자가 메시지에서 정확한 해결책을 볼 수 있어야 합니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+
+      def registerKoreanFont():
+          candidates = {
+              "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+              "darwin": [
+                  "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+                  "/Library/Fonts/AppleSDGothicNeo.ttc",
+              ],
+              "linux": [
+                  "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+                  "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+              ],
+          }
+          for path in candidates.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          raise FileNotFoundError(
+              "한글 폰트를 찾지 못했습니다. Linux는 'apt install fonts-nanum', "
+              "Windows·macOS는 기본 폰트 사용."
+          )
+
+      try:
+          fontName = registerKoreanFont()
+      except FileNotFoundError as exc:
+          fontName = None
+      fontName
+    exercise:
+      prompt: "candidates 딕셔너리에 'linux' 항목에 한 경로를 더 추가하세요. 예: '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc'."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+
+        def registerKoreanFont():
+            candidates = {
+                "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": [
+                    "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+                    ___,
+                ],
+            }
+            for path in candidates.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            raise FileNotFoundError("font missing")
+
+        try:
+            fontName = registerKoreanFont()
+        except FileNotFoundError:
+            fontName = None
+        fontName
+      hints:
+        - "문자열 경로 한 줄."
+    check:
+      noError: "TTFont 등록 시 두 번째 인자는 파일 경로 문자열."
+      resultCheck: "fontName이 'Korean' 또는 None."
+
+  - id: step2_korean_text
+    title: "2단계. drawString으로 한글 본문"
+    structuredPrimary: true
+    subtitle: "setFont('Korean', size) + drawString"
+    goal: "등록한 한글 폰트로 한글 본문이 들어간 PDF를 만든다."
+    why: "헬퍼만 만들고 끝나면 의미가 없습니다. 실제 한글 본문이 PdfReader로 추출될 때 깨지지 않는지 확인하는 게 중요합니다."
+    explanation: |-
+      registerKoreanFont() 호출 후 setFont('Korean', 14)을 부르면 그 시점부터 drawString에 한글이 깨지지 않고 그려집니다.
+    tips:
+      - "폰트가 등록되지 않은 상태에서 drawString에 한글을 넘기면 PDF는 만들어지지만 본문이 □로 보입니다. PdfReader.extract_text 결과도 깨질 수 있습니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.pdfgen.canvas import Canvas
+
+      def registerKoreanFont():
+          candidates = {
+              "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in candidates.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return None
+
+      fontName = registerKoreanFont() or "Helvetica"
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "ko.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.setFont(fontName, 14)
+      canvas.drawString(72, 720, "월간 보고서")
+      canvas.drawString(72, 700, "작성자: 김대리")
+      canvas.showPage()
+      canvas.save()
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "월간" in body and "작성자" in body
+    exercise:
+      prompt: "한 줄을 더 그려 '부서: 회계팀' 본문을 추가하고 추출 결과에 '회계'가 포함되는지 확인하세요."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfgen.canvas import Canvas
+
+        def registerKoreanFont():
+            candidates = {
+                "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in candidates.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return None
+
+        fontName = registerKoreanFont() or "Helvetica"
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "ko.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.setFont(fontName, 14)
+        canvas.drawString(72, 720, "월간 보고서")
+        canvas.drawString(72, 700, "작성자: 김대리")
+        canvas.drawString(72, 680, ___)
+        canvas.showPage()
+        canvas.save()
+        "회계" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "한글 문자열 '부서: 회계팀'."
+    check:
+      noError: "drawString 인자는 문자열."
+      resultCheck: "True 출력 (시스템 폰트 있을 때)."
+
+  - id: step3_paragraph
+    title: "3단계. Paragraph와 ParagraphStyle"
+    structuredPrimary: true
+    subtitle: "긴 문장 자동 줄바꿈"
+    goal: "긴 한글 문장을 Paragraph로 그려 페이지 폭에 맞춰 자동 줄바꿈한다."
+    why: "drawString은 줄바꿈을 직접 계산해야 합니다. Paragraph는 폭만 정해주면 자동으로 줄바꿈하므로 본문 단락 처리에 적합합니다."
+    explanation: |-
+      Paragraph(text, style)을 만들고 wrapOn으로 폭을 정한 뒤 drawOn으로 그립니다. ParagraphStyle은 이름·폰트·크기·줄간격·정렬을 한 객체에 묶습니다.
+    tips:
+      - "Paragraph는 SimpleDocTemplate.build의 flowable로도 쓸 수 있습니다. 07강에서 활용합니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.styles import ParagraphStyle
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.pdfgen.canvas import Canvas
+      from reportlab.platypus import Paragraph
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      fontName = registerKoreanFont()
+
+      style = ParagraphStyle(
+          name="ko",
+          fontName=fontName,
+          fontSize=12,
+          leading=18,
+          alignment=0,
+      )
+      longText = (
+          "Codaro의 PDF 자동화 트랙은 받은 PDF에서 텍스트와 표를 뽑고, "
+          "새 PDF를 만들고, 묶고 자르고 잠그는 흐름을 로컬 Python 한 사이클로 끝냅니다."
+      )
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "para.pdf"
+      canvas = Canvas(str(pdfPath))
+      paragraph = Paragraph(longText, style)
+      width, height = paragraph.wrapOn(canvas, 400, 200)
+      paragraph.drawOn(canvas, 72, 720 - height)
+      canvas.showPage()
+      canvas.save()
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "PDF 자동화" in body
+    exercise:
+      prompt: "leading(줄간격) 값을 24로 늘리고 본문이 여전히 추출되는지 확인하세요."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfgen.canvas import Canvas
+        from reportlab.platypus import Paragraph
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        fontName = registerKoreanFont()
+        style = ParagraphStyle(name="ko2", fontName=fontName, fontSize=12, leading=___, alignment=0)
+        longText = "Codaro PDF 자동화 트랙 설명입니다."
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "p.pdf"
+        canvas = Canvas(str(pdfPath))
+        paragraph = Paragraph(longText, style)
+        width, height = paragraph.wrapOn(canvas, 400, 200)
+        paragraph.drawOn(canvas, 72, 720 - height)
+        canvas.showPage()
+        canvas.save()
+        "Codaro" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "정수 24."
+    check:
+      noError: "leading은 숫자."
+      resultCheck: "True 출력."
+
+  - id: step4_sample_stylesheet
+    title: "4단계. getSampleStyleSheet로 표지 만들기"
+    structuredPrimary: true
+    subtitle: "기본 스타일 갈아끼우기"
+    goal: "표지 PDF를 Title·Heading1·BodyText 스타일로 그린다."
+    why: "처음부터 ParagraphStyle을 일일이 만드는 건 비효율적입니다. 기본 스타일 라이브러리를 가져와 한글 폰트로 갈아끼우는 게 가장 빠릅니다."
+    explanation: |-
+      getSampleStyleSheet()는 Title, Heading1, BodyText 같은 기본 스타일을 반환합니다. style.fontName = 'Korean'으로 한 줄에 한글 폰트로 바꿉니다.
+    tips:
+      - "기본 스타일은 영어 권장 크기·줄간격으로 설정됩니다. 한글 표지는 조금 키우는 게 어울립니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      fontName = registerKoreanFont()
+      styles = getSampleStyleSheet()
+      for style in styles.byName.values():
+          style.fontName = fontName
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "cover.pdf"
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      flow = [
+          Paragraph("월간 보고서", styles["Title"]),
+          Spacer(1, 24),
+          Paragraph("2026년 5월", styles["Heading1"]),
+          Spacer(1, 12),
+          Paragraph("작성자: 회계팀 김대리", styles["BodyText"]),
+      ]
+      doc.build(flow)
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "월간 보고서" in body and "김대리" in body
+    exercise:
+      prompt: "부서명 'Heading2' 스타일로 한 줄 더 추가하세요."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        fontName = registerKoreanFont()
+        styles = getSampleStyleSheet()
+        for style in styles.byName.values():
+            style.fontName = fontName
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "cover.pdf"
+        doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+        flow = [
+            Paragraph("월간 보고서", styles["Title"]),
+            Paragraph("재무회계실", styles[___]),
+            Paragraph("작성자: 김대리", styles["BodyText"]),
+        ]
+        doc.build(flow)
+        "재무회계실" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "스타일 이름 'Heading2'."
+    check:
+      noError: "styles 인덱싱은 정확한 이름."
+      resultCheck: "True 출력."
+
+  - id: validation
+    title: "5단계. 검증 루프 — 한글 본문 보존"
+    structuredPrimary: true
+    subtitle: "buildKoreanCover + PdfReader 비교"
+    goal: "한글 표지 PDF를 만든 뒤 본문 한글이 추출에서 깨지지 않는지 단일 assert로 검증한다."
+    why: "한글 PDF의 핵심 회귀는 본문이 깨지는 것입니다. assert 한 묶음이 폰트 등록 누락·깨진 폰트 사용을 자동으로 잡습니다."
+    explanation: |-
+      buildKoreanCover(path, title, author)이 표지 한 페이지를 만들고, 결과를 PdfReader로 다시 열어 title·author 두 단어가 모두 포함되는지 확인합니다.
+    tips:
+      - "한글 폰트가 시스템에 없는 환경(예: CI)에서는 'Helvetica'로 폴백되어 한글이 깨질 수 있습니다. 검증에서는 영문 문자열을 같이 그려두는 게 안전합니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      def buildKoreanCover(path, title, author):
+          fontName = registerKoreanFont()
+          styles = getSampleStyleSheet()
+          for style in styles.byName.values():
+              style.fontName = fontName
+          doc = SimpleDocTemplate(str(path), pagesize=A4)
+          doc.build([
+              Paragraph(title, styles["Title"]),
+              Paragraph(f"author: {author}", styles["BodyText"]),
+          ])
+
+      vault = TemporaryDirectory()
+      pdfPath = Path(vault.name) / "verify.pdf"
+      buildKoreanCover(pdfPath, "월간 보고서", "Kim")
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      assert "Kim" in body
+      assert "author" in body
+      body
+    exercise:
+      prompt: "buildKoreanCover에 'department' 영문 키도 본문에 그려, 검증에 추가하세요."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.platypus import Paragraph, SimpleDocTemplate
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        def buildKoreanCover(path, title, author, department):
+            fontName = registerKoreanFont()
+            styles = getSampleStyleSheet()
+            for style in styles.byName.values():
+                style.fontName = fontName
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            doc.build([
+                Paragraph(title, styles["Title"]),
+                Paragraph(f"author: {author}", styles["BodyText"]),
+                Paragraph(f"department: {department}", styles["BodyText"]),
+            ])
+
+        vault = TemporaryDirectory()
+        pdfPath = Path(vault.name) / "verify.pdf"
+        buildKoreanCover(pdfPath, "월간 보고서", "Kim", ___)
+        body = PdfReader(pdfPath).pages[0].extract_text() or ""
+        assert "department" in body
+        body
+      hints:
+        - "영문 문자열 'finance' 같은 단어."
+    check:
+      noError: "함수 인자는 4개."
+      resultCheck: "본문 문자열이 출력되어야 합니다."
+
+  - id: misconception
+    title: "6단계. 흔한 오개념 차단"
+    subtitle: "폰트 미등록 = PDF 만들기는 됨, 추출은 깨짐"
+    goal: "한글이 깨졌을 때 사용자가 잘못된 곳을 보지 않게 한다."
+    why: "한글 PDF가 시각적으로 □로 보이는 게 가장 흔한 사고입니다. PDF 자체가 망가진 게 아니라 폰트 등록을 안 한 것뿐입니다."
+    explanation: |-
+      등록 없이 setFont('Helvetica')로 한글 drawString을 호출하면 PDF는 생성되지만 한글이 ASCII 폴백 또는 □로 표시됩니다. PdfReader.extract_text 결과에도 깨진 문자가 나옵니다. 해결은 단 한 줄, registerKoreanFont() 호출입니다.
+    tips:
+      - "PDF가 안 깨진 것 같은데 추출이 깨지면 폰트 임베드는 됐지만 텍스트 매핑(ToUnicode)이 누락된 경우입니다. 06강 헬퍼는 임베드와 매핑을 모두 처리합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "broken.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.setFont("Helvetica", 14)
+      canvas.drawString(72, 720, "Hello — ASCII OK")
+      canvas.showPage()
+      canvas.save()
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "ASCII OK" in body
+    exercise:
+      prompt: "본문을 'ASCII fine'으로 바꾸고 추출에 그대로 포함되는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "broken.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.setFont("Helvetica", 14)
+        canvas.drawString(72, 720, ___)
+        canvas.showPage()
+        canvas.save()
+        "ASCII fine" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "영문 문자열 'ASCII fine'."
+    check:
+      noError: "drawString 인자는 문자열."
+      resultCheck: "True 출력."
+
+  - id: practice
+    title: "실습 — 종합 미션 2개"
+    subtitle: "한글 표지 + 본문 단락"
+    goal: "헬퍼 + Paragraph 패턴으로 실용 PDF 두 개를 직접 만든다."
+    why: "헬퍼를 한 번 만들고 끝나는 게 아니라, 직접 PDF에 호출해봐야 후속 강의에서 자연스럽게 재사용됩니다."
+    explanation: |-
+      미션1은 회사 표지 PDF(회사명·부서·날짜), 미션2는 긴 본문 단락(자동 줄바꿈)이 들어간 보고서 본문 PDF입니다.
+    tips:
+      - "변수 prefix: cover*(미션1), body*(미션2)."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+    exercise:
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "미션1: makeCompanyCover(path, company, dept, date) -> Path"
+        - "미션2: makeLongBody(path, body) -> Path"
+    check:
+      noError: "헬퍼 호출과 함수 정의가 일관되어야 합니다."
+      resultCheck: "두 결과 모두 PdfReader로 본문 키워드가 검출되어야 합니다."
+    blocks:
+      - type: tip
+        content: "registerKoreanFont는 같은 프로세스에서 여러 번 호출해도 안전합니다. 중복 등록은 reportlab이 알아서 처리합니다."
+      - type: expansion
+        title: "미션1: 회사 표지 PDF"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import sys
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.pdfbase import pdfmetrics
+              from reportlab.pdfbase.ttfonts import TTFont
+              from reportlab.platypus import Paragraph, SimpleDocTemplate
+
+              def registerCover():
+                  paths = {
+                      "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                      "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                      "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+                  }
+                  for path in paths.get(sys.platform, []):
+                      if Path(path).exists():
+                          pdfmetrics.registerFont(TTFont("Korean", path))
+                          return "Korean"
+                  return "Helvetica"
+
+              def makeCompanyCover(path, company, dept, date):
+                  fontName = registerCover()
+                  styles = getSampleStyleSheet()
+                  for style in styles.byName.values():
+                      style.fontName = fontName
+                  doc = SimpleDocTemplate(str(path), pagesize=A4)
+                  doc.build([
+                      Paragraph(company, styles["Title"]),
+                      Paragraph(f"dept: {dept}", styles["Heading2"]),
+                      Paragraph(f"date: {date}", styles["BodyText"]),
+                  ])
+                  return Path(path)
+
+              coverDir = TemporaryDirectory()
+              coverPath = Path(coverDir.name) / "cover.pdf"
+              makeCompanyCover(coverPath, "Codaro", "finance", "2026-05-28")
+              body = PdfReader(coverPath).pages[0].extract_text() or ""
+              assert "Codaro" in body and "finance" in body and "2026-05-28" in body
+              body.strip().splitlines()
+      - type: expansion
+        title: "미션2: 긴 본문 단락 PDF"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import sys
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.pdfbase import pdfmetrics
+              from reportlab.pdfbase.ttfonts import TTFont
+              from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+              def registerBody():
+                  paths = {
+                      "win32": [r"C:\Windows\Fonts\malgun.ttf"],
+                      "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                      "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+                  }
+                  for path in paths.get(sys.platform, []):
+                      if Path(path).exists():
+                          pdfmetrics.registerFont(TTFont("Korean", path))
+                          return "Korean"
+                  return "Helvetica"
+
+              def makeLongBody(path, body):
+                  fontName = registerBody()
+                  styles = getSampleStyleSheet()
+                  for style in styles.byName.values():
+                      style.fontName = fontName
+                  doc = SimpleDocTemplate(str(path), pagesize=A4)
+                  doc.build([
+                      Paragraph("body section", styles["Heading1"]),
+                      Spacer(1, 12),
+                      Paragraph(body, styles["BodyText"]),
+                  ])
+                  return Path(path)
+
+              bodyDir = TemporaryDirectory()
+              bodyPath = Path(bodyDir.name) / "body.pdf"
+              longText = (
+                  "Codaro PDF lesson covers reading, extracting, generating, and securing PDFs in a single local Python cycle."
+              )
+              makeLongBody(bodyPath, longText)
+              extracted = PdfReader(bodyPath).pages[0].extract_text() or ""
+              assert "Codaro" in extracted
+              extracted[:80]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          한글 폰트 헬퍼와 단락 스타일의 응용 아이디어입니다.
+      - type: list
+        style: bullet
+        items:
+          - "회사 양식의 색·여백·로고 위치를 BrandStyle 객체로 정의해 모든 보고서에 재사용"
+          - "헬퍼에 굵은 폰트(NanumGothicBold) 추가 등록"
+          - "다국어 PDF(영문 본문 + 한글 표지) 페이지별로 다른 폰트 적용"
+          - "표지 + 목차 + 본문 + 부록을 함수로 분리해 SimpleDocTemplate 다중 빌드"
+          - "Paragraph 스타일을 JSON 설정으로 외부화해 디자인 일관성 유지"

@@ -1,0 +1,295 @@
+meta:
+  id: word_02
+  title: 제목과 목록
+  order: 2
+  category: word
+  difficulty: ⭐
+  badge: 입문
+  packages:
+    - python-docx
+    - docx
+  tags:
+    - add_heading
+    - List Bullet
+    - List Number
+  outcomes:
+    - automation.word.paragraphs
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 35
+  seo:
+    title: "Word 제목과 목록 — add_heading + List Bullet/Number"
+    description: "보고서 목차 골격을 만든다. add_heading 레벨별 제목과 List Bullet/Number 스타일로 정렬된 목록."
+    keywords:
+      - python-docx add_heading
+      - List Bullet
+      - 목차 골격
+
+intro:
+  direction: "보고서 목차 골격을 코드로 만든다. add_heading 레벨 1-3과 List Bullet/Number 스타일이 한 문서에 결합되는 패턴."
+  benefits:
+    - "보고서 목차 자동 생성 — 헤더 + 본문 + 항목 구조를 한 함수 호출로."
+    - "List Bullet/Number 스타일이 docx 표준 스타일과 일관됨."
+    - "10강 회의록 자동 생성기의 목차 골격 패턴이 본 강의에서 정착."
+  diagram:
+    steps:
+      - label: "1. add_heading 레벨"
+        detail: "level 0(제목) ~ 9까지 헤더 단계 지정."
+      - label: "2. List Bullet/Number"
+        detail: "add_paragraph(text, style='List Bullet') 또는 'List Number'."
+      - label: "3. 목차 골격 함수"
+        detail: "딕셔너리 구조를 받아 헤더 + 항목 묶음 자동 생성."
+    runtime:
+      - label: "python-docx 기본 스타일"
+        detail: "List Bullet, List Number는 미리 정의된 스타일."
+      - label: "검증"
+        detail: "paragraphs의 style.name으로 목록 스타일 확인."
+
+sections:
+  - id: step1_heading
+    title: "1단계. add_heading 레벨"
+    structuredPrimary: true
+    subtitle: "doc.add_heading(text, level)"
+    goal: "제목·소제목·부제목 3 레벨의 헤더가 들어간 문서를 만든다."
+    why: "보고서 구조의 첫 단계입니다. 레벨이 일관되면 자동 목차 생성도 가능합니다."
+    explanation: |-
+      doc.add_heading(text, level=N)은 Heading N 스타일을 적용한 단락 추가. level=0은 Title, 1-9는 Heading 1-9.
+    tips:
+      - "Heading 0은 문서 한 번만 사용. level=1부터가 본문 구조의 시작."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "headings.docx"
+
+      doc = Document()
+      doc.add_heading("월간 보고서", level=0)
+      doc.add_heading("1. 매출 현황", level=1)
+      doc.add_heading("1.1. 지역별", level=2)
+      doc.add_paragraph("Seoul 1,200,000원")
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      [(p.text, p.style.name) for p in reopened.paragraphs]
+    exercise:
+      prompt: "Heading level 2 한 줄 더 추가('1.2. 분기별')하고 paragraphs가 5개인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "h.docx"
+
+        doc = Document()
+        doc.add_heading("월간 보고서", level=0)
+        doc.add_heading("1. 매출 현황", level=1)
+        doc.add_heading("1.1. 지역별", level=2)
+        doc.add_heading(___, level=2)
+        doc.add_paragraph("Seoul 1,200,000원")
+        doc.save(docxPath)
+
+        len(Document(docxPath).paragraphs)
+      hints:
+        - "문자열 '1.2. 분기별'."
+    check:
+      noError: "level은 정수."
+      resultCheck: "출력 5."
+
+  - id: step2_lists
+    title: "2단계. List Bullet과 List Number"
+    structuredPrimary: true
+    subtitle: "style='List Bullet' 또는 'List Number'"
+    goal: "글머리 기호 목록과 번호 매김 목록을 한 문서에 둔다."
+    why: "보고서의 행동 항목·결정사항은 거의 항상 목록입니다. 표준 스타일을 쓰면 docx 클라이언트에서 일관되게 보입니다."
+    explanation: |-
+      doc.add_paragraph(text, style='List Bullet')은 글머리 기호, style='List Number'는 번호 매김. 같은 스타일을 연속 사용하면 같은 목록으로 그룹화됩니다.
+    tips:
+      - "스타일명은 영어. 한글 번들에도 영어 스타일명이 그대로 동작합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "lists.docx"
+
+      doc = Document()
+      doc.add_heading("결정 사항", level=1)
+      doc.add_paragraph("긴급 이슈 우선", style="List Number")
+      doc.add_paragraph("정기 회의 주 1회", style="List Number")
+      doc.add_heading("액션 아이템", level=1)
+      doc.add_paragraph("김대리: 보고서 작성", style="List Bullet")
+      doc.add_paragraph("박과장: 검토", style="List Bullet")
+      doc.save(docxPath)
+
+      [(p.text, p.style.name) for p in Document(docxPath).paragraphs]
+    exercise:
+      prompt: "액션 아이템 목록에 한 줄('이주임: 발송') 더 추가하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "l.docx"
+
+        doc = Document()
+        doc.add_heading("결정", level=1)
+        doc.add_paragraph("a", style="List Number")
+        doc.add_heading("액션", level=1)
+        doc.add_paragraph("김대리", style="List Bullet")
+        doc.add_paragraph(___, style="List Bullet")
+        doc.save(docxPath)
+
+        len(Document(docxPath).paragraphs)
+      hints:
+        - "문자열 '이주임: 발송'."
+    check:
+      noError: "style 인자는 문자열."
+      resultCheck: "출력 5."
+
+  - id: validation
+    title: "3단계. 검증 — 목차 골격 통합"
+    structuredPrimary: true
+    subtitle: "buildReportSkeleton + 스타일 확인"
+    goal: "보고서 골격을 만드는 함수 결과의 헤더 레벨과 목록 스타일을 한 셀에서 검증한다."
+    why: "구조가 정확해야 자동 목차 생성, 후속 단계 가공이 안정적입니다."
+    explanation: |-
+      buildReportSkeleton(path, sections)은 sections dict 리스트를 받아 헤더와 항목 목록을 생성. 결과의 style.name이 의도와 같은지 검증.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def buildReportSkeleton(path, sections):
+          doc = Document()
+          doc.add_heading("월간 보고서", level=0)
+          for section in sections:
+              doc.add_heading(section["title"], level=section.get("level", 1))
+              for item in section.get("items", []):
+                  doc.add_paragraph(item, style="List Bullet")
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "skel.docx"
+      buildReportSkeleton(docxPath, [
+          {"title": "1. 매출", "level": 1, "items": ["Seoul 120만", "Busan 80만"]},
+          {"title": "2. 비용", "level": 1, "items": ["인건비", "운영비"]},
+      ])
+
+      reopened = Document(docxPath)
+      assert reopened.paragraphs[0].style.name == "Title"
+      bullets = [p for p in reopened.paragraphs if p.style.name == "List Bullet"]
+      assert len(bullets) == 4
+      [(p.text, p.style.name) for p in reopened.paragraphs]
+    exercise:
+      prompt: "sections에 한 항목 더 추가하고 bullets 길이가 6인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def buildReportSkeleton(path, sections):
+            doc = Document()
+            doc.add_heading("월간 보고서", level=0)
+            for section in sections:
+                doc.add_heading(section["title"], level=section.get("level", 1))
+                for item in section.get("items", []):
+                    doc.add_paragraph(item, style="List Bullet")
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "s.docx"
+        buildReportSkeleton(docxPath, [
+            {"title": "1.", "level": 1, "items": ["a", "b"]},
+            {"title": "2.", "level": 1, "items": ["c", "d", ___, ___]},
+        ])
+        bullets = [p for p in Document(docxPath).paragraphs if p.style.name == "List Bullet"]
+        len(bullets)
+      hints:
+        - "문자열 두 개. 예: 'e', 'f'."
+    check:
+      noError: "리스트 원소는 문자열."
+      resultCheck: "출력 6."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "목차 골격 생성기"
+    goal: "데이터 dict를 받아 헤더 + 본문 + 목록이 들어간 보고서 골격 함수를 만든다."
+    why: "본 강의 패턴이 10강 회의록 생성기에 그대로 들어갑니다."
+    explanation: |-
+      미션: buildReportSkeleton에 본문 단락(items 외의 'body' 키)도 추가하도록 확장.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수 시그니처: buildReportSkeleton(path, title, sections) -> None"
+    check:
+      noError: "함수 정의."
+      resultCheck: "title/headings/body/lists 모두 결과에 포함."
+    blocks:
+      - type: expansion
+        title: "미션: 본문 포함 목차 골격"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def buildReportSkeleton(path, title, sections):
+                  doc = Document()
+                  doc.add_heading(title, level=0)
+                  for section in sections:
+                      doc.add_heading(section["title"], level=section.get("level", 1))
+                      if section.get("body"):
+                          doc.add_paragraph(section["body"])
+                      for item in section.get("items", []):
+                          doc.add_paragraph(item, style="List Bullet")
+                  doc.save(path)
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "report.docx"
+              buildReportSkeleton(docxPath, "Codaro 월간 보고", [
+                  {
+                      "title": "1. 매출",
+                      "level": 1,
+                      "body": "지난 달 대비 +12%",
+                      "items": ["Seoul 120만", "Busan 80만"],
+                  },
+                  {
+                      "title": "2. 액션",
+                      "level": 1,
+                      "items": ["김대리 보고서 작성", "박과장 검토"],
+                  },
+              ])
+
+              reopened = Document(docxPath)
+              titles = [p for p in reopened.paragraphs if p.style.name == "Title"]
+              h1s = [p for p in reopened.paragraphs if p.style.name == "Heading 1"]
+              bullets = [p for p in reopened.paragraphs if p.style.name == "List Bullet"]
+              assert len(titles) == 1
+              assert len(h1s) == 2
+              assert len(bullets) == 4
+              [(p.text, p.style.name) for p in reopened.paragraphs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "헤더 레벨에 따라 자동 들여쓰기 본문"
+          - "목록을 dict로 받아 중첩 목록 (Level Bullet 2 사용)"
+          - "각 헤더 끝에 PageBreak 추가 (10강 회의록 결합)"
+          - "TOC 필드 자동 삽입 (사용자가 Word에서 업데이트)"
+          - "마크다운 → docx 변환기 (# → Heading, - → List Bullet)"

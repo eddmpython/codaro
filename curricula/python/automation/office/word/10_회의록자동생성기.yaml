@@ -1,0 +1,440 @@
+meta:
+  id: word_10
+  title: 회의록 자동 생성기
+  order: 10
+  category: word
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  packages:
+    - python-docx
+    - docx
+    - docxtpl
+  tags:
+    - 종합프로젝트
+    - 회의록
+    - JSON 기반
+  outcomes:
+    - automation.word.report
+  prerequisites:
+    - automation.word.tables
+    - automation.word.media
+    - automation.word.styles
+    - automation.word.template
+  estimatedMinutes: 90
+  seo:
+    title: "회의록 자동 생성기 — 회의 메모 JSON → 양식 회의록 docx"
+    description: "Word 트랙 모든 패턴을 한 함수에 결합. 회의 메모 JSON에서 표·머리말·서명란 회의록 docx 자동 생성."
+    keywords:
+      - 회의록 자동
+      - 한국 회의록 양식
+      - JSON to docx
+
+intro:
+  direction: "01-09강 모든 패턴을 한 사이클에 묶는다. 회의 메모(JSON)에서 한국 컨설팅 회의록 양식 docx를 한 함수 호출로 생성."
+  benefits:
+    - "컨설팅 이대표의 매주 회의록 40분이 8초로 줄어든다."
+    - "Heading + 표(참석자) + 본문(결정사항) + 머리말(회사) + 서명란이 모두 한 함수에."
+    - "Email 트랙 03강과 결합 시 회의록이 즉시 참석자에게 자동 발송."
+  diagram:
+    steps:
+      - label: "1. 데이터 모델"
+        detail: "회의록 JSON: 일시·장소·참석자·안건·결정사항·액션."
+      - label: "2. 양식 함수"
+        detail: "Codaro 양식 스타일 + 표 + 본문 + 머리말 결합."
+      - label: "3. 일괄 생성"
+        detail: "여러 회의록 메모 → 폴더에 N개 docx."
+      - label: "4. PDF 변환 안내"
+        detail: "LibreOffice headless 명령 한 줄 안내 (트랙 범위 밖)."
+    runtime:
+      - label: "전 강의 패턴 통합"
+        detail: "03강 East Asian font, 04강 표, 05강 머리말, 06강 스타일, 09강 docxtpl 옵션."
+      - label: "검증"
+        detail: "결과 docx의 단락·표·머리말 단위 assert."
+
+sections:
+  - id: step1_model
+    title: "1단계. 회의록 데이터 모델"
+    structuredPrimary: true
+    subtitle: "JSON 구조"
+    goal: "회의록 메모 데이터 dict 구조를 정의한다."
+    why: "자동화의 시작은 데이터 모양을 고정하는 것입니다. 한 회의록 = 한 dict."
+    snippet: |-
+      meetingNote = {
+          "title": "Codaro 주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [
+              {"name": "김대리", "role": "기획"},
+              {"name": "박과장", "role": "개발"},
+              {"name": "이팀장", "role": "리드"},
+          ],
+          "agenda": [
+              "1Q 매출 리뷰",
+              "신기능 출시 일정",
+              "다음 분기 계획",
+          ],
+          "decisions": [
+              "신기능은 5월 31일 출시",
+              "마케팅 캠페인 6월 1일 시작",
+          ],
+          "actions": [
+              {"who": "김대리", "what": "PRD 작성", "due": "2026-05-30"},
+              {"who": "박과장", "what": "QA 진행", "due": "2026-05-31"},
+          ],
+      }
+      meetingNote["title"], len(meetingNote["attendees"])
+    exercise:
+      prompt: "attendees에 한 명 더 추가하고 길이가 4인지 확인하세요."
+      starterCode: |-
+        meetingNote = {
+            "title": "주간",
+            "attendees": [
+                {"name": "김대리", "role": "기획"},
+                {"name": "박과장", "role": "개발"},
+                {"name": "이팀장", "role": "리드"},
+                ___,
+            ],
+        }
+        len(meetingNote["attendees"])
+      hints:
+        - "dict 한 개. 예: {'name': '윤주임', 'role': '디자인'}."
+    check:
+      noError: "리스트 원소는 dict."
+      resultCheck: "출력 4."
+
+  - id: step2_builder
+    title: "2단계. 회의록 docx 빌더"
+    structuredPrimary: true
+    subtitle: "양식 스타일 + 표 + 본문 결합"
+    goal: "회의록 dict → docx 함수를 만든다."
+    why: "본 강의의 핵심 함수. 컨설팅 이대표가 그대로 가져갈 수 있는 도구."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.enum.style import WD_STYLE_TYPE
+      from docx.oxml.ns import qn
+      from docx.shared import Inches, Pt
+
+      def applyCodaroStyles(doc):
+          for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+              if name in doc.styles:
+                  continue
+              style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+              style.font.name = "맑은 고딕"
+              style.font.size = Pt(size)
+              style.font.bold = bold
+              style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+          for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+              setattr(doc.sections[0], side, Inches(0.8))
+          return doc
+
+      def buildMinutes(path, note):
+          doc = Document()
+          applyCodaroStyles(doc)
+          doc.sections[0].header.paragraphs[0].text = "주식회사 Codaro"
+
+          doc.add_heading(note["title"], level=0)
+          doc.add_paragraph(f"일시: {note['date']}, 장소: {note['location']}", style="CodaroBody")
+
+          doc.add_heading("참석자", level=1)
+          attendeesTable = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
+          attendeesTable.cell(0, 0).text = "성명"
+          attendeesTable.cell(0, 1).text = "역할"
+          for idx, attendee in enumerate(note["attendees"], start=1):
+              attendeesTable.cell(idx, 0).text = attendee["name"]
+              attendeesTable.cell(idx, 1).text = attendee["role"]
+
+          doc.add_heading("안건", level=1)
+          for item in note["agenda"]:
+              doc.add_paragraph(item, style="List Number")
+
+          doc.add_heading("결정 사항", level=1)
+          for decision in note["decisions"]:
+              doc.add_paragraph(decision, style="List Bullet")
+
+          doc.add_heading("액션 아이템", level=1)
+          actionTable = doc.add_table(rows=len(note["actions"]) + 1, cols=3, style="Table Grid")
+          for colIdx, header in enumerate(["담당", "내용", "마감"]):
+              actionTable.cell(0, colIdx).text = header
+          for idx, action in enumerate(note["actions"], start=1):
+              actionTable.cell(idx, 0).text = action["who"]
+              actionTable.cell(idx, 1).text = action["what"]
+              actionTable.cell(idx, 2).text = action["due"]
+
+          doc.add_heading("서명", level=1)
+          doc.add_paragraph("작성자: ____________  검토자: ____________", style="CodaroBody")
+
+          doc.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "minutes.docx"
+      buildMinutes(docxPath, {
+          "title": "주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [{"name": "김대리", "role": "기획"}, {"name": "박과장", "role": "개발"}],
+          "agenda": ["1. 매출", "2. 일정"],
+          "decisions": ["5월 31일 출시"],
+          "actions": [{"who": "김대리", "what": "PRD", "due": "2026-05-30"}],
+      })
+      reopened = Document(docxPath)
+      reopened.paragraphs[0].text, len(reopened.tables)
+    exercise:
+      prompt: "buildMinutes에 한 액션 더 추가하고 actions 표 행 수가 3인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.enum.style import WD_STYLE_TYPE
+        from docx.oxml.ns import qn
+        from docx.shared import Inches, Pt
+
+        def applyCodaroStyles(doc):
+            for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                if name in doc.styles:
+                    continue
+                style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                style.font.name = "맑은 고딕"
+                style.font.size = Pt(size)
+                style.font.bold = bold
+                style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+            return doc
+
+        def buildMinutes(path, note):
+            doc = Document()
+            applyCodaroStyles(doc)
+            doc.add_heading(note["title"], level=0)
+            actionTable = doc.add_table(rows=len(note["actions"]) + 1, cols=3, style="Table Grid")
+            for colIdx, header in enumerate(["담당", "내용", "마감"]):
+                actionTable.cell(0, colIdx).text = header
+            for idx, action in enumerate(note["actions"], start=1):
+                actionTable.cell(idx, 0).text = action["who"]
+                actionTable.cell(idx, 1).text = action["what"]
+                actionTable.cell(idx, 2).text = action["due"]
+            doc.save(path)
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "m.docx"
+        buildMinutes(docxPath, {
+            "title": "주간",
+            "actions": [
+                {"who": "김대리", "what": "PRD", "due": "2026-05-30"},
+                ___,
+            ],
+        })
+        len(Document(docxPath).tables[0].rows)
+      hints:
+        - "dict {'who': '박과장', 'what': 'QA', 'due': '2026-05-31'}."
+    check:
+      noError: "리스트 원소는 dict."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "3단계. 검증 — 회의록 통합 검증"
+    structuredPrimary: true
+    subtitle: "단락 + 표 + 머리말 일괄 assert"
+    goal: "buildMinutes 결과의 모든 요소를 한 셀에서 검증."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.enum.style import WD_STYLE_TYPE
+      from docx.oxml.ns import qn
+      from docx.shared import Inches, Pt
+
+      def applyCodaroStyles(doc):
+          for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+              if name in doc.styles:
+                  continue
+              style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+              style.font.name = "맑은 고딕"
+              style.font.size = Pt(size)
+              style.font.bold = bold
+              style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+          for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+              setattr(doc.sections[0], side, Inches(0.8))
+          return doc
+
+      def buildMinutes(path, note):
+          doc = Document()
+          applyCodaroStyles(doc)
+          doc.sections[0].header.paragraphs[0].text = note.get("company", "Codaro")
+          doc.add_heading(note["title"], level=0)
+          doc.add_paragraph(f"일시: {note['date']}, 장소: {note['location']}", style="CodaroBody")
+          doc.add_heading("참석자", level=1)
+          tbl = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
+          tbl.cell(0, 0).text = "성명"
+          tbl.cell(0, 1).text = "역할"
+          for idx, attendee in enumerate(note["attendees"], start=1):
+              tbl.cell(idx, 0).text = attendee["name"]
+              tbl.cell(idx, 1).text = attendee["role"]
+          doc.add_heading("결정 사항", level=1)
+          for decision in note["decisions"]:
+              doc.add_paragraph(decision, style="List Bullet")
+          doc.save(path)
+          return path
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "v.docx"
+      buildMinutes(docxPath, {
+          "company": "주식회사 Codaro",
+          "title": "주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [{"name": "김대리", "role": "기획"}, {"name": "박과장", "role": "개발"}],
+          "decisions": ["신기능 5월 31일 출시", "마케팅 6월 1일"],
+      })
+
+      reopened = Document(docxPath)
+      assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"
+      assert reopened.paragraphs[0].text == "주간 동기화"
+      attendeesTable = reopened.tables[0]
+      assert attendeesTable.cell(1, 0).text == "김대리"
+      decisions = [p.text for p in reopened.paragraphs if p.style.name == "List Bullet"]
+      assert len(decisions) == 2
+      reopened.paragraphs[0].text, attendeesTable.cell(2, 0).text
+    exercise:
+      prompt: "attendees 4명으로 늘리고 검증을 통과시키세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.enum.style import WD_STYLE_TYPE
+        from docx.oxml.ns import qn
+        from docx.shared import Pt
+
+        def applyCodaroStyles(doc):
+            for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                if name in doc.styles:
+                    continue
+                style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                style.font.name = "맑은 고딕"
+                style.font.size = Pt(size)
+                style.font.bold = bold
+                style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+            return doc
+
+        def buildMinutes(path, note):
+            doc = Document()
+            applyCodaroStyles(doc)
+            doc.add_heading(note["title"], level=0)
+            tbl = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
+            tbl.cell(0, 0).text = "성명"
+            tbl.cell(0, 1).text = "역할"
+            for idx, attendee in enumerate(note["attendees"], start=1):
+                tbl.cell(idx, 0).text = attendee["name"]
+                tbl.cell(idx, 1).text = attendee["role"]
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "v.docx"
+        buildMinutes(docxPath, {
+            "title": "주간",
+            "attendees": [
+                {"name": "김대리", "role": "기획"},
+                {"name": "박과장", "role": "개발"},
+                {"name": "이팀장", "role": "리드"},
+                ___,
+            ],
+        })
+        len(Document(docxPath).tables[0].rows)
+      hints:
+        - "dict {'name': '윤주임', 'role': '디자인'}."
+    check:
+      noError: "리스트 원소는 dict."
+      resultCheck: "출력 5."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "다수 회의록 일괄 생성기"
+    goal: "여러 회의 메모를 받아 폴더에 N개 회의록 docx를 만든다."
+    explanation: |-
+      미션: bulkBuildMinutes(notes, outFolder) -> list[Path]. 회의록 파일명은 'YYYY-MM-DD_제목.docx'.
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: bulkBuildMinutes(notes, outFolder) -> list[Path]"
+    check:
+      noError: "함수 정의 + 폴더 생성."
+      resultCheck: "각 메모마다 docx 1개."
+    blocks:
+      - type: tip
+        content: "본 강의가 Word 트랙의 마지막입니다. 본인 팀의 실제 회의 메모로 함수를 시도해 보세요."
+      - type: expansion
+        title: "미션: 다수 회의록"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.enum.style import WD_STYLE_TYPE
+              from docx.oxml.ns import qn
+              from docx.shared import Pt
+
+              def applyCodaroStyles(doc):
+                  for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                      if name in doc.styles:
+                          continue
+                      style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                      style.font.name = "맑은 고딕"
+                      style.font.size = Pt(size)
+                      style.font.bold = bold
+                      style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+                  return doc
+
+              def buildMinutes(path, note):
+                  doc = Document()
+                  applyCodaroStyles(doc)
+                  doc.add_heading(note["title"], level=0)
+                  doc.add_paragraph(f"일시: {note['date']}", style="CodaroBody")
+                  for decision in note.get("decisions", []):
+                      doc.add_paragraph(decision, style="List Bullet")
+                  doc.save(path)
+                  return path
+
+              def bulkBuildMinutes(notes, outFolder):
+                  Path(outFolder).mkdir(exist_ok=True)
+                  outputs = []
+                  for note in notes:
+                      safeTitle = note["title"].replace(" ", "_")
+                      outPath = Path(outFolder) / f"{note['date']}_{safeTitle}.docx"
+                      buildMinutes(outPath, note)
+                      outputs.append(outPath)
+                  return outputs
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              notes = [
+                  {"title": "주간 동기화", "date": "2026-05-28", "decisions": ["a", "b"]},
+                  {"title": "킥오프", "date": "2026-05-29", "decisions": ["c"]},
+                  {"title": "회고", "date": "2026-05-30", "decisions": ["d", "e"]},
+              ]
+              outputs = bulkBuildMinutes(notes, base / "minutes")
+              assert len(outputs) == 3
+              for path in outputs:
+                  doc = Document(path)
+                  assert len(doc.paragraphs) > 0
+              [p.name for p in outputs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          본 트랙의 마무리 강의 응용 아이디어입니다. 한 가지를 골라 본인 업무에 적용해 보세요.
+      - type: list
+        style: bullet
+        items:
+          - "Email 트랙 03강과 결합 — 회의록 docx를 참석자에게 자동 발송"
+          - "PDF 변환 (`soffice --headless --convert-to pdf minutes.docx`)"
+          - "회의록 → 캘린더 ics (다음 회의 일정 자동)"
+          - "회의록에서 액션 아이템만 추출해 별도 docx (todo 목록)"
+          - "회의 녹음 → llmBasics로 자동 메모 → 본 함수에 dict 주입"

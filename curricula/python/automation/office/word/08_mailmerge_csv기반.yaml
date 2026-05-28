@@ -1,0 +1,423 @@
+meta:
+  id: word_08
+  title: CSV 기반 mail merge
+  order: 8
+  category: word
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+    - python-docx
+    - docx
+  tags:
+    - mail merge
+    - CSV
+    - 양식 일괄
+  outcomes:
+    - automation.word.mailMerge
+  prerequisites:
+    - automation.word.edit
+  estimatedMinutes: 55
+  seo:
+    title: "Word CSV mail merge — 200명 가정통신문 자동 생성"
+    description: "CSV 명단에서 가정통신문 200장을 한 번에 자동 생성. 학교 행정 10시간이 30초로."
+    keywords:
+      - mail merge python
+      - 가정통신문 자동
+      - CSV docx 양식
+
+intro:
+  direction: "CSV 명단의 각 행으로 양식 docx를 채워 N장을 자동 생성. 학교 행정의 가정통신문 200장이 10시간에서 30초로."
+  benefits:
+    - "학교 행정 김선생님의 가정통신문 200장 10시간을 30초로 줄인다."
+    - "07강 fillTemplate 함수를 그대로 호출해 한 함수 추가로 mail merge 완성."
+    - "파일명 패턴(학년_반_번호_이름)으로 결과 정리도 자동."
+  diagram:
+    steps:
+      - label: "1. CSV → dict 리스트"
+        detail: "csv.DictReader로 명단 로드."
+      - label: "2. 양식 + 자리표시자"
+        detail: "07강의 fillTemplate 함수 재사용."
+      - label: "3. 일괄 생성"
+        detail: "각 dict로 fillTemplate 호출, 파일명 자동 생성."
+      - label: "4. 결과 폴더"
+        detail: "outFolder에 N개 docx, 파일명은 데이터 기반."
+    runtime:
+      - label: "07강 함수 재사용"
+        detail: "본 강의는 07강 fillTemplate 함수를 import만 함."
+      - label: "검증"
+        detail: "결과 폴더의 파일 수와 각 docx의 자리표시자 잔여 단위 assert."
+
+sections:
+  - id: step1_csv_load
+    title: "1단계. CSV 명단 로드"
+    structuredPrimary: true
+    subtitle: "csv.DictReader"
+    goal: "학생 명단 CSV를 dict 리스트로 읽는다."
+    why: "발송 대상이 표 형태로 입력되는 게 일반적입니다. CSV 한 곳이 출처."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      workdir = TemporaryDirectory()
+      csvPath = Path(workdir.name) / "students.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\n"
+          "김민수,3,1,12,김부모\n"
+          "박지영,3,1,13,박부모\n"
+          "이수진,3,2,5,이부모\n",
+          encoding="utf-8",
+      )
+      with open(csvPath, "r", encoding="utf-8") as f:
+          students = list(csv.DictReader(f))
+      len(students), students[0]
+    exercise:
+      prompt: "한 명 추가하고 학생 수가 4인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        workdir = TemporaryDirectory()
+        csvPath = Path(workdir.name) / "students.csv"
+        csvPath.write_text(
+            "name,grade,classroom,number,parent\n"
+            "김민수,3,1,12,김부모\n"
+            "박지영,3,1,13,박부모\n"
+            "이수진,3,2,5,이부모\n"
+            ___,
+            encoding="utf-8",
+        )
+        with open(csvPath, "r", encoding="utf-8") as f:
+            students = list(csv.DictReader(f))
+        len(students)
+      hints:
+        - "한 줄 추가. 예: '윤하늘,3,2,7,윤부모\\n'."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 4."
+
+  - id: step2_merge
+    title: "2단계. 일괄 생성"
+    structuredPrimary: true
+    subtitle: "각 학생으로 fillTemplate 호출"
+    goal: "학생 명단 전체에 대해 양식 docx를 만들고 폴더에 저장한다."
+    why: "200장 자동 생성이 본 강의의 ROI 핵심입니다."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def replaceInRuns(paragraph, replacements):
+          for run in paragraph.runs:
+              for key, value in replacements.items():
+                  placeholder = f"{{{{{key}}}}}"
+                  if placeholder in run.text:
+                      run.text = run.text.replace(placeholder, value)
+
+      def fillTemplate(templatePath, replacements, outPath):
+          doc = Document(templatePath)
+          for p in doc.paragraphs:
+              replaceInRuns(p, replacements)
+          doc.save(outPath)
+
+      def mailMerge(templatePath, csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          with open(csvPath, "r", encoding="utf-8") as f:
+              students = list(csv.DictReader(f))
+          outputs = []
+          for student in students:
+              safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+              outPath = Path(outFolder) / f"{safeName}.docx"
+              fillTemplate(templatePath, student, outPath)
+              outputs.append(outPath)
+          return outputs
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      tplPath = base / "tpl.docx"
+      seed = Document()
+      seed.add_paragraph("학년: {{grade}}, 반: {{classroom}}, 번호: {{number}}")
+      seed.add_paragraph("학생: {{name}}, 학부모: {{parent}}")
+      seed.add_paragraph("가정통신문 본문입니다.")
+      seed.save(tplPath)
+
+      csvPath = base / "students.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\n"
+          "김민수,3,1,12,김부모\n"
+          "박지영,3,1,13,박부모\n",
+          encoding="utf-8",
+      )
+
+      outputs = mailMerge(tplPath, csvPath, base / "letters")
+      [p.name for p in outputs]
+    exercise:
+      prompt: "CSV에 한 명 더 추가하고 결과 docx 수가 3인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def replaceInRuns(paragraph, replacements):
+            for run in paragraph.runs:
+                for key, value in replacements.items():
+                    placeholder = f"{{{{{key}}}}}"
+                    if placeholder in run.text:
+                        run.text = run.text.replace(placeholder, value)
+
+        def fillTemplate(templatePath, replacements, outPath):
+            doc = Document(templatePath)
+            for p in doc.paragraphs:
+                replaceInRuns(p, replacements)
+            doc.save(outPath)
+
+        def mailMerge(templatePath, csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            with open(csvPath, "r", encoding="utf-8") as f:
+                students = list(csv.DictReader(f))
+            outputs = []
+            for student in students:
+                safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+                outPath = Path(outFolder) / f"{safeName}.docx"
+                fillTemplate(templatePath, student, outPath)
+                outputs.append(outPath)
+            return outputs
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        tplPath = base / "t.docx"
+        seed = Document()
+        seed.add_paragraph("학생: {{name}}")
+        seed.save(tplPath)
+
+        csvPath = base / "s.csv"
+        csvPath.write_text(
+            "name,grade,classroom,number,parent\n"
+            "김민수,3,1,12,김부모\n"
+            "박지영,3,1,13,박부모\n"
+            ___,
+            encoding="utf-8",
+        )
+        len(mailMerge(tplPath, csvPath, base / "out"))
+      hints:
+        - "한 줄 추가."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "3단계. 검증 — 각 docx 자리표시자 잔여 확인"
+    structuredPrimary: true
+    subtitle: "모든 결과의 자리표시자 잔여 검사"
+    goal: "생성된 모든 docx에 자리표시자가 한 개도 남지 않는지 검증한다."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def replaceInRuns(paragraph, replacements):
+          for run in paragraph.runs:
+              for key, value in replacements.items():
+                  placeholder = f"{{{{{key}}}}}"
+                  if placeholder in run.text:
+                      run.text = run.text.replace(placeholder, value)
+
+      def fillTemplate(templatePath, replacements, outPath):
+          doc = Document(templatePath)
+          for p in doc.paragraphs:
+              replaceInRuns(p, replacements)
+          doc.save(outPath)
+
+      def mailMerge(templatePath, csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          with open(csvPath, "r", encoding="utf-8") as f:
+              students = list(csv.DictReader(f))
+          outputs = []
+          for student in students:
+              safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+              outPath = Path(outFolder) / f"{safeName}.docx"
+              fillTemplate(templatePath, student, outPath)
+              outputs.append(outPath)
+          return outputs
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      tplPath = base / "tpl.docx"
+      seed = Document()
+      seed.add_paragraph("학생: {{name}}, 부모: {{parent}}")
+      seed.save(tplPath)
+      csvPath = base / "s.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\n"
+          "김민수,3,1,12,김부모\n"
+          "박지영,3,1,13,박부모\n"
+          "이수진,3,2,5,이부모\n",
+          encoding="utf-8",
+      )
+
+      outputs = mailMerge(tplPath, csvPath, base / "out")
+      assert len(outputs) == 3
+      for path in outputs:
+          combined = "\n".join(p.text for p in Document(path).paragraphs)
+          assert "{{" not in combined
+      [p.name for p in outputs]
+    exercise:
+      prompt: "outputs 길이를 5로 만들어 검증을 통과시키세요(CSV에 두 줄 추가)."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def replaceInRuns(paragraph, replacements):
+            for run in paragraph.runs:
+                for key, value in replacements.items():
+                    placeholder = f"{{{{{key}}}}}"
+                    if placeholder in run.text:
+                        run.text = run.text.replace(placeholder, value)
+
+        def fillTemplate(templatePath, replacements, outPath):
+            doc = Document(templatePath)
+            for p in doc.paragraphs:
+                replaceInRuns(p, replacements)
+            doc.save(outPath)
+
+        def mailMerge(templatePath, csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            with open(csvPath, "r", encoding="utf-8") as f:
+                students = list(csv.DictReader(f))
+            outputs = []
+            for student in students:
+                safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+                outPath = Path(outFolder) / f"{safeName}.docx"
+                fillTemplate(templatePath, student, outPath)
+                outputs.append(outPath)
+            return outputs
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        tplPath = base / "t.docx"
+        seed = Document()
+        seed.add_paragraph("학생: {{name}}")
+        seed.save(tplPath)
+        csvPath = base / "s.csv"
+        csvPath.write_text(
+            "name,grade,classroom,number,parent\n"
+            "김민수,3,1,12,김부모\n"
+            "박지영,3,1,13,박부모\n"
+            "이수진,3,2,5,이부모\n"
+            ___,
+            encoding="utf-8",
+        )
+        outputs = mailMerge(tplPath, csvPath, base / "o")
+        len(outputs)
+      hints:
+        - "CSV 두 줄 추가."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 5."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "가정통신문 일괄 생성기"
+    goal: "표 안 자리표시자도 처리하는 mailMerge로 확장."
+    why: "07강 패턴을 그대로 가져와 mail merge 전 흐름을 완성."
+    explanation: |-
+      미션: 표 셀 안 자리표시자도 처리하는 mailMergeFull(templatePath, csvPath, outFolder).
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "07강 fillTemplate(표 셀 순회 포함)을 그대로 호출."
+    check:
+      noError: "함수 정의."
+      resultCheck: "표 안 자리표시자 모두 치환."
+    blocks:
+      - type: expansion
+        title: "미션: 표 포함 mail merge"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import csv
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def replaceInRuns(paragraph, replacements):
+                  for run in paragraph.runs:
+                      for key, value in replacements.items():
+                          placeholder = f"{{{{{key}}}}}"
+                          if placeholder in run.text:
+                              run.text = run.text.replace(placeholder, value)
+
+              def fillTemplate(templatePath, replacements, outPath):
+                  doc = Document(templatePath)
+                  for p in doc.paragraphs:
+                      replaceInRuns(p, replacements)
+                  for tbl in doc.tables:
+                      for row in tbl.rows:
+                          for cell in row.cells:
+                              for p in cell.paragraphs:
+                                  replaceInRuns(p, replacements)
+                  doc.save(outPath)
+
+              def mailMergeFull(templatePath, csvPath, outFolder):
+                  Path(outFolder).mkdir(exist_ok=True)
+                  with open(csvPath, "r", encoding="utf-8") as f:
+                      rows = list(csv.DictReader(f))
+                  outputs = []
+                  for row in rows:
+                      outPath = Path(outFolder) / f"{row['name']}.docx"
+                      fillTemplate(templatePath, row, outPath)
+                      outputs.append(outPath)
+                  return outputs
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              tplPath = base / "tpl.docx"
+              seed = Document()
+              seed.add_heading("가정통신문", level=0)
+              seed.add_paragraph("학부모: {{parent}}님께")
+              tbl = seed.add_table(rows=2, cols=2, style="Table Grid")
+              tbl.cell(0, 0).text = "학생"
+              tbl.cell(0, 1).text = "{{name}}"
+              tbl.cell(1, 0).text = "반"
+              tbl.cell(1, 1).text = "{{classroom}}반 {{number}}번"
+              seed.save(tplPath)
+
+              csvPath = base / "students.csv"
+              csvPath.write_text(
+                  "name,classroom,number,parent\n"
+                  "김민수,1,12,김부모\n"
+                  "박지영,1,13,박부모\n",
+                  encoding="utf-8",
+              )
+
+              outputs = mailMergeFull(tplPath, csvPath, base / "letters")
+              assert len(outputs) == 2
+              for path in outputs:
+                  doc = Document(path)
+                  combined = "\n".join(p.text for p in doc.paragraphs)
+                  combined += "\n" + "\n".join(c.text for tbl in doc.tables for row in tbl.rows for c in row.cells)
+                  assert "{{" not in combined
+              [p.name for p in outputs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "Email 트랙 03강과 결합 — 생성된 docx를 학부모에게 자동 발송"
+          - "PDF 변환 (LibreOffice headless) 후 발송"
+          - "발송 결과 로그를 CSV에 추가"
+          - "헤더 매핑 dict로 한국식 컬럼명(이름→name) 자동 변환"
+          - "조건부 추가 단락 (특정 학년에만 보이는 안내)"

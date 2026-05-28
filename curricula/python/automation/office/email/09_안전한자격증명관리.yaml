@@ -1,0 +1,308 @@
+meta:
+  id: email_09
+  title: 안전한 자격증명 관리
+  order: 9
+  category: email
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages: []
+  tags:
+    - os.environ
+    - dryRun
+    - .env
+    - 보안
+  outcomes:
+    - automation.email.credentials
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 45
+  seo:
+    title: "안전한 자격증명 관리 — 환경변수 + dryRun 일관 패턴"
+    description: "발송·수신 모듈에 자격증명을 안전하게 관리. .env 활용, dryRun 일관 패턴, 환경 검증."
+    keywords:
+      - 환경변수 관리
+      - dotenv
+      - dryRun 패턴
+      - SMTP 자격증명
+
+intro:
+  direction: "발송·수신 모듈의 자격증명을 환경변수와 dryRun으로 일관되게 관리한다. 평문 비밀번호 사고와 .env 커밋 사고를 모두 차단."
+  benefits:
+    - "한 모듈로 모든 강의의 자격증명을 통합 관리해 사고 위험을 한 곳에 격리."
+    - ".env 파일 + .gitignore + load_dotenv 패턴이 본 강의로 안착."
+    - "dryRun 정책을 함수 시그니처 수준에서 강제."
+  diagram:
+    steps:
+      - label: "1. 환경변수 로드"
+        detail: ".env 파일에서 os.environ으로 자동 로드 (외부 dotenv 불필요한 표준 구현)."
+      - label: "2. validateCredentials"
+        detail: "필수 변수 누락 시 명확한 에러."
+      - label: "3. dryRun 강제"
+        detail: "함수 표면에서 dryRun=True 기본값 일관 적용."
+      - label: "4. .gitignore 안내"
+        detail: ".env 파일은 절대 커밋하지 않도록."
+    runtime:
+      - label: "표준만"
+        detail: "외부 python-dotenv 대신 표준 라이브러리로 간단 구현."
+      - label: "검증"
+        detail: "환경변수 가드와 dryRun 흐름을 단위 assert."
+
+sections:
+  - id: step1_load_env
+    title: "1단계. .env 파일 로드 (표준만)"
+    structuredPrimary: true
+    subtitle: "임시 .env 작성 + 수동 파싱"
+    goal: "key=value 형태의 .env 파일을 읽어 os.environ에 주입한다."
+    why: "외부 dotenv 의존 없이 표준만으로 .env 로드 가능. 본 트랙의 외부 의존 0 정책 일관."
+    explanation: |-
+      .env 파일은 KEY=VALUE 줄들. 파싱은 strip().split('=', 1)으로 충분. 줄 시작이 #이면 주석.
+    tips:
+      - "값에 따옴표가 있으면 strip하는 정도면 충분. 본격 dotenv는 python-dotenv 추천."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import os
+
+      def loadEnvFile(path):
+          loaded = {}
+          for raw in Path(path).read_text(encoding="utf-8").splitlines():
+              line = raw.strip()
+              if not line or line.startswith("#"):
+                  continue
+              key, _, value = line.partition("=")
+              loaded[key.strip()] = value.strip().strip('"').strip("'")
+          for key, value in loaded.items():
+              os.environ[key] = value
+          return list(loaded.keys())
+
+      workdir = TemporaryDirectory()
+      envPath = Path(workdir.name) / ".env"
+      envPath.write_text(
+          "# Codaro Email\n"
+          "SMTP_USER=me@example.com\n"
+          'SMTP_APP_PASS="app pass 16자"\n',
+          encoding="utf-8",
+      )
+      keys = loadEnvFile(envPath)
+      keys, os.environ.get("SMTP_USER")
+    exercise:
+      prompt: ".env에 IMAP_USER 한 줄 더 추가하고 loaded keys 길이가 3인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import os
+
+        def loadEnvFile(path):
+            loaded = {}
+            for raw in Path(path).read_text(encoding="utf-8").splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#"):
+                    continue
+                key, _, value = line.partition("=")
+                loaded[key.strip()] = value.strip().strip('"').strip("'")
+            for key, value in loaded.items():
+                os.environ[key] = value
+            return list(loaded.keys())
+
+        workdir = TemporaryDirectory()
+        envPath = Path(workdir.name) / ".env"
+        envPath.write_text(
+            "SMTP_USER=me@example.com\n"
+            "SMTP_APP_PASS=secret\n"
+            ___,
+            encoding="utf-8",
+        )
+        len(loadEnvFile(envPath))
+      hints:
+        - "추가 줄. 예: 'IMAP_USER=me@example.com\\n'."
+    check:
+      noError: "줄 끝 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: step2_validate
+    title: "2단계. 자격증명 검증"
+    structuredPrimary: true
+    subtitle: "필수 변수 가드"
+    goal: "필요한 환경변수가 모두 있는지 확인하고 누락 시 명확한 에러를 낸다."
+    why: "환경변수 누락이 디버깅 시간을 가장 많이 잡아먹습니다. 시작 단계에서 한 번 검증하면 끝까지 안전."
+    explanation: |-
+      validateCredentials(required=['SMTP_USER', 'SMTP_APP_PASS'])이 누락된 변수 리스트를 돌려주고, 누락이 있으면 EnvironmentError로 명확히 알림.
+    tips:
+      - "에러 메시지에 누락 변수 이름을 명시적으로 적어주면 사용자가 바로 해결 가능."
+    snippet: |-
+      import os
+
+      def validateCredentials(required):
+          missing = [key for key in required if not os.environ.get(key)]
+          if missing:
+              raise EnvironmentError(f"필수 환경변수 누락: {', '.join(missing)}")
+          return True
+
+      os.environ["SMTP_USER"] = "me@example.com"
+      os.environ["SMTP_APP_PASS"] = "secret"
+      try:
+          validateCredentials(["SMTP_USER", "SMTP_APP_PASS"])
+          state = "valid"
+      except EnvironmentError as exc:
+          state = str(exc)
+      state
+    exercise:
+      prompt: "필수에 'IMAP_USER'를 추가하고, 환경변수가 없으면 에러 메시지에 'IMAP_USER'가 포함되는지 확인하세요."
+      starterCode: |-
+        import os
+
+        def validateCredentials(required):
+            missing = [key for key in required if not os.environ.get(key)]
+            if missing:
+                raise EnvironmentError(f"missing: {', '.join(missing)}")
+            return True
+
+        os.environ.pop("IMAP_USER", None)
+        try:
+            validateCredentials(["SMTP_USER", ___])
+            state = "ok"
+        except EnvironmentError as exc:
+            state = str(exc)
+        "IMAP_USER" in state
+      hints:
+        - "문자열 'IMAP_USER'."
+    check:
+      noError: "리스트 원소는 문자열."
+      resultCheck: "True 출력."
+
+  - id: step3_dryrun_module
+    title: "3단계. 통합 발송 모듈"
+    structuredPrimary: true
+    subtitle: "환경 + dryRun + 발송 패턴 통합"
+    goal: "자격증명 검증 + dryRun + 실 발송이 한 모듈에 들어간다."
+    why: "본 모듈 하나가 본 트랙의 모든 강의 발송 표면입니다. 한 곳에서 보안과 안전 모두 관리."
+    explanation: |-
+      sendEmail(toAddr, subject, body, dryRun=True)이 검증 → 메시지 빌드 → dryRun 분기 → 실 발송 흐름을 한 함수에 묶음.
+    tips:
+      - "dryRun=True를 절대 기본값에서 빼지 마세요. 변경 시 안전 정책이 깨집니다."
+    snippet: |-
+      import os
+      import smtplib
+      import ssl
+      from email.message import EmailMessage
+
+      def sendEmail(toAddr, subject, body, dryRun=True):
+          if not dryRun:
+              required = ["SMTP_USER", "SMTP_APP_PASS"]
+              missing = [key for key in required if not os.environ.get(key)]
+              if missing:
+                  raise EnvironmentError(f"missing: {', '.join(missing)}")
+          msg = EmailMessage()
+          msg["From"] = os.environ.get("SMTP_USER", "me@example.com")
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content(body, charset="utf-8")
+          if dryRun:
+              return msg
+          ctx = ssl.create_default_context()
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+              smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+              smtp.send_message(msg)
+          return msg
+
+      result = sendEmail("partner@example.com", "test", "body", dryRun=True)
+      result["Subject"], result.get_content().strip()
+    exercise:
+      prompt: "Subject를 '월간 보고서'로 호출하고 dryRun 결과 객체의 Subject를 확인하세요."
+      starterCode: |-
+        import os
+        from email.message import EmailMessage
+
+        def sendEmail(toAddr, subject, body, dryRun=True):
+            msg = EmailMessage()
+            msg["From"] = "me@example.com"
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content(body, charset="utf-8")
+            if dryRun:
+                return msg
+            return msg
+
+        result = sendEmail("partner@example.com", ___, "body", dryRun=True)
+        result["Subject"]
+      hints:
+        - "한글 문자열 '월간 보고서'."
+    check:
+      noError: "Subject는 문자열."
+      resultCheck: "출력 '월간 보고서'."
+
+  - id: practice
+    title: "실습 — 종합 미션"
+    subtitle: "환경 격리 발송 모듈"
+    goal: "loadEnvFile + validate + sendEmail을 한 모듈로 묶어 환경 격리된 안전 발송기 완성."
+    why: "본 모듈이 10강 주간 보고서 발송기의 자격증명 백엔드가 됩니다."
+    explanation: |-
+      미션: 환경 가드, 검증, dryRun을 모두 갖춘 sendEmailModule(toAddr, subject, body, dryRun=True) 함수 작성.
+    tips:
+      - ".env는 절대 git 커밋 금지. .gitignore에 추가 필수."
+    snippet: |-
+      import os
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: sendEmailModule(toAddr, subject, body, dryRun=True) -> EmailMessage"
+    check:
+      noError: "환경 가드 + dryRun."
+      resultCheck: "dryRun=True에서 EmailMessage 반환."
+    blocks:
+      - type: expansion
+        title: "미션: 환경 격리 발송 모듈"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import os
+              import smtplib
+              import ssl
+              from email.message import EmailMessage
+
+              def validateCredentials(required):
+                  missing = [key for key in required if not os.environ.get(key)]
+                  if missing:
+                      raise EnvironmentError(f"필수 환경변수 누락: {', '.join(missing)}")
+                  return True
+
+              def sendEmailModule(toAddr, subject, body, dryRun=True, fromAddr=None):
+                  msg = EmailMessage()
+                  msg["From"] = fromAddr or os.environ.get("SMTP_USER", "me@example.com")
+                  msg["To"] = toAddr
+                  msg["Subject"] = subject
+                  msg.set_content(body, charset="utf-8")
+                  if dryRun:
+                      return msg
+                  validateCredentials(["SMTP_USER", "SMTP_APP_PASS"])
+                  ctx = ssl.create_default_context()
+                  with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+                      smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+                      smtp.send_message(msg)
+                  return msg
+
+              result = sendEmailModule(
+                  "partner@example.com",
+                  "월간 보고서 발송",
+                  "검토 부탁드립니다.",
+                  dryRun=True,
+              )
+              assert result["Subject"] == "월간 보고서 발송"
+              assert result["To"] == "partner@example.com"
+              assert "검토" in result.get_content()
+              result["Subject"]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "여러 계정 (개인/회사) 환경변수 분리"
+          - "OAuth2 토큰 refresh 자동화 (Outlook M365)"
+          - "비밀번호를 OS 키체인(macOS Keychain, Windows Credential)에 저장"
+          - ".env 검증 CLI 도구 (필수 변수 보고)"
+          - "환경별 .env (.env.dev, .env.prod) 분기"
