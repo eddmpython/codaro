@@ -15,6 +15,7 @@ from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
 from ..curriculum.analyticsTimeline import buildSnapshot
+from ..curriculum.learnerStateBridge import buildUnifiedMastery
 from ..curriculum.reviewScheduler import daysOverdue
 from .requestModels import (
     CheckExerciseRequest,
@@ -465,6 +466,23 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         report = computeMastery(graph, taxonomy, state.progressTracker, validated)
         snapshot = buildSnapshot(state.progressTracker, report)
         state.analyticsTimeline.append(snapshot)
+
+    @router.get("/api/curriculum/mastery/unified")
+    def apiUnifiedMastery() -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        graph = state.curriculumOs.graph()
+        report = buildUnifiedMastery(
+            state.progressTracker, state.learnerStateStore, taxonomy, graph,
+        )
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="mastery-unified",
+                mastered=report.masteredCount,
+                total=report.totalCount,
+            ),
+        )
+        return report.model_dump()
 
     @router.get("/api/curriculum/analytics")
     def apiCurriculumAnalytics(days: int = 30) -> dict[str, object]:
