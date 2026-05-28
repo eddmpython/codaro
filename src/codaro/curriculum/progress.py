@@ -7,6 +7,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from .outcomeCredit import OutcomeCreditEntry, hintWeight, shouldAutoValidate
+from .reviewScheduler import ReviewState, initState as initReviewState, isDue as reviewIsDue, updateOnLapse as reviewOnLapse, updateOnSuccess as reviewOnSuccess
 
 
 class SectionResult(BaseModel):
@@ -33,6 +34,7 @@ class UserProgress(BaseModel):
     validatedOutcomes: list[str] = Field(default_factory=list)
     autoValidatedOutcomes: list[str] = Field(default_factory=list)
     outcomeCredits: dict[str, list[OutcomeCreditEntry]] = Field(default_factory=dict)
+    lessonReviews: dict[str, ReviewState] = Field(default_factory=dict)
     updatedAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -83,8 +85,16 @@ class ProgressTracker:
         lesson.lastAccessedAt = datetime.now(timezone.utc).isoformat()
         if totalMissions > 0:
             lesson.totalMissions = totalMissions
+        becameComplete = False
         if lesson.totalMissions > 0 and len(lesson.completedMissions) >= lesson.totalMissions:
+            if lesson.completedAt is None:
+                becameComplete = True
             lesson.completedAt = datetime.now(timezone.utc).isoformat()
+        if becameComplete:
+            key = f"{category}/{contentId}"
+            progress = self.load()
+            if key not in progress.lessonReviews:
+                progress.lessonReviews[key] = initReviewState(key, lesson.completedAt)
         self.save()
         return lesson
 
@@ -188,6 +198,23 @@ class ProgressTracker:
 
     def outcomeCreditMap(self) -> dict[str, list[OutcomeCreditEntry]]:
         return {k: list(v) for k, v in self.load().outcomeCredits.items()}
+
+    def getReviewState(self, lessonKey: str) -> ReviewState | None:
+        return self.load().lessonReviews.get(lessonKey)
+
+    def listDueReviews(self, now: datetime | None = None) -> list[ReviewState]:
+        progress = self.load()
+        return [state for state in progress.lessonReviews.values() if reviewIsDue(state, now)]
+
+    def recordReviewResult(self, lessonKey: str, success: bool) -> ReviewState:
+        progress = self.load()
+        existing = progress.lessonReviews.get(lessonKey)
+        if existing is None:
+            existing = initReviewState(lessonKey)
+        updated = reviewOnSuccess(existing) if success else reviewOnLapse(existing)
+        progress.lessonReviews[lessonKey] = updated
+        self.save()
+        return updated
 
     def creditCheckPass(
         self,
