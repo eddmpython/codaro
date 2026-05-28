@@ -92,6 +92,7 @@ sections:
     - capture_output=True가 둘 다 캡처합니다.
     - print(..., file=sys.stderr)는 stderr로 흐릅니다.
   check:
+    type: noError
     noError: subprocess.run 호출이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: returncode가 0이고 stdout과 stderr이 각각 out과 err로 분리되어야 합니다.
 - id: check-and-timeout
@@ -142,6 +143,7 @@ sections:
     - TimeoutExpired는 timeout 인자 값을 .timeout에 담습니다.
     - 자식이 stdout을 쓰기 전에 죽었으므로 부분 출력은 비어 있습니다.
   check:
+    type: noError
     noError: try/except 분기가 NameError나 ImportError 없이 실행되어야 합니다.
     resultCheck: CalledProcessError 분기는 returncode가 2여야 하고, timeout 분기는 stdout이 빈 문자열이어야 합니다.
 - id: shell-injection
@@ -196,6 +198,7 @@ sections:
     - 리스트 인자에서는 ;가 인자의 일부로 처리되어 echo가 실행되지 않습니다.
     - shell=True 호출에서는 ;가 명령 구분자로 해석되어 INJECTED가 출력됩니다.
   check:
+    type: noError
     noError: 두 subprocess.run 호출이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: listStdout에는 INJECTED가 없고 shellStdout에는 INJECTED가 포함되어 셸 해석 차이가 드러나야 합니다.
 - id: popen-pipes
@@ -312,5 +315,6 @@ sections:
     - 매핑이 없는 코드는 dict.get의 default로 처리합니다.
     - 모든 분기에 reason 필드가 채워져 호출자가 일관된 형태로 받을 수 있도록 합니다.
   check:
+    type: noError
     noError: runCheck와 subprocess 호출이 NameError나 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과 dict가 returncode별로 reason을 분기해 a/b는 표 매핑이 적용되고 c는 default 메시지가 들어가야 합니다.
