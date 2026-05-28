@@ -73,6 +73,7 @@ sections:
     - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
     - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic
@@ -109,6 +110,7 @@ sections:
     - 바꿀 지점은 `addr = ...` 오른쪽 값입니다.
     - 실행 뒤 `addr` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 중첩 모델에서 `addr` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 중첩 모델 실행 뒤 `addr` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: listmodel
@@ -145,6 +147,7 @@ sections:
     - 바꿀 지점은 `item = ...` 오른쪽 값입니다.
     - 실행 뒤 `item` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 모델 리스트에서 `item` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 모델 리스트 실행 뒤 `item` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: optional
@@ -187,6 +190,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 선택적 중첩에서 `minimal` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 선택적 중첩 실행 뒤 `minimal` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: dict
@@ -229,6 +233,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 딕셔너리 타입에서 `doc` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 딕셔너리 타입 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: deep
@@ -311,6 +316,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 깊은 중첩에서 `companyData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 깊은 중첩 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: selfref
@@ -357,6 +363,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 자기 참조 모델에서 `treeData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 자기 참조 모델 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: union
@@ -409,6 +416,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: Union 타입의 입력 데이터와 처리 인자가 다음 단계까지 도달해야 합니다.
     resultCheck: Union 타입 결과 값이 본문 기대값과 일치해야 합니다.
 - id: serial
@@ -449,6 +457,7 @@ sections:
     - 바꿀 지점은 `orderDict = ...` 오른쪽 값입니다.
     - 실행 뒤 `orderDict` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 중첩 직렬화에서 `orderDict` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 중첩 직렬화 실행 뒤 `orderDict` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: result
@@ -565,6 +574,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: E커머스 주문 시스템의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: E커머스 주문 시스템 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
@@ -669,6 +679,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -755,5 +766,6 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
