@@ -77,6 +77,7 @@ sections:
         - shutil.which는 PATH 또는 절대 경로 인자를 받는다.
         - 절대 경로가 인자이면 그 파일이 존재할 때 같은 경로가 돌아온다.
       check:
+        type: noError
         noError: shutil.which 호출이 OSError 없이 끝나야 한다.
         resultCheck: present 값이 True여야 한다.
     check:
@@ -167,6 +168,7 @@ sections:
         - capture_output 인자는 True여야 결과 dict의 stdout이 채워진다.
         - 자식 print 문자열을 "hello"로 두면 stdout 키가 같은 값으로 채워진다.
       check:
+        type: noError
         noError: callTool 호출이 TypeError 없이 끝나야 한다.
         resultCheck: summary 딕셔너리가 returncode 0, stdout "hello", stderr 빈 문자열이어야 한다.
     check:
@@ -246,6 +248,7 @@ sections:
         - raise 키워드 뒤에는 RuntimeError 같은 좁힌 예외 클래스가 와야 한다.
         - 함수 인자 문자열 missing-tool-zzz가 메시지에도 포함되어야 한다.
       check:
+        type: noError
         noError: requireTool 호출이 의도한 RuntimeError로 잡혀야 한다.
         resultCheck: attempts에 도구 이름이 포함된 메시지 한 줄이 들어가야 한다.
     check:
@@ -381,6 +384,7 @@ sections:
         - returncode가 0이어야 status가 success로 매겨진다.
         - 두 번의 호출에서 stdout이 본문에서 지정한 문자열과 같아야 한다.
       check:
+        type: noError
         noError: runExternal 두 번 호출이 종합 정리 흐름으로 끝나야 한다.
         resultCheck: 두 결과의 status가 모두 success이고 stdout 값이 종합 기대값과 같아야 한다.
     check:

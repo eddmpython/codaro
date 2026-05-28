@@ -94,6 +94,7 @@ sections:
         - 자식 sleep 인자와 timeout 값은 본문에서 지정한 대로 2와 0.2다.
         - exc.cmd[-1]은 -c 다음의 코드 문자열을 그대로 돌려준다.
       check:
+        type: noError
         noError: TimeoutExpired 좁힌 예외 처리가 정확히 발동해야 한다.
         resultCheck: events 리스트가 본문 기대값과 정확히 같아야 한다.
     check:
@@ -169,6 +170,7 @@ sections:
         - 자식 print 문자열을 "running"으로 두면 collected와 비교가 통과한다.
         - capture_output=True를 켜야 TimeoutExpired 객체에 stdout이 들어간다.
       check:
+        type: noError
         noError: TimeoutExpired 발생과 예외 객체 stdout 접근이 끝나야 한다.
         resultCheck: collected가 "running"과 정확히 같아야 한다.
     check:
@@ -275,6 +277,7 @@ sections:
         - 첫 번째 except 이름은 subprocess.TimeoutExpired다.
         - 두 번째 except 이름은 subprocess.CalledProcessError다.
       check:
+        type: noError
         noError: 두 분기 호출이 좁힌 예외 처리로 끝나야 한다.
         resultCheck: first는 status failed, second는 status timeout으로 분류되어야 한다.
     check:
@@ -407,6 +410,7 @@ sections:
         - 분류 키 이름은 result 객체의 status 속성을 그대로 사용한다.
         - 세 명령 중 두 개는 성공, 한 개는 실패이므로 timeout 리스트는 빈 채 남는다.
       check:
+        type: noError
         noError: summarizeBatch 호출이 KeyError 없이 끝나야 한다.
         resultCheck: 종합 결과 dict가 success 두 개와 failed 한 개를 정확히 분류해야 한다.
     check:

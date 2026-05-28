@@ -88,6 +88,7 @@ sections:
         - 공백이 들어간 한국어도 리스트 인자 한 슬롯에 그대로 넣으면 된다.
         - 자식 코드는 sys.argv[1]을 읽어 출력하면 충분하다.
       check:
+        type: noError
         noError: 인자 리스트 전달과 stdout 캡처가 끝나야 한다.
         resultCheck: stdout이 본문에서 넘긴 한국어 문자열과 동일해야 한다.
     check:
@@ -139,6 +140,7 @@ sections:
         - '"ab"와 "cd"는 셸 토큰 분리에서 두 인자로 쪼개진다.'
         - sys.argv의 첫 요소는 -c로 받는 코드 표시자 자체다.
       check:
+        type: noError
         noError: shell=True 호출이 정상적으로 끝나야 한다.
         resultCheck: tokenCount가 정확히 3이어야 한다.
     check:
@@ -217,6 +219,7 @@ sections:
         - 파일 이름은 공백을 포함한 "daily report.txt"여야 한다.
         - Path 객체를 인자로 넘길 때는 str()로 변환해야 OS 표준 표기로 전달된다.
       check:
+        type: noError
         noError: tempfile 안 파일 작성과 자식 실행이 모두 끝나야 한다.
         resultCheck: stdout이 "good"이고 returncode가 0이어야 한다.
     check:
@@ -280,6 +283,7 @@ sections:
         - '"$(whoami)"는 셸 치환 시도이지만 리스트 인자로 넘기면 그대로 문자열로 다뤄진다.'
         - 자식은 단순히 인자 길이만 출력하므로 결과는 정수 문자열이 된다.
       check:
+        type: noError
         noError: 인자 리스트 호출이 OSError 없이 끝나야 한다.
         resultCheck: stdout이 입력 길이와 같은 정수 문자열이고 whoami 결과가 포함되지 않아야 한다.
     check:

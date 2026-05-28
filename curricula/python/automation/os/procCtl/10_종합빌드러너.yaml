@@ -82,6 +82,7 @@ sections:
         - 두 단계 이름을 step-A와 step-B로 두어야 검증이 통과한다.
         - 리스트 컴프리헨션이 단계 이름을 그대로 모으도록 두면 된다.
       check:
+        type: noError
         noError: 리스트 구성과 dict 빌드가 끝나야 한다.
         resultCheck: summary의 count가 2, names 리스트가 본문 기대값과 같아야 한다.
     check:
@@ -214,6 +215,7 @@ sections:
         - returncode가 0일 때만 status가 success로 매겨진다.
         - sys.exit(2)는 returncode를 정확히 2로 만든다.
       check:
+        type: noError
         noError: runStep 호출과 분기 처리가 끝나야 한다.
         resultCheck: result의 status가 failed이고 returncode가 2여야 한다.
     check:
@@ -353,6 +355,7 @@ sections:
         - failed 초기값은 False로 두어야 첫 단계가 실행된다.
         - 두 단계 모두 성공이므로 skipped는 없다.
       check:
+        type: noError
         noError: runPipeline 두 단계 흐름이 정상적으로 끝나야 한다.
         resultCheck: 두 단계 모두 status가 success여야 한다.
     check:
@@ -506,6 +509,7 @@ sections:
         - Path 객체의 텍스트 읽기 메서드는 read_text다.
         - 두 단계가 모두 성공이므로 restored 리스트에서 status를 뽑으면 두 success가 나온다.
       check:
+        type: noError
         noError: 종합 리포트 저장과 다시 읽기가 IOError 없이 끝나야 한다.
         resultCheck: restored의 steps가 두 success 항목을 가지고 generatedAt 키가 채워져야 한다.
     check:

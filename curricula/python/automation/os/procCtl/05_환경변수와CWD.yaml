@@ -100,6 +100,7 @@ sections:
         - os.environ.copy는 부모 환경을 dict로 복사해 자식 변형에만 사용한다.
         - 자식 stdout이 "5"여야 하므로 LESSON_NUMBER 값도 같은 문자열이어야 한다.
       check:
+        type: noError
         noError: 자식 실행이 환경 변수와 함께 정상적으로 끝나야 한다.
         resultCheck: stdout이 "5"이고 부모 환경에는 LESSON_NUMBER 키가 없어야 한다.
     check:
@@ -173,6 +174,7 @@ sections:
         - PATH를 빈 문자열로 만들면 어떤 도구도 발견되지 않아 missing이 출력된다.
         - 도구 이름이 존재하지 않는 임의 문자열이어야 어떤 PATH에서도 찾지 못한다.
       check:
+        type: noError
         noError: 자식 실행이 좁힌 PATH 안에서 끝나야 한다.
         resultCheck: stdout이 정확히 "missing"이어야 한다.
     check:
@@ -248,6 +250,7 @@ sections:
         - cwd 인자 값은 tempfile.TemporaryDirectory가 돌려준 td 문자열을 그대로 넘긴다.
         - resolve를 양쪽에 적용하면 운영체제 별 표기 차이가 사라진다.
       check:
+        type: noError
         noError: 자식 실행과 cwd 비교가 정상적으로 끝나야 한다.
         resultCheck: reportedCwd가 tempfile 절대 경로와 정확히 같아야 한다.
     check:
@@ -350,6 +353,7 @@ sections:
         - LESSON_KEY 값을 fileOps_10으로 두면 parsed의 key 항목과 비교가 통과한다.
         - parsed의 cwd는 자식이 보고한 절대 경로와 일치해야 한다.
       check:
+        type: noError
         noError: json.loads 호출이 JSONDecodeError 없이 끝나야 한다.
         resultCheck: parsed dict가 cwd와 key 두 값을 종합 결과로 정확히 담아야 한다.
     check:
