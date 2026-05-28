@@ -32,7 +32,7 @@ class PredictConfig(BaseModel):
 class GuideConfig(BaseModel):
     exerciseType: str = "fillBlank"
     hints: list[str] = Field(default_factory=list)
-    checkConfig: dict[str, str] = Field(default_factory=dict)
+    checkConfig: dict[str, str | list[str]] = Field(default_factory=dict)
     difficulty: str = "easy"
     solution: str = ""
     description: str = ""
