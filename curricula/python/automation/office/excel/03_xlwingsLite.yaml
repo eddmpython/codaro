@@ -98,6 +98,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 보고서 파일의 목표의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 보고서 파일의 목표의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: build_report
