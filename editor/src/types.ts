@@ -362,6 +362,17 @@ export type LearningPredict = {
   expectedError?: string;
 };
 
+export type MisconceptionMatch = {
+  misconceptionId: string;
+  outcomeId: string;
+  label: string;
+  summary: string;
+  diagnostic: { message: string; references: string[] };
+  correction: { hint: string; miniExercise: string };
+  repeatStatus: "new" | "repeat";
+  hitCount: number;
+};
+
 export type CheckResult = {
   passed: boolean;
   feedback: string;
@@ -370,6 +381,11 @@ export type CheckResult = {
   studentOutput: string;
   expectedOutput: string;
   detail: string;
+  // Predict-Run-Reconcile-Adapt 루프 — 매 check 마다 runtime이 채우는 진단 페이로드
+  creditedOutcomes?: string[];
+  autoValidatedOutcomes?: string[];
+  misconceptionMatches?: MisconceptionMatch[];
+  doneCriterionViolated?: boolean;
 };
 
 export type TaskDefinition = {
