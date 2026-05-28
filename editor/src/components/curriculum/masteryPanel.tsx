@@ -104,7 +104,7 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
 
       <div className="space-y-1.5">
         {activeOutcomes.map((entry) => {
-          const mastered = entry.validated || entry.level >= 0.8;
+          const mastered = entry.validated || entry.autoValidated || entry.level >= 0.8;
           const pct = Math.round(entry.level * 100);
           return (
             <div
@@ -127,6 +127,22 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
                       검증됨
                     </Badge>
                   )}
+                  {!entry.validated && entry.autoValidated && (
+                    <Badge
+                      variant="outline"
+                      className="h-4 border-amber-700/50 px-1.5 text-[9px] text-amber-200"
+                    >
+                      자동 검증
+                    </Badge>
+                  )}
+                  {entry.creditCount > 0 && !entry.validated && !entry.autoValidated && (
+                    <Badge
+                      variant="outline"
+                      className="h-4 border-emerald-700/40 px-1.5 text-[9px] text-emerald-200"
+                    >
+                      credits {entry.creditCount}
+                    </Badge>
+                  )}
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <Progress
@@ -147,14 +163,20 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
                 disabled={validating === entry.outcomeId}
                 className={cn(
                   "h-6 shrink-0 px-1.5 text-[10px]",
-                  entry.validated
+                  entry.validated || entry.autoValidated
                     ? "text-amber-200 hover:bg-amber-900/40"
                     : "text-zinc-400 hover:bg-zinc-800",
                 )}
                 onClick={() => toggleValidation(entry)}
-                title={entry.validated ? "검증 해제" : "이 능력 검증 완료 표시"}
+                title={
+                  entry.validated
+                    ? "검증 해제"
+                    : entry.autoValidated
+                      ? "자동 검증됨 — 수동 토글하면 manual 로 고정"
+                      : "이 능력 검증 완료 표시"
+                }
               >
-                {entry.validated ? (
+                {entry.validated || entry.autoValidated ? (
                   <Sparkles className="h-3 w-3" />
                 ) : (
                   <CheckCircle2 className="h-3 w-3" />

@@ -293,6 +293,9 @@ export const codaroApi = {
     requiredPatterns?: string[];
     hints?: string[];
     currentHintLevel?: number;
+    category?: string;
+    contentId?: string;
+    sectionId?: string;
   }) => postJson<CheckResult>("/api/curriculum/check", payload),
   tasks: () => requestJson<TaskListPayload>("/api/tasks"),
   runTask: (taskId: string) => postJson<TaskRun>(`/api/tasks/${encodeURIComponent(taskId)}/run`, {}),

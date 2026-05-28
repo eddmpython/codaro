@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Lightbulb, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -85,6 +85,52 @@ export function CheckResultPanel({
           doneCriterionViolated={result.doneCriterionViolated ?? false}
         />
       ) : null}
+      {passed && result.creditedOutcomes && result.creditedOutcomes.length > 0 ? (
+        <CreditNotice
+          credited={result.creditedOutcomes}
+          autoValidated={result.autoValidatedOutcomes ?? []}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function CreditNotice({
+  credited,
+  autoValidated,
+}: {
+  credited: string[];
+  autoValidated: string[];
+}) {
+  const autoSet = new Set(autoValidated);
+  return (
+    <div
+      className="flex flex-col gap-1 rounded border border-emerald-300/50 bg-emerald-50/70 px-2 py-2 text-[11px] leading-5 text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-100"
+      data-check-result-credits="true"
+    >
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase">
+        <Sparkles className="size-3" />
+        outcome 기여
+      </div>
+      <ul className="flex flex-wrap gap-1">
+        {credited.map((outcomeId) => (
+          <li key={outcomeId} className="flex items-center gap-1">
+            {autoSet.has(outcomeId) ? <Trophy className="size-3 text-amber-500" /> : null}
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[10px]",
+                autoSet.has(outcomeId)
+                  ? "border-amber-400/50 bg-amber-50/80 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+                  : "border-emerald-400/40 bg-background/70 text-emerald-900 dark:text-emerald-100",
+              )}
+            >
+              {outcomeId}
+              {autoSet.has(outcomeId) ? " · 자동 검증" : ""}
+            </Badge>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
