@@ -1,0 +1,64 @@
+meta:
+  outcomeId: pandas.aggregate
+  status: draft
+  version: 1
+  note: "초안 — groupby 결과 타입과 집계 함수 호출에서 흔한 함정."
+
+misconceptions:
+  - id: pandas.aggregate.groupbyResultIsLazy
+    label: "groupby() 결과를 바로 출력하려고 함"
+    summary: "`df.groupby('a')` 는 DataFrameGroupBy 객체일 뿐이라 그냥 출력해도 의미 없는 repr 만 나온다."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        mismatchPattern: "DataFrameGroupBy"
+        description: "예측은 집계된 표, 실제는 lazy 객체 repr."
+    diagnostic:
+      message: "`groupby()` 는 그룹 객체만 만듭니다. 실제 집계는 `.sum()`, `.mean()`, `.agg(...)` 같은 후속 호출이 일어나야 합니다."
+      references: ["pandas.aggregate"]
+    correction:
+      hint: "집계 함수를 체이닝하세요: `df.groupby('a')['b'].mean()` 또는 `df.groupby('a').agg({'b': 'sum'})`."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"region": ["A", "A", "B"], "sales": [10, 20, 30]})
+        grouped = df.groupby("region")["sales"].sum()
+        grouped
+
+  - id: pandas.aggregate.aggOnSeries
+    label: "Series에 agg() 호출 시 문자열로 함수 이름 주기를 안 함"
+    summary: "`df.a.agg(sum, mean)` 같이 함수 자체를 위치 인자로 주면 TypeError. 리스트로 묶거나 문자열로 줘야 한다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*agg\\(\\) takes from 1 to 2"
+        description: "agg() 인자 개수 에러."
+    diagnostic:
+      message: "`agg()` 는 하나의 함수 또는 함수의 리스트/딕셔너리를 받습니다. 여러 함수는 리스트로 묶으세요: `[sum, 'mean']` 또는 문자열로 `['sum', 'mean']`."
+      references: ["pandas.aggregate"]
+    correction:
+      hint: "표준 집계는 문자열이 가장 간결합니다: `df.a.agg(['sum', 'mean', 'std'])`."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"v": [10, 20, 30, 40]})
+        summary = df["v"].agg(["sum", "mean", "std"])
+        summary
+
+  - id: pandas.aggregate.groupbySumIncludesNonNumeric
+    label: "groupby().sum() 이 문자열 컬럼도 더해버린다고 예측"
+    summary: "예전 pandas는 문자열을 이어붙였지만 최근 버전은 numeric만 자동 집계. TypeError가 날 수도 있고 컬럼이 빠질 수도 있다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*could not convert string|cannot perform reduce.*string"
+        description: "문자열에 sum/mean 시도."
+    diagnostic:
+      message: "최신 pandas 의 `groupby().sum()` 은 numeric_only 동작이 변했습니다. 명시적으로 `numeric_only=True` 를 주거나 컬럼을 골라 집계하는 게 안전합니다."
+      references: ["pandas.aggregate"]
+    correction:
+      hint: "특정 컬럼만 집계하세요: `df.groupby('region')['sales'].sum()`. 또는 `df.groupby('region').sum(numeric_only=True)`."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"region": ["A", "B", "A"], "name": ["x", "y", "z"], "sales": [10, 20, 30]})
+        salesByRegion = df.groupby("region")["sales"].sum()
+        salesByRegion

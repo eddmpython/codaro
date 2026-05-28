@@ -1,0 +1,70 @@
+meta:
+  outcomeId: numpy.arrayOps
+  status: draft
+  version: 1
+  note: "초안 — ndarray 인덱싱·복사·브로드캐스팅의 흔한 오개념."
+
+misconceptions:
+  - id: numpy.arrayOps.viewVsCopy
+    label: "슬라이스가 복사본인 줄 알고 변경했더니 원본도 바뀜"
+    summary: "`b = a[:5]` 는 view이며 `b[0] = 99` 가 a 도 바꾼다. list 슬라이싱과 정반대."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "([A-Za-z_]\\w*)\\s*=\\s*([A-Za-z_]\\w*)\\s*\\[[^\\]]*:[^\\]]*\\]\\s*\\n[\\s\\S]{0,200}?\\1\\s*\\["
+        description: "ndarray 슬라이스 후 인덱싱 변경 — view 잠재 위험."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "원본은 변하지 않을 거라 예측, 실제는 변함."
+    diagnostic:
+      message: "NumPy 의 기본 슬라이싱은 **view** 입니다. 동일 메모리를 가리키므로 한쪽 수정이 양쪽에 보입니다. (Python list 슬라이싱과 다름)"
+      references: ["numpy.arrayOps", "python.lists"]
+    correction:
+      hint: "독립 복사가 필요하면 `b = a[:5].copy()` 또는 `np.array(a[:5])`."
+      miniExercise: |
+        import numpy as np
+        a = np.array([1, 2, 3, 4, 5])
+        b = a[:3].copy()
+        b[0] = 99
+        a, b
+
+  - id: numpy.arrayOps.broadcastingShapeMismatch
+    label: "broadcasting 규칙 위반"
+    summary: "`(3, 4)` 배열에 `(3,)` 더하기 시도 — 차원이 안 맞음. `(4,)` 라면 가능."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError.*operands could not be broadcast together"
+        description: "broadcasting 실패."
+    diagnostic:
+      message: "Broadcasting 은 뒤 차원부터 맞춰야 합니다. `(3, 4)` 와 `(4,)` 는 OK, `(3, 4)` 와 `(3,)` 은 실패 — 마지막 축이 안 맞습니다."
+      references: ["numpy.arrayOps"]
+    correction:
+      hint: "`(3, 1)` 처럼 명시적으로 reshape 하거나, `[:, None]` 으로 새 축을 추가하세요."
+      miniExercise: |
+        import numpy as np
+        a = np.arange(12).reshape(3, 4)
+        rowVec = np.array([10, 20, 30])
+        added = a + rowVec[:, None]
+        added.shape
+
+  - id: numpy.arrayOps.integerVsFloatDivision
+    label: "정수 배열 나누기 결과 타입 예측 실수"
+    summary: "`np.array([5, 4]) / 2` 는 float64 결과를 반환하는데 int 로 예측하는 경우."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: dtype
+        description: "dtype 이 int → float 으로 바뀜."
+    diagnostic:
+      message: "NumPy 의 `/` 는 항상 float 결과를 반환합니다. 정수 나눗셈을 원하면 `//` 또는 `np.floor_divide`."
+      references: ["numpy.arrayOps"]
+    correction:
+      hint: "결과를 int 로 유지하려면 `arr // 2` 또는 `arr.astype(int)` 캐스팅."
+      miniExercise: |
+        import numpy as np
+        arr = np.array([5, 4])
+        floatResult = arr / 2
+        intResult = arr // 2
+        floatResult.dtype, intResult.dtype

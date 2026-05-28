@@ -1,0 +1,66 @@
+meta:
+  outcomeId: pandas.intro
+  status: draft
+  version: 1
+  note: "초안 — pandas Series/DataFrame 첫 만남에서 흔한 오개념."
+
+misconceptions:
+  - id: pandas.intro.seriesAsList
+    label: "Series를 list처럼 슬라이싱"
+    summary: "list 슬라이싱 감각으로 Series에 접근해 이상한 결과나 KeyError가 난다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "\\.iloc\\s*\\[\\s*[0-9]+\\s*:\\s*[0-9]+\\s*\\]\\.iloc"
+        description: ".iloc 결과에 다시 .iloc 체이닝 — 인덱스가 변하는 줄 모름."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "KeyError.*not in (index|axis)"
+        description: "label 인덱스를 정수 위치로 착각."
+    diagnostic:
+      message: "Series는 list와 달리 label 인덱스를 가집니다. `s[0]`은 label 0의 값, `s.iloc[0]`은 첫 위치의 값입니다. 둘은 다를 수 있습니다."
+      references: ["pandas.intro", "pandas.filterSelect"]
+    correction:
+      hint: "위치 기반은 `.iloc`, label 기반은 `.loc`. 헷갈리면 명시적으로 쓰세요."
+      miniExercise: |
+        import pandas as pd
+        scores = pd.Series([90, 80, 70], index=["a", "b", "c"])
+        firstByPosition = scores.iloc[0]
+        valueByLabel = scores.loc["a"]
+        firstByPosition, valueByLabel
+
+  - id: pandas.intro.dataFrameDictAxis
+    label: "dict로 DataFrame 만들 때 행/열 방향 혼동"
+    summary: "`pd.DataFrame({'a': [1,2]})` 가 행 a를 만든다고 예측하지만 실제로는 열 a다."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: shape
+        description: "행/열 수 예측이 뒤바뀜."
+    diagnostic:
+      message: "`pd.DataFrame({key: list})` 는 key 가 열 이름이고 list 가 그 열의 값입니다. 행 방향이 아닙니다."
+      references: ["pandas.intro"]
+    correction:
+      hint: "행 단위로 만들고 싶으면 dict의 list로 만든 뒤 .T 로 전치하거나, `pd.DataFrame.from_records(...)` 를 사용하세요."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"sales": [10, 20, 30], "region": ["A", "B", "C"]})
+        df.shape
+
+  - id: pandas.intro.printDataFrame
+    label: "print() 또는 display() 없이 마지막 줄 활용 모름"
+    summary: "여러 줄 코드의 중간에서 DataFrame 결과를 보려고 print() 를 남발해 노트북이 지저분해진다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "print\\(\\s*[A-Za-z_]\\w*(\\.head|\\.tail|\\.shape|\\.describe)?\\s*\\(?\\s*\\)?\\s*\\)"
+        description: "DataFrame/Series를 print()로 감싸는 패턴."
+    diagnostic:
+      message: "Codaro는 셀의 마지막 줄을 자동으로 표시합니다. print() 없이 그냥 `df.head()` 만 적으면 표 형태로 깔끔하게 보입니다."
+      references: ["pandas.intro"]
+    correction:
+      hint: "여러 결과를 한 셀에서 보고 싶으면 IPython.display.display 를 사용하거나, 셀을 분리하세요."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"x": [1, 2, 3]})
+        df.head()
