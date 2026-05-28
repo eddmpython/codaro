@@ -95,6 +95,7 @@ sections:
         - 새 파일 이름은 invoice.json으로 두어 자동화 입력의 다양성을 확보한다.
         - 정렬 결과는 알파벳 순으로 invoice가 가장 먼저 나온다.
       check:
+        type: noError
         noError: 다섯 파일을 차례로 만들고 iterdir로 정렬하는 코드가 끝나야 한다.
         resultCheck: initial 리스트가 다섯 파일 이름을 정렬된 형태로 담아야 한다.
     check:
@@ -236,6 +237,7 @@ sections:
         - rules dict에 ".log" 키를 추가해야 logs 폴더로 분류된다.
         - 정렬된 iterdir 결과는 csv가 먼저 log가 뒤로 처리된다.
       check:
+        type: noError
         noError: organizeAndBackup 함수 호출이 PermissionError 없이 끝나야 한다.
         resultCheck: report.moved와 report.archived가 같은 두 경로를 본문 순서대로 담아야 한다.
     check:
@@ -335,6 +337,7 @@ sections:
         - generatedAt 키 이름은 camelCase로 통일한다.
         - 리포트 dict는 함수 안에서 복사해 둬야 호출자의 payload가 변경되지 않는다.
       check:
+        type: noError
         noError: saveReport 호출과 JSON 왕복이 IOError 없이 끝나야 한다.
         resultCheck: restored 딕셔너리가 두 키와 generatedAt까지 정확히 채워져야 한다.
     check:
@@ -485,6 +488,7 @@ sections:
         - 두 번째 사이클은 base에 정리되지 않은 파일이 없어 moved 리스트가 빈 상태가 된다.
         - assert에서 빈 리스트는 그냥 []로 비교한다.
       check:
+        type: noError
         noError: cleanupOnce 두 번 호출이 격리 공간에서 끝나야 한다.
         resultCheck: 두 번째 보고의 moved와 archived가 모두 빈 리스트로 종합 사이클의 멱등성을 보여야 한다.
     check:

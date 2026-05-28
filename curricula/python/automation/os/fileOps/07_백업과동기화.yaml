@@ -121,6 +121,7 @@ sections:
         - hashlib.sha256은 hexdigest 메서드로 사람이 읽을 수 있는 문자열을 만든다.
         - 두 파일의 바이트가 다르면 해시 결과도 반드시 달라진다.
       check:
+        type: noError
         noError: sha256OfFile 함수와 두 파일 해시 비교가 끝나야 한다.
         resultCheck: summary 딕셔너리의 differ 값이 True여야 한다.
     check:
@@ -199,6 +200,7 @@ sections:
         - os.utime의 두 번째 인자는 (atime, mtime) 튜플로 받는다.
         - 60초를 더해야 부동소수 정밀도와 무관하게 newer가 True가 된다.
       check:
+        type: noError
         noError: os.utime과 stat 호출이 PermissionError 없이 끝나야 한다.
         resultCheck: newer가 True이고 decision이 "copy" 문자열이어야 한다.
     check:
@@ -350,6 +352,7 @@ sections:
         - 첫 호출에서 added는 두 파일 이름이 정렬된 상태로 들어간다.
         - 두 번째 호출은 같은 두 파일이 skipped로 분류되어 멱등하다.
       check:
+        type: noError
         noError: 두 번의 syncOnce 호출이 PermissionError 없이 끝나야 한다.
         resultCheck: firstReport의 added와 secondReport의 skipped가 같은 두 파일 이름을 담아야 한다.
     check:
@@ -519,6 +522,7 @@ sections:
         - 두 번째와 세 번째 보고서는 added와 updated가 모두 비어 있어야 한다.
         - dict 키 이름은 skipped를 그대로 사용해 안정성을 비교한다.
       check:
+        type: noError
         noError: 세 번의 syncOnce 호출이 격리 공간에서 끝나야 한다.
         resultCheck: summary 딕셔너리의 모든 키가 종합 결과로 멱등성을 확인해야 한다.
     check:

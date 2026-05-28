@@ -91,6 +91,7 @@ sections:
         - parents 인자를 True로 설정해야 중간 폴더가 한 번에 생긴다.
         - 두 파일 이름을 모두 summary.txt로 두어야 rglob 결과가 기대값과 맞다.
       check:
+        type: noError
         noError: mkdir(parents=True)와 write_text가 격리 폴더에서 정상 실행되어야 한다.
         resultCheck: created 리스트가 두 reports 하위 summary.txt 경로를 정렬된 상태로 포함해야 한다.
     check:
@@ -151,6 +152,7 @@ sections:
         - archives와 reports는 알파벳 순으로 archives가 먼저 온다.
         - 파일을 제외하려면 is_dir 호출 결과로 필터링해야 한다.
       check:
+        type: noError
         noError: iterdir 호출과 is_dir 필터가 OSError 없이 동작해야 한다.
         resultCheck: folders 리스트가 두 폴더 이름만 정렬된 상태로 담아야 한다.
     check:
@@ -217,6 +219,7 @@ sections:
         - rglob 패턴에서 확장자 앞의 점을 잊지 말아야 한다.
         - 결과가 비어 있다면 트리에 .txt 파일이 한 개만 있는지 확인한다.
       check:
+        type: noError
         noError: rglob와 정렬이 PermissionError 없이 끝나야 한다.
         resultCheck: txtPaths가 단 하나의 sales/2025/note.txt 경로만 포함해야 한다.
     check:
@@ -301,6 +304,7 @@ sections:
         - 패턴 확장자는 점을 포함해 *.png, *.json 형태로 넣는다.
         - dict 키 이름을 png와 json으로 맞추어야 비교 단계가 통과한다.
       check:
+        type: noError
         noError: 두 번의 rglob 호출과 dict 구성이 KeyError 없이 끝나야 한다.
         resultCheck: summary 딕셔너리의 png에 두 png 경로가, json에 한 json 경로가 정렬된 상태로 담겨야 한다.
     check:

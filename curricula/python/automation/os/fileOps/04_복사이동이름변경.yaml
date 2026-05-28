@@ -112,6 +112,7 @@ sections:
         - 파일 이름은 변수로 한 번만 정해서 source와 archive 양쪽에서 같은 이름이 쓰이게 한다.
         - copy2가 정답이며 copy는 mtime이 새로 갱신되어 비교가 실패한다.
       check:
+        type: noError
         noError: copy2 호출과 stat 비교가 PermissionError 없이 끝나야 한다.
         resultCheck: status 딕셔너리의 세 키가 모두 True여야 한다.
     check:
@@ -187,6 +188,7 @@ sections:
         - 함수 이름은 shutil.move이고 첫 인자가 원본이며 두 번째 인자가 대상이다.
         - 이동이 끝난 뒤 원본 exists는 False가 되어야 자동화 흐름이 안전하다.
       check:
+        type: noError
         noError: shutil.move 호출이 FileExistsError 없이 끝나야 한다.
         resultCheck: status 딕셔너리에서 sourceLeft는 False, movedExists는 True여야 한다.
     check:
@@ -259,6 +261,7 @@ sections:
         - 임시 파일 이름과 with_suffix 인자, assert 마지막 이름이 모두 일치해야 한다.
         - with_suffix는 점을 포함한 문자열을 받으므로 ".png" 형태로 넘긴다.
       check:
+        type: noError
         noError: rename과 with_suffix가 OSError 없이 끝나야 한다.
         resultCheck: status에서 finalName이 capture.png이고 draftGone이 False여야 한다.
     check:
@@ -374,6 +377,7 @@ sections:
         - 처음 충돌에서는 _1이 붙고 다음 호출에서는 카운터가 다시 시작해 _2가 붙는다.
         - 파일이 늘어날수록 정렬된 names 결과에 새 이름이 추가된다.
       check:
+        type: noError
         noError: uniqueTarget 함수와 copy2 호출이 두 번 모두 통과해야 한다.
         resultCheck: 첫 결과는 note_1.md, 두 번째 결과는 note_2.md여야 한다.
     check:
