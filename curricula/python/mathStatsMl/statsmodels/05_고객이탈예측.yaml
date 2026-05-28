@@ -95,6 +95,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_head
@@ -116,6 +117,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 데이터 미리보기의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 2단계. 데이터 미리보기 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step3_churn_rate
@@ -145,6 +147,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 3단계. 이탈률 확인에서 `churnRate` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 3단계. 이탈률 확인 실행 뒤 `churnRate` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step4_preprocessing
@@ -174,6 +177,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 4단계. 데이터 전처리의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 4단계. 데이터 전처리 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step5_select_features
@@ -213,6 +217,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 5단계. 주요 변수 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 5단계. 주요 변수 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step6_add_constant
@@ -233,6 +238,7 @@ sections:
     - 바꿀 지점은 `XWithConst = ...` 오른쪽 값입니다.
     - 실행 뒤 `XWithConst` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 상수항 추가에서 `XWithConst` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 6단계. 상수항 추가 실행 뒤 `XWithConst` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step7_logit_model
@@ -264,6 +270,7 @@ sections:
     - 바꿀 지점은 `logitModel = ...` 오른쪽 값입니다.
     - 실행 뒤 `logitModel` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 로지스틱 회귀 모델 학습에서 `logitModel` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 7단계. 로지스틱 회귀 모델 학습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step8_coefficients
@@ -293,6 +300,7 @@ sections:
     - 바꿀 지점은 `oddsRatios = ...` 오른쪽 값입니다.
     - 실행 뒤 `oddsRatios` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 계수 해석에서 `oddsRatios` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 8단계. 계수 해석 실행 뒤 `oddsRatios` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step9_predict_prob
@@ -322,6 +330,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 이탈 확률 예측에서 `churnProb` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 9단계. 이탈 확률 예측 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_threshold
@@ -349,6 +358,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 임계값 설정의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 10단계. 임계값 설정 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step11_confusion_matrix
@@ -386,6 +396,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 11단계. 혼동 행렬에서 `cm` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 11단계. 혼동 행렬 실행 뒤 `cm` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step12_cm_viz
@@ -430,6 +441,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 12단계. 혼동 행렬 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 12단계. 혼동 행렬 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step13_accuracy
@@ -472,6 +484,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 13단계. 정확도와 재현율에서 `accuracy` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 13단계. 정확도와 재현율 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step14_roc_curve
@@ -524,6 +537,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 14단계. ROC 곡선의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 14단계. ROC 곡선의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step15_odds_ratio_viz
@@ -605,6 +619,7 @@ sections:
     - 바꿀 지점은 `pvalues = ...` 오른쪽 값입니다.
     - 실행 뒤 `pvalues` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 16단계. 변수 중요도에서 `pvalues` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 16단계. 변수 중요도 실행 뒤 `pvalues` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: practice
@@ -647,6 +662,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: summary
@@ -732,5 +748,6 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
