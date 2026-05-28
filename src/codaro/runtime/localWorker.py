@@ -318,6 +318,11 @@ def _isSerializable(value: object) -> bool:
     moduleName = type(value).__module__
     if moduleName.startswith("pandas") or moduleName.startswith("numpy"):
         return True
+    # Reject instances of classes defined in the cell scope (__main__):
+    # they pickle-fail when sent across the multiprocessing boundary because
+    # the class object itself isn't importable from the parent process.
+    if moduleName == "__main__":
+        return False
     if hasattr(value, "__dict__") or hasattr(value, "__slots__"):
         return True
     return False
