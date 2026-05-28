@@ -454,3 +454,17 @@ sections:
     type: noError
     noError: Day 7 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 7 종합 복습 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: reflection
+  title: Day 7 회고 — 리스트 첫 감각 굳히기
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 7에서 다룬 리스트 생성, 인덱싱, 슬라이싱의 핵심을 자기 말로 정리한다.
+  why: 같은 개념을 출력 코드와 자기 문장으로 두 번 표현하면 헷갈리기 쉬운 인덱스/슬라이싱 규칙이 굳어집니다.
+  explanation: 오늘 다룬 리스트 생성, append/insert, 인덱싱과 슬라이싱 표기 중에서 가장 익숙해진 점과 아직 헷갈리는 지점을 한 단락으로 적어보세요.
+  reflection:
+    prompt: 리스트 인덱싱과 슬라이싱 중 아직 헷갈리는 한 가지를 예시 코드와 함께 적어주세요.
+    expectedKeywords:
+    - list
+    - 인덱싱
+    - 슬라이싱
+    aiFollowup: 학습자가 적은 헷갈림 지점에 대해 다음 day08(리스트 메서드) 또는 day26(컴프리헨션)에서 어떻게 다시 다루는지 안내한다.

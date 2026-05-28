@@ -377,3 +377,17 @@ sections:
     type: noError
     noError: Day 1 종합 복습의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
     resultCheck: Day 1 종합 복습 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: reflection
+  title: Day 1 회고 — 오늘 무엇을 배웠나요?
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 1에서 print()와 주석으로 얻은 첫 감각을 자기 표현으로 정리한다.
+  why: 자기 말로 다시 적으면 단순히 따라한 실행이 진짜 이해로 굳어집니다.
+  explanation: 오늘 다룬 print(), 따옴표, 주석, 마지막 표현식의 자동 표시 중에서 가장 새로웠던 점과 가장 헷갈렸던 지점을 한 단락으로 적어보세요.
+  reflection:
+    prompt: 오늘 Day 1에서 가장 새로 배운 한 가지와 가장 헷갈렸던 한 가지를 각각 한 문장으로 적어주세요.
+    expectedKeywords:
+    - print
+    - 출력
+    - 주석
+    aiFollowup: 학습자가 적은 답을 한 줄로 요약하고, 헷갈린 지점에 대해 다음 강의 어디에서 다시 만날지 안내한다.

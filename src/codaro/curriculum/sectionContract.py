@@ -72,6 +72,21 @@ class LearningExerciseContract(BaseModel):
     predict: LearningPredictContract = Field(default_factory=LearningPredictContract)
 
 
+class LearningReflectionContract(BaseModel):
+    """강의 끝 회고 셀 — Predict-Run-Reconcile-Adapt 루프 후 기억 굳히기 단계.
+
+    학습자가 "방금 배운 것" 을 자기 표현으로 적게 한다. expectedKeywords 가 있으면
+    auto-grade 가능 (포함 여부 검사). aiFollowup 는 채워진 답을 (있다면 teacher) 가
+    한 줄로 코멘트 — 강제는 아니다.
+    """
+    prompt: str = ""
+    expectedKeywords: list[str] = Field(default_factory=list)
+    aiFollowup: str = ""
+
+    def isEmpty(self) -> bool:
+        return not any([self.prompt, self.expectedKeywords, self.aiFollowup])
+
+
 class LearningSectionContract(BaseModel):
     id: str = ""
     title: str = ""
@@ -83,6 +98,7 @@ class LearningSectionContract(BaseModel):
     snippet: str = ""
     exercise: LearningExerciseContract = Field(default_factory=LearningExerciseContract)
     check: dict[str, Any] = Field(default_factory=dict)
+    reflection: LearningReflectionContract = Field(default_factory=LearningReflectionContract)
     rawBlocks: list[dict[str, Any]] = Field(default_factory=list)
     contractGaps: list[str] = Field(default_factory=list)
 
@@ -160,6 +176,7 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
     if exercise.starterCode and not exercise.solution:
         exercise = exercise.model_copy(update={"solution": exercise.starterCode})
     check = _checkMap(section.get("check")) or exercise.check
+    reflection = _reflectionContract(section.get("reflection"))
     contract = LearningSectionContract(
         id=_textValue(section.get("id")) or f"section-{index}",
         title=_textValue(section.get("title")) or f"{index}단계",
@@ -172,6 +189,7 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
         snippet=_snippetText(section.get("snippet")) or _firstCodeFromBlocks(blocks),
         exercise=exercise,
         check=check,
+        reflection=reflection,
         rawBlocks=blocks,
     )
     if not sectionHasStructuredFields(section):
@@ -191,6 +209,16 @@ def _exerciseContract(value: Any) -> LearningExerciseContract:
         hints=_uniqueTextList(value.get("hints") or value.get("tips")),
         difficulty=_textValue(value.get("difficulty")) or "easy",
         predict=_predictContract(value.get("predict")),
+    )
+
+
+def _reflectionContract(value: Any) -> LearningReflectionContract:
+    if not isinstance(value, dict):
+        return LearningReflectionContract()
+    return LearningReflectionContract(
+        prompt=_textValue(value.get("prompt") or value.get("question")),
+        expectedKeywords=_uniqueTextList(value.get("expectedKeywords") or value.get("keywords")),
+        aiFollowup=_textValue(value.get("aiFollowup") or value.get("followup")),
     )
 
 

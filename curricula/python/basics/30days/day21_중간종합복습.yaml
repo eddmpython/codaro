@@ -100,8 +100,8 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
     predict:
-      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
-      expectedValue: 'A' if score >= 90 else 'B' if score >= 80 else 'C'
+      prompt: score = 85 일 때 삼항 조건식이 어떤 문자열을 반환할까요?
+      expectedValue: "'B'"
       expectedDtype: str
   check:
     type: noError
@@ -428,3 +428,16 @@ sections:
     type: noError
     noError: Day 21 종합 복습에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 21 종합 복습 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: reflection
+  title: Day 21 회고 — 중간 종합 점검
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 1-20 의 누적 개념 중 자신이 가장 약한 영역을 한 가지 골라 학습 계획을 세운다.
+  why: 누적 학습은 자기 약점을 직접 호출하지 않으면 휘발됩니다. 회고로 약점을 호명하면 다음 사이클이 의도된 복습이 됩니다.
+  explanation: Day 1-20에서 다룬 print, 변수, 자료형, 문자열, 리스트/딕셔너리, 조건문, 반복문, 함수, 파일입출력 중에서 가장 자주 막혔던 영역을 한 가지만 적고, 다음 주에 이 영역으로 무엇을 만들지 한 줄로 계획해보세요.
+  reflection:
+    prompt: 가장 약한 영역 1개 + 그 영역으로 다음 주에 만들 작은 자동화 1개를 적어주세요.
+    expectedKeywords:
+    - 약점
+    - 자동화
+    aiFollowup: 학습자가 고른 약한 영역에 해당하는 Day 강의 ID 1-2개를 안내하고 자동화 아이디어를 한 줄 짧게 강화한다.

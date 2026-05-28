@@ -62,10 +62,10 @@ class LessonProgress(BaseModel):
     completedAt: str | None = None
     lastAccessedAt: str | None = None
     sectionResults: dict[str, SectionResult] = Field(default_factory=dict)
-    # Phase 5 — 실측 학습 시간 EWMA. 첫 진입 시점부터 완료까지의 elapsed 를 누적.
     firstAccessedAt: str | None = None
     observedMinutesEwma: float = 0.0
     observedSampleCount: int = 0
+    reflectionAnswers: dict[str, str] = Field(default_factory=dict)
 
 
 class UserProgress(BaseModel):

@@ -535,3 +535,17 @@ sections:
     type: noError
     noError: Day 14 종합 복습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: Day 14 종합 복습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: reflection
+  title: Day 14 회고 — 반복문 패턴 굳히기
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 14에서 다룬 for/while과 흐름 제어(break, continue)의 차이를 자기 말로 정리한다.
+  why: 반복문은 자동화의 핵심이라 패턴별로 머릿속 모델을 굳혀두면 다음 단계 업무 코드에서 즉시 활용할 수 있습니다.
+  explanation: 오늘 다룬 for vs while, range(), enumerate, break/continue 중에서 가장 잘 이해된 한 가지와 아직 어색한 한 가지를 적어보세요.
+  reflection:
+    prompt: 같은 작업을 for와 while 두 가지로 적을 때 어느 쪽이 더 자연스러웠는지, 그 이유는 무엇인지 한 단락으로 적어주세요.
+    expectedKeywords:
+    - for
+    - while
+    - break
+    aiFollowup: 학습자가 선호한 반복 패턴을 인정하고, 다른 쪽이 더 적합한 사례를 한 가지 제시한다.
