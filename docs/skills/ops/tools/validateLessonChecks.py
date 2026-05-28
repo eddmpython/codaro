@@ -38,6 +38,9 @@ from typing import Iterable
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
+# Use non-interactive backend so matplotlib doesn't try to open a window in
+# the kernel subprocess.
+os.environ.setdefault("MPLBACKEND", "Agg")
 
 import yaml  # noqa: E402
 
