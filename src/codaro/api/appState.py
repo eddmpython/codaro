@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..curriculum.learnerState import LearnerStateStore
 from ..curriculum.osCache import CurriculumOsCache
 from ..curriculum.studyLoader import StudyLoader
 from ..curriculum.progress import ProgressTracker
@@ -24,6 +25,7 @@ class ServerState:
     studyLoader: StudyLoader | None
     progressTracker: ProgressTracker
     curriculumOs: CurriculumOsCache
+    learnerStateStore: LearnerStateStore
 
 
 def createServerState(
@@ -52,4 +54,5 @@ def createServerState(
         studyLoader=studyLoader,
         progressTracker=ProgressTracker(),
         curriculumOs=CurriculumOsCache(studyLoader),
+        learnerStateStore=LearnerStateStore(),
     )
