@@ -1,0 +1,67 @@
+meta:
+  outcomeId: python.variables
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.variables.assignmentReversal
+    label: "할당 방향을 수학 등호처럼 거꾸로 적기"
+    summary: "수학의 등호처럼 5 = x 형태로 적어 SyntaxError가 발생한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "^\\s*\\d+\\s*=\\s*[A-Za-z_]"
+        description: "숫자 리터럴에 변수를 할당하려는 패턴."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*cannot assign to literal"
+        description: "Python이 리터럴 좌변 할당을 거부."
+    diagnostic:
+      message: "Python의 `=`는 오른쪽 값을 왼쪽 이름에 저장합니다. 수학의 등식과 달리 좌우를 바꿀 수 없습니다."
+      references: ["python.variables"]
+    correction:
+      hint: "변수 이름을 왼쪽, 값을 오른쪽에 두세요. `x = 5`."
+      miniExercise: |
+        x = 5
+        x
+
+  - id: python.variables.typeConflation
+    label: "문자열과 숫자를 같은 타입처럼 섞기"
+    summary: "사용자 입력처럼 보이는 \"5\"와 정수 3을 더해 TypeError를 만난다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "[\"'][0-9]+[\"']\\s*\\+\\s*[0-9]"
+        description: "문자열 숫자와 정수를 직접 더하는 패턴."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*can only concatenate str.*to str|unsupported operand type.*str.*int"
+        description: "str+int 조합으로 인한 TypeError."
+    diagnostic:
+      message: "`\"5\"`는 문자열, `3`은 정수입니다. 같은 타입으로 맞춰야 더할 수 있습니다."
+      references: ["python.variables"]
+    correction:
+      hint: "숫자로 계산하려면 `int(\"5\") + 3`, 문자로 이으려면 `\"5\" + str(3)`."
+      miniExercise: |
+        int("5") + 3
+
+  - id: python.variables.augmentedAssignmentScope
+    label: "함수 안에서 외부 변수에 += 사용"
+    summary: "함수 안에서 모듈 전역 변수에 += 하면 UnboundLocalError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "UnboundLocalError.*local variable.*referenced before assignment"
+        description: "함수 안에서 같은 이름에 할당이 있으면 로컬로 묶임."
+    diagnostic:
+      message: "함수 안에서 같은 이름에 할당이 한 번이라도 있으면 Python은 그 이름을 로컬로 묶습니다. += 도 할당이라 외부 값을 못 봅니다."
+      references: ["python.variables", "python.functions"]
+    correction:
+      hint: "함수 안에서 외부 변수를 갱신하려면 `global x` 선언 또는 인자/반환값으로 명시적으로 주고받으세요."
+      miniExercise: |
+        count = 0
+        def bump(value):
+            return value + 1
+        count = bump(count)
+        count

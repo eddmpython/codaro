@@ -1,0 +1,71 @@
+meta:
+  outcomeId: python.oop
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.oop.missingSelf
+    label: "메서드 정의에서 self 누락"
+    summary: "def method(): ... 형태로 적은 뒤 인스턴스에서 호출 시 TypeError."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*takes 0 positional arguments but 1 was given"
+        description: "self 빠진 메서드 호출."
+    diagnostic:
+      message: "인스턴스 메서드는 첫 번째 인자로 `self`를 받아야 합니다. Python은 `obj.method()` 호출 시 `obj`를 첫 인자로 자동으로 넘깁니다."
+      references: ["python.oop"]
+    correction:
+      hint: "메서드의 첫 인자를 `self`로 두세요. 인스턴스를 받지 않는 보조라면 `@staticmethod`."
+      miniExercise: |
+        class Counter:
+            def __init__(self):
+                self.value = 0
+            def bump(self):
+                self.value += 1
+                return self.value
+        counter = Counter()
+        counter.bump()
+
+  - id: python.oop.classVarMutationShare
+    label: "클래스 속성 list가 인스턴스 간 공유됨"
+    summary: "class Box: items = []  형태에서 인스턴스가 items.append를 하면 모든 인스턴스가 공유한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "class\\s+\\w+[^:]*:\\s*\\n\\s+\\w+\\s*=\\s*(\\[\\]|\\{\\})"
+        description: "클래스 본문에 mutable 기본값."
+    diagnostic:
+      message: "클래스 본문의 `items = []`는 **클래스 속성**이라 모든 인스턴스가 같은 리스트를 공유합니다. 인스턴스마다 따로 두려면 `__init__`에서 할당하세요."
+      references: ["python.oop", "python.lists"]
+    correction:
+      hint: "`def __init__(self): self.items = []` 처럼 인스턴스 속성으로 두세요."
+      miniExercise: |
+        class Box:
+            def __init__(self):
+                self.items = []
+        first = Box()
+        second = Box()
+        first.items.append("a")
+        first.items, second.items
+
+  - id: python.oop.callingUninstantiated
+    label: "클래스를 인스턴스 없이 메서드 호출"
+    summary: "MyClass.method() 처럼 인스턴스 없이 호출해 TypeError: missing 'self'."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*missing 1 required positional argument:\\s*['\"]self['\"]"
+        description: "클래스를 통한 직접 호출."
+    diagnostic:
+      message: "`MyClass.method()` 형태는 self를 자동으로 넘겨주지 않습니다. 인스턴스를 먼저 만든 뒤 `obj.method()`로 호출하거나, 정적이라면 `@staticmethod`를 붙이세요."
+      references: ["python.oop"]
+    correction:
+      hint: "필요하면 `MyClass().method()` 처럼 한 줄에 만들 수도 있습니다. 인스턴스가 필요 없는 보조 함수라면 클래스 밖으로 빼거나 `@classmethod`/`@staticmethod`."
+      miniExercise: |
+        class Greeter:
+            def hello(self, name):
+                return f"hi, {name}"
+        result = Greeter().hello("Codaro")
+        result

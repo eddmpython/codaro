@@ -1,0 +1,62 @@
+meta:
+  outcomeId: python.dictsAndSets
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.dictsAndSets.missingKeyError
+    label: "존재하지 않는 키를 직접 인덱싱"
+    summary: "키가 있는지 확인하지 않고 dict[key]에 접근해 KeyError가 발생한다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "KeyError"
+        description: "dict의 missing key 접근."
+    diagnostic:
+      message: "딕셔너리의 `[key]` 접근은 키가 없으면 KeyError를 던집니다. 부재 가능성이 있으면 안전한 형태로 접근하세요."
+      references: ["python.dictsAndSets"]
+    correction:
+      hint: "`d.get(key, default)` 또는 `if key in d:` 패턴을 사용하세요. 카운팅에는 `collections.defaultdict`."
+      miniExercise: |
+        prices = {"apple": 1200}
+        price = prices.get("banana", 0)
+        price
+
+  - id: python.dictsAndSets.mutableKey
+    label: "리스트나 dict를 키로 사용"
+    summary: "{[1,2]: 'x'} 처럼 mutable한 객체를 키로 써 TypeError: unhashable."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*unhashable type"
+        description: "list/dict/set을 dict key 또는 set 원소로 사용."
+    diagnostic:
+      message: "딕셔너리 키와 집합 원소는 hashable이어야 합니다. list와 dict는 mutable이라 hash가 안 됩니다."
+      references: ["python.dictsAndSets"]
+    correction:
+      hint: "tuple로 바꾸세요. `(1, 2)` 는 hashable이라 키로 사용 가능합니다."
+      miniExercise: |
+        coords = {(1, 2): "A", (3, 4): "B"}
+        coords[(1, 2)]
+
+  - id: python.dictsAndSets.duplicateKeySurprise
+    label: "같은 키를 리터럴에서 두 번 적었을 때의 동작"
+    summary: "{'a': 1, 'a': 2}는 에러가 아니라 마지막 값으로 덮인다. 학습자는 에러를 예상한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "\\{[^{}]*([\"'][A-Za-z_]\\w*[\"'])\\s*:[^,{}]+,[^{}]*\\1\\s*:"
+        description: "딕셔너리 리터럴에서 같은 키가 두 번 등장."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "예측은 에러나 두 값 모두, 실제는 마지막 값만 남음."
+    diagnostic:
+      message: "딕셔너리 리터럴에 같은 키가 여러 번 적히면 마지막 값으로 덮어쓰기됩니다. 에러는 발생하지 않습니다."
+      references: ["python.dictsAndSets"]
+    correction:
+      hint: "여러 값을 한 키에 모으려면 리스트를 값으로 두세요: `{'a': [1, 2]}`."
+      miniExercise: |
+        grouped = {"a": [1, 2], "b": [3]}
+        grouped

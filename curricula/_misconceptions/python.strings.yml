@@ -1,0 +1,68 @@
+meta:
+  outcomeId: python.strings
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.strings.immutabilityIgnored
+    label: "문자열 요소를 인덱스로 바꾸려 함"
+    summary: "s[0] = 'A' 형태로 in-place 수정을 시도해 TypeError가 발생한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "[A-Za-z_]\\w*\\s*\\[\\s*[0-9]+\\s*\\]\\s*="
+        description: "문자열로 보이는 변수의 인덱스에 할당."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*'str' object does not support item assignment"
+        description: "str의 immutability 위반."
+    diagnostic:
+      message: "문자열은 immutable입니다. 만들고 나면 안의 글자를 직접 바꿀 수 없습니다."
+      references: ["python.strings"]
+    correction:
+      hint: "새 문자열을 만드세요: `s = s[:i] + 'A' + s[i+1:]` 또는 `s.replace`."
+      miniExercise: |
+        s = "hello"
+        s = "H" + s[1:]
+        s
+
+  - id: python.strings.concatVsFormat
+    label: "숫자와 문자열을 + 로 잇기"
+    summary: "\"count = \" + 42 처럼 숫자를 문자열에 + 해 TypeError를 만난다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "[\"'][^\"']*[\"']\\s*\\+\\s*[0-9]+(?![\"'])"
+        description: "문자열 리터럴 + 정수 리터럴 패턴."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*can only concatenate str.*to str"
+        description: "str + non-str 시도."
+    diagnostic:
+      message: "+ 는 같은 타입끼리만 잇습니다. 숫자를 문자열에 끼우려면 변환이 필요합니다."
+      references: ["python.strings", "python.variables"]
+    correction:
+      hint: "f-string을 사용하세요: `f\"count = {n}\"`. 또는 `str(n)`으로 변환."
+      miniExercise: |
+        n = 42
+        message = f"count = {n}"
+        message
+
+  - id: python.strings.fStringMissingBrace
+    label: "f-string 안에 literal 중괄호를 그대로 적기"
+    summary: "f\"{a}이고 {b} 같은 dict {1:2}\" 처럼 literal {}를 적어 파싱이 깨진다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*f-string|ValueError.*Invalid format specifier"
+        description: "f-string 안의 잘못된 중괄호."
+    diagnostic:
+      message: "f-string에서 literal `{`/`}` 를 표현하려면 `{{`/`}}` 로 두 번 적어야 합니다."
+      references: ["python.strings"]
+    correction:
+      hint: "예: `f\"set is {{1, 2}}\"` 로 적으면 `set is {1, 2}` 가 출력됩니다."
+      miniExercise: |
+        x = 1
+        result = f"x is {x}, literal is {{1, 2}}"
+        result

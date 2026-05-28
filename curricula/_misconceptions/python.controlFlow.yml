@@ -1,0 +1,68 @@
+meta:
+  outcomeId: python.controlFlow
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.controlFlow.assignmentInCondition
+    label: "비교 자리에 할당 = 사용"
+    summary: "if x = 5: 처럼 비교가 아니라 할당을 적어 SyntaxError가 발생한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "(if|while|elif)\\s+[A-Za-z_]\\w*\\s*=(?!=)"
+        description: "조건문에 단일 등호."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*invalid syntax"
+        description: "조건문에서 = 사용."
+    diagnostic:
+      message: "Python의 비교는 `==`, 할당은 `=` 입니다. C/JavaScript처럼 헷갈리기 쉽지만 Python은 조건문에 할당을 허용하지 않습니다."
+      references: ["python.controlFlow", "python.variables"]
+    correction:
+      hint: "비교라면 `if x == 5:`. Python 3.8+의 walrus가 필요하면 `:=` 를 명시적으로 씁니다."
+      miniExercise: |
+        x = 5
+        if x == 5:
+            answer = "match"
+        answer
+
+  - id: python.controlFlow.rangeUpperInclusive
+    label: "range(n)의 상한 포함 여부 오해"
+    summary: "range(1, 5)가 5를 포함한다고 예측하지만 실제로는 1,2,3,4까지만 나온다."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "학습자가 range 상한을 포함 가정."
+    diagnostic:
+      message: "`range(start, stop)`은 stop을 **포함하지 않습니다**. `range(1, 5)`는 1,2,3,4."
+      references: ["python.controlFlow"]
+    correction:
+      hint: "stop까지 포함하고 싶다면 `range(start, stop + 1)`."
+      miniExercise: |
+        values = list(range(1, 5 + 1))
+        values
+
+  - id: python.controlFlow.mutateDuringIteration
+    label: "반복 중 원본 리스트를 변경"
+    summary: "for x in items: items.remove(x) 처럼 반복 중 mutate해서 일부 원소가 스킵된다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "for\\s+(\\w+)\\s+in\\s+([A-Za-z_]\\w*):[\\s\\S]{0,200}?\\2\\.(remove|pop|append|insert|extend)"
+        description: "for 안에서 같은 컬렉션을 mutating."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "예측은 깨끗하게 비어 있음, 실제는 일부 원소가 남음."
+    diagnostic:
+      message: "반복 중 같은 리스트를 변경하면 인덱스가 흐트러져 일부 원소를 건너뜁니다. 이건 버그의 흔한 원인입니다."
+      references: ["python.controlFlow", "python.lists"]
+    correction:
+      hint: "복사본을 순회하거나(`for x in items[:]:`), 새 리스트를 만드세요(`items = [x for x in items if cond]`)."
+      miniExercise: |
+        items = [1, 2, 3, 4]
+        kept = [x for x in items if x % 2 == 0]
+        kept

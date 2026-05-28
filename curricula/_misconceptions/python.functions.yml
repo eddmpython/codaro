@@ -1,0 +1,74 @@
+meta:
+  outcomeId: python.functions
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.functions.missingReturn
+    label: "return 없이 결과를 받으려 함"
+    summary: "함수에 return이 없는데 result = f()로 받아 None이 들어 있다."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        mismatchPattern: "None"
+        description: "예측은 값, 실제는 None."
+    diagnostic:
+      message: "return 문이 없는 함수는 자동으로 None을 반환합니다. print만 있고 return이 없으면 값을 받을 수 없습니다."
+      references: ["python.functions"]
+    correction:
+      hint: "함수에서 값을 돌려주려면 `return value` 를 명시하세요."
+      miniExercise: |
+        def double(value):
+            return value * 2
+        result = double(7)
+        result
+
+  - id: python.functions.mutableDefaultArg
+    label: "기본 인자에 mutable 객체"
+    summary: "def f(items=[]): items.append(x) 패턴에서 호출이 누적된다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "def\\s+\\w+\\([^)]*=\\s*(\\[\\]|\\{\\})"
+        description: "기본 인자 자리에 list/dict 리터럴."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "함수를 두 번 호출했을 때 두 번째가 깨끗할 거라 예측, 실제는 누적."
+    diagnostic:
+      message: "기본 인자는 함수 정의 시 단 한 번 평가됩니다. mutable 기본값은 호출 간에 공유돼 예상치 못한 누적을 일으킵니다."
+      references: ["python.functions", "python.lists"]
+    correction:
+      hint: "기본값은 None으로 두고 함수 안에서 새로 만드세요: `def f(items=None): items = items or []`."
+      miniExercise: |
+        def collect(value, items=None):
+            items = list(items) if items else []
+            items.append(value)
+            return items
+        first = collect(1)
+        second = collect(2)
+        first, second
+
+  - id: python.functions.shadowBuiltin
+    label: "내장 이름을 변수/함수로 덮어쓰기"
+    summary: "list = [...] 또는 def list(...): 후에 list(...) 가 깨진다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "(^|\\n)\\s*(list|dict|set|str|int|float|sum|len|type|map|filter|range|input)\\s*="
+        description: "내장 이름에 직접 할당."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*object is not callable"
+        description: "내장이 가려진 뒤 호출 실패."
+    diagnostic:
+      message: "`list`, `dict`, `sum` 같은 이름은 내장 함수입니다. 변수명으로 덮어쓰면 그 이후로 원래 기능을 잃습니다."
+      references: ["python.functions", "python.variables"]
+    correction:
+      hint: "다른 이름을 쓰세요: `items`, `mapping`, `total`. 이미 덮였다면 `del list` 또는 인터프리터를 재시작."
+      miniExercise: |
+        items = [1, 2, 3]
+        total = sum(items)
+        total

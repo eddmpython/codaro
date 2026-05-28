@@ -1,0 +1,75 @@
+meta:
+  outcomeId: python.lists
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.lists.indexFromOne
+    label: "1-based indexing 가정"
+    summary: "첫 요소를 list[1]로 접근하려다 두 번째 요소를 얻거나 IndexError에 직면한다."
+    triggers:
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "학습자가 첫 요소를 list[1]로 예측."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "IndexError.*list index out of range"
+        description: "off-by-one 인덱싱."
+    diagnostic:
+      message: "Python 리스트는 0부터 시작합니다. 첫 요소는 `list[0]`, 마지막은 `list[-1]`."
+      references: ["python.lists"]
+    correction:
+      hint: "음수 인덱스로 끝에서부터 접근할 수 있습니다. `list[-1]`은 마지막."
+      miniExercise: |
+        items = ["a", "b", "c"]
+        first = items[0]
+        last = items[-1]
+        first, last
+
+  - id: python.lists.sortReturnsNone
+    label: "list.sort()의 반환값을 새 리스트로 받기"
+    summary: "sorted_items = items.sort() 했더니 None이 들어 있다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "=\\s*[A-Za-z_]\\w*\\.sort\\s*\\("
+        description: "`.sort()` 결과를 변수에 할당."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        mismatchPattern: "None"
+        description: "예측은 정렬된 리스트, 실제는 None."
+    diagnostic:
+      message: "`list.sort()`는 in-place로 원본을 정렬하고 None을 반환합니다. 새 리스트가 필요하면 `sorted(items)`."
+      references: ["python.lists"]
+    correction:
+      hint: "원본을 그대로 두고 정렬본을 얻으려면 내장 함수 `sorted(items)`."
+      miniExercise: |
+        items = [3, 1, 2]
+        ordered = sorted(items)
+        ordered
+
+  - id: python.lists.aliasingMutation
+    label: "= 로 복사한 리스트의 변경이 원본에도 반영됨"
+    summary: "b = a; b.append(x) 했더니 a도 같이 바뀐다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "([A-Za-z_]\\w*)\\s*=\\s*([A-Za-z_]\\w*)\\s*\\n[\\s\\S]{0,200}?\\1\\.(append|extend|pop|remove|sort|insert)"
+        description: "별칭 후 mutating method 호출."
+      - kind: predictionMismatch
+        appliesTo: prediction
+        expectedField: value
+        description: "별칭만 바뀔 것이라 예측, 실제는 원본도 변함."
+    diagnostic:
+      message: "`b = a` 는 같은 리스트에 두 이름을 붙입니다. 한쪽에서 바꾸면 양쪽이 같이 보입니다."
+      references: ["python.lists", "python.variables"]
+    correction:
+      hint: "독립 복사가 필요하면 `b = list(a)` 또는 `b = a.copy()`. 깊은 중첩은 `copy.deepcopy`."
+      miniExercise: |
+        a = [1, 2, 3]
+        b = list(a)
+        b.append(4)
+        a, b

@@ -1,0 +1,75 @@
+meta:
+  outcomeId: python.errorHandling
+  status: draft
+  version: 1
+  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.errorHandling.bareExcept
+    label: "맨 except 로 모든 예외 잡기"
+    summary: "except: 만 적어 KeyboardInterrupt나 SystemExit까지 삼킨다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "(^|\\n)\\s*except\\s*:"
+        description: "bare except 사용."
+    diagnostic:
+      message: "맨 `except:`는 모든 예외를 잡습니다. KeyboardInterrupt, SystemExit 같은 종료 신호도 삼키게 됩니다. Codaro 코드 규칙에서도 금지입니다."
+      references: ["python.errorHandling"]
+    correction:
+      hint: "예상하는 예외를 명시하세요. `except (ValueError, KeyError) as exc:` 처럼 좁히고, 메시지를 남기세요."
+      miniExercise: |
+        text = "12a"
+        try:
+            value = int(text)
+        except ValueError as exc:
+            value = None
+            reason = str(exc)
+        value, reason
+
+  - id: python.errorHandling.silencedException
+    label: "예외를 pass로 무시"
+    summary: "except Exception: pass 로 진단 없이 흐름을 지나가서 버그가 숨는다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "except[^:]*:\\s*\\n?\\s*pass"
+        description: "except + pass 패턴."
+    diagnostic:
+      message: "예외를 잡고 아무것도 하지 않으면 문제 신호가 사라집니다. 무엇이 잘못됐는지 모르게 됩니다."
+      references: ["python.errorHandling"]
+    correction:
+      hint: "최소한 로깅하거나, 의도적으로 무시할 수밖에 없는 좁은 예외에만 한정하세요. 보통은 `raise` 또는 `from exc` 체인이 답입니다."
+      miniExercise: |
+        import logging
+        try:
+            value = int("12a")
+        except ValueError as exc:
+            logging.warning("parse failed: %s", exc)
+            value = None
+        value
+
+  - id: python.errorHandling.raiseString
+    label: "raise 에 문자열 또는 클래스만 적기"
+    summary: "raise \"문제 발생\" 또는 raise ValueError (호출 없이) 사용. Python 3에서 TypeError."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "raise\\s+[\"']"
+        description: "문자열을 raise."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*exceptions must derive from BaseException"
+        description: "문자열을 raise 했을 때의 에러."
+    diagnostic:
+      message: "Python 3에서는 예외 클래스의 **인스턴스**를 raise해야 합니다. 문자열이나 클래스 자체는 안 됩니다."
+      references: ["python.errorHandling"]
+    correction:
+      hint: "예: `raise ValueError(\"메시지\")`. 메시지가 필요 없어도 괄호는 적습니다: `raise StopIteration()`."
+      miniExercise: |
+        def parsePositive(text):
+            value = int(text)
+            if value <= 0:
+                raise ValueError(f"positive required, got {value}")
+            return value
+        parsePositive("3")
