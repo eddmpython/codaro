@@ -21,6 +21,18 @@ dev = [
     "pytest>=9.0.2",
     "watchdog>=6.0.0",
 ]
+curriculum = [
+    "matplotlib>=3.10.9",
+    "openpyxl>=3.1.5",
+    "pillow>=12.2.0",
+    "plotly>=6.7.0",
+    "polars>=1.41.1",
+    "python-docx>=1.2.0",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.6",
+]
 
 [project.scripts]
 codaro = "codaro:main"

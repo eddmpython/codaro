@@ -87,6 +87,7 @@ sections:
     - Polars DataFrame의 .shape는 pandas와 동일하게 (행 수, 열 수) 튜플입니다.
     - .columns 속성으로 컬럼 이름 리스트를 얻을 수 있습니다.
   check:
+    type: noError
     noError: pl.read_csv 호출이 정상 실행되어 DataFrame을 반환해야 합니다.
     resultCheck: 결과 DataFrame의 행 수가 506이거나 그에 준해야 합니다.
 - id: step2_schema
@@ -109,6 +110,7 @@ sections:
     - dtypes는 타입만 리스트로, schema는 컬럼명까지 dict로 반환합니다.
     - head는 데이터 미리보기를 줍니다.
   check:
+    type: noError
     noError: .schema 호출이 정상 실행되어야 합니다.
     resultCheck: 결과가 dict 형태이고 각 컬럼명에 Polars 타입이 매핑되어야 합니다.
 - id: step3_null_check
@@ -131,6 +133,7 @@ sections:
     - 단일 컬럼이면 결과 DataFrame이 한 컬럼만 가집니다.
     - 결과의 합계가 0이면 결측 없음을 뜻합니다.
   check:
+    type: noError
     noError: is_null + sum 체인이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame의 각 셀이 0 이상의 정수여야 합니다.
 - id: step4_null_sample
@@ -167,6 +170,7 @@ sections:
     - 임계값을 높이면 더 많은 행이 null이 됩니다.
     - 임계값을 데이터 max보다 높이면 모든 행이 null이 됩니다.
   check:
+    type: noError
     noError: when-then-otherwise 체인이 정상 실행되어야 합니다.
     resultCheck: 결과의 null 개수가 0보다 커야 합니다.
 - id: step5_drop_nulls
@@ -193,6 +197,7 @@ sections:
     - subset 없이 호출하면 다른 컬럼에 null이 있을 때도 행이 삭제됩니다.
     - 이 데이터는 rm만 null이 있으므로 결과는 같습니다.
   check:
+    type: noError
     noError: drop_nulls 호출이 정상 실행되어야 합니다.
     resultCheck: housingClean.shape의 행 수가 housingNull.shape보다 작거나 같아야 합니다.
 - id: step6_fill_null
@@ -225,6 +230,7 @@ sections:
     - 채운 값에 따라 housingFilled의 평균이 달라집니다.
     - 채우기 후 is_null sum이 0이어야 모든 null이 처리된 것입니다.
   check:
+    type: noError
     noError: fill_null 호출이 정상 실행되어야 합니다.
     resultCheck: 결과의 null 개수가 0이어야 합니다.
 - id: step7_when_then
@@ -265,6 +271,7 @@ sections:
     - 임계값이 높을수록 고가 비율이 줄고 저가가 늘어납니다.
     - housingGrade.group_by("priceGrade").len()으로 각 등급의 행 수를 셀 수 있습니다.
   check:
+    type: noError
     noError: when-then 체인이 정상 실행되어야 합니다.
     resultCheck: 결과에 priceGrade 컬럼이 있고 값이 고가/중가/저가 중 하나여야 합니다.
 - id: step8_grade_stats
@@ -294,6 +301,7 @@ sections:
     - count는 행 수, mean은 평균, max는 최댓값입니다.
     - 결과 DataFrame의 컬럼 수가 agg에 넘긴 표현식 개수와 같아야 합니다.
   check:
+    type: noError
     noError: group_by + agg 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame에 priceGrade와 추가 통계 컬럼이 모두 있어야 합니다.
 - id: step9_n_unique
@@ -316,6 +324,7 @@ sections:
     - medv는 가격이라 거의 모든 값이 unique입니다 — n_unique가 행 수에 가까워집니다.
     - 결과는 단일 값을 가진 1x1 DataFrame입니다.
   check:
+    type: noError
     noError: n_unique 호출이 정상 실행되어야 합니다.
     resultCheck: 결과가 1 이상의 정수여야 합니다.
 - id: step10_std
@@ -350,6 +359,7 @@ sections:
     - crim은 분포가 매우 치우쳐 mean과 max 차이가 큽니다.
     - rm은 정규분포에 가까워 mean ± std로 대부분이 들어갑니다.
   check:
+    type: noError
     noError: select에 여러 표현식을 넘기는 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame이 1행 4열이고 mean, std, min, max 컬럼을 가져야 합니다.
 - id: step11_group_std
@@ -382,6 +392,7 @@ sections:
     - 등급마다 std 값이 다르게 나오는지 확인하세요.
     - uniquePrices가 count보다 작으면 같은 가격이 여러 번 등장한다는 뜻입니다.
   check:
+    type: noError
     noError: agg에 여러 표현식을 넘기는 호출이 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame에 priceGrade와 4개 통계 컬럼이 모두 있어야 합니다.
 - id: step12_join_data
@@ -415,6 +426,7 @@ sections:
     - 모든 리스트의 길이가 같아야 합니다(여기서는 2).
     - dtype은 자동 추론되며 premium은 Float64가 됩니다.
   check:
+    type: noError
     noError: pl.DataFrame 생성이 정상 실행되어야 합니다.
     resultCheck: regionInfo가 2행 3열 DataFrame이고 chas/regionName/premium 컬럼을 가져야 합니다.
 - id: step13_join
@@ -449,6 +461,7 @@ sections:
     - regionInfo가 chas 0/1 모두를 가지므로 left와 inner는 같은 결과를 줍니다.
     - 만약 regionInfo에서 한 키를 빼면 left에서는 null이 나오고 inner에서는 행이 사라집니다.
   check:
+    type: noError
     noError: join 호출이 정상 실행되어야 합니다.
     resultCheck: housingJoined에 regionName과 premium 컬럼이 포함되어야 합니다.
 - id: step14_joined_analysis
@@ -481,6 +494,7 @@ sections:
     - group_by에 컬럼 리스트를 주면 조합별 그룹이 만들어집니다.
     - housingJoined에 priceGrade가 없다면 join 전에 추가해야 합니다.
   check:
+    type: noError
     noError: group_by + agg가 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame에 regionName, count, avgPrice, stdPrice, uniquePrices가 모두 있어야 합니다.
 - id: step15_result
@@ -515,6 +529,7 @@ sections:
     - sort에 descending=True를 주면 내림차순입니다.
     - 정렬은 group_by 결과에 바로 체이닝할 수 있습니다.
   check:
+    type: noError
     noError: group_by + 다중 agg가 정상 실행되어야 합니다.
     resultCheck: 결과 DataFrame에 count, avgPrice, stdPrice, minPrice, maxPrice가 모두 있어야 합니다.
 - id: practice
@@ -547,6 +562,7 @@ sections:
     - when-then으로 rmGroup 컬럼을 large/small로 만든 뒤 group_by로 집계하세요.
     - 큰 방 그룹이 medv가 더 높을 것입니다 — 가설을 수치로 검증하세요.
   check:
+    type: noError
     noError: 분석 코드가 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과가 그룹별 통계 DataFrame이거나 의미 있는 비교 값이어야 합니다.
 - id: summary
@@ -641,5 +657,6 @@ sections:
     - quantity 음수 시도 시 quantity는 0보다 커야 합니다 메시지가 떠야 합니다.
     - 컬럼 하나를 임의로 빼면 필수 컬럼 누락 에러가 나옵니다.
   check:
+    type: noError
     noError: validateOrderFrame이 정상 입력에는 True를 반환해야 합니다.
     resultCheck: 잘못된 입력에는 ValueError가 발생하고 정상 입력에는 통과해야 합니다.
