@@ -36,6 +36,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [excludeCompleted, setExcludeCompleted] = useState(true);
   const [skipMastered, setSkipMastered] = useState(false);
+  const [maxMinutes, setMaxMinutes] = useState<number>(0);
   const [plan, setPlan] = useState<MasterPlanPayload | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,6 +85,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           domain: domainId,
           excludeCompleted,
           skipMasteredOutcomes: skipMastered,
+          maxMinutes: maxMinutes > 0 ? maxMinutes : undefined,
         });
         setPlan(next);
       } catch (err) {
@@ -92,7 +94,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         setLoadingPlan(false);
       }
     },
-    [excludeCompleted, skipMastered],
+    [excludeCompleted, skipMastered, maxMinutes],
   );
 
   useEffect(() => {
@@ -159,6 +161,21 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
             onChange={(event) => setSkipMastered(event.target.checked)}
           />
           이미 익힌 능력 건너뛰기
+        </label>
+        <label className="flex items-center gap-1">
+          시간 예산
+          <select
+            className="rounded border border-zinc-700 bg-zinc-900 px-1 py-0.5 text-zinc-200"
+            value={maxMinutes}
+            onChange={(event) => setMaxMinutes(Number(event.target.value))}
+          >
+            <option value={0}>제한 없음</option>
+            <option value={60}>1시간</option>
+            <option value={180}>3시간</option>
+            <option value={360}>6시간</option>
+            <option value={600}>10시간</option>
+            <option value={1200}>20시간</option>
+          </select>
         </label>
       </div>
 
@@ -439,6 +456,24 @@ function PlanBody({
             </li>
           ))}
         </ol>
+      )}
+
+      {plan.droppedSteps && plan.droppedSteps.length > 0 && (
+        <div className="rounded-md border border-zinc-700 bg-zinc-900/30 px-3 py-2 text-[11px] text-zinc-400">
+          <div className="text-zinc-300">
+            시간 예산 밖 {plan.droppedSteps.length}개 단계 (이번 주에는 못 끝낼 수도)
+          </div>
+          <ul className="mt-1 list-disc pl-4 text-zinc-500">
+            {plan.droppedSteps.slice(0, 5).map((step) => (
+              <li key={step.key}>
+                {step.title} · {step.estimatedMinutes}분
+              </li>
+            ))}
+            {plan.droppedSteps.length > 5 && (
+              <li className="text-zinc-600">외 {plan.droppedSteps.length - 5}개…</li>
+            )}
+          </ul>
+        </div>
       )}
 
       {plan.gaps.length > 0 && (

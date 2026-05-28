@@ -88,6 +88,7 @@ class MasterPlanRequest(BaseModel):
     excludeCompleted: bool = True
     excludeKeys: list[str] = Field(default_factory=list)
     skipMasteredOutcomes: bool = False
+    maxMinutes: int = 0
 
 
 class OutcomeValidationRequest(BaseModel):

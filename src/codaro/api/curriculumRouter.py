@@ -178,6 +178,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             excludeCompleted=request.excludeCompleted,
             excludeKeys=request.excludeKeys,
             skipMasteredOutcomes=request.skipMasteredOutcomes,
+            maxMinutes=request.maxMinutes,
         )
         plan = composeMasterPlan(goal, graph, taxonomy, state.progressTracker)
         logger.debug(

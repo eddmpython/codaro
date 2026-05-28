@@ -254,10 +254,13 @@ export type MasterPlanPayload = {
     outcomes: string[];
     excludeCompleted: boolean;
     excludeKeys: string[];
+    skipMasteredOutcomes?: boolean;
+    maxMinutes?: number;
   };
   targetOutcomes: string[];
   steps: MasterPlanStep[];
   gaps: MasterPlanGap[];
+  droppedSteps?: MasterPlanStep[];
   totalMinutes: number;
   summary: string;
   nextStepKey: string | null;
@@ -278,6 +281,7 @@ export type MasterPlanRequestBody = {
   excludeCompleted?: boolean;
   excludeKeys?: string[];
   skipMasteredOutcomes?: boolean;
+  maxMinutes?: number;
 };
 
 export type OutcomeMasteryEntry = {

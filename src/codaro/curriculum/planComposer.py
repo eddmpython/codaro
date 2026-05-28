@@ -68,6 +68,8 @@ class PlanGoal(BaseModel):
     excludeCompleted: bool = True
     excludeKeys: list[str] = Field(default_factory=list)
     skipMasteredOutcomes: bool = False
+    # 시간 예산(분). 0이면 무제한. plan이 이 예산을 넘으면 dropped로 분리.
+    maxMinutes: int = 0
 
 
 class PlanStep(BaseModel):
@@ -98,6 +100,7 @@ class MasterPlan(BaseModel):
     steps: list[PlanStep]
     gaps: list[PlanGap]
     dynamicGaps: list[PlanGap] = Field(default_factory=list)
+    droppedSteps: list[PlanStep] = Field(default_factory=list)
     totalMinutes: int
     summary: str
     nextStepKey: str | None = None
@@ -349,6 +352,31 @@ def composeMasterPlan(
             learnerConfidence=learnerConfidence,
         ))
 
+    # 시간 예산이 주어졌으면 끝부분 step을 droppedSteps로 분리한다.
+    # 합성 우선순위(prerequisite-아래에서-위)는 유지된다 — 끊는 위치는 budget을
+    # 넘기 시작한 직후. 미완료 step만 budget 누적에 포함.
+    droppedSteps: list[PlanStep] = []
+    if goal.maxMinutes and goal.maxMinutes > 0:
+        kept: list[PlanStep] = []
+        budgetRemaining = goal.maxMinutes
+        for step in steps:
+            cost = 0 if step.completed else step.estimatedMinutes
+            if cost == 0 or budgetRemaining >= cost:
+                budgetRemaining -= cost
+                kept.append(step)
+            else:
+                droppedSteps.append(step)
+        steps = kept
+        # totalMinutes는 kept 기준으로 재계산
+        totalMinutes = sum(s.estimatedMinutes for s in steps if not s.completed)
+        # 끝부분이 잘렸으면 nextStepKey도 재계산
+        for step in steps:
+            if not step.completed:
+                nextStepKey = step.key
+                break
+        else:
+            nextStepKey = None
+
     # 정적 gap — 해당 outcome을 가르치는 레슨이 없음
     gaps: list[PlanGap] = [
         PlanGap(
@@ -372,6 +400,7 @@ def composeMasterPlan(
         steps=steps,
         gaps=gaps,
         dynamicGaps=dynamicGaps,
+        droppedSteps=droppedSteps,
         totalMinutes=totalMinutes,
         summary=summary,
         nextStepKey=nextStepKey,
