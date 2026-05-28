@@ -1,0 +1,19 @@
+# 디버깅 패턴
+
+학습자가 자주 마주치는 Python 에러 클래스별로 **"먼저 해볼 3가지"** 를 정리한다.
+ExecutionOutput UI 와 AI teacher 가 같은 카드/디렉토리를 참조해 일관된 가이드를 제공한다.
+
+## 카탈로그
+
+- [KeyError.md](KeyError.md) — 딕셔너리에 없는 키 호출
+- [TypeError.md](TypeError.md) — 자료형이 맞지 않는 연산/호출
+- [NameError.md](NameError.md) — 정의하지 않은 변수/함수 참조
+- [IndexError.md](IndexError.md) — 시퀀스 범위 밖 인덱스
+- [AttributeError.md](AttributeError.md) — 존재하지 않는 속성/메서드 호출
+
+## 카드 작성 규칙
+
+- 한 에러 클래스당 **3가지 검사** — 첫 시도, 두 번째 시도, 세 번째 시도 순서대로.
+- 각 검사는 한 줄 가이드 + 짧은 코드 예시 (실행 가능한 1-2 라인).
+- 학습 맥락에서 흔한 오인을 한 줄로 짚고, 해결의 직관을 키운다.
+- 코드 식별자/예외 이름은 원문 그대로, 설명은 한국어로.

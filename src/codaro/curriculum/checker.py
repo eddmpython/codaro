@@ -42,6 +42,30 @@ COMMON_ERROR_PATTERNS = {
 }
 
 
+# debugging-patterns/<ErrorClass>.md 의 "먼저 해볼 3가지" 가이드 참조.
+# 카드 작성 여부와 무관하게 ref 만 노출 — UI 가 알아서 fetch 한다.
+DEBUGGING_PATTERN_REFS = {
+    "NameError": "docs/skills/learning/debugging-patterns/NameError.md",
+    "TypeError": "docs/skills/learning/debugging-patterns/TypeError.md",
+    "IndexError": "docs/skills/learning/debugging-patterns/IndexError.md",
+    "KeyError": "docs/skills/learning/debugging-patterns/KeyError.md",
+    "AttributeError": "docs/skills/learning/debugging-patterns/AttributeError.md",
+}
+
+
+def detectErrorClass(errorText: str) -> str:
+    """에러 텍스트에서 첫 매칭되는 Python 예외 클래스 이름을 추출한다."""
+    for errorType in COMMON_ERROR_PATTERNS:
+        if errorType in errorText:
+            return errorType
+    return ""
+
+
+def debuggingPatternRef(errorClass: str) -> str:
+    """에러 클래스에 대응하는 디버깅 패턴 카드 경로 (없으면 빈 문자열)."""
+    return DEBUGGING_PATTERN_REFS.get(errorClass, "")
+
+
 async def checkByOutput(
     session: KernelSession,
     studentCode: str,

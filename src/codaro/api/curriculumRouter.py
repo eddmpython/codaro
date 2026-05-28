@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
+from ..curriculum.checker import debuggingPatternRef, detectErrorClass
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.contentCache import CurriculumContentCache
 from ..curriculum.misconceptionCatalog import matchOutcomes
@@ -227,6 +228,16 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         payload["misconceptionMatches"] = misconceptionPayload
         payload["doneCriterionViolated"] = doneCriterionViolated
         payload["predictionDiff"] = predictionDiffPayload
+
+        # 디버깅 패턴 ref — 학습자가 만난 에러 클래스를 보조 가이드로 안내.
+        errorContext = " ".join([
+            str(payload.get("studentOutput") or ""),
+            str(payload.get("detail") or ""),
+            str(payload.get("feedback") or ""),
+        ])
+        errorClass = detectErrorClass(errorContext) if not result.passed else ""
+        payload["errorClass"] = errorClass
+        payload["debuggingPatternRef"] = debuggingPatternRef(errorClass)
 
         logger.debug(
             "curriculum %s",
