@@ -496,6 +496,40 @@ outcomes:
     label: LLM 전처리
     description: 토큰화, 마스킹, 정제 파이프라인
 
+  - id: automation.webApi.intro
+    label: requests/API 자동화 입문
+    description: HTTP/REST/JSON 감각, status code, 안전 정책
+  - id: automation.webApi.get
+    label: 첫 GET 요청
+    description: requests.get, status_code, raise_for_status, .json() 파싱
+  - id: automation.webApi.params
+    label: 쿼리 파라미터
+    description: params= 키워드, URL 인코딩, 응답 캐시
+  - id: automation.webApi.headers
+    label: 헤더와 API 키
+    description: headers=, User-Agent, 환경변수 기반 API 키 주입
+  - id: automation.webApi.post
+    label: POST와 JSON 전송
+    description: requests.post, json= vs data=, webhook 호출
+  - id: automation.webApi.errorHandling
+    label: 에러 처리·재시도
+    description: timeout, raise_for_status, urllib3 Retry, backoff
+  - id: automation.webApi.session
+    label: Session과 로그인
+    description: requests.Session, cookies, 헤더 persist, 커넥션 풀
+  - id: automation.webApi.pagination
+    label: 페이지네이션 수집
+    description: offset/cursor/Link 헤더, generator 기반 반복 수집
+  - id: automation.webApi.fileTransfer
+    label: 파일 업·다운로드
+    description: files= multipart, stream=, iter_content, 대용량 처리
+  - id: automation.webApi.async
+    label: 비동기 병렬 호출
+    description: httpx.AsyncClient, asyncio.gather, Semaphore 동시성 제한
+  - id: automation.webApi.report
+    label: API 수집기 종합
+    description: 다중 API → DataFrame → 차트 → 저장·통보 통합 파이프라인
+
   # === LLM API 통합 ===
   - id: llm.intro
     label: LLM API 첫 호출
@@ -583,6 +617,25 @@ domains:
       - automation.email.notify
       - automation.email.credentials
       - automation.email.report
+
+  - id: apiAutomation
+    label: 웹 API 자동화 (requests)
+    description: requests로 외부 API에서 데이터를 수집·결합·통보하는 일일 자동화 파이프라인을 만든다.
+    targetOutcomes:
+      - python.functions
+      - python.errorHandling
+      - python.modulesAndIo
+      - automation.webApi.intro
+      - automation.webApi.get
+      - automation.webApi.params
+      - automation.webApi.headers
+      - automation.webApi.post
+      - automation.webApi.errorHandling
+      - automation.webApi.session
+      - automation.webApi.pagination
+      - automation.webApi.fileTransfer
+      - automation.webApi.async
+      - automation.webApi.report
 
   - id: documentAutomation
     label: 문서 자동화 (Word)

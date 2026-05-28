@@ -49,6 +49,7 @@ categoryMapping = {
     'watchSched': '감시·스케줄',
     'inputCtl': '입력·GUI자동화',
     'llmBasics': 'LLM 통합 기초',
+    'requests': 'requests REST API 자동화',
 }
 
 categoryMeta = {
@@ -280,6 +281,12 @@ categoryMeta = {
         'description': 'Claude API로 대화·도구·캐싱·구조화 출력을 실무 자동화에 붙인다',
         'imageUrl': None,
     },
+    'requests': {
+        'icon': 'cloud_sync',
+        'color': 'sky',
+        'description': 'requests로 외부 API에서 데이터를 받아 가공·저장·통보하는 일일 자동화 파이프라인을 만든다',
+        'imageUrl': None,
+    },
 }
 
 categoryGroups = {
@@ -288,7 +295,7 @@ categoryGroups = {
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
-    '자동화': ['playwright', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
+    '자동화': ['playwright', 'requests', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
     '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     'AI 통합': ['llmBasics'],
 }
@@ -334,6 +341,13 @@ categoryTree = [
                 'description': '화면 점검, 폼 입력, 증거 저장, E2E 흐름을 다룬다.',
                 'folder': 'browser',
                 'categories': ['playwright'],
+            },
+            {
+                'id': 'web-api-automation',
+                'name': '웹 API 자동화',
+                'description': 'requests로 외부 API에서 데이터를 받아 가공·저장·통보한다.',
+                'folder': 'webApi',
+                'categories': ['requests'],
             },
             {
                 'id': 'office-automation',
@@ -423,7 +437,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'playwright', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'playwright', 'requests', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {
