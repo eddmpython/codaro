@@ -89,6 +89,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 1단계. 라이브러리 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: step2_pairplot_basic
@@ -120,6 +121,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 기본 pairplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 2단계. 기본 pairplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_pairplot_hue
@@ -148,6 +150,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 그룹별 pairplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 3단계. 그룹별 pairplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_pairplot_reg
@@ -176,6 +179,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 4단계. 회귀선 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 4단계. 회귀선 추가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_jointplot_basic
@@ -204,6 +208,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 5단계. 기본 jointplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 5단계. 기본 jointplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_jointplot_reg
@@ -233,6 +238,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 6단계. jointplot 회귀의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 6단계. jointplot 회귀의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_jointplot_kde
@@ -258,6 +264,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 7단계. KDE jointplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 7단계. KDE jointplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step8_jointplot_hue
@@ -283,6 +290,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 8단계. 그룹별 jointplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 8단계. 그룹별 jointplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step9_lmplot_basic
@@ -312,6 +320,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 9단계. 기본 lmplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 9단계. 기본 lmplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step10_lmplot_col
@@ -337,6 +346,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 10단계. 패널별 회귀의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 10단계. 패널별 회귀의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step11_lmplot_poly
@@ -366,6 +376,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 11단계. 다항 회귀의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 11단계. 다항 회귀의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step12_lmplot_grid
@@ -393,6 +404,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 12단계. 다중 조건 회귀의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 12단계. 다중 조건 회귀의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step13_corr_heatmap
@@ -426,6 +438,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 13단계. 상관계수 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 13단계. 상관계수 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: workflow_validation
@@ -472,6 +485,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 14단계. 자동차 연비 다변량 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 14단계. 자동차 연비 다변량 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
@@ -504,5 +518,6 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
