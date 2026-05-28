@@ -13,6 +13,10 @@ solutions가 있는지). 이 audit은 한 단계 더 들어가서 plan 가시성
 6. **sectionIdMissing**: taxonomy.sectionOutcomes 에 매핑된 section id 가 YAML 의
    실제 section id 와 불일치 — credit 흐름이 무효 section id 를 신뢰하는 위험.
 
+체크 (카테고리 단위):
+7. **categoryWithoutProject**: deliverable-driven plan 합성을 위한 project lesson
+   이 카테고리 내에 0 개. 단, 명시적 유틸 모듈 카테고리는 면제.
+
 체크 (runtime, 정보성):
 6. **runtimeWeakOutcomes**: 학습자 학습자 상태(`learnerState.db`)에서 mastery<0.3 또는
    confidence<0.2인 outcome — 사람이 강의를 보강해야 할 신호.
@@ -50,7 +54,14 @@ THRESHOLDS: dict[str, int] = {
     "exerciseWithoutCheck": 0,
     "noHint": 0,
     "sectionIdMissing": 0,
+    "categoryWithoutProject": 0,
 }
+
+# 명시적으로 project lesson 면제되는 카테고리.
+# - builtins: 표준라이브러리 유틸 단원 모음. 별도 deliverable 없음.
+# - excel: deprecated 스텁 (실제 xlwings 트랙은 xlwings 카테고리).
+# - practical: intro 전용 카테고리.
+PROJECT_EXEMPT_CATEGORIES: frozenset[str] = frozenset({"builtins", "excel", "practical"})
 
 # runtime mastery 임계 — Predict-Run-Reconcile-Adapt 루프와 동일.
 RUNTIME_MASTERY_THRESHOLD = 0.3
@@ -160,6 +171,20 @@ def auditCurriculum() -> dict[str, Any]:
                     "flags": flags,
                 })
 
+    # category-level project gate.
+    categoryProjects: dict[str, int] = {}
+    for cat in loader.listCategories():
+        categoryProjects.setdefault(cat.key, 0)
+    for key, record in taxonomy.lessonOutcomes.items():
+        if record.lessonRole == "project":
+            cat = key.split("/")[0]
+            categoryProjects[cat] = categoryProjects.get(cat, 0) + 1
+    missingProjectCategories = [
+        cat for cat, count in categoryProjects.items()
+        if count == 0 and cat not in PROJECT_EXEMPT_CATEGORIES
+    ]
+    flagCounts["categoryWithoutProject"] = len(missingProjectCategories)
+
     breaches = []
     for flag, threshold in THRESHOLDS.items():
         count = flagCounts.get(flag, 0)
@@ -168,6 +193,8 @@ def auditCurriculum() -> dict[str, Any]:
 
     return {
         "lessonReports": lessonReports,
+        "missingProjectCategories": missingProjectCategories,
+        "categoryProjects": dict(sorted(categoryProjects.items())),
         "flagCounts": flagCounts,
         "thresholds": THRESHOLDS,
         "breaches": breaches,
