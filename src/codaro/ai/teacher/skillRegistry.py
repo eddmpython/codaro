@@ -72,6 +72,26 @@ teacherSkills: tuple[TeacherSkill, ...] = (
         requiredTools=("read-cells", "create-automation-task"),
         policy="검증된 recipe 또는 documentPath만 task로 등록하며 커리큘럼 학습 공간과 섞지 않는다.",
     ),
+    TeacherSkill(
+        skillId="learner-diagnostics",
+        purpose="학습자의 mental model 상태를 읽고 misconception을 매칭해 다음 발자국을 derive한다.",
+        trigger=(
+            "학습자가 셀을 실행했거나 예측을 적었을 때, 같은 outcome에서 반복 실패할 때, "
+            "또는 사용자가 '왜 안 되는지', '뭐가 헷갈리는지', '이제 뭐 하면 좋을지'를 물을 때"
+        ),
+        requiredTools=(
+            "read-learner-state",
+            "record-prediction-result",
+            "match-misconception",
+            "suggest-next-step",
+        ),
+        policy=(
+            "Predict-Run-Reconcile-Adapt 루프: predict가 있으면 record-prediction-result로 diff를 mastery 신호로 바꾸고, "
+            "에러/이상한 코드가 보이면 match-misconception으로 catalog와 매칭한다. "
+            "그 다음 suggest-next-step으로 applyCorrection/replayOutcome/advance/continuePractice 중 하나를 골라 학습자에게 다음 행동을 제시한다. "
+            "같은 misconception이 두 번 매칭되면 doneCriterionViolated가 떠 강의 보강이 필요한 신호다."
+        ),
+    ),
 )
 
 

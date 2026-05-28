@@ -224,3 +224,54 @@ def testGapSortingIsDeterministic(tmp_path: Path) -> None:
 
 def testThresholdConstantIsExposed() -> None:
     assert 0 < DYNAMIC_GAP_MASTERY_THRESHOLD < 1
+
+
+def testMaxMinutesBudgetSplitsDroppedSteps() -> None:
+    """maxMinutes 예산이 주어지면 끝부분 step이 droppedSteps로 분리된다.
+
+    smallGraph는 a(10) + b(15) + c(20) = 45분. budget 25분이면 a+b는 kept,
+    c는 dropped.
+    """
+    plan = composeMasterPlan(
+        PlanGoal(domain="goalC", maxMinutes=25),
+        _smallGraph(),
+        _smallTaxonomy(),
+    )
+    keptKeys = [step.key for step in plan.steps]
+    droppedKeys = [step.key for step in plan.droppedSteps]
+    assert keptKeys == ["cat/01_a", "cat/02_b"]
+    assert droppedKeys == ["cat/03_c"]
+    assert plan.totalMinutes == 25
+    assert plan.nextStepKey == "cat/01_a"
+
+
+def testMaxMinutesZeroMeansUnlimited() -> None:
+    plan = composeMasterPlan(
+        PlanGoal(domain="goalC", maxMinutes=0),
+        _smallGraph(),
+        _smallTaxonomy(),
+    )
+    assert len(plan.steps) == 3
+    assert plan.droppedSteps == []
+
+
+def testMaxMinutesCompletedDoesNotConsumeBudget(tmp_path: Path) -> None:
+    """완료된 step은 budget을 소비하지 않아야 한다 — 이미 한 것은 시간 비용 없음."""
+    from codaro.curriculum.progress import ProgressTracker
+
+    tracker = ProgressTracker(tmp_path / "progress.json")
+    tracker.completeMission("cat", "01_a", "m1", totalMissions=1)
+
+    plan = composeMasterPlan(
+        PlanGoal(domain="goalC", maxMinutes=20, excludeCompleted=False),
+        _smallGraph(),
+        _smallTaxonomy(),
+        progressTracker=tracker,
+    )
+    # 완료된 a(10)는 cost 0, 미완료 b(15) + c(20) = 35분. budget 20에서 b만 fit.
+    keptKeys = [step.key for step in plan.steps]
+    assert "cat/01_a" in keptKeys
+    assert "cat/02_b" in keptKeys
+    assert "cat/03_c" not in keptKeys
+    droppedKeys = [step.key for step in plan.droppedSteps]
+    assert droppedKeys == ["cat/03_c"]
