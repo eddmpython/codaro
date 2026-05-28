@@ -397,6 +397,143 @@ sections:
   check:
     noError: Table의 ref가 헤더 포함 데이터 영역과 정확히 일치해야 합니다.
     resultCheck: ref가 "A1:E3"이어야 합니다.
+- id: practice
+  title: 실습 — 종합 미션 2개
+  structuredPrimary: true
+  subtitle: import부터 검증까지 독립 실행
+  goal: Table·DataValidation·freeze_panes를 두 가지 실무 양식에 결합한다.
+  why: 입력 양식의 무결성은 단계별 예제만으로는 부족합니다. 여러 검증을 한 양식에 결합해 봐야 양식이 양식답게 동작합니다.
+  explanation: |-
+    미션1은 휴가 신청서(부서 드롭다운 + 일수 1~30 범위 + Table + 헤더 고정)입니다. 미션2는 재고 입력 양식(카테고리 드롭다운 + 수량 양수 검증 + Table + A열까지 고정)입니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 변수 prefix는 `leave*`(미션1), `stock*`(미션2)로 격리됩니다. Table displayName도 미션별로 다르게 두지 않으면 ValueError가 납니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+  exercise:
+    prompt: 두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "mission.xlsx"
+      ___
+    hints:
+    - 미션1 부서 목록은 '"영업,개발,운영"' 형식, 일수는 decimal 1~30.
+    - 미션2 카테고리는 '"가전,주방,사무"', 수량은 decimal greaterThan 0.
+  check:
+    noError: DataValidation의 formula1은 큰따옴표로 감싼 콤마 문자열이어야 합니다.
+    resultCheck: 재오픈 후 tables 개수와 freeze_panes 값이 모두 보존되어야 합니다.
+  blocks:
+  - type: tip
+    content: Table의 displayName은 워크북 전역에서 고유해야 합니다. 두 미션을 한 파일에 합치지 말고 별도 파일로 분리하세요.
+  - type: expansion
+    title: "미션1: 휴가 신청서 양식"
+    blocks:
+    - type: code
+      title: 부서 드롭다운 + 일수 범위 + Table + 헤더 고정
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.worksheet.datavalidation import DataValidation
+        from openpyxl.worksheet.table import Table, TableStyleInfo
+
+        leaveDir = TemporaryDirectory()
+        leavePath = Path(leaveDir.name) / "leave.xlsx"
+
+        leaveBook = Workbook()
+        leaveSheet = leaveBook.active
+        leaveSheet.title = "leaves"
+        leaveSheet.append(["사번", "부서", "사유", "일수", "시작일"])
+        leaveSheet.append(["E001", "영업", "연차", 3, "2026-06-03"])
+        leaveSheet.append(["E002", "개발", "병가", 1, "2026-06-05"])
+
+        deptDv = DataValidation(type="list", formula1='"영업,개발,운영"', allow_blank=False)
+        deptDv.errorTitle = "부서 선택"
+        deptDv.error = "영업/개발/운영 중 하나를 선택하세요."
+        leaveSheet.add_data_validation(deptDv)
+        deptDv.add("B2:B100")
+
+        daysDv = DataValidation(type="decimal", operator="between", formula1=1, formula2=30)
+        daysDv.errorTitle = "일수 범위"
+        daysDv.error = "1~30일 사이로 입력하세요."
+        leaveSheet.add_data_validation(daysDv)
+        daysDv.add("D2:D100")
+
+        leaveTable = Table(displayName="LeaveTable", ref="A1:E3")
+        leaveTable.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
+        leaveSheet.add_table(leaveTable)
+        leaveSheet.freeze_panes = "A2"
+        leaveBook.save(leavePath)
+        leaveSheet.freeze_panes
+    - type: code
+      title: 양식 무결성 검증
+      content: |-
+        leaveReopen = load_workbook(leavePath)
+        leaveBack = leaveReopen["leaves"]
+        assert len(leaveBack.tables) == 1
+        assert "LeaveTable" in leaveBack.tables
+        assert leaveBack.freeze_panes == "A2"
+        assert len(leaveBack.data_validations.dataValidation) == 2
+        len(leaveBack.tables), leaveBack.freeze_panes
+  - type: expansion
+    title: "미션2: 재고 입력 양식"
+    blocks:
+    - type: code
+      title: 카테고리 드롭다운 + 수량 양수 + Table + 첫 열 고정
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.worksheet.datavalidation import DataValidation
+        from openpyxl.worksheet.table import Table, TableStyleInfo
+
+        stockDir = TemporaryDirectory()
+        stockPath = Path(stockDir.name) / "stock.xlsx"
+
+        stockBook = Workbook()
+        stockSheet = stockBook.active
+        stockSheet.title = "stocks"
+        stockSheet.append(["품번", "카테고리", "수량", "단가"])
+        stockSheet.append(["SKU-1", "가전", 12, 480000])
+        stockSheet.append(["SKU-2", "주방", 25, 35000])
+
+        categoryDv = DataValidation(type="list", formula1='"가전,주방,사무"', allow_blank=False)
+        categoryDv.errorTitle = "카테고리 선택"
+        categoryDv.error = "가전/주방/사무 중 하나를 선택하세요."
+        stockSheet.add_data_validation(categoryDv)
+        categoryDv.add("B2:B100")
+
+        qtyDv = DataValidation(type="decimal", operator="greaterThan", formula1=0)
+        qtyDv.errorTitle = "수량은 양수"
+        qtyDv.error = "0보다 큰 수량을 입력하세요."
+        stockSheet.add_data_validation(qtyDv)
+        qtyDv.add("C2:C100")
+
+        stockTable = Table(displayName="StockTable", ref="A1:D3")
+        stockTable.tableStyleInfo = TableStyleInfo(name="TableStyleLight9", showRowStripes=True)
+        stockSheet.add_table(stockTable)
+        stockSheet.freeze_panes = "B2"
+        stockBook.save(stockPath)
+        stockSheet.freeze_panes
+    - type: code
+      title: 양식 무결성 검증
+      content: |-
+        stockReopen = load_workbook(stockPath)
+        stockBack = stockReopen["stocks"]
+        assert "StockTable" in stockBack.tables
+        assert stockBack.freeze_panes == "B2"
+        assert len(stockBack.data_validations.dataValidation) == 2
+        len(stockBack.tables), stockBack.freeze_panes
 - id: summary
   title: 정리
   subtitle: 양식의 무결성을 코드로
