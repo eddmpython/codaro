@@ -24,7 +24,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from .predictionDiff import PredictionDiff
 
 
-DEFAULT_DB_PATH = Path.home() / ".codaro" / "learnerState.db"
 MASTERY_EMA = 0.3
 CONFIDENCE_STEP = 0.1
 REPEAT_THRESHOLD_DAYS = 0  # 같은 day에 두 번 hit 해도 repeat로 본다 (가장 엄격).
@@ -108,7 +107,8 @@ class LearnerStateStore:
         if storagePath:
             self._dbPath = Path(storagePath).resolve()
         else:
-            self._dbPath = DEFAULT_DB_PATH
+            # 기본 경로는 인스턴스 생성 시점에 평가 — 환경변수 변경/테스트 격리를 반영
+            self._dbPath = Path.home() / ".codaro" / "learnerState.db"
         self._dbPath.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
 

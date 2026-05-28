@@ -280,4 +280,59 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             "aiTeacherInstructions": AI_TEACHER_INSTRUCTIONS,
         }
 
+    @router.get("/api/learner/snapshot")
+    def apiLearnerSnapshot() -> dict[str, object]:
+        """학습자 상태 전체 스냅샷 — Predict-Run-Reconcile-Adapt 루프 표면.
+
+        프론트가 mastery 패널, misconception 표시, dynamic gap UI를 그릴 때 호출한다.
+        """
+        snapshot = state.learnerStateStore.snapshot()
+        repeats = state.learnerStateStore.listRepeatedMisconceptions()
+        logger.debug(
+            "learner %s",
+            formatLogFields(
+                action="snapshot",
+                masteryEntries=len(snapshot.mastery),
+                misconceptionHits=len(snapshot.misconceptions),
+                repeatedMisconceptions=len(repeats),
+            ),
+        )
+        return {
+            **snapshot.model_dump(),
+            "repeatedMisconceptionCount": len(repeats),
+            "doneCriterionViolated": bool(repeats),
+        }
+
+    @router.get("/api/learner/outcome/{outcomeId}")
+    def apiLearnerOutcome(outcomeId: str) -> dict[str, object]:
+        """단일 outcome에 대한 mastery + 관련 misconception hit 목록.
+
+        Predict-Run-Reconcile-Adapt 루프에서 한 outcome에 집중할 때 폴링용.
+        """
+        taxonomy = state.curriculumOs.taxonomy()
+        if not taxonomy.hasOutcome(outcomeId):
+            fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {outcomeId}")
+        store = state.learnerStateStore
+        mastery = store.getMastery(outcomeId)
+        related = [
+            hit.model_dump()
+            for hit in store.listMisconceptionHits()
+            if hit.outcomeId == outcomeId
+        ]
+        logger.debug(
+            "learner %s",
+            formatLogFields(
+                action="outcome",
+                outcomeId=outcomeId,
+                score=mastery.score,
+                misconceptionHits=len(related),
+            ),
+        )
+        return {
+            "outcomeId": outcomeId,
+            "outcomeLabel": taxonomy.outcomeLabel(outcomeId),
+            "mastery": mastery.model_dump(),
+            "misconceptionHits": related,
+        }
+
     return router
