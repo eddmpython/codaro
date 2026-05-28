@@ -4,13 +4,19 @@ from fastapi import APIRouter
 
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.contentCache import CurriculumContentCache
+from ..curriculum.outcomeMastery import computeMastery
 from ..curriculum.planComposer import PlanGoal, composeMasterPlan
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
-from .requestModels import CheckExerciseRequest, CurriculumProgressRequest, MasterPlanRequest
+from .requestModels import (
+    CheckExerciseRequest,
+    CurriculumProgressRequest,
+    MasterPlanRequest,
+    OutcomeValidationRequest,
+)
 
 
 def createCurriculumRouter(state: ServerState) -> APIRouter:
@@ -171,6 +177,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             outcomes=request.outcomes,
             excludeCompleted=request.excludeCompleted,
             excludeKeys=request.excludeKeys,
+            skipMasteredOutcomes=request.skipMasteredOutcomes,
         )
         plan = composeMasterPlan(goal, graph, taxonomy, state.progressTracker)
         logger.debug(
@@ -184,6 +191,44 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             ),
         )
         return plan.model_dump()
+
+    @router.get("/api/curriculum/mastery")
+    def apiCurriculumMastery() -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        graph = state.curriculumOs.graph()
+        validated = state.progressTracker.listValidatedOutcomes()
+        report = computeMastery(graph, taxonomy, state.progressTracker, validated)
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="mastery",
+                mastered=report.masteredOutcomeCount,
+                total=report.totalOutcomeCount,
+            ),
+        )
+        return report.model_dump()
+
+    @router.post("/api/curriculum/outcomes/validate")
+    def apiCurriculumValidateOutcome(request: OutcomeValidationRequest) -> dict[str, object]:
+        taxonomy = state.curriculumOs.taxonomy()
+        if not taxonomy.hasOutcome(request.outcomeId):
+            fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {request.outcomeId}")
+        if request.validated:
+            state.progressTracker.markOutcomeValidated(request.outcomeId)
+        else:
+            state.progressTracker.clearOutcomeValidation(request.outcomeId)
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="outcome-validate",
+                outcomeId=request.outcomeId,
+                validated=request.validated,
+            ),
+        )
+        return {
+            "outcomeId": request.outcomeId,
+            "validated": request.validated,
+        }
 
     @router.get("/api/curriculum/gaps")
     def apiCurriculumGaps(domain: str | None = None) -> dict[str, object]:

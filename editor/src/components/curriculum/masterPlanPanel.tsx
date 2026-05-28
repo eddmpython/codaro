@@ -24,6 +24,7 @@ import type {
   CurriculumTaxonomyPayload,
   MasterPlanPayload,
 } from "@/types";
+import { MasteryPanel } from "./masteryPanel";
 
 type MasterPlanPanelProps = {
   onSelectLesson?: (category: string, contentId: string) => void;
@@ -34,9 +35,11 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
   const [taxonomy, setTaxonomy] = useState<CurriculumTaxonomyPayload | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [excludeCompleted, setExcludeCompleted] = useState(true);
+  const [skipMastered, setSkipMastered] = useState(false);
   const [plan, setPlan] = useState<MasterPlanPayload | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [masteryRefreshKey, setMasteryRefreshKey] = useState(0);
 
   const outcomeLabels = useMemo<Record<string, string>>(() => {
     const map: Record<string, string> = {};
@@ -80,6 +83,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         const next = await codaroApi.curriculumMasterPlan({
           domain: domainId,
           excludeCompleted,
+          skipMasteredOutcomes: skipMastered,
         });
         setPlan(next);
       } catch (err) {
@@ -88,14 +92,14 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         setLoadingPlan(false);
       }
     },
-    [excludeCompleted],
+    [excludeCompleted, skipMastered],
   );
 
   useEffect(() => {
     if (selectedDomain) {
       void composePlan(selectedDomain);
     }
-  }, [selectedDomain, composePlan]);
+  }, [selectedDomain, composePlan, masteryRefreshKey]);
 
   const activeDomain = useMemo<CurriculumDomain | null>(() => {
     if (!taxonomy || !selectedDomain) return null;
@@ -137,7 +141,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         onSelect={setSelectedDomain}
       />
 
-      <div className="flex items-center gap-2 text-xs text-zinc-400">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
         <label className="flex items-center gap-1 cursor-pointer">
           <input
             type="checkbox"
@@ -146,6 +150,15 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
             onChange={(event) => setExcludeCompleted(event.target.checked)}
           />
           이미 끝낸 레슨 제외
+        </label>
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input
+            type="checkbox"
+            className="rounded"
+            checked={skipMastered}
+            onChange={(event) => setSkipMastered(event.target.checked)}
+          />
+          이미 익힌 능력 건너뛰기
         </label>
       </div>
 
@@ -161,6 +174,22 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
           <div className="mt-1 text-zinc-500">{activeDomain.description}</div>
         </div>
       )}
+
+      <MasteryPanel
+        taxonomy={taxonomy}
+        selectedDomain={selectedDomain}
+        refreshKey={masteryRefreshKey}
+      />
+      <div className="flex justify-end">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-5 px-2 text-[10px] text-zinc-500 hover:text-zinc-300"
+          onClick={() => setMasteryRefreshKey((k) => k + 1)}
+        >
+          숙련도 새로고침
+        </Button>
+      </div>
 
       {plan && !loadingPlan && totalLessons > 0 && (
         <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs">

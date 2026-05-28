@@ -9,7 +9,9 @@ from threading import Lock
 from typing import Any
 
 from ...curriculum.lessonGraph import LessonGraph, buildLessonGraph
+from ...curriculum.outcomeMastery import computeMastery, masteredOutcomeIds
 from ...curriculum.planComposer import PlanGoal, composeMasterPlan
+from ...curriculum.progress import ProgressTracker
 from ...curriculum.studyLoader import StudyLoader
 from ...curriculum.taxonomy import CurriculumTaxonomy, loadTaxonomy
 
@@ -21,6 +23,16 @@ _cacheLock = Lock()
 _taxonomyCache: CurriculumTaxonomy | None = None
 _graphCache: LessonGraph | None = None
 _studyLoaderCache: StudyLoader | None = None
+_progressTrackerCache: ProgressTracker | None = None
+
+
+def _progressTracker() -> ProgressTracker:
+    global _progressTrackerCache
+    if _progressTrackerCache is None:
+        with _cacheLock:
+            if _progressTrackerCache is None:
+                _progressTrackerCache = ProgressTracker()
+    return _progressTrackerCache
 
 
 def _taxonomy() -> CurriculumTaxonomy:
@@ -238,6 +250,59 @@ class CurriculumOsToolHandlers:
                 })
         return {"gaps": gaps}
 
+    async def _handle_getOutcomeMastery(self, args: dict[str, Any]) -> dict[str, Any]:
+        domain = args.get("domain") or None
+        min_level = args.get("minLevel")
+        if not isinstance(min_level, (int, float)):
+            min_level = 0.0
+        taxonomy = _taxonomy()
+        if domain and not taxonomy.domainById(domain):
+            return {"error": f"Unknown domain: {domain}"}
+        tracker = _progressTracker()
+        report = computeMastery(_graph(), taxonomy, tracker, tracker.listValidatedOutcomes())
+        outcomes = [
+            entry.model_dump()
+            for entry in report.outcomes
+            if entry.level >= float(min_level)
+        ]
+        if domain:
+            target = taxonomy.domainById(domain)
+            if target:
+                wanted = set(target.targetOutcomes)
+                outcomes = [o for o in outcomes if o["outcomeId"] in wanted]
+        domains = [d.model_dump() for d in report.domains]
+        if domain:
+            domains = [d for d in domains if d["domainId"] == domain]
+        return {
+            "outcomes": outcomes,
+            "domains": domains,
+            "masteredOutcomeCount": report.masteredOutcomeCount,
+            "totalOutcomeCount": report.totalOutcomeCount,
+            "masteredOutcomeIds": sorted(masteredOutcomeIds(report)),
+        }
+
+    async def _handle_markOutcomeValidated(self, args: dict[str, Any]) -> dict[str, Any]:
+        outcomeId = str(args.get("outcomeId") or "")
+        if not outcomeId:
+            return {"error": "outcomeId is required"}
+        taxonomy = _taxonomy()
+        if not taxonomy.hasOutcome(outcomeId):
+            return {"error": f"Unknown outcome: {outcomeId}"}
+        validated = args.get("validated")
+        if validated is None:
+            validated = True
+        tracker = _progressTracker()
+        if bool(validated):
+            tracker.markOutcomeValidated(outcomeId)
+        else:
+            tracker.clearOutcomeValidation(outcomeId)
+        return {
+            "outcomeId": outcomeId,
+            "outcomeLabel": taxonomy.outcomeLabel(outcomeId),
+            "validated": bool(validated),
+            "reason": args.get("reason"),
+        }
+
     async def _handle_proposeCurriculumDraft(self, args: dict[str, Any]) -> dict[str, Any]:
         outcomeId = str(args.get("outcomeId") or "")
         title = str(args.get("title") or "")
@@ -272,8 +337,9 @@ class CurriculumOsToolHandlers:
 
 def resetCurriculumOsCache() -> None:
     """테스트에서 taxonomy/graph 재로딩이 필요할 때 사용."""
-    global _taxonomyCache, _graphCache, _studyLoaderCache
+    global _taxonomyCache, _graphCache, _studyLoaderCache, _progressTrackerCache
     with _cacheLock:
         _taxonomyCache = None
         _graphCache = None
         _studyLoaderCache = None
+        _progressTrackerCache = None

@@ -277,6 +277,32 @@ export type MasterPlanRequestBody = {
   outcomes?: string[];
   excludeCompleted?: boolean;
   excludeKeys?: string[];
+  skipMasteredOutcomes?: boolean;
+};
+
+export type OutcomeMasteryEntry = {
+  outcomeId: string;
+  label: string;
+  level: number;
+  completedLessonKeys: string[];
+  inProgressLessonKeys: string[];
+  sourceLessonCount: number;
+  validated: boolean;
+};
+
+export type DomainMasteryEntry = {
+  domainId: string;
+  label: string;
+  level: number;
+  masteredOutcomeCount: number;
+  targetOutcomeCount: number;
+};
+
+export type MasteryReportPayload = {
+  outcomes: OutcomeMasteryEntry[];
+  domains: DomainMasteryEntry[];
+  masteredOutcomeCount: number;
+  totalOutcomeCount: number;
 };
 
 export type CheckResult = {

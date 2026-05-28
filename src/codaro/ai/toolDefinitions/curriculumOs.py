@@ -151,6 +151,52 @@ TOOL_LIST_CURRICULUM_GAPS = ToolDef(
 )
 
 
+TOOL_GET_OUTCOME_MASTERY = ToolDef(
+    name="get-outcome-mastery",
+    description=(
+        "Report what the learner has actually mastered, derived from lesson completion + "
+        "validated outcome marks. Returns per-outcome mastery levels (0..1), per-domain "
+        "rollups, and the set of currently mastered outcomes. Use this BEFORE composing a "
+        "plan to skip topics the learner already knows, or AFTER conversation to suggest "
+        "next growth points."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "domain": {
+                "type": "string",
+                "description": "Restrict the rollup to a single domain id.",
+            },
+            "minLevel": {
+                "type": "number",
+                "description": "Only return outcomes with mastery >= this threshold (0..1).",
+            },
+        },
+    },
+    handler="getOutcomeMastery",
+)
+
+
+TOOL_MARK_OUTCOME_VALIDATED = ToolDef(
+    name="mark-outcome-validated",
+    description=(
+        "Mark an outcome as explicitly validated (e.g. after a knowledge check passed). "
+        "Validated outcomes are treated as fully mastered (level 1.0) by the composer "
+        "regardless of lesson completion. Pass validated=false to clear."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "outcomeId": {"type": "string"},
+            "validated": {"type": "boolean", "description": "True to mark validated, false to clear."},
+            "reason": {"type": "string", "description": "Short note about why (knowledge check result, prior experience, etc.). Logged for audit."},
+        },
+        "required": ["outcomeId"],
+    },
+    handler="markOutcomeValidated",
+)
+
+
 TOOL_PROPOSE_CURRICULUM_DRAFT = ToolDef(
     name="propose-curriculum-draft",
     description=(

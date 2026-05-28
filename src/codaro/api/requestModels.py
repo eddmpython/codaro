@@ -87,3 +87,9 @@ class MasterPlanRequest(BaseModel):
     outcomes: list[str] = Field(default_factory=list)
     excludeCompleted: bool = True
     excludeKeys: list[str] = Field(default_factory=list)
+    skipMasteredOutcomes: bool = False
+
+
+class OutcomeValidationRequest(BaseModel):
+    outcomeId: str
+    validated: bool = True

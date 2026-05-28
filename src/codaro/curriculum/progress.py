@@ -18,6 +18,7 @@ class LessonProgress(BaseModel):
 
 class UserProgress(BaseModel):
     lessons: dict[str, LessonProgress] = Field(default_factory=dict)
+    validatedOutcomes: list[str] = Field(default_factory=list)
     updatedAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -93,5 +94,21 @@ class ProgressTracker:
         return {
             "totalAccessed": totalLessons,
             "totalCompleted": completedLessons,
+            "validatedOutcomeCount": len(progress.validatedOutcomes),
             "updatedAt": progress.updatedAt,
         }
+
+    def listValidatedOutcomes(self) -> set[str]:
+        return set(self.load().validatedOutcomes)
+
+    def markOutcomeValidated(self, outcomeId: str) -> None:
+        progress = self.load()
+        if outcomeId not in progress.validatedOutcomes:
+            progress.validatedOutcomes.append(outcomeId)
+            self.save()
+
+    def clearOutcomeValidation(self, outcomeId: str) -> None:
+        progress = self.load()
+        if outcomeId in progress.validatedOutcomes:
+            progress.validatedOutcomes.remove(outcomeId)
+            self.save()
