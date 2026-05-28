@@ -97,6 +97,7 @@ sections:
     - 바꿀 지점은 `fs = ...` 오른쪽 값입니다.
     - 실행 뒤 `fs` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 데이터 로드에서 `fs` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: butter
@@ -143,6 +144,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 버터워스 필터 설계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 버터워스 필터 설계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: freqresp
@@ -205,6 +207,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 주파수 응답의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 주파수 응답의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: filtfilt
@@ -253,6 +256,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 제로위상 필터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 제로위상 필터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: lfilter
@@ -305,6 +309,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: lfilter vs filtfilt의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: lfilter vs filtfilt의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: highpass
@@ -329,6 +334,7 @@ sections:
     - 바꿀 지점은 `drift = ...` 오른쪽 값입니다.
     - 실행 뒤 `drift` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 고역통과 필터에서 `drift` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 고역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: bandpass
@@ -357,6 +363,7 @@ sections:
     - 바꿀 지점은 `comp1 = ...` 오른쪽 값입니다.
     - 실행 뒤 `comp1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 대역통과 필터에서 `comp1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 대역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: notch
@@ -415,6 +422,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 노치 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 노치 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: sos
@@ -463,6 +471,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: SOS 형식 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: SOS 형식 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: result
@@ -497,6 +506,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 필터 선택 가이드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 필터 선택 가이드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
@@ -538,6 +548,7 @@ sections:
     - 바꿀 지점은 `fsEcg = ...` 오른쪽 값입니다.
     - 실행 뒤 `fsEcg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `fsEcg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -607,5 +618,6 @@ sections:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
+    type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

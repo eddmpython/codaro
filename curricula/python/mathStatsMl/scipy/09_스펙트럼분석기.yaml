@@ -112,6 +112,7 @@ sections:
     - 바꿀 지점은 `fs = ...` 오른쪽 값입니다.
     - 실행 뒤 `fs` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 데이터 로드에서 `fs` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: fftcalc
@@ -144,6 +145,7 @@ sections:
     - 바꿀 지점은 `n = ...` 오른쪽 값입니다.
     - 실행 뒤 `n` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: FFT 수행에서 `n` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: FFT 수행 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: spectrum
@@ -196,6 +198,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 주파수 스펙트럼의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 주파수 스펙트럼의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: peaks
@@ -234,6 +237,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 피크 검출의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 피크 검출의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: psd
@@ -277,6 +281,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 파워 스펙트럼 밀도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 파워 스펙트럼 밀도 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
 - id: spectrogram
@@ -301,6 +306,7 @@ sections:
     - 바꿀 지점은 `tChirp = ...` 오른쪽 값입니다.
     - 실행 뒤 `tChirp` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 스펙트로그램에서 `tChirp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 스펙트로그램 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: fftfilter
@@ -333,6 +339,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: FFT 필터링에서 `fftFiltered` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: FFT 필터링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: window
@@ -401,6 +408,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 윈도우 함수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 윈도우 함수의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: result
@@ -433,6 +441,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: FFT 분석 가이드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: FFT 분석 가이드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: practice
@@ -470,6 +479,7 @@ sections:
     - 바꿀 지점은 `fsHr = ...` 오른쪽 값입니다.
     - 실행 뒤 `fsHr` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `fsHr` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -539,5 +549,6 @@ sections:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
+    type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

@@ -86,6 +86,7 @@ sections:
     - 바꿀 지점은 수치 입력을 만드는 첫 줄과 최적화/적분/신호 처리 줄에서 찾으세요.
     - 실행 뒤 오차와 결과 범위 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: 라이브러리 로드 실행 결과가 오차와 결과 범위 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: create_dist
@@ -112,6 +113,7 @@ sections:
     - 바꿀 지점은 `scoreDist = ...` 오른쪽 값입니다.
     - 실행 뒤 `scoreDist` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 정규분포 생성에서 `scoreDist` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 정규분포 생성 실행 뒤 `scoreDist` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: pdf_explore
@@ -140,6 +142,7 @@ sections:
     - 바꿀 지점은 `pdfAt70 = ...` 오른쪽 값입니다.
     - 실행 뒤 `pdfAt70` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 확률밀도함수 탐색에서 `pdfAt70` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 확률밀도함수 탐색 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: cdf_explore
@@ -168,6 +171,7 @@ sections:
     - 바꿀 지점은 `probFail = ...` 오른쪽 값입니다.
     - 실행 뒤 `probFail` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 누적분포함수 탐색에서 `probFail` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 누적분포함수 탐색 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: ppf_explore
@@ -198,6 +202,7 @@ sections:
     - 바꿀 지점은 `top10Cutoff = ...` 오른쪽 값입니다.
     - 실행 뒤 `top10Cutoff` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 분위수함수 탐색에서 `top10Cutoff` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 분위수함수 탐색 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: result
@@ -232,6 +237,7 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 종합 분석 결과의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 종합 분석 결과의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
 - id: workflow_validation
@@ -287,6 +293,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실무 확률분포 리포트 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실무 확률분포 리포트 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
@@ -323,5 +330,6 @@ sections:
     - 바꿀 지점은 `waitDist = ...` 오른쪽 값입니다.
     - 실행 뒤 `waitDist` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `waitDist` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
