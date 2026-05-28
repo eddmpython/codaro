@@ -225,6 +225,20 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         orderedBefore=(("find-element", "click-element"),),
         expectedToolResultFields=(("find-element", "elements"), ("click-element", "success")),
     ),
+    TeacherEvalCase(
+        caseId="learner-diagnostics-loop-on-error",
+        prompt="5 = x 라고 적었는데 syntax error가 나. 어디가 틀렸지?",
+        expectedTools=("read-cells", "match-misconception", "suggest-next-step"),
+        orderedBefore=(
+            ("read-cells", "match-misconception"),
+            ("match-misconception", "suggest-next-step"),
+        ),
+        expectedToolResultFields=(
+            ("match-misconception", "matches"),
+            ("match-misconception", "doneCriterionViolated"),
+            ("suggest-next-step", "action"),
+        ),
+    ),
 )
 
 
