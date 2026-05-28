@@ -82,6 +82,7 @@ sections:
     - 바꿀 지점은 `gapminder = ...` 오른쪽 값입니다.
     - 실행 뒤 `gapminder` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 준비에서 `gapminder` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 1단계. 데이터 준비 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step2_continent_summary
@@ -110,6 +111,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 2단계. 대륙별 집계에서 `continentPop` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 2단계. 대륙별 집계 실행 뒤 `continentPop` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: step3_pie_basic
@@ -137,6 +139,7 @@ sections:
     - 바꿀 지점은 대시보드 데이터을 만드는 첫 줄과 인터랙티브 시각화 줄에서 찾으세요.
     - 실행 뒤 툴팁과 선택 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 파이 차트 기본의 수정 코드가 인터랙티브 시각화 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 3단계. 파이 차트 기본 실행 결과가 툴팁과 선택 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: step4_pie_color
@@ -166,6 +169,7 @@ sections:
     - 바꿀 지점은 `color = ...` 오른쪽 값입니다.
     - 실행 뒤 `color` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 4단계. 파이 차트 색상에서 `color` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 4단계. 파이 차트 색상 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step5_pie_donut
@@ -196,6 +200,7 @@ sections:
     - 바꿀 지점은 `hole = ...` 오른쪽 값입니다.
     - 실행 뒤 `hole` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 5단계. 도넛 차트에서 `hole` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 5단계. 도넛 차트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_treemap_basic
@@ -225,6 +230,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 트리맵 기본의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 6단계. 트리맵 기본 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step7_treemap_hierarchy
@@ -247,6 +253,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 트리맵 계층의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 7단계. 트리맵 계층 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step8_treemap_color
@@ -279,6 +286,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 트리맵 색상에서 `color` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 8단계. 트리맵 색상 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_sunburst_basic
@@ -300,6 +308,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 선버스트 기본의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
     resultCheck: 9단계. 선버스트 기본 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
 - id: step10_sunburst_color
@@ -332,6 +341,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 선버스트 색상에서 `color` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 10단계. 선버스트 색상 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step11_comparison
@@ -368,6 +378,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 11단계. 차트 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 11단계. 차트 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step12_final
@@ -406,6 +417,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 12단계. 결과물 완성의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 12단계. 결과물 완성의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: practice
@@ -438,6 +450,7 @@ sections:
     - 바꿀 지점은 `europeGap = ...` 오른쪽 값입니다.
     - 실행 뒤 `europeGap` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `europeGap` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: summary
@@ -498,5 +511,6 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 13단계. 계층 구조 Figure 검증 루프에서 `gapHierarchy` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 13단계. 계층 구조 Figure 검증 루프에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.

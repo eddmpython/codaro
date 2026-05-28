@@ -78,6 +78,7 @@ sections:
     - 바꿀 지점은 `iris = ...` 오른쪽 값입니다.
     - 실행 뒤 `iris` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기에서 `iris` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 1단계. 데이터 불러오기 실행 뒤 `iris` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step2_scatter_basic
@@ -116,6 +117,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 기본 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 2단계. 기본 산점도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_scatter_color
@@ -154,6 +156,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 품종별 색상 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 3단계. 품종별 색상 구분의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_scatter_size
@@ -196,6 +199,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 4단계. 크기로 추가 정보 표현의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 4단계. 크기로 추가 정보 표현의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_hover
@@ -238,6 +242,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 5단계. 호버 정보 추가에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 5단계. 호버 정보 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step6_trendline
@@ -276,6 +281,7 @@ sections:
     - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
     - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 추세선 추가에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 6단계. 추세선 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step7_violin_basic
@@ -312,6 +318,7 @@ sections:
     - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
     - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 7단계. 바이올린 플롯에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 7단계. 바이올린 플롯 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step8_violin_box
@@ -349,6 +356,7 @@ sections:
     - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
     - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 바이올린 + 박스에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 8단계. 바이올린 + 박스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step9_violin_points
@@ -388,6 +396,7 @@ sections:
     - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
     - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 개별 데이터 포인트에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 9단계. 개별 데이터 포인트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_scatter_sepal
@@ -429,6 +438,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 꽃받침 특성 분석에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 10단계. 꽃받침 특성 분석 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step11_matrix
@@ -463,6 +473,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 11단계. 산점도 매트릭스에서 `dimensions` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 11단계. 산점도 매트릭스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step12_matrix_hover
@@ -496,6 +507,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 12단계. 매트릭스 호버 개선에서 `dimensions` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 12단계. 매트릭스 호버 개선 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step13_violin_sepal
@@ -535,6 +547,7 @@ sections:
     - 바꿀 지점은 `x = ...` 오른쪽 값입니다.
     - 실행 뒤 `x` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 13단계. 꽃받침 분포 비교에서 `x` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 13단계. 꽃받침 분포 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practice
@@ -565,6 +578,7 @@ sections:
     - 바꿀 지점은 `flower = ...` 오른쪽 값입니다.
     - 실행 뒤 `flower` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `flower` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 `flower` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: summary
@@ -625,5 +639,6 @@ sections:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 15단계. 붓꽃 분류 Figure 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 15단계. 붓꽃 분류 Figure 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.

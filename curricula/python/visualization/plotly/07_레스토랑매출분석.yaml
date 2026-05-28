@@ -87,6 +87,7 @@ sections:
     - 바꿀 지점은 `tips = ...` 오른쪽 값입니다.
     - 실행 뒤 `tips` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 1단계. 데이터 불러오기에서 `tips` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 1단계. 데이터 불러오기 실행 뒤 `tips` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: step2_bar
@@ -136,6 +137,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 2단계. 요일별 평균 팁 막대 그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 2단계. 요일별 평균 팁 막대 그래프의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step3_box
@@ -177,6 +179,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 3단계. 시간대별 팁 분포의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 3단계. 시간대별 팁 분포의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step4_facet
@@ -219,6 +222,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 4단계. 성별/흡연 여부별 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 4단계. 성별/흡연 여부별 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step5_density_heatmap
@@ -261,6 +265,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 5단계. 결제금액팁 관계 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 5단계. 결제금액팁 관계 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step6_heatmap_options
@@ -310,6 +315,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 6단계. 히트맵 옵션의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 6단계. 히트맵 옵션의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
 - id: step7_make_subplots_intro
@@ -361,6 +367,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 7단계. makesubplots 기초의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 7단계. makesubplots 기초 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step8_dashboard
@@ -488,6 +495,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 8단계. 완성 대시보드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 8단계. 완성 대시보드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: step9_layout_polish
@@ -540,6 +548,7 @@ sections:
     - 바꿀 지점은 `title = ...` 오른쪽 값입니다.
     - 실행 뒤 `title` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 레이아웃 다듬기에서 `title` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 9단계. 레이아웃 다듬기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: step10_workflow
@@ -603,6 +612,7 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
+    type: noError
     noError: 10단계. 실무 대시보드 검증의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
     resultCheck: 10단계. 실무 대시보드 검증 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: practice
@@ -633,6 +643,7 @@ sections:
     - 바꿀 지점은 `billData = ...` 오른쪽 값입니다.
     - 실행 뒤 `billData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습에서 `billData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 `billData` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: summary
