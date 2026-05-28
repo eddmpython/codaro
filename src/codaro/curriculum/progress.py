@@ -159,6 +159,8 @@ class ProgressTracker:
         sectionId: str,
         passed: bool,
         hintLevel: int,
+        *,
+        save: bool = True,
     ) -> SectionResult:
         lesson = self.getLesson(category, contentId)
         now = datetime.now(timezone.utc).isoformat()
@@ -174,10 +176,11 @@ class ProgressTracker:
             if existing.firstPassAt is None:
                 existing.firstPassAt = now
         lesson.lastAccessedAt = now
-        self.save()
+        if save:
+            self.save()
         return existing
 
-    def recordOutcomeCredit(self, credit: OutcomeCreditEntry) -> bool:
+    def recordOutcomeCredit(self, credit: OutcomeCreditEntry, *, save: bool = True) -> bool:
         """Append credit, return True if outcome reached auto-validated threshold."""
         progress = self.load()
         bucket = progress.outcomeCredits.setdefault(credit.outcomeId, [])
@@ -190,14 +193,16 @@ class ProgressTracker:
         ):
             progress.autoValidatedOutcomes.append(credit.outcomeId)
             autoValidated = True
-        self.save()
+        if save:
+            self.save()
         return autoValidated
 
     def listOutcomeCredits(self, outcomeId: str) -> list[OutcomeCreditEntry]:
         return list(self.load().outcomeCredits.get(outcomeId, []))
 
     def outcomeCreditMap(self) -> dict[str, list[OutcomeCreditEntry]]:
-        return {k: list(v) for k, v in self.load().outcomeCredits.items()}
+        """Read-only view of outcome → credits. 합성기는 수정하지 않는다."""
+        return self.load().outcomeCredits
 
     def getReviewState(self, lessonKey: str) -> ReviewState | None:
         return self.load().lessonReviews.get(lessonKey)
@@ -227,6 +232,7 @@ class ProgressTracker:
         """Credit attached outcomes for a section pass. Returns (creditedIds, autoValidatedIds).
 
         Caller is responsible for `recordSectionResult` — this method only handles credits.
+        Batched: N credits 가 들어와도 disk write 는 1회.
         """
         weight = hintWeight(hintLevel)
         lessonKey = f"{category}/{contentId}"
@@ -240,8 +246,10 @@ class ProgressTracker:
                 hintLevel=hintLevel,
                 weight=weight,
             )
-            became = self.recordOutcomeCredit(entry)
+            became = self.recordOutcomeCredit(entry, save=False)
             creditedIds.append(outcomeId)
             if became:
                 autoValidatedIds.append(outcomeId)
+        if creditedIds:
+            self.save()
         return creditedIds, autoValidatedIds

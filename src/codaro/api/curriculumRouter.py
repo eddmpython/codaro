@@ -459,7 +459,16 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         )
         return {"reviews": items, "totalDue": len(items)}
 
+    # 30초 throttle — 같은 페이지 진입 시 /analytics 와 /analytics/summary 가
+    # 연속 호출되어 computeMastery 가 두 번 도는 것을 막는다.
+    analyticsRefreshState: dict[str, float] = {"lastAt": 0.0}
+
     def _refreshAnalyticsSnapshot() -> None:
+        import time as _time
+        now = _time.monotonic()
+        if now - analyticsRefreshState["lastAt"] < 30.0:
+            return
+        analyticsRefreshState["lastAt"] = now
         taxonomy = state.curriculumOs.taxonomy()
         graph = state.curriculumOs.graph()
         validated = state.progressTracker.listValidatedOutcomes()

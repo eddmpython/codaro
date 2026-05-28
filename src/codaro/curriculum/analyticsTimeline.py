@@ -67,13 +67,21 @@ class AnalyticsTimeline:
         lines = [snap.model_dump_json() for snap in snapshots]
         self._path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
-    def append(self, snapshot: DailySnapshot) -> None:
-        """같은 날짜가 이미 있으면 교체, 없으면 append (idempotent per day)."""
+    def append(self, snapshot: DailySnapshot) -> bool:
+        """같은 날짜가 이미 있으면 교체, 없으면 append (idempotent per day).
+
+        값이 동일한 snapshot 이 이미 있으면 disk write 없이 False 반환 — 매
+        /analytics 호출마다 365 row rewrite 하는 핫스팟을 막는다.
+        """
         snapshots = self._readAll()
+        existing = next((s for s in snapshots if s.date == snapshot.date), None)
+        if existing is not None and existing.model_dump() == snapshot.model_dump():
+            return False
         snapshots = [s for s in snapshots if s.date != snapshot.date]
         snapshots.append(snapshot)
         snapshots.sort(key=lambda s: s.date)
         self._writeAll(snapshots)
+        return True
 
     def latest(self) -> DailySnapshot | None:
         snapshots = self._readAll()
