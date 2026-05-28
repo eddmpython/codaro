@@ -1,0 +1,289 @@
+meta:
+  packages:
+  - anthropic
+  id: llmBasics_01
+  title: 첫Claude호출
+  order: 1
+  category: llmBasics
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - anthropic
+  - claude
+  - messages_api
+  - sdk
+  - 첫호출
+  seo:
+    title: anthropic SDK로 Claude 첫 호출 - Messages API 입문
+    description: anthropic.Anthropic 클라이언트로 Claude를 처음 호출하고 응답에서 텍스트를 꺼내는 표준 흐름을 만듭니다.
+    keywords:
+    - anthropic SDK
+    - Claude API
+    - Messages API
+    - claude-haiku-4-5
+intro:
+  emoji: 🚀
+  goal: anthropic SDK로 Claude를 한 번 호출하고 응답에서 텍스트를 꺼내본다.
+  description: 클라이언트 초기화 → messages.create 호출 → 응답 객체 파싱이라는 LLM 호출의 기본 흐름을 손에 익힙니다.
+  direction: Anthropic 클라이언트 생성, model/max_tokens/messages 인자 구성, content 블록에서 텍스트 추출까지 한 번의 호출 흐름을 완성한다.
+  benefits:
+  - anthropic 패키지 설치와 ANTHROPIC_API_KEY 환경변수 흐름을 분명히 한다.
+  - Messages API의 필수 인자(model, max_tokens, messages) 셋을 정확한 형태로 기억한다.
+  - 응답 객체의 content 블록 구조를 직접 확인하고 텍스트를 안전하게 꺼낸다.
+  - 토큰 사용량(usage)을 첫 호출부터 보는 습관을 만든다.
+  diagram:
+    steps:
+    - label: 1단계. 클라이언트 만들기
+      detail: anthropic.Anthropic 인스턴스를 생성하고 API 키 로드를 확인한다.
+    - label: 2단계. messages.create 호출
+      detail: model, max_tokens, messages 세 인자로 한 줄짜리 질문을 보낸다.
+    - label: 3단계. 응답 파싱
+      detail: response.content[0].text와 response.usage를 꺼내본다.
+    - label: 4단계. 모델·토큰 인자 변주
+      detail: max_tokens를 줄이거나 messages 내용을 바꿔 응답이 달라지는지 확인한다.
+    runtime:
+    - label: LLM 호출 환경
+      detail: anthropic 패키지와 ANTHROPIC_API_KEY가 준비된 로컬 Python에서 실행한다.
+    - label: 첫Claude호출 실행
+      detail: 셀을 순서대로 실행해 응답 객체와 usage를 확인한다.
+    - label: 첫Claude호출 완료
+      detail: 다음 강의의 시스템 프롬프트 추가에 필요한 호출 패턴을 손에 익혔다.
+sections:
+- id: install_and_key
+  title: 1단계. 패키지 준비와 API 키 확인
+  structuredPrimary: true
+  subtitle: anthropic 패키지와 ANTHROPIC_API_KEY
+  goal: anthropic 패키지가 설치되어 있고 ANTHROPIC_API_KEY 환경변수가 잡혀 있는지 코드로 확인한다.
+  why: 패키지나 키 둘 중 하나만 빠져도 이후 호출이 인증 실패로 멈춥니다. 첫 줄에서 사전 점검 한 번을 코드로 박아두면 시간이 절약됩니다.
+  explanation: anthropic 패키지는 Claude API와 통신하는 공식 Python SDK입니다. uv run --with anthropic 또는 강의의 packages 메타가 자동으로
+    준비합니다. ANTHROPIC_API_KEY는 console.anthropic.com에서 발급받은 키를 환경변수로 등록한 값입니다. import anthropic이 성공하고 os.environ에
+    키가 존재하면 호출 준비가 끝난 것입니다.
+  tips:
+  - API 키 자체를 코드로 출력하지 말고 길이만 확인합니다. 노트북 공유나 git 커밋 사고를 막아줍니다.
+  snippet: |-
+    import os
+    import anthropic
+
+    hasKey = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    sdkVersion = anthropic.__version__
+    (hasKey, sdkVersion)
+  exercise:
+    prompt: hasKey 대신 ANTHROPIC_API_KEY 길이를 함께 출력해 키가 비어 있지 않은지 확인하세요. 키 값 자체는 출력하지 마세요.
+    starterCode: |-
+      import os
+      import anthropic
+
+      hasKey = bool(os.environ.get("ANTHROPIC_API_KEY"))
+      sdkVersion = anthropic.__version__
+      (hasKey, sdkVersion)
+    hints:
+    - os.environ.get("ANTHROPIC_API_KEY", "")의 길이를 len으로 측정합니다.
+    - 키 값을 절대 그대로 표현식 결과로 두지 마세요.
+  check:
+    noError: import anthropic과 os.environ 접근이 ImportError, KeyError 없이 실행되어야 합니다.
+    resultCheck: hasKey가 True이고 sdkVersion이 문자열 형태로 반환되어야 합니다.
+- id: client_create
+  title: 2단계. Anthropic 클라이언트 만들기
+  structuredPrimary: true
+  subtitle: anthropic.Anthropic()
+  goal: anthropic.Anthropic() 호출 한 줄로 클라이언트 인스턴스를 만든다.
+  why: 모든 호출은 클라이언트 객체에서 시작합니다. 클라이언트는 API 키, HTTP 세션, 기본 설정을 묶어 보관합니다.
+  explanation: anthropic.Anthropic 클래스는 SDK의 진입점입니다. 인자 없이 호출하면 환경변수 ANTHROPIC_API_KEY를 자동으로 읽고, api_key="..." 인자를
+    명시하면 코드 안에서 직접 전달도 가능합니다. 환경변수 방식이 비밀 관리 측면에서 안전합니다. 클라이언트는 스레드 안전하므로 한 프로세스에서 하나만 만들어 재사용해도 됩니다.
+  tips:
+  - 클라이언트 변수명은 client로 통일합니다. 이후 강의 코드와 자연스럽게 이어집니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    type(client).__name__
+  exercise:
+    prompt: type(client).__name__ 대신 client 객체를 직접 출력해 어떤 정보가 보이는지 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      type(client).__name__
+    hints:
+    - Anthropic 객체는 repr이 짧게 정의되어 클래스명만 보이거나 메서드 안내가 보일 수 있습니다.
+    - client.messages 처럼 점 표기법으로 하위 자원을 노출합니다.
+  check:
+    noError: anthropic.Anthropic() 호출이 인증 오류 없이 실행되어야 합니다.
+    resultCheck: 결과가 "Anthropic" 같은 클래스명 문자열 또는 동등한 표현이어야 합니다.
+- id: first_call
+  title: 3단계. messages.create로 첫 호출
+  structuredPrimary: true
+  subtitle: model, max_tokens, messages 세 인자
+  goal: client.messages.create에 model, max_tokens, messages 세 인자만 넘겨 첫 응답을 받는다.
+  why: Messages API의 모든 호출은 이 셋을 기본으로 합니다. 다른 인자(system, tools, stream)는 이 위에 얹는 형태로 늘어납니다.
+  explanation: model은 사용할 Claude 모델 ID를 문자열로 지정합니다. claude-haiku-4-5는 빠르고 저렴해 학습에 적합합니다. max_tokens는 응답에서
+    생성할 최대 토큰 수로, 너무 크게 잡으면 비용이 늘고 너무 작으면 응답이 잘립니다. messages는 사용자/모델의 대화 기록 리스트이며, 입문 단계에서는 user 한 줄만 넣습니다.
+  tips:
+  - max_tokens는 응답 길이의 상한입니다. 학습용 호출은 256~512로 시작하면 비용과 시간을 모두 통제할 수 있습니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=256,
+        messages=[
+            {"role": "user", "content": "한 문장으로 인사해 주세요."},
+        ],
+    )
+    response.stop_reason
+  exercise:
+    prompt: max_tokens를 16으로 줄여 응답이 stop_reason="max_tokens"로 끊기는지 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      response = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=256,
+          messages=[
+              {"role": "user", "content": "한 문장으로 인사해 주세요."},
+          ],
+      )
+      response.stop_reason
+    hints:
+    - 정상 종료는 stop_reason이 "end_turn"입니다.
+    - 토큰 한도로 끊기면 stop_reason이 "max_tokens"가 됩니다.
+  check:
+    noError: messages.create 호출이 인증·요청 오류 없이 실행되어야 합니다.
+    resultCheck: stop_reason이 "end_turn" 또는 "max_tokens" 등 SDK 정의값이어야 합니다.
+- id: parse_text
+  title: 4단계. 응답 텍스트 꺼내기
+  structuredPrimary: true
+  subtitle: response.content[0].text
+  goal: response.content 리스트의 첫 블록에서 text 속성을 꺼내 사용자에게 보여줄 텍스트를 얻는다.
+  why: API 응답은 텍스트 한 줄이 아니라 ContentBlock 리스트입니다. 구조를 정확히 알면 도구 사용·이미지 응답 같은 확장 기능을 그대로 받아들일 수 있습니다.
+  explanation: response.content는 ContentBlock 인스턴스 리스트입니다. 일반 텍스트 응답은 첫 블록이 TextBlock이며, 이 객체의 .text 속성에 응답
+    문자열이 담깁니다. 도구 사용이 끼면 ToolUseBlock 같은 다른 타입이 섞이므로 실전 코드에서는 type 필드를 확인해 안전하게 분기하는 패턴을 씁니다.
+  tips:
+  - block.type == "text"인 블록만 골라 text를 모으면 도구 응답이 섞여도 안전합니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=256,
+        messages=[{"role": "user", "content": "Python의 list comprehension을 한 문장으로 설명해 주세요."}],
+    )
+    answer = "".join(block.text for block in response.content if block.type == "text")
+    answer
+  exercise:
+    prompt: 메시지 내용을 다른 질문으로 바꾸고 answer 문자열이 다른 응답으로 갱신되는지 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      response = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=256,
+          messages=[{"role": "user", "content": "Python의 list comprehension을 한 문장으로 설명해 주세요."}],
+      )
+      answer = "".join(block.text for block in response.content if block.type == "text")
+      answer
+    hints:
+    - 모델 응답은 결정론적이지 않아 같은 질문에도 표현이 살짝 달라질 수 있습니다.
+    - join 호출은 여러 텍스트 블록이 있을 때도 안전하게 합쳐줍니다.
+  check:
+    noError: response.content 순회와 block.text 접근이 AttributeError 없이 실행되어야 합니다.
+    resultCheck: answer가 비어있지 않은 문자열이어야 합니다.
+- id: inspect_usage
+  title: 5단계. 토큰 사용량 확인
+  structuredPrimary: true
+  subtitle: response.usage
+  goal: response.usage.input_tokens와 output_tokens를 꺼내 호출이 소비한 토큰을 본다.
+  why: 비용은 토큰으로 계산되므로 첫 호출부터 usage를 보는 습관이 있으면 실험이 비용 가시성과 함께 늘어납니다.
+  explanation: response.usage는 입력 토큰(input_tokens)과 출력 토큰(output_tokens) 두 값을 담은 객체입니다. 캐싱이나 도구 사용이 끼면
+    cache_creation_input_tokens, cache_read_input_tokens 같은 추가 필드가 따라옵니다. 4번 강의에서 비용 추정 함수를 만들 때 이 객체를 직접
+    사용하게 됩니다.
+  tips:
+  - input_tokens + output_tokens 합을 한눈에 보면 호출 비용 직감이 생깁니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=128,
+        messages=[{"role": "user", "content": "1+1의 결과만 숫자로 알려줘."}],
+    )
+    usage = response.usage
+    (usage.input_tokens, usage.output_tokens)
+  exercise:
+    prompt: 같은 호출을 두 번 반복해 input_tokens가 같은지, output_tokens는 응답에 따라 약간 달라지는지 비교하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      response = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=128,
+          messages=[{"role": "user", "content": "1+1의 결과만 숫자로 알려줘."}],
+      )
+      usage = response.usage
+      (usage.input_tokens, usage.output_tokens)
+    hints:
+    - 입력 토큰은 시스템·user 메시지가 같다면 동일합니다.
+    - 출력 토큰은 모델 응답 길이에 따라 호출마다 살짝 달라집니다.
+  check:
+    noError: response.usage 접근이 AttributeError 없이 실행되어야 합니다.
+    resultCheck: 두 값이 모두 양의 정수여야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 호출 한 번을 함수로 묶기'
+  structuredPrimary: true
+  subtitle: 예측 → 호출 → 응답 검증 → 함수화
+  goal: 한 번의 호출을 askClaude(question, model) 함수로 묶고 assert로 결과 모양을 고정한다.
+  why: 자동화 흐름은 항상 함수 한 개로 시작합니다. 함수가 응답 텍스트와 usage를 함께 돌려주도록 만들어 두면 이후 모든 강의에서 재사용할 수 있습니다.
+  explanation: 입력은 질문 문자열과 모델 이름, 출력은 텍스트와 usage 튜플로 만듭니다. 응답이 비어 있거나 stop_reason이 예상과 달라도 함수가 깨지지 않도록 텍스트는
+    join으로, usage는 객체 그대로 돌려줍니다. 실전에서는 이 함수를 모듈에 두고 자동화 파이프라인의 다른 단계에서 호출합니다.
+  tips:
+  - 함수 입력으로 model을 받게 만들어 두면 다른 모델로 비교 실험할 때 코드 변경이 적습니다.
+  snippet: |-
+    import anthropic
+
+    def askClaude(question: str, model: str = "claude-haiku-4-5") -> tuple[str, object]:
+        agent = anthropic.Anthropic()
+        result = agent.messages.create(
+            model=model,
+            max_tokens=256,
+            messages=[{"role": "user", "content": question}],
+        )
+        text = "".join(block.text for block in result.content if block.type == "text")
+        return text, result.usage
+
+    answer, usage = askClaude("파이썬에서 None은 무엇인가요? 한 문장으로 답해주세요.")
+    assert isinstance(answer, str) and len(answer) > 0
+    assert usage.input_tokens > 0
+    assert usage.output_tokens > 0
+    (answer[:40], usage.input_tokens, usage.output_tokens)
+  exercise:
+    prompt: askClaude 함수에 max_tokens 인자를 추가하고 기본값을 256으로 두세요. 호출 시 다른 값을 넘겨 응답 길이가 달라지는지 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      def askClaude(question: str, model: str = "claude-haiku-4-5") -> tuple[str, object]:
+          agent = anthropic.Anthropic()
+          result = agent.messages.create(
+              model=model,
+              max_tokens=256,
+              messages=[{"role": "user", "content": question}],
+          )
+          text = "".join(block.text for block in result.content if block.type == "text")
+          return text, result.usage
+
+      answer, usage = askClaude("파이썬에서 None은 무엇인가요? 한 문장으로 답해주세요.")
+      assert isinstance(answer, str) and len(answer) > 0
+      assert usage.input_tokens > 0
+      assert usage.output_tokens > 0
+      (answer[:40], usage.input_tokens, usage.output_tokens)
+    hints:
+    - def askClaude(question, model=..., maxTokens=256) 형태로 인자를 추가합니다.
+    - max_tokens=maxTokens로 API 호출에 전달합니다.
+  check:
+    noError: 함수 정의와 호출, assert가 모두 통과해야 합니다.
+    resultCheck: 반환된 answer가 비어있지 않고 두 토큰 값이 모두 양수여야 합니다.
