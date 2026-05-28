@@ -73,6 +73,7 @@ sections:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플이란? 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: tuple_create
@@ -99,6 +100,7 @@ sections:
     - 바꿀 지점은 `digits = ...` 오른쪽 값입니다.
     - 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 다양한 튜플 생성에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 다양한 튜플 생성 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: tuple_indexing
@@ -125,6 +127,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 인덱싱에서 `palette` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 인덱싱 실행 뒤 `palette` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: tuple_slicing
@@ -151,6 +154,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 슬라이싱에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 슬라이싱 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: tuple_immutable
@@ -185,6 +189,7 @@ sections:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
+    type: noError
     noError: 튜플의 불변성의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
     resultCheck: 튜플의 불변성 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: tuple_concat
@@ -213,6 +218,7 @@ sections:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 연결과 반복에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 연결과 반복 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: tuple_membership
@@ -239,6 +245,7 @@ sections:
     - 바꿀 지점은 `weekdays = ...` 오른쪽 값입니다.
     - 실행 뒤 `weekdays` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: in/not in 연산자에서 `weekdays` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: in/not in 연산자 실행 뒤 `weekdays` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: tuple_packing
@@ -265,6 +272,7 @@ sections:
     - 바꿀 지점은 `coords = ...` 오른쪽 값입니다.
     - 실행 뒤 `coords` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 패킹에서 `coords` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 패킹 실행 뒤 `coords` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: tuple_unpacking
@@ -293,6 +301,7 @@ sections:
     - 바꿀 지점은 `point = ...` 오른쪽 값입니다.
     - 실행 뒤 `point` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 언패킹에서 `point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 언패킹 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: tuple_list_convert
@@ -319,6 +328,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플과 리스트 변환에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플과 리스트 변환 실행 뒤 `items` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: tuple_methods
@@ -345,6 +355,7 @@ sections:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 메서드에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 메서드 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: tuple_length
@@ -371,6 +382,7 @@ sections:
     - 바꿀 지점은 `week = ...` 오른쪽 값입니다.
     - 실행 뒤 `week` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 튜플 길이에서 `week` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 튜플 길이 실행 뒤 `week` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -411,6 +423,7 @@ sections:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 변경되면 안 되는 설정값 다루기에서 `topLeft` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
     resultCheck: '검증 루프: 변경되면 안 되는 설정값 다루기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
 - id: practice
@@ -435,5 +448,6 @@ sections:
     - 바꿀 지점은 `tpl = ...` 오른쪽 값입니다.
     - 실행 뒤 `tpl` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Day 9 종합 복습에서 `tpl` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 9 종합 복습 실행 뒤 `tpl` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

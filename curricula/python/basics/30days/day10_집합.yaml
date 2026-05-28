@@ -74,6 +74,7 @@ sections:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 집합이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 집합이란? 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: set_create
@@ -100,6 +101,7 @@ sections:
     - 바꿀 지점은 `direct = ...` 오른쪽 값입니다.
     - 실행 뒤 `direct` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 집합 생성하기에서 `direct` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 집합 생성하기 실행 뒤 `direct` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: set_unique
@@ -126,6 +128,7 @@ sections:
     - 바꿀 지점은 `dups = ...` 오른쪽 값입니다.
     - 실행 뒤 `dups` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 중복 제거 특성에서 `dups` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 중복 제거 특성 실행 뒤 `dups` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: add_method
@@ -156,6 +159,7 @@ sections:
     - 바꿀 지점은 `fruits = ...` 오른쪽 값입니다.
     - 실행 뒤 `fruits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: add() 메서드에서 `fruits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: add() 메서드 실행 뒤 `fruits` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: remove_discard
@@ -184,6 +188,7 @@ sections:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: remove()와 discard()에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: remove()와 discard() 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: clear_method
@@ -212,6 +217,7 @@ sections:
     - 바꿀 지점은 `items = ...` 오른쪽 값입니다.
     - 실행 뒤 `items` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: clear() 메서드에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: clear() 메서드 실행 뒤 `items` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: union_method
@@ -240,6 +246,7 @@ sections:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 합집합 (union)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 합집합 (union) 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: intersection_method
@@ -268,6 +275,7 @@ sections:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 교집합 (intersection)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 교집합 (intersection) 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: difference_method
@@ -296,6 +304,7 @@ sections:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 차집합 (difference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 차집합 (difference) 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: symmetric_difference
@@ -324,6 +333,7 @@ sections:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 대칭차집합 (symmetricdifference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 대칭차집합 (symmetricdifference) 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: membership_method
@@ -350,6 +360,7 @@ sections:
     - 바꿀 지점은 `colors = ...` 오른쪽 값입니다.
     - 실행 뒤 `colors` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: in/not in 연산자에서 `colors` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: in/not in 연산자 실행 뒤 `colors` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: set_length
@@ -376,6 +387,7 @@ sections:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 집합 길이에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 집합 길이 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -416,6 +428,7 @@ sections:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 권한과 참석자 집합 비교하기에서 `dayOne` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
     resultCheck: '검증 루프: 권한과 참석자 집합 비교하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
 - id: practice
@@ -440,5 +453,6 @@ sections:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Day 10 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 10 종합 복습 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

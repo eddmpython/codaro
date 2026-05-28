@@ -75,6 +75,7 @@ sections:
     - 바꿀 지점은 `itemA = ...` 오른쪽 값입니다.
     - 실행 뒤 `itemA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 덧셈 연산자에서 `itemA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 덧셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: sub_operator
@@ -100,6 +101,7 @@ sections:
     - 바꿀 지점은 `budget = ...` 오른쪽 값입니다.
     - 실행 뒤 `budget` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 뺄셈 연산자에서 `budget` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 뺄셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: mul_operator
@@ -125,6 +127,7 @@ sections:
     - 바꿀 지점은 `width = ...` 오른쪽 값입니다.
     - 실행 뒤 `width` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 곱셈 연산자에서 `width` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 곱셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: div_operator
@@ -153,6 +156,7 @@ sections:
     - 바꿀 지점은 `dividend = ...` 오른쪽 값입니다.
     - 실행 뒤 `dividend` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 나눗셈 연산자에서 `dividend` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 나눗셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: floordiv_operator
@@ -178,6 +182,7 @@ sections:
     - 바꿀 지점은 `items = ...` 오른쪽 값입니다.
     - 실행 뒤 `items` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 몫 연산자에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 몫 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: mod_operator
@@ -206,6 +211,7 @@ sections:
     - 바꿀 지점은 `coins = ...` 오른쪽 값입니다.
     - 실행 뒤 `coins` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 나머지 연산자에서 `coins` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 나머지 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: pow_operator
@@ -231,6 +237,7 @@ sections:
     - 바꿀 지점은 `base = ...` 오른쪽 값입니다.
     - 실행 뒤 `base` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 거듭제곱 연산자에서 `base` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 거듭제곱 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: compare_equal
@@ -259,6 +266,7 @@ sections:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 같음 비교 연산자에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 같음 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: compare_notequal
@@ -284,6 +292,7 @@ sections:
     - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
     - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 다름 비교 연산자에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 다름 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: compare_greater
@@ -309,6 +318,7 @@ sections:
     - 바꿀 지점은 `val = ...` 오른쪽 값입니다.
     - 실행 뒤 `val` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 크기 비교 연산자에서 `val` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 크기 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: logical_and
@@ -334,6 +344,7 @@ sections:
     - 바꿀 지점은 `adult = ...` 오른쪽 값입니다.
     - 실행 뒤 `adult` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: and 논리 연산자에서 `adult` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: and 논리 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: logical_or
@@ -359,6 +370,7 @@ sections:
     - 바꿀 지점은 `cash = ...` 오른쪽 값입니다.
     - 실행 뒤 `cash` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: or 논리 연산자에서 `cash` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: or 논리 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: logical_not
@@ -382,6 +394,7 @@ sections:
     - 바꿀 지점은 `rain = ...` 오른쪽 값입니다.
     - 실행 뒤 `rain` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: not 논리 연산자에서 `rain` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: not 논리 연산자 실행 뒤 `rain` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: membership_in
@@ -408,6 +421,7 @@ sections:
     - 바꿀 지점은 `lang = ...` 오른쪽 값입니다.
     - 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: in 멤버십 연산자에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: in 멤버십 연산자 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: compound_assign
@@ -433,6 +447,7 @@ sections:
     - 바꿀 지점은 `balance = ...` 오른쪽 값입니다.
     - 실행 뒤 `balance` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 복합 대입 연산자에서 `balance` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 복합 대입 연산자 실행 뒤 `balance` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: operator_priority
@@ -463,6 +478,7 @@ sections:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
   check:
+    type: noError
     noError: 연산자 우선순위의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
     resultCheck: 연산자 우선순위 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
 - id: workflow_validation
@@ -513,6 +529,7 @@ sections:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 주문 계산식과 승인 조건에서 `unitPrice` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
     resultCheck: '검증 루프: 주문 계산식과 승인 조건에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
 - id: practice
@@ -540,5 +557,6 @@ sections:
     - 바꿀 지점은 `apples = ...` 오른쪽 값입니다.
     - 실행 뒤 `apples` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Day 3 종합 복습에서 `apples` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 3 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
