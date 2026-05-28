@@ -228,3 +228,31 @@ def testMatchOutcomesDeduplicatesEntries() -> None:
     # 같은 entry 가 code/error 양쪽으로 매칭되더라도 한 번만
     ids = [entry.id for _, entry in hits]
     assert len(ids) == len(set(ids))
+
+
+# False-positive 가드: 정상 코드가 어떤 카탈로그에도 false hit 을 일으키지 않아야 한다.
+# 카탈로그 정규식이 너무 느슨해지면 학습자에게 잘못된 진단을 던지게 된다.
+_INNOCUOUS_CODE_SAMPLES = [
+    'name = "alice"\nprint(name.upper())\n',
+    "numbers = [1, 2, 3]\ntotal = sum(numbers)\nprint(total)\n",
+    "scores = {'alice': 90, 'bob': 85}\nfor name, score in scores.items():\n    print(name, score)\n",
+    "def square(value):\n    return value * value\n\nresult = square(7)\nprint(result)\n",
+    "try:\n    value = int('123')\nexcept ValueError as exc:\n    print('parse failed:', exc)\n",
+    "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\np = Point(1, 2)\nprint(p.x, p.y)\n",
+]
+
+
+def testInnocuousCodeDoesNotTriggerFalseHitsOnSeedCatalogs() -> None:
+    from codaro.curriculum.misconceptionCatalog import matchOutcomes
+
+    catalogs = loadAllCatalogs()
+    allOutcomeIds = [catalog.outcomeId for catalog in catalogs]
+    falsePositives: list[tuple[str, str, str]] = []
+    for sample in _INNOCUOUS_CODE_SAMPLES:
+        hits = matchOutcomes(allOutcomeIds, code=sample, errorText="")
+        for outcomeId, entry in hits:
+            falsePositives.append((outcomeId, entry.id, sample.splitlines()[0]))
+    assert not falsePositives, (
+        "innocuous code triggered misconception hits — catalog patterns too loose:\n  - "
+        + "\n  - ".join(f"{entry} for outcome {outcome} on '{first}'" for outcome, entry, first in falsePositives)
+    )

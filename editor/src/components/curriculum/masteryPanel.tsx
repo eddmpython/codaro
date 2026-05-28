@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Sparkles, Trophy } from "lucide-react";
+import { CheckCircle2, Sparkles, Target, Trophy } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,6 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
     const filtered = domainTargets
       ? report.outcomes.filter((entry) => domainTargets.has(entry.outcomeId))
       : report.outcomes.slice(0, 8);
-    // sort: not-yet-mastered ascending mastery first (focus areas), then mastered
     return [...filtered].sort((a, b) => {
       const aMastered = a.validated || a.level >= 0.8 ? 1 : 0;
       const bMastered = b.validated || b.level >= 0.8 ? 1 : 0;
@@ -62,6 +61,12 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
       return a.level - b.level;
     });
   }, [report, domainTargets]);
+
+  const focusOutcomes = useMemo<OutcomeMasteryEntry[]>(() => {
+    return activeOutcomes
+      .filter((entry) => !entry.validated && !entry.autoValidated && entry.level < 0.8)
+      .slice(0, 3);
+  }, [activeOutcomes]);
 
   const toggleValidation = async (entry: OutcomeMasteryEntry) => {
     setValidating(entry.outcomeId);
@@ -99,6 +104,33 @@ export function MasteryPanel({ taxonomy, selectedDomain, refreshKey = 0 }: Maste
             </span>
           </div>
           <Progress className="h-1.5 bg-zinc-800" value={Math.round(activeDomain.level * 100)} />
+        </div>
+      )}
+
+      {focusOutcomes.length > 0 && (
+        <div
+          className="rounded border border-amber-700/40 bg-amber-950/30 px-2 py-2"
+          data-mastery-focus="true"
+        >
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-amber-200">
+            <Target className="h-3 w-3" />
+            <span>집중 영역</span>
+            <span className="ml-auto text-amber-400/70">Top {focusOutcomes.length}</span>
+          </div>
+          <ul className="mt-1 space-y-0.5">
+            {focusOutcomes.map((entry) => (
+              <li
+                key={entry.outcomeId}
+                className="flex items-center gap-1.5 text-[11px] text-amber-100"
+                data-focus-outcome-id={entry.outcomeId}
+              >
+                <span className="truncate">{entry.label}</span>
+                <span className="ml-auto text-amber-400/80 tabular-nums">
+                  {Math.round(entry.level * 100)}%
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

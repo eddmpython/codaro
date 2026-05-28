@@ -53,8 +53,8 @@ misconceptions:
     triggers:
       - kind: codePattern
         appliesTo: code
-        pattern: "print\\(\\s*[A-Za-z_]\\w*(\\.head|\\.tail|\\.shape|\\.describe)?\\s*\\(?\\s*\\)?\\s*\\)"
-        description: "DataFrame/Series를 print()로 감싸는 패턴."
+        pattern: "print\\(\\s*[A-Za-z_]\\w*\\.(head|tail|shape|describe|info|dtypes|columns|index)\\s*\\(?\\s*\\)?\\s*\\)"
+        description: "pandas DataFrame/Series 메서드 결과를 print()로 감싸는 패턴."
     diagnostic:
       message: "Codaro는 셀의 마지막 줄을 자동으로 표시합니다. print() 없이 그냥 `df.head()` 만 적으면 표 형태로 깔끔하게 보입니다."
       references: ["pandas.intro"]
