@@ -70,6 +70,10 @@ class PlanGoal(BaseModel):
     skipMasteredOutcomes: bool = False
     # 시간 예산(분). 0이면 무제한. plan이 이 예산을 넘으면 dropped로 분리.
     maxMinutes: int = 0
+    # deliverable-driven 목표 ("대시보드 만들기" 등). 비어있지 않으면 project lesson 우선 선정.
+    projectIntent: str = ""
+    # True 면 mastery >=0.6 인 concept lesson은 droppedSteps로 분리 (project 위주 plan).
+    deliverableOnly: bool = False
 
 
 class PlanStep(BaseModel):
@@ -85,6 +89,7 @@ class PlanStep(BaseModel):
     completed: bool = False
     learnerMastery: float | None = None
     learnerConfidence: float | None = None
+    lessonRole: str = "concept"
 
 
 class PlanGap(BaseModel):
@@ -105,6 +110,11 @@ class MasterPlan(BaseModel):
     summary: str
     nextStepKey: str | None = None
     completedCount: int = 0
+    # 3단 분리 — frontend 가 칼럼 뷰로 렌더할 수 있게.
+    conceptSteps: list[PlanStep] = Field(default_factory=list)
+    practiceSteps: list[PlanStep] = Field(default_factory=list)
+    projectSteps: list[PlanStep] = Field(default_factory=list)
+    projectMatches: list[str] = Field(default_factory=list)  # projectIntent 토큰 매칭 결과
 
 
 def _categoryRank(category: str) -> int:
@@ -155,6 +165,59 @@ def _resolveTargetOutcomes(goal: PlanGoal, taxonomy: CurriculumTaxonomy) -> list
             targets.append(outcomeId)
             seen.add(outcomeId)
     return targets
+
+
+# projectIntent 한국어 키워드 → category prioritization. resolve-learning-goal 과 동일 결정성.
+PROJECT_INTENT_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "dashboard": ("plotly", "altair", "seaborn", "matplotlib", "folium"),
+    "대시보드": ("plotly", "altair", "seaborn", "matplotlib", "folium"),
+    "보고서": ("openpyxl", "xlwings", "pandas", "matplotlib"),
+    "report": ("openpyxl", "xlwings", "pandas", "matplotlib"),
+    "자동화": ("openpyxl", "xlwings", "playwright", "fileOps", "watchSched", "procCtl"),
+    "자동": ("openpyxl", "xlwings", "playwright", "fileOps", "watchSched"),
+    "데이터분석": ("pandas", "polars", "duckdb", "numpy"),
+    "분석": ("pandas", "polars", "numpy", "statsmodels"),
+    "엑셀": ("openpyxl", "xlwings"),
+    "excel": ("openpyxl", "xlwings"),
+    "이미지": ("pillow", "opencv", "visionApps"),
+    "사진": ("pillow", "visionApps", "deepVision"),
+    "비전": ("opencv", "visionBasics", "visionFeatures", "deepVision"),
+    "지도": ("folium",),
+    "ml": ("sklearn", "statsmodels", "scipy"),
+    "머신러닝": ("sklearn", "statsmodels", "scipy"),
+    "llm": ("llmBasics", "regex"),
+    "챗봇": ("llmBasics",),
+    "봇": ("llmBasics",),
+    "네트워크": ("networkx",),
+    "그래프": ("networkx",),
+    "수학": ("sympy", "scipy"),
+}
+
+
+def _matchProjectIntent(projectIntent: str) -> tuple[set[str], list[str]]:
+    """projectIntent 텍스트에서 카테고리 우선순위와 매칭된 키워드 추출."""
+    if not projectIntent:
+        return set(), []
+    text = projectIntent.lower()
+    matchedKeywords: list[str] = []
+    boostedCategories: set[str] = set()
+    for keyword, categories in PROJECT_INTENT_KEYWORDS.items():
+        if keyword.lower() in text:
+            matchedKeywords.append(keyword)
+            boostedCategories.update(categories)
+    return boostedCategories, matchedKeywords
+
+
+def _projectLessonsForIntent(
+    graph: LessonGraph,
+    boostedCategories: set[str],
+) -> list[LessonNode]:
+    """projectIntent 가 매칭한 카테고리들의 project lesson 선정 (결정적 정렬)."""
+    projects = graph.projectLessons()
+    if boostedCategories:
+        projects = [p for p in projects if p.category in boostedCategories]
+    projects.sort(key=lambda p: (_categoryRank(p.category), p.sortKey))
+    return projects
 
 
 def _expandWithPrerequisites(
@@ -283,6 +346,16 @@ def composeMasterPlan(
     targetOutcomes = _resolveTargetOutcomes(goal, taxonomy)
     excludeKeys: set[str] = set(goal.excludeKeys or [])
 
+    # projectIntent — deliverable-driven 목표. 매칭된 project lesson 의 outcome 을
+    # target 에 강제 포함시키고, project lesson 자체를 selected 로 forced 추가.
+    boostedCategories, matchedKeywords = _matchProjectIntent(goal.projectIntent)
+    projectAnchors = _projectLessonsForIntent(graph, boostedCategories) if goal.projectIntent else []
+    forcedProjects = projectAnchors[:3]  # 너무 많이 묶이면 plan 폭주 — 상위 3 개로 제한
+    for project in forcedProjects:
+        for outcomeId in project.outcomes:
+            if outcomeId not in targetOutcomes:
+                targetOutcomes.append(outcomeId)
+
     # skipMasteredOutcomes — mastery >= MASTERY_THRESHOLD인 outcome은 plan에서 제외.
     # target 단계뿐 아니라 prerequisite expansion에서도 차단되어야 한다.
     masteredOutcomes: set[str] = set()
@@ -295,6 +368,25 @@ def composeMasterPlan(
     selected, unresolved = _expandWithPrerequisites(
         targetOutcomes, graph, excludeKeys, masteredOutcomes,
     )
+
+    # projectIntent 가 매칭한 project lesson 은 강제 포함 — backward expansion 이
+    # 이미 같은 outcome 을 더 입문 lesson 으로 cover 했더라도 deliverable 까지 도달해야 한다.
+    for project in forcedProjects:
+        if project.key in excludeKeys:
+            continue
+        if project.key not in selected:
+            selected[project.key] = project
+            # project 의 prerequisite 도 expansion
+            for prereq in project.prerequisites:
+                if prereq in masteredOutcomes:
+                    continue
+                covered = any(prereq in lesson.outcomes for lesson in selected.values())
+                if not covered:
+                    extra, extraUnresolved = _expandWithPrerequisites(
+                        [prereq], graph, set(excludeKeys) | set(selected.keys()), masteredOutcomes,
+                    )
+                    selected.update(extra)
+                    unresolved.update(extraUnresolved)
 
     # completed는 항상 조회한다 — excludeCompleted=False여도 진도/다음단계 표시에 필요.
     completed: set[str] = set()
@@ -350,12 +442,37 @@ def composeMasterPlan(
             completed=isCompleted,
             learnerMastery=learnerMastery,
             learnerConfidence=learnerConfidence,
+            lessonRole=lesson.lessonRole,
         ))
+
+    droppedSteps: list[PlanStep] = []
+
+    # deliverableOnly — mastery 가 이미 0.6 이상인 outcome 의 concept lesson 은 droppedSteps 로.
+    # project / practice 는 유지.
+    if goal.deliverableOnly and progressTracker is not None:
+        if not masteredOutcomes:  # skipMastered 가 off 였더라도 mastery 측정은 필요
+            validated = progressTracker.listValidatedOutcomes()
+            report = computeMastery(graph, taxonomy, progressTracker, validated)
+            highMastery = {
+                entry.outcomeId for entry in report.outcomes
+                if entry.level >= 0.6 or entry.mastered
+            }
+        else:
+            highMastery = set(masteredOutcomes)
+        kept: list[PlanStep] = []
+        for step in steps:
+            if step.lessonRole == "concept" and step.outcomes:
+                # 모든 outcome 이 이미 mastery>=0.6 이면 skip
+                if all(o in highMastery for o in step.outcomes):
+                    droppedSteps.append(step)
+                    continue
+            kept.append(step)
+        steps = kept
+        totalMinutes = sum(s.estimatedMinutes for s in steps if not s.completed)
 
     # 시간 예산이 주어졌으면 끝부분 step을 droppedSteps로 분리한다.
     # 합성 우선순위(prerequisite-아래에서-위)는 유지된다 — 끊는 위치는 budget을
     # 넘기 시작한 직후. 미완료 step만 budget 누적에 포함.
-    droppedSteps: list[PlanStep] = []
     if goal.maxMinutes and goal.maxMinutes > 0:
         kept: list[PlanStep] = []
         budgetRemaining = goal.maxMinutes
@@ -392,6 +509,11 @@ def composeMasterPlan(
         targetOutcomes, learnerMasteryByOutcome, taxonomy, unresolved
     )
 
+    # 3단 분리 — concept/practice/project. frontend 가 칼럼 뷰로 렌더.
+    conceptSteps = [s for s in steps if s.lessonRole == "concept"]
+    practiceSteps = [s for s in steps if s.lessonRole == "practice"]
+    projectSteps = [s for s in steps if s.lessonRole == "project"]
+
     summary = _formatSummary(goal, taxonomy, steps, gaps, dynamicGaps, totalMinutes)
 
     return MasterPlan(
@@ -405,6 +527,10 @@ def composeMasterPlan(
         summary=summary,
         nextStepKey=nextStepKey,
         completedCount=completedCount,
+        conceptSteps=conceptSteps,
+        practiceSteps=practiceSteps,
+        projectSteps=projectSteps,
+        projectMatches=matchedKeywords,
     )
 
 

@@ -625,3 +625,48 @@ def testLessonNodeOutcomesForSection() -> None:
     assert node.outcomesForSection("sec1") == ["a"]
     # 매핑 없는 섹션은 lesson outcomes 전체 fallback
     assert node.outcomesForSection("unknown") == ["a", "b"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 2d — lessonRole / project plan
+# ---------------------------------------------------------------------------
+
+
+def testPlanStepsCarryLessonRole() -> None:
+    taxonomy = loadTaxonomy()
+    loader = StudyLoader(str(CURRICULA_DIR))
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+    graph = buildLessonGraph(loader, taxonomy)
+    plan = composeMasterPlan(
+        PlanGoal(domain="dataReporting", excludeCompleted=False),
+        graph, taxonomy,
+    )
+    roles = {step.lessonRole for step in plan.steps}
+    assert "concept" in roles or "project" in roles, "steps must carry lessonRole"
+
+
+def testProjectIntentMatchesKoreanKeywords() -> None:
+    taxonomy = loadTaxonomy()
+    loader = StudyLoader(str(CURRICULA_DIR))
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+    graph = buildLessonGraph(loader, taxonomy)
+    plan = composeMasterPlan(
+        PlanGoal(projectIntent="매출 대시보드 만들기", excludeCompleted=False),
+        graph, taxonomy,
+    )
+    assert "대시보드" in plan.projectMatches
+    assert plan.projectSteps, "matching project lessons should appear as project tier"
+
+
+def testThreeTierSplit() -> None:
+    taxonomy = loadTaxonomy()
+    loader = StudyLoader(str(CURRICULA_DIR))
+    from codaro.curriculum.lessonGraph import buildLessonGraph
+    graph = buildLessonGraph(loader, taxonomy)
+    plan = composeMasterPlan(
+        PlanGoal(domain="dataReporting", excludeCompleted=False),
+        graph, taxonomy,
+    )
+    # 합집합이 steps 와 동일
+    combined = plan.conceptSteps + plan.practiceSteps + plan.projectSteps
+    assert {s.key for s in combined} == {s.key for s in plan.steps}

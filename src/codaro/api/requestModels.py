@@ -100,6 +100,8 @@ class MasterPlanRequest(BaseModel):
     excludeKeys: list[str] = Field(default_factory=list)
     skipMasteredOutcomes: bool = False
     maxMinutes: int = 0
+    projectIntent: str = ""
+    deliverableOnly: bool = False
 
 
 class OutcomeValidationRequest(BaseModel):
