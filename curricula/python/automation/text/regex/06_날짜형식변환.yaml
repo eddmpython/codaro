@@ -64,6 +64,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_date_formats
@@ -112,6 +113,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 2단계. 다양한 날짜 형식 확인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 2단계. 다양한 날짜 형식 확인의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step3_pattern1_yyyymmdd
@@ -144,6 +146,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 3단계. YYYYMMDD 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 3단계. YYYYMMDD 형식 처리의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step4_pattern2_slash
@@ -176,6 +179,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 4단계. 슬래시(/) 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 4단계. 슬래시(/) 형식 처리의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step5_pattern3_dotdmy
@@ -210,6 +214,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 5단계. DD.MM.YYYY 형식 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 5단계. DD.MM.YYYY 형식 처리의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step6_multiple_patterns
@@ -259,6 +264,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 6단계. 여러 패턴 한 번에 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 6단계. 여러 패턴 한 번에 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step7_compile_pattern
@@ -300,6 +306,7 @@ sections:
     - 바꿀 지점은 이미지 로드, resize, 색공간 변환, threshold/filter 인자입니다.
     - 실행 뒤 shape, dtype, 채널 수, 검출 개수, 저장 파일이 바뀐 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 7단계. re.compile로 최적화의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
     resultCheck: 7단계. re.compile로 최적화 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.
 - id: step8_month_names
@@ -334,6 +341,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 8단계. 영문 월 이름 처리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 8단계. 영문 월 이름 처리의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: step9_complete_converter
@@ -473,6 +481,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 9단계. 완성된 날짜 변환기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 9단계. 완성된 날짜 변환기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: step10_extract_dates
@@ -501,6 +510,7 @@ sections:
     - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
     - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
   check:
+    type: noError
     noError: 10단계. 날짜만 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
     resultCheck: 10단계. 날짜만 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
 - id: workflow_validation
@@ -553,6 +563,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 11단계. 날짜 정규화 검증 루프의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
     resultCheck: 11단계. 날짜 정규화 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
@@ -619,6 +630,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실습의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
     resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: summary
