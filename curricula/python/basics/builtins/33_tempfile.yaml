@@ -90,6 +90,7 @@ sections:
     - mkdir로 하위 폴더를 만든 뒤 write_text로 파일을 씁니다.
     - with 종료 시 트리 전체가 삭제되므로 root.exists()는 False입니다.
   check:
+    type: noError
     noError: TemporaryDirectory와 Path 조합이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: nestedExists가 True이고 cleanedUp이 True여야 with 블록 안에서는 파일이 있고 종료 후 삭제된 것입니다.
 - id: named-temp-file
@@ -235,6 +236,7 @@ sections:
     - try 본문에서 예외가 나도 finally가 실행됩니다.
     - shutil.rmtree(ignore_errors=True)는 부분적으로 만들어진 폴더도 안전하게 정리합니다.
   check:
+    type: noError
     noError: TemporaryDirectory와 try/finally가 NameError나 OSError 없이 실행되어야 합니다.
     resultCheck: raised가 simulated failure이고 cleanedUpAfterError가 True여야 예외 안전성이 보장된 것입니다.
 - id: practice-pattern
@@ -290,5 +292,6 @@ sections:
     - glob으로 같은 패턴의 파일을 한 번에 모읍니다.
     - 결과 dict를 함수 반환으로 받아두면 with 종료 후에도 검증할 수 있습니다.
   check:
+    type: noError
     noError: summarizeAll과 TemporaryDirectory 조합이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: summary가 warnings 2, errors 1, total 5를 정확히 담아야 두 파일이 합쳐 처리된 것입니다.
