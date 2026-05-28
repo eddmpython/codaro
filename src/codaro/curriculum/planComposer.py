@@ -17,9 +17,17 @@ from typing import Iterable
 
 from pydantic import BaseModel, Field
 
+from .learnerState import LearnerStateStore
 from .lessonGraph import LessonGraph, LessonNode
+from .outcomeMastery import computeMastery, masteredOutcomeIds
 from .progress import ProgressTracker
 from .taxonomy import CurriculumTaxonomy
+
+
+# 학습자 mastery가 이 임계 이하면 dynamic gap으로 표시한다.
+# learnerState EMA 기본 0.3 (한 번 성공 시 0.3 도달) — 그 아래면 신뢰할 수 없는 상태로 본다.
+DYNAMIC_GAP_MASTERY_THRESHOLD = 0.3
+DYNAMIC_GAP_CONFIDENCE_THRESHOLD = 0.2
 
 
 PRIMARY_CATEGORY_ORDER = (
@@ -59,6 +67,7 @@ class PlanGoal(BaseModel):
     outcomes: list[str] = Field(default_factory=list)
     excludeCompleted: bool = True
     excludeKeys: list[str] = Field(default_factory=list)
+    skipMasteredOutcomes: bool = False
 
 
 class PlanStep(BaseModel):
@@ -72,6 +81,8 @@ class PlanStep(BaseModel):
     rationale: str
     estimatedMinutes: int
     completed: bool = False
+    learnerMastery: float | None = None
+    learnerConfidence: float | None = None
 
 
 class PlanGap(BaseModel):
@@ -86,6 +97,7 @@ class MasterPlan(BaseModel):
     targetOutcomes: list[str]
     steps: list[PlanStep]
     gaps: list[PlanGap]
+    dynamicGaps: list[PlanGap] = Field(default_factory=list)
     totalMinutes: int
     summary: str
     nextStepKey: str | None = None
@@ -146,11 +158,16 @@ def _expandWithPrerequisites(
     targetOutcomes: Iterable[str],
     graph: LessonGraph,
     excludeKeys: set[str],
+    masteredOutcomes: set[str] | None = None,
 ) -> tuple[dict[str, LessonNode], set[str]]:
     """target outcome 집합에서 출발해 prerequisite을 따라가며 필요한 레슨을 모은다.
 
+    masteredOutcomes가 주어지면 — 이미 익힌 outcome은 lesson을 추가하지 않고
+    "이미 만족됨"으로 처리한다 (prerequisite 사슬을 따라 들어와도 차단).
+
     반환: (선택된 레슨 매핑[key -> LessonNode], 미해결 outcome 집합).
     """
+    mastered = masteredOutcomes or set()
     selected: dict[str, LessonNode] = {}
     unresolved: set[str] = set()
     open_: list[str] = list(targetOutcomes)
@@ -160,6 +177,9 @@ def _expandWithPrerequisites(
         if outcomeId in visitedOutcomes:
             continue
         visitedOutcomes.add(outcomeId)
+        # 이미 익힌 outcome은 레슨 추가 없이 만족된 것으로 본다.
+        if outcomeId in mastered:
+            continue
         # 이미 선택된 레슨이 이 outcome을 제공하면 추가 작업 불필요
         alreadyCovered = any(
             outcomeId in lesson.outcomes for lesson in selected.values()
@@ -255,11 +275,23 @@ def composeMasterPlan(
     graph: LessonGraph,
     taxonomy: CurriculumTaxonomy,
     progressTracker: ProgressTracker | None = None,
+    learnerStateStore: LearnerStateStore | None = None,
 ) -> MasterPlan:
     targetOutcomes = _resolveTargetOutcomes(goal, taxonomy)
     excludeKeys: set[str] = set(goal.excludeKeys or [])
 
-    selected, unresolved = _expandWithPrerequisites(targetOutcomes, graph, excludeKeys)
+    # skipMasteredOutcomes — mastery >= MASTERY_THRESHOLD인 outcome은 plan에서 제외.
+    # target 단계뿐 아니라 prerequisite expansion에서도 차단되어야 한다.
+    masteredOutcomes: set[str] = set()
+    if goal.skipMasteredOutcomes and progressTracker is not None:
+        validated = progressTracker.listValidatedOutcomes()
+        report = computeMastery(graph, taxonomy, progressTracker, validated)
+        masteredOutcomes = masteredOutcomeIds(report)
+        targetOutcomes = [oid for oid in targetOutcomes if oid not in masteredOutcomes]
+
+    selected, unresolved = _expandWithPrerequisites(
+        targetOutcomes, graph, excludeKeys, masteredOutcomes,
+    )
 
     # completed는 항상 조회한다 — excludeCompleted=False여도 진도/다음단계 표시에 필요.
     completed: set[str] = set()
@@ -267,6 +299,15 @@ def composeMasterPlan(
         completed = _completedKeys(progressTracker)
 
     ordered = _topologicalSort(selected)
+
+    # learnerState 입력 — 결정적: 동일 store 상태 → 동일 결과
+    learnerMasteryByOutcome: dict[str, tuple[float, float]] = {}
+    if learnerStateStore is not None:
+        for mastery in learnerStateStore.listMastery():
+            learnerMasteryByOutcome[mastery.outcomeId] = (
+                mastery.score,
+                mastery.confidence,
+            )
 
     targetSet = set(targetOutcomes)
     steps: list[PlanStep] = []
@@ -284,6 +325,15 @@ def composeMasterPlan(
         totalMinutes += lesson.estimatedMinutes
         if nextStepKey is None and not isCompleted:
             nextStepKey = lesson.key
+
+        # lesson의 첫 outcome에서 learner mastery 가져오기 — 가장 representative
+        learnerMastery: float | None = None
+        learnerConfidence: float | None = None
+        if learnerMasteryByOutcome and lesson.outcomes:
+            primary = lesson.outcomes[0]
+            if primary in learnerMasteryByOutcome:
+                learnerMastery, learnerConfidence = learnerMasteryByOutcome[primary]
+
         steps.append(PlanStep(
             order=visibleOrder,
             category=lesson.category,
@@ -295,24 +345,33 @@ def composeMasterPlan(
             rationale=_buildRationale(lesson, targetSet, taxonomy),
             estimatedMinutes=lesson.estimatedMinutes,
             completed=isCompleted,
+            learnerMastery=learnerMastery,
+            learnerConfidence=learnerConfidence,
         ))
 
+    # 정적 gap — 해당 outcome을 가르치는 레슨이 없음
     gaps: list[PlanGap] = [
         PlanGap(
             outcomeId=outcomeId,
             outcomeLabel=taxonomy.outcomeLabel(outcomeId),
             reason="해당 능력을 가르치는 레슨이 아직 커리큘럼에 없습니다.",
         )
-        for outcomeId in unresolved
+        for outcomeId in sorted(unresolved)
     ]
 
-    summary = _formatSummary(goal, taxonomy, steps, gaps, totalMinutes)
+    # 동적 gap — 레슨은 있지만 학습자 mastery가 낮은 outcome
+    dynamicGaps = _computeDynamicGaps(
+        targetOutcomes, learnerMasteryByOutcome, taxonomy, unresolved
+    )
+
+    summary = _formatSummary(goal, taxonomy, steps, gaps, dynamicGaps, totalMinutes)
 
     return MasterPlan(
         goal=goal,
         targetOutcomes=targetOutcomes,
         steps=steps,
         gaps=gaps,
+        dynamicGaps=dynamicGaps,
         totalMinutes=totalMinutes,
         summary=summary,
         nextStepKey=nextStepKey,
@@ -320,11 +379,40 @@ def composeMasterPlan(
     )
 
 
+def _computeDynamicGaps(
+    targetOutcomes: list[str],
+    learnerMasteryByOutcome: dict[str, tuple[float, float]],
+    taxonomy: CurriculumTaxonomy,
+    unresolved: set[str],
+) -> list[PlanGap]:
+    """학습자 mastery 가 낮은 target outcome을 dynamic gap으로 보고.
+
+    static gap(unresolved)과 중복되지 않게 분리. 학습자 정보가 없으면 빈 리스트.
+    """
+    if not learnerMasteryByOutcome:
+        return []
+    gaps: list[PlanGap] = []
+    for outcomeId in targetOutcomes:
+        if outcomeId in unresolved:
+            continue  # static gap이 우선
+        if outcomeId not in learnerMasteryByOutcome:
+            continue  # 학습자가 시도 안 한 outcome은 dynamic gap 아님 (아직 모름)
+        score, confidence = learnerMasteryByOutcome[outcomeId]
+        if score < DYNAMIC_GAP_MASTERY_THRESHOLD or confidence < DYNAMIC_GAP_CONFIDENCE_THRESHOLD:
+            gaps.append(PlanGap(
+                outcomeId=outcomeId,
+                outcomeLabel=taxonomy.outcomeLabel(outcomeId),
+                reason=f"학습자 mastery {score:.2f} / confidence {confidence:.2f} — 보강 학습 필요",
+            ))
+    return gaps
+
+
 def _formatSummary(
     goal: PlanGoal,
     taxonomy: CurriculumTaxonomy,
     steps: list[PlanStep],
     gaps: list[PlanGap],
+    dynamicGaps: list[PlanGap],
     totalMinutes: int,
 ) -> str:
     parts: list[str] = []
@@ -340,4 +428,6 @@ def _formatSummary(
         parts.append(f"약 {totalMinutes}분")
     if gaps:
         parts.append(f"미충족 능력 {len(gaps)}개")
+    if dynamicGaps:
+        parts.append(f"보강 필요 {len(dynamicGaps)}개")
     return " · ".join(parts) if parts else "마스터 플랜"
