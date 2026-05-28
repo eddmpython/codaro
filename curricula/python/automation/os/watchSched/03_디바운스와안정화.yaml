@@ -115,6 +115,7 @@ sections:
         - 짧은 간격으로 같은 키가 들어오면 함수는 False를 돌려준다.
         - 첫 호출은 lastSeen에 키가 없으므로 처리가 진행된다.
       check:
+        type: noError
         noError: 디바운스 함수 두 번 호출이 정상적으로 끝나야 한다.
         resultCheck: first는 True, second는 False여야 한다.
     check:
@@ -202,6 +203,7 @@ sections:
         - sleep 시간이 시간 창인 0.15초보다 커야 세 번째 호출이 True가 된다.
         - 0.2초가 안정적인 sleep 값이다.
       check:
+        type: noError
         noError: 세 번의 디바운스 호출과 sleep이 끝나야 한다.
         resultCheck: results가 [True, False, True]여야 한다.
     check:
@@ -278,6 +280,7 @@ sections:
         - in 비교의 좌변에는 함수 인자 변수 key를 그대로 둔다.
         - 두 다른 키는 서로의 lastSeen 항목과 무관하다.
       check:
+        type: noError
         noError: 두 키 디바운스 호출이 정상적으로 끝나야 한다.
         resultCheck: results가 [True, True]여야 한다.
     check:
@@ -374,6 +377,7 @@ sections:
         - 카운터를 1만큼 더하면 처리 횟수가 정확히 늘어난다.
         - x의 두 번째 호출은 시간 창 안이라 처리되지 않는다.
       check:
+        type: noError
         noError: 종합 함수 호출과 dict 반환이 끝나야 한다.
         resultCheck: 'summary가 {"x": 1, "y": 1}로 본문 기대값과 같아야 한다.'
     check:

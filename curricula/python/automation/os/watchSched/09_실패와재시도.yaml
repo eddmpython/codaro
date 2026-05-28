@@ -128,6 +128,7 @@ sections:
         - counter 임계값이 4이면 세 번 실패 후 네 번째에 성공한다.
         - 카운터 1, 2, 3에서는 RuntimeError가 발생한다.
       check:
+        type: noError
         noError: while/try 흐름이 RuntimeError로 빠지지 않고 끝나야 한다.
         resultCheck: attempts 리스트가 네 항목을 본문 기대값과 같은 순서로 담아야 한다.
     check:
@@ -227,6 +228,7 @@ sections:
         - 최대 시도 횟수는 4여야 세 번째 시도까지 도달한다.
         - 성공한 시도 번호는 정확히 3이다.
       check:
+        type: noError
         noError: retry 함수와 작업 호출이 정상적으로 끝나야 한다.
         resultCheck: outcome 튜플이 ("success", 3, "done")이어야 한다.
     check:
@@ -275,6 +277,7 @@ sections:
         - 거듭제곱 지수는 attempt에서 1을 뺀 값이다.
         - 시도 3은 4배가 되어 0.4가 된다.
       check:
+        type: noError
         noError: computeBackoff 호출이 정상적으로 끝나야 한다.
         resultCheck: schedule 리스트가 [0.1, 0.2, 0.4]여야 한다.
     check:
@@ -375,6 +378,7 @@ sections:
         - 종료 상태 키는 exhausted다.
         - 두 번 실패의 백오프 합은 0.05 + 0.1 = 0.15다.
       check:
+        type: noError
         noError: retryWithReport 호출이 종합 정리 흐름으로 끝나야 한다.
         resultCheck: report의 status가 exhausted, attempts가 2, sleeps가 약 0.15여야 한다.
     check:

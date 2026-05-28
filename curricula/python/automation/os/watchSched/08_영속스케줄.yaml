@@ -76,6 +76,7 @@ sections:
         - 두 작업 이름은 morning과 hourly다.
         - 리스트 컴프리헨션은 dict의 name 키를 그대로 모은다.
       check:
+        type: noError
         noError: dict 리스트 구성이 끝나야 한다.
         resultCheck: summary가 count 2와 두 이름 리스트를 정확히 담아야 한다.
     check:
@@ -150,6 +151,7 @@ sections:
         - ensure_ascii 인자에 False를 넘기면 한글이 그대로 저장된다.
         - 두 이름이 saved 문자열에 모두 포함되는지 확인한다.
       check:
+        type: noError
         noError: JSON 저장과 읽기가 IOError 없이 끝나야 한다.
         resultCheck: saved 문자열에 두 이름이 모두 포함되어야 한다.
     check:
@@ -221,6 +223,7 @@ sections:
         - 복원 함수 이름은 json.loads다.
         - 원본과 복원 dict는 == 연산자로 깊은 비교가 가능하다.
       check:
+        type: noError
         noError: json.loads 호출이 JSONDecodeError 없이 끝나야 한다.
         resultCheck: restored가 원본 schedule과 정확히 같아야 한다.
     check:
@@ -318,6 +321,7 @@ sections:
         - 함수 인자 변수 이름은 schedule이다.
         - matches는 복원 dict와 원본을 == 로 비교한 결과다.
       check:
+        type: noError
         noError: persistRoundtrip 호출이 종합 정리 흐름으로 끝나야 한다.
         resultCheck: report dict의 matches가 True이고 restored 길이가 2여야 한다.
     check:
