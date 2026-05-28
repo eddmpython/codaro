@@ -359,5 +359,6 @@ sections:
     - 반복적인 텍스트는 압축이 잘 되어 ratio가 1보다 훨씬 작습니다.
     - 결과 dict 안의 ratio가 0과 1 사이여야 합니다.
   check:
+    type: noError
     noError: packDirectory 호출이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: result dict의 items가 2이고 ratio가 0보다 크고 1보다 작아야 압축이 동작한 것입니다.
