@@ -57,6 +57,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: ⚠️ difflib 모듈 임포트의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: ⚠️ difflib 모듈 임포트 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
   name: module_import
@@ -93,6 +94,7 @@ sections:
     - 바꿀 지점은 `text1 = ...` 오른쪽 값입니다.
     - 실행 뒤 `text1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: SequenceMatcher 기본에서 `text1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: SequenceMatcher 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: sequence_matcher
@@ -143,6 +145,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 텍스트 비교 함수에서 `text1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 텍스트 비교 함수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: text_comparison
@@ -177,6 +180,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 유사 문자열 찾기에서 `word` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 유사 문자열 찾기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: close_matches
@@ -215,6 +219,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: HTML 형식 비교에서 `text1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: HTML 형식 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: html_diff
@@ -259,6 +264,7 @@ sections:
     - 바꿀 지점은 `text1 = ...` 오른쪽 값입니다.
     - 실행 뒤 `text1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 고급 기능에서 `text1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 고급 기능 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: advanced_usage
@@ -330,6 +336,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 활용 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실전 활용 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
   name: practical
@@ -441,6 +448,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 변경 리포트 품질 게이트의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.'
     resultCheck: '검증 루프: 변경 리포트 품질 게이트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
   name: workflow_validation
@@ -470,6 +478,7 @@ sections:
     - 바꿀 지점은 `text1 = ...` 오른쪽 값입니다.
     - 실행 뒤 `text1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 연습 문제에서 `text1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 연습 문제 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: practice

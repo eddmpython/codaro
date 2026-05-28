@@ -102,6 +102,7 @@ sections:
     - finally의 close는 정상/예외 경로 모두에서 실행됩니다.
     - try를 빼면 예외 경로에서 close가 누락되는지 확인해 보세요.
   check:
+    type: noError
     noError: trace 데코레이터와 with 블록이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: events 리스트가 open:task, body:task, close:task, caught 순서로 채워져 예외 경로에서도 close가 보존되어야 합니다.
 - id: closing-cleanup
@@ -170,6 +171,7 @@ sections:
     - closing은 with 종료 시 항상 close()를 호출합니다.
     - log의 close 항목은 caught 앞에 있어야 합니다(with가 먼저 정리되고 except가 실행됨).
   check:
+    type: noError
     noError: closing과 Resource 정의가 NameError나 AttributeError 없이 실행되어야 합니다.
     resultCheck: log 리스트가 open, use, close, caught 순서로 채워지고 closed가 True여야 합니다.
 - id: suppress
@@ -219,6 +221,7 @@ sections:
     - KeyError는 suppress가 흡수하므로 after 분기는 실행되지 않습니다.
     - ValueError는 흡수 대상이 아니므로 with 바깥의 except로 전파됩니다.
   check:
+    type: noError
     noError: suppress 사용 코드가 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: log 리스트가 before-key, before-value, caught:not a key error 순서로 채워져 흡수 대상과 비대상의 분기가 분명히 드러나야 합니다.
 - id: exitstack
@@ -272,6 +275,7 @@ sections:
     - ExitStack은 등록 역순으로 정리합니다. callback이 가장 마지막에 등록되었으므로 가장 먼저 실행됩니다.
     - close 순서는 c, b, a 역순이어야 합니다.
   check:
+    type: noError
     noError: ExitStack과 labeled 사용이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: events 리스트에서 callback-runs가 close:c보다 앞에 나오고 close 순서가 c, b, a여야 LIFO 정리가 맞는 것입니다.
 - id: nullcontext
@@ -327,5 +331,6 @@ sections:
     - nullcontext()는 기본값 None을 as 절에 바인딩합니다.
     - 명시 값으로 nullcontext("placeholder")를 호출하면 그 값이 그대로 들어옵니다.
   check:
+    type: noError
     noError: nullcontext와 execute 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: default 리스트는 bound:None이고 labelled 리스트는 bound:placeholder로 두 경우의 as 바인딩 차이가 드러나야 합니다.

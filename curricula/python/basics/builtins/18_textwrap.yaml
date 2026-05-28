@@ -59,6 +59,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: ⚠️ textwrap 모듈 임포트의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: ⚠️ textwrap 모듈 임포트 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
   name: module_import
@@ -89,6 +90,7 @@ sections:
     - 바꿀 지점은 `longText = ...` 오른쪽 값입니다.
     - 실행 뒤 `longText` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 텍스트 래핑에서 `longText` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 텍스트 래핑 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: basic_wrapping
@@ -127,6 +129,7 @@ sections:
     - 바꿀 지점은 `indentedText = ...` 오른쪽 값입니다.
     - 실행 뒤 `indentedText` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 들여쓰기 제거에서 `indentedText` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 들여쓰기 제거 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: text_dedenting
@@ -157,6 +160,7 @@ sections:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 들여쓰기 추가에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 들여쓰기 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: text_indenting
@@ -187,6 +191,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 텍스트 축약의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 텍스트 축약 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
   name: text_shortening
@@ -219,6 +224,7 @@ sections:
     - 바꿀 지점은 `wrapper = ...` 오른쪽 값입니다.
     - 실행 뒤 `wrapper` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: TextWrapper 클래스에서 `wrapper` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: TextWrapper 클래스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: textwrapper_class
@@ -280,6 +286,7 @@ sections:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
   check:
+    type: noError
     noError: 실전 활용 예제의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 실전 활용 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
   name: practical
@@ -341,6 +348,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: CLI 출력 품질 게이트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: CLI 출력 품질 게이트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
   name: workflow_validation
@@ -366,6 +374,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 연습 문제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 연습 문제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
   name: practice

@@ -76,6 +76,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: math 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: math 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic_functions
@@ -102,6 +103,7 @@ sections:
     - 바꿀 지점은 `squareRoot = ...` 오른쪽 값입니다.
     - 실행 뒤 `squareRoot` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 수학 함수에서 `squareRoot` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 수학 함수 실행 뒤 `squareRoot` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: trigonometric
@@ -128,6 +130,7 @@ sections:
     - 바꿀 지점은 `angleInRadians = ...` 오른쪽 값입니다.
     - 실행 뒤 `angleInRadians` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 삼각함수에서 `angleInRadians` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 삼각함수 실행 뒤 `angleInRadians` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: logarithmic
@@ -154,6 +157,7 @@ sections:
     - 바꿀 지점은 `exponential = ...` 오른쪽 값입니다.
     - 실행 뒤 `exponential` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 로그와 지수에서 `exponential` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 로그와 지수 실행 뒤 `exponential` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: rounding
@@ -180,6 +184,7 @@ sections:
     - 바꿀 지점은 `ceilingValue = ...` 오른쪽 값입니다.
     - 실행 뒤 `ceilingValue` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 반올림과 정수 변환에서 `ceilingValue` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 반올림과 정수 변환 실행 뒤 `ceilingValue` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: constants
@@ -208,6 +213,7 @@ sections:
     - 바꿀 지점은 `radius = ...` 오른쪽 값입니다.
     - 실행 뒤 `radius` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 수학 상수에서 `radius` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 수학 상수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practical
@@ -234,6 +240,7 @@ sections:
     - 바꿀 지점은 `hypotenuse = ...` 오른쪽 값입니다.
     - 실행 뒤 `hypotenuse` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 활용에서 `hypotenuse` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실전 활용 실행 뒤 `hypotenuse` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -307,6 +314,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 업무 계산 리포트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: 업무 계산 리포트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -330,5 +338,6 @@ sections:
     - 바꿀 지점은 `sqrtValue = ...` 오른쪽 값입니다.
     - 실행 뒤 `sqrtValue` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: math 모듈 종합 복습에서 `sqrtValue` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: math 모듈 종합 복습 실행 뒤 `sqrtValue` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

@@ -83,6 +83,7 @@ sections:
       noError: logging.warning과 logging.error가 NameError 없이 실행되어야 합니다.
       resultCheck: 셀 반환값이 "logging module ready" 문자열이어야 합니다.
   check:
+    type: noError
     noError: import logging과 warning/error 호출이 NameError 없이 끝나야 합니다.
     resultCheck: 셀 반환값이 "logging module ready"이고 stderr에 WARNING/ERROR 두 줄이 보여야 합니다.
 - id: log_levels
@@ -131,6 +132,7 @@ sections:
       noError: basicConfig와 5개 로그 호출이 NameError 없이 끝나야 합니다.
       resultCheck: 셀 반환값이 [10, 20, 30, 40, 50] 리스트여야 합니다.
   check:
+    type: noError
     noError: basicConfig(level=...) 호출이 끝나고 5개 로그 record가 발생해야 합니다.
     resultCheck: 셀 반환값이 [10, 20, 30, 40, 50]이고, 설정한 레벨 미만은 stderr에 보이지 않아야 합니다.
 - id: formatters
@@ -201,6 +203,7 @@ sections:
       noError: StringIO와 StreamHandler 설정이 NameError 없이 끝나야 합니다.
       resultCheck: swapLine이 4개 요소 리스트이고 인덱스 1이 'codaro.formatter.swap'이어야 합니다.
   check:
+    type: noError
     noError: Formatter와 StreamHandler 구성이 NameError, AttributeError 없이 끝나야 합니다.
     resultCheck: sampleLine.split('|')이 4개 요소를 갖고 인덱스 1이 'INFO'여야 합니다.
 - id: handlers
@@ -282,6 +285,7 @@ sections:
       noError: 두 핸들러와 로거 구성이 NameError, AttributeError 없이 끝나야 합니다.
       resultCheck: 결과 dict의 detailLines가 1개 라인, summaryLines가 빈 리스트여야 합니다.
   check:
+    type: noError
     noError: 두 StreamHandler를 같은 로거에 등록하고 record를 흘려보내는 흐름이 끝나야 합니다.
     resultCheck: 결과 dict의 detail에 2개 라인, summary에 1개 라인이 있어야 합니다.
 - id: loggers
@@ -349,6 +353,7 @@ sections:
       noError: 부모/자식 로거 구성이 NameError 없이 끝나야 합니다.
       resultCheck: 셀 반환값이 빈 리스트여야 합니다.
   check:
+    type: noError
     noError: getLogger와 핸들러 등록 흐름이 NameError 없이 끝나야 합니다.
     resultCheck: 결과 dict의 lines가 1개 항목이고 sameInstance가 True여야 합니다.
 - id: advanced_patterns
@@ -420,6 +425,7 @@ sections:
       noError: extra dict 사용과 핸들러 출력이 KeyError 없이 끝나야 합니다.
       resultCheck: firstAdapterLine 안에 본인이 넣은 requestId 문자열이 포함되어야 합니다.
   check:
+    type: noError
     noError: try/except, exception, extra 흐름이 KeyError 없이 끝나야 합니다.
     resultCheck: 결과 dict의 firstLine이 "ERROR|req-001|나누기 실패"이고 hasTraceback이 True여야 합니다.
 - id: practical
@@ -501,6 +507,7 @@ sections:
       noError: callApiWithCode 호출이 NameError 없이 끝나야 합니다.
       resultCheck: sampleResult의 statusCode가 503이고 firstLine에 'code=503'이 포함되어야 합니다.
   check:
+    type: noError
     noError: callApi 정의와 두 번 호출이 NameError 없이 끝나야 합니다.
     resultCheck: lineCount가 3이고 errorLines가 정확히 1개 항목이며, failResult의 status가 'error'여야 합니다.
 - id: workflow_validation
@@ -594,6 +601,7 @@ sections:
       noError: TimestampedJsonFormatter 정의와 timedLogger.info 호출이 NameError 없이 끝나야 합니다.
       resultCheck: timedParsed[0]에 'timestamp' 키가 있고 그 값이 ISO 형식 문자열이어야 합니다.
   check:
+    type: noError
     noError: WorkflowJsonFormatter 정의와 JSON 파싱이 KeyError/JSONDecodeError 없이 끝나야 합니다.
     resultCheck: parsedRecords가 2개 항목 리스트이고 첫 항목의 requestId가 'req-101'이어야 합니다.
 - id: practice
@@ -674,5 +682,6 @@ sections:
       noError: configureLogger 정의와 두 번 호출이 NameError 없이 끝나야 합니다.
       resultCheck: 결과 dict의 handlerCount가 1이고 lineCount가 1이어야 합니다.
   check:
+    type: noError
     noError: configureLogger 정의와 두 번 호출이 NameError 없이 끝나야 합니다.
     resultCheck: 결과 dict의 handlerCount가 1, lineCount가 2여야 합니다.

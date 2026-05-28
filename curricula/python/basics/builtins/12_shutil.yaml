@@ -64,6 +64,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: shutil 모듈 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
     resultCheck: shutil 모듈 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: file_operations
@@ -107,6 +108,7 @@ sections:
     - 바꿀 지점은 `tempDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `tempDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 파일 복사/이동에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 복사/이동 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: directory_operations
@@ -152,6 +154,7 @@ sections:
     - 바꿀 지점은 `tempDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `tempDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 디렉토리 작업에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 디렉토리 작업 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: archive_operations
@@ -198,6 +201,7 @@ sections:
     - 바꿀 지점은 `tempDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `tempDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 압축 파일에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 압축 파일 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: disk_usage
@@ -224,6 +228,7 @@ sections:
     - 바꿀 지점은 `usageInfo = ...` 오른쪽 값입니다.
     - 실행 뒤 `usageInfo` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 디스크 사용량에서 `usageInfo` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 디스크 사용량 실행 뒤 `usageInfo` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: practical_use
@@ -269,6 +274,7 @@ sections:
     - 바꿀 지점은 `tempDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `tempDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 활용에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실전 활용 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -354,6 +360,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 안전한 백업 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: 안전한 백업 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -397,5 +404,6 @@ sections:
     - 바꿀 지점은 `tempDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `tempDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: shutil 모듈 종합 복습에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: shutil 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.

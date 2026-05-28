@@ -86,6 +86,7 @@ sections:
     - sha256은 32바이트, hex는 두 글자 = 한 바이트라 64자입니다.
     - sha512는 64바이트라 128자가 됩니다.
   check:
+    type: noError
     noError: hashlib 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: sha256Length가 64이고 sha512Length가 128이어야 두 해시의 출력 크기가 맞는 것입니다.
 - id: hash-streaming
@@ -145,6 +146,7 @@ sections:
     - 같은 바이트 시퀀스는 항상 같은 해시를 만듭니다.
     - 한 글자만 달라도 해시는 완전히 달라집니다.
   check:
+    type: noError
     noError: 파일 생성과 fileHash 호출이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: aEqualsB가 True이고 aEqualsC가 False여야 해시가 무결성 검사로 동작하는 것입니다.
 - id: secrets-tokens
@@ -189,6 +191,7 @@ sections:
     - token_urlsafe(n)은 약 n * 4 / 3 자 길이의 base64-url 문자열을 돌려줍니다.
     - 매 호출마다 다른 토큰이 나옵니다.
   check:
+    type: noError
     noError: secrets 호출이 NameError 없이 실행되어야 합니다.
     resultCheck: firstLength가 longerLength보다 작고 firstDiffersFromSecond가 True여야 합니다.
 - id: hmac-verify
@@ -236,6 +239,7 @@ sections:
     - 키가 다르면 서명이 완전히 달라집니다.
     - compare_digest는 일치 시 True, 불일치 시 False입니다.
   check:
+    type: noError
     noError: hmac 호출이 NameError 없이 실행되어야 합니다.
     resultCheck: keysMatch가 False이고 signaturesDiffer가 True여야 키가 다른 서명이 검출된 것입니다.
 - id: password-kdf
@@ -284,5 +288,6 @@ sections:
     - iterations가 다르면 누적 해시 결과가 달라져 키도 달라집니다.
     - 출력 키 길이는 알고리즘에 따라 고정입니다(sha256 = 32바이트).
   check:
+    type: noError
     noError: pbkdf2_hmac 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: iterationsAffectKey가 True이고 lengthSame이 True여야 KDF가 iterations에 민감한 것입니다.

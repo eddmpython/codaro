@@ -76,6 +76,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: time 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: time 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: basic_time
@@ -102,6 +103,7 @@ sections:
     - 바꿀 지점은 `timestamp = ...` 오른쪽 값입니다.
     - 실행 뒤 `timestamp` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 기본 시간 함수에서 `timestamp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본 시간 함수 실행 뒤 `timestamp` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: time_formats
@@ -130,6 +132,7 @@ sections:
     - 바꿀 지점은 `current = ...` 오른쪽 값입니다.
     - 실행 뒤 `current` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 시간 형식 변환에서 `current` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 시간 형식 변환 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: performance_measurement
@@ -162,6 +165,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 성능 측정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 성능 측정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: timing_control
@@ -188,6 +192,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: 시간 제어와 대기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 시간 제어와 대기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: clock_types
@@ -220,6 +225,7 @@ sections:
     - 바꿀 지점은 `tick = ...` 오른쪽 값입니다.
     - 실행 뒤 `tick` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 다양한 시계에서 `tick` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 다양한 시계 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practical
@@ -254,6 +260,7 @@ sections:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
   check:
+    type: noError
     noError: 실전 활용의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
     resultCheck: 실전 활용 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
 - id: workflow_validation
@@ -315,6 +322,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 시간 측정 운영 리포트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: 시간 측정 운영 리포트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -338,5 +346,6 @@ sections:
     - 바꿀 지점은 `currentTimestamp = ...` 오른쪽 값입니다.
     - 실행 뒤 `currentTimestamp` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: time 모듈 종합 복습에서 `currentTimestamp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: time 모듈 종합 복습 실행 뒤 `currentTimestamp` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

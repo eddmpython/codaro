@@ -78,6 +78,7 @@ sections:
     - 바꿀 지점은 `currentPath = ...` 오른쪽 값입니다.
     - 실행 뒤 `currentPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: pathlib 모듈 불러오기에서 `currentPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: pathlib 모듈 불러오기 실행 뒤 `currentPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: path_basics
@@ -104,6 +105,7 @@ sections:
     - 바꿀 지점은 `absolutePath = ...` 오른쪽 값입니다.
     - 실행 뒤 `absolutePath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: Path 객체 기초에서 `absolutePath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Path 객체 기초 실행 뒤 `absolutePath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: path_operations
@@ -132,6 +134,7 @@ sections:
     - 바꿀 지점은 `basePath = ...` 오른쪽 값입니다.
     - 실행 뒤 `basePath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 경로 조작에서 `basePath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 경로 조작 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: path_checking
@@ -158,6 +161,7 @@ sections:
     - 바꿀 지점은 `checkPath = ...` 오른쪽 값입니다.
     - 실행 뒤 `checkPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 경로 확인에서 `checkPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 경로 확인 실행 뒤 `checkPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: directory_navigation
@@ -184,6 +188,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 디렉토리 탐색의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 디렉토리 탐색 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: file_operations
@@ -216,6 +221,7 @@ sections:
     - 바꿀 지점은 `pathlibScratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `pathlibScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 파일 읽기/쓰기에서 `pathlibScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 읽기/쓰기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -289,6 +295,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: Path 기반 파일 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: Path 기반 파일 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -312,5 +319,6 @@ sections:
     - 바꿀 지점은 `currentWorkingDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `currentWorkingDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: pathlib 모듈 종합 복습에서 `currentWorkingDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: pathlib 모듈 종합 복습 실행 뒤 `currentWorkingDir` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

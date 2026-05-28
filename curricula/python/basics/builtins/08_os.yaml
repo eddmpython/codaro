@@ -78,6 +78,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: os 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: os 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: path_manipulation
@@ -104,6 +105,7 @@ sections:
     - 바꿀 지점은 `folderPath = ...` 오른쪽 값입니다.
     - 실행 뒤 `folderPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 경로 조작에서 `folderPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 경로 조작 실행 뒤 `folderPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: path_checking
@@ -130,6 +132,7 @@ sections:
     - 바꿀 지점은 `rootExists = ...` 오른쪽 값입니다.
     - 실행 뒤 `rootExists` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 경로 확인에서 `rootExists` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 경로 확인 실행 뒤 `rootExists` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: directory_operations
@@ -156,6 +159,7 @@ sections:
     - 바꿀 지점은 `currentDir = ...` 오른쪽 값입니다.
     - 실행 뒤 `currentDir` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 디렉토리 작업에서 `currentDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 디렉토리 작업 실행 뒤 `currentDir` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: file_operations
@@ -188,6 +192,7 @@ sections:
     - 바꿀 지점은 `testFile = ...` 오른쪽 값입니다.
     - 실행 뒤 `testFile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 파일 작업에서 `testFile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 작업 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: environment
@@ -214,6 +219,7 @@ sections:
     - 바꿀 지점은 `systemName = ...` 오른쪽 값입니다.
     - 실행 뒤 `systemName` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: 환경 변수와 시스템 정보에서 `systemName` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 환경 변수와 시스템 정보 실행 뒤 `systemName` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -299,6 +305,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 파일 수집 자동화의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: 파일 수집 자동화 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -322,5 +329,6 @@ sections:
     - 바꿀 지점은 `userDocsPath = ...` 오른쪽 값입니다.
     - 실행 뒤 `userDocsPath` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: os 모듈 종합 복습에서 `userDocsPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: os 모듈 종합 복습 실행 뒤 `userDocsPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.

@@ -76,6 +76,7 @@ sections:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: collections 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: collections 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: counter
@@ -104,6 +105,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: Counter 빈도 계산기에서 `fruits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Counter 빈도 계산기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: defaultdict
@@ -136,6 +138,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: defaultdict 기본값 딕셔너리에서 `scores` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: defaultdict 기본값 딕셔너리 실행 뒤 `scores` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: deque
@@ -166,6 +169,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: deque 양방향 큐에서 `dq` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: deque 양방향 큐 실행 뒤 `dq` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: namedtuple
@@ -194,6 +198,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: namedtuple 이름있는 튜플에서 `Point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: namedtuple 이름있는 튜플 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: chainmap
@@ -224,6 +229,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: ChainMap 딕셔너리 체인에서 `defaults` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: ChainMap 딕셔너리 체인 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: practical
@@ -254,6 +260,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 실전 활용에서 `votes` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실전 활용 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: workflow_validation
@@ -339,6 +346,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: '검증 루프: 티켓 운영 집계의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '검증 루프: 티켓 운영 집계 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
 - id: practice
@@ -364,5 +372,6 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: collections 모듈 종합 복습에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: collections 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
