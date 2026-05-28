@@ -315,6 +315,82 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         )
         return report.model_dump()
 
+    @router.get("/api/curriculum/quality-report")
+    def apiCurriculumQualityReport() -> dict[str, object]:
+        """학습자 행동 데이터 기반 강의 품질 신호 (Phase 8).
+
+        작가가 needs-attention lesson 을 보고 보강 우선순위 결정. 신호는 informational —
+        audit gate 차단은 안 한다.
+        """
+        from ..curriculum.qualityAnalytics import computeQualityReport
+
+        graph = state.curriculumOs.graph()
+        misconceptionMap: dict[str, int] = {}
+        if state.learnerStateStore is not None:
+            outcomeHits: dict[str, int] = {}
+            for hit in state.learnerStateStore.listMisconceptionHits():
+                outcomeHits[hit.outcomeId] = outcomeHits.get(hit.outcomeId, 0) + hit.hitCount
+            # outcome → lesson 분배: outcome 을 가르치는 각 lesson 에 같은 hitCount attribute.
+            for outcomeId, count in outcomeHits.items():
+                for lesson in graph.lessonsProvidingOutcome(outcomeId):
+                    misconceptionMap[lesson.key] = misconceptionMap.get(lesson.key, 0) + count
+        report = computeQualityReport(graph, state.progressTracker, misconceptionMap)
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="quality-report",
+                lessonCount=len(report.lessons),
+                flagged=report.flaggedCount,
+            ),
+        )
+        return report.model_dump()
+
+    @router.get("/api/curriculum/check-proposals")
+    def apiCurriculumCheckProposals() -> dict[str, object]:
+        """약한 검증 lesson 식별 + (AI provider 있으면) 제안 초안.
+
+        AI provider 가 없으면 약점 목록만 반환 — 작가가 직접 보강.
+        """
+        from ..curriculum.checkProposer import (
+            lessonContextForSection,
+            proposeChecksForGap,
+            weakCheckCoverage,
+        )
+
+        if state.studyLoader is None:
+            return {"available": False, "weak": [], "proposals": []}
+        graph = state.curriculumOs.graph()
+        weak = weakCheckCoverage(graph, state.studyLoader)
+        taxonomy = state.curriculumOs.taxonomy()
+        for entry in weak:
+            label = taxonomy.outcomeLabel(entry.outcomeId)
+            entry.outcomeLabel = label
+        proposals: list[dict[str, object]] = []
+        provider = getattr(state, "aiProvider", None)
+        if provider is not None:
+            for entry in weak[:5]:  # 상위 5개만 LLM 호출 — 비용 절감
+                context = lessonContextForSection(
+                    state.studyLoader, entry.category, entry.contentId, entry.sectionId,
+                )
+                proposal = proposeChecksForGap(
+                    entry, context, outcomeLabel=entry.outcomeLabel, aiProvider=provider,
+                )
+                if proposal is not None:
+                    proposals.append(proposal.model_dump())
+        logger.debug(
+            "curriculum %s",
+            formatLogFields(
+                action="check-proposals",
+                weakCount=len(weak),
+                proposalCount=len(proposals),
+            ),
+        )
+        return {
+            "available": provider is not None,
+            "weak": [w.model_dump() for w in weak],
+            "proposals": proposals,
+        }
+
     @router.get("/api/curriculum/lesson-stats")
     def apiCurriculumLessonStats() -> dict[str, object]:
         """학습자 실측 학습 시간 통계.

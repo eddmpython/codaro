@@ -26,6 +26,7 @@ import type {
   MasterPlanPayload,
   MasterPlanStep,
 } from "@/types";
+import { CheckProposalsPanel } from "./checkProposalsPanel";
 import { MasteryPanel } from "./masteryPanel";
 import { TodayReviewsCard } from "./todayReviewsCard";
 
@@ -262,6 +263,7 @@ export function MasterPlanPanel({ onSelectLesson, onRequestGapDraft }: MasterPla
         selectedDomain={selectedDomain}
         refreshKey={masteryRefreshKey}
       />
+      <CheckProposalsPanel />
       <div className="flex justify-end">
         <Button
           size="sm"

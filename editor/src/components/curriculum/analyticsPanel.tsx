@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, Loader2, RefreshCw, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, BarChart3, Loader2, RefreshCw, Sparkles, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,18 @@ import { cn } from "@/lib/utils";
 import type {
   AnalyticsListPayload,
   AnalyticsSummaryPayload,
+  CurriculumQualityReportPayload,
   DailySnapshot,
+  LearnerMisconceptionHit,
+  LearnerSnapshotPayload,
+  LessonQualityMetric,
 } from "@/types";
 
 export function AnalyticsPanel() {
   const [snapshots, setSnapshots] = useState<DailySnapshot[]>([]);
   const [summary, setSummary] = useState<AnalyticsSummaryPayload | null>(null);
+  const [learnerSnapshot, setLearnerSnapshot] = useState<LearnerSnapshotPayload | null>(null);
+  const [quality, setQuality] = useState<CurriculumQualityReportPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,12 +28,16 @@ export function AnalyticsPanel() {
     setLoading(true);
     setError(null);
     try {
-      const [analyticsPayload, summaryPayload] = await Promise.all([
+      const [analyticsPayload, summaryPayload, learnerPayload, qualityPayload] = await Promise.all([
         codaroApi.curriculumAnalytics(30) as Promise<AnalyticsListPayload>,
         codaroApi.curriculumAnalyticsSummary(),
+        codaroApi.learnerSnapshot().catch(() => null),
+        codaroApi.curriculumQualityReport().catch(() => null),
       ]);
       setSnapshots(analyticsPayload.snapshots);
       setSummary(summaryPayload);
+      setLearnerSnapshot(learnerPayload);
+      setQuality(qualityPayload);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -78,6 +88,9 @@ export function AnalyticsPanel() {
       {summary?.available && (
         <SummaryCards summary={summary} />
       )}
+      {learnerSnapshot && learnerSnapshot.repeatedMisconceptionCount > 0 && (
+        <RepeatedMisconceptionsCard snapshot={learnerSnapshot} />
+      )}
       {snapshots.length > 1 && (
         <MasteryTrendCard snapshots={snapshots} />
       )}
@@ -87,7 +100,108 @@ export function AnalyticsPanel() {
       {summary?.available && summary.recent30 && (
         <DomainTouchesCard domainTouches={summary.recent30.domainTouches} />
       )}
+      {quality && quality.lessons.length > 0 && (
+        <CurriculumQualityCard quality={quality} />
+      )}
     </div>
+  );
+}
+
+function CurriculumQualityCard({ quality }: { quality: CurriculumQualityReportPayload }) {
+  const [expanded, setExpanded] = useState(false);
+  const flagged = quality.lessons.filter((l) => l.qualitySignal === "needs-attention");
+  return (
+    <Card className="border-zinc-800 bg-zinc-900/40 px-3 py-2">
+      <div className="flex items-center justify-between text-xs text-zinc-300">
+        <div className="flex items-center gap-1.5">
+          <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+          <span className="font-medium">강의 품질</span>
+          <Badge
+            variant="outline"
+            className="h-4 border-amber-700/40 px-1.5 text-[9px] text-amber-300"
+          >
+            보강 필요 {quality.flaggedCount}
+          </Badge>
+        </div>
+        <button
+          type="button"
+          className="text-[10px] text-zinc-400 hover:text-zinc-200 underline"
+          onClick={() => setExpanded((s) => !s)}
+        >
+          {expanded ? "접기" : "펼치기"}
+        </button>
+      </div>
+      <div className="mt-1 text-[10px] text-zinc-500">
+        평균 hint {quality.overallHintAverage.toFixed(2)} · 통과율 {(quality.overallPassRate * 100).toFixed(0)}%
+      </div>
+      {expanded && (
+        <ul className="mt-2 space-y-1 text-[10px]">
+          {flagged.length === 0 && <li className="text-zinc-500">현재 needs-attention 강의 없음</li>}
+          {flagged.slice(0, 12).map((m) => (
+            <QualityLessonRow key={m.lessonKey} metric={m} />
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+function QualityLessonRow({ metric }: { metric: LessonQualityMetric }) {
+  return (
+    <li className="rounded border border-amber-700/30 bg-amber-950/20 px-2 py-1">
+      <div className="font-medium text-amber-100">{metric.title}</div>
+      <div className="mt-0.5 text-amber-300/70">
+        hint {metric.averageHintLevel.toFixed(1)} · 통과율 {(metric.passRate * 100).toFixed(0)}% ·
+        sample {metric.sampleSize}
+        {metric.misconceptionHits > 0 && <span> · misconception {metric.misconceptionHits}</span>}
+      </div>
+    </li>
+  );
+}
+
+function RepeatedMisconceptionsCard({ snapshot }: { snapshot: LearnerSnapshotPayload }) {
+  const top = useMemo<LearnerMisconceptionHit[]>(() => {
+    return [...snapshot.misconceptions]
+      .filter((hit) => hit.hitCount > 1 && !hit.resolvedAt)
+      .sort((a, b) => {
+        if (a.hitCount !== b.hitCount) return b.hitCount - a.hitCount;
+        return b.lastSeenAt.localeCompare(a.lastSeenAt);
+      })
+      .slice(0, 5);
+  }, [snapshot]);
+  if (top.length === 0) return null;
+  return (
+    <Card
+      className="border border-amber-700/40 bg-amber-950/30 px-3 py-2"
+      data-analytics-repeats="true"
+    >
+      <div className="flex items-center gap-1.5 text-xs text-amber-200">
+        <AlertTriangle className="h-3.5 w-3.5" />
+        <span>반복 오개념</span>
+        <Badge
+          variant="outline"
+          className="ml-auto border-amber-700/40 text-[10px] text-amber-200"
+        >
+          {snapshot.repeatedMisconceptionCount}건
+        </Badge>
+      </div>
+      <ul className="mt-1.5 space-y-1">
+        {top.map((hit) => (
+          <li
+            key={hit.misconceptionId}
+            className="flex items-center gap-2 text-[11px] text-amber-100"
+            data-analytics-misconception-id={hit.misconceptionId}
+          >
+            <span className="truncate font-mono text-[10px] text-amber-300/80">
+              {hit.misconceptionId}
+            </span>
+            <span className="ml-auto shrink-0 tabular-nums text-amber-400/80">
+              {hit.hitCount}회
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 

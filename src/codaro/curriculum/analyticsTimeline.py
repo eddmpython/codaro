@@ -23,6 +23,8 @@ class DailySnapshot(BaseModel):
     creditsToday: int = 0
     domainsTouched: list[str] = Field(default_factory=list)
     hintLevelHistogram: dict[str, int] = Field(default_factory=dict)
+    # Phase 8 — 품질 신호 needs-attention lesson 누적 추적.
+    flaggedLessonKeys: list[str] = Field(default_factory=list)
 
 
 def _todayIso() -> str:

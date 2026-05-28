@@ -197,6 +197,52 @@ TOOL_MARK_OUTCOME_VALIDATED = ToolDef(
 )
 
 
+TOOL_ANALYZE_CURRICULUM_QUALITY = ToolDef(
+    name="analyze-curriculum-quality",
+    description=(
+        "Return learner-behavior-derived quality metrics per lesson — average hint level, "
+        "pass rate, misconception hits, and a flag for lessons that need authoring attention."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "domain": {
+                "type": "string",
+                "description": "Optional domain filter — only lessons whose category aligns.",
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Max metrics to return (default 10).",
+            },
+        },
+    },
+    handler="analyzeCurriculumQuality",
+)
+
+
+TOOL_PROPOSE_KNOWLEDGE_CHECKS = ToolDef(
+    name="propose-knowledge-checks",
+    description=(
+        "Identify lesson sections with weak verification coverage (no check or noError-only) "
+        "and propose minimal validation cell YAML drafts. Author must review and apply manually."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "outcomeId": {
+                "type": "string",
+                "description": "Optional outcome filter — only sections that grant this outcome.",
+            },
+            "maxProposals": {
+                "type": "integer",
+                "description": "Max proposals to return (default 5).",
+            },
+        },
+    },
+    handler="proposeKnowledgeChecks",
+)
+
+
 TOOL_PROPOSE_CURRICULUM_DRAFT = ToolDef(
     name="propose-curriculum-draft",
     description=(

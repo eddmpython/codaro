@@ -337,6 +337,91 @@ class CurriculumOsToolHandlers:
             "reason": args.get("reason"),
         }
 
+    async def _handle_analyzeCurriculumQuality(self, args: dict[str, Any]) -> dict[str, Any]:
+        from ...curriculum.qualityAnalytics import computeQualityReport
+
+        graph = _graph()
+        tracker = _progressTracker()
+        report = computeQualityReport(graph, tracker, None)
+        domainFilter = args.get("domain")
+        limit = args.get("limit") or 10
+        if not isinstance(limit, int) or limit <= 0:
+            limit = 10
+        lessons = report.lessons
+        if isinstance(domainFilter, str) and domainFilter:
+            # 도메인의 targetOutcomes 를 가르치는 lesson 만 필터.
+            taxonomy = _taxonomy()
+            domain = taxonomy.domainById(domainFilter)
+            if domain is None:
+                return {"error": f"Unknown domain: {domainFilter}"}
+            targetSet = set(domain.targetOutcomes)
+            relevantKeys: set[str] = set()
+            for outcomeId in targetSet:
+                for lesson in graph.lessonsProvidingOutcome(outcomeId):
+                    relevantKeys.add(lesson.key)
+            lessons = [l for l in lessons if l.lessonKey in relevantKeys]
+        topMetrics = lessons[:limit]
+        recommendation = ""
+        flagged = [m for m in topMetrics if m.qualitySignal == "needs-attention"]
+        if flagged:
+            top = flagged[0]
+            recommendation = (
+                f"'{top.title}' 강의는 hint 평균 {top.averageHintLevel:.1f}, "
+                f"통과율 {top.passRate*100:.0f}% — 가장 먼저 보강을 검토하세요."
+            )
+        else:
+            recommendation = "needs-attention 강의 없음 — 현재 데이터로는 보강 우선순위 신호 없음."
+        return {
+            "lessons": [m.model_dump() for m in topMetrics],
+            "overallHintAverage": report.overallHintAverage,
+            "overallPassRate": report.overallPassRate,
+            "flaggedCount": report.flaggedCount,
+            "recommendation": recommendation,
+        }
+
+    async def _handle_proposeKnowledgeChecks(self, args: dict[str, Any]) -> dict[str, Any]:
+        from ...curriculum.checkProposer import (
+            lessonContextForSection,
+            proposeChecksForGap,
+            weakCheckCoverage,
+        )
+
+        loader = _studyLoader()
+        if loader is None:
+            return {"available": False, "weak": [], "proposals": []}
+        graph = _graph()
+        taxonomy = _taxonomy()
+        weak = weakCheckCoverage(graph, loader)
+        outcomeFilter = args.get("outcomeId")
+        if isinstance(outcomeFilter, str) and outcomeFilter:
+            weak = [w for w in weak if w.outcomeId == outcomeFilter]
+        maxProposals = args.get("maxProposals") or 5
+        if not isinstance(maxProposals, int) or maxProposals <= 0:
+            maxProposals = 5
+        for entry in weak:
+            entry.outcomeLabel = taxonomy.outcomeLabel(entry.outcomeId)
+        provider = getattr(self, "innerAiProvider", None)
+        proposals: list[dict[str, Any]] = []
+        if provider is not None:
+            for entry in weak[:maxProposals]:
+                context = lessonContextForSection(
+                    loader, entry.category, entry.contentId, entry.sectionId,
+                )
+                proposal = proposeChecksForGap(
+                    entry, context, outcomeLabel=entry.outcomeLabel, aiProvider=provider,
+                )
+                if proposal is not None:
+                    proposals.append(proposal.model_dump())
+        return {
+            "available": provider is not None,
+            "weak": [w.model_dump() for w in weak[:50]],
+            "proposals": proposals,
+            "next": (
+                "각 제안은 작가가 수동으로 lesson YAML 의 해당 section.check 필드에 패치해야 합니다 — "
+                "자동 패치 금지 (커리큘럼은 한 강의씩 직접 작성)."
+            ),
+        }
+
     async def _handle_proposeCurriculumDraft(self, args: dict[str, Any]) -> dict[str, Any]:
         outcomeId = str(args.get("outcomeId") or "")
         title = str(args.get("title") or "")

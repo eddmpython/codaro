@@ -414,6 +414,54 @@ export type LessonStatsPayload = {
   lessons: LessonStatsRow[];
 };
 
+export type WeakCheckCoverageRow = {
+  lessonKey: string;
+  category: string;
+  contentId: string;
+  sectionId: string;
+  outcomeId: string;
+  outcomeLabel: string;
+  currentCheckType: string | null;
+  reason: string;
+};
+
+export type CheckProposalRow = {
+  lessonKey: string;
+  sectionId: string;
+  outcomeId: string;
+  proposedCheckType: string;
+  proposedCheckYaml: string;
+  starterCode: string;
+  hints: string[];
+  reasoning: string;
+  confidence: number;
+};
+
+export type CheckProposalsPayload = {
+  available: boolean;
+  weak: WeakCheckCoverageRow[];
+  proposals: CheckProposalRow[];
+};
+
+export type LessonQualityMetric = {
+  lessonKey: string;
+  title: string;
+  sectionCount: number;
+  averageHintLevel: number;
+  averageAttemptCount: number;
+  passRate: number;
+  misconceptionHits: number;
+  sampleSize: number;
+  qualitySignal: "good" | "needs-attention" | "insufficient-data";
+};
+
+export type CurriculumQualityReportPayload = {
+  lessons: LessonQualityMetric[];
+  overallHintAverage: number;
+  overallPassRate: number;
+  flaggedCount: number;
+};
+
 export type AnalyticsSummaryPayload = {
   available: boolean;
   firstDate?: string;
