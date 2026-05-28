@@ -239,6 +239,8 @@ export type MasterPlanStep = {
   rationale: string;
   estimatedMinutes: number;
   completed: boolean;
+  learnerMastery?: number | null;
+  learnerConfidence?: number | null;
 };
 
 export type MasterPlanGap = {
@@ -260,6 +262,7 @@ export type MasterPlanPayload = {
   targetOutcomes: string[];
   steps: MasterPlanStep[];
   gaps: MasterPlanGap[];
+  dynamicGaps?: MasterPlanGap[];
   droppedSteps?: MasterPlanStep[];
   totalMinutes: number;
   summary: string;
@@ -307,6 +310,56 @@ export type MasteryReportPayload = {
   domains: DomainMasteryEntry[];
   masteredOutcomeCount: number;
   totalOutcomeCount: number;
+};
+
+// Predict-Run-Reconcile-Adapt 루프 — 학습자 상태 (LearnerStateStore HTTP surface)
+export type LearnerOutcomeMastery = {
+  outcomeId: string;
+  score: number;
+  confidence: number;
+  successCount: number;
+  failureCount: number;
+  lastTouched: string;
+};
+
+export type LearnerMisconceptionHit = {
+  misconceptionId: string;
+  outcomeId: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  hitCount: number;
+  resolvedAt: string | null;
+};
+
+export type LearnerExecutionSummary = {
+  totalExecutions: number;
+  totalErrors: number;
+  lastErrorClass: string;
+  perOutcomeCounts: Record<string, { success: number; failure: number }>;
+};
+
+export type LearnerSnapshotPayload = {
+  mastery: LearnerOutcomeMastery[];
+  misconceptions: LearnerMisconceptionHit[];
+  execution: LearnerExecutionSummary;
+  repeatedMisconceptionCount: number;
+  doneCriterionViolated: boolean;
+};
+
+export type LearnerOutcomePayload = {
+  outcomeId: string;
+  outcomeLabel: string;
+  mastery: LearnerOutcomeMastery;
+  misconceptionHits: LearnerMisconceptionHit[];
+};
+
+// Predict cell — 학습자가 코드 실행 전 예측을 적는 컨트랙트
+export type LearningPredict = {
+  prompt?: string;
+  expectedShape?: string;
+  expectedDtype?: string;
+  expectedValue?: string;
+  expectedError?: string;
 };
 
 export type CheckResult = {

@@ -14,6 +14,8 @@ import type {
   CurriculumLessonPayload,
   CurriculumTaxonomyPayload,
   MasteryReportPayload,
+  LearnerSnapshotPayload,
+  LearnerOutcomePayload,
   DiagnosticExportPayload,
   DiagnosticSummary,
   EStopStatus,
@@ -263,6 +265,11 @@ export const codaroApi = {
       : "/api/curriculum/gaps",
   ),
   curriculumMastery: () => requestJson<MasteryReportPayload>("/api/curriculum/mastery"),
+  learnerSnapshot: () => requestJson<LearnerSnapshotPayload>("/api/learner/snapshot"),
+  learnerOutcome: (outcomeId: string) =>
+    requestJson<LearnerOutcomePayload>(
+      `/api/learner/outcome/${encodeURIComponent(outcomeId)}`,
+    ),
   curriculumValidateOutcome: (outcomeId: string, validated: boolean) =>
     postJson<{ outcomeId: string; validated: boolean }>(
       "/api/curriculum/outcomes/validate",
