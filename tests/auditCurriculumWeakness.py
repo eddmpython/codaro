@@ -4,12 +4,20 @@
 solutions가 있는지). 이 audit은 한 단계 더 들어가서 plan 가시성과 학습 흐름
 약점을 본다.
 
-체크:
+체크 (정적):
 1. **orphanInPlan**: lessonOutcomes에 등록되지 않은 레슨 (plan에서 안 보임)
 2. **noExercise**: 모든 섹션에 exercise가 없음
 3. **exerciseWithoutCheck**: exercise는 있는데 check 블록이 없음
 4. **shortGoal**: section.goal이 20자 미만
 5. **noHint**: exercise.hints가 비어 있음
+
+체크 (runtime, 정보성):
+6. **runtimeWeakOutcomes**: 학습자 학습자 상태(`learnerState.db`)에서 mastery<0.3 또는
+   confidence<0.2인 outcome — 사람이 강의를 보강해야 할 신호.
+7. **runtimeRepeatedMisconceptions**: 같은 misconception을 두 번 이상 hit한 학습자 기록 —
+   강의가 그 오개념을 충분히 다루지 못했다는 신호.
+
+runtime 신호는 임계치를 깨지 않는다 (informational only). 게이트 통과/실패는 정적 체크만 결정한다.
 
 생성하는 리포트: output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json
 
@@ -40,6 +48,13 @@ THRESHOLDS: dict[str, int] = {
     "exerciseWithoutCheck": 0,
     "noHint": 0,
 }
+
+# runtime mastery 임계 — Predict-Run-Reconcile-Adapt 루프와 동일.
+RUNTIME_MASTERY_THRESHOLD = 0.3
+RUNTIME_CONFIDENCE_THRESHOLD = 0.2
+
+# 환경변수로 학습자 상태 DB 경로를 주입할 수 있다 (CI/감사에서 익명 aggregate DB 사용).
+RUNTIME_STATE_ENV = "CODARO_LEARNER_STATE_DB"
 
 
 def _runGitHead() -> str | None:
@@ -142,10 +157,88 @@ def auditCurriculum() -> dict[str, Any]:
     }
 
 
+def _resolveLearnerStatePath() -> Path | None:
+    """학습자 상태 DB 경로를 결정한다 (환경변수 > 기본 경로)."""
+    envPath = os.environ.get(RUNTIME_STATE_ENV)
+    if envPath:
+        candidate = Path(envPath)
+        return candidate if candidate.exists() else None
+    default = Path.home() / ".codaro" / "learnerState.db"
+    return default if default.exists() else None
+
+
+def auditRuntimeWeakness(dbPath: Path | None) -> dict[str, Any]:
+    """학습자 상태에서 보강이 필요한 outcome과 반복 misconception을 추출한다.
+
+    DB가 없으면 빈 결과 반환 — gate를 깨지 않는다. 정보성 신호이며,
+    사람이 강의를 보강하는 데 사용한다 (bulk regeneration 금지).
+    """
+    if dbPath is None:
+        return {
+            "available": False,
+            "weakOutcomes": [],
+            "repeatedMisconceptions": [],
+            "perOutcomeHitCounts": {},
+            "thresholds": {
+                "mastery": RUNTIME_MASTERY_THRESHOLD,
+                "confidence": RUNTIME_CONFIDENCE_THRESHOLD,
+            },
+        }
+
+    from codaro.curriculum.learnerState import LearnerStateStore
+
+    store = LearnerStateStore(dbPath)
+
+    weakOutcomes: list[dict[str, Any]] = []
+    for mastery in store.listMastery():
+        if (
+            mastery.score < RUNTIME_MASTERY_THRESHOLD
+            or mastery.confidence < RUNTIME_CONFIDENCE_THRESHOLD
+        ):
+            weakOutcomes.append({
+                "outcomeId": mastery.outcomeId,
+                "score": round(mastery.score, 4),
+                "confidence": round(mastery.confidence, 4),
+                "successCount": mastery.successCount,
+                "failureCount": mastery.failureCount,
+            })
+
+    repeats = store.listRepeatedMisconceptions()
+    repeatedMisconceptions = [
+        {
+            "misconceptionId": hit.misconceptionId,
+            "outcomeId": hit.outcomeId,
+            "hitCount": hit.hitCount,
+            "firstSeenAt": hit.firstSeenAt,
+            "lastSeenAt": hit.lastSeenAt,
+        }
+        for hit in repeats
+    ]
+
+    perOutcome: dict[str, int] = {}
+    for hit in store.listMisconceptionHits():
+        perOutcome[hit.outcomeId] = perOutcome.get(hit.outcomeId, 0) + hit.hitCount
+
+    return {
+        "available": True,
+        "dbPath": str(dbPath),
+        "weakOutcomes": sorted(weakOutcomes, key=lambda item: item["outcomeId"]),
+        "repeatedMisconceptions": sorted(
+            repeatedMisconceptions, key=lambda item: item["misconceptionId"]
+        ),
+        "perOutcomeHitCounts": dict(sorted(perOutcome.items())),
+        "thresholds": {
+            "mastery": RUNTIME_MASTERY_THRESHOLD,
+            "confidence": RUNTIME_CONFIDENCE_THRESHOLD,
+        },
+    }
+
+
 def main() -> int:
     startedAt = datetime.now(UTC).isoformat()
     startedAtNs = int(datetime.now(UTC).timestamp() * 1_000_000_000)
     audit = auditCurriculum()
+    runtime = auditRuntimeWeakness(_resolveLearnerStatePath())
     completedAt = datetime.now(UTC).isoformat()
 
     passed = not audit["breaches"]
@@ -162,15 +255,30 @@ def main() -> int:
             "flagCounts": audit["flagCounts"],
             "thresholds": audit["thresholds"],
             "breaches": audit["breaches"],
+            "runtime": {
+                "available": runtime["available"],
+                "weakOutcomeCount": len(runtime["weakOutcomes"]),
+                "repeatedMisconceptionCount": len(runtime["repeatedMisconceptions"]),
+            },
         },
         "lessonReports": audit["lessonReports"],
+        "runtime": runtime,
     }
 
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if passed:
-        print(f"ok: curriculum weakness audit passed ({audit['lessonsWithFlags']} lessons with at least one informational flag)")
+        runtimeNote = ""
+        if runtime["available"]:
+            runtimeNote = (
+                f" · runtime: {len(runtime['weakOutcomes'])} weak outcomes, "
+                f"{len(runtime['repeatedMisconceptions'])} repeated misconceptions"
+            )
+        print(
+            "ok: curriculum weakness audit passed "
+            f"({audit['lessonsWithFlags']} lessons with at least one informational flag){runtimeNote}"
+        )
         return 0
     else:
         print("FAIL: curriculum weakness audit breached thresholds:")
