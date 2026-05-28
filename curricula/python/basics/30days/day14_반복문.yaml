@@ -81,6 +81,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: for 리스트 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: for 리스트 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_string
@@ -115,6 +116,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: for 문자열 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: for 문자열 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_dict
@@ -147,6 +149,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: for 딕셔너리 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: for 딕셔너리 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: range_basic
@@ -169,6 +172,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: range() 함수의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: range() 함수 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: for_range
@@ -199,6 +203,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: range()와 for의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: range()와 for 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: while_basic
@@ -233,6 +238,7 @@ sections:
     - 바꿀 지점은 `idx = ...` 오른쪽 값입니다.
     - 실행 뒤 `idx` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: while 기본에서 `idx` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: while 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: break_statement
@@ -269,6 +275,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: break 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: break 문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: continue_statement
@@ -303,6 +310,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: continue 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: continue 문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: for_else
@@ -341,6 +349,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: forelse 절의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: forelse 절 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: while_else
@@ -375,6 +384,7 @@ sections:
     - 바꿀 지점은 `counter = ...` 오른쪽 값입니다.
     - 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: whileelse 절에서 `counter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: whileelse 절 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
 - id: nested_loop
@@ -411,6 +421,7 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: 중첩 반복문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 중첩 반복문 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: workflow_validation
@@ -451,6 +462,7 @@ sections:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
   check:
+    type: noError
     noError: 실무 반복 처리 루프에서 `dailyOrders` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실무 반복 처리 루프 실행 뒤 `dailyOrders` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: practice
@@ -481,5 +493,6 @@ sections:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
+    type: noError
     noError: Day 14 종합 복습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: Day 14 종합 복습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.

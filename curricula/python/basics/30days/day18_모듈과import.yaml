@@ -76,6 +76,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: import 기본의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: import 기본 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: from_import
@@ -104,6 +105,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: from import의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: from import 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: import_as
@@ -132,6 +134,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: as 별칭의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: as 별칭 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: math_module
@@ -160,6 +163,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: math 모듈의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: math 모듈 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: random_module
@@ -188,6 +192,7 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: random 모듈의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: random 모듈 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
 - id: datetime_module
@@ -218,6 +223,7 @@ sections:
     - 바꿀 지점은 `now = ...` 오른쪽 값입니다.
     - 실행 뒤 `now` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
   check:
+    type: noError
     noError: datetime 모듈에서 `now` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: datetime 모듈 실행 뒤 `now` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: workflow_validation
@@ -294,6 +300,7 @@ sections:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
   check:
+    type: noError
     noError: 실무 import 조합 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 실무 import 조합 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
@@ -320,5 +327,6 @@ sections:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
+    type: noError
     noError: Day 18 종합 복습의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: Day 18 종합 복습 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
