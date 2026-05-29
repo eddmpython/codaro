@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
+
+from codaro.api.spaRouter import createSpaRouter
 
 import codaro.api.aiRouter as aiRouterModule
 import codaro.api.systemRouter as systemRouterModule
@@ -876,3 +880,59 @@ def testKernelWebSocketRejectsUnknownMessageType() -> None:
         error = websocket.receive_json()
         assert error["type"] == "error"
         assert "Unsupported websocket message type" in error["message"]
+
+
+def spaClient(tmp_path: Path) -> TestClient:
+    """Build a TestClient over the SPA router alone, against a fake web build.
+
+    Isolated from the real editor build so the test is deterministic regardless
+    of whether `editor/` has been built yet (the backend gate runs before the
+    editor-build gate in CI).
+    """
+    buildRoot = tmp_path / "webBuild"
+    (buildRoot / "_app").mkdir(parents=True)
+    (buildRoot / "index.html").write_text(
+        "<html><head></head><body>codaro</body></html>", encoding="utf-8"
+    )
+    (buildRoot / "_app" / "index-real.js").write_text("export const ok = 1;\n", encoding="utf-8")
+    app = FastAPI()
+    app.include_router(createSpaRouter(SimpleNamespace(webBuildRoot=buildRoot)))
+    return TestClient(app)
+
+
+def testSpaServesExistingAssetWithRealMime(tmp_path: Path) -> None:
+    response = spaClient(tmp_path).get("/_app/index-real.js")
+
+    assert response.status_code == 200
+    assert "javascript" in response.headers["content-type"]
+    assert "html" not in response.headers["content-type"]
+
+
+def testSpaMissingAssetReturns404NotIndexHtml(tmp_path: Path) -> None:
+    # A stale browser requesting a hashed asset that no longer exists must get a
+    # clean 404 — never index.html, which the browser would reject on a MIME
+    # mismatch (nosniff) and boot to a blank screen.
+    response = spaClient(tmp_path).get("/_app/index-staleHash.js")
+
+    assert response.status_code == 404
+    assert "text/html" not in response.headers.get("content-type", "")
+
+
+def testSpaMissingStylesheetReturns404(tmp_path: Path) -> None:
+    response = spaClient(tmp_path).get("/_app/index-staleHash.css")
+
+    assert response.status_code == 404
+    assert "text/html" not in response.headers.get("content-type", "")
+
+
+def testSpaClientRouteFallsBackToIndexHtml(tmp_path: Path) -> None:
+    client = spaClient(tmp_path)
+
+    root = client.get("/")
+    assert root.status_code == 200
+    assert "text/html" in root.headers["content-type"]
+
+    # Extensionless paths are client routes → index.html, not 404.
+    route = client.get("/curriculum")
+    assert route.status_code == 200
+    assert "text/html" in route.headers["content-type"]
