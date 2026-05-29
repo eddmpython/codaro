@@ -405,14 +405,6 @@ function App() {
                 selectCurriculumCategory(category);
                 selectCurriculumContent(contentId);
               }}
-              onRequestGapDraft={(gap) => {
-                const message =
-                  `'${gap.outcomeLabel}' (${gap.outcomeId}) 능력을 가르치는 새 강의 초안을 ` +
-                  `propose-curriculum-draft 도구로 만들어주세요. ` +
-                  `prerequisites와 sectionOutline까지 채워주세요.`;
-                setPrompt(message);
-                selectSurface("chat");
-              }}
               onToggleEStop={toggleEStop}
             />
           </div>

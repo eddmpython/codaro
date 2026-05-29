@@ -29,8 +29,6 @@ const NotebookPanel = lazy(() => import("@/components/notebook/notebookPanel").t
 const CodeCellEditor = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.CodeCellEditor })));
 const CurriculumView = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumView })));
 const CurriculumCellToc = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumCellToc })));
-const MasterPlanPanel = lazy(() => import("@/components/curriculum/masterPlanPanel").then((module) => ({ default: module.MasterPlanPanel })));
-const AnalyticsPanel = lazy(() => import("@/components/curriculum/analyticsPanel").then((module) => ({ default: module.AnalyticsPanel })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
 type MainSurfaceProps = {
@@ -81,7 +79,6 @@ type MainSurfaceProps = {
   onSelectBlock: (blockId: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
   onSelectCurriculumLesson: (category: string, contentId: string) => void;
-  onRequestGapDraft: (gap: { outcomeId: string; outcomeLabel: string }) => void;
   onToggleEStop: () => void;
 };
 
@@ -164,37 +161,32 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     );
   }
 
-  if (props.surface === "plan") {
-    return (
-      <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
-        <div className="w-full max-w-3xl">
-          <MasterPlanPanel onSelectLesson={props.onSelectCurriculumLesson} />
-        </div>
-      </div>
-    );
-  }
-
-  if (props.surface === "analytics") {
-    return (
-      <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
-        <div className="w-full max-w-3xl">
-          <AnalyticsPanel />
-        </div>
-      </div>
-    );
-  }
-
   if (props.surface === "curriculum") {
     if (!props.curriculumDocument) {
       return (
-        <div className="flex h-full min-h-0 items-stretch justify-center overflow-auto bg-zinc-950">
-          <div className="w-full max-w-3xl">
-            <MasterPlanPanel
-              onSelectLesson={props.onSelectCurriculumLesson}
-              onRequestGapDraft={props.onRequestGapDraft}
-            />
-          </div>
-        </div>
+        <ChatSurface
+          aiConnecting={props.aiConnecting}
+          aiProfile={props.aiProfile}
+          apiOnline={props.apiOnline}
+          loading={props.assistantLoading}
+          loadState={props.loadState}
+          messages={props.messages}
+          pendingBlocks={props.pendingBlocks}
+          prompt={props.prompt}
+          heroTitle={t("curriculum.goal.title")}
+          heroDetail={t("curriculum.goal.detail")}
+          placeholder={t("curriculum.goal.placeholder")}
+          examples={[
+            { label: t("curriculum.goal.example.report"), prompt: t("curriculum.goal.example.report.prompt") },
+            { label: t("curriculum.goal.example.dashboard"), prompt: t("curriculum.goal.example.dashboard.prompt") },
+            { label: t("curriculum.goal.example.pandas"), prompt: t("curriculum.goal.example.pandas.prompt") },
+          ]}
+          onAsk={props.onAsk}
+          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
+          onConnectAi={props.onConnectAi}
+          onPromptChange={props.onPromptChange}
+          onRejectPendingBlocks={props.onRejectPendingBlocks}
+        />
       );
     }
     const curriculumDoc = props.curriculumDocument;

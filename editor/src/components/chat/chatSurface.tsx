@@ -14,6 +14,8 @@ import type {
   LoadState,
 } from "@/types";
 
+export type ChatSurfaceExample = { label: string; prompt: string };
+
 export function ChatSurface({
   aiConnecting,
   aiProfile,
@@ -23,6 +25,10 @@ export function ChatSurface({
   messages,
   pendingBlocks,
   prompt,
+  heroTitle,
+  heroDetail,
+  placeholder,
+  examples,
   onAsk,
   onAcceptPendingBlocks,
   onConnectAi,
@@ -37,6 +43,10 @@ export function ChatSurface({
   messages: AssistantMessage[];
   pendingBlocks: BlockConfig[];
   prompt: string;
+  heroTitle?: string;
+  heroDetail?: string;
+  placeholder?: string;
+  examples?: ChatSurfaceExample[];
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
   onAcceptPendingBlocks: () => void;
   onConnectAi: () => void;
@@ -46,21 +56,26 @@ export function ChatSurface({
   const { t } = useLocale();
   const isEmptyChat = !messages.length && !pendingBlocks.length && loadState !== "loading";
   const providerReady = apiOnline && aiProfileReady(aiProfile);
+  const heroExamples: ChatSurfaceExample[] = examples ?? [
+    { label: t("chat.example.pandas"), prompt: t("chat.example.pandas.prompt") },
+    { label: t("chat.example.browser"), prompt: t("chat.example.browser.prompt") },
+    { label: t("chat.example.automation"), prompt: t("chat.example.automation.prompt") },
+  ];
   if (isEmptyChat) {
     return (
       <div className="grid h-full min-h-0 place-items-center px-4">
         <section className="w-full max-w-3xl">
           <img alt="" className="mx-auto mb-5 size-52 object-contain sm:size-56" src="/brand/avatar-small.png" />
           <div className="mb-5 text-center">
-            <div className="text-xl font-semibold tracking-normal">{t("chat.empty.title")}</div>
+            <div className="text-xl font-semibold tracking-normal">{heroTitle ?? t("chat.empty.title")}</div>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-              {t("chat.empty.detail")}
+              {heroDetail ?? t("chat.empty.detail")}
             </p>
           </div>
           <AssistantComposer
             autoFocus
             loading={loading}
-            placeholder={t("chat.placeholder")}
+            placeholder={placeholder ?? t("chat.placeholder")}
             prompt={prompt}
             variant="hero"
             onAsk={onAsk}
@@ -74,15 +89,11 @@ export function ChatSurface({
             </div>
           ) : null}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.pandas.prompt"))}>
-              {t("chat.example.pandas")}
-            </Button>
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.browser.prompt"))}>
-              {t("chat.example.browser")}
-            </Button>
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.automation.prompt"))}>
-              {t("chat.example.automation")}
-            </Button>
+            {heroExamples.map((example) => (
+              <Button key={example.label} size="sm" type="button" variant="outline" onClick={() => onPromptChange(example.prompt)}>
+                {example.label}
+              </Button>
+            ))}
           </div>
         </section>
       </div>
