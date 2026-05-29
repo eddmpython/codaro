@@ -101,6 +101,14 @@ const codeCellEditorTheme = EditorView.theme({
     width: "0.875rem",
     textAlign: "center",
   },
+  ".cm-codaroAiCommentLine": {
+    backgroundColor: "color-mix(in oklch, var(--primary, currentColor) 8%, transparent)",
+    borderLeft: "2px solid color-mix(in oklch, var(--primary, currentColor) 45%, transparent)",
+  },
+  ".cm-codaroAiCommentGutter": {
+    width: "1.125rem",
+    textAlign: "center",
+  },
 });
 
 export function NotebookPanel({
@@ -252,6 +260,102 @@ const errorGutter = gutter({
   initialSpacer: () => errorMarkerInstance,
 });
 
+
+export type AiLineComment = {
+  line: number;
+  comment: string;
+};
+
+
+class AiCommentGutterMarker extends GutterMarker {
+  private readonly summary: string;
+  private readonly onClick?: () => void;
+
+  constructor(summary: string, onClick?: () => void) {
+    super();
+    this.summary = summary;
+    this.onClick = onClick;
+  }
+
+  override toDOM(): HTMLElement {
+    const node = document.createElement("span");
+    node.textContent = "\u{1F4AC}";
+    node.title = this.summary;
+    node.dataset.aiCommentMarker = "true";
+    node.style.cursor = this.onClick ? "pointer" : "default";
+    node.style.fontSize = "11px";
+    node.style.padding = "0 2px";
+    node.style.color = "var(--primary, #6b7280)";
+    if (this.onClick) {
+      const clickHandler = (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.onClick?.();
+      };
+      node.addEventListener("mousedown", clickHandler);
+    }
+    return node;
+  }
+}
+
+const setAiCommentsEffect = StateEffect.define<AiLineComment[]>();
+
+const aiCommentClickHandlerRef: { current: ((comment: AiLineComment) => void) | null } = {
+  current: null,
+};
+
+const aiCommentMarkerField = StateField.define<RangeSet<GutterMarker>>({
+  create: () => RangeSet.empty,
+  update(value, tr) {
+    let next = value.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setAiCommentsEffect)) {
+        const totalLines = tr.state.doc.lines;
+        const ranges = effect.value
+          .filter((entry) => Number.isInteger(entry.line) && entry.line > 0 && entry.line <= totalLines)
+          .map((entry) => {
+            const handler = aiCommentClickHandlerRef.current;
+            const marker = new AiCommentGutterMarker(
+              entry.comment,
+              handler ? () => handler(entry) : undefined,
+            );
+            return marker.range(tr.state.doc.line(entry.line).from);
+          });
+        next = RangeSet.of(ranges, true);
+      }
+    }
+    return next;
+  },
+});
+
+const aiCommentLineHighlight = Decoration.line({
+  attributes: { class: "cm-codaroAiCommentLine" },
+});
+
+const aiCommentLineDecorationField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(value, tr) {
+    let next = value.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setAiCommentsEffect)) {
+        const totalLines = tr.state.doc.lines;
+        const ranges = effect.value
+          .filter((entry) => Number.isInteger(entry.line) && entry.line > 0 && entry.line <= totalLines)
+          .map((entry) => aiCommentLineHighlight.range(tr.state.doc.line(entry.line).from));
+        next = Decoration.set(ranges, true);
+      }
+    }
+    return next;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
+const aiCommentGutter = gutter({
+  class: "cm-codaroAiCommentGutter",
+  markers: (view) => view.state.field(aiCommentMarkerField),
+  initialSpacer: () => new AiCommentGutterMarker(""),
+});
+
 export function CodeCellEditor({
   autoFocus = false,
   placeholderText = "Python 코드를 입력하세요.",
@@ -261,6 +365,8 @@ export function CodeCellEditor({
   onRun,
   completionContext,
   errorLines,
+  aiComments,
+  onAiCommentClick,
 }: {
   autoFocus?: boolean;
   placeholderText?: string;
@@ -270,6 +376,8 @@ export function CodeCellEditor({
   onRun?: () => void;
   completionContext?: CompletionContextProvider;
   errorLines?: number[];
+  aiComments?: AiLineComment[];
+  onAiCommentClick?: (comment: AiLineComment) => void;
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -337,6 +445,9 @@ export function CodeCellEditor({
         errorMarkerField,
         errorLineDecorationField,
         errorGutter,
+        aiCommentMarkerField,
+        aiCommentLineDecorationField,
+        aiCommentGutter,
         Prec.high(keymap.of([
           {
             key: "Mod-Enter",
@@ -402,6 +513,21 @@ export function CodeCellEditor({
     if (!view) return;
     view.dispatch({ effects: setErrorLinesEffect.of(errorLines ?? []) });
   }, [errorLines]);
+
+  useEffect(() => {
+    aiCommentClickHandlerRef.current = onAiCommentClick ?? null;
+    return () => {
+      if (aiCommentClickHandlerRef.current === (onAiCommentClick ?? null)) {
+        aiCommentClickHandlerRef.current = null;
+      }
+    };
+  }, [onAiCommentClick]);
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.dispatch({ effects: setAiCommentsEffect.of(aiComments ?? []) });
+  }, [aiComments]);
 
   return (
     <div
@@ -504,6 +630,8 @@ function DocumentBlock({
               typeof result?.data === "string" ? result?.data : null,
               result?.stderr,
             )}
+            aiComments={cellHelp?.inlineComments}
+            onAiCommentClick={onSelect}
           />
         </div>
         {result ? (

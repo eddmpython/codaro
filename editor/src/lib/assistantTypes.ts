@@ -40,10 +40,16 @@ export type AssistantWorkStep = {
   finishedAt?: number;
 };
 
+export type CellAiHelpInlineComment = {
+  line: number;
+  comment: string;
+};
+
 export type CellAiHelpState = {
   blockId: string;
   question: string;
   answer: string;
   loading: boolean;
   tone?: "default" | "warning" | "error";
+  inlineComments?: CellAiHelpInlineComment[];
 };
