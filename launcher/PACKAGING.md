@@ -19,8 +19,8 @@
 - editor frontend는 `codaro` wheel 안의 `codaro/webBuild`로 함께 배포한다
 - 자동화 capability는 `extras`가 아니라 별도 package로 배포한다
 - launcher는 index에서 최신을 해석하지 않고 manifest가 지정한 exact wheel만 설치한다
-- GitHub Releases는 현재 product control plane이자 artifact plane이다
-- PyPI publish는 developer install과 생태계 노출이 필요할 때 별도 선택지로 둔다
+- GitHub Releases는 product control plane이자 artifact plane이다 (유일한 배포 경로)
+- **PyPI에는 배포하지 않는다.** 유일한 배포 경로는 GitHub Releases의 release-manifest.json이 핀한 `codaro` wheel을 CodaroLauncher.exe가 설치하는 것이다. pyproject의 `Private :: Do Not Upload` 분류자가 실수 업로드를 차단한다.
 
 ## 왜 별도 package인가
 
