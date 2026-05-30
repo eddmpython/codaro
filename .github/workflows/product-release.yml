@@ -264,6 +264,20 @@ jobs:
             --python-runtime-archive "release-assets/${PYTHON_RUNTIME_ASSET}" \
             --output "release-assets/${RELEASE_MANIFEST_ASSET}"
 
+      - name: Generate release notes from changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          python docs/skills/ops/tools/extractChangelogSection.py \
+            --version "${{ needs.build.outputs.package_version }}" \
+            --output release-assets/release-notes.md
+          cat >> release-assets/release-notes.md <<'EOF'
+
+          ---
+
+          Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher. The release also includes `release-manifest.json`, the exact `codaro` backend wheel, a managed Windows Python runtime archive, checksums, and SPDX SBOM assets. The manifest pins the wheel asset and sha256 from this GitHub Release.
+          EOF
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -271,10 +285,7 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Codaro ${{ github.ref_name }}
           fail_on_unmatched_files: true
-          body: |
-            Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher.
-
-            The release includes `release-manifest.json`, the exact `codaro` backend wheel, a managed Windows Python runtime archive, checksums, and SPDX SBOM assets. The manifest pins the wheel asset and sha256 from this GitHub Release.
+          body_path: release-assets/release-notes.md
           files: |
             release-assets/CodaroLauncher.exe
             release-assets/CodaroLauncher.exe.sha256
