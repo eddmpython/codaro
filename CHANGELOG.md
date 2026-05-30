@@ -8,6 +8,23 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.4 - 2026-05-30
+
+Makes the curriculum actually run from the downloaded launcher. The native window
+opened in `0.0.3`, but lesson cells failed with `ModuleNotFoundError` because the
+managed runtime shipped only the backend's core dependencies — not the data-science
+stack the lessons import.
+
+### Fixed
+
+- Bundled the curriculum library stack (`pandas`, `numpy`, `matplotlib`, `seaborn`, `plotly`, `polars`, `scikit-learn`, `scipy`, `statsmodels`, `openpyxl`, `python-docx`, `pillow`) into the managed Python runtime. Lesson cells execute in the backend interpreter in-process, so these libraries must be present in the runtime — without them every data lesson raised `ModuleNotFoundError`.
+- Resolved the package environment to the running interpreter when no project `.venv` exists, so the packaged managed runtime no longer raises the `package_environment_missing` "Startup diagnostics required" banner and on-demand package install targets the runtime. Development checkouts with a project `.venv` are unchanged.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` -> all gates pass
+- Downloaded `CodaroLauncher.exe` confirmed: native window with no startup-diagnostics banner, and a curriculum cell importing `pandas` runs successfully.
+
 ## 0.0.3 - 2026-05-30
 
 First public download train (`v0.0.1` -> `v0.0.3`) documented as a release. The launcher

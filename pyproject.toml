@@ -1,6 +1,6 @@
 [project]
 name = "codaro"
-version = "0.0.3"
+version = "0.0.4"
 description = "Programmable studio — interactive editor runtime for code, learning, and automation"
 readme = "README.md"
 authors = [
