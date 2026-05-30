@@ -1,7 +1,9 @@
 import {
   AlertTriangle,
   BookOpen,
+  Check,
   CheckCircle2,
+  Copy,
   GraduationCap,
   Layers3,
   Lightbulb,
@@ -322,9 +324,11 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   const [installProgress, setInstallProgress] = useState<PackageInstallProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
+  const installCommand = `uv pip install ${requiredPackages.join(" ")}`;
   const activeMessage = installProgress
     ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
     : checking
@@ -369,6 +373,16 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   }, [apiOnline, requiredPackages]);
 
   if (!requiredPackages.length) return null;
+
+  const copyCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(installCommand);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch (copyError) {
+      setError(errorText(copyError));
+    }
+  };
 
   const installMissing = async () => {
     setError(null);
@@ -447,7 +461,26 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
           );
         })}
       </div>
-      {!apiOnline ? <div className="mt-2 text-xs leading-5 text-muted-foreground">서버 세션이 열리면 uv 설치를 실행할 수 있습니다.</div> : null}
+      <div className="mt-2 flex items-center gap-2 rounded border bg-muted/40 px-2 py-1.5" data-learning-package-command-row="true">
+        <TerminalSquare className="size-3.5 shrink-0 text-muted-foreground" />
+        <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground" data-learning-package-command="true">
+          {installCommand}
+        </code>
+        <button
+          aria-label="설치 명령 복사"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          data-learning-package-command-copy="true"
+          type="button"
+          onClick={copyCommand}
+        >
+          {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+        </button>
+      </div>
+      <div className="mt-1 text-xs leading-5 text-muted-foreground">
+        {apiOnline
+          ? "위 버튼으로 프로젝트 .venv에 바로 설치하거나, 명령을 복사해 터미널에서 직접 uv로 설치할 수 있습니다."
+          : "서버 세션이 없으면 위 명령을 복사해 터미널에서 직접 uv로 설치하세요."}
+      </div>
       {activeMessage ? (
         <div className="mt-2 text-xs leading-5 text-muted-foreground" data-learning-package-progress="true">
           {activeMessage}
