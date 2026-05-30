@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -50,10 +51,26 @@ def getProjectPythonPath(projectRoot: Path | None = None) -> Path:
         if candidate.is_file():
             return candidate
 
+    # 프로젝트 `.venv`가 없으면 현재 실행 중인 인터프리터가 곧 패키지 환경이다.
+    # 런처가 제공하는 managed runtime(standalone Python)이 이 경로에 해당하며,
+    # 셀도 이 인터프리터에서 in-process로 실행되므로 패키지 설치/조회 대상이 일치한다.
+    # codaro가 그 인터프리터에서 import 가능할 때만(=정상 런타임) fallback 한다.
+    if Path(sys.executable).is_file() and _runningInterpreterHasCodaro():
+        return Path(sys.executable)
+
     raise PackageEnvironmentError(
         "package_environment_missing",
         "Project virtual environment was not found. Expected .venv for Codaro.",
     )
+
+
+def _runningInterpreterHasCodaro() -> bool:
+    try:
+        import importlib.util
+
+        return importlib.util.find_spec("codaro") is not None
+    except (ImportError, ValueError):
+        return False
 
 
 async def listPackages() -> list[PackageInfo]:
