@@ -4,6 +4,14 @@ export type SurfaceMode = "chat" | "editor" | "curriculum" | "automation" | "sha
 export type ThemeMode = "dark" | "light";
 export type AutomationSection = "codaro" | "custom" | "tasks";
 
+// 베타 확정 전까지 사이드바에서 임시로 감추는 표면. 확정되면 이 배열을 비우고 beta 배지로 노출한다.
+// 코드/라우팅은 그대로 살아 있어 `#automation`, `#share` 해시로는 개발/검증 접근이 가능하다.
+export const HIDDEN_SURFACES: readonly SurfaceMode[] = ["automation", "share"];
+
+export function isHiddenSurface(surface: SurfaceMode): boolean {
+  return HIDDEN_SURFACES.includes(surface);
+}
+
 export function surfaceTitle(surface: SurfaceMode) {
   const en = getActiveLocale() === "en";
   if (surface === "editor") return en ? "Editor" : "에디터";
