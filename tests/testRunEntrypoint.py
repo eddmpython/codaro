@@ -42,6 +42,7 @@ def testGateNamesAreStable() -> None:
         "runtime-recovery-contract",
         "runtime-recovery-browser",
         "curriculum-quality-matrix",
+        "curriculum-executability",
         "curriculum-top-tier-audit",
         "curriculum-weakness-audit",
         "predict-contract-strict",
@@ -68,6 +69,7 @@ def testGateNamesAreStable() -> None:
         "mobile-layout",
         "editor-build",
         "curriculum-quality-matrix",
+        "curriculum-executability",
     )
     assert runner.PRODUCT_QUALITY_GATES == (
         "root-clean",
@@ -84,6 +86,7 @@ def testGateNamesAreStable() -> None:
         "runtime-recovery-contract",
         "runtime-recovery-browser",
         "curriculum-quality-matrix",
+        "curriculum-executability",
         "curriculum-top-tier-audit",
         "playwright-curriculum-runtime",
         "onboarding-browser",
