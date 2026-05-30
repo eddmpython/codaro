@@ -42,6 +42,15 @@ jobs:
       - name: Run backend gate
         run: uv run python -X utf8 tests/run.py gate backend
 
+      - name: Run widget-bridge gate
+        run: uv run python -X utf8 tests/run.py gate widget-bridge
+
+      - name: Run app-runtime gate
+        run: uv run python -X utf8 tests/run.py gate app-runtime
+
+      - name: Run mobile-layout gate
+        run: uv run python -X utf8 tests/run.py gate mobile-layout
+
   editor:
     runs-on: ubuntu-latest
     steps:

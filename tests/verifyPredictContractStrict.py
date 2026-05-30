@@ -82,14 +82,18 @@ def predictIsPresent(predict) -> bool:
 
 
 def categorizePath(filePath: Path) -> str:
+    """카테고리 키 — YAML 파일의 부모 디렉터리 (curricula/python 기준 상대 경로).
+
+    예: `curricula/python/basics/30days/day01_*.yaml` → `basics/30days`.
+    """
     try:
         relative = filePath.relative_to(CURRICULA_ROOT)
     except ValueError:
         return ""
-    parts = relative.parts
-    if not parts:
+    parent = relative.parent
+    if str(parent) in ("", "."):
         return ""
-    return parts[0]
+    return parent.as_posix()
 
 
 def scanLesson(filePath: Path) -> tuple[str, list[StepViolation], int, int]:

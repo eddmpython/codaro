@@ -344,12 +344,6 @@ AUTOMATION_REQUIREMENTS = (
                 "taskRun",
                 "output/test-runner/automation-ide-audit/automation-ide-report.json",
             )),
-            ("objectiveNinePlusScorecard.md", (
-                "automation-ide",
-                "task/workflow/schedule/webhook/audit/E-Stop",
-                "automation-ide-audit",
-                "모든 분야 `score >= 9.0`",
-            )),
             ("docs/skills/architecture/ssot-map.md", (
                 "automation state",
                 "automation state hook",

@@ -77,11 +77,7 @@ REQUIRED_ROOT_FILES = {
     "SECURITY.md",
     "SUPPORT.md",
     "TRADEMARKS.md",
-    "goalNinePlusChecklist.md",
-    "launchKit.md",
-    "objectiveNinePlusScorecard.md",
     "pyproject.toml",
-    "publicReadinessChecklist.md",
     "uv.lock",
 }
 ALLOWED_LOCAL_ROOT_DIRS = {

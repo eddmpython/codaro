@@ -438,8 +438,6 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
         domain("objective-evidence-and-gate-wiring", (
             textContains("runner has top-tier gate", "tests/run.py", "\"curriculum-top-tier-audit\""),
             textContains("gate docs mention top-tier audit", "docs/skills/ops/foundation/testing-and-gates.md", "`curriculum-top-tier-audit`"),
-            textContains("objective scorecard references top-tier audit", "objectiveNinePlusScorecard.md", "curriculum-top-tier-audit"),
-            textContains("objective verifier reads top-tier report", "tests/verifyObjectiveNinePlusScorecard.py", "curriculumTopTier"),
             textContains("product quality docs mention top-tier report", "docs/skills/ops/product/service-candidate.md", "curriculum-top-tier-report.json"),
             summaryEquals("top-tier report has current conversion baseline", summary, "conversionFailureLessonCount", 0),
         )),
