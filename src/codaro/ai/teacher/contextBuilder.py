@@ -8,6 +8,7 @@ def injectContext(message: str, context: dict[str, Any]) -> str:
     parts: list[str] = []
     _appendDisplayLanguage(parts, context)
     _appendInstruction(parts, context)
+    _appendIntake(parts, context)
     _appendClarificationPlan(parts, context)
     _appendSelectedCell(parts, context)
     _appendVariables(parts, context)
@@ -39,6 +40,15 @@ def _appendDisplayLanguage(parts: list[str], context: dict[str, Any]) -> None:
 def _appendInstruction(parts: list[str], context: dict[str, Any]) -> None:
     if context.get("instruction"):
         parts.append(f"[Codaro procedure]\n{context['instruction']}")
+
+
+def _appendIntake(parts: list[str], context: dict[str, Any]) -> None:
+    intake = context.get("intake")
+    if not isinstance(intake, dict):
+        return
+    from .intakePolicy import intakeActionDirective
+
+    parts.append(intakeActionDirective(intake))
 
 
 def _appendClarificationPlan(parts: list[str], context: dict[str, Any]) -> None:

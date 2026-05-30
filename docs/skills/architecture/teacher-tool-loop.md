@@ -21,6 +21,8 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 학습 요청이 너무 모호하면 provider를 호출하지 않고 deterministic clarification gate에서 먼저 멈춘다. 수준, 깊이, 환경, 실습/설명 비중 중 결과를 바꿀 핵심 질문만 최대 1-3개 묻는다.
    - 답이 없으면 바로 생성했다고 느껴지지 않도록, 먼저 되묻고 현재 작업 기준을 clarification plan/workloop에 남긴다.
    - clarification gate가 멈춘 대화는 `pendingClarification`으로 `assumptions` payload를 대화 상태에 저장한다. 다음 턴에서 사용자가 `진행`하거나 수준/깊이/환경/실습 비중을 짧게 답하면 이 payload를 `[Clarification plan]`으로 provider prompt에 주입하고 한 번 소비한다. `취소`, `새로`, `다른 주제`처럼 새 요청으로 보이는 턴이나 `초급 pandas 실습 중심 짧은 레슨 만들어줘`처럼 독립적인 새 학습 요청에는 주입하지 않고 stale pending을 비운다. 이전 assistant 텍스트만 다시 읽게 만들거나 무관한 다음 요청에 기준을 섞으면 실패다.
+   - **Intake — 대화 누적 후 시작**: `intakePolicy`가 대화 이력에서 핵심 축(수준/범위/실습 비중)을 누적한다. 한 번에 몰아 묻지 않고 `gather` 턴마다 빠진 축 하나만 되묻고, 축이 2개 이상 모이거나 사용자가 `진행`하거나 최대 2회 되물으면 `act`로 전환해 시작한다. 신호 누적은 대화 이력에서 도출하므로 별도 상태 저장이 없고, 저장된 메시지의 `[Clarification plan]` 컨텍스트는 떼고 축을 센다. gather 턴은 `clarification-gate` trace에 `intakeProgress`(`collected/total`, `nextAxis`)를 실어 workloop에 `학습 목표 파악 · 목표 N/3 · 다음: <축>`으로 보인다.
+   - **추천·조합 우선 (goal-discovery)**: 목표가 분명해진 `act` 턴은 새로 만들기 전에 먼저 기존 커리큘럼을 추천·조합한다. `resolve-learning-goal`로 목표를 도메인으로 매핑하고, `search-curricula`로 기존 레슨을 찾고, `compose-master-plan`으로 순서가 잡힌 학습 경로를 조합한다. 기존 레슨이 목표를 덮지 못하는 갭일 때만 `write-curriculum-yaml`로 새 레슨을 작성한다. 이 행동 지침은 `[Intake]`로 provider prompt에 주입되고 `goal-discovery` skill로 등록되어 있다. 진행 중에는 무엇을 찾고 무엇을 추천·조합·작성하는지 workloop에 한 줄로 보인다.
    - 셀 수정/답 확인이면 현재 cell map에서 대상 셀을 고른다.
    - 자동화 요청이면 `automation-authoring-loop` 기준으로 recipe, automation 셀, dry-run, task 등록 흐름으로 보낸다.
    - skill registry의 required tool은 등록된 tool과 manifest metadata를 기준으로 검증한다.
@@ -116,6 +118,7 @@ src/codaro/ai/
 │   ├── providerLoop.py
 │   ├── providerStream.py
 │   ├── clarificationPolicy.py
+│   ├── intakePolicy.py      # 대화 누적 → gather/act 결정 + 추천·조합 steering
 │   ├── contextBuilder.py
 │   ├── toolPolicy.py
 │   ├── traceModel.py

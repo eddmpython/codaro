@@ -53,6 +53,11 @@ def sourceContractFailures() -> list[str]:
             "cell-call",
             "write-automation-recipe",
             "create-automation-task",
+            "resolve-learning-goal",
+            "search-curricula",
+            "compose-master-plan",
+            "학습 목표 해석",
+            "커리큘럼 조합",
             "durationMs",
             "skipped",
             "sectionCount",
@@ -291,6 +296,68 @@ const curriculumGapRun = finish({{
 ]);
 const curriculumGapStep = findStep(curriculumGapRun, "커리큘럼 YAML 전개");
 assert.match(curriculumGapStep.detail, /계약 gap 2개/);
+
+const recommendRun = finish({{
+  traceId: "trace-recommend",
+  toolSequence: ["resolve-learning-goal", "search-curricula", "compose-master-plan"],
+}}, [
+  {{
+    toolCallId: "call-resolve",
+    name: "resolve-learning-goal",
+    arguments: {{ goalText: "데이터 분석" }},
+    result: {{ candidates: [{{ domainId: "dataReporting", domainLabel: "데이터 리포팅" }}] }},
+    status: "done",
+    category: "curriculumOs",
+    lane: "planning",
+  }},
+  {{
+    toolCallId: "call-search",
+    name: "search-curricula",
+    arguments: {{ query: "pandas" }},
+    result: {{ matches: [{{ title: "pandas 기초" }}], total: 3 }},
+    status: "done",
+    category: "curriculumOs",
+    lane: "planning",
+  }},
+  {{
+    toolCallId: "call-compose",
+    name: "compose-master-plan",
+    arguments: {{ domain: "dataReporting" }},
+    result: {{ steps: [{{}}, {{}}, {{}}], totalMinutes: 90, gaps: [] }},
+    status: "done",
+    category: "curriculumOs",
+    lane: "planning",
+  }},
+]);
+const resolveStep = findStep(recommendRun, "학습 목표 해석");
+const searchStep = findStep(recommendRun, "커리큘럼 검색");
+const composeStep = findStep(recommendRun, "커리큘럼 조합");
+assert.match(resolveStep.detail, /후보 도메인 1개/);
+assert.match(resolveStep.detail, /데이터 리포팅/);
+assert.match(searchStep.detail, /기존 레슨 3개/);
+assert.match(searchStep.detail, /pandas 기초/);
+assert.match(composeStep.detail, /3단계 경로/);
+assert.match(composeStep.detail, /총 90분/);
+
+const intakeProgress = finish({{
+  traceId: "trace-intake",
+  eventCount: 2,
+  toolCount: 0,
+  workloop: [{{
+    eventIndex: 1,
+    elapsedMs: 9,
+    eventType: "clarification-gate",
+    workLabel: "학습 목표 파악",
+    workDetail: "핵심 질문 1개 · 작업 기준: 초급-중급 사이 · 목표 1/3 파악 · 다음: 범위",
+    category: "teacher",
+    lane: "read",
+    target: "clarification-gate",
+  }}],
+}});
+const intakeStep = findStep(intakeProgress, "학습 목표 파악");
+assert.equal(intakeStep.status, "done");
+assert.match(intakeStep.detail, /목표 1\\/3 파악/);
+assert.match(intakeStep.detail, /다음: 범위/);
 
 const skippedInstall = finish({{
   traceId: "trace-skip-install",

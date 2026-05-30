@@ -2,6 +2,12 @@ from __future__ import annotations
 
 from .clarificationPolicy import ClarificationPlan, buildClarificationPlan, clarificationAnswer
 from .contextBuilder import injectContext
+from .intakePolicy import (
+    IntakePlan,
+    buildIntakePlan,
+    conversationIntakeInputs,
+    intakeActionDirective,
+)
 from .evalHarness import (
     MAXIMUM_TEACHER_EVAL_SCORE,
     MINIMUM_TEACHER_EVAL_SCORE,
@@ -86,6 +92,10 @@ __all__ = [
     "TeacherTurnSession",
     "TeacherToolRound",
     "ClarificationPlan",
+    "IntakePlan",
+    "buildIntakePlan",
+    "conversationIntakeInputs",
+    "intakeActionDirective",
     "MAXIMUM_TEACHER_EVAL_SCORE",
     "MINIMUM_TEACHER_EVAL_SCORE",
     "ToolPolicyState",

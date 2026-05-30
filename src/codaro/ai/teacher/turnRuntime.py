@@ -14,8 +14,8 @@ from .clarificationPolicy import (
     ENVIRONMENT_MARKERS,
     LEVEL_MARKERS,
     LEARNING_KEYWORDS,
-    buildClarificationPlan,
 )
+from .intakePolicy import buildIntakePlan, conversationIntakeInputs
 from .teacherOrchestrator import TeacherOrchestrator
 from .turnSession import TeacherTurnSession, prepareTeacherTurn
 
@@ -116,18 +116,26 @@ def prepareTeacherRuntimeTurn(
         displayLocale=displayLocale,
         message=message,
     )
+    priorUserTexts, priorGatherCount = conversationIntakeInputs(convManager, conversationId)
+    intakePlan = buildIntakePlan(
+        message,
+        priorUserTexts=priorUserTexts,
+        context=contextMap,
+        priorGatherCount=priorGatherCount,
+    )
+    if intakePlan.shouldAct and intakePlan.isLearning:
+        contextMap["intake"] = intakePlan.actionPayload()
     orchestrator = TeacherOrchestrator.fromContext(contextMap)
-    clarificationPlan = buildClarificationPlan(message, contextMap)
-    gateClarification = clarificationPlan.shouldAsk
+    gather = intakePlan.shouldGather
     turn = prepareTeacherTurn(
         convManager=convManager,
         profileManager=profileManager,
         conversationId=conversationId,
-        message=message if gateClarification else orchestrator.injectContext(message),
+        message=message if gather else orchestrator.injectContext(message),
         providerOverride=providerOverride,
         roleOverride=roleOverride,
-        clarificationPlan=clarificationPlan if gateClarification else None,
-        skipProvider=gateClarification,
+        clarificationPlan=intakePlan.gatherClarificationPlan() if gather else None,
+        skipProvider=gather,
         providerFactory=providerFactory,
     )
     executor = createTeacherToolExecutor(

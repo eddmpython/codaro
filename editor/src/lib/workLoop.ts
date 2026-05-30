@@ -382,6 +382,18 @@ function toolCallArguments(toolCall: AiToolCall) {
 
 function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
   switch (name) {
+    case "resolve-learning-goal":
+      return localText("Resolve learning goal", "학습 목표 해석");
+    case "search-curricula":
+      return localText("Search curricula", "커리큘럼 검색");
+    case "compose-master-plan":
+      return localText("Compose learning path", "커리큘럼 조합");
+    case "inspect-curriculum":
+      return localText("Inspect lesson", "레슨 살펴보기");
+    case "list-curriculum-gaps":
+      return localText("Find curriculum gaps", "미충족 영역 확인");
+    case "propose-curriculum-draft":
+      return localText("Draft new lesson", "새 강의 초안 제안");
     case "write-curriculum-yaml":
       return localText("Expand curriculum YAML", "커리큘럼 YAML 전개");
     case "packages-check":
@@ -412,6 +424,8 @@ function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
   switch (toolCall.lane) {
     case "curriculum":
       return localText("Build curriculum", "커리큘럼 구성");
+    case "planning":
+      return localText("Plan curriculum", "커리큘럼 계획");
     case "read":
       return localText("Check state", "상태 확인");
     case "write":
@@ -443,6 +457,59 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
   if (!result || typeof result !== "object") return "";
   const payload = result as Record<string, unknown>;
   switch (name) {
+    case "resolve-learning-goal": {
+      const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+      if (!candidates.length) return localText("No domain match", "맞는 도메인 없음");
+      const top = candidates[0] as Record<string, unknown>;
+      const topLabel = textArg(top, "domainLabel") || textArg(top, "domainId");
+      return topLabel
+        ? localText(`${candidates.length} domains · top ${topLabel}`, `후보 도메인 ${candidates.length}개 · 최상위 ${topLabel}`)
+        : localText(`${candidates.length} domain candidates`, `후보 도메인 ${candidates.length}개`);
+    }
+    case "search-curricula": {
+      const matches = Array.isArray(payload.matches) ? payload.matches : [];
+      const total = numberArg(payload, "total");
+      const count = total ?? matches.length;
+      if (!count) return localText("No existing lesson", "기존 레슨 없음");
+      const first = matches[0] as Record<string, unknown> | undefined;
+      const firstTitle = first ? textArg(first, "title") : "";
+      return firstTitle
+        ? localText(`${count} lessons · ${firstTitle}`, `기존 레슨 ${count}개 · ${firstTitle}`)
+        : localText(`${count} existing lessons`, `기존 레슨 ${count}개`);
+    }
+    case "compose-master-plan": {
+      const steps = Array.isArray(payload.steps) ? payload.steps : [];
+      const gaps = Array.isArray(payload.gaps) ? payload.gaps : [];
+      const minutes = numberArg(payload, "totalMinutes");
+      const parts = [
+        localText(`${steps.length} steps`, `${steps.length}단계 경로`),
+        minutes !== undefined ? localText(`${minutes} min`, `총 ${minutes}분`) : "",
+        gaps.length ? localText(`${gaps.length} gaps`, `미충족 ${gaps.length}건`) : "",
+      ].filter(Boolean);
+      return parts.join(" · ");
+    }
+    case "inspect-curriculum": {
+      const title = textArg(payload, "title");
+      const minutes = numberArg(payload, "estimatedMinutes");
+      return [title, minutes !== undefined ? localText(`${minutes} min`, `${minutes}분`) : ""]
+        .filter(Boolean)
+        .join(" · ");
+    }
+    case "list-curriculum-gaps": {
+      const gaps = Array.isArray(payload.gaps) ? payload.gaps : [];
+      return gaps.length
+        ? localText(`${gaps.length} domains with gaps`, `미충족 도메인 ${gaps.length}개`)
+        : localText("No gaps", "미충족 영역 없음");
+    }
+    case "propose-curriculum-draft": {
+      const draft = payload.draft && typeof payload.draft === "object" && !Array.isArray(payload.draft)
+        ? payload.draft as Record<string, unknown>
+        : {};
+      const draftTitle = textArg(draft, "title") || textArg(args, "title");
+      return draftTitle
+        ? localText(`Draft: ${draftTitle}`, `초안: ${draftTitle}`)
+        : localText("New lesson draft", "새 강의 초안");
+    }
     case "packages-check": {
       const missing = listArg(payload, "missing");
       if (missing.length) return localText(`Missing: ${missing.join(", ")}`, `${missing.join(", ")} 누락 확인`);
@@ -522,6 +589,42 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
 
 function toolSpecificDetail(name: string, args: Record<string, unknown>) {
   switch (name) {
+    case "resolve-learning-goal": {
+      const goal = textArg(args, "goalText");
+      return goal
+        ? localText(`Map "${goal}" to domains`, `"${goal}" 목표를 도메인으로 해석`)
+        : localText("Map the goal to curriculum domains", "목표를 커리큘럼 도메인으로 해석");
+    }
+    case "search-curricula": {
+      const query = textArg(args, "query") || textArg(args, "category") || textArg(args, "outcomeId");
+      return query
+        ? localText(`Search existing lessons for ${query}`, `${query} 기존 레슨 검색`)
+        : localText("Search existing lessons", "기존 레슨 검색");
+    }
+    case "compose-master-plan": {
+      const target = textArg(args, "projectIntent") || textArg(args, "domain");
+      return target
+        ? localText(`Combine lessons into a path for ${target}`, `${target} 학습 경로로 기존 레슨 조합`)
+        : localText("Combine existing lessons into a learning path", "기존 레슨을 학습 경로로 조합");
+    }
+    case "inspect-curriculum": {
+      const contentId = textArg(args, "contentId");
+      return contentId
+        ? localText(`Inspect lesson ${contentId}`, `${contentId} 레슨 살펴보기`)
+        : localText("Inspect a lesson", "레슨 살펴보기");
+    }
+    case "list-curriculum-gaps": {
+      const domain = textArg(args, "domain");
+      return domain
+        ? localText(`Find gaps in ${domain}`, `${domain} 미충족 영역 확인`)
+        : localText("Find uncovered learning outcomes", "미충족 학습 영역 확인");
+    }
+    case "propose-curriculum-draft": {
+      const title = textArg(args, "title");
+      return title
+        ? localText(`Draft outline for ${title}`, `${title} 새 강의 초안 작성`)
+        : localText("Draft a new lesson outline", "새 강의 초안 작성");
+    }
     case "write-curriculum-yaml":
       return textArg(args, "title") || localText("Convert YAML into section cards and executable cells", "YAML을 섹션 카드와 실행 셀로 변환");
     case "packages-check":

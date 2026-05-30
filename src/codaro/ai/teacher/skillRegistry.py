@@ -24,6 +24,18 @@ class TeacherSkillIssue:
 
 teacherSkills: tuple[TeacherSkill, ...] = (
     TeacherSkill(
+        skillId="goal-discovery",
+        purpose="학습 목표가 분명해지면 새로 만들기 전에 기존 커리큘럼을 추천하거나 조합해 학습 경로로 제안한다.",
+        trigger="대화에서 학습 목표(주제·수준·범위·실습 비중)가 충분히 쌓여 무엇을 배울지 분명해졌을 때",
+        requiredTools=("resolve-learning-goal", "search-curricula", "compose-master-plan"),
+        policy=(
+            "먼저 resolve-learning-goal로 목표를 도메인으로 매핑하고 search-curricula로 기존 레슨을 찾은 뒤 "
+            "compose-master-plan으로 순서가 잡힌 학습 경로를 조합해 추천한다. 기존 레슨이 목표를 충분히 덮지 못하는 "
+            "갭일 때만 write-curriculum-yaml로 새 레슨을 작성한다. 진행 중에는 무엇을 찾고 무엇을 추천·조합·작성하는지 "
+            "한 줄로 보여준다."
+        ),
+    ),
+    TeacherSkill(
         skillId="curriculum-authoring",
         purpose="학습 요청을 curriculum YAML과 학습 셀 document로 전개한다.",
         trigger="사용자가 주제 학습, 레슨, 커리큘럼, 루틴 학습을 요청할 때",

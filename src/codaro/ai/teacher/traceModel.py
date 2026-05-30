@@ -177,8 +177,10 @@ def _turnErrorWorkDetail(*, provider: str, code: str, action: str) -> str:
 def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     questions = event.payload.get("questions")
     assumptions = event.payload.get("assumptions")
+    intakeProgress = event.payload.get("intakeProgress")
     questionCount = len(questions) if isinstance(questions, list) else 0
-    workDetail = _clarificationWorkDetail(questionCount, assumptions)
+    workDetail = _clarificationWorkDetail(questionCount, assumptions, intakeProgress)
+    isIntake = isinstance(intakeProgress, dict)
     return {
         "eventIndex": event.eventIndex,
         "eventType": event.eventType,
@@ -187,23 +189,41 @@ def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
         "lane": "read",
         "target": "clarification-gate",
         "risk": "normal",
-        "workLabel": "작업 전 확인 질문",
+        "workLabel": "학습 목표 파악" if isIntake else "작업 전 확인 질문",
         "workDetail": workDetail,
         "elapsedMs": event.elapsedMs,
     }
 
 
-def _clarificationWorkDetail(questionCount: int, assumptions: Any) -> str:
+def _clarificationWorkDetail(questionCount: int, assumptions: Any, intakeProgress: Any = None) -> str:
     if not isinstance(assumptions, dict):
-        return f"핵심 질문 {questionCount}개 · 작업 기준 0개"
-    summary = [
-        value
-        for key in ("level", "depth", "environment", "balance")
-        if isinstance(value := assumptions.get(key), str) and value
-    ]
-    if not summary:
-        return f"핵심 질문 {questionCount}개 · 작업 기준 {len(assumptions)}개"
-    return f"핵심 질문 {questionCount}개 · 작업 기준: {' / '.join(summary)}"
+        base = f"핵심 질문 {questionCount}개 · 작업 기준 0개"
+    else:
+        summary = [
+            value
+            for key in ("level", "depth", "environment", "balance")
+            if isinstance(value := assumptions.get(key), str) and value
+        ]
+        if not summary:
+            base = f"핵심 질문 {questionCount}개 · 작업 기준 {len(assumptions)}개"
+        else:
+            base = f"핵심 질문 {questionCount}개 · 작업 기준: {' / '.join(summary)}"
+    progress = _intakeProgressDetail(intakeProgress)
+    return f"{base} · {progress}" if progress else base
+
+
+def _intakeProgressDetail(intakeProgress: Any) -> str:
+    if not isinstance(intakeProgress, dict):
+        return ""
+    parts: list[str] = []
+    collected = intakeProgress.get("collected")
+    total = intakeProgress.get("total")
+    if isinstance(collected, int) and isinstance(total, int):
+        parts.append(f"목표 {collected}/{total} 파악")
+    nextLabel = intakeProgress.get("nextAxisLabel")
+    if isinstance(nextLabel, str) and nextLabel:
+        parts.append(f"다음: {nextLabel}")
+    return " · ".join(parts)
 
 
 def _payloadText(payload: dict[str, Any], key: str) -> str:

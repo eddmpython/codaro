@@ -11,19 +11,41 @@ DEFAULT_LABELS = {
     "balance": "학습 비중",
 }
 
+# 단일 출처 — 같은 문구를 intake gather 와 clarification gate 가 공유한다.
+AXIS_QUESTIONS = {
+    "level": "학습자 수준은 어느 정도로 잡을까요?",
+    "depth": "결과물은 짧은 실습 레슨이면 될까요, 아니면 프로젝트 수준까지 갈까요?",
+    "balance": "실습 중심으로 갈까요, 개념 설명 비중을 더 둘까요?",
+    "environment": "사용할 라이브러리나 실행 환경 제한이 있나요?",
+}
+
+DEFAULT_ASSUMPTIONS = {
+    "level": "초급-중급 사이",
+    "depth": "한 레슨 안에서 바로 실행 가능한 실습 중심",
+    "environment": "현재 Codaro 로컬 Python과 uv 패키지 설치",
+    "balance": "설명은 짧게, 섹션마다 직접 입력 셀 포함",
+}
+
+# clarificationAnswer 의 첫 줄 — assistant gather 턴을 대화 이력에서 식별하는 데 쓴다.
+CLARIFICATION_PREAMBLE = "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다."
+
 
 @dataclass(frozen=True)
 class ClarificationPlan:
     shouldAsk: bool
     questions: tuple[str, ...] = ()
     assumptions: dict[str, str] = field(default_factory=dict)
+    intakeProgress: dict[str, Any] | None = None
 
     def payload(self) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             "shouldAsk": self.shouldAsk,
             "questions": list(self.questions),
             "assumptions": dict(self.assumptions),
         }
+        if self.intakeProgress is not None:
+            data["intakeProgress"] = dict(self.intakeProgress)
+        return data
 
 
 def clarificationAnswer(plan: ClarificationPlan) -> str:
@@ -40,7 +62,7 @@ def clarificationAnswer(plan: ClarificationPlan) -> str:
     return "\n\n".join(
         part
         for part in [
-            "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다.",
+            CLARIFICATION_PREAMBLE,
             questionLines,
             "답을 주면 그 기준으로 조정하겠습니다. 이 기준이 맞으면 '진행'이라고만 답해도 됩니다.",
             "작업 기준:",
@@ -80,21 +102,16 @@ def buildClarificationPlan(message: str, context: dict[str, Any] | None = None) 
         return ClarificationPlan(shouldAsk=False)
 
     questions: list[str] = []
-    assumptions = {
-        "level": "초급-중급 사이",
-        "depth": "한 레슨 안에서 바로 실행 가능한 실습 중심",
-        "environment": "현재 Codaro 로컬 Python과 uv 패키지 설치",
-        "balance": "설명은 짧게, 섹션마다 직접 입력 셀 포함",
-    }
+    assumptions = dict(DEFAULT_ASSUMPTIONS)
 
     if not _hasAny(normalized, LEVEL_MARKERS) and not contextMap.get("learnerLevel"):
-        questions.append("학습자 수준은 어느 정도로 잡을까요?")
+        questions.append(AXIS_QUESTIONS["level"])
     if not _hasAny(normalized, DEPTH_MARKERS) and not contextMap.get("lessonDepth"):
-        questions.append("결과물은 짧은 실습 레슨이면 될까요, 아니면 프로젝트 수준까지 갈까요?")
+        questions.append(AXIS_QUESTIONS["depth"])
     if not _hasAny(normalized, BALANCE_MARKERS) and not contextMap.get("lessonBalance"):
-        questions.append("실습 중심으로 갈까요, 개념 설명 비중을 더 둘까요?")
+        questions.append(AXIS_QUESTIONS["balance"])
     if "라이브러리" in message and not _hasAny(normalized, ENVIRONMENT_MARKERS) and not contextMap.get("dependencyPreflight"):
-        questions.append("사용할 라이브러리나 실행 환경 제한이 있나요?")
+        questions.append(AXIS_QUESTIONS["environment"])
 
     return ClarificationPlan(
         shouldAsk=bool(questions),
