@@ -50,6 +50,12 @@ jobs:
       - name: Run tests
         run: uv run --extra dev pytest tests/ -v --tb=short
 
+      - name: Stage base curriculum into package
+        run: |
+          rm -rf src/codaro/curricula
+          cp -r curricula src/codaro/curricula
+          test -f src/codaro/curricula/python/__init__.py
+
       - name: Build wheel
         run: uv build
 
@@ -80,7 +86,7 @@ jobs:
           format: spdx-json
           output-file: release-assets/codaro.spdx.json
 
-      - name: Verify wheel includes editor frontend
+      - name: Verify wheel includes editor frontend and base curriculum
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -93,7 +99,15 @@ jobs:
               raise SystemExit("codaro/webBuild/index.html missing from wheel")
           if not any(name.startswith("codaro/webBuild/_app/") for name in names):
               raise SystemExit("codaro/webBuild/_app/ assets missing from wheel")
-          print(f"verified packaged editor frontend in {wheel}")
+          if "codaro/curricula/python/__init__.py" not in names:
+              raise SystemExit("codaro/curricula/python/__init__.py missing from wheel")
+          lessonCount = sum(
+              1 for name in names
+              if name.startswith("codaro/curricula/python/") and name.endswith(".yaml")
+          )
+          if lessonCount == 0:
+              raise SystemExit("codaro/curricula/python/*.yaml lessons missing from wheel")
+          print(f"verified packaged editor frontend and {lessonCount} curriculum lessons in {wheel}")
           PY
 
       - name: Upload dist artifact

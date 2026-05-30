@@ -47,6 +47,7 @@
 - `codaro`
   - editor server
   - `codaro/webBuild` editor frontend build
+  - `codaro/curricula` base curriculum content (release 시 repo 루트 `curricula/`에서 wheel 안으로 번들; loader는 패키지 경로 우선, 개발 체크아웃은 repo 루트 폴백)
   - document model
   - runtime contracts
   - LocalEngine and future isolated runtime entrypoints

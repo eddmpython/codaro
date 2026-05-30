@@ -113,6 +113,8 @@ EVIDENCE = (
             "Verify wheel includes editor frontend",
             "codaro/webBuild/index.html",
             "codaro/webBuild/_app/",
+            "Stage base curriculum into package",
+            "codaro/curricula/python/__init__.py",
         ),
     ),
     Evidence(

@@ -38,7 +38,22 @@ from .serverLog import configureServerLogging, formatLogFields, isVerboseLogging
 PACKAGE_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_ROOT.parent.parent
 EDITOR_ROOT = PROJECT_ROOT / "editor"
-CURRICULA_ROOT = PROJECT_ROOT / "curricula" / "python"
+
+
+def resolveCurriculaRoot() -> Path:
+    """base curriculum 콘텐츠 위치를 해석한다. 배포 wheel은 editor webBuild처럼 base curriculum을
+    codaro 패키지 안(codaro/curricula/python)에 번들하므로 그 경로를 우선하고, 개발 체크아웃에서는
+    repo 루트의 curricula/python으로 폴백한다. (PRD Bundle 전략: base install 기본 포함 = base curriculum)"""
+    configured = os.environ.get("CODARO_STUDY_DIR")
+    if configured:
+        return Path(configured).expanduser().resolve()
+    bundled = PACKAGE_ROOT / "curricula" / "python"
+    if bundled.exists():
+        return bundled
+    return PROJECT_ROOT / "curricula" / "python"
+
+
+CURRICULA_ROOT = resolveCurriculaRoot()
 
 
 def resolveWebBuildRoot() -> Path:

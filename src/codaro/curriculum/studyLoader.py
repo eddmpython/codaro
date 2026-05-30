@@ -36,8 +36,23 @@ class StudyData(BaseModel):
     sections: list = Field(default_factory=list)
 
 
+def _curriculaPythonRoot() -> Path:
+    """server.resolveCurriculaRoot와 같은 규칙으로 base curriculum 루트를 찾는다:
+    CODARO_STUDY_DIR 환경변수 → 패키지 번들(codaro/curricula/python) → 개발 repo 루트 폴백."""
+    import os
+
+    configured = os.environ.get("CODARO_STUDY_DIR")
+    if configured:
+        return Path(configured).expanduser().resolve()
+    packageRoot = Path(__file__).resolve().parent.parent  # src/codaro/
+    bundled = packageRoot / "curricula" / "python"
+    if bundled.exists():
+        return bundled
+    return Path(__file__).resolve().parents[3] / "curricula" / "python"
+
+
 def _loadCurriculaRegistry() -> Any:
-    registryPath = Path(__file__).resolve().parents[3] / "curricula" / "python" / "__init__.py"
+    registryPath = _curriculaPythonRoot() / "__init__.py"
     spec = importlib.util.spec_from_file_location("_codaroCurriculaPythonRegistry", registryPath)
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load curriculum registry: {registryPath}")

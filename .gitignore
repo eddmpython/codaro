@@ -39,6 +39,8 @@ logs/
 node_modules/
 editor/.svelte-kit/
 src/codaro/webBuild/
+# base curriculum bundled into the wheel at release time (mirrors webBuild); authored at repo-root curricula/
+src/codaro/curricula/
 launcher/target/
 launcher/cargo-test.log
 
