@@ -12,6 +12,17 @@ import sys
 import traceback
 from typing import Any
 
+# numpy/scipy/scikit-learn이 쓰는 OpenBLAS는 기본적으로 CPU 코어 수만큼 스레드 버퍼를 미리
+# 잡는다. spawn으로 만든 worker(특히 여러 세션이 동시에 떠 있을 때)에서는 이 할당이 실패해
+# "OpenBLAS error: Memory allocation still failed"로 프로세스가 죽고, 셀이 EOFError로 끝난다.
+# 스레드 수를 1로 제한하고 matplotlib을 headless(Agg)로 고정해 데이터 라이브러리가 worker에서
+# 안전하게 import되도록 한다. numpy import보다 먼저 설정되어야 하므로 모듈 최상단에 둔다.
+# 사용자가 명시한 값은 보존한다(setdefault). spawn 자식은 이 모듈을 다시 import하므로 자식에도,
+# 부모 백엔드도 이 모듈을 import하므로 부모에도 동일하게 적용된다.
+for _threadVar in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
+    os.environ.setdefault(_threadVar, "1")
+os.environ.setdefault("MPLBACKEND", "Agg")
+
 from ..document.analysis import analyzeCode
 from ..errorGuard import safeRepr
 from ..outputDescriptor import isDescriptorPayload
