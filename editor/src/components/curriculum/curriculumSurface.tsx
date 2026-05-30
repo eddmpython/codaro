@@ -328,7 +328,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
-  const installCommand = `uv pip install ${requiredPackages.join(" ")}`;
+  const installCommand = `uv add ${requiredPackages.join(" ")}`;
   const activeMessage = installProgress
     ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
     : checking
