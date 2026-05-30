@@ -19,10 +19,12 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
 import os
 import sys
 import tempfile
 import traceback
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +32,19 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 CURRICULA = ROOT / "curricula"
+REPORT_PATH = ROOT / "output" / "test-runner" / "curriculum-executability" / "curriculum-executability-report.json"
+
+# 게이트 임계치 — 환경과 무관한 콘텐츠 결함만 차단한다.
+# real-bug          : 학습 코드 결함(NameError/Syntax/Assert 등). 0 유지.
+# yaml-load-error   : YAML 파싱 실패. 0 유지.
+# undeclared-package: import 하지만 meta.packages 에 없는 패키지. 0 유지.
+# 반면 missing-package / cascade-failure / runtime-other 는 실행 환경(라이브러리 미설치,
+# OS/네트워크 의존)에 좌우되므로 정보성으로만 보고하고 게이트를 깨지 않는다.
+THRESHOLDS: dict[str, int] = {
+    "real-bug": 0,
+    "yaml-load-error": 0,
+    "undeclared-package": 0,
+}
 
 REAL_BUG_TYPES = {
     "SyntaxError",
@@ -179,16 +194,8 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
     return results
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default=str(CURRICULA))
-    parser.add_argument("--only-real-bugs", action="store_true")
-    parser.add_argument("--show-load-errors", action="store_true")
-    parser.add_argument("--show-missing", action="store_true",
-                        help="missing-package 항목도 출력 (환경 점검용)")
-    args = parser.parse_args()
-
-    root = Path(args.root).resolve()
+def runAudit(root: Path) -> list[dict[str, Any]]:
+    """모든 yaml 을 격리 스크래치 디렉터리에서 누적 실행하고 결과 리스트를 반환한다."""
     files = sorted(p.resolve() for p in root.rglob("*.yaml"))
     print(f"audit {len(files)} curriculum files under {root.relative_to(ROOT)}")
     allResults: list[dict[str, Any]] = []
@@ -206,6 +213,54 @@ def main() -> int:
     if rootCacheAfter and not rootCacheBefore:
         import shutil
         shutil.rmtree(ROOT / ".pytest_cache", ignore_errors=True)
+    allResults.insert(0, {"_fileCount": len(files)})
+    return allResults
+
+
+def _gitHead() -> str | None:
+    headPath = ROOT / ".git" / "HEAD"
+    if not headPath.exists():
+        return None
+    head = headPath.read_text(encoding="utf-8").strip()
+    if head.startswith("ref: "):
+        refPath = ROOT / ".git" / head.removeprefix("ref: ").strip()
+        if refPath.exists():
+            return refPath.read_text(encoding="utf-8").strip()
+    return head or None
+
+
+def _missingPackageCoverage(results: list[dict[str, Any]]) -> dict[str, int]:
+    """라이브러리 미설치로 실행을 건너뛴 레슨을 카테고리별로 집계한다 (silent cap 방지)."""
+    coverage: dict[str, int] = {}
+    seen: set[str] = set()
+    for result in results:
+        if result.get("category") != "missing-package":
+            continue
+        path = str(result.get("path", ""))
+        if path in seen:
+            continue
+        seen.add(path)
+        parts = path.replace("\\", "/").split("/")
+        category = parts[-2] if len(parts) >= 2 else "<root>"
+        coverage[category] = coverage.get(category, 0) + 1
+    return dict(sorted(coverage.items(), key=lambda kv: -kv[1]))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", default=str(CURRICULA))
+    parser.add_argument("--only-real-bugs", action="store_true")
+    parser.add_argument("--show-load-errors", action="store_true")
+    parser.add_argument("--show-missing", action="store_true",
+                        help="missing-package 항목도 출력 (환경 점검용)")
+    parser.add_argument("--no-report", action="store_true", help="JSON 리포트를 쓰지 않는다")
+    args = parser.parse_args()
+
+    startedAt = datetime.now(UTC).isoformat()
+    root = Path(args.root).resolve()
+    rawResults = runAudit(root)
+    fileCount = rawResults[0].get("_fileCount", 0) if rawResults else 0
+    allResults = [r for r in rawResults if "_fileCount" not in r]
 
     counts: dict[str, int] = {}
     for result in allResults:
@@ -217,6 +272,15 @@ def main() -> int:
 
     realBugs = [r for r in allResults if r["category"] == "real-bug"]
     loadErrors = [r for r in allResults if r["category"] == "yaml-load-error"]
+    undeclared = [r for r in allResults if r["category"] == "undeclared-package"]
+    missingCoverage = _missingPackageCoverage(allResults)
+
+    breaches = []
+    for flag, threshold in THRESHOLDS.items():
+        count = counts.get(flag, 0)
+        if count > threshold:
+            breaches.append({"flag": flag, "count": count, "threshold": threshold})
+    passed = not breaches
 
     if args.only_real_bugs or realBugs:
         print(f"\nreal-bug entries ({len(realBugs)}):")
@@ -234,13 +298,52 @@ def main() -> int:
         for r in missing:
             print(f"  {r['path']} [{r['section']}.{r['kind']}] {r['detail']}")
 
-    undeclared = [r for r in allResults if r["category"] == "undeclared-package"]
     if undeclared:
         print(f"\nundeclared-package entries ({len(undeclared)}):")
         for r in undeclared[:20]:
             print(f"  {r['path']} [{r['section']}.{r['kind']}] {r['detail']}")
 
-    return 0 if not realBugs and not loadErrors else 1
+    if missingCoverage:
+        skipped = sum(missingCoverage.values())
+        print(
+            f"\ncoverage note: {skipped} lessons skipped at import (library not installed). "
+            "real-bugs inside them are NOT checked in this environment:"
+        )
+        for category, count in list(missingCoverage.items())[:30]:
+            print(f"  {category:24s} {count}")
+
+    if not args.no_report:
+        report = {
+            "gate": "curriculum-executability",
+            "passed": passed,
+            "status": "passed" if passed else "failed",
+            "startedAt": startedAt,
+            "completedAt": datetime.now(UTC).isoformat(),
+            "gitHead": _gitHead(),
+            "reportPath": str(REPORT_PATH.relative_to(ROOT)),
+            "summary": {
+                "fileCount": fileCount,
+                "checkCount": len(allResults),
+                "counts": dict(sorted(counts.items(), key=lambda kv: -kv[1])),
+                "thresholds": THRESHOLDS,
+                "breaches": breaches,
+                "missingPackageCoverage": missingCoverage,
+            },
+            "realBugs": realBugs,
+            "loadErrors": loadErrors,
+            "undeclaredPackages": undeclared,
+        }
+        REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"\nreport: {REPORT_PATH.relative_to(ROOT)}")
+
+    if passed:
+        print("\nok: curriculum executability audit passed (no real-bug / load-error / undeclared-package)")
+        return 0
+    print("\nFAIL: curriculum executability audit breached thresholds:")
+    for breach in breaches:
+        print(f"  - {breach['flag']}: {breach['count']} (threshold {breach['threshold']})")
+    return 1
 
 
 if __name__ == "__main__":

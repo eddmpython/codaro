@@ -100,6 +100,7 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 | `curriculum-quality-matrix` | fast | 대표 structured YAML과 실제 전체 curriculum YAML의 섹션 카드, 패키지, 실습 solution, 학습 흐름 계약을 확인한다. |
 | `curriculum-top-tier-audit` | fast | 커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, lazy uv 의존성, 소개 레슨, structured source 채택률, gate wiring으로 점수화한다. |
 | `curriculum-weakness-audit` | fast | 레슨 단위 약점(plan orphan, exercise/check 누락, hint 부재 등)을 Curriculum OS taxonomy 위에서 점검한다. |
+| `curriculum-executability` | fast | 모든 레슨의 snippet/solution을 누적 namespace에서 실행해 환경 무관 코드 결함(real-bug, yaml-load-error, undeclared-package)이 0인지 검사한다. missing-package/cascade/runtime-other는 정보성. |
 | `predict-contract-strict` | fast | strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다. |
 | `playwright-curriculum-runtime` | fast | Playwright 학습 트랙의 structured YAML 계약과 예제/정답 코드가 실제 Chromium에서 실행되는지 확인한다. |
 | `onboarding-browser` | surface | 브라우저에서 첫 화면 fallback, Provider 연결 행동, provider 연결 후 실제 응답 상태를 확인한다. |

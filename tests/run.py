@@ -27,6 +27,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
     "curriculum-weakness-audit": ("output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json",),
+    "curriculum-executability": ("output/test-runner/curriculum-executability/curriculum-executability-report.json",),
     "predict-contract-strict": ("output/test-runner/predict-contract-strict/predict-contract-strict-report.json",),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
@@ -232,6 +233,12 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumWeakness.py")),),
         ci_required=False,
     ),
+    "curriculum-executability": Gate(
+        tier="fast",
+        description="모든 레슨의 snippet/solution 을 누적 namespace 에서 실행해 환경 무관 코드 결함(real-bug, yaml-load-error, undeclared-package)이 0인지 검사한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumExecutability.py"), timeoutSeconds=900),),
+        ci_required=False,
+    ),
     "predict-contract-strict": Gate(
         tier="fast",
         description="strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다.",
@@ -327,6 +334,7 @@ PREFLIGHT_GATES = (
     "mobile-layout",
     "editor-build",
     "curriculum-quality-matrix",
+    "curriculum-executability",
 )
 PRODUCT_QUALITY_GATES = (
     "root-clean",
@@ -343,6 +351,7 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-contract",
     "runtime-recovery-browser",
     "curriculum-quality-matrix",
+    "curriculum-executability",
     "curriculum-top-tier-audit",
     "playwright-curriculum-runtime",
     "onboarding-browser",
@@ -853,8 +862,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 34:
-        failures.append(f"expected 34 gates, found {len(GATES)}")
+    if len(GATES) != 35:
+        failures.append(f"expected 35 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
