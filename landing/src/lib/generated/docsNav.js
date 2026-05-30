@@ -563,22 +563,6 @@ export const docsPages = [
     "contentModule": "page9161bdf74323"
   },
   {
-    "path": "skills/ops/release/public-release",
-    "slugSegments": [
-      "skills",
-      "ops",
-      "release",
-      "public-release"
-    ],
-    "title": "Public Release Readiness",
-    "description": "Public distribution readiness rules for security, privacy, support, supply chain, and objective gate evidence.",
-    "section": "ops",
-    "sectionLabel": "Operations",
-    "order": 307,
-    "url": "/codaro/docs/skills/ops/release/public-release",
-    "contentModule": "paged350c930b3e5"
-  },
-  {
     "path": "skills/ops/workflow/doc-and-session",
     "slugSegments": [
       "skills",
@@ -593,22 +577,6 @@ export const docsPages = [
     "order": 307,
     "url": "/codaro/docs/skills/ops/workflow/doc-and-session",
     "contentModule": "page93674194e801"
-  },
-  {
-    "path": "skills/ops/release/launch-playbook",
-    "slugSegments": [
-      "skills",
-      "ops",
-      "release",
-      "launch-playbook"
-    ],
-    "title": "Launch Playbook",
-    "description": "Public launch playbook for positioning, demos, video, release notes, and first-user feedback.",
-    "section": "ops",
-    "sectionLabel": "Operations",
-    "order": 308,
-    "url": "/codaro/docs/skills/ops/release/launch-playbook",
-    "contentModule": "page4974f45b264e"
   },
   {
     "path": "skills/ops/workflow/reference-impl",
@@ -1304,22 +1272,6 @@ export const docsSections = [
         "contentModule": "page9161bdf74323"
       },
       {
-        "path": "skills/ops/release/public-release",
-        "slugSegments": [
-          "skills",
-          "ops",
-          "release",
-          "public-release"
-        ],
-        "title": "Public Release Readiness",
-        "description": "Public distribution readiness rules for security, privacy, support, supply chain, and objective gate evidence.",
-        "section": "ops",
-        "sectionLabel": "Operations",
-        "order": 307,
-        "url": "/codaro/docs/skills/ops/release/public-release",
-        "contentModule": "paged350c930b3e5"
-      },
-      {
         "path": "skills/ops/workflow/doc-and-session",
         "slugSegments": [
           "skills",
@@ -1334,22 +1286,6 @@ export const docsSections = [
         "order": 307,
         "url": "/codaro/docs/skills/ops/workflow/doc-and-session",
         "contentModule": "page93674194e801"
-      },
-      {
-        "path": "skills/ops/release/launch-playbook",
-        "slugSegments": [
-          "skills",
-          "ops",
-          "release",
-          "launch-playbook"
-        ],
-        "title": "Launch Playbook",
-        "description": "Public launch playbook for positioning, demos, video, release notes, and first-user feedback.",
-        "section": "ops",
-        "sectionLabel": "Operations",
-        "order": 308,
-        "url": "/codaro/docs/skills/ops/release/launch-playbook",
-        "contentModule": "page4974f45b264e"
       },
       {
         "path": "skills/ops/workflow/reference-impl",
