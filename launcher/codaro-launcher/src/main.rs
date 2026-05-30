@@ -336,9 +336,8 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+fn provision_and_spawn(paths: &LauncherPaths, args: &LaunchArgs) -> Result<(Child, String)> {
     use ipc::{ErrorPayload, IpcMessage, LaunchStatus, ProgressPayload, StatusPayload, encode_ipc};
-    use webview::{WebviewBackend, detect_webview_backend, open_in_system_browser};
 
     let stores = LauncherStateStores::new(paths);
     let active = stores.active_release.load_optional()?;
@@ -471,6 +470,7 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     let workspace_root = args
         .workspace_root
+        .clone()
         .unwrap_or(std::env::current_dir().context("Failed to resolve current directory.")?);
     let config = BackendLaunchConfig::from_active_release(
         paths,
@@ -509,14 +509,156 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         }
     }
 
-    let backend = detect_webview_backend();
-    if args.no_webview || backend == WebviewBackend::SystemBrowser {
+    Ok((child, url))
+}
+
+fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+    use webview::open_in_system_browser;
+    // --no-webview: 헤드리스/CLI/스모크 경로. 네이티브 창 없이 백엔드를 띄우고 시스템 브라우저로 연다.
+    if args.no_webview {
+        let (mut child, url) = provision_and_spawn(paths, &args)?;
         open_in_system_browser(&url)?;
+        let _ = child.wait();
+        return Ok(());
+    }
+    // 기본: 임베디드 WebView2 네이티브 창에서 UI를 띄운다(브라우저 탭이 아니라 런처 자체 창).
+    run_windowed(paths, args)
+}
+
+fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+    use std::sync::{Arc, Mutex};
+    use tao::dpi::{LogicalPosition, LogicalSize};
+    use tao::event::{Event, WindowEvent};
+    use tao::event_loop::{ControlFlow, EventLoopBuilder};
+    use tao::window::WindowBuilder;
+    use wry::{Rect, WebViewBuilder};
+
+    hide_console_window();
+
+    let event_loop = EventLoopBuilder::<AppEvent>::with_user_event().build();
+
+    let window = WindowBuilder::new()
+        .with_title("Codaro")
+        .with_inner_size(LogicalSize::new(1280.0, 860.0))
+        .with_min_inner_size(LogicalSize::new(900.0, 640.0))
+        .build(&event_loop)
+        .context("failed to create launcher window")?;
+
+    let mut web_ctx = wry::WebContext::new(Some(paths.root().join("webview2")));
+    let webview = WebViewBuilder::with_web_context(&mut web_ctx)
+        .with_background_color((9, 9, 11, 255))
+        .with_html(LAUNCH_HTML)
+        .build(&window)
+        .context("failed to create webview")?;
+
+    let child_slot: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
+
+    {
+        let setup_paths = paths.clone();
+        let setup_proxy = event_loop.create_proxy();
+        let setup_child = child_slot.clone();
+        std::thread::spawn(move || match provision_and_spawn(&setup_paths, &args) {
+            Ok((child, url)) => {
+                if let Ok(mut slot) = setup_child.lock() {
+                    *slot = Some(child);
+                }
+                let _ = setup_proxy.send_event(AppEvent::Ready(url));
+            }
+            Err(err) => {
+                let _ = setup_proxy.send_event(AppEvent::Fail(format!("{err:#}")));
+            }
+        });
     }
 
-    let _ = child.wait();
-    Ok(())
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
+        match event {
+            Event::UserEvent(AppEvent::Ready(url)) => {
+                let _ = webview.load_url(&url);
+                window.set_focus();
+            }
+            Event::UserEvent(AppEvent::Fail(msg)) => {
+                let escaped = msg
+                    .replace('\\', "\\\\")
+                    .replace('\'', "\\'")
+                    .replace('\n', "\\n");
+                let _ = webview.evaluate_script(&format!("setError('{escaped}')"));
+            }
+            Event::WindowEvent {
+                event: WindowEvent::Resized(size),
+                ..
+            } => {
+                let _ = webview.set_bounds(Rect {
+                    position: LogicalPosition::new(0, 0).into(),
+                    size: LogicalSize::new(size.width, size.height).into(),
+                });
+            }
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                ..
+            } => {
+                if let Ok(mut slot) = child_slot.lock() {
+                    if let Some(mut child) = slot.take() {
+                        let _ = child.kill();
+                    }
+                }
+                *control_flow = ControlFlow::Exit;
+            }
+            _ => {}
+        }
+    });
 }
+
+#[derive(Debug)]
+enum AppEvent {
+    Ready(String),
+    Fail(String),
+}
+
+fn hide_console_window() {
+    #[cfg(target_os = "windows")]
+    unsafe {
+        use windows_sys::Win32::System::Console::GetConsoleWindow;
+        use windows_sys::Win32::UI::WindowsAndMessaging::{SW_HIDE, ShowWindow};
+        let hwnd = GetConsoleWindow();
+        if !hwnd.is_null() {
+            ShowWindow(hwnd, SW_HIDE);
+        }
+    }
+}
+
+const LAUNCH_HTML: &str = r##"<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #09090b; color: #fafafa;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 22px; user-select: none; }
+  .logo { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; }
+  .spinner { width: 38px; height: 38px; border: 3px solid #27272a; border-top-color: #a1a1aa;
+    border-radius: 50%; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status { color: #a1a1aa; font-size: 14px; text-align: center; padding: 0 24px; }
+  .err { display: none; max-width: 580px; text-align: center; color: #fca5a5; font-size: 13px;
+    line-height: 1.7; white-space: pre-wrap; padding: 0 28px; }
+  .err.show { display: block; }
+  .hide { display: none !important; }
+</style></head><body>
+  <div class="logo">Codaro</div>
+  <div id="spin" class="spinner"></div>
+  <div id="status" class="status">준비 중 — Python 런타임과 커리큘럼을 설치하고 있어요…<br>처음 실행은 다운로드 때문에 잠시 걸릴 수 있어요.</div>
+  <div id="err" class="err"></div>
+  <script>
+    function setError(msg) {
+      document.getElementById('spin').classList.add('hide');
+      document.getElementById('status').classList.add('hide');
+      var e = document.getElementById('err');
+      e.textContent = '문제가 발생했어요:\n\n' + msg;
+      e.classList.add('show');
+    }
+  </script>
+</body></html>
+"##;
 
 fn launch_probe_port(port: u16) -> Option<u16> {
     if port == 0 { None } else { Some(port) }
