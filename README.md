@@ -1,28 +1,37 @@
-<p align="right">
-  <a href="https://eddmpython.github.io/codaro/"><strong>eddmpython.github.io/codaro</strong></a>
+<div align="center">
+
+<img src="assets/brand/mascot/codaro-character.png" width="170" alt="Codaro 마스코트 — 로컬 Python 학습과 자동화를 잇는 개인 스튜디오 캐릭터" />
+
+# Codaro
+
+**AI 없이도 완전한 Python 공부 · 업무 자동화 커리큘럼 — 원하면 AI가 다음 확장을 추천합니다.**
+
+코드가 인터페이스가 되는 개인 자동화 스튜디오. 전부 로컬에서, 더블클릭 한 번으로 시작합니다.
+
+<sub><em>코다로(Codaro) — "코드 아로?" "코드 아로~" 코드와 친해지자는 말장난에서 시작한 이름입니다.</em></sub>
+
+<p>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Download CodaroLauncher.exe" src="https://img.shields.io/badge/Download-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
+  <a href="https://github.com/eddmpython/codaro/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/eddmpython/codaro?style=for-the-badge&label=Release&labelColor=18181b&color=18181b&logo=github&logoColor=white" /></a>
+  <a href="https://github.com/eddmpython/codaro/actions/workflows/product-release.yml"><img alt="Release build" src="https://img.shields.io/github/actions/workflow/status/eddmpython/codaro/product-release.yml?style=for-the-badge&label=Build&labelColor=18181b&logo=github&logoColor=white" /></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Non--Commercial_1.0-7c3aed?style=for-the-badge&labelColor=18181b" /></a>
 </p>
 
-# Codaro — 로컬 Python 학습·실행·자동화 스튜디오
-
-<p align="center">
-  <img src="assets/brand/mascot/codaro-character.png" width="170" alt="Codaro 마스코트 — 로컬 Python 학습과 자동화를 잇는 개인 스튜디오 캐릭터" />
+<p>
+  <img alt="Platform Windows 10/11" src="https://img.shields.io/badge/Platform-Windows_10%2F11-38bdf8?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" />
+  <img alt="Python 3.12+" src="https://img.shields.io/badge/Runtime-Python_3.12+-3776ab?style=for-the-badge&labelColor=18181b&logo=python&logoColor=white" />
+  <img alt="Editor React 19" src="https://img.shields.io/badge/Editor-React_19-61dafb?style=for-the-badge&labelColor=18181b&logo=react&logoColor=white" />
+  <img alt="Distribution GitHub Releases" src="https://img.shields.io/badge/Distribution-GitHub_Releases-18181b?style=for-the-badge&labelColor=18181b" />
 </p>
 
-<p align="center">
-  <strong>코드가 인터페이스가 되는 개인 자동화 스튜디오.</strong><br/>
-  <em>Reactive 노트북 · Percent Format · AI tool_use · 데스크톱 자동화 — 모두 로컬 Python 위에서.</em>
+<p>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><strong>다운로드</strong></a> ·
+  <a href="https://eddmpython.github.io/codaro/">문서</a> ·
+  <a href="https://eddmpython.github.io/codaro/docs/blog">소식</a> ·
+  <a href="https://github.com/eddmpython/codaro/issues">이슈</a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/eddmpython/codaro/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/eddmpython/codaro?label=Release&color=18181b" /></a>
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Non--Commercial_Source_1.0-7c3aed" /></a>
-  <a href="https://www.python.org/"><img alt="Python 3.12+" src="https://img.shields.io/badge/Python-3.12+-3776ab?logo=python&logoColor=white" /></a>
-  <a href="https://docs.astral.sh/uv/"><img alt="uv" src="https://img.shields.io/badge/Runtime-uv-de7c2c" /></a>
-  <a href="https://react.dev/"><img alt="React 19" src="https://img.shields.io/badge/Editor-React_19-61dafb?logo=react&logoColor=white" /></a>
-  <a href="https://eddmpython.github.io/codaro/"><img alt="GitHub Pages" src="https://img.shields.io/badge/Site-eddmpython.github.io%2Fcodaro-222" /></a>
-  <a href="notebooks/python30DaysComplete/readme.md"><img alt="Python 30 Days" src="https://img.shields.io/badge/Python_30_Days-open-2563eb" /></a>
-  <a href="https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb"><img alt="Open Day 01 in Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
-</p>
+</div>
 
 ---
 
@@ -30,8 +39,38 @@
 
 > **한 줄로** — 그냥 Python을 쓰면, 엔진이 셀 격리·의존 추적·재실행을 자동으로 합니다. 같은 셀이 학습 카드가 되고, 같은 `.py`가 자동화 태스크가 됩니다.
 
+## 다운로드 & 빠른 시작
+
+**비개발자도 더블클릭이면 끝.** 시스템 Python·uv·설정 전부 필요 없습니다 — 런처가 전부 자동으로 처리합니다.
+
+<p align="center">
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Download CodaroLauncher.exe" src="https://img.shields.io/badge/Windows_다운로드-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
+</p>
+
+1. **[CodaroLauncher.exe 다운로드](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe)** _(Windows 10/11)_
+2. 받은 파일을 **더블클릭**합니다.
+3. 첫 실행에서 런처가 자동으로 — 관리형 Python runtime + `codaro` 본체 + **기본 커리큘럼(463 레슨)** 을 내려받아 설치합니다. (네트워크/디스크에 따라 몇 분)
+4. 준비가 끝나면 로컬 에디터(`http://127.0.0.1:8765`)로 자동 전환 — **커리큘럼 카드에서 바로 학습을 시작**합니다.
+
+> 시스템에 Python이 없어도 됩니다. 런처가 격리된 관리형 런타임을 따로 설치하므로 기존 환경을 건드리지 않습니다.
+
+**AI는 없어도 완전합니다.** 463개 커리큘럼 레슨과 업무 자동화는 AI 없이 그대로 동작하고, AI provider(GPT · Claude · Ollama)를 꽂으면 *다음에 배울 것·만들 것*을 추천하고 셀 단위로 확장해 줍니다.
+
+### 첫 실행에서 자동 구성되는 것
+
+| 구성 요소 | 역할 |
+|---|---|
+| 관리형 Python 3.12 runtime | 시스템 Python과 분리된 격리 실행 환경 |
+| `codaro` wheel | 에디터(React) · 실행 엔진 · **기본 커리큘럼(463 레슨)** 포함 |
+| `release-manifest.json` | 정확한 wheel·runtime 버전을 핀. 런처가 같은 경로로 업데이트를 확인 |
+
+- **모두 자동, 자체 업데이트** — 런처는 실행할 때마다 본체 릴리스와 *런처 자신의 새 버전*을 확인해 갱신합니다.
+- **PyPI 미사용** — 배포는 오직 GitHub Releases manifest가 핀한 wheel로만 이뤄집니다.
+- **macOS / Linux** — 데스크톱 런처는 Windows 우선입니다. 다른 OS는 아래 [개발자 — 저장소에서 바로](#개발자--저장소에서-바로)로 동일 기능을 사용하세요.
+
 ## 목차
 
+- [다운로드 & 빠른 시작](#다운로드--빠른-시작)
 - [Codaro는 무엇이 다른가](#codaro는-무엇이-다른가)
 - [Codaro vs Jupyter · marimo · Streamlit · ipynb](#codaro-vs-jupyter--marimo--streamlit--ipynb)
 - [어떤 사람에게 맞는가 — Use cases](#어떤-사람에게-맞는가--use-cases)
@@ -75,7 +114,7 @@
 | **AI 셀 단위 tool_use** | ✅ 기본 | ⚠ 확장 | ❌ | ❌ |
 | **자동화 태스크 승격** | ✅ 스케줄·Webhook·DAG·E-Stop | ❌ | ❌ | ❌ |
 | **데스크톱 자동화** | ✅ Vision/Voice/Input | ❌ | ❌ | ❌ |
-| **학습 커리큘럼 1급** | ✅ 130+ YAML 레슨 | ❌ | ❌ | ❌ |
+| **학습 커리큘럼 1급** | ✅ 460+ YAML 레슨 | ❌ | ❌ | ❌ |
 | **외부 서버 마운트** | ✅ FastAPI/Django/Flask | ⚠ | ⚠ | ⚠ |
 | **라이선스** | Non-Commercial Source 1.0 | BSD | Apache 2.0 | Apache 2.0 |
 
@@ -85,7 +124,7 @@
 
 | 사용자 | 무엇을 얻나 |
 |---|---|
-| **Python 학습자** | YAML 130+ 레슨을 카테고리 트리로 탐색. 예측 → 실행 → 오류 → 검증 → 변주 흐름이 한 카드 안에서 끊기지 않음. |
+| **Python 학습자** | YAML 460+ 레슨을 카테고리 트리로 탐색. 예측 → 실행 → 오류 → 검증 → 변주 흐름이 한 카드 안에서 끊기지 않음. |
 | **데이터 분석가** | pandas/polars/duckdb 셀이 reactive로 묶여 입력 바꾸면 하위 계산이 자동 재실행. 검증된 분석은 매일 돌아가는 태스크로 승격. |
 | **반복 업무가 많은 직장인** | "매주 CSV 정리 → 리포트 → Slack 알림"을 셀 조합으로 만들고 `@every_5m` 스케줄로 등록. E-Stop으로 즉시 중단. |
 | **데스크톱 자동화 개발자** | Vision(OCR/템플릿 매칭) + Input(PyAutoGUI + InputGuard)으로 GUI 자동화 스크립트를 녹화 → Python으로 변환. |
@@ -153,7 +192,7 @@ Codaro의 제품 폴더는 [`editor/`](editor/)이고, 사용자에게 보이는
 ## 학습 시스템 — 3기둥
 
 - **기둥 1 — 노트북 기능**: 셀 편집/실행/리액티브 그대로가 학습 환경.
-- **기둥 2 — 뼈대 커리큘럼**: `curricula/` YAML 130+ 레슨, 카테고리 트리로 진입.
+- **기둥 2 — 뼈대 커리큘럼**: `curricula/` YAML 460+ 레슨, 카테고리 트리로 진입.
 - **기둥 3 — 학습 사상**: 코드로 정의된 교육 철학. AI도 사람도 따른다.
   - 최소 설명·최대 실행 · 빈칸부터 시작 · 예측 → 검증 · 오류로 배우기 · 점진적 빌드
   - 수정 실험 · 3단계 힌트 · 즉시 피드백 · 반복 변주 · 실제 맥락
@@ -294,7 +333,7 @@ uv run python -X utf8 demos/publicLaunch/fileOrganizerDemo.py
 codaro/
 ├── src/codaro/        # Python 패키지 (engine / kernel / runtime / curriculum / ai / automation / api ...)
 ├── editor/            # 제품 UI (React 19 + Vite + CodeMirror + Tailwind)
-├── curricula/         # 기본 학습 자산 YAML (130+ 레슨)
+├── curricula/         # 기본 학습 자산 YAML (460+ 레슨)
 ├── notebooks/         # curricula에서 파생된 배포용 노트북
 ├── demos/             # 공개 데모 + 5분 quickstart
 ├── launcher/          # 데스크톱 런처 + 업데이터
