@@ -102,13 +102,13 @@ export function ProductSidebar({
   onToggleTheme,
 }: ProductSidebarProps) {
   const { locale, t, toggleLocale } = useLocale();
-  const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
-    { value: "chat", label: t("nav.chat"), Icon: MessageSquare },
-    { value: "editor", label: t("nav.editor"), Icon: FileCode2 },
-    { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap },
-    { value: "automation", label: t("nav.automation"), Icon: Workflow },
+  const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }>; beta: boolean }> = [
+    { value: "chat", label: t("nav.chat"), Icon: MessageSquare, beta: true },
+    { value: "editor", label: t("nav.editor"), Icon: FileCode2, beta: true },
+    { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap, beta: false },
+    { value: "automation", label: t("nav.automation"), Icon: Workflow, beta: true },
   ];
-  navItems.push({ value: "share", label: t("nav.share"), Icon: PackageOpen });
+  navItems.push({ value: "share", label: t("nav.share"), Icon: PackageOpen, beta: true });
   const themeLabel = themeMode === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode");
   const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
 
@@ -177,7 +177,7 @@ export function ProductSidebar({
             <SidebarGroup className="py-0.5">
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {navItems.map(({ Icon, label, value }) => (
+                  {navItems.map(({ Icon, label, value, beta }) => (
                     <SidebarMenuItem key={value}>
                       <SidebarMenuButton
                         className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
@@ -187,6 +187,11 @@ export function ProductSidebar({
                       >
                         <Icon />
                         <span>{label}</span>
+                        {beta ? (
+                          <span className="ml-auto rounded-sm border border-sidebar-border bg-sidebar-accent/40 px-1 text-[9px] font-medium uppercase leading-[1.4] tracking-wide text-sidebar-foreground/55 group-data-[collapsible=icon]:hidden">
+                            {t("nav.beta")}
+                          </span>
+                        ) : null}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
