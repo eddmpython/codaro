@@ -217,6 +217,7 @@ sections:
   tips:
   - 실험 코드를 만들 때는 매개변수를 한 곳에 모아 두면 다른 미션에서 재사용이 쉬워집니다.
   snippet: |-
+    flower = load_sample_image('flower.jpg')
     chinaCorners = cv2.goodFeaturesToTrack(gray, maxCorners=80, qualityLevel=0.02, minDistance=15)
     flowerGray = cv2.cvtColor(flower, cv2.COLOR_RGB2GRAY)
     flowerCorners = cv2.goodFeaturesToTrack(flowerGray, maxCorners=80, qualityLevel=0.02, minDistance=15)

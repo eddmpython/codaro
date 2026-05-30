@@ -145,6 +145,8 @@ sections:
   snippet: |-
     flowerImg = Image.open(tempDir / 'flower_orig.png')
     flowerHash = imagehash.phash(flowerImg)
+    brightImg = Image.open(tempDir / 'china_bright.png')
+    brightHash = imagehash.phash(brightImg)
     sameDistance = chinaHash - brightHash
     diffDistance = chinaHash - flowerHash
     sameDistance, diffDistance

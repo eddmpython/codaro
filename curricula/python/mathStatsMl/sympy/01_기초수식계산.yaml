@@ -228,12 +228,14 @@ sections:
   tips:
   - collect(expr, x)는 x의 거듭제곱별로 계수를 묶습니다. 여러 변수가 있을 때 특정 변수 기준으로 정리하고 싶을 때 사용합니다.
   snippet: |-
+    y = symbols('y')
     mixed = x*y + x**2 + 2*x + y*x**2
     byX = collect(mixed, x)
     byX
   exercise:
     prompt: 7단계. 변수로 정리 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
     starterCode: |-
+      y = symbols('y')
       mixed = x*y + x**2 + 2*x + y*x**2
       byX = collect(mixed, x)
       byX

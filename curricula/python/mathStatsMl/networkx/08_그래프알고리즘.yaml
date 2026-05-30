@@ -94,7 +94,10 @@ sections:
         (1, 2), (1, 3), (2, 4), (2, 5),
         (3, 6), (3, 7), (4, 8), (5, 8)
     ])
-    G.number_of_nodes(), G.number_of_edges()
+
+    bfsEdges = list(nx.bfs_edges(G, source=1))
+    bfsNodes = [1] + [v for _, v in bfsEdges]
+    bfsNodes
   exercise:
     prompt: 2단계. 너비우선탐색 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
@@ -103,7 +106,10 @@ sections:
           (1, 2), (1, 3), (2, 4), (2, 5),
           (3, 6), (3, 7), (4, 8), (5, 8)
       ])
-      G.number_of_nodes(), G.number_of_edges()
+
+      bfsEdges = list(nx.bfs_edges(G, source=1))
+      bfsNodes = [1] + [v for _, v in bfsEdges]
+      bfsNodes
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
@@ -203,7 +209,11 @@ sections:
     wG.add_edge("D", "E", weight=2)
     wG.add_edge("D", "F", weight=6)
     wG.add_edge("E", "F", weight=3)
-    wG.edges(data=True)
+
+    mst = nx.minimum_spanning_tree(wG)
+    mstEdges = list(mst.edges(data=True))
+    mstWeight = sum(d["weight"] for _, _, d in mstEdges)
+    mstWeight
   exercise:
     prompt: 5단계. 최소신장트리 예제에서 `wG` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
@@ -217,7 +227,11 @@ sections:
       wG.add_edge("D", "E", weight=2)
       wG.add_edge("D", "F", weight=6)
       wG.add_edge("E", "F", weight=3)
-      wG.edges(data=True)
+
+      mst = nx.minimum_spanning_tree(wG)
+      mstEdges = list(mst.edges(data=True))
+      mstWeight = sum(d["weight"] for _, _, d in mstEdges)
+      mstWeight
     hints:
     - 바꿀 지점은 `wG = ...` 오른쪽 값입니다.
     - 실행 뒤 `wG` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.

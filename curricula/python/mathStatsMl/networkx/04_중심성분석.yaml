@@ -256,6 +256,7 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
+    pos = nx.spring_layout(G, seed=42)
     nodeSizes = [3000 * degCent[n] for n in G.nodes()]
 
     fig2, ax2 = plt.subplots(figsize=(8, 6))
@@ -266,6 +267,7 @@ sections:
   exercise:
     prompt: 8단계. 중심성 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
+      pos = nx.spring_layout(G, seed=42)
       nodeSizes = [3000 * degCent[n] for n in G.nodes()]
 
       fig2, ax2 = plt.subplots(figsize=(8, 6))

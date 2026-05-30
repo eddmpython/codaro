@@ -8,7 +8,7 @@ meta:
   packages:
   - matplotlib
   - numpy
-  - opencv-python
+  - opencv-contrib-python
   tags:
   - opencv
   - 트래커

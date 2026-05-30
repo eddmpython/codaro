@@ -172,28 +172,34 @@ sections:
   goal: 5단계. Matplotlib 연동에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
   why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
   explanation: |-
-    SymPy 플롯의 기능이 부족할 때는 matplotlib과 연동합니다. backend를 통해 matplotlib의 Figure와 Axes 객체에 접근할 수 있습니다. ax.grid(True)로 격자를 추가하고, ax.annotate()로 주석을 달고, ax.axhline()으로 보조선을 그립니다. matplotlib의 모든 기능을 활용하여 출판 품질의 그래프를 만들 수 있습니다.
+    SymPy 플롯의 기능이 부족할 때는 matplotlib과 직접 연동합니다. lambdify로 SymPy 수식을 numpy 함수로 바꾸면 matplotlib의 Figure와 Axes를 완전히 제어할 수 있습니다. ax.grid(True)로 격자를 추가하고, ax.annotate()로 주석을 달고, ax.axhline()으로 보조선을 그립니다. matplotlib의 모든 기능을 활용하여 출판 품질의 그래프를 만들 수 있습니다.
 
-    backend를 통해 matplotlib의 Figure와 Axes 객체에 접근할 수 있습니다. grid, annotation 등을 추가할 수 있습니다.
+    lambdify(x, expr, 'numpy')는 기호 수식을 numpy 배열을 받는 함수로 변환합니다. SymPy 내부 백엔드에 의존하지 않아 버전 변화에도 안정적입니다.
   tips:
-  - backend를 통해 matplotlib의 Figure와 Axes 객체에 접근할 수 있습니다. grid, annotation 등을 추가할 수 있습니다.
+  - lambdify로 numpy 함수를 만든 뒤 plt.subplots()로 직접 그리면 축/주석/보조선을 자유롭게 추가할 수 있습니다.
   snippet: |-
-    p6 = plot(x**2, (x, -3, 3), show=False)
-    backend = p6.backend(p6)
-    backend.process_series()
-    fig = backend.fig
-    ax = backend.ax[0]
+    import numpy as np
+    from sympy import lambdify
+
+    f = lambdify(x, x**2, 'numpy')
+    xs = np.linspace(-3, 3, 200)
+
+    fig, ax = plt.subplots()
+    ax.plot(xs, f(xs))
     ax.set_title('Parabola with Matplotlib')
     ax.grid(True)
     fig
   exercise:
     prompt: 5단계. Matplotlib 연동 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
-      p6 = plot(x**2, (x, -3, 3), show=False)
-      backend = p6.backend(p6)
-      backend.process_series()
-      fig = backend.fig
-      ax = backend.ax[0]
+      import numpy as np
+      from sympy import lambdify
+
+      f = lambdify(x, x**2, 'numpy')
+      xs = np.linspace(-3, 3, 200)
+
+      fig, ax = plt.subplots()
+      ax.plot(xs, f(xs))
       ax.set_title('Parabola with Matplotlib')
       ax.grid(True)
       fig

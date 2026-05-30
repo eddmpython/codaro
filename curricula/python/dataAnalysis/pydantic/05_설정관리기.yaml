@@ -62,13 +62,13 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
-    import pydantic
-    import pydantic_settings
+    from pydantic import BaseModel, Field, SecretStr, field_validator
+    from pydantic_settings import BaseSettings, SettingsConfigDict
   exercise:
-    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    prompt: 라이브러리 로드 예제에서 import한 이름이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: |-
-      import pydantic
-      import pydantic_settings
+      from pydantic import BaseModel, Field, SecretStr, field_validator
+      from pydantic_settings import BaseSettings, SettingsConfigDict
     hints:
     - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
     - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
@@ -122,6 +122,8 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
+    import os
+
     os.environ["APPNAME"] = "ProductionApp"
     os.environ["DEBUG"] = "true"
     os.environ["PORT"] = "9000"
@@ -131,6 +133,8 @@ sections:
   exercise:
     prompt: 환경변수 연동 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
+      import os
+
       os.environ["APPNAME"] = "ProductionApp"
       os.environ["DEBUG"] = "true"
       os.environ["PORT"] = "9000"

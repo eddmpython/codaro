@@ -8,7 +8,7 @@ meta:
   packages:
   - matplotlib
   - numpy
-  - opencv-python
+  - opencv-contrib-python
   tags:
   - opencv
   - 종합프로젝트
@@ -295,6 +295,8 @@ sections:
   tips:
   - 다른 영상 추가는 5단계 합성 영상 코드 패턴을 그대로 활용하면 됩니다.
   snippet: |-
+    seqB, centersB, figB = trackAndReport(diagonalPath, (20, 20, 40, 40))
+
     fig = plt.figure(figsize=(8, 3))
     plt.plot(centersA[:, 0], label='video1 x')
     plt.plot(centersB[:, 0], label='video2 x')

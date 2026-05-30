@@ -279,6 +279,14 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
+    diameter = nx.diameter(G)
+    avgPath = nx.average_shortest_path_length(G)
+    avgClustering = nx.average_clustering(G)
+    transitivity = nx.transitivity(G)
+    modularity = nx.community.modularity(G, commList)
+    artPoints = list(nx.articulation_points(G))
+    bridges = list(nx.bridges(G))
+
     report = {
         'Basic Stats': {
             'Nodes': numNodes,
@@ -307,6 +315,14 @@ sections:
   exercise:
     prompt: 9단계. 분석 리포트 예제에서 `report` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
+      diameter = nx.diameter(G)
+      avgPath = nx.average_shortest_path_length(G)
+      avgClustering = nx.average_clustering(G)
+      transitivity = nx.transitivity(G)
+      modularity = nx.community.modularity(G, commList)
+      artPoints = list(nx.articulation_points(G))
+      bridges = list(nx.bridges(G))
+
       report = {
           'Basic Stats': {
               'Nodes': numNodes,

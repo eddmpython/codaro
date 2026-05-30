@@ -243,6 +243,11 @@ sections:
   tips:
   - 비교 실험을 자주 만들수록 알고리즘을 제대로 선택할 수 있습니다.
   snippet: |-
+    hardMat = cv2.getRotationMatrix2D((w / 2, h / 2), angle=30, scale=1.0)
+    hardWarped = cv2.warpAffine(china, hardMat, (w, h))
+    grayHard = cv2.cvtColor(hardWarped, cv2.COLOR_RGB2GRAY)
+    kpHard, descHard = orb.detectAndCompute(grayHard, mask=None)
+
     bfTest = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
     easyKnn = bfTest.knnMatch(descA, descB, k=2)
     hardKnn = bfTest.knnMatch(descA, descHard, k=2)
