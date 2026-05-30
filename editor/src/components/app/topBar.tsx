@@ -9,12 +9,14 @@ import {
   PanelRightClose,
   PanelRightOpen,
   Play,
+  Star,
   XCircle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
@@ -76,6 +78,17 @@ export function TopBar({
       )}
 
       <div className="relative z-10 flex shrink-0 items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild className="h-6 gap-1 px-2 text-[11px] [&_svg]:size-3" size="sm" variant="outline">
+              <a aria-label={t("topbar.githubStar")} href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
+                <Star className="fill-amber-400 text-amber-400" />
+                <span className="hidden sm:inline">{t("topbar.githubStar")}</span>
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t("topbar.githubStar")}</TooltipContent>
+        </Tooltip>
         {showStatusNotice && onCopyDiagnosticExport ? (
           <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
         ) : null}

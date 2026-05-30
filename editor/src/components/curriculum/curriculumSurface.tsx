@@ -3,8 +3,10 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
+  Coffee,
   Copy,
   GraduationCap,
+  Heart,
   Layers3,
   Lightbulb,
   ListChecks,
@@ -14,6 +16,7 @@ import {
   Play,
   RefreshCw,
   Sparkles,
+  Star,
   Target,
   TerminalSquare,
 } from "lucide-react";
@@ -33,6 +36,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { codaroApi } from "@/lib/api";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
+import { CODARO_LINKS } from "@/lib/externalLinks";
+import { useLocale } from "@/lib/localeContext";
 import { useWidgetSession } from "@/lib/widgetSession";
 import { CheckResultPanel } from "./checkResultPanel";
 import { PredictCard, type LearnerPrediction } from "./predictCard";
@@ -158,9 +163,53 @@ export function CurriculumView({
               />
             ))}
           </div>
+
+          <CurriculumSupportFooter />
         </div>
       </div>
     </ScrollArea>
+  );
+}
+
+function CurriculumSupportFooter() {
+  const { t } = useLocale();
+  return (
+    <footer
+      className="mt-2 rounded-md border bg-card/60 px-4 py-4 text-card-foreground"
+      data-curriculum-support="true"
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-500">
+            <Heart className="size-4" />
+          </span>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold">{t("support.title")}</div>
+            <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{t("support.message")}</p>
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+            <a href={CODARO_LINKS.buyMeACoffee} rel="noreferrer noopener" target="_blank">
+              <Coffee className="size-3.5" />
+              {t("support.buyMeACoffee")}
+            </a>
+          </Button>
+          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+            <a href={CODARO_LINKS.githubSponsors} rel="noreferrer noopener" target="_blank">
+              <Heart className="size-3.5" />
+              {t("support.githubSponsors")}
+            </a>
+          </Button>
+          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+            <a href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
+              <Star className="size-3.5" />
+              {t("support.star")}
+            </a>
+          </Button>
+        </div>
+      </div>
+    </footer>
   );
 }
 
