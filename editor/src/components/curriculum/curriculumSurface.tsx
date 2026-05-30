@@ -325,6 +325,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   const [error, setError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [hasChecked, setHasChecked] = useState(false);
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
@@ -350,11 +351,13 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
       setInstalledPackages([]);
       setError(null);
       setLastMessage(null);
+      setHasChecked(false);
       return undefined;
     }
 
     async function refreshPackages() {
       setChecking(true);
+      setHasChecked(false);
       setError(null);
       try {
         const packages = await codaroApi.packagesList();
@@ -362,7 +365,10 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
       } catch (refreshError) {
         if (!cancelled) setError(errorText(refreshError));
       } finally {
-        if (!cancelled) setChecking(false);
+        if (!cancelled) {
+          setChecking(false);
+          setHasChecked(true);
+        }
       }
     }
 
@@ -372,7 +378,13 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
     };
   }, [apiOnline, requiredPackages]);
 
+  const allInstalledVerified = apiOnline && hasChecked && missingPackages.length === 0;
+
   if (!requiredPackages.length) return null;
+  // 필요한 라이브러리가 모두 설치된 것이 확인되면 패널을 감춘다. 설치 진행/오류는 계속 노출한다.
+  if (allInstalledVerified && !installProgress && !error) return null;
+  // 온라인에서 첫 점검이 끝나기 전에는 깜빡임을 막기 위해 감춘다(오프라인은 안내를 유지).
+  if (apiOnline && !hasChecked && !installProgress && !error) return null;
 
   const copyCommand = async () => {
     try {
