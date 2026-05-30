@@ -28,7 +28,7 @@ Diagnostic export는 지원을 빠르게 하기 위한 redacted payload입니다
 - `sk-...` 형식의 key
 - 사용자의 파일 원문이나 private notebook content
 
-이 계약은 `diagnostic-summary-contract` gate와 `public-readiness-audit` gate가 검증합니다.
+이 계약은 `diagnostic-summary-contract` gate가 검증합니다.
 
 ## User Control
 

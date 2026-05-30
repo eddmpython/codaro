@@ -46,7 +46,7 @@ codaro/
 └── tests/            # pytest suites, verifiers, gate runner
 ```
 
-Root files are limited to package metadata, public project documents, local entry pointers, and release readiness scorecards. Examples are `README.md`, `pyproject.toml`, `uv.lock`, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `CLAUDE.md`, and `AGENTS.md`.
+Root files are limited to package metadata and public project documents. Examples are `README.md`, `pyproject.toml`, `uv.lock`, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `CLAUDE.md`, and `AGENTS.md`.
 
 ## Local And Generated Roots
 

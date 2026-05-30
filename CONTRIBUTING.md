@@ -31,9 +31,8 @@ cargo check --manifest-path launcher/codaro-launcher/Cargo.toml
 | Editor UI | `uv run python -X utf8 tests/run.py gate editor-build` |
 | Landing/docs | `uv run python -X utf8 tests/run.py gate landing-build` |
 | Launcher/release | `uv run python -X utf8 tests/run.py gate install-launcher-smoke` |
-| 공개 준비 기준 | `uv run python -X utf8 tests/run.py gate public-readiness-audit` |
 
-릴리즈 판단 전에는 `quality-cycle`, `objective-nineplus-audit`, `public-readiness-audit`가 같은 clean HEAD에서 통과해야 합니다.
+릴리즈 판단 전에는 `quality-cycle`이 clean HEAD에서 통과해야 합니다.
 
 ## Coding Rules
 

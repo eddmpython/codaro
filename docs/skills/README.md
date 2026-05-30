@@ -125,8 +125,6 @@ Release:
 - [git-and-release](ops/release/git-and-release.md)
 - [licensing](ops/release/licensing.md)
 - [packaging](ops/release/packaging.md)
-- [public-release](ops/release/public-release.md)
-- [launch-playbook](ops/release/launch-playbook.md)
 
 Product:
 

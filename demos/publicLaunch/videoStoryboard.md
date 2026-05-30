@@ -63,7 +63,6 @@
 
 화면:
 
-- `publicReadinessChecklist.md`
 - `SECURITY.md`
 - `PRIVACY.md`
 - gate command output 일부

@@ -70,5 +70,3 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 ## 관련 gate
 
 `dogfood-alpha-audit`는 문서와 코드에 9단계 완주 경로, provider/OAuth 복구, live provider smoke, 학습카드 완주 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다.
-
-`learning-goal-audit`는 최종 묶음 gate다. `dogfood-alpha-audit`, `product-quality-audit`, 명시 요구사항 audit, readiness, backend, landing build를 한 번에 묶어 "부분 gate는 통과했지만 제품 품질 증거가 빠진" 상태를 막는다.

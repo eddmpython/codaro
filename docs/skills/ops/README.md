@@ -37,8 +37,6 @@ Git, 릴리즈, 라이선스, 패키징처럼 외부 배포와 권리 경계에 
 - [git-and-release](release/git-and-release.md)
 - [licensing](release/licensing.md)
 - [packaging](release/packaging.md)
-- [public-release](release/public-release.md)
-- [launch-playbook](release/launch-playbook.md)
 
 ## Product
 

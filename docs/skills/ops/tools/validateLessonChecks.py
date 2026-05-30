@@ -85,9 +85,9 @@ async def _evaluateSection(
     starterCode = _normalizeCode(exercise.starterCode)
     solutionCode = _normalizeCode(exercise.solution)
 
-    # Prewarm: execute the section's solution as its OWN block so any variables
-    # it defines persist into subsequent sections' checks. Without this, the
-    # checker's fixed `_check_noerr` blockId would overwrite prior state.
+    # Prewarm: execute the section's solution as its OWN block. Prior sections'
+    # variables stay in `session` registry across sections (each section uses
+    # unique `_warm_{id}` blockId), so this section can see them.
     if solutionCode:
         prewarmResult = await session.execute(solutionCode, blockId=f"_warm_{section.id}")
         if prewarmResult.status == "error":
