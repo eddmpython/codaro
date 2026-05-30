@@ -19,9 +19,12 @@ def main() -> int:
 
     indexHtml = BUILD / "index.html"
     if not indexHtml.is_file():
-        failures.append("webBuild/index.html missing — run 'npm run build' in editor/")
-        print("\n".join(f"FAIL: {item}" for item in failures), file=sys.stderr)
-        return 1
+        # webBuild는 editor 빌드 산출물(gitignore)이라, editor를 빌드하지 않는 환경(예: CI의
+        # backend job)에는 검증 대상이 존재하지 않는다. Playwright 게이트와 동일하게 graceful
+        # skip 한다. webBuild가 있는 환경(로컬 preflight, editor 빌드 후)에서는 아래 전체 PWA
+        # 자산 검증을 그대로 수행한다.
+        print("SKIP: webBuild/index.html 없음 — editor 빌드 산출물이 없어 PWA 자산 검증을 건너뜀")
+        return 0
 
     html = indexHtml.read_text(encoding="utf-8")
     if "manifest.webmanifest" not in html and "manifest.json" not in html:
