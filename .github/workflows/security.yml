@@ -7,16 +7,19 @@ on:
   schedule:
     - cron: "17 3 * * 1"
 
+# scorecard publish_results는 top-level 권한이 read-only여야 한다(scorecard-action
+# workflow-restrictions). write 권한은 그것이 필요한 job-level에서만 선언한다.
 permissions:
   contents: read
-  security-events: write
-  actions: read
-  id-token: write
 
 jobs:
   codeql:
     name: CodeQL
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     strategy:
       fail-fast: false
       matrix:
