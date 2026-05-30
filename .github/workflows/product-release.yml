@@ -153,6 +153,20 @@ jobs:
           }
           New-Item -ItemType Directory -Force -Path $pythonStage | Out-Null
           Copy-Item -Path (Join-Path $runtimeRoot "*") -Destination $pythonStage -Recurse -Force
+          # codaro 백엔드 런타임 의존성을 런타임에 사전 설치한다. launcher provision은 codaro wheel을
+          # --no-deps로(오프라인) 설치하므로, 런타임이 fastapi/pydantic/uvicorn 등 코어 의존성을 제공하지
+          # 않으면 백엔드가 ModuleNotFoundError로 기동에 실패한다. uv.lock 고정 버전을 export 해 uv-managed
+          # 런타임에 --break-system-packages로 설치한다. (커리큘럼 레슨용 무거운 라이브러리는 런타임에
+          # 넣지 않고, 앱의 준비물 카드가 필요 시 설치한다.)
+          $runtimePython = Join-Path $pythonStage "python.exe"
+          & $runtimePython -m ensurepip --upgrade | Out-Null
+          $depsFile = Join-Path $env:RUNNER_TEMP "codaro-backend-deps.txt"
+          uv export --no-dev --no-emit-project --no-hashes --output-file $depsFile
+          if ($LASTEXITCODE -ne 0) { throw "uv export of backend dependencies failed" }
+          & $runtimePython -m pip install --break-system-packages --disable-pip-version-check --no-warn-script-location -r $depsFile
+          if ($LASTEXITCODE -ne 0) { throw "failed to pre-install backend dependencies into runtime" }
+          & $runtimePython -c "import fastapi, pydantic, uvicorn, yaml, requests; print('runtime backend deps verified')"
+          if ($LASTEXITCODE -ne 0) { throw "runtime backend dependency verification failed" }
           New-Item -ItemType Directory -Force -Path "launcher/target/release" | Out-Null
           $runtimeArchive = "launcher/target/release/$($env:PYTHON_RUNTIME_ASSET)"
           Compress-Archive -Path (Join-Path $stage "python") -DestinationPath $runtimeArchive -Force
