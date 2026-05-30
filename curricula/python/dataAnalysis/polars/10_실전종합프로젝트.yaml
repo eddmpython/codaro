@@ -113,6 +113,20 @@ sections:
         "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0],
         "country": ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "Korea", "USA", "USA"]
     })
+
+    dfActors = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kangho", "Robert Pattinson", "Timothee Chalamet"],
+        "fee": [50, 25, 10, 20, 5, 30, 25, 2, 15, 12]
+    })
+
+    dfRevenue = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "budget": [220, 200, 237, 55, 150, 160, 165, 11, 185, 165],
+        "boxOffice": [1518, 2200, 2847, 1074, 1280, 829, 677, 258, 770, 401],
+        "releaseDate": ["2012-05-04", "1997-12-19", "2009-12-18", "2019-10-04", "2013-11-27", "2010-07-16", "2014-11-07", "2019-05-30", "2022-03-04", "2021-10-22"]
+    })
+
     dfMovies
   exercise:
     prompt: 2단계. 데이터 생성 및 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
@@ -127,6 +141,20 @@ sections:
           "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0],
           "country": ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "Korea", "USA", "USA"]
       })
+
+      dfActors = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kangho", "Robert Pattinson", "Timothee Chalamet"],
+          "fee": [50, 25, 10, 20, 5, 30, 25, 2, 15, 12]
+      })
+
+      dfRevenue = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "budget": [220, 200, 237, 55, 150, 160, 165, 11, 185, 165],
+          "boxOffice": [1518, 2200, 2847, 1074, 1280, 829, 677, 258, 770, 401],
+          "releaseDate": ["2012-05-04", "1997-12-19", "2009-12-18", "2019-10-04", "2013-11-27", "2010-07-16", "2014-11-07", "2019-05-30", "2022-03-04", "2021-10-22"]
+      })
+
       dfMovies
     hints:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
@@ -185,7 +213,12 @@ sections:
         on="movieId",
         how="left"
     )
-    dfMovieActor
+    dfFull = dfMovieActor.join(
+        dfRevenue,
+        on="movieId",
+        how="left"
+    )
+    dfFull
   exercise:
     prompt: 4단계. 데이터 결합 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
@@ -194,7 +227,12 @@ sections:
           on="movieId",
           how="left"
       )
-      dfMovieActor
+      dfFull = dfMovieActor.join(
+          dfRevenue,
+          on="movieId",
+          how="left"
+      )
+      dfFull
     hints:
     - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
     - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
@@ -220,7 +258,13 @@ sections:
         pl.col("releaseDate").dt.year().alias("releaseYear"),
         pl.col("releaseDate").dt.month().alias("releaseMonth")
     ])
-    dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth"])
+    dfFull = dfFull.with_columns(
+        pl.when(pl.col("roi") >= 500).then(pl.lit("대박"))
+        .when(pl.col("roi") >= 200).then(pl.lit("성공"))
+        .when(pl.col("roi") >= 0).then(pl.lit("보통"))
+        .otherwise(pl.lit("실패")).alias("successLevel")
+    )
+    dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth", "successLevel"])
   exercise:
     prompt: 5단계. 파생 컬럼 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
     starterCode: |-
@@ -229,7 +273,13 @@ sections:
           pl.col("releaseDate").dt.year().alias("releaseYear"),
           pl.col("releaseDate").dt.month().alias("releaseMonth")
       ])
-      dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth"])
+      dfFull = dfFull.with_columns(
+          pl.when(pl.col("roi") >= 500).then(pl.lit("대박"))
+          .when(pl.col("roi") >= 200).then(pl.lit("성공"))
+          .when(pl.col("roi") >= 0).then(pl.lit("보통"))
+          .otherwise(pl.lit("실패")).alias("successLevel")
+      )
+      dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth", "successLevel"])
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
