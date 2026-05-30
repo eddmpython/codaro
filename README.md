@@ -11,9 +11,15 @@
 <sub><em>코다로(Codaro) — "코드 아로?" "코드 아로~" 코드와 친해지자는 말장난에서 시작한 이름입니다.</em></sub>
 
 <p>
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Download CodaroLauncher.exe" src="https://img.shields.io/badge/Download-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Windows 다운로드 — CodaroLauncher.exe" src="https://img.shields.io/badge/Windows_다운로드-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="36" /></a>
+  &nbsp;&nbsp;
+  <a href="https://buymeacoffee.com/eddmpython"><img alt="Buy me a coffee" src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=18181b" height="36" /></a>
+</p>
+
+<p>
   <a href="https://github.com/eddmpython/codaro/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/eddmpython/codaro?style=for-the-badge&label=Release&labelColor=18181b&color=18181b&logo=github&logoColor=white" /></a>
   <a href="https://github.com/eddmpython/codaro/actions/workflows/product-release.yml"><img alt="Release build" src="https://img.shields.io/github/actions/workflow/status/eddmpython/codaro/product-release.yml?style=for-the-badge&label=Build&labelColor=18181b&logo=github&logoColor=white" /></a>
+  <a href="https://github.com/sponsors/eddmpython"><img alt="GitHub Sponsors" src="https://img.shields.io/badge/Sponsor-eddmpython-ea4aaa?style=for-the-badge&labelColor=18181b&logo=githubsponsors&logoColor=white" /></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Non--Commercial_1.0-7c3aed?style=for-the-badge&labelColor=18181b" /></a>
 </p>
 
