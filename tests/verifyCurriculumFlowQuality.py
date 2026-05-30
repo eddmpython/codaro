@@ -74,6 +74,9 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
     importedPackages = inferImportedPackages(content)
     declaredPackages = uniquePackages(meta.get("packages"))
     declaredNormalized = {normalizePackageName(item) for item in declaredPackages}
+    # opencv-contrib-python is a superset of opencv-python, so it satisfies cv2 imports.
+    if "opencv-contrib-python" in declaredNormalized:
+        declaredNormalized.add("opencv-python")
     missingPackages = [package for package in importedPackages if normalizePackageName(package) not in declaredNormalized]
     expansionCount = countBlocks(content, "expansion") + structuredPracticeCount(content)
     codeCount = countBlocks(content, "code") + structuredCodeCount(content)
