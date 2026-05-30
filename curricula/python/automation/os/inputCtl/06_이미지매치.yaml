@@ -143,7 +143,7 @@ sections:
     subtitle: pyautogui.locate()
     goal: pyautogui.locate(needle, haystack)으로 needle을 haystack 안에서 찾고 Box의 좌표가 자른 위치와 일치하는지 확인한다.
     why: 자동화는 화면 안 특정 요소를 좌표로 잡아야 클릭이나 입력 위치를 정할 수 있어 이미지 매치가 핵심 도구다.
-    explanation: pyautogui.locate(needle, haystack)는 Box(left, top, width, height) namedtuple을 돌려주며 매치가 없으면 None이 돌아온다. Box.left와 top은 needle을 찾은 좌표다. 합성 이미지처럼 정확한 매치가 보장되면 Box가 반드시 돌아온다.
+    explanation: pyautogui.locate(needle, haystack)는 Box(left, top, width, height) namedtuple을 돌려준다. 최신 pyautogui는 매치가 없으면 None 대신 pyautogui.ImageNotFoundException을 던지므로, 실패 가능성이 있으면 try/except로 감싼다. Box.left와 top은 needle을 찾은 좌표다. 합성 이미지처럼 정확한 매치가 보장되면 Box가 반드시 돌아온다.
     tips:
       - locate는 needle과 haystack 모두 PIL.Image 객체로 받을 수 있다.
       - 실제 자동화에서는 locateOnScreen이 화면에서 직접 찾는다.
@@ -200,7 +200,7 @@ sections:
     subtitle: Box를 dict로
     goal: 매치 결과 Box를 dict로 변환해 found, left, top, width, height 키를 가진 자동화 보고를 만든다.
     why: 종합 매치 보고는 자동화가 어떤 좌표에서 요소를 찾았는지 운영자가 한눈에 검토하게 만들고 매치 실패도 명확히 드러낸다.
-    explanation: locateOrReport 함수는 needle과 haystack을 받아 pyautogui.locate를 호출하고 결과 Box를 dict로 풀어 돌려준다. 매치가 없으면 found 키를 False로, 좌표 키들은 None으로 채워 호출 측이 단일 형태로 분기할 수 있다. 같은 함수는 매치 성공과 실패 모두 안전한 dict 구조를 보장한다.
+    explanation: locateOrReport 함수는 needle과 haystack을 받아 pyautogui.locate를 호출하고 결과 Box를 dict로 풀어 돌려준다. 매치가 없으면 pyautogui가 ImageNotFoundException을 던지므로 try/except로 잡아 box를 None으로 두고, found 키를 False로, 좌표 키들은 None으로 채워 호출 측이 단일 형태로 분기할 수 있다. 같은 함수는 매치 성공과 실패 모두 안전한 dict 구조를 보장한다.
     tips:
       - 보고 dict의 found 키는 자동화 분기의 표준 신호다.
       - 매치 실패 시 좌표 키를 None으로 두면 다음 단계 코드가 단순해진다.
@@ -210,7 +210,10 @@ sections:
 
 
       def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
-          box = pyautogui.locate(needle, haystack)
+          try:
+              box = pyautogui.locate(needle, haystack)
+          except pyautogui.ImageNotFoundException:
+              box = None
           if box is None:
               return {"found": False, "left": None, "top": None, "width": None, "height": None}
           return {
@@ -241,7 +244,10 @@ sections:
 
 
         def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
-            box = pyautogui.locate(needle, haystack)
+            try:
+                box = pyautogui.locate(needle, haystack)
+            except pyautogui.ImageNotFoundException:
+                box = None
             if box is None:
                 return {"found": False, "left": None, "top": None, "width": None, "height": None}
             return {
@@ -267,7 +273,10 @@ sections:
 
 
         def locateOrReport(needle: Image.Image, haystack: Image.Image) -> dict:
-            box = pyautogui.locate(needle, haystack)
+            try:
+                box = pyautogui.locate(needle, haystack)
+            except pyautogui.ImageNotFoundException:
+                box = None
             if box is None:
                 return {"found": False, "left": None, "top": None, "width": None, "height": None}
             return {

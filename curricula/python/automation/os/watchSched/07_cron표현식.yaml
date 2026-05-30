@@ -227,13 +227,13 @@ sections:
 
 
       utc = ZoneInfo("UTC")
-      summary = previewTriggers(datetime(2024, 9, 1, 11, 0, tzinfo=utc))
+      summary = previewTriggers(datetime(2024, 9, 1, 11, 5, tzinfo=utc))
 
       assert summary["cron"] == datetime(2024, 9, 1, 12, 0, tzinfo=utc)
       assert summary["interval"] == datetime(2024, 9, 1, 11, 10, tzinfo=utc)
       summary
     exercise:
-      prompt: previewTriggers에 2024-09-01 09:00 UTC를 넘기면 cron이 12시, interval이 09시 10분이 되는지 종합 검증하세요.
+      prompt: previewTriggers에 2024-09-01 09:05 UTC를 넘기면 cron이 12시, interval이 09시 10분이 되는지 종합 검증하세요.
       starterCode: |-
         from datetime import datetime
         from zoneinfo import ZoneInfo
@@ -252,7 +252,7 @@ sections:
 
 
         utc = ZoneInfo("UTC")
-        summary = previewTriggers(datetime(2024, 9, 1, ___, 0, tzinfo=utc))
+        summary = previewTriggers(datetime(2024, 9, 1, ___, 5, tzinfo=utc))
 
         assert summary["cron"] == datetime(2024, 9, 1, 12, 0, tzinfo=utc)
         assert summary["interval"] == datetime(2024, 9, 1, 9, 10, tzinfo=utc)
@@ -275,7 +275,7 @@ sections:
 
 
         utc = ZoneInfo("UTC")
-        summary = previewTriggers(datetime(2024, 9, 1, 9, 0, tzinfo=utc))
+        summary = previewTriggers(datetime(2024, 9, 1, 9, 5, tzinfo=utc))
 
         assert summary["cron"] == datetime(2024, 9, 1, 12, 0, tzinfo=utc)
         assert summary["interval"] == datetime(2024, 9, 1, 9, 10, tzinfo=utc)
