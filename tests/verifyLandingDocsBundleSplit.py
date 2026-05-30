@@ -225,7 +225,7 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
         "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
         "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
         "Python 학습과 개인 자동화 스튜디오 - Codaro",
-        'rel="canonical" href="https://eddmpython.github.io/codaro"',
+        'rel="canonical" href="https://eddmpython.github.io/codaro/"',
     ):
         if needle not in text:
             missing.append(f"built index missing {needle}")
