@@ -659,6 +659,101 @@ export const docsPages = [
     "contentModule": "page5394c7b8fa83"
   },
   {
+    "path": "skills/learning/debugging-patterns",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns"
+    ],
+    "title": "디버깅 패턴",
+    "description": "학습자가 자주 만나는 Python 에러 클래스별 '먼저 해볼 3가지' 가이드 카탈로그.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 900,
+    "url": "/codaro/docs/skills/learning/debugging-patterns",
+    "contentModule": "page0929dae4aeb5"
+  },
+  {
+    "path": "skills/learning/debugging-patterns/KeyError",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns",
+      "KeyError"
+    ],
+    "title": "KeyError 디버깅 패턴",
+    "description": "딕셔너리에 없는 키를 호출했을 때의 진단 순서.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 901,
+    "url": "/codaro/docs/skills/learning/debugging-patterns/KeyError",
+    "contentModule": "pagefc96a05f3bc0"
+  },
+  {
+    "path": "skills/learning/debugging-patterns/IndexError",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns",
+      "IndexError"
+    ],
+    "title": "IndexError 디버깅 패턴",
+    "description": "시퀀스 길이를 넘는 인덱스를 호출했을 때의 진단.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 902,
+    "url": "/codaro/docs/skills/learning/debugging-patterns/IndexError",
+    "contentModule": "pagefcbaeebe5c0c"
+  },
+  {
+    "path": "skills/learning/debugging-patterns/NameError",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns",
+      "NameError"
+    ],
+    "title": "NameError 디버깅 패턴",
+    "description": "정의/import 전에 이름을 사용했을 때의 진단.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 903,
+    "url": "/codaro/docs/skills/learning/debugging-patterns/NameError",
+    "contentModule": "page56ae5f62d335"
+  },
+  {
+    "path": "skills/learning/debugging-patterns/TypeError",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns",
+      "TypeError"
+    ],
+    "title": "TypeError 디버깅 패턴",
+    "description": "자료형·함수 시그니처 불일치 진단.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 904,
+    "url": "/codaro/docs/skills/learning/debugging-patterns/TypeError",
+    "contentModule": "page1cb36520a923"
+  },
+  {
+    "path": "skills/learning/debugging-patterns/AttributeError",
+    "slugSegments": [
+      "skills",
+      "learning",
+      "debugging-patterns",
+      "AttributeError"
+    ],
+    "title": "AttributeError 디버깅 패턴",
+    "description": "객체에 없는 속성/메서드를 호출했을 때의 진단.",
+    "section": "reference",
+    "sectionLabel": "reference",
+    "order": 905,
+    "url": "/codaro/docs/skills/learning/debugging-patterns/AttributeError",
+    "contentModule": "page4a818399cff6"
+  },
+  {
     "path": "skills",
     "slugSegments": [
       "skills"

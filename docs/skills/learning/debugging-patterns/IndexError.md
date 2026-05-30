@@ -1,3 +1,10 @@
+---
+title: IndexError 디버깅 패턴
+description: 시퀀스 길이를 넘는 인덱스를 호출했을 때의 진단.
+section: reference
+order: 902
+---
+
 # IndexError 디버깅 패턴
 
 `IndexError: list index out of range` 는 시퀀스(list/tuple/문자열)의 길이를 넘는

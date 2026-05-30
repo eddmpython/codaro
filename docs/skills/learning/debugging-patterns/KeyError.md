@@ -1,3 +1,10 @@
+---
+title: KeyError 디버깅 패턴
+description: 딕셔너리에 없는 키를 호출했을 때의 진단 순서.
+section: reference
+order: 901
+---
+
 # KeyError 디버깅 패턴
 
 `KeyError: '...'` 는 딕셔너리에 없는 키를 `d['...']` 또는 `d.pop('...')` 같이 호출했을 때

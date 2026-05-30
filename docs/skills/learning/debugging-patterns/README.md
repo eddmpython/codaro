@@ -1,3 +1,10 @@
+---
+title: 디버깅 패턴
+description: 학습자가 자주 만나는 Python 에러 클래스별 '먼저 해볼 3가지' 가이드 카탈로그.
+section: reference
+order: 900
+---
+
 # 디버깅 패턴
 
 학습자가 자주 마주치는 Python 에러 클래스별로 **"먼저 해볼 3가지"** 를 정리한다.

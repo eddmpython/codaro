@@ -1,3 +1,10 @@
+---
+title: TypeError 디버깅 패턴
+description: 자료형·함수 시그니처 불일치 진단.
+section: reference
+order: 904
+---
+
 # TypeError 디버깅 패턴
 
 `TypeError: unsupported operand type(s) for ...` / `... takes N positional arguments but M were given`

@@ -1,3 +1,10 @@
+---
+title: NameError 디버깅 패턴
+description: 정의/import 전에 이름을 사용했을 때의 진단.
+section: reference
+order: 903
+---
+
 # NameError 디버깅 패턴
 
 `NameError: name '...' is not defined` 는 이름을 부르기 전에 정의/import 가 안 됐다는

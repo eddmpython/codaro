@@ -1,3 +1,10 @@
+---
+title: AttributeError 디버깅 패턴
+description: 객체에 없는 속성/메서드를 호출했을 때의 진단.
+section: reference
+order: 905
+---
+
 # AttributeError 디버깅 패턴
 
 `AttributeError: '...' object has no attribute '...'` 는 객체에 그 이름의 속성/메서드가
