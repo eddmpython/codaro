@@ -8,6 +8,22 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.5 - 2026-05-30
+
+Fixes the data-science worker crash that still blocked lessons in `0.0.4`. The libraries
+were bundled, but executing `import numpy`/`pandas` in a cell crashed the execution worker
+with `OpenBLAS error: Memory allocation still failed`, surfaced to the user as a worker
+restart and `EOFError`.
+
+### Fixed
+
+- Limited the BLAS/OpenMP thread pools (`OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `NUMEXPR_NUM_THREADS` = 1) and pinned matplotlib to the headless `Agg` backend in the execution worker, set before any cell imports NumPy. OpenBLAS pre-allocates per-thread buffers sized to the CPU count; in spawned worker processes (especially with several sessions open) that allocation failed and killed the worker, so every data lesson crashed. Values the user sets explicitly are preserved.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` -> all gates pass
+- Downloaded `CodaroLauncher.exe` confirmed: `import pandas`/`numpy` and a matplotlib `Agg` plot run across multiple kernel sessions without setting any environment variables, and no startup-diagnostics banner.
+
 ## 0.0.4 - 2026-05-30
 
 Makes the curriculum actually run from the downloaded launcher. The native window
