@@ -523,7 +523,7 @@ export const docsPages = [
       "git-and-release"
     ],
     "title": "Git + 릴리즈 원칙",
-    "description": "Git, commit, and release rules for Codaro changes.",
+    "description": "Git, commit, push gate, and release rules for Codaro changes.",
     "section": "ops",
     "sectionLabel": "Operations",
     "order": 305,
@@ -1327,7 +1327,7 @@ export const docsSections = [
           "git-and-release"
         ],
         "title": "Git + 릴리즈 원칙",
-        "description": "Git, commit, and release rules for Codaro changes.",
+        "description": "Git, commit, push gate, and release rules for Codaro changes.",
         "section": "ops",
         "sectionLabel": "Operations",
         "order": 305,
