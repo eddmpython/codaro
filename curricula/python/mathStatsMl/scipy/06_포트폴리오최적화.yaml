@@ -329,6 +329,10 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
+    eqRet = portfolioReturn(initWeights, returns)
+    eqRisk = portfolioRisk(initWeights, covMatrix)
+    eqSharpe = sharpeRatio(initWeights, returns, covMatrix)
+
     compareDf = pd.DataFrame({
         'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
         'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],
@@ -339,6 +343,10 @@ sections:
   exercise:
     prompt: 전략 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
+      eqRet = portfolioReturn(initWeights, returns)
+      eqRisk = portfolioRisk(initWeights, covMatrix)
+      eqSharpe = sharpeRatio(initWeights, returns, covMatrix)
+
       compareDf = pd.DataFrame({
           'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
           'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],

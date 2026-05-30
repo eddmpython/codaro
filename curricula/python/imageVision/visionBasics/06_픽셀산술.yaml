@@ -69,6 +69,8 @@ sections:
     import matplotlib.pyplot as plt
     from sklearn.datasets import load_sample_image
 
+    china = load_sample_image('china.jpg')
+
     bright = np.array([240, 250, 255], dtype=np.uint8)
     overflow = bright + np.uint8(30)
     overflow

@@ -115,6 +115,17 @@ sections:
         tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
         summary.to_excel(writer, sheet_name="summary", index=False)
 
+    workbook = load_workbook(reportPath)
+    summarySheet = workbook["summary"]
+    chart = BarChart()
+    chart.title = "시간대별 평균 팁"
+    data = Reference(summarySheet, min_col=3, min_row=1, max_row=summarySheet.max_row)
+    categories = Reference(summarySheet, min_col=1, min_row=2, max_row=summarySheet.max_row)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(categories)
+    summarySheet.add_chart(chart, "G2")
+    workbook.save(reportPath)
+
     assert reportPath.exists()
     workbook = load_workbook(reportPath)
     assert workbook.sheetnames == ["raw_data", "summary"]
@@ -124,6 +135,17 @@ sections:
       with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
           tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
           summary.to_excel(writer, sheet_name="summary", index=False)
+
+      workbook = load_workbook(reportPath)
+      summarySheet = workbook["summary"]
+      chart = BarChart()
+      chart.title = "시간대별 평균 팁"
+      data = Reference(summarySheet, min_col=3, min_row=1, max_row=summarySheet.max_row)
+      categories = Reference(summarySheet, min_col=1, min_row=2, max_row=summarySheet.max_row)
+      chart.add_data(data, titles_from_data=True)
+      chart.set_categories(categories)
+      summarySheet.add_chart(chart, "G2")
+      workbook.save(reportPath)
 
       assert reportPath.exists()
       workbook = load_workbook(reportPath)

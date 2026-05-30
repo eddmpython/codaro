@@ -263,10 +263,11 @@ sections:
   - ROI의 크기를 변수로 고정해 두면 같은 ROI를 여러 위치에 복사할 때 코드가 짧아집니다.
   snippet: |-
     swap = flower.copy()
-    top = swap[: h // 2].copy()
-    bottom = swap[h // 2:].copy()
-    swap[: h // 2] = bottom[: h // 2]
-    swap[h // 2:] = top[: bottom.shape[0]]
+    half = h // 2
+    top = swap[:half].copy()
+    bottom = swap[half:half * 2].copy()
+    swap[:half] = bottom
+    swap[half:half * 2] = top
     fig = plt.figure(figsize=(5, 4))
     plt.imshow(swap)
     plt.axis('off')

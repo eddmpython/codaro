@@ -134,6 +134,7 @@ sections:
         assert all(amount > 0 for amount in amounts)
         return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
 
+    loadedSheet = load_workbook(salesPath)["sales"]
     salesValidation = validateSalesWorksheet(loadedSheet)
     assert salesValidation["rowCount"] == 3
     salesValidation
@@ -149,6 +150,7 @@ sections:
           assert all(amount > 0 for amount in amounts)
           return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
 
+      loadedSheet = load_workbook(salesPath)["sales"]
       salesValidation = validateSalesWorksheet(loadedSheet)
       assert salesValidation["rowCount"] == 3
       salesValidation
