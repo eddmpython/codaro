@@ -32,6 +32,9 @@ jobs:
     name: Dependency Review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    # fork PR은 제한된 토큰이라 dependency review API에 접근하지 못해 "not supported"로
+    # 실패할 수 있다. 검토는 advisory로 계속 돌리되 워크플로를 실패시키지 않는다.
+    continue-on-error: true
     permissions:
       contents: read
       pull-requests: read
