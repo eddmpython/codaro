@@ -297,6 +297,7 @@ sections:
     modelRidge.fit(xTrainSc, yTrain)
     predRidge = modelRidge.predict(xTestSc)
     r2Ridge = r2_score(yTest, predRidge)
+    cvRidge = cross_val_score(modelRidge, xTrainSc, yTrain, cv=5, scoring='r2')
     f"Ridge R²: {r2Ridge:.4f}"
   exercise:
     prompt: 9단계. Ridge 회귀 예제에서 `modelRidge`, `predRidge`, `r2Ridge` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
@@ -305,6 +306,7 @@ sections:
       modelRidge.fit(xTrainSc, yTrain)
       predRidge = modelRidge.predict(xTestSc)
       r2Ridge = r2_score(yTest, predRidge)
+      cvRidge = cross_val_score(modelRidge, xTrainSc, yTrain, cv=5, scoring='r2')
       f"Ridge R²: {r2Ridge:.4f}"
     hints:
     - 바꿀 지점은 `modelRidge = ...` 오른쪽 값입니다.

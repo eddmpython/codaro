@@ -116,16 +116,24 @@ sections:
 
     le = LabelEncoder()
     yEnc = le.fit_transform(y)
-    le.classes_
+
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        X, yEnc, test_size=0.2, random_state=42, stratify=yEnc
+    )
+    xTrain.shape, xTest.shape
   exercise:
-    prompt: 2단계. 데이터 준비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 2단계. 데이터 준비 예제에서 test_size나 random_state 값을 바꾸고 분할 결과(shape)가 달라지는지 확인하세요.
     starterCode: |-
       X = sonar.drop("label", axis=1)
       y = sonar["label"]
 
       le = LabelEncoder()
       yEnc = le.fit_transform(y)
-      le.classes_
+
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          X, yEnc, test_size=0.2, random_state=42, stratify=yEnc
+      )
+      xTrain.shape, xTest.shape
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.

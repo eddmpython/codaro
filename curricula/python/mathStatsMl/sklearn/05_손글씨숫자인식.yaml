@@ -421,6 +421,7 @@ sections:
     pcaFull = PCA()
     pcaFull.fit(xTrainSc)
     cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+    nFor95 = int(np.argmax(cumVar >= 0.95) + 1)
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(range(1, 65), cumVar, 'bo-')
@@ -436,6 +437,7 @@ sections:
       pcaFull = PCA()
       pcaFull.fit(xTrainSc)
       cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+      nFor95 = int(np.argmax(cumVar >= 0.95) + 1)
 
       fig, ax = plt.subplots(figsize=(10, 5))
       ax.plot(range(1, 65), cumVar, 'bo-')

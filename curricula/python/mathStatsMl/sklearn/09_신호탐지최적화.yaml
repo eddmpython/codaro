@@ -115,12 +115,20 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    xTrain.shape, xTest.shape
+
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+    xTrainSc.shape, xTest.shape
   exercise:
-    prompt: 2단계. 데이터 준비 예제에서 `xTrain`, `xTest`, `yTrain` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: 2단계. 데이터 준비 예제에서 test_size나 random_state 값을 바꾸고 분할·스케일 결과가 맞는지 확인하세요.
     starterCode: |-
       xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-      xTrain.shape, xTest.shape
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape, xTest.shape
     hints:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
@@ -351,6 +359,10 @@ sections:
     }
     rfTotalComb = 3 * 4 * 3
     print(f"Total combinations: {rfTotalComb}")
+
+    rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
+    rfGridSearch.fit(xTrainSc, yTrain)
+    print(f"Best RF params: {rfGridSearch.best_params_}")
   exercise:
     prompt: 9단계. RandomForest 튜닝 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
@@ -361,6 +373,10 @@ sections:
       }
       rfTotalComb = 3 * 4 * 3
       print(f"Total combinations: {rfTotalComb}")
+
+      rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
+      rfGridSearch.fit(xTrainSc, yTrain)
+      print(f"Best RF params: {rfGridSearch.best_params_}")
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.

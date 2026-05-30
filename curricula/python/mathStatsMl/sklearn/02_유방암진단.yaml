@@ -244,12 +244,14 @@ sections:
     Positive)하면 안 되므로 정밀도가 더 중요합니다.
   snippet: |-
     prec = precision_score(yTest, yPred)
-    f"정밀도: {prec:.2%}"
+    rec = recall_score(yTest, yPred)
+    f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
   exercise:
-    prompt: 7단계. 정밀도와 재현율 예제에서 `prec` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: 7단계. 정밀도와 재현율 예제에서 `prec`, `rec` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
       prec = precision_score(yTest, yPred)
-      f"정밀도: {prec:.2%}"
+      rec = recall_score(yTest, yPred)
+      f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
     hints:
     - 바꿀 지점은 `prec = ...` 오른쪽 값입니다.
     - 실행 뒤 `prec` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
