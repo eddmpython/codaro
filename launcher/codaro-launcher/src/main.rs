@@ -537,10 +537,14 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     let event_loop = EventLoopBuilder::<AppEvent>::with_user_event().build();
 
-    let window = WindowBuilder::new()
+    let mut window_builder = WindowBuilder::new()
         .with_title("Codaro")
         .with_inner_size(LogicalSize::new(1280.0, 860.0))
-        .with_min_inner_size(LogicalSize::new(900.0, 640.0))
+        .with_min_inner_size(LogicalSize::new(900.0, 640.0));
+    if let Some(icon) = load_window_icon() {
+        window_builder = window_builder.with_window_icon(Some(icon));
+    }
+    let window = window_builder
         .build(&event_loop)
         .context("failed to create launcher window")?;
 
@@ -625,6 +629,22 @@ fn hide_console_window() {
             ShowWindow(hwnd, SW_HIDE);
         }
     }
+}
+
+// 창/태스크바 아이콘으로 쓰는 Codaro 아바타(256x256 RGBA PNG). exe 파일 아이콘은 build.rs가
+// 별도로 ICO를 굽고, 여기서는 실행 중 창에 보이는 아이콘을 설정한다.
+const ICON_PNG: &[u8] = include_bytes!("../assets/codaro-icon.png");
+
+fn load_window_icon() -> Option<tao::window::Icon> {
+    let decoder = png::Decoder::new(ICON_PNG);
+    let mut reader = decoder.read_info().ok()?;
+    if reader.info().color_type != png::ColorType::Rgba || reader.info().bit_depth != png::BitDepth::Eight {
+        return None;
+    }
+    let mut buffer = vec![0u8; reader.output_buffer_size()];
+    let frame = reader.next_frame(&mut buffer).ok()?;
+    buffer.truncate(frame.buffer_size());
+    tao::window::Icon::from_rgba(buffer, frame.width, frame.height).ok()
 }
 
 const LAUNCH_HTML: &str = r##"<!DOCTYPE html>

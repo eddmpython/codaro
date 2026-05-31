@@ -225,11 +225,11 @@ pub fn apply_self_update(downloaded: &Path, current_exe: &Path) -> Result<PathBu
 
 fn launcher_asset_name() -> String {
     if cfg!(target_os = "windows") {
-        "CodaroLauncher.exe".to_string()
+        "Codaro.exe".to_string()
     } else if cfg!(target_os = "macos") {
-        "CodaroLauncher-macos".to_string()
+        "Codaro-macos".to_string()
     } else {
-        "CodaroLauncher-linux".to_string()
+        "Codaro-linux".to_string()
     }
 }
 
@@ -250,7 +250,7 @@ mod tests {
         let name = launcher_asset_name();
         assert!(!name.is_empty());
         if cfg!(target_os = "windows") {
-            assert_eq!(name, "CodaroLauncher.exe");
+            assert_eq!(name, "Codaro.exe");
         }
     }
 

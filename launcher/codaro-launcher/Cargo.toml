@@ -18,6 +18,12 @@ zip = "2.4.2"
 tao = "0.33"
 wry = "0.49"
 windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_Console", "Win32_UI_WindowsAndMessaging"] }
+# 창/태스크바 아이콘으로 쓸 아바타 PNG 디코드.
+png = "0.17"
+
+[build-dependencies]
+# exe 파일 아이콘 + 버전 리소스(아바타 ICO)를 Windows 실행 파일에 굽는다.
+winresource = "0.1"
 
 [dev-dependencies]
 tempfile = "3.23.0"
