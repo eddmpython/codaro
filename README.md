@@ -26,7 +26,7 @@
 </p>
 
 <p>
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Windows 다운로드 — Codaro.exe" src="https://img.shields.io/badge/Windows%20다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="60" /></a>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Windows 다운로드 — Codaro.exe" src="assets/brand/buttons/downloadCodaro.svg" height="60" /></a>
   &nbsp;&nbsp;
   <a href="https://buymeacoffee.com/eddmpython"><img alt="Buy me a coffee — eddmpython 후원" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="60" /></a>
 </p>
