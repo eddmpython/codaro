@@ -9,6 +9,9 @@ const staticRoot = resolve(projectRoot, "landing", "static");
 
 const brandFiles = [
   ["codaro-character.png", "brand/codaro-character.png"],
+  ["work/avatar-full.png", "brand/avatar-hero.png"],
+  ["work/avatar-face.png", "brand/avatar-face.png"],
+  ["work/avatar-small.png", "brand/avatar-small.png"],
 ];
 
 for (const [sourceName, targetRelative] of brandFiles) {

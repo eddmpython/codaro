@@ -14,7 +14,7 @@ const socialLinks: Array<{
 
 export function SocialLinks() {
   return (
-    <div className="flex items-center gap-1 px-1 group-data-[collapsible=icon]:flex-col">
+    <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
       {socialLinks.map(({ label, href, Icon }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>

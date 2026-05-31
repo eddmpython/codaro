@@ -26,6 +26,9 @@ export const brand = {
   pythonRuntimeChecksumUrl:
     "https://github.com/eddmpython/codaro/releases/latest/download/python-runtime-win-x64.zip.sha256",
   get mascotUrl() { return `${basePath}/brand/codaro-character.png`; },
+  get avatarHeroUrl() { return `${basePath}/brand/avatar-hero.png`; },
+  get avatarFaceUrl() { return `${basePath}/brand/avatar-face.png`; },
+  get avatarSmallUrl() { return `${basePath}/brand/avatar-small.png`; },
   get faviconUrl() { return `${basePath}/favicon.png`; },
   appPath(path = "/") {
     const resolvedPath = path || "/";

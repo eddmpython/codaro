@@ -49,6 +49,7 @@ type MainSurfaceProps = {
   eStop: EStopStatus;
   loadState: LoadState;
   messages: AssistantMessage[];
+  notebookRunning: boolean;
   pendingBlocks: BlockConfig[];
   prompt: string;
   referenceLoading: boolean;
@@ -75,6 +76,7 @@ type MainSurfaceProps = {
   onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
+  onRunNotebook: () => void;
   onRunTask: (task: TaskDefinition) => void;
   onSelectBlock: (blockId: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
@@ -125,6 +127,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           cellHelpByBlockId={props.cellHelpByBlockId}
           document={props.document}
           drafts={props.drafts}
+          notebookRunning={props.notebookRunning}
           pendingBlocks={props.pendingBlocks}
           results={props.results}
           runningBlockId={props.runningBlockId}
@@ -137,6 +140,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           onRenameDocument={props.onRenameDocument}
           onRejectPendingBlocks={props.onRejectPendingBlocks}
           onRunBlock={props.onRunBlock}
+          onRunNotebook={props.onRunNotebook}
           onSelectBlock={props.onSelectBlock}
         />
         {props.assistantCollapsed ? null : (
@@ -210,6 +214,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         )}
       >
         <CurriculumView
+          key={`${props.selectedCategory}/${props.selectedContentId}`}
           apiOnline={props.apiOnline}
           canRun={props.canRun}
           cellHelpByBlockId={props.cellHelpByBlockId}
@@ -227,13 +232,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           renderCodeCellEditor={({ autoFocus = true, block, draft, onChange, onFocus, onRun }) => (
             <CodeCellEditor
               autoFocus={autoFocus}
-              placeholderText={
-                block.role === "snippet"
-                  ? t("cell.placeholder.snippet")
-                  : block.role === "exercise"
-                    ? "Python 코드를 입력하세요."
-                    : t("cell.placeholder.code")
-              }
+              placeholderText=""
               value={draft}
               onChange={onChange}
               onFocus={onFocus}

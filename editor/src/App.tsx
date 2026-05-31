@@ -5,8 +5,9 @@ import {
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { ProductSidebar } from "@/components/app/productSidebar";
-import { TopBar } from "@/components/app/topBar";
+import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
+import { TerminalPanel } from "@/components/terminal/terminalPanel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
@@ -176,9 +177,11 @@ function App() {
   const {
     canRun,
     currentResult,
+    notebookRunning,
     resetRuntimeState,
     results,
     runBlock,
+    runNotebook,
     runningBlockId,
     sessionId,
     setSessionId,
@@ -297,16 +300,12 @@ function App() {
     setSurface(nextSurface);
   }, [categories, selectCurriculumCategory, selectedCategory, setSurface]);
 
-  const runActiveNotebookBlock = useCallback(() => {
-    if (selectedBlock) {
-      runBlock(selectedBlock);
-    }
-  }, [runBlock, selectedBlock]);
-
   const copyDiagnosticExport = useCallback(async () => {
     const payload = await codaroApi.systemDiagnosticsExport();
     await writeClipboardText(JSON.stringify(payload, null, 2));
   }, []);
+
+  const [terminalOpen, setTerminalOpen] = useState(false);
 
   return (
     <LocaleProvider value={localeState}>
@@ -337,23 +336,20 @@ function App() {
         onDeleteCustomCurriculum={deleteCustomCurriculum}
         onSurfaceChange={selectSurface}
         onToggleTheme={toggleThemeMode}
+        terminalOpen={terminalOpen}
+        onToggleTerminal={() => setTerminalOpen((current) => !current)}
       />
 
-      <SidebarInset className="h-svh min-h-0 min-w-0 overflow-hidden">
-        <div className="flex h-full min-h-0 flex-col">
-          <TopBar
-            assistantCollapsed={assistantCollapsed}
-            canRun={canRun}
-            loadState={loadState}
-            notebookRunning={Boolean(runningBlockId)}
-            notice={notice}
-            showSidebarTrigger
-            surface={surface}
-            onCopyDiagnosticExport={copyDiagnosticExport}
-            onRunNotebook={runActiveNotebookBlock}
-            onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
-          />
-          <div className="min-h-0 flex-1">
+      <SidebarInset className="relative flex h-svh min-h-0 min-w-0 flex-col overflow-hidden">
+        <TopControls
+          assistantCollapsed={assistantCollapsed}
+          notice={notice}
+          showSidebarTrigger
+          surface={surface}
+          onCopyDiagnosticExport={copyDiagnosticExport}
+          onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
+        />
+        <div className="min-h-0 flex-1">
             <MainSurface
               aiConnecting={aiConnecting}
               aiProfile={aiProfile}
@@ -397,7 +393,9 @@ function App() {
               onRefreshAutomation={refreshAutomation}
               onRenameDocument={renameNotebookDocument}
               onOpenSharePackCurriculum={openSharePackCurriculum}
+              notebookRunning={notebookRunning}
               onRunBlock={runBlock}
+              onRunNotebook={runNotebook}
               onRunTask={runTask}
               onSelectBlock={selectBlock}
               onSelectCurriculumBlock={setSelectedCurriculumBlockId}
@@ -407,8 +405,12 @@ function App() {
               }}
               onToggleEStop={toggleEStop}
             />
-          </div>
         </div>
+        {terminalOpen ? (
+          <div className="h-72 min-h-0 shrink-0">
+            <TerminalPanel themeMode={themeMode} onClose={() => setTerminalOpen(false)} />
+          </div>
+        ) : null}
       </SidebarInset>
 
       <ProviderSettingsSheet

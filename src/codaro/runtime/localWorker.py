@@ -538,36 +538,60 @@ def _serializeDataFrame(value: object) -> dict[str, object] | None:
     valueType = type(value)
     moduleName = valueType.__module__
     typeName = valueType.__name__
-    if not moduleName.startswith("pandas"):
-        return None
 
-    frame = value
-    if typeName == "Series" and hasattr(value, "to_frame"):
+    if moduleName.startswith("pandas"):
+        frame = value
+        if typeName == "Series" and hasattr(value, "to_frame"):
+            try:
+                frame = value.to_frame()
+            except Exception:  # noqa: BLE001 — user object method
+                return None
+        if not hasattr(frame, "to_dict") or not hasattr(frame, "columns") or not hasattr(frame, "index"):
+            return None
         try:
-            frame = value.to_frame()
+            records = frame.to_dict(orient="records")
+            totalRows = len(frame)
+            columns = [str(column) for column in list(frame.columns)]
+            visibleRows = records[:200]
+            indexValues = [str(indexValue) for indexValue in list(frame.index)[: len(visibleRows)]]
         except Exception:  # noqa: BLE001 — user object method
             return None
+        return {
+            "columns": columns,
+            "rows": visibleRows,
+            "index": indexValues,
+            "totalRows": totalRows,
+            "truncated": totalRows > len(visibleRows),
+            "typeName": typeName,
+        }
 
-    if not hasattr(frame, "to_dict") or not hasattr(frame, "columns") or not hasattr(frame, "index"):
-        return None
+    if moduleName.startswith("polars"):
+        frame = value
+        if typeName == "Series" and hasattr(value, "to_frame"):
+            try:
+                frame = value.to_frame()
+            except Exception:  # noqa: BLE001 — user object method
+                return None
+        if not hasattr(frame, "to_dicts") or not hasattr(frame, "columns"):
+            return None
+        try:
+            records = frame.to_dicts()
+            totalRows = len(frame)
+            columns = [str(column) for column in list(frame.columns)]
+            visibleRows = records[:200]
+            indexValues = [str(rowIndex) for rowIndex in range(len(visibleRows))]
+        except Exception:  # noqa: BLE001 — user object method
+            return None
+        return {
+            "columns": columns,
+            "rows": visibleRows,
+            "index": indexValues,
+            "totalRows": totalRows,
+            "truncated": totalRows > len(visibleRows),
+            "typeName": typeName,
+        }
 
-    try:
-        records = frame.to_dict(orient="records")
-        totalRows = len(frame)
-        columns = [str(column) for column in list(frame.columns)]
-        visibleRows = records[:200]
-        indexValues = [str(indexValue) for indexValue in list(frame.index)[: len(visibleRows)]]
-    except Exception:  # noqa: BLE001 — user object method
-        return None
-
-    return {
-        "columns": columns,
-        "rows": visibleRows,
-        "index": indexValues,
-        "totalRows": totalRows,
-        "truncated": totalRows > len(visibleRows),
-        "typeName": typeName,
-    }
+    return None
 
 
 def _serializeDescriptor(value: object) -> dict[str, object] | None:

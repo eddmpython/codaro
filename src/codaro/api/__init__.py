@@ -23,6 +23,7 @@ from .requestModels import (
 )
 from .spaRouter import createSpaRouter
 from .systemRouter import createSystemRouter
+from .terminalRouter import createTerminalRouter
 from .workspaceRouter import createWorkspaceRouter
 
 __all__ = [
@@ -51,6 +52,7 @@ __all__ = [
     "createShareRouter",
     "createSpaRouter",
     "createSystemRouter",
+    "createTerminalRouter",
     "createWorkspaceRouter",
     "fail",
     "httpExceptionHandler",

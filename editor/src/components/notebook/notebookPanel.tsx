@@ -116,6 +116,7 @@ export function NotebookPanel({
   cellHelpByBlockId,
   document,
   drafts,
+  notebookRunning,
   pendingBlocks,
   results,
   runningBlockId,
@@ -128,12 +129,14 @@ export function NotebookPanel({
   onRenameDocument,
   onRejectPendingBlocks,
   onRunBlock,
+  onRunNotebook,
   onSelectBlock,
 }: {
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
   document: CodaroDocument;
   drafts: Record<string, string>;
+  notebookRunning: boolean;
   pendingBlocks: BlockConfig[];
   results: ResultMap;
   runningBlockId: string | null;
@@ -146,18 +149,30 @@ export function NotebookPanel({
   onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
+  onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   return (
     <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-2 sm:p-3">
-      <div className="mb-2 flex min-h-8 items-center justify-end">
+      <div className="mb-2 flex min-h-8 items-center gap-2 pl-9">
         <Input
           aria-label="노트북 파일명"
-          className="h-7 w-48 rounded-md bg-background px-2 text-right font-mono text-xs"
+          className="h-7 w-48 max-w-[18rem] border-0 bg-transparent px-1 font-mono text-sm shadow-none focus-visible:ring-1"
           value={document.title}
           onBlur={(event) => onRenameDocument(normalizeNotebookFilename(event.target.value))}
           onChange={(event) => onRenameDocument(event.target.value)}
         />
+        <Button
+          aria-label="모두 실행"
+          className="ml-auto size-7 shrink-0 [&_svg]:size-3.5"
+          disabled={!canRun || notebookRunning || runningBlockId !== null}
+          size="icon"
+          title="모두 실행"
+          variant="default"
+          onClick={onRunNotebook}
+        >
+          {notebookRunning || runningBlockId !== null ? <Loader2 className="animate-spin" /> : <Play />}
+        </Button>
       </div>
       <div className="mb-1">
         <PendingNotebookBar
@@ -168,7 +183,7 @@ export function NotebookPanel({
       </div>
 
       <ScrollArea className="h-full min-h-0">
-        <div className="space-y-1 pr-2">
+        <div className="space-y-0.5 pr-2">
           {document.blocks.length ? document.blocks.map((block) => (
             <DocumentBlock
               block={block}
@@ -358,7 +373,7 @@ const aiCommentGutter = gutter({
 
 export function CodeCellEditor({
   autoFocus = false,
-  placeholderText = "Python 코드를 입력하세요.",
+  placeholderText = "",
   value,
   onChange,
   onFocus,
@@ -571,18 +586,19 @@ function DocumentBlock({
 
   if (block.type === "markdown") {
     return (
-      <section className="group grid grid-cols-[1.25rem_minmax(0,1fr)] gap-1.5 py-1 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-2" data-notebook-cell="markdown">
-        <CellInsertRail onInsertCell={onInsertCell} />
-        <div className="min-w-0">
-          <CellMetaBar
-            status={resultStatus}
-            title={cellTitle}
-            type="markdown"
-            selected={isSelected}
-            cellHelp={cellHelp}
-            onCellAsk={onCellAsk}
-            onDelete={onDelete}
-          />
+      <section className="group relative py-0.5 pl-6" data-notebook-cell="markdown">
+        <CellMetaBar
+          status={resultStatus}
+          title={cellTitle}
+          type="markdown"
+          selected={isSelected}
+          cellHelp={cellHelp}
+          onCellAsk={onCellAsk}
+          onDelete={onDelete}
+        />
+        <div className="relative min-w-0">
+          <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+          <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
           <Textarea
             className={cn(
               "min-h-24 resize-y rounded-md bg-background font-sans text-sm leading-6 shadow-sm transition-colors",
@@ -599,21 +615,22 @@ function DocumentBlock({
   }
 
   return (
-    <section className="group grid grid-cols-[1.25rem_minmax(0,1fr)] gap-1.5 py-1 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-2" data-notebook-cell="code">
-      <CellInsertRail onInsertCell={onInsertCell} />
-      <div className="min-w-0">
-        <CellMetaBar
-          canRun={canRun}
-          running={isRunning}
-          status={resultStatus}
-          title={cellTitle}
-          type="code"
-          selected={isSelected}
-          cellHelp={cellHelp}
-          onCellAsk={onCellAsk}
-          onDelete={onDelete}
-          onRun={onRun}
-        />
+    <section className="group relative py-0.5 pl-6" data-notebook-cell="code">
+      <CellMetaBar
+        canRun={canRun}
+        running={isRunning}
+        status={resultStatus}
+        title={cellTitle}
+        type="code"
+        selected={isSelected}
+        cellHelp={cellHelp}
+        onCellAsk={onCellAsk}
+        onDelete={onDelete}
+        onRun={onRun}
+      />
+      <div className="relative min-w-0">
+        <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+        <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
         <div
           className={cn(
             "overflow-hidden rounded-md border bg-code shadow-sm transition-colors",
@@ -634,17 +651,17 @@ function DocumentBlock({
             onAiCommentClick={onSelect}
           />
         </div>
-        {result ? (
-          <div className="mt-1.5">
-            <ExecutionOutput result={result} />
-          </div>
-        ) : null}
-        {isRunning && !result ? (
-          <div className="mt-1.5">
-            <LoadingInline label="셀 실행 중" />
-          </div>
-        ) : null}
       </div>
+      {result ? (
+        <div className="mt-1.5">
+          <ExecutionOutput result={result} />
+        </div>
+      ) : null}
+      {isRunning && !result ? (
+        <div className="mt-1.5">
+          <LoadingInline label="셀 실행 중" />
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -675,7 +692,7 @@ function CellMetaBar({
   const Icon = type === "code" ? TerminalSquare : MessageSquare;
 
   return (
-    <div className="mb-1 flex min-h-7 w-full min-w-0 items-center gap-2">
+    <div className="mb-0.5 flex min-h-7 w-full min-w-0 items-center gap-2">
       <div
         className={cn(
           "inline-flex min-w-0 items-center gap-1.5 px-0.5 text-left text-[11px] text-muted-foreground",
@@ -730,30 +747,19 @@ function CellMetaBar({
   );
 }
 
-function CellInsertRail({
-  onInsertCell,
-}: {
-  onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
-}) {
-  return (
-    <div className="flex min-h-full flex-col items-center justify-between py-6 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100">
-      <InsertCellButton placement="before" onInsertCell={onInsertCell} />
-      <InsertCellButton placement="after" onInsertCell={onInsertCell} />
-    </div>
-  );
-}
-
 function InsertCellButton({
   placement,
   onInsertCell,
+  className,
 }: {
   placement: "before" | "after";
   onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
+  className?: string;
 }) {
   const placementLabel = placement === "before" ? "위에" : "아래에";
 
   return (
-    <div className="group/insert relative">
+    <div className={cn("group/insert", className)}>
       <button
         aria-label={`${placementLabel} Python 셀 추가`}
         className="flex size-5 items-center justify-center rounded-full border bg-background shadow-sm hover:border-ring hover:text-foreground"

@@ -5,14 +5,13 @@ import {
   Clock3,
   Clipboard,
   ClipboardCheck,
-  Loader2,
   PanelRightClose,
   PanelRightOpen,
-  Play,
   Star,
   XCircle,
 } from "lucide-react";
 
+import { SocialLinks } from "@/components/app/socialLinks";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -20,64 +19,49 @@ import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
-import type { AppNotice, LoadState } from "@/types";
+import type { AppNotice } from "@/types";
 
-export function TopBar({
+// 탑바(전폭 헤더 바)를 제거하고 컨트롤만 floating 오버레이로 띄운다.
+// - 좌상단: 사이드바 토글
+// - 우상단: SNS 아이콘 + GitHub 스타 + (에디터/커리큘럼) 어시스턴트 패널 토글
+// - 상단 중앙: 진단/상태 알림(에러·경고일 때만)
+// 본문/우측 패널은 세로 전체를 그대로 쓰고, 헤더 바가 만들던 경계선은 사라진다.
+// 노트북 실행 버튼은 에디터 본문(NotebookPanel)으로 이동했다.
+export function TopControls({
   assistantCollapsed,
-  canRun,
-  loadState,
   notice,
   showSidebarTrigger,
   surface,
-  notebookRunning,
   onCopyDiagnosticExport,
-  onRunNotebook,
   onToggleAssistant,
 }: {
   assistantCollapsed: boolean;
-  canRun: boolean;
-  loadState: LoadState;
   notice: AppNotice;
   showSidebarTrigger: boolean;
   surface: SurfaceMode;
-  notebookRunning: boolean;
   onCopyDiagnosticExport?: () => Promise<void>;
-  onRunNotebook: () => void;
   onToggleAssistant: () => void;
 }) {
   const { t } = useLocale();
-  const isBusy = loadState === "loading" || notebookRunning;
-  const showRunNotebook = surface === "editor" && canRun;
   const showAssistantToggle = surface === "editor" || surface === "curriculum";
   const showStatusNotice = notice.tone === "error" || notice.tone === "warning";
-  const assistantDividerClass = topBarAssistantDividerClass(surface, assistantCollapsed);
-  const tocDividerClass = topBarTocDividerClass(surface, assistantCollapsed);
 
   return (
-    <header className="sticky top-0 z-20 flex h-10 min-w-0 items-center justify-between gap-1.5 bg-background/95 px-2.5 backdrop-blur">
-      {tocDividerClass ? (
-        <div aria-hidden className={cn("pointer-events-none absolute inset-y-0 hidden border-l border-border 2xl:block", tocDividerClass)} />
-      ) : null}
-      {assistantDividerClass ? (
-        <div aria-hidden className={cn("pointer-events-none absolute inset-y-0 hidden border-l border-border xl:block", assistantDividerClass)} />
-      ) : null}
-
-      <div className="relative z-10 flex min-w-0 items-center gap-2">
-        {showSidebarTrigger ? <SidebarTrigger /> : null}
-        <div className={cn("min-w-0", surface === "chat" && "sr-only")}>
-          <div className="truncate text-[13px] font-semibold leading-none">{t(`nav.${surface}`)}</div>
+    <>
+      {showSidebarTrigger ? (
+        <div className="absolute left-1.5 top-1.5 z-30">
+          <SidebarTrigger />
         </div>
-      </div>
+      ) : null}
 
       {showStatusNotice ? (
-        <div className="relative z-10 hidden min-w-0 flex-1 items-center justify-center xl:flex">
+        <div className="absolute left-1/2 top-1.5 z-20 hidden -translate-x-1/2 xl:block">
           <StatusNotice notice={notice} />
         </div>
-      ) : (
-        <div className="relative z-10 min-w-0 flex-1" />
-      )}
+      ) : null}
 
-      <div className="relative z-10 flex shrink-0 items-center gap-1">
+      <div className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5">
+        <SocialLinks />
         <Tooltip>
           <TooltipTrigger asChild>
             <Button asChild className="h-6 gap-1 px-2 text-[11px] [&_svg]:size-3" size="sm" variant="outline">
@@ -100,13 +84,8 @@ export function TopBar({
             {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
           </TopBarIconButton>
         ) : null}
-        {showRunNotebook ? (
-          <TopBarIconButton disabled={isBusy} label={t("topbar.runNotebook")} variant="default" onClick={onRunNotebook}>
-            {notebookRunning ? <Loader2 className="animate-spin" /> : <Play />}
-          </TopBarIconButton>
-        ) : null}
       </div>
-    </header>
+    </>
   );
 }
 
@@ -149,18 +128,6 @@ function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticEx
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
   );
-}
-
-function topBarAssistantDividerClass(surface: SurfaceMode, assistantCollapsed: boolean) {
-  if (assistantCollapsed) return "";
-  if (surface === "editor") return "right-[380px]";
-  if (surface === "curriculum") return "right-[360px]";
-  return "";
-}
-
-function topBarTocDividerClass(surface: SurfaceMode, assistantCollapsed: boolean) {
-  if (surface !== "curriculum") return "";
-  return assistantCollapsed ? "right-11" : "right-[404px]";
 }
 
 function TopBarIconButton({

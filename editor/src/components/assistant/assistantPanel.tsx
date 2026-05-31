@@ -15,7 +15,6 @@ import {
   IconButton,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
-import { SocialLinks } from "@/components/app/socialLinks";
 import { AssistantMarkdown } from "@/components/assistant/assistantMarkdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -621,10 +620,7 @@ function AssistantHeader({
 }) {
   const { t } = useLocale();
   return (
-    <div className="mb-3 space-y-3">
-      <div className="flex justify-end">
-        <SocialLinks />
-      </div>
+    <div className="mb-3 space-y-3 pt-9">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-sm font-semibold">

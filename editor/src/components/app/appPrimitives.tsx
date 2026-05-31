@@ -106,6 +106,7 @@ export function ExecutionOutput({
   const packageError = result.status === "package-error";
   const hasError = packageError || result.status === "error" || Boolean(result.stderr);
   const widgetDescriptor = !hasError && isWidgetDescriptor(result.data) ? result.data : null;
+  const dataframeData = !widgetDescriptor && !hasError && result.type === "dataframe" ? asDataFramePayload(result.data) : null;
   const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   return (
     <div
@@ -127,6 +128,8 @@ export function ExecutionOutput({
             descriptor={widgetDescriptor}
           />
         </div>
+      ) : dataframeData ? (
+        <DataFrameOutput data={dataframeData} />
       ) : (
       <ScrollArea className="max-h-72">
         <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
@@ -148,6 +151,63 @@ export function ExecutionOutput({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+type DataFramePayload = {
+  columns: string[];
+  rows: Array<Record<string, unknown>>;
+  totalRows?: number;
+  truncated?: boolean;
+};
+
+function asDataFramePayload(data: unknown): DataFramePayload | null {
+  if (!data || typeof data !== "object") return null;
+  const record = data as { columns?: unknown; rows?: unknown };
+  if (!Array.isArray(record.columns) || !Array.isArray(record.rows)) return null;
+  return {
+    columns: record.columns.map((column) => String(column)),
+    rows: record.rows as Array<Record<string, unknown>>,
+    totalRows: typeof (data as { totalRows?: unknown }).totalRows === "number" ? (data as { totalRows: number }).totalRows : undefined,
+    truncated: Boolean((data as { truncated?: unknown }).truncated),
+  };
+}
+
+function formatDataFrameCell(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function DataFrameOutput({ data }: { data: DataFramePayload }) {
+  const { columns, rows } = data;
+  const totalRows = data.totalRows ?? rows.length;
+  return (
+    <div className="overflow-hidden rounded-md border bg-background" data-execution-output-mode="dataframe">
+      <div className="max-h-72 overflow-auto">
+        <table className="w-full border-collapse text-left text-xs">
+          <thead className="sticky top-0 bg-muted/70">
+            <tr>
+              {columns.map((column) => (
+                <th key={column} className="whitespace-nowrap border-b px-2 py-1 font-medium">{column}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={rowIndex} className="odd:bg-muted/20">
+                {columns.map((column) => (
+                  <td key={column} className="whitespace-nowrap px-2 py-1 font-mono">{formatDataFrameCell(row[column])}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="border-t bg-muted/30 px-2 py-1 text-[10px] text-muted-foreground">
+        shape: ({totalRows}, {columns.length}){data.truncated ? ` · 상위 ${rows.length}행 표시` : ""}
+      </div>
     </div>
   );
 }

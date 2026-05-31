@@ -8,6 +8,45 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.7 - 2026-05-31
+
+학습 화면을 정리하고(검증 사족 제거·셀/섹션 배치 개선), polars DataFrame 출력을 깨진 HTML 덤프에서 표로 고치고,
+전역 터미널과 레슨별 댓글(Giscus)을 추가했다. 사이드바 네비게이션 버벅임을 없애고, 더블클릭으로 창이 안 뜨던 런처를 고쳤다.
+
+### Added
+
+- 전역 터미널: 좌측 사이드바 터미널 버튼 → 본문을 밀어 올리는 하단 패널(xterm.js)에 실제 로컬 셸 연결. 백엔드 PTY 추가(`src/codaro/api/terminalWebSocket.py`, `terminalRouter.py`; Windows는 pywinpty/ConPTY, POSIX는 `pty.fork`).
+- 레슨 하단 댓글 — GitHub Discussions 기반 Giscus(`editor/src/components/curriculum/lessonComments.tsx`, `editor/src/lib/giscusConfig.ts`). 레슨마다 `lesson:<category>/<contentId>` 토론에 매핑, 오프라인이면 안내로 graceful degrade.
+- DataFrame 표 렌더 컴포넌트(`editor/src/components/app/appPrimitives.tsx`의 `DataFrameOutput`)와 사이드바 펼침 상태 영속 훅(`editor/src/hooks/useSidebarExpansionState.ts`).
+- 랜딩: 브랜드 아바타 이미지/웹폰트 자산 추가.
+
+### Changed
+
+- 에디터 탑바 제거 → floating 컨트롤(`topBar.tsx`의 `TopControls`): SNS 아이콘을 최상단 우측으로, 본문/우측 패널이 세로 전체를 사용. 좌·우상단 아이콘 클러스터 갭 축소.
+- 노트북 셀: `+` 버튼을 코드/마크다운 에디터 박스의 위·아래 모서리에 고정(`notebookPanel.tsx`), 셀 간격 축소. 실행 버튼을 에디터 우측·아이콘만·"모두 실행"으로.
+- 커리큘럼 섹션 개요 재배치(이번 섹션에서 공부할 것·왜 유용한지·팁을 한 행 3열, 상세 설명은 단독 전체 폭 행) + 가독성 개선(아이콘 틴트 칩·좌측 액센트 보더·본문 대비 상향).
+- 시스템 기본 표시 언어를 한국어로(`useLocaleState.ts`, `localeCopy.ts`). 후원 카드 색상/디자인 보강.
+- PWA service worker(`editor/vite.config.ts`): `skipWaiting`/`clientsClaim`/`cleanupOutdatedCaches`로 재빌드 후 stale 캐시가 빈 화면을 만들던 문제 방지.
+- 랜딩 사이트 재설계(`landing/src/styles.css` 대폭 갱신, `App.jsx`·prerender 스크립트 갱신).
+- 런처 버전 0.2.0 → 0.2.1.
+
+### Fixed
+
+- 런처를 더블클릭하면 창이 안 뜨던 문제 — 인자 없이 실행하면 기본 launch로 네이티브 창을 띄우도록(`launcher/codaro-launcher/src/main.rs`, `command: Option<Command>` + `LaunchArgs::default()`).
+- 커리큘럼 사이드바에서 다른 레슨을 클릭해도 본문(코드 셀)이 안 바뀌던 문제 — 레슨 변경 시 `CurriculumView`를 `key`로 remount(`mainSurface.tsx`).
+- 사이드바 네비게이션 때 펼쳐둔 카테고리가 초기화돼 버벅이던 문제 — 펼침 상태를 localStorage에 영속 + 트리 빌드 `useMemo`(`productSidebar.tsx`).
+- polars `DataFrame.head()` 출력이 `<style>`+이스케이프된 HTML 텍스트로 덤프되던 문제 — polars/pandas를 구조화 직렬화(`src/codaro/runtime/localWorker.py`의 `_serializeDataFrame`)하고 프론트에서 표로 렌더.
+
+### Removed
+
+- 검증 시스템 전체 — "검증하기" 버튼, "검증 기준 / 실행 조건 / 확인할 것" 박스, 실습 헤더의 "확인:" 텍스트. 셀마다 비슷한 generic 보일러플레이트라 학습 카드를 어지럽혀 제거(실제 평가 로직은 백엔드에 남김).
+- 실행 전 예측 카드, 빈 코드 셀의 입력 플레이스홀더.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` → 9/9 게이트 통과(root-clean·docs·backend·widget-bridge·app-runtime·mobile-layout·editor-build·curriculum-quality-matrix·curriculum-executability).
+- 에디터 빌드(`npm --prefix editor run build`)와 랜딩 빌드(`npm --prefix landing run build`) 통과.
+
 ## 0.0.6 - 2026-05-31
 
 Names and brands the launcher. The download is now `Codaro.exe` (was `CodaroLauncher.exe`)

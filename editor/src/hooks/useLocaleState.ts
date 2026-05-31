@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   type AppLocale,
-  detectBrowserLocale,
   nextLocale,
   setActiveLocale,
 } from "@/lib/localeCopy";
@@ -10,7 +9,7 @@ import {
 const storageKey = "codaro.displayLocale";
 
 export function useLocaleState() {
-  const [locale, setLocaleState] = useState<AppLocale>(() => storedLocale() ?? detectBrowserLocale());
+  const [locale, setLocaleState] = useState<AppLocale>(() => storedLocale() ?? "ko");
 
   useEffect(() => {
     setActiveLocale(locale);

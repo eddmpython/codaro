@@ -229,12 +229,16 @@ const messages: Record<AppLocale, LocaleMessages> = {
     "sidebar.darkMode": "다크 모드",
     "sidebar.lightMode": "라이트 모드",
     "sidebar.myCurriculum": "나만의 커리큘럼",
+    "comments.title": "댓글 · 토론",
+    "comments.offline": "온라인일 때 이 레슨의 댓글과 토론을 볼 수 있어요.",
     "support.title": "Codaro 후원하기",
     "support.message": "Codaro가 도움이 되었다면, 후원은 더 많은 분들이 유익한 학습 공간을 누리도록 이어가는 힘이 됩니다.",
     "support.buyMeACoffee": "커피 한 잔",
     "support.githubSponsors": "GitHub 후원",
     "support.star": "GitHub 스타로 응원",
     "surface.loading": "화면을 불러오는 중",
+    "terminal.close": "터미널 닫기",
+    "terminal.title": "터미널",
     "topbar.aiClose": "AI 패널 접기",
     "topbar.aiOpen": "AI 패널 열기",
     "topbar.copyDiagnostic": "진단 복사",
@@ -467,12 +471,16 @@ const messages: Record<AppLocale, LocaleMessages> = {
     "sidebar.darkMode": "Dark mode",
     "sidebar.lightMode": "Light mode",
     "sidebar.myCurriculum": "My Curriculum",
+    "comments.title": "Comments",
+    "comments.offline": "Comments and discussion for this lesson are available when you're online.",
     "support.title": "Support Codaro",
     "support.message": "If Codaro helps you, your support keeps this a useful learning space for more people.",
     "support.buyMeACoffee": "Buy me a coffee",
     "support.githubSponsors": "GitHub Sponsors",
     "support.star": "Star on GitHub",
     "surface.loading": "Loading surface",
+    "terminal.close": "Close terminal",
+    "terminal.title": "Terminal",
     "topbar.aiClose": "Collapse AI panel",
     "topbar.aiOpen": "Open AI panel",
     "topbar.copyDiagnostic": "Copy diagnostics",
@@ -481,7 +489,7 @@ const messages: Record<AppLocale, LocaleMessages> = {
   },
 };
 
-let activeLocale: AppLocale = detectBrowserLocale();
+let activeLocale: AppLocale = "ko";
 
 export function detectBrowserLocale(): AppLocale {
   if (typeof navigator === "undefined") return "ko";

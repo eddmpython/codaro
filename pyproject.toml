@@ -1,6 +1,6 @@
 [project]
 name = "codaro"
-version = "0.0.6"
+version = "0.0.7"
 description = "Programmable studio — interactive editor runtime for code, learning, and automation"
 readme = "README.md"
 authors = [
@@ -19,6 +19,9 @@ dependencies = [
     "pyyaml>=6.0",
     "requests>=2.32.0",
     "uvicorn[standard]>=0.41.0",
+    # 전역 터미널(에디터 하단 패널)의 백엔드 PTY. Windows는 ConPTY를 pywinpty로 띄우고,
+    # POSIX는 표준 라이브러리 pty를 쓰므로 별도 의존성이 없다.
+    "pywinpty>=2.0.13; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]

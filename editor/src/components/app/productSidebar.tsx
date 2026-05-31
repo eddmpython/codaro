@@ -15,7 +15,9 @@ import {
   Trash2,
   Workflow,
 } from "lucide-react";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+
+import { useSidebarExpansionState } from "@/hooks/useSidebarExpansionState";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -67,6 +69,8 @@ type ProductSidebarProps = {
   onDeleteCustomCurriculum: (id: string) => void;
   onSurfaceChange: (surface: SurfaceMode) => void;
   onToggleTheme: () => void;
+  terminalOpen: boolean;
+  onToggleTerminal: () => void;
 };
 
 export type SidebarCustomCurriculum = {
@@ -101,6 +105,8 @@ export function ProductSidebar({
   onDeleteCustomCurriculum,
   onSurfaceChange,
   onToggleTheme,
+  terminalOpen,
+  onToggleTerminal,
 }: ProductSidebarProps) {
   const { locale, t, toggleLocale } = useLocale();
   const allNavItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }>; beta: boolean }> = [
@@ -117,7 +123,7 @@ export function ProductSidebar({
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader>
-        <div className="flex items-center gap-1 sm:gap-1.5">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
               <SidebarMenuButton className="h-10 px-2 text-[13px] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!" size="lg" tooltip="Codaro">
@@ -197,6 +203,17 @@ export function ProductSidebar({
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
+                      isActive={terminalOpen}
+                      tooltip={t("terminal.title")}
+                      onClick={onToggleTerminal}
+                    >
+                      <TerminalSquare />
+                      <span>{t("terminal.title")}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -292,8 +309,7 @@ function CurriculumTree({
     other: string;
   };
 }) {
-  const [expandedTreeNodes, setExpandedTreeNodes] = useState<Record<string, boolean>>({});
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const { expandedCategories, setExpandedCategories, expandedTreeNodes, setExpandedTreeNodes } = useSidebarExpansionState();
   const [deleteTarget, setDeleteTarget] = useState<SidebarCustomCurriculum | null>(null);
   const hasQuery = Boolean(query.trim());
   const customItems = customCurricula.filter((item) => {
@@ -301,7 +317,10 @@ function CurriculumTree({
     if (!trimmed) return true;
     return item.title.toLowerCase().includes(trimmed);
   });
-  const curriculumTree = buildSidebarCurriculumTree(categories, categoryGroups, categoryTree, text.other);
+  const curriculumTree = useMemo(
+    () => buildSidebarCurriculumTree(categories, categoryGroups, categoryTree, text.other),
+    [categories, categoryGroups, categoryTree, text.other],
+  );
 
   return (
     <>

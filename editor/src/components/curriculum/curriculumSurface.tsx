@@ -38,10 +38,8 @@ import { codaroApi } from "@/lib/api";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
-import { useWidgetSession } from "@/lib/widgetSession";
-import { CheckResultPanel } from "./checkResultPanel";
-import { PredictCard, type LearnerPrediction } from "./predictCard";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
+import { LessonComments } from "./lessonComments";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import {
   blockLabel,
@@ -55,7 +53,7 @@ import {
 import { statusLabel } from "@/lib/displayFormat";
 import { inferDocumentPackages, normalizePackageName } from "@/lib/packageInference";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
+import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
 import {
   CurriculumMarkdownBody,
   curriculumCellTone,
@@ -164,6 +162,8 @@ export function CurriculumView({
             ))}
           </div>
 
+          <LessonComments apiOnline={apiOnline} category={selectedCategory} contentId={selectedContentId} />
+
           <CurriculumSupportFooter />
         </div>
       </div>
@@ -175,13 +175,13 @@ function CurriculumSupportFooter() {
   const { t } = useLocale();
   return (
     <footer
-      className="mt-2 rounded-md border bg-card/60 px-4 py-4 text-card-foreground"
+      className="mt-3 overflow-hidden rounded-xl border border-rose-300/40 bg-gradient-to-br from-rose-500/10 via-amber-500/10 to-orange-500/10 px-5 py-4 text-card-foreground shadow-sm dark:border-rose-400/20"
       data-curriculum-support="true"
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-start gap-2.5">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-500">
-            <Heart className="size-4" />
+      <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm shadow-rose-500/30">
+            <Heart className="size-5 fill-white" />
           </span>
           <div className="min-w-0">
             <div className="text-sm font-semibold">{t("support.title")}</div>
@@ -189,21 +189,25 @@ function CurriculumSupportFooter() {
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+          <Button
+            asChild
+            className="h-8 gap-1.5 border-0 bg-gradient-to-r from-amber-500 to-orange-500 px-3 text-xs text-white shadow-sm transition-opacity hover:opacity-90"
+            size="sm"
+          >
             <a href={CODARO_LINKS.buyMeACoffee} rel="noreferrer noopener" target="_blank">
               <Coffee className="size-3.5" />
               {t("support.buyMeACoffee")}
             </a>
           </Button>
-          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+          <Button asChild className="h-8 gap-1.5 border-rose-300/50 px-2.5 text-xs hover:bg-rose-500/10" size="sm" variant="outline">
             <a href={CODARO_LINKS.githubSponsors} rel="noreferrer noopener" target="_blank">
-              <Heart className="size-3.5" />
+              <Heart className="size-3.5 text-rose-500" />
               {t("support.githubSponsors")}
             </a>
           </Button>
-          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
+          <Button asChild className="h-8 gap-1.5 border-amber-300/50 px-2.5 text-xs hover:bg-amber-500/10" size="sm" variant="outline">
             <a href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
-              <Star className="size-3.5" />
+              <Star className="size-3.5 fill-amber-400 text-amber-400" />
               {t("support.star")}
             </a>
           </Button>
@@ -730,18 +734,6 @@ function isSectionTitleBlock(block: BlockConfig) {
   return block.role === "title" && block.sourceType !== "intro";
 }
 
-function extractSectionYamlId(section: CurriculumSectionGroup): string | undefined {
-  const titlePayload = isRecord(section.titleBlock?.payload) ? section.titleBlock?.payload : undefined;
-  const fromTitle = readPayloadText(titlePayload?.id);
-  if (fromTitle) return fromTitle;
-  for (const block of section.blocks) {
-    const payload = isRecord(block.payload) ? block.payload : undefined;
-    const sectionId = readPayloadText(payload?.sectionId);
-    if (sectionId) return sectionId;
-  }
-  return undefined;
-}
-
 function curriculumOverview(document: CodaroDocument, introBlock?: BlockConfig) {
   const payload = isRecord(introBlock?.payload) ? introBlock.payload : {};
   const lessonContract = isRecord(payload.learningContract) ? payload.learningContract : {};
@@ -787,6 +779,36 @@ function sectionInfo(block: BlockConfig) {
   };
 }
 
+const OVERVIEW_ACCENTS = {
+  indigo: { border: "border-indigo-400/50", chip: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-300" },
+  emerald: { border: "border-emerald-400/50", chip: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
+  sky: { border: "border-sky-400/50", chip: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
+  amber: { border: "border-amber-400/50", chip: "bg-amber-500/10 text-amber-600 dark:text-amber-300" },
+} as const;
+
+function OverviewBlock({
+  accent,
+  icon,
+  label,
+  children,
+}: {
+  accent: keyof typeof OVERVIEW_ACCENTS;
+  icon: ReactNode;
+  label: string;
+  children: ReactNode;
+}) {
+  const tone = OVERVIEW_ACCENTS[accent];
+  return (
+    <div className={cn("min-w-0 border-l-2 pl-3", tone.border)}>
+      <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+        <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-md", tone.chip)}>{icon}</span>
+        {label}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function SectionContractOverview({ contract }: { contract?: CurriculumSectionContract }) {
   if (!contract) return null;
   const goal = specificLearningCopy(readPayloadText(contract.goal));
@@ -820,53 +842,35 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
         </div>
       ) : null}
 
-      <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)]">
-        <div className="min-w-0 space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
-            {goal ? (
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Target className="size-3.5" />
-                  이번 섹션에서 공부할 것
-                </div>
-                <p className="mt-1 text-sm leading-6">{goal}</p>
+      <div className="min-w-0 space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {goal ? (
+            <OverviewBlock accent="indigo" icon={<Target className="size-3" />} label="이번 섹션에서 공부할 것">
+              <p className="mt-1.5 text-sm leading-6 text-foreground/90">{goal}</p>
+            </OverviewBlock>
+          ) : null}
+          {why ? (
+            <OverviewBlock accent="emerald" icon={<CheckCircle2 className="size-3" />} label="왜 유용한지">
+              <p className="mt-1.5 text-sm leading-6 text-foreground/90">{why}</p>
+            </OverviewBlock>
+          ) : null}
+          {tips.length ? (
+            <OverviewBlock accent="amber" icon={<Lightbulb className="size-3" />} label="팁">
+              <div className="mt-2 space-y-1.5">
+                {tips.map((tip, index) => (
+                  <div className="flex gap-2 text-xs leading-5 text-foreground/75" key={`${tip}-${index}`}>
+                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-amber-500/60" />
+                    <span className="min-w-0">{stripBullet(tip)}</span>
+                  </div>
+                ))}
               </div>
-            ) : null}
-            {why ? (
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <CheckCircle2 className="size-3.5" />
-                  왜 유용한지
-                </div>
-                <p className="mt-1 text-sm leading-6">{why}</p>
-              </div>
-            ) : null}
-          </div>
-          {explanation ? (
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <BookOpen className="size-3.5" />
-                상세 설명
-              </div>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">{explanation}</p>
-            </div>
+            </OverviewBlock>
           ) : null}
         </div>
-        {tips.length ? (
-          <div className="min-w-0 border-t pt-3 lg:border-l lg:border-t-0 lg:pl-3 lg:pt-0">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Lightbulb className="size-3.5" />
-              팁
-            </div>
-            <div className="mt-2 space-y-1.5">
-              {tips.map((tip, index) => (
-                <div className="flex gap-2 text-xs leading-5 text-muted-foreground" key={`${tip}-${index}`}>
-                  <span className="mt-2 size-1 rounded-full bg-muted-foreground/60" />
-                  <span className="min-w-0">{stripBullet(tip)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        {explanation ? (
+          <OverviewBlock accent="sky" icon={<BookOpen className="size-3" />} label="상세 설명">
+            <p className="mt-1.5 max-w-[68ch] text-sm leading-7 text-foreground/90">{explanation}</p>
+          </OverviewBlock>
         ) : null}
       </div>
     </div>
@@ -929,9 +933,6 @@ function StructuredSectionLearningBody({
   const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
   const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
   const exerciseDescription = specificPracticeCopy(exercise?.guide?.description || exercise?.description || "");
-  const exerciseCheck = exercise
-    ? preferredValidationEntry(validationEntriesFromCheckConfig(exercise.guide?.checkConfig))
-    : null;
 
   return (
     <div className="divide-y">
@@ -964,12 +965,6 @@ function StructuredSectionLearningBody({
               {exerciseDescription ? (
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
                   {exerciseDescription}
-                </p>
-              ) : null}
-              {exerciseCheck ? (
-                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-                  <span className="font-medium text-foreground">확인: </span>
-                  {exerciseCheck.text}
                 </p>
               ) : null}
             </div>
@@ -1028,31 +1023,9 @@ function StructuredSectionLearningBody({
                 실행 결과
               </div>
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
-              {exerciseResult && exercise && exerciseCheck ? (
-                <div className="mt-2">
-                  <ExerciseCheckPanel
-                    category={category}
-                    contentId={contentId}
-                    exercise={exercise}
-                    sectionId={extractSectionYamlId(section)}
-                    studentCode={exerciseDraft}
-                  />
-                </div>
-              ) : null}
             </div>
           ) : null}
         </div>
-      ) : null}
-
-      {parts.check ? (
-        <StructuredSectionBand
-          icon={<CheckCircle2 className="size-3.5" />}
-          label="검증 기준"
-          part="check"
-          title={blockLabel(parts.check)}
-        >
-          <ValidationCriteriaBody block={parts.check} />
-        </StructuredSectionBand>
       ) : null}
 
       {parts.extraBlocks.length ? (
@@ -1098,126 +1071,19 @@ function StructuredSectionBand({
 }) {
   return (
     <div className="px-4 py-4" data-learning-section-part={part}>
-      <div className="mb-3 min-w-0">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          {icon}
+      <div className="mb-3 min-w-0 border-l-2 border-violet-400/50 pl-3">
+        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-300">
+            {icon}
+          </span>
           <span>{label}</span>
         </div>
-        {title ? <h3 className="mt-1 text-base font-semibold tracking-normal">{title}</h3> : null}
-        {detail ? <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{stripMarkdown(detail)}</p> : null}
+        {title ? <h3 className="mt-1.5 text-base font-semibold tracking-normal">{title}</h3> : null}
+        {detail ? <p className="mt-1.5 max-w-[68ch] text-sm leading-6 text-foreground/80">{stripMarkdown(detail)}</p> : null}
       </div>
       {children}
     </div>
   );
-}
-
-type ValidationEntry = {
-  key: string;
-  label: string;
-  text: string;
-};
-
-// Keep in sync with EVAL_RESERVED_KEYS in src/codaro/curriculum/exerciseCheck.py.
-// These keys are consumed by the backend evaluator (runExerciseCheck) and must
-// not appear in the display panel.
-const EVAL_RESERVED_KEYS: ReadonlySet<string> = new Set([
-  "type",
-  "expectedCode",
-  "variableName",
-  "expectedValue",
-  "requiredPatterns",
-  "hints",
-]);
-
-function ValidationCriteriaBody({ block }: { block: BlockConfig }) {
-  const entries = validationEntriesFromBlock(block);
-  if (!entries.length) return <CurriculumMarkdownBody block={block} />;
-
-  return (
-    <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
-      <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-background/80 text-amber-600 dark:text-amber-300">
-          <CheckCircle2 className="size-4" />
-        </span>
-        <dl className="min-w-0 flex-1 space-y-2">
-          {entries.map((entry) => (
-            <div className="grid min-w-0 gap-1 sm:grid-cols-[7.5rem_minmax(0,1fr)]" key={`${entry.key}-${entry.text}`}>
-              <dt className="text-sm font-semibold leading-6 text-foreground">{entry.label}</dt>
-              <dd className="min-w-0 whitespace-normal break-words text-sm leading-6 text-muted-foreground">
-                {entry.text}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </div>
-  );
-}
-
-function validationEntriesFromBlock(block: BlockConfig): ValidationEntry[] {
-  const payload = isRecord(block.payload) ? block.payload : undefined;
-  const payloadCheck = payload && isRecord(payload.check) ? payload.check : undefined;
-  const payloadEntries = validationEntriesFromCheckConfig(payloadCheck);
-  if (payloadEntries.length) return payloadEntries;
-  return validationEntriesFromMarkdown(block.content);
-}
-
-function validationEntriesFromCheckConfig(checkConfig?: Record<string, unknown>): ValidationEntry[] {
-  if (!checkConfig) return [];
-  return Object.entries(checkConfig)
-    .filter(([key]) => !EVAL_RESERVED_KEYS.has(key))
-    .map(([key, value]) => ({
-      key,
-      label: validationLabel(key),
-      text: readPayloadText(value),
-    }))
-    .filter((entry) => entry.text)
-    .sort((left, right) => validationOrder(left.key) - validationOrder(right.key));
-}
-
-function validationEntriesFromMarkdown(content: string): ValidationEntry[] {
-  return content
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .map((line, index) => {
-      const boldMatch = line.match(/^\s*[-*]\s*\*\*(.+?)\*\*\s*:?\s*(.+)$/);
-      if (boldMatch) {
-        const label = stripMarkdown(boldMatch[1]);
-        return { key: `line-${index}`, label, text: stripMarkdown(boldMatch[2]) };
-      }
-      const stripped = stripBullet(stripMarkdown(line));
-      if (!stripped || stripped === "검증 기준") return null;
-      const [label, ...rest] = stripped.split(":");
-      if (!rest.length) return null;
-      return { key: `line-${index}`, label: label.trim(), text: rest.join(":").trim() };
-    })
-    .filter((entry): entry is ValidationEntry => Boolean(entry?.label && entry.text));
-}
-
-function preferredValidationEntry(entries: ValidationEntry[]) {
-  return entries.find((entry) => entry.key === "resultCheck" || entry.key === "outputCheck" || entry.key === "assertCheck")
-    ?? entries[0]
-    ?? null;
-}
-
-function validationLabel(key: string) {
-  const labels: Record<string, string> = {
-    noError: "실행 조건",
-    resultCheck: "확인할 것",
-    assertCheck: "assert",
-    outputCheck: "출력",
-  };
-  return labels[key] ?? key;
-}
-
-function validationOrder(key: string) {
-  const order: Record<string, number> = {
-    noError: 0,
-    assertCheck: 1,
-    outputCheck: 2,
-    resultCheck: 3,
-  };
-  return order[key] ?? 10;
 }
 
 function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
@@ -1697,10 +1563,12 @@ function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   const description = block.description?.trim();
 
   return (
-    <div className="border-l-2 border-emerald-400/40 pl-3">
+    <div className="border-l-2 border-violet-400/50 pl-3">
       <div className="space-y-2 pb-2.5">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <TerminalSquare className="size-3.5" />
+        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-300">
+            <TerminalSquare className="size-3.5" />
+          </span>
           <span>예제 스니펫</span>
         </div>
         {description ? <p className="text-sm leading-6 text-foreground">{description}</p> : null}
@@ -1794,19 +1662,11 @@ function curriculumInitialDraft(block: BlockConfig) {
 function ExerciseBrief({ block }: { block: BlockConfig }) {
   if (!block.guide) return null;
   const description = specificPracticeCopy(block.guide.description);
-  const check = preferredValidationEntry(validationEntriesFromCheckConfig(block.guide.checkConfig));
-  if (!description && !check) return null;
+  if (!description) return null;
 
   return (
     <div className="rounded-md border bg-muted/20 px-3 py-2.5">
-      {description ? <p className="text-sm leading-6 text-muted-foreground">{description}</p> : null}
-      {check ? (
-        <p className={cn("text-sm leading-6 text-muted-foreground", description && "mt-1")}>
-          <span className="font-medium text-foreground">확인할 것</span>
-          <span className="mx-1 text-muted-foreground">·</span>
-          {check.text}
-        </p>
-      ) : null}
+      <p className="text-sm leading-6 text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -1823,105 +1683,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function cellDomId(blockId: string) {
   return `curriculum-cell-${blockId.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
-}
-
-function ExerciseCheckPanel({
-  category,
-  contentId,
-  exercise,
-  sectionId,
-  studentCode,
-}: {
-  category?: string;
-  contentId?: string;
-  exercise: BlockConfig;
-  sectionId?: string;
-  studentCode: string;
-}) {
-  const sessionId = useWidgetSession();
-  const [result, setResult] = useState<CheckResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [hintLevel, setHintLevel] = useState(0);
-  const [prediction, setPrediction] = useState<LearnerPrediction | null>(null);
-
-  const predict = exercise.guide?.predict ?? null;
-  // predict 가 정의되어 있고 예측 잠금 전이면 검증을 막는다 — 학습자가 mental model을
-  // 먼저 외부화하도록 강제하는 게 Predict-Run-Reconcile-Adapt 핵심.
-  const predictRequired = predict !== null;
-  const predictReady = !predictRequired || prediction !== null;
-
-  const runCheck = async (nextHintLevel: number = hintLevel) => {
-    if (!sessionId) return;
-    const guide = exercise.guide;
-    if (!guide) return;
-    setLoading(true);
-    try {
-      const next = await codaroApi.checkExercise({
-        sessionId,
-        studentCode,
-        expectedCode: guide.solution ?? undefined,
-        checkType: guide.checkConfig?.type ?? undefined,
-        variableName: guide.checkConfig?.variableName ?? undefined,
-        expectedValue: guide.checkConfig?.expectedValue ?? undefined,
-        requiredPatterns: Array.isArray(guide.checkConfig?.requiredPatterns)
-          ? (guide.checkConfig?.requiredPatterns as unknown[]).filter(
-              (value): value is string => typeof value === "string",
-            )
-          : undefined,
-        hints: guide.hints ?? [],
-        currentHintLevel: nextHintLevel,
-        category: category || undefined,
-        contentId: contentId || undefined,
-        sectionId: sectionId || undefined,
-        prediction: prediction ?? undefined,
-      });
-      setResult(next);
-      setHintLevel(next.hintLevel);
-    } catch (error) {
-      console.warn("check failed", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-2" data-check-panel="exercise">
-      {predict ? (
-        <PredictCard
-          predict={predict}
-          locked={prediction}
-          onLock={(next) => setPrediction(next)}
-          onUnlock={() => setPrediction(null)}
-        />
-      ) : null}
-      <div className="flex items-center gap-2">
-        <Button
-          className="h-7 px-2 text-[11px]"
-          size="sm"
-          type="button"
-          variant="outline"
-          disabled={loading || !sessionId || !predictReady}
-          onClick={() => void runCheck(hintLevel)}
-          title={
-            predictRequired && !predictReady
-              ? "예측을 먼저 잠그세요 — 그래야 결과와 비교할 수 있습니다."
-              : undefined
-          }
-        >
-          {loading ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3" />}
-          검증하기
-        </Button>
-        {predictRequired && !predictReady ? (
-          <span className="text-[11px] text-foreground/60">예측 잠금 필요</span>
-        ) : null}
-      </div>
-      <CheckResultPanel
-        result={result}
-        loading={loading}
-        onNextHint={() => void runCheck(hintLevel + 1)}
-      />
-    </div>
-  );
 }
 
 export function CurriculumHeaderProgress({

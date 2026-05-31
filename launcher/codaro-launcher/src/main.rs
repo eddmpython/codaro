@@ -37,8 +37,10 @@ const BACKEND_RESTART_DELAY: Duration = Duration::from_millis(750);
 struct Cli {
     #[arg(long)]
     root: Option<PathBuf>,
+    // dartlab-desktop 런처처럼 서브커맨드는 선택이다. 인자 없이 실행(탐색기 더블클릭)하면
+    // None이 되어 네이티브 창을 바로 띄운다. 서브커맨드는 디버그·운영 경로 전용.
     #[command(subcommand)]
-    command: Command,
+    command: Option<Command>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -64,6 +66,20 @@ struct LaunchArgs {
     #[arg(long)]
     workspace_root: Option<PathBuf>,
     path: Option<PathBuf>,
+}
+
+impl Default for LaunchArgs {
+    // clap의 default_value는 파싱 시점에만 적용되므로, 더블클릭(no-arg) 경로에서 쓸
+    // 기본값을 명시한다. host/port는 run_windowed가 자동 포트로 백엔드를 띄우는 값과 동일.
+    fn default() -> Self {
+        Self {
+            host: "127.0.0.1".to_string(),
+            port: 0,
+            no_webview: false,
+            workspace_root: None,
+            path: None,
+        }
+    }
 }
 
 #[derive(Args, Debug)]
@@ -323,14 +339,16 @@ fn main() -> Result<()> {
     paths.ensure_layout()?;
 
     match cli.command {
-        Command::Doctor => run_doctor(&paths)?,
-        Command::Launch(args) => run_launch(&paths, args)?,
-        Command::Manifest(command) => run_manifest(command)?,
-        Command::State(command) => run_state(&paths, command)?,
-        Command::Release(command) => run_release(&paths, command)?,
-        Command::Update(command) => run_update(&paths, command)?,
-        Command::SelfUpdate(command) => run_self_update(&paths, command)?,
-        Command::Backend(command) => run_backend(&paths, command)?,
+        // 인자 없이 실행 = 탐색기 더블클릭. dartlab처럼 바로 네이티브 창을 띄운다.
+        None => run_launch(&paths, LaunchArgs::default())?,
+        Some(Command::Doctor) => run_doctor(&paths)?,
+        Some(Command::Launch(args)) => run_launch(&paths, args)?,
+        Some(Command::Manifest(command)) => run_manifest(command)?,
+        Some(Command::State(command)) => run_state(&paths, command)?,
+        Some(Command::Release(command)) => run_release(&paths, command)?,
+        Some(Command::Update(command)) => run_update(&paths, command)?,
+        Some(Command::SelfUpdate(command)) => run_self_update(&paths, command)?,
+        Some(Command::Backend(command)) => run_backend(&paths, command)?,
     }
 
     Ok(())

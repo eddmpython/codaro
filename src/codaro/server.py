@@ -27,6 +27,7 @@ from .api import (
     createShareRouter,
     createSpaRouter,
     createSystemRouter,
+    createTerminalRouter,
     createWorkspaceRouter,
     httpExceptionHandler,
     unhandledExceptionHandler,
@@ -314,6 +315,7 @@ def createServerApp(
     app.include_router(createKernelRouter(state))
     app.include_router(createShareRouter(state))
     app.include_router(createSystemRouter(state))
+    app.include_router(createTerminalRouter(state))
     app.include_router(createWorkspaceRouter(state))
     app.include_router(createCurriculumRouter(state))
     app.include_router(createSpaRouter(state))
