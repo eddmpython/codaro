@@ -184,7 +184,7 @@ sections:
     subtitle: 한 dict로 묶기
     goal: 화면 해상도와 현재 마우스 좌표를 한 함수에서 dict로 묶어 자동화 시작 보고를 만든다.
     why: 종합 스냅숏은 자동화 사고가 났을 때 시작 시점의 환경을 추적하는 첫 번째 단서가 된다.
-    explanation: desktopSnapshot 함수는 pyautogui.size()와 position()을 호출해 screen, cursor 두 키를 가진 dict를 돌려준다. cursorOnScreen 키는 현재 마우스가 화면 안인지 boolean으로 함께 담는다. 결과는 그대로 JSON 직렬화에 안전한 정수형 구조다.
+    explanation: desktopSnapshot 함수는 pyautogui.size()와 position()을 호출해 screen, cursor 두 키를 가진 dict를 돌려준다. cursorOnScreen 키는 현재 마우스가 화면 안인지 boolean으로 함께 담는다. pyautogui.size()는 주 모니터 해상도만 돌려주므로, 다중 모니터에서 커서가 보조 모니터에 있으면 cursorOnScreen이 False가 된다. 그래서 스냅숏은 True/False를 단정하지 않고 boolean 타입만 검증한다 — 어느 모니터에서 실행해도 의미가 유지된다. 결과는 그대로 JSON 직렬화에 안전한 정수형 구조다.
     tips:
       - 시작 스냅숏은 자동화 로그의 첫 줄로 기록해 두면 사고 분석이 빨라진다.
       - 같은 함수를 두 번 호출하면 두 번째 cursor 값으로 마우스 이동량을 추적할 수 있다.
@@ -205,10 +205,10 @@ sections:
       snapshot = desktopSnapshot()
 
       assert snapshot["screen"]["width"] > 0
-      assert snapshot["cursorOnScreen"] is True
+      assert isinstance(snapshot["cursorOnScreen"], bool)
       snapshot
     exercise:
-      prompt: desktopSnapshot를 호출해 결과에 screen, cursor, cursorOnScreen 세 키가 있고 cursorOnScreen이 True인지 종합 검증하세요.
+      prompt: desktopSnapshot를 호출해 결과에 screen, cursor, cursorOnScreen 세 키가 정확히 있고 cursorOnScreen이 boolean인지 종합 검증하세요.
       starterCode: |-
         import pyautogui
 
@@ -226,7 +226,7 @@ sections:
         snapshot = desktopSnapshot()
 
         assert set(snapshot.keys()) == {"screen", "cursor", "cursorOnScreen"}
-        assert snapshot["cursorOnScreen"] is True
+        assert isinstance(snapshot["cursorOnScreen"], bool)
         snapshot
       solution: |-
         import pyautogui
@@ -245,14 +245,14 @@ sections:
         snapshot = desktopSnapshot()
 
         assert set(snapshot.keys()) == {"screen", "cursor", "cursorOnScreen"}
-        assert snapshot["cursorOnScreen"] is True
+        assert isinstance(snapshot["cursorOnScreen"], bool)
         snapshot
       hints:
         - 화면 경계 검사 함수 이름은 onScreen이다.
-        - 마우스가 화면 안에 있으면 cursorOnScreen 값이 True다.
+        - size()는 주 모니터만 보므로 보조 모니터의 커서는 cursorOnScreen이 False다 — 값이 아니라 bool 타입을 검증한다.
       check:
         noError: desktopSnapshot 호출이 종합 결과를 돌려줘야 한다.
-        resultCheck: snapshot에 screen, cursor, cursorOnScreen 세 키가 정확히 있고 cursorOnScreen이 True여야 한다.
+        resultCheck: snapshot에 screen, cursor, cursorOnScreen 세 키가 정확히 있고 cursorOnScreen이 boolean이어야 한다.
     check:
       noError: 종합 스냅숏 함수 호출이 끝나야 한다.
       resultCheck: snapshot이 screen, cursor, cursorOnScreen 세 키를 담아야 한다.
