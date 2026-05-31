@@ -258,7 +258,7 @@ Codaro 약속:
 
 | ID | 요구사항 | 수용 기준 |
 |---|---|---|
-| LD-01 | 최종 사용자는 Python 설치를 몰라도 실행할 수 있다. | `CodaroLauncher.exe`가 embedded runtime과 exact wheel을 관리한다. |
+| LD-01 | 최종 사용자는 Python 설치를 몰라도 실행할 수 있다. | `Codaro.exe`가 embedded runtime과 exact wheel을 관리한다. |
 | LD-02 | 자동화 capability는 curated bundle로 제공한다. | `codaro-excel`, `codaro-browser`, `codaro-db`, `codaro-ai-local` 같은 bundle manifest가 capability probe를 가진다. |
 | LD-03 | 외부 앱과 드라이버는 user-managed boundary로 표시한다. | Excel, 브라우저 로그인, DB 서버, OS 권한 상태가 diagnostics에 분리된다. |
 | LD-04 | update는 health probe 후 active release를 바꾼다. | 실패 시 last-known-good rollback이 동작한다. |
@@ -485,7 +485,7 @@ uv run python -X utf8 tests/run.py gate automation-safety-benchmark
 
 범위:
 
-- CodaroLauncher.exe install/update/rollback
+- Codaro.exe install/update/rollback
 - `codaro-excel`, `codaro-browser`, `codaro-db` bundle baseline
 - capability diagnostics UI
 - release manifest signing/checksum

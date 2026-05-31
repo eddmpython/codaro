@@ -14,11 +14,11 @@ export const brand = {
   repoUrl: "https://github.com/eddmpython/codaro",
   releaseUrl: "https://github.com/eddmpython/codaro/releases/latest",
   launcherDownloadUrl:
-    "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe",
+    "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe",
   launcherChecksumUrl:
-    "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
+    "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256",
   launcherSbomUrl:
-    "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
+    "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.spdx.json",
   releaseManifestUrl:
     "https://github.com/eddmpython/codaro/releases/latest/download/release-manifest.json",
   pythonRuntimeUrl:

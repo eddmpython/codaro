@@ -22,7 +22,7 @@ Rules:
 - `landing/src/styles.css` keeps the public site visual system compact and token-like
 - framework parity is visual/token parity here; product code stays in `editor/`, while public docs and writing stay in the React static site
 - launcher download CTAs must point to GitHub Release assets, not repo-internal build paths
-- `.github/workflows/launcher-release.yml` is responsible for publishing `CodaroLauncher.exe`, checksum, and SBOM with stable asset names
+- `.github/workflows/launcher-release.yml` is responsible for publishing `Codaro.exe`, checksum, and SBOM with stable asset names
 - writing asset URLs are flattened to `/docs/blog/assets/*` during build
 - `landing/` is the only shipped public docs surface
 - long-form docs, writing, and search must not be embedded back into the IDE as a full docs browser

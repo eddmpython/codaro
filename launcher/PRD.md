@@ -9,7 +9,7 @@ package artifact 분리와 publish 정책의 상세 source of truth는 `launcher
 
 최종 사용자 약속은 단순하다.
 
-- 사용자는 `CodaroLauncher.exe`만 설치한다
+- 사용자는 `Codaro.exe`만 설치한다
 - 런처가 Python runtime, Codaro backend wheel에 포함된 editor 자산, automation bundle, 업데이트를 관리한다
 - 사용자는 Python 설치 여부를 신경 쓰지 않는다
 - Codaro는 desktop, mobile, web이 같은 문서 모델과 같은 제품 정체성을 유지한다
@@ -97,7 +97,7 @@ launcher가 들어오면 아래가 가능해진다.
 
 ### 최초 설치
 
-1. 사용자가 `CodaroLauncher.exe`를 실행한다
+1. 사용자가 `Codaro.exe`를 실행한다
 2. launcher가 install root를 만든다
 3. launcher가 embedded runtime과 base asset을 설치한다
 4. launcher가 backend manifest를 확인한다
@@ -125,7 +125,7 @@ launcher가 들어오면 아래가 가능해진다.
 
 ### 주요 구성요소
 
-- `CodaroLauncher.exe`
+- `Codaro.exe`
   - Rust 기반 설치기, supervisor, updater
 - embedded Python runtime
   - launcher가 관리하는 앱 전용 Python
@@ -500,7 +500,7 @@ launcher는 최소 아래 로그를 남긴다.
 - `autoUpdateOnLaunch` 기본값은 true이며, `launch`와 `launch-active`는 active release 실행 전에 update sync를 시도한다
 - startup auto-update 실패는 기존 active release 실행을 막지 않는 best-effort 경로로 처리한다
 - normal `vX.Y.Z` tag workflow는 exact `codaro` wheel, `release-manifest.json`, managed Windows Python runtime archive, launcher binary, checksums, SPDX SBOM을 같은 GitHub Release에 올린다
-- launcher self-update helper는 launcher-only tag뿐 아니라 `CodaroLauncher.exe` asset을 가진 product release tag도 후보로 본다
+- launcher self-update helper는 launcher-only tag뿐 아니라 `Codaro.exe` asset을 가진 product release tag도 후보로 본다
 - backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed editor build root를 받을 수 있다
 - launcher는 staged archive editor가 없으면 `site-packages/<backend-package>/webBuild`를 `CODARO_WEB_BUILD_ROOT`로 전달한다
 - package distribution과 bundle 분리 정책은 `launcher/PACKAGING.md`에 정리됐다

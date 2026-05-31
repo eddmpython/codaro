@@ -11,7 +11,7 @@
 <sub><em>코다로(Codaro) — "코드 아로?" "코드 아로~" 코드와 친해지자는 말장난에서 시작한 이름입니다.</em></sub>
 
 <p>
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Windows 다운로드 — CodaroLauncher.exe" src="https://img.shields.io/badge/Windows_다운로드-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="36" /></a>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Windows 다운로드 — Codaro.exe" src="https://img.shields.io/badge/Windows_다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="36" /></a>
   &nbsp;&nbsp;
   <a href="https://buymeacoffee.com/eddmpython"><img alt="Buy me a coffee" src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=18181b" height="36" /></a>
 </p>
@@ -31,7 +31,7 @@
 </p>
 
 <p>
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><strong>다운로드</strong></a> ·
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><strong>다운로드</strong></a> ·
   <a href="https://eddmpython.github.io/codaro/">문서</a> ·
   <a href="https://eddmpython.github.io/codaro/docs/blog">소식</a> ·
   <a href="https://github.com/eddmpython/codaro/issues">이슈</a>
@@ -50,10 +50,10 @@
 **비개발자도 더블클릭이면 끝.** 시스템 Python·uv·설정 전부 필요 없습니다 — 런처가 전부 자동으로 처리합니다.
 
 <p align="center">
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Download CodaroLauncher.exe" src="https://img.shields.io/badge/Windows_다운로드-CodaroLauncher.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Download Codaro.exe" src="https://img.shields.io/badge/Windows_다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
 </p>
 
-1. **[CodaroLauncher.exe 다운로드](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe)** _(Windows 10/11)_
+1. **[Codaro.exe 다운로드](https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe)** _(Windows 10/11)_
 2. 받은 파일을 **더블클릭**합니다.
 3. 첫 실행에서 런처가 자동으로 — 관리형 Python runtime + `codaro` 본체 + **기본 커리큘럼(463 레슨)** 을 내려받아 설치합니다. (네트워크/디스크에 따라 몇 분)
 4. 준비가 끝나면 로컬 에디터(`http://127.0.0.1:8765`)로 자동 전환 — **커리큘럼 카드에서 바로 학습을 시작**합니다.
@@ -279,11 +279,11 @@ app.mount("/codaro", createServerApp())
 
 | 항목 | 링크 |
 |---|---|
-| Codaro Launcher | [CodaroLauncher.exe](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe) |
-| 체크섬 | [CodaroLauncher.exe.sha256](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256) |
+| Codaro Launcher | [Codaro.exe](https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe) |
+| 체크섬 | [Codaro.exe.sha256](https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256) |
 | 릴리즈 manifest | [release-manifest.json](https://github.com/eddmpython/codaro/releases/latest/download/release-manifest.json) |
 | 관리형 Python runtime | [python-runtime-win-x64.zip](https://github.com/eddmpython/codaro/releases/latest/download/python-runtime-win-x64.zip) |
-| SBOM | [CodaroLauncher.spdx.json](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json) |
+| SBOM | [Codaro.spdx.json](https://github.com/eddmpython/codaro/releases/latest/download/Codaro.spdx.json) |
 | 전체 릴리즈 | [GitHub Releases](https://github.com/eddmpython/codaro/releases/latest) |
 
 ### 개발자 — 저장소에서 바로

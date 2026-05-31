@@ -20,7 +20,7 @@
 - 자동화 capability는 `extras`가 아니라 별도 package로 배포한다
 - launcher는 index에서 최신을 해석하지 않고 manifest가 지정한 exact wheel만 설치한다
 - GitHub Releases는 product control plane이자 artifact plane이다 (유일한 배포 경로)
-- **PyPI에는 배포하지 않는다.** 유일한 배포 경로는 GitHub Releases의 release-manifest.json이 핀한 `codaro` wheel을 CodaroLauncher.exe가 설치하는 것이다. pyproject의 `Private :: Do Not Upload` 분류자가 실수 업로드를 차단한다.
+- **PyPI에는 배포하지 않는다.** 유일한 배포 경로는 GitHub Releases의 release-manifest.json이 핀한 `codaro` wheel을 Codaro.exe가 설치하는 것이다. pyproject의 `Private :: Do Not Upload` 분류자가 실수 업로드를 차단한다.
 
 ## 왜 별도 package인가
 
@@ -466,7 +466,7 @@ core repo + bundle repos
 - launcher는 staged release의 release-local Python runtime으로 exact backend wheel과 bundle wheel을 `backend/site-packages`에 실제 설치한다
 - launcher는 `editor.source: "backendWheel"` manifest에서 별도 editor zip 없이 backend wheel 내부 `codaro/webBuild`를 editor root로 사용한다
 - publish workflow는 wheel 안에 `codaro/webBuild/index.html`와 `_app/` asset이 포함됐는지 검증한다
-- normal `vX.Y.Z` tag release workflow는 local build dist의 exact wheel URL/sha256을 `release-manifest.json`에 넣고, `CodaroLauncher.exe`, backend wheel, checksums, SPDX SBOM, `python-runtime-win-x64.zip`, runtime checksum을 같은 GitHub Release에 업로드한다
+- normal `vX.Y.Z` tag release workflow는 local build dist의 exact wheel URL/sha256을 `release-manifest.json`에 넣고, `Codaro.exe`, backend wheel, checksums, SPDX SBOM, `python-runtime-win-x64.zip`, runtime checksum을 같은 GitHub Release에 업로드한다
 - bundle package는 아직 구현되지 않았다
 - `extras`는 아직 정리되지 않았지만 제품 capability용으로 쓰지 않는 것이 확정 방향이다
 - launcher-managed bundle과 user-managed external dependency 경계가 문서로 고정됐다

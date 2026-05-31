@@ -124,7 +124,7 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
         (
             "landing/src/App.jsx",
             (
-                "CodaroLauncher.exe",
+                "Codaro.exe",
                 "Python 학습과 개인 자동화 스튜디오",
                 "GitHub Releases",
                 "brand.launcherDownloadUrl",
@@ -136,7 +136,7 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
             "landing/src/lib/brand.js",
             (
                 "launcherDownloadUrl",
-                "releases/latest/download/CodaroLauncher.exe",
+                "releases/latest/download/Codaro.exe",
                 "launcherChecksumUrl",
                 "launcherSbomUrl",
                 "toSiteUrl",
@@ -166,12 +166,12 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
             ".github/workflows/launcher-release.yml",
             (
                 "workflow_dispatch",
-                "CodaroLauncher.exe",
-                "CodaroLauncher.exe.sha256",
-                "CodaroLauncher.spdx.json",
-                "launcher/target/release/CodaroLauncher.exe",
-                "launcher/target/release/CodaroLauncher.exe.sha256",
-                "launcher/target/release/CodaroLauncher.spdx.json",
+                "Codaro.exe",
+                "Codaro.exe.sha256",
+                "Codaro.spdx.json",
+                "launcher/target/release/Codaro.exe",
+                "launcher/target/release/Codaro.exe.sha256",
+                "launcher/target/release/Codaro.spdx.json",
                 "fail_on_unmatched_files: true",
             ),
         ),
@@ -221,9 +221,9 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
         return result("built-home-seo-download", missing)
     text = path.read_text(encoding="utf-8")
     for needle in (
-        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe",
-        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
-        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
+        "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe",
+        "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256",
+        "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.spdx.json",
         "Python 학습과 개인 자동화 스튜디오 - Codaro",
         'rel="canonical" href="https://eddmpython.github.io/codaro/"',
     ):

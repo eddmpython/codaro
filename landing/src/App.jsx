@@ -361,7 +361,7 @@ function HomePage() {
           <div className="heroActions">
             <a className="primaryButton" href={brand.launcherDownloadUrl}>
               <Download size={17} aria-hidden="true" />
-              CodaroLauncher.exe
+              Codaro.exe
             </a>
             <a className="secondaryButton" href={appPath("/docs")}>
               <BookOpen size={17} aria-hidden="true" />

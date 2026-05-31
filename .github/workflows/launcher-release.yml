@@ -34,19 +34,19 @@ jobs:
         shell: pwsh
         run: |
           $hash = (Get-FileHash "launcher/target/release/codaro-launcher.exe" -Algorithm SHA256).Hash.ToLower()
-          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
+          "$hash  Codaro.exe" | Out-File -FilePath "launcher/target/release/Codaro.exe.sha256" -Encoding utf8
 
       - name: Rename binary
         shell: pwsh
         run: |
-          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/CodaroLauncher.exe"
+          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/Codaro.exe"
 
       - name: Generate SPDX SBOM
         uses: anchore/sbom-action@v0
         with:
           path: launcher/codaro-launcher
           format: spdx-json
-          output-file: launcher/target/release/CodaroLauncher.spdx.json
+          output-file: launcher/target/release/Codaro.spdx.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -56,15 +56,15 @@ jobs:
           name: Codaro Launcher ${{ env.RELEASE_TAG }}
           fail_on_unmatched_files: true
           body: |
-            Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher.
+            Download `Codaro.exe`, verify `Codaro.exe.sha256`, then run the launcher.
 
             This launcher-only release is for manual binary verification. Product releases are created from normal `vX.Y.Z` tags and include `release-manifest.json`, managed Python runtime assets, and the exact backend wheel asset.
 
-            The release also includes `CodaroLauncher.spdx.json` for dependency transparency.
+            The release also includes `Codaro.spdx.json` for dependency transparency.
           files: |
-            launcher/target/release/CodaroLauncher.exe
-            launcher/target/release/CodaroLauncher.exe.sha256
-            launcher/target/release/CodaroLauncher.spdx.json
+            launcher/target/release/Codaro.exe
+            launcher/target/release/Codaro.exe.sha256
+            launcher/target/release/Codaro.spdx.json
           generate_release_notes: true
           prerelease: true
           make_latest: false

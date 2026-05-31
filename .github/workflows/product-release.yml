@@ -180,29 +180,29 @@ jobs:
       - name: Rename launcher binary
         shell: pwsh
         run: |
-          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/CodaroLauncher.exe"
+          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/Codaro.exe"
 
       - name: Compute launcher SHA256
         shell: pwsh
         run: |
-          $hash = (Get-FileHash "launcher/target/release/CodaroLauncher.exe" -Algorithm SHA256).Hash.ToLower()
-          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
+          $hash = (Get-FileHash "launcher/target/release/Codaro.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  Codaro.exe" | Out-File -FilePath "launcher/target/release/Codaro.exe.sha256" -Encoding utf8
 
       - name: Generate launcher SPDX SBOM
         uses: anchore/sbom-action@v0
         with:
           path: launcher/codaro-launcher
           format: spdx-json
-          output-file: launcher/target/release/CodaroLauncher.spdx.json
+          output-file: launcher/target/release/Codaro.spdx.json
 
       - name: Upload Windows release assets
         uses: actions/upload-artifact@v4
         with:
           name: windows-release-assets
           path: |
-            launcher/target/release/CodaroLauncher.exe
-            launcher/target/release/CodaroLauncher.exe.sha256
-            launcher/target/release/CodaroLauncher.spdx.json
+            launcher/target/release/Codaro.exe
+            launcher/target/release/Codaro.exe.sha256
+            launcher/target/release/Codaro.spdx.json
             launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}
             launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}.sha256
 
@@ -275,7 +275,7 @@ jobs:
 
           ---
 
-          Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher. The release also includes `release-manifest.json`, the exact `codaro` backend wheel, a managed Windows Python runtime archive, checksums, and SPDX SBOM assets. The manifest pins the wheel asset and sha256 from this GitHub Release.
+          Download `Codaro.exe`, verify `Codaro.exe.sha256`, then run the launcher. The release also includes `release-manifest.json`, the exact `codaro` backend wheel, a managed Windows Python runtime archive, checksums, and SPDX SBOM assets. The manifest pins the wheel asset and sha256 from this GitHub Release.
           EOF
 
       - name: Create GitHub Release
@@ -287,9 +287,9 @@ jobs:
           fail_on_unmatched_files: true
           body_path: release-assets/release-notes.md
           files: |
-            release-assets/CodaroLauncher.exe
-            release-assets/CodaroLauncher.exe.sha256
-            release-assets/CodaroLauncher.spdx.json
+            release-assets/Codaro.exe
+            release-assets/Codaro.exe.sha256
+            release-assets/Codaro.spdx.json
             release-assets/python-runtime-win-x64.zip
             release-assets/python-runtime-win-x64.zip.sha256
             release-assets/codaro-*.whl
