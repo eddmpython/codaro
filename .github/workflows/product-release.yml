@@ -111,13 +111,13 @@ jobs:
           PY
 
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
 
       - name: Upload package release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package-release-assets
           path: release-assets/
@@ -196,7 +196,7 @@ jobs:
           output-file: launcher/target/release/Codaro.spdx.json
 
       - name: Upload Windows release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-release-assets
           path: |
