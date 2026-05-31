@@ -8,6 +8,22 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.6 - 2026-05-31
+
+Names and brands the launcher. The download is now `Codaro.exe` (was `CodaroLauncher.exe`)
+and the executable and its window carry the Codaro mascot avatar as their icon.
+
+### Changed
+
+- Renamed the launcher download asset from `CodaroLauncher.exe` to `Codaro.exe` across the release workflow, self-update asset resolution, landing download buttons, README, and docs. Self-update resolves the new asset name, so existing launchers can update to it.
+- Embedded the Codaro mascot avatar as the Windows executable icon via a `winresource` build script (multi-resolution `.ico`) and set the same avatar as the application window/taskbar icon.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` -> all gates pass
+- `cargo test` (launcher) and a local release build confirmed; the built executable's embedded icon extracts as the Codaro avatar.
+- Downloaded `Codaro.exe` confirmed: avatar file icon, avatar window icon, native window, and curriculum cells run.
+
 ## 0.0.5 - 2026-05-30
 
 Fixes the data-science worker crash that still blocked lessons in `0.0.4`. The libraries
