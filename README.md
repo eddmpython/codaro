@@ -1,20 +1,15 @@
 <div align="center">
 
-<img src="assets/brand/mascot/codaro-character.png" width="170" alt="Codaro 마스코트 — 로컬 Python 학습과 자동화를 잇는 개인 스튜디오 캐릭터" />
-
-# Codaro
+<h3 align="center">
+  <img src="assets/brand/mascot/codaro-character.png" width="240" alt="Codaro 마스코트 — 로컬 Python 학습과 자동화를 잇는 개인 스튜디오 캐릭터" /><br/>
+  Codaro
+</h3>
 
 **AI 없이도 완전한 Python 공부 · 업무 자동화 커리큘럼 — 원하면 AI가 다음 확장을 추천합니다.**
 
 코드가 인터페이스가 되는 개인 자동화 스튜디오. 전부 로컬에서, 더블클릭 한 번으로 시작합니다.
 
 <sub><em>코다로(Codaro) — "코드 아로?" "코드 아로~" 코드와 친해지자는 말장난에서 시작한 이름입니다.</em></sub>
-
-<p>
-  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Windows 다운로드 — Codaro.exe" src="https://img.shields.io/badge/Windows_다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="36" /></a>
-  &nbsp;&nbsp;
-  <a href="https://buymeacoffee.com/eddmpython"><img alt="Buy me a coffee" src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=18181b" height="36" /></a>
-</p>
 
 <p>
   <a href="https://github.com/eddmpython/codaro/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/eddmpython/codaro?style=for-the-badge&label=Release&labelColor=18181b&color=18181b&logo=github&logoColor=white" /></a>
@@ -28,6 +23,12 @@
   <img alt="Python 3.12+" src="https://img.shields.io/badge/Runtime-Python_3.12+-3776ab?style=for-the-badge&labelColor=18181b&logo=python&logoColor=white" />
   <img alt="Editor React 19" src="https://img.shields.io/badge/Editor-React_19-61dafb?style=for-the-badge&labelColor=18181b&logo=react&logoColor=white" />
   <img alt="Distribution GitHub Releases" src="https://img.shields.io/badge/Distribution-GitHub_Releases-18181b?style=for-the-badge&labelColor=18181b" />
+</p>
+
+<p>
+  <a href="https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"><img alt="Windows 다운로드 — Codaro.exe" src="https://img.shields.io/badge/Windows%20다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" height="60" /></a>
+  &nbsp;&nbsp;
+  <a href="https://buymeacoffee.com/eddmpython"><img alt="Buy me a coffee — eddmpython 후원" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="60" /></a>
 </p>
 
 <p>
