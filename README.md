@@ -33,8 +33,6 @@
 
 <p>
   <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><strong>다운로드</strong></a> ·
-  <a href="https://eddmpython.github.io/codaro/">문서</a> ·
-  <a href="https://eddmpython.github.io/codaro/docs/blog">소식</a> ·
   <a href="https://github.com/eddmpython/codaro/issues">이슈</a>
 </p>
 
@@ -409,7 +407,6 @@ Codaro의 기본 실행 플랫폼은 사용자의 로컬 Python 환경입니다 
 | 제품 식별성 (11 사상) | [docs/skills/identity/](docs/skills/identity/) |
 | 아키텍처 SSOT | [docs/skills/architecture/](docs/skills/architecture/) |
 | 운영 규칙 (환경·품질·릴리즈) | [docs/skills/ops/](docs/skills/ops/) |
-| 공식 사이트 + 블로그 | [eddmpython.github.io/codaro](https://eddmpython.github.io/codaro/) |
 | Python 30일 완성 안내 | [notebooks/python30DaysComplete/readme.md](notebooks/python30DaysComplete/readme.md) |
 | Day 01 Colab | [열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) |
 | 코스 가이드 | [courseGuide.md](notebooks/python30DaysComplete/courseGuide.md) |
@@ -442,10 +439,8 @@ Codaro는 공개 학습과 검토를 허용하지만, **상업적 재사용을 �
 <p align="center">
   <sub><strong>Codaro</strong> — 배우는 코드가 곧 실행되는 자동화가 된다.</sub><br/>
   <sub>
-    <a href="https://eddmpython.github.io/codaro/">웹사이트</a> ·
     <a href="https://github.com/eddmpython/codaro">GitHub</a> ·
-    <a href="https://github.com/eddmpython/codaro/releases/latest">최신 릴리즈</a> ·
-    <a href="https://eddmpython.github.io/codaro/docs/blog">Codaro 소식</a>
+    <a href="https://github.com/eddmpython/codaro/releases/latest">최신 릴리즈</a>
   </sub>
 </p>
 
