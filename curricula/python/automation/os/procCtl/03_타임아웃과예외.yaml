@@ -110,16 +110,17 @@ sections:
     tips:
       - flush=True를 print에 주면 stdout이 즉시 자식 밖으로 빠져 나간다.
       - TimeoutExpired.stdout은 bytes 또는 text 모드 설정에 따라 형이 다르다.
+      - 부분 출력을 보려면 timeout이 자식의 첫 출력 시점보다 길어야 한다. 너무 짧으면 자식이 인터프리터를 띄우기도 전에 잘려 stdout이 빈다.
     snippet: |-
       import subprocess
       import sys
 
-      script = "import time, sys; print('start', flush=True); time.sleep(5); print('end')"
+      script = "import time, sys; print('start', flush=True); time.sleep(30); print('end')"
       collected = None
       try:
           subprocess.run(
               [sys.executable, "-c", script],
-              timeout=0.3,
+              timeout=3.0,
               capture_output=True,
               text=True,
           )
@@ -134,12 +135,12 @@ sections:
         import subprocess
         import sys
 
-        script = "import time, sys; print('___', flush=True); time.sleep(5)"
+        script = "import time, sys; print('___', flush=True); time.sleep(30)"
         collected = None
         try:
             subprocess.run(
                 [sys.executable, "-c", script],
-                timeout=0.3,
+                timeout=3.0,
                 capture_output=___,
                 text=True,
             )
@@ -152,12 +153,12 @@ sections:
         import subprocess
         import sys
 
-        script = "import time, sys; print('running', flush=True); time.sleep(5)"
+        script = "import time, sys; print('running', flush=True); time.sleep(30)"
         collected = None
         try:
             subprocess.run(
                 [sys.executable, "-c", script],
-                timeout=0.3,
+                timeout=3.0,
                 capture_output=True,
                 text=True,
             )
