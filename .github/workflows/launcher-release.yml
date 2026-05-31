@@ -49,7 +49,7 @@ jobs:
           output-file: launcher/target/release/Codaro.spdx.json
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           target_commitish: ${{ github.sha }}
