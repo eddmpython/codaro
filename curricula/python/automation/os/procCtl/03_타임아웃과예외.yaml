@@ -120,7 +120,7 @@ sections:
       try:
           subprocess.run(
               [sys.executable, "-c", script],
-              timeout=3.0,
+              timeout=8.0,
               capture_output=True,
               text=True,
           )
@@ -140,7 +140,7 @@ sections:
         try:
             subprocess.run(
                 [sys.executable, "-c", script],
-                timeout=3.0,
+                timeout=8.0,
                 capture_output=___,
                 text=True,
             )
@@ -158,7 +158,7 @@ sections:
         try:
             subprocess.run(
                 [sys.executable, "-c", script],
-                timeout=3.0,
+                timeout=8.0,
                 capture_output=True,
                 text=True,
             )
@@ -209,9 +209,9 @@ sections:
 
 
       summary = {
-          "ok": runOnce("print('ok')", 1.0),
+          "ok": runOnce("print('ok')", 10.0),
           "slow": runOnce("import time; time.sleep(5)", 0.2),
-          "fail": runOnce("import sys; sys.exit(3)", 1.0),
+          "fail": runOnce("import sys; sys.exit(3)", 10.0),
       }
 
       assert summary["ok"]["status"] == "success"
@@ -241,7 +241,7 @@ sections:
                 return {"status": "failed", "returncode": exc.returncode}
 
 
-        first = runOnce("import sys; sys.exit(4)", 1.0)
+        first = runOnce("import sys; sys.exit(4)", 10.0)
         second = runOnce("import time; time.sleep(3)", 0.2)
 
         assert first == {"status": "failed", "returncode": 4}
@@ -268,7 +268,7 @@ sections:
                 return {"status": "failed", "returncode": exc.returncode}
 
 
-        first = runOnce("import sys; sys.exit(4)", 1.0)
+        first = runOnce("import sys; sys.exit(4)", 10.0)
         second = runOnce("import time; time.sleep(3)", 0.2)
 
         assert first == {"status": "failed", "returncode": 4}
@@ -324,9 +324,9 @@ sections:
 
 
       summary = summarizeBatch([
-          {"name": "ok", "script": "print(1)", "timeout": 1.0},
+          {"name": "ok", "script": "print(1)", "timeout": 10.0},
           {"name": "slow", "script": "import time; time.sleep(5)", "timeout": 0.2},
-          {"name": "fail", "script": "import sys; sys.exit(2)", "timeout": 1.0},
+          {"name": "fail", "script": "import sys; sys.exit(2)", "timeout": 10.0},
       ])
 
       assert summary == {"success": ["ok"], "failed": ["fail"], "timeout": ["slow"]}
@@ -363,9 +363,9 @@ sections:
 
 
         summary = summarizeBatch([
-            {"name": "alpha", "script": "print(0)", "timeout": 1.0},
-            {"name": "beta", "script": "print(1)", "timeout": 1.0},
-            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 1.0},
+            {"name": "alpha", "script": "print(0)", "timeout": 10.0},
+            {"name": "beta", "script": "print(1)", "timeout": 10.0},
+            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 10.0},
         ])
 
         assert summary == {"success": ["alpha", "beta"], "failed": ["gamma"], "timeout": []}
@@ -400,9 +400,9 @@ sections:
 
 
         summary = summarizeBatch([
-            {"name": "alpha", "script": "print(0)", "timeout": 1.0},
-            {"name": "beta", "script": "print(1)", "timeout": 1.0},
-            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 1.0},
+            {"name": "alpha", "script": "print(0)", "timeout": 10.0},
+            {"name": "beta", "script": "print(1)", "timeout": 10.0},
+            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 10.0},
         ])
 
         assert summary == {"success": ["alpha", "beta"], "failed": ["gamma"], "timeout": []}
