@@ -52,6 +52,8 @@
   <a href="https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe"><img alt="Download Codaro.exe" src="https://img.shields.io/badge/Windows_다운로드-Codaro.exe-2563eb?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" /></a>
 </p>
 
+> ⚠️ **런처는 아직 안정화 작업 중입니다 (초기 베타).** 일부 환경에서 설치·실행 중 오류가 날 수 있습니다. 문제가 생기면 [이슈로 알려주세요](https://github.com/eddmpython/codaro/issues) — 화면에 뜬 메시지나 로그를 함께 남겨주시면 빠르게 고치겠습니다.
+
 1. **[Codaro 런처 다운로드](https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe)** _(Windows 10/11)_
 2. 받은 파일을 **더블클릭**합니다.
 3. 첫 실행에서 런처가 자동으로 — 관리형 Python runtime + `codaro` 본체 + **기본 커리큘럼(463 레슨)** 을 내려받아 설치합니다. (네트워크/디스크에 따라 몇 분)
