@@ -5,6 +5,7 @@ from typing import Generator
 
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
+from .providerDependencies import raiseOpenaiSdkMissing
 
 OLLAMA_DEFAULT_URL = "http://localhost:11434"
 
@@ -75,7 +76,7 @@ class OllamaProvider(BaseProvider):
             try:
                 from openai import OpenAI
             except ImportError:
-                raise ImportError("openai package is required.\n  uv add codaro[ai]")
+                raiseOpenaiSdkMissing()
             self._client = OpenAI(base_url=self._baseUrl, api_key="ollama")
         return self._client
 

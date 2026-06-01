@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import builtins
 
 import pytest
 
@@ -34,6 +35,9 @@ from codaro.ai.providerSpec import (
 )
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai.providers import oauthChatgptProvider as oauthProviderModule
+from codaro.ai.providers.customProvider import CustomProvider
+from codaro.ai.providers.ollamaProvider import OllamaProvider
+from codaro.ai.providers.openaiProvider import OpenAIProvider
 from codaro.ai.providers.oauthChatgptProvider import ChatGPTOAuthError, OAuthChatGPTProvider, _parseSseResponseDetailed
 from codaro.ai.tools import toolManifest
 
@@ -240,6 +244,31 @@ class TestFactory:
         config.provider = "nonexistent"
         with pytest.raises(ValueError, match="Unsupported provider"):
             createProvider(config)
+
+    def test_provider_missing_sdk_message_uses_settings_recovery(self, monkeypatch):
+        originalImport = builtins.__import__
+
+        def blockOpenaiImport(name, *args, **kwargs):
+            if name == "openai":
+                raise ImportError("blocked openai import")
+            return originalImport(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", blockOpenaiImport)
+        ollama = OllamaProvider(LLMConfig(provider="ollama"))
+        monkeypatch.setattr(ollama, "checkAvailable", lambda: True)
+        providers = (
+            OpenAIProvider(LLMConfig(provider="openai")),
+            CustomProvider(LLMConfig(provider="custom", baseUrl="http://localhost:9000/v1")),
+            ollama,
+        )
+
+        for provider in providers:
+            with pytest.raises(ImportError) as error:
+                provider._getClient()
+            message = str(error.value)
+            assert "uv add" not in message
+            assert "pip install" not in message
+            assert "Provider 설정" in message
 
     def test_register_provider(self):
         registerProvider("test-prov", "codaro.ai.providers.openaiProvider.OpenAIProvider")

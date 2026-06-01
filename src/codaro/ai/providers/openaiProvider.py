@@ -5,6 +5,7 @@ from typing import Generator
 
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
+from .providerDependencies import raiseOpenaiSdkMissing
 
 try:
     from openai import OpenAIError as _OpenAIError
@@ -25,7 +26,7 @@ class OpenAIProvider(BaseProvider):
             try:
                 from openai import OpenAI
             except ImportError:
-                raise ImportError("openai package is required.\n  uv add codaro[ai]")
+                raiseOpenaiSdkMissing()
             kwargs = {}
             if self.config.apiKey:
                 kwargs["api_key"] = self.config.apiKey

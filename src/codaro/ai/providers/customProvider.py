@@ -5,6 +5,7 @@ from typing import Generator
 
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
+from .providerDependencies import raiseOpenaiSdkMissing
 
 try:
     from openai import OpenAIError as _OpenAIError
@@ -25,7 +26,7 @@ class CustomProvider(BaseProvider):
             try:
                 from openai import OpenAI
             except ImportError:
-                raise ImportError("openai package is required.\n  uv add codaro[ai]")
+                raiseOpenaiSdkMissing()
             if not self.config.baseUrl:
                 raise ValueError("Custom provider requires a baseUrl.")
             kwargs: dict = {"base_url": self.config.baseUrl}
