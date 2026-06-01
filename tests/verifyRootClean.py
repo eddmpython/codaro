@@ -93,6 +93,9 @@ ALLOWED_LOCAL_ROOT_DIRS = {
     "output",
     "sns",
 }
+ALLOWED_LOCAL_RUNNER_DIR_MARKERS = {
+    "-pytest-",
+}
 ALLOWED_LOCAL_ROOT_FILES = {
     "AGENTS.md",
     "CLAUDE.md",
@@ -100,6 +103,12 @@ ALLOWED_LOCAL_ROOT_FILES = {
 }
 ALLOWED_ROOT_DIRS = REQUIRED_ROOT_DIRS | ALLOWED_LOCAL_ROOT_DIRS
 ALLOWED_ROOT_FILES = REQUIRED_ROOT_FILES | ALLOWED_LOCAL_ROOT_FILES
+
+
+def isAllowedLocalRootDirectoryName(name: str) -> bool:
+    return name in ALLOWED_LOCAL_ROOT_DIRS or (
+        name.startswith(".") and any(marker in name for marker in ALLOWED_LOCAL_RUNNER_DIR_MARKERS)
+    )
 
 
 def gitOutput(*args: str) -> list[str]:
@@ -138,7 +147,7 @@ def rootUnexpectedFilesystemEntries() -> list[str]:
     for entry in ROOT.iterdir():
         name = entry.name
         if entry.is_dir():
-            if name not in ALLOWED_ROOT_DIRS:
+            if name not in ALLOWED_ROOT_DIRS and not isAllowedLocalRootDirectoryName(name):
                 failures.append(rootRelativePath(entry) + "/")
             continue
         if entry.is_file():
@@ -164,7 +173,7 @@ def backupLikeDirectoryEntries() -> list[str]:
             if name in FORBIDDEN_BACKUP_DIR_NAMES:
                 failures.append(rootRelativePath(child) + "/")
                 continue
-            if name in BACKUP_SCAN_SKIP_DIRS:
+            if name in BACKUP_SCAN_SKIP_DIRS or isAllowedLocalRootDirectoryName(name):
                 continue
             pending.append(child)
     return failures
@@ -200,7 +209,7 @@ def rootUnexpectedUntrackedEntries() -> list[str]:
     failures: list[str] = []
     for entry in rootUntrackedEntries():
         path = ROOT / entry
-        if path.is_dir() and entry in ALLOWED_LOCAL_ROOT_DIRS:
+        if path.is_dir() and isAllowedLocalRootDirectoryName(entry):
             continue
         if path.is_file() and entry in ALLOWED_LOCAL_ROOT_FILES:
             continue

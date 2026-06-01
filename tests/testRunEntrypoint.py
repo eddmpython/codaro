@@ -64,12 +64,20 @@ def testGateNamesAreStable() -> None:
         "root-clean",
         "docs",
         "backend",
-        "widget-bridge",
-        "app-runtime",
-        "mobile-layout",
+    )
+    assert runner.changedCycleGates((
+        "editor/src/App.tsx",
+        "launcher/codaro-launcher/src/main.rs",
+        "src/codaro/system/packageOps.py",
+        "curricula/python/pandas/example.yaml",
+    )) == (
+        "root-clean",
+        "docs",
         "editor-build",
+        "launcher-check",
+        "launcher-test",
+        "backend",
         "curriculum-quality-matrix",
-        "curriculum-executability",
     )
     assert runner.PRODUCT_QUALITY_GATES == (
         "root-clean",

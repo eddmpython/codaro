@@ -5,7 +5,6 @@ fn main() {
         res.set("ProductName", "Codaro");
         res.set("FileDescription", "Codaro Desktop Launcher");
         res.set("CompanyName", "eddmpython");
-        res.compile()
-            .expect("Failed to compile Windows resources");
+        res.compile().expect("Failed to compile Windows resources");
     }
 }

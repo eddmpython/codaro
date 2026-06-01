@@ -329,12 +329,6 @@ PREFLIGHT_GATES = (
     "root-clean",
     "docs",
     "backend",
-    "widget-bridge",
-    "app-runtime",
-    "mobile-layout",
-    "editor-build",
-    "curriculum-quality-matrix",
-    "curriculum-executability",
 )
 PRODUCT_QUALITY_GATES = (
     "root-clean",
@@ -360,6 +354,47 @@ PRODUCT_QUALITY_GATES = (
     "launcher-test",
 )
 TIER_ORDER = ("fast", "surface", "release")
+
+
+def changedCyclePaths() -> tuple[str, ...]:
+    paths: set[str] = set()
+    for args in (
+        ("diff", "--name-only", "--diff-filter=ACMRTUXB", "HEAD", "--"),
+        ("ls-files", "--others", "--exclude-standard", "--"),
+    ):
+        result = subprocess.run(
+            ("git", *args),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            encoding="utf-8",
+        )
+        paths.update(line.strip() for line in result.stdout.splitlines() if line.strip())
+    return tuple(sorted(paths))
+
+
+def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
+    changedPaths = paths if paths is not None else changedCyclePaths()
+    gates: list[str] = ["root-clean", "docs"]
+
+    def addGate(gateName: str) -> None:
+        if gateName not in gates:
+            gates.append(gateName)
+
+    for path in changedPaths:
+        normalized = path.replace("\\", "/")
+        if normalized.startswith(("src/", "tests/")) or normalized in {"pyproject.toml", "uv.lock"}:
+            addGate("backend")
+        if normalized.startswith("editor/"):
+            addGate("editor-build")
+        if normalized.startswith("landing/"):
+            addGate("landing-build")
+        if normalized.startswith("launcher/"):
+            addGate("launcher-check")
+            addGate("launcher-test")
+        if normalized.startswith("curricula/"):
+            addGate("curriculum-quality-matrix")
+    return tuple(gates)
 
 
 def runCommand(gateName: str, gateCommand: GateCommand) -> int:
@@ -669,14 +704,18 @@ def commandLogSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, o
     logsDir = localGateWorkspace(gateName) / "logs"
     if not logsDir.exists():
         return []
-    logPaths = list(logsDir.glob("*.log"))
+    logPaths: list[Path] = []
+    for logPath in logsDir.glob("*.log"):
+        try:
+            if logPath.stat().st_mtime_ns >= gateStartedAtNs:
+                logPaths.append(logPath)
+        except OSError:
+            continue
     for logPath in logPaths:
         waitForLogFileStable(logPath)
     summaries: list[dict[str, object]] = []
     for logPath in sorted(logPaths, key=lambda path: path.stat().st_mtime_ns):
         modifiedAtNs = logPath.stat().st_mtime_ns
-        if modifiedAtNs < gateStartedAtNs:
-            continue
         summaries.append({
             "path": displayPath(logPath),
             "exists": True,
@@ -845,6 +884,9 @@ def listGates() -> int:
     print("preflight:")
     for name in PREFLIGHT_GATES:
         print(f"  {name}")
+    print("change-cycle:")
+    for name in changedCycleGates():
+        print(f"  {name}")
     print("quality-cycle:")
     for name in PRODUCT_QUALITY_GATES:
         print(f"  {name}")
@@ -911,6 +953,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     subparsers.add_parser("list", help="show available gates")
     subparsers.add_parser("preflight", help="run the default local preflight gates")
+    subparsers.add_parser("change-cycle", help="run gates selected from changed files")
     subparsers.add_parser("quality-cycle", help="run the product quality gate sequence")
     subparsers.add_parser("audit-self", help="validate runner, docs, and CI wiring")
 
@@ -930,6 +973,14 @@ def main(argv: list[str] | None = None) -> int:
         return listGates()
     if args.command == "preflight":
         return runGateSequence(PREFLIGHT_GATES, sequenceName="preflight")
+    if args.command == "change-cycle":
+        paths = changedCyclePaths()
+        print(f"change-cycle changed paths: {len(paths)}")
+        for path in paths:
+            print(f"  {path}")
+        gates = changedCycleGates(paths)
+        print(f"change-cycle gates: {', '.join(gates)}")
+        return runGateSequence(gates, sequenceName="change-cycle")
     if args.command == "quality-cycle":
         return runGateSequence(PRODUCT_QUALITY_GATES, sequenceName="quality-cycle")
     if args.command == "audit-self":

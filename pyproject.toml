@@ -70,4 +70,4 @@ select = [
 
 [tool.pytest.ini_options]
 python_files = ["test*.py"]
-addopts = "-o cache_dir=output/test-runner/.pytest_cache"
+addopts = "-p no:cacheprovider -o cache_dir=output/test-runner/.pytest_cache"

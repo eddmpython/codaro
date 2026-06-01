@@ -1703,6 +1703,7 @@ mod tests {
         let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
         paths.ensure_layout().unwrap();
         let stores = LauncherStateStores::new(&paths);
+        disable_auto_update_for_launch_tests(&stores);
         let active_state = sample_state("2026.03.18-2");
         let rollback_state = sample_state("2026.03.10-2");
         stores.active_release.save(&active_state).unwrap();
@@ -1752,6 +1753,7 @@ mod tests {
         let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
         paths.ensure_layout().unwrap();
         let stores = LauncherStateStores::new(&paths);
+        disable_auto_update_for_launch_tests(&stores);
         let active_state = sample_state("2026.03.18-6");
         stores.active_release.save(&active_state).unwrap();
 
@@ -1786,6 +1788,7 @@ mod tests {
         let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
         paths.ensure_layout().unwrap();
         let stores = LauncherStateStores::new(&paths);
+        disable_auto_update_for_launch_tests(&stores);
         let active_state = sample_state("2026.03.18-7");
         let rollback_state = sample_state("2026.03.10-7");
         stores.active_release.save(&active_state).unwrap();
@@ -2078,6 +2081,19 @@ mod tests {
             editor_version: "0.3.0".into(),
             installed_at_unix_seconds: 1234,
         }
+    }
+
+    fn disable_auto_update_for_launch_tests(stores: &LauncherStateStores) {
+        stores
+            .update_config
+            .save(&UpdateConfig {
+                channel: "stable".into(),
+                auto_update_on_launch: false,
+                manifest_source: None,
+                github_repo: "eddmpython/codaro".into(),
+                github_manifest_asset_name: "release-manifest.json".into(),
+            })
+            .unwrap();
     }
 
     fn write_release_runtime(
