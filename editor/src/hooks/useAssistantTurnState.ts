@@ -71,6 +71,15 @@ type SaveCurriculum = (
   title?: string,
 ) => CustomCurriculumEntry | null;
 
+type AssistantTurnApplication = {
+  clearPendingBlocks: boolean;
+  curriculumToSave: CurriculumToSave | null;
+  documentToApply?: CodaroDocument | null;
+  pendingBlocks: BlockConfig[];
+  pendingTarget: PendingTarget | null;
+  surfaceToOpen: SurfaceMode | null;
+};
+
 export function useAssistantTurnState({
   activeDocument,
   apiOnline,
@@ -109,6 +118,26 @@ export function useAssistantTurnState({
     return entry.title;
   }, [openCurriculum, saveCurriculum]);
 
+  const applyAssistantTurnApplication = useCallback((application: AssistantTurnApplication) => {
+    const savedCurriculumTitle = saveAndOpenCurriculum(application.curriculumToSave);
+    if (application.documentToApply) {
+      applyDocument(application.documentToApply);
+    }
+    if (application.clearPendingBlocks) {
+      setPendingBlocks([]);
+    }
+    if (application.pendingBlocks.length) {
+      setPendingBlocks((current) => mergePendingBlocks(current, application.pendingBlocks));
+    }
+    if (application.pendingTarget) {
+      setPendingTarget(application.pendingTarget);
+    }
+    if (application.surfaceToOpen && !application.curriculumToSave) {
+      setSurface(application.surfaceToOpen);
+    }
+    return savedCurriculumTitle;
+  }, [applyDocument, saveAndOpenCurriculum, setPendingBlocks, setPendingTarget, setSurface]);
+
   const askAssistant = useCallback(async (
     messageOverride?: string,
     scopeOverride?: TeacherScope,
@@ -140,25 +169,13 @@ export function useAssistantTurnState({
         message,
         scope: activeScope,
       });
-      const savedCurriculumTitle = saveAndOpenCurriculum(localApplication.curriculumToSave);
+      const savedCurriculumTitle = applyAssistantTurnApplication(localApplication);
       const localResult = completeAssistantLocalTurn({
         application: localApplication,
         message,
         savedCurriculumTitle,
         scope: activeScope,
       });
-      if (localApplication.clearPendingBlocks) {
-        setPendingBlocks([]);
-      }
-      if (localApplication.pendingBlocks.length) {
-        setPendingBlocks((current) => mergePendingBlocks(current, localApplication.pendingBlocks));
-      }
-      if (localApplication.pendingTarget) {
-        setPendingTarget(localApplication.pendingTarget);
-      }
-      if (localApplication.surfaceToOpen && !localApplication.curriculumToSave) {
-        setSurface(localApplication.surfaceToOpen);
-      }
       setMessages((current) => [...current, localResult.assistantMessage]);
       if (cellTargetBlockId) {
         setCellHelpByBlockId((current) => ({
@@ -226,22 +243,7 @@ export function useAssistantTurnState({
         message,
         response,
       });
-      const savedCurriculumTitle = saveAndOpenCurriculum(application.curriculumToSave);
-      if (application.documentToApply) {
-        applyDocument(application.documentToApply);
-      }
-      if (application.surfaceToOpen && !application.curriculumToSave) {
-        setSurface(application.surfaceToOpen);
-      }
-      if (application.pendingBlocks.length) {
-        setPendingBlocks((current) => mergePendingBlocks(current, application.pendingBlocks));
-      }
-      if (application.pendingTarget) {
-        setPendingTarget(application.pendingTarget);
-      }
-      if (application.clearPendingBlocks) {
-        setPendingBlocks([]);
-      }
+      const savedCurriculumTitle = applyAssistantTurnApplication(application);
       setMessages((current) => finalizeAssistantMessage({
         assistantMessageId,
         messages: current,
@@ -292,7 +294,7 @@ export function useAssistantTurnState({
   }, [
     activeDocument,
     apiOnline,
-    applyDocument,
+    applyAssistantTurnApplication,
     assistantLoading,
     conversationId,
     currentResult,
@@ -302,12 +304,8 @@ export function useAssistantTurnState({
     profile,
     prompt,
     results,
-    saveAndOpenCurriculum,
     selectedBlock,
     sessionId,
-    setPendingBlocks,
-    setPendingTarget,
-    setSurface,
     surface,
     teacherScope,
     toolCatalog.tools,

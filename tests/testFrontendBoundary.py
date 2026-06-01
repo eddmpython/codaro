@@ -196,8 +196,11 @@ def testAssistantContextSteersAutomationAuthoringAwayFromCurriculumYaml() -> Non
 def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     source = _read("editor/src/hooks/useAssistantTurnState.ts")
 
+    assert "const applyAssistantTurnApplication = useCallback" in source
     assert "saveAndOpenCurriculum(application.curriculumToSave)" in source
-    assert "saveAndOpenCurriculum(localApplication.curriculumToSave)" in source
+    assert "applyAssistantTurnApplication(localApplication)" in source
+    assert "applyAssistantTurnApplication(application)" in source
+    assert "mergePendingBlocks(current, application.pendingBlocks)" in source
     assert "openCurriculum(entry)" in source
     assert "completeAssistantLocalTurn" in source
 
@@ -221,7 +224,8 @@ def testLocalFallbackRoutesAutomationDraftsToNotebookPendingChanges() -> None:
     assert "DRY_RUN = True" in fallback
     assert 'scope === "lesson" || scope === "curriculum"' in fallback
     assert "pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks" in localTurn
-    assert "mergePendingBlocks(current, localApplication.pendingBlocks)" in hook
+    assert "applyAssistantTurnApplication(localApplication)" in hook
+    assert "mergePendingBlocks(current, application.pendingBlocks)" in hook
     assert "buildLocalExecutionResult" not in fallback
     assert "firstOutputLine" not in fallback
 
