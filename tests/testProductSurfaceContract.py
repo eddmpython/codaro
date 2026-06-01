@@ -159,9 +159,14 @@ def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
     assert 'activeScope === "automation"' in responsePlan
     assert "plan.pendingBlocks = buildLocalBlocksFromPrompt(message, activeScope)" in responsePlan
     assert "routeAssistantArtifacts(plan)" in responsePlan
-    assert 'surfaceToOpen: input.curriculumToSave ? "curriculum" : hasNotebookArtifact ? "editor" : null' in routing
+    assert "pendingTargetForAssistantArtifacts(input)" in routing
+    assert "surfaceForAssistantArtifacts(input)" in routing
+    assert 'return input.pendingBlocks.length > 0 ? "notebook" : null' in routing
+    assert 'if (input.curriculumToSave) return "curriculum"' in routing
+    assert 'if (input.documentToApply || input.pendingBlocks.length > 0) return "editor"' in routing
     assert "surfaceForAcceptedPendingTarget(pendingTarget)" in pendingChanges
     assert 'return target === "curriculum" ? "curriculum" : "editor"' in routing
+    assert "clearPendingBlocks ? \"notebook\"" not in routing
     assert 'surfaceToOpen: "automation"' not in responsePlan
     assert 'surfaceToOpen: "automation"' not in routing
     assert '"automation"' not in pendingChanges

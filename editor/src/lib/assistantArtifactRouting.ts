@@ -21,13 +21,20 @@ export type AssistantArtifactRoute = {
 };
 
 export function routeAssistantArtifacts(input: AssistantArtifactRouteInput): AssistantArtifactRoute {
-  const hasPendingNotebookChange = input.clearPendingBlocks || input.pendingBlocks.length > 0;
-  const hasNotebookArtifact = Boolean(input.documentToApply) || input.pendingBlocks.length > 0;
-
   return {
-    pendingTarget: hasPendingNotebookChange ? "notebook" : null,
-    surfaceToOpen: input.curriculumToSave ? "curriculum" : hasNotebookArtifact ? "editor" : null,
+    pendingTarget: pendingTargetForAssistantArtifacts(input),
+    surfaceToOpen: surfaceForAssistantArtifacts(input),
   };
+}
+
+export function pendingTargetForAssistantArtifacts(input: AssistantArtifactRouteInput): PendingTarget | null {
+  return input.pendingBlocks.length > 0 ? "notebook" : null;
+}
+
+export function surfaceForAssistantArtifacts(input: AssistantArtifactRouteInput): SurfaceMode | null {
+  if (input.curriculumToSave) return "curriculum";
+  if (input.documentToApply || input.pendingBlocks.length > 0) return "editor";
+  return null;
 }
 
 export function surfaceForAcceptedPendingTarget(target: PendingTarget): SurfaceMode {

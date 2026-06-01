@@ -147,10 +147,15 @@ def testAssistantArtifactRoutingOwnsChatArtifactSurfaceTransitions() -> None:
     ssotMap = _read("docs/skills/architecture/ssot-map.md")
 
     assert "export function routeAssistantArtifacts" in route
+    assert "export function pendingTargetForAssistantArtifacts" in route
+    assert "export function surfaceForAssistantArtifacts" in route
     assert "export function surfaceForAcceptedPendingTarget" in route
-    assert "hasPendingNotebookChange" in route
-    assert "hasNotebookArtifact" in route
-    assert 'surfaceToOpen: input.curriculumToSave ? "curriculum" : hasNotebookArtifact ? "editor" : null' in route
+    assert 'pendingTarget: pendingTargetForAssistantArtifacts(input)' in route
+    assert 'surfaceToOpen: surfaceForAssistantArtifacts(input)' in route
+    assert 'return input.pendingBlocks.length > 0 ? "notebook" : null' in route
+    assert 'if (input.curriculumToSave) return "curriculum"' in route
+    assert 'if (input.documentToApply || input.pendingBlocks.length > 0) return "editor"' in route
+    assert "clearPendingBlocks ? \"notebook\"" not in route
     assert 'surfaceToOpen: "automation"' not in route
     assert 'type PendingTarget = "notebook" | "curriculum"' in route
     assert 'from "@/lib/assistantArtifactRouting"' in responsePlan
