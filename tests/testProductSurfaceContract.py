@@ -79,6 +79,11 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
     assert "PRODUCT_SIDEBAR_FLOW_ITEMS" in flowNav
+    assert "sidebarSurfaceIcons" in flowNav
+    assert "sidebarIconForSurface" in flowNav
+    assert "Unsupported sidebar surface" in flowNav
+    assert "PackageOpen" not in flowNav
+    assert "share:" not in flowNav
     assert "PRODUCT_SIDEBAR_NAV" not in flowNav
     assert "PRODUCT_SURFACE_NAV" not in flowNav
     assert "flowStep: index + 1" not in flowNav
