@@ -84,9 +84,12 @@ def test_provider_failure_notice_and_assistant_auth_boundary_use_diagnostics() -
         connection,
         (
             "providerSettingsActions",
+            "export function isProviderSettingsAction",
+            "export function shouldOfferProviderSettings",
+            "export function providerAssistantDisplayContent",
             "export function providerActionFailureNotice",
             "diagnostic?.message ?? errorMessage(error).replace(/^\\d+\\s+/, \"\")",
-            "return providerSettingsActions.has(diagnostic.action)",
+            "return isProviderSettingsAction(diagnostic.action)",
             '"check-permission"',
         ),
     )
@@ -94,7 +97,11 @@ def test_provider_failure_notice_and_assistant_auth_boundary_use_diagnostics() -
     assert "normalized.includes(\"oauth\")" in connection
     assert "diagnostic: event.diagnostic" in conversation
     assert "diagnostic: failure.diagnostic" in assistantTurn
-    assert "shouldOfferProviderSettings(message)" in panel
-    assert "providerSettingsMessageActions.has(diagnosticAction)" in panel
+    assert 'from "@/lib/providerConnection"' in panel
+    assert "shouldOfferProviderSettings({" in panel
+    assert "providerAssistantDisplayContent({" in panel
+    assert "providerSettingsMessageActions" not in panel
+    assert "function isProviderAuthMessage" not in panel
+    assert "function cleanAssistantMessage" not in panel
     assert "providerActionFailureNotice" in hook
     assert hook.count("providerActionFailureNotice(") >= 3

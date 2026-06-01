@@ -35,6 +35,17 @@ export type ProviderConnectionPromptResetInput = {
   providerReady: boolean;
 };
 
+export type ProviderSettingsOfferInput = {
+  action?: string | null;
+  content: string;
+  diagnosticAction?: string | null;
+};
+
+export type ProviderAssistantDisplayContentInput = {
+  content: string;
+  diagnostic?: ProviderDiagnostic;
+};
+
 const providerSettingsActions = new Set([
   "check-network",
   "check-provider-compatibility",
@@ -87,6 +98,42 @@ export function shouldResetProviderConnectionPrompt({
   providerReady,
 }: ProviderConnectionPromptResetInput): boolean {
   return !apiOnline || providerReady;
+}
+
+export function isProviderSettingsAction(action?: string | null): boolean {
+  return Boolean(action && providerSettingsActions.has(action));
+}
+
+export function isProviderAuthMessageContent(content: string): boolean {
+  const normalized = content.toLowerCase();
+  return (
+    normalized.includes("oauth authentication required") ||
+    normalized.includes("please login") ||
+    normalized.includes("authentication expired") ||
+    normalized.includes("re-login") ||
+    normalized.includes("provider 로그인이 필요") ||
+    normalized.includes("대화 제공자 로그인이 필요")
+  );
+}
+
+export function shouldOfferProviderSettings({
+  action,
+  content,
+  diagnosticAction,
+}: ProviderSettingsOfferInput): boolean {
+  if (action === "connect-provider") return true;
+  if (diagnosticAction) return isProviderSettingsAction(diagnosticAction);
+  return isProviderAuthMessageContent(content);
+}
+
+export function providerAssistantDisplayContent({
+  content,
+  diagnostic,
+}: ProviderAssistantDisplayContentInput): string {
+  if (diagnostic?.message) return diagnostic.message;
+  return isProviderAuthMessageContent(content)
+    ? translate("assistant.providerLoginRequired")
+    : content.replace(/^503\s+/, "");
 }
 
 export async function loginOauthProvider(providerId = "oauth-chatgpt"): Promise<ProviderActionResult> {
@@ -258,7 +305,7 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
 export function isProviderAuthError(error: unknown) {
   const diagnostic = providerDiagnosticFromError(error);
   if (diagnostic?.action) {
-    return providerSettingsActions.has(diagnostic.action);
+    return isProviderSettingsAction(diagnostic.action);
   }
   const normalized = errorMessage(error).toLowerCase();
   return (

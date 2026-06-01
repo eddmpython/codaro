@@ -30,6 +30,10 @@ import {
   providerProfileReady,
 } from "@/lib/providerProfile";
 import {
+  providerAssistantDisplayContent,
+  shouldOfferProviderSettings,
+} from "@/lib/providerConnection";
+import {
   formatDuration,
   formatPayload,
   groupAssistantSteps,
@@ -162,7 +166,11 @@ export function AssistantMessages({
           <LoadingState title={t("assistant.appLoading.title")} detail={t("assistant.appLoading.detail")} />
         ) : messages.length ? (
           messages.map((message) => {
-            const needsProvider = shouldOfferProviderSettings(message);
+            const needsProvider = shouldOfferProviderSettings({
+              action: message.action,
+              content: message.content,
+              diagnosticAction: message.diagnostic?.action,
+            });
             const isWriting = message.role === "assistant" && message.loading;
             const hasWorkSteps = Boolean(message.steps?.length);
             return (
@@ -183,7 +191,7 @@ export function AssistantMessages({
                       <div className="flex items-start gap-2 text-destructive">
                         <AlertCircle className="mt-1 size-4 shrink-0" />
                         <div className="min-w-0">
-                          <AssistantMarkdown content={cleanAssistantMessage(message.content, message.diagnostic)} />
+                          <AssistantMarkdown content={providerAssistantDisplayContent({ content: message.content, diagnostic: message.diagnostic })} />
                           {needsProvider ? (
                             <ProviderConnectAction
                               aiConnecting={aiConnecting}
@@ -196,7 +204,7 @@ export function AssistantMessages({
                     ) : (
                       <>
                         {message.content.trim() ? (
-                          <AssistantMarkdown content={cleanAssistantMessage(message.content, message.diagnostic)} />
+                          <AssistantMarkdown content={providerAssistantDisplayContent({ content: message.content, diagnostic: message.diagnostic })} />
                         ) : null}
                         <AssistantWorkLoop steps={message.steps} trace={message.trace} />
                         {isWriting ? (
@@ -600,41 +608,6 @@ function LoadingState({ title, detail }: { title: string; detail: string }) {
       <div className="text-xs text-muted-foreground">{detail}</div>
     </div>
   );
-}
-
-function isProviderAuthMessage(content: string) {
-  const normalized = content.toLowerCase();
-  return (
-    normalized.includes("oauth authentication required") ||
-    normalized.includes("please login") ||
-    normalized.includes("authentication expired") ||
-    normalized.includes("re-login") ||
-    normalized.includes("provider 로그인이 필요") ||
-    normalized.includes("대화 제공자 로그인이 필요")
-  );
-}
-
-const providerSettingsMessageActions = new Set([
-  "connect-provider",
-  "relogin-provider",
-  "restart-login",
-  "configure-api-key",
-  "configure-base-url",
-  "check-permission",
-]);
-
-function shouldOfferProviderSettings(message: AssistantMessage) {
-  if (message.action === "connect-provider") return true;
-  const diagnosticAction = message.diagnostic?.action;
-  if (diagnosticAction) return providerSettingsMessageActions.has(diagnosticAction);
-  return isProviderAuthMessage(message.content);
-}
-
-function cleanAssistantMessage(content: string, diagnostic?: AssistantMessage["diagnostic"]) {
-  if (diagnostic?.message) return diagnostic.message;
-  return isProviderAuthMessage(content)
-    ? translate("assistant.providerLoginRequired")
-    : content.replace(/^503\s+/, "");
 }
 
 function ProviderConnectAction({
