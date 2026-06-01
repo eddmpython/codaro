@@ -20,6 +20,17 @@ export type AssistantArtifactRoute = {
   surfaceToOpen: SurfaceMode | null;
 };
 
+export type AssistantArtifactApplication = AssistantArtifactRouteInput & AssistantArtifactRoute;
+
+export function buildAssistantArtifactApplication(input: AssistantArtifactRouteInput): AssistantArtifactApplication {
+  const route = routeAssistantArtifacts(input);
+  return {
+    ...input,
+    pendingTarget: route.pendingTarget,
+    surfaceToOpen: route.surfaceToOpen,
+  };
+}
+
 export function routeAssistantArtifacts(input: AssistantArtifactRouteInput): AssistantArtifactRoute {
   return {
     pendingTarget: pendingTargetForAssistantArtifacts(input),

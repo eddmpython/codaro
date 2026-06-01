@@ -19,6 +19,7 @@ import {
   mergePendingBlocks,
 } from "@/lib/assistantResponsePlan";
 import {
+  type AssistantArtifactApplication,
   type CurriculumToSave,
   type PendingTarget,
 } from "@/lib/assistantArtifactRouting";
@@ -71,15 +72,6 @@ type UseAssistantTurnStateOptions = {
   onProviderConnectionRequired?: () => void;
 };
 
-type AssistantTurnApplication = {
-  clearPendingBlocks: boolean;
-  curriculumToSave: CurriculumToSave | null;
-  documentToApply?: CodaroDocument | null;
-  pendingBlocks: BlockConfig[];
-  pendingTarget: PendingTarget | null;
-  surfaceToOpen: SurfaceMode | null;
-};
-
 export function useAssistantTurnState({
   activeDocument,
   apiOnline,
@@ -126,7 +118,7 @@ export function useAssistantTurnState({
     }).title;
   }, [openCurriculum, saveCurriculum]);
 
-  const applyAssistantTurnApplication = useCallback((application: AssistantTurnApplication) => {
+  const applyAssistantTurnApplication = useCallback((application: AssistantArtifactApplication) => {
     const savedCurriculumTitle = saveAndOpenCurriculum(application.curriculumToSave);
     if (application.documentToApply) {
       applyDocument(application.documentToApply);

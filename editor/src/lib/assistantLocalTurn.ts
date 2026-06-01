@@ -5,13 +5,12 @@ import {
   type LocalAssistantDraft,
 } from "@/lib/localFallback";
 import {
-  routeAssistantArtifacts,
-  type CurriculumToSave,
+  buildAssistantArtifactApplication,
+  type AssistantArtifactApplication,
   type PendingTarget,
 } from "@/lib/assistantArtifactRouting";
-import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
-import type { AppNotice, BlockConfig } from "@/types";
+import type { AppNotice } from "@/types";
 
 export type AssistantLocalTurnResult = {
   assistantMessage: AssistantMessage;
@@ -20,13 +19,8 @@ export type AssistantLocalTurnResult = {
   pendingTarget: PendingTarget | null;
 };
 
-export type AssistantLocalTurnApplication = {
-  clearPendingBlocks: boolean;
-  curriculumToSave: CurriculumToSave | null;
+export type AssistantLocalTurnApplication = AssistantArtifactApplication & {
   draft: LocalAssistantDraft;
-  pendingBlocks: BlockConfig[];
-  pendingTarget: PendingTarget | null;
-  surfaceToOpen: SurfaceMode | null;
 };
 
 export function buildAssistantLocalTurnApplication({
@@ -39,19 +33,15 @@ export function buildAssistantLocalTurnApplication({
   const draft = buildLocalAssistantDraft(message, scope);
   const pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks;
   const curriculumToSave = draft.shouldSaveCurriculum ? { blocks: draft.generatedBlocks } : null;
-  const route = routeAssistantArtifacts({
+  const application = buildAssistantArtifactApplication({
     clearPendingBlocks: draft.clearPendingBlocks,
     curriculumToSave,
     documentToApply: null,
     pendingBlocks,
   });
   return {
-    clearPendingBlocks: draft.clearPendingBlocks,
-    curriculumToSave,
+    ...application,
     draft,
-    pendingBlocks,
-    pendingTarget: route.pendingTarget,
-    surfaceToOpen: route.surfaceToOpen,
   };
 }
 

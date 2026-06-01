@@ -223,6 +223,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/lib/pendingChanges.ts`",
         "`editor/src/lib/chatStartExamples.ts`",
         "target surface/flow role",
+        "application payload",
         "`editor/src/lib/customCurricula.ts`",
         "`saveAndOpenCustomCurriculum`",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
@@ -303,7 +304,10 @@ def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
 
     assert 'activeScope === "automation"' in responsePlan
     assert "plan.pendingBlocks = buildLocalBlocksFromPrompt(message, activeScope)" in responsePlan
-    assert "routeAssistantArtifacts(plan)" in responsePlan
+    assert "buildAssistantArtifactApplication(plan)" in responsePlan
+    assert "export type AssistantResponseApplication = AssistantArtifactApplication" in responsePlan
+    assert "export type AssistantArtifactApplication" in routing
+    assert "export function buildAssistantArtifactApplication" in routing
     assert "pendingTargetForAssistantArtifacts(input)" in routing
     assert "surfaceForAssistantArtifacts(input)" in routing
     assert 'return input.pendingBlocks.length > 0 ? "notebook" : null' in routing

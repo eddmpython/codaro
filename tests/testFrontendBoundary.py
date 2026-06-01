@@ -146,8 +146,8 @@ def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
     source = _read("editor/src/lib/assistantResponsePlan.ts")
 
     assert "saveCurriculum" not in source
-    assert "curriculumToSave: plan.curriculumToSave" in source
-    assert "routeAssistantArtifacts(plan)" in source
+    assert "export type AssistantResponseApplication = AssistantArtifactApplication" in source
+    assert "return buildAssistantArtifactApplication(plan)" in source
 
 
 def testAssistantArtifactRoutingOwnsChatArtifactSurfaceTransitions() -> None:
@@ -159,14 +159,22 @@ def testAssistantArtifactRoutingOwnsChatArtifactSurfaceTransitions() -> None:
     ssotMap = _read("docs/skills/architecture/ssot-map.md")
 
     assert "export function routeAssistantArtifacts" in route
+    assert "export type AssistantArtifactApplication" in route
+    assert "export function buildAssistantArtifactApplication" in route
     assert "export function pendingTargetForAssistantArtifacts" in route
     assert "export function surfaceForAssistantArtifacts" in route
     assert "export function surfaceForAcceptedPendingTarget" in route
+    assert "...input" in route
     assert 'pendingTarget: pendingTargetForAssistantArtifacts(input)' in route
     assert 'surfaceToOpen: surfaceForAssistantArtifacts(input)' in route
     assert 'return input.pendingBlocks.length > 0 ? "notebook" : null' in route
     assert 'if (input.curriculumToSave) return "curriculum"' in route
     assert 'if (input.documentToApply || input.pendingBlocks.length > 0) return "editor"' in route
+    assert "buildAssistantArtifactApplication(plan)" in responsePlan
+    assert "routeAssistantArtifacts(plan)" not in responsePlan
+    assert "type AssistantLocalTurnApplication = AssistantArtifactApplication &" in localTurn
+    assert "buildAssistantArtifactApplication({" in localTurn
+    assert "documentToApply: null" in localTurn
     assert "clearPendingBlocks ? \"notebook\"" not in route
     assert 'surfaceToOpen: "automation"' not in route
     assert 'type PendingTarget = "notebook" | "curriculum"' in route
@@ -225,6 +233,8 @@ def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     customCurricula = _read("editor/src/lib/customCurricula.ts")
 
     assert "const applyAssistantTurnApplication = useCallback" in source
+    assert "application: AssistantArtifactApplication" in source
+    assert "type AssistantTurnApplication" not in source
     assert "saveAndOpenCurriculum(application.curriculumToSave)" in source
     assert "saveAndOpenCustomCurriculum" in source
     assert "export function saveAndOpenCustomCurriculum" in customCurricula

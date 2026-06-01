@@ -1,11 +1,10 @@
 import { buildLocalBlocksFromPrompt } from "@/lib/localFallback";
 import { translate } from "@/lib/localeCopy";
 import {
-  routeAssistantArtifacts,
+  buildAssistantArtifactApplication,
+  type AssistantArtifactApplication,
   type CurriculumToSave,
-  type PendingTarget,
 } from "@/lib/assistantArtifactRouting";
-import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import {
   collectBlocksFromToolCalls,
@@ -20,14 +19,7 @@ export type AssistantResponsePlan = {
   pendingBlocks: BlockConfig[];
 };
 
-export type AssistantResponseApplication = {
-  clearPendingBlocks: boolean;
-  curriculumToSave: CurriculumToSave | null;
-  documentToApply: CodaroDocument | null;
-  pendingBlocks: BlockConfig[];
-  pendingTarget: PendingTarget | null;
-  surfaceToOpen: SurfaceMode | null;
-};
+export type AssistantResponseApplication = AssistantArtifactApplication;
 
 export function buildAssistantResponsePlan({
   activeScope,
@@ -73,16 +65,7 @@ export function buildAssistantResponseApplication({
   response: AiChatResponse;
 }): AssistantResponseApplication {
   const plan = buildAssistantResponsePlan({ activeScope, message, response });
-  const route = routeAssistantArtifacts(plan);
-
-  return {
-    clearPendingBlocks: plan.clearPendingBlocks,
-    curriculumToSave: plan.curriculumToSave,
-    documentToApply: plan.documentToApply,
-    pendingBlocks: plan.pendingBlocks,
-    pendingTarget: route.pendingTarget,
-    surfaceToOpen: route.surfaceToOpen,
-  };
+  return buildAssistantArtifactApplication(plan);
 }
 
 export function mergePendingBlocks(current: BlockConfig[], incoming: BlockConfig[]): BlockConfig[] {
