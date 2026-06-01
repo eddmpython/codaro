@@ -37,6 +37,23 @@ export type PackageInstallResult = {
   skipped?: boolean;
 };
 
+export type PackageEnvironment = {
+  installer: string;
+  pythonPath: string;
+  uvPath?: string | null;
+  environment: string;
+  mode: string;
+  projectRoot: string;
+  pathEntries: string[];
+  uvAvailable: boolean;
+};
+
+export type PackageInstallCommand = {
+  command: string;
+  environment: PackageEnvironment;
+  packages: string[];
+};
+
 export type VariableDelta = {
   added: VariableInfo[];
   updated: VariableInfo[];

@@ -7,7 +7,7 @@ import { MainSurface } from "@/components/app/mainSurface";
 import { ProductSidebar } from "@/components/app/productSidebar";
 import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
-import { TerminalPanel } from "@/components/terminal/terminalPanel";
+import { TerminalPanel, type TerminalLaunchIntent } from "@/components/terminal/terminalPanel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
@@ -216,6 +216,10 @@ function App() {
     onNotice: applyNotice,
   });
 
+  const openProviderSettingsFromFailure = useCallback(() => {
+    if (apiOnline) setProviderSettingsOpen(true);
+  }, [apiOnline, setProviderSettingsOpen]);
+
   const applyDocument = useCallback((nextDocument: CodaroDocument) => {
     applyNotebookDocument(nextDocument);
     resetRuntimeState();
@@ -281,6 +285,7 @@ function App() {
     variables,
     displayLocale: localeState.locale,
     onNotice: applyNotice,
+    onProviderConnectionRequired: openProviderSettingsFromFailure,
   });
 
   function selectAutomationSection(section: AutomationSection) {
@@ -305,6 +310,11 @@ function App() {
   }, []);
 
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [terminalLaunchIntent, setTerminalLaunchIntent] = useState<TerminalLaunchIntent | null>(null);
+  const openTerminalCommand = useCallback((command: string) => {
+    setTerminalOpen(true);
+    setTerminalLaunchIntent({ command, id: Date.now() });
+  }, []);
 
   return (
     <LocaleProvider value={localeState}>
@@ -387,6 +397,7 @@ function App() {
               onDraftChange={updateDraft}
               onDeleteCell={deleteNotebookCell}
               onNewChat={startNewChat}
+              onOpenTerminalCommand={openTerminalCommand}
               onPromptChange={setPrompt}
               onRejectPendingBlocks={rejectPendingBlocks}
               onRefreshAutomation={refreshAutomation}
@@ -407,7 +418,11 @@ function App() {
         </div>
         {terminalOpen ? (
           <div className="h-72 min-h-0 shrink-0">
-            <TerminalPanel themeMode={themeMode} onClose={() => setTerminalOpen(false)} />
+            <TerminalPanel
+              launchIntent={terminalLaunchIntent}
+              themeMode={themeMode}
+              onClose={() => setTerminalOpen(false)}
+            />
           </div>
         ) : null}
       </SidebarInset>

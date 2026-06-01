@@ -10,9 +10,10 @@ from typing import Any
 from fastapi import WebSocket, WebSocketDisconnect
 
 from ..serverLog import formatLogFields
+from ..system.packageOps import terminalEnvironmentVariables
 
 # 전역 터미널: 작업 폴더에 붙은 실제 로컬 셸을 PTY로 띄워 xterm.js와 양방향으로 잇는다.
-# 사용자는 "터미널"이 뭔지 몰라도 누락 패키지 설치(`uv add ...`) 같은 명령을 이 패널에서 그대로 친다.
+# 패키지 환경의 PATH를 주입해서 설치형 런타임에서도 같은 터미널 표면을 쓴다.
 # Windows는 ConPTY(pywinpty), POSIX는 표준 pty를 쓴다.
 
 _IS_WINDOWS = sys.platform == "win32"
@@ -33,10 +34,17 @@ class PtyUnavailableError(RuntimeError):
 class PtySession:
     """작업 폴더에 붙은 실제 셸을 PTY로 실행하고 read/write/resize/terminate를 제공한다."""
 
-    def __init__(self, cwd: Path, cols: int = 80, rows: int = 24) -> None:
+    def __init__(
+        self,
+        cwd: Path,
+        cols: int = 80,
+        rows: int = 24,
+        envOverrides: dict[str, str] | None = None,
+    ) -> None:
         self._cwd = str(cwd)
         self._cols = max(1, cols)
         self._rows = max(1, rows)
+        self._envOverrides = envOverrides or {}
         self._winProc: Any = None
         self._posixPid: int | None = None
         self._masterFd: int | None = None
@@ -44,6 +52,7 @@ class PtySession:
 
     def start(self) -> None:
         env = dict(os.environ)
+        env.update(self._envOverrides)
         env.setdefault("TERM", "xterm-256color")
         if _IS_WINDOWS:
             self._startWindows(env)
@@ -190,7 +199,7 @@ async def handleTerminalWebSocket(websocket: WebSocket, workspaceRoot: Path, log
     await websocket.accept()
     logger.debug("terminal-ws %s", formatLogFields(action="connect", cwd=str(workspaceRoot)))
 
-    session = PtySession(workspaceRoot)
+    session = PtySession(workspaceRoot, envOverrides=terminalEnvironmentVariables())
     try:
         session.start()
     except PtyUnavailableError as error:

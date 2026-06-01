@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import json
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -31,6 +33,23 @@ class InstallResult(BaseModel):
     environment: str = "project .venv"
     durationMs: int | None = None
     skipped: bool = False
+
+
+class PackageEnvironment(BaseModel):
+    installer: str = "uv"
+    pythonPath: str
+    uvPath: str | None
+    environment: str
+    mode: str
+    projectRoot: str
+    pathEntries: list[str]
+    uvAvailable: bool
+
+
+class PackageInstallCommand(BaseModel):
+    command: str
+    environment: PackageEnvironment
+    packages: list[str]
 
 
 class PackageEnvironmentError(RuntimeError):
@@ -62,6 +81,144 @@ def getProjectPythonPath(projectRoot: Path | None = None) -> Path:
         "package_environment_missing",
         "Project virtual environment was not found. Expected .venv for Codaro.",
     )
+
+
+def getPackageEnvironment(projectRoot: Path | None = None) -> PackageEnvironment:
+    root = projectRoot or PROJECT_ROOT
+    pythonPath = getProjectPythonPath(root) if projectRoot is not None else getProjectPythonPath()
+    uvPath = resolveUvPath(pythonPath=pythonPath, projectRoot=root)
+    mode = _environmentModeForPython(pythonPath, root)
+    pathEntries = _packagePathEntries(pythonPath, uvPath)
+    return PackageEnvironment(
+        pythonPath=str(pythonPath),
+        uvPath=str(uvPath) if uvPath else None,
+        environment=_environmentLabel(mode),
+        mode=mode,
+        projectRoot=str(root),
+        pathEntries=[str(path) for path in pathEntries],
+        uvAvailable=uvPath is not None,
+    )
+
+
+def buildPackageInstallCommand(names: list[str]) -> PackageInstallCommand:
+    packages = [name.strip() for name in names if name.strip()]
+    for packageName in packages:
+        validatePackageName(packageName)
+    environment = getPackageEnvironment()
+    uvExecutable = environment.uvPath or "uv"
+    commandParts = [
+        uvExecutable,
+        "pip",
+        "install",
+        "--python",
+        environment.pythonPath,
+        *packages,
+    ]
+    return PackageInstallCommand(
+        command=" ".join(_shellToken(part) for part in commandParts),
+        environment=environment,
+        packages=packages,
+    )
+
+
+def terminalEnvironmentVariables() -> dict[str, str]:
+    try:
+        environment = getPackageEnvironment()
+    except PackageEnvironmentError:
+        return {}
+    values: dict[str, str] = {
+        "CODARO_PACKAGE_PYTHON": environment.pythonPath,
+        "CODARO_PACKAGE_ENV": environment.environment,
+    }
+    if environment.uvPath:
+        values["CODARO_UV_EXE"] = environment.uvPath
+    if environment.pathEntries:
+        currentPath = os.environ.get("PATH", "")
+        entries = [*environment.pathEntries]
+        if currentPath:
+            entries.append(currentPath)
+        values["PATH"] = os.pathsep.join(entries)
+    return values
+
+
+def resolveUvPath(*, pythonPath: Path | None = None, projectRoot: Path | None = None) -> Path | None:
+    configured = os.environ.get("CODARO_UV_EXE")
+    if configured:
+        candidate = Path(configured).expanduser()
+        if candidate.is_file():
+            return candidate
+
+    discovered = shutil.which("uv")
+    if discovered:
+        return Path(discovered)
+
+    root = projectRoot or PROJECT_ROOT
+    pythonExecutable = pythonPath or Path(sys.executable)
+    executableName = "uv.exe" if os.name == "nt" else "uv"
+    candidates = [
+        pythonExecutable.parent / executableName,
+        root / ".venv" / ("Scripts" if os.name == "nt" else "bin") / executableName,
+        Path(sys.executable).parent / executableName,
+    ]
+    launcherLogDir = os.environ.get("CODARO_LAUNCHER_LOG_DIR")
+    if launcherLogDir:
+        launcherRoot = Path(launcherLogDir).expanduser().parent
+        candidates.extend(
+            [
+                launcherRoot / "runtime" / "uv" / executableName,
+                launcherRoot / "launcher" / executableName,
+            ]
+        )
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _isProjectVenvPython(pythonPath: Path, projectRoot: Path) -> bool:
+    return pythonPath in {
+        projectRoot / ".venv" / "Scripts" / "python.exe",
+        projectRoot / ".venv" / "bin" / "python",
+    }
+
+
+def _environmentLabel(mode: str) -> str:
+    if mode == "project":
+        return "project .venv"
+    return "Codaro managed runtime"
+
+
+def _environmentModeForPython(pythonPath: Path, projectRoot: Path) -> str:
+    if _isProjectVenvPython(pythonPath, projectRoot):
+        return "project"
+    try:
+        if pythonPath.resolve() == Path(sys.executable).resolve() and _runningInterpreterHasCodaro():
+            return "managed"
+    except OSError:
+        pass
+    return "project"
+
+
+def _packagePathEntries(pythonPath: Path, uvPath: Path | None) -> list[Path]:
+    entries: list[Path] = []
+    if uvPath:
+        entries.append(uvPath.parent)
+    entries.append(pythonPath.parent)
+    deduped: list[Path] = []
+    seen: set[str] = set()
+    for entry in entries:
+        key = str(entry).lower() if os.name == "nt" else str(entry)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(entry)
+    return deduped
+
+
+def _shellToken(value: str) -> str:
+    if re.match(r"^[A-Za-z0-9_./\\:=-]+$", value):
+        return value
+    return f'"{value.replace("\"", "\\\"")}"'
 
 
 def _runningInterpreterHasCodaro() -> bool:
@@ -105,6 +262,7 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
             text=True,
             timeout=PACKAGE_LIST_TIMEOUT_SECONDS,
             cwd=PROJECT_ROOT,
+            env=_subprocessEnvForPython(pythonPath),
             check=False,
         )
     except FileNotFoundError as error:
@@ -171,36 +329,45 @@ def _installSync(name: str) -> InstallResult:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
         return _packageResult(name, False, error.message, startedAt)
+    environment = _environmentForPython(pythonPath)
 
     try:
         installedVersion = installedPackageVersion(name, pythonPath=pythonPath)
     except FileNotFoundError:
-        return _packageResult(name, False, "Project virtual environment Python executable was not found.", startedAt)
+        return _packageResult(
+            name,
+            False,
+            "Project virtual environment Python executable was not found.",
+            startedAt,
+            environment=environment,
+        )
     except subprocess.TimeoutExpired:
         installedVersion = None
     if installedVersion:
         return _packageResult(
             name,
             True,
-            f"{name} is already installed in the project .venv ({installedVersion}).",
+            f"{name} is already installed in {_environmentForPython(pythonPath)} ({installedVersion}).",
             startedAt,
+            environment=environment,
             skipped=True,
         )
 
     try:
         result = runUvPip("install", [name], pythonPath=pythonPath, timeoutSeconds=INSTALL_TIMEOUT_SECONDS)
     except FileNotFoundError:
-        return _packageResult(name, False, "uv executable was not found.", startedAt)
+        return _packageResult(name, False, "uv executable was not found.", startedAt, environment=environment)
     except subprocess.TimeoutExpired:
         return _packageResult(
             name,
             False,
             f"Installation timed out after {INSTALL_TIMEOUT_SECONDS} seconds while running uv pip install.",
             startedAt,
+            environment=environment,
         )
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return _packageResult(name, result.returncode == 0, output, startedAt)
+    return _packageResult(name, result.returncode == 0, output, startedAt, environment=environment)
 
 
 async def uninstallPackage(name: str) -> InstallResult:
@@ -219,16 +386,23 @@ def _uninstallSync(name: str) -> InstallResult:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
         return _packageResult(name, False, error.message, startedAt)
+    environment = _environmentForPython(pythonPath)
 
     try:
         result = runUvPip("uninstall", [name, "-y"], pythonPath=pythonPath, timeoutSeconds=UNINSTALL_TIMEOUT_SECONDS)
     except FileNotFoundError:
-        return _packageResult(name, False, "uv executable was not found.", startedAt)
+        return _packageResult(name, False, "uv executable was not found.", startedAt, environment=environment)
     except subprocess.TimeoutExpired:
-        return _packageResult(name, False, f"Uninstall timed out after {UNINSTALL_TIMEOUT_SECONDS} seconds.", startedAt)
+        return _packageResult(
+            name,
+            False,
+            f"Uninstall timed out after {UNINSTALL_TIMEOUT_SECONDS} seconds.",
+            startedAt,
+            environment=environment,
+        )
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return _packageResult(name, result.returncode == 0, output, startedAt)
+    return _packageResult(name, result.returncode == 0, output, startedAt, environment=environment)
 
 
 def installedPackageVersion(name: str, *, pythonPath: Path) -> str | None:
@@ -265,12 +439,14 @@ def _packageResult(
     message: str,
     startedAt: float,
     *,
+    environment: str | None = None,
     skipped: bool = False,
 ) -> InstallResult:
     return InstallResult(
         package=name,
         success=success,
         message=message,
+        environment=environment or _environmentForCurrentPython(),
         durationMs=_elapsedMs(startedAt),
         skipped=skipped,
     )
@@ -287,10 +463,56 @@ def runUvPip(
     pythonPath: Path,
     timeoutSeconds: int,
 ) -> subprocess.CompletedProcess[str]:
+    packageEnvironment = getPackageEnvironment()
+    if not packageEnvironment.uvPath:
+        raise FileNotFoundError("uv")
     return subprocess.run(
-        ["uv", "pip", command, "--python", str(pythonPath), *arguments],
+        [packageEnvironment.uvPath, "pip", command, "--python", str(pythonPath), *arguments],
         capture_output=True,
         text=True,
         timeout=timeoutSeconds,
         cwd=PROJECT_ROOT,
+        env=_subprocessEnv(packageEnvironment),
     )
+
+
+def _environmentForCurrentPython() -> str:
+    try:
+        return getPackageEnvironment().environment
+    except PackageEnvironmentError:
+        return "package environment"
+
+
+def _environmentForPython(pythonPath: Path) -> str:
+    root = PROJECT_ROOT
+    return _environmentLabel(_environmentModeForPython(pythonPath, root))
+
+
+def _subprocessEnvForPython(pythonPath: Path) -> dict[str, str]:
+    uvPath = resolveUvPath(pythonPath=pythonPath)
+    return _subprocessEnv(
+        PackageEnvironment(
+            pythonPath=str(pythonPath),
+            uvPath=str(uvPath) if uvPath else None,
+            environment=_environmentForPython(pythonPath),
+            mode=_environmentModeForPython(pythonPath, PROJECT_ROOT),
+            projectRoot=str(PROJECT_ROOT),
+            pathEntries=[str(path) for path in _packagePathEntries(pythonPath, uvPath)],
+            uvAvailable=uvPath is not None,
+        )
+    )
+
+
+def _subprocessEnv(packageEnvironment: PackageEnvironment) -> dict[str, str]:
+    env = dict(os.environ)
+    if packageEnvironment.pathEntries:
+        existing = env.get("PATH", "")
+        entries = [*packageEnvironment.pathEntries]
+        if existing:
+            entries.append(existing)
+        env["PATH"] = os.pathsep.join(entries)
+    if packageEnvironment.uvPath:
+        env["CODARO_UV_EXE"] = packageEnvironment.uvPath
+    env["CODARO_PACKAGE_PYTHON"] = packageEnvironment.pythonPath
+    env["CODARO_PACKAGE_ENV"] = packageEnvironment.environment
+    return env

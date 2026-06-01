@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
@@ -8,16 +8,52 @@ import { useLocale } from "@/lib/localeContext";
 import type { ThemeMode } from "@/lib/surfaceModel";
 
 // 전역 터미널 패널: 백엔드 /ws/terminal(PTY)에 붙어 xterm.js로 실제 로컬 셸을 렌더한다.
-// 작업 폴더에 붙은 진짜 셸이라 `uv add ...` 같은 명령을 그대로 칠 수 있다.
+// 백엔드가 주입한 패키지 환경 PATH를 그대로 쓰므로 설치형 런타임과 같은 셸이 열린다.
 
 const DARK_THEME = { background: "#09090b", foreground: "#e4e4e7", cursor: "#e4e4e7" };
 const LIGHT_THEME = { background: "#ffffff", foreground: "#18181b", cursor: "#18181b" };
 
-export function TerminalPanel({ themeMode, onClose }: { themeMode: ThemeMode; onClose: () => void }) {
+export type TerminalLaunchIntent = {
+  command: string;
+  id: number;
+};
+
+export function TerminalPanel({
+  launchIntent,
+  themeMode,
+  onClose,
+}: {
+  launchIntent?: TerminalLaunchIntent | null;
+  themeMode: ThemeMode;
+  onClose: () => void;
+}) {
   const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
+  const termRef = useRef<Terminal | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
+  const launchIntentRef = useRef<TerminalLaunchIntent | null | undefined>(launchIntent);
+  const lastLaunchIntentIdRef = useRef<number | null>(null);
   const themeRef = useRef(themeMode);
   themeRef.current = themeMode;
+
+  const sendLaunchIntent = useCallback((intent?: TerminalLaunchIntent | null) => {
+    if (!intent || lastLaunchIntentIdRef.current === intent.id) return;
+    const socket = socketRef.current;
+    const term = termRef.current;
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+    lastLaunchIntentIdRef.current = intent.id;
+    term?.focus();
+    window.setTimeout(() => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "input", data: intent.command }));
+      }
+    }, 80);
+  }, []);
+
+  useEffect(() => {
+    launchIntentRef.current = launchIntent;
+    sendLaunchIntent(launchIntent);
+  }, [launchIntent, sendLaunchIntent]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -32,10 +68,12 @@ export function TerminalPanel({ themeMode, onClose }: { themeMode: ThemeMode; on
     const fit = new FitAddon();
     term.loadAddon(fit);
     term.open(container);
+    termRef.current = term;
     fit.fit();
 
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
     const socket = new WebSocket(`${proto}//${window.location.host}/ws/terminal`);
+    socketRef.current = socket;
 
     const sendResize = () => {
       if (socket.readyState === WebSocket.OPEN) {
@@ -47,6 +85,7 @@ export function TerminalPanel({ themeMode, onClose }: { themeMode: ThemeMode; on
       fit.fit();
       sendResize();
       term.focus();
+      sendLaunchIntent(launchIntentRef.current);
     };
     socket.onmessage = (event) => {
       const parsed = parseMessage(event.data);
@@ -76,9 +115,11 @@ export function TerminalPanel({ themeMode, onClose }: { themeMode: ThemeMode; on
       resizeObserver.disconnect();
       dataSub.dispose();
       socket.close();
+      socketRef.current = null;
+      termRef.current = null;
       term.dispose();
     };
-  }, []);
+  }, [sendLaunchIntent]);
 
   return (
     <div className="flex h-full min-h-0 flex-col border-t bg-background">

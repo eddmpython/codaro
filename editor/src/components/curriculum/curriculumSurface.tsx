@@ -45,7 +45,11 @@ import {
   type CellAiAction,
   type LearningCellKind,
 } from "@/lib/cellModel";
-import { installCurriculumPackage, listCurriculumPackages } from "@/lib/curriculumPackagePreparation";
+import {
+  curriculumPackageInstallCommand,
+  installCurriculumPackage,
+  listCurriculumPackages,
+} from "@/lib/curriculumPackagePreparation";
 import { statusLabel } from "@/lib/displayFormat";
 import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
@@ -92,6 +96,7 @@ export function CurriculumView({
   onDraftChange,
   onRejectPendingBlocks,
   onRunBlock,
+  onOpenTerminalCommand,
   onSelectBlock,
 }: {
   apiOnline: boolean;
@@ -115,6 +120,7 @@ export function CurriculumView({
   onDraftChange: (blockId: string, value: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
+  onOpenTerminalCommand: (command: string) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   const curriculumSections = useMemo(() => groupCurriculumSections(document.blocks), [document.blocks]);
@@ -135,6 +141,7 @@ export function CurriculumView({
             selectedCategoryLabel={selectedCategoryLabel}
             selectedContentId={selectedContentId}
             selectedContentLabel={selectedContentLabel}
+            onOpenTerminalCommand={onOpenTerminalCommand}
             onAcceptPendingBlocks={onAcceptPendingBlocks}
             onRejectPendingBlocks={onRejectPendingBlocks}
           />
@@ -252,6 +259,7 @@ function LearningOverviewHeader({
   selectedContentLabel,
   onAcceptPendingBlocks,
   onRejectPendingBlocks,
+  onOpenTerminalCommand,
 }: {
   apiOnline: boolean;
   contents?: Array<{ contentId: string; title: string }>;
@@ -265,6 +273,7 @@ function LearningOverviewHeader({
   selectedContentLabel: string;
   onAcceptPendingBlocks: () => void;
   onRejectPendingBlocks: () => void;
+  onOpenTerminalCommand: (command: string) => void;
 }) {
   const overview = curriculumOverview(document, introBlock);
 
@@ -318,7 +327,11 @@ function LearningOverviewHeader({
             </div>
           ) : null}
           <div className="mt-auto">
-            <CurriculumDependencyPanel apiOnline={apiOnline} document={document} />
+            <CurriculumDependencyPanel
+              apiOnline={apiOnline}
+              document={document}
+              onOpenTerminalCommand={onOpenTerminalCommand}
+            />
           </div>
         </div>
       </div>
@@ -370,19 +383,30 @@ type PackageInstallProgress = {
   total: number;
 };
 
-function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean; document: CodaroDocument }) {
+function CurriculumDependencyPanel({
+  apiOnline,
+  document,
+  onOpenTerminalCommand,
+}: {
+  apiOnline: boolean;
+  document: CodaroDocument;
+  onOpenTerminalCommand: (command: string) => void;
+}) {
   const requiredPackages = useMemo(() => inferDocumentPackages(document), [document]);
   const [installedPackages, setInstalledPackages] = useState<PackageInfo[]>([]);
   const [checking, setChecking] = useState(false);
   const [installProgress, setInstallProgress] = useState<PackageInstallProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [commandError, setCommandError] = useState<string | null>(null);
+  const [installCommand, setInstallCommand] = useState("");
+  const [installEnvironment, setInstallEnvironment] = useState("");
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
-  const installCommand = `uv add ${requiredPackages.join(" ")}`;
+  const terminalCommandReady = Boolean(apiOnline && installCommand);
   const activeMessage = installProgress
     ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
     : checking
@@ -431,6 +455,30 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
     };
   }, [apiOnline, requiredPackages]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setCommandError(null);
+    setInstallCommand("");
+    setInstallEnvironment("");
+    if (!requiredPackages.length || !apiOnline) return undefined;
+
+    async function loadInstallCommand() {
+      try {
+        const plan = await curriculumPackageInstallCommand(requiredPackages);
+        if (cancelled) return;
+        setInstallCommand(plan.command);
+        setInstallEnvironment(plan.environment.environment);
+      } catch (loadError) {
+        if (!cancelled) setCommandError(errorText(loadError));
+      }
+    }
+
+    void loadInstallCommand();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiOnline, requiredPackages]);
+
   const allInstalledVerified = apiOnline && hasChecked && missingPackages.length === 0;
 
   if (!requiredPackages.length) return null;
@@ -440,6 +488,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   if (apiOnline && !hasChecked && !installProgress && !error) return null;
 
   const copyCommand = async () => {
+    if (!installCommand) return;
     try {
       await navigator.clipboard.writeText(installCommand);
       setCopied(true);
@@ -529,23 +578,37 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
       <div className="mt-2 flex items-center gap-2 rounded border bg-muted/40 px-2 py-1.5" data-learning-package-command-row="true">
         <TerminalSquare className="size-3.5 shrink-0 text-muted-foreground" />
         <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground" data-learning-package-command="true">
-          {installCommand}
+          {installCommand || "터미널 명령 준비 중"}
         </code>
         <button
           aria-label="설치 명령 복사"
-          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
           data-learning-package-command-copy="true"
+          disabled={!installCommand}
           type="button"
           onClick={copyCommand}
         >
           {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
         </button>
+        <Button
+          className="h-6 gap-1.5 px-2 text-xs"
+          data-learning-package-terminal-open="true"
+          disabled={!terminalCommandReady}
+          size="sm"
+          type="button"
+          variant="ghost"
+          onClick={() => onOpenTerminalCommand(installCommand)}
+        >
+          <TerminalSquare className="size-3.5" />
+          터미널 열기
+        </Button>
       </div>
       <div className="mt-1 text-xs leading-5 text-muted-foreground">
         {apiOnline
-          ? "위 버튼으로 프로젝트 .venv에 바로 설치하거나, 명령을 복사해 터미널에서 직접 uv로 설치할 수 있습니다."
-          : "서버 세션이 없으면 위 명령을 복사해 터미널에서 직접 uv로 설치하세요."}
+          ? `위 버튼으로 ${installEnvironment || "현재 실행 환경"}에 바로 설치하거나, 터미널에서 같은 환경으로 실행할 수 있습니다.`
+          : "서버 세션이 있어야 현재 실행 환경의 터미널 명령을 준비할 수 있습니다."}
       </div>
+      {commandError ? <div className="mt-1 text-xs leading-5 text-muted-foreground">{firstMessageLine(commandError)}</div> : null}
       {activeMessage ? (
         <div className="mt-2 text-xs leading-5 text-muted-foreground" data-learning-package-progress="true">
           {activeMessage}
@@ -1251,7 +1314,7 @@ function firstMessageLine(value: string) {
 function packageInstallStatusText(result: PackageInstallResult) {
   if (!result.success) return firstMessageLine(result.message) || `${result.package} 설치에 실패했습니다.`;
   const duration = formatPackageDuration(result.durationMs);
-  const environment = result.environment || "project .venv";
+  const environment = result.environment || "현재 패키지 환경";
   const suffix = duration ? ` · ${duration}` : "";
   if (result.skipped) return `${result.package} 이미 준비됨 · ${environment}${suffix}`;
   return `${result.package} 설치 완료 · ${result.installer || "uv"} → ${environment}${suffix}`;

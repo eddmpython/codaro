@@ -1,3 +1,5 @@
+#![cfg_attr(all(target_os = "windows", not(test)), windows_subsystem = "windows")]
+
 mod backend;
 mod github;
 mod ipc;
@@ -668,8 +670,16 @@ fn avatar_data_uri() -> String {
         let triple = (b0 << 16) | (b1 << 8) | b2;
         out.push(TABLE[((triple >> 18) & 0x3f) as usize] as char);
         out.push(TABLE[((triple >> 12) & 0x3f) as usize] as char);
-        out.push(if chunk.len() > 1 { TABLE[((triple >> 6) & 0x3f) as usize] as char } else { '=' });
-        out.push(if chunk.len() > 2 { TABLE[(triple & 0x3f) as usize] as char } else { '=' });
+        out.push(if chunk.len() > 1 {
+            TABLE[((triple >> 6) & 0x3f) as usize] as char
+        } else {
+            '='
+        });
+        out.push(if chunk.len() > 2 {
+            TABLE[(triple & 0x3f) as usize] as char
+        } else {
+            '='
+        });
     }
     out
 }
@@ -677,7 +687,9 @@ fn avatar_data_uri() -> String {
 fn load_window_icon() -> Option<tao::window::Icon> {
     let decoder = png::Decoder::new(ICON_PNG);
     let mut reader = decoder.read_info().ok()?;
-    if reader.info().color_type != png::ColorType::Rgba || reader.info().bit_depth != png::BitDepth::Eight {
+    if reader.info().color_type != png::ColorType::Rgba
+        || reader.info().bit_depth != png::BitDepth::Eight
+    {
         return None;
     }
     let mut buffer = vec![0u8; reader.output_buffer_size()];

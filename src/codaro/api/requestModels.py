@@ -52,6 +52,10 @@ class PackageRequest(BaseModel):
     name: str
 
 
+class PackageInstallCommandRequest(BaseModel):
+    names: list[str] = Field(default_factory=list)
+
+
 class PathRequest(BaseModel):
     path: str
 

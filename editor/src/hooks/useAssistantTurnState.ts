@@ -1,4 +1,4 @@
-import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import {
   buildCellAiPrompt,
@@ -64,6 +64,7 @@ type UseAssistantTurnStateOptions = {
   toolCatalog: AiToolCatalogPayload;
   variables: VariableInfo[];
   onNotice: (notice: AppNotice) => void;
+  onProviderConnectionRequired?: () => void;
 };
 
 type SaveCurriculum = (
@@ -102,6 +103,7 @@ export function useAssistantTurnState({
   toolCatalog,
   variables,
   onNotice,
+  onProviderConnectionRequired,
 }: UseAssistantTurnStateOptions) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -109,6 +111,13 @@ export function useAssistantTurnState({
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [cellHelpByBlockId, setCellHelpByBlockId] = useState<Record<string, CellAiHelpState>>({});
   const [assistantLoading, setAssistantLoading] = useState(false);
+  const providerConnectionPromptedRef = useRef(false);
+
+  useEffect(() => {
+    if (!apiOnline || profile?.ready) {
+      providerConnectionPromptedRef.current = false;
+    }
+  }, [apiOnline, profile?.ready]);
 
   const saveAndOpenCurriculum = useCallback((curriculumToSave: CurriculumToSave | null) => {
     if (!curriculumToSave) return "";
@@ -288,6 +297,10 @@ export function useAssistantTurnState({
         }));
       }
       onNotice(failure.notice);
+      if (failure.action === "connect-provider" && apiOnline && !providerConnectionPromptedRef.current) {
+        providerConnectionPromptedRef.current = true;
+        onProviderConnectionRequired?.();
+      }
     } finally {
       setAssistantLoading(false);
     }
@@ -301,6 +314,7 @@ export function useAssistantTurnState({
     displayLocale,
     drafts,
     onNotice,
+    onProviderConnectionRequired,
     profile,
     prompt,
     results,

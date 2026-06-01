@@ -198,6 +198,46 @@ def testInstallPackageUsesUvProjectPythonAndReportsMetadata(monkeypatch, tmp_pat
     assert result.message == "Installed rich"
 
 
+def testPackageInstallCommandUsesResolvedEnvironment(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    uvPath = tmp_path / "uv.exe"
+    pythonPath.write_text("", encoding="utf-8")
+    uvPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
+
+    plan = packageOps.buildPackageInstallCommand(["pandas", "python-docx"])
+
+    assert plan.environment.pythonPath == str(pythonPath)
+    assert plan.environment.uvPath == str(uvPath)
+    assert plan.command.startswith(str(uvPath))
+    assert " pip install --python " in plan.command
+    assert "pandas" in plan.command
+    assert "python-docx" in plan.command
+
+
+def testTerminalEnvironmentPrependsPackageRuntimePaths(monkeypatch, tmp_path: Path) -> None:
+    pythonDir = tmp_path / "runtime"
+    uvDir = tmp_path / "tools"
+    pythonDir.mkdir()
+    uvDir.mkdir()
+    pythonPath = pythonDir / "python.exe"
+    uvPath = uvDir / "uv.exe"
+    pythonPath.write_text("", encoding="utf-8")
+    uvPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
+
+    env = packageOps.terminalEnvironmentVariables()
+
+    assert env["CODARO_PACKAGE_PYTHON"] == str(pythonPath)
+    assert env["CODARO_UV_EXE"] == str(uvPath)
+    pathPrefix = env["PATH"].split(packageOps.os.pathsep)[:2]
+    assert pathPrefix == [str(uvDir), str(pythonDir)]
+
+
 def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
     pythonPath = tmp_path / "python.exe"
     pythonPath.write_text("", encoding="utf-8")

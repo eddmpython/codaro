@@ -70,6 +70,7 @@ type MainSurfaceProps = {
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNewChat: () => void;
+  onOpenTerminalCommand: (command: string) => void;
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
   onRefreshAutomation: () => void;
@@ -242,6 +243,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           onAcceptPendingBlocks={props.onAcceptPendingBlocks}
           onCellAsk={props.onCellAsk}
           onDraftChange={props.onDraftChange}
+          onOpenTerminalCommand={props.onOpenTerminalCommand}
           onRejectPendingBlocks={props.onRejectPendingBlocks}
           onRunBlock={props.onRunBlock}
           onSelectBlock={props.onSelectCurriculumBlock}

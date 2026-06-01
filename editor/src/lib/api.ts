@@ -31,7 +31,9 @@ import type {
   MasterPlanRequestBody,
   OauthAuthorizePayload,
   OauthStatusPayload,
+  PackageEnvironment,
   PackageInfo,
+  PackageInstallCommand,
   PackageInstallResult,
   ProviderDiagnostic,
   ProviderValidationPayload,
@@ -252,6 +254,11 @@ export const codaroApi = {
     },
   ),
   packagesList: () => requestJson<PackageInfo[]>("/api/packages/list"),
+  packageEnvironment: () => requestJson<PackageEnvironment>("/api/packages/environment"),
+  packageInstallCommand: (names: string[]) => postJson<PackageInstallCommand>(
+    "/api/packages/install-command",
+    { names },
+  ),
   packageInstall: (name: string) => postJson<PackageInstallResult>("/api/packages/install", { name }),
   sessionPackagesList: (sessionId: string) => requestJson<PackageInfo[]>(`/api/kernel/${sessionId}/packages/list`),
   sessionPackageInstall: (sessionId: string, name: string) =>

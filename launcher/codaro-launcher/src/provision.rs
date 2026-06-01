@@ -7,11 +7,13 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io;
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::time::{SystemTime, UNIX_EPOCH};
 use url::Url;
 use zip::ZipArchive;
 
@@ -163,6 +165,7 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &python_executable_path,
         &backend_site_packages_path,
         &wheel_paths,
+        &paths.logs_dir(),
     )?;
     let editor_root_path = if manifest.editor.is_backend_wheel_source() {
         let bundled_editor_root =
@@ -498,18 +501,20 @@ fn install_wheels_into_site_packages(
     python_executable: &Path,
     site_packages_dir: &Path,
     wheel_paths: &[PathBuf],
+    logs_dir: &Path,
 ) -> Result<()> {
     if wheel_paths.is_empty() {
         return Ok(());
     }
 
-    ensure_pip_available(python_executable)?;
+    ensure_pip_available(python_executable, logs_dir)?;
     fs::create_dir_all(site_packages_dir).with_context(|| {
         format!(
             "Failed to create backend site-packages directory `{}`.",
             site_packages_dir.display()
         )
     })?;
+    let (stdout_log, stderr_log) = open_process_logs(logs_dir, "provision-wheel-install")?;
 
     let mut command = Command::new(python_executable);
     command
@@ -521,11 +526,12 @@ fn install_wheels_into_site_packages(
         .arg("--no-deps")
         .arg("--target")
         .arg(site_packages_dir)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+        .stdout(Stdio::from(stdout_log))
+        .stderr(Stdio::from(stderr_log));
     for wheel_path in wheel_paths {
         command.arg(wheel_path);
     }
+    apply_no_window(&mut command);
 
     let status = command.status().with_context(|| {
         format!(
@@ -539,42 +545,81 @@ fn install_wheels_into_site_packages(
     bail!("Wheel installation exited with status {status}.");
 }
 
-fn ensure_pip_available(python_executable: &Path) -> Result<()> {
-    let pip_status = Command::new(python_executable)
+fn ensure_pip_available(python_executable: &Path, logs_dir: &Path) -> Result<()> {
+    let mut pip_probe = Command::new(python_executable);
+    pip_probe
         .arg("-m")
         .arg("pip")
         .arg("--version")
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .with_context(|| {
-            format!(
-                "Failed to probe pip using `{}`.",
-                python_executable.display()
-            )
-        })?;
+        .stderr(Stdio::null());
+    apply_no_window(&mut pip_probe);
+    let pip_status = pip_probe.status().with_context(|| {
+        format!(
+            "Failed to probe pip using `{}`.",
+            python_executable.display()
+        )
+    })?;
     if pip_status.success() {
         return Ok(());
     }
 
-    let ensurepip_status = Command::new(python_executable)
+    let (stdout_log, stderr_log) = open_process_logs(logs_dir, "provision-ensurepip")?;
+    let mut ensurepip = Command::new(python_executable);
+    ensurepip
         .arg("-m")
         .arg("ensurepip")
         .arg("--upgrade")
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .with_context(|| {
-            format!(
-                "Failed to bootstrap pip using `{}`.",
-                python_executable.display()
-            )
-        })?;
+        .stdout(Stdio::from(stdout_log))
+        .stderr(Stdio::from(stderr_log));
+    apply_no_window(&mut ensurepip);
+    let ensurepip_status = ensurepip.status().with_context(|| {
+        format!(
+            "Failed to bootstrap pip using `{}`.",
+            python_executable.display()
+        )
+    })?;
     if ensurepip_status.success() {
         return Ok(());
     }
     bail!("ensurepip exited with status {ensurepip_status}.");
 }
+
+fn open_process_logs(logs_dir: &Path, prefix: &str) -> Result<(File, File)> {
+    fs::create_dir_all(logs_dir).with_context(|| {
+        format!(
+            "Failed to create launcher log directory `{}`.",
+            logs_dir.display()
+        )
+    })?;
+    let path = logs_dir.join(format!("{prefix}-{}.log", unix_millis()));
+    let stdout_log = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .with_context(|| format!("Failed to open launcher log `{}`.", path.display()))?;
+    let stderr_log = stdout_log
+        .try_clone()
+        .with_context(|| format!("Failed to clone launcher log `{}`.", path.display()))?;
+    Ok((stdout_log, stderr_log))
+}
+
+fn unix_millis() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
+}
+
+#[cfg(windows)]
+fn apply_no_window(command: &mut Command) {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+    command.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(windows))]
+fn apply_no_window(_command: &mut Command) {}
 
 #[derive(Debug, Clone)]
 struct ArchiveEntryMetadata {

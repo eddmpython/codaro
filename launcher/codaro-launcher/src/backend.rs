@@ -3,10 +3,11 @@ use crate::state::ActiveReleaseState;
 use anyhow::{Context, Result, bail};
 use reqwest::blocking::Client;
 use serde::Serialize;
+use std::fs::{self, OpenOptions};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct CommandPreview {
@@ -21,7 +22,10 @@ pub struct BackendLaunchConfig {
     python_executable: PathBuf,
     backend_python_path: PathBuf,
     editor_root: PathBuf,
+    logs_dir: PathBuf,
     workspace_root: PathBuf,
+    uv_executable: Option<PathBuf>,
+    release_id: String,
     entry_module: String,
     host: String,
     port: u16,
@@ -42,7 +46,10 @@ impl BackendLaunchConfig {
             python_executable: LauncherPaths::resolve_python_executable(&python_runtime_dir)?,
             editor_root: resolve_editor_root(paths, state, &backend_python_path),
             backend_python_path,
+            logs_dir: paths.logs_dir(),
             workspace_root,
+            uv_executable: resolve_uv_executable(paths, state),
+            release_id: state.release_id.clone(),
             entry_module: state.backend_entry_module.clone(),
             host,
             port,
@@ -51,14 +58,34 @@ impl BackendLaunchConfig {
 
     pub fn spawn(&self) -> Result<Child> {
         let preview = self.command_preview();
+        fs::create_dir_all(&self.logs_dir).with_context(|| {
+            format!(
+                "Failed to create backend log directory `{}`.",
+                self.logs_dir.display()
+            )
+        })?;
+        let log_path = self.backend_log_path();
+        let stdout_log = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&log_path)
+            .with_context(|| format!("Failed to open backend log `{}`.", log_path.display()))?;
+        let stderr_log = stdout_log
+            .try_clone()
+            .with_context(|| format!("Failed to clone backend log `{}`.", log_path.display()))?;
         let mut command = Command::new(&self.python_executable);
         command.args(&preview.args);
         command.current_dir(&self.workspace_root);
         command.env("PYTHONPATH", &self.backend_python_path);
         command.env("CODARO_WEB_BUILD_ROOT", &self.editor_root);
+        command.env("CODARO_LAUNCHER_LOG_DIR", &self.logs_dir);
+        if let Some(uv_executable) = &self.uv_executable {
+            command.env("CODARO_UV_EXE", uv_executable);
+        }
         command.stdin(Stdio::null());
-        command.stdout(Stdio::inherit());
-        command.stderr(Stdio::inherit());
+        command.stdout(Stdio::from(stdout_log));
+        command.stderr(Stdio::from(stderr_log));
+        apply_no_window(&mut command);
         command.spawn().with_context(|| {
             format!(
                 "Failed to spawn backend with `{}`.",
@@ -96,7 +123,43 @@ impl BackendLaunchConfig {
             "--no-browser".into(),
         ]
     }
+
+    fn backend_log_path(&self) -> PathBuf {
+        let release = sanitize_log_segment(&self.release_id);
+        self.logs_dir
+            .join(format!("backend-{release}-{}.log", unix_millis()))
+    }
 }
+
+fn sanitize_log_segment(value: &str) -> String {
+    value
+        .chars()
+        .map(|item| {
+            if item.is_ascii_alphanumeric() || matches!(item, '-' | '_' | '.') {
+                item
+            } else {
+                '-'
+            }
+        })
+        .collect()
+}
+
+fn unix_millis() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
+}
+
+#[cfg(windows)]
+fn apply_no_window(command: &mut Command) {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+    command.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(windows))]
+fn apply_no_window(_command: &mut Command) {}
 
 fn resolve_editor_root(
     paths: &LauncherPaths,
@@ -110,6 +173,23 @@ fn resolve_editor_root(
     backend_python_path
         .join(state.backend_package_name.replace('-', "_"))
         .join("webBuild")
+}
+
+fn resolve_uv_executable(paths: &LauncherPaths, state: &ActiveReleaseState) -> Option<PathBuf> {
+    let executable_name = if cfg!(windows) { "uv.exe" } else { "uv" };
+    let candidates = [
+        paths
+            .release_runtime_dir(&state.release_id)
+            .join("uv")
+            .join(executable_name),
+        paths.runtime_dir().join("uv").join(executable_name),
+        paths.launcher_dir().join(executable_name),
+        std::env::current_exe()
+            .ok()
+            .and_then(|path| path.parent().map(|parent| parent.join(executable_name)))
+            .unwrap_or_else(|| PathBuf::from(executable_name)),
+    ];
+    candidates.into_iter().find(|candidate| candidate.is_file())
 }
 
 pub fn wait_for_health(url: &str, timeout: Duration) -> Result<()> {
