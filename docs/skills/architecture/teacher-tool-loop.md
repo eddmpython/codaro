@@ -45,8 +45,8 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 학습자에게는 패키지 설치 세부 로그보다 "필요한 도구를 uv로 준비 중"이라고 보여주고, 실패 시 첫 오류 줄을 바로 노출한다.
    - 새 커리큘럼을 만들 때는 설치 설명을 독립 문서로 빼지 않고 소개/첫 실행 섹션에 "라이브러리 확인 → uv 준비 → 작은 코드 검증" 흐름으로 포함한다.
 
-4. **Curriculum YAML 우선**
-   - 학습 요청은 `meta`, `intro`, `sections` 구조의 YAML로 설계한다.
+4. **Gap YAML 전개**
+   - 추천·조합 뒤 실제 gap으로 판정된 학습 요청만 `meta`, `intro`, `sections` 구조의 YAML로 설계한다.
    - 신규 YAML은 structured section contract를 우선한다. `sections[].blocks[]`는 기존 curriculum 호환용이다.
    - 커리큘럼 작성 세부 기준은 `docs/skills/architecture/curriculum-authoring.md`를 따른다.
    - provider system prompt, teacher skill registry, `write-curriculum-yaml` tool schema는 모두 신규 레슨에서 `sections[].blocks[]` 대신 `intro.diagram.steps`, `intro.diagram.runtime`, `title/subtitle/goal/why/explanation/tips/snippet/exercise/check` fields를 쓰도록 안내해야 한다.

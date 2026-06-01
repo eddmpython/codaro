@@ -70,11 +70,15 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
 
 
 def testProductSurfaceDocsNameTheSameFlow() -> None:
+    skillsReadme = _read("docs/skills/README.md")
     frontendDoc = _read("docs/skills/architecture/frontend-product-surface.md")
     dogfoodDoc = _read("docs/skills/ops/product/dogfood-alpha.md")
     identityDoc = _read("docs/skills/identity/multi-editor-modes.md")
     ssotMap = _read("docs/skills/architecture/ssot-map.md")
 
+    assert "대화, 현재 학습, 노트북, 자동화" in skillsReadme
+    assert "기존 커리큘럼 추천·조합" in skillsReadme
+    assert "자동화는 검증된 스크립트를 태스크로 예약 실행" in skillsReadme
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in frontendDoc
     assert "`PRODUCT_SURFACE_NAV`" in frontendDoc
     assert "`entry`/`learning`/`notebook`/`secondLoop`/`support`" in frontendDoc

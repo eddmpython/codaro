@@ -138,6 +138,21 @@ def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
     assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum"' in source
 
 
+def testAssistantContextSteersGoalDiscoveryBeforeYamlAuthoring() -> None:
+    source = _read("editor/src/lib/assistantContext.ts")
+
+    for expected in (
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+        "Only call write-curriculum-yaml when compose-master-plan shows a real gap",
+        "compose-master-plan이 기존 레슨으로 덮지 못하는 실제 gap",
+    ):
+        assert expected in source
+    assert "draft curriculum YAML first" not in source
+    assert "커리큘럼 YAML을 먼저" not in source
+
+
 def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     source = _read("editor/src/hooks/useAssistantTurnState.ts")
 

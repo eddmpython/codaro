@@ -104,6 +104,13 @@ DOGFOOD_REQUIREMENTS = (
                 "compose-master-plan",
                 "Only call write-curriculum-yaml",
             )),
+            ("editor/src/lib/assistantContext.ts", (
+                "For learning requests, first call resolve-learning-goal",
+                "then search-curricula",
+                "then compose-master-plan",
+                "Only call write-curriculum-yaml when compose-master-plan shows a real gap",
+                "compose-master-plan이 기존 레슨으로 덮지 못하는 실제 gap",
+            )),
             ("tests/testTeacherArchitecture.py", (
                 "testTeacherSkillRegistryLocksGoalDiscoveryBeforeYamlAuthoring",
                 "resolve-learning-goal",

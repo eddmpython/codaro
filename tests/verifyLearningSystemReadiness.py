@@ -101,12 +101,22 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
         ),
         fileCriterion(
             "teacher-prompt-contract-alignment",
-            "Teacher prompts and legacy practice tools steer new lessons to structured section-card YAML.",
+            "Teacher prompts, frontend context, and legacy practice tools steer learning through goal discovery before structured section-card YAML.",
             (
                 ("src/codaro/ai/conversation.py", (
                     "intro(direction,benefits,diagram.steps,diagram.runtime)",
                     "Each new concept lives in one YAML section card",
                     "legacy or targeted practice helpers",
+                    "call resolve-learning-goal to map the goal to domains",
+                    "search-curricula to find lessons that already cover it",
+                    "compose-master-plan to assemble an ordered learning path",
+                    "Only call write-curriculum-yaml to author a new lesson when no existing lesson covers the goal",
+                )),
+                ("editor/src/lib/assistantContext.ts", (
+                    "For learning requests, first call resolve-learning-goal",
+                    "then search-curricula",
+                    "then compose-master-plan",
+                    "Only call write-curriculum-yaml when compose-master-plan shows a real gap",
                 )),
                 ("src/codaro/curriculum/learningSpec.py", (
                     "sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check)",

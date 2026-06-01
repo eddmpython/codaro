@@ -370,7 +370,7 @@ function AssistantTraceDetails({ trace, workloop }: { trace?: AiTraceSummary; wo
   const hasPolicyViolation = policyCount > 0;
 
   return (
-    <details className="rounded-md border border-border/70 bg-background/50 px-2.5 py-2">
+    <details className="rounded-md border border-border/70 bg-background/50 px-2.5 py-2" data-trace-workloop="trace.workloop">
       <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-foreground">
         {hasPolicyViolation || errorCount ? (
           <ShieldAlert className="size-3.5 text-destructive" />
