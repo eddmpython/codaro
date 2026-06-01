@@ -223,7 +223,7 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
     for needle in (
         "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe",
         "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256",
-        "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.spdx.json",
+        "https://github.com/eddmpython/codaro/releases/latest/download/codaro.spdx.json",
         "Python 학습과 개인 자동화 스튜디오 - Codaro",
         'rel="canonical" href="https://eddmpython.github.io/codaro/"',
     ):

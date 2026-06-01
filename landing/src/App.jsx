@@ -695,7 +695,7 @@ report = df.groupby("week").sum()`}</pre>
             <p className="sha">
               Codaro.exe{"          "}<span className="tok-c"># 단일 실행 파일</span>
               {"\n"}Codaro.exe.sha256{"   "}<span className="tok-c"># SHA256 체크섬</span>
-              {"\n"}Codaro.spdx.json{"    "}<span className="tok-c"># SBOM</span>
+              {"\n"}codaro.spdx.json{"    "}<span className="tok-c"># SBOM</span>
               {"\n"}release-manifest.json <span className="tok-c"># 버전 핀</span>
               {"\n"}python-runtime…zip{"  "}<span className="tok-c"># 관리형 런타임</span>
             </p>

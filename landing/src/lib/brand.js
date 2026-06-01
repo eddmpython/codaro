@@ -18,7 +18,7 @@ export const brand = {
   launcherChecksumUrl:
     "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256",
   launcherSbomUrl:
-    "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.spdx.json",
+    "https://github.com/eddmpython/codaro/releases/latest/download/codaro.spdx.json",
   releaseManifestUrl:
     "https://github.com/eddmpython/codaro/releases/latest/download/release-manifest.json",
   pythonRuntimeUrl:
