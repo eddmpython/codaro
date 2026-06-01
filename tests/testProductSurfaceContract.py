@@ -61,9 +61,14 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "PRODUCT_SIDEBAR_NAV" in flowNav
     assert "PRODUCT_SURFACE_NAV" not in flowNav
     assert 'data-product-nav="flow"' in flowNav
+    assert 'data-product-flow-hierarchy="chat-first"' in flowNav
     assert 'data-product-nav="utility"' in source
+    assert 'data-product-flow-marker="true"' in flowNav
     assert "data-product-flow-role={flowRole}" in flowNav
+    assert 'data-product-flow-second-loop={flowRole === "secondLoop" ? "true" : undefined}' in flowNav
     assert "data-product-flow-step={flowStep}" in flowNav
+    assert 'flowRole === "entry" && "font-medium"' in flowNav
+    assert 'flowRole === "secondLoop" && "border-t border-sidebar-border/60 bg-sidebar-accent/20"' in flowNav
     assert source.index("<ProductFlowNav") < source.index('data-product-nav="utility"')
     assert source.index('data-product-nav="utility"') < source.index('tooltip={t("terminal.title")}')
 
