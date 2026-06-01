@@ -59,7 +59,7 @@ openpyxl 트랙(파일 기반, Excel 없이 동작)과는 의도적으로 분리
 - xlwings는 Excel 본체를 제어한다. **로컬 PC에 Excel 설치 필수**.
 - 모든 레슨은 `with xw.App(visible=False) as app:` 패턴으로 시작. 좀비 Excel 프로세스 방지.
 - 결과 파일은 `TemporaryDirectory()`로 임시 생성. CLAUDE.md 루트 청결 규칙.
-- 패키지: `xlwings` (uv add xlwings)
+- 패키지: `xlwings` (`meta.packages`와 라이브러리 패널 기준)
 
 ## 핵심 안전 패턴 (모든 레슨 반복)
 

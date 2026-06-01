@@ -2869,6 +2869,28 @@ lessonOutcomes:
     estimatedMinutes: 90
     lessonRole: project
 
+  # pdf/email/word/requests 프로젝트 트랙
+  "pdf/10_월간청구서생성기":
+    outcomes: [automation.pdf.report]
+    prerequisites: [automation.pdf.layout, automation.pdf.security]
+    estimatedMinutes: 90
+    lessonRole: project
+  "email/10_주간보고서발송기":
+    outcomes: [automation.email.report]
+    prerequisites: [automation.email.bulk, automation.email.notify, automation.email.credentials]
+    estimatedMinutes: 90
+    lessonRole: project
+  "word/10_회의록자동생성기":
+    outcomes: [automation.word.report]
+    prerequisites: [automation.word.tables, automation.word.media, automation.word.styles, automation.word.template]
+    estimatedMinutes: 90
+    lessonRole: project
+  "requests/01_첫GET요청":
+    outcomes: [automation.webApi.get]
+    prerequisites: [automation.webApi.intro]
+    estimatedMinutes: 40
+    lessonRole: project
+
   # openpyxl 트랙 — 파일 기반 엑셀 자동화
   "openpyxl/00_openpyxl소개":
     outcomes: [automation.excel.intro]

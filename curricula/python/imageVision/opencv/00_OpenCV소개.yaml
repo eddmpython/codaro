@@ -30,6 +30,7 @@ intro:
   - 이미지가 (높이, 너비, 채널) ndarray로 표현된다는 사실을 코드로 확인합니다.
   - BGR/Gray/HSV 색공간 차이와 변환 시 채널 수가 어떻게 달라지는지 파악합니다.
   - Canny 에지, findContours 컨투어, morphologyEx 모폴로지 같은 핵심 함수의 입력/출력 계약을 이해합니다.
+  - 첫 실행 셀에서 shape, dtype, edgePixelCount를 assert로 고정해 검출 흐름을 확인합니다.
   - 검출 결과를 픽셀 수, 컨투어 개수처럼 수치로 검증하는 습관을 들입니다.
   diagram:
     steps:

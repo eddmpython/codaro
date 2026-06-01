@@ -259,6 +259,20 @@ def testCurriculumPackageCopyUsesCanonicalNames() -> None:
     assert not failures
 
 
+def testCurriculumCopyDoesNotEmbedInstallCommands() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*")):
+        if not path.is_file() or path.suffix not in {".yaml", ".yml", ".md", ".json"}:
+            continue
+        text = path.read_text(encoding="utf-8").lower()
+        matched = [marker for marker in INSTALL_COMMAND_MARKERS if marker in text]
+        if matched:
+            rel = path.relative_to(ROOT).as_posix()
+            failures.append(f"{rel}: use the library panel, not embedded install commands: {', '.join(matched)}")
+
+    assert not failures
+
+
 def testCurriculumMetaPackagesUseInstallableDistributionNames() -> None:
     failures: list[str] = []
     for path in sorted(CURRICULA_DIR.rglob("*.yaml")):

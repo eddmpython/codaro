@@ -190,7 +190,7 @@ with tempfile.TemporaryDirectory() as tmp:
 
 ## 실행 환경
 
-- Python 3.12+ + `uv add python-docx docxtpl`.
+- Python 3.12+ + Codaro 라이브러리 패널(`meta.packages`: `python-docx`, `docxtpl`).
 - 모든 결과 `tempfile.TemporaryDirectory()`. 다시 `Document(path)`로 열어 assert.
 
 ## 레슨 yaml 작성 규약

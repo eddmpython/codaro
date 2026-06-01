@@ -44,7 +44,7 @@ intro:
         detail: "CSV → 다수 docx + docxtpl Jinja 템플릿."
     runtime:
       - label: "라이브러리"
-        detail: "uv add python-docx docxtpl. 둘 다 MIT/LGPL."
+        detail: "meta.packages의 python-docx, docxtpl을 라이브러리 패널에서 준비합니다. 둘 다 MIT/LGPL."
       - label: "검증"
         detail: "모든 결과 docx를 다시 Document로 열어 단락·표·이미지 단위 assert."
 
@@ -142,4 +142,4 @@ sections:
           - "07강 자리표시자 형식은 {{name}} Jinja 스타일로 통일 — 09강 docxtpl과 자연스럽게 연결."
           - "10강 회의록은 데이터(JSON) → 표·머리말·서명란 docx 한 함수에 모든 패턴 결합."
       - type: tip
-        content: "본 트랙을 시작하기 전에 uv add python-docx docxtpl로 두 패키지를 설치해 두세요."
+        content: "본 트랙을 시작하기 전에 라이브러리 패널에서 python-docx와 docxtpl 준비 상태를 확인하세요."

@@ -41,7 +41,7 @@ intro:
       - label: "3. save"
         detail: "tpl.save(outPath)로 결과 저장."
     runtime:
-      - label: "uv add docxtpl"
+      - label: "docxtpl 준비"
         detail: "LGPL 라이선스."
       - label: "검증"
         detail: "결과 docx에 자리표시자 잔여 없고 데이터가 정확히 반영됐는지 assert."

@@ -178,7 +178,7 @@ PDF 트랙이 **고립되지 않도록** 다른 트랙과의 연결 지점을 PR
 
 ## 실행 환경
 
-- Python 3.12+ + `uv add pypdf pdfplumber reportlab`.
+- Python 3.12+ + Codaro 라이브러리 패널(`meta.packages`: `pypdf`, `pdfplumber`, `reportlab`).
 - 모든 강의 1회 실행 시간 **30초 이내** (10강 200건 청구서 포함). 학습 흐름 끊김 방지.
 
 ## 검증 계약 (모든 레슨 반복)

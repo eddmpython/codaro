@@ -300,6 +300,8 @@ def main() -> int:
             "flagCounts": audit["flagCounts"],
             "thresholds": audit["thresholds"],
             "breaches": audit["breaches"],
+            "missingProjectCategories": audit["missingProjectCategories"],
+            "categoryProjects": audit["categoryProjects"],
             "runtime": {
                 "available": runtime["available"],
                 "weakOutcomeCount": len(runtime["weakOutcomes"]),
@@ -307,6 +309,8 @@ def main() -> int:
             },
         },
         "lessonReports": audit["lessonReports"],
+        "missingProjectCategories": audit["missingProjectCategories"],
+        "categoryProjects": audit["categoryProjects"],
         "runtime": runtime,
     }
 

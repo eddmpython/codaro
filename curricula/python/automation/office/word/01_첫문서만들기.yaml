@@ -42,7 +42,7 @@ intro:
         detail: "Document(path)로 다시 열어 doc.paragraphs로 확인."
     runtime:
       - label: "외부 의존"
-        detail: "python-docx만 (uv add python-docx)."
+        detail: "python-docx만 meta.packages 기준으로 준비합니다."
       - label: "검증"
         detail: "TemporaryDirectory + Document 재오픈 + paragraphs assert."
 

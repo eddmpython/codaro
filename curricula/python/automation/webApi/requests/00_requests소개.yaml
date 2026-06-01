@@ -48,7 +48,7 @@ intro:
       - label: "메인 의존성"
         detail: "requests 한 패키지. 09강에서만 httpx, 07·10강에서 pandas 결합."
       - label: "안전 검증"
-        detail: "공공 sample 또는 httpbin.org로 동작 확인 후 실 API 호출. 부수효과 호출은 dryRun=True 기본."
+        detail: "공공 sample 또는 httpbin.org로 동작 확인 후 응답 객체 단위 assert로 검증한다. 부수효과 호출은 dryRun=True 기본."
 
 sections:
   - id: position

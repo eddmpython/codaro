@@ -29,6 +29,7 @@ intro:
   - 이미지의 mode(L/RGB/RGBA)와 size(width, height)를 코드로 확인합니다.
   - crop/rotate/resize/convert가 무엇을 바꾸고 무엇을 그대로 두는지 픽셀로 검증합니다.
   - ImageFilter, ImageEnhance, ImageDraw 세 모듈의 역할 분담을 익힙니다.
+  - 첫 실행 셀에서 mode, size, grayMean을 assert로 고정해 처리 흐름을 확인합니다.
   - paste의 mask 인자로 알파 합성이 어떻게 일어나는지 손으로 확인합니다.
   diagram:
     steps:
