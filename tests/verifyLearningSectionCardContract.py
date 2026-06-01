@@ -11,6 +11,8 @@ APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
 LOCALE_COPY = ROOT / "editor" / "src" / "lib" / "localeCopy.ts"
+PACKAGE_INFERENCE = ROOT / "editor" / "src" / "lib" / "packageInference.ts"
+PYTHON_STDLIB = ROOT / "editor" / "src" / "lib" / "pythonStdlib.ts"
 
 
 def require(text: str, token: str, label: str, failures: list[str]) -> None:
@@ -31,7 +33,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, LOCALE_COPY):
+    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, LOCALE_COPY, PACKAGE_INFERENCE, PYTHON_STDLIB):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -42,6 +44,8 @@ def main() -> int:
     markdownBodyText = MARKDOWN_BODY.read_text(encoding="utf-8")
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
     localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
+    packageInferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
+    pythonStdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
 
     required_tokens = {
         "section card marker": "data-learning-section-card={section.id}",
@@ -149,6 +153,23 @@ def main() -> int:
     }
     for label, token in locale_copy_tokens.items():
         require(localeCopyText, token, label, failures)
+
+    package_inference_tokens = {
+        "stdlib helper import": "isPythonStdlibModule",
+        "stdlib runtime package filter": "installablePackageName",
+        "stdlib package name helper": "isPythonStdlibPackageName",
+    }
+    for label, token in package_inference_tokens.items():
+        require(packageInferenceText, token, label, failures)
+
+    stdlib_tokens = {
+        "io is stdlib": '"io"',
+        "zipfile is stdlib": '"zipfile"',
+        "stdlib module helper": "function isPythonStdlibModule",
+        "stdlib package helper": "function isPythonStdlibPackageName",
+    }
+    for label, token in stdlib_tokens.items():
+        require(pythonStdlibText, token, label, failures)
 
     require_order(
         text,

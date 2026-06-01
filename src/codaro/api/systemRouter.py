@@ -138,7 +138,10 @@ def createSystemRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/packages/install")
     async def apiInstallPackage(request: PackageRequest) -> dict[str, Any]:
-        result = await workspaceEngine.installPackage(request.name)
+        try:
+            result = await workspaceEngine.installPackage(request.name)
+        except PackageEnvironmentError as error:
+            fail(error.statusCode, error.code, error.message)
         logger.info(
             "packages %s",
             formatLogFields(action="install", name=request.name, success=result.success, message=result.message),
@@ -147,7 +150,10 @@ def createSystemRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/packages/uninstall")
     async def apiUninstallPackage(request: PackageRequest) -> dict[str, Any]:
-        result = await workspaceEngine.uninstallPackage(request.name)
+        try:
+            result = await workspaceEngine.uninstallPackage(request.name)
+        except PackageEnvironmentError as error:
+            fail(error.statusCode, error.code, error.message)
         logger.info(
             "packages %s",
             formatLogFields(action="uninstall", name=request.name, success=result.success, message=result.message),

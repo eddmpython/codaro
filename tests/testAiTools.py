@@ -26,7 +26,7 @@ from codaro.ai.toolManifest import (
 )
 from codaro.document.models import BlockConfig, CodaroDocument
 from codaro.kernel.session import KernelSession
-from codaro.system.packageOps import InstallResult
+from codaro.system.packageOps import InstallResult, PackageInfo
 
 
 EXPECTED_BUILTIN_TOOLS = {
@@ -59,6 +59,9 @@ class _MockSessionManager:
 
 
 class _PackageSession:
+    async def listPackages(self):
+        return [PackageInfo(name="numpy", version="2.0.0")]
+
     async def installPackage(self, packageName: str):
         return InstallResult(
             package=packageName,
@@ -303,6 +306,19 @@ class TestDocumentTools:
             "durationMs": 42,
             "skipped": True,
         }
+
+    def test_packages_check_treats_standard_library_as_ready(self):
+        sessionManager = _MockSessionManager()
+        sessionManager._sessions["session-1"] = _PackageSession()
+        executor = ToolExecutor(sessionManager=sessionManager, documentGetter=lambda: _makeDoc())
+        executor.setActiveSession("session-1")
+
+        result = asyncio.run(executor.execute("packages-check", {"names": ["io", "pandas", "numpy"]}))
+
+        assert result["missing"] == ["pandas"]
+        packages = {item["name"]: item for item in result["packages"]}
+        assert packages["io"] == {"name": "io", "installed": True, "version": "stdlib"}
+        assert packages["numpy"] == {"name": "numpy", "installed": True, "version": "2.0.0"}
 
 
 class TestAutomationAuthoringTools:

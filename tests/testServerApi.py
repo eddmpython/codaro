@@ -257,6 +257,30 @@ def testPackagesListUsesWorkspaceEngine(monkeypatch) -> None:
     assert response.json() == [{"name": "WorkspacePkg", "version": "9.9.9"}]
 
 
+def testPackagesInstallSkipsStandardLibraryModule() -> None:
+    client = TestClient(createServerApp())
+
+    response = client.post("/api/packages/install", json={"name": "io"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["package"] == "io"
+    assert payload["success"] is True
+    assert payload["skipped"] is True
+    assert "standard library" in payload["message"]
+
+
+def testPackageInstallCommandDropsStandardLibraryModules() -> None:
+    client = TestClient(createServerApp())
+
+    response = client.post("/api/packages/install-command", json={"names": ["io", "pandas", "zipfile"]})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["packages"] == ["pandas"]
+    assert "pandas" in payload["command"]
+
+
 def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch, tmp_path: Path) -> None:
     class _ProfileManager:
         def serialize(self):

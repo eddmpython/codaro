@@ -317,7 +317,10 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     @router.post("/api/kernel/{sessionId}/packages/install")
     async def apiInstallSessionPackage(sessionId: str, request: PackageRequest) -> dict[str, Any]:
         session = requireSession(state, sessionId)
-        result = await session.installPackage(request.name)
+        try:
+            result = await session.installPackage(request.name)
+        except PackageEnvironmentError as error:
+            fail(error.statusCode, error.code, error.message)
         logger.info(
             "kernel-packages %s",
             formatLogFields(action="install", sessionId=sessionId, name=request.name, success=result.success),
@@ -327,7 +330,10 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     @router.post("/api/kernel/{sessionId}/packages/uninstall")
     async def apiUninstallSessionPackage(sessionId: str, request: PackageRequest) -> dict[str, Any]:
         session = requireSession(state, sessionId)
-        result = await session.uninstallPackage(request.name)
+        try:
+            result = await session.uninstallPackage(request.name)
+        except PackageEnvironmentError as error:
+            fail(error.statusCode, error.code, error.message)
         logger.info(
             "kernel-packages %s",
             formatLogFields(action="uninstall", sessionId=sessionId, name=request.name, success=result.success),

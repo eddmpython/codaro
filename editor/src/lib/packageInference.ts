@@ -1,4 +1,5 @@
 import type { CodaroDocument } from "@/types";
+import { isPythonStdlibModule, isPythonStdlibPackageName } from "@/lib/pythonStdlib";
 
 const PACKAGE_ALIASES: Record<string, string> = {
   PIL: "pillow",
@@ -17,37 +18,6 @@ const PACKAGE_ALIASES: Record<string, string> = {
   easyocr: "easyocr",
   mss: "mss",
 };
-
-const PYTHON_STDLIB_MODULES = new Set([
-  "__future__",
-  "argparse",
-  "asyncio",
-  "base64",
-  "collections",
-  "contextlib",
-  "csv",
-  "dataclasses",
-  "datetime",
-  "decimal",
-  "functools",
-  "glob",
-  "itertools",
-  "json",
-  "math",
-  "os",
-  "pathlib",
-  "random",
-  "re",
-  "statistics",
-  "string",
-  "subprocess",
-  "sys",
-  "textwrap",
-  "time",
-  "typing",
-  "urllib",
-  "uuid",
-]);
 
 const KEYWORD_PACKAGES: Record<string, string> = {
   pandas: "pandas",
@@ -73,7 +43,9 @@ export function inferAssistantPackages(message: string, document: CodaroDocument
 }
 
 export function inferDocumentPackages(document: CodaroDocument) {
-  const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
+  const packages = new Set<string>(
+    (document.runtime?.packages ?? []).map(String).map(installablePackageName).filter(Boolean),
+  );
   for (const block of document.blocks) {
     if (block.type !== "code") continue;
     for (const packageName of inferCodePackages(block.content)) {
@@ -94,8 +66,14 @@ export function inferCodePackages(code: string) {
 
 export function importPackageName(moduleName: string) {
   const normalized = moduleName.trim();
-  if (!normalized || PYTHON_STDLIB_MODULES.has(normalized)) return "";
+  if (!normalized || isPythonStdlibModule(normalized)) return "";
   return PACKAGE_ALIASES[normalized] ?? normalized;
+}
+
+export function installablePackageName(packageName: string) {
+  const normalized = packageName.trim();
+  if (!normalized || isPythonStdlibPackageName(normalized)) return "";
+  return normalized;
 }
 
 export function normalizePackageName(value: string) {

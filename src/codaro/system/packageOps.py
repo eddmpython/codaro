@@ -18,6 +18,7 @@ PACKAGE_LIST_TIMEOUT_SECONDS = 30
 PACKAGE_VERSION_TIMEOUT_SECONDS = 10
 INSTALL_TIMEOUT_SECONDS = 600
 UNINSTALL_TIMEOUT_SECONDS = 120
+_STDLIB_MODULE_NAMES = set(getattr(sys, "stdlib_module_names", ()))
 
 
 class PackageInfo(BaseModel):
@@ -101,9 +102,7 @@ def getPackageEnvironment(projectRoot: Path | None = None) -> PackageEnvironment
 
 
 def buildPackageInstallCommand(names: list[str]) -> PackageInstallCommand:
-    packages = [name.strip() for name in names if name.strip()]
-    for packageName in packages:
-        validatePackageName(packageName)
+    packages = installablePackageNames(names)
     environment = getPackageEnvironment()
     uvExecutable = environment.uvPath or "uv"
     commandParts = [
@@ -113,7 +112,7 @@ def buildPackageInstallCommand(names: list[str]) -> PackageInstallCommand:
         "--python",
         environment.pythonPath,
         *packages,
-    ]
+    ] if packages else []
     return PackageInstallCommand(
         command=" ".join(_shellToken(part) for part in commandParts),
         environment=environment,
@@ -313,6 +312,38 @@ def validatePackageName(name: str) -> None:
         )
 
 
+def installablePackageNames(names: list[str]) -> list[str]:
+    packages: list[str] = []
+    seen: set[str] = set()
+    for rawName in names:
+        packageName = rawName.strip()
+        if not packageName:
+            continue
+        validatePackageName(packageName)
+        if isStandardLibraryPackage(packageName):
+            continue
+        key = packageName.lower().replace("_", "-")
+        if key in seen:
+            continue
+        seen.add(key)
+        packages.append(packageName)
+    return packages
+
+
+def isStandardLibraryPackage(name: str) -> bool:
+    packageName = _basePackageName(name)
+    if not packageName:
+        return False
+    return packageName.replace("-", "_") in _STDLIB_MODULE_NAMES
+
+
+def _basePackageName(name: str) -> str:
+    match = re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]*", name.strip())
+    if match is None:
+        return ""
+    return match.group(0)
+
+
 async def installPackage(name: str) -> InstallResult:
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _installSync, name)
@@ -324,6 +355,14 @@ def _installSync(name: str) -> InstallResult:
         validatePackageName(name)
     except PackageEnvironmentError as error:
         return _packageResult(name, False, error.message, startedAt)
+    if isStandardLibraryPackage(name):
+        return _packageResult(
+            name,
+            True,
+            f"{name} is included in the Python standard library.",
+            startedAt,
+            skipped=True,
+        )
 
     try:
         pythonPath = getProjectPythonPath()
@@ -357,6 +396,8 @@ def _installSync(name: str) -> InstallResult:
         result = runUvPip("install", [name], pythonPath=pythonPath, timeoutSeconds=INSTALL_TIMEOUT_SECONDS)
     except FileNotFoundError:
         return _packageResult(name, False, "uv executable was not found.", startedAt, environment=environment)
+    except PackageEnvironmentError as error:
+        return _packageResult(name, False, error.message, startedAt, environment=environment)
     except subprocess.TimeoutExpired:
         return _packageResult(
             name,
@@ -365,6 +406,8 @@ def _installSync(name: str) -> InstallResult:
             startedAt,
             environment=environment,
         )
+    except OSError as error:
+        return _packageResult(name, False, f"uv pip install failed: {error}", startedAt, environment=environment)
 
     output = (result.stdout + "\n" + result.stderr).strip()
     return _packageResult(name, result.returncode == 0, output, startedAt, environment=environment)

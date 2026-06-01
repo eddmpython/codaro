@@ -148,6 +148,20 @@ def testInstallPackageReportsInvalidName() -> None:
     assert "Invalid package name" in result.message or "Suspicious package name" in result.message
 
 
+def testInstallPackageSkipsStandardLibraryPackage(monkeypatch) -> None:
+    def failRunUvPip(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("uv pip should not run for a Python standard library module")
+
+    monkeypatch.setattr(packageOps, "runUvPip", failRunUvPip)
+
+    result = _run(packageOps.installPackage("io"))
+
+    assert result.success is True
+    assert result.skipped is True
+    assert "standard library" in result.message
+
+
 def testInstallPackageSkipsUvWhenPlainPackageAlreadyInstalled(monkeypatch, tmp_path: Path) -> None:
     pythonPath = tmp_path / "python.exe"
     pythonPath.write_text("", encoding="utf-8")
@@ -215,6 +229,38 @@ def testPackageInstallCommandUsesResolvedEnvironment(monkeypatch, tmp_path: Path
     assert " pip install --python " in plan.command
     assert "pandas" in plan.command
     assert "python-docx" in plan.command
+
+
+def testPackageInstallCommandDropsStandardLibraryModules(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    uvPath = tmp_path / "uv.exe"
+    pythonPath.write_text("", encoding="utf-8")
+    uvPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
+
+    plan = packageOps.buildPackageInstallCommand(["io", "pandas", "zipfile"])
+
+    assert plan.packages == ["pandas"]
+    assert "pandas" in plan.command
+    assert "io" not in plan.packages
+    assert "zipfile" not in plan.packages
+
+
+def testPackageInstallCommandForOnlyStandardLibraryModulesHasNoCommand(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    uvPath = tmp_path / "uv.exe"
+    pythonPath.write_text("", encoding="utf-8")
+    uvPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
+
+    plan = packageOps.buildPackageInstallCommand(["io", "zipfile"])
+
+    assert plan.packages == []
+    assert plan.command == ""
 
 
 def testTerminalEnvironmentPrependsPackageRuntimePaths(monkeypatch, tmp_path: Path) -> None:

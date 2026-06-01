@@ -5,6 +5,7 @@ from typing import Any
 from ...curriculum.exerciseCheck import InvalidExerciseCheck, ToolExerciseCheckInput, runToolExerciseCheck
 from ...document.blockOperations import DocumentOperationError, getDocumentBlock
 from ...kernel.documentExecution import executeDocumentReactiveBlock
+from ...system import packageOps
 
 
 def _documentBlockErrorPayload(exc: DocumentOperationError, blockId: str) -> dict[str, str]:
@@ -60,6 +61,15 @@ class RuntimeToolHandlers:
         packageResults = []
         missing = []
         for name in requested:
+            if packageOps.isStandardLibraryPackage(name):
+                packageResults.append(
+                    {
+                        "name": name,
+                        "installed": True,
+                        "version": "stdlib",
+                    }
+                )
+                continue
             normalized = name.lower().replace("_", "-")
             package = installedByName.get(normalized)
             installed = package is not None
