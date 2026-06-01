@@ -67,6 +67,17 @@ src/codaro/
 - 실행기/문서/커리큘럼 세부 모델은 router가 직접 해석하지 않는다.
 - `ServerState` 생성과 runtime/domain concrete wiring은 `system/serverState.py`가 소유한다. `api/appState.py`는 legacy import 호환 shim으로만 둔다.
 
+## 호환 shim 계약
+
+호환 shim은 새 책임을 추가하는 위치가 아니다. 현재 허용된 shim은 아래 둘뿐이다.
+
+| shim | 대체 import | 역할 | 제거 조건 |
+| --- | --- | --- | --- |
+| `src/codaro/ai/teacherLoop.py` | `codaro.ai.teacher` | 예전 context/tool lifecycle import 호환 | 외부 호출자가 대체 import로 이동하고 다음 minor release에서 전환 경로를 문서화한 뒤 |
+| `src/codaro/api/appState.py` | `codaro.system.serverState` | 예전 server state import 호환 | 외부 호출자가 대체 import로 이동하고 다음 minor release에서 전환 경로를 문서화한 뒤 |
+
+각 shim은 모듈 docstring에 역할, 대체 import, 제거 조건을 적고, `tests/testTransportBoundary.py`의 `COMPATIBILITY_SHIMS` 계약으로 public export와 금지 내부 구현을 검사한다.
+
 ## 계층 import gate
 
 목표 의존 방향은 `core → engine → domain → transport → entry`다. 현재 물리 폴더가 목표 트리와 완전히 같지 않아도 import 방향은 아래 매핑으로 판단한다.

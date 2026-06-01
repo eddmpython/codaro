@@ -4,6 +4,51 @@ import ast
 
 ROOT = Path(__file__).resolve().parents[1]
 
+COMPATIBILITY_SHIMS = {
+    "src/codaro/ai/teacherLoop.py": {
+        "replacement": "codaro.ai.teacher",
+        "exports": ('"injectContext"', '"toolCallResult"', '"toolCallStart"'),
+        "reexports": (
+            "from .teacher.contextBuilder import injectContext",
+            "from .teacher.toolLifecycle import toolCallResult, toolCallStart",
+        ),
+        "forbidden": ("providerLoop", "providerStream", "turnRuntime", "turnExecution"),
+    },
+    "src/codaro/api/appState.py": {
+        "replacement": "codaro.system.serverState",
+        "exports": ('"ServerState"', '"createServerState"'),
+        "reexports": ("from ..system.serverState import ServerState, createServerState",),
+        "forbidden": (
+            "dataclass",
+            "AnalyticsTimeline",
+            "LearnerStateStore",
+            "CurriculumOsCache",
+            "ProgressTracker",
+            "StudyLoader",
+            "SessionManager",
+            "ExecutionEngine",
+            "LocalEngine",
+        ),
+    },
+}
+
+
+def testCompatibilityShimsNameRoleReplacementAndRemovalCriteria() -> None:
+    for relativePath, contract in COMPATIBILITY_SHIMS.items():
+        source = (ROOT / relativePath).read_text(encoding="utf-8")
+        normalizedSource = " ".join(source.split())
+
+        assert "Legacy import shim" in normalizedSource
+        assert f"Internal code must import from {contract['replacement']} instead." in normalizedSource
+        assert "Remove after external callers move off" in normalizedSource
+        assert "next minor release" in normalizedSource
+        for reexport in contract["reexports"]:
+            assert reexport in source
+        for export in contract["exports"]:
+            assert export in source
+        for forbidden in contract["forbidden"]:
+            assert forbidden not in source
+
 
 def testAiRouterDoesNotImportProviderImplementations() -> None:
     source = (ROOT / "src/codaro/api/aiRouter.py").read_text(encoding="utf-8")
@@ -67,14 +112,13 @@ def testTeacherRuntimeOwnsPayloadToRuntimeTurnBoundary() -> None:
 def testTeacherLoopCompatibilityShimStaysThinAndUnusedInternally() -> None:
     shimPath = ROOT / "src/codaro/ai/teacherLoop.py"
     source = shimPath.read_text(encoding="utf-8")
+    contract = COMPATIBILITY_SHIMS["src/codaro/ai/teacherLoop.py"]
 
-    assert "from .teacher.contextBuilder import injectContext" in source
-    assert "from .teacher.toolLifecycle import toolCallResult, toolCallStart" in source
+    for reexport in contract["reexports"]:
+        assert reexport in source
     assert '__all__ = ["injectContext", "toolCallResult", "toolCallStart"]' in source
-    assert "providerLoop" not in source
-    assert "providerStream" not in source
-    assert "turnRuntime" not in source
-    assert "turnExecution" not in source
+    for forbidden in contract["forbidden"]:
+        assert forbidden not in source
 
     offenders: list[str] = []
     for path in (ROOT / "src/codaro").rglob("*.py"):
@@ -836,20 +880,12 @@ def testServerStateFactoryLivesOutsideTransportLayer() -> None:
 def testApiAppStateCompatibilityShimStaysThinAndUnusedInternally() -> None:
     shimPath = ROOT / "src/codaro/api/appState.py"
     source = shimPath.read_text(encoding="utf-8")
+    contract = COMPATIBILITY_SHIMS["src/codaro/api/appState.py"]
 
-    assert "from ..system.serverState import ServerState, createServerState" in source
+    for reexport in contract["reexports"]:
+        assert reexport in source
     assert '__all__ = ["ServerState", "createServerState"]' in source
-    for forbidden in (
-        "dataclass",
-        "AnalyticsTimeline",
-        "LearnerStateStore",
-        "CurriculumOsCache",
-        "ProgressTracker",
-        "StudyLoader",
-        "SessionManager",
-        "ExecutionEngine",
-        "LocalEngine",
-    ):
+    for forbidden in contract["forbidden"]:
         assert forbidden not in source
 
     offenders: list[str] = []
