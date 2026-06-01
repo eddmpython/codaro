@@ -56,7 +56,7 @@ function App() {
       const knownBlocks = activeDocumentRef.current.blocks;
       for (const blockId of detail.blockIds) {
         const target = knownBlocks.find((block) => block.id === blockId);
-        if (target && target.type === "code") {
+        if (target && isExecutableBlock(target)) {
           void runBlockRef.current?.(target);
         }
       }

@@ -234,6 +234,7 @@ def testLocalRuntimeOwnsOfflineExecutionBoundary() -> None:
 
 
 def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
+    appShell = _read("editor/src/App.tsx")
     cellModel = _read("editor/src/lib/cellModel.ts")
     documentModel = _read("editor/src/lib/documentModel.ts")
     runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
@@ -246,6 +247,8 @@ def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
     assert "document.blocks.filter(isExecutableBlock)" in runtimeHook
     assert 'type: isExecutableBlock(block) ? "code" : "markdown"' in notebookRuntime
     assert 'block.type === "automation" ? "Automation"' in notebookPanel
+    assert "isExecutableBlock(target)" in appShell
+    assert 'target.type === "code"' not in appShell
 
 
 def testFrontendStateDoesNotImportComponentImplementations() -> None:
