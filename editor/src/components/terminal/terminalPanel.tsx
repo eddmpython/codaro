@@ -6,18 +6,13 @@ import { X } from "lucide-react";
 
 import { useLocale } from "@/lib/localeContext";
 import type { ThemeMode } from "@/lib/surfaceModel";
+import { terminalLaunchInput, type TerminalLaunchIntent } from "@/lib/terminalLaunch";
 
 // 전역 터미널 패널: 백엔드 /ws/terminal(PTY)에 붙어 xterm.js로 실제 로컬 셸을 렌더한다.
 // 백엔드가 주입한 패키지 환경 PATH를 그대로 쓰므로 설치형 런타임과 같은 셸이 열린다.
 
 const DARK_THEME = { background: "#09090b", foreground: "#e4e4e7", cursor: "#e4e4e7" };
 const LIGHT_THEME = { background: "#ffffff", foreground: "#18181b", cursor: "#18181b" };
-
-export type TerminalLaunchIntent = {
-  command: string;
-  id: number;
-  submit?: boolean;
-};
 
 export function TerminalPanel({
   launchIntent,
@@ -144,12 +139,6 @@ export function TerminalPanel({
 }
 
 type TerminalMessage = { type?: string; data?: unknown; message?: unknown };
-
-export function terminalLaunchInput(intent: TerminalLaunchIntent): string {
-  if (!intent.submit) return intent.command;
-  if (intent.command.endsWith("\r") || intent.command.endsWith("\n")) return intent.command;
-  return `${intent.command}\r`;
-}
 
 function parseMessage(raw: unknown): TerminalMessage | null {
   if (typeof raw !== "string") return null;

@@ -12,6 +12,7 @@ CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.t
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
 APP = ROOT / "editor" / "src" / "App.tsx"
 TERMINAL_PANEL = ROOT / "editor" / "src" / "components" / "terminal" / "terminalPanel.tsx"
+TERMINAL_LAUNCH = ROOT / "editor" / "src" / "lib" / "terminalLaunch.ts"
 LOCALE_COPY = ROOT / "editor" / "src" / "lib" / "localeCopy.ts"
 PACKAGE_INFERENCE = ROOT / "editor" / "src" / "lib" / "packageInference.ts"
 PACKAGE_PREPARATION = ROOT / "editor" / "src" / "lib" / "curriculumPackagePreparation.ts"
@@ -36,7 +37,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
+    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -46,6 +47,7 @@ def main() -> int:
     aiPanelText = AI_PANEL.read_text(encoding="utf-8")
     appText = APP.read_text(encoding="utf-8")
     terminalPanelText = TERMINAL_PANEL.read_text(encoding="utf-8")
+    terminalLaunchText = TERMINAL_LAUNCH.read_text(encoding="utf-8")
     markdownBodyText = MARKDOWN_BODY.read_text(encoding="utf-8")
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
     localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
@@ -141,13 +143,20 @@ def main() -> int:
 
     terminal_tokens = {
         "terminal launch submits curriculum command": "setTerminalLaunchIntent({ command, id: Date.now(), submit: true })",
+        "terminal launch model import in app": 'type { TerminalLaunchIntent } from "@/lib/terminalLaunch"',
+        "terminal launch helper import in panel": 'terminalLaunchInput, type TerminalLaunchIntent',
         "terminal launch input helper": "function terminalLaunchInput",
         "terminal launch submit flag": "submit?: boolean",
         "terminal launch sends transformed input": "data: terminalLaunchInput(intent)",
         "terminal launch appends enter": 'return `${intent.command}\\r`',
     }
     for label, token in terminal_tokens.items():
-        source = appText if label == "terminal launch submits curriculum command" else terminalPanelText
+        if label in {"terminal launch submits curriculum command", "terminal launch model import in app"}:
+            source = appText
+        elif label in {"terminal launch helper import in panel", "terminal launch sends transformed input"}:
+            source = terminalPanelText
+        else:
+            source = terminalLaunchText
         require(source, token, label, failures)
 
     markdown_body_tokens = {
@@ -269,11 +278,16 @@ def main() -> int:
             "lg:opacity-0",
             "tabIndex={selected ? 0 : -1}",
         ),
+        TERMINAL_PANEL: (
+            "export type TerminalLaunchIntent",
+            "export function terminalLaunchInput",
+        ),
     }
     sourceByPath = {
         SURFACE: text,
         AI_PANEL: aiPanelText,
         CELL_ACTIONS: cellActionsText,
+        TERMINAL_PANEL: terminalPanelText,
     }
     for path, tokens in forbidden_tokens.items():
         source = sourceByPath[path]
