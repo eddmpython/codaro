@@ -3,10 +3,25 @@ import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
+EDITOR_SRC = ROOT / "editor" / "src"
 
 
 def _read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
+
+
+def _editorFiles(*roots: str) -> list[Path]:
+    files: list[Path] = []
+    for root in roots:
+        files.extend(
+            path for path in (EDITOR_SRC / root).rglob("*")
+            if path.suffix in {".ts", ".tsx"}
+        )
+    return sorted(files)
+
+
+def _rel(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
 
 
 def testProductSurfaceNavKeepsConversationFirstFlow() -> None:
@@ -217,6 +232,33 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
         "YAML",
     ):
         assert forbidden not in chatSurface
+
+
+def testFrontendStateAndComponentBoundariesStayLayered() -> None:
+    directApiFailures: list[str] = []
+    directApiTokens = (
+        'from "@/lib/api"',
+        "from '@/lib/api'",
+        "codaroApi",
+        "requestJson",
+        "postJson",
+        "fetch(",
+    )
+    for path in _editorFiles("components", "hooks"):
+        source = path.read_text(encoding="utf-8")
+        for token in directApiTokens:
+            if token in source:
+                directApiFailures.append(f"{_rel(path)} imports or calls API boundary token {token!r}")
+
+    componentImportFailures: list[str] = []
+    componentImportPattern = re.compile(r'from\s+["\']@/components/')
+    for path in _editorFiles("lib", "hooks"):
+        source = path.read_text(encoding="utf-8")
+        if componentImportPattern.search(source):
+            componentImportFailures.append(f"{_rel(path)} imports component implementation")
+
+    assert not directApiFailures
+    assert not componentImportFailures
 
 
 def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
