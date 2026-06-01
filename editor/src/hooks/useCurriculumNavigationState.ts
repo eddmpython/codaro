@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import type { SidebarCustomCurriculum } from "@/components/app/productSidebar";
+import type { SidebarCustomCurriculum } from "@/components/app/curriculumSidebarTree";
 import {
   categorySubtitle,
   categoryTitle,

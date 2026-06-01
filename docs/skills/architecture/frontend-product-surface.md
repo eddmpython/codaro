@@ -24,6 +24,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 사용자에게 보이는 제품 표면은 **대화**, **현재 학습**, **노트북**, **자동화** 네 가지다.
 - 사이드바 표면 순서는 `대화 → 현재 학습 → 노트북 → 자동화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 대화에서 시작해 산출물을 관리하고 실행하는 흐름이다.
 - `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. 컴포넌트가 별도 배열로 표면 순서나 숨김 정책을 복사하면 실패다.
+- `editor/src/components/app/productSidebar.tsx`는 sidebar shell이다. flow nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
 - 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다.
 - 폐기된 이전 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다.
 - 제품 기본 진입은 **대화**다.

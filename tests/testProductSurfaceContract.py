@@ -44,17 +44,46 @@ def testSurfaceRouteUsesSurfaceModelContract() -> None:
 
 def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     source = _read("editor/src/components/app/productSidebar.tsx")
+    flowNav = _read("editor/src/components/app/productFlowNav.tsx")
 
-    assert "PRODUCT_SIDEBAR_NAV" in source
+    assert "ProductFlowNav" in source
+    assert "CurriculumSidebarTree" in source
+    assert "AutomationSidebarTree" in source
+    assert "PRODUCT_SIDEBAR_NAV" not in source
     assert "PRODUCT_SURFACE_NAV" not in source
     assert "allNavItems" not in source
     assert "HIDDEN_SURFACES" not in source
     assert ".filter((item) => item.visibleInSidebar)" not in source
-    assert 'data-product-nav="flow"' in source
+    assert "buildSidebarCurriculumTree" not in source
+    assert "CustomCurriculumDeleteDialog" not in source
+    assert "surfaceIcons" not in source
+    assert "categoryTitle" not in source
+    assert "PRODUCT_SIDEBAR_NAV" in flowNav
+    assert "PRODUCT_SURFACE_NAV" not in flowNav
+    assert 'data-product-nav="flow"' in flowNav
     assert 'data-product-nav="utility"' in source
-    assert "data-product-flow-role={flowRole}" in source
-    assert source.index('data-product-nav="flow"') < source.index('data-product-nav="utility"')
+    assert "data-product-flow-role={flowRole}" in flowNav
+    assert "data-product-flow-step={flowStep}" in flowNav
+    assert source.index("<ProductFlowNav") < source.index('data-product-nav="utility"')
     assert source.index('data-product-nav="utility"') < source.index('tooltip={t("terminal.title")}')
+
+
+def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
+    productSidebar = _read("editor/src/components/app/productSidebar.tsx")
+    curriculumTree = _read("editor/src/components/app/curriculumSidebarTree.tsx")
+    automationTree = _read("editor/src/components/app/automationSidebarTree.tsx")
+    navigationHook = _read("editor/src/hooks/useCurriculumNavigationState.ts")
+
+    assert "buildSidebarCurriculumTree" in curriculumTree
+    assert "CustomCurriculumDeleteDialog" in curriculumTree
+    assert "useSidebarExpansionState" in curriculumTree
+    assert "AutomationSidebarTree" in automationTree
+    assert "selectedSection: AutomationSection" in automationTree
+    assert "PRODUCT_SIDEBAR_NAV" not in curriculumTree
+    assert "PRODUCT_SIDEBAR_NAV" not in automationTree
+    assert "buildSidebarCurriculumTree" not in productSidebar
+    assert 'from "@/components/app/curriculumSidebarTree"' in navigationHook
+    assert 'from "@/components/app/productSidebar"' not in navigationHook
 
 
 def testProductSurfaceCopyMatchesFocusedFlow() -> None:
