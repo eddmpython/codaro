@@ -22,7 +22,6 @@ import {
   lineNumbers,
   placeholder,
 } from "@codemirror/view";
-import { codaroApi } from "@/lib/api";
 import { combineErrorSources } from "@/lib/tracebackParser";
 import {
   Loader2,
@@ -44,6 +43,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/codeCompletion";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
@@ -209,11 +209,6 @@ export function NotebookPanel({
     </section>
   );
 }
-
-export type CompletionContextProvider = () => {
-  variables?: Array<{ name: string; type?: string }>;
-  blocks?: Array<{ type: string; content: string }>;
-};
 
 class ErrorGutterMarker extends GutterMarker {
   override toDOM() {
@@ -416,24 +411,19 @@ export function CodeCellEditor({
     const suffix = context.state.doc.sliceString(context.pos);
     if (prefix.trim().length < 2 && !context.explicit) return null;
     const extra = completionContextRef.current ? completionContextRef.current() : undefined;
-    try {
-      const response = await codaroApi.complete({ prefix, suffix, context: extra });
-      const completions = response.completions.filter((text) => text && text.length > 0);
-      if (!completions.length) return null;
-      return {
-        from: word.from,
-        to: context.pos,
-        options: completions.map((text) => ({
-          label: word.text + text,
-          apply: word.text + text,
-          type: "function",
-          detail: "AI",
-        })),
-        validFor: /^[\w.]*$/,
-      };
-    } catch {
-      return null;
-    }
+    const completions = await fetchCodeCompletions({ prefix, suffix, context: extra });
+    if (!completions.length) return null;
+    return {
+      from: word.from,
+      to: context.pos,
+      options: completions.map((text) => ({
+        label: word.text + text,
+        apply: word.text + text,
+        type: "function",
+        detail: "AI",
+      })),
+      validFor: /^[\w.]*$/,
+    };
   };
 
   useEffect(() => {

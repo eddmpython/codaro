@@ -3,7 +3,7 @@ import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { codaroApi } from "@/lib/api";
+import { sendMobileChatTurn } from "@/lib/mobileChatTurn";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
 
 type ChatLine = { role: "user" | "assistant"; text: string };
@@ -28,11 +28,9 @@ export function MobileChat() {
     setLines((current) => [...current, { role: "user", text: message }]);
     setDraft("");
     try {
-      const response = await codaroApi.teacherChat({
+      const response = await sendMobileChatTurn({
         conversationId,
-        displayLocale: "ko",
         message,
-        role: "teacher",
       });
       setConversationId(response.conversationId);
       const reply = response.answer || "(빈 응답)";

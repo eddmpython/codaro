@@ -1,14 +1,19 @@
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from ..automation.integrations.base import getIntegrationRegistry
-
-logger = logging.getLogger(__name__)
+from ..automation.integrationFlow import (
+    AutomationIntegrationFlowError,
+    configureAutomationIntegrationPayload,
+    executeAutomationIntegrationPayload,
+    getAutomationIntegrationPayload,
+    listAutomationIntegrationsByCategoryPayload,
+    listAutomationIntegrationsPayload,
+    runAutomationIntegrationTestPayload,
+)
 
 
 class ConfigureRequest(BaseModel):
@@ -17,56 +22,43 @@ class ConfigureRequest(BaseModel):
 
 class ExecuteRequest(BaseModel):
     action: str
-    params: dict[str, Any] = {}
+    params: dict[str, Any] = Field(default_factory=dict)
 
 
 def createIntegrationRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
+    def failAutomationIntegrationFlow(error: AutomationIntegrationFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
     @router.get("/api/integrations")
     def apiListIntegrations():
-        registry = getIntegrationRegistry()
-        return {
-            "integrations": [i.serialize() for i in registry.listIntegrations()],
-            "total": registry.count,
-        }
+        return listAutomationIntegrationsPayload()
 
     @router.get("/api/integrations/category/{category}")
     def apiIntegrationsByCategory(category: str):
-        registry = getIntegrationRegistry()
-        return {
-            "integrations": [i.serialize() for i in registry.listByCategory(category)],
-        }
+        return listAutomationIntegrationsByCategoryPayload(category)
 
     @router.get("/api/integrations/{integrationId}")
     def apiGetIntegration(integrationId: str):
-        registry = getIntegrationRegistry()
-        integration = registry.get(integrationId)
-        if integration is None:
-            raise HTTPException(status_code=404, detail="Integration not found")
-        return {
-            "info": integration.info().serialize(),
-            "actions": integration.listActions(),
-        }
+        try:
+            return getAutomationIntegrationPayload(integrationId)
+        except AutomationIntegrationFlowError as error:
+            failAutomationIntegrationFlow(error)
 
     @router.post("/api/integrations/{integrationId}/configure")
     def apiConfigureIntegration(integrationId: str, req: ConfigureRequest):
-        registry = getIntegrationRegistry()
-        success = registry.configure(integrationId, req.config)
-        if not success:
-            raise HTTPException(status_code=404, detail="Integration not found")
-        return {"ok": True, "integrationId": integrationId}
+        try:
+            return configureAutomationIntegrationPayload(integrationId, req.config)
+        except AutomationIntegrationFlowError as error:
+            failAutomationIntegrationFlow(error)
 
     @router.post("/api/integrations/{integrationId}/test")
     def apiTestIntegration(integrationId: str):
-        registry = getIntegrationRegistry()
-        result = registry.testConnection(integrationId)
-        return result.serialize()
+        return runAutomationIntegrationTestPayload(integrationId)
 
     @router.post("/api/integrations/{integrationId}/execute")
     def apiExecuteIntegration(integrationId: str, req: ExecuteRequest):
-        registry = getIntegrationRegistry()
-        result = registry.execute(integrationId, req.action, req.params)
-        return result
+        return executeAutomationIntegrationPayload(integrationId, req.action, req.params)
 
     return router

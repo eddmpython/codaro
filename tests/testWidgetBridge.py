@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from codaro.outputDescriptor import isDescriptorPayload, ui
+from codaro.kernel.protocol import UiEventRequest
+from codaro.kernel.uiEventFlow import handleKernelUiEvent, jsonSafeUiEventResult, reactiveTriggerFromUiEventResult
 from codaro.uiCallbacks import callbackCount, invokeCallback, resetCallbacks
 
 
@@ -85,6 +87,41 @@ def testInvalidCallbackRaises() -> None:
     except KeyError:
         raised = True
     assert raised
+
+
+def testKernelUiEventFlowReturnsReactiveTrigger() -> None:
+    setUp()
+    descriptor = ui.button(
+        "run",
+        onClick=lambda: {
+            "reactiveTrigger": ["cell-1", "", 2],
+            "other": object(),
+        },
+    )
+
+    response = handleKernelUiEvent(UiEventRequest(callbackId=descriptor["events"]["click"], eventType="click"))
+
+    assert response.status == "ok"
+    assert response.callbackId == descriptor["events"]["click"]
+    assert response.reactiveTrigger == ["cell-1", "2"]
+    assert isinstance(response.result, dict)
+    assert response.result["other"].startswith("<object object")
+
+
+def testKernelUiEventFlowReturnsCallbackErrorResponse() -> None:
+    setUp()
+    descriptor = ui.button("fail", onClick=lambda: (_ for _ in ()).throw(ValueError("bad input")))
+
+    response = handleKernelUiEvent(UiEventRequest(callbackId=descriptor["events"]["click"], eventType="click"))
+
+    assert response.status == "error"
+    assert response.error == "bad input"
+
+
+def testKernelUiEventHelpersNormalizePayloads() -> None:
+    assert jsonSafeUiEventResult({"x": object(), "items": (1, object())})["items"][1].startswith("<object object")
+    assert reactiveTriggerFromUiEventResult({"reactiveTrigger": ["a", "", None]}) == ["a", "None"]
+    assert reactiveTriggerFromUiEventResult({"reactiveTrigger": "a"}) == []
 
 
 def testCustomDescriptorShape() -> None:

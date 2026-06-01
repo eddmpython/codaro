@@ -79,6 +79,32 @@ AUTOMATION_REQUIREMENTS = (
                 "stepResults",
                 "getRuns",
             )),
+            ("src/codaro/automation/recordingFlow.py", (
+                "startAutomationRecordingPayload",
+                "stopAutomationRecordingPayload",
+                "getAutomationRecordingStatusPayload",
+                "RecipeGenerator",
+            )),
+            ("src/codaro/automation/notificationFlow.py", (
+                "listAutomationChannelsPayload",
+                "addAutomationChannelPayload",
+                "removeAutomationChannelPayload",
+                "sendAutomationNotificationPayload",
+                "MessageChannel",
+            )),
+            ("src/codaro/automation/monitoringFlow.py", (
+                "automationResourceUsagePayload",
+                "automationAuditLogPayload",
+                "getAuditTrail",
+                "queryFromDisk",
+            )),
+            ("src/codaro/automation/integrationFlow.py", (
+                "listAutomationIntegrationsPayload",
+                "configureAutomationIntegrationPayload",
+                "runAutomationIntegrationTestPayload",
+                "executeAutomationIntegrationPayload",
+                "getIntegrationRegistry",
+            )),
         ),
     ),
     AutomationRequirement(
@@ -232,8 +258,14 @@ AUTOMATION_REQUIREMENTS = (
             )),
             ("src/codaro/api/automationRouter.py", (
                 "/api/automation/input-policy",
+            )),
+            ("src/codaro/automation/inputPolicyFlow.py", (
                 "maxActionsPerSecond",
+                "maxActionsPerMinute",
+                "humanDelay",
                 "allowedScreenRegion",
+                "Region(",
+                "AutomationInputPolicyFlowError",
             )),
         ),
     ),

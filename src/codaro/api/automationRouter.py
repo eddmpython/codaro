@@ -7,12 +7,66 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..automation.audit import getAuditTrail
-from ..automation.eStop import getEmergencyStop
-from ..automation.taskModel import TaskDefinition
-from ..automation.taskRegistry import getTaskRegistry
-from ..automation.taskRunner import TaskRunner
-from ..automation.workflow import getWorkflowEngine
+from ..automation.inputPolicyFlow import (
+    AutomationInputPolicyFlowError,
+    getAutomationInputPolicyPayload,
+    updateAutomationInputPolicyPayload,
+)
+from ..automation.monitoringFlow import (
+    automationAuditLogPayload,
+    automationResourceUsagePayload,
+)
+from ..automation.notificationFlow import (
+    AutomationNotificationFlowError,
+    addAutomationChannelPayload,
+    listAutomationChannelsPayload,
+    removeAutomationChannelPayload,
+    sendAutomationNotificationPayload,
+)
+from ..automation.planFlow import (
+    AutomationPlanFlowError,
+    executeAutomationPlanPayload,
+    getAutomationPlanStatusPayload,
+    pauseAutomationPlanPayload,
+    resumeAutomationPlanPayload,
+)
+from ..automation.recordingFlow import (
+    AutomationRecordingFlowError,
+    getAutomationRecordingStatusPayload,
+    startAutomationRecordingPayload,
+    stopAutomationRecordingPayload,
+)
+from ..automation.taskFlow import (
+    AutomationTaskFlowError,
+    automationSchedulerStatusPayload,
+    cancelAutomationTaskSchedulePayload,
+    clearAutomationStopPayload,
+    createAutomationTaskPayload,
+    deleteAutomationTaskPayload,
+    getAutomationStopPayload,
+    getAutomationTaskPayload,
+    listAutomationTaskRunsPayload,
+    listAutomationTasksPayload,
+    runAutomationTaskPayload,
+    setAutomationTaskSchedulePayload,
+    triggerAutomationStopPayload,
+    triggerAutomationWebhookPayload,
+    updateAutomationTaskPayload,
+)
+from ..automation.voiceFlow import (
+    listenAutomationVoicePayload,
+    parseAutomationVoiceCommandPayload,
+    speakAutomationVoicePayload,
+)
+from ..automation.workflowFlow import (
+    AutomationWorkflowFlowError,
+    createAutomationWorkflowPayload,
+    deleteAutomationWorkflowPayload,
+    getAutomationWorkflowPayload,
+    listAutomationWorkflowRunsPayload,
+    listAutomationWorkflowsPayload,
+    runAutomationWorkflowPayload,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,157 +99,121 @@ class CreateWorkflowRequest(BaseModel):
 def createAutomationRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
+    def failAutomationTaskFlow(error: AutomationTaskFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationPlanFlow(error: AutomationPlanFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationWorkflowFlow(error: AutomationWorkflowFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationInputPolicyFlow(error: AutomationInputPolicyFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationRecordingFlow(error: AutomationRecordingFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationNotificationFlow(error: AutomationNotificationFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
     @router.get("/api/tasks")
     def apiListTasks():
-        registry = getTaskRegistry()
-        tasks = registry.listTasks()
-        return {
-            "tasks": [t.serialize() for t in tasks],
-            "total": len(tasks),
-        }
+        return listAutomationTasksPayload()
 
     @router.post("/api/tasks")
     def apiCreateTask(req: CreateTaskRequest):
-        registry = getTaskRegistry()
-        task = registry.create(
+        return createAutomationTaskPayload(
             name=req.name,
             documentPath=req.documentPath,
             description=req.description,
             schedule=req.schedule,
             inputs=req.inputs,
         )
-        return task.serialize()
 
     @router.get("/api/tasks/{taskId}")
     def apiGetTask(taskId: str):
-        registry = getTaskRegistry()
-        task = registry.get(taskId)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-        lastRun = registry.getLastRun(taskId)
-        result = task.serialize()
-        if lastRun:
-            result["lastRun"] = lastRun.serialize()
-        return result
+        try:
+            return getAutomationTaskPayload(taskId)
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.put("/api/tasks/{taskId}")
     def apiUpdateTask(taskId: str, req: UpdateTaskRequest):
-        registry = getTaskRegistry()
-        task = registry.update(
-            taskId,
-            name=req.name,
-            description=req.description,
-            schedule=req.schedule,
-            enabled=req.enabled,
-        )
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-        return task.serialize()
+        try:
+            return updateAutomationTaskPayload(
+                taskId,
+                name=req.name,
+                description=req.description,
+                schedule=req.schedule,
+                enabled=req.enabled,
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.delete("/api/tasks/{taskId}")
     def apiDeleteTask(taskId: str):
-        registry = getTaskRegistry()
-        deleted = registry.delete(taskId)
-        if not deleted:
-            raise HTTPException(status_code=404, detail="Task not found")
-        return {"ok": True}
+        try:
+            return deleteAutomationTaskPayload(taskId)
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.post("/api/tasks/{taskId}/run")
     async def apiRunTask(taskId: str):
-        registry = getTaskRegistry()
-        task = registry.get(taskId)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-
-        workspaceRoot = str(getattr(state, "workspaceRoot", "."))
-        runner = TaskRunner(workspaceRoot=workspaceRoot)
-        run = await runner.run(task)
-        registry.addRun(run)
-        return run.serialize()
+        try:
+            return await runAutomationTaskPayload(
+                taskId,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.get("/api/tasks/{taskId}/runs")
     def apiGetRuns(taskId: str, limit: int = Query(20)):
-        registry = getTaskRegistry()
-        task = registry.get(taskId)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-        runs = registry.getRuns(taskId, limit=limit)
-        return {"runs": [r.serialize() for r in runs]}
+        try:
+            return listAutomationTaskRunsPayload(taskId, limit=limit)
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.put("/api/tasks/{taskId}/schedule")
-    def apiSetSchedule(taskId: str, req: ScheduleRequest):
-        registry = getTaskRegistry()
-        task = registry.update(taskId, schedule=req.schedule)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-
-        from ..automation.scheduler import parseScheduleSeconds
-
-        if parseScheduleSeconds(req.schedule) is None:
-            raise HTTPException(status_code=400, detail=f"Invalid schedule: {req.schedule}")
-
-        scheduler = _getScheduler()
-        workspaceRoot = str(getattr(state, "workspaceRoot", "."))
-
-        async def _runScheduled():
-            fresh = registry.get(taskId)
-            if fresh is None or not fresh.enabled:
-                scheduler.cancel(taskId)
-                return
-            runner = TaskRunner(workspaceRoot=workspaceRoot)
-            run = await runner.run(fresh)
-            registry.addRun(run)
-
-        scheduler.schedule(taskId, req.schedule, _runScheduled)
-        return {"ok": True, "schedule": req.schedule}
+    async def apiSetSchedule(taskId: str, req: ScheduleRequest):
+        try:
+            return setAutomationTaskSchedulePayload(
+                taskId,
+                schedule=req.schedule,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.delete("/api/tasks/{taskId}/schedule")
     def apiCancelSchedule(taskId: str):
-        scheduler = _getScheduler()
-        cancelled = scheduler.cancel(taskId)
-        if not cancelled:
-            raise HTTPException(status_code=404, detail="No active schedule for this task")
-        registry = getTaskRegistry()
-        registry.update(taskId, schedule=None)
-        return {"ok": True}
+        try:
+            return cancelAutomationTaskSchedulePayload(taskId)
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.get("/api/scheduler/status")
     def apiSchedulerStatus():
-        scheduler = _getScheduler()
-        return {
-            "activeJobs": scheduler.listScheduled(),
-            "jobCount": scheduler.jobCount,
-        }
+        return automationSchedulerStatusPayload()
 
     @router.post("/api/webhooks/trigger/{taskId}")
     async def apiWebhookTrigger(taskId: str, request: Request):
-        registry = getTaskRegistry()
-        task = registry.get(taskId)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-        if not task.enabled:
-            raise HTTPException(status_code=403, detail="Task is disabled")
-
         try:
-            payload = await request.json()
+            await request.json()
         except (json.JSONDecodeError, ValueError) as exc:
             logger.warning("webhook body parse failed for task %s: %s", taskId, exc)
-            payload = {}
-
-        workspaceRoot = str(getattr(state, "workspaceRoot", "."))
-        runner = TaskRunner(workspaceRoot=workspaceRoot)
-        run = await runner.run(task)
-        registry.addRun(run)
-        return {
-            "triggered": True,
-            "taskId": taskId,
-            "runId": run.id,
-            "status": run.status.value,
-        }
+        try:
+            return await triggerAutomationWebhookPayload(
+                taskId,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.get("/api/automation/e-stop")
     def apiGetEStop():
-        return getEmergencyStop().serialize()
+        return getAutomationStopPayload()
 
     @router.post("/api/automation/e-stop")
     async def apiTriggerEStop(request: Request):
@@ -205,42 +223,21 @@ def createAutomationRouter(state: Any) -> APIRouter:
         except (json.JSONDecodeError, ValueError) as exc:
             logger.debug("e-stop body parse: %s", exc)
         reason = body.get("reason", "Manual trigger via API")
-        eStop = getEmergencyStop()
-        triggered = eStop.trigger(reason)
-        if not triggered:
-            raise HTTPException(status_code=409, detail="E-Stop already active")
-
-        scheduler = _getScheduler()
-        scheduler.cancelAll()
-
-        return eStop.serialize()
+        try:
+            return triggerAutomationStopPayload(reason)
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.delete("/api/automation/e-stop")
     def apiClearEStop():
-        eStop = getEmergencyStop()
-        cleared = eStop.clear()
-        if not cleared:
-            raise HTTPException(status_code=409, detail="E-Stop is not active")
-        return eStop.serialize()
+        try:
+            return clearAutomationStopPayload()
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.get("/api/automation/resource-usage")
     def apiResourceUsage():
-        sessionMgr = getattr(state, "sessionManager", None)
-        if sessionMgr is None:
-            return {"sessions": []}
-        snapshots = []
-        for session in sessionMgr.listSessions():
-            engine = getattr(session, "engine", None)
-            if engine is not None and hasattr(engine, "getResourceUsage"):
-                snap = engine.getResourceUsage()
-                snapshots.append({
-                    "sessionId": session.id,
-                    "memoryMb": round(snap.memoryMb, 1),
-                    "cpuPercent": round(snap.cpuPercent, 1),
-                    "uptime": round(snap.uptime, 1),
-                    "alive": snap.alive,
-                })
-        return {"sessions": snapshots}
+        return automationResourceUsagePayload(getattr(state, "sessionManager", None))
 
     @router.get("/api/automation/audit")
     def apiGetAuditLog(
@@ -248,289 +245,168 @@ def createAutomationRouter(state: Any) -> APIRouter:
         date: str | None = Query(None),
         limit: int = Query(100),
     ):
-        trail = getAuditTrail()
-        if date:
-            entries = trail.queryFromDisk(date=date, actionType=actionType, limit=limit)
-        else:
-            entries = [e.serialize() for e in trail.query(actionType=actionType, limit=limit)]
-        return {"entries": entries, "count": len(entries)}
+        return automationAuditLogPayload(actionType=actionType, date=date, limit=limit)
 
     @router.get("/api/automation/input-policy")
     def apiGetInputPolicy():
-        guard = _getInputGuard()
-        return guard.policy.serialize()
+        return getAutomationInputPolicyPayload()
 
     @router.put("/api/automation/input-policy")
     async def apiUpdateInputPolicy(request: Request):
         body = await request.json()
-        guard = _getInputGuard()
-        policy = guard.policy
-        if "maxActionsPerSecond" in body:
-            policy.maxActionsPerSecond = int(body["maxActionsPerSecond"])
-        if "maxActionsPerMinute" in body:
-            policy.maxActionsPerMinute = int(body["maxActionsPerMinute"])
-        if "humanDelay" in body:
-            policy.humanDelay = bool(body["humanDelay"])
-        if "enabled" in body:
-            policy.enabled = bool(body["enabled"])
-        if "allowedScreenRegion" in body:
-            r = body["allowedScreenRegion"]
-            if r is None:
-                policy.allowedScreenRegion = None
-            else:
-                from ..automation.vision.capture import Region
-                policy.allowedScreenRegion = Region(x=r["x"], y=r["y"], width=r["width"], height=r["height"])
-        return policy.serialize()
+        try:
+            return updateAutomationInputPolicyPayload(body)
+        except AutomationInputPolicyFlowError as error:
+            failAutomationInputPolicyFlow(error)
 
     @router.post("/api/automation/recording/start")
     def apiStartRecording():
-        recorder = _getRecorder()
-        recordingId = recorder.start()
-        return {"recordingId": recordingId, "status": "recording"}
+        try:
+            return startAutomationRecordingPayload()
+        except AutomationRecordingFlowError as error:
+            failAutomationRecordingFlow(error)
 
     @router.post("/api/automation/recording/stop")
     async def apiStopRecording(request: Request):
-        from ..automation.recorder.recipeGenerator import RecipeGenerator
         body = {}
         try:
             body = await request.json()
         except (json.JSONDecodeError, ValueError) as exc:
             logger.debug("recording stop body: %s", exc)
-        recorder = _getRecorder()
-        actions = recorder.stop()
         title = body.get("title", "Recorded Automation")
-
-        generator = RecipeGenerator()
-        recipe = generator.generate(actions, title=title)
-        summary = generator.generateDict(actions, title=title)
-        recorder.reset()
-        return {"recipe": recipe, "summary": summary}
+        try:
+            return stopAutomationRecordingPayload(title=title)
+        except AutomationRecordingFlowError as error:
+            failAutomationRecordingFlow(error)
 
     @router.get("/api/automation/recording/status")
     def apiRecordingStatus():
-        recorder = _getRecorder()
-        return recorder.serialize()
+        return getAutomationRecordingStatusPayload()
 
     @router.post("/api/automation/plan/execute")
     async def apiExecutePlan(request: Request):
-        from ..automation.loop.automationLoop import AutomationLoop, LoopConfig
         body = await request.json()
-        steps = body.get("steps", [])
-
-        if not steps:
-            raise HTTPException(status_code=400, detail="No steps provided")
-
-        config = LoopConfig(
-            maxConsecutiveFailures=body.get("maxConsecutiveFailures", 3),
-        )
-
-        async def actionHandler(action: str, params: dict[str, Any]) -> dict[str, Any]:
-            return {"status": "simulated", "action": action}
-
-        loop = AutomationLoop(actionHandler=actionHandler, config=config)
-        loop.addSteps(steps)
-        _activePlans[loop.planId] = loop
-
-        result = await loop.run()
-        return result
+        try:
+            return await executeAutomationPlanPayload(
+                steps=body.get("steps", []),
+                maxConsecutiveFailures=body.get("maxConsecutiveFailures", 3),
+            )
+        except AutomationPlanFlowError as error:
+            failAutomationPlanFlow(error)
 
     @router.get("/api/automation/plan/{planId}/status")
     def apiGetPlanStatus(planId: str):
-        loop = _activePlans.get(planId)
-        if loop is None:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        return loop.serialize()
+        try:
+            return getAutomationPlanStatusPayload(planId)
+        except AutomationPlanFlowError as error:
+            failAutomationPlanFlow(error)
 
     @router.post("/api/automation/plan/{planId}/pause")
     def apiPausePlan(planId: str):
-        loop = _activePlans.get(planId)
-        if loop is None:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        paused = loop.pause()
-        if not paused:
-            raise HTTPException(status_code=409, detail="Cannot pause plan in current state")
-        return loop.progress
+        try:
+            return pauseAutomationPlanPayload(planId)
+        except AutomationPlanFlowError as error:
+            failAutomationPlanFlow(error)
 
     @router.post("/api/automation/plan/{planId}/resume")
     def apiResumePlan(planId: str):
-        loop = _activePlans.get(planId)
-        if loop is None:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        resumed = loop.resume()
-        if not resumed:
-            raise HTTPException(status_code=409, detail="Cannot resume plan in current state")
-        return loop.progress
+        try:
+            return resumeAutomationPlanPayload(planId)
+        except AutomationPlanFlowError as error:
+            failAutomationPlanFlow(error)
 
     @router.post("/api/automation/voice/listen")
     async def apiVoiceListen(request: Request):
-        import asyncio
         body = {}
         try:
             body = await request.json()
         except (json.JSONDecodeError, ValueError) as exc:
             logger.debug("voice body: %s", exc)
-        duration = min(body.get("duration", 5), 30)
-        language = body.get("language", "en")
-
-        from ..automation.voice.whisperEngine import WhisperEngine
-        engine = WhisperEngine()
-        try:
-            engine.startListening(language=language)
-            await asyncio.sleep(duration)
-            result = engine.stopListening()
-        except ImportError as exc:
-            return {"error": f"Voice dependencies not installed: {exc}"}
-        finally:
-            engine.dispose()
-
-        if result is None:
-            return {"error": "No audio captured"}
-        return result.serialize()
+        return await listenAutomationVoicePayload(
+            duration=body.get("duration", 5),
+            language=body.get("language", "en"),
+        )
 
     @router.post("/api/automation/voice/speak")
     async def apiVoiceSpeak(request: Request):
         body = await request.json()
-        text = body.get("text", "")
-        rate = body.get("rate", 150)
-
-        from ..automation.voice.pyttsx3Speaker import Pyttsx3Speaker
-        speaker = Pyttsx3Speaker()
-        try:
-            speaker.speak(text, rate=rate)
-        except ImportError as exc:
-            return {"error": f"Voice dependencies not installed: {exc}"}
-        finally:
-            speaker.dispose()
-
-        return {"spoken": True, "text": text}
+        return speakAutomationVoicePayload(
+            text=body.get("text", ""),
+            rate=body.get("rate", 150),
+        )
 
     @router.post("/api/automation/voice/command")
     async def apiVoiceCommand(request: Request):
         body = await request.json()
-        text = body.get("text", "")
-
-        from ..automation.voice.commandParser import CommandParser
-        parser = CommandParser()
-        cmd = parser.parse(text)
-        if cmd is None:
-            return {"error": "Empty text"}
-
-        action = parser.parseToAction(text)
-        return {
-            "command": cmd.serialize(),
-            "action": action,
-        }
+        return parseAutomationVoiceCommandPayload(body.get("text", ""))
 
     @router.get("/api/automation/channels")
     def apiListChannels():
-        bridge = _getMessageBridgeApi()
-        channels = bridge.listChannels()
-        return {"channels": [c.serialize() for c in channels]}
+        return listAutomationChannelsPayload()
 
     @router.post("/api/automation/channels")
     async def apiAddChannel(request: Request):
         body = await request.json()
-        from ..automation.integrations.messageBridge import MessageChannel
-        channel = MessageChannel(
-            name=body["name"],
-            channelType=body["channelType"],
-            webhookUrl=body["webhookUrl"],
-            enabled=body.get("enabled", True),
-        )
-        bridge = _getMessageBridgeApi()
-        bridge.addChannel(channel)
-        return channel.serialize()
+        try:
+            return addAutomationChannelPayload(body)
+        except AutomationNotificationFlowError as error:
+            failAutomationNotificationFlow(error)
 
     @router.delete("/api/automation/channels/{channelName}")
     def apiRemoveChannel(channelName: str):
-        bridge = _getMessageBridgeApi()
-        removed = bridge.removeChannel(channelName)
-        if not removed:
-            raise HTTPException(status_code=404, detail="Channel not found")
-        return {"ok": True}
+        try:
+            return removeAutomationChannelPayload(channelName)
+        except AutomationNotificationFlowError as error:
+            failAutomationNotificationFlow(error)
 
     @router.post("/api/automation/notify")
     async def apiSendNotification(request: Request):
         body = await request.json()
         channel = body.get("channel", "all")
         message = body.get("message", "")
-
-        bridge = _getMessageBridgeApi()
-        if channel == "all":
-            results = bridge.broadcast(message)
-            return {"results": [r.serialize() for r in results]}
-
-        result = bridge.send(channel, message)
-        return result.serialize()
+        return sendAutomationNotificationPayload(channel=channel, message=message)
 
     @router.get("/api/workflows")
     def apiListWorkflows():
-        engine = getWorkflowEngine(str(getattr(state, "workspaceRoot", ".")))
-        workflows = engine.listWorkflows()
-        return {"workflows": [w.serialize() for w in workflows], "total": len(workflows)}
+        return listAutomationWorkflowsPayload(
+            workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+        )
 
     @router.post("/api/workflows")
     def apiCreateWorkflow(req: CreateWorkflowRequest):
-        engine = getWorkflowEngine(str(getattr(state, "workspaceRoot", ".")))
-        workflow = engine.create(name=req.name, steps=req.steps, description=req.description)
-        return workflow.serialize()
+        return createAutomationWorkflowPayload(
+            workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            name=req.name,
+            steps=req.steps,
+            description=req.description,
+        )
 
     @router.get("/api/workflows/{workflowId}")
     def apiGetWorkflow(workflowId: str):
-        engine = getWorkflowEngine()
-        workflow = engine.get(workflowId)
-        if workflow is None:
-            raise HTTPException(status_code=404, detail="Workflow not found")
-        return workflow.serialize()
+        try:
+            return getAutomationWorkflowPayload(workflowId)
+        except AutomationWorkflowFlowError as error:
+            failAutomationWorkflowFlow(error)
 
     @router.delete("/api/workflows/{workflowId}")
     def apiDeleteWorkflow(workflowId: str):
-        engine = getWorkflowEngine()
-        deleted = engine.delete(workflowId)
-        if not deleted:
-            raise HTTPException(status_code=404, detail="Workflow not found")
-        return {"ok": True}
+        try:
+            return deleteAutomationWorkflowPayload(workflowId)
+        except AutomationWorkflowFlowError as error:
+            failAutomationWorkflowFlow(error)
 
     @router.post("/api/workflows/{workflowId}/run")
     async def apiRunWorkflow(workflowId: str):
-        engine = getWorkflowEngine(str(getattr(state, "workspaceRoot", ".")))
         try:
-            wfRun = await engine.run(workflowId)
-        except ValueError as exc:
-            raise HTTPException(status_code=404, detail=str(exc))
-        return wfRun.serialize()
+            return await runAutomationWorkflowPayload(
+                workflowId,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationWorkflowFlowError as error:
+            failAutomationWorkflowFlow(error)
 
     @router.get("/api/workflows/{workflowId}/runs")
     def apiGetWorkflowRuns(workflowId: str, limit: int = Query(20)):
-        engine = getWorkflowEngine()
-        runs = engine.getRuns(workflowId, limit=limit)
-        return {"runs": [r.serialize() for r in runs]}
+        return listAutomationWorkflowRunsPayload(workflowId, limit=limit)
 
     return router
-
-
-_scheduler = None
-_activePlans: dict[str, Any] = {}
-
-
-def _getMessageBridgeApi():
-    from ..automation.shared import getSharedMessageBridge
-    return getSharedMessageBridge()
-
-
-def _getRecorder():
-    from ..automation.shared import getSharedRecorder
-    return getSharedRecorder()
-
-
-def _getInputGuard():
-    from ..automation.shared import getSharedInputGuard
-    return getSharedInputGuard()
-
-
-def _getScheduler():
-    global _scheduler
-    if _scheduler is None:
-        from ..automation.scheduler import TaskScheduler
-        _scheduler = TaskScheduler()
-    return _scheduler

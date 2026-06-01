@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from ..extensions import ExtensionRegistry, Extension, ExtensionCapability, getExtensionRegistry
-
-logger = logging.getLogger(__name__)
+from ..extensions.extensionFlow import (
+    ExtensionFlowError,
+    getExtensionPayload,
+    listExtensionsByCapabilityPayload,
+    listExtensionsPayload,
+    registerExtensionPayload,
+    unregisterExtensionPayload,
+)
 
 
 class RegisterExtensionRequest(BaseModel):
@@ -16,65 +20,52 @@ class RegisterExtensionRequest(BaseModel):
     version: str = "0.0.0"
     description: str = ""
     author: str = ""
-    capabilities: list[str] = []
+    capabilities: list[str] = Field(default_factory=list)
     entryPoint: str = ""
-    config: dict[str, Any] = {}
+    config: dict[str, Any] = Field(default_factory=dict)
 
 
 def createExtensionRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
+    def failExtensionFlow(error: ExtensionFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
     @router.get("/api/extensions")
     def apiListExtensions():
-        registry = getExtensionRegistry()
-        return {
-            "extensions": [e.serialize() for e in registry.listExtensions()],
-            "total": registry.count,
-        }
+        return listExtensionsPayload()
 
     @router.post("/api/extensions")
     def apiRegisterExtension(req: RegisterExtensionRequest):
-        registry = getExtensionRegistry()
-        caps = tuple(
-            ExtensionCapability(c) for c in req.capabilities
-            if c in ExtensionCapability._value2member_map_
-        )
-        extension = Extension(
+        return registerExtensionPayload(
             name=req.name,
             version=req.version,
             description=req.description,
             author=req.author,
-            capabilities=caps,
+            capabilities=req.capabilities,
             entryPoint=req.entryPoint,
             config=req.config,
         )
-        registry.register(extension)
-        return extension.serialize()
 
     @router.get("/api/extensions/{extensionId}")
     def apiGetExtension(extensionId: str):
-        registry = getExtensionRegistry()
-        ext = registry.get(extensionId)
-        if ext is None:
-            raise HTTPException(status_code=404, detail="Extension not found")
-        return ext.serialize()
+        try:
+            return getExtensionPayload(extensionId)
+        except ExtensionFlowError as error:
+            failExtensionFlow(error)
 
     @router.delete("/api/extensions/{extensionId}")
     def apiUnregisterExtension(extensionId: str):
-        registry = getExtensionRegistry()
-        removed = registry.unregister(extensionId)
-        if not removed:
-            raise HTTPException(status_code=404, detail="Extension not found")
-        return {"ok": True}
+        try:
+            return unregisterExtensionPayload(extensionId)
+        except ExtensionFlowError as error:
+            failExtensionFlow(error)
 
     @router.get("/api/extensions/capability/{capability}")
     def apiExtensionsByCapability(capability: str):
-        registry = getExtensionRegistry()
         try:
-            cap = ExtensionCapability(capability)
-        except ValueError:
-            raise HTTPException(status_code=400, detail=f"Unknown capability: {capability}")
-        extensions = registry.listByCapability(cap)
-        return {"extensions": [e.serialize() for e in extensions]}
+            return listExtensionsByCapabilityPayload(capability)
+        except ExtensionFlowError as error:
+            failExtensionFlow(error)
 
     return router

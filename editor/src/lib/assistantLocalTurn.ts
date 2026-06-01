@@ -2,15 +2,12 @@ import type { AssistantMessage } from "@/lib/assistantTypes";
 import {
   buildLocalAssistantDraft,
   completeLocalAssistantDraft,
+  type LocalAssistantDraft,
 } from "@/lib/localFallback";
-import type { PendingTarget } from "@/lib/assistantResponsePlan";
+import type { CurriculumToSave, PendingTarget } from "@/lib/assistantResponsePlan";
+import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
-import type { AppNotice, BlockConfig } from "@/types";
-
-export type SaveCurriculum = (
-  blocks: BlockConfig[],
-  title?: string,
-) => { title: string } | null;
+import type { AppNotice } from "@/types";
 
 export type AssistantLocalTurnResult = {
   assistantMessage: AssistantMessage;
@@ -19,30 +16,70 @@ export type AssistantLocalTurnResult = {
   pendingTarget: PendingTarget | null;
 };
 
-export function runAssistantLocalTurn({
+export type AssistantLocalTurnApplication = {
+  clearPendingBlocks: boolean;
+  curriculumToSave: CurriculumToSave | null;
+  draft: LocalAssistantDraft;
+  pendingTarget: PendingTarget | null;
+  surfaceToOpen: SurfaceMode | null;
+};
+
+export function buildAssistantLocalTurnApplication({
   message,
-  saveCurriculum,
   scope,
 }: {
   message: string;
-  saveCurriculum: SaveCurriculum;
+  scope: TeacherScope;
+}): AssistantLocalTurnApplication {
+  const draft = buildLocalAssistantDraft(message, scope);
+  return {
+    clearPendingBlocks: draft.clearPendingBlocks,
+    curriculumToSave: draft.shouldSaveCurriculum ? { blocks: draft.generatedBlocks } : null,
+    draft,
+    pendingTarget: draft.clearPendingBlocks ? "notebook" : null,
+    surfaceToOpen: draft.shouldSaveCurriculum ? "curriculum" : null,
+  };
+}
+
+export function completeAssistantLocalTurn({
+  application,
+  message,
+  savedCurriculumTitle,
+  scope,
+}: {
+  application: AssistantLocalTurnApplication;
+  message: string;
+  savedCurriculumTitle?: string;
   scope: TeacherScope;
 }): AssistantLocalTurnResult {
-  const draft = buildLocalAssistantDraft(message, scope);
-  const savedEntry = draft.shouldSaveCurriculum
-    ? saveCurriculum(draft.generatedBlocks)
-    : null;
   const localResult = completeLocalAssistantDraft({
-    draft,
+    draft: application.draft,
     message,
-    savedTitle: savedEntry?.title,
+    savedTitle: savedCurriculumTitle,
     scope,
   });
 
   return {
     assistantMessage: localResult.assistantMessage,
-    clearPendingBlocks: draft.clearPendingBlocks,
+    clearPendingBlocks: application.clearPendingBlocks,
     notice: localResult.notice,
-    pendingTarget: draft.clearPendingBlocks ? "notebook" : null,
+    pendingTarget: application.pendingTarget,
   };
+}
+
+export function runAssistantLocalTurn({
+  message,
+  savedCurriculumTitle,
+  scope,
+}: {
+  message: string;
+  savedCurriculumTitle?: string;
+  scope: TeacherScope;
+}): AssistantLocalTurnResult {
+  return completeAssistantLocalTurn({
+    application: buildAssistantLocalTurnApplication({ message, scope }),
+    message,
+    savedCurriculumTitle,
+    scope,
+  });
 }

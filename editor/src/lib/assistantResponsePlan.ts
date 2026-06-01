@@ -10,29 +10,26 @@ import type { AiChatResponse, AppNotice, BlockConfig, CodaroDocument } from "@/t
 
 export type PendingTarget = "notebook" | "curriculum";
 
+export type CurriculumToSave = {
+  blocks: BlockConfig[];
+  title?: string;
+};
+
 export type AssistantResponsePlan = {
   clearPendingBlocks: boolean;
-  curriculumToSave: {
-    blocks: BlockConfig[];
-    title?: string;
-  } | null;
+  curriculumToSave: CurriculumToSave | null;
   documentToApply: CodaroDocument | null;
   pendingBlocks: BlockConfig[];
 };
 
 export type AssistantResponseApplication = {
   clearPendingBlocks: boolean;
+  curriculumToSave: CurriculumToSave | null;
   documentToApply: CodaroDocument | null;
-  notice: AppNotice;
   pendingBlocks: BlockConfig[];
   pendingTarget: PendingTarget | null;
   surfaceToOpen: SurfaceMode | null;
 };
-
-type SaveCurriculum = (
-  blocks: BlockConfig[],
-  title?: string,
-) => { title: string } | null;
 
 export function buildAssistantResponsePlan({
   activeScope,
@@ -68,27 +65,20 @@ export function buildAssistantResponseApplication({
   activeScope,
   message,
   response,
-  saveCurriculum,
 }: {
   activeScope: TeacherScope;
   message: string;
   response: AiChatResponse;
-  saveCurriculum: SaveCurriculum;
 }): AssistantResponseApplication {
   const plan = buildAssistantResponsePlan({ activeScope, message, response });
-  const savedCurriculumTitle = plan.curriculumToSave
-    ? saveCurriculum(plan.curriculumToSave.blocks, plan.curriculumToSave.title)?.title
-      ?? plan.curriculumToSave.title
-      ?? ""
-    : "";
 
   return {
     clearPendingBlocks: plan.clearPendingBlocks,
+    curriculumToSave: plan.curriculumToSave,
     documentToApply: plan.documentToApply,
-    notice: assistantResponseNotice({ activeScope, response, savedCurriculumTitle }),
     pendingBlocks: plan.pendingBlocks,
     pendingTarget: plan.pendingBlocks.length || plan.clearPendingBlocks ? "notebook" : null,
-    surfaceToOpen: plan.documentToApply ? "editor" : null,
+    surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply ? "editor" : null,
   };
 }
 

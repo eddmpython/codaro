@@ -1,0 +1,201 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _read(path: str) -> str:
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+def testNotebookPanelDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/components/notebook/notebookPanel.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "fetchCodeCompletions" in source
+
+
+def testCodeCompletionOwnsCompletionApiBoundary() -> None:
+    source = _read("editor/src/lib/codeCompletion.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.complete" in source
+    assert "CodeCompletionContext" in source
+
+
+def testCurriculumSurfaceDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/components/curriculum/curriculumSurface.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "listCurriculumPackages" in source
+    assert "installCurriculumPackage" in source
+
+
+def testCurriculumPackagePreparationOwnsPackageApiBoundary() -> None:
+    source = _read("editor/src/lib/curriculumPackagePreparation.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.packagesList" in source
+    assert "codaroApi.packageInstall" in source
+
+
+def testWidgetHostDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/components/widgets/widgetHost.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "sendUiEvent" not in source
+    assert "dispatchWidgetUiEvent" in source
+
+
+def testWidgetUiEventsOwnsKernelUiEventBoundary() -> None:
+    source = _read("editor/src/lib/widgetUiEvents.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.sendUiEvent" in source
+    assert "codaro:reactive-trigger" in source
+
+
+def testSharePackSurfaceDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/components/share/sharePackSurface.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "loadSharePackLibrary" in source
+    assert "inspectSharePackSource" in source
+    assert "createSharePackAutomationTask" in source
+
+
+def testSharePackOperationsOwnsShareApiBoundary() -> None:
+    source = _read("editor/src/lib/sharePackOperations.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.sharePackStatus" in source
+    assert "codaroApi.sharePacks" in source
+    assert "codaroApi.inspectSharePack" in source
+    assert "codaroApi.installSharePack" in source
+    assert "codaroApi.uninstallSharePack" in source
+    assert "codaroApi.sharePackAutomation" in source
+    assert "codaroApi.sharePackCurriculum" in source
+    assert "codaroApi.createSharePackAutomationTask" in source
+    assert "codaroApi.exportSharePack" in source
+
+
+def testAppShellDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/App.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "loadSharePackCurriculum" in source
+    assert "loadSystemDiagnosticExport" in source
+
+
+def testSystemDiagnosticsOwnsDiagnosticExportBoundary() -> None:
+    source = _read("editor/src/lib/systemDiagnostics.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.systemDiagnosticsExport" in source
+
+
+def testMobileChatRouteDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/routes/mobileChat.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "sendMobileChatTurn" in source
+
+
+def testMobileChatTurnOwnsTeacherChatBoundary() -> None:
+    source = _read("editor/src/lib/mobileChatTurn.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.teacherChat" in source
+    assert 'role: "teacher"' in source
+
+
+def testCurriculumProgressHookDoesNotCallTransportApiDirectly() -> None:
+    source = _read("editor/src/hooks/useCurriculumProgress.ts")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "loadCurriculumProgress" in source
+
+
+def testCurriculumProgressOwnsProgressApiBoundary() -> None:
+    source = _read("editor/src/lib/curriculumProgress.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.progress" in source
+
+
+def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
+    source = _read("editor/src/lib/assistantResponsePlan.ts")
+
+    assert "saveCurriculum" not in source
+    assert "curriculumToSave: plan.curriculumToSave" in source
+    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum"' in source
+
+
+def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
+    source = _read("editor/src/hooks/useAssistantTurnState.ts")
+
+    assert "saveAndOpenCurriculum(application.curriculumToSave)" in source
+    assert "saveAndOpenCurriculum(localApplication.curriculumToSave)" in source
+    assert "openCurriculum(entry)" in source
+    assert "completeAssistantLocalTurn" in source
+
+
+def testFrontendStateDoesNotImportComponentImplementations() -> None:
+    for relativePath in (
+        "editor/src/hooks/useAssistantTurnState.ts",
+        "editor/src/lib/assistantProviderTurn.ts",
+        "editor/src/lib/providerConnection.ts",
+    ):
+        source = _read(relativePath)
+        assert 'from "@/components/' not in source
+
+
+def testProviderProfileDisplayLogicLivesInLibBoundary() -> None:
+    hook = _read("editor/src/hooks/useAssistantTurnState.ts")
+    panel = _read("editor/src/components/assistant/assistantPanel.tsx")
+    chat = _read("editor/src/components/chat/chatSurface.tsx")
+    profileLib = _read("editor/src/lib/providerProfile.ts")
+
+    assert "providerProfileName(profile)" in hook
+    assert "providerProfileName" in panel
+    assert "providerProfileReady" in panel
+    assert "providerProfileReady" in chat
+    assert "export function providerProfileName" in profileLib
+    assert "export function providerProfileReady" in profileLib
+    assert "export function aiProviderName" not in panel
+    assert "export function aiProfileReady" not in panel
+    assert 'from "@/components/assistant/assistantPanel"' not in hook
+
+
+def testAssistantPanelKeepsWorkloopViewModelInLibBoundary() -> None:
+    panel = _read("editor/src/components/assistant/assistantPanel.tsx")
+    workLoop = _read("editor/src/lib/workLoop.ts")
+
+    assert 'from "@/lib/workLoop"' in panel
+    for symbol in (
+        "formatDuration",
+        "formatPayload",
+        "groupAssistantSteps",
+        "traceWorkloopEvents",
+        "traceWorkloopRowDetail",
+    ):
+        assert symbol in panel
+        assert f"export function {symbol}" in workLoop
+        assert f"function {symbol}" not in panel
+    assert "function laneLabel" not in panel
+    assert "function categoryLabel" not in panel
+
+
+def testPendingCurriculumChangesOpenCurrentLearningSurface() -> None:
+    source = _read("editor/src/lib/pendingChanges.ts")
+    hook = _read("editor/src/hooks/usePendingChangesState.ts")
+
+    assert 'surfaceToOpen: "curriculum"' in source
+    assert "openCurriculum(entry, { showNotice: true })" in hook

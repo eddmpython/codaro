@@ -6,6 +6,14 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from ...document.blockOperations import insertDocumentBlock
+from ...document.notebookGeneration import (
+    buildGeneratedNotebookDocument,
+    buildSplitNotebookDocument,
+    safeNotebookFileName,
+    saveNotebookDocument,
+)
+
 
 class LearningToolHandlers:
     async def _handle_createLearningCard(self, args: dict[str, Any]) -> dict[str, Any]:
@@ -17,22 +25,23 @@ class LearningToolHandlers:
         blanks = args["blanks"]
         tags = args.get("tags", [])
 
-        from codaro.document.models import BlockConfig
-
-        blocks: list[Any] = []
-
-        mdId = f"card-md-{uuid.uuid4().hex[:8]}"
-        blocks.append(BlockConfig(
-            id=mdId, type="markdown",
+        blockIds: list[str] = []
+        blockIds.append(_insertToolDocumentBlock(
+            doc,
+            idPrefix="card-md",
+            blockType="markdown",
             content=f"## {topic}\n\n{explanation}",
         ))
-
-        exId = f"card-ex-{uuid.uuid4().hex[:8]}"
-        blocks.append(BlockConfig(id=exId, type="code", content=exampleCode))
-
-        guideId = f"card-guide-{uuid.uuid4().hex[:8]}"
-        blocks.append(BlockConfig(
-            id=guideId, type="guide",
+        blockIds.append(_insertToolDocumentBlock(
+            doc,
+            idPrefix="card-ex",
+            blockType="code",
+            content=exampleCode,
+        ))
+        blockIds.append(_insertToolDocumentBlock(
+            doc,
+            idPrefix="card-guide",
+            blockType="guide",
             content=json.dumps({
                 "exerciseType": "fillBlank",
                 "description": f"Fill in the blanks to complete the {topic} example.",
@@ -47,13 +56,11 @@ class LearningToolHandlers:
             }, ensure_ascii=False),
         ))
 
-        for block in blocks:
-            doc.blocks.append(block)
         self._saveDocument(doc)
 
         return {
             "topic": topic,
-            "blockIds": [b.id for b in blocks],
+            "blockIds": blockIds,
             "tags": tags,
         }
 
@@ -63,23 +70,24 @@ class LearningToolHandlers:
         questions = args["questions"]
         difficulty = args.get("difficulty", "medium")
 
-        from codaro.document.models import BlockConfig
-
-        headerId = f"quiz-hdr-{uuid.uuid4().hex[:8]}"
-        doc.blocks.append(BlockConfig(
-            id=headerId, type="markdown",
+        headerId = _insertToolDocumentBlock(
+            doc,
+            idPrefix="quiz-hdr",
+            blockType="markdown",
             content=f"## Quiz: {topic}\n\nDifficulty: **{difficulty}** | {len(questions)} questions",
-        ))
+        )
 
         questionIds = []
         for i, q in enumerate(questions):
             qType = q["type"]
-            qId = f"quiz-q{i}-{uuid.uuid4().hex[:8]}"
+            qId = ""
 
             if qType == "multiple-choice":
                 choiceLines = "\n".join(f"- {c}" for c in q.get("choices", []))
-                doc.blocks.append(BlockConfig(
-                    id=qId, type="guide",
+                qId = _insertToolDocumentBlock(
+                    doc,
+                    idPrefix=f"quiz-q{i}",
+                    blockType="guide",
                     content=json.dumps({
                         "exerciseType": "fillBlank",
                         "description": q["question"],
@@ -92,10 +100,12 @@ class LearningToolHandlers:
                         "solution": f"answer = \"{q['correctAnswer']}\"",
                         "difficulty": difficulty,
                     }, ensure_ascii=False),
-                ))
+                )
             elif qType == "coding":
-                doc.blocks.append(BlockConfig(
-                    id=qId, type="guide",
+                qId = _insertToolDocumentBlock(
+                    doc,
+                    idPrefix=f"quiz-q{i}",
+                    blockType="guide",
                     content=json.dumps({
                         "exerciseType": "writeCode",
                         "description": q["question"],
@@ -108,10 +118,12 @@ class LearningToolHandlers:
                         "solution": q["correctAnswer"],
                         "difficulty": difficulty,
                     }, ensure_ascii=False),
-                ))
+                )
             elif qType == "predict-output":
-                doc.blocks.append(BlockConfig(
-                    id=qId, type="guide",
+                qId = _insertToolDocumentBlock(
+                    doc,
+                    idPrefix=f"quiz-q{i}",
+                    blockType="guide",
                     content=json.dumps({
                         "exerciseType": "predict",
                         "description": "Predict the output of this code:",
@@ -124,8 +136,9 @@ class LearningToolHandlers:
                         "solution": q["correctAnswer"],
                         "difficulty": difficulty,
                     }, ensure_ascii=False),
-                ))
-            questionIds.append(qId)
+                )
+            if qId:
+                questionIds.append(qId)
 
         self._saveDocument(doc)
         return {
@@ -140,13 +153,12 @@ class LearningToolHandlers:
         title = args["title"]
         stages = args["stages"]
 
-        from codaro.document.models import BlockConfig
-
-        headerId = f"exnb-hdr-{uuid.uuid4().hex[:8]}"
-        doc.blocks.append(BlockConfig(
-            id=headerId, type="markdown",
+        headerId = _insertToolDocumentBlock(
+            doc,
+            idPrefix="exnb-hdr",
+            blockType="markdown",
             content=f"## Exercise: {title}\n\nThis exercise has **{len(stages)} stages**: fill-blank → modify → write from scratch.",
-        ))
+        )
 
         stageIds = []
         for i, stage in enumerate(stages):
@@ -159,15 +171,17 @@ class LearningToolHandlers:
             exerciseType = exerciseTypeMap.get(stageType, "writeCode")
 
             stageLabel = f"Stage {i + 1}: {stageType.replace('-', ' ').title()}"
-            mdId = f"exnb-md{i}-{uuid.uuid4().hex[:8]}"
-            doc.blocks.append(BlockConfig(
-                id=mdId, type="markdown",
+            mdId = _insertToolDocumentBlock(
+                doc,
+                idPrefix=f"exnb-md{i}",
+                blockType="markdown",
                 content=f"### {stageLabel}\n\n{stage['instruction']}",
-            ))
+            )
 
-            guideId = f"exnb-g{i}-{uuid.uuid4().hex[:8]}"
-            doc.blocks.append(BlockConfig(
-                id=guideId, type="guide",
+            guideId = _insertToolDocumentBlock(
+                doc,
+                idPrefix=f"exnb-g{i}",
+                blockType="guide",
                 content=json.dumps({
                     "exerciseType": exerciseType,
                     "description": stage["instruction"],
@@ -180,7 +194,7 @@ class LearningToolHandlers:
                     "solution": stage["solution"],
                     "difficulty": "medium",
                 }, ensure_ascii=False),
-            ))
+            )
             stageIds.append({"markdownId": mdId, "guideId": guideId, "stage": stageType})
 
         self._saveDocument(doc)
@@ -247,10 +261,6 @@ class LearningToolHandlers:
         difficulty = args.get("difficulty", "medium")
         position = args.get("position", -1)
 
-        from codaro.document.models import BlockConfig
-
-        blockId = f"guide-{uuid.uuid4().hex[:8]}"
-
         guideContent = json.dumps({
             "exerciseType": exerciseType,
             "description": description,
@@ -260,12 +270,13 @@ class LearningToolHandlers:
             "difficulty": difficulty,
         }, ensure_ascii=False)
 
-        newBlock = BlockConfig(id=blockId, type="guide", content=guideContent)
-
-        if position < 0 or position >= len(doc.blocks):
-            doc.blocks.append(newBlock)
-        else:
-            doc.blocks.insert(position, newBlock)
+        blockId = _insertToolDocumentBlock(
+            doc,
+            idPrefix="guide",
+            blockType="guide",
+            content=guideContent,
+            position=position,
+        )
 
         self._saveDocument(doc)
         return {
@@ -278,9 +289,6 @@ class LearningToolHandlers:
         doc = self._getDocument()
         splits = args["splits"]
         outputDir = args.get("outputDir", ".")
-
-        from codaro.document.models import BlockConfig, CodaroDocument
-        from codaro.document.service import saveDocument
 
         if not self._workspaceRoot:
             return {"error": "No workspace root configured"}
@@ -297,19 +305,9 @@ class LearningToolHandlers:
                 results.append({"title": title, "error": "No matching blocks"})
                 continue
 
-            newDoc = CodaroDocument(
-                id=f"doc-{uuid.uuid4().hex[:10]}",
-                title=title,
-                blocks=[
-                    BlockConfig(id=b.id, type=b.type, content=b.content)
-                    for b in blocks
-                ],
-            )
-
-            safeName = "".join(c if c.isalnum() or c in "-_ " else "" for c in title)
-            safeName = safeName.strip().replace(" ", "_")[:60] or "untitled"
-            filePath = self._validatePath(f"{outputDir}/{safeName}.py")
-            saveDocument(filePath, newDoc)
+            newDoc = buildSplitNotebookDocument(title=title, blocks=blocks)
+            filePath = self._validatePath(f"{outputDir}/{safeNotebookFileName(title)}.py")
+            saveNotebookDocument(filePath, newDoc)
             results.append({"title": title, "path": filePath, "blockCount": len(blocks)})
 
         return {"notebooks": results, "splitCount": len(results)}
@@ -319,26 +317,15 @@ class LearningToolHandlers:
         blocks = args["blocks"]
         outputPath = args.get("outputPath")
 
-        from codaro.document.models import BlockConfig, CodaroDocument
-        from codaro.document.service import saveDocument
-
-        docBlocks = []
-        for i, b in enumerate(blocks):
-            blockId = f"gen-{uuid.uuid4().hex[:8]}"
-            docBlocks.append(BlockConfig(id=blockId, type=b["type"], content=b["content"]))
-
-        newDoc = CodaroDocument(
-            id=f"doc-{uuid.uuid4().hex[:10]}",
-            title=title,
-            blocks=docBlocks,
-        )
+        newDoc = buildGeneratedNotebookDocument(title=title, blockDrafts=blocks)
+        blockCount = len(newDoc.blocks)
 
         if outputPath and self._workspaceRoot:
             filePath = self._validatePath(outputPath)
-            saveDocument(filePath, newDoc)
+            saveNotebookDocument(filePath, newDoc)
             return {
                 "title": title,
-                "blockCount": len(docBlocks),
+                "blockCount": blockCount,
                 "path": filePath,
                 "saved": True,
             }
@@ -348,7 +335,26 @@ class LearningToolHandlers:
 
         return {
             "title": title,
-            "blockCount": len(docBlocks),
+            "blockCount": blockCount,
             "saved": False,
             "loadedInEditor": self._documentSetter is not None,
         }
+
+
+def _insertToolDocumentBlock(
+    document: Any,
+    *,
+    idPrefix: str,
+    blockType: str,
+    content: str,
+    position: int = -1,
+) -> str:
+    result = insertDocumentBlock(
+        document,
+        idPrefix=idPrefix,
+        blockType=blockType,
+        content=content,
+        position=position,
+    )
+    assert result.block is not None
+    return result.block.id

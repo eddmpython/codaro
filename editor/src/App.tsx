@@ -23,9 +23,9 @@ import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLocaleState } from "@/hooks/useLocaleState";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
-import { codaroApi } from "@/lib/api";
-import { buildCustomCurriculumApplication } from "@/lib/customCurricula";
 import { LocaleProvider } from "@/lib/localeContext";
+import { loadSharePackCurriculum } from "@/lib/sharePackOperations";
+import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
 import {
   SidebarInset,
@@ -150,6 +150,7 @@ function App() {
   const {
     filteredCategories,
     deleteCustomCurriculum,
+    openCustomCurriculum,
     query,
     saveCustomCurriculum,
     selectCustomCurriculum,
@@ -206,6 +207,7 @@ function App() {
   } = usePendingChangesState({
     applyDraftUpdates,
     document,
+    openCurriculum: openCustomCurriculum,
     replaceDocument,
     saveCurriculum: saveCustomCurriculum,
     selectNotebookBlock: selectBlock,
@@ -239,17 +241,12 @@ function App() {
   });
 
   const openSharePackCurriculum = useCallback(async (packId: string, path: string, version?: string | null) => {
-    const payload = await codaroApi.sharePackCurriculum(packId, path, version);
+    const payload = await loadSharePackCurriculum(packId, path, version);
     const entry = saveCustomCurriculumDocumentEntry(payload.document, payload.document.title);
-    const application = buildCustomCurriculumApplication(entry, { showNotice: true });
-    applyCurriculumSelectionState(application);
-    setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
-    setSurface(application.surfaceToOpen);
+    openCustomCurriculum(entry, { showNotice: true });
   }, [
-    applyCurriculumSelectionState,
+    openCustomCurriculum,
     saveCustomCurriculumDocumentEntry,
-    setSelectedCustomCurriculumId,
-    setSurface,
   ]);
 
   const {
@@ -269,6 +266,7 @@ function App() {
     drafts,
     profile: aiProfile,
     results,
+    openCurriculum: openCustomCurriculum,
     saveCurriculum: saveCustomCurriculum,
     selectedBlock,
     selectCurriculumBlock: setSelectedCurriculumBlockId,
@@ -301,7 +299,7 @@ function App() {
   }, [categories, selectCurriculumCategory, selectedCategory, setSurface]);
 
   const copyDiagnosticExport = useCallback(async () => {
-    const payload = await codaroApi.systemDiagnosticsExport();
+    const payload = await loadSystemDiagnosticExport();
     await writeClipboardText(JSON.stringify(payload, null, 2));
   }, []);
 

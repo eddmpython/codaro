@@ -2,7 +2,7 @@ import type {
   AssistantMessage,
   AssistantWorkStep,
 } from "@/lib/assistantTypes";
-import { getActiveLocale } from "@/lib/localeCopy";
+import { getActiveLocale, translate } from "@/lib/localeCopy";
 import type {
   AiChatResponse,
   AiTraceEvent,
@@ -13,6 +13,12 @@ import type {
 } from "@/types";
 
 export type AssistantTraceSummary = AiTraceSummary;
+export type AssistantWorkStepGroup = {
+  key: string;
+  label: string;
+  steps: AssistantWorkStep[];
+  errorCount: number;
+};
 
 export function createComposeStep(): AssistantWorkStep {
   return { id: "compose", label: localText("Analyze request", "요청 분석"), status: "running", startedAt: Date.now() };
@@ -691,7 +697,99 @@ function firstLine(value: string) {
   return value.split(/\r?\n/)[0]?.trim() ?? "";
 }
 
-function formatDuration(value: number) {
+export function traceWorkloopEvents(trace?: AiTraceSummary): AiTraceWorkloopEvent[] {
+  return Array.isArray(trace?.workloop) ? trace.workloop : [];
+}
+
+export function traceWorkloopRowDetail(event: AiTraceWorkloopEvent) {
+  if (event.error && event.workDetail && event.error !== event.workDetail) {
+    return `${event.workDetail} · ${event.error}`;
+  }
+  return event.error || event.workDetail;
+}
+
+export function formatPayload(value: unknown) {
+  if (value === undefined || value === null || value === "") return translate("common.none");
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value, null, 2).slice(0, 2000);
+  } catch {
+    return String(value);
+  }
+}
+
+export function groupAssistantSteps(steps: AssistantWorkStep[]): AssistantWorkStepGroup[] {
+  const groups: AssistantWorkStepGroup[] = [];
+  for (const step of steps) {
+    const key = stepGroupKey(step);
+    const existing = groups.find((group) => group.key === key);
+    if (existing) {
+      existing.steps.push(step);
+      if (step.status === "error") existing.errorCount += 1;
+      continue;
+    }
+    groups.push({
+      key,
+      label: stepGroupLabel(step, key),
+      steps: [step],
+      errorCount: step.status === "error" ? 1 : 0,
+    });
+  }
+  return groups;
+}
+
+function stepGroupKey(step: AssistantWorkStep) {
+  return step.lane || step.category || (step.toolName ? "tool" : "compose");
+}
+
+function stepGroupLabel(step: AssistantWorkStep, key: string) {
+  if (step.lane) return laneLabel(step.lane);
+  if (step.category) return categoryLabel(step.category);
+  if (key === "compose") return "요청 준비";
+  return "도구 실행";
+}
+
+function laneLabel(lane: string) {
+  switch (lane) {
+    case "curriculum":
+      return "커리큘럼 설계";
+    case "read":
+      return "상태 확인";
+    case "write":
+      return "노트북 반영";
+    case "cell-call":
+      return "셀 실행/검증";
+    case "progress":
+      return "진도 기록";
+    case "automation":
+      return "자동화";
+    case "safety":
+      return "안전 확인";
+    default:
+      return lane;
+  }
+}
+
+function categoryLabel(category: string) {
+  switch (category) {
+    case "runtime":
+      return "런타임";
+    case "learning":
+      return "학습 구성";
+    case "workbench":
+      return "워크벤치";
+    case "files":
+      return "파일/패키지";
+    case "automation":
+      return "자동화";
+    case "safety":
+      return "안전";
+    default:
+      return category;
+  }
+}
+
+export function formatDuration(value: number) {
   if (!Number.isFinite(value)) return "";
   if (value < 1000) return `${Math.max(0, Math.round(value))}ms`;
   return `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}s`;

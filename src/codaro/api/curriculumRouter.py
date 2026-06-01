@@ -2,22 +2,45 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from ..curriculum.checker import debuggingPatternRef, detectErrorClass
-from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
-from ..curriculum.contentCache import CurriculumContentCache
-from ..curriculum.misconceptionCatalog import matchOutcomes
-from ..curriculum.outcomeMastery import computeMastery
-from ..curriculum.planComposer import PlanGoal, composeMasterPlan
-from ..curriculum.predictionDiff import ActualResult, comparePrediction, extractErrorClass
-from ..curriculum.sectionContract import LearningPredictContract
-from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, curriculumCategoryTree
-from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
+from ..curriculum.analyticsFlow import CurriculumAnalyticsFlow
+from ..curriculum.catalogFlow import buildCurriculumTaxonomyPayload, buildLearningSpecPayload
+from ..curriculum.checkFlow import (
+    CurriculumCheckInput,
+    CurriculumCheckInvalid,
+    CurriculumCheckPrediction,
+    CurriculumCheckSessionMissing,
+    runCurriculumCheckFlow,
+)
+from ..curriculum.contentFlow import (
+    CurriculumContentFlow,
+    CurriculumContentError,
+)
+from ..curriculum.planningFlow import (
+    CurriculumMasterPlanInput,
+    CurriculumPlanningError,
+    buildCurriculumGapsPayload,
+    composeCurriculumMasterPlan,
+)
+from ..curriculum.progressFlow import (
+    CurriculumProgressInput,
+    buildCurriculumProgressSummary,
+    updateCurriculumProgress,
+)
+from ..curriculum.qualityFlow import (
+    buildCurriculumCheckProposalsPayload,
+    buildCurriculumLessonStatsPayload,
+    buildCurriculumQualityReport,
+)
+from ..curriculum.learnerProgressFlow import (
+    LearnerProgressError,
+    buildLearnerOutcomePayload,
+    buildLearnerSnapshotPayload,
+    updateOutcomeValidation,
+)
+from ..curriculum.reviewFlow import buildCurriculumReviewsPayload, recordCurriculumReviewResult
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
 from .errors import fail
-from ..curriculum.analyticsTimeline import buildSnapshot
-from ..curriculum.learnerStateBridge import buildUnifiedMastery
-from ..curriculum.reviewScheduler import daysOverdue
 from .requestModels import (
     CheckExerciseRequest,
     CurriculumProgressRequest,
@@ -30,63 +53,64 @@ from .requestModels import (
 def createCurriculumRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
-    contentCache = CurriculumContentCache()
+    contentFlow = CurriculumContentFlow(
+        studyLoader=state.studyLoader,
+        progressTracker=state.progressTracker,
+    )
+    analyticsFlow = CurriculumAnalyticsFlow(
+        curriculumOs=state.curriculumOs,
+        progressTracker=state.progressTracker,
+        learnerStateStore=state.learnerStateStore,
+        analyticsTimeline=state.analyticsTimeline,
+    )
 
     @router.get("/api/curriculum/categories")
     def apiCurriculumCategories() -> dict[str, object]:
-        if state.studyLoader is None:
-            return {"categories": [], "groups": {}, "tree": [], "learningPaths": {}}
-        categories = state.studyLoader.listCategories()
+        payload = contentFlow.categoriesPayload()
+        categories = payload.get("categories", [])
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="categories", categoryCount=len(categories)),
+            formatLogFields(action="categories", categoryCount=len(categories) if isinstance(categories, list) else 0),
         )
-        return {
-            "categories": [category.model_dump() for category in categories],
-            "groups": CATEGORY_GROUPS,
-            "tree": curriculumCategoryTree(),
-            "learningPaths": LEARNING_PATHS,
-        }
+        return payload
 
     @router.get("/api/curriculum/contents/{category}")
     def apiCurriculumContents(category: str) -> dict[str, object]:
-        if state.studyLoader is None:
-            fail(404, "curriculum_unavailable", "Curriculum content not available.")
-        contents = state.studyLoader.listContents(category)
+        try:
+            payload = contentFlow.contentsPayload(category=category)
+        except CurriculumContentError as error:
+            fail(error.statusCode, error.code, error.message)
+        contents = payload.get("contents", [])
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="contents", category=category, contentCount=len(contents)),
+            formatLogFields(action="contents", category=category, contentCount=len(contents) if isinstance(contents, list) else None),
         )
-        return {
-            "category": category,
-            "categoryName": CATEGORY_MAPPING.get(category, category),
-            "contents": [{"contentId": content.contentId, "title": content.title} for content in contents],
-        }
+        return payload
 
     @router.get("/api/curriculum/content/{category}/{contentId}")
     def apiCurriculumContent(category: str, contentId: str) -> dict[str, object]:
-        if state.studyLoader is None:
-            fail(404, "curriculum_unavailable", "Curriculum content not available.")
         try:
-            payload = contentCache.get(state.studyLoader, category, contentId)
-        except FileNotFoundError:
-            fail(404, "curriculum_content_not_found", "Content not found.")
-        state.progressTracker.markAccessed(category, contentId)
+            result = contentFlow.contentPayload(
+                category=category,
+                contentId=contentId,
+            )
+        except CurriculumContentError as error:
+            fail(error.statusCode, error.code, error.message)
         logger.debug(
             "curriculum %s",
             formatLogFields(
                 action="content",
                 category=category,
                 contentId=contentId,
-                blockCount=payload.blockCount,
-                solutionCount=payload.solutionCount,
+                blockCount=result.blockCount,
+                solutionCount=result.solutionCount,
             ),
         )
-        return payload.response()
+        return result.payload
 
     @router.get("/api/curriculum/progress")
     def apiCurriculumProgress() -> dict[str, object]:
-        summary = state.progressTracker.getSummary()
+        summary = buildCurriculumProgressSummary(state.progressTracker)
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -98,38 +122,36 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/curriculum/progress")
     def apiUpdateProgress(request: CurriculumProgressRequest) -> dict[str, object]:
-        if request.missionId:
-            lesson = state.progressTracker.completeMission(
-                request.category, request.contentId, request.missionId, request.totalMissions,
-            )
-            logger.debug(
-                "curriculum %s",
-                formatLogFields(
-                    action="progress-mission",
-                    category=request.category,
-                    contentId=request.contentId,
-                    missionId=request.missionId,
-                    totalMissions=request.totalMissions,
-                ),
-            )
-            return lesson.model_dump()
-        state.progressTracker.markAccessed(request.category, request.contentId)
+        result = updateCurriculumProgress(
+            progressTracker=state.progressTracker,
+            request=CurriculumProgressInput(
+                category=request.category,
+                contentId=request.contentId,
+                missionId=request.missionId,
+                totalMissions=request.totalMissions,
+            ),
+        )
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="progress-access", category=request.category, contentId=request.contentId),
+            formatLogFields(
+                action=result.action,
+                category=request.category,
+                contentId=request.contentId,
+                missionId=request.missionId or None,
+                totalMissions=request.totalMissions or None,
+            ),
         )
-        return {"status": "accessed"}
+        return result.payload
 
     @router.post("/api/curriculum/check")
     async def apiCheckExercise(request: CheckExerciseRequest) -> dict[str, object]:
-        session = state.sessionManager.getSession(request.sessionId)
-        if session is None:
-            fail(404, "session_not_found", "Session not found.")
-
         try:
-            result = await runExerciseCheck(
-                session,
-                ExerciseCheckInput(
+            payload = await runCurriculumCheckFlow(
+                curriculumOs=state.curriculumOs,
+                learnerStateStore=state.learnerStateStore,
+                progressTracker=state.progressTracker,
+                request=CurriculumCheckInput(
+                    sessionId=request.sessionId,
                     studentCode=request.studentCode,
                     expectedCode=request.expectedCode,
                     checkType=request.checkType,
@@ -138,106 +160,22 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                     requiredPatterns=request.requiredPatterns,
                     hints=request.hints,
                     currentHintLevel=request.currentHintLevel,
+                    category=request.category,
+                    contentId=request.contentId,
+                    sectionId=request.sectionId,
+                    prediction=CurriculumCheckPrediction(
+                        expectedShape=request.prediction.expectedShape,
+                        expectedDtype=request.prediction.expectedDtype,
+                        expectedValue=request.prediction.expectedValue,
+                        expectedError=request.prediction.expectedError,
+                    ) if request.prediction is not None else None,
                 ),
+                sessionManager=state.sessionManager,
             )
-        except InvalidExerciseCheck as error:
+        except CurriculumCheckSessionMissing:
+            fail(404, "session_not_found", "Session not found.")
+        except CurriculumCheckInvalid as error:
             fail(400, "curriculum_invalid_check", str(error))
-
-        payload = result.payload()
-        creditedOutcomes: list[str] = []
-        autoValidatedOutcomes: list[str] = []
-        sectionOutcomes: list[str] = []
-        if request.category and request.contentId and request.sectionId:
-            state.progressTracker.recordSectionResult(
-                request.category,
-                request.contentId,
-                request.sectionId,
-                passed=result.passed,
-                hintLevel=result.hintLevel,
-            )
-            graph = state.curriculumOs.graph()
-            lesson = graph.byKey(f"{request.category}/{request.contentId}")
-            sectionOutcomes = list(
-                lesson.outcomesForSection(request.sectionId) if lesson else []
-            )
-            if result.passed and sectionOutcomes:
-                creditedOutcomes, autoValidatedOutcomes = state.progressTracker.creditCheckPass(
-                    request.category,
-                    request.contentId,
-                    request.sectionId,
-                    sectionOutcomes,
-                    hintLevel=result.hintLevel,
-                )
-        payload["creditedOutcomes"] = creditedOutcomes
-        payload["autoValidatedOutcomes"] = autoValidatedOutcomes
-
-        # Predict-Run-Reconcile-Adapt 루프 — 매 check 마다 learnerState 갱신.
-        # 진단을 AI tool call이 아니라 런타임에서 deterministic하게 박는다.
-        misconceptionPayload: list[dict[str, object]] = []
-        doneCriterionViolated = False
-        predictionDiffPayload: dict[str, object] | None = None
-        if sectionOutcomes:
-            store = state.learnerStateStore
-            errorText = payload.get("detail") or payload.get("studentOutput") or ""
-
-            # 학습자 예측이 잠겨 있으면 실측과 4차원 diff 를 계산해 mastery 신호로 변환.
-            # prediction-based 신호가 있으면 그것을 우선; 없으면 check pass/fail 만으로 갱신.
-            usedPredictionSignal = False
-            if request.prediction is not None:
-                predict = LearningPredictContract(
-                    expectedShape=request.prediction.expectedShape,
-                    expectedDtype=request.prediction.expectedDtype,
-                    expectedValue=request.prediction.expectedValue,
-                    expectedError=request.prediction.expectedError,
-                )
-                if not predict.isEmpty():
-                    actual = ActualResult(
-                        value=str(payload.get("studentOutput") or ""),
-                        errorClass=extractErrorClass(str(payload.get("detail") or "")),
-                    )
-                    diff = comparePrediction(predict, actual)
-                    predictionDiffPayload = diff.model_dump()
-                    if diff.overall != "skipped":
-                        for outcomeId in sectionOutcomes:
-                            store.recordPredictionResult(outcomeId, diff)
-                        usedPredictionSignal = True
-
-            if not usedPredictionSignal:
-                for outcomeId in sectionOutcomes:
-                    store.recordOutcomeAttempt(outcomeId, success=result.passed)
-
-            if not result.passed:
-                for outcomeId, entry in matchOutcomes(
-                    sectionOutcomes,
-                    code=request.studentCode or "",
-                    errorText=str(errorText),
-                ):
-                    hit, repeatStatus = store.recordMisconception(entry.id, outcomeId)
-                    if repeatStatus == "repeat":
-                        doneCriterionViolated = True
-                    misconceptionPayload.append({
-                        "misconceptionId": entry.id,
-                        "outcomeId": outcomeId,
-                        "label": entry.label,
-                        "summary": entry.summary,
-                        "diagnostic": entry.diagnostic.model_dump(),
-                        "correction": entry.correction.model_dump(),
-                        "repeatStatus": repeatStatus,
-                        "hitCount": hit.hitCount,
-                    })
-        payload["misconceptionMatches"] = misconceptionPayload
-        payload["doneCriterionViolated"] = doneCriterionViolated
-        payload["predictionDiff"] = predictionDiffPayload
-
-        # 디버깅 패턴 ref — 학습자가 만난 에러 클래스를 보조 가이드로 안내.
-        errorContext = " ".join([
-            str(payload.get("studentOutput") or ""),
-            str(payload.get("detail") or ""),
-            str(payload.get("feedback") or ""),
-        ])
-        errorClass = detectErrorClass(errorContext) if not result.passed else ""
-        payload["errorClass"] = errorClass
-        payload["debuggingPatternRef"] = debuggingPatternRef(errorClass)
 
         logger.debug(
             "curriculum %s",
@@ -245,59 +183,50 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 action="check",
                 sessionId=request.sessionId,
                 checkType=request.checkType,
-                passed=result.passed,
-                hintLevel=result.hintLevel,
-                creditedCount=len(creditedOutcomes),
-                autoValidatedCount=len(autoValidatedOutcomes),
-                misconceptionMatches=len(misconceptionPayload),
-                doneCriterionViolated=doneCriterionViolated,
+                passed=payload.get("passed"),
+                hintLevel=payload.get("hintLevel"),
+                creditedCount=len(payload.get("creditedOutcomes", [])),
+                autoValidatedCount=len(payload.get("autoValidatedOutcomes", [])),
+                misconceptionMatches=len(payload.get("misconceptionMatches", [])),
+                doneCriterionViolated=payload.get("doneCriterionViolated"),
             ),
         )
         return payload
 
     @router.get("/api/curriculum/taxonomy")
     def apiCurriculumTaxonomy() -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
+        result = buildCurriculumTaxonomyPayload(state.curriculumOs)
         logger.debug(
             "curriculum %s",
             formatLogFields(
                 action="taxonomy",
-                outcomes=len(taxonomy.outcomes),
-                domains=len(taxonomy.domains),
+                outcomes=result.outcomeCount,
+                domains=result.domainCount,
             ),
         )
-        return {
-            "outcomes": [outcome.model_dump() for outcome in taxonomy.outcomes],
-            "domains": [domain.model_dump() for domain in taxonomy.domains],
-        }
+        return result.payload
 
     @router.post("/api/curriculum/master-plan")
     def apiCurriculumMasterPlan(request: MasterPlanRequest) -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
-        if request.domain and not taxonomy.domainById(request.domain):
-            fail(400, "curriculum_unknown_domain", f"Unknown domain: {request.domain}")
-        for outcomeId in request.outcomes:
-            if not taxonomy.hasOutcome(outcomeId):
-                fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {outcomeId}")
-        graph = state.curriculumOs.graph()
-        goal = PlanGoal(
-            domain=request.domain,
-            outcomes=request.outcomes,
-            excludeCompleted=request.excludeCompleted,
-            excludeKeys=request.excludeKeys,
-            skipMasteredOutcomes=request.skipMasteredOutcomes,
-            maxMinutes=request.maxMinutes,
-            projectIntent=request.projectIntent,
-            deliverableOnly=request.deliverableOnly,
-            adaptiveSkip=request.adaptiveSkip,
-        )
-        plan = composeMasterPlan(
-            goal,
-            graph,
-            taxonomy,
-            state.progressTracker,
-            learnerStateStore=state.learnerStateStore,
-        )
+        try:
+            plan = composeCurriculumMasterPlan(
+                curriculumOs=state.curriculumOs,
+                progressTracker=state.progressTracker,
+                learnerStateStore=state.learnerStateStore,
+                request=CurriculumMasterPlanInput(
+                    domain=request.domain,
+                    outcomes=request.outcomes,
+                    excludeCompleted=request.excludeCompleted,
+                    excludeKeys=request.excludeKeys,
+                    skipMasteredOutcomes=request.skipMasteredOutcomes,
+                    maxMinutes=request.maxMinutes,
+                    projectIntent=request.projectIntent,
+                    deliverableOnly=request.deliverableOnly,
+                    adaptiveSkip=request.adaptiveSkip,
+                ),
+            )
+        except CurriculumPlanningError as error:
+            fail(400, error.code, error.message)
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -312,10 +241,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/curriculum/mastery")
     def apiCurriculumMastery() -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
-        graph = state.curriculumOs.graph()
-        validated = state.progressTracker.listValidatedOutcomes()
-        report = computeMastery(graph, taxonomy, state.progressTracker, validated)
+        report = analyticsFlow.masteryReport()
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -333,19 +259,11 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         작가가 needs-attention lesson 을 보고 보강 우선순위 결정. 신호는 informational —
         audit gate 차단은 안 한다.
         """
-        from ..curriculum.qualityAnalytics import computeQualityReport
-
-        graph = state.curriculumOs.graph()
-        misconceptionMap: dict[str, int] = {}
-        if state.learnerStateStore is not None:
-            outcomeHits: dict[str, int] = {}
-            for hit in state.learnerStateStore.listMisconceptionHits():
-                outcomeHits[hit.outcomeId] = outcomeHits.get(hit.outcomeId, 0) + hit.hitCount
-            # outcome → lesson 분배: outcome 을 가르치는 각 lesson 에 같은 hitCount attribute.
-            for outcomeId, count in outcomeHits.items():
-                for lesson in graph.lessonsProvidingOutcome(outcomeId):
-                    misconceptionMap[lesson.key] = misconceptionMap.get(lesson.key, 0) + count
-        report = computeQualityReport(graph, state.progressTracker, misconceptionMap)
+        report = buildCurriculumQualityReport(
+            curriculumOs=state.curriculumOs,
+            progressTracker=state.progressTracker,
+            learnerStateStore=state.learnerStateStore,
+        )
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -362,45 +280,23 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
         AI provider 가 없으면 약점 목록만 반환 — 작가가 직접 보강.
         """
-        from ..curriculum.checkProposer import (
-            lessonContextForSection,
-            proposeChecksForGap,
-            weakCheckCoverage,
-        )
-
-        if state.studyLoader is None:
-            return {"available": False, "weak": [], "proposals": []}
-        graph = state.curriculumOs.graph()
-        weak = weakCheckCoverage(graph, state.studyLoader)
-        taxonomy = state.curriculumOs.taxonomy()
-        for entry in weak:
-            label = taxonomy.outcomeLabel(entry.outcomeId)
-            entry.outcomeLabel = label
-        proposals: list[dict[str, object]] = []
         provider = getattr(state, "aiProvider", None)
-        if provider is not None:
-            for entry in weak[:5]:  # 상위 5개만 LLM 호출 — 비용 절감
-                context = lessonContextForSection(
-                    state.studyLoader, entry.category, entry.contentId, entry.sectionId,
-                )
-                proposal = proposeChecksForGap(
-                    entry, context, outcomeLabel=entry.outcomeLabel, aiProvider=provider,
-                )
-                if proposal is not None:
-                    proposals.append(proposal.model_dump())
+        payload = buildCurriculumCheckProposalsPayload(
+            curriculumOs=state.curriculumOs,
+            studyLoader=state.studyLoader,
+            aiProvider=provider,
+        )
+        weak = payload.get("weak", [])
+        proposals = payload.get("proposals", [])
         logger.debug(
             "curriculum %s",
             formatLogFields(
                 action="check-proposals",
-                weakCount=len(weak),
-                proposalCount=len(proposals),
+                weakCount=len(weak) if isinstance(weak, list) else None,
+                proposalCount=len(proposals) if isinstance(proposals, list) else None,
             ),
         )
-        return {
-            "available": provider is not None,
-            "weak": [w.model_dump() for w in weak],
-            "proposals": proposals,
-        }
+        return payload
 
     @router.get("/api/curriculum/lesson-stats")
     def apiCurriculumLessonStats() -> dict[str, object]:
@@ -408,45 +304,28 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
         작가가 estimatedMinutes 보정에 사용. observed 표본이 있는 lesson 만 반환.
         """
-        graph = state.curriculumOs.graph()
-        progress = state.progressTracker.load()
-        rows: list[dict[str, object]] = []
-        for key, lesson in progress.lessons.items():
-            if lesson.observedSampleCount < 1:
-                continue
-            node = graph.byKey(key)
-            if node is None:
-                continue
-            static = node.estimatedMinutes
-            observed = lesson.observedMinutesEwma
-            deviation = ""
-            if static > 0 and observed > 0:
-                pct = (observed - static) / static * 100
-                deviation = f"{pct:+.1f}%"
-            rows.append({
-                "key": key,
-                "title": node.title,
-                "static": static,
-                "observedEwma": round(observed, 2),
-                "sampleCount": lesson.observedSampleCount,
-                "deviation": deviation,
-            })
-        rows.sort(key=lambda r: (-int(r["sampleCount"]), str(r["key"])))
+        payload = buildCurriculumLessonStatsPayload(
+            curriculumOs=state.curriculumOs,
+            progressTracker=state.progressTracker,
+        )
+        lessons = payload.get("lessons", [])
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="lesson-stats", count=len(rows)),
+            formatLogFields(action="lesson-stats", count=len(lessons) if isinstance(lessons, list) else None),
         )
-        return {"lessons": rows}
+        return payload
 
     @router.post("/api/curriculum/outcomes/validate")
     def apiCurriculumValidateOutcome(request: OutcomeValidationRequest) -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
-        if not taxonomy.hasOutcome(request.outcomeId):
-            fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {request.outcomeId}")
-        if request.validated:
-            state.progressTracker.markOutcomeValidated(request.outcomeId)
-        else:
-            state.progressTracker.clearOutcomeValidation(request.outcomeId)
+        try:
+            payload = updateOutcomeValidation(
+                curriculumOs=state.curriculumOs,
+                progressTracker=state.progressTracker,
+                outcomeId=request.outcomeId,
+                validated=request.validated,
+            )
+        except LearnerProgressError as error:
+            fail(400, error.code, error.message)
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -455,53 +334,24 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 validated=request.validated,
             ),
         )
-        return {
-            "outcomeId": request.outcomeId,
-            "validated": request.validated,
-        }
+        return payload
 
     @router.get("/api/curriculum/gaps")
     def apiCurriculumGaps(domain: str | None = None) -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
-        graph = state.curriculumOs.graph()
-        covered = graph.coveredOutcomes()
-        domainsOfInterest = taxonomy.domains
-        if domain:
-            singleDomain = taxonomy.domainById(domain)
-            if singleDomain is None:
-                fail(400, "curriculum_unknown_domain", f"Unknown domain: {domain}")
-            domainsOfInterest = [singleDomain]
-        gaps: list[dict[str, object]] = []
-        for dom in domainsOfInterest:
-            missing = [outcomeId for outcomeId in dom.targetOutcomes if outcomeId not in covered]
-            if missing:
-                gaps.append({
-                    "domainId": dom.id,
-                    "domainLabel": dom.label,
-                    "missing": [
-                        {
-                            "outcomeId": outcomeId,
-                            "outcomeLabel": taxonomy.outcomeLabel(outcomeId),
-                        }
-                        for outcomeId in missing
-                    ],
-                })
+        try:
+            payload = buildCurriculumGapsPayload(curriculumOs=state.curriculumOs, domain=domain)
+        except CurriculumPlanningError as error:
+            fail(400, error.code, error.message)
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="gaps", domain=domain, gapDomains=len(gaps)),
+            formatLogFields(action="gaps", domain=domain, gapDomains=len(payload["gaps"])),
         )
-        return {"gaps": gaps}
+        return payload
 
     @router.get("/api/curriculum/learning-spec")
     def apiLearningSpec() -> dict[str, object]:
         logger.debug("curriculum %s", formatLogFields(action="learning-spec"))
-        return {
-            "philosophy": PHILOSOPHY,
-            "exerciseTypes": EXERCISE_TYPES,
-            "hintStrategy": HINT_STRATEGY,
-            "lessonStructure": LESSON_STRUCTURE,
-            "aiTeacherInstructions": AI_TEACHER_INSTRUCTIONS,
-        }
+        return buildLearningSpecPayload()
 
     @router.get("/api/learner/snapshot")
     def apiLearnerSnapshot() -> dict[str, object]:
@@ -509,22 +359,19 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
         프론트가 mastery 패널, misconception 표시, dynamic gap UI를 그릴 때 호출한다.
         """
-        snapshot = state.learnerStateStore.snapshot()
-        repeats = state.learnerStateStore.listRepeatedMisconceptions()
+        payload = buildLearnerSnapshotPayload(learnerStateStore=state.learnerStateStore)
         logger.debug(
             "learner %s",
             formatLogFields(
                 action="snapshot",
-                masteryEntries=len(snapshot.mastery),
-                misconceptionHits=len(snapshot.misconceptions),
-                repeatedMisconceptions=len(repeats),
+                masteryEntries=len(payload.get("mastery", [])) if isinstance(payload.get("mastery"), list) else None,
+                misconceptionHits=len(payload.get("misconceptions", []))
+                if isinstance(payload.get("misconceptions"), list)
+                else None,
+                repeatedMisconceptions=payload.get("repeatedMisconceptionCount"),
             ),
         )
-        return {
-            **snapshot.model_dump(),
-            "repeatedMisconceptionCount": len(repeats),
-            "doneCriterionViolated": bool(repeats),
-        }
+        return payload
 
     @router.get("/api/learner/outcome/{outcomeId}")
     def apiLearnerOutcome(outcomeId: str) -> dict[str, object]:
@@ -532,81 +379,43 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
         Predict-Run-Reconcile-Adapt 루프에서 한 outcome에 집중할 때 폴링용.
         """
-        taxonomy = state.curriculumOs.taxonomy()
-        if not taxonomy.hasOutcome(outcomeId):
-            fail(400, "curriculum_unknown_outcome", f"Unknown outcome: {outcomeId}")
-        store = state.learnerStateStore
-        mastery = store.getMastery(outcomeId)
-        related = [
-            hit.model_dump()
-            for hit in store.listMisconceptionHits()
-            if hit.outcomeId == outcomeId
-        ]
+        try:
+            payload = buildLearnerOutcomePayload(
+                curriculumOs=state.curriculumOs,
+                learnerStateStore=state.learnerStateStore,
+                outcomeId=outcomeId,
+            )
+        except LearnerProgressError as error:
+            fail(400, error.code, error.message)
+        mastery = payload["mastery"] if isinstance(payload.get("mastery"), dict) else {}
+        misconceptionHits = payload.get("misconceptionHits")
         logger.debug(
             "learner %s",
             formatLogFields(
                 action="outcome",
                 outcomeId=outcomeId,
-                score=mastery.score,
-                misconceptionHits=len(related),
+                score=mastery.get("score") if isinstance(mastery, dict) else None,
+                misconceptionHits=len(misconceptionHits) if isinstance(misconceptionHits, list) else None,
             ),
         )
-        return {
-            "outcomeId": outcomeId,
-            "outcomeLabel": taxonomy.outcomeLabel(outcomeId),
-            "mastery": mastery.model_dump(),
-            "misconceptionHits": related,
-        }
+        return payload
 
     @router.get("/api/curriculum/reviews")
     def apiCurriculumReviews() -> dict[str, object]:
-        dueStates = state.progressTracker.listDueReviews()
-        graph = state.curriculumOs.graph()
-        items: list[dict[str, object]] = []
-        for review in dueStates:
-            lesson = graph.byKey(review.lessonKey)
-            items.append({
-                "lessonKey": review.lessonKey,
-                "title": lesson.title if lesson else review.lessonKey,
-                "category": lesson.category if lesson else "",
-                "contentId": lesson.contentId if lesson else "",
-                "interval": review.interval,
-                "ease": review.ease,
-                "streak": review.streak,
-                "lastResult": review.lastResult,
-                "nextReviewAt": review.nextReviewAt,
-                "daysOverdue": daysOverdue(review),
-            })
+        payload = buildCurriculumReviewsPayload(
+            curriculumOs=state.curriculumOs,
+            progressTracker=state.progressTracker,
+        )
+        reviews = payload.get("reviews", [])
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="reviews-list", dueCount=len(items)),
+            formatLogFields(action="reviews-list", dueCount=len(reviews) if isinstance(reviews, list) else None),
         )
-        return {"reviews": items, "totalDue": len(items)}
-
-    # 30초 throttle — 같은 페이지 진입 시 /analytics 와 /analytics/summary 가
-    # 연속 호출되어 computeMastery 가 두 번 도는 것을 막는다.
-    analyticsRefreshState: dict[str, float] = {"lastAt": 0.0}
-
-    def _refreshAnalyticsSnapshot() -> None:
-        import time as _time
-        now = _time.monotonic()
-        if now - analyticsRefreshState["lastAt"] < 30.0:
-            return
-        analyticsRefreshState["lastAt"] = now
-        taxonomy = state.curriculumOs.taxonomy()
-        graph = state.curriculumOs.graph()
-        validated = state.progressTracker.listValidatedOutcomes()
-        report = computeMastery(graph, taxonomy, state.progressTracker, validated)
-        snapshot = buildSnapshot(state.progressTracker, report)
-        state.analyticsTimeline.append(snapshot)
+        return payload
 
     @router.get("/api/curriculum/mastery/unified")
     def apiUnifiedMastery() -> dict[str, object]:
-        taxonomy = state.curriculumOs.taxonomy()
-        graph = state.curriculumOs.graph()
-        report = buildUnifiedMastery(
-            state.progressTracker, state.learnerStateStore, taxonomy, graph,
-        )
+        report = analyticsFlow.unifiedMasteryReport()
         logger.debug(
             "curriculum %s",
             formatLogFields(
@@ -619,59 +428,26 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/curriculum/analytics")
     def apiCurriculumAnalytics(days: int = 30) -> dict[str, object]:
-        _refreshAnalyticsSnapshot()
-        snapshots = state.analyticsTimeline.loadRange()
-        if days > 0 and len(snapshots) > days:
-            snapshots = snapshots[-days:]
+        payload = analyticsFlow.analyticsPayload(days=days)
         logger.debug(
             "curriculum %s",
-            formatLogFields(action="analytics", snapshotCount=len(snapshots), days=days),
+            formatLogFields(action="analytics", snapshotCount=payload["totalSnapshots"], days=days),
         )
-        return {
-            "snapshots": [snap.model_dump() for snap in snapshots],
-            "totalSnapshots": len(snapshots),
-        }
+        return payload
 
     @router.get("/api/curriculum/analytics/summary")
     def apiCurriculumAnalyticsSummary() -> dict[str, object]:
-        _refreshAnalyticsSnapshot()
-        snapshots = state.analyticsTimeline.loadRange()
-        if not snapshots:
-            return {"available": False}
-        latest = snapshots[-1]
-        first = snapshots[0]
-        recent30 = snapshots[-30:] if len(snapshots) > 30 else snapshots
-        lessonsRecent = sum(s.lessonsCompletedToday for s in recent30)
-        sectionsRecent = sum(s.sectionsCompletedToday for s in recent30)
-        creditsRecent = sum(s.creditsToday for s in recent30)
-        hintHistogram: dict[str, int] = {}
-        for snap in recent30:
-            for k, v in snap.hintLevelHistogram.items():
-                hintHistogram[k] = hintHistogram.get(k, 0) + v
-        domainTouches: dict[str, int] = {}
-        for snap in recent30:
-            for dom in snap.domainsTouched:
-                domainTouches[dom] = domainTouches.get(dom, 0) + 1
-        return {
-            "available": True,
-            "firstDate": first.date,
-            "latestDate": latest.date,
-            "currentMastered": latest.masteredCount,
-            "totalOutcomes": latest.totalOutcomes,
-            "recent30": {
-                "lessons": lessonsRecent,
-                "sections": sectionsRecent,
-                "credits": creditsRecent,
-                "hintHistogram": hintHistogram,
-                "domainTouches": dict(sorted(domainTouches.items(), key=lambda kv: -kv[1])),
-            },
-            "totalSnapshots": len(snapshots),
-        }
+        return analyticsFlow.analyticsSummaryPayload()
 
     @router.post("/api/curriculum/reviews/{category}/{contentId}")
     def apiRecordReviewResult(category: str, contentId: str, request: ReviewResultRequest) -> dict[str, object]:
         key = f"{category}/{contentId}"
-        updated = state.progressTracker.recordReviewResult(key, request.success)
+        updated = recordCurriculumReviewResult(
+            progressTracker=state.progressTracker,
+            category=category,
+            contentId=contentId,
+            success=request.success,
+        )
         logger.debug(
             "curriculum %s",
             formatLogFields(

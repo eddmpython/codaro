@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { codaroApi } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { useWidgetSession } from "@/lib/widgetSession";
 import { getCustomComponent } from "@/components/widgets/customComponentRegistry";
+import { cn } from "@/lib/utils";
+import { dispatchWidgetUiEvent } from "@/lib/widgetUiEvents";
+import { useWidgetSession } from "@/lib/widgetSession";
 
 export type WidgetEventBindings = Record<string, string>;
 
@@ -57,20 +57,13 @@ export function WidgetHost({
   const dispatchEvent = async (callbackId: string | undefined, eventType: string, payload: unknown) => {
     if (!callbackId || !resolvedSessionId) return;
     try {
-      const response = await codaroApi.sendUiEvent(resolvedSessionId, {
+      await dispatchWidgetUiEvent({
         callbackId,
         eventType,
         payload,
+        sessionId: resolvedSessionId,
         blockId: blockId ?? null,
       });
-      const trigger = (response as { reactiveTrigger?: string[] } | undefined)?.reactiveTrigger;
-      if (Array.isArray(trigger) && trigger.length > 0) {
-        window.dispatchEvent(
-          new CustomEvent("codaro:reactive-trigger", {
-            detail: { sessionId: resolvedSessionId, blockIds: trigger, sourceBlockId: blockId ?? null },
-          }),
-        );
-      }
     } catch (error) {
       console.warn("ui event dispatch failed", error);
     }

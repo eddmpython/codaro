@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { codaroApi } from "@/lib/api";
+import { loadCurriculumProgress } from "@/lib/curriculumProgress";
 import type { ProgressSummary } from "@/types";
 
 const PROGRESS_ERRORS = new Set(["NetworkError", "TypeError"]);
@@ -18,7 +18,7 @@ export function useCurriculumProgress(): UseCurriculumProgressResult {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const next = await codaroApi.progress();
+      const next = await loadCurriculumProgress();
       setSummary(next);
     } catch (error) {
       const name = (error as { name?: string } | null)?.name ?? "";

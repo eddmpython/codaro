@@ -3,20 +3,50 @@ import { getActiveLocale } from "@/lib/localeCopy";
 export type SurfaceMode = "chat" | "editor" | "curriculum" | "automation" | "share";
 export type ThemeMode = "dark" | "light";
 export type AutomationSection = "codaro" | "custom" | "tasks";
+export type ProductSurfaceFlowRole = "entry" | "learning" | "notebook" | "secondLoop" | "support";
 
-// 베타 확정 전까지 사이드바에서 임시로 감추는 표면. 확정되면 이 배열을 비우고 beta 배지로 노출한다.
-// 코드/라우팅은 그대로 살아 있어 `#automation`, `#share` 해시로는 개발/검증 접근이 가능하다.
-export const HIDDEN_SURFACES: readonly SurfaceMode[] = ["automation", "share"];
+export type ProductSurfaceNavItem = {
+  value: SurfaceMode;
+  labelKey: string;
+  flowRole: ProductSurfaceFlowRole;
+  beta: boolean;
+  visibleInSidebar: boolean;
+};
+
+export const PRODUCT_SURFACE_NAV: readonly ProductSurfaceNavItem[] = [
+  { value: "chat", labelKey: "nav.chat", flowRole: "entry", beta: false, visibleInSidebar: true },
+  { value: "curriculum", labelKey: "nav.curriculum", flowRole: "learning", beta: false, visibleInSidebar: true },
+  { value: "editor", labelKey: "nav.editor", flowRole: "notebook", beta: true, visibleInSidebar: true },
+  { value: "automation", labelKey: "nav.automation", flowRole: "secondLoop", beta: true, visibleInSidebar: true },
+  { value: "share", labelKey: "nav.share", flowRole: "support", beta: true, visibleInSidebar: false },
+];
+
+export const DEFAULT_SURFACE: SurfaceMode = "chat";
+
+export const SURFACE_MODES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV.map((item) => item.value);
+
+export const PRODUCT_SIDEBAR_NAV: readonly ProductSurfaceNavItem[] = PRODUCT_SURFACE_NAV
+  .filter((item) => item.visibleInSidebar);
+
+export const SIDEBAR_SURFACES: readonly SurfaceMode[] = PRODUCT_SIDEBAR_NAV.map((item) => item.value);
+
+export const HIDDEN_SURFACES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV
+  .filter((item) => !item.visibleInSidebar)
+  .map((item) => item.value);
 
 export function isHiddenSurface(surface: SurfaceMode): boolean {
   return HIDDEN_SURFACES.includes(surface);
 }
 
+export function isSurfaceMode(value: string): value is SurfaceMode {
+  return SURFACE_MODES.includes(value as SurfaceMode);
+}
+
 export function surfaceTitle(surface: SurfaceMode) {
   const en = getActiveLocale() === "en";
-  if (surface === "editor") return en ? "Editor" : "에디터";
-  if (surface === "curriculum") return en ? "Curriculum" : "커리큘럼";
+  if (surface === "editor") return en ? "Notebook" : "노트북";
+  if (surface === "curriculum") return en ? "Current Learning" : "현재 학습";
   if (surface === "automation") return en ? "Automation" : "자동화";
   if (surface === "share") return en ? "Share Packs" : "공유 팩";
-  return en ? "Chat" : "채팅";
+  return en ? "Chat" : "대화";
 }

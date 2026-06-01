@@ -42,7 +42,7 @@ export function buildAcceptPendingChangesApplication({
       notice: null,
       pendingTarget: "notebook",
       selectedBlockId: "",
-      surfaceToOpen: null,
+      surfaceToOpen: "curriculum",
     };
   }
 

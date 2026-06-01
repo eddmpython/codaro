@@ -1,12 +1,11 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import type { SurfaceMode } from "@/lib/surfaceModel";
+import { DEFAULT_SURFACE, isSurfaceMode, type SurfaceMode } from "@/lib/surfaceModel";
 
 type SurfaceSetter = Dispatch<SetStateAction<SurfaceMode>>;
 
 function surfaceFromHash(hash: string): SurfaceMode {
   const value = hash.replace(/^#/, "");
-  if (value === "editor" || value === "curriculum" || value === "automation" || value === "chat" || value === "share") return value;
-  return "chat";
+  return isSurfaceMode(value) ? value : DEFAULT_SURFACE;
 }
 
 export function useSurfaceRoute(): readonly [SurfaceMode, SurfaceSetter] {

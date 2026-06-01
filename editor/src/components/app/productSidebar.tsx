@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/sidebar";
 import { categoryTitle } from "@/lib/fallbackData";
 import { useLocale } from "@/lib/localeContext";
-import { HIDDEN_SURFACES } from "@/lib/surfaceModel";
+import { PRODUCT_SIDEBAR_NAV } from "@/lib/surfaceModel";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
 
@@ -80,6 +80,14 @@ export type SidebarCustomCurriculum = {
   createdAt: number;
 };
 
+const surfaceIcons: Record<SurfaceMode, React.ComponentType<{ className?: string }>> = {
+  automation: Workflow,
+  chat: MessageSquare,
+  curriculum: GraduationCap,
+  editor: FileCode2,
+  share: PackageOpen,
+};
+
 export function ProductSidebar({
   categories,
   categoryGroups,
@@ -109,14 +117,12 @@ export function ProductSidebar({
   onToggleTerminal,
 }: ProductSidebarProps) {
   const { locale, t, toggleLocale } = useLocale();
-  const allNavItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }>; beta: boolean }> = [
-    { value: "chat", label: t("nav.chat"), Icon: MessageSquare, beta: true },
-    { value: "editor", label: t("nav.editor"), Icon: FileCode2, beta: true },
-    { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap, beta: false },
-    { value: "automation", label: t("nav.automation"), Icon: Workflow, beta: true },
-    { value: "share", label: t("nav.share"), Icon: PackageOpen, beta: true },
-  ];
-  const navItems = allNavItems.filter((item) => !HIDDEN_SURFACES.includes(item.value));
+  const navItems = PRODUCT_SIDEBAR_NAV
+    .map((item) => ({
+      ...item,
+      Icon: surfaceIcons[item.value],
+      label: t(item.labelKey),
+    }));
   const themeLabel = themeMode === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode");
   const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
 
@@ -182,11 +188,11 @@ export function ProductSidebar({
       <SidebarContent className="overflow-hidden">
         <ScrollArea className="min-h-0 flex-1">
           <div className="min-w-0 pr-3 group-data-[collapsible=icon]:pr-0">
-            <SidebarGroup className="py-0.5">
+            <SidebarGroup className="py-0.5" data-product-nav="flow">
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {navItems.map(({ Icon, label, value, beta }) => (
-                    <SidebarMenuItem key={value}>
+                  {navItems.map(({ Icon, label, value, beta, flowRole }) => (
+                    <SidebarMenuItem data-product-flow-role={flowRole} data-product-surface={value} key={value}>
                       <SidebarMenuButton
                         className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
                         isActive={surface === value}
@@ -203,6 +209,13 @@ export function ProductSidebar({
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup className="py-0.5" data-product-nav="utility">
+              <SidebarGroupContent>
+                <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       className="h-8 px-2 text-[13px] [&>svg]:size-3.5"

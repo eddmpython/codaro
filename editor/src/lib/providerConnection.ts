@@ -1,5 +1,6 @@
 import { CodaroApiError, codaroApi } from "@/lib/api";
 import { translate } from "@/lib/localeCopy";
+import { providerProfileName } from "@/lib/providerProfile";
 import type {
   AiProfile,
   AppNotice,
@@ -265,7 +266,7 @@ async function withProviderValidation(
       notice: {
         tone: "success",
         title: translate("provider.connected.title"),
-        detail: validation.model ? `${provider} · ${validation.model}` : providerName(profile),
+        detail: validation.model ? `${provider} · ${validation.model}` : providerProfileName(profile),
       },
       validation: validationSnapshot,
     };
@@ -323,10 +324,6 @@ function snapshotProviderValidation(
     phase,
     provider: providerId,
   };
-}
-
-function providerName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? translate("common.defaultProvider"));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

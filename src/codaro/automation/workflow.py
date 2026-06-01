@@ -174,3 +174,8 @@ def getWorkflowEngine(workspaceRoot: str | None = None) -> WorkflowEngine:
     if _engine is None:
         _engine = WorkflowEngine(workspaceRoot=workspaceRoot)
     return _engine
+
+
+def resetWorkflowEngine() -> None:
+    global _engine
+    _engine = None

@@ -1,0 +1,163 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+from .checker import debuggingPatternRef, detectErrorClass
+from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
+from .misconceptionCatalog import matchOutcomes
+from .predictionDiff import ActualResult, comparePrediction, extractErrorClass
+from .sectionContract import LearningPredictContract
+
+
+class CurriculumCheckInvalid(ValueError):
+    pass
+
+
+class CurriculumCheckSessionMissing(LookupError):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
+class CurriculumCheckPrediction:
+    expectedShape: str = ""
+    expectedDtype: str = ""
+    expectedValue: str = ""
+    expectedError: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class CurriculumCheckInput:
+    sessionId: str
+    studentCode: str
+    expectedCode: str = ""
+    checkType: str = "output"
+    variableName: str = ""
+    expectedValue: str = ""
+    requiredPatterns: list[str] = field(default_factory=list)
+    hints: list[str] = field(default_factory=list)
+    currentHintLevel: int = 0
+    category: str = ""
+    contentId: str = ""
+    sectionId: str = ""
+    prediction: CurriculumCheckPrediction | None = None
+
+
+async def runCurriculumCheckFlow(
+    *,
+    curriculumOs: Any,
+    learnerStateStore: Any,
+    progressTracker: Any,
+    request: CurriculumCheckInput,
+    sessionManager: Any,
+) -> dict[str, object]:
+    session = sessionManager.getSession(request.sessionId)
+    if session is None:
+        raise CurriculumCheckSessionMissing("Session not found.")
+
+    try:
+        result = await runExerciseCheck(
+            session,
+            ExerciseCheckInput(
+                studentCode=request.studentCode,
+                expectedCode=request.expectedCode,
+                checkType=request.checkType,
+                variableName=request.variableName,
+                expectedValue=request.expectedValue,
+                requiredPatterns=list(request.requiredPatterns),
+                hints=list(request.hints),
+                currentHintLevel=request.currentHintLevel,
+            ),
+        )
+    except InvalidExerciseCheck as exc:
+        raise CurriculumCheckInvalid(str(exc)) from exc
+
+    payload = result.payload()
+    creditedOutcomes: list[str] = []
+    autoValidatedOutcomes: list[str] = []
+    sectionOutcomes: list[str] = []
+    if request.category and request.contentId and request.sectionId:
+        progressTracker.recordSectionResult(
+            request.category,
+            request.contentId,
+            request.sectionId,
+            passed=result.passed,
+            hintLevel=result.hintLevel,
+        )
+        graph = curriculumOs.graph()
+        lesson = graph.byKey(f"{request.category}/{request.contentId}")
+        sectionOutcomes = list(
+            lesson.outcomesForSection(request.sectionId) if lesson else []
+        )
+        if result.passed and sectionOutcomes:
+            creditedOutcomes, autoValidatedOutcomes = progressTracker.creditCheckPass(
+                request.category,
+                request.contentId,
+                request.sectionId,
+                sectionOutcomes,
+                hintLevel=result.hintLevel,
+            )
+    payload["creditedOutcomes"] = creditedOutcomes
+    payload["autoValidatedOutcomes"] = autoValidatedOutcomes
+
+    misconceptionPayload: list[dict[str, object]] = []
+    doneCriterionViolated = False
+    predictionDiffPayload: dict[str, object] | None = None
+    if sectionOutcomes:
+        errorText = payload.get("detail") or payload.get("studentOutput") or ""
+        usedPredictionSignal = False
+        if request.prediction is not None:
+            predict = LearningPredictContract(
+                expectedShape=request.prediction.expectedShape,
+                expectedDtype=request.prediction.expectedDtype,
+                expectedValue=request.prediction.expectedValue,
+                expectedError=request.prediction.expectedError,
+            )
+            if not predict.isEmpty():
+                actual = ActualResult(
+                    value=str(payload.get("studentOutput") or ""),
+                    errorClass=extractErrorClass(str(payload.get("detail") or "")),
+                )
+                diff = comparePrediction(predict, actual)
+                predictionDiffPayload = diff.model_dump()
+                if diff.overall != "skipped":
+                    for outcomeId in sectionOutcomes:
+                        learnerStateStore.recordPredictionResult(outcomeId, diff)
+                    usedPredictionSignal = True
+
+        if not usedPredictionSignal:
+            for outcomeId in sectionOutcomes:
+                learnerStateStore.recordOutcomeAttempt(outcomeId, success=result.passed)
+
+        if not result.passed:
+            for outcomeId, entry in matchOutcomes(
+                sectionOutcomes,
+                code=request.studentCode or "",
+                errorText=str(errorText),
+            ):
+                hit, repeatStatus = learnerStateStore.recordMisconception(entry.id, outcomeId)
+                if repeatStatus == "repeat":
+                    doneCriterionViolated = True
+                misconceptionPayload.append({
+                    "misconceptionId": entry.id,
+                    "outcomeId": outcomeId,
+                    "label": entry.label,
+                    "summary": entry.summary,
+                    "diagnostic": entry.diagnostic.model_dump(),
+                    "correction": entry.correction.model_dump(),
+                    "repeatStatus": repeatStatus,
+                    "hitCount": hit.hitCount,
+                })
+    payload["misconceptionMatches"] = misconceptionPayload
+    payload["doneCriterionViolated"] = doneCriterionViolated
+    payload["predictionDiff"] = predictionDiffPayload
+
+    errorContext = " ".join([
+        str(payload.get("studentOutput") or ""),
+        str(payload.get("detail") or ""),
+        str(payload.get("feedback") or ""),
+    ])
+    errorClass = detectErrorClass(errorContext) if not result.passed else ""
+    payload["errorClass"] = errorClass
+    payload["debuggingPatternRef"] = debuggingPatternRef(errorClass)
+    return payload

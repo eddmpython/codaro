@@ -12,7 +12,6 @@ from pydantic import ValidationError
 from codaro.api.spaRouter import createSpaRouter
 
 import codaro.api.aiRouter as aiRouterModule
-import codaro.api.systemRouter as systemRouterModule
 from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
 from codaro.ai.conversation import ConversationManager
 from codaro.ai.oauthToken import TokenRefreshError
@@ -21,6 +20,7 @@ from codaro.ai.providerSpec import oauthSecretName
 from codaro.ai.providers import oauthChatgptProvider as oauthProviderModule
 from codaro.ai.secrets import SecretStore
 import codaro.server as serverModule
+import codaro.system.localDiagnostics as localDiagnosticsModule
 from codaro.document import createEmptyDocument
 from codaro.kernel.protocol import WsExecuteMessage
 from codaro.runtime import LocalEngine
@@ -269,8 +269,8 @@ def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch,
             }
 
     monkeypatch.setenv("OPENAI_API_KEY", "sk-diagnosticenv123456")
-    monkeypatch.setattr(systemRouterModule, "getProfileManager", lambda: _ProfileManager())
-    monkeypatch.setattr(systemRouterModule.shutil, "which", lambda name: None if name == "uv" else "tool")
+    monkeypatch.setattr(localDiagnosticsModule, "getProfileManager", lambda: _ProfileManager())
+    monkeypatch.setattr(localDiagnosticsModule.shutil, "which", lambda name: None if name == "uv" else "tool")
 
     def missingProjectPython():
         raise packageOps.PackageEnvironmentError(
@@ -278,7 +278,7 @@ def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch,
             "Project .venv missing with sk-diagnosticenv123456",
         )
 
-    monkeypatch.setattr(systemRouterModule.packageOps, "getProjectPythonPath", missingProjectPython)
+    monkeypatch.setattr(localDiagnosticsModule.packageOps, "getProjectPythonPath", missingProjectPython)
     monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path / "missing-web-build")
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
 
@@ -316,8 +316,8 @@ def testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload(monkeypa
             }
 
     monkeypatch.setenv("OPENAI_API_KEY", "sk-exportenv123456")
-    monkeypatch.setattr(systemRouterModule, "getProfileManager", lambda: _ProfileManager())
-    monkeypatch.setattr(systemRouterModule.shutil, "which", lambda name: None if name == "uv" else "tool")
+    monkeypatch.setattr(localDiagnosticsModule, "getProfileManager", lambda: _ProfileManager())
+    monkeypatch.setattr(localDiagnosticsModule.shutil, "which", lambda name: None if name == "uv" else "tool")
 
     def missingProjectPython():
         raise packageOps.PackageEnvironmentError(
@@ -325,7 +325,7 @@ def testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload(monkeypa
             "Project .venv missing with sk-exportenv123456",
         )
 
-    monkeypatch.setattr(systemRouterModule.packageOps, "getProjectPythonPath", missingProjectPython)
+    monkeypatch.setattr(localDiagnosticsModule.packageOps, "getProjectPythonPath", missingProjectPython)
     monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path / "missing-web-build")
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
 

@@ -1,7 +1,13 @@
 from __future__ import annotations
 
-import uuid
 from typing import Any
+
+from ...document.blockOperations import (
+    DocumentOperationError,
+    insertDocumentBlock,
+    removeDocumentBlock,
+    updateDocumentBlock,
+)
 
 
 class WorkbenchToolHandlers:
@@ -10,46 +16,40 @@ class WorkbenchToolHandlers:
         blockType = args["blockType"]
         content = args["content"]
         position = args.get("position", -1)
-
-        from codaro.document.models import BlockConfig
-
-        blockId = f"block-{uuid.uuid4().hex[:8]}"
-        newBlock = BlockConfig(id=blockId, type=blockType, content=content)
-
-        if position < 0 or position >= len(doc.blocks):
-            doc.blocks.append(newBlock)
-        else:
-            doc.blocks.insert(position, newBlock)
-
+        result = insertDocumentBlock(
+            doc,
+            blockType=blockType,
+            content=content,
+            position=position,
+        )
         self._saveDocument(doc)
-        return {"blockId": blockId, "position": position, "type": blockType}
+        assert result.block is not None
+        return {"blockId": result.block.id, "position": position, "type": result.block.type}
 
     async def _handle_updateBlock(self, args: dict[str, Any]) -> dict[str, Any]:
         doc = self._getDocument()
         blockId = args["blockId"]
         content = args["content"]
 
-        for block in doc.blocks:
-            if block.id == blockId:
-                block.content = content
-                self._saveDocument(doc)
-                return {"blockId": blockId, "updated": True}
-
-        return {"error": f"Block not found: {blockId}"}
+        try:
+            updateDocumentBlock(doc, blockId=blockId, content=content)
+        except DocumentOperationError as error:
+            return {"error": error.message, "code": error.code}
+        self._saveDocument(doc)
+        return {"blockId": blockId, "updated": True}
 
     async def _handle_deleteBlock(self, args: dict[str, Any]) -> dict[str, Any]:
         doc = self._getDocument()
         blockId = args["blockId"]
 
-        for i, block in enumerate(doc.blocks):
-            if block.id == blockId:
-                doc.blocks.pop(i)
-                session = self._getSession()
-                session.removeCellDefinitions(blockId)
-                self._saveDocument(doc)
-                return {"blockId": blockId, "deleted": True}
-
-        return {"error": f"Block not found: {blockId}"}
+        try:
+            removeDocumentBlock(doc, blockId=blockId)
+        except DocumentOperationError as error:
+            return {"error": error.message, "code": error.code}
+        session = self._getSession()
+        session.removeCellDefinitions(blockId)
+        self._saveDocument(doc)
+        return {"blockId": blockId, "deleted": True}
 
     async def _handle_getBlocks(self, args: dict[str, Any]) -> dict[str, Any]:
         doc = self._getDocument()
@@ -100,28 +100,24 @@ class WorkbenchToolHandlers:
         doc = self._getDocument()
         operation = args["operation"]
 
-        from codaro.document.models import BlockConfig
-
         if operation == "insert":
             blockType = args.get("blockType", "code")
             content = args.get("content", "")
             position = args.get("position", -1)
-            blockId = f"block-{uuid.uuid4().hex[:8]}"
-            newBlock = BlockConfig(id=blockId, type=blockType, content=content)
-
-            if position < 0 or position >= len(doc.blocks):
-                doc.blocks.append(newBlock)
-                resolvedPosition = len(doc.blocks) - 1
-            else:
-                doc.blocks.insert(position, newBlock)
-                resolvedPosition = position
+            result = insertDocumentBlock(
+                doc,
+                blockType=blockType,
+                content=content,
+                position=position,
+            )
 
             self._saveDocument(doc)
+            assert result.block is not None
             return {
                 "operation": operation,
-                "blockId": blockId,
-                "position": resolvedPosition,
-                "type": blockType,
+                "blockId": result.block.id,
+                "position": result.toIndex,
+                "type": result.block.type,
             }
 
         if operation == "update":
@@ -132,30 +128,28 @@ class WorkbenchToolHandlers:
             if content is None:
                 return {"error": "content is required for update"}
 
-            for block in doc.blocks:
-                if block.id == blockId:
-                    block.content = content
-                    self._saveDocument(doc)
-                    return {"operation": operation, "blockId": blockId, "updated": True}
-
-            return {"error": f"Block not found: {blockId}"}
+            try:
+                updateDocumentBlock(doc, blockId=blockId, content=content)
+            except DocumentOperationError as error:
+                return {"error": error.message, "code": error.code}
+            self._saveDocument(doc)
+            return {"operation": operation, "blockId": blockId, "updated": True}
 
         if operation == "delete":
             blockId = args.get("blockId")
             if not blockId:
                 return {"error": "blockId is required for delete"}
 
-            for index, block in enumerate(doc.blocks):
-                if block.id == blockId:
-                    doc.blocks.pop(index)
-                    if self._activeSessionId:
-                        session = self._sessionManager.getSession(self._activeSessionId)
-                        if session is not None:
-                            session.removeCellDefinitions(blockId)
-                    self._saveDocument(doc)
-                    return {"operation": operation, "blockId": blockId, "deleted": True}
-
-            return {"error": f"Block not found: {blockId}"}
+            try:
+                removeDocumentBlock(doc, blockId=blockId)
+            except DocumentOperationError as error:
+                return {"error": error.message, "code": error.code}
+            if self._activeSessionId:
+                session = self._sessionManager.getSession(self._activeSessionId)
+                if session is not None:
+                    session.removeCellDefinitions(blockId)
+            self._saveDocument(doc)
+            return {"operation": operation, "blockId": blockId, "deleted": True}
 
         return {"error": f"Unknown write-cell operation: {operation}"}
 

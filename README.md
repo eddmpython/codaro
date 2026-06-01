@@ -44,6 +44,19 @@
 
 > **한 줄로** — 그냥 Python을 쓰면, 엔진이 셀 격리·의존 추적·재실행을 자동으로 합니다. 같은 셀이 학습 카드가 되고, 같은 `.py`가 자동화 태스크가 됩니다.
 
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/brand/screenshots/chatHome.webp" alt="Codaro 채팅 시작 화면 — 마스코트와 함께 '무엇을 만들까요?' 자연어 프롬프트로 레슨·자동화·태스크를 시작" /><br/>
+      <sub><strong>채팅</strong> — "이걸 배우고 싶어 / 만들어줘"를 자연어로 시작</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/brand/screenshots/curriculumSurface.webp" alt="Codaro 커리큘럼 표면 — 카테고리 트리 사이드바와 레슨의 예측·실행·검증·재사용 실무 흐름" /><br/>
+      <sub><strong>커리큘럼</strong> — 카테고리 트리에서 레슨 카드로 진입</sub>
+    </td>
+  </tr>
+</table>
+
 ## 다운로드 & 빠른 시작
 
 **비개발자도 더블클릭이면 끝.** 시스템 Python·uv·설정 전부 필요 없습니다 — 런처가 전부 자동으로 처리합니다.

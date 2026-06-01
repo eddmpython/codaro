@@ -1,14 +1,21 @@
 from __future__ import annotations
 
-import uuid
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter
 
-from ..document.models import BlockConfig, CodaroDocument, ExportRequest, ExportResponse, LoadRequest, SaveRequest
+from ..document.blockOperations import (
+    DocumentOperationError,
+    insertBlock,
+    loadCodeBlockForExecution,
+    moveBlock,
+    removeBlock,
+    updateBlock,
+)
+from ..document.models import ExportRequest, ExportResponse, LoadRequest, SaveRequest
 from ..document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
-from ..kernel.executionPayload import executeKernelBlock
+from ..kernel.documentExecution import executeDocumentCodeBlock
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import WorkspacePathError, resolvePath
 from .appState import ServerState
@@ -25,6 +32,10 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
             return resolvePath(rawPath, state.workspaceRoot)
         except WorkspacePathError:
             fail(403, "document_path_outside_workspace", "Path must stay within the active workspace.")
+
+    def failDocumentOperation(error: DocumentOperationError) -> None:
+        statusCode = 404 if error.kind == "not_found" else 400
+        fail(statusCode, error.code, error.message)
 
     @router.post("/api/document/load")
     def apiLoadDocument(request: LoadRequest) -> dict[str, Any]:
@@ -75,109 +86,93 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
     @router.post("/api/document/insert-block")
     def apiInsertBlock(request: InsertBlockRequest) -> dict[str, Any]:
         path = safeResolvePath(request.path)
-        if not path.exists():
-            fail(404, "document_not_found", "Document not found.")
-        document = loadDocument(str(path))
-        newBlock = BlockConfig(
-            id=f"block-{uuid.uuid4().hex[:8]}",
-            type=request.type,
-            content=request.content,
-        )
-        if not request.anchorBlockId:
-            document.blocks.append(newBlock)
-        else:
-            anchorIndex = findBlockIndex(document, request.anchorBlockId)
-            insertionIndex = anchorIndex if request.direction == "before" else anchorIndex + 1
-            document.blocks.insert(insertionIndex, newBlock)
-        saveDocument(str(path), document)
+        try:
+            result = insertBlock(
+                path,
+                anchorBlockId=request.anchorBlockId,
+                direction=request.direction,
+                blockType=request.type,
+                content=request.content,
+            )
+        except DocumentOperationError as error:
+            failDocumentOperation(error)
+        assert result.block is not None
         logger.debug(
             "document-block %s",
             formatLogFields(
                 action="insert",
                 path=path,
-                blockId=newBlock.id,
-                blockType=newBlock.type,
+                blockId=result.block.id,
+                blockType=result.block.type,
                 direction=request.direction,
                 anchorBlockId=request.anchorBlockId,
-                blockCount=len(document.blocks),
+                blockCount=result.blockCount,
             ),
         )
-        return {"blockId": newBlock.id, "document": document.model_dump()}
+        return {"blockId": result.block.id, "document": result.document.model_dump()}
 
     @router.post("/api/document/remove-block")
     def apiRemoveBlock(request: RemoveBlockRequest) -> dict[str, Any]:
         path = safeResolvePath(request.path)
-        if not path.exists():
-            fail(404, "document_not_found", "Document not found.")
-        document = loadDocument(str(path))
-        document.blocks = [block for block in document.blocks if block.id != request.blockId]
-        saveDocument(str(path), document)
+        try:
+            result = removeBlock(path, blockId=request.blockId)
+        except DocumentOperationError as error:
+            failDocumentOperation(error)
         logger.debug(
             "document-block %s",
             formatLogFields(
                 action="remove",
                 path=path,
                 blockId=request.blockId,
-                blockCount=len(document.blocks),
+                blockCount=result.blockCount,
             ),
         )
-        return {"document": document.model_dump()}
+        return {"document": result.document.model_dump()}
 
     @router.post("/api/document/move-block")
     def apiMoveBlock(request: MoveBlockRequest) -> dict[str, Any]:
         path = safeResolvePath(request.path)
-        if not path.exists():
-            fail(404, "document_not_found", "Document not found.")
-        if request.offset == 0:
-            fail(400, "document_move_invalid_offset", "Move offset must be non-zero.")
-        document = loadDocument(str(path))
-        index = findBlockIndex(document, request.blockId)
-        nextIndex = index + request.offset
-        if nextIndex < 0 or nextIndex >= len(document.blocks):
-            fail(400, "document_move_out_of_range", "Move out of range.")
-        block = document.blocks.pop(index)
-        document.blocks.insert(nextIndex, block)
-        saveDocument(str(path), document)
+        try:
+            result = moveBlock(path, blockId=request.blockId, offset=request.offset)
+        except DocumentOperationError as error:
+            failDocumentOperation(error)
         logger.debug(
             "document-block %s",
             formatLogFields(
                 action="move",
                 path=path,
                 blockId=request.blockId,
-                fromIndex=index,
-                toIndex=nextIndex,
+                fromIndex=result.fromIndex,
+                toIndex=result.toIndex,
                 offset=request.offset,
             ),
         )
-        return {"document": document.model_dump()}
+        return {"document": result.document.model_dump()}
 
     @router.post("/api/document/update-block")
     def apiUpdateBlock(request: UpdateBlockRequest) -> dict[str, Any]:
         path = safeResolvePath(request.path)
-        if not path.exists():
-            fail(404, "document_not_found", "Document not found.")
-        if request.content is None and request.type is None:
-            fail(400, "document_block_update_empty", "No block fields were provided for update.")
-        document = loadDocument(str(path))
-        index = findBlockIndex(document, request.blockId)
-        block = document.blocks[index]
-        if request.content is not None:
-            block = block.model_copy(update={"content": request.content})
-        if request.type is not None:
-            block = block.model_copy(update={"type": request.type})
-        document.blocks[index] = block
-        saveDocument(str(path), document)
+        try:
+            result = updateBlock(
+                path,
+                blockId=request.blockId,
+                content=request.content,
+                blockType=request.type,
+            )
+        except DocumentOperationError as error:
+            failDocumentOperation(error)
+        assert result.block is not None
         logger.debug(
             "document-block %s",
             formatLogFields(
                 action="update",
                 path=path,
                 blockId=request.blockId,
-                blockType=block.type,
-                contentLength=len(block.content),
+                blockType=result.block.type,
+                contentLength=len(result.block.content),
             ),
         )
-        return {"block": block.model_dump(), "document": document.model_dump()}
+        return {"block": result.block.model_dump(), "document": result.document.model_dump()}
 
     @router.post("/api/document/run-block")
     async def apiRunBlock(request: RunBlockRequest) -> dict[str, Any]:
@@ -185,14 +180,11 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         if session is None:
             fail(404, "session_not_found", "Session not found.")
         path = safeResolvePath(request.path)
-        if not path.exists():
-            fail(404, "document_not_found", "Document not found.")
-        document = loadDocument(str(path))
-        index = findBlockIndex(document, request.blockId)
-        block = document.blocks[index]
-        if block.type != "code":
-            fail(400, "document_block_not_code", "Block is not a code block.")
-        payload = await executeKernelBlock(session, block.content, blockId=block.id)
+        try:
+            block = loadCodeBlockForExecution(path, blockId=request.blockId)
+        except DocumentOperationError as error:
+            failDocumentOperation(error)
+        payload = await executeDocumentCodeBlock(session, block)
         logger.debug(
             "document-run %s",
             formatLogFields(
@@ -206,10 +198,3 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         return {"result": payload.httpPayload(), "blockId": block.id}
 
     return router
-
-
-def findBlockIndex(document: CodaroDocument, blockId: str) -> int:
-    for index, block in enumerate(document.blocks):
-        if block.id == blockId:
-            return index
-    fail(404, "document_block_not_found", f"Block {blockId} not found.")

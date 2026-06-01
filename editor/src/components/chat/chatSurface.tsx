@@ -1,11 +1,11 @@
 import {
   AssistantComposer,
   AssistantMessages,
-  aiProfileReady,
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/lib/localeContext";
+import { providerProfileReady } from "@/lib/providerProfile";
 import type { AssistantMessage } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
@@ -55,7 +55,7 @@ export function ChatSurface({
 }) {
   const { t } = useLocale();
   const isEmptyChat = !messages.length && !pendingBlocks.length && loadState !== "loading";
-  const providerReady = apiOnline && aiProfileReady(aiProfile);
+  const providerReady = apiOnline && providerProfileReady(aiProfile);
   const heroExamples: ChatSurfaceExample[] = examples ?? [
     { label: t("chat.example.pandas"), prompt: t("chat.example.pandas.prompt") },
     { label: t("chat.example.browser"), prompt: t("chat.example.browser.prompt") },

@@ -19,7 +19,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { codaroApi } from "@/lib/api";
+import {
+  createSharePackAutomationTask,
+  exportSharePackArchive,
+  inspectSharePackSource,
+  installSharePackSource,
+  loadSharePackAutomation,
+  loadSharePackLibrary,
+  removeInstalledSharePack,
+} from "@/lib/sharePackOperations";
 import type {
   SharePackAutomationPayload,
   SharePackIssue,
@@ -55,12 +63,9 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
 
   const loadInstalled = useCallback(async () => {
     if (!apiOnline) return;
-    const [nextStatus, nextPacks] = await Promise.all([
-      codaroApi.sharePackStatus(),
-      codaroApi.sharePacks(),
-    ]);
-    setStatus(nextStatus);
-    setPacks(nextPacks);
+    const snapshot = await loadSharePackLibrary();
+    setStatus(snapshot.status);
+    setPacks(snapshot.packs);
   }, [apiOnline]);
 
   useEffect(() => {
@@ -76,7 +81,7 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      const nextPreview = await codaroApi.inspectSharePack(trimmedSource);
+      const nextPreview = await inspectSharePackSource(trimmedSource);
       setPreview(nextPreview);
     } catch (inspectError) {
       setPreview(null);
@@ -93,7 +98,7 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      await codaroApi.installSharePack(trimmedSource);
+      await installSharePackSource(trimmedSource);
       await loadInstalled();
       setNotice("공유 팩을 설치했습니다.");
     } catch (installError) {
@@ -109,7 +114,7 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      await codaroApi.uninstallSharePack(pack.id, pack.version);
+      await removeInstalledSharePack(pack);
       await loadInstalled();
       setAutomationPreview(null);
       setNotice(`${pack.title} 팩을 제거했습니다.`);
@@ -142,7 +147,7 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      setAutomationPreview(await codaroApi.sharePackAutomation(pack.id, path, pack.version));
+      setAutomationPreview(await loadSharePackAutomation(pack, path));
     } catch (previewError) {
       setError(previewError instanceof Error ? previewError.message : String(previewError));
     } finally {
@@ -157,12 +162,9 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      const payload = await codaroApi.createSharePackAutomationTask(pack.id, {
-        path,
-        version: pack.version,
-      });
+      const task = await createSharePackAutomationTask(pack, path);
       onTaskCreated();
-      setNotice(`자동화 태스크를 등록했습니다: ${payload.task.name}`);
+      setNotice(`자동화 태스크를 등록했습니다: ${task.name}`);
     } catch (taskError) {
       setError(taskError instanceof Error ? taskError.message : String(taskError));
     } finally {
@@ -178,8 +180,8 @@ export function SharePackSurface({ apiOnline, onOpenCurriculum, onTaskCreated }:
     setError("");
     setNotice("");
     try {
-      const payload = await codaroApi.exportSharePack(sourceDir, outputPath);
-      setNotice(`공유용 zip을 만들었습니다: ${payload.outputPath}`);
+      const exportedPath = await exportSharePackArchive(sourceDir, outputPath);
+      setNotice(`공유용 zip을 만들었습니다: ${exportedPath}`);
     } catch (exportError) {
       setError(exportError instanceof Error ? exportError.message : String(exportError));
     } finally {

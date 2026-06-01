@@ -367,7 +367,7 @@ export const docsPages = [
       "multi-editor-modes"
     ],
     "title": "제품 표면 모드",
-    "description": "Product surface principles for chat, editor, curriculum, and automation.",
+    "description": "Product surface principles for conversation, current learning, notebook, and automation.",
     "section": "identity",
     "sectionLabel": "Identity",
     "order": 109,
@@ -919,7 +919,7 @@ export const docsSections = [
           "multi-editor-modes"
         ],
         "title": "제품 표면 모드",
-        "description": "Product surface principles for chat, editor, curriculum, and automation.",
+        "description": "Product surface principles for conversation, current learning, notebook, and automation.",
         "section": "identity",
         "sectionLabel": "Identity",
         "order": 109,

@@ -1,5 +1,6 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
 import type { PendingTarget } from "@/lib/assistantResponsePlan";
+import type { CustomCurriculumEntry } from "@/lib/customCurricula";
 import {
   buildAcceptPendingChangesApplication,
   buildRejectPendingChangesApplication,
@@ -11,11 +12,12 @@ import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 type SaveCurriculum = (
   blocks: BlockConfig[],
   title?: string,
-) => { title: string } | null;
+) => CustomCurriculumEntry | null;
 
 type UsePendingChangesStateOptions = {
   applyDraftUpdates: (updates: Record<string, string>) => void;
   document: CodaroDocument;
+  openCurriculum: (entry: CustomCurriculumEntry, options?: { showNotice?: boolean }) => void;
   replaceDocument: (document: CodaroDocument) => void;
   saveCurriculum: SaveCurriculum;
   selectNotebookBlock: (blockId: string) => void;
@@ -26,6 +28,7 @@ type UsePendingChangesStateOptions = {
 export function usePendingChangesState({
   applyDraftUpdates,
   document,
+  openCurriculum,
   replaceDocument,
   saveCurriculum,
   selectNotebookBlock,
@@ -42,8 +45,13 @@ export function usePendingChangesState({
 
   const applyPendingChangesApplication = useCallback((application: PendingChangesApplication | null) => {
     if (!application) return;
+    let openedCurriculum = false;
     if (application.curriculumToSave) {
-      saveCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
+      const entry = saveCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
+      if (entry) {
+        openCurriculum(entry, { showNotice: true });
+        openedCurriculum = true;
+      }
     }
     if (application.documentToApply) {
       replaceDocument(application.documentToApply);
@@ -58,13 +66,13 @@ export function usePendingChangesState({
       setPendingBlocks([]);
     }
     setPendingTarget(application.pendingTarget);
-    if (application.surfaceToOpen) {
+    if (application.surfaceToOpen && !openedCurriculum) {
       setSurface(application.surfaceToOpen);
     }
     if (application.notice) {
       onNotice(application.notice);
     }
-  }, [applyDraftUpdates, onNotice, replaceDocument, saveCurriculum, selectNotebookBlock, setSurface]);
+  }, [applyDraftUpdates, onNotice, openCurriculum, replaceDocument, saveCurriculum, selectNotebookBlock, setSurface]);
 
   const acceptPendingBlocks = useCallback(() => {
     applyPendingChangesApplication(buildAcceptPendingChangesApplication({

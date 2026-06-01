@@ -73,12 +73,16 @@ export function useCurriculumNavigationState({
     }
   }, [applyCurriculumSelectionState, onNotice, setSelectedCustomCurriculumId, setSurface]);
 
+  const openCustomCurriculum = useCallback((
+    entry: CustomCurriculumEntry,
+    options: { showNotice?: boolean } = {},
+  ) => {
+    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, options));
+  }, [applyCustomCurriculumApplication]);
+
   const saveCustomCurriculum = useCallback((blocks: BlockConfig[], title?: string) => {
-    const entry = saveCustomCurriculumEntry(blocks, title);
-    if (!entry) return null;
-    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, { showNotice: true }));
-    return entry;
-  }, [applyCustomCurriculumApplication, saveCustomCurriculumEntry]);
+    return saveCustomCurriculumEntry(blocks, title);
+  }, [saveCustomCurriculumEntry]);
 
   const selectCurriculumCategory = useCallback((key: string) => {
     const selection = selectCurriculumCategoryState(key);
@@ -116,6 +120,7 @@ export function useCurriculumNavigationState({
   return {
     deleteCustomCurriculum,
     filteredCategories,
+    openCustomCurriculum,
     query,
     saveCustomCurriculum,
     selectCustomCurriculum,

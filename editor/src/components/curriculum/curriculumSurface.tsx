@@ -34,13 +34,8 @@ import { learningCellCatalog } from "@/components/app/learningCellCatalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { codaroApi } from "@/lib/api";
-import type { CellAiHelpState } from "@/lib/assistantTypes";
-import { CODARO_LINKS } from "@/lib/externalLinks";
-import { useLocale } from "@/lib/localeContext";
-import { CurriculumProgressBadge } from "./curriculumProgressBadge";
-import { LessonComments } from "./lessonComments";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import type { CellAiHelpState } from "@/lib/assistantTypes";
 import {
   blockLabel,
   classifyLearningCell,
@@ -50,14 +45,19 @@ import {
   type CellAiAction,
   type LearningCellKind,
 } from "@/lib/cellModel";
+import { installCurriculumPackage, listCurriculumPackages } from "@/lib/curriculumPackagePreparation";
 import { statusLabel } from "@/lib/displayFormat";
+import { CODARO_LINKS } from "@/lib/externalLinks";
+import { useLocale } from "@/lib/localeContext";
 import { inferDocumentPackages, normalizePackageName } from "@/lib/packageInference";
 import { cn } from "@/lib/utils";
 import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
+import { CurriculumProgressBadge } from "./curriculumProgressBadge";
 import {
   CurriculumMarkdownBody,
   curriculumCellTone,
 } from "./curriculumMarkdownBody";
+import { LessonComments } from "./lessonComments";
 
 type ResultMap = Record<string, ExecutionResult>;
 
@@ -413,7 +413,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
       setHasChecked(false);
       setError(null);
       try {
-        const packages = await codaroApi.packagesList();
+        const packages = await listCurriculumPackages();
         if (!cancelled) setInstalledPackages(packages);
       } catch (refreshError) {
         if (!cancelled) setError(errorText(refreshError));
@@ -456,7 +456,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
     for (const [index, packageName] of packagesToInstall.entries()) {
       setInstallProgress({ name: packageName, index: index + 1, total: packagesToInstall.length });
       try {
-        const result = await codaroApi.packageInstall(packageName);
+        const result = await installCurriculumPackage(packageName);
         setLastMessage(packageInstallStatusText(result));
         if (!result.success) {
           setError(firstMessageLine(result.message) || `${packageName} 설치에 실패했습니다.`);
@@ -472,7 +472,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
 
     try {
       setChecking(true);
-      setInstalledPackages(await codaroApi.packagesList());
+      setInstalledPackages(await listCurriculumPackages());
     } catch (refreshError) {
       setError(errorText(refreshError));
     } finally {
@@ -1026,6 +1026,18 @@ function StructuredSectionLearningBody({
             </div>
           ) : null}
         </div>
+      ) : null}
+
+      {parts.check ? (
+        <StructuredSectionBand
+          detail={parts.check.description || stripMarkdown(readPayloadText(section.contract?.why))}
+          icon={<ListChecks className="size-3.5" />}
+          label="검증 기준"
+          part="check"
+          title={blockLabel(parts.check)}
+        >
+          <CurriculumMarkdownBody block={parts.check} hideRepeatedTitle />
+        </StructuredSectionBand>
       ) : null}
 
       {parts.extraBlocks.length ? (

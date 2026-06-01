@@ -1,5 +1,4 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
-import { aiProviderName } from "@/components/assistant/assistantPanel";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import {
   buildCellAiPrompt,
@@ -15,16 +14,20 @@ import {
 } from "@/lib/assistantConversationState";
 import { runAssistantProviderTurn } from "@/lib/assistantProviderTurn";
 import {
+  assistantResponseNotice,
   buildAssistantResponseApplication,
   mergePendingBlocks,
+  type CurriculumToSave,
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
 import { buildAssistantTurnRequest } from "@/lib/assistantTurnRequest";
 import {
-  runAssistantLocalTurn,
-  type SaveCurriculum,
+  buildAssistantLocalTurnApplication,
+  completeAssistantLocalTurn,
 } from "@/lib/assistantLocalTurn";
+import type { CustomCurriculumEntry } from "@/lib/customCurricula";
 import { providerAssistantFailure } from "@/lib/providerConnection";
+import { providerProfileName } from "@/lib/providerProfile";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import type {
@@ -46,6 +49,7 @@ type UseAssistantTurnStateOptions = {
   drafts: Record<string, string>;
   profile: AiProfile | null;
   results: ResultMap;
+  openCurriculum: (entry: CustomCurriculumEntry, options?: { showNotice?: boolean }) => void;
   saveCurriculum: SaveCurriculum;
   selectedBlock: BlockConfig | undefined;
   selectCurriculumBlock: (blockId: string) => void;
@@ -60,6 +64,11 @@ type UseAssistantTurnStateOptions = {
   onNotice: (notice: AppNotice) => void;
 };
 
+type SaveCurriculum = (
+  blocks: BlockConfig[],
+  title?: string,
+) => CustomCurriculumEntry | null;
+
 export function useAssistantTurnState({
   activeDocument,
   apiOnline,
@@ -69,6 +78,7 @@ export function useAssistantTurnState({
   drafts,
   profile,
   results,
+  openCurriculum,
   saveCurriculum,
   selectedBlock,
   selectCurriculumBlock,
@@ -88,6 +98,14 @@ export function useAssistantTurnState({
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [cellHelpByBlockId, setCellHelpByBlockId] = useState<Record<string, CellAiHelpState>>({});
   const [assistantLoading, setAssistantLoading] = useState(false);
+
+  const saveAndOpenCurriculum = useCallback((curriculumToSave: CurriculumToSave | null) => {
+    if (!curriculumToSave) return "";
+    const entry = saveCurriculum(curriculumToSave.blocks, curriculumToSave.title);
+    if (!entry) return curriculumToSave.title ?? "";
+    openCurriculum(entry);
+    return entry.title;
+  }, [openCurriculum, saveCurriculum]);
 
   const askAssistant = useCallback(async (
     messageOverride?: string,
@@ -116,16 +134,25 @@ export function useAssistantTurnState({
     setAssistantLoading(true);
 
     if (!apiOnline) {
-      const localResult = runAssistantLocalTurn({
+      const localApplication = buildAssistantLocalTurnApplication({
         message,
-        saveCurriculum,
         scope: activeScope,
       });
-      if (localResult.clearPendingBlocks) {
+      const savedCurriculumTitle = saveAndOpenCurriculum(localApplication.curriculumToSave);
+      const localResult = completeAssistantLocalTurn({
+        application: localApplication,
+        message,
+        savedCurriculumTitle,
+        scope: activeScope,
+      });
+      if (localApplication.clearPendingBlocks) {
         setPendingBlocks([]);
       }
-      if (localResult.pendingTarget) {
-        setPendingTarget(localResult.pendingTarget);
+      if (localApplication.pendingTarget) {
+        setPendingTarget(localApplication.pendingTarget);
+      }
+      if (localApplication.surfaceToOpen && !localApplication.curriculumToSave) {
+        setSurface(localApplication.surfaceToOpen);
       }
       setMessages((current) => [...current, localResult.assistantMessage]);
       if (cellTargetBlockId) {
@@ -150,7 +177,7 @@ export function useAssistantTurnState({
       ...current,
       createAssistantPlaceholder({
         id: assistantMessageId,
-        provider: aiProviderName(profile),
+        provider: providerProfileName(profile),
       }),
     ]);
 
@@ -193,12 +220,12 @@ export function useAssistantTurnState({
         activeScope,
         message,
         response,
-        saveCurriculum,
       });
+      const savedCurriculumTitle = saveAndOpenCurriculum(application.curriculumToSave);
       if (application.documentToApply) {
         applyDocument(application.documentToApply);
       }
-      if (application.surfaceToOpen) {
+      if (application.surfaceToOpen && !application.curriculumToSave) {
         setSurface(application.surfaceToOpen);
       }
       if (application.pendingBlocks.length) {
@@ -227,7 +254,11 @@ export function useAssistantTurnState({
           },
         }));
       }
-      onNotice(application.notice);
+      onNotice(assistantResponseNotice({
+        activeScope,
+        response,
+        savedCurriculumTitle: savedCurriculumTitle || application.curriculumToSave?.title || "",
+      }));
     } catch (error) {
       const failure = providerAssistantFailure(error);
       setMessages((current) => failAssistantMessage({
@@ -266,7 +297,7 @@ export function useAssistantTurnState({
     profile,
     prompt,
     results,
-    saveCurriculum,
+    saveAndOpenCurriculum,
     selectedBlock,
     sessionId,
     setPendingBlocks,

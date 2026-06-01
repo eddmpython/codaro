@@ -27,7 +27,6 @@ from ..ai.profileMutation import (
 )
 from ..ai.providerValidation import validateProviderConnection
 from ..ai.providerErrors import ProviderRuntimeError, providerErrorPayload
-from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
 )
@@ -35,8 +34,8 @@ from ..ai.teacher import (
     TeacherConversationNotFound,
     TeacherRuntimeTurnRequest,
     prepareTeacherRuntimeTurnFromRequest,
-    runTeacherChatLoop,
-    runTeacherChatStream,
+    runTeacherRuntimeTurn,
+    streamTeacherRuntimeTurn,
     teacherStreamSseFrame,
 )
 
@@ -44,7 +43,6 @@ logger = logging.getLogger(__name__)
 
 _HANDLED_ERRORS = (
     AttributeError,
-    ChatGPTOAuthError,
     ProviderRuntimeError,
     ConnectionError,
     FileNotFoundError,
@@ -198,15 +196,9 @@ def createAiRouter(state: Any) -> APIRouter:
         )
 
         try:
-            return await runTeacherChatLoop(
-                provider=runtimeTurn.turn.provider,
+            return await runTeacherRuntimeTurn(
+                runtimeTurn,
                 convManager=convManager,
-                conversationId=runtimeTurn.turn.conversationId,
-                messages=runtimeTurn.turn.messages,
-                tools=runtimeTurn.turn.tools,
-                executor=runtimeTurn.executor,
-                orchestrator=runtimeTurn.orchestrator,
-                clarificationPlan=runtimeTurn.turn.clarificationPlan,
             )
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
@@ -224,15 +216,9 @@ def createAiRouter(state: Any) -> APIRouter:
         )
 
         async def _streamGenerate():
-            async for event in runTeacherChatStream(
-                provider=runtimeTurn.turn.provider,
+            async for event in streamTeacherRuntimeTurn(
+                runtimeTurn,
                 convManager=convManager,
-                conversationId=runtimeTurn.turn.conversationId,
-                messages=runtimeTurn.turn.messages,
-                tools=runtimeTurn.turn.tools,
-                executor=runtimeTurn.executor,
-                orchestrator=runtimeTurn.orchestrator,
-                clarificationPlan=runtimeTurn.turn.clarificationPlan,
             ):
                 yield teacherStreamSseFrame(event)
 

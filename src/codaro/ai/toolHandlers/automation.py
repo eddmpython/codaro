@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import time
-import uuid
 from pathlib import Path
 from typing import Any
+
+from ...document.blockOperations import insertDocumentBlock
 
 
 class AutomationToolHandlers:
@@ -407,26 +408,27 @@ class AutomationToolHandlers:
         loadedInEditor = False
         blockId: str | None = None
         if loadInEditor:
-            from codaro.document.models import BlockConfig
-
             doc = self._getDocument()
-            blockId = f"automation-{uuid.uuid4().hex[:8]}"
-            doc.blocks.append(BlockConfig(
-                id=blockId,
-                type="automation",
+            result = insertDocumentBlock(
+                doc,
+                idPrefix="automation",
+                blockType="automation",
+                content=draft.automationBody,
+                position=-1,
                 role="automation",
                 executionKind="python",
                 displayKind="cell",
                 sourceType="automationAuthoring",
                 title=draft.title,
                 description=draft.description,
-                content=draft.automationBody,
                 payload={
                     "recipePath": savedPath,
                     "dryRunFirst": draft.dryRunFirst,
                     "authoringTool": "write-automation-recipe",
                 },
-            ))
+            )
+            assert result.block is not None
+            blockId = result.block.id
             self._saveDocument(doc)
             loadedInEditor = self._documentSetter is not None
 
@@ -549,72 +551,34 @@ class AutomationToolHandlers:
         }
 
     async def _handle_voiceListen(self, args: dict[str, Any]) -> dict[str, Any]:
-        import asyncio
+        from codaro.automation.voiceFlow import listenAutomationVoicePayload
 
-        from codaro.automation.eStop import getEmergencyStop
-
-        getEmergencyStop().check()
-
-        duration = min(args.get("duration", 5), 30)
-        language = args.get("language", "en")
-
-        from codaro.automation.voice.whisperEngine import WhisperEngine
-
-        engine = WhisperEngine()
-        try:
-            engine.startListening(language=language)
-            await asyncio.sleep(duration)
-            result = engine.stopListening()
-        finally:
-            engine.dispose()
-
-        if result is None:
-            return {"error": "No audio captured", "text": ""}
-
-        return result.serialize()
+        return await listenAutomationVoicePayload(
+            duration=args.get("duration", 5),
+            language=args.get("language", "en"),
+            includeEmptyText=True,
+            enforceStop=True,
+        )
 
     async def _handle_voiceSpeak(self, args: dict[str, Any]) -> dict[str, Any]:
-        from codaro.automation.eStop import getEmergencyStop
+        from codaro.automation.voiceFlow import speakAutomationVoicePayload
 
-        getEmergencyStop().check()
-
-        text = args["text"]
-        rate = args.get("rate", 150)
-
-        from codaro.automation.voice.pyttsx3Speaker import Pyttsx3Speaker
-
-        speaker = Pyttsx3Speaker()
-        try:
-            speaker.speak(text, rate=rate)
-        finally:
-            speaker.dispose()
-
-        return {"spoken": True, "text": text, "rate": rate}
+        return speakAutomationVoicePayload(
+            text=args["text"],
+            rate=args.get("rate", 150),
+            enforceStop=True,
+        )
 
     async def _handle_sendNotification(self, args: dict[str, Any]) -> dict[str, Any]:
-        from codaro.automation.audit import getAuditTrail
-        from codaro.automation.eStop import getEmergencyStop
+        from codaro.automation.notificationFlow import sendAutomationNotificationPayload
 
-        getEmergencyStop().check()
-
-        channel = args["channel"]
-        message = args["message"]
-
-        from codaro.automation.shared import getSharedMessageBridge
-
-        bridge = getSharedMessageBridge()
-
-        if channel == "all":
-            results = bridge.broadcast(message)
-            getAuditTrail().record("sendNotification", "ai", {"channel": "all", "resultCount": len(results)})
-            return {
-                "broadcast": True,
-                "results": [r.serialize() for r in results],
-            }
-
-        result = bridge.send(channel, message)
-        getAuditTrail().record("sendNotification", "ai", {"channel": channel, "success": result.success})
-        return result.serialize()
+        return sendAutomationNotificationPayload(
+            channel=args["channel"],
+            message=args["message"],
+            auditSource="ai",
+            enforceStop=True,
+            includeBroadcastFlag=True,
+        )
 
     async def _handle_emergencyStop(self, args: dict[str, Any]) -> dict[str, Any]:
         from codaro.automation.eStop import getEmergencyStop

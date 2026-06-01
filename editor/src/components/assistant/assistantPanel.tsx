@@ -25,6 +25,17 @@ import type {
   AssistantMessage,
   AssistantWorkStep,
 } from "@/lib/assistantTypes";
+import {
+  providerProfileName,
+  providerProfileReady,
+} from "@/lib/providerProfile";
+import {
+  formatDuration,
+  formatPayload,
+  groupAssistantSteps,
+  traceWorkloopEvents,
+  traceWorkloopRowDetail,
+} from "@/lib/workLoop";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { useLocale } from "@/lib/localeContext";
 import {
@@ -194,7 +205,7 @@ export function AssistantMessages({
                             <span>{message.content.trim() ? t("assistant.writingResponse") : t("assistant.startingResponse")}</span>
                           </div>
                         ) : null}
-                        {needsProvider && !aiProfileReady(aiProfile) ? (
+                        {needsProvider && !providerProfileReady(aiProfile) ? (
                           <ProviderConnectAction
                             aiConnecting={aiConnecting}
                             apiOnline={apiOnline}
@@ -416,13 +427,6 @@ function TraceWorkloopRow({ event }: { event: AiTraceWorkloopEvent }) {
   );
 }
 
-function traceWorkloopRowDetail(event: AiTraceWorkloopEvent) {
-  if (event.error && event.workDetail && event.error !== event.workDetail) {
-    return `${event.workDetail} · ${event.error}`;
-  }
-  return event.error || event.workDetail;
-}
-
 function ToolPayloadBlock({ label, tone = "default", value }: { label: string; tone?: "default" | "error"; value: unknown }) {
   return (
     <div className={cn("rounded-md bg-muted/20 px-2 py-1.5", tone === "error" && "bg-destructive/10 text-destructive")}>
@@ -430,96 +434,6 @@ function ToolPayloadBlock({ label, tone = "default", value }: { label: string; t
       <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-5">{formatPayload(value)}</pre>
     </div>
   );
-}
-
-function formatPayload(value: unknown) {
-  if (value === undefined || value === null || value === "") return translate("common.none");
-  if (typeof value === "string") return value;
-  try {
-    return JSON.stringify(value, null, 2).slice(0, 2000);
-  } catch {
-    return String(value);
-  }
-}
-
-function groupAssistantSteps(steps: AssistantWorkStep[]) {
-  const groups: Array<{ key: string; label: string; steps: AssistantWorkStep[]; errorCount: number }> = [];
-  for (const step of steps) {
-    const key = stepGroupKey(step);
-    const existing = groups.find((group) => group.key === key);
-    if (existing) {
-      existing.steps.push(step);
-      if (step.status === "error") existing.errorCount += 1;
-      continue;
-    }
-    groups.push({
-      key,
-      label: stepGroupLabel(step, key),
-      steps: [step],
-      errorCount: step.status === "error" ? 1 : 0,
-    });
-  }
-  return groups;
-}
-
-function stepGroupKey(step: AssistantWorkStep) {
-  return step.lane || step.category || (step.toolName ? "tool" : "compose");
-}
-
-function stepGroupLabel(step: AssistantWorkStep, key: string) {
-  if (step.lane) return laneLabel(step.lane);
-  if (step.category) return categoryLabel(step.category);
-  if (key === "compose") return "요청 준비";
-  return "도구 실행";
-}
-
-function laneLabel(lane: string) {
-  switch (lane) {
-    case "curriculum":
-      return "커리큘럼 설계";
-    case "read":
-      return "상태 확인";
-    case "write":
-      return "노트북 반영";
-    case "cell-call":
-      return "셀 실행/검증";
-    case "progress":
-      return "진도 기록";
-    case "automation":
-      return "자동화";
-    case "safety":
-      return "안전 확인";
-    default:
-      return lane;
-  }
-}
-
-function categoryLabel(category: string) {
-  switch (category) {
-    case "runtime":
-      return "런타임";
-    case "learning":
-      return "학습 구성";
-    case "workbench":
-      return "워크벤치";
-    case "files":
-      return "파일/패키지";
-    case "automation":
-      return "자동화";
-    case "safety":
-      return "안전";
-    default:
-      return category;
-  }
-}
-
-function traceWorkloopEvents(trace?: AiTraceSummary): AiTraceWorkloopEvent[] {
-  return Array.isArray(trace?.workloop) ? trace.workloop : [];
-}
-
-function formatDuration(milliseconds: number) {
-  if (milliseconds < 1000) return `${milliseconds}ms`;
-  return `${(milliseconds / 1000).toFixed(1)}s`;
 }
 
 export function AssistantComposer({
@@ -595,14 +509,6 @@ export function AssistantComposer({
   );
 }
 
-export function aiProviderName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? translate("common.defaultProvider"));
-}
-
-export function aiProfileReady(profile: AiProfile | null) {
-  return Boolean(profile?.ready ?? profile?.enabled);
-}
-
 function AssistantHeader({
   aiConnecting,
   aiProfile,
@@ -631,16 +537,16 @@ function AssistantHeader({
             <div className="mt-1 text-xs leading-5 text-muted-foreground">{assistantStatusText(apiOnline, aiProfile)}</div>
           ) : (
             <div className="mt-1 flex flex-wrap gap-2">
-              <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-                {apiOnline && aiProfileReady(aiProfile) ? t("assistant.providerConnected") : t("provider.fallbackMode")}
+              <Badge variant={apiOnline && providerProfileReady(aiProfile) ? "secondary" : "outline"}>
+                {apiOnline && providerProfileReady(aiProfile) ? t("assistant.providerConnected") : t("provider.fallbackMode")}
               </Badge>
-              <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
+              <Badge variant={providerProfileReady(aiProfile) ? "secondary" : "outline"}>{providerProfileName(aiProfile)}</Badge>
             </div>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {compact ? (
-            apiOnline && !aiProfileReady(aiProfile) ? (
+            apiOnline && !providerProfileReady(aiProfile) ? (
               <Button className="h-8 gap-1.5 px-2 text-xs" disabled={aiConnecting} size="sm" variant="outline" onClick={onConnectAi}>
                 {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
                 Provider
@@ -665,7 +571,7 @@ function AssistantHeader({
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
   const locale = getActiveLocale();
   if (!apiOnline) return translateWithLocale(locale, "assistant.providerFallbackDetail");
-  if (!aiProfileReady(profile)) return translateWithLocale(locale, "assistant.providerNeedsConnection");
+  if (!providerProfileReady(profile)) return translateWithLocale(locale, "assistant.providerNeedsConnection");
   return translateWithLocale(locale, "assistant.providerLiveDetail");
 }
 
