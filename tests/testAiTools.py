@@ -147,6 +147,12 @@ class TestToolRegistry:
         assert "Prefer write-curriculum-yaml" in description
         assert "structured section-card lessons" in description
 
+    def test_automation_task_tool_requires_dry_run_percent_format_recipe(self):
+        schema = next(schema for schema in toolSchemas() if schema["function"]["name"] == "create-automation-task")
+        description = schema["function"]["description"]
+
+        assert "dry-run percent-format automation recipe" in description
+
     def test_every_tool_has_required_fields(self):
         for tool in allTools():
             assert tool.name
@@ -332,12 +338,12 @@ class TestAutomationAuthoringTools:
         assert block.payload["recipePath"] == str(recipePath)
         assert "DRY_RUN = True" in block.content
 
-    def test_create_automation_task_registers_validated_recipe(self, tmp_path, monkeypatch):
+    def test_create_automation_task_registers_dry_run_recipe(self, tmp_path, monkeypatch):
         monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
         taskRegistryModule._registry = None
         recipePath = tmp_path / "recipes" / "report.py"
         recipePath.parent.mkdir()
-        recipePath.write_text("# %% [automation]\nprint('ok')\n", encoding="utf-8")
+        recipePath.write_text("# %% [automation]\nDRY_RUN = True\n\nprint('ok')\n", encoding="utf-8")
         executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
 
         result = asyncio.run(executor.execute("create-automation-task", {
@@ -355,6 +361,7 @@ class TestAutomationAuthoringTools:
         assert result["task"]["description"] == "Daily report task"
         assert result["task"]["schedule"] == "@every_15m"
         assert result["task"]["inputs"] == {"dryRun": True}
+        assert result["recipeValidation"] == {"percentFormat": True, "dryRunFirst": True}
         assert (tmp_path / "home" / "tasks" / "index.json").exists()
 
     def test_create_automation_task_rejects_missing_recipe(self, tmp_path, monkeypatch):
@@ -369,6 +376,22 @@ class TestAutomationAuthoringTools:
 
         taskRegistryModule._registry = None
         assert result["error"] == "Automation recipe not found: missing.py"
+
+    def test_create_automation_task_rejects_recipe_without_dry_run(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+        taskRegistryModule._registry = None
+        recipePath = tmp_path / "recipes" / "unsafe.py"
+        recipePath.parent.mkdir()
+        recipePath.write_text("# %% [automation]\nprint('writes now')\n", encoding="utf-8")
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+
+        result = asyncio.run(executor.execute("create-automation-task", {
+            "name": "Unsafe",
+            "documentPath": "recipes/unsafe.py",
+        }))
+
+        taskRegistryModule._registry = None
+        assert result["error"] == "Automation task requires DRY_RUN = True before registration."
 
 
 class TestGuide:

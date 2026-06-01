@@ -25,6 +25,12 @@ class AutomationTaskDraft:
     inputs: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class AutomationTaskRecipeValidation:
+    percentFormat: bool
+    dryRunFirst: bool
+
+
 def buildAutomationRecipeDraft(
     *,
     title: str,
@@ -82,6 +88,14 @@ def buildAutomationTaskDraft(
         schedule=normalizedSchedule,
         inputs=dict(inputs or {}),
     )
+
+
+def validateAutomationTaskRecipeText(recipeText: str) -> AutomationTaskRecipeValidation:
+    if "# %% [automation]" not in recipeText:
+        raise ValueError("Automation task requires a percent-format automation cell.")
+    if "DRY_RUN = True" not in recipeText:
+        raise ValueError("Automation task requires DRY_RUN = True before registration.")
+    return AutomationTaskRecipeValidation(percentFormat=True, dryRunFirst=True)
 
 
 def automationRecipeSlug(title: str) -> str:

@@ -549,6 +549,16 @@ def testAutomationHandlersUseNotificationFlowForExternalChannels() -> None:
     assert ".send(channel, message)" not in source
 
 
+def testAutomationHandlersUseRecipeAuthoringBoundaryForTaskValidation() -> None:
+    handlerSource = (ROOT / "src/codaro/ai/toolHandlers/automation.py").read_text(encoding="utf-8")
+    recipeSource = (ROOT / "src/codaro/automation/recipeAuthoring.py").read_text(encoding="utf-8")
+
+    assert "validateAutomationTaskRecipeText" in handlerSource
+    assert "def validateAutomationTaskRecipeText" in recipeSource
+    assert "Automation task requires DRY_RUN = True before registration." in recipeSource
+    assert "DRY_RUN = True" not in handlerSource
+
+
 def testAutomationHandlersUseVoiceFlowForVoiceEngines() -> None:
     source = (ROOT / "src/codaro/ai/toolHandlers/automation.py").read_text(encoding="utf-8")
 

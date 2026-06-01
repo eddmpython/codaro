@@ -442,7 +442,7 @@ class AutomationToolHandlers:
         }
 
     async def _handle_createAutomationTask(self, args: dict[str, Any]) -> dict[str, Any]:
-        from codaro.automation.recipeAuthoring import buildAutomationTaskDraft
+        from codaro.automation.recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
         from codaro.automation.taskRegistry import getTaskRegistry
 
         try:
@@ -459,6 +459,12 @@ class AutomationToolHandlers:
         recipePath = Path(self._validatePath(draft.documentPath))
         if not recipePath.is_file():
             return {"error": f"Automation recipe not found: {draft.documentPath}"}
+        try:
+            recipeValidation = validateAutomationTaskRecipeText(recipePath.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError) as exc:
+            return {"error": f"Automation recipe could not be read: {exc}"}
+        except ValueError as exc:
+            return {"error": str(exc)}
 
         task = getTaskRegistry().create(
             name=draft.name,
@@ -471,6 +477,10 @@ class AutomationToolHandlers:
             "created": True,
             "task": task.serialize(),
             "documentPath": str(recipePath),
+            "recipeValidation": {
+                "percentFormat": recipeValidation.percentFormat,
+                "dryRunFirst": recipeValidation.dryRunFirst,
+            },
         }
 
     async def _handle_runAutomation(self, args: dict[str, Any]) -> dict[str, Any]:

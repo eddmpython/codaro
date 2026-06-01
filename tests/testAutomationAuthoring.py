@@ -6,6 +6,7 @@ from codaro.automation.recipeAuthoring import (
     automationRecipeSlug,
     buildAutomationRecipeDraft,
     buildAutomationTaskDraft,
+    validateAutomationTaskRecipeText,
 )
 
 
@@ -62,3 +63,16 @@ def testBuildAutomationTaskDraftRejectsNonObjectInputs() -> None:
             documentPath="automations/report.py",
             inputs=["bad"],
         )
+
+
+def testValidateAutomationTaskRecipeRequiresPercentFormatDryRun() -> None:
+    validation = validateAutomationTaskRecipeText("# %% [automation]\nDRY_RUN = True\n\nprint('ready')\n")
+
+    assert validation.percentFormat is True
+    assert validation.dryRunFirst is True
+
+    with pytest.raises(ValueError, match="percent-format automation cell"):
+        validateAutomationTaskRecipeText("DRY_RUN = True\nprint('ready')\n")
+
+    with pytest.raises(ValueError, match="DRY_RUN = True"):
+        validateAutomationTaskRecipeText("# %% [automation]\nprint('ready')\n")

@@ -286,7 +286,7 @@ TOOL_WRITE_AUTOMATION_RECIPE = ToolDef(
 
 TOOL_CREATE_AUTOMATION_TASK = ToolDef(
     name="create-automation-task",
-    description="Register a saved automation recipe or document as a runnable task.",
+    description="Register a saved dry-run percent-format automation recipe as a runnable task.",
     parameters={
         "type": "object",
         "properties": {
