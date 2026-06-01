@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useLocale } from "@/lib/localeContext";
-import { PRODUCT_SIDEBAR_NAV } from "@/lib/surfaceModel";
+import { PRODUCT_SIDEBAR_FLOW_ITEMS } from "@/lib/surfaceModel";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 
@@ -34,10 +34,9 @@ const surfaceIcons: Record<SurfaceMode, ComponentType<{ className?: string }>> =
 
 export function ProductFlowNav({ surface, onSurfaceChange }: ProductFlowNavProps) {
   const { t } = useLocale();
-  const navItems = PRODUCT_SIDEBAR_NAV.map((item, index) => ({
+  const navItems = PRODUCT_SIDEBAR_FLOW_ITEMS.map((item) => ({
     ...item,
     Icon: surfaceIcons[item.value],
-    flowStep: index + 1,
     label: t(item.labelKey),
   }));
 

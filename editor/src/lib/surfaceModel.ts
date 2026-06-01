@@ -13,6 +13,10 @@ export type ProductSurfaceNavItem = {
   visibleInSidebar: boolean;
 };
 
+export type ProductSidebarFlowItem = ProductSurfaceNavItem & {
+  flowStep: number;
+};
+
 export const PRODUCT_SURFACE_NAV: readonly ProductSurfaceNavItem[] = [
   { value: "chat", labelKey: "nav.chat", flowRole: "entry", beta: false, visibleInSidebar: true },
   { value: "curriculum", labelKey: "nav.curriculum", flowRole: "learning", beta: false, visibleInSidebar: true },
@@ -27,6 +31,11 @@ export const SURFACE_MODES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV.map((it
 
 export const PRODUCT_SIDEBAR_NAV: readonly ProductSurfaceNavItem[] = PRODUCT_SURFACE_NAV
   .filter((item) => item.visibleInSidebar);
+
+export const PRODUCT_SIDEBAR_FLOW_ITEMS: readonly ProductSidebarFlowItem[] = PRODUCT_SIDEBAR_NAV.map((item, index) => ({
+  ...item,
+  flowStep: index + 1,
+}));
 
 export const SIDEBAR_SURFACES: readonly SurfaceMode[] = PRODUCT_SIDEBAR_NAV.map((item) => item.value);
 

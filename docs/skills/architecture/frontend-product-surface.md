@@ -23,7 +23,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - `editor/`가 Codaro의 실제 제품 UI 표면이다.
 - 사용자에게 보이는 제품 표면은 **대화**, **현재 학습**, **노트북**, **자동화** 네 가지다.
 - 사이드바 표면 순서는 `대화 → 현재 학습 → 노트북 → 자동화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 대화에서 시작해 산출물을 관리하고 실행하는 흐름이다.
-- `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. 컴포넌트가 별도 배열로 표면 순서나 숨김 정책을 복사하면 실패다.
+- `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. `PRODUCT_SIDEBAR_NAV`는 보이는 표면만, `PRODUCT_SIDEBAR_FLOW_ITEMS`는 여기서 파생한 사이드바 흐름 단계다. 컴포넌트가 별도 배열로 표면 순서, 숨김 정책, 단계 번호를 복사하면 실패다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell이다. flow nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
 - 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다.
 - 폐기된 이전 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다.
@@ -36,7 +36,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 ## 현재 구조 평가
 
-- 표면 순서, 제품 흐름 역할, 사이드바 노출, 기본 진입점은 `editor/src/lib/surfaceModel.ts`에 모여 있다. 이 파일이 제품 표면 모델의 SSOT다.
+- 표면 순서, 제품 흐름 역할, 사이드바 노출, 사이드바 흐름 단계, 기본 진입점은 `editor/src/lib/surfaceModel.ts`에 모여 있다. 이 파일이 제품 표면 모델의 SSOT다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell로 남아 있다. 흐름 nav는 `productFlowNav.tsx`, 현재 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
 - `editor/src/components/app/mainSurface.tsx`는 표면 조립만 맡는다. 요청 범위 분류는 `editor/src/lib/teacherScope.ts`, assistant 산출물 라우팅은 `editor/src/lib/assistantArtifactRouting.ts`, 응답 적용 계획은 `editor/src/lib/assistantResponsePlan.ts`, pending 적용은 `editor/src/lib/pendingChanges.ts`가 맡는다.
 - `editor/src/components/chat/chatSurface.tsx`는 대화 입구, provider 연결 버튼, 시작 예시, pending notebook bar만 다룬다. 커리큘럼 tree, 자동화 tree, YAML 카드, 패키지 준비 내부를 직접 알면 실패다.
@@ -49,7 +49,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | 파일 | 책임 |
 | --- | --- |
 | `editor/src/lib/surfaceModel.ts` | `대화 → 현재 학습 → 노트북 → 자동화` 순서, flow role, visible/hidden, 기본 표면 |
-| `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_NAV`만 읽어 사이드바 흐름 nav 렌더링 |
+| `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`만 읽어 사이드바 흐름 nav 렌더링 |
 | `editor/src/components/app/productSidebar.tsx` | sidebar shell, terminal utility, 현재 표면의 focused tree 배치 |
 | `editor/src/components/app/mainSurface.tsx` | 표면 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직 금지 |
 | `editor/src/components/chat/chatSurface.tsx` | 채팅 입구와 provider 연결 행동. curriculum/automation 내부 구현 import 금지 |
@@ -66,7 +66,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 ## 덕지덕지 위험과 제거 기준
 
-- 표면 순서나 노출 정책을 `surfaceModel.ts` 밖에서 별도 배열로 복사하면 실패다. 컴포넌트는 `PRODUCT_SURFACE_NAV`가 아니라 필요한 파생값만 읽는다.
+- 표면 순서, 노출 정책, 흐름 단계 번호를 `surfaceModel.ts` 밖에서 별도 배열이나 index 계산으로 복사하면 실패다. 컴포넌트는 `PRODUCT_SURFACE_NAV`가 아니라 필요한 파생값만 읽는다.
 - `productSidebar.tsx`가 커리큘럼 tree 생성, 자동화 tree 생성, 삭제 dialog, 표면 icon map까지 직접 품으면 실패다. focused 파일로 되돌린다.
 - `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정이 들어오면 실패다. `editor/src/lib/*` 또는 전용 hook으로 이동한다.
 - `chatSurface.tsx`가 `curriculumSidebarTree`, `automationSidebarTree`, YAML 카드 렌더러, 패키지 준비 내부를 import하면 실패다. 채팅은 입구와 provider 연결만 책임진다.

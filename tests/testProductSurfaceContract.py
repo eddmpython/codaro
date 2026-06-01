@@ -42,6 +42,9 @@ def testProductSurfaceNavKeepsConversationFirstFlow() -> None:
     assert 'DEFAULT_SURFACE: SurfaceMode = "chat"' in source
     assert "SURFACE_MODES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV.map" in source
     assert "PRODUCT_SIDEBAR_NAV: readonly ProductSurfaceNavItem[] = PRODUCT_SURFACE_NAV" in source
+    assert "ProductSidebarFlowItem = ProductSurfaceNavItem &" in source
+    assert "PRODUCT_SIDEBAR_FLOW_ITEMS: readonly ProductSidebarFlowItem[] = PRODUCT_SIDEBAR_NAV.map" in source
+    assert "flowStep: index + 1" in source
     assert "SIDEBAR_SURFACES: readonly SurfaceMode[] = PRODUCT_SIDEBAR_NAV.map" in source
     assert "isSurfaceMode(value: string)" in source
     assert "PRODUCT_SURFACE_NAV" in source
@@ -73,8 +76,10 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "CustomCurriculumDeleteDialog" not in source
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
-    assert "PRODUCT_SIDEBAR_NAV" in flowNav
+    assert "PRODUCT_SIDEBAR_FLOW_ITEMS" in flowNav
+    assert "PRODUCT_SIDEBAR_NAV" not in flowNav
     assert "PRODUCT_SURFACE_NAV" not in flowNav
+    assert "flowStep: index + 1" not in flowNav
     assert 'data-product-nav="flow"' in flowNav
     assert 'data-product-flow-hierarchy="chat-first"' in flowNav
     assert 'data-product-nav="utility"' in source
@@ -197,6 +202,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`tests/verifyDogfoodAlphaAudit.py`",
         "`PRODUCT_SURFACE_NAV`",
         "`PRODUCT_SIDEBAR_NAV`",
+        "`PRODUCT_SIDEBAR_FLOW_ITEMS`",
         "primary route",
         "second loop",
         "호환 레이어",
