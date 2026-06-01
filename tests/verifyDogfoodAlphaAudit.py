@@ -154,6 +154,28 @@ DOGFOOD_REQUIREMENTS = (
         ),
     ),
     DogfoodRequirement(
+        requirementId="provider-not-ready-fallback-before-live-call",
+        requirement="When the API is online but the provider is not ready, chat uses local fallback and opens provider setup before making a live provider call.",
+        evidenceChecks=(
+            ("docs/skills/ops/product/dogfood-alpha.md", (
+                "연결 전에는 fallback 안내만 보며 연결 후에는 실제 provider 응답",
+            )),
+            ("editor/src/hooks/useAssistantTurnState.ts", (
+                "const providerReady = providerProfileReady(profile)",
+                "if (!apiOnline || !providerReady)",
+                "buildAssistantLocalTurnApplication",
+                "translate(\"provider.connectionRequired.title\")",
+                "translate(\"assistant.providerLoginRequired\")",
+                "onProviderConnectionRequired?.()",
+                "runAssistantProviderTurn",
+            )),
+            ("tests/testFrontendBoundary.py", (
+                "testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady",
+                "providerFallbackIndex < providerCallIndex",
+            )),
+        ),
+    ),
+    DogfoodRequirement(
         requirementId="live-provider-smoke-path",
         requirement="The opt-in live provider gate covers real answer, teacher answer, clarification, goal-discovery, gap-only YAML tool loop, and cell-call loop.",
         evidenceChecks=(

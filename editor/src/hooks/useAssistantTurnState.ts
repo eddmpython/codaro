@@ -29,7 +29,7 @@ import {
 } from "@/lib/assistantLocalTurn";
 import type { CustomCurriculumEntry } from "@/lib/customCurricula";
 import { providerAssistantFailure } from "@/lib/providerConnection";
-import { providerProfileName } from "@/lib/providerProfile";
+import { providerProfileName, providerProfileReady } from "@/lib/providerProfile";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import type {
@@ -114,10 +114,10 @@ export function useAssistantTurnState({
   const providerConnectionPromptedRef = useRef(false);
 
   useEffect(() => {
-    if (!apiOnline || profile?.ready) {
+    if (!apiOnline || providerProfileReady(profile)) {
       providerConnectionPromptedRef.current = false;
     }
-  }, [apiOnline, profile?.ready]);
+  }, [apiOnline, profile]);
 
   const saveAndOpenCurriculum = useCallback((curriculumToSave: CurriculumToSave | null) => {
     if (!curriculumToSave) return "";
@@ -173,7 +173,8 @@ export function useAssistantTurnState({
     setPrompt("");
     setAssistantLoading(true);
 
-    if (!apiOnline) {
+    const providerReady = providerProfileReady(profile);
+    if (!apiOnline || !providerReady) {
       const localApplication = buildAssistantLocalTurnApplication({
         message,
         scope: activeScope,
@@ -198,7 +199,19 @@ export function useAssistantTurnState({
           },
         }));
       }
-      onNotice(localResult.notice);
+      if (apiOnline && !providerReady) {
+        onNotice({
+          tone: "warning",
+          title: translate("provider.connectionRequired.title"),
+          detail: translate("assistant.providerLoginRequired"),
+        });
+        if (!providerConnectionPromptedRef.current) {
+          providerConnectionPromptedRef.current = true;
+          onProviderConnectionRequired?.();
+        }
+      } else {
+        onNotice(localResult.notice);
+      }
       setAssistantLoading(false);
       return;
     }
