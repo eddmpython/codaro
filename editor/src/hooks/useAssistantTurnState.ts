@@ -17,9 +17,11 @@ import {
   assistantResponseNotice,
   buildAssistantResponseApplication,
   mergePendingBlocks,
+} from "@/lib/assistantResponsePlan";
+import {
   type CurriculumToSave,
   type PendingTarget,
-} from "@/lib/assistantResponsePlan";
+} from "@/lib/assistantArtifactRouting";
 import { buildAssistantTurnRequest } from "@/lib/assistantTurnRequest";
 import {
   buildAssistantLocalTurnApplication,

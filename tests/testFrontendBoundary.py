@@ -135,7 +135,29 @@ def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
 
     assert "saveCurriculum" not in source
     assert "curriculumToSave: plan.curriculumToSave" in source
-    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null' in source
+    assert "routeAssistantArtifacts(plan)" in source
+
+
+def testAssistantArtifactRoutingOwnsChatArtifactSurfaceTransitions() -> None:
+    route = _read("editor/src/lib/assistantArtifactRouting.ts")
+    responsePlan = _read("editor/src/lib/assistantResponsePlan.ts")
+    localTurn = _read("editor/src/lib/assistantLocalTurn.ts")
+    pendingChanges = _read("editor/src/lib/pendingChanges.ts")
+    pendingHook = _read("editor/src/hooks/usePendingChangesState.ts")
+    ssotMap = _read("docs/skills/architecture/ssot-map.md")
+
+    assert "export function routeAssistantArtifacts" in route
+    assert "export function surfaceForAcceptedPendingTarget" in route
+    assert "hasPendingNotebookChange" in route
+    assert "hasNotebookArtifact" in route
+    assert 'surfaceToOpen: input.curriculumToSave ? "curriculum" : hasNotebookArtifact ? "editor" : null' in route
+    assert 'surfaceToOpen: "automation"' not in route
+    assert 'type PendingTarget = "notebook" | "curriculum"' in route
+    assert 'from "@/lib/assistantArtifactRouting"' in responsePlan
+    assert 'from "@/lib/assistantArtifactRouting"' in localTurn
+    assert 'from "@/lib/assistantArtifactRouting"' in pendingChanges
+    assert 'from "@/lib/assistantResponsePlan"' not in pendingHook
+    assert "`editor/src/lib/assistantArtifactRouting.ts`" in ssotMap
 
 
 def testAssistantContextSteersGoalDiscoveryBeforeYamlAuthoring() -> None:
@@ -275,6 +297,8 @@ def testAssistantPanelKeepsWorkloopViewModelInLibBoundary() -> None:
 def testPendingCurriculumChangesOpenCurrentLearningSurface() -> None:
     source = _read("editor/src/lib/pendingChanges.ts")
     hook = _read("editor/src/hooks/usePendingChangesState.ts")
+    route = _read("editor/src/lib/assistantArtifactRouting.ts")
 
-    assert 'surfaceToOpen: "curriculum"' in source
+    assert "surfaceForAcceptedPendingTarget(pendingTarget)" in source
+    assert 'return target === "curriculum" ? "curriculum" : "editor"' in route
     assert "openCurriculum(entry, { showNotice: true })" in hook

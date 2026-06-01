@@ -1,4 +1,7 @@
-import type { PendingTarget } from "@/lib/assistantResponsePlan";
+import {
+  surfaceForAcceptedPendingTarget,
+  type PendingTarget,
+} from "@/lib/assistantArtifactRouting";
 import {
   appendUniqueBlocks,
   draftsFromBlocks,
@@ -33,6 +36,8 @@ export function buildAcceptPendingChangesApplication({
 }): PendingChangesApplication | null {
   if (!pendingBlocks.length) return null;
 
+  const surfaceToOpen = surfaceForAcceptedPendingTarget(pendingTarget);
+
   if (pendingTarget === "curriculum") {
     return {
       clearPendingBlocks: true,
@@ -42,7 +47,7 @@ export function buildAcceptPendingChangesApplication({
       notice: null,
       pendingTarget: "notebook",
       selectedBlockId: "",
-      surfaceToOpen: "curriculum",
+      surfaceToOpen,
     };
   }
 
@@ -59,7 +64,7 @@ export function buildAcceptPendingChangesApplication({
     },
     pendingTarget: "notebook",
     selectedBlockId: firstCodeBlockId(pendingBlocks),
-    surfaceToOpen: "editor",
+    surfaceToOpen,
   };
 }
 

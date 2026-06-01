@@ -4,7 +4,11 @@ import {
   completeLocalAssistantDraft,
   type LocalAssistantDraft,
 } from "@/lib/localFallback";
-import type { CurriculumToSave, PendingTarget } from "@/lib/assistantResponsePlan";
+import {
+  routeAssistantArtifacts,
+  type CurriculumToSave,
+  type PendingTarget,
+} from "@/lib/assistantArtifactRouting";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type { AppNotice, BlockConfig } from "@/types";
@@ -34,13 +38,20 @@ export function buildAssistantLocalTurnApplication({
 }): AssistantLocalTurnApplication {
   const draft = buildLocalAssistantDraft(message, scope);
   const pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks;
+  const curriculumToSave = draft.shouldSaveCurriculum ? { blocks: draft.generatedBlocks } : null;
+  const route = routeAssistantArtifacts({
+    clearPendingBlocks: draft.clearPendingBlocks,
+    curriculumToSave,
+    documentToApply: null,
+    pendingBlocks,
+  });
   return {
     clearPendingBlocks: draft.clearPendingBlocks,
-    curriculumToSave: draft.shouldSaveCurriculum ? { blocks: draft.generatedBlocks } : null,
+    curriculumToSave,
     draft,
     pendingBlocks,
-    pendingTarget: draft.clearPendingBlocks || pendingBlocks.length ? "notebook" : null,
-    surfaceToOpen: draft.shouldSaveCurriculum ? "curriculum" : pendingBlocks.length ? "editor" : null,
+    pendingTarget: route.pendingTarget,
+    surfaceToOpen: route.surfaceToOpen,
   };
 }
 

@@ -1,5 +1,5 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
-import type { PendingTarget } from "@/lib/assistantResponsePlan";
+import type { PendingTarget } from "@/lib/assistantArtifactRouting";
 import type { CustomCurriculumEntry } from "@/lib/customCurricula";
 import {
   buildAcceptPendingChangesApplication,

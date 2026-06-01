@@ -1,5 +1,10 @@
 import { buildLocalBlocksFromPrompt } from "@/lib/localFallback";
 import { translate } from "@/lib/localeCopy";
+import {
+  routeAssistantArtifacts,
+  type CurriculumToSave,
+  type PendingTarget,
+} from "@/lib/assistantArtifactRouting";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import {
@@ -7,13 +12,6 @@ import {
   documentFromToolCalls,
 } from "@/lib/toolCallDocuments";
 import type { AiChatResponse, AppNotice, BlockConfig, CodaroDocument } from "@/types";
-
-export type PendingTarget = "notebook" | "curriculum";
-
-export type CurriculumToSave = {
-  blocks: BlockConfig[];
-  title?: string;
-};
 
 export type AssistantResponsePlan = {
   clearPendingBlocks: boolean;
@@ -75,14 +73,15 @@ export function buildAssistantResponseApplication({
   response: AiChatResponse;
 }): AssistantResponseApplication {
   const plan = buildAssistantResponsePlan({ activeScope, message, response });
+  const route = routeAssistantArtifacts(plan);
 
   return {
     clearPendingBlocks: plan.clearPendingBlocks,
     curriculumToSave: plan.curriculumToSave,
     documentToApply: plan.documentToApply,
     pendingBlocks: plan.pendingBlocks,
-    pendingTarget: plan.pendingBlocks.length || plan.clearPendingBlocks ? "notebook" : null,
-    surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null,
+    pendingTarget: route.pendingTarget,
+    surfaceToOpen: route.surfaceToOpen,
   };
 }
 

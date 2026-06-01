@@ -140,13 +140,16 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
 
 
 def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
+    routing = _read("editor/src/lib/assistantArtifactRouting.ts")
     responsePlan = _read("editor/src/lib/assistantResponsePlan.ts")
     pendingChanges = _read("editor/src/lib/pendingChanges.ts")
 
     assert 'activeScope === "automation"' in responsePlan
     assert "plan.pendingBlocks = buildLocalBlocksFromPrompt(message, activeScope)" in responsePlan
-    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null' in responsePlan
-    assert 'surfaceToOpen: "curriculum"' in pendingChanges
-    assert 'surfaceToOpen: "editor"' in pendingChanges
+    assert "routeAssistantArtifacts(plan)" in responsePlan
+    assert 'surfaceToOpen: input.curriculumToSave ? "curriculum" : hasNotebookArtifact ? "editor" : null' in routing
+    assert "surfaceForAcceptedPendingTarget(pendingTarget)" in pendingChanges
+    assert 'return target === "curriculum" ? "curriculum" : "editor"' in routing
     assert 'surfaceToOpen: "automation"' not in responsePlan
+    assert 'surfaceToOpen: "automation"' not in routing
     assert '"automation"' not in pendingChanges
