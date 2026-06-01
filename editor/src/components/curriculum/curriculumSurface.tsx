@@ -45,9 +45,15 @@ import {
   type LearningCellKind,
 } from "@/lib/cellModel";
 import {
+  curriculumPackageActiveMessage,
   curriculumPackageInstallCommand,
+  curriculumPackageStatus,
+  curriculumPackageTerminalCommandReady,
+  installedCurriculumPackageNameSet,
   installCurriculumPackage,
   listCurriculumPackages,
+  missingCurriculumPackages,
+  type PackageInstallProgress,
 } from "@/lib/curriculumPackagePreparation";
 import { statusLabel } from "@/lib/displayFormat";
 import { CODARO_LINKS } from "@/lib/externalLinks";
@@ -376,12 +382,6 @@ function WorkflowArchitectureDiagram({ diagram }: { diagram?: Record<string, unk
   );
 }
 
-type PackageInstallProgress = {
-  name: string;
-  index: number;
-  total: number;
-};
-
 function CurriculumDependencyPanel({
   apiOnline,
   document,
@@ -403,26 +403,14 @@ function CurriculumDependencyPanel({
   const [copied, setCopied] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
 
-  const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
+  const installedNames = useMemo(() => installedCurriculumPackageNameSet(installedPackages), [installedPackages]);
   const missingPackages = useMemo(
-    () => requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item))),
+    () => missingCurriculumPackages(requiredPackages, installedNames),
     [installedNames, requiredPackages],
   );
-  const terminalCommandReady = Boolean(apiOnline && installCommand && missingPackages.length);
-  const activeMessage = installProgress
-    ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
-    : checking
-      ? "필요한 라이브러리 설치 상태를 확인 중입니다."
-      : null;
-  const packageStatus = installProgress
-    ? "installing"
-    : checking
-      ? "checking"
-      : error
-        ? "error"
-        : missingPackages.length
-          ? "missing"
-          : "ready";
+  const terminalCommandReady = curriculumPackageTerminalCommandReady({ apiOnline, installCommand, missingPackages });
+  const activeMessage = curriculumPackageActiveMessage({ checking, installProgress });
+  const packageStatus = curriculumPackageStatus({ checking, error, installProgress, missingPackages });
 
   useEffect(() => {
     let cancelled = false;

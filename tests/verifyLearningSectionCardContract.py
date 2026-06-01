@@ -12,6 +12,7 @@ CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.t
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
 LOCALE_COPY = ROOT / "editor" / "src" / "lib" / "localeCopy.ts"
 PACKAGE_INFERENCE = ROOT / "editor" / "src" / "lib" / "packageInference.ts"
+PACKAGE_PREPARATION = ROOT / "editor" / "src" / "lib" / "curriculumPackagePreparation.ts"
 PYTHON_STDLIB = ROOT / "editor" / "src" / "lib" / "pythonStdlib.ts"
 
 
@@ -33,7 +34,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, LOCALE_COPY, PACKAGE_INFERENCE, PYTHON_STDLIB):
+    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -45,6 +46,7 @@ def main() -> int:
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
     localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
     packageInferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
+    packagePreparationText = PACKAGE_PREPARATION.read_text(encoding="utf-8")
     pythonStdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
 
     required_tokens = {
@@ -69,8 +71,12 @@ def main() -> int:
         "package command marker": 'data-learning-package-command="true"',
         "package terminal open marker": 'data-learning-package-terminal-open="true"',
         "package progress marker": 'data-learning-package-progress="true"',
-        "package progress state": "type PackageInstallProgress",
-        "package progress text": "${installProgress.index}/${installProgress.total} 단계",
+        "package progress state import": "type PackageInstallProgress",
+        "package installed names model": "installedCurriculumPackageNameSet(installedPackages)",
+        "package missing model": "missingCurriculumPackages(requiredPackages, installedNames)",
+        "package command ready model": "curriculumPackageTerminalCommandReady({ apiOnline, installCommand, missingPackages })",
+        "package active message model": "curriculumPackageActiveMessage({ checking, installProgress })",
+        "package status model": "curriculumPackageStatus({ checking, error, installProgress, missingPackages })",
         "package install button progress": "${installProgress.index}/${installProgress.total} 설치 중",
         "package ready copy": "준비됨",
         "exercise marker": 'data-learning-section-part="exercise"',
@@ -161,6 +167,21 @@ def main() -> int:
     }
     for label, token in package_inference_tokens.items():
         require(packageInferenceText, token, label, failures)
+
+    package_preparation_tokens = {
+        "package progress state": "export type PackageInstallProgress",
+        "package status union": 'export type CurriculumPackageStatus = "installing" | "checking" | "error" | "missing" | "ready"',
+        "installed package names projection": "function installedCurriculumPackageNameSet",
+        "missing package projection": "function missingCurriculumPackages",
+        "terminal command readiness": "function curriculumPackageTerminalCommandReady",
+        "active package message": "function curriculumPackageActiveMessage",
+        "package panel status": "function curriculumPackageStatus",
+        "package progress text": "${installProgress.index}/${installProgress.total} 단계",
+        "uv install delay copy": "처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.",
+        "package API boundary kept": "codaroApi.packageInstallCommand(packageNames)",
+    }
+    for label, token in package_preparation_tokens.items():
+        require(packagePreparationText, token, label, failures)
 
     stdlib_tokens = {
         "io is stdlib": '"io"',
