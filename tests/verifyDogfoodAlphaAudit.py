@@ -312,6 +312,36 @@ DOGFOOD_REQUIREMENTS = (
         ),
     ),
     DogfoodRequirement(
+        requirementId="automation-second-loop-provider-e2e",
+        requirement="Automation is verified as a second loop that reads cells, writes a dry-run recipe, checks packages, validates a cell, then registers a task.",
+        evidenceChecks=(
+            ("docs/skills/architecture/automation-authoring-loop.md", (
+                "read-cells",
+                "write-automation-recipe",
+                "packages-check",
+                "cell-call",
+                "create-automation-task",
+                "DRY_RUN = True",
+            )),
+            ("src/codaro/ai/teacher/evalHarness.py", (
+                "automation-authoring-second-loop",
+                "read-cells",
+                "write-automation-recipe",
+                "packages-check",
+                "cell-call",
+                "create-automation-task",
+                "forbiddenTools=(\"write-curriculum-yaml\",)",
+            )),
+            ("tests/verifyTeacherGoldenE2e.py", (
+                "runAutomationAuthoringCase",
+                "AutomationAuthoringExecutor",
+                "automation authoring leaked into curriculum YAML",
+                "provider did not receive successful cell-call result before task registration",
+                "task registration did not preserve dry-run recipe validation",
+            )),
+        ),
+    ),
+    DogfoodRequirement(
         requirementId="product-quality-judgement-gates",
         requirement="Product quality judgement is blocked on named gates plus the first-user audit.",
         evidenceChecks=(
@@ -460,6 +490,7 @@ def dogfoodAuditSummary(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         "learningCompletionCovered": "learning-card-completion-path" in passedIds,
         "workloopTraceCovered": "workloop-trace-progress-path" in passedIds,
         "runtimeRecoveryCovered": "runtime-failure-recovery-path" in passedIds,
+        "automationSecondLoopCovered": "automation-second-loop-provider-e2e" in passedIds,
     }
 
 

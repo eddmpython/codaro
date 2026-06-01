@@ -352,8 +352,14 @@ AUTOMATION_REQUIREMENTS = (
             )),
             ("tests/testAiTools.py", (
                 "test_write_automation_recipe_creates_file_and_automation_cell",
-                "test_create_automation_task_registers_validated_recipe",
+                "test_create_automation_task_registers_dry_run_recipe",
                 "test_create_automation_task_rejects_missing_recipe",
+            )),
+            ("tests/verifyTeacherGoldenE2e.py", (
+                "runAutomationAuthoringCase",
+                "automation-authoring-second-loop",
+                "provider did not receive successful cell-call result before task registration",
+                "task registration did not preserve dry-run recipe validation",
             )),
             ("tests/testTeacherArchitecture.py", (
                 "testAutomationRolePromptPromotesRecipeAuthoringLoop",

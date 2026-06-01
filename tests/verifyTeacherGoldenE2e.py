@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
+import tempfile
 from typing import Any
 
 from codaro.ai.teacher import (
@@ -63,6 +65,92 @@ class ScriptedProvider:
         if self._responses:
             return self._responses.pop(0)
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+
+class AutomationAuthoringProvider:
+    supportsNativeTools = True
+
+    def __init__(self) -> None:
+        self.callCount = 0
+        self.messagesByCall: list[list[dict[str, Any]]] = []
+
+    def completeWithTools(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> ToolResponse:
+        del tools
+        self.messagesByCall.append(cloneProviderMessages(messages))
+        return self._next(messages)
+
+    def complete(self, messages: list[dict[str, Any]]) -> ToolResponse:
+        self.messagesByCall.append(cloneProviderMessages(messages))
+        return self._next(messages)
+
+    def _next(self, messages: list[dict[str, Any]]) -> ToolResponse:
+        callIndex = self.callCount
+        self.callCount += 1
+        if callIndex == 0:
+            return ToolResponse(
+                answer="현재 셀을 먼저 확인합니다.",
+                provider="fake",
+                model="test",
+                toolCalls=[ToolCall(id="call-read", name="read-cells", arguments={})],
+            )
+        if callIndex == 1:
+            return ToolResponse(
+                answer="검증용 recipe를 작성합니다.",
+                provider="fake",
+                model="test",
+                toolCalls=[
+                    ToolCall(
+                        id="call-recipe",
+                        name="write-automation-recipe",
+                        arguments={
+                            "title": "Daily Report",
+                            "description": "Prepare the recurring report.",
+                            "code": "import pandas as pd\nprint('report ready')",
+                            "dryRunFirst": True,
+                        },
+                    )
+                ],
+            )
+        if callIndex == 2:
+            return ToolResponse(
+                answer="실행 전 패키지를 확인합니다.",
+                provider="fake",
+                model="test",
+                toolCalls=[ToolCall(id="call-packages", name="packages-check", arguments={"names": ["pandas"]})],
+            )
+        if callIndex == 3:
+            recipePayload = toolResultPayloadFromMessages(messages, "call-recipe") or {}
+            blockId = str(recipePayload.get("blockId") or "automation-missing")
+            return ToolResponse(
+                answer="automation 셀을 dry-run으로 검증합니다.",
+                provider="fake",
+                model="test",
+                toolCalls=[
+                    ToolCall(
+                        id="call-cell",
+                        name="cell-call",
+                        arguments={"operation": "check", "blockId": blockId},
+                    )
+                ],
+            )
+        if callIndex == 4:
+            return ToolResponse(
+                answer="검증된 recipe만 태스크로 등록합니다.",
+                provider="fake",
+                model="test",
+                toolCalls=[
+                    ToolCall(
+                        id="call-task",
+                        name="create-automation-task",
+                        arguments={
+                            "name": "Daily Report",
+                            "documentPath": "automations/daily-report.py",
+                            "schedule": "@daily",
+                        },
+                    )
+                ],
+            )
+        return ToolResponse(answer="자동화 recipe와 태스크 등록까지 완료했습니다.", provider="fake", model="test", toolCalls=[])
 
 
 class FailingProvider:
@@ -139,6 +227,20 @@ class GoalDiscoveryExecutor:
             }
         if toolName == "packages-check":
             return {"missing": [], "packages": ["pandas"], "ready": True}
+        return await self._delegate.execute(toolName, arguments)
+
+
+class AutomationAuthoringExecutor:
+    def __init__(self, delegate: ToolExecutor) -> None:
+        self._delegate = delegate
+        self.calls: list[dict[str, Any]] = []
+
+    async def execute(self, toolName: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        self.calls.append({"tool": toolName, "arguments": arguments})
+        if toolName == "packages-check":
+            return {"missing": [], "packages": ["pandas"], "ready": True}
+        if toolName == "cell-call":
+            return {"passed": True, "status": "ok", "blockId": arguments.get("blockId")}
         return await self._delegate.execute(toolName, arguments)
 
 
@@ -220,6 +322,7 @@ async def mainAsync() -> int:
         await runClarificationCase(),
         await runClarificationContinuationCase(),
         await runGoalDiscoveryBeforeYamlCase(),
+        await runAutomationAuthoringCase(),
         await runDependencyPreflightCase(),
         await runDependencyPreflightFailureCase(),
         await runProviderErrorCase(),
@@ -509,6 +612,59 @@ async def runGoalDiscoveryBeforeYamlCase() -> dict[str, Any]:
     return reportPayload(report, extraFailures)
 
 
+async def runAutomationAuthoringCase() -> dict[str, Any]:
+    case = goldenCase("automation-authoring-second-loop")
+    activeDocument = createEmptyDocument("자동화 노트북")
+    savedDocuments = []
+
+    def getDocument():
+        return activeDocument
+
+    def setDocument(document):
+        nonlocal activeDocument
+        activeDocument = document
+        savedDocuments.append(document)
+
+    oldCodaroHome = os.environ.get("CODARO_HOME")
+    with tempfile.TemporaryDirectory() as workspace:
+        os.environ["CODARO_HOME"] = os.path.join(workspace, "home")
+        resetTaskRegistry()
+        provider = AutomationAuthoringProvider()
+        executor = AutomationAuthoringExecutor(
+            ToolExecutor(
+                NoSessionManager(),
+                documentGetter=getDocument,
+                documentSetter=setDocument,
+                workspaceRoot=workspace,
+            )
+        )
+        report = await runTeacherGoldenProviderCase(
+            case,
+            provider=provider,
+            executor=executor,
+            convManager=FakeConversationManager(),
+            orchestrator=TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["pandas"]}}),
+            tools=toolSchemas(),
+        )
+        recipePath = os.path.join(workspace, "automations", "daily-report.py")
+        taskIndexPath = os.path.join(workspace, "home", "tasks", "index.json")
+        extraFailures = automationAuthoringFailures(
+            activeDocument=activeDocument,
+            calls=executor.calls,
+            provider=provider,
+            recipePath=recipePath,
+            savedDocumentCount=len(savedDocuments),
+            taskIndexPath=taskIndexPath,
+        )
+        resetTaskRegistry()
+    if oldCodaroHome is None:
+        os.environ.pop("CODARO_HOME", None)
+    else:
+        os.environ["CODARO_HOME"] = oldCodaroHome
+    resetTaskRegistry()
+    return reportPayload(report, extraFailures)
+
+
 async def runProviderErrorCase() -> dict[str, Any]:
     case = goldenCase("provider-error-promotes-workloop")
     provider = FailingProvider()
@@ -759,6 +915,21 @@ def firstTraceEventPayload(tracePayload: dict[str, Any], eventType: str) -> dict
     return None
 
 
+def toolResultPayloadFromMessages(messages: list[dict[str, Any]], toolCallId: str) -> dict[str, Any] | None:
+    for message in messages:
+        if message.get("role") != "tool" or message.get("tool_call_id") != toolCallId:
+            continue
+        content = message.get("content")
+        if not isinstance(content, str):
+            return None
+        try:
+            payload = json.loads(content)
+        except json.JSONDecodeError:
+            return None
+        return payload if isinstance(payload, dict) else None
+    return None
+
+
 def cloneProviderMessages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return json.loads(json.dumps(messages, ensure_ascii=False))
 
@@ -788,6 +959,113 @@ def clarificationAssumptionKeys(tracePayload: dict[str, Any]) -> list[str]:
     if not isinstance(assumptions, dict):
         return []
     return sorted(str(key) for key in assumptions.keys())
+
+
+def automationAuthoringFailures(
+    *,
+    activeDocument,
+    calls: list[dict[str, Any]],
+    provider: Any,
+    recipePath: str,
+    savedDocumentCount: int,
+    taskIndexPath: str,
+) -> list[str]:
+    failures: list[str] = []
+    observedCalls = [call["tool"] for call in calls]
+    expectedCalls = [
+        "read-cells",
+        "write-automation-recipe",
+        "packages-check",
+        "cell-call",
+        "create-automation-task",
+    ]
+    if observedCalls != expectedCalls:
+        failures.append(f"automation authoring tool order mismatch: {observedCalls}")
+    if "write-curriculum-yaml" in observedCalls:
+        failures.append("automation authoring leaked into curriculum YAML")
+    if savedDocumentCount != 1:
+        failures.append(f"expected one automation document save, found {savedDocumentCount}")
+
+    automationBlocks = [
+        block
+        for block in activeDocument.blocks
+        if block.type == "automation" and block.role == "automation"
+    ]
+    if len(automationBlocks) != 1:
+        failures.append(f"expected one automation block, found {len(automationBlocks)}")
+    else:
+        block = automationBlocks[0]
+        if block.sourceType != "automationAuthoring":
+            failures.append(f"automation block sourceType mismatch: {block.sourceType}")
+        if block.executionKind != "python":
+            failures.append(f"automation block executionKind mismatch: {block.executionKind}")
+        if "DRY_RUN = True" not in block.content:
+            failures.append("automation block is missing DRY_RUN = True")
+        payload = block.payload if isinstance(block.payload, dict) else {}
+        if payload.get("recipePath") != recipePath:
+            failures.append(f"automation block recipePath mismatch: {payload.get('recipePath')}")
+
+    if not os.path.isfile(recipePath):
+        failures.append(f"automation recipe was not saved: {recipePath}")
+    else:
+        recipe = open(recipePath, encoding="utf-8").read()
+        for expected in ("# %% [markdown]", "# %% [automation]", "DRY_RUN = True", "import pandas as pd"):
+            if expected not in recipe:
+                failures.append(f"automation recipe missing: {expected}")
+
+    if not os.path.isfile(taskIndexPath):
+        failures.append("automation task index was not written")
+    else:
+        taskIndex = json.loads(open(taskIndexPath, encoding="utf-8").read())
+        taskNames = [item.get("name") for item in taskIndex.get("tasks", []) if isinstance(item, dict)]
+        if "Daily Report" not in taskNames:
+            failures.append(f"automation task registry missing Daily Report: {taskNames}")
+
+    if provider.callCount != 6:
+        failures.append(f"automation provider loop call count mismatch: {provider.callCount}")
+    for callIndex, toolCallId in enumerate(
+        ("call-read", "call-recipe", "call-packages", "call-cell", "call-task"),
+        start=1,
+    ):
+        if providerCallToolResultPayload(provider, callIndex, toolCallId) is None:
+            failures.append(f"provider did not receive {toolCallId} result")
+
+    recipePayload = providerCallToolResultPayload(provider, 2, "call-recipe")
+    if recipePayload is None:
+        failures.append("provider did not receive recipe payload")
+    else:
+        if recipePayload.get("loadedInEditor") is not True:
+            failures.append("recipe payload did not load automation cell in editor")
+        if recipePayload.get("dryRunFirst") is not True:
+            failures.append("recipe payload did not preserve dry-run-first")
+        recipeBlockId = str(recipePayload.get("blockId") or "")
+        if automationBlocks and recipeBlockId != automationBlocks[0].id:
+            failures.append(f"recipe payload blockId mismatch: {recipeBlockId}")
+        cellCalls = [call for call in calls if call["tool"] == "cell-call"]
+        cellBlockId = str(cellCalls[0]["arguments"].get("blockId") or "") if cellCalls else ""
+        if recipeBlockId and cellBlockId != recipeBlockId:
+            failures.append(f"cell-call did not use generated automation block id: {cellBlockId}")
+
+    cellPayload = providerCallToolResultPayload(provider, 4, "call-cell")
+    if cellPayload is None or cellPayload.get("passed") is not True:
+        failures.append("provider did not receive successful cell-call result before task registration")
+
+    taskPayload = providerCallToolResultPayload(provider, 5, "call-task")
+    if taskPayload is None:
+        failures.append("provider did not receive task registration payload")
+    else:
+        validation = taskPayload.get("recipeValidation")
+        if not isinstance(validation, dict) or validation.get("dryRunFirst") is not True:
+            failures.append("task registration did not preserve dry-run recipe validation")
+    return failures
+
+
+def resetTaskRegistry() -> None:
+    import codaro.automation.taskRegistry as taskRegistryModule
+    from codaro.automation.taskFlow import resetAutomationTaskFlowState
+
+    taskRegistryModule._registry = None
+    resetAutomationTaskFlowState()
 
 
 def goldenCase(caseId: str):
