@@ -4,6 +4,8 @@ import pytest
 
 from codaro.document.blockOperations import (
     DocumentOperationError,
+    getDocumentBlock,
+    getDocumentCodeBlock,
     insertDocumentBlock,
     insertBlock,
     loadCodeBlockForExecution,
@@ -88,6 +90,25 @@ def testInMemoryDocumentBlockOperationsMutateCurrentDocument() -> None:
     removed = removeDocumentBlock(document, blockId=blockId)
     assert removed.fromIndex == 1
     assert [block.id for block in document.blocks] == ["b1"]
+
+
+def testGetDocumentBlockHelpersResolveCurrentDocumentBlocks() -> None:
+    document = CodaroDocument(
+        id="doc",
+        title="Tool Doc",
+        blocks=[
+            BlockConfig(id="code-1", type="code", content="x = 1"),
+            BlockConfig(id="note-1", type="markdown", content="note"),
+        ],
+    )
+
+    assert getDocumentBlock(document, blockId="note-1").content == "note"
+    assert getDocumentCodeBlock(document, blockId="code-1").content == "x = 1"
+
+    with pytest.raises(DocumentOperationError) as excInfo:
+        getDocumentCodeBlock(document, blockId="note-1")
+
+    assert excInfo.value.code == "document_block_not_code"
 
 
 def testLoadCodeBlockForExecutionRejectsMarkdown(tmp_path: Path) -> None:

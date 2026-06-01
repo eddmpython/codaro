@@ -175,8 +175,16 @@ def updateBlock(
 
 def loadCodeBlockForExecution(path: Path, *, blockId: str) -> BlockConfig:
     document = loadExistingDocument(path)
+    return getDocumentCodeBlock(document, blockId=blockId)
+
+
+def getDocumentBlock(document: CodaroDocument, *, blockId: str) -> BlockConfig:
     index = findBlockIndex(document, blockId)
-    block = document.blocks[index]
+    return document.blocks[index]
+
+
+def getDocumentCodeBlock(document: CodaroDocument, *, blockId: str) -> BlockConfig:
+    block = getDocumentBlock(document, blockId=blockId)
     if block.type != "code":
         raise DocumentOperationError(
             "document_block_not_code",

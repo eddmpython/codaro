@@ -986,5 +986,17 @@ def testKernelDocumentExecutionDoesNotImportTransportLayer() -> None:
 
     assert all("api." not in module and not module.endswith("api") for module in importedModules)
     assert "executeDocumentCodeBlock" in source
+    assert "executeDocumentReactiveBlock" in source
+    assert "documentBlocksForReactiveExecution" in source
     assert "APIRouter" not in source
     assert "fail(" not in source
+
+
+def testRuntimeHandlersUseDocumentExecutionBoundaryForReactiveRuns() -> None:
+    source = (ROOT / "src/codaro/ai/toolHandlers/runtime.py").read_text(encoding="utf-8")
+
+    assert "executeDocumentReactiveBlock" in source
+    assert "getDocumentBlock" in source
+    assert "executeKernelReactive" not in source
+    assert "blocksData" not in source
+    assert "for b in doc.blocks" not in source

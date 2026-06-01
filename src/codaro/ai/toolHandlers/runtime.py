@@ -3,6 +3,16 @@ from __future__ import annotations
 from typing import Any
 
 from ...curriculum.exerciseCheck import InvalidExerciseCheck, ToolExerciseCheckInput, runToolExerciseCheck
+from ...document.blockOperations import DocumentOperationError, getDocumentBlock
+from ...kernel.documentExecution import executeDocumentReactiveBlock
+
+
+def _documentBlockErrorPayload(exc: DocumentOperationError, blockId: str) -> dict[str, str]:
+    if exc.code == "document_block_not_found":
+        return {"error": f"Block not found: {blockId}"}
+    if exc.code == "document_block_not_code":
+        return {"error": f"Block {blockId} is not a code block"}
+    return {"error": exc.message}
 
 
 class RuntimeToolHandlers:
@@ -11,22 +21,10 @@ class RuntimeToolHandlers:
         session = self._getSession()
         blockId = args["blockId"]
 
-        block = None
-        for b in doc.blocks:
-            if b.id == blockId:
-                block = b
-                break
-
-        if block is None:
-            return {"error": f"Block not found: {blockId}"}
-        if block.type != "code":
-            return {"error": f"Block {blockId} is not a code block"}
-
-        from codaro.kernel.executionPayload import executeKernelReactive
-
-        blocksData = [{"id": b.id, "type": b.type, "content": b.content} for b in doc.blocks]
-
-        payload = await executeKernelReactive(session, blocksData, blockId)
+        try:
+            payload = await executeDocumentReactiveBlock(session, doc, blockId=blockId)
+        except DocumentOperationError as exc:
+            return _documentBlockErrorPayload(exc, blockId)
         return payload.toolPayload()
 
     async def _handle_getVariables(self, args: dict[str, Any]) -> dict[str, Any]:
@@ -101,13 +99,10 @@ class RuntimeToolHandlers:
         checkType = args["checkType"]
         expected = args.get("expected", "")
 
-        block = None
-        for b in doc.blocks:
-            if b.id == blockId:
-                block = b
-                break
-        if block is None:
-            return {"error": f"Block not found: {blockId}"}
+        try:
+            block = getDocumentBlock(doc, blockId=blockId)
+        except DocumentOperationError as exc:
+            return _documentBlockErrorPayload(exc, blockId)
 
         try:
             return await runToolExerciseCheck(

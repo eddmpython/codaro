@@ -235,6 +235,29 @@ class TestDocumentTools:
         result = asyncio.run(executor.execute("get-variables", {}))
         assert "error" in result
 
+    def test_execute_reactive_uses_current_document_blocks(self):
+        session = KernelSession()
+        sessionManager = _MockSessionManager()
+        sessionManager._sessions[session.sessionId] = session
+        doc = _makeDoc([
+            BlockConfig(id="b1", type="code", content="x = 10"),
+            BlockConfig(id="b2", type="code", content="y = x * 2"),
+            BlockConfig(id="b3", type="markdown", content="note"),
+        ])
+        executor = ToolExecutor(
+            sessionManager=sessionManager,
+            documentGetter=lambda: doc,
+            documentSetter=lambda d: None,
+        )
+        executor.setActiveSession(session.sessionId)
+
+        result = asyncio.run(executor.execute("execute-reactive", {"blockId": "b1"}))
+
+        assert result["executionOrder"] == ["b1", "b2"]
+        assert [item["status"] for item in result["results"]] == ["done", "done"]
+        assert session._registry.get("y") == 20
+        session.dispose()
+
     def test_check_exercise_uses_curriculum_check_dispatch(self):
         session = KernelSession()
         sessionManager = _MockSessionManager()
