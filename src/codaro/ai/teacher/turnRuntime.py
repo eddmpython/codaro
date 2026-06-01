@@ -93,6 +93,27 @@ def prepareTeacherRuntimeTurnFromRequest(
     )
 
 
+def prepareTeacherRuntimeTurnFromPayload(
+    *,
+    convManager: Any,
+    profileManager: Any,
+    sessionManager: Any,
+    documentPath: str | Path | None,
+    workspaceRoot: str | Path | None,
+    payload: Mapping[str, Any],
+    providerFactory: Callable[[LLMConfig], Any] = createProvider,
+) -> TeacherRuntimeTurn:
+    return prepareTeacherRuntimeTurnFromRequest(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=documentPath,
+        workspaceRoot=workspaceRoot,
+        request=TeacherRuntimeTurnRequest.fromPayload(payload),
+        providerFactory=providerFactory,
+    )
+
+
 def prepareTeacherRuntimeTurn(
     *,
     convManager: Any,

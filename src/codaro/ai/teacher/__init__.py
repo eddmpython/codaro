@@ -75,6 +75,7 @@ from .turnRuntime import (
     createTeacherToolExecutor,
     prepareTeacherRuntimeTurn,
     prepareTeacherRuntimeTurnFromRequest,
+    prepareTeacherRuntimeTurnFromPayload,
 )
 from .turnExecution import runTeacherRuntimeTurn, streamTeacherRuntimeTurn
 from .turnSession import TeacherConversationNotFound, TeacherTurnSession, prepareTeacherTurn
@@ -120,6 +121,7 @@ __all__ = [
     "prepareTeacherTurn",
     "prepareTeacherRuntimeTurn",
     "prepareTeacherRuntimeTurnFromRequest",
+    "prepareTeacherRuntimeTurnFromPayload",
     "recordAssistantToolRequest",
     "recordPendingClarification",
     "recordTeacherToolRoundRequest",

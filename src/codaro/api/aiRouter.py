@@ -32,8 +32,7 @@ from ..ai.providerSpec import (
 )
 from ..ai.teacher import (
     TeacherConversationNotFound,
-    TeacherRuntimeTurnRequest,
-    prepareTeacherRuntimeTurnFromRequest,
+    prepareTeacherRuntimeTurnFromPayload,
     runTeacherRuntimeTurn,
     streamTeacherRuntimeTurn,
     teacherStreamSseFrame,
@@ -243,13 +242,13 @@ def createAiRouter(state: Any) -> APIRouter:
 
 def _prepareTeacherRuntimeTurnForHttp(*, body: dict[str, Any], convManager: Any, state: Any):
     try:
-        return prepareTeacherRuntimeTurnFromRequest(
+        return prepareTeacherRuntimeTurnFromPayload(
             convManager=convManager,
             profileManager=getProfileManager(),
             sessionManager=state.sessionManager,
             documentPath=state.documentPath,
             workspaceRoot=state.workspaceRoot,
-            request=TeacherRuntimeTurnRequest.fromPayload(body),
+            payload=body,
         )
     except TeacherConversationNotFound as exc:
         raise HTTPException(status_code=404, detail="Conversation not found") from exc

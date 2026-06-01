@@ -32,7 +32,8 @@ def testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary() -> None:
         not any(fragment in module for fragment in blockedFragments)
         for module in importedModules
     )
-    assert "prepareTeacherRuntimeTurnFromRequest" in source
+    assert "prepareTeacherRuntimeTurnFromPayload" in source
+    assert "TeacherRuntimeTurnRequest" not in source
     assert "runtimeTurn.turn." not in source
     assert "runTeacherChatLoop" not in source
     assert "runTeacherChatStream" not in source
@@ -53,6 +54,14 @@ def testTeacherRuntimeTurnExecutionOwnsPreparedTurnUnpacking() -> None:
     assert "runtimeTurn.turn.provider" in source
     assert "runTeacherChatLoop" in source
     assert "runTeacherChatStream" in source
+
+
+def testTeacherRuntimeOwnsPayloadToRuntimeTurnBoundary() -> None:
+    source = (ROOT / "src/codaro/ai/teacher/turnRuntime.py").read_text(encoding="utf-8")
+
+    assert "def prepareTeacherRuntimeTurnFromPayload" in source
+    assert "TeacherRuntimeTurnRequest.fromPayload(payload)" in source
+    assert "prepareTeacherRuntimeTurnFromRequest(" in source
 
 
 def testTeacherLoopCompatibilityShimStaysThinAndUnusedInternally() -> None:
