@@ -47,6 +47,8 @@ def testProductSurfaceNavKeepsConversationFirstFlow() -> None:
     assert "flowStep: index + 1" in source
     assert "SIDEBAR_SURFACES: readonly SurfaceMode[] = PRODUCT_SIDEBAR_NAV.map" in source
     assert "isSurfaceMode(value: string)" in source
+    assert "surfaceNavItem(surface: SurfaceMode)" in source
+    assert "surfaceFlowRole(surface: SurfaceMode)" in source
     assert "PRODUCT_SURFACE_NAV" in source
     assert "HIDDEN_SURFACES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV" in source
 
@@ -145,6 +147,31 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
     assert "chat.example.pandas" in startExamples
 
 
+def testChatStartExamplesCarryDogfoodFlowMetadata() -> None:
+    chat = _read("editor/src/components/chat/chatSurface.tsx")
+    mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+    startExamples = _read("editor/src/lib/chatStartExamples.ts")
+
+    assert 'surfaceFlowRole, type ProductSurfaceFlowRole, type SurfaceMode' in startExamples
+    assert "CHAT_START_EXAMPLE_DEFINITIONS" in startExamples
+    assert "CURRICULUM_GOAL_EXAMPLE_DEFINITIONS" in startExamples
+    assert "translateExampleDefinitions(CHAT_START_EXAMPLE_DEFINITIONS, t)" in startExamples
+    assert "translateExampleDefinitions(CURRICULUM_GOAL_EXAMPLE_DEFINITIONS, t)" in startExamples
+    assert 'labelKey: "chat.example.pandas", promptKey: "chat.example.pandas.prompt", surface: "curriculum"' in startExamples
+    assert 'labelKey: "chat.example.browser", promptKey: "chat.example.browser.prompt", surface: "curriculum"' in startExamples
+    assert 'labelKey: "chat.example.automation", promptKey: "chat.example.automation.prompt", surface: "automation"' in startExamples
+    assert 'labelKey: "curriculum.goal.example.report", promptKey: "curriculum.goal.example.report.prompt", surface: "curriculum"' in startExamples
+    assert startExamples.index('"chat.example.pandas"') < startExamples.index('"chat.example.automation"')
+    assert "flowRole: surfaceFlowRole(example.surface)" in startExamples
+    assert 'flowRole: "secondLoop"' not in startExamples
+    assert "curriculumGoalExamples(t)" in mainSurface
+    assert "curriculum.goal.example.report" not in mainSurface
+    assert 'data-chat-start-example="true"' in chat
+    assert "data-chat-start-flow-role={example.flowRole}" in chat
+    assert 'data-chat-start-second-loop={example.flowRole === "secondLoop" ? "true" : undefined}' in chat
+    assert "data-chat-start-surface={example.surface}" in chat
+
+
 def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     source = _read("editor/src/components/automation/automationSurface.tsx")
 
@@ -195,6 +222,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/lib/assistantResponsePlan.ts`",
         "`editor/src/lib/pendingChanges.ts`",
         "`editor/src/lib/chatStartExamples.ts`",
+        "target surface/flow role",
         "`editor/src/lib/customCurricula.ts`",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",

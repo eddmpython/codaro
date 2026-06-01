@@ -87,7 +87,17 @@ export function ChatSurface({
           ) : null}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {heroExamples.map((example) => (
-              <Button key={example.label} size="sm" type="button" variant="outline" onClick={() => onPromptChange(example.prompt)}>
+              <Button
+                data-chat-start-example="true"
+                data-chat-start-flow-role={example.flowRole}
+                data-chat-start-second-loop={example.flowRole === "secondLoop" ? "true" : undefined}
+                data-chat-start-surface={example.surface}
+                key={example.label}
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => onPromptChange(example.prompt)}
+              >
                 {example.label}
               </Button>
             ))}

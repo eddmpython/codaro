@@ -51,6 +51,18 @@ export function isSurfaceMode(value: string): value is SurfaceMode {
   return SURFACE_MODES.includes(value as SurfaceMode);
 }
 
+export function surfaceNavItem(surface: SurfaceMode): ProductSurfaceNavItem {
+  const item = PRODUCT_SURFACE_NAV.find((candidate) => candidate.value === surface);
+  if (!item) {
+    throw new Error(`Unknown surface mode: ${surface}`);
+  }
+  return item;
+}
+
+export function surfaceFlowRole(surface: SurfaceMode): ProductSurfaceFlowRole {
+  return surfaceNavItem(surface).flowRole;
+}
+
 export function surfaceTitle(surface: SurfaceMode) {
   const en = getActiveLocale() === "en";
   if (surface === "editor") return en ? "Notebook" : "노트북";

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
+import { curriculumGoalExamples } from "@/lib/chatStartExamples";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
@@ -181,11 +182,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           heroTitle={t("curriculum.goal.title")}
           heroDetail={t("curriculum.goal.detail")}
           placeholder={t("curriculum.goal.placeholder")}
-          examples={[
-            { label: t("curriculum.goal.example.report"), prompt: t("curriculum.goal.example.report.prompt") },
-            { label: t("curriculum.goal.example.dashboard"), prompt: t("curriculum.goal.example.dashboard.prompt") },
-            { label: t("curriculum.goal.example.pandas"), prompt: t("curriculum.goal.example.pandas.prompt") },
-          ]}
+          examples={curriculumGoalExamples(t)}
           onAsk={props.onAsk}
           onAcceptPendingBlocks={props.onAcceptPendingBlocks}
           onConnectAi={props.onConnectAi}

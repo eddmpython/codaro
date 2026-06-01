@@ -71,6 +71,23 @@ DOGFOOD_REQUIREMENTS = (
                 "learning-card-completion-path",
                 "product-quality-judgement-gates",
             )),
+            ("editor/src/lib/chatStartExamples.ts", (
+                "CHAT_START_EXAMPLE_DEFINITIONS",
+                "chat.example.pandas.prompt",
+                "chat.example.browser.prompt",
+                "chat.example.automation.prompt",
+                "curriculumGoalExamples",
+                "curriculum.goal.example.pandas.prompt",
+                "surface: \"curriculum\"",
+                "surface: \"automation\"",
+                "flowRole: surfaceFlowRole(example.surface)",
+            )),
+            ("editor/src/components/chat/chatSurface.tsx", (
+                "data-chat-start-example=\"true\"",
+                "data-chat-start-surface={example.surface}",
+                "data-chat-start-flow-role={example.flowRole}",
+                "data-chat-start-second-loop={example.flowRole === \"secondLoop\" ? \"true\" : undefined}",
+            )),
         ),
     ),
     DogfoodRequirement(
