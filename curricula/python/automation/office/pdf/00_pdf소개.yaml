@@ -53,6 +53,90 @@ intro:
         detail: "모든 생성·조작 결과는 TemporaryDirectory에 저장하고 PdfReader로 다시 열어 페이지·텍스트·메타 단위 assert로 자동 검증한다."
 
 sections:
+  - id: runtime_check
+    title: "라이브러리 실행 확인"
+    structuredPrimary: true
+    subtitle: "PDF 세 패키지 import 확인"
+    goal: "pypdf, pdfplumber, reportlab을 import하고 메모리 PDF 한 페이지를 만들어 읽을 수 있는지 확인한다."
+    why: "이 트랙은 읽기·표 추출·생성을 같이 다루므로 첫 셀에서 세 라이브러리의 역할이 실제 실행으로 연결되는지 확인해야 합니다."
+    explanation: "상단 라이브러리 패널이 패키지 준비를 맡고, 학습 셀은 reportlab으로 작은 PDF를 만든 뒤 pypdf와 pdfplumber로 다시 읽어 실행 계약을 고정합니다."
+    tips:
+      - "패키지 준비와 학습 코드를 분리하면 import 실패와 코드 실수를 쉽게 구분할 수 있습니다."
+      - "파일을 바로 만들지 않고 BytesIO를 쓰면 로컬 폴더를 어지럽히지 않고도 PDF 흐름을 검증할 수 있습니다."
+    snippet: |-
+      import io
+      import pdfplumber
+      from pypdf import PdfReader
+      from reportlab.pdfgen import canvas
+
+      buffer = io.BytesIO()
+      page = canvas.Canvas(buffer)
+      page.drawString(72, 720, "Codaro PDF ready")
+      page.save()
+
+      buffer.seek(0)
+      reader = PdfReader(buffer)
+      assert len(reader.pages) == 1
+
+      buffer.seek(0)
+      with pdfplumber.open(buffer) as pdf:
+          text = pdf.pages[0].extract_text() or ""
+
+      assert "Codaro PDF ready" in text
+      print(text)
+    exercise:
+      prompt: PDF에 쓰는 문자열을 바꾸고, pypdf 페이지 수와 pdfplumber 추출 텍스트 assert가 함께 통과하는지 확인하세요.
+      starterCode: |-
+        import io
+        import pdfplumber
+        from pypdf import PdfReader
+        from reportlab.pdfgen import canvas
+
+        label = "monthly invoice ready"
+        buffer = io.BytesIO()
+        page = canvas.Canvas(buffer)
+        page.drawString(72, 720, label)
+        page.save()
+
+        buffer.seek(0)
+        reader = PdfReader(buffer)
+        assert len(reader.pages) == 1
+
+        buffer.seek(0)
+        with pdfplumber.open(buffer) as pdf:
+            text = pdf.pages[0].extract_text() or ""
+
+        assert label in text
+        print(text)
+      solution: |-
+        import io
+        import pdfplumber
+        from pypdf import PdfReader
+        from reportlab.pdfgen import canvas
+
+        label = "monthly invoice ready"
+        buffer = io.BytesIO()
+        page = canvas.Canvas(buffer)
+        page.drawString(72, 720, label)
+        page.save()
+
+        buffer.seek(0)
+        reader = PdfReader(buffer)
+        assert len(reader.pages) == 1
+
+        buffer.seek(0)
+        with pdfplumber.open(buffer) as pdf:
+            text = pdf.pages[0].extract_text() or ""
+
+        assert label in text
+        print(text)
+      hints:
+        - "BytesIO는 파일 대신 메모리에 PDF 바이트를 담습니다."
+        - "PdfReader와 pdfplumber가 같은 버퍼를 읽기 전에 buffer.seek(0)을 다시 호출해야 합니다."
+    check:
+      type: noError
+      noError: "세 라이브러리 import와 메모리 PDF 생성·읽기가 오류 없이 끝나야 합니다."
+      resultCheck: "페이지 수 assert와 추출 텍스트 assert가 모두 통과해야 합니다."
   - id: pdf_position
     title: "1. PDF가 사무 자동화에서 차지하는 자리"
     blocks:

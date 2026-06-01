@@ -52,7 +52,7 @@ sections:
 - id: load
   title: 라이브러리 로드
   structuredPrimary: true
-  subtitle: Pydantic 설치 및 import
+  subtitle: Pydantic import 확인
   goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
   why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로

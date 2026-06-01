@@ -64,6 +64,7 @@ STDLIB_MODULES = set(getattr(sys, "stdlib_module_names", set())) | {
 }
 IMPORT_RE = re.compile(r"^\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import\s+)", re.M)
 BAD_INSTALL_COPY_RE = re.compile(r"(설치\s*없이|install\s*없이|pip\s+install)", re.I)
+MISLEADING_IMPORT_SETUP_RE = re.compile(r"(설치\s*(?:및|와|과)?\s*import|import\s*(?:및|와|과)?\s*설치)", re.I)
 ABILITY_TERMS = (
     "할 수",
     "만들",
@@ -208,6 +209,8 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         "codeBlockCount": countBlocks(content, "code") + structuredCodeCount(content),
         "directPipInstall": bool(re.search(r"\bpip\s+install\b", text)),
         "badInstallCopy": bool(BAD_INSTALL_COPY_RE.search(text) and declaredPackages),
+        "misleadingImportSetupCopy": hasMisleadingImportSetupCopy(content),
+        "packageIntroImportCheckMissing": bool(orientation and declaredPackages and not importedPackages),
         "externalUrlCount": len(re.findall(r"https?://", text)),
         "conversionFailures": conversionFailures,
         "introSignals": introSignals,
@@ -372,6 +375,8 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         "directPipInstallLessonCount": sum(1 for lesson in lessons if lesson.get("directPipInstall")),
         "badInstallCopyLessonCount": sum(1 for lesson in lessons if lesson.get("badInstallCopy")),
+        "misleadingImportSetupCopyLessonCount": sum(1 for lesson in lessons if lesson.get("misleadingImportSetupCopy")),
+        "packageIntroImportCheckMissingLessonCount": sum(1 for lesson in lessons if lesson.get("packageIntroImportCheckMissing")),
         "externalUrlLessonCount": sum(1 for lesson in lessons if int(lesson.get("externalUrlCount", 0)) > 0),
         "conversionFailureLessonCount": sum(1 for lesson in lessons if lesson.get("conversionFailures")),
     }
@@ -392,6 +397,7 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
             summaryEquals("all imports declared in meta.packages", summary, "missingDeclaredPackageLessonCount", 0),
             summaryEquals("all declared packages preserved in document runtime", summary, "documentRuntimeMissingLessonCount", 0),
             summaryEquals("no direct pip install copy in curricula", summary, "directPipInstallLessonCount", 0),
+            summaryEquals("package intro lessons have an import check", summary, "packageIntroImportCheckMissingLessonCount", 0),
             textContains("runtime preflight gate exists", "tests/run.py", "\"editor-runtime-preflight\""),
             textContains("local runtime documents uv only", "docs/skills/identity/local-first-runtime.md", "uv"),
         )),
@@ -417,6 +423,7 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
                 0.90,
             ),
             summaryEquals("no package lesson says install-free", summary, "badInstallCopyLessonCount", 0),
+            summaryEquals("no import-check section is labeled as install", summary, "misleadingImportSetupCopyLessonCount", 0),
             textContains("authoring doc lists what learner can do", "docs/skills/architecture/curriculum-authoring.md", "무엇을 할 수 있는지"),
             textContains("authoring doc requires first assert", "docs/skills/architecture/curriculum-authoring.md", "assert"),
             textContains("learning contract requires intro runtime", "docs/skills/architecture/learning-yaml-contract.md", "intro.diagram.runtime"),
@@ -538,6 +545,16 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             for lesson in lessons
             if lesson.get("badInstallCopy")
         ][:30],
+        "misleadingImportSetupCopyLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("misleadingImportSetupCopy")
+        ][:30],
+        "packageIntroImportCheckMissingLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("packageIntroImportCheckMissing")
+        ][:30],
         "missingPackageDeclarationLessons": [
             {
                 "path": lesson["path"],
@@ -564,6 +581,25 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
 
 def countPackageOrientationLessons(lessons: list[dict[str, Any]]) -> int:
     return sum(1 for lesson in lessons if lesson.get("orientation") and lesson.get("declaredPackages"))
+
+
+def hasMisleadingImportSetupCopy(content: dict[str, Any]) -> bool:
+    for node in walkMaps(content):
+        for fieldName in ("title", "subtitle", "goal", "prompt", "noError"):
+            value = textValue(node.get(fieldName))
+            if value and MISLEADING_IMPORT_SETUP_RE.search(value):
+                return True
+    return False
+
+
+def walkMaps(value: Any):
+    if isinstance(value, dict):
+        yield value
+        for item in value.values():
+            yield from walkMaps(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from walkMaps(item)
 
 
 def isStructuredSection(section: dict[str, Any]) -> bool:

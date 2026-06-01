@@ -52,7 +52,7 @@ sections:
 - id: load
   title: 라이브러리 로드
   structuredPrimary: true
-  subtitle: Pydantic 설치 및 import
+  subtitle: Pydantic import 확인
   goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
   why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로

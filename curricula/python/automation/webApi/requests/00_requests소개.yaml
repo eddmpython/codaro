@@ -51,6 +51,60 @@ intro:
         detail: "공공 sample 또는 httpbin.org로 동작 확인 후 응답 객체 단위 assert로 검증한다. 부수효과 호출은 dryRun=True 기본."
 
 sections:
+  - id: runtime_check
+    title: "라이브러리 실행 확인"
+    structuredPrimary: true
+    subtitle: "requests와 httpx import 확인"
+    goal: "requests와 httpx를 import하고 버전 문자열을 확인해 현재 로컬 Python에서 웹 요청 도구를 바로 쓸 수 있는지 검증한다."
+    why: "실제 네트워크 호출 전에 패키지와 객체를 먼저 확인하면 API 오류와 환경 오류를 분리할 수 있습니다."
+    explanation: "상단 라이브러리 패널이 requests, httpx 준비 상태를 확인하고, 이 셀은 두 패키지가 코드에서 import되는지와 기본 메타데이터가 읽히는지 검증합니다."
+    tips:
+      - "첫 셀에서는 외부 사이트 호출보다 import와 버전 확인을 먼저 고정합니다."
+      - "버전 문자열을 dict로 묶어두면 이후 진단 로그에도 그대로 재사용할 수 있습니다."
+    snippet: |-
+      import httpx
+      import requests
+
+      versions = {
+          "requests": requests.__version__,
+          "httpx": httpx.__version__,
+      }
+
+      assert all(versions.values())
+      print(versions)
+    exercise:
+      prompt: versions dict에 두 패키지의 major 버전을 추가하고, 값이 비어 있지 않은지 assert로 확인하세요.
+      starterCode: |-
+        import httpx
+        import requests
+
+        versions = {
+            "requests": requests.__version__,
+            "httpx": httpx.__version__,
+        }
+        major_versions = {name: value.split(".")[0] for name, value in versions.items()}
+
+        assert all(major_versions.values())
+        print(major_versions)
+      solution: |-
+        import httpx
+        import requests
+
+        versions = {
+            "requests": requests.__version__,
+            "httpx": httpx.__version__,
+        }
+        major_versions = {name: value.split(".")[0] for name, value in versions.items()}
+
+        assert all(major_versions.values())
+        print(major_versions)
+      hints:
+      - "__version__은 패키지가 제공하는 버전 문자열입니다."
+      - "split('.')의 첫 값은 major 버전입니다."
+    check:
+      type: noError
+      noError: "requests와 httpx import, 버전 dict 생성, assert가 오류 없이 끝나야 합니다."
+      resultCheck: "출력에 requests와 httpx의 major 버전이 모두 포함되어야 합니다."
   - id: position
     title: "1. 웹 API 자동화가 차지하는 자리"
     blocks:

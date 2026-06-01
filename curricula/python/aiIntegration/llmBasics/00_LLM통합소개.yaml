@@ -49,6 +49,59 @@ intro:
     - label: LLM통합소개 완료
       detail: 다음 강의(첫 Claude 호출)에서 실제 호출 코드를 작성할 준비를 마친다.
 sections:
+- id: runtime_check
+  title: SDK 실행 확인
+  structuredPrimary: true
+  subtitle: import와 클라이언트 클래스 확인
+  goal: anthropic 패키지를 import하고 클라이언트 클래스를 확인해 첫 호출 전 로컬 Python 준비 상태를 고정한다.
+  why: 모델 호출은 자격증명과 네트워크가 필요하므로, 소개 단계에서는 패키지 import와 객체 확인을 먼저 분리해야 합니다.
+  explanation: 상단 라이브러리 패널이 anthropic 준비 상태를 확인하고, 이 셀은 실제 요청을 보내지 않고 SDK 객체와 배포 버전을 검증합니다.
+  tips:
+  - 이 셀은 API 키가 없어도 실행 가능한 준비 점검입니다.
+  - 실제 호출은 다음 강의에서 환경변수와 응답 객체 검증까지 함께 다룹니다.
+  snippet: |-
+    import importlib.metadata as metadata
+    import anthropic
+
+    version = metadata.version("anthropic")
+    clientClass = anthropic.Anthropic
+
+    assert version
+    assert clientClass.__name__ == "Anthropic"
+    print(version)
+  exercise:
+    prompt: version과 clientClass 이름을 readiness dict에 담고, 두 값이 비어 있지 않은지 assert로 확인하세요.
+    starterCode: |-
+      import importlib.metadata as metadata
+      import anthropic
+
+      readiness = {
+          "version": metadata.version("anthropic"),
+          "client": anthropic.Anthropic.__name__,
+      }
+
+      assert readiness["version"]
+      assert readiness["client"] == "Anthropic"
+      print(readiness)
+    solution: |-
+      import importlib.metadata as metadata
+      import anthropic
+
+      readiness = {
+          "version": metadata.version("anthropic"),
+          "client": anthropic.Anthropic.__name__,
+      }
+
+      assert readiness["version"]
+      assert readiness["client"] == "Anthropic"
+      print(readiness)
+    hints:
+    - importlib.metadata.version은 설치된 배포 패키지 버전을 읽습니다.
+    - anthropic.Anthropic은 실제 요청 전에도 참조할 수 있는 클라이언트 클래스입니다.
+  check:
+    type: noError
+    noError: anthropic import, 버전 조회, 클라이언트 클래스 확인이 오류 없이 끝나야 합니다.
+    resultCheck: 출력에 버전 또는 readiness dict가 보이고 두 assert가 통과해야 합니다.
 - id: intro
   blocks:
   - type: mainHeader

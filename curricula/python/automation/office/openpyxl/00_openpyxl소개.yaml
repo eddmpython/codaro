@@ -40,6 +40,55 @@ intro:
     - label: 결과 검증
       detail: 저장한 파일을 다시 load_workbook으로 열어 셀 값과 구조를 assert로 확인한다.
 sections:
+- id: runtime_check
+  title: 라이브러리 실행 확인
+  structuredPrimary: true
+  subtitle: import와 워크북 생성 확인
+  goal: openpyxl을 import하고 Workbook 객체를 만들어 현재 로컬 Python에서 바로 쓸 수 있는지 확인한다.
+  why: 이후 강의는 파일 생성과 재열기를 반복하므로 첫 셀에서 라이브러리와 기본 객체를 고정해야 합니다.
+  explanation: 상단 라이브러리 패널이 openpyxl 준비 상태를 확인하고, 이 셀은 준비된 라이브러리가 실제 코드에서 동작하는지 검증합니다.
+  tips:
+  - 패키지 준비는 상단 라이브러리 패널이 맡고, 학습 셀은 import와 작은 객체 생성에 집중합니다.
+  - Workbook을 만든 뒤 셀 값을 하나 쓰고 다시 읽으면 최소 실행 계약을 빠르게 확인할 수 있습니다.
+  snippet: |-
+    import openpyxl
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet["A1"] = "ready"
+
+    assert sheet["A1"].value == "ready"
+    print(openpyxl.__version__)
+  exercise:
+    prompt: A1 대신 B2에 다른 값을 넣고, 같은 값을 다시 읽는 assert를 직접 확인하세요.
+    starterCode: |-
+      import openpyxl
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet["B2"] = "report"
+
+      assert sheet["B2"].value == "report"
+      print(openpyxl.__version__)
+    solution: |-
+      import openpyxl
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet["B2"] = "report"
+
+      assert sheet["B2"].value == "report"
+      print(openpyxl.__version__)
+    hints:
+    - Workbook()으로 새 파일 구조를 메모리에 만듭니다.
+    - 셀 주소 문자열을 바꾸면 같은 패턴으로 다른 위치를 검증할 수 있습니다.
+  check:
+    type: noError
+    noError: openpyxl import, Workbook 생성, 셀 쓰기와 읽기가 오류 없이 끝나야 합니다.
+    resultCheck: 출력에 openpyxl 버전이 보이고 assert가 통과해야 합니다.
 - id: openpyxl_position
   title: 1. openpyxl이 서 있는 자리
   blocks:
