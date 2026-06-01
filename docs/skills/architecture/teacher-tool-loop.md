@@ -124,7 +124,7 @@ src/codaro/ai/
 │   ├── traceModel.py
 │   ├── skillRegistry.py
 │   └── evalHarness.py
-├── teacherLoop.py    # compatibility re-export
+├── teacherLoop.py    # compatibility shim: older context/tool lifecycle imports only
 ├── tools.py          # 기본 tool 정의
 ├── toolRegistry.py   # registry + provider schema 변환
 ├── toolManifest.py   # group/lane/risk 표시 메타데이터
@@ -136,6 +136,14 @@ src/codaro/api/
 ```
 
 router가 셀 맥락 조립, tool round 실행, tool payload 포맷을 직접 소유하면 금방 덕지덕지 붙는다. provider loop의 판단 재료와 workloop 표시 payload는 `teacher/` 패키지에서 관리한다.
+
+## 호환 경로
+
+- `src/codaro/ai/teacherLoop.py`는 예전 `injectContext`, `toolCallStart`, `toolCallResult` import를 깨지 않기 위한 얇은 shim이다.
+- 새 내부 코드는 `teacherLoop.py`를 import하지 않고 `src/codaro/ai/teacher/`의 기준 모듈이나 `codaro.ai.teacher` public export를 사용한다.
+- 이 shim에는 provider loop, stream, runtime turn, router 판단 로직을 추가하지 않는다.
+- 제거 조건은 저장소 내부 검색에서 `teacherLoop.py`를 쓰는 코드가 없고, 다음 minor release note에서 외부 import 전환 경로를 안내한 뒤다.
+- 테스트 기준은 `tests/testTransportBoundary.py`의 compatibility shim 계약이다. shim이 두꺼워지거나 내부 코드가 다시 import하면 실패해야 한다.
 
 ## Tool Map
 

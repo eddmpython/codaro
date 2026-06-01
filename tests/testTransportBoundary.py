@@ -55,6 +55,34 @@ def testTeacherRuntimeTurnExecutionOwnsPreparedTurnUnpacking() -> None:
     assert "runTeacherChatStream" in source
 
 
+def testTeacherLoopCompatibilityShimStaysThinAndUnusedInternally() -> None:
+    shimPath = ROOT / "src/codaro/ai/teacherLoop.py"
+    source = shimPath.read_text(encoding="utf-8")
+
+    assert "from .teacher.contextBuilder import injectContext" in source
+    assert "from .teacher.toolLifecycle import toolCallResult, toolCallStart" in source
+    assert '__all__ = ["injectContext", "toolCallResult", "toolCallStart"]' in source
+    assert "providerLoop" not in source
+    assert "providerStream" not in source
+    assert "turnRuntime" not in source
+    assert "turnExecution" not in source
+
+    offenders: list[str] = []
+    for path in (ROOT / "src/codaro").rglob("*.py"):
+        if path == shimPath:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module in {"codaro.ai.teacherLoop", "teacherLoop"}:
+                offenders.append(path.relative_to(ROOT).as_posix())
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name == "codaro.ai.teacherLoop":
+                        offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
 def testCurriculumRouterKeepsCheckFlowBehindDomainBoundary() -> None:
     source = (ROOT / "src/codaro/api/curriculumRouter.py").read_text(encoding="utf-8")
     tree = ast.parse(source)

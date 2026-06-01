@@ -47,7 +47,7 @@ src/codaro/
 │   ├── factory.py baseProvider.py providers/
 │   ├── conversation.py      # conversation state + role prompts
 │   ├── teacher/             # provider loop + orchestrator + context + policy + trace + eval
-│   ├── teacherLoop.py       # compatibility re-export
+│   ├── teacherLoop.py       # compatibility shim for older context/tool lifecycle imports
 │   ├── tools.py             # default tool definitions
 │   ├── toolRegistry.py      # ToolDef + schema registry
 │   ├── toolManifest.py      # group/lane/risk metadata
