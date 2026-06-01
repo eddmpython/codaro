@@ -16,7 +16,7 @@ from ..kernel.uiEventFlow import UiCallbackNotFound, handleKernelUiEvent, resetK
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import MoveRequest, WorkspacePathError, WriteFileRequest
 from ..system.packageOps import PackageEnvironmentError
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .errors import fail
 from .kernelWebSocket import handleKernelWebSocket
 from .requestModels import PackageRequest, PathRequest, ReactiveExecuteRequest

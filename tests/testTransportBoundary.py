@@ -782,6 +782,79 @@ def testSystemHealthFlowDoesNotImportTransportLayer() -> None:
     assert "HTTPException" not in source
 
 
+def testServerStateFactoryLivesOutsideTransportLayer() -> None:
+    source = (ROOT / "src/codaro/system/serverState.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert "class ServerState" in source
+    assert "def createServerState" in source
+    for expected in (
+        "AnalyticsTimeline",
+        "LearnerStateStore",
+        "CurriculumOsCache",
+        "ProgressTracker",
+        "StudyLoader",
+        "SessionManager",
+        "ExecutionEngine",
+        "LocalEngine",
+    ):
+        assert expected in source
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
+
+
+def testApiAppStateCompatibilityShimStaysThinAndUnusedInternally() -> None:
+    shimPath = ROOT / "src/codaro/api/appState.py"
+    source = shimPath.read_text(encoding="utf-8")
+
+    assert "from ..system.serverState import ServerState, createServerState" in source
+    assert '__all__ = ["ServerState", "createServerState"]' in source
+    for forbidden in (
+        "dataclass",
+        "AnalyticsTimeline",
+        "LearnerStateStore",
+        "CurriculumOsCache",
+        "ProgressTracker",
+        "StudyLoader",
+        "SessionManager",
+        "ExecutionEngine",
+        "LocalEngine",
+    ):
+        assert forbidden not in source
+
+    offenders: list[str] = []
+    for path in (ROOT / "src/codaro").rglob("*.py"):
+        if path == shimPath:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                if node.module == "codaro.api.appState":
+                    offenders.append(path.relative_to(ROOT).as_posix())
+                if node.module == "appState" and node.level > 0:
+                    offenders.append(path.relative_to(ROOT).as_posix())
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name == "codaro.api.appState":
+                        offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
+def testApiPackageReexportsServerStateFromSystemBoundary() -> None:
+    source = (ROOT / "src/codaro/api/__init__.py").read_text(encoding="utf-8")
+
+    assert "from ..system.serverState import ServerState, createServerState" in source
+    assert "from .appState import ServerState" not in source
+    assert "from .appState import ServerState, createServerState" not in source
+
+
 def testExtensionFlowDoesNotImportTransportLayer() -> None:
     source = (ROOT / "src/codaro/extensions/extensionFlow.py").read_text(encoding="utf-8")
     tree = ast.parse(source)

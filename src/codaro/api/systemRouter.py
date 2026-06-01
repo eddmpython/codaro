@@ -9,7 +9,7 @@ from ..system.fileOps import DirectoryListing, MoveRequest, WorkspacePathError, 
 from ..system.healthFlow import buildSystemHealthPayload
 from ..system.localDiagnostics import buildLocalDiagnosticExport, buildLocalDiagnosticSummary
 from ..system.packageOps import PackageEnvironmentError
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .errors import fail
 from .requestModels import PackageRequest, PathRequest
 

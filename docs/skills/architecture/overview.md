@@ -55,6 +55,8 @@ src/codaro/
 │   └── toolExecutor.py      # dispatch + session/document boundary
 ├── api/
 │   └── aiRouter.py          # HTTP/SSE boundary only
+├── system/
+│   └── serverState.py       # process/session/curriculum/runtime state factory
 └── webBuild/                # built product surface
 ```
 
@@ -63,6 +65,7 @@ src/codaro/
 - `api/aiRouter.py`에는 HTTP/SSE, request parsing, status code만 둔다.
 - provider 선택, context 조립, tool payload는 `ai/` 안에서 관리한다.
 - 실행기/문서/커리큘럼 세부 모델은 router가 직접 해석하지 않는다.
+- `ServerState` 생성과 runtime/domain concrete wiring은 `system/serverState.py`가 소유한다. `api/appState.py`는 legacy import 호환 shim으로만 둔다.
 
 ## 관련
 

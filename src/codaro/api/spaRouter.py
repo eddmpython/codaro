@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 
-from .appState import ServerState
+from ..system.serverState import ServerState
 
 
 def createSpaRouter(state: ServerState) -> APIRouter:

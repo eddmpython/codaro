@@ -23,7 +23,6 @@ from .api import (
     createDocumentRouter,
     createExtensionRouter,
     createKernelRouter,
-    createServerState,
     createShareRouter,
     createSpaRouter,
     createSystemRouter,
@@ -34,6 +33,7 @@ from .api import (
     validationExceptionHandler,
 )
 from .serverLog import configureServerLogging, formatLogFields, isVerboseLoggingEnabled, setVerboseLogging
+from .system.serverState import createServerState
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent

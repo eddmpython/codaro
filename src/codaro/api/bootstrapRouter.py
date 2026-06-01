@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 
 from ..serverLog import formatLogFields, getServerLogger
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .requestModels import EnvironmentInfo
 
 

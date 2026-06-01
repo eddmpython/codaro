@@ -4,9 +4,9 @@ import time
 
 from fastapi import APIRouter
 
-from ..system.workspaceIndex import WorkspaceIndex, buildWorkspaceIndex
 from ..serverLog import formatLogFields, getServerLogger
-from .appState import ServerState
+from ..system.serverState import ServerState
+from ..system.workspaceIndex import WorkspaceIndex, buildWorkspaceIndex
 
 
 def createWorkspaceRouter(state: ServerState) -> APIRouter:

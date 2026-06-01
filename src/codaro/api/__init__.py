@@ -1,7 +1,6 @@
 from .aiRouter import createAiRouter
 from .automationRouter import createAutomationRouter
 from .extensionRouter import createExtensionRouter
-from .appState import ServerState, createServerState
 from .bootstrapRouter import createBootstrapRouter
 from .curriculumRouter import createCurriculumRouter
 from .documentRouter import createDocumentRouter
@@ -25,6 +24,7 @@ from .spaRouter import createSpaRouter
 from .systemRouter import createSystemRouter
 from .terminalRouter import createTerminalRouter
 from .workspaceRouter import createWorkspaceRouter
+from ..system.serverState import ServerState, createServerState
 
 __all__ = [
     "CheckExerciseRequest",

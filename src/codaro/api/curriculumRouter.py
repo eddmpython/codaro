@@ -39,7 +39,7 @@ from ..curriculum.learnerProgressFlow import (
 )
 from ..curriculum.reviewFlow import buildCurriculumReviewsPayload, recordCurriculumReviewResult
 from ..serverLog import formatLogFields, getServerLogger
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .errors import fail
 from .requestModels import (
     CheckExerciseRequest,

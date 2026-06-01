@@ -18,7 +18,7 @@ from ..document.service import createEmptyDocument, exportDocument, loadDocument
 from ..kernel.documentExecution import executeDocumentCodeBlock
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import WorkspacePathError, resolvePath
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .errors import fail
 from .requestModels import InsertBlockRequest, MoveBlockRequest, RemoveBlockRequest, RunBlockRequest, UpdateBlockRequest
 

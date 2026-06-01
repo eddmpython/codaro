@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from ..serverLog import formatLogFields, getServerLogger
 from ..share.packFlow import SharePackFlow, SharePackFlowError
-from .appState import ServerState
+from ..system.serverState import ServerState
 from .errors import fail
 
 
