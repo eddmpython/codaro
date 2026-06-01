@@ -15,6 +15,16 @@ import {
 import { translate } from "@/lib/localeCopy";
 import type { AiProfile, AppNotice, ProviderValidationSnapshot } from "@/types";
 
+type ProviderActionPhase = NonNullable<ProviderValidationSnapshot["phase"]>;
+
+type ProviderActionTask = {
+  beforeRun?: () => void;
+  failureNotice: (error: unknown) => AppNotice;
+  phase: ProviderActionPhase;
+  providerId: string;
+  run: () => Promise<ProviderActionResult>;
+};
+
 export function useProviderConnection({
   apiOnline,
   onNotice,
@@ -53,6 +63,26 @@ export function useProviderConnection({
     }));
   }, []);
 
+  const runProviderAction = useCallback(async ({
+    beforeRun,
+    failureNotice,
+    phase,
+    providerId,
+    run,
+  }: ProviderActionTask) => {
+    if (!apiOnline || aiConnecting) return;
+    setAiConnecting(true);
+    try {
+      beforeRun?.();
+      applyProviderActionResult(await run());
+    } catch (error) {
+      recordProviderFailure(providerId, error, phase);
+      onNotice(failureNotice(error));
+    } finally {
+      setAiConnecting(false);
+    }
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+
   const connectProvider = useCallback(async () => {
     applyProviderActionResult(openProviderSettings(apiOnline));
   }, [apiOnline, applyProviderActionResult]);
@@ -65,77 +95,60 @@ export function useProviderConnection({
       return;
     }
 
-    setAiConnecting(true);
-    setProviderValidation((current) => ({
-      ...current,
-      [providerId]: providerOauthLoginPending(providerId),
-    }));
-    try {
-      onNotice({
-        tone: "default",
-        title: translate("provider.loginOpened.title"),
-        detail: translate("provider.loginOpened.detail"),
-      });
-      applyProviderActionResult(await loginOauthProvider(providerId));
-    } catch (error) {
-      recordProviderFailure(providerId, error, "login");
-      onNotice(providerAuthFailureNotice(error));
-    } finally {
-      setAiConnecting(false);
-    }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+    await runProviderAction({
+      beforeRun: () => {
+        setProviderValidation((current) => ({
+          ...current,
+          [providerId]: providerOauthLoginPending(providerId),
+        }));
+        onNotice({
+          tone: "default",
+          title: translate("provider.loginOpened.title"),
+          detail: translate("provider.loginOpened.detail"),
+        });
+      },
+      failureNotice: providerAuthFailureNotice,
+      phase: "login",
+      providerId,
+      run: () => loginOauthProvider(providerId),
+    });
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, runProviderAction]);
 
   const logoutOauthProvider = useCallback(async (providerId = "oauth-chatgpt") => {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await logoutOauthProviderAction(providerId));
-    } catch (error) {
-      recordProviderFailure(providerId, error, "logout");
-      onNotice(providerActionFailureNotice(translate("provider.logoutFailed.title"), error));
-    } finally {
-      setAiConnecting(false);
-    }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+    await runProviderAction({
+      failureNotice: (error) => providerActionFailureNotice(translate("provider.logoutFailed.title"), error),
+      phase: "logout",
+      providerId,
+      run: () => logoutOauthProviderAction(providerId),
+    });
+  }, [runProviderAction]);
 
   const selectAiProvider = useCallback(async (providerId: string) => {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await selectProvider(providerId));
-    } catch (error) {
-      recordProviderFailure(providerId, error, "select");
-      onNotice(providerActionFailureNotice(translate("provider.selectFailed.title"), error));
-    } finally {
-      setAiConnecting(false);
-    }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+    await runProviderAction({
+      failureNotice: (error) => providerActionFailureNotice(translate("provider.selectFailed.title"), error),
+      phase: "select",
+      providerId,
+      run: () => selectProvider(providerId),
+    });
+  }, [runProviderAction]);
 
   const saveApiProvider = useCallback(async (providerId: string, apiKey: string, baseUrl?: string) => {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
-    } catch (error) {
-      recordProviderFailure(providerId, error, "save");
-      onNotice(providerActionFailureNotice(translate("provider.saveFailed.title"), error));
-    } finally {
-      setAiConnecting(false);
-    }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+    await runProviderAction({
+      failureNotice: (error) => providerActionFailureNotice(translate("provider.saveFailed.title"), error),
+      phase: "save",
+      providerId,
+      run: () => saveApiProviderAction(providerId, apiKey, baseUrl),
+    });
+  }, [runProviderAction]);
 
   const validateAiProvider = useCallback(async (providerId: string) => {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await validateProviderAction(providerId, providerModel(aiProfile, providerId)));
-    } catch (error) {
-      recordProviderFailure(providerId, error, "manual");
-      onNotice(providerAuthFailureNotice(error));
-    } finally {
-      setAiConnecting(false);
-    }
-  }, [aiConnecting, aiProfile, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
+    await runProviderAction({
+      failureNotice: providerAuthFailureNotice,
+      phase: "manual",
+      providerId,
+      run: () => validateProviderAction(providerId, providerModel(aiProfile, providerId)),
+    });
+  }, [aiProfile, runProviderAction]);
 
   return {
     aiConnecting,

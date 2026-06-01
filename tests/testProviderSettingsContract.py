@@ -27,9 +27,15 @@ def test_provider_validation_state_is_persisted_for_settings_ui() -> None:
             "result.validation",
             "providerValidationFailure(providerId, error",
             "providerOauthLoginPending(providerId)",
+            "const runProviderAction = useCallback",
+            "beforeRun?.()",
+            "recordProviderFailure(providerId, error, phase)",
+            "failureNotice(error)",
             "providerValidation,",
         ),
     )
+    assert hook.count("setAiConnecting(true)") == 1
+    assert hook.count("setAiConnecting(false)") == 1
     assert_markers(
         connection,
         (
