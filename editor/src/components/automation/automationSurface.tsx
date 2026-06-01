@@ -80,7 +80,7 @@ export function AutomationView({
 
   return (
     <ScrollArea className="h-full min-h-0">
-      <div className="p-4">
+      <div className="p-4" data-automation-loop="second-loop" data-automation-source="validated-cell-recipe">
         <div className="mx-auto max-w-6xl space-y-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -125,7 +125,11 @@ export function AutomationView({
               </CardContent>
             </Card>
 
-            <Card id={automationSectionId("custom")} className={sectionCardClass(activeSection, "custom")}>
+            <Card
+              id={automationSectionId("custom")}
+              className={sectionCardClass(activeSection, "custom")}
+              data-automation-artifact="validated-cell-recipe"
+            >
               <CardHeader>
                 <CardTitle>{t("automation.custom.title")}</CardTitle>
                 <CardDescription>{t("automation.custom.description")}</CardDescription>

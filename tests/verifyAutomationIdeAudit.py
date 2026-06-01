@@ -168,8 +168,14 @@ AUTOMATION_REQUIREMENTS = (
         evidenceChecks=(
             ("editor/src/components/automation/automationSurface.tsx", (
                 "codaroAutomationTemplates",
+                "data-automation-loop=\"second-loop\"",
+                "data-automation-source=\"validated-cell-recipe\"",
+                "data-automation-artifact=\"validated-cell-recipe\"",
                 "automation.codaro.title",
+                "automation.codaro.description",
                 "automation.custom.title",
+                "automation.custom.description",
+                "automation.empty.detail",
                 "automation.tasks.title",
                 "automation.metric.automations",
                 "automation.metric.scheduled",
@@ -185,6 +191,9 @@ AUTOMATION_REQUIREMENTS = (
                 "자동화 루틴",
                 "Codaro 자동화",
                 "나만의 자동화",
+                "검증된 셀과 recipe를 태스크로 키울 때",
+                "대화, 현재 학습, 노트북에서 검증한 자동화 셀과 스크립트",
+                "Reference templates for turning validated cells and recipes into tasks.",
                 "긴급 정지",
                 "태스크 기준",
                 "Automation Routines",
@@ -195,6 +204,12 @@ AUTOMATION_REQUIREMENTS = (
                 "auditCount",
                 "onRunTask={runTask}",
                 "onToggleEStop={toggleEStop}",
+            )),
+        ),
+        forbiddenChecks=(
+            ("editor/src/lib/localeCopy.ts", (
+                "바로 시작할 수 있는 자동화 출발점",
+                "Ready-to-use starting points",
             )),
         ),
     ),

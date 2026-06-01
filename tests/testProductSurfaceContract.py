@@ -97,6 +97,27 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
     ):
         assert expected in locale
 
+    for expected in (
+        "검증된 셀과 recipe를 태스크로 키울 때",
+        "대화, 현재 학습, 노트북에서 검증한 자동화 셀과 스크립트",
+        "채팅에서 반복 작업을 말하고 셀 또는 recipe를 검증하면",
+        "Automation stores cells and recipes validated from chat, current learning, or notebooks.",
+    ):
+        assert expected in locale
+    assert "바로 시작할 수 있는 자동화 출발점" not in locale
+    assert "Ready-to-use starting points" not in locale
+
+
+def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
+    source = _read("editor/src/components/automation/automationSurface.tsx")
+
+    assert 'data-automation-loop="second-loop"' in source
+    assert 'data-automation-source="validated-cell-recipe"' in source
+    assert 'data-automation-artifact="validated-cell-recipe"' in source
+    assert "automation.codaro.description" in source
+    assert "automation.custom.description" in source
+    assert "automation.empty.detail" in source
+
 
 def testProductSurfaceDocsNameTheSameFlow() -> None:
     skillsReadme = _read("docs/skills/README.md")
