@@ -567,9 +567,10 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         .context("failed to create launcher window")?;
 
     let mut web_ctx = wry::WebContext::new(Some(paths.root().join("webview2")));
+    let launch_html = LAUNCH_HTML.replace("{{AVATAR_SRC}}", &avatar_data_uri());
     let webview = WebViewBuilder::with_web_context(&mut web_ctx)
         .with_background_color((9, 9, 11, 255))
-        .with_html(LAUNCH_HTML)
+        .with_html(launch_html)
         .build(&window)
         .context("failed to create webview")?;
 
@@ -653,6 +654,26 @@ fn hide_console_window() {
 // 별도로 ICO를 굽고, 여기서는 실행 중 창에 보이는 아이콘을 설정한다.
 const ICON_PNG: &[u8] = include_bytes!("../assets/codaro-icon.png");
 
+// 로딩 화면(LAUNCH_HTML)에 브랜드 마스코트를 띄우려고 임베디드 PNG를 base64 data URI로 만든다.
+// 로딩 화면은 네트워크/프로비저닝 전에 보이므로 원격 URL이 아니라 임베드 바이트를 쓴다.
+fn avatar_data_uri() -> String {
+    const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let data = ICON_PNG;
+    let mut out = String::with_capacity(data.len().div_ceil(3) * 4 + 24);
+    out.push_str("data:image/png;base64,");
+    for chunk in data.chunks(3) {
+        let b0 = chunk[0] as u32;
+        let b1 = *chunk.get(1).unwrap_or(&0) as u32;
+        let b2 = *chunk.get(2).unwrap_or(&0) as u32;
+        let triple = (b0 << 16) | (b1 << 8) | b2;
+        out.push(TABLE[((triple >> 18) & 0x3f) as usize] as char);
+        out.push(TABLE[((triple >> 12) & 0x3f) as usize] as char);
+        out.push(if chunk.len() > 1 { TABLE[((triple >> 6) & 0x3f) as usize] as char } else { '=' });
+        out.push(if chunk.len() > 2 { TABLE[(triple & 0x3f) as usize] as char } else { '=' });
+    }
+    out
+}
+
 fn load_window_icon() -> Option<tao::window::Icon> {
     let decoder = png::Decoder::new(ICON_PNG);
     let mut reader = decoder.read_info().ok()?;
@@ -671,17 +692,27 @@ const LAUNCH_HTML: &str = r##"<!DOCTYPE html>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
   body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #09090b; color: #fafafa;
-    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 22px; user-select: none; }
-  .logo { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; }
-  .spinner { width: 38px; height: 38px; border: 3px solid #27272a; border-top-color: #a1a1aa;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; user-select: none; }
+  .avatarWrap { position: relative; width: 148px; height: 148px; margin-bottom: 4px;
+    opacity: 0; animation: fadeIn 0.5s 0.15s forwards; }
+  .avatarWrap::before { content: ''; position: absolute; inset: -16px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(251,146,60,0.32) 0%, rgba(245,158,11,0.12) 52%, transparent 72%);
+    filter: blur(18px); animation: pulse 3s ease-in-out infinite; }
+  .avatar { position: relative; width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(0 6px 22px rgba(0,0,0,0.45)); }
+  .logo { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #27272a; border-top-color: #a1a1aa;
     border-radius: 50%; animation: spin 0.9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+  @keyframes fadeIn { to { opacity: 1; } }
   .status { color: #a1a1aa; font-size: 14px; text-align: center; padding: 0 24px; }
   .err { display: none; max-width: 580px; text-align: center; color: #fca5a5; font-size: 13px;
     line-height: 1.7; white-space: pre-wrap; padding: 0 28px; }
   .err.show { display: block; }
   .hide { display: none !important; }
 </style></head><body>
+  <div class="avatarWrap"><img class="avatar" src="{{AVATAR_SRC}}" alt="Codaro"></div>
   <div class="logo">Codaro</div>
   <div id="spin" class="spinner"></div>
   <div id="status" class="status">준비 중 — Python 런타임과 커리큘럼을 설치하고 있어요…<br>처음 실행은 다운로드 때문에 잠시 걸릴 수 있어요.</div>
