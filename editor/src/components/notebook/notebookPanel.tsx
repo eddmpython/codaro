@@ -44,7 +44,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/codeCompletion";
-import type { CellAiAction } from "@/lib/cellModel";
+import { isExecutableBlock, type CellAiAction } from "@/lib/cellModel";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
 import { cn } from "@/lib/utils";
@@ -187,7 +187,7 @@ export function NotebookPanel({
           {document.blocks.length ? document.blocks.map((block) => (
             <DocumentBlock
               block={block}
-              canRun={canRun && (block.type !== "code" || Boolean((drafts[block.id] ?? block.content).trim()))}
+              canRun={canRun && (!isExecutableBlock(block) || Boolean((drafts[block.id] ?? block.content).trim()))}
               draft={drafts[block.id] ?? block.content}
               isSelected={block.id === selectedBlockId}
               key={block.id}
@@ -571,7 +571,7 @@ function DocumentBlock({
   onRun: () => void;
   onSelect: () => void;
 }) {
-  const cellTitle = block.type === "markdown" ? "Markdown" : "Python";
+  const cellTitle = block.type === "markdown" ? "Markdown" : block.type === "automation" ? "Automation" : "Python";
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
 
   if (block.type === "markdown") {

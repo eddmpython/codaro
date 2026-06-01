@@ -132,17 +132,21 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in frontendDoc
     assert "`PRODUCT_SURFACE_NAV`" in frontendDoc
     assert "`entry`/`learning`/`notebook`/`secondLoop`/`support`" in frontendDoc
+    assert "`editor/src/lib/teacherScope.ts`" in frontendDoc
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in dogfoodDoc
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in identityDoc
     assert "`대화 → 현재 학습 → 노트북 → 자동화` 사이드바 순서" in ssotMap
+    assert "`editor/src/lib/teacherScope.ts`" in ssotMap
 
 
 def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
     responsePlan = _read("editor/src/lib/assistantResponsePlan.ts")
     pendingChanges = _read("editor/src/lib/pendingChanges.ts")
 
-    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply ? "editor" : null' in responsePlan
+    assert 'activeScope === "automation"' in responsePlan
+    assert "plan.pendingBlocks = buildLocalBlocksFromPrompt(message, activeScope)" in responsePlan
+    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null' in responsePlan
     assert 'surfaceToOpen: "curriculum"' in pendingChanges
     assert 'surfaceToOpen: "editor"' in pendingChanges
-    assert '"automation"' not in responsePlan
+    assert 'surfaceToOpen: "automation"' not in responsePlan
     assert '"automation"' not in pendingChanges

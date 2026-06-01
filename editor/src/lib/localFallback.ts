@@ -11,10 +11,11 @@ export type LocalAssistantDraft = {
 
 export function buildLocalAssistantDraft(message: string, scope: TeacherScope): LocalAssistantDraft {
   const generatedBlocks = scope === "cell" ? [] : buildLocalBlocksFromPrompt(message, scope);
+  const shouldSaveCurriculum = generatedBlocks.length > 0 && (scope === "lesson" || scope === "curriculum");
   return {
-    clearPendingBlocks: generatedBlocks.length > 0 && scope !== "cell",
+    clearPendingBlocks: shouldSaveCurriculum,
     generatedBlocks,
-    shouldSaveCurriculum: generatedBlocks.length > 0 && scope !== "cell",
+    shouldSaveCurriculum,
   };
 }
 
@@ -42,6 +43,7 @@ export function completeLocalAssistantDraft({
 } {
   const blockCount = draft.generatedBlocks.length;
   const saved = Boolean(savedTitle);
+  const automationDraft = scope === "automation" && blockCount > 0 && !saved;
   return {
     assistantMessage: {
       id: `assistant-preview-${now}`,
@@ -52,13 +54,27 @@ export function completeLocalAssistantDraft({
     },
     notice: {
       tone: blockCount ? "success" : "default",
-      title: saved ? translate("local.curriculumSaved") : blockCount ? translate("local.curriculumDraftReady") : translate("local.aiAnswerDone"),
-      detail: savedTitle ?? (blockCount ? translate("local.cellsGenerated", { count: blockCount }) : translate("local.cellGuideReady")),
+      title: saved
+        ? translate("local.curriculumSaved")
+        : automationDraft
+          ? translate("assistant.notebookChangeReady")
+          : blockCount
+            ? translate("local.curriculumDraftReady")
+            : translate("local.aiAnswerDone"),
+      detail: savedTitle ?? (
+        automationDraft
+          ? translate("assistant.notebookChangeReadyDetail")
+          : blockCount
+            ? translate("local.cellsGenerated", { count: blockCount })
+            : translate("local.cellGuideReady")
+      ),
     },
   };
 }
 
 export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope): BlockConfig[] {
+  if (scope === "automation") return buildLocalAutomationBlocksFromPrompt(message);
+
   const topic = inferLocalTopic(message);
   const seed = `${Date.now()}-${slugifyText(topic)}`;
   const scopeLine = scope === "cell"
@@ -142,6 +158,65 @@ export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope)
   ];
 }
 
+function buildLocalAutomationBlocksFromPrompt(message: string): BlockConfig[] {
+  const topic = inferLocalTopic(message);
+  const seed = `${Date.now()}-${slugifyText(topic)}`;
+  const quotedTopic = JSON.stringify(topic);
+  return [
+    {
+      id: `local-${seed}-automation-plan`,
+      type: "markdown",
+      content: [
+        `# ${topic}`,
+        "",
+        "자동화 요청은 커리큘럼 YAML로 저장하지 않고, 검토 가능한 노트북 셀로 먼저 준비합니다.",
+        "",
+        "- 현재 문서의 셀과 입력 경계를 확인합니다.",
+        "- percent-format recipe로 옮길 코드를 dry-run 기본값으로 둡니다.",
+        "- 검증된 뒤에만 태스크로 예약합니다.",
+      ].join("\n"),
+      displayKind: "callout",
+      role: "automation",
+      sourceType: "automationAuthoring",
+      title: topic,
+      payload: {
+        title: topic,
+        dryRunFirst: true,
+        target: "automation-recipe",
+      },
+    },
+    {
+      id: `local-${seed}-automation-cell`,
+      type: "automation",
+      content: [
+        "DRY_RUN = True",
+        "",
+        `TASK_NAME = ${quotedTopic}`,
+        "",
+        "def run():",
+        "    if DRY_RUN:",
+        "        print(f\"dry-run: {TASK_NAME}\")",
+        "        return",
+        "    # 검증 후 실제 자동화 동작을 여기에 넣습니다.",
+        "    print(f\"run: {TASK_NAME}\")",
+        "",
+        "run()",
+      ].join("\n"),
+      displayKind: "code",
+      role: "automation",
+      executionKind: "python",
+      sourceType: "automationAuthoring",
+      title: "Dry-run 자동화 셀",
+      description: "검토 후 cell-call로 dry-run을 확인하고 recipe/task로 승격합니다.",
+      payload: {
+        dryRunFirst: true,
+        authoringTool: "localFallback",
+        target: "automation-recipe",
+      },
+    },
+  ];
+}
+
 export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, blockCount: number, saved = false) {
   const locale = getActiveLocale();
   const topic = inferLocalTopic(message);
@@ -154,6 +229,14 @@ export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, 
         `This is cell-level guidance for ${cellSubject}.`,
         "Read and run the selected cell, then compare its output against the expected learning goal.",
         "Connect a provider to continue with explanations, hints, and validation based on the current cell and execution result.",
+      ].join("\n\n");
+    }
+    if (scope === "automation") {
+      return [
+        "Local guide mode is active, so I prepared dry-run automation cells for notebook review.",
+        `The draft starts from ${topic}.`,
+        `${blockCount} automation cells are waiting as notebook changes. Review and run them with DRY_RUN = True before turning them into a task.`,
+        "Connect a provider to inspect current cells, write the percent-format recipe, dry-run it, and register the validated task.",
       ].join("\n\n");
     }
     return [
@@ -172,6 +255,14 @@ export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, 
       `${cellSubject}에 대한 ${scopeLabel} 안내입니다.`,
       "선택한 셀을 읽고 실행한 뒤, 출력을 기대 학습 목표와 비교하세요.",
       "provider를 연결하면 현재 셀과 실행 결과를 바탕으로 설명, 힌트, 검증을 이어갑니다.",
+    ].join("\n\n");
+  }
+  if (scope === "automation") {
+    return [
+      "기본 안내 모드라 실행 전 검토용 자동화 셀만 준비합니다.",
+      `${topic} 요청을 ${scopeLabel} 노트북 변경으로 초안화했습니다.`,
+      `${blockCount}개 자동화 셀이 대기 중입니다. 적용 후 DRY_RUN = True 상태로 실행해 확인하세요.`,
+      "provider를 연결하면 현재 셀 확인, percent-format recipe 작성, dry-run 검증, 태스크 등록까지 이어갑니다.",
     ].join("\n\n");
   }
   return [

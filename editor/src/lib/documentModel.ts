@@ -1,4 +1,5 @@
 import type { BlockConfig, CodaroDocument } from "@/types";
+import { isExecutableBlock } from "@/lib/cellModel";
 
 export const starterDocument: CodaroDocument = {
   id: "new-notebook",
@@ -35,7 +36,7 @@ export function draftsFromBlocks(
 
   return Object.fromEntries(
     blocks
-      .filter((block) => block.type === "code" || (options.includeMarkdown && block.type === "markdown"))
+      .filter((block) => isExecutableBlock(block) || (options.includeMarkdown && block.type === "markdown"))
       .map((block) => [
         block.id,
         draftValueForBlock(block, options, duplicateExerciseBlockIds),
@@ -65,7 +66,7 @@ function duplicateSnippetExerciseBlockIds(blocks: BlockConfig[]) {
     if (block.sourceType === "section") {
       activeSnippetContent = "";
     }
-    if (block.type !== "code") return;
+    if (!isExecutableBlock(block)) return;
     const content = normalizeDraftCode(block.content);
     if (block.role === "snippet") {
       activeSnippetContent = content;
@@ -107,14 +108,14 @@ export function appendUniqueBlocks(
 }
 
 export function firstCodeBlockId(blocks: BlockConfig[]) {
-  return blocks.find((block) => block.type === "code")?.id ?? "";
+  return blocks.find((block) => isExecutableBlock(block))?.id ?? "";
 }
 
 export function materializeDrafts(document: CodaroDocument, drafts: Record<string, string>): CodaroDocument {
   return {
     ...document,
     blocks: document.blocks.map((block) =>
-      block.type === "code" || block.type === "markdown"
+      isExecutableBlock(block) || block.type === "markdown"
         ? { ...block, content: drafts[block.id] ?? block.content }
         : block,
     ),

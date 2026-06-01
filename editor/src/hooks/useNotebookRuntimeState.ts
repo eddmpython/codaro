@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { blockLabel } from "@/lib/cellModel";
+import { blockLabel, isExecutableBlock } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
 import {
@@ -42,7 +42,7 @@ export function useNotebookRuntimeState({
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
 
-  const codeBlocks = useMemo(() => document.blocks.filter((block) => block.type === "code"), [document.blocks]);
+  const codeBlocks = useMemo(() => document.blocks.filter(isExecutableBlock), [document.blocks]);
   const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
   const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
   const canRun = true;
@@ -53,7 +53,7 @@ export function useNotebookRuntimeState({
   }, []);
 
   const runBlock = useCallback(async (block: BlockConfig) => {
-    if (block.type !== "code") return;
+    if (!isExecutableBlock(block)) return;
     const code = resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
     if (surface === "curriculum") {
       selectCurriculumBlock(block.id);
@@ -85,7 +85,7 @@ export function useNotebookRuntimeState({
   }, [apiOnline, drafts, onNotice, results, selectCurriculumBlock, selectNotebookBlock, sessionId, surface]);
 
   const runNotebook = useCallback(async () => {
-    const firstBlock = selectedBlock?.type === "code" ? selectedBlock : codeBlocks[0];
+    const firstBlock = selectedBlock && isExecutableBlock(selectedBlock) ? selectedBlock : codeBlocks[0];
     if (!firstBlock) return;
     onNotice({ tone: "default", title: translate("runtime.notebookRunning"), detail: document.title });
     setNotebookRunning(true);

@@ -72,6 +72,12 @@ export function buildAssistantContext({
 }
 
 function assistantProcedureInstruction(activeScope: string, locale: AppLocale) {
+  if (activeScope === "automation") {
+    if (locale === "en") {
+      return `${aiLanguageInstruction(locale)} Prefer a chat-first automation authoring workflow. Current decision scope: automation. Inspect the current document with read-cells, then create a percent-format recipe with write-automation-recipe and an automation cell. Keep the first execution in dry-run mode, use packages-check before running code that needs external packages, validate with cell-call, and only register a task after the recipe is validated. Do not turn automation authoring requests into curriculum YAML.`;
+    }
+    return `${aiLanguageInstruction(locale)} 채팅 우선 자동화 작성 흐름을 기본으로 한다. 현재 판단 범위는 automation이다. read-cells로 현재 문서를 확인한 뒤 write-automation-recipe로 percent-format recipe와 automation 셀을 만든다. 첫 실행은 dry-run으로 두고, 외부 패키지가 필요하면 packages-check를 먼저 호출하며, cell-call로 검증한 뒤 검증된 recipe만 task로 등록한다. 자동화 작성 요청을 커리큘럼 YAML로 바꾸지 않는다.`;
+  }
   if (locale === "en") {
     return `${aiLanguageInstruction(locale)} Prefer a chat-first learning workflow. Current decision scope: ${activeScope}. For learning requests, first call resolve-learning-goal, then search-curricula, then compose-master-plan to recommend or combine existing lessons. Only call write-curriculum-yaml when compose-master-plan shows a real gap that existing lessons do not cover; materialize that gap into Current Learning before working cell-by-cell with read-cells, write-cell, and cell-call. Before writing or running cells that need external packages, use packages-check and call packages-install first when any package is missing. Before editing cells, use cellMap role/displayKind/executionKind/purpose and edit only the right explanation, snippet, practice, or check cell.`;
   }

@@ -1,5 +1,6 @@
 import { codaroApi } from "@/lib/api";
 import type { ResultMap } from "@/lib/assistantContext";
+import { isExecutableBlock } from "@/lib/cellModel";
 import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localFallback";
 import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
@@ -184,12 +185,10 @@ export async function runReactiveNotebook({
       activeSession.sessionId,
       firstBlock.id,
       document.blocks
-        .filter((block): block is BlockConfig & { type: "code" | "markdown" } =>
-          block.type === "code" || block.type === "markdown",
-        )
+        .filter((block) => isExecutableBlock(block) || block.type === "markdown")
         .map((block) => ({
           id: block.id,
-          type: block.type,
+          type: isExecutableBlock(block) ? "code" : "markdown",
           content: drafts[block.id] ?? block.content,
         })),
     );
@@ -242,7 +241,7 @@ export async function preflightRuntimePackages(
 function inferDocumentRuntimePackages(document: CodaroDocument, drafts: Record<string, string>) {
   const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
   for (const block of document.blocks) {
-    if (block.type !== "code") continue;
+    if (!isExecutableBlock(block)) continue;
     for (const packageName of inferCodePackages(drafts[block.id] ?? block.content)) {
       packages.add(packageName);
     }

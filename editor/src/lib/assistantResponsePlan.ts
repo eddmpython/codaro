@@ -51,11 +51,15 @@ export function buildAssistantResponsePlan({
     applyToolArtifacts(plan, response, activeScope);
   }
 
-  if (!plan.curriculumToSave && activeScope !== "cell") {
-    plan.curriculumToSave = {
-      blocks: buildLocalBlocksFromPrompt(message, activeScope),
-    };
-    plan.clearPendingBlocks = true;
+  if (!plan.curriculumToSave && !plan.documentToApply && !plan.pendingBlocks.length && activeScope !== "cell") {
+    if (activeScope === "automation") {
+      plan.pendingBlocks = buildLocalBlocksFromPrompt(message, activeScope);
+    } else {
+      plan.curriculumToSave = {
+        blocks: buildLocalBlocksFromPrompt(message, activeScope),
+      };
+      plan.clearPendingBlocks = true;
+    }
   }
 
   return plan;
@@ -78,7 +82,7 @@ export function buildAssistantResponseApplication({
     documentToApply: plan.documentToApply,
     pendingBlocks: plan.pendingBlocks,
     pendingTarget: plan.pendingBlocks.length || plan.clearPendingBlocks ? "notebook" : null,
-    surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply ? "editor" : null,
+    surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null,
   };
 }
 
@@ -96,14 +100,6 @@ export function assistantResponseNotice({
   response: AiChatResponse;
   savedCurriculumTitle: string;
 }): AppNotice {
-  if (!response.toolCalls.length) {
-    return {
-      tone: "default",
-      title: translate("assistant.responseDone"),
-      detail: response.provider,
-    };
-  }
-
   if (savedCurriculumTitle) {
     return {
       tone: "success",
@@ -112,7 +108,15 @@ export function assistantResponseNotice({
     };
   }
 
-  if (activeScope === "cell") {
+  if (!response.toolCalls.length && activeScope !== "automation") {
+    return {
+      tone: "default",
+      title: translate("assistant.responseDone"),
+      detail: response.provider,
+    };
+  }
+
+  if (activeScope === "cell" || activeScope === "automation") {
     return {
       tone: "success",
       title: translate("assistant.notebookChangeReady"),
@@ -149,7 +153,7 @@ function applyToolArtifacts(
   const generatedBlocks = collectBlocksFromToolCalls(response.toolCalls);
   if (!generatedBlocks.length) return;
 
-  if (activeScope === "cell") {
+  if (activeScope === "cell" || activeScope === "automation") {
     plan.pendingBlocks = generatedBlocks;
     return;
   }

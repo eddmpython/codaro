@@ -148,6 +148,9 @@ export function useAssistantTurnState({
       if (localApplication.clearPendingBlocks) {
         setPendingBlocks([]);
       }
+      if (localApplication.pendingBlocks.length) {
+        setPendingBlocks((current) => mergePendingBlocks(current, localApplication.pendingBlocks));
+      }
       if (localApplication.pendingTarget) {
         setPendingTarget(localApplication.pendingTarget);
       }

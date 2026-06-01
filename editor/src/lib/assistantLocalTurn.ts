@@ -7,7 +7,7 @@ import {
 import type { CurriculumToSave, PendingTarget } from "@/lib/assistantResponsePlan";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
-import type { AppNotice } from "@/types";
+import type { AppNotice, BlockConfig } from "@/types";
 
 export type AssistantLocalTurnResult = {
   assistantMessage: AssistantMessage;
@@ -20,6 +20,7 @@ export type AssistantLocalTurnApplication = {
   clearPendingBlocks: boolean;
   curriculumToSave: CurriculumToSave | null;
   draft: LocalAssistantDraft;
+  pendingBlocks: BlockConfig[];
   pendingTarget: PendingTarget | null;
   surfaceToOpen: SurfaceMode | null;
 };
@@ -32,12 +33,14 @@ export function buildAssistantLocalTurnApplication({
   scope: TeacherScope;
 }): AssistantLocalTurnApplication {
   const draft = buildLocalAssistantDraft(message, scope);
+  const pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks;
   return {
     clearPendingBlocks: draft.clearPendingBlocks,
     curriculumToSave: draft.shouldSaveCurriculum ? { blocks: draft.generatedBlocks } : null,
     draft,
-    pendingTarget: draft.clearPendingBlocks ? "notebook" : null,
-    surfaceToOpen: draft.shouldSaveCurriculum ? "curriculum" : null,
+    pendingBlocks,
+    pendingTarget: draft.clearPendingBlocks || pendingBlocks.length ? "notebook" : null,
+    surfaceToOpen: draft.shouldSaveCurriculum ? "curriculum" : pendingBlocks.length ? "editor" : null,
   };
 }
 

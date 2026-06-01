@@ -24,6 +24,7 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLocaleState } from "@/hooks/useLocaleState";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
 import { LocaleProvider } from "@/lib/localeContext";
+import { isExecutableBlock } from "@/lib/cellModel";
 import { loadSharePackCurriculum } from "@/lib/sharePackOperations";
 import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
@@ -174,7 +175,7 @@ function App() {
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
-  const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find((block) => block.type === "code") ?? activeDocument.blocks[0];
+  const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find(isExecutableBlock) ?? activeDocument.blocks[0];
   const {
     canRun,
     currentResult,

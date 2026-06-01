@@ -4,6 +4,10 @@ import { getActiveLocale, type AppLocale } from "@/lib/localeCopy";
 export type LearningCellKind = "concept" | "visual" | "snippet" | "practice" | "check" | "reflection" | "automation";
 export type CellAiAction = "explain" | "hint" | "check" | "revise";
 
+export function isExecutableBlock(block: BlockConfig) {
+  return block.type === "code" || block.type === "automation";
+}
+
 export function classifyLearningCell(block: BlockConfig, draft: string): LearningCellKind {
   if (block.type === "automation") return "automation";
   if (block.displayKind === "quiz") return "check";
@@ -19,8 +23,8 @@ export function classifyLearningCell(block: BlockConfig, draft: string): Learnin
   if (block.role === "automation" || block.executionKind === "browser" || block.executionKind === "os" || block.executionKind === "mouse") return "automation";
   if (block.role === "skill" || block.executionKind === "skill") return "automation";
 
-  const content = (block.type === "code" ? draft : block.content).toLowerCase();
-  const lineCount = (block.type === "code" ? draft : block.content).split("\n").filter((line) => line.trim()).length;
+  const content = (isExecutableBlock(block) ? draft : block.content).toLowerCase();
+  const lineCount = (isExecutableBlock(block) ? draft : block.content).split("\n").filter((line) => line.trim()).length;
 
   if (block.type === "markdown") {
     if (/\|.+\||compare|diagram|visual|표|비교|그림|흐름|구조/.test(content)) return "visual";
@@ -42,7 +46,7 @@ export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, ques
   const preview = block.content.length > 900 ? `${block.content.slice(0, 900)}...` : block.content;
   const customQuestion = question?.trim();
   if (locale === "en") {
-    const typeLabel = block.type === "code" ? "code cell" : "learning cell";
+    const typeLabel = isExecutableBlock(block) ? "code cell" : "learning cell";
     const base = `Selected ${typeLabel}: ${label}\n\nCell content:\n${preview}`;
     const questionLine = customQuestion ? `\n\nUser question:\n${customQuestion}` : "";
     if (action === "hint") {
@@ -57,7 +61,7 @@ export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, ques
     return `${base}${questionLine}\n\nExplain this cell in context. Include what the learner should understand, what to run or change next, and how to verify the answer.`;
   }
 
-  const typeLabel = block.type === "code" ? "코드 셀" : "학습 셀";
+  const typeLabel = isExecutableBlock(block) ? "코드 셀" : "학습 셀";
   const base = `선택한 ${typeLabel}: ${label}\n\n셀 내용:\n${preview}`;
   const questionLine = customQuestion ? `\n\n사용자 질문:\n${customQuestion}` : "";
 

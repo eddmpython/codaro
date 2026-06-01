@@ -135,7 +135,7 @@ def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
 
     assert "saveCurriculum" not in source
     assert "curriculumToSave: plan.curriculumToSave" in source
-    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum"' in source
+    assert 'surfaceToOpen: plan.curriculumToSave ? "curriculum" : plan.documentToApply || plan.pendingBlocks.length ? "editor" : null' in source
 
 
 def testAssistantContextSteersGoalDiscoveryBeforeYamlAuthoring() -> None:
@@ -153,6 +153,19 @@ def testAssistantContextSteersGoalDiscoveryBeforeYamlAuthoring() -> None:
     assert "커리큘럼 YAML을 먼저" not in source
 
 
+def testAssistantContextSteersAutomationAuthoringAwayFromCurriculumYaml() -> None:
+    source = _read("editor/src/lib/assistantContext.ts")
+
+    for expected in (
+        'activeScope === "automation"',
+        "write-automation-recipe",
+        "dry-run",
+        "Do not turn automation authoring requests into curriculum YAML",
+        "자동화 작성 요청을 커리큘럼 YAML로 바꾸지 않는다",
+    ):
+        assert expected in source
+
+
 def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     source = _read("editor/src/hooks/useAssistantTurnState.ts")
 
@@ -160,6 +173,43 @@ def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     assert "saveAndOpenCurriculum(localApplication.curriculumToSave)" in source
     assert "openCurriculum(entry)" in source
     assert "completeAssistantLocalTurn" in source
+
+
+def testTeacherScopeSeparatesAutomationFromLearningRequests() -> None:
+    source = _read("editor/src/lib/teacherScope.ts")
+
+    assert 'export type TeacherScope = "cell" | "lesson" | "curriculum" | "automation"' in source
+    assert 'if (scope === "automation") return en ? "automation" : "자동화"' in source
+    assert 'return "automation"' in source
+    assert source.index("배우|학습|공부|연습|실습") < source.index("자동화|루틴|태스크")
+
+
+def testLocalFallbackRoutesAutomationDraftsToNotebookPendingChanges() -> None:
+    fallback = _read("editor/src/lib/localFallback.ts")
+    localTurn = _read("editor/src/lib/assistantLocalTurn.ts")
+    hook = _read("editor/src/hooks/useAssistantTurnState.ts")
+
+    assert 'scope === "automation"' in fallback
+    assert 'sourceType: "automationAuthoring"' in fallback
+    assert "DRY_RUN = True" in fallback
+    assert 'scope === "lesson" || scope === "curriculum"' in fallback
+    assert "pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks" in localTurn
+    assert "mergePendingBlocks(current, localApplication.pendingBlocks)" in hook
+
+
+def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
+    cellModel = _read("editor/src/lib/cellModel.ts")
+    documentModel = _read("editor/src/lib/documentModel.ts")
+    runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
+    notebookRuntime = _read("editor/src/lib/notebookRuntime.ts")
+    notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
+
+    assert "export function isExecutableBlock(block: BlockConfig)" in cellModel
+    assert 'block.type === "code" || block.type === "automation"' in cellModel
+    assert ".filter((block) => isExecutableBlock(block)" in documentModel
+    assert "document.blocks.filter(isExecutableBlock)" in runtimeHook
+    assert 'type: isExecutableBlock(block) ? "code" : "markdown"' in notebookRuntime
+    assert 'block.type === "automation" ? "Automation"' in notebookPanel
 
 
 def testFrontendStateDoesNotImportComponentImplementations() -> None:
