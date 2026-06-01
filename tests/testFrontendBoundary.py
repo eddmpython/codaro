@@ -232,13 +232,18 @@ def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     assert "completeAssistantLocalTurn" in source
 
 
-def testTeacherScopeSeparatesAutomationFromLearningRequests() -> None:
+def testTeacherScopeSeparatesAutomationLearningFromAutomationAuthoring() -> None:
     source = _read("editor/src/lib/teacherScope.ts")
 
     assert 'export type TeacherScope = "cell" | "lesson" | "curriculum" | "automation"' in source
     assert 'if (scope === "automation") return en ? "automation" : "자동화"' in source
     assert 'return "automation"' in source
-    assert source.index("배우|학습|공부|연습|실습") < source.index("자동화|루틴|태스크")
+    assert "function hasLearningIntent(value: string): boolean" in source
+    assert "function hasAutomationAuthoringIntent(value: string): boolean" in source
+    assert 'if (hasLearningIntent(normalized)) return "curriculum"' in source
+    assert 'if (hasAutomationAuthoringIntent(normalized)) return "automation"' in source
+    assert source.index("hasLearningIntent(normalized)") < source.index("hasAutomationAuthoringIntent(normalized)")
+    assert "dry-?run" in source
 
 
 def testLocalFallbackRoutesAutomationDraftsToNotebookPendingChanges() -> None:

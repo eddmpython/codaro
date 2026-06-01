@@ -176,6 +176,28 @@ DOGFOOD_REQUIREMENTS = (
         ),
     ),
     DogfoodRequirement(
+        requirementId="chat-scope-splits-learning-from-automation-authoring",
+        requirement="Chat keeps learning-about-automation requests in current learning and routes validated recipe/task requests into automation authoring.",
+        evidenceChecks=(
+            ("editor/src/lib/teacherScope.ts", (
+                "function hasLearningIntent(value: string): boolean",
+                "function hasAutomationAuthoringIntent(value: string): boolean",
+                "if (hasLearningIntent(normalized)) return \"curriculum\"",
+                "if (hasAutomationAuthoringIntent(normalized)) return \"automation\"",
+                "dry-?run",
+            )),
+            ("tests/testFrontendBoundary.py", (
+                "testTeacherScopeSeparatesAutomationLearningFromAutomationAuthoring",
+                "hasLearningIntent(normalized)",
+                "hasAutomationAuthoringIntent(normalized)",
+            )),
+            ("editor/src/lib/assistantContext.ts", (
+                "Do not turn automation authoring requests into curriculum YAML",
+                "자동화 작성 요청을 커리큘럼 YAML로 바꾸지 않는다",
+            )),
+        ),
+    ),
+    DogfoodRequirement(
         requirementId="live-provider-smoke-path",
         requirement="The opt-in live provider gate covers real answer, teacher answer, clarification, goal-discovery, gap-only YAML tool loop, and cell-call loop.",
         evidenceChecks=(
