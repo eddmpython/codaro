@@ -10,6 +10,7 @@ from codaro.automation.taskFlow import (
     AutomationTaskFlowError,
     automationSchedulerStatusPayload,
     clearAutomationStopPayload,
+    createAutomationTaskFromRecipePayload,
     createAutomationTaskPayload,
     getAutomationTaskPayload,
     resetAutomationTaskFlowState,
@@ -42,6 +43,45 @@ def testInvalidScheduleDoesNotMutateTaskSchedule(tmp_path) -> None:
 
     assert excInfo.value.statusCode == 400
     assert getAutomationTaskPayload(task["id"])["schedule"] is None
+
+
+def testCreateAutomationTaskFromRecipeValidatesRecipeBeforeRegistration(tmp_path) -> None:
+    recipePath = tmp_path / "recipes" / "report.py"
+    recipePath.parent.mkdir()
+    recipePath.write_text("# %% [automation]\nDRY_RUN = True\n\nprint('ok')\n", encoding="utf-8")
+
+    result = createAutomationTaskFromRecipePayload(
+        recipePath=recipePath,
+        documentPath="recipes/report.py",
+        name="Run report",
+        description="Daily report task",
+        schedule="@every_15m",
+        inputs={"dryRun": True},
+    )
+
+    assert result["created"] is True
+    assert result["documentPath"] == str(recipePath)
+    assert result["task"]["name"] == "Run report"
+    assert result["task"]["description"] == "Daily report task"
+    assert result["task"]["schedule"] == "@every_15m"
+    assert result["task"]["inputs"] == {"dryRun": True}
+    assert result["recipeValidation"] == {"percentFormat": True, "dryRunFirst": True}
+
+
+def testCreateAutomationTaskFromRecipeRejectsUnsafeRecipe(tmp_path) -> None:
+    recipePath = tmp_path / "recipes" / "unsafe.py"
+    recipePath.parent.mkdir()
+    recipePath.write_text("# %% [automation]\nprint('writes now')\n", encoding="utf-8")
+
+    with pytest.raises(AutomationTaskFlowError) as excInfo:
+        createAutomationTaskFromRecipePayload(
+            recipePath=recipePath,
+            documentPath="recipes/unsafe.py",
+            name="Unsafe",
+        )
+
+    assert excInfo.value.statusCode == 400
+    assert str(excInfo.value) == "Automation task requires DRY_RUN = True before registration."
 
 
 def testEStopCancelsScheduledAutomationTasks(tmp_path) -> None:

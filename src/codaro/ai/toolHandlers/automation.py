@@ -442,46 +442,24 @@ class AutomationToolHandlers:
         }
 
     async def _handle_createAutomationTask(self, args: dict[str, Any]) -> dict[str, Any]:
-        from codaro.automation.recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
-        from codaro.automation.taskRegistry import getTaskRegistry
+        from codaro.automation.taskFlow import (
+            AutomationTaskFlowError,
+            createAutomationTaskFromRecipePayload,
+        )
 
+        requestedDocumentPath = str(args.get("documentPath", ""))
         try:
-            draft = buildAutomationTaskDraft(
+            recipePath = Path(self._validatePath(requestedDocumentPath))
+            return createAutomationTaskFromRecipePayload(
+                recipePath=recipePath,
+                documentPath=requestedDocumentPath,
                 name=str(args.get("name", "")),
-                documentPath=str(args.get("documentPath", "")),
                 description=str(args.get("description", "")),
                 schedule=str(args["schedule"]) if args.get("schedule") else None,
                 inputs=args.get("inputs"),
             )
-        except (TypeError, ValueError) as exc:
+        except AutomationTaskFlowError as exc:
             return {"error": str(exc)}
-
-        recipePath = Path(self._validatePath(draft.documentPath))
-        if not recipePath.is_file():
-            return {"error": f"Automation recipe not found: {draft.documentPath}"}
-        try:
-            recipeValidation = validateAutomationTaskRecipeText(recipePath.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError) as exc:
-            return {"error": f"Automation recipe could not be read: {exc}"}
-        except ValueError as exc:
-            return {"error": str(exc)}
-
-        task = getTaskRegistry().create(
-            name=draft.name,
-            documentPath=str(recipePath),
-            description=draft.description,
-            schedule=draft.schedule,
-            inputs=draft.inputs,
-        )
-        return {
-            "created": True,
-            "task": task.serialize(),
-            "documentPath": str(recipePath),
-            "recipeValidation": {
-                "percentFormat": recipeValidation.percentFormat,
-                "dryRunFirst": recipeValidation.dryRunFirst,
-            },
-        }
 
     async def _handle_runAutomation(self, args: dict[str, Any]) -> dict[str, Any]:
         from codaro.automation.eStop import getEmergencyStop

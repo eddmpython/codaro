@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from .eStop import getEmergencyStop
+from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
 from .scheduler import TaskScheduler, parseScheduleSeconds
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
@@ -43,6 +45,53 @@ def createAutomationTaskPayload(
         inputs=inputs,
     )
     return task.serialize()
+
+
+def createAutomationTaskFromRecipePayload(
+    *,
+    recipePath: Path,
+    documentPath: str,
+    name: str,
+    description: str = "",
+    schedule: str | None = None,
+    inputs: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    try:
+        draft = buildAutomationTaskDraft(
+            name=name,
+            documentPath=documentPath,
+            description=description,
+            schedule=schedule,
+            inputs=inputs,
+        )
+    except (TypeError, ValueError) as exc:
+        raise AutomationTaskFlowError(400, str(exc)) from exc
+
+    if not recipePath.is_file():
+        raise AutomationTaskFlowError(404, f"Automation recipe not found: {draft.documentPath}")
+    try:
+        recipeValidation = validateAutomationTaskRecipeText(recipePath.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError) as exc:
+        raise AutomationTaskFlowError(400, f"Automation recipe could not be read: {exc}") from exc
+    except ValueError as exc:
+        raise AutomationTaskFlowError(400, str(exc)) from exc
+
+    task = getTaskRegistry().create(
+        name=draft.name,
+        documentPath=str(recipePath),
+        description=draft.description,
+        schedule=draft.schedule,
+        inputs=draft.inputs,
+    )
+    return {
+        "created": True,
+        "task": task.serialize(),
+        "documentPath": str(recipePath),
+        "recipeValidation": {
+            "percentFormat": recipeValidation.percentFormat,
+            "dryRunFirst": recipeValidation.dryRunFirst,
+        },
+    }
 
 
 def getAutomationTaskPayload(taskId: str) -> dict[str, Any]:

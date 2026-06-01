@@ -54,11 +54,13 @@ class AuditTrail:
 
     def _ensureFileHandle(self):
         today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
-        if self._currentDate != today:
-            if self._fileHandle:
-                self._fileHandle.close()
-            self._currentDate = today
-            self._fileHandle = open(self._getLogFile(), "a", encoding="utf-8")
+        if self._currentDate == today and self._fileHandle is not None:
+            return self._fileHandle
+        if self._fileHandle:
+            self._fileHandle.close()
+        fileHandle = open(self._getLogFile(), "a", encoding="utf-8")
+        self._currentDate = today
+        self._fileHandle = fileHandle
         return self._fileHandle
 
     def record(

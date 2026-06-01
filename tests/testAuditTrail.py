@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import json
 from pathlib import Path
 
@@ -102,4 +103,25 @@ def testAuditTrailDisposeIdempotent(tmp_path: Path) -> None:
     trail = AuditTrail(auditDir=tmp_path)
     trail.record("click", "ai")
     trail.dispose()
+    trail.dispose()
+
+
+def testAuditTrailOpenFailureDoesNotPoisonFutureRecords(tmp_path: Path, monkeypatch) -> None:
+    trail = AuditTrail(auditDir=tmp_path)
+
+    def failOpen(*args, **kwargs):
+        raise PermissionError("denied")
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(builtins, "open", failOpen)
+        trail.record("click", "ai")
+        trail.record("typeText", "ai")
+
+    trail.record("scroll", "ai")
+    assert [entry.actionType for entry in trail.query(limit=3)] == ["scroll", "typeText", "click"]
+
+    lines = next(tmp_path.glob("audit-*.jsonl")).read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 1
+    assert json.loads(lines[0])["actionType"] == "scroll"
+
     trail.dispose()
