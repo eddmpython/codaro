@@ -151,6 +151,67 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
     assert "`editor/src/lib/teacherScope.ts`" in ssotMap
 
 
+def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
+    frontendDoc = _read("docs/skills/architecture/frontend-product-surface.md")
+
+    for heading in (
+        "## 현재 구조 평가",
+        "## 목표 구조와 영향 파일",
+        "## 덕지덕지 위험과 제거 기준",
+    ):
+        assert heading in frontendDoc
+
+    for expected in (
+        "`editor/src/components/app/mainSurface.tsx`",
+        "표면 조립",
+        "`editor/src/components/chat/chatSurface.tsx`",
+        "`editor/src/lib/assistantArtifactRouting.ts`",
+        "`editor/src/lib/assistantResponsePlan.ts`",
+        "`editor/src/lib/pendingChanges.ts`",
+        "`editor/src/lib/chatStartExamples.ts`",
+        "`editor/src/components/app/curriculumSidebarTree.tsx`",
+        "`editor/src/components/app/automationSidebarTree.tsx`",
+        "`tests/testProductSurfaceContract.py`",
+        "`tests/verifyDogfoodAlphaAudit.py`",
+        "`PRODUCT_SURFACE_NAV`",
+        "`PRODUCT_SIDEBAR_NAV`",
+        "primary route",
+        "second loop",
+        "호환 레이어",
+    ):
+        assert expected in frontendDoc
+
+
+def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
+    mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+    chatSurface = _read("editor/src/components/chat/chatSurface.tsx")
+
+    for forbidden in (
+        "routeAssistantArtifacts",
+        "buildAssistantResponseApplication",
+        "buildAssistantResponsePlan",
+        "buildAcceptPendingChangesApplication",
+        "buildRejectPendingChangesApplication",
+        "pendingTargetForAssistantArtifacts",
+        "surfaceForAssistantArtifacts",
+    ):
+        assert forbidden not in mainSurface
+
+    for forbidden in (
+        "curriculumSidebarTree",
+        "automationSidebarTree",
+        "CurriculumSidebarTree",
+        "AutomationSidebarTree",
+        "CurriculumDependencyPanel",
+        "curriculumPackagePreparation",
+        "learningContract",
+        "sectionContract",
+        "Yaml",
+        "YAML",
+    ):
+        assert forbidden not in chatSurface
+
+
 def testAssistantArtifactsRouteToLearningOrNotebookBeforeAutomation() -> None:
     routing = _read("editor/src/lib/assistantArtifactRouting.ts")
     responsePlan = _read("editor/src/lib/assistantResponsePlan.ts")
