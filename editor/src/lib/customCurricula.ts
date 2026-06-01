@@ -18,6 +18,27 @@ export type CustomCurriculumEntry = {
   createdAt: number;
 };
 
+export type CustomCurriculumSaveRequest = {
+  blocks: BlockConfig[];
+  title?: string;
+} | null;
+
+export type SaveCustomCurriculum = (
+  blocks: BlockConfig[],
+  title?: string,
+) => CustomCurriculumEntry | null;
+
+export type OpenCustomCurriculum = (
+  entry: CustomCurriculumEntry,
+  options?: { showNotice?: boolean },
+) => void;
+
+export type SaveAndOpenCustomCurriculumResult = {
+  entry: CustomCurriculumEntry | null;
+  opened: boolean;
+  title: string;
+};
+
 export type SidebarCustomCurriculum = {
   id: string;
   title: string;
@@ -140,6 +161,38 @@ export function upsertCustomCurriculumEntry(
   entry: CustomCurriculumEntry,
 ) {
   return [entry, ...current.filter((item) => item.id !== entry.id)];
+}
+
+export function saveAndOpenCustomCurriculum({
+  curriculumToSave,
+  openCurriculum,
+  openOptions,
+  saveCurriculum,
+}: {
+  curriculumToSave: CustomCurriculumSaveRequest;
+  openCurriculum: OpenCustomCurriculum;
+  openOptions?: { showNotice?: boolean };
+  saveCurriculum: SaveCustomCurriculum;
+}): SaveAndOpenCustomCurriculumResult {
+  if (!curriculumToSave) {
+    return { entry: null, opened: false, title: "" };
+  }
+
+  const entry = saveCurriculum(curriculumToSave.blocks, curriculumToSave.title);
+  if (!entry) {
+    return {
+      entry: null,
+      opened: false,
+      title: curriculumToSave.title ?? "",
+    };
+  }
+
+  openCurriculum(entry, openOptions);
+  return {
+    entry,
+    opened: true,
+    title: entry.title,
+  };
 }
 
 export function buildCustomCurriculumApplication(

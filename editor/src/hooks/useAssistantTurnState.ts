@@ -27,7 +27,11 @@ import {
   buildAssistantLocalTurnApplication,
   completeAssistantLocalTurn,
 } from "@/lib/assistantLocalTurn";
-import type { CustomCurriculumEntry } from "@/lib/customCurricula";
+import {
+  saveAndOpenCustomCurriculum,
+  type CustomCurriculumEntry,
+  type SaveCustomCurriculum,
+} from "@/lib/customCurricula";
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import { providerProfileName, providerProfileReady } from "@/lib/providerProfile";
 import type { SurfaceMode } from "@/lib/surfaceModel";
@@ -52,7 +56,7 @@ type UseAssistantTurnStateOptions = {
   profile: AiProfile | null;
   results: ResultMap;
   openCurriculum: (entry: CustomCurriculumEntry, options?: { showNotice?: boolean }) => void;
-  saveCurriculum: SaveCurriculum;
+  saveCurriculum: SaveCustomCurriculum;
   selectedBlock: BlockConfig | undefined;
   selectCurriculumBlock: (blockId: string) => void;
   selectNotebookBlock: (blockId: string) => void;
@@ -66,11 +70,6 @@ type UseAssistantTurnStateOptions = {
   onNotice: (notice: AppNotice) => void;
   onProviderConnectionRequired?: () => void;
 };
-
-type SaveCurriculum = (
-  blocks: BlockConfig[],
-  title?: string,
-) => CustomCurriculumEntry | null;
 
 type AssistantTurnApplication = {
   clearPendingBlocks: boolean;
@@ -120,11 +119,11 @@ export function useAssistantTurnState({
   }, [apiOnline, profile]);
 
   const saveAndOpenCurriculum = useCallback((curriculumToSave: CurriculumToSave | null) => {
-    if (!curriculumToSave) return "";
-    const entry = saveCurriculum(curriculumToSave.blocks, curriculumToSave.title);
-    if (!entry) return curriculumToSave.title ?? "";
-    openCurriculum(entry);
-    return entry.title;
+    return saveAndOpenCustomCurriculum({
+      curriculumToSave,
+      openCurriculum,
+      saveCurriculum,
+    }).title;
   }, [openCurriculum, saveCurriculum]);
 
   const applyAssistantTurnApplication = useCallback((application: AssistantTurnApplication) => {

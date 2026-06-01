@@ -224,6 +224,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/lib/chatStartExamples.ts`",
         "target surface/flow role",
         "`editor/src/lib/customCurricula.ts`",
+        "`saveAndOpenCustomCurriculum`",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
         "`tests/testProductSurfaceContract.py`",

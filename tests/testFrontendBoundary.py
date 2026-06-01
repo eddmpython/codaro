@@ -222,13 +222,16 @@ def testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady() -> N
 
 def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:
     source = _read("editor/src/hooks/useAssistantTurnState.ts")
+    customCurricula = _read("editor/src/lib/customCurricula.ts")
 
     assert "const applyAssistantTurnApplication = useCallback" in source
     assert "saveAndOpenCurriculum(application.curriculumToSave)" in source
+    assert "saveAndOpenCustomCurriculum" in source
+    assert "export function saveAndOpenCustomCurriculum" in customCurricula
     assert "applyAssistantTurnApplication(localApplication)" in source
     assert "applyAssistantTurnApplication(application)" in source
     assert "mergePendingBlocks(current, application.pendingBlocks)" in source
-    assert "openCurriculum(entry)" in source
+    assert "openCurriculum(entry)" not in source
     assert "completeAssistantLocalTurn" in source
 
 
@@ -352,7 +355,11 @@ def testPendingCurriculumChangesOpenCurrentLearningSurface() -> None:
     source = _read("editor/src/lib/pendingChanges.ts")
     hook = _read("editor/src/hooks/usePendingChangesState.ts")
     route = _read("editor/src/lib/assistantArtifactRouting.ts")
+    customCurricula = _read("editor/src/lib/customCurricula.ts")
 
     assert "surfaceForAcceptedPendingTarget(pendingTarget)" in source
     assert 'return target === "curriculum" ? "curriculum" : "editor"' in route
-    assert "openCurriculum(entry, { showNotice: true })" in hook
+    assert "saveAndOpenCustomCurriculum" in hook
+    assert "openOptions: { showNotice: true }" in hook
+    assert "openCurriculum(entry, { showNotice: true })" not in hook
+    assert "export function saveAndOpenCustomCurriculum" in customCurricula

@@ -1,6 +1,10 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
 import type { PendingTarget } from "@/lib/assistantArtifactRouting";
-import type { CustomCurriculumEntry } from "@/lib/customCurricula";
+import {
+  saveAndOpenCustomCurriculum,
+  type CustomCurriculumEntry,
+  type SaveCustomCurriculum,
+} from "@/lib/customCurricula";
 import {
   buildAcceptPendingChangesApplication,
   buildRejectPendingChangesApplication,
@@ -9,17 +13,12 @@ import {
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 
-type SaveCurriculum = (
-  blocks: BlockConfig[],
-  title?: string,
-) => CustomCurriculumEntry | null;
-
 type UsePendingChangesStateOptions = {
   applyDraftUpdates: (updates: Record<string, string>) => void;
   document: CodaroDocument;
   openCurriculum: (entry: CustomCurriculumEntry, options?: { showNotice?: boolean }) => void;
   replaceDocument: (document: CodaroDocument) => void;
-  saveCurriculum: SaveCurriculum;
+  saveCurriculum: SaveCustomCurriculum;
   selectNotebookBlock: (blockId: string) => void;
   setSurface: Dispatch<SetStateAction<SurfaceMode>>;
   onNotice: (notice: AppNotice) => void;
@@ -45,14 +44,12 @@ export function usePendingChangesState({
 
   const applyPendingChangesApplication = useCallback((application: PendingChangesApplication | null) => {
     if (!application) return;
-    let openedCurriculum = false;
-    if (application.curriculumToSave) {
-      const entry = saveCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
-      if (entry) {
-        openCurriculum(entry, { showNotice: true });
-        openedCurriculum = true;
-      }
-    }
+    const savedCurriculum = saveAndOpenCustomCurriculum({
+      curriculumToSave: application.curriculumToSave,
+      openCurriculum,
+      openOptions: { showNotice: true },
+      saveCurriculum,
+    });
     if (application.documentToApply) {
       replaceDocument(application.documentToApply);
     }
@@ -66,7 +63,7 @@ export function usePendingChangesState({
       setPendingBlocks([]);
     }
     setPendingTarget(application.pendingTarget);
-    if (application.surfaceToOpen && !openedCurriculum) {
+    if (application.surfaceToOpen && !savedCurriculum.opened) {
       setSurface(application.surfaceToOpen);
     }
     if (application.notice) {
