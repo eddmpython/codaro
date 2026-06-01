@@ -24,6 +24,17 @@ export type ProviderAssistantFailure = {
   notice: AppNotice;
 };
 
+export type ProviderConnectionPromptInput = {
+  alreadyPrompted: boolean;
+  apiOnline: boolean;
+  connectionRequired: boolean;
+};
+
+export type ProviderConnectionPromptResetInput = {
+  apiOnline: boolean;
+  providerReady: boolean;
+};
+
 const providerSettingsActions = new Set([
   "check-network",
   "check-provider-compatibility",
@@ -53,6 +64,29 @@ export function openProviderSettings(apiOnline: boolean): ProviderActionResult {
       detail: translate("provider.connectUnavailable.detail"),
     },
   };
+}
+
+export function providerConnectionRequiredNotice(): AppNotice {
+  return {
+    tone: "warning",
+    title: translate("provider.connectionRequired.title"),
+    detail: translate("assistant.providerLoginRequired"),
+  };
+}
+
+export function shouldOpenProviderConnectionPrompt({
+  alreadyPrompted,
+  apiOnline,
+  connectionRequired,
+}: ProviderConnectionPromptInput): boolean {
+  return apiOnline && connectionRequired && !alreadyPrompted;
+}
+
+export function shouldResetProviderConnectionPrompt({
+  apiOnline,
+  providerReady,
+}: ProviderConnectionPromptResetInput): boolean {
+  return !apiOnline || providerReady;
 }
 
 export async function loginOauthProvider(providerId = "oauth-chatgpt"): Promise<ProviderActionResult> {

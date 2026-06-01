@@ -215,6 +215,7 @@ def testAssistantContextSteersAutomationAuthoringAwayFromCurriculumYaml() -> Non
 
 def testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady() -> None:
     source = _read("editor/src/hooks/useAssistantTurnState.ts")
+    providerConnection = _read("editor/src/lib/providerConnection.ts")
 
     assert "providerProfileReady" in source
     assert "const providerReady = providerProfileReady(profile)" in source
@@ -223,9 +224,15 @@ def testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady() -> N
     providerCallIndex = source.index("const { response, streamedContent } = await runAssistantProviderTurn")
     assert providerFallbackIndex < providerCallIndex
     assert "buildAssistantLocalTurnApplication" in source
-    assert 'translate("provider.connectionRequired.title")' in source
-    assert 'translate("assistant.providerLoginRequired")' in source
+    assert "providerConnectionRequiredNotice()" in source
+    assert "shouldOpenProviderConnectionPrompt({" in source
+    assert "shouldResetProviderConnectionPrompt({" in source
     assert "onProviderConnectionRequired?.()" in source
+    assert "export function providerConnectionRequiredNotice" in providerConnection
+    assert "export function shouldOpenProviderConnectionPrompt" in providerConnection
+    assert "export function shouldResetProviderConnectionPrompt" in providerConnection
+    assert 'translate("provider.connectionRequired.title")' in providerConnection
+    assert 'translate("assistant.providerLoginRequired")' in providerConnection
 
 
 def testAssistantTurnStateMakesCurriculumOpenExplicit() -> None:

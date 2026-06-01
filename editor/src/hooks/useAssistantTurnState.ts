@@ -33,7 +33,12 @@ import {
   type CustomCurriculumEntry,
   type SaveCustomCurriculum,
 } from "@/lib/customCurricula";
-import { providerAssistantFailure } from "@/lib/providerConnection";
+import {
+  providerAssistantFailure,
+  providerConnectionRequiredNotice,
+  shouldOpenProviderConnectionPrompt,
+  shouldResetProviderConnectionPrompt,
+} from "@/lib/providerConnection";
 import { providerProfileName, providerProfileReady } from "@/lib/providerProfile";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
@@ -105,7 +110,7 @@ export function useAssistantTurnState({
   const providerConnectionPromptedRef = useRef(false);
 
   useEffect(() => {
-    if (!apiOnline || providerProfileReady(profile)) {
+    if (shouldResetProviderConnectionPrompt({ apiOnline, providerReady: providerProfileReady(profile) })) {
       providerConnectionPromptedRef.current = false;
     }
   }, [apiOnline, profile]);
@@ -191,12 +196,12 @@ export function useAssistantTurnState({
         }));
       }
       if (apiOnline && !providerReady) {
-        onNotice({
-          tone: "warning",
-          title: translate("provider.connectionRequired.title"),
-          detail: translate("assistant.providerLoginRequired"),
-        });
-        if (!providerConnectionPromptedRef.current) {
+        onNotice(providerConnectionRequiredNotice());
+        if (shouldOpenProviderConnectionPrompt({
+          alreadyPrompted: providerConnectionPromptedRef.current,
+          apiOnline,
+          connectionRequired: !providerReady,
+        })) {
           providerConnectionPromptedRef.current = true;
           onProviderConnectionRequired?.();
         }
@@ -301,7 +306,11 @@ export function useAssistantTurnState({
         }));
       }
       onNotice(failure.notice);
-      if (failure.action === "connect-provider" && apiOnline && !providerConnectionPromptedRef.current) {
+      if (shouldOpenProviderConnectionPrompt({
+        alreadyPrompted: providerConnectionPromptedRef.current,
+        apiOnline,
+        connectionRequired: failure.action === "connect-provider",
+      })) {
         providerConnectionPromptedRef.current = true;
         onProviderConnectionRequired?.();
       }
