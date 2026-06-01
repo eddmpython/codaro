@@ -67,6 +67,22 @@ src/codaro/
 - 실행기/문서/커리큘럼 세부 모델은 router가 직접 해석하지 않는다.
 - `ServerState` 생성과 runtime/domain concrete wiring은 `system/serverState.py`가 소유한다. `api/appState.py`는 legacy import 호환 shim으로만 둔다.
 
+## 계층 import gate
+
+목표 의존 방향은 `core → engine → domain → transport → entry`다. 현재 물리 폴더가 목표 트리와 완전히 같지 않아도 import 방향은 아래 매핑으로 판단한다.
+
+| 목표 계층 | 현재 폴더 | 규칙 |
+| --- | --- | --- |
+| core | `serverLog.py`, 공용 primitive | 위 계층 구현을 import하지 않는다 |
+| engine | `document/`, `runtime/`, `kernel/` | `api/`, `ai/`, `curriculum/`, `automation/`, `share/`, `extensions/`를 import하지 않는다 |
+| domain | `curriculum/`, `automation/`, `share/`, `extensions/`, `ai/` | `api/`를 import하지 않는다. tool handler는 engine/domain flow 경계만 호출한다 |
+| transport | `api/`, `webBuild/` | HTTP/SSE/WebSocket/payload 변환만 맡고 provider/runtime/domain 내부 판단을 직접 소유하지 않는다 |
+| entry | `server.py`, `cli.py` | 앱 조립과 실행 진입점이다 |
+
+`system/`은 현재 전환기 composition seam이다. `serverState.py`는 runtime/domain concrete wiring을 소유할 수 있지만, `api/`를 import하거나 router 판단을 흡수하면 실패다. 이 예외는 영구 설계가 아니라 목표 트리로 이동할 때 줄일 제거 대상이다.
+
+일반 import 방향은 `tests/testArchitectureLayerContract.py`가 검사하고, router별 세부 경계는 `tests/testTransportBoundary.py`가 검사한다. 새 모듈이 생기면 먼저 이 매핑에서 위치를 정하고, 예외가 필요하면 문서·테스트·제거 조건을 같은 변경에서 갱신한다.
+
 ## 관련
 
 - [[ssot-map]] [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]]
