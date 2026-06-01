@@ -18,8 +18,16 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        let codaroRefreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (codaroRefreshing) return;
+          codaroRefreshing = true;
+          window.location.reload();
+        });
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/serviceWorker.js").catch(() => {});
+          navigator.serviceWorker.register("/serviceWorker.js")
+            .then((registration) => registration.update())
+            .catch(() => {});
         });
       }
     </script>

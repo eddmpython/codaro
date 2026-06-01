@@ -80,12 +80,12 @@ def checkManifest() -> CheckResult:
 
 def checkServiceWorker() -> CheckResult:
     sw = (PUBLIC / "serviceWorker.js").read_text(encoding="utf-8")
-    keywords = ("cacheFirst", "networkFirst", "/api/", "/ws/", "STATIC_CACHE", "RUNTIME_CACHE")
+    keywords = ("navigationNetworkFirst", "assetCacheFirst", "networkFirst", "/api/", "/ws/", "SHELL_CACHE", "RUNTIME_CACHE")
     missing = [keyword for keyword in keywords if keyword not in sw]
     return CheckResult(
         name="service-worker-strategies",
         ok=not missing,
-        detail="cache-first + network-first separated" if not missing else f"missing: {', '.join(missing)}",
+        detail="navigation, asset, and API strategies separated" if not missing else f"missing: {', '.join(missing)}",
     )
 
 
@@ -148,12 +148,12 @@ def checkPrefersDarkHook() -> CheckResult:
 
 def checkVitePwaConfig() -> CheckResult:
     config = (EDITOR / "vite.config.ts").read_text(encoding="utf-8")
-    required = ("VitePWA", "registerType", "globPatterns", "navigateFallback")
-    missing = [token for token in required if token not in config]
+    forbidden = ("VitePWA", "vite-plugin-pwa", "navigateFallback")
+    present = [token for token in forbidden if token in config]
     return CheckResult(
-        name="vite-plugin-pwa",
-        ok=not missing,
-        detail="VitePWA configured" if not missing else f"missing: {', '.join(missing)}",
+        name="service-worker-ssot",
+        ok=not present,
+        detail="custom service worker is the only PWA worker" if not present else f"unexpected duplicate worker config: {', '.join(present)}",
     )
 
 

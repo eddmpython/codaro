@@ -19,10 +19,13 @@ def testManifestExistsAndHasCoreFields() -> None:
 
 def testServiceWorkerImplementsBothStrategies() -> None:
     source = (PUBLIC / "serviceWorker.js").read_text(encoding="utf-8")
-    assert "cacheFirst" in source
+    assert "navigationNetworkFirst" in source
+    assert "assetCacheFirst" in source
     assert "networkFirst" in source
     assert "/api/" in source
     assert "/ws/" in source
+    assert 'caches.match("/index.html")' in source
+    assert "url.pathname.startsWith(\"/_app/\")" in source
 
 
 def testIndexHasMobileMetaTags() -> None:
