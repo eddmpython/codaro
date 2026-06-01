@@ -56,7 +56,7 @@ sections:
   - type: mainHeader
     emoji: 📊
     title: statsmodels란?
-    subtitle: Python 통계 분석의 표준 라이브러리
+    subtitle: Python 통계 분석의 대표 외부 패키지
   - type: hero
     emoji: 🔬
     title: 통계적 추론을 위한 라이브러리

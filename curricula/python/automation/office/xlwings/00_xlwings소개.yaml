@@ -42,7 +42,7 @@ intro:
     runtime:
       - label: xlwings 패키지 확인
         detail: meta.packages의 xlwings를 packages-check로 확인하고, 없으면 uv add xlwings로 준비한다.
-      - label: Excel 설치 확인
+      - label: Excel 실행 확인
         detail: xlwings는 Excel 본체를 제어하므로 Windows/macOS에 Excel이 설치되어 있어야 동작한다. Linux/CI에서는 openpyxl 트랙을 권장한다.
       - label: 라이브 셀 실행
         detail: visible=False로 띄운 백그라운드 Excel에 값을 쓰고 assert로 결과를 확인한다.
@@ -231,10 +231,10 @@ sections:
     title: 트랙 시작 준비 체크리스트
     structuredPrimary: true
     subtitle: 환경, 패턴, 산출물 묶기
-    goal: 패키지 설치, Excel 본체 실행 가능, 컨텍스트 매니저 패턴, 산출물 목록 네 가지를 하나의 준비 딕셔너리로 검증한다.
+    goal: 패키지 준비, Excel 본체 실행 가능, 컨텍스트 매니저 패턴, 산출물 목록 네 가지를 하나의 준비 딕셔너리로 검증한다.
     why: 자동화 트랙을 시작할 때 환경과 산출물 기준을 먼저 묶어 두면, 이후 레슨에서 발생하는 실패가 환경 문제인지 코드 문제인지 빠르게 구분할 수 있다.
     explanation: |-
-      준비 점검은 설치 가이드를 따라가는 것이 아니라 실행 가능한 상태를 코드로 확인하는 단계입니다. xlwings 패키지가 import되는지, Excel을 띄울 수 있는지, 컨텍스트 매니저로 정리가 되는지, 그리고 트랙에서 어떤 산출물을 만들지가 한 변수에 묶여야 합니다.
+      준비 점검은 환경 가이드를 따라가는 것이 아니라 실행 가능한 상태를 코드로 확인하는 단계입니다. xlwings 패키지가 import되는지, Excel을 띄울 수 있는지, 컨텍스트 매니저로 정리가 되는지, 그리고 트랙에서 어떤 산출물을 만들지가 한 변수에 묶여야 합니다.
       이 패턴은 이후 모든 레슨의 시작 셀로 재사용할 수 있으며, 실무에서도 자동화 스크립트의 "preflight" 셀로 그대로 옮겨 쓸 수 있습니다.
     tips:
       - readiness 딕셔너리는 이후 종합 프로젝트(10번 레슨)에서 시작 체크 함수로 발전합니다.

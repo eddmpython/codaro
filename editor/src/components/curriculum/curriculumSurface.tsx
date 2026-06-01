@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   BookOpen,
   Check,
   CheckCircle2,
@@ -479,11 +478,7 @@ function CurriculumDependencyPanel({
     };
   }, [apiOnline, requiredPackages]);
 
-  const allInstalledVerified = apiOnline && hasChecked && missingPackages.length === 0;
-
   if (!requiredPackages.length) return null;
-  // 필요한 라이브러리가 모두 설치된 것이 확인되면 패널을 감춘다. 설치 진행/오류는 계속 노출한다.
-  if (allInstalledVerified && !installProgress && !error) return null;
   // 온라인에서 첫 점검이 끝나기 전에는 깜빡임을 막기 위해 감춘다(오프라인은 안내를 유지).
   if (apiOnline && !hasChecked && !installProgress && !error) return null;
 
@@ -878,33 +873,10 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
   const why = specificLearningCopy(readPayloadText(contract.why));
   const explanation = specificLearningCopy(readPayloadText(contract.explanation));
   const tips = payloadTextList(contract.tips).map(specificLearningCopy).filter(Boolean).slice(0, 4);
-  const gapLabels = sectionContractGapLabels(contract.contractGaps);
-  if (!goal && !why && !explanation && !tips.length && !gapLabels.length) return null;
+  if (!goal && !why && !explanation && !tips.length) return null;
 
   return (
     <div className="border-b bg-background/35 px-4 py-3" data-learning-section-part="overview">
-      {gapLabels.length ? (
-        <div
-          className="mb-3 rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
-          data-learning-section-contract-gaps="true"
-        >
-          <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
-            <AlertTriangle className="size-3.5" />
-            <span>YAML 계약 보강 필요</span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {gapLabels.map((label) => (
-              <span
-                className="rounded border border-amber-300/70 bg-background/70 px-1.5 py-0.5 text-[11px] leading-4 text-amber-900 dark:border-amber-400/40 dark:bg-background/20 dark:text-amber-100"
-                key={label}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
       <div className="min-w-0 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {goal ? (
@@ -938,24 +910,6 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
       </div>
     </div>
   );
-}
-
-function sectionContractGapLabels(value: unknown) {
-  if (!Array.isArray(value)) return [];
-  const labels: Record<string, string> = {
-    subtitle: "보조 타이틀",
-    goal: "이번 섹션에서 공부할 것",
-    why: "왜 유용한지",
-    explanation: "상세 설명",
-    tips: "팁",
-    snippet: "예제 스니펫",
-    "exercise.prompt": "실습 안내",
-    "exercise.starterCode": "실습 시작 코드",
-    check: "검증 기준",
-  };
-  return value
-    .map((item) => typeof item === "string" ? (labels[item] ?? item) : "")
-    .filter(Boolean);
 }
 
 function StructuredSectionLearningBody({

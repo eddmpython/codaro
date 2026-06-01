@@ -12,6 +12,7 @@ EDITOR_DIR = ROOT / "editor"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
 LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
+PYTHON_STDLIB = EDITOR_DIR / "src" / "lib" / "pythonStdlib.ts"
 LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
 
 
@@ -34,7 +35,7 @@ def main() -> int:
 
 def sourceContractFailures() -> list[str]:
     failures: list[str] = []
-    for path in (NOTEBOOK_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, LOCALE_COPY):
+    for path in (NOTEBOOK_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, PYTHON_STDLIB, LOCALE_COPY):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
 
@@ -44,6 +45,7 @@ def sourceContractFailures() -> list[str]:
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
     localRuntimeText = LOCAL_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
+    stdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
     localeText = LOCALE_COPY.read_text(encoding="utf-8")
     required = {
         NOTEBOOK_RUNTIME: (
@@ -65,8 +67,13 @@ def sourceContractFailures() -> list[str]:
             "inferDocumentPackages",
             "inferAssistantPackages",
             "normalizePackageName",
-            "PYTHON_STDLIB_MODULES",
+            "isPythonStdlibModule",
             "PACKAGE_ALIASES",
+        ),
+        PYTHON_STDLIB: (
+            "PYTHON_STDLIB_MODULES",
+            "isPythonStdlibModule",
+            "isPythonStdlibPackageName",
         ),
         LOCALE_COPY: (
             "라이브러리 준비 실패",
@@ -81,6 +88,8 @@ def sourceContractFailures() -> list[str]:
             if path == LOCAL_RUNTIME
             else inferenceText
             if path == PACKAGE_INFERENCE
+            else stdlibText
+            if path == PYTHON_STDLIB
             else localeText
         )
         for token in tokens:
@@ -113,6 +122,7 @@ def runRuntimeProbe() -> tuple[str | None, str]:
 def nodeProbeScript() -> str:
     runtimePath = json.dumps(str(NOTEBOOK_RUNTIME), ensure_ascii=False)
     inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
+    stdlibPath = json.dumps(str(PYTHON_STDLIB), ensure_ascii=False)
     editorDir = json.dumps(str(EDITOR_DIR), ensure_ascii=False)
     return f"""
 (async () => {{
@@ -194,8 +204,13 @@ const fakeApi = {{
     return {{ results: [{{ ...fakeResult, blockId }}], executionOrder: [blockId] }};
   }},
 }};
+const stdlib = loadModule({stdlibPath}, (specifier) => {{
+  if (specifier === "@/types") return {{}};
+  return require(specifier);
+}});
 const inference = loadModule({inferencePath}, (specifier) => {{
   if (specifier === "@/types") return {{}};
+  if (specifier === "@/lib/pythonStdlib") return stdlib;
   return require(specifier);
 }});
 function translate(key, values) {{

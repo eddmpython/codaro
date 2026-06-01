@@ -37,7 +37,7 @@ intro:
   - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 1단계. scikitlearn 입력 확인
+    - label: 1단계. scikit-learn import 확인
       detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 데이터 불러오기 처리 실행
       detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
@@ -47,35 +47,35 @@ intro:
       detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
     - label: 업무 코드 환경
-      detail: matplotlib, pandas, scikitlearn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+      detail: matplotlib, pandas, scikit-learn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 와인품질분류 실행
       detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 와인품질분류 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
-- id: step1_install
-  title: 1단계. scikit-learn 설치
+- id: step1_package_ready
+  title: 1단계. scikit-learn import 확인
   structuredPrimary: true
-  subtitle: pip
-  goal: 1단계. scikitlearn 설치에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  subtitle: sklearn 모듈
+  goal: 1단계. scikit-learn import 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
   why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
-    scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비합니다. 처음 준비할 때 약간의 시간이 걸릴 수 있습니다.
+    scikit-learn은 Python 머신러닝용 외부 패키지입니다. Codaro 로컬 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 필요한 패키지를 uv로 준비합니다.
 
-    scikit-learn 설치 시 약 10-20MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다.
+    이 셀은 설치 명령을 실행하는 단계가 아니라 현재 Python 환경에서 sklearn 모듈을 import할 수 있는지 확인하는 단계입니다.
   tips:
-  - scikit-learn 설치 시 약 10-20MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다.
+  - import sklearn은 설치 명령이 아니라 준비된 패키지를 코드에서 불러오는 확인 단계입니다.
   snippet: import sklearn
   exercise:
-    prompt: 1단계. scikitlearn 설치 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    prompt: 1단계. scikit-learn import 확인 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import sklearn
     hints:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
     type: noError
-    noError: 1단계. scikitlearn 설치의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
-    resultCheck: 1단계. scikitlearn 설치 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+    noError: 1단계. scikit-learn import 확인의 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. scikit-learn import 확인 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true

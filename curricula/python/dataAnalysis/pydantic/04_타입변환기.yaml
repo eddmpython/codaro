@@ -33,7 +33,7 @@ intro:
   - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
   diagram:
     steps:
-    - label: 1단계. 패키지 설치 입력 확인
+    - label: 1단계. pydantic import 확인
       detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
     - label: 2단계. 자동 타입 변환 처리 실행
       detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
@@ -49,26 +49,26 @@ intro:
     - label: 타입변환기 완료
       detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
 sections:
-- id: step1_install
-  title: 1단계. 패키지 설치
+- id: step1_package_ready
+  title: 1단계. pydantic import 확인
   structuredPrimary: true
-  subtitle: pip
-  goal: 1단계. 패키지 설치에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  subtitle: pydantic 모듈
+  goal: 1단계. pydantic import 확인에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
   why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: import pydantic
   exercise:
-    prompt: 1단계. 패키지 설치 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    prompt: 1단계. pydantic import 확인 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import pydantic
     hints:
     - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
     - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
     type: noError
-    noError: 1단계. 패키지 설치의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
-    resultCheck: 1단계. 패키지 설치 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
+    noError: 1단계. pydantic import 확인의 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. pydantic import 확인 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_auto_coercion
   title: 2단계. 자동 타입 변환
   structuredPrimary: true

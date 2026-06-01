@@ -57,29 +57,29 @@ intro:
     - label: 광고비매출예측 완료
       detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
 sections:
-- id: step1_install
-  title: 1단계. statsmodels 설치
+- id: step1_package_ready
+  title: 1단계. statsmodels import 확인
   structuredPrimary: true
-  subtitle: 통계 분석 라이브러리
-  goal: 1단계. statsmodels 설치에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  subtitle: 통계 분석 모듈
+  goal: 1단계. statsmodels import 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
   why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
   explanation: |-
-    statsmodels는 통계 분석을 위한 파이썬 라이브러리로, R 언어의 통계 기능을 파이썬으로 가져온 것입니다. 회귀분석은 변수 간의 인과관계를 수식으로 표현하여 예측 모델을 만드는 기법으로, 광고비를 투입하면 매출이 얼마나 증가할지 정량적으로 계산할 수 있습니다. 시계열 예측은 과거 데이터의 패턴을 학습하여 미래 값을 추정하고, 가설 검정은 두 집단의 차이가 우연인지 의미있는 차이인지 통계적으로 판단합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하고, 레슨 안에서는 import가 성공하는지 확인합니다. 이 라이브러리는 학술 연구와 비즈니스 분석 모두에서 널리 사용되며, 특히 경제학, 금융, 마케팅 분야에서 필수적인 도구입니다.
+    statsmodels는 통계 분석을 위한 파이썬 외부 패키지로, R 언어의 통계 기능을 파이썬으로 가져온 것입니다. 회귀분석은 변수 간의 인과관계를 수식으로 표현하여 예측 모델을 만드는 기법으로, 광고비를 투입하면 매출이 얼마나 증가할지 정량적으로 계산할 수 있습니다. 시계열 예측은 과거 데이터의 패턴을 학습하여 미래 값을 추정하고, 가설 검정은 두 집단의 차이가 우연인지 의미있는 차이인지 통계적으로 판단합니다. 이 라이브러리는 학술 연구와 비즈니스 분석 모두에서 널리 사용되며, 특히 경제학, 금융, 마케팅 분야에서 필수적인 도구입니다.
 
     Codaro는 YAML의 meta.packages와 로컬 Python 환경을 기준으로 필요한 패키지를 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하면 됩니다.
   tips:
   - Codaro는 YAML의 meta.packages와 로컬 Python 환경을 기준으로 필요한 패키지를 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하면 됩니다.
   snippet: import statsmodels.api as sm
   exercise:
-    prompt: 1단계. statsmodels 설치 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    prompt: 1단계. statsmodels import 확인 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
     starterCode: import statsmodels.api as sm
     hints:
     - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
     - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
   check:
     type: noError
-    noError: 1단계. statsmodels 설치의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
-    resultCheck: 1단계. statsmodels 설치 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+    noError: 1단계. statsmodels import 확인의 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. statsmodels import 확인 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
 - id: step2_load
   title: 2단계. 데이터 불러오기
   structuredPrimary: true

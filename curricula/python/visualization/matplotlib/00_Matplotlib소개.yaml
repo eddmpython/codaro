@@ -69,7 +69,7 @@ sections:
     - emoji: 📊
       title: 모든 차트 유형 지원
     - emoji: 🏛️
-      title: 20년 검증된 표준 라이브러리
+      title: 20년 검증된 대표 시각화 패키지
   goal: Matplotlib에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
   why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
 - id: matplotlib_history

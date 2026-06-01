@@ -53,7 +53,7 @@ sections:
   - type: mainHeader
     emoji: ✅
     title: Pydantic??
-    subtitle: Python 데이터 검증의 표준 라이브러리
+    subtitle: Python 데이터 검증의 대표 외부 패키지
   - type: hero
     emoji: 🛡️
     title: 타입 힌트 기반 데이터 검증

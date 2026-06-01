@@ -27,7 +27,7 @@ intro:
   description: 클라이언트 초기화 → messages.create 호출 → 응답 객체 파싱이라는 LLM 호출의 기본 흐름을 손에 익힙니다.
   direction: Anthropic 클라이언트 생성, model/max_tokens/messages 인자 구성, content 블록에서 텍스트 추출까지 한 번의 호출 흐름을 완성한다.
   benefits:
-  - anthropic 패키지 설치와 ANTHROPIC_API_KEY 환경변수 흐름을 분명히 한다.
+  - anthropic 패키지 준비와 ANTHROPIC_API_KEY 환경변수 흐름을 분명히 한다.
   - Messages API의 필수 인자(model, max_tokens, messages) 셋을 정확한 형태로 기억한다.
   - 응답 객체의 content 블록 구조를 직접 확인하고 텍스트를 안전하게 꺼낸다.
   - 토큰 사용량(usage)을 첫 호출부터 보는 습관을 만든다.
@@ -49,13 +49,13 @@ intro:
     - label: 첫Claude호출 완료
       detail: 다음 강의의 시스템 프롬프트 추가에 필요한 호출 패턴을 손에 익혔다.
 sections:
-- id: install_and_key
+- id: package_and_key
   title: 1단계. 패키지 준비와 API 키 확인
   structuredPrimary: true
   subtitle: anthropic 패키지와 ANTHROPIC_API_KEY
-  goal: anthropic 패키지가 설치되어 있고 ANTHROPIC_API_KEY 환경변수가 잡혀 있는지 코드로 확인한다.
+  goal: anthropic 패키지가 준비되어 있고 ANTHROPIC_API_KEY 환경변수가 잡혀 있는지 코드로 확인한다.
   why: 패키지나 키 둘 중 하나만 빠져도 이후 호출이 인증 실패로 멈춥니다. 첫 줄에서 사전 점검 한 번을 코드로 박아두면 시간이 절약됩니다.
-  explanation: anthropic 패키지는 Claude API와 통신하는 공식 Python SDK입니다. uv run --with anthropic 또는 강의의 packages 메타가 자동으로
+  explanation: anthropic 패키지는 Claude API와 통신하는 공식 Python SDK입니다. 강의의 packages 메타와 라이브러리 패널이 현재 Python 환경에
     준비합니다. ANTHROPIC_API_KEY는 console.anthropic.com에서 발급받은 키를 환경변수로 등록한 값입니다. import anthropic이 성공하고 os.environ에
     키가 존재하면 호출 준비가 끝난 것입니다.
   tips:

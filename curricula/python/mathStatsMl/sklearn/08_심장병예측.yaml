@@ -48,7 +48,7 @@ intro:
       detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
     - label: 업무 코드 환경
-      detail: matplotlib, numpy, pandas, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+      detail: matplotlib, numpy, pandas, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
     - label: 심장병예측 실행
       detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: 심장병예측 완료

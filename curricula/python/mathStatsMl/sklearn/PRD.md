@@ -2,7 +2,7 @@
 
 ## 라이브러리 소개
 
-**scikit-learn**: Python 머신러닝의 표준 라이브러리
+**scikit-learn**: Python 머신러닝의 대표 외부 패키지
 
 ### 왜 scikit-learn인가?
 
@@ -205,7 +205,7 @@ sections:
   subtitle: Codaro 로컬 Python 환경 설정
   blocks:
   - type: text
-    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro 로컬 Python 환경에서는 uv으로 설치합니다. 초기 로딩에 약간의 시간이 걸릴 수 있습니다.
+    content: scikit-learn은 Python 머신러닝의 대표 외부 패키지입니다. Codaro 로컬 Python 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 uv가 준비합니다. 초기 로딩에 약간의 시간이 걸릴 수 있습니다.
 - type: code
     language: python
     title: scikit-learn 확인

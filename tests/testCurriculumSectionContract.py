@@ -1,7 +1,35 @@
 from __future__ import annotations
 
+import ast
+from pathlib import Path
+from typing import Any
+
+import yaml
+
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.sectionContract import lessonContractFromYaml, sectionContractGaps
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CURRICULA_DIR = ROOT / "curricula" / "python"
+INSTALL_STAGE_PHRASES = (
+    "설치 예제",
+    "설치 실습",
+    "설치 스니펫",
+    "설치 입력",
+    "설치 확인",
+    "설치에서",
+    "설치 다음",
+    "설치의 import",
+    "패키지 설치",
+)
+INSTALL_COMMAND_MARKERS = ("uv add", "uv pip", "pip install", "%pip", "!pip", "python -m pip")
+EXTERNAL_STDLIB_LABELS = (
+    "Python 데이터 검증의 표준 라이브러리",
+    "Python 머신러닝의 표준 라이브러리",
+    "Python 통계 분석의 표준 라이브러리",
+    "20년 검증된 표준 라이브러리",
+)
 
 
 def testLessonContractExtractsStructuredSectionFields() -> None:
@@ -185,3 +213,93 @@ def testStructuredSectionContractReportsMissingFields() -> None:
     sectionBlock = next(block for block in document.blocks if block.sourceType == "section")
     assert sectionBlock.payload["sectionContractGaps"] == section.contractGaps
     assert sectionBlock.payload["sectionContract"]["contractGaps"] == section.contractGaps
+
+
+def testCurriculumPackageReadinessCopyDoesNotPretendToInstall() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*.yaml")):
+        if path.name == "schema.yaml":
+            continue
+        content = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if not isinstance(content, dict):
+            continue
+        for index, section in enumerate(content.get("sections") or [], start=1):
+            if not isinstance(section, dict):
+                continue
+            code = sectionCode(section)
+            if not codeLooksLikePackageReadinessCheck(code):
+                continue
+            if codeHasInstallCommand(code):
+                continue
+            for field, text in sectionCopyFields(section).items():
+                matched = [phrase for phrase in INSTALL_STAGE_PHRASES if phrase in text]
+                if matched:
+                    rel = path.relative_to(ROOT).as_posix()
+                    failures.append(f"{rel} section {index} {field} uses install-stage copy for import readiness: {', '.join(matched)}")
+
+    assert not failures
+
+
+def testCurriculumPackageCopyUsesCanonicalNames() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*")):
+        if not path.is_file() or path.suffix not in {".yaml", ".yml", ".md", ".json"}:
+            continue
+        text = path.read_text(encoding="utf-8")
+        rel = path.relative_to(ROOT).as_posix()
+        if "scikitlearn" in text.lower():
+            failures.append(f"{rel}: use scikit-learn for display text or sklearn for import code")
+        for phrase in EXTERNAL_STDLIB_LABELS:
+            if phrase in text:
+                failures.append(f"{rel}: external package is described as stdlib: {phrase}")
+
+    assert not failures
+
+
+def sectionCopyFields(section: dict[str, Any]) -> dict[str, str]:
+    exercise = section.get("exercise") if isinstance(section.get("exercise"), dict) else {}
+    check = section.get("check") if isinstance(section.get("check"), dict) else {}
+    return {
+        "id": textValue(section.get("id")),
+        "title": textValue(section.get("title")),
+        "subtitle": textValue(section.get("subtitle")),
+        "goal": textValue(section.get("goal")),
+        "explanation": textValue(section.get("explanation")),
+        "exercise.prompt": textValue(exercise.get("prompt")),
+        "check.noError": textValue(check.get("noError")),
+        "check.resultCheck": textValue(check.get("resultCheck")),
+    }
+
+
+def sectionCode(section: dict[str, Any]) -> str:
+    exercise = section.get("exercise") if isinstance(section.get("exercise"), dict) else {}
+    return "\n".join((textValue(section.get("snippet")), textValue(exercise.get("starterCode"))))
+
+
+def codeLooksLikePackageReadinessCheck(code: str) -> bool:
+    source = code.strip()
+    if not source:
+        return False
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return False
+    executableNodes = [
+        node
+        for node in tree.body
+        if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str))
+    ]
+    if not executableNodes:
+        return False
+    if all(isinstance(node, (ast.Import, ast.ImportFrom)) for node in executableNodes):
+        return True
+    return isinstance(executableNodes[0], (ast.Import, ast.ImportFrom))
+
+
+def codeHasInstallCommand(code: str) -> bool:
+    lowered = code.lower()
+    return any(marker in lowered for marker in INSTALL_COMMAND_MARKERS)
+
+
+def textValue(value: Any) -> str:
+    return value if isinstance(value, str) else ""

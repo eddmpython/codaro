@@ -43,7 +43,7 @@ intro:
       detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
     runtime:
     - label: 업무 코드 환경
-      detail: numpy, scikitlearn 기준으로 로컬 Python 실행을 준비합니다.
+      detail: numpy, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
     - label: sklearn소개 실행
       detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
     - label: sklearn소개 완료
@@ -54,7 +54,7 @@ sections:
   - type: mainHeader
     emoji: 🤖
     title: scikit-learn이란?
-    subtitle: Python 머신러닝의 표준 라이브러리
+    subtitle: Python 머신러닝의 대표 외부 패키지
   - type: hero
     emoji: 🎯
     title: 예측을 위한 라이브러리
@@ -68,7 +68,7 @@ sections:
       title: 클러스터링
     - emoji: ⚙️
       title: 통일된 API
-  goal: scikitlearn이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: scikit-learn이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: what_is_sklearn
   blocks:
@@ -95,7 +95,7 @@ sections:
     - emoji: 📉
       title: 차원 축소 (Dimensionality)
       description: 특성 압축 - PCA, 시각화
-  goal: 🤔 scikitlearn이 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: 🤔 scikit-learn이 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: why_sklearn
   blocks:
@@ -128,7 +128,7 @@ sections:
     - emoji: 🌐
       title: Codaro 로컬 Python 지원
       description: 로컬 Python에서 바로 실행 가능
-  goal: 🌟 왜 scikitlearn인가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: 🌟 왜 scikit-learn인가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: statsmodels_vs_sklearn
   blocks:
@@ -165,7 +165,7 @@ sections:
     title: 학습 순서가 중요합니다
     content: statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다.
       통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
-  goal: 🆚 statsmodels vs scikitlearn에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: 🆚 statsmodels vs scikit-learn에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: sklearn_workflow
   blocks:
@@ -198,7 +198,7 @@ sections:
     - emoji: 🔄
       title: 6. 개선
       description: 하이퍼파라미터 튜닝, 교차검증
-  goal: 🔄 scikitlearn 워크플로우에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: 🔄 scikit-learn 워크플로우에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: algorithms
   blocks:

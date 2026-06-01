@@ -65,7 +65,7 @@ def main(argv: list[str] | None = None) -> int:
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
         desktopVisual = cli.eval(jsAssertLearningVisualIntegrity("desktop"))
-        desktopContractGaps = cli.eval(jsAssertContractGapWarning("desktop"))
+        desktopContractGaps = cli.eval(jsAssertContractGapSignalHidden("desktop"))
         cli.run("resize", "1680", "900")
         toc = cli.eval(jsAssertTocPushRail())
         cli.run("resize", "390", "844")
@@ -76,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
         mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
         mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
         mobileVisual = cli.eval(jsAssertLearningVisualIntegrity("mobile"))
-        mobileContractGaps = cli.eval(jsAssertContractGapWarning("mobile"))
+        mobileContractGaps = cli.eval(jsAssertContractGapSignalHidden("mobile"))
         print(
             "ok: Playwright structured learning card verified "
             f"{deleteDialog} {desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
@@ -487,13 +487,19 @@ def jsAssertDependencyPanel(viewport: str) -> str:
   }
   const installButton = panel.querySelector('[data-learning-package-install="true"]');
   if (!installButton) throw new Error('package install action missing');
+  const commandRow = panel.querySelector('[data-learning-package-command-row="true"]');
+  if (!commandRow) throw new Error('package terminal command row missing');
+  const commandText = commandRow.querySelector('[data-learning-package-command="true"]');
+  if (!commandText) throw new Error('package terminal command text missing');
+  const terminalButton = commandRow.querySelector('[data-learning-package-terminal-open="true"]');
+  if (!terminalButton) throw new Error('package terminal open action missing');
   const item = panel.querySelector('[data-learning-package-item="pandas"]');
   if (!item) throw new Error('pandas package badge missing');
   if (!item.hasAttribute('data-learning-package-installed')) {
     throw new Error('package installed marker missing');
   }
   const text = panel.textContent || '';
-  if (!text.includes('라이브러리') || !text.includes('uv로 준비')) {
+  if (!text.includes('라이브러리') || !text.includes('uv로 준비') || !text.includes('터미널 열기')) {
     throw new Error('package panel copy missing');
   }
   return 'dependency-panel-ok';
@@ -759,27 +765,23 @@ def jsAssertLearningVisualIntegrity(viewport: str) -> str:
 """)
 
 
-def jsAssertContractGapWarning(viewport: str) -> str:
+def jsAssertContractGapSignalHidden(viewport: str) -> str:
     return compactJs(f"""
 (() => {{
   const cards = Array.from(document.querySelectorAll('[data-learning-section-card]'));
   const gapCard = cards.find((item) => (item.textContent || '').includes('부분 구조화 섹션'));
   if (!gapCard) throw new Error('contract gap section card missing');
   const warning = gapCard.querySelector('[data-learning-section-contract-gaps="true"]');
-  if (!warning) throw new Error('contract gap warning missing');
-  const text = warning.textContent || '';
-  for (const expected of ['YAML 계약 보강 필요', '보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증 기준']) {{
-    if (!text.includes(expected)) throw new Error('contract gap label missing: ' + expected);
+  if (warning) throw new Error('contract gap warning should stay out of product UI');
+  const pageText = document.body.textContent || '';
+  if (pageText.includes('YAML 계약 보강 필요')) {{
+    throw new Error('internal contract gap copy leaked into product UI');
   }}
   const cardRect = gapCard.getBoundingClientRect();
-  const warningRect = warning.getBoundingClientRect();
-  if (warningRect.width <= 0 || warningRect.height <= 0) throw new Error('contract gap warning has no size');
-  if (warningRect.left < cardRect.left - 1 || warningRect.right > cardRect.right + 1) {{
-    throw new Error('contract gap warning escapes card');
-  }}
+  if (cardRect.width <= 0 || cardRect.height <= 0) throw new Error('contract gap card has no size');
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
-    labels: ['보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증 기준'],
+    contractGapSignal: 'hidden',
   }});
 }})()
 """)

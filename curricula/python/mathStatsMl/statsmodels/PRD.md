@@ -2,7 +2,7 @@
 
 ## 라이브러리 소개
 
-**statsmodels**: Python 통계 분석의 표준 라이브러리
+**statsmodels**: Python 통계 분석의 대표 외부 패키지
 
 ### 왜 statsmodels인가?
 
@@ -183,7 +183,7 @@ sections:
   subtitle: Codaro 로컬 Python 환경에서 라이브러리 설치
   blocks:
   - type: text
-    content: statsmodels는 Python 통계 분석의 표준 라이브러리입니다. 회귀분석, 시계열, 가설검정 등 다양한 통계 모델을 제공합니다. Codaro 로컬 Python 환경에서는 uv으로 설치합니다.
+    content: statsmodels는 Python 통계 분석의 대표 외부 패키지입니다. 회귀분석, 시계열, 가설검정 등 다양한 통계 모델을 제공합니다. Codaro 로컬 Python 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 uv가 준비합니다.
   - type: code
     language: python
     title: statsmodels 확인
