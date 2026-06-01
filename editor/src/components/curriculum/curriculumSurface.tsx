@@ -586,7 +586,7 @@ function CurriculumDependencyPanel({
           onClick={() => onOpenTerminalCommand(installCommand)}
         >
           <TerminalSquare className="size-3.5" />
-          터미널 열기
+          터미널에서 실행
         </Button>
       </div>
       <div className="mt-1 text-xs leading-5 text-muted-foreground">

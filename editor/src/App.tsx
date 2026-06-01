@@ -313,7 +313,7 @@ function App() {
   const [terminalLaunchIntent, setTerminalLaunchIntent] = useState<TerminalLaunchIntent | null>(null);
   const openTerminalCommand = useCallback((command: string) => {
     setTerminalOpen(true);
-    setTerminalLaunchIntent({ command, id: Date.now() });
+    setTerminalLaunchIntent({ command, id: Date.now(), submit: true });
   }, []);
 
   return (

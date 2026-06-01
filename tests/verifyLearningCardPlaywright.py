@@ -499,7 +499,7 @@ def jsAssertDependencyPanel(viewport: str) -> str:
     throw new Error('package installed marker missing');
   }
   const text = panel.textContent || '';
-  if (!text.includes('라이브러리') || !text.includes('uv로 준비') || !text.includes('터미널 열기')) {
+  if (!text.includes('라이브러리') || !text.includes('uv로 준비') || !text.includes('터미널에서 실행')) {
     throw new Error('package panel copy missing');
   }
   return 'dependency-panel-ok';
