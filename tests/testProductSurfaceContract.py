@@ -88,6 +88,8 @@ def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
 
 def testProductSurfaceCopyMatchesFocusedFlow() -> None:
     locale = _read("editor/src/lib/localeCopy.ts")
+    chat = _read("editor/src/components/chat/chatSurface.tsx")
+    startExamples = _read("editor/src/lib/chatStartExamples.ts")
 
     for expected in (
         '"nav.chat": "대화"',
@@ -101,11 +103,20 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
         "검증된 셀과 recipe를 태스크로 키울 때",
         "대화, 현재 학습, 노트북에서 검증한 자동화 셀과 스크립트",
         "채팅에서 반복 작업을 말하고 셀 또는 recipe를 검증하면",
+        "기존 레슨을 먼저 찾아 학습 경로를 짜줘",
+        "검증된 노트북 셀을 dry-run 자동화 recipe로 정리",
         "Automation stores cells and recipes validated from chat, current learning, or notebooks.",
+        "First find existing lessons and compose a learning path",
+        "Turn validated notebook cells into a dry-run automation recipe",
     ):
         assert expected in locale
     assert "바로 시작할 수 있는 자동화 출발점" not in locale
     assert "Ready-to-use starting points" not in locale
+    assert "공유 가능한 자동화 노트북" not in locale
+    assert "Turn repeated work into a shareable automation notebook" not in locale
+    assert "defaultChatStartExamples(t)" in chat
+    assert "chat.example.pandas" not in chat
+    assert "chat.example.pandas" in startExamples
 
 
 def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
@@ -133,6 +144,7 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
     assert "`PRODUCT_SURFACE_NAV`" in frontendDoc
     assert "`entry`/`learning`/`notebook`/`secondLoop`/`support`" in frontendDoc
     assert "`editor/src/lib/teacherScope.ts`" in frontendDoc
+    assert "`editor/src/lib/chatStartExamples.ts`" in ssotMap
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in dogfoodDoc
     assert "`대화 → 현재 학습 → 노트북 → 자동화`" in identityDoc
     assert "`대화 → 현재 학습 → 노트북 → 자동화` 사이드바 순서" in ssotMap

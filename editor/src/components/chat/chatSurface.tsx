@@ -4,6 +4,7 @@ import {
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
+import { defaultChatStartExamples, type ChatStartExample } from "@/lib/chatStartExamples";
 import { useLocale } from "@/lib/localeContext";
 import { providerProfileReady } from "@/lib/providerProfile";
 import type { AssistantMessage } from "@/lib/assistantTypes";
@@ -14,7 +15,7 @@ import type {
   LoadState,
 } from "@/types";
 
-export type ChatSurfaceExample = { label: string; prompt: string };
+export type ChatSurfaceExample = ChatStartExample;
 
 export function ChatSurface({
   aiConnecting,
@@ -56,11 +57,7 @@ export function ChatSurface({
   const { t } = useLocale();
   const isEmptyChat = !messages.length && !pendingBlocks.length && loadState !== "loading";
   const providerReady = apiOnline && providerProfileReady(aiProfile);
-  const heroExamples: ChatSurfaceExample[] = examples ?? [
-    { label: t("chat.example.pandas"), prompt: t("chat.example.pandas.prompt") },
-    { label: t("chat.example.browser"), prompt: t("chat.example.browser.prompt") },
-    { label: t("chat.example.automation"), prompt: t("chat.example.automation.prompt") },
-  ];
+  const heroExamples = examples ?? defaultChatStartExamples(t);
   if (isEmptyChat) {
     return (
       <div className="grid h-full min-h-0 place-items-center px-4">
