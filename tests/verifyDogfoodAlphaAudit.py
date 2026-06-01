@@ -182,6 +182,7 @@ DOGFOOD_REQUIREMENTS = (
                 "if (!apiOnline || !providerReady)",
                 "buildAssistantLocalTurnApplication",
                 "providerConnectionRequiredNotice()",
+                "openProviderConnectionPromptOnce",
                 "shouldOpenProviderConnectionPrompt",
                 "shouldResetProviderConnectionPrompt",
                 "onProviderConnectionRequired?.()",

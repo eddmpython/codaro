@@ -115,6 +115,17 @@ export function useAssistantTurnState({
     }
   }, [apiOnline, profile]);
 
+  const openProviderConnectionPromptOnce = useCallback((connectionRequired: boolean) => {
+    if (shouldOpenProviderConnectionPrompt({
+      alreadyPrompted: providerConnectionPromptedRef.current,
+      apiOnline,
+      connectionRequired,
+    })) {
+      providerConnectionPromptedRef.current = true;
+      onProviderConnectionRequired?.();
+    }
+  }, [apiOnline, onProviderConnectionRequired]);
+
   const saveAndOpenCurriculum = useCallback((curriculumToSave: CurriculumToSave | null) => {
     return saveAndOpenCustomCurriculum({
       curriculumToSave,
@@ -197,14 +208,7 @@ export function useAssistantTurnState({
       }
       if (apiOnline && !providerReady) {
         onNotice(providerConnectionRequiredNotice());
-        if (shouldOpenProviderConnectionPrompt({
-          alreadyPrompted: providerConnectionPromptedRef.current,
-          apiOnline,
-          connectionRequired: !providerReady,
-        })) {
-          providerConnectionPromptedRef.current = true;
-          onProviderConnectionRequired?.();
-        }
+        openProviderConnectionPromptOnce(!providerReady);
       } else {
         onNotice(localResult.notice);
       }
@@ -306,14 +310,7 @@ export function useAssistantTurnState({
         }));
       }
       onNotice(failure.notice);
-      if (shouldOpenProviderConnectionPrompt({
-        alreadyPrompted: providerConnectionPromptedRef.current,
-        apiOnline,
-        connectionRequired: failure.action === "connect-provider",
-      })) {
-        providerConnectionPromptedRef.current = true;
-        onProviderConnectionRequired?.();
-      }
+      openProviderConnectionPromptOnce(failure.action === "connect-provider");
     } finally {
       setAssistantLoading(false);
     }
@@ -327,7 +324,7 @@ export function useAssistantTurnState({
     displayLocale,
     drafts,
     onNotice,
-    onProviderConnectionRequired,
+    openProviderConnectionPromptOnce,
     profile,
     prompt,
     results,

@@ -225,9 +225,14 @@ def testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady() -> N
     assert providerFallbackIndex < providerCallIndex
     assert "buildAssistantLocalTurnApplication" in source
     assert "providerConnectionRequiredNotice()" in source
+    assert "const openProviderConnectionPromptOnce = useCallback" in source
     assert "shouldOpenProviderConnectionPrompt({" in source
     assert "shouldResetProviderConnectionPrompt({" in source
     assert "onProviderConnectionRequired?.()" in source
+    assert source.count("onProviderConnectionRequired?.()") == 1
+    assert source.count("shouldOpenProviderConnectionPrompt({") == 1
+    assert "openProviderConnectionPromptOnce(!providerReady)" in source
+    assert 'openProviderConnectionPromptOnce(failure.action === "connect-provider")' in source
     assert "export function providerConnectionRequiredNotice" in providerConnection
     assert "export function shouldOpenProviderConnectionPrompt" in providerConnection
     assert "export function shouldResetProviderConnectionPrompt" in providerConnection
