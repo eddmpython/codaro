@@ -52,7 +52,7 @@ import {
 import { statusLabel } from "@/lib/displayFormat";
 import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
-import { inferDocumentPackages, normalizePackageName } from "@/lib/packageInference";
+import { declaredDocumentPackages, normalizePackageName } from "@/lib/packageInference";
 import { cn } from "@/lib/utils";
 import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
@@ -391,7 +391,7 @@ function CurriculumDependencyPanel({
   document: CodaroDocument;
   onOpenTerminalCommand: (command: string) => void;
 }) {
-  const requiredPackages = useMemo(() => inferDocumentPackages(document), [document]);
+  const requiredPackages = useMemo(() => declaredDocumentPackages(document), [document]);
   const [installedPackages, setInstalledPackages] = useState<PackageInfo[]>([]);
   const [checking, setChecking] = useState(false);
   const [installProgress, setInstallProgress] = useState<PackageInstallProgress | null>(null);
@@ -404,8 +404,11 @@ function CurriculumDependencyPanel({
   const [hasChecked, setHasChecked] = useState(false);
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
-  const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
-  const terminalCommandReady = Boolean(apiOnline && installCommand);
+  const missingPackages = useMemo(
+    () => requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item))),
+    [installedNames, requiredPackages],
+  );
+  const terminalCommandReady = Boolean(apiOnline && installCommand && missingPackages.length);
   const activeMessage = installProgress
     ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
     : checking
@@ -459,11 +462,11 @@ function CurriculumDependencyPanel({
     setCommandError(null);
     setInstallCommand("");
     setInstallEnvironment("");
-    if (!requiredPackages.length || !apiOnline) return undefined;
+    if (!requiredPackages.length || !apiOnline || !hasChecked || !missingPackages.length) return undefined;
 
     async function loadInstallCommand() {
       try {
-        const plan = await curriculumPackageInstallCommand(requiredPackages);
+        const plan = await curriculumPackageInstallCommand(missingPackages);
         if (cancelled) return;
         setInstallCommand(plan.command);
         setInstallEnvironment(plan.environment.environment);
@@ -476,7 +479,7 @@ function CurriculumDependencyPanel({
     return () => {
       cancelled = true;
     };
-  }, [apiOnline, requiredPackages]);
+  }, [apiOnline, hasChecked, missingPackages, requiredPackages]);
 
   if (!requiredPackages.length) return null;
   // 온라인에서 첫 점검이 끝나기 전에는 깜빡임을 막기 위해 감춘다(오프라인은 안내를 유지).
@@ -573,7 +576,7 @@ function CurriculumDependencyPanel({
       <div className="mt-2 flex items-center gap-2 rounded border bg-muted/40 px-2 py-1.5" data-learning-package-command-row="true">
         <TerminalSquare className="size-3.5 shrink-0 text-muted-foreground" />
         <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground" data-learning-package-command="true">
-          {installCommand || "터미널 명령 준비 중"}
+          {installCommand || (missingPackages.length ? "터미널 명령 준비 중" : "설치 필요 없음")}
         </code>
         <button
           aria-label="설치 명령 복사"
@@ -600,7 +603,9 @@ function CurriculumDependencyPanel({
       </div>
       <div className="mt-1 text-xs leading-5 text-muted-foreground">
         {apiOnline
-          ? `위 버튼으로 ${installEnvironment || "현재 실행 환경"}에 바로 설치하거나, 터미널에서 같은 환경으로 실행할 수 있습니다.`
+          ? missingPackages.length
+            ? `위 버튼으로 ${installEnvironment || "현재 실행 환경"}에 바로 설치하거나, 터미널에서 같은 환경으로 실행할 수 있습니다.`
+            : "필요한 라이브러리가 현재 실행 환경에 준비되어 있습니다."
           : "서버 세션이 있어야 현재 실행 환경의 터미널 명령을 준비할 수 있습니다."}
       </div>
       {commandError ? <div className="mt-1 text-xs leading-5 text-muted-foreground">{firstMessageLine(commandError)}</div> : null}

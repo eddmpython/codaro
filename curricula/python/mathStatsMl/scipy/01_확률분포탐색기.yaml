@@ -64,10 +64,9 @@ sections:
   explanation: |-
     scipy는 과학 계산을 위한 Python 라이브러리입니다. scipy.stats 모듈에는 80개 이상의 확률분포와 다양한 통계 함수가 포함되어 있습니다. 정규분포, 균등분포, 지수분포, 이항분포 등 통계학에서 사용하는 거의 모든 분포를 지원합니다. 이 프로젝트에서는 가장 기본적인 정규분포를 다루며, 실제 시험 점수 분석에 적용합니다.
 
-    scipy 설치 시 약 15-25MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다. scipy.stats는 from scipy import stats로 불러오는 것이 일반적입니다.
+    scipy는 라이브러리 패널이 meta.packages 기준으로 준비합니다. 준비가 끝난 뒤에는 세션 동안 유지되며, scipy.stats는 from scipy import stats로 불러오는 것이 일반적입니다.
   tips:
-  - scipy 설치 시 약 15-25MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다. scipy.stats는 from scipy import stats로
-    불러오는 것이 일반적입니다.
+  - scipy는 라이브러리 패널에서 준비한 뒤 import로 확인합니다. scipy.stats는 from scipy import stats로 불러오는 것이 일반적입니다.
   snippet: |-
     import scipy
 

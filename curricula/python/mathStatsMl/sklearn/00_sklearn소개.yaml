@@ -379,8 +379,8 @@ sections:
       title: 주의 필요
       description: n_jobs=-1 → n_jobs=1로 변경 필요
     - emoji: 📦
-      title: 설치 방법
-      description: meta.packages 기준으로 uv run 실행
+      title: 준비 방법
+      description: 라이브러리 패널이 meta.packages 기준으로 현재 실행 환경을 준비
   goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: projects_preview

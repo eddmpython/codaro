@@ -264,6 +264,13 @@ assert.deepEqual(inference.inferDocumentPackages({{
   "opencv-contrib-python",
   "python-docx",
 ]);
+assert.deepEqual(inference.declaredDocumentPackages({{
+  runtime: {{ packages: ["io", "docx", "pandas"] }},
+  blocks: [{{ id: "cell-a", type: "code", content: "from sklearn.model_selection import train_test_split" }}],
+}}), [
+  "pandas",
+  "python-docx",
+]);
 assert.equal(inference.normalizePackageName("Pandas>=2"), "pandas");
 
 const block = {{ id: "cell-1", type: "code", content: "" }};

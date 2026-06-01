@@ -60,6 +60,7 @@ def main() -> int:
         "workflow step resolver": "function workflowArchitectureSteps",
         "workflow generic guard": "function isSpecificWorkflowStep",
         "package panel marker": 'data-learning-package-panel="true"',
+        "package panel explicit package source": "declaredDocumentPackages(document)",
         "package status marker": "data-learning-package-status={packageStatus}",
         "package install action marker": 'data-learning-package-install="true"',
         "package item marker": "data-learning-package-item={packageName}",

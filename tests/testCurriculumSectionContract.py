@@ -23,6 +23,7 @@ INSTALL_STAGE_PHRASES = (
     "설치의 import",
     "패키지 설치",
 )
+INSTALL_STAGE_HEADING_FIELDS = {"title", "subtitle"}
 INSTALL_COMMAND_MARKERS = ("uv add", "uv pip", "pip install", "%pip", "!pip", "python -m pip")
 EXTERNAL_STDLIB_LABELS = (
     "Python 데이터 검증의 표준 라이브러리",
@@ -236,6 +237,8 @@ def testCurriculumPackageReadinessCopyDoesNotPretendToInstall() -> None:
                 continue
             for field, text in sectionCopyFields(section).items():
                 matched = [phrase for phrase in INSTALL_STAGE_PHRASES if phrase in text]
+                if field in INSTALL_STAGE_HEADING_FIELDS and "설치" in text:
+                    matched.append("설치 heading")
                 if matched:
                     rel = path.relative_to(ROOT).as_posix()
                     failures.append(f"{rel} section {index} {field} uses install-stage copy for import readiness: {', '.join(matched)}")

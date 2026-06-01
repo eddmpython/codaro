@@ -61,9 +61,7 @@ export function inferAssistantPackages(message: string, document: CodaroDocument
 }
 
 export function inferDocumentPackages(document: CodaroDocument) {
-  const packages = new Set<string>(
-    (document.runtime?.packages ?? []).map(String).map(installablePackageName).filter(Boolean),
-  );
+  const packages = new Set<string>(declaredDocumentPackages(document));
   for (const block of document.blocks) {
     if (block.type !== "code") continue;
     for (const packageName of inferCodePackages(block.content)) {
@@ -71,6 +69,10 @@ export function inferDocumentPackages(document: CodaroDocument) {
     }
   }
   return sortedPackages(packages);
+}
+
+export function declaredDocumentPackages(document: CodaroDocument) {
+  return sortedPackages((document.runtime?.packages ?? []).map(String).map(installablePackageName).filter(Boolean));
 }
 
 export function inferCodePackages(code: string) {
