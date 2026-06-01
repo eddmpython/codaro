@@ -13,6 +13,7 @@ PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
     "backend",
+    "architecture-boundary",
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "product-quality-audit",
@@ -141,6 +142,44 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "testGateSequenceFailsWhenArtifactGitHeadDoesNotMatch",
                 "testGateSequenceContinuesThroughSoftLiveCredentialMissing",
                 "testGateSequenceStillFailsHardLiveProviderFailure",
+            )),
+        ),
+    ),
+    ProductQualityRequirement(
+        requirementId="architecture-boundary-gate",
+        requirement="Architecture direction is enforced by a named gate, not only hidden inside the full backend suite.",
+        evidenceChecks=(
+            ("tests/run.py", (
+                "\"architecture-boundary\"",
+                "tests/testArchitectureLayerContract.py",
+                "tests/testTransportBoundary.py",
+                "core→engine→domain→transport→entry",
+            )),
+            ("tests/testArchitectureLayerContract.py", (
+                "testCodaroPackageImportsFollowLayerDirection",
+                "FORBIDDEN_IMPORTS_BY_PACKAGE",
+                "`core → engine → domain → transport → entry`",
+            )),
+            ("tests/testTransportBoundary.py", (
+                "testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary",
+                "testTeacherLoopCompatibilityShimStaysThinAndUnusedInternally",
+                "testServerStateFactoryLivesOutsideTransportLayer",
+                "testDocumentRouterKeepsBlockOperationsBehindDocumentBoundary",
+            )),
+            ("docs/skills/architecture/overview.md", (
+                "`core → engine → domain → transport → entry`",
+                "`tests/testArchitectureLayerContract.py`",
+                "`tests/testTransportBoundary.py`",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "`architecture-boundary`",
+                "core→engine→domain→transport→entry",
+                "router/domain 경계",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "`architecture-boundary`",
+                "core→engine→domain→transport→entry",
+                "router/domain 경계",
             )),
         ),
     ),

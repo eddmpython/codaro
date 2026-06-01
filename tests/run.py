@@ -84,6 +84,26 @@ GATES: dict[str, Gate] = {
         description="Python backend 전체 테스트를 실행한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/", "-q", "--tb=short")),),
     ),
+    "architecture-boundary": Gate(
+        tier="fast",
+        description="core→engine→domain→transport→entry 의존 방향과 router/domain 경계를 집중 확인한다.",
+        commands=(
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "-m",
+                "pytest",
+                "tests/testArchitectureLayerContract.py",
+                "tests/testTransportBoundary.py",
+                "-q",
+                "--tb=short",
+            )),
+        ),
+        ci_required=False,
+    ),
     "widget-bridge": Gate(
         tier="fast",
         description="Python ui descriptor + 콜백 registry + traceback parser + widget TS 타입 동기 + React round-trip + chromium E2E.",
@@ -334,6 +354,7 @@ PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
     "backend",
+    "architecture-boundary",
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "product-quality-audit",
@@ -904,8 +925,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 35:
-        failures.append(f"expected 35 gates, found {len(GATES)}")
+    if len(GATES) != 36:
+        failures.append(f"expected 36 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
