@@ -590,6 +590,32 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
     assert "explicit defaults" not in prompt
 
 
+def testTeacherSkillRegistryLocksGoalDiscoveryBeforeYamlAuthoring() -> None:
+    summary = teacherSkillToolSummary()
+    goalDiscovery = next(item for item in summary if item["skillId"] == "goal-discovery")
+    prompt = buildSystemPrompt(role="teacher")
+
+    assert tuple(tool["name"] for tool in goalDiscovery["tools"]) == (
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+    )
+    assert all(tool["category"] == "curriculumOs" for tool in goalDiscovery["tools"])
+    assert all(tool["lane"] == "planning" for tool in goalDiscovery["tools"])
+
+    orderedSnippets = (
+        "call resolve-learning-goal to map the goal to domains",
+        "search-curricula to find lessons that already cover it",
+        "compose-master-plan to assemble an ordered learning path",
+        "Only call write-curriculum-yaml to author a new lesson when no existing lesson covers the goal",
+        "If existing lessons cover the goal, recommend the composed path instead of authoring a duplicate lesson",
+    )
+    snippetIndexes = [prompt.index(snippet) for snippet in orderedSnippets]
+
+    assert snippetIndexes == sorted(snippetIndexes)
+    assert "When the user asks to learn a topic, draft a compact structured curriculum YAML" not in prompt
+
+
 def testAutomationRolePromptPromotesRecipeAuthoringLoop() -> None:
     prompt = buildSystemPrompt(role="automation")
 

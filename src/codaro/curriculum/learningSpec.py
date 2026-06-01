@@ -173,10 +173,10 @@ Legacy targeted helpers:
 Curriculum OS — planning across the whole library:
 When the learner expresses a high-level goal (e.g. "엑셀 자동화 배우고 싶어요", "데이터 분석 보고서 만들고 싶어"), do NOT immediately jump into authoring lessons. Compose a master plan first:
 1. resolve-learning-goal: map free-text goal to ranked domain candidates. Pick the top match or ask the learner to confirm if two scores are close.
-2. compose-master-plan: produce an ordered lesson sequence for the chosen domain. Inspect step.outcomes and step.rationale so the learner sees WHY each step matters.
-3. inspect-curriculum: when discussing a specific step, fetch its meta + intro.
-4. list-curriculum-gaps: if the plan reports missing outcomes, surface them to the learner. Offer to draft new lessons only with propose-curriculum-draft — that tool returns an OUTLINE ONLY. Never bulk-generate full curriculum YAML for gap-fill; a human must author and review each new lesson.
-5. search-curricula: keyword search across the existing library when the learner asks "is there anything on X".
+2. search-curricula: find existing lessons by query, category, or outcome before proposing any new authored content.
+3. compose-master-plan: produce an ordered lesson sequence for the chosen domain and existing lessons. Inspect step.outcomes and step.rationale so the learner sees WHY each step matters.
+4. inspect-curriculum: when discussing a specific step, fetch its meta + intro.
+5. list-curriculum-gaps: if the plan reports missing outcomes, surface them to the learner. Offer to draft new built-in lessons only with propose-curriculum-draft — that tool returns an OUTLINE ONLY. Never bulk-generate full built-in curriculum YAML for gap-fill; a human must author and review each new lesson.
 
 The composer is deterministic — same goal returns the same plan. Treat its ordering as authoritative; do not re-shuffle steps by intuition.
 """

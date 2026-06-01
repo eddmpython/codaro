@@ -126,11 +126,17 @@ def testGatherClarificationPlanCarriesSingleQuestionAndProgress() -> None:
 def testActionDirectiveSteersTowardRecommendThenCompose() -> None:
     plan = buildIntakePlan("초급 pandas 실습 중심 짧은 레슨 만들어줘")
     directive = intakeActionDirective(plan.actionPayload())
+    orderedSnippets = (
+        "FIRST recommend or combine what already exists",
+        "call resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+        "Only call write-curriculum-yaml",
+    )
 
-    assert "resolve-learning-goal" in directive
-    assert "search-curricula" in directive
-    assert "compose-master-plan" in directive
-    assert "write-curriculum-yaml" in directive
+    assert [directive.index(snippet) for snippet in orderedSnippets] == sorted(
+        directive.index(snippet) for snippet in orderedSnippets
+    )
     assert "Understood goal:" in directive
 
 

@@ -15,17 +15,18 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 ## 첫 사용자 플로우
 
-아래 9단계는 audit에서 빠지면 안 된다.
+아래 10단계는 audit에서 빠지면 안 된다.
 
 1. 첫 실행: 사용자가 Codaro를 처음 실행하고 provider 연결 전 상태를 본다.
 2. provider 연결: Provider 설정에서 `oauth-chatgpt` 또는 `openai`를 연결하고, 연결 전에는 fallback 안내만 보며 연결 후에는 실제 provider 응답을 쓴다.
 3. 질문: 사용자가 "pandas 기초를 실습형으로 배우고 싶다" 같은 학습 요청을 보낸다.
 4. clarification: 요청이 모호하면 provider 호출 전에 1-3개의 핵심 질문으로 멈춘다.
-5. YAML 생성: 답변 후 structured learning YAML을 만들고 `write-curriculum-yaml`을 통과한다.
-6. 학습카드 렌더링: YAML이 섹션 단위 학습카드로 열리고 overview diagram, 스니펫, 실습 셀, 결과/검증 영역이 보인다.
-7. 실습 셀 입력: 학습자는 "클릭해서 직접 입력" 단계를 거치지 않고 바로 보이는 코드 editor에 입력한다.
-8. 셀 실행: 실행 전 `packages-check`, 필요 시 `packages-install`, 이후 `cell-call` 순서로 실행한다.
-9. 피드백과 실패 복구: 실행 결과와 검증/피드백을 보고, 실패하면 원인과 다음 행동을 사용자 문장으로 확인한다.
+5. 추천·조합 우선: 목표가 분명해지면 `resolve-learning-goal` → `search-curricula` → `compose-master-plan` 순서로 기존 커리큘럼을 먼저 찾고 학습 경로를 조합한다.
+6. YAML 생성: 기존 레슨이 목표를 덮지 못하는 실제 gap일 때만 structured learning YAML을 만들고 `write-curriculum-yaml`을 통과한다.
+7. 학습카드 렌더링: YAML이 섹션 단위 학습카드로 열리고 overview diagram, 스니펫, 실습 셀, 결과/검증 영역이 보인다.
+8. 실습 셀 입력: 학습자는 "클릭해서 직접 입력" 단계를 거치지 않고 바로 보이는 코드 editor에 입력한다.
+9. 셀 실행: 실행 전 `packages-check`, 필요 시 `packages-install`, 이후 `cell-call` 순서로 실행한다.
+10. 피드백과 실패 복구: 실행 결과와 검증/피드백을 보고, 실패하면 원인과 다음 행동을 사용자 문장으로 확인한다.
 
 이 흐름의 제품 내비게이션은 `대화 → 현재 학습 → 노트북 → 자동화` 순서로 보인다. 자동화는 첫 화면의 동급 출발점이 아니라, 학습/노트북에서 검증된 셀과 recipe를 저장하고 예약하는 두 번째 loop로 판단한다.
 
@@ -71,4 +72,4 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 ## 관련 gate
 
-`dogfood-alpha-audit`는 문서와 코드에 9단계 완주 경로, provider/OAuth 복구, live provider smoke, 학습카드 완주 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다.
+`dogfood-alpha-audit`는 문서와 코드에 10단계 완주 경로, provider/OAuth 복구, live provider smoke, 추천·조합 우선 goal-discovery, 학습카드 완주 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다.
