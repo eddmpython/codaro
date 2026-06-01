@@ -18,6 +18,13 @@ export type CustomCurriculumEntry = {
   createdAt: number;
 };
 
+export type SidebarCustomCurriculum = {
+  id: string;
+  title: string;
+  blockCount: number;
+  createdAt: number;
+};
+
 export type CustomCurriculumApplication = {
   draftUpdates: Record<string, string>;
   document: CodaroDocument;
@@ -157,6 +164,15 @@ export function buildCustomCurriculumApplication(
     selectedContentId: entry.id,
     selectedCustomCurriculumId: entry.id,
     surfaceToOpen: "curriculum",
+  };
+}
+
+export function sidebarCustomCurriculumFromEntry(entry: CustomCurriculumEntry): SidebarCustomCurriculum {
+  return {
+    id: entry.id,
+    title: entry.title,
+    blockCount: entry.document.blocks.length,
+    createdAt: entry.createdAt,
   };
 }
 

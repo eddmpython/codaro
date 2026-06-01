@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { AutomationSidebarTree } from "@/components/app/automationSidebarTree";
-import { CurriculumSidebarTree, type SidebarCustomCurriculum } from "@/components/app/curriculumSidebarTree";
+import { CurriculumSidebarTree } from "@/components/app/curriculumSidebarTree";
 import { ProductFlowNav } from "@/components/app/productFlowNav";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
 import { useLocale } from "@/lib/localeContext";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";

@@ -2,10 +2,22 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+EDITOR_SRC = ROOT / "editor/src"
 
 
 def _read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
+
+
+def _editor_sources(*roots: str) -> list[Path]:
+    paths: list[Path] = []
+    for root in roots:
+        base = EDITOR_SRC / root
+        if base.is_file():
+            paths.append(base)
+            continue
+        paths.extend(path for path in base.rglob("*") if path.suffix in {".ts", ".tsx"})
+    return sorted(paths)
 
 
 def testNotebookPanelDoesNotCallTransportApiDirectly() -> None:
@@ -261,13 +273,23 @@ def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
 
 
 def testFrontendStateDoesNotImportComponentImplementations() -> None:
-    for relativePath in (
-        "editor/src/hooks/useAssistantTurnState.ts",
-        "editor/src/lib/assistantProviderTurn.ts",
-        "editor/src/lib/providerConnection.ts",
-    ):
-        source = _read(relativePath)
-        assert 'from "@/components/' not in source
+    offenders: list[str] = []
+    for path in _editor_sources("hooks", "lib"):
+        source = path.read_text(encoding="utf-8")
+        if '@/components/' in source:
+            offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
+def testUiAndHookLayersDoNotCallTransportApiDirectly() -> None:
+    offenders: list[str] = []
+    for path in _editor_sources("App.tsx", "components", "hooks", "routes"):
+        source = path.read_text(encoding="utf-8")
+        if '@/lib/api' in source or "codaroApi" in source:
+            offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
 
 
 def testProviderProfileDisplayLogicLivesInLibBoundary() -> None:

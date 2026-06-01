@@ -82,7 +82,8 @@ def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
     assert "PRODUCT_SIDEBAR_NAV" not in curriculumTree
     assert "PRODUCT_SIDEBAR_NAV" not in automationTree
     assert "buildSidebarCurriculumTree" not in productSidebar
-    assert 'from "@/components/app/curriculumSidebarTree"' in navigationHook
+    assert 'from "@/lib/customCurricula"' in navigationHook
+    assert 'from "@/components/app/curriculumSidebarTree"' not in navigationHook
     assert 'from "@/components/app/productSidebar"' not in navigationHook
 
 
@@ -169,6 +170,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/lib/assistantResponsePlan.ts`",
         "`editor/src/lib/pendingChanges.ts`",
         "`editor/src/lib/chatStartExamples.ts`",
+        "`editor/src/lib/customCurricula.ts`",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
         "`tests/testProductSurfaceContract.py`",

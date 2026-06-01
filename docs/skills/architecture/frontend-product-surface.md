@@ -58,6 +58,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/lib/assistantResponsePlan.ts` | 응답에서 curriculum 저장 또는 notebook pending 변경을 만드는 계획 |
 | `editor/src/lib/pendingChanges.ts` | pending 변경 승인/거절과 승인 뒤 열 표면 결정 |
 | `editor/src/lib/chatStartExamples.ts` | 빈 채팅 시작 예시. 기존 레슨 추천과 검증된 셀 recipe가 먼저 보이게 유지 |
+| `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장 모델, 적용 계획, 사이드바 표시용 projection |
 | `editor/src/components/app/curriculumSidebarTree.tsx` | 현재 학습 tree ownership |
 | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 tree ownership |
 | `tests/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
@@ -69,6 +70,8 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - `productSidebar.tsx`가 커리큘럼 tree 생성, 자동화 tree 생성, 삭제 dialog, 표면 icon map까지 직접 품으면 실패다. focused 파일로 되돌린다.
 - `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정이 들어오면 실패다. `editor/src/lib/*` 또는 전용 hook으로 이동한다.
 - `chatSurface.tsx`가 `curriculumSidebarTree`, `automationSidebarTree`, YAML 카드 렌더러, 패키지 준비 내부를 import하면 실패다. 채팅은 입구와 provider 연결만 책임진다.
+- `editor/src/hooks/*` 또는 `editor/src/lib/*`가 `editor/src/components/*` 구현을 import하면 실패다. 표시용 타입과 projection은 lib 경계에 둔다.
+- 컴포넌트, route, hook이 `codaroApi`를 직접 호출하면 실패다. server 통신은 `editor/src/lib/*`의 명명된 경계 함수를 통해서만 한다.
 - assistant 응답이 자동화를 primary route로 직접 열면 실패다. 자동화는 검증된 셀/recipe 뒤에 이어지는 second loop다.
 - `share`나 폐기된 이전 편집기 표면이 1급 사이드바 흐름으로 노출되면 실패다. 지원 경로는 숨김 또는 보조 action으로 남긴다.
 - 호환 레이어는 SSOT에 이름이 있고 테스트로 덮인 경우만 유지한다. 이름 없는 예외, 중복 상태, 화면별 복붙 배열은 제거 대상이다.

@@ -1,14 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 
-import type { SidebarCustomCurriculum } from "@/components/app/curriculumSidebarTree";
 import {
   categorySubtitle,
   categoryTitle,
 } from "@/lib/fallbackData";
 import {
   buildCustomCurriculumApplication,
+  sidebarCustomCurriculumFromEntry,
   type CustomCurriculumApplication,
   type CustomCurriculumEntry,
+  type SidebarCustomCurriculum,
 } from "@/lib/customCurricula";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { AppNotice, BlockConfig, CurriculumCategory } from "@/types";
@@ -56,12 +57,7 @@ export function useCurriculumNavigationState({
   }, [categories, query]);
 
   const sidebarCustomCurricula = useMemo<SidebarCustomCurriculum[]>(() => {
-    return customCurricula.map((entry) => ({
-      id: entry.id,
-      title: entry.title,
-      blockCount: entry.document.blocks.length,
-      createdAt: entry.createdAt,
-    }));
+    return customCurricula.map(sidebarCustomCurriculumFromEntry);
   }, [customCurricula]);
 
   const applyCustomCurriculumApplication = useCallback((application: CustomCurriculumApplication) => {

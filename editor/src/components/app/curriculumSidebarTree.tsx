@@ -22,14 +22,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { categoryTitle } from "@/lib/fallbackData";
+import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
-
-export type SidebarCustomCurriculum = {
-  id: string;
-  title: string;
-  blockCount: number;
-  createdAt: number;
-};
 
 type CurriculumSidebarTreeProps = {
   categories: CurriculumCategory[];
