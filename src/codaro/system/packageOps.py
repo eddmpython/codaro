@@ -295,6 +295,9 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
 
 _VALID_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
 _PLAIN_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$")
+PACKAGE_NAME_ALIASES = {
+    "docx": "python-docx",
+}
 
 
 def validatePackageName(name: str) -> None:
@@ -316,7 +319,7 @@ def installablePackageNames(names: list[str]) -> list[str]:
     packages: list[str] = []
     seen: set[str] = set()
     for rawName in names:
-        packageName = rawName.strip()
+        packageName = canonicalPackageName(rawName)
         if not packageName:
             continue
         validatePackageName(packageName)
@@ -328,6 +331,12 @@ def installablePackageNames(names: list[str]) -> list[str]:
         seen.add(key)
         packages.append(packageName)
     return packages
+
+
+def canonicalPackageName(name: str) -> str:
+    packageName = name.strip()
+    normalized = packageName.lower().replace("_", "-")
+    return PACKAGE_NAME_ALIASES.get(normalized, packageName)
 
 
 def isStandardLibraryPackage(name: str) -> bool:

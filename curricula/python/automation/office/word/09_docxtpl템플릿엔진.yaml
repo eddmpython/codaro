@@ -7,7 +7,6 @@ meta:
   badge: 심화
   packages:
     - python-docx
-    - docx
     - docxtpl
   tags:
     - docxtpl

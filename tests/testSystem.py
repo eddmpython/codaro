@@ -221,14 +221,16 @@ def testPackageInstallCommandUsesResolvedEnvironment(monkeypatch, tmp_path: Path
     monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
     monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
 
-    plan = packageOps.buildPackageInstallCommand(["pandas", "python-docx"])
+    plan = packageOps.buildPackageInstallCommand(["pandas", "docx", "python-docx"])
 
     assert plan.environment.pythonPath == str(pythonPath)
     assert plan.environment.uvPath == str(uvPath)
     assert plan.command.startswith(str(uvPath))
     assert " pip install --python " in plan.command
     assert "pandas" in plan.command
+    assert plan.packages == ["pandas", "python-docx"]
     assert "python-docx" in plan.command
+    assert " docx" not in plan.command
 
 
 def testPackageInstallCommandDropsStandardLibraryModules(monkeypatch, tmp_path: Path) -> None:

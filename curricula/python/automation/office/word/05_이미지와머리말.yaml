@@ -7,7 +7,6 @@ meta:
   badge: 기초
   packages:
     - python-docx
-    - docx
     - pillow
   tags:
     - add_picture

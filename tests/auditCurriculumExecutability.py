@@ -151,10 +151,13 @@ def loadYaml(path: Path) -> dict[str, Any] | None:
 
 IMPORT_TO_PKG = {
     "cv2": "opencv-python",
+    "docx": "python-docx",
+    "mpl_toolkits": "matplotlib",
     "sklearn": "scikit-learn",
     "pil": "pillow",
     "yaml": "pyyaml",
     "bs4": "beautifulsoup4",
+    "fitz": "pymupdf",
     "pydantic_settings": "pydantic-settings",
     "dotenv": "python-dotenv",
     "dateutil": "python-dateutil",

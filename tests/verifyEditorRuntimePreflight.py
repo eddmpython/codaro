@@ -69,6 +69,7 @@ def sourceContractFailures() -> list[str]:
             "normalizePackageName",
             "isPythonStdlibModule",
             "PACKAGE_ALIASES",
+            "PACKAGE_PROVIDER_EQUIVALENTS",
         ),
         PYTHON_STDLIB: (
             "PYTHON_STDLIB_MODULES",
@@ -249,6 +250,19 @@ assert.deepEqual(inference.inferCodePackages("import os\\nfrom PIL import Image\
   "pillow",
   "pyyaml",
   "scikit-learn",
+]);
+assert.deepEqual(inference.inferCodePackages("import cv2\\nfrom docx import Document\\nfrom bs4 import BeautifulSoup\\nimport pydantic_settings"), [
+  "beautifulsoup4",
+  "opencv-python",
+  "pydantic-settings",
+  "python-docx",
+]);
+assert.deepEqual(inference.inferDocumentPackages({{
+  runtime: {{ packages: ["opencv-contrib-python", "docx"] }},
+  blocks: [{{ id: "cell-a", type: "code", content: "import cv2\\nfrom docx import Document" }}],
+}}), [
+  "opencv-contrib-python",
+  "python-docx",
 ]);
 assert.equal(inference.normalizePackageName("Pandas>=2"), "pandas");
 

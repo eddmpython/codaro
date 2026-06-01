@@ -21,7 +21,10 @@ REPORT_PATH = ROOT / "output" / "test-runner" / "curriculum-quality-matrix" / "c
 
 PACKAGE_ALIASES = {
     "PIL": "pillow",
+    "bs4": "beautifulsoup4",
     "cv2": "opencv-python",
+    "docx": "python-docx",
+    "fitz": "pymupdf",
     "mpl_toolkits": "matplotlib",
     "pydantic_settings": "pydantic-settings",
     "sklearn": "scikit-learn",

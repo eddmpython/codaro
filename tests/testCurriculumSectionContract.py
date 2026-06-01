@@ -30,6 +30,9 @@ EXTERNAL_STDLIB_LABELS = (
     "Python 통계 분석의 표준 라이브러리",
     "20년 검증된 표준 라이브러리",
 )
+CANONICAL_PACKAGE_NAMES = {
+    "docx": "python-docx",
+}
 
 
 def testLessonContractExtractsStructuredSectionFields() -> None:
@@ -252,6 +255,28 @@ def testCurriculumPackageCopyUsesCanonicalNames() -> None:
         for phrase in EXTERNAL_STDLIB_LABELS:
             if phrase in text:
                 failures.append(f"{rel}: external package is described as stdlib: {phrase}")
+
+    assert not failures
+
+
+def testCurriculumMetaPackagesUseInstallableDistributionNames() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*.yaml")):
+        if path.name == "schema.yaml":
+            continue
+        content = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if not isinstance(content, dict):
+            continue
+        meta = content.get("meta") if isinstance(content.get("meta"), dict) else {}
+        packages = meta.get("packages") if isinstance(meta, dict) else []
+        if not isinstance(packages, list):
+            continue
+        for packageName in packages:
+            normalized = str(packageName).strip().lower().replace("_", "-")
+            replacement = CANONICAL_PACKAGE_NAMES.get(normalized)
+            if replacement:
+                rel = path.relative_to(ROOT).as_posix()
+                failures.append(f"{rel}: use {replacement} in meta.packages instead of {packageName!r}")
 
     assert not failures
 

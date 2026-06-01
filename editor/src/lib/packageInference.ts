@@ -3,20 +3,38 @@ import { isPythonStdlibModule, isPythonStdlibPackageName } from "@/lib/pythonStd
 
 const PACKAGE_ALIASES: Record<string, string> = {
   PIL: "pillow",
+  bs4: "beautifulsoup4",
   cv2: "opencv-python",
+  dateutil: "python-dateutil",
+  docx: "python-docx",
+  dotenv: "python-dotenv",
+  easyocr: "easyocr",
+  fitz: "pymupdf",
+  imagehash: "imagehash",
+  magic: "python-magic",
   matplotlib: "matplotlib",
   mpl_toolkits: "matplotlib",
+  mss: "mss",
   numpy: "numpy",
   pandas: "pandas",
   pydantic_settings: "pydantic-settings",
+  pytesseract: "pytesseract",
   sklearn: "scikit-learn",
+  skimage: "scikit-image",
+  win32api: "pywin32",
+  win32com: "pywin32",
   yaml: "pyyaml",
   torch: "torch",
   torchvision: "torchvision",
-  imagehash: "imagehash",
-  pytesseract: "pytesseract",
-  easyocr: "easyocr",
-  mss: "mss",
+};
+
+const PACKAGE_NAME_ALIASES: Record<string, string> = {
+  docx: "python-docx",
+  pillow: "pillow",
+};
+
+const PACKAGE_PROVIDER_EQUIVALENTS: Record<string, string[]> = {
+  "opencv-contrib-python": ["opencv-python"],
 };
 
 const KEYWORD_PACKAGES: Record<string, string> = {
@@ -49,7 +67,7 @@ export function inferDocumentPackages(document: CodaroDocument) {
   for (const block of document.blocks) {
     if (block.type !== "code") continue;
     for (const packageName of inferCodePackages(block.content)) {
-      packages.add(packageName);
+      if (!packageSetCoversPackage(packages, packageName)) packages.add(packageName);
     }
   }
   return sortedPackages(packages);
@@ -73,7 +91,7 @@ export function importPackageName(moduleName: string) {
 export function installablePackageName(packageName: string) {
   const normalized = packageName.trim();
   if (!normalized || isPythonStdlibPackageName(normalized)) return "";
-  return normalized;
+  return PACKAGE_NAME_ALIASES[normalizePackageName(normalized)] ?? normalized;
 }
 
 export function normalizePackageName(value: string) {
@@ -85,4 +103,14 @@ function sortedPackages(packages: Iterable<string>) {
   return Array.from(new Set(Array.from(packages).map(String).filter(Boolean))).sort((left, right) =>
     left.localeCompare(right),
   );
+}
+
+function packageSetCoversPackage(packages: Set<string>, packageName: string) {
+  const target = normalizePackageName(packageName);
+  for (const existing of packages) {
+    const normalizedExisting = normalizePackageName(existing);
+    if (normalizedExisting === target) return true;
+    if ((PACKAGE_PROVIDER_EQUIVALENTS[normalizedExisting] ?? []).includes(target)) return true;
+  }
+  return false;
 }

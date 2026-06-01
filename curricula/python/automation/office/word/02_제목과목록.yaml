@@ -7,7 +7,6 @@ meta:
   badge: 입문
   packages:
     - python-docx
-    - docx
   tags:
     - add_heading
     - List Bullet

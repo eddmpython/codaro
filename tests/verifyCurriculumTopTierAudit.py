@@ -49,7 +49,10 @@ STUDY_TOPIC_PACKAGES = {
 }
 PACKAGE_ALIASES = {
     "PIL": "pillow",
+    "bs4": "beautifulsoup4",
     "cv2": "opencv-python",
+    "docx": "python-docx",
+    "fitz": "pymupdf",
     "mpl_toolkits": "matplotlib",
     "pydantic_settings": "pydantic-settings",
     "sklearn": "scikit-learn",
@@ -161,6 +164,8 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
     declaredPackages = uniqueTextList(meta.get("packages"))
     importedPackages = inferImportedPackages(content)
     declaredNormalized = {normalizePackageName(package) for package in declaredPackages}
+    if "opencv-contrib-python" in declaredNormalized:
+        declaredNormalized.add("opencv-python")
     missingPackages = [
         package
         for package in importedPackages

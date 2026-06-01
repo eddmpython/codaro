@@ -7,7 +7,6 @@ meta:
   badge: 중급
   packages:
     - python-docx
-    - docx
   tags:
     - Document open
     - 자리표시자

@@ -7,7 +7,6 @@ meta:
   badge: 중급
   packages:
     - python-docx
-    - docx
   tags:
     - styles.add_style
     - Pt
