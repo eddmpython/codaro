@@ -27,9 +27,6 @@ export default defineConfig({
           if (id.includes("node_modules/pdf-lib") || id.includes("node_modules/pdfjs-dist") || id.includes("node_modules/fflate")) {
             return "vendor-pdf";
           }
-          if (id.includes("node_modules/xlsx")) {
-            return "vendor-xlsx";
-          }
           if (id.includes("src/lib/generated/docsNav") || id.includes("src/lib/generated/posts")) {
             return "data-content";
           }
