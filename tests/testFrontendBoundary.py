@@ -195,6 +195,20 @@ def testLocalFallbackRoutesAutomationDraftsToNotebookPendingChanges() -> None:
     assert 'scope === "lesson" || scope === "curriculum"' in fallback
     assert "pendingBlocks = draft.shouldSaveCurriculum ? [] : draft.generatedBlocks" in localTurn
     assert "mergePendingBlocks(current, localApplication.pendingBlocks)" in hook
+    assert "buildLocalExecutionResult" not in fallback
+    assert "firstOutputLine" not in fallback
+
+
+def testLocalRuntimeOwnsOfflineExecutionBoundary() -> None:
+    localRuntime = _read("editor/src/lib/localRuntime.ts")
+    notebookRuntime = _read("editor/src/lib/notebookRuntime.ts")
+    ssotMap = _read("docs/skills/architecture/ssot-map.md")
+
+    assert "export function buildLocalExecutionResult" in localRuntime
+    assert "export function firstOutputLine" in localRuntime
+    assert 'from "@/lib/localRuntime"' in notebookRuntime
+    assert "`editor/src/lib/localRuntime.ts`" in ssotMap
+    assert "로컬 실행 결과" not in _read("editor/src/lib/localFallback.ts")
 
 
 def testAutomationBlocksRemainExecutableInNotebookModel() -> None:

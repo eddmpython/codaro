@@ -1,7 +1,7 @@
 import { codaroApi } from "@/lib/api";
 import type { ResultMap } from "@/lib/assistantContext";
 import { isExecutableBlock } from "@/lib/cellModel";
-import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localFallback";
+import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
 import type {

@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EDITOR_DIR = ROOT / "editor"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
+LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
 LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
 
@@ -33,7 +34,7 @@ def main() -> int:
 
 def sourceContractFailures() -> list[str]:
     failures: list[str] = []
-    for path in (NOTEBOOK_RUNTIME, PACKAGE_INFERENCE, LOCALE_COPY):
+    for path in (NOTEBOOK_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, LOCALE_COPY):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
 
@@ -41,6 +42,7 @@ def sourceContractFailures() -> list[str]:
         return failures
 
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
+    localRuntimeText = LOCAL_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     localeText = LOCALE_COPY.read_text(encoding="utf-8")
     required = {
@@ -52,6 +54,11 @@ def sourceContractFailures() -> list[str]:
             "executeReactive",
             "runtime.libraryFailed",
             "runtime.uvPrepared",
+        ),
+        LOCAL_RUNTIME: (
+            "buildLocalExecutionResult",
+            "firstOutputLine",
+            "extractStdout",
         ),
         PACKAGE_INFERENCE: (
             "inferCodePackages",
@@ -67,7 +74,15 @@ def sourceContractFailures() -> list[str]:
         ),
     }
     for path, tokens in required.items():
-        text = runtimeText if path == NOTEBOOK_RUNTIME else inferenceText if path == PACKAGE_INFERENCE else localeText
+        text = (
+            runtimeText
+            if path == NOTEBOOK_RUNTIME
+            else localRuntimeText
+            if path == LOCAL_RUNTIME
+            else inferenceText
+            if path == PACKAGE_INFERENCE
+            else localeText
+        )
         for token in tokens:
             if token not in text:
                 failures.append(f"{path.relative_to(ROOT)} missing {token}")
@@ -202,8 +217,11 @@ function translate(key, values) {{
 }}
 const runtime = loadModule({runtimePath}, (specifier) => {{
   if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/cellModel") return {{
+    isExecutableBlock: (block) => block.type === "code" || block.type === "automation",
+  }};
   if (specifier === "@/lib/localeCopy") return {{ translate }};
-  if (specifier === "@/lib/localFallback") return {{
+  if (specifier === "@/lib/localRuntime") return {{
     buildLocalExecutionResult: () => fakeResult,
     firstOutputLine: (result) => result.stdout.trim(),
   }};
