@@ -538,8 +538,29 @@ def testToolPolicyOnlyTrustsMissingPackagesThatWereChecked() -> None:
 def testToolSequenceHarnessCapturesCoreExpectations() -> None:
     curriculumCase = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
     dependencyCase = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-before-install")
+    goalDiscoveryCase = next(case for case in goldenEvalCases if case.caseId == "goal-discovery-before-yaml-authoring")
 
     assert evaluateToolSequence(curriculumCase, ["write-curriculum-yaml"]).passed
+    assert evaluateToolSequence(goalDiscoveryCase, [
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+        "packages-check",
+        "write-curriculum-yaml",
+    ]).passed
+    discoveryReport = evaluateToolSequence(goalDiscoveryCase, [
+        "write-curriculum-yaml",
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+        "packages-check",
+    ])
+    assert not discoveryReport.passed
+    assert (
+        "expected exact tool sequence resolve-learning-goal -> search-curricula -> compose-master-plan -> packages-check -> write-curriculum-yaml, "
+        "observed write-curriculum-yaml -> resolve-learning-goal -> search-curricula -> compose-master-plan -> packages-check"
+    ) in discoveryReport.failures
+    assert "packages-check must run before write-curriculum-yaml" in discoveryReport.failures
     report = evaluateToolSequence(dependencyCase, ["packages-install", "packages-check", "cell-call"])
     assert not report.passed
     assert (
@@ -547,6 +568,44 @@ def testToolSequenceHarnessCapturesCoreExpectations() -> None:
         "observed packages-install -> packages-check -> cell-call"
     ) in report.failures
     assert "packages-check must run before packages-install" in report.failures
+
+
+def testGoalDiscoveryToolsHaveReadableBackendWorkloop() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-goal-discovery")
+
+    resolve = orchestrator.toolCallStart(trace, "call-resolve", "resolve-learning-goal", {"goalText": "pandas 지출 CSV"})
+    resolveDone = orchestrator.toolCallResult(
+        trace,
+        "call-resolve",
+        "resolve-learning-goal",
+        {"goalText": "pandas 지출 CSV"},
+        {"candidates": [{"domainId": "dataReporting", "domainLabel": "데이터 리포팅"}]},
+    )
+    search = orchestrator.toolCallStart(trace, "call-search", "search-curricula", {"query": "pandas"})
+    searchDone = orchestrator.toolCallResult(
+        trace,
+        "call-search",
+        "search-curricula",
+        {"query": "pandas"},
+        {"matches": [{"title": "pandas 기초"}], "total": 1},
+    )
+    compose = orchestrator.toolCallStart(trace, "call-compose", "compose-master-plan", {"domain": "dataReporting"})
+    composeDone = orchestrator.toolCallResult(
+        trace,
+        "call-compose",
+        "compose-master-plan",
+        {"domain": "dataReporting"},
+        {"steps": [{"title": "pandas 기초"}], "gaps": [{"outcomeId": "expense-csv-summary"}], "totalMinutes": 30},
+    )
+
+    assert resolve["workLabel"] == "학습 목표 해석"
+    assert resolve["workDetail"] == "pandas 지출 CSV 목표를 도메인으로 해석"
+    assert resolveDone["workDetail"] == "후보 도메인 1개 · 최상위 데이터 리포팅"
+    assert search["workLabel"] == "커리큘럼 검색"
+    assert searchDone["workDetail"] == "기존 레슨 1개 · pandas 기초"
+    assert compose["workLabel"] == "커리큘럼 조합"
+    assert composeDone["workDetail"] == "1단계 경로 · 총 30분 · 미충족 1건"
 
 
 def testGoldenEvalCasesReferenceRegisteredTools() -> None:

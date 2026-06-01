@@ -84,6 +84,9 @@ def workloopMetadata(name: str, arguments: dict[str, Any]) -> dict[str, str]:
 
 def _workLabel(name: str) -> str:
     labels = {
+        "resolve-learning-goal": "학습 목표 해석",
+        "search-curricula": "커리큘럼 검색",
+        "compose-master-plan": "커리큘럼 조합",
         "write-curriculum-yaml": "커리큘럼 YAML 전개",
         "packages-check": "라이브러리 확인",
         "packages-install": "uv 라이브러리 설치",
@@ -106,6 +109,15 @@ def _workLabel(name: str) -> str:
 
 
 def _workDetail(name: str, arguments: dict[str, Any]) -> str:
+    if name == "resolve-learning-goal":
+        goalText = _textArg(arguments, "goalText")
+        return f"{goalText} 목표를 도메인으로 해석" if goalText else "목표를 커리큘럼 도메인으로 해석"
+    if name == "search-curricula":
+        query = _textArg(arguments, "query") or _textArg(arguments, "category") or _textArg(arguments, "outcomeId")
+        return f"{query} 기존 레슨 검색" if query else "기존 레슨 검색"
+    if name == "compose-master-plan":
+        target = _textArg(arguments, "projectIntent") or _textArg(arguments, "domain")
+        return f"{target} 학습 경로로 기존 레슨 조합" if target else "기존 레슨을 학습 경로로 조합"
     if name == "write-curriculum-yaml":
         return "구조화된 YAML을 섹션 카드와 실행 셀로 변환"
     if name == "packages-check":
@@ -143,6 +155,37 @@ def _workDetail(name: str, arguments: dict[str, Any]) -> str:
 
 
 def _resultWorkDetail(name: str, arguments: dict[str, Any], result: dict[str, Any]) -> str:
+    if name == "resolve-learning-goal":
+        candidates = _dictListResult(result, "candidates")
+        if not candidates:
+            return "맞는 도메인 없음"
+        topCandidate = candidates[0]
+        topLabel = _textResult(topCandidate, "domainLabel") or _textResult(topCandidate, "domainId")
+        parts = [f"후보 도메인 {len(candidates)}개"]
+        if topLabel:
+            parts.append(f"최상위 {topLabel}")
+        return " · ".join(parts)
+    if name == "search-curricula":
+        matches = _dictListResult(result, "matches")
+        total = _intResult(result, "total")
+        count = total if total is not None else len(matches)
+        if count < 1:
+            return "기존 레슨 없음"
+        firstTitle = _textResult(matches[0], "title") if matches else ""
+        parts = [f"기존 레슨 {count}개"]
+        if firstTitle:
+            parts.append(firstTitle)
+        return " · ".join(parts)
+    if name == "compose-master-plan":
+        steps = _dictListResult(result, "steps")
+        gaps = _dictListResult(result, "gaps")
+        totalMinutes = _intResult(result, "totalMinutes")
+        parts = [f"{len(steps)}단계 경로"]
+        if totalMinutes is not None:
+            parts.append(f"총 {totalMinutes}분")
+        if gaps:
+            parts.append(f"미충족 {len(gaps)}건")
+        return " · ".join(parts)
     if name == "write-curriculum-yaml":
         stats = _curriculumResultStats(result)
         title = _textResult(result, "title")
@@ -273,6 +316,13 @@ def _listResult(result: dict[str, Any], key: str) -> list[str]:
     if not isinstance(value, list):
         return []
     return [item for item in value if isinstance(item, str)]
+
+
+def _dictListResult(result: dict[str, Any], key: str) -> list[dict[str, Any]]:
+    value = result.get(key)
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, dict)]
 
 
 def _firstLine(value: str) -> str:

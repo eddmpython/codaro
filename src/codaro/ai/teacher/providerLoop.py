@@ -64,6 +64,12 @@ PROVIDER_TOOL_RESULT_SIGNAL_KEYS = (
     "runtimePackageCount",
     "blockCount",
     "solutionCount",
+    "candidates",
+    "matches",
+    "total",
+    "steps",
+    "gaps",
+    "totalMinutes",
 )
 
 

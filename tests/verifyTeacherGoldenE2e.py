@@ -94,6 +94,54 @@ class ScriptedExecutor:
         return self._results.get(toolName, {"ok": True, "tool": toolName})
 
 
+class GoalDiscoveryExecutor:
+    def __init__(self, delegate: ToolExecutor) -> None:
+        self._delegate = delegate
+        self.calls: list[dict[str, Any]] = []
+
+    async def execute(self, toolName: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        self.calls.append({"tool": toolName, "arguments": arguments})
+        if toolName == "resolve-learning-goal":
+            return {
+                "candidates": [
+                    {"domainId": "dataReporting", "domainLabel": "데이터 리포팅", "score": 0.93}
+                ],
+                "goalText": arguments.get("goalText", ""),
+            }
+        if toolName == "search-curricula":
+            return {
+                "matches": [
+                    {
+                        "category": "pandas",
+                        "contentId": "pandas-basics",
+                        "title": "pandas 기초",
+                        "outcomes": ["dataframe-basics"],
+                    }
+                ],
+                "total": 1,
+            }
+        if toolName == "compose-master-plan":
+            return {
+                "steps": [
+                    {
+                        "category": "pandas",
+                        "contentId": "pandas-basics",
+                        "title": "pandas 기초",
+                    }
+                ],
+                "gaps": [
+                    {
+                        "outcomeId": "expense-csv-summary",
+                        "missing": "지출 CSV 요약 산출물 실습",
+                    }
+                ],
+                "totalMinutes": 30,
+            }
+        if toolName == "packages-check":
+            return {"missing": [], "packages": ["pandas"], "ready": True}
+        return await self._delegate.execute(toolName, arguments)
+
+
 class FakeConversationManager:
     def __init__(self) -> None:
         self.assistantMessages: list[dict[str, Any]] = []
@@ -171,6 +219,7 @@ async def mainAsync() -> int:
     reports = [
         await runClarificationCase(),
         await runClarificationContinuationCase(),
+        await runGoalDiscoveryBeforeYamlCase(),
         await runDependencyPreflightCase(),
         await runDependencyPreflightFailureCase(),
         await runProviderErrorCase(),
@@ -346,6 +395,118 @@ async def runClarificationContinuationCase() -> dict[str, Any]:
     if manager.consumePendingClarification(conversation.conversationId) is not None:
         extraFailures.append("specific new learning request did not clear stale pending")
     return reportPayload(continuationPayload, extraFailures)
+
+
+async def runGoalDiscoveryBeforeYamlCase() -> dict[str, Any]:
+    case = goldenCase("goal-discovery-before-yaml-authoring")
+    activeDocument = createEmptyDocument("빈 문서")
+    savedDocuments = []
+
+    def getDocument():
+        return activeDocument
+
+    def setDocument(document):
+        nonlocal activeDocument
+        activeDocument = document
+        savedDocuments.append(document)
+
+    provider = ScriptedProvider([
+        ToolResponse(
+            answer="목표를 먼저 해석합니다.",
+            provider="fake",
+            model="test",
+            toolCalls=[
+                ToolCall(
+                    id="call-resolve",
+                    name="resolve-learning-goal",
+                    arguments={"goalText": "초급 pandas 지출 CSV 요약", "limit": 3},
+                )
+            ],
+        ),
+        ToolResponse(
+            answer="기존 레슨을 찾습니다.",
+            provider="fake",
+            model="test",
+            toolCalls=[
+                ToolCall(
+                    id="call-search",
+                    name="search-curricula",
+                    arguments={"query": "pandas 지출 CSV", "limit": 3},
+                )
+            ],
+        ),
+        ToolResponse(
+            answer="학습 경로와 gap을 조합합니다.",
+            provider="fake",
+            model="test",
+            toolCalls=[
+                ToolCall(
+                    id="call-compose",
+                    name="compose-master-plan",
+                    arguments={"domain": "dataReporting", "projectIntent": "지출 CSV 요약", "maxMinutes": 30},
+                )
+            ],
+        ),
+        ToolResponse(
+            answer="gap을 채우기 전에 패키지를 확인합니다.",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-packages", name="packages-check", arguments={"names": ["pandas"]})],
+        ),
+        ToolResponse(
+            answer="gap을 채우는 새 개인 레슨을 전개합니다.",
+            provider="fake",
+            model="test",
+            toolCalls=[
+                ToolCall(
+                    id="call-yaml",
+                    name="write-curriculum-yaml",
+                    arguments={
+                        "yamlContent": structuredLessonYaml(),
+                        "category": "golden",
+                        "contentId": "pandas-expense-gap",
+                    },
+                )
+            ],
+        ),
+        ToolResponse(answer="기존 경로를 추천하고 부족한 부분만 새 레슨으로 구성했습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    executor = GoalDiscoveryExecutor(
+        ToolExecutor(NoSessionManager(), documentGetter=getDocument, documentSetter=setDocument)
+    )
+    report = await runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=toolSchemas(),
+    )
+    expectedCalls = [
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+        "packages-check",
+        "write-curriculum-yaml",
+    ]
+    observedCalls = [call["tool"] for call in executor.calls]
+    extraFailures = []
+    if observedCalls != expectedCalls:
+        extraFailures.append(f"goal discovery tool order mismatch: {observedCalls}")
+    if len(savedDocuments) != 1:
+        extraFailures.append(f"expected one saved document, found {len(savedDocuments)}")
+    if provider.callCount != 6:
+        extraFailures.append(f"goal discovery provider loop call count mismatch: {provider.callCount}")
+    for callIndex, toolCallId in enumerate(
+        ("call-resolve", "call-search", "call-compose", "call-packages", "call-yaml"),
+        start=1,
+    ):
+        if providerCallToolResultPayload(provider, callIndex, toolCallId) is None:
+            extraFailures.append(f"provider did not receive {toolCallId} result")
+    composePayload = providerCallToolResultPayload(provider, 3, "call-compose")
+    if composePayload is None or not composePayload.get("gaps"):
+        extraFailures.append("provider did not receive compose-master-plan gap evidence before YAML")
+    return reportPayload(report, extraFailures)
 
 
 async def runProviderErrorCase() -> dict[str, Any]:

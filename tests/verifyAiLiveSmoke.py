@@ -139,6 +139,52 @@ class LiveSmokeExecutor:
 
     async def execute(self, toolName: str, arguments: dict[str, Any]) -> dict[str, Any]:
         self.calls.append({"tool": toolName, "arguments": arguments})
+        if toolName == "resolve-learning-goal":
+            result = {
+                "candidates": [
+                    {
+                        "domainId": "dataReporting",
+                        "domainLabel": "데이터 리포팅",
+                        "score": 0.93,
+                    }
+                ],
+                "goalText": str(arguments.get("goalText") or ""),
+            }
+            self.results.append({"tool": toolName, "result": result})
+            return result
+        if toolName == "search-curricula":
+            result = {
+                "matches": [
+                    {
+                        "category": "pandas",
+                        "contentId": "pandas-basics",
+                        "title": "pandas 기초",
+                        "outcomes": ["dataframe-basics"],
+                    }
+                ],
+                "total": 1,
+            }
+            self.results.append({"tool": toolName, "result": result})
+            return result
+        if toolName == "compose-master-plan":
+            result = {
+                "steps": [
+                    {
+                        "category": "pandas",
+                        "contentId": "pandas-basics",
+                        "title": "pandas 기초",
+                    }
+                ],
+                "gaps": [
+                    {
+                        "outcomeId": "expense-csv-summary",
+                        "missing": "지출 CSV 요약 산출물 실습",
+                    }
+                ],
+                "totalMinutes": 30,
+            }
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "write-curriculum-yaml":
             result = materializeLiveSmokeYaml(arguments)
             self.results.append({"tool": toolName, "result": result})
@@ -646,12 +692,17 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         {
             "role": "user",
             "content": (
-                "초급 pandas 실습 중심 아주 짧은 레슨을 만들어줘. "
-                "정확히 먼저 packages-check tool을 names=[\"pandas\"]로 한 번 호출해 런타임 준비를 확인한 뒤, "
+                "초급 pandas 지출 CSV 요약을 실습 중심 아주 짧은 레슨으로 진행해줘. "
+                "답변만 하지 말고 정확히 이 순서로 tool을 사용하세요. "
+                "1) resolve-learning-goal로 목표를 도메인에 매핑합니다. "
+                "2) search-curricula로 기존 레슨을 찾습니다. "
+                "3) compose-master-plan으로 기존 레슨 경로와 gap을 확인합니다. "
+                "4) compose-master-plan 결과에 gap이 있으면 packages-check tool을 names=[\"pandas\"]로 한 번 호출해 런타임 준비를 확인합니다. "
+                "5) gap을 채우는 새 개인 레슨이 필요한 경우에만 "
                 "반드시 structured Codaro YAML 계약으로 작성하세요: meta, intro.direction, intro.benefits, "
                 "intro.diagram.steps, intro.diagram.runtime, sections[0].title/subtitle/goal/why/explanation/"
                 "tips/snippet/exercise.prompt/exercise.starterCode/exercise.hints/exercise.check/check. "
-                "섹션은 1개만 만들고, 답변만 하지 말고 packages-check 다음 write-curriculum-yaml tool을 호출해 반영하세요."
+                "섹션은 1개만 만들고, packages-check 다음 write-curriculum-yaml tool을 호출해 반영하세요."
             ),
         },
     ]
@@ -664,7 +715,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             tools=toolSchemas(),
             executor=executor,
             orchestrator=orchestrator,
-            maxToolRounds=3,
+            maxToolRounds=6,
         )
     except LIVE_PROVIDER_ERRORS as exc:
         return failedCase("live-tool-loop", startedAt, config, exc)
@@ -674,6 +725,15 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     workloopSignals = workloopSignal(trace)
     networkSignals = providerNetworkFailureSignals(trace, payload)
     executorCalls = [call["tool"] for call in executor.calls]
+    expectedDiscoveryTools = ("resolve-learning-goal", "search-curricula", "compose-master-plan")
+    usedGoalDiscovery = all(toolName in executorCalls for toolName in expectedDiscoveryTools)
+    orderedGoalDiscovery = (
+        toolsInOrder(executorCalls, "resolve-learning-goal", "search-curricula")
+        and toolsInOrder(executorCalls, "search-curricula", "compose-master-plan")
+    )
+    composeResults = toolResultsByName(executor.results, "compose-master-plan")
+    composeResult = composeResults[-1] if composeResults else {}
+    composeGapCount = len(composeResult.get("gaps") or []) if isinstance(composeResult.get("gaps"), list) else 0
     yamlResults = toolResultsByName(executor.results, "write-curriculum-yaml")
     yamlResult = yamlResults[-1] if yamlResults else {}
     contractGapCount = intSignal(yamlResult, "contractGapCount")
@@ -683,9 +743,15 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     yamlContractObserved = bool(trace.get("yamlContractObserved"))
     usedCurriculumTool = "write-curriculum-yaml" in executorCalls or "write-curriculum-yaml" in toolNames
     usedPackageCheck = "packages-check" in executorCalls
-    orderedPreflight = toolsInOrder(executorCalls, "packages-check", "write-curriculum-yaml")
+    orderedPreflight = (
+        toolsInOrder(executorCalls, "compose-master-plan", "packages-check")
+        and toolsInOrder(executorCalls, "packages-check", "write-curriculum-yaml")
+    )
     passed = (
-        usedCurriculumTool
+        usedGoalDiscovery
+        and orderedGoalDiscovery
+        and composeGapCount >= 1
+        and usedCurriculumTool
         and usedPackageCheck
         and orderedPreflight
         and str(payload.get("provider") or "") != ""
@@ -703,19 +769,43 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         error = "live provider network error interrupted write-curriculum-yaml continuation"
         failureStatus = "provider_network_error"
         failureSignals = networkSignals
+    elif not usedGoalDiscovery:
+        error = "live provider did not run goal-discovery before YAML authoring"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-goal-discovery-tools",
+            requiredTools=(*expectedDiscoveryTools, "packages-check", "write-curriculum-yaml"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
+    elif not orderedGoalDiscovery:
+        error = "live provider did not use resolve-learning-goal -> search-curricula -> compose-master-plan order"
+        failureSignals = toolLoopTuningSignals(
+            reason="goal-discovery-order-violation",
+            requiredTools=(*expectedDiscoveryTools, "packages-check", "write-curriculum-yaml"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
+    elif composeGapCount < 1:
+        error = "live provider authored YAML without compose-master-plan gap evidence"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-gap-before-yaml",
+            requiredTools=("compose-master-plan", "write-curriculum-yaml"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif usedCurriculumTool and not usedPackageCheck:
         error = "live provider did not call packages-check before write-curriculum-yaml"
         failureSignals = toolLoopTuningSignals(
             reason="missing-preflight-tool",
-            requiredTools=("packages-check", "write-curriculum-yaml"),
+            requiredTools=(*expectedDiscoveryTools, "packages-check", "write-curriculum-yaml"),
             observedTools=executorCalls,
             answer=str(payload.get("answer") or ""),
         )
     elif usedCurriculumTool and not orderedPreflight:
-        error = "live provider called write-curriculum-yaml before packages-check"
+        error = "live provider called packages-check/write-curriculum-yaml before goal-discovery was complete"
         failureSignals = toolLoopTuningSignals(
             reason="tool-order-violation",
-            requiredTools=("packages-check", "write-curriculum-yaml"),
+            requiredTools=(*expectedDiscoveryTools, "packages-check", "write-curriculum-yaml"),
             observedTools=executorCalls,
             answer=str(payload.get("answer") or ""),
         )
@@ -780,6 +870,8 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "toolSequence": executorCalls or trace.get("toolSequence") or toolNames,
             "toolCount": len(executorCalls or toolNames),
             "executorCalls": executorCalls,
+            "goalDiscoveryComplete": usedGoalDiscovery and orderedGoalDiscovery,
+            "composeGapCount": composeGapCount,
             "contractGapCount": contractGapCount,
             "sectionCount": sectionCount,
             "exerciseCellCount": exerciseCellCount,

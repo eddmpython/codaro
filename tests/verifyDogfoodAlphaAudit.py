@@ -148,7 +148,7 @@ DOGFOOD_REQUIREMENTS = (
     ),
     DogfoodRequirement(
         requirementId="live-provider-smoke-path",
-        requirement="The opt-in live provider gate covers real answer, teacher answer, clarification, YAML tool loop, and cell-call loop.",
+        requirement="The opt-in live provider gate covers real answer, teacher answer, clarification, goal-discovery, gap-only YAML tool loop, and cell-call loop.",
         evidenceChecks=(
             ("tests/verifyAiLiveSmoke.py", (
                 "live credential missing",
@@ -157,6 +157,11 @@ DOGFOOD_REQUIREMENTS = (
                 "runClarificationGateCase",
                 "runToolLoopCase",
                 "runCellCallLoopCase",
+                "resolve-learning-goal",
+                "search-curricula",
+                "compose-master-plan",
+                "composeGapCount",
+                "goalDiscoveryComplete",
                 "write-curriculum-yaml",
                 "packages-check",
                 "cell-call",
@@ -165,6 +170,8 @@ DOGFOOD_REQUIREMENTS = (
             ("docs/skills/architecture/live-provider-ops.md", (
                 "실제 provider 응답",
                 "모호한 학습 요청이 provider 호출 전에",
+                "resolve-learning-goal → search-curricula → compose-master-plan",
+                "gap을 보고할 때만 `packages-check → write-curriculum-yaml`",
                 "write-curriculum-yaml",
                 "packages-check → cell-call",
             )),

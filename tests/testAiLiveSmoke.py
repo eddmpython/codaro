@@ -233,6 +233,24 @@ def testToolsInOrderRequiresBothTools() -> None:
     assert not smoke.toolsInOrder(["packages-check"], "packages-check", "cell-call")
 
 
+def testLiveSmokeExecutorExposesGoalDiscoveryGapSignals() -> None:
+    smoke = loadSmoke()
+    executor = smoke.LiveSmokeExecutor()
+
+    resolve = asyncio.run(executor.execute("resolve-learning-goal", {"goalText": "pandas 지출 CSV"}))
+    search = asyncio.run(executor.execute("search-curricula", {"query": "pandas"}))
+    compose = asyncio.run(executor.execute("compose-master-plan", {"domain": "dataReporting"}))
+
+    assert resolve["candidates"][0]["domainId"] == "dataReporting"
+    assert search["matches"][0]["title"] == "pandas 기초"
+    assert compose["gaps"][0]["outcomeId"] == "expense-csv-summary"
+    assert [call["tool"] for call in executor.calls] == [
+        "resolve-learning-goal",
+        "search-curricula",
+        "compose-master-plan",
+    ]
+
+
 def testToolLoopTuningSignalsExposeActionableFailureContext() -> None:
     smoke = loadSmoke()
 
