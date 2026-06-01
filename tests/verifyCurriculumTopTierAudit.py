@@ -65,6 +65,8 @@ STDLIB_MODULES = set(getattr(sys, "stdlib_module_names", set())) | {
 IMPORT_RE = re.compile(r"^\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import\s+)", re.M)
 BAD_INSTALL_COPY_RE = re.compile(r"(설치\s*없이|install\s*없이|pip\s+install)", re.I)
 MISLEADING_IMPORT_SETUP_RE = re.compile(r"(설치\s*(?:및|와|과)?\s*import|import\s*(?:및|와|과)?\s*설치)", re.I)
+VALID_PACKAGE_RE = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
+VISIBLE_INSTALL_LABEL_FIELDS = ("title", "subtitle", "goal", "prompt", "label")
 ABILITY_TERMS = (
     "할 수",
     "만들",
@@ -164,6 +166,8 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
     sections = [section for section in content.get("sections", []) if isinstance(section, dict)]
     declaredPackages = uniqueTextList(meta.get("packages"))
     importedPackages = inferImportedPackages(content)
+    stdlibDeclaredPackages = standardLibraryDeclaredPackages(declaredPackages)
+    invalidDeclaredPackages = invalidPackageNames(declaredPackages)
     declaredNormalized = {normalizePackageName(package) for package in declaredPackages}
     if "opencv-contrib-python" in declaredNormalized:
         declaredNormalized.add("opencv-python")
@@ -201,6 +205,8 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         "structuredSectionCount": len(structuredSections),
         "structuredFieldEncodingLosses": corruptedStructuredSections,
         "declaredPackages": declaredPackages,
+        "stdlibDeclaredPackages": stdlibDeclaredPackages,
+        "invalidDeclaredPackages": invalidDeclaredPackages,
         "importedPackages": importedPackages,
         "missingPackages": missingPackages,
         "documentRuntimePackages": documentRuntimePackages,
@@ -210,6 +216,7 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         "directPipInstall": bool(re.search(r"\bpip\s+install\b", text)),
         "badInstallCopy": bool(BAD_INSTALL_COPY_RE.search(text) and declaredPackages),
         "misleadingImportSetupCopy": hasMisleadingImportSetupCopy(content),
+        "visibleInstallLabelCopy": hasVisibleInstallLabelCopy(content),
         "packageIntroImportCheckMissing": bool(orientation and declaredPackages and not importedPackages),
         "externalUrlCount": len(re.findall(r"https?://", text)),
         "conversionFailures": conversionFailures,
@@ -362,6 +369,8 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
         "packageOrientationRuntimePrepCount": len(packageIntroRuntime),
         "packageOrientationRuntimePrepRatio": ratio(len(packageIntroRuntime), len([lesson for lesson in orientationLessons if lesson.get("declaredPackages")])),
         "missingDeclaredPackageLessonCount": sum(1 for lesson in lessons if lesson.get("missingPackages")),
+        "stdlibDeclaredPackageLessonCount": sum(1 for lesson in lessons if lesson.get("stdlibDeclaredPackages")),
+        "invalidDeclaredPackageLessonCount": sum(1 for lesson in lessons if lesson.get("invalidDeclaredPackages")),
         "documentRuntimeMissingLessonCount": sum(
             1
             for lesson in lessons
@@ -376,6 +385,7 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
         "directPipInstallLessonCount": sum(1 for lesson in lessons if lesson.get("directPipInstall")),
         "badInstallCopyLessonCount": sum(1 for lesson in lessons if lesson.get("badInstallCopy")),
         "misleadingImportSetupCopyLessonCount": sum(1 for lesson in lessons if lesson.get("misleadingImportSetupCopy")),
+        "visibleInstallLabelLessonCount": sum(1 for lesson in lessons if lesson.get("visibleInstallLabelCopy")),
         "packageIntroImportCheckMissingLessonCount": sum(1 for lesson in lessons if lesson.get("packageIntroImportCheckMissing")),
         "externalUrlLessonCount": sum(1 for lesson in lessons if int(lesson.get("externalUrlCount", 0)) > 0),
         "conversionFailureLessonCount": sum(1 for lesson in lessons if lesson.get("conversionFailures")),
@@ -395,6 +405,8 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
         domain("lazy-uv-dependency-discipline", (
             projectDependenciesAvoidStudyPackages(),
             summaryEquals("all imports declared in meta.packages", summary, "missingDeclaredPackageLessonCount", 0),
+            summaryEquals("no stdlib module is declared as a package", summary, "stdlibDeclaredPackageLessonCount", 0),
+            summaryEquals("all declared package names are valid", summary, "invalidDeclaredPackageLessonCount", 0),
             summaryEquals("all declared packages preserved in document runtime", summary, "documentRuntimeMissingLessonCount", 0),
             summaryEquals("no direct pip install copy in curricula", summary, "directPipInstallLessonCount", 0),
             summaryEquals("package intro lessons have an import check", summary, "packageIntroImportCheckMissingLessonCount", 0),
@@ -424,6 +436,7 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
             ),
             summaryEquals("no package lesson says install-free", summary, "badInstallCopyLessonCount", 0),
             summaryEquals("no import-check section is labeled as install", summary, "misleadingImportSetupCopyLessonCount", 0),
+            summaryEquals("no visible lesson label asks the learner to install packages", summary, "visibleInstallLabelLessonCount", 0),
             textContains("authoring doc lists what learner can do", "docs/skills/architecture/curriculum-authoring.md", "무엇을 할 수 있는지"),
             textContains("authoring doc requires first assert", "docs/skills/architecture/curriculum-authoring.md", "assert"),
             textContains("learning contract requires intro runtime", "docs/skills/architecture/learning-yaml-contract.md", "intro.diagram.runtime"),
@@ -550,6 +563,11 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             for lesson in lessons
             if lesson.get("misleadingImportSetupCopy")
         ][:30],
+        "visibleInstallLabelLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("visibleInstallLabelCopy")
+        ][:30],
         "packageIntroImportCheckMissingLessons": [
             lesson["path"]
             for lesson in lessons
@@ -562,6 +580,22 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             }
             for lesson in lessons
             if lesson.get("missingPackages")
+        ][:30],
+        "stdlibDeclaredPackageLessons": [
+            {
+                "path": lesson["path"],
+                "stdlibDeclaredPackages": lesson["stdlibDeclaredPackages"],
+            }
+            for lesson in lessons
+            if lesson.get("stdlibDeclaredPackages")
+        ][:30],
+        "invalidDeclaredPackageLessons": [
+            {
+                "path": lesson["path"],
+                "invalidDeclaredPackages": lesson["invalidDeclaredPackages"],
+            }
+            for lesson in lessons
+            if lesson.get("invalidDeclaredPackages")
         ][:30],
         "structuredFieldEncodingLossLessons": [
             {
@@ -583,11 +617,35 @@ def countPackageOrientationLessons(lessons: list[dict[str, Any]]) -> int:
     return sum(1 for lesson in lessons if lesson.get("orientation") and lesson.get("declaredPackages"))
 
 
+def standardLibraryDeclaredPackages(packages: list[str]) -> list[str]:
+    return [package for package in packages if isStandardLibraryPackage(package)]
+
+
+def invalidPackageNames(packages: list[str]) -> list[str]:
+    return [package for package in packages if not VALID_PACKAGE_RE.match(package)]
+
+
+def isStandardLibraryPackage(package: str) -> bool:
+    match = re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]*", package.strip())
+    if match is None:
+        return False
+    return match.group(0).replace("-", "_") in STDLIB_MODULES
+
+
 def hasMisleadingImportSetupCopy(content: dict[str, Any]) -> bool:
     for node in walkMaps(content):
         for fieldName in ("title", "subtitle", "goal", "prompt", "noError"):
             value = textValue(node.get(fieldName))
             if value and MISLEADING_IMPORT_SETUP_RE.search(value):
+                return True
+    return False
+
+
+def hasVisibleInstallLabelCopy(content: dict[str, Any]) -> bool:
+    for node in walkMaps(content):
+        for fieldName in VISIBLE_INSTALL_LABEL_FIELDS:
+            value = textValue(node.get(fieldName))
+            if "설치" in value:
                 return True
     return False
 

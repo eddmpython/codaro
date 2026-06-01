@@ -328,14 +328,14 @@ sections:
       title: 제한 가능
       description: 파일 시스템 기반 설정 로딩
     - emoji: 📦
-      title: 설치 방법
+      title: 로컬 준비
       description: uv run --with pydantic
   goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
   why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
 - id: installation
   blocks:
   - type: sectionHeader
-    title: 📦 설치 및 시작
+    title: 📦 준비 확인과 시작
     subtitle: Codaro 로컬 Python 환경에서 바로 사용
   - type: note
     style: info
@@ -353,7 +353,7 @@ sections:
     - emoji: 🚀
       title: 바로 시작
       description: from pydantic import BaseModel
-  goal: 📦 설치 및 시작에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  goal: 📦 준비 확인과 시작에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
   why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
 - id: resources
   blocks:

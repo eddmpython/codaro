@@ -384,7 +384,7 @@ def changedCyclePaths() -> tuple[str, ...]:
         ("ls-files", "--others", "--exclude-standard", "--"),
     ):
         result = subprocess.run(
-            ("git", *args),
+            ("git", "-c", "core.quotepath=false", *args),
             cwd=ROOT,
             check=True,
             capture_output=True,

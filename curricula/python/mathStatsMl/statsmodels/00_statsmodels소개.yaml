@@ -416,7 +416,7 @@ sections:
 - id: installation
   blocks:
   - type: sectionHeader
-    title: 📦 설치 및 시작
+    title: 📦 준비 확인과 시작
     subtitle: Codaro 로컬 Python 환경에서 바로 사용
   - type: note
     style: info
@@ -434,7 +434,7 @@ sections:
     - emoji: 🚀
       title: 바로 시작
       description: import statsmodels.api as sm
-  goal: 📦 설치 및 시작에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  goal: 📦 준비 확인과 시작에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: resources
   blocks:

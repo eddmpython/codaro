@@ -33,7 +33,7 @@ intro:
   - 모델 호출 결과를 기존 데이터 분석·자동화 흐름에 붙이는 그림을 잡는다.
   diagram:
     steps:
-    - label: 1단계. SDK 설치와 API 키 준비
+    - label: 1단계. SDK 준비와 API 키 확인
       detail: anthropic 패키지와 ANTHROPIC_API_KEY 환경변수를 로컬에 준비한다.
     - label: 2단계. 첫 호출과 응답 파싱
       detail: Messages API로 한 줄 호출을 만들고 응답 객체에서 텍스트를 꺼낸다.
