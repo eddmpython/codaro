@@ -328,6 +328,20 @@ def testErrorPatternMatchesNotAContextManager() -> None:
     assert "builtins.contextManagers.notAContextManager" in ids
 
 
+def testErrorPatternMatchesRegexGroupOnNone() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.regex.yml")
+    hits = matchErrorPattern(catalog, "AttributeError: 'NoneType' object has no attribute 'group'")
+    ids = {hit.id for hit in hits}
+    assert "automation.regex.groupOnNone" in ids
+
+
+def testErrorPatternMatchesRegexInvalidPattern() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.regex.yml")
+    hits = matchErrorPattern(catalog, "re.error: missing ), unterminated subpattern at position 0")
+    ids = {hit.id for hit in hits}
+    assert "automation.regex.invalidPattern" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"

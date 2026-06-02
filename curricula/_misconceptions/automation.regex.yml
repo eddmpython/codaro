@@ -1,0 +1,45 @@
+meta:
+  outcomeId: automation.regex
+  status: draft
+  version: 1
+  note: "초안 — 정규표현식 흔한 오개념 시드. 자동화 텍스트 추출 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: automation.regex.groupOnNone
+    label: "매치 실패(None)에 .group() 호출"
+    summary: "re.match/search 는 못 찾으면 None 을 돌려주는데, 바로 .group() 을 불러 AttributeError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "AttributeError: 'NoneType' object has no attribute 'group'"
+        description: "매치 결과 None 에 .group() 접근."
+    diagnostic:
+      message: "`re.search`/`re.match` 는 패턴을 못 찾으면 **None** 을 반환합니다. None 에는 `.group()` 이 없습니다. 항상 매치 여부를 먼저 확인하세요: `m = re.search(...); if m: m.group()`."
+      references: ["automation.regex"]
+    correction:
+      hint: "매치를 변수에 담고 None 검사부터. `m = re.search(p, s)` 후 `if m: print(m.group())`."
+      miniExercise: |
+        import re
+        m = re.search(r"\d+", "주문 42건")
+        if m:
+            print(m.group())
+        else:
+            print("매치 없음")
+
+  - id: automation.regex.invalidPattern
+    label: "정규식 패턴 문법 오류"
+    summary: "괄호/대괄호를 안 닫는 등 잘못된 패턴을 컴파일해 re.error 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(re\\.error|error: (missing|unterminated|unbalanced|nothing to repeat|bad character))"
+        description: "정규식 문법 위반."
+    diagnostic:
+      message: "정규식에서 `(`, `[`, `{` 같은 특수문자는 짝을 맞추거나 글자 그대로 쓰려면 `\\\\` 로 이스케이프해야 합니다. 예: 괄호 글자는 `\\\\(`. raw 문자열 `r\"...\"` 를 쓰면 이스케이프가 편합니다."
+      references: ["automation.regex"]
+    correction:
+      hint: "특수문자는 이스케이프(`\\\\(`)하거나 짝을 맞추세요. 패턴은 `r\"...\"` 로 작성."
+      miniExercise: |
+        import re
+        m = re.search(r"\(\d+\)", "코드 (42)")
+        print(m.group() if m else "없음")
