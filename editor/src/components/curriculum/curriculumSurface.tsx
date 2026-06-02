@@ -44,7 +44,8 @@ import { statusLabel } from "@/lib/displayFormat";
 import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
-import { codaroApi } from "@/lib/api";
+import { runExerciseCheck } from "@/lib/curriculumCheck";
+import { recordLessonMissionComplete } from "@/lib/curriculumCompletion";
 import { useWidgetSession } from "@/lib/widgetSession";
 import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult, PredictConfig } from "@/types";
 import { CheckResultPanel } from "./checkResultPanel";
@@ -117,6 +118,13 @@ export function CurriculumView({
   onSelectBlock: (blockId: string) => void;
 }) {
   const curriculumSections = useMemo(() => groupCurriculumSections(document.blocks), [document.blocks]);
+  const totalMissions = useMemo(
+    () =>
+      curriculumSections.sections.filter((section) =>
+        Boolean(structuredSectionParts(section).exercise?.guide?.checkConfig?.type),
+      ).length,
+    [curriculumSections],
+  );
   const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
 
   return (
@@ -154,6 +162,7 @@ export function CurriculumView({
                 runningBlockId={runningBlockId}
                 section={section}
                 selectedBlockId={selectedBlockId}
+                totalMissions={totalMissions}
                 onCellAsk={onCellAsk}
                 onDraftChange={onDraftChange}
                 onRunBlock={onRunBlock}
@@ -382,6 +391,7 @@ function CurriculumSectionCard({
   runningBlockId,
   section,
   selectedBlockId,
+  totalMissions,
   onCellAsk,
   onDraftChange,
   onRunBlock,
@@ -398,6 +408,7 @@ function CurriculumSectionCard({
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
+  totalMissions: number;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig) => void;
@@ -452,6 +463,7 @@ function CurriculumSectionCard({
           runningBlockId={runningBlockId}
           section={section}
           selectedBlockId={selectedBlockId}
+          totalMissions={totalMissions}
           onCellAsk={onCellAsk}
           onDraftChange={onDraftChange}
           onRunBlock={onRunBlock}
@@ -696,6 +708,7 @@ function StructuredSectionLearningBody({
   runningBlockId,
   section,
   selectedBlockId,
+  totalMissions,
   onCellAsk,
   onDraftChange,
   onRunBlock,
@@ -711,6 +724,7 @@ function StructuredSectionLearningBody({
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
+  totalMissions: number;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig) => void;
@@ -737,7 +751,7 @@ function StructuredSectionLearningBody({
     if (!exercise || !sessionId) return;
     setChecking(true);
     try {
-      const result = await codaroApi.checkExercise({
+      const result = await runExerciseCheck({
         sessionId,
         studentCode: drafts[exercise.id] ?? curriculumInitialDraft(exercise),
         expectedCode: checkConfig.expectedCode,
@@ -754,6 +768,13 @@ function StructuredSectionLearningBody({
       });
       setCheckResult(result);
       setHintLevel(result.hintLevel ?? level);
+      if (result.passed && exercise && totalMissions > 0) {
+        try {
+          await recordLessonMissionComplete(category, contentId, exercise.id, totalMissions);
+        } catch (completionError) {
+          console.warn("lesson completion record failed", completionError);
+        }
+      }
     } catch (error) {
       console.warn("exercise check failed", error);
     } finally {

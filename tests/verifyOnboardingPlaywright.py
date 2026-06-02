@@ -371,6 +371,8 @@ class OnboardingStubApi:
                         "executionCount": 1,
                         "status": "ok",
                     })
+                elif path == "/api/curriculum/progress":
+                    self._sendJson({"category": "python", "contentId": "hello", "completedMissions": ["cell-1"], "totalMissions": 1, "completedAt": "2026-06-02T00:00:00+00:00"})
                 elif path == "/api/curriculum/check":
                     self._sendJson({
                         "passed": True,
