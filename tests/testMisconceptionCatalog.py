@@ -272,6 +272,20 @@ def testErrorPatternMatchesSingleQuotedJson() -> None:
     assert "builtins.dataFormats.singleQuotedJson" in ids
 
 
+def testErrorPatternMatchesCoroutineNeverAwaited() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.async.yml")
+    hits = matchErrorPattern(catalog, "RuntimeWarning: coroutine 'greet' was never awaited")
+    ids = {hit.id for hit in hits}
+    assert "builtins.async.missingAwait" in ids
+
+
+def testErrorPatternMatchesNestedAsyncioRun() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.async.yml")
+    hits = matchErrorPattern(catalog, "RuntimeError: asyncio.run() cannot be called from a running event loop")
+    ids = {hit.id for hit in hits}
+    assert "builtins.async.nestedAsyncioRun" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"

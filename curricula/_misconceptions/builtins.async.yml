@@ -1,0 +1,52 @@
+meta:
+  outcomeId: builtins.async
+  status: draft
+  version: 1
+  note: "초안 — asyncio 기초(async/await, 이벤트 루프) 흔한 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: builtins.async.missingAwait
+    label: "코루틴 함수를 await 없이 호출"
+    summary: "async 함수를 그냥 호출하면 실행되지 않고 코루틴 객체만 생겨 'was never awaited' 경고가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "RuntimeWarning: coroutine '.*' was never awaited"
+        description: "코루틴을 await/run 하지 않음."
+    diagnostic:
+      message: "`async def` 함수는 호출만 하면 코드가 실행되지 않고 **코루틴 객체**를 돌려줍니다. 실제로 실행하려면 `await`(다른 코루틴 안에서) 하거나 최상위에서 `asyncio.run(coro())` 으로 돌려야 합니다."
+      references: ["builtins.async"]
+    correction:
+      hint: "최상위에서는 `asyncio.run(main())`, 코루틴 내부에서는 `await something()`."
+      miniExercise: |
+        import asyncio
+
+        async def greet():
+            return "안녕"
+
+        print(asyncio.run(greet()))
+
+  - id: builtins.async.nestedAsyncioRun
+    label: "이미 도는 이벤트 루프 안에서 asyncio.run 호출"
+    summary: "이벤트 루프가 이미 실행 중인데 asyncio.run 을 또 불러 RuntimeError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "RuntimeError: asyncio.run\\(\\) cannot be called from a running event loop"
+        description: "중첩된 asyncio.run 호출."
+    diagnostic:
+      message: "`asyncio.run` 은 이벤트 루프를 새로 만들어 돌리므로, 이미 루프가 도는 곳(다른 코루틴 안, 노트북 일부 환경)에서는 다시 부를 수 없습니다. 그 안에서는 `await` 를 직접 쓰세요."
+      references: ["builtins.async"]
+    correction:
+      hint: "코루틴 안에서는 `result = await coro()`. 최상위에서만 `asyncio.run(...)` 을 한 번 씁니다."
+      miniExercise: |
+        import asyncio
+
+        async def fetch():
+            await asyncio.sleep(0)
+            return 42
+
+        async def main():
+            return await fetch()
+
+        print(asyncio.run(main()))
