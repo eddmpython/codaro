@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumCompletion";
 import { loadCurriculumReviews } from "@/lib/curriculumReviews";
 import type { ReviewListPayload } from "@/types";
 
@@ -32,6 +33,12 @@ export function useCurriculumReviews(): UseCurriculumReviewsResult {
 
   useEffect(() => {
     void reload();
+  }, [reload]);
+
+  useEffect(() => {
+    const handler = () => void reload();
+    window.addEventListener(PROGRESS_UPDATED_EVENT, handler);
+    return () => window.removeEventListener(PROGRESS_UPDATED_EVENT, handler);
   }, [reload]);
 
   return { reviews, loading, reload };
