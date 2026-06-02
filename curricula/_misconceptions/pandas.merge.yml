@@ -1,0 +1,44 @@
+meta:
+  outcomeId: pandas.merge
+  status: draft
+  version: 1
+  note: "초안 — DataFrame 병합(merge/join) 단계 오개념 시드. 실무 데이터 결합 빈출. 사람이 정제 필요."
+
+misconceptions:
+  - id: pandas.merge.keyNotFound
+    label: "존재하지 않는 키 컬럼으로 병합"
+    summary: "on= 에 한쪽 프레임에 없는 컬럼명을 적어 KeyError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "KeyError: '[^']+'"
+        description: "merge on= 키가 한쪽 프레임에 없음."
+    diagnostic:
+      message: "`on=` 에 적은 컬럼은 양쪽 DataFrame에 모두 있어야 합니다. 이름이 다르면 `left_on=`, `right_on=` 으로 각각 지정하세요. `df.columns` 로 실제 컬럼명을 먼저 확인하세요."
+      references: ["pandas.merge"]
+    correction:
+      hint: "양쪽 컬럼명을 확인하고, 다르면 `left_on`/`right_on` 을 쓰세요."
+      miniExercise: |
+        import pandas as pd
+        left = pd.DataFrame({"id": [1, 2], "name": ["a", "b"]})
+        right = pd.DataFrame({"id": [1, 2], "score": [90, 80]})
+        print(left.merge(right, on="id"))
+
+  - id: pandas.merge.noCommonColumns
+    label: "공통 컬럼 없이 on 생략하고 병합"
+    summary: "on= 없이 merge 했는데 공통 컬럼이 없어 MergeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "MergeError.*No common columns"
+        description: "공통 컬럼이 없어 자동 병합 키를 못 찾음."
+    diagnostic:
+      message: "`on=` 을 생략하면 pandas는 이름이 같은 공통 컬럼을 키로 찾습니다. 공통 컬럼이 없으면 병합 기준을 `on=`(또는 `left_on`/`right_on`)으로 명시해야 합니다."
+      references: ["pandas.merge"]
+    correction:
+      hint: "병합 기준 컬럼을 `on=` 으로 명시하세요."
+      miniExercise: |
+        import pandas as pd
+        left = pd.DataFrame({"key": [1, 2], "a": ["x", "y"]})
+        right = pd.DataFrame({"key": [1, 2], "b": [10, 20]})
+        print(left.merge(right, on="key"))

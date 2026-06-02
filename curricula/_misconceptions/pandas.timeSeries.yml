@@ -1,0 +1,46 @@
+meta:
+  outcomeId: pandas.timeSeries
+  status: draft
+  version: 1
+  note: "초안 — 시계열(datetime 변환·resample) 단계 오개념 시드. 실무 시계열 빈출. 사람이 정제 필요."
+
+misconceptions:
+  - id: pandas.timeSeries.stringDateAccessor
+    label: "문자열 날짜 컬럼에 .dt 접근"
+    summary: "날짜가 아직 문자열(object)인데 .dt 접근자를 써 AttributeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "AttributeError.*Can only use \\.dt accessor with datetimelike values"
+        description: "object dtype 컬럼에 .dt 사용."
+    diagnostic:
+      message: "`.dt` 는 datetime 타입에서만 됩니다. 컬럼이 문자열이면 먼저 `pd.to_datetime(df['날짜'])` 로 변환하세요. `read_csv` 라면 `parse_dates=['날짜']` 도 방법입니다."
+      references: ["pandas.timeSeries"]
+    correction:
+      hint: "`df['날짜'] = pd.to_datetime(df['날짜'])` 로 먼저 변환하세요."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({"날짜": ["2026-01-01", "2026-01-02"]})
+        df["날짜"] = pd.to_datetime(df["날짜"])
+        print(df["날짜"].dt.day)
+
+  - id: pandas.timeSeries.resampleWithoutDatetimeIndex
+    label: "datetime 인덱스 없이 resample"
+    summary: "datetime 인덱스를 설정하지 않고 resample 해 TypeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(TypeError|Only valid with DatetimeIndex).*(DatetimeIndex|resample)"
+        description: "resample은 datetime 인덱스가 필요."
+    diagnostic:
+      message: "`resample` 은 시간 인덱스를 기준으로 묶습니다. 날짜 컬럼을 `set_index('날짜')` 로 인덱스에 올린 뒤 resample 하세요."
+      references: ["pandas.timeSeries"]
+    correction:
+      hint: "`df = df.set_index('날짜')` 후 `df.resample('D').sum()`."
+      miniExercise: |
+        import pandas as pd
+        df = pd.DataFrame({
+            "날짜": pd.to_datetime(["2026-01-01", "2026-01-01", "2026-01-02"]),
+            "값": [1, 2, 3],
+        }).set_index("날짜")
+        print(df.resample("D").sum())

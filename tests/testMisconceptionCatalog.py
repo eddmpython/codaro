@@ -195,6 +195,20 @@ def testErrorPatternMatchesNumpyMissingAlias() -> None:
     assert "numpy.intro.missingImportAlias" in ids
 
 
+def testErrorPatternMatchesMergeKeyNotFound() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "pandas.merge.yml")
+    hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'customer_id'")
+    ids = {hit.id for hit in hits}
+    assert "pandas.merge.keyNotFound" in ids
+
+
+def testErrorPatternMatchesTimeSeriesDtAccessor() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "pandas.timeSeries.yml")
+    hits = matchErrorPattern(catalog, "AttributeError: Can only use .dt accessor with datetimelike values")
+    ids = {hit.id for hit in hits}
+    assert "pandas.timeSeries.stringDateAccessor" in ids
+
+
 def testErrorPatternMatchesKeyError() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dictsAndSets.yml")
     hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'banana'")
