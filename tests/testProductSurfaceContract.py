@@ -155,6 +155,7 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
 def testChatStartExamplesCarryDogfoodFlowMetadata() -> None:
     chat = _read("editor/src/components/chat/chatSurface.tsx")
     mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+    currentLearningSurface = _read("editor/src/components/app/currentLearningSurface.tsx")
     startExamples = _read("editor/src/lib/chatStartExamples.ts")
 
     assert 'surfaceFlowRole, type ProductSurfaceFlowRole, type SurfaceMode' in startExamples
@@ -169,7 +170,8 @@ def testChatStartExamplesCarryDogfoodFlowMetadata() -> None:
     assert startExamples.index('"chat.example.pandas"') < startExamples.index('"chat.example.automation"')
     assert "flowRole: surfaceFlowRole(example.surface)" in startExamples
     assert 'flowRole: "secondLoop"' not in startExamples
-    assert "curriculumGoalExamples(t)" in mainSurface
+    assert "CurrentLearningSurface" in mainSurface
+    assert "curriculumGoalExamples(t)" in currentLearningSurface
     assert "curriculum.goal.example.report" not in mainSurface
     assert 'data-chat-start-example="true"' in chat
     assert "data-chat-start-flow-role={example.flowRole}" in chat
@@ -221,7 +223,9 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
 
     for expected in (
         "`editor/src/components/app/mainSurface.tsx`",
-        "표면 조립",
+        "표면 선택과 큰 레이아웃 조립",
+        "`editor/src/components/app/currentLearningSurface.tsx`",
+        "현재 학습 표면 조립",
         "`editor/src/components/chat/chatSurface.tsx`",
         "`editor/src/lib/assistantArtifactRouting.ts`",
         "`editor/src/lib/assistantResponsePlan.ts`",
@@ -248,8 +252,16 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
 def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
     mainSurface = _read("editor/src/components/app/mainSurface.tsx")
     chatSurface = _read("editor/src/components/chat/chatSurface.tsx")
+    currentLearningSurface = _read("editor/src/components/app/currentLearningSurface.tsx")
 
     for forbidden in (
+        "CUSTOM_CURRICULUM_CATEGORY",
+        "CurriculumCellToc",
+        "CurriculumView",
+        "CodeCellEditor",
+        "curriculumGoalExamples",
+        "selectedCategoryLabel",
+        "selectedContentLabel",
         "routeAssistantArtifacts",
         "buildAssistantResponseApplication",
         "buildAssistantResponsePlan",
@@ -259,6 +271,17 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
         "surfaceForAssistantArtifacts",
     ):
         assert forbidden not in mainSurface
+
+    for expected in (
+        "CUSTOM_CURRICULUM_CATEGORY",
+        "CurriculumCellToc",
+        "CurriculumView",
+        "CodeCellEditor",
+        "curriculumGoalExamples",
+        "selectedCategoryLabel",
+        "selectedContentLabel",
+    ):
+        assert expected in currentLearningSurface
 
     for forbidden in (
         "curriculumSidebarTree",

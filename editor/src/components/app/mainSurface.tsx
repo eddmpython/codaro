@@ -1,7 +1,5 @@
 import { lazy, Suspense } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
-import { curriculumGoalExamples } from "@/lib/chatStartExamples";
-import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import type { CellAiAction } from "@/lib/cellModel";
@@ -26,10 +24,8 @@ type ResultMap = Record<string, ExecutionResult>;
 const TeacherPanel = lazy(() => import("@/components/assistant/teacherPanel").then((module) => ({ default: module.TeacherPanel })));
 const AutomationView = lazy(() => import("@/components/automation/automationSurface").then((module) => ({ default: module.AutomationView })));
 const ChatSurface = lazy(() => import("@/components/chat/chatSurface").then((module) => ({ default: module.ChatSurface })));
+const CurrentLearningSurface = lazy(() => import("@/components/app/currentLearningSurface").then((module) => ({ default: module.CurrentLearningSurface })));
 const NotebookPanel = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.NotebookPanel })));
-const CodeCellEditor = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.CodeCellEditor })));
-const CurriculumView = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumView })));
-const CurriculumCellToc = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumCellToc })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
 type MainSurfaceProps = {
@@ -95,7 +91,6 @@ export function MainSurface(props: MainSurfaceProps) {
 }
 
 function MainSurfaceContent(props: MainSurfaceProps) {
-  const { t } = useLocale();
   if (props.surface === "chat") {
     return (
       <ChatSurface
@@ -168,107 +163,41 @@ function MainSurfaceContent(props: MainSurfaceProps) {
   }
 
   if (props.surface === "curriculum") {
-    if (!props.curriculumDocument) {
-      return (
-        <ChatSurface
-          aiConnecting={props.aiConnecting}
-          aiProfile={props.aiProfile}
-          apiOnline={props.apiOnline}
-          loading={props.assistantLoading}
-          loadState={props.loadState}
-          messages={props.messages}
-          pendingBlocks={props.pendingBlocks}
-          prompt={props.prompt}
-          heroTitle={t("curriculum.goal.title")}
-          heroDetail={t("curriculum.goal.detail")}
-          placeholder={t("curriculum.goal.placeholder")}
-          examples={curriculumGoalExamples(t)}
-          onAsk={props.onAsk}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onConnectAi={props.onConnectAi}
-          onPromptChange={props.onPromptChange}
-          onRejectPendingBlocks={props.onRejectPendingBlocks}
-        />
-      );
-    }
-    const curriculumDoc = props.curriculumDocument;
-    const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
-    const selectedCategoryLabel =
-      isCustomCurriculum
-        ? t("sidebar.myCurriculum")
-        : props.categories.find((category) => category.key === props.selectedCategory)?.name ?? props.selectedCategory;
-    const selectedContentLabel =
-      isCustomCurriculum
-        ? curriculumDoc.title
-        : props.contents.find((content) => content.contentId === props.selectedContentId)?.title ?? props.selectedContentId;
-
     return (
-      <div
-        className={cn(
-          "grid h-full min-h-0 grid-cols-1",
-          props.assistantCollapsed
-            ? "2xl:grid-cols-[minmax(0,1fr)_44px]"
-            : "xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_44px_360px]",
-        )}
-      >
-        <CurriculumView
-          key={`${props.selectedCategory}/${props.selectedContentId}`}
-          apiOnline={props.apiOnline}
-          canRun={props.canRun}
-          cellHelpByBlockId={props.cellHelpByBlockId}
-          document={curriculumDoc}
-          drafts={props.drafts}
-          pendingBlocks={props.pendingBlocks}
-          referenceLoading={props.referenceLoading}
-          results={props.results}
-          runningBlockId={props.runningBlockId}
-          selectedBlockId={props.selectedCurriculumBlockId}
-          selectedCategory={props.selectedCategory}
-          selectedCategoryLabel={selectedCategoryLabel}
-          selectedContentId={props.selectedContentId}
-          selectedContentLabel={selectedContentLabel}
-          renderCodeCellEditor={({ autoFocus = true, block, draft, onChange, onFocus, onRun }) => (
-            <CodeCellEditor
-              autoFocus={autoFocus}
-              placeholderText=""
-              value={draft}
-              onChange={onChange}
-              onFocus={onFocus}
-              onRun={onRun}
-            />
-          )}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onCellAsk={props.onCellAsk}
-          onDraftChange={props.onDraftChange}
-          onOpenTerminalCommand={props.onOpenTerminalCommand}
-          onRejectPendingBlocks={props.onRejectPendingBlocks}
-          onRunBlock={props.onRunBlock}
-          onSelectBlock={props.onSelectCurriculumBlock}
-        />
-        <CurriculumCellToc
-          document={curriculumDoc}
-          selectedBlockId={props.selectedCurriculumBlockId}
-          onSelectBlock={props.onSelectCurriculumBlock}
-        />
-        {props.assistantCollapsed ? null : (
-          <TeacherPanel
-            aiConnecting={props.aiConnecting}
-            aiProfile={props.aiProfile}
-            apiOnline={props.apiOnline}
-            loading={props.assistantLoading}
-            messages={props.messages}
-            pendingBlocks={props.pendingBlocks}
-            placement="right"
-            prompt={props.prompt}
-            onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-            onAsk={props.onAsk}
-            onConnectAi={props.onConnectAi}
-            onNewChat={props.onNewChat}
-            onPromptChange={props.onPromptChange}
-            onRejectPendingBlocks={props.onRejectPendingBlocks}
-          />
-        )}
-      </div>
+      <CurrentLearningSurface
+        aiConnecting={props.aiConnecting}
+        aiProfile={props.aiProfile}
+        apiOnline={props.apiOnline}
+        assistantCollapsed={props.assistantCollapsed}
+        assistantLoading={props.assistantLoading}
+        canRun={props.canRun}
+        cellHelpByBlockId={props.cellHelpByBlockId}
+        categories={props.categories}
+        contents={props.contents}
+        curriculumDocument={props.curriculumDocument}
+        drafts={props.drafts}
+        loadState={props.loadState}
+        messages={props.messages}
+        pendingBlocks={props.pendingBlocks}
+        prompt={props.prompt}
+        referenceLoading={props.referenceLoading}
+        results={props.results}
+        runningBlockId={props.runningBlockId}
+        selectedCategory={props.selectedCategory}
+        selectedContentId={props.selectedContentId}
+        selectedCurriculumBlockId={props.selectedCurriculumBlockId}
+        onAcceptPendingBlocks={props.onAcceptPendingBlocks}
+        onAsk={props.onAsk}
+        onCellAsk={props.onCellAsk}
+        onConnectAi={props.onConnectAi}
+        onDraftChange={props.onDraftChange}
+        onNewChat={props.onNewChat}
+        onOpenTerminalCommand={props.onOpenTerminalCommand}
+        onPromptChange={props.onPromptChange}
+        onRejectPendingBlocks={props.onRejectPendingBlocks}
+        onRunBlock={props.onRunBlock}
+        onSelectCurriculumBlock={props.onSelectCurriculumBlock}
+      />
     );
   }
 
