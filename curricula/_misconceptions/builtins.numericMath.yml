@@ -1,0 +1,42 @@
+meta:
+  outcomeId: builtins.numericMath
+  status: draft
+  version: 1
+  note: "초안 — math·random 표준 모듈 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: builtins.numericMath.missingImport
+    label: "math 모듈을 import 없이 사용"
+    summary: "import math 없이 math.sqrt(...)를 호출해 NameError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "NameError: name 'math' is not defined"
+        description: "math 모듈 미import."
+    diagnostic:
+      message: "표준 라이브러리도 쓰기 전에 import가 필요합니다. 셀 맨 위에 `import math` 를 추가하세요."
+      references: ["builtins.numericMath"]
+    correction:
+      hint: "`import math` 를 먼저 추가하세요."
+      miniExercise: |
+        import math
+        print(math.sqrt(16))
+
+  - id: builtins.numericMath.domainError
+    label: "정의역 밖 값을 math 함수에 전달"
+    summary: "math.sqrt(-1)이나 math.log(0)처럼 정의역 밖 값을 넣어 ValueError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: math domain error"
+        description: "math 함수 정의역 위반."
+    diagnostic:
+      message: "`math.sqrt` 는 음수, `math.log` 는 0 이하를 받지 못합니다. 입력 범위를 먼저 확인하거나 복소수가 필요하면 `cmath` 를 쓰세요."
+      references: ["builtins.numericMath"]
+    correction:
+      hint: "입력이 정의역 안인지 확인하세요. 음수 제곱근은 `cmath.sqrt`."
+      miniExercise: |
+        import math
+        x = 16
+        if x >= 0:
+            print(math.sqrt(x))

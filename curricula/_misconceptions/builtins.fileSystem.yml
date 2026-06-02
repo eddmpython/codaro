@@ -1,0 +1,45 @@
+meta:
+  outcomeId: builtins.fileSystem
+  status: draft
+  version: 1
+  note: "초안 — 파일 읽기/쓰기 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: builtins.fileSystem.fileNotFound
+    label: "없는 경로의 파일 열기"
+    summary: "존재하지 않는 파일을 읽기 모드로 열어 FileNotFoundError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "FileNotFoundError"
+        description: "존재하지 않는 파일 접근."
+    diagnostic:
+      message: "읽기 모드는 파일이 이미 있어야 합니다. 경로 철자와 현재 작업 폴더를 확인하세요. 없을 수도 있으면 `os.path.exists` 로 먼저 검사하거나 쓰기 모드로 만드세요."
+      references: ["builtins.fileSystem"]
+    correction:
+      hint: "경로를 확인하고, 없으면 먼저 `'w'` 모드로 만들거나 존재를 검사하세요."
+      miniExercise: |
+        from pathlib import Path
+        p = Path("note.txt")
+        if p.exists():
+            print(p.read_text(encoding="utf-8"))
+        else:
+            print("파일이 아직 없습니다")
+
+  - id: builtins.fileSystem.wrongMode
+    label: "읽기 모드로 연 파일에 쓰기"
+    summary: "'r' 모드로 연 파일에 write 해서 UnsupportedOperation이 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(io\\.)?UnsupportedOperation: not writable"
+        description: "읽기 모드 파일에 쓰기 시도."
+    diagnostic:
+      message: "`open(path)` 의 기본은 읽기('r') 모드라 쓸 수 없습니다. 쓰려면 `'w'`(새로 쓰기) 또는 `'a'`(이어쓰기) 모드로 여세요."
+      references: ["builtins.fileSystem"]
+    correction:
+      hint: "쓰기는 `open(path, 'w')` 로 모드를 지정하세요."
+      miniExercise: |
+        from pathlib import Path
+        Path("note.txt").write_text("안녕", encoding="utf-8")
+        print(Path("note.txt").read_text(encoding="utf-8"))

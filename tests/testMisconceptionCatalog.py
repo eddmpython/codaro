@@ -209,6 +209,27 @@ def testErrorPatternMatchesTimeSeriesDtAccessor() -> None:
     assert "pandas.timeSeries.stringDateAccessor" in ids
 
 
+def testErrorPatternMatchesMathDomainError() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.numericMath.yml")
+    hits = matchErrorPattern(catalog, "ValueError: math domain error")
+    ids = {hit.id for hit in hits}
+    assert "builtins.numericMath.domainError" in ids
+
+
+def testErrorPatternMatchesStrptimeMismatch() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.datetime.yml")
+    hits = matchErrorPattern(catalog, "ValueError: time data '06/02/2026' does not match format '%Y-%m-%d'")
+    ids = {hit.id for hit in hits}
+    assert "builtins.datetime.strptimeFormatMismatch" in ids
+
+
+def testErrorPatternMatchesFileNotFound() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.fileSystem.yml")
+    hits = matchErrorPattern(catalog, "FileNotFoundError: [Errno 2] No such file or directory: 'x.txt'")
+    ids = {hit.id for hit in hits}
+    assert "builtins.fileSystem.fileNotFound" in ids
+
+
 def testErrorPatternMatchesKeyError() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dictsAndSets.yml")
     hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'banana'")
