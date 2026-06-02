@@ -396,7 +396,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "onboarding-provider-connect-ok",
                 "기본 안내 모드",
                 "provider 연결됨",
-                "Pandas 레슨",
+                "Pandas 실습",
                 "diagnosticExportCopied",
                 "providerFallbackBeforeReady",
                 "providerReadyAfterValidate",
