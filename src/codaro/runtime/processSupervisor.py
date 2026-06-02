@@ -315,7 +315,8 @@ class ProcessSupervisor:
             logger.warning("Failed to kill supervised process: %s", exc)
 
     def _emitEvent(self, eventType: str, data: dict[str, Any]) -> None:
-        logger.info("supervisor %s: %s", eventType, data)
+        logEvent = logger.debug if eventType == "process-dead" else logger.info
+        logEvent("supervisor %s: %s", eventType, data)
         if self._onEvent is not None:
             try:
                 self._onEvent(eventType, data)

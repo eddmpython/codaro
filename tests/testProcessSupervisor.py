@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+import codaro.runtime.processSupervisor as processSupervisorModule
 from codaro.runtime.processSupervisor import ProcessSupervisor, ResourceLimits, ResourceSnapshot
 
 
@@ -61,6 +62,40 @@ class TestProcessSupervisor:
             onEvent=onEvent,
         )
         assert supervisor.limits.maxExecutionSeconds == 0
+
+    def test_processDeadEventUsesDebugLogLevel(self, monkeypatch):
+        calls = []
+
+        def fakeDebug(*args, **kwargs):
+            calls.append(("debug", args, kwargs))
+
+        def fakeInfo(*args, **kwargs):
+            calls.append(("info", args, kwargs))
+
+        monkeypatch.setattr(processSupervisorModule.logger, "debug", fakeDebug)
+        monkeypatch.setattr(processSupervisorModule.logger, "info", fakeInfo)
+        supervisor = ProcessSupervisor(ResourceLimits())
+
+        supervisor._emitEvent("process-dead", {"exitcode": 0})
+
+        assert [call[0] for call in calls] == ["debug"]
+
+    def test_resourceEventsUseInfoLogLevel(self, monkeypatch):
+        calls = []
+
+        def fakeDebug(*args, **kwargs):
+            calls.append(("debug", args, kwargs))
+
+        def fakeInfo(*args, **kwargs):
+            calls.append(("info", args, kwargs))
+
+        monkeypatch.setattr(processSupervisorModule.logger, "debug", fakeDebug)
+        monkeypatch.setattr(processSupervisorModule.logger, "info", fakeInfo)
+        supervisor = ProcessSupervisor(ResourceLimits())
+
+        supervisor._emitEvent("resource-exceeded", {"reason": "timeout"})
+
+        assert [call[0] for call in calls] == ["info"]
 
 
 class TestLocalEngineIntegration:
