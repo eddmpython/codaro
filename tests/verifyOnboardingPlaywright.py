@@ -78,6 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
         cli.waitEval(jsTextPresent("Hello World"), "default curriculum lesson")
         defaultLesson = recordCheck(checks, "curriculum-default-lesson", cli.eval(jsAssertCurriculumDefaultLesson()))
+        exerciseCheck = recordCheck(checks, "curriculum-exercise-check", cli.eval(jsAssertExerciseCheck()))
         sidebar = recordCheck(checks, "curriculum-sidebar-groups", cli.eval(jsAssertCurriculumSidebarGroups()))
         sidebarClearance = recordCheck(checks, "curriculum-sidebar-scrollbar-clearance", cli.eval(jsAssertCurriculumSidebarScrollbarClearance()))
         sidebarToggle = recordCheck(checks, "curriculum-sidebar-toggle", cli.eval(jsAssertCurriculumSidebarToggle()))
@@ -356,6 +357,36 @@ class OnboardingStubApi:
                         "model": "gpt-5.4",
                         "message": "응답 검증을 통과했습니다." if owner.ready else "Provider 로그인이 필요합니다.",
                     })
+                elif path == "/api/kernel/create":
+                    self._sendJson({"sessionId": "onboarding-session", "status": "ready"})
+                elif path.startswith("/api/kernel/") and path.endswith("/execute"):
+                    self._sendJson({
+                        "type": "execute_result",
+                        "blockId": "cell-1",
+                        "data": None,
+                        "stdout": "hello\n",
+                        "stderr": "",
+                        "variables": [],
+                        "stateDelta": {"added": [], "updated": [], "removed": []},
+                        "executionCount": 1,
+                        "status": "ok",
+                    })
+                elif path == "/api/curriculum/check":
+                    self._sendJson({
+                        "passed": True,
+                        "feedback": "정확합니다!",
+                        "hintLevel": 0,
+                        "hints": ["print 함수를 사용하세요"],
+                        "studentOutput": "hello\n",
+                        "expectedOutput": "hello\n",
+                        "detail": "",
+                        "creditedOutcomes": ["python.intro"],
+                        "autoValidatedOutcomes": [],
+                        "misconceptionMatches": [],
+                        "doneCriterionViolated": False,
+                        "predictionDiff": None,
+                        "nextAction": {"kind": "advance", "label": "다음 단계로 진행하기"},
+                    })
                 else:
                     self._sendJson({"error": f"unhandled {path}"}, status=404)
 
@@ -566,6 +597,37 @@ def jsAssertCurriculumHome() -> str:
   const reviewItems = reviews.querySelectorAll('[data-curriculum-home-review]');
   if (reviewItems.length < 1) throw new Error('curriculum home review items missing');
   return 'curriculum-home-ok';
+})()
+""")
+
+
+def jsAssertExerciseCheck() -> str:
+    return compactJs("""
+(async () => {
+  const exercise = document.querySelector('[data-learning-section-part="exercise"]');
+  if (!exercise) throw new Error('exercise part missing');
+  const runBtn = exercise.querySelector('button[aria-label="셀 실행"]');
+  if (!runBtn) throw new Error('exercise run button missing');
+  runBtn.click();
+  let checkBtn = null;
+  for (let i = 0; i < 80; i++) {
+    checkBtn = document.querySelector('[data-learning-exercise-check="true"]');
+    if (checkBtn) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!checkBtn) throw new Error('verify button did not appear after running the exercise');
+  checkBtn.click();
+  let panel = null;
+  for (let i = 0; i < 80; i++) {
+    panel = document.querySelector('[data-check-result="success"]');
+    if (panel) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!panel) throw new Error('check result panel did not render after verify click');
+  if (!panel.textContent || !panel.textContent.includes('검증 통과')) throw new Error('check pass label missing');
+  const nextAction = panel.querySelector('[data-check-next-action]');
+  if (!nextAction) throw new Error('check next-action missing');
+  return 'exercise-check-ok';
 })()
 """)
 
@@ -793,7 +855,20 @@ def curriculumLessonPayload() -> dict[str, Any]:
             "app": {"title": "Hello World", "layout": "learning", "hideCode": False},
             "blocks": [
                 {"id": "intro", "type": "markdown", "role": "title", "displayKind": "hero", "executionKind": "none", "sourceType": "intro", "title": "Hello World", "content": "# Hello World", "payload": {}},
-                {"id": "cell-1", "type": "code", "role": "exercise", "displayKind": "cell", "executionKind": "python", "sourceType": "sectionContract:exercise", "title": "Hello World 실습", "content": "print('hello')", "payload": {}},
+                {
+                    "id": "cell-1", "type": "code", "role": "exercise", "displayKind": "cell", "executionKind": "python",
+                    "sourceType": "sectionContract:exercise", "title": "Hello World 실습", "content": "print('hello')", "payload": {},
+                    "guide": {
+                        "exerciseType": "code",
+                        "hints": ["print 함수를 사용하세요"],
+                        "checkConfig": {"type": "output", "expectedCode": "print('hello')"},
+                        "difficulty": "easy",
+                        "solution": "print('hello')",
+                        "description": "hello를 출력하세요",
+                        "studentAnswer": "",
+                        "predict": None,
+                    },
+                },
             ],
         },
         "solutions": {},

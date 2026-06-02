@@ -15,7 +15,7 @@ import {
   Target,
   TerminalSquare,
 } from "lucide-react";
-import { useMemo, type ComponentType, type ReactNode } from "react";
+import { useMemo, useState, type ComponentType, type ReactNode } from "react";
 
 import { CellAiActions } from "@/components/app/cellAiActions";
 import {
@@ -44,7 +44,10 @@ import { statusLabel } from "@/lib/displayFormat";
 import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
+import { codaroApi } from "@/lib/api";
+import { useWidgetSession } from "@/lib/widgetSession";
+import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult, PredictConfig } from "@/types";
+import { CheckResultPanel } from "./checkResultPanel";
 import { CurriculumDependencyPanel } from "./curriculumDependencyPanel";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
 import {
@@ -664,6 +667,24 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
   );
 }
 
+function parseRequiredPatterns(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function toPredictionPayload(predict: PredictConfig | null | undefined) {
+  if (!predict) return null;
+  return {
+    expectedShape: predict.expectedShape ?? "",
+    expectedDtype: predict.expectedDtype ?? "",
+    expectedValue: predict.expectedValue ?? "",
+    expectedError: predict.expectedError ?? "",
+  };
+}
+
 function StructuredSectionLearningBody({
   canRun,
   category,
@@ -702,6 +723,43 @@ function StructuredSectionLearningBody({
   const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
   const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
   const exerciseDescription = specificPracticeCopy(exercise?.guide?.description || exercise?.description || "");
+
+  const sessionId = useWidgetSession();
+  const checkConfig = exercise?.guide?.checkConfig ?? {};
+  const checkType = checkConfig.type ?? "";
+  const hintCount = exercise?.guide?.hints?.length ?? 0;
+  const canCheck = Boolean(exercise && checkType && sessionId && canRun);
+  const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
+
+  const runCheck = async (level: number) => {
+    if (!exercise || !sessionId) return;
+    setChecking(true);
+    try {
+      const result = await codaroApi.checkExercise({
+        sessionId,
+        studentCode: drafts[exercise.id] ?? curriculumInitialDraft(exercise),
+        expectedCode: checkConfig.expectedCode,
+        checkType,
+        variableName: checkConfig.variableName,
+        expectedValue: checkConfig.expectedValue,
+        requiredPatterns: parseRequiredPatterns(checkConfig.requiredPatterns),
+        hints: exercise.guide?.hints ?? [],
+        currentHintLevel: level,
+        category,
+        contentId,
+        sectionId: section.id,
+        prediction: toPredictionPayload(exercise.guide?.predict),
+      });
+      setCheckResult(result);
+      setHintLevel(result.hintLevel ?? level);
+    } catch (error) {
+      console.warn("exercise check failed", error);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
     <div className="divide-y">
@@ -755,6 +813,22 @@ function StructuredSectionLearningBody({
               >
                 {exerciseRunning ? <Loader2 className="animate-spin" /> : <Play />}
               </IconButton>
+              {canCheck ? (
+                <Button
+                  className="h-7 gap-1.5 rounded-md px-2.5 text-xs [&_svg]:size-3.5"
+                  data-learning-exercise-check="true"
+                  disabled={checking}
+                  size="sm"
+                  variant="secondary"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void runCheck(hintLevel);
+                  }}
+                >
+                  {checking ? <Loader2 className="animate-spin" /> : <ListChecks />}
+                  검증
+                </Button>
+              ) : null}
               <CellAiActions
                 helpState={cellHelpByBlockId[exercise.id]}
                 selected={exerciseSelected}
@@ -792,6 +866,16 @@ function StructuredSectionLearningBody({
                 실행 결과
               </div>
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
+            </div>
+          ) : null}
+
+          {checking || checkResult ? (
+            <div className="mt-3" data-learning-section-part="check">
+              <CheckResultPanel
+                loading={checking && !checkResult}
+                result={checkResult}
+                onNextHint={() => void runCheck(Math.min(hintLevel + 1, hintCount))}
+              />
             </div>
           ) : null}
         </div>
