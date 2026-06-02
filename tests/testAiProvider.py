@@ -12,6 +12,7 @@ from codaro.ai.completion import (
     completeCodeFromRequest,
     completionTextFromAnswer,
 )
+from codaro.ai.staticCompletion import staticCompletions
 from codaro.ai.conversation import ConversationManager
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.providerErrors import providerErrorDiagnostic
@@ -568,6 +569,53 @@ class TestCompletion:
         assert result.payload()["completions"] == ["value + 1"]
         assert profileManager.resolvedProvider == "custom"
         assert providers[0].config.provider == "custom"
+
+
+class TestStaticCompletion:
+    def test_static_completions_return_identifier_suffix(self):
+        assert "nt" in staticCompletions("pri")
+        assert "wd" in staticCompletions("import os\nos.getc")
+
+    def test_static_completions_empty_for_blank_prefix(self):
+        assert staticCompletions("   ") == []
+
+    def test_complete_code_falls_back_to_static_when_offline(self):
+        offlineProfile = _ResolvedProfileManager({
+            "provider": "none",
+            "model": None,
+            "apiKey": None,
+            "baseUrl": None,
+        })
+
+        def providerFactory(config: LLMConfig):
+            raise AssertionError("provider must not be used when offline")
+
+        result = completeCode(
+            profileManager=offlineProfile,
+            prefix="pri",
+            providerFactory=providerFactory,
+        )
+
+        assert "nt" in result.completions
+        assert result.provider == "static"
+        assert result.model is None
+
+    def test_complete_code_uses_static_when_llm_returns_empty(self):
+        class _EmptyProvider:
+            def __init__(self, config: LLMConfig) -> None:
+                self.config = config
+
+            def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
+                return LLMResponse(answer="", provider=self.config.provider, model=self.config.model)
+
+        result = completeCode(
+            profileManager=_CompletionProfileManager(),
+            prefix="pri",
+            providerFactory=_EmptyProvider,
+        )
+
+        assert "nt" in result.completions
+        assert result.provider == "static"
 
 
 class TestOAuthChatGPTTools:

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from .factory import createProvider
+from .staticCompletion import staticCompletions
 from .types import LLMConfig
 
 
@@ -73,21 +74,32 @@ def completeCode(
         return emptyCompletionResult()
 
     resolved = profileManager.resolve(provider=providerOverride, role="copilot")
-    config = LLMConfig(
-        provider=resolved["provider"],
-        model=resolved.get("model"),
-        apiKey=resolved.get("apiKey"),
-        baseUrl=resolved.get("baseUrl"),
-        temperature=0,
-        maxTokens=120,
-    )
-    provider = providerFactory(config)
-    response = provider.complete(buildCompletionMessages(prefix=prefix, suffix=suffix, context=context))
-    completion = completionTextFromAnswer(response.answer)
+    # provider가 실제로 사용 가능할 때만 LLM 완성을 시도한다(apiKey 또는 로컬 baseUrl).
+    # 둘 다 없으면 오프라인이므로 LLM 호출 없이 정적 완성으로 폴백한다.
+    if resolved.get("apiKey") or resolved.get("baseUrl"):
+        config = LLMConfig(
+            provider=resolved["provider"],
+            model=resolved.get("model"),
+            apiKey=resolved.get("apiKey"),
+            baseUrl=resolved.get("baseUrl"),
+            temperature=0,
+            maxTokens=120,
+        )
+        provider = providerFactory(config)
+        response = provider.complete(buildCompletionMessages(prefix=prefix, suffix=suffix, context=context))
+        completion = completionTextFromAnswer(response.answer)
+        if completion:
+            return CodeCompletionResult(
+                completions=[completion],
+                provider=response.provider,
+                model=response.model,
+            )
+
+    static = staticCompletions(prefix, suffix)
     return CodeCompletionResult(
-        completions=[completion] if completion else [],
-        provider=response.provider,
-        model=response.model,
+        completions=static,
+        provider="static" if static else "",
+        model=None,
     )
 
 
