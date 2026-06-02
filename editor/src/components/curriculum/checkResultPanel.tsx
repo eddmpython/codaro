@@ -25,11 +25,13 @@ export function CheckResultPanel({
   loading = false,
   onNextHint,
   onAskAssistant,
+  onApplyCorrection,
 }: {
   result: CheckResult | null;
   loading?: boolean;
   onNextHint?: () => void;
   onAskAssistant?: (question: string) => void;
+  onApplyCorrection?: (code: string) => void;
 }) {
   if (loading) {
     return (
@@ -101,8 +103,9 @@ export function CheckResultPanel({
       ) : null}
       {result.misconceptionMatches && result.misconceptionMatches.length > 0 ? (
         <MisconceptionList
-          matches={result.misconceptionMatches}
           doneCriterionViolated={result.doneCriterionViolated ?? false}
+          matches={result.misconceptionMatches}
+          onApplyCorrection={onApplyCorrection}
         />
       ) : null}
       {passed && result.creditedOutcomes && result.creditedOutcomes.length > 0 ? (
@@ -243,9 +246,11 @@ function PredictionDiffPanel({ diff }: { diff: PredictionDiffPayload }) {
 function MisconceptionList({
   matches,
   doneCriterionViolated,
+  onApplyCorrection,
 }: {
   matches: MisconceptionMatch[];
   doneCriterionViolated: boolean;
+  onApplyCorrection?: (code: string) => void;
 }) {
   return (
     <div className="space-y-2" data-check-result-misconceptions="true">
@@ -289,6 +294,19 @@ function MisconceptionList({
               <pre className="mt-1 whitespace-pre-wrap rounded bg-background/70 p-2 font-mono leading-4">
                 {match.correction.miniExercise}
               </pre>
+              {onApplyCorrection ? (
+                <Button
+                  className="mt-1.5 h-7 gap-1.5 px-2 text-[11px]"
+                  data-misconception-apply-correction="true"
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                  onClick={() => onApplyCorrection(match.correction.miniExercise)}
+                >
+                  <Lightbulb className="size-3.5" />
+                  교정 코드로 연습하기
+                </Button>
+              ) : null}
             </details>
           ) : null}
         </div>

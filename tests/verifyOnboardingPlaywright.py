@@ -670,6 +670,7 @@ def jsAssertExerciseCheck() -> str:
   if (!failPanel) throw new Error('failing check panel did not render');
   if (!failPanel.querySelector('[data-check-result-misconceptions="true"]')) throw new Error('misconception diagnosis missing on fail');
   if (!failPanel.querySelector('[data-check-ask-assistant="true"]')) throw new Error('ask-assistant button missing on fail');
+  if (!failPanel.querySelector('[data-misconception-apply-correction="true"]')) throw new Error('apply-correction button missing on fail');
   const failNext = failPanel.querySelector('[data-check-next-action="studyCorrection"]');
   if (!failNext) throw new Error('studyCorrection next-action missing on fail');
   checkBtn.click();

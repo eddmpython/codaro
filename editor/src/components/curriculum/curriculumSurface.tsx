@@ -899,6 +899,14 @@ function StructuredSectionLearningBody({
               <CheckResultPanel
                 loading={checking && !checkResult}
                 result={checkResult}
+                onApplyCorrection={
+                  exercise
+                    ? (code) => {
+                        onSelectBlock(exercise.id);
+                        onDraftChange(exercise.id, code);
+                      }
+                    : undefined
+                }
                 onAskAssistant={
                   exercise ? (question) => onCellAsk("explain", exercise, question) : undefined
                 }
