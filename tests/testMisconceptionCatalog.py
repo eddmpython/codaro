@@ -314,6 +314,20 @@ def testErrorPatternMatchesSingularMatrix() -> None:
     assert "numpy.linearAlgebra.singularMatrix" in ids
 
 
+def testErrorPatternMatchesUseAfterClose() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.contextManagers.yml")
+    hits = matchErrorPattern(catalog, "ValueError: I/O operation on closed file.")
+    ids = {hit.id for hit in hits}
+    assert "builtins.contextManagers.useAfterClose" in ids
+
+
+def testErrorPatternMatchesNotAContextManager() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.contextManagers.yml")
+    hits = matchErrorPattern(catalog, "TypeError: 'int' object does not support the context manager protocol")
+    ids = {hit.id for hit in hits}
+    assert "builtins.contextManagers.notAContextManager" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"

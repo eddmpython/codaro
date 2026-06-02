@@ -1,0 +1,52 @@
+meta:
+  outcomeId: builtins.contextManagers
+  status: draft
+  version: 1
+  note: "초안 — with 문/컨텍스트 매니저 흔한 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: builtins.contextManagers.useAfterClose
+    label: "with 블록이 끝난 파일을 다시 사용"
+    summary: "with open(...) 블록 밖에서 파일을 읽어 'I/O operation on closed file' 에러가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: I/O operation on closed file"
+        description: "with 블록 종료 후 파일 접근."
+    diagnostic:
+      message: "`with open(...) as f:` 블록을 벗어나면 파일이 **자동으로 닫힙니다**. 닫힌 파일은 더 못 읽습니다. 파일 작업은 `with` 블록 **안에서** 끝내거나, 필요한 내용을 변수에 담아 두세요."
+      references: ["builtins.contextManagers", "builtins.fileSystem"]
+    correction:
+      hint: "읽기는 with 블록 안에서. `with open(p) as f: data = f.read()` 후 밖에서 `data` 를 쓰세요."
+      miniExercise: |
+        from pathlib import Path
+        p = Path("note.txt")
+        p.write_text("안녕", encoding="utf-8")
+        with open(p, encoding="utf-8") as f:
+            data = f.read()
+        print(data)
+
+  - id: builtins.contextManagers.notAContextManager
+    label: "with 에 컨텍스트 매니저가 아닌 값을 사용"
+    summary: "with 5: 처럼 __enter__/__exit__ 가 없는 객체를 써서 TypeError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError: '\\w+' object does not support the context manager protocol"
+        description: "컨텍스트 매니저 프로토콜 미지원 객체."
+    diagnostic:
+      message: "`with` 는 `__enter__`/`__exit__` 를 가진 **컨텍스트 매니저** 에만 씁니다(파일, 락, `contextlib` 등). 일반 값에는 못 씁니다. 직접 만들려면 `@contextlib.contextmanager` 데코레이터를 쓰세요."
+      references: ["builtins.contextManagers"]
+    correction:
+      hint: "파일·락 같은 컨텍스트 매니저에만 with 를 쓰거나, `contextlib.contextmanager` 로 직접 정의하세요."
+      miniExercise: |
+        import contextlib
+
+        @contextlib.contextmanager
+        def banner(name):
+            print(f"-- {name} 시작 --")
+            yield
+            print(f"-- {name} 끝 --")
+
+        with banner("작업"):
+            print("내용")
