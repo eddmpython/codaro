@@ -67,12 +67,18 @@ def buildLearnerSnapshotPayload(
     payload = snapshot.model_dump()
     if curriculumOs is not None:
         taxonomy = curriculumOs.taxonomy()
+        graph = curriculumOs.graph()
         misconceptions = payload.get("misconceptions")
         if isinstance(misconceptions, list):
             for hit in misconceptions:
                 if isinstance(hit, dict):
                     outcomeId = str(hit.get("outcomeId") or "")
                     hit["outcomeLabel"] = taxonomy.outcomeLabel(outcomeId) if outcomeId else ""
+                    lessons = graph.lessonsProvidingOutcome(outcomeId) if outcomeId else []
+                    if lessons:
+                        lesson = lessons[0]
+                        hit["lessonCategory"] = lesson.category
+                        hit["lessonContentId"] = lesson.contentId
     return {
         **payload,
         "repeatedMisconceptionCount": len(repeats),

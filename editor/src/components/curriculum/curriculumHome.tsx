@@ -53,17 +53,26 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
   const { snapshot } = useLearnerSnapshot();
   const weakAreas = useMemo(() => {
     const unresolved = (snapshot?.misconceptions ?? []).filter((hit) => !hit.resolvedAt);
-    const byOutcome = new Map<string, { label: string; hitCount: number; repeated: boolean }>();
+    const byOutcome = new Map<
+      string,
+      { label: string; hitCount: number; repeated: boolean; category?: string; contentId?: string }
+    >();
     for (const hit of unresolved) {
       const existing = byOutcome.get(hit.outcomeId);
       if (existing) {
         existing.hitCount += hit.hitCount;
         existing.repeated = existing.repeated || hit.hitCount >= 2;
+        if (!existing.contentId && hit.lessonContentId) {
+          existing.category = hit.lessonCategory;
+          existing.contentId = hit.lessonContentId;
+        }
       } else {
         byOutcome.set(hit.outcomeId, {
           label: hit.outcomeLabel || hit.outcomeId,
           hitCount: hit.hitCount,
           repeated: hit.hitCount >= 2,
+          category: hit.lessonCategory,
+          contentId: hit.lessonContentId,
         });
       }
     }
@@ -237,18 +246,25 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                 최근 자주 막힌 개념입니다. 복습으로 약점을 메워 보세요.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {weakAreas.map((area) => (
-                  <div
-                    key={area.label}
-                    className="flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-sm"
-                    data-weak-area={area.label}
-                  >
-                    <span className="font-medium">{area.label}</span>
-                    <Badge variant={area.repeated ? "destructive" : "outline"}>
-                      {area.hitCount}회{area.repeated ? " · 반복" : ""}
-                    </Badge>
-                  </div>
-                ))}
+                {weakAreas.map((area) => {
+                  const canOpen = Boolean(area.category && area.contentId);
+                  return (
+                    <button
+                      key={area.label}
+                      className="flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-sm transition-colors enabled:hover:border-primary/50 enabled:hover:bg-accent/40 disabled:cursor-default"
+                      data-weak-area={area.label}
+                      disabled={!canOpen}
+                      onClick={() => canOpen && onSelectLesson(area.category!, area.contentId!)}
+                      type="button"
+                    >
+                      <span className="font-medium">{area.label}</span>
+                      <Badge variant={area.repeated ? "destructive" : "outline"}>
+                        {area.hitCount}회{area.repeated ? " · 반복" : ""}
+                      </Badge>
+                      {canOpen ? <ArrowRight className="size-3.5 text-muted-foreground" /> : null}
+                    </button>
+                  );
+                })}
               </div>
             </section>
           ) : null}

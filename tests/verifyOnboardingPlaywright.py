@@ -341,7 +341,7 @@ class OnboardingStubApi:
                     self._sendJson({
                         "mastery": [],
                         "misconceptions": [
-                            {"misconceptionId": "python.operators.caretAsPower", "outcomeId": "python.operators", "outcomeLabel": "Python 연산자", "firstSeenAt": "2026-06-01T00:00:00+00:00", "lastSeenAt": "2026-06-02T00:00:00+00:00", "hitCount": 2, "resolvedAt": None},
+                            {"misconceptionId": "python.operators.caretAsPower", "outcomeId": "python.operators", "outcomeLabel": "Python 연산자", "lessonCategory": "30days", "lessonContentId": "hello", "firstSeenAt": "2026-06-01T00:00:00+00:00", "lastSeenAt": "2026-06-02T00:00:00+00:00", "hitCount": 2, "resolvedAt": None},
                         ],
                         "execution": {"totalRuns": 3, "errorRuns": 1},
                         "repeatedMisconceptionCount": 1,
@@ -654,7 +654,9 @@ def jsAssertCurriculumHome() -> str:
   const weakAreas = document.querySelector('[data-curriculum-home-weak-areas="true"]');
   if (!weakAreas) throw new Error('curriculum home weak-areas section missing');
   if (!weakAreas.textContent || !weakAreas.textContent.includes('집중하면 좋은 영역')) throw new Error('weak-areas label missing');
-  if (!weakAreas.querySelector('[data-weak-area]')) throw new Error('weak-area item missing');
+  const weakItem = weakAreas.querySelector('[data-weak-area]');
+  if (!weakItem) throw new Error('weak-area item missing');
+  if (weakItem.disabled) throw new Error('weak-area with a lesson should be clickable');
   return 'curriculum-home-ok';
 })()
 """)

@@ -547,6 +547,8 @@ export type LearnerMisconceptionHit = {
   misconceptionId: string;
   outcomeId: string;
   outcomeLabel?: string;
+  lessonCategory?: string;
+  lessonContentId?: string;
   firstSeenAt: string;
   lastSeenAt: string;
   hitCount: number;
