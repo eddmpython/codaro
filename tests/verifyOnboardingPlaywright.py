@@ -305,6 +305,13 @@ class OnboardingStubApi:
                         "totalCompleted": 2,
                         "categoryProgress": {"30days": {"completed": 2, "accessed": 5}},
                         "resume": {"category": "30days", "contentId": "hello"},
+                        "learningPath": {
+                            "tracks": [
+                                {"track": "초급", "description": "처음이라면", "completed": 2, "total": 5, "ratio": 0.4, "state": "active"},
+                                {"track": "중급", "description": "기초를 마쳤다면", "completed": 0, "total": 10, "ratio": 0.0, "state": "upcoming"},
+                            ],
+                            "recommended": {"track": "초급", "category": "30days", "completed": 2, "total": 5, "description": "처음이라면"},
+                        },
                         "updatedAt": "2026-06-02T00:00:00+00:00",
                     })
                 elif path.startswith("/api/curriculum/contents/"):
@@ -526,6 +533,15 @@ def jsAssertCurriculumHome() -> str:
   if (!resume.textContent || !resume.textContent.includes('이어서 학습')) throw new Error('curriculum home resume label missing');
   const cards = document.querySelectorAll('[data-curriculum-home-category]');
   if (cards.length < 1) throw new Error('curriculum home category cards missing');
+  const journey = document.querySelector('[data-curriculum-home-journey="true"]');
+  if (!journey) throw new Error('curriculum home learning journey missing');
+  const tracks = journey.querySelectorAll('[data-curriculum-home-journey-track]');
+  if (tracks.length < 2) throw new Error('curriculum home journey tracks missing');
+  const active = journey.querySelector('[data-journey-state="active"]');
+  if (!active) throw new Error('curriculum home journey active track missing');
+  const next = document.querySelector('[data-curriculum-home-journey-next="true"]');
+  if (!next) throw new Error('curriculum home journey next CTA missing');
+  if (!next.textContent || !next.textContent.includes('다음 단계')) throw new Error('curriculum home journey next label missing');
   return 'curriculum-home-ok';
 })()
 """)

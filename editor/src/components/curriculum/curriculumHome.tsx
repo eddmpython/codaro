@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import { cn } from "@/lib/utils";
 import type { CurriculumCategory } from "@/types";
 
 type CurriculumHomeProps = {
@@ -55,6 +56,11 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
     ? categories.find((category) => category.key === resume.category)?.name ?? resume.category
     : "";
   const firstCategory = categories[0];
+  const learningPath = summary?.learningPath ?? null;
+  const recommended = learningPath?.recommended ?? null;
+  const recommendedCategoryName = recommended?.category
+    ? categories.find((category) => category.key === recommended.category)?.name ?? recommended.category
+    : "";
 
   return (
     <ScrollArea className="h-full min-h-0 min-w-0" data-curriculum-home="true">
@@ -107,6 +113,73 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
               ) : null}
             </div>
           </section>
+
+          {learningPath && learningPath.tracks.length > 0 ? (
+            <section data-curriculum-home-journey="true">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-muted-foreground">학습 여정</h2>
+                {recommended ? (
+                  <Button
+                    className="h-8 gap-1.5 px-3 text-xs"
+                    data-curriculum-home-journey-next="true"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => recommended.category && onSelectCategory(recommended.category)}
+                  >
+                    다음 단계 · {recommended.track}
+                    {recommendedCategoryName ? ` · ${recommendedCategoryName}` : ""}
+                    <ArrowRight className="size-3.5" />
+                  </Button>
+                ) : (
+                  <span className="text-xs font-medium text-emerald-600">전 과정 완주 🎉</span>
+                )}
+              </div>
+              <div className="space-y-2">
+                {learningPath.tracks.map((track) => {
+                  const trackPercent = Math.min(100, Math.round(track.ratio * 100));
+                  const isActive = track.state === "active";
+                  const isDone = track.state === "done";
+                  return (
+                    <div
+                      key={track.track}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg border p-3 transition-colors",
+                        isActive && "border-primary/50 bg-primary/5",
+                        isDone && "opacity-75",
+                      )}
+                      data-curriculum-home-journey-track={track.track}
+                      data-journey-state={track.state}
+                    >
+                      <span className="flex size-5 shrink-0 items-center justify-center">
+                        {isDone ? (
+                          <CheckCircle2 className="size-4 text-emerald-500" />
+                        ) : (
+                          <span
+                            className={cn(
+                              "size-2.5 rounded-full",
+                              isActive ? "bg-primary" : "bg-muted-foreground/30",
+                            )}
+                          />
+                        )}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="truncate text-sm font-medium">{track.track}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {track.completed} / {track.total}
+                          </span>
+                        </div>
+                        {track.description ? (
+                          <p className="truncate text-xs text-muted-foreground">{track.description}</p>
+                        ) : null}
+                        <Progress className="mt-1.5 h-1.5" value={trackPercent} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
 
           {groups.map((group) => (
             <section key={group.track} data-curriculum-home-track={group.track}>

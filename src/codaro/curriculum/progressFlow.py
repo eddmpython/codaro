@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .learningPathFlow import recommendLearningPath
 from .progress import ProgressTracker
+from .studyLoader import LEARNING_PATHS, StudyLoader
 
 
 @dataclass(frozen=True)
@@ -19,8 +21,22 @@ class CurriculumProgressResult:
     action: str
 
 
-def buildCurriculumProgressSummary(progressTracker: ProgressTracker) -> dict[str, object]:
-    return progressTracker.getSummary()
+def buildCurriculumProgressSummary(
+    progressTracker: ProgressTracker,
+    studyLoader: StudyLoader | None = None,
+) -> dict[str, object]:
+    summary = progressTracker.getSummary()
+    if studyLoader is not None and LEARNING_PATHS:
+        categoryTotals = {category.key: category.count for category in studyLoader.listCategories()}
+        categoryProgress = summary.get("categoryProgress")
+        if not isinstance(categoryProgress, dict):
+            categoryProgress = {}
+        summary["learningPath"] = recommendLearningPath(
+            learningPaths=LEARNING_PATHS,
+            categoryTotals=categoryTotals,
+            categoryProgress=categoryProgress,
+        )
+    return summary
 
 
 def updateCurriculumProgress(

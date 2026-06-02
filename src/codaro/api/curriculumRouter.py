@@ -110,7 +110,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/curriculum/progress")
     def apiCurriculumProgress() -> dict[str, object]:
-        summary = buildCurriculumProgressSummary(state.progressTracker)
+        summary = buildCurriculumProgressSummary(state.progressTracker, state.studyLoader)
         logger.debug(
             "curriculum %s",
             formatLogFields(

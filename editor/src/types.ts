@@ -240,12 +240,35 @@ export type ProgressResumeTarget = {
   contentId: string;
 };
 
+export type LearningPathTrack = {
+  track: string;
+  description: string;
+  completed: number;
+  total: number;
+  ratio: number;
+  state: "done" | "active" | "upcoming";
+};
+
+export type LearningPathRecommendation = {
+  track: string;
+  category: string | null;
+  completed: number;
+  total: number;
+  description: string;
+};
+
+export type LearningPathSummary = {
+  tracks: LearningPathTrack[];
+  recommended: LearningPathRecommendation | null;
+};
+
 export type ProgressSummary = {
   totalAccessed: number;
   totalCompleted: number;
   updatedAt?: string;
   categoryProgress?: Record<string, CategoryProgressEntry>;
   resume?: ProgressResumeTarget | null;
+  learningPath?: LearningPathSummary | null;
 };
 
 export type CurriculumOutcome = {
