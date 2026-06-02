@@ -10,6 +10,30 @@ from .predictionDiff import ActualResult, comparePrediction, extractErrorClass
 from .sectionContract import LearningPredictContract
 
 
+def recommendNextAction(
+    *,
+    passed: bool,
+    hasMisconception: bool,
+    doneCriterionViolated: bool,
+    hintLevel: int,
+    maxHints: int,
+) -> dict[str, str]:
+    """체크 결과로부터 다음 행동을 결정적으로 추천한다(provider 불필요).
+
+    학습 루프가 LLM provider 없이도 "진단 → 안내"까지 닫히게 하는 규칙 기반 baseline.
+    provider가 있으면 teacher가 더 풍부히 보강하지만, 없어도 항상 한 가지 다음 행동을 준다.
+    """
+    if passed:
+        return {"kind": "advance", "label": "다음 단계로 진행하기"}
+    if hasMisconception:
+        return {"kind": "studyCorrection", "label": "교정 코드를 보고 다시 풀기"}
+    if doneCriterionViolated:
+        return {"kind": "reviewConcept", "label": "개념을 다시 보고 시도하기"}
+    if hintLevel < maxHints:
+        return {"kind": "nextHint", "label": "다음 힌트 보기"}
+    return {"kind": "retry", "label": "예상한 결과와 비교하며 다시 시도하기"}
+
+
 class CurriculumCheckInvalid(ValueError):
     pass
 
@@ -160,4 +184,11 @@ async def runCurriculumCheckFlow(
     errorClass = detectErrorClass(errorContext) if not result.passed else ""
     payload["errorClass"] = errorClass
     payload["debuggingPatternRef"] = debuggingPatternRef(errorClass)
+    payload["nextAction"] = recommendNextAction(
+        passed=result.passed,
+        hasMisconception=bool(misconceptionPayload),
+        doneCriterionViolated=doneCriterionViolated,
+        hintLevel=result.hintLevel,
+        maxHints=len(request.hints),
+    )
     return payload

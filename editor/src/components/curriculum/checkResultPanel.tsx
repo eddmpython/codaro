@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Eye, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Eye, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,6 +93,15 @@ export function CheckResultPanel({
           credited={result.creditedOutcomes}
           autoValidated={result.autoValidatedOutcomes ?? []}
         />
+      ) : null}
+      {result.nextAction?.label ? (
+        <div
+          className="flex items-center gap-1.5 border-t pt-2 text-[11px] font-medium text-foreground/80"
+          data-check-next-action={result.nextAction.kind}
+        >
+          <ArrowRight className="size-3.5" />
+          <span>다음: {result.nextAction.label}</span>
+        </div>
       ) : null}
     </div>
   );

@@ -595,6 +595,7 @@ export type CheckResult = {
   misconceptionMatches?: MisconceptionMatch[];
   doneCriterionViolated?: boolean;
   predictionDiff?: PredictionDiffPayload | null;
+  nextAction?: { kind: string; label: string } | null;
 };
 
 export type TaskDefinition = {
