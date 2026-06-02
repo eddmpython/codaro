@@ -1,0 +1,51 @@
+meta:
+  outcomeId: python.dataclasses
+  status: draft
+  version: 1
+  note: "초안 — dataclass 단계 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.dataclasses.mutableDefault
+    label: "가변 기본값을 필드에 직접 지정"
+    summary: "field: list = [] 처럼 가변 기본값을 적어 ValueError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: mutable default .* is not allowed"
+        description: "dataclass 필드에 가변 기본값 직접 지정."
+    diagnostic:
+      message: "리스트·딕셔너리 같은 가변 기본값은 모든 인스턴스가 공유하게 되어 dataclass가 막습니다. `field(default_factory=list)` 로 매번 새로 만들게 하세요."
+      references: ["python.dataclasses"]
+    correction:
+      hint: "`from dataclasses import field` 후 `items: list = field(default_factory=list)`."
+      miniExercise: |
+        from dataclasses import dataclass, field
+
+        @dataclass
+        class Cart:
+            items: list = field(default_factory=list)
+
+        print(Cart().items)
+
+  - id: python.dataclasses.missingDecorator
+    label: "@dataclass 없이 필드만 선언"
+    summary: "@dataclass 데코레이터를 빠뜨려 생성자에 인자를 넘기면 TypeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError: .*__init__\\(\\) takes 1 positional argument but \\d+ were given"
+        description: "데코레이터 없이 생성자에 인자 전달."
+    diagnostic:
+      message: "타입 주석만으로는 생성자가 만들어지지 않습니다. 클래스 위에 `@dataclass` 를 붙여야 `__init__` 이 자동 생성됩니다."
+      references: ["python.dataclasses"]
+    correction:
+      hint: "클래스 바로 위에 `@dataclass` 를 붙이세요."
+      miniExercise: |
+        from dataclasses import dataclass
+
+        @dataclass
+        class Point:
+            x: int
+            y: int
+
+        print(Point(1, 2))

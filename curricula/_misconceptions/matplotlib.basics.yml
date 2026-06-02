@@ -1,0 +1,44 @@
+meta:
+  outcomeId: matplotlib.basics
+  status: draft
+  version: 1
+  note: "초안 — matplotlib 기본 플롯 오개념 시드. 시각화 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: matplotlib.basics.missingPyplotImport
+    label: "plt 별칭 없이 pyplot 사용"
+    summary: "import matplotlib.pyplot as plt 없이 plt.plot(...)을 호출해 NameError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "NameError: name 'plt' is not defined"
+        description: "pyplot 별칭 미import."
+    diagnostic:
+      message: "matplotlib은 보통 `plt` 별칭으로 씁니다. 셀 맨 위에서 `import matplotlib.pyplot as plt` 를 먼저 실행하세요."
+      references: ["matplotlib.basics"]
+    correction:
+      hint: "`import matplotlib.pyplot as plt` 를 추가하세요."
+      miniExercise: |
+        import matplotlib.pyplot as plt
+        plt.plot([1, 2, 3], [1, 4, 9])
+        plt.show()
+
+  - id: matplotlib.basics.xyLengthMismatch
+    label: "길이가 다른 x, y로 플롯"
+    summary: "plt.plot(x, y)에서 x와 y의 길이가 달라 ValueError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: x and y must have same first dimension"
+        description: "x, y 길이 불일치."
+    diagnostic:
+      message: "`plt.plot(x, y)` 는 x와 y의 개수가 같아야 점을 이어 그립니다. 두 리스트의 길이를 `len()` 으로 확인해 맞추세요."
+      references: ["matplotlib.basics"]
+    correction:
+      hint: "x와 y의 개수를 같게 맞추세요."
+      miniExercise: |
+        import matplotlib.pyplot as plt
+        x = [1, 2, 3, 4]
+        y = [1, 4, 9, 16]
+        plt.plot(x, y)
+        plt.show()

@@ -1,0 +1,45 @@
+meta:
+  outcomeId: ml.intro
+  status: draft
+  version: 1
+  note: "초안 — 머신러닝 입문(scikit-learn fit/predict) 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: ml.intro.predictBeforeFit
+    label: "학습 전에 예측 호출"
+    summary: "fit 하기 전에 predict를 호출해 NotFittedError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(NotFittedError|is not fitted yet|instance is not fitted)"
+        description: "fit 전에 predict 호출."
+    diagnostic:
+      message: "모델은 `fit(X, y)` 로 먼저 학습해야 `predict(X)` 를 할 수 있습니다. 학습 → 예측 순서를 지키세요."
+      references: ["ml.intro"]
+    correction:
+      hint: "`model.fit(X, y)` 를 먼저 호출한 뒤 `model.predict(...)`."
+      miniExercise: |
+        from sklearn.linear_model import LinearRegression
+        X = [[1], [2], [3]]
+        y = [2, 4, 6]
+        model = LinearRegression().fit(X, y)
+        print(model.predict([[4]]))
+
+  - id: ml.intro.expected2dArray
+    label: "1차원 배열을 그대로 fit/predict에 전달"
+    summary: "[1,2,3] 같은 1차원 입력을 넘겨 'Expected 2D array' ValueError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: Expected 2D array"
+        description: "특징(feature) 입력이 2차원이 아님."
+    diagnostic:
+      message: "scikit-learn은 입력 X를 `[샘플, 특징]` 2차원으로 받습니다. 특징이 하나뿐이어도 `[[1], [2], [3]]` 처럼 각 샘플을 리스트로 감싸세요(또는 `np.reshape(-1, 1)`)."
+      references: ["ml.intro"]
+    correction:
+      hint: "각 샘플을 리스트로 감싸 2차원으로 만드세요. `[[1],[2],[3]]`."
+      miniExercise: |
+        from sklearn.linear_model import LinearRegression
+        X = [[1], [2], [3]]
+        y = [2, 4, 6]
+        print(LinearRegression().fit(X, y).predict([[5]]))

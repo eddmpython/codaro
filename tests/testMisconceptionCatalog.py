@@ -230,6 +230,27 @@ def testErrorPatternMatchesFileNotFound() -> None:
     assert "builtins.fileSystem.fileNotFound" in ids
 
 
+def testErrorPatternMatchesMatplotlibMissingImport() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "matplotlib.basics.yml")
+    hits = matchErrorPattern(catalog, "NameError: name 'plt' is not defined")
+    ids = {hit.id for hit in hits}
+    assert "matplotlib.basics.missingPyplotImport" in ids
+
+
+def testErrorPatternMatchesDataclassMutableDefault() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dataclasses.yml")
+    hits = matchErrorPattern(catalog, "ValueError: mutable default <class 'list'> for field items is not allowed")
+    ids = {hit.id for hit in hits}
+    assert "python.dataclasses.mutableDefault" in ids
+
+
+def testErrorPatternMatchesMlNotFitted() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "ml.intro.yml")
+    hits = matchErrorPattern(catalog, "sklearn.exceptions.NotFittedError: This LinearRegression instance is not fitted yet")
+    ids = {hit.id for hit in hits}
+    assert "ml.intro.predictBeforeFit" in ids
+
+
 def testErrorPatternMatchesKeyError() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dictsAndSets.yml")
     hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'banana'")
