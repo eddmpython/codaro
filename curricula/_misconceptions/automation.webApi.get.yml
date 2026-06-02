@@ -1,0 +1,44 @@
+meta:
+  outcomeId: automation.webApi.get
+  status: draft
+  version: 1
+  note: "초안 — requests GET 요청 흔한 오개념 시드. 자동화 webApi 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: automation.webApi.get.missingSchema
+    label: "URL 에 http:// 를 빼고 요청"
+    summary: "requests.get('example.com') 처럼 스킴(http/https)을 빼서 MissingSchema 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(MissingSchema|No scheme supplied)"
+        description: "URL 에 http(s):// 스킴 누락."
+    diagnostic:
+      message: "`requests` 는 URL 에 **스킴**(`http://` 또는 `https://`)이 있어야 어디로 요청할지 압니다. `requests.get('https://example.com')` 처럼 스킴을 포함하세요."
+      references: ["automation.webApi.get"]
+    correction:
+      hint: "URL 앞에 `https://` 를 붙이세요. `requests.get('https://example.com')`."
+      miniExercise: |
+        import requests
+        url = "https://httpbin.org/get"
+        # 실제 호출 대신 URL 형식만 확인
+        print(url.startswith("https://"))
+
+  - id: automation.webApi.get.jsonOnNonJson
+    label: "JSON 이 아닌 응답에 .json() 호출"
+    summary: "에러 페이지(HTML) 같은 비-JSON 응답에 response.json() 을 불러 JSONDecodeError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(requests\\.exceptions\\.JSONDecodeError|JSONDecodeError)"
+        description: "비-JSON 응답을 json 으로 파싱."
+    diagnostic:
+      message: "`response.json()` 은 본문이 **JSON 일 때만** 됩니다. 상태 코드가 에러거나 HTML 을 받으면 실패합니다. 먼저 `response.raise_for_status()` 와 `response.headers.get('content-type')` 을 확인하세요."
+      references: ["automation.webApi.get", "builtins.dataFormats"]
+    correction:
+      hint: "`r.raise_for_status()` 로 성공 확인 후 `r.json()`. 필요하면 `r.text` 로 본문을 먼저 보세요."
+      miniExercise: |
+        import json
+        body = '{"ok": true}'
+        # JSON 형식일 때만 파싱
+        print(json.loads(body))

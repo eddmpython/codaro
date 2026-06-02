@@ -342,6 +342,20 @@ def testErrorPatternMatchesRegexInvalidPattern() -> None:
     assert "automation.regex.invalidPattern" in ids
 
 
+def testErrorPatternMatchesWebApiMissingSchema() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.webApi.get.yml")
+    hits = matchErrorPattern(catalog, "requests.exceptions.MissingSchema: Invalid URL 'example.com': No scheme supplied.")
+    ids = {hit.id for hit in hits}
+    assert "automation.webApi.get.missingSchema" in ids
+
+
+def testErrorPatternMatchesWebApiJsonOnNonJson() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.webApi.get.yml")
+    hits = matchErrorPattern(catalog, "requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)")
+    ids = {hit.id for hit in hits}
+    assert "automation.webApi.get.jsonOnNonJson" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"
