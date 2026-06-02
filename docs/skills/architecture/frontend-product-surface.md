@@ -38,11 +38,11 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 표면 순서, 제품 흐름 역할, 사이드바 노출, 사이드바 흐름 단계, 기본 진입점은 `editor/src/lib/surfaceModel.ts`에 모여 있다. 이 파일이 제품 표면 모델의 SSOT다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell로 남아 있다. 흐름 nav는 `productFlowNav.tsx`, 현재 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
-- `editor/src/components/app/mainSurface.tsx`는 표면 선택과 큰 레이아웃 조립만 맡는다. 현재 학습 화면 조립은 `editor/src/components/app/currentLearningSurface.tsx`가 맡는다. 요청 범위 분류는 `editor/src/lib/teacherScope.ts`, assistant 산출물 라우팅은 `editor/src/lib/assistantArtifactRouting.ts`, 응답 적용 계획은 `editor/src/lib/assistantResponsePlan.ts`, pending 적용은 `editor/src/lib/pendingChanges.ts`가 맡는다.
+- `editor/src/components/app/mainSurface.tsx`는 표면 선택과 큰 레이아웃 조립만 맡는다. 현재 학습 화면 조립은 `editor/src/components/app/currentLearningSurface.tsx`, 노트북 화면 조립은 `editor/src/components/app/notebookSurface.tsx`가 맡는다. 요청 범위 분류는 `editor/src/lib/teacherScope.ts`, assistant 산출물 라우팅은 `editor/src/lib/assistantArtifactRouting.ts`, 응답 적용 계획은 `editor/src/lib/assistantResponsePlan.ts`, pending 적용은 `editor/src/lib/pendingChanges.ts`가 맡는다.
 - `editor/src/components/chat/chatSurface.tsx`는 대화 입구, provider 연결 버튼, 시작 예시, pending notebook bar만 다룬다. 커리큘럼 tree, 자동화 tree, YAML 카드, 패키지 준비 내부를 직접 알면 실패다.
 - 자동화는 보이는 표면이지만 기본 입구가 아니다. `secondLoop` 역할로 유지하고, 검증된 셀/recipe가 생긴 뒤 태스크 저장과 예약으로 이어진다.
 
-현재 점수 판단은 8.5/10이다. 제품 흐름과 파일 경계는 한 방향으로 정리됐고, 현재 학습 화면 조립도 `currentLearningSurface.tsx`로 분리됐다. 남은 리스크는 `mainSurface.tsx`가 여전히 많은 props를 전달하는 중앙 표면이라는 점이다. 라우팅·분류·pending 변경 책임이 다시 붙지 않게 gate를 유지하고, 채팅 화면이 입구 역할을 넘어서 학습/자동화 세부 구현을 끌어오지 않게 막아야 한다.
+현재 점수 판단은 8.7/10이다. 제품 흐름과 파일 경계는 한 방향으로 정리됐고, 현재 학습 화면 조립은 `currentLearningSurface.tsx`, 노트북 화면 조립은 `notebookSurface.tsx`로 분리됐다. 남은 리스크는 `mainSurface.tsx`가 여전히 많은 props를 전달하는 중앙 표면이라는 점이다. 라우팅·분류·pending 변경 책임이 다시 붙지 않게 gate를 유지하고, 채팅 화면이 입구 역할을 넘어서 학습/자동화 세부 구현을 끌어오지 않게 막아야 한다.
 
 ## 목표 구조와 영향 파일
 
@@ -51,7 +51,8 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/lib/surfaceModel.ts` | `대화 → 현재 학습 → 노트북 → 자동화` 순서, flow role, visible/hidden, 기본 표면 |
 | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`만 읽어 사이드바 흐름 nav 렌더링 |
 | `editor/src/components/app/productSidebar.tsx` | sidebar shell, terminal utility, 현재 표면의 focused tree 배치 |
-| `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 현재 학습 내부 조립 금지 |
+| `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 현재 학습/노트북 내부 조립 금지 |
+| `editor/src/components/app/notebookSurface.tsx` | 노트북 표면 조립. 빈 노트북 편집, 셀 실행, pending notebook bar, 우측 teacher panel 배치 |
 | `editor/src/components/app/currentLearningSurface.tsx` | 현재 학습 표면 조립. 목표 입력 fallback, 커리큘럼 학습 카드, 셀 TOC, 우측 teacher panel 배치 |
 | `editor/src/components/chat/chatSurface.tsx` | 채팅 입구와 provider 연결 행동. curriculum/automation 내부 구현 import 금지 |
 | `editor/src/lib/teacherScope.ts` | 대화 요청 범위 분류 |
@@ -69,7 +70,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 표면 순서, 노출 정책, 흐름 단계 번호를 `surfaceModel.ts` 밖에서 별도 배열이나 index 계산으로 복사하면 실패다. 컴포넌트는 `PRODUCT_SURFACE_NAV`가 아니라 필요한 파생값만 읽는다.
 - `productSidebar.tsx`가 커리큘럼 tree 생성, 자동화 tree 생성, 삭제 dialog, 표면 icon map까지 직접 품으면 실패다. focused 파일로 되돌린다.
-- `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정, 현재 학습 라벨 계산, 커리큘럼 카드/TOC 조립이 들어오면 실패다. `editor/src/lib/*`, 전용 hook, 또는 `currentLearningSurface.tsx` 같은 focused surface 파일로 이동한다.
+- `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정, 현재 학습 라벨 계산, 커리큘럼 카드/TOC 조립, 노트북 패널/teacher panel 조립이 들어오면 실패다. `editor/src/lib/*`, 전용 hook, 또는 `currentLearningSurface.tsx`/`notebookSurface.tsx` 같은 focused surface 파일로 이동한다.
 - 빈 채팅 시작 예시가 target surface나 flow role을 직접 문자열로 흩뿌리면 실패다. 예시는 `chatStartExamples.ts`에서 정의하고, 표면 역할은 `surfaceModel.ts`에서 조회한다.
 - assistant 응답과 pending 승인 hook이 나만의 커리큘럼 저장/열기 절차를 각자 복붙하면 실패다. 저장 후 현재 학습 열기 정책은 `customCurricula.ts`의 `saveAndOpenCustomCurriculum`이 맡는다.
 - assistant 응답, local fallback, turn hook이 적용 payload shape를 각자 다시 정의하면 실패다. `assistantArtifactRouting.ts`의 `AssistantArtifactApplication`과 `buildAssistantArtifactApplication`을 기준으로 쓴다.

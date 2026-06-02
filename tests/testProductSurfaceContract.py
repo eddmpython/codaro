@@ -224,6 +224,8 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
     for expected in (
         "`editor/src/components/app/mainSurface.tsx`",
         "표면 선택과 큰 레이아웃 조립",
+        "`editor/src/components/app/notebookSurface.tsx`",
+        "노트북 표면 조립",
         "`editor/src/components/app/currentLearningSurface.tsx`",
         "현재 학습 표면 조립",
         "`editor/src/components/chat/chatSurface.tsx`",
@@ -253,12 +255,15 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
     mainSurface = _read("editor/src/components/app/mainSurface.tsx")
     chatSurface = _read("editor/src/components/chat/chatSurface.tsx")
     currentLearningSurface = _read("editor/src/components/app/currentLearningSurface.tsx")
+    notebookSurface = _read("editor/src/components/app/notebookSurface.tsx")
 
     for forbidden in (
         "CUSTOM_CURRICULUM_CATEGORY",
         "CurriculumCellToc",
         "CurriculumView",
         "CodeCellEditor",
+        "NotebookPanel",
+        "TeacherPanel",
         "curriculumGoalExamples",
         "selectedCategoryLabel",
         "selectedContentLabel",
@@ -282,6 +287,15 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
         "selectedContentLabel",
     ):
         assert expected in currentLearningSurface
+
+    for expected in (
+        "NotebookPanel",
+        "TeacherPanel",
+        "xl:grid-cols-[minmax(0,1fr)_380px]",
+        "onRunNotebook",
+        "onAddCell",
+    ):
+        assert expected in notebookSurface
 
     for forbidden in (
         "curriculumSidebarTree",

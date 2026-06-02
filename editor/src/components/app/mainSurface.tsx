@@ -1,7 +1,6 @@
 import { lazy, Suspense } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import { useLocale } from "@/lib/localeContext";
-import { cn } from "@/lib/utils";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
@@ -21,11 +20,10 @@ import type {
 
 type ResultMap = Record<string, ExecutionResult>;
 
-const TeacherPanel = lazy(() => import("@/components/assistant/teacherPanel").then((module) => ({ default: module.TeacherPanel })));
 const AutomationView = lazy(() => import("@/components/automation/automationSurface").then((module) => ({ default: module.AutomationView })));
 const ChatSurface = lazy(() => import("@/components/chat/chatSurface").then((module) => ({ default: module.ChatSurface })));
 const CurrentLearningSurface = lazy(() => import("@/components/app/currentLearningSurface").then((module) => ({ default: module.CurrentLearningSurface })));
-const NotebookPanel = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.NotebookPanel })));
+const NotebookSurface = lazy(() => import("@/components/app/notebookSurface").then((module) => ({ default: module.NotebookSurface })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
 type MainSurfaceProps = {
@@ -113,52 +111,38 @@ function MainSurfaceContent(props: MainSurfaceProps) {
 
   if (props.surface === "editor") {
     return (
-      <div
-        className={cn(
-          "grid h-full min-h-0 grid-cols-1",
-          !props.assistantCollapsed && "xl:grid-cols-[minmax(0,1fr)_380px]",
-        )}
-      >
-        <NotebookPanel
-          canRun={props.canRun}
-          cellHelpByBlockId={props.cellHelpByBlockId}
-          document={props.document}
-          drafts={props.drafts}
-          notebookRunning={props.notebookRunning}
-          pendingBlocks={props.pendingBlocks}
-          results={props.results}
-          runningBlockId={props.runningBlockId}
-          selectedBlockId={props.selectedBlockId}
-          onAddCell={props.onAddCell}
-          onDraftChange={props.onDraftChange}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onCellAsk={props.onCellAsk}
-          onDeleteCell={props.onDeleteCell}
-          onRenameDocument={props.onRenameDocument}
-          onRejectPendingBlocks={props.onRejectPendingBlocks}
-          onRunBlock={props.onRunBlock}
-          onRunNotebook={props.onRunNotebook}
-          onSelectBlock={props.onSelectBlock}
-        />
-        {props.assistantCollapsed ? null : (
-          <TeacherPanel
-            aiConnecting={props.aiConnecting}
-            aiProfile={props.aiProfile}
-            apiOnline={props.apiOnline}
-            loading={props.assistantLoading}
-            messages={props.messages}
-            pendingBlocks={props.pendingBlocks}
-            placement="right"
-            prompt={props.prompt}
-            onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-            onAsk={props.onAsk}
-            onConnectAi={props.onConnectAi}
-            onNewChat={props.onNewChat}
-            onPromptChange={props.onPromptChange}
-            onRejectPendingBlocks={props.onRejectPendingBlocks}
-          />
-        )}
-      </div>
+      <NotebookSurface
+        aiConnecting={props.aiConnecting}
+        aiProfile={props.aiProfile}
+        apiOnline={props.apiOnline}
+        assistantCollapsed={props.assistantCollapsed}
+        assistantLoading={props.assistantLoading}
+        canRun={props.canRun}
+        cellHelpByBlockId={props.cellHelpByBlockId}
+        document={props.document}
+        drafts={props.drafts}
+        messages={props.messages}
+        notebookRunning={props.notebookRunning}
+        pendingBlocks={props.pendingBlocks}
+        prompt={props.prompt}
+        results={props.results}
+        runningBlockId={props.runningBlockId}
+        selectedBlockId={props.selectedBlockId}
+        onAcceptPendingBlocks={props.onAcceptPendingBlocks}
+        onAddCell={props.onAddCell}
+        onAsk={props.onAsk}
+        onCellAsk={props.onCellAsk}
+        onConnectAi={props.onConnectAi}
+        onDeleteCell={props.onDeleteCell}
+        onDraftChange={props.onDraftChange}
+        onNewChat={props.onNewChat}
+        onPromptChange={props.onPromptChange}
+        onRejectPendingBlocks={props.onRejectPendingBlocks}
+        onRenameDocument={props.onRenameDocument}
+        onRunBlock={props.onRunBlock}
+        onRunNotebook={props.onRunNotebook}
+        onSelectBlock={props.onSelectBlock}
+      />
     );
   }
 
