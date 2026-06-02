@@ -65,6 +65,7 @@ def testAiRouterDoesNotImportProviderImplementations() -> None:
 
 def testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary() -> None:
     source = (ROOT / "src/codaro/api/aiRouter.py").read_text(encoding="utf-8")
+    flow = (ROOT / "src/codaro/ai/chatFlow.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
     importedModules = [
         node.module
@@ -77,13 +78,45 @@ def testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary() -> None:
         not any(fragment in module for fragment in blockedFragments)
         for module in importedModules
     )
-    assert "prepareTeacherRuntimeTurnFromPayload" in source
+    assert "ai.chatFlow" in importedModules
+    assert "runChatTurnPayload" in source
+    assert "streamChatTurnSseFrames" in source
+    assert "buildCodeCompletionPayload" in source
+    assert "chatFlowErrorPayload" in source
+    assert "prepareTeacherRuntimeTurnFromPayload" in flow
+    assert "runTeacherRuntimeTurn" in flow
+    assert "streamTeacherRuntimeTurn" in flow
+    assert "teacherStreamSseFrame" in flow
+    assert "CodeCompletionRequest.fromPayload(payload)" in flow
+    assert "completeCodeFromRequest(" in flow
+    assert "getProfileManager()" not in source
+    assert "CodeCompletionRequest" not in source
+    assert "completeCodeFromRequest" not in source
+    assert "emptyCompletionResult" not in source
+    assert "providerErrorPayload" not in source
+    assert "prepareTeacherRuntimeTurnFromPayload" not in source
+    assert "streamTeacherRuntimeTurn" not in source
+    assert "teacherStreamSseFrame" not in source
+    assert "_prepareTeacherRuntimeTurnForHttp" not in source
+    assert "_HANDLED_ERRORS" not in source
     assert "TeacherRuntimeTurnRequest" not in source
     assert "runtimeTurn.turn." not in source
     assert "runTeacherChatLoop" not in source
     assert "runTeacherChatStream" not in source
-    assert "runTeacherRuntimeTurn" in source
-    assert "streamTeacherRuntimeTurn" in source
+
+
+def testChatFlowDoesNotImportTransportLayer() -> None:
+    source = (ROOT / "src/codaro/ai/chatFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
 
 
 def testAiRouterKeepsProviderProfileBehindFlowBoundary() -> None:

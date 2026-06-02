@@ -6,7 +6,14 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..ai.completion import CodeCompletionRequest, completeCodeFromRequest, emptyCompletionResult
+from ..ai.chatFlow import (
+    CHAT_FLOW_ERRORS,
+    ChatFlowConversationNotFound,
+    buildCodeCompletionPayload,
+    chatFlowErrorPayload,
+    runChatTurnPayload,
+    streamChatTurnSseFrames,
+)
 from ..ai.conversation import (
     ConversationNotFound,
     conversationListPayload,
@@ -15,7 +22,6 @@ from ..ai.conversation import (
     getConversationManager,
 )
 from ..ai.oauthFlow import getOAuthLoginFlow
-from ..ai.profile import getProfileManager
 from ..ai.profileFlow import (
     ProfileFlowError,
     buildProviderCatalogPayload,
@@ -27,29 +33,8 @@ from ..ai.profileFlow import (
     updateProviderSecretPayload,
     validateProviderConnectionPayload,
 )
-from ..ai.providerErrors import ProviderRuntimeError, providerErrorPayload
-from ..ai.teacher import (
-    TeacherConversationNotFound,
-    prepareTeacherRuntimeTurnFromPayload,
-    runTeacherRuntimeTurn,
-    streamTeacherRuntimeTurn,
-    teacherStreamSseFrame,
-)
 
 logger = logging.getLogger(__name__)
-
-_HANDLED_ERRORS = (
-    AttributeError,
-    ProviderRuntimeError,
-    ConnectionError,
-    FileNotFoundError,
-    ImportError,
-    OSError,
-    PermissionError,
-    RuntimeError,
-    TypeError,
-    ValueError,
-)
 
 
 class AiProfileUpdateRequest(BaseModel):
@@ -69,7 +54,7 @@ class AiSecretUpdateRequest(BaseModel):
 
 
 def _providerUnavailable(exc: Exception) -> HTTPException:
-    detail = providerErrorPayload(exc)
+    detail = chatFlowErrorPayload(exc)
     logger.info("provider unavailable: %s", detail.get("message"))
     return HTTPException(status_code=503, detail=detail)
 
@@ -180,18 +165,18 @@ def createAiRouter(state: Any) -> APIRouter:
     async def apiChat(request: Request):
         body = await request.json()
         convManager = getConversationManager()
-        runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
-            body=body,
-            convManager=convManager,
-            state=state,
-        )
 
         try:
-            return await runTeacherRuntimeTurn(
-                runtimeTurn,
+            return await runChatTurnPayload(
+                payload=body,
                 convManager=convManager,
+                sessionManager=state.sessionManager,
+                documentPath=state.documentPath,
+                workspaceRoot=state.workspaceRoot,
             )
-        except _HANDLED_ERRORS as exc:
+        except ChatFlowConversationNotFound as exc:
+            raise HTTPException(status_code=404, detail="Conversation not found") from exc
+        except CHAT_FLOW_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
 
     @router.post("/api/ai/chat/stream")
@@ -200,49 +185,24 @@ def createAiRouter(state: Any) -> APIRouter:
 
         body = await request.json()
         convManager = getConversationManager()
-        runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
-            body=body,
-            convManager=convManager,
-            state=state,
-        )
-
-        async def _streamGenerate():
-            async for event in streamTeacherRuntimeTurn(
-                runtimeTurn,
+        try:
+            frames = streamChatTurnSseFrames(
+                payload=body,
                 convManager=convManager,
-            ):
-                yield teacherStreamSseFrame(event)
+                sessionManager=state.sessionManager,
+                documentPath=state.documentPath,
+                workspaceRoot=state.workspaceRoot,
+            )
+        except ChatFlowConversationNotFound as exc:
+            raise HTTPException(status_code=404, detail="Conversation not found") from exc
+        except CHAT_FLOW_ERRORS as exc:
+            raise _providerUnavailable(exc) from exc
 
-        return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
+        return StreamingResponse(frames, media_type="text/event-stream")
 
     @router.post("/api/ai/complete")
     async def apiComplete(request: Request):
         body = await request.json()
-        completionRequest = CodeCompletionRequest.fromPayload(body)
-
-        try:
-            return completeCodeFromRequest(
-                profileManager=getProfileManager(),
-                request=completionRequest,
-            ).payload()
-        except _HANDLED_ERRORS as exc:
-            logger.info("completion failed: %s", exc)
-            return emptyCompletionResult().payload()
+        return buildCodeCompletionPayload(body)
 
     return router
-
-
-def _prepareTeacherRuntimeTurnForHttp(*, body: dict[str, Any], convManager: Any, state: Any):
-    try:
-        return prepareTeacherRuntimeTurnFromPayload(
-            convManager=convManager,
-            profileManager=getProfileManager(),
-            sessionManager=state.sessionManager,
-            documentPath=state.documentPath,
-            workspaceRoot=state.workspaceRoot,
-            payload=body,
-        )
-    except TeacherConversationNotFound as exc:
-        raise HTTPException(status_code=404, detail="Conversation not found") from exc
-    except _HANDLED_ERRORS as exc:
-        raise _providerUnavailable(exc) from exc

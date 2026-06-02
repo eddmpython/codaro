@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from codaro.api.spaRouter import createSpaRouter
 
 import codaro.api.aiRouter as aiRouterModule
+import codaro.ai.chatFlow as chatFlowModule
 import codaro.ai.profileFlow as profileFlowModule
 from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
 from codaro.ai.conversation import ConversationManager
@@ -430,7 +431,7 @@ def testAiChatReportsOauthRefreshExpiredAsReloginDiagnostic(monkeypatch, tmp_pat
     def failValidToken():
         raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
 
-    monkeypatch.setattr(aiRouterModule, "getProfileManager", lambda: profileManager)
+    monkeypatch.setattr(chatFlowModule, "getProfileManager", lambda: profileManager)
     monkeypatch.setattr(aiRouterModule, "getConversationManager", lambda: conversationManager)
     monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failValidToken)
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
@@ -461,7 +462,7 @@ def testAiChatStreamReportsOauthRefreshExpiredAsDiagnosticEvent(monkeypatch, tmp
     def failValidToken():
         raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
 
-    monkeypatch.setattr(aiRouterModule, "getProfileManager", lambda: profileManager)
+    monkeypatch.setattr(chatFlowModule, "getProfileManager", lambda: profileManager)
     monkeypatch.setattr(aiRouterModule, "getConversationManager", lambda: conversationManager)
     monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failValidToken)
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
