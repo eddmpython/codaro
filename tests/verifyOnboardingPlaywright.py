@@ -81,6 +81,7 @@ def main(argv: list[str] | None = None) -> int:
         sidebar = recordCheck(checks, "curriculum-sidebar-groups", cli.eval(jsAssertCurriculumSidebarGroups()))
         sidebarClearance = recordCheck(checks, "curriculum-sidebar-scrollbar-clearance", cli.eval(jsAssertCurriculumSidebarScrollbarClearance()))
         sidebarToggle = recordCheck(checks, "curriculum-sidebar-toggle", cli.eval(jsAssertCurriculumSidebarToggle()))
+        curriculumHome = recordCheck(checks, "curriculum-home", cli.eval(jsAssertCurriculumHome()))
         cli.eval(jsOpenSurface("대화"))
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
         api.ready = True
@@ -105,7 +106,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(
             f"ok: onboarding browser verified {fallback} {diagnosticExport} {providerCta} "
-            f"{fallbackSettings} {defaultLesson} {sidebar} {sidebarClearance} {sidebarToggle} {ready} {settings}"
+            f"{fallbackSettings} {defaultLesson} {sidebar} {sidebarClearance} {sidebarToggle} "
+            f"{curriculumHome} {ready} {settings}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
@@ -297,6 +299,14 @@ class OnboardingStubApi:
                         ],
                         "learningPaths": {},
                     })
+                elif path == "/api/curriculum/progress":
+                    self._sendJson({
+                        "totalAccessed": 5,
+                        "totalCompleted": 2,
+                        "categoryProgress": {"30days": {"completed": 2, "accessed": 5}},
+                        "resume": {"category": "30days", "contentId": "hello"},
+                        "updatedAt": "2026-06-02T00:00:00+00:00",
+                    })
                 elif path.startswith("/api/curriculum/contents/"):
                     self._sendJson({"category": "python", "categoryName": "Python", "contents": [{"contentId": "hello", "title": "Hello World"}]})
                 elif path.startswith("/api/curriculum/content/"):
@@ -391,7 +401,7 @@ def jsAssertFallbackOnboarding() -> str:
   const accessibleSidebarTriggers = [...document.querySelectorAll('button')]
     .filter((button) => button.textContent?.includes('사이드바 전환'));
   const rail = document.querySelector('[data-sidebar="rail"]');
-  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', '진단 복사', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
+  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', '진단 복사', 'Pandas 실습', '브라우저 자동화 배우기', '검증 후 자동화'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('fallback onboarding missing: ' + missing.join(', '));
   if (!providerButton || providerButton.disabled) throw new Error('Provider 연결 button is missing or disabled');
@@ -500,6 +510,27 @@ def jsAssertCurriculumSidebarGroups() -> str:
 """)
 
 
+def jsAssertCurriculumHome() -> str:
+    return compactJs("""
+(async () => {
+  const entry = document.querySelector('[data-curriculum-home-entry="true"]');
+  if (!entry) throw new Error('curriculum home sidebar entry missing');
+  entry.click();
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  const home = document.querySelector('[data-curriculum-home="true"]');
+  if (!home) throw new Error('curriculum home did not render after clicking home entry');
+  const text = home.innerText;
+  if (!text.includes('완료')) throw new Error('curriculum home progress copy missing');
+  const resume = document.querySelector('[data-curriculum-home-resume="true"]');
+  if (!resume) throw new Error('curriculum home resume CTA missing');
+  if (!resume.textContent || !resume.textContent.includes('이어서 학습')) throw new Error('curriculum home resume label missing');
+  const cards = document.querySelectorAll('[data-curriculum-home-category]');
+  if (cards.length < 1) throw new Error('curriculum home category cards missing');
+  return 'curriculum-home-ok';
+})()
+""")
+
+
 def jsAssertCurriculumDefaultLesson() -> str:
     return compactJs("""
 (() => {
@@ -573,7 +604,8 @@ def jsAssertCurriculumSidebarToggle() -> str:
 def jsOpenSurface(label: str) -> str:
     return compactJs(f"""
 (() => {{
-  const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === {json.dumps(label, ensure_ascii=False)});
+  const target = {json.dumps(label, ensure_ascii=False)}.replace(/\\s+/g, '');
+  const button = [...document.querySelectorAll('button')].find((item) => (item.textContent || '').replace(/\\s+/g, '').endsWith(target));
   if (!button) throw new Error({json.dumps(label + ' surface button missing', ensure_ascii=False)});
   button.click();
   return {json.dumps(label + '-surface-opened', ensure_ascii=False)};
