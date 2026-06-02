@@ -230,10 +230,22 @@ export type CurriculumLessonPayload = {
   };
 };
 
+export type CategoryProgressEntry = {
+  completed: number;
+  accessed: number;
+};
+
+export type ProgressResumeTarget = {
+  category: string;
+  contentId: string;
+};
+
 export type ProgressSummary = {
   totalAccessed: number;
   totalCompleted: number;
   updatedAt?: string;
+  categoryProgress?: Record<string, CategoryProgressEntry>;
+  resume?: ProgressResumeTarget | null;
 };
 
 export type CurriculumOutcome = {

@@ -402,6 +402,7 @@ function App() {
               onRunNotebook={runNotebook}
               onRunTask={runTask}
               onSelectBlock={selectBlock}
+              onSelectCategory={selectCurriculumCategory}
               onSelectCurriculumBlock={setSelectedCurriculumBlockId}
               onSelectCurriculumLesson={(category, contentId) => {
                 selectCurriculumCategory(category);

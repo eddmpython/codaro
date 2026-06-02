@@ -23,6 +23,7 @@ type ResultMap = Record<string, ExecutionResult>;
 const AutomationView = lazy(() => import("@/components/automation/automationSurface").then((module) => ({ default: module.AutomationView })));
 const ChatSurface = lazy(() => import("@/components/chat/chatSurface").then((module) => ({ default: module.ChatSurface })));
 const CurrentLearningSurface = lazy(() => import("@/components/app/currentLearningSurface").then((module) => ({ default: module.CurrentLearningSurface })));
+const CurriculumHome = lazy(() => import("@/components/curriculum/curriculumHome").then((module) => ({ default: module.CurriculumHome })));
 const NotebookSurface = lazy(() => import("@/components/app/notebookSurface").then((module) => ({ default: module.NotebookSurface })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
@@ -75,6 +76,7 @@ type MainSurfaceProps = {
   onRunNotebook: () => void;
   onRunTask: (task: TaskDefinition) => void;
   onSelectBlock: (blockId: string) => void;
+  onSelectCategory: (category: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
   onSelectCurriculumLesson: (category: string, contentId: string) => void;
   onToggleEStop: () => void;
@@ -147,6 +149,15 @@ function MainSurfaceContent(props: MainSurfaceProps) {
   }
 
   if (props.surface === "curriculum") {
+    if (!props.selectedContentId) {
+      return (
+        <CurriculumHome
+          categories={props.categories}
+          onSelectCategory={props.onSelectCategory}
+          onSelectLesson={props.onSelectCurriculumLesson}
+        />
+      );
+    }
     return (
       <CurrentLearningSurface
         aiConnecting={props.aiConnecting}

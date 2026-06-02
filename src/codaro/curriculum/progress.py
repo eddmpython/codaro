@@ -158,14 +158,40 @@ class ProgressTracker:
         progress = self.load()
         totalLessons = len(progress.lessons)
         completedLessons = sum(1 for l in progress.lessons.values() if l.completedAt)
+        categoryProgress = self._summarizeByCategory(progress)
+        resume = self._resumeTarget(progress)
         return {
             "totalAccessed": totalLessons,
             "totalCompleted": completedLessons,
             "validatedOutcomeCount": len(progress.validatedOutcomes),
             "autoValidatedOutcomeCount": len(progress.autoValidatedOutcomes),
             "creditedOutcomeCount": len(progress.outcomeCredits),
+            "categoryProgress": categoryProgress,
+            "resume": resume,
             "updatedAt": progress.updatedAt,
         }
+
+    @staticmethod
+    def _summarizeByCategory(progress: UserProgress) -> dict[str, dict[str, int]]:
+        summary: dict[str, dict[str, int]] = {}
+        for lesson in progress.lessons.values():
+            bucket = summary.setdefault(lesson.category, {"completed": 0, "accessed": 0})
+            bucket["accessed"] += 1
+            if lesson.completedAt:
+                bucket["completed"] += 1
+        return summary
+
+    @staticmethod
+    def _resumeTarget(progress: UserProgress) -> dict[str, str] | None:
+        candidate: LessonProgress | None = None
+        for lesson in progress.lessons.values():
+            if lesson.completedAt or not lesson.lastAccessedAt:
+                continue
+            if candidate is None or lesson.lastAccessedAt > (candidate.lastAccessedAt or ""):
+                candidate = lesson
+        if candidate is None:
+            return None
+        return {"category": candidate.category, "contentId": candidate.contentId}
 
     def listValidatedOutcomes(self) -> set[str]:
         progress = self.load()

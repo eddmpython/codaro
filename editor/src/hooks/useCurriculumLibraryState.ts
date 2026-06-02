@@ -48,7 +48,10 @@ export function useCurriculumLibraryState({
         if (cancelled) return;
         if (result) {
           setContents(result.contents);
-          setSelectedContentId(result.selectedContentId);
+          // 빈 contentId는 "학습 홈" 의도 — 자동으로 첫 레슨을 채우지 않는다.
+          if (selectedContentId) {
+            setSelectedContentId(result.selectedContentId);
+          }
         }
       } finally {
         if (!cancelled) setContentsLoading(false);

@@ -189,6 +189,7 @@ export function ProductSidebar({
                   text={{
                     codaroCurriculum: t("sidebar.codaroCurriculum"),
                     curriculumEmpty: t("sidebar.curriculumEmpty"),
+                    curriculumHome: t("sidebar.curriculumHome"),
                     loading: t("sidebar.curriculumLoading"),
                     myCurriculum: t("sidebar.myCurriculum"),
                     other: locale === "en" ? "Other" : "기타",

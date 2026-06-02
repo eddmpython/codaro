@@ -1,6 +1,7 @@
 import {
   ChevronRight,
   GraduationCap,
+  Home,
   Loader2,
   Trash2,
 } from "lucide-react";
@@ -40,6 +41,7 @@ type CurriculumSidebarTreeProps = {
   text: {
     codaroCurriculum: string;
     curriculumEmpty: string;
+    curriculumHome: string;
     loading: string;
     myCurriculum: string;
     other: string;
@@ -87,6 +89,18 @@ export function CurriculumSidebarTree({
         <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.codaroCurriculum}</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                data-curriculum-home-entry="true"
+                isActive={!selectedContentId}
+                tooltip={text.curriculumHome}
+                onClick={() => onSelectContent("")}
+              >
+                <Home />
+                <span>{text.curriculumHome}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             {curriculumTree.map((node) => (
               <CurriculumTreeNodeItem
                 contents={contents}
