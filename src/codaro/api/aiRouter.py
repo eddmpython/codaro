@@ -15,21 +15,19 @@ from ..ai.conversation import (
     getConversationManager,
 )
 from ..ai.oauthFlow import getOAuthLoginFlow
-from ..ai.profile import AiProfileManager, getProfileManager
-from ..ai.profileEvents import streamProfileChangeEvents
-from ..ai.providerModels import providerModelList
-from ..ai.profileMutation import (
-    ProfileMutationError,
-    ProviderProfileUpdate,
-    ProviderSecretUpdate,
-    updateProviderProfile,
-    updateProviderSecret,
+from ..ai.profile import getProfileManager
+from ..ai.profileFlow import (
+    ProfileFlowError,
+    buildProviderCatalogPayload,
+    buildProviderModelsPayload,
+    buildProviderProfilePayload,
+    buildProviderToolsPayload,
+    streamProviderProfileEvents,
+    updateProviderProfilePayload,
+    updateProviderSecretPayload,
+    validateProviderConnectionPayload,
 )
-from ..ai.providerValidation import validateProviderConnection
 from ..ai.providerErrors import ProviderRuntimeError, providerErrorPayload
-from ..ai.providerSpec import (
-    buildProviderCatalog,
-)
 from ..ai.teacher import (
     TeacherConversationNotFound,
     prepareTeacherRuntimeTurnFromPayload,
@@ -81,44 +79,40 @@ def createAiRouter(state: Any) -> APIRouter:
 
     @router.get("/api/ai/providers")
     def apiAiProviders():
-        return {"catalog": buildProviderCatalog()}
+        return buildProviderCatalogPayload()
 
     @router.get("/api/ai/profile")
     def apiAiProfile():
-        return getProfileManager().serialize()
+        return buildProviderProfilePayload()
 
     @router.get("/api/ai/tools")
     def apiAiTools():
-        from ..ai.tools import toolManifest
-
-        return toolManifest()
+        return buildProviderToolsPayload()
 
     @router.put("/api/ai/profile")
     def apiAiProfileUpdate(req: AiProfileUpdateRequest):
         try:
-            return updateProviderProfile(
-                getProfileManager(),
-                ProviderProfileUpdate(
-                    provider=req.provider,
-                    model=req.model,
-                    role=req.role,
-                    baseUrl=req.baseUrl,
-                    temperature=req.temperature,
-                    maxTokens=req.maxTokens,
-                    systemPrompt=req.systemPrompt,
-                ),
+            return updateProviderProfilePayload(
+                provider=req.provider,
+                model=req.model,
+                role=req.role,
+                baseUrl=req.baseUrl,
+                temperature=req.temperature,
+                maxTokens=req.maxTokens,
+                systemPrompt=req.systemPrompt,
             )
-        except ProfileMutationError as exc:
+        except ProfileFlowError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.post("/api/ai/profile/secrets")
     def apiAiProfileSecret(req: AiSecretUpdateRequest):
         try:
-            return updateProviderSecret(
-                getProfileManager(),
-                ProviderSecretUpdate(provider=req.provider, apiKey=req.apiKey, clear=req.clear),
+            return updateProviderSecretPayload(
+                provider=req.provider,
+                apiKey=req.apiKey,
+                clear=req.clear,
             )
-        except ProfileMutationError as exc:
+        except ProfileFlowError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.post("/api/ai/provider/validate")
@@ -127,24 +121,22 @@ def createAiRouter(state: Any) -> APIRouter:
         model: str | None = Query(None),
         probe: str = Query("availability"),
     ):
-        return validateProviderConnection(
+        return validateProviderConnectionPayload(
             provider=provider,
             model=model,
             probe=probe,
-            profileManager=getProfileManager(),
-        ).payload()
+        )
 
     @router.get("/api/ai/models/{provider}")
     def apiModels(provider: str):
-        return {"models": providerModelList(provider, profileManager=getProfileManager())}
+        return buildProviderModelsPayload(provider)
 
     @router.get("/api/ai/profile/events")
     async def apiAiProfileEvents(request: Request):
         from starlette.responses import StreamingResponse
 
         return StreamingResponse(
-            streamProfileChangeEvents(
-                manager=getProfileManager(),
+            streamProviderProfileEvents(
                 isDisconnected=request.is_disconnected,
             ),
             media_type="text/event-stream",

@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from codaro.api.spaRouter import createSpaRouter
 
 import codaro.api.aiRouter as aiRouterModule
+import codaro.ai.profileFlow as profileFlowModule
 from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
 from codaro.ai.conversation import ConversationManager
 from codaro.ai.oauthToken import TokenRefreshError
@@ -388,7 +389,7 @@ def testProviderValidateUsesProviderValidationDomain(monkeypatch) -> None:
         captured.update(kwargs)
         return _ValidationResult()
 
-    monkeypatch.setattr(aiRouterModule, "validateProviderConnection", fakeValidateProviderConnection)
+    monkeypatch.setattr(profileFlowModule, "validateProviderConnection", fakeValidateProviderConnection)
     client = TestClient(createServerApp())
 
     response = client.post("/api/ai/provider/validate?provider=custom&model=demo-model")
@@ -412,7 +413,7 @@ def testProviderValidatePassesResponseProbe(monkeypatch) -> None:
         captured.update(kwargs)
         return _ValidationResult()
 
-    monkeypatch.setattr(aiRouterModule, "validateProviderConnection", fakeValidateProviderConnection)
+    monkeypatch.setattr(profileFlowModule, "validateProviderConnection", fakeValidateProviderConnection)
     client = TestClient(createServerApp())
 
     response = client.post("/api/ai/provider/validate?provider=custom&probe=response")

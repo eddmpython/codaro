@@ -86,6 +86,69 @@ def testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary() -> None:
     assert "streamTeacherRuntimeTurn" in source
 
 
+def testAiRouterKeepsProviderProfileBehindFlowBoundary() -> None:
+    source = (ROOT / "src/codaro/api/aiRouter.py").read_text(encoding="utf-8")
+    flow = (ROOT / "src/codaro/ai/profileFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    blockedModules = {
+        "ai.profileMutation",
+        "ai.providerValidation",
+        "ai.providerModels",
+        "ai.providerSpec",
+        "ai.profileEvents",
+    }
+    requiredFlowCalls = (
+        "buildProviderCatalogPayload",
+        "buildProviderProfilePayload",
+        "buildProviderToolsPayload",
+        "updateProviderProfilePayload",
+        "updateProviderSecretPayload",
+        "validateProviderConnectionPayload",
+        "buildProviderModelsPayload",
+        "streamProviderProfileEvents",
+    )
+    forbiddenRouterCalls = (
+        "buildProviderCatalog(",
+        "getProfileManager().serialize",
+        "toolManifest(",
+        "ProviderProfileUpdate(",
+        "ProviderSecretUpdate(",
+        "updateProviderProfile(",
+        "updateProviderSecret(",
+        "validateProviderConnection(",
+        "providerModelList(",
+        "streamProfileChangeEvents(",
+    )
+
+    assert "ai.profileFlow" in importedModules
+    assert all(module not in blockedModules for module in importedModules)
+    for call in requiredFlowCalls:
+        assert call in source
+        assert f"def {call}" in flow
+    for call in forbiddenRouterCalls:
+        assert call not in source
+
+
+def testProviderProfileFlowDoesNotImportTransportLayer() -> None:
+    source = (ROOT / "src/codaro/ai/profileFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
+
+
 def testTeacherRuntimeTurnExecutionOwnsPreparedTurnUnpacking() -> None:
     source = (ROOT / "src/codaro/ai/teacher/turnExecution.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
