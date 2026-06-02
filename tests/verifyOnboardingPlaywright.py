@@ -304,6 +304,9 @@ class OnboardingStubApi:
                     self._sendJson({
                         "totalAccessed": 5,
                         "totalCompleted": 2,
+                        "validatedOutcomeCount": 3,
+                        "autoValidatedOutcomeCount": 1,
+                        "creditedOutcomeCount": 6,
                         "categoryProgress": {"30days": {"completed": 2, "accessed": 5}},
                         "resume": {"category": "30days", "contentId": "hello"},
                         "learningPath": {
@@ -581,6 +584,9 @@ def jsAssertCurriculumHome() -> str:
   if (!home) throw new Error('curriculum home did not render after clicking home entry');
   const text = home.innerText;
   if (!text.includes('완료')) throw new Error('curriculum home progress copy missing');
+  const mastery = document.querySelector('[data-curriculum-home-mastery="true"]');
+  if (!mastery) throw new Error('curriculum home mastery stat missing');
+  if (!mastery.textContent || !mastery.textContent.includes('숙달한 개념')) throw new Error('curriculum home mastery label missing');
   const resume = document.querySelector('[data-curriculum-home-resume="true"]');
   if (!resume) throw new Error('curriculum home resume CTA missing');
   if (!resume.textContent || !resume.textContent.includes('이어서 학습')) throw new Error('curriculum home resume label missing');

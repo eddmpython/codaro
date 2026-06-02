@@ -65,6 +65,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
   );
   const completedLessons = summary?.totalCompleted ?? 0;
   const overallPercent = percent(completedLessons, totalLessons);
+  const masteredOutcomes = (summary?.validatedOutcomeCount ?? 0) + (summary?.autoValidatedOutcomeCount ?? 0);
   const categoryProgress = summary?.categoryProgress ?? {};
   const resume = summary?.resume ?? null;
   const resumeLabel = resume
@@ -102,6 +103,15 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                 </span>
               </div>
               <Progress className="mt-2" value={overallPercent} />
+              {masteredOutcomes > 0 ? (
+                <div
+                  className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400"
+                  data-curriculum-home-mastery="true"
+                >
+                  <CheckCircle2 className="size-3.5" />
+                  <span>숙달한 개념 {masteredOutcomes}개</span>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">

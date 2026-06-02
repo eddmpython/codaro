@@ -269,6 +269,9 @@ export type ProgressSummary = {
   categoryProgress?: Record<string, CategoryProgressEntry>;
   resume?: ProgressResumeTarget | null;
   learningPath?: LearningPathSummary | null;
+  validatedOutcomeCount?: number;
+  autoValidatedOutcomeCount?: number;
+  creditedOutcomeCount?: number;
 };
 
 export type CurriculumOutcome = {
