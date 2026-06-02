@@ -1,0 +1,59 @@
+meta:
+  outcomeId: python.intro
+  status: draft
+  version: 1
+  note: "초안 — 첫 레슨(Hello World·print) 오개념 시드. Predict-Run-Reconcile-Adapt 루프 1단계. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.intro.printWithoutParentheses
+    label: "print 를 괄호 없이 호출하기"
+    summary: "Python 2 처럼 print \"Hello\" 로 적어 SyntaxError 가 발생한다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "(^|\\n)\\s*print[ \\t]+['\"]"
+        description: "print 뒤에 괄호 없이 곧바로 문자열을 적는 패턴."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*Missing parentheses in call to 'print'"
+        description: "Python 3 가 괄호 없는 print 를 거부."
+    diagnostic:
+      message: "Python 3 에서 print 는 함수입니다. 출력할 값을 괄호로 감싸야 합니다. `print \"Hello\"` 가 아니라 `print(\"Hello\")`."
+      references: ["python.intro"]
+    correction:
+      hint: "출력할 값을 괄호 안에 넣으세요. `print(\"Hello World\")`."
+      miniExercise: |
+        print("Hello World")
+
+  - id: python.intro.unterminatedString
+    label: "따옴표를 닫지 않거나 짝을 섞기"
+    summary: "여는 따옴표와 닫는 따옴표가 맞지 않아 문자열이 끝나지 않는다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*(unterminated string literal|EOL while scanning string literal)"
+        description: "문자열이 닫히지 않아 발생하는 SyntaxError."
+    diagnostic:
+      message: "문자열은 시작한 따옴표와 같은 종류의 따옴표로 닫아야 합니다. `'Hello\"` 처럼 짝을 섞으면 끝나지 않습니다."
+      references: ["python.intro"]
+    correction:
+      hint: "여는 따옴표와 닫는 따옴표를 같은 종류로 맞추세요. `\"Hello\"` 또는 `'Hello'`."
+      miniExercise: |
+        print("Hello")
+
+  - id: python.intro.bareWordString
+    label: "문자열을 따옴표 없이 적기"
+    summary: "Hello 처럼 따옴표 없이 적으면 이름(변수)으로 해석돼 NameError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "NameError: name '[A-Za-z_][A-Za-z0-9_]*' is not defined"
+        description: "정의되지 않은 이름 참조 — 따옴표 누락 또는 미정의 변수."
+    diagnostic:
+      message: "따옴표가 없으면 Python 은 그 단어를 변수 이름으로 봅니다. 글자를 그대로 출력하려면 따옴표로 감싸고, 변수라면 먼저 값을 정의했는지 확인하세요."
+      references: ["python.intro", "python.variables"]
+    correction:
+      hint: "문자라면 `print(\"Hello\")` 처럼 따옴표로 감싸고, 변수라면 사용 전에 `name = \"Hello\"` 로 정의하세요."
+      miniExercise: |
+        name = "Hello"
+        print(name)

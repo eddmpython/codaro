@@ -167,6 +167,20 @@ def testCodePatternMatchesAssignmentReversal() -> None:
     assert "python.variables.assignmentReversal" in ids
 
 
+def testCodePatternMatchesPrintWithoutParentheses() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.intro.yml")
+    hits = matchCodePattern(catalog, 'print "Hello World"')
+    ids = {hit.id for hit in hits}
+    assert "python.intro.printWithoutParentheses" in ids
+
+
+def testErrorPatternMatchesBareWordNameError() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.intro.yml")
+    hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nNameError: name 'Hello' is not defined")
+    ids = {hit.id for hit in hits}
+    assert "python.intro.bareWordString" in ids
+
+
 def testErrorPatternMatchesKeyError() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dictsAndSets.yml")
     hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'banana'")
