@@ -14,6 +14,7 @@ import {
   Star,
   Target,
   TerminalSquare,
+  Trophy,
 } from "lucide-react";
 import { useMemo, useState, type ComponentType, type ReactNode } from "react";
 
@@ -739,6 +740,7 @@ function StructuredSectionLearningBody({
   const [checking, setChecking] = useState(false);
   const [hintLevel, setHintLevel] = useState(0);
   const [lockedPrediction, setLockedPrediction] = useState<LearnerPrediction | null>(null);
+  const [lessonCompleted, setLessonCompleted] = useState(false);
 
   const runCheck = async (level: number) => {
     if (!exercise || !sessionId) return;
@@ -763,7 +765,8 @@ function StructuredSectionLearningBody({
       setHintLevel(result.hintLevel ?? level);
       if (result.passed && exercise && totalMissions > 0) {
         try {
-          await recordLessonMissionComplete(category, contentId, exercise.id, totalMissions);
+          const completion = await recordLessonMissionComplete(category, contentId, exercise.id, totalMissions);
+          if (completion.lessonCompleted) setLessonCompleted(true);
         } catch (completionError) {
           console.warn("lesson completion record failed", completionError);
         }
@@ -912,6 +915,16 @@ function StructuredSectionLearningBody({
                 }
                 onNextHint={() => void runCheck(Math.min(hintLevel + 1, hintCount))}
               />
+            </div>
+          ) : null}
+
+          {lessonCompleted ? (
+            <div
+              className="mt-3 flex items-center gap-2 rounded-md border border-emerald-400/50 bg-emerald-100/40 px-3 py-2 text-sm font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200"
+              data-lesson-completed="true"
+            >
+              <Trophy className="size-4" />
+              이 레슨의 실습을 모두 끝냈어요! 🎉
             </div>
           ) : null}
         </div>

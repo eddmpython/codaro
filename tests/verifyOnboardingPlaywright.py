@@ -701,6 +701,13 @@ def jsAssertExerciseCheck() -> str:
   if (!passPanel) throw new Error('passing check panel did not render after retry');
   if (!passPanel.textContent || !passPanel.textContent.includes('검증 통과')) throw new Error('check pass label missing');
   if (!passPanel.querySelector('[data-check-next-action]')) throw new Error('check next-action missing on pass');
+  let completed = null;
+  for (let i = 0; i < 40; i++) {
+    completed = document.querySelector('[data-lesson-completed="true"]');
+    if (completed) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!completed) throw new Error('lesson completion celebration missing after final pass');
   return 'exercise-check-ok';
 })()
 """)
