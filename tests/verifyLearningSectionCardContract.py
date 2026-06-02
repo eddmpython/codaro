@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SURFACE = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumSurface.tsx"
+DEPENDENCY_PANEL = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumDependencyPanel.tsx"
 MARKDOWN_BODY = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumMarkdownBody.tsx"
 APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives.tsx"
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
@@ -37,12 +38,13 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
+    for path in (SURFACE, DEPENDENCY_PANEL, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
 
     text = SURFACE.read_text(encoding="utf-8")
+    dependencyPanelText = DEPENDENCY_PANEL.read_text(encoding="utf-8")
     cellActionsText = CELL_ACTIONS.read_text(encoding="utf-8")
     aiPanelText = AI_PANEL.read_text(encoding="utf-8")
     appText = APP.read_text(encoding="utf-8")
@@ -67,25 +69,8 @@ def main() -> int:
         "workflow renderer": "function WorkflowArchitectureDiagram",
         "workflow step resolver": "function workflowArchitectureSteps",
         "workflow generic guard": "function isSpecificWorkflowStep",
-        "package panel marker": 'data-learning-package-panel="true"',
-        "package panel explicit package source": "declaredDocumentPackages(document)",
-        "package status marker": "data-learning-package-status={packageStatus}",
-        "package install action marker": 'data-learning-package-install="true"',
-        "package item marker": "data-learning-package-item={packageName}",
-        "package installed marker": 'data-learning-package-installed={installed ? "true" : "false"}',
-        "package command row marker": 'data-learning-package-command-row="true"',
-        "package command marker": 'data-learning-package-command="true"',
-        "package terminal open marker": 'data-learning-package-terminal-open="true"',
-        "package terminal run copy": "터미널에서 실행",
-        "package progress marker": 'data-learning-package-progress="true"',
-        "package progress state import": "type PackageInstallProgress",
-        "package installed names model": "installedCurriculumPackageNameSet(installedPackages)",
-        "package missing model": "missingCurriculumPackages(requiredPackages, installedNames)",
-        "package command ready model": "curriculumPackageTerminalCommandReady({ apiOnline, installCommand, missingPackages })",
-        "package active message model": "curriculumPackageActiveMessage({ checking, installProgress })",
-        "package status model": "curriculumPackageStatus({ checking, error, installProgress, missingPackages })",
-        "package install button progress": "${installProgress.index}/${installProgress.total} 설치 중",
-        "package ready copy": "준비됨",
+        "package dependency panel shell": "<CurriculumDependencyPanel",
+        "package dependency panel import": 'from "./curriculumDependencyPanel"',
         "exercise marker": 'data-learning-section-part="exercise"',
         "exercise direct editor marker": 'data-learning-exercise-input="editor"',
         "exercise student practice role": 'data-learning-exercise-input-role="student-practice"',
@@ -120,6 +105,31 @@ def main() -> int:
     }
     for label, token in required_tokens.items():
         require(text, token, label, failures)
+
+    package_panel_tokens = {
+        "package panel marker": 'data-learning-package-panel="true"',
+        "package panel explicit package source": "declaredDocumentPackages(document)",
+        "package status marker": "data-learning-package-status={packageStatus}",
+        "package install action marker": 'data-learning-package-install="true"',
+        "package item marker": "data-learning-package-item={packageName}",
+        "package installed marker": 'data-learning-package-installed={installed ? "true" : "false"}',
+        "package command row marker": 'data-learning-package-command-row="true"',
+        "package command marker": 'data-learning-package-command="true"',
+        "package terminal open marker": 'data-learning-package-terminal-open="true"',
+        "package terminal run copy": "터미널에서 실행",
+        "package progress marker": 'data-learning-package-progress="true"',
+        "package progress state import": "type PackageInstallProgress",
+        "package installed names model": "installedCurriculumPackageNameSet(installedPackages)",
+        "package missing model": "missingCurriculumPackages(requiredPackages, installedNames)",
+        "package command ready model": "curriculumPackageTerminalCommandReady({ apiOnline, installCommand, missingPackages })",
+        "package active message model": "curriculumPackageActiveMessage({ checking, installProgress })",
+        "package status model": "curriculumPackageStatus({ checking, error, installProgress, missingPackages })",
+        "package install button progress": "${installProgress.index}/${installProgress.total} 설치 중",
+        "package ready copy": "준비됨",
+        "package install result copy": "packageInstallStatusText",
+    }
+    for label, token in package_panel_tokens.items():
+        require(dependencyPanelText, token, label, failures)
 
     cell_action_tokens = {
         "cell help popover marker": 'data-cell-ai-popover="true"',
@@ -266,6 +276,9 @@ def main() -> int:
             "data-learning-section-contract-gaps",
             "sectionContractGapLabels",
             "AlertTriangle",
+            "curriculumPackagePreparation",
+            "installCurriculumPackage",
+            "listCurriculumPackages",
         ),
         AI_PANEL: (
             "Codaro 어시스턴트",

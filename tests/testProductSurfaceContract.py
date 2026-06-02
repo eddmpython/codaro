@@ -254,6 +254,8 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "application payload",
         "`editor/src/lib/customCurricula.ts`",
         "`saveAndOpenCustomCurriculum`",
+        "`editor/src/components/curriculum/curriculumDependencyPanel.tsx`",
+        "패키지 확인/누락 설치/터미널 명령 열기",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
         "`tests/testProductSurfaceContract.py`",

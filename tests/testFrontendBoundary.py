@@ -41,8 +41,19 @@ def testCurriculumSurfaceDoesNotCallTransportApiDirectly() -> None:
 
     assert 'from "@/lib/api"' not in source
     assert "codaroApi" not in source
+    assert "CurriculumDependencyPanel" in source
+    assert "listCurriculumPackages" not in source
+    assert "installCurriculumPackage" not in source
+
+
+def testCurriculumDependencyPanelDelegatesPackageApiBoundary() -> None:
+    source = _read("editor/src/components/curriculum/curriculumDependencyPanel.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
     assert "listCurriculumPackages" in source
     assert "installCurriculumPackage" in source
+    assert "curriculumPackageInstallCommand" in source
 
 
 def testCurriculumPackagePreparationOwnsPackageApiBoundary() -> None:
