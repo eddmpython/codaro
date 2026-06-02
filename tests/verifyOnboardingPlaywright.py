@@ -314,6 +314,24 @@ class OnboardingStubApi:
                         },
                         "updatedAt": "2026-06-02T00:00:00+00:00",
                     })
+                elif path == "/api/curriculum/reviews":
+                    self._sendJson({
+                        "reviews": [
+                            {
+                                "lessonKey": "30days/hello",
+                                "title": "Hello World",
+                                "category": "30days",
+                                "contentId": "hello",
+                                "interval": 1,
+                                "ease": 2.5,
+                                "streak": 1,
+                                "lastResult": "success",
+                                "nextReviewAt": "2026-06-01T00:00:00+00:00",
+                                "daysOverdue": 1,
+                            },
+                        ],
+                        "totalDue": 1,
+                    })
                 elif path.startswith("/api/curriculum/contents/"):
                     self._sendJson({"category": "python", "categoryName": "Python", "contents": [{"contentId": "hello", "title": "Hello World"}]})
                 elif path.startswith("/api/curriculum/content/"):
@@ -542,6 +560,11 @@ def jsAssertCurriculumHome() -> str:
   const next = document.querySelector('[data-curriculum-home-journey-next="true"]');
   if (!next) throw new Error('curriculum home journey next CTA missing');
   if (!next.textContent || !next.textContent.includes('다음 단계')) throw new Error('curriculum home journey next label missing');
+  const reviews = document.querySelector('[data-curriculum-home-reviews="true"]');
+  if (!reviews) throw new Error('curriculum home review section missing');
+  if (!reviews.textContent || !reviews.textContent.includes('복습할 시간')) throw new Error('curriculum home review label missing');
+  const reviewItems = reviews.querySelectorAll('[data-curriculum-home-review]');
+  if (reviewItems.length < 1) throw new Error('curriculum home review items missing');
   return 'curriculum-home-ok';
 })()
 """)

@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, RotateCcw, Sparkles } from "lucide-react";
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import { useCurriculumReviews } from "@/hooks/useCurriculumReviews";
 import { cn } from "@/lib/utils";
 import type { CurriculumCategory } from "@/types";
 
@@ -42,7 +43,11 @@ function percent(completed: number, total: number): number {
 
 export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }: CurriculumHomeProps) {
   const { summary } = useCurriculumProgress();
+  const { reviews } = useCurriculumReviews();
   const groups = useMemo(() => groupByTrack(categories), [categories]);
+
+  const dueReviews = reviews?.reviews ?? [];
+  const totalDue = reviews?.totalDue ?? 0;
 
   const totalLessons = useMemo(
     () => categories.reduce((sum, category) => sum + (category.count || 0), 0),
@@ -113,6 +118,44 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
               ) : null}
             </div>
           </section>
+
+          {totalDue > 0 ? (
+            <section
+              className="rounded-xl border border-amber-300/60 bg-amber-50/50 p-4 dark:border-amber-500/30 dark:bg-amber-500/5"
+              data-curriculum-home-reviews="true"
+            >
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                <RotateCcw className="size-4" />
+                <h2 className="text-sm font-semibold">복습할 시간 · {totalDue}개</h2>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                간격을 두고 다시 풀면 배운 내용이 오래 남습니다. 오늘의 복습을 끝내 보세요.
+              </p>
+              <div className="mt-3 space-y-2">
+                {dueReviews.slice(0, 5).map((review) => (
+                  <button
+                    key={review.lessonKey}
+                    className="flex w-full items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
+                    data-curriculum-home-review={review.lessonKey}
+                    disabled={!review.contentId}
+                    onClick={() => review.contentId && onSelectLesson(review.category, review.contentId)}
+                    type="button"
+                  >
+                    <span className="truncate text-sm font-medium">{review.title}</span>
+                    <Badge
+                      className="shrink-0"
+                      variant={review.daysOverdue > 0 ? "destructive" : "outline"}
+                    >
+                      {review.daysOverdue > 0 ? `${review.daysOverdue}일 지남` : "오늘"}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+              {totalDue > 5 ? (
+                <p className="mt-2 text-[11px] text-muted-foreground">외 {totalDue - 5}개 더</p>
+              ) : null}
+            </section>
+          ) : null}
 
           {learningPath && learningPath.tracks.length > 0 ? (
             <section data-curriculum-home-journey="true">
