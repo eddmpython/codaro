@@ -399,10 +399,10 @@ class OnboardingStubApi:
                                 "summary": "출력할 문자열을 다르게 적었습니다.",
                                 "diagnostic": {"message": "기대한 'hello'와 다른 문자열을 출력했습니다.", "references": ["python.intro"]},
                                 "correction": {"hint": "정확히 'hello'를 출력하세요.", "miniExercise": "print('hello')"},
-                                "repeatStatus": "new",
-                                "hitCount": 1,
+                                "repeatStatus": "repeat",
+                                "hitCount": 2,
                             }],
-                            "doneCriterionViolated": False,
+                            "doneCriterionViolated": True,
                             "predictionDiff": {
                                 "overall": "mismatch",
                                 "fields": [{"field": "value", "status": "mismatch", "expected": "world", "actual": "hi", "note": "예측과 실제 출력이 다릅니다."}],
@@ -687,6 +687,8 @@ def jsAssertExerciseCheck() -> str:
   if (!predictionDiff.querySelector('[data-prediction-field="value"]')) throw new Error('prediction value field diff missing');
   if (!failPanel.querySelector('[data-check-ask-assistant="true"]')) throw new Error('ask-assistant button missing on fail');
   if (!failPanel.querySelector('[data-misconception-apply-correction="true"]')) throw new Error('apply-correction button missing on fail');
+  const correctionDetails = failPanel.querySelector('[data-misconception-id] details');
+  if (!correctionDetails || !correctionDetails.open) throw new Error('repeated misconception correction should auto-expand');
   const failNext = failPanel.querySelector('[data-check-next-action="studyCorrection"]');
   if (!failNext) throw new Error('studyCorrection next-action missing on fail');
   checkBtn.click();

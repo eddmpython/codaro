@@ -289,7 +289,7 @@ function MisconceptionList({
             </div>
           ) : null}
           {match.correction.miniExercise ? (
-            <details className="mt-1 text-[10px] text-muted-foreground">
+            <details className="mt-1 text-[10px] text-muted-foreground" open={match.repeatStatus === "repeat"}>
               <summary className="cursor-pointer">교정 코드 보기</summary>
               <pre className="mt-1 whitespace-pre-wrap rounded bg-background/70 p-2 font-mono leading-4">
                 {match.correction.miniExercise}
