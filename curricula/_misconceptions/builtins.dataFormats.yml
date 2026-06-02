@@ -1,0 +1,49 @@
+meta:
+  outcomeId: builtins.dataFormats
+  status: draft
+  version: 1
+  note: "초안 — json/csv 직렬화 흔한 오개념 시드. 실무 자동화 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: builtins.dataFormats.loadsVsDumps
+    label: "json.loads 와 json.dumps 를 혼동"
+    summary: "이미 dict 인 값을 json.loads 에 넘겨 TypeError 가 난다. loads=문자열→객체, dumps=객체→문자열."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "json\\.loads\\(\\s*\\{"
+        description: "json.loads 에 dict 리터럴을 직접 전달."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError: the JSON object must be str, bytes or bytearray"
+        description: "json.loads 에 문자열이 아닌 값 전달."
+    diagnostic:
+      message: "`json.loads` 는 **문자열을 파싱**해 객체로 만듭니다(load string). 이미 dict 라면 파싱할 필요가 없습니다. 반대로 객체를 문자열로 만들려면 `json.dumps` 를 쓰세요."
+      references: ["builtins.dataFormats"]
+    correction:
+      hint: "객체→문자열은 `json.dumps(obj)`, 문자열→객체는 `json.loads(text)`."
+      miniExercise: |
+        import json
+        obj = {"a": 1}
+        text = json.dumps(obj)
+        back = json.loads(text)
+        print(text, back)
+
+  - id: builtins.dataFormats.singleQuotedJson
+    label: "작은따옴표로 적은 JSON 을 파싱"
+    summary: "JSON 표준은 큰따옴표만 허용하는데 작은따옴표 문자열을 json.loads 해서 JSONDecodeError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "(JSONDecodeError|Expecting property name enclosed in double quotes)"
+        description: "JSON 표준 위반(작은따옴표/트레일링 콤마 등)."
+    diagnostic:
+      message: "JSON 은 문자열과 키를 **큰따옴표**로만 적습니다. `{'a': 1}` 처럼 작은따옴표를 쓰면 파싱에 실패합니다. Python 객체를 JSON 문자열로 만들 땐 직접 적지 말고 `json.dumps` 로 생성하세요."
+      references: ["builtins.dataFormats"]
+    correction:
+      hint: "Python 객체를 JSON 문자열로 만들 땐 `json.dumps`. 직접 적을 땐 큰따옴표를 쓰세요."
+      miniExercise: |
+        import json
+        text = json.dumps({"a": 1})
+        print(text)
+        print(json.loads(text))

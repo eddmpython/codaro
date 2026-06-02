@@ -258,6 +258,20 @@ def testErrorPatternMatchesKeyError() -> None:
     assert "python.dictsAndSets.missingKeyError" in ids
 
 
+def testCodePatternMatchesJsonLoadsOnDict() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.dataFormats.yml")
+    hits = matchCodePattern(catalog, "import json\njson.loads({'a': 1})")
+    ids = {hit.id for hit in hits}
+    assert "builtins.dataFormats.loadsVsDumps" in ids
+
+
+def testErrorPatternMatchesSingleQuotedJson() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.dataFormats.yml")
+    hits = matchErrorPattern(catalog, "json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2")
+    ids = {hit.id for hit in hits}
+    assert "builtins.dataFormats.singleQuotedJson" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"
