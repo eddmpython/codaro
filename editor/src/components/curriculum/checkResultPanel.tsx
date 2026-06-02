@@ -1,18 +1,35 @@
-import { AlertTriangle, ArrowRight, CheckCircle2, Eye, Lightbulb, Sparkles, Trophy, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Eye, Lightbulb, MessageSquare, Sparkles, Trophy, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { CheckResult, MisconceptionMatch, PredictionDiffPayload } from "@/types";
 
+function buildAssistantQuestion(result: CheckResult): string {
+  const lines: string[] = ["방금 연습 검증에 실패했어요. AI 튜터로서 도와주세요."];
+  const top = result.misconceptionMatches?.[0];
+  if (top) {
+    lines.push(`감지된 오개념: ${top.label} — ${top.summary}`);
+    if (top.diagnostic?.message) lines.push(`진단: ${top.diagnostic.message}`);
+    if (top.correction?.hint) lines.push(`교정 힌트: ${top.correction.hint}`);
+  }
+  if (result.expectedOutput || result.studentOutput) {
+    lines.push(`기대 결과: ${result.expectedOutput || "(없음)"} / 내 결과: ${result.studentOutput || "(없음)"}`);
+  }
+  lines.push("왜 이렇게 됐고, 정답을 바로 알려주기보다 스스로 고칠 수 있게 다음 한 걸음을 설명해 주세요.");
+  return lines.join("\n");
+}
+
 export function CheckResultPanel({
   result,
   loading = false,
   onNextHint,
+  onAskAssistant,
 }: {
   result: CheckResult | null;
   loading?: boolean;
   onNextHint?: () => void;
+  onAskAssistant?: (question: string) => void;
 }) {
   if (loading) {
     return (
@@ -102,6 +119,19 @@ export function CheckResultPanel({
           <ArrowRight className="size-3.5" />
           <span>다음: {result.nextAction.label}</span>
         </div>
+      ) : null}
+      {!passed && onAskAssistant ? (
+        <Button
+          className="h-7 gap-1.5 px-2 text-[11px]"
+          data-check-ask-assistant="true"
+          size="sm"
+          type="button"
+          variant="outline"
+          onClick={() => onAskAssistant(buildAssistantQuestion(result))}
+        >
+          <MessageSquare className="size-3.5" />
+          AI 튜터에게 도움 요청
+        </Button>
       ) : null}
     </div>
   );

@@ -899,6 +899,9 @@ function StructuredSectionLearningBody({
               <CheckResultPanel
                 loading={checking && !checkResult}
                 result={checkResult}
+                onAskAssistant={
+                  exercise ? (question) => onCellAsk("explain", exercise, question) : undefined
+                }
                 onNextHint={() => void runCheck(Math.min(hintLevel + 1, hintCount))}
               />
             </div>
