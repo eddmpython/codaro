@@ -29,8 +29,14 @@ const PACKAGE_ALIASES: Record<string, string> = {
 };
 
 const PACKAGE_NAME_ALIASES: Record<string, string> = {
+  bs4: "beautifulsoup4",
+  cv2: "opencv-python",
   docx: "python-docx",
+  pil: "pillow",
   pillow: "pillow",
+  skimage: "scikit-image",
+  sklearn: "scikit-learn",
+  yaml: "pyyaml",
 };
 
 const PACKAGE_PROVIDER_EQUIVALENTS: Record<string, string[]> = {

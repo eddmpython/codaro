@@ -265,11 +265,15 @@ assert.deepEqual(inference.inferDocumentPackages({{
   "python-docx",
 ]);
 assert.deepEqual(inference.declaredDocumentPackages({{
-  runtime: {{ packages: ["io", "docx", "pandas"] }},
+  runtime: {{ packages: ["io", "docx", "pandas", "sklearn", "PIL", "cv2", "yaml", "zipfile"] }},
   blocks: [{{ id: "cell-a", type: "code", content: "from sklearn.model_selection import train_test_split" }}],
 }}), [
+  "opencv-python",
   "pandas",
+  "pillow",
   "python-docx",
+  "pyyaml",
+  "scikit-learn",
 ]);
 assert.equal(inference.normalizePackageName("Pandas>=2"), "pandas");
 

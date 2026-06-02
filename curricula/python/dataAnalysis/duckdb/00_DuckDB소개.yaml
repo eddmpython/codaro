@@ -109,7 +109,7 @@ sections:
       description: pandas보다 10~100배 빠른 분석 쿼리 처리
     - emoji: 📦
       title: 준비가 간단
-      description: uv run --with duckdb로 바로 실행
+      description: 라이브러리 패널에서 현재 실행 환경 준비
     - emoji: 🌐
       title: 로컬 실행
       description: 로컬 Python 패키지로 바로 동작

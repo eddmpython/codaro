@@ -354,7 +354,7 @@ sections:
       description: meta.packages 기준 uv run
   goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
   why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
-- id: installation
+- id: package_ready
   blocks:
   - type: sectionHeader
     title: 📦 준비 확인과 시작

@@ -329,10 +329,10 @@ sections:
       description: 파일 시스템 기반 설정 로딩
     - emoji: 📦
       title: 로컬 준비
-      description: uv run --with pydantic
+      description: 라이브러리 패널에서 현재 실행 환경 준비
   goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
   why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
-- id: installation
+- id: package_ready
   blocks:
   - type: sectionHeader
     title: 📦 준비 확인과 시작
@@ -340,16 +340,15 @@ sections:
   - type: note
     style: info
     title: 로컬에서 바로 실행
-    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 Codaro가 uv로 준비하고, 터미널에서는 uv run --with pydantic으로
-      바로 실행할 수 있습니다.
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 상단 라이브러리 패널이 현재 실행 환경에 준비하고, 레슨 안에서는 import와 작은 객체 생성으로 동작을 확인합니다.
   - type: featureCards
     cards:
     - emoji: 🌐
       title: Codaro 로컬 Python 환경
       description: 로컬 Python 실행
     - emoji: 📦
-      title: uv 실행
-      description: uv run --with pydantic
+      title: 패키지 준비
+      description: 라이브러리 패널 기준
     - emoji: 🚀
       title: 바로 시작
       description: from pydantic import BaseModel

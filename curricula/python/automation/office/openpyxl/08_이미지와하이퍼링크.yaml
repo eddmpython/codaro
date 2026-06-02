@@ -7,7 +7,7 @@ meta:
   badge: 중급
   packages:
   - openpyxl
-  - Pillow
+  - pillow
   tags:
   - openpyxl
   - 이미지

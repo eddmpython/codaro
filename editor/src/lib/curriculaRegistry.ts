@@ -11,6 +11,7 @@ import type {
   CurriculumLessonPayload,
   ExecutionKind,
 } from "@/types";
+import { installablePackageName } from "@/lib/packageInference";
 
 const rawCurricula = import.meta.glob("../../../curricula/python/**/*.yaml", {
   import: "default",
@@ -777,7 +778,7 @@ function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): Learnin
       title: textValue(meta.title ?? yaml.title) || fallbackTitle,
       audience: textValue(meta.audience ?? meta.target ?? meta.level),
       difficulty: textValue(meta.difficulty),
-      packages: uniqueTextList(meta.packages ?? runtime.packages ?? yaml.packages),
+      packages: installablePackageList(meta.packages ?? runtime.packages ?? yaml.packages),
     },
     intro: {
       direction: textValue(intro.direction ?? intro.goal ?? intro.description ?? meta.description ?? seo.description),
@@ -1339,6 +1340,10 @@ function uniqueTextList(value: unknown): string[] {
     }
     return "";
   }).filter(Boolean));
+}
+
+function installablePackageList(value: unknown): string[] {
+  return uniqueValues(uniqueTextList(value).map(installablePackageName).filter(Boolean));
 }
 
 function uniqueValues(values: string[]) {

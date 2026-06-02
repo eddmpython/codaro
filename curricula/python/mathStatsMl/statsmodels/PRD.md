@@ -178,9 +178,9 @@ intro:
   description: 단순선형회귀의 기초를 배웁니다. 기울기, 절편, R²를 이해하고, 광고 ROI를 최적화합니다.
 
 sections:
-- id: step1_install
-  title: 1단계. statsmodels 설치
-  subtitle: Codaro 로컬 Python 환경에서 라이브러리 설치
+- id: step1_package_ready
+  title: 1단계. statsmodels import 확인
+  subtitle: statsmodels 모듈 준비 확인
   blocks:
   - type: text
     content: statsmodels는 Python 통계 분석의 대표 외부 패키지입니다. 회귀분석, 시계열, 가설검정 등 다양한 통계 모델을 제공합니다. Codaro 로컬 Python 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 uv가 준비합니다.
@@ -192,7 +192,7 @@ sections:
       import statsmodels
       statsmodels.__version__
   - type: tip
-    content: 필요한 패키지는 레슨 실행 전에 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하고 통계 모델링 흐름에 집중합니다.
+    content: 필요한 패키지는 상단 라이브러리 패널이 현재 실행 환경에 준비합니다. 레슨 안에서는 import가 성공하는지 확인하고 통계 모델링 흐름에 집중합니다.
 
 - id: step2_load
   title: 2단계. 데이터 불러오기

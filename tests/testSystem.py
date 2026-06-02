@@ -221,16 +221,23 @@ def testPackageInstallCommandUsesResolvedEnvironment(monkeypatch, tmp_path: Path
     monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
     monkeypatch.setattr(packageOps, "resolveUvPath", lambda **kwargs: uvPath)
 
-    plan = packageOps.buildPackageInstallCommand(["pandas", "docx", "python-docx"])
+    plan = packageOps.buildPackageInstallCommand(["pandas", "docx", "python-docx", "sklearn", "cv2", "yaml", "PIL"])
 
     assert plan.environment.pythonPath == str(pythonPath)
     assert plan.environment.uvPath == str(uvPath)
     assert plan.command.startswith(str(uvPath))
     assert " pip install --python " in plan.command
     assert "pandas" in plan.command
-    assert plan.packages == ["pandas", "python-docx"]
+    assert plan.packages == ["pandas", "python-docx", "scikit-learn", "opencv-python", "pyyaml", "pillow"]
     assert "python-docx" in plan.command
+    assert "scikit-learn" in plan.command
+    assert "opencv-python" in plan.command
+    assert "pyyaml" in plan.command
+    assert "pillow" in plan.command
     assert " docx" not in plan.command
+    assert " sklearn" not in plan.command
+    assert " cv2" not in plan.command
+    assert " yaml" not in plan.command
 
 
 def testPackageInstallCommandDropsStandardLibraryModules(monkeypatch, tmp_path: Path) -> None:

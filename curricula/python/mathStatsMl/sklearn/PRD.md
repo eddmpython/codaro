@@ -200,9 +200,9 @@ intro:
   description: scikit-learn의 기본 워크플로우를 배웁니다. 데이터 분할, 모델 학습, 예측, 평가의 전체 과정을 익힙니다.
 
 sections:
-- id: step1_install
-  title: 1단계. scikit-learn 설치
-  subtitle: Codaro 로컬 Python 환경 설정
+- id: step1_package_ready
+  title: 1단계. scikit-learn import 확인
+  subtitle: sklearn 모듈 준비 확인
   blocks:
   - type: text
     content: scikit-learn은 Python 머신러닝의 대표 외부 패키지입니다. Codaro 로컬 Python 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 uv가 준비합니다. 초기 로딩에 약간의 시간이 걸릴 수 있습니다.
@@ -214,7 +214,7 @@ sections:
       import sklearn
       sklearn.__version__
   - type: tip
-    content: 필요한 패키지는 레슨 실행 전에 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하고 바로 모델링 흐름으로 들어갑니다.
+    content: 필요한 패키지는 상단 라이브러리 패널이 현재 실행 환경에 준비합니다. 레슨 안의 코드는 import가 성공하는지 확인하고 바로 모델링 흐름으로 들어갑니다.
 
 - id: step2_load
   title: 2단계. 데이터 불러오기

@@ -296,7 +296,14 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
 _VALID_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
 _PLAIN_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$")
 PACKAGE_NAME_ALIASES = {
+    "bs4": "beautifulsoup4",
+    "cv2": "opencv-python",
     "docx": "python-docx",
+    "pil": "pillow",
+    "pillow": "pillow",
+    "skimage": "scikit-image",
+    "sklearn": "scikit-learn",
+    "yaml": "pyyaml",
 }
 
 

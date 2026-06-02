@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+import sys
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -26,6 +28,18 @@ REQUIRED_STRUCTURED_SECTION_FIELDS = (
     "exercise.starterCode",
     "check",
 )
+
+_STDLIB_MODULE_NAMES = set(getattr(sys, "stdlib_module_names", ()))
+PACKAGE_NAME_ALIASES = {
+    "bs4": "beautifulsoup4",
+    "cv2": "opencv-python",
+    "docx": "python-docx",
+    "pil": "pillow",
+    "pillow": "pillow",
+    "skimage": "scikit-image",
+    "sklearn": "scikit-learn",
+    "yaml": "pyyaml",
+}
 
 
 class LessonMetaContract(BaseModel):
@@ -141,7 +155,7 @@ def lessonContractFromYaml(content: dict[str, Any], *, fallbackTitle: str = "") 
             title=title,
             audience=_textValue(meta.get("audience") or meta.get("target") or meta.get("level")),
             difficulty=_textValue(meta.get("difficulty")),
-            packages=_uniqueTextList(meta.get("packages") or runtime.get("packages") or content.get("packages")),
+            packages=_installablePackageList(meta.get("packages") or runtime.get("packages") or content.get("packages")),
         ),
         intro=LessonIntroContract(
             direction=_textValue(
@@ -399,6 +413,32 @@ def _uniqueTextList(value: Any) -> list[str]:
             if text:
                 items.append(text)
     return _unique(items)
+
+
+def _installablePackageList(value: Any) -> list[str]:
+    return _unique([
+        package
+        for item in _uniqueTextList(value)
+        if (package := _installablePackageName(item))
+    ])
+
+
+def _installablePackageName(name: str) -> str:
+    packageName = name.strip()
+    if not packageName:
+        return ""
+    normalized = packageName.lower().replace("_", "-")
+    canonical = PACKAGE_NAME_ALIASES.get(normalized, packageName)
+    if _isStandardLibraryPackage(canonical):
+        return ""
+    return canonical
+
+
+def _isStandardLibraryPackage(name: str) -> bool:
+    match = re.match(r"^[A-Za-z0-9][A-Za-z0-9_.-]*", name.strip())
+    if match is None:
+        return False
+    return match.group(0).replace("-", "_") in _STDLIB_MODULE_NAMES
 
 
 def _unique(items: list[str]) -> list[str]:

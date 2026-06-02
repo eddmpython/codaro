@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 from typing import Any
 
@@ -32,8 +33,16 @@ EXTERNAL_STDLIB_LABELS = (
     "20년 검증된 표준 라이브러리",
 )
 CANONICAL_PACKAGE_NAMES = {
+    "bs4": "beautifulsoup4",
+    "cv2": "opencv-python",
     "docx": "python-docx",
+    "pil": "pillow",
+    "pillow": "pillow",
+    "skimage": "scikit-image",
+    "sklearn": "scikit-learn",
+    "yaml": "pyyaml",
 }
+STALE_INSTALL_STAGE_PATTERN = re.compile(r"(?m)^\s*(id:\s*step\d*_install|id:\s*installation|title:\s*\d+단계\.[^\n]*설치)")
 
 
 def testLessonContractExtractsStructuredSectionFields() -> None:
@@ -142,6 +151,19 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
     assert exercise.guide.checkConfig == {"variable": "frame"}
     assert solutions[exercise.id] == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
     assert check.role == "check"
+
+
+def testLessonRuntimePackagesNormalizeAliasesAndDropStdlib() -> None:
+    content = {
+        "meta": {"title": "Package normalization", "packages": ["io", "docx", "sklearn", "PIL", "zipfile"]},
+        "sections": [],
+    }
+
+    contract = lessonContractFromYaml(content)
+    document, _solutions = yamlToDocument(content, "packages", "normalization")
+
+    assert contract.meta.packages == ["python-docx", "scikit-learn", "pillow"]
+    assert document.runtime.packages == ["python-docx", "scikit-learn", "pillow"]
 
 
 def testStructuredSectionMaterializesSingleCardFlowBlocks() -> None:
@@ -276,6 +298,20 @@ def testCurriculumCopyDoesNotEmbedInstallCommands() -> None:
     assert not failures
 
 
+def testCurriculumCopyDoesNotKeepStaleInstallStageNames() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*")):
+        if not path.is_file() or path.suffix not in {".yaml", ".yml", ".md", ".json"}:
+            continue
+        text = path.read_text(encoding="utf-8")
+        matched = [match.group(0).strip() for match in STALE_INSTALL_STAGE_PATTERN.finditer(text)]
+        if matched:
+            rel = path.relative_to(ROOT).as_posix()
+            failures.append(f"{rel}: package readiness/import checks must not be named install stages: {matched}")
+
+    assert not failures
+
+
 def testCurriculumMetaPackagesUseInstallableDistributionNames() -> None:
     failures: list[str] = []
     for path in sorted(CURRICULA_DIR.rglob("*.yaml")):
@@ -291,7 +327,7 @@ def testCurriculumMetaPackagesUseInstallableDistributionNames() -> None:
         for packageName in packages:
             normalized = str(packageName).strip().lower().replace("_", "-")
             replacement = CANONICAL_PACKAGE_NAMES.get(normalized)
-            if replacement:
+            if replacement and str(packageName).strip() != replacement:
                 rel = path.relative_to(ROOT).as_posix()
                 failures.append(f"{rel}: use {replacement} in meta.packages instead of {packageName!r}")
 

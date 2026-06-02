@@ -6,7 +6,7 @@ meta:
   difficulty: easy
   audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
   packages:
-    - APScheduler
+  - apscheduler
   tags:
     - apscheduler
     - background
