@@ -444,6 +444,42 @@ def testSharePackFlowDoesNotImportTransportLayer() -> None:
     assert "createSharePackAutomationTask" in source
 
 
+def testSystemRouterKeepsPackageEnvironmentBehindSystemBoundary() -> None:
+    source = (ROOT / "src/codaro/api/systemRouter.py").read_text(encoding="utf-8")
+    flow = (ROOT / "src/codaro/system/packageFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert "system.packageFlow" in importedModules
+    assert "buildPackageEnvironmentPayload" in source
+    assert "buildPackageInstallCommandPayload" in source
+    assert "packageOps" not in source
+    assert "getPackageEnvironment()" not in source
+    assert "buildPackageInstallCommand(" not in source
+    assert "def buildPackageEnvironmentPayload" in flow
+    assert "def buildPackageInstallCommandPayload" in flow
+    assert "getPackageEnvironment().model_dump()" in flow
+    assert "buildPackageInstallCommand(names).model_dump()" in flow
+
+
+def testSystemPackageFlowDoesNotImportTransportLayer() -> None:
+    source = (ROOT / "src/codaro/system/packageFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
+
+
 def testAutomationRouterKeepsTaskExecutionBehindAutomationBoundary() -> None:
     source = (ROOT / "src/codaro/api/automationRouter.py").read_text(encoding="utf-8")
 

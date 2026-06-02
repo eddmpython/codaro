@@ -8,8 +8,11 @@ from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import DirectoryListing, MoveRequest, WorkspacePathError, WriteFileRequest
 from ..system.healthFlow import buildSystemHealthPayload
 from ..system.localDiagnostics import buildLocalDiagnosticExport, buildLocalDiagnosticSummary
-from ..system import packageOps
-from ..system.packageOps import PackageEnvironmentError
+from ..system.packageFlow import (
+    PackageEnvironmentError,
+    buildPackageEnvironmentPayload,
+    buildPackageInstallCommandPayload,
+)
 from ..system.serverState import ServerState
 from .errors import fail
 from .requestModels import PackageInstallCommandRequest, PackageRequest, PathRequest
@@ -125,14 +128,14 @@ def createSystemRouter(state: ServerState) -> APIRouter:
     @router.get("/api/packages/environment")
     async def apiPackageEnvironment() -> dict[str, Any]:
         try:
-            return packageOps.getPackageEnvironment().model_dump()
+            return buildPackageEnvironmentPayload()
         except PackageEnvironmentError as error:
             fail(error.statusCode, error.code, error.message)
 
     @router.post("/api/packages/install-command")
     async def apiPackageInstallCommand(request: PackageInstallCommandRequest) -> dict[str, Any]:
         try:
-            return packageOps.buildPackageInstallCommand(request.names).model_dump()
+            return buildPackageInstallCommandPayload(request.names)
         except PackageEnvironmentError as error:
             fail(error.statusCode, error.code, error.message)
 
