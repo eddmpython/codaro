@@ -286,6 +286,20 @@ def testErrorPatternMatchesNestedAsyncioRun() -> None:
     assert "builtins.async.nestedAsyncioRun" in ids
 
 
+def testErrorPatternMatchesJoinNonString() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.textProcessing.yml")
+    hits = matchErrorPattern(catalog, "TypeError: sequence item 0: expected str instance, int found")
+    ids = {hit.id for hit in hits}
+    assert "builtins.textProcessing.joinNonString" in ids
+
+
+def testErrorPatternMatchesBase64NeedsBytes() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "builtins.textProcessing.yml")
+    hits = matchErrorPattern(catalog, "TypeError: a bytes-like object is required, not 'str'")
+    ids = {hit.id for hit in hits}
+    assert "builtins.textProcessing.base64NeedsBytes" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"
