@@ -1,0 +1,59 @@
+meta:
+  outcomeId: numpy.intro
+  status: draft
+  version: 1
+  note: "초안 — numpy 첫 단계(배열 생성·벡터 연산) 오개념 시드. 데이터 분석 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: numpy.intro.missingImportAlias
+    label: "np 별칭 없이 numpy 쓰기"
+    summary: "import numpy as np 없이 np.array(...)를 호출해 NameError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "NameError: name 'np' is not defined"
+        description: "np 별칭이 정의되지 않음."
+    diagnostic:
+      message: "numpy는 보통 `np` 별칭으로 씁니다. 셀 맨 위에서 `import numpy as np` 를 먼저 실행해야 `np.array` 를 쓸 수 있습니다."
+      references: ["numpy.intro"]
+    correction:
+      hint: "맨 위에 `import numpy as np` 를 추가하세요."
+      miniExercise: |
+        import numpy as np
+        print(np.array([1, 2, 3]))
+
+  - id: numpy.intro.listInsteadOfArray
+    label: "파이썬 리스트에 벡터 연산 기대하기"
+    summary: "[1, 2, 3] + 1 처럼 리스트에 스칼라를 더해 element-wise를 기대하지만 TypeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*(can only concatenate list|unsupported operand type.*'list')"
+        description: "리스트에 스칼라 연산을 시도."
+    diagnostic:
+      message: "파이썬 리스트는 `+ 1` 같은 원소별(element-wise) 연산을 못 합니다. numpy 배열로 바꾸면 `np.array([1,2,3]) + 1` 이 각 원소에 적용됩니다."
+      references: ["numpy.intro"]
+    correction:
+      hint: "리스트를 `np.array(...)` 로 감싸세요."
+      miniExercise: |
+        import numpy as np
+        print(np.array([1, 2, 3]) + 1)
+
+  - id: numpy.intro.shapeMismatch
+    label: "모양이 다른 배열을 그대로 연산"
+    summary: "길이가 다른 두 배열을 더해 broadcast ValueError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError.*operands could not be broadcast together"
+        description: "shape 불일치로 broadcast 실패."
+    diagnostic:
+      message: "numpy 연산은 두 배열의 모양(shape)이 맞거나 broadcast 가능해야 합니다. `.shape` 를 출력해 두 배열의 크기를 먼저 확인하세요."
+      references: ["numpy.intro"]
+    correction:
+      hint: "`a.shape`, `b.shape` 를 출력해 크기를 맞추세요."
+      miniExercise: |
+        import numpy as np
+        a = np.array([1, 2, 3])
+        print(a.shape)
+        print(a + np.array([10, 20, 30]))

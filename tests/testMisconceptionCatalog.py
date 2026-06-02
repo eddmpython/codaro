@@ -181,6 +181,20 @@ def testErrorPatternMatchesBareWordNameError() -> None:
     assert "python.intro.bareWordString" in ids
 
 
+def testCodePatternMatchesCaretAsPower() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.operators.yml")
+    hits = matchCodePattern(catalog, "print(2 ^ 3)")
+    ids = {hit.id for hit in hits}
+    assert "python.operators.caretAsPower" in ids
+
+
+def testErrorPatternMatchesNumpyMissingAlias() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "numpy.intro.yml")
+    hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nNameError: name 'np' is not defined")
+    ids = {hit.id for hit in hits}
+    assert "numpy.intro.missingImportAlias" in ids
+
+
 def testErrorPatternMatchesKeyError() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.dictsAndSets.yml")
     hits = matchErrorPattern(catalog, "Traceback (most recent call last):\nKeyError: 'banana'")

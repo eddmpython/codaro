@@ -1,0 +1,62 @@
+meta:
+  outcomeId: python.operators
+  status: draft
+  version: 1
+  note: "초안 — 연산자(산술·비교·논리) 단계 오개념 시드. 초급 30일 핵심. 사람이 정제 필요."
+
+misconceptions:
+  - id: python.operators.caretAsPower
+    label: "거듭제곱을 ^ 로 적기"
+    summary: "2 ^ 3 을 거듭제곱으로 알고 적지만 ^ 는 비트 XOR라 1이 나온다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "[0-9]\\s*\\^\\s*[0-9]"
+        description: "숫자 사이에 ^ 를 거듭제곱처럼 쓰는 패턴."
+    diagnostic:
+      message: "Python에서 `^` 는 거듭제곱이 아니라 비트 XOR입니다. `2 ^ 3` 은 8이 아니라 1이 됩니다. 거듭제곱은 `**` 입니다."
+      references: ["python.operators"]
+    correction:
+      hint: "거듭제곱은 `**` 를 쓰세요. `2 ** 3` 은 8입니다."
+      miniExercise: |
+        print(2 ** 3)
+
+  - id: python.operators.assignmentInCondition
+    label: "조건에서 비교 == 대신 할당 = 쓰기"
+    summary: "if x = 5 처럼 조건 안에 할당 = 를 적어 SyntaxError가 난다."
+    triggers:
+      - kind: codePattern
+        appliesTo: code
+        pattern: "(^|\\n)\\s*(if|elif|while)\\s+[A-Za-z_][A-Za-z0-9_]*\\s*=\\s*[^=]"
+        description: "조건문에서 단일 = 로 비교하려는 패턴."
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "SyntaxError.*(invalid syntax|cannot assign)"
+        description: "조건 안 할당으로 인한 SyntaxError."
+    diagnostic:
+      message: "값을 비교할 때는 `==`, 값을 저장할 때는 `=` 입니다. 조건문 안에서는 비교이므로 `if x == 5:` 처럼 두 개를 써야 합니다."
+      references: ["python.operators"]
+    correction:
+      hint: "비교는 `==` 입니다. `if x == 5:`"
+      miniExercise: |
+        x = 5
+        if x == 5:
+            print("같다")
+
+  - id: python.operators.floatWhereIntExpected
+    label: "정수가 필요한 곳에 / 결과(실수)를 쓰기"
+    summary: "range(len(items) / 2) 처럼 / 의 실수 결과를 정수 자리에 넣어 TypeError가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "TypeError.*'float' object cannot be interpreted as an integer"
+        description: "정수가 필요한 자리에 실수를 넘겨 발생."
+    diagnostic:
+      message: "`/` 는 항상 실수를 돌려줍니다(`4 / 2` 는 2.0). range나 인덱스처럼 정수가 필요한 곳에는 몫 연산자 `//` 를 쓰세요."
+      references: ["python.operators"]
+    correction:
+      hint: "정수 몫은 `//` 입니다. `range(len(items) // 2)`."
+      miniExercise: |
+        items = [10, 20, 30, 40]
+        for i in range(len(items) // 2):
+            print(items[i])
