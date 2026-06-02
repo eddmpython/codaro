@@ -127,13 +127,14 @@ export function CheckResultPanel({
         <Button
           className="h-7 gap-1.5 px-2 text-[11px]"
           data-check-ask-assistant="true"
+          data-ask-emphasized={result.doneCriterionViolated ? "true" : "false"}
           size="sm"
           type="button"
-          variant="outline"
+          variant={result.doneCriterionViolated ? "default" : "outline"}
           onClick={() => onAskAssistant(buildAssistantQuestion(result))}
         >
           <MessageSquare className="size-3.5" />
-          AI 튜터에게 도움 요청
+          {result.doneCriterionViolated ? "막혔다면 AI 튜터에게 물어보기" : "AI 튜터에게 도움 요청"}
         </Button>
       ) : null}
     </div>

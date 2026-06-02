@@ -699,7 +699,9 @@ def jsAssertExerciseCheck() -> str:
   const predictionDiff = failPanel.querySelector('[data-prediction-diff]');
   if (!predictionDiff) throw new Error('prediction-vs-actual diff missing on fail');
   if (!predictionDiff.querySelector('[data-prediction-field="value"]')) throw new Error('prediction value field diff missing');
-  if (!failPanel.querySelector('[data-check-ask-assistant="true"]')) throw new Error('ask-assistant button missing on fail');
+  const askBtn = failPanel.querySelector('[data-check-ask-assistant="true"]');
+  if (!askBtn) throw new Error('ask-assistant button missing on fail');
+  if (askBtn.getAttribute('data-ask-emphasized') !== 'true') throw new Error('ask-assistant should be emphasized on repeated struggle');
   if (!failPanel.querySelector('[data-misconception-apply-correction="true"]')) throw new Error('apply-correction button missing on fail');
   const correctionDetails = failPanel.querySelector('[data-misconception-id] details');
   if (!correctionDetails || !correctionDetails.open) throw new Error('repeated misconception correction should auto-expand');
