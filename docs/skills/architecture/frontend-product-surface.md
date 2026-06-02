@@ -55,6 +55,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/components/app/notebookSurface.tsx` | 노트북 표면 조립. 빈 노트북 편집, 셀 실행, pending notebook bar, 우측 teacher panel 배치 |
 | `editor/src/components/app/currentLearningSurface.tsx` | 현재 학습 표면 조립. 목표 입력 fallback, 커리큘럼 학습 카드, 셀 TOC, 우측 teacher panel 배치 |
 | `editor/src/components/chat/chatSurface.tsx` | 채팅 입구와 provider 연결 행동. curriculum/automation 내부 구현 import 금지 |
+| `editor/src/hooks/useProductSurfaceSelection.ts` | 사이드바 표면 선택 정책. 현재 학습 재진입 시 유효한 현재 카테고리 유지, 없을 때만 기본 레지스트리 카테고리 fallback, 자동화 섹션 선택 뒤 자동화 표면 열기 |
 | `editor/src/lib/teacherScope.ts` | 대화 요청 범위 분류 |
 | `editor/src/lib/assistantArtifactRouting.ts` | assistant 산출물이 현재 학습 또는 노트북으로 먼저 열리게 하는 표면 결정과 application payload shape |
 | `editor/src/lib/assistantResponsePlan.ts` | 응답에서 curriculum 저장 또는 notebook pending 변경을 만드는 계획 |
@@ -70,6 +71,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 표면 순서, 노출 정책, 흐름 단계 번호를 `surfaceModel.ts` 밖에서 별도 배열이나 index 계산으로 복사하면 실패다. 컴포넌트는 `PRODUCT_SURFACE_NAV`가 아니라 필요한 파생값만 읽는다.
 - `productSidebar.tsx`가 커리큘럼 tree 생성, 자동화 tree 생성, 삭제 dialog, 표면 icon map까지 직접 품으면 실패다. focused 파일로 되돌린다.
+- `App.tsx`가 기본 커리큘럼 카테고리 선택, 현재 학습 재진입 fallback, 자동화 섹션 선택 후 표면 전환 정책을 직접 품으면 실패다. 표면 선택 정책은 `useProductSurfaceSelection.ts`가 맡는다.
 - `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정, 현재 학습 라벨 계산, 커리큘럼 카드/TOC 조립, 노트북 패널/teacher panel 조립이 들어오면 실패다. `editor/src/lib/*`, 전용 hook, 또는 `currentLearningSurface.tsx`/`notebookSurface.tsx` 같은 focused surface 파일로 이동한다.
 - 빈 채팅 시작 예시가 target surface나 flow role을 직접 문자열로 흩뿌리면 실패다. 예시는 `chatStartExamples.ts`에서 정의하고, 표면 역할은 `surfaceModel.ts`에서 조회한다.
 - assistant 응답과 pending 승인 hook이 나만의 커리큘럼 저장/열기 절차를 각자 복붙하면 실패다. 저장 후 현재 학습 열기 정책은 `customCurricula.ts`의 `saveAndOpenCustomCurriculum`이 맡는다.

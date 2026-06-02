@@ -8,7 +8,6 @@ import { ProductSidebar } from "@/components/app/productSidebar";
 import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import { TerminalPanel } from "@/components/terminal/terminalPanel";
-import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import type { TerminalLaunchIntent } from "@/lib/terminalLaunch";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
@@ -19,6 +18,7 @@ import { useCurriculumNavigationState } from "@/hooks/useCurriculumNavigationSta
 import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
 import { useNotebookRuntimeState } from "@/hooks/useNotebookRuntimeState";
 import { usePendingChangesState } from "@/hooks/usePendingChangesState";
+import { useProductSurfaceSelection } from "@/hooks/useProductSurfaceSelection";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
@@ -38,8 +38,6 @@ import type {
   CodaroDocument,
   LoadState,
 } from "@/types";
-
-const DEFAULT_CURRICULUM_CATEGORY = "30days";
 
 function App() {
   const localeState = useLocaleState();
@@ -289,21 +287,16 @@ function App() {
     onProviderConnectionRequired: openProviderSettingsFromFailure,
   });
 
-  function selectAutomationSection(section: AutomationSection) {
-    setAutomationSection(section);
-    setSurface("automation");
-  }
-
-  const selectSurface = useCallback((nextSurface: SurfaceMode) => {
-    if (nextSurface === "curriculum") {
-      const defaultCategory = categories.some((category) => category.key === DEFAULT_CURRICULUM_CATEGORY)
-        ? DEFAULT_CURRICULUM_CATEGORY
-        : categories[0]?.key ?? selectedCategory;
-      selectCurriculumCategory(defaultCategory);
-      return;
-    }
-    setSurface(nextSurface);
-  }, [categories, selectCurriculumCategory, selectedCategory, setSurface]);
+  const {
+    selectAutomationSection,
+    selectSurface,
+  } = useProductSurfaceSelection({
+    categories,
+    selectedCategory,
+    selectCurriculumCategory,
+    setAutomationSection,
+    setSurface,
+  });
 
   const copyDiagnosticExport = useCallback(async () => {
     const payload = await loadSystemDiagnosticExport();

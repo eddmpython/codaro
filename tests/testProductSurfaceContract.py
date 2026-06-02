@@ -62,6 +62,21 @@ def testSurfaceRouteUsesSurfaceModelContract() -> None:
     assert 'value === "editor"' not in source
 
 
+def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
+    app = _read("editor/src/App.tsx")
+    selectionHook = _read("editor/src/hooks/useProductSurfaceSelection.ts")
+
+    assert "useProductSurfaceSelection" in app
+    assert "DEFAULT_CURRICULUM_CATEGORY" not in app
+    assert 'setSurface("automation")' not in app
+    assert 'nextSurface === "curriculum"' not in app
+    assert "defaultRegistrySelection" in selectionHook
+    assert "productLearningCategory" in selectionHook
+    assert "categories.some((category) => category.key === selectedCategory)" in selectionHook
+    assert 'if (nextSurface === "curriculum")' in selectionHook
+    assert 'setSurface("automation")' in selectionHook
+
+
 def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     source = _read("editor/src/components/app/productSidebar.tsx")
     flowNav = _read("editor/src/components/app/productFlowNav.tsx")
@@ -229,6 +244,8 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/components/app/currentLearningSurface.tsx`",
         "현재 학습 표면 조립",
         "`editor/src/components/chat/chatSurface.tsx`",
+        "`editor/src/hooks/useProductSurfaceSelection.ts`",
+        "현재 학습 재진입",
         "`editor/src/lib/assistantArtifactRouting.ts`",
         "`editor/src/lib/assistantResponsePlan.ts`",
         "`editor/src/lib/pendingChanges.ts`",
