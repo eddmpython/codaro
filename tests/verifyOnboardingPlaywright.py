@@ -215,6 +215,7 @@ class OnboardingStubApi:
         self.baseUrl = f"http://127.0.0.1:{port}"
         self.ready = False
         self.calls: list[str] = []
+        self.checkCalls = 0
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
 
@@ -379,21 +380,48 @@ class OnboardingStubApi:
                 elif path.startswith("/api/curriculum/reviews/"):
                     self._sendJson({"lessonKey": "30days/hello", "interval": 3, "ease": 2.6, "streak": 2, "nextReviewAt": "2026-06-05T00:00:00+00:00", "lastResult": "success", "lastReviewedAt": "2026-06-02T00:00:00+00:00"})
                 elif path == "/api/curriculum/check":
-                    self._sendJson({
-                        "passed": True,
-                        "feedback": "정확합니다!",
-                        "hintLevel": 0,
-                        "hints": ["print 함수를 사용하세요"],
-                        "studentOutput": "hello\n",
-                        "expectedOutput": "hello\n",
-                        "detail": "",
-                        "creditedOutcomes": ["python.intro"],
-                        "autoValidatedOutcomes": [],
-                        "misconceptionMatches": [],
-                        "doneCriterionViolated": False,
-                        "predictionDiff": None,
-                        "nextAction": {"kind": "advance", "label": "다음 단계로 진행하기"},
-                    })
+                    owner.checkCalls += 1
+                    if owner.checkCalls == 1:
+                        self._sendJson({
+                            "passed": False,
+                            "feedback": "출력이 기대와 다릅니다.",
+                            "hintLevel": 0,
+                            "hints": ["print 함수를 사용하세요"],
+                            "studentOutput": "hi\n",
+                            "expectedOutput": "hello\n",
+                            "detail": "",
+                            "creditedOutcomes": [],
+                            "autoValidatedOutcomes": [],
+                            "misconceptionMatches": [{
+                                "misconceptionId": "python.intro.printQuote",
+                                "outcomeId": "python.intro",
+                                "label": "출력 문자열 불일치",
+                                "summary": "출력할 문자열을 다르게 적었습니다.",
+                                "diagnostic": {"message": "기대한 'hello'와 다른 문자열을 출력했습니다.", "references": ["python.intro"]},
+                                "correction": {"hint": "정확히 'hello'를 출력하세요.", "miniExercise": "print('hello')"},
+                                "repeatStatus": "new",
+                                "hitCount": 1,
+                            }],
+                            "doneCriterionViolated": False,
+                            "predictionDiff": None,
+                            "nextAction": {"kind": "studyCorrection", "label": "교정 코드를 보고 다시 풀기"},
+                        })
+                    else:
+                        self._sendJson({
+                            "passed": True,
+                            "feedback": "정확합니다!",
+                            "hintLevel": 0,
+                            "hints": ["print 함수를 사용하세요"],
+                            "studentOutput": "hello\n",
+                            "expectedOutput": "hello\n",
+                            "detail": "",
+                            "creditedOutcomes": ["python.intro"],
+                            "autoValidatedOutcomes": [],
+                            "misconceptionMatches": [],
+                            "doneCriterionViolated": False,
+                            "predictionDiff": None,
+                            "nextAction": {"kind": "advance", "label": "다음 단계로 진행하기"},
+                        })
                 else:
                     self._sendJson({"error": f"unhandled {path}"}, status=404)
 
@@ -633,16 +661,27 @@ def jsAssertExerciseCheck() -> str:
   }
   if (!checkBtn) throw new Error('verify button did not appear after running the exercise');
   checkBtn.click();
-  let panel = null;
+  let failPanel = null;
   for (let i = 0; i < 80; i++) {
-    panel = document.querySelector('[data-check-result="success"]');
-    if (panel) break;
+    failPanel = document.querySelector('[data-check-result="fail"]');
+    if (failPanel) break;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (!panel) throw new Error('check result panel did not render after verify click');
-  if (!panel.textContent || !panel.textContent.includes('검증 통과')) throw new Error('check pass label missing');
-  const nextAction = panel.querySelector('[data-check-next-action]');
-  if (!nextAction) throw new Error('check next-action missing');
+  if (!failPanel) throw new Error('failing check panel did not render');
+  if (!failPanel.querySelector('[data-check-result-misconceptions="true"]')) throw new Error('misconception diagnosis missing on fail');
+  if (!failPanel.querySelector('[data-check-ask-assistant="true"]')) throw new Error('ask-assistant button missing on fail');
+  const failNext = failPanel.querySelector('[data-check-next-action="studyCorrection"]');
+  if (!failNext) throw new Error('studyCorrection next-action missing on fail');
+  checkBtn.click();
+  let passPanel = null;
+  for (let i = 0; i < 80; i++) {
+    passPanel = document.querySelector('[data-check-result="success"]');
+    if (passPanel) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!passPanel) throw new Error('passing check panel did not render after retry');
+  if (!passPanel.textContent || !passPanel.textContent.includes('검증 통과')) throw new Error('check pass label missing');
+  if (!passPanel.querySelector('[data-check-next-action]')) throw new Error('check next-action missing on pass');
   return 'exercise-check-ok';
 })()
 """)
