@@ -337,6 +337,16 @@ class OnboardingStubApi:
                         ],
                         "totalDue": 1,
                     })
+                elif path == "/api/learner/snapshot":
+                    self._sendJson({
+                        "mastery": [],
+                        "misconceptions": [
+                            {"misconceptionId": "python.operators.caretAsPower", "outcomeId": "python.operators", "outcomeLabel": "Python 연산자", "firstSeenAt": "2026-06-01T00:00:00+00:00", "lastSeenAt": "2026-06-02T00:00:00+00:00", "hitCount": 2, "resolvedAt": None},
+                        ],
+                        "execution": {"totalRuns": 3, "errorRuns": 1},
+                        "repeatedMisconceptionCount": 1,
+                        "doneCriterionViolated": True,
+                    })
                 elif path.startswith("/api/curriculum/contents/"):
                     self._sendJson({"category": "python", "categoryName": "Python", "contents": [{"contentId": "hello", "title": "Hello World"}]})
                 elif path.startswith("/api/curriculum/content/"):
@@ -641,6 +651,10 @@ def jsAssertCurriculumHome() -> str:
   if (!reviewPass) throw new Error('curriculum home review recall-pass button missing');
   const reviewLapse = reviews.querySelector('[data-curriculum-home-review-lapse="true"]');
   if (!reviewLapse) throw new Error('curriculum home review recall-lapse button missing');
+  const weakAreas = document.querySelector('[data-curriculum-home-weak-areas="true"]');
+  if (!weakAreas) throw new Error('curriculum home weak-areas section missing');
+  if (!weakAreas.textContent || !weakAreas.textContent.includes('집중하면 좋은 영역')) throw new Error('weak-areas label missing');
+  if (!weakAreas.querySelector('[data-weak-area]')) throw new Error('weak-area item missing');
   return 'curriculum-home-ok';
 })()
 """)

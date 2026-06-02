@@ -57,11 +57,24 @@ def updateOutcomeValidationToolPayload(
     }
 
 
-def buildLearnerSnapshotPayload(*, learnerStateStore: LearnerStateStore) -> dict[str, object]:
+def buildLearnerSnapshotPayload(
+    *,
+    learnerStateStore: LearnerStateStore,
+    curriculumOs: CurriculumOsCache | None = None,
+) -> dict[str, object]:
     snapshot = learnerStateStore.snapshot()
     repeats = learnerStateStore.listRepeatedMisconceptions()
+    payload = snapshot.model_dump()
+    if curriculumOs is not None:
+        taxonomy = curriculumOs.taxonomy()
+        misconceptions = payload.get("misconceptions")
+        if isinstance(misconceptions, list):
+            for hit in misconceptions:
+                if isinstance(hit, dict):
+                    outcomeId = str(hit.get("outcomeId") or "")
+                    hit["outcomeLabel"] = taxonomy.outcomeLabel(outcomeId) if outcomeId else ""
     return {
-        **snapshot.model_dump(),
+        **payload,
         "repeatedMisconceptionCount": len(repeats),
         "doneCriterionViolated": bool(repeats),
     }

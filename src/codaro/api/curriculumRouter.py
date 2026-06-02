@@ -359,7 +359,10 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
         프론트가 mastery 패널, misconception 표시, dynamic gap UI를 그릴 때 호출한다.
         """
-        payload = buildLearnerSnapshotPayload(learnerStateStore=state.learnerStateStore)
+        payload = buildLearnerSnapshotPayload(
+            learnerStateStore=state.learnerStateStore,
+            curriculumOs=state.curriculumOs,
+        )
         logger.debug(
             "learner %s",
             formatLogFields(

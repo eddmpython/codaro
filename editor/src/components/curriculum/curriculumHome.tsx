@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Check, CheckCircle2, GraduationCap, RotateCcw, Sparkles, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, BookOpen, Check, CheckCircle2, GraduationCap, RotateCcw, Sparkles, X } from "lucide-react";
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import { useCurriculumReviews } from "@/hooks/useCurriculumReviews";
+import { useLearnerSnapshot } from "@/hooks/useLearnerSnapshot";
 import { recordReviewResult } from "@/lib/curriculumReviews";
 import { cn } from "@/lib/utils";
 import type { CurriculumCategory } from "@/types";
@@ -49,6 +50,25 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
 
   const dueReviews = reviews?.reviews ?? [];
   const totalDue = reviews?.totalDue ?? 0;
+  const { snapshot } = useLearnerSnapshot();
+  const weakAreas = useMemo(() => {
+    const unresolved = (snapshot?.misconceptions ?? []).filter((hit) => !hit.resolvedAt);
+    const byOutcome = new Map<string, { label: string; hitCount: number; repeated: boolean }>();
+    for (const hit of unresolved) {
+      const existing = byOutcome.get(hit.outcomeId);
+      if (existing) {
+        existing.hitCount += hit.hitCount;
+        existing.repeated = existing.repeated || hit.hitCount >= 2;
+      } else {
+        byOutcome.set(hit.outcomeId, {
+          label: hit.outcomeLabel || hit.outcomeId,
+          hitCount: hit.hitCount,
+          repeated: hit.hitCount >= 2,
+        });
+      }
+    }
+    return [...byOutcome.values()].sort((a, b) => b.hitCount - a.hitCount).slice(0, 4);
+  }, [snapshot]);
 
   const rateReview = async (category: string, contentId: string, success: boolean) => {
     if (!contentId) return;
@@ -201,6 +221,35 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
               {totalDue > 5 ? (
                 <p className="mt-2 text-[11px] text-muted-foreground">외 {totalDue - 5}개 더</p>
               ) : null}
+            </section>
+          ) : null}
+
+          {weakAreas.length > 0 ? (
+            <section
+              className="rounded-xl border border-rose-300/50 bg-rose-50/40 p-4 dark:border-rose-500/30 dark:bg-rose-500/5"
+              data-curriculum-home-weak-areas="true"
+            >
+              <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400">
+                <AlertTriangle className="size-4" />
+                <h2 className="text-sm font-semibold">집중하면 좋은 영역</h2>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                최근 자주 막힌 개념입니다. 복습으로 약점을 메워 보세요.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {weakAreas.map((area) => (
+                  <div
+                    key={area.label}
+                    className="flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-sm"
+                    data-weak-area={area.label}
+                  >
+                    <span className="font-medium">{area.label}</span>
+                    <Badge variant={area.repeated ? "destructive" : "outline"}>
+                      {area.hitCount}회{area.repeated ? " · 반복" : ""}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
             </section>
           ) : null}
 

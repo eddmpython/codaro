@@ -546,6 +546,7 @@ export type LearnerOutcomeMastery = {
 export type LearnerMisconceptionHit = {
   misconceptionId: string;
   outcomeId: string;
+  outcomeLabel?: string;
   firstSeenAt: string;
   lastSeenAt: string;
   hitCount: number;
