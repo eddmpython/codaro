@@ -1,0 +1,46 @@
+meta:
+  outcomeId: automation.excel.workbook
+  status: draft
+  version: 1
+  note: "초안 — openpyxl 워크북/시트/셀 접근 흔한 오개념 시드. 자동화 Excel 진입. 사람이 정제 필요."
+
+misconceptions:
+  - id: automation.excel.workbook.sheetNotFound
+    label: "없는 시트 이름으로 접근"
+    summary: "wb['Sheet1'] 처럼 실제와 다른 시트 이름을 써서 KeyError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "KeyError: 'Worksheet .* does not exist"
+        description: "존재하지 않는 시트 이름 접근."
+    diagnostic:
+      message: "시트 이름은 파일에 있는 것과 **정확히** 일치해야 합니다(대소문자·공백 포함). 실제 이름은 `wb.sheetnames` 로 확인하세요. 첫 시트는 `wb.active` 로도 얻습니다."
+      references: ["automation.excel.workbook"]
+    correction:
+      hint: "`print(wb.sheetnames)` 로 이름을 확인하고 정확히 쓰거나 `wb.active` 를 쓰세요."
+      miniExercise: |
+        import openpyxl
+        wb = openpyxl.Workbook()
+        print(wb.sheetnames)
+        ws = wb.active
+        print(ws.title)
+
+  - id: automation.excel.workbook.zeroIndexedCell
+    label: "행/열을 0부터 세기"
+    summary: "ws.cell(row=0, column=1) 처럼 0 을 써서 'must be at least 1' ValueError 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: Row or column values must be at least 1"
+        description: "openpyxl 의 행/열은 1부터 시작."
+    diagnostic:
+      message: "openpyxl 의 행·열 번호는 **1 부터** 시작합니다(엑셀과 동일). `ws.cell(row=1, column=1)` 이 A1 입니다. 리스트처럼 0 을 쓰면 안 됩니다."
+      references: ["automation.excel.workbook"]
+    correction:
+      hint: "첫 셀은 `ws.cell(row=1, column=1)` 또는 `ws['A1']`."
+      miniExercise: |
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.cell(row=1, column=1, value="A1")
+        print(ws["A1"].value)

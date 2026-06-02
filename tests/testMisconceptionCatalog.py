@@ -356,6 +356,20 @@ def testErrorPatternMatchesWebApiJsonOnNonJson() -> None:
     assert "automation.webApi.get.jsonOnNonJson" in ids
 
 
+def testErrorPatternMatchesExcelSheetNotFound() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.excel.workbook.yml")
+    hits = matchErrorPattern(catalog, "KeyError: 'Worksheet Sheet1 does not exist.'")
+    ids = {hit.id for hit in hits}
+    assert "automation.excel.workbook.sheetNotFound" in ids
+
+
+def testErrorPatternMatchesExcelZeroIndexedCell() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "automation.excel.workbook.yml")
+    hits = matchErrorPattern(catalog, "ValueError: Row or column values must be at least 1")
+    ids = {hit.id for hit in hits}
+    assert "automation.excel.workbook.zeroIndexedCell" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"
