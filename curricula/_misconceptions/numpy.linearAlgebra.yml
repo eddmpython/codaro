@@ -1,0 +1,44 @@
+meta:
+  outcomeId: numpy.linearAlgebra
+  status: draft
+  version: 1
+  note: "초안 — 선형대수(dot/solve/inv) 흔한 오개념 시드. 사람이 정제 필요."
+
+misconceptions:
+  - id: numpy.linearAlgebra.dotShapeMismatch
+    label: "행렬곱의 안쪽 차원이 안 맞음"
+    summary: "(2,3) @ (2,3) 처럼 앞 행렬의 열 수와 뒤 행렬의 행 수가 달라 'not aligned' 에러가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "ValueError: shapes .* not aligned"
+        description: "행렬곱 안쪽 차원 불일치."
+    diagnostic:
+      message: "행렬곱 `A @ B` 는 A 의 **열 수**와 B 의 **행 수**가 같아야 합니다. `(2, 3)` 과 곱하려면 뒤 행렬은 `(3, k)` 모양이어야 합니다. 필요하면 `B.T` 로 전치하세요."
+      references: ["numpy.linearAlgebra", "numpy.arrayOps"]
+    correction:
+      hint: "안쪽 차원을 맞추세요. `(2,3) @ (3,k)`. 모양은 `A.shape`, `B.shape` 로 확인."
+      miniExercise: |
+        import numpy as np
+        A = np.ones((2, 3))
+        B = np.ones((3, 4))
+        print((A @ B).shape)
+
+  - id: numpy.linearAlgebra.singularMatrix
+    label: "특이행렬의 역행렬/해를 구함"
+    summary: "행/열이 선형종속인 행렬에 inv 나 solve 를 써서 LinAlgError: Singular matrix 가 난다."
+    triggers:
+      - kind: errorPattern
+        appliesTo: error
+        pattern: "LinAlgError: Singular matrix"
+        description: "역행렬이 없는(행렬식 0) 행렬."
+    diagnostic:
+      message: "행렬식이 0 인 **특이행렬**은 역행렬이 없어 `inv`/`solve` 가 실패합니다(예: 한 행이 다른 행의 배수). 데이터가 선형종속인지 확인하고, 근사해가 필요하면 `np.linalg.lstsq` 를 쓰세요."
+      references: ["numpy.linearAlgebra"]
+    correction:
+      hint: "정칙행렬인지 `np.linalg.det(A)` 로 확인하거나, 최소제곱 `np.linalg.lstsq(A, b, rcond=None)` 를 사용하세요."
+      miniExercise: |
+        import numpy as np
+        A = np.array([[1.0, 2.0], [3.0, 5.0]])
+        b = np.array([1.0, 2.0])
+        print(np.linalg.solve(A, b))

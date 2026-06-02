@@ -300,6 +300,20 @@ def testErrorPatternMatchesBase64NeedsBytes() -> None:
     assert "builtins.textProcessing.base64NeedsBytes" in ids
 
 
+def testErrorPatternMatchesDotShapeMismatch() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "numpy.linearAlgebra.yml")
+    hits = matchErrorPattern(catalog, "ValueError: shapes (2,3) and (2,3) not aligned: 3 (dim 1) != 2 (dim 0)")
+    ids = {hit.id for hit in hits}
+    assert "numpy.linearAlgebra.dotShapeMismatch" in ids
+
+
+def testErrorPatternMatchesSingularMatrix() -> None:
+    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "numpy.linearAlgebra.yml")
+    hits = matchErrorPattern(catalog, "numpy.linalg.LinAlgError: Singular matrix")
+    ids = {hit.id for hit in hits}
+    assert "numpy.linearAlgebra.singularMatrix" in ids
+
+
 def testCodePatternMatchesBareExcept() -> None:
     catalog = loadCatalog(DEFAULT_CATALOG_DIR / "python.errorHandling.yml")
     code = "try:\n    risky()\nexcept:\n    pass\n"
