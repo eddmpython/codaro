@@ -373,6 +373,8 @@ class OnboardingStubApi:
                     })
                 elif path == "/api/curriculum/progress":
                     self._sendJson({"category": "python", "contentId": "hello", "completedMissions": ["cell-1"], "totalMissions": 1, "completedAt": "2026-06-02T00:00:00+00:00"})
+                elif path.startswith("/api/curriculum/reviews/"):
+                    self._sendJson({"lessonKey": "30days/hello", "interval": 3, "ease": 2.6, "streak": 2, "nextReviewAt": "2026-06-05T00:00:00+00:00", "lastResult": "success", "lastReviewedAt": "2026-06-02T00:00:00+00:00"})
                 elif path == "/api/curriculum/check":
                     self._sendJson({
                         "passed": True,
@@ -598,6 +600,10 @@ def jsAssertCurriculumHome() -> str:
   if (!reviews.textContent || !reviews.textContent.includes('복습할 시간')) throw new Error('curriculum home review label missing');
   const reviewItems = reviews.querySelectorAll('[data-curriculum-home-review]');
   if (reviewItems.length < 1) throw new Error('curriculum home review items missing');
+  const reviewPass = reviews.querySelector('[data-curriculum-home-review-pass="true"]');
+  if (!reviewPass) throw new Error('curriculum home review recall-pass button missing');
+  const reviewLapse = reviews.querySelector('[data-curriculum-home-review-lapse="true"]');
+  if (!reviewLapse) throw new Error('curriculum home review recall-lapse button missing');
   return 'curriculum-home-ok';
 })()
 """)
@@ -608,6 +614,8 @@ def jsAssertExerciseCheck() -> str:
 (async () => {
   const exercise = document.querySelector('[data-learning-section-part="exercise"]');
   if (!exercise) throw new Error('exercise part missing');
+  const predictCard = exercise.querySelector('[data-predict-card="exercise"]');
+  if (!predictCard) throw new Error('predict card missing');
   const runBtn = exercise.querySelector('button[aria-label="셀 실행"]');
   if (!runBtn) throw new Error('exercise run button missing');
   runBtn.click();
@@ -868,7 +876,7 @@ def curriculumLessonPayload() -> dict[str, Any]:
                         "solution": "print('hello')",
                         "description": "hello를 출력하세요",
                         "studentAnswer": "",
-                        "predict": None,
+                        "predict": {"prompt": "무엇이 출력될까요?", "expectedValue": "hello"},
                     },
                 },
             ],

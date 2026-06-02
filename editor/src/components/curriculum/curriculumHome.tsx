@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Check, CheckCircle2, GraduationCap, RotateCcw, Sparkles, X } from "lucide-react";
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import { useCurriculumReviews } from "@/hooks/useCurriculumReviews";
+import { recordReviewResult } from "@/lib/curriculumReviews";
 import { cn } from "@/lib/utils";
 import type { CurriculumCategory } from "@/types";
 
@@ -48,6 +49,15 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
 
   const dueReviews = reviews?.reviews ?? [];
   const totalDue = reviews?.totalDue ?? 0;
+
+  const rateReview = async (category: string, contentId: string, success: boolean) => {
+    if (!contentId) return;
+    try {
+      await recordReviewResult(category, contentId, success);
+    } catch (error) {
+      console.warn("review rating failed", error);
+    }
+  };
 
   const totalLessons = useMemo(
     () => categories.reduce((sum, category) => sum + (category.count || 0), 0),
@@ -133,22 +143,49 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
               </p>
               <div className="mt-3 space-y-2">
                 {dueReviews.slice(0, 5).map((review) => (
-                  <button
+                  <div
                     key={review.lessonKey}
-                    className="flex w-full items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2"
                     data-curriculum-home-review={review.lessonKey}
-                    disabled={!review.contentId}
-                    onClick={() => review.contentId && onSelectLesson(review.category, review.contentId)}
-                    type="button"
                   >
-                    <span className="truncate text-sm font-medium">{review.title}</span>
-                    <Badge
-                      className="shrink-0"
-                      variant={review.daysOverdue > 0 ? "destructive" : "outline"}
+                    <button
+                      className="flex min-w-0 flex-1 items-center gap-2 text-left transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={!review.contentId}
+                      onClick={() => review.contentId && onSelectLesson(review.category, review.contentId)}
+                      type="button"
                     >
-                      {review.daysOverdue > 0 ? `${review.daysOverdue}일 지남` : "오늘"}
-                    </Badge>
-                  </button>
+                      <BookOpen className="size-3.5 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-sm font-medium">{review.title}</span>
+                      <Badge
+                        className="shrink-0"
+                        variant={review.daysOverdue > 0 ? "destructive" : "outline"}
+                      >
+                        {review.daysOverdue > 0 ? `${review.daysOverdue}일 지남` : "오늘"}
+                      </Badge>
+                    </button>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <Button
+                        className="h-7 gap-1 px-2 text-[11px] text-emerald-700 hover:bg-emerald-100/60 dark:text-emerald-400"
+                        data-curriculum-home-review-pass="true"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => void rateReview(review.category, review.contentId, true)}
+                      >
+                        <Check className="size-3.5" />
+                        기억남
+                      </Button>
+                      <Button
+                        className="h-7 gap-1 px-2 text-[11px] text-muted-foreground hover:bg-muted"
+                        data-curriculum-home-review-lapse="true"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => void rateReview(review.category, review.contentId, false)}
+                      >
+                        <X className="size-3.5" />
+                        가물
+                      </Button>
+                    </div>
+                  </div>
                 ))}
               </div>
               {totalDue > 5 ? (
