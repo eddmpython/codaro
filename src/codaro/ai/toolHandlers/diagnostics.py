@@ -189,6 +189,9 @@ class DiagnosticsToolHandlers:
         baseSignal = {
             "masteryScore": mastery.score,
             "masteryConfidence": mastery.confidence,
+            "masteryLowerBound": round(mastery.lowerBound, 4),
+            "strongObservations": mastery.strongCount,
+            "mastered": mastery.mastered,
             "repeatedMisconceptions": 0,
             "unresolvedMisconceptions": 0,
         }
@@ -202,10 +205,15 @@ class DiagnosticsToolHandlers:
                 "signal": baseSignal,
             }
 
-        if mastery.score >= 0.8 and mastery.confidence >= 0.5:
+        # 정직한 숙달 판정으로만 다음 outcome 진급 — 불확실성 하한 ≥ 임계 AND 강한 관측 ≥ 1.
+        # raw score/confidence는 noError만으로도 부풀 수 있어 과대주장을 막는다.
+        if mastery.mastered:
             return {
                 "action": "advanceToNextOutcome",
-                "reason": f"mastery score {mastery.score:.2f} and confidence {mastery.confidence:.2f} meet advancement thresholds",
+                "reason": (
+                    f"mastery lower-bound {mastery.lowerBound:.2f} ≥ threshold with "
+                    f"{mastery.strongCount} strong observation(s) — genuine mastery"
+                ),
                 "outcomeId": currentOutcomeId,
                 "domainId": domainId,
                 "signal": baseSignal,

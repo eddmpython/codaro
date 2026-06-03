@@ -152,6 +152,23 @@ def testSuggestNextStepAdvancesWhenMasteryHigh(
     assert result["action"] == "advanceToNextOutcome"
 
 
+def testSuggestNextStepDoesNotAdvanceOnWeakSignalOnly(
+    handlers: DiagnosticsToolHandlers,
+    isolatedStore: LearnerStateStore,
+) -> None:
+    # noError(약한 신호)만 스무 번 통과 — score는 올라도 강한 관측 0이라 진급하지 않는다.
+    from codaro.curriculum.masterySignal import MasteryEvidence
+
+    for _ in range(20):
+        isolatedStore.recordEvidence(
+            "python.variables", MasteryEvidence(scoreTarget=1.0, strength=0.25, isSuccess=True)
+        )
+    result = _run(handlers._handle_suggestNextStep({"currentOutcomeId": "python.variables"}))
+    assert result["action"] != "advanceToNextOutcome"
+    assert result["signal"]["mastered"] is False
+    assert result["signal"]["strongObservations"] == 0
+
+
 def testSuggestNextStepAppliesCorrectionOnRepeat(
     handlers: DiagnosticsToolHandlers,
     isolatedStore: LearnerStateStore,
