@@ -8,6 +8,28 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.10 - 2026-06-03
+
+리액티브 노트북을 "살아있게" 만들었다 — 위젯을 변수에 담으면(`slider = ui.slider(0, 100)`) 슬라이더를
+드래그할 때 그 변수를 쓰는 셀만 자동 재실행되고(위젯 정의 셀은 값 리셋 방지로 제외), 순환 의존은 실행
+순서를 잡아 표면에 노출한다. marimo의 로컬-우선 리액티브 강점을 흡수하되 WASM/pyodide는 제외했다.
+
+### Added
+
+- 리액티브 위젯 값 바인딩 — `ui.slider/dropdown/number/checkbox`가 값 객체(`UiValue`)를 반환하고, 값 변경 시 `POST /api/kernel/{id}/set-ui-value`로 그 변수를 쓰는 다운스트림 셀만 재실행한다. 값은 위치 기반 id(`{blockId}#{index}`)로 워커 store에 영속(셀 재실행에도 유지) (`src/codaro/uiValue.py`, `src/codaro/outputDescriptor.py`, `src/codaro/api/kernelRouter.py`).
+- 프론트 위젯 바인딩 — `widgetHost`의 값 위젯이 150ms 디바운스로 값 변경을 송신하고, 노트북 런타임이 의존 셀 출력을 갱신 (`editor/src/components/widgets/widgetHost.tsx`, `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`).
+- 리액티브 순환 의존 감지 — `reactive.detectCycles`가 의존 그래프의 순환(A↔B 등)을 잡아 reactive payload·WS `reactiveComplete`에 `cycles`로 동봉 (`src/codaro/kernel/reactive.py`, `executionPayload.py`).
+
+### Changed
+
+- `getReactiveOrder`/`executeReactive`/`executeKernelReactive`에 `includeSource`(기본 True) — 위젯 값 변경 시 source(위젯 정의) 셀을 제외하고 다운스트림만 재실행.
+- 위젯 값 위젯이 bare descriptor가 아닌 `UiValue` 객체를 반환하도록 팩토리 확장(렌더 형태는 `codaroDescriptor()`로 불변, layout 중첩 UiValue도 직렬화).
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py quality-cycle` 22/22 게이트 통과(soft-fail 0).
+- 신규 테스트: `tests/testReactiveCycles.py`, `tests/testUiValueBinding.py`; HTTP/WS set-ui-value 라운드트립(`tests/testServerApi.py`).
+
 ## 0.0.9 - 2026-06-03
 
 지능형 학습 루프를 라이브 학습 화면에 연결했다 — 검증 버튼이 채점·오개념 진단·다음 행동까지 닫고,
