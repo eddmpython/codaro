@@ -8,6 +8,46 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.8 - 2026-06-03
+
+지능형 학습 루프를 라이브 학습 화면에 연결했다 — 검증 버튼이 채점·오개념 진단·다음 행동까지 닫고,
+완료한 개념을 간격 반복으로 되살린다. 진단 신호를 정직하게 다듬고(신호강도 가중 mastery·불확실성
+하한), 학습/편집기 코드를 자동화 태스크로 가져가는 경로와 실행 리포트 영속·diff를 추가했다. 초보가
+첫 화면에서 마주치던 사족(실행 전 예측 카드·검증 기준 덤프)을 걷어내고 5층 아키텍처 경계를 게이트로
+강제했다.
+
+### Added
+
+- 라이브 학습 검증 루프 — 검증 버튼 → 채점 → 오개념·다음 행동 패널, 통과 시 레슨 완료 기록과 진행률·여정·복습 advance (`src/codaro/curriculum/checkFlow.py`, `editor/src/components/curriculum/`, `editor/src/lib/curriculumCheck.ts`).
+- 오개념 카탈로그 다수 — python.intro, 표준 라이브러리, 연산자·numpy 입문, 데이터 결합·시계열, 시각화·dataclass·머신러닝 입문, JSON 직렬화, asyncio, 문자열 처리, 선형대수, 컨텍스트 매니저, 정규식, HTTP GET, Excel(openpyxl) (`curricula/python/_misconceptions/`).
+- 학습 홈 메타인지 surface — 약점 영역(미해결 오개념 집계 + 복습 레슨 바로가기), 복습 due 레슨(간격 반복), 학습 여정 추천(초급→중급→실무→고급), 숙달 개념 수.
+- 간격 반복 복습 — 레슨 완료 시 SM-2 복습 상태 seed, 복습 회상 평가로 retention 루프 (`src/codaro/curriculum/reviewScheduler.py`, `reviewFlow.py`, `progress.py`).
+- engine 실행 포착 primitive `captureDocument`와 numpy/pandas shape/dtype introspection — authoring·diagnostics·automation 공유 (`src/codaro/kernel/documentExecution.py`, `runtime/localWorker.py`).
+- 레퍼런스-솔루션 강한-체크 제안기(dev tooling, 출력 전용·YAML 미변경) (`tests/authorReferenceChecks.py`).
+- 자동화 — 실행 기록 디스크 영속화 + 직전대비 diff (`src/codaro/automation/reportDiff.py`, `taskRegistry.py`), 재시작 시 스케줄 복원, 완료 시 채널 알림, 학습 코드 → 태스크 Harvest(`POST /api/tasks/from-code`) + 숙달 졸업 게이트.
+- 5층 아키텍처 import 게이트 (`tests/testArchitectureLayerContract.py`), 학습 셀 로컬-우선 정적 자동완성, 런처 로딩 화면 마스코트 아바타.
+
+### Changed
+
+- mastery 정직성 — 체크 신호강도 가중 + slip/guess 결합 (`src/codaro/curriculum/masterySignal.py`), Wilson 불확실성 하한 기반 "mastered" 판정과 강한 관측 요구 (`learnerState.py`), 다음-단계 진급을 raw score가 아닌 정직한 숙달로 (`ai/toolHandlers/diagnostics.py`).
+- transport/도메인 경계 정리 — provider·채팅·자동화·커리큘럼 surface 책임 분리(사용자 동작 불변, 계층 게이트 충족).
+- 30days day1~2 예측 grain 정리 — day1 타입 예측 제거, day2(데이터 타입) 타입 예측 추가.
+
+### Removed
+
+- "실행 전 예측" 학습자 카드 — 표면에서 제거(백엔드 predict 인프라는 튜터 도구 경로용으로 보존). `editor/src/components/curriculum/predictCard.tsx` 삭제, predict-contract-strict 비활성.
+- 검증 기준 카드 — 내부 채점 설정을 학습자에게 덤프하던 자동 생성 블록을 converter 생성 지점에서 제거 (`src/codaro/curriculum/converter.py`).
+
+### Fixed
+
+- 예측 placeholder("(…적어주세요)") 정규화 + 예측 입력 hint가 정답을 노출하던 스포일러 제거.
+- 다운로드 링크 자산명을 게시 자산(`Codaro.exe`·`codaro.spdx.json`)으로 맞춰 404 해소, 성능 예산·품질 audit 게이트 stale 복구, 온보딩 브라우저 게이트 복구.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py quality-cycle` 22/22 게이트 통과(soft-fail 0).
+- `uv run python -X utf8 tests/run.py preflight` green.
+
 ## 0.0.7 - 2026-05-31
 
 학습 화면을 정리하고(검증 사족 제거·셀/섹션 배치 개선), polars DataFrame 출력을 깨진 HTML 덤프에서 표로 고치고,
