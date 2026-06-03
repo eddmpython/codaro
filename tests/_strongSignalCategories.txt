@@ -1,0 +1,9 @@
+# 강한 신호로 정리 완료된 커리큘럼 카테고리 — 회귀 차단 allowlist.
+#
+# 여기 등록된 카테고리는 약한 신호(noError-only 체크 또는 placeholder predict)가
+# 0개여야 한다(curriculum-weakness-audit의 weakSignalRegression 임계 = 0).
+# 한 카테고리의 모든 레슨을 강한 체크(output/variable/contains) + 실제 predict 기대값으로
+# 정리한 뒤 그 카테고리 키를 한 줄로 추가한다 → 이후 그 카테고리는 약한 신호로 회귀할 수 없다.
+#
+# 비어 있으면(현재) 회귀 차단은 비활성 — 전체 약한 신호는 게이트 리포트에 정보성으로만 집계된다.
+# 형식: 카테고리 키 한 줄(예: 30days). '#' 주석/빈 줄 무시.

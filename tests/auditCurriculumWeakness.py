@@ -13,6 +13,14 @@ solutions가 있는지). 이 audit은 한 단계 더 들어가서 plan 가시성
 6. **sectionIdMissing**: taxonomy.sectionOutcomes 에 매핑된 section id 가 YAML 의
    실제 section id 와 불일치 — credit 흐름이 무효 section id 를 신뢰하는 위험.
 
+체크 (신호 강도, 정보성 + 회귀 차단):
+8. **weakCheckSignal**(정보성): exercise+check는 있으나 강한 체크(output/variable/
+   contains)가 0개 — noError-only 레슨. 약한 신호의 규모를 가시화한다.
+9. **placeholderPredict**(정보성): predict 기대값이 placeholder("직접 …주세요").
+10. **weakSignalRegression**(임계 0): `tests/_strongSignalCategories.txt` allowlist에
+   등록된(정리 완료) 카테고리에서 약한 신호가 재등장하면 차단. 콘텐츠는 사람이 강화하고,
+   정리된 카테고리는 회귀하지 못하게 막는다(엔진은 측정, 작성은 사람).
+
 체크 (카테고리 단위):
 7. **categoryWithoutProject**: deliverable-driven plan 합성을 위한 project lesson
    이 카테고리 내에 0 개. 단, 명시적 유틸 모듈 카테고리는 면제.
@@ -48,6 +56,8 @@ if str(ROOT / "src") not in sys.path:
 REPORT_PATH = ROOT / "output" / "test-runner" / "curriculum-weakness-audit" / "curriculum-weakness-report.json"
 
 # 임계치 — orphan 0개, noExercise 0개, exerciseWithoutCheck 0개, noHint 0개 유지.
+# weakSignalRegression: strong-signal allowlist에 등록된 카테고리는 약한 신호 0개 강제
+# (정리된 카테고리의 회귀 차단). weakCheckSignal/placeholderPredict 자체는 정보성(아래).
 THRESHOLDS: dict[str, int] = {
     "orphanInPlan": 0,
     "noExercise": 0,
@@ -55,7 +65,50 @@ THRESHOLDS: dict[str, int] = {
     "noHint": 0,
     "sectionIdMissing": 0,
     "categoryWithoutProject": 0,
+    "weakSignalRegression": 0,
 }
+
+# 강한 신호 체크 타입 — noError 는 "예외 안 남"이라 약한 신호로 분류.
+STRONG_CHECK_TYPES: frozenset[str] = frozenset({"output", "variable", "contains"})
+# predict 기대값 placeholder 마커 — "(직접 실행해 본 값을 적어주세요)" 류.
+PLACEHOLDER_MARKERS: tuple[str, ...] = ("직접", "주세요")
+# 강한 신호로 정리 완료된 카테고리(회귀 차단). tests/_strongSignalCategories.txt.
+STRONG_SIGNAL_ALLOWLIST_PATH = ROOT / "tests" / "_strongSignalCategories.txt"
+
+
+def _loadStrongSignalCategories() -> frozenset[str]:
+    if not STRONG_SIGNAL_ALLOWLIST_PATH.exists():
+        return frozenset()
+    lines = STRONG_SIGNAL_ALLOWLIST_PATH.read_text(encoding="utf-8").splitlines()
+    return frozenset(
+        stripped for line in lines
+        if (stripped := line.strip()) and not stripped.startswith("#")
+    )
+
+
+def _sectionCheckTypes(section: dict[str, Any]) -> list[str]:
+    types: list[str] = []
+    for blockKey in ("check", "checks"):
+        block = section.get(blockKey)
+        if isinstance(block, dict) and isinstance(block.get("type"), str):
+            types.append(block["type"])
+        elif isinstance(block, list):
+            types.extend(c["type"] for c in block if isinstance(c, dict) and isinstance(c.get("type"), str))
+    return types
+
+
+def _sectionHasPlaceholderPredict(section: dict[str, Any]) -> bool:
+    exercise = section.get("exercise")
+    if not isinstance(exercise, dict):
+        return False
+    predict = exercise.get("predict")
+    if not isinstance(predict, dict):
+        return False
+    for field in ("expectedValue", "expectedShape", "expectedDtype", "expectedError"):
+        value = predict.get(field)
+        if isinstance(value, str) and all(marker in value for marker in PLACEHOLDER_MARKERS):
+            return True
+    return False
 
 # 명시적으로 project lesson 면제되는 카테고리.
 # - builtins: 표준라이브러리 유틸 단원 모음. 별도 deliverable 없음.
@@ -90,9 +143,13 @@ def auditCurriculum() -> dict[str, Any]:
     loader = StudyLoader(str(ROOT / "curricula" / "python"))
     taxonomy = loadTaxonomy()
     taxonomyKeys = set(taxonomy.lessonOutcomes.keys())
+    strongSignalCategories = _loadStrongSignalCategories()
 
     lessonReports: list[dict[str, Any]] = []
     flagCounts: dict[str, int] = {}
+    # 정보성 집계(게이트 미차단) — 약한 신호의 가시화.
+    weakCheckSignalCount = 0
+    placeholderPredictCount = 0
     for category in loader.listCategories():
         for summary in loader.listContents(category.key):
             key = f"{category.key}/{summary.contentId}"
@@ -113,6 +170,8 @@ def auditCurriculum() -> dict[str, Any]:
             hintMissing = 0
             shortGoals = 0
             sectionIds: set[str] = set()
+            lessonCheckTypes: list[str] = []
+            lessonHasPlaceholder = False
             for section in sections:
                 if not isinstance(section, dict):
                     continue
@@ -130,6 +189,9 @@ def auditCurriculum() -> dict[str, Any]:
                         hintMissing += 1
                 if section.get("check") or section.get("checks"):
                     checkSections += 1
+                lessonCheckTypes.extend(_sectionCheckTypes(section))
+                if _sectionHasPlaceholderPredict(section):
+                    lessonHasPlaceholder = True
 
             taxonomyRecord = taxonomy.lessonOutcomes.get(key)
             if taxonomyRecord and taxonomyRecord.sectionOutcomes:
@@ -158,6 +220,20 @@ def auditCurriculum() -> dict[str, Any]:
             if sections and shortGoals * 2 > len(sections):
                 flags.append("shortGoal")
 
+            # 약한 신호(정보성) — 강한 체크가 0개이거나 predict가 placeholder.
+            isWeakCheck = (
+                exerciseSections > 0
+                and checkSections > 0
+                and not any(t in STRONG_CHECK_TYPES for t in lessonCheckTypes)
+            )
+            if isWeakCheck:
+                weakCheckSignalCount += 1
+            if lessonHasPlaceholder:
+                placeholderPredictCount += 1
+            # 회귀 차단 — 정리 완료(allowlist) 카테고리는 약한 신호 0개여야 한다.
+            if category.key in strongSignalCategories and (isWeakCheck or lessonHasPlaceholder):
+                flags.append("weakSignalRegression")
+
             for flag in flags:
                 flagCounts[flag] = flagCounts.get(flag, 0) + 1
 
@@ -184,6 +260,9 @@ def auditCurriculum() -> dict[str, Any]:
         if count == 0 and cat not in PROJECT_EXEMPT_CATEGORIES
     ]
     flagCounts["categoryWithoutProject"] = len(missingProjectCategories)
+    # 정보성(미차단) — 약한 신호의 규모를 가시화한다. 사람-작성 강화의 측정 지표.
+    flagCounts["weakCheckSignal"] = weakCheckSignalCount
+    flagCounts["placeholderPredict"] = placeholderPredictCount
 
     breaches = []
     for flag, threshold in THRESHOLDS.items():
@@ -324,9 +403,14 @@ def main() -> int:
                 f" · runtime: {len(runtime['weakOutcomes'])} weak outcomes, "
                 f"{len(runtime['repeatedMisconceptions'])} repeated misconceptions"
             )
+        signalNote = (
+            f" · signal: {audit['flagCounts'].get('weakCheckSignal', 0)} weak-check lessons, "
+            f"{audit['flagCounts'].get('placeholderPredict', 0)} placeholder-predict lessons"
+        )
         print(
             "ok: curriculum weakness audit passed "
-            f"({audit['lessonsWithFlags']} lessons with at least one informational flag){runtimeNote}"
+            f"({audit['lessonsWithFlags']} lessons with at least one informational flag)"
+            f"{signalNote}{runtimeNote}"
         )
         return 0
     else:
