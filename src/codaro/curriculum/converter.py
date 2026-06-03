@@ -806,16 +806,36 @@ def _checkConfig(block: dict[str, Any]) -> dict[str, str]:
     return {str(key): _textValue(value) for key, value in check.items()}
 
 
+def _isPlaceholderPredict(value: str) -> bool:
+    """예측 값이 작성 안내 placeholder인지 — "(…적어주세요)" 류. 실제 기대값엔 이런 말이 없다."""
+    return "주세요" in value or "적어" in value
+
+
+def _cleanPredictField(value: str) -> str:
+    return "" if _isPlaceholderPredict(value) else value
+
+
 def _predictConfig(predict: LearningPredictContract | None) -> PredictConfig | None:
-    """exercise.predict 가 비어있으면 None — 프론트 페이로드를 깨끗하게 유지한다."""
+    """exercise.predict 를 프론트용으로 정규화한다.
+
+    작성 안내 placeholder("(셀 마지막 출력값을 적어주세요)" 등)는 실제 기대값이 아니라 작성 미완
+    표시이므로 빈 값으로 떨군다 — 그래야 카드가 그 차원을 숨기고(grain 정합), placeholder를 hint로
+    echo하지 않는다. 정규화 후 실제 예측 대상이 하나도 없으면 None(카드를 아예 안 띄움).
+    """
     if predict is None or predict.isEmpty():
+        return None
+    shape = _cleanPredictField(predict.expectedShape)
+    dtype = _cleanPredictField(predict.expectedDtype)
+    value = _cleanPredictField(predict.expectedValue)
+    error = _cleanPredictField(predict.expectedError)
+    if not any([predict.prompt, shape, dtype, value, error]):
         return None
     return PredictConfig(
         prompt=predict.prompt,
-        expectedShape=predict.expectedShape,
-        expectedDtype=predict.expectedDtype,
-        expectedValue=predict.expectedValue,
-        expectedError=predict.expectedError,
+        expectedShape=shape,
+        expectedDtype=dtype,
+        expectedValue=value,
+        expectedError=error,
     )
 
 
