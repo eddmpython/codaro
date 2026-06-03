@@ -26,7 +26,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")
 from ..document.analysis import analyzeCode
 from ..errorGuard import safeRepr
 from ..outputDescriptor import isDescriptorPayload
-from ..uiValue import beginBlock, resetStore
+from ..uiValue import beginBlock, resetStore, setStoredValue
 
 
 def runLocalWorker(
@@ -143,6 +143,11 @@ def runLocalWorker(
                         "executionCount": executionCount,
                     },
                 )
+                continue
+
+            if action == "setUiValue":
+                setStoredValue(command["elementId"], command.get("value"))
+                _workerSend(connection, {"ok": True})
                 continue
 
             _workerSend(connection, {"error": f"Unsupported worker action: {action}"})

@@ -65,6 +65,9 @@ class KernelSession:
             status=result.status,
         )
 
+    def setUiValue(self, elementId: str, value: object) -> None:
+        self._engine.setUiValue(elementId, value)
+
     def removeCellDefinitions(self, blockId: str) -> None:
         self._engine.removeBlockDefinitions(blockId)
 

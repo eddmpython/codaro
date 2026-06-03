@@ -111,6 +111,15 @@ class WsExecuteReactiveMessage(BaseModel):
     blocks: list[ReactiveBlockPayload]
 
 
+class WsSetUiValueMessage(BaseModel):
+    type: Literal["setUiValue"] = "setUiValue"
+    requestId: str
+    blockId: str
+    elementId: str
+    value: Any = None
+    blocks: list[ReactiveBlockPayload]
+
+
 class WsResetMessage(BaseModel):
     type: Literal["reset"] = "reset"
 

@@ -283,6 +283,15 @@ class LocalEngine(ExecutionEngine):
             self._replaceWorker()
             self._cellDefinitions.pop(blockId, None)
 
+    def setUiValue(self, elementId: str, value: Any) -> None:
+        """리액티브 위젯 값을 워커 store에 갱신한다(registry/변수 불변, 값만)."""
+        if not self._hasLiveWorker():
+            return
+        try:
+            self._sendCommand({"action": "setUiValue", "elementId": elementId, "value": value})
+        except (BrokenPipeError, EOFError, OSError):
+            self._replaceWorker()
+
     def reset(self, *, preserveDefinitions: bool = False) -> None:
         if self._hasLiveWorker():
             action = "resetVariables" if preserveDefinitions else "reset"

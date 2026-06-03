@@ -891,6 +891,52 @@ def testKernelWebSocketReactiveAndReset() -> None:
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 
 
+def testKernelWebSocketSetUiValueRerunsDependentsOnly() -> None:
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+    widgetBlock = {
+        "id": "w",
+        "type": "code",
+        "content": "from codaro.outputDescriptor import ui\nslider = ui.slider(0, 100)",
+    }
+    consumerBlock = {"id": "c", "type": "code", "content": "doubled = slider.value * 2\ndoubled"}
+
+    def drainUntilReady(websocket) -> list[dict]:
+        messages: list[dict] = []
+        while True:
+            message = websocket.receive_json()
+            messages.append(message)
+            if message.get("type") == "status" and message.get("engineStatus") == "ready":
+                return messages
+
+    with client.websocket_connect(f"/ws/kernel/{sessionId}") as websocket:
+        websocket.receive_json()  # initial ready
+        for requestId, block in (("rw", widgetBlock), ("rc", consumerBlock)):
+            websocket.send_json({"type": "execute", "requestId": requestId, "blockId": block["id"], "code": block["content"]})
+            consumerMessages = drainUntilReady(websocket)
+        firstResult = next(m for m in consumerMessages if m["type"] == "result")
+        assert "0" in str(firstResult["data"])  # slider.value=0 → doubled=0
+
+        websocket.send_json({
+            "type": "setUiValue",
+            "requestId": "rs",
+            "blockId": "w",
+            "elementId": "w#0",
+            "value": 50,
+            "blocks": [widgetBlock, consumerBlock],
+        })
+        messages: list[dict] = []
+        while True:
+            message = websocket.receive_json()
+            messages.append(message)
+            if message.get("type") == "reactiveComplete":
+                break
+        complete = messages[-1]
+        assert complete["executionOrder"] == ["c"]  # 위젯 셀 w는 재실행 제외
+        results = [m for m in messages if m["type"] == "result"]
+        assert any("100" in str(result["data"]) for result in results)  # 50 * 2
+
+
 def testKernelWebSocketRejectsInvalidPayload() -> None:
     client = TestClient(createServerApp())
     sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]

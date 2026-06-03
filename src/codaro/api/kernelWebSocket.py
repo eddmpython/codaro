@@ -14,6 +14,7 @@ from ..kernel.protocol import (
     WsGetVariablesMessage,
     WsInterruptMessage,
     WsResetMessage,
+    WsSetUiValueMessage,
     WsStatusMessage,
 )
 from ..kernel.uiEventFlow import resetKernelUiCallbacks
@@ -89,6 +90,8 @@ async def handleKernelWsMessage(websocket: WebSocket, session: Any, message: Any
         logger.debug("kernel-variables %s", formatLogFields(transport="ws", sessionId=session.sessionId))
     elif isinstance(message, WsExecuteReactiveMessage):
         await handleReactiveMessage(websocket, session, message, logger)
+    elif isinstance(message, WsSetUiValueMessage):
+        await handleSetUiValueMessage(websocket, session, message, logger)
     elif isinstance(message, WsResetMessage):
         session.reset()
         resetKernelUiCallbacks()
@@ -106,6 +109,8 @@ def validateKernelWsMessage(message: dict[str, Any]) -> Any:
         return WsGetVariablesMessage.model_validate(message)
     if messageType == "executeReactive":
         return WsExecuteReactiveMessage.model_validate(message)
+    if messageType == "setUiValue":
+        return WsSetUiValueMessage.model_validate(message)
     if messageType == "reset":
         return WsResetMessage.model_validate(message)
     raise ValueError(f"Unsupported websocket message type: {messageType or 'unknown'}.")
@@ -152,28 +157,55 @@ async def handleReactiveMessage(
     message: WsExecuteReactiveMessage,
     logger: Any,
 ) -> None:
-    requestId = message.requestId
-    changedBlockId = message.blockId
     blocks = [block.model_dump() for block in message.blocks]
+    await _runReactiveAndSend(
+        websocket, session, message.requestId, message.blockId, blocks, logger,
+        includeSource=True, kind="reactive",
+    )
 
+
+async def handleSetUiValueMessage(
+    websocket: WebSocket,
+    session: Any,
+    message: WsSetUiValueMessage,
+    logger: Any,
+) -> None:
+    # 위젯 값 store 갱신 → 그 변수를 쓰는 다운스트림만 재실행(위젯 셀 자신은 제외).
+    session.setUiValue(message.elementId, message.value)
+    blocks = [block.model_dump() for block in message.blocks]
+    await _runReactiveAndSend(
+        websocket, session, message.requestId, message.blockId, blocks, logger,
+        includeSource=False, kind="setUiValue",
+    )
+
+
+async def _runReactiveAndSend(
+    websocket: WebSocket,
+    session: Any,
+    requestId: str,
+    changedBlockId: str,
+    blocks: list[dict[str, Any]],
+    logger: Any,
+    *,
+    includeSource: bool,
+    kind: str,
+) -> None:
     if not await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="busy").model_dump()):
         return
     reactiveEvents: list[dict[str, Any]] = []
 
     async def eventHandler(event: Any) -> None:
-        reactiveEvents.append(
-            {
-                "blockId": event.blockId,
-                "eventType": event.eventType,
-            }
-        )
+        reactiveEvents.append({"blockId": event.blockId, "eventType": event.eventType})
         await sendExecutionEvent(websocket, requestId, event)
 
-    payload = await executeKernelReactive(session, blocks, changedBlockId, eventHandler=eventHandler)
+    payload = await executeKernelReactive(
+        session, blocks, changedBlockId, eventHandler=eventHandler, includeSource=includeSource
+    )
     logger.debug(
         "kernel-reactive %s",
         formatLogFields(
             transport="ws",
+            kind=kind,
             sessionId=session.sessionId,
             requestId=requestId,
             changedBlockId=changedBlockId,
