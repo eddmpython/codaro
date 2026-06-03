@@ -47,7 +47,12 @@ def buildReactiveGraph(blocks: list[dict[str, Any]]) -> ReactiveGraph:
     return graph
 
 
-def getReactiveOrder(graph: ReactiveGraph, changedBlockId: str) -> list[str]:
+def getReactiveOrder(
+    graph: ReactiveGraph,
+    changedBlockId: str,
+    *,
+    includeSource: bool = True,
+) -> list[str]:
     affected: set[str] = {changedBlockId}
     queue = [changedBlockId]
 
@@ -58,7 +63,49 @@ def getReactiveOrder(graph: ReactiveGraph, changedBlockId: str) -> list[str]:
                 affected.add(dependent)
                 queue.append(dependent)
 
+    # 위젯 값 변경 등에서는 source 블록(위젯 정의 셀) 자신은 재실행하지 않고
+    # 그 변수를 쓰는 다운스트림만 돌린다(값 리셋 방지).
+    if not includeSource:
+        affected.discard(changedBlockId)
+
     return [bid for bid in graph.blockOrder if bid in affected]
+
+
+def detectCycles(graph: ReactiveGraph) -> list[list[str]]:
+    """`dependents` 방향그래프의 순환 경로들을 반환한다(없으면 빈 리스트).
+
+    A↔B 같은 순환 의존은 실행 순서가 미정의라 한 셀이 stale 데이터로 돈다.
+    white/gray/black DFS로 back-edge를 잡아 순환을 노출한다(엔진은 측정, 표시는 표면).
+    """
+    white, gray, black = 0, 1, 2
+    color: dict[str, int] = {blockId: white for blockId in graph.nodes}
+    cycles: list[list[str]] = []
+    seen: set[frozenset[str]] = set()
+
+    def visit(node: str, stack: list[str]) -> None:
+        color[node] = gray
+        stack.append(node)
+        for dependent in sorted(graph.dependents.get(node, set())):
+            state = color.get(dependent, white)
+            if state == gray:
+                cycle = stack[stack.index(dependent):]
+                key = frozenset(cycle)
+                if key not in seen:
+                    seen.add(key)
+                    cycles.append(list(cycle))
+            elif state == white:
+                visit(dependent, stack)
+        stack.pop()
+        color[node] = black
+
+    for blockId in graph.blockOrder:
+        if color.get(blockId, white) == white:
+            visit(blockId, [])
+    return cycles
+
+
+def reactiveDiagnostics(blocks: list[dict[str, Any]]) -> list[list[str]]:
+    return detectCycles(buildReactiveGraph(blocks))
 
 
 def previewReactiveOrder(blocks: list[dict[str, Any]], changedBlockId: str) -> list[str]:
@@ -71,9 +118,11 @@ async def executeReactive(
     blocks: list[dict[str, Any]],
     changedBlockId: str,
     eventHandler: Callable[[Any], Awaitable[None]] | None = None,
+    *,
+    includeSource: bool = True,
 ) -> tuple[list[ExecutionOutput], list[str]]:
     graph = buildReactiveGraph(blocks)
-    executionOrder = getReactiveOrder(graph, changedBlockId)
+    executionOrder = getReactiveOrder(graph, changedBlockId, includeSource=includeSource)
 
     blockMap = {b["id"]: b for b in blocks if b.get("type") == "code"}
     results: list[ExecutionOutput] = []

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .protocol import ExecutionEvent, ExecutionOutput, WsResultMessage
-from .reactive import executeReactive, previewReactiveOrder
+from .reactive import executeReactive, previewReactiveOrder, reactiveDiagnostics
 from .session import KernelSession
 
 
@@ -27,6 +27,7 @@ class KernelReactivePayload:
     results: tuple[ExecutionOutput, ...]
     executionOrder: tuple[str, ...]
     durationMs: float
+    cycles: tuple[tuple[str, ...], ...] = ()
 
     @property
     def resultCount(self) -> int:
@@ -40,6 +41,7 @@ class KernelReactivePayload:
         return {
             "results": [result.model_dump() for result in self.results],
             "executionOrder": list(self.executionOrder),
+            "cycles": [list(cycle) for cycle in self.cycles],
         }
 
     def toolPayload(self) -> dict[str, Any]:
@@ -65,6 +67,7 @@ class KernelReactivePayload:
             "type": "reactiveComplete",
             "requestId": requestId,
             "executionOrder": list(self.executionOrder),
+            "cycles": [list(cycle) for cycle in self.cycles],
         }
 
 
@@ -86,13 +89,19 @@ async def executeKernelReactive(
     changedBlockId: str,
     *,
     eventHandler: Callable[[ExecutionEvent], Awaitable[None]] | None = None,
+    includeSource: bool = True,
 ) -> KernelReactivePayload:
     startedAt = time.perf_counter()
-    results, executionOrder = await executeReactive(session, list(blocks), changedBlockId, eventHandler=eventHandler)
+    blockList = list(blocks)
+    cycles = reactiveDiagnostics(blockList)
+    results, executionOrder = await executeReactive(
+        session, blockList, changedBlockId, eventHandler=eventHandler, includeSource=includeSource
+    )
     return KernelReactivePayload(
         results=tuple(results),
         executionOrder=tuple(executionOrder),
         durationMs=_durationMs(startedAt),
+        cycles=tuple(tuple(cycle) for cycle in cycles),
     )
 
 

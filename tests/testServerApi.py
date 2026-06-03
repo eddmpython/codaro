@@ -883,6 +883,7 @@ def testKernelWebSocketReactiveAndReset() -> None:
             "type": "reactiveComplete",
             "requestId": "req-reactive",
             "executionOrder": ["b1", "b2"],
+            "cycles": [],
         }
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 

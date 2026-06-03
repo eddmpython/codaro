@@ -184,6 +184,7 @@ def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
         "type": "reactiveComplete",
         "requestId": "req-r",
         "executionOrder": ["b1", "b2"],
+        "cycles": [],
     }
 
     toolPayload = payload.toolPayload()
