@@ -68,6 +68,42 @@ def testWeakEvidenceMovesScoreLess(store: LearnerStateStore) -> None:
     assert weak.confidence < strong.confidence
 
 
+def testStrongCountOnlyRisesOnStrongEvidence(store: LearnerStateStore) -> None:
+    # 약한 noError(0.25)는 strongCount를 안 올린다.
+    weak = store.recordEvidence(
+        "o", MasteryEvidence(scoreTarget=1.0, strength=0.25, isSuccess=True)
+    )
+    assert weak.strongCount == 0
+    # 강한 관측(>=0.6)은 올린다.
+    strong = store.recordEvidence(
+        "o", MasteryEvidence(scoreTarget=1.0, strength=1.0, isSuccess=True)
+    )
+    assert strong.strongCount == 1
+
+
+def testNoErrorOnlyNeverMastered(store: LearnerStateStore) -> None:
+    for _ in range(20):
+        store.recordEvidence("weak.only", MasteryEvidence(scoreTarget=1.0, strength=0.25, isSuccess=True))
+    mastery = store.getMastery("weak.only")
+    assert mastery.strongCount == 0
+    assert mastery.mastered is False  # 강한 관측 0 → 숙달 불가
+
+
+def testStrongRepeatedSuccessBecomesMastered(store: LearnerStateStore) -> None:
+    for _ in range(15):
+        store.recordEvidence("strong.repeat", MasteryEvidence(scoreTarget=1.0, strength=1.0, isSuccess=True))
+    mastery = store.getMastery("strong.repeat")
+    assert mastery.strongCount == 15
+    assert mastery.mastered is True
+    assert store.masteredOutcomes() and store.masteredOutcomes()[0].outcomeId == "strong.repeat"
+
+
+def testSingleStrongSuccessNotYetMastered(store: LearnerStateStore) -> None:
+    mastery = store.recordEvidence("once", MasteryEvidence(scoreTarget=1.0, strength=1.0, isSuccess=True))
+    # 한 번의 강한 성공은 표본 부족 — 하한이 임계 아래.
+    assert mastery.mastered is False
+
+
 def testRecordEvidenceCountsBySuccessFlag(store: LearnerStateStore) -> None:
     # guess: 통과(isSuccess=True)지만 점수 목표는 낮음 — 카운트는 success.
     guess = store.recordEvidence(

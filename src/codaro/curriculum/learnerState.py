@@ -21,7 +21,12 @@ from typing import Iterable, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .masterySignal import MasteryEvidence
+from .masterySignal import (
+    STRONG_OBSERVATION_THRESHOLD,
+    MasteryEvidence,
+    isMastered,
+    masteryLowerBound,
+)
 from .predictionDiff import PredictionDiff
 
 
@@ -40,7 +45,22 @@ class OutcomeMastery(BaseModel):
     confidence: float = 0.0
     successCount: int = 0
     failureCount: int = 0
+    strongCount: int = 0
     lastTouched: str = ""
+
+    @property
+    def trials(self) -> int:
+        return self.successCount + self.failureCount
+
+    @property
+    def lowerBound(self) -> float:
+        """표본 부족을 반영한 mastery 하한(Wilson). UI/판정이 과대주장하지 않게."""
+        return masteryLowerBound(self.score, self.trials)
+
+    @property
+    def mastered(self) -> bool:
+        """숙달 판정 — 하한 ≥ 임계 AND 강한 관측 ≥ 1(noError만으론 불가)."""
+        return isMastered(score=self.score, trials=self.trials, strongCount=self.strongCount)
 
 
 class MisconceptionHit(BaseModel):
@@ -82,6 +102,7 @@ CREATE TABLE IF NOT EXISTS outcomeMastery (
     confidence REAL NOT NULL,
     successCount INTEGER NOT NULL DEFAULT 0,
     failureCount INTEGER NOT NULL DEFAULT 0,
+    strongCount INTEGER NOT NULL DEFAULT 0,
     lastTouched TEXT NOT NULL
 );
 
@@ -126,6 +147,13 @@ class LearnerStateStore:
         with closing(self._connect()) as conn:
             with conn:
                 conn.executescript(_SCHEMA)
+                self._migrate(conn)
+
+    def _migrate(self, conn: sqlite3.Connection) -> None:
+        """기존 DB 호환 — 누락 컬럼을 default로 추가(파괴적 변경 없음)."""
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(outcomeMastery)")}
+        if "strongCount" not in columns:
+            conn.execute("ALTER TABLE outcomeMastery ADD COLUMN strongCount INTEGER NOT NULL DEFAULT 0")
 
     # ------------------------------------------------------------------
     # Mastery
@@ -148,6 +176,13 @@ class LearnerStateStore:
             ).fetchall()
         return [OutcomeMastery(**dict(row)) for row in rows]
 
+    def masteredOutcomes(self) -> list[OutcomeMastery]:
+        """숙달 판정을 통과한 outcome만 — 하한+강한 관측 기준(과대주장 없음).
+
+        Harvest gate·certification·next-lesson 추천이 신뢰해도 되는 "진짜 숙달" 집합.
+        """
+        return [mastery for mastery in self.listMastery() if mastery.mastered]
+
     def recordEvidence(self, outcomeId: str, evidence: MasteryEvidence) -> OutcomeMastery:
         """강도 가중 증거로 mastery를 EMA 갱신한다(신호 정직성의 핵심 경로).
 
@@ -160,19 +195,22 @@ class LearnerStateStore:
         newConfidence = min(1.0, existing.confidence + CONFIDENCE_STEP * evidence.strength)
         successCount = existing.successCount + (1 if evidence.isSuccess else 0)
         failureCount = existing.failureCount + (0 if evidence.isSuccess else 1)
+        # 강한 관측(contains 이상)만 strongCount를 올린다 — "숙달"이 강한 증거를 요구하게.
+        strongCount = existing.strongCount + (1 if evidence.strength >= STRONG_OBSERVATION_THRESHOLD else 0)
         lastTouched = _utcNow()
 
         with closing(self._connect()) as conn:
             with conn:
                 conn.execute(
                     """
-                    INSERT INTO outcomeMastery(outcomeId, score, confidence, successCount, failureCount, lastTouched)
-                    VALUES(?, ?, ?, ?, ?, ?)
+                    INSERT INTO outcomeMastery(outcomeId, score, confidence, successCount, failureCount, strongCount, lastTouched)
+                    VALUES(?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(outcomeId) DO UPDATE SET
                         score=excluded.score,
                         confidence=excluded.confidence,
                         successCount=excluded.successCount,
                         failureCount=excluded.failureCount,
+                        strongCount=excluded.strongCount,
                         lastTouched=excluded.lastTouched
                     """,
                     (
@@ -181,6 +219,7 @@ class LearnerStateStore:
                         newConfidence,
                         successCount,
                         failureCount,
+                        strongCount,
                         lastTouched,
                     ),
                 )
@@ -191,6 +230,7 @@ class LearnerStateStore:
             confidence=newConfidence,
             successCount=successCount,
             failureCount=failureCount,
+            strongCount=strongCount,
             lastTouched=lastTouched,
         )
 
