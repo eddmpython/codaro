@@ -18,7 +18,7 @@ export type ProductSidebarFlowItem = ProductSurfaceNavItem & {
 };
 
 export const PRODUCT_SURFACE_NAV: readonly ProductSurfaceNavItem[] = [
-  { value: "chat", labelKey: "nav.chat", flowRole: "entry", beta: false, visibleInSidebar: true },
+  { value: "chat", labelKey: "nav.chat", flowRole: "entry", beta: true, visibleInSidebar: true },
   { value: "curriculum", labelKey: "nav.curriculum", flowRole: "learning", beta: false, visibleInSidebar: true },
   { value: "editor", labelKey: "nav.editor", flowRole: "notebook", beta: true, visibleInSidebar: true },
   { value: "automation", labelKey: "nav.automation", flowRole: "secondLoop", beta: true, visibleInSidebar: true },

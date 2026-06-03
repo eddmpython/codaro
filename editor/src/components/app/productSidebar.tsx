@@ -166,6 +166,9 @@ export function ProductSidebar({
                     >
                       <TerminalSquare />
                       <span>{t("terminal.title")}</span>
+                      <span className="ml-auto rounded-sm border border-sidebar-border bg-sidebar-accent/40 px-1 text-[9px] font-medium uppercase leading-[1.4] tracking-wide text-sidebar-foreground/55 group-data-[collapsible=icon]:hidden">
+                        {t("nav.beta")}
+                      </span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>

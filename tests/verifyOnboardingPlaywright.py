@@ -620,8 +620,12 @@ def jsAssertCurriculumHome() -> str:
   const entry = document.querySelector('[data-curriculum-home-entry="true"]');
   if (!entry) throw new Error('curriculum home sidebar entry missing');
   entry.click();
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  const home = document.querySelector('[data-curriculum-home="true"]');
+  let home = null;
+  for (let i = 0; i < 60; i++) {
+    home = document.querySelector('[data-curriculum-home="true"]');
+    if (home) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
   if (!home) throw new Error('curriculum home did not render after clicking home entry');
   const text = home.innerText;
   if (!text.includes('완료')) throw new Error('curriculum home progress copy missing');
@@ -790,7 +794,7 @@ def jsOpenSurface(label: str) -> str:
     return compactJs(f"""
 (() => {{
   const target = {json.dumps(label, ensure_ascii=False)}.replace(/\\s+/g, '');
-  const button = [...document.querySelectorAll('button')].find((item) => (item.textContent || '').replace(/\\s+/g, '').endsWith(target));
+  const button = [...document.querySelectorAll('button')].find((item) => (item.textContent || '').replace(/\\s+/g, '').includes(target));
   if (!button) throw new Error({json.dumps(label + ' surface button missing', ensure_ascii=False)});
   button.click();
   return {json.dumps(label + '-surface-opened', ensure_ascii=False)};
