@@ -14,6 +14,8 @@ class VariableState:
     typeName: str
     repr: str
     size: int | None = None
+    shape: str = ""
+    dtype: str = ""
 
 
 @dataclass(slots=True)

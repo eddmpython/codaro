@@ -123,6 +123,8 @@ class KernelSession:
                 typeName=variable.typeName,
                 repr=variable.repr,
                 size=variable.size,
+                shape=variable.shape,
+                dtype=variable.dtype,
             )
             for variable in (variables or self._engine.getVariables())
         ]

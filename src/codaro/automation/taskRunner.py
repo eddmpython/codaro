@@ -3,11 +3,14 @@ from __future__ import annotations
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
 from .audit import getAuditTrail
 from .eStop import EmergencyStopActive, getEmergencyStop
 from .taskModel import TaskDefinition, TaskRun, TaskStatus
+
+if TYPE_CHECKING:
+    from ..kernel.documentExecution import CaptureResult
 
 
 class TaskRunner:
@@ -22,10 +25,14 @@ class TaskRunner:
 
         try:
             getEmergencyStop().check()
-            result = await self._executeDocument(task)
-            run.status = TaskStatus.SUCCESS
-            run.output = result.get("stdout", "")
-            run.variables = result.get("variables", {})
+            capture = await self._executeDocument(task)
+            run.output = capture.stdout
+            run.variables = {variable.name: variable.repr for variable in capture.variables}
+            if capture.status == "error":
+                run.status = TaskStatus.FAILED
+                run.error = capture.error or f"Block {capture.failedBlockId} failed"
+            else:
+                run.status = TaskStatus.SUCCESS
         except EmergencyStopActive as exc:
             run.status = TaskStatus.CANCELLED
             run.error = str(exc)
@@ -51,44 +58,17 @@ class TaskRunner:
 
         return run
 
-    async def _executeDocument(self, task: TaskDefinition) -> dict[str, Any]:
+    async def _executeDocument(self, task: TaskDefinition) -> CaptureResult:
         from ..document.service import loadDocument
+        from ..kernel.documentExecution import captureDocument
         from ..kernel.manager import SessionManager
 
         docPath = self._workspaceRoot / task.documentPath
         document = loadDocument(str(docPath))
 
         manager = SessionManager(workspaceRoot=str(self._workspaceRoot))
-        session = manager.createSession()
-
-        allStdout: list[str] = []
-        lastVariables: dict[str, Any] = {}
-
-        try:
-            for block in document.blocks:
-                getEmergencyStop().check()
-                if block.type != "code":
-                    continue
-                if not block.content.strip():
-                    continue
-
-                result = await session.execute(block.content)
-                if result.stdout:
-                    allStdout.append(result.stdout)
-                if result.status == "error":
-                    raise RuntimeError(
-                        f"Block {block.id} failed: {result.stderr}"
-                    )
-
-            variables = session.getVariables()
-            lastVariables = {
-                v.name: v.repr
-                for v in variables
-            }
-        finally:
-            manager.destroySession(session.sessionId)
-
-        return {
-            "stdout": "\n".join(allStdout),
-            "variables": lastVariables,
-        }
+        return await captureDocument(
+            document,
+            manager=manager,
+            onBlock=lambda block: getEmergencyStop().check(),
+        )

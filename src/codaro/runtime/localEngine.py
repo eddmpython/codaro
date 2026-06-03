@@ -505,6 +505,8 @@ class LocalEngine(ExecutionEngine):
                 "typeName": variable.typeName,
                 "repr": variable.repr,
                 "size": variable.size,
+                "shape": variable.shape,
+                "dtype": variable.dtype,
             }
             for variable in variables
         ]
@@ -516,6 +518,8 @@ class LocalEngine(ExecutionEngine):
                 typeName=str(variable.get("typeName", "")),
                 repr=str(variable.get("repr", "")),
                 size=variable.get("size"),
+                shape=str(variable.get("shape", "")),
+                dtype=str(variable.get("dtype", "")),
             )
             for variable in variables
         ]

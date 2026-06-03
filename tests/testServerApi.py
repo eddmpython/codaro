@@ -105,6 +105,8 @@ def testKernelCreateAndExecute() -> None:
             "typeName": "int",
             "repr": "10",
             "size": None,
+            "shape": "",
+            "dtype": "",
         }
     ]
     assert [event["eventType"] for event in result["events"]] == ["started", "display", "stateDelta", "finished"]
@@ -804,6 +806,8 @@ def testKernelWebSocketExecuteAndVariables() -> None:
                 "typeName": "int",
                 "repr": "42",
                 "size": None,
+                "shape": "",
+                "dtype": "",
             }
         ]
         assert [message["eventType"] for message in eventMessages] == ["started", "display", "stateDelta", "finished"]
@@ -851,6 +855,8 @@ def testKernelWebSocketReactiveAndReset() -> None:
                 "typeName": "int",
                 "repr": "1",
                 "size": None,
+                "shape": "",
+                "dtype": "",
             }
         ]
         assert second["blockId"] == "b2"
@@ -860,6 +866,8 @@ def testKernelWebSocketReactiveAndReset() -> None:
                 "typeName": "int",
                 "repr": "3",
                 "size": None,
+                "shape": "",
+                "dtype": "",
             }
         ]
         assert {(message["blockId"], message["eventType"]) for message in eventMessages} >= {

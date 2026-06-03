@@ -10,6 +10,8 @@ class VariableInfo(BaseModel):
     typeName: str
     repr: str
     size: int | None = None
+    shape: str = ""
+    dtype: str = ""
 
 
 class VariableDelta(BaseModel):

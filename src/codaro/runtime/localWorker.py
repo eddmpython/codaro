@@ -399,6 +399,7 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
         valueRepr = safeRepr(value)
 
         size = _estimateSize(value)
+        shape, dtype = _introspectShapeDtype(value)
 
         variables.append(
             {
@@ -406,9 +407,31 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
                 "typeName": type(value).__name__,
                 "repr": valueRepr,
                 "size": size,
+                "shape": shape,
+                "dtype": dtype,
             }
         )
     return variables
+
+
+def _introspectShapeDtype(value: object) -> tuple[str, str]:
+    """numpy/pandas/polars 값의 shape/dtype를 문자열로 포착(없으면 빈 문자열).
+
+    Predict-Run-Reconcile 루프의 shape/dtype 차원 입력. getattr만 쓰므로
+    임의 사용자 객체에서도 예외 없이 안전하다(shape/dtype 미보유 → "").
+    """
+    moduleName = type(value).__module__
+    if not moduleName.startswith(("numpy", "pandas", "polars")):
+        return "", ""
+    shape = ""
+    rawShape = getattr(value, "shape", None)
+    if isinstance(rawShape, tuple):
+        shape = str(rawShape)
+    dtype = ""
+    rawDtype = getattr(value, "dtype", None)
+    if rawDtype is not None:
+        dtype = str(rawDtype)
+    return shape, dtype
 
 
 def _estimateSize(value: object) -> int | None:
@@ -436,6 +459,8 @@ def _mapVariablesByName(variables: list[dict[str, object]]) -> dict[str, dict[st
             "typeName": str(variable.get("typeName", "")),
             "repr": str(variable.get("repr", "")),
             "size": variable.get("size"),
+            "shape": str(variable.get("shape", "")),
+            "dtype": str(variable.get("dtype", "")),
         }
         for variable in variables
     }
