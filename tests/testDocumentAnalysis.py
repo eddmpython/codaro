@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from codaro.document.analysis import analyzeCode
+from codaro.document.analysis import analyzeCellBindings, analyzeCode
 
 
 def testAnalyzeCodeIgnoresFunctionParametersAndLocals() -> None:
@@ -37,3 +37,59 @@ def testAnalyzeCodeKeepsComprehensionLocalsScoped() -> None:
 
     assert defines == ["items"]
     assert uses == ["scale"]
+
+
+def testCellBindingsFlagsSubscriptMutationOfFreeName() -> None:
+    binding = analyzeCellBindings("data[0] = 1")
+
+    assert binding.defines == []
+    assert binding.uses == ["data"]  # base의 Load ctx로 의존 엣지는 이미 존재
+    assert binding.mutatedFreeNames == ["data"]
+
+
+def testCellBindingsFlagsAttributeMutationOfFreeName() -> None:
+    binding = analyzeCellBindings("config.debug = True\nrows = config.rows")
+
+    assert binding.defines == ["rows"]
+    assert binding.uses == ["config"]
+    assert binding.mutatedFreeNames == ["config"]
+
+
+def testCellBindingsIgnoresMutationOfLocallyDefinedName() -> None:
+    binding = analyzeCellBindings("d = {}\nd[0] = 1")
+
+    assert binding.defines == ["d"]
+    assert binding.mutatedFreeNames == []  # 같은 셀이 정의 → 변경 아님
+
+
+def testCellBindingsTreatsAugmentedSubscriptAsMutation() -> None:
+    binding = analyzeCellBindings("totals[k] += 1")
+
+    assert binding.mutatedFreeNames == ["totals"]
+
+
+def testCellBindingsTreatsRebindAugAssignAsDefinitionNotMutation() -> None:
+    binding = analyzeCellBindings("counter += 1")
+
+    assert binding.defines == ["counter"]  # x += 1(free Name)은 재정의 = 다중정의 경로
+    assert binding.mutatedFreeNames == []
+
+
+def testCellBindingsDoesNotFlagMethodCallMutation() -> None:
+    binding = analyzeCellBindings("rows.append(1)")
+
+    assert binding.uses == ["rows"]
+    assert binding.mutatedFreeNames == []  # 메서드 변경은 정적 미탐지(정직한 한계)
+
+
+def testCellBindingsIgnoresMutationInsideFunctionScope() -> None:
+    binding = analyzeCellBindings("def f():\n    state[0] = 1")
+
+    assert binding.defines == ["f"]
+    assert binding.mutatedFreeNames == []  # 모듈 스코프에서만 판정(E6 오탐 방지)
+
+
+def testAnalyzeCodePreservesTwoTupleContract() -> None:
+    result = analyzeCode("data[0] = 1")
+
+    assert result == ([], ["data"])  # 기존 호출자 보호: 정확히 (defines, uses)

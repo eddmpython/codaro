@@ -171,6 +171,9 @@ class UseCollector(ast.NodeVisitor):
         self.moduleScope = moduleScope
         self.scopeStack = [moduleScope]
         self.moduleUses: set[str] = set()
+        # 모듈 스코프에서 외부 정의 변수를 제자리 변경(x[0]=v / obj.a=v)하는 base 이름.
+        # 의존 엣지(use)는 base의 Load ctx로 이미 기록되므로 여기선 "변경"이라는 신호만 모은다.
+        self.mutatedFreeNames: set[str] = set()
 
     @property
     def currentScope(self) -> ScopeState:
@@ -184,8 +187,20 @@ class UseCollector(ast.NodeVisitor):
         if isinstance(node.target, ast.Name):
             self._recordLoad(node.target.id)
         else:
+            # x[0] += 1 / obj.a += 1 → target(Subscript/Attribute)이 visit_Subscript/Attribute로
+            # 라우팅되어 base를 변경으로 기록한다(이름 재정의인 Name target은 위 분기에서 정의로 처리).
             self.visit(node.target)
         self.visit(node.value)
+
+    def visit_Subscript(self, node: ast.Subscript) -> None:
+        if isinstance(node.ctx, (ast.Store, ast.Del)) and isinstance(node.value, ast.Name):
+            self._recordMutationBase(node.value.id)
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        if isinstance(node.ctx, (ast.Store, ast.Del)) and isinstance(node.value, ast.Name):
+            self._recordMutationBase(node.value.id)
+        self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         for decorator in node.decorator_list:
@@ -303,6 +318,16 @@ class UseCollector(ast.NodeVisitor):
             return
         self.moduleUses.add(name)
 
+    def _recordMutationBase(self, name: str) -> None:
+        # 모듈 스코프에서만 판정한다(함수/comprehension 내부 변경은 호출 시점 의존이라 오탐 방지).
+        if self.currentScope.kind != SCOPE_MODULE:
+            return
+        if name in PYTHON_BUILTINS:
+            return
+        if self._resolvesInScope(name, self.currentScope):
+            return
+        self.mutatedFreeNames.add(name)
+
     def _resolvesInScope(self, name: str, scope: ScopeState) -> bool:
         if scope.kind == SCOPE_MODULE:
             return name in self.moduleScope.bindings
@@ -340,11 +365,18 @@ class UseCollector(ast.NodeVisitor):
         return self.moduleScope if allowModule and name in self.moduleScope.bindings else None
 
 
-def analyzeCode(code: str) -> tuple[list[str], list[str]]:
+@dataclass(slots=True)
+class CellBindings:
+    defines: list[str]
+    uses: list[str]
+    mutatedFreeNames: list[str]
+
+
+def analyzeCellBindings(code: str) -> CellBindings:
     try:
         tree = ast.parse(code)
     except SyntaxError:
-        return [], []  # noqa: BLE001 — incomplete user code is expected
+        return CellBindings(defines=[], uses=[], mutatedFreeNames=[])  # incomplete user code is expected
 
     moduleBindings = collectScopeBindings(tree.body)
     moduleScope = ScopeState(
@@ -362,7 +394,22 @@ def analyzeCode(code: str) -> tuple[list[str], list[str]]:
         for name in sorted(useCollector.moduleUses)
         if name not in moduleBindings.names and name not in PYTHON_BUILTINS
     ]
-    return moduleBindings.orderedResolvedNames, uses
+    mutatedFreeNames = [
+        name
+        for name in sorted(useCollector.mutatedFreeNames)
+        if name not in moduleBindings.names and name not in PYTHON_BUILTINS
+    ]
+    return CellBindings(
+        defines=moduleBindings.orderedResolvedNames,
+        uses=uses,
+        mutatedFreeNames=mutatedFreeNames,
+    )
+
+
+def analyzeCode(code: str) -> tuple[list[str], list[str]]:
+    # 하위호환 래퍼 — 기존 호출자(reactive.buildReactiveGraph, localWorker)는 (defines, uses)만 쓴다.
+    binding = analyzeCellBindings(code)
+    return binding.defines, binding.uses
 
 
 def collectScopeBindings(
