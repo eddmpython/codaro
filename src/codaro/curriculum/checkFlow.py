@@ -23,6 +23,8 @@ def recommendNextAction(
     학습 루프가 LLM provider 없이도 "진단 → 안내"까지 닫히게 하는 규칙 기반 baseline.
     provider가 있으면 teacher가 더 풍부히 보강하지만, 없어도 항상 한 가지 다음 행동을 준다.
     """
+    if passed and hasMisconception:
+        return {"kind": "reconcilePrediction", "label": "맞혔지만 예측과 다른 점이 있어요 — 왜 그런지 짚어보기"}
     if passed:
         return {"kind": "advance", "label": "다음 단계로 진행하기"}
     if hasMisconception:
@@ -129,7 +131,9 @@ async def runCurriculumCheckFlow(
     predictionDiffPayload: dict[str, object] | None = None
     if sectionOutcomes:
         errorText = payload.get("detail") or payload.get("studentOutput") or ""
-        usedPredictionSignal = False
+
+        # 예측-실측 diff를 한 번 계산(payload + mastery 신호 + 진단 매칭 공용).
+        diff = None
         if request.prediction is not None:
             predict = LearningPredictContract(
                 expectedShape=request.prediction.expectedShape,
@@ -144,20 +148,22 @@ async def runCurriculumCheckFlow(
                 )
                 diff = comparePrediction(predict, actual)
                 predictionDiffPayload = diff.model_dump()
-                if diff.overall != "skipped":
-                    for outcomeId in sectionOutcomes:
-                        learnerStateStore.recordPredictionResult(outcomeId, diff)
-                    usedPredictionSignal = True
 
-        if not usedPredictionSignal:
+        if diff is not None and diff.overall != "skipped":
+            for outcomeId in sectionOutcomes:
+                learnerStateStore.recordPredictionResult(outcomeId, diff)
+        else:
             for outcomeId in sectionOutcomes:
                 learnerStateStore.recordOutcomeAttempt(outcomeId, success=result.passed)
 
-        if not result.passed:
+        # 진단 매칭 — 실패면 code/error, 예측이 어긋나면 통과여도 silent 오개념 발화.
+        matchPrediction = diff if (diff is not None and diff.overall == "mismatch") else None
+        if (not result.passed) or matchPrediction is not None:
             for outcomeId, entry in matchOutcomes(
                 sectionOutcomes,
-                code=request.studentCode or "",
-                errorText=str(errorText),
+                code=request.studentCode if not result.passed else "",
+                errorText=str(errorText) if not result.passed else "",
+                predictionDiff=matchPrediction,
             ):
                 hit, repeatStatus = learnerStateStore.recordMisconception(entry.id, outcomeId)
                 if repeatStatus == "repeat":

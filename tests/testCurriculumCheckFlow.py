@@ -12,6 +12,15 @@ def testPassAdvances() -> None:
     assert action["kind"] == "advance"
 
 
+def testPassWithMisconceptionReconcilesPrediction() -> None:
+    # 통과했지만 예측이 어긋나 silent 오개념이 발화한 경우 — reflective 안내.
+    action = recommendNextAction(
+        passed=True, hasMisconception=True, doneCriterionViolated=False, hintLevel=0, maxHints=3
+    )
+    assert action["kind"] == "reconcilePrediction"
+    assert action["label"]
+
+
 def testMisconceptionPointsToCorrection() -> None:
     action = recommendNextAction(
         passed=False, hasMisconception=True, doneCriterionViolated=False, hintLevel=0, maxHints=3
@@ -43,6 +52,7 @@ def testFailWithNoHintsLeftRetries() -> None:
 def testEveryBranchHasLabel() -> None:
     cases = [
         (True, False, False, 0, 3),
+        (True, True, False, 0, 3),
         (False, True, False, 0, 3),
         (False, False, True, 0, 3),
         (False, False, False, 0, 3),
