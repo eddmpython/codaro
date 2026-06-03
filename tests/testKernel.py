@@ -185,12 +185,31 @@ def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
         "requestId": "req-r",
         "executionOrder": ["b1", "b2"],
         "cycles": [],
+        "multipleDefinitions": [],
+        "crossCellMutations": [],
+        "staleBlockIds": [],
+        "dependents": {"b1": ["b2"]},
     }
 
     toolPayload = payload.toolPayload()
     assert toolPayload["executionOrder"] == ["b1", "b2"]
     assert toolPayload["results"][0]["blockId"] == "b1"
     assert set(toolPayload["results"][0]) == {"blockId", "status", "stdout", "stderr", "data"}
+    session.dispose()
+
+
+def testReactivePayloadMarksUnrunDownstreamStaleOnError() -> None:
+    session = KernelSession()
+    blocks = [
+        {"id": "a", "type": "code", "content": "x = 1"},
+        {"id": "b", "type": "code", "content": "y = x + missing"},  # NameError → early stop
+        {"id": "c", "type": "code", "content": "z = y + 1"},
+    ]
+    payload = _run(executeKernelReactive(session, blocks, "a"))
+
+    assert payload.executionOrder == ("a", "b", "c")
+    # b가 에러로 끊겨 c는 실행 못 함 → stale.
+    assert payload.staleBlockIds == ("c",)
     session.dispose()
 
 

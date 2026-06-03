@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .protocol import ExecutionEvent, ExecutionOutput, WsResultMessage
-from .reactive import executeReactive, previewReactiveOrder, reactiveDiagnostics
+from .reactive import buildReactiveGraph, diagnosticsFromGraph, executeReactive, previewReactiveOrder
 from .session import KernelSession
 
 
@@ -28,6 +28,10 @@ class KernelReactivePayload:
     executionOrder: tuple[str, ...]
     durationMs: float
     cycles: tuple[tuple[str, ...], ...] = ()
+    multipleDefinitions: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    crossCellMutations: tuple[tuple[str, str, str], ...] = ()
+    staleBlockIds: tuple[str, ...] = ()
+    dependents: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
     @property
     def resultCount(self) -> int:
@@ -37,11 +41,20 @@ class KernelReactivePayload:
     def executionCount(self) -> int:
         return len(self.executionOrder)
 
+    def _diagnosticsPayload(self) -> dict[str, Any]:
+        return {
+            "cycles": [list(cycle) for cycle in self.cycles],
+            "multipleDefinitions": [[var, list(blockIds)] for var, blockIds in self.multipleDefinitions],
+            "crossCellMutations": [list(mutation) for mutation in self.crossCellMutations],
+            "staleBlockIds": list(self.staleBlockIds),
+            "dependents": {blockId: list(downstream) for blockId, downstream in self.dependents},
+        }
+
     def httpPayload(self) -> dict[str, Any]:
         return {
             "results": [result.model_dump() for result in self.results],
             "executionOrder": list(self.executionOrder),
-            "cycles": [list(cycle) for cycle in self.cycles],
+            **self._diagnosticsPayload(),
         }
 
     def toolPayload(self) -> dict[str, Any]:
@@ -67,7 +80,7 @@ class KernelReactivePayload:
             "type": "reactiveComplete",
             "requestId": requestId,
             "executionOrder": list(self.executionOrder),
-            "cycles": [list(cycle) for cycle in self.cycles],
+            **self._diagnosticsPayload(),
         }
 
 
@@ -93,15 +106,28 @@ async def executeKernelReactive(
 ) -> KernelReactivePayload:
     startedAt = time.perf_counter()
     blockList = list(blocks)
-    cycles = reactiveDiagnostics(blockList)
+    graph = buildReactiveGraph(blockList)
+    diagnostics = diagnosticsFromGraph(graph)
     results, executionOrder = await executeReactive(
-        session, blockList, changedBlockId, eventHandler=eventHandler, includeSource=includeSource
+        session, blockList, changedBlockId, eventHandler=eventHandler, includeSource=includeSource, graph=graph
+    )
+    # early-stop(에러로 중단)으로 영향받았지만 실행 못 한 셀 = stale.
+    executed = {result.blockId for result in results}
+    staleBlockIds = tuple(blockId for blockId in executionOrder if blockId not in executed)
+    dependents = tuple(
+        (blockId, tuple(sorted(graph.dependents[blockId])))
+        for blockId in graph.blockOrder
+        if graph.dependents.get(blockId)
     )
     return KernelReactivePayload(
         results=tuple(results),
         executionOrder=tuple(executionOrder),
         durationMs=_durationMs(startedAt),
-        cycles=tuple(tuple(cycle) for cycle in cycles),
+        cycles=diagnostics.cycles,
+        multipleDefinitions=diagnostics.multipleDefinitions,
+        crossCellMutations=diagnostics.crossCellMutations,
+        staleBlockIds=staleBlockIds,
+        dependents=dependents,
     )
 
 

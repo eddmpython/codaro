@@ -134,6 +134,23 @@ def testKernelStatePersistence() -> None:
     client.delete(f"/api/kernel/{sessionId}")
 
 
+def testKernelRemoveCellEndpointClearsDefinitions() -> None:
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+
+    client.post(f"/api/kernel/{sessionId}/execute", json={"code": "x = 10", "blockId": "a"})
+    removeResponse = client.post(f"/api/kernel/{sessionId}/remove-cell", json={"code": "", "blockId": "a"})
+    assert removeResponse.status_code == 200
+    assert removeResponse.json() == {"status": "removed"}
+
+    # 삭제 후 x를 참조하면 NameError(zombie 없음).
+    result = client.post(f"/api/kernel/{sessionId}/execute", json={"code": "x + 1", "blockId": "b"})
+    assert result.json()["status"] == "error"
+    assert "NameError" in f"{result.json()['data']} {result.json()['stderr']}"
+
+    client.delete(f"/api/kernel/{sessionId}")
+
+
 def testKernelReset() -> None:
     client = TestClient(createServerApp())
 
@@ -884,6 +901,10 @@ def testKernelWebSocketReactiveAndReset() -> None:
             "requestId": "req-reactive",
             "executionOrder": ["b1", "b2"],
             "cycles": [],
+            "multipleDefinitions": [],
+            "crossCellMutations": [],
+            "staleBlockIds": [],
+            "dependents": {"b1": ["b2"]},
         }
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 
