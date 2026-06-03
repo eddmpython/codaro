@@ -5,6 +5,7 @@ from typing import Any
 
 from .checker import debuggingPatternRef, detectErrorClass
 from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
+from .masterySignal import checkSignalStrength, combineEvidence
 from .misconceptionCatalog import matchOutcomes
 from .predictionDiff import ActualResult, comparePrediction, extractErrorClass
 from .sectionContract import LearningPredictContract
@@ -149,12 +150,11 @@ async def runCurriculumCheckFlow(
                 diff = comparePrediction(predict, actual)
                 predictionDiffPayload = diff.model_dump()
 
-        if diff is not None and diff.overall != "skipped":
-            for outcomeId in sectionOutcomes:
-                learnerStateStore.recordPredictionResult(outcomeId, diff)
-        else:
-            for outcomeId in sectionOutcomes:
-                learnerStateStore.recordOutcomeAttempt(outcomeId, success=result.passed)
+        # 강도 가중 + slip/guess 증거 — 약한 noError는 mastery를 거의 안 움직인다.
+        strength = checkSignalStrength(request.checkType)
+        evidence = combineEvidence(passed=result.passed, diff=diff, strength=strength)
+        for outcomeId in sectionOutcomes:
+            learnerStateStore.recordEvidence(outcomeId, evidence)
 
         # 진단 매칭 — 실패면 code/error, 예측이 어긋나면 통과여도 silent 오개념 발화.
         matchPrediction = diff if (diff is not None and diff.overall == "mismatch") else None

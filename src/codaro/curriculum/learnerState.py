@@ -21,6 +21,7 @@ from typing import Iterable, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .masterySignal import MasteryEvidence
 from .predictionDiff import PredictionDiff
 
 
@@ -147,19 +148,18 @@ class LearnerStateStore:
             ).fetchall()
         return [OutcomeMastery(**dict(row)) for row in rows]
 
-    def recordOutcomeAttempt(
-        self,
-        outcomeId: str,
-        *,
-        success: bool,
-    ) -> OutcomeMastery:
-        """outcome 단위로 success/failure 신호를 기록하고 mastery를 EMA로 갱신."""
+    def recordEvidence(self, outcomeId: str, evidence: MasteryEvidence) -> OutcomeMastery:
+        """강도 가중 증거로 mastery를 EMA 갱신한다(신호 정직성의 핵심 경로).
+
+        강한 증거(output/variable)는 score를 크게, 약한 noError는 거의 안 움직인다.
+        confidence도 strength로 누적해 "증거의 양"을 정직하게 반영한다.
+        """
         existing = self.getMastery(outcomeId)
-        target = 1.0 if success else 0.0
-        newScore = (1.0 - MASTERY_EMA) * existing.score + MASTERY_EMA * target
-        newConfidence = min(1.0, existing.confidence + CONFIDENCE_STEP)
-        successCount = existing.successCount + (1 if success else 0)
-        failureCount = existing.failureCount + (0 if success else 1)
+        alpha = MASTERY_EMA * evidence.strength
+        newScore = (1.0 - alpha) * existing.score + alpha * evidence.scoreTarget
+        newConfidence = min(1.0, existing.confidence + CONFIDENCE_STEP * evidence.strength)
+        successCount = existing.successCount + (1 if evidence.isSuccess else 0)
+        failureCount = existing.failureCount + (0 if evidence.isSuccess else 1)
         lastTouched = _utcNow()
 
         with closing(self._connect()) as conn:
@@ -194,6 +194,17 @@ class LearnerStateStore:
             lastTouched=lastTouched,
         )
 
+    def recordOutcomeAttempt(self, outcomeId: str, *, success: bool) -> OutcomeMastery:
+        """outcome 단위 success/failure 신호(강도 1.0)를 기록한다.
+
+        체크 타입 강도를 모르는 호출자용 baseline. 강도 가중이 필요하면 호출부에서
+        [[masterySignal]].combineEvidence 로 증거를 만들어 recordEvidence 를 쓴다.
+        """
+        return self.recordEvidence(
+            outcomeId,
+            MasteryEvidence(scoreTarget=1.0 if success else 0.0, strength=1.0, isSuccess=success),
+        )
+
     def recordPredictionResult(
         self,
         outcomeId: str,
@@ -202,7 +213,11 @@ class LearnerStateStore:
         """예측 diff를 mastery 신호로 변환. match→success, mismatch→failure, skipped→무영향."""
         if diff.overall == "skipped":
             return self.getMastery(outcomeId)
-        return self.recordOutcomeAttempt(outcomeId, success=(diff.overall == "match"))
+        match = diff.overall == "match"
+        return self.recordEvidence(
+            outcomeId,
+            MasteryEvidence(scoreTarget=1.0 if match else 0.0, strength=1.0, isSuccess=match),
+        )
 
     # ------------------------------------------------------------------
     # Misconceptions

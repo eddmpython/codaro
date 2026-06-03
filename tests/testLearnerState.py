@@ -9,6 +9,7 @@ from codaro.curriculum.learnerState import (
     LearnerStateStore,
     MASTERY_EMA,
 )
+from codaro.curriculum.masterySignal import MasteryEvidence
 from codaro.curriculum.predictionDiff import (
     ActualResult,
     PredictionDiff,
@@ -51,6 +52,33 @@ def testRepeatedSuccessConvergesToOne(store: LearnerStateStore) -> None:
     mastery = store.getMastery("python.variables")
     assert mastery.score > 0.95
     assert mastery.confidence == 1.0
+
+
+def testWeakEvidenceMovesScoreLess(store: LearnerStateStore) -> None:
+    weak = store.recordEvidence(
+        "weak.outcome", MasteryEvidence(scoreTarget=1.0, strength=0.25, isSuccess=True)
+    )
+    strong = store.recordEvidence(
+        "strong.outcome", MasteryEvidence(scoreTarget=1.0, strength=1.0, isSuccess=True)
+    )
+    assert weak.score == pytest.approx(MASTERY_EMA * 0.25)
+    assert strong.score == pytest.approx(MASTERY_EMA)
+    assert weak.score < strong.score
+    # confidence 도 strength 로 누적 — 약한 증거는 덜 확신.
+    assert weak.confidence < strong.confidence
+
+
+def testRecordEvidenceCountsBySuccessFlag(store: LearnerStateStore) -> None:
+    # guess: 통과(isSuccess=True)지만 점수 목표는 낮음 — 카운트는 success.
+    guess = store.recordEvidence(
+        "g.outcome", MasteryEvidence(scoreTarget=0.6, strength=1.0, isSuccess=True)
+    )
+    assert guess.successCount == 1 and guess.failureCount == 0
+    # slip: 실패(isSuccess=False)지만 점수는 덜 깎임 — 카운트는 failure.
+    slip = store.recordEvidence(
+        "s.outcome", MasteryEvidence(scoreTarget=0.4, strength=1.0, isSuccess=False)
+    )
+    assert slip.failureCount == 1 and slip.successCount == 0
 
 
 def testPredictionDiffMatchCountsAsSuccess(store: LearnerStateStore) -> None:
