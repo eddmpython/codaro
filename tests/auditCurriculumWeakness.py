@@ -150,6 +150,10 @@ def auditCurriculum() -> dict[str, Any]:
     # 정보성 집계(게이트 미차단) — 약한 신호의 가시화.
     weakCheckSignalCount = 0
     placeholderPredictCount = 0
+    # 양의 진행 다이얼 — 강한 체크 보유 레슨 수 / exercise+check 보유 레슨 수.
+    # (차단하면 현재 ~2%라 false-fail이므로 정직하게 정보성. 강화 캠페인 진척 추적용.)
+    strongCheckSignalCount = 0
+    exerciseCheckLessonCount = 0
     for category in loader.listCategories():
         for summary in loader.listContents(category.key):
             key = f"{category.key}/{summary.contentId}"
@@ -221,11 +225,13 @@ def auditCurriculum() -> dict[str, Any]:
                 flags.append("shortGoal")
 
             # 약한 신호(정보성) — 강한 체크가 0개이거나 predict가 placeholder.
-            isWeakCheck = (
-                exerciseSections > 0
-                and checkSections > 0
-                and not any(t in STRONG_CHECK_TYPES for t in lessonCheckTypes)
-            )
+            hasExerciseCheck = exerciseSections > 0 and checkSections > 0
+            hasStrongCheck = hasExerciseCheck and any(t in STRONG_CHECK_TYPES for t in lessonCheckTypes)
+            isWeakCheck = hasExerciseCheck and not hasStrongCheck
+            if hasExerciseCheck:
+                exerciseCheckLessonCount += 1
+            if hasStrongCheck:
+                strongCheckSignalCount += 1
             if isWeakCheck:
                 weakCheckSignalCount += 1
             if lessonHasPlaceholder:
@@ -263,6 +269,8 @@ def auditCurriculum() -> dict[str, Any]:
     # 정보성(미차단) — 약한 신호의 규모를 가시화한다. 사람-작성 강화의 측정 지표.
     flagCounts["weakCheckSignal"] = weakCheckSignalCount
     flagCounts["placeholderPredict"] = placeholderPredictCount
+    flagCounts["strongCheckSignal"] = strongCheckSignalCount
+    flagCounts["exerciseCheckLessons"] = exerciseCheckLessonCount
 
     breaches = []
     for flag, threshold in THRESHOLDS.items():
@@ -403,9 +411,13 @@ def main() -> int:
                 f" · runtime: {len(runtime['weakOutcomes'])} weak outcomes, "
                 f"{len(runtime['repeatedMisconceptions'])} repeated misconceptions"
             )
+        strongCount = audit["flagCounts"].get("strongCheckSignal", 0)
+        exerciseCheckLessons = audit["flagCounts"].get("exerciseCheckLessons", 0)
+        coveragePct = round(100.0 * strongCount / exerciseCheckLessons, 1) if exerciseCheckLessons else 0.0
         signalNote = (
             f" · signal: {audit['flagCounts'].get('weakCheckSignal', 0)} weak-check lessons, "
             f"{audit['flagCounts'].get('placeholderPredict', 0)} placeholder-predict lessons"
+            f" · strong-check coverage {strongCount}/{exerciseCheckLessons} ({coveragePct}%)"
         )
         print(
             "ok: curriculum weakness audit passed "
