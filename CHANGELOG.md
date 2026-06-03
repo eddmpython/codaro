@@ -8,7 +8,7 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
-## 0.0.8 - 2026-06-03
+## 0.0.9 - 2026-06-03
 
 지능형 학습 루프를 라이브 학습 화면에 연결했다 — 검증 버튼이 채점·오개념 진단·다음 행동까지 닫고,
 완료한 개념을 간격 반복으로 되살린다. 진단 신호를 정직하게 다듬고(신호강도 가중 mastery·불확실성
@@ -32,6 +32,7 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 - mastery 정직성 — 체크 신호강도 가중 + slip/guess 결합 (`src/codaro/curriculum/masterySignal.py`), Wilson 불확실성 하한 기반 "mastered" 판정과 강한 관측 요구 (`learnerState.py`), 다음-단계 진급을 raw score가 아닌 정직한 숙달로 (`ai/toolHandlers/diagnostics.py`).
 - transport/도메인 경계 정리 — provider·채팅·자동화·커리큘럼 surface 책임 분리(사용자 동작 불변, 계층 게이트 충족).
 - 30days day1~2 예측 grain 정리 — day1 타입 예측 제거, day2(데이터 타입) 타입 예측 추가.
+- 사이드바 베타 표시 — 커리큘럼(현재 학습)만 정식, 나머지 표면(대화·노트북·자동화)과 터미널에 베타 배지 (`editor/src/lib/surfaceModel.ts`, `components/app/productSidebar.tsx`).
 
 ### Removed
 
