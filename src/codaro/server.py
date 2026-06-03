@@ -213,6 +213,16 @@ def createServerApp(
         reapTask = asyncio.create_task(reapSessionsPeriodically())
         reapTask.add_done_callback(_onBackgroundTaskDone)
 
+        # 재시작 시 schedule 보유 태스크의 주기 실행을 복원(잡은 휘발, schedule은 영속).
+        try:
+            from .automation.taskFlow import rehydrateAutomationSchedules
+
+            rehydrated = rehydrateAutomationSchedules(str(state.workspaceRoot))
+            if rehydrated["count"]:
+                logger.info("scheduler %s", formatLogFields(status="rehydrated", count=rehydrated["count"]))
+        except Exception as scheduleError:  # noqa: BLE001 — schedule restore must not block startup
+            logger.warning("scheduler %s", formatLogFields(status="rehydrate-failed", error=str(scheduleError)))
+
         if browserUrl:
             import webbrowser
             try:

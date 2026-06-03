@@ -9,10 +9,12 @@ from codaro.automation.eStop import getEmergencyStop
 from codaro.automation.taskFlow import (
     AutomationTaskFlowError,
     automationSchedulerStatusPayload,
+    automationTaskScheduler,
     clearAutomationStopPayload,
     createAutomationTaskFromRecipePayload,
     createAutomationTaskPayload,
     getAutomationTaskPayload,
+    rehydrateAutomationSchedules,
     resetAutomationTaskFlowState,
     setAutomationTaskSchedulePayload,
     triggerAutomationStopPayload,
@@ -82,6 +84,65 @@ def testCreateAutomationTaskFromRecipeRejectsUnsafeRecipe(tmp_path) -> None:
 
     assert excInfo.value.statusCode == 400
     assert str(excInfo.value) == "Automation task requires DRY_RUN = True before registration."
+
+
+def testRehydrateRestoresSchedulesAfterRestart(tmp_path) -> None:
+    async def scenario() -> None:
+        task = createAutomationTaskPayload(name="Report", documentPath="report.py")
+        setAutomationTaskSchedulePayload(task["id"], schedule="@every_1m", workspaceRoot=str(tmp_path))
+        assert automationSchedulerStatusPayload()["jobCount"] == 1
+
+        # 재시작 시뮬레이션 — active 잡은 휘발(schedule 문자열은 task에 영속).
+        automationTaskScheduler().cancelAll()
+        assert automationSchedulerStatusPayload()["jobCount"] == 0
+
+        result = rehydrateAutomationSchedules(str(tmp_path))
+        assert result["count"] == 1
+        assert task["id"] in result["restored"]
+        assert automationSchedulerStatusPayload()["jobCount"] == 1
+
+    asyncio.run(scenario())
+
+
+def testRehydrateSkipsUnscheduledTasks(tmp_path) -> None:
+    async def scenario() -> None:
+        createAutomationTaskPayload(name="NoSchedule", documentPath="x.py")
+        result = rehydrateAutomationSchedules(str(tmp_path))
+        assert result["count"] == 0
+
+    asyncio.run(scenario())
+
+
+def testNotifyCompletionNoOpWithoutChannels() -> None:
+    from codaro.automation.taskFlow import _notifyTaskCompletion
+    from codaro.automation.taskModel import TaskDefinition, TaskRun, TaskStatus
+
+    task = TaskDefinition(name="R", documentPath="r.py")
+    run = TaskRun(taskId=task.id, status=TaskStatus.SUCCESS)
+    # 채널 0개 — 예외 없이 무동작.
+    asyncio.run(_notifyTaskCompletion(task, run))
+
+
+def testNotifyCompletionBroadcastsWhenChannel(monkeypatch) -> None:
+    import codaro.automation.shared as shared
+    from codaro.automation.taskFlow import _notifyTaskCompletion
+    from codaro.automation.taskModel import TaskDefinition, TaskRun, TaskStatus
+
+    sent: list[str] = []
+
+    class _FakeBridge:
+        def listChannels(self):
+            return ["channel"]
+
+        def broadcast(self, message):
+            sent.append(message)
+            return []
+
+    monkeypatch.setattr(shared, "getSharedMessageBridge", lambda: _FakeBridge())
+    task = TaskDefinition(name="Weekly", documentPath="r.py")
+    run = TaskRun(taskId=task.id, status=TaskStatus.SUCCESS)
+    asyncio.run(_notifyTaskCompletion(task, run))
+    assert sent and "Weekly" in sent[0] and "완료" in sent[0]
 
 
 def testEStopCancelsScheduledAutomationTasks(tmp_path) -> None:

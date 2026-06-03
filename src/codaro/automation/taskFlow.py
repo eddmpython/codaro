@@ -1,13 +1,30 @@
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 from typing import Any
 
 from .eStop import getEmergencyStop
 from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
 from .scheduler import TaskScheduler, parseScheduleSeconds
+from .taskModel import TaskDefinition, TaskRun
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
+
+
+async def _notifyTaskCompletion(task: TaskDefinition, run: TaskRun) -> None:
+    """완료 시 등록된 채널로 diff 요약을 broadcast한다 — 채널이 0개면 no-op(무해).
+
+    재진입 hook: "리포트 준비됨 — 무엇이 바뀌었나". 블로킹 urllib는 스레드로 빼 루프를 막지 않는다.
+    """
+    from .shared import getSharedMessageBridge
+
+    bridge = getSharedMessageBridge()
+    if not bridge.listChannels():
+        return
+    diff = getTaskRegistry().getRunDiff(task.id)
+    message = f"[{task.name}] 완료 — 상태 {run.status.value} · {diff.summary}"
+    await asyncio.to_thread(bridge.broadcast, message)
 
 
 class AutomationTaskFlowError(Exception):
@@ -158,20 +175,9 @@ def listAutomationTaskRunsPayload(taskId: str, *, limit: int) -> dict[str, Any]:
     }
 
 
-def setAutomationTaskSchedulePayload(
-    taskId: str,
-    *,
-    schedule: str,
-    workspaceRoot: str,
-) -> dict[str, Any]:
-    if parseScheduleSeconds(schedule) is None:
-        raise AutomationTaskFlowError(400, f"Invalid schedule: {schedule}")
-
+def _scheduleTaskRun(taskId: str, schedule: str, workspaceRoot: str) -> bool:
+    """스케줄러에 한 태스크의 주기 실행을 등록한다(설정·재시작 복원 공용 경로)."""
     registry = getTaskRegistry()
-    task = registry.update(taskId, schedule=schedule)
-    if task is None:
-        raise AutomationTaskFlowError(404, "Task not found")
-
     scheduler = automationTaskScheduler()
 
     async def runScheduled() -> None:
@@ -181,9 +187,46 @@ def setAutomationTaskSchedulePayload(
             return
         run = await TaskRunner(workspaceRoot=workspaceRoot).run(fresh)
         registry.addRun(run)
+        await _notifyTaskCompletion(fresh, run)
 
-    scheduler.schedule(taskId, schedule, runScheduled)
+    return scheduler.schedule(taskId, schedule, runScheduled)
+
+
+def setAutomationTaskSchedulePayload(
+    taskId: str,
+    *,
+    schedule: str,
+    workspaceRoot: str,
+) -> dict[str, Any]:
+    if parseScheduleSeconds(schedule) is None:
+        raise AutomationTaskFlowError(400, f"Invalid schedule: {schedule}")
+
+    task = getTaskRegistry().update(taskId, schedule=schedule)
+    if task is None:
+        raise AutomationTaskFlowError(404, "Task not found")
+
+    _scheduleTaskRun(taskId, schedule, workspaceRoot)
     return {"ok": True, "schedule": schedule}
+
+
+def rehydrateAutomationSchedules(workspaceRoot: str) -> dict[str, Any]:
+    """재시작 시 schedule 보유 enabled 태스크의 주기 실행을 복원한다.
+
+    schedule 문자열은 index.json에 영속되지만 active 잡(asyncio 루프)은 휘발하므로,
+    서버 기동 시 한 번 호출해 스케줄을 되살린다(재부팅에 잡이 사라지지 않게).
+    이벤트 루프가 도는 컨텍스트(서버 startup)에서 호출해야 한다.
+    """
+    registry = getTaskRegistry()
+    scheduler = automationTaskScheduler()
+    restored: list[str] = []
+    for task in registry.listTasks():
+        if not task.enabled or not task.schedule:
+            continue
+        if scheduler.isScheduled(task.id):
+            continue
+        if _scheduleTaskRun(task.id, task.schedule, workspaceRoot):
+            restored.append(task.id)
+    return {"restored": restored, "count": len(restored)}
 
 
 def cancelAutomationTaskSchedulePayload(taskId: str) -> dict[str, Any]:
@@ -212,6 +255,7 @@ async def triggerAutomationWebhookPayload(taskId: str, *, workspaceRoot: str) ->
 
     run = await TaskRunner(workspaceRoot=workspaceRoot).run(task)
     registry.addRun(run)
+    await _notifyTaskCompletion(task, run)
     return {
         "triggered": True,
         "taskId": taskId,
