@@ -47,8 +47,14 @@ import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/code
 import { isExecutableBlock, type CellAiAction } from "@/lib/cellModel";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
+import {
+  blockInCycle,
+  cellDiagnosticChips,
+  formatCyclePaths,
+  type CellDiagnosticChip,
+} from "@/lib/reactiveDiagnostics";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
+import type { BlockConfig, CodaroDocument, ExecutionResult, ReactiveDiagnostics } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
 
@@ -114,6 +120,7 @@ const codeCellEditorTheme = EditorView.theme({
 export function NotebookPanel({
   canRun,
   cellHelpByBlockId,
+  diagnostics,
   document,
   drafts,
   notebookRunning,
@@ -121,6 +128,7 @@ export function NotebookPanel({
   results,
   runningBlockId,
   selectedBlockId,
+  staleBlockIds,
   onAddCell,
   onAcceptPendingBlocks,
   onCellAsk,
@@ -134,6 +142,7 @@ export function NotebookPanel({
 }: {
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
+  diagnostics: ReactiveDiagnostics;
   document: CodaroDocument;
   drafts: Record<string, string>;
   notebookRunning: boolean;
@@ -141,6 +150,7 @@ export function NotebookPanel({
   results: ResultMap;
   runningBlockId: string | null;
   selectedBlockId: string;
+  staleBlockIds: string[];
   onAddCell: (type: "code" | "markdown", referenceBlockId?: string, placement?: "before" | "after") => void;
   onAcceptPendingBlocks: () => void;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
@@ -152,6 +162,8 @@ export function NotebookPanel({
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
 }) {
+  const staleSet = new Set(staleBlockIds);
+  const cyclePaths = formatCyclePaths(diagnostics.cycles);
   return (
     <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-2 sm:p-3">
       <div className="mb-2 flex min-h-8 items-center gap-2 pl-9">
@@ -180,6 +192,11 @@ export function NotebookPanel({
           onAccept={onAcceptPendingBlocks}
           onReject={onRejectPendingBlocks}
         />
+        {cyclePaths.length ? (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-2.5 py-1.5 text-[11px] text-destructive">
+            <span className="font-medium">순환 의존</span> — 실행 순서가 정해지지 않습니다: {cyclePaths.join(" · ")}
+          </div>
+        ) : null}
       </div>
 
       <ScrollArea className="h-full min-h-0">
@@ -194,6 +211,9 @@ export function NotebookPanel({
               result={results[block.id]}
               cellHelp={cellHelpByBlockId[block.id]}
               isRunning={runningBlockId === block.id}
+              isStale={staleSet.has(block.id)}
+              inCycle={blockInCycle(diagnostics, block.id)}
+              diagnosticChips={cellDiagnosticChips(diagnostics, block.id)}
               onCellAsk={(action, question) => onCellAsk(action, block, question)}
               onDelete={() => onDeleteCell(block.id)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
@@ -548,6 +568,9 @@ function DocumentBlock({
   draft,
   isSelected,
   isRunning,
+  isStale = false,
+  inCycle = false,
+  diagnosticChips = [],
   result,
   cellHelp,
   onDraftChange,
@@ -562,6 +585,9 @@ function DocumentBlock({
   draft: string;
   isSelected: boolean;
   isRunning: boolean;
+  isStale?: boolean;
+  inCycle?: boolean;
+  diagnosticChips?: CellDiagnosticChip[];
   result?: ExecutionResult;
   cellHelp?: CellAiHelpState;
   onCellAsk: (action: CellAiAction, question?: string) => void;
@@ -572,7 +598,8 @@ function DocumentBlock({
   onSelect: () => void;
 }) {
   const cellTitle = block.type === "markdown" ? "Markdown" : block.type === "automation" ? "Automation" : "Python";
-  const resultStatus = isRunning ? "running" : result?.status ?? "idle";
+  // 우선순위: 실행 중 → 순환(conflict, 빨강) → stale(오래됨) → 실행 결과 → 대기.
+  const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
 
   if (block.type === "markdown") {
     return (
@@ -583,6 +610,7 @@ function DocumentBlock({
           type="markdown"
           selected={isSelected}
           cellHelp={cellHelp}
+          diagnosticChips={diagnosticChips}
           onCellAsk={onCellAsk}
           onDelete={onDelete}
         />
@@ -614,6 +642,7 @@ function DocumentBlock({
         type="code"
         selected={isSelected}
         cellHelp={cellHelp}
+        diagnosticChips={diagnosticChips}
         onCellAsk={onCellAsk}
         onDelete={onDelete}
         onRun={onRun}
@@ -664,6 +693,7 @@ function CellMetaBar({
   type,
   selected,
   cellHelp,
+  diagnosticChips = [],
   onCellAsk,
   onDelete,
   onRun,
@@ -675,6 +705,7 @@ function CellMetaBar({
   type: "code" | "markdown";
   selected: boolean;
   cellHelp?: CellAiHelpState;
+  diagnosticChips?: CellDiagnosticChip[];
   onCellAsk: (action: CellAiAction, question?: string) => void;
   onDelete: () => void;
   onRun?: () => void;
@@ -693,11 +724,24 @@ function CellMetaBar({
         <span className="truncate">{title}</span>
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-1">
+        {diagnosticChips.map((chip) => (
+          <span
+            key={chip.kind}
+            className="h-6 rounded-md border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium leading-5 text-amber-700 dark:text-amber-400"
+            title="정합성 경고 — 실행은 진행되며, 마지막 정의가 적용됩니다."
+          >
+            {chip.label}
+          </span>
+        ))}
         {status !== "idle" ? (
           <span
             className={cn(
               "h-6 rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-5",
-              status === "error" ? "bg-destructive text-destructive-foreground" : "border bg-background text-muted-foreground",
+              status === "error" || status === "conflict"
+                ? "bg-destructive text-destructive-foreground"
+                : status === "stale"
+                  ? "border border-dashed bg-background text-muted-foreground"
+                  : "border bg-background text-muted-foreground",
             )}
           >
             {statusLabel(status)}

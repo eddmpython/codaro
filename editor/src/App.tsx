@@ -177,7 +177,9 @@ function App() {
   const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find(isExecutableBlock) ?? activeDocument.blocks[0];
   const {
     canRun,
+    cleanupCellDefinitions,
     currentResult,
+    diagnostics,
     notebookRunning,
     resetRuntimeState,
     results,
@@ -187,6 +189,7 @@ function App() {
     sessionId,
     setSessionId,
     setUiValue,
+    staleBlockIds,
     variables,
   } = useNotebookRuntimeState({
     apiOnline,
@@ -369,6 +372,7 @@ function App() {
               categories={filteredCategories}
               contents={contents}
               curriculumDocument={curriculumDocument}
+              diagnostics={diagnostics}
               document={document}
               drafts={drafts}
               eStop={eStop}
@@ -383,6 +387,7 @@ function App() {
               selectedBlockId={selectedBlockId}
               selectedCurriculumBlockId={selectedCurriculumBlockId}
               selectedContentId={selectedContentId}
+              staleBlockIds={staleBlockIds}
               surface={surface}
               tasks={tasks}
               loadState={loadState}
@@ -393,7 +398,10 @@ function App() {
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
               onDraftChange={updateDraft}
-              onDeleteCell={deleteNotebookCell}
+              onDeleteCell={(blockId) => {
+                cleanupCellDefinitions(blockId);
+                deleteNotebookCell(blockId);
+              }}
               onNewChat={startNewChat}
               onOpenTerminalCommand={openTerminalCommand}
               onPromptChange={setPrompt}

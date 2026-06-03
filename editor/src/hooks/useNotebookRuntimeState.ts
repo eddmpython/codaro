@@ -3,16 +3,19 @@ import { blockLabel, isExecutableBlock } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
 import {
+  removeNotebookCellState,
   resolveBlockRunCode,
   runNotebookBlock,
   runReactiveNotebook,
   setNotebookUiValue,
 } from "@/lib/notebookRuntime";
+import { computeStaleBlockIds, emptyReactiveDiagnostics } from "@/lib/reactiveDiagnostics";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type {
   AppNotice,
   BlockConfig,
   CodaroDocument,
+  ReactiveDiagnostics,
   VariableInfo,
 } from "@/types";
 
@@ -42,6 +45,9 @@ export function useNotebookRuntimeState({
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
+  // 마지막 실행 시점에 보낸 셀 내용 스냅샷 — 이후 draft가 달라지면 그 셀(+다운스트림)이 stale.
+  const [lastRunContent, setLastRunContent] = useState<Record<string, string>>({});
 
   const codeBlocks = useMemo(() => document.blocks.filter(isExecutableBlock), [document.blocks]);
   const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
@@ -51,6 +57,8 @@ export function useNotebookRuntimeState({
   const resetRuntimeState = useCallback(() => {
     setResults({});
     setVariables([]);
+    setDiagnostics(emptyReactiveDiagnostics);
+    setLastRunContent({});
   }, []);
 
   const runBlock = useCallback(async (block: BlockConfig) => {
@@ -104,6 +112,9 @@ export function useNotebookRuntimeState({
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
       if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
       if (outcome.variables) setVariables(outcome.variables);
+      if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
+      // 실행에 사용한 draft를 스냅샷 → 이후 편집을 stale 판정의 기준선으로.
+      setLastRunContent(Object.fromEntries(codeBlocks.map((block) => [block.id, drafts[block.id] ?? block.content])));
       if (outcome.notice) onNotice(outcome.notice);
     } finally {
       setNotebookRunning(false);
@@ -124,7 +135,25 @@ export function useNotebookRuntimeState({
     });
     if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
     if (outcome.variables) setVariables(outcome.variables);
+    if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
   }, [sessionId, document, drafts, variables]);
+
+  // 코드 편집(draft≠마지막 실행 내용)으로 stale해진 셀 + 다운스트림 전이 + 백엔드 early-stop stale.
+  const staleBlockIds = useMemo(() => {
+    const dirty = new Set<string>();
+    for (const block of codeBlocks) {
+      const current = drafts[block.id] ?? block.content;
+      if (block.id in lastRunContent && current !== lastRunContent[block.id]) dirty.add(block.id);
+    }
+    const stale = computeStaleBlockIds(diagnostics.dependents, dirty);
+    for (const blockId of diagnostics.staleBlockIds) stale.add(blockId);
+    if (runningBlockId) stale.delete(runningBlockId);
+    return Array.from(stale);
+  }, [codeBlocks, drafts, lastRunContent, diagnostics, runningBlockId]);
+
+  const cleanupCellDefinitions = useCallback((blockId: string) => {
+    void removeNotebookCellState(sessionId, blockId);
+  }, [sessionId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -144,7 +173,9 @@ export function useNotebookRuntimeState({
 
   return {
     canRun,
+    cleanupCellDefinitions,
     currentResult,
+    diagnostics,
     hasRunnableNotebook,
     notebookRunning,
     resetRuntimeState,
@@ -155,6 +186,7 @@ export function useNotebookRuntimeState({
     sessionId,
     setSessionId,
     setUiValue,
+    staleBlockIds,
     variables,
   };
 }

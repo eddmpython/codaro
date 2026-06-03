@@ -1,17 +1,39 @@
-import { codaroApi } from "@/lib/api";
+import { codaroApi, type ReactiveResponse } from "@/lib/api";
 import type { ResultMap } from "@/lib/assistantContext";
 import { isExecutableBlock } from "@/lib/cellModel";
 import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
+import { emptyReactiveDiagnostics } from "@/lib/reactiveDiagnostics";
 import type {
   AppNotice,
   BlockConfig,
   CodaroDocument,
   ExecutionResult,
   PackageInstallResult,
+  ReactiveDiagnostics,
   VariableInfo,
 } from "@/types";
+
+function extractDiagnostics(payload: ReactiveResponse): ReactiveDiagnostics {
+  return {
+    cycles: payload.cycles ?? [],
+    multipleDefinitions: payload.multipleDefinitions ?? [],
+    crossCellMutations: payload.crossCellMutations ?? [],
+    staleBlockIds: payload.staleBlockIds ?? [],
+    dependents: payload.dependents ?? {},
+  };
+}
+
+// 셀 삭제 시 워커 registry 정리(zombie 변수 제거). 검증된 remove-cell 엔드포인트를 호출만 한다.
+export async function removeNotebookCellState(sessionId: string | null, blockId: string): Promise<void> {
+  if (!sessionId) return;
+  try {
+    await codaroApi.removeCell(sessionId, blockId);
+  } catch (error) {
+    console.warn("remove-cell failed", error);
+  }
+}
 
 export type RuntimeSessionResult = {
   notice?: AppNotice;
@@ -26,6 +48,7 @@ export type RunBlockResult = RuntimeSessionResult & {
 export type RunNotebookResult = RuntimeSessionResult & {
   results?: ResultMap;
   variables?: VariableInfo[];
+  diagnostics?: ReactiveDiagnostics;
 };
 
 export type RuntimePackagePreflight = {
@@ -159,6 +182,7 @@ export async function runReactiveNotebook({
       sessionId,
       results,
       variables: lastResult?.variables ?? [],
+      diagnostics: emptyReactiveDiagnostics,
       notice: {
         tone: "success",
         title: translate("runtime.notebookRunDone"),
@@ -197,6 +221,7 @@ export async function runReactiveNotebook({
       sessionId: activeSession.sessionId,
       results,
       variables: payload.results.at(-1)?.variables ?? previousVariables,
+      diagnostics: extractDiagnostics(payload),
       notice: {
         tone: "success",
         title: translate("runtime.notebookRunDone"),
@@ -231,7 +256,7 @@ export async function setNotebookUiValue({
   elementId: string;
   value: unknown;
   previousVariables: VariableInfo[];
-}): Promise<{ sessionId: string | null; results?: ResultMap; variables?: VariableInfo[] }> {
+}): Promise<{ sessionId: string | null; results?: ResultMap; variables?: VariableInfo[]; diagnostics?: ReactiveDiagnostics }> {
   if (!sessionId) return { sessionId };
   try {
     const payload = await codaroApi.setUiValue(sessionId, {
@@ -253,6 +278,7 @@ export async function setNotebookUiValue({
       sessionId,
       results,
       variables: payload.results.at(-1)?.variables ?? previousVariables,
+      diagnostics: extractDiagnostics(payload),
     };
   } catch (error) {
     console.warn("set-ui-value failed", error);

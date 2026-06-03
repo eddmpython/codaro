@@ -13,6 +13,7 @@ import type {
   EStopStatus,
   ExecutionResult,
   LoadState,
+  ReactiveDiagnostics,
   SchedulerStatus,
   TaskDefinition,
   TaskListPayload,
@@ -40,6 +41,7 @@ type MainSurfaceProps = {
   categories: CurriculumCategory[];
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
+  diagnostics: ReactiveDiagnostics;
   document: CodaroDocument;
   drafts: Record<string, string>;
   eStop: EStopStatus;
@@ -56,6 +58,7 @@ type MainSurfaceProps = {
   selectedCategory: string;
   selectedContentId: string;
   selectedCurriculumBlockId: string;
+  staleBlockIds: string[];
   surface: SurfaceMode;
   tasks: TaskListPayload;
   onAcceptPendingBlocks: () => void;
@@ -121,6 +124,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         assistantLoading={props.assistantLoading}
         canRun={props.canRun}
         cellHelpByBlockId={props.cellHelpByBlockId}
+        diagnostics={props.diagnostics}
         document={props.document}
         drafts={props.drafts}
         messages={props.messages}
@@ -130,6 +134,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         results={props.results}
         runningBlockId={props.runningBlockId}
         selectedBlockId={props.selectedBlockId}
+        staleBlockIds={props.staleBlockIds}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onAddCell={props.onAddCell}
         onAsk={props.onAsk}

@@ -38,6 +38,7 @@ import type {
   ProviderDiagnostic,
   ProviderValidationPayload,
   ProgressSummary,
+  ReactiveDiagnostics,
   SchedulerStatus,
   SharePackListPayload,
   SharePackAutomationPayload,
@@ -57,6 +58,12 @@ import {
 } from "@/lib/assistantStream";
 
 const configuredApiBase = import.meta.env.VITE_CODARO_API_BASE?.replace(/\/$/, "") ?? "";
+
+// 리액티브 실행 응답 — 결과 + 진단 묶음(진단 필드는 옵셔널: 오프라인/구버전 경로 호환).
+export type ReactiveResponse = {
+  results: ExecutionResult[];
+  executionOrder: string[];
+} & Partial<ReactiveDiagnostics>;
 
 export class CodaroApiError extends Error {
   readonly status: number;
@@ -216,7 +223,7 @@ export const codaroApi = {
     sessionId: string,
     blockId: string,
     blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
-  ) => postJson<{ results: ExecutionResult[]; executionOrder: string[]; cycles?: string[][] }>(
+  ) => postJson<ReactiveResponse>(
     `/api/kernel/${sessionId}/execute-reactive`,
     { blockId, blocks },
   ),
@@ -228,9 +235,13 @@ export const codaroApi = {
       value: unknown;
       blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>;
     },
-  ) => postJson<{ results: ExecutionResult[]; executionOrder: string[]; cycles?: string[][] }>(
+  ) => postJson<ReactiveResponse>(
     `/api/kernel/${sessionId}/set-ui-value`,
     payload,
+  ),
+  removeCell: (sessionId: string, blockId: string) => postJson<{ status: string }>(
+    `/api/kernel/${sessionId}/remove-cell`,
+    { code: "", blockId },
   ),
   variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
   resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),

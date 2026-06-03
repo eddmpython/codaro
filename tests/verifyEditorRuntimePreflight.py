@@ -242,6 +242,11 @@ const runtime = loadModule({runtimePath}, (specifier) => {{
     firstOutputLine: (result) => result.stdout.trim(),
   }};
   if (specifier === "@/lib/packageInference") return inference;
+  if (specifier === "@/lib/reactiveDiagnostics") return {{
+    emptyReactiveDiagnostics: {{
+      cycles: [], multipleDefinitions: [], crossCellMutations: [], staleBlockIds: [], dependents: {{}},
+    }},
+  }};
   if (specifier === "@/types") return {{}};
   return require(specifier);
 }});

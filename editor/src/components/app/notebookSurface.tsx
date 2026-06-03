@@ -9,6 +9,7 @@ import type {
   BlockConfig,
   CodaroDocument,
   ExecutionResult,
+  ReactiveDiagnostics,
 } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
@@ -21,6 +22,7 @@ export type NotebookSurfaceProps = {
   assistantLoading: boolean;
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
+  diagnostics: ReactiveDiagnostics;
   document: CodaroDocument;
   drafts: Record<string, string>;
   messages: AssistantMessage[];
@@ -30,6 +32,7 @@ export type NotebookSurfaceProps = {
   results: ResultMap;
   runningBlockId: string | null;
   selectedBlockId: string;
+  staleBlockIds: string[];
   onAcceptPendingBlocks: () => void;
   onAddCell: (type: "code" | "markdown", referenceBlockId?: string, placement?: "before" | "after") => void;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
@@ -57,6 +60,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
       <NotebookPanel
         canRun={props.canRun}
         cellHelpByBlockId={props.cellHelpByBlockId}
+        diagnostics={props.diagnostics}
         document={props.document}
         drafts={props.drafts}
         notebookRunning={props.notebookRunning}
@@ -64,6 +68,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         results={props.results}
         runningBlockId={props.runningBlockId}
         selectedBlockId={props.selectedBlockId}
+        staleBlockIds={props.staleBlockIds}
         onAddCell={props.onAddCell}
         onDraftChange={props.onDraftChange}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
