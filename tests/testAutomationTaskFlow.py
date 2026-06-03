@@ -11,6 +11,7 @@ from codaro.automation.taskFlow import (
     automationSchedulerStatusPayload,
     automationTaskScheduler,
     clearAutomationStopPayload,
+    createAutomationTaskFromCodePayload,
     createAutomationTaskFromRecipePayload,
     createAutomationTaskPayload,
     getAutomationTaskPayload,
@@ -19,6 +20,7 @@ from codaro.automation.taskFlow import (
     setAutomationTaskSchedulePayload,
     triggerAutomationStopPayload,
 )
+from codaro.automation.taskModel import TaskStatus
 
 
 @pytest.fixture(autouse=True)
@@ -111,6 +113,41 @@ def testRehydrateSkipsUnscheduledTasks(tmp_path) -> None:
         assert result["count"] == 0
 
     asyncio.run(scenario())
+
+
+def testHarvestCodeMaterializesAndRuns(tmp_path) -> None:
+    from codaro.automation.taskRegistry import getTaskRegistry
+    from codaro.automation.taskRunner import TaskRunner
+
+    result = createAutomationTaskFromCodePayload(
+        code="x = 21 * 2\nprint(x)",
+        name="My Weekly Job",
+        workspaceRoot=str(tmp_path),
+    )
+    assert result["created"] is True
+    docPath = tmp_path / result["documentPath"]
+    assert docPath.exists()  # 코드가 문서로 materialize됨
+    assert result["task"]["documentPath"] == result["documentPath"]
+
+    # 단일 경로 — materialize된 문서를 기존 TaskRunner가 실행한다.
+    task = getTaskRegistry().get(result["task"]["id"])
+    run = asyncio.run(TaskRunner(workspaceRoot=str(tmp_path)).run(task))
+    assert run.status == TaskStatus.SUCCESS
+    assert "42" in run.output
+
+
+def testHarvestRejectsEmptyCode(tmp_path) -> None:
+    with pytest.raises(AutomationTaskFlowError) as excInfo:
+        createAutomationTaskFromCodePayload(code="   ", name="X", workspaceRoot=str(tmp_path))
+    assert excInfo.value.statusCode == 400
+
+
+def testHarvestRejectsInvalidSchedule(tmp_path) -> None:
+    with pytest.raises(AutomationTaskFlowError) as excInfo:
+        createAutomationTaskFromCodePayload(
+            code="x = 1", name="X", schedule="nope", workspaceRoot=str(tmp_path)
+        )
+    assert excInfo.value.statusCode == 400
 
 
 def testNotifyCompletionNoOpWithoutChannels() -> None:

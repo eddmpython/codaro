@@ -64,6 +64,58 @@ def createAutomationTaskPayload(
     return task.serialize()
 
 
+def _harvestSlug(name: str) -> str:
+    import re
+
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", name.strip().lower()).strip("-")
+    return slug or "task"
+
+
+def createAutomationTaskFromCodePayload(
+    *,
+    code: str,
+    name: str,
+    description: str = "",
+    schedule: str | None = None,
+    inputs: dict[str, Any] | None = None,
+    workspaceRoot: str,
+) -> dict[str, Any]:
+    """학습/편집기에서 쓴 코드를 자동화 태스크로 Harvest한다(졸업 메커닉).
+
+    임의 코드 문자열을 두 번째 생성 경로로 만들지 않는다 — document service로 percent 문서로
+    materialize한 뒤, 기존 path-based 생성/실행(TaskRunner)을 그대로 쓴다(단일 경로).
+    """
+    import uuid
+
+    from ..document.models import BlockConfig, CodaroDocument, DocumentMetadata
+    from ..document.service import saveDocument
+
+    if not code.strip():
+        raise AutomationTaskFlowError(400, "코드가 비어 있습니다.")
+    if schedule is not None and parseScheduleSeconds(schedule) is None:
+        raise AutomationTaskFlowError(400, f"Invalid schedule: {schedule}")
+
+    relPath = f"automations/{_harvestSlug(name)}-{uuid.uuid4().hex[:6]}.py"
+    document = CodaroDocument(
+        id=_harvestSlug(name),
+        title=name,
+        blocks=[BlockConfig(id="harvested", type="code", content=code)],
+        metadata=DocumentMetadata(sourceFormat="percent"),
+    )
+    saveDocument(str(Path(workspaceRoot) / relPath), document)
+
+    payload = createAutomationTaskPayload(
+        name=name,
+        documentPath=relPath,
+        description=description,
+        inputs=inputs,
+    )
+    if schedule is not None:
+        setAutomationTaskSchedulePayload(payload["id"], schedule=schedule, workspaceRoot=workspaceRoot)
+        payload = getAutomationTaskPayload(payload["id"])
+    return {"created": True, "documentPath": relPath, "task": payload}
+
+
 def createAutomationTaskFromRecipePayload(
     *,
     recipePath: Path,

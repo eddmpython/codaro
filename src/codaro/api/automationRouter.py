@@ -41,6 +41,7 @@ from ..automation.taskFlow import (
     automationSchedulerStatusPayload,
     cancelAutomationTaskSchedulePayload,
     clearAutomationStopPayload,
+    createAutomationTaskFromCodePayload,
     createAutomationTaskPayload,
     deleteAutomationTaskPayload,
     getAutomationStopPayload,
@@ -77,6 +78,15 @@ class CreateTaskRequest(BaseModel):
     description: str = ""
     schedule: str | None = None
     inputs: dict[str, Any] | None = None
+
+
+class HarvestCodeRequest(BaseModel):
+    code: str
+    name: str
+    description: str = ""
+    schedule: str | None = None
+    inputs: dict[str, Any] | None = None
+    outcomeId: str | None = None  # 주면 그 outcome 숙달을 요구(졸업 게이트). 없으면 게이트 없음.
 
 
 class UpdateTaskRequest(BaseModel):
@@ -130,6 +140,29 @@ def createAutomationRouter(state: Any) -> APIRouter:
             schedule=req.schedule,
             inputs=req.inputs,
         )
+
+    @router.post("/api/tasks/from-code")
+    def apiHarvestCode(req: HarvestCodeRequest):
+        # 졸업 게이트(H4.b) — outcomeId가 주어지면 그 개념을 숙달했을 때만 Harvest 허용.
+        # 마스터하지 않은 코드를 자동화로 굳히는 cargo-cult를 막는다(transfer 평가로서의 Harvest).
+        if req.outcomeId:
+            mastery = state.learnerStateStore.getMastery(req.outcomeId)
+            if not mastery.mastered:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"아직 '{req.outcomeId}' 개념을 충분히 숙달하지 않았어요 — 조금 더 연습한 뒤 자동화로 가져가요.",
+                )
+        try:
+            return createAutomationTaskFromCodePayload(
+                code=req.code,
+                name=req.name,
+                description=req.description,
+                schedule=req.schedule,
+                inputs=req.inputs,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
 
     @router.get("/api/tasks/{taskId}")
     def apiGetTask(taskId: str):

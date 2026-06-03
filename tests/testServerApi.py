@@ -970,3 +970,37 @@ def testSpaClientRouteFallsBackToIndexHtml(tmp_path: Path) -> None:
     route = client.get("/curriculum")
     assert route.status_code == 200
     assert "text/html" in route.headers["content-type"]
+
+
+def testHarvestCodeEndpointMaterializesTask(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+    import codaro.automation.taskRegistry as taskRegistryModule
+
+    taskRegistryModule._registry = None
+    app = createServerApp(workspaceRoot=tmp_path)
+    client = TestClient(app)
+
+    response = client.post("/api/tasks/from-code", json={"code": "x = 1\nprint(x)", "name": "Harvest Demo"})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["created"] is True
+    assert (tmp_path / body["documentPath"]).exists()
+
+    taskRegistryModule._registry = None
+
+
+def testHarvestCodeGatedByUnmasteredOutcome(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+    import codaro.automation.taskRegistry as taskRegistryModule
+
+    taskRegistryModule._registry = None
+    app = createServerApp(workspaceRoot=tmp_path)
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/tasks/from-code",
+        json={"code": "x = 1", "name": "Gated", "outcomeId": "python.never.mastered.xyz"},
+    )
+    assert response.status_code == 403
+
+    taskRegistryModule._registry = None
