@@ -33,6 +33,7 @@ def testCapturesStdoutAcrossBlocks() -> None:
 
 
 def testCapturesVariablesWithShapeDtype() -> None:
+    pytest.importorskip("numpy")  # shape/dtype 포착은 numpy 객체가 있어야 검증 가능
     result = _run(
         captureDocument(
             _doc("import numpy as np", "arr = np.zeros((3, 5), dtype='int64')"),
