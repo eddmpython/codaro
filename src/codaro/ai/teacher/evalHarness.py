@@ -816,11 +816,11 @@ def _sectionContractBlocksAfter(blocks: Sequence[Any], sectionIndex: int) -> tup
 
 
 def _sectionBlocksHaveCardFlow(blocks: Sequence[Mapping[str, Any]]) -> bool:
+    # 검증 기준 카드는 제거됨(내부 채점 메타) — 설명→스니펫→실습 3블록 흐름.
     expectedTypes = (
         "sectionContract:explanation",
         "sectionContract:snippet",
         "sectionContract:exercise",
-        "sectionContract:check",
     )
     nextExpectedIndex = 0
     for block in blocks:
@@ -848,8 +848,6 @@ def _sectionFlowBlockIsValid(block: Mapping[str, Any], sourceType: str) -> bool:
             and _hasText(block.get("content"))
             and isinstance(guide, Mapping)
         )
-    if sourceType == "sectionContract:check":
-        return block.get("role") == "check" and _hasText(block.get("content"))
     return False
 
 

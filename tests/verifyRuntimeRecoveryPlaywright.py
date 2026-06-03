@@ -514,8 +514,6 @@ def compactBlockPayload(block: dict[str, Any]) -> dict[str, Any] | None:
             }.items()
             if value not in (None, "", [], {})
         }
-    if block.get("sourceType") == "sectionContract:check":
-        return {"check": payload.get("check"), "sectionId": payload.get("sectionId")}
     return None
 
 

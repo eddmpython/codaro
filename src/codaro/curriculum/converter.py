@@ -159,17 +159,10 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
         if solutionCode:
             solutions[exerciseCell.id] = solutionCode
 
-    if section.check:
-        result.append(
-            _markdownBlock(
-                _formatStructuredCheck(section.check),
-                displayKind="callout",
-                role="check",
-                sourceType="sectionContract:check",
-                title=f"{section.title} 검증" if section.title else "검증",
-                payload={"check": section.check, "sectionId": section.id},
-            )
-        )
+    # 검증 기준을 학습자용 카드로 덤프하지 않는다 — check 설정(noError/resultCheck)은 내부 채점
+    # 메타이지 학습 콘텐츠가 아니다. 채점은 exercise 셀의 checkConfig가 담당하고(위), 학습자는
+    # "검증" 버튼 결과(CheckResultPanel)로 피드백을 받는다. 성공 조건이 필요하면 작성자가
+    # exercise.prompt/goal에 학습자 언어로 적는다(자동 생성 jargon 금지).
     return result
 
 
@@ -196,23 +189,6 @@ def _hasStructuredExercise(section: LearningSectionContract) -> bool:
         bool(exercise.check),
         bool(exercise.hints),
     ])
-
-
-def _formatStructuredCheck(check: dict[str, str]) -> str:
-    lines = ["### 검증 기준"]
-    for key, value in check.items():
-        lines.append(f"- **{_checkLabel(key)}**: {value}")
-    return "\n".join(lines)
-
-
-def _checkLabel(key: str) -> str:
-    labels = {
-        "noError": "오류 없이 실행",
-        "resultCheck": "결과 확인",
-        "assertCheck": "assert 통과",
-        "outputCheck": "출력 확인",
-    }
-    return labels.get(key, key)
 
 
 def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: str | None = None) -> list[BlockConfig]:

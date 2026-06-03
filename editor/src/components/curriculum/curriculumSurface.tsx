@@ -930,18 +930,6 @@ function StructuredSectionLearningBody({
         </div>
       ) : null}
 
-      {parts.check ? (
-        <StructuredSectionBand
-          detail={parts.check.description || stripMarkdown(readPayloadText(section.contract?.why))}
-          icon={<ListChecks className="size-3.5" />}
-          label="검증 기준"
-          part="check"
-          title={blockLabel(parts.check)}
-        >
-          <CurriculumMarkdownBody block={parts.check} hideRepeatedTitle />
-        </StructuredSectionBand>
-      ) : null}
-
       {parts.extraBlocks.length ? (
         <div className="divide-y">
           {parts.extraBlocks.map((block) => (
@@ -1007,14 +995,15 @@ function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
 function structuredSectionParts(section: CurriculumSectionGroup) {
   const snippet = section.blocks.find((block) => block.sourceType === "sectionContract:snippet");
   const exercise = section.blocks.find((block) => block.sourceType === "sectionContract:exercise");
-  const check = section.blocks.find((block) => block.sourceType === "sectionContract:check");
+  // 검증 기준(sectionContract:check)은 학습자에게 표시하지 않는다 — 내부 채점 메타이지 학습
+  // 콘텐츠가 아니다. 남아 있어도 학습자 카드로 렌더하지 않도록 extraBlocks에서도 제외한다.
   const extraBlocks = section.blocks.filter((block) => (
     block.sourceType !== "sectionContract:explanation"
     && block.sourceType !== "sectionContract:snippet"
     && block.sourceType !== "sectionContract:exercise"
     && block.sourceType !== "sectionContract:check"
   ));
-  return { snippet, exercise, check, extraBlocks };
+  return { snippet, exercise, extraBlocks };
 }
 
 function specificLearningCopy(value: string) {

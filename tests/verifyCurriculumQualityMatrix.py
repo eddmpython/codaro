@@ -22,7 +22,6 @@ REQUIRED_SECTION_FLOW = (
     "sectionContract:explanation",
     "sectionContract:snippet",
     "sectionContract:exercise",
-    "sectionContract:check",
 )
 REQUIRED_CONTRACT_FIELDS = (
     "title",

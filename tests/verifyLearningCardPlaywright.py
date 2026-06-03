@@ -154,7 +154,6 @@ def assertMaterializedContract(document: dict[str, Any]) -> None:
         "sectionContract:explanation",
         "sectionContract:snippet",
         "sectionContract:exercise",
-        "sectionContract:check",
     ]
     for sourceType in expectedFlow:
         if sourceType not in sourceTypes:
@@ -256,16 +255,6 @@ def compactBlockPayload(block: dict[str, Any]) -> dict[str, Any] | None:
                 "id": payload.get("id"),
                 "sectionContract": compactContract,
                 "sectionContractGaps": payload.get("sectionContractGaps"),
-            }.items()
-            if value not in (None, "", [], {})
-        }
-
-    if block.get("sourceType") == "sectionContract:check":
-        return {
-            key: value
-            for key, value in {
-                "check": payload.get("check"),
-                "sectionId": payload.get("sectionId"),
             }.items()
             if value not in (None, "", [], {})
         }

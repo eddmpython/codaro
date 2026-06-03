@@ -49,13 +49,24 @@ export function PredictCard({
     setValue: (v: string) => void;
     show: boolean;
   }> = [
+    // 예측 grain은 레슨에 맞춘다 — 값은 보편(모든 레슨), shape/dtype/error는 작성자가
+    // 그 차원을 실제로 채운 레슨에서만 노출한다. Hello World 초보에게 numpy 개념(shape/dtype)이나
+    // 예외 jargon(ValueError)을 들이밀면 활성화 최악의 순간에 "못 따라가겠다"는 인상만 준다.
+    {
+      key: "expectedValue",
+      label: "예상 값",
+      hint: predict.expectedValue ? `예: ${predict.expectedValue}` : "예: Hello World 또는 42",
+      value: value,
+      setValue: setValue,
+      show: true,
+    },
     {
       key: "expectedShape",
       label: "예상 모양 (shape)",
       hint: predict.expectedShape ? `예: ${predict.expectedShape}` : "예: (3,) 또는 10 rows × 4 cols",
       value: shape,
       setValue: setShape,
-      show: predict.expectedShape !== undefined,
+      show: Boolean(predict.expectedShape),
     },
     {
       key: "expectedDtype",
@@ -63,23 +74,15 @@ export function PredictCard({
       hint: predict.expectedDtype ? `예: ${predict.expectedDtype}` : "예: int / float64 / list[str]",
       value: dtype,
       setValue: setDtype,
-      show: predict.expectedDtype !== undefined,
-    },
-    {
-      key: "expectedValue",
-      label: "예상 값",
-      hint: predict.expectedValue ? `예: ${predict.expectedValue}` : "예: [1, 2, 3] 또는 42",
-      value: value,
-      setValue: setValue,
-      show: predict.expectedValue !== undefined,
+      show: Boolean(predict.expectedDtype),
     },
     {
       key: "expectedError",
-      label: "예상 에러 (없으면 비워두기)",
+      label: "예상 에러",
       hint: predict.expectedError ? `예: ${predict.expectedError}` : "예: ValueError / KeyError",
       value: error,
       setValue: setError,
-      show: predict.expectedError !== undefined,
+      show: Boolean(predict.expectedError),
     },
   ];
 

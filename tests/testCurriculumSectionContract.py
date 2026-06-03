@@ -140,7 +140,8 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
 
     snippet = next(block for block in document.blocks if block.sourceType == "sectionContract:snippet")
     exercise = next(block for block in document.blocks if block.sourceType == "sectionContract:exercise")
-    check = next(block for block in document.blocks if block.sourceType == "sectionContract:check")
+    # 검증 기준은 더 이상 학습자용 카드로 생성하지 않는다(내부 채점 메타). 채점은 exercise.checkConfig가 담당.
+    assert not any(block.sourceType == "sectionContract:check" for block in document.blocks)
 
     assert snippet.role == "snippet"
     assert snippet.content == "import pandas as pd"
@@ -150,7 +151,6 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
     assert exercise.guide.solution == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
     assert exercise.guide.checkConfig == {"variable": "frame"}
     assert solutions[exercise.id] == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
-    assert check.role == "check"
 
 
 def testLessonRuntimePackagesNormalizeAliasesAndDropStdlib() -> None:
@@ -194,12 +194,13 @@ def testStructuredSectionMaterializesSingleCardFlowBlocks() -> None:
 
     sourceTypes = [block.sourceType for block in document.blocks]
     assert sourceTypes.count("section") == 1
-    assert sourceTypes[sourceTypes.index("section") + 1:sourceTypes.index("section") + 5] == [
+    # 검증 기준 카드는 제거됨 — 설명→스니펫→실습 3블록 흐름.
+    assert sourceTypes[sourceTypes.index("section") + 1:sourceTypes.index("section") + 4] == [
         "sectionContract:explanation",
         "sectionContract:snippet",
         "sectionContract:exercise",
-        "sectionContract:check",
     ]
+    assert "sectionContract:check" not in sourceTypes
 
     sectionBlock = next(block for block in document.blocks if block.sourceType == "section")
     contract = sectionBlock.payload["sectionContract"]
