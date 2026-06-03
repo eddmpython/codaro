@@ -251,7 +251,6 @@ sections:
     predict:
       prompt: 이 print() 호출의 출력 영역에는 어떤 숫자가 표시될까요?
       expectedValue: 123
-      expectedDtype: int
   check:
     type: noError
     noError: 숫자 출력하기의 숫자 print() 호출이 SyntaxError 없이 출력되어야 합니다.
@@ -276,7 +275,6 @@ sections:
     predict:
       prompt: 이 계산식의 결과는 어떤 숫자일까요? 직접 계산해 본 뒤 실행과 비교하세요.
       expectedValue: (계산 결과 숫자를 적어주세요)
-      expectedDtype: int
   check:
     type: noError
     noError: 계산 결과 출력하기의 계산식이 SyntaxError 없이 print()까지 실행되어야 합니다.
@@ -301,7 +299,6 @@ sections:
     predict:
       prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
       expectedValue: '''Hello Notebook'''
-      expectedDtype: str
   check:
     type: noError
     noError: 마지막 줄 값 확인하기의 마지막 표현식이 SyntaxError 없이 평가되어야 합니다.

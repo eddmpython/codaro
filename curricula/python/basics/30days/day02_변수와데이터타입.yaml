@@ -169,8 +169,9 @@ sections:
     - 바꿀 지점은 `years = ...` 오른쪽 값입니다.
     - 실행 뒤 `years` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
     predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
       expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: int
   check:
     type: noError
     noError: 정수 타입에서 `years` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -197,8 +198,9 @@ sections:
     - 바꿀 지점은 `pi = ...` 오른쪽 값입니다.
     - 실행 뒤 `pi` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
     predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
       expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: float
   check:
     type: noError
     noError: 실수 타입에서 `pi` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -225,8 +227,9 @@ sections:
     - 바꿀 지점은 `town = ...` 오른쪽 값입니다.
     - 실행 뒤 `town` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
     predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
       expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: str
   check:
     type: noError
     noError: 문자열 타입에서 `town` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -253,8 +256,9 @@ sections:
     - 바꿀 지점은 `active = ...` 오른쪽 값입니다.
     - 실행 뒤 `active` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
     predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
       expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: bool
   check:
     type: noError
     noError: 불린 타입에서 `active` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
