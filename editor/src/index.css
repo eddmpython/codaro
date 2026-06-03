@@ -158,3 +158,9 @@ textarea,
 select {
   font: inherit;
 }
+
+/* giscus(GitHub Discussions) 댓글 — iframe 기본 너비(300px) 대신 컨테이너를 가득 채운다. */
+[data-lesson-comments] .giscus,
+[data-lesson-comments] .giscus-frame {
+  width: 100%;
+}
