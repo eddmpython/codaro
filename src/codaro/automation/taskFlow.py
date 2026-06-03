@@ -144,12 +144,18 @@ async def runAutomationTaskPayload(taskId: str, *, workspaceRoot: str) -> dict[s
 
 
 def listAutomationTaskRunsPayload(taskId: str, *, limit: int) -> dict[str, Any]:
+    from dataclasses import asdict
+
     registry = getTaskRegistry()
     task = registry.get(taskId)
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
     runs = registry.getRuns(taskId, limit=limit)
-    return {"runs": [run.serialize() for run in runs]}
+    # 직전 대비 diff를 동봉 — 프론트가 "무엇이 바뀌었나"를 한 번의 호출로 렌더한다.
+    return {
+        "runs": [run.serialize() for run in runs],
+        "diff": asdict(registry.getRunDiff(taskId)),
+    }
 
 
 def setAutomationTaskSchedulePayload(

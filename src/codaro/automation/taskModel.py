@@ -67,3 +67,17 @@ class TaskRun:
             "error": self.error,
             "variables": self.variables,
         }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, Any]) -> "TaskRun":
+        return cls(
+            id=str(data.get("id") or f"run-{uuid.uuid4().hex[:10]}"),
+            taskId=str(data.get("taskId") or ""),
+            status=TaskStatus(str(data.get("status") or TaskStatus.PENDING.value)),
+            startedAt=data.get("startedAt"),
+            finishedAt=data.get("finishedAt"),
+            durationMs=data.get("durationMs"),
+            output=str(data.get("output") or ""),
+            error=data.get("error"),
+            variables=dict(data.get("variables") or {}),
+        )

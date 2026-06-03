@@ -6,9 +6,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .taskModel import TaskDefinition, TaskRun
+from .reportDiff import RunDiff, diffRuns
+from .taskModel import TaskDefinition, TaskRun, TaskStatus
 
 logger = logging.getLogger(__name__)
+
+MAX_PERSISTED_RUNS = 50
 
 
 class TaskRegistry:
@@ -34,6 +37,29 @@ class TaskRegistry:
                 self._tasks[task.id] = task
         except (json.JSONDecodeError, TypeError, KeyError):
             logger.warning("Failed to load task registry from %s", indexPath)
+            return
+        for task in self._tasks.values():
+            self._runs[task.id] = self._loadRuns(task.id)
+
+    def _runsPath(self, taskId: str) -> Path:
+        return self._storagePath / "runs" / f"{taskId}.json"
+
+    def _loadRuns(self, taskId: str) -> list[TaskRun]:
+        runsPath = self._runsPath(taskId)
+        if not runsPath.exists():
+            return []
+        try:
+            payload = json.loads(runsPath.read_text(encoding="utf-8"))
+            return [TaskRun.deserialize(entry) for entry in payload.get("runs", [])]
+        except (json.JSONDecodeError, TypeError, KeyError, ValueError) as exc:
+            logger.warning("Failed to load runs for %s: %s", taskId, exc)
+            return []
+
+    def _saveRuns(self, taskId: str) -> None:
+        runsPath = self._runsPath(taskId)
+        runsPath.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"runs": [run.serialize() for run in self._runs.get(taskId, [])]}
+        runsPath.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     def _save(self) -> None:
         self._storagePath.mkdir(parents=True, exist_ok=True)
@@ -81,6 +107,9 @@ class TaskRegistry:
         if taskId in self._tasks:
             del self._tasks[taskId]
             self._runs.pop(taskId, None)
+            runsPath = self._runsPath(taskId)
+            if runsPath.exists():
+                runsPath.unlink()
             self._save()
             return True
         return False
@@ -89,9 +118,9 @@ class TaskRegistry:
         if run.taskId not in self._runs:
             self._runs[run.taskId] = []
         self._runs[run.taskId].append(run)
-        maxRuns = 50
-        if len(self._runs[run.taskId]) > maxRuns:
-            self._runs[run.taskId] = self._runs[run.taskId][-maxRuns:]
+        if len(self._runs[run.taskId]) > MAX_PERSISTED_RUNS:
+            self._runs[run.taskId] = self._runs[run.taskId][-MAX_PERSISTED_RUNS:]
+        self._saveRuns(run.taskId)
 
     def getRuns(self, taskId: str, limit: int = 20) -> list[TaskRun]:
         runs = self._runs.get(taskId, [])
@@ -100,6 +129,14 @@ class TaskRegistry:
     def getLastRun(self, taskId: str) -> TaskRun | None:
         runs = self._runs.get(taskId, [])
         return runs[-1] if runs else None
+
+    def getRunDiff(self, taskId: str) -> RunDiff:
+        """가장 최근 실행을 직전 실행과 비교한다 — '무엇이 바뀌었나'(retention pull)."""
+        runs = self._runs.get(taskId, [])
+        if not runs:
+            return diffRuns(None, TaskRun(taskId=taskId, status=TaskStatus.PENDING))
+        previous = runs[-2] if len(runs) >= 2 else None
+        return diffRuns(previous, runs[-1])
 
 
 _registry: TaskRegistry | None = None
