@@ -285,11 +285,12 @@ def createServerApp(
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; "
+            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://giscus.app; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: blob:; "
             "connect-src 'self' ws: wss:; "
             "font-src 'self' data:; "
+            "frame-src https://giscus.app; "
             "frame-ancestors 'none'"
         )
         if request.url.path == "/" or request.url.path.startswith("/_app"):
