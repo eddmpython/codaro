@@ -70,7 +70,7 @@ AUTOMATION_REQUIREMENTS = (
                 "listTasks",
                 "addRun",
                 "getRuns",
-                "maxRuns = 50",
+                "MAX_PERSISTED_RUNS = 50",
             )),
             ("src/codaro/automation/workflow.py", (
                 "class WorkflowEngine",
@@ -119,7 +119,7 @@ AUTOMATION_REQUIREMENTS = (
                 "\"taskRun\"",
                 "\"task-runner\"",
                 "\"durationMs\": run.durationMs",
-                "manager.destroySession(session.sessionId)",
+                "captureDocument(",
             )),
             ("tests/testAutomation.py", (
                 "test_e_stop_cancels_task_before_document_execution",

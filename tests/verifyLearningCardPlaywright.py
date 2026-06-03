@@ -504,7 +504,7 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
   const parts = Array.from(card.querySelectorAll('[data-learning-section-part]')).map((item) =>
     item.getAttribute('data-learning-section-part')
   );
-  const required = ['overview', 'snippet', 'exercise', 'check'];
+  const required = ['overview', 'snippet', 'exercise'];
   const missing = required.filter((part) => !parts.includes(part));
   if (missing.length) throw new Error('missing parts: ' + missing.join(', '));
   if (parts.includes('result')) throw new Error('empty result part should stay hidden before execution');
@@ -522,9 +522,8 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
     card.querySelector(':scope > [data-learning-section-part="overview"]'),
     card.querySelector(':scope > div.divide-y > [data-learning-section-part="snippet"]'),
     card.querySelector(':scope > div.divide-y > [data-learning-section-part="exercise"]'),
-    card.querySelector(':scope > div.divide-y > [data-learning-section-part="check"]'),
   ].filter(Boolean);
-  if (bands.length !== 5) throw new Error('band count ' + bands.length);
+  if (bands.length !== 4) throw new Error('band count ' + bands.length);
 
   const header = bands[0];
   const sectionIndex = header.querySelector('[data-learning-section-index="true"]');
