@@ -2,7 +2,39 @@
 
 LLM provider 없이도 학습 루프가 "진단 → 안내"까지 닫히는지 결정적으로 검증한다.
 """
-from codaro.curriculum.checkFlow import recommendNextAction
+from dataclasses import dataclass
+
+from codaro.curriculum.checkFlow import _variableShapeDtype, recommendNextAction
+
+
+@dataclass
+class _FakeVar:
+    name: str
+    shape: str = ""
+    dtype: str = ""
+
+
+class _FakeSession:
+    def __init__(self, variables):
+        self._variables = variables
+
+    def getVariables(self):
+        return self._variables
+
+
+def testVariableShapeDtypeReadsNamedVariable() -> None:
+    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64"), _FakeVar("x")])
+    assert _variableShapeDtype(session, "arr") == ("(3, 5)", "int64")
+
+
+def testVariableShapeDtypeEmptyWhenNoName() -> None:
+    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64")])
+    assert _variableShapeDtype(session, "") == ("", "")
+
+
+def testVariableShapeDtypeEmptyWhenMissing() -> None:
+    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64")])
+    assert _variableShapeDtype(session, "other") == ("", "")
 
 
 def testPassAdvances() -> None:

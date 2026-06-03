@@ -37,6 +37,21 @@ def recommendNextAction(
     return {"kind": "retry", "label": "예상한 결과와 비교하며 다시 시도하기"}
 
 
+def _variableShapeDtype(session: Any, variableName: str) -> tuple[str, str]:
+    """실행 후 세션에서 지정 변수의 shape/dtype를 읽는다(없으면 빈 문자열).
+
+    Predict-Run-Reconcile의 shape/dtype 차원은 *명명된 변수*가 있을 때만 채운다 —
+    final-output 추론은 모호하므로, 변수를 짚는 강한 체크(checkType=variable)에 한해
+    정직하게 활성화한다. runtime introspection(H0)이 numpy/pandas에서 채워 흘린 값.
+    """
+    if not variableName:
+        return "", ""
+    for variable in session.getVariables():
+        if variable.name == variableName:
+            return variable.shape, variable.dtype
+    return "", ""
+
+
 class CurriculumCheckInvalid(ValueError):
     pass
 
@@ -143,9 +158,12 @@ async def runCurriculumCheckFlow(
                 expectedError=request.prediction.expectedError,
             )
             if not predict.isEmpty():
+                actualShape, actualDtype = _variableShapeDtype(session, request.variableName)
                 actual = ActualResult(
                     value=str(payload.get("studentOutput") or ""),
                     errorClass=extractErrorClass(str(payload.get("detail") or "")),
+                    shape=actualShape,
+                    dtype=actualDtype,
                 )
                 diff = comparePrediction(predict, actual)
                 predictionDiffPayload = diff.model_dump()
