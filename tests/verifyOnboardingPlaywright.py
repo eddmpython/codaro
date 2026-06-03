@@ -667,18 +667,6 @@ def jsAssertExerciseCheck() -> str:
 (async () => {
   const exercise = document.querySelector('[data-learning-section-part="exercise"]');
   if (!exercise) throw new Error('exercise part missing');
-  const predictCard = exercise.querySelector('[data-predict-card="exercise"]');
-  if (!predictCard) throw new Error('predict card missing');
-  const predictInput = predictCard.querySelector('[data-predict-field="expectedValue"]');
-  if (!predictInput) throw new Error('predict value field missing');
-  const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-  nativeSetter.call(predictInput, 'world');
-  predictInput.dispatchEvent(new Event('input', { bubbles: true }));
-  const lockBtn = [...predictCard.querySelectorAll('button')].find((b) => b.textContent && b.textContent.includes('예측 잠그기'));
-  if (!lockBtn) throw new Error('predict lock button missing');
-  lockBtn.click();
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  if (predictCard.getAttribute('data-predict-locked') !== 'true') throw new Error('prediction did not lock');
   const runBtn = exercise.querySelector('button[aria-label="셀 실행"]');
   if (!runBtn) throw new Error('exercise run button missing');
   runBtn.click();
@@ -698,9 +686,6 @@ def jsAssertExerciseCheck() -> str:
   }
   if (!failPanel) throw new Error('failing check panel did not render');
   if (!failPanel.querySelector('[data-check-result-misconceptions="true"]')) throw new Error('misconception diagnosis missing on fail');
-  const predictionDiff = failPanel.querySelector('[data-prediction-diff]');
-  if (!predictionDiff) throw new Error('prediction-vs-actual diff missing on fail');
-  if (!predictionDiff.querySelector('[data-prediction-field="value"]')) throw new Error('prediction value field diff missing');
   const askBtn = failPanel.querySelector('[data-check-ask-assistant="true"]');
   if (!askBtn) throw new Error('ask-assistant button missing on fail');
   if (askBtn.getAttribute('data-ask-emphasized') !== 'true') throw new Error('ask-assistant should be emphasized on repeated struggle');

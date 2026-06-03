@@ -50,7 +50,6 @@ import { recordLessonMissionComplete } from "@/lib/curriculumCompletion";
 import { useWidgetSession } from "@/lib/widgetSession";
 import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult } from "@/types";
 import { CheckResultPanel } from "./checkResultPanel";
-import { PredictCard, type LearnerPrediction } from "./predictCard";
 import { CurriculumDependencyPanel } from "./curriculumDependencyPanel";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
 import {
@@ -735,11 +734,9 @@ function StructuredSectionLearningBody({
   const checkType = checkConfig.type ?? "";
   const hintCount = exercise?.guide?.hints?.length ?? 0;
   const canCheck = Boolean(exercise && checkType && sessionId && canRun);
-  const predict = exercise?.guide?.predict ?? null;
   const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
   const [checking, setChecking] = useState(false);
   const [hintLevel, setHintLevel] = useState(0);
-  const [lockedPrediction, setLockedPrediction] = useState<LearnerPrediction | null>(null);
   const [lessonCompleted, setLessonCompleted] = useState(false);
 
   const runCheck = async (level: number) => {
@@ -759,7 +756,6 @@ function StructuredSectionLearningBody({
         category,
         contentId,
         sectionId: section.id,
-        prediction: lockedPrediction,
       });
       setCheckResult(result);
       setHintLevel(result.hintLevel ?? level);
@@ -853,17 +849,6 @@ function StructuredSectionLearningBody({
               />
             </div>
           </div>
-
-          {predict ? (
-            <div className="mt-3">
-              <PredictCard
-                locked={lockedPrediction}
-                predict={predict}
-                onLock={setLockedPrediction}
-                onUnlock={() => setLockedPrediction(null)}
-              />
-            </div>
-          ) : null}
 
           <div className="mt-3">
             <div
