@@ -29,6 +29,7 @@ from codaro.outputDescriptor import (
     ui,
     vstack,
 )
+from codaro.uiValue import UiValue
 
 HOST = ROOT / "editor" / "src" / "components" / "widgets" / "widgetHost.tsx"
 GENERATED = ROOT / "editor" / "src" / "lib" / "widgetTypes.generated.ts"
@@ -63,7 +64,11 @@ def buildSampleDescriptors() -> list[dict]:
 
 
 def main() -> int:
-    samples = buildSampleDescriptors()
+    # 값 위젯(slider/dropdown/number/checkbox)은 이제 UiValue 객체 — 렌더 형태(descriptor)로 정규화.
+    samples = [
+        sample.codaroDescriptor() if isinstance(sample, UiValue) else sample
+        for sample in buildSampleDescriptors()
+    ]
     hostSource = HOST.read_text(encoding="utf-8")
     generatedSource = GENERATED.read_text(encoding="utf-8")
 

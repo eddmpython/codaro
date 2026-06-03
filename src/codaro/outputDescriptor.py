@@ -4,6 +4,7 @@ import textwrap
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from .uiCallbacks import registerCallback
+from .uiValue import UiValue
 
 
 DESCRIPTOR_TYPES = {
@@ -249,16 +250,14 @@ class _UiNamespace:
         max: int | float | None = None,
         step: int | float | None = None,
         onChange: Callable[..., Any] | None = None,
-    ) -> dict[str, Any]:
-        return _uiDescriptor(
-            "number",
-            value=value,
-            label=label,
-            min=min,
-            max=max,
-            step=step,
-            events=_bindEvents(change=onChange),
-        )
+    ) -> UiValue:
+        return UiValue("number", value, {
+            "label": label,
+            "min": min,
+            "max": max,
+            "step": step,
+            "events": _bindEvents(change=onChange),
+        })
 
     def slider(
         self,
@@ -269,16 +268,14 @@ class _UiNamespace:
         step: int | float = 1,
         label: str = "",
         onChange: Callable[..., Any] | None = None,
-    ) -> dict[str, Any]:
-        return _uiDescriptor(
-            "slider",
-            value=start if value is None else value,
-            label=label,
-            min=start,
-            max=stop,
-            step=step,
-            events=_bindEvents(change=onChange),
-        )
+    ) -> UiValue:
+        return UiValue("slider", start if value is None else value, {
+            "label": label,
+            "min": start,
+            "max": stop,
+            "step": step,
+            "events": _bindEvents(change=onChange),
+        })
 
     def checkbox(
         self,
@@ -286,13 +283,11 @@ class _UiNamespace:
         *,
         label: str = "",
         onChange: Callable[..., Any] | None = None,
-    ) -> dict[str, Any]:
-        return _uiDescriptor(
-            "checkbox",
-            value=bool(value),
-            label=label,
-            events=_bindEvents(change=onChange),
-        )
+    ) -> UiValue:
+        return UiValue("checkbox", bool(value), {
+            "label": label,
+            "events": _bindEvents(change=onChange),
+        })
 
     def dropdown(
         self,
@@ -301,16 +296,14 @@ class _UiNamespace:
         value: object | None = None,
         label: str = "",
         onChange: Callable[..., Any] | None = None,
-    ) -> dict[str, Any]:
+    ) -> UiValue:
         normalizedOptions = [str(option) for option in options]
         selected = str(value) if value is not None else (normalizedOptions[0] if normalizedOptions else "")
-        return _uiDescriptor(
-            "dropdown",
-            value=selected,
-            label=label,
-            options=normalizedOptions,
-            events=_bindEvents(change=onChange),
-        )
+        return UiValue("dropdown", selected, {
+            "label": label,
+            "options": normalizedOptions,
+            "events": _bindEvents(change=onChange),
+        })
 
     def button(
         self,
@@ -439,6 +432,8 @@ def isDescriptorPayload(value: object) -> bool:
 def toDescriptor(value: object) -> object:
     if value is None:
         return {"type": "plain", "content": ""}
+    if isinstance(value, UiValue):
+        return _sanitizeValue(value.codaroDescriptor())
     if isDescriptorPayload(value):
         return _sanitizeValue(value)
     if isinstance(value, str):
@@ -487,6 +482,8 @@ def _uiDescriptor(component: str, **props: object) -> dict[str, Any]:
 
 
 def _sanitizeValue(value: object) -> Any:
+    if isinstance(value, UiValue):
+        return _sanitizeValue(value.codaroDescriptor())
     if isDescriptorPayload(value):
         payload = value if isinstance(value, dict) else {}
         return {key: _sanitizeValue(item) for key, item in payload.items()}

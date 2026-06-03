@@ -31,7 +31,8 @@ def testButtonRegistersClickCallback() -> None:
 def testCheckboxChangeCallbackReceivesPayload() -> None:
     setUp()
     received: list[object] = []
-    descriptor = ui.checkbox(False, label="동의", onChange=lambda value: received.append(value))
+    # 값 위젯은 이제 UiValue 객체 — 렌더 형태는 codaroDescriptor()로 본다.
+    descriptor = ui.checkbox(False, label="동의", onChange=lambda value: received.append(value)).codaroDescriptor()
 
     callbackId = descriptor["events"]["change"]
     invokeCallback(callbackId, True)
@@ -43,7 +44,7 @@ def testCheckboxChangeCallbackReceivesPayload() -> None:
 def testSliderEventsBindWithMinMaxStep() -> None:
     setUp()
     received: list[float] = []
-    descriptor = ui.slider(0, 200, value=10, step=5, onChange=lambda value: received.append(float(value)))
+    descriptor = ui.slider(0, 200, value=10, step=5, onChange=lambda value: received.append(float(value))).codaroDescriptor()
 
     assert descriptor["component"] == "slider"
     assert descriptor["min"] == 0
@@ -56,7 +57,7 @@ def testSliderEventsBindWithMinMaxStep() -> None:
 def testDropdownDefaultSelectsFirstOption() -> None:
     setUp()
     received: list[str] = []
-    descriptor = ui.dropdown(["red", "green", "blue"], onChange=lambda value: received.append(value))
+    descriptor = ui.dropdown(["red", "green", "blue"], onChange=lambda value: received.append(value)).codaroDescriptor()
 
     assert descriptor["value"] == "red"
     assert descriptor["options"] == ["red", "green", "blue"]

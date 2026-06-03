@@ -26,6 +26,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")
 from ..document.analysis import analyzeCode
 from ..errorGuard import safeRepr
 from ..outputDescriptor import isDescriptorPayload
+from ..uiValue import beginBlock, resetStore
 
 
 def runLocalWorker(
@@ -119,6 +120,7 @@ def runLocalWorker(
             if action == "reset":
                 registry.clear()
                 cellDefinitions.clear()
+                resetStore()
                 executionCount = 0
                 _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
                 continue
@@ -180,6 +182,10 @@ def _executeCommand(
         cellScope.update(registry)
 
     emitEvent("started", {"status": "running"})
+
+    # 위젯 위치 카운터 리셋 + 현재 blockId 설정 — 이 블록에서 만드는 ui.* 위젯이
+    # {blockId}#{index} 안정 id를 받아 값이 셀 재실행에도 영속한다.
+    beginBlock(blockId)
 
     beforeVariables = _mapVariablesByName(_collectVariables(registry))
     stdoutBuf = _StreamingTextBuffer("stdout", emitEvent)
@@ -521,6 +527,10 @@ def _normalizeResult(value: object) -> tuple[str, object]:
     if dataframePayload is not None:
         return "dataframe", dataframePayload
 
+    uiValuePayload = _serializeUiValue(value)
+    if uiValuePayload is not None:
+        return "layout", uiValuePayload
+
     descriptorPayload = _serializeDescriptor(value)
     if descriptorPayload is not None:
         return "layout", descriptorPayload
@@ -619,6 +629,21 @@ def _serializeDataFrame(value: object) -> dict[str, object] | None:
     return None
 
 
+def _serializeUiValue(value: object) -> dict[str, object] | None:
+    """UiValue(리액티브 위젯 값 객체)를 descriptor로 직렬화한다(없으면 None).
+
+    객체의 `codaroDescriptor()`가 기존 ui descriptor 형태({type:ui, component, value, elementId})를
+    내고, 그걸 표준 descriptor 직렬화에 태워 프론트 렌더를 불변으로 유지한다.
+    """
+    builder = getattr(value, "codaroDescriptor", None)
+    if not callable(builder):
+        return None
+    descriptor = builder()
+    if not isDescriptorPayload(descriptor):
+        return None
+    return _sanitizeDescriptor(descriptor)
+
+
 def _serializeDescriptor(value: object) -> dict[str, object] | None:
     if not isDescriptorPayload(value):
         return None
@@ -626,6 +651,10 @@ def _serializeDescriptor(value: object) -> dict[str, object] | None:
 
 
 def _sanitizeDescriptor(value: object) -> object:
+    # layout(hstack/tabs/...) 안에 중첩된 UiValue(위젯 값 객체)를 descriptor로 변환.
+    builder = getattr(value, "codaroDescriptor", None)
+    if callable(builder):
+        return _sanitizeDescriptor(builder())
     if isinstance(value, dict):
         return {str(key): _sanitizeDescriptor(item) for key, item in value.items()}
     if isinstance(value, list):
