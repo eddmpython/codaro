@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -45,6 +45,13 @@ class ReactiveBlockRequest(BaseModel):
 
 class ReactiveExecuteRequest(BaseModel):
     blockId: str
+    blocks: list[ReactiveBlockRequest]
+
+
+class SetUiValueRequest(BaseModel):
+    blockId: str
+    elementId: str
+    value: Any = None
     blocks: list[ReactiveBlockRequest]
 
 

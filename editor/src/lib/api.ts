@@ -216,9 +216,21 @@ export const codaroApi = {
     sessionId: string,
     blockId: string,
     blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
-  ) => postJson<{ results: ExecutionResult[]; executionOrder: string[] }>(
+  ) => postJson<{ results: ExecutionResult[]; executionOrder: string[]; cycles?: string[][] }>(
     `/api/kernel/${sessionId}/execute-reactive`,
     { blockId, blocks },
+  ),
+  setUiValue: (
+    sessionId: string,
+    payload: {
+      blockId: string;
+      elementId: string;
+      value: unknown;
+      blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>;
+    },
+  ) => postJson<{ results: ExecutionResult[]; executionOrder: string[]; cycles?: string[][] }>(
+    `/api/kernel/${sessionId}/set-ui-value`,
+    payload,
   ),
   variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
   resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getCustomComponent } from "@/components/widgets/customComponentRegistry";
 import { cn } from "@/lib/utils";
 import { dispatchWidgetUiEvent } from "@/lib/widgetUiEvents";
-import { useWidgetSession } from "@/lib/widgetSession";
+import { useWidgetSession, useWidgetUiValueChange } from "@/lib/widgetSession";
 
 export type WidgetEventBindings = Record<string, string>;
 
@@ -53,7 +53,9 @@ export function WidgetHost({
   descriptor: WidgetDescriptor;
 }) {
   const contextSessionId = useWidgetSession();
+  const onUiValueChange = useWidgetUiValueChange();
   const resolvedSessionId = sessionId ?? contextSessionId;
+  const uiValueTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dispatchEvent = async (callbackId: string | undefined, eventType: string, payload: unknown) => {
     if (!callbackId || !resolvedSessionId) return;
     try {
@@ -69,25 +71,38 @@ export function WidgetHost({
     }
   };
 
-  return <WidgetNode descriptor={descriptor} dispatchEvent={dispatchEvent} />;
+  // 값 위젯(elementId 보유) 변경 → 그 변수를 쓰는 셀만 리액티브 갱신. 슬라이더 드래그
+  // hammering을 막기 위해 150ms 디바운스(마지막 값만 보낸다).
+  const dispatchUiValue = (elementId: string, value: unknown) => {
+    if (!onUiValueChange || !elementId) return;
+    if (uiValueTimer.current) clearTimeout(uiValueTimer.current);
+    uiValueTimer.current = setTimeout(() => {
+      void onUiValueChange({ blockId: blockId ?? null, elementId, value });
+    }, 150);
+  };
+
+  return <WidgetNode descriptor={descriptor} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />;
 }
 
 type Dispatch = (callbackId: string | undefined, eventType: string, payload: unknown) => Promise<void>;
+type DispatchUiValue = (elementId: string, value: unknown) => void;
 
 function WidgetNode({
   descriptor,
   dispatchEvent,
+  dispatchUiValue,
 }: {
   descriptor: WidgetDescriptor;
   dispatchEvent: Dispatch;
+  dispatchUiValue: DispatchUiValue;
 }) {
   if (descriptor.type === "ui") {
-    return <UiWidget descriptor={descriptor} dispatchEvent={dispatchEvent} />;
+    return <UiWidget descriptor={descriptor} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />;
   }
   if (descriptor.type === "custom") {
     return <CustomWidget descriptor={descriptor} />;
   }
-  return <ContainerWidget descriptor={descriptor} dispatchEvent={dispatchEvent} />;
+  return <ContainerWidget descriptor={descriptor} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />;
 }
 
 function CustomWidget({ descriptor }: { descriptor: WidgetDescriptor }) {
@@ -115,9 +130,11 @@ function CustomWidget({ descriptor }: { descriptor: WidgetDescriptor }) {
 function ContainerWidget({
   descriptor,
   dispatchEvent,
+  dispatchUiValue,
 }: {
   descriptor: WidgetDescriptor;
   dispatchEvent: Dispatch;
+  dispatchUiValue: DispatchUiValue;
 }) {
   const renderChild = (child: unknown, key: number): ReactNode => {
     if (isWidgetDescriptor(child)) {
@@ -126,6 +143,7 @@ function ContainerWidget({
           key={key}
           descriptor={child}
           dispatchEvent={dispatchEvent}
+          dispatchUiValue={dispatchUiValue}
         />
       );
     }
@@ -196,7 +214,7 @@ function ContainerWidget({
         >
           {title ? <div className="mb-1 text-xs font-semibold uppercase">{title}</div> : null}
           {isWidgetDescriptor(content) ? (
-            <WidgetNode descriptor={content} dispatchEvent={dispatchEvent} />
+            <WidgetNode descriptor={content} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />
           ) : (
             <div>{String(content ?? "")}</div>
           )}
@@ -215,7 +233,7 @@ function ContainerWidget({
               <summary className="cursor-pointer px-3 py-2 text-sm font-medium">{entry.label}</summary>
               <div className="px-3 pb-3">
                 {isWidgetDescriptor(entry.content) ? (
-                  <WidgetNode descriptor={entry.content} dispatchEvent={dispatchEvent} />
+                  <WidgetNode descriptor={entry.content} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />
                 ) : (
                   <div className="text-sm">{String(entry.content ?? "")}</div>
                 )}
@@ -243,7 +261,7 @@ function ContainerWidget({
           {items.map((entry) => (
             <TabsContent key={entry.label} value={entry.label}>
               {isWidgetDescriptor(entry.content) ? (
-                <WidgetNode descriptor={entry.content} dispatchEvent={dispatchEvent} />
+                <WidgetNode descriptor={entry.content} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />
               ) : (
                 <div className="text-sm">{String(entry.content ?? "")}</div>
               )}
@@ -261,11 +279,11 @@ function ContainerWidget({
           data-widget="sidebar"
           style={{ gridTemplateColumns: String((descriptor as { width?: string }).width ?? "minmax(0,1fr)") }}
         >
-          {isWidgetDescriptor(content) ? <WidgetNode descriptor={content} dispatchEvent={dispatchEvent} /> : null}
+          {isWidgetDescriptor(content) ? <WidgetNode descriptor={content} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} /> : null}
           {footer ? (
             <div className="border-t pt-2 text-xs text-muted-foreground">
               {isWidgetDescriptor(footer) ? (
-                <WidgetNode descriptor={footer} dispatchEvent={dispatchEvent} />
+                <WidgetNode descriptor={footer} dispatchEvent={dispatchEvent} dispatchUiValue={dispatchUiValue} />
               ) : (
                 <div>{String(footer ?? "")}</div>
               )}
@@ -307,13 +325,22 @@ function ContainerWidget({
 function UiWidget({
   descriptor,
   dispatchEvent,
+  dispatchUiValue,
 }: {
   descriptor: WidgetDescriptor;
   dispatchEvent: Dispatch;
+  dispatchUiValue: DispatchUiValue;
 }) {
   const component = descriptor.component ?? "";
   const events = (descriptor.events ?? {}) as WidgetEventBindings;
   const label = String((descriptor as { label?: string }).label ?? "");
+  const elementId = String((descriptor as { elementId?: unknown }).elementId ?? "");
+
+  // 값 변경 = 옵션 콜백(기존) + 리액티브 값-바인딩(elementId 있을 때).
+  const emitChange = (value: unknown) => {
+    void dispatchEvent(events.change, "change", value);
+    if (elementId) dispatchUiValue(elementId, value);
+  };
 
   switch (component) {
     case "button": {
@@ -363,7 +390,7 @@ function UiWidget({
             min={numberOrUndefined((descriptor as { min?: unknown }).min)}
             max={numberOrUndefined((descriptor as { max?: unknown }).max)}
             step={numberOrUndefined((descriptor as { step?: unknown }).step)}
-            onChange={(event) => dispatchEvent(events.change, "change", Number(event.target.value))}
+            onChange={(event) => emitChange(Number(event.target.value))}
           />
         </UiInputWrapper>
       );
@@ -378,7 +405,7 @@ function UiWidget({
             min={Number((descriptor as { min?: unknown }).min ?? 0)}
             max={Number((descriptor as { max?: unknown }).max ?? 100)}
             step={Number((descriptor as { step?: unknown }).step ?? 1)}
-            onChange={(event) => dispatchEvent(events.change, "change", Number(event.target.value))}
+            onChange={(event) => emitChange(Number(event.target.value))}
           />
         </UiInputWrapper>
       );
@@ -389,7 +416,7 @@ function UiWidget({
           <input
             type="checkbox"
             defaultChecked={Boolean((descriptor as { value?: unknown }).value)}
-            onChange={(event) => dispatchEvent(events.change, "change", event.target.checked)}
+            onChange={(event) => emitChange(event.target.checked)}
           />
           <span>{label}</span>
         </label>
@@ -403,7 +430,7 @@ function UiWidget({
             data-widget-ui="dropdown"
             className="h-9 w-full rounded-md border bg-background px-2 text-sm"
             defaultValue={value}
-            onChange={(event) => dispatchEvent(events.change, "change", event.target.value)}
+            onChange={(event) => emitChange(event.target.value)}
           >
             {options.map((option) => (
               <option key={option} value={option}>

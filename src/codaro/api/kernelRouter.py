@@ -19,7 +19,7 @@ from ..system.packageOps import PackageEnvironmentError
 from ..system.serverState import ServerState
 from .errors import fail
 from .kernelWebSocket import handleKernelWebSocket
-from .requestModels import PackageRequest, PathRequest, ReactiveExecuteRequest
+from .requestModels import PackageRequest, PathRequest, ReactiveExecuteRequest, SetUiValueRequest
 
 
 def createKernelRouter(state: ServerState) -> APIRouter:
@@ -158,6 +158,28 @@ def createKernelRouter(state: ServerState) -> APIRouter:
                 transport="http",
                 sessionId=sessionId,
                 changedBlockId=request.blockId,
+                resultCount=payload.resultCount,
+                executionCount=payload.executionCount,
+                durationMs=payload.durationMs,
+            ),
+        )
+        return payload.httpPayload()
+
+    @router.post("/api/kernel/{sessionId}/set-ui-value")
+    async def apiSetUiValue(sessionId: str, request: SetUiValueRequest) -> dict[str, Any]:
+        # 위젯 값 갱신 → 그 변수를 쓰는 다운스트림만 재실행(위젯 정의 셀 제외).
+        session = requireSession(state, sessionId)
+        session.setUiValue(request.elementId, request.value)
+        blocks = [block.model_dump() for block in request.blocks]
+        payload = await executeKernelReactive(session, blocks, request.blockId, includeSource=False)
+        logger.debug(
+            "kernel-reactive %s",
+            formatLogFields(
+                transport="http",
+                kind="setUiValue",
+                sessionId=sessionId,
+                changedBlockId=request.blockId,
+                elementId=request.elementId,
                 resultCount=payload.resultCount,
                 executionCount=payload.executionCount,
                 durationMs=payload.durationMs,

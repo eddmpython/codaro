@@ -937,6 +937,33 @@ def testKernelWebSocketSetUiValueRerunsDependentsOnly() -> None:
         assert any("100" in str(result["data"]) for result in results)  # 50 * 2
 
 
+def testHttpSetUiValueRerunsDependentsOnly() -> None:
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+    widgetCode = "from codaro.outputDescriptor import ui\nslider = ui.slider(0, 100)"
+    consumerCode = "doubled = slider.value * 2\ndoubled"
+    client.post(f"/api/kernel/{sessionId}/execute", json={"code": widgetCode, "blockId": "w"})
+    client.post(f"/api/kernel/{sessionId}/execute", json={"code": consumerCode, "blockId": "c"})
+
+    response = client.post(
+        f"/api/kernel/{sessionId}/set-ui-value",
+        json={
+            "blockId": "w",
+            "elementId": "w#0",
+            "value": 50,
+            "blocks": [
+                {"id": "w", "type": "code", "content": widgetCode},
+                {"id": "c", "type": "code", "content": consumerCode},
+            ],
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["executionOrder"] == ["c"]  # 위젯 셀 w 제외
+    assert any("100" in str(result["data"]) for result in body["results"])  # 50 * 2
+    client.delete(f"/api/kernel/{sessionId}")
+
+
 def testKernelWebSocketRejectsInvalidPayload() -> None:
     client = TestClient(createServerApp())
     sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]

@@ -215,6 +215,51 @@ export async function runReactiveNotebook({
   }
 }
 
+export async function setNotebookUiValue({
+  sessionId,
+  document,
+  drafts,
+  blockId,
+  elementId,
+  value,
+  previousVariables,
+}: {
+  sessionId: string | null;
+  document: CodaroDocument;
+  drafts: Record<string, string>;
+  blockId: string;
+  elementId: string;
+  value: unknown;
+  previousVariables: VariableInfo[];
+}): Promise<{ sessionId: string | null; results?: ResultMap; variables?: VariableInfo[] }> {
+  if (!sessionId) return { sessionId };
+  try {
+    const payload = await codaroApi.setUiValue(sessionId, {
+      blockId,
+      elementId,
+      value,
+      blocks: document.blocks
+        .filter((block) => isExecutableBlock(block) || block.type === "markdown")
+        .map((block) => ({
+          id: block.id,
+          type: isExecutableBlock(block) ? "code" : ("markdown" as const),
+          content: drafts[block.id] ?? block.content,
+        })),
+    });
+    const results = Object.fromEntries(
+      payload.results.map((result) => [result.blockId ?? "", result]),
+    ) as ResultMap;
+    return {
+      sessionId,
+      results,
+      variables: payload.results.at(-1)?.variables ?? previousVariables,
+    };
+  } catch (error) {
+    console.warn("set-ui-value failed", error);
+    return { sessionId };
+  }
+}
+
 export async function preflightRuntimePackages(
   sessionId: string,
   packageNames: string[],

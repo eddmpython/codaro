@@ -6,6 +6,7 @@ import {
   resolveBlockRunCode,
   runNotebookBlock,
   runReactiveNotebook,
+  setNotebookUiValue,
 } from "@/lib/notebookRuntime";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type {
@@ -109,6 +110,22 @@ export function useNotebookRuntimeState({
     }
   }, [apiOnline, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
 
+  const setUiValue = useCallback(async (blockId: string, elementId: string, value: unknown) => {
+    if (!sessionId) return;
+    // 위젯 값 변경 → 그 변수를 쓰는 다운스트림 셀 출력만 갱신(위젯 정의 셀은 재실행 안 함).
+    const outcome = await setNotebookUiValue({
+      sessionId,
+      document,
+      drafts,
+      blockId,
+      elementId,
+      value,
+      previousVariables: variables,
+    });
+    if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
+    if (outcome.variables) setVariables(outcome.variables);
+  }, [sessionId, document, drafts, variables]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handler = (event: Event) => {
@@ -137,6 +154,7 @@ export function useNotebookRuntimeState({
     runningBlockId,
     sessionId,
     setSessionId,
+    setUiValue,
     variables,
   };
 }

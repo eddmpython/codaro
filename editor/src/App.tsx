@@ -186,6 +186,7 @@ function App() {
     runningBlockId,
     sessionId,
     setSessionId,
+    setUiValue,
     variables,
   } = useNotebookRuntimeState({
     apiOnline,
@@ -312,7 +313,10 @@ function App() {
 
   return (
     <LocaleProvider value={localeState}>
-    <WidgetSessionProvider sessionId={sessionId}>
+    <WidgetSessionProvider
+      sessionId={sessionId}
+      onUiValueChange={({ blockId, elementId, value }) => setUiValue(blockId ?? "", elementId, value)}
+    >
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <ProductSidebar
         categories={filteredCategories}
