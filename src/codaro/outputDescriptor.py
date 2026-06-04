@@ -36,15 +36,31 @@ UI_COMPONENTS = {
     "button",
     "checkbox",
     "code_editor",
+    "date",
     "dropdown",
+    "file",
+    "form",
+    "multiselect",
     "number",
     "progress",
+    "radio",
     "slider",
     "table",
     "text",
     "textarea",
     "toggle",
 }
+
+
+def _toDate(raw: object) -> object | None:
+    import datetime as _datetime
+
+    if not raw or not isinstance(raw, str):
+        return None
+    try:
+        return _datetime.date.fromisoformat(raw)
+    except ValueError:
+        return None
 
 
 def md(content: str) -> dict[str, Any]:
@@ -302,6 +318,84 @@ class _UiNamespace:
         return UiValue("dropdown", selected, {
             "label": label,
             "options": normalizedOptions,
+            "events": _bindEvents(change=onChange),
+        })
+
+    def radio(
+        self,
+        options: Sequence[object],
+        *,
+        value: object | None = None,
+        label: str = "",
+        onChange: Callable[..., Any] | None = None,
+    ) -> UiValue:
+        normalizedOptions = [str(option) for option in options]
+        selected = str(value) if value is not None else None
+        return UiValue("radio", selected, {
+            "label": label,
+            "options": normalizedOptions,
+            "events": _bindEvents(change=onChange),
+        })
+
+    def multiselect(
+        self,
+        options: Sequence[object],
+        *,
+        value: Sequence[object] | None = None,
+        label: str = "",
+        onChange: Callable[..., Any] | None = None,
+    ) -> UiValue:
+        normalizedOptions = [str(option) for option in options]
+        selected = [str(item) for item in (value or [])]
+        return UiValue("multiselect", selected, {
+            "label": label,
+            "options": normalizedOptions,
+            "events": _bindEvents(change=onChange),
+        })
+
+    def date(
+        self,
+        *,
+        value: object | None = None,
+        label: str = "",
+        onChange: Callable[..., Any] | None = None,
+    ) -> UiValue:
+        default = value.isoformat() if hasattr(value, "isoformat") else (str(value) if value else "")
+        return UiValue(
+            "date",
+            default,
+            {"label": label, "events": _bindEvents(change=onChange)},
+            transform=_toDate,
+        )
+
+    def file(
+        self,
+        *,
+        label: str = "",
+        multiple: bool = False,
+        onChange: Callable[..., Any] | None = None,
+    ) -> UiValue:
+        # value = [{name, content(base64)}] — 프론트가 FileReader로 채운다.
+        return UiValue("file", [], {
+            "label": label,
+            "multiple": bool(multiple),
+            "events": _bindEvents(change=onChange),
+        })
+
+    def form(
+        self,
+        element: Any,
+        *,
+        label: str = "",
+        submitLabel: str = "제출",
+        onChange: Callable[..., Any] | None = None,
+    ) -> UiValue:
+        # 자식 위젯을 품고 제출 시에만 값이 반영되는 deferred 입력(자식 live 변경은 form 로컬).
+        childDescriptor = element.codaroDescriptor() if hasattr(element, "codaroDescriptor") else element
+        return UiValue("form", None, {
+            "label": label,
+            "submitLabel": submitLabel,
+            "element": childDescriptor,
             "events": _bindEvents(change=onChange),
         })
 

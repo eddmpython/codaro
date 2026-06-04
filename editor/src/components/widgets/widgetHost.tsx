@@ -467,6 +467,44 @@ function UiWidget({
       );
     case "table":
       return <TableWidget descriptor={descriptor} />;
+    case "radio": {
+      const options = ((descriptor as { options?: unknown[] }).options ?? []).map((value) => String(value));
+      const current = String((descriptor as { value?: unknown }).value ?? "");
+      return (
+        <UiInputWrapper label={label}>
+          <div className="flex flex-col gap-1" data-widget-ui="radio">
+            {options.map((option) => (
+              <label key={option} className="inline-flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={elementId || label || "radio"}
+                  defaultChecked={option === current}
+                  onChange={() => emitChange(option)}
+                />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
+        </UiInputWrapper>
+      );
+    }
+    case "multiselect":
+      return <MultiselectWidget descriptor={descriptor} label={label} onChangeValue={emitChange} />;
+    case "date":
+      return (
+        <UiInputWrapper label={label}>
+          <Input
+            type="date"
+            data-widget-ui="date"
+            defaultValue={String((descriptor as { value?: unknown }).value ?? "")}
+            onChange={(event) => emitChange(event.target.value)}
+          />
+        </UiInputWrapper>
+      );
+    case "file":
+      return <FileWidget descriptor={descriptor} label={label} onChangeValue={emitChange} />;
+    case "form":
+      return <FormWidget descriptor={descriptor} label={label} onSubmit={emitChange} />;
     default:
       return (
         <Badge data-widget-ui={component || "unknown"} variant="outline">
@@ -483,6 +521,113 @@ function UiInputWrapper({ label, children }: { label: string; children: ReactNod
       <span className="text-xs text-muted-foreground">{label}</span>
       {children}
     </label>
+  );
+}
+
+function MultiselectWidget({
+  descriptor,
+  label,
+  onChangeValue,
+}: {
+  descriptor: WidgetDescriptor;
+  label: string;
+  onChangeValue: (value: unknown) => void;
+}) {
+  const options = ((descriptor as { options?: unknown[] }).options ?? []).map((value) => String(value));
+  const initial = ((descriptor as { value?: unknown[] }).value ?? []).map((value) => String(value));
+  const [selected, setSelected] = useState<string[]>(initial);
+  const toggle = (option: string, checked: boolean) => {
+    const next = checked ? [...selected, option] : selected.filter((item) => item !== option);
+    setSelected(next);
+    onChangeValue(next);
+  };
+  return (
+    <UiInputWrapper label={label}>
+      <div className="flex flex-col gap-1" data-widget-ui="multiselect">
+        {options.map((option) => (
+          <label key={option} className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={selected.includes(option)}
+              onChange={(event) => toggle(option, event.target.checked)}
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </UiInputWrapper>
+  );
+}
+
+function FileWidget({
+  descriptor,
+  label,
+  onChangeValue,
+}: {
+  descriptor: WidgetDescriptor;
+  label: string;
+  onChangeValue: (value: unknown) => void;
+}) {
+  const multiple = Boolean((descriptor as { multiple?: boolean }).multiple);
+  const handleFiles = async (fileList: FileList | null) => {
+    if (!fileList) return;
+    const files = await Promise.all(
+      Array.from(fileList).map(
+        (file) =>
+          new Promise<{ name: string; content: string }>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = String(reader.result ?? "");
+              const base64 = result.includes(",") ? result.slice(result.indexOf(",") + 1) : result;
+              resolve({ name: file.name, content: base64 });
+            };
+            reader.readAsDataURL(file);
+          }),
+      ),
+    );
+    onChangeValue(files);
+  };
+  return (
+    <UiInputWrapper label={label}>
+      <input
+        type="file"
+        data-widget-ui="file"
+        multiple={multiple}
+        className="text-sm"
+        onChange={(event) => void handleFiles(event.target.files)}
+      />
+    </UiInputWrapper>
+  );
+}
+
+function FormWidget({
+  descriptor,
+  label,
+  onSubmit,
+}: {
+  descriptor: WidgetDescriptor;
+  label: string;
+  onSubmit: (value: unknown) => void;
+}) {
+  const element = (descriptor as { element?: WidgetDescriptor }).element;
+  const submitLabel = String((descriptor as { submitLabel?: string }).submitLabel ?? "제출");
+  const [pending, setPending] = useState<unknown>(element ? (element as { value?: unknown }).value : null);
+  // 자식 위젯은 form-local 캡처로 렌더 — live 변경은 reactive 송신 없이 pending에만 담고, 제출에서만 반영.
+  return (
+    <UiInputWrapper label={label}>
+      <div className="flex flex-col gap-2" data-widget-ui="form">
+        {element ? (
+          <UiWidget
+            descriptor={element}
+            dispatchEvent={async () => {}}
+            dispatchUiValue={(_elementId, value) => setPending(value)}
+          />
+        ) : null}
+        <Button data-widget-ui="form-submit" variant="default" onClick={() => onSubmit(pending)}>
+          {submitLabel}
+        </Button>
+      </div>
+    </UiInputWrapper>
   );
 }
 

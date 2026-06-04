@@ -55,23 +55,37 @@ class UiValue:
     직렬화된다 — 프론트 위젯 렌더는 불변, elementId만 추가로 실어 값-변경 경로를 연다.
     """
 
-    def __init__(self, kind: str, defaultValue: Any, meta: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        kind: str,
+        defaultValue: Any,
+        meta: dict[str, Any] | None = None,
+        transform: Any = None,
+    ) -> None:
         self.kind = kind
         self.elementId = nextElementId()
         self._default = defaultValue
         self.meta = dict(meta or {})
+        # 프론트가 보내는 raw 값을 Python 타입으로 바꾸는 옵셔널 변환(예: date ISO→datetime.date).
+        self._transform = transform
         if self.elementId not in _store:
             _store[self.elementId] = defaultValue
 
     @property
-    def value(self) -> Any:
+    def rawValue(self) -> Any:
         return _store.get(self.elementId, self._default)
 
+    @property
+    def value(self) -> Any:
+        raw = self.rawValue
+        return self._transform(raw) if self._transform is not None else raw
+
     def codaroDescriptor(self) -> dict[str, Any]:
+        # 프론트로는 항상 raw(직렬화 가능) 값을 보낸다 — 변환은 Python 쪽 .value에서만.
         descriptor: dict[str, Any] = {
             "type": "ui",
             "component": self.kind,
-            "value": self.value,
+            "value": self.rawValue,
             "elementId": self.elementId,
         }
         descriptor.update(self.meta)
