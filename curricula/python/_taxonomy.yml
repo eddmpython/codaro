@@ -520,6 +520,9 @@ outcomes:
   - id: automation.webApi.businessDays
     label: 공휴일·영업일 계산 자동화
     description: 공공데이터 특일정보 Open API로 그 해 공휴일을 받아 datetime으로 영업일 판정·D+N 영업일·마감일 순연 계산
+  - id: automation.webApi.exchangeRate
+    label: 환율 조회·환산 자동화
+    description: 한국수출입은행 환율 Open API의 매매기준율을 받아 decimal로 100단위 통화 보정·ROUND_HALF_UP 원화 환산
 
   # === LLM API 통합 ===
   - id: llm.intro

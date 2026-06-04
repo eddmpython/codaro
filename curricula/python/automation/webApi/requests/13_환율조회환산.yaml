@@ -1,0 +1,419 @@
+meta:
+  id: requests_13
+  title: 환율 조회·환산 — 매매기준율로 외화 인보이스를 원화로
+  order: 13
+  category: requests
+  difficulty: ⭐⭐
+  badge: 실전
+  packages:
+    - requests
+  tags:
+    - 환율
+    - 매매기준율
+    - 한국수출입은행
+    - decimal
+    - 공공데이터포털
+  outcomes:
+    - automation.webApi.exchangeRate
+  prerequisites:
+    - automation.webApi.get
+  estimatedMinutes: 45
+  seo:
+    title: "환율 조회·환산 자동화 — 한국수출입은행 Open API로 외화 인보이스 원화 계산"
+    description: "한국수출입은행 환율 Open API의 매매기준율(deal_bas_r)을 requests로 받아 decimal로 100단위 통화 보정과 ROUND_HALF_UP 반올림까지 정확히 원화로 환산한다. 무역·해외결제·회계 마감을 자동화한다."
+    keywords:
+      - 환율 조회
+      - 매매기준율
+      - 한국수출입은행 API
+      - 외화 환산
+      - decimal 반올림
+
+intro:
+  direction: "외화 인보이스·해외결제·외화자산 평가를 매매기준율로 원화 환산하는 흐름을 자동화한다. 돈 계산이라 float이 아닌 decimal로 정확히 하고, JPY·IDR 같은 100단위 통화와 반올림 규칙까지 맞춘다."
+  benefits:
+    - "해외 인보이스를 매번 환율 사이트 보며 손계산하던 일을 코드 한 번으로. 회당 30분 × 결제 주기마다 반복되던 환산·검산을 없앤다."
+    - "돈은 float이면 오차가 쌓인다 — 0.1+0.2조차 0.3이 아니다. decimal로 계산하고 ROUND_HALF_UP으로 원화 단위까지 정확히 떨어뜨린다."
+    - "환율은 키 없이 샘플로 폴백하고, 파싱·100단위 보정·반올림은 표준 decimal만으로 네트워크 없이 검증한다."
+  diagram:
+    steps:
+      - label: "1. 환율 응답 파싱"
+        detail: "deal_bas_r의 콤마를 떼 decimal로, cur_unit의 (100) 표기로 단위를 읽는다."
+      - label: "2. 돈은 decimal"
+        detail: "float은 오차가 쌓인다. 환율·금액 계산은 decimal로 한다."
+      - label: "3. 원화 환산"
+        detail: "금액 × 매매기준율 ÷ 단위, ROUND_HALF_UP으로 원 단위까지."
+      - label: "4. 인보이스 일괄 환산"
+        detail: "통화·금액 목록을 읽어 통화별 환율로 원화 표를 만든다."
+    runtime:
+      - label: "로컬 requests + 환경변수 키"
+        detail: "requests.get로 한국수출입은행 환율 API 호출, authkey는 os.environ에서. 로컬 Python에서 그대로 실행한다."
+      - label: "키 없이 결정론 검증"
+        detail: "환율 파싱·100단위 보정·반올림은 샘플 매매기준율로 assert. 네트워크·키 없이도 회귀를 잡는다."
+
+sections:
+  - id: parse_rate
+    title: "1단계. 환율 응답 파싱 — 콤마와 100단위 표기"
+    structuredPrimary: true
+    subtitle: "deal_bas_r 콤마 제거 + cur_unit의 (100)"
+    goal: "환율 API 응답 한 건에서 매매기준율을 decimal로 파싱하고, 통화 단위(1 또는 100)를 읽는다."
+    why: "응답의 deal_bas_r은 '1,389.5' 처럼 콤마가 섞인 문자열이고, 엔화·루피아는 'JPY(100)'처럼 100단위로 고시된다. 이 두 함정을 처음에 정확히 풀어야 환산이 맞는다."
+    explanation: |-
+      한국수출입은행 환율 응답의 각 항목은 cur_unit(통화 코드), cur_nm(통화명), deal_bas_r(매매 기준율), ttb/tts(송금 받을 때/보낼 때) 등을 담는다. 우리는 환산 기준이 되는 deal_bas_r을 쓴다.
+
+      두 가지를 정규화한다. (1) deal_bas_r은 '1,389.5'처럼 천단위 콤마가 들어간 문자열이라 콤마를 떼고 Decimal로 만든다. (2) cur_unit이 'JPY(100)'이면 그 환율은 100엔 기준이므로 단위(unitSize)를 100으로 잡는다 — 1엔이 아니다.
+    tips:
+      - "deal_bas_r은 float()이 아니라 Decimal()로 만든다 — 돈 계산에 float을 쓰면 오차가 쌓인다."
+      - "cur_unit에 '(100)'이 있으면 100단위 통화(엔·루피아 등)다. 단위를 안 나누면 100배 틀린다."
+    snippet: |-
+      from decimal import Decimal
+
+      def parseRate(item):
+          code = item["cur_unit"].split("(")[0]
+          unitSize = 100 if "(100)" in item["cur_unit"] else 1
+          rate = Decimal(item["deal_bas_r"].replace(",", ""))
+          return {"code": code, "unitSize": unitSize, "rate": rate}
+
+      usd = parseRate({"cur_unit": "USD", "deal_bas_r": "1,389.5"})
+      jpy = parseRate({"cur_unit": "JPY(100)", "deal_bas_r": "913.45"})
+
+      assert usd == {"code": "USD", "unitSize": 1, "rate": Decimal("1389.5")}
+      assert jpy["code"] == "JPY"
+      assert jpy["unitSize"] == 100
+      jpy
+    exercise:
+      prompt: "인도네시아 루피아도 'IDR(100)'으로 100단위 고시된다. unitSize가 100으로 읽히는지 확인하세요."
+      starterCode: |-
+        from decimal import Decimal
+
+        def parseRate(item):
+            code = item["cur_unit"].split("(")[0]
+            unitSize = 100 if "(100)" in item["cur_unit"] else 1
+            rate = Decimal(item["deal_bas_r"].replace(",", ""))
+            return {"code": code, "unitSize": unitSize, "rate": rate}
+
+        idr = parseRate({"cur_unit": "IDR(___)", "deal_bas_r": "8.5"})
+
+        assert idr["unitSize"] == 100
+        assert idr["code"] == "IDR"
+        idr
+      hints:
+        - "100단위 통화는 cur_unit에 (100)이 붙는다."
+        - "빈칸에 100을 넣으면 'IDR(100)'이 되어 unitSize가 100으로 읽힌다."
+      check:
+        type: noError
+        noError: "parseRate가 예외 없이 끝나야 한다."
+        resultCheck: "IDR의 unitSize가 100으로 읽혀야 한다."
+    check:
+      noError: "환율 파싱이 끝나야 한다."
+      resultCheck: "콤마 제거 후 Decimal('1389.5'), JPY는 unitSize 100으로 읽힌다."
+
+  - id: money_decimal
+    title: "2단계. 돈은 float이 아니라 decimal"
+    structuredPrimary: true
+    subtitle: "0.1 + 0.2 조차 0.3이 아니다"
+    goal: "float이 돈 계산에 왜 위험한지 보고, decimal로 정확히 계산되는 것을 확인한다."
+    why: "float은 2진 부동소수라 10진 소수를 정확히 못 담는다. 0.1+0.2가 0.3이 아니고, 환율·금액을 곱하고 더하면 오차가 쌓여 1원씩 어긋난다. 회계는 1원도 틀리면 안 된다."
+    explanation: |-
+      float은 0.1, 0.2 같은 값을 2진수로 근사해 저장한다. 그래서 0.1 + 0.2는 0.30000000000000004가 되어 0.3과 다르다. 금액을 수천 건 곱하고 더하면 이 오차가 누적된다.
+
+      Decimal은 10진 소수를 있는 그대로 다룬다. Decimal('0.1') + Decimal('0.2')는 정확히 Decimal('0.3')이다. 환율·금액처럼 정확도가 중요한 값은 처음부터 Decimal로 만들고, 문자열로 생성한다(Decimal(0.1)은 float을 거쳐 다시 부정확해지므로 Decimal('0.1')로).
+    tips:
+      - "Decimal은 문자열로 만든다 — Decimal('0.1')은 정확, Decimal(0.1)은 float을 거쳐 부정확하다."
+      - "딱 떨어지는 정수 곱셈도 float이면 표시 오차가 날 수 있으니, 돈은 일관되게 Decimal로 다룬다."
+    snippet: |-
+      from decimal import Decimal
+
+      assert 0.1 + 0.2 != 0.3
+      assert Decimal("0.1") + Decimal("0.2") == Decimal("0.3")
+
+      rate = Decimal("1389.5")
+      assert rate * 3 == Decimal("4168.5")
+
+      (0.1 + 0.2, Decimal("0.1") + Decimal("0.2"))
+    exercise:
+      prompt: "Decimal로 0.1을 세 번 더하면 정확히 0.3이 되는지 확인하세요(float은 그렇지 않습니다)."
+      starterCode: |-
+        from decimal import Decimal
+
+        total = Decimal("___") + Decimal("0.1") + Decimal("0.1")
+
+        assert total == Decimal("0.3")
+        total
+      hints:
+        - "빈칸에도 0.1을 넣어 0.1을 세 번 더한다."
+        - "Decimal은 문자열로 만들어야 정확하다 — \"0.1\"."
+      check:
+        type: noError
+        noError: "Decimal 덧셈이 예외 없이 끝나야 한다."
+        resultCheck: "Decimal('0.1') 세 번 합이 정확히 Decimal('0.3')이어야 한다."
+    check:
+      noError: "decimal 계산이 끝나야 한다."
+      resultCheck: "float은 0.1+0.2≠0.3, decimal은 정확히 0.3이다."
+
+  - id: to_krw
+    title: "3단계. 원화 환산 — 100단위 보정과 반올림"
+    structuredPrimary: true
+    subtitle: "금액 × 매매기준율 ÷ 단위, ROUND_HALF_UP"
+    goal: "외화 금액을 매매기준율로 원화로 환산하되, 100단위 통화를 보정하고 원 단위로 반올림한다."
+    why: "원화는 1원 단위라 소수점을 반올림해 떨어뜨려야 한다. 그냥 round()는 사사오입(은행가 반올림)이라 4168.5를 4168로 내릴 수 있다 — 회계 관행인 ROUND_HALF_UP은 4169로 올린다. 규칙을 명시해야 검산이 맞는다."
+    explanation: |-
+      환산식은 금액 × 매매기준율 ÷ 단위다. USD처럼 단위가 1이면 그대로, JPY(100)처럼 100단위면 100으로 나눠 1통화당 원화로 만든다.
+
+      마지막에 quantize(Decimal('1'), ROUND_HALF_UP)로 원 단위까지 반올림한다. Python 기본 round()는 4168.5를 가장 가까운 짝수(4168)로 내리는 '은행가 반올림'이라 회계와 어긋날 수 있다. ROUND_HALF_UP은 0.5를 항상 올려(4169) 우리가 아는 반올림과 같다.
+    tips:
+      - "원화는 정수다 — quantize(Decimal('1'), rounding=ROUND_HALF_UP)로 원 단위까지 떨어뜨린다."
+      - "amount는 Decimal(str(amount))로 감싼다 — CSV의 문자열 금액과 정수 금액을 모두 안전하게 받는다."
+    snippet: |-
+      from decimal import Decimal, ROUND_HALF_UP
+
+      def toKrw(amount, rate, unitSize):
+          won = Decimal(str(amount)) * rate / Decimal(unitSize)
+          return won.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+      assert toKrw(1250, Decimal("1389.5"), 1) == Decimal("1736875")
+      assert toKrw(50000, Decimal("913.45"), 100) == Decimal("456725")
+      assert toKrw(3, Decimal("1389.5"), 1) == Decimal("4169")
+      toKrw(50000, Decimal("913.45"), 100)
+    exercise:
+      prompt: "엔화 30,000엔을 매매기준율 913.45(100단위)로 환산하면 원화 얼마인지 확인하세요."
+      starterCode: |-
+        from decimal import Decimal, ROUND_HALF_UP
+
+        def toKrw(amount, rate, unitSize):
+            won = Decimal(str(amount)) * rate / Decimal(unitSize)
+            return won.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+        krw = toKrw(30000, Decimal("913.45"), ___)
+
+        assert krw == Decimal("274035")
+        krw
+      hints:
+        - "엔화는 100단위 통화라 unitSize에 100을 넣는다."
+        - "30000 × 913.45 ÷ 100 = 274035."
+      check:
+        type: noError
+        noError: "toKrw가 예외 없이 끝나야 한다."
+        resultCheck: "30,000엔이 274,035원으로 환산돼야 한다."
+    check:
+      noError: "원화 환산이 끝나야 한다."
+      resultCheck: "1,250달러=1,736,875원, 50,000엔=456,725원, 반올림은 ROUND_HALF_UP."
+
+  - id: fetch_rates
+    title: "4단계. 실전 호출 — 한국수출입은행 환율 API"
+    structuredPrimary: true
+    subtitle: "requests.get + os.environ + dryRun"
+    goal: "한국수출입은행 환율 API를 부르는 실제 호출 함수를 만들되, 키가 없으면 샘플로 폴백하고 통화별 환율 표를 만든다."
+    why: "authkey는 자격증명이라 코드·커밋·로그에 남기지 않고 환경변수로 분리한다. dryRun 안전판으로 키 없이도 전체 환산 파이프라인을 결정론적으로 돌려본다."
+    explanation: |-
+      엔드포인트는 GET `https://www.koreaexim.go.kr/site/program/financial/exchangeJSON`이고, 파라미터에 authkey, searchdate(YYYYMMDD), data=AP01(환율)을 넣는다. 응답은 통화별 항목의 JSON 배열이다. authkey는 os.environ에서 읽는다.
+
+      fetchRates는 dryRun이 True거나 키가 없으면 네트워크를 타지 않고 sample을 돌려준다. 받은 항목을 parseRate로 정규화해 통화 코드 기준 dict로 만들면, 인보이스의 통화로 바로 환율을 찾을 수 있다.
+    tips:
+      - "authkey를 코드에 박거나 커밋하지 않는다 — 환경변수(KOREAEXIM_API_KEY)로만. 한국수출입은행에서 무료 발급."
+      - "환율은 영업일 09:00경 갱신되고 주말·공휴일엔 직전 영업일 값이 유지된다(12강 영업일 계산과 결합). 주말 searchdate는 빈 배열이 올 수 있어 직전 영업일로 재조회한다."
+    snippet: |-
+      import os
+      import requests
+      from decimal import Decimal
+
+      def parseRate(item):
+          code = item["cur_unit"].split("(")[0]
+          unitSize = 100 if "(100)" in item["cur_unit"] else 1
+          rate = Decimal(item["deal_bas_r"].replace(",", ""))
+          return {"code": code, "unitSize": unitSize, "rate": rate}
+
+      def fetchRates(searchdate, authkey=None, dryRun=True, sample=None):
+          if dryRun or not authkey:
+              return sample
+          url = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
+          response = requests.get(
+              url,
+              params={"authkey": authkey, "searchdate": searchdate, "data": "AP01"},
+              timeout=10,
+          )
+          response.raise_for_status()
+          return response.json()
+
+      sample = [
+          {"result": 1, "cur_unit": "USD", "cur_nm": "미국 달러", "deal_bas_r": "1,389.5"},
+          {"result": 1, "cur_unit": "JPY(100)", "cur_nm": "일본 옌", "deal_bas_r": "913.45"},
+          {"result": 1, "cur_unit": "EUR", "cur_nm": "유로", "deal_bas_r": "1,502.1"},
+      ]
+      authkey = os.environ.get("KOREAEXIM_API_KEY")
+      items = fetchRates("20250602", authkey=authkey, dryRun=True, sample=sample)
+      rateByCode = {parseRate(item)["code"]: parseRate(item) for item in items}
+
+      assert rateByCode["USD"]["rate"] == Decimal("1389.5")
+      assert rateByCode["JPY"]["unitSize"] == 100
+      len(rateByCode)
+    exercise:
+      prompt: "dryRun=True로 호출하면 네트워크 없이 sample이 그대로 반환되어 통화 3건이 표로 만들어지는지 확인하세요."
+      starterCode: |-
+        import os
+        import requests
+        from decimal import Decimal
+
+        def parseRate(item):
+            code = item["cur_unit"].split("(")[0]
+            unitSize = 100 if "(100)" in item["cur_unit"] else 1
+            rate = Decimal(item["deal_bas_r"].replace(",", ""))
+            return {"code": code, "unitSize": unitSize, "rate": rate}
+
+        def fetchRates(searchdate, authkey=None, dryRun=True, sample=None):
+            if dryRun or not authkey:
+                return sample
+            url = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
+            response = requests.get(
+                url,
+                params={"authkey": authkey, "searchdate": searchdate, "data": "AP01"},
+                timeout=10,
+            )
+            response.raise_for_status()
+            return response.json()
+
+        sample = [
+            {"result": 1, "cur_unit": "USD", "cur_nm": "미국 달러", "deal_bas_r": "1,389.5"},
+            {"result": 1, "cur_unit": "JPY(100)", "cur_nm": "일본 옌", "deal_bas_r": "913.45"},
+            {"result": 1, "cur_unit": "EUR", "cur_nm": "유로", "deal_bas_r": "1,502.1"},
+        ]
+        items = fetchRates("20250602", dryRun=___, sample=sample)
+        rateByCode = {parseRate(item)["code"]: parseRate(item) for item in items}
+
+        assert len(rateByCode) == 3
+        len(rateByCode)
+      hints:
+        - "네트워크를 타지 않으려면 dryRun을 True로."
+        - "dryRun이 True면 sample이 그대로 반환되어 통화 3건이 표로 만들어진다."
+      check:
+        type: noError
+        noError: "dryRun 경로는 requests를 호출하지 않으므로 키·네트워크 없이 끝나야 한다."
+        resultCheck: "통화 3건이 환율 표로 만들어져야 한다."
+    check:
+      noError: "환율 받기가 끝나야 한다."
+      resultCheck: "키가 없어도 sample 응답이 통화별 환율 표로 정규화된다."
+
+  - id: practice
+    title: "5단계. 종합 실전 — 해외 인보이스 CSV → 원화 환산 CSV"
+    structuredPrimary: true
+    subtitle: "통화·금액 목록을 한 흐름으로 원화 합계까지"
+    goal: "통화·금액이 담긴 해외 인보이스 CSV를 읽어 통화별 환율로 원화 환산하고, 원화 표와 합계를 CSV로 산출한다."
+    why: "환율 파싱(1)·decimal(2)·환산(3)·실전 호출(4)을 하나로 묶어, 결제·마감 때 그대로 돌리는 자동화로 완성한다. 입력 인보이스 목록 → 출력 원화 표가 그날 바로 쓰인다."
+    explanation: |-
+      인보이스 CSV(인보이스번호·통화·금액)를 csv.DictReader로 읽고, 각 행의 통화로 환율 표에서 매매기준율을 찾아 toKrw로 원화로 바꾼다. 결과는 csv.DictWriter로 다시 CSV 문자열로 쓰고, 원화 합계는 Decimal로 누적한다.
+
+      실전에서는 sample 대신 fetchRates(..., dryRun=False, authkey=키)로 그날 환율을 받으면 같은 흐름이 그대로 돈다. 100단위 통화(엔)도 toKrw가 단위를 보정하므로 행마다 신경 쓸 게 없다.
+    tips:
+      - "통화별 환율 표(rateByCode)를 미리 만들어 두면 인보이스 행마다 바로 환율을 찾는다."
+      - "원화 합계는 Decimal(0)에서 시작해 누적한다 — sum의 start를 Decimal로 줘야 float이 섞이지 않는다."
+    snippet: |-
+      import csv
+      import io
+      from decimal import Decimal, ROUND_HALF_UP
+
+      def toKrw(amount, rate, unitSize):
+          won = Decimal(str(amount)) * rate / Decimal(unitSize)
+          return won.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+      rateByCode = {
+          "USD": {"rate": Decimal("1389.5"), "unitSize": 1},
+          "JPY": {"rate": Decimal("913.45"), "unitSize": 100},
+          "EUR": {"rate": Decimal("1502.1"), "unitSize": 1},
+      }
+
+      invoiceCsv = "invoice_no,currency,amount\nINV-1,USD,1250\nINV-2,JPY,50000\nINV-3,EUR,800\n"
+      rows = []
+      for row in csv.DictReader(io.StringIO(invoiceCsv)):
+          info = rateByCode[row["currency"]]
+          krw = toKrw(row["amount"], info["rate"], info["unitSize"])
+          rows.append({"invoice_no": row["invoice_no"], "krw": str(krw)})
+
+      output = io.StringIO()
+      writer = csv.DictWriter(output, fieldnames=["invoice_no", "krw"])
+      writer.writeheader()
+      writer.writerows(rows)
+      krwCsv = output.getvalue()
+      total = sum((Decimal(item["krw"]) for item in rows), Decimal(0))
+
+      assert rows[0]["krw"] == "1736875"
+      assert rows[1]["krw"] == "456725"
+      assert total == Decimal("3395280")
+      assert "INV-2,456725" in krwCsv
+      str(total)
+    exercise:
+      prompt: "INV-2(엔화)의 금액을 30,000엔으로 바꾸면 그 행 원화와 합계가 얼마가 되는지 확인하세요."
+      starterCode: |-
+        import csv
+        import io
+        from decimal import Decimal, ROUND_HALF_UP
+
+        def toKrw(amount, rate, unitSize):
+            won = Decimal(str(amount)) * rate / Decimal(unitSize)
+            return won.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+        rateByCode = {
+            "USD": {"rate": Decimal("1389.5"), "unitSize": 1},
+            "JPY": {"rate": Decimal("913.45"), "unitSize": 100},
+            "EUR": {"rate": Decimal("1502.1"), "unitSize": 1},
+        }
+
+        invoiceCsv = "invoice_no,currency,amount\nINV-1,USD,1250\nINV-2,JPY,___\nINV-3,EUR,800\n"
+        rows = []
+        for row in csv.DictReader(io.StringIO(invoiceCsv)):
+            info = rateByCode[row["currency"]]
+            krw = toKrw(row["amount"], info["rate"], info["unitSize"])
+            rows.append({"invoice_no": row["invoice_no"], "krw": str(krw)})
+
+        total = sum((Decimal(item["krw"]) for item in rows), Decimal(0))
+
+        assert rows[1]["krw"] == "274035"
+        assert total == Decimal("3212590")
+        str(total)
+      solution: |-
+        import csv
+        import io
+        from decimal import Decimal, ROUND_HALF_UP
+
+        def toKrw(amount, rate, unitSize):
+            won = Decimal(str(amount)) * rate / Decimal(unitSize)
+            return won.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+        rateByCode = {
+            "USD": {"rate": Decimal("1389.5"), "unitSize": 1},
+            "JPY": {"rate": Decimal("913.45"), "unitSize": 100},
+            "EUR": {"rate": Decimal("1502.1"), "unitSize": 1},
+        }
+
+        invoiceCsv = "invoice_no,currency,amount\nINV-1,USD,1250\nINV-2,JPY,30000\nINV-3,EUR,800\n"
+        rows = []
+        for row in csv.DictReader(io.StringIO(invoiceCsv)):
+            info = rateByCode[row["currency"]]
+            krw = toKrw(row["amount"], info["rate"], info["unitSize"])
+            rows.append({"invoice_no": row["invoice_no"], "krw": str(krw)})
+
+        total = sum((Decimal(item["krw"]) for item in rows), Decimal(0))
+
+        assert rows[1]["krw"] == "274035"
+        assert total == Decimal("3212590")
+        str(total)
+      hints:
+        - "빈칸에 30000을 넣는다."
+        - "30,000엔=274,035원, 합계는 1,736,875+274,035+1,201,680=3,212,590원."
+      check:
+        type: noError
+        noError: "전체 파이프라인이 예외 없이 끝나야 한다."
+        resultCheck: "INV-2가 274,035원, 합계가 3,212,590원이어야 한다."
+    check:
+      noError: "인보이스 CSV → 원화 CSV 파이프라인이 끝나야 한다."
+      resultCheck: "달러·엔·유로 세 인보이스가 원화로 환산되고 합계 3,395,280원이 나온다."
+
+    blocks:
+      - type: tip
+        content: "흔한 오개념: ① 돈을 float으로 계산해 1원씩 어긋난다 — Decimal로 한다. ② JPY·IDR 같은 100단위 통화를 1단위로 곱해 100배 틀린다 — cur_unit의 (100)을 보고 나눈다. ③ 환율은 24시간 갱신이 아니다 — 영업일 09:00경 고시되고 주말·공휴일은 직전 영업일 값이라, 주말 searchdate는 빈 배열이 와서 직전 영업일로 재조회해야 한다."
+      - type: list
+        style: bullet
+        items:
+          - "주말·공휴일 searchdate면 12강의 영업일 계산으로 직전 영업일을 구해 재조회."
+          - "환율을 날짜별로 캐시(원자적 쓰기 트랙과 결합)해 같은 날 반복 호출을 줄인다."
+          - "ttb(받으실 때)·tts(보내실 때)까지 함께 받아 송금 수수료 시나리오를 구분."
+          - "원화 환산 결과를 openpyxl로 통화별 소계·총계 엑셀로 산출."
+          - "월말 외화자산 평가: 보유 외화 잔액 × 말일 매매기준율로 평가액을 자동 산출."
