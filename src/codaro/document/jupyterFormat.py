@@ -19,7 +19,7 @@ def parseJupyterDocument(source: str, sourcePath: Path | None = None) -> CodaroD
             blocks.append(BlockConfig(id=_blockId(), type="markdown", content=content))
             continue
         if cellType == "code":
-            blocks.append(BlockConfig(id=_blockId(), type="code", content=content))
+            blocks.append(BlockConfig(id=_blockId(), type="code", content=_stripJupyterMagics(content)))
 
     if not blocks:
         blocks.append(BlockConfig(id=_blockId(), type="code", content=""))
@@ -75,6 +75,23 @@ def _normalizeSource(source: str | list[str]) -> str:
     if isinstance(source, list):
         return "".join(source)
     return source
+
+
+def _stripJupyterMagics(content: str) -> str:
+    """Jupyter magic/shell 줄을 주석 처리한다 — 로컬 Python에서 그대로 돌게(`%`, `!`, `%%`)."""
+    lines = content.split("\n")
+    firstNonEmpty = next((line for line in lines if line.strip()), "")
+    if firstNonEmpty.lstrip().startswith("%%"):
+        # 셀 매직(%%sql 등)은 셀 전체가 매직 입력 → 전체 주석 처리.
+        return "\n".join(f"# {line}" if line.strip() else line for line in lines)
+    out: list[str] = []
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith("%") or stripped.startswith("!"):
+            out.append(f"# {line}")
+        else:
+            out.append(line)
+    return "\n".join(out)
 
 
 def _sanitizeId(value: str) -> str:
