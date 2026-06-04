@@ -26,11 +26,11 @@ intro:
         detail: 임시 파일에 전량 쓰고 os.replace로 한 번에 바꾼다.
       - label: 죽어도 보존
         detail: replace 전에 죽으면 원본이 그대로 남고 임시 파일만 남는다.
-  runtime:
-    - label: 표준 라이브러리만
-      detail: os, pathlib, tempfile만 사용한다.
-    - label: assert로 직접 확인
-      detail: 중단을 모사해 원본 보존 여부를 assert로 눈에 보이게 검증한다.
+    runtime:
+      - label: 로컬 표준 라이브러리 실행
+        detail: os, pathlib, tempfile만으로 로컬 Python에서 그대로 실행한다.
+      - label: assert로 직접 확인
+        detail: 중단을 모사해 원본 보존 여부를 assert로 눈에 보이게 검증한다.
 sections:
   - id: unsafe-overwrite
     title: 직접 덮어쓰기의 위험

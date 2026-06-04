@@ -26,11 +26,11 @@ intro:
         detail: 처리 도중 예외가 나도 체크포인트는 마지막 성공 지점에 남는다.
       - label: 재개
         detail: 저장된 체크포인트를 로드해 그 다음 항목부터 이어서 처리한다.
-  runtime:
-    - label: 표준 라이브러리만
-      detail: json, pathlib, tempfile만 사용한다.
-    - label: assert로 직접 확인
-      detail: 재개가 남은 항목만, 전체를 중복·누락 없이 처리하는지 assert로 검증한다.
+    runtime:
+      - label: 로컬 표준 라이브러리 실행
+        detail: json, pathlib, tempfile만으로 로컬 Python에서 그대로 실행한다.
+      - label: assert로 직접 확인
+        detail: 재개가 남은 항목만, 전체를 중복·누락 없이 처리하는지 assert로 검증한다.
 sections:
   - id: checkpoint-file
     title: 체크포인트 파일
