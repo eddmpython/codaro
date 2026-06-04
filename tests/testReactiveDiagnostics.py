@@ -31,6 +31,24 @@ def testUnderscoreNamesExemptFromMultipleDefinitionSurface() -> None:
     assert detectMultipleDefinitions(buildReactiveGraph(blocks)) == []
 
 
+def testRefinementChainIsNotMultipleDefinition() -> None:
+    # 읽어서 다듬는 셀(df = df.dropna())은 충돌이 아니라 정상 체인.
+    blocks = _blocks(("a", "df = load()"), ("b", "df = df.dropna()"))
+    assert detectMultipleDefinitions(buildReactiveGraph(blocks)) == []
+
+
+def testAccumulationChainIsNotMultipleDefinition() -> None:
+    blocks = _blocks(("a", "total = 0"), ("b", "total = total + 5"))
+    assert detectMultipleDefinitions(buildReactiveGraph(blocks)) == []
+
+
+def testRefinerDependsOnRootDefiner() -> None:
+    # df = df.dropna()(b)는 df를 읽으므로 정의 셀 a에 의존(a 수정 시 b 재실행).
+    blocks = _blocks(("a", "df = load()"), ("b", "df = df.dropna()"))
+    graph = buildReactiveGraph(blocks)
+    assert "b" in getReactiveOrder(graph, "a")
+
+
 def testMultipleDefinitionRegistersDependentsOnAllProviders() -> None:
     # b1:x=1, b2:x=2, b3:y=x → x를 쓰는 b3은 b1·b2 둘 다의 변경에 영향받아야 한다.
     blocks = _blocks(("b1", "x = 1"), ("b2", "x = 2"), ("b3", "y = x"))

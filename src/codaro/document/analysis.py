@@ -174,6 +174,10 @@ class UseCollector(ast.NodeVisitor):
         # 모듈 스코프에서 외부 정의 변수를 제자리 변경(x[0]=v / obj.a=v)하는 base 이름.
         # 의존 엣지(use)는 base의 Load ctx로 이미 기록되므로 여기선 "변경"이라는 신호만 모은다.
         self.mutatedFreeNames: set[str] = set()
+        # 같은 셀에서 정의되면서도 외부 값을 읽는 이름(total = total + 5, df = df.dropna()).
+        # 정의에 가려 moduleUses 필터에서 빠지므로 별도로 모아 use로 살린다(주입 + 의존 엣지).
+        self.selfReferentialUses: set[str] = set()
+        self._pendingReassignTargets: set[str] = set()
 
     @property
     def currentScope(self) -> ScopeState:
@@ -183,12 +187,32 @@ class UseCollector(ast.NodeVisitor):
         if isinstance(node.ctx, ast.Load):
             self._recordLoad(node.id)
 
+    def visit_Assign(self, node: ast.Assign) -> None:
+        if self.currentScope.kind != SCOPE_MODULE:
+            self.generic_visit(node)
+            return
+        # 모듈 스코프 — Python은 RHS를 평가한 뒤 target을 바인딩한다. 그래서 RHS에서 읽힌
+        # target 이름은 "이번 셀이 정의하기 전의 외부 값"을 읽는 것 = self-referential use.
+        targets: set[str] = set()
+        for target in node.targets:
+            targets.update(_collectAssignedNames(target))
+        previous = self._pendingReassignTargets
+        self._pendingReassignTargets = previous | targets
+        self.visit(node.value)
+        self._pendingReassignTargets = previous
+        for target in node.targets:
+            self.visit(target)
+
     def visit_AugAssign(self, node: ast.AugAssign) -> None:
         if isinstance(node.target, ast.Name):
-            self._recordLoad(node.target.id)
+            # x += 1 은 항상 x의 외부 값을 읽는다. 모듈 스코프면 self-referential use로 살린다.
+            if self.currentScope.kind == SCOPE_MODULE:
+                self.selfReferentialUses.add(node.target.id)
+            else:
+                self._recordLoad(node.target.id)
         else:
             # x[0] += 1 / obj.a += 1 → target(Subscript/Attribute)이 visit_Subscript/Attribute로
-            # 라우팅되어 base를 변경으로 기록한다(이름 재정의인 Name target은 위 분기에서 정의로 처리).
+            # 라우팅되어 base를 변경으로 기록한다.
             self.visit(node.target)
         self.visit(node.value)
 
@@ -314,6 +338,10 @@ class UseCollector(ast.NodeVisitor):
     def _recordLoad(self, name: str) -> None:
         if name in PYTHON_BUILTINS:
             return
+        # 모듈 스코프에서 재할당 target을 그 RHS가 읽으면(total = total + 5) 외부 값을 읽는 것.
+        if self.currentScope.kind == SCOPE_MODULE and name in self._pendingReassignTargets:
+            self.selfReferentialUses.add(name)
+            return
         if self._resolvesInScope(name, self.currentScope):
             return
         self.moduleUses.add(name)
@@ -389,11 +417,14 @@ def analyzeCellBindings(code: str) -> CellBindings:
     for statement in tree.body:
         useCollector.visit(statement)
 
-    uses = [
+    useSet = {
         name
-        for name in sorted(useCollector.moduleUses)
+        for name in useCollector.moduleUses
         if name not in moduleBindings.names and name not in PYTHON_BUILTINS
-    ]
+    }
+    # self-referential use는 정의(moduleBindings)에 가려도 살린다 — 외부 값을 읽으므로 주입 필요.
+    useSet |= {name for name in useCollector.selfReferentialUses if name not in PYTHON_BUILTINS}
+    uses = sorted(useSet)
     mutatedFreeNames = [
         name
         for name in sorted(useCollector.mutatedFreeNames)

@@ -203,6 +203,19 @@ def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
     session.dispose()
 
 
+def testReactiveReassignmentReadsExternalValueWithoutError() -> None:
+    # 다른 셀의 변수를 읽어 재할당(total = total + 5)이 격리 주입으로 동작 — NameError 없음.
+    session = KernelSession()
+    blocks = [
+        {"id": "a", "type": "code", "content": "total = 0"},
+        {"id": "b", "type": "code", "content": "total = total + 5"},
+    ]
+    payload = _run(executeKernelReactive(session, blocks, "a"))
+    statuses = {result.blockId: result.status for result in payload.results}
+    assert statuses == {"a": "done", "b": "done"}  # a→b 캐스케이드, 에러 없음
+    session.dispose()
+
+
 def testReactivePayloadMarksUnrunDownstreamStaleOnError() -> None:
     session = KernelSession()
     blocks = [

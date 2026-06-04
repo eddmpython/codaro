@@ -89,6 +89,31 @@ def testCellBindingsIgnoresMutationInsideFunctionScope() -> None:
     assert binding.mutatedFreeNames == []  # 모듈 스코프에서만 판정(E6 오탐 방지)
 
 
+def testCellBindingsTreatsSelfReferentialReassignmentAsUse() -> None:
+    # 다른 셀의 값을 읽어 재할당 → 그 이름은 정의이면서도 use(주입 필요).
+    assert analyzeCellBindings("total = total + 5").uses == ["total"]
+    assert analyzeCellBindings("total += 5").uses == ["total"]
+    assert analyzeCellBindings("df = df.dropna()").uses == ["df"]
+
+
+def testCellBindingsPureReassignmentIsNotUse() -> None:
+    # 외부 값을 읽지 않는 순수 재할당은 use가 아니다.
+    assert analyzeCellBindings("x = 2").uses == []
+
+
+def testCellBindingsSwapReadsBothNames() -> None:
+    binding = analyzeCellBindings("x, y = y, x")
+    assert binding.defines == ["x", "y"]
+    assert binding.uses == ["x", "y"]
+
+
+def testCellBindingsDoesNotMisflagLoopVariable() -> None:
+    # for 루프 변수는 헤더가 먼저 바인딩 → use 아님(자기참조 오탐 방지).
+    binding = analyzeCellBindings("for i in range(n):\n    print(i)")
+    assert binding.defines == ["i"]
+    assert binding.uses == ["n"]
+
+
 def testAnalyzeCodePreservesTwoTupleContract() -> None:
     result = analyzeCode("data[0] = 1")
 

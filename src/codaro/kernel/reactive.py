@@ -145,18 +145,24 @@ class ReactiveDiagnostics:
 
 
 def detectMultipleDefinitions(graph: ReactiveGraph) -> list[tuple[str, list[str]]]:
-    """한 변수를 둘 이상의 *구별되는* 셀이 정의하는 경우 (변수, 정의 셀들)를 반환한다.
+    """한 변수를 둘 이상의 셀이 *독립적으로 덮어쓰는* 경우 (변수, 충돌 셀들)를 반환한다.
 
-    `_` 접두 임시 변수는 surface에서 면제한다(의존 엣지는 유지). 같은 셀 내 재정의는
-    binding이 1회로 모으므로 제외된다.
+    그 변수를 읽어서 다듬는 셀(total = total + 5, df = df.dropna())은 정상 체인이라
+    충돌에서 제외한다 — root 덮어쓰기(정의하지만 읽지는 않는 셀)가 2개 이상일 때만 경고.
+    `_` 접두 임시 변수는 surface에서 면제한다(의존 엣지는 유지).
     """
     result: list[tuple[str, list[str]]] = []
     for var in sorted(graph.definedBy):
         if var.startswith("_"):
             continue
         blockIds = list(dict.fromkeys(graph.definedBy[var]))
-        if len(blockIds) > 1:
-            result.append((var, blockIds))
+        rootDefiners = [
+            blockId
+            for blockId in blockIds
+            if blockId in graph.nodes and var not in graph.nodes[blockId].uses
+        ]
+        if len(rootDefiners) > 1:
+            result.append((var, rootDefiners))
     return result
 
 
