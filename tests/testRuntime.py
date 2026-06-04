@@ -121,7 +121,7 @@ def testLocalEngineWorkerCrashMessageSaysRestarted(monkeypatch) -> None:
     monkeypatch.setattr(engine, "_sendCommand", fakeSendCommand)
     monkeypatch.setattr(engine, "_replaceWorker", fakeReplaceWorker)
 
-    result = engine._executeBlocking("value = 1", "crash", None, 0, lambda event: None)
+    result = engine._executeBlocking("value = 1", "crash", None, "code", 0, lambda event: None)
 
     assert replaced is True
     assert result["status"] == "error"
