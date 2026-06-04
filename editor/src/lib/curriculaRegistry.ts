@@ -223,6 +223,11 @@ const categoryLabels: Record<string, { title: string; track: string; description
     track: "자동화",
     description: "폴더 이벤트 감시와 시간 기반 자동 실행을 다룹니다.",
   },
+  resilience: {
+    title: "운영 안전",
+    track: "자동화",
+    description: "다시 실행해도, 중간에 죽어도 안전한 자동화 — 멱등성·체크포인트·원자적 쓰기.",
+  },
   inputCtl: {
     title: "입력·GUI 자동화",
     track: "자동화",
@@ -235,7 +240,7 @@ const categoryGroups: Record<string, string[]> = {
   "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
   "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-  "자동화": ["playwright", "excel", "regex", "practical", "fileOps", "procCtl", "watchSched", "inputCtl"],
+  "자동화": ["playwright", "excel", "regex", "practical", "fileOps", "procCtl", "watchSched", "resilience", "inputCtl"],
   "이미지·비전": ["visionBasics", "pillow", "opencv", "visionFeatures", "deepVision", "visionApps"],
 };
 
@@ -291,7 +296,7 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
         id: "os-automation",
         name: "OS 자동화",
         description: "파일, 프로세스, 이벤트, 입력을 로컬 Python으로 다룬다.",
-        categories: ["fileOps", "procCtl", "watchSched", "inputCtl"],
+        categories: ["fileOps", "procCtl", "watchSched", "resilience", "inputCtl"],
       },
       {
         id: "test-automation",
