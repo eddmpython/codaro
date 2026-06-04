@@ -47,6 +47,7 @@ categoryMapping = {
     'fileOps': '파일자동화',
     'procCtl': '프로세스자동화',
     'watchSched': '감시·스케줄',
+    'resilience': '운영 안전',
     'inputCtl': '입력·GUI자동화',
     'llmBasics': 'LLM 통합 기초',
     'requests': 'requests REST API 자동화',
@@ -269,6 +270,12 @@ categoryMeta = {
         'description': '폴더 이벤트 감시와 시간 기반 자동 실행을 배운다',
         'imageUrl': None,
     },
+    'resilience': {
+        'icon': 'shield',
+        'color': 'teal',
+        'description': '다시 실행해도, 중간에 죽어도 안전한 자동화를 만든다 — 멱등성·체크포인트·원자적 쓰기',
+        'imageUrl': None,
+    },
     'inputCtl': {
         'icon': 'mouse',
         'color': 'rose',
@@ -295,7 +302,7 @@ categoryGroups = {
     '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
     '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
     '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
-    '자동화': ['playwright', 'requests', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'inputCtl'],
+    '자동화': ['playwright', 'requests', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'resilience', 'inputCtl'],
     '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     'AI 통합': ['llmBasics'],
 }
@@ -368,7 +375,7 @@ categoryTree = [
                 'name': 'OS 자동화',
                 'description': '파일, 프로세스, 이벤트, 입력을 로컬 Python으로 다룬다.',
                 'folder': 'os',
-                'categories': ['fileOps', 'procCtl', 'watchSched', 'inputCtl'],
+                'categories': ['fileOps', 'procCtl', 'watchSched', 'resilience', 'inputCtl'],
             },
             {
                 'id': 'test-automation',
@@ -437,7 +444,7 @@ learningPaths = {
     '실무': {
         'icon': 'construction',
         'color': 'orange',
-        'categories': ['duckdb', 'pydantic', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'playwright', 'requests', 'fileOps', 'procCtl', 'watchSched', 'inputCtl', 'llmBasics'],
+        'categories': ['duckdb', 'pydantic', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'playwright', 'requests', 'fileOps', 'procCtl', 'watchSched', 'resilience', 'inputCtl', 'llmBasics'],
         'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {

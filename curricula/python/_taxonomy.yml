@@ -183,6 +183,9 @@ outcomes:
   - id: pandas.loadFrame
     label: 데이터프레임 로딩
     description: read_csv, read_excel, 기본 탐색
+  - id: pandas.readContract
+    label: 읽기 계약과 타입
+    description: dtype 지정으로 식별자 선행 0 보존, 타입 손상 방지
   - id: pandas.filterSelect
     label: 필터링과 선택
     description: loc, iloc, 불리언 마스킹
@@ -479,6 +482,15 @@ outcomes:
   - id: automation.scheduling
     label: 스케줄 운영
     description: APScheduler, cron, 영속·재시도
+  - id: automation.resilience.idempotency
+    label: 멱등성과 처리 원장
+    description: 영속 처리 원장으로 재실행을 안전하게 만드는 멱등성
+  - id: automation.resilience.checkpoint
+    label: 재개 가능한 체크포인트
+    description: 진행 위치를 영속해 중단 지점부터 재개하는 장기 배치
+  - id: automation.resilience.atomicWrite
+    label: 원자적 쓰기
+    description: 임시 파일과 os.replace로 반쪽 파일 없이 안전하게 교체
   - id: automation.inputCtl
     label: GUI/입력 자동화
     description: 키보드, 마우스, OS 입력 제어
@@ -1137,6 +1149,10 @@ lessonOutcomes:
     prerequisites: [pandas.aggregate, pandas.merge]
     estimatedMinutes: 90
     lessonRole: project
+  "pandas/11_읽기계약과타입손상":
+    outcomes: [pandas.readContract]
+    prerequisites: [pandas.loadFrame]
+    estimatedMinutes: 40
 
   # playwright 트랙
   "playwright/00_playwright소개":
@@ -2309,6 +2325,18 @@ lessonOutcomes:
     prerequisites: [automation.watchSched, automation.scheduling]
     estimatedMinutes: 75
     lessonRole: project
+  "resilience/01_멱등성과처리원장":
+    outcomes: [automation.resilience.idempotency]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 40
+  "resilience/02_재개가능체크포인트":
+    outcomes: [automation.resilience.checkpoint]
+    prerequisites: [automation.resilience.idempotency]
+    estimatedMinutes: 40
+  "resilience/03_원자적쓰기":
+    outcomes: [automation.resilience.atomicWrite]
+    prerequisites: [automation.fileOps]
+    estimatedMinutes: 40
 
   # inputCtl 트랙
   "inputCtl/01_pyautogui안전장치":
