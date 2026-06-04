@@ -14,6 +14,7 @@ LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
 PYTHON_STDLIB = EDITOR_DIR / "src" / "lib" / "pythonStdlib.ts"
 LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
+DEP_GRAPH_LAYOUT = EDITOR_DIR / "src" / "lib" / "dependencyGraphLayout.ts"
 
 
 def main() -> int:
@@ -124,6 +125,7 @@ def nodeProbeScript() -> str:
     runtimePath = json.dumps(str(NOTEBOOK_RUNTIME), ensure_ascii=False)
     inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
     stdlibPath = json.dumps(str(PYTHON_STDLIB), ensure_ascii=False)
+    layoutPath = json.dumps(str(DEP_GRAPH_LAYOUT), ensure_ascii=False)
     editorDir = json.dumps(str(EDITOR_DIR), ensure_ascii=False)
     return f"""
 (async () => {{
@@ -336,6 +338,18 @@ await runtime.runReactiveNotebook({{
   sessionId: "session-1",
 }});
 assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install", "cell-call-reactive"]);
+
+const graphLayout = loadModule({layoutPath}, (specifier) => require(specifier));
+{{
+  const linear = graphLayout.layoutDependencyGraph(["a", "b", "c"], {{ a: ["b"], b: ["c"] }}, [], (id) => id);
+  const byId = Object.fromEntries(linear.nodes.map((node) => [node.blockId, node]));
+  assert.ok(byId.a.x < byId.b.x && byId.b.x < byId.c.x, "linear chain layers left-to-right");
+  assert.equal(linear.edges.filter((edge) => edge.isBackEdge).length, 0);
+  const cyclic = graphLayout.layoutDependencyGraph(["a", "b"], {{ a: ["b"], b: ["a"] }}, [["a", "b"]], (id) => id);
+  assert.equal(cyclic.edges.length, 2);
+  assert.ok(cyclic.edges.every((edge) => edge.isBackEdge), "intra-cycle edges are back-edges");
+  assert.ok(cyclic.nodes.every((node) => node.inCycle), "cycle nodes flagged inCycle");
+}}
 
 process.stdout.write(JSON.stringify({{
   directRun: outcome.notice.detail,
