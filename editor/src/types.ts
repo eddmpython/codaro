@@ -20,6 +20,8 @@ export type VariableInfo = {
   typeName: string;
   repr: string;
   size?: number | null;
+  shape?: string;
+  dtype?: string;
 };
 
 export type PackageInfo = {
@@ -79,13 +81,15 @@ export type BlockExecution = {
   lastOutput?: string | null;
 };
 
-// 리액티브 정합성 진단 — 백엔드 KernelReactivePayload가 보내는 묶음(셀별 투영은 프론트가 한다).
+// 리액티브 그래프 요약 + 정합성 진단 — 백엔드 KernelReactivePayload가 보내는 묶음(셀별 투영은 프론트가 한다).
 export type ReactiveDiagnostics = {
   cycles: string[][];
   multipleDefinitions: Array<[string, string[]]>; // (변수, 정의 셀들)
   crossCellMutations: Array<[string, string, string]>; // (변수, 변경 셀, 소유 셀)
   staleBlockIds: string[]; // 영향받았으나 실행 못 한 셀(early-stop)
   dependents: Record<string, string[]>; // 셀 → 다운스트림 셀들(stale 전파용)
+  definedBy: Record<string, string[]>; // 변수 → 정의 셀들(변수 탐색기)
+  nodes: Array<{ blockId: string; defines: string[]; uses: string[] }>; // 셀별 정의/사용(의존성 그래프)
 };
 
 export type PredictConfig = {

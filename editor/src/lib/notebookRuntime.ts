@@ -22,6 +22,8 @@ function extractDiagnostics(payload: ReactiveResponse): ReactiveDiagnostics {
     crossCellMutations: payload.crossCellMutations ?? [],
     staleBlockIds: payload.staleBlockIds ?? [],
     dependents: payload.dependents ?? {},
+    definedBy: payload.definedBy ?? {},
+    nodes: payload.nodes ?? [],
   };
 }
 

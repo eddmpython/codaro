@@ -6,6 +6,8 @@ export const emptyReactiveDiagnostics: ReactiveDiagnostics = {
   crossCellMutations: [],
   staleBlockIds: [],
   dependents: {},
+  definedBy: {},
+  nodes: [],
 };
 
 // dirty 셀 + 의존성 전이 다운스트림 = stale 집합(순수 BFS, 백엔드 dependents 인접 재사용).
