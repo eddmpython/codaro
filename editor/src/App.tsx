@@ -390,6 +390,7 @@ function App() {
               staleBlockIds={staleBlockIds}
               surface={surface}
               tasks={tasks}
+              variables={variables}
               loadState={loadState}
               assistantCollapsed={assistantCollapsed}
               onAddCell={addNotebookCell}

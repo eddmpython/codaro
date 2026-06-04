@@ -17,6 +17,7 @@ import type {
   SchedulerStatus,
   TaskDefinition,
   TaskListPayload,
+  VariableInfo,
 } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
@@ -61,6 +62,7 @@ type MainSurfaceProps = {
   staleBlockIds: string[];
   surface: SurfaceMode;
   tasks: TaskListPayload;
+  variables: VariableInfo[];
   onAcceptPendingBlocks: () => void;
   onAddCell: (type: "code" | "markdown", referenceBlockId?: string, placement?: "before" | "after") => void;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
@@ -135,6 +137,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         runningBlockId={props.runningBlockId}
         selectedBlockId={props.selectedBlockId}
         staleBlockIds={props.staleBlockIds}
+        variables={props.variables}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onAddCell={props.onAddCell}
         onAsk={props.onAsk}
