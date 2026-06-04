@@ -1,0 +1,316 @@
+meta:
+  id: resilience_03
+  title: 원자적 쓰기
+  order: 3
+  category: resilience
+  difficulty: easy
+  audience: 리포트·상태 파일을 주기적으로 덮어쓰는 자동화를 만드는 Python 학습자
+  packages: []
+  tags:
+    - atomic
+    - 원자적
+    - os.replace
+    - 파일안전
+    - tempfile
+intro:
+  direction: 임시 파일에 전량을 먼저 쓰고 os.replace로 한 번에 교체해, 쓰는 도중 죽어도 파일이 반쪽으로 남지 않게 만든다.
+  benefits:
+    - open('w')가 여는 즉시 기존 내용을 날린다는 위험을 직접 본다.
+    - 임시 파일 + os.replace로 "옛 버전 또는 새 버전, 절대 반쪽 아님"을 보장한다.
+    - 쓰다 죽어도 원본이 보존돼 다음 독자가 깨진 파일을 읽지 않는다.
+  diagram:
+    steps:
+      - label: 직접 덮어쓰기의 위험
+        detail: open('w')로 바로 쓰다 죽으면 원본도 신규본도 잃고 반쪽만 남는다.
+      - label: 원자적 교체
+        detail: 임시 파일에 전량 쓰고 os.replace로 한 번에 바꾼다.
+      - label: 죽어도 보존
+        detail: replace 전에 죽으면 원본이 그대로 남고 임시 파일만 남는다.
+  runtime:
+    - label: 표준 라이브러리만
+      detail: os, pathlib, tempfile만 사용한다.
+    - label: assert로 직접 확인
+      detail: 중단을 모사해 원본 보존 여부를 assert로 눈에 보이게 검증한다.
+sections:
+  - id: unsafe-overwrite
+    title: 직접 덮어쓰기의 위험
+    structuredPrimary: true
+    subtitle: 쓰다 죽으면 반쪽만 남는다
+    goal: open('w')로 직접 덮어쓰다 중간에 죽으면 원본이 사라지고 미완성 내용만 남는 것을 확인한다.
+    why: 매시간 status.json을 통째로 덮어쓰는 자동화는, 쓰는 도중 죽으면 독자가 깨진 파일을 읽고 파이프라인 전체가 멈춘다.
+    explanation: |-
+      open(path, "w")는 파일을 여는 즉시 기존 내용을 0바이트로 날린다. 그 뒤 write로 새 내용을 조금씩 채우는데, 다 쓰기 전에 죽으면 원본은 이미 사라졌고 새 내용은 미완성 — 반쪽짜리 파일만 남는다.
+
+      아래는 세 조각을 쓰다 세 번째에서 죽는 상황이다. 원본 "OLD-DATA"는 사라지고 "AAABBB"만 남는다. 이게 직접 덮어쓰기의 근본 위험이다.
+    tips:
+      - "'w' 모드는 여는 순간 truncate(0바이트화)한다 — 한 글자도 안 썼는데 원본이 날아갈 수 있다."
+      - 예외를 잡되 메시지를 보존해 무엇 때문에 죽었는지 남긴다(삼키지 않기).
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      def unsafeWrite(path, chunks):
+          with open(path, "w", encoding="utf-8") as handle:
+              for i, chunk in enumerate(chunks):
+                  if i == 2:
+                      raise RuntimeError("crashed mid-write")
+                  handle.write(chunk)
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "report.txt"
+          path.write_text("OLD-DATA", encoding="utf-8")
+          crashed = ""
+          try:
+              unsafeWrite(path, ["AAA", "BBB", "CCC"])
+          except RuntimeError as exc:
+              crashed = str(exc)
+          after = path.read_text(encoding="utf-8")
+
+      assert crashed == "crashed mid-write"
+      assert after != "OLD-DATA"
+      assert after == "AAABBB"
+      corruptedLen = len(after)
+      assert corruptedLen == 6
+      corruptedLen
+    exercise:
+      prompt: 두 번째 조각(i == 1)에서 죽도록 바꾸면 파일에 몇 글자가 남는지 확인하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        def unsafeWrite(path, chunks):
+            with open(path, "w", encoding="utf-8") as handle:
+                for i, chunk in enumerate(chunks):
+                    if i == ___:
+                        raise RuntimeError("crashed mid-write")
+                    handle.write(chunk)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            path.write_text("OLD-DATA", encoding="utf-8")
+            crashed = ""
+            try:
+                unsafeWrite(path, ["AAA", "BBB", "CCC"])
+            except RuntimeError as exc:
+                crashed = str(exc)
+            after = path.read_text(encoding="utf-8")
+
+        assert after == "AAA"
+        corruptedLen = len(after)
+        assert corruptedLen == 3
+        corruptedLen
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        def unsafeWrite(path, chunks):
+            with open(path, "w", encoding="utf-8") as handle:
+                for i, chunk in enumerate(chunks):
+                    if i == 1:
+                        raise RuntimeError("crashed mid-write")
+                    handle.write(chunk)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            path.write_text("OLD-DATA", encoding="utf-8")
+            crashed = ""
+            try:
+                unsafeWrite(path, ["AAA", "BBB", "CCC"])
+            except RuntimeError as exc:
+                crashed = str(exc)
+            after = path.read_text(encoding="utf-8")
+
+        assert after == "AAA"
+        corruptedLen = len(after)
+        assert corruptedLen == 3
+        corruptedLen
+      hints:
+        - i == 1이면 첫 조각 "AAA"만 쓰이고 죽는다.
+        - 남는 글자 수는 3이다.
+      check:
+        type: noError
+        noError: 중단 모사가 잡혀서 끝나야 한다.
+        resultCheck: corruptedLen이 3이어야 한다.
+    check:
+      noError: unsafeWrite 중단이 잡혀서 끝나야 한다.
+      resultCheck: corruptedLen이 6이고 원본이 사라져야 한다.
+  - id: atomic-replace
+    title: 원자적 교체
+    structuredPrimary: true
+    subtitle: 임시 파일 + os.replace
+    goal: 임시 파일에 전량을 쓴 뒤 os.replace로 한 번에 교체해 최종 파일이 항상 완전한지 확인한다.
+    why: os.replace는 교체를 원자적으로 수행한다 — 독자는 항상 옛 버전 아니면 새 버전을 보고, 반쪽을 보는 일이 없다.
+    explanation: |-
+      atomicWrite는 두 단계다. ① 임시 파일(path + ".tmp")에 데이터 전량을 먼저 쓴다. ② os.replace(tmp, path)로 임시 파일을 최종 경로로 한 번에 옮긴다.
+
+      os.replace는 운영체제 수준에서 원자적이라, 교체가 "완료" 또는 "미수행" 둘 중 하나다. 중간 상태가 독자에게 보이지 않는다. 참고로 Path.rename은 Windows에서 대상이 이미 있으면 FileExistsError를 내 교체용으로 부적합하지만, os.replace는 기존 파일을 원자적으로 덮어쓴다.
+    tips:
+      - 임시 파일은 같은 디렉터리에 두어야 os.replace가 같은 파일시스템 안에서 원자적으로 동작한다.
+      - os.replace는 대상이 있어도 덮어쓴다 — rename과 달리 교체에 바로 쓸 수 있다.
+    snippet: |-
+      import os
+      import tempfile
+      from pathlib import Path
+
+      def atomicWrite(path, data):
+          tmpPath = str(path) + ".tmp"
+          Path(tmpPath).write_text(data, encoding="utf-8")
+          os.replace(tmpPath, path)
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "report.txt"
+          atomicWrite(path, "v2-complete")
+          restored = path.read_text(encoding="utf-8")
+
+      assert restored == "v2-complete"
+      restored
+    exercise:
+      prompt: atomicWrite로 "final-report"를 쓰면 읽어 온 내용이 정확히 그 문자열인지 확인하세요.
+      starterCode: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        def atomicWrite(path, data):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(data, encoding="utf-8")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            atomicWrite(path, ___)
+            restored = path.read_text(encoding="utf-8")
+
+        assert restored == "final-report"
+        restored
+      solution: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        def atomicWrite(path, data):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(data, encoding="utf-8")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            atomicWrite(path, "final-report")
+            restored = path.read_text(encoding="utf-8")
+
+        assert restored == "final-report"
+        restored
+      hints:
+        - 쓸 데이터는 문자열 "final-report"다.
+        - os.replace 뒤 읽으면 같은 문자열이 그대로 나온다.
+      check:
+        type: noError
+        noError: 임시 파일 쓰기와 os.replace가 예외 없이 끝나야 한다.
+        resultCheck: restored가 "final-report"여야 한다.
+    check:
+      noError: atomicWrite가 끝나야 한다.
+      resultCheck: restored가 "v2-complete"여야 한다.
+  - id: crash-keeps-original
+    title: 쓰다 죽어도 원본 보존
+    structuredPrimary: true
+    subtitle: replace 전에 죽으면 원본 그대로
+    goal: 임시 파일을 쓴 뒤 os.replace 전에 죽으면 원본이 그대로 남고 임시 파일만 남는 것을 확인한다.
+    why: 원자적 쓰기의 진짜 이득 — 쓰다 죽어도 독자는 항상 완전한 옛 버전을 본다. 깨진 파일이 절대 노출되지 않는다.
+    explanation: |-
+      atomicWriteWithCrash는 임시 파일에 새 데이터를 쓴 뒤, replace 직전에 죽는 상황을 모사한다. 이때 최종 경로의 파일은 손대지 않았으므로 원본 "v1"이 그대로 남는다. 새 데이터는 임시 파일에만 있어 독자에게 보이지 않는다.
+
+      즉 "v2로 바꾸다 죽음"의 결과가 "v1 그대로 + 임시 파일 잔존"이다. 반쪽짜리 v2는 어디에도 노출되지 않는다. 남은 임시 파일은 다음 실행이 정리하면 된다.
+    tips:
+      - 원자성의 핵심은 "최종 경로를 마지막 순간에 단 한 번 건드린다"는 것이다.
+      - 남은 .tmp 파일은 사고의 흔적일 뿐, 원본을 오염시키지 않는다.
+    snippet: |-
+      import os
+      import tempfile
+      from pathlib import Path
+
+      def atomicWriteWithCrash(path, data, crash):
+          tmpPath = str(path) + ".tmp"
+          Path(tmpPath).write_text(data, encoding="utf-8")
+          if crash:
+              raise RuntimeError("crashed before replace")
+          os.replace(tmpPath, path)
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "report.txt"
+          path.write_text("v1", encoding="utf-8")
+          crashed = ""
+          try:
+              atomicWriteWithCrash(path, "v2", crash=True)
+          except RuntimeError as exc:
+              crashed = str(exc)
+          survived = path.read_text(encoding="utf-8")
+          tmpLeft = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+      assert crashed == "crashed before replace"
+      assert survived == "v1"
+      assert len(tmpLeft) == 1
+      survived
+    exercise:
+      prompt: crash=False로 바꾸면(정상 교체) 원본이 v2로 바뀌고 임시 파일이 안 남는지 확인하세요.
+      starterCode: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        def atomicWriteWithCrash(path, data, crash):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(data, encoding="utf-8")
+            if crash:
+                raise RuntimeError("crashed before replace")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            path.write_text("v1", encoding="utf-8")
+            crashed = ""
+            try:
+                atomicWriteWithCrash(path, "v2", crash=___)
+            except RuntimeError as exc:
+                crashed = str(exc)
+            survived = path.read_text(encoding="utf-8")
+            tmpLeft = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+        assert survived == "v2"
+        assert len(tmpLeft) == 0
+        survived
+      solution: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        def atomicWriteWithCrash(path, data, crash):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(data, encoding="utf-8")
+            if crash:
+                raise RuntimeError("crashed before replace")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.txt"
+            path.write_text("v1", encoding="utf-8")
+            crashed = ""
+            try:
+                atomicWriteWithCrash(path, "v2", crash=False)
+            except RuntimeError as exc:
+                crashed = str(exc)
+            survived = path.read_text(encoding="utf-8")
+            tmpLeft = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+        assert survived == "v2"
+        assert len(tmpLeft) == 0
+        survived
+      hints:
+        - crash=False면 replace가 정상 수행된다.
+        - 교체가 끝나면 임시 파일은 사라지고 원본은 v2가 된다.
+      check:
+        type: noError
+        noError: 정상 교체가 예외 없이 끝나야 한다.
+        resultCheck: survived가 "v2"이고 임시 파일이 안 남아야 한다.
+    check:
+      noError: atomicWriteWithCrash 중단이 잡혀서 끝나야 한다.
+      resultCheck: survived가 "v1"으로 보존되고 임시 파일이 1개 남아야 한다.

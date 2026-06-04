@@ -1,0 +1,310 @@
+meta:
+  id: resilience_02
+  title: 재개 가능한 체크포인트
+  order: 2
+  category: resilience
+  difficulty: easy
+  audience: 대량·장시간 배치를 중간에 죽어도 이어서 돌리려는 Python 학습자
+  packages: []
+  tags:
+    - checkpoint
+    - 체크포인트
+    - resume
+    - 재개
+    - json
+intro:
+  direction: 진행 위치를 디스크 체크포인트에 남겨, 작업이 중간에 죽어도 처음부터가 아니라 죽은 지점부터 이어서 처리하게 만든다.
+  benefits:
+    - 진행 상태를 암묵적 루프 인덱스가 아니라 명시적 체크포인트 파일로 외부화한다.
+    - 중단된 작업을 처음부터 다시 돌리지 않고 다음 항목부터 재개한다.
+    - 멱등성과 합쳐 "두 번 해도 안전 + 중간에 죽어도 이어서"를 완성한다.
+  diagram:
+    steps:
+      - label: 체크포인트 저장
+        detail: 마지막으로 처리한 인덱스를 JSON 파일에 기록한다.
+      - label: 중단 모사
+        detail: 처리 도중 예외가 나도 체크포인트는 마지막 성공 지점에 남는다.
+      - label: 재개
+        detail: 저장된 체크포인트를 로드해 그 다음 항목부터 이어서 처리한다.
+  runtime:
+    - label: 표준 라이브러리만
+      detail: json, pathlib, tempfile만 사용한다.
+    - label: assert로 직접 확인
+      detail: 재개가 남은 항목만, 전체를 중복·누락 없이 처리하는지 assert로 검증한다.
+sections:
+  - id: checkpoint-file
+    title: 체크포인트 파일
+    structuredPrimary: true
+    subtitle: 진행 위치를 디스크에 남긴다
+    goal: 마지막으로 처리한 인덱스를 JSON 파일에 저장했다가 다시 읽어 복원하는 흐름을 확인한다.
+    why: 진행 상태를 메모리 변수에만 두면 프로세스가 죽을 때 사라진다. 디스크 체크포인트가 있어야 다음 실행이 어디까지 했는지 안다.
+    explanation: |-
+      체크포인트(checkpoint)는 "여기까지 했다"를 디스크에 적어 둔 표식이다. 가장 단순한 형태는 마지막으로 처리한 인덱스를 JSON 파일에 저장하는 것이다.
+
+      저장과 로드를 왕복해 보면, 프로세스가 죽었다 떠도 같은 진행 위치가 복원된다는 걸 확인할 수 있다. 이 작은 파일 하나가 "처음부터 다시"와 "이어서"를 가른다.
+    tips:
+      - 체크포인트는 dict로 두면 나중에 진행률·단계명 같은 필드를 함께 담기 쉽다.
+      - 한 번에 하나의 키만 쓰더라도 JSON dict로 시작하면 확장이 편하다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as tmp:
+          checkpointPath = Path(tmp) / "checkpoint.json"
+          checkpointPath.write_text(json.dumps({"lastDone": 5}), encoding="utf-8")
+          loaded = json.loads(checkpointPath.read_text(encoding="utf-8"))
+
+      assert loaded["lastDone"] == 5
+      loaded
+    exercise:
+      prompt: 체크포인트에 lastDone을 8로 저장한 뒤 로드해도 8이 복원되는지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpointPath = Path(tmp) / "checkpoint.json"
+            checkpointPath.write_text(json.dumps({"lastDone": ___}), encoding="utf-8")
+            loaded = json.loads(checkpointPath.read_text(encoding="utf-8"))
+
+        assert loaded["lastDone"] == 8
+        loaded
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpointPath = Path(tmp) / "checkpoint.json"
+            checkpointPath.write_text(json.dumps({"lastDone": 8}), encoding="utf-8")
+            loaded = json.loads(checkpointPath.read_text(encoding="utf-8"))
+
+        assert loaded["lastDone"] == 8
+        loaded
+      hints:
+        - 저장할 값은 정수 8이다.
+        - JSON dict의 lastDone 키에 8이 들어간다.
+      check:
+        type: noError
+        noError: 저장·로드가 예외 없이 끝나야 한다.
+        resultCheck: loaded["lastDone"]가 8이어야 한다.
+    check:
+      noError: 체크포인트 저장·로드가 끝나야 한다.
+      resultCheck: loaded["lastDone"]가 5여야 한다.
+  - id: crash-keeps-checkpoint
+    title: 중간에 죽어도 위치는 남는다
+    structuredPrimary: true
+    subtitle: 마지막 성공 지점까지 기록
+    goal: 처리 도중 예외가 나도 체크포인트가 마지막으로 성공한 인덱스에 남는지 확인한다.
+    why: 무인 배치는 언제든 죽을 수 있다. 죽기 직전까지의 진행이 디스크에 남아야 재개가 가능하다.
+    explanation: |-
+      runUntilCrash는 항목을 돌며 매 성공마다 체크포인트를 갱신한다. crashAt 항목에 도달하면 RuntimeError로 중단을 모사한다. 이 예외는 좁힌 except로 잡아 메시지를 보존하고(삼키지 않는다), 함수는 마지막으로 성공한 인덱스를 돌려준다.
+
+      crashAt이 6이면 1~5는 성공해 체크포인트가 5까지 기록되고, 6에서 죽는다. 죽어도 "5까지 했다"는 사실이 디스크에 남는다.
+    tips:
+      - 예외를 잡되 메시지를 변수에 담아 두면 무엇 때문에 죽었는지 추적할 수 있다(삼키지 않기).
+      - 체크포인트는 매 성공 직후에 써야 죽는 순간까지의 진행이 보존된다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def runUntilCrash(items, crashAt, checkpointPath):
+          lastDone = 0
+          crashed = ""
+          try:
+              for n in items:
+                  if n == crashAt:
+                      raise RuntimeError(f"crashed at {n}")
+                  lastDone = n
+                  checkpointPath.write_text(json.dumps({"lastDone": lastDone}), encoding="utf-8")
+          except RuntimeError as exc:
+              crashed = str(exc)
+          return lastDone, crashed
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "checkpoint.json"
+          lastDone, crashed = runUntilCrash(range(1, 11), 6, path)
+
+      assert lastDone == 5
+      assert crashed == "crashed at 6"
+      lastDone
+    exercise:
+      prompt: crashAt을 4로 바꾸면 체크포인트가 어디까지 남는지 확인하세요(3까지 성공 후 4에서 죽음).
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def runUntilCrash(items, crashAt, checkpointPath):
+            lastDone = 0
+            crashed = ""
+            try:
+                for n in items:
+                    if n == crashAt:
+                        raise RuntimeError(f"crashed at {n}")
+                    lastDone = n
+                    checkpointPath.write_text(json.dumps({"lastDone": lastDone}), encoding="utf-8")
+            except RuntimeError as exc:
+                crashed = str(exc)
+            return lastDone, crashed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "checkpoint.json"
+            lastDone, crashed = runUntilCrash(range(1, 11), ___, path)
+
+        assert lastDone == 3
+        assert crashed == "crashed at 4"
+        lastDone
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def runUntilCrash(items, crashAt, checkpointPath):
+            lastDone = 0
+            crashed = ""
+            try:
+                for n in items:
+                    if n == crashAt:
+                        raise RuntimeError(f"crashed at {n}")
+                    lastDone = n
+                    checkpointPath.write_text(json.dumps({"lastDone": lastDone}), encoding="utf-8")
+            except RuntimeError as exc:
+                crashed = str(exc)
+            return lastDone, crashed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "checkpoint.json"
+            lastDone, crashed = runUntilCrash(range(1, 11), 4, path)
+
+        assert lastDone == 3
+        assert crashed == "crashed at 4"
+        lastDone
+      hints:
+        - crashAt이 4이면 1, 2, 3은 성공한다.
+        - 4에서 죽으므로 체크포인트는 3에 남는다.
+      check:
+        type: noError
+        noError: 중단 모사가 예외 없이(잡혀서) 끝나야 한다.
+        resultCheck: lastDone이 3이어야 한다.
+    check:
+      noError: runUntilCrash가 끝나야 한다.
+      resultCheck: lastDone이 5, crashed가 "crashed at 6"이어야 한다.
+  - id: resume-from-checkpoint
+    title: 죽은 지점부터 재개
+    structuredPrimary: true
+    subtitle: 남은 항목만, 중복·누락 없이
+    goal: 저장된 체크포인트를 로드해 그 다음 항목부터 재개하고, 전체가 정확히 한 번씩 처리되는지 확인한다.
+    why: 1000건 발송이 중간에 죽었을 때 처음부터 다시 돌면 이미 보낸 수백 건이 중복된다. 재개는 남은 것만 처리해 시간과 사고를 모두 막는다.
+    explanation: |-
+      resumeBatch는 체크포인트를 로드(없으면 0)해 lastDone 이하 항목은 건너뛰고 그 다음부터 처리하며, 매 항목마다 체크포인트를 갱신한다.
+
+      1차 실행이 5까지 하고 죽었다면 체크포인트는 5다. 2차 실행은 6부터 시작해 6~10만 처리한다. 1차에서 처리한 1~5와 2차의 6~10을 합치면 1~10이 정확히 한 번씩 — 중복도 누락도 없다.
+    tips:
+      - 재개의 핵심은 n <= lastDone이면 continue로 이미 처리한 항목을 건너뛰는 것이다.
+      - 재개 결과(6~10)와 1차 결과(1~5)를 합쳐 전체 범위와 같은지 보면 무결성이 한눈에 보인다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def resumeBatch(items, checkpointPath):
+          if checkpointPath.exists():
+              lastDone = json.loads(checkpointPath.read_text(encoding="utf-8"))["lastDone"]
+          else:
+              lastDone = 0
+          processed = []
+          for n in items:
+              if n <= lastDone:
+                  continue
+              processed.append(n)
+              checkpointPath.write_text(json.dumps({"lastDone": n}), encoding="utf-8")
+          return processed
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "checkpoint.json"
+          path.write_text(json.dumps({"lastDone": 5}), encoding="utf-8")
+          firstRun = [1, 2, 3, 4, 5]
+          secondRun = resumeBatch(range(1, 11), path)
+
+      allProcessed = firstRun + secondRun
+      assert secondRun == [6, 7, 8, 9, 10]
+      assert sorted(allProcessed) == list(range(1, 11))
+      processedCount = len(allProcessed)
+      assert processedCount == 10
+      processedCount
+    exercise:
+      prompt: 1차 실행이 7까지 하고 죽은 상태(체크포인트 7)에서 재개가 8, 9, 10만 처리하는지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def resumeBatch(items, checkpointPath):
+            if checkpointPath.exists():
+                lastDone = json.loads(checkpointPath.read_text(encoding="utf-8"))["lastDone"]
+            else:
+                lastDone = 0
+            processed = []
+            for n in items:
+                if n <= lastDone:
+                    continue
+                processed.append(n)
+                checkpointPath.write_text(json.dumps({"lastDone": n}), encoding="utf-8")
+            return processed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "checkpoint.json"
+            path.write_text(json.dumps({"lastDone": ___}), encoding="utf-8")
+            firstRun = [1, 2, 3, 4, 5, 6, 7]
+            secondRun = resumeBatch(range(1, 11), path)
+
+        allProcessed = firstRun + secondRun
+        assert secondRun == [8, 9, 10]
+        assert sorted(allProcessed) == list(range(1, 11))
+        processedCount = len(allProcessed)
+        assert processedCount == 10
+        processedCount
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def resumeBatch(items, checkpointPath):
+            if checkpointPath.exists():
+                lastDone = json.loads(checkpointPath.read_text(encoding="utf-8"))["lastDone"]
+            else:
+                lastDone = 0
+            processed = []
+            for n in items:
+                if n <= lastDone:
+                    continue
+                processed.append(n)
+                checkpointPath.write_text(json.dumps({"lastDone": n}), encoding="utf-8")
+            return processed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "checkpoint.json"
+            path.write_text(json.dumps({"lastDone": 7}), encoding="utf-8")
+            firstRun = [1, 2, 3, 4, 5, 6, 7]
+            secondRun = resumeBatch(range(1, 11), path)
+
+        allProcessed = firstRun + secondRun
+        assert secondRun == [8, 9, 10]
+        assert sorted(allProcessed) == list(range(1, 11))
+        processedCount = len(allProcessed)
+        assert processedCount == 10
+        processedCount
+      hints:
+        - 체크포인트 값은 7이다(7까지 처리하고 죽음).
+        - 재개는 8부터 시작하므로 8, 9, 10만 처리한다.
+      check:
+        type: noError
+        noError: 재개 처리가 예외 없이 끝나야 한다.
+        resultCheck: processedCount가 10이고 전체가 1~10을 한 번씩 담아야 한다.
+    check:
+      noError: resumeBatch가 끝나야 한다.
+      resultCheck: processedCount가 10, 전체가 1~10을 중복·누락 없이 담아야 한다.

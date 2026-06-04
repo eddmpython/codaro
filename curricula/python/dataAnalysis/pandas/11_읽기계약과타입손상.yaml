@@ -1,0 +1,227 @@
+meta:
+  id: pandas_11
+  title: 읽기 계약과 타입 손상
+  order: 11
+  category: pandas
+  difficulty: ⭐⭐
+  badge: 심화
+  packages:
+    - pandas
+  tags:
+    - read_csv
+    - dtype
+    - 식별자
+    - 데이터품질
+    - 읽기계약
+intro:
+  emoji: 🪪
+  goal: CSV를 읽는 순간 식별자(우편번호·사번)의 선행 0이 사라지는 손상을 보고, dtype 계약으로 막는 법을 익힌다.
+  description: read_csv는 컬럼 타입을 자동 추론한다. 숫자처럼 보이는 식별자는 정수로 추론돼 00123이 123이 되고, 조인 키가 깨진다. dtype를 지정하는 "읽기 계약"으로 막는다.
+  direction: 데이터를 읽는 첫 순간의 타입 추론을 점검하고, 식별자를 문자열로 지켜 조인까지 안전하게 연결한다.
+  benefits:
+    - 읽는 순간의 dtype 추론이 데이터 정합성을 좌우함을 안다.
+    - dtype={"열": str}로 식별자의 선행 0을 보존한다.
+    - 타입이 어긋난 키가 조인을 깨뜨리는 실무 사고를 예방한다.
+  diagram:
+    steps:
+      - label: 추론 손상 확인
+        detail: dtype 없이 읽으면 00123이 int 123이 되는 걸 본다.
+      - label: 읽기 계약 적용
+        detail: 'dtype={"id": str}로 선행 0을 보존한다.'
+      - label: 조인 안전
+        detail: 문자열 키가 보존돼 마스터 테이블과 정상 조인됨을 확인한다.
+    runtime:
+      - label: pandas + 인라인 CSV
+        detail: io.StringIO로 작은 CSV를 만들어 로컬에서 바로 실행한다.
+      - label: assert로 직접 확인
+        detail: dtype와 값, 조인 매칭 수를 assert로 눈에 보이게 검증한다.
+sections:
+  - id: inference-corruption
+    title: 읽는 순간의 타입 손상
+    structuredPrimary: true
+    subtitle: 00123이 123이 된다
+    goal: dtype 없이 read_csv하면 식별자 컬럼이 int로 추론돼 선행 0이 사라지는 것을 확인한다.
+    why: 우편번호·사번·전화번호처럼 숫자로 보이지만 문자열인 식별자는, 읽는 순간 정수로 추론되면 조용히 망가진다.
+    explanation: |-
+      read_csv는 각 컬럼의 타입을 자동으로 추론한다. "00123" 같은 값이 든 컬럼은 전부 숫자로 보이므로 int64로 추론되고, 그 순간 선행 0이 사라져 123이 된다.
+
+      문제는 에러가 안 난다는 것이다. 데이터는 멀쩡히 읽히고 숫자도 그럴듯하다. 하지만 "00123"이라는 원래 식별자는 이미 사라졌다.
+    tips:
+      - 식별자는 숫자처럼 보여도 "이름"이다 — 계산하지 않으면 문자열로 다뤄야 한다.
+      - df["열"].dtype로 읽은 직후 타입을 확인하는 습관이 손상을 일찍 잡는다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+      df = pd.read_csv(io.StringIO(csv))
+
+      idDtypeName = str(df["id"].dtype)
+      firstId = df["id"].iloc[0]
+
+      assert idDtypeName == "int64"
+      assert firstId == 123
+      idDtypeName
+    exercise:
+      prompt: 같은 CSV에서 첫 행 id의 값이 문자열 "00123"이 아니라 정수 123으로 읽히는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        df = pd.read_csv(io.StringIO(csv))
+
+        firstId = df["id"].iloc[___]
+
+        assert firstId == 123
+        firstId
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        df = pd.read_csv(io.StringIO(csv))
+
+        firstId = df["id"].iloc[0]
+
+        assert firstId == 123
+        firstId
+      hints:
+        - 첫 행은 인덱스 0이다.
+        - dtype 없이 읽었으므로 "00123"이 아니라 123이 나온다.
+      check:
+        type: noError
+        noError: read_csv가 예외 없이 끝나야 한다.
+        resultCheck: firstId가 정수 123이어야 한다(선행 0 손실).
+    check:
+      noError: read_csv가 끝나야 한다.
+      resultCheck: idDtypeName이 "int64"여야 한다.
+  - id: read-contract
+    title: 읽기 계약으로 보존
+    structuredPrimary: true
+    subtitle: 'dtype={"id": str}'
+    goal: read_csv에 dtype를 지정해 식별자를 문자열로 읽으면 선행 0이 보존되는 것을 확인한다.
+    why: 읽기 계약(dtype 지정)은 "이 컬럼은 문자열이다"를 명시해, 추론에 맡기지 않고 식별자를 있는 그대로 지킨다.
+    explanation: |-
+      read_csv의 dtype 인자에 {"id": str}를 넘기면 id 컬럼을 추론 없이 문자열로 읽는다. 그러면 "00123"이 그대로 보존된다.
+
+      식별자 컬럼은 거의 항상 이 계약이 필요하다. 한 줄 추가로 "읽는 순간의 손상"을 원천 차단한다.
+    tips:
+      - dtype에는 여러 열을 dict로 한 번에 지정할 수 있다.
+      - 계산이 필요한 수치 컬럼(amount 등)은 그대로 두고 식별자만 str로 지정하면 된다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+      df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+
+      firstId = df["id"].iloc[0]
+      firstIdLen = len(firstId)
+
+      assert firstId == "00123"
+      assert firstIdLen == 5
+      firstIdLen
+    exercise:
+      prompt: dtype 계약으로 읽었을 때 두 번째 행 id가 "00045"로 보존되는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": ___})
+
+        secondId = df["id"].iloc[1]
+
+        assert secondId == "00045"
+        secondId
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+
+        secondId = df["id"].iloc[1]
+
+        assert secondId == "00045"
+        secondId
+      hints:
+        - 문자열로 읽으려면 dtype 값으로 str을 넘긴다.
+        - 계약을 지키면 "00045"의 선행 0이 보존된다.
+      check:
+        type: noError
+        noError: dtype를 지정한 read_csv가 예외 없이 끝나야 한다.
+        resultCheck: secondId가 문자열 "00045"여야 한다.
+    check:
+      noError: dtype 지정 read_csv가 끝나야 한다.
+      resultCheck: firstIdLen이 5여야 한다(선행 0 보존).
+  - id: join-safety
+    title: 조인까지 안전하게
+    structuredPrimary: true
+    subtitle: 키 타입이 맞아야 합쳐진다
+    goal: 읽기 계약으로 보존한 문자열 키가 마스터 테이블과 정상 조인되고, 손상된 키는 문자열로 안 맞는 것을 확인한다.
+    why: 사번 0042가 42로 손상되면 문자열 키 마스터와 한 건도 안 맞아, 매출이 통째로 누락되는 사고가 난다.
+    explanation: |-
+      마스터 테이블의 id가 문자열("00123")일 때, 읽기 계약을 지킨 거래 데이터는 문자열 키가 보존돼 정상 조인된다.
+
+      반대로 계약 없이 읽어 id가 정수 45가 되면, 마스터의 "00045"와 문자열로 비교했을 때 "45" != "00045"라 매칭되지 않는다. 타입이 어긋난 키는 조용히 조인을 깨뜨린다.
+    tips:
+      - 조인 전에 양쪽 키의 dtype가 같은지 확인하면 "0건 매칭" 사고를 예방한다.
+      - 식별자는 양쪽 모두 문자열로 통일하는 게 가장 안전하다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+      master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+      right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+      rightMerged = right.merge(master, on="id", how="inner")
+      matchedRows = len(rightMerged)
+
+      wrong = pd.read_csv(io.StringIO(csv))
+      wrongKeyAsText = str(wrong["id"].iloc[1])
+
+      assert matchedRows == 3
+      assert wrongKeyAsText == "45"
+      assert wrongKeyAsText != "00045"
+      matchedRows
+    exercise:
+      prompt: 마스터에 "00045"만 있을 때, 계약을 지킨 데이터의 조인 결과가 몇 행인지 확인하세요(00045 한 종류만 매칭).
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        master = pd.DataFrame({"id": [___], "name": ["Bob"]})
+
+        right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        rightMerged = right.merge(master, on="id", how="inner")
+        matchedRows = len(rightMerged)
+
+        assert matchedRows == 1
+        matchedRows
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+        master = pd.DataFrame({"id": ["00045"], "name": ["Bob"]})
+
+        right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        rightMerged = right.merge(master, on="id", how="inner")
+        matchedRows = len(rightMerged)
+
+        assert matchedRows == 1
+        matchedRows
+      hints:
+        - 마스터 id 리스트에 "00045" 한 개만 넣는다.
+        - CSV에 00045는 한 행뿐이라 매칭은 1행이다.
+      check:
+        type: noError
+        noError: 조인이 예외 없이 끝나야 한다.
+        resultCheck: matchedRows가 1이어야 한다.
+    check:
+      noError: 조인이 끝나야 한다.
+      resultCheck: matchedRows가 3이고 손상된 키는 문자열로 안 맞아야 한다.
