@@ -15,6 +15,9 @@ class BlockNode:
     defines: list[str] = field(default_factory=list)
     uses: list[str] = field(default_factory=list)
     mutatedFreeNames: list[str] = field(default_factory=list)
+    imports: list[str] = field(default_factory=list)
+    unsafeCalls: list[str] = field(default_factory=list)
+    isEmpty: bool = False
 
 
 @dataclass(slots=True)
@@ -41,6 +44,9 @@ def buildReactiveGraph(blocks: list[dict[str, Any]]) -> ReactiveGraph:
             defines=binding.defines,
             uses=binding.uses,
             mutatedFreeNames=binding.mutatedFreeNames,
+            imports=binding.imports,
+            unsafeCalls=binding.unsafeCalls,
+            isEmpty=binding.isEmpty,
         )
         graph.blockOrder.append(blockId)
         for var in binding.defines:
@@ -142,6 +148,10 @@ class ReactiveDiagnostics:
     cycles: tuple[tuple[str, ...], ...] = ()
     multipleDefinitions: tuple[tuple[str, tuple[str, ...]], ...] = ()
     crossCellMutations: tuple[tuple[str, str, str], ...] = ()
+    selfImports: tuple[tuple[str, str], ...] = ()           # (셀, 노트북명과 충돌하는 import)
+    definitionOrder: tuple[tuple[str, str, str], ...] = ()  # (변수, 쓰는 셀, 뒤에서 정의하는 셀)
+    emptyCells: tuple[str, ...] = ()
+    unsafeCalls: tuple[tuple[str, str], ...] = ()           # (셀, 위험 호출)
 
 
 def detectMultipleDefinitions(graph: ReactiveGraph) -> list[tuple[str, list[str]]]:
@@ -184,16 +194,75 @@ def detectCrossCellMutations(graph: ReactiveGraph) -> list[tuple[str, str, str]]
     return result
 
 
-def diagnosticsFromGraph(graph: ReactiveGraph) -> ReactiveDiagnostics:
+def _moduleNameFromTitle(notebookName: str | None) -> str | None:
+    if not notebookName:
+        return None
+    stem = notebookName.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+    if stem.endswith(".py"):
+        stem = stem[:-3]
+    return stem or None
+
+
+def detectSelfImports(graph: ReactiveGraph, notebookName: str | None) -> list[tuple[str, str]]:
+    """노트북 파일명과 같은 모듈을 import하는 셀(예: requests.py에서 import requests → 자기 자신)."""
+    moduleName = _moduleNameFromTitle(notebookName)
+    if not moduleName:
+        return []
+    result: list[tuple[str, str]] = []
+    for blockId in graph.blockOrder:
+        node = graph.nodes.get(blockId)
+        if node is None:
+            continue
+        for module in node.imports:
+            if module == moduleName:
+                result.append((blockId, module))
+    return result
+
+
+def detectDefinitionOrder(graph: ReactiveGraph) -> list[tuple[str, str, str]]:
+    """변수를 쓰는 셀이 그 변수를 정의하는 셀보다 *앞*에 있는 경우(= plain `python file.py`로
+    위→아래 실행하면 NameError). 리액티브 엔진은 재정렬하지만 스크립트 실행성은 깨진다."""
+    order = {blockId: index for index, blockId in enumerate(graph.blockOrder)}
+    result: list[tuple[str, str, str]] = []
+    for blockId in graph.blockOrder:
+        node = graph.nodes.get(blockId)
+        if node is None:
+            continue
+        for var in node.uses:
+            providers = [p for p in graph.definedBy.get(var, []) if p != blockId]
+            # 이 셀보다 앞선 정의가 하나도 없고, 뒤에 정의가 있으면 순서 위반.
+            if providers and all(order[p] > order[blockId] for p in providers):
+                result.append((var, blockId, providers[0]))
+    result.sort()
+    return result
+
+
+def detectEmptyCells(graph: ReactiveGraph) -> list[str]:
+    return [blockId for blockId in graph.blockOrder if graph.nodes[blockId].isEmpty]
+
+
+def detectUnsafeCalls(graph: ReactiveGraph) -> list[tuple[str, str]]:
+    result: list[tuple[str, str]] = []
+    for blockId in graph.blockOrder:
+        for call in graph.nodes[blockId].unsafeCalls:
+            result.append((blockId, call))
+    return result
+
+
+def diagnosticsFromGraph(graph: ReactiveGraph, notebookName: str | None = None) -> ReactiveDiagnostics:
     return ReactiveDiagnostics(
         cycles=tuple(tuple(cycle) for cycle in detectCycles(graph)),
         multipleDefinitions=tuple((var, tuple(blockIds)) for var, blockIds in detectMultipleDefinitions(graph)),
         crossCellMutations=tuple(detectCrossCellMutations(graph)),
+        selfImports=tuple(detectSelfImports(graph, notebookName)),
+        definitionOrder=tuple(detectDefinitionOrder(graph)),
+        emptyCells=tuple(detectEmptyCells(graph)),
+        unsafeCalls=tuple(detectUnsafeCalls(graph)),
     )
 
 
-def buildReactiveDiagnostics(blocks: list[dict[str, Any]]) -> ReactiveDiagnostics:
-    return diagnosticsFromGraph(buildReactiveGraph(blocks))
+def buildReactiveDiagnostics(blocks: list[dict[str, Any]], notebookName: str | None = None) -> ReactiveDiagnostics:
+    return diagnosticsFromGraph(buildReactiveGraph(blocks), notebookName)
 
 
 def previewReactiveOrder(blocks: list[dict[str, Any]], changedBlockId: str) -> list[str]:

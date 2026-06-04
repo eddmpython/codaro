@@ -24,6 +24,10 @@ function extractDiagnostics(payload: ReactiveResponse): ReactiveDiagnostics {
     dependents: payload.dependents ?? {},
     definedBy: payload.definedBy ?? {},
     nodes: payload.nodes ?? [],
+    selfImports: payload.selfImports ?? [],
+    definitionOrder: payload.definitionOrder ?? [],
+    emptyCells: payload.emptyCells ?? [],
+    unsafeCalls: payload.unsafeCalls ?? [],
   };
 }
 
@@ -217,6 +221,7 @@ export async function runReactiveNotebook({
           type: isExecutableBlock(block) ? "code" : "markdown",
           content: drafts[block.id] ?? block.content,
         })),
+      document.title,
     );
     const results = Object.fromEntries(payload.results.map((result) => [result.blockId ?? "", result])) as ResultMap;
     return {

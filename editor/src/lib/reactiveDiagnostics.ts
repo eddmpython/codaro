@@ -8,6 +8,10 @@ export const emptyReactiveDiagnostics: ReactiveDiagnostics = {
   dependents: {},
   definedBy: {},
   nodes: [],
+  selfImports: [],
+  definitionOrder: [],
+  emptyCells: [],
+  unsafeCalls: [],
 };
 
 // dirty 셀 + 의존성 전이 다운스트림 = stale 집합(순수 BFS, 백엔드 dependents 인접 재사용).
@@ -30,7 +34,13 @@ export function computeStaleBlockIds(
 }
 
 export type CellDiagnosticChip = {
-  kind: "multiple-definition" | "cross-cell-mutation";
+  kind:
+    | "multiple-definition"
+    | "cross-cell-mutation"
+    | "self-import"
+    | "definition-order"
+    | "empty-cell"
+    | "unsafe-call";
   label: string;
 };
 
@@ -48,6 +58,21 @@ export function cellDiagnosticChips(diagnostics: ReactiveDiagnostics, blockId: s
     .map(([name]) => name);
   if (mutatedVars.length) {
     chips.push({ kind: "cross-cell-mutation", label: `외부 변경: ${mutatedVars.join(", ")}` });
+  }
+  const selfImported = diagnostics.selfImports.filter(([cell]) => cell === blockId).map(([, module]) => module);
+  if (selfImported.length) {
+    chips.push({ kind: "self-import", label: `자기 import: ${selfImported.join(", ")}` });
+  }
+  const lateVars = diagnostics.definitionOrder.filter(([, useCell]) => useCell === blockId).map(([name]) => name);
+  if (lateVars.length) {
+    chips.push({ kind: "definition-order", label: `정의 순서: ${lateVars.join(", ")}` });
+  }
+  if (diagnostics.emptyCells.includes(blockId)) {
+    chips.push({ kind: "empty-cell", label: "빈 셀" });
+  }
+  const unsafe = diagnostics.unsafeCalls.filter(([cell]) => cell === blockId).map(([, call]) => call);
+  if (unsafe.length) {
+    chips.push({ kind: "unsafe-call", label: `주의 호출: ${unsafe.join(", ")}` });
   }
   return chips;
 }

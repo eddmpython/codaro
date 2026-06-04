@@ -114,6 +114,19 @@ def testCellBindingsDoesNotMisflagLoopVariable() -> None:
     assert binding.uses == ["n"]
 
 
+def testCellBindingsCollectsImportsAndUnsafeCalls() -> None:
+    binding = analyzeCellBindings("import os.path\nfrom math import sqrt\nos.system('ls')")
+    assert binding.imports == ["os", "math"]
+    assert binding.unsafeCalls == ["os.system"]
+
+
+def testCellBindingsFlagsEmptyAndCommentOnly() -> None:
+    assert analyzeCellBindings("").isEmpty is True
+    assert analyzeCellBindings("# only a comment").isEmpty is True
+    assert analyzeCellBindings("pass").isEmpty is True
+    assert analyzeCellBindings("x = 1").isEmpty is False
+
+
 def testAnalyzeCodePreservesTwoTupleContract() -> None:
     result = analyzeCode("data[0] = 1")
 

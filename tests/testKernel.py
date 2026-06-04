@@ -194,6 +194,10 @@ def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
             {"blockId": "b1", "defines": ["x"], "uses": []},
             {"blockId": "b2", "defines": ["y"], "uses": ["x"]},
         ],
+        "selfImports": [],
+        "definitionOrder": [],
+        "emptyCells": [],
+        "unsafeCalls": [],
     }
 
     toolPayload = payload.toolPayload()

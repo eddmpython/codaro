@@ -393,18 +393,58 @@ class UseCollector(ast.NodeVisitor):
         return self.moduleScope if allowModule and name in self.moduleScope.bindings else None
 
 
+# 로컬-우선 학습 노트북에서 진짜 footgun인 호출만 advisory로 잡는다(차단 아님).
+# subprocess 등 로컬에서 정상 동작하는 건 제외 — marimo의 WASM 전용 목록은 따르지 않는다.
+_UNSAFE_ATTR_CALLS = {
+    "os": {"system", "popen", "fork", "kill", "remove", "rmdir", "unlink", "removedirs"},
+    "shutil": {"rmtree"},
+}
+_UNSAFE_ATTR_PREFIXES = {"os": ("exec", "spawn")}
+_UNSAFE_BUILTINS = {"eval", "exec", "__import__", "breakpoint"}
+
+
+def _collectImportsAndUnsafe(tree: ast.Module) -> tuple[list[str], list[str]]:
+    imports: list[str] = []
+    unsafe: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imports.extend(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module and not node.level:
+                imports.append(node.module.split(".")[0])
+        elif isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+                module, attr = func.value.id, func.attr
+                allowed = _UNSAFE_ATTR_CALLS.get(module)
+                prefixes = _UNSAFE_ATTR_PREFIXES.get(module)
+                if (allowed and attr in allowed) or (prefixes and attr.startswith(prefixes)):
+                    unsafe.append(f"{module}.{attr}")
+            elif isinstance(func, ast.Name) and func.id in _UNSAFE_BUILTINS:
+                unsafe.append(func.id)
+    return list(dict.fromkeys(imports)), list(dict.fromkeys(unsafe))
+
+
+def _isEmptyBody(tree: ast.Module) -> bool:
+    return not tree.body or all(isinstance(node, ast.Pass) for node in tree.body)
+
+
 @dataclass(slots=True)
 class CellBindings:
     defines: list[str]
     uses: list[str]
     mutatedFreeNames: list[str]
+    imports: list[str] = field(default_factory=list)
+    unsafeCalls: list[str] = field(default_factory=list)
+    isEmpty: bool = False
 
 
 def analyzeCellBindings(code: str) -> CellBindings:
     try:
         tree = ast.parse(code)
     except SyntaxError:
-        return CellBindings(defines=[], uses=[], mutatedFreeNames=[])  # incomplete user code is expected
+        # 파싱 불가 = 깨진 코드가 있다는 뜻이라 빈 셀이 아니다.
+        return CellBindings(defines=[], uses=[], mutatedFreeNames=[], isEmpty=False)
 
     moduleBindings = collectScopeBindings(tree.body)
     moduleScope = ScopeState(
@@ -430,10 +470,14 @@ def analyzeCellBindings(code: str) -> CellBindings:
         for name in sorted(useCollector.mutatedFreeNames)
         if name not in moduleBindings.names and name not in PYTHON_BUILTINS
     ]
+    imports, unsafeCalls = _collectImportsAndUnsafe(tree)
     return CellBindings(
         defines=moduleBindings.orderedResolvedNames,
         uses=uses,
         mutatedFreeNames=mutatedFreeNames,
+        imports=imports,
+        unsafeCalls=unsafeCalls,
+        isEmpty=_isEmptyBody(tree),
     )
 
 

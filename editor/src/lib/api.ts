@@ -223,9 +223,10 @@ export const codaroApi = {
     sessionId: string,
     blockId: string,
     blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
+    notebookName?: string | null,
   ) => postJson<ReactiveResponse>(
     `/api/kernel/${sessionId}/execute-reactive`,
-    { blockId, blocks },
+    { blockId, blocks, notebookName: notebookName ?? null },
   ),
   setUiValue: (
     sessionId: string,

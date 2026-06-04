@@ -910,6 +910,10 @@ def testKernelWebSocketReactiveAndReset() -> None:
                 {"blockId": "b1", "defines": ["x"], "uses": []},
                 {"blockId": "b2", "defines": ["y"], "uses": ["x"]},
             ],
+            "selfImports": [],
+            "definitionOrder": [],
+            "emptyCells": [],
+            "unsafeCalls": [],
         }
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 

@@ -34,6 +34,10 @@ class KernelReactivePayload:
     dependents: tuple[tuple[str, tuple[str, ...]], ...] = ()
     definedBy: tuple[tuple[str, tuple[str, ...]], ...] = ()
     nodes: tuple[tuple[str, tuple[str, ...], tuple[str, ...]], ...] = ()
+    selfImports: tuple[tuple[str, str], ...] = ()
+    definitionOrder: tuple[tuple[str, str, str], ...] = ()
+    emptyCells: tuple[str, ...] = ()
+    unsafeCalls: tuple[tuple[str, str], ...] = ()
 
     @property
     def resultCount(self) -> int:
@@ -50,6 +54,10 @@ class KernelReactivePayload:
             "crossCellMutations": [list(mutation) for mutation in self.crossCellMutations],
             "staleBlockIds": list(self.staleBlockIds),
             "dependents": {blockId: list(downstream) for blockId, downstream in self.dependents},
+            "selfImports": [list(item) for item in self.selfImports],
+            "definitionOrder": [list(item) for item in self.definitionOrder],
+            "emptyCells": list(self.emptyCells),
+            "unsafeCalls": [list(item) for item in self.unsafeCalls],
         }
 
     def _graphPayload(self) -> dict[str, Any]:
@@ -117,11 +125,12 @@ async def executeKernelReactive(
     *,
     eventHandler: Callable[[ExecutionEvent], Awaitable[None]] | None = None,
     includeSource: bool = True,
+    notebookName: str | None = None,
 ) -> KernelReactivePayload:
     startedAt = time.perf_counter()
     blockList = list(blocks)
     graph = buildReactiveGraph(blockList)
-    diagnostics = diagnosticsFromGraph(graph)
+    diagnostics = diagnosticsFromGraph(graph, notebookName)
     results, executionOrder = await executeReactive(
         session, blockList, changedBlockId, eventHandler=eventHandler, includeSource=includeSource, graph=graph
     )
@@ -149,6 +158,10 @@ async def executeKernelReactive(
         dependents=dependents,
         definedBy=definedBy,
         nodes=nodes,
+        selfImports=diagnostics.selfImports,
+        definitionOrder=diagnostics.definitionOrder,
+        emptyCells=diagnostics.emptyCells,
+        unsafeCalls=diagnostics.unsafeCalls,
     )
 
 

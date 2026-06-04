@@ -90,6 +90,10 @@ export type ReactiveDiagnostics = {
   dependents: Record<string, string[]>; // 셀 → 다운스트림 셀들(stale 전파용)
   definedBy: Record<string, string[]>; // 변수 → 정의 셀들(변수 탐색기)
   nodes: Array<{ blockId: string; defines: string[]; uses: string[] }>; // 셀별 정의/사용(의존성 그래프)
+  selfImports: Array<[string, string]>; // (셀, 노트북명과 충돌하는 import)
+  definitionOrder: Array<[string, string, string]>; // (변수, 쓰는 셀, 뒤에서 정의하는 셀)
+  emptyCells: string[];
+  unsafeCalls: Array<[string, string]>; // (셀, 위험 호출)
 };
 
 export type PredictConfig = {

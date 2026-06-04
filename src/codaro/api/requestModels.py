@@ -46,6 +46,7 @@ class ReactiveBlockRequest(BaseModel):
 class ReactiveExecuteRequest(BaseModel):
     blockId: str
     blocks: list[ReactiveBlockRequest]
+    notebookName: str | None = None
 
 
 class SetUiValueRequest(BaseModel):

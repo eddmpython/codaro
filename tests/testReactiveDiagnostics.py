@@ -6,7 +6,12 @@ from codaro.kernel.reactive import (
     buildReactiveGraph,
     calculateStaleSet,
     detectCrossCellMutations,
+    detectDefinitionOrder,
+    detectEmptyCells,
     detectMultipleDefinitions,
+    detectSelfImports,
+    detectUnsafeCalls,
+    diagnosticsFromGraph,
     getReactiveOrder,
 )
 
@@ -79,6 +84,35 @@ def testStaleSetIsTransitiveDownstream() -> None:
     graph = buildReactiveGraph(blocks)
     assert calculateStaleSet(graph, "a") == {"a", "b", "c"}
     assert calculateStaleSet(graph, "a", includeSource=False) == {"b", "c"}
+
+
+def testDetectsSelfImportAgainstNotebookName() -> None:
+    blocks = _blocks(("a", "import requests\nr = requests.get"))
+    assert detectSelfImports(buildReactiveGraph(blocks), "requests.py") == [("a", "requests")]
+    assert detectSelfImports(buildReactiveGraph(blocks), "notebook.py") == []
+
+
+def testDetectsDefinitionOrderViolation() -> None:
+    # a(앞)가 b(뒤)의 정의를 씀 → plain python 위→아래 실행 시 NameError.
+    blocks = _blocks(("a", "y = x + 1"), ("b", "x = 5"))
+    assert detectDefinitionOrder(buildReactiveGraph(blocks)) == [("x", "a", "b")]
+    # 정상 순서는 비어야.
+    assert detectDefinitionOrder(buildReactiveGraph(_blocks(("a", "x = 5"), ("b", "y = x + 1")))) == []
+
+
+def testDetectsEmptyCells() -> None:
+    blocks = _blocks(("a", "# comment only"), ("b", "pass"), ("c", "z = 1"))
+    assert detectEmptyCells(buildReactiveGraph(blocks)) == ["a", "b"]
+
+
+def testDetectsUnsafeCalls() -> None:
+    blocks = _blocks(("a", "import os\nos.system('ls')\neval('1')"))
+    assert detectUnsafeCalls(buildReactiveGraph(blocks)) == [("a", "os.system"), ("a", "eval")]
+
+
+def testCleanNotebookHasNoLintDiagnostics() -> None:
+    diag = diagnosticsFromGraph(buildReactiveGraph(_blocks(("a", "x = 1"), ("b", "y = x + 1"))), "notebook.py")
+    assert diag.selfImports == () and diag.definitionOrder == () and diag.emptyCells == () and diag.unsafeCalls == ()
 
 
 def testBuildReactiveDiagnosticsBundlesAll() -> None:

@@ -151,7 +151,7 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     async def apiExecuteReactive(sessionId: str, request: ReactiveExecuteRequest) -> dict[str, Any]:
         session = requireSession(state, sessionId)
         blocks = [block.model_dump() for block in request.blocks]
-        payload = await executeKernelReactive(session, blocks, request.blockId)
+        payload = await executeKernelReactive(session, blocks, request.blockId, notebookName=request.notebookName)
         logger.debug(
             "kernel-reactive %s",
             formatLogFields(
