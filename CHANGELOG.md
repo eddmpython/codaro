@@ -8,6 +8,40 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.0.11 - 2026-06-04
+
+marimo의 로컬-우선 리액티브 개념을 에디터 본체로 흡수하고(정합성 계약·탐색 UI·입력 위젯·리액티브
+마크다운·제어 흐름·인라인 의존성·ipynb 변환), "운영 안전" 커리큘럼 트랙을 신설했다. WASM/pyodide/marimo
+런타임은 제외하고 plain-python·로컬 실행 정체성을 지켰다.
+
+### Added
+
+- 리액티브 정합성 진단 — `ReactiveDiagnostics`가 순환 의존·다중 정의·셀 간 외부 변수 변경(cross-cell mutation)을 잡아 reactive payload·WS에 동봉하고, 셀 삭제 시 커널에서 그 셀의 변수를 정리 (`src/codaro/kernel/reactive.py`, `src/codaro/document/analysis.py`, `src/codaro/kernel/executionPayload.py`).
+- 탐색 UI — 노트북 우측 패널을 [튜터·변수·의존성] 탭으로 나누고, 변수 탐색기(이름·shape·dtype·정의 셀)와 의존성 그래프 패널을 추가 (`editor/src/components/notebook/variableExplorerPanel.tsx`, `editor/src/components/notebook/dependencyGraphPanel.tsx`, `editor/src/lib/dependencyGraphLayout.ts`).
+- 입력 위젯 5종 — `ui.radio/multiselect/date/file/form`을 `UiValue` 모델에 추가, widgetHost가 native input으로 렌더하고 값 변경 시 의존 셀을 재실행 (`src/codaro/outputDescriptor.py`, `src/codaro/uiValue.py`, `editor/src/components/widgets/widgetHost.tsx`).
+- 리액티브 마크다운 — 마크다운 셀이 `{변수}`를 보간하고 HTML로 렌더되며, 의존 변수가 바뀌면 자동 갱신. `markdown()`이 순수 Python `markdown` 라이브러리로 HTML을 생성 (`src/codaro/outputDescriptor.py`, `src/codaro/kernel/reactive.py`, `editor/src/components/notebook/notebookPanel.tsx`).
+- 제어·반응 — `stop(predicate, output)`으로 조건부 셀 중단(다운스트림 프루닝), `state(value)`로 셀 간 반응형 공유 상태, 편집 세션 autoreload(임포트한 사용자 모듈 편집 시 재실행) (`src/codaro/outputDescriptor.py`, `src/codaro/runtime/localWorker.py`, `src/codaro/kernel/session.py`).
+- PEP 723 인라인 의존성 — 노트북 `.py` 상단 `# /// script` 블록의 `dependencies`를 `tomllib`로 파싱해 `RuntimeConfig.packages`에 병합하고 라운드트립 직렬화 (`src/codaro/document/percentFormat.py`).
+- jupyter(.ipynb) 변환 — `.ipynb`를 CodaroDocument로 변환(셀 매핑·출력 버림·`%`/`!`/`%%` magic 주석 처리) (`src/codaro/document/jupyterFormat.py`).
+- lint 진단 확장 — self-import·정의 순서·빈 셀·위험 system call(os.system 등)을 정적 진단으로 추가 (`src/codaro/document/analysis.py`, `src/codaro/kernel/reactive.py`, `editor/src/lib/reactiveDiagnostics.ts`).
+- 커리큘럼 운영 안전(resilience) 트랙 + 견고한 자동화 4강 — 멱등성과 처리 원장, 재개 가능한 체크포인트, 원자적 쓰기, pandas 읽기 계약과 타입 손상. 표준 라이브러리 기반(P1은 pandas)이고 snippet/solution이 assert로 개념을 검증한다 (`curricula/python/automation/os/resilience/01_멱등성과처리원장.yaml`, `curricula/python/automation/os/resilience/02_재개가능체크포인트.yaml`, `curricula/python/automation/os/resilience/03_원자적쓰기.yaml`, `curricula/python/dataAnalysis/pandas/11_읽기계약과타입손상.yaml`, `curricula/python/__init__.py`, `curricula/python/_taxonomy.yml`, `editor/src/lib/curriculaRegistry.ts`).
+
+### Changed
+
+- 셀 간 변수 재할당이 plain Python처럼 동작 — `total = total + 5`의 우변 자기참조 읽기를 use로 인식해, 같은 변수를 다른 셀에서 재할당해도 에러 없이 동작한다 (`src/codaro/document/analysis.py`).
+- `executeReactive`가 stopped 셀의 다운스트림을 `dependents`로 프루닝(에러 break 대신 가지치기)하고, 마크다운 셀을 리액티브 노드로 포함한다 (`src/codaro/kernel/reactive.py`, `src/codaro/runtime/localWorker.py`).
+
+### Fixed
+
+- 편집 세션 autoreload가 codaro 자신을 재로드해 `StopExecution` 클래스 정체성이 깨지던 문제 — `_reloadChangedUserModules`가 `codaro.*`와 site-packages를 제외하도록 수정 (`src/codaro/runtime/localWorker.py`).
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` 3/3 (1305 passed, 5 skipped).
+- `uv run python -X utf8 tests/auditCurriculumExecutability.py` real-bug 0 / yaml-load-error 0 / undeclared-package 0 (4,292 체크).
+- `uv run python -X utf8 tests/run.py quality-cycle` 22/22.
+- `npm --prefix editor run check && npm --prefix editor run build` 성공.
+
 ## 0.0.10 - 2026-06-03
 
 리액티브 노트북을 "살아있게" 만들었다 — 위젯을 변수에 담으면(`slider = ui.slider(0, 100)`) 슬라이더를
