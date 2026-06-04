@@ -23,9 +23,9 @@ for _threadVar in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS",
     os.environ.setdefault(_threadVar, "1")
 os.environ.setdefault("MPLBACKEND", "Agg")
 
-from ..document.analysis import analyzeCode
+from ..document.analysis import analyzeCode, interpolateMarkdown
 from ..errorGuard import safeRepr
-from ..outputDescriptor import isDescriptorPayload
+from ..outputDescriptor import isDescriptorPayload, markdown
 from ..uiValue import beginBlock, resetStore, setStoredValue
 
 
@@ -85,6 +85,7 @@ def runLocalWorker(
                         code=command["code"],
                         blockId=blockId,
                         injectedVars=command.get("injectedVars"),
+                        cellType=command.get("cellType", "code"),
                         registry=registry,
                         cellDefinitions=cellDefinitions,
                         executionCount=executionCount,
@@ -173,6 +174,7 @@ def _executeCommand(
     executionCount: int,
     targetCwd: Path | None,
     emitEvent,
+    cellType: str = "code",
 ) -> dict[str, Any]:
     cellScope: dict[str, object] = {
         "__builtins__": __builtins__,
@@ -204,6 +206,16 @@ def _executeCommand(
         if targetCwd is not None:
             os.chdir(targetCwd)
         importlib.invalidate_caches()
+
+        if cellType == "markdown":
+            # reactive markdown — 주입된 변수로 {var} 보간 후 마크다운→HTML 렌더.
+            interpolated = interpolateMarkdown(code, cellScope)
+            resultType = "markdown"
+            resultData = markdown(interpolated)
+            hasDisplay = True
+            return _buildMarkdownResponse(
+                resultData, registry, cellDefinitions, executionCount, beforeVariables, emitEvent
+            )
 
         tree = ast.parse(code)
         lastExpr = None
@@ -279,6 +291,22 @@ def _executeCommand(
             "outputType": resultType,
         },
     )
+    return response
+
+
+def _buildMarkdownResponse(
+    resultData: object,
+    registry: dict[str, object],
+    cellDefinitions: dict[str, set[str]],
+    executionCount: int,
+    beforeVariables: dict[str, Any],
+    emitEvent,
+) -> dict[str, Any]:
+    response = _buildStateResponse(registry, cellDefinitions, executionCount)
+    response["stateDelta"] = _buildVariableDelta(beforeVariables, response["variables"])
+    response.update({"type": "markdown", "data": resultData, "stdout": "", "stderr": "", "status": "done"})
+    emitEvent("display", {"outputType": "markdown", "data": resultData})
+    emitEvent("finished", {"status": "done", "outputType": "markdown"})
     return response
 
 

@@ -602,6 +602,10 @@ function DocumentBlock({
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
 
   if (block.type === "markdown") {
+    const markdownData = result?.data as { html?: unknown } | null | undefined;
+    const markdownHtml = markdownData && typeof markdownData.html === "string" ? markdownData.html : "";
+    // 미선택 + 렌더 결과가 있으면 미리보기, 선택하면 편집(클릭으로 전환).
+    const showPreview = !isSelected && Boolean(markdownHtml);
     return (
       <section className="group relative py-0.5 pl-6" data-notebook-cell="markdown">
         <CellMetaBar
@@ -617,16 +621,25 @@ function DocumentBlock({
         <div className="relative min-w-0">
           <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
           <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
-          <Textarea
-            className={cn(
-              "min-h-24 resize-y rounded-md bg-background font-sans text-sm leading-6 shadow-sm transition-colors",
-              isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
-            )}
-            placeholder="Markdown을 입력하세요."
-            value={draft}
-            onChange={(event) => onDraftChange(event.target.value)}
-            onFocus={onSelect}
-          />
+          {showPreview ? (
+            <div
+              className="prose prose-sm max-w-none cursor-text rounded-md border border-transparent px-2 py-1.5 hover:border-border"
+              data-notebook-markdown-preview="true"
+              onClick={onSelect}
+              dangerouslySetInnerHTML={{ __html: markdownHtml }}
+            />
+          ) : (
+            <Textarea
+              className={cn(
+                "min-h-24 resize-y rounded-md bg-background font-sans text-sm leading-6 shadow-sm transition-colors",
+                isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
+              )}
+              placeholder="Markdown을 입력하세요. {변수}로 값 보간."
+              value={draft}
+              onChange={(event) => onDraftChange(event.target.value)}
+              onFocus={onSelect}
+            />
+          )}
         </div>
       </section>
     );

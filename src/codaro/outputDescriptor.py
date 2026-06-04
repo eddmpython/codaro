@@ -68,10 +68,19 @@ def md(content: str) -> dict[str, Any]:
 
 
 def markdown(content: str) -> dict[str, Any]:
+    dedented = textwrap.dedent(content).strip("\n")
     return {
         "type": "markdown",
-        "content": textwrap.dedent(content).strip("\n"),
+        "content": dedented,
+        "html": _renderMarkdownHtml(dedented),
     }
+
+
+def _renderMarkdownHtml(content: str) -> str:
+    # 순수 Python 마크다운→HTML. LaTeX(KaTeX)는 후속.
+    import markdown as _markdown
+
+    return _markdown.markdown(content, extensions=["tables", "fenced_code", "sane_lists"])
 
 
 def html(content: str) -> dict[str, Any]:

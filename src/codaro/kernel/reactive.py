@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from ..document.analysis import analyzeCellBindings
+from ..document.analysis import analyzeCellBindings, analyzeMarkdownRefs
 from .protocol import ExecutionOutput
 from .session import KernelSession
 
@@ -34,10 +34,16 @@ def buildReactiveGraph(blocks: list[dict[str, Any]]) -> ReactiveGraph:
     graph = ReactiveGraph()
 
     for block in blocks:
-        if block.get("type") != "code":
+        blockType = block.get("type")
+        if blockType not in ("code", "markdown"):
             continue
         blockId = block["id"]
         content = block.get("content", "")
+        if blockType == "markdown":
+            # reactive markdown — {var} 보간 참조가 uses(정의는 없음). 변경 시 재렌더.
+            graph.nodes[blockId] = BlockNode(blockId=blockId, uses=analyzeMarkdownRefs(content))
+            graph.blockOrder.append(blockId)
+            continue
         binding = analyzeCellBindings(content)
         graph.nodes[blockId] = BlockNode(
             blockId=blockId,
@@ -283,7 +289,7 @@ async def executeReactive(
         graph = buildReactiveGraph(blocks)
     executionOrder = getReactiveOrder(graph, changedBlockId, includeSource=includeSource)
 
-    blockMap = {b["id"]: b for b in blocks if b.get("type") == "code"}
+    blockMap = {b["id"]: b for b in blocks if b.get("type") in ("code", "markdown")}
     results: list[ExecutionOutput] = []
 
     for blockId in executionOrder:
@@ -298,6 +304,7 @@ async def executeReactive(
             block["content"],
             blockId=blockId,
             injectedVars=injectedVars,
+            cellType=block.get("type", "code"),
             eventHandler=eventHandler,
         )
         results.append(result)

@@ -39,6 +39,7 @@ class KernelSession:
         code: str,
         blockId: str | None = None,
         injectedVars: list[str] | None = None,
+        cellType: str = "code",
         eventHandler: Callable[[ExecutionEvent], Awaitable[None]] | None = None,
     ) -> ExecutionOutput:
         engineEventHandler = None
@@ -50,6 +51,7 @@ class KernelSession:
             code,
             blockId=blockId,
             injectedVars=injectedVars,
+            cellType=cellType,
             eventHandler=engineEventHandler,
         )
         return ExecutionOutput(

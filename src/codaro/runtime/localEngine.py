@@ -66,6 +66,7 @@ class LocalEngine(ExecutionEngine):
         *,
         blockId: str | None = None,
         injectedVars: list[str] | None = None,
+        cellType: str = "code",
         eventHandler=None,
     ) -> ExecutionResult:
         loop = asyncio.get_running_loop()
@@ -95,6 +96,7 @@ class LocalEngine(ExecutionEngine):
                     code,
                     blockId,
                     injectedVars,
+                    cellType,
                     startInterruptCount,
                     emitEvent,
                 ),
@@ -328,6 +330,7 @@ class LocalEngine(ExecutionEngine):
         code: str,
         blockId: str | None,
         injectedVars: list[str] | None,
+        cellType: str,
         startInterruptCount: int,
         eventSink,
     ) -> dict[str, Any]:
@@ -339,6 +342,7 @@ class LocalEngine(ExecutionEngine):
                         "code": code,
                         "blockId": blockId,
                         "injectedVars": injectedVars,
+                        "cellType": cellType,
                     },
                     eventSink=eventSink,
                 )

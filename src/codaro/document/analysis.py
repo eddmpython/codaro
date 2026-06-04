@@ -1,7 +1,31 @@
 from __future__ import annotations
 
 import ast
+import re
 from dataclasses import dataclass, field
+
+
+# reactive markdown — `{var}` 보간 참조. `{{`/`}}`는 리터럴 중괄호 이스케이프.
+_MARKDOWN_REF = re.compile(r"\{\{|\}\}|\{([a-zA-Z_]\w*)\}")
+
+
+def analyzeMarkdownRefs(content: str) -> list[str]:
+    """마크다운 셀이 보간하는 `{var}` 변수명들을 반환한다(리액티브 의존 = uses)."""
+    return sorted({match.group(1) for match in _MARKDOWN_REF.finditer(content) if match.group(1)})
+
+
+def interpolateMarkdown(content: str, namespace: dict[str, object]) -> str:
+    """`{var}`를 namespace 값으로 치환하고 `{{`/`}}`는 리터럴로 푼다(모르는 이름은 그대로 둠)."""
+    def _replace(match: re.Match[str]) -> str:
+        token = match.group(0)
+        if token == "{{":
+            return "{"
+        if token == "}}":
+            return "}"
+        name = match.group(1)
+        return str(namespace[name]) if name in namespace else token
+
+    return _MARKDOWN_REF.sub(_replace, content)
 
 
 PYTHON_BUILTINS = {

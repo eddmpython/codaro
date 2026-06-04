@@ -151,18 +151,29 @@ function ContainerWidget({
   };
 
   switch (descriptor.type) {
-    case "markdown":
+    case "markdown": {
+      const html = (descriptor as { html?: unknown }).html;
+      const content = String((descriptor as { content?: unknown }).content ?? "");
+      if (typeof html === "string" && html) {
+        return (
+          <div
+            data-widget="markdown"
+            className="prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        );
+      }
+      return (
+        <div className="prose prose-sm max-w-none whitespace-pre-wrap text-sm leading-6" data-widget="markdown">
+          {content}
+        </div>
+      );
+    }
     case "text":
     case "plain": {
       const content = String((descriptor as { content?: unknown }).content ?? "");
       return (
-        <div
-          className={cn(
-            "whitespace-pre-wrap text-sm leading-6",
-            descriptor.type === "markdown" && "prose prose-sm max-w-none",
-          )}
-          data-widget={descriptor.type}
-        >
+        <div className="whitespace-pre-wrap text-sm leading-6" data-widget={descriptor.type}>
           {content}
         </div>
       );
