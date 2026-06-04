@@ -25,7 +25,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")
 
 from ..document.analysis import analyzeCode, interpolateMarkdown
 from ..errorGuard import safeRepr
-from ..outputDescriptor import isDescriptorPayload, markdown
+from ..outputDescriptor import StopExecution, isDescriptorPayload, markdown
 from ..uiValue import beginBlock, resetStore, setStoredValue
 
 
@@ -164,6 +164,37 @@ def _workerSend(connection, data: Any) -> None:
         raise
 
 
+# autoreload(lazy on-run) — 워킹 디렉터리 아래 사용자 모듈의 mtime을 기억해, 바뀌었으면 실행 직전 reload.
+_moduleStamps: dict[str, float] = {}
+
+
+def _reloadChangedUserModules(targetCwd: Path | None) -> None:
+    if targetCwd is None:
+        return
+    rootStr = str(targetCwd)
+    for name, module in list(sys.modules.items()):
+        if module is None or name == "__main__":
+            continue
+        # 프레임워크(codaro) 자체나 설치 패키지는 절대 reload하지 않는다 — 클래스 정체성·상태가 깨진다.
+        if name == "codaro" or name.startswith("codaro."):
+            continue
+        file = getattr(module, "__file__", None)
+        if not file:
+            continue
+        fileStr = str(file)
+        if not fileStr.startswith(rootStr) or "site-packages" in fileStr:
+            continue
+        try:
+            mtime = os.path.getmtime(file)
+        except OSError:
+            continue
+        previous = _moduleStamps.get(name)
+        _moduleStamps[name] = mtime
+        if previous is not None and previous != mtime:
+            # 사용자가 import한 로컬 모듈이 바뀜 → reload. 실패는 셀 실행 에러로 자연히 표면된다.
+            importlib.reload(module)
+
+
 def _executeCommand(
     *,
     code: str,
@@ -206,6 +237,7 @@ def _executeCommand(
         if targetCwd is not None:
             os.chdir(targetCwd)
         importlib.invalidate_caches()
+        _reloadChangedUserModules(targetCwd)
 
         if cellType == "markdown":
             # reactive markdown — 주입된 변수로 {var} 보간 후 마크다운→HTML 렌더.
@@ -245,14 +277,25 @@ def _executeCommand(
         resultType = "error"
         resultData = _formatSyntaxError(syntaxError)
         hasDisplay = True
-    except Exception:  # noqa: BLE001 — user code execution
-        resultStatus = "error"
-        resultType = "error"
-        resultData = traceback.format_exc()
-        hasDisplay = True
+    except Exception as exc:  # noqa: BLE001 — user code execution
+        # mo.stop — 의도된 조기 중단(에러 아님). spawn 워커는 outputDescriptor를 이중 로드해
+        # 클래스 정체성이 어긋날 수 있어 isinstance와 이름 둘 다로 식별한다.
+        if isinstance(exc, StopExecution) or type(exc).__name__ == "StopExecution":
+            resultStatus = "stopped"
+            output = getattr(exc, "output", None)
+            if output is not None:
+                resultType, resultData = _normalizeResult(output)
+                hasDisplay = True
+            else:
+                resultType, resultData = "text", ""
+        else:
+            resultStatus = "error"
+            resultType = "error"
+            resultData = traceback.format_exc()
+            hasDisplay = True
 
     effectiveBlockId = blockId or f"_anon_{executionCount}"
-    if resultStatus != "error":
+    if resultStatus not in ("error", "stopped"):
         _updateRegistry(
             blockId=effectiveBlockId,
             code=code,

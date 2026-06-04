@@ -24,6 +24,21 @@ DESCRIPTOR_TYPES = {
 }
 
 
+class StopExecution(Exception):
+    """`stop()`이 던지는 제어 흐름 예외. 워커는 이것을 에러보다 먼저 잡아 'stopped'로 처리한다
+    (spawn 워커에서 BaseException은 프로세스를 죽이므로 Exception 상속)."""
+
+    def __init__(self, output: object | None = None) -> None:
+        super().__init__()
+        self.output = output
+
+
+def stop(predicate: bool, output: object | None = None) -> None:
+    """predicate가 참이면 이 셀 실행을 중단한다(선택 output 표시, 다운스트림은 실행 안 함)."""
+    if predicate:
+        raise StopExecution(output)
+
+
 def custom(name: str, props: dict[str, Any] | None = None) -> dict[str, Any]:
     if not name or not isinstance(name, str):
         raise ValueError("custom component name must be a non-empty string")

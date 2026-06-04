@@ -308,7 +308,8 @@ async def executeReactive(
             eventHandler=eventHandler,
         )
         results.append(result)
-        if result.status == "error":
+        if result.status in ("error", "stopped"):
+            # mo.stop이거나 에러면 이 가지의 다운스트림은 실행하지 않는다(프루닝).
             break
 
     return results, executionOrder

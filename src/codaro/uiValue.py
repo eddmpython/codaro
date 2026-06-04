@@ -48,6 +48,25 @@ def resetStore() -> None:
     _counter = 0
 
 
+def state(value: Any) -> tuple[Any, Any]:
+    """셀 간 공유되는 반응형 상태. `(getter, setter)`를 돌려준다 — getter()는 현재 값,
+    setter(v)는 값을 갱신(또는 setter(updater)로 함수 적용)한다. 값은 UiValue와 같은 store에
+    위치 기반 안정 키로 영속해 셀 재실행에도 유지된다. getter를 쓰는 셀은 그 정의 셀에 의존한다.
+    """
+    key = nextElementId()
+    if key not in _store:
+        _store[key] = value
+
+    def getter() -> Any:
+        return _store.get(key, value)
+
+    def setter(update: Any) -> None:
+        current = _store.get(key, value)
+        _store[key] = update(current) if callable(update) else update
+
+    return getter, setter
+
+
 class UiValue:
     """변수에 담겨 리액티브 의존을 형성하는 위젯 값 객체. `.value`는 store에서 live로 읽는다.
 
