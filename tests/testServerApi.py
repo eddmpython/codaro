@@ -905,6 +905,11 @@ def testKernelWebSocketReactiveAndReset() -> None:
             "crossCellMutations": [],
             "staleBlockIds": [],
             "dependents": {"b1": ["b2"]},
+            "definedBy": {"x": ["b1"], "y": ["b2"]},
+            "nodes": [
+                {"blockId": "b1", "defines": ["x"], "uses": []},
+                {"blockId": "b2", "defines": ["y"], "uses": ["x"]},
+            ],
         }
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 

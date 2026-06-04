@@ -32,6 +32,8 @@ class KernelReactivePayload:
     crossCellMutations: tuple[tuple[str, str, str], ...] = ()
     staleBlockIds: tuple[str, ...] = ()
     dependents: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    definedBy: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    nodes: tuple[tuple[str, tuple[str, ...], tuple[str, ...]], ...] = ()
 
     @property
     def resultCount(self) -> int:
@@ -50,11 +52,22 @@ class KernelReactivePayload:
             "dependents": {blockId: list(downstream) for blockId, downstream in self.dependents},
         }
 
+    def _graphPayload(self) -> dict[str, Any]:
+        # 탐색 UI(변수 탐색기·의존성 그래프)용 그래프 데이터 — 변수→정의셀, 셀별 defines/uses.
+        return {
+            "definedBy": {var: list(cells) for var, cells in self.definedBy},
+            "nodes": [
+                {"blockId": blockId, "defines": list(defines), "uses": list(uses)}
+                for blockId, defines, uses in self.nodes
+            ],
+        }
+
     def httpPayload(self) -> dict[str, Any]:
         return {
             "results": [result.model_dump() for result in self.results],
             "executionOrder": list(self.executionOrder),
             **self._diagnosticsPayload(),
+            **self._graphPayload(),
         }
 
     def toolPayload(self) -> dict[str, Any]:
@@ -81,6 +94,7 @@ class KernelReactivePayload:
             "requestId": requestId,
             "executionOrder": list(self.executionOrder),
             **self._diagnosticsPayload(),
+            **self._graphPayload(),
         }
 
 
@@ -119,6 +133,11 @@ async def executeKernelReactive(
         for blockId in graph.blockOrder
         if graph.dependents.get(blockId)
     )
+    definedBy = tuple((var, tuple(cells)) for var, cells in graph.definedBy.items())
+    nodes = tuple(
+        (node.blockId, tuple(node.defines), tuple(node.uses))
+        for node in graph.nodes.values()
+    )
     return KernelReactivePayload(
         results=tuple(results),
         executionOrder=tuple(executionOrder),
@@ -128,6 +147,8 @@ async def executeKernelReactive(
         crossCellMutations=diagnostics.crossCellMutations,
         staleBlockIds=staleBlockIds,
         dependents=dependents,
+        definedBy=definedBy,
+        nodes=nodes,
     )
 
 

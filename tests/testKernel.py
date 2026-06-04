@@ -189,6 +189,11 @@ def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
         "crossCellMutations": [],
         "staleBlockIds": [],
         "dependents": {"b1": ["b2"]},
+        "definedBy": {"x": ["b1"], "y": ["b2"]},
+        "nodes": [
+            {"blockId": "b1", "defines": ["x"], "uses": []},
+            {"blockId": "b2", "defines": ["y"], "uses": ["x"]},
+        ],
     }
 
     toolPayload = payload.toolPayload()
