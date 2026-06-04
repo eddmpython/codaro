@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import tomllib
 import uuid
 from pathlib import Path
 
@@ -11,9 +12,52 @@ from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, Gu
 _CELL_MARKER = re.compile(r"^# %%\s*\[(\w+)\]\s*(.*)$")
 _APP_HEADER = re.compile(r"^# codaro:app\s+(.*)$")
 _KV_PAIR = re.compile(r'(\w+)=["\']([^"\']*)["\']|(\w+)=(\S+)')
+# PEP 723 인라인 스크립트 메타데이터 — `# /// script` ~ `# ///` 사이의 주석 줄이 TOML이다.
+_INLINE_SCRIPT = re.compile(r"(?m)^# /// script[ \t]*$\n(?P<content>(?:^#.*\n)*?)^# ///[ \t]*$\n?")
+
+
+def parseInlineScriptMetadata(source: str) -> dict | None:
+    """PEP 723 `# /// script` 블록을 TOML로 파싱해 반환한다(없으면 None)."""
+    match = _INLINE_SCRIPT.search(source)
+    if not match:
+        return None
+    tomlLines: list[str] = []
+    for line in match.group("content").splitlines():
+        if line.startswith("# "):
+            tomlLines.append(line[2:])
+        elif line == "#":
+            tomlLines.append("")
+    try:
+        return tomllib.loads("\n".join(tomlLines))
+    except tomllib.TOMLDecodeError:
+        return None
+
+
+def _packagesFromInlineMeta(meta: dict | None) -> list[str]:
+    if not meta:
+        return []
+    dependencies = meta.get("dependencies", [])
+    return [dep for dep in dependencies if isinstance(dep, str)]
+
+
+def writeInlineScriptMetadata(packages: list[str], requiresPython: str | None = None) -> str:
+    lines = ["# /// script"]
+    if requiresPython:
+        lines.append(f'# requires-python = "{requiresPython}"')
+    lines.append("# dependencies = [")
+    for pkg in packages:
+        lines.append(f'#     "{pkg}",')
+    lines.append("# ]")
+    lines.append("# ///")
+    return "\n".join(lines)
 
 
 def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroDocument:
+    # PEP 723 인라인 의존성을 먼저 떼어내 packages로 쓰고, 셀 파싱에서는 제외한다.
+    inlineMeta = parseInlineScriptMetadata(source)
+    if inlineMeta is not None:
+        source = _INLINE_SCRIPT.sub("", source, count=1)
+    inlinePackages = _packagesFromInlineMeta(inlineMeta)
     lines = source.splitlines()
     title = sourcePath.stem if sourcePath else "Untitled"
 
@@ -66,13 +110,18 @@ def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroD
         title=title,
         blocks=blocks,
         metadata=DocumentMetadata(sourceFormat="percent"),
-        runtime=RuntimeConfig(),
+        runtime=RuntimeConfig(packages=inlinePackages) if inlinePackages else RuntimeConfig(),
         app=AppConfig(title=title),
     )
 
 
 def writePercentDocument(document: CodaroDocument) -> str:
-    parts: list[str] = [f"# codaro:app title={document.title!r}", ""]
+    parts: list[str] = []
+    if document.runtime.packages:
+        # 선언 의존성을 PEP 723 블록으로 직렬화 → `uv run`/다른 도구도 읽을 수 있다(라운드트립).
+        parts.append(writeInlineScriptMetadata(list(document.runtime.packages)))
+        parts.append("")
+    parts.extend([f"# codaro:app title={document.title!r}", ""])
 
     for block in document.blocks:
         if block.type == "markdown":
