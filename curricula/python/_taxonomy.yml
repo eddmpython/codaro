@@ -517,6 +517,9 @@ outcomes:
   - id: automation.webApi.businessStatus
     label: 사업자등록 상태조회 자동화
     description: 국세청 공식 Open API(requests.post)로 휴폐업·과세유형 분류, 세금계산서 발행 차단 리스트 산출
+  - id: automation.webApi.businessDays
+    label: 공휴일·영업일 계산 자동화
+    description: 공공데이터 특일정보 Open API로 그 해 공휴일을 받아 datetime으로 영업일 판정·D+N 영업일·마감일 순연 계산
 
   # === LLM API 통합 ===
   - id: llm.intro
