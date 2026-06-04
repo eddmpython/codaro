@@ -314,3 +314,93 @@ sections:
     check:
       noError: atomicWriteWithCrash 중단이 잡혀서 끝나야 한다.
       resultCheck: survived가 "v1"으로 보존되고 임시 파일이 1개 남아야 한다.
+  - id: practice-state-updater
+    title: '종합 실습: 깨지지 않는 상태 파일'
+    structuredPrimary: true
+    subtitle: 원자적 쓰기로 반복 갱신
+    goal: 상태 파일을 원자적 쓰기로 반복 갱신할 때 최종 내용이 정확하고 임시 파일이 남지 않는지 종합 점검한다.
+    why: 주기적으로 status.json을 갱신하는 자동화가 임시 파일+os.replace로 어떻게 항상 완전한 상태를 유지하는지 확인한다.
+    explanation: |-
+      saveState는 임시 파일에 JSON을 전량 쓴 뒤 os.replace로 교체한다. 같은 경로를 두 번 갱신해도 매번 원자적으로 바뀌므로, 독자는 항상 step 1 또는 step 2의 완전한 상태만 본다.
+
+      성공적으로 교체되면 임시 파일은 남지 않는다. 최종 내용이 마지막으로 쓴 상태와 같고 .tmp가 0개면, 반복 갱신이 안전하게 동작한 것이다.
+    tips:
+      - 상태를 dict로 두고 JSON으로 직렬화하면 단계·플래그를 함께 담기 쉽다.
+      - 정상 교체 뒤 .tmp가 0개인지 보면 누수 없이 끝났는지 확인된다.
+    snippet: |-
+      import os
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def saveState(path, state):
+          tmpPath = str(path) + ".tmp"
+          Path(tmpPath).write_text(json.dumps(state), encoding="utf-8")
+          os.replace(tmpPath, path)
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "status.json"
+          saveState(path, {"step": 1, "ok": True})
+          saveState(path, {"step": 2, "ok": True})
+          loaded = json.loads(path.read_text(encoding="utf-8"))
+          leftover = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+      assert loaded == {"step": 2, "ok": True}
+      assert leftover == []
+      loaded["step"]
+    exercise:
+      prompt: 세 번째 갱신으로 step 3을 저장하면 최종 step과 남은 임시 파일 수가 각각 얼마인지 확인하세요.
+      starterCode: |-
+        import os
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def saveState(path, state):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(json.dumps(state), encoding="utf-8")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "status.json"
+            saveState(path, {"step": 1, "ok": True})
+            saveState(path, {"step": 2, "ok": True})
+            saveState(path, {"step": ___, "ok": True})
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            leftover = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+        assert loaded["step"] == 3
+        assert leftover == []
+        loaded["step"]
+      solution: |-
+        import os
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def saveState(path, state):
+            tmpPath = str(path) + ".tmp"
+            Path(tmpPath).write_text(json.dumps(state), encoding="utf-8")
+            os.replace(tmpPath, path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "status.json"
+            saveState(path, {"step": 1, "ok": True})
+            saveState(path, {"step": 2, "ok": True})
+            saveState(path, {"step": 3, "ok": True})
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            leftover = [name for name in os.listdir(tmp) if name.endswith(".tmp")]
+
+        assert loaded["step"] == 3
+        assert leftover == []
+        loaded["step"]
+      hints:
+        - 저장할 단계 값은 정수 3이다.
+        - 매 갱신이 원자적이라 .tmp는 0개로 남는다.
+      check:
+        type: noError
+        noError: 세 번의 saveState가 예외 없이 끝나야 한다.
+        resultCheck: 최종 step이 3이고 임시 파일이 0개여야 한다.
+    check:
+      noError: 반복 saveState가 끝나야 한다.
+      resultCheck: 최종 내용이 step 2이고 임시 파일이 0개여야 한다.

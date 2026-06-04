@@ -308,3 +308,111 @@ sections:
     check:
       noError: resumeBatch가 끝나야 한다.
       resultCheck: processedCount가 10, 전체가 1~10을 중복·누락 없이 담아야 한다.
+  - id: practice-crash-resume
+    title: '종합 실습: 죽고 다시 살아나는 배치'
+    structuredPrimary: true
+    subtitle: 중단 → 재개를 한 흐름으로
+    goal: 같은 체크포인트로 1차에 중간에 죽고 2차에 재개하는 배치가, 전체를 정확히 한 번씩 처리하는지 종합 점검한다.
+    why: 체크포인트 저장·중단 생존·재개를 한 흐름으로 묶어 장기 배치가 어떻게 무중단처럼 완주하는지 확인한다.
+    explanation: |-
+      processAll은 체크포인트(done 리스트)를 로드해 이미 처리한 항목은 건너뛰고, crashAt에 도달하면 멈춘다. 1차 실행은 6에서 죽어 1~5만 처리하고, 2차 실행은 체크포인트를 로드해 6부터 재개해 끝까지 간다.
+
+      두 번의 실행을 합치면 1~10이 정확히 한 번씩 처리된다. 죽었다 살아나도 처음부터 다시 돌지 않는다.
+    tips:
+      - done 집합을 매번 저장하면 어느 지점에서 죽어도 다음 실행이 이어받는다.
+      - 최종 done이 전체 범위와 같으면 무중단 실행과 결과가 동일하다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def processAll(items, checkpointPath, crashAt=None):
+          done = json.loads(checkpointPath.read_text(encoding="utf-8"))["done"] if checkpointPath.exists() else []
+          doneSet = set(done)
+          crashed = False
+          for n in items:
+              if n in doneSet:
+                  continue
+              if crashAt is not None and n == crashAt:
+                  crashed = True
+                  break
+              doneSet.add(n)
+              checkpointPath.write_text(json.dumps({"done": sorted(doneSet)}), encoding="utf-8")
+          return sorted(doneSet), crashed
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "cp.json"
+          firstDone, crashed1 = processAll(range(1, 11), path, crashAt=6)
+          finalDone, crashed2 = processAll(range(1, 11), path)
+
+      assert firstDone == [1, 2, 3, 4, 5]
+      assert crashed1 is True
+      assert finalDone == list(range(1, 11))
+      assert crashed2 is False
+      finalDone
+    exercise:
+      prompt: 1차 실행이 4에서 죽도록 crashAt을 바꾸면 1차 done이 어디까지인지 확인하세요(재개 후 최종은 그대로 1~10).
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def processAll(items, checkpointPath, crashAt=None):
+            done = json.loads(checkpointPath.read_text(encoding="utf-8"))["done"] if checkpointPath.exists() else []
+            doneSet = set(done)
+            crashed = False
+            for n in items:
+                if n in doneSet:
+                    continue
+                if crashAt is not None and n == crashAt:
+                    crashed = True
+                    break
+                doneSet.add(n)
+                checkpointPath.write_text(json.dumps({"done": sorted(doneSet)}), encoding="utf-8")
+            return sorted(doneSet), crashed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cp.json"
+            firstDone, crashed1 = processAll(range(1, 11), path, crashAt=___)
+            finalDone, crashed2 = processAll(range(1, 11), path)
+
+        assert firstDone == [1, 2, 3]
+        assert finalDone == list(range(1, 11))
+        finalDone
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def processAll(items, checkpointPath, crashAt=None):
+            done = json.loads(checkpointPath.read_text(encoding="utf-8"))["done"] if checkpointPath.exists() else []
+            doneSet = set(done)
+            crashed = False
+            for n in items:
+                if n in doneSet:
+                    continue
+                if crashAt is not None and n == crashAt:
+                    crashed = True
+                    break
+                doneSet.add(n)
+                checkpointPath.write_text(json.dumps({"done": sorted(doneSet)}), encoding="utf-8")
+            return sorted(doneSet), crashed
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cp.json"
+            firstDone, crashed1 = processAll(range(1, 11), path, crashAt=4)
+            finalDone, crashed2 = processAll(range(1, 11), path)
+
+        assert firstDone == [1, 2, 3]
+        assert finalDone == list(range(1, 11))
+        finalDone
+      hints:
+        - crashAt이 4이면 1, 2, 3까지 처리하고 4에서 죽는다.
+        - 재개가 4부터 이어받아 최종은 1~10이 된다.
+      check:
+        type: noError
+        noError: 1차·2차 processAll이 예외 없이 끝나야 한다.
+        resultCheck: 1차 done이 [1, 2, 3], 최종이 1~10이어야 한다.
+    check:
+      noError: 1차·2차 processAll이 끝나야 한다.
+      resultCheck: 최종 done이 1~10을 한 번씩 담아야 한다.

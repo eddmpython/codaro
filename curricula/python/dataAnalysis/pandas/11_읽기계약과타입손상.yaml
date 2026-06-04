@@ -225,3 +225,67 @@ sections:
     check:
       noError: 조인이 끝나야 한다.
       resultCheck: matchedRows가 3이고 손상된 키는 문자열로 안 맞아야 한다.
+  - id: practice-read-join-pipeline
+    title: '종합 실습: 읽기 계약을 지킨 집계'
+    structuredPrimary: true
+    subtitle: 안전한 읽기 → 조인 → 집계
+    goal: 읽기 계약으로 식별자를 보존해 읽고, 마스터와 조인한 뒤 이름별 금액을 집계하는 파이프라인을 종합 점검한다.
+    why: dtype 계약·조인·집계를 한 흐름으로 묶어, 손상 없이 읽은 데이터가 어떻게 올바른 리포트로 이어지는지 확인한다.
+    explanation: |-
+      거래 CSV를 dtype={"id": str}로 읽어 선행 0을 보존하고, 이름이 든 마스터와 id로 조인한 뒤 이름별 amount 합계를 구한다. 00123은 Alice(10+30=40), 00045는 Bob(20)이다.
+
+      읽는 순간 식별자를 지켰기 때문에 조인이 정상 매칭되고 집계가 올바르게 나온다. 한 곳에서 계약을 어기면 이 전체 파이프라인이 조용히 틀어진다.
+    tips:
+      - 식별자를 문자열로 읽는 한 줄이 조인·집계 전체의 정확성을 떠받친다.
+      - 집계 결과를 dict로 만들면 기대값과 바로 비교해 검증할 수 있다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\n00123,10\n00045,20\n00123,30\n"
+      master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+      df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+      merged = df.merge(master, on="id", how="inner")
+      totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+      assert totalByName == {"Alice": 40, "Bob": 20}
+      totalByName
+    exercise:
+      prompt: CSV에 "00045,5" 행을 한 줄 더 넣으면 Bob의 합계가 얼마가 되는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n00045,___\n"
+        master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        merged = df.merge(master, on="id", how="inner")
+        totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+        assert totalByName == {"Alice": 40, "Bob": 25}
+        totalByName
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\n00123,10\n00045,20\n00123,30\n00045,5\n"
+        master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        merged = df.merge(master, on="id", how="inner")
+        totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+        assert totalByName == {"Alice": 40, "Bob": 25}
+        totalByName
+      hints:
+        - 추가할 금액은 정수 5다.
+        - Bob은 20 + 5 = 25가 된다.
+      check:
+        type: noError
+        noError: 읽기·조인·집계가 예외 없이 끝나야 한다.
+        resultCheck: Bob의 합계가 25여야 한다.
+    check:
+      noError: 읽기·조인·집계 파이프라인이 끝나야 한다.
+      resultCheck: 이름별 합계가 Alice 40, Bob 20이어야 한다.

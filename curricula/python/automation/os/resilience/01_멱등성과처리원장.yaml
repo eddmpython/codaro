@@ -287,3 +287,104 @@ sections:
     check:
       noError: runBatch 두 번 호출이 끝나야 한다.
       resultCheck: summary가 sent 1, skipped 2여야 한다.
+  - id: practice-daily-batch
+    title: '종합 실습: 하루 두 번 도는 배치'
+    structuredPrimary: true
+    subtitle: 원장 + 멱등 처리를 한 흐름으로
+    goal: 같은 원장 파일로 아침·저녁 두 번 도는 배치가 고유 주문만 발송하고 중복은 흡수하는지 종합 점검한다.
+    why: 영속 원장·멱등 처리·재실행 안전을 한 번에 묶어 실제 업무 배치가 어떻게 안전해지는지 확인한다.
+    explanation: |-
+      dailyRun은 원장을 로드(없으면 빈 set)해 이미 처리한 주문은 건너뛰고 신규만 발송한 뒤 원장을 저장한다. 아침에 A·B·C 세 건이 들어오면 3건 발송, 저녁에 B·C·D·E가 들어오면 B·C는 원장에 있어 건너뛰고 D·E만 발송한다.
+
+      두 번의 실행을 합쳐도 발송은 고유 주문 5건뿐이다. 멱등성·원장·재실행 안전이 함께 작동한 결과다.
+    tips:
+      - 매 실행이 원장을 로드→처리→저장하므로 몇 번을 돌려도 누적 효과가 같다.
+      - 발송 건수 합이 고유 주문 수와 같으면 중복이 없다는 신호다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def dailyRun(orders, ledgerPath):
+          ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+          sent = 0
+          for key in orders:
+              if key in ledger:
+                  continue
+              sent += 1
+              ledger.add(key)
+          ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+          return sent
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "ledger.json"
+          morning = dailyRun(["A", "B", "C"], path)
+          evening = dailyRun(["B", "C", "D", "E"], path)
+          totalSent = morning + evening
+
+      assert morning == 3
+      assert evening == 2
+      assert totalSent == 5
+      totalSent
+    exercise:
+      prompt: 저녁 입력을 ["C", "D"]로 바꾸면 저녁 발송과 총 발송이 각각 몇 건인지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def dailyRun(orders, ledgerPath):
+            ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+            sent = 0
+            for key in orders:
+                if key in ledger:
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return sent
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            morning = dailyRun(["A", "B", "C"], path)
+            evening = dailyRun([___, ___], path)
+            totalSent = morning + evening
+
+        assert evening == 1
+        assert totalSent == 4
+        totalSent
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def dailyRun(orders, ledgerPath):
+            ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+            sent = 0
+            for key in orders:
+                if key in ledger:
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return sent
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            morning = dailyRun(["A", "B", "C"], path)
+            evening = dailyRun(["C", "D"], path)
+            totalSent = morning + evening
+
+        assert evening == 1
+        assert totalSent == 4
+        totalSent
+      hints:
+        - C는 아침에 이미 발송돼 원장에 있으므로 건너뛴다.
+        - D만 신규라 저녁 발송 1건, 총 4건이다.
+      check:
+        type: noError
+        noError: 두 번의 dailyRun이 예외 없이 끝나야 한다.
+        resultCheck: 저녁 발송 1건, 총 발송 4건이어야 한다.
+    check:
+      noError: 아침·저녁 dailyRun이 끝나야 한다.
+      resultCheck: 총 발송이 고유 주문 5건과 같아야 한다.
