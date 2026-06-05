@@ -60,6 +60,7 @@ def testGateNamesAreStable() -> None:
         "widget-bridge",
         "app-runtime",
         "mobile-layout",
+        "attempts",
     }
     assert runner.PREFLIGHT_GATES == (
         "root-clean",
