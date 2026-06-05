@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="내 PC와 동료 PC가 GitHub 원격 저장소를 통해 코드를 주고받는 흐름">
+  <rect x="0" y="0" width="760" height="300" rx="14" fill="#0f172a"/>
+  <text x="380" y="40" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#e2e8f0">코드는 GitHub을 거쳐 오간다</text>
+
+  <!-- 내 PC -->
+  <rect x="40" y="100" width="180" height="110" rx="12" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+  <text x="130" y="140" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#e2e8f0">내 PC</text>
+  <text x="130" y="166" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">로컬 Git</text>
+  <text x="130" y="186" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">저장소 사본</text>
+
+  <!-- GitHub -->
+  <rect x="290" y="90" width="180" height="130" rx="12" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+  <text x="380" y="135" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#e2e8f0">GitHub</text>
+  <text x="380" y="161" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">원격 저장소</text>
+  <text x="380" y="181" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">모두의 기준본</text>
+
+  <!-- 동료 PC -->
+  <rect x="540" y="100" width="180" height="110" rx="12" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+  <text x="630" y="140" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#e2e8f0">동료 PC</text>
+  <text x="630" y="166" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">로컬 Git</text>
+  <text x="630" y="186" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#94a3b8">저장소 사본</text>
+
+  <!-- 내 PC -> GitHub (push) -->
+  <line x1="220" y1="138" x2="285" y2="138" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="252" y="126" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#34d399">push</text>
+  <!-- GitHub -> 내 PC (pull) -->
+  <line x1="285" y1="172" x2="220" y2="172" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="252" y="192" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#22d3ee">pull</text>
+
+  <!-- GitHub -> 동료 (clone/pull) -->
+  <line x1="475" y1="138" x2="540" y2="138" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="508" y="126" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#22d3ee">clone / pull</text>
+  <!-- 동료 -> GitHub (push) -->
+  <line x1="540" y1="172" x2="475" y2="172" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="508" y="192" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#34d399">push</text>
+
+  <text x="380" y="262" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#cbd5e1">각자 PC에서 작업 → GitHub에 올리면(push) 모두가 최신본을 받는다(pull)</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

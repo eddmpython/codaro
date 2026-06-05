@@ -51,6 +51,7 @@ categoryMapping = {
     'inputCtl': '입력·GUI자동화',
     'llmBasics': 'LLM 통합 기초',
     'requests': 'requests REST API 자동화',
+    'devTools': '개발 도구 상식',
 }
 
 categoryMeta = {
@@ -294,6 +295,12 @@ categoryMeta = {
         'description': 'requests로 외부 API에서 데이터를 받아 가공·저장·통보하는 일일 자동화 파이프라인을 만든다',
         'imageUrl': None,
     },
+    'devTools': {
+        'icon': 'hub',
+        'color': 'slate',
+        'description': '코드를 짜기 전 알아야 할 개발 도구·용어를 그림과 비유로 이해하는 한 파일 읽기 자료',
+        'imageUrl': None,
+    },
 }
 
 categoryGroups = {
@@ -305,6 +312,7 @@ categoryGroups = {
     '자동화': ['playwright', 'requests', 'excel', 'openpyxl', 'xlwings', 'pdf', 'email', 'word', 'regex', 'practical', 'fileOps', 'procCtl', 'watchSched', 'resilience', 'inputCtl'],
     '이미지·비전': ['visionBasics', 'pillow', 'opencv', 'visionFeatures', 'deepVision', 'visionApps'],
     'AI 통합': ['llmBasics'],
+    '개발 교양': ['devTools'],
 }
 
 categoryTree = [
@@ -399,6 +407,13 @@ categoryTree = [
         'description': 'Claude API로 대화·도구·캐싱·구조화 출력을 실무 자동화 흐름에 붙인다.',
         'folder': 'aiIntegration',
         'categories': ['llmBasics'],
+    },
+    {
+        'id': 'dev-literacy',
+        'name': '개발 교양',
+        'description': '코드를 짜기 전 알아야 할 개발 세계의 지도 — 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.',
+        'folder': 'devLiteracy',
+        'categories': ['devTools'],
     },
 ]
 

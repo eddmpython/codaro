@@ -1,0 +1,186 @@
+meta:
+  id: devTools_00
+  title: GitHub 소개 — 깃헙이 무엇인지 그림으로 이해하기
+  order: 0
+  category: devTools
+  difficulty: ⭐
+  badge: 읽기
+  packages: []
+  tags:
+    - GitHub
+    - Git
+    - 버전관리
+    - 협업
+    - 개발교양
+  outcomes:
+    - devLiteracy.git
+    - devLiteracy.github
+  prerequisites: []
+  estimatedMinutes: 15
+  seo:
+    title: "GitHub 소개 — 깃헙이 무엇인지 그림과 비유로 이해하기"
+    description: "Git과 GitHub의 차이, 저장소·커밋·브랜치·풀 리퀘스트 같은 핵심 개념을 코드 없이 그림과 비유로 읽고 이해하는 한 파일 개발 교양 자료."
+    keywords:
+      - GitHub이란
+      - Git GitHub 차이
+      - 저장소 커밋 브랜치
+      - 풀 리퀘스트
+      - 버전 관리
+
+intro:
+  direction: "GitHub이 무엇이고 왜 거의 모든 개발자가 쓰는지, Git과 어떻게 다른지를 코드 실행 없이 그림과 비유로 읽고 이해한다. 마지막 핵심 정리 체크리스트로 스스로 설명할 수 있는지 확인한다."
+  benefits:
+    - "Git과 GitHub의 차이를 한 문장으로 설명할 수 있다 — 가장 흔한 입문 오개념을 먼저 푼다."
+    - "저장소·커밋·브랜치·풀 리퀘스트가 무엇인지 일상 비유로 구분할 수 있다."
+    - "코드를 한 줄도 치지 않고, 개념 지도만 머릿속에 그린 뒤 다음 실습 트랙으로 넘어간다."
+  diagram:
+    steps:
+      - label: "1. 버전 관리의 문제"
+        detail: "보고서_최종_진짜최종 처럼 파일명에 버전을 붙이던 방식이 협업에서 왜 무너지는지 본다."
+      - label: "2. Git이 푸는 것"
+        detail: "변경 이력을 스냅샷(커밋)으로 쌓고 갈래(브랜치)로 나누는 Git의 버전 관리 모델을 이해한다."
+      - label: "3. GitHub이 더하는 것"
+        detail: "로컬 Git을 인터넷의 원격 저장소로 올려 협업·리뷰·공개를 가능하게 하는 GitHub의 역할을 본다."
+      - label: "4. 협업 한 사이클"
+        detail: "clone·branch·commit·push·풀 리퀘스트·merge로 남의 코드에 기여하는 한 바퀴를 따라간다."
+    runtime:
+      - label: "읽기 전용 개념 카드"
+        detail: "이 자료는 코드 실행이 없는 개념 읽기 카드다. 그림·비교·비유로 GitHub의 큰 그림을 잡는다."
+      - label: "다음 행동 — git 실습"
+        detail: "개념을 잡았다면 이어지는 git 실습 트랙에서 로컬 터미널로 실제 commit·push를 쳐본다."
+
+sections:
+  - id: hook
+    title: "1. GitHub은 코드의 공유 플랫폼이다"
+    blocks:
+      - type: hero
+        title: "GitHub — 전 세계 개발자가 코드를 모으고 함께 고치는 곳"
+        subtitle: "코드용 구글 드라이브 + 협업 공간이라고 생각하면 가깝다"
+        points:
+          - emoji: "🌍"
+            title: "세계 최대 코드 저장소"
+            description: "수억 개의 프로젝트가 공개돼 있고, 회사 안팎의 협업이 여기서 일어난다."
+          - emoji: "🤝"
+            title: "혼자가 아니라 함께"
+            description: "남의 코드를 읽고, 고치고, 내 코드를 공개하고 기여받는 일이 표준이 됐다."
+          - emoji: "📜"
+            title: "모든 변경이 기록된다"
+            description: "누가 언제 무엇을 왜 바꿨는지가 전부 이력으로 남아 되돌릴 수 있다."
+
+  - id: git_vs_github
+    title: "2. Git과 GitHub은 다르다 — 1순위 오개념"
+    blocks:
+      - type: compare
+        title: "Git ≠ GitHub"
+        subtitle: "이 둘을 섞으면 이후 모든 설명이 헷갈린다"
+        left:
+          title: "Git"
+          subtitle: "내 컴퓨터에서 도는 프로그램"
+          icon: "💻"
+          items:
+            - "버전 관리 도구 자체 — 설치해서 쓰는 소프트웨어"
+            - "인터넷이 없어도 로컬에서 커밋·브랜치가 된다"
+            - "리누스 토르발스가 만든 오픈소스 명령어 도구"
+        right:
+          title: "GitHub"
+          subtitle: "Git 결과물을 올리는 웹 서비스"
+          icon: "🌐"
+          items:
+            - "Git 저장소를 인터넷에 올려두는 호스팅 플랫폼"
+            - "협업·리뷰·이슈·공개 같은 기능을 얹은 회사 서비스"
+            - "GitLab·Bitbucket 같은 경쟁 서비스도 있다"
+      - type: note
+        style: info
+        title: "한 줄 정리"
+        content: "Git은 '버전 관리 도구'(내 PC의 프로그램), GitHub은 'Git 저장소를 올려 협업하는 웹 서비스'다. Git 없이도 GitHub 웹은 볼 수 있고, GitHub 없이도 Git은 혼자 쓸 수 있다."
+
+  - id: core_concepts
+    title: "3. 핵심 개념 4개"
+    blocks:
+      - type: featureCards
+        title: "이 네 단어만 알면 절반은 끝"
+        cards:
+          - emoji: "📦"
+            title: "저장소 (Repository)"
+            description: "프로젝트 하나가 통째로 담기는 폴더. 코드·문서·이력이 다 들어간다."
+          - emoji: "📸"
+            title: "커밋 (Commit)"
+            description: "그 순간의 변경을 메시지와 함께 찍는 스냅샷. 되돌릴 수 있는 저장 지점."
+          - emoji: "🌿"
+            title: "브랜치 (Branch)"
+            description: "본줄기를 건드리지 않고 따로 작업하는 갈래. 실험·기능 개발용 평행 사본."
+          - emoji: "🔀"
+            title: "풀 리퀘스트 (PR)"
+            description: "내 브랜치 변경을 본줄기에 합쳐 달라는 제안 + 리뷰 요청."
+
+  - id: analogy
+    title: "4. 익숙한 것에 빗대 보기"
+    blocks:
+      - type: conceptRow
+        title: "GitHub 개념 ↔ 일상 비유"
+        description: "낯선 용어를 이미 아는 것에 붙이면 한 번에 잡힌다"
+        rows:
+          - emoji: "📦"
+            concept: "저장소(Repository)"
+            explain: "프로젝트 전용 폴더 한 개 — 그 안에 코드·문서·기록이 모두 들어 있는 작업 상자."
+            accent: cyan
+          - emoji: "📸"
+            concept: "커밋(Commit)"
+            explain: "게임의 세이브 포인트 — 언제든 그 지점으로 되돌아갈 수 있게 현재 상태를 저장한다."
+            accent: emerald
+          - emoji: "🌿"
+            concept: "브랜치(Branch)"
+            explain: "원본을 복사해 만든 평행 우주 — 마음껏 실험하다 좋으면 본 줄기에 합치고, 아니면 버린다."
+            accent: amber
+          - emoji: "☁️"
+            concept: "원격(Remote) / push·pull"
+            explain: "구글 드라이브에 올리고(push) 내려받기(pull) — 내 작업을 모두의 기준본과 맞춘다."
+            accent: sky
+
+  - id: flow
+    title: "5. 코드가 오가는 그림"
+    blocks:
+      - type: image
+        title: "내 PC ↔ GitHub ↔ 동료 PC"
+        src: "/curriculum/devTools/githubFlow.svg"
+        description: "각자 PC에서 작업한 뒤 GitHub에 올리면(push) 모두가 최신본을 받는다(pull). GitHub이 '모두의 기준본'을 보관하는 가운데 허브 역할을 한다."
+
+  - id: glossary
+    title: "6. 자주 보는 용어 8개"
+    blocks:
+      - type: table
+        title: "용어 → 뜻 → 비유"
+        headers: ["용어", "뜻", "한 줄 비유"]
+        rows:
+          - ["repository (repo)", "프로젝트가 담긴 저장소", "프로젝트 폴더"]
+          - ["commit", "변경을 기록한 스냅샷", "세이브 포인트"]
+          - ["branch", "독립 작업 갈래", "평행 우주 사본"]
+          - ["merge", "갈래를 본줄기에 합치기", "합본 만들기"]
+          - ["clone", "원격 저장소를 내 PC로 복제", "통째로 내려받기"]
+          - ["fork", "남의 저장소를 내 계정으로 복사", "내 사본 뜨기"]
+          - ["pull request (PR)", "변경을 합쳐 달라는 제안+리뷰", "수정 제안서"]
+          - ["issue", "할 일·버그·논의 기록표", "포스트잇 메모"]
+
+  - id: misconceptions
+    title: "7. 흔한 오해 바로잡기"
+    blocks:
+      - type: warning
+        title: "초심자가 자주 오해하는 3가지"
+        content: "① GitHub은 코드만 올린다? — 문서·이력서·블로그·발표자료도 많이 올린다. ② 공개하면 도둑맞는다? — 비공개(private) 저장소가 기본 제공되고, 공개는 선택이다. ③ 명령어를 다 외워야 한다? — GitHub Desktop·VS Code·웹 UI로 버튼만 눌러도 대부분 된다."
+
+  - id: summary
+    title: "8. 핵심 정리"
+    blocks:
+      - type: list
+        style: check
+        title: "이 다섯 줄을 스스로 설명할 수 있으면 충분하다"
+        items:
+          - "Git은 내 PC의 버전 관리 도구, GitHub은 그 결과를 올려 협업하는 웹 서비스다."
+          - "저장소는 프로젝트 폴더, 커밋은 되돌릴 수 있는 저장 지점이다."
+          - "브랜치로 따로 작업하고, 풀 리퀘스트로 합쳐 달라고 제안한다."
+          - "push로 올리고 pull로 내려받아 모두의 기준본과 맞춘다."
+          - "공식 문서는 [GitHub Docs](https://docs.github.com/ko)에서 한국어로 볼 수 있다."
+      - type: note
+        style: tip
+        title: "다음 단계"
+        content: "개념이 잡혔다면, 이어지는 git 실습 트랙에서 로컬 터미널로 실제 `git init`·`commit`·`push`를 직접 쳐보며 손에 익힌다. 읽기에서 멈추지 말고 한 번은 직접 해보는 게 가장 빠른 길이다."

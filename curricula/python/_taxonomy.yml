@@ -544,6 +544,14 @@ outcomes:
     label: 도구 사용
     description: 도구 정의, tool_use 루프, 결과 전달, 멀티 도구 라우팅
 
+  # === 개발 교양(읽기) ===
+  - id: devLiteracy.git
+    label: Git과 버전 관리 개념
+    description: 버전 관리가 푸는 문제, 커밋·브랜치 모델을 그림과 비유로 이해(읽기)
+  - id: devLiteracy.github
+    label: GitHub 플랫폼 개념
+    description: 원격 저장소·협업·PR 등 GitHub이 무엇이고 왜 쓰는지 이해(읽기)
+
 # 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
 domains:
   - id: dataReporting
