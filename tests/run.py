@@ -82,7 +82,19 @@ GATES: dict[str, Gate] = {
     "backend": Gate(
         tier="fast",
         description="Python backend 전체 테스트를 실행한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/", "-q", "--tb=short")),),
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+            "tests/", "--ignore=tests/_attempts", "-q", "--tb=short",
+        )),),
+    ),
+    "attempts": Gate(
+        tier="experiment",
+        description="운영과 분리된 tests/_attempts 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/_attempts", "-q", "--tb=short",
+        )),),
+        blocking=False,
+        ci_required=False,
     ),
     "architecture-boundary": Gate(
         tier="fast",
@@ -375,7 +387,7 @@ PRODUCT_QUALITY_GATES = (
     "landing-build",
     "launcher-test",
 )
-TIER_ORDER = ("fast", "surface", "release")
+TIER_ORDER = ("fast", "surface", "release", "experiment")
 
 
 def changedCyclePaths() -> tuple[str, ...]:
@@ -926,8 +938,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 36:
-        failures.append(f"expected 36 gates, found {len(GATES)}")
+    if len(GATES) != 37:
+        failures.append(f"expected 37 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

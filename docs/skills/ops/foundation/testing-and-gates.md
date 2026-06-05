@@ -58,6 +58,7 @@ uv run python -X utf8 tests/run.py gate launcher-test
 uv run python -X utf8 tests/run.py gate widget-bridge
 uv run python -X utf8 tests/run.py gate app-runtime
 uv run python -X utf8 tests/run.py gate mobile-layout
+uv run python -X utf8 tests/run.py gate attempts
 ```
 
 직접 `pytest tests/ -v`를 금지하지는 않는다. 다만 PR 전 확인, CI, 세션 종료 검증은 gate 이름으로 남긴다. 일반 작업 종료 검증은 `change-cycle`을 우선 사용하고, `quality-cycle`은 “서비스 출시 라벨”이 아니라 제품이 잘 만들어졌는지 보는 묶음 실행 단위다.
@@ -81,7 +82,8 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 | --- | --- | --- |
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
-| `backend` | fast | Python backend 전체 테스트를 실행한다. |
+| `backend` | fast | Python backend 전체 테스트를 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않는다. |
+| `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
 | `architecture-boundary` | fast | core→engine→domain→transport→entry 의존 방향과 router/domain 경계를 집중 확인한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
 | `teacher-e2e` | fast | scripted provider loop, provider error workloop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness와 9점 기준 score를 실행한다. |
@@ -119,6 +121,23 @@ uv run python -X utf8 tests/run.py gate mobile-layout
 `preflight`는 로컬 기본 확인이며 현재 `root-clean`, `docs`, `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`과 `teacher-e2e`는 빠른 집중 확인용으로 둔다.
 `change-cycle`은 현재 `HEAD` 대비 변경 파일과 untracked 파일을 보고 일반 작업 완료에 필요한 gate만 고른다. 항상 `root-clean`, `docs`를 먼저 실행하고, `src/`·`tests/` 변경은 `backend`, `editor/` 변경은 `editor-build`, `launcher/` 변경은 `launcher-check`와 `launcher-test`, `landing/` 변경은 `landing-build`, `curricula/` 변경은 `curriculum-quality-matrix`를 추가한다. 커리큘럼 전체 실행성, 브라우저 표면, 제품 품질 판정은 명시 gate나 `quality-cycle`에서 본다.
 `quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `root-clean` → `docs` → `backend` → `architecture-boundary` → `learning-system-readiness` → `dogfood-alpha-audit` → `product-quality-audit` → `automation-ide-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `curriculum-top-tier-audit` → `playwright-curriculum-runtime` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, 자동화, runtime, 설치/런처, 온보딩, 프론트 성능, architecture-boundary가 한 사이클에서 함께 버티는지 확인한다. 묶음 실행이 끝나면 runner는 통과한 gate 수, soft failure 수, gate별 duration summary, gate별 command log path/size/freshness, 현재 `gitHead`, `startedAt`/`completedAt`, 그리고 gate별 artifact freshness를 `output/test-runner/quality-cycle/sequence-summary.json`에 남긴다. `dogfood-alpha-audit`, `automation-ide-audit`, `diagnostic-summary-contract`, `ai-live-smoke`, `provider-settings-browser`, `install-launcher-smoke`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `curriculum-top-tier-audit`, `playwright-curriculum-runtime`, `onboarding-browser`, `frontend-performance-budget`처럼 report를 쓰는 gate는 summary 안에 artifact path, fresh 여부, `payloadGitHead`, `gitHeadMatches`, `payloadStatus`가 함께 들어가야 하며, report의 git head가 sequence head와 맞지 않으면 artifact failure로 sequence를 실패시킨다. `curriculum-quality-matrix`는 대표 structured sample report와 실제 전체 YAML flow report를 둘 다 artifact로 남기고, `curriculum-top-tier-audit`와 `playwright-curriculum-runtime`은 각각 최상위 설계 점수와 실제 Chromium 예제 실행 report를 남긴다. credential missing exit code 2는 `softFailure: true`와 `softFailureCount`로 기록하고 이후 gate를 계속 실행한다. 실제 provider 실패 exit code 1은 soft 처리하지 않고 sequence를 중단해야 한다. 이 summary는 제품 SSOT가 아니라 사람이 읽는 완료 증거다.
+
+## 테스트 트리
+
+`tests/`는 평면이 아니라 도메인 트리로 관리한다.
+
+- `tests/run.py` — gate runner 진입점(SSOT). 항상 루트에 둔다.
+- `tests/<domain>/test*.py` — 도메인별 pytest 스위트. `backend` gate가 재귀 수집한다.
+- `tests/verify*.py` · `tests/audit*.py` — `tests/run.py`가 이름이 아니라 **경로 리터럴로 직접 실행**하는 gate 드라이버. run.py와 강결합이라 루트에 둔다.
+- `tests/support/`, `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` — 여러 테스트가 import 하는 공유 인프라.
+- `tests/_attempts/` — **운영과 분리된 실험 샌드박스**. 아래 규칙 참조.
+
+## 실험 샌드박스 (`tests/_attempts/`)
+
+- 새 자동화 메커니즘(브라우저 무중단 객체 유지, OS 자동화 객체 상주 등)은 정식 gate에 박기 전에 `tests/_attempts/<카테고리>/`에서 먼저 프로토타이핑한다. 계약 SSOT는 `tests/_attempts/README.md`다.
+- `backend` gate(`pytest tests/`)는 `--ignore=tests/_attempts`로 이 디렉터리를 수집하지 않으므로 실험이 깨져도 preflight/CI는 흔들리지 않는다. `_attempts`는 `preflight`, `quality-cycle`, CI 어디에도 들어가지 않는다.
+- 실험을 돌려보려면 전용 비운영 gate `attempts`(`tier="experiment"`)를 쓴다. 이 tier는 `tests/run.py tier fast|surface|release` 스윕에도 포함되지 않는다.
+- 실험이 검증되면 메커니즘을 `src/codaro/`로 이식하고, 정식 회귀 테스트를 `tests/<domain>/`에 추가해 gate로 배선한 뒤, `_attempts/`의 실험 파일은 삭제한다. `_attempts/`는 누적 보관소가 아니라 회전 작업대다.
 
 ## 추가 규칙
 
