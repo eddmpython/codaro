@@ -118,14 +118,14 @@ def testArchitectureOverviewNamesLayerGateAndCurrentMapping() -> None:
         "`api/`, `webBuild/`",
         "`server.py`, `cli.py`",
         "`system/`은 현재 전환기 composition seam",
-        "`tests/testArchitectureLayerContract.py`",
-        "`tests/testTransportBoundary.py`",
+        "`tests/architecture/testArchitectureLayerContract.py`",
+        "`tests/architecture/testTransportBoundary.py`",
         "문서·테스트·제거 조건",
     ):
         assert expected in source
 
     assert "architecture layer contract" in ssotMap
-    assert "`docs/skills/architecture/overview.md`, `tests/testArchitectureLayerContract.py`" in ssotMap
+    assert "`docs/skills/architecture/overview.md`, `tests/architecture/testArchitectureLayerContract.py`" in ssotMap
     assert "`core → engine → domain → transport → entry`" in ssotMap
 
 
