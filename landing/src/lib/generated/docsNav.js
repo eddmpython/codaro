@@ -210,6 +210,21 @@ export const docsPages = [
     "contentModule": "pagef49c9e49c1de"
   },
   {
+    "path": "skills/architecture/curriculum-card-contract",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "curriculum-card-contract"
+    ],
+    "title": "Curriculum Card Contract",
+    "description": "커리큘럼 YAML sections[].blocks[]의 블록 type → displayKind/role/필수키 단일 계약(SSOT).",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 210,
+    "url": "/codaro/docs/skills/architecture/curriculum-card-contract",
+    "contentModule": "page5a01853799ad"
+  },
+  {
     "path": "skills/architecture/share-pack-distribution",
     "slugSegments": [
       "skills",
@@ -1171,6 +1186,21 @@ export const docsSections = [
         "order": 209,
         "url": "/codaro/docs/skills/architecture/live-provider-ops",
         "contentModule": "pagef49c9e49c1de"
+      },
+      {
+        "path": "skills/architecture/curriculum-card-contract",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "curriculum-card-contract"
+        ],
+        "title": "Curriculum Card Contract",
+        "description": "커리큘럼 YAML sections[].blocks[]의 블록 type → displayKind/role/필수키 단일 계약(SSOT).",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 210,
+        "url": "/codaro/docs/skills/architecture/curriculum-card-contract",
+        "contentModule": "page5a01853799ad"
       },
       {
         "path": "skills/architecture/share-pack-distribution",

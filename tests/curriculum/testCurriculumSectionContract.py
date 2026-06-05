@@ -11,7 +11,7 @@ from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.sectionContract import lessonContractFromYaml, sectionContractGaps
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CURRICULA_DIR = ROOT / "curricula" / "python"
 INSTALL_STAGE_PHRASES = (
     "설치 예제",

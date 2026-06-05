@@ -188,7 +188,7 @@ def testMasterPlanCarriesGoalResolution() -> None:
 
     clearResolutionCache()
     taxonomy = loadTaxonomy()
-    curriculaDir = Path(__file__).resolve().parent.parent / "curricula" / "python"
+    curriculaDir = Path(__file__).resolve().parent.parent.parent / "curricula" / "python"
     loader = StudyLoader(str(curriculaDir))
     graph = buildLessonGraph(loader, taxonomy)
     goal = PlanGoal(domain="dataExploration", projectIntent="판매 대시보드 만들기")
@@ -205,7 +205,7 @@ def testMasterPlanWithoutIntentLeavesResolutionNone() -> None:
     from pathlib import Path
 
     taxonomy = loadTaxonomy()
-    curriculaDir = Path(__file__).resolve().parent.parent / "curricula" / "python"
+    curriculaDir = Path(__file__).resolve().parent.parent.parent / "curricula" / "python"
     loader = StudyLoader(str(curriculaDir))
     graph = buildLessonGraph(loader, taxonomy)
     goal = PlanGoal(domain="dataExploration")

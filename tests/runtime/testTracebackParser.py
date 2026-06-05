@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-PARSER_PATH = Path(__file__).resolve().parents[1] / "editor" / "src" / "lib" / "tracebackParser.ts"
+PARSER_PATH = Path(__file__).resolve().parents[2] / "editor" / "src" / "lib" / "tracebackParser.ts"
 
 
 def testParserSourceDefinesExpectedFunctions() -> None:

@@ -121,7 +121,7 @@ AUTOMATION_REQUIREMENTS = (
                 "\"durationMs\": run.durationMs",
                 "captureDocument(",
             )),
-            ("tests/testAutomation.py", (
+            ("tests/automation/testAutomation.py", (
                 "test_e_stop_cancels_task_before_document_execution",
                 "TaskRunner",
                 "objective safety check",
@@ -153,7 +153,7 @@ AUTOMATION_REQUIREMENTS = (
                 "def resume",
                 "def cancel",
             )),
-            ("tests/testAutomationLoop.py", (
+            ("tests/automation/testAutomationLoop.py", (
                 "testLoopRetryOnFailure",
                 "testLoopAbortOnConsecutiveFailures",
                 "testLoopVerification",
@@ -249,7 +249,7 @@ AUTOMATION_REQUIREMENTS = (
         requirementId="automation-tool-and-input-policy",
         requirement="Automation tools and input policy cover guarded browser/OS interaction primitives.",
         evidenceChecks=(
-            ("tests/testAutomationTools.py", (
+            ("tests/automation/testAutomationTools.py", (
                 "testClickElementToolRegistered",
                 "testTypeTextToolRegistered",
                 "testPressHotkeyToolRegistered",
@@ -350,7 +350,7 @@ AUTOMATION_REQUIREMENTS = (
                 "write-automation-recipe",
                 "create-automation-task",
             )),
-            ("tests/testAiTools.py", (
+            ("tests/teacher/testAiTools.py", (
                 "test_write_automation_recipe_creates_file_and_automation_cell",
                 "test_create_automation_task_registers_dry_run_recipe",
                 "test_create_automation_task_rejects_missing_recipe",
@@ -361,7 +361,7 @@ AUTOMATION_REQUIREMENTS = (
                 "provider did not receive successful cell-call result before task registration",
                 "task registration did not preserve dry-run recipe validation",
             )),
-            ("tests/testTeacherArchitecture.py", (
+            ("tests/teacher/testTeacherArchitecture.py", (
                 "testAutomationRolePromptPromotesRecipeAuthoringLoop",
                 "testToolWorkDetailSummarizesAutomationAuthoring",
                 "automationTools[\"write-automation-recipe\"]",
@@ -372,7 +372,7 @@ AUTOMATION_REQUIREMENTS = (
                 "자동화 recipe 작성",
                 "자동화 태스크 등록",
             )),
-            ("tests/testAutomationAuthoring.py", (
+            ("tests/automation/testAutomationAuthoring.py", (
                 "testBuildAutomationRecipeDraftCreatesPercentFormatRecipe",
                 "testBuildAutomationTaskDraftNormalizesAndValidatesInputs",
                 "testBuildAutomationTaskDraftRejectsInvalidSchedule",

@@ -2,7 +2,7 @@ from pathlib import Path
 import ast
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 COMPATIBILITY_SHIMS = {
     "src/codaro/ai/teacherLoop.py": {

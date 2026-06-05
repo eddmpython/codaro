@@ -18,7 +18,7 @@ from codaro.curriculum.taxonomy import (
 )
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 CURRICULA_DIR = ROOT / "curricula" / "python"
 
 

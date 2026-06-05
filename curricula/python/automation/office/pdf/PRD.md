@@ -216,7 +216,7 @@ with tempfile.TemporaryDirectory() as tmp:
 - `__init__.py`에 `pdf` 카테고리 등록 (5곳).
 - `illustration.py` 카드 SVG (xlwings 패턴).
 - 각 yaml PRINCIPLES.md 체크리스트 통과.
-- `uv run python -X utf8 tests/run.py preflight` + `tests/testCurriculumOs.py` 통과.
+- `uv run python -X utf8 tests/run.py preflight` + `tests/curriculum/testCurriculumOs.py` 통과.
 
 ## 남은 결정사항 (00 작성 진입 시 확인)
 

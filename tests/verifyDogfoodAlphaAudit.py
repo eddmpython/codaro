@@ -128,14 +128,14 @@ DOGFOOD_REQUIREMENTS = (
                 "Only call write-curriculum-yaml when compose-master-plan shows a real gap",
                 "compose-master-plan이 기존 레슨으로 덮지 못하는 실제 gap",
             )),
-            ("tests/testTeacherArchitecture.py", (
+            ("tests/teacher/testTeacherArchitecture.py", (
                 "testTeacherSkillRegistryLocksGoalDiscoveryBeforeYamlAuthoring",
                 "resolve-learning-goal",
                 "search-curricula",
                 "compose-master-plan",
                 "authoring a duplicate lesson",
             )),
-            ("tests/testIntakePolicy.py", (
+            ("tests/automation/testIntakePolicy.py", (
                 "testActionDirectiveSteersTowardRecommendThenCompose",
                 "resolve-learning-goal",
                 "search-curricula",
@@ -195,7 +195,7 @@ DOGFOOD_REQUIREMENTS = (
                 "translate(\"provider.connectionRequired.title\")",
                 "translate(\"assistant.providerLoginRequired\")",
             )),
-            ("tests/testFrontendBoundary.py", (
+            ("tests/surface/testFrontendBoundary.py", (
                 "testAssistantTurnUsesLocalFallbackBeforeProviderWhenProfileIsNotReady",
                 "providerFallbackIndex < providerCallIndex",
             )),
@@ -212,7 +212,7 @@ DOGFOOD_REQUIREMENTS = (
                 "if (hasAutomationAuthoringIntent(normalized)) return \"automation\"",
                 "dry-?run",
             )),
-            ("tests/testFrontendBoundary.py", (
+            ("tests/surface/testFrontendBoundary.py", (
                 "testTeacherScopeSeparatesAutomationLearningFromAutomationAuthoring",
                 "hasLearningIntent(normalized)",
                 "hasAutomationAuthoringIntent(normalized)",

@@ -40,7 +40,7 @@ UI surfaces (MasterPlanPanel + MasteryPanel + TodayReviewsCard + AnalyticsPanel)
 새 레슨을 만들 때 권장 순서:
 1. 필요한 outcome/domain이 없으면 `_taxonomy.yml`에 먼저 추가
 2. 레슨 YAML `meta`에 `outcomes`/`prerequisites`/`estimatedMinutes` 적기 (권장) 또는 `lessonOutcomes`에 등록
-3. `tests/testCurriculumOs.py`가 그래프 무결성을 검증
+3. `tests/curriculum/testCurriculumOs.py`가 그래프 무결성을 검증
 
 ## planComposer 알고리즘
 
@@ -142,7 +142,7 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 
 ## 무결성 게이트
 
-`tests/testCurriculumOs.py`에 24개 케이스:
+`tests/curriculum/testCurriculumOs.py`에 24개 케이스:
 - 모든 domain.targetOutcomes가 outcome 카탈로그에 존재
 - 모든 lessonOutcomes의 outcomes/prerequisites가 카탈로그에 존재
 - 레슨 메타의 outcomes가 taxonomy backfill보다 우선

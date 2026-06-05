@@ -65,7 +65,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/components/curriculum/curriculumDependencyPanel.tsx` | 현재 레슨의 `meta.packages` 기반 라이브러리 준비 패널. 패키지 확인/누락 설치/터미널 명령 열기 UI를 소유하고, 커리큘럼 섹션 렌더러는 이 패널을 호출만 한다 |
 | `editor/src/components/app/curriculumSidebarTree.tsx` | 현재 학습 tree ownership |
 | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 tree ownership |
-| `tests/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
+| `tests/surface/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
 | `tests/verifyDogfoodAlphaAudit.py` | provider 연결부터 학습 요청, 카드, 셀 실행, 실패 복구까지 dogfood evidence gate |
 
 ## 덕지덕지 위험과 제거 기준

@@ -10,7 +10,7 @@
 # 새 레슨을 만들 때:
 # 1) outcomes/domains에 없는 능력/목표가 필요하면 여기에 먼저 등록.
 # 2) 레슨 meta에 outcomes/prerequisites/estimatedMinutes 등록(권장) 또는 lessonOutcomes에 등록.
-# 3) tests/testCurriculumOs.py가 그래프 무결성을 검증한다.
+# 3) tests/curriculum/testCurriculumOs.py가 그래프 무결성을 검증한다.
 
 outcomes:
   # === Python 기초 ===

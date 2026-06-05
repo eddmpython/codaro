@@ -108,8 +108,8 @@ GATES: dict[str, Gate] = {
                 "utf8",
                 "-m",
                 "pytest",
-                "tests/testArchitectureLayerContract.py",
-                "tests/testTransportBoundary.py",
+                "tests/architecture/testArchitectureLayerContract.py",
+                "tests/architecture/testTransportBoundary.py",
                 "-q",
                 "--tb=short",
             )),
@@ -120,8 +120,8 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="Python ui descriptor + 콜백 registry + traceback parser + widget TS 타입 동기 + React round-trip + chromium E2E.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/testWidgetBridge.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/testTracebackParser.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/testWidgetBridge.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testTracebackParser.py")),
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genWidgetTypes.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyWidgetBridgeRoundTrip.py")),
             command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightAppRuntime.py")),
@@ -131,9 +131,9 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="App 라이프사이클 hook, 포트 회피, 사용자 정의 컴포넌트, teacher tool registry, OAuth refresh, dogfood.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/testAppRuntime.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/testTeacherToolBridge.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/testOauthTokenRefresh.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testAppRuntime.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testTeacherToolBridge.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testOauthTokenRefresh.py")),
             command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightDogfood.py")),
         ),
     ),
@@ -141,7 +141,7 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="PWA manifest, service worker, viewport meta, 모바일 hook + chromium viewport 회귀.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/testMobileShell.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/testMobileShell.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyMobileLayout.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyPwaArtifacts.py")),
             command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightMobile.py")),
@@ -150,7 +150,7 @@ GATES: dict[str, Gate] = {
     "teacher-eval": Gate(
         tier="fast",
         description="teacher tool policy, trace, golden eval 계약을 빠르게 확인한다.",
-        commands=(command(("uv", "run", "pytest", "tests/testTeacherArchitecture.py", "-q", "--tb=short")),),
+        commands=(command(("uv", "run", "pytest", "tests/teacher/testTeacherArchitecture.py", "-q", "--tb=short")),),
         ci_required=False,
     ),
     "teacher-e2e": Gate(
@@ -213,7 +213,7 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="local diagnostic summary가 실패 범주와 secret redaction 계약을 지키는지 확인한다.",
         commands=(
-            command(("uv", "run", "pytest", "tests/testDiagnosticSummary.py", "-q", "--tb=short")),
+            command(("uv", "run", "pytest", "tests/teacher/testDiagnosticSummary.py", "-q", "--tb=short")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyDiagnosticSummaryContract.py")),
         ),
         ci_required=False,
@@ -231,7 +231,7 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="runtime worker crash, package preflight, cell 실행 실패 복구 계약을 확인한다.",
         commands=(
-            command(("uv", "run", "pytest", "tests/testRuntime.py", "-q", "--tb=short")),
+            command(("uv", "run", "pytest", "tests/runtime/testRuntime.py", "-q", "--tb=short")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyEditorRuntimePreflight.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyRuntimeRecoveryContract.py")),
         ),

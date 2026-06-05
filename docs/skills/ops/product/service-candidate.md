@@ -75,7 +75,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ## 아키텍처 경계
 
-제품 품질은 기능 완성만으로 판단하지 않는다. `architecture-boundary`는 `core→engine→domain→transport→entry` 방향과 router/domain 경계를 독립 gate로 고정한다. 이 gate는 `tests/testArchitectureLayerContract.py`와 `tests/testTransportBoundary.py`를 묶어 document/runtime/provider/frontend 경계가 다시 router나 화면 안으로 덕지덕지 흡수되지 않는지 본다. backend 전체 테스트 안에 묻힌 통과 결과만으로는 아키텍처 10점 판단 증거로 충분하지 않다.
+제품 품질은 기능 완성만으로 판단하지 않는다. `architecture-boundary`는 `core→engine→domain→transport→entry` 방향과 router/domain 경계를 독립 gate로 고정한다. 이 gate는 `tests/architecture/testArchitectureLayerContract.py`와 `tests/architecture/testTransportBoundary.py`를 묶어 document/runtime/provider/frontend 경계가 다시 router나 화면 안으로 덕지덕지 흡수되지 않는지 본다. backend 전체 테스트 안에 묻힌 통과 결과만으로는 아키텍처 10점 판단 증거로 충분하지 않다.
 
 ## 자동화 IDE 품질
 

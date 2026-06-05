@@ -127,7 +127,7 @@ CHECKS = (
         ),
     ),
     (
-        "tests/testDiagnosticSummary.py",
+        "tests/teacher/testDiagnosticSummary.py",
         (
             "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
             "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
@@ -143,7 +143,7 @@ CHECKS = (
         ),
     ),
     (
-        "tests/testServerApi.py",
+        "tests/runtime/testServerApi.py",
         (
             "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
             "testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload",

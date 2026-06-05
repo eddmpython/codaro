@@ -139,12 +139,12 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "`packages-check`, `packages-install`: 실행 전 라이브러리 확인과 uv 설치",
                     "`sections[].blocks[]`는 기존 curriculum 변환용이다",
                 )),
-                ("tests/testTeacherArchitecture.py", (
+                ("tests/teacher/testTeacherArchitecture.py", (
                     "testLearningSpecInstructionsPromoteStructuredSectionYaml",
                     "create-learning-card: explanation + fill-blank card",
                     "sections, and blocks",
                 )),
-                ("tests/testAiTools.py", (
+                ("tests/teacher/testAiTools.py", (
                     "test_legacy_learning_card_tool_does_not_compete_with_section_card_lessons",
                 )),
             ),
@@ -469,7 +469,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "provider 응답 처리 중단",
                     "provider-loop",
                 )),
-                ("tests/testTeacherArchitecture.py", (
+                ("tests/teacher/testTeacherArchitecture.py", (
                     "testProviderStreamReportsToolLoopProviderErrorsInTrace",
                     "provider broken after tool",
                 )),
@@ -610,7 +610,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "provider-tool-result-max-chars",
                     "PROVIDER_TOOL_RESULT_SIGNAL_KEYS",
                 )),
-                ("tests/testTeacherArchitecture.py", (
+                ("tests/teacher/testTeacherArchitecture.py", (
                     "testProviderLoopBoundsLargeToolResultMessages",
                     "roundResult.toolResults[0][\"result\"]",
                     "\"truncatedReason\"",

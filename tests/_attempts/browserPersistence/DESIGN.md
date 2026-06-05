@@ -188,7 +188,7 @@ class SessionHandle:            # 라이브 in-memory 자원 (직렬화 X)
   `testAutomationTaskFlow...` 클론) + 라우터가 payload만 부르고 driver 심볼은 안 부르는지
   가드 추가.
 - `automation-ide-audit`(min 9.0, needle 기반): `AutomationRequirement("automation-persistent-session", ...)`
-  신설 — 라우터 경로/`sessionFlow` payload/`SessionRegistry`/모델 클래스/`tests/testAutomationSession.py`
+  신설 — 라우터 경로/`sessionFlow` payload/`SessionRegistry`/모델 클래스/`tests/automation/testAutomationSession.py`
   needle. **반드시 구현과 같은 변경에서** 추가(앞서 추가하면 needle 미존재로 score<9.0).
   `ssot-map.md`·`service-candidate.md`도 같이.
 

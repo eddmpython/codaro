@@ -49,7 +49,7 @@ EVIDENCE = (
     ),
     Evidence(
         "backend-runtime-tests",
-        "tests/testRuntime.py",
+        "tests/runtime/testRuntime.py",
         (
             "testLocalEngineImportErrorDoesNotCrashWorker",
             "testLocalEngineWorkerCrashMessageSaysRestarted",

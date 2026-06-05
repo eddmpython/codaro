@@ -135,7 +135,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "artifact failure",
                 "실제 provider 실패 exit code 1은 hard failure",
             )),
-            ("tests/testRunEntrypoint.py", (
+            ("tests/runtime/testRunEntrypoint.py", (
                 *tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES),
                 "PRODUCT_QUALITY_GATES",
                 "testGateSequenceRecordsArtifactPayloadMetadata",
@@ -151,16 +151,16 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         evidenceChecks=(
             ("tests/run.py", (
                 "\"architecture-boundary\"",
-                "tests/testArchitectureLayerContract.py",
-                "tests/testTransportBoundary.py",
+                "tests/architecture/testArchitectureLayerContract.py",
+                "tests/architecture/testTransportBoundary.py",
                 "core→engine→domain→transport→entry",
             )),
-            ("tests/testArchitectureLayerContract.py", (
+            ("tests/architecture/testArchitectureLayerContract.py", (
                 "testCodaroPackageImportsFollowLayerDirection",
                 "FORBIDDEN_IMPORTS_BY_PACKAGE",
                 "`core → engine → domain → transport → entry`",
             )),
-            ("tests/testTransportBoundary.py", (
+            ("tests/architecture/testTransportBoundary.py", (
                 "testAiRouterKeepsRuntimeAndCurriculumBehindTeacherBoundary",
                 "testTeacherLoopCompatibilityShimStaysThinAndUnusedInternally",
                 "testServerStateFactoryLivesOutsideTransportLayer",
@@ -168,8 +168,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("docs/skills/architecture/overview.md", (
                 "`core → engine → domain → transport → entry`",
-                "`tests/testArchitectureLayerContract.py`",
-                "`tests/testTransportBoundary.py`",
+                "`tests/architecture/testArchitectureLayerContract.py`",
+                "`tests/architecture/testTransportBoundary.py`",
             )),
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "`architecture-boundary`",
@@ -226,7 +226,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "cell-call",
                 "라이브러리 준비 실패",
             )),
-            ("tests/run.py", ("tests/verifyRuntimeRecoveryContract.py", "tests/verifyEditorRuntimePreflight.py", "tests/testRuntime.py")),
+            ("tests/run.py", ("tests/verifyRuntimeRecoveryContract.py", "tests/verifyEditorRuntimePreflight.py", "tests/runtime/testRuntime.py")),
         ),
     ),
     ProductQualityRequirement(
@@ -243,7 +243,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "이전 tool result가 다음 turn의 tool policy state를 통과시키면 실패",
                 "이전 실패 result가 새 성공 turn의 toolCalls/trace/workloop payload에 섞이면 실패",
             )),
-            ("tests/testTeacherArchitecture.py", (
+            ("tests/teacher/testTeacherArchitecture.py", (
                 "testProviderLoopDoesNotReusePriorToolResultsForNextTurnPolicy",
                 "testProviderLoopKeepsRetryTurnTraceSeparateAfterFailedPreflight",
                 "call-check-1",
@@ -546,7 +546,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "buildDiagnosticSummary",
                 "buildDiagnosticExport",
             )),
-            ("tests/testDiagnosticSummary.py", (
+            ("tests/teacher/testDiagnosticSummary.py", (
                 "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
                 "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
                 "testDiagnosticRedactionPreservesSafeSecretConfiguredState",
@@ -557,7 +557,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "summaryText",
                 "readableActions",
             )),
-            ("tests/testServerApi.py", (
+            ("tests/runtime/testServerApi.py", (
                 "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
                 "testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload",
                 "/api/system/diagnostics",
@@ -626,7 +626,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("tests/run.py", (
                 "\"diagnostic-summary-contract\"",
-                "tests/testDiagnosticSummary.py",
+                "tests/teacher/testDiagnosticSummary.py",
                 "tests/verifyDiagnosticSummaryContract.py",
                 "output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",
             )),
@@ -681,7 +681,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "composeGapCount",
                 "redactSignalText",
             )),
-            ("tests/testAiLiveSmoke.py", (
+            ("tests/teacher/testAiLiveSmoke.py", (
                 "testCredentialMissingPayloadIncludesProviderDiagnostic",
                 "testFailedCasePayloadUsesProviderDiagnostic",
                 "testWriteLiveSmokeReportPersistsBoundedPayload",
@@ -691,12 +691,12 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "provider_network_error",
                 "configure-api-key",
             )),
-            ("tests/testAiProvider.py", (
+            ("tests/teacher/testAiProvider.py", (
                 "test_oauth_body_bridges_tool_results_as_user_text",
                 "[tool_result id=call-check]",
                 "previous_response_id",
             )),
-            ("tests/testTeacherArchitecture.py", (
+            ("tests/teacher/testTeacherArchitecture.py", (
                 "testProviderToolResultSerializationGuidesCellCallAfterReadyPackageCheck",
                 "codaroToolPolicy",
                 "codaroNextRequiredTool",
@@ -761,7 +761,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "TMPDIR",
                 "scratch",
             )),
-            ("tests/testRunEntrypoint.py", (
+            ("tests/runtime/testRunEntrypoint.py", (
                 "testUvWithCommandsUseRepoLocalCache",
                 "testRunCommandWritesRepoLocalFailureLog",
                 "testRunCommandTimesOutWithLog",

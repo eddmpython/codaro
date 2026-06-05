@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SMOKE_PATH = ROOT / "tests" / "verifyAiLiveSmoke.py"
 
 

@@ -205,7 +205,7 @@ PDF/Email 트랙과 동일 + S급 추가:
 - `_taxonomy.yml`에 outcomes 10개(automation.word.*) + domain `documentAutomation` 등록.
 - `__init__.py`에 `word` 카테고리 등록 (5곳).
 - `illustration.py` 카드 SVG.
-- `tests/run.py preflight` + `tests/testCurriculumOs.py` 통과.
+- `tests/run.py preflight` + `tests/curriculum/testCurriculumOs.py` 통과.
 
 ## 남은 결정사항
 

@@ -14,7 +14,7 @@ from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 CURRICULA_DIR = ROOT / "curricula" / "python"
 
 

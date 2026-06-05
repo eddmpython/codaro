@@ -76,7 +76,7 @@ src/codaro/
 | `src/codaro/ai/teacherLoop.py` | `codaro.ai.teacher` | 예전 context/tool lifecycle import 호환 | 외부 호출자가 대체 import로 이동하고 다음 minor release에서 전환 경로를 문서화한 뒤 |
 | `src/codaro/api/appState.py` | `codaro.system.serverState` | 예전 server state import 호환 | 외부 호출자가 대체 import로 이동하고 다음 minor release에서 전환 경로를 문서화한 뒤 |
 
-각 shim은 모듈 docstring에 역할, 대체 import, 제거 조건을 적고, `tests/testTransportBoundary.py`의 `COMPATIBILITY_SHIMS` 계약으로 public export와 금지 내부 구현을 검사한다.
+각 shim은 모듈 docstring에 역할, 대체 import, 제거 조건을 적고, `tests/architecture/testTransportBoundary.py`의 `COMPATIBILITY_SHIMS` 계약으로 public export와 금지 내부 구현을 검사한다.
 
 ## 계층 import gate
 
@@ -92,7 +92,7 @@ src/codaro/
 
 `system/`은 현재 전환기 composition seam이다. `serverState.py`는 runtime/domain concrete wiring을 소유할 수 있지만, `api/`를 import하거나 router 판단을 흡수하면 실패다. 이 예외는 영구 설계가 아니라 목표 트리로 이동할 때 줄일 제거 대상이다.
 
-일반 import 방향은 `tests/testArchitectureLayerContract.py`가 검사하고, router별 세부 경계는 `tests/testTransportBoundary.py`가 검사한다. 새 모듈이 생기면 먼저 이 매핑에서 위치를 정하고, 예외가 필요하면 문서·테스트·제거 조건을 같은 변경에서 갱신한다.
+일반 import 방향은 `tests/architecture/testArchitectureLayerContract.py`가 검사하고, router별 세부 경계는 `tests/architecture/testTransportBoundary.py`가 검사한다. 새 모듈이 생기면 먼저 이 매핑에서 위치를 정하고, 예외가 필요하면 문서·테스트·제거 조건을 같은 변경에서 갱신한다.
 
 ## 관련
 

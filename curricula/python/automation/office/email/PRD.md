@@ -215,7 +215,7 @@ PDF 트랙과 동일 + 추가 (S급 기준):
 - `_taxonomy.yml`에 outcomes 9개(automation.email.*) + domain `emailAutomation` 등록.
 - `__init__.py`에 `email` 카테고리 등록 (5곳).
 - `illustration.py` 카드 SVG.
-- `tests/run.py preflight` + `tests/testCurriculumOs.py` 통과.
+- `tests/run.py preflight` + `tests/curriculum/testCurriculumOs.py` 통과.
 
 ## 남은 결정사항
 

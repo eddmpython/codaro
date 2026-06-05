@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 EDITOR_SRC = ROOT / "editor" / "src"
 
 
@@ -258,7 +258,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "패키지 확인/누락 설치/터미널 명령 열기",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
-        "`tests/testProductSurfaceContract.py`",
+        "`tests/surface/testProductSurfaceContract.py`",
         "`tests/verifyDogfoodAlphaAudit.py`",
         "`PRODUCT_SURFACE_NAV`",
         "`PRODUCT_SIDEBAR_NAV`",
