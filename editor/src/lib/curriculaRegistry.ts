@@ -242,6 +242,7 @@ const categoryGroups: Record<string, string[]> = {
   "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
   "자동화": ["playwright", "excel", "regex", "practical", "fileOps", "procCtl", "watchSched", "resilience", "inputCtl"],
   "이미지·비전": ["visionBasics", "pillow", "opencv", "visionFeatures", "deepVision", "visionApps"],
+  "개발 교양": ["devTools"],
 };
 
 const categoryTree: CurriculumCategoryTreeNode[] = [
@@ -311,6 +312,12 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
     name: "이미지·비전",
     description: "픽셀 기초부터 사전학습 딥러닝 모델, 실전 응용까지 이미지 비전 전 영역을 다룬다.",
     categories: ["visionBasics", "pillow", "opencv", "visionFeatures", "deepVision", "visionApps"],
+  },
+  {
+    id: "dev-literacy",
+    name: "개발 교양",
+    description: "코드를 짜기 전 알아야 할 개발 세계의 지도 — 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.",
+    categories: ["devTools"],
   },
 ];
 
@@ -731,6 +738,18 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
     })];
   }
 
+  if (sourceType === "conceptRow") {
+    const rows = arrayOfMaps(block.rows ?? block.items ?? block.cards);
+    return [markdownBlock({
+      content: formatConceptRows(rows, title || blockTypeLabel(sourceType), subtitle || description),
+      displayKind: "conceptRow",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, rows },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
   return [markdownBlock({
     content: [displayTitle ? `### ${displayTitle}` : "", subtitle, description, content || textFromUnknownBlock(block)].filter(Boolean).join("\n\n"),
     displayKind: "prose",
@@ -1138,6 +1157,17 @@ function formatCardList(cards: YamlMap[], fallbackTitle: string) {
   ].join("\n\n");
 }
 
+function formatConceptRows(rows: YamlMap[], fallbackTitle: string, intro: string) {
+  const lines = [`### ${fallbackTitle}`];
+  if (intro) lines.push(intro);
+  for (const row of rows) {
+    const concept = [textValue(row.emoji ?? row.icon), textValue(row.concept ?? row.title ?? row.label ?? row.term)].filter(Boolean).join(" ");
+    const explain = textValue(row.explain ?? row.explanation ?? row.description ?? row.analogy ?? row.content);
+    lines.push([`#### ${concept || "개념"}`, explain].filter(Boolean).join("\n"));
+  }
+  return lines.join("\n\n");
+}
+
 function formatCompare(left: YamlMap, right: YamlMap, fallbackTitle: string) {
   const formatSide = (label: string, side: YamlMap) => [
     `#### ${[textValue(side.icon), textValue(side.title) || label].filter(Boolean).join(" ")}`,
@@ -1286,6 +1316,7 @@ function blockTypeLabel(type: string) {
     centerText: "중앙 설명",
     choiceCards: "선택 카드",
     codeDescription: "코드 설명",
+    conceptRow: "개념 설명",
     featureCards: "핵심 카드",
     fullWidthComparison: "비교",
     hero: "대표 설명",

@@ -36,4 +36,5 @@ export const cellDisplayKinds = [
   "practice",
   "quiz",
   "centerText",
+  "conceptRow",
 ] as const;

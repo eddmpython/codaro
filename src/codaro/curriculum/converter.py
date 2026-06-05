@@ -28,6 +28,7 @@ COMPARE_TYPES = {"compare", "fullWidthComparison"}
 MEDIA_TYPES = {"image", "video", "youtube", "videoCarousel", "pdf", "MIME"}
 LINK_TYPES = {"link", "links", "linkButtons"}
 CALLOUT_TYPES = {"tip", "tipCard", "note", "info", "warning", "codeDescription"}
+CONCEPT_ROW_TYPES = {"conceptRow"}
 
 
 def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[CodaroDocument, dict[str, str]]:
@@ -367,6 +368,19 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
             )
         ]
 
+    if sourceType in CONCEPT_ROW_TYPES:
+        rows = _firstMaps(block, "rows", "items", "cards")
+        return [
+            _markdownBlock(
+                _formatConceptRows(rows, title or _blockTypeLabel(sourceType), intro=subtitle or description),
+                displayKind="conceptRow",
+                role="visual",
+                sourceType=sourceType,
+                title=title or _blockTypeLabel(sourceType),
+                payload=_payload(block, sourceType),
+            )
+        ]
+
     return [
         _markdownBlock(
             "\n\n".join(item for item in [f"### {title}" if title else "", subtitle, description, content or _textFromUnknownBlock(block)] if item),
@@ -672,6 +686,24 @@ def _formatCompare(block: dict[str, Any], fallbackTitle: str) -> str:
     return "\n\n".join([f"### {fallbackTitle}", *sides])
 
 
+def _formatConceptRows(rows: list[dict[str, Any]], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    for row in rows:
+        concept = " ".join(
+            item
+            for item in [
+                _textValue(row.get("emoji") or row.get("icon")),
+                _textValue(row.get("concept") or row.get("title") or row.get("label") or row.get("term")),
+            ]
+            if item
+        )
+        explain = _textValue(row.get("explain") or row.get("explanation") or row.get("description") or row.get("analogy") or row.get("content"))
+        lines.append("\n".join(item for item in [f"#### {concept or 'Concept'}", explain] if item))
+    return "\n\n".join(lines)
+
+
 def _formatMedia(block: dict[str, Any], sourceType: str, title: str, subtitle: str, description: str) -> str:
     src = _textValue(
         block.get("src")
@@ -870,6 +902,7 @@ def _blockTypeLabel(sourceType: str) -> str:
         "centerText": "Center Text",
         "choiceCards": "Choice Cards",
         "codeDescription": "Code Description",
+        "conceptRow": "개념 설명",
         "featureCards": "Feature Cards",
         "fullWidthComparison": "Comparison",
         "hero": "Hero",

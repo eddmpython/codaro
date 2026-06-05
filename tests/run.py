@@ -238,6 +238,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumFlowQuality.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumWorkflowArchitecture.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCardContract.py")),
         ),
         ci_required=False,
     ),

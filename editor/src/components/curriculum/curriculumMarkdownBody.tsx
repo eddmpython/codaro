@@ -27,6 +27,7 @@ import {
 } from "@/lib/cellModel";
 import { cn } from "@/lib/utils";
 import type { BlockConfig } from "@/types";
+import type { ReactNode } from "react";
 
 export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { block: BlockConfig; hideRepeatedTitle?: boolean }) {
   const payload = payloadMap(block.payload);
@@ -221,6 +222,10 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
         </div>
       </div>
     );
+  }
+
+  if (displayKind === "conceptRow") {
+    return <ConceptRowCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
   }
 
   return (
@@ -636,6 +641,54 @@ function LearningValuePanel({ index, item }: { index: number; item: Record<strin
   );
 }
 
+const CONCEPT_ACCENTS: Record<string, { frame: string; icon: string }> = {
+  cyan: { frame: "border-cyan-400/25 bg-cyan-400/5", icon: "bg-cyan-400/10 text-cyan-300" },
+  amber: { frame: "border-amber-400/25 bg-amber-400/5", icon: "bg-amber-400/10 text-amber-300" },
+  emerald: { frame: "border-emerald-400/25 bg-emerald-400/5", icon: "bg-emerald-400/10 text-emerald-300" },
+  rose: { frame: "border-rose-400/25 bg-rose-400/5", icon: "bg-rose-400/10 text-rose-300" },
+  sky: { frame: "border-sky-400/25 bg-sky-400/5", icon: "bg-sky-400/10 text-sky-300" },
+};
+
+// 수평 설명카드 — 한 행 = 개념(좌) ↔ 비유/예시 + 선택 이미지(우). 공간 인접·듀얼코딩.
+function ConceptRowCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const rows = payloadItems(payload, "rows").length ? payloadItems(payload, "rows") : payloadItems(payload, "items");
+  const title = payloadText(payload, "title") || block.title || "";
+  const subtitle = payloadText(payload, "description") || payloadText(payload, "subtitle");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      {rows.length ? (
+        <div className="space-y-2">
+          {rows.map((row, index) => <ConceptRowItem index={index} key={`${payloadText(row, "concept")}-${index}`} row={row} />)}
+        </div>
+      ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
+    </div>
+  );
+}
+
+function ConceptRowItem({ index, row }: { index: number; row: Record<string, unknown> }) {
+  const concept = payloadText(row, "concept") || payloadText(row, "title") || payloadText(row, "term") || payloadText(row, "label") || "개념";
+  const explain = payloadText(row, "explain") || payloadText(row, "explanation") || payloadText(row, "analogy") || payloadText(row, "description") || payloadText(row, "content");
+  const emoji = payloadText(row, "emoji") || payloadText(row, "icon");
+  const image = payloadText(row, "image") || payloadText(row, "src");
+  const accent = payloadText(row, "accent");
+  const tone = CONCEPT_ACCENTS[accent] ?? panelTone(index);
+  return (
+    <div className={cn("grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[1fr_1.4fr] md:items-center", tone.frame)}>
+      <div className="flex items-center gap-2">
+        <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md text-xs", tone.icon)}>
+          {emoji || <Sparkles className="size-3.5" />}
+        </span>
+        <div className="min-w-0 text-sm font-semibold">{stripMarkdown(concept)}</div>
+      </div>
+      <div className="min-w-0 text-sm leading-6 text-muted-foreground">
+        {explain ? <div>{renderInline(explain)}</div> : null}
+        {image ? <div className="mt-2"><VisualAsset src={image} title={concept} /></div> : null}
+      </div>
+    </div>
+  );
+}
+
 function DetailList({
   items,
   label,
@@ -778,7 +831,7 @@ function MediaCell({ block, payload, repeatedTitle }: { block: BlockConfig; payl
   const description = payloadText(payload, "description") || payloadText(payload, "subtitle");
   const items = payloadItems(payload, "items");
 
-  if (sourceType === "image" && src) {
+  if ((sourceType === "image" || sourceType === "video" || sourceType === "youtube") && src) {
     return (
       <div className="space-y-3">
         <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={description} />
@@ -834,6 +887,44 @@ function MediaResourceCard({ index, item }: { index: number; item: Record<string
   );
 }
 
+function isSafeHref(href: string) {
+  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("/");
+}
+
+// 마크다운 인라인 링크 [label](url)를 클릭 가능한 <a>로. 링크 외 텍스트는 stripMarkdown으로 정리.
+// href는 스킴 화이트리스트(http/https/선두 /)만 앵커 — javascript:/data: 등은 평문으로 떨군다(XSS 차단).
+function renderInline(text: string): ReactNode {
+  const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts: ReactNode[] = [];
+  let lastIndex = 0;
+  let key = 0;
+  let match: RegExpExecArray | null;
+  while ((match = linkRe.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(stripMarkdown(text.slice(lastIndex, match.index)));
+    const label = match[1];
+    const href = match[2].trim();
+    if (isSafeHref(href)) {
+      const external = !href.startsWith("/");
+      parts.push(
+        <a
+          className="text-cyan-400 underline underline-offset-2 hover:text-cyan-300"
+          href={href}
+          key={`lnk-${key++}`}
+          rel={external ? "noopener noreferrer" : undefined}
+          target={external ? "_blank" : undefined}
+        >
+          {label}
+        </a>,
+      );
+    } else {
+      parts.push(`${label} ${href}`);
+    }
+    lastIndex = linkRe.lastIndex;
+  }
+  if (lastIndex < text.length) parts.push(stripMarkdown(text.slice(lastIndex)));
+  return parts.length ? parts : stripMarkdown(text);
+}
+
 function MarkdownBlock({ content, dedupeTitle = "" }: { content: string; dedupeTitle?: string }) {
   const lines = dedupeRepeatedLines(normalizeRichText(content).split("\n"), dedupeTitle);
   return (
@@ -852,14 +943,14 @@ function MarkdownBlock({ content, dedupeTitle = "" }: { content: string; dedupeT
         if (line.startsWith("> ")) {
           return (
             <div className="rounded-md border-l-2 border-cyan-400/50 bg-cyan-400/5 px-3 py-2 text-muted-foreground" key={key}>
-              {stripMarkdown(line.slice(2))}
+              {renderInline(line.slice(2))}
             </div>
           );
         }
-        if (line.startsWith("- ")) return <div className="rounded-md bg-muted/20 px-3 py-1.5 text-muted-foreground" key={key}>- {stripMarkdown(line.slice(2))}</div>;
-        if (/^\d+\.\s+/.test(line)) return <div className="rounded-md bg-muted/20 px-3 py-1.5 text-muted-foreground" key={key}>{stripMarkdown(line)}</div>;
+        if (line.startsWith("- ")) return <div className="rounded-md bg-muted/20 px-3 py-1.5 text-muted-foreground" key={key}>- {renderInline(line.slice(2))}</div>;
+        if (/^\d+\.\s+/.test(line)) return <div className="rounded-md bg-muted/20 px-3 py-1.5 text-muted-foreground" key={key}>{renderInline(line)}</div>;
         if (line.trim().startsWith("|")) return <ScrollableInlineText key={key} text={line} />;
-        return <p className="text-muted-foreground" key={key}>{stripMarkdown(line)}</p>;
+        return <p className="text-muted-foreground" key={key}>{renderInline(line)}</p>;
       })}
     </div>
   );
@@ -907,20 +998,53 @@ function VisualAsset({ src, title }: { src: string; title: string }) {
     );
   }
 
-  const isVideo = /\.(mp4|webm|mov)$/i.test(src);
-  const Icon = isVideo ? MonitorPlay : ImageIcon;
+  if (/\.(mp4|webm|mov)(\?.*)?$/i.test(src)) {
+    return (
+      <div className="overflow-hidden rounded-md border bg-muted/20">
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video className="max-h-96 w-full" controls preload="metadata" src={resolveAssetSrc(src)} />
+      </div>
+    );
+  }
 
+  const youtubeId = extractYoutubeId(src);
+  if (youtubeId) {
+    return (
+      <div className="overflow-hidden rounded-md border bg-muted/20">
+        <iframe
+          allow="encrypted-media; picture-in-picture"
+          className="aspect-video w-full"
+          referrerPolicy="strict-origin-when-cross-origin"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+          title={title || "YouTube"}
+        />
+      </div>
+    );
+  }
+
+  const Icon = /\.(mp4|webm|mov)/i.test(src) ? MonitorPlay : ImageIcon;
   return (
     <div className="flex items-center gap-3 rounded-md border bg-muted/20 px-3 py-3">
       <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground">
         <Icon className="size-4" />
       </span>
       <div className="min-w-0">
-        <div className="text-sm font-medium">{isVideo ? "영상 자료" : "이미지 자료"}</div>
+        <div className="text-sm font-medium">자료</div>
         <div className="mt-1 truncate font-mono text-xs text-muted-foreground">{src}</div>
       </div>
     </div>
   );
+}
+
+function extractYoutubeId(src: string) {
+  if (!src) return "";
+  const match = src.match(
+    /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/|youtube-nocookie\.com\/embed\/)([A-Za-z0-9_-]{11})/,
+  );
+  if (match) return match[1];
+  if (/^[A-Za-z0-9_-]{11}$/.test(src)) return src;
+  return "";
 }
 
 function isRenderableImageSrc(src: string) {
