@@ -246,6 +246,60 @@ AUTOMATION_REQUIREMENTS = (
         ),
     ),
     AutomationRequirement(
+        requirementId="automation-persistent-session",
+        requirement="Persistent automation sessions keep a live browser/OS object across task boundaries, E-Stop guarded and audited, behind the automation flow boundary.",
+        evidenceChecks=(
+            ("src/codaro/api/automationRouter.py", (
+                "/api/automation/sessions",
+                "/api/automation/sessions/{sessionId}/step",
+                "openAutomationSessionPayload",
+                "runAutomationSessionStepPayload",
+                "closeAutomationSessionPayload",
+            )),
+            ("src/codaro/automation/sessionFlow.py", (
+                "openAutomationSessionPayload",
+                "listAutomationSessionsPayload",
+                "getAutomationSessionStatePayload",
+                "runAutomationSessionStepPayload",
+                "closeAutomationSessionPayload",
+                "AutomationSessionFlowError",
+            )),
+            ("src/codaro/automation/session/sessionRegistry.py", (
+                "class SessionRegistry",
+                "getSessionRegistry",
+                "getEmergencyStop().check()",
+                "getAuditTrail().record(",
+                "BUSY",
+            )),
+            ("src/codaro/automation/session/persistentSession.py", (
+                "class PersistentSession",
+                "run_coroutine_threadsafe",
+                "asyncio.wrap_future",
+                "run_forever",
+            )),
+            ("src/codaro/automation/session/sessionModel.py", (
+                "class SessionDefinition",
+                "class SessionHandle",
+                "class SessionStepRecord",
+                "SessionStatus",
+                "SessionKind",
+            )),
+            ("tests/automation/testAutomationSession.py", (
+                "testRegistryReusesLiveObjectAcrossSteps",
+                "testEstopBlocksStepButKeepsHandleLive",
+                "testFlowOpenStepCloseWithStubBrowser",
+                "StubBrowser.instances == 1",
+            )),
+        ),
+        forbiddenChecks=(
+            ("src/codaro/api/automationRouter.py", (
+                "SessionRegistry",
+                "getSessionRegistry",
+                "PersistentSession",
+            )),
+        ),
+    ),
+    AutomationRequirement(
         requirementId="automation-tool-and-input-policy",
         requirement="Automation tools and input policy cover guarded browser/OS interaction primitives.",
         evidenceChecks=(

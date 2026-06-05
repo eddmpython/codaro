@@ -1,8 +1,10 @@
 # 무중단 자동화 객체 lifecycle 설계 (3-렌즈 토론 합성)
 
-> 상태: **R&D 설계 합의** — 아직 운영 코드 아님. `tests/_attempts/` 계약에 따라
-> 검증되면 `src/codaro/automation/`으로 승격하고 이 문서의 핵심을
-> `docs/skills/architecture/`로 옮긴 뒤 여기 실험은 삭제한다.
+> 상태: **P1 구현 완료** — `src/codaro/automation/session/`(model/persistentSession/browserDriver/
+> registry) + `sessionFlow.py` + `automationRouter` 5라우트 + `tests/automation/testAutomationSession.py`
+> + 경계 테스트 + `automation-persistent-session` audit 요구사항이 운영에 반영됨. P2(AI tool),
+> P3(DESKTOP)은 §9 로드맵 참조. 이 문서는 P3 완료까지 설계 SSOT 로 유지하고, 완료 후 핵심을
+> `docs/skills/architecture/`로 옮긴다.
 >
 > 세 전문 렌즈(async 런타임 / 엔진·도메인 통합 / AI tool 인체공학)가 독립적으로
 > 같은 코어에 수렴했다. 아래는 그 합성 + 충돌 해소다.

@@ -765,6 +765,35 @@ def testAutomationTaskFlowDoesNotImportTransportLayer() -> None:
     assert "HTTPException" not in source
 
 
+def testAutomationSessionFlowDoesNotImportTransportLayer() -> None:
+    source = (ROOT / "src/codaro/automation/sessionFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
+
+
+def testAutomationRouterKeepsSessionRegistryBehindAutomationBoundary() -> None:
+    source = (ROOT / "src/codaro/api/automationRouter.py").read_text(encoding="utf-8")
+
+    assert "openAutomationSessionPayload" in source
+    assert "listAutomationSessionsPayload" in source
+    assert "getAutomationSessionStatePayload" in source
+    assert "runAutomationSessionStepPayload" in source
+    assert "closeAutomationSessionPayload" in source
+    assert "SessionRegistry" not in source
+    assert "getSessionRegistry" not in source
+    assert "PersistentSession" not in source
+    assert "createBrowserDriver" not in source
+    assert "run_coroutine_threadsafe" not in source
+
+
 def testAutomationPlanFlowDoesNotImportTransportLayer() -> None:
     source = (ROOT / "src/codaro/automation/planFlow.py").read_text(encoding="utf-8")
     tree = ast.parse(source)

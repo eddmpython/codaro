@@ -59,6 +59,14 @@ from ..automation.voiceFlow import (
     parseAutomationVoiceCommandPayload,
     speakAutomationVoicePayload,
 )
+from ..automation.sessionFlow import (
+    AutomationSessionFlowError,
+    closeAutomationSessionPayload,
+    getAutomationSessionStatePayload,
+    listAutomationSessionsPayload,
+    openAutomationSessionPayload,
+    runAutomationSessionStepPayload,
+)
 from ..automation.workflowFlow import (
     AutomationWorkflowFlowError,
     createAutomationWorkflowPayload,
@@ -106,6 +114,17 @@ class CreateWorkflowRequest(BaseModel):
     steps: list[dict[str, Any]]
 
 
+class OpenSessionRequest(BaseModel):
+    kind: str = "browser"
+    name: str = ""
+    options: dict[str, Any] | None = None
+
+
+class RunSessionStepRequest(BaseModel):
+    action: str
+    params: dict[str, Any] | None = None
+
+
 def createAutomationRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
@@ -125,6 +144,9 @@ def createAutomationRouter(state: Any) -> APIRouter:
         raise HTTPException(status_code=error.statusCode, detail=error.message)
 
     def failAutomationNotificationFlow(error: AutomationNotificationFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAutomationSessionFlow(error: AutomationSessionFlowError) -> None:
         raise HTTPException(status_code=error.statusCode, detail=error.message)
 
     @router.get("/api/tasks")
@@ -229,6 +251,38 @@ def createAutomationRouter(state: Any) -> APIRouter:
     @router.get("/api/scheduler/status")
     def apiSchedulerStatus():
         return automationSchedulerStatusPayload()
+
+    @router.get("/api/automation/sessions")
+    def apiListSessions():
+        return listAutomationSessionsPayload()
+
+    @router.post("/api/automation/sessions")
+    async def apiOpenSession(req: OpenSessionRequest):
+        try:
+            return await openAutomationSessionPayload(kind=req.kind, name=req.name, options=req.options)
+        except AutomationSessionFlowError as error:
+            failAutomationSessionFlow(error)
+
+    @router.get("/api/automation/sessions/{sessionId}")
+    async def apiGetSession(sessionId: str):
+        try:
+            return await getAutomationSessionStatePayload(sessionId)
+        except AutomationSessionFlowError as error:
+            failAutomationSessionFlow(error)
+
+    @router.post("/api/automation/sessions/{sessionId}/step")
+    async def apiRunSessionStep(sessionId: str, req: RunSessionStepRequest):
+        try:
+            return await runAutomationSessionStepPayload(sessionId, action=req.action, params=req.params)
+        except AutomationSessionFlowError as error:
+            failAutomationSessionFlow(error)
+
+    @router.delete("/api/automation/sessions/{sessionId}")
+    async def apiCloseSession(sessionId: str):
+        try:
+            return await closeAutomationSessionPayload(sessionId)
+        except AutomationSessionFlowError as error:
+            failAutomationSessionFlow(error)
 
     @router.post("/api/webhooks/trigger/{taskId}")
     async def apiWebhookTrigger(taskId: str, request: Request):
