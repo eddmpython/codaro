@@ -7,7 +7,7 @@
 
 이 모듈이 블록 type → displayKind/role/필수키의 **단일 SSOT**다.
 - `converter.py`의 분기 로직은 이 레지스트리를 따른다(문서 미러: docs/skills/architecture/curriculum-card-contract.md).
-- `tests/verifyCardContract.py`가 전 커리큘럼을 walk하며 `validateCardBlock`로 type 오타·필수키
+- `tests/curriculum/verifyCardContract.py`가 전 커리큘럼을 walk하며 `validateCardBlock`로 type 오타·필수키
   누락을 머신 게이트로 차단한다.
 
 강제 수위는 의도적으로 경량이다(allowlist + 필수키만). 선택/미지 키는 검사하지 않아 작성

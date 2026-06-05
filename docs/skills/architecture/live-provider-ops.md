@@ -131,8 +131,8 @@ Live 응답은 deterministic하지 않으므로 exact text를 비교하지 않�
 
 ## 관련 파일
 
-- `tests/verifyAiLiveSmoke.py`
-- `tests/verifyProviderSettingsPlaywright.py`
+- `tests/teacher/verifyAiLiveSmoke.py`
+- `tests/surface/verifyProviderSettingsPlaywright.py`
 - `src/codaro/ai/providers/oauthChatgptProvider.py`
 - `src/codaro/ai/oauthFlow.py`
 - `src/codaro/ai/oauthToken.py`

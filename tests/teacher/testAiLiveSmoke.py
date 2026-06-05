@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SMOKE_PATH = ROOT / "tests" / "verifyAiLiveSmoke.py"
+SMOKE_PATH = ROOT / "tests" / "teacher" / "verifyAiLiveSmoke.py"
 
 
 def loadSmoke():

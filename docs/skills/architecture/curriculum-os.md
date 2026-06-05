@@ -155,7 +155,7 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 - 같은 입력은 같은 plan을 낸다 (결정성 스냅샷)
 - API 엔드포인트 통합 테스트 (FastAPI TestClient)
 
-`tests/auditCurriculumWeakness.py`가 영구 게이트로 등록되어 있다 (`tests/run.py gate curriculum-weakness-audit`):
+`tests/curriculum/auditCurriculumWeakness.py`가 영구 게이트로 등록되어 있다 (`tests/run.py gate curriculum-weakness-audit`):
 - 정적 신호: `orphanInPlan`, `noExercise` (intro `00_*` 제외), `exerciseWithoutCheck`, `noHint`, `shortGoal`, `sectionIdMissing` (Phase 2b)
 - 카테고리 신호: `categoryWithoutProject` (Phase 2d, builtins/excel/practical 면제)
 - 각 신호별 임계치(현재 모두 0)를 넘으면 게이트 실패

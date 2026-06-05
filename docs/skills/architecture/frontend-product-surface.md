@@ -66,7 +66,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/components/app/curriculumSidebarTree.tsx` | 현재 학습 tree ownership |
 | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 tree ownership |
 | `tests/surface/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
-| `tests/verifyDogfoodAlphaAudit.py` | provider 연결부터 학습 요청, 카드, 셀 실행, 실패 복구까지 dogfood evidence gate |
+| `tests/product/verifyDogfoodAlphaAudit.py` | provider 연결부터 학습 요청, 카드, 셀 실행, 실패 복구까지 dogfood evidence gate |
 
 ## 덕지덕지 위험과 제거 기준
 

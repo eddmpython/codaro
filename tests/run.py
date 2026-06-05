@@ -123,8 +123,8 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/testWidgetBridge.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testTracebackParser.py")),
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genWidgetTypes.py", "--check")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyWidgetBridgeRoundTrip.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightAppRuntime.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyWidgetBridgeRoundTrip.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightAppRuntime.py")),
         ),
     ),
     "app-runtime": Gate(
@@ -134,7 +134,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testAppRuntime.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testTeacherToolBridge.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testOauthTokenRefresh.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightDogfood.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightDogfood.py")),
         ),
     ),
     "mobile-layout": Gate(
@@ -142,9 +142,9 @@ GATES: dict[str, Gate] = {
         description="PWA manifest, service worker, viewport meta, 모바일 hook + chromium viewport 회귀.",
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/testMobileShell.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyMobileLayout.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyPwaArtifacts.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/verifyPlaywrightMobile.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyMobileLayout.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPwaArtifacts.py")),
+            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/surface/verifyPlaywrightMobile.py")),
         ),
     ),
     "teacher-eval": Gate(
@@ -156,19 +156,19 @@ GATES: dict[str, Gate] = {
     "teacher-e2e": Gate(
         tier="fast",
         description="teacher provider loop, provider error workloop, curriculum golden e2e harness를 실행한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyTeacherGoldenE2e.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/teacher/verifyTeacherGoldenE2e.py")),),
         ci_required=False,
     ),
     "assistant-workloop-contract": Gate(
         tier="fast",
         description="assistant workloop/trace UI state가 clarification, provider error, tool detail을 보존하는지 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAssistantWorkloopContract.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/teacher/verifyAssistantWorkloopContract.py")),),
         ci_required=False,
     ),
     "ai-live-smoke": Gate(
         tier="fast",
         description="실제 provider credential이 있을 때 provider 응답, OAuth 상태, live tool loop smoke를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAiLiveSmoke.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/teacher/verifyAiLiveSmoke.py")),),
         blocking=False,
         ci_required=False,
         softExitCodes=(2,),
@@ -176,37 +176,37 @@ GATES: dict[str, Gate] = {
     "editor-runtime-preflight": Gate(
         tier="fast",
         description="editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyEditorRuntimePreflight.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyEditorRuntimePreflight.py")),),
         ci_required=False,
     ),
     "learning-system-readiness": Gate(
         tier="fast",
         description="학습 YAML, 카드 UI, teacher loop, workloop, gate SSOT readiness score를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningSystemReadiness.py")),),
         ci_required=False,
     ),
     "dogfood-alpha-audit": Gate(
         tier="surface",
         description="첫 사용자 provider 연결, 질문, 학습 생성, 셀 실행, 실패 복구 플로우의 증거를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyDogfoodAlphaAudit.py")),),
         ci_required=False,
     ),
     "product-quality-audit": Gate(
         tier="surface",
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyProductQualityAudit.py")),),
         ci_required=False,
     ),
     "automation-ide-audit": Gate(
         tier="surface",
         description="자동화 IDE의 task/schedule/webhook/workflow/E-Stop/audit/frontend surface 연결을 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAutomationIdeAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/automation/verifyAutomationIdeAudit.py")),),
         ci_required=False,
     ),
     "service-readiness-audit": Gate(
         tier="surface",
         description="product-quality-audit의 기존 호환 alias다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyProductQualityAudit.py")),),
         ci_required=False,
     ),
     "diagnostic-summary-contract": Gate(
@@ -214,7 +214,7 @@ GATES: dict[str, Gate] = {
         description="local diagnostic summary가 실패 범주와 secret redaction 계약을 지키는지 확인한다.",
         commands=(
             command(("uv", "run", "pytest", "tests/teacher/testDiagnosticSummary.py", "-q", "--tb=short")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyDiagnosticSummaryContract.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/teacher/verifyDiagnosticSummaryContract.py")),
         ),
         ci_required=False,
     ),
@@ -222,7 +222,7 @@ GATES: dict[str, Gate] = {
         tier="release",
         description="launcher doctor, health check, rollback, exact artifact 설치 경계의 smoke 증거를 확인한다.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyInstallLauncherSmoke.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyInstallLauncherSmoke.py")),
             command(("cargo", "check"), cwd="launcher/codaro-launcher"),
         ),
         ci_required=False,
@@ -232,50 +232,50 @@ GATES: dict[str, Gate] = {
         description="runtime worker crash, package preflight, cell 실행 실패 복구 계약을 확인한다.",
         commands=(
             command(("uv", "run", "pytest", "tests/runtime/testRuntime.py", "-q", "--tb=short")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyEditorRuntimePreflight.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyRuntimeRecoveryContract.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyEditorRuntimePreflight.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyRuntimeRecoveryContract.py")),
         ),
         ci_required=False,
     ),
     "runtime-recovery-browser": Gate(
         tier="surface",
         description="브라우저에서 package install 실패가 셀 근처 복구 UX로 보이는지 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyRuntimeRecoveryPlaywright.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyRuntimeRecoveryPlaywright.py")),),
         ci_required=False,
     ),
     "curriculum-quality-matrix": Gate(
         tier="fast",
         description="대표 structured YAML과 실제 전체 curriculum YAML의 학습 흐름, 패키지, 실습 계약을 확인한다.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumFlowQuality.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumWorkflowArchitecture.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCardContract.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumQualityMatrix.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumFlowQuality.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumWorkflowArchitecture.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCardContract.py")),
         ),
         ci_required=False,
     ),
     "curriculum-top-tier-audit": Gate(
         tier="fast",
         description="커리큘럼이 최상위 학습 자산 기준을 만족하는지 skills, 의존성, 소개 레슨, structured source 채택률로 점수화한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumTopTierAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumTopTierAudit.py")),),
         ci_required=False,
     ),
     "curriculum-weakness-audit": Gate(
         tier="fast",
         description="레슨 단위 약점(plan orphan, exercise/check 누락, hint 부재 등)을 Curriculum OS taxonomy 위에서 점검한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumWeakness.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/auditCurriculumWeakness.py")),),
         ci_required=False,
     ),
     "curriculum-executability": Gate(
         tier="fast",
         description="모든 레슨의 snippet/solution 을 누적 namespace 에서 실행해 환경 무관 코드 결함(real-bug, yaml-load-error, undeclared-package)이 0인지 검사한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/auditCurriculumExecutability.py"), timeoutSeconds=900),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/auditCurriculumExecutability.py"), timeoutSeconds=900),),
         ci_required=False,
     ),
     "predict-contract-strict": Gate(
         tier="fast",
         description="strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyPredictContractStrict.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyPredictContractStrict.py")),),
         ci_required=False,
     ),
     "playwright-curriculum-runtime": Gate(
@@ -292,7 +292,7 @@ GATES: dict[str, Gate] = {
                 "python",
                 "-X",
                 "utf8",
-                "tests/verifyPlaywrightCurriculumRuntime.py",
+                "tests/curriculum/verifyPlaywrightCurriculumRuntime.py",
             ), timeoutSeconds=1200),
         ),
         ci_required=False,
@@ -300,7 +300,7 @@ GATES: dict[str, Gate] = {
     "onboarding-browser": Gate(
         tier="surface",
         description="브라우저에서 첫 화면 fallback과 provider 연결 후 상태를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyOnboardingPlaywright.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyOnboardingPlaywright.py")),),
         ci_required=False,
     ),
     "frontend-performance-budget": Gate(
@@ -308,7 +308,7 @@ GATES: dict[str, Gate] = {
         description="editor build 후 chunk 분리와 asset size budget을 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyFrontendPerformanceBudget.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyFrontendPerformanceBudget.py")),
         ),
         ci_required=False,
     ),
@@ -316,7 +316,7 @@ GATES: dict[str, Gate] = {
         tier="surface",
         description="structured learning section card marker와 editor build를 확인한다.",
         commands=(
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSectionCardContract.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningSectionCardContract.py")),
             command(("npm", "run", "build"), cwd="editor"),
         ),
         ci_required=False,
@@ -324,13 +324,13 @@ GATES: dict[str, Gate] = {
     "learning-card-browser": Gate(
         tier="surface",
         description="Playwright CLI로 lesson overview와 structured section card의 desktop/mobile 렌더링을 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningCardPlaywright.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningCardPlaywright.py")),),
         ci_required=False,
     ),
     "provider-settings-browser": Gate(
         tier="surface",
         description="Playwright CLI로 provider 설정 sheet의 fallback, 선택, 검증, 실패 안내 렌더링을 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProviderSettingsPlaywright.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyProviderSettingsPlaywright.py")),),
         ci_required=False,
     ),
     "editor-build": Gate(
@@ -343,7 +343,7 @@ GATES: dict[str, Gate] = {
         description="문서/landing surface의 static build와 docs content bundle split을 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="landing"),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLandingDocsBundleSplit.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyLandingDocsBundleSplit.py")),
         ),
     ),
     "launcher-check": Gate(

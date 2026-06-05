@@ -259,7 +259,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
         "`tests/surface/testProductSurfaceContract.py`",
-        "`tests/verifyDogfoodAlphaAudit.py`",
+        "`tests/product/verifyDogfoodAlphaAudit.py`",
         "`PRODUCT_SURFACE_NAV`",
         "`PRODUCT_SIDEBAR_NAV`",
         "`PRODUCT_SIDEBAR_FLOW_ITEMS`",

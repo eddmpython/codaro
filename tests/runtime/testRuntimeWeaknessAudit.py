@@ -5,14 +5,13 @@ from pathlib import Path
 
 from codaro.curriculum.learnerState import LearnerStateStore
 
-# auditCurriculumWeakness.py는 tests/ 디렉토리 자체에 있어 직접 import.
 import sys
 
-TESTS_DIR = Path(__file__).resolve().parent
-if str(TESTS_DIR) not in sys.path:
-    sys.path.insert(0, str(TESTS_DIR))
+TESTS_ROOT = Path(__file__).resolve().parents[1]
+if str(TESTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(TESTS_ROOT))
 
-from auditCurriculumWeakness import (  # type: ignore[import-not-found]
+from curriculum.auditCurriculumWeakness import (
     RUNTIME_CONFIDENCE_THRESHOLD,
     RUNTIME_MASTERY_THRESHOLD,
     auditRuntimeWeakness,

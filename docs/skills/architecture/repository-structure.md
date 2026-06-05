@@ -43,7 +43,7 @@ codaro/
 ├── launcher/         # desktop launcher, packaging notes, release updater
 ├── notebooks/        # distributable notebooks derived from curricula
 ├── src/              # Python package source
-└── tests/            # 도메인 트리(tests/<domain>/) pytest suites + verifiers + gate runner + _attempts 샌드박스
+└── tests/            # 도메인 트리(tests/<domain>/): pytest suites + 같은 도메인 verify/audit 드라이버 + gate runner(run.py) + root enforcer(verifyRootClean.py) + 공유 인프라 + _attempts 샌드박스
 ```
 
 Root files are limited to package metadata and public project documents. Examples are `README.md`, `pyproject.toml`, `uv.lock`, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `CLAUDE.md`, and `AGENTS.md`.
