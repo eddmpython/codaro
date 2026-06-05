@@ -1,93 +1,214 @@
 ---
 id: curriculum-card-contract
 title: Curriculum Card Contract
-description: 커리큘럼 YAML sections[].blocks[]의 블록 type → displayKind/role/필수키 단일 계약(SSOT).
+description: 커리큘럼 YAML sections[].blocks[]의 학습 카드 계약(SSOT) — 어떤 표현 카드가 있고, 언제 무엇을 쓰는지 사람·AI 저자가 정확히 고르게 한다.
 category: architecture
 section: reference
 order: 210
-purpose: 학습 카드 블록의 허용 type과 필수 키를 한 곳에 못박아, type 오타가 조용히 prose로 fallback되는 사고를 막는다.
-whenToUse: 새 학습 카드(블록 type)를 추가하거나, 카드 YAML 키를 바꾸거나, 프론트 렌더 분기를 고칠 때.
+purpose: 학습 카드 type·displayKind·필수키를 한 곳에 못박고, 의도→카드 선택을 명확히 해 type 오타·오선택·prose fallback 사고를 막는다.
+whenToUse: 레슨 카드를 작성·선택할 때(저자), 새 카드 type을 추가할 때(개발), 카드 YAML 키를 바꿀 때.
 ---
 
-# Curriculum Card Contract
+# Curriculum Card Contract — 학습 카드 저자 가이드
 
-<!-- SSOT: 코드(`src/codaro/curriculum/cardContract.py`의 CARD_REGISTRY)가 기준이고, 이 문서는 미러다.
-     게이트 `tests/verifyCardContract.py`가 전 커리큘럼을 walk해 둘의 드리프트·type 오타·필수키 누락을 차단한다. -->
+<!-- SSOT: 코드(`src/codaro/curriculum/cardContract.py`의 CARD_REGISTRY)가 type→displayKind/role/필수키의 기준,
+     이 문서는 그 미러이자 "언제 무엇을 쓰는가"의 SSOT다.
+     게이트 `tests/verifyCardContract.py`(quality-cycle)가 둘의 드리프트·type 오타·필수키 누락을 차단한다. -->
 
-커리큘럼 YAML의 `sections[].blocks[]`는 `converter.py`가 `displayKind`로 바꿔 프론트
-(`editor/src/components/curriculum/curriculumMarkdownBody.tsx`)가 렌더한다. 같은 변환을
-번들 빌드용으로 `editor/src/lib/curriculaRegistry.ts`가 미러한다.
+이 문서는 **사람과 AI가 같은 마크다운을 읽고** 효과적인 학습 카드를 고르도록 한다.
+커리큘럼 YAML의 `sections[].blocks[]`는 각 블록의 `type`으로 표현을 정한다 →
+`converter.py`가 `displayKind`로 바꾸고 → 프론트(`curriculumMarkdownBody.tsx`)가 카드로 렌더한다.
 
-## 기준 파일 (이 순서로 본다)
+## AI 저자 4규칙 (작성 전 자가검증)
 
-| 기준 | 파일 | 역할 |
-|---|---|---|
-| 카드 계약 SSOT(코드) | `src/codaro/curriculum/cardContract.py` | 허용 type·displayKind·role·필수키 단일 레지스트리 |
-| 계약 게이트 | `tests/verifyCardContract.py` | 전 YAML walk, type 오타·필수키 누락 차단(quality-cycle 편입) |
-| 서버 변환 | `src/codaro/curriculum/converter.py` | `_convertBlock`이 type→BlockConfig(displayKind/role/payload) |
-| 번들 변환(미러) | `editor/src/lib/curriculaRegistry.ts` | 브라우저에서 같은 변환을 수행 |
-| 프론트 렌더 | `editor/src/components/curriculum/curriculumMarkdownBody.tsx` | `displayKind`로 카드 컴포넌트 디스패치 |
-| displayKind 유니온 | `editor/src/lib/cellSchema.ts` `cellDisplayKinds` | 프론트 displayKind 타입 SSOT |
+1. **하나의 카드 = 하나의 의도.** 의도가 둘이면 카드를 쪼갠다.
+2. **아래 "의도 → 카드" 트리에서 위→아래 첫 매치를 고른다.** "쓰지 마라(NOT)"에 걸리면 이웃 카드로 이동.
+3. **필수키 OR-그룹을 채운다.** 못 채우면 게이트(`verifyCardContract.py`)가 막는다.
+4. **인벤토리에 없는 type을 지어내지 않는다.** 정말 없으면 사람에게 신규 등록을 요청(게이트가 미등록 type을 차단).
 
-## 규약
+## 의도 → 카드 결정 트리
 
-- 블록 `type`은 **camelCase canonical**. 미등록 type은 게이트가 에러로 막는다(조용한 prose fallback 금지).
-- **선택/미지 키는 자유 패스스루** — 작성 유연성과 converter의 관용적 폴백을 보존한다. full pydantic 강검증은 하지 않는다.
-- 새 카드 추가 = (1) `cardContract.py` `CARD_REGISTRY`에 1줄, (2) `converter.py`·`curriculaRegistry.ts`에 변환 분기, (3) 프론트 `curriculumMarkdownBody.tsx`에 displayKind 분기, (4) `cellSchema.ts`에 displayKind 리터럴, (5) 이 문서 표에 1행. 게이트가 (1)↔(5) 누락을 잡는다.
-
-## 블록 type 표
-
-필수키는 OR-그룹(그 중 하나 이상이 비어있지 않으면 통과). 빈 칸은 type allowlist 검사만 한다.
-
-| type | displayKind | role | 필수키(OR) | 주요 선택키 | 렌더 |
-|---|---|---|---|---|---|
-| `mainHeader` / `sectionHeader` / `sectionTitle` | title | title | — | title, subtitle, description | 제목 박스 |
-| `hero` | hero | visual | — | title, subtitle, description, points[] | 배너 + 포인트 격자 |
-| `localWorkbench`(별칭 `localRunner`) / `tiobeIndex` | hero | visual | — | title, description | 특수 히어로 |
-| `featureCards` / `choiceCards` / `threeColumnCards` | cardGrid | visual | cards \| items | title, subtitle, cards[].{emoji,title,description} | 2열 카드 그리드 |
-| `resourceCards` | resource | explanation | cards \| items \| resources | cards[].{emoji,title,url,stats} | 자료 카드 |
-| `stepCard` / `practiceCard` | practice | exercise | cards \| items \| steps | code, footer | 단계/실습 카드 |
-| `compare` / `fullWidthComparison` | comparison | visual | cards \| left \| right \| items | left/right.{title,subtitle,icon,items[]} | 좌우/3열 비교 |
-| `table` | table | visual | rows \| items \| data \| headers | headers[], rows[][] | 표 |
-| `image` | media | visual | src \| url \| href \| imageUrl | title, description | `<img>`(png/jpg/gif/webp/svg) |
-| `video` | media | visual | src \| url \| href \| videoUrl \| items | title, description | 인라인 `<video>`(mp4/webm/mov) |
-| `youtube` | media | visual | youtube \| youtubeId \| videoId \| src \| url | title | youtube-nocookie iframe |
-| `videoCarousel` / `pdf` / `MIME` | media | visual | items / src / — | title | 미디어 자료 |
-| `link` / `links` / `linkButtons` | resource | explanation | url\|href\|items\|links / items\|links / items\|links\|buttons | title, description | 링크 카드 |
-| `tip` / `tipCard` / `note` / `info` | callout | explanation | content \| title \| description \| items | style | 컬러 callout |
-| `warning` | callout | check | content \| title \| description \| items | style | 경고 callout |
-| `codeDescription` | callout | explanation | content \| code \| description | — | 코드 설명 callout |
-| `quiz` | quiz | check | question \| title | options[] | 문제 + 선택지 |
-| `expansion` | practice | exercise | — | blocks[], code, hints[] | 실습(연습) — 채점 동결 |
-| `code` | code | snippet | — | language | 코드 셀 |
-| `list` | prose | learning | items | style(bullet\|number\|check) | 목록/체크리스트 |
-| `centerText` | centerText | learning | — | title, content | 중앙 정렬 텍스트 |
-| `text`(기본) | prose | learning | — | content | 마크다운 prose |
-| `conceptRow` | conceptRow | visual | rows | title, rows[].{concept,explain,emoji,image,accent} | 개념↔비유 좌우 병치(수평 설명카드) |
-
-## 수평 설명카드 (`conceptRow`)
-
-개념(좌) ↔ 비유/예시 + 선택 이미지(우)를 한 행에 좌우 병치하고 행을 세로로 쌓는다.
-학습과학 근거: 공간 인접(split-attention 제거) + 듀얼코딩 + 기지개념 anchoring.
-
-```yaml
-- type: conceptRow
-  title: GitHub 개념 ↔ 일상 비유
-  description: 낯선 용어를 이미 아는 것에 붙인다   # 선택
-  rows:                                          # 필수, 2~4행 권장
-    - emoji: "📦"                                # 선택
-      concept: 저장소(Repository)                # 필수
-      explain: 프로젝트 전용 폴더 한 개           # 필수(권장)
-      image: /curriculum/devTools/repo.svg       # 선택, 상대 경로 자산
-      accent: cyan                               # 선택, 토큰만: cyan|amber|emerald|rose|sky
+```
+무엇을 하려는가?
+├─ 레슨/섹션 문을 연다 ................................ hero
+├─ 임팩트 수치로 동기 부여 ............................ stat
+├─ 새 용어를 안내한다
+│   ├─ 이미 아는 것에 빗댄다(비유) .................... conceptRow
+│   └─ 정확한 뜻을 못박는다(정의) .................... definition
+├─ 사실/지식 전달(읽기)
+│   ├─ 한 문단 서술 .................................. text
+│   ├─ 나열 ......................................... list
+│   ├─ 시간·단계·인과 순서 .......................... timeline
+│   └─ 권위 원문 인용 ................................ note(style:example) 또는 인용 패턴(> )
+├─ 비교·판단하게 한다
+│   ├─ 대안 2+ 를 축별로 맞비교 ...................... compare
+│   ├─ 옳은 행동 vs 틀린 행동(규범) .................. doDont
+│   ├─ 착각 vs 사실(믿음 교정) ....................... misconception
+│   └─ 한 대상 장점 vs 단점 .......................... choiceCards(advantages/disadvantages)
+├─ 코드를 보여준다
+│   ├─ 그냥 코드 ................................... code
+│   └─ before → after 변화(리팩터링) ................ codeCompare
+├─ 직접 해보게 한다(실습)
+│   ├─ 따라 하는 절차 .............................. stepCard / practiceCard
+│   └─ 자유 연습(채점 동결) ......................... expansion
+├─ 주의·맥락을 덧붙인다
+│   ├─ 꿀팁/보조 .................................. tip / note(style:info)
+│   ├─ 성공 기준 .................................. note(style:success) / success
+│   ├─ 예시 박스 .................................. note(style:example) / example
+│   ├─ 일반 경고 .................................. warning
+│   └─ 치명·되돌릴 수 없음 ......................... danger
+├─ 확인·회수한다
+│   ├─ 채점 문제 .................................. quiz
+│   └─ 섹션 끝 핵심 회수(TL;DR) ..................... summary
+├─ 선택지로 분기 ................................... featureCards / choiceCards
+├─ 구조화 데이터 .................................. table
+└─ 미디어 ......................................... image / video / youtube
 ```
 
-데스크톱은 좌우 병치(`md:grid-cols-[1fr_1.4fr]`), 모바일은 1열로 폴백한다.
-`accent`는 자유 색상값이 아니라 위 토큰만 허용한다(색상 난립 방지).
+## 충돌쌍 경계 (AI 오선택 방지)
 
-## 미디어 키 정규화
+| 충돌쌍 | 경계 규칙 | 판별 키워드 |
+|---|---|---|
+| conceptRow vs definition | 빗대면 conceptRow / 정확한 뜻 고정이면 definition | "마치 ~같다"=conceptRow, "~란 ~이다"=definition |
+| compare vs doDont | 가치중립 맞비교=compare / 옳고 그름(규범)=doDont | 정/오 판단이 있나 |
+| doDont vs misconception | 행동(코드·습관)의 권장/금지=doDont / 믿음·모델의 착각/사실=misconception | "이렇게 써라"=doDont, "~라 생각하지만 실은"=misconception |
+| note vs summary | 흐름 중 곁가지 보강=note / 섹션 끝 배운 것 압축 회수=summary(새 정보 금지) | 위치: 중간=note, 끝맺음=summary |
+| stepCard vs timeline | 직접 따라 하는 실습 절차=stepCard / 읽고 이해하는 사건·순서=timeline | 손으로 실행하나 |
+| list vs timeline | 순서 무관 나열=list / 순서·인과가 의미=timeline | 순서가 바뀌면 틀리나 |
+| code vs codeCompare | 그냥 코드=code / before→after 변화=codeCompare | 두 상태를 대비하나 |
+| quiz vs summary | 채점 문제=quiz / 핵심 회수=summary | 채점하나 |
+| warning vs danger | 일반 주의=warning / 치명·복구불가=danger | 데이터 손실·되돌릴 수 없음=danger |
 
-`image`/`video`/`youtube`는 소스 키 alias를 폭넓게 받지만(작성 호환), 신규 작성은
-canonical을 쓴다: 파일 소스 `src`, youtube는 `youtubeId`(또는 watch/embed URL). 외부
-hotlink는 깨짐·라이선스·방화벽 위험이 있으니 **자체 자산을 `editor/public/` 상대 경로로**
-두는 것을 권장한다(예: `/curriculum/<category>/<name>.svg`).
+## 카드 카탈로그
+
+각 카드: **목적 / 언제(SELECT) / 쓰지마(NOT) / displayKind·role / 필수키(OR) / 예시**.
+필수키는 OR-그룹(그 중 하나 이상). 선택/미지 키는 자유(게이트 무검사).
+
+### 도입·동기
+
+**`hero`** — 레슨/섹션 문 열기. SELECT: 첫 화면에서 주제 한 줄 + 배울 것 3~6개. NOT: 본문 중간 강조(→ note). displayKind hero / role visual. 키: `title`, `subtitle`, `points[].{emoji,title,description}`.
+
+**`stat`** — 큰 숫자로 규모·성능·차이를 각인. SELECT: "1억+ 사용자", "10x 빠름" 같은 임팩트 수치. NOT: 일반 표(→ table), 개념 설명. displayKind stat / role visual. 필수 `(items|stats|value)`. 항목 `{value, label, delta?, trend?(up|down|flat), accent?}`.
+```yaml
+- type: stat
+  title: GitHub 규모
+  items:
+    - { value: "1억+", label: 개발자, accent: cyan }
+    - { value: "4억+", label: 저장소, accent: emerald }
+```
+
+### 개념·정의
+
+**`conceptRow`** — 개념 ↔ 비유/예시 좌우 병치(듀얼코딩). SELECT: 낯선 개념을 이미 아는 것에 빗댈 때. NOT: 정확한 뜻 고정(→ definition). displayKind conceptRow / role visual. 필수 `(rows)`. 항목 `{concept, explain, emoji?, image?, accent?}`.
+
+**`definition`** — 용어 → 뜻 → 예시 구조로 못박기(앵커링). SELECT: 본문 첫 등장 용어를 정확히 정의. NOT: 비유(→ conceptRow), 곁가지(→ note). displayKind definition / role explanation. 필수 `(items|term)`. 항목 `{term, meaning(또는 definition), english?, example?, accent?}`.
+```yaml
+- type: definition
+  items:
+    - term: 멱등성
+      english: idempotency
+      meaning: 같은 작업을 여러 번 해도 결과가 한 번 한 것과 같은 성질
+      example: mkdir -p 는 이미 있어도 에러 없이 끝난다
+      accent: cyan
+```
+
+### 비교·판단
+
+**`compare`** — 대안 2+ 를 축별로 맞비교(가치중립). 필수 `(cards|left|right|items)`. `left/right.{title,subtitle,icon,items[]}`.
+
+**`doDont`** — 옳은 행동 vs 틀린 행동(규범, 대조학습). SELECT: 권장 패턴과 흔한 실수를 나란히. NOT: 가치중립 비교(→ compare), 믿음 교정(→ misconception). displayKind doDont / role check. 필수 `(do|dont|items)`. `do/dont.{title?, items[]}`.
+```yaml
+- type: doDont
+  title: 커밋 메시지
+  do:   { title: 권장, items: [무엇을 왜 바꿨는지 한 줄, 한 커밋 = 한 변경] }
+  dont: { title: 지양, items: ["'수정'·'asdf' 같은 무의미", 10개 변경 몰아넣기] }
+```
+
+**`misconception`** — 착각 ❌ → 사실 ✓ 교정(Codaro 진단 철학). SELECT: 초심자 오개념을 정면 교정. NOT: 행동 규범(→ doDont). displayKind misconception / role check. 필수 `(items|myth|wrong)`. 항목 `{myth(또는 wrong), truth(또는 right)}`.
+```yaml
+- type: misconception
+  items:
+    - { myth: GitHub은 코드만 올린다, truth: 문서·이력서·블로그도 올린다 }
+```
+
+**`choiceCards`** — 선택지별 장점·단점·쓸 곳. 한 대상 prosCons도 여기로. 항목 `{title, advantages[], disadvantages[], useCases[]}`.
+
+### 흐름·순서
+
+**`timeline`** — 시간·단계·인과 순서(세그멘팅). SELECT: 순서가 의미를 만드는 사건/생명주기. NOT: 순서 무관 나열(→ list), 직접 실습(→ stepCard). displayKind timeline / role visual. 필수 `(items|steps|events)`. 항목 `{title, description, step?, accent?}`.
+```yaml
+- type: timeline
+  items:
+    - { step: 1, title: clone, description: 원격을 내 PC로 복제 }
+    - { step: 2, title: commit, description: 변경을 스냅샷으로 }
+```
+
+### 코드
+
+**`code`** — 보여줄 코드(실행 셀 아님은 role learning). 키 `code`, `language?`.
+
+**`codeCompare`** — before → after 코드 대비(리팩터링·개선). SELECT: 같은 코드의 두 상태를 좌우로. NOT: 단일 코드(→ code). **before/after는 문자열 필드라 실행 게이트가 돌리지 않는다**(고의 버그 코드 안전). displayKind codeCompare / role visual. 필수 `(before|after|items)`. `before/after.{label?, code}`.
+```yaml
+- type: codeCompare
+  title: 리팩터링 전후
+  before: { label: 전, code: "for i in range(len(xs)): print(xs[i])" }
+  after:  { label: 후, code: "for x in xs: print(x)" }
+```
+
+### 주의·콜아웃 (한 displayKind, 톤만 다름)
+
+`note`/`tip`/`info`/`warning`/`danger`/`success`/`example`/`summary`는 모두 displayKind `callout`이다.
+작성: 전용 type(`type: danger`) 또는 `type: note` + `style: danger` 둘 다 된다. 필수 `(content|title|description|items)`.
+
+| type / style | 톤 | 언제 |
+|---|---|---|
+| `note` / `info` / `tip` | cyan / emerald | 보조 설명, 꿀팁 |
+| `warning` | amber | 일반 주의 |
+| `danger` | rose | 치명·되돌릴 수 없음·데이터 손실 |
+| `success` | emerald | 성공 기준·권장 결과 |
+| `example` | sky | 예시 박스 |
+| `summary` | cyan | 섹션 끝 핵심 회수(TL;DR) — `points[]`로 요점 나열 |
+
+```yaml
+- type: summary
+  title: 이것만 기억하세요
+  points: [Git은 도구·GitHub은 서비스, 커밋=되돌릴 수 있는 저장 지점]
+- type: danger
+  title: 되돌릴 수 없음
+  content: force push는 동료의 커밋을 지울 수 있다
+```
+
+### 실습·확인·구조·미디어
+
+- **`stepCard`/`practiceCard`** — 따라 하는 실습 절차. **`expansion`** — 자유 연습(채점 동결).
+- **`quiz`** — 채점 문제(`question`, `options[]`).
+- **`featureCards`** — 병렬 항목 카드 그리드(`cards[].{emoji,title,description}`). **`table`** — 표(`headers[]`, `rows[][]`). **`list`** — 목록(`items[]`, `style: bullet|number|check`).
+- **`image`/`video`/`youtube`** — 미디어. 마크다운 링크 `[text](url)`는 prose/콜아웃/리스트에서 클릭된다(스킴 화이트리스트). 영상은 `<video>`·youtube-nocookie iframe 인라인 임베드. **외부 hotlink 금지** — 자체 자산을 `editor/public/curriculum/<category>/<name>.svg` 상대 경로로.
+
+## 키 컨벤션 (canonical — alias 난립 금지)
+
+같은 의미는 같은 키를 쓴다. 새 카드도 이 키를 재사용한다.
+
+| 의미 | canonical 키 | 도메인 고유 신규 키(예외) |
+|---|---|---|
+| 항목 배열 | `items` | rows(conceptRow/definition), steps/events(timeline), stats(stat) |
+| 제목/이름 | `title` | term(definition), concept(conceptRow) |
+| 본문 | `description` 또는 `content` | meaning/definition, explain, truth/myth |
+| 코드 | `code` | — |
+| 강조색 | `accent` (enum: cyan\|amber\|emerald\|rose\|sky) | — (새 색 enum 금지) |
+| 콜아웃 톤 | `style` 또는 `tone` | — |
+
+## 새 카드 type 추가 절차 (개발)
+
+새 카드 = **코드 5곳 + 문서 1곳 동기 변경**(하나라도 빠지면 게이트/드리프트):
+1. `src/codaro/curriculum/cardContract.py` — `CARD_REGISTRY`에 `CardSpec(displayKind, role, requiredKeys)` 1줄. requiredKeys는 **느슨하게**(흔한 키 OR-그룹) — 기존 코퍼스 무파손.
+2. `src/codaro/curriculum/converter.py` — `_convertBlock` 분기(+ 필요 시 formatter). 기존 displayKind 재사용이면 해당 `*_TYPES` set에 추가만.
+3. `editor/src/lib/curriculaRegistry.ts` — 번들 변환 미러 분기 + `blockTypeLabel`.
+4. `editor/src/components/curriculum/curriculumMarkdownBody.tsx` — 신규 displayKind면 디스패치 분기 + 컴포넌트. 콜아웃 톤이면 `CALLOUT_TONES`만 확장.
+5. `editor/src/lib/cellSchema.ts` — 신규 displayKind면 `cellDisplayKinds`에 리터럴.
+6. **이 문서** — 카탈로그·결정 트리·충돌쌍에 1항목.
+
+추가 규약:
+- **기존 displayKind 재사용이 가능하면 신규 displayKind 만들지 않는다**(콜아웃 톤·compare·cardGrid로 표현되면 0~2파일로 끝).
+- **신규 카드는 최소 1개 레슨이 실제로 쓴다**(미사용 카드 금지) — 등록과 사용을 같은 변경에 묶는다.
+- 레지스트리는 additive-only. 기존 엔트리 키/requiredKeys 변경 금지(회귀). 폐기는 alias로만.

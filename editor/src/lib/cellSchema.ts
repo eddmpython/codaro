@@ -37,4 +37,10 @@ export const cellDisplayKinds = [
   "quiz",
   "centerText",
   "conceptRow",
+  "doDont",
+  "definition",
+  "misconception",
+  "timeline",
+  "stat",
+  "codeCompare",
 ] as const;

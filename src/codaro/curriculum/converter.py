@@ -27,7 +27,7 @@ CARD_TYPES = {"featureCards", "choiceCards", "resourceCards", "threeColumnCards"
 COMPARE_TYPES = {"compare", "fullWidthComparison"}
 MEDIA_TYPES = {"image", "video", "youtube", "videoCarousel", "pdf", "MIME"}
 LINK_TYPES = {"link", "links", "linkButtons"}
-CALLOUT_TYPES = {"tip", "tipCard", "note", "info", "warning", "codeDescription"}
+CALLOUT_TYPES = {"tip", "tipCard", "note", "info", "warning", "codeDescription", "danger", "success", "example", "summary"}
 CONCEPT_ROW_TYPES = {"conceptRow"}
 
 
@@ -316,7 +316,7 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
             _markdownBlock(
                 "\n\n".join(item for item in [f"### {calloutTitle}", subtitle, description, _formatCodeDescription(content) if sourceType == "codeDescription" else content] if item),
                 displayKind="callout",
-                role="check" if sourceType == "warning" else "explanation",
+                role="check" if sourceType in {"warning", "danger"} else "explanation",
                 sourceType=sourceType,
                 title=calloutTitle,
                 description=description,
@@ -377,6 +377,82 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
                 role="visual",
                 sourceType=sourceType,
                 title=title or _blockTypeLabel(sourceType),
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "doDont":
+        return [
+            _markdownBlock(
+                _formatDoDont(block, title or "권장 vs 지양"),
+                displayKind="doDont",
+                role="check",
+                sourceType=sourceType,
+                title=title or "권장 vs 지양",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "definition":
+        rows = _firstMaps(block, "items", "rows", "terms") or ([block] if _textValue(block.get("term")) else [])
+        return [
+            _markdownBlock(
+                _formatDefinitions(rows, title or "정의", intro=subtitle or description),
+                displayKind="definition",
+                role="explanation",
+                sourceType=sourceType,
+                title=title or "정의",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "misconception":
+        rows = _firstMaps(block, "items", "rows")
+        return [
+            _markdownBlock(
+                _formatMisconceptions(rows, title or "흔한 오해", intro=subtitle or description),
+                displayKind="misconception",
+                role="check",
+                sourceType=sourceType,
+                title=title or "흔한 오해",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "timeline":
+        rows = _firstMaps(block, "items", "steps", "events")
+        return [
+            _markdownBlock(
+                _formatTimeline(rows, title or "흐름", intro=subtitle or description),
+                displayKind="timeline",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "흐름",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "stat":
+        rows = _firstMaps(block, "items", "stats", "metrics")
+        return [
+            _markdownBlock(
+                _formatStats(rows, title or "지표", intro=subtitle or description),
+                displayKind="stat",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "지표",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "codeCompare":
+        return [
+            _markdownBlock(
+                _formatCodeCompare(block, title or "코드 비교"),
+                displayKind="codeCompare",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "코드 비교",
                 payload=_payload(block, sourceType),
             )
         ]
@@ -704,6 +780,92 @@ def _formatConceptRows(rows: list[dict[str, Any]], fallbackTitle: str, *, intro:
     return "\n\n".join(lines)
 
 
+def _formatDoDont(block: dict[str, Any], fallbackTitle: str) -> str:
+    def side(value: Any, label: str) -> str:
+        side_map = _mapValue(value)
+        items = _arrayOfText(side_map.get("items") or side_map.get("points")) or _arrayOfText(value)
+        head = _textValue(side_map.get("title")) or label
+        return "\n".join([f"#### {head}", *[f"- {item}" for item in items]])
+
+    lines = [f"### {fallbackTitle}"]
+    items = _firstMaps(block, "items")
+    if items:
+        for item in items:
+            verdict = _textValue(item.get("verdict") or item.get("kind"))
+            mark = "✅" if verdict in {"do", "good", "권장"} else "❌"
+            lines.append(f"- {mark} {_textValue(item.get('text') or item.get('title') or item.get('description'))}")
+    else:
+        lines.append(side(block.get("do") or block.get("good"), "권장(Do)"))
+        lines.append(side(block.get("dont") or block.get("bad"), "지양(Don't)"))
+    return "\n\n".join(lines)
+
+
+def _formatDefinitions(rows: list[dict[str, Any]], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    for row in rows:
+        term = _textValue(row.get("term") or row.get("title"))
+        english = _textValue(row.get("english") or row.get("en"))
+        head = f"{term} ({english})" if english else term
+        meaning = _textValue(row.get("meaning") or row.get("definition") or row.get("description"))
+        example = _textValue(row.get("example"))
+        body = [meaning]
+        if example:
+            body.append(f"예: {example}")
+        lines.append("\n".join(item for item in [f"#### {head or 'Term'}", *body] if item))
+    return "\n\n".join(lines)
+
+
+def _formatMisconceptions(rows: list[dict[str, Any]], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    for row in rows:
+        myth = _textValue(row.get("myth") or row.get("wrong") or row.get("misconception"))
+        truth = _textValue(row.get("truth") or row.get("right") or row.get("fact") or row.get("reality"))
+        lines.append("\n".join(item for item in [f"#### ❌ {myth}" if myth else "", f"✅ {truth}" if truth else ""] if item))
+    return "\n\n".join(lines)
+
+
+def _formatTimeline(rows: list[dict[str, Any]], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    for index, row in enumerate(rows, start=1):
+        label = _textValue(row.get("step") or row.get("label")) or str(index)
+        head = _textValue(row.get("title") or row.get("name"))
+        detail = _textValue(row.get("description") or row.get("detail") or row.get("content"))
+        lines.append(f"- **{label}. {head}** — {detail}" if detail else f"- **{label}. {head}**")
+    return "\n".join(lines)
+
+
+def _formatStats(rows: list[dict[str, Any]], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    for row in rows:
+        value = _textValue(row.get("value") or row.get("number") or row.get("stat"))
+        label = _textValue(row.get("label") or row.get("title") or row.get("name"))
+        delta = _textValue(row.get("delta") or row.get("change"))
+        lines.append(f"- **{value}** {label}{f' ({delta})' if delta else ''}")
+    return "\n".join(lines)
+
+
+def _formatCodeCompare(block: dict[str, Any], fallbackTitle: str) -> str:
+    def side(value: Any, label: str) -> str:
+        side_map = _mapValue(value)
+        code = _textValue(side_map.get("code")) or _textValue(value)
+        head = _textValue(side_map.get("label") or side_map.get("title")) or label
+        return f"#### {head}\n```\n{code}\n```" if code else f"#### {head}"
+
+    return "\n\n".join([
+        f"### {fallbackTitle}",
+        side(block.get("before") or block.get("bad"), "Before"),
+        side(block.get("after") or block.get("good"), "After"),
+    ])
+
+
 def _formatMedia(block: dict[str, Any], sourceType: str, title: str, subtitle: str, description: str) -> str:
     src = _textValue(
         block.get("src")
@@ -809,7 +971,16 @@ def _executionKindFromLanguage(language: str) -> str:
 def _noteTitle(block: dict[str, Any], sourceType: str) -> str:
     if sourceType == "note":
         style = _textValue(block.get("style")) or "info"
-        return {"info": "Info", "tip": "Tip", "warning": "Warning", "error": "Error"}.get(style, "Note")
+        return {
+            "info": "Info",
+            "tip": "Tip",
+            "warning": "Warning",
+            "error": "Error",
+            "danger": "주의",
+            "success": "성공 기준",
+            "example": "예시",
+            "summary": "핵심 정리",
+        }.get(style, "Note")
     return _blockTypeLabel(sourceType)
 
 
@@ -901,8 +1072,18 @@ def _blockTypeLabel(sourceType: str) -> str:
     labels = {
         "centerText": "Center Text",
         "choiceCards": "Choice Cards",
+        "codeCompare": "코드 비교",
         "codeDescription": "Code Description",
         "conceptRow": "개념 설명",
+        "danger": "주의",
+        "definition": "정의",
+        "doDont": "권장 vs 지양",
+        "example": "예시",
+        "misconception": "흔한 오해",
+        "stat": "지표",
+        "success": "성공 기준",
+        "summary": "핵심 정리",
+        "timeline": "흐름",
         "featureCards": "Feature Cards",
         "fullWidthComparison": "Comparison",
         "hero": "Hero",

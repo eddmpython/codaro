@@ -66,9 +66,40 @@ sections:
           - emoji: "📜"
             title: "모든 변경이 기록된다"
             description: "누가 언제 무엇을 왜 바꿨는지가 전부 이력으로 남아 되돌릴 수 있다."
+      - type: stat
+        title: "GitHub의 규모 (왜 알아야 하나)"
+        items:
+          - { value: "1억+", label: "전 세계 개발자", accent: cyan }
+          - { value: "4억+", label: "공개·비공개 저장소", accent: emerald }
+          - { value: "사실상 표준", label: "오픈소스 협업의 중심", accent: sky }
+
+  - id: version_problem
+    title: "2. 왜 버전 관리인가"
+    blocks:
+      - type: codeCompare
+        title: "파일 버전을 관리하는 두 방식"
+        subtitle: "왼쪽처럼 해본 적 있다면, 그 문제를 Git이 푼다"
+        before:
+          label: "수동 — 파일명에 버전 붙이기"
+          code: |-
+            보고서.docx
+            보고서_최종.docx
+            보고서_최종_진짜최종.docx
+            보고서_최종_진짜최종_v2.docx
+            보고서_최종_진짜최종_v2_김대리수정.docx
+        after:
+          label: "Git — 한 파일 + 이력"
+          code: |-
+            보고서.docx        # 파일은 하나, 모든 버전은 이력에
+            $ git log --oneline
+            d4e5f6  오타 수정
+            a1b2c3  3분기 표 추가
+            9f8e7d  초안 작성
+      - type: text
+        content: "파일명에 버전을 붙이는 방식은 누가 무엇을 언제 왜 바꿨는지 알 수 없고, 협업하면 _김대리수정 _박과장수정 이 끝없이 늘어난다. Git은 파일을 하나로 두고 모든 변경을 '커밋' 이력으로 쌓아, 언제든 과거로 되돌리고 누가 무엇을 바꿨는지 추적한다."
 
   - id: git_vs_github
-    title: "2. Git과 GitHub은 다르다 — 1순위 오개념"
+    title: "3. Git과 GitHub은 다르다 — 1순위 오개념"
     blocks:
       - type: compare
         title: "Git ≠ GitHub"
@@ -95,7 +126,7 @@ sections:
         content: "Git은 '버전 관리 도구'(내 PC의 프로그램), GitHub은 'Git 저장소를 올려 협업하는 웹 서비스'다. Git 없이도 GitHub 웹은 볼 수 있고, GitHub 없이도 Git은 혼자 쓸 수 있다."
 
   - id: core_concepts
-    title: "3. 핵심 개념 4개"
+    title: "4. 핵심 개념 4개"
     blocks:
       - type: featureCards
         title: "이 네 단어만 알면 절반은 끝"
@@ -113,8 +144,30 @@ sections:
             title: "풀 리퀘스트 (PR)"
             description: "내 브랜치 변경을 본줄기에 합쳐 달라는 제안 + 리뷰 요청."
 
+  - id: definitions
+    title: "5. 정확한 정의로 못박기"
+    blocks:
+      - type: definition
+        title: "용어를 정확히"
+        items:
+          - term: 버전 관리
+            english: version control
+            meaning: 파일의 변경 이력을 시점별로 저장해 언제든 과거로 되돌리고 누가 무엇을 바꿨는지 추적하는 일.
+            example: Git이 가장 널리 쓰이는 버전 관리 도구다.
+            accent: cyan
+          - term: 커밋
+            english: commit
+            meaning: 그 순간의 변경 묶음을 한 줄 메시지와 함께 저장하는 행위(또는 그 저장 지점).
+            example: "git commit -m \"3분기 표 추가\" 가 커밋 하나를 만든다."
+            accent: emerald
+          - term: 원격 저장소
+            english: remote
+            meaning: 내 PC 밖(보통 GitHub)에 있는, 모두가 공유하는 기준 저장소.
+            example: push로 올리고 pull로 내려받는다.
+            accent: sky
+
   - id: analogy
-    title: "4. 익숙한 것에 빗대 보기"
+    title: "6. 익숙한 것에 빗대 보기"
     blocks:
       - type: conceptRow
         title: "GitHub 개념 ↔ 일상 비유"
@@ -138,15 +191,49 @@ sections:
             accent: sky
 
   - id: flow
-    title: "5. 코드가 오가는 그림"
+    title: "7. 코드가 오가는 그림"
     blocks:
       - type: image
         title: "내 PC ↔ GitHub ↔ 동료 PC"
         src: "/curriculum/devTools/githubFlow.svg"
         description: "각자 PC에서 작업한 뒤 GitHub에 올리면(push) 모두가 최신본을 받는다(pull). GitHub이 '모두의 기준본'을 보관하는 가운데 허브 역할을 한다."
 
+  - id: collab_cycle
+    title: "8. 오픈소스 기여 한 사이클"
+    blocks:
+      - type: timeline
+        title: "남의 프로젝트에 기여하는 흐름"
+        subtitle: "각 단계가 앞 단계의 결과 위에서 일어난다"
+        items:
+          - { step: 1, title: "fork", description: "남의 저장소를 내 계정으로 복사한다." }
+          - { step: 2, title: "clone", description: "내 사본을 로컬 PC로 내려받는다." }
+          - { step: 3, title: "branch", description: "작업용 갈래를 따로 만든다(본줄기 보호)." }
+          - { step: 4, title: "commit", description: "변경을 메시지와 함께 스냅샷으로 쌓는다." }
+          - { step: 5, title: "push", description: "내 사본(원격)에 올린다." }
+          - { step: 6, title: "pull request", description: "원본에 '합쳐 달라'고 제안하고 리뷰받는다." }
+          - { step: 7, title: "merge", description: "리뷰가 통과하면 본줄기에 합쳐진다 — 기여 완료." }
+
+  - id: commit_habits
+    title: "9. 좋은 커밋 메시지 습관"
+    blocks:
+      - type: doDont
+        title: "커밋 메시지 — 권장 vs 지양"
+        subtitle: "메시지는 미래의 나와 동료가 읽는 변경 이력이다"
+        do:
+          title: "권장 (Do)"
+          items:
+            - "무엇을 왜 바꿨는지 현재형 한 줄로 요약"
+            - "한 커밋 = 한 가지 논리적 변경"
+            - "예: '폐업 거래처 발행 차단 로직 추가'"
+        dont:
+          title: "지양 (Don't)"
+          items:
+            - "'수정', 'ㅁㄴㅇ', 'asdf' 같은 무의미한 메시지"
+            - "10개의 무관한 변경을 한 커밋에 몰아넣기"
+            - "무엇을 했는지 알 수 없는 'update' 한 단어"
+
   - id: glossary
-    title: "6. 자주 보는 용어 8개"
+    title: "10. 자주 보는 용어 8개"
     blocks:
       - type: table
         title: "용어 → 뜻 → 비유"
@@ -162,23 +249,34 @@ sections:
           - ["issue", "할 일·버그·논의 기록표", "포스트잇 메모"]
 
   - id: misconceptions
-    title: "7. 흔한 오해 바로잡기"
+    title: "11. 흔한 오해 바로잡기"
     blocks:
-      - type: warning
-        title: "초심자가 자주 오해하는 3가지"
-        content: "① GitHub은 코드만 올린다? — 문서·이력서·블로그·발표자료도 많이 올린다. ② 공개하면 도둑맞는다? — 비공개(private) 저장소가 기본 제공되고, 공개는 선택이다. ③ 명령어를 다 외워야 한다? — GitHub Desktop·VS Code·웹 UI로 버튼만 눌러도 대부분 된다."
+      - type: misconception
+        title: "초심자가 자주 하는 착각"
+        items:
+          - myth: "GitHub은 코드만 올리는 곳이다."
+            truth: "문서·이력서·블로그·발표자료도 많이 올린다. 텍스트 기반이면 무엇이든 버전 관리할 수 있다."
+          - myth: "공개하면 코드를 도둑맞는다."
+            truth: "비공개(private) 저장소가 기본 제공된다. 공개는 선택이고, 오픈소스는 라이선스로 보호된다."
+          - myth: "명령어를 다 외워야 쓸 수 있다."
+            truth: "GitHub Desktop·VS Code·웹 UI로 버튼만 눌러도 대부분 된다. 명령어는 익숙해지며 천천히."
 
   - id: summary
-    title: "8. 핵심 정리"
+    title: "12. 핵심 정리"
     blocks:
+      - type: summary
+        title: "이것만 기억하세요 (TL;DR)"
+        points:
+          - "Git은 내 PC의 버전 관리 도구, GitHub은 그 결과를 올려 협업하는 웹 서비스다."
+          - "저장소=프로젝트 폴더, 커밋=되돌릴 수 있는 저장 지점, 브랜치=평행 작업 사본."
+          - "push로 올리고 pull로 내려받아 모두의 기준본과 맞춘다."
       - type: list
         style: check
-        title: "이 다섯 줄을 스스로 설명할 수 있으면 충분하다"
+        title: "스스로 설명할 수 있으면 충분하다"
         items:
-          - "Git은 내 PC의 버전 관리 도구, GitHub은 그 결과를 올려 협업하는 웹 서비스다."
-          - "저장소는 프로젝트 폴더, 커밋은 되돌릴 수 있는 저장 지점이다."
-          - "브랜치로 따로 작업하고, 풀 리퀘스트로 합쳐 달라고 제안한다."
-          - "push로 올리고 pull로 내려받아 모두의 기준본과 맞춘다."
+          - "Git과 GitHub의 차이를 한 문장으로 말할 수 있다."
+          - "저장소·커밋·브랜치·풀 리퀘스트를 일상 비유로 설명할 수 있다."
+          - "fork→clone→branch→commit→push→PR→merge 흐름을 안다."
           - "공식 문서는 [GitHub Docs](https://docs.github.com/ko)에서 한국어로 볼 수 있다."
       - type: note
         style: tip

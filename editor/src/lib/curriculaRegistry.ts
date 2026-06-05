@@ -614,14 +614,14 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
     })];
   }
 
-  if (["tip", "tipCard", "note", "info", "warning", "codeDescription"].includes(sourceType)) {
+  if (["tip", "tipCard", "note", "info", "warning", "codeDescription", "danger", "success", "example", "summary"].includes(sourceType)) {
     const calloutTitle = title || blockTypeLabel(sourceType);
     return [markdownBlock({
       content: [`### ${calloutTitle}`, content || description || subtitle].filter(Boolean).join("\n\n"),
       description,
       displayKind: "callout",
-      payload: { tone: sourceType, title: calloutTitle, content: content || description || subtitle },
-      role: sourceType === "warning" ? "check" : "explanation",
+      payload: { ...block, tone: textValue(block.tone) || sourceType, title: calloutTitle, content: content || description || subtitle, points: arrayOfText(block.points ?? block.items) },
+      role: sourceType === "warning" || sourceType === "danger" ? "check" : "explanation",
       sourceType,
       title: calloutTitle,
     })];
@@ -744,6 +744,76 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
       content: formatConceptRows(rows, title || blockTypeLabel(sourceType), subtitle || description),
       displayKind: "conceptRow",
       payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, rows },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "doDont") {
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "doDont",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description },
+      role: "check",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "definition") {
+    const rows = arrayOfMaps(block.items ?? block.rows ?? block.terms);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "definition",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, rows: rows.length ? rows : (textValue(block.term) ? [block] : []) },
+      role: "explanation",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "misconception") {
+    const items = arrayOfMaps(block.items ?? block.rows);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "misconception",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, items },
+      role: "check",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "timeline") {
+    const items = arrayOfMaps(block.items ?? block.steps ?? block.events);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "timeline",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, items },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "stat") {
+    const items = arrayOfMaps(block.items ?? block.stats ?? block.metrics);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "stat",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, items },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "codeCompare") {
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "codeCompare",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description },
       role: "visual",
       sourceType,
       title: displayTitle || title || blockTypeLabel(sourceType),
@@ -1315,8 +1385,18 @@ function blockTypeLabel(type: string) {
   const labels: Record<string, string> = {
     centerText: "중앙 설명",
     choiceCards: "선택 카드",
+    codeCompare: "코드 비교",
     codeDescription: "코드 설명",
     conceptRow: "개념 설명",
+    danger: "주의",
+    definition: "정의",
+    doDont: "권장 vs 지양",
+    example: "예시",
+    misconception: "흔한 오해",
+    stat: "지표",
+    success: "성공 기준",
+    summary: "핵심 정리",
+    timeline: "흐름",
     featureCards: "핵심 카드",
     fullWidthComparison: "비교",
     hero: "대표 설명",

@@ -75,6 +75,11 @@ CARD_REGISTRY: dict[str, CardSpec] = {
     "info": CardSpec("callout", "explanation", (("content", "title", "description", "items"),)),
     "warning": CardSpec("callout", "check", (("content", "title", "description", "items"),)),
     "codeDescription": CardSpec("callout", "explanation", (("content", "code", "description"),)),
+    # 의미 콜아웃(callout displayKind 재사용, 톤만 다름)
+    "danger": CardSpec("callout", "check", (("content", "title", "description", "items"),)),
+    "success": CardSpec("callout", "explanation", (("content", "title", "description", "items"),)),
+    "example": CardSpec("callout", "explanation", (("content", "title", "description", "items"),)),
+    "summary": CardSpec("callout", "explanation", (("content", "title", "description", "items", "points"),)),
     # 퀴즈
     "quiz": CardSpec("quiz", "check", (("question", "title"),)),
     # 구조/텍스트
@@ -83,8 +88,21 @@ CARD_REGISTRY: dict[str, CardSpec] = {
     "list": CardSpec("prose", "learning", (("items",),)),
     "centerText": CardSpec("centerText", "learning"),
     "text": CardSpec("prose", "learning"),
-    # 수평 설명카드(신규) — 개념↔비유/예시 좌우 병치(듀얼코딩·공간 인접)
+    # === 교육 표현 카드 ===
+    # 수평 설명카드 — 개념↔비유/예시 좌우 병치(듀얼코딩·공간 인접)
     "conceptRow": CardSpec("conceptRow", "visual", (("rows",),)),
+    # 권장/지양 규범 대조(대조학습)
+    "doDont": CardSpec("doDont", "check", (("do", "dont", "items"),)),
+    # 용어 정의(term→뜻→예시, 앵커링)
+    "definition": CardSpec("definition", "explanation", (("items", "term", "rows"),)),
+    # 오개념 교정(착각↔사실, Codaro 진단 철학)
+    "misconception": CardSpec("misconception", "check", (("items", "myth", "wrong"),)),
+    # 단계 타임라인(순서·인과 세그멘팅)
+    "timeline": CardSpec("timeline", "visual", (("items", "steps", "events"),)),
+    # 지표 강조(큰 숫자 현저성)
+    "stat": CardSpec("stat", "visual", (("items", "stats", "value"),)),
+    # Before/After 코드 비교(대조학습 코드판)
+    "codeCompare": CardSpec("codeCompare", "visual", (("before", "after", "items"),)),
 }
 
 # allowlist = canonical type + alias. type 오타는 여기에 없으므로 게이트가 잡는다.

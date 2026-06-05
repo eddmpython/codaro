@@ -17,6 +17,8 @@ import {
   Sparkles,
   Target,
   TerminalSquare,
+  TrendingUp,
+  TriangleAlert,
 } from "lucide-react";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -228,6 +230,30 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
     return <ConceptRowCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
   }
 
+  if (displayKind === "doDont") {
+    return <DoDontCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "definition") {
+    return <DefinitionCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "misconception") {
+    return <MisconceptionCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "timeline") {
+    return <TimelineCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "stat") {
+    return <StatCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "codeCompare") {
+    return <CodeCompareCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
   return (
     <div className="space-y-3">
       {block.description ? (
@@ -436,28 +462,44 @@ function ResourceCard({ item, index }: { item: Record<string, unknown>; index: n
   );
 }
 
+const CALLOUT_TONES: Record<string, { frame: string; Icon: typeof FileText }> = {
+  warning: { frame: "border-amber-400/40 bg-amber-400/10 text-amber-300", Icon: ListChecks },
+  danger: { frame: "border-rose-400/40 bg-rose-400/10 text-rose-300", Icon: TriangleAlert },
+  tip: { frame: "border-emerald-400/35 bg-emerald-400/10 text-emerald-300", Icon: Lightbulb },
+  success: { frame: "border-emerald-400/35 bg-emerald-400/10 text-emerald-300", Icon: CheckCircle2 },
+  example: { frame: "border-sky-400/35 bg-sky-400/10 text-sky-300", Icon: BookOpen },
+  summary: { frame: "border-cyan-400/35 bg-cyan-400/10 text-cyan-300", Icon: ListChecks },
+  note: { frame: "border-cyan-400/35 bg-cyan-400/10 text-cyan-300", Icon: FileText },
+};
+
 function CalloutCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
-  const tone = payloadText(payload, "tone") || block.sourceType || "note";
+  const styleTone = payloadText(payload, "style");
+  const tone = payloadText(payload, "tone") || (block.sourceType && block.sourceType !== "note" ? block.sourceType : styleTone) || block.sourceType || "note";
   const title = payloadText(payload, "title") || block.title || blockTypeLabel(tone);
   const content = payloadText(payload, "content") || block.content;
-  const isWarning = tone === "warning" || block.role === "check";
-  const isTip = tone === "tip" || tone === "tipCard";
-  const Icon = isWarning ? ListChecks : isTip ? Lightbulb : FileText;
-  const toneClass = isWarning
-    ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
-    : isTip
-      ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300"
-      : "border-cyan-400/35 bg-cyan-400/10 text-cyan-300";
+  const points = payloadTextList(payload.points).length ? payloadTextList(payload.points) : payloadTextList(payload.items);
+  const resolved = CALLOUT_TONES[tone] ?? (block.role === "check" ? CALLOUT_TONES.warning : CALLOUT_TONES.note);
+  const { frame, Icon } = resolved;
 
   return (
-    <div className={cn("rounded-md border px-4 py-3", toneClass)}>
+    <div className={cn("rounded-md border px-4 py-3", frame)}>
       <div className="flex min-w-0 items-start gap-3">
         <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-background/80">
           <Icon className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold tracking-normal text-foreground">{stripMarkdown(title)}</div>
-          {content ? <div className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(content)}</div> : null}
+          {content ? <div className="mt-1 text-sm leading-6 text-muted-foreground">{renderInline(content)}</div> : null}
+          {points.length ? (
+            <div className="mt-2 space-y-1.5">
+              {points.map((point, index) => (
+                <div className="flex gap-2 text-sm leading-6 text-muted-foreground" key={`${point}-${index}`}>
+                  <CheckCircle2 className="mt-1 size-3.5 shrink-0 text-current opacity-70" />
+                  <span>{renderInline(point)}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -684,6 +726,204 @@ function ConceptRowItem({ index, row }: { index: number; row: Record<string, unk
       <div className="min-w-0 text-sm leading-6 text-muted-foreground">
         {explain ? <div>{renderInline(explain)}</div> : null}
         {image ? <div className="mt-2"><VisualAsset src={image} title={concept} /></div> : null}
+      </div>
+    </div>
+  );
+}
+
+// 권장/지양 규범 대조 — 좋은 예(녹색/체크) | 나쁜 예(적색/엑스) 좌우 병치
+function DoDontCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const title = payloadText(payload, "title") || block.title || "권장 vs 지양";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  const doMap = payloadMap(payload.do).items ? payloadMap(payload.do) : payloadMap(payload.do || payload.good);
+  const dontMap = payloadMap(payload.dont).items ? payloadMap(payload.dont) : payloadMap(payload.dont || payload.bad);
+  const doItems = payloadTextList(doMap.items).length ? payloadTextList(doMap.items) : payloadTextList(payload.do);
+  const dontItems = payloadTextList(dontMap.items).length ? payloadTextList(dontMap.items) : payloadTextList(payload.dont);
+  const Side = ({ label, items, good }: { label: string; items: string[]; good: boolean }) => (
+    <div className={cn("rounded-md border px-3 py-3", good ? "border-emerald-400/30 bg-emerald-400/5" : "border-rose-400/30 bg-rose-400/5")}>
+      <div className={cn("mb-2 flex items-center gap-1.5 text-xs font-semibold", good ? "text-emerald-300" : "text-rose-300")}>
+        {good ? <CheckCircle2 className="size-3.5" /> : <TriangleAlert className="size-3.5" />}
+        {label}
+      </div>
+      <div className="space-y-1.5">
+        {items.map((item, index) => (
+          <div className="flex gap-2 text-sm leading-6 text-muted-foreground" key={`${item}-${index}`}>
+            <span className={cn("mt-0.5 shrink-0", good ? "text-emerald-400" : "text-rose-400")}>{good ? "○" : "✕"}</span>
+            <span>{renderInline(item)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      <div className="grid gap-2 md:grid-cols-2">
+        <Side good label={payloadText(doMap, "title") || "권장 (Do)"} items={doItems} />
+        <Side good={false} label={payloadText(dontMap, "title") || "지양 (Don't)"} items={dontItems} />
+      </div>
+    </div>
+  );
+}
+
+// 용어 정의 — 용어(좌, 강조) ↔ 뜻 + 예시(우)
+function DefinitionCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const rowsRaw = payloadItems(payload, "rows").length ? payloadItems(payload, "rows") : payloadItems(payload, "items");
+  const rows = rowsRaw.length ? rowsRaw : payloadText(payload, "term") ? [payload] : [];
+  const title = payloadText(payload, "title") || block.title || "정의";
+  const subtitle = payloadText(payload, "subtitle");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      {rows.length ? (
+        <div className="space-y-2">
+          {rows.map((row, index) => {
+            const term = payloadText(row, "term") || payloadText(row, "title") || "용어";
+            const english = payloadText(row, "english") || payloadText(row, "en");
+            const meaning = payloadText(row, "meaning") || payloadText(row, "definition") || payloadText(row, "description");
+            const example = payloadText(row, "example");
+            const tone = CONCEPT_ACCENTS[payloadText(row, "accent")] ?? panelTone(index);
+            return (
+              <div className={cn("grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[260px_1fr] md:items-start", tone.frame)} key={`${term}-${index}`}>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-foreground">{stripMarkdown(term)}</div>
+                  {english ? <div className="mt-0.5 font-mono text-xs text-muted-foreground">{english}</div> : null}
+                </div>
+                <div className="min-w-0 space-y-2">
+                  {meaning ? <div className="text-sm leading-6 text-muted-foreground">{renderInline(meaning)}</div> : null}
+                  {example ? <div className="rounded-md bg-muted/30 px-2 py-1.5 text-xs leading-5 text-muted-foreground">예: {renderInline(example)}</div> : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
+    </div>
+  );
+}
+
+// 오개념 교정 — 착각(❌) → 사실(✓) 대구
+function MisconceptionCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const rows = payloadItems(payload, "items").length ? payloadItems(payload, "items") : payloadItems(payload, "rows");
+  const title = payloadText(payload, "title") || block.title || "흔한 오해";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      {rows.length ? (
+        <div className="space-y-2">
+          {rows.map((row, index) => {
+            const myth = payloadText(row, "myth") || payloadText(row, "wrong") || payloadText(row, "misconception");
+            const truth = payloadText(row, "truth") || payloadText(row, "right") || payloadText(row, "fact") || payloadText(row, "reality");
+            return (
+              <div className="rounded-md border bg-background px-3 py-3" key={`${myth}-${index}`}>
+                <div className="flex gap-2 text-sm leading-6">
+                  <span className="mt-0.5 shrink-0 text-rose-400">✕</span>
+                  <span className="text-muted-foreground line-through decoration-rose-400/40">{renderInline(myth)}</span>
+                </div>
+                <div className="mt-1.5 flex gap-2 text-sm leading-6">
+                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400" />
+                  <span className="text-foreground">{renderInline(truth)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
+    </div>
+  );
+}
+
+// 단계 타임라인 — 세로 rail + 번호 노드
+function TimelineCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const rows = payloadItems(payload, "items").length ? payloadItems(payload, "items") : (payloadItems(payload, "steps").length ? payloadItems(payload, "steps") : payloadItems(payload, "events"));
+  const title = payloadText(payload, "title") || block.title || "흐름";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      <div className="space-y-0">
+        {rows.map((row, index) => {
+          const label = payloadText(row, "step") || payloadText(row, "label") || String(index + 1);
+          const head = payloadText(row, "title") || payloadText(row, "name");
+          const detail = payloadText(row, "description") || payloadText(row, "detail") || payloadText(row, "content");
+          const last = index === rows.length - 1;
+          return (
+            <div className="flex gap-3" key={`${head}-${index}`}>
+              <div className="flex flex-col items-center">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-cyan-400/10 text-xs font-semibold tabular-nums text-cyan-300">{label}</span>
+                {!last ? <span className="my-1 w-px flex-1 bg-border" /> : null}
+              </div>
+              <div className={cn("min-w-0 flex-1", last ? "pb-0" : "pb-3")}>
+                <div className="text-sm font-semibold text-foreground">{stripMarkdown(head)}</div>
+                {detail ? <div className="mt-0.5 text-sm leading-6 text-muted-foreground">{renderInline(detail)}</div> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// 지표 강조 — 큰 숫자 + 라벨 + 증감
+function StatCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const rows = payloadItems(payload, "items").length ? payloadItems(payload, "items") : (payloadItems(payload, "stats").length ? payloadItems(payload, "stats") : payloadItems(payload, "metrics"));
+  const title = payloadText(payload, "title") || block.title || "";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map((row, index) => {
+          const value = payloadText(row, "value") || payloadText(row, "number") || payloadText(row, "stat");
+          const label = payloadText(row, "label") || payloadText(row, "title") || payloadText(row, "name");
+          const delta = payloadText(row, "delta") || payloadText(row, "change");
+          const trend = payloadText(row, "trend");
+          const tone = CONCEPT_ACCENTS[payloadText(row, "accent")] ?? panelTone(index);
+          return (
+            <div className={cn("rounded-md border bg-background px-3 py-4 text-center", tone.frame)} key={`${label}-${index}`}>
+              <div className="text-2xl font-bold tabular-nums text-foreground">{stripMarkdown(value)}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{stripMarkdown(label)}</div>
+              {delta ? (
+                <div className={cn("mt-1 inline-flex items-center gap-1 text-[11px]", trend === "down" ? "text-rose-300" : "text-emerald-300")}>
+                  <TrendingUp className={cn("size-3", trend === "down" && "rotate-180")} />
+                  {stripMarkdown(delta)}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Before/After 코드 비교 — 좌우 코드 패널
+function CodeCompareCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const title = payloadText(payload, "title") || block.title || "코드 비교";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  const beforeMap = payloadMap(payload.before).code ? payloadMap(payload.before) : payloadMap(payload.before || payload.bad);
+  const afterMap = payloadMap(payload.after).code ? payloadMap(payload.after) : payloadMap(payload.after || payload.good);
+  const beforeCode = payloadText(beforeMap, "code") || payloadText(payload, "before");
+  const afterCode = payloadText(afterMap, "code") || payloadText(payload, "after");
+  const Pane = ({ label, code, good }: { label: string; code: string; good: boolean }) => (
+    <div className="min-w-0">
+      <div className={cn("flex items-center gap-1.5 px-1 pb-1 text-[10px] font-semibold uppercase", good ? "text-emerald-300" : "text-rose-300")}>
+        {good ? <CheckCircle2 className="size-3" /> : <TriangleAlert className="size-3" />}
+        {label}
+      </div>
+      <div className={cn("rounded-md border bg-code", good ? "border-emerald-400/25" : "border-rose-400/25")}>
+        <ScrollableCode code={code} />
+      </div>
+    </div>
+  );
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      <div className="grid gap-2 md:grid-cols-2">
+        <Pane good={false} label={payloadText(beforeMap, "label") || "Before"} code={beforeCode} />
+        <Pane good label={payloadText(afterMap, "label") || "After"} code={afterCode} />
       </div>
     </div>
   );
