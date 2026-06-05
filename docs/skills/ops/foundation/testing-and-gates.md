@@ -128,8 +128,10 @@ uv run python -X utf8 tests/run.py gate attempts
 
 - `tests/run.py` — gate runner 진입점(SSOT). 항상 루트에 둔다.
 - `tests/<domain>/test*.py` — 도메인별 pytest 스위트. `backend` gate가 재귀 수집한다.
-- `tests/verify*.py` · `tests/audit*.py` — `tests/run.py`가 이름이 아니라 **경로 리터럴로 직접 실행**하는 gate 드라이버. run.py와 강결합이라 루트에 둔다.
-- `tests/support/`, `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` — 여러 테스트가 import 하는 공유 인프라.
+- `tests/verify*.py` · `tests/audit*.py` — `tests/run.py`가 이름이 아니라 **경로 리터럴로 직접 실행**하는 gate 드라이버. run.py와 강결합이라 루트에 평면으로 둔다(도메인 트리로 내리지 않는다). `tests/verifyRootClean.py`는 구조 SSOT의 root 계약 enforcer라 특히 경로가 고정이다.
+- `tests/conftest.py` — `tests/` 루트를 `sys.path`에 올려 도메인 트리 스위트가 루트 공유 헬퍼를 bare import 하게 하는 부트스트랩.
+- `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` — 여러 테스트가 import 하는 공유 인프라.
+- `tests/_predictStrictCategories.txt`, `tests/_strongSignalCategories.txt` — gate 드라이버가 `ROOT/"tests"/...` 경로로 읽는 카테고리 allowlist 데이터.
 - `tests/_attempts/` — **운영과 분리된 실험 샌드박스**. 아래 규칙 참조.
 
 ## 실험 샌드박스 (`tests/_attempts/`)
