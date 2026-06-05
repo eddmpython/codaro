@@ -305,6 +305,44 @@ def testCurriculumRouterKeepsPlanningBehindDomainBoundary() -> None:
     assert "PHILOSOPHY" not in source
 
 
+def testClassroomRouterKeepsAssignmentRoomBehindDomainBoundary() -> None:
+    source = (ROOT / "src/codaro/api/classroomRouter.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert any(module.endswith("classroom.assignmentFlow") for module in importedModules)
+    for blocked in (
+        "classroom.assignmentStore",
+        "classroom.assignmentModel",
+        "classroom.syncQueue",
+        "classroom.relayClient",
+    ):
+        assert all(not module.endswith(blocked) for module in importedModules)
+    assert "AssignmentFlow(store=state.assignmentStore)" in source
+    assert "AssignmentStore" not in source
+    assert '"/api/classroom/assignments"' in source
+    assert '"/api/classroom/events"' in source
+
+
+def testAssignmentFlowDoesNotImportTransportLayer() -> None:
+    source = (ROOT / "src/codaro/classroom/assignmentFlow.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    importedModules = [
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module
+    ]
+
+    assert all("api." not in module and not module.endswith("api") for module in importedModules)
+    assert "APIRouter" not in source
+    assert "HTTPException" not in source
+    assert "fail(" not in source
+
+
 def testCurriculumCheckFlowDoesNotImportTransportLayer() -> None:
     source = (ROOT / "src/codaro/curriculum/checkFlow.py").read_text(encoding="utf-8")
     tree = ast.parse(source)

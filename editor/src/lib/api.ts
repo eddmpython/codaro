@@ -16,6 +16,14 @@ import type {
   CurriculumTaxonomyPayload,
   AnalyticsListPayload,
   AnalyticsSummaryPayload,
+  AssignmentCreatePayload,
+  AssignmentDashboardPayload,
+  AssignmentEventPayload,
+  AssignmentEventsPayload,
+  AssignmentJoinPayload,
+  AssignmentListPayload,
+  AssignmentMaterialResponse,
+  AssignmentPublishPayload,
   CheckProposalsPayload,
   CurriculumQualityReportPayload,
   LessonStatsPayload,
@@ -50,6 +58,7 @@ import type {
   TaskListPayload,
   TaskRun,
   VariableInfo,
+  ClassroomStatusPayload,
 } from "@/types";
 import {
   applyAssistantStreamProtocolEvent,
@@ -424,6 +433,73 @@ export const codaroApi = {
     const query = params.toString();
     return deleteJson<{ ok: boolean }>(`/api/share/packs/${encodeURIComponent(packId)}${query ? `?${query}` : ""}`);
   },
+  classroomStatus: () => requestJson<ClassroomStatusPayload>("/api/classroom/status"),
+  assignments: () => requestJson<AssignmentListPayload>("/api/classroom/assignments"),
+  createAssignment: (payload: {
+    title: string;
+    description?: string;
+    material: Record<string, unknown>;
+    dueAt?: string | null;
+    settings?: Record<string, unknown> | null;
+  }) => postJson<AssignmentCreatePayload>("/api/classroom/assignments", payload),
+  publishAssignment: (assignmentId: string, tutorToken: string) =>
+    postJson<AssignmentPublishPayload>(
+      `/api/classroom/assignments/${encodeURIComponent(assignmentId)}/publish`,
+      { tutorToken },
+    ),
+  joinAssignment: (payload: { joinCode: string; studentTag: string; displayName?: string }) =>
+    postJson<AssignmentJoinPayload>("/api/classroom/join", payload),
+  assignmentMaterial: (assignmentId: string, payload: {
+    participantId?: string;
+    participantToken?: string;
+    tutorToken?: string;
+  }) => {
+    const params = new URLSearchParams();
+    if (payload.participantId) params.set("participantId", payload.participantId);
+    if (payload.participantToken) params.set("participantToken", payload.participantToken);
+    if (payload.tutorToken) params.set("tutorToken", payload.tutorToken);
+    return requestJson<AssignmentMaterialResponse>(
+      `/api/classroom/assignments/${encodeURIComponent(assignmentId)}/material?${params.toString()}`,
+    );
+  },
+  assignmentDashboard: (assignmentId: string, tutorToken: string) =>
+    requestJson<AssignmentDashboardPayload>(
+      `/api/classroom/assignments/${encodeURIComponent(assignmentId)}/dashboard?tutorToken=${encodeURIComponent(tutorToken)}`,
+    ),
+  recordAssignmentEvent: (payload: {
+    assignmentId: string;
+    participantId: string;
+    participantToken: string;
+    eventType: string;
+    eventId?: string;
+    sectionId?: string;
+    category?: string;
+    contentId?: string;
+    payload?: Record<string, unknown>;
+  }) => postJson<{ event: AssignmentEventPayload; accepted: boolean }>("/api/classroom/events", payload),
+  assignmentEvents: (payload: {
+    assignmentId: string;
+    participantId?: string;
+    participantToken?: string;
+    tutorToken?: string;
+    afterSequence?: number;
+  }) => {
+    const params = new URLSearchParams({ assignmentId: payload.assignmentId });
+    if (payload.participantId) params.set("participantId", payload.participantId);
+    if (payload.participantToken) params.set("participantToken", payload.participantToken);
+    if (payload.tutorToken) params.set("tutorToken", payload.tutorToken);
+    if (payload.afterSequence) params.set("afterSequence", String(payload.afterSequence));
+    return requestJson<AssignmentEventsPayload>(`/api/classroom/events?${params.toString()}`);
+  },
+  postAssignmentComment: (payload: {
+    assignmentId: string;
+    body: string;
+    sectionId?: string;
+    targetParticipantId?: string;
+    tutorToken?: string;
+    participantId?: string;
+    participantToken?: string;
+  }) => postJson<{ event: AssignmentEventPayload; accepted: boolean }>("/api/classroom/comments", payload),
   aiProviders: () => requestJson<AiProviderCatalogPayload>("/api/ai/providers"),
   aiTools: () => requestJson<AiToolCatalogPayload>("/api/ai/tools"),
   aiProfile: () => requestJson<AiProfile>("/api/ai/profile"),

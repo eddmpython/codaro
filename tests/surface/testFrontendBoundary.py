@@ -65,6 +65,54 @@ def testCurriculumDependencyPanelDelegatesPackageApiBoundary() -> None:
     assert "curriculumPackageInstallCommand" in source
 
 
+def testAssignmentRoomPanelDelegatesClassroomApiBoundary() -> None:
+    source = _read("editor/src/components/classroom/assignmentRoomPanel.tsx")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "useAssignmentRoomState" in source
+    assert 'data-assignment-room-panel="true"' in source
+    assert 'data-assignment-room-create="true"' in source
+    assert 'data-assignment-room-join="true"' in source
+    assert 'data-assignment-room-dashboard="true"' in source
+
+
+def testAssignmentRoomStateHookDelegatesClassroomApiBoundary() -> None:
+    source = _read("editor/src/hooks/useAssignmentRoomState.ts")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "createAssignmentRoomFromDocument" in source
+    assert "loadAssignmentDashboard" in source
+    assert "recordAssignmentLearningEvent" in source
+
+
+def testClassroomOperationsOwnsClassroomApiBoundary() -> None:
+    source = _read("editor/src/lib/classroomOperations.ts")
+
+    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi.classroomStatus" in source
+    assert "codaroApi.createAssignment" in source
+    assert "codaroApi.publishAssignment" in source
+    assert "codaroApi.joinAssignment" in source
+    assert "codaroApi.assignmentMaterial" in source
+    assert "codaroApi.assignmentDashboard" in source
+    assert "codaroApi.recordAssignmentEvent" in source
+
+
+def testClassroomEventsKeepStudentSignalScopedAndOfflineSafe() -> None:
+    source = _read("editor/src/lib/classroomEvents.ts")
+
+    assert 'from "@/lib/api"' not in source
+    assert "codaroApi" not in source
+    assert "ASSIGNMENT_OUTBOX_KEY" in source
+    assert "enqueueAssignmentEvent" in source
+    assert "flushAssignmentEventOutbox" in source
+    assert "SECRET_PATTERNS" in source
+    assert "redactText" in source
+    assert "studentCode" not in source
+
+
 def testCurriculumPackagePreparationOwnsPackageApiBoundary() -> None:
     source = _read("editor/src/lib/curriculumPackagePreparation.ts")
 

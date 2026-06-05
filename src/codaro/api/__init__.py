@@ -1,5 +1,6 @@
 from .aiRouter import createAiRouter
 from .automationRouter import createAutomationRouter
+from .classroomRouter import createClassroomRouter
 from .extensionRouter import createExtensionRouter
 from .bootstrapRouter import createBootstrapRouter
 from .curriculumRouter import createCurriculumRouter
@@ -9,6 +10,11 @@ from .kernelRouter import createKernelRouter
 from .shareRouter import createShareRouter
 from .requestModels import (
     CheckExerciseRequest,
+    AssignmentCommentRequest,
+    AssignmentCreateRequest,
+    AssignmentEventRequest,
+    AssignmentJoinRequest,
+    AssignmentPublishRequest,
     CurriculumProgressRequest,
     EnvironmentInfo,
     InsertBlockRequest,
@@ -27,6 +33,11 @@ from .workspaceRouter import createWorkspaceRouter
 from ..system.serverState import ServerState, createServerState
 
 __all__ = [
+    "AssignmentCommentRequest",
+    "AssignmentCreateRequest",
+    "AssignmentEventRequest",
+    "AssignmentJoinRequest",
+    "AssignmentPublishRequest",
     "CheckExerciseRequest",
     "CurriculumProgressRequest",
     "EnvironmentInfo",
@@ -44,6 +55,7 @@ __all__ = [
     "createAiRouter",
     "createAutomationRouter",
     "createBootstrapRouter",
+    "createClassroomRouter",
     "createCurriculumRouter",
     "createDocumentRouter",
     "createExtensionRouter",

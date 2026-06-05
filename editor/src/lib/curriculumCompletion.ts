@@ -1,4 +1,5 @@
 import { codaroApi } from "@/lib/api";
+import { recordAssignmentMissionEvent } from "@/lib/classroomEvents";
 
 export const PROGRESS_UPDATED_EVENT = "codaro:progress-updated";
 
@@ -13,5 +14,17 @@ export async function recordLessonMissionComplete(
     window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
   }
   const completedAt = (lesson as { completedAt?: unknown } | null)?.completedAt;
-  return { lessonCompleted: typeof completedAt === "string" && completedAt.length > 0 };
+  const lessonCompleted = typeof completedAt === "string" && completedAt.length > 0;
+  try {
+    await recordAssignmentMissionEvent({
+      category,
+      contentId,
+      missionId,
+      totalMissions,
+      lessonCompleted,
+    });
+  } catch (error) {
+    console.warn("assignment mission event record failed", error);
+  }
+  return { lessonCompleted };
 }

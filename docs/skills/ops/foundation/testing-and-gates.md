@@ -128,7 +128,7 @@ uv run python -X utf8 tests/run.py gate attempts
 
 - `tests/run.py` — gate runner 진입점(SSOT). gate를 이름이 아니라 **경로 리터럴**로 직접 실행한다. 항상 루트에 둔다.
 - `tests/<domain>/test*.py` — 도메인별 pytest 스위트. `backend` gate가 재귀 수집한다.
-- `tests/<domain>/verify*.py` · `tests/<domain>/audit*.py` — 같은 도메인의 gate 드라이버. `tests/run.py`가 경로 리터럴로 직접 실행한다. 도메인: `architecture` `automation` `curriculum` `document` `learning` `runtime` `share` `surface` `teacher`, 그리고 제품 전반 audit은 `product`. 드라이버는 `Path(__file__).resolve().parents[2]`로 repo ROOT를 잡는다.
+- `tests/<domain>/verify*.py` · `tests/<domain>/audit*.py` — 같은 도메인의 gate 드라이버. `tests/run.py`가 경로 리터럴로 직접 실행한다. 도메인: `architecture` `automation` `classroom` `curriculum` `document` `learning` `runtime` `share` `surface` `teacher`, 그리고 제품 전반 audit은 `product`. 드라이버는 `Path(__file__).resolve().parents[2]`로 repo ROOT를 잡는다.
 - `tests/verifyRootClean.py` — root 구조 계약 enforcer. 구조 SSOT(`repository-structure.md`)가 이 경로를 명시하므로 도메인 폴더로 내리지 않고 루트에 고정한다.
 - `tests/conftest.py` — `tests/` 루트를 `sys.path`에 올려 도메인 스위트가 루트 공유 헬퍼를 bare import 하게 하는 부트스트랩.
 - `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` — 여러 테스트가 import 하는 공유 인프라. 도메인 폴더의 playwright 드라이버는 직접 실행되므로 각자 `tests/` 루트를 `sys.path`에 올려 import 한다.

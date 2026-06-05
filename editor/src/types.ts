@@ -779,6 +779,130 @@ export type SharePackStatusPayload = {
   workspaceRoot: string;
 };
 
+export type AssignmentEventType =
+  | "materialOpened"
+  | "sectionStarted"
+  | "predictionLocked"
+  | "checkSubmitted"
+  | "checkPassed"
+  | "checkFailed"
+  | "hintUsed"
+  | "missionCompleted"
+  | "lessonCompleted"
+  | "questionAsked"
+  | "feedbackPosted"
+  | "feedbackRead";
+
+export type AssignmentMaterialPayload = {
+  materialId: string;
+  sourceKind: "document" | "sharePack" | "inlineYaml";
+  title: string;
+  category: string;
+  contentId: string;
+  document?: CodaroDocument | null;
+  packId?: string;
+  packVersion?: string;
+  contentPath?: string;
+  packages: string[];
+};
+
+export type AssignmentParticipantPayload = {
+  participantId: string;
+  role: "student" | "tutor";
+  studentTag: string;
+  displayName: string;
+  joinedAt: string;
+  lastSeenAt: string;
+};
+
+export type AssignmentRoomPayload = {
+  assignmentId: string;
+  title: string;
+  description: string;
+  status: "draft" | "published" | "archived";
+  joinCode: string;
+  material: AssignmentMaterialPayload;
+  participants: Record<string, AssignmentParticipantPayload>;
+  settings: {
+    shareCode: "never" | "finalOnly" | "liveHelp";
+    allowLateSubmission: boolean;
+    syncMode: "local" | "relay";
+  };
+  dueAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AssignmentEventPayload = {
+  eventId: string;
+  assignmentId: string;
+  participantId: string;
+  eventType: AssignmentEventType;
+  sequence: number;
+  sectionId: string;
+  category: string;
+  contentId: string;
+  createdAt: string;
+  payload: Record<string, unknown>;
+};
+
+export type AssignmentDashboardParticipant = AssignmentParticipantPayload & {
+  learningStatus: "notStarted" | "inProgress" | "stuck" | "completed";
+  lastEventAt: string | null;
+  currentSectionId: string;
+  checkPassedCount: number;
+  checkFailedCount: number;
+  hintUsedCount: number;
+  missionCompletedCount: number;
+  completedSections: string[];
+  failedSections: string[];
+  latestFailure: AssignmentEventPayload | null;
+};
+
+export type AssignmentDashboardPayload = {
+  assignment: AssignmentRoomPayload;
+  participants: AssignmentDashboardParticipant[];
+  statusCounts: Record<"notStarted" | "inProgress" | "stuck" | "completed", number>;
+  sectionStats: Array<{ sectionId: string; started: number; passed: number; failed: number; hintUsed: number }>;
+  eventCount: number;
+};
+
+export type AssignmentCreatePayload = {
+  assignment: AssignmentRoomPayload;
+  tutorToken: string;
+};
+
+export type AssignmentPublishPayload = AssignmentCreatePayload & {
+  joinCode: string;
+};
+
+export type AssignmentJoinPayload = {
+  assignment: AssignmentRoomPayload;
+  participant: AssignmentParticipantPayload;
+  participantToken: string;
+};
+
+export type AssignmentMaterialResponse = {
+  assignment: AssignmentRoomPayload;
+  material: AssignmentMaterialPayload;
+};
+
+export type AssignmentEventsPayload = {
+  events: AssignmentEventPayload[];
+  nextSequence: number;
+};
+
+export type ClassroomStatusPayload = {
+  enabled: boolean;
+  storageRoot: string;
+  syncMode: "local" | "relay";
+};
+
+export type AssignmentListPayload = {
+  assignments: AssignmentRoomPayload[];
+  total: number;
+};
+
 export type AiProvider = {
   id?: string;
   name?: string;

@@ -49,6 +49,7 @@ export type CurrentLearningSurfaceProps = {
   onConnectAi: () => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNewChat: () => void;
+  onOpenAssignmentMaterial?: (document: CodaroDocument, title: string) => void;
   onOpenTerminalCommand: (command: string) => void;
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
@@ -132,6 +133,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onCellAsk={props.onCellAsk}
         onDraftChange={props.onDraftChange}
+        onOpenAssignmentMaterial={props.onOpenAssignmentMaterial}
         onOpenTerminalCommand={props.onOpenTerminalCommand}
         onRejectPendingBlocks={props.onRejectPendingBlocks}
         onRunBlock={props.onRunBlock}

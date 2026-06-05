@@ -86,7 +86,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (15) — 5층 구조
+## Architecture (16) — 5층 구조
 
 - [repository-structure](architecture/repository-structure.md)
 - [ssot-map](architecture/ssot-map.md)
@@ -102,6 +102,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
 - [automation-authoring-loop](architecture/automation-authoring-loop.md)
 - [share-pack-distribution](architecture/share-pack-distribution.md)
+- [assignment-room](architecture/assignment-room.md)
 - [live-provider-ops](architecture/live-provider-ops.md)
 
 ## Ops (15) — 운영 규칙

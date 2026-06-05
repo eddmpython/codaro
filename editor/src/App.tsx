@@ -257,6 +257,14 @@ function App() {
     saveCustomCurriculumDocumentEntry,
   ]);
 
+  const openAssignmentMaterial = useCallback((materialDocument: CodaroDocument, title: string) => {
+    const entry = saveCustomCurriculumDocumentEntry(materialDocument, title || materialDocument.title);
+    openCustomCurriculum(entry, { showNotice: true });
+  }, [
+    openCustomCurriculum,
+    saveCustomCurriculumDocumentEntry,
+  ]);
+
   const {
     askAssistant,
     askCellAssistant,
@@ -409,6 +417,7 @@ function App() {
               onRejectPendingBlocks={rejectPendingBlocks}
               onRefreshAutomation={refreshAutomation}
               onRenameDocument={renameNotebookDocument}
+              onOpenAssignmentMaterial={openAssignmentMaterial}
               onOpenSharePackCurriculum={openSharePackCurriculum}
               notebookRunning={notebookRunning}
               onRunBlock={runBlock}

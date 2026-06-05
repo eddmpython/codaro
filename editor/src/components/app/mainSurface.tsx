@@ -71,6 +71,7 @@ type MainSurfaceProps = {
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNewChat: () => void;
+  onOpenAssignmentMaterial?: (document: CodaroDocument, title: string) => void;
   onOpenTerminalCommand: (command: string) => void;
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
@@ -195,6 +196,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onConnectAi={props.onConnectAi}
         onDraftChange={props.onDraftChange}
         onNewChat={props.onNewChat}
+        onOpenAssignmentMaterial={props.onOpenAssignmentMaterial}
         onOpenTerminalCommand={props.onOpenTerminalCommand}
         onPromptChange={props.onPromptChange}
         onRejectPendingBlocks={props.onRejectPendingBlocks}

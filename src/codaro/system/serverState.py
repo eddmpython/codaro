@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..classroom.assignmentStore import AssignmentStore
 from ..curriculum.analyticsTimeline import AnalyticsTimeline
 from ..curriculum.learnerState import LearnerStateStore
 from ..curriculum.osCache import CurriculumOsCache
@@ -28,6 +29,7 @@ class ServerState:
     curriculumOs: CurriculumOsCache
     learnerStateStore: LearnerStateStore
     analyticsTimeline: AnalyticsTimeline
+    assignmentStore: AssignmentStore
 
 
 def createServerState(
@@ -58,4 +60,5 @@ def createServerState(
         curriculumOs=CurriculumOsCache(studyLoader),
         learnerStateStore=LearnerStateStore(),
         analyticsTimeline=AnalyticsTimeline(),
+        assignmentStore=AssignmentStore(),
     )

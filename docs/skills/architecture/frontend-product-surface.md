@@ -93,6 +93,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 현재 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
 - 노트북: 빈 노트북, Python/Markdown 셀, 셀 바로 아래 실행 결과, 접을 수 있는 Codaro 패널
 - 자동화: 검증된 셀/recipe를 저장하고 예약하는 두 번째 loop. `Codaro 자동화`, `나만의 자동화`, 태스크 예약과 실행 상태를 보여준다.
+- 과제방: MVP에서는 별도 1급 사이드바 표면이 아니라 현재 학습 상단의 과제 패널이다. 튜터는 현재 YAML로 과제를 만들고 joinCode를 배포하며, 학생은 joinCode로 참가해 로컬 실행 결과 이벤트를 동기화한다. 표면/계약 SSOT는 `docs/skills/architecture/assignment-room.md`다.
 - tool call과 컨텍스트는 사용자가 검토해야 할 때 action log/diff/detail로 열 수 있게 한다. 학습 화면의 기본 우측 패널로 고정하지 않는다.
 
 ## 결정

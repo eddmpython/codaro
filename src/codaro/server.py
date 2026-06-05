@@ -19,6 +19,7 @@ from .api import (
     createAiRouter,
     createAutomationRouter,
     createBootstrapRouter,
+    createClassroomRouter,
     createCurriculumRouter,
     createDocumentRouter,
     createExtensionRouter,
@@ -337,6 +338,7 @@ def createServerApp(
     app.include_router(createTerminalRouter(state))
     app.include_router(createWorkspaceRouter(state))
     app.include_router(createCurriculumRouter(state))
+    app.include_router(createClassroomRouter(state))
     app.include_router(createSpaRouter(state))
     return app
 

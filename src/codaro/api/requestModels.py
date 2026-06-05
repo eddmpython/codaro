@@ -124,3 +124,43 @@ class OutcomeValidationRequest(BaseModel):
 
 class ReviewResultRequest(BaseModel):
     success: bool = True
+
+
+class AssignmentCreateRequest(BaseModel):
+    title: str
+    description: str = ""
+    material: dict[str, Any]
+    dueAt: str | None = None
+    settings: dict[str, Any] | None = None
+
+
+class AssignmentPublishRequest(BaseModel):
+    tutorToken: str
+
+
+class AssignmentJoinRequest(BaseModel):
+    joinCode: str
+    studentTag: str
+    displayName: str = ""
+
+
+class AssignmentEventRequest(BaseModel):
+    assignmentId: str
+    participantId: str
+    participantToken: str
+    eventType: str
+    eventId: str = ""
+    sectionId: str = ""
+    category: str = ""
+    contentId: str = ""
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class AssignmentCommentRequest(BaseModel):
+    assignmentId: str
+    body: str
+    sectionId: str = ""
+    targetParticipantId: str = ""
+    tutorToken: str = ""
+    participantId: str = ""
+    participantToken: str = ""

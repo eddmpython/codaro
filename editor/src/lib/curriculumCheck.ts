@@ -1,4 +1,5 @@
 import { codaroApi } from "@/lib/api";
+import { recordAssignmentCheckEvent } from "@/lib/classroomEvents";
 import type { CheckResult } from "@/types";
 
 export type ExerciseCheckRequest = {
@@ -23,5 +24,11 @@ export type ExerciseCheckRequest = {
 };
 
 export async function runExerciseCheck(request: ExerciseCheckRequest): Promise<CheckResult> {
-  return codaroApi.checkExercise(request);
+  const result = await codaroApi.checkExercise(request);
+  try {
+    await recordAssignmentCheckEvent(request, result);
+  } catch (error) {
+    console.warn("assignment check event record failed", error);
+  }
+  return result;
 }

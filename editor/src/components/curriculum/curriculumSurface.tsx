@@ -26,6 +26,7 @@ import {
   LoadingInline,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
+import { AssignmentRoomPanel } from "@/components/classroom/assignmentRoomPanel";
 import { learningCellCatalog } from "@/components/app/learningCellCatalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,7 @@ export function CurriculumView({
   onRejectPendingBlocks,
   onRunBlock,
   onOpenTerminalCommand,
+  onOpenAssignmentMaterial,
   onSelectBlock,
 }: {
   apiOnline: boolean;
@@ -116,6 +118,7 @@ export function CurriculumView({
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
   onOpenTerminalCommand: (command: string) => void;
+  onOpenAssignmentMaterial?: (document: CodaroDocument, title: string) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   const curriculumSections = useMemo(() => groupCurriculumSections(document.blocks), [document.blocks]);
@@ -143,6 +146,7 @@ export function CurriculumView({
             selectedCategoryLabel={selectedCategoryLabel}
             selectedContentId={selectedContentId}
             selectedContentLabel={selectedContentLabel}
+            onOpenAssignmentMaterial={onOpenAssignmentMaterial}
             onOpenTerminalCommand={onOpenTerminalCommand}
             onAcceptPendingBlocks={onAcceptPendingBlocks}
             onRejectPendingBlocks={onRejectPendingBlocks}
@@ -262,6 +266,7 @@ function LearningOverviewHeader({
   selectedContentLabel,
   onAcceptPendingBlocks,
   onRejectPendingBlocks,
+  onOpenAssignmentMaterial,
   onOpenTerminalCommand,
 }: {
   apiOnline: boolean;
@@ -276,6 +281,7 @@ function LearningOverviewHeader({
   selectedContentLabel: string;
   onAcceptPendingBlocks: () => void;
   onRejectPendingBlocks: () => void;
+  onOpenAssignmentMaterial?: (document: CodaroDocument, title: string) => void;
   onOpenTerminalCommand: (command: string) => void;
 }) {
   const overview = curriculumOverview(document, introBlock);
@@ -336,6 +342,12 @@ function LearningOverviewHeader({
               onOpenTerminalCommand={onOpenTerminalCommand}
             />
           </div>
+          <AssignmentRoomPanel
+            category={selectedCategory}
+            contentId={selectedContentId}
+            document={document}
+            onOpenMaterial={onOpenAssignmentMaterial}
+          />
         </div>
       </div>
       <PendingNotebookBar
