@@ -462,3 +462,88 @@ TOOL_EMERGENCY_STOP = ToolDef(
     },
     handler="emergencyStop",
 )
+
+TOOL_OPEN_AUTOMATION_SESSION = ToolDef(
+    name="open-automation-session",
+    description=(
+        "Open a long-lived browser automation session that survives across steps and turns. "
+        "Returns a sessionId handle. Reuse the same sessionId to operate the same live browser later."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "kind": {"type": "string", "enum": ["browser"], "description": "Session backend (default browser)."},
+            "name": {"type": "string", "description": "Human-readable label shown in the live session list."},
+            "startUrl": {"type": "string", "description": "Optional initial URL to navigate to on open."},
+            "headless": {
+                "type": "boolean",
+                "description": "Run the browser headless (default false so the user can watch).",
+            },
+            "browserType": {
+                "type": "string",
+                "enum": ["chromium", "firefox", "webkit"],
+                "description": "Browser engine (default chromium).",
+            },
+        },
+    },
+    handler="openAutomationSession",
+)
+
+TOOL_RUN_AUTOMATION_STEP = ToolDef(
+    name="run-automation-step",
+    description=(
+        "Run ONE step on an existing live automation session by sessionId. The live browser is reused, "
+        "not re-opened. Returns the step result and current page state."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "sessionId": {"type": "string", "description": "Handle returned by open-automation-session."},
+            "action": {
+                "type": "string",
+                "enum": ["navigate", "click", "type", "press", "waitFor", "extractText", "state"],
+                "description": "Step verb against the live page.",
+            },
+            "parameters": {
+                "type": "object",
+                "description": "Action params, e.g. {url}, {selector}, {selector,text}, {keys}, {selector,timeoutMs}.",
+            },
+        },
+        "required": ["sessionId", "action"],
+    },
+    handler="runAutomationStep",
+)
+
+TOOL_QUERY_AUTOMATION_SESSION = ToolDef(
+    name="query-automation-session",
+    description="Read the current state (url, title, recent steps) of a live automation session without mutating it.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "sessionId": {"type": "string", "description": "Handle to inspect."},
+        },
+        "required": ["sessionId"],
+    },
+    handler="queryAutomationSession",
+)
+
+TOOL_LIST_AUTOMATION_SESSIONS = ToolDef(
+    name="list-automation-sessions",
+    description="List all live automation sessions so you can re-acquire a handle opened in a previous turn.",
+    parameters={"type": "object", "properties": {}},
+    handler="listAutomationSessions",
+)
+
+TOOL_CLOSE_AUTOMATION_SESSION = ToolDef(
+    name="close-automation-session",
+    description="Close a live automation session and free its handle. Always close sessions you no longer need.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "sessionId": {"type": "string", "description": "Handle to close."},
+            "reason": {"type": "string", "description": "Optional reason recorded in the audit trail."},
+        },
+        "required": ["sessionId"],
+    },
+    handler="closeAutomationSession",
+)

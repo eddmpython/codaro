@@ -1,10 +1,12 @@
 # 무중단 자동화 객체 lifecycle 설계 (3-렌즈 토론 합성)
 
-> 상태: **P1 구현 완료** — `src/codaro/automation/session/`(model/persistentSession/browserDriver/
-> registry) + `sessionFlow.py` + `automationRouter` 5라우트 + `tests/automation/testAutomationSession.py`
-> + 경계 테스트 + `automation-persistent-session` audit 요구사항이 운영에 반영됨. P2(AI tool),
-> P3(DESKTOP)은 §9 로드맵 참조. 이 문서는 P3 완료까지 설계 SSOT 로 유지하고, 완료 후 핵심을
-> `docs/skills/architecture/`로 옮긴다.
+> 상태: **P1·P2 구현 완료** — P1: `src/codaro/automation/session/` + `sessionFlow.py` +
+> `automationRouter` 5라우트 + 경계 테스트 + `automation-persistent-session` audit. P2: AI tool 5종
+> (`open/run-step/query/list/close-automation-session`) — toolDefinitions + `_handle_*` 핸들러 +
+> toolManifest 메타 + 등록/핸들러 dispatch 테스트. AI 가 `sessionId` 핸들로 라이브 객체를 턴 너머
+> 조작한다. 턴-시작 자동 `[Live sessions]` 노트는 core teacher 경로 리스크를 피해 보류하고
+> `list-automation-sessions` tool 로 on-demand discovery 를 제공한다(필요 시 P2.b 로 강화).
+> **P3(DESKTOP kind)** 남음 — §9 로드맵 참조.
 >
 > 세 전문 렌즈(async 런타임 / 엔진·도메인 통합 / AI tool 인체공학)가 독립적으로
 > 같은 코어에 수렴했다. 아래는 그 합성 + 충돌 해소다.

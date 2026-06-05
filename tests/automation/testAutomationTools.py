@@ -42,6 +42,33 @@ def testWaitForToolRegistered() -> None:
     assert "timeout" in tool.parameters["properties"]
 
 
+def testOpenAutomationSessionToolRegistered() -> None:
+    tool = getTool("open-automation-session")
+    assert tool is not None
+    assert tool.handler == "openAutomationSession"
+    assert "kind" in tool.parameters["properties"]
+
+
+def testRunAutomationStepToolRegistered() -> None:
+    tool = getTool("run-automation-step")
+    assert tool is not None
+    assert tool.handler == "runAutomationStep"
+    props = tool.parameters["properties"]
+    assert "sessionId" in props
+    assert "action" in props
+
+
+def testSessionLifecycleToolsRegistered() -> None:
+    for name, handler in (
+        ("query-automation-session", "queryAutomationSession"),
+        ("list-automation-sessions", "listAutomationSessions"),
+        ("close-automation-session", "closeAutomationSession"),
+    ):
+        tool = getTool(name)
+        assert tool is not None, name
+        assert tool.handler == handler
+
+
 def testTotalToolCount() -> None:
     tools = allTools()
     assert len(tools) >= 25

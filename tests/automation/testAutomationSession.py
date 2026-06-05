@@ -22,6 +22,7 @@ from codaro.automation.session import (
 from codaro.automation.session import sessionRegistry as sessionRegistryModule
 from codaro.automation.sessionFlow import AutomationSessionFlowError
 from codaro.automation.taskModel import TaskStatus
+from codaro.ai.toolHandlers.automation import AutomationToolHandlers
 
 
 class StubBrowser:
@@ -198,3 +199,45 @@ def testFlowOpenStepCloseWithStubBrowser(monkeypatch) -> None:
     closed = asyncio.run(sessionFlow.closeAutomationSessionPayload(sessionId))
     assert closed["ok"] is True
     assert StubBrowser.instances == 1
+
+
+# ---- AI tool handlers ------------------------------------------------------
+def testToolHandlersOperateLiveSessionAcrossCalls(monkeypatch) -> None:
+    monkeypatch.setattr(sessionRegistryModule, "createBrowserDriver", lambda options: stubFactory())
+    monkeypatch.setattr(sessionRegistryModule, "buildBrowserStep", stubStepBuilder)
+    monkeypatch.setattr(sessionRegistryModule, "browserState", stubStateFn)
+    handlers = AutomationToolHandlers()
+
+    opened = asyncio.run(
+        handlers._handle_openAutomationSession({"kind": "browser", "name": "orders", "headless": True})
+    )
+    assert "error" not in opened
+    sessionId = opened["sessionId"]
+
+    listed = asyncio.run(handlers._handle_listAutomationSessions({}))
+    assert listed["total"] == 1
+
+    stepped = asyncio.run(
+        handlers._handle_runAutomationStep(
+            {"sessionId": sessionId, "action": "navigate", "parameters": {"url": "https://app"}}
+        )
+    )
+    assert stepped["status"] == "success"
+    assert stepped["result"]["url"] == "https://app"
+
+    queried = asyncio.run(handlers._handle_queryAutomationSession({"sessionId": sessionId}))
+    assert queried["stepCount"] == 1
+
+    # 같은 라이브 객체를 핸들로 연속 조작(턴 너머)
+    assert StubBrowser.instances == 1
+
+    closed = asyncio.run(handlers._handle_closeAutomationSession({"sessionId": sessionId}))
+    assert closed["ok"] is True
+
+
+def testToolHandlerErrorsAreStructured() -> None:
+    handlers = AutomationToolHandlers()
+    missing = asyncio.run(handlers._handle_queryAutomationSession({"sessionId": "ghost"}))
+    assert "error" in missing
+    stepMissing = asyncio.run(handlers._handle_runAutomationStep({"action": "click"}))
+    assert "error" in stepMissing

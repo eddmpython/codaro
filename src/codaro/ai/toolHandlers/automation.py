@@ -461,6 +461,76 @@ class AutomationToolHandlers:
         except AutomationTaskFlowError as exc:
             return {"error": str(exc)}
 
+    async def _handle_openAutomationSession(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.sessionFlow import (
+            AutomationSessionFlowError,
+            openAutomationSessionPayload,
+        )
+
+        options = dict(args.get("options") or {})
+        for key in ("headless", "startUrl", "browserType"):
+            if key in args and key not in options:
+                options[key] = args[key]
+        try:
+            return await openAutomationSessionPayload(
+                kind=str(args.get("kind", "browser")),
+                name=str(args.get("name", "")),
+                options=options,
+            )
+        except AutomationSessionFlowError as exc:
+            return {"error": str(exc)}
+
+    async def _handle_runAutomationStep(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.sessionFlow import (
+            AutomationSessionFlowError,
+            runAutomationSessionStepPayload,
+        )
+
+        try:
+            return await runAutomationSessionStepPayload(
+                str(args["sessionId"]),
+                action=str(args["action"]),
+                params=dict(args.get("parameters") or {}),
+            )
+        except KeyError as exc:
+            return {"error": f"missing required arg: {exc}"}
+        except AutomationSessionFlowError as exc:
+            return {"error": str(exc)}
+
+    async def _handle_queryAutomationSession(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.sessionFlow import (
+            AutomationSessionFlowError,
+            getAutomationSessionStatePayload,
+        )
+
+        try:
+            return await getAutomationSessionStatePayload(str(args["sessionId"]))
+        except KeyError as exc:
+            return {"error": f"missing required arg: {exc}"}
+        except AutomationSessionFlowError as exc:
+            return {"error": str(exc)}
+
+    async def _handle_listAutomationSessions(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.sessionFlow import listAutomationSessionsPayload
+
+        return listAutomationSessionsPayload()
+
+    async def _handle_closeAutomationSession(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.sessionFlow import (
+            AutomationSessionFlowError,
+            closeAutomationSessionPayload,
+        )
+
+        try:
+            return await closeAutomationSessionPayload(
+                str(args["sessionId"]),
+                reason=str(args.get("reason", "explicit")),
+            )
+        except KeyError as exc:
+            return {"error": f"missing required arg: {exc}"}
+        except AutomationSessionFlowError as exc:
+            return {"error": str(exc)}
+
     async def _handle_runAutomation(self, args: dict[str, Any]) -> dict[str, Any]:
         from codaro.automation.eStop import getEmergencyStop
         from codaro.automation.loop.automationLoop import AutomationLoop, LoopConfig
