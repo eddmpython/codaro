@@ -100,12 +100,19 @@ const INSPECTOR_TABS: ReadonlyArray<{ value: InspectorTab; label: string; Icon: 
   { value: "graph", label: "의존성", Icon: GitBranch },
 ];
 
-// 우측 컬럼 — 선택기는 에디터 경계 레일에 두고, 패널은 마운트 유지해 입력 상태를 보존한다.
+const FLOATING_TOP_CONTROLS_SAFE_AREA = "xl:pt-10";
+
+// 우측 컬럼 — 선택기는 에디터 경계 레일에 두고, SNS 컨트롤이 떠 있는 상단 줄은 비워 둔다.
 function NotebookInspector(props: NotebookSurfaceProps) {
   const [tab, setTab] = useState<InspectorTab>("tutor");
   const codeBlocks = props.document.blocks;
   return (
-    <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:grid-cols-[40px_minmax(0,1fr)] xl:grid-rows-1 xl:border-l xl:border-t-0">
+    <div
+      className={cn(
+        "grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:grid-cols-[40px_minmax(0,1fr)] xl:grid-rows-1 xl:border-l xl:border-t-0",
+        FLOATING_TOP_CONTROLS_SAFE_AREA,
+      )}
+    >
       <div className="flex items-center gap-1 border-b px-2 py-1.5 xl:flex-col xl:border-b-0 xl:border-r xl:px-1 xl:py-2">
         {INSPECTOR_TABS.map((item) => (
           <Tooltip key={item.value}>
