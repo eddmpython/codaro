@@ -233,7 +233,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
 function SurfaceLoading() {
   const { t } = useLocale();
   return (
-    <div className="grid h-full min-h-0 place-items-center px-4 text-sm text-muted-foreground">
+    <div className="grid h-full min-h-0 place-items-center px-4 text-sm text-muted-foreground sm:px-6">
       {t("surface.loading")}
     </div>
   );

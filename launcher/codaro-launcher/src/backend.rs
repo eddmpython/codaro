@@ -219,6 +219,7 @@ pub fn wait_for_backend_ready(child: &mut Child, url: &str, timeout: Duration) -
 
 fn build_healthcheck_client() -> Result<Client> {
     Client::builder()
+        .no_proxy()
         .timeout(Duration::from_millis(500))
         .build()
         .context("Failed to build HTTP client for launcher health check.")

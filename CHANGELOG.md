@@ -8,6 +8,30 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.2.3 - 2026-06-06
+
+0.2.2 공개 직후 원격 CI에서 확인된 macOS 런처 health probe와 mobile-layout 정적 게이트를
+패치했다. PyPI 발행은 이 CI 정리판 기준으로 진행한다.
+
+### Fixed
+
+- 런처 health check client가 localhost probe에서 proxy 설정을 타지 않도록 `no_proxy`를 적용했다.
+- `mainSurface` loading shell에 responsive spacing 클래스를 추가해 mobile-layout core surface gate를 통과하도록 했다.
+- Playwright dogfood verifier의 위젯 API probe를 page execution context에서 request context로 옮겨 navigation timing flake를 제거했다.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` 3/3.
+- `uv run python -X utf8 tests/run.py gate widget-bridge` 통과.
+- `uv run python -X utf8 tests/run.py gate editor-build` 통과.
+- `uv run python -X utf8 tests/run.py gate landing-build` 통과.
+- `uv run python -X utf8 tests/run.py gate mobile-layout` 통과.
+- `uv run python -X utf8 tests/run.py gate app-runtime` 통과.
+- `python -X utf8 tests/run.py gate launcher-check` 통과.
+- `python -X utf8 tests/run.py gate launcher-test` 통과.
+- `uv run python -X utf8 tests/run.py gate install-launcher-smoke` 통과.
+- `uv build --clear` 통과.
+
 ## 0.2.2 - 2026-06-06
 
 런처 수신성, 자동화 영속 세션, 과제방 진행 추적, 학습 카드 계약, 테스트/릴리즈 운영면을 한 번에

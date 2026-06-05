@@ -93,35 +93,21 @@ def runDogfoodScenarios() -> dict[str, Any]:
 
                 # 2. ui-event 직접 fetch — 위젯 클릭 round-trip
                 ctx2 = browser.new_context()
-                page2 = ctx2.new_page()
-                page2.goto(base, wait_until="domcontentloaded", timeout=15000)
-                createResp = page2.evaluate(
-                    """async () => {
-                        const create = await fetch('/api/kernel/create', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ workingDirectory: null }),
-                        });
-                        return await create.json();
-                    }"""
+                createResponse = ctx2.request.post(
+                    f"{base}/api/kernel/create",
+                    data={"workingDirectory": None},
                 )
+                createResp = createResponse.json()
                 sessionId = createResp.get("sessionId")
-                clickResp = page2.evaluate(
-                    """async ({ sessionId, callbackId }) => {
-                        const r = await fetch(`/api/kernel/${sessionId}/ui-event`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ callbackId, eventType: 'click', payload: null }),
-                        });
-                        return { status: r.status, body: await r.json() };
-                    }""",
-                    {"sessionId": sessionId, "callbackId": callbackId},
+                clickResponse = ctx2.request.post(
+                    f"{base}/api/kernel/{sessionId}/ui-event",
+                    data={"callbackId": callbackId, "eventType": "click", "payload": None},
                 )
                 record("widget-click-round-trip", {
                     "sessionId": sessionId,
-                    "httpStatus": clickResp["status"],
+                    "httpStatus": clickResponse.status,
                     "callbackFired": clicks == ["clicked"],
-                    "responseStatus": clickResp["body"].get("status"),
+                    "responseStatus": clickResponse.json().get("status"),
                 })
                 ctx2.close()
 
