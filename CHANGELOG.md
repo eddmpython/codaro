@@ -16,6 +16,8 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 ### Fixed
 
 - 런처 health check client가 localhost probe에서 proxy 설정을 타지 않도록 `no_proxy`를 적용했다.
+- staged backend probe timeout을 실제 launch 경로와 같은 30초로 맞춰 느린 macOS runner의 cold start를 수용한다.
+- Unix 런처 테스트 runtime이 shell wrapper보다 실제 Python 실행에 가까운 symlink를 우선 사용하도록 했다.
 - `mainSurface` loading shell에 responsive spacing 클래스를 추가해 mobile-layout core surface gate를 통과하도록 했다.
 - Playwright dogfood verifier의 위젯 API probe를 page execution context에서 request context로 옮겨 navigation timing flake를 제거했다.
 

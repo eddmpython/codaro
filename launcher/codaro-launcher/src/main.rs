@@ -1538,7 +1538,7 @@ fn start_backend_for_state(
     )?;
     let mut child = config.spawn()?;
     if let Err(error) =
-        wait_for_backend_ready(&mut child, &config.health_url(), Duration::from_secs(10))
+        wait_for_backend_ready(&mut child, &config.health_url(), Duration::from_secs(30))
     {
         let _ = child.kill();
         let _ = child.wait();
@@ -2230,6 +2230,12 @@ mod tests {
         let bin_dir = runtime_dir.join("bin");
         fs::create_dir_all(&bin_dir).unwrap();
         let wrapper_path = bin_dir.join("python3");
+        #[cfg(unix)]
+        {
+            if std::os::unix::fs::symlink(python, &wrapper_path).is_ok() {
+                return;
+            }
+        }
         fs::write(
             &wrapper_path,
             format!("#!/bin/sh\nexec \"{}\" \"$@\"\n", python.display()),
