@@ -241,3 +241,71 @@ def testToolHandlerErrorsAreStructured() -> None:
     assert "error" in missing
     stepMissing = asyncio.run(handlers._handle_runAutomationStep({"action": "click"}))
     assert "error" in stepMissing
+
+
+# ---- DESKTOP kind (OS 자동화 객체 상주) ------------------------------------
+def testDesktopStepBuilderDispatchesActions() -> None:
+    from codaro.automation.session import DesktopDriver, DesktopDriverError, buildDesktopStep
+
+    class FakeFrame:
+        width = 120
+        height = 40
+        data = b"x"
+
+    class FakeCapture:
+        def grab(self, region=None):
+            return FakeFrame()
+
+        def dispose(self):
+            pass
+
+    class FakeGuard:
+        def __init__(self):
+            self.calls: list = []
+
+        def click(self, x, y, button, clicks):
+            self.calls.append(("click", x, y, button, clicks))
+
+        def typeText(self, text, interval):
+            self.calls.append(("type", text))
+
+        def hotkey(self, *keys):
+            self.calls.append(("hotkey", keys))
+
+    guard = FakeGuard()
+    driver = DesktopDriver(FakeCapture(), guard)
+
+    cap = asyncio.run(buildDesktopStep("capture", {})(driver))
+    assert cap["width"] == 120
+
+    clicked = asyncio.run(buildDesktopStep("click", {"x": 5, "y": 7})(driver))
+    assert clicked["clicked"] and clicked["x"] == 5
+    assert ("click", 5, 7, "left", 1) in guard.calls
+
+    typed = asyncio.run(buildDesktopStep("type", {"text": "hi"})(driver))
+    assert typed["typed"]
+
+    pressed = asyncio.run(buildDesktopStep("press", {"keys": ["ctrl", "c"]})(driver))
+    assert pressed["pressed"] and pressed["keys"] == ["ctrl", "c"]
+
+    with pytest.raises(DesktopDriverError):
+        asyncio.run(buildDesktopStep("bogus", {})(driver))
+
+
+def testFlowOpenDesktopSessionWithStub(monkeypatch) -> None:
+    monkeypatch.setattr(sessionRegistryModule, "createDesktopDriver", lambda options: stubFactory())
+    monkeypatch.setattr(sessionRegistryModule, "buildDesktopStep", stubStepBuilder)
+    monkeypatch.setattr(sessionRegistryModule, "desktopState", stubStateFn)
+
+    opened = asyncio.run(sessionFlow.openAutomationSessionPayload(kind="desktop", name="os"))
+    assert opened["kind"] == "desktop"
+    assert opened["status"] == "live"
+    sessionId = opened["sessionId"]
+
+    stepped = asyncio.run(
+        sessionFlow.runAutomationSessionStepPayload(sessionId, action="click", params={"x": 1, "y": 2})
+    )
+    assert stepped["status"] == "success"
+
+    closed = asyncio.run(sessionFlow.closeAutomationSessionPayload(sessionId))
+    assert closed["ok"] is True

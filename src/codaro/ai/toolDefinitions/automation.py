@@ -472,7 +472,11 @@ TOOL_OPEN_AUTOMATION_SESSION = ToolDef(
     parameters={
         "type": "object",
         "properties": {
-            "kind": {"type": "string", "enum": ["browser"], "description": "Session backend (default browser)."},
+            "kind": {
+                "type": "string",
+                "enum": ["browser", "desktop"],
+                "description": "Session backend: 'browser' (Playwright page) or 'desktop' (resident screen capture + guarded OS input).",
+            },
             "name": {"type": "string", "description": "Human-readable label shown in the live session list."},
             "startUrl": {"type": "string", "description": "Optional initial URL to navigate to on open."},
             "headless": {

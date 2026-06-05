@@ -9,6 +9,7 @@ from ..audit import getAuditTrail
 from ..eStop import EmergencyStopActive, getEmergencyStop
 from ..taskModel import TaskStatus
 from .browserDriver import browserState, buildBrowserStep, createBrowserDriver
+from .desktopDriver import buildDesktopStep, createDesktopDriver, desktopState
 from .persistentSession import PersistentSession, SessionError
 from .sessionModel import (
     SessionDefinition,
@@ -68,6 +69,8 @@ class SessionRegistry:
             return driverFactory, stepBuilder, stateFn
         if definition.kind is SessionKind.BROWSER:
             return (lambda: createBrowserDriver(definition.options)), buildBrowserStep, browserState
+        if definition.kind is SessionKind.DESKTOP:
+            return (lambda: createDesktopDriver(definition.options)), buildDesktopStep, desktopState
         raise SessionRegistryError(f"지원하지 않는 session kind: {definition.kind.value}")
 
     async def open(

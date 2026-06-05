@@ -6,7 +6,10 @@
 > toolManifest 메타 + 등록/핸들러 dispatch 테스트. AI 가 `sessionId` 핸들로 라이브 객체를 턴 너머
 > 조작한다. 턴-시작 자동 `[Live sessions]` 노트는 core teacher 경로 리스크를 피해 보류하고
 > `list-automation-sessions` tool 로 on-demand discovery 를 제공한다(필요 시 P2.b 로 강화).
-> **P3(DESKTOP kind)** 남음 — §9 로드맵 참조.
+> **P3(DESKTOP kind) 구현 완료** — `session/desktopDriver.py`(resident 화면 capture + lazy resident
+> OCR + 공유 InputGuard) + `_resolveKind` DESKTOP 분기 + open-automation-session tool 의 kind
+> enum `desktop` + 단위/flow 테스트. **P0~P3 전부 운영 반영.** BROWSER·DESKTOP 이 동일
+> PersistentSession 런타임을 공유한다. 이 설계 SSOT 의 핵심은 `docs/skills/architecture/`로 이관 가능.
 >
 > 세 전문 렌즈(async 런타임 / 엔진·도메인 통합 / AI tool 인체공학)가 독립적으로
 > 같은 코어에 수렴했다. 아래는 그 합성 + 충돌 해소다.

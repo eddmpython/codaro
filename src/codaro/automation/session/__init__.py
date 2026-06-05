@@ -5,6 +5,13 @@ from .browserDriver import (
     buildBrowserStep,
     createBrowserDriver,
 )
+from .desktopDriver import (
+    DesktopDriver,
+    DesktopDriverError,
+    buildDesktopStep,
+    createDesktopDriver,
+    desktopState,
+)
 from .persistentSession import PersistentSession, SessionError
 from .sessionModel import (
     SessionDefinition,
@@ -26,6 +33,11 @@ __all__ = [
     "browserState",
     "buildBrowserStep",
     "createBrowserDriver",
+    "DesktopDriver",
+    "DesktopDriverError",
+    "buildDesktopStep",
+    "createDesktopDriver",
+    "desktopState",
     "PersistentSession",
     "SessionError",
     "SessionDefinition",

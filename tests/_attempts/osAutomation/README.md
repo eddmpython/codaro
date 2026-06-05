@@ -1,5 +1,10 @@
 # osAutomation — OS 자동화 객체 상주 실험
 
+> 상태: **DESKTOP kind 로 구현됨** — `src/codaro/automation/session/desktopDriver.py` 가 resident
+> 화면 capture + lazy resident OCR + 공유 InputGuard 를 묶은 라이브 OS 자동화 객체를 제공하고,
+> `SessionKind.DESKTOP` 으로 BROWSER 와 동일한 PersistentSession lifecycle 을 공유한다. 아래는
+> 원래 실험 질문 기록이다.
+
 ## 목표
 
 브라우저 외 OS 수준 자동화 객체(키보드/마우스 입력 컨트롤러, 화면 캡처/비전,
