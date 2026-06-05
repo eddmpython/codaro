@@ -17,7 +17,9 @@ whenToUse: 새 bundle 정의, manifest 스키마 변경, 외부 앱(xlwings 등)
 - launcher는 index에서 arbitrary latest package를 해석하거나 무제한 `pip install` 경로를 제품 기본으로 삼지 않는다.
 - `codaro-excel` 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다.
 - normal `vX.Y.Z` tag release는 GitHub Release에 exact `codaro` wheel, `release-manifest.json`, `Codaro.exe`, checksum, SPDX SBOM, managed Windows Python runtime archive를 함께 업로드한다.
+- 같은 게시 릴리즈는 `.github/workflows/publish.yaml`의 PyPI Trusted Publisher 경로로 `codaro` wheel/sdist를 PyPI에 올린다. PyPI publisher 값은 project `codaro`, owner `eddmpython`, repository `codaro`, workflow `publish.yaml`, environment `pypi`와 일치해야 한다.
 - GitHub Pages는 다운로드/문서 표면이다. launcher update는 tag 문자열만 보지 않고 `release-manifest.json`의 artifact URL과 sha256을 기준으로 한다.
+- PyPI는 Python 생태계 검색과 개발자 설치 채널이다. launcher는 PyPI index에서 latest를 해석하지 않고 GitHub Release manifest가 지정한 exact wheel만 설치한다.
 - 외부 앱과 드라이버 의존성은 별도 경계로 둔다.
   - 예: `xlwings` 기반 Excel app automation은 launcher가 Python 쪽 의존성과 bootstrap을 관리하지만, Microsoft Excel 자체는 사용자가 설치해야 한다.
 - 세부 배포 설계의 source of truth는 `launcher/PRD.md`, `launcher/PACKAGING.md`다.

@@ -14,6 +14,7 @@
 <p>
   <a href="https://github.com/eddmpython/codaro/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/eddmpython/codaro?style=for-the-badge&label=Release&labelColor=18181b&color=18181b&logo=github&logoColor=white" /></a>
   <a href="https://github.com/eddmpython/codaro/actions/workflows/product-release.yml"><img alt="Release build" src="https://img.shields.io/github/actions/workflow/status/eddmpython/codaro/product-release.yml?style=for-the-badge&label=Build&labelColor=18181b&logo=github&logoColor=white" /></a>
+  <a href="https://pypi.org/project/codaro/"><img alt="PyPI package" src="https://img.shields.io/pypi/v/codaro?style=for-the-badge&label=PyPI&labelColor=18181b&logo=pypi&logoColor=white" /></a>
   <a href="https://github.com/sponsors/eddmpython"><img alt="GitHub Sponsors" src="https://img.shields.io/badge/Sponsor-eddmpython-ea4aaa?style=for-the-badge&labelColor=18181b&logo=githubsponsors&logoColor=white" /></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Non--Commercial_1.0-7c3aed?style=for-the-badge&labelColor=18181b" /></a>
 </p>
@@ -22,7 +23,7 @@
   <img alt="Platform Windows 10/11" src="https://img.shields.io/badge/Platform-Windows_10%2F11-38bdf8?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=white" />
   <img alt="Python 3.12+" src="https://img.shields.io/badge/Runtime-Python_3.12+-3776ab?style=for-the-badge&labelColor=18181b&logo=python&logoColor=white" />
   <img alt="Editor React 19" src="https://img.shields.io/badge/Editor-React_19-61dafb?style=for-the-badge&labelColor=18181b&logo=react&logoColor=white" />
-  <img alt="Distribution GitHub Releases" src="https://img.shields.io/badge/Distribution-GitHub_Releases-18181b?style=for-the-badge&labelColor=18181b" />
+  <img alt="Distribution GitHub Releases and PyPI" src="https://img.shields.io/badge/Distribution-GitHub_Releases_%2B_PyPI-18181b?style=for-the-badge&labelColor=18181b" />
 </p>
 
 <p>
@@ -67,8 +68,15 @@
 
 > ⚠️ **런처는 아직 안정화 작업 중입니다 (초기 베타).** 일부 환경에서 설치·실행 중 오류가 날 수 있습니다. 문제가 생기면 [이슈로 알려주세요](https://github.com/eddmpython/codaro/issues) — 화면에 뜬 메시지나 로그를 함께 남겨주시면 빠르게 고치겠습니다.
 
+> 🛡️ **"Windows의 PC 보호" 경고가 떠도 정상입니다.** Codaro.exe는 아직 코드 서명 인증서가 없어 Windows SmartScreen이 *알 수 없는 게시자*로 표시할 수 있습니다 — 악성코드라서가 아니라 다운로드 평판이 아직 쌓이지 않아서입니다. 파란 경고 화면에서 **추가 정보 → 실행**을 누르면 시작됩니다. 받은 파일이 변조되지 않았는지는 아래 체크섬으로 직접 검증할 수 있습니다.
+>
+> ```powershell
+> # 다운로드한 Codaro.exe의 해시를 릴리즈의 Codaro.exe.sha256 값과 비교
+> (Get-FileHash .\Codaro.exe -Algorithm SHA256).Hash.ToLower()
+> ```
+
 1. **[Codaro 런처 다운로드](https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe)** _(Windows 10/11)_
-2. 받은 파일을 **더블클릭**합니다.
+2. 받은 파일을 **더블클릭**합니다. *"Windows의 PC 보호" 경고가 뜨면 **추가 정보 → 실행**.*
 3. 첫 실행에서 런처가 자동으로 — 관리형 Python runtime + `codaro` 본체 + **기본 커리큘럼(463 레슨)** 을 내려받아 설치합니다. (네트워크/디스크에 따라 몇 분)
 4. 준비가 끝나면 로컬 에디터(`http://127.0.0.1:8765`)로 자동 전환 — **커리큘럼 카드에서 바로 학습을 시작**합니다.
 
@@ -85,7 +93,7 @@
 | `release-manifest.json` | 정확한 wheel·runtime 버전을 핀. 런처가 같은 경로로 업데이트를 확인 |
 
 - **모두 자동, 자체 업데이트** — 런처는 실행할 때마다 본체 릴리스와 *런처 자신의 새 버전*을 확인해 갱신합니다.
-- **PyPI 미사용** — 배포는 오직 GitHub Releases manifest가 핀한 wheel로만 이뤄집니다.
+- **PyPI는 개발자 설치 채널** — 런처는 여전히 GitHub Releases manifest가 핀한 wheel만 설치하고, PyPI는 Python 생태계 검색과 개발자 설치용 보조 배포 채널로 둡니다.
 - **macOS / Linux** — 데스크톱 런처는 Windows 우선입니다. 다른 OS는 아래 [개발자 — 저장소에서 바로](#개발자--저장소에서-바로)로 동일 기능을 사용하세요.
 
 ## 목차
@@ -325,6 +333,14 @@ uv run codaro task list
 # 학습/배포용 share pack
 uv run codaro pack inspect ./my-pack
 uv run codaro pack install ./my-pack
+```
+
+### 개발자 — PyPI 패키지
+
+PyPI 게시본은 long-lived token 없이 GitHub Actions Trusted Publisher로 발행됩니다. 저장소 릴리즈가 published 된 뒤 `.github/workflows/publish.yaml`이 `pypi` 환경에서 `codaro` wheel과 sdist를 업로드합니다.
+
+```powershell
+uvx codaro
 ```
 
 ### 5분 체험 — 설치 전에도 가능

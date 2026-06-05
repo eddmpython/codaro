@@ -1,6 +1,8 @@
 #![cfg_attr(all(target_os = "windows", not(test)), windows_subsystem = "windows")]
 
 mod backend;
+mod download;
+mod failure;
 mod github;
 mod ipc;
 mod manifest;
@@ -15,7 +17,9 @@ use backend::{BackendLaunchConfig, wait_for_backend_ready, wait_for_health};
 use clap::{Args, Parser, Subcommand};
 use github::{GitHubManifestDiscovery, discover_manifest_for_repo};
 use paths::LauncherPaths;
-use provision::{activate_release, load_manifest_from_source, stage_release};
+use provision::{
+    activate_release, load_manifest_from_source, stage_release, stage_release_with_progress,
+};
 use self_update::{apply_self_update, check_launcher_update, download_launcher_update};
 use serde::Serialize;
 use state::{
@@ -356,7 +360,11 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn provision_and_spawn(paths: &LauncherPaths, args: &LaunchArgs) -> Result<(Child, String)> {
+fn provision_and_spawn(
+    paths: &LauncherPaths,
+    args: &LaunchArgs,
+    progress: &dyn Fn(&str, u64, Option<u64>),
+) -> Result<(Child, String)> {
     use ipc::{ErrorPayload, IpcMessage, LaunchStatus, ProgressPayload, StatusPayload, encode_ipc};
 
     let stores = LauncherStateStores::new(paths);
@@ -408,10 +416,10 @@ fn provision_and_spawn(paths: &LauncherPaths, args: &LaunchArgs) -> Result<(Chil
                     percent: Some(30.0),
                 }))
             );
-            let summary = stage_release(paths, &found.manifest_source)?;
+            let summary = stage_release_with_progress(paths, &found.manifest_source, progress)?;
             activate_release(paths, &summary.release_id)?;
         } else if let Some(manifest_source) = source {
-            let summary = stage_release(paths, &manifest_source)?;
+            let summary = stage_release_with_progress(paths, &manifest_source, progress)?;
             activate_release(paths, &summary.release_id)?;
         }
     } else {
@@ -536,7 +544,15 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
     use webview::open_in_system_browser;
     // --no-webview: 헤드리스/CLI/스모크 경로. 네이티브 창 없이 백엔드를 띄우고 시스템 브라우저로 연다.
     if args.no_webview {
-        let (mut child, url) = provision_and_spawn(paths, &args)?;
+        let progress = |label: &str, received: u64, total: Option<u64>| {
+            println!(
+                "{}",
+                ipc::encode_ipc(&ipc::IpcMessage::SetProgress(download_progress_payload(
+                    label, received, total
+                )))
+            );
+        };
+        let (mut child, url) = provision_and_spawn(paths, &args, &progress)?;
         open_in_system_browser(&url)?;
         let _ = child.wait();
         return Ok(());
@@ -582,15 +598,25 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         let setup_paths = paths.clone();
         let setup_proxy = event_loop.create_proxy();
         let setup_child = child_slot.clone();
-        std::thread::spawn(move || match provision_and_spawn(&setup_paths, &args) {
-            Ok((child, url)) => {
-                if let Ok(mut slot) = setup_child.lock() {
-                    *slot = Some(child);
+        std::thread::spawn(move || {
+            let progress_proxy = setup_proxy.clone();
+            let progress = move |label: &str, received: u64, total: Option<u64>| {
+                let _ = progress_proxy.send_event(AppEvent::Progress(download_progress_payload(
+                    label, received, total,
+                )));
+            };
+            match provision_and_spawn(&setup_paths, &args, &progress) {
+                Ok((child, url)) => {
+                    if let Ok(mut slot) = setup_child.lock() {
+                        *slot = Some(child);
+                    }
+                    let _ = setup_proxy.send_event(AppEvent::Ready(url));
                 }
-                let _ = setup_proxy.send_event(AppEvent::Ready(url));
-            }
-            Err(err) => {
-                let _ = setup_proxy.send_event(AppEvent::Fail(format!("{err:#}")));
+                Err(err) => {
+                    // raw 에러는 로그에만, 사용자에겐 분류된 카드.
+                    log_failure(&setup_paths, &err);
+                    let _ = setup_proxy.send_event(AppEvent::Fail(failure::to_card(&err)));
+                }
             }
         });
     }
@@ -602,12 +628,15 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 let _ = webview.load_url(&url);
                 window.set_focus();
             }
-            Event::UserEvent(AppEvent::Fail(msg)) => {
-                let escaped = msg
-                    .replace('\\', "\\\\")
-                    .replace('\'', "\\'")
-                    .replace('\n', "\\n");
-                let _ = webview.evaluate_script(&format!("setError('{escaped}')"));
+            Event::UserEvent(AppEvent::Progress(payload)) => {
+                let json = serde_json::to_string(&payload).unwrap_or_default();
+                let _ =
+                    webview.evaluate_script(&format!("window.setProgress&&window.setProgress({json})"));
+            }
+            Event::UserEvent(AppEvent::Fail(card)) => {
+                let json = serde_json::to_string(&card).unwrap_or_default();
+                let _ =
+                    webview.evaluate_script(&format!("window.setFailure&&window.setFailure({json})"));
             }
             Event::WindowEvent {
                 event: WindowEvent::Resized(size),
@@ -637,7 +666,52 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 #[derive(Debug)]
 enum AppEvent {
     Ready(String),
-    Fail(String),
+    Progress(ipc::ProgressPayload),
+    Fail(failure::FailureCard),
+}
+
+/// 다운로드 진행 콜백 `(artifact_label, received, total)`을 사용자용 IPC 진행률로 변환한다.
+fn download_progress_payload(label: &str, received: u64, total: Option<u64>) -> ipc::ProgressPayload {
+    fn mb(bytes: u64) -> f64 {
+        bytes as f64 / (1024.0 * 1024.0)
+    }
+    let name = match label {
+        "backend" => "코드 엔진",
+        "runtime" => "Python 런타임",
+        "editor" => "에디터",
+        other if other.starts_with("bundle:") => "확장 구성요소",
+        _ => "구성요소",
+    };
+    let percent = total.and_then(|t| {
+        if t > 0 {
+            Some((received as f64 / t as f64 * 100.0) as f32)
+        } else {
+            None
+        }
+    });
+    let message = match total {
+        Some(t) => format!("{name} 내려받는 중 — {:.1} / {:.1} MB", mb(received), mb(t)),
+        None => format!("{name} 내려받는 중 — {:.1} MB", mb(received)),
+    };
+    ipc::ProgressPayload {
+        stage: "download".into(),
+        message,
+        percent,
+    }
+}
+
+/// 프로비전 실패의 raw 에러 체인을 로그 파일에만 남긴다(UI엔 분류 카드만 보인다).
+fn log_failure(paths: &LauncherPaths, err: &anyhow::Error) {
+    let dir = paths.logs_dir();
+    if std::fs::create_dir_all(&dir).is_err() {
+        return;
+    }
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_millis())
+        .unwrap_or(0);
+    let path = dir.join(format!("launcher-failure-{stamp}.log"));
+    let _ = std::fs::write(&path, format!("{err:#}\n"));
 }
 
 fn hide_console_window() {
@@ -719,24 +793,49 @@ const LAUNCH_HTML: &str = r##"<!DOCTYPE html>
   @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
   @keyframes fadeIn { to { opacity: 1; } }
   .status { color: #a1a1aa; font-size: 14px; text-align: center; padding: 0 24px; }
-  .err { display: none; max-width: 580px; text-align: center; color: #fca5a5; font-size: 13px;
-    line-height: 1.7; white-space: pre-wrap; padding: 0 28px; }
+  .bar { width: 320px; max-width: 70vw; height: 6px; background: #27272a; border-radius: 999px; overflow: hidden; }
+  .barfill { height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #fb923c);
+    border-radius: 999px; transition: width 0.25s ease; }
+  .err { display: none; max-width: 580px; text-align: center; padding: 0 28px; }
   .err.show { display: block; }
+  .errTitle { color: #fca5a5; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+  .errCause { color: #d4d4d8; font-size: 13px; line-height: 1.7; }
+  .errActions { color: #a1a1aa; font-size: 12.5px; line-height: 1.9; margin-top: 14px; text-align: left;
+    display: inline-block; }
   .hide { display: none !important; }
 </style></head><body>
   <div class="avatarWrap"><img class="avatar" src="{{AVATAR_SRC}}" alt="Codaro"></div>
   <div class="logo">Codaro</div>
   <div id="spin" class="spinner"></div>
   <div id="status" class="status">준비 중 — Python 런타임과 커리큘럼을 설치하고 있어요…<br>처음 실행은 다운로드 때문에 잠시 걸릴 수 있어요.</div>
+  <div id="bar" class="bar hide"><div id="barfill" class="barfill"></div></div>
   <div id="err" class="err"></div>
   <script>
-    function setError(msg) {
+    function escapeHtml(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+    function setProgress(p) {
+      if (!p) return;
+      var status = document.getElementById('status');
+      if (p.message) status.innerHTML = escapeHtml(p.message);
+      var bar = document.getElementById('bar');
+      var fill = document.getElementById('barfill');
+      if (typeof p.percent === 'number') {
+        bar.classList.remove('hide');
+        fill.style.width = Math.max(0, Math.min(100, p.percent)) + '%';
+      }
+    }
+    function setFailure(card) {
+      card = card || {};
       document.getElementById('spin').classList.add('hide');
       document.getElementById('status').classList.add('hide');
+      document.getElementById('bar').classList.add('hide');
+      var actions = (card.actions || []).map(function(a){ return '· ' + escapeHtml(a); }).join('<br>');
       var e = document.getElementById('err');
-      e.textContent = '문제가 발생했어요:\n\n' + msg;
+      e.innerHTML = '<div class="errTitle">' + escapeHtml(card.title || '문제가 발생했어요') + '</div>'
+        + '<div class="errCause">' + escapeHtml(card.cause || '') + '</div>'
+        + (actions ? '<div class="errActions">' + actions + '</div>' : '');
       e.classList.add('show');
     }
+    function setError(msg) { setFailure({ title: '문제가 발생했어요', cause: String(msg), actions: [] }); }
   </script>
 </body></html>
 "##;
@@ -771,6 +870,7 @@ fn run_doctor(paths: &LauncherPaths) -> Result<()> {
         "crashState": stores.crash_state.load_optional()?,
         "rollbackMarker": stores.rollback_marker.load_optional()?,
         "updateConfig": update_config,
+        "selfCheck": provision::self_check(paths),
     });
     println!("{}", serde_json::to_string_pretty(&payload)?);
     Ok(())

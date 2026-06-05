@@ -1,0 +1,199 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish, for example v0.0.11"
+        required: true
+        type: string
+
+concurrency:
+  group: pypi-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.release.tag_name, 'v') && !endsWith(github.event.release.tag_name, '-launcher'))
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Build editor
+        working-directory: editor
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify version matches release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_tag="${{ github.event.release.tag_name || inputs.tag }}"
+          package_version="$(python - <<'PY'
+          import tomllib
+          with open("pyproject.toml", "rb") as handle:
+              print(tomllib.load(handle)["project"]["version"])
+          PY
+          )"
+          if [ "$release_tag" != "v${package_version}" ]; then
+            echo "release tag ${release_tag} does not match package version v${package_version}" >&2
+            exit 1
+          fi
+
+      - name: Run preflight
+        run: uv run python -X utf8 tests/run.py preflight
+
+      - name: Stage base curriculum into package
+        run: |
+          rm -rf src/codaro/curricula
+          cp -r curricula src/codaro/curricula
+          test -f src/codaro/curricula/python/__init__.py
+
+      - name: Build sdist and wheel
+        run: uv build --clear
+
+      - name: Verify package payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import tarfile
+          import zipfile
+
+          wheels = list(Path("dist").glob("codaro-*.whl"))
+          sdists = list(Path("dist").glob("codaro-*.tar.gz"))
+          if len(wheels) != 1:
+              raise SystemExit(f"expected one wheel, found {len(wheels)}")
+          if len(sdists) != 1:
+              raise SystemExit(f"expected one sdist, found {len(sdists)}")
+
+          with zipfile.ZipFile(wheels[0]) as archive:
+              wheel_names = set(archive.namelist())
+          required_wheel_entries = {
+              "codaro/webBuild/index.html",
+              "codaro/curricula/python/__init__.py",
+          }
+          missing = sorted(required_wheel_entries - wheel_names)
+          if missing:
+              raise SystemExit(f"wheel missing required entries: {missing}")
+          if not any(name.startswith("codaro/webBuild/_app/") for name in wheel_names):
+              raise SystemExit("wheel missing codaro/webBuild/_app assets")
+          if not any(name.startswith("codaro/curricula/python/") and name.endswith(".yaml") for name in wheel_names):
+              raise SystemExit("wheel missing built-in curriculum YAML files")
+
+          with tarfile.open(sdists[0], "r:gz") as archive:
+              sdist_names = set(archive.getnames())
+          if not any(name.endswith("/src/codaro/webBuild/index.html") for name in sdist_names):
+              raise SystemExit("sdist missing src/codaro/webBuild/index.html")
+          if not any(name.endswith("/src/codaro/curricula/python/__init__.py") for name in sdist_names):
+              raise SystemExit("sdist missing built-in curriculum package")
+          PY
+
+      - name: Verify wheel install
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="${RUNNER_TEMP}/codaro-wheel-smoke"
+          uv venv "$smoke_dir" --python ${{ env.PYTHON_VERSION }}
+          uv pip install --python "$smoke_dir/bin/python" dist/*.whl
+          "$smoke_dir/bin/python" - <<'PY'
+          import importlib.metadata
+          import codaro
+
+          version = importlib.metadata.version("codaro")
+          assert version
+          assert callable(codaro.main)
+          print(f"codaro {version} wheel import ok")
+          PY
+
+      - name: Verify uv add install
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="${RUNNER_TEMP}/codaro-uv-add-smoke"
+          rm -rf "$smoke_dir"
+          mkdir -p "$smoke_dir"
+          package_version="$(python - <<'PY'
+          import tomllib
+          with open("pyproject.toml", "rb") as handle:
+              print(tomllib.load(handle)["project"]["version"])
+          PY
+          )"
+          pushd "$smoke_dir"
+          uv init --bare
+          uv add --find-links "${GITHUB_WORKSPACE}/dist" "codaro==${package_version}"
+          uv run python -X utf8 - <<'PY'
+          from importlib.resources import files
+          import importlib.metadata
+
+          import codaro
+
+          version = importlib.metadata.version("codaro")
+          assert version
+          assert callable(codaro.main)
+          assert (files("codaro") / "webBuild" / "index.html").is_file()
+          assert (files("codaro") / "curricula" / "python" / "__init__.py").is_file()
+          assert any((files("codaro") / "curricula" / "python").glob("*.yaml"))
+          print(f"codaro {version} uv add resources ok")
+          PY
+          uv run codaro --help
+          popd
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true

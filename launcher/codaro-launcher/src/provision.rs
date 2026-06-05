@@ -1,3 +1,4 @@
+use crate::download::{self, DownloadConfig};
 use crate::manifest::{BundleArtifact, ReleaseManifest};
 use crate::paths::LauncherPaths;
 use crate::state::{ActiveReleaseState, ActiveReleaseStore};
@@ -13,7 +14,7 @@ use std::io;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use url::Url;
 use zip::ZipArchive;
 
@@ -61,6 +62,16 @@ pub fn load_manifest_from_source(source: &str) -> Result<ReleaseManifest> {
 }
 
 pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<StagedReleaseSummary> {
+    stage_release_with_progress(paths, manifest_source, &|_, _, _| {})
+}
+
+/// `stage_release`의 진행률 보고 버전. `progress(artifact_label, received, total)`로 각
+/// 아티팩트의 다운로드 진척을 알린다. 네이티브 창이 이 콜백을 IPC 진행률로 중계한다.
+pub fn stage_release_with_progress(
+    paths: &LauncherPaths,
+    manifest_source: &str,
+    progress: &dyn Fn(&str, u64, Option<u64>),
+) -> Result<StagedReleaseSummary> {
     let manifest = load_manifest_from_source(manifest_source)?;
     let release_dir = paths.release_dir(&manifest.release_id);
     let downloads_dir = paths.downloads_dir().join(&manifest.release_id);
@@ -114,12 +125,14 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &backend_wheels_dir,
         &manifest.backend.wheel_url,
         &manifest.backend.sha256,
+        &|received, total| progress("backend", received, total),
     )?;
     let python_runtime_archive_path = stage_artifact(
         &downloads_dir.join("runtime"),
         &runtime_archive_dir,
         &manifest.python_runtime.url,
         &manifest.python_runtime.sha256,
+        &|received, total| progress("runtime", received, total),
     )?;
     let editor_archive_path = if manifest.editor.is_backend_wheel_source() {
         None
@@ -139,6 +152,7 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
             &editor_archive_dir,
             editor_url,
             editor_sha256,
+            &|received, total| progress("editor", received, total),
         )?;
         extract_zip_archive(&archive_path, &staged_editor_root_path)?;
         Some(archive_path)
@@ -154,6 +168,7 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
             &bundle_wheels_dir,
             &bundle.wheel_url,
             &bundle.sha256,
+            &|received, total| progress(&format!("bundle:{}", bundle.package_name), received, total),
         )?;
         installed_bundles.push(installed_bundle(bundle, staged_path.clone()));
         bundle_paths.push(staged_path);
@@ -270,6 +285,87 @@ pub fn activate_release(paths: &LauncherPaths, release_id: &str) -> Result<Activ
     Ok(state)
 }
 
+/// 런처 자가진단 결과. `doctor`가 사람/게이트가 읽을 수 있게 노출한다. 네트워크·외부
+/// 의존성 없이 로컬 상태만 본다(빠르고 오프라인 안전). 발행 아티팩트의 원격 reachability는
+/// 별도 릴리즈 게이트(`verifyPublishedRelease.py`)가 담당한다.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SelfCheckReport {
+    /// installs 디렉터리에 실제로 파일을 쓰고 지울 수 있는가.
+    pub installs_writable: bool,
+    /// 점검 대상이 된 활성 릴리즈 id(없으면 None).
+    pub active_release_id: Option<String>,
+    /// 스테이징된 백엔드 wheel을 재해시한 결과: `ok` / `mismatch` / `missing` /
+    /// `missingRecord` / `noActiveRelease`.
+    pub backend_wheel_integrity: String,
+    /// 재해시로 무결성을 확인한 아티팩트 개수.
+    pub checked_artifacts: u32,
+}
+
+/// 로컬 설치 상태를 자가진단한다. `doctor`에서 호출.
+pub fn self_check(paths: &LauncherPaths) -> SelfCheckReport {
+    let installs_writable = probe_writable(&paths.installs_dir());
+    let store = ActiveReleaseStore::new(paths.state_dir().join("active-release.json"));
+    let active = store.load_optional().ok().flatten();
+    let Some(active) = active else {
+        return SelfCheckReport {
+            installs_writable,
+            active_release_id: None,
+            backend_wheel_integrity: "noActiveRelease".into(),
+            checked_artifacts: 0,
+        };
+    };
+    let record_path = paths
+        .release_dir(&active.release_id)
+        .join("backend")
+        .join("install-record.json");
+    let (integrity, checked) = match load_install_record(&record_path) {
+        Some(record) => (
+            verify_staged_artifact(&record.backend.staged_path, &record.backend.sha256),
+            1,
+        ),
+        None => ("missingRecord".to_string(), 0),
+    };
+    SelfCheckReport {
+        installs_writable,
+        active_release_id: Some(active.release_id),
+        backend_wheel_integrity: integrity,
+        checked_artifacts: checked,
+    }
+}
+
+fn probe_writable(dir: &Path) -> bool {
+    if fs::create_dir_all(dir).is_err() {
+        return false;
+    }
+    let probe = dir.join(".codaro-write-probe");
+    match fs::write(&probe, b"ok") {
+        Ok(()) => {
+            fs::remove_file(&probe).ok();
+            true
+        }
+        Err(_) => false,
+    }
+}
+
+fn load_install_record(path: &Path) -> Option<InstallRecord> {
+    let text = fs::read_to_string(path).ok()?;
+    serde_json::from_str(&text).ok()
+}
+
+fn verify_staged_artifact(staged_path: &Path, expected_sha256: &str) -> String {
+    match fs::read(staged_path) {
+        Ok(bytes) => {
+            if sha256_hex(&bytes) == expected_sha256.to_ascii_lowercase() {
+                "ok".to_string()
+            } else {
+                "mismatch".to_string()
+            }
+        }
+        Err(_) => "missing".to_string(),
+    }
+}
+
 fn installed_bundle(bundle: &BundleArtifact, staged_path: PathBuf) -> InstalledArtifact {
     InstalledArtifact {
         name: bundle.package_name.clone(),
@@ -303,6 +399,7 @@ fn stage_artifact(
     destination_dir: &Path,
     source: &str,
     expected_sha256: &str,
+    progress: &dyn Fn(u64, Option<u64>),
 ) -> Result<PathBuf> {
     fs::create_dir_all(download_dir).with_context(|| {
         format!(
@@ -320,27 +417,70 @@ fn stage_artifact(
     let file_name = source_file_name(source)?;
     let download_path = download_dir.join(&file_name);
     let destination_path = destination_dir.join(file_name);
-    let bytes = read_source_bytes(source)?;
-    let actual_sha256 = sha256_hex(&bytes);
-    if actual_sha256 != expected_sha256.to_ascii_lowercase() {
-        bail!(
-            "Artifact sha256 mismatch for `{source}`. expected `{expected_sha256}`, got `{actual_sha256}`."
-        );
+    let expected = expected_sha256.to_ascii_lowercase();
+
+    if is_remote_http_source(source) {
+        // 느린/불안정 회선 내성: 스트리밍 + 재시도 + Range resume + stall timeout.
+        download_remote_artifact(source, &download_path, &expected, progress)?;
+    } else {
+        // 로컬 경로 / file:// 는 작고 신뢰 가능하므로 통째로 읽어 검증.
+        let bytes = read_source_bytes(source)?;
+        let actual_sha256 = sha256_hex(&bytes);
+        if actual_sha256 != expected {
+            bail!(
+                "Artifact sha256 mismatch for `{source}`. expected `{expected}`, got `{actual_sha256}`."
+            );
+        }
+        fs::write(&download_path, &bytes).with_context(|| {
+            format!(
+                "Failed to write downloaded artifact cache `{}`.",
+                download_path.display()
+            )
+        })?;
     }
 
-    fs::write(&download_path, &bytes).with_context(|| {
-        format!(
-            "Failed to write downloaded artifact cache `{}`.",
-            download_path.display()
-        )
-    })?;
-    fs::write(&destination_path, &bytes).with_context(|| {
+    // 다운로드 캐시(downloads_dir) → 스테이징 위치(release dir)로 복사.
+    fs::copy(&download_path, &destination_path).with_context(|| {
         format!(
             "Failed to write staged artifact `{}`.",
             destination_path.display()
         )
     })?;
     Ok(destination_path)
+}
+
+/// http/https 아티팩트를 견고하게 받아 `download_path`로 떨군다. sha 불일치 시 손상된
+/// 캐시를 폐기하고 처음부터 1회 재다운로드한다(전송 손상은 일시적일 수 있으므로). 두 번째도
+/// 불일치면 아티팩트 자체가 잘못된 것이므로 영구 실패.
+fn download_remote_artifact(
+    source: &str,
+    download_path: &Path,
+    expected: &str,
+    progress: &dyn Fn(u64, Option<u64>),
+) -> Result<()> {
+    let config = DownloadConfig::default();
+    let mut last_actual = String::new();
+    for _ in 0..2 {
+        let actual = download::download_to_file(source, download_path, &config, progress)
+            .with_context(|| format!("Failed to download `{source}`."))?;
+        if actual == expected {
+            return Ok(());
+        }
+        last_actual = actual;
+        fs::remove_file(download_path).ok();
+    }
+    bail!("Artifact sha256 mismatch for `{source}`. expected `{expected}`, got `{last_actual}`.");
+}
+
+/// 소스가 원격 http/https URL인지 판정한다. 존재하는 로컬 경로와 `file://`은 false.
+fn is_remote_http_source(source: &str) -> bool {
+    if Path::new(source).exists() {
+        return false;
+    }
+    match Url::parse(source) {
+        Ok(url) => matches!(url.scheme(), "http" | "https"),
+        Err(_) => false,
+    }
 }
 
 fn read_source_bytes(source: &str) -> Result<Vec<u8>> {
@@ -360,7 +500,11 @@ fn read_source_bytes(source: &str) -> Result<Vec<u8>> {
                 .with_context(|| format!("Failed to read file URL source `{}`.", path.display()))
         }
         "http" | "https" => {
+            // 이 경로는 작은 페이로드(매니페스트 JSON 등) 전용 — 큰 아티팩트는
+            // `download::download_to_file`가 처리한다. 작은 본문이라 전체 timeout이 안전.
             let client = Client::builder()
+                .connect_timeout(Duration::from_secs(15))
+                .timeout(Duration::from_secs(60))
                 .build()
                 .context("Failed to build HTTP client for launcher download.")?;
             let response = client

@@ -1,0 +1,63 @@
+name: Release Receivability Smoke
+
+# 발행된 릴리즈 아티팩트가 빌드 환경이 아닌 깨끗한 러너에서 실제로 끝까지 받아지는지 검증한다.
+# "내 로컬은 되는데 사용자 환경은 터진다"를 게시 직후 자동으로 잡는다. release-manifest.json이
+# 가리키는 모든 자산을 실제로 GET 해서 200 + Content-Length + sha256 + ranged 수신을 확인한다.
+#
+# 트리거: 릴리즈가 published 되는 순간(draft → --draft=false 승격 포함). 수동 재검증용
+# workflow_dispatch도 제공한다(manifest_url 입력).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      manifest_url:
+        description: "검증할 release-manifest.json URL (비우면 최신 릴리즈)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  receivability-smoke:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.release.tag_name, 'v') && !endsWith(github.event.release.tag_name, '-launcher'))
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Resolve manifest URL
+        id: url
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.manifest_url }}" ]; then
+            echo "url=${{ github.event.inputs.manifest_url }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "url=https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/release-manifest.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://github.com/${{ github.repository }}/releases/latest/download/release-manifest.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify published artifacts are receivable
+        run: >
+          uv run python -X utf8 docs/skills/ops/tools/verifyPublishedRelease.py
+          "${{ steps.url.outputs.url }}" --strict
+
+      - name: Upload receivability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-release-report
+          path: output/test-runner/published-release-smoke/published-release-report.json
+          if-no-files-found: ignore
