@@ -193,7 +193,7 @@ jobs:
         with:
           path: launcher/codaro-launcher
           format: spdx-json
-          output-file: launcher/target/release/Codaro.spdx.json
+          output-file: launcher/target/release/Codaro.exe.spdx.json
 
       - name: Upload Windows release assets
         uses: actions/upload-artifact@v4
@@ -202,7 +202,7 @@ jobs:
           path: |
             launcher/target/release/Codaro.exe
             launcher/target/release/Codaro.exe.sha256
-            launcher/target/release/Codaro.spdx.json
+            launcher/target/release/Codaro.exe.spdx.json
             launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}
             launcher/target/release/${{ env.PYTHON_RUNTIME_ASSET }}.sha256
 
@@ -289,7 +289,7 @@ jobs:
           files: |
             release-assets/Codaro.exe
             release-assets/Codaro.exe.sha256
-            release-assets/Codaro.spdx.json
+            release-assets/Codaro.exe.spdx.json
             release-assets/python-runtime-win-x64.zip
             release-assets/python-runtime-win-x64.zip.sha256
             release-assets/codaro-*.whl
