@@ -8,6 +8,48 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
+## 0.2.2 - 2026-06-06
+
+런처 수신성, 자동화 영속 세션, 과제방 진행 추적, 학습 카드 계약, 테스트/릴리즈 운영면을 한 번에
+정리했다. package/tag/launcher 버전을 `0.2.2`로 맞춰 기존 `0.2.1` 런처가 새 `Codaro.exe`를
+업데이트 후보로 볼 수 있게 했다.
+
+### Added
+
+- 런처 다운로드 엔진 — `launcher/codaro-launcher/src/download.rs`가 HTTP 다운로드를 timeout, 재시도, resume, sha256 검증으로 처리하고 `provision.rs`가 runtime/wheel 수신 실패를 구조화된 failure card로 연결한다.
+- 릴리즈 수신성 게이트 — `docs/skills/ops/tools/verifyPublishedRelease.py`, `.github/workflows/release-smoke.yml`, `.github/workflows/publish.yaml`을 추가해 GitHub Release 자산과 PyPI 발행 경로를 분리 검증한다.
+- 자동화 영속 세션 — `src/codaro/automation/session/`과 `sessionFlow.py`, `sessionCellFlow.py`, automation tool handler/manifest/router가 open/run-step/query/list/close와 browser/desktop driver 경계를 제공한다.
+- 에디터 automation 셀 런타임 — `editor/src/lib/automationCellRuntime.ts`와 notebook runtime hook이 automation 셀 실행 상태를 프론트 상태와 연결한다.
+- 과제방 진행 추적 — `src/codaro/classroom/` 모델/store/sync/router와 `editor/src/components/classroom/assignmentRoomPanel.tsx`, `useAssignmentRoomState.ts`가 숙제 배포·진행 이벤트·relay queue를 다룬다.
+- 학습 카드 계약 — `src/codaro/curriculum/cardContract.py`, `docs/skills/architecture/curriculum-card-contract.md`, `tests/curriculum/verifyCardContract.py`가 structured card type과 렌더 계약을 고정한다.
+- 커리큘럼 보강 — requests 실무 레슨 3개(사업자등록 상태조회, 공휴일/영업일 계산, 환율 조회/환산)와 개발 교양 GitHub 소개 레슨을 추가했다.
+- 테스트 도메인 트리 — `tests/`를 architecture/automation/classroom/curriculum/runtime/surface/teacher 등 책임별 폴더로 정리하고 `tests/_attempts/` 실험 샌드박스를 분리했다.
+
+### Changed
+
+- 릴리즈 자산 계약 — product-release 워크플로우의 package SBOM과 launcher SBOM 이름 충돌을 제거하고, manifest 기반 exact wheel/runtime 수신 검증을 문서화했다.
+- 노트북 표면 — 검사기 아이콘 레일, 우측 검사기 상단 safe area, cell schema/model을 조정해 floating controls와 노트북 본문 충돌을 줄였다.
+- 커리큘럼 Markdown 렌더러 — 링크, 영상 임베드, callout tone, horizontal card 등 structured card 표현을 확장했다.
+- 게이트 운영 — `tests/run.py`, `docs/skills/ops/foundation/testing-and-gates.md`, CI workflow가 도메인별 gate 경로와 artifact freshness 검증을 따르도록 갱신됐다.
+- Linux CI 런처 job — Ubuntu에서 GTK/WebKit 개발 패키지를 설치한 뒤 `cargo check/test`를 실행한다.
+
+### Fixed
+
+- widget round-trip 샘플이 `radio`, `multiselect`, `date`, `file`, `form` UI descriptor를 빠뜨려 CI `widget-bridge`가 실패하던 문제를 고쳤다.
+- Unix 테스트 runtime wrapper가 shell 자식으로 Python을 띄워 macOS 런처 테스트에서 orphan backend process가 남을 수 있던 문제를 `exec` 기반 wrapper로 고쳤다.
+- 런처 provision의 HTTP 본문 수신 timeout/부분 수신 취약점을 스트리밍 다운로드와 range resume 경로로 보강했다.
+
+### Verification
+
+- `uv run python -X utf8 tests/run.py preflight` 3/3.
+- `uv run python -X utf8 tests/run.py gate widget-bridge` 통과.
+- `uv run python -X utf8 tests/run.py gate editor-build` 통과.
+- `uv run python -X utf8 tests/run.py gate landing-build` 통과.
+- `python -X utf8 tests/run.py gate launcher-check` 통과.
+- `python -X utf8 tests/run.py gate launcher-test` 통과.
+- `uv run python -X utf8 tests/run.py gate install-launcher-smoke` 통과.
+- `uv build --clear` 통과.
+
 ## 0.0.11 - 2026-06-04
 
 marimo의 로컬-우선 리액티브 개념을 에디터 본체로 흡수하고(정합성 계약·탐색 UI·입력 위젯·리액티브

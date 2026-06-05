@@ -255,6 +255,21 @@ export const docsPages = [
     "contentModule": "page09a62c1f41c7"
   },
   {
+    "path": "skills/architecture/assignment-room",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "assignment-room"
+    ],
+    "title": "Assignment Room",
+    "description": "Tutor-led homework rooms for distributing curriculum YAML, joining with codes, and tracking learner progress events.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 216,
+    "url": "/codaro/docs/skills/architecture/assignment-room",
+    "contentModule": "pagec0ce1c1ec181"
+  },
+  {
     "path": "skills/identity/transparent-scope-isolation",
     "slugSegments": [
       "skills",
@@ -1231,6 +1246,21 @@ export const docsSections = [
         "order": 215,
         "url": "/codaro/docs/skills/architecture/curriculum-os",
         "contentModule": "page09a62c1f41c7"
+      },
+      {
+        "path": "skills/architecture/assignment-room",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "assignment-room"
+        ],
+        "title": "Assignment Room",
+        "description": "Tutor-led homework rooms for distributing curriculum YAML, joining with codes, and tracking learner progress events.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 216,
+        "url": "/codaro/docs/skills/architecture/assignment-room",
+        "contentModule": "pagec0ce1c1ec181"
       }
     ]
   },

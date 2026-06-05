@@ -2232,7 +2232,7 @@ mod tests {
         let wrapper_path = bin_dir.join("python3");
         fs::write(
             &wrapper_path,
-            format!("#!/bin/sh\n\"{}\" \"$@\"\n", python.display()),
+            format!("#!/bin/sh\nexec \"{}\" \"$@\"\n", python.display()),
         )
         .unwrap();
         #[cfg(unix)]
