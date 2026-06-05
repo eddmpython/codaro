@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Database, GitBranch, GraduationCap, type LucideIcon } from "lucide-react";
 import { TeacherPanel } from "@/components/assistant/teacherPanel";
 import { NotebookPanel } from "@/components/notebook/notebookPanel";
 import { DependencyGraphPanel } from "@/components/notebook/dependencyGraphPanel";
 import { VariableExplorerPanel } from "@/components/notebook/variableExplorerPanel";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { TeacherScope } from "@/lib/teacherScope";
@@ -92,32 +94,39 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
 
 type InspectorTab = "tutor" | "variables" | "graph";
 
-const INSPECTOR_TABS: ReadonlyArray<{ value: InspectorTab; label: string }> = [
-  { value: "tutor", label: "튜터" },
-  { value: "variables", label: "변수" },
-  { value: "graph", label: "의존성" },
+const INSPECTOR_TABS: ReadonlyArray<{ value: InspectorTab; label: string; Icon: LucideIcon }> = [
+  { value: "tutor", label: "튜터", Icon: GraduationCap },
+  { value: "variables", label: "변수", Icon: Database },
+  { value: "graph", label: "의존성", Icon: GitBranch },
 ];
 
-// 우측 컬럼 — 튜터/변수 탐색기/의존성 그래프를 탭으로. 세 패널 모두 마운트 유지하고
-// 비활성은 hidden 처리해 튜터 채팅 입력 상태를 보존한다(기본 탭=튜터).
+// 우측 컬럼 — 선택기는 에디터 경계 레일에 두고, 패널은 마운트 유지해 입력 상태를 보존한다.
 function NotebookInspector(props: NotebookSurfaceProps) {
   const [tab, setTab] = useState<InspectorTab>("tutor");
   const codeBlocks = props.document.blocks;
   return (
-    <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:border-l xl:border-t-0">
-      <div className="flex items-center gap-0.5 border-b px-2 py-1.5">
+    <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:grid-cols-[40px_minmax(0,1fr)] xl:grid-rows-1 xl:border-l xl:border-t-0">
+      <div className="flex items-center gap-1 border-b px-2 py-1.5 xl:flex-col xl:border-b-0 xl:border-r xl:px-1 xl:py-2">
         {INSPECTOR_TABS.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            className={cn(
-              "rounded-md px-2.5 py-1 text-[12px] font-medium transition-colors",
-              tab === item.value ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground",
-            )}
-            onClick={() => setTab(item.value)}
-          >
-            {item.label}
-          </button>
+          <Tooltip key={item.value}>
+            <TooltipTrigger asChild>
+              <button
+                aria-label={item.label}
+                aria-pressed={tab === item.value}
+                title={item.label}
+                type="button"
+                className={cn(
+                  "flex size-8 shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
+                  tab === item.value && "border-border bg-accent text-foreground shadow-sm",
+                )}
+                onClick={() => setTab(item.value)}
+              >
+                <item.Icon className="size-4" />
+                <span className="sr-only">{item.label}</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{item.label}</TooltipContent>
+          </Tooltip>
         ))}
       </div>
       <div className="h-full min-h-0">
