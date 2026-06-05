@@ -217,7 +217,7 @@ export const docsPages = [
       "curriculum-card-contract"
     ],
     "title": "Curriculum Card Contract",
-    "description": "커리큘럼 YAML sections[].blocks[]의 블록 type → displayKind/role/필수키 단일 계약(SSOT).",
+    "description": "커리큘럼 YAML sections[].blocks[]의 학습 카드 계약(SSOT) — 어떤 표현 카드가 있고, 언제 무엇을 쓰는지 사람·AI 저자가 정확히 고르게 한다.",
     "section": "architecture",
     "sectionLabel": "Architecture",
     "order": 210,
@@ -1195,7 +1195,7 @@ export const docsSections = [
           "curriculum-card-contract"
         ],
         "title": "Curriculum Card Contract",
-        "description": "커리큘럼 YAML sections[].blocks[]의 블록 type → displayKind/role/필수키 단일 계약(SSOT).",
+        "description": "커리큘럼 YAML sections[].blocks[]의 학습 카드 계약(SSOT) — 어떤 표현 카드가 있고, 언제 무엇을 쓰는지 사람·AI 저자가 정확히 고르게 한다.",
         "section": "architecture",
         "sectionLabel": "Architecture",
         "order": 210,
