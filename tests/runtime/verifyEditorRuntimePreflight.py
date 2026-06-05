@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 EDITOR_DIR = ROOT / "editor"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
+AUTOMATION_CELL_RUNTIME = EDITOR_DIR / "src" / "lib" / "automationCellRuntime.ts"
 LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
 PYTHON_STDLIB = EDITOR_DIR / "src" / "lib" / "pythonStdlib.ts"
@@ -36,7 +37,7 @@ def main() -> int:
 
 def sourceContractFailures() -> list[str]:
     failures: list[str] = []
-    for path in (NOTEBOOK_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, PYTHON_STDLIB, LOCALE_COPY):
+    for path in (NOTEBOOK_RUNTIME, AUTOMATION_CELL_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, PYTHON_STDLIB, LOCALE_COPY):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
 
@@ -44,12 +45,16 @@ def sourceContractFailures() -> list[str]:
         return failures
 
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
+    automationCellText = AUTOMATION_CELL_RUNTIME.read_text(encoding="utf-8")
     localRuntimeText = LOCAL_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     stdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
     localeText = LOCALE_COPY.read_text(encoding="utf-8")
     required = {
         NOTEBOOK_RUNTIME: (
+            "runAutomationSessionCell",
+            "isKernelExecutableBlock",
+            "isPersistentAutomationBlock",
             "preflightRuntimePackages",
             "sessionPackagesList",
             "sessionPackageInstall",
@@ -57,6 +62,12 @@ def sourceContractFailures() -> list[str]:
             "executeReactive",
             "runtime.libraryFailed",
             "runtime.uvPrepared",
+        ),
+        AUTOMATION_CELL_RUNTIME: (
+            "runAutomationCell",
+            "runtime.automationCellDone",
+            "runtime.automationCellFailed",
+            "AutomationSessionCellPayload",
         ),
         LOCAL_RUNTIME: (
             "buildLocalExecutionResult",
@@ -82,18 +93,16 @@ def sourceContractFailures() -> list[str]:
             "uv로 준비한 뒤 실행했습니다",
         ),
     }
+    sourceByPath = {
+        NOTEBOOK_RUNTIME: runtimeText,
+        AUTOMATION_CELL_RUNTIME: automationCellText,
+        LOCAL_RUNTIME: localRuntimeText,
+        PACKAGE_INFERENCE: inferenceText,
+        PYTHON_STDLIB: stdlibText,
+        LOCALE_COPY: localeText,
+    }
     for path, tokens in required.items():
-        text = (
-            runtimeText
-            if path == NOTEBOOK_RUNTIME
-            else localRuntimeText
-            if path == LOCAL_RUNTIME
-            else inferenceText
-            if path == PACKAGE_INFERENCE
-            else stdlibText
-            if path == PYTHON_STDLIB
-            else localeText
-        )
+        text = sourceByPath[path]
         for token in tokens:
             if token not in text:
                 failures.append(f"{path.relative_to(ROOT)} missing {token}")
@@ -123,6 +132,7 @@ def runRuntimeProbe() -> tuple[str | None, str]:
 
 def nodeProbeScript() -> str:
     runtimePath = json.dumps(str(NOTEBOOK_RUNTIME), ensure_ascii=False)
+    automationRuntimePath = json.dumps(str(AUTOMATION_CELL_RUNTIME), ensure_ascii=False)
     inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
     stdlibPath = json.dumps(str(PYTHON_STDLIB), ensure_ascii=False)
     layoutPath = json.dumps(str(DEP_GRAPH_LAYOUT), ensure_ascii=False)
@@ -206,6 +216,21 @@ const fakeApi = {{
     calls.push(["cell-call-reactive", sessionId, blockId, blocks.map((block) => block.id)]);
     return {{ results: [{{ ...fakeResult, blockId }}], executionOrder: [blockId] }};
   }},
+  runAutomationCell: async (payload) => {{
+    calls.push(["automation-cell", payload.blockId, payload.executionKind, payload.sessionId]);
+    return {{
+      sessionKey: "browser:orders",
+      sessionId: "auto-session-1",
+      kind: "browser",
+      op: "open",
+      action: "open",
+      status: "success",
+      opened: true,
+      closed: false,
+      state: {{ url: "about:blank", title: "stub" }},
+      result: {{ status: "live" }},
+    }};
+  }},
 }};
 const stdlib = loadModule({stdlibPath}, (specifier) => {{
   if (specifier === "@/types") return {{}};
@@ -219,6 +244,8 @@ const inference = loadModule({inferencePath}, (specifier) => {{
 function translate(key, values) {{
   const messages = {{
     "runtime.cellRunDone": "셀 실행 완료",
+    "runtime.automationCellDone": "자동화 셀 실행 완료",
+    "runtime.automationCellFailed": "자동화 셀 실패",
     "runtime.executionFailed": "실행 실패",
     "runtime.evaluatedCells": "{{count}}개 셀을 평가했습니다.",
     "runtime.libraryFailed": "라이브러리 준비 실패",
@@ -233,11 +260,21 @@ function translate(key, values) {{
   const template = messages[key] || key;
   return template.replace(/\\{{(\\w+)\\}}/g, (_, name) => String((values || {{}})[name] ?? ""));
 }}
+const cellModel = {{
+  isExecutableBlock: (block) => block.type === "code" || block.type === "automation",
+  isPersistentAutomationBlock: (block) => block.type === "automation" && ["browser", "os", "mouse"].includes(block.executionKind),
+  isKernelExecutableBlock: (block) => (block.type === "code" || block.type === "automation") && !(block.type === "automation" && ["browser", "os", "mouse"].includes(block.executionKind)),
+}};
+const automationCellRuntime = loadModule({automationRuntimePath}, (specifier) => {{
+  if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/localeCopy") return {{ translate }};
+  if (specifier === "@/types") return {{}};
+  return require(specifier);
+}});
 const runtime = loadModule({runtimePath}, (specifier) => {{
   if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
-  if (specifier === "@/lib/cellModel") return {{
-    isExecutableBlock: (block) => block.type === "code" || block.type === "automation",
-  }};
+  if (specifier === "@/lib/automationCellRuntime") return automationCellRuntime;
+  if (specifier === "@/lib/cellModel") return cellModel;
   if (specifier === "@/lib/localeCopy") return {{ translate }};
   if (specifier === "@/lib/localRuntime") return {{
     buildLocalExecutionResult: () => fakeResult,
@@ -306,6 +343,41 @@ assert.deepEqual(calls.map((call) => call[0]), [
 assert.deepEqual(calls.slice(2, 4).map((call) => call[2]), ["pandas", "scikit-learn"]);
 
 calls.length = 0;
+const automationBlock = {{
+  id: "auto-1",
+  type: "automation",
+  executionKind: "browser",
+  content: "{{\\"op\\": \\"open\\", \\"session\\": \\"orders\\"}}",
+}};
+const automationOutcome = await runtime.runNotebookBlock({{
+  apiOnline: true,
+  block: automationBlock,
+  code: automationBlock.content,
+  localExecutionCount: 2,
+  runtimePackages: ["numpy"],
+  sessionId: "session-1",
+  automationSessionId: null,
+}});
+assert.equal(automationOutcome.sessionId, "session-1");
+assert.equal(automationOutcome.automationSessionId, "auto-session-1");
+assert.equal(automationOutcome.result.status, "done");
+assert.match(automationOutcome.notice.title, /자동화 셀 실행 완료/);
+assert.deepEqual(calls.map((call) => call[0]), ["automation-cell"]);
+
+calls.length = 0;
+const offlineAutomation = await runtime.runNotebookBlock({{
+  apiOnline: false,
+  block: automationBlock,
+  code: automationBlock.content,
+  localExecutionCount: 3,
+  runtimePackages: ["numpy"],
+  sessionId: "session-1",
+  automationSessionId: "auto-session-1",
+}});
+assert.equal(offlineAutomation.result.status, "error");
+assert.deepEqual(calls, []);
+
+calls.length = 0;
 installFails = true;
 const failed = await runtime.runNotebookBlock({{
   apiOnline: true,
@@ -325,12 +397,15 @@ calls.length = 0;
 installFails = false;
 await runtime.runReactiveNotebook({{
   apiOnline: true,
-  codeBlocks: [block],
+  codeBlocks: [block, automationBlock],
   document: {{
     id: "doc-1",
     title: "Doc",
     runtime: {{ defaultEngine: "local", reactiveMode: "hybrid", packages: ["pandas"] }},
-    blocks: [{{ ...block, content: "import pandas as pd\\nprint('done')" }}],
+    blocks: [
+      {{ ...block, content: "import pandas as pd\\nprint('done')" }},
+      {{ ...automationBlock, content: "{{\\"op\\": \\"step\\", \\"session\\": \\"orders\\", \\"action\\": \\"click\\"}}" }},
+    ],
   }},
   drafts: {{}},
   firstBlock: block,
@@ -338,6 +413,7 @@ await runtime.runReactiveNotebook({{
   sessionId: "session-1",
 }});
 assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install", "cell-call-reactive"]);
+assert.deepEqual(calls.at(-1)[3], ["cell-1"]);
 
 const graphLayout = loadModule({layoutPath}, (specifier) => require(specifier));
 {{
@@ -353,6 +429,7 @@ const graphLayout = loadModule({layoutPath}, (specifier) => require(specifier));
 
 process.stdout.write(JSON.stringify({{
   directRun: outcome.notice.detail,
+  automationRun: automationOutcome.notice.detail,
   failure: failed.notice.title,
   reactiveOrder: calls.map((call) => call[0]),
 }}, null, 2));

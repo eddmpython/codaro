@@ -252,9 +252,18 @@ AUTOMATION_REQUIREMENTS = (
             ("src/codaro/api/automationRouter.py", (
                 "/api/automation/sessions",
                 "/api/automation/sessions/{sessionId}/step",
+                "/api/automation/session-cell",
                 "openAutomationSessionPayload",
                 "runAutomationSessionStepPayload",
+                "runAutomationSessionCellPayload",
                 "closeAutomationSessionPayload",
+            )),
+            ("src/codaro/automation/sessionCellFlow.py", (
+                "runAutomationSessionCellPayload",
+                "parseAutomationSessionCell",
+                "openIfMissing",
+                "Automation session not open",
+                "_findLiveSessionId",
             )),
             ("src/codaro/automation/sessionFlow.py", (
                 "openAutomationSessionPayload",
@@ -289,6 +298,34 @@ AUTOMATION_REQUIREMENTS = (
                 "testEstopBlocksStepButKeepsHandleLive",
                 "testFlowOpenStepCloseWithStubBrowser",
                 "StubBrowser.instances == 1",
+            )),
+            ("tests/automation/testAutomationSessionCellFlow.py", (
+                "testAutomationCellReusesLiveSessionAcrossRepeatedRuns",
+                "testQueryDoesNotOpenMissingSession",
+                "testEmergencyStopBlocksOpenAndStepButKeepsHandleLive",
+                "testConcurrentStepsKeepSingleWriterGuard",
+            )),
+            ("editor/src/lib/automationCellRuntime.ts", (
+                "runAutomationSessionCell",
+                "codaroApi.runAutomationCell",
+                "runtime.automationCellDone",
+            )),
+            ("editor/src/lib/notebookRuntime.ts", (
+                "isPersistentAutomationBlock(block)",
+                "runAutomationSessionCell",
+                "isKernelExecutableBlock(block)",
+            )),
+            ("editor/src/hooks/useNotebookRuntimeState.ts", (
+                "automationSessions",
+                "applyAutomationSessionOutcome",
+            )),
+            ("editor/src/components/notebook/notebookPanel.tsx", (
+                "data-automation-session-cell",
+                "세션 유지",
+            )),
+            ("editor/src/components/app/appPrimitives.tsx", (
+                "data-automation-session-output",
+                "AutomationSessionOutput",
             )),
         ),
         forbiddenChecks=(

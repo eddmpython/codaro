@@ -4,6 +4,7 @@ import type {
   AiProfile,
   AiProviderCatalogPayload,
   AiToolCatalogPayload,
+  AutomationSessionCellPayload,
   AuditPayload,
   BootstrapPayload,
   CheckResult,
@@ -364,6 +365,17 @@ export const codaroApi = {
   triggerEStop: (reason: string) => postJson<EStopStatus>("/api/automation/e-stop", { reason }),
   clearEStop: () => deleteJson<EStopStatus>("/api/automation/e-stop"),
   audit: () => requestJson<AuditPayload>("/api/automation/audit?limit=8"),
+  runAutomationCell: (payload: {
+    blockId: string;
+    content: string;
+    executionKind?: string | null;
+    sessionId?: string | null;
+  }) => postJson<AutomationSessionCellPayload>("/api/automation/session-cell", {
+    blockId: payload.blockId,
+    content: payload.content,
+    executionKind: payload.executionKind ?? null,
+    sessionId: payload.sessionId ?? null,
+  }),
   sharePackStatus: () => requestJson<SharePackStatusPayload>("/api/share/packs/status"),
   sharePacks: () => requestJson<SharePackListPayload>("/api/share/packs"),
   inspectSharePack: (source: string) => postJson<SharePackPreview>("/api/share/packs/inspect", { source }),

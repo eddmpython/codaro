@@ -329,12 +329,36 @@ def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
 
     assert "export function isExecutableBlock(block: BlockConfig)" in cellModel
     assert 'block.type === "code" || block.type === "automation"' in cellModel
+    assert "export function isPersistentAutomationBlock(block: BlockConfig)" in cellModel
+    assert 'block.type === "automation"' in cellModel
+    assert "export function isKernelExecutableBlock(block: BlockConfig)" in cellModel
     assert ".filter((block) => isExecutableBlock(block)" in documentModel
     assert "document.blocks.filter(isExecutableBlock)" in runtimeHook
-    assert 'type: isExecutableBlock(block) ? "code" : "markdown"' in notebookRuntime
-    assert 'block.type === "automation" ? "Automation"' in notebookPanel
+    assert 'type: isKernelExecutableBlock(block) ? "code" : "markdown"' in notebookRuntime
+    assert "isPersistentAutomationBlock(block)" in notebookPanel
+    assert 'data-automation-session-cell={persistentAutomation ? "true" : undefined}' in notebookPanel
     assert "isExecutableBlock(target)" in appShell
     assert 'target.type === "code"' not in appShell
+
+
+def testPersistentAutomationCellsUseSessionCellBoundary() -> None:
+    api = _read("editor/src/lib/api.ts")
+    runtime = _read("editor/src/lib/notebookRuntime.ts")
+    automationRuntime = _read("editor/src/lib/automationCellRuntime.ts")
+    runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
+    output = _read("editor/src/components/app/appPrimitives.tsx")
+
+    assert "runAutomationCell" in api
+    assert '"/api/automation/session-cell"' in api
+    assert 'import { codaroApi } from "@/lib/api"' in automationRuntime
+    assert "codaroApi.runAutomationCell" in automationRuntime
+    assert "runAutomationSessionCell" in runtime
+    assert "isPersistentAutomationBlock(block)" in runtime
+    assert "isKernelExecutableBlock(block)" in runtime
+    assert "preflightRuntimePackages(activeSession.sessionId, inferDocumentRuntimePackages(document, drafts))" in runtime
+    assert "const [automationSessions, setAutomationSessions]" in runtimeHook
+    assert "applyAutomationSessionOutcome" in runtimeHook
+    assert 'data-automation-session-output="true"' in output
 
 
 def testFrontendStateDoesNotImportComponentImplementations() -> None:

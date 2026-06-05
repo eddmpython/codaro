@@ -74,6 +74,20 @@ export type ExecutionResult = {
   status: string;
 };
 
+export type AutomationSessionCellPayload = {
+  sessionKey: string;
+  sessionId: string | null;
+  kind: string;
+  op?: string;
+  action: string;
+  status: string;
+  result?: unknown;
+  step?: Record<string, unknown>;
+  state?: Record<string, unknown> | null;
+  opened?: boolean;
+  closed?: boolean;
+};
+
 export type BlockExecution = {
   executionCount: number;
   status: string;

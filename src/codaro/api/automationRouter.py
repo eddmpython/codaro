@@ -67,6 +67,7 @@ from ..automation.sessionFlow import (
     openAutomationSessionPayload,
     runAutomationSessionStepPayload,
 )
+from ..automation.sessionCellFlow import runAutomationSessionCellPayload
 from ..automation.workflowFlow import (
     AutomationWorkflowFlowError,
     createAutomationWorkflowPayload,
@@ -123,6 +124,13 @@ class OpenSessionRequest(BaseModel):
 class RunSessionStepRequest(BaseModel):
     action: str
     params: dict[str, Any] | None = None
+
+
+class RunSessionCellRequest(BaseModel):
+    blockId: str
+    content: str
+    executionKind: str | None = None
+    sessionId: str | None = None
 
 
 def createAutomationRouter(state: Any) -> APIRouter:
@@ -274,6 +282,18 @@ def createAutomationRouter(state: Any) -> APIRouter:
     async def apiRunSessionStep(sessionId: str, req: RunSessionStepRequest):
         try:
             return await runAutomationSessionStepPayload(sessionId, action=req.action, params=req.params)
+        except AutomationSessionFlowError as error:
+            failAutomationSessionFlow(error)
+
+    @router.post("/api/automation/session-cell")
+    async def apiRunSessionCell(req: RunSessionCellRequest):
+        try:
+            return await runAutomationSessionCellPayload(
+                blockId=req.blockId,
+                content=req.content,
+                executionKind=req.executionKind,
+                sessionId=req.sessionId,
+            )
         except AutomationSessionFlowError as error:
             failAutomationSessionFlow(error)
 

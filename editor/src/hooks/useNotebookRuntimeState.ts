@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { blockLabel, isExecutableBlock } from "@/lib/cellModel";
+import { blockLabel, isExecutableBlock, isKernelExecutableBlock } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
 import {
@@ -30,6 +30,29 @@ type UseNotebookRuntimeStateOptions = {
   surface: SurfaceMode;
 };
 
+function applyAutomationSessionOutcome(
+  current: Record<string, string>,
+  blockId: string,
+  sessionKey: string,
+  sessionId: string | null | undefined,
+) {
+  const next = { ...current };
+  const previousId = current[blockId] ?? current[sessionKey];
+  if (sessionId) {
+    next[blockId] = sessionId;
+    next[sessionKey] = sessionId;
+    return next;
+  }
+  delete next[blockId];
+  delete next[sessionKey];
+  if (previousId) {
+    for (const [key, value] of Object.entries(next)) {
+      if (value === previousId) delete next[key];
+    }
+  }
+  return next;
+}
+
 export function useNotebookRuntimeState({
   apiOnline,
   document,
@@ -46,6 +69,7 @@ export function useNotebookRuntimeState({
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
   const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
+  const [automationSessions, setAutomationSessions] = useState<Record<string, string>>({});
   // 마지막 실행 시점에 보낸 셀 내용 스냅샷 — 이후 draft가 달라지면 그 셀(+다운스트림)이 stale.
   const [lastRunContent, setLastRunContent] = useState<Record<string, string>>({});
 
@@ -59,6 +83,7 @@ export function useNotebookRuntimeState({
     setVariables([]);
     setDiagnostics(emptyReactiveDiagnostics);
     setLastRunContent({});
+    setAutomationSessions({});
   }, []);
 
   const runBlock = useCallback(async (block: BlockConfig) => {
@@ -80,8 +105,17 @@ export function useNotebookRuntimeState({
         localExecutionCount: Object.keys(results).length + 1,
         runtimePackages: document.runtime?.packages ?? [],
         sessionId,
+        automationSessionId: automationSessions[block.id] ?? null,
       });
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
+      if (outcome.automationSessionKey) {
+        setAutomationSessions((current) => applyAutomationSessionOutcome(
+          current,
+          block.id,
+          outcome.automationSessionKey ?? "",
+          outcome.automationSessionId,
+        ));
+      }
       if (outcome.result) {
         const result = outcome.result;
         setResults((current) => ({ ...current, [block.id]: result }));
@@ -91,10 +125,11 @@ export function useNotebookRuntimeState({
     } finally {
       setRunningBlockId(null);
     }
-  }, [apiOnline, drafts, onNotice, results, selectCurriculumBlock, selectNotebookBlock, sessionId, surface]);
+  }, [apiOnline, automationSessions, drafts, onNotice, results, selectCurriculumBlock, selectNotebookBlock, sessionId, surface]);
 
   const runNotebook = useCallback(async () => {
-    const firstBlock = selectedBlock && isExecutableBlock(selectedBlock) ? selectedBlock : codeBlocks[0];
+    const defaultBlock = codeBlocks.find(isKernelExecutableBlock) ?? codeBlocks[0];
+    const firstBlock = selectedBlock && isExecutableBlock(selectedBlock) ? selectedBlock : defaultBlock;
     if (!firstBlock) return;
     onNotice({ tone: "default", title: translate("runtime.notebookRunning"), detail: document.title });
     setNotebookRunning(true);
@@ -108,8 +143,17 @@ export function useNotebookRuntimeState({
         firstBlock,
         previousVariables: variables,
         sessionId,
+        automationSessionId: automationSessions[firstBlock.id] ?? null,
       });
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
+      if (outcome.automationSessionKey) {
+        setAutomationSessions((current) => applyAutomationSessionOutcome(
+          current,
+          firstBlock.id,
+          outcome.automationSessionKey ?? "",
+          outcome.automationSessionId,
+        ));
+      }
       if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
       if (outcome.variables) setVariables(outcome.variables);
       if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
@@ -119,7 +163,7 @@ export function useNotebookRuntimeState({
     } finally {
       setNotebookRunning(false);
     }
-  }, [apiOnline, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
+  }, [apiOnline, automationSessions, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
 
   const setUiValue = useCallback(async (blockId: string, elementId: string, value: unknown) => {
     if (!sessionId) return;
@@ -153,6 +197,17 @@ export function useNotebookRuntimeState({
 
   const cleanupCellDefinitions = useCallback((blockId: string) => {
     void removeNotebookCellState(sessionId, blockId);
+    setAutomationSessions((current) => {
+      const next = { ...current };
+      const previousId = next[blockId];
+      delete next[blockId];
+      if (previousId) {
+        for (const [key, value] of Object.entries(next)) {
+          if (value === previousId) delete next[key];
+        }
+      }
+      return next;
+    });
   }, [sessionId]);
 
   useEffect(() => {

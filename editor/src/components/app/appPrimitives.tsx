@@ -19,7 +19,7 @@ import { statusLabel, stringifyData } from "@/lib/displayFormat";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import { useWidgetSession } from "@/lib/widgetSession";
-import type { BlockConfig, ExecutionResult } from "@/types";
+import type { AutomationSessionCellPayload, BlockConfig, ExecutionResult } from "@/types";
 
 export function IconButton({
   children,
@@ -107,6 +107,7 @@ export function ExecutionOutput({
   const hasError = packageError || result.status === "error" || Boolean(result.stderr);
   const widgetDescriptor = !hasError && isWidgetDescriptor(result.data) ? result.data : null;
   const dataframeData = !widgetDescriptor && !hasError && result.type === "dataframe" ? asDataFramePayload(result.data) : null;
+  const automationData = !hasError && result.type === "automation" ? asAutomationSessionPayload(result.data) : null;
   const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   return (
     <div
@@ -130,6 +131,8 @@ export function ExecutionOutput({
         </div>
       ) : dataframeData ? (
         <DataFrameOutput data={dataframeData} />
+      ) : automationData ? (
+        <AutomationSessionOutput output={output} payload={automationData} />
       ) : (
       <ScrollArea className="max-h-72">
         <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
@@ -161,6 +164,49 @@ type DataFramePayload = {
   totalRows?: number;
   truncated?: boolean;
 };
+
+function asAutomationSessionPayload(data: unknown): AutomationSessionCellPayload | null {
+  if (!data || typeof data !== "object") return null;
+  const record = data as Partial<AutomationSessionCellPayload>;
+  if (typeof record.sessionKey !== "string" || typeof record.action !== "string") return null;
+  if (typeof record.kind !== "string" || typeof record.status !== "string") return null;
+  return record as AutomationSessionCellPayload;
+}
+
+function AutomationSessionOutput({
+  output,
+  payload,
+}: {
+  output: string;
+  payload: AutomationSessionCellPayload;
+}) {
+  return (
+    <div className="space-y-2" data-automation-session-output="true">
+      <div className="flex flex-wrap items-center gap-1.5 text-xs">
+        <Badge variant="outline">{payload.kind}</Badge>
+        <Badge variant="outline">{payload.op ?? payload.action}</Badge>
+        <Badge variant={payload.status === "success" || payload.status === "closed" ? "outline" : "secondary"}>
+          {payload.status}
+        </Badge>
+        {payload.opened ? <Badge variant="secondary">opened</Badge> : null}
+        {payload.closed ? <Badge variant="secondary">closed</Badge> : null}
+      </div>
+      <div className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+        <div className="min-w-0">
+          <span className="font-medium text-foreground">session</span>{" "}
+          <span className="break-all">{payload.sessionId ?? payload.sessionKey}</span>
+        </div>
+        <div className="min-w-0">
+          <span className="font-medium text-foreground">action</span>{" "}
+          <span className="break-all">{payload.action}</span>
+        </div>
+      </div>
+      <ScrollArea className="max-h-44">
+        <pre className="whitespace-pre-wrap font-mono text-xs leading-5">{output}</pre>
+      </ScrollArea>
+    </div>
+  );
+}
 
 function asDataFramePayload(data: unknown): DataFramePayload | null {
   if (!data || typeof data !== "object") return null;

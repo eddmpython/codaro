@@ -8,6 +8,15 @@ export function isExecutableBlock(block: BlockConfig) {
   return block.type === "code" || block.type === "automation";
 }
 
+export function isPersistentAutomationBlock(block: BlockConfig) {
+  return block.type === "automation"
+    && (block.executionKind === "browser" || block.executionKind === "os" || block.executionKind === "mouse");
+}
+
+export function isKernelExecutableBlock(block: BlockConfig) {
+  return isExecutableBlock(block) && !isPersistentAutomationBlock(block);
+}
+
 export function classifyLearningCell(block: BlockConfig, draft: string): LearningCellKind {
   if (block.type === "automation") return "automation";
   if (block.displayKind === "quiz") return "check";

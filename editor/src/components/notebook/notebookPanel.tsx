@@ -44,7 +44,12 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/codeCompletion";
-import { isExecutableBlock, type CellAiAction } from "@/lib/cellModel";
+import {
+  executionKindLabel,
+  isExecutableBlock,
+  isPersistentAutomationBlock,
+  type CellAiAction,
+} from "@/lib/cellModel";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
 import {
@@ -597,7 +602,14 @@ function DocumentBlock({
   onRun: () => void;
   onSelect: () => void;
 }) {
-  const cellTitle = block.type === "markdown" ? "Markdown" : block.type === "automation" ? "Automation" : "Python";
+  const persistentAutomation = isPersistentAutomationBlock(block);
+  const cellTitle = block.type === "markdown"
+    ? "Markdown"
+    : persistentAutomation
+      ? `${executionKindLabel(block.executionKind)} · 세션 유지`
+      : block.type === "automation"
+        ? "Automation"
+        : "Python";
   // 우선순위: 실행 중 → 순환(conflict, 빨강) → stale(오래됨) → 실행 결과 → 대기.
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
 
@@ -646,7 +658,11 @@ function DocumentBlock({
   }
 
   return (
-    <section className="group relative py-0.5 pl-6" data-notebook-cell="code">
+    <section
+      className="group relative py-0.5 pl-6"
+      data-automation-session-cell={persistentAutomation ? "true" : undefined}
+      data-notebook-cell="code"
+    >
       <CellMetaBar
         canRun={canRun}
         running={isRunning}

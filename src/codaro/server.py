@@ -32,6 +32,7 @@ from .api import (
     unhandledExceptionHandler,
     validationExceptionHandler,
 )
+from .automation.session import getSessionRegistry
 from .serverLog import configureServerLogging, formatLogFields, isVerboseLoggingEnabled, setVerboseLogging
 from .system.serverState import createServerState
 
@@ -245,6 +246,13 @@ def createServerApp(
             state.workspaceEngine.dispose()
         except Exception as disposeError:  # noqa: BLE001 — shutdown must continue
             logger.exception("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
+        try:
+            await getSessionRegistry().closeAll()
+        except Exception as automationCloseError:  # noqa: BLE001 — shutdown must continue
+            logger.exception(
+                "lifespan %s",
+                formatLogFields(status="automation-session-close-failed", error=str(automationCloseError)),
+            )
         try:
             state.sessionManager.destroyAll()
         except Exception as destroyError:  # noqa: BLE001 — shutdown must continue

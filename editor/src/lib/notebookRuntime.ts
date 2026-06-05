@@ -1,6 +1,7 @@
 import { codaroApi, type ReactiveResponse } from "@/lib/api";
+import { runAutomationSessionCell } from "@/lib/automationCellRuntime";
 import type { ResultMap } from "@/lib/assistantContext";
-import { isExecutableBlock } from "@/lib/cellModel";
+import { isKernelExecutableBlock, isPersistentAutomationBlock } from "@/lib/cellModel";
 import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
@@ -47,11 +48,15 @@ export type RuntimeSessionResult = {
 };
 
 export type RunBlockResult = RuntimeSessionResult & {
+  automationSessionId?: string | null;
+  automationSessionKey?: string;
   result?: ExecutionResult;
   variables?: VariableInfo[];
 };
 
 export type RunNotebookResult = RuntimeSessionResult & {
+  automationSessionId?: string | null;
+  automationSessionKey?: string;
   results?: ResultMap;
   variables?: VariableInfo[];
   diagnostics?: ReactiveDiagnostics;
@@ -97,6 +102,7 @@ export async function runNotebookBlock({
   localExecutionCount,
   runtimePackages = [],
   sessionId,
+  automationSessionId = null,
 }: {
   apiOnline: boolean;
   block: BlockConfig;
@@ -104,7 +110,43 @@ export async function runNotebookBlock({
   localExecutionCount: number;
   runtimePackages?: string[];
   sessionId: string | null;
+  automationSessionId?: string | null;
 }): Promise<RunBlockResult> {
+  if (isPersistentAutomationBlock(block)) {
+    if (!apiOnline) {
+      return {
+        sessionId,
+        automationSessionId,
+        result: {
+          type: "automation",
+          blockId: block.id,
+          data: null,
+          stdout: "",
+          stderr: translate("runtime.unavailable"),
+          variables: [],
+          stateDelta: { added: [], updated: [], removed: [] },
+          executionCount: localExecutionCount,
+          status: "error",
+        },
+        notice: {
+          tone: "error",
+          title: translate("runtime.automationCellFailed"),
+          detail: translate("runtime.unavailable"),
+        },
+      };
+    }
+    const automationResult = await runAutomationSessionCell({
+      block,
+      code,
+      executionCount: localExecutionCount,
+      automationSessionId,
+    });
+    return {
+      sessionId,
+      ...automationResult,
+    };
+  }
+
   if (!apiOnline) {
     await sleep(250);
     const result = buildLocalExecutionResult(block, code, localExecutionCount);
@@ -166,6 +208,7 @@ export async function runReactiveNotebook({
   firstBlock,
   previousVariables,
   sessionId,
+  automationSessionId = null,
 }: {
   apiOnline: boolean;
   codeBlocks: BlockConfig[];
@@ -174,11 +217,57 @@ export async function runReactiveNotebook({
   firstBlock: BlockConfig;
   previousVariables: VariableInfo[];
   sessionId: string | null;
+  automationSessionId?: string | null;
 }): Promise<RunNotebookResult> {
+  if (isPersistentAutomationBlock(firstBlock)) {
+    if (!apiOnline) {
+      return {
+        sessionId,
+        automationSessionId,
+        results: {
+          [firstBlock.id]: {
+            type: "automation",
+            blockId: firstBlock.id,
+            data: null,
+            stdout: "",
+            stderr: translate("runtime.unavailable"),
+            variables: [],
+            stateDelta: { added: [], updated: [], removed: [] },
+            executionCount: 1,
+            status: "error",
+          },
+        },
+        variables: previousVariables,
+        diagnostics: emptyReactiveDiagnostics,
+        notice: {
+          tone: "error",
+          title: translate("runtime.automationCellFailed"),
+          detail: translate("runtime.unavailable"),
+        },
+      };
+    }
+    const result = await runAutomationSessionCell({
+      block: firstBlock,
+      code: resolveBlockRunCode(firstBlock, drafts),
+      executionCount: 1,
+      automationSessionId,
+    });
+    return {
+      sessionId,
+      automationSessionId: result.automationSessionId,
+      automationSessionKey: result.automationSessionKey,
+      results: result.result ? { [firstBlock.id]: result.result } : undefined,
+      variables: previousVariables,
+      diagnostics: emptyReactiveDiagnostics,
+      notice: result.notice,
+    };
+  }
+
   if (!apiOnline) {
     await sleep(350);
+    const localBlocks = codeBlocks.filter(isKernelExecutableBlock);
     const results = Object.fromEntries(
-      codeBlocks.map((block, index) => [
+      localBlocks.map((block, index) => [
         block.id,
         buildLocalExecutionResult(block, drafts[block.id] ?? block.content, index + 1),
       ]),
@@ -192,7 +281,7 @@ export async function runReactiveNotebook({
       notice: {
         tone: "success",
         title: translate("runtime.notebookRunDone"),
-        detail: translate("runtime.evaluatedCells", { count: codeBlocks.length }),
+        detail: translate("runtime.evaluatedCells", { count: localBlocks.length }),
       },
     };
   }
@@ -215,10 +304,10 @@ export async function runReactiveNotebook({
       activeSession.sessionId,
       firstBlock.id,
       document.blocks
-        .filter((block) => isExecutableBlock(block) || block.type === "markdown")
+        .filter((block) => isKernelExecutableBlock(block) || block.type === "markdown")
         .map((block) => ({
           id: block.id,
-          type: isExecutableBlock(block) ? "code" : "markdown",
+          type: isKernelExecutableBlock(block) ? "code" : "markdown",
           content: drafts[block.id] ?? block.content,
         })),
       document.title,
@@ -271,10 +360,10 @@ export async function setNotebookUiValue({
       elementId,
       value,
       blocks: document.blocks
-        .filter((block) => isExecutableBlock(block) || block.type === "markdown")
+        .filter((block) => isKernelExecutableBlock(block) || block.type === "markdown")
         .map((block) => ({
           id: block.id,
-          type: isExecutableBlock(block) ? "code" : ("markdown" as const),
+          type: isKernelExecutableBlock(block) ? "code" : ("markdown" as const),
           content: drafts[block.id] ?? block.content,
         })),
     });
@@ -319,7 +408,7 @@ export async function preflightRuntimePackages(
 function inferDocumentRuntimePackages(document: CodaroDocument, drafts: Record<string, string>) {
   const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
   for (const block of document.blocks) {
-    if (!isExecutableBlock(block)) continue;
+    if (!isKernelExecutableBlock(block)) continue;
     for (const packageName of inferCodePackages(drafts[block.id] ?? block.content)) {
       packages.add(packageName);
     }

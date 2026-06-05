@@ -766,17 +766,21 @@ def testAutomationTaskFlowDoesNotImportTransportLayer() -> None:
 
 
 def testAutomationSessionFlowDoesNotImportTransportLayer() -> None:
-    source = (ROOT / "src/codaro/automation/sessionFlow.py").read_text(encoding="utf-8")
-    tree = ast.parse(source)
-    importedModules = [
-        node.module
-        for node in ast.walk(tree)
-        if isinstance(node, ast.ImportFrom) and node.module
-    ]
+    for relPath in (
+        "src/codaro/automation/sessionFlow.py",
+        "src/codaro/automation/sessionCellFlow.py",
+    ):
+        source = (ROOT / relPath).read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        importedModules = [
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module
+        ]
 
-    assert all("api." not in module and not module.endswith("api") for module in importedModules)
-    assert "APIRouter" not in source
-    assert "HTTPException" not in source
+        assert all("api." not in module and not module.endswith("api") for module in importedModules)
+        assert "APIRouter" not in source
+        assert "HTTPException" not in source
 
 
 def testAutomationRouterKeepsSessionRegistryBehindAutomationBoundary() -> None:
@@ -786,6 +790,7 @@ def testAutomationRouterKeepsSessionRegistryBehindAutomationBoundary() -> None:
     assert "listAutomationSessionsPayload" in source
     assert "getAutomationSessionStatePayload" in source
     assert "runAutomationSessionStepPayload" in source
+    assert "runAutomationSessionCellPayload" in source
     assert "closeAutomationSessionPayload" in source
     assert "SessionRegistry" not in source
     assert "getSessionRegistry" not in source
