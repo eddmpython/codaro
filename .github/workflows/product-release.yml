@@ -296,4 +296,4 @@ jobs:
             release-assets/codaro-*.whl.sha256
             release-assets/release-manifest.json
             release-assets/codaro.spdx.json
-          generate_release_notes: true
+          generate_release_notes: false
