@@ -30,7 +30,7 @@ gate 드라이버를 같은 폴더에 둔다. 구조의 SSOT는
 | `conftest.py` | `tests/` 루트를 `sys.path`에 올려 도메인 스위트가 루트 헬퍼를 bare import |
 | `browserStaticServer.py`, `playwrightCli.py`, `authorReferenceChecks.py` | 여러 테스트가 import 하는 공유 인프라 |
 | `_predictStrictCategories.txt`, `_strongSignalCategories.txt` | gate 드라이버가 읽는 카테고리 allowlist 데이터 |
-| `_attempts/` | 운영과 분리된 실험 샌드박스(비운영 `attempts` gate 전용) |
+| `_attempts/` | 운영과 분리된 실험 샌드박스(비운영 `attempts` gate 전용). **git 미추적**(`.gitignore`) — 코드·데이터 전부 로컬 전용, 검증되면 `src/` + 정식 `tests/<domain>/`로 졸업 |
 
 ## 드라이버를 추가·이동할 때
 

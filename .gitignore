@@ -23,6 +23,10 @@ data/
 # Local reference artifacts
 .__marimo_upstream/
 
+# tests/_attempts/ 는 스크래치 실험 인큐베이터 — 비운영 attempts gate 전용(tests/run.py --ignore=tests/_attempts).
+# 코드·데이터 전부 추적 제외(로컬 전용). 검증된 산출물은 src/ + 정식 tests/<domain>/ 로 졸업시킨다.
+tests/_attempts/
+
 # Local tool artifacts
 *.log
 *.tsbuildinfo

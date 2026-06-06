@@ -140,6 +140,7 @@ uv run python -X utf8 tests/run.py gate attempts
 ## 실험 샌드박스 (`tests/_attempts/`)
 
 - 새 자동화 메커니즘(브라우저 무중단 객체 유지, OS 자동화 객체 상주 등)은 정식 gate에 박기 전에 `tests/_attempts/<카테고리>/`에서 먼저 프로토타이핑한다. 계약 SSOT는 `tests/_attempts/README.md`다.
+- `tests/_attempts/`는 **git 미추적**이다(`.gitignore`에 `tests/_attempts/`). 안의 코드·데이터는 전부 로컬 전용이라 저장소에 올라가지 않는다 — 검증된 산출물만 `src/` + 정식 `tests/<domain>/`로 졸업시킨다. (dartlab의 스크래치 인큐베이터 체계와 동일.)
 - `backend` gate(`pytest tests/`)는 `--ignore=tests/_attempts`로 이 디렉터리를 수집하지 않으므로 실험이 깨져도 preflight/CI는 흔들리지 않는다. `_attempts`는 `preflight`, `quality-cycle`, CI 어디에도 들어가지 않는다.
 - 실험을 돌려보려면 전용 비운영 gate `attempts`(`tier="experiment"`)를 쓴다. 이 tier는 `tests/run.py tier fast|surface|release` 스윕에도 포함되지 않는다.
 - 실험이 검증되면 메커니즘을 `src/codaro/`로 이식하고, 정식 회귀 테스트를 `tests/<domain>/`에 추가해 gate로 배선한 뒤, `_attempts/`의 실험 파일은 삭제한다. `_attempts/`는 누적 보관소가 아니라 회전 작업대다.
