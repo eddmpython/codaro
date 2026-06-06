@@ -1,6 +1,6 @@
 [package]
 name = "codaro-launcher"
-version = "0.2.3"
+version = "0.0.12"
 edition = "2024"
 
 [dependencies]

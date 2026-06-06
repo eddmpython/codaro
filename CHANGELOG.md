@@ -8,38 +8,10 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 (next release accumulates here)
 
-## 0.2.3 - 2026-06-06
+## 0.0.12 - 2026-06-06
 
-0.2.2 공개 직후 원격 CI에서 확인된 macOS 런처 health probe와 mobile-layout 정적 게이트를
-패치했다. PyPI 발행은 이 CI 정리판 기준으로 진행한다.
-
-### Fixed
-
-- 런처 health check client가 localhost probe에서 proxy 설정을 타지 않도록 `no_proxy`를 적용했다.
-- staged backend probe timeout을 실제 launch 경로와 같은 30초로 맞춰 느린 macOS runner의 cold start를 수용한다.
-- Unix 런처 테스트 runtime이 shell wrapper보다 실제 Python 실행에 가까운 symlink를 우선 사용하도록 했다.
-- macOS CI에서는 hosted runner에서 timeout되는 fake Python supervisor probe 6개만 skip하고 Windows/Ubuntu coverage를 유지한다.
-- `mainSurface` loading shell에 responsive spacing 클래스를 추가해 mobile-layout core surface gate를 통과하도록 했다.
-- Playwright dogfood verifier의 위젯 API probe를 page execution context에서 request context로 옮겨 navigation timing flake를 제거했다.
-
-### Verification
-
-- `uv run python -X utf8 tests/run.py preflight` 3/3.
-- `uv run python -X utf8 tests/run.py gate widget-bridge` 통과.
-- `uv run python -X utf8 tests/run.py gate editor-build` 통과.
-- `uv run python -X utf8 tests/run.py gate landing-build` 통과.
-- `uv run python -X utf8 tests/run.py gate mobile-layout` 통과.
-- `uv run python -X utf8 tests/run.py gate app-runtime` 통과.
-- `python -X utf8 tests/run.py gate launcher-check` 통과.
-- `python -X utf8 tests/run.py gate launcher-test` 통과.
-- `uv run python -X utf8 tests/run.py gate install-launcher-smoke` 통과.
-- `uv build --clear` 통과.
-
-## 0.2.2 - 2026-06-06
-
-런처 수신성, 자동화 영속 세션, 과제방 진행 추적, 학습 카드 계약, 테스트/릴리즈 운영면을 한 번에
-정리했다. package/tag/launcher 버전을 `0.2.2`로 맞춰 기존 `0.2.1` 런처가 새 `Codaro.exe`를
-업데이트 후보로 볼 수 있게 했다.
+`0.0.x` 다운로드 우선 배포 트레인을 이어가며 런처 수신성, 자동화 영속 세션, 과제방 진행 추적,
+학습 카드 계약, 테스트/릴리즈 운영면을 한 번에 정리했다.
 
 ### Added
 
@@ -65,6 +37,12 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 - widget round-trip 샘플이 `radio`, `multiselect`, `date`, `file`, `form` UI descriptor를 빠뜨려 CI `widget-bridge`가 실패하던 문제를 고쳤다.
 - Unix 테스트 runtime wrapper가 shell 자식으로 Python을 띄워 macOS 런처 테스트에서 orphan backend process가 남을 수 있던 문제를 `exec` 기반 wrapper로 고쳤다.
 - 런처 provision의 HTTP 본문 수신 timeout/부분 수신 취약점을 스트리밍 다운로드와 range resume 경로로 보강했다.
+- 런처 health check client가 localhost probe에서 proxy 설정을 타지 않도록 `no_proxy`를 적용했다.
+- staged backend probe timeout을 실제 launch 경로와 같은 30초로 맞춰 느린 macOS runner의 cold start를 수용한다.
+- Unix 런처 테스트 runtime이 shell wrapper보다 실제 Python 실행에 가까운 symlink를 우선 사용하도록 했다.
+- macOS CI에서는 hosted runner에서 timeout되는 fake Python supervisor probe 6개만 skip하고 Windows/Ubuntu coverage를 유지한다.
+- `mainSurface` loading shell에 responsive spacing 클래스를 추가해 mobile-layout core surface gate를 통과하도록 했다.
+- Playwright dogfood verifier의 위젯 API probe를 page execution context에서 request context로 옮겨 navigation timing flake를 제거했다.
 
 ### Verification
 
@@ -72,6 +50,8 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 - `uv run python -X utf8 tests/run.py gate widget-bridge` 통과.
 - `uv run python -X utf8 tests/run.py gate editor-build` 통과.
 - `uv run python -X utf8 tests/run.py gate landing-build` 통과.
+- `uv run python -X utf8 tests/run.py gate mobile-layout` 통과.
+- `uv run python -X utf8 tests/run.py gate app-runtime` 통과.
 - `python -X utf8 tests/run.py gate launcher-check` 통과.
 - `python -X utf8 tests/run.py gate launcher-test` 통과.
 - `uv run python -X utf8 tests/run.py gate install-launcher-smoke` 통과.
