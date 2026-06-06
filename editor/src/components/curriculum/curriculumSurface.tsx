@@ -618,10 +618,10 @@ function sectionInfo(block: BlockConfig) {
 }
 
 const OVERVIEW_ACCENTS = {
-  indigo: { border: "border-indigo-400/50", chip: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-300" },
-  emerald: { border: "border-emerald-400/50", chip: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
-  sky: { border: "border-sky-400/50", chip: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
-  amber: { border: "border-amber-400/50", chip: "bg-amber-500/10 text-amber-600 dark:text-amber-300" },
+  indigo: { border: "border-border", chip: "bg-muted text-muted-foreground" },
+  emerald: { border: "border-border", chip: "bg-muted text-muted-foreground" },
+  sky: { border: "border-border", chip: "bg-muted text-muted-foreground" },
+  amber: { border: "border-border", chip: "bg-muted text-muted-foreground" },
 } as const;
 
 function OverviewBlock({
@@ -970,9 +970,9 @@ function StructuredSectionBand({
 }) {
   return (
     <div className="px-4 py-4" data-learning-section-part={part}>
-      <div className="mb-3 min-w-0 border-l-2 border-violet-400/50 pl-3">
+      <div className="mb-3 min-w-0 border-l-2 border-border pl-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-300">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             {icon}
           </span>
           <span>{label}</span>
@@ -1071,7 +1071,6 @@ function payloadTextList(value: unknown): string[] {
       if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") return String(item);
       if (isRecord(item)) {
         return [
-          readPayloadText(item.emoji),
           readPayloadText(item.title ?? item.label ?? item.name ?? item.text),
           readPayloadText(item.description ?? item.content),
         ].filter(Boolean).join(" ");
@@ -1440,10 +1439,10 @@ function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   const description = block.description?.trim();
 
   return (
-    <div className="border-l-2 border-violet-400/50 pl-3">
+    <div className="border-l-2 border-border pl-3">
       <div className="space-y-2 pb-2.5">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-300">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <TerminalSquare className="size-3.5" />
           </span>
           <span>예제 스니펫</span>

@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SURFACE = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumSurface.tsx"
 DEPENDENCY_PANEL = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumDependencyPanel.tsx"
 MARKDOWN_BODY = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumMarkdownBody.tsx"
+CURRICULA_REGISTRY = ROOT / "editor" / "src" / "lib" / "curriculaRegistry.ts"
 APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives.tsx"
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
@@ -38,7 +39,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, DEPENDENCY_PANEL, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
+    for path in (SURFACE, DEPENDENCY_PANEL, MARKDOWN_BODY, CURRICULA_REGISTRY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH, LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -51,6 +52,7 @@ def main() -> int:
     terminalPanelText = TERMINAL_PANEL.read_text(encoding="utf-8")
     terminalLaunchText = TERMINAL_LAUNCH.read_text(encoding="utf-8")
     markdownBodyText = MARKDOWN_BODY.read_text(encoding="utf-8")
+    curriculaRegistryText = CURRICULA_REGISTRY.read_text(encoding="utf-8")
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
     localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
     packageInferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
@@ -172,9 +174,19 @@ def main() -> int:
         "list item title dedupe": "dedupeRepeatedItems",
         "markdown line title dedupe": "dedupeRepeatedLines",
         "lead title hide": "shouldHideRepeatedTitle",
+        "neutral learning cell tone": 'return { frame: "", icon: "" };',
+        "center text ignores legacy emoji": 'const centerContent = payloadText(payload, "content") || block.content;',
+        "card icon component fallback": '<PanelIcon className="size-3.5" />',
     }
     for label, token in markdown_body_tokens.items():
         require(markdownBodyText, token, label, failures)
+
+    curricula_registry_tokens = {
+        "plain YAML display title": "const displayTitle = title;",
+        "legacy visual fields filtered from unknown fallback": '"emoji", "titleEmoji", "endEmoji", "icon"',
+    }
+    for label, token in curricula_registry_tokens.items():
+        require(curriculaRegistryText, token, label, failures)
 
     code_payload_tokens = {
         "snippet code box marker": 'data-code-payload="snippet"',
@@ -293,12 +305,40 @@ def main() -> int:
             "export type TerminalLaunchIntent",
             "export function terminalLaunchInput",
         ),
+        MARKDOWN_BODY: (
+            "panelTone",
+            "CONCEPT_ACCENTS",
+            'payloadText(item, "emoji")',
+            'payloadText(row, "emoji")',
+            'payloadText(item, "icon")',
+            'payloadText(row, "icon")',
+            'payloadText(payload, "endEmoji")',
+            "text-cyan-300",
+            "text-emerald-300",
+            "text-amber-300",
+            "text-violet-300",
+            "bg-cyan-400",
+            "bg-emerald-400",
+            "bg-amber-400",
+            "bg-violet-400",
+            "○",
+            "✕",
+        ),
+        CURRICULA_REGISTRY: (
+            "decoratedTitle",
+            "card.emoji ?? card.icon",
+            "row.emoji ?? row.icon",
+            "point.emoji",
+            "footer.icon",
+        ),
     }
     sourceByPath = {
         SURFACE: text,
         AI_PANEL: aiPanelText,
         CELL_ACTIONS: cellActionsText,
         TERMINAL_PANEL: terminalPanelText,
+        MARKDOWN_BODY: markdownBodyText,
+        CURRICULA_REGISTRY: curriculaRegistryText,
     }
     for path, tokens in forbidden_tokens.items():
         source = sourceByPath[path]

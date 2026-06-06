@@ -43,7 +43,7 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
     return (
       <div className="rounded-md border bg-background px-4 py-3">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-cyan-400/10 text-cyan-300">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <Target className="size-4" />
           </span>
           <div className="min-w-0 flex-1">
@@ -153,7 +153,7 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
       <div className="grid gap-2">
         {items.map((item, index) => (
           <div className="flex gap-2 rounded-md border bg-background px-3 py-2 text-sm leading-6" key={`${item}-${index}`}>
-            <CheckCircle2 className="mt-1 size-4 shrink-0 text-cyan-300" />
+            <CheckCircle2 className="mt-1 size-4 shrink-0 text-muted-foreground" />
             <span className="text-muted-foreground">{stripMarkdown(item)}</span>
           </div>
         ))}
@@ -170,9 +170,9 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
     const options = payloadTextList(payload.options);
     return (
       <div className="space-y-3">
-        <div className="rounded-md border bg-amber-400/5 px-4 py-3">
+        <div className="rounded-md border bg-background px-4 py-3">
           <div className="flex items-start gap-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-amber-400/10 text-amber-300">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
               <ListChecks className="size-4" />
             </span>
             <div className="min-w-0">
@@ -216,7 +216,7 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
   }
 
   if (displayKind === "centerText") {
-    const centerContent = [payloadText(payload, "content") || block.content, payloadText(payload, "endEmoji")].filter(Boolean).join("\n\n");
+    const centerContent = payloadText(payload, "content") || block.content;
     return (
       <div className="rounded-md border bg-background px-5 py-6 text-center">
         <div className="mx-auto max-w-2xl">
@@ -266,12 +266,7 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
   );
 }
 
-export function curriculumCellTone(kind: LearningCellKind, role?: BlockConfig["role"], displayKind?: BlockConfig["displayKind"]) {
-  if (role === "title" || displayKind === "hero") return { frame: "border-cyan-400/25 bg-cyan-400/5", icon: "text-cyan-300" };
-  if (kind === "check" || displayKind === "quiz") return { frame: "border-amber-400/25 bg-amber-400/5", icon: "text-amber-300" };
-  if (kind === "practice" || role === "exercise") return { frame: "border-emerald-400/25 bg-emerald-400/5", icon: "text-emerald-300" };
-  if (kind === "automation" || role === "automation") return { frame: "border-violet-400/25 bg-violet-400/5", icon: "text-violet-300" };
-  if (displayKind === "cardGrid" || displayKind === "comparison" || displayKind === "table" || displayKind === "media") return { frame: "border-sky-400/20 bg-sky-400/5", icon: "text-sky-300" };
+export function curriculumCellTone(_kind: LearningCellKind, _role?: BlockConfig["role"], _displayKind?: BlockConfig["displayKind"]) {
   return { frame: "", icon: "" };
 }
 
@@ -288,7 +283,7 @@ function LocalRunnerHero({ block, payload }: { block: BlockConfig; payload: Reco
     <div className="space-y-3">
       <div className="rounded-md border bg-background px-4 py-4">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-emerald-400/10 text-emerald-300">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <TerminalSquare className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -301,7 +296,7 @@ function LocalRunnerHero({ block, payload }: { block: BlockConfig; payload: Reco
         {steps.map(({ Icon, title: stepTitle, detail }) => (
           <div className="rounded-md border bg-background px-3 py-3" key={stepTitle}>
             <div className="flex items-center gap-2 text-sm font-medium">
-              <Icon className="size-4 text-emerald-300" />
+              <Icon className="size-4 text-muted-foreground" />
               {stepTitle}
             </div>
             <div className="mt-2 text-xs leading-5 text-muted-foreground">{detail}</div>
@@ -321,7 +316,7 @@ function RankInsightHero({ block, payload }: { block: BlockConfig; payload: Reco
     <div className="space-y-3">
       <div className="rounded-md border bg-background px-4 py-4">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-sky-400/10 text-sky-300">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <PanelTop className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -349,7 +344,7 @@ function ProseLearningCell({ block, payload, repeatedTitle }: { block: BlockConf
     <div className="space-y-3">
       {showTitle || subtitle ? (
         <div className="flex min-w-0 items-start gap-3 rounded-md border bg-background px-4 py-3">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-sky-400/10 text-sky-300">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <BookOpen className="size-4" />
           </span>
           <div className="min-w-0 flex-1">
@@ -389,16 +384,15 @@ function ChoiceOptionCard({ item, index }: { item: Record<string, unknown>; inde
   const advantages = payloadItems(item, "advantages");
   const disadvantages = payloadItems(item, "disadvantages");
   const useCases = payloadItems(item, "useCases").length ? payloadItems(item, "useCases") : payloadItems(item, "items");
-  const toneClass = panelTone(index);
 
   return (
-    <div className={cn("min-w-0 rounded-md border bg-background px-3 py-3", toneClass.frame)}>
+    <div className="min-w-0 rounded-md border bg-background px-3 py-3">
       <div className="flex min-w-0 items-start gap-2">
-        <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums", toneClass.icon)}>
-          {payloadText(item, "emoji") || payloadText(item, "icon") || index}
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold tabular-nums text-muted-foreground">
+          {index}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold">{stripMarkdown(title)}</div>
+          <div className="text-sm font-semibold leading-5">{stripMarkdown(title)}</div>
           {subtitle ? <div className="mt-0.5 text-xs text-muted-foreground">{stripMarkdown(subtitle)}</div> : null}
         </div>
       </div>
@@ -434,16 +428,15 @@ function ResourceCard({ item, index }: { item: Record<string, unknown>; index: n
   const description = payloadText(item, "description") || payloadText(item, "content") || payloadText(item, "subtitle");
   const url = payloadText(item, "url") || payloadText(item, "href") || payloadText(item, "buttonLink") || payloadText(item, "src");
   const stats = payloadItems(item, "stats");
-  const toneClass = panelTone(index);
 
   return (
-    <div className={cn("min-w-0 rounded-md border bg-background px-3 py-3", toneClass.frame)}>
+    <div className="min-w-0 rounded-md border bg-background px-3 py-3">
       <div className="flex min-w-0 items-start gap-2">
-        <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md text-xs", toneClass.icon)}>
-          {payloadText(item, "emoji") || payloadText(item, "icon") || <LinkIcon className="size-4" />}
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <LinkIcon className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold">{stripMarkdown(title)}</div>
+          <div className="text-sm font-semibold leading-5">{stripMarkdown(title)}</div>
           {description ? <p className="mt-1 text-xs leading-5 text-muted-foreground">{stripMarkdown(description)}</p> : null}
         </div>
       </div>
@@ -463,13 +456,13 @@ function ResourceCard({ item, index }: { item: Record<string, unknown>; index: n
 }
 
 const CALLOUT_TONES: Record<string, { frame: string; Icon: typeof FileText }> = {
-  warning: { frame: "border-amber-400/40 bg-amber-400/10 text-amber-300", Icon: ListChecks },
-  danger: { frame: "border-rose-400/40 bg-rose-400/10 text-rose-300", Icon: TriangleAlert },
-  tip: { frame: "border-emerald-400/35 bg-emerald-400/10 text-emerald-300", Icon: Lightbulb },
-  success: { frame: "border-emerald-400/35 bg-emerald-400/10 text-emerald-300", Icon: CheckCircle2 },
-  example: { frame: "border-sky-400/35 bg-sky-400/10 text-sky-300", Icon: BookOpen },
-  summary: { frame: "border-cyan-400/35 bg-cyan-400/10 text-cyan-300", Icon: ListChecks },
-  note: { frame: "border-cyan-400/35 bg-cyan-400/10 text-cyan-300", Icon: FileText },
+  warning: { frame: "border-border border-l-amber-500/70 bg-background text-foreground", Icon: ListChecks },
+  danger: { frame: "border-border border-l-rose-500/70 bg-background text-foreground", Icon: TriangleAlert },
+  tip: { frame: "border-border bg-background text-foreground", Icon: Lightbulb },
+  success: { frame: "border-border border-l-emerald-500/70 bg-background text-foreground", Icon: CheckCircle2 },
+  example: { frame: "border-border bg-background text-foreground", Icon: BookOpen },
+  summary: { frame: "border-border bg-background text-foreground", Icon: ListChecks },
+  note: { frame: "border-border bg-background text-foreground", Icon: FileText },
 };
 
 function CalloutCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
@@ -484,7 +477,7 @@ function CalloutCell({ block, payload }: { block: BlockConfig; payload: Record<s
   return (
     <div className={cn("rounded-md border px-4 py-3", frame)}>
       <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-background/80">
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <Icon className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
@@ -521,7 +514,7 @@ function StepPracticeCell({ block, payload }: { block: BlockConfig; payload: Rec
     <div className="space-y-3">
       <div className="rounded-md border bg-background px-4 py-3">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="flex min-h-8 min-w-8 shrink-0 items-center justify-center rounded-md bg-emerald-400/10 px-2 text-xs font-semibold text-emerald-300">
+          <span className="flex min-h-8 min-w-8 shrink-0 items-center justify-center rounded-md bg-muted px-2 text-xs font-semibold text-muted-foreground">
             {stepNumber || "STEP"}
           </span>
           <div className="min-w-0 flex-1">
@@ -548,7 +541,7 @@ function StepPracticeCell({ block, payload }: { block: BlockConfig; payload: Rec
         <div className="grid gap-2">
           {tips.map((tip, index) => (
             <div className="flex gap-2 rounded-md border bg-background px-3 py-2 text-sm leading-6" key={`${tip}-${index}`}>
-              <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400" />
+              <CheckCircle2 className="mt-1 size-4 shrink-0 text-muted-foreground" />
               <span className="text-muted-foreground">{stripMarkdown(tip)}</span>
             </div>
           ))}
@@ -577,7 +570,7 @@ function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: R
     <div className="space-y-3">
       <div className="rounded-md border bg-background px-4 py-4">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-emerald-400/10 text-emerald-300">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <PlayCircle className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -596,8 +589,8 @@ function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: R
         </div>
       ) : null}
       {footerText ? (
-        <div className="flex gap-2 rounded-md border bg-emerald-400/5 px-3 py-2 text-sm leading-6 text-muted-foreground">
-          <Sparkles className="mt-1 size-4 shrink-0 text-emerald-300" />
+        <div className="flex gap-2 rounded-md border bg-background px-3 py-2 text-sm leading-6 text-muted-foreground">
+          <Sparkles className="mt-1 size-4 shrink-0 text-muted-foreground" />
           <span>{stripMarkdown(footerText)}</span>
         </div>
       ) : null}
@@ -610,16 +603,15 @@ function LearningSectionLead({ hideTitle = false, title, subtitle }: { hideTitle
 
   return (
     <div className="min-w-0">
-      {!hideTitle ? <div className="truncate text-base font-semibold tracking-normal">{stripMarkdown(title)}</div> : null}
+      {!hideTitle ? <div className="text-base font-semibold leading-6 tracking-normal">{stripMarkdown(title)}</div> : null}
       {subtitle ? <p className={cn("text-sm leading-6 text-muted-foreground", !hideTitle && "mt-1")}>{stripMarkdown(subtitle)}</p> : null}
     </div>
   );
 }
 
-function LearningValuePanel({ index, item }: { index: number; item: Record<string, unknown> }) {
+function LearningValuePanel({ index: _index, item }: { index: number; item: Record<string, unknown> }) {
   const title = payloadText(item, "title") || payloadText(item, "text") || payloadText(item, "label") || payloadText(item, "name") || payloadText(item, "url") || "항목";
   const description = payloadText(item, "description") || payloadText(item, "content") || payloadText(item, "subtitle");
-  const emoji = payloadText(item, "emoji");
   const points = payloadTextList(item.points).length
     ? payloadTextList(item.points)
     : payloadTextList(item.tips).length
@@ -633,16 +625,15 @@ function LearningValuePanel({ index, item }: { index: number; item: Record<strin
   const stats = payloadItems(item, "stats");
   const advantages = payloadItems(item, "advantages");
   const disadvantages = payloadItems(item, "disadvantages");
-  const toneClass = panelTone(index);
   const PanelIcon = code ? Code2 : url ? ExternalLink : points.length ? Route : BookOpen;
 
   return (
-    <div className={cn("min-w-0 rounded-md border bg-background px-3 py-3", toneClass.frame)}>
+    <div className="min-w-0 rounded-md border bg-background px-3 py-3">
       <div className="flex min-w-0 items-center gap-2">
-        <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md text-xs font-medium tabular-nums", toneClass.icon)}>
-          {emoji || <PanelIcon className="size-3.5" />}
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <PanelIcon className="size-3.5" />
         </span>
-        <div className="min-w-0 flex-1 truncate text-sm font-medium">{stripMarkdown(title)}</div>
+        <div className="min-w-0 flex-1 text-sm font-medium leading-5">{stripMarkdown(title)}</div>
         {url ? <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" /> : null}
       </div>
       {description ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{stripMarkdown(description)}</div> : null}
@@ -650,7 +641,7 @@ function LearningValuePanel({ index, item }: { index: number; item: Record<strin
         <div className="mt-3 space-y-1.5">
           {points.slice(0, 5).map((point, pointIndex) => (
             <div className="flex gap-2 text-xs leading-5 text-muted-foreground" key={`${point}-${pointIndex}`}>
-              <CheckCircle2 className="mt-0.5 size-3 shrink-0 text-emerald-400" />
+              <CheckCircle2 className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
               <span>{stripMarkdown(point)}</span>
             </div>
           ))}
@@ -683,14 +674,6 @@ function LearningValuePanel({ index, item }: { index: number; item: Record<strin
   );
 }
 
-const CONCEPT_ACCENTS: Record<string, { frame: string; icon: string }> = {
-  cyan: { frame: "border-cyan-400/25 bg-cyan-400/5", icon: "bg-cyan-400/10 text-cyan-300" },
-  amber: { frame: "border-amber-400/25 bg-amber-400/5", icon: "bg-amber-400/10 text-amber-300" },
-  emerald: { frame: "border-emerald-400/25 bg-emerald-400/5", icon: "bg-emerald-400/10 text-emerald-300" },
-  rose: { frame: "border-rose-400/25 bg-rose-400/5", icon: "bg-rose-400/10 text-rose-300" },
-  sky: { frame: "border-sky-400/25 bg-sky-400/5", icon: "bg-sky-400/10 text-sky-300" },
-};
-
 // 수평 설명카드 — 한 행 = 개념(좌) ↔ 비유/예시 + 선택 이미지(우). 공간 인접·듀얼코딩.
 function ConceptRowCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const rows = payloadItems(payload, "rows").length ? payloadItems(payload, "rows") : payloadItems(payload, "items");
@@ -708,18 +691,15 @@ function ConceptRowCell({ block, payload, repeatedTitle }: { block: BlockConfig;
   );
 }
 
-function ConceptRowItem({ index, row }: { index: number; row: Record<string, unknown> }) {
+function ConceptRowItem({ index: _index, row }: { index: number; row: Record<string, unknown> }) {
   const concept = payloadText(row, "concept") || payloadText(row, "title") || payloadText(row, "term") || payloadText(row, "label") || "개념";
   const explain = payloadText(row, "explain") || payloadText(row, "explanation") || payloadText(row, "analogy") || payloadText(row, "description") || payloadText(row, "content");
-  const emoji = payloadText(row, "emoji") || payloadText(row, "icon");
   const image = payloadText(row, "image") || payloadText(row, "src");
-  const accent = payloadText(row, "accent");
-  const tone = CONCEPT_ACCENTS[accent] ?? panelTone(index);
   return (
-    <div className={cn("grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[1fr_1.4fr] md:items-center", tone.frame)}>
+    <div className="grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[1fr_1.4fr] md:items-center">
       <div className="flex items-center gap-2">
-        <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md text-xs", tone.icon)}>
-          {emoji || <Sparkles className="size-3.5" />}
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <Sparkles className="size-3.5" />
         </span>
         <div className="min-w-0 text-sm font-semibold">{stripMarkdown(concept)}</div>
       </div>
@@ -740,15 +720,15 @@ function DoDontCell({ block, payload, repeatedTitle }: { block: BlockConfig; pay
   const doItems = payloadTextList(doMap.items).length ? payloadTextList(doMap.items) : payloadTextList(payload.do);
   const dontItems = payloadTextList(dontMap.items).length ? payloadTextList(dontMap.items) : payloadTextList(payload.dont);
   const Side = ({ label, items, good }: { label: string; items: string[]; good: boolean }) => (
-    <div className={cn("rounded-md border px-3 py-3", good ? "border-emerald-400/30 bg-emerald-400/5" : "border-rose-400/30 bg-rose-400/5")}>
-      <div className={cn("mb-2 flex items-center gap-1.5 text-xs font-semibold", good ? "text-emerald-300" : "text-rose-300")}>
+    <div className="rounded-md border bg-background px-3 py-3">
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground">
         {good ? <CheckCircle2 className="size-3.5" /> : <TriangleAlert className="size-3.5" />}
         {label}
       </div>
       <div className="space-y-1.5">
         {items.map((item, index) => (
           <div className="flex gap-2 text-sm leading-6 text-muted-foreground" key={`${item}-${index}`}>
-            <span className={cn("mt-0.5 shrink-0", good ? "text-emerald-400" : "text-rose-400")}>{good ? "○" : "✕"}</span>
+            {good ? <CheckCircle2 className="mt-1 size-3.5 shrink-0 text-muted-foreground" /> : <TriangleAlert className="mt-1 size-3.5 shrink-0 text-muted-foreground" />}
             <span>{renderInline(item)}</span>
           </div>
         ))}
@@ -782,9 +762,8 @@ function DefinitionCell({ block, payload, repeatedTitle }: { block: BlockConfig;
             const english = payloadText(row, "english") || payloadText(row, "en");
             const meaning = payloadText(row, "meaning") || payloadText(row, "definition") || payloadText(row, "description");
             const example = payloadText(row, "example");
-            const tone = CONCEPT_ACCENTS[payloadText(row, "accent")] ?? panelTone(index);
             return (
-              <div className={cn("grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[260px_1fr] md:items-start", tone.frame)} key={`${term}-${index}`}>
+              <div className="grid gap-2 rounded-md border bg-background px-3 py-3 md:grid-cols-[260px_1fr] md:items-start" key={`${term}-${index}`}>
                 <div className="min-w-0">
                   <div className="text-sm font-bold text-foreground">{stripMarkdown(term)}</div>
                   {english ? <div className="mt-0.5 font-mono text-xs text-muted-foreground">{english}</div> : null}
@@ -802,7 +781,7 @@ function DefinitionCell({ block, payload, repeatedTitle }: { block: BlockConfig;
   );
 }
 
-// 오개념 교정 — 착각(❌) → 사실(✓) 대구
+// 오개념 교정 — 착각과 사실을 나란히 보여주는 대구
 function MisconceptionCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const rows = payloadItems(payload, "items").length ? payloadItems(payload, "items") : payloadItems(payload, "rows");
   const title = payloadText(payload, "title") || block.title || "흔한 오해";
@@ -818,11 +797,11 @@ function MisconceptionCell({ block, payload, repeatedTitle }: { block: BlockConf
             return (
               <div className="rounded-md border bg-background px-3 py-3" key={`${myth}-${index}`}>
                 <div className="flex gap-2 text-sm leading-6">
-                  <span className="mt-0.5 shrink-0 text-rose-400">✕</span>
+                  <TriangleAlert className="mt-1 size-4 shrink-0 text-muted-foreground" />
                   <span className="text-muted-foreground line-through decoration-rose-400/40">{renderInline(myth)}</span>
                 </div>
                 <div className="mt-1.5 flex gap-2 text-sm leading-6">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-muted-foreground" />
                   <span className="text-foreground">{renderInline(truth)}</span>
                 </div>
               </div>
@@ -851,7 +830,7 @@ function TimelineCell({ block, payload, repeatedTitle }: { block: BlockConfig; p
           return (
             <div className="flex gap-3" key={`${head}-${index}`}>
               <div className="flex flex-col items-center">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-cyan-400/10 text-xs font-semibold tabular-nums text-cyan-300">{label}</span>
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums text-muted-foreground">{label}</span>
                 {!last ? <span className="my-1 w-px flex-1 bg-border" /> : null}
               </div>
               <div className={cn("min-w-0 flex-1", last ? "pb-0" : "pb-3")}>
@@ -880,13 +859,12 @@ function StatCell({ block, payload, repeatedTitle }: { block: BlockConfig; paylo
           const label = payloadText(row, "label") || payloadText(row, "title") || payloadText(row, "name");
           const delta = payloadText(row, "delta") || payloadText(row, "change");
           const trend = payloadText(row, "trend");
-          const tone = CONCEPT_ACCENTS[payloadText(row, "accent")] ?? panelTone(index);
           return (
-            <div className={cn("rounded-md border bg-background px-3 py-4 text-center", tone.frame)} key={`${label}-${index}`}>
+            <div className="rounded-md border bg-background px-3 py-4 text-center" key={`${label}-${index}`}>
               <div className="text-2xl font-bold tabular-nums text-foreground">{stripMarkdown(value)}</div>
               <div className="mt-1 text-xs text-muted-foreground">{stripMarkdown(label)}</div>
               {delta ? (
-                <div className={cn("mt-1 inline-flex items-center gap-1 text-[11px]", trend === "down" ? "text-rose-300" : "text-emerald-300")}>
+                <div className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                   <TrendingUp className={cn("size-3", trend === "down" && "rotate-180")} />
                   {stripMarkdown(delta)}
                 </div>
@@ -909,11 +887,11 @@ function CodeCompareCell({ block, payload, repeatedTitle }: { block: BlockConfig
   const afterCode = payloadText(afterMap, "code") || payloadText(payload, "after");
   const Pane = ({ label, code, good }: { label: string; code: string; good: boolean }) => (
     <div className="min-w-0">
-      <div className={cn("flex items-center gap-1.5 px-1 pb-1 text-[10px] font-semibold uppercase", good ? "text-emerald-300" : "text-rose-300")}>
+      <div className="flex items-center gap-1.5 px-1 pb-1 text-[10px] font-semibold uppercase text-muted-foreground">
         {good ? <CheckCircle2 className="size-3" /> : <TriangleAlert className="size-3" />}
         {label}
       </div>
-      <div className={cn("rounded-md border bg-code", good ? "border-emerald-400/25" : "border-rose-400/25")}>
+      <div className="rounded-md border bg-code">
         <ScrollableCode code={code} />
       </div>
     </div>
@@ -939,7 +917,7 @@ function DetailList({
   tone: "default" | "good" | "warn";
 }) {
   if (!items.length) return null;
-  const iconClass = tone === "good" ? "text-emerald-400" : tone === "warn" ? "text-amber-400" : "text-cyan-400";
+  const DetailIcon = tone === "warn" ? TriangleAlert : CheckCircle2;
 
   return (
     <div className="mt-3 space-y-1.5">
@@ -949,7 +927,7 @@ function DetailList({
         const description = payloadText(item, "description") || payloadText(item, "content");
         return (
           <div className="flex gap-2 text-xs leading-5 text-muted-foreground" key={`${title}-${index}`}>
-            <CheckCircle2 className={cn("mt-0.5 size-3 shrink-0", iconClass)} />
+            <DetailIcon className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
             <span>
               <span>{stripMarkdown(title)}</span>
               {description && description !== title ? <span className="text-muted-foreground/80"> — {stripMarkdown(description)}</span> : null}
@@ -975,16 +953,6 @@ function InlineLink({ url, label }: { url: string; label: string }) {
   );
 }
 
-function panelTone(index: number) {
-  const tones = [
-    { frame: "border-cyan-400/20 bg-cyan-400/5", icon: "bg-cyan-400/10 text-cyan-300" },
-    { frame: "border-emerald-400/20 bg-emerald-400/5", icon: "bg-emerald-400/10 text-emerald-300" },
-    { frame: "border-amber-400/20 bg-amber-400/5", icon: "bg-amber-400/10 text-amber-300" },
-    { frame: "border-violet-400/20 bg-violet-400/5", icon: "bg-violet-400/10 text-violet-300" },
-  ];
-  return tones[(index - 1) % tones.length];
-}
-
 function ComparisonGrid({ cards }: { cards: Array<Record<string, unknown>> }) {
   return (
     <div className="grid gap-2 lg:grid-cols-3">
@@ -1003,17 +971,15 @@ function ComparisonGrid({ cards }: { cards: Array<Record<string, unknown>> }) {
 function ComparisonPanel({ item, fallback, index }: { item: Record<string, unknown>; fallback: string; index: number }) {
   const title = payloadText(item, "title") || fallback;
   const subtitle = payloadText(item, "subtitle") || payloadText(item, "description");
-  const icon = payloadText(item, "icon");
   const items = payloadTextList(item.items).length ? payloadTextList(item.items) : payloadTextList(item.points);
-  const toneClass = panelTone(index);
 
   return (
-    <div className={cn("min-w-0 rounded-md border bg-background px-3 py-3", toneClass.frame)}>
+    <div className="min-w-0 rounded-md border bg-background px-3 py-3">
       <div className="flex min-w-0 items-center gap-2">
-        <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums", toneClass.icon)}>
-          {icon || index}
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold tabular-nums text-muted-foreground">
+          {index}
         </span>
-        <div className="min-w-0 flex-1 truncate text-sm font-semibold">{stripMarkdown(title)}</div>
+        <div className="min-w-0 flex-1 text-sm font-semibold leading-5">{stripMarkdown(title)}</div>
       </div>
       {subtitle ? <div className="mt-1 text-xs text-muted-foreground">{stripMarkdown(subtitle)}</div> : null}
       {items.length ? (
@@ -1147,7 +1113,7 @@ function renderInline(text: string): ReactNode {
       const external = !href.startsWith("/");
       parts.push(
         <a
-          className="text-cyan-400 underline underline-offset-2 hover:text-cyan-300"
+          className="text-foreground underline underline-offset-2 hover:text-foreground/80"
           href={href}
           key={`lnk-${key++}`}
           rel={external ? "noopener noreferrer" : undefined}
@@ -1182,7 +1148,7 @@ function MarkdownBlock({ content, dedupeTitle = "" }: { content: string; dedupeT
         if (line.startsWith("#### ")) return <h5 className="text-sm font-medium tracking-normal" key={key}>{line.replace(/^####\s+/, "")}</h5>;
         if (line.startsWith("> ")) {
           return (
-            <div className="rounded-md border-l-2 border-cyan-400/50 bg-cyan-400/5 px-3 py-2 text-muted-foreground" key={key}>
+            <div className="rounded-md border-l-2 border-border bg-muted/20 px-3 py-2 text-muted-foreground" key={key}>
               {renderInline(line.slice(2))}
             </div>
           );

@@ -508,7 +508,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   const emoji = textValue(block.emoji ?? block.titleEmoji ?? block.icon);
   const content = textValue(block.content) || textValue(block.text);
   const codeContent = textValue(block.content) || textValue(block.code);
-  const displayTitle = decoratedTitle(emoji, title);
+  const displayTitle = title;
   const roleFromParent = parentRole === "exercise" ? "exercise" : undefined;
 
   if (["mainHeader", "sectionHeader", "sectionTitle"].includes(sourceType)) {
@@ -729,7 +729,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   if (sourceType === "centerText") {
     const endEmoji = textValue(block.endEmoji);
     return [markdownBlock({
-      content: [displayTitle ? `## ${displayTitle}` : "", subtitle, description, content, endEmoji].filter(Boolean).join("\n\n"),
+      content: [displayTitle ? `## ${displayTitle}` : "", subtitle, description, content].filter(Boolean).join("\n\n"),
       displayKind: "centerText",
       payload: { ...block, title: displayTitle || title, subtitle, description, content, endEmoji },
       role: "learning",
@@ -1212,7 +1212,7 @@ function formatCardList(cards: YamlMap[], fallbackTitle: string) {
   return [
     `### ${fallbackTitle}`,
     ...cards.map((card) => {
-      const heading = [textValue(card.emoji ?? card.icon), textValue(card.title ?? card.label ?? card.text)].filter(Boolean).join(" ");
+      const heading = textValue(card.title ?? card.label ?? card.text);
       const code = textValue(card.code ?? card.snippet);
       const footer = mapValue(card.footer);
       return [
@@ -1231,7 +1231,7 @@ function formatConceptRows(rows: YamlMap[], fallbackTitle: string, intro: string
   const lines = [`### ${fallbackTitle}`];
   if (intro) lines.push(intro);
   for (const row of rows) {
-    const concept = [textValue(row.emoji ?? row.icon), textValue(row.concept ?? row.title ?? row.label ?? row.term)].filter(Boolean).join(" ");
+    const concept = textValue(row.concept ?? row.title ?? row.label ?? row.term);
     const explain = textValue(row.explain ?? row.explanation ?? row.description ?? row.analogy ?? row.content);
     lines.push([`#### ${concept || "개념"}`, explain].filter(Boolean).join("\n"));
   }
@@ -1240,7 +1240,7 @@ function formatConceptRows(rows: YamlMap[], fallbackTitle: string, intro: string
 
 function formatCompare(left: YamlMap, right: YamlMap, fallbackTitle: string) {
   const formatSide = (label: string, side: YamlMap) => [
-    `#### ${[textValue(side.icon), textValue(side.title) || label].filter(Boolean).join(" ")}`,
+    `#### ${textValue(side.title) || label}`,
     textValue(side.subtitle),
     arrayOfText(side.items).map((item) => `- ${item}`).join("\n"),
     textValue(side.infoBox) ? `> ${textValue(side.infoBox)}` : "",
@@ -1322,14 +1322,14 @@ function formatMedia({
 function pointLines(value: unknown) {
   const objects = arrayOfMaps(value);
   if (objects.length) {
-    return objects.map((point) => `- ${[textValue(point.emoji), textValue(point.title ?? point.label), textValue(point.description)].filter(Boolean).join(" ")}`).join("\n");
+    return objects.map((point) => `- ${[textValue(point.title ?? point.label), textValue(point.description)].filter(Boolean).join(" ")}`).join("\n");
   }
   return arrayOfText(value).map((item) => `- ${item}`).join("\n");
 }
 
 function textFromUnknownBlock(block: YamlMap): string {
   return Object.entries(block)
-    .filter(([key]) => !["type", "style"].includes(key))
+    .filter(([key]) => !["type", "style", "emoji", "titleEmoji", "endEmoji", "icon"].includes(key))
     .map(([key, value]): string => {
       if (Array.isArray(value)) return `**${key}**\n${arrayOfText(value).map((item) => `- ${item}`).join("\n")}`;
       if (isMap(value)) return `**${key}**\n${textFromUnknownBlock(value)}`;
@@ -1341,7 +1341,7 @@ function textFromUnknownBlock(block: YamlMap): string {
 
 function footerText(value: unknown) {
   const footer = mapValue(value);
-  return [textValue(footer.icon), textValue(footer.text ?? footer.title ?? footer.description)].filter(Boolean).join(" ");
+  return textValue(footer.text ?? footer.title ?? footer.description);
 }
 
 function expansionDifficulty(title: string) {
@@ -1438,7 +1438,7 @@ function arrayOfText(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.map((item) => {
     if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") return String(item);
-    if (isMap(item)) return [textValue(item.emoji), textValue(item.title ?? item.label ?? item.name), textValue(item.description ?? item.content)].filter(Boolean).join(" ");
+    if (isMap(item)) return [textValue(item.title ?? item.label ?? item.name), textValue(item.description ?? item.content)].filter(Boolean).join(" ");
     return "";
   }).filter(Boolean);
 }
@@ -1504,13 +1504,6 @@ function firstSentence(value: string) {
 
 function firstCodeLine(value: string) {
   return value.split("\n").find((line) => line.trim() && !line.trim().startsWith("#"))?.trim().slice(0, 80) || "Python 셀";
-}
-
-function decoratedTitle(emoji: string, title: string) {
-  if (!emoji) return title;
-  if (!title) return emoji;
-  if (title.startsWith(emoji)) return title;
-  return `${emoji} ${title}`;
 }
 
 function categoryTitleFromRegistry(key: string) {
