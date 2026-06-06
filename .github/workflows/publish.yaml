@@ -182,7 +182,6 @@ jobs:
     name: Publish to PyPI
     needs: build
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
       contents: read
       id-token: write

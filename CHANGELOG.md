@@ -9,6 +9,7 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 ### Fixed
 
 - product-release 워크플로우가 GitHub 자동 릴리즈 노트를 붙여 `0.0.x` 릴리즈의 비교 링크를 잘못 생성하지 않도록 `CHANGELOG.md` 섹션만 Release 본문으로 쓰게 고정했다.
+- PyPI Trusted Publisher environment를 비워둔 설정과 맞도록 publish workflow의 `environment:` 선언을 제거했다.
 
 ## 0.0.12 - 2026-06-06
 
