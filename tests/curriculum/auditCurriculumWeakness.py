@@ -164,7 +164,8 @@ def auditCurriculum() -> dict[str, Any]:
             flags: list[str] = []
 
             # 1. orphan: lessonOutcomes에 등록 안 됨 + meta에도 outcomes 없음
-            metaOutcomes = data.get("meta", {}).get("outcomes") if isinstance(data.get("meta"), dict) else None
+            meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+            metaOutcomes = meta.get("outcomes")
             if key not in taxonomyKeys and not metaOutcomes:
                 flags.append("orphanInPlan")
 
@@ -207,9 +208,9 @@ def auditCurriculum() -> dict[str, Any]:
                     flags.append("sectionIdMissing")
 
             # 2. noExercise: section은 있는데 exercise가 하나도 없음
-            #    (intro convention `00_*` 는 개념 소개 전용으로 exercise 가 없는 게 정상)
-            isIntroLesson = summary.contentId.startswith("00_")
-            if sections and exerciseSections == 0 and not isIntroLesson:
+            #    읽기 전용 레슨은 meta.badge 로 의도를 밝히고 예외 처리한다.
+            isReadingLesson = str(meta.get("badge") or "").strip() == "읽기"
+            if sections and exerciseSections == 0 and not isReadingLesson:
                 flags.append("noExercise")
 
             # 3. exerciseWithoutCheck: exercise는 있는데 check가 하나도 없음
