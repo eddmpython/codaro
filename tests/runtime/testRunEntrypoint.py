@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
+import time
 from pathlib import Path
 
 
@@ -18,6 +20,13 @@ def loadRunner():
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def writeFreshJsonArtifact(path: Path, payload: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    freshNs = time.time_ns() + 1_000_000_000
+    os.utime(path, ns=(freshNs, freshNs))
 
 
 def testGateNamesAreStable() -> None:
@@ -283,18 +292,16 @@ def testGateSequenceRecordsArtifactPayloadMetadata(monkeypatch, tmp_path) -> Non
     artifactRelPath = "output/test-runner/ai-live-smoke/live-smoke-report.json"
 
     def fakeRunGate(name: str) -> int:
-        artifactPath = tmp_path / artifactRelPath
-        artifactPath.parent.mkdir(parents=True, exist_ok=True)
-        artifactPath.write_text(
-            json.dumps({
+        writeFreshJsonArtifact(
+            tmp_path / artifactRelPath,
+            {
                 "passed": True,
                 "status": "passed",
                 "startedAt": "2026-05-22T00:00:00+00:00",
                 "completedAt": "2026-05-22T00:00:03+00:00",
                 "durationMs": 3000,
                 "gitHead": "abcdef1",
-            }),
-            encoding="utf-8",
+            },
         )
         return 0
 
@@ -322,11 +329,9 @@ def testGateSequenceFailsWhenArtifactGitHeadDoesNotMatch(monkeypatch, capsys, tm
     artifactRelPath = "output/test-runner/ai-live-smoke/live-smoke-report.json"
 
     def fakeRunGate(name: str) -> int:
-        artifactPath = tmp_path / artifactRelPath
-        artifactPath.parent.mkdir(parents=True, exist_ok=True)
-        artifactPath.write_text(
-            json.dumps({"passed": True, "status": "passed", "gitHead": "deadbeef"}),
-            encoding="utf-8",
+        writeFreshJsonArtifact(
+            tmp_path / artifactRelPath,
+            {"passed": True, "status": "passed", "gitHead": "deadbeef"},
         )
         return 0
 
