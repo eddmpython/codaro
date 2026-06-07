@@ -495,6 +495,54 @@ AUTOMATION_REQUIREMENTS = (
             )),
         ),
     ),
+    AutomationRequirement(
+        requirementId="automation-agent-loop",
+        requirement="Agent lines (browserUse/computerUse) drive a goal via observe→decide→act→verify on the session spine, gated by SafetyGate (dry-run/confirm/critical/rate-limit) and E-Stop, with the LLM policy + run lifecycle in the ai facade behind the router boundary.",
+        evidenceChecks=(
+            ("src/codaro/automation/agent/agentLoop.py", (
+                "class AgentLoop",
+                "EmergencyStopActive",
+                "maxConsecutiveFailures",
+                "AgentOutcome.ESTOP",
+                "recordExecuted",
+            )),
+            ("src/codaro/automation/agent/safetyGate.py", (
+                "class SafetyGate",
+                "confirmEachClick",
+                "criticalForbidden",
+                "maxActionsPerSecond",
+            )),
+            ("src/codaro/ai/agentFlow.py", (
+                "class LlmAgentPolicy",
+                "getAgentRunRegistry",
+                "runBrowserAgentPayload",
+                "runComputerAgentPayload",
+                "confirmAgentStepPayload",
+                "stopAgentRunPayload",
+                "def pause",
+                "def resume",
+                "def cancel",
+            )),
+            ("src/codaro/api/automationRouter.py", (
+                "/api/automation/agent/browser/run",
+                "/api/automation/agent/computer/run",
+                "/api/automation/agent/run/{runId}",
+                "runBrowserAgentPayload",
+            )),
+            ("tests/automation/testAutomationAgentLoop.py", (
+                "testAgentLoopEstopHalts",
+                "testAgentLoopMaxConsecutiveFailures",
+                "testLlmAgentPolicyDrivesLoop",
+                "testAgentRunRegistryConfirmFlow",
+            )),
+        ),
+        forbiddenChecks=(
+            ("src/codaro/api/automationRouter.py", (
+                "AgentLoop",
+                "getAgentRunRegistry",
+            )),
+        ),
+    ),
 )
 
 

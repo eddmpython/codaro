@@ -59,6 +59,16 @@ from ..automation.voiceFlow import (
     parseAutomationVoiceCommandPayload,
     speakAutomationVoicePayload,
 )
+from ..ai.agentFlow import (
+    AgentRunFlowError,
+    confirmAgentStepPayload,
+    getAgentRunPayload,
+    pauseAgentRunPayload,
+    resumeAgentRunPayload,
+    runBrowserAgentPayload,
+    runComputerAgentPayload,
+    stopAgentRunPayload,
+)
 from ..automation.sessionFlow import (
     AutomationSessionFlowError,
     closeAutomationSessionPayload,
@@ -133,6 +143,20 @@ class RunSessionCellRequest(BaseModel):
     sessionId: str | None = None
 
 
+class RunBrowserAgentRequest(BaseModel):
+    instruction: str
+    startUrl: str | None = None
+
+
+class RunComputerAgentRequest(BaseModel):
+    instruction: str
+
+
+class ConfirmAgentStepRequest(BaseModel):
+    stepId: str | None = None
+    approved: bool
+
+
 def createAutomationRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
@@ -155,6 +179,9 @@ def createAutomationRouter(state: Any) -> APIRouter:
         raise HTTPException(status_code=error.statusCode, detail=error.message)
 
     def failAutomationSessionFlow(error: AutomationSessionFlowError) -> None:
+        raise HTTPException(status_code=error.statusCode, detail=error.message)
+
+    def failAgentRunFlow(error: AgentRunFlowError) -> None:
         raise HTTPException(status_code=error.statusCode, detail=error.message)
 
     @router.get("/api/tasks")
@@ -303,6 +330,56 @@ def createAutomationRouter(state: Any) -> APIRouter:
             return await closeAutomationSessionPayload(sessionId)
         except AutomationSessionFlowError as error:
             failAutomationSessionFlow(error)
+
+    # ── 에이전트 라인(브라우저유즈/컴퓨터유즈) 실행 ──
+    @router.post("/api/automation/agent/browser/run")
+    async def apiRunBrowserAgent(req: RunBrowserAgentRequest):
+        try:
+            return await runBrowserAgentPayload(instruction=req.instruction, startUrl=req.startUrl)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.post("/api/automation/agent/computer/run")
+    async def apiRunComputerAgent(req: RunComputerAgentRequest):
+        try:
+            return await runComputerAgentPayload(instruction=req.instruction)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.get("/api/automation/agent/run/{runId}")
+    def apiGetAgentRun(runId: str):
+        try:
+            return getAgentRunPayload(runId)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.post("/api/automation/agent/run/{runId}/confirm")
+    def apiConfirmAgentStep(runId: str, req: ConfirmAgentStepRequest):
+        try:
+            return confirmAgentStepPayload(runId, approved=req.approved)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.post("/api/automation/agent/run/{runId}/pause")
+    def apiPauseAgentRun(runId: str):
+        try:
+            return pauseAgentRunPayload(runId)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.post("/api/automation/agent/run/{runId}/resume")
+    def apiResumeAgentRun(runId: str):
+        try:
+            return resumeAgentRunPayload(runId)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
+
+    @router.post("/api/automation/agent/run/{runId}/stop")
+    def apiStopAgentRun(runId: str):
+        try:
+            return stopAgentRunPayload(runId)
+        except AgentRunFlowError as error:
+            failAgentRunFlow(error)
 
     @router.post("/api/webhooks/trigger/{taskId}")
     async def apiWebhookTrigger(taskId: str, request: Request):

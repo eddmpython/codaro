@@ -55,6 +55,60 @@ async def browserState(driver: BrowserDriver) -> dict[str, Any]:
     return {"url": driver.page.url, "title": await driver.page.title()}
 
 
+# 에이전트 관찰용 상수 — interactive 요소 상한(토큰 예산).
+MAX_OBSERVE_ELEMENTS = 40
+
+# interactive 요소를 DOM 순서로 수집 + data-codaro-idx 태깅(1회 evaluate, 결정론 순서).
+# 정책은 index 로만 요소를 가리키고, clickIndex/typeIndex 가 이 속성으로 해석한다(매 observe 갱신 → stale 제거).
+_INTERACTIVE_JS = """
+() => {
+  const sel = 'a,button,input,textarea,select,[role=button],[role=link],[role=textbox]';
+  const els = Array.from(document.querySelectorAll(sel));
+  return els.map((el, i) => {
+    el.setAttribute('data-codaro-idx', String(i));
+    const rect = el.getBoundingClientRect();
+    const name = (el.getAttribute('aria-label') || el.innerText || el.value || el.placeholder || '').trim().slice(0, 80);
+    return {
+      index: i,
+      role: el.getAttribute('role') || el.tagName.toLowerCase(),
+      name,
+      selector: '[data-codaro-idx="' + i + '"]',
+      interactive: rect.width > 0 && rect.height > 0,
+    };
+  });
+}
+"""
+
+
+async def browserObserve(driver: BrowserDriver, maxElements: int = MAX_OBSERVE_ELEMENTS) -> dict[str, Any]:
+    """라이브 page 의 interactive 요소를 번호 붙은 set-of-marks 관찰 payload 로 만든다(TEXT-FIRST)."""
+    page = driver.page
+    raw = await page.evaluate(_INTERACTIVE_JS)
+    interactive = [e for e in raw if e.get("interactive", True)]
+    truncated = interactive[:maxElements]
+    elements = [
+        {
+            "index": i,
+            "role": str(e.get("role", "")),
+            "name": str(e.get("name", "")),
+            "selector": str(e.get("selector", "")),
+            "interactive": True,
+        }
+        for i, e in enumerate(truncated)
+    ]
+    title = await page.title()
+    return {
+        "kind": "browser",
+        "url": page.url,
+        "title": title,
+        "progressKey": f"{page.url}|{title}|{len(elements)}",
+        "elements": elements,
+        "textDigest": " ".join(e["name"] for e in elements if e["name"]),
+        "screenshotRef": None,  # 비전 미래 슬롯
+        "truncated": len(interactive) > maxElements,
+    }
+
+
 def buildBrowserStep(action: str, params: dict[str, Any]) -> Callable[[BrowserDriver], Awaitable[dict[str, Any]]]:
     """action 이름을 라이브 page 에 대한 1개 step 코루틴으로 변환한다."""
 
@@ -75,6 +129,20 @@ def buildBrowserStep(action: str, params: dict[str, Any]) -> Callable[[BrowserDr
             state = await browserState(driver)
             return {**state, "text": text}
         elif action == "state":
+            return await browserState(driver)
+        # ── 에이전트 관찰/행동 verb (index 기반 set-of-marks) ──
+        elif action in ("observe", "snapshot"):
+            return await browserObserve(driver, int(params.get("maxElements", MAX_OBSERVE_ELEMENTS)))
+        elif action == "clickIndex":
+            await page.click(f'[data-codaro-idx="{int(params["index"])}"]')
+            state = await browserState(driver)
+            return {**state, "actedIndex": int(params["index"])}
+        elif action == "typeIndex":
+            await page.fill(f'[data-codaro-idx="{int(params["index"])}"]', str(params.get("text", "")))
+            state = await browserState(driver)
+            return {**state, "actedIndex": int(params["index"])}
+        elif action == "scroll":
+            await page.mouse.wheel(float(params.get("dx", 0)), float(params.get("dy", 0)))
             return await browserState(driver)
         else:
             raise BrowserDriverError(f"지원하지 않는 action: {action}")

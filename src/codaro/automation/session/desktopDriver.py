@@ -37,6 +37,7 @@ class DesktopDriver:
         self._guard = inputGuard
         self._ocr: Any = None
         self._ocrBackend: str | None = None
+        self._lastElements: dict[int, tuple[int, int]] = {}  # 에이전트 observe index → (centerX, centerY)
 
     def _ocrEngine(self, backend: str) -> Any:
         if self._ocr is not None and self._ocrBackend == backend:
@@ -77,6 +78,66 @@ class DesktopDriver:
         keyList = keys if isinstance(keys, list) else [str(keys)]
         self._guard.hotkey(*keyList)
         return {"pressed": True, "keys": keyList}
+
+    # ── 에이전트 관찰/행동 (OCR 텍스트 grounding + index 클릭) ──────────
+    def ocrRegions(self, region: Any, backend: str) -> dict[str, Any]:
+        """resident OCR 의 텍스트 영역을 bbox 와 함께 반환(readText 가 버리던 좌표 보존)."""
+        frame = self._capture.grab(region=region)
+        regions = self._ocrEngine(backend).readText(frame)
+        return {
+            "regions": [
+                {"x": r.x, "y": r.y, "width": r.width, "height": r.height,
+                 "text": r.text, "confidence": round(r.confidence, 3)}
+                for r in regions
+            ],
+            "fullText": " ".join(r.text for r in regions),
+            "count": len(regions),
+        }
+
+    def detect(self, region: Any, searchText: str | None, backend: str) -> dict[str, Any]:
+        """화면을 관찰해 번호 붙은(클릭 좌표 포함) 요소 인덱스 관찰 payload 를 만든다(TEXT-FIRST)."""
+        frame = self._capture.grab(region=region)
+        regions = self._ocrEngine(backend).readText(frame)
+        elements: list[dict[str, Any]] = []
+        self._lastElements = {}
+        for r in regions:
+            if searchText and searchText.lower() not in r.text.lower():
+                continue
+            index = len(elements)
+            centerX = r.x + r.width // 2
+            centerY = r.y + r.height // 2
+            self._lastElements[index] = (centerX, centerY)
+            elements.append({
+                "index": index,
+                "elementType": "text",
+                "x": r.x, "y": r.y, "width": r.width, "height": r.height,
+                "centerX": centerX, "centerY": centerY,
+                "text": r.text, "confidence": round(r.confidence, 3),
+            })
+        first = elements[0]["text"] if elements else ""
+        return {
+            "kind": "desktop",
+            "screen": {"width": frame.width, "height": frame.height},
+            "progressKey": f"{frame.width}x{frame.height}|{len(elements)}|{first}",
+            "elements": elements,
+            "ocrText": " ".join(r.text for r in regions),
+            "screenshotRef": None,  # 비전 미래 슬롯
+        }
+
+    def clickIndex(self, index: int, button: str, clicks: int) -> dict[str, Any]:
+        if index not in self._lastElements:
+            raise DesktopDriverError(f"stale index {index}: re-observe required")
+        x, y = self._lastElements[index]
+        self._guard.click(x, y, button=button, clicks=clicks)
+        return {"clicked": True, "x": x, "y": y, "index": index}
+
+    def moveTo(self, x: int, y: int, duration: float) -> dict[str, Any]:
+        self._guard.moveTo(x, y, duration=duration)
+        return {"moved": True, "x": x, "y": y}
+
+    def scroll(self, clicks: int, x: int | None, y: int | None) -> dict[str, Any]:
+        self._guard.scroll(clicks, x=x, y=y)
+        return {"scrolled": True, "clicks": clicks}
 
     def _disposeOcr(self) -> None:
         if self._ocr is None:
@@ -146,6 +207,25 @@ def buildDesktopStep(action: str, params: dict[str, Any]) -> Callable[[DesktopDr
             return driver.hotkey(params["keys"])
         if action == "state":
             return await desktopState(driver)
+        # ── 에이전트 관찰/행동 verb (OCR grounding + index 클릭) ──
+        if action in ("observe", "detect"):
+            return driver.detect(
+                _region(params), params.get("searchText"), str(params.get("backend", "paddle"))
+            )
+        if action == "ocrRegions":
+            return driver.ocrRegions(_region(params), str(params.get("backend", "paddle")))
+        if action == "clickIndex":
+            result = driver.clickIndex(
+                int(params["index"]), str(params.get("button", "left")), int(params.get("clicks", 1))
+            )
+            getAuditTrail().record(
+                "desktopClick", "session-registry", {"x": result["x"], "y": result["y"]}, success=True
+            )
+            return result
+        if action == "moveTo":
+            return driver.moveTo(int(params["x"]), int(params["y"]), float(params.get("duration", 0.1)))
+        if action == "scroll":
+            return driver.scroll(int(params["clicks"]), params.get("x"), params.get("y"))
         raise DesktopDriverError(f"지원하지 않는 desktop action: {action}")
 
     return step
