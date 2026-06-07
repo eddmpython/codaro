@@ -24,6 +24,7 @@ import {
   type PendingTarget,
 } from "@/lib/assistantArtifactRouting";
 import { buildAssistantTurnRequest } from "@/lib/assistantTurnRequest";
+import { reportConnectionFailure } from "@/lib/connectionStatus";
 import {
   buildAssistantLocalTurnApplication,
   completeAssistantLocalTurn,
@@ -289,6 +290,8 @@ export function useAssistantTurnState({
         savedCurriculumTitle: savedCurriculumTitle || application.curriculumToSave?.title || "",
       }));
     } catch (error) {
+      // 연결성 오류(503/네트워크)면 라이브 연결 스토어에 알려 즉시 재확인하게 한다. 인증(4xx)은 무시된다.
+      reportConnectionFailure(error);
       const failure = providerAssistantFailure(error);
       setMessages((current) => failAssistantMessage({
         action: failure.action,

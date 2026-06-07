@@ -5,6 +5,7 @@ import {
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { ProductSidebar } from "@/components/app/productSidebar";
+import { ProviderReconnectBar } from "@/components/app/providerReconnectBar";
 import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import { TerminalPanel } from "@/components/terminal/terminalPanel";
@@ -12,6 +13,8 @@ import type { TerminalLaunchIntent } from "@/lib/terminalLaunch";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
+import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import { useProviderReconnect, type ReconnectVariant } from "@/hooks/useProviderReconnect";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
 import { useCurriculumNavigationState } from "@/hooks/useCurriculumNavigationState";
@@ -28,6 +31,7 @@ import { LocaleProvider } from "@/lib/localeContext";
 import { isExecutableBlock } from "@/lib/cellModel";
 import { loadSharePackCurriculum } from "@/lib/sharePackOperations";
 import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
+import { providerProfileReady } from "@/lib/providerProfile";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
 import {
   SidebarInset,
@@ -65,7 +69,9 @@ function App() {
   }, []);
   const [surface, setSurface] = useSurfaceRoute();
   const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
+  // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
+  const connection = useConnectionStatus();
+  const apiOnline = connection.apiOnline;
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
   const applyNotice = useCallback((nextNotice: AppNotice) => {
     setNotice((currentNotice) =>
@@ -146,6 +152,23 @@ function App() {
     startOauthProviderLogin,
     validateAiProvider,
   } = useProviderConnection({ apiOnline, onNotice: applyNotice });
+
+  const providerReady = providerProfileReady(aiProfile);
+  const reconnect = useProviderReconnect({
+    apiOnline,
+    appReady: loadState === "ready",
+    initialized: connection.initialized,
+    lastDropAt: connection.lastDropAt,
+    phase: connection.phase,
+    providerReady,
+  });
+  const handleReconnectAction = useCallback((variant: ReconnectVariant) => {
+    if (variant === "offline") {
+      connection.probeNow();
+    } else {
+      void connectAiProvider();
+    }
+  }, [connection, connectAiProvider]);
 
   const {
     filteredCategories,
@@ -239,7 +262,6 @@ function App() {
   useAppBootstrapEffect({
     applyBootstrapCurriculumState,
     applyDocument,
-    onApiOnline: setApiOnline,
     onLoadState: setLoadState,
     onNotice: applyNotice,
     onProfile: setAiProfile,
@@ -247,6 +269,15 @@ function App() {
     onToolCatalog: setToolCatalog,
     refreshAutomation,
   });
+
+  // 끊겼다가 다시 연결되면(offline→online) 자동화 스냅샷을 한 번 새로고침해 멈춰 있던 상태를 회복한다.
+  const apiOnlinePrevRef = useRef(apiOnline);
+  useEffect(() => {
+    if (!apiOnlinePrevRef.current && apiOnline) {
+      void refreshAutomation();
+    }
+    apiOnlinePrevRef.current = apiOnline;
+  }, [apiOnline, refreshAutomation]);
 
   const openSharePackCurriculum = useCallback(async (packId: string, path: string, version?: string | null) => {
     const payload = await loadSharePackCurriculum(packId, path, version);
@@ -387,6 +418,7 @@ function App() {
               messages={messages}
               pendingBlocks={pendingBlocks}
               prompt={prompt}
+              providerPromptDismissed={reconnect.promptDismissed}
               referenceLoading={referenceLoading}
               results={results}
               runningBlockId={runningBlockId}
@@ -433,6 +465,12 @@ function App() {
               onToggleEStop={toggleEStop}
             />
         </div>
+        <ProviderReconnectBar
+          variant={reconnect.variant}
+          busy={aiConnecting}
+          onAction={handleReconnectAction}
+          onDismiss={reconnect.dismiss}
+        />
         {terminalOpen ? (
           <div className="h-72 min-h-0 shrink-0">
             <TerminalPanel

@@ -72,7 +72,9 @@ export function LiveAutomationView({
         const next = await refreshAgentRun(run.runId);
         setRun(next);
       } catch {
+        // 연결이 끊기면 폴링을 멈추되, 타임라인이 멈춘 이유를 사용자에게 알린다.
         stopPolling();
+        setError(t("automation.live.pollLost"));
       }
     }, 1000);
     return stopPolling;

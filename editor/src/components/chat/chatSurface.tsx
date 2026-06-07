@@ -26,6 +26,7 @@ export function ChatSurface({
   messages,
   pendingBlocks,
   prompt,
+  providerPromptDismissed,
   heroTitle,
   heroDetail,
   placeholder,
@@ -44,6 +45,7 @@ export function ChatSurface({
   messages: AssistantMessage[];
   pendingBlocks: BlockConfig[];
   prompt: string;
+  providerPromptDismissed: boolean;
   heroTitle?: string;
   heroDetail?: string;
   placeholder?: string;
@@ -78,7 +80,7 @@ export function ChatSurface({
             onAsk={onAsk}
             onPromptChange={onPromptChange}
           />
-          {!providerReady ? (
+          {!providerReady && !providerPromptDismissed ? (
             <div className="mt-3 flex justify-center">
               <Button className="h-8 px-3 text-xs" disabled={aiConnecting || !apiOnline} size="sm" type="button" variant="secondary" onClick={onConnectAi}>
                 {aiConnecting ? t("chat.connecting") : t("chat.connectProvider")}

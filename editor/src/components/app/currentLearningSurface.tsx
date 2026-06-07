@@ -37,6 +37,7 @@ export type CurrentLearningSurfaceProps = {
   messages: AssistantMessage[];
   pendingBlocks: BlockConfig[];
   prompt: string;
+  providerPromptDismissed: boolean;
   referenceLoading: boolean;
   results: ResultMap;
   runningBlockId: string | null;
@@ -71,6 +72,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         messages={props.messages}
         pendingBlocks={props.pendingBlocks}
         prompt={props.prompt}
+        providerPromptDismissed={props.providerPromptDismissed}
         heroTitle={t("curriculum.goal.title")}
         heroDetail={t("curriculum.goal.detail")}
         placeholder={t("curriculum.goal.placeholder")}

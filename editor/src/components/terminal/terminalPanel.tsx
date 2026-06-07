@@ -71,6 +71,16 @@ export function TerminalPanel({
     const socket = new WebSocket(`${proto}//${window.location.host}/ws/terminal`);
     socketRef.current = socket;
 
+    // 연결이 끊겨도(onclose/onerror) 조용히 멈추지 않도록 한 번만 안내선을 찍는다.
+    // 정상 언마운트(cleanup)에서는 disposed 플래그로 안내를 건너뛴다.
+    let disposed = false;
+    let notifiedDisconnect = false;
+    const notifyDisconnect = () => {
+      if (disposed || notifiedDisconnect) return;
+      notifiedDisconnect = true;
+      term.write("\r\n\x1b[31m[연결이 끊어졌습니다. 터미널을 닫았다가 다시 열어 주세요]\x1b[0m\r\n");
+    };
+
     const sendResize = () => {
       if (socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ type: "resize", cols: term.cols, rows: term.rows }));
@@ -94,6 +104,8 @@ export function TerminalPanel({
         term.write(`\r\n\x1b[31m${parsed.message}\x1b[0m\r\n`);
       }
     };
+    socket.onclose = notifyDisconnect;
+    socket.onerror = notifyDisconnect;
 
     const dataSub = term.onData((data) => {
       if (socket.readyState === WebSocket.OPEN) {
@@ -108,6 +120,7 @@ export function TerminalPanel({
     resizeObserver.observe(container);
 
     return () => {
+      disposed = true;
       resizeObserver.disconnect();
       dataSub.dispose();
       socket.close();
