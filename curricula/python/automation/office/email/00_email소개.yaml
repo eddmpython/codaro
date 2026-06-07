@@ -3,6 +3,7 @@ meta:
   title: 이메일 자동화 소개
   order: 0
   category: email
+  badge: 읽기
   packages: []
   tags:
     - email

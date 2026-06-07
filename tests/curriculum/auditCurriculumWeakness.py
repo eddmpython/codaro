@@ -116,7 +116,9 @@ def _sectionHasPlaceholderPredict(section: dict[str, Any]) -> bool:
 # - practical: intro 전용 카테고리.
 # - devTools: 개발 교양(읽기/오리엔테이션) 트랙. 코드 실행 deliverable이 없는 읽기 자료라
 #   verifyCurriculumFlowQuality/TopTierAudit의 ORIENTATION_CATEGORIES와 동일하게 면제한다.
-PROJECT_EXEMPT_CATEGORIES: frozenset[str] = frozenset({"builtins", "excel", "practical", "devTools"})
+# - resilience: 신뢰성 횡단 기법 트랙(멱등성·재개 체크포인트·원자적 쓰기). 다른 자동화에
+#   적용하는 기법 모음이라 standalone deliverable이 없다 — builtins와 동일 논리로 면제.
+PROJECT_EXEMPT_CATEGORIES: frozenset[str] = frozenset({"builtins", "excel", "practical", "devTools", "resilience"})
 
 # runtime mastery 임계 — Predict-Run-Reconcile-Adapt 루프와 동일.
 RUNTIME_MASTERY_THRESHOLD = 0.3
