@@ -213,6 +213,8 @@ export function ProductSidebar({
                   codaro: t("automation.codaro.title"),
                   custom: t("automation.custom.title"),
                   tasks: t("automation.tasks.title"),
+                  browserUse: t("automation.browserUse.title"),
+                  computerUse: t("automation.computerUse.title"),
                 }}
                 onSelectSection={onSelectAutomationSection}
               />

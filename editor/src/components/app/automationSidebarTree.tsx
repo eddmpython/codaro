@@ -1,5 +1,7 @@
 import {
   Clock3,
+  Globe,
+  MonitorCog,
   TerminalSquare,
   Workflow,
 } from "lucide-react";
@@ -22,6 +24,8 @@ type AutomationSidebarTreeProps = {
     codaro: string;
     custom: string;
     tasks: string;
+    browserUse: string;
+    computerUse: string;
   };
   onSelectSection: (section: AutomationSection) => void;
 };
@@ -32,6 +36,8 @@ export function AutomationSidebarTree({
   onSelectSection,
 }: AutomationSidebarTreeProps) {
   const items: Array<{ section: AutomationSection; label: string; Icon: ComponentType<{ className?: string }> }> = [
+    { section: "browserUse", label: text.browserUse, Icon: Globe },
+    { section: "computerUse", label: text.computerUse, Icon: MonitorCog },
     { section: "codaro", label: text.codaro, Icon: Workflow },
     { section: "custom", label: text.custom, Icon: TerminalSquare },
     { section: "tasks", label: text.tasks, Icon: Clock3 },

@@ -59,6 +59,7 @@ import type {
   TaskRun,
   VariableInfo,
   ClassroomStatusPayload,
+  AgentRunPayload,
 } from "@/types";
 import {
   applyAssistantStreamProtocolEvent,
@@ -385,6 +386,25 @@ export const codaroApi = {
     executionKind: payload.executionKind ?? null,
     sessionId: payload.sessionId ?? null,
   }),
+  runBrowserAgent: (payload: { instruction: string; startUrl?: string | null }) =>
+    postJson<AgentRunPayload>("/api/automation/agent/browser/run", {
+      instruction: payload.instruction,
+      startUrl: payload.startUrl ?? null,
+    }),
+  runComputerAgent: (payload: { instruction: string }) =>
+    postJson<AgentRunPayload>("/api/automation/agent/computer/run", {
+      instruction: payload.instruction,
+    }),
+  getAgentRun: (runId: string) =>
+    requestJson<AgentRunPayload>(`/api/automation/agent/run/${encodeURIComponent(runId)}`),
+  confirmAgentStep: (runId: string, approved: boolean) =>
+    postJson<AgentRunPayload>(`/api/automation/agent/run/${encodeURIComponent(runId)}/confirm`, { approved }),
+  pauseAgentRun: (runId: string) =>
+    postJson<AgentRunPayload>(`/api/automation/agent/run/${encodeURIComponent(runId)}/pause`, {}),
+  resumeAgentRun: (runId: string) =>
+    postJson<AgentRunPayload>(`/api/automation/agent/run/${encodeURIComponent(runId)}/resume`, {}),
+  stopAgentRun: (runId: string) =>
+    postJson<AgentRunPayload>(`/api/automation/agent/run/${encodeURIComponent(runId)}/stop`, {}),
   sharePackStatus: () => requestJson<SharePackStatusPayload>("/api/share/packs/status"),
   sharePacks: () => requestJson<SharePackListPayload>("/api/share/packs"),
   inspectSharePack: (source: string) => postJson<SharePackPreview>("/api/share/packs/inspect", { source }),

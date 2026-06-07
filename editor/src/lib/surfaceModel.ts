@@ -2,7 +2,14 @@ import { getActiveLocale } from "@/lib/localeCopy";
 
 export type SurfaceMode = "chat" | "editor" | "curriculum" | "automation" | "share";
 export type ThemeMode = "dark" | "light";
-export type AutomationSection = "codaro" | "custom" | "tasks";
+export type AutomationSection = "codaro" | "custom" | "tasks" | "browserUse" | "computerUse";
+
+// 라이브 에이전트 실행 뷰로 라우팅되는 서브라인(기존 3-섹션 스크롤 페이지와 분리).
+export const LIVE_AUTOMATION_SECTIONS: readonly AutomationSection[] = ["browserUse", "computerUse"];
+
+export function isLiveAutomationSection(section: AutomationSection): boolean {
+  return LIVE_AUTOMATION_SECTIONS.includes(section);
+}
 export type ProductSurfaceFlowRole = "entry" | "learning" | "notebook" | "secondLoop" | "support";
 
 export type ProductSurfaceNavItem = {

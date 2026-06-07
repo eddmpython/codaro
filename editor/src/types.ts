@@ -88,6 +88,47 @@ export type AutomationSessionCellPayload = {
   closed?: boolean;
 };
 
+export type AgentRunStep = {
+  id: string;
+  index: number;
+  decision: string;
+  verb: string | null;
+  params?: Record<string, unknown> | null;
+  rationale?: string;
+  label?: string;
+  gateVerdict?: string | null;
+  stepStatus?: string | null;
+  stepError?: string | null;
+  observationSummary?: string;
+};
+
+export type AgentRunPendingStep = {
+  id: string;
+  verb: string;
+  params: Record<string, unknown>;
+  label?: string;
+  rationale?: string;
+};
+
+export type AgentRunStatus =
+  | "running"
+  | "awaiting-confirm"
+  | "paused"
+  | "done"
+  | "stopped"
+  | "error";
+
+export type AgentRunPayload = {
+  runId: string;
+  kind: "browserUse" | "computerUse";
+  goal: string;
+  status: AgentRunStatus;
+  outcome?: string | null;
+  error?: string | null;
+  steps: AgentRunStep[];
+  pending?: AgentRunPendingStep | null;
+};
+
 export type BlockExecution = {
   executionCount: number;
   status: string;

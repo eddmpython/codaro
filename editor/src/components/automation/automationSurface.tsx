@@ -19,9 +19,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { LiveAutomationView } from "@/components/automation/liveAutomationView";
 import { useLocale } from "@/lib/localeContext";
 import { localeDateFormat } from "@/lib/localeCopy";
-import type { AutomationSection } from "@/lib/surfaceModel";
+import { isLiveAutomationSection, type AutomationSection } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 import type {
   EStopStatus,
@@ -73,10 +74,15 @@ export function AutomationView({
 }) {
   const { locale, t } = useLocale();
   useEffect(() => {
+    if (isLiveAutomationSection(activeSection)) return;
     window.document
       .getElementById(automationSectionId(activeSection))
       ?.scrollIntoView({ block: "start", behavior: "smooth" });
   }, [activeSection]);
+
+  if (isLiveAutomationSection(activeSection)) {
+    return <LiveAutomationView agentKind={activeSection as "browserUse" | "computerUse"} eStop={eStop} />;
+  }
 
   return (
     <ScrollArea className="h-full min-h-0">
