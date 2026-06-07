@@ -254,6 +254,18 @@ export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { b
     return <CodeCompareCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
   }
 
+  if (displayKind === "anatomy") {
+    return <AnatomyCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "terminal") {
+    return <TerminalCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
+  if (displayKind === "annotatedCode") {
+    return <AnnotatedCodeCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+  }
+
   return (
     <div className="space-y-3">
       {block.description ? (
@@ -903,6 +915,140 @@ function CodeCompareCell({ block, payload, repeatedTitle }: { block: BlockConfig
         <Pane good={false} label={payloadText(beforeMap, "label") || "Before"} code={beforeCode} />
         <Pane good label={payloadText(afterMap, "label") || "After"} code={afterCode} />
       </div>
+    </div>
+  );
+}
+
+// 구조 분해 — 한 줄 명령/코드/경로를 토큰별 번호 카드로 해부(세그멘팅·시그널링)
+function AnatomyCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const parts = payloadItems(payload, "parts").length
+    ? payloadItems(payload, "parts")
+    : (payloadItems(payload, "items").length ? payloadItems(payload, "items") : payloadItems(payload, "tokens"));
+  const code = payloadText(payload, "code") || payloadText(payload, "line") || payloadText(payload, "target");
+  const title = payloadText(payload, "title") || block.title || "구조 분해";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      {code ? (
+        <div className="rounded-md border bg-code">
+          <div className="flex items-center gap-1.5 px-3 pt-2 text-[10px] font-medium uppercase text-muted-foreground">
+            <Code2 className="size-3" />
+            분해 대상
+          </div>
+          <ScrollArea className="min-w-0">
+            <pre className="min-w-0 whitespace-pre-wrap break-words px-3 py-2 font-mono text-sm leading-6 text-code-foreground">{code}</pre>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      ) : null}
+      {parts.length ? (
+        <div className="grid gap-2 md:grid-cols-2">
+          {parts.map((part, index) => {
+            const token = payloadText(part, "token") || payloadText(part, "text") || payloadText(part, "part") || payloadText(part, "code");
+            const label = payloadText(part, "label") || payloadText(part, "title") || payloadText(part, "name") || payloadText(part, "role");
+            const explain = payloadText(part, "explain") || payloadText(part, "explanation") || payloadText(part, "description") || payloadText(part, "meaning");
+            return (
+              <div className="flex gap-2 rounded-md border bg-background px-3 py-2" key={`${token}-${index}`}>
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">{index + 1}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline gap-1.5">
+                    {token ? <code className="font-mono text-xs text-foreground">{token}</code> : null}
+                    {label ? <span className="text-[11px] text-muted-foreground">{stripMarkdown(label)}</span> : null}
+                  </div>
+                  {explain ? <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{renderInline(explain)}</p> : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
+    </div>
+  );
+}
+
+// 터미널 — 프롬프트($)+명령+출력 세션 재현. 명령은 풀강도, 출력은 dim(명도 위계만, 색 없음)
+function TerminalCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const lines = payloadItems(payload, "lines").length
+    ? payloadItems(payload, "lines")
+    : (payloadItems(payload, "commands").length ? payloadItems(payload, "commands") : payloadItems(payload, "session"));
+  const title = payloadText(payload, "title") || block.title || "터미널";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  const fallback = payloadText(payload, "content") || payloadText(payload, "code");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      <div className="rounded-md border bg-code">
+        <div className="flex items-center gap-1.5 px-3 pt-2 text-[10px] font-medium uppercase text-muted-foreground">
+          <TerminalSquare className="size-3" />
+          터미널
+        </div>
+        <ScrollArea className="max-h-72 min-w-0">
+          <div className="px-3 py-2 font-mono text-xs leading-6">
+            {lines.length ? lines.map((line, index) => {
+              const cmd = payloadText(line, "cmd") || payloadText(line, "command") || payloadText(line, "input") || payloadText(line, "in");
+              const out = payloadText(line, "out") || payloadText(line, "output") || payloadText(line, "result");
+              return (
+                <div key={index}>
+                  {cmd ? (
+                    <div className="text-code-foreground">
+                      <span className="select-none text-muted-foreground/60">$ </span>
+                      <span className="whitespace-pre-wrap break-words">{cmd}</span>
+                    </div>
+                  ) : null}
+                  {out ? <div className="whitespace-pre-wrap break-words text-muted-foreground/80">{out}</div> : null}
+                </div>
+              );
+            }) : <div className="whitespace-pre-wrap break-words text-muted-foreground/80">{fallback}</div>}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// 코드 해설 — 라인별 거터(번호) + 우측 주석. worked example + self-explanation. 무채색 구분선만.
+function AnnotatedCodeCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
+  const lines = payloadItems(payload, "lines").length
+    ? payloadItems(payload, "lines")
+    : (payloadItems(payload, "items").length ? payloadItems(payload, "items") : payloadItems(payload, "rows"));
+  const title = payloadText(payload, "title") || block.title || "코드 해설";
+  const subtitle = payloadText(payload, "subtitle") || payloadText(payload, "description");
+  const fallback = payloadText(payload, "code") || payloadText(payload, "content");
+  return (
+    <div className="space-y-3">
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
+      {lines.length ? (
+        <div className="rounded-md border bg-code">
+          <div className="flex items-center gap-1.5 px-3 pt-2 text-[10px] font-medium uppercase text-muted-foreground">
+            <Code2 className="size-3" />
+            코드 해설
+          </div>
+          <div className="divide-y divide-border/40">
+            {lines.map((line, index) => {
+              const code = payloadText(line, "code") || payloadText(line, "line") || payloadText(line, "text");
+              const note = payloadText(line, "note") || payloadText(line, "annotation") || payloadText(line, "explain") || payloadText(line, "description");
+              return (
+                <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 px-3 py-1.5 md:grid-cols-[1.75rem_minmax(0,1fr)_minmax(0,18rem)]" key={index}>
+                  <span className="text-right font-mono text-xs leading-6 tabular-nums text-muted-foreground/50">{index + 1}</span>
+                  <div className="min-w-0">
+                    <code className="block whitespace-pre-wrap break-words font-mono text-xs leading-6 text-code-foreground">{code}</code>
+                    {note ? <p className="mt-0.5 text-xs leading-5 text-muted-foreground md:hidden">{renderInline(note)}</p> : null}
+                  </div>
+                  {note ? (
+                    <span className="hidden text-xs leading-6 text-muted-foreground md:block md:border-l md:border-border/40 md:pl-2">{renderInline(note)}</span>
+                  ) : <span className="hidden md:block" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (fallback ? (
+        <div className="rounded-md border bg-code">
+          <ScrollableCode code={fallback} />
+        </div>
+      ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />)}
     </div>
   );
 }

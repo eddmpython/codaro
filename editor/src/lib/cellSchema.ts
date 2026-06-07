@@ -43,4 +43,7 @@ export const cellDisplayKinds = [
   "timeline",
   "stat",
   "codeCompare",
+  "anatomy",
+  "terminal",
+  "annotatedCode",
 ] as const;

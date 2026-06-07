@@ -551,6 +551,12 @@ outcomes:
   - id: devLiteracy.github
     label: GitHub 플랫폼 개념
     description: 원격 저장소·협업·PR 등 GitHub이 무엇이고 왜 쓰는지 이해(읽기)
+  - id: devLiteracy.commandLine
+    label: 명령줄·터미널 기초 개념
+    description: 터미널이 무엇인지, 명령=프로그램+인자+플래그 구조, 현재 작업 디렉터리·경로를 그림과 세션 예시로 이해(읽기)
+  - id: devLiteracy.gitBasics
+    label: Git 기본 사이클 개념
+    description: init→add→commit→log 한 사이클과 작업트리·스테이징·이력 3영역을 명령 분해와 터미널 출력 예시로 이해(읽기)
 
 # 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
 domains:

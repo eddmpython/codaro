@@ -103,6 +103,12 @@ CARD_REGISTRY: dict[str, CardSpec] = {
     "stat": CardSpec("stat", "visual", (("items", "stats", "value"),)),
     # Before/After 코드 비교(대조학습 코드판)
     "codeCompare": CardSpec("codeCompare", "visual", (("before", "after", "items"),)),
+    # 한 줄 명령/코드/경로를 토큰별 라벨로 분해(세그멘팅·시그널링)
+    "anatomy": CardSpec("anatomy", "visual", (("parts", "items", "tokens"),)),
+    # 터미널 세션 재현(프롬프트+명령+출력, worked example)
+    "terminal": CardSpec("terminal", "visual", (("lines", "commands", "content"),)),
+    # 코드 라인별 거터 주석(worked example + self-explanation)
+    "annotatedCode": CardSpec("annotatedCode", "visual", (("lines", "code", "items"),), aliases=("codeWalkthrough",)),
 }
 
 # allowlist = canonical type + alias. type 오타는 여기에 없으므로 게이트가 잡는다.

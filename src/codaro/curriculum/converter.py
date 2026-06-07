@@ -457,6 +457,42 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
             )
         ]
 
+    if sourceType == "anatomy":
+        return [
+            _markdownBlock(
+                _formatAnatomy(block, title or "구조 분해", intro=subtitle or description),
+                displayKind="anatomy",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "구조 분해",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType == "terminal":
+        return [
+            _markdownBlock(
+                _formatTerminal(block, title or "터미널", intro=subtitle or description),
+                displayKind="terminal",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "터미널",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
+    if sourceType in {"annotatedCode", "codeWalkthrough"}:
+        return [
+            _markdownBlock(
+                _formatAnnotatedCode(block, title or "코드 해설", intro=subtitle or description),
+                displayKind="annotatedCode",
+                role="visual",
+                sourceType=sourceType,
+                title=title or "코드 해설",
+                payload=_payload(block, sourceType),
+            )
+        ]
+
     return [
         _markdownBlock(
             "\n\n".join(item for item in [f"### {title}" if title else "", subtitle, description, content or _textFromUnknownBlock(block)] if item),
@@ -866,6 +902,75 @@ def _formatCodeCompare(block: dict[str, Any], fallbackTitle: str) -> str:
     ])
 
 
+def _formatAnatomy(block: dict[str, Any], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    code = _textValue(block.get("code") or block.get("line") or block.get("target"))
+    if code:
+        lines.append(f"```\n{code}\n```")
+    parts = _firstMaps(block, "parts", "items", "tokens")
+    bullets: list[str] = []
+    for index, part in enumerate(parts, start=1):
+        token = _textValue(part.get("token") or part.get("text") or part.get("part") or part.get("code"))
+        label = _textValue(part.get("label") or part.get("title") or part.get("name") or part.get("role"))
+        explain = _textValue(part.get("explain") or part.get("explanation") or part.get("description") or part.get("meaning"))
+        head = f"`{token}`" if token else str(index)
+        meta = f" — {label}" if label else ""
+        bullets.append(f"- {head}{meta}{f': {explain}' if explain else ''}")
+    if bullets:
+        lines.append("\n".join(bullets))
+    return "\n\n".join(lines)
+
+
+def _formatTerminal(block: dict[str, Any], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    rows = _firstMaps(block, "lines", "commands", "session", "steps")
+    rendered: list[str] = []
+    if rows:
+        for row in rows:
+            cmd = _textValue(row.get("cmd") or row.get("command") or row.get("input") or row.get("in"))
+            out = _textValue(row.get("out") or row.get("output") or row.get("result"))
+            if cmd:
+                rendered.append(f"$ {cmd}")
+            if out:
+                rendered.append(out)
+    else:
+        text = _textValue(block.get("content") or block.get("code"))
+        if text:
+            rendered.append(text)
+    if rendered:
+        lines.append("```\n" + "\n".join(rendered) + "\n```")
+    return "\n\n".join(lines)
+
+
+def _formatAnnotatedCode(block: dict[str, Any], fallbackTitle: str, *, intro: str = "") -> str:
+    lines = [f"### {fallbackTitle}"]
+    if intro:
+        lines.append(intro)
+    rows = _firstMaps(block, "lines", "items", "rows")
+    if rows:
+        codeLines: list[str] = []
+        notes: list[str] = []
+        for row in rows:
+            code = _textValue(row.get("code") or row.get("line") or row.get("text"))
+            note = _textValue(row.get("note") or row.get("annotation") or row.get("explain") or row.get("description"))
+            codeLines.append(code)
+            if note:
+                notes.append(f"- `{code}` — {note}" if code else f"- {note}")
+        if any(codeLines):
+            lines.append("```\n" + "\n".join(codeLines) + "\n```")
+        if notes:
+            lines.append("\n".join(notes))
+    else:
+        code = _textValue(block.get("code") or block.get("content"))
+        if code:
+            lines.append(f"```\n{code}\n```")
+    return "\n\n".join(lines)
+
+
 def _formatMedia(block: dict[str, Any], sourceType: str, title: str, subtitle: str, description: str) -> str:
     src = _textValue(
         block.get("src")
@@ -1070,6 +1175,10 @@ def _structuredCheckConfig(
 
 def _blockTypeLabel(sourceType: str) -> str:
     labels = {
+        "anatomy": "구조 분해",
+        "annotatedCode": "코드 해설",
+        "codeWalkthrough": "코드 해설",
+        "terminal": "터미널",
         "centerText": "Center Text",
         "choiceCards": "Choice Cards",
         "codeCompare": "코드 비교",

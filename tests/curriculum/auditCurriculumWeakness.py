@@ -114,7 +114,9 @@ def _sectionHasPlaceholderPredict(section: dict[str, Any]) -> bool:
 # - builtins: 표준라이브러리 유틸 단원 모음. 별도 deliverable 없음.
 # - excel: deprecated 스텁 (실제 xlwings 트랙은 xlwings 카테고리).
 # - practical: intro 전용 카테고리.
-PROJECT_EXEMPT_CATEGORIES: frozenset[str] = frozenset({"builtins", "excel", "practical"})
+# - devTools: 개발 교양(읽기/오리엔테이션) 트랙. 코드 실행 deliverable이 없는 읽기 자료라
+#   verifyCurriculumFlowQuality/TopTierAudit의 ORIENTATION_CATEGORIES와 동일하게 면제한다.
+PROJECT_EXEMPT_CATEGORIES: frozenset[str] = frozenset({"builtins", "excel", "practical", "devTools"})
 
 # runtime mastery 임계 — Predict-Run-Reconcile-Adapt 루프와 동일.
 RUNTIME_MASTERY_THRESHOLD = 0.3

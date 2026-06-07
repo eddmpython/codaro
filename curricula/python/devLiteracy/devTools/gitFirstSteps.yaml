@@ -1,0 +1,207 @@
+meta:
+  id: devTools_gitFirstSteps
+  title: Git 첫 사이클 — init부터 commit까지 머리로 먼저
+  order: 2
+  category: devTools
+  difficulty: ⭐⭐
+  badge: 읽기
+  packages: []
+  tags:
+    - Git
+    - 버전관리
+    - commit
+    - 터미널
+    - 개발교양
+  outcomes:
+    - devLiteracy.gitBasics
+  prerequisites:
+    - devLiteracy.git
+    - devLiteracy.commandLine
+  estimatedMinutes: 18
+  seo:
+    title: "Git 첫 사이클 — init·add·commit·log를 명령 분해로 이해하기"
+    description: "git init→add→commit→log 한 사이클과 작업트리·스테이징·이력 3영역을 명령 분해와 실제 터미널 출력 예시로 코드 실행 없이 읽고 이해하는 개발 교양 자료."
+    keywords:
+      - git 기초
+      - git commit 이란
+      - git add staging
+      - git status 보는 법
+      - git log oneline
+
+intro:
+  direction: "GitHub 소개가 '왜·무엇'이었다면, 이번엔 Git이 실제로 어떻게 도는지를 머리로 먼저 그린다. '명령줄 첫걸음'에서 익힌 '프로그램+옵션+인자' 분해 습관을 이번엔 git 명령에 그대로 적용해, init→add→commit→log 한 사이클을 명령 분해와 실제 터미널 출력 예시로 코드 실행 없이 읽고 이해한 뒤, 직접 손으로 쳐볼 준비를 한다."
+  benefits:
+    - "작업트리·스테이징·이력이라는 Git의 세 영역을 구분하고, add와 commit이 무엇을 옮기는지 말할 수 있다."
+    - "git commit -m '메시지' 를 부품으로 분해해 각 조각의 역할을 설명할 수 있다."
+    - "git status·git log의 실제 출력을 읽어, 지금 무슨 일이 일어났는지 스스로 해석할 수 있다."
+  diagram:
+    steps:
+      - label: "1. Git의 세 영역"
+        detail: "작업트리(내가 고치는 곳)·스테이징(담아둔 곳)·이력(새긴 곳)이 어떻게 다른지 본다."
+      - label: "2. 커밋 명령 분해"
+        detail: "git commit -m 'first commit' 한 줄을 프로그램·부속 명령·옵션·인자로 쪼개 읽는다."
+      - label: "3. 한 사이클"
+        detail: "init→add→commit→log로 빈 폴더가 첫 이력을 갖기까지 한 바퀴를 따라간다."
+      - label: "4. 출력 읽기"
+        detail: "git status와 git log --oneline의 실제 출력을 줄 단위로 해석한다."
+    runtime:
+      - label: "읽기 전용 개념 카드"
+        detail: "코드 실행이 없는 개념 읽기 자료다. 명령 분해와 출력 예시로 Git 사이클의 큰 그림을 잡는다."
+      - label: "다음 행동 — git 실습"
+        detail: "개념을 잡았다면 빈 폴더에서 git init→add→commit→log를 직접 쳐보며 출력이 예시와 같은지 확인한다."
+
+sections:
+  - id: hook
+    title: "1. 이번엔 Git이 '어떻게' 도는지 본다"
+    blocks:
+      - type: hero
+        title: "Git 첫 사이클 — 빈 폴더가 첫 기록을 갖기까지"
+        subtitle: "명령을 외우는 게 아니라, 각 명령이 무엇을 어디로 옮기는지 그림으로 잡는다"
+        points:
+          - title: "세 영역의 이동"
+            description: "Git을 쓰는 건 결국 '작업트리 → 스테이징 → 이력'으로 변경을 단계별로 옮기는 일이다."
+          - title: "출력을 읽는 힘"
+            description: "git status·git log의 출력을 읽을 줄 알면, 막혀도 '지금 어디인지'를 스스로 안다."
+          - title: "되돌릴 수 있는 안전망"
+            description: "한 번 커밋한 지점으로는 언제든 돌아올 수 있다. 그래서 자주 커밋하는 게 좋다."
+
+  - id: three_areas
+    title: "2. Git의 세 영역 — 변경은 단계로 옮겨진다"
+    blocks:
+      - type: featureCards
+        title: "add와 commit은 '영역 사이의 이동'이다"
+        cards:
+          - title: "작업트리 (Working Tree)"
+            description: "내가 실제로 파일을 고치는 폴더. 여기 변경은 아직 Git이 '기록하기로 한' 게 아니다."
+          - title: "스테이징 (Staging Area)"
+            description: "다음 커밋에 담을 변경만 골라 올려두는 준비 칸. git add 가 여기로 옮긴다."
+          - title: "이력 (History)"
+            description: "커밋으로 영구히 새겨진 스냅샷들의 모음. git commit 이 스테이징의 내용을 여기로 새긴다."
+      - type: text
+        content: "핵심은 '고친다고 바로 기록되지 않는다'는 점이다. git add 로 담을 것을 고르고(스테이징), git commit 으로 도장을 찍어(이력) 비로소 한 버전이 된다. 이 두 단계 덕분에 '이번 커밋엔 이 파일만' 같은 선택이 가능하다."
+      - type: conceptRow
+        title: "세 영역을 사무실에 비유하면"
+        rows:
+          - concept: "작업트리 = 내 책상"
+            explain: "지금 펼쳐 놓고 고치는 중인 서류. 아직 아무 데도 제출하지 않은 상태다."
+          - concept: "스테이징 = 발송 트레이"
+            explain: "이번에 보낼 서류만 골라 올려둔 칸. git add 가 책상에서 여기로 옮긴다."
+          - concept: "이력 = 보관 캐비닛"
+            explain: "도장 찍어 영구 보관한 사본들. git commit 이 발송 트레이의 서류를 여기 새긴다."
+
+  - id: anatomy
+    title: "3. 커밋 명령 분해"
+    blocks:
+      - type: anatomy
+        title: "git commit -m 'first commit' 를 분해하면"
+        code: 'git commit -m "first commit"'
+        parts:
+          - token: "git"
+            label: "프로그램"
+            explain: "버전 관리 도구 Git을 부른다. Git의 모든 명령은 git 으로 시작한다."
+          - token: "commit"
+            label: "부속 명령"
+            explain: "git에게 시킬 일. 'commit'은 스테이징에 담긴 변경을 이력에 새기라는 뜻이다."
+          - token: "-m"
+            label: "옵션(플래그)"
+            explain: "'message'의 약자. 커밋 메시지를 바로 뒤 인자로 붙이겠다는 스위치다."
+          - token: '"first commit"'
+            label: "인자"
+            explain: "이번 커밋을 설명하는 메시지. 나중에 이력에서 '무엇을 왜 바꿨는지' 알아보게 한다."
+
+  - id: cycle
+    title: "4. 한 사이클 — init에서 log까지"
+    blocks:
+      - type: timeline
+        title: "빈 폴더가 첫 이력을 갖기까지"
+        items:
+          - { step: 1, title: "git init", description: "현재 폴더를 Git 저장소로 만든다. 숨김 폴더 .git 이 생기며 이력이 여기 쌓인다." }
+          - { step: 2, title: "파일 작성", description: "notes.txt 같은 파일을 만들거나 고친다. 아직 작업트리에만 있는 상태." }
+          - { step: 3, title: "git add", description: "그 파일을 스테이징에 올려 '이번 커밋에 담겠다'고 고른다." }
+          - { step: 4, title: "git commit", description: "스테이징의 내용을 메시지와 함께 이력에 새긴다. 첫 저장 지점 완성." }
+          - { step: 5, title: "git log", description: "지금까지의 커밋 이력을 확인한다. 방금 만든 커밋이 보인다." }
+      - type: note
+        style: info
+        title: "처음 한 번 — 신원 설정"
+        content: "git을 처음 쓰는 컴퓨터라면 첫 commit 전에 이름·이메일을 한 번 설정해야 한다. git config --global user.name \"내이름\" 과 git config --global user.email \"메일주소\" 를 먼저 쳐 두자. 안 해 두면 첫 commit에서 '누가 커밋했는지 알 수 없다'는 안내가 뜬다."
+
+  - id: status
+    title: "5. git status — 지금 무슨 일이 일어났나"
+    blocks:
+      - type: text
+        content: "막힐 때마다 가장 먼저 치는 명령이 git status 다. 어떤 파일이 변경됐고, 무엇이 스테이징됐는지, 다음에 무엇을 하면 되는지까지 알려준다. 아래는 파일을 하나 만든 직후의 전형적인 출력이다."
+      - type: terminal
+        title: "파일을 만들고 git status 를 치면"
+        lines:
+          - { cmd: "git status" }
+          - { out: "On branch main" }
+          - { out: "No commits yet" }
+          - { out: "Untracked files:" }
+          - { out: '  (use "git add <file>..." to include in what will be committed)' }
+          - { out: "        notes.txt" }
+          - { out: 'nothing added to commit but untracked files present (use "git add" to track)' }
+      - type: text
+        content: "한 줄씩 읽어 보자. 'On branch main'은 지금 main이라는 갈래(브랜치)에 있다는 뜻이다(환경에 따라 master로 보일 수 있는데 둘 다 정상, 기본 브랜치 이름 차이일 뿐이다). 'No commits yet'은 아직 커밋이 하나도 없다는 뜻. 'Untracked files'는 'Git이 아직 추적하지 않는 새 파일'(notes.txt)이고, 친절하게도 다음에 할 일(git add)까지 괄호로 알려준다. Git의 출력은 대부분 이렇게 다음 행동을 안내한다 — 그래서 읽는 습관이 중요하다."
+
+  - id: log
+    title: "6. git log — 이력을 줄 단위로 읽기"
+    blocks:
+      - type: annotatedCode
+        title: "git log --oneline 출력 해설"
+        lines:
+          - { code: "$ git log --oneline", note: "--oneline 은 커밋 하나를 한 줄로 압축해 보여주는 옵션이다." }
+          - { code: "e4f5a6b  fix typo in notes", note: "최신 커밋이 맨 위. 왼쪽 e4f5a6b 는 커밋의 짧은 해시(지문), 오른쪽은 메시지다. 해시는 0-9·a-f 만 쓰는 16진수다." }
+          - { code: "a1b2c3d  first commit", note: "그 아래는 더 과거의 커밋. 위로 갈수록 최신, 아래로 갈수록 처음이다." }
+      - type: text
+        content: "커밋 해시는 각 저장 지점을 가리키는 고유한 주소다. 'a1b2c3d 로 되돌려줘'처럼 특정 시점을 지목할 때 쓴다. 메시지가 부실하면 이 목록만 보고는 무엇을 한 커밋인지 알 수 없다 — 그래서 메시지가 중요하다."
+
+  - id: messages
+    title: "7. 커밋 메시지 — 권장 vs 지양"
+    blocks:
+      - type: doDont
+        title: "미래의 나를 위한 한 줄"
+        do:
+          title: "권장 (Do)"
+          items:
+            - "무엇을 왜 바꿨는지 현재형 한 줄로 요약한다. 예: '로그인 실패 시 에러 메시지 추가'"
+            - "한 커밋에는 한 가지 변경만 담는다 — 되돌리기 쉽고 읽기 쉽다."
+        dont:
+          title: "지양 (Don't)"
+          items:
+            - "'수정', 'asdf', 'ㅁㄴㅇ' 같은 무의미한 메시지 — 이력에서 아무 정보도 주지 못한다."
+            - "여러 기능 변경을 한 커밋에 몰아넣기 — 나중에 일부만 되돌릴 수 없다."
+
+  - id: misconceptions
+    title: "8. 초심자가 자주 하는 착각"
+    blocks:
+      - type: misconception
+        title: "Git 첫 사이클의 흔한 오해"
+        items:
+          - myth: "git commit 하면 GitHub에 올라간다."
+            truth: "commit은 '내 컴퓨터의 이력'에만 새긴다. GitHub에 올리려면 별도로 git push 가 필요하다."
+          - myth: "파일을 고치면 자동으로 커밋된다."
+            truth: "고친 것(작업트리)은 git add 로 담고 git commit 으로 새겨야 비로소 한 버전이 된다. 자동이 아니다."
+          - myth: "한 번 커밋하면 되돌릴 수 없다."
+            truth: "오히려 반대다. 커밋은 '되돌아올 수 있는 저장 지점'을 만드는 일이라, 자주 커밋할수록 안전하다."
+
+  - id: summary
+    title: "9. 핵심 정리"
+    blocks:
+      - type: summary
+        title: "이것만 기억하세요 (TL;DR)"
+        points:
+          - "Git은 변경을 '작업트리 → (git add) → 스테이징 → (git commit) → 이력'으로 단계별로 옮긴다."
+          - "git commit -m '메시지' = 프로그램(git) + 부속 명령(commit) + 옵션(-m) + 인자(메시지)."
+          - "막히면 git status로 현재 상태를, git log로 지나온 이력을 읽는다. commit은 로컬, push라야 GitHub."
+      - type: list
+        style: check
+        title: "스스로 설명할 수 있으면 충분하다"
+        items:
+          - "작업트리·스테이징·이력 세 영역과 add·commit의 역할을 말할 수 있다."
+          - "git commit -m '메시지' 를 네 부품으로 분해할 수 있다."
+          - "git status의 'Untracked files' 출력이 무슨 뜻인지 읽을 수 있다."
+          - "commit과 push의 차이를 한 문장으로 설명할 수 있다."
+      - type: note
+        style: tip
+        title: "다음 단계"
+        content: "이제 빈 폴더를 하나 만들고 git init → 파일 작성 → git add → git commit -m 'first commit' → git log 를 직접 쳐보자. 출력이 이 자료의 예시와 같은지 눈으로 맞춰 보면, 머리로 그린 사이클이 손에 붙는다."

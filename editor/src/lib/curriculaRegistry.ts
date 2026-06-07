@@ -820,6 +820,42 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
     })];
   }
 
+  if (sourceType === "anatomy") {
+    const parts = arrayOfMaps(block.parts ?? block.items ?? block.tokens);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "anatomy",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, parts },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "terminal") {
+    const lines = arrayOfMaps(block.lines ?? block.commands ?? block.session ?? block.steps);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "terminal",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, lines },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
+  if (sourceType === "annotatedCode" || sourceType === "codeWalkthrough") {
+    const lines = arrayOfMaps(block.lines ?? block.items ?? block.rows);
+    return [markdownBlock({
+      content: `### ${title || blockTypeLabel(sourceType)}`,
+      displayKind: "annotatedCode",
+      payload: { ...block, title: displayTitle || title || blockTypeLabel(sourceType), subtitle, description, lines },
+      role: "visual",
+      sourceType,
+      title: displayTitle || title || blockTypeLabel(sourceType),
+    })];
+  }
+
   return [markdownBlock({
     content: [displayTitle ? `### ${displayTitle}` : "", subtitle, description, content || textFromUnknownBlock(block)].filter(Boolean).join("\n\n"),
     displayKind: "prose",
@@ -1383,6 +1419,10 @@ function normalizeSourceType(value: string) {
 function blockTypeLabel(type: string) {
   const normalized = type.trim();
   const labels: Record<string, string> = {
+    anatomy: "구조 분해",
+    annotatedCode: "코드 해설",
+    codeWalkthrough: "코드 해설",
+    terminal: "터미널",
     centerText: "중앙 설명",
     choiceCards: "선택 카드",
     codeCompare: "코드 비교",
