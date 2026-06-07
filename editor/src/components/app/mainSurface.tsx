@@ -51,7 +51,6 @@ type MainSurfaceProps = {
   notebookRunning: boolean;
   pendingBlocks: BlockConfig[];
   prompt: string;
-  providerPromptDismissed: boolean;
   referenceLoading: boolean;
   results: ResultMap;
   runningBlockId: string | null;
@@ -109,7 +108,6 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         messages={props.messages}
         pendingBlocks={props.pendingBlocks}
         prompt={props.prompt}
-        providerPromptDismissed={props.providerPromptDismissed}
         onAsk={props.onAsk}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onConnectAi={props.onConnectAi}
@@ -186,7 +184,6 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         messages={props.messages}
         pendingBlocks={props.pendingBlocks}
         prompt={props.prompt}
-        providerPromptDismissed={props.providerPromptDismissed}
         referenceLoading={props.referenceLoading}
         results={props.results}
         runningBlockId={props.runningBlockId}

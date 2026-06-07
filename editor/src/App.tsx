@@ -418,7 +418,6 @@ function App() {
               messages={messages}
               pendingBlocks={pendingBlocks}
               prompt={prompt}
-              providerPromptDismissed={reconnect.promptDismissed}
               referenceLoading={referenceLoading}
               results={results}
               runningBlockId={runningBlockId}

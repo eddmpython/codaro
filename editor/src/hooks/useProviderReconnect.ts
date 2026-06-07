@@ -29,11 +29,7 @@ export function useProviderReconnect({
   lastDropAt,
   phase,
   providerReady,
-}: UseProviderReconnectInput): {
-  variant: ReconnectVariant | null;
-  dismiss: () => void;
-  promptDismissed: boolean;
-} {
+}: UseProviderReconnectInput): { variant: ReconnectVariant | null; dismiss: () => void } {
   const [promptDismissed, setPromptDismissed] = useState(loadProviderPromptDismissed);
   const [episodeId, setEpisodeId] = useState(0);
   const [dismissedEpisode, setDismissedEpisode] = useState(-1);
@@ -87,5 +83,5 @@ export function useProviderReconnect({
     }
   }, [activeVariant, episodeId]);
 
-  return { variant, dismiss, promptDismissed };
+  return { variant, dismiss };
 }
