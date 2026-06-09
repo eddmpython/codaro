@@ -850,7 +850,7 @@ fn run_doctor(paths: &LauncherPaths) -> Result<()> {
     let update_config = load_update_config(&stores)?;
     let active_python_executable = active_release.as_ref().and_then(|state| {
         LauncherPaths::resolve_python_executable(
-            &paths.release_python_runtime_dir(&state.release_id),
+            &paths.runtime_store_dir(&state.runtime_version),
         )
         .ok()
         .map(|path| path.display().to_string())
@@ -2185,6 +2185,7 @@ mod tests {
             backend_entry_module: "fakebackend".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         }
     }
@@ -2210,7 +2211,7 @@ mod tests {
     ) {
         let python = discover_test_python();
         let release_dir = paths.release_dir(&state.release_id);
-        let runtime_dir = paths.release_python_runtime_dir(&state.release_id);
+        let runtime_dir = paths.runtime_store_dir(&state.runtime_version);
         let site_packages_dir = release_dir.join("backend").join("site-packages");
         let editor_dir = paths.release_editor_dir(&state.release_id);
 

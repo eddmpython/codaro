@@ -40,7 +40,7 @@ impl BackendLaunchConfig {
         workspace_root: PathBuf,
     ) -> Result<Self> {
         let release_dir = paths.release_dir(&state.release_id);
-        let python_runtime_dir = paths.release_python_runtime_dir(&state.release_id);
+        let python_runtime_dir = paths.runtime_store_dir(&state.runtime_version);
         let backend_python_path = release_dir.join("backend").join("site-packages");
         Ok(Self {
             python_executable: LauncherPaths::resolve_python_executable(&python_runtime_dir)?,
@@ -262,7 +262,7 @@ mod tests {
     fn launch_config_builds_expected_command() {
         let temp_dir = tempdir().unwrap();
         let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
-        let runtime_dir = paths.release_python_runtime_dir("2026.03.18-1");
+        let runtime_dir = paths.runtime_store_dir("3.12.12");
         fs::create_dir_all(&runtime_dir).unwrap();
         if cfg!(windows) {
             fs::write(runtime_dir.join("python.cmd"), "@echo off\r\n").unwrap();
@@ -279,6 +279,7 @@ mod tests {
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         };
         let config = BackendLaunchConfig::from_active_release(
@@ -318,7 +319,7 @@ mod tests {
     fn launch_config_uses_bundled_editor_when_archive_editor_is_missing() {
         let temp_dir = tempdir().unwrap();
         let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
-        let runtime_dir = paths.release_python_runtime_dir("2026.03.18-1");
+        let runtime_dir = paths.runtime_store_dir("3.12.12");
         fs::create_dir_all(&runtime_dir).unwrap();
         if cfg!(windows) {
             fs::write(runtime_dir.join("python.cmd"), "@echo off\r\n").unwrap();
@@ -344,6 +345,7 @@ mod tests {
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         };
 

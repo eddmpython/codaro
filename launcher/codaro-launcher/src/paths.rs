@@ -71,8 +71,10 @@ impl LauncherPaths {
         self.release_dir(release_id).join("runtime")
     }
 
-    pub fn release_python_runtime_dir(&self, release_id: &str) -> PathBuf {
-        self.release_runtime_dir(release_id).join("python")
+    /// 여러 release가 공유하는 Python 런타임 디렉터리. python version으로 키잉해, 같은 버전이면
+    /// release가 바뀌어도 무거운 런타임을 재다운로드/재추출하지 않고 재사용한다.
+    pub fn runtime_store_dir(&self, version: &str) -> PathBuf {
+        self.installs_dir().join("_runtimes").join(version)
     }
 
     pub fn release_editor_dir(&self, release_id: &str) -> PathBuf {

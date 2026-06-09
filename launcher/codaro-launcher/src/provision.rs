@@ -96,14 +96,13 @@ pub fn stage_release_with_progress(
     let editor_archive_dir = release_dir.join("editor").join("archive");
     let staged_editor_root_path = paths.release_editor_dir(&manifest.release_id);
     let runtime_archive_dir = release_dir.join("runtime").join("archive");
-    let python_runtime_dir = paths.release_python_runtime_dir(&manifest.release_id);
+    let python_runtime_dir = paths.runtime_store_dir(&manifest.python_runtime.version);
     let bundle_wheels_dir = release_dir.join("bundles").join("wheels");
 
     let mut directories = vec![
         backend_site_packages_path.clone(),
         backend_wheels_dir.clone(),
         runtime_archive_dir.clone(),
-        python_runtime_dir.clone(),
         bundle_wheels_dir.clone(),
         downloads_dir.clone(),
     ];
@@ -127,13 +126,29 @@ pub fn stage_release_with_progress(
         &manifest.backend.sha256,
         &|received, total| progress("backend", received, total),
     )?;
-    let python_runtime_archive_path = stage_artifact(
-        &downloads_dir.join("runtime"),
-        &runtime_archive_dir,
-        &manifest.python_runtime.url,
-        &manifest.python_runtime.sha256,
-        &|received, total| progress("runtime", received, total),
-    )?;
+    // 런타임 재사용: 같은 python version이 이미 추출돼 있고 sha256 마커가 일치하면 재다운로드/추출을 건너뛴다.
+    let runtime_marker = python_runtime_dir.join(".runtime-sha256");
+    let runtime_sha = manifest.python_runtime.sha256.to_ascii_lowercase();
+    let runtime_reused = fs::read_to_string(&runtime_marker)
+        .map(|recorded| recorded.trim() == runtime_sha)
+        .unwrap_or(false)
+        && LauncherPaths::resolve_python_executable(&python_runtime_dir).is_ok();
+    let python_runtime_archive_path = if runtime_reused {
+        python_runtime_dir.clone()
+    } else {
+        let archive = stage_artifact(
+            &downloads_dir.join("runtime"),
+            &runtime_archive_dir,
+            &manifest.python_runtime.url,
+            &manifest.python_runtime.sha256,
+            &|received, total| progress("runtime", received, total),
+        )?;
+        extract_zip_archive(&archive, &python_runtime_dir)?;
+        fs::write(&runtime_marker, &runtime_sha).with_context(|| {
+            format!("Failed to write runtime marker `{}`.", runtime_marker.display())
+        })?;
+        archive
+    };
     let editor_archive_path = if manifest.editor.is_backend_wheel_source() {
         None
     } else {
@@ -157,7 +172,6 @@ pub fn stage_release_with_progress(
         extract_zip_archive(&archive_path, &staged_editor_root_path)?;
         Some(archive_path)
     };
-    extract_zip_archive(&python_runtime_archive_path, &python_runtime_dir)?;
     let python_executable_path = LauncherPaths::resolve_python_executable(&python_runtime_dir)?;
 
     let mut bundle_paths = Vec::new();
@@ -570,6 +584,12 @@ fn extract_zip_archive(archive_path: &Path, destination_dir: &Path) -> Result<()
             )
         })?;
     }
+    extract_zip_into(archive_path, destination_dir)
+}
+
+/// `extract_zip_archive`와 달리 대상 디렉터리를 비우지 않고 그 위에 머지한다. 같은
+/// site-packages에 여러 wheel을 직접 푸는 데 쓴다(wheel은 zip이라 추출 = pip --no-deps 설치와 동등).
+fn extract_zip_into(archive_path: &Path, destination_dir: &Path) -> Result<()> {
     fs::create_dir_all(destination_dir).with_context(|| {
         format!(
             "Failed to create extraction directory `{}`.",
@@ -641,6 +661,9 @@ fn extract_zip_archive(archive_path: &Path, destination_dir: &Path) -> Result<()
     Ok(())
 }
 
+/// 백엔드/번들 wheel을 site-packages에 설치한다. wheel은 zip이므로 직접 추출이 곧
+/// `pip install --no-deps --no-compile --target`과 동등하다(codaro는 py3-none-any이고 의존성은 이미
+/// 런타임에 사전설치돼 있다). pip/ensurepip 프로세스 비용을 없애고, 끝에 .pyc를 사전 컴파일해 첫 부팅을 빠르게 한다.
 fn install_wheels_into_site_packages(
     python_executable: &Path,
     site_packages_dir: &Path,
@@ -651,82 +674,50 @@ fn install_wheels_into_site_packages(
         return Ok(());
     }
 
-    ensure_pip_available(python_executable, logs_dir)?;
     fs::create_dir_all(site_packages_dir).with_context(|| {
         format!(
             "Failed to create backend site-packages directory `{}`.",
             site_packages_dir.display()
         )
     })?;
-    let (stdout_log, stderr_log) = open_process_logs(logs_dir, "provision-wheel-install")?;
+    for wheel_path in wheel_paths {
+        extract_zip_into(wheel_path, site_packages_dir)
+            .with_context(|| format!("Failed to unpack wheel `{}`.", wheel_path.display()))?;
+    }
 
+    // .pyc 사전 컴파일 — best-effort. 실패해도 import 시 lazy 컴파일되므로 설치는 성공으로 본다.
+    if let Err(error) = precompile_site_packages(python_executable, site_packages_dir, logs_dir) {
+        eprintln!("Codaro bytecode precompile skipped (will compile lazily on first run): {error:#}");
+    }
+    Ok(())
+}
+
+/// site-packages를 미리 바이트컴파일한다(.pyc). 첫 백엔드 기동의 import 컴파일 지연을 없앤다.
+fn precompile_site_packages(
+    python_executable: &Path,
+    site_packages_dir: &Path,
+    logs_dir: &Path,
+) -> Result<()> {
+    let (stdout_log, stderr_log) = open_process_logs(logs_dir, "provision-compileall")?;
     let mut command = Command::new(python_executable);
     command
         .arg("-m")
-        .arg("pip")
-        .arg("install")
-        .arg("--disable-pip-version-check")
-        .arg("--no-compile")
-        .arg("--no-deps")
-        .arg("--target")
+        .arg("compileall")
+        .arg("-q")
         .arg(site_packages_dir)
         .stdout(Stdio::from(stdout_log))
         .stderr(Stdio::from(stderr_log));
-    for wheel_path in wheel_paths {
-        command.arg(wheel_path);
-    }
     apply_no_window(&mut command);
-
     let status = command.status().with_context(|| {
         format!(
-            "Failed to run wheel installer with `{}`.",
+            "Failed to run compileall with `{}`.",
             python_executable.display()
         )
     })?;
-    if status.success() {
-        return Ok(());
+    if !status.success() {
+        bail!("compileall exited with status {status}.");
     }
-    bail!("Wheel installation exited with status {status}.");
-}
-
-fn ensure_pip_available(python_executable: &Path, logs_dir: &Path) -> Result<()> {
-    let mut pip_probe = Command::new(python_executable);
-    pip_probe
-        .arg("-m")
-        .arg("pip")
-        .arg("--version")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
-    apply_no_window(&mut pip_probe);
-    let pip_status = pip_probe.status().with_context(|| {
-        format!(
-            "Failed to probe pip using `{}`.",
-            python_executable.display()
-        )
-    })?;
-    if pip_status.success() {
-        return Ok(());
-    }
-
-    let (stdout_log, stderr_log) = open_process_logs(logs_dir, "provision-ensurepip")?;
-    let mut ensurepip = Command::new(python_executable);
-    ensurepip
-        .arg("-m")
-        .arg("ensurepip")
-        .arg("--upgrade")
-        .stdout(Stdio::from(stdout_log))
-        .stderr(Stdio::from(stderr_log));
-    apply_no_window(&mut ensurepip);
-    let ensurepip_status = ensurepip.status().with_context(|| {
-        format!(
-            "Failed to bootstrap pip using `{}`.",
-            python_executable.display()
-        )
-    })?;
-    if ensurepip_status.success() {
-        return Ok(());
-    }
-    bail!("ensurepip exited with status {ensurepip_status}.");
+    Ok(())
 }
 
 fn open_process_logs(logs_dir: &Path, prefix: &str) -> Result<(File, File)> {
@@ -854,7 +845,8 @@ fn archive_output_path(
 #[cfg(test)]
 mod tests {
     use super::{
-        InstallRecord, activate_release, load_manifest_from_source, sha256_hex, stage_release,
+        InstallRecord, activate_release, extract_zip_into, load_manifest_from_source, sha256_hex,
+        stage_release,
     };
     use crate::paths::LauncherPaths;
     use crate::state::ActiveReleaseStore;
@@ -1108,6 +1100,108 @@ mod tests {
 
         assert_eq!(active.release_id, "2026.03.18-1");
         assert_eq!(stored.backend_entry_module, "codaro.cli");
+    }
+
+    #[test]
+    fn extract_zip_into_unpacks_and_merges_wheels() {
+        // B1: wheel은 zip이라 pip 없이 직접 추출하고, 같은 site-packages에 여러 wheel을 머지한다.
+        let temp_dir = tempdir().unwrap();
+        let source = temp_dir.path().join("src");
+        fs::create_dir_all(&source).unwrap();
+        let wheel_a = write_wheel_archive(
+            &source,
+            "pkg_a-1.0-py3-none-any.whl",
+            "pkg_a",
+            "1.0",
+            vec![("pkg_a/__init__.py".into(), b"a\n".to_vec())],
+        );
+        let wheel_b = write_wheel_archive(
+            &source,
+            "pkg_b-1.0-py3-none-any.whl",
+            "pkg_b",
+            "1.0",
+            vec![("pkg_b/__init__.py".into(), b"b\n".to_vec())],
+        );
+        let dest = temp_dir.path().join("site-packages");
+
+        extract_zip_into(&wheel_a, &dest).unwrap();
+        extract_zip_into(&wheel_b, &dest).unwrap();
+
+        assert!(dest.join("pkg_a").join("__init__.py").is_file());
+        assert!(dest.join("pkg_b").join("__init__.py").is_file());
+    }
+
+    #[test]
+    fn stage_release_reuses_runtime_across_releases_with_same_version() {
+        // B2: 같은 python version이면 둘째 release는 런타임을 재다운로드하지 않는다.
+        // 둘째 매니페스트의 런타임 URL을 존재하지 않는 파일로 둬도, 재사용이 동작하면 stage가 성공한다.
+        let temp_dir = tempdir().unwrap();
+        let source_dir = temp_dir.path().join("source");
+        fs::create_dir_all(&source_dir).unwrap();
+        let python_path = write_runtime_archive(&source_dir, "python-runtime.zip");
+        let editor_path = write_editor_archive(&source_dir, "editor.zip");
+        let backend_path = write_wheel_archive(
+            &source_dir,
+            "codaro-0.3.0-py3-none-any.whl",
+            "codaro",
+            "0.3.0",
+            vec![(
+                "codaro/cli.py".into(),
+                "def main():\n    return 'ok'\n".as_bytes().to_vec(),
+            )],
+        );
+        let runtime_sha = sha256_hex(&fs::read(&python_path).unwrap());
+        let editor_sha = sha256_hex(&fs::read(&editor_path).unwrap());
+        let backend_sha = sha256_hex(&fs::read(&backend_path).unwrap());
+        let editor_url = Url::from_file_path(&editor_path).unwrap().to_string();
+        let backend_url = Url::from_file_path(&backend_path).unwrap().to_string();
+
+        let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
+        paths.ensure_layout().unwrap();
+
+        let manifest_a = temp_dir.path().join("manifest-a.json");
+        fs::write(
+            &manifest_a,
+            sample_manifest_json(
+                "rel-A",
+                &Url::from_file_path(&python_path).unwrap().to_string(),
+                runtime_sha.clone(),
+                &editor_url,
+                editor_sha.clone(),
+                &backend_url,
+                backend_sha.clone(),
+                vec![],
+            ),
+        )
+        .unwrap();
+        stage_release(&paths, manifest_a.to_str().unwrap()).unwrap();
+
+        // 둘째: 같은 python version(3.12.12), sha도 동일 → 마커 일치. URL은 없는 파일.
+        let bogus_runtime_url = Url::from_file_path(temp_dir.path().join("missing-runtime.zip"))
+            .unwrap()
+            .to_string();
+        let manifest_b = temp_dir.path().join("manifest-b.json");
+        fs::write(
+            &manifest_b,
+            sample_manifest_json(
+                "rel-B",
+                &bogus_runtime_url,
+                runtime_sha,
+                &editor_url,
+                editor_sha,
+                &backend_url,
+                backend_sha,
+                vec![],
+            ),
+        )
+        .unwrap();
+        let summary_b = stage_release(&paths, manifest_b.to_str().unwrap()).unwrap();
+
+        assert!(summary_b.python_executable_path.is_file());
+        assert_eq!(
+            summary_b.python_executable_path,
+            LauncherPaths::resolve_python_executable(&paths.runtime_store_dir("3.12.12")).unwrap()
+        );
     }
 
     fn write_runtime_archive(directory: &Path, file_name: &str) -> PathBuf {
