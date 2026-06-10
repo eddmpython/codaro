@@ -17,9 +17,16 @@ zip = "2.4.2"
 # 임베디드 네이티브 WebView2 창(브라우저 탭이 아니라 런처 자체 창에서 UI를 띄운다).
 tao = "0.33"
 wry = "0.49"
-windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_Console", "Win32_UI_WindowsAndMessaging"] }
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Console", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }
 # 창/태스크바 아이콘으로 쓸 아바타 PNG 디코드.
 png = "0.17"
+# 트레이 아이콘 + 메뉴(백그라운드 상주, 열기/종료/자동시작 토글).
+tray-icon = "0.19"
+
+# 부팅 자동시작 등록(HKCU\...\Run)은 Windows 전용. winreg는 비-Windows에서 빌드되지 않으므로
+# 타깃 한정 의존성으로 둔다(autostart 모듈은 비-Windows에서 no-op 스텁).
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
 
 [build-dependencies]
 # exe 파일 아이콘 + 버전 리소스(아바타 ICO)를 Windows 실행 파일에 굽는다.

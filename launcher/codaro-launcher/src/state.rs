@@ -48,6 +48,14 @@ pub struct UpdateConfig {
     pub manifest_source: Option<String>,
     pub github_repo: String,
     pub github_manifest_asset_name: String,
+    /// 부팅 시 런처를 트레이 백그라운드로 자동 기동할지. 기존 설정 파일에는 없을 수 있어
+    /// 기본값 true(상주가 제품 기본 동작)로 채운다.
+    #[serde(default = "default_auto_start_on_boot")]
+    pub auto_start_on_boot: bool,
+}
+
+fn default_auto_start_on_boot() -> bool {
+    true
 }
 
 impl Default for UpdateConfig {
@@ -58,6 +66,7 @@ impl Default for UpdateConfig {
             manifest_source: None,
             github_repo: "eddmpython/codaro".into(),
             github_manifest_asset_name: "release-manifest.json".into(),
+            auto_start_on_boot: true,
         }
     }
 }
@@ -351,6 +360,7 @@ mod tests {
             manifest_source: Some("https://example.com/release-manifest.json".into()),
             github_repo: "eddmpython/codaro".into(),
             github_manifest_asset_name: "release-manifest.json".into(),
+            auto_start_on_boot: true,
         };
 
         store.save(&config).unwrap();

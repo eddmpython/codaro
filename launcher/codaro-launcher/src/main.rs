@@ -1,15 +1,18 @@
 #![cfg_attr(all(target_os = "windows", not(test)), windows_subsystem = "windows")]
 
+mod autostart;
 mod backend;
 mod download;
 mod failure;
 mod github;
+mod instance;
 mod ipc;
 mod manifest;
 mod paths;
 mod provision;
 mod self_update;
 mod state;
+mod tray;
 mod webview;
 
 use anyhow::{Context, Result, bail};
@@ -69,6 +72,9 @@ struct LaunchArgs {
     port: u16,
     #[arg(long)]
     no_webview: bool,
+    // 부팅 자동시작 경로. 창을 숨긴 채 트레이로만 상주 기동한다(사용자가 트레이에서 연다).
+    #[arg(long)]
+    background: bool,
     #[arg(long)]
     workspace_root: Option<PathBuf>,
     path: Option<PathBuf>,
@@ -82,6 +88,7 @@ impl Default for LaunchArgs {
             host: "127.0.0.1".to_string(),
             port: 0,
             no_webview: false,
+            background: false,
             workspace_root: None,
             path: None,
         }
@@ -567,14 +574,26 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
     use tao::event::{Event, WindowEvent};
     use tao::event_loop::{ControlFlow, EventLoopBuilder};
     use tao::window::WindowBuilder;
+    use tray_icon::menu::MenuEvent;
+    use tray_icon::{MouseButton, MouseButtonState, TrayIconEvent};
     use wry::{Rect, WebViewBuilder};
 
     hide_console_window();
+
+    // 단일 인스턴스: 이미 상주 중이면 그쪽 창을 띄우라고 신호만 보내고 조용히 종료한다.
+    let instance_guard = match instance::acquire_or_signal_existing() {
+        instance::Acquisition::AlreadyRunning => return Ok(()),
+        instance::Acquisition::Primary(guard) => guard,
+    };
+
+    // --background(부팅 자동시작)면 창을 숨긴 채 트레이로만 상주한다(사용자가 트레이에서 연다).
+    let start_hidden = args.background;
 
     let event_loop = EventLoopBuilder::<AppEvent>::with_user_event().build();
 
     let mut window_builder = WindowBuilder::new()
         .with_title("Codaro")
+        .with_visible(!start_hidden)
         .with_inner_size(LogicalSize::new(1280.0, 860.0))
         .with_min_inner_size(LogicalSize::new(900.0, 640.0));
     if let Some(icon) = load_window_icon() {
@@ -591,6 +610,45 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         .with_html(launch_html)
         .build(&window)
         .context("failed to create webview")?;
+
+    // 트레이: 창을 닫아도 여기서 다시 열거나 자동시작을 토글하거나 완전히 종료할 수 있다.
+    let autostart_enabled = std::env::current_exe()
+        .ok()
+        .map(|exe| autostart::is_enabled(&exe))
+        .unwrap_or(false);
+    let tray_handle =
+        tray::build_tray(autostart_enabled).context("failed to create system tray")?;
+
+    // 메뉴/트레이 클릭을 이벤트 루프로 펌프한다. 글로벌 핸들러는 Send+Sync라야 하므로
+    // proxy를 Arc<Mutex<>>로 감싼다.
+    let menu_proxy = Arc::new(Mutex::new(event_loop.create_proxy()));
+    let tray_proxy = menu_proxy.clone();
+    MenuEvent::set_event_handler(Some(move |event: MenuEvent| {
+        if let Ok(proxy) = menu_proxy.lock() {
+            let _ = proxy.send_event(AppEvent::TrayMenu(event.id.0));
+        }
+    }));
+    TrayIconEvent::set_event_handler(Some(move |event: TrayIconEvent| {
+        // 트레이 아이콘 좌클릭 = 창 열기.
+        if let TrayIconEvent::Click {
+            button: MouseButton::Left,
+            button_state: MouseButtonState::Up,
+            ..
+        } = event
+        {
+            if let Ok(proxy) = tray_proxy.lock() {
+                let _ = proxy.send_event(AppEvent::ShowWindow);
+            }
+        }
+    }));
+
+    // 두 번째 인스턴스가 보내는 표시 신호를 감시해 창을 띄운다.
+    instance_guard.watch_show_requests({
+        let proxy = event_loop.create_proxy();
+        move || {
+            let _ = proxy.send_event(AppEvent::ShowWindow);
+        }
+    });
 
     let child_slot: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
 
@@ -621,12 +679,22 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         });
     }
 
+    let loop_paths = paths.clone();
+    let mut autostart_synced = false;
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
         match event {
             Event::UserEvent(AppEvent::Ready(url)) => {
                 let _ = webview.load_url(&url);
-                window.set_focus();
+                if !start_hidden {
+                    window.set_visible(true);
+                    window.set_focus();
+                }
+                // 첫 정상 기동 시 부팅 자동시작을 등록한다(설정 on이고 아직 미등록일 때).
+                if !autostart_synced {
+                    autostart_synced = true;
+                    sync_autostart_on_first_launch(&loop_paths, &tray_handle);
+                }
             }
             Event::UserEvent(AppEvent::Progress(payload)) => {
                 let json = serde_json::to_string(&payload).unwrap_or_default();
@@ -638,6 +706,30 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 let _ =
                     webview.evaluate_script(&format!("window.setFailure&&window.setFailure({json})"));
             }
+            Event::UserEvent(AppEvent::ShowWindow) => {
+                window.set_visible(true);
+                window.set_minimized(false);
+                window.set_focus();
+            }
+            Event::UserEvent(AppEvent::TrayMenu(id)) => match tray_handle.action_for(&id) {
+                Some(tray::TrayAction::Open) => {
+                    window.set_visible(true);
+                    window.set_minimized(false);
+                    window.set_focus();
+                }
+                Some(tray::TrayAction::ToggleAutostart) => {
+                    toggle_autostart(&loop_paths, &tray_handle);
+                }
+                Some(tray::TrayAction::Quit) => {
+                    if let Ok(mut slot) = child_slot.lock() {
+                        if let Some(mut child) = slot.take() {
+                            let _ = child.kill();
+                        }
+                    }
+                    *control_flow = ControlFlow::Exit;
+                }
+                None => {}
+            },
             Event::WindowEvent {
                 event: WindowEvent::Resized(size),
                 ..
@@ -651,16 +743,73 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 event: WindowEvent::CloseRequested,
                 ..
             } => {
-                if let Ok(mut slot) = child_slot.lock() {
-                    if let Some(mut child) = slot.take() {
-                        let _ = child.kill();
-                    }
-                }
-                *control_flow = ControlFlow::Exit;
+                // 창을 닫아도 백엔드(엔진)는 상주시킨다. 완전 종료는 트레이 "종료"로만.
+                window.set_visible(false);
             }
             _ => {}
         }
     });
+}
+
+/// 첫 정상 기동 시, 설정이 켜져 있으면 부팅 자동시작을 등록하고 트레이 체크 상태를 맞춘다.
+fn sync_autostart_on_first_launch(paths: &LauncherPaths, tray_handle: &tray::TrayHandle) {
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    if read_autostart_pref(paths) && !autostart::is_enabled(&exe) {
+        if let Err(error) = autostart::enable(&exe) {
+            eprintln!("Codaro: failed to register autostart: {error:#}");
+        }
+    }
+    tray_handle.set_autostart_checked(autostart::is_enabled(&exe));
+}
+
+/// 트레이 "시작 시 자동 실행" 토글 처리. 레지스트리(진실)의 현재 상태를 뒤집고, 체크박스를
+/// 그 진실에 맞춰 보정한 뒤 설정에 영속한다. muda가 클릭 시 체크를 자동 토글하든 말든,
+/// 끝 상태는 항상 레지스트리 진실과 일치한다(불일치 자가복구).
+fn toggle_autostart(paths: &LauncherPaths, tray_handle: &tray::TrayHandle) {
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    let target = !autostart::is_enabled(&exe);
+    let result = if target {
+        autostart::enable(&exe)
+    } else {
+        autostart::disable()
+    };
+    if let Err(error) = result {
+        eprintln!("Codaro: failed to update autostart: {error:#}");
+    }
+    let truth = autostart::is_enabled(&exe);
+    tray_handle.set_autostart_checked(truth);
+    write_autostart_pref(paths, truth);
+}
+
+/// 부팅 자동시작 설정값을 읽는다(설정 파일이 없거나 읽기 실패면 기본 true).
+fn read_autostart_pref(paths: &LauncherPaths) -> bool {
+    let stores = LauncherStateStores::new(paths);
+    stores
+        .update_config
+        .load_optional()
+        .ok()
+        .flatten()
+        .map(|config| config.auto_start_on_boot)
+        .unwrap_or(true)
+}
+
+/// 부팅 자동시작 설정값을 저장한다(나머지 설정은 보존).
+fn write_autostart_pref(paths: &LauncherPaths, enabled: bool) {
+    let stores = LauncherStateStores::new(paths);
+    let mut config = stores
+        .update_config
+        .load_optional()
+        .ok()
+        .flatten()
+        .unwrap_or_default();
+    config.auto_start_on_boot = enabled;
+    if let Err(error) = stores.update_config.save(&config) {
+        eprintln!("Codaro: failed to persist autostart preference: {error:#}");
+    }
 }
 
 #[derive(Debug)]
@@ -668,6 +817,8 @@ enum AppEvent {
     Ready(String),
     Progress(ipc::ProgressPayload),
     Fail(failure::FailureCard),
+    ShowWindow,
+    TrayMenu(String),
 }
 
 /// 다운로드 진행 콜백 `(artifact_label, received, total)`을 사용자용 IPC 진행률로 변환한다.
@@ -2004,6 +2155,7 @@ mod tests {
                 manifest_source: Some(manifest_source.to_str().unwrap().into()),
                 github_repo: "eddmpython/codaro".into(),
                 github_manifest_asset_name: "release-manifest.json".into(),
+                auto_start_on_boot: true,
             })
             .unwrap();
 
@@ -2093,6 +2245,7 @@ mod tests {
                 manifest_source: Some(manifest_source.to_str().unwrap().into()),
                 github_repo: "eddmpython/codaro".into(),
                 github_manifest_asset_name: "release-manifest.json".into(),
+                auto_start_on_boot: true,
             })
             .unwrap();
 
@@ -2199,6 +2352,7 @@ mod tests {
                 manifest_source: None,
                 github_repo: "eddmpython/codaro".into(),
                 github_manifest_asset_name: "release-manifest.json".into(),
+                auto_start_on_boot: true,
             })
             .unwrap();
     }
