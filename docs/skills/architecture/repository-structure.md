@@ -41,6 +41,7 @@ codaro/
 ├── editor/           # product UI surface
 ├── landing/          # GitHub Pages and docs/blog web surface
 ├── launcher/         # desktop launcher, packaging notes, release updater
+├── mainPlan/         # 제품·커리큘럼 방향 PRD(전략 SSOT) — 토론으로 합성한 장기 계획 문서
 ├── notebooks/        # distributable notebooks derived from curricula
 ├── src/              # Python package source
 └── tests/            # 도메인 트리(tests/<domain>/): pytest suites + 같은 도메인 verify/audit 드라이버 + gate runner(run.py) + root enforcer(verifyRootClean.py) + 공유 인프라 + _attempts 샌드박스(git 미추적·로컬 전용)
@@ -78,6 +79,7 @@ Root files are limited to package metadata and public project documents. Example
 | Public runnable demos | `demos/` |
 | Desktop launcher and update logic | `launcher/` |
 | Brand source assets | `assets/` |
+| 제품·커리큘럼 방향 PRD(전략 계획 SSOT) | `mainPlan/` |
 | Tests and verifiers | `tests/` |
 | Gate scratch/logs/reports | `output/test-runner/<gate>/` |
 | User-installed share packs | `localData/sharePacks/` |
