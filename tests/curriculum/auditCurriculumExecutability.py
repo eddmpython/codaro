@@ -23,6 +23,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import traceback
@@ -104,8 +105,6 @@ def _neutralizeInputControl() -> None:
             setattr(pyautogui, name, _wrapNoop(original))
 
 
-_configureHeadless()
-
 ROOT = Path(__file__).resolve().parent.parent.parent
 CURRICULA = ROOT / "curricula"
 REPORT_PATH = ROOT / "output" / "test-runner" / "curriculum-executability" / "curriculum-executability-report.json"
@@ -149,12 +148,13 @@ def loadYaml(path: Path) -> dict[str, Any] | None:
         return {"_loadError": f"yaml: {exc}"}
 
 
+# keys are the real top-level import names; values are the pip distribution names.
 IMPORT_TO_PKG = {
     "cv2": "opencv-python",
     "docx": "python-docx",
     "mpl_toolkits": "matplotlib",
     "sklearn": "scikit-learn",
-    "pil": "pillow",
+    "PIL": "pillow",
     "yaml": "pyyaml",
     "bs4": "beautifulsoup4",
     "fitz": "pymupdf",
@@ -169,6 +169,11 @@ IMPORT_TO_PKG = {
     "OpenSSL": "pyopenssl",
     "Crypto": "pycryptodome",
 }
+
+# Import-root → distribution lookup is case-insensitive so an import name's casing
+# (PIL, OpenSSL, Crypto) can never cause a false undeclared-package classification.
+_IMPORT_TO_PKG_LOWER = {key.lower(): value for key, value in IMPORT_TO_PKG.items()}
+_NO_MODULE_RE = re.compile(r"No module named ['\"]([\w.]+)['\"]")
 
 
 def declaredPackageNames(data: dict[str, Any]) -> set[str]:
@@ -191,8 +196,26 @@ def packageFromMissingDetail(detail: str) -> str | None:
         if not name:
             return None
         importRoot = name.split(".")[0]
-        mapped = IMPORT_TO_PKG.get(importRoot, importRoot)
+        mapped = _IMPORT_TO_PKG_LOWER.get(importRoot.lower(), importRoot)
         return mapped.lower().replace("_", "-")
+    return None
+
+
+def declaredMissingModule(detail: str, declaredPackages: set[str]) -> str | None:
+    """Return a declared package name when `detail` shows that a declared dependency is
+    missing from this environment, even when the ImportError is surfaced indirectly — e.g. a
+    subprocess/pytest step whose collection fails and is re-raised as an AssertionError.
+
+    This lets the gate treat a declared-but-uninstalled package as an environment
+    `missing-package` skip rather than a content `real-bug`. It only fires for packages the
+    lesson actually declared, so a genuine code defect that never names a declared package
+    stays a real-bug.
+    """
+    for match in _NO_MODULE_RE.finditer(detail):
+        importRoot = match.group(1).split(".")[0]
+        mapped = _IMPORT_TO_PKG_LOWER.get(importRoot.lower(), importRoot).lower().replace("_", "-")
+        if mapped in declaredPackages:
+            return mapped
     return None
 
 
@@ -250,6 +273,8 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
         snippet = section.get("snippet")
         if isinstance(snippet, str) and snippet.strip():
             category, detail = execCode(snippet, namespace, f"{relPath}::{sectionId}.snippet")
+            if category in ("real-bug", "runtime-other") and declaredMissingModule(detail, declaredPackages):
+                category = "missing-package"
             if category == "real-bug" and priorFailureSeen and detail.startswith("NameError"):
                 category = "cascade-failure"
             if category == "missing-package":
@@ -267,6 +292,8 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
         if isinstance(solution, str) and solution.strip():
             solutionNs = dict(namespace)
             category, detail = execCode(solution, solutionNs, f"{relPath}::{sectionId}.solution")
+            if category in ("real-bug", "runtime-other") and declaredMissingModule(detail, declaredPackages):
+                category = "missing-package"
             if category == "real-bug" and priorFailureSeen and detail.startswith("NameError"):
                 category = "cascade-failure"
             if category == "missing-package":
@@ -280,6 +307,7 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
 
 def runAudit(root: Path) -> list[dict[str, Any]]:
     """모든 yaml 을 격리 스크래치 디렉터리에서 누적 실행하고 결과 리스트를 반환한다."""
+    _configureHeadless()
     files = sorted(p.resolve() for p in root.rglob("*.yaml"))
     print(f"audit {len(files)} curriculum files under {root.relative_to(ROOT)}")
     allResults: list[dict[str, Any]] = []

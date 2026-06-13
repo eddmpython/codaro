@@ -517,3 +517,162 @@ def testToolResultsByNameFiltersResultPayloads() -> None:
     assert smoke.toolResultsByName(results, "write-curriculum-yaml") == [{"contractGapCount": 0}]
     assert smoke.intSignal({"contractGapCount": 0}, "contractGapCount") == 0
     assert smoke.intSignal({"contractGapCount": True}, "contractGapCount") == -1
+
+
+def makeAvailabilityCase(smoke, action: str):
+    return smoke.failedCase(
+        "provider-availability",
+        time.monotonic(),
+        smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+        smoke.ProviderRuntimeError("auth precondition", action=action, provider="oauth-chatgpt"),
+    )
+
+
+def testLiveCredentialUnusableCodeDetectsReloginRequired() -> None:
+    smoke = loadSmoke()
+    cases = (
+        makeAvailabilityCase(smoke, "reused"),
+        smoke.LiveSmokeCase(caseId="short-answer", passed=False, status="provider_relogin_required", durationMs=1),
+    )
+
+    assert smoke.liveCredentialUnusableCode(cases) == "provider_relogin_required"
+
+
+def testLiveCredentialUnusableCodeDetectsLoginRequired() -> None:
+    smoke = loadSmoke()
+
+    assert smoke.liveCredentialUnusableCode((makeAvailabilityCase(smoke, "no_token"),)) == "provider_login_required"
+
+
+def testLiveCredentialUnusableCodeIgnoresPassedAvailability() -> None:
+    smoke = loadSmoke()
+    cases = (
+        smoke.LiveSmokeCase(caseId="provider-availability", passed=True, status="passed", durationMs=1),
+        smoke.LiveSmokeCase(caseId="live-tool-loop", passed=False, status="live curriculum quality failed", durationMs=1),
+    )
+
+    assert smoke.liveCredentialUnusableCode(cases) is None
+
+
+def testLiveCredentialUnusableCodeIgnoresCompatibilityBreakage() -> None:
+    smoke = loadSmoke()
+
+    # provider_compatibility_error is recoverable=False: a genuine integration breakage must
+    # stay a hard failure, never a soft skip.
+    assert smoke.liveCredentialUnusableCode((makeAvailabilityCase(smoke, "check_endpoint"),)) is None
+
+
+def testLiveCredentialUnusableCodeIgnoresNetworkError() -> None:
+    smoke = loadSmoke()
+
+    assert smoke.liveCredentialUnusableCode((makeAvailabilityCase(smoke, "network"),)) is None
+
+
+def testRunLiveProviderClassifiesUnusableCredentialAsSoftSkip(monkeypatch) -> None:
+    smoke = loadSmoke()
+
+    def failedCase(caseId, status="failed"):
+        return smoke.LiveSmokeCase(caseId=caseId, passed=False, status=status, durationMs=1)
+
+    async def failedToolCase(_config):
+        return failedCase("live-tool-loop", "live curriculum quality failed")
+
+    async def failedCellCase(_config):
+        return failedCase("live-cell-call-loop", "missing live cell-call")
+
+    selection = smoke.LiveProviderSelection(
+        provider="oauth-chatgpt",
+        config=smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+    )
+    monkeypatch.setattr(smoke, "runProviderAvailabilityCase", lambda _config: makeAvailabilityCase(smoke, "reused"))
+    monkeypatch.setattr(smoke, "runShortAnswerCase", lambda _config: failedCase("short-answer", "provider_relogin_required"))
+    monkeypatch.setattr(smoke, "runTeacherAnswerCase", lambda _config: failedCase("teacher-answer", "provider_relogin_required"))
+    monkeypatch.setattr(
+        smoke,
+        "runClarificationGateCase",
+        lambda: smoke.LiveSmokeCase(caseId="clarification-before-provider", passed=True, status="passed", durationMs=0),
+    )
+    monkeypatch.setattr(smoke, "runToolLoopCase", failedToolCase)
+    monkeypatch.setattr(smoke, "runCellCallLoopCase", failedCellCase)
+
+    run = smoke.runLiveProvider(selection)
+
+    assert run.status == "live credential unusable"
+    assert run.credentialUnusable is True
+    assert run.credentialSkipped is True
+    assert run.passed is False
+    assert run.nextAction
+
+
+def testRunLiveProviderKeepsHardFailWhenAvailabilityPasses(monkeypatch) -> None:
+    smoke = loadSmoke()
+
+    def passedCase(caseId):
+        return smoke.LiveSmokeCase(caseId=caseId, passed=True, status="passed", durationMs=1)
+
+    async def failedToolCase(_config):
+        return smoke.LiveSmokeCase(caseId="live-tool-loop", passed=False, status="live curriculum quality failed", durationMs=1)
+
+    async def passedCellCase(_config):
+        return passedCase("live-cell-call-loop")
+
+    selection = smoke.LiveProviderSelection(
+        provider="oauth-chatgpt",
+        config=smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+    )
+    monkeypatch.setattr(smoke, "runProviderAvailabilityCase", lambda _config: passedCase("provider-availability"))
+    monkeypatch.setattr(smoke, "runShortAnswerCase", lambda _config: passedCase("short-answer"))
+    monkeypatch.setattr(smoke, "runTeacherAnswerCase", lambda _config: passedCase("teacher-answer"))
+    monkeypatch.setattr(smoke, "runClarificationGateCase", lambda: passedCase("clarification-before-provider"))
+    monkeypatch.setattr(smoke, "runToolLoopCase", failedToolCase)
+    monkeypatch.setattr(smoke, "runCellCallLoopCase", passedCellCase)
+
+    run = smoke.runLiveProvider(selection)
+
+    # Availability passed but a downstream product case failed → genuine regression, hard fail.
+    assert run.status == "failed"
+    assert run.credentialSkipped is False
+
+
+def testRunSingleProviderSoftSkipsUnusableCredential(monkeypatch, capsys) -> None:
+    smoke = loadSmoke()
+    writtenReports: list[dict] = []
+    selection = smoke.LiveProviderSelection(
+        provider="oauth-chatgpt",
+        config=smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+    )
+    run = smoke.LiveProviderRun(
+        selection=selection,
+        passed=False,
+        status="live credential unusable",
+        cases=(makeAvailabilityCase(smoke, "reused"),),
+        nextAction="Open Provider 설정에서 ChatGPT OAuth login을 완료한 뒤 다시 실행하세요.",
+    )
+    monkeypatch.setattr(smoke, "selectLiveProvider", lambda providerOverride=None: selection)
+    monkeypatch.setattr(smoke, "runLiveProvider", lambda _selection: run)
+    monkeypatch.setattr(smoke, "writeLiveSmokeReport", lambda payload: writtenReports.append(payload))
+
+    assert smoke.runSingleProvider() == smoke.MISSING_CREDENTIAL_EXIT
+    output = capsys.readouterr().out
+    assert "live credential unusable" in output
+    assert writtenReports and writtenReports[0]["status"] == "live credential unusable"
+
+
+def testMatrixTreatsUnusableCredentialAsSoftSkip() -> None:
+    smoke = loadSmoke()
+    runs = (makeRun(smoke, "oauth-chatgpt", "live credential unusable"),)
+
+    assert smoke.matrixExitCode(runs) == smoke.MISSING_CREDENTIAL_EXIT
+    assert smoke.matrixStatus(runs) == "live credential unusable"
+
+
+def testMatrixUnusableWithPassIsPartialSkip() -> None:
+    smoke = loadSmoke()
+    runs = (
+        makeRun(smoke, "oauth-chatgpt", "passed", passed=True),
+        makeRun(smoke, "openai", "live credential unusable"),
+    )
+
+    assert smoke.matrixExitCode(runs) == smoke.MISSING_CREDENTIAL_EXIT
+    assert smoke.matrixStatus(runs) == "partial credential missing"
+    assert smoke.matrixRunPayload(runs)["summary"]["credentialUnusable"] == 1

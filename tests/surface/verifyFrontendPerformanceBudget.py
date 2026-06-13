@@ -24,7 +24,13 @@ MAX_SINGLE_JS_BYTES = 400_000
 MAX_ENTRY_JS_BYTES = 320_000
 MAX_TOTAL_JS_BYTES = 7_500_000
 MAX_APP_SHELL_JS_BYTES = MAX_TOTAL_JS_BYTES
-MAX_LAZY_CURRICULUM_JS_BYTES = 12_000_000
+# Coarse growth guard on the SUM of fully lazy-loaded per-lesson chunks. Each lesson chunk is
+# fetched only when its lesson opens (~25KB avg, ~64KB max), so this total does not affect
+# first-load UX — the upfront guard is MAX_APP_SHELL_JS_BYTES (~22% used) and the per-lesson
+# UX guard is MAX_SINGLE_JS_BYTES (both stay tight). The curriculum legitimately grows lesson
+# by lesson and crossed 12MB; this ceiling carries headroom for continued additions while still
+# catching a runaway regression. Raise it as the curriculum keeps growing.
+MAX_LAZY_CURRICULUM_JS_BYTES = 13_500_000
 MAX_CSS_BYTES = 160_000
 REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
 

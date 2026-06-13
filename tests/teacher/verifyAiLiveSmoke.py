@@ -30,6 +30,16 @@ MISSING_CREDENTIAL_EXIT = 2
 ROOT = Path(__file__).resolve().parents[2]
 LIVE_SMOKE_REPORT_PATH = ROOT / "output" / "test-runner" / "ai-live-smoke" / "live-smoke-report.json"
 
+# Recoverable auth-precondition diagnostic codes: the stored live credential exists but
+# cannot be used until the operator (re)logs in. This is the same "environment not ready"
+# class as a missing credential — not a product defect — so a run blocked solely by it is a
+# soft skip, never a hard failure. Compatibility breakage (recoverable=False) and network
+# errors are deliberately excluded so genuine regressions still hard-fail.
+RECOVERABLE_AUTH_DIAGNOSTIC_CODES = (
+    "provider_login_required",
+    "provider_relogin_required",
+)
+
 LIVE_PROVIDER_ERRORS = (
     AttributeError,
     ChatGPTOAuthError,
@@ -116,6 +126,14 @@ class LiveProviderRun:
     @property
     def credentialMissing(self) -> bool:
         return self.status == "live credential missing"
+
+    @property
+    def credentialUnusable(self) -> bool:
+        return self.status == "live credential unusable"
+
+    @property
+    def credentialSkipped(self) -> bool:
+        return self.credentialMissing or self.credentialUnusable
 
     def payload(self) -> dict[str, Any]:
         data: dict[str, Any] = {
@@ -239,7 +257,12 @@ def runSingleProvider() -> int:
     run = runLiveProvider(selection)
     payload = stampLiveSmokePayload(singleRunPayload(run), startedAt=startedAt, startedAtMonotonic=startedAtMonotonic)
     writeLiveSmokeReport(payload)
-    if run.credentialMissing:
+    if run.credentialSkipped:
+        if run.credentialUnusable:
+            print(
+                f"skip: AI live smoke — {selection.provider} live credential unusable; "
+                f"{run.nextAction or 'relogin required'}"
+            )
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return MISSING_CREDENTIAL_EXIT
 
@@ -289,12 +312,42 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
         cellCallCase,
     )
     passed = all(case.passed for case in cases)
+    if not passed and liveCredentialUnusableCode(cases) is not None:
+        return LiveProviderRun(
+            selection=selection,
+            passed=False,
+            status="live credential unusable",
+            cases=cases,
+            nextAction=liveCredentialNextAction(selection.provider),
+        )
     return LiveProviderRun(
         selection=selection,
         passed=passed,
         status="passed" if passed else "failed",
         cases=cases,
     )
+
+
+def liveCredentialUnusableCode(cases: tuple[LiveSmokeCase, ...]) -> str | None:
+    """Return the recoverable auth diagnostic code when the live provider credential is
+    present but unusable (login/relogin required), else None.
+
+    Keyed on provider-availability: when checkAvailable cannot reach the provider because
+    the stored session needs (re)login, every downstream provider case is blocked by the
+    same cause, so the whole run is an environment-not-ready skip — the same class as a
+    missing credential — not a product failure. Any other failure (provider unavailable for
+    an unknown reason, network error, compatibility breakage, tool-loop/quality regression)
+    keeps the run a hard failure so genuine defects are never masked.
+    """
+    for case in cases:
+        if case.caseId != "provider-availability":
+            continue
+        if case.passed:
+            return None
+        diagnostic = case.diagnostic if isinstance(case.diagnostic, dict) else {}
+        code = str(diagnostic.get("code") or case.signals.get("diagnosticCode") or "")
+        return code if code in RECOVERABLE_AUTH_DIAGNOSTIC_CODES else None
+    return None
 
 
 def runLiveCaseWithNetworkRetry(
@@ -421,6 +474,7 @@ def matrixRunPayload(runs: tuple[LiveProviderRun, ...]) -> dict[str, Any]:
         "passed": sum(1 for run in runs if run.passed),
         "failed": sum(1 for run in runs if run.status == "failed"),
         "credentialMissing": sum(1 for run in runs if run.credentialMissing),
+        "credentialUnusable": sum(1 for run in runs if run.credentialUnusable),
         "total": len(runs),
     }
     return {
@@ -435,9 +489,12 @@ def matrixRunPayload(runs: tuple[LiveProviderRun, ...]) -> dict[str, Any]:
 def matrixStatus(runs: tuple[LiveProviderRun, ...]) -> str:
     if any(run.status == "failed" for run in runs):
         return "failed"
-    if any(run.credentialMissing for run in runs):
+    skipped = tuple(run for run in runs if run.credentialSkipped)
+    if skipped:
         if any(run.passed for run in runs):
             return "partial credential missing"
+        if all(run.credentialUnusable for run in skipped):
+            return "live credential unusable"
         return "live credential missing"
     return "passed"
 
@@ -445,7 +502,7 @@ def matrixStatus(runs: tuple[LiveProviderRun, ...]) -> str:
 def matrixExitCode(runs: tuple[LiveProviderRun, ...]) -> int:
     if any(run.status == "failed" for run in runs):
         return 1
-    if any(run.credentialMissing for run in runs):
+    if any(run.credentialSkipped for run in runs):
         return MISSING_CREDENTIAL_EXIT
     return 0
 
