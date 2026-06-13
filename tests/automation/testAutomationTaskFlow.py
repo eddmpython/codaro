@@ -160,10 +160,55 @@ def testNotifyCompletionNoOpWithoutChannels() -> None:
     asyncio.run(_notifyTaskCompletion(task, run))
 
 
-def testNotifyCompletionBroadcastsWhenChannel(monkeypatch) -> None:
-    import codaro.automation.shared as shared
-    from codaro.automation.taskFlow import _notifyTaskCompletion
+def _makeDiff(*, statusChanged: bool, previousStatus: str = "failed", currentStatus: str = "success") -> object:
+    from codaro.automation.reportDiff import RunDiff
+
+    return RunDiff(
+        hasPrevious=True,
+        previousStatus=previousStatus,
+        currentStatus=currentStatus,
+        statusChanged=statusChanged,
+        outputLineDelta=0,
+        summary=f"상태 {previousStatus}→{currentStatus}" if statusChanged else f"상태 {currentStatus} 유지",
+    )
+
+
+def testShouldNotifyRunFailureAlwaysSuccessOnlyOnRecovery() -> None:
+    from codaro.automation.taskFlow import _shouldNotifyRun
+    from codaro.automation.taskModel import TaskRun, TaskStatus
+
+    # 실패·중단은 전환 여부와 무관하게 항상 알린다.
+    assert _shouldNotifyRun(TaskRun(status=TaskStatus.FAILED), _makeDiff(statusChanged=False)) is True
+    assert _shouldNotifyRun(TaskRun(status=TaskStatus.CANCELLED), _makeDiff(statusChanged=False)) is True
+    # 성공은 직전이 실패였던 복구(statusChanged)일 때만 알리고, 반복 성공은 침묵(스팸 방지).
+    assert _shouldNotifyRun(TaskRun(status=TaskStatus.SUCCESS), _makeDiff(statusChanged=True)) is True
+    assert _shouldNotifyRun(TaskRun(status=TaskStatus.SUCCESS), _makeDiff(statusChanged=False)) is False
+
+
+def testNotificationMessageDistinguishesFailureRecoveryAndError() -> None:
+    from codaro.automation.taskFlow import _taskNotificationMessage
     from codaro.automation.taskModel import TaskDefinition, TaskRun, TaskStatus
+
+    task = TaskDefinition(name="Nightly", documentPath="n.py")
+    failMessage = _taskNotificationMessage(
+        task,
+        TaskRun(taskId=task.id, status=TaskStatus.FAILED, error="ValueError: boom\n  stack frame"),
+        _makeDiff(statusChanged=True, previousStatus="success", currentStatus="failed"),
+    )
+    assert "실패" in failMessage and "Nightly" in failMessage and "ValueError: boom" in failMessage
+    recoverMessage = _taskNotificationMessage(
+        task,
+        TaskRun(taskId=task.id, status=TaskStatus.SUCCESS),
+        _makeDiff(statusChanged=True, previousStatus="failed", currentStatus="success"),
+    )
+    assert "복구" in recoverMessage and "Nightly" in recoverMessage
+
+
+def testNotifyCompletionAlertsOnFailureNotRoutineSuccess(monkeypatch) -> None:
+    import codaro.automation.shared as shared
+    from codaro.automation.taskFlow import _notifyTaskCompletion, createAutomationTaskPayload
+    from codaro.automation.taskModel import TaskRun, TaskStatus
+    from codaro.automation.taskRegistry import getTaskRegistry
 
     sent: list[str] = []
 
@@ -176,10 +221,52 @@ def testNotifyCompletionBroadcastsWhenChannel(monkeypatch) -> None:
             return []
 
     monkeypatch.setattr(shared, "getSharedMessageBridge", lambda: _FakeBridge())
-    task = TaskDefinition(name="Weekly", documentPath="r.py")
-    run = TaskRun(taskId=task.id, status=TaskStatus.SUCCESS)
-    asyncio.run(_notifyTaskCompletion(task, run))
-    assert sent and "Weekly" in sent[0] and "완료" in sent[0]
+
+    registry = getTaskRegistry()
+    created = createAutomationTaskPayload(name="Weekly", documentPath="r.py")
+    taskId = created["id"]
+    task = registry.get(taskId)
+
+    def runWith(status: TaskStatus, error: str | None = None) -> None:
+        run = TaskRun(taskId=taskId, status=status, error=error)
+        registry.addRun(run)
+        asyncio.run(_notifyTaskCompletion(task, run))
+
+    # 첫 성공·반복 성공 — 스팸 방지로 침묵.
+    runWith(TaskStatus.SUCCESS)
+    runWith(TaskStatus.SUCCESS)
+    assert sent == []
+
+    # 실패 — 항상 알림.
+    runWith(TaskStatus.FAILED, error="boom")
+    assert len(sent) == 1 and "실패" in sent[0] and "Weekly" in sent[0]
+
+    # 복구(실패→성공) — 알림.
+    runWith(TaskStatus.SUCCESS)
+    assert len(sent) == 2 and "복구" in sent[1]
+
+
+def testListTasksIncludesLastRunStatus() -> None:
+    from codaro.automation.taskFlow import createAutomationTaskPayload, listAutomationTasksPayload
+    from codaro.automation.taskModel import TaskRun, TaskStatus
+    from codaro.automation.taskRegistry import getTaskRegistry
+
+    created = createAutomationTaskPayload(name="Daily", documentPath="d.py")
+    # 실행 전 — lastRun 없음.
+    before = listAutomationTasksPayload()
+    assert before["tasks"][0].get("lastRun") is None
+
+    getTaskRegistry().addRun(
+        TaskRun(
+            taskId=created["id"],
+            status=TaskStatus.FAILED,
+            finishedAt="2026-06-10T00:00:00+00:00",
+        )
+    )
+    after = listAutomationTasksPayload()
+    entry = next(item for item in after["tasks"] if item["id"] == created["id"])
+    assert entry["lastRun"]["status"] == "failed"
+    assert entry["lastRun"]["finishedAt"] == "2026-06-10T00:00:00+00:00"
 
 
 def testEStopCancelsScheduledAutomationTasks(tmp_path) -> None:

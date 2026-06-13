@@ -6,14 +6,45 @@ from typing import Any
 
 from .eStop import getEmergencyStop
 from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
+from .reportDiff import RunDiff
 from .scheduler import TaskScheduler, parseScheduleSeconds
-from .taskModel import TaskDefinition, TaskRun
+from .taskModel import TaskDefinition, TaskRun, TaskStatus
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
 
 
+def _shouldNotifyRun(run: TaskRun, diff: RunDiff) -> bool:
+    """무인 실행 알림 정책 — 실패·중단은 항상 알린다(set&forget 신뢰의 핵심).
+
+    성공은 직전이 다른 상태였을 때(=실패에서 복구)만 알린다. 매 주기 성공 알림은 스팸이라
+    사용자가 채널을 음소거하게 만들고, 그러면 정작 실패도 함께 묻힌다 — 알림 피로 방지.
+    """
+    if run.status != TaskStatus.SUCCESS:
+        return True
+    return diff.statusChanged
+
+
+def _taskNotificationMessage(task: TaskDefinition, run: TaskRun, diff: RunDiff) -> str:
+    """알림 본문. 실패/중단/복구/완료를 머리말로 구분하고, 실패면 에러 첫 줄을 덧붙인다."""
+    if run.status == TaskStatus.FAILED:
+        head = f"⚠️ [{task.name}] 실패"
+    elif run.status == TaskStatus.CANCELLED:
+        head = f"⏹️ [{task.name}] 중단됨"
+    elif diff.statusChanged:
+        head = f"✅ [{task.name}] 복구됨"
+    else:
+        head = f"✅ [{task.name}] 완료"
+    detail = diff.summary
+    if run.status != TaskStatus.SUCCESS and run.error:
+        firstLine = next((line.strip() for line in run.error.splitlines() if line.strip()), "")
+        if firstLine:
+            detail = f"{detail} · {firstLine[:200]}"
+    return f"{head} — {detail}"
+
+
 async def _notifyTaskCompletion(task: TaskDefinition, run: TaskRun) -> None:
-    """완료 시 등록된 채널로 diff 요약을 broadcast한다 — 채널이 0개면 no-op(무해).
+    """완료 시 등록된 채널로 알린다 — 단, 무인 실행 신뢰를 위해 실패·복구만 알리고 매 주기
+    성공 스팸은 억제한다(_shouldNotifyRun). 채널이 0개면 no-op(무해).
 
     재진입 hook: "리포트 준비됨 — 무엇이 바뀌었나". 블로킹 urllib는 스레드로 빼 루프를 막지 않는다.
     """
@@ -23,7 +54,9 @@ async def _notifyTaskCompletion(task: TaskDefinition, run: TaskRun) -> None:
     if not bridge.listChannels():
         return
     diff = getTaskRegistry().getRunDiff(task.id)
-    message = f"[{task.name}] 완료 — 상태 {run.status.value} · {diff.summary}"
+    if not _shouldNotifyRun(run, diff):
+        return
+    message = _taskNotificationMessage(task, run, diff)
     await asyncio.to_thread(bridge.broadcast, message)
 
 
@@ -40,9 +73,19 @@ _scheduler: TaskScheduler | None = None
 def listAutomationTasksPayload() -> dict[str, Any]:
     registry = getTaskRegistry()
     tasks = registry.listTasks()
+    entries: list[dict[str, Any]] = []
+    for task in tasks:
+        # 목록에 마지막 실행 상태를 동봉한다 — 프론트가 실패한 자동화를 한눈에 배지로 보여줄 수
+        # 있게(단건 조회 getAutomationTaskPayload와 동일한 lastRun 형태로 일관). 무인 실행에서
+        # "어떤 자동화가 실패 중인지"를 태스크를 일일이 열지 않고 파악하는 신뢰 신호.
+        entry = task.serialize()
+        lastRun = registry.getLastRun(task.id)
+        if lastRun is not None:
+            entry["lastRun"] = lastRun.serialize()
+        entries.append(entry)
     return {
-        "tasks": [task.serialize() for task in tasks],
-        "total": len(tasks),
+        "tasks": entries,
+        "total": len(entries),
     }
 
 
