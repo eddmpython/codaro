@@ -369,6 +369,13 @@ sections:
         shape=alt.Shape('island:N', title='서식지'),
         tooltip=['species', 'island', 'flipper_length_mm', 'body_mass_g', 'sex']
     )
+
+    speciesMeanRule = alt.Chart(penguins).mark_rule(strokeDash=[4, 4], size=2).encode(
+        y=alt.Y('mean(body_mass_g):Q', title='체중 (g)'),
+        color=alt.Color('species:N', title='종')
+    )
+
+    dotFinal + speciesMeanRule
   exercise:
     prompt: 8단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
@@ -379,6 +386,13 @@ sections:
           shape=alt.Shape('island:N', title='서식지'),
           tooltip=['species', 'island', 'flipper_length_mm', 'body_mass_g', 'sex']
       )
+
+      speciesMeanRule = alt.Chart(penguins).mark_rule(strokeDash=[4, 4], size=2).encode(
+          y=alt.Y('mean(body_mass_g):Q', title='체중 (g)'),
+          color=alt.Color('species:N', title='종')
+      )
+
+      dotFinal + speciesMeanRule
     hints:
     - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
     - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.

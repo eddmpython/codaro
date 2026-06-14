@@ -184,7 +184,7 @@ sections:
   tips:
   - opacity도 when().then().otherwise()로 조절합니다. 선택된 점은 불투명, 나머지는 반투명으로 표시됩니다.
   snippet: |-
-    click = alt.selection_point(fields=['origin'])
+    click = alt.selection_point(fields=['origin'], bind='legend')
 
     chartClick = alt.Chart(mpg).mark_point().encode(
         x='horsepower:Q',
@@ -200,7 +200,7 @@ sections:
   exercise:
     prompt: 4단계. 클릭 선택 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
-      click = alt.selection_point(fields=['origin'])
+      click = alt.selection_point(fields=['origin'], bind='legend')
 
       chartClick = alt.Chart(mpg).mark_point().encode(
           x='horsepower:Q',

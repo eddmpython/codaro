@@ -103,12 +103,12 @@ sections:
   title: 2단계. ImageDraw.text
   structuredPrimary: true
   subtitle: 좌표와 fill 색상
-  goal: ImageDraw.Draw(rgba)로 그리기 객체를 만들고 .text((x, y), msg, fill=color)로 텍스트를 그린 뒤 그 영역 픽셀이 색이 바뀌었는지 확인합니다.
+  goal: ImageDraw.Draw(rgba)로 그리기 객체를 만들고 .text((x, y), msg, fill=color)로 텍스트를 그린 뒤 텍스트 영역의 픽셀 변화량을 확인합니다.
   why: ImageDraw.text는 모든 텍스트 워터마크의 출발점입니다. (x, y) 좌표가 텍스트 왼쪽 위 모서리이고 fill이 색상이라는 두 인자의 동작을 손으로 확인하면 워터마크 위치 정렬이 자연스러워집니다.
   explanation: |-
     ImageDraw.Draw(image)는 image에 in-place 그리기를 가능하게 합니다. 결과는 별도 객체 없이 원본이 직접 수정됩니다.
     .text((x, y), text, fill=(r, g, b, a))로 텍스트를 그립니다. (x, y)는 텍스트 시작 위치(왼쪽 상단), fill은 (R, G, B, A) 튜플.
-    검증은 텍스트가 그려진 영역의 픽셀이 원본과 다른지로 합니다. text 그린 위치 근처의 픽셀 색이 fill 인자 색으로 바뀌어야 정상 동작입니다.
+    검증은 텍스트가 그려진 영역의 픽셀이 원본과 다른지로 합니다. 기본 폰트는 글리프가 작아 특정 한 픽셀만 찍으면 빗나갈 수 있으므로, 그리기 전후 배열 차이로 확인하는 편이 안정적입니다.
   tips:
   - 기본 폰트는 매우 작습니다. ImageFont.truetype으로 폰트와 크기를 명시하는 게 표준입니다.
   - ImageDraw는 in-place라 .copy()를 먼저 만들어야 원본이 보존됩니다.
@@ -119,13 +119,15 @@ sections:
 
     textCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
     textDraw = ImageDraw.Draw(textCanvas)
+    textBefore = np.asarray(textCanvas).copy()
     textDraw.text((10, 10), '워터마크 테스트', fill=(255, 255, 255, 255))
 
-    textArr = np.asarray(textCanvas)
+    textAfter = np.asarray(textCanvas)
+    textDiff = np.abs(textAfter.astype(int) - textBefore.astype(int))
     {
         'size': textCanvas.size,
-        'pixelAt12_12': textArr[12, 12].tolist(),
-        'isLightFromWhiteText': textArr[12, 12, 0] > 200 or textArr[12, 12, 1] > 200,
+        'changedPixels': int((textDiff.sum(axis=2) > 0).sum()),
+        'isLightFromWhiteText': int(textDiff.sum()) > 0,
     }
   exercise:
     prompt: 빨강 텍스트를 (100, 100)에 그리고 그 픽셀의 R 채널이 200 이상인지 확인하세요.
@@ -136,10 +138,12 @@ sections:
 
       redCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
       redDraw = ImageDraw.Draw(redCanvas)
+      before = np.asarray(redCanvas).copy()
       redDraw.text((100, 100), 'RED', fill=(___, 0, 0, 255))
 
-      redArr = np.asarray(redCanvas)
-      {'rPixel': int(redArr[102, 105, 0]), 'isRed': int(redArr[102, 105, 0]) > 50}
+      after = np.asarray(redCanvas)
+      regionDiff = np.abs(after[95:125, 95:145].astype(int) - before[95:125, 95:145].astype(int))
+      {'changedPixels': int((regionDiff.sum(axis=2) > 0).sum()), 'isRed': int(regionDiff[..., 0].sum()) > 0}
     hints:
     - 빨강 채널 값 255를 넣습니다.
     - 빈칸에는 255가 들어갑니다.

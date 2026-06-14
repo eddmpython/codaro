@@ -381,8 +381,8 @@ sections:
     - text: Vega-Lite 문서
       url: https://vega.github.io/vega-lite/
       icon: 🔗
-    - text: Codaro 문서
-      url: https://altair-viz.github.io/
+    - text: Codaro Altair 연동
+      url: https://codaro.io/blog/altair
       icon: 🔗
   goal: 📚 참고 자료에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
   why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.

@@ -274,7 +274,7 @@ sections:
   why: 운영 사진은 거의 항상 조명이 고르지 않습니다. 그림자가 있는 문서, 야외에서 찍은 표지판 등은 전역 임계값으로는 한쪽이 잘립니다. 적응형이 강한 영역이 바로 이런 사진들입니다.
   explanation: |-
     adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)는 각 픽셀마다 그 주변 blockSize 영역의 평균(MEAN_C) 또는 가우시안 가중 평균(GAUSSIAN_C)에서 C를 뺀 값을 임계값으로 씁니다.
-    예제 입력은 좌→우로 밝기가 50→200까지 증가하는 그래디언트 배경에 가로로 긴 글자 같은 어두운 막대 두 개를 그립니다. 전역 임계값 100을 적용하면 왼쪽 막대는 잡히지만 오른쪽은 배경의 밝기에 가려 사라집니다.
+    예제 입력은 좌→우로 밝기가 50→200까지 증가하는 그래디언트 배경에 가로로 긴 글자 같은 막대 두 개를 그립니다. 왼쪽 막대는 30, 오른쪽 막대는 130이라 전역 임계값 100을 적용하면 왼쪽은 잡히지만 오른쪽은 배경보다 어두워도 사라집니다.
     adaptiveThreshold는 각 픽셀이 그 주변과 비교되어, 오른쪽 막대도 그 주변 배경(밝음)보다 어두우면 객체로 분류됩니다. 결과적으로 두 막대가 모두 잡힙니다.
   tips:
   - blockSize는 홀수여야 합니다. 11, 15, 21이 일반적입니다.
@@ -285,7 +285,7 @@ sections:
 
     gradientBg = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
     cv2.rectangle(gradientBg, (10, 20), (40, 40), 30, -1)
-    cv2.rectangle(gradientBg, (150, 20), (180, 40), 30, -1)
+    cv2.rectangle(gradientBg, (150, 20), (180, 40), 130, -1)
 
     _, globalBinary = cv2.threshold(gradientBg, 100, 255, cv2.THRESH_BINARY_INV)
     adaptiveBinary = cv2.adaptiveThreshold(
@@ -313,7 +313,7 @@ sections:
 
       gaussGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
       cv2.rectangle(gaussGradient, (10, 20), (40, 40), 30, -1)
-      cv2.rectangle(gaussGradient, (150, 20), (180, 40), 30, -1)
+      cv2.rectangle(gaussGradient, (150, 20), (180, 40), 130, -1)
 
       gaussAdaptive = cv2.adaptiveThreshold(
           gaussGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, ___, 5
@@ -349,7 +349,7 @@ sections:
 
     blockGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
     cv2.rectangle(blockGradient, (10, 20), (40, 40), 30, -1)
-    cv2.rectangle(blockGradient, (150, 20), (180, 40), 30, -1)
+    cv2.rectangle(blockGradient, (150, 20), (180, 40), 130, -1)
 
     block5 = cv2.adaptiveThreshold(blockGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 5)
     block21 = cv2.adaptiveThreshold(blockGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 5)
@@ -368,7 +368,7 @@ sections:
 
       cGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
       cv2.rectangle(cGradient, (10, 20), (40, 40), 30, -1)
-      cv2.rectangle(cGradient, (150, 20), (180, 40), 30, -1)
+      cv2.rectangle(cGradient, (150, 20), (180, 40), 130, -1)
 
       cLow = cv2.adaptiveThreshold(cGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 0)
       cHigh = cv2.adaptiveThreshold(cGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, ___)

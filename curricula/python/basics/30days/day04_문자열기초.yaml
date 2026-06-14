@@ -259,16 +259,16 @@ sections:
   subtitle: \\로 백슬래시 표현하기
   goal: 백슬래시 문자에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
-  explanation: 백슬래시 자체를 문자로 표현하려면 \\처럼 두 번 사용합니다. Windows 경로(C:\Users)나 정규표현식에서 자주 사용됩니다.
+  explanation: 백슬래시 자체를 문자로 표현하려면 코드 안에서 \\처럼 두 번 사용합니다. 예를 들어 Windows 경로는 코드에서 'C:\\Users'처럼 쓰고, 출력에는 C:\Users처럼 보입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
-    path = 'C:\\\\Users\\\\Documents'
+    path = 'C:\\Users\\Documents'
     print(path)
   exercise:
     prompt: 백슬래시 문자 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
     starterCode: |-
-      path = 'C:\\\\Users\\\\Documents'
+      path = 'C:\\Users\\Documents'
       print(path)
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.

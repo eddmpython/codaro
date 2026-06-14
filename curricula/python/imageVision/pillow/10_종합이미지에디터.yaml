@@ -264,7 +264,12 @@ sections:
         sharpened = ImageEnhance.Sharpness(blurred).enhance(config['sharpness'])
         rgba = sharpened.convert('RGBA').copy()
         layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
-        ImageDraw.Draw(layer).text((rgba.size[0] - 100, rgba.size[1] - 20), config['watermarkText'], fill=(255, 255, 255, 160))
+        draw = ImageDraw.Draw(layer)
+        bbox = draw.textbbox((0, 0), config['watermarkText'])
+        textWidth = bbox[2] - bbox[0]
+        textHeight = bbox[3] - bbox[1]
+        wmPos = (rgba.size[0] - textWidth - 12, rgba.size[1] - textHeight - 12)
+        draw.text(wmPos, config['watermarkText'], fill=(255, 255, 255, 160))
         rgba.paste(layer, (0, 0), mask=layer)
         return {
             'finalSize': rgba.size,
@@ -338,7 +343,12 @@ sections:
         sharpened = ImageEnhance.Sharpness(blurred).enhance(config['sharpness'])
         rgba = sharpened.convert('RGBA').copy()
         layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
-        ImageDraw.Draw(layer).text((rgba.size[0] - 100, rgba.size[1] - 20), config['watermarkText'], fill=(255, 255, 255, 160))
+        draw = ImageDraw.Draw(layer)
+        bbox = draw.textbbox((0, 0), config['watermarkText'])
+        textWidth = bbox[2] - bbox[0]
+        textHeight = bbox[3] - bbox[1]
+        wmPos = (rgba.size[0] - textWidth - 12, rgba.size[1] - textHeight - 12)
+        draw.text(wmPos, config['watermarkText'], fill=(255, 255, 255, 160))
         rgba.paste(layer, (0, 0), mask=layer)
         return {
             'finalSize': rgba.size,

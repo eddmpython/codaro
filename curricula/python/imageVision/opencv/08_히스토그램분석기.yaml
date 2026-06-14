@@ -374,19 +374,26 @@ sections:
   title: 실습 — china 사진 대비 향상
   structuredPrimary: true
   subtitle: 컬러 LAB CLAHE
-  goal: china 컬러 사진을 LAB 색공간으로 변환하고 L 채널에 CLAHE를 적용한 뒤 다시 BGR로 돌려, 채널별 평균 변화로 색 보존 여부를 검증합니다.
-  why: 합성 입력에서 검증한 LAB-CLAHE 패턴이 실제 사진에서도 동작하는지를 보는 마지막 일반화 단계입니다. 풍경 사진은 종종 안개나 거리감 때문에 대비가 부족해 CLAHE의 효과를 보기 좋습니다.
+  goal: china 컬러 사진의 L 채널을 저대비 범위로 압축한 뒤 LAB 색공간에서 CLAHE를 적용해, 색 보존과 대비 회복 여부를 검증합니다.
+  why: 원본 china 사진은 이미 L 채널 표준편차가 커서 CLAHE 뒤 표준편차가 내려갈 수 있습니다. 학습용으로는 같은 사진의 색상 구조를 유지하되 L 채널만 저대비로 눌러, CLAHE가 어떤 입력에서 효과를 내는지 분명히 보여 줘야 합니다.
   explanation: |-
-    china 사진은 풍경이라 안개 영역의 대비가 부족합니다. LAB의 L에 CLAHE를 적용하면 그 영역의 디테일이 살아나면서 색은 거의 그대로 유지됩니다.
-    검증은 원본과 결과의 채널별 평균을 비교합니다. L 채널은 변하지만 a, b 채널의 평균은 거의 동일해야 합니다. 비교는 보통 ±2 이내면 색 왜곡이 미미하다고 봅니다.
-    실무에서는 이 패턴을 함수로 묶어 두고 새 사진마다 호출합니다. CLAHE 객체는 thread-safe하므로 멀티프로세싱에서도 안전합니다.
+    먼저 china 사진의 LAB L 채널을 95~155 범위로 압축해 저대비 입력을 만듭니다. 그 뒤 L 채널에 CLAHE를 적용하면 지역 대비가 회복되고, a/b 색상 채널은 그대로 유지됩니다.
+    검증은 저대비 입력과 결과의 L 채널 표준편차를 비교합니다. 이 비교는 원본 사진이 아니라 CLAHE를 적용하기 직전의 저대비 입력을 기준으로 해야 합니다.
+    실무에서는 이 패턴을 함수로 묶어 두고 새 사진마다 호출합니다. 병렬 처리에서는 공유 객체의 안전성을 가정하지 말고 함수 안이나 워커별로 CLAHE 객체를 만듭니다.
   tips:
-  - CLAHE는 thread-safe합니다. 멀티프로세싱 환경에서도 같은 객체를 공유할 수 있습니다.
+  - 병렬 처리에서는 CLAHE 객체를 워커별로 만들거나 함수 안에서 생성해 공유 상태를 피하세요.
   - 사진의 노이즈 수준이 높으면 clipLimit을 낮춰 노이즈 증폭을 피합니다.
   snippet: |-
     import cv2
     import numpy as np
     from sklearn.datasets import load_sample_image
+
+
+    def makeLowContrastBgr(bgr: np.ndarray) -> np.ndarray:
+        lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
+        lCh, aCh, bCh = cv2.split(lab)
+        lLow = cv2.normalize(lCh, None, 95, 155, cv2.NORM_MINMAX).astype(np.uint8)
+        return cv2.cvtColor(cv2.merge([lLow, aCh, bCh]), cv2.COLOR_LAB2BGR)
 
 
     def claheEnhanceBgr(bgr: np.ndarray, clipLimit: float = 2.0) -> np.ndarray:
@@ -396,7 +403,7 @@ sections:
         return cv2.cvtColor(cv2.merge([clahe.apply(lCh), aCh, bCh]), cv2.COLOR_LAB2BGR)
 
 
-    chinaBgr = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)
+    chinaBgr = makeLowContrastBgr(cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR))
     enhancedChinaBgr = claheEnhanceBgr(chinaBgr, clipLimit=3.0)
 
     originalLChannel = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2LAB)[..., 0]
@@ -409,11 +416,18 @@ sections:
         'contrastImproved': float(enhancedLChannel.std()) > float(originalLChannel.std()),
     }
   exercise:
-    prompt: claheEnhanceBgr에 clipLimit=1.0 (약한 평활화)을 적용해 표준편차 향상이 clipLimit=3.0보다 작은지 확인하세요.
+    prompt: 저대비 china 입력에 claheEnhanceBgr를 clipLimit=1.0으로 적용해 표준편차가 적용 전보다 어떻게 달라지는지 확인하세요.
     starterCode: |-
       import cv2
       import numpy as np
       from sklearn.datasets import load_sample_image
+
+
+      def makeLowContrastBgr(bgr: np.ndarray) -> np.ndarray:
+          lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
+          lCh, aCh, bCh = cv2.split(lab)
+          lLow = cv2.normalize(lCh, None, 95, 155, cv2.NORM_MINMAX).astype(np.uint8)
+          return cv2.cvtColor(cv2.merge([lLow, aCh, bCh]), cv2.COLOR_LAB2BGR)
 
 
       def claheEnhanceBgr(bgr: np.ndarray, clipLimit: float = 2.0) -> np.ndarray:
@@ -423,7 +437,7 @@ sections:
           return cv2.cvtColor(cv2.merge([clahe.apply(lCh), aCh, bCh]), cv2.COLOR_LAB2BGR)
 
 
-      weakBase = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)
+      weakBase = makeLowContrastBgr(cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR))
       weakResult = claheEnhanceBgr(weakBase, clipLimit=___)
       weakLAfter = cv2.cvtColor(weakResult, cv2.COLOR_BGR2LAB)[..., 0]
       weakLBefore = cv2.cvtColor(weakBase, cv2.COLOR_BGR2LAB)[..., 0]

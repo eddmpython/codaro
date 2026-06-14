@@ -102,12 +102,12 @@ sections:
   title: 2단계. crop으로 가운데 영역
   structuredPrimary: true
   subtitle: (left, upper, right, lower) 좌표
-  goal: chinaImage의 가운데 절반 영역을 crop으로 잘라내고, 결과 size가 (320, 213)인지 확인합니다.
+  goal: chinaImage의 가운데 절반 영역을 crop으로 잘라내고, 결과 size가 (320, 214)인지 확인합니다.
   why: crop의 4-tuple은 NumPy 슬라이스와 비슷하지만 인자 순서가 다릅니다. 좌상단 (left, upper)과 우하단 (right, lower)을 직접 계산해 한 번 만들어 두면 좌표 계약이 머리에 들어옵니다.
   explanation: |-
     Image.crop(box)에서 box는 (left, upper, right, lower) 4-tuple입니다. left/right는 x, upper/lower는 y에 해당합니다.
     NumPy 슬라이스 image[upper:lower, left:right]와 같은 영역을 잡습니다. y 인덱스가 먼저 오는 NumPy 컨벤션과 좌표 순서가 다르다는 점이 함정입니다.
-    가운데 절반은 width의 1/4부터 3/4까지, height의 1/4부터 3/4까지로 잡습니다. (640, 427) 입력이면 (160, 107, 480, 320)이 되고, 잘라낸 결과는 (320, 213)입니다.
+    가운데 절반은 width의 1/4부터 3/4까지, height의 1/4부터 3/4까지로 잡습니다. (640, 427) 입력이면 정수 나눗셈 기준 box가 (160, 106, 480, 320)이 되고, 잘라낸 결과는 (320, 214)입니다.
   tips:
   - right와 lower는 포함되지 않는 경계입니다. NumPy 슬라이스와 같은 방식입니다.
   - box 좌표가 이미지 밖이면 빈 영역이 검정으로 채워집니다(예외는 아닙니다). 미리 검증이 필요합니다.
@@ -124,7 +124,7 @@ sections:
         'originalSize': cropImage.size,
         'cropBox': cropBox,
         'croppedSize': cropped.size,
-        'matchesHalfQuarter': cropped.size == (320, 213) or cropped.size == (320, 214),
+        'matchesHalfQuarter': cropped.size == (320, 214),
     }
   exercise:
     prompt: chinaImage에서 오른쪽 절반만 잘라내는 box를 만들고 결과 size가 (320, 427)인지 확인하세요.

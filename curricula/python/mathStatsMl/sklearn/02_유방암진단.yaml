@@ -236,21 +236,20 @@ sections:
   goal: 7단계. 정밀도와 재현율에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
-    정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
+    정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 이 데이터셋은 악성이 0, 양성이 1이므로 악성 탐지 지표를 보려면 pos_label=0을 명시해야 합니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
 
     암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
   tips:
-  - 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False
-    Positive)하면 안 되므로 정밀도가 더 중요합니다.
+  - sklearn의 precision_score/recall_score는 기본 pos_label=1입니다. 유방암 데이터에서 악성(0)을 기준으로 보려면 pos_label=0을 넣습니다.
   snippet: |-
-    prec = precision_score(yTest, yPred)
-    rec = recall_score(yTest, yPred)
+    prec = precision_score(yTest, yPred, pos_label=0)
+    rec = recall_score(yTest, yPred, pos_label=0)
     f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
   exercise:
     prompt: 7단계. 정밀도와 재현율 예제에서 `prec`, `rec` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
-      prec = precision_score(yTest, yPred)
-      rec = recall_score(yTest, yPred)
+      prec = precision_score(yTest, yPred, pos_label=0)
+      rec = recall_score(yTest, yPred, pos_label=0)
       f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
     hints:
     - 바꿀 지점은 `prec = ...` 오른쪽 값입니다.
@@ -273,12 +272,12 @@ sections:
   - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9,
     recall=0.1이면 F1은 0.18에 불과합니다.
   snippet: |-
-    f1 = f1_score(yTest, yPred)
+    f1 = f1_score(yTest, yPred, pos_label=0)
     f"F1 점수: {f1:.2%}"
   exercise:
     prompt: 8단계. F1 점수 예제에서 `f1` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
     starterCode: |-
-      f1 = f1_score(yTest, yPred)
+      f1 = f1_score(yTest, yPred, pos_label=0)
       f"F1 점수: {f1:.2%}"
     hints:
     - 바꿀 지점은 `f1 = ...` 오른쪽 값입니다.
@@ -294,12 +293,11 @@ sections:
   goal: 9단계. 혼동행렬 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
   explanation: |-
-    혼동행렬을 통해 True Positive(TP), True Negative(TN), False Positive(FP), False Negative(FN)를 확인합니다. 의료에서 FN(실제 악성을 양성으로 예측)이 가장 위험합니다.
+    혼동행렬을 통해 실제 클래스와 예측 클래스가 어떻게 엇갈렸는지 확인합니다. 이 데이터셋은 라벨 0이 악성, 1이 양성이므로 의료 관점에서는 실제 악성을 양성으로 예측한 칸이 가장 위험합니다.
 
-    혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측.
+    confusion_matrix(yTest, yPred)는 기본 라벨 순서 [0, 1]을 씁니다. 이 표에서는 좌상=악성을 악성으로 정확히 예측, 우상=악성을 양성으로 놓침, 좌하=양성을 악성으로 오경보, 우하=양성을 양성으로 정확히 예측입니다. TP/TN 명칭은 어떤 클래스를 positive로 둘지에 따라 달라집니다.
   tips:
-  - '혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을
-    양성으로 정확히 예측.'
+  - 악성을 positive로 볼 때는 라벨 0 기준으로 해석합니다. 우상 칸이 실제 악성을 양성으로 놓친 위험 사례입니다.
   snippet: |-
     cm = confusion_matrix(yTest, yPred)
     cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
@@ -382,7 +380,7 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
     summary = pd.DataFrame({
-        'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
+        'Item': ['Dataset', 'Model', 'Accuracy', 'Malignant Precision', 'Malignant Recall', 'Malignant F1'],
         'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
     })
     summary
@@ -390,7 +388,7 @@ sections:
     prompt: 12단계. 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       summary = pd.DataFrame({
-          'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
+          'Item': ['Dataset', 'Model', 'Accuracy', 'Malignant Precision', 'Malignant Recall', 'Malignant F1'],
           'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
       })
       summary

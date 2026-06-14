@@ -131,7 +131,7 @@ sections:
         'scaledShape': scaledResized.shape,
     }
   exercise:
-    prompt: 가로는 그대로 두고 세로만 절반으로 줄이는 resize를 fx/fy로 구현해 결과 shape가 (213, 640, 3)인지 확인하세요. (427//2 = 213)
+    prompt: 가로는 그대로 두고 세로만 절반으로 줄이는 resize를 fx/fy로 구현해 결과 shape가 (214, 640, 3)인지 확인하세요. OpenCV는 427 * 0.5를 214로 반올림합니다.
     starterCode: |-
       import cv2
       from sklearn.datasets import load_sample_image
@@ -141,10 +141,10 @@ sections:
 
       {
           'shape': verticalShrunk.shape,
-          'isHalfHeight': verticalShrunk.shape[0] == 213,
+          'isHalfHeight': verticalShrunk.shape[0] == 214,
       }
     hints:
-    - 세로만 절반으로 줄이려면 fx=1.0, fy=0.5가 됩니다.
+    - 세로만 절반으로 줄이려면 fx=1.0, fy=0.5가 됩니다. 427 높이는 OpenCV 반올림 때문에 214가 됩니다.
     - 빈칸에는 0.5가 들어갑니다.
     check:
       noError: resize 호출이 TypeError 없이 끝나야 합니다.
