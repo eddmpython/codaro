@@ -37,7 +37,7 @@ intro:
   diagram:
     steps:
     - label: 1단계. 데이터 로드 + shape 확인
-      detail: loadLocalDataset('penguins')로 344행 × 7~8컬럼 DataFrame을 만든다.
+      detail: loadLocalDataset('penguins')로 120행 × 7컬럼 DataFrame을 만든다.
     - label: 2단계. value_counts + describe로 분포 확인
       detail: 종별 개수와 숫자 컬럼 전체 통계를 먼저 본다.
     - label: 3단계. groupby + agg + query 체인
@@ -57,8 +57,8 @@ sections:
   structuredPrimary: true
   subtitle: 펭귄 데이터
   goal: loadLocalDataset로 penguins DataFrame을 불러오고 shape으로 행/열 수를 확인한다.
-  why: 데이터 분석은 항상 입력 크기 확인부터 시작합니다. 344행이라는 사실을 알아야 이후 groupby 결과의 합계가 344가 되는지 검증할 수 있습니다.
-  explanation: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈)
+  why: 데이터 분석은 항상 입력 크기 확인부터 시작합니다. 120행이라는 사실을 알아야 이후 groupby 결과의 합계가 120이 되는지 검증할 수 있습니다.
+  explanation: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬을 본뜬 로컬 펭귄 120마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈)
     3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로
     자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 로컬 실행에서는 네트워크가 없어도 종별 비교 흐름을 유지하도록 같은 컬럼의 샘플 데이터를 함께 둡니다.
   tips:

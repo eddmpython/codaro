@@ -85,7 +85,7 @@ sections:
   subtitle: penguins 데이터셋
   goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
-  explanation: penguins 데이터셋은 344개의 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리
+  explanation: penguins 데이터셋은 120개의 로컬 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리
     깊이), flipper_length_mm(날개 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다. 결측값이 있으므로 dropna()로 제거합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.

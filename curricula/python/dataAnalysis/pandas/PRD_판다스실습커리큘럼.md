@@ -82,7 +82,7 @@
 ### 03. 펭귄 종 비교 분석 (penguins) ⭐⭐⭐
 **파일명**: `03_펭귄종비교분석.yaml`
 **데이터**: `https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv`
-**컬럼**: species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex (344행 7열)
+**컬럼**: species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex (120행 7열)
 
 **학습 목표**:
 - 그룹별 통계 구하기

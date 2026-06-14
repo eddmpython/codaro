@@ -29,7 +29,7 @@ intro:
   emoji: 🚢
   goal: 타이타닉 승객 데이터에서 "누가 생존했는가?"를 분석합니다.
   description: 조건 필터링을 배웁니다. "생존자만", "1등석만"처럼 원하는 데이터만 골라내는 방법을 익힙니다.
-  direction: 타이타닉 891명 승객 데이터로 Boolean Indexing + value_counts + loc/iloc을 손에 익혀 "필터링 → 집계 → 위치 기반 선택" 흐름을 완성합니다.
+  direction: 타이타닉 180명 로컬 승객 샘플로 Boolean Indexing + value_counts + loc/iloc을 손에 익혀 "필터링 → 집계 → 위치 기반 선택" 흐름을 완성합니다.
   benefits:
   - DataFrame에서 단일 컬럼/다중 컬럼 선택 패턴을 명확히 구분합니다.
   - Boolean Series(== 비교)와 Boolean Indexing(df[조건])의 관계를 코드로 확인합니다.
@@ -38,7 +38,7 @@ intro:
   diagram:
     steps:
     - label: 1단계. 데이터 로드 + shape
-      detail: loadLocalDataset(titanic)으로 891행 DataFrame을 만든다.
+      detail: loadLocalDataset(titanic)으로 180행 DataFrame을 만든다.
     - label: 2단계. 컬럼 선택과 조건식
       detail: 단일/다중 컬럼 + Boolean Series로 필터링 기반을 다진다.
     - label: 3단계. 필터링 + 통계 조합
@@ -58,8 +58,8 @@ sections:
   structuredPrimary: true
   subtitle: 타이타닉 승객 데이터
   goal: loadLocalDataset로 titanic DataFrame을 불러오고 shape으로 행/열 수를 확인한다.
-  why: 데이터 분석의 첫 단계입니다. 891명이라는 전체 표본 크기를 알아야 이후 1등석/여성 같은 그룹 비율을 해석할 수 있습니다.
-  explanation: 타이타닉 데이터셋은 1912년 4월 15일 침몰한 타이타닉호 승객 891명의 정보를 담고 있습니다. 이 데이터는 데이터 분석 교육에서 가장 널리 사용되는 클래식
+  why: 데이터 분석의 첫 단계입니다. 180명이라는 전체 표본 크기를 알아야 이후 1등석/여성 같은 그룹 비율을 해석할 수 있습니다.
+  explanation: 타이타닉 데이터셋은 1912년 4월 15일 침몰한 타이타닉호 승객 구조를 본뜬 180명의 로컬 샘플 정보를 담고 있습니다. 이 데이터는 데이터 분석 교육에서 가장 널리 사용되는 클래식
     데이터셋으로, 실제 역사적 사건을 바탕으로 생존 요인을 분석할 수 있습니다. 15개의 컬럼에는 승객의 나이, 성별, 객실 등급, 운임, 가족 관계 등 다양한 정보가 포함되어 있습니다.
     survived 컬럼이 1이면 생존, 0이면 사망을 의미하며, 이번 분석의 핵심 타겟 변수입니다. 로컬 실행에서는 네트워크가 없어도 필터링 흐름을 연습할 수 있도록 핵심 컬럼을
     가진 샘플 데이터를 함께 사용합니다.
@@ -161,7 +161,7 @@ sections:
   goal: == 연산자로 Boolean Series(True/False 배열)를 만든다.
   why: 필터링의 첫 절반은 Boolean Series입니다. 이 단계 없이 6단계의 df 대괄호 조건이 어떻게 동작하는지 이해할 수 없습니다.
   explanation: |-
-    데이터 필터링의 핵심은 조건식을 만드는 것입니다. ==는 같은지를 확인하는 비교 연산자로, 각 값이 조건을 만족하면 True, 만족하지 않으면 False를 반환합니다. titanic survived ==1은 각 승객이 생존했는지 확인하는 조건식입니다. 결과는 891개의 True/False 값으로 이루어진 Boolean Series가 됩니다. 이 Boolean Series를 다음 단계에서 필터링에 사용합니다.
+    데이터 필터링의 핵심은 조건식을 만드는 것입니다. ==는 같은지를 확인하는 비교 연산자로, 각 값이 조건을 만족하면 True, 만족하지 않으면 False를 반환합니다. titanic survived ==1은 각 승객이 생존했는지 확인하는 조건식입니다. 결과는 180개의 True/False 값으로 이루어진 Boolean Series가 됩니다. 이 Boolean Series를 다음 단계에서 필터링에 사용합니다.
 
     비교 연산자는 ==, !=, >, <, >=, <= 등이 있습니다. 할당의 =과 비교의 ==를 구분해야 합니다. x = 5는 값을 대입하고, x == 5는 같은지 비교합니다.
   tips:
@@ -181,19 +181,19 @@ sections:
   title: 6단계. 생존자 필터링
   structuredPrimary: true
   subtitle: 조건이 True인 행만
-  goal: df 대괄호 조건 형태(Boolean Indexing)로 생존자 342명만 추출한다.
+  goal: df 대괄호 조건 형태(Boolean Indexing)로 생존자 99명만 추출한다.
   why: Boolean Series와 Boolean Indexing이 결합되는 핵심 단계입니다. 이 패턴이 모든 pandas 필터링의 기본입니다.
   explanation: |-
-    이제 조건식을 DataFrame의 대괄호 안에 넣어서 실제 필터링을 수행합니다. df 대괄호 조건식 형태로 작성하면 조건이 True인 행만 선택되고, False인 행은 자동으로 제외됩니다. 이를 Boolean Indexing이라고 부릅니다. len 함수로 개수를 세어보면 891명 중 342명이 생존한 것을 확인할 수 있습니다. 생존율은 약 38%입니다.
+    이제 조건식을 DataFrame의 대괄호 안에 넣어서 실제 필터링을 수행합니다. df 대괄호 조건식 형태로 작성하면 조건이 True인 행만 선택되고, False인 행은 자동으로 제외됩니다. 이를 Boolean Indexing이라고 부릅니다. len 함수로 개수를 세어보면 180명 중 99명이 생존한 것을 확인할 수 있습니다. 생존율은 55%입니다.
 
     필터링 결과를 새 변수에 저장하면 추가 분석을 할 수 있습니다. len은 행의 개수를 세는 함수입니다. .shape[0]이나 .count()를 사용해도 같은 결과를 얻을 수 있습니다.
   tips:
-  - 생존자 수 / 전체 수가 곧 생존율입니다 — 342 / 891 ≈ 0.384.
+  - 생존자 수 / 전체 수가 곧 생존율입니다 — 99 / 180 = 0.55.
   snippet: |-
     survivors = titanic[titanic['survived'] == 1]
     len(survivors)
   exercise:
-    prompt: == 1 대신 == 0으로 바꿔 사망자 수를 구하고 891 - 생존자 수와 같은지 확인하세요.
+    prompt: == 1 대신 == 0으로 바꿔 사망자 수를 구하고 180 - 생존자 수와 같은지 확인하세요.
     starterCode: |-
       survivors = titanic[titanic['survived'] == 1]
       len(survivors)
@@ -224,7 +224,7 @@ sections:
       len(first)
     hints:
     - 3등석은 약 491명으로 가장 많습니다.
-    - 1등석 + 2등석 + 3등석이 891이 되어야 합니다.
+    - 1등석 + 2등석 + 3등석이 180이 되어야 합니다.
   check:
     type: noError
     noError: Boolean Indexing이 정상 실행되어야 합니다.
@@ -236,7 +236,7 @@ sections:
   goal: value_counts로 컬럼의 모든 고유 값마다 등장 횟수를 한 줄에 본다.
   why: 매번 ==로 필터링하고 len 호출하는 대신, value_counts 한 줄이면 분포 전체가 나옵니다.
   explanation: |-
-    value_counts 메서드는 범주형 데이터의 각 값이 몇 번 등장하는지 자동으로 세어줍니다. 일일이 필터링해서 개수를 셀 필요 없이 한 줄로 전체 분포를 파악할 수 있어 매우 편리합니다. 기본적으로 개수가 많은 순서대로 정렬되어 출력됩니다. 타이타닉 데이터에서는 549명이 사망(0), 342명이 생존(1)했습니다. 사망자가 생존자보다 약 1.6배 많았습니다.
+    value_counts 메서드는 범주형 데이터의 각 값이 몇 번 등장하는지 자동으로 세어줍니다. 일일이 필터링해서 개수를 셀 필요 없이 한 줄로 전체 분포를 파악할 수 있어 매우 편리합니다. 기본적으로 개수가 많은 순서대로 정렬되어 출력됩니다. 로컬 타이타닉 샘플에서는 81명이 사망(0), 99명이 생존(1)했습니다. 생존자가 사망자보다 조금 많습니다.
 
     value_counts는 기본적으로 결측치(NaN)를 제외합니다. 결측치도 포함하려면 dropna=False를 추가하면 됩니다. 또한 sort=False를 추가하면 정렬하지 않고 원래 순서대로 보여줍니다.
   tips:
@@ -280,7 +280,7 @@ sections:
   structuredPrimary: true
   subtitle: normalize=True
   goal: value_counts에 normalize=True를 주어 빈도가 아닌 비율로 본다.
-  why: 549 vs 342 같은 절대 수치보다 0.62 vs 0.38 같은 비율이 더 직관적입니다. 보고서나 시각화에는 비율이 더 적합합니다.
+  why: 81 vs 99 같은 절대 수치보다 0.45 vs 0.55 같은 비율이 더 직관적입니다. 보고서나 시각화에는 비율이 더 적합합니다.
   explanation: |-
     value_counts에 normalize=True 파라미터를 추가하면 개수 대신 비율(백분율)을 보여줍니다. 전체에서 각 값이 차지하는 상대적 비중을 파악할 때 유용합니다. 개수만 보면 절대적 규모를 알 수 있지만, 비율을 보면 전체 대비 어느 정도 비중인지 직관적으로 이해할 수 있습니다. 3등석이 약 55%, 1등석이 약 24%, 2등석이 약 21%를 차지합니다.
 
@@ -293,7 +293,7 @@ sections:
     starterCode: titanic['pclass'].value_counts(normalize=True)
     hints:
     - sex는 male이 약 65%, female이 약 35%입니다.
-    - survived는 0이 약 62%, 1이 약 38%입니다.
+    - survived는 0이 45%, 1이 55%입니다.
   check:
     type: noError
     noError: normalize 옵션 호출이 정상 실행되어야 합니다.
@@ -302,20 +302,20 @@ sections:
   title: 10단계. 1등석 생존율
   structuredPrimary: true
   subtitle: 필터링 + 통계 조합
-  goal: pclass==1 필터링 + survived.mean() 조합으로 1등석 생존율(약 63%)을 한 줄에 계산한다.
+  goal: pclass==1 필터링 + survived.mean() 조합으로 1등석 생존율(약 72%)을 한 줄에 계산한다.
   why: 0/1 이진 변수의 평균이 곧 1의 비율이라는 트릭이 이 강의의 가장 강력한 도구입니다. 같은 패턴이 합격률, 클릭률, 전환율 계산에 그대로 적용됩니다.
   explanation: |-
-    이제 필터링과 통계를 조합해서 더 깊이 있는 분석을 수행합니다. 1등석 승객만 필터링한 후, survived 컬럼의 평균을 구하면 생존율을 계산할 수 있습니다. survived가 0(사망)과 1(생존)로 이루어져 있기 때문에, 평균값이 곧 생존한 사람의 비율이 됩니다. 1등석 생존율은 약 63%로, 전체 생존율 38%보다 훨씬 높습니다. 메서드 체이닝을 통해 여러 작업을 한 줄로 연결할 수 있습니다.
+    이제 필터링과 통계를 조합해서 더 깊이 있는 분석을 수행합니다. 1등석 승객만 필터링한 후, survived 컬럼의 평균을 구하면 생존율을 계산할 수 있습니다. survived가 0(사망)과 1(생존)로 이루어져 있기 때문에, 평균값이 곧 생존한 사람의 비율이 됩니다. 로컬 샘플에서 1등석 생존율은 약 72%로, 전체 생존율 55%보다 높습니다. 메서드 체이닝을 통해 여러 작업을 한 줄로 연결할 수 있습니다.
 
     0과 1로 이루어진 이진 변수의 평균은 1의 비율과 같습니다. 예를 들어 1, 0, 1, 1, 0의 평균은 0.6이며 60%가 1이라는 의미입니다. 이 트릭은 생존율, 합격률, 성공률 계산에 자주 사용됩니다.
   tips:
-  - 등급별 생존율을 보면 1등석 63% > 2등석 47% > 3등석 24%로 단조 감소합니다. 객실 등급이 생존에 명확한 영향을 미쳤다는 증거입니다.
+  - 등급별 생존율을 보면 1등석이 약 72%로 가장 높고, 2등석과 3등석은 약 47%입니다. 객실 등급별 차이를 비율로 비교하세요.
   snippet: titanic[titanic['pclass'] == 1]['survived'].mean()
   exercise:
     prompt: pclass == 1을 pclass == 3으로 바꿔 3등석 생존율을 구하고 1등석과 비교하세요.
     starterCode: titanic[titanic['pclass'] == 1]['survived'].mean()
     hints:
-    - 3등석 생존율은 약 0.24로 1등석의 1/3 수준입니다.
+    - 3등석 생존율은 약 0.47로 1등석보다 낮습니다.
     - 두 결과의 차이가 객실 등급의 영향력을 보여줍니다.
   check:
     type: noError
@@ -325,10 +325,10 @@ sections:
   title: 11단계. 여성 생존율
   structuredPrimary: true
   subtitle: 성별로 비교
-  goal: sex == female 필터링으로 여성 생존율(약 74%)을 계산해 "여성과 어린이 먼저" 원칙이 실제 데이터에 나타나는지 확인한다.
+  goal: sex == female 필터링으로 여성 생존율(100%)을 계산해 성별 차이가 로컬 샘플에 어떻게 들어 있는지 확인한다.
   why: 데이터 분석은 가설을 수치로 검증하는 과정입니다. 역사적 서술이 데이터에서 실제로 보이는지 확인하는 것이 분석의 핵심 가치입니다.
   explanation: 타이타닉 침몰 당시 "여성과 어린이 먼저(Women and children first)" 원칙이 실제로 적용되었는지 데이터로 확인해봅니다. 여성 승객만 필터링한
-    후 생존율을 계산하면 약 74%가 나옵니다. 이는 전체 생존율 38%, 남성 생존율 약 19%와 비교하면 압도적으로 높은 수치입니다. 실제로 구명보트 우선순위가 성별에 따라 달랐음을
+    후 생존율을 계산하면 100%가 나옵니다. 이는 전체 생존율 55%, 남성 생존율 25%와 비교하면 압도적으로 높은 수치입니다. 로컬 샘플에서 성별 차이가 크게 설계되었음을
     데이터가 입증합니다.
   tips:
   - 문자열 비교는 따옴표가 필수입니다 — sex == female이 아니라 sex == "female"이어야 합니다(파이썬 변수처럼 인식되어 NameError).
@@ -337,8 +337,8 @@ sections:
     prompt: female을 male로 바꿔 남성 생존율을 구하고 여성과 비교하세요.
     starterCode: titanic[titanic['sex'] == 'female']['survived'].mean()
     hints:
-    - 남성 생존율은 약 0.19로 여성의 1/4 수준입니다.
-    - 74% vs 19%의 압도적인 차이가 성별 우선순위를 보여줍니다.
+    - 남성 생존율은 0.25로 여성보다 낮습니다.
+    - 100% vs 25%의 차이가 로컬 샘플의 성별 생존율 차이를 보여줍니다.
   check:
     type: noError
     noError: 문자열 비교 필터링이 정상 실행되어야 합니다.

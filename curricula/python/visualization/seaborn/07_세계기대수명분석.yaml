@@ -335,14 +335,14 @@ sections:
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: |-
-    gapDecade = gapminder[gapminder['year'].isin([1967, 1987, 2007])].copy()
+    gapDecade = gapminder[gapminder['year'].isin([1962, 1982, 2007])].copy()
     gYear = sns.relplot(data=gapDecade, x='gdpPercap', y='lifeExp', hue='continent', size='pop', sizes=(20, 500), col='year', palette='Set1', alpha=0.7, height=4)
     gYear.figure.suptitle('GDP vs Life Expectancy Over Decades', y=1.02)
     gYear.figure
   exercise:
     prompt: 10단계. 연도별 패널 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
     starterCode: |-
-      gapDecade = gapminder[gapminder['year'].isin([1967, 1987, 2007])].copy()
+      gapDecade = gapminder[gapminder['year'].isin([1962, 1982, 2007])].copy()
       gYear = sns.relplot(data=gapDecade, x='gdpPercap', y='lifeExp', hue='continent', size='pop', sizes=(20, 500), col='year', palette='Set1', alpha=0.7, height=4)
       gYear.figure.suptitle('GDP vs Life Expectancy Over Decades', y=1.02)
       gYear.figure

@@ -57,7 +57,7 @@ sections:
   subtitle: 자동차 연비 데이터
   goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
-  explanation: 자동차 연비 데이터셋은 1970년대~1980년대 미국, 일본, 유럽에서 생산된 자동차 398대의 연비와 성능 정보를 담고 있습니다. mpg(miles per
+  explanation: 자동차 연비 데이터셋은 1970년대~1980년대 미국, 일본, 유럽에서 생산된 자동차 144대의 로컬 샘플 연비와 성능 정보를 담고 있습니다. mpg(miles per
     gallon, 갤런당 마일)는 연비를 나타내며, 숫자가 클수록 연비가 좋습니다. cylinders(실린더 수), displacement(배기량), horsepower(마력),
     weight(무게), acceleration(가속력), model_year(연식), origin(제조국) 등 9개의 컬럼이 있습니다. 이 데이터로 정렬(sort), TOP N
     추출(nlargest), 피벗테이블(pivot_table) 등 pandas의 핵심 분석 기법을 배웁니다. 로컬 실행에서는 같은 분석 질문을 계속 풀 수 있도록 작은 자동차 샘플을
