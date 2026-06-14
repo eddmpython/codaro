@@ -195,7 +195,7 @@ sections:
     minimal = Profile(username="dave")
     minimal
   exercise:
-    prompt: 기본값과 Optional 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 기본값과 Optional 예제에서 입력 dict의 누락 필드나 선택 필드를 바꾸고 모델 기본값이 어떻게 채워지는지 확인하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -206,8 +206,8 @@ sections:
       minimal = Profile(username="dave")
       minimal
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 입력 dict의 누락 필드, 선택 필드, 모델 생성 인자입니다.
+    - 실행 뒤 기본값으로 채워진 필드와 model_dump 결과가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: 기본값과 Optional에서 `minimal` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 기본값과 Optional 실행 뒤 `minimal` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
@@ -257,7 +257,7 @@ sections:
     frozen = ImmutableUser(name="Henry", age=30)
     frozen
   exercise:
-    prompt: 불변 모델 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 불변 모델 예제에서 생성 인자나 수정 시도 값을 바꾸고 frozen 모델이 변경을 막는지 확인하세요.
     starterCode: |-
       class ImmutableUser(BaseModel):
           model_config = {"frozen": True}
@@ -267,8 +267,8 @@ sections:
       frozen = ImmutableUser(name="Henry", age=30)
       frozen
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 생성 인자, frozen 모델 선언, 수정 시도 코드입니다.
+    - 실행 뒤 변경 시도가 ValidationError로 막히고 원본 모델 값이 유지되는지 보세요.
   check:
     type: noError
     noError: 불변 모델의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
@@ -304,7 +304,7 @@ sections:
     )
     profile
   exercise:
-    prompt: 최종 사용자 시스템 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 최종 사용자 시스템 예제에서 사용자 프로필 입력값을 바꾸고 검증된 모델과 model_dump 결과가 달라지는지 확인하세요.
     starterCode: |-
       class UserProfile(BaseModel):
           model_config = {"frozen": False}
@@ -326,8 +326,8 @@ sections:
       )
       profile
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 사용자 프로필 필드, 중첩 값, 직렬화 대상입니다.
+    - 실행 뒤 생성된 모델 필드와 직렬화 결과가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: 최종 사용자 시스템의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 최종 사용자 시스템의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -364,7 +364,7 @@ sections:
     )
     laptop
   exercise:
-    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 실습 예제에서 상품 모델 필드와 입력값을 바꾸고 검증/직렬화 결과가 달라지는지 확인하세요.
     starterCode: |-
       from pydantic import BaseModel
       from typing import Optional
@@ -386,8 +386,8 @@ sections:
       )
       laptop
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 모델 필드 선언, 입력 dict, 생성 인자입니다.
+    - 실행 뒤 model_dump(), 오류 메시지, 반환값이 바꾼 입력을 반영하는지 보세요.
   check:
     type: noError
     noError: 실습에서 `laptop` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

@@ -427,7 +427,7 @@ sections:
     assert receipt.count('\n') == 5
     print(receipt)
   exercise:
-    prompt: '검증 루프: 영수증 문자열을 안전하게 만들기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    prompt: '검증 루프: 영수증 문자열을 안전하게 만들기 예제에서 문자열 값과 포맷 조각을 바꾸고 출력 문장이 달라지는지 확인하세요.'
     starterCode: |-
       level = 'INFO'
       action = 'order_created'
@@ -439,8 +439,8 @@ sections:
       assert 'ERROR' not in logLine
       logLine
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `level`, `orderId`, `amount`, f-string 포맷 조각입니다.
+    - 실행 뒤 `receipt` 문자열의 접두사, 주문번호, 금액 표기가 바꾼 입력을 반영하는지 보세요.
     predict:
       prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
       expectedValue: (직접 실행해 본 값을 적어주세요)

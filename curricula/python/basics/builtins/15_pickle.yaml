@@ -230,7 +230,7 @@ sections:
         pickle.dump(obj3, f)
     'multi.pkl 저장 완료'
   exercise:
-    prompt: 다중 객체 처리 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 다중 객체 처리 예제에서 저장할 객체의 순서나 값을 바꾸고 순차 load 결과가 같은 순서를 따르는지 확인하세요.
     starterCode: |-
       obj1 = {'type': 'config', 'value': 100}
       obj2 = ['item1', 'item2', 'item3']
@@ -241,8 +241,8 @@ sections:
           pickle.dump(obj3, f)
       'multi.pkl 저장 완료'
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `obj1`, `obj2`, `obj3`의 값과 dump 호출 순서입니다.
+    - 실행 뒤 load를 같은 순서로 호출했을 때 복원된 객체가 저장 순서를 반영하는지 보세요.
   check:
     noError: 다중 객체 처리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 다중 객체 처리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.

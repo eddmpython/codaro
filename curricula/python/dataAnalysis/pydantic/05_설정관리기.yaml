@@ -131,7 +131,7 @@ sections:
     prodSettings = AppSettings()
     prodSettings
   exercise:
-    prompt: 환경변수 연동 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 환경변수 연동 예제에서 환경변수 이름이나 값을 바꾸고 Settings 모델에 반영되는지 확인하세요.
     starterCode: |-
       import os
 
@@ -142,8 +142,8 @@ sections:
       prodSettings = AppSettings()
       prodSettings
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 환경변수 이름, 값, Settings 필드 선언입니다.
+    - 실행 뒤 Settings 모델 필드와 출력값이 바꾼 환경값을 반영하는지 보세요.
   check:
     noError: 환경변수 연동에서 `prodSettings` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 환경변수 연동 실행 뒤 `prodSettings` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
@@ -173,7 +173,7 @@ sections:
     dbSettings = DbSettings()
     dbSettings
   exercise:
-    prompt: 환경변수 접두사 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 환경변수 접두사 예제에서 접두사와 환경변수 값을 바꾸고 DB 설정 필드가 달라지는지 확인하세요.
     starterCode: |-
       class DbSettings(BaseSettings):
           model_config = {"env_prefix": "DB_"}
@@ -190,8 +190,8 @@ sections:
       dbSettings = DbSettings()
       dbSettings
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 DB 접두사 환경변수와 Settings 필드 선언입니다.
+    - 실행 뒤 Settings 인스턴스의 필드와 model_dump 결과가 바꾼 환경값을 반영하는지 보세요.
   check:
     noError: 환경변수 접두사의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 환경변수 접두사의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -225,7 +225,7 @@ sections:
     fullSettings = FullSettings()
     fullSettings
   exercise:
-    prompt: 중첩 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 중첩 설정 예제에서 database나 cache 하위 설정 값을 바꾸고 중첩 모델 결과가 달라지는지 확인하세요.
     starterCode: |-
       class DatabaseConfig(BaseModel):
           host: str = "localhost"
@@ -246,8 +246,8 @@ sections:
       fullSettings = FullSettings()
       fullSettings
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `DatabaseConfig`, `CacheConfig`, `FullSettings`의 필드와 기본값입니다.
+    - 실행 뒤 중첩된 Settings 필드와 model_dump 결과가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: 중첩 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 중첩 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -331,7 +331,7 @@ sections:
     authSettings = AuthSettings()
     authSettings
   exercise:
-    prompt: 비밀 값 관리 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 비밀 값 관리 예제에서 API 키나 토큰 값을 바꾸고 SecretStr 출력과 실제 값 접근이 어떻게 다른지 확인하세요.
     starterCode: |-
       class AuthSettings(BaseSettings):
           model_config = {"env_prefix": "AUTH_"}
@@ -346,8 +346,8 @@ sections:
       authSettings = AuthSettings()
       authSettings
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 SecretStr 필드, 환경변수 값, 출력 확인 방식입니다.
+    - 실행 뒤 화면 표시용 값과 `get_secret_value()` 결과가 각각 어떻게 달라지는지 보세요.
   check:
     noError: 비밀 값 관리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 비밀 값 관리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -374,7 +374,7 @@ sections:
     jsonSettings = JsonSettings()
     jsonSettings
   exercise:
-    prompt: JSON 환경변수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: JSON 환경변수 예제에서 JSON 문자열 안의 옵션 값을 바꾸고 Settings 모델이 파싱한 결과를 확인하세요.
     starterCode: |-
       class JsonSettings(BaseSettings):
           allowedHosts: list[str] = []
@@ -388,8 +388,8 @@ sections:
       jsonSettings = JsonSettings()
       jsonSettings
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 JSON 환경변수 문자열과 Settings 필드 타입입니다.
+    - 실행 뒤 파싱된 리스트/딕셔너리 필드가 바꾼 JSON 값을 반영하는지 보세요.
   check:
     noError: JSON 환경변수에서 `jsonSettings` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: JSON 환경변수 실행 뒤 `jsonSettings` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
@@ -421,7 +421,7 @@ sections:
     config2 = getSettings()
     config1 is config2
   exercise:
-    prompt: 싱글톤 패턴 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 싱글톤 패턴 예제에서 캐시 함수 입력이나 설정 값을 바꾸고 같은 객체가 재사용되는지 확인하세요.
     starterCode: |-
       from functools import lru_cache
 
@@ -438,8 +438,8 @@ sections:
       config2 = getSettings()
       config1 is config2
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `getSettings()`의 캐시 대상과 Settings 생성 흐름입니다.
+    - 실행 뒤 객체 identity와 설정 필드가 캐시 정책을 어떻게 반영하는지 보세요.
   check:
     noError: 싱글톤 패턴의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 싱글톤 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -488,7 +488,7 @@ sections:
     svcSettings = ServiceSettings()
     svcSettings
   exercise:
-    prompt: 마이크로서비스 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 마이크로서비스 설정 예제에서 서비스 이름, 포트, 환경 값을 바꾸고 검증된 설정 모델을 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -524,8 +524,8 @@ sections:
       svcSettings = ServiceSettings()
       svcSettings
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 서비스 설정 필드, Literal 환경값, 포트 범위입니다.
+    - 실행 뒤 Settings 모델의 필드와 검증 오류 여부가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: 마이크로서비스 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 마이크로서비스 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -574,7 +574,7 @@ sections:
     webSettings = getWebAppSettings()
     webSettings
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 실습 예제에서 웹 서비스 설정 값을 바꾸고 BaseSettings가 환경/기본값을 어떻게 조합하는지 확인하세요.
     starterCode: |-
       from pydantic_settings import BaseSettings
       from pydantic import BaseModel, Field, SecretStr
@@ -608,8 +608,8 @@ sections:
       webSettings = getWebAppSettings()
       webSettings
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 웹 서비스 Settings 필드, 기본값, 환경변수 입력입니다.
+    - 실행 뒤 생성된 설정 모델과 model_dump 결과가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.

@@ -166,7 +166,7 @@ sections:
     config = ServerConfig()
     config
   exercise:
-    prompt: 필드 설명과 기본값 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 필드 설명과 기본값 예제에서 Field 설명, 기본값, 입력값을 바꾸고 schema와 모델 결과가 달라지는지 확인하세요.
     starterCode: |-
       class ServerConfig(BaseModel):
           host: str = Field(default="localhost", description="서버 호스트 주소")
@@ -176,8 +176,8 @@ sections:
       config = ServerConfig()
       config
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 Field 설명, 기본값, 모델 생성 입력입니다.
+    - 실행 뒤 schema 설명과 모델 기본값이 바꾼 정의를 반영하는지 보세요.
   check:
     type: noError
     noError: 필드 설명과 기본값의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.

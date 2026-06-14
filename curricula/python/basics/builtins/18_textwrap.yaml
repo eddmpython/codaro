@@ -260,7 +260,7 @@ sections:
 
     helpText
   exercise:
-    prompt: 실전 활용 예제 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 실전 활용 예제에서 명령 설명이나 width 값을 바꾸고 CLI 도움말 줄바꿈과 들여쓰기가 달라지는지 확인하세요.
     starterCode: |-
       def formatHelpMessage(command, description, width=70):
           wrapper = textwrap.TextWrapper(
@@ -283,8 +283,8 @@ sections:
 
       helpText
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `commands`의 설명 문자열, `width`, `initial_indent`, `subsequent_indent`입니다.
+    - 실행 뒤 `helpText`의 줄 길이와 들여쓰기 정렬이 바꾼 포맷 정책을 반영하는지 보세요.
   check:
     type: noError
     noError: 실전 활용 예제의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.

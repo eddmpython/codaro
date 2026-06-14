@@ -173,7 +173,7 @@ sections:
     contactSchema = Contact.model_json_schema()
     contactSchema["properties"]["name"]
   exercise:
-    prompt: 예시 값 추가 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 예시 값 추가 예제에서 Field 예시나 입력값을 바꾸고 생성된 JSON Schema 속성이 달라지는지 확인하세요.
     starterCode: |-
       class Contact(BaseModel):
           name: str = Field(description="이름", examples=["홍길동", "김철수"])
@@ -183,8 +183,8 @@ sections:
       contactSchema = Contact.model_json_schema()
       contactSchema["properties"]["name"]
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 Field 예시, 모델 필드 선언, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 properties와 examples가 바꾼 정의를 반영하는지 보세요.
   check:
     type: noError
     noError: 예시 값 추가에서 `contactSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -249,7 +249,7 @@ sections:
     profileSchema = Profile.model_json_schema()
     profileSchema["properties"]["bio"]
   exercise:
-    prompt: Optional과 Union 스키마 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: Optional과 Union 스키마 예제에서 선택 필드 타입이나 입력값을 바꾸고 schema의 anyOf/null 허용이 어떻게 표현되는지 확인하세요.
     starterCode: |-
       class Profile(BaseModel):
           username: str
@@ -259,8 +259,8 @@ sections:
       profileSchema = Profile.model_json_schema()
       profileSchema["properties"]["bio"]
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 Optional/Union 타입 선언과 입력 예시입니다.
+    - 실행 뒤 JSON Schema의 anyOf, nullable 표현, properties가 바꾼 타입을 반영하는지 보세요.
   check:
     noError: Optional과 Union 스키마에서 `profileSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Optional과 Union 스키마 실행 뒤 `profileSchema` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
@@ -287,7 +287,7 @@ sections:
     taskSchema = Task.model_json_schema()
     taskSchema["$defs"]["Status"]
   exercise:
-    prompt: Enum과 Literal 스키마 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: Enum과 Literal 스키마 예제에서 허용값을 바꾸고 schema의 enum/const 표현이 달라지는지 확인하세요.
     starterCode: |-
       class Status(str, Enum):
           PENDING = "pending"
@@ -301,8 +301,8 @@ sections:
       taskSchema = Task.model_json_schema()
       taskSchema["$defs"]["Status"]
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 Enum 멤버, Literal 허용값, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 enum/const 값이 바꾼 정의를 반영하는지 보세요.
   check:
     noError: Enum과 Literal 스키마에서 `PENDING` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Enum과 Literal 스키마 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -324,7 +324,7 @@ sections:
     taggedSchema = TaggedItem.model_json_schema()
     taggedSchema["properties"]["tags"]
   exercise:
-    prompt: 리스트와 딕셔너리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 리스트와 딕셔너리 예제에서 컬렉션 필드 타입이나 기본값을 바꾸고 schema의 배열/객체 표현을 확인하세요.
     starterCode: |-
       class TaggedItem(BaseModel):
           itemId: str
@@ -334,8 +334,8 @@ sections:
       taggedSchema = TaggedItem.model_json_schema()
       taggedSchema["properties"]["tags"]
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 list/dict 필드 선언, 기본값, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 array/object 타입과 item 정의가 바꾼 모델을 반영하는지 보세요.
   check:
     type: noError
     noError: 리스트와 딕셔너리에서 `taggedSchema` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -409,7 +409,7 @@ sections:
     customSchema = CustomModel.model_json_schema()
     customSchema.get("x-api-version"), customSchema.get("x-tags")
   exercise:
-    prompt: 커스텀 스키마 수정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 커스텀 스키마 수정 예제에서 json_schema_extra 값을 바꾸고 schema에 추가 메타데이터가 반영되는지 확인하세요.
     starterCode: |-
       class CustomModel(BaseModel):
           model_config = {
@@ -425,8 +425,8 @@ sections:
       customSchema = CustomModel.model_json_schema()
       customSchema.get("x-api-version"), customSchema.get("x-tags")
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `json_schema_extra`, 모델 필드, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 확장 메타데이터가 바꾼 정의를 반영하는지 보세요.
   check:
     type: noError
     noError: 커스텀 스키마 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
@@ -459,7 +459,7 @@ sections:
     requestSchema = CreateUserRequest.model_json_schema()
     json.dumps(requestSchema, indent=2, ensure_ascii=False)
   exercise:
-    prompt: REST API 스키마 시스템 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: REST API 스키마 시스템 예제에서 요청 필드나 응답 필드를 바꾸고 생성된 API schema 구조가 달라지는지 확인하세요.
     starterCode: |-
       class CreateUserRequest(BaseModel):
           model_config = {
@@ -478,8 +478,8 @@ sections:
       requestSchema = CreateUserRequest.model_json_schema()
       json.dumps(requestSchema, indent=2, ensure_ascii=False)
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 요청/응답 모델 필드와 schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 properties와 required 목록이 바꾼 모델을 반영하는지 보세요.
   check:
     type: noError
     noError: REST API 스키마 시스템의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
@@ -539,7 +539,7 @@ sections:
     blogReqSchema = BlogPostRequest.model_json_schema()
     blogReqSchema
   exercise:
-    prompt: 실습 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 실습 예제에서 블로그 요청 모델의 필드, 예시, 제약을 바꾸고 schema 출력이 달라지는지 확인하세요.
     starterCode: |-
       from pydantic import BaseModel, Field
       from typing import Optional
@@ -583,8 +583,8 @@ sections:
       blogReqSchema = BlogPostRequest.model_json_schema()
       blogReqSchema
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 블로그 요청 모델의 필드, 제약, 예시 값입니다.
+    - 실행 뒤 JSON Schema의 properties, required, examples가 바꾼 모델 정의를 반영하는지 보세요.
   check:
     noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 실습의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.

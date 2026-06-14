@@ -134,7 +134,7 @@ sections:
     strictData = StrictData(intVal=123, strVal="hello")
     strictData
   exercise:
-    prompt: 3단계. 엄격 모드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 3단계. 엄격 모드 예제에서 입력 타입을 바꾸고 strict=True가 자동 변환을 막는지 확인하세요.
     starterCode: |-
       class StrictData(BaseModel):
           model_config = {"strict": True}
@@ -144,8 +144,8 @@ sections:
       strictData = StrictData(intVal=123, strVal="hello")
       strictData
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 strict 필드 선언과 모델 생성 입력 타입입니다.
+    - 실행 뒤 자동 변환이 허용되는 값과 거부되는 값이 의도대로 갈리는지 보세요.
   check:
     type: noError
     noError: 3단계. 엄격 모드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
@@ -303,7 +303,7 @@ sections:
     priority1 = Priority(level="high", score=5)
     priority1
   exercise:
-    prompt: 7단계. Literal 타입 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 7단계. Literal 타입 예제에서 허용값과 입력값을 바꾸고 검증 성공/실패가 달라지는지 확인하세요.
     starterCode: |-
       from typing import Literal
 
@@ -314,8 +314,8 @@ sections:
       priority1 = Priority(level="high", score=5)
       priority1
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `Literal[...]`의 허용값과 모델 생성 입력입니다.
+    - 실행 뒤 허용된 값은 통과하고 벗어난 값은 검증 오류로 잡히는지 보세요.
   check:
     type: noError
     noError: 7단계. Literal 타입에서 `priority1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

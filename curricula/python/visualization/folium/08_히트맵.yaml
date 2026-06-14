@@ -406,7 +406,7 @@ sections:
 
       m9
     hints:
-    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 바꿀 지점은 `largeData`를 만드는 반복 횟수, 좌표 범위, HeatMap의 radius 값입니다.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
     noError: 8단계. 대량 데이터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -480,7 +480,7 @@ sections:
 
       m10
     hints:
-    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 바꿀 지점은 `complaintHeatRows`의 `district`, `loc`, `weight` 값입니다.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
     noError: 9단계. 마커와 조합의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -635,7 +635,7 @@ sections:
   structuredPrimary: true
   subtitle: 예측 → 데이터 오류 확인 → 렌더 검증 → 기준 실험
   goal: 11단계. 실무 히트맵 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  why: 히트맵은 좌표와 가중치가 조금만 틀려도 밀집 지역 해석이 달라지므로 데이터 행과 집계 결과를 함께 확인해야 합니다.
   explanation: |-
     히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을 바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
 
@@ -660,7 +660,7 @@ sections:
     hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
     hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
   exercise:
-    prompt: 11단계. 실무 히트맵 검증 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    prompt: 11단계. 실무 히트맵 검증 예제에서 민원 좌표, 구 이름, 가중치를 바꾸고 가장 뜨거운 구 집계가 달라지는지 확인하세요.
     starterCode: |-
       complaintHeatRows = [
           {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
@@ -680,7 +680,7 @@ sections:
       hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
-    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    - 실행 뒤 구별 누적 점수와 `hottestDistrict`가 바꾼 히트맵 입력을 반영하는지 보세요.
   check:
     noError: 11단계. 실무 히트맵 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 11단계. 실무 히트맵 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.

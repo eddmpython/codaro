@@ -133,15 +133,15 @@ sections:
         json.dump(configData, f)
     'config.json 저장 완료'
   exercise:
-    prompt: 파일 읽기와 쓰기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 파일 읽기와 쓰기 예제에서 설정 키나 값을 바꾸고 저장 후 다시 읽은 JSON이 원본 변경을 반영하는지 확인하세요.
     starterCode: |-
       configData = {'theme': 'dark', 'language': 'ko', 'notifications': True}
       with open(jsonScratch / 'config.json', 'w', encoding='utf-8') as f:
           json.dump(configData, f)
       'config.json 저장 완료'
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `configData`의 키와 값, 저장 파일명, json.dump/json.load 흐름입니다.
+    - 실행 뒤 저장 파일을 다시 읽은 결과와 원본 dict가 같은지 확인하세요.
   check:
     noError: 파일 읽기와 쓰기의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 파일 읽기와 쓰기의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
@@ -197,7 +197,7 @@ sections:
     convertedJson = json.dumps(mixedData, indent=2)
     convertedJson
   exercise:
-    prompt: 지원 데이터 타입 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 지원 데이터 타입 예제에서 JSON으로 직접 직렬화되는 값과 별도 처리가 필요한 값을 바꿔 변환 결과를 확인하세요.
     starterCode: |-
       mixedData = {
           'text': 'Hello',
@@ -210,8 +210,8 @@ sections:
       convertedJson = json.dumps(mixedData, indent=2)
       convertedJson
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `mixedData`의 문자열, 숫자, 불린, None, 리스트 값입니다.
+    - 실행 뒤 `convertedJson`에 값과 타입 변환이 어떻게 반영됐는지 보세요.
   check:
     noError: 지원 데이터 타입에서 `mixedData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 지원 데이터 타입 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -271,15 +271,15 @@ sections:
     totalUsers = parsedResponse['data']['users']
     totalUsers
   exercise:
-    prompt: 실전 활용 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: 실전 활용 예제에서 API 응답 JSON의 키나 숫자 값을 바꾸고 파싱 결과가 달라지는지 확인하세요.
     starterCode: |-
       apiResponse = '{"status": "success", "data": {"users": 150, "active": 120}}'
       parsedResponse = json.loads(apiResponse)
       totalUsers = parsedResponse['data']['users']
       totalUsers
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 JSON 문자열 안의 `status`, `users`, `active` 값입니다.
+    - 실행 뒤 `parsedResponse`와 `totalUsers`가 바꾼 응답 데이터를 반영하는지 보세요.
   check:
     noError: 실전 활용에서 `apiResponse` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실전 활용 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -318,7 +318,7 @@ sections:
     assert 'token' not in normalizedConfig
     normalizedConfig
   exercise:
-    prompt: '검증 루프: JSON 설정 품질 게이트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.'
+    prompt: '검증 루프: JSON 설정 품질 게이트 예제에서 설정 필드, 제한값, 비밀 키를 바꾸고 정규화와 검증 결과가 달라지는지 확인하세요.'
     starterCode: |-
       jsonWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_json_workflow_'))
       rawConfig = {
@@ -344,8 +344,8 @@ sections:
       assert 'token' not in normalizedConfig
       normalizedConfig
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `rawConfig`의 중첩 필드, `features`, `limits`, 비밀 키입니다.
+    - 실행 뒤 정렬된 공개 설정과 비밀 키 제거 여부가 바꾼 입력을 반영하는지 보세요.
   check:
     noError: '검증 루프: JSON 설정 품질 게이트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.'
     resultCheck: '검증 루프: JSON 설정 품질 게이트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'

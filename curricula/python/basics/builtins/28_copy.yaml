@@ -310,7 +310,7 @@ sections:
 
     defaultConfig, customConfig
   exercise:
-    prompt: 실전 활용 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 실전 활용 예제에서 기본 설정 dict나 중첩 리스트를 바꾸고 deepcopy가 원본을 보존하는지 확인하세요.
     starterCode: |-
       import copy
 
@@ -326,8 +326,8 @@ sections:
 
       defaultConfig, customConfig
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `defaultConfig`의 키, `customConfig` 수정값, 중첩 `features` 리스트입니다.
+    - 실행 뒤 `defaultConfig`와 `customConfig`가 서로 독립적으로 유지되는지 보세요.
   check:
     type: noError
     noError: 실전 활용의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.

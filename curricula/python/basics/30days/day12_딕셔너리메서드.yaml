@@ -66,7 +66,7 @@ sections:
     config = {'host': 'localhost', 'port': 8080}
     config.get('host')
   exercise:
-    prompt: get() 메서드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: get() 메서드 예제에서 조회 키나 기본값을 바꾸고 존재하지 않는 키를 안전하게 처리하는 결과를 확인하세요.
     starterCode: |-
       config = {'host': 'localhost', 'port': 8080}
       config.get('host')
@@ -386,7 +386,7 @@ sections:
     assert locale == 'ko-KR'
     assert finalConfig['region'] == 'kr'
   exercise:
-    prompt: '검증 루프: 기본 설정과 사용자 설정 병합하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    prompt: '검증 루프: 기본 설정과 사용자 설정 병합하기 예제에서 설정 키나 값을 바꾸고 병합 결과가 달라지는지 확인하세요.'
     starterCode: |-
       counters = {}
       counters.setdefault('success', 0)
@@ -396,8 +396,8 @@ sections:
       assert counters == {'success': 1, 'failed': 0}
       counters
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 기본 설정 dict, 사용자 설정 dict, update 호출 순서입니다.
+    - 실행 뒤 최종 설정의 키 우선순위와 병합 결과가 바꾼 입력을 반영하는지 보세요.
     predict:
       prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
       expectedValue: (직접 실행해 본 값을 적어주세요)

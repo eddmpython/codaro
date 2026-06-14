@@ -127,7 +127,7 @@ sections:
     scores['alice'] += 3
     dict(scores)
   exercise:
-    prompt: defaultdict 기본값 딕셔너리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: defaultdict 기본값 딕셔너리 예제에서 사용자 이름이나 누적 점수를 바꾸고 자동 기본값이 합계에 반영되는지 확인하세요.
     starterCode: |-
       scores = defaultdict(int)
       scores['alice'] += 10
@@ -135,8 +135,8 @@ sections:
       scores['alice'] += 3
       dict(scores)
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `scores[...]`의 키 이름과 더하는 점수입니다.
+    - 실행 뒤 dict로 변환한 결과가 새 키와 누적값을 반영하는지 보세요.
   check:
     type: noError
     noError: defaultdict 기본값 딕셔너리에서 `scores` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -189,14 +189,14 @@ sections:
     p = Point(3, 4)
     p.x, p.y
   exercise:
-    prompt: namedtuple 이름있는 튜플 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: namedtuple 이름있는 튜플 예제에서 필드 이름이나 좌표 값을 바꾸고 속성 접근 결과가 달라지는지 확인하세요.
     starterCode: |-
       Point = namedtuple('Point', ['x', 'y'])
       p = Point(3, 4)
       p.x, p.y
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `namedtuple`의 필드 목록과 `Point(...)` 생성 인자입니다.
+    - 실행 뒤 `p.x`, `p.y` 같은 속성 접근이 바꾼 필드와 값을 반영하는지 보세요.
   check:
     type: noError
     noError: namedtuple 이름있는 튜플에서 `Point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -219,15 +219,15 @@ sections:
     combined = ChainMap(custom, defaults)
     combined['color'], combined['size']
   exercise:
-    prompt: ChainMap 딕셔너리 체인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: ChainMap 딕셔너리 체인 예제에서 기본값과 사용자 설정 dict를 바꾸고 조회 우선순위가 어떻게 달라지는지 확인하세요.
     starterCode: |-
       defaults = {'color': 'red', 'size': 10}
       custom = {'size': 20}
       combined = ChainMap(custom, defaults)
       combined['color'], combined['size']
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - 바꿀 지점은 `defaults`, `custom`, `ChainMap(custom, defaults)`의 순서입니다.
+    - 실행 뒤 같은 키 조회가 앞쪽 dict를 우선하는지 확인하세요.
   check:
     type: noError
     noError: ChainMap 딕셔너리 체인에서 `defaults` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.

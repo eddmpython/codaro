@@ -854,7 +854,7 @@ sections:
   structuredPrimary: true
   subtitle: 데이터 계약과 레이어 렌더 확인
   goal: 11단계. 종합 지도 품질 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  why: 종합 지도는 위치 데이터, GeoJSON, 레이어 표시 의도를 함께 확인해야 화면 완성 뒤에도 데이터 누락을 줄일 수 있습니다.
   explanation: |-
     종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
 
@@ -910,7 +910,7 @@ sections:
 
     len(projectSites), len(projectGeo["features"]), len(routePoints)
   exercise:
-    prompt: 11단계. 종합 지도 품질 검증 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    prompt: 11단계. 종합 지도 품질 검증 예제에서 관광지, GeoJSON feature, 경로 좌표, 카테고리 표시 설정을 바꾸고 검증 결과가 달라지는지 확인하세요.
     starterCode: |-
       import folium
       from folium.plugins import HeatMap, MarkerCluster
@@ -960,8 +960,8 @@ sections:
 
       len(projectSites), len(projectGeo["features"]), len(routePoints)
     hints:
-    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
-    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+    - 바꿀 지점은 `projectSites`, `projectGeo`, `routePoints`, `categoryConfig`의 좌표와 카테고리 값입니다.
+    - 실행 뒤 개수 검증, 카테고리 설정, 레이어 구성 기준이 바꾼 지도 데이터를 반영하는지 보세요.
   check:
     noError: 11단계. 종합 지도 품질 검증의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
     resultCheck: 11단계. 종합 지도 품질 검증의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
