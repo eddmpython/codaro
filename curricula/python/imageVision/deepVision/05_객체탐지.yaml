@@ -190,6 +190,7 @@ sections:
   snippet: |-
     from matplotlib.patches import Rectangle
 
+    detCategories = detWeights.meta['categories']
     fig, axis = plt.subplots(figsize=(8, 6))
     axis.imshow(china)
     for box, score, labelIdx in zip(chinaBoxes, chinaScores, chinaLabels):

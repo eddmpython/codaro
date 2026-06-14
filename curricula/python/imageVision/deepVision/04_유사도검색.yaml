@@ -74,6 +74,7 @@ sections:
     from torchvision.models import resnet18, ResNet18_Weights
     import numpy as np
     import matplotlib.pyplot as plt
+    from PIL import Image
     from sklearn.datasets import load_sample_image
 
     china = load_sample_image('china.jpg')
@@ -116,17 +117,22 @@ sections:
   explanation: |-
     각 사진을 preprocess로 변환한 뒤 `torch.stack(...)` 으로 배치 텐서를 만듭니다. 인코더에 통과시키고 flatten하면 (N, 512) 행렬이 됩니다.
 
+    `weights.transforms()` 전처리는 PIL Image나 torch Tensor만 받습니다. 라이브러리 사진은 numpy ndarray이므로 `Image.fromarray(...)` 로 감싸 전달합니다.
+
     L2 정규화한 행렬을 보관하면 이후 검색이 단순해집니다.
   tips:
   - 라이브러리가 큰 경우 메모리 사용량이 커집니다. 적절한 배치 크기로 나누어 처리하는 것이 표준입니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
   snippet: |-
+    from PIL import Image
+
     weights = ResNet18_Weights.DEFAULT
     model = resnet18(weights=weights)
     encoder = nn.Sequential(*list(model.children())[:-1])
     encoder.eval()
     preprocess = weights.transforms()
 
-    batch = torch.stack([preprocess(item[1]) for item in library])
+    batch = torch.stack([preprocess(Image.fromarray(item[1])) for item in library])
     with torch.inference_mode():
         libFeat = encoder(batch).flatten(1)
     libFeatNorm = F.normalize(libFeat, dim=1)
@@ -150,11 +156,14 @@ sections:
   why: 검색은 항상 질의 임베딩 한 개와 라이브러리 N개의 비교입니다.
   explanation: |-
     질의는 라이브러리에 없는 새 사진이어야 의미 있는 검증이 됩니다. 여기서는 china에 색 보정을 살짝 가한 사진을 질의로 씁니다.
+
+    질의 사진도 numpy ndarray이므로 `weights.transforms()` 전처리에 넣기 전 `Image.fromarray(...)` 로 PIL Image로 감쌉니다.
   tips:
   - 질의 사진은 라이브러리에 들어가지 않아야 검색 평가가 공정합니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
   snippet: |-
     queryImg = (china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8)
-    queryBatch = preprocess(queryImg).unsqueeze(0)
+    queryBatch = preprocess(Image.fromarray(queryImg)).unsqueeze(0)
     with torch.inference_mode():
         queryFeat = encoder(queryBatch).flatten(1)
     queryFeatNorm = F.normalize(queryFeat, dim=1)
@@ -163,7 +172,7 @@ sections:
     prompt: flower 기반의 질의 queryFlower를 만들고 임베딩을 얻으세요.
     starterCode: |-
       queryFlower = (flower.astype(np.float32) * 0.9 + 10).clip(0, 255).astype(np.uint8)
-      queryFlowerBatch = preprocess(queryFlower).unsqueeze(0)
+      queryFlowerBatch = preprocess(Image.fromarray(queryFlower)).unsqueeze(0)
       with torch.inference_mode():
           queryFlowerFeat = encoder(queryFlowerBatch).flatten(___)
       queryFlowerNorm = F.normalize(queryFlowerFeat, dim=1)

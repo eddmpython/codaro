@@ -103,15 +103,20 @@ sections:
   explanation: |-
     두 모델의 권장 전처리가 거의 같지만 미세하게 다를 수 있습니다. 비교 실험에서는 한 가지 전처리(보통 ResNet50의 권장)를 두 모델에 모두 적용합니다.
 
+    권장 전처리는 PIL Image나 텐서만 받습니다. `load_sample_image` 는 numpy 배열을 주므로 `Image.fromarray` 로 PIL Image로 바꿔 넣습니다.
+
     입력 텐서도 같은 배치로 만들어 비교의 조건을 통일합니다.
   tips:
   - 비교 실험은 입력을 통제하지 않으면 결론이 흔들립니다.
+  - 권장 transforms는 numpy 배열을 거부하므로 Image.fromarray로 PIL Image로 변환해 넣습니다.
   snippet: |-
+    from PIL import Image
+
     preprocess = weights50.transforms()
     china = load_sample_image('china.jpg')
     flower = load_sample_image('flower.jpg')
-    chinaBatch = preprocess(china).unsqueeze(0)
-    flowerBatch = preprocess(flower).unsqueeze(0)
+    chinaBatch = preprocess(Image.fromarray(china)).unsqueeze(0)
+    flowerBatch = preprocess(Image.fromarray(flower)).unsqueeze(0)
     chinaBatch.shape
   exercise:
     prompt: 두 이미지 텐서의 모양이 같은지 확인하세요.
@@ -173,6 +178,8 @@ sections:
   tips:
   - 일치율은 데이터셋 단위로 측정하지만 학습용에서는 두 사진 정도면 충분합니다.
   snippet: |-
+    cat18 = weights18.meta['categories']
+    cat50 = weights50.meta['categories']
     with torch.inference_mode():
         top18 = int(model18(chinaBatch).argmax(dim=1))
         top50 = int(model50(chinaBatch).argmax(dim=1))

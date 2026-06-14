@@ -62,9 +62,10 @@ sections:
   explanation: |-
     deepVision 3강과 같은 패턴입니다. `nn.Sequential(*list(model.children())[:-1])` 로 분류층을 제외한 인코더를 만듭니다.
 
-    preprocess는 ResNet18 권장 transforms를 그대로 사용합니다.
+    preprocess는 ResNet18 권장 transforms를 그대로 사용합니다. 이 transforms는 PIL Image를 입력으로 받으므로, numpy 배열 이미지는 `Image.fromarray(...)` 로 감싸서 넘깁니다.
   tips:
   - 얼굴 특화 임베딩이 필요하면 facenet-pytorch 같은 별도 패키지를 쓰는 것이 표준입니다. 학습용으로는 일반 임베딩으로 흐름만 익힙니다.
+  - load_sample_image는 numpy 배열을 돌려줍니다. preprocess에 넣기 전 `Image.fromarray(...)` 로 PIL Image로 변환해야 합니다.
   snippet: |-
     import torch
     import torchvision
@@ -74,6 +75,7 @@ sections:
     import numpy as np
     import matplotlib.pyplot as plt
     from sklearn.datasets import load_sample_image
+    from PIL import Image
     import cv2
 
     weights = ResNet18_Weights.DEFAULT
@@ -86,7 +88,7 @@ sections:
     starterCode: |-
       china = load_sample_image('china.jpg')
       with torch.inference_mode():
-          feat = encoder(preprocess(china).unsqueeze(0)).flatten(1)
+          feat = encoder(preprocess(Image.fromarray(china)).unsqueeze(0)).flatten(1)
       feat.shape[___]
     hints:
     - 빈칸은 정수 1입니다(두 번째 차원).
@@ -105,6 +107,7 @@ sections:
   tips:
   - 변형이 너무 강하면 같은 쌍도 다르게 인식됩니다. 변형 강도를 조절하면서 임베딩의 강건성을 시험합니다.
   snippet: |-
+    china = load_sample_image('china.jpg')
     flower = load_sample_image('flower.jpg')
     chinaBright = (china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8)
     chinaDim = (china.astype(np.float32) * 0.7).clip(0, 255).astype(np.uint8)
@@ -138,14 +141,16 @@ sections:
   goal: 두 이미지를 입력으로 받아 코사인 유사도 점수를 돌려주는 함수를 만듭니다.
   why: 함수로 묶어야 다양한 쌍에 일관되게 적용할 수 있습니다.
   explanation: |-
-    함수 내부에서 각 사진을 preprocess → encoder → flatten → normalize 한 뒤 내적을 계산합니다. L2 정규화한 두 벡터의 내적이 코사인 유사도입니다.
+    함수 내부에서 각 사진을 `Image.fromarray` → preprocess → encoder → flatten → normalize 한 뒤 내적을 계산합니다. preprocess는 PIL Image를 받으므로 numpy 이미지는 먼저 변환합니다. L2 정규화한 두 벡터의 내적이 코사인 유사도입니다.
   tips:
   - 함수 호출 횟수가 많으면 미리 임베딩을 계산해 캐싱하는 것이 효율적입니다.
   snippet: |-
+    from PIL import Image
+
     def cosine(imgA, imgB):
         with torch.inference_mode():
-            ea = F.normalize(encoder(preprocess(imgA).unsqueeze(0)).flatten(1), dim=1)
-            eb = F.normalize(encoder(preprocess(imgB).unsqueeze(0)).flatten(1), dim=1)
+            ea = F.normalize(encoder(preprocess(Image.fromarray(imgA)).unsqueeze(0)).flatten(1), dim=1)
+            eb = F.normalize(encoder(preprocess(Image.fromarray(imgB)).unsqueeze(0)).flatten(1), dim=1)
         return float((ea * eb).sum())
 
     sameScore = cosine(*samePair)

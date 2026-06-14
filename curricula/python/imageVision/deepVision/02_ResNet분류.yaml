@@ -73,6 +73,7 @@ sections:
     from torchvision import transforms
     import numpy as np
     import matplotlib.pyplot as plt
+    from PIL import Image
     from sklearn.datasets import load_sample_image
 
     weights = ResNet18_Weights.DEFAULT
@@ -127,13 +128,18 @@ sections:
   explanation: |-
     `preprocess(img)` 결과는 (C, H, W)입니다. `unsqueeze(0)` 으로 맨 앞에 차원을 추가해 (1, C, H, W)로 만들면 됩니다.
 
+    `weights.transforms()` 가 만든 전처리는 PIL Image나 torch Tensor만 받습니다. `load_sample_image` 는 numpy ndarray를 반환하므로 `Image.fromarray(...)` 로 PIL Image로 감싼 뒤 전달합니다.
+
     모델 호출 결과는 logits 텐서 (1, 1000) 입니다. 1000은 ImageNet 클래스 수입니다.
   tips:
   - torch.inference_mode 컨텍스트 안에서 모델을 호출하는 것을 잊지 마세요.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
   snippet: |-
+    from PIL import Image
+
     preprocess = weights.transforms()
     china = load_sample_image('china.jpg')
-    batch = preprocess(china).unsqueeze(0)
+    batch = preprocess(Image.fromarray(china)).unsqueeze(0)
     with torch.inference_mode():
         logits = model(batch)
     batch.shape, logits.shape
@@ -141,7 +147,7 @@ sections:
     prompt: flower 이미지에도 같은 흐름을 적용해 logitsFlower를 얻으세요.
     starterCode: |-
       flower = load_sample_image('flower.jpg')
-      batchFlower = preprocess(flower).___(0)
+      batchFlower = preprocess(Image.fromarray(flower)).___(0)
       with torch.inference_mode():
           logitsFlower = model(batchFlower)
       logitsFlower.shape
@@ -235,6 +241,13 @@ sections:
   tips:
   - 모델 자신감이 낮은(top-1 확률이 작은) 이미지는 사진의 카테고리가 ImageNet 1000 클래스에 잘 매핑되지 않는다는 신호입니다.
   snippet: |-
+    flower = load_sample_image('flower.jpg')
+    batchFlower = preprocess(Image.fromarray(flower)).unsqueeze(0)
+    with torch.inference_mode():
+        logitsFlower = model(batchFlower)
+    probsFlower = torch.softmax(logitsFlower, dim=1).squeeze(0)
+    flowerTop5 = [(categories[int(i)], float(p)) for i, p in zip(*probsFlower.topk(5))]
+
     chinaTop1 = chinaTop5[0]
     flowerTop1 = flowerTop5[0]
     {"china": chinaTop1, "flower": flowerTop1}

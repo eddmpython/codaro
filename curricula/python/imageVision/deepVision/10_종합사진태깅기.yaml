@@ -105,23 +105,28 @@ sections:
   goal: 분류 모델로 사진의 top-1 라벨을 얻습니다.
   why: 사진 전체의 카테고리는 다른 결과의 맥락이 됩니다.
   explanation: |-
-    `clsWeights.transforms()` 로 전처리한 뒤 추론합니다. argmax로 top-1 인덱스를 얻고 카테고리 리스트로 라벨화합니다.
+    `clsWeights.transforms()` 로 전처리한 뒤 추론합니다. 이 권장 전처리는 PIL Image나 텐서만 받으므로 numpy 배열은 `Image.fromarray` 로 PIL Image로 바꿔 넣습니다. argmax로 top-1 인덱스를 얻고 카테고리 리스트로 라벨화합니다.
   tips:
   - 분류 결과는 사진의 "주요" 객체 한 개입니다. 여러 객체가 있어도 한 라벨만 나옵니다.
+  - 분류·세그 권장 transforms는 numpy 배열을 거부하므로 Image.fromarray로 PIL Image로 변환해 넣습니다.
   snippet: |-
+    from PIL import Image
+
     target = load_sample_image('china.jpg')
     clsPreprocess = clsWeights.transforms()
     with torch.inference_mode():
-        clsLogits = classifier(clsPreprocess(target).unsqueeze(0))
+        clsLogits = classifier(clsPreprocess(Image.fromarray(target)).unsqueeze(0))
     clsTopIdx = int(clsLogits.argmax(dim=1))
     clsLabel = clsWeights.meta['categories'][clsTopIdx]
     clsLabel
   exercise:
     prompt: flower 사진에도 같은 분류를 적용하세요.
     starterCode: |-
+      from PIL import Image
+
       flowerImg = load_sample_image('flower.jpg')
       with torch.inference_mode():
-          flowerLogits = classifier(clsPreprocess(___).unsqueeze(0))
+          flowerLogits = classifier(clsPreprocess(Image.fromarray(___)).unsqueeze(0))
       flowerLabel = clsWeights.meta['categories'][int(flowerLogits.argmax(dim=1))]
       flowerLabel
     hints:
@@ -170,20 +175,25 @@ sections:
   goal: 세그 모델로 픽셀별 클래스 라벨 맵을 얻습니다.
   why: 세그는 객체 영역의 정확한 모양을 알려주는 가장 세밀한 정보입니다.
   explanation: |-
-    `segWeights.transforms()` 가 권장 전처리입니다. 모델 호출 후 `out` 키의 argmax로 라벨 맵을 얻습니다.
+    `segWeights.transforms()` 가 권장 전처리입니다. 분류와 마찬가지로 numpy 배열은 `Image.fromarray` 로 PIL Image로 바꿔 넣습니다. 모델 호출 후 `out` 키의 argmax로 라벨 맵을 얻습니다.
   tips:
   - 세그 결과 라벨 맵의 크기가 원본과 다를 수 있습니다. 시각화 시 원본을 같은 크기로 잘라 맞춥니다.
   snippet: |-
+    from PIL import Image
+
     segPreprocess = segWeights.transforms()
     with torch.inference_mode():
-        segOut = segmenter(segPreprocess(target).unsqueeze(0))
+        segOut = segmenter(segPreprocess(Image.fromarray(target)).unsqueeze(0))
     segLabelMap = segOut['out'].argmax(dim=1).squeeze(0)
     segLabelMap.shape, int(segLabelMap.max())
   exercise:
     prompt: flower 사진에도 같은 세그를 적용하세요.
     starterCode: |-
+      from PIL import Image
+
+      flowerImg = load_sample_image('flower.jpg')
       with torch.inference_mode():
-          flowerSegOut = segmenter(segPreprocess(flowerImg).unsqueeze(___))
+          flowerSegOut = segmenter(segPreprocess(Image.fromarray(flowerImg)).unsqueeze(___))
       flowerSegLabelMap = flowerSegOut['out'].argmax(dim=1).squeeze(0)
       flowerSegLabelMap.shape
     hints:
@@ -255,11 +265,15 @@ sections:
   tips:
   - 함수 반환을 표준 dict로 두면 후속 응용에서 재사용이 쉽습니다.
   snippet: |-
+    from PIL import Image
+
+    flowerImg = load_sample_image('flower.jpg')
+
     def autoTag(img):
-        clsLogitsLocal = classifier(clsPreprocess(img).unsqueeze(0))
+        clsLogitsLocal = classifier(clsPreprocess(Image.fromarray(img)).unsqueeze(0))
         tensorLocal = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
         detLocal = detector([tensorLocal])[0]
-        segLocal = segmenter(segPreprocess(img).unsqueeze(0))
+        segLocal = segmenter(segPreprocess(Image.fromarray(img)).unsqueeze(0))
         return {
             "label": clsWeights.meta['categories'][int(clsLogitsLocal.argmax(dim=1))],
             "boxes": [b.tolist() for b in detLocal['boxes'][detLocal['scores'] > 0.5]],

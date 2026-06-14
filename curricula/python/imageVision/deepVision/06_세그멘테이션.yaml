@@ -96,19 +96,24 @@ sections:
   explanation: |-
     `segWeights.transforms()` 가 권장 전처리입니다. 보통 resize와 normalize가 포함됩니다.
 
+    이 권장 전처리는 PIL Image 또는 텐서만 받습니다. `load_sample_image` 는 numpy 배열을 주므로 `Image.fromarray` 로 PIL Image로 바꿔 넣습니다.
+
     배치 차원을 추가해 (1, 3, H, W) 형식으로 만들어야 모델에 넘길 수 있습니다.
   tips:
   - 입력 크기를 너무 크게 두면 CPU 추론이 매우 느려집니다. 권장 transforms가 합리적인 크기로 줄여 줍니다.
+  - 권장 transforms는 numpy 배열을 거부하므로 Image.fromarray로 PIL Image로 변환해 넣습니다.
   snippet: |-
+    from PIL import Image
+
     china = load_sample_image('china.jpg')
     segPreprocess = segWeights.transforms()
-    inputBatch = segPreprocess(china).unsqueeze(0)
+    inputBatch = segPreprocess(Image.fromarray(china)).unsqueeze(0)
     inputBatch.shape
   exercise:
     prompt: flower 이미지에도 같은 전처리를 적용하세요.
     starterCode: |-
       flower = load_sample_image('flower.jpg')
-      flowerBatch = segPreprocess(flower).unsqueeze(___)
+      flowerBatch = segPreprocess(Image.fromarray(flower)).unsqueeze(___)
       flowerBatch.shape
     hints:
     - 빈칸은 정수 0입니다.
@@ -222,6 +227,7 @@ sections:
   tips:
   - "원본 - 배경 = 객체 마스크 추출이 이 패턴의 자연스러운 응용입니다."
   snippet: |-
+    segCategories = segWeights.meta['categories']
     uniqueLabels = torch.unique(chinaLabelMap).tolist()
     summary = {idx: segCategories[idx] for idx in uniqueLabels}
     summary

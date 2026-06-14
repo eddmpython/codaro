@@ -185,7 +185,7 @@ sections:
   subtitle: 그룹별 boxplot
   goal: 4단계. 종별 박스플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
   why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
-  explanation: 이전에 배운 박스플롯을 종별로 그려봅니다. 여러 그룹의 박스플롯을 한 번에 그리려면 각 그룹의 데이터를 리스트로 전달합니다. labels로 각 박스에 라벨을
+  explanation: 이전에 배운 박스플롯을 종별로 그려봅니다. 여러 그룹의 박스플롯을 한 번에 그리려면 각 그룹의 데이터를 리스트로 전달합니다. tick_labels로 각 박스에 라벨을
     지정합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -195,7 +195,7 @@ sections:
     speciesBox = ['Adelie', 'Chinstrap', 'Gentoo']
     weightBox = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesBox]
 
-    axBox.boxplot(weightBox, labels=speciesBox)
+    axBox.boxplot(weightBox, tick_labels=speciesBox)
     axBox.set_title('펭귄 종별 체중 분포', fontsize=14)
     axBox.set_xlabel('종', fontsize=12)
     axBox.set_ylabel('체중 (g)', fontsize=12)
@@ -209,7 +209,7 @@ sections:
       speciesBox = ['Adelie', 'Chinstrap', 'Gentoo']
       weightBox = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesBox]
 
-      axBox.boxplot(weightBox, labels=speciesBox)
+      axBox.boxplot(weightBox, tick_labels=speciesBox)
       axBox.set_title('펭귄 종별 체중 분포', fontsize=14)
       axBox.set_xlabel('종', fontsize=12)
       axBox.set_ylabel('체중 (g)', fontsize=12)
@@ -329,7 +329,7 @@ sections:
     colorsShare = ['#E74C3C', '#27AE60', '#3498DB']
     weightShare = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesShare]
 
-    bpShare = axBoxShare.boxplot(weightShare, labels=speciesShare, patch_artist=True)
+    bpShare = axBoxShare.boxplot(weightShare, tick_labels=speciesShare, patch_artist=True)
     for patch, color in zip(bpShare['boxes'], colorsShare):
         patch.set_facecolor(color)
         patch.set_alpha(0.7)
@@ -346,7 +346,7 @@ sections:
       colorsShare = ['#E74C3C', '#27AE60', '#3498DB']
       weightShare = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesShare]
 
-      bpShare = axBoxShare.boxplot(weightShare, labels=speciesShare, patch_artist=True)
+      bpShare = axBoxShare.boxplot(weightShare, tick_labels=speciesShare, patch_artist=True)
       for patch, color in zip(bpShare['boxes'], colorsShare):
           patch.set_facecolor(color)
           patch.set_alpha(0.7)

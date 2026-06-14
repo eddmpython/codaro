@@ -73,6 +73,7 @@ sections:
     import torch.nn as nn
     import numpy as np
     import matplotlib.pyplot as plt
+    from PIL import Image
     from sklearn.datasets import load_sample_image
 
     weights = ResNet18_Weights.DEFAULT
@@ -127,13 +128,18 @@ sections:
   explanation: |-
     같은 전처리 (weights.transforms) 로 입력을 만든 뒤 encoder를 호출합니다. 결과는 (1, 512, 1, 1) 이므로 `.flatten(1)` 으로 (1, 512) 로 펴면 됩니다.
 
+    `weights.transforms()` 전처리는 PIL Image나 torch Tensor만 받으므로, `load_sample_image` 가 준 numpy ndarray는 `Image.fromarray(...)` 로 감싸 전달합니다.
+
     numpy로 변환하면 `.detach().numpy()` 를 거칩니다.
   tips:
   - flatten(1) 은 인덱스 1 차원 이후를 모두 한 차원으로 합칩니다. squeeze 보다 안전합니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
   snippet: |-
+    from PIL import Image
+
     preprocess = weights.transforms()
     china = load_sample_image('china.jpg')
-    batch = preprocess(china).unsqueeze(0)
+    batch = preprocess(Image.fromarray(china)).unsqueeze(0)
     with torch.inference_mode():
         feat = encoder(batch).flatten(1)
     feat.shape, feat.dtype
@@ -141,7 +147,7 @@ sections:
     prompt: flower 이미지의 임베딩 featFlower 를 같은 방식으로 얻으세요.
     starterCode: |-
       flower = load_sample_image('flower.jpg')
-      batchFlower = preprocess(flower).unsqueeze(0)
+      batchFlower = preprocess(Image.fromarray(flower)).unsqueeze(0)
       with torch.inference_mode():
           featFlower = encoder(batchFlower).flatten(___)
       featFlower.shape
@@ -192,6 +198,12 @@ sections:
   tips:
   - 코사인 유사도가 모든 사진 쌍에서 0.99 이상이면 모델이 사진을 충분히 구분하지 못한다는 신호일 수 있습니다.
   snippet: |-
+    flower = load_sample_image('flower.jpg')
+    batchFlower = preprocess(Image.fromarray(flower)).unsqueeze(0)
+    with torch.inference_mode():
+        featFlower = encoder(batchFlower).flatten(1)
+    featFlowerNorm = F.normalize(featFlower, dim=1)
+
     sameSim = float((featNorm * featNorm).sum())
     diffSim = float((featNorm * featFlowerNorm).sum())
     sameSim, diffSim
@@ -199,7 +211,7 @@ sections:
     prompt: china와 china를 좌우 반전한 사진의 임베딩을 만들고 코사인 유사도를 비교하세요.
     starterCode: |-
       mirrored = china[:, ::-1, :].copy()
-      batchMirror = preprocess(mirrored).unsqueeze(0)
+      batchMirror = preprocess(Image.fromarray(mirrored)).unsqueeze(0)
       with torch.inference_mode():
           featMirror = encoder(batchMirror).flatten(1)
       featMirrorNorm = F.normalize(featMirror, dim=1)
@@ -207,6 +219,7 @@ sections:
       mirrorSim, ___
     hints:
     - 빈칸은 sameSim 같은 비교 변수입니다.
+    - mirrored는 ndarray이므로 Image.fromarray로 감싸 전처리에 넣습니다.
     - 좌우 반전 사진은 유사도가 1보다 살짝 작아야 정상입니다.
   check:
     noError: 코사인 계산이 오류 없이 끝나야 합니다.

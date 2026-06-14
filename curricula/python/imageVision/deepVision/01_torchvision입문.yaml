@@ -185,23 +185,25 @@ sections:
   explanation: |-
     PyTorch 0.13+ 부터 `torchvision.models.<Model>_Weights.DEFAULT` 가 표준 가중치 객체입니다. `weights.transforms()` 가 권장 전처리, `weights.meta['categories']` 가 클래스 라벨 리스트입니다.
 
-    이 메타데이터를 사용하면 모델별로 다른 전처리·라벨을 일관된 방법으로 다룰 수 있습니다.
+    이 메타데이터를 사용하면 모델별로 다른 전처리·라벨을 일관된 방법으로 다룰 수 있습니다. 다만 weights.transforms()는 numpy ndarray가 아니라 PIL Image(또는 텐서)를 입력으로 받으므로, sklearn 샘플 이미지 같은 ndarray는 Image.fromarray()로 변환해 넣습니다.
   tips:
   - 처음 호출 시 가중치 파일을 자동 다운로드합니다(약 40MB). 네트워크가 차단된 환경에서는 미리 캐시 디렉터리에 받아 두세요.
   snippet: |-
     from torchvision.models import ResNet18_Weights
+    from PIL import Image
 
     weights = ResNet18_Weights.DEFAULT
     autoPreprocess = weights.transforms()
     categories = weights.meta['categories']
+    chinaAuto = autoPreprocess(Image.fromarray(china))
     len(categories), categories[0], categories[1]
   exercise:
     prompt: autoPreprocess로 china를 변환한 chinaAuto 텐서를 만들고 shape을 확인하세요.
     starterCode: |-
-      chinaAuto = autoPreprocess(___)
+      chinaAuto = autoPreprocess(Image.fromarray(___))
       chinaAuto.shape, chinaAuto.dtype
     hints:
-    - 빈칸은 numpy 이미지 변수입니다.
+    - 빈칸은 numpy 이미지 변수(china)입니다. weights.transforms()는 PIL Image를 받으므로 Image.fromarray로 감쌉니다.
     - 결과는 자동으로 224x224 정도로 resize된 텐서입니다.
   check:
     noError: weights 메타데이터 추출이 오류 없이 끝나야 합니다.

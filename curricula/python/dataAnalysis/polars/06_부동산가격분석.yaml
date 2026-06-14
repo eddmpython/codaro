@@ -620,6 +620,13 @@ sections:
   exercise:
     prompt: orderFrame의 quantity 한 값을 0이나 음수로 바꿔 validateOrderFrame이 ValueError를 던지는지 확인하세요.
     starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
               lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,

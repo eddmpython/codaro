@@ -94,7 +94,7 @@ sections:
           eventBook.sheets[0].name = firstEvent
           eventBook.sheets[firstEvent]["A1"].value = eventMedals[firstEvent]
           for laterEvent in eventNames[1:]:
-              addedSheet = eventBook.sheets.add(laterEvent)
+              addedSheet = eventBook.sheets.add(laterEvent, after=eventBook.sheets[-1])
               addedSheet["A1"].value = eventMedals[laterEvent]
           sheetNames = [s.name for s in eventBook.sheets]
 
@@ -133,7 +133,7 @@ sections:
             eventBook.sheets[0].name = firstEvent
             eventBook.sheets[firstEvent]["A1"].value = eventMedals[firstEvent]
             for laterEvent in eventNames[1:]:
-                eventBook.sheets.add(laterEvent)["A1"].value = eventMedals[laterEvent]
+                eventBook.sheets.add(laterEvent, after=eventBook.sheets[-1])["A1"].value = eventMedals[laterEvent]
             sheetNames = [s.name for s in eventBook.sheets]
 
         assert len(sheetNames) == 4
@@ -170,7 +170,7 @@ sections:
             eventBook.sheets[0].name = firstEvent
             eventBook.sheets[firstEvent]["A1"].value = eventMedals[firstEvent]
             for laterEvent in eventNames[1:]:
-                eventBook.sheets.add(laterEvent)["A1"].value = eventMedals[laterEvent]
+                eventBook.sheets.add(laterEvent, after=eventBook.sheets[-1])["A1"].value = eventMedals[laterEvent]
             sheetNames = [s.name for s in eventBook.sheets]
 
         assert len(sheetNames) == 4

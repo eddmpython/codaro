@@ -78,7 +78,7 @@ sections:
       calorieList = [runCalories(70, 30), runCalories(58, 45, 1.2), runCalories(82, 60, 0.8)]
 
       assert bmiList == [22.86, 22.10, 25.31]
-      assert calorieList == [132.3, 197.2, 247.8]
+      assert calorieList == [132.3, 197.3, 248.0]
       {"bmi": bmiList, "calories": calorieList}
     exercise:
       prompt: 체지방률을 추정하는 UDF bodyFatEstimate(bmi, age, sex)를 만들어 보세요. 남성은 1.20*bmi + 0.23*age - 16.2, 여성은 1.20*bmi + 0.23*age - 5.4 공식을 씁니다.
@@ -101,7 +101,7 @@ sections:
             bodyFatEstimate(25.31, 45, "M"),
         ]
 
-        assert fatList == [18.13, 26.66, 24.52]
+        assert fatList == [18.13, 27.56, 24.52]
         fatList
       solution: |-
         import xlwings as xw
@@ -122,7 +122,7 @@ sections:
             bodyFatEstimate(25.31, 45, "M"),
         ]
 
-        assert fatList == [18.13, 26.66, 24.52]
+        assert fatList == [18.13, 27.56, 24.52]
         fatList
       hints:
         - 남성은 16.2를 빼고, 여성은 5.4를 뺍니다.

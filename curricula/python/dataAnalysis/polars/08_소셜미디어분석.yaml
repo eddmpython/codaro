@@ -677,6 +677,13 @@ sections:
   exercise:
     prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
     starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
       thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
           pl.col("threshold").map_elements(
               lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,

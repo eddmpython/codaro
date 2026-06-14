@@ -181,3 +181,128 @@ def testAuditLessonKeepsGenuineRealBug() -> None:
         path.unlink(missing_ok=True)
 
     assert cats[("bug", "snippet")] == "real-bug"
+
+
+def testAuditLessonReclassifiesCredentialErrorAsRuntimeOther() -> None:
+    audit = loadAudit()
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: call
+            snippet: |
+              raise TypeError("Could not resolve authentication method. Expected one of api_key, auth_token")
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_cred.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    # Missing API key is an environment gap, not a content defect — must NOT be a real-bug.
+    assert cats[("call", "snippet")] == "runtime-other"
+
+
+def testIterExecutableCodeBlocksFlattensAndFilters() -> None:
+    audit = loadAudit()
+    blocks = [
+        {"type": "code", "content": "a = 1"},                       # python (default lang) → keep
+        {"type": "code", "language": "shell", "content": "ls"},     # shell → drop
+        {"type": "text", "content": "prose"},                       # not code → drop
+        {"type": "expansion", "code": "b = 2", "blocks": [
+            {"type": "code", "content": "c = 3"},
+        ]},
+        {"type": "code", "language": "python", "content": "   "},   # blank content → drop
+    ]
+    found = audit.iterExecutableCodeBlocks(blocks)
+    codes = [code for _label, code in found]
+    assert codes == ["a = 1", "b = 2", "c = 3"]
+
+
+def testAuditLessonExecutesCodeBlockAndCatchesBug() -> None:
+    audit = loadAudit()
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: blk
+            snippet: |
+              x = 1
+            blocks:
+              - type: code
+                content: |
+                  undefined_block_name + 1
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_block_bug.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    # snippet runs clean; the code block's NameError is surfaced as a real-bug (not masked).
+    assert cats[("blk", "snippet")] == "ok"
+    assert cats[("blk", "block[0]")] == "real-bug"
+
+
+def testAuditLessonSkipsShellAndStarterBlankBlocks() -> None:
+    audit = loadAudit()
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: blk
+            snippet: |
+              y = 2
+            blocks:
+              - type: code
+                language: shell
+                content: |
+                  echo hi
+              - type: code
+                content: |
+                  z = ___
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_block_skip.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    # No block result at all: shell is a non-python language, the second is a blank starter cell.
+    assert not [key for key in cats if key[0] == "blk" and key[1].startswith("block")]
+
+
+def testAuditLessonExpansionBlockReusesSectionNamespace() -> None:
+    audit = loadAudit()
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: blk
+            snippet: |
+              base = 10
+            blocks:
+              - type: expansion
+                title: mission
+                blocks:
+                  - type: code
+                    content: |
+                      result = base + 5
+                      assert result == 15
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_block_ns.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    # The expansion's nested code sees `base` from the section snippet namespace copy.
+    assert cats[("blk", "block[0].blocks[0]")] == "ok"

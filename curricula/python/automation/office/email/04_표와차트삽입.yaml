@@ -259,7 +259,7 @@ sections:
       msg = buildDailyReport("partner@example.com", df, pngPath)
 
       assert msg.is_multipart()
-      htmlPart = next(p for p in msg.iter_parts() if p.get_content_type() == "text/html")
+      htmlPart = next(p for p in msg.walk() if p.get_content_type() == "text/html")
       assert "Seoul" in htmlPart.get_content()
       assert any("chart" in (p.get("Content-ID") or "") for p in msg.iter_parts())
       msg["Subject"]
@@ -294,7 +294,7 @@ sections:
 
         df = pd.DataFrame({"region": ["Seoul", "Busan", ___], "amount": [120000, 80000, ___]})
         msg = buildDailyReport("p@x.com", df, pngPath)
-        htmlPart = next(p for p in msg.iter_parts() if p.get_content_type() == "text/html")
+        htmlPart = next(p for p in msg.walk() if p.get_content_type() == "text/html")
         "Daegu" in htmlPart.get_content()
       hints:
         - "'Daegu' 문자열, 60000 정수."
@@ -381,7 +381,7 @@ sections:
               df = pd.DataFrame({"region": ["Seoul", "Busan", "Daegu"], "amount": [120000, 80000, 60000]})
               msg = dailyReportEmail("팀장@example.com", df, pngPath, dryRun=True)
 
-              htmlPart = next(p for p in msg.iter_parts() if p.get_content_type() == "text/html")
+              htmlPart = next(p for p in msg.walk() if p.get_content_type() == "text/html")
               assert "Seoul" in htmlPart.get_content()
               assert any("chart" in (p.get("Content-ID") or "") for p in msg.iter_parts())
               msg["Subject"]

@@ -149,10 +149,15 @@ sections:
   explanation: |-
     각 에폭마다 데이터셋을 셔플해 한 장씩 (또는 작은 배치) 모델에 통과시키고, CrossEntropyLoss로 손실을 계산하고, optimizer.step으로 가중치를 갱신합니다.
 
+    `weights.transforms()` 권장 전처리는 PIL Image나 텐서만 받습니다. 데이터셋의 이미지는 numpy 배열이므로 `Image.fromarray` 로 PIL Image로 바꿔 넣습니다.
+
     합성 데이터가 단순해 3 에폭 안에 손실이 충분히 줄어듭니다.
   tips:
   - 학습 시 model.train(), 추론 시 model.eval() 을 호출해 모드를 정확히 맞춥니다.
+  - 권장 transforms는 numpy 배열을 거부하므로 Image.fromarray로 PIL Image로 변환해 넣습니다.
   snippet: |-
+    from PIL import Image
+
     preprocess = weights.transforms()
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
     lossFn = nn.CrossEntropyLoss()
@@ -163,7 +168,7 @@ sections:
         order = rng.permutation(len(dataset))
         for idx in order:
             img, label = dataset[idx]
-            batch = preprocess(img).unsqueeze(0)
+            batch = preprocess(Image.fromarray(img)).unsqueeze(0)
             target = torch.tensor([label])
             optimizer.zero_grad()
             logits = model(batch)
@@ -197,11 +202,13 @@ sections:
   tips:
   - 정확도는 학습이 잘 됐는지 빠르게 확인하는 가장 단순한 지표입니다.
   snippet: |-
+    from PIL import Image
+
     model.eval()
     correct = 0
     with torch.inference_mode():
         for img, label in dataset:
-            logits = model(preprocess(img).unsqueeze(0))
+            logits = model(preprocess(Image.fromarray(img)).unsqueeze(0))
             pred = int(logits.argmax(dim=1))
             if pred == label:
                 correct += 1
@@ -210,10 +217,12 @@ sections:
   exercise:
     prompt: 학습 가중치를 망가뜨리지 않고 첫 두 사진의 logits을 출력해 모델이 얼마나 자신감 있는지 확인하세요.
     starterCode: |-
+      from PIL import Image
+
       model.eval()
       with torch.inference_mode():
-          logitsA = model(preprocess(dataset[0][0]).unsqueeze(0))
-          logitsB = model(preprocess(dataset[___][0]).unsqueeze(0))
+          logitsA = model(preprocess(Image.fromarray(dataset[0][0])).unsqueeze(0))
+          logitsB = model(preprocess(Image.fromarray(dataset[___][0])).unsqueeze(0))
       logitsA, logitsB
     hints:
     - 빈칸은 정수 1 입니다.
@@ -232,9 +241,11 @@ sections:
   tips:
   - 작은 데이터셋의 전이학습은 항상 일반화 실패 위험이 있습니다. 새 변형 검증은 그 위험을 빠르게 발견합니다.
   snippet: |-
+    from PIL import Image
+
     newImg = augment(china, seed=999)
     with torch.inference_mode():
-        newLogits = model(preprocess(newImg).unsqueeze(0))
+        newLogits = model(preprocess(Image.fromarray(newImg)).unsqueeze(0))
     newPred = int(newLogits.argmax(dim=1))
     fig, axis = plt.subplots(figsize=(5, 4))
     axis.imshow(newImg)
@@ -244,9 +255,11 @@ sections:
   exercise:
     prompt: 새 flower 변형 한 장으로도 같은 검증을 하세요.
     starterCode: |-
+      from PIL import Image
+
       newFlower = augment(flower, seed=___)
       with torch.inference_mode():
-          newFlowerLogits = model(preprocess(newFlower).unsqueeze(0))
+          newFlowerLogits = model(preprocess(Image.fromarray(newFlower)).unsqueeze(0))
       newFlowerPred = int(newFlowerLogits.argmax(dim=1))
       fig2, axis2 = plt.subplots(figsize=(5, 4))
       axis2.imshow(newFlower)
@@ -278,11 +291,13 @@ sections:
   exercise:
     prompt: "미션1: 학습 데이터의 분류 정확도와 새 검증(첫 5개 seed) 사진의 정확도를 비교해 출력하세요. 미션2: 모델 fc 층의 가중치 평균과 표준편차를 학습 전과 비교하기 위해 출력하세요(학습 후 값만)."
     starterCode: |-
+      from PIL import Image
+
       correctNew = 0
       for seed in range(5):
           img = augment(china, seed=2000 + seed)
           with torch.inference_mode():
-              logitsC = model(preprocess(img).unsqueeze(0))
+              logitsC = model(preprocess(Image.fromarray(img)).unsqueeze(0))
           if int(logitsC.argmax(dim=1)) == 0:
               correctNew += 1
       ratio = correctNew / ___

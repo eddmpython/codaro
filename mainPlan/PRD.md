@@ -1,6 +1,6 @@
 # Codaro 커리큘럼 방향 PRD — "실행 데모에서 검증되는 졸업 자동화로"
 
-> **상태**: v2 (전문가 4렌즈 토론 → 적대적 리뷰 2회 → 게이트 정합 검증으로 정제).
+> **상태**: v3 (v2의 채점-확장 모순 정정 — Phase 0을 "검증=콘텐츠 정직성"으로 재정의, 학생 채점 동결 재확인. 이력은 §9 v3 정정).
 > **범위**: Codaro 커리큘럼이 앞으로 나아갈 방향. 개별 레슨 작성 지침이 아니라 *무엇을 왜 하고 무엇을 안 하는가*, 그리고 *언제 끝났다고 하는가*를 고정한다.
 > **자기충족성 기준**: 이 문서만 읽고 재조사 없이 Phase 0 첫 작업에 착수할 수 있어야 한다.
 > **부록 A** 토론 요약 · **부록 B** 검증 근거(grep/게이트 라이브 출력) · **부록 C** 핵심 메커니즘 레퍼런스(file:line).
@@ -9,10 +9,12 @@
 
 ## 0. 한 줄 비전 (North Star)
 
-> **Codaro 커리큘럼을 "실행 데모 472개"에서 "검증되는 학습 → Harvest로 졸업하는 무인 자동화"로 전환한다.**
-> 척도는 **도메인 수가 아니라 (검증 깊이 · 횡단 졸업 여정 · moat 활용)** 이다.
+> **Codaro 커리큘럼을 "실행 데모 472개"에서 "코드가 정직한 학습 → Harvest로 졸업하는 무인 자동화"로 전환한다.**
+> 척도는 **도메인 수가 아니라 (콘텐츠 정직성 · 횡단 졸업 여정 · moat 활용)** 이다.
 
-핵심 통찰: **갭은 폭이 아니라 깊이다.** 472레슨·31도메인·169 outcome은 이미 시장 어떤 Python 강의보다 넓다. 늘려야 할 것은 도메인이 아니라, 이미 가진 것을 *진짜 검증되는 학습*과 *Codaro에서만 되는 졸업 루프*로 끌어올리는 일이다.
+핵심 통찰: **갭은 폭이 아니라 깊이다.** 472레슨·31도메인·169 outcome은 이미 시장 어떤 Python 강의보다 넓다. 늘려야 할 것은 도메인이 아니라, 이미 가진 것을 *코드가 실제로 돌고 본문 주장과 일치하는 정직한 학습*과 *Codaro에서만 되는 졸업 루프*로 끌어올리는 일이다.
+
+> **검증의 정의(중요):** 이 PRD에서 "검증"은 **레슨 코드 자체가 로컬에서 실행되고 가르치는 내용과 일치하는가**(콘텐츠 무결성)를 뜻한다. **학습자 답을 맞다/틀리다로 채점하는 것이 아니다.** 학생 채점(`check.type`을 학생 코드에 적용)은 동결 상태이며 사용자 명시 전 확장하지 않는다(§3.1).
 
 ---
 
@@ -42,19 +44,21 @@
 
 ## 2. 문제 정의 — 진짜 갭 (4렌즈 합성)
 
-### 2.1 검증 위기 (Depth) — **최대 품질 부채**
+### 2.1 콘텐츠 정직성 (Depth) — 실행으로만 보증되는 무결성
 
-약점 감사 게이트(`auditCurriculumWeakness.py`)의 **라이브 출력**(부록 B):
+**진짜 depth 갭은 "학생을 더 빡세게 채점하느냐"가 아니라 "교재 코드가 거짓말을 안 하느냐"다.** 472레슨의 모든 `snippet`·`solution`·code 블록이 (a) 로컬에서 예외 없이 돌고 (b) 본문이 주장하는 결과를 실제로 내는가 — 이게 콘텐츠 정직성이고, 이것만이 학생 채점 부활 없이 올릴 수 있는 품질 축이다.
+
+현 상태: 실행 가능성 게이트 `auditCurriculumExecutability.py`가 각 yaml을 노트북처럼 누적 namespace에서 `snippet`+`exercise.solution`을 실제 `exec`하고 real-bug(코드 결함)/missing-package(환경)로 분류한다(real-bug·undeclared-package·yaml-load-error 임계 0). **하지만 무결성이 아직 기계로 완전 보증되지 않는다 — 사각지대 셋:**
 
 ```
-strong-check coverage 2/464 (0.4%)   ← exercise+check 보유 464레슨 중 강한 체크(output/variable/contains) 보유는 2개뿐
-462 weak-check lessons               ← 나머지 전부 noError-only("크래시 안 나면 통과")
-30 placeholder-predict lessons
+1. blocks[].type==code (code/expansion 블록 코드)는 실행 대상이 아니다.
+2. code 블록의 선언된 output: 가 실제 출력과 일치하는지 검증하지 않는다.
+3. missing-package 레슨은 import 단계에서 건너뛴다 → 그 안의 real-bug가 안 보인다(게이트가 coverage note로 정직히 고지).
 ```
 
-즉 exercise를 가진 464레슨 중 **99.6%가 정답을 검증하지 않는다.** 연습 프롬프트 ~2,500개도 사실상 8개 템플릿("값 하나 바꾸고 결과 보기")으로 수렴한다. 현 커리큘럼은 **"검증되는 학습"이 아니라 "실행 데모"**다. 메모리 `codaro_capability_engine_audit`·`codaro_signal_honesty`의 "엔진 설계는 상위권인데 실제 전달 ~0" 결론이 게이트 숫자로 확정된다.
+그래서 "콘텐츠가 정직하다"는 **사람이 한 레슨씩 직접 읽어 코드-본문 정합을 확인**하고, 그 결과를 기계 게이트(사각지대 포함 확장)로 잠가야 비로소 참이 된다. 이것이 Phase 0다.
 
-> **측정 단위 주의(리뷰 반영):** 이 베이스라인은 **레슨 단위**(게이트 자신의 정의: exercise를 가진 레슨 중 강한 체크 보유 레슨 비율)다. check-블록 단위 집계(`grep type:`)는 `predict.expectedDtype`(예: `type: str`/`int`)를 검증으로 오인하므로 **쓰지 않는다.** 이 PRD의 모든 검증-깊이 목표는 게이트와 동일한 **레슨 단위·`STRONG_CHECK_TYPES={output,variable,contains}` 정의**로 통일한다.
+> **채점(0.4%) 숫자에 대한 정정(리뷰 반영):** 약점 감사의 `strong-check coverage 2/464`는 **학생 코드 채점 메커니즘**(`check.type`=output/variable/contains를 학습자 제출에 적용 → pass/fail → mastery 적립, `checkFlow.runCurriculumCheckFlow`)의 밀도를 잰다. 채점은 동결(§3.1)이므로 이 숫자는 **북극성 결함이 아니라 정보성 지표**다. 이전 v2가 이를 "최대 품질 부채"로 둔 것은 채점을 바람직한 것으로 전제한 오류였고, v3에서 콘텐츠 정직성으로 교체한다. (`weakCheckSignal`·`placeholderPredict`는 사람-작성 보강의 정보성 다이얼로 유지.)
 
 ### 2.2 Harvest 졸업 루프 부재 (Moat) — **최대 정체성 갭**
 
@@ -81,15 +85,17 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 
 ### 2.6 갭이 **아닌** 것 (명시)
 
-- **도메인/레슨 폭**: 31도메인·472레슨은 과포화. 6번째 시각화 라이브러리, FastAPI 풀스택, 추가 비전/딥러닝은 *가장 약한 자산(검증 깊이)을 양적으로 더 늘리는* 역효과.
-- **predict 카드 / 자동 채점 부활**: 이 PRD의 "검증 깊이"는 predict/채점 재도입이 **아니다**(§3.1). 명시 금지(`feedback_curriculum_no_prediction`).
+- **도메인/레슨 폭**: 31도메인·472레슨은 과포화. 6번째 시각화 라이브러리, FastAPI 풀스택, 추가 비전/딥러닝은 *가장 약한 축(콘텐츠 정직성·횡단 졸업)을 놔둔 채 폭만 더 늘리는* 역효과.
+- **predict 카드 / 자동 채점 / 채점 확장**: 이 PRD의 "검증"은 콘텐츠 정직성(코드 실행 정합)이지 학생 채점이 **아니다**(§3.1). `check.type`을 noError → output/variable/contains로 올리는 것도 **학생 코드 채점을 빡세게 만드는 일**이라 동결 대상이다. 명시 금지(`feedback_curriculum_no_prediction`).
 
 ---
 
 ## 3. 원칙 / 제약 (절대 게이트 — 위반 시 방향 자체가 틀림)
 
-1. **검증 ≠ 예측/채점 부활.** "검증 깊이"는 *결정적 정답이 이미 존재하는 곳*에서 `check.type`을 `noError` → **`output`/`variable`/`contains`**(실재하는 3개 강한 타입, 부록 C)로 올리는 것이다. predict 카드·자동 채점·점수화 재도입은 **사용자 명시 전 금지**. (저장소 머신 게이트 `verifyPredictContractStrict`는 현재 strict 목록이 비어 사실상 비활성 — no-prediction은 정책/피드백 메모리로 강제됨. 이 PRD의 framing은 그 정책과 충돌하지 않는다.)
-   - ⚠️ check 타입은 정확히 **`output`(expectedCode/solution 출력 일치) · `variable`(variableName+expectedValue) · `contains`(requiredPatterns) · `noError`** 4종뿐이다(`exerciseCheck.py:104`). `assert`·`str`은 **존재하지 않는 타입**이다(`type: str`은 `predict.expectedDtype` 메타). 결정적 정답 고정은 `output` 또는 `variable`로 한다.
+1. **검증 = 콘텐츠 정직성, ≠ 학생 채점.** 이 PRD의 "검증"은 *레슨의 코드(`snippet`/`solution`/code 블록)가 실제로 돌고 본문 주장과 일치*하는지를 뜻한다. **학생 답 채점이 아니다.**
+   - ⚠️ **정정(이전 v2의 모순 수정):** `check.type`의 `output`/`variable`/`contains`는 *학생 제출 코드*에 돌려 pass/fail을 내고 그 결과로 outcome/mastery를 적립하는 **채점 메커니즘**이다(`checkFlow.runCurriculumCheckFlow:88-141` → `creditCheckPass`/`recordEvidence`). `noError`도 그중 "안 죽으면 통과"인 가장 약한 채점일 뿐이다. 따라서 exercise의 `check.type`을 `noError` → `output`/`variable`/`contains`로 **올리는 것 자체가 채점 확장**이며, predict·점수화와 함께 **사용자 명시 전 동결**이다(`feedback_curriculum_no_prediction`).
+   - Phase 0의 "검증"은 이와 무관하게 **레슨 자신의 코드가 정직한지**를 본다. 같은 실행 인프라를 *학생*이 아니라 *교재 해답*에 돌리는 실행성 게이트(`auditCurriculumExecutability`)가 그 도구다 — 점수화 아님.
+   - ⚠️ (참고) check 타입은 정확히 **`output` · `variable` · `contains` · `noError`** 4종뿐(`exerciseCheck.py:104`). `assert`·`str`은 **존재하지 않는 타입**(`type: str`은 `predict.expectedDtype` 메타)이다.
 2. **bulk 생성 금지.** 새 레슨/캡스톤은 사람이 한 강의씩 직접 작성. 생성기 스크립트 금지. → PRD는 "레슨 수백 개"를 약속하지 않는다. 지표는 *수*가 아니라 *깊이·연결·졸업*.
 3. **도메인 동결.** §2.4 스파인 트랙 2개(sqlite, aiAgents) 외 신규 *폭* 도메인 기본 거절. 입증 책임은 추가하려는 쪽.
 4. **taxonomy 배선 의무.** 새 트랙은 (a) `_taxonomy.yml`의 `outcomes`·`domains`·`lessonOutcomes`, (b) `curricula/python/__init__.py`의 dict들 **`categoryMapping`·`categoryMeta`·`categoryGroups`·`categoryTree`(+필요 시 `learningPaths`)** 를 같은 변경에서 배선한다(별도 파일 3곳이 아니라 단일 `__init__.py` 내 다수 dict — `studyLoader.py:65` SSOT). `testCurriculumOs.py`의 `testNoOrphanLessons`/`testTaxonomyCoversAllOutcomes`/`testEveryDomainProducesPlan`이 차단. 스파인 트랙의 **첫 작업 = outcome 어휘 등록**(그래야 진짜 갭이 그래프에 드러남).
@@ -103,21 +109,23 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 
 순서 = 의존성 + ROI. 각 Phase는 독립적으로 가치를 낸다.
 
-### Phase 0 — 검증 정직화 (Depth) · 신규 콘텐츠 ≈ 0 · ROI 최고
+### Phase 0 — 콘텐츠 정직성 QA (Depth) · 신규 콘텐츠 0 · ROI 최고
 
-- **목표**: 핵심 트랙의 `check`를 `noError`에서 `output`/`variable`/`contains` 결정적 검증으로 올린다. 도메인 1개 추가는 1/31 효과지만 검증 정직화는 전 도메인 가로 레버리지.
-- **측정 도구는 이미 존재**(리뷰 반영): `auditCurriculumWeakness.py`가 `STRONG_CHECK_TYPES`·`weakCheckSignal`·`strong-check coverage`를 이미 집계하고, `tests/_strongSignalCategories.txt` allowlist(현재 비어 회귀차단 비활성)와 `weakSignalRegression`(임계 0) 메커니즘이 이미 있다. **Phase 0 첫 작업은 "도구 만들기"가 아니라**:
-  1. 우선 트랙의 결정적-정답 가능 exercise를 `output`/`variable`로 고정(noError→강한 체크).
-  2. 그 트랙 카테고리 키를 `tests/_strongSignalCategories.txt`에 등록 → 이후 그 카테고리는 약한 신호로 회귀 불가(`weakSignalRegression=0` 차단).
-- **우선 트랙(분모 정의 포함)**: `30days` · `pandas` · `requests` · `openpyxl`. 분모 = "exercise를 가진 레슨 중 결정적 산출물이 가능한 레슨"(탐색형 noError 레슨은 §3.1대로 정당하게 제외 → 분모에서도 제외).
+- **목표**: 472레슨의 모든 실행 가능한 코드(`snippet`·`exercise.solution`·`blocks[].code`)가 (a) 로컬에서 예외 없이 돌고 (b) 선언된 `output:`·본문 주장과 일치함을 보증한다. **학생 채점 확장 아님(§3.1)** — 교재 코드 자신의 무결성만 본다. 도메인 1개 추가는 1/31 효과지만 콘텐츠 정직성은 전 도메인 가로 레버리지.
+- **측정 도구는 이미 존재**: `auditCurriculumExecutability.py`가 snippet+solution을 누적 namespace에서 실제 `exec`하고 real-bug/undeclared-package/yaml-load-error 임계 0으로 차단한다. **Phase 0 첫 작업은 "도구 만들기"가 아니라**:
+  1. 베이스라인 실행 → real-bug를 전부 0으로 **정공법 수정**(우회·예외 삼킴 금지).
+  2. **사람이 한 레슨씩 직접 읽어** 코드-본문 정합 확인(기계가 못 보는 의미 결함: 주장과 다른 출력, 오개념 유발 예시, 죽은 `___`, 무의미한 assert). 결과를 루트 기록에 남긴다.
+  3. **사각지대 봉쇄(확장 게이트)**: 실행성 audit를 `blocks[].code`(expansion 포함) 실행까지 넓혀 회귀 차단. 선언된 `output:`/본문 주장과의 정합은 자동 비교가 취약(부동소수·객체 repr·비결정성)하므로 정독 스윕(2)이 담당하고, 자동 게이트는 실행 무결함(real-bug 0)에 집중한다.
+  4. 환경상 로컬 실행 불가 레슨(xlwings/Excel, playwright/브라우저, deepVision/대형 모델)은 **실행 대신 정독 검증**으로 처리하되, 기록에 "실행-검증"과 "정독-검증"을 정직히 구분(환경 미준비를 결함으로 오판 금지).
 - **DoD (머신 판정)**:
 
   | gate | 임계 | 통과 조건 |
   | --- | --- | --- |
-  | `curriculum-weakness-audit` | `weakSignalRegression: 0` | 우선 트랙 키가 `_strongSignalCategories.txt`에 등록되고 해당 카테고리 weak-check 레슨 0 |
-  | (보조 지표) | — | `strong-check coverage` 우선 트랙 부분이 2/464 → 우선 트랙 exercise-결정가능 레슨 100% |
+  | `curriculum-executability` | real-bug 0 · undeclared-package 0 · yaml-load-error 0 | snippet+solution 누적 실행 무결함 |
+  | (확장) blocks 실행 | real-bug 0 | code/expansion 블록 실행 무결함 (선언 output·본문 정합은 정독 스윕) |
+  | 루트 기록 | 존재 | `mainPlan/curriculumCodeAudit.md`에 472레슨 전수 점검 결과(실행/정독 구분) |
 
-- **비범위**: predict/자동채점/점수(§3.1). 결정적 정답 없는 탐색형 셀은 `noError` 유지(정직).
+- **비범위**: 학생 채점/점수화 확장(§3.1, 동결). 결정적 정답을 학생에게 강제하는 `check.type` 상향은 하지 않는다.
 
 ### Phase 1 — Harvest 졸업 레일 (Moat) · 정체성 핵심
 
@@ -141,7 +149,7 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
   | --- | --- |
   | taxonomy 정합 | `testCurriculumOs`(orphan 0 / 모든 outcome 제공 / 모든 도메인 plan) green |
   | project 제약 | 각 신규 트랙에 project 레슨 ≥1 → `categoryWithoutProject` 0 |
-  | 품질 일관성 | 신규 트랙 레슨이 처음부터 Phase 0(강한 체크)·Phase 1(Harvest 핸드오프) 기준 충족 |
+  | 품질 일관성 | 신규 트랙 레슨이 처음부터 Phase 0(콘텐츠 정직성·전수 실행)·Phase 1(Harvest 핸드오프) 기준 충족 |
   | "트랙 완성" 정의 | 그 트랙의 등록 outcome 전부가 ≥1 레슨에서 제공(gap 0) — *레슨 수가 아니라 outcome 커버리지* |
 
 ### Phase 3 — 횡단 졸업 캡스톤 (Journey) · 서명 산출물
@@ -156,16 +164,16 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 
 | 지표 | 베이스라인(게이트 라이브) | 목표 | 측정 |
 | --- | --- | --- | --- |
-| 검증 깊이(레슨 단위) | strong-check 2/464 (0.4%), weak 462 | 우선 트랙 결정-가능 레슨 100% + `_strongSignalCategories.txt` 등록 | `auditCurriculumWeakness` strong-check coverage + weakSignalRegression |
+| 콘텐츠 정직성 | real-bug 미확정(blocks·output 미검증) | 모든 실행면 real-bug 0 + 선언 output 일치 + 472레슨 정독 완료 | `auditCurriculumExecutability`(확장) + 루트 점검 기록 |
+| 전수 점검 커버리지 | 0 (미기록) | 472/472 (실행-검증 + 환경불가 정독-검증 구분 기록) | `mainPlan/curriculumCodeAudit.md` |
 | Harvest 핸드오프 캡스톤 | 0 | ≥3 | `curricula/` harvest 섹션 카운트 |
 | 크로스-도메인 캡스톤 | 0 | 2~3 | 다중 그룹 outcome prerequisite 캡스톤 |
 | 스파인 outcome 어휘 | 0 (sqlite/agentLoop/secrets) | 등록 | `_taxonomy.yml` outcomes |
-| **결과 지표(리뷰 반영)** | placeholder-predict 30 · weak 462 | 우선 트랙 weak-check 레슨 0 | 게이트 출력 추세 |
 | 숙달 라벨 정직성 | "noError 3회=숙달" 부풀림 | autoValidate 라벨 정직화 | `codaro_capability_engine_audit` 반영 |
 
 **비지표(의도적 제외):** 총 레슨 수, 도메인 수. 둘 다 충분하고, 늘리는 것은 약속 위반의 씨앗.
 
-**달성 가능성(리뷰 반영):** "우선 트랙 100%"는 *결정적 산출물이 가능한 레슨* 분모 기준이다. Phase 0 착수 시 우선 트랙별 *결정-가능 셀 비율*을 먼저 실측해, 결정 불가능한 탐색형이 많은 트랙은 분모에서 제외(목표 천장 과대설정 방지). 트랙별 차등 가능.
+**달성 가능성(리뷰 반영):** 콘텐츠 정직성은 *결정적 산출물 비율*과 무관하다 — 탐색형 셀도 "예외 없이 돌고 본문과 모순 없음"은 보증 가능하다. 환경상 로컬 실행 불가 레슨만 실행-검증에서 빠지며, 그건 정독-검증 + 기록으로 정직히 메운다.
 
 ---
 
@@ -186,9 +194,9 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 | 리스크 | 완화 |
 | --- | --- |
 | bulk 금지로 신규 콘텐츠 속도 느림 | 지표를 수가 아닌 깊이로. Phase 0(수선)·1(기존 캡스톤 확장)이 신규 작성 최소 |
-| "검증 깊이"가 predict/채점 부활로 오해 | §3.1로 못박음, `output`/`variable`/`contains`만, 탐색형 noError 유지 |
+| "검증"이 predict/채점 부활로 오해 | §3.1로 못박음 — 검증=콘텐츠 정직성(교재 코드 실행), 학생 채점(`check.type` 상향)은 동결 |
 | `assert`/`str` 등 없는 타입 사용 | check 타입 4종 명시(§3.1, 부록 C) |
-| 기존 도구 중복 구현 | Phase 0이 `auditCurriculumWeakness`·`_strongSignalCategories.txt` 재사용(§4) |
+| 기존 도구 중복 구현 | Phase 0이 `auditCurriculumExecutability` 재사용·확장(§4), 새 실행기 만들지 않음 |
 | 스파인 트랙 project 누락으로 차단 | Phase 2 DoD에 project ≥1 명시 |
 | Harvest 학습 표면 부재 | Phase 1 step 0에 tool_use 정의 선행작업 |
 | src 사본 오작성 | 데이터 SSOT 루트 고정(§3.5) |
@@ -201,7 +209,7 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 1. `automation/office/openpyxl/10_월간매출리포트생성기.yaml` — Harvest 핸드오프 섹션(Phase 1 첫 슬라이스). **단 Phase 1 step 0(from-code Harvest tool_use 정의) 선행.**
 2. `automation/webApi/requests/` — 02~10 결번 복구 + capstone `10_거래처일괄조회자동화.yaml`(깨진 약속 복구, Phase 3 결합). **착수 전 기존 트랙 PRD `automation/webApi/requests/PRD.md`(이미 존재)를 읽고 정합을 맞춘다** — 이 트랙은 자체 PRD를 가지므로 결번 복구 계획이 그것과 충돌하지 않게 한다.
 3. `automation/os/resilience/04_배치재실행시뮬레이션.yaml` — 멱등성+체크포인트+원자적쓰기 통합(sqlite 원장 씨앗, Phase 2 연결).
-4. `dataAnalysis/pandas` 우선 트랙 — Phase 0 검증 정직화 시범(`output`/`variable`로 결정적 산출물 고정) + `_strongSignalCategories.txt` 등록.
+4. `dataAnalysis/pandas` 트랙 — Phase 0 콘텐츠 정직성 시범(snippet/solution/blocks 전수 실행 + 본문 주장 정합 정독).
 5. `devLiteracy/devTools/commandLineIntro.yaml` — mock 대신 로컬 실행 섹션 1개 추가(트랙 확장 아님).
 
 ---
@@ -213,21 +221,22 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 - **전략 PM 렌즈**: sqlite·agent는 폭이 아니라 스파인 누락, 횡단 여정 0. → Phase 2·3(스파인 2개 제한).
 - **품질 감사 렌즈**: 약한 레슨 구체 지목(webApi·resilience·devLiteracy). → §8.
 - **적대적 리뷰 1·2**: 베이스라인이 predict 메타로 오염(`str` 허수)·`assert`/`str` 없는 타입·Phase 0 도구 이미 존재·Harvest 학습표면 부재·sqlite project 제약·`__init__` 배선 부정확·mainPlan 미추적·생성문서 stale. → v2에서 전부 반영(베이스라인 2/464 레슨단위로 교체, check 4종 명시, 도구 재사용, Phase 1 step 0, Phase 2 project 제약, 배선 정정, §10·11 신설).
-- **충돌 해소**: PM "신규 트랙" vs 회의주의 "동결" → 깊이를 주축(Phase 0·1·3), 스파인 2개만 surgical(Phase 2), 나머지 폭 동결. no-prediction 게이트로 "검증=정직 check"를 분리.
+- **충돌 해소**: PM "신규 트랙" vs 회의주의 "동결" → 깊이를 주축(Phase 0·1·3), 스파인 2개만 surgical(Phase 2), 나머지 폭 동결.
+- **v3 정정(채점 동결 재확인)**: v2가 Phase 0을 "`check.type` noError→output/variable/contains 상향"으로 둔 것은 **학생 채점 확장**이라 no-prediction 동결과 모순이었다(`output`/`variable`/`contains`는 학생 코드에 돌려 mastery를 적립하는 채점 메커니즘 — `checkFlow.py:88-141`). v3에서 Phase 0을 **콘텐츠 정직성 QA**(교재 코드의 실행·정합)로 재정의하고, 채점 관련 모든 상향을 명시 전 동결로 못박음. 측정도 `auditCurriculumWeakness` strong-check(채점 밀도) → `auditCurriculumExecutability`(콘텐츠 무결성)로 교체.
 
 ---
 
 ## 10. 저자 · 캐파시티 · 마일스톤
 
 - **저자**: 레슨/캡스톤 콘텐츠는 **사람이 직접 작성**(bulk 금지). AI는 초안 outline(`propose-curriculum-draft`)·검토·배선 보조까지. 최종 YAML은 사람.
-- **처리량 가정**: 품질 우선이라 *주당 N편* 식 약속을 하지 않는다. 대신 **Phase는 캘린더가 아니라 DoD 게이트로 종료**한다(§4 각 DoD). 부분 완료도 진전(예: 우선 트랙 1개만 강한 체크화 + allowlist 등록해도 그 카테고리는 영구 회귀 차단).
+- **처리량 가정**: 품질 우선이라 *주당 N편* 식 약속을 하지 않는다. 대신 **Phase는 캘린더가 아니라 DoD 게이트로 종료**한다(§4 각 DoD). 부분 완료도 진전(예: 트랙 1개만 전수 정독+실행 검증하고 확장 게이트로 잠가도 그 트랙은 영구 회귀 차단).
 - **권장 시퀀스**: Phase 0(openpyxl·pandas·requests·30days 순) → Phase 1 step 0(tool) → Phase 1 캡스톤 → Phase 2 어휘 등록 → Phase 2 트랙 작성 → Phase 3 횡단 캡스톤. Phase 간 병렬 가능하나 Phase 1 캡스톤은 step 0 도구 선행 필수.
 
 ---
 
 ## 11. 롤백
 
-- **Phase 0(검증 체크 변경)**: 레슨 YAML check 변경은 단일 커밋 단위. `git revert <sha>` + `_strongSignalCategories.txt`에서 해당 카테고리 줄 제거(회귀 차단 해제).
+- **Phase 0(콘텐츠 정직성 QA)**: 레슨 코드 수정 + 실행성 audit 확장은 단일 커밋 단위. `git revert <sha>`로 코드 수정·확장 게이트를 함께 원복(루트 점검 기록은 이력 문서라 revert하지 않고 후속 기록으로 갱신).
 - **Phase 1(Harvest 섹션·tool 정의)**: 캡스톤 YAML revert + `toolDefinitions/automation.py`의 from-code 도구 등록 취소 + teacher tool 카탈로그/테스트 동기 revert.
 - **Phase 2(스파인 트랙)**: 트랙 디렉터리 revert + `_taxonomy.yml` outcome/lessonOutcomes 등록 취소 + `__init__.py` dict 항목 제거(미하면 orphan/그래프 무결성 게이트가 실패하므로 같은 커밋에서 원복).
 - **Phase 3(횡단 캡스톤)**: 캡스톤 YAML + taxonomy 항목 revert.
@@ -240,7 +249,7 @@ Codaro의 서명 메커닉은 **학습→Harvest→자동화 졸업**이다(`cre
 - **품질 감사(15+레슨 정독)**: 강한 트랙=30days·pandas·requests(구조)·matplotlib. 약한=devLiteracy(읽기만)·resilience(통합 없음). webApi capstone 부재.
 - **전략 PM**: P0=sqlite·aiAgents, 여정 갭=횡단 캡스톤·Harvest 핸드오프 0. "그래프 갭 0은 닫힌 어휘 안에서만 참."
 - **정체성 moat**: moat 활용도 ≈ 0. Harvest 루프 0건이 최대 갭. 방향 A(졸업 캡스톤)·B(GUI=API tool_use)·C(리액티브/무인 에이전트). 경계: lock-in·predict 부활·미승격 의존 금지.
-- **회의주의**: breadth-saturated/depth-starved. check 99.6% weak, exercise 8템플릿. 도메인 동결. 북극성=검증 정직화+횡단 여정.
+- **회의주의**: breadth-saturated/depth-starved. exercise 8템플릿. 도메인 동결. 북극성=콘텐츠 정직성+횡단 여정. (check 99.6% weak는 채점 밀도 — §2.1 정정으로 북극성에서 강등.)
 - **적대 리뷰 1(52→)**: 베이스라인 predict 오염, 도구 이미 존재 미인지, DoD/롤백/저자캐파/결과지표 누락.
 - **적대 리뷰 2(68→, 게이트 정합)**: `assert`/`str` 없는 타입, check 4종 SSOT, Harvest tool 부재, sqlite project 제약, `__init__` 단일파일 다수 dict, mainPlan 미추적+생성문서 stale.
 
@@ -265,7 +274,9 @@ grep -niE 'sqlite|agentloop|aiagent|secrets|harvest' _taxonomy.yml  →  0건
 ## 부록 C — 핵심 메커니즘 레퍼런스 (file:line)
 
 - check 타입 SSOT(4종): `src/codaro/curriculum/exerciseCheck.py:104` — `output/variable/contains/noError`. `output`=expectedCode/solution 출력 일치, `variable`=variableName+expectedValue, `contains`=requiredPatterns.
-- 강한 체크 정의·집계: `tests/curriculum/auditCurriculumWeakness.py:72` `STRONG_CHECK_TYPES={output,variable,contains}`; `:419` strong-check coverage 출력; `:68` `weakSignalRegression:0`; allowlist `tests/_strongSignalCategories.txt`(현재 비어 회귀차단 비활성).
+- 강한 체크 정의·집계(정보성, 채점 밀도): `tests/curriculum/auditCurriculumWeakness.py:72` `STRONG_CHECK_TYPES={output,variable,contains}`; `:419` strong-check coverage 출력; `:68` `weakSignalRegression:0`; allowlist `tests/_strongSignalCategories.txt`(현재 비어 회귀차단 비활성). **주의: 이 수치는 학생 채점 메커니즘 밀도이지 콘텐츠 정직성 지표가 아니다(§2.1 정정).**
+- 콘텐츠 실행성 게이트(Phase 0 주도구): `tests/curriculum/auditCurriculumExecutability.py` — 각 yaml의 `snippet`+`exercise.solution`을 누적 namespace에서 실제 `exec`, real-bug/missing-package/undeclared-package 분류, 임계 real-bug·undeclared-package·yaml-load-error 0(`:118`). `blocks[].code`·선언 `output:`은 미검증(Phase 0 확장 대상, §4). 학생 채점이 아니라 *교재 해답*을 돌리는 도구다.
+- 학생 채점 흐름(동결 대상): `src/codaro/curriculum/checkFlow.py:88-141` `runCurriculumCheckFlow` — `studentCode`에 `runExerciseCheck` → `result.passed` → `progressTracker.creditCheckPass`/`learnerStateStore.recordEvidence`. output/variable/contains/noError가 여기서 학생 답을 채점한다.
 - project 면제: `auditCurriculumWeakness.py:121` `PROJECT_EXEMPT_CATEGORIES={builtins,excel,practical,devTools,resilience}` (sqlite·aiAgents 미포함 → project 레슨 필수).
 - Harvest 엔진: `src/codaro/automation/taskFlow.py:117` `createAutomationTaskFromCodePayload`; REST `src/codaro/api/automationRouter.py:201` `POST /api/tasks/from-code`(+outcomeId 졸업 게이트 403). **AI tool_use 정의는 부재**(`toolDefinitions/automation.py`의 `create-automation-task`는 path 기반).
 - 트랙 배선 SSOT: `curricula/python/__init__.py`의 `categoryMapping`·`categoryMeta`·`categoryGroups`·`categoryTree`(+`learningPaths`) — `studyLoader.py:65-70`이 이 dict들을 읽음. 경로 결정 `_curriculaPythonRoot`(`studyLoader.py:48-51`)는 bundled src 사본을 우선(패키징), 약점 감사는 루트 고정(`auditCurriculumWeakness.py:147`) — 편집 SSOT는 루트.
