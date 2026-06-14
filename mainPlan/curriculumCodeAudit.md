@@ -1,7 +1,9 @@
 # 커리큘럼 코드 전수 점검 기록
 
-> **일자**: 2026-06-14 · **대상**: 루트 `curricula/python/` 472개 레슨 전체 · **상태**: 실행-검증 완료, 정독 스윕 반영 중
+> **일자**: 2026-06-14 · **대상**: 루트 `curricula/python/` 473개 레슨 전체 · **상태**: 실행-검증 + 41-트랙 의미 정독 전수 완료, broken-exercise 회귀 락 가동
 > 이 문서는 "모든 강의 코드를 기계적 통과가 아니라 직접 점검했다"의 증거 기록이다. PRD Phase 0(콘텐츠 정직성 QA, [PRD.md](PRD.md))의 산출물.
+>
+> **2차 갱신(같은 날)**: 의미 정독을 41개 트랙 전수로 완료(종전 28/41 → 41/41). 동시에 audit를 **starterCode 실행**까지 확장하니, solution만 보던 종전 게이트가 못 잡던 **broken-exercise 40건**(학습자가 실제 실행하는 starterCode가 미정의 헬퍼·변수 참조)이 코퍼스 전역에서 드러나 정공법 수정했다. 8절 참조.
 
 ## 1. 무엇을, 어떻게 점검했나
 
@@ -52,15 +54,16 @@
 이번에 다시 깨지지 않도록 기계 게이트를 보강했다:
 
 - **blocks[].code 실행 확장** — 종전 audit는 snippet+solution만 돌렸다. 이제 `blocks[].code`(expansion 중첩 포함)도 섹션 namespace 복사본에서 실행해 real-bug를 잡는다. blank(`___`)·비-Python(shell/browser) 블록은 정확히 제외.
+- **starterCode 실행 확장 (혁신 회귀 락)** — 종전 audit의 최대 사각지대는 **학습자가 노트북에서 실제로 실행하는 `exercise.starterCode`** 였다. solution(정답 복사본)만 검사하니, starterCode가 snippet에 없는 헬퍼·집계 변수를 참조해도 통과했다. 이제 blank(`___`)가 없는 완성형 starterCode를 섹션 **누적 namespace 복사본**에서 실행한다. 노트북 모델을 충실히 재현하므로(이전 snippet이 누적 namespace에 정의한 이름은 보임) cross-section 참조는 false positive가 아니고, 어디에도 정의되지 않은 이름만 NameError로 잡는다. 이 확장이 코퍼스 전역에서 broken-exercise 40건을 발굴했다(8절).
 - **환경-자격 정직분류** — `isEnvCredentialError`로 자격증명/네트워크 실패를 runtime-other로 분류(환경 미준비 오판 방지).
-- **단위 테스트** — `tests/curriculum/testCurriculumExecutabilityAudit.py`에 블록 실행·블랭크 스킵·중첩 namespace·자격오류 분류 케이스 추가.
+- **단위 테스트** — `tests/curriculum/testCurriculumExecutabilityAudit.py`에 블록 실행·블랭크 스킵·중첩 namespace·자격오류 분류 + **starterCode 3종**(미정의 참조→real-bug / blank starter→실행제외 / snippet정의 변수 참조 starter→ok) 케이스 추가. 전체 18 케이스 green.
 - **커버리지 확대** — 레슨 선언 패키지 전체 설치로, 종전 건너뛰던 데이터과학·비전 레슨이 실제로 검사 대상이 됨.
 
-게이트: `uv run python -X utf8 tests/curriculum/auditCurriculumExecutability.py` (임계 real-bug·undeclared-package·yaml-load-error 0).
+게이트: `uv run python -X utf8 tests/curriculum/auditCurriculumExecutability.py` (임계 real-bug·undeclared-package·yaml-load-error 0). 검사 단위가 snippet·solution·blocks·**starterCode** 4종으로 늘어 7,583 체크(473파일).
 
 ## 6. 정독 스윕 결과 (실행으로 못 잡는 의미 결함)
 
-41-트랙 전수 정독 스윕(트랙당 1에이전트, 코드↔본문 정합 검사)을 돌렸다. **28개 트랙 정독 완료**, 13개 트랙은 **세션 사용 한도**로 미완(후속 §8). 완료분에서 실행으론 안 잡히는 의미 결함 **약 91건(high 36 · medium 54 · 그 외)** 을 찾았다. 실행 게이트는 "안 죽으면 통과"라 이런 결함을 못 잡는다 — 이게 정독을 따로 돌린 이유다.
+41-트랙 전수 정독 스윕(트랙당 1에이전트, 코드↔본문 정합 검사)을 **41/41 트랙 완료**했다(1차 28 + 2차 13). 각 에이전트는 그 트랙 모든 레슨을 정독하고 구체 수치 주장은 `uv run python`으로 직접 실증했다. 실행으론 안 잡히는 의미 결함을 다수 찾았다 — 실행 게이트는 "안 죽으면 통과"라 이런 결함을 못 잡는다(이게 정독을 따로 돌린 이유). 2차 13트랙 결과는 6.4절.
 
 ### 6.1 수정한 정독 결함
 
@@ -85,8 +88,49 @@
 
 playwright(11), sympy(00~06·08~10), llmBasics(00~05·08·09), office/practical 등은 정독에서 코드↔본문 정합 양호로 확인.
 
-## 7. 미완 · 후속 (정직 고지)
+### 6.4 2차 13트랙 정독 결과 (종전 미완분 — 이번에 전수 완료)
 
-- **정독 미완 13트랙(세션 사용 한도, resets 후 재실행)**: basics/30days · basics/builtins · dataAnalysis/numpy · dataAnalysis/pydantic · imageVision/{opencv,pillow,visionBasics,visionApps} · mathStatsMl/{scipy,sklearn} · visualization/{seaborn,altair,folium}. 이 트랙들은 **실행 게이트로는 real-bug 0 확인됨**(코드 실행 무결), 의미 정독만 미완.
-- **§6.2 문서화 결함**: 합성데이터 수술/프로즈 정정은 별도 사이클. 합성↔실데이터는 단일 로더(`localData.py`) 정합화로 대량 해소 가능하나 통계 충실도(Simpson 역설 등) 재현이 필요해 신중히 진행.
-- 본 기록의 수치(real-bug 61→0, 정독 91)는 2026-06-14 기준. 후속 재실행 시 갱신.
+각 트랙 high/medium 위주(low는 합산만). 결함은 5계열로 분류한다:
+**A** broken-exercise(코드/NameError, 게이트가 잡음 → 8절에서 수정) · **B** 합성데이터↔본문 실데이터 불일치(loader-surgery/prose, 문서화) · **C** 타 주제 템플릿 잔재(차트/정규식/리스트 어휘가 엉뚱한 섹션 prompt/hints, prose-fix) · **D** prose 사실오류/과장(prose-fix) · **E** 구조 이상(check.type 누락 등). check/resultCheck에 있는 결함은 **채점 카드라 보고만**(predict/채점 동결, [PRD.md](PRD.md)).
+
+| 트랙 | high/med/low | 핵심 결함(계열) |
+| --- | --- | --- |
+| basics/30days | 1/6/12 | day12 method_get prompt/hints가 Altair 차트 템플릿 잔재(C, high). day04 `'C:\\\\Users'`(4 backslash) 본문 규칙과 출력 불일치(D). day07/14/28 reflection이 안 가르친 내용 회상(D). day05 파일전체 "리스트" prose(실제 string, C) |
+| basics/builtins | 11/14/13 | **차트 템플릿 잔재** prompt/hints — 13_json·15_pickle·18_textwrap·28_copy(C, high). **정규식(re) 템플릿 잔재** — 11_glob(4섹션)·19_difflib·26_unittest(C, high). 12_shutil workflow 깨진약속(copy/archive 약속, 실제 개수집계만, D) + "_backup" 교육이 repo 규칙 충돌. check.type 체계적 누락 14_csv·24_argparse·26_unittest(E) |
+| dataAnalysis/numpy | 9/5/5 | 합성↔실데이터 규모 단정(B): 03"23,000건"(합성160)·04"32,000곡"(144)·05"10,000명"(160)·10"768명"(220). **09 전복** 합성 회귀 R²=0.003(설명력0)+본문 "ShellWeight 최중요"인데 실제 WholeWeight(B). 02 기온 본문 145년인데 합성 10년→온난화 차이 항상 0(B). workflow assert 11셀 전부 실제 통과 |
+| dataAnalysis/pydantic | 4/5/8 | 누락 import 순차커널 NameError — 01 Optional·06 computed_field·09 datetime/Literal/TypeVar(**A후보→8절 머신확정**). 차트 템플릿 잔재 광범위 05(5섹션)·01(3섹션)·02·04·06(C). 10 quality errorsByType 실제 stage별(D) |
+| imageVision/opencv | 3/1/1 | L03 step2 resize height=214인데 hint·check 213 기대(cv2 반올림, hint=D수정/check=보고만). L06 step5/6 적응임계 데모 입력이 전역우위 못 만듦→데모 작동 안 함(B/D). L08 practice china 고대비라 CLAHE std↓→contrastImproved 항상 거짓(B/D) |
+| imageVision/pillow | 1/4/6 | 07 워터마크 step2 좌표픽셀(12,12) 검증이 기본폰트 글리프 미도달로 flower에서 항상 False(D, diff기반으로). 02 crop off-by-one 107/213→106/214(D). 04 emboss/07 우연·공허 통과(D). 08 type:noError가 resultCheck 무력화 가능(E) |
+| imageVision/visionBasics | 0/1/3 | 04 lab_lightness가 BT.709 휘도를 OpenCV Lab L 근사라 오기(실제 비선형 CIE L*, D). 10 빨강증폭을 "누런"(실제 붉은, D). 04 hint brightMask 미정의(개방형). 08 np.where dtype int64 |
+| imageVision/visionApps | 1/1/1 | 05 Haar가 flower에서 3개 오검출(본문 "얼굴0·동일이미지" 거짓, D 정정). 10 노출태깅 'bright' 0건(합성 max mean~158, B/D). 08 썸네일 균등간격 prose(D) |
+| mathStatsMl/scipy | 0/0/2 | 거의 clean. 05 로그변환 후 정규성 회복 단정인데 Shapiro p≈0.014 여전히 기각(D, prose완화). 03 interp1d legacy. 모든 수치 직접 검증·시드 고정 |
+| mathStatsMl/sklearn | 12/1/2 | **workflow_validation starterCode fitRiskModel 미정의 ×11(A→8절)**. 02 유방암 recall이 pos_label=1(benign)인데 본문 "악성 재현율 중요"라 라벨 불일치(D). 08 "14개 특성"(실제 13, D) |
+| visualization/seaborn | 1/2/4 | 07 step10 `isin([1967,1987,2007])` 합성 gapminder에 1967/1987 없어 1패널만 렌더→데모 붕괴(B, high prose-fix). 05 titanic"891명"(180)·여성생존100%(실제74%)·age null 0(B). 02/03/00 행수 표기(B) |
+| visualization/altair | 1/3/5 | 04 step3 stacked-area가 합성 penguins 섬당1종이라 안 쌓임(본문은 다종분포, B). 04 step8 "점선=평균"인데 rule 레이어 없음(D)+dotFinal 표시줄 누락(차트 안 보임, D). 07 step4 "범례클릭"인데 bind='legend' 없음(D). 09 step3 explanation 자리표시자(D). 00 "Codaro 문서" 링크가 Altair URL(D) |
+| visualization/folium | 0/4/4 | 05·08·10 step11/workflow why·prompt·hints가 차트/정규식 어휘 오염(C). 00 약속한 `m` 지도 표시 셀이 레슨에 없음(D). 좌표·GeoJSON·API 전부 정상 |
+
+> 압도적 패턴 둘: **B(합성데이터↔실데이터 prose)** 와 **C(타 주제 템플릿 잔재)**. B는 단일 로더 `src/codaro/curriculum/localData.py` 정합화로 대량 해소 가능하나 통계 충실도 재현이 필요(별도 사이클). C는 prompt/hints prose의 대량 정정(별도 사이클). 둘 다 실행 게이트 사각이라 §6.2와 함께 후속 보강 대상으로 문서화한다. 작고 명확한 D 계열 code-fix(altair dotFinal·30days backslash 등)도 함께 묶어 후속.
+
+## 7. 후속 보강 대상 (정직 고지 — 게이트 사각의 의미 결함)
+
+정독으로 드러난 의미 결함 중 **실행/회귀 게이트가 못 잡는** 것(prose·합성데이터·구조)은 별도 사이클로 둔다. 게이트가 잡는 코드 결함은 8절에서 이번에 전부 수정했다.
+
+- **B. 합성데이터↔실데이터 prose 클러스터** — numpy·seaborn·altair 다수 + §6.2(duckdb/diamonds/mpg/flights). `localData.py` 단일 로더 정합화로 대량 해소 가능하나 통계 충실도(Simpson 역설·결측·실데이터 행수) 재현이 필요해 신중히. 게이트 통과엔 prose-fix(행수/결론 톤다운)로 충분.
+- **C. 타 주제 템플릿 잔재** — builtins(11)·pydantic·folium·30days·altair의 prompt/hints에 차트/정규식/리스트 어휘 오염. 대량 prose-fix(섹션 실제 주제 어휘로). check 블록의 동일 오염은 채점 카드라 동결.
+- **D. 소형 prose 사실오류** — 산발(scipy 로그변환·pillow crop·sklearn recall·opencv hint 등).
+- **E. 구조 이상** — builtins의 check.type 체계적 누락 등(loader-surgery).
+- 본 기록 수치(real-bug 61+40→0, 정독 41/41)는 2026-06-14 기준.
+
+## 8. broken-exercise 회귀 락이 발굴한 40건 — 정공법 수정 (게이트 통과)
+
+starterCode 실행 확장(5절)을 코퍼스 전역(473파일, 7,583체크)에 돌리니 종전 게이트가 못 잡던 **real-bug 40건**이 드러났다. 전부 "학습자가 실제 실행하는 starterCode가 어디에도 정의되지 않은 헬퍼·변수를 참조" — solution만 보던 게이트의 사각이었다. 주목할 점: 이 중 networkx·statsmodels·visionFeatures는 이번 의미 정독 13트랙에도 없던 트랙인데, **머신 회귀 락이 코퍼스 전역에서 스스로 발굴**했다(정독이 닿지 않은 곳까지 커버). 4개 패턴:
+
+| 패턴 | 건수 | 정체 | 정공법 |
+| --- | --- | --- | --- |
+| P1 sklearn 00~10 workflow_validation | 11 | snippet이 `riskPipeline`만 정의, starterCode가 참조하는 헬퍼 `fitRiskModel`·baseline `riskAccuracy`/`riskF1` 미정의 → NameError | snippet에 `fitRiskModel` 정의 + baseline 학습/평가 추가(누적 namespace 충족) |
+| P1 networkx 00~10 workflow_validation | 11 | snippet이 그래프만 만들고 starterCode의 `salesToFinanceCost`(경로비용) 미정의 | snippet에 그래프 실제 노드 기준 비용 변수 정의 |
+| P1 statsmodels 00~06·08~10 workflow_validation | 10 | snippet이 모델만 적합하고 starterCode의 `reportY`(예측/실측) 미정의 | snippet에 모델 결과 기준 `reportY` 정의 |
+| P2 이미지 starterCode 자체충족 실패 | 7 | deepVision/04(`queryFlower`)·visionBasics/04(`chinaHsv`)·05(`china`)·09(`flower`)·visionFeatures/02(`flower`,`kpFlower`) — 직전 exercise에서만 정의되던 샘플 변수 | 해당 섹션 snippet에서 샘플을 정의해 자체충족화(deepVision 1차 수정과 동일 원칙) |
+| P3 statsmodels/07 step5_gdp_trend | 1패턴 | snippet+starter 둘 다 `ValueError: cannot insert date, already exists`(date 인덱스/컬럼 충돌) | reset_index 충돌 정공법 수정 |
+
+> P1은 **snippet만** 고친다 — starterCode는 누적 namespace에서 그 정의를 보므로, snippet이 헬퍼/baseline을 정의하면 자연히 해소된다(check 채점 카드는 동결, 무수정). cascade-failure 13건은 위 real-bug의 2차 파생이라 원인 수정으로 함께 사라진다. 수정 후 코퍼스 audit **real-bug 0** 확인.

@@ -278,6 +278,95 @@ def testAuditLessonSkipsShellAndStarterBlankBlocks() -> None:
     assert not [key for key in cats if key[0] == "blk" and key[1].startswith("block")]
 
 
+def testAuditLessonExecutesStarterCodeAndCatchesBrokenExercise() -> None:
+    audit = loadAudit()
+    # The sklearn/polars class: a complete (blank-free) starterCode the learner actually runs,
+    # referencing a helper the snippet never defines. solution-only audits miss it because the
+    # solution is a clean snippet copy and check.type is noError on a different assignment.
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: workflow
+            snippet: |
+              riskPipeline = "ready"
+            exercise:
+              starterCode: |
+                model = fitRiskModel(riskPipeline)
+              solution: |
+                riskPipeline = "ready"
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_starter_bug.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    assert cats[("workflow", "snippet")] == "ok"
+    assert cats[("workflow", "solution")] == "ok"
+    # The learner-facing starterCode hits the undefined helper → real-bug, no longer invisible.
+    assert cats[("workflow", "starterCode")] == "real-bug"
+
+
+def testAuditLessonSkipsBlankStarterCode() -> None:
+    audit = loadAudit()
+    # A starterCode with the "___" blank is unfinished fill-in-the-gap code, not a contract to
+    # run — the solution carries the canonical answer. It must not be executed/flagged.
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: fill
+            snippet: |
+              total = 10
+            exercise:
+              starterCode: |
+                answer = total + ___
+              solution: |
+                answer = total + 5
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_starter_blank.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    assert cats[("fill", "solution")] == "ok"
+    assert ("fill", "starterCode") not in cats
+
+
+def testAuditLessonStarterCodeSeesSnippetNamespace() -> None:
+    audit = loadAudit()
+    # A blank-free starterCode that leans on a name the section snippet defined is legitimate in
+    # the notebook model (snippets feed the cumulative namespace). It must NOT false-positive.
+    content = textwrap.dedent(
+        """
+        meta:
+          packages: []
+        sections:
+          - id: build
+            snippet: |
+              scratchDir = "/tmp/x"
+            exercise:
+              starterCode: |
+                target = scratchDir + "/out.txt"
+              solution: |
+                scratchDir = "/tmp/x"
+        """
+    ).lstrip()
+    path = writeLesson(audit, "_unit_starter_ns.yaml", content)
+    try:
+        cats = auditCategories(audit, path)
+    finally:
+        path.unlink(missing_ok=True)
+
+    assert cats[("build", "starterCode")] == "ok"
+
+
 def testAuditLessonExpansionBlockReusesSectionNamespace() -> None:
     audit = loadAudit()
     content = textwrap.dedent(

@@ -192,6 +192,9 @@ sections:
   tips:
   - 마지막에 어떤 색공간이 어떤 분석에 쓰이는지 한 줄로 요약해 두면 다음 트랙에서 함수 선택이 빨라집니다.
   snippet: |-
+    china = load_sample_image('china.jpg')
+    chinaHsv = rgb_to_hsv(china.astype(np.float32) / 255.0)
+
     fig, axes = plt.subplots(2, 2, figsize=(10, 8))
     axes[0, 0].imshow(flower)
     axes[0, 0].set_title('RGB')

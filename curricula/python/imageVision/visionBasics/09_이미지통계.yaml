@@ -236,6 +236,8 @@ sections:
   tips:
   - 통계만으로도 단순 보정 도구를 만들 수 있다는 점이 이 강의의 결론입니다.
   snippet: |-
+    flower = load_sample_image('flower.jpg')
+
     p5 = np.percentile(gray, 5)
     p95 = np.percentile(gray, 95)
     stretched = ((gray.astype(np.float32) - p5) / max(p95 - p5, 1.0) * 255).clip(0, 255).astype(np.uint8)

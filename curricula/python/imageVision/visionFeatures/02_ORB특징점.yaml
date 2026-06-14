@@ -127,6 +127,10 @@ sections:
   tips:
   - drawKeypoints는 BGR을 가정하므로 입력이 RGB라면 결과를 다시 변환하거나 그대로 표시해도 됩니다(시각화 색만 살짝 다름).
   snippet: |-
+    flower = load_sample_image('flower.jpg')
+    flowerGray = cv2.cvtColor(flower, cv2.COLOR_RGB2GRAY)
+    kpFlower, descFlower = orb.detectAndCompute(flowerGray, mask=None)
+
     drawn = cv2.drawKeypoints(china, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     fig = plt.figure(figsize=(8, 5))
     plt.imshow(drawn)
@@ -221,6 +225,10 @@ sections:
   tips:
   - 키포인트 list comprehension은 [k.response for k in keypoints] 같이 단순합니다.
   snippet: |-
+    flower = load_sample_image('flower.jpg')
+    flowerGray = cv2.cvtColor(flower, cv2.COLOR_RGB2GRAY)
+    kpFlower, descFlower = orb.detectAndCompute(flowerGray, mask=None)
+
     responses = np.array([point.response for point in kp])
     responses.shape, responses.mean(), responses.max()
   exercise:

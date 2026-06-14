@@ -222,6 +222,14 @@ sections:
   tips:
   - 검색 결과 화면은 학습용 코드에서도 표준 패턴을 따르면 다른 응용에 그대로 활용할 수 있습니다.
   snippet: |-
+    queryFlower = (flower.astype(np.float32) * 0.9 + 10).clip(0, 255).astype(np.uint8)
+    queryFlowerBatch = preprocess(Image.fromarray(queryFlower)).unsqueeze(0)
+    with torch.inference_mode():
+        queryFlowerFeat = encoder(queryFlowerBatch).flatten(1)
+    queryFlowerNorm = F.normalize(queryFlowerFeat, dim=1)
+    simsFlower = (queryFlowerNorm @ libFeatNorm.T).squeeze(0)
+    topF, topIF = simsFlower.topk(3)
+
     fig, axes = plt.subplots(1, 4, figsize=(14, 4))
     axes[0].imshow(queryImg)
     axes[0].set_title('query')

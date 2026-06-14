@@ -432,6 +432,9 @@ sections:
     if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
         raise ValueError("인수인계 비용은 0보다 커야 합니다.")
 
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
     workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
   exercise:
     prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.

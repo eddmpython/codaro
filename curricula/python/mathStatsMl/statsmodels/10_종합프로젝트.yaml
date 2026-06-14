@@ -822,6 +822,10 @@ sections:
     if marketingData[requiredColumns].isna().any().any():
         raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
 
+    reportY = marketingData["Sales"]
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+    reportModel = sm.OLS(reportY, reportX).fit()
+
     marketingData[requiredColumns].head()
   exercise:
     prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.

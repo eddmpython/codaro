@@ -262,6 +262,8 @@ sections:
   tips:
   - ROI의 크기를 변수로 고정해 두면 같은 ROI를 여러 위치에 복사할 때 코드가 짧아집니다.
   snippet: |-
+    china = load_sample_image('china.jpg')
+
     swap = flower.copy()
     half = h // 2
     top = swap[:half].copy()
