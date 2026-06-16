@@ -5,15 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "typecheck:math-city": "tsc --noEmit -p tsconfig.math-city.json",
     "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js",
-    "build": "vite build",
+    "build": "npm run typecheck:math-city && vite build",
     "postbuild": "node scripts/prerenderReact.js && node scripts/postbuild.js",
-    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
+    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && npm run typecheck:math-city && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
+    "typescript": "^6.0.3",
     "vite": "^7.3.5"
   },
   "dependencies": {

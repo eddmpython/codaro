@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -27,6 +27,7 @@ import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
+const MathCityApp = lazy(() => import("./apps/suspiciousMathCity/MathCityApp"));
 
 const surfaces = [
   {
@@ -254,14 +255,16 @@ function App() {
 
   return (
     <div className="appFrame">
-      <Header
-        onNavigate={navigate}
-        currentPath={path}
-        themeMode={themeMode}
-        onToggleTheme={() => setThemeMode((current) => (current === "dark" ? "light" : "dark"))}
-      />
+      {route.hideChrome ? null : (
+        <Header
+          onNavigate={navigate}
+          currentPath={path}
+          themeMode={themeMode}
+          onToggleTheme={() => setThemeMode((current) => (current === "dark" ? "light" : "dark"))}
+        />
+      )}
       {route.element}
-      <Footer />
+      {route.hideChrome ? null : <Footer />}
     </div>
   );
 }
@@ -310,6 +313,20 @@ function Header({ onNavigate, themeMode, onToggleTheme }) {
         </button>
       </div>
     </>
+  );
+}
+
+function MathCityFallback() {
+  return (
+    <main className="mathCityRoot">
+      <section className="mc-mapScreen" aria-label="수상한 수학도시 불러오기">
+        <div className="mc-mapIntro">
+          <p className="mc-kicker">Season 1 · 사라진 숫자</p>
+          <h1>시계탑 사건을 불러오는 중</h1>
+          <p>지도와 단서 장면을 준비하고 있어.</p>
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -386,6 +403,21 @@ function resolveRoute(path) {
         url: "/",
       },
       element: <HomePage />,
+    };
+  }
+  if (path === "/math-city") {
+    return {
+      meta: {
+        title: "수상한 수학도시",
+        description: "초등학생이 수학 개념을 능력처럼 획득하고 도시의 이상현상을 해결하는 무료 브라우저 수학 어드벤처.",
+        url: "/math-city",
+      },
+      element: (
+        <Suspense fallback={<MathCityFallback />}>
+          <MathCityApp />
+        </Suspense>
+      ),
+      hideChrome: true,
     };
   }
   if (path === "/docs") return docsIndexRoute();

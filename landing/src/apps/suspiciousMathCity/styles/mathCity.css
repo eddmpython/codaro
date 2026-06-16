@@ -1,0 +1,1029 @@
+.mathCityRoot {
+  --mc-ink: #17231d;
+  --mc-muted: #5b665f;
+  --mc-bg: #f7f3e7;
+  --mc-surface: #fffaf0;
+  --mc-surface-strong: #ffffff;
+  --mc-line: rgba(23, 35, 29, 0.16);
+  --mc-line-strong: rgba(23, 35, 29, 0.28);
+  --mc-green: #2f8f5b;
+  --mc-green-deep: #14633e;
+  --mc-amber: #eaa32a;
+  --mc-red: #c84b3c;
+  --mc-blue: #3d70b8;
+  --mc-violet: #7655a6;
+  --mc-shadow: 0 18px 44px rgba(44, 36, 20, 0.15);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    linear-gradient(90deg, rgba(23, 35, 29, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(23, 35, 29, 0.04) 1px, transparent 1px),
+    linear-gradient(160deg, #fff8dc 0%, #d9efe4 52%, #f0e3fb 100%);
+  background-size: 34px 34px, 34px 34px, auto;
+  color: var(--mc-ink);
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+}
+
+.mathCityRoot * {
+  box-sizing: border-box;
+}
+
+.mathCityRoot button,
+.mathCityRoot input {
+  font: inherit;
+}
+
+.mathCityRoot button {
+  cursor: pointer;
+}
+
+.mathCityRoot button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.mathCityRoot button:focus-visible,
+.mathCityRoot input:focus-visible {
+  outline: 3px solid #1f6feb;
+  outline-offset: 3px;
+}
+
+.mathCityRoot h1,
+.mathCityRoot h2,
+.mathCityRoot p {
+  margin: 0;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  letter-spacing: 0;
+}
+
+.mc-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 68px;
+  padding: 10px clamp(12px, 3vw, 28px);
+  border-bottom: 1px solid var(--mc-line);
+  background: rgba(255, 250, 240, 0.84);
+  backdrop-filter: blur(16px);
+}
+
+.mc-brandButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 5px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--mc-ink);
+  text-align: left;
+}
+
+.mc-brandButton strong,
+.mc-brandButton small {
+  display: block;
+}
+
+.mc-brandButton strong {
+  font-size: 18px;
+  line-height: 1.12;
+}
+
+.mc-brandButton small {
+  margin-top: 2px;
+  color: var(--mc-muted);
+  font-size: 12px;
+}
+
+.mc-brandMark {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #17231d;
+  border-radius: 8px;
+  background: #ffd65a;
+  box-shadow: 4px 4px 0 #17231d;
+  font-weight: 900;
+}
+
+.mc-nav {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mc-iconButton {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--mc-ink);
+}
+
+.mc-iconButton:hover {
+  border-color: var(--mc-line-strong);
+  background: #ffffff;
+}
+
+.mc-notice,
+.mc-contractWarning {
+  width: min(1160px, calc(100% - 24px));
+  margin: 12px auto 0;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: var(--mc-surface);
+  box-shadow: var(--mc-shadow);
+}
+
+.mc-notice {
+  padding: 12px 14px;
+  color: var(--mc-muted);
+}
+
+.mc-contractWarning {
+  padding: 14px 16px;
+}
+
+.mc-contractWarning strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.mc-contractWarning ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.mc-mapScreen,
+.mc-episodeScreen,
+.mc-libraryScreen,
+.mc-settingsScreen {
+  width: min(1160px, calc(100% - 24px));
+  margin: 0 auto;
+  padding: 22px 0 32px;
+}
+
+.mc-mapIntro {
+  display: grid;
+  gap: 8px;
+  max-width: 720px;
+  margin-bottom: 16px;
+}
+
+.mc-kicker {
+  color: var(--mc-green-deep);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mc-mapIntro h1,
+.mc-episodeHeader h1,
+.mc-libraryScreen h1,
+.mc-settingsScreen h1 {
+  color: var(--mc-ink);
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1.08;
+}
+
+.mc-mapIntro p {
+  color: var(--mc-muted);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.mc-mapLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.mc-cityStage,
+.mc-sceneWrap,
+.mc-mapPanel,
+.mc-bottomSheet,
+.mc-libraryItem,
+.mc-settingsList,
+.mc-resetBox {
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.9);
+  box-shadow: var(--mc-shadow);
+}
+
+.mc-cityStage {
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+.mc-citySvg,
+.mc-sceneSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mc-citySvg {
+  min-height: 500px;
+}
+
+.mc-mapGround {
+  fill: #d9eddc;
+  stroke: rgba(23, 35, 29, 0.18);
+  stroke-width: 2;
+}
+
+.mc-road,
+.mc-sceneRoad {
+  fill: none;
+  stroke: #bd9f69;
+  stroke-linecap: round;
+  stroke-width: 32;
+}
+
+.mc-stream {
+  fill: none;
+  stroke: #83c7df;
+  stroke-linecap: round;
+  stroke-width: 18;
+}
+
+.mc-towerBody,
+.mc-sceneTowerBody {
+  fill: #f8c86c;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-towerRoof,
+.mc-sceneTowerRoof {
+  fill: #d75a44;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-clockFace,
+.mc-sceneClock {
+  fill: #fffdf2;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-clocktowerCorrupted .mc-clockFace,
+.mc-sceneClockWrong {
+  fill: #ffe4dc;
+}
+
+.mc-clocktowerRestored .mc-clockFace {
+  fill: #e8fff1;
+}
+
+.mc-clockHandHour,
+.mc-clockHandMinute,
+.mc-sceneHourHand,
+.mc-sceneMinuteHand {
+  stroke: #17231d;
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.mc-clocktowerCorrupted .mc-clockHandMinute,
+.mc-sceneMinuteHand {
+  stroke: var(--mc-red);
+}
+
+.mc-clocktowerRestored .mc-clockHandMinute {
+  stroke: var(--mc-green-deep);
+}
+
+.mc-door,
+.mc-sceneDoor {
+  fill: #5e4432;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-mapLabel,
+.mc-sceneLabel,
+.mc-busText,
+.mc-timeText,
+.mc-lightText,
+.mc-gapText,
+.mc-foundLabel,
+.mc-lensLabel {
+  fill: #17231d;
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.mc-mapLabel,
+.mc-sceneLabel,
+.mc-gapText {
+  font-size: 18px;
+}
+
+.mc-busBody {
+  fill: #5aa6dc;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-busSign,
+.mc-timeRow {
+  fill: #fffdf2;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-wheel {
+  fill: #28323f;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-bakeryBody {
+  fill: #ffdf99;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-bakeryRoof {
+  fill: #e87264;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-cakeMark {
+  fill: #fffdf2;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-cakeLine {
+  fill: none;
+  stroke: var(--mc-red);
+  stroke-width: 3;
+}
+
+.mc-lockedPlace rect {
+  fill: #b9b8b1;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-lockedPlace path {
+  fill: none;
+  stroke: #17231d;
+  stroke-linecap: round;
+  stroke-width: 8;
+}
+
+.mc-placeButtons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mc-placeButton {
+  position: absolute;
+  display: grid;
+  gap: 2px;
+  width: 154px;
+  min-height: 88px;
+  padding: 10px;
+  border: 2px solid #17231d;
+  border-radius: 8px;
+  background: #fffdf2;
+  box-shadow: 5px 5px 0 #17231d;
+  color: var(--mc-ink);
+  text-align: left;
+  pointer-events: auto;
+}
+
+.mc-placeButton strong {
+  font-size: 16px;
+}
+
+.mc-placeButton small,
+.mc-placeStatus {
+  color: var(--mc-muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.mc-place-corrupted {
+  left: 43%;
+  top: 18%;
+  background: #ffe0cf;
+}
+
+.mc-place-restored {
+  left: 43%;
+  top: 18%;
+  background: #dff7e8;
+}
+
+.mc-place-available,
+.mc-place-revisitable {
+  right: 5%;
+  top: 47%;
+  background: #e7f3ff;
+}
+
+.mc-place-locked:nth-of-type(3) {
+  left: 7%;
+  top: 62%;
+}
+
+.mc-place-locked:nth-of-type(4) {
+  left: 9%;
+  top: 24%;
+}
+
+.mc-mapPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+}
+
+.mc-panelHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mc-green-deep);
+  font-weight: 900;
+}
+
+.mc-mapPanel h2 {
+  font-size: 25px;
+  line-height: 1.18;
+}
+
+.mc-mapPanel p,
+.mc-nextHint span,
+.mc-memoryLine {
+  color: var(--mc-muted);
+  line-height: 1.6;
+}
+
+.mc-nextHint {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(61, 112, 184, 0.28);
+  border-radius: 8px;
+  background: #eef5ff;
+}
+
+.mc-panelActions,
+.mc-taskActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.mc-panelActions button,
+.mc-secondaryAction,
+.mc-textButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--mc-ink);
+  font-weight: 800;
+}
+
+.mc-primaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 18px;
+  border: 2px solid #17231d;
+  border-radius: 8px;
+  background: #ffd65a;
+  box-shadow: 4px 4px 0 #17231d;
+  color: #17231d;
+  font-weight: 900;
+}
+
+.mc-primaryAction:hover,
+.mc-placeButton:hover {
+  transform: translate(-1px, -1px);
+}
+
+.mc-dangerAction {
+  background: #ff9b8e;
+}
+
+.mc-episodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.mc-episodeHeader > div {
+  min-width: 0;
+}
+
+.mc-episodeLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.mc-sceneWrap {
+  min-height: 520px;
+  overflow: hidden;
+}
+
+.mc-sceneSky {
+  fill: #dcedff;
+  stroke: rgba(23, 35, 29, 0.18);
+  stroke-width: 2;
+}
+
+.mc-timetableBoard {
+  fill: #fff8de;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-lightOff {
+  fill: #c7c3b9;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-lightOn {
+  fill: #70d285;
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-timeLensBand {
+  fill: rgba(255, 253, 242, 0.9);
+  stroke: #17231d;
+  stroke-width: 3;
+}
+
+.mc-lensLabel,
+.mc-foundLabel {
+  font-size: 17px;
+}
+
+.mc-gapLine {
+  stroke: #17231d;
+  stroke-linecap: round;
+  stroke-width: 8;
+}
+
+.mc-gapPoint {
+  fill: #ffffff;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-gapPointFilled {
+  fill: #ffd65a;
+  stroke: #17231d;
+  stroke-width: 4;
+}
+
+.mc-clockPin,
+.mc-scenePeople circle {
+  fill: #17231d;
+}
+
+.mc-bottomSheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 520px;
+  padding: 18px;
+}
+
+.mc-panelContent {
+  display: grid;
+  gap: 14px;
+}
+
+.mc-panelContent h2 {
+  font-size: clamp(22px, 4vw, 31px);
+  line-height: 1.16;
+}
+
+.mc-panelContent p {
+  color: var(--mc-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.mc-inspectGrid,
+.mc-choiceGrid,
+.mc-libraryGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.mc-choiceGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mc-inspectButton,
+.mc-choiceButton,
+.mc-timeTile,
+.mc-timeSlot {
+  min-height: 56px;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--mc-ink);
+  font-weight: 850;
+}
+
+.mc-inspectButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  text-align: left;
+}
+
+.mc-choiceButton {
+  padding: 12px;
+  text-align: center;
+}
+
+.mc-selected {
+  border-color: #17231d;
+  background: #e2f3ff;
+  box-shadow: inset 0 0 0 2px #3d70b8;
+}
+
+.mc-taskActions {
+  align-items: center;
+}
+
+.mc-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--mc-ink);
+  line-height: 1.55;
+}
+
+.mc-feedback-success {
+  border-color: rgba(47, 143, 91, 0.38);
+  background: #e8f8ee;
+}
+
+.mc-feedback-wrong {
+  border-color: rgba(200, 75, 60, 0.38);
+  background: #ffe8e4;
+}
+
+.mc-dragPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.mc-modelLine,
+.mc-mathSentence {
+  padding: 12px;
+  border: 1px dashed var(--mc-line-strong);
+  border-radius: 8px;
+  background: #fffef8;
+  color: var(--mc-ink);
+  font-weight: 900;
+  text-align: center;
+}
+
+.mc-tileRow,
+.mc-slotRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mc-timeTile {
+  background: #ffd65a;
+  border: 2px solid #17231d;
+}
+
+.mc-timeSlot {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+}
+
+.mc-timeSlot span {
+  color: var(--mc-muted);
+  font-size: 12px;
+}
+
+.mc-rewardGrid,
+.mc-libraryGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mc-rewardItem,
+.mc-libraryItem {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.mc-rewardItem {
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.mc-rewardItem strong,
+.mc-libraryItem h2 {
+  color: var(--mc-ink);
+}
+
+.mc-rewardItem span,
+.mc-libraryItem span,
+.mc-libraryItem small {
+  color: var(--mc-muted);
+  line-height: 1.5;
+}
+
+.mc-libraryScreen,
+.mc-settingsScreen {
+  display: grid;
+  gap: 14px;
+}
+
+.mc-libraryGrid {
+  display: grid;
+}
+
+.mc-libraryItem {
+  min-height: 190px;
+}
+
+.mc-libraryItem p {
+  color: var(--mc-green-deep);
+  font-weight: 900;
+}
+
+.mc-libraryItem strong {
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.mc-libraryItem:not(.mc-owned) {
+  filter: grayscale(0.45);
+  opacity: 0.75;
+}
+
+.mc-clueCard {
+  background: #fff8d9;
+}
+
+.mc-settingsList,
+.mc-resetBox {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.mc-toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px;
+  border: 1px solid var(--mc-line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.mc-toggleRow span {
+  display: grid;
+  gap: 4px;
+}
+
+.mc-toggleRow small {
+  color: var(--mc-muted);
+  line-height: 1.4;
+}
+
+.mc-toggleRow input {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+}
+
+.mc-resetBox h2 {
+  font-size: 24px;
+}
+
+.mc-resetBox p {
+  color: var(--mc-muted);
+  line-height: 1.6;
+}
+
+.mc-largeText {
+  font-size: 18px;
+}
+
+.mc-largeText .mc-panelContent p,
+.mc-largeText .mc-mapIntro p {
+  font-size: 19px;
+}
+
+.mc-reducedMotion *,
+.mc-reducedMotion *::before,
+.mc-reducedMotion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mathCityRoot *,
+  .mathCityRoot *::before,
+  .mathCityRoot *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .mc-mapLayout,
+  .mc-episodeLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .mc-mapPanel,
+  .mc-bottomSheet,
+  .mc-sceneWrap {
+    min-height: auto;
+  }
+
+  .mc-sceneSvg {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 620px) {
+  .mc-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mc-nav {
+    justify-content: space-between;
+  }
+
+  .mc-iconButton {
+    flex: 1 1 0;
+  }
+
+  .mc-mapScreen,
+  .mc-episodeScreen,
+  .mc-libraryScreen,
+  .mc-settingsScreen,
+  .mc-notice,
+  .mc-contractWarning {
+    width: min(100% - 16px, 1160px);
+  }
+
+  .mc-cityStage {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .mc-citySvg {
+    min-height: 300px;
+    transform: none;
+    transform-origin: center;
+  }
+
+  .mc-sceneSvg {
+    height: auto;
+    min-height: 0;
+  }
+
+  .mc-placeButtons {
+    position: static;
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255, 250, 240, 0.72);
+  }
+
+  .mc-placeButton {
+    position: static;
+    width: 128px;
+    min-height: 82px;
+    padding: 8px;
+    width: 100%;
+  }
+
+  .mc-placeButton strong {
+    font-size: 14px;
+  }
+
+  .mc-place-corrupted {
+    background: #ffe0cf;
+  }
+
+  .mc-place-restored {
+    background: #dff7e8;
+  }
+
+  .mc-place-available,
+  .mc-place-revisitable {
+    background: #e7f3ff;
+  }
+
+  .mc-place-locked:nth-of-type(3) {
+    background: #f5f0e5;
+  }
+
+  .mc-place-locked:nth-of-type(4) {
+    background: #f5f0e5;
+  }
+
+  .mc-episodeHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mc-choiceGrid,
+  .mc-tileRow,
+  .mc-slotRow,
+  .mc-rewardGrid,
+  .mc-libraryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mc-panelActions,
+  .mc-taskActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mc-panelActions button,
+  .mc-primaryAction,
+  .mc-secondaryAction,
+  .mc-textButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .mc-brandButton strong {
+    font-size: 16px;
+  }
+
+  .mc-brandMark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .mc-mapIntro h1,
+  .mc-episodeHeader h1,
+  .mc-libraryScreen h1,
+  .mc-settingsScreen h1 {
+    font-size: 27px;
+  }
+
+  .mc-placeButton {
+    width: 118px;
+  }
+}

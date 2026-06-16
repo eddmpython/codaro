@@ -36,6 +36,7 @@ const defaultImage = `${siteUrl}/brand/codaro-character.png`;
 
 const urls = [
   { loc: `${siteUrl}/`, changefreq: "weekly", priority: "1.0", lastmod: buildDate, image: defaultImage, imageCaption: "Codaro 마스코트" },
+  { loc: `${siteUrl}/math-city`, changefreq: "weekly", priority: "0.9", lastmod: buildDate, image: defaultImage, imageCaption: "수상한 수학도시" },
   { loc: `${siteUrl}/docs`, changefreq: "weekly", priority: "0.9", lastmod: buildDate },
   { loc: `${siteUrl}/packs`, changefreq: "weekly", priority: "0.8", lastmod: buildDate },
   { loc: `${siteUrl}/docs/blog`, changefreq: "weekly", priority: "0.8", lastmod: latestPostDate },
