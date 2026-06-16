@@ -43,7 +43,7 @@
 
 ## 3. 최종 게임 포맷
 
-MVP는 자유 이동 게임이 아니라 지도 기반 장면 어드벤처다.
+Product Core Slice는 자유 이동 게임이 아니라 지도 기반 장면 어드벤처다.
 
 ```text
 지도 기반 허브
@@ -64,7 +64,7 @@ MVP는 자유 이동 게임이 아니라 지도 기반 장면 어드벤처다.
 
 ## 4. 최종 그래픽 포맷
 
-MVP 그래픽은 다음 비율로 간다.
+Core Slice 그래픽은 다음 비율로 간다.
 
 | 계층 | 방식 | 책임 |
 | --- | --- | --- |
@@ -97,14 +97,14 @@ MVP 그래픽은 다음 비율로 간다.
 
 ## 6. 최종 브라우저 저장 포맷
 
-MVP는 다음 구조로 고정한다.
+Core Slice는 다음 구조로 고정한다.
 
 ```text
 localStorage: 진행 상태와 설정
 HTTP cache: 이미지, 글꼴, bundle
-service worker: MVP 제외
-IndexedDB: MVP 제외
-Cache API: MVP 제외
+service worker: Core Slice 제외
+IndexedDB: Core Slice 제외
+Cache API: Core Slice 제외
 ```
 
 진행 key:

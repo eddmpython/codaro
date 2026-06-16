@@ -200,6 +200,11 @@ const abilityCard = {
   visualModel: "색 띠로 연결된 시간 간격",
   memoryLine: "두 시각을 함께 보면 남은 시간을 알 수 있어.",
   reusableAt: ["clocktower", "number-bus-stop"],
+  printVariant: {
+    workbookAction: "10분 타일을 사이 칸에 놓기",
+    storybookPrompt: "시계와 시간표를 함께 찾아봐.",
+    teacherPrompt: "두 시각 사이에는 어떤 간격이 있을까?",
+  },
 };
 ```
 
@@ -244,7 +249,7 @@ const manipulationBoard = {
 - 선택지는 보조이고, 핵심은 타일/선/조각을 움직이는 일이다.
 - 성공하면 조작판의 모델이 장면 속 변화로 이어진다.
 
-MVP 조작:
+Core Slice 조작:
 
 - 시간 조각 놓기.
 - 버스 번호 타일 끌어놓기.
@@ -378,6 +383,11 @@ const clueCard = {
   conceptAfterLearning: "자리값과 규칙",
   rereadMeaning: "0은 없다는 뜻만이 아니라 숫자의 자리를 지키기도 한다.",
   nextAnomalyHint: "버스 번호판에서 10번을 찾아봐.",
+  printVariant: {
+    storybookAnchor: "시계탑 아래 쪽지",
+    workbookQuestion: "0을 지우면 10번 버스는 어떻게 보일까?",
+    classroomPrompt: "0은 언제 아무것도 아닌 것이 아니라 자리를 지킬까?",
+  },
 };
 ```
 
@@ -518,9 +528,9 @@ const bottomSheetArtifact = {
 - 열렸을 때 배경 장면은 유지하되 클릭은 잠근다.
 - 모션 줄이기 설정에서는 slide 대신 즉시 열림으로 바꾼다.
 
-## 5. MVP 아티팩트 세트
+## 5. Product Core Slice 아티팩트 세트
 
-MVP에서 반드시 구현할 최소 세트:
+Core Slice에서 반드시 구현할 최소 세트:
 
 | 에피소드 | 이상현상 | 능력 | 조작판 | 오개념 반응 | 복구 기록 | 단서 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -530,7 +540,7 @@ MVP에서 반드시 구현할 최소 세트:
 
 시계탑 에피소드의 아티팩트 완성도가 제품 증명이다. 시계탑이 약하면 에피소드 수를 늘리지 않는다.
 
-MVP 우선순위:
+Core Slice 우선순위:
 
 1. 도시 지도 조각.
 2. 시계탑 장면 조작판.

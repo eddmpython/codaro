@@ -1,6 +1,6 @@
 # 수상한 수학도시 PRD
 
-> 상태: draft 2
+> 상태: draft 3
 > 범위: GitHub Pages에 올릴 수 있는 서버 없는 초등 수학 스토리형 학습 게임.
 > 원칙: 개인정보를 만들지 않고, 브라우저에 남는 개인 진행만 사용한다.
 
@@ -8,13 +8,20 @@
 
 수상한 수학도시는 초등학생이 수학 개념을 능력처럼 획득하고, 그 능력으로 도시의 이상현상을 해결하며, 숨겨진 이야기를 이해하는 정적 웹 학습 게임이다.
 
-이 제품은 수학 문제를 많이 풀게 하는 앱이 아니다. 아이가 먼저 이상한 사건을 보고, 왜 그런 일이 생겼는지 궁금해하고, 필요한 개념을 찾아 세계를 고치는 앱이다.
+이 제품은 수학 문제를 많이 풀게 하는 앱이 아니다. 아이가 먼저 이상한 사건을 보고, 왜 그런 일이 생겼는지 궁금해하고, 필요한 개념을 찾아 세계를 고치는 앱이다. 장기적으로는 같은 Episode Pack에서 스토리북, 워크북, 조작 부록, 교사용 활동지까지 파생할 수 있는 수학 세계관이다.
 
 기획의 출발점은 `게임을 좋아하지만 수학은 싫어하는 초등 3학년 으뜸이`와, `게임 자체보다 공부와 멀어지는 모습이 아쉬운 으뜸아빠`다. 이들은 실제 사용자 정보가 아니라 제품 판단을 위한 대표 페르소나다. 자세한 기준은 [originAndPersona.md](originAndPersona.md)를 따른다.
 
 핵심 문장:
 
 > 개념을 배우면 새로운 능력이 생기고, 새로운 능력으로 도시의 숨겨진 이야기를 이해한다.
+
+첫 출시 단위는 버리는 MVP가 아니다. 이 문서에서는 `Product Core Slice`라고 부른다.
+
+```text
+Product Core Slice
+= 앞으로 시즌, 도서, 워크북이 올라갈 제품 코어를 시계탑 한 편으로 증명하는 단위
+```
 
 ## 2. 왜 GitHub Pages인가
 
@@ -132,7 +139,7 @@
 
 ### 5.5 접근성과 단독 사용
 
-초등학생이 혼자 플레이할 수 없으면 MVP가 아니다. 접근성은 후속 개선이 아니라 완료 조건이다.
+초등학생이 혼자 플레이할 수 없으면 Product Core Slice가 아니다. 접근성은 후속 개선이 아니라 완료 조건이다.
 
 필수 기준:
 
@@ -151,15 +158,21 @@
 
 | 계약 | 기준 문서 | 출시 조건 |
 | --- | --- | --- |
+| 매체 원천 | [crossMediaPrd.md](crossMediaPrd.md) | Episode Pack이 앱, 스토리북, 워크북, 활동지로 변환 가능 |
+| 기술 스택 | [technicalStackAdr.md](technicalStackAdr.md) | TypeScript game boundary, registry validation, visual gate |
+| 세계관 캐논 | [ipCanon.md](ipCanon.md) | 제로, 노바, 시즌 질문, 금지 변형을 지킴 |
 | 커리큘럼 | [curriculumMatrix.md](curriculumMatrix.md) | 새 개념 1개, 선수 개념, 전이 과제, 오개념 대응이 명확함 |
+| 교과 연계 | [standardsAlignment.md](standardsAlignment.md) | 성취기준, 선수 감각, 독해 함정, 전이 수준 명시 |
 | 제작 | [episodeAuthoringGuide.md](episodeAuthoringGuide.md) | Episode Brief부터 registry 등록까지 통과 |
+| 출판 변환 | [publishingFormatMatrix.md](publishingFormatMatrix.md) | 8-12쪽 이야기, 4쪽 워크북, 15분 활동지로 변환 |
+| 시각 제작 | [premiumProductionPipeline.md](premiumProductionPipeline.md) | graybox, state-art, character, polish, visual QA 통과 |
 | 접근성 | [accessibilityAndUsability.md](accessibilityAndUsability.md) | 키보드, 터치, 큰 글자, 모션 축소 통과 |
 | 품질 | [contentQualityRubric.md](contentQualityRubric.md) | 필수 항목 2점 이상 |
 | 운영 | [operationsPrd.md](operationsPrd.md) | id 안정성, 저장 migration, 회귀 테스트 통과 |
 
-## 6. MVP 범위
+## 6. Product Core Slice 범위
 
-MVP는 `시즌 1: 사라진 숫자`의 첫 3개 에피소드다.
+첫 Product Core Slice는 `시계탑이 멈춘 날`이다. 단, 장기 구조를 검증하기 위해 시즌 1의 초기 에피소드 3개를 같은 registry 계약 안에서 설계한다.
 
 | 에피소드 | 개념 | 능력 | 세계 변화 | 다음 단서 |
 | --- | --- | --- | --- | --- |
@@ -167,7 +180,7 @@ MVP는 `시즌 1: 사라진 숫자`의 첫 3개 에피소드다.
 | 숫자 버스의 실종 | 수 배열, 규칙 | 패턴 렌즈 | 버스 노선 복구 | 도시 지도가 찢어짐 |
 | 반쪽 빵집 | 나눗셈, 분수 기초 | 나누기 칼 | 빵집과 광장 식탁 복구 | 제로의 편지 발견 |
 
-MVP 기능:
+Core Slice 기능:
 
 - 도시 지도 화면
 - 에피소드 화면
@@ -181,7 +194,7 @@ MVP 기능:
 - 브라우저 진행 저장
 - 진행 초기화 버튼
 
-MVP에서 하지 않는 것:
+Core Slice에서 하지 않는 것:
 
 - 계정
 - 원격 저장
@@ -213,6 +226,10 @@ MVP에서 하지 않는 것:
 | M-16 | Curriculum Matrix | 시즌별 개념, 능력, 조작, 오개념, 전이 과제를 관리 | High |
 | M-17 | Content Quality Rubric | 출시 전 학습 품질과 접근성 기준을 내부 점검 | High |
 | M-18 | Versioned Registry | 콘텐츠 id, asset, migration, deprecated mapping을 장기 관리 | High |
+| M-19 | Cross-media Episode Pack | 앱, 스토리북, 워크북, 활동지로 파생 가능한 공통 원천 | High |
+| M-20 | Technical Stack Boundary | React/Vite 안에 TypeScript 게임 경계와 SVG/HTML 조작 계약 | High |
+| M-21 | Premium Visual QA | 주요 뷰포트와 상태별 스크린샷으로 허접한 화면을 차단 | High |
+| M-22 | Publishing Adapter | 워크북 4쪽, 스토리북 8-12쪽, 활동지 1장을 파생 | Medium |
 
 ## 8. 콘텐츠 단위
 
@@ -275,7 +292,7 @@ MVP에서 하지 않는 것:
 7. 오개념 반응: 틀리면 어떤 이유가 장면으로 보이는가.
 8. 이야기 단서: 이 개념으로 어떤 비밀이 새롭게 읽히는가.
 
-MVP task UI는 다음 중 하나다.
+Core Slice task UI는 다음 중 하나다.
 
 - `storyChoice`: 상황 속 필요한 정보나 개념 선택.
 - `mathChoice`: 계산 또는 개념 선택.
@@ -283,9 +300,9 @@ MVP task UI는 다음 중 하나다.
 - `splitWhole`: 전체를 같은 부분으로 나누기.
 - `inspectScene`: 장면에서 단서 클릭.
 
-MVP는 `storyChoice`, `mathChoice`, `dragArrange`만 구현해도 된다. `splitWhole`은 반쪽 빵집의 핵심 조작이므로 2차 슬라이스에서 곧바로 붙인다.
+첫 Core Slice는 `storyChoice`, `mathChoice`, `dragArrange`를 구현한다. `splitWhole`은 반쪽 빵집의 핵심 조작이므로 다음 제품 slice에서 곧바로 붙인다.
 
-단, 각 에피소드에는 손가락으로 직접 조작하는 수학 행동이 최소 1개 있어야 한다. 정답 선택만으로 완료되는 에피소드는 MVP 완료로 보지 않는다.
+단, 각 에피소드에는 손가락으로 직접 조작하는 수학 행동이 최소 1개 있어야 한다. 정답 선택만으로 완료되는 에피소드는 Core Slice 완료로 보지 않는다.
 
 ## 9. 진행 저장
 
@@ -327,7 +344,7 @@ suspiciousMathCity.progress.v1
 
 ## 10. 성공 지표
 
-MVP 성공은 숫자 많은 분석이 아니라 품질 체크로 본다.
+Core Slice 성공은 숫자 많은 분석이 아니라 품질 체크로 본다.
 
 | 지표 | 기준 |
 | --- | --- |
@@ -344,10 +361,13 @@ MVP 성공은 숫자 많은 분석이 아니라 품질 체크로 본다.
 | 접근성 | 키보드, 터치, 큰 글자, 모션 축소, 소리 없음에서도 완료 가능하다 |
 | 학습 품질 | [contentQualityRubric.md](contentQualityRubric.md)의 필수 항목이 2점 이상이다 |
 | 운영 안정성 | registry 참조, 저장 migration, id 안정성 검증을 통과한다 |
+| 스택 적합성 | TypeScript game boundary, SVG/HTML 조작, localStorage, lazy loading 계약이 지켜진다 |
+| 출판 가능성 | 첫 에피소드가 스토리북 1장, 워크북 1단원, 활동지 1장으로 변환된다 |
+| 프리미엄 기준 | graybox부터 visual QA까지 통과하고 버튼/텍스트/장면이 겹치지 않는다 |
 
-## 10.1 MVP 완료 판정
+## 10.1 Product Core Slice 완료 판정
 
-MVP는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을 모두 만족해야 한다.
+Product Core Slice는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을 모두 만족해야 한다.
 
 1. 시계탑 vertical slice가 첫 30초 안에 이상현상, 관찰, 첫 질문을 보여준다.
 2. 에피소드 1개 이상이 문제 전 단서 찾기, 직접 조작, 오개념 반응, 전이 과제를 가진다.
@@ -356,6 +376,9 @@ MVP는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을
 5. 360px 모바일 폭, 키보드만 사용, `largeText`, `reducedMotion`에서 완료 가능하다.
 6. 완료 화면 기본 행동이 `지도 보기` 또는 `오늘은 여기까지`다.
 7. 금지 패턴이 UI, 데이터, 문구에 없다.
+8. 첫 시계탑 에피소드가 스토리북 8-12쪽, 워크북 4쪽, 교사용 15분 활동으로 변환 가능하다.
+9. `math-city-contract`, `math-city-storage`, `math-city-browser`, `math-city-accessibility`, `math-city-visual` gate 설계가 문서화되어 있다.
+10. 에피소드 문장과 수학 데이터가 React 화면에 박히지 않고 registry에서 나온다.
 
 ## 11. 로드맵
 
@@ -366,8 +389,9 @@ MVP는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을
 - 개념 능력 3개 확정.
 - 데이터 스키마 확정.
 - 커리큘럼 매트릭스, 제작 가이드, 접근성 기준, 품질 루브릭, 운영 PRD 확정.
+- 크로스미디어 PRD, 세계관 캐논, 기술 스택 ADR, 프리미엄 제작 파이프라인 확정.
 
-### Phase 1: 클릭 가능한 정적 MVP
+### Phase 1: Product Core Slice
 
 - `landing` route 추가.
 - 지도, 에피소드, 도감, 단서장 화면 구현.
@@ -375,14 +399,17 @@ MVP는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을
 - 브라우저 저장 구현.
 - 키보드 경로, 큰 글자, 모션 축소, 끌기 대체 조작 구현.
 - registry 검증과 저장 failure path 구현.
+- TypeScript game boundary와 lazy import 구성.
+- 시계탑 에피소드의 스토리북/워크북/활동지 변환 데이터 작성.
 
-### Phase 2: MVP 3에피소드 완성
+### Phase 2: Core Season Opening
 
 - 에피소드 2, 3 추가.
 - 패턴 배열 조작과 나누기 조작 추가.
 - 시각 변화와 힌트 정리.
 - 모바일 화면 검증.
 - 콘텐츠 품질 루브릭으로 3개 에피소드 검수.
+- 사라진 0, 숫자 버스, 공평 배분, 단위분수 발달 순서 반영.
 
 ### Phase 3: 시즌 1 확장
 
@@ -390,6 +417,7 @@ MVP는 기능이 보이는 것만으로 완료하지 않는다. 아래 조건을
 - 각도, 길이, 뺄셈, 도형 기초 개념 능력 추가.
 - 조합 퍼즐 도입.
 - 시즌 확장 규칙에 따라 기존 능력 재사용과 재방문 미션 추가.
+- 스토리북 1권, 워크북 1권, 조작 부록 초안으로 확장 가능한 episode pack 검수.
 
 ## 12. 비범위
 

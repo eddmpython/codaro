@@ -11,38 +11,43 @@ landing/
   src/
     apps/
       suspiciousMathCity/
-        MathCityApp.jsx
+        MathCityApp.tsx
         data/
-          registry.js
+          registry.ts
           seasons/
-            season01.js
+            season01.ts
           episodes/
-            clocktower01.js
-            numberBus02.js
-            bakery03.js
+            clocktower01.ts
+            numberBus02.ts
+            bakery03.ts
           artifacts/
-            abilityCards.js
-            clueCards.js
-            repairRecords.js
-            revisitHooks.js
-          abilities.js
-          clues.js
-          mapPlaces.js
-          sceneObjects.js
-          assets.js
-          motion.js
-          sessionPolicy.js
+            abilityCards.ts
+            clueCards.ts
+            repairRecords.ts
+            revisitHooks.ts
+          formatAdapters/
+            storybook.ts
+            workbook.ts
+            teacherSheet.ts
+          abilities.ts
+          clues.ts
+          mapPlaces.ts
+          sceneObjects.ts
+          assets.ts
+          motion.ts
+          sessionPolicy.ts
         domain/
-          progressSchema.js
-          progressStore.js
-          progressMigrations.js
-          questEngine.js
-          mathTasks.js
-          mapState.js
-          registryValidation.js
+          progressSchema.ts
+          progressStore.ts
+          progressMigrations.ts
+          questEngine.ts
+          mathTasks.ts
+          mapState.ts
+          registryValidation.ts
         components/
           ...
-        mathCity.css
+        styles/
+          mathCity.css
     App.jsx
     styles.css
   static/
@@ -67,10 +72,10 @@ https://eddmpython.github.io/codaro/math-city
 브라우저 안에서 닫힌 구조로 만든다.
 
 ```text
-data/registry.js
-→ domain/questEngine.js
-→ MathCityApp.jsx
-→ domain/progressStore.js
+data/registry.ts
+→ domain/questEngine.ts
+→ MathCityApp.tsx
+→ domain/progressStore.ts
 → localStorage
 ```
 
@@ -78,25 +83,27 @@ data/registry.js
 
 | 파일 | 책임 |
 | --- | --- |
-| `data/registry.js` | 에피소드, 능력, 단서, 지도, 오브젝트, 에셋, 모션을 묶는 정적 registry |
-| `data/seasons/*.js` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
-| `data/episodes/*.js` | 에피소드별 World Math Beat 데이터 |
-| `data/artifacts/*.js` | 능력 카드, 단서 카드, 복구 기록, 재방문 초대 |
-| `data/abilities.js` | 개념 능력 정의 |
-| `data/clues.js` | 단서 정의와 연결 관계 |
-| `data/mapPlaces.js` | 지도 장소와 상태별 copy |
-| `data/sceneObjects.js` | 장면 오브젝트와 상태 정의 |
-| `data/assets.js` | asset id와 포맷 정의. URL 직접 저장 금지 |
-| `data/motion.js` | motion id, trigger, duration, reduced motion 대체 |
-| `data/sessionPolicy.js` | 세션 마무리와 과몰입 방지 정책 |
-| `domain/mathTasks.js` | 숫자 범위가 있는 작은 문제 생성 |
-| `domain/questEngine.js` | 현재 beat, 정답 판정, 다음 단계 계산 |
-| `domain/progressSchema.js` | 저장 schema, 허용 id, 기본값 |
-| `domain/progressStore.js` | 저장, 로드, 마이그레이션, 초기화 |
-| `domain/progressMigrations.js` | schemaVersion별 순차 migration |
-| `domain/mapState.js` | 진행 상태를 지도 장소 상태로 변환 |
-| `domain/registryValidation.js` | id 참조, asset, 금지 필드, task type 검증 |
-| `MathCityApp.jsx` | 화면 조립 |
+| `data/registry.ts` | 에피소드, 능력, 단서, 지도, 오브젝트, 에셋, 모션을 묶는 정적 registry |
+| `data/seasons/*.ts` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
+| `data/seasons/*.ts` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
+| `data/episodes/*.ts` | 에피소드별 World Math Beat 데이터 |
+| `data/artifacts/*.ts` | 능력 카드, 단서 카드, 복구 기록, 재방문 초대 |
+| `data/formatAdapters/*.ts` | 스토리북, 워크북, 활동지 변환 데이터 |
+| `data/abilities.ts` | 개념 능력 정의 |
+| `data/clues.ts` | 단서 정의와 연결 관계 |
+| `data/mapPlaces.ts` | 지도 장소와 상태별 copy |
+| `data/sceneObjects.ts` | 장면 오브젝트와 상태 정의 |
+| `data/assets.ts` | asset id와 포맷 정의. URL 직접 저장 금지 |
+| `data/motion.ts` | motion id, trigger, duration, reduced motion 대체 |
+| `data/sessionPolicy.ts` | 세션 마무리와 과몰입 방지 정책 |
+| `domain/mathTasks.ts` | 숫자 범위가 있는 작은 문제 생성 |
+| `domain/questEngine.ts` | 현재 beat, 정답 판정, 다음 단계 계산 |
+| `domain/progressSchema.ts` | 저장 schema, 허용 id, 기본값 |
+| `domain/progressStore.ts` | 저장, 로드, 마이그레이션, 초기화 |
+| `domain/progressMigrations.ts` | schemaVersion별 순차 migration |
+| `domain/mapState.ts` | 진행 상태를 지도 장소 상태로 변환 |
+| `domain/registryValidation.ts` | id 참조, asset, 금지 필드, task type 검증 |
+| `MathCityApp.tsx` | 화면 조립 |
 
 `landing/src/App.jsx`는 route만 연결하고 게임 내부 상태를 알지 않는다.
 
@@ -106,8 +113,8 @@ data/registry.js
 export const mathCityRegistry = {
   registryVersion: 1,
   schemaVersion: 1,
-  contentVersion: "mvp-001",
-  assetsVersion: "mvp-assets-001",
+  contentVersion: "core-001",
+  assetsVersion: "core-assets-001",
   routePath: "/math-city",
   storageKey: "suspiciousMathCity.progress.v1",
   seasonsById,
@@ -121,10 +128,11 @@ export const mathCityRegistry = {
   assetsById,
   motionsById,
   revisitHooksById,
+  formatAdaptersById,
   deprecatedIds,
   replacementIds,
   sessionPolicy,
-};
+} satisfies MathCityRegistry;
 ```
 
 `status`, `state`, `found`, `owned` 같은 사용자별 값은 registry에 넣지 않는다. 단서 발견 여부, 지도 상태, 열린 에피소드는 `progress`와 registry의 unlock rule에서 매번 계산한다.
@@ -137,6 +145,14 @@ Registry 검증 기준:
 - 제거된 id는 `deprecatedIds`와 `replacementIds`로 처리한다.
 - 구현되지 않은 task type은 콘텐츠에 넣지 않는다.
 - 출석, 순위, 랜덤 보상, 광고 보상 필드는 registry에 없다.
+- Episode Pack은 앱, 스토리북, 워크북, 활동지 adapter를 가진다.
+
+TypeScript 도입 범위:
+
+- 기존 `landing` 전체를 한 번에 변환하지 않는다.
+- `suspiciousMathCity` 경계 안의 신규 파일만 `.ts`/`.tsx`로 작성한다.
+- `tsc --noEmit`은 게임 전용 gate 또는 landing check에 연결한다.
+- 타입은 콘텐츠 품질의 1차 방어선이고, `registryValidation`은 2차 방어선이다.
 
 ## 3. 상태 모델
 
@@ -145,7 +161,7 @@ Registry 검증 기준:
 ```js
 const defaultProgress = {
   schemaVersion: 1,
-  contentVersion: "mvp-001",
+  contentVersion: "core-001",
   completedEpisodeIds: [],
   ownedAbilityIds: [],
   restoredWorldStateIds: [],
@@ -204,7 +220,7 @@ const sessionState = {
 
 브라우저 저장 구분:
 
-| 대상 | 방식 | MVP 여부 |
+| 대상 | 방식 | Core Slice 여부 |
 | --- | --- | --- |
 | 진행 상태 | `localStorage` | 사용 |
 | 설정 | `localStorage` | 사용 |
@@ -235,7 +251,7 @@ const sessionState = {
 - 힌트 사용 이력, 오답 횟수, 클릭 로그.
 - 점수, 랭킹, streak, 출석 기록.
 
-service worker는 MVP에서 등록하지 않는다. 오프라인 실행보다 GitHub Pages route 안정성과 stale cache 회피가 먼저다. 후속 PWA 단계에서만 `/codaro/math-city` scope, versioned cache, HTML network-first 정책으로 추가한다.
+service worker는 Product Core Slice에서 등록하지 않는다. 오프라인 실행보다 GitHub Pages route 안정성과 stale cache 회피가 먼저다. 후속 PWA 단계에서만 `/codaro/math-city` scope, versioned cache, HTML network-first 정책으로 추가한다.
 
 Migration 구조:
 
@@ -307,7 +323,7 @@ export const episodes = [
 
 ## 6. 문제 생성
 
-MVP에서는 완전한 랜덤 생성보다 제한된 변형을 쓴다.
+Product Core Slice에서는 완전한 랜덤 생성보다 제한된 변형을 쓴다.
 
 예:
 
@@ -323,7 +339,7 @@ const timeGapTasks = [
 
 - 초등 대상이라 잘못된 난이도 상승을 막아야 한다.
 - 각 문제의 장면 표현을 직접 검수할 수 있다.
-- MVP에서는 품질이 다양성보다 중요하다.
+- Core Slice에서는 품질이 다양성보다 중요하다.
 
 나중에 `mathTasks.js`에서 범위 기반 생성으로 확장한다.
 
@@ -375,6 +391,8 @@ const timeGapTasks = [
 | `landing/src/App.jsx` | `/math-city` route 추가 |
 | `landing/src/styles.css` | 게임 화면 스타일 추가 또는 import 연결 |
 | `landing/src/apps/suspiciousMathCity/*` | 새 게임 구현 |
+| `landing/tsconfig.json` | 게임 경계 TypeScript 설정 |
+| `landing/package.json` | `typescript`, `@types/react`, `@types/react-dom`, `tsc --noEmit` script 추가 |
 | `landing/static/math-city/*` | 게임 에셋 |
 | `landing/static/manifest.webmanifest` | 필요 시 shortcut 추가. 독립 설치 UX는 후속 판단 |
 | `landing/scripts/prerenderReact.js` | `/math-city` route prerender 추가 |
@@ -382,6 +400,8 @@ const timeGapTasks = [
 | `tests/surface/verifyMathCityContract.py` | registry, 저장 금지 필드, id 참조 검증 |
 | `tests/surface/verifyMathCityStorage.py` | migration, 깨진 저장값, unknown id 검증 |
 | `tests/surface/verifyMathCityBrowser.py` | route, completion, reset, mobile overflow smoke |
+| `tests/surface/verifyMathCityAccessibility.py` | 키보드, 큰 글자, 모션 축소, 끌기 대체 smoke |
+| `tests/surface/verifyMathCityVisual.py` | 주요 뷰포트 visual smoke |
 
 ## 9. 영향 함수·심볼
 
@@ -397,6 +417,9 @@ const timeGapTasks = [
 | `sanitizeProgress` | registry에 없는 id와 중복 id 제거 |
 | `validateRegistry` | registry id 참조, 금지 필드, asset, task type 검증 |
 | `applyDeprecatedIdMap` | 공개 후 변경된 id를 replacement id로 변환 |
+| `loadEpisodePack` | route 진입 뒤 필요한 episode pack lazy load |
+| `resolveAssetUrl` | asset id를 base-aware URL로 변환 |
+| `exportEpisodePack` | 도서/워크북/활동지 adapter 산출물 생성 |
 | `getEpisodeById` | 에피소드 조회 |
 | `resolveMapPlaces` | 진행 상태를 지도 표시 상태로 변환 |
 | `evaluateBeatAnswer` | 현재 미션 정답 판정 |
@@ -418,6 +441,7 @@ uv run python -X utf8 tests/run.py gate math-city-contract
 uv run python -X utf8 tests/run.py gate math-city-storage
 uv run python -X utf8 tests/run.py gate math-city-browser
 uv run python -X utf8 tests/run.py gate math-city-accessibility
+uv run python -X utf8 tests/run.py gate math-city-visual
 ```
 
 구현 후 브라우저 확인:
@@ -442,6 +466,9 @@ uv run python -X utf8 tests/run.py gate math-city-accessibility
 - `migrateProgress` 깨진 데이터 처리.
 - `progressMigrations` deprecated id mapping 처리.
 - `validateRegistry` 중복 id, orphan asset, 금지 필드 처리.
+- `loadEpisodePack` lazy import와 missing pack 처리.
+- `resolveAssetUrl` `/codaro/` base path 처리.
+- `exportEpisodePack` storybook/workbook/teacher adapter 필드 처리.
 - `questEngine` 정답 판정.
 - `completeEpisode` 중복 완료 처리.
 - `resolveMapPlaces` locked, available, restored 상태 변환.
@@ -506,13 +533,15 @@ uv run python -X utf8 tests/run.py gate math-city-accessibility
 2. prerender와 sitemap URL 추가.
 3. 진행 저장 `progressStore`.
 4. `registryValidation`과 기본 registry.
-5. 정적 지도와 장소 상태.
-6. 에피소드 1 데이터.
-7. `World Math Beat` 기반 `storyChoice`, `mathChoice`, `dragArrange` task.
-8. 끌기 대체 조작과 키보드 경로.
-9. 에피소드 완료와 보상 반영.
-10. 도감과 단서장.
-11. 접근성 설정 `largeText`, `reducedMotion`.
-12. 에피소드 2, 3 추가.
-13. 모바일 검수.
-14. 시각 디테일 보강.
+5. TypeScript game boundary.
+6. 정적 지도와 장소 상태.
+7. 에피소드 1 Episode Pack 데이터.
+8. `World Math Beat` 기반 `storyChoice`, `mathChoice`, `dragArrange` task.
+9. 끌기 대체 조작과 키보드 경로.
+10. 에피소드 완료와 보상 반영.
+11. 도감과 단서장.
+12. 접근성 설정 `largeText`, `reducedMotion`.
+13. 스토리북/워크북/활동지 adapter 필드.
+14. visual smoke 뷰포트 검수.
+15. 에피소드 2, 3 추가.
+16. 시각 디테일 보강.

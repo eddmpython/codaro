@@ -26,8 +26,11 @@ World Math Beat 1개
 | 6 | 아티팩트 연결 | 능력 카드, 단서 카드, 복구 기록, 재방문 초대가 연결된다 |
 | 7 | Registry 등록 | 모든 id가 중복 없이 연결된다 |
 | 8 | 브라우저 확인 | 모바일, 키보드, 저장, 초기화, 모션 축소에서 깨지지 않는다 |
+| 9 | Format Adapter | 스토리북, 워크북, 활동지 변환 필드가 채워져 있다 |
 
-이 8단계를 통과하지 못하면 에피소드 수를 늘리지 않는다.
+이 9단계를 통과하지 못하면 에피소드 수를 늘리지 않는다.
+
+이제 에피소드의 단위는 `Episode Pack`이다. 앱만 만들고 끝나는 에피소드는 장기 확장 기준을 통과하지 못한다.
 
 ## 3. Episode Brief 템플릿
 
@@ -85,6 +88,49 @@ const beat = {
   transferBeatId: "bus-timetable-gap-01",
 };
 ```
+
+## 4.1 Cross-media Episode Pack 템플릿
+
+```ts
+const episodePack = {
+  episodeId: "clocktower-01",
+  storyArc: {
+    openingProblem: "시계탑이 2시 40분에서 멈췄다.",
+    closedAnswer: "두 시각 사이를 보면 남은 시간을 알 수 있다.",
+    openQuestion: "왜 번호판에서 0만 사라질까?",
+  },
+  worldMathBeats: ["clock-gap-01"],
+  abilityId: "time-lens",
+  clueIds: ["zero-placeholder-note"],
+  misconceptionIds: ["clock-gap-full-hour"],
+  representationLadderId: "rep-clock-gap",
+  transferBeatIds: ["bus-timetable-gap-01"],
+  formatAdapters: {
+    app: {
+      sceneId: "sceneClocktower",
+      primaryOperation: "10분 조각 놓기",
+    },
+    storybook: {
+      spreadCount: 12,
+      anchorScene: "멈춘 시계탑과 버스 시간표",
+      findQuestion: "무엇을 함께 봐야 할까?",
+    },
+    workbook: {
+      pageType: "observe-cut-color-transfer",
+      manipulative: "10분 타일",
+    },
+    teacherSheet: {
+      durationOptions: [15, 30, 45],
+      keyQuestion: "두 시각 사이에는 어떤 간격이 있을까?",
+    },
+  },
+};
+```
+
+필수:
+
+- 앱 장면, 스토리북 anchor, 워크북 조작, 교사용 발문이 같은 개념을 가리켜야 한다.
+- format adapter가 없는 에피소드는 Product Core Slice에 포함하지 않는다.
 
 필수 규칙:
 
@@ -185,4 +231,3 @@ const beat = {
 11. 접근성 기준을 통과한다.
 12. 저장을 지우거나 막아도 플레이가 멈추지 않는다.
 13. 첫 30초 안에 "풀어야 할 문제"보다 "왜 저렇게 됐지?"를 먼저 느끼게 한다.
-
