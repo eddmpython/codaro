@@ -122,6 +122,7 @@
 | 섹션 행동 이해 | 각 섹션에서 `읽기 → 바꾸기 → 실행 → 검증` 순서가 시각적으로 이어진다. |
 | 글자 가독성 | 학습 본문은 보조 메타처럼 보이지 않고, 긴 한국어 문장이 잘리지 않는다. |
 | 모바일 완주성 | 360px 폭에서도 editor, 실행 버튼, 검증 버튼, 도움 버튼이 겹치지 않는다. |
+| 배치 균형 | 한 화면에 primary action이 하나만 있고, 나머지는 흐름을 보조한다. |
 | 계약 보존 | 기존 `data-learning-*` marker와 YAML 계약이 깨지지 않는다. |
 
 ## 5. 대상 사용자
@@ -412,6 +413,63 @@ section header
 - 실패/위험/성공 색은 한 화면에서 동시에 세력 경쟁하지 않아야 한다.
 - 브라우저 visual integrity fixture는 colored badge와 border가 많은 long lesson에서도 핵심 CTA가 먼저 보이는지 확인한다.
 
+### LCR-11. 배치는 학습 순서와 시각 무게를 동시에 지켜야 한다
+
+현재 PRD의 방향은 맞지만, 구현자가 그대로 화면을 만들 때 균형이 깨질 수 있는 지점은 분명하다. 특히 소개 카드, workflow grid, section overview, feedback panel은 콘텐츠 길이에 따라 쉽게 한쪽으로 쏠리거나 카드 더미처럼 보일 수 있다. 따라서 배치는 감각이 아니라 불변조건으로 고정한다.
+
+학습에 도움이 되는 배치 원칙:
+
+- **Signaling**: 지금 볼 것, 따라 할 것, 고칠 것, 확인할 것이 라벨·위치로 구분된다.
+- **Segmenting**: 한 band는 한 행동만 맡는다. 목표와 이유, 스니펫, editor, 결과, 검증을 한 덩어리로 섞지 않는다.
+- **Contiguity**: 설명은 관련 코드 바로 위나 옆에 있고, 피드백은 해당 editor 바로 아래에 있다.
+- **Worked example → practice → feedback**: 읽기 예제, 직접 입력, 검증 피드백 순서가 항상 유지된다.
+- **Single primary action**: 한 화면에서 가장 먼저 눌러야 하는 버튼은 하나다. 실행과 검증과 도움 요청이 동시에 같은 강도로 보이면 실패다.
+
+소개 카드 배치:
+
+- 상단은 title/direction이 주인공이다. badge row는 한 줄 보조 정보이며 3개를 넘기면 compact 처리한다.
+- workflow는 3-4단계 rail 또는 timeline이 기본이다. 긴 문장을 4개 동일 카드 grid에 억지로 넣지 않는다.
+- benefits는 bullet band로 충분하다. benefits card grid가 workflow보다 강해지면 실패다.
+- dependency/readiness는 준비 완료 상태에서 접힌 compact 상태가 기본이다. 설치 필요, 설치 중, 오류일 때만 확장한다.
+- assignment panel은 소개 본문과 같은 위계가 아니다. 별도 낮은 slot으로 둔다.
+
+섹션 카드 배치:
+
+- header는 44-64px 수준의 안정된 높이를 가진다. 제목이 길면 header가 깨지는 대신 subtitle과 action row가 줄바꿈된다.
+- task brief는 goal과 why를 한 묶음으로 보여준다. goal/why/tip/explanation을 각각 같은 크기의 카드로 만들지 않는다.
+- explanation이 길면 기본 노출은 2-4문장이고, 나머지는 "개념 더 보기" 성격의 secondary disclosure로 둔다.
+- snippet과 exercise는 같은 흐름 안에서 세로 배치가 기본이다. side-by-side는 충분한 폭과 짧은 코드일 때만 허용한다.
+- exercise editor는 시각 무게의 중심이다. 섹션 카드에서 editor보다 package badge, help button, detail panel이 더 강하면 실패다.
+- result와 check는 실행/검증 후에만 자리를 차지한다. 빈 result/check placeholder가 layout을 흔들면 실패다.
+
+grid 사용 규칙:
+
+- 360px-639px: 1열.
+- 640px-1023px: 짧은 항목만 2열. 문장형 항목은 1열.
+- 1024px 이상: 3열은 stat, 짧은 benefit, 짧은 resource에만 허용한다.
+- 항목 설명이 2줄을 넘는 카드가 3개 이상이면 grid가 아니라 list/timeline/band로 바꾼다.
+- 홀수 카드가 마지막에 어색한 빈 칸을 만들면 마지막 항목을 full-width로 두거나 전체를 1열/2열로 낮춘다.
+- code, terminal, annotatedCode, exercise editor는 카드 grid 안에 넣지 않는다.
+
+시각 무게 budget:
+
+| 영역 | primary | secondary | 금지 |
+| --- | --- | --- | --- |
+| 소개 카드 | title + direction | workflow, benefits, readiness | badge가 title보다 강함 |
+| 섹션 카드 | exercise editor 또는 현재 상태 | snippet, brief, tips | overview mini card 3개가 editor보다 강함 |
+| 실행 후 | result summary | stdout/stderr detail | raw output이 검증 행동을 밀어냄 |
+| 검증 실패 | 실패 이유 + 다음 행동 | diff, hint, detail | 모든 진단 block이 같은 색과 무게 |
+| 검증 통과 | 통과 + 다음 섹션 | outcome credit | 숙달/완전 이해 과장 |
+
+깨짐 방지 수용 기준:
+
+- 카드 header, action row, editor, result, check panel의 bounding box가 서로 겹치지 않는다.
+- learning-critical text는 `clientWidth < scrollWidth` 상태로 잘리지 않는다.
+- desktop/mobile 모두 page horizontal scroll이 없다.
+- 360px 폭에서 run/check/help action row는 줄바꿈되더라도 버튼 text가 잘리지 않는다.
+- 긴 workflow label, 긴 section title, 긴 feedback, 긴 code line fixture가 각각 별도 브라우저 assertion을 가진다.
+- screenshot 검토에서 첫 시선이 title 또는 editor가 아니라 badge cluster, 색상 block, 보조 패널로 가면 실패다.
+
 ## 8. 상태 모델
 
 섹션 카드는 다음 상태를 가진다.
@@ -666,6 +724,9 @@ PRD 수용 기준:
 - 카드 안 카드 더미처럼 보이는 중첩 border가 줄어든다.
 - 기본 카드 표면은 neutral/zinc 계열을 유지하고, 색상은 상태 표식에만 제한된다.
 - card grid에서 순번별 무지개 색상이나 랜덤 accent가 보이지 않는다.
+- 3열 grid는 짧은 항목에만 쓰고, 긴 문장형 학습 문구는 1열 또는 rail/timeline으로 내려간다.
+- 한 viewport 안에서 primary action은 하나만 강하게 보인다.
+- section header와 action row는 긴 제목이나 모바일 폭에서도 높이·줄바꿈이 안정적이다.
 - prose는 68-72ch 안팎에서 읽힌다.
 - 모바일 control touch target은 최소 40px이다.
 
@@ -700,6 +761,7 @@ uv run python -X utf8 tests/run.py gate learning-system-readiness
 - `preflight`는 `root-clean`, `docs`, `backend` 중심이므로 학습카드 렌더러 완성을 증명하지 않는다.
 - 레이아웃 변경은 브라우저 게이트가 필요하다.
 - 긴 한국어 fixture, 긴 코드, 긴 검증 피드백, 모바일 폭, keyboard focus를 테스트에 포함해야 한다.
+- layout-balance fixture는 long title, long workflow, odd-number grid, long feedback, long code를 모두 포함해야 한다.
 
 ## 15. 롤백
 
