@@ -25,6 +25,7 @@ import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
 import { sharePacks } from "./lib/sharePacks.js";
 import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
+import "./apps/suspiciousMathCity/styles/mathCity.css";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
 const MathCityApp = lazy(() => import("./apps/suspiciousMathCity/MathCityApp"));
@@ -318,13 +319,11 @@ function Header({ onNavigate, themeMode, onToggleTheme }) {
 
 function MathCityFallback() {
   return (
-    <main className="mathCityRoot">
-      <section className="mc-mapScreen" aria-label="수상한 수학도시 불러오기">
-        <div className="mc-mapIntro">
-          <p className="mc-kicker">Season 1 · 사라진 숫자</p>
-          <h1>시계탑 사건을 불러오는 중</h1>
-          <p>지도와 단서 장면을 준비하고 있어.</p>
-        </div>
+    <main className="mathCityRoot mc-gameRoot">
+      <section className="mc-loadingScreen" aria-label="수상한 수학도시 불러오기">
+        <p>수상한 수학도시</p>
+        <h1>시계버스 정비소</h1>
+        <span>게임 장치를 불러오는 중...</span>
       </section>
     </main>
   );
