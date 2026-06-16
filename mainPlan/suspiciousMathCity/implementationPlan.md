@@ -13,10 +13,18 @@ landing/
       suspiciousMathCity/
         MathCityApp.jsx
         data/
-          episodes.js
+          registry.js
+          episodes/
+            clocktower01.js
+            numberBus02.js
+            bakery03.js
           abilities.js
           clues.js
           mapPlaces.js
+          sceneObjects.js
+          assets.js
+          motion.js
+          sessionPolicy.js
         domain/
           progressSchema.js
           progressStore.js
@@ -50,8 +58,8 @@ https://eddmpython.github.io/codaro/math-city
 브라우저 안에서 닫힌 구조로 만든다.
 
 ```text
-data/episodes.js
-→ questEngine.js
+data/registry.js
+→ domain/questEngine.js
 → MathCityApp.jsx
 → domain/progressStore.js
 → localStorage
@@ -61,10 +69,15 @@ data/episodes.js
 
 | 파일 | 책임 |
 | --- | --- |
-| `data/episodes.js` | 에피소드, 대화, 미션, 보상 데이터 |
+| `data/registry.js` | 에피소드, 능력, 단서, 지도, 오브젝트, 에셋, 모션을 묶는 정적 registry |
+| `data/episodes/*.js` | 에피소드별 World Math Beat 데이터 |
 | `data/abilities.js` | 개념 능력 정의 |
 | `data/clues.js` | 단서 정의와 연결 관계 |
 | `data/mapPlaces.js` | 지도 장소와 상태별 copy |
+| `data/sceneObjects.js` | 장면 오브젝트와 상태 정의 |
+| `data/assets.js` | asset id와 포맷 정의. URL 직접 저장 금지 |
+| `data/motion.js` | motion id, trigger, duration, reduced motion 대체 |
+| `data/sessionPolicy.js` | 세션 마무리와 과몰입 방지 정책 |
 | `domain/mathTasks.js` | 숫자 범위가 있는 작은 문제 생성 |
 | `domain/questEngine.js` | 현재 beat, 정답 판정, 다음 단계 계산 |
 | `domain/progressSchema.js` | 저장 schema, 허용 id, 기본값 |
@@ -74,6 +87,29 @@ data/episodes.js
 
 `landing/src/App.jsx`는 route만 연결하고 게임 내부 상태를 알지 않는다.
 
+정적 registry 원칙:
+
+```js
+export const mathCityRegistry = {
+  schemaVersion: 1,
+  contentVersion: "mvp-001",
+  routePath: "/math-city",
+  storageKey: "suspiciousMathCity.progress.v1",
+  episodeOrder: ["clocktower-01", "number-bus-02", "bakery-03"],
+  episodesById,
+  abilitiesById,
+  cluesById,
+  mapPlacesById,
+  sceneObjectsById,
+  assetsById,
+  motionsById,
+  revisitHooksById,
+  sessionPolicy,
+};
+```
+
+`status`, `state`, `found`, `owned` 같은 사용자별 값은 registry에 넣지 않는다. 단서 발견 여부, 지도 상태, 열린 에피소드는 `progress`와 registry의 unlock rule에서 매번 계산한다.
+
 ## 3. 상태 모델
 
 ### 3.1 진행 상태
@@ -81,11 +117,13 @@ data/episodes.js
 ```js
 const defaultProgress = {
   schemaVersion: 1,
-  completedEpisodes: [],
-  unlockedEpisodes: ["clocktower-01"],
-  abilities: [],
-  worldStates: [],
-  clues: [],
+  contentVersion: "mvp-001",
+  completedEpisodeIds: [],
+  ownedAbilityIds: [],
+  restoredWorldStateIds: [],
+  foundClueIds: [],
+  completedRevisitHookIds: [],
+  lastMapFocusPlaceId: "clocktower",
   settings: {
     sound: false,
     reducedMotion: false,
@@ -154,7 +192,18 @@ const sessionState = {
 - JSON parse 실패: 기본 상태.
 - schemaVersion 불일치: 마이그레이션 또는 기본 상태.
 - 알 수 없는 episode, ability, clue id: 제거.
+- 중복 id: 제거.
 - 저장 실패: 화면 상단에 짧게 알리고 메모리 상태로 계속 진행.
+
+저장하지 않는 것:
+
+- 열린 에피소드 목록.
+- 지도 상태 cache.
+- 단서 `found` 상태 cache.
+- 능력 `owned` 상태 cache.
+- 현재 beat index, 드래그 위치, 선택 중인 답.
+- 힌트 사용 이력, 오답 횟수, 클릭 로그.
+- 점수, 랭킹, streak, 출석 기록.
 
 service worker는 MVP에서 등록하지 않는다. 오프라인 실행보다 GitHub Pages route 안정성과 stale cache 회피가 먼저다. 후속 PWA 단계에서만 `/codaro/math-city` scope, versioned cache, HTML network-first 정책으로 추가한다.
 
@@ -297,6 +346,7 @@ const timeGapTasks = [
 | `saveProgress` | 브라우저 진행 저장 |
 | `resetProgress` | 진행 초기화 |
 | `migrateProgress` | 버전 마이그레이션 |
+| `sanitizeProgress` | registry에 없는 id와 중복 id 제거 |
 | `getEpisodeById` | 에피소드 조회 |
 | `resolveMapPlaces` | 진행 상태를 지도 표시 상태로 변환 |
 | `evaluateBeatAnswer` | 현재 미션 정답 판정 |

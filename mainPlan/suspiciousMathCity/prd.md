@@ -10,6 +10,8 @@
 
 이 제품은 수학 문제를 많이 풀게 하는 앱이 아니다. 아이가 먼저 이상한 사건을 보고, 왜 그런 일이 생겼는지 궁금해하고, 필요한 개념을 찾아 세계를 고치는 앱이다.
 
+기획의 출발점은 `게임을 좋아하지만 수학은 싫어하는 초등 3학년 으뜸이`와, `게임 자체보다 공부와 멀어지는 모습이 아쉬운 으뜸아빠`다. 이들은 실제 사용자 정보가 아니라 제품 판단을 위한 대표 페르소나다. 자세한 기준은 [originAndPersona.md](originAndPersona.md)를 따른다.
+
 핵심 문장:
 
 > 개념을 배우면 새로운 능력이 생기고, 새로운 능력으로 도시의 숨겨진 이야기를 이해한다.
@@ -265,11 +267,13 @@ suspiciousMathCity.progress.v1
 ```json
 {
   "schemaVersion": 1,
-  "completedEpisodes": ["clocktower-01"],
-  "unlockedEpisodes": ["clocktower-01", "number-bus-02"],
-  "abilities": ["time-lens"],
-  "worldStates": ["clocktower-fixed"],
-  "clues": ["zero-is-missing"],
+  "contentVersion": "mvp-001",
+  "completedEpisodeIds": ["clocktower-01"],
+  "ownedAbilityIds": ["time-lens"],
+  "restoredWorldStateIds": ["clocktower-fixed"],
+  "foundClueIds": ["zero-is-missing"],
+  "completedRevisitHookIds": [],
+  "lastMapFocusPlaceId": "number-bus-stop",
   "settings": {
     "sound": false,
     "reducedMotion": false,
@@ -284,6 +288,7 @@ suspiciousMathCity.progress.v1
 - 저장 데이터가 깨지면 기본 상태로 복구한다.
 - `schemaVersion`이 맞지 않으면 안전하게 마이그레이션하거나 초기화한다.
 - 사용자가 직접 초기화할 수 있어야 한다.
+- `unlockedEpisodeIds`, 지도 장소 상태, 단서 `found` 상태는 저장하지 않고 registry와 완료 id에서 계산한다.
 
 진행 저장은 브라우저 HTTP 캐시에 맡기지 않는다. HTTP 캐시는 이미지와 스크립트 같은 에셋을 위한 것이고, 아이의 진행 상태는 작은 JSON으로 `localStorage`에 저장한다. 나중에 그림, 소리, 큰 에셋을 오프라인으로 더 강하게 보관해야 할 때만 Cache API와 service worker를 검토한다.
 

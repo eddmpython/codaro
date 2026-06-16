@@ -14,12 +14,14 @@
 
 | 파일 | 역할 |
 | --- | --- |
+| [originAndPersona.md](originAndPersona.md) | 으뜸이와 으뜸아빠에서 출발한 기획 기준 |
 | [prd.md](prd.md) | 제품 목표, 범위, 기능, 완료 기준 |
 | [learningDesign.md](learningDesign.md) | 수학 개념을 능력과 미션으로 바꾸는 학습 설계 |
 | [storyBible.md](storyBible.md) | 세계관, 캐릭터, 시즌, 에피소드 구조 |
 | [visualDirection.md](visualDirection.md) | 지도, 장면, 상태 변화, 시각 연출 원칙 |
 | [visualInteractionBlueprint.md](visualInteractionBlueprint.md) | 상태가 있는 장면, 오브젝트, 에셋, 모션 계약 |
 | [engagementDesign.md](engagementDesign.md) | 건강한 중독성, 재방문 동기, 세션 종료 설계 |
+| [learningEngagementArtifacts.md](learningEngagementArtifacts.md) | 중독성을 학습 기억으로 바꾸는 아티팩트 카탈로그 |
 | [browserGameFormat.md](browserGameFormat.md) | 브라우저 저장, 게임 방식, 그래픽 구현 포맷 |
 | [expertSynthesis.md](expertSynthesis.md) | 전문가 검토 합성, 최종 포맷, 구현 금지선 |
 | [implementationPlan.md](implementationPlan.md) | `landing/` 구현 구조, 테스트, 롤백, 평가 |

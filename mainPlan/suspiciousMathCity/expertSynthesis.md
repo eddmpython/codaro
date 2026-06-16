@@ -8,8 +8,11 @@
 2. `Visual Interaction Blueprint`: 상태가 있는 지도, 장면, 오브젝트, 모션 계약.
 3. `Healthy Engagement Loop`: 사건 하나를 닫고 질문 하나만 여는 건강한 몰입 구조.
 4. `Browser-only Save Contract`: 개인정보 없이 `localStorage`에 진행만 저장하는 정적 웹 게임 구조.
+5. `Learning Engagement Artifacts`: 능력 카드, 오개념 카드, 단서 연결판, 복구 기록처럼 학습 기억을 다시 꺼내 쓰는 아티팩트 시스템.
 
 이 네 가지가 없으면 구현은 객관식 문제집, 예쁜 랜딩, 보상 수집 앱으로 흐를 위험이 크다.
+
+아티팩트 시스템의 상세 계약은 [learningEngagementArtifacts.md](learningEngagementArtifacts.md)를 기준으로 한다.
 
 ## 2. 최종 미션 포맷
 
@@ -139,4 +142,3 @@ suspiciousMathCity.progress.v1
 8. 숫자 버스, 반쪽 빵집.
 
 시계탑 장면이 완성되기 전에는 에피소드 수를 늘리지 않는다.
-
