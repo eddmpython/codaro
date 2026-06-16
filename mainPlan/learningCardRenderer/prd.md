@@ -49,6 +49,7 @@
 - 구조화 섹션 카드의 overview가 2-3열 미니 대시보드처럼 보여, 읽기 순서가 약하다.
 - Korean 학습 문구가 `truncate`, `line-clamp`, `text-xs`에 자주 걸려 핵심 문장이 보조 메타처럼 느껴진다.
 - 보조 블록 카드가 모두 border 박스가 되면서 카드 안 카드 더미처럼 보인다.
+- 색, badge, border, icon이 동시에 늘어나면 학습 흐름보다 장식이 먼저 보인다.
 - 실행, 검증, 도움 요청 버튼이 같은 줄에서 경쟁한다.
 - 검증 실패 후 가장 중요한 "왜 틀렸는지 / 다음 한 걸음"보다 상세 패널들이 먼저 눈에 들어올 수 있다.
 
@@ -374,6 +375,43 @@ section header
 - 카드 밖으로 나가는 popover 또는 tooltip.
 - text와 control 겹침.
 
+### LCR-10. 색상은 상태와 구조만 말해야 한다
+
+학습카드는 화려할수록 좋아지는 표면이 아니다. Codaro의 카드 표면은 깔끔하고 직관적이어야 하며, 색은 학습자가 다음 행동을 판단하는 데 필요한 신호에만 쓴다.
+
+색상 원칙:
+
+- 기본 표면은 `bg-card`, `bg-background`, `border-border`, `text-foreground`, `text-muted-foreground` 계열을 쓴다.
+- 제품 공통 톤은 `zinc`와 shadcn token을 기준으로 한다.
+- 색은 `running`, `success`, `warning`, `danger`, `error`, `complete` 같은 상태에만 사용한다.
+- 상태 색도 넓은 배경보다 얇은 left rail, icon tint, 작은 badge, border tint로 제한한다.
+- 한 카드 안에서 상태색은 최대 1개 주색과 1개 보조색만 허용한다.
+- 같은 card grid의 1번/2번/3번을 서로 다른 색으로 칠하지 않는다.
+- `emoji`, `accent`, legacy `icon` 입력은 화면 장식으로 쓰지 않는다.
+- 코드, 출력, 검증, 팁은 색이 아니라 위치, 라벨, divider, spacing으로 먼저 구분한다.
+
+직관성 원칙:
+
+- 학습자가 색 의미를 새로 외워야 하면 실패다.
+- 녹색은 성공/통과/준비 완료, amber는 주의/대기/준비 필요, rose/destructive는 오류/위험에만 쓴다.
+- 파랑, 보라, 무지개 gradient는 학습카드의 기본 장식으로 쓰지 않는다.
+- 카드마다 다른 accent를 주는 방식보다, 같은 흐름의 같은 위치가 늘 같은 형태로 보이는 것이 우선이다.
+- icon은 의미 보조일 뿐이다. icon만 보고 카드 의미를 알아야 하는 구조는 실패다.
+
+금지 예:
+
+- 소개 카드 안에 category badge, progress badge, workflow card, package status, assignment status가 모두 강한 색으로 보이는 구성.
+- 섹션 카드의 goal, why, tip, explanation을 각각 다른 배경색 카드로 나누는 구성.
+- 검증 실패 패널에서 diff, 오개념, hint, next action이 모두 다른 색 block으로 경쟁하는 구성.
+- 카드 grid 항목마다 랜덤 accent 또는 순번별 색상을 주는 구성.
+
+수용 기준:
+
+- 기본 학습 상태에서 화면은 neutral/zinc 계열이 80% 이상이어야 한다.
+- 상태 변화가 없는 정보 카드에는 강한 배경색이 없어야 한다.
+- 실패/위험/성공 색은 한 화면에서 동시에 세력 경쟁하지 않아야 한다.
+- 브라우저 visual integrity fixture는 colored badge와 border가 많은 long lesson에서도 핵심 CTA가 먼저 보이는지 확인한다.
+
 ## 8. 상태 모델
 
 섹션 카드는 다음 상태를 가진다.
@@ -626,6 +664,8 @@ PRD 수용 기준:
 - 긴 한국어 제목과 workflow label이 잘리지 않는다.
 - button text overflow가 없다.
 - 카드 안 카드 더미처럼 보이는 중첩 border가 줄어든다.
+- 기본 카드 표면은 neutral/zinc 계열을 유지하고, 색상은 상태 표식에만 제한된다.
+- card grid에서 순번별 무지개 색상이나 랜덤 accent가 보이지 않는다.
 - prose는 68-72ch 안팎에서 읽힌다.
 - 모바일 control touch target은 최소 40px이다.
 
