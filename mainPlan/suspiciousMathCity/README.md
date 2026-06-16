@@ -7,6 +7,7 @@
 - 배포 표면: `landing/` 아래 독립 route.
 - 저장 방식: 개인정보 없이 브라우저 로컬 저장소에 진행 상태만 저장.
 - 제품 초점: 문제 풀이 보상보다 개념 이해, 세계 변화, 스토리 단서 해석.
+- 장기 기준: 커리큘럼, 에피소드 제작, 접근성, 품질 루브릭, 운영 계약을 통과해야 확장.
 - 첫 범위: 에피소드 3개, 개념 능력 3개, 지도 변화, 단서장, 로컬 진행 저장.
 - 제외 범위: 로그인, 랭킹, 광고 보상, 랜덤박스, 학부모 계정, 서버 분석.
 
@@ -17,14 +18,31 @@
 | [originAndPersona.md](originAndPersona.md) | 으뜸이와 으뜸아빠에서 출발한 기획 기준 |
 | [prd.md](prd.md) | 제품 목표, 범위, 기능, 완료 기준 |
 | [learningDesign.md](learningDesign.md) | 수학 개념을 능력과 미션으로 바꾸는 학습 설계 |
+| [curriculumMatrix.md](curriculumMatrix.md) | 시즌별 개념 범위, 에피소드 학습 목표, 오개념 레지스트리 |
+| [episodeAuthoringGuide.md](episodeAuthoringGuide.md) | 에피소드를 계속 만들 수 있게 하는 제작 절차와 템플릿 |
 | [storyBible.md](storyBible.md) | 세계관, 캐릭터, 시즌, 에피소드 구조 |
 | [visualDirection.md](visualDirection.md) | 지도, 장면, 상태 변화, 시각 연출 원칙 |
 | [visualInteractionBlueprint.md](visualInteractionBlueprint.md) | 상태가 있는 장면, 오브젝트, 에셋, 모션 계약 |
+| [accessibilityAndUsability.md](accessibilityAndUsability.md) | 키보드, 터치, 큰 글자, 모션 축소, 초등 단독 사용 기준 |
 | [engagementDesign.md](engagementDesign.md) | 건강한 중독성, 재방문 동기, 세션 종료 설계 |
 | [learningEngagementArtifacts.md](learningEngagementArtifacts.md) | 중독성을 학습 기억으로 바꾸는 아티팩트 카탈로그 |
+| [contentQualityRubric.md](contentQualityRubric.md) | 출시 전 학습 품질과 접근성 검수 루브릭 |
 | [browserGameFormat.md](browserGameFormat.md) | 브라우저 저장, 게임 방식, 그래픽 구현 포맷 |
 | [expertSynthesis.md](expertSynthesis.md) | 전문가 검토 합성, 최종 포맷, 구현 금지선 |
 | [implementationPlan.md](implementationPlan.md) | `landing/` 구현 구조, 테스트, 롤백, 평가 |
+| [operationsPrd.md](operationsPrd.md) | registry, migration, release, gate, 시즌 확장 운영 계약 |
+
+## 장기 유지 판정
+
+이 프로젝트는 에피소드 수가 아니라 아래 5개 계약을 통과할 때만 확장한다.
+
+| 계약 | 기준 문서 |
+| --- | --- |
+| 학습 범위 | [curriculumMatrix.md](curriculumMatrix.md) |
+| 제작 절차 | [episodeAuthoringGuide.md](episodeAuthoringGuide.md) |
+| 접근성 | [accessibilityAndUsability.md](accessibilityAndUsability.md) |
+| 품질 검수 | [contentQualityRubric.md](contentQualityRubric.md) |
+| 운영 안정성 | [operationsPrd.md](operationsPrd.md) |
 
 ## 한 줄 방향
 

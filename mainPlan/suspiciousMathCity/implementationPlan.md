@@ -14,10 +14,17 @@ landing/
         MathCityApp.jsx
         data/
           registry.js
+          seasons/
+            season01.js
           episodes/
             clocktower01.js
             numberBus02.js
             bakery03.js
+          artifacts/
+            abilityCards.js
+            clueCards.js
+            repairRecords.js
+            revisitHooks.js
           abilities.js
           clues.js
           mapPlaces.js
@@ -28,9 +35,11 @@ landing/
         domain/
           progressSchema.js
           progressStore.js
+          progressMigrations.js
           questEngine.js
           mathTasks.js
           mapState.js
+          registryValidation.js
         components/
           ...
         mathCity.css
@@ -70,7 +79,9 @@ data/registry.js
 | 파일 | 책임 |
 | --- | --- |
 | `data/registry.js` | 에피소드, 능력, 단서, 지도, 오브젝트, 에셋, 모션을 묶는 정적 registry |
+| `data/seasons/*.js` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
 | `data/episodes/*.js` | 에피소드별 World Math Beat 데이터 |
+| `data/artifacts/*.js` | 능력 카드, 단서 카드, 복구 기록, 재방문 초대 |
 | `data/abilities.js` | 개념 능력 정의 |
 | `data/clues.js` | 단서 정의와 연결 관계 |
 | `data/mapPlaces.js` | 지도 장소와 상태별 copy |
@@ -82,7 +93,9 @@ data/registry.js
 | `domain/questEngine.js` | 현재 beat, 정답 판정, 다음 단계 계산 |
 | `domain/progressSchema.js` | 저장 schema, 허용 id, 기본값 |
 | `domain/progressStore.js` | 저장, 로드, 마이그레이션, 초기화 |
+| `domain/progressMigrations.js` | schemaVersion별 순차 migration |
 | `domain/mapState.js` | 진행 상태를 지도 장소 상태로 변환 |
+| `domain/registryValidation.js` | id 참조, asset, 금지 필드, task type 검증 |
 | `MathCityApp.jsx` | 화면 조립 |
 
 `landing/src/App.jsx`는 route만 연결하고 게임 내부 상태를 알지 않는다.
@@ -91,24 +104,39 @@ data/registry.js
 
 ```js
 export const mathCityRegistry = {
+  registryVersion: 1,
   schemaVersion: 1,
   contentVersion: "mvp-001",
+  assetsVersion: "mvp-assets-001",
   routePath: "/math-city",
   storageKey: "suspiciousMathCity.progress.v1",
+  seasonsById,
   episodeOrder: ["clocktower-01", "number-bus-02", "bakery-03"],
   episodesById,
   abilitiesById,
   cluesById,
   mapPlacesById,
   sceneObjectsById,
+  artifactsById,
   assetsById,
   motionsById,
   revisitHooksById,
+  deprecatedIds,
+  replacementIds,
   sessionPolicy,
 };
 ```
 
 `status`, `state`, `found`, `owned` 같은 사용자별 값은 registry에 넣지 않는다. 단서 발견 여부, 지도 상태, 열린 에피소드는 `progress`와 registry의 unlock rule에서 매번 계산한다.
+
+Registry 검증 기준:
+
+- 모든 id는 중복되지 않는다.
+- 모든 참조 id는 registry 안에 존재한다.
+- 공개된 id는 rename하지 않는다.
+- 제거된 id는 `deprecatedIds`와 `replacementIds`로 처리한다.
+- 구현되지 않은 task type은 콘텐츠에 넣지 않는다.
+- 출석, 순위, 랜덤 보상, 광고 보상 필드는 registry에 없다.
 
 ## 3. 상태 모델
 
@@ -191,7 +219,9 @@ const sessionState = {
 
 - JSON parse 실패: 기본 상태.
 - schemaVersion 불일치: 마이그레이션 또는 기본 상태.
+- contentVersion 변경: 저장 초기화 금지. unknown id 제거와 replacement mapping으로 복구.
 - 알 수 없는 episode, ability, clue id: 제거.
+- deprecated id: replacement mapping 적용.
 - 중복 id: 제거.
 - 저장 실패: 화면 상단에 짧게 알리고 메모리 상태로 계속 진행.
 
@@ -206,6 +236,22 @@ const sessionState = {
 - 점수, 랭킹, streak, 출석 기록.
 
 service worker는 MVP에서 등록하지 않는다. 오프라인 실행보다 GitHub Pages route 안정성과 stale cache 회피가 먼저다. 후속 PWA 단계에서만 `/codaro/math-city` scope, versioned cache, HTML network-first 정책으로 추가한다.
+
+Migration 구조:
+
+```js
+export const migrationsBySchemaVersion = {
+  1: progress => progress,
+};
+```
+
+순차 적용 규칙:
+
+1. parse에 실패하면 기본 상태.
+2. 낮은 `schemaVersion`은 한 단계씩 migration.
+3. migration 도중 오류가 나면 기본 상태.
+4. migration 뒤 `sanitizeProgress`로 unknown id, deprecated id, 중복 id를 정리.
+5. 저장 실패는 화면 알림만 내고 플레이를 막지 않음.
 
 ## 5. 콘텐츠 데이터 예시
 
@@ -333,7 +379,9 @@ const timeGapTasks = [
 | `landing/static/manifest.webmanifest` | 필요 시 shortcut 추가. 독립 설치 UX는 후속 판단 |
 | `landing/scripts/prerenderReact.js` | `/math-city` route prerender 추가 |
 | `landing/scripts/postbuild.js` | sitemap 또는 정적 URL 목록에 `/math-city` 추가 |
-| `tests/` | landing build 또는 route smoke 보강 필요 시 추가 |
+| `tests/surface/verifyMathCityContract.py` | registry, 저장 금지 필드, id 참조 검증 |
+| `tests/surface/verifyMathCityStorage.py` | migration, 깨진 저장값, unknown id 검증 |
+| `tests/surface/verifyMathCityBrowser.py` | route, completion, reset, mobile overflow smoke |
 
 ## 9. 영향 함수·심볼
 
@@ -347,6 +395,8 @@ const timeGapTasks = [
 | `resetProgress` | 진행 초기화 |
 | `migrateProgress` | 버전 마이그레이션 |
 | `sanitizeProgress` | registry에 없는 id와 중복 id 제거 |
+| `validateRegistry` | registry id 참조, 금지 필드, asset, task type 검증 |
+| `applyDeprecatedIdMap` | 공개 후 변경된 id를 replacement id로 변환 |
 | `getEpisodeById` | 에피소드 조회 |
 | `resolveMapPlaces` | 진행 상태를 지도 표시 상태로 변환 |
 | `evaluateBeatAnswer` | 현재 미션 정답 판정 |
@@ -361,6 +411,15 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate root-clean
 ```
 
+후속 gate:
+
+```text
+uv run python -X utf8 tests/run.py gate math-city-contract
+uv run python -X utf8 tests/run.py gate math-city-storage
+uv run python -X utf8 tests/run.py gate math-city-browser
+uv run python -X utf8 tests/run.py gate math-city-accessibility
+```
+
 구현 후 브라우저 확인:
 
 - `/math-city` 첫 진입이 빈 화면이 아닌지.
@@ -371,11 +430,18 @@ uv run python -X utf8 tests/run.py gate root-clean
 - 진행 초기화 후 첫 상태로 돌아가는지.
 - `localStorage`를 막거나 지워도 앱이 깨지지 않는지.
 - GitHub Pages base path `/codaro/` 아래 route가 맞게 동작하는지.
+- 키보드만으로 지도 진입부터 에피소드 완료까지 가능한지.
+- 끌기 과제를 끌지 않고도 완료할 수 있는지.
+- `largeText`와 200% 확대에서 가로 스크롤이 생기지 않는지.
+- `reducedMotion`에서 완료 연출이 플레이를 막지 않는지.
+- 360px, 390px, 414px 폭에서 하단 시트와 버튼 텍스트가 겹치지 않는지.
 
 권장 단위 테스트:
 
 - `progressStore` 저장 데이터 검증.
 - `migrateProgress` 깨진 데이터 처리.
+- `progressMigrations` deprecated id mapping 처리.
+- `validateRegistry` 중복 id, orphan asset, 금지 필드 처리.
 - `questEngine` 정답 판정.
 - `completeEpisode` 중복 완료 처리.
 - `resolveMapPlaces` locked, available, restored 상태 변환.
@@ -403,6 +469,8 @@ uv run python -X utf8 tests/run.py gate root-clean
 - 에피소드 데이터와 화면 컴포넌트가 분리된다.
 - 새 에피소드는 데이터 추가 중심으로 가능하다.
 - GitHub Pages base path를 깨지 않는다.
+- registry 검증이 콘텐츠 오류를 구현 전에 잡는다.
+- storage migration이 contentVersion 변경과 schemaVersion 변경을 분리한다.
 
 위험 신호:
 
@@ -411,6 +479,8 @@ uv run python -X utf8 tests/run.py gate root-clean
 - 진행 저장 실패가 앱 전체 오류로 이어진다.
 - 시각 효과가 레이아웃을 밀어 텍스트가 겹친다.
 - 랜덤 생성 때문에 문제 검수가 어려워진다.
+- 끌기 조작만 있고 선택 기반 대체 조작이 없다.
+- id rename으로 기존 브라우저 진행이 끊긴다.
 
 ### 제품 렌즈
 
@@ -435,11 +505,14 @@ uv run python -X utf8 tests/run.py gate root-clean
 1. `/math-city` route와 빈 shell.
 2. prerender와 sitemap URL 추가.
 3. 진행 저장 `progressStore`.
-4. 정적 지도와 장소 상태.
-5. 에피소드 1 데이터.
-6. `World Math Beat` 기반 `storyChoice`, `mathChoice`, `dragArrange` task.
-7. 에피소드 완료와 보상 반영.
-8. 도감과 단서장.
-9. 에피소드 2, 3 추가.
-10. 모바일 검수.
-11. 시각 디테일 보강.
+4. `registryValidation`과 기본 registry.
+5. 정적 지도와 장소 상태.
+6. 에피소드 1 데이터.
+7. `World Math Beat` 기반 `storyChoice`, `mathChoice`, `dragArrange` task.
+8. 끌기 대체 조작과 키보드 경로.
+9. 에피소드 완료와 보상 반영.
+10. 도감과 단서장.
+11. 접근성 설정 `largeText`, `reducedMotion`.
+12. 에피소드 2, 3 추가.
+13. 모바일 검수.
+14. 시각 디테일 보강.

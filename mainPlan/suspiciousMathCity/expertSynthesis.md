@@ -2,17 +2,22 @@
 
 ## 1. 결론
 
-최고 포맷은 다음 4개 계약을 중심으로 잡는다.
+최고 포맷은 다음 8개 계약을 중심으로 잡는다.
 
 1. `World Math Beat`: 수학이 세계를 조작하게 만드는 미션 단위.
 2. `Visual Interaction Blueprint`: 상태가 있는 지도, 장면, 오브젝트, 모션 계약.
 3. `Healthy Engagement Loop`: 사건 하나를 닫고 질문 하나만 여는 건강한 몰입 구조.
 4. `Browser-only Save Contract`: 개인정보 없이 `localStorage`에 진행만 저장하는 정적 웹 게임 구조.
 5. `Learning Engagement Artifacts`: 능력 카드, 오개념 카드, 단서 연결판, 복구 기록처럼 학습 기억을 다시 꺼내 쓰는 아티팩트 시스템.
+6. `Curriculum Matrix`: 시즌, 개념, 능력, 조작, 오개념, 전이 과제를 관리하는 학습 범위 계약.
+7. `Accessibility and Solo-use Contract`: 초등학생이 혼자 키보드, 터치, 큰 글자, 모션 축소에서도 완주하는 사용성 계약.
+8. `Operations Contract`: versioned registry, 저장 migration, release gate, 회귀 테스트를 관리하는 장기 운영 계약.
 
-이 네 가지가 없으면 구현은 객관식 문제집, 예쁜 랜딩, 보상 수집 앱으로 흐를 위험이 크다.
+이 계약들이 없으면 구현은 객관식 문제집, 예쁜 랜딩, 보상 수집 앱, 유지 어려운 콘텐츠 묶음으로 흐를 위험이 크다.
 
 아티팩트 시스템의 상세 계약은 [learningEngagementArtifacts.md](learningEngagementArtifacts.md)를 기준으로 한다.
+커리큘럼과 품질 기준은 [curriculumMatrix.md](curriculumMatrix.md), [episodeAuthoringGuide.md](episodeAuthoringGuide.md), [contentQualityRubric.md](contentQualityRubric.md)를 따른다.
+접근성과 운영 기준은 [accessibilityAndUsability.md](accessibilityAndUsability.md), [operationsPrd.md](operationsPrd.md)를 따른다.
 
 ## 2. 최종 미션 포맷
 
@@ -134,11 +139,28 @@ suspiciousMathCity.progress.v1
 
 1. `/math-city` route, prerender, sitemap.
 2. `localStorage` 진행 저장.
-3. SVG toy-city 지도.
-4. 시계탑 장면.
-5. 시간 렌즈 조작.
-6. 시계탑 복구 애니메이션.
-7. 능력 도감, 단서장.
-8. 숫자 버스, 반쪽 빵집.
+3. versioned registry와 registry 검증.
+4. SVG toy-city 지도.
+5. 시계탑 장면.
+6. 시간 렌즈 조작.
+7. 끌기 대체 조작과 키보드 경로.
+8. 시계탑 복구 애니메이션.
+9. 능력 도감, 단서장.
+10. 큰 글자와 모션 축소 확인.
+11. 숫자 버스, 반쪽 빵집.
 
 시계탑 장면이 완성되기 전에는 에피소드 수를 늘리지 않는다.
+
+## 8. 장기 유지 판정
+
+장기 프로젝트로 볼 수 있는 기준:
+
+| 영역 | 통과 기준 |
+| --- | --- |
+| 학습 | 커리큘럼 매트릭스에 개념, 선수 감각, 오개념, 전이 과제가 있다 |
+| 제작 | Episode Brief부터 registry 등록까지 제작 절차가 있다 |
+| 접근성 | 키보드, 터치, 큰 글자, 모션 축소, 소리 없음에서 완주 가능 |
+| 몰입 | 재방문 이유가 출석이나 보상이 아니라 능력 재사용과 단서 연결이다 |
+| 운영 | id 안정성, migration, gate, 회귀 테스트가 있다 |
+
+이 기준을 통과하지 못하면 시즌 확장이 아니라 첫 에피소드 품질 보강으로 돌아간다.

@@ -275,12 +275,17 @@ MVP 조작:
 ```js
 const misconceptionCard = {
   artifactId: "mis-clock-gap-hour",
+  misconceptionId: "clock-gap-full-hour",
   conceptId: "time-difference",
   wrongIdea: "3시까지 60분이라고 생각함",
   triggerAnswers: ["60분", "1시간"],
+  diagnosis: "현재 시각이 2시 40분이라는 단서를 놓침",
   worldResponse: "색 띠가 시계 한 바퀴를 넘으려다 멈춘다.",
-  novaHint: "지금은 2시 40분이야. 3시까지 빈 칸만 세어 봐.",
+  hint1Observation: "시계탑의 분침 위치를 다시 보게 함",
+  hint2Concept: "두 시각 사이의 빈 칸을 세게 함",
+  hint3Procedure: "10분 칸 2개를 놓게 함",
   recoveryAction: "10분 칸 두 개만 다시 놓기",
+  transferCheck: "1시 30분에서 2시까지도 찾게 함",
 };
 ```
 
@@ -289,6 +294,8 @@ const misconceptionCard = {
 - 오답 후 빨간 X보다 장면 반응을 먼저 보여준다.
 - 힌트는 정답을 말하지 않고 다시 볼 물건을 알려준다.
 - 같은 오개념이 반복되면 더 구체적인 시각 힌트를 보여준다.
+- 오개념 카드는 [curriculumMatrix.md](curriculumMatrix.md)의 오개념 대응 레지스트리와 같은 필드를 쓴다.
+- `wrongIdea`가 없는 단순 오답 처리는 핵심 미션에 쓰지 않는다.
 
 금지:
 
