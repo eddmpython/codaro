@@ -1,5 +1,7 @@
 # 구현 계획
 
+> 리부트 메모: 이 구현 계획은 v1 `지도 + 에피소드 패널` 구조를 기준으로 작성되었다. 현재는 [prd.md](prd.md), [liveRepairStageSpec.md](liveRepairStageSpec.md), [implementationAcceptanceCriteria.md](implementationAcceptanceCriteria.md)의 `시계버스 graybox`를 우선한다. 이 문서는 배경 참고로만 사용한다.
+
 ## 1. 구현 위치
 
 `수상한 수학도시`는 Codaro 제품 본체가 아니라 공개 정적 웹 표면에 둔다.

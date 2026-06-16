@@ -1,5 +1,7 @@
 # 학습 설계
 
+> 리부트 메모: 학습 철학은 유지하되, 구현 순서와 화면 문법은 [prd.md](prd.md), [liveRepairStageSpec.md](liveRepairStageSpec.md), [clocktowerEpisodePack.md](clocktowerEpisodePack.md)를 우선한다. 객관식 중심 진행은 보류하고, 수학 부품을 끼우는 라이브 수리 스테이지를 기본 단위로 둔다.
+
 ## 1. 학습 철학
 
 수상한 수학도시의 학습은 "문제를 많이 풀면 보상을 받는다"가 아니다. 학습자는 이상한 사건을 이해하기 위해 수학 개념을 쓴다.

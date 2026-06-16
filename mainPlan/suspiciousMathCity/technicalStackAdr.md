@@ -1,5 +1,7 @@
 # 기술 스택 ADR
 
+> 리부트 메모: 스택 선택은 유지한다. 바뀐 것은 엔진이 아니라 화면 문법이다. React/Vite + TypeScript + 상태 있는 SVG/HTML로 [liveRepairStageSpec.md](liveRepairStageSpec.md)의 장치 퍼즐을 구현한다.
+
 ## 1. 결정
 
 `수상한 수학도시`는 정적 웹 기반의 조작형 수학 어드벤처로 만든다. 기술 선택은 화려한 엔진보다 장기 유지, 접근성, 콘텐츠 제작, 도서/워크북 파생 가능성을 우선한다.
@@ -226,4 +228,3 @@ docs
 - service worker.
 - 내부 에피소드 preview tool.
 - 도서/워크북 export tool.
-

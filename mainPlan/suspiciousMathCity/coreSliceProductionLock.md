@@ -1,5 +1,7 @@
 # Core Slice 제작 잠금
 
+> 리부트 메모: 이 문서는 v1 제작 잠금 기록이다. 현재 구현 기준은 [liveRepairStageSpec.md](liveRepairStageSpec.md)와 [playtestFunGate.md](playtestFunGate.md)를 우선한다. v1의 지도/패널 중심 구조는 시계버스 graybox 재미 검증 전까지 보류한다.
+
 ## 1. 목적
 
 이 문서는 `시계탑이 멈춘 날` Product Core Slice의 화면, 조작, 그래픽, 에셋, 접근성 기준을 잠근다. 완료 기준은 문제 풀이 화면이 보이는 것이 아니라, 시간 차이를 알아야 세계가 복구된다는 감각이 화면과 조작으로 증명되는 것이다.

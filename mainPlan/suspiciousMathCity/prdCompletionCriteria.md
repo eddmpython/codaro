@@ -2,77 +2,75 @@
 
 ## 1. 현재 판정
 
-현재 PRD 묶음은 `production lock v1`로 둔다. 의미는 다음과 같다.
+현재 PRD 묶음은 `리부트 v2 설계 중`이다. 기존 완성 판정은 철회한다.
 
-```text
-제품 방향은 확정됐고,
-첫 Product Core Slice를 구현 가능한 수준으로 잠갔으며,
-시계탑 Episode Pack과 인수조건을 기준으로 바로 작업 티켓을 만들 수 있다.
-```
+이유:
 
-단, 이것은 제품 출시 완료가 아니다. 앱 구현, 브라우저 검증, 접근성 검증, visual smoke를 통과해야 출시 가능 상태가 된다.
+- 첫 화면 집중도와 재미가 검증되지 않았다.
+- 기존 구현 방향이 카드형 문제풀이처럼 보였다.
+- 장기 문서가 많았지만 첫 2분 손맛 게이트가 없었다.
+- 시계탑 기준본이 수리 장치가 아니라 에피소드 패널 중심이었다.
 
-## 2. 완성으로 인정하는 범위
+## 2. 완성으로 인정하지 않는 것
 
-| 범위 | 상태 | 근거 |
-| --- | --- | --- |
-| 제품 정의 | 완료 | [prd.md](prd.md) |
-| 개인정보 없음 | 완료 | [prd.md](prd.md), [operationsPrd.md](operationsPrd.md) |
-| 학습 설계 | 완료 | [learningDesign.md](learningDesign.md), [curriculumMatrix.md](curriculumMatrix.md) |
-| 교과 연계 | 완료 | [standardsAlignment.md](standardsAlignment.md) |
-| 세계관 캐논 | 완료 | [ipCanon.md](ipCanon.md), [storyBible.md](storyBible.md) |
-| 스택 결정 | 완료 | [technicalStackAdr.md](technicalStackAdr.md) |
-| 시계탑 Episode Pack | 완료 | [clocktowerEpisodePack.md](clocktowerEpisodePack.md) |
-| 화면/에셋 제작 잠금 | 완료 | [coreSliceProductionLock.md](coreSliceProductionLock.md) |
-| 구현 인수조건 | 완료 | [implementationAcceptanceCriteria.md](implementationAcceptanceCriteria.md) |
-| 품질 루브릭 | 완료 | [contentQualityRubric.md](contentQualityRubric.md) |
-| 출판 변환 | 완료 | [publishingFormatMatrix.md](publishingFormatMatrix.md), [crossMediaPrd.md](crossMediaPrd.md) |
+아래는 이제 PRD 완성 근거가 아니다.
 
-## 3. 아직 출시 완료가 아닌 이유
+- 문서 수가 많음.
+- 에피소드 3개가 표로 있음.
+- 도서/워크북 변환 가능성이 있음.
+- 지도와 단서장 구조가 있음.
+- 객관식과 조작 과제가 함께 있음.
+- 시계탑 이야기가 완결됨.
 
-PRD가 완성권에 들어간 것과 제품이 완성된 것은 다르다. 아래는 구현 후에만 닫힌다.
+## 3. 새 PRD 완성 조건
 
-- `/math-city` route 구현.
-- TypeScript game boundary 구성.
-- 실제 registry와 progressStore 구현.
-- 시계탑 장면 SVG/HTML 조작 구현.
-- `localStorage` 실패 경로 확인.
-- 키보드만으로 에피소드 완료 확인.
-- 360px, 390px, 414px, 768px, 1280px viewport 확인.
-- 스토리북/워크북/활동지 adapter가 실제 데이터에서 산출되는지 확인.
+PRD 완성은 아래가 닫힌 상태다.
 
-## 4. PRD가 더 이상 흔들리면 안 되는 결정
-
-아래 결정은 구현 중 기본값으로 유지한다.
-
-| 결정 | 잠금 |
+| 조건 | 기준 문서 |
 | --- | --- |
-| 배포 | GitHub Pages 정적 route |
-| 저장 | 브라우저 `localStorage`만 사용 |
-| 개인정보 | 이름, 학년, 학교, 보호자 정보, 원격 학습 기록 저장 금지 |
-| 게임 방식 | React/Vite + TypeScript 경계 + SVG/HTML 조작 |
-| 그래픽 | 핵심 오브젝트는 통 bitmap 금지, 상태 있는 SVG/HTML 우선 |
-| 몰입 | 출석, 순위, 랜덤 보상, 광고 보상 금지 |
-| 첫 기준 | 시계탑 1편이 약하면 에피소드 수를 늘리지 않음 |
-| 확장 | 같은 Episode Pack에서 앱, 도서, 워크북, 활동지 파생 |
+| 새 북극성 | [prd.md](prd.md) |
+| 라이브 수리 스테이지 계약 | [liveRepairStageSpec.md](liveRepairStageSpec.md) |
+| 브라우저 게임 포맷 | [browserGameFormat.md](browserGameFormat.md) |
+| 시계버스 Episode Pack | [clocktowerEpisodePack.md](clocktowerEpisodePack.md) |
+| 재미 검증 게이트 | [playtestFunGate.md](playtestFunGate.md) |
+| 구현 인수조건 | [implementationAcceptanceCriteria.md](implementationAcceptanceCriteria.md) |
 
-## 5. 다음 단계 판정
+## 4. 구현 착수 조건
 
-다음 단계는 추가 기획이 아니라 구현 착수다.
+구현 착수는 전체 제품 구현이 아니라 `시계버스 graybox`에 한정한다.
 
 ```text
-Phase 1 진입 조건:
-시계탑 Episode Pack, 제작 잠금표, 구현 인수조건을 기준으로
-/math-city route와 registry fixture부터 구현한다.
+허용:
+시계버스 수리 장치 graybox
+부품 선택/슬롯/작동
+부족/과다/성공 반응
+키보드 대체 조작
+360px 검증
+
+보류:
+에피소드 확장
+도감 polish
+단서장 polish
+출판 adapter 구현
+소리
+service worker
 ```
 
-Phase 1을 완료했다고 말하려면 아래가 통과해야 한다.
+## 5. 완성 판정 체크리스트
 
-1. 시계탑 에피소드가 실제 브라우저에서 처음부터 끝까지 진행된다.
-2. 완료 후 시간 렌즈, 제로 단서, 시계탑 복구 상태가 저장된다.
-3. 저장을 지워도 다시 시작 가능하다.
-4. 저장이 막혀도 현재 플레이가 멈추지 않는다.
-5. 큰 글자와 모션 줄이기에서 같은 흐름이 완료된다.
-6. 10분 조각 과제는 끌기 없이도 완료된다.
-7. 첫 에피소드 데이터가 React 화면에 박히지 않고 registry에서 나온다.
-8. storybook, workbook, teacherSheet adapter 필드가 채워진다.
+아래를 모두 통과하면 PRD를 `제작 착수 가능`으로 바꿀 수 있다.
+
+1. 첫 30초 안에 아이가 부품을 만질 수 있는 화면 설계가 있다.
+2. 첫 2분 안에 실패와 성공을 모두 보는 흐름이 있다.
+3. 핵심 미션이 객관식 없이도 작동한다.
+4. 오답 이유가 장치 반응으로 보인다.
+5. 시간 렌즈가 보상이 아니라 입력 방식으로 설계되어 있다.
+6. 같은 개념을 다른 시간표에 한 번 전이한다.
+7. 개인정보와 행동 로그를 저장하지 않는다.
+8. 키보드와 터치 대체 조작이 설계되어 있다.
+9. 360px 모바일에서 장치와 조작대가 한 흐름으로 보인다.
+10. 재미 검증 게이트가 명확하다.
+
+## 6. 한 줄 판정
+
+시계버스 graybox가 `수학 부품을 끼워 넣어 장치가 작동한다`는 경험을 증명하기 전에는 PRD 완성이라고 부르지 않는다.
