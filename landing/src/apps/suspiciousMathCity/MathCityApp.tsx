@@ -3,69 +3,127 @@ import {
   BookOpen,
   CheckCircle2,
   Clock3,
-  Eye,
-  Lightbulb,
+  Gauge,
   Map,
   RotateCcw,
   Settings,
   Sparkles,
+  Wrench,
 } from "lucide-react";
 import { mathCityRegistry } from "./data/registry";
-import { resolveMapPlaces } from "./domain/mapState";
 import { loadProgress, resetProgress, saveProgress } from "./domain/progressStore";
-import { completeEpisode, evaluateTask, isEpisodeCompleted } from "./domain/questEngine";
+import { completeEpisode, isEpisodeCompleted } from "./domain/questEngine";
 import { validateRegistry } from "./domain/registryValidation";
-import type { DragArrangeTask, Episode, EpisodeTask, MathCityProgress } from "./types";
+import type { MathCityProgress } from "./types";
 import "./styles/mathCity.css";
 
-type Screen = "map" | "episode" | "abilities" | "clues" | "settings";
-type EpisodePhase = "intro" | "inspect" | "task" | "reward";
-type FeedbackTone = "neutral" | "success" | "wrong";
+type Screen = "repair" | "abilities" | "clues" | "settings";
+type RunState = "idle" | "short" | "overflow" | "success";
 
-type EpisodeSession = {
-  phase: EpisodePhase;
-  taskIndex: number;
-  inspectedObjectIds: string[];
-  selectedChoiceIds: string[];
-  selectedChoiceId: string | null;
-  selectedTileId: string | null;
-  placements: Record<string, string>;
-  feedback: string | null;
-  feedbackTone: FeedbackTone;
-  hintIndex: number;
+type RepairSlot = {
+  slotId: string;
+  label: string;
+  tone: "target" | "overflow";
 };
+
+type RepairStage = {
+  stageId: string;
+  title: string;
+  currentTime: string;
+  targetTime: string;
+  partCount: number;
+  correctSlotCount: number;
+  slots: RepairSlot[];
+  prompt: string;
+  successLine: string;
+  shortLine: string;
+  overflowLine: string;
+  memoryLine: string;
+};
+
+type SlotParts = Record<string, string | null>;
+
+const repairStages: RepairStage[] = [
+  {
+    stageId: "clockBus-gap-01",
+    title: "시계버스 2:40 -> 3:00",
+    currentTime: "2:40",
+    targetTime: "3:00",
+    partCount: 3,
+    correctSlotCount: 2,
+    slots: [
+      { slotId: "slot-240-250", label: "2:40 -> 2:50", tone: "target" },
+      { slotId: "slot-250-300", label: "2:50 -> 3:00", tone: "target" },
+      { slotId: "slot-300-310", label: "3:00 -> 3:10", tone: "overflow" },
+    ],
+    prompt: "시간 길이 10분씩 끊겨 있어. 맞는 만큼만 이어야 버스가 움직여.",
+    successLine: "딱 맞았어. 버스가 3시에 출발했어.",
+    shortLine: "버스가 2시 50분에서 멈췄어. 아직 한 칸이 남았어.",
+    overflowLine: "버스가 3시를 지나쳤어. 너무 많이 넣었어.",
+    memoryLine: "10분 부품 2개가 20분이야.",
+  },
+  {
+    stageId: "clockBus-gap-02",
+    title: "한 칸 수리 4:50 -> 5:00",
+    currentTime: "4:50",
+    targetTime: "5:00",
+    partCount: 2,
+    correctSlotCount: 1,
+    slots: [
+      { slotId: "slot-450-500", label: "4:50 -> 5:00", tone: "target" },
+      { slotId: "slot-500-510", label: "5:00 -> 5:10", tone: "overflow" },
+    ],
+    prompt: "이번 시간 길은 짧아. 한 조각만 지나면 5시 정류장이야.",
+    successLine: "좋아. 10분 뒤에 정확히 5시가 됐어.",
+    shortLine: "아직 움직이지 않았어. 빈칸에 부품을 넣어 보자.",
+    overflowLine: "5시를 지나쳤어. 한 칸만 필요해.",
+    memoryLine: "한 칸은 10분이야.",
+  },
+  {
+    stageId: "clockBus-gap-03",
+    title: "세 칸 수리 1:30 -> 2:00",
+    currentTime: "1:30",
+    targetTime: "2:00",
+    partCount: 4,
+    correctSlotCount: 3,
+    slots: [
+      { slotId: "slot-130-140", label: "1:30 -> 1:40", tone: "target" },
+      { slotId: "slot-140-150", label: "1:40 -> 1:50", tone: "target" },
+      { slotId: "slot-150-200", label: "1:50 -> 2:00", tone: "target" },
+      { slotId: "slot-200-210", label: "2:00 -> 2:10", tone: "overflow" },
+    ],
+    prompt: "1시 30분에서 2시까지 시간 길이 길게 비어 있어.",
+    successLine: "세 칸이 채워졌어. 30분 뒤에 출발해.",
+    shortLine: "버스가 2시 전에 멈췄어. 빈칸을 더 봐.",
+    overflowLine: "2시를 지나쳤어. 목표 뒤 칸은 빼야 해.",
+    memoryLine: "10분 부품 3개가 30분이야.",
+  },
+  {
+    stageId: "clockBus-transfer-01",
+    title: "시간 렌즈 전이 5:20 -> 5:40",
+    currentTime: "5:20",
+    targetTime: "5:40",
+    partCount: 3,
+    correctSlotCount: 2,
+    slots: [
+      { slotId: "slot-520-530", label: "5:20 -> 5:30", tone: "target" },
+      { slotId: "slot-530-540", label: "5:30 -> 5:40", tone: "target" },
+      { slotId: "slot-540-550", label: "5:40 -> 5:50", tone: "overflow" },
+    ],
+    prompt: "시간 렌즈가 전광판의 빈 길도 보여 주고 있어.",
+    successLine: "전광판도 고쳤어. 시간 렌즈가 제대로 작동해.",
+    shortLine: "전광판이 아직 어두워. 빈칸 하나가 남았어.",
+    overflowLine: "전광판이 목표 시간을 지나쳤어. 뒤 칸은 빼자.",
+    memoryLine: "두 시각 사이 빈칸을 보면 남은 시간이 보여.",
+  },
+];
 
 const initialLoad = typeof window === "undefined"
   ? null
   : loadProgress(mathCityRegistry);
 
-function createEpisodeSession(): EpisodeSession {
-  return {
-    phase: "intro",
-    taskIndex: 0,
-    inspectedObjectIds: [],
-    selectedChoiceIds: [],
-    selectedChoiceId: null,
-    selectedTileId: null,
-    placements: {},
-    feedback: null,
-    feedbackTone: "neutral",
-    hintIndex: 0,
-  };
-}
-
-function resetTaskInput(session: EpisodeSession, nextTaskIndex: number): EpisodeSession {
-  return {
-    ...session,
-    taskIndex: nextTaskIndex,
-    selectedChoiceIds: [],
-    selectedChoiceId: null,
-    selectedTileId: null,
-    placements: {},
-    feedback: null,
-    feedbackTone: "neutral",
-    hintIndex: 0,
-  };
+function createEmptySlots(stage: RepairStage): SlotParts {
+  return Object.fromEntries(stage.slots.map((slot) => [slot.slotId, null]));
 }
 
 export default function MathCityApp() {
@@ -73,29 +131,31 @@ export default function MathCityApp() {
   const [progress, setProgress] = useState<MathCityProgress>(
     () => initialLoad?.progress ?? loadProgress(mathCityRegistry).progress,
   );
-  const [screen, setScreen] = useState<Screen>("map");
-  const [activeEpisodeId, setActiveEpisodeId] = useState("clocktower-01");
-  const [session, setSession] = useState<EpisodeSession>(createEpisodeSession);
+  const [screen, setScreen] = useState<Screen>("repair");
+  const [stageIndex, setStageIndex] = useState(0);
+  const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
+  const [slotParts, setSlotParts] = useState<SlotParts>(() => createEmptySlots(repairStages[0]));
+  const [runState, setRunState] = useState<RunState>("idle");
+  const [lensUnlocked, setLensUnlocked] = useState(() => progress.ownedAbilityIds.includes("time-lens"));
+  const [lensActive, setLensActive] = useState(() => progress.ownedAbilityIds.includes("time-lens"));
   const [notice, setNotice] = useState<string | null>(initialLoad?.notice ?? null);
   const [confirmReset, setConfirmReset] = useState(false);
 
-  const episode = mathCityRegistry.episodesById[activeEpisodeId];
-  const resolvedPlaces = useMemo(() => resolveMapPlaces(progress, mathCityRegistry), [progress]);
-  const currentTask = session.phase === "task" ? episode.tasks[session.taskIndex] : null;
+  const episode = mathCityRegistry.episodesById["clocktower-01"];
+  const stage = repairStages[stageIndex];
+  const completed = isEpisodeCompleted(progress, episode.episodeId);
   const rootClassName = [
     "mathCityRoot",
+    "mc-repairRoot",
     progress.settings.largeText ? "mc-largeText" : "",
     progress.settings.reducedMotion ? "mc-reducedMotion" : "",
   ].filter(Boolean).join(" ");
 
-  function scrollToTopSoon(): void {
-    if (typeof window === "undefined") return;
-    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
-  }
-
   function showScreen(nextScreen: Screen): void {
     setScreen(nextScreen);
-    scrollToTopSoon();
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+    }
   }
 
   function persist(nextProgress: MathCityProgress): void {
@@ -104,110 +164,70 @@ export default function MathCityApp() {
     setNotice(saveResult.notice);
   }
 
-  function startEpisode(episodeId: string): void {
-    setActiveEpisodeId(episodeId);
-    setSession(createEpisodeSession());
-    showScreen("episode");
-    const nextProgress = { ...progress, lastMapFocusPlaceId: mathCityRegistry.episodesById[episodeId].districtId };
-    persist(nextProgress);
+  function resetStage(nextStageIndex = stageIndex): void {
+    const nextStage = repairStages[nextStageIndex];
+    setStageIndex(nextStageIndex);
+    setSelectedPartId(null);
+    setSlotParts(createEmptySlots(nextStage));
+    setRunState("idle");
   }
 
-  function inspectObject(objectId: string): void {
-    const target = episode.inspection.objects.find((item) => item.objectId === objectId);
-    const nextIds = session.inspectedObjectIds.includes(objectId)
-      ? session.inspectedObjectIds
-      : [...session.inspectedObjectIds, objectId];
-    setSession({
-      ...session,
-      inspectedObjectIds: nextIds,
-      feedback: target?.detail ?? null,
-      feedbackTone: target?.isUseful ? "success" : "neutral",
-    });
+  function selectPart(partId: string): void {
+    setSelectedPartId(partId);
+    setRunState("idle");
   }
 
-  function canContinueInspection(): boolean {
-    return episode.inspection.requiredObjectIds.every((id) => session.inspectedObjectIds.includes(id));
-  }
-
-  function submitCurrentTask(): void {
-    if (!currentTask) return;
-    const answer = buildTaskAnswer(currentTask, session);
-    const result = evaluateTask(currentTask, answer);
-    if (!result.correct) {
-      setSession({
-        ...session,
-        feedback: result.message,
-        feedbackTone: "wrong",
-        hintIndex: Math.min(session.hintIndex + 1, currentTask.hintLadder.length),
-      });
+  function toggleSlot(slotId: string): void {
+    if (!selectedPartId) {
+      if (slotParts[slotId]) {
+        setSlotParts({ ...slotParts, [slotId]: null });
+        setRunState("idle");
+      }
       return;
     }
+    const nextSlots = Object.fromEntries(
+      Object.entries(slotParts).map(([currentSlotId, currentPartId]) => [
+        currentSlotId,
+        currentPartId === selectedPartId ? null : currentPartId,
+      ]),
+    ) as SlotParts;
+    nextSlots[slotId] = selectedPartId;
+    setSlotParts(nextSlots);
+    setSelectedPartId(null);
+    setRunState("idle");
+  }
 
-    if (session.taskIndex >= episode.tasks.length - 1) {
-      const completedProgress = completeEpisode(progress, episode, mathCityRegistry);
-      persist(completedProgress);
-      setSession({
-        ...session,
-        phase: "reward",
-        feedback: result.message,
-        feedbackTone: "success",
-      });
+  function runDevice(): void {
+    const overflowFilled = stage.slots
+      .filter((slot) => slot.tone === "overflow")
+      .some((slot) => Boolean(slotParts[slot.slotId]));
+    const targetFilledCount = stage.slots
+      .filter((slot) => slot.tone === "target")
+      .filter((slot) => Boolean(slotParts[slot.slotId]))
+      .length;
+    if (overflowFilled) {
+      setRunState("overflow");
       return;
     }
-
-    setSession({
-      ...resetTaskInput(session, session.taskIndex + 1),
-      feedback: result.message,
-      feedbackTone: "success",
-    });
-  }
-
-  function toggleStoryChoice(optionId: string): void {
-    const selected = session.selectedChoiceIds.includes(optionId)
-      ? session.selectedChoiceIds.filter((id) => id !== optionId)
-      : [...session.selectedChoiceIds, optionId];
-    setSession({ ...session, selectedChoiceIds: selected, feedback: null, feedbackTone: "neutral" });
-  }
-
-  function selectMathChoice(optionId: string): void {
-    setSession({ ...session, selectedChoiceId: optionId, feedback: null, feedbackTone: "neutral" });
-  }
-
-  function selectTile(tileId: string): void {
-    setSession({ ...session, selectedTileId: tileId, feedback: "놓을 칸을 고르면 조각이 들어가.", feedbackTone: "neutral" });
-  }
-
-  function placeSelectedTile(slotId: string): void {
-    if (!session.selectedTileId) {
-      setSession({ ...session, feedback: "먼저 10분 조각을 골라 봐.", feedbackTone: "neutral" });
+    if (targetFilledCount < stage.correctSlotCount) {
+      setRunState("short");
       return;
     }
-    const nextPlacements = Object.fromEntries(
-      Object.entries(session.placements).filter(([, tileId]) => tileId !== session.selectedTileId),
-    );
-    nextPlacements[slotId] = session.selectedTileId;
-    setSession({
-      ...session,
-      placements: nextPlacements,
-      selectedTileId: null,
-      feedback: "조각을 놓았어. 남은 빈칸도 확인해 봐.",
-      feedbackTone: "neutral",
-    });
+    setRunState("success");
+    if (stage.stageId === "clockBus-gap-01") {
+      setLensUnlocked(true);
+      setLensActive(true);
+    }
+    if (stage.stageId === "clockBus-transfer-01" && !completed) {
+      const nextProgress = completeEpisode(progress, episode, mathCityRegistry);
+      persist(nextProgress);
+      setLensUnlocked(true);
+      setLensActive(true);
+    }
   }
 
-  function clearPlacements(): void {
-    setSession({ ...session, placements: {}, selectedTileId: null, feedback: "조각을 다시 놓을 수 있어.", feedbackTone: "neutral" });
-  }
-
-  function showNextHint(): void {
-    if (!currentTask) return;
-    const nextIndex = Math.min(session.hintIndex + 1, currentTask.hintLadder.length);
-    setSession({
-      ...session,
-      hintIndex: nextIndex,
-      feedback: currentTask.hintLadder[nextIndex - 1] ?? null,
-      feedbackTone: "neutral",
-    });
+  function nextStage(): void {
+    resetStage(Math.min(stageIndex + 1, repairStages.length - 1));
   }
 
   function updateSettings(key: keyof MathCityProgress["settings"], value: boolean): void {
@@ -225,28 +245,30 @@ export default function MathCityApp() {
     setProgress(resetResult.progress);
     setNotice(resetResult.notice);
     setConfirmReset(false);
-    setSession(createEpisodeSession());
-    showScreen("map");
+    setLensUnlocked(false);
+    setLensActive(false);
+    resetStage(0);
+    showScreen("repair");
   }
 
   return (
     <main className={rootClassName}>
       <header className="mc-topbar">
-        <button className="mc-brandButton" type="button" onClick={() => showScreen("map")} aria-label="수학도시 지도">
-          <span className="mc-brandMark" aria-hidden="true">M</span>
+        <button className="mc-brandButton" type="button" onClick={() => showScreen("repair")} aria-label="수학도시 수리 스테이지">
+          <span className="mc-brandMark" aria-hidden="true"><Wrench size={22} /></span>
           <span>
             <strong>수상한 수학도시</strong>
-            <small>개념으로 고치는 도시</small>
+            <small>수학 부품으로 고치는 장난감 도시</small>
           </span>
         </button>
         <nav className="mc-nav" aria-label="수학도시 메뉴">
-          <button type="button" className="mc-iconButton" onClick={() => showScreen("map")} aria-label="지도">
+          <button type="button" className="mc-iconButton" onClick={() => showScreen("repair")} aria-label="수리 장치">
             <Map size={18} aria-hidden="true" />
           </button>
-          <button type="button" className="mc-iconButton" onClick={() => showScreen("abilities")} aria-label="능력 도감">
+          <button type="button" className="mc-iconButton" onClick={() => showScreen("abilities")} aria-label="능력">
             <Sparkles size={18} aria-hidden="true" />
           </button>
-          <button type="button" className="mc-iconButton" onClick={() => showScreen("clues")} aria-label="단서장">
+          <button type="button" className="mc-iconButton" onClick={() => showScreen("clues")} aria-label="단서">
             <BookOpen size={18} aria-hidden="true" />
           </button>
           <button type="button" className="mc-iconButton" onClick={() => showScreen("settings")} aria-label="설정">
@@ -255,11 +277,7 @@ export default function MathCityApp() {
         </nav>
       </header>
 
-      {notice ? (
-        <div className="mc-notice" role="status">
-          {notice}
-        </div>
-      ) : null}
+      {notice ? <div className="mc-notice" role="status">{notice}</div> : null}
 
       {registryIssues.length ? (
         <section className="mc-contractWarning" aria-label="콘텐츠 계약 경고">
@@ -270,47 +288,30 @@ export default function MathCityApp() {
         </section>
       ) : null}
 
-      {screen === "map" ? (
-        <MapScreen
-          progress={progress}
-          places={resolvedPlaces}
-          onStartEpisode={startEpisode}
-          onOpenAbilities={() => showScreen("abilities")}
-          onOpenClues={() => showScreen("clues")}
+      {screen === "repair" ? (
+        <RepairScreen
+          stage={stage}
+          stageIndex={stageIndex}
+          stageCount={repairStages.length}
+          selectedPartId={selectedPartId}
+          slotParts={slotParts}
+          runState={runState}
+          lensUnlocked={lensUnlocked}
+          lensActive={lensActive}
+          completed={completed}
+          onSelectPart={selectPart}
+          onToggleSlot={toggleSlot}
+          onRunDevice={runDevice}
+          onResetStage={() => resetStage()}
+          onNextStage={nextStage}
+          onToggleLens={() => {
+            if (lensUnlocked) setLensActive(!lensActive);
+          }}
         />
       ) : null}
 
-      {screen === "episode" ? (
-        <EpisodeScreen
-          episode={episode}
-          progress={progress}
-          session={session}
-          currentTask={currentTask}
-          onBackToMap={() => showScreen("map")}
-          onStartInspect={() => setSession({ ...session, phase: "inspect", feedback: episode.inspection.prompt })}
-          onInspectObject={inspectObject}
-          canContinueInspection={canContinueInspection()}
-          onContinueAfterInspect={() => setSession({ ...resetTaskInput(session, 0), phase: "task", feedback: null })}
-          onToggleStoryChoice={toggleStoryChoice}
-          onSelectMathChoice={selectMathChoice}
-          onSelectTile={selectTile}
-          onPlaceSelectedTile={placeSelectedTile}
-          onClearPlacements={clearPlacements}
-          onSubmitTask={submitCurrentTask}
-          onShowHint={showNextHint}
-          onOpenAbilities={() => showScreen("abilities")}
-          onOpenClues={() => showScreen("clues")}
-        />
-      ) : null}
-
-      {screen === "abilities" ? (
-        <AbilityScreen progress={progress} onBackToMap={() => showScreen("map")} />
-      ) : null}
-
-      {screen === "clues" ? (
-        <ClueScreen progress={progress} onBackToMap={() => showScreen("map")} />
-      ) : null}
-
+      {screen === "abilities" ? <AbilityScreen progress={progress} onBackToRepair={() => showScreen("repair")} /> : null}
+      {screen === "clues" ? <ClueScreen progress={progress} onBackToRepair={() => showScreen("repair")} /> : null}
       {screen === "settings" ? (
         <SettingsScreen
           progress={progress}
@@ -319,535 +320,274 @@ export default function MathCityApp() {
           onConfirmReset={() => setConfirmReset(true)}
           onCancelReset={() => setConfirmReset(false)}
           onReset={handleResetProgress}
-          onBackToMap={() => showScreen("map")}
+          onBackToRepair={() => showScreen("repair")}
         />
       ) : null}
     </main>
   );
 }
 
-function buildTaskAnswer(task: EpisodeTask, session: EpisodeSession): string[] | string | Record<string, string> | null {
-  if (task.type === "storyChoice") return session.selectedChoiceIds;
-  if (task.type === "mathChoice") return session.selectedChoiceId;
-  return session.placements;
-}
-
-type MapScreenProps = {
-  progress: MathCityProgress;
-  places: ReturnType<typeof resolveMapPlaces>;
-  onStartEpisode: (episodeId: string) => void;
-  onOpenAbilities: () => void;
-  onOpenClues: () => void;
-};
-
-function MapScreen({ progress, places, onStartEpisode, onOpenAbilities, onOpenClues }: MapScreenProps) {
-  const clocktowerRestored = progress.completedEpisodeIds.includes("clocktower-01");
+function RepairScreen({
+  stage,
+  stageIndex,
+  stageCount,
+  selectedPartId,
+  slotParts,
+  runState,
+  lensUnlocked,
+  lensActive,
+  completed,
+  onSelectPart,
+  onToggleSlot,
+  onRunDevice,
+  onResetStage,
+  onNextStage,
+  onToggleLens,
+}: {
+  stage: RepairStage;
+  stageIndex: number;
+  stageCount: number;
+  selectedPartId: string | null;
+  slotParts: SlotParts;
+  runState: RunState;
+  lensUnlocked: boolean;
+  lensActive: boolean;
+  completed: boolean;
+  onSelectPart: (partId: string) => void;
+  onToggleSlot: (slotId: string) => void;
+  onRunDevice: () => void;
+  onResetStage: () => void;
+  onNextStage: () => void;
+  onToggleLens: () => void;
+}) {
+  const usedPartIds = new Set(Object.values(slotParts).filter((partId): partId is string => Boolean(partId)));
+  const feedback = getRepairFeedback(stage, runState);
   return (
-    <section className="mc-mapScreen" aria-labelledby="mc-map-title">
-      <div className="mc-mapIntro">
+    <section className="mc-repairScreen" aria-labelledby="mc-repair-title">
+      <div className="mc-repairIntro">
         <p className="mc-kicker">Season 1 · 사라진 숫자</p>
-        <h1 id="mc-map-title">멈춘 시계탑을 조사하자</h1>
-        <p>시계가 멈추자 버스도 출발하지 못하고 있어. 장면 속 단서를 찾아 도시를 고쳐 보자.</p>
+        <h1 id="mc-repair-title">멈춘 시계버스 정비소</h1>
+        <p>버스 시간표가 찢어져 2시 40분 뒤의 길이 비었다. 10분 부품으로 시간 길을 다시 잇는다.</p>
       </div>
 
-      <div className="mc-mapLayout">
-        <div className="mc-cityStage" aria-label="수상한 수학도시 지도">
-          <CityMapSvg clocktowerRestored={clocktowerRestored} />
-          <div className="mc-placeButtons" aria-label="장소 목록">
-            {places.map((place) => (
-              <button
-                key={place.placeId}
-                className={`mc-placeButton mc-place-${place.status}`}
-                type="button"
-                disabled={place.status === "locked"}
-                onClick={() => {
-                  if (place.episodeId && place.canStart) onStartEpisode(place.episodeId);
-                }}
-              >
-                <span className="mc-placeStatus">{place.statusLabel}</span>
-                <strong>{place.title}</strong>
-                <small>{place.status === "restored" ? place.restoredLabel : place.mapHint}</small>
-              </button>
-            ))}
+      <div className="mc-repairLayout">
+        <section className="mc-devicePanel" aria-label="시계버스 장치">
+          <div className="mc-deviceHud">
+            <span><Clock3 size={16} aria-hidden="true" /> 현재 {stage.currentTime}</span>
+            <span>목표 {stage.targetTime}</span>
+            <span>{stageIndex + 1}/{stageCount}</span>
           </div>
-        </div>
+          <ClockBusDeviceSvg
+            stage={stage}
+            slotParts={slotParts}
+            runState={runState}
+            lensActive={lensUnlocked && lensActive}
+          />
+        </section>
 
-        <aside className="mc-mapPanel" aria-label="현재 사건">
-          <div className="mc-panelHeader">
-            <Clock3 size={20} aria-hidden="true" />
-            <span>{clocktowerRestored ? "복구 기록" : "현재 사건"}</span>
+        <aside className="mc-workbench" aria-label="수리 조작대">
+          <div className="mc-novaLine">
+            <strong>노바</strong>
+            <span>{stage.prompt}</span>
           </div>
-          {clocktowerRestored ? (
-            <>
-              <h2>시계탑 광장 복구 완료</h2>
-              <p>시간 렌즈로 두 시각 사이를 보고 버스를 3시에 출발시켰어.</p>
-              <div className="mc-nextHint">
-                <strong>다음 이상현상</strong>
-                <span>숫자 버스의 번호판에서 0만 사라졌어.</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>시계탑이 2시 40분에서 멈췄다</h2>
-              <p>버스는 3시에 출발해야 해. 현재 시각과 출발 시각을 같이 봐야 원인을 알 수 있어.</p>
-              <button className="mc-primaryAction" type="button" onClick={() => onStartEpisode("clocktower-01")}>
-                시계탑 조사하기
-              </button>
-            </>
-          )}
-          <div className="mc-panelActions">
-            <button type="button" onClick={onOpenAbilities}>
-              <Sparkles size={16} aria-hidden="true" />
-              능력 도감
+
+          <button
+            className={`mc-lensButton ${lensUnlocked ? "mc-lensReady" : ""} ${lensActive ? "mc-lensOn" : ""}`}
+            type="button"
+            disabled={!lensUnlocked}
+            aria-pressed={lensActive}
+            onClick={onToggleLens}
+          >
+            <Sparkles size={17} aria-hidden="true" />
+            {lensUnlocked ? (lensActive ? "시간 렌즈 켜짐" : "시간 렌즈 켜기") : "시간 렌즈 잠김"}
+          </button>
+
+          <div className="mc-stageCard">
+            <span>현재 장치</span>
+            <strong>{stage.title}</strong>
+            <small>{stage.currentTime}에서 {stage.targetTime}까지 빈칸을 채운다.</small>
+          </div>
+
+          <div className="mc-partTray" aria-label="10분 부품 트레이">
+            <div className="mc-sectionTitle">
+              <span>10분 부품</span>
+              <small>시간 길에 들어갈 작은 톱니들.</small>
+            </div>
+            <div className="mc-partGrid">
+              {Array.from({ length: stage.partCount }, (_, index) => {
+                const partId = `part-${index + 1}`;
+                const used = usedPartIds.has(partId);
+                return (
+                  <button
+                    key={partId}
+                    className={`mc-timePart ${selectedPartId === partId ? "mc-selected" : ""}`}
+                    type="button"
+                    disabled={used}
+                    aria-pressed={selectedPartId === partId}
+                    onClick={() => onSelectPart(partId)}
+                  >
+                    <span>10</span>
+                    <small>분</small>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mc-slotBoard" aria-label="장치 슬롯">
+            <div className="mc-sectionTitle">
+              <span>장치 슬롯</span>
+              <small>목표 뒤 붉은 칸은 지나친 시간이다.</small>
+            </div>
+            <div className="mc-slotGrid">
+              {stage.slots.map((slot) => (
+                <button
+                  key={slot.slotId}
+                  className={`mc-repairSlot mc-slot-${slot.tone} ${slotParts[slot.slotId] ? "mc-filled" : ""}`}
+                  type="button"
+                  onClick={() => onToggleSlot(slot.slotId)}
+                >
+                  <span>{slot.label}</span>
+                  <strong>{slotParts[slot.slotId] ? "10분" : "빈칸"}</strong>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mc-runControls">
+            <button className="mc-runButton" type="button" onClick={onRunDevice}>
+              <Gauge size={20} aria-hidden="true" />
+              작동
             </button>
-            <button type="button" onClick={onOpenClues}>
-              <BookOpen size={16} aria-hidden="true" />
-              단서장
+            <button className="mc-secondaryAction" type="button" onClick={onResetStage}>
+              <RotateCcw size={16} aria-hidden="true" />
+              다시 놓기
             </button>
           </div>
+
+          <div className={`mc-repairFeedback mc-feedback-${runState}`} role="status">
+            {runState === "success" ? <CheckCircle2 size={18} aria-hidden="true" /> : <Wrench size={18} aria-hidden="true" />}
+            <span>{feedback}</span>
+          </div>
+
+          {runState === "success" && stageIndex < stageCount - 1 ? (
+            <button className="mc-primaryAction" type="button" onClick={onNextStage}>
+              다음 장치
+            </button>
+          ) : null}
+
+          {completed && stageIndex === stageCount - 1 && runState === "success" ? (
+            <div className="mc-cliffhangerBox">
+              <strong>다음 고장 장치</strong>
+              <span>번호판에서 0 부품이 빠졌다. 10이 1처럼 보인다.</span>
+            </div>
+          ) : null}
         </aside>
       </div>
     </section>
   );
 }
 
-function CityMapSvg({ clocktowerRestored }: { clocktowerRestored: boolean }) {
-  return (
-    <svg className="mc-citySvg" viewBox="0 0 760 520" role="img" aria-labelledby="mc-city-title mc-city-desc">
-      <title id="mc-city-title">수상한 수학도시 지도</title>
-      <desc id="mc-city-desc">중앙 시계탑, 숫자 버스 정류장, 반쪽 빵집과 잠긴 지역이 보이는 장난감 도시 지도</desc>
-      <rect x="24" y="28" width="712" height="464" rx="28" className="mc-mapGround" />
-      <path d="M100 370 C220 270 310 410 446 308 C548 232 616 266 688 196" className="mc-road" />
-      <path d="M132 145 C234 102 330 122 424 86 C530 46 630 82 692 120" className="mc-stream" />
-      <g className={clocktowerRestored ? "mc-clocktowerRestored" : "mc-clocktowerCorrupted"} transform="translate(302 118)">
-        <rect x="44" y="116" width="92" height="152" rx="10" className="mc-towerBody" />
-        <path d="M28 116 L90 58 L152 116 Z" className="mc-towerRoof" />
-        <circle cx="90" cy="116" r="38" className="mc-clockFace" />
-        <line x1="90" y1="116" x2="90" y2="88" className="mc-clockHandHour" />
-        <line x1="90" y1="116" x2={clocktowerRestored ? "90" : "64"} y2={clocktowerRestored ? "78" : "132"} className="mc-clockHandMinute" />
-        <rect x="70" y="204" width="40" height="64" rx="6" className="mc-door" />
-        <text x="90" y="290" textAnchor="middle" className="mc-mapLabel">시계탑</text>
-      </g>
-      <g transform="translate(532 238)">
-        <rect x="0" y="58" width="132" height="74" rx="16" className="mc-busBody" />
-        <rect x="18" y="34" width="74" height="32" rx="8" className="mc-busSign" />
-        <text x="55" y="56" textAnchor="middle" className="mc-busText">{clocktowerRestored ? "0?" : "3:00"}</text>
-        <circle cx="34" cy="136" r="14" className="mc-wheel" />
-        <circle cx="102" cy="136" r="14" className="mc-wheel" />
-        <text x="66" y="172" textAnchor="middle" className="mc-mapLabel">숫자 버스</text>
-      </g>
-      <g transform="translate(112 260)">
-        <rect x="0" y="70" width="126" height="86" rx="14" className="mc-bakeryBody" />
-        <path d="M-8 76 L64 22 L136 76 Z" className="mc-bakeryRoof" />
-        <circle cx="42" cy="112" r="18" className="mc-cakeMark" />
-        <path d="M42 94 L42 130 M24 112 L60 112" className="mc-cakeLine" />
-        <text x="63" y="180" textAnchor="middle" className="mc-mapLabel">반쪽 빵집</text>
-      </g>
-      <g transform="translate(112 112)" className="mc-lockedPlace">
-        <rect x="0" y="36" width="112" height="72" rx="14" />
-        <path d="M34 36 v-12 a22 22 0 0 1 44 0 v12" />
-        <text x="56" y="136" textAnchor="middle" className="mc-mapLabel">잠긴 다리</text>
-      </g>
-    </svg>
-  );
+function getRepairFeedback(stage: RepairStage, runState: RunState): string {
+  if (runState === "short") return stage.shortLine;
+  if (runState === "overflow") return stage.overflowLine;
+  if (runState === "success") return `${stage.successLine} ${stage.memoryLine}`;
+  return "시간 길이 이어지면 버스 바퀴가 먼저 반응해.";
 }
 
-type EpisodeScreenProps = {
-  episode: Episode;
-  progress: MathCityProgress;
-  session: EpisodeSession;
-  currentTask: EpisodeTask | null;
-  onBackToMap: () => void;
-  onStartInspect: () => void;
-  onInspectObject: (objectId: string) => void;
-  canContinueInspection: boolean;
-  onContinueAfterInspect: () => void;
-  onToggleStoryChoice: (optionId: string) => void;
-  onSelectMathChoice: (optionId: string) => void;
-  onSelectTile: (tileId: string) => void;
-  onPlaceSelectedTile: (slotId: string) => void;
-  onClearPlacements: () => void;
-  onSubmitTask: () => void;
-  onShowHint: () => void;
-  onOpenAbilities: () => void;
-  onOpenClues: () => void;
-};
-
-function EpisodeScreen(props: EpisodeScreenProps) {
-  const { episode, progress, session, currentTask } = props;
-  const completed = isEpisodeCompleted(progress, episode.episodeId);
-  const placedCount = Object.keys(session.placements).length;
+function ClockBusDeviceSvg({
+  stage,
+  slotParts,
+  runState,
+  lensActive,
+}: {
+  stage: RepairStage;
+  slotParts: SlotParts;
+  runState: RunState;
+  lensActive: boolean;
+}) {
+  const filledTargetCount = stage.slots.filter((slot) => slot.tone === "target" && slotParts[slot.slotId]).length;
+  const busX = runState === "success"
+    ? 570
+    : runState === "overflow"
+      ? 658
+      : runState === "short"
+        ? 426
+        : 292 + (filledTargetCount * 68);
+  const minuteHand = runState === "success"
+    ? { x: 182, y: 78 }
+    : runState === "overflow"
+      ? { x: 214, y: 116 }
+      : filledTargetCount >= 1
+        ? { x: 112, y: 94 }
+        : { x: 86, y: 170 };
   return (
-    <section className="mc-episodeScreen" aria-labelledby="mc-episode-title">
-      <div className="mc-episodeHeader">
-        <button className="mc-textButton" type="button" onClick={props.onBackToMap}>지도 보기</button>
-        <div>
-          <p className="mc-kicker">{episode.targetMinutes} · 시간 렌즈</p>
-          <h1 id="mc-episode-title">{episode.title}</h1>
-        </div>
-      </div>
+    <svg className={`mc-repairSvg mc-run-${runState}`} viewBox="0 0 900 560" role="img" aria-labelledby="mc-device-title mc-device-desc">
+      <title id="mc-device-title">시계버스 수리 장치</title>
+      <desc id="mc-device-desc">현재 시각과 목표 시각 사이에 10분 부품을 끼워 버스를 작동시키는 장치</desc>
+      <rect x="22" y="22" width="856" height="516" rx="28" className="mc-deviceBg" />
+      <path d="M128 388 C238 334 330 386 444 340 C560 292 650 314 772 260" className="mc-deviceTrack" />
+      {lensActive ? <path d="M174 286 C296 244 474 236 658 210" className="mc-lensBeam" /> : null}
 
-      <div className="mc-episodeLayout">
-        <div className="mc-sceneWrap">
-          <ClocktowerSceneSvg
-            phase={session.phase}
-            task={currentTask}
-            inspectedObjectIds={session.inspectedObjectIds}
-            placedCount={placedCount}
-            completed={completed || session.phase === "reward"}
-            wrong={session.feedbackTone === "wrong"}
-          />
-        </div>
-        <div className="mc-bottomSheet" aria-live="polite">
-          {session.phase === "intro" ? (
-            <IntroPanel episode={episode} onStartInspect={props.onStartInspect} />
-          ) : null}
-          {session.phase === "inspect" ? (
-            <InspectPanel
-              episode={episode}
-              session={session}
-              canContinue={props.canContinueInspection}
-              onInspectObject={props.onInspectObject}
-              onContinue={props.onContinueAfterInspect}
+      <g transform="translate(72 74)">
+        <rect x="26" y="196" width="156" height="168" rx="18" className="mc-deviceTower" />
+        <path d="M6 202 L104 88 L204 202 Z" className="mc-deviceRoof" />
+        <circle cx="104" cy="202" r="78" className="mc-deviceClock" />
+        <line x1="104" y1="202" x2="104" y2="142" className="mc-hourHand" />
+        <line x1="104" y1="202" x2={minuteHand.x} y2={minuteHand.y} className="mc-minuteHand" />
+        <circle cx="104" cy="202" r="6" className="mc-pin" />
+        <text x="104" y="310" textAnchor="middle" className="mc-deviceText">현재 {stage.currentTime}</text>
+      </g>
+
+      <g transform="translate(618 80)">
+        <rect x="0" y="42" width="198" height="150" rx="18" className="mc-signBoard" />
+        <rect x="30" y="70" width="138" height="46" rx="10" className="mc-signScreen" />
+        <text x="99" y="101" textAnchor="middle" className="mc-deviceText">{stage.targetTime} 출발</text>
+        <rect x="50" y="134" width="98" height="34" rx="17" className={runState === "success" ? "mc-lightOn" : "mc-lightOff"} />
+        <text x="99" y="156" textAnchor="middle" className="mc-lightText">{runState === "success" ? "출발" : "대기"}</text>
+      </g>
+
+      <g className="mc-busRig" style={{ transform: `translate(${busX}px, 338px)` }}>
+        <rect x="0" y="38" width="154" height="78" rx="18" className="mc-repairBus" />
+        <rect x="24" y="14" width="86" height="36" rx="10" className="mc-busWindow" />
+        <text x="67" y="39" textAnchor="middle" className="mc-busTime">{runState === "overflow" ? "지나침" : "BUS"}</text>
+        <circle cx="36" cy="122" r="15" className="mc-wheel" />
+        <circle cx="118" cy="122" r="15" className="mc-wheel" />
+      </g>
+
+      <g transform="translate(178 444)">
+        {stage.slots.map((slot, index) => (
+          <g key={slot.slotId} transform={`translate(${index * 176} 0)`}>
+            <rect
+              x="0"
+              y="0"
+              width="152"
+              height="64"
+              rx="14"
+              className={`mc-deviceSlot mc-deviceSlot-${slot.tone} ${slotParts[slot.slotId] ? "mc-deviceSlotFilled" : ""}`}
             />
-          ) : null}
-          {session.phase === "task" && currentTask ? (
-            <TaskPanel
-              task={currentTask}
-              session={session}
-              onToggleStoryChoice={props.onToggleStoryChoice}
-              onSelectMathChoice={props.onSelectMathChoice}
-              onSelectTile={props.onSelectTile}
-              onPlaceSelectedTile={props.onPlaceSelectedTile}
-              onClearPlacements={props.onClearPlacements}
-              onSubmit={props.onSubmitTask}
-              onShowHint={props.onShowHint}
-            />
-          ) : null}
-          {session.phase === "reward" ? (
-            <RewardPanel
-              episode={episode}
-              onBackToMap={props.onBackToMap}
-              onOpenAbilities={props.onOpenAbilities}
-              onOpenClues={props.onOpenClues}
-            />
-          ) : null}
-          {session.feedback ? <FeedbackMessage message={session.feedback} tone={session.feedbackTone} /> : null}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ClocktowerSceneSvg({
-  phase,
-  task,
-  inspectedObjectIds,
-  placedCount,
-  completed,
-  wrong,
-}: {
-  phase: EpisodePhase;
-  task: EpisodeTask | null;
-  inspectedObjectIds: string[];
-  placedCount: number;
-  completed: boolean;
-  wrong: boolean;
-}) {
-  const showLens = phase === "task" || phase === "reward";
-  const showGap = showLens && task?.taskId !== "clocktower-clue-01";
-  const minuteHandX = completed ? 220 : 174;
-  const minuteHandY = completed ? 88 : 176;
-  return (
-    <svg className="mc-sceneSvg" viewBox="0 0 760 500" role="img" aria-labelledby="mc-scene-title mc-scene-desc">
-      <title id="mc-scene-title">시계탑 장면</title>
-      <desc id="mc-scene-desc">2시 40분에서 멈춘 시계와 3시 출발 시간표, 10분 조각을 놓는 장면</desc>
-      <rect x="26" y="28" width="708" height="438" rx="28" className="mc-sceneSky" />
-      <path d="M74 360 C190 308 284 388 400 330 C524 268 608 300 698 250" className="mc-sceneRoad" />
-      <g transform="translate(112 74)">
-        <rect x="62" y="142" width="118" height="214" rx="14" className="mc-sceneTowerBody" />
-        <path d="M40 144 L120 54 L202 144 Z" className="mc-sceneTowerRoof" />
-        <circle cx="120" cy="146" r="66" className={wrong ? "mc-sceneClock mc-sceneClockWrong" : "mc-sceneClock"} />
-        <line x1="120" y1="146" x2="120" y2="98" className="mc-sceneHourHand" />
-        <line x1="120" y1="146" x2={minuteHandX} y2={minuteHandY} className="mc-sceneMinuteHand" />
-        <circle cx="120" cy="146" r="5" className="mc-clockPin" />
-        <text x="120" y="236" textAnchor="middle" className="mc-sceneLabel">현재 2시 40분</text>
-        <rect x="96" y="284" width="48" height="72" rx="8" className="mc-sceneDoor" />
-      </g>
-      <g transform="translate(468 138)">
-        <rect x="0" y="28" width="174" height="150" rx="18" className="mc-timetableBoard" />
-        <rect x="22" y="52" width="130" height="40" rx="8" className="mc-timeRow" />
-        <text x="87" y="79" textAnchor="middle" className="mc-timeText">3:00 출발</text>
-        <rect x="40" y="112" width="94" height="34" rx="17" className={completed ? "mc-lightOn" : "mc-lightOff"} />
-        <text x="87" y="134" textAnchor="middle" className="mc-lightText">{completed ? "출발 가능" : "대기 중"}</text>
-        <text x="87" y="208" textAnchor="middle" className="mc-sceneLabel">버스 시간표</text>
-      </g>
-      {showGap ? (
-        <g className="mc-timeLensLayer" transform="translate(268 302)">
-          <rect x="0" y="0" width="230" height="72" rx="18" className="mc-timeLensBand" />
-          <text x="0" y="-14" className="mc-lensLabel">시간 렌즈</text>
-          <line x1="28" y1="38" x2="202" y2="38" className="mc-gapLine" />
-          <circle cx="28" cy="38" r="9" className="mc-gapPoint" />
-          <circle cx="115" cy="38" r="9" className={placedCount >= 1 ? "mc-gapPointFilled" : "mc-gapPoint"} />
-          <circle cx="202" cy="38" r="9" className={placedCount >= 2 || completed ? "mc-gapPointFilled" : "mc-gapPoint"} />
-          <text x="28" y="64" textAnchor="middle" className="mc-gapText">2:40</text>
-          <text x="115" y="64" textAnchor="middle" className="mc-gapText">2:50</text>
-          <text x="202" y="64" textAnchor="middle" className="mc-gapText">3:00</text>
-        </g>
-      ) : null}
-      <g className="mc-scenePeople" transform="translate(76 376)">
-        <circle cx="0" cy="0" r="12" />
-        <circle cx="36" cy="-8" r="12" />
-        <circle cx="72" cy="0" r="12" />
-      </g>
-      {inspectedObjectIds.includes("clockFace") ? <text x="132" y="58" className="mc-foundLabel">시계 단서 확인</text> : null}
-      {inspectedObjectIds.includes("busTimetable") ? <text x="506" y="120" className="mc-foundLabel">시간표 확인</text> : null}
-    </svg>
-  );
-}
-
-function IntroPanel({ episode, onStartInspect }: { episode: Episode; onStartInspect: () => void }) {
-  return (
-    <div className="mc-panelContent">
-      <p className="mc-kicker">이상현상 발견</p>
-      <h2>{episode.subtitle}</h2>
-      {episode.introDialog.map((line) => <p key={line}>{line}</p>)}
-      <button className="mc-primaryAction" type="button" onClick={onStartInspect}>
-        단서 찾기
-      </button>
-    </div>
-  );
-}
-
-function InspectPanel({
-  episode,
-  session,
-  canContinue,
-  onInspectObject,
-  onContinue,
-}: {
-  episode: Episode;
-  session: EpisodeSession;
-  canContinue: boolean;
-  onInspectObject: (objectId: string) => void;
-  onContinue: () => void;
-}) {
-  return (
-    <div className="mc-panelContent">
-      <p className="mc-kicker">장면 관찰</p>
-      <h2>{episode.inspection.prompt}</h2>
-      <div className="mc-inspectGrid">
-        {episode.inspection.objects.map((object) => {
-          const selected = session.inspectedObjectIds.includes(object.objectId);
-          return (
-            <button
-              key={object.objectId}
-              className={`mc-inspectButton ${selected ? "mc-selected" : ""}`}
-              type="button"
-              onClick={() => onInspectObject(object.objectId)}
-            >
-              <Eye size={17} aria-hidden="true" />
-              <span>{object.label}</span>
-            </button>
-          );
-        })}
-      </div>
-      <button className="mc-primaryAction" type="button" disabled={!canContinue} onClick={onContinue}>
-        두 단서를 함께 보기
-      </button>
-    </div>
-  );
-}
-
-function TaskPanel({
-  task,
-  session,
-  onToggleStoryChoice,
-  onSelectMathChoice,
-  onSelectTile,
-  onPlaceSelectedTile,
-  onClearPlacements,
-  onSubmit,
-  onShowHint,
-}: {
-  task: EpisodeTask;
-  session: EpisodeSession;
-  onToggleStoryChoice: (optionId: string) => void;
-  onSelectMathChoice: (optionId: string) => void;
-  onSelectTile: (tileId: string) => void;
-  onPlaceSelectedTile: (slotId: string) => void;
-  onClearPlacements: () => void;
-  onSubmit: () => void;
-  onShowHint: () => void;
-}) {
-  return (
-    <div className="mc-panelContent">
-      <p className="mc-kicker">{task.title}</p>
-      <h2>{task.prompt}</h2>
-      {task.type === "storyChoice" ? (
-        <div className="mc-choiceGrid">
-          {task.choices.map((choice) => (
-            <button
-              key={choice.optionId}
-              type="button"
-              className={`mc-choiceButton ${session.selectedChoiceIds.includes(choice.optionId) ? "mc-selected" : ""}`}
-              onClick={() => onToggleStoryChoice(choice.optionId)}
-              aria-pressed={session.selectedChoiceIds.includes(choice.optionId)}
-            >
-              {choice.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {task.type === "mathChoice" ? (
-        <div className="mc-choiceGrid">
-          {task.choices.map((choice) => (
-            <button
-              key={choice.optionId}
-              type="button"
-              className={`mc-choiceButton ${session.selectedChoiceId === choice.optionId ? "mc-selected" : ""}`}
-              onClick={() => onSelectMathChoice(choice.optionId)}
-              aria-pressed={session.selectedChoiceId === choice.optionId}
-            >
-              {choice.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {task.type === "dragArrange" ? (
-        <DragArrangePanel
-          task={task}
-          session={session}
-          onSelectTile={onSelectTile}
-          onPlaceSelectedTile={onPlaceSelectedTile}
-          onClearPlacements={onClearPlacements}
-        />
-      ) : null}
-      <div className="mc-taskActions">
-        <button className="mc-secondaryAction" type="button" onClick={onShowHint}>
-          <Lightbulb size={16} aria-hidden="true" />
-          힌트
-        </button>
-        <button className="mc-primaryAction" type="button" onClick={onSubmit}>
-          확인
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function DragArrangePanel({
-  task,
-  session,
-  onSelectTile,
-  onPlaceSelectedTile,
-  onClearPlacements,
-}: {
-  task: DragArrangeTask;
-  session: EpisodeSession;
-  onSelectTile: (tileId: string) => void;
-  onPlaceSelectedTile: (slotId: string) => void;
-  onClearPlacements: () => void;
-}) {
-  const usedTileIds = new Set(Object.values(session.placements));
-  return (
-    <div className="mc-dragPanel">
-      <div className="mc-modelLine">{task.modelLine}</div>
-      <div className="mc-tileRow" aria-label="10분 조각">
-        {task.tiles.map((tile) => (
-          <button
-            key={tile.tileId}
-            type="button"
-            className={`mc-timeTile ${session.selectedTileId === tile.tileId ? "mc-selected" : ""}`}
-            disabled={usedTileIds.has(tile.tileId)}
-            onClick={() => onSelectTile(tile.tileId)}
-          >
-            {tile.label}
-          </button>
+            <text x="76" y="25" textAnchor="middle" className="mc-slotText">{slot.label}</text>
+            <text x="76" y="48" textAnchor="middle" className="mc-slotPartText">{slotParts[slot.slotId] ? "10분 장착" : "빈칸"}</text>
+          </g>
         ))}
-      </div>
-      <div className="mc-slotRow" aria-label="시간 칸">
-        {task.slots.map((slot) => {
-          const placedTile = task.tiles.find((tile) => tile.tileId === session.placements[slot.slotId]);
-          return (
-            <button key={slot.slotId} type="button" className="mc-timeSlot" onClick={() => onPlaceSelectedTile(slot.slotId)}>
-              <span>{slot.label}</span>
-              <strong>{placedTile?.label ?? "빈칸"}</strong>
-            </button>
-          );
-        })}
-      </div>
-      <p className="mc-mathSentence">{task.mathSentence}</p>
-      <button className="mc-textButton" type="button" onClick={onClearPlacements}>
-        <RotateCcw size={15} aria-hidden="true" />
-        조각 다시 놓기
-      </button>
-    </div>
+      </g>
+    </svg>
   );
 }
 
-function FeedbackMessage({ message, tone }: { message: string; tone: FeedbackTone }) {
-  return (
-    <div className={`mc-feedback mc-feedback-${tone}`} role="status">
-      {tone === "success" ? <CheckCircle2 size={17} aria-hidden="true" /> : null}
-      <span>{message}</span>
-    </div>
-  );
-}
-
-function RewardPanel({
-  episode,
-  onBackToMap,
-  onOpenAbilities,
-  onOpenClues,
-}: {
-  episode: Episode;
-  onBackToMap: () => void;
-  onOpenAbilities: () => void;
-  onOpenClues: () => void;
-}) {
-  const ability = mathCityRegistry.abilitiesById[episode.abilityRewardId];
-  const clue = mathCityRegistry.cluesById[episode.clueRewardId];
-  return (
-    <div className="mc-panelContent">
-      <p className="mc-kicker">장소 복구</p>
-      <h2>{episode.completion.restoredLine}</h2>
-      <div className="mc-rewardGrid">
-        <article className="mc-rewardItem">
-          <Sparkles size={20} aria-hidden="true" />
-          <strong>{ability.name}</strong>
-          <span>{ability.actionVerb}</span>
-        </article>
-        <article className="mc-rewardItem">
-          <BookOpen size={20} aria-hidden="true" />
-          <strong>{clue.title}</strong>
-          <span>{episode.completion.nextQuestion}</span>
-        </article>
-      </div>
-      <p className="mc-memoryLine">{episode.completion.memoryLine}</p>
-      <p>{episode.completion.cliffhanger}</p>
-      <div className="mc-taskActions">
-        <button className="mc-primaryAction" type="button" onClick={onBackToMap}>지도 보기</button>
-        <button className="mc-secondaryAction" type="button" onClick={onOpenAbilities}>능력 보기</button>
-        <button className="mc-secondaryAction" type="button" onClick={onOpenClues}>단서 보기</button>
-      </div>
-    </div>
-  );
-}
-
-function AbilityScreen({ progress, onBackToMap }: { progress: MathCityProgress; onBackToMap: () => void }) {
+function AbilityScreen({ progress, onBackToRepair }: { progress: MathCityProgress; onBackToRepair: () => void }) {
   const abilities = Object.values(mathCityRegistry.abilitiesById);
   return (
     <section className="mc-libraryScreen" aria-labelledby="mc-ability-title">
-      <button className="mc-textButton" type="button" onClick={onBackToMap}>지도 보기</button>
-      <h1 id="mc-ability-title">개념 능력 도감</h1>
+      <button className="mc-textButton" type="button" onClick={onBackToRepair}>수리 장치 보기</button>
+      <h1 id="mc-ability-title">능력 도구함</h1>
       <div className="mc-libraryGrid">
         {abilities.map((ability) => {
           const owned = progress.ownedAbilityIds.includes(ability.abilityId);
           return (
             <article className={`mc-libraryItem ${owned ? "mc-owned" : ""}`} key={ability.abilityId}>
               <Sparkles size={22} aria-hidden="true" />
-              <p>{owned ? "획득" : "잠김"}</p>
+              <p>{owned ? "설치됨" : "수리하면 설치됨"}</p>
               <h2>{ability.name}</h2>
               <span>{ability.conceptLabel}</span>
               <strong>{ability.childMemoryLine}</strong>
@@ -860,22 +600,22 @@ function AbilityScreen({ progress, onBackToMap }: { progress: MathCityProgress; 
   );
 }
 
-function ClueScreen({ progress, onBackToMap }: { progress: MathCityProgress; onBackToMap: () => void }) {
+function ClueScreen({ progress, onBackToRepair }: { progress: MathCityProgress; onBackToRepair: () => void }) {
   const clues = Object.values(mathCityRegistry.cluesById);
   return (
     <section className="mc-libraryScreen" aria-labelledby="mc-clue-title">
-      <button className="mc-textButton" type="button" onClick={onBackToMap}>지도 보기</button>
-      <h1 id="mc-clue-title">단서장</h1>
+      <button className="mc-textButton" type="button" onClick={onBackToRepair}>수리 장치 보기</button>
+      <h1 id="mc-clue-title">다음 고장 단서</h1>
       <div className="mc-libraryGrid">
         {clues.map((clue) => {
           const found = progress.foundClueIds.includes(clue.clueId);
           return (
             <article className={`mc-libraryItem mc-clueCard ${found ? "mc-owned" : ""}`} key={clue.clueId}>
               <BookOpen size={22} aria-hidden="true" />
-              <p>{found ? "발견" : "아직 못 찾음"}</p>
+              <p>{found ? "발견" : "아직 잠김"}</p>
               <h2>{clue.title}</h2>
-              <span>{found ? clue.text : "시계탑 아래에서 무언가를 찾을 수 있을 것 같아."}</span>
-              <strong>{found ? clue.childQuestion : "먼저 시계탑을 고쳐 보자."}</strong>
+              <span>{found ? clue.text : "시계버스 장치를 마지막까지 작동시키면 열린다."}</span>
+              <strong>{found ? clue.childQuestion : "다음 장치는 0 부품이 빠진 번호판이다."}</strong>
             </article>
           );
         })}
@@ -891,7 +631,7 @@ function SettingsScreen({
   onConfirmReset,
   onCancelReset,
   onReset,
-  onBackToMap,
+  onBackToRepair,
 }: {
   progress: MathCityProgress;
   confirmReset: boolean;
@@ -899,17 +639,17 @@ function SettingsScreen({
   onConfirmReset: () => void;
   onCancelReset: () => void;
   onReset: () => void;
-  onBackToMap: () => void;
+  onBackToRepair: () => void;
 }) {
   return (
     <section className="mc-settingsScreen" aria-labelledby="mc-settings-title">
-      <button className="mc-textButton" type="button" onClick={onBackToMap}>지도 보기</button>
+      <button className="mc-textButton" type="button" onClick={onBackToRepair}>수리 장치 보기</button>
       <h1 id="mc-settings-title">설정</h1>
       <div className="mc-settingsList">
         <label className="mc-toggleRow">
           <span>
             <strong>소리</strong>
-            <small>소리 없이도 모든 단서를 볼 수 있어.</small>
+            <small>소리 없이도 모든 장치 반응을 볼 수 있어.</small>
           </span>
           <input
             type="checkbox"
@@ -920,7 +660,7 @@ function SettingsScreen({
         <label className="mc-toggleRow">
           <span>
             <strong>글자 크게</strong>
-            <small>문장과 버튼을 더 크게 보여줘.</small>
+            <small>장치 문구와 버튼을 더 크게 보여줘.</small>
           </span>
           <input
             type="checkbox"
@@ -931,7 +671,7 @@ function SettingsScreen({
         <label className="mc-toggleRow">
           <span>
             <strong>모션 줄이기</strong>
-            <small>바늘 이동 대신 정지 상태 변화로 보여줘.</small>
+            <small>버스 이동 대신 상태 변화로 보여줘.</small>
           </span>
           <input
             type="checkbox"
@@ -942,9 +682,9 @@ function SettingsScreen({
       </div>
       <div className="mc-resetBox">
         <h2>이 브라우저의 진행 초기화</h2>
-        <p>이름이나 학년은 저장하지 않아. 완료한 에피소드, 능력, 단서만 이 브라우저에 남아.</p>
+        <p>이름이나 학년은 저장하지 않아. 수리한 장치, 능력, 단서만 이 브라우저에 남아.</p>
         {confirmReset ? (
-          <div className="mc-taskActions">
+          <div className="mc-runControls">
             <button className="mc-secondaryAction" type="button" onClick={onCancelReset}>취소</button>
             <button className="mc-primaryAction mc-dangerAction" type="button" onClick={onReset}>초기화</button>
           </div>
