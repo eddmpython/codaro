@@ -48,8 +48,8 @@ route
 export const mathCityRegistry = {
   registryVersion: 1,
   schemaVersion: 1,
-  contentVersion: "mvp-001",
-  assetsVersion: "mvp-assets-001",
+  contentVersion: "core-001",
+  assetsVersion: "core-assets-001",
   routePath: "/math-city",
   storageKey: "suspiciousMathCity.progress.v1",
   seasonsById,

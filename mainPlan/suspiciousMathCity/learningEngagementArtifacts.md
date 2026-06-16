@@ -65,7 +65,7 @@
 ```js
 const artifactRegistry = {
   schemaVersion: 1,
-  contentVersion: "mvp-001",
+  contentVersion: "core-001",
   routePath: "/math-city",
   storageKey: "suspiciousMathCity.progress.v1",
   anomalyCards: [],
@@ -85,7 +85,7 @@ const artifactRegistry = {
 ```js
 const progress = {
   schemaVersion: 1,
-  contentVersion: "mvp-001",
+  contentVersion: "core-001",
   completedEpisodeIds: ["clocktower-01"],
   ownedAbilityIds: ["time-lens"],
   restoredWorldStateIds: ["clocktower-fixed"],

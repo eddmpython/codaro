@@ -67,6 +67,8 @@ landing/
 https://eddmpython.github.io/codaro/math-city
 ```
 
+구현 착수 기준은 [implementationAcceptanceCriteria.md](implementationAcceptanceCriteria.md)를 따른다. 시계탑 1편의 runtime 데이터는 [clocktowerEpisodePack.md](clocktowerEpisodePack.md)를 기준으로 작성하고, 화면/에셋/접근성은 [coreSliceProductionLock.md](coreSliceProductionLock.md)를 우선한다.
+
 ## 2. 아키텍처
 
 브라우저 안에서 닫힌 구조로 만든다.
@@ -84,7 +86,6 @@ data/registry.ts
 | 파일 | 책임 |
 | --- | --- |
 | `data/registry.ts` | 에피소드, 능력, 단서, 지도, 오브젝트, 에셋, 모션을 묶는 정적 registry |
-| `data/seasons/*.ts` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
 | `data/seasons/*.ts` | 시즌 질문, 개념 범위, 장소 목록, finale 조건 |
 | `data/episodes/*.ts` | 에피소드별 World Math Beat 데이터 |
 | `data/artifacts/*.ts` | 능력 카드, 단서 카드, 복구 기록, 재방문 초대 |
@@ -280,7 +281,7 @@ export const episodes = [
     requiredConcepts: ["time-reading", "addition-basic"],
     abilityReward: "time-lens",
     worldChange: "clocktower-fixed",
-    clueReward: "zero-is-missing",
+    clueReward: "zero-placeholder-note",
     cliffhanger: {
       closedLoop: "시계탑은 다시 움직이고, 버스는 3시에 출발할 수 있게 됐다.",
       newQuestion: "그런데 밤이 되자 번호판에서 0만 사라졌다.",
@@ -529,19 +530,40 @@ uv run python -X utf8 tests/run.py gate math-city-visual
 
 ## 13. 첫 구현 순서
 
-1. `/math-city` route와 빈 shell.
-2. prerender와 sitemap URL 추가.
-3. 진행 저장 `progressStore`.
-4. `registryValidation`과 기본 registry.
-5. TypeScript game boundary.
-6. 정적 지도와 장소 상태.
-7. 에피소드 1 Episode Pack 데이터.
-8. `World Math Beat` 기반 `storyChoice`, `mathChoice`, `dragArrange` task.
-9. 끌기 대체 조작과 키보드 경로.
-10. 에피소드 완료와 보상 반영.
-11. 도감과 단서장.
-12. 접근성 설정 `largeText`, `reducedMotion`.
-13. 스토리북/워크북/활동지 adapter 필드.
-14. visual smoke 뷰포트 검수.
-15. 에피소드 2, 3 추가.
-16. 시각 디테일 보강.
+1. T-01 `/math-city` route와 빈 shell.
+2. T-02 TypeScript game boundary.
+3. T-03 registry schema와 시계탑 fixture.
+4. T-04 `registryValidation`.
+5. T-05/T-06 진행 저장 `progressStore`.
+6. T-07 저장 실패 경로.
+7. T-11 정적 지도와 장소 상태.
+8. T-18 시계탑 Episode Pack runtime 데이터.
+9. T-08 quest engine.
+10. T-09 `storyChoice`, `mathChoice`, `dragArrange` task.
+11. T-10 끌기 대체 조작과 키보드 경로.
+12. T-12 도감, 단서장, 완료 보상.
+13. T-13 asset manifest.
+14. T-14 스토리북/워크북/활동지 adapter 필드.
+15. T-15/T-16/T-17 browser, accessibility, visual smoke.
+16. 시계탑 Product Core Slice가 통과한 뒤 에피소드 2, 3 추가.
+
+## 14. 구현 착수 잠금
+
+Phase 1은 아래 문서가 서로 어긋나지 않는 상태에서만 시작한다.
+
+| 기준 | 문서 |
+| --- | --- |
+| 제품 완료 판정 | [prdCompletionCriteria.md](prdCompletionCriteria.md) |
+| 첫 에피소드 기준본 | [clocktowerEpisodePack.md](clocktowerEpisodePack.md) |
+| 화면/에셋/접근성 제작 잠금 | [coreSliceProductionLock.md](coreSliceProductionLock.md) |
+| 구현 티켓과 gate | [implementationAcceptanceCriteria.md](implementationAcceptanceCriteria.md) |
+
+구현 중 충돌이 나면 우선순위는 다음과 같다.
+
+```text
+개인정보 없음 원칙
+→ 접근성 완료 조건
+→ 시계탑 Episode Pack
+→ 구현 인수조건
+→ 시각 polish
+```
