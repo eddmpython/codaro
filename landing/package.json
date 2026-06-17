@@ -5,11 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "typecheck:math-city": "tsc --noEmit -p tsconfig.math-city.json",
     "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js",
-    "build": "npm run typecheck:math-city && vite build",
+    "build": "vite build",
     "postbuild": "node scripts/prerenderReact.js && node scripts/postbuild.js",
-    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && npm run typecheck:math-city && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
+    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
     "preview": "vite preview"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -25,10 +25,8 @@ import { posts, postCategories, postSeries } from "./lib/generated/posts.js";
 import { sharePacks } from "./lib/sharePacks.js";
 import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
-import "./apps/suspiciousMathCity/styles/mathCity.css";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
-const MathCityApp = lazy(() => import("./apps/suspiciousMathCity/MathCityApp"));
 
 const surfaces = [
   {
@@ -317,18 +315,6 @@ function Header({ onNavigate, themeMode, onToggleTheme }) {
   );
 }
 
-function MathCityFallback() {
-  return (
-    <main className="mathCityRoot mc-gameRoot">
-      <section className="mc-loadingScreen" aria-label="수상한 수학도시 불러오기">
-        <p>수상한 수학도시</p>
-        <h1>시계버스 정비소</h1>
-        <span>게임 장치를 불러오는 중...</span>
-      </section>
-    </main>
-  );
-}
-
 function Footer() {
   return (
     <footer className="siteFooter">
@@ -402,21 +388,6 @@ function resolveRoute(path) {
         url: "/",
       },
       element: <HomePage />,
-    };
-  }
-  if (path === "/math-city") {
-    return {
-      meta: {
-        title: "수상한 수학도시",
-        description: "초등학생이 수학 개념을 능력처럼 획득하고 도시의 이상현상을 해결하는 무료 브라우저 수학 어드벤처.",
-        url: "/math-city",
-      },
-      element: (
-        <Suspense fallback={<MathCityFallback />}>
-          <MathCityApp />
-        </Suspense>
-      ),
-      hideChrome: true,
     };
   }
   if (path === "/docs") return docsIndexRoute();

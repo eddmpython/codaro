@@ -60,7 +60,6 @@ REQUIRED_ROOT_DIRS = {
     "editor",
     "landing",
     "launcher",
-    "mainPlan",
     "notebooks",
     "src",
     "tests",
