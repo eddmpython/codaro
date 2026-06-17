@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, extname, posix, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import matter from "gray-matter";
 import { marked } from "marked";
+import { parse as parseYaml } from "yaml";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..", "..");
@@ -68,6 +68,23 @@ function escapeForModule(value) {
   return JSON.stringify(value, null, 2);
 }
 
+function parseFrontmatter(raw, filePath) {
+  const normalized = raw.replace(/^\uFEFF/, "");
+  const match = /^---\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(normalized);
+  if (!match) {
+    return { data: {}, content: normalized };
+  }
+
+  const data = parseYaml(match[1]) ?? {};
+  if (typeof data !== "object" || Array.isArray(data)) {
+    throw new Error(`Invalid frontmatter object in ${filePath}`);
+  }
+  return {
+    data,
+    content: normalized.slice(match[0].length),
+  };
+}
+
 function docsContentModuleName(pathValue) {
   const digest = createHash("sha1").update(pathValue || "index").digest("hex").slice(0, 12);
   return `page${digest}`;
@@ -90,7 +107,7 @@ function collectBlogPosts() {
       }
       const filePath = resolve(categoryPath, postEntry.name, "index.md");
       const raw = readFileSync(filePath, "utf-8");
-      const parsed = matter(raw);
+      const parsed = parseFrontmatter(raw, filePath);
       const slug = postEntry.name.replace(/^\d+-/, "");
       const fileMeta = parsed.data;
       const requiredFields = ["title", "date", "description", "category", "series", "seriesOrder", "thumbnail", "cardPreview"];
@@ -218,7 +235,7 @@ function collectDocsPages() {
   const pages = [];
   for (const filePath of walkDocs(docsRoot)) {
     const raw = readFileSync(filePath, "utf-8");
-    const parsed = matter(raw);
+    const parsed = parseFrontmatter(raw, filePath);
     const fileMeta = parsed.data;
     const requiredFields = ["title", "description", "section", "order"];
     for (const field of requiredFields) {
