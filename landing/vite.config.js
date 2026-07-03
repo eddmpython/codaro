@@ -21,7 +21,7 @@ export default defineConfig({
           if (id.includes("node_modules/lucide-react")) {
             return "vendor-icons";
           }
-          if (id.includes("node_modules/marked") || id.includes("node_modules/gray-matter") || id.includes("node_modules/yaml")) {
+          if (id.includes("node_modules/marked") || id.includes("node_modules/yaml")) {
             return "vendor-markdown";
           }
           if (id.includes("node_modules/pdf-lib") || id.includes("node_modules/pdfjs-dist") || id.includes("node_modules/fflate")) {
