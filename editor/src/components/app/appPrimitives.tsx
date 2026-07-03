@@ -69,7 +69,7 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
     <div className="overflow-hidden rounded-md border bg-code shadow-inner" data-code-payload="snippet">
       <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background/35 px-3 py-2">
         <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium uppercase text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-emerald-400" />
+          <span className="size-1.5 rounded-full bg-muted-foreground/50" />
           <span className="truncate">{resolvedLabel}</span>
         </div>
         <Button

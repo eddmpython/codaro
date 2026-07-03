@@ -2,6 +2,7 @@ import {
   Languages,
   Loader2,
   Moon,
+  Palette,
   Search,
   Settings,
   Sun,
@@ -11,6 +12,7 @@ import {
 import { AutomationSidebarTree } from "@/components/app/automationSidebarTree";
 import { CurriculumSidebarTree } from "@/components/app/curriculumSidebarTree";
 import { ProductFlowNav } from "@/components/app/productFlowNav";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
@@ -26,7 +28,8 @@ import {
 } from "@/components/ui/sidebar";
 import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
 import { useLocale } from "@/lib/localeContext";
-import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
+import { cn } from "@/lib/utils";
+import { ACCENT_COLORS, type AccentColor, type AutomationSection, type SurfaceMode, type ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
 
 type ProductSidebarProps = {
@@ -44,6 +47,7 @@ type ProductSidebarProps = {
   selectedCustomCurriculumId: string;
   selectedContentId: string;
   themeMode: ThemeMode;
+  accentColor: AccentColor;
   aiConnecting: boolean;
   onQueryChange: (value: string) => void;
   onConnectProvider: () => void;
@@ -54,8 +58,18 @@ type ProductSidebarProps = {
   onDeleteCustomCurriculum: (id: string) => void;
   onSurfaceChange: (surface: SurfaceMode) => void;
   onToggleTheme: () => void;
+  onSelectAccentColor: (value: AccentColor) => void;
   terminalOpen: boolean;
   onToggleTerminal: () => void;
+};
+
+// 스와치 표시용 고정 색 — index.css html[data-accent] 팔레트의 라이트 값과 동일(oklch).
+const ACCENT_SWATCHES: Record<AccentColor, { label: string; swatch: string }> = {
+  zinc: { label: "기본", swatch: "oklch(0.552 0.016 285.938)" },
+  blue: { label: "블루", swatch: "oklch(0.546 0.245 262.881)" },
+  indigo: { label: "인디고", swatch: "oklch(0.511 0.262 276.966)" },
+  violet: { label: "바이올렛", swatch: "oklch(0.541 0.281 293.009)" },
+  teal: { label: "틸", swatch: "oklch(0.511 0.096 186.391)" },
 };
 
 export function ProductSidebar({
@@ -73,6 +87,7 @@ export function ProductSidebar({
   selectedCustomCurriculumId,
   selectedContentId,
   themeMode,
+  accentColor,
   aiConnecting,
   onQueryChange,
   onConnectProvider,
@@ -83,6 +98,7 @@ export function ProductSidebar({
   onDeleteCustomCurriculum,
   onSurfaceChange,
   onToggleTheme,
+  onSelectAccentColor,
   terminalOpen,
   onToggleTerminal,
 }: ProductSidebarProps) {
@@ -123,6 +139,38 @@ export function ProductSidebar({
           >
             {themeMode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
+          <Popover>
+            <PopoverTrigger
+              aria-label="강조 색상 선택"
+              className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
+              title="강조 색상"
+            >
+              <Palette className="size-4" />
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto p-3" data-accent-palette="true">
+              <div className="text-xs font-medium text-muted-foreground">강조 색상</div>
+              <div className="mt-2 flex items-center gap-2">
+                {ACCENT_COLORS.map((value) => {
+                  const { label, swatch } = ACCENT_SWATCHES[value];
+                  return (
+                    <button
+                      aria-label={label}
+                      className={cn(
+                        "size-6 rounded-full border border-border transition-transform hover:scale-110",
+                        accentColor === value && "ring-2 ring-ring ring-offset-2 ring-offset-popover",
+                      )}
+                      data-accent-swatch={value}
+                      key={value}
+                      style={{ backgroundColor: swatch }}
+                      title={label}
+                      type="button"
+                      onClick={() => onSelectAccentColor(value)}
+                    />
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
           <button
             aria-label={localeLabel}
             className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"

@@ -401,7 +401,7 @@ def jsStructuredCardReady() -> str:
 
 
 def jsLearningOverviewReady() -> str:
-    return "Boolean(document.querySelector('[data-learning-overview=\"true\"] [data-learning-workflow-diagram=\"true\"]'))"
+    return "Boolean(document.querySelector('[data-learning-overview=\"true\"] [data-learning-overview-part=\"learn-list\"]'))"
 
 
 def jsAssertLearningOverview(viewport: str) -> str:
@@ -409,61 +409,59 @@ def jsAssertLearningOverview(viewport: str) -> str:
 (() => {{
   const overview = document.querySelector('[data-learning-overview="true"]');
   if (!overview) throw new Error('learning overview not found');
+  const title = overview.querySelector('[data-learning-overview-part="title"]');
+  if (!title || !(title.textContent || '').trim()) throw new Error('learning title is missing');
   const direction = overview.querySelector('[data-learning-overview-part="direction"]');
   if (!direction || !(direction.textContent || '').includes('DataFrame 생성부터 직접 입력 실습과 검증까지')) {{
     throw new Error('learning direction is missing or incorrect');
   }}
-  const benefits = Array.from(overview.querySelectorAll('[data-learning-overview-part="benefit"]'));
-  if (!benefits.some((item) => (item.textContent || '').includes('작은 카드 반복 없이 섹션 흐름'))) {{
-    throw new Error('learning benefit is missing');
+  const learnList = overview.querySelector('[data-learning-overview-part="learn-list"]');
+  if (!learnList) throw new Error('learn list is missing');
+  if (!(learnList.textContent || '').includes('오늘 배우는 것')) {{
+    throw new Error('learn list heading is missing');
   }}
-  const diagram = overview.querySelector('[data-learning-workflow-diagram="true"]');
-  if (!diagram || !(diagram.textContent || '').includes('실무 흐름')) {{
-    throw new Error('workflow diagram is missing');
+  const learnRows = Array.from(learnList.querySelectorAll('li'));
+  if (learnRows.length < 1) throw new Error('learn list rows are missing');
+  if (!(learnList.textContent || '').includes('DataFrame 만들기')) {{
+    throw new Error('learn list should surface section titles');
   }}
-  if ((diagram.textContent || '').includes('학습 아키텍처')) {{
-    throw new Error('old generic architecture label remains');
+  const startButton = overview.querySelector('[data-learning-overview-start="true"]');
+  if (!startButton) throw new Error('start button is missing');
+  if (!(startButton.textContent || '').includes('학습 시작')) throw new Error('start button copy is missing');
+  if (overview.querySelector('[data-learning-workflow-diagram="true"], [data-learning-workflow-step="true"]')) {{
+    throw new Error('workflow diagram should be removed');
   }}
-  if (!overview.querySelector('[data-learning-overview-blueprint="true"]')) {{
-    throw new Error('learning overview blueprint texture is missing');
+  if (overview.querySelector('[data-learning-overview-blueprint="true"], [data-learning-overview-rail="true"]')) {{
+    throw new Error('blueprint texture and rail should be removed');
   }}
-  if (!overview.querySelector('[data-learning-overview-rail="true"]')) {{
-    throw new Error('learning overview rail is missing');
+  if (overview.querySelector('[data-learning-overview-part="benefit"]')) {{
+    throw new Error('benefits grid should be removed');
   }}
-  const steps = Array.from(diagram.querySelectorAll('[data-learning-workflow-step="true"]'));
-  if (steps.length < 3) throw new Error('workflow steps are missing');
-  const workflowText = diagram.textContent || '';
-  const requiredSteps = ['DataFrame 입력 확인', 'DataFrame 처리 실행', 'sales 결과 검증'];
-  const missingSteps = requiredSteps.filter((step) => !workflowText.includes(step));
-  if (missingSteps.length) throw new Error('missing workflow steps: ' + missingSteps.join(', '));
-  ['목표', '스니펫', '실행'].forEach((genericStep) => {{
-    if (steps.some((step) => (step.textContent || '').trim() === genericStep)) {{
-      throw new Error('generic workflow step rendered: ' + genericStep);
-    }}
-  }});
+  const litColor = /(emerald|rose|amber|violet|sky|orange|cyan|indigo|fuchsia|zinc|slate|gray)-[0-9]/;
+  const surfaceRoots = [overview, ...Array.from(document.querySelectorAll('[data-learning-section-card]'))];
+  for (const root of surfaceRoots) {{
+    const offender = [root, ...Array.from(root.querySelectorAll('[class]'))]
+      .find((item) => litColor.test(item.getAttribute('class') || ''));
+    if (offender) throw new Error('literal color class in curriculum surface: ' + offender.getAttribute('class'));
+  }}
 
   const overviewRect = overview.getBoundingClientRect();
-  const diagramRect = diagram.getBoundingClientRect();
   if (overviewRect.width < Math.min(320, window.innerWidth - 24)) {{
     throw new Error('overview width is unexpectedly small: ' + overviewRect.width);
   }}
-  if (diagramRect.width <= 0 || diagramRect.height <= 0) {{
-    throw new Error('learning diagram has no visible size');
-  }}
-  if (diagramRect.left < overviewRect.left - 1 || diagramRect.right > overviewRect.right + 1) {{
-    throw new Error('learning diagram escapes overview');
-  }}
-
-  const visibleBands = [direction, ...benefits, diagram].filter(Boolean).map((item) => item.getBoundingClientRect());
+  const visibleBands = [title, direction, learnList, startButton].filter(Boolean).map((item) => item.getBoundingClientRect());
   visibleBands.forEach((rect, index) => {{
     if (rect.width <= 0 || rect.height <= 0) throw new Error('empty overview band at ' + index);
+    if (rect.left < overviewRect.left - 1 || rect.right > overviewRect.right + 1) {{
+      throw new Error('overview band escapes overview at ' + index);
+    }}
   }});
 
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
-    title: (overview.querySelector('[data-learning-overview-part="title"]')?.textContent || '').trim(),
-    benefitCount: benefits.length,
-    steps: steps.length,
+    title: (title.textContent || '').trim(),
+    learnRows: learnRows.length,
+    startButton: true,
   }});
 }})()
 """)
@@ -524,8 +522,8 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
   const bands = [
     card.querySelector(':scope > button'),
     card.querySelector(':scope > [data-learning-section-part="overview"]'),
-    card.querySelector(':scope > div.divide-y > [data-learning-section-part="snippet"]'),
-    card.querySelector(':scope > div.divide-y > [data-learning-section-part="exercise"]'),
+    card.querySelector('[data-learning-section-part="snippet"]'),
+    card.querySelector('[data-learning-section-part="exercise"]'),
   ].filter(Boolean);
   if (bands.length !== 4) throw new Error('band count ' + bands.length);
 
@@ -534,10 +532,7 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
   const sectionHeading = header.querySelector('[data-learning-section-heading="true"]');
   if (!sectionIndex || !sectionHeading) throw new Error('header marker missing');
   const indexRect = sectionIndex.getBoundingClientRect();
-  const headingRect = sectionHeading.getBoundingClientRect();
-  if (Math.abs(indexRect.height - headingRect.height) > 2) {{
-    throw new Error('index height mismatch');
-  }}
+  if (indexRect.width <= 0 || indexRect.height <= 0) throw new Error('section index invisible');
 
   const rects = bands.map((item) => item.getBoundingClientRect());
   rects.forEach((rect, index) => {{
@@ -613,8 +608,9 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!snippetBox) throw new Error('snippet box missing');
   const copyButton = snippetBox.querySelector('[data-code-payload-copy="true"]');
   if (!copyButton) throw new Error('copy missing');
-  if (!(snippet.textContent || '').includes('예제 스니펫')) {{
-    throw new Error('snippet section label missing');
+  const snippetKicker = snippet.querySelector('[data-learning-snippet-kicker="true"]');
+  if (!snippetKicker || !(snippetKicker.textContent || '').includes('예제')) {{
+    throw new Error('snippet kicker missing');
   }}
   if (!(snippetBox.textContent || '').includes('코드')) {{
     throw new Error('snippet code label missing');
@@ -624,10 +620,10 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!['ready', 'selected'].includes(exerciseInput.getAttribute('data-learning-exercise-input-state') || '')) {{
     throw new Error('student practice state missing');
   }}
-  if (!(exerciseInput.getAttribute('aria-label') || '').includes('직접 입력 실습 코드 편집기')) {{
+  if (!(exerciseInput.getAttribute('aria-label') || '').includes('직접 해보기 코드 편집기')) {{
     throw new Error('student practice aria label missing');
   }}
-  if (!(exercise.textContent || '').includes('직접 입력 실습')) {{
+  if (!(exercise.textContent || '').includes('직접 해보기')) {{
     throw new Error('student practice section label missing');
   }}
   if ((exercise.textContent || '').includes('Python 실습 코드')) {{
@@ -704,8 +700,8 @@ def jsAssertLearningVisualIntegrity(viewport: str) -> str:
   const selectors = [
     '[data-learning-overview-part="title"]',
     '[data-learning-overview-part="direction"]',
-    '[data-learning-overview-part="benefit"]',
-    '[data-learning-workflow-step="true"]',
+    '[data-learning-overview-part="learn-list"]',
+    '[data-learning-overview-start="true"]',
     '[data-learning-section-index="true"]',
     '[data-learning-section-heading="true"]',
     '[data-code-payload-copy="true"]',

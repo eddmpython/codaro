@@ -1,5 +1,4 @@
 import {
-  BookOpen,
   CheckCircle2,
   Coffee,
   GraduationCap,
@@ -27,7 +26,6 @@ import {
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
 import { AssignmentRoomPanel } from "@/components/classroom/assignmentRoomPanel";
-import { learningCellCatalog } from "@/components/app/learningCellCatalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -53,10 +51,7 @@ import type { BlockConfig, CheckResult, CodaroDocument, ExecutionResult } from "
 import { CheckResultPanel } from "./checkResultPanel";
 import { CurriculumDependencyPanel } from "./curriculumDependencyPanel";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
-import {
-  CurriculumMarkdownBody,
-  curriculumCellTone,
-} from "./curriculumMarkdownBody";
+import { CurriculumMarkdownBody } from "./curriculumMarkdownBody";
 import { LessonComments } from "./lessonComments";
 
 type ResultMap = Record<string, ExecutionResult>;
@@ -142,6 +137,7 @@ export function CurriculumView({
             introBlock={introBlock}
             pendingBlocks={pendingBlocks}
             referenceLoading={referenceLoading}
+            sections={curriculumSections.sections}
             selectedCategory={selectedCategory}
             selectedCategoryLabel={selectedCategoryLabel}
             selectedContentId={selectedContentId}
@@ -189,14 +185,12 @@ function CurriculumSupportFooter() {
   const { t } = useLocale();
   return (
     <footer
-      className="mt-3 overflow-hidden rounded-xl border border-rose-300/40 bg-gradient-to-br from-rose-500/10 via-amber-500/10 to-orange-500/10 px-5 py-4 text-card-foreground shadow-sm dark:border-rose-400/20"
+      className="mt-3 rounded-lg border bg-card px-5 py-4 text-card-foreground"
       data-curriculum-support="true"
     >
       <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm shadow-rose-500/30">
-            <Heart className="size-5 fill-white" />
-          </span>
+          <Heart className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
           <div className="min-w-0">
             <div className="text-sm font-semibold">{t("support.title")}</div>
             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{t("support.message")}</p>
@@ -205,7 +199,7 @@ function CurriculumSupportFooter() {
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Button
             asChild
-            className="h-8 gap-1.5 border-0 bg-gradient-to-r from-amber-500 to-orange-500 px-3 text-xs text-white shadow-sm transition-opacity hover:opacity-90"
+            className="h-8 gap-1.5 border-0 bg-accent-brand px-3 text-xs text-accent-brand-foreground hover:bg-accent-brand/90"
             size="sm"
           >
             <a href={CODARO_LINKS.buyMeACoffee} rel="noreferrer noopener" target="_blank">
@@ -213,15 +207,15 @@ function CurriculumSupportFooter() {
               {t("support.buyMeACoffee")}
             </a>
           </Button>
-          <Button asChild className="h-8 gap-1.5 border-rose-300/50 px-2.5 text-xs hover:bg-rose-500/10" size="sm" variant="outline">
+          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
             <a href={CODARO_LINKS.githubSponsors} rel="noreferrer noopener" target="_blank">
-              <Heart className="size-3.5 text-rose-500" />
+              <Heart className="size-3.5" />
               {t("support.githubSponsors")}
             </a>
           </Button>
-          <Button asChild className="h-8 gap-1.5 border-amber-300/50 px-2.5 text-xs hover:bg-amber-500/10" size="sm" variant="outline">
+          <Button asChild className="h-8 gap-1.5 px-2.5 text-xs" size="sm" variant="outline">
             <a href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
-              <Star className="size-3.5 fill-amber-400 text-amber-400" />
+              <Star className="size-3.5" />
               {t("support.star")}
             </a>
           </Button>
@@ -251,8 +245,9 @@ type CurriculumSectionContract = Record<string, unknown> & {
   contractGaps?: unknown;
 };
 
-type StructuredSectionPart = "snippet" | "check";
 
+// 레슨 소개 — 시선 3정거장: 제목 → 오늘 배우는 것 → 학습 시작 버튼(화면 유일의 accent 면).
+// blueprint 격자·rail·배지 행·워크플로 다이어그램·benefits 그리드는 폐지(스펙 §6).
 function LearningOverviewHeader({
   apiOnline,
   contents = [],
@@ -260,6 +255,7 @@ function LearningOverviewHeader({
   introBlock,
   pendingBlocks,
   referenceLoading,
+  sections,
   selectedCategory,
   selectedCategoryLabel,
   selectedContentId,
@@ -275,6 +271,7 @@ function LearningOverviewHeader({
   introBlock?: BlockConfig;
   pendingBlocks: BlockConfig[];
   referenceLoading: boolean;
+  sections: CurriculumSectionGroup[];
   selectedCategory: string;
   selectedCategoryLabel: string;
   selectedContentId: string;
@@ -285,70 +282,87 @@ function LearningOverviewHeader({
   onOpenTerminalCommand: (command: string) => void;
 }) {
   const overview = curriculumOverview(document, introBlock);
+  // intro.points가 있으면 그대로, 없으면 sections 제목 파생 목차(≤6행 + "외 N개").
+  const learnItems = overview.points.length
+    ? overview.points.slice(0, 6).map((point) => ({ label: point, anchorBlockId: "" }))
+    : sections.slice(0, 6).map((section) => ({ label: section.title, anchorBlockId: section.anchorBlockId }));
+  const overflowCount = overview.points.length ? 0 : Math.max(0, sections.length - 6);
+  const firstSectionAnchor = sections[0]?.anchorBlockId ?? "";
+  const categoryLabel = selectedCategoryLabel || selectedCategory;
+  const contentLabel = selectedContentLabel || selectedContentId;
 
   return (
     <header
-      className="relative overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm"
+      className="rounded-lg border bg-card text-card-foreground"
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-40"
-        data-learning-overview-blueprint="true"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, hsl(var(--border) / 0.55) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.55) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-y-0 left-0 w-1 bg-zinc-300 dark:bg-zinc-700"
-        data-learning-overview-rail="true"
-      />
-      <div className="relative z-10 p-5">
-        <div className="flex min-w-0 flex-col">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">커리큘럼</Badge>
-            <Badge variant="outline">{selectedCategoryLabel || selectedCategory}</Badge>
-            {selectedContentLabel || selectedContentId ? <Badge variant="outline">{selectedContentLabel || selectedContentId}</Badge> : null}
+      <div className="px-6 py-6">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted-foreground">
+          <span>{categoryLabel}</span>
+          {contentLabel ? <span aria-hidden="true">·</span> : null}
+          {contentLabel ? <span>{contentLabel}</span> : null}
+          <span className="ml-auto flex items-center gap-2">
             <CurriculumHeaderProgress contents={contents} loading={referenceLoading} />
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
-          </div>
-          <h1 className="mt-3 text-2xl font-semibold tracking-normal" data-learning-overview-part="title">{overview.title}</h1>
-          {overview.direction ? (
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground" data-learning-overview-part="direction">{overview.direction}</p>
-          ) : null}
-          <WorkflowArchitectureDiagram diagram={overview.diagram} />
-          {overview.benefits.length ? (
-            <div className="mt-5 grid gap-x-5 gap-y-2 border-t pt-4 sm:grid-cols-2">
-              {overview.benefits.slice(0, 4).map((benefit, index) => (
-                <div
-                  className="flex min-w-0 items-start gap-2 text-sm leading-5"
-                  data-learning-overview-part="benefit"
-                  key={`${benefit}-${index}`}
-                >
-                  <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
-                  <span className="min-w-0 text-muted-foreground">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <div className="mt-auto">
-            <CurriculumDependencyPanel
-              apiOnline={apiOnline}
-              document={document}
-              onOpenTerminalCommand={onOpenTerminalCommand}
-            />
-          </div>
-          <AssignmentRoomPanel
-            category={selectedCategory}
-            contentId={selectedContentId}
-            document={document}
-            onOpenMaterial={onOpenAssignmentMaterial}
-          />
+          </span>
         </div>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground" data-learning-overview-part="title">{overview.title}</h1>
+        {overview.direction ? (
+          <p className="mt-2 max-w-[60ch] text-md text-foreground" data-learning-overview-part="direction">{overview.direction}</p>
+        ) : null}
+
+        {learnItems.length ? (
+          <div className="mt-5" data-learning-overview-part="learn-list">
+            <div className="text-xs font-medium text-muted-foreground">오늘 배우는 것</div>
+            <ul className="mt-2 max-w-[60ch] space-y-1.5">
+              {learnItems.map((item, index) => (
+                <li className="flex gap-2.5 text-md text-foreground" key={`${item.label}-${index}`}>
+                  <span className="mt-[0.65em] size-1 shrink-0 rounded-full bg-foreground/40" />
+                  {item.anchorBlockId ? (
+                    <button
+                      className="text-left hover:underline hover:underline-offset-4"
+                      type="button"
+                      onClick={() => scrollToCell(item.anchorBlockId)}
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
+                </li>
+              ))}
+              {overflowCount > 0 ? (
+                <li className="pl-3.5 text-sm text-muted-foreground">외 {overflowCount}개 섹션</li>
+              ) : null}
+            </ul>
+          </div>
+        ) : null}
+
+        {firstSectionAnchor ? (
+          <Button
+            className="mt-5 h-9 gap-1.5 border-0 bg-accent-brand px-4 text-sm font-medium text-accent-brand-foreground hover:bg-accent-brand/90"
+            data-learning-overview-start="true"
+            onClick={() => scrollToCell(firstSectionAnchor)}
+          >
+            <Play className="size-3.5" />
+            학습 시작
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="border-t px-6 py-3 empty:hidden">
+        <CurriculumDependencyPanel
+          apiOnline={apiOnline}
+          document={document}
+          onOpenTerminalCommand={onOpenTerminalCommand}
+        />
+        <AssignmentRoomPanel
+          category={selectedCategory}
+          contentId={selectedContentId}
+          document={document}
+          onOpenMaterial={onOpenAssignmentMaterial}
+        />
       </div>
       <PendingNotebookBar
         pendingBlocks={pendingBlocks}
@@ -359,37 +373,19 @@ function LearningOverviewHeader({
   );
 }
 
-function WorkflowArchitectureDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
-  const steps = workflowArchitectureSteps(diagram);
-  if (steps.length < 3) return null;
-
-  return (
-    <section className="mt-5 border-t pt-4" data-learning-overview-part="workflow" data-learning-workflow-diagram="true">
-      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <ListChecks className="size-3.5" />
-        <span>실무 흐름</span>
-      </div>
-      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-        {steps.map((step, index) => (
-          <div
-            className="min-w-0 rounded-md border bg-background/70 px-3 py-2"
-            data-learning-workflow-step="true"
-            key={`${step.label}-${index}`}
-          >
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border bg-muted text-[11px] font-semibold text-muted-foreground">
-                {index + 1}
-              </span>
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold tracking-normal">{step.label}</div>
-                {step.detail ? <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{step.detail}</p> : null}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+// 목차/학습 시작 클릭 → 해당 셀로 스크롤(선택 상태 변경 없음).
+function scrollToCell(blockId: string) {
+  window.requestAnimationFrame(() => {
+    const target = window.document.getElementById(cellDomId(blockId));
+    if (!target) return;
+    const viewport = target.closest("[data-slot='scroll-area-viewport']") as HTMLElement | null;
+    if (!viewport) {
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      return;
+    }
+    const targetTop = target.getBoundingClientRect().top - viewport.getBoundingClientRect().top + viewport.scrollTop;
+    viewport.scrollTo({ top: Math.max(0, targetTop - 12), behavior: "smooth" });
+  });
 }
 
 function CurriculumSectionCard({
@@ -434,7 +430,7 @@ function CurriculumSectionCard({
     <section
       aria-label={`${section.title} 학습 섹션`}
       className={cn(
-        "overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
+        "overflow-hidden rounded-lg border bg-card text-card-foreground",
         selected && "ring-1 ring-ring/35",
       )}
       data-learning-section-card={section.id}
@@ -442,27 +438,23 @@ function CurriculumSectionCard({
       id={cellDomId(section.anchorBlockId)}
     >
       <button
-        className="flex w-full min-w-0 items-stretch gap-3 border-b border-zinc-200 bg-zinc-100/80 px-4 py-3 text-left transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900/85 dark:hover:bg-zinc-900"
+        className="flex w-full min-w-0 items-baseline gap-3 border-b bg-muted/30 px-5 py-4 text-left transition-colors hover:bg-muted/50"
         type="button"
         onClick={() => onSelectBlock(section.anchorBlockId)}
       >
         <span
-          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-sm font-semibold tabular-nums text-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
+          className="shrink-0 text-sm font-semibold tabular-nums text-muted-foreground"
           data-learning-section-index="true"
         >
-          {index + 1}
+          {String(index + 1).padStart(2, "0")}
         </span>
-        <span className="flex min-w-0 flex-1 flex-col justify-center" data-learning-section-heading="true">
-          <span className="block text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">{section.title}</span>
-          {section.subtitle ? <span className="mt-1 block text-sm leading-6 text-zinc-600 dark:text-zinc-300">{section.subtitle}</span> : null}
+        <span className="min-w-0 flex-1" data-learning-section-heading="true">
+          <span className="block text-lg font-semibold text-foreground">{section.title}</span>
+          {section.subtitle ? <span className="mt-0.5 block text-sm leading-6 text-muted-foreground">{section.subtitle}</span> : null}
         </span>
-        <Badge className="mt-1 gap-1 border-zinc-300 bg-background/80 text-zinc-800 dark:border-zinc-700 dark:bg-zinc-950/70 dark:text-zinc-200" variant="outline">
-          <Layers3 className="size-3" />
-          섹션
-        </Badge>
       </button>
 
-      <SectionContractOverview contract={section.contract} />
+      <SectionNarrative contract={section.contract} />
 
       {structured ? (
         <StructuredSectionLearningBody
@@ -483,7 +475,7 @@ function CurriculumSectionCard({
           onSelectBlock={onSelectBlock}
         />
       ) : (
-        <div className="divide-y">
+        <div className="space-y-6 px-5 py-5">
           {section.blocks.map((block) => (
             <CurriculumLearningCell
               block={block}
@@ -572,25 +564,21 @@ function isSectionTitleBlock(block: BlockConfig) {
   return block.role === "title" && block.sourceType !== "intro";
 }
 
+// 오버뷰 렌더 필드(스펙 §6): title·direction·points만 쓴다.
+// intro.benefits/diagram은 boilerplate라 렌더에서 제외한다(YAML 스키마는 불변).
 function curriculumOverview(document: CodaroDocument, introBlock?: BlockConfig) {
   const payload = isRecord(introBlock?.payload) ? introBlock.payload : {};
   const lessonContract = isRecord(payload.learningContract) ? payload.learningContract : {};
   const meta = isRecord(lessonContract.meta) ? lessonContract.meta : {};
   const intro = isRecord(lessonContract.intro) ? lessonContract.intro : {};
   const title = readPayloadText(meta.title) || readPayloadText(payload.title) || introBlock?.title || document.title;
-  const goal = readPayloadText(intro.direction) || readPayloadText(payload.goal);
+  const goal = specificLearningCopy(readPayloadText(intro.direction) || readPayloadText(payload.goal));
   const description = readPayloadText(payload.description) || introBlock?.description || textAfterHeading(introBlock?.content ?? "");
-  const contractBenefits = payloadTextList(intro.benefits);
-  const benefits = contractBenefits.length
-    ? contractBenefits.map(stripMarkdown)
-    : payloadTextList(payload.points).length
-      ? payloadTextList(payload.points).map(stripMarkdown)
-    : inferBenefits(document.blocks);
+  const points = payloadTextList(payload.points).map(stripMarkdown);
   return {
     title: stripMarkdown(title),
     direction: stripMarkdown(goal || description),
-    benefits,
-    diagram: isRecord(intro.diagram) ? intro.diagram : undefined,
+    points,
   };
 }
 
@@ -617,77 +605,31 @@ function sectionInfo(block: BlockConfig) {
   };
 }
 
-const OVERVIEW_ACCENTS = {
-  indigo: { border: "border-border", chip: "bg-muted text-muted-foreground" },
-  emerald: { border: "border-border", chip: "bg-muted text-muted-foreground" },
-  sky: { border: "border-border", chip: "bg-muted text-muted-foreground" },
-  amber: { border: "border-border", chip: "bg-muted text-muted-foreground" },
-} as const;
-
-function OverviewBlock({
-  accent,
-  icon,
-  label,
-  children,
-}: {
-  accent: keyof typeof OVERVIEW_ACCENTS;
-  icon: ReactNode;
-  label: string;
-  children: ReactNode;
-}) {
-  const tone = OVERVIEW_ACCENTS[accent];
-  return (
-    <div className={cn("min-w-0 border-l-2 pl-3", tone.border)}>
-      <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-        <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-md", tone.chip)}>{icon}</span>
-        {label}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function SectionContractOverview({ contract }: { contract?: CurriculumSectionContract }) {
+// 구조화 섹션 서사(스펙 §5 ①②) — 3열 그리드 대신 단일 컬럼: 리드(goal) → 이유(why) → 본문(explanation).
+// 팁은 실습 직전에 배치되므로 StructuredSectionLearningBody가 렌더한다.
+function SectionNarrative({ contract }: { contract?: CurriculumSectionContract }) {
   if (!contract) return null;
   const goal = specificLearningCopy(readPayloadText(contract.goal));
   const why = specificLearningCopy(readPayloadText(contract.why));
   const explanation = specificLearningCopy(readPayloadText(contract.explanation));
-  const tips = payloadTextList(contract.tips).map(specificLearningCopy).filter(Boolean).slice(0, 4);
-  if (!goal && !why && !explanation && !tips.length) return null;
+  if (!goal && !why && !explanation) return null;
+  const explanationParagraphs = explanation.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
 
   return (
-    <div className="border-b bg-background/35 px-4 py-3" data-learning-section-part="overview">
-      <div className="min-w-0 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {goal ? (
-            <OverviewBlock accent="indigo" icon={<Target className="size-3" />} label="이번 섹션에서 공부할 것">
-              <p className="mt-1.5 text-sm leading-6 text-foreground/90">{goal}</p>
-            </OverviewBlock>
-          ) : null}
-          {why ? (
-            <OverviewBlock accent="emerald" icon={<CheckCircle2 className="size-3" />} label="왜 유용한지">
-              <p className="mt-1.5 text-sm leading-6 text-foreground/90">{why}</p>
-            </OverviewBlock>
-          ) : null}
-          {tips.length ? (
-            <OverviewBlock accent="amber" icon={<Lightbulb className="size-3" />} label="팁">
-              <div className="mt-2 space-y-1.5">
-                {tips.map((tip, index) => (
-                  <div className="flex gap-2 text-xs leading-5 text-foreground/75" key={`${tip}-${index}`}>
-                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-amber-500/60" />
-                    <span className="min-w-0">{stripBullet(tip)}</span>
-                  </div>
-                ))}
-              </div>
-            </OverviewBlock>
-          ) : null}
+    <div className="space-y-4 px-5 pt-5" data-learning-section-part="overview">
+      {goal || why ? (
+        <div className="min-w-0 max-w-[70ch]">
+          {goal ? <p className="text-md font-medium text-foreground">{goal}</p> : null}
+          {why ? <p className={cn("text-sm leading-6 text-muted-foreground", goal && "mt-1")}>{why}</p> : null}
         </div>
-        {explanation ? (
-          <OverviewBlock accent="sky" icon={<BookOpen className="size-3" />} label="상세 설명">
-            <p className="mt-1.5 max-w-[68ch] text-sm leading-7 text-foreground/90">{explanation}</p>
-          </OverviewBlock>
-        ) : null}
-      </div>
+      ) : null}
+      {explanationParagraphs.length ? (
+        <div className="min-w-0 max-w-[70ch] space-y-3">
+          {explanationParagraphs.map((paragraph, index) => (
+            <p className="text-md text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{paragraph}</p>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -739,7 +681,9 @@ function StructuredSectionLearningBody({
   const exerciseResult = exercise ? results[exercise.id] : undefined;
   const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
   const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
-  const exerciseDescription = specificPracticeCopy(exercise?.guide?.description || exercise?.description || "");
+  // 실습 prompt는 사람이 쓴 학습 지시문 — 필터·자르기 없이 그대로 렌더한다(스펙 §5 ⑤).
+  const exerciseDescription = stripMarkdown(exercise?.guide?.description || exercise?.description || "");
+  const sectionTips = payloadTextList(section.contract?.tips).map(stripMarkdown).filter(Boolean).slice(0, 4);
 
   const sessionId = useWidgetSession();
   const checkConfig = exercise?.guide?.checkConfig ?? {};
@@ -787,35 +731,43 @@ function StructuredSectionLearningBody({
   };
 
   return (
-    <div className="divide-y">
+    <div className="space-y-6 px-5 py-5">
       {parts.snippet ? (
-        <StructuredSectionBand
-          detail={parts.snippet.description || stripMarkdown(readPayloadText(section.contract?.goal))}
-          icon={<TerminalSquare className="size-3.5" />}
-          label="예제 스니펫"
-          part="snippet"
-          title={blockLabel(parts.snippet)}
-        >
+        <div data-learning-section-part="snippet">
+          <div className="pb-1.5 text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">예제</div>
           <CodePayload label="코드" value={parts.snippet.content} />
-        </StructuredSectionBand>
+        </div>
+      ) : null}
+
+      {sectionTips.length ? (
+        <aside className="min-w-0 max-w-[70ch] border-l-2 border-border py-0.5 pl-4" data-learning-section-part="tips">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <Lightbulb className="size-3.5" />
+            팁
+          </div>
+          <ul className="mt-1.5 space-y-1">
+            {sectionTips.map((tip, index) => (
+              <li className="flex gap-2.5 text-md text-foreground" key={`${tip}-${index}`}>
+                <span className="mt-[0.65em] size-1 shrink-0 rounded-full bg-foreground/40" />
+                <span>{stripBullet(tip)}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
       ) : null}
 
       {exercise ? (
         <div
-          className={cn("px-4 py-4", exerciseSelected && "bg-muted/20")}
           data-learning-section-part="exercise"
           id={cellDomId(exercise.id)}
           onClick={() => onSelectBlock(exercise.id)}
         >
           <div className="flex flex-wrap items-start gap-3">
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
-                <Play className="size-3.5" />
-                <span>직접 입력 실습</span>
-              </div>
-              <h3 className="mt-1 text-base font-semibold tracking-normal">{blockLabel(exercise)}</h3>
+              <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
+              <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{blockLabel(exercise)}</h3>
               {exerciseDescription ? (
-                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                <p className="mt-1 max-w-[70ch] text-md text-foreground">
                   {exerciseDescription}
                 </p>
               ) : null}
@@ -840,11 +792,10 @@ function StructuredSectionLearningBody({
               </IconButton>
               {canCheck ? (
                 <Button
-                  className="h-7 gap-1.5 rounded-md px-2.5 text-xs [&_svg]:size-3.5"
+                  className="h-7 gap-1.5 rounded-md border-0 bg-accent-brand px-2.5 text-xs text-accent-brand-foreground hover:bg-accent-brand/90 [&_svg]:size-3.5"
                   data-learning-exercise-check="true"
                   disabled={checking}
                   size="sm"
-                  variant="secondary"
                   onClick={(event) => {
                     event.stopPropagation();
                     void runCheck(hintLevel);
@@ -864,10 +815,10 @@ function StructuredSectionLearningBody({
 
           <div className="mt-3">
             <div
-              aria-label={`${blockLabel(exercise)} 직접 입력 실습 코드 편집기`}
+              aria-label={`${blockLabel(exercise)} 직접 해보기 코드 편집기`}
               className={cn(
-                "rounded-md border bg-code shadow-inner transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25",
-                exerciseSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
+                "rounded-lg border bg-code transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-accent-brand/30",
+                exerciseSelected ? "border-ring ring-2 ring-accent-brand/25" : "border-border hover:border-ring/60",
               )}
               data-learning-exercise-input="editor"
               data-learning-exercise-input-role="student-practice"
@@ -886,10 +837,7 @@ function StructuredSectionLearningBody({
 
           {exerciseResult || exerciseRunning ? (
             <div className="mt-3" data-learning-section-part="result">
-              <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                <CheckCircle2 className="size-3.5" />
-                실행 결과
-              </div>
+              <div className="mb-1.5 text-xs font-medium text-muted-foreground">실행 결과</div>
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
             </div>
           ) : null}
@@ -917,18 +865,20 @@ function StructuredSectionLearningBody({
 
           {lessonCompleted ? (
             <div
-              className="mt-3 flex items-center gap-2 rounded-md border border-emerald-400/50 bg-emerald-100/40 px-3 py-2 text-sm font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200"
+              className="mt-3 border-l-2 border-success py-0.5 pl-4"
               data-lesson-completed="true"
             >
-              <Trophy className="size-4" />
-              이 레슨의 실습을 모두 끝냈어요! 🎉
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Trophy className="size-4 text-success" />
+                이 레슨의 실습을 모두 끝냈어요!
+              </div>
             </div>
           ) : null}
         </div>
       ) : null}
 
       {parts.extraBlocks.length ? (
-        <div className="divide-y">
+        <div className="space-y-6">
           {parts.extraBlocks.map((block) => (
             <CurriculumLearningCell
               block={block}
@@ -949,38 +899,6 @@ function StructuredSectionLearningBody({
           ))}
         </div>
       ) : null}
-    </div>
-  );
-}
-
-function StructuredSectionBand({
-  children,
-  detail,
-  icon,
-  label,
-  part,
-  title,
-}: {
-  children: ReactNode;
-  detail?: string;
-  icon: ReactNode;
-  label: string;
-  part: StructuredSectionPart;
-  title?: string;
-}) {
-  return (
-    <div className="px-4 py-4" data-learning-section-part={part}>
-      <div className="mb-3 min-w-0 border-l-2 border-border pl-3">
-        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-            {icon}
-          </span>
-          <span>{label}</span>
-        </div>
-        {title ? <h3 className="mt-1.5 text-base font-semibold tracking-normal">{title}</h3> : null}
-        {detail ? <p className="mt-1.5 max-w-[68ch] text-sm leading-6 text-foreground/80">{stripMarkdown(detail)}</p> : null}
-      </div>
-      {children}
     </div>
   );
 }
@@ -1008,11 +926,8 @@ function specificLearningCopy(value: string) {
   return isGenericLearningCopy(text) ? "" : text;
 }
 
-function specificPracticeCopy(value: string) {
-  const text = stripMarkdown(value);
-  return isGenericPracticeCopy(text) ? "" : text;
-}
-
+// 유일하게 유지하는 런타임 카피 필터 — 자동생성 boilerplate 문구만 숨긴다.
+// 신규 필터 추가 금지: 콘텐츠 결함은 YAML을 고친다(스펙 §1 원칙 5).
 function isGenericLearningCopy(value: string) {
   const normalized = normalizeCopy(value);
   return [
@@ -1022,31 +937,8 @@ function isGenericLearningCopy(value: string) {
   ].includes(normalized);
 }
 
-function isGenericPracticeCopy(value: string) {
-  const normalized = normalizeCopy(value);
-  return [
-    /^예제를 실행한 뒤.*값 하나.*결과를 비교하세요\.$/,
-    /^기준 실행 후.*값 하나.*결과를 비교하세요\.$/,
-    /^위 예제 스니펫을 참고해.*값 하나를 바꾼 뒤 실행하세요\.$/,
-    /^아래 코드 영역을 클릭해.*입력하세요\.$/,
-    /^예제와 다르게.*결과 변화를 볼 수 있습니다\.$/,
-  ].some((pattern) => pattern.test(normalized)) || (
-    normalized.includes("값 하나") &&
-    normalized.includes("결과") &&
-    (normalized.includes("비교") || normalized.includes("변화"))
-  );
-}
-
 function normalizeCopy(value: string) {
   return stripBullet(stripMarkdown(value)).replace(/\s+/g, " ").trim();
-}
-
-function inferBenefits(blocks: BlockConfig[]) {
-  const benefits = blocks
-    .filter((block) => block.type === "markdown" && block.displayKind !== "title")
-    .map((block) => stripMarkdown(block.title || firstContentLine(block.content)))
-    .filter(Boolean);
-  return Array.from(new Set(benefits)).slice(0, 4);
 }
 
 function textAfterHeading(content: string) {
@@ -1078,53 +970,6 @@ function payloadTextList(value: unknown): string[] {
       return "";
     })
     .filter(Boolean);
-}
-
-function workflowArchitectureSteps(diagram?: Record<string, unknown>) {
-  if (!diagram || !Array.isArray(diagram.steps)) return [];
-  return diagram.steps
-    .map((item) => {
-      if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
-        return { label: String(item), detail: "" };
-      }
-      if (!isRecord(item)) return null;
-      const label = readPayloadText(item.label ?? item.title ?? item.name);
-      const detail = readPayloadText(item.detail ?? item.description ?? item.content);
-      return label ? { label, detail } : null;
-    })
-    .filter((item): item is { label: string; detail: string } => Boolean(item))
-    .filter(isSpecificWorkflowStep)
-    .slice(0, 4);
-}
-
-function isSpecificWorkflowStep(step: { label: string; detail: string }) {
-  const label = normalizeCopy(step.label).replace(/\s+/g, "");
-  const combined = normalizeCopy(`${step.label} ${step.detail}`);
-  const genericLabels = new Set([
-    "목표",
-    "준비",
-    "개념",
-    "스니펫",
-    "실습",
-    "실행",
-    "검증",
-    "완료",
-    "패키지",
-    "첫실행",
-    "환경",
-  ]);
-  if (genericLabels.has(label)) return false;
-  if (combined.length < 8) return false;
-  return ![
-    "무슨 공부",
-    "설명과 팁",
-    "따라 칠 코드",
-    "입력과 검증",
-    "YAML 계약",
-    "uv 패키지",
-    "assert와 결과 비교",
-    "결과 확인",
-  ].some((phrase) => combined.includes(phrase));
 }
 
 function readSectionContract(value: unknown): CurriculumSectionContract | undefined {
@@ -1178,7 +1023,7 @@ export function CurriculumCellToc({
                   aria-label={label}
                   className={cn(
                     "flex h-7 w-7 min-w-0 items-center gap-2 rounded-md px-1.5 text-left text-xs text-muted-foreground transition-[width,background-color,color] duration-150 hover:bg-muted/60 hover:text-foreground group-hover/toc:w-full group-hover/toc:px-2",
-                    active && "bg-muted text-foreground ring-1 ring-border",
+                    active && "bg-accent-brand text-accent-brand-foreground hover:bg-accent-brand/90 hover:text-accent-brand-foreground",
                   )}
                   key={block.id}
                   title={label}
@@ -1203,17 +1048,7 @@ export function CurriculumCellToc({
 
 function selectTocBlock(blockId: string, onSelectBlock: (blockId: string) => void) {
   onSelectBlock(blockId);
-  window.requestAnimationFrame(() => {
-    const target = window.document.getElementById(cellDomId(blockId));
-    if (!target) return;
-    const viewport = target.closest("[data-slot='scroll-area-viewport']") as HTMLElement | null;
-    if (!viewport) {
-      target.scrollIntoView({ block: "start", behavior: "smooth" });
-      return;
-    }
-    const targetTop = target.getBoundingClientRect().top - viewport.getBoundingClientRect().top + viewport.scrollTop;
-    viewport.scrollTo({ top: Math.max(0, targetTop - 12), behavior: "smooth" });
-  });
+  scrollToCell(blockId);
 }
 
 function shouldShowTocItem(block: BlockConfig, label: string) {
@@ -1268,13 +1103,8 @@ function CurriculumLearningCell({
   onRun: () => void;
   onSelect: () => void;
 }) {
-  const kind = classifyLearningCell(block, draft);
-  const meta = learningCellCatalog[kind];
-  const Icon = meta.Icon;
   const role = block.role ?? (block.type === "code" ? "snippet" : "explanation");
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
-  const tone = curriculumCellTone(kind, role, block.displayKind);
-  const bodyFirst = block.displayKind === "hero";
   const isSnippetCode = block.type === "code" && role === "snippet";
   const embedded = variant === "embedded";
   const showStatus = isRunning || Boolean(result);
@@ -1291,71 +1121,42 @@ function CurriculumLearningCell({
       );
     }
 
-    if (block.displayKind === "callout") {
+    // 마크다운 셀 래퍼 — 아이콘칩+라벨 이중 헤더 폐지. 제목은 CurriculumMarkdownBody가
+    // 유일하게 소유한다. 선택 상태는 좌측 accent rail 하나로만 표시한다.
+    if (embedded || block.displayKind === "callout") {
       return (
         <section
-          id={cellDomId(block.id)}
-          className={cn("group min-w-0", isSelected && "rounded-md ring-1 ring-ring/30")}
-          onClick={onSelect}
-        >
-          <CurriculumMarkdownBody block={block} />
-        </section>
-      );
-    }
-
-    if (embedded) {
-      return (
-        <section
-          id={cellDomId(block.id)}
           className={cn(
-            "group min-w-0 px-4 py-4",
-            isSelected && "bg-muted/20",
-            tone.frame,
+            "group relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4",
+            isSelected && "border-accent-brand",
           )}
+          data-learning-cell="embedded"
+          data-selected={isSelected ? "true" : "false"}
+          id={cellDomId(block.id)}
           onClick={onSelect}
         >
-          <div className="mb-2 flex min-w-0 items-center gap-2">
-            <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-md bg-muted/70 text-muted-foreground", tone.icon)}>
-              <Icon className="size-3.5" />
-            </span>
-            <span className="min-w-0 flex-1 truncate text-sm font-semibold">{blockLabel(block)}</span>
+          <div className="absolute right-0 top-0 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
             <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
           </div>
-          <CurriculumMarkdownBody block={block} hideRepeatedTitle />
+          <CurriculumMarkdownBody block={block} />
         </section>
       );
     }
 
     return (
       <section
-        id={cellDomId(block.id)}
         className={cn(
-          "group min-w-0 overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
-          isSelected && "bg-muted/20 ring-1 ring-ring/30",
-          tone.frame,
+          "group relative min-w-0 rounded-lg border bg-card text-card-foreground",
+          isSelected && "ring-1 ring-ring/30",
         )}
+        id={cellDomId(block.id)}
+        onClick={onSelect}
       >
-        <div className="min-w-0">
-          {bodyFirst ? (
-            <div className="flex items-center justify-end px-3 pt-3">
-              <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 border-b bg-muted/20 px-3 py-2">
-              <button className="flex min-w-0 flex-1 items-center gap-2 text-left" type="button" onClick={onSelect}>
-                <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground", tone.icon)}>
-                  <Icon className="size-4" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-base font-semibold tracking-normal">{blockLabel(block)}</span>
-                </span>
-              </button>
-              <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
-            </div>
-          )}
-          <div className={cn("space-y-3 px-3 pb-3", bodyFirst ? "pt-2" : "pt-3")}>
-            <CurriculumMarkdownBody block={block} hideRepeatedTitle={!bodyFirst} />
-          </div>
+        <div className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+          <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
+        </div>
+        <div className="p-5">
+          <CurriculumMarkdownBody block={block} />
         </div>
       </section>
     );
@@ -1363,22 +1164,21 @@ function CurriculumLearningCell({
 
   return (
     <section
-      id={cellDomId(block.id)}
       className={cn(
-        embedded ? "group min-w-0 text-card-foreground" : "group min-w-0 overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
-        isSelected && (embedded ? "bg-muted/20" : "bg-muted/20 ring-1 ring-ring/30"),
-        tone.frame,
+        embedded
+          ? "group relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4"
+          : "group min-w-0 rounded-lg border bg-card text-card-foreground",
+        embedded && isSelected && "border-accent-brand",
+        !embedded && isSelected && "ring-1 ring-ring/30",
       )}
+      data-learning-cell={embedded ? "embedded" : "standalone"}
+      data-selected={isSelected ? "true" : "false"}
+      id={cellDomId(block.id)}
     >
-      <div className="min-w-0">
-        <div className={cn("flex items-center gap-3", embedded ? "px-4 py-3" : "border-b bg-muted/20 px-3 py-2")}>
-          <button className="flex min-w-0 flex-1 items-center gap-2 text-left" type="button" onClick={onSelect}>
-            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted/70 text-muted-foreground", !embedded && "bg-background", tone.icon)}>
-              <Icon className="size-4" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-base font-semibold tracking-normal">{blockLabel(block)}</span>
-            </span>
+      <div className={cn("min-w-0", !embedded && "p-5")}>
+        <div className="flex items-center gap-2">
+          <button className="min-w-0 flex-1 text-left" type="button" onClick={onSelect}>
+            <span className="block truncate text-[15px] font-semibold leading-6 text-foreground">{blockLabel(block)}</span>
           </button>
           {showStatus ? (
             <Badge className="h-7 rounded-md px-2 text-xs" variant={resultStatus === "error" ? "destructive" : "outline"}>
@@ -1399,33 +1199,30 @@ function CurriculumLearningCell({
           </IconButton>
           <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
         </div>
-        <div className={cn("space-y-3", embedded ? "px-4 pb-4" : "px-3 py-3")}>
+        <div className="mt-3 space-y-3">
           {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
-          {!isSnippetCode && block.guide ? <ExerciseBrief block={block} /> : null}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{isSnippetCode ? "Python 연습 코드" : "Python 코드"}</span>
-            </div>
-            <div
-              aria-label={`${blockLabel(block)} 코드 편집기`}
-              className={cn(
-                "rounded-md border bg-code shadow-inner transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25",
-                isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
-              )}
-              data-learning-code-input="editor"
-              data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}
-              data-learning-code-input-state={isSelected ? "selected" : "ready"}
-              onClick={onSelect}
-            >
-              {renderCodeCellEditor({
-                autoFocus: isSelected,
-                block,
-                draft,
-                onChange: onDraftChange,
-                onFocus: onSelect,
-                onRun,
-              })}
-            </div>
+          {!isSnippetCode && block.guide?.description ? (
+            <p className="max-w-[70ch] text-md text-foreground">{stripMarkdown(block.guide.description)}</p>
+          ) : null}
+          <div
+            aria-label={`${blockLabel(block)} 코드 편집기`}
+            className={cn(
+              "rounded-lg border bg-code transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-accent-brand/30",
+              isSelected ? "border-ring ring-2 ring-accent-brand/25" : "border-border hover:border-ring/60",
+            )}
+            data-learning-code-input="editor"
+            data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}
+            data-learning-code-input-state={isSelected ? "selected" : "ready"}
+            onClick={onSelect}
+          >
+            {renderCodeCellEditor({
+              autoFocus: isSelected,
+              block,
+              draft,
+              onChange: onDraftChange,
+              onFocus: onSelect,
+              onRun,
+            })}
           </div>
           {result ? <ExecutionOutput result={result} /> : null}
           {isRunning && !result ? <LoadingInline label="셀 실행 중" /> : null}
@@ -1439,19 +1236,10 @@ function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   const description = block.description?.trim();
 
   return (
-    <div className="border-l-2 border-border pl-3">
-      <div className="space-y-2 pb-2.5">
-        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-            <TerminalSquare className="size-3.5" />
-          </span>
-          <span>예제 스니펫</span>
-        </div>
-        {description ? <p className="text-sm leading-6 text-foreground">{description}</p> : null}
-      </div>
-      <div>
-        <CodePayload value={block.content} />
-      </div>
+    <div className="min-w-0 space-y-2">
+      <div className="text-xs font-medium text-muted-foreground">예제</div>
+      {description ? <p className="max-w-[70ch] text-md text-foreground">{description}</p> : null}
+      <CodePayload value={block.content} />
     </div>
   );
 }
@@ -1479,25 +1267,18 @@ function CurriculumSectionTitle({
     "";
 
   return (
-    <section className="px-1 py-2" id={cellDomId(block.id)}>
+    <section className="py-2" id={cellDomId(block.id)}>
       <button
         aria-label={cleanTitle}
         className={cn(
-          "w-full rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/20",
-          isSelected && "bg-muted/20 ring-1 ring-ring/25",
+          "w-full rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/30",
+          isSelected && "bg-muted/30 ring-1 ring-ring/25",
         )}
         type="button"
         onClick={onSelect}
       >
-        <div className="flex items-center gap-3">
-          <span className="h-px flex-1 bg-border/70" />
-          <Badge className="bg-background/80 text-[11px]" variant="outline">섹션</Badge>
-          <span className="h-px flex-1 bg-border/70" />
-        </div>
-        <div className="mt-2 min-w-0">
-          <h2 className="text-xl font-semibold tracking-normal">{cleanTitle}</h2>
-          {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
-        </div>
+        <h2 className="text-lg font-semibold text-foreground">{cleanTitle}</h2>
+        {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
       </button>
     </section>
   );
@@ -1533,18 +1314,6 @@ function curriculumInitialDraft(block: BlockConfig) {
   if (block.type !== "code") return block.content;
   if (block.role === "snippet") return "";
   return block.content;
-}
-
-function ExerciseBrief({ block }: { block: BlockConfig }) {
-  if (!block.guide) return null;
-  const description = specificPracticeCopy(block.guide.description);
-  if (!description) return null;
-
-  return (
-    <div className="rounded-md border bg-muted/20 px-3 py-2.5">
-      <p className="text-sm leading-6 text-muted-foreground">{description}</p>
-    </div>
-  );
 }
 
 function readPayloadText(value: unknown) {

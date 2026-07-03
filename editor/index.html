@@ -11,6 +11,14 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="512x512" />
     <link rel="apple-touch-icon" href="/favicon.png" />
+    <script>
+      (function () {
+        try {
+          var accent = localStorage.getItem("codaro-accent");
+          if (accent && accent !== "zinc") document.documentElement.dataset.accent = accent;
+        } catch (storageError) {}
+      })();
+    </script>
     <title>Codaro</title>
   </head>
   <body>

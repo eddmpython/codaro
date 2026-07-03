@@ -2,6 +2,9 @@ import { getActiveLocale } from "@/lib/localeCopy";
 
 export type SurfaceMode = "chat" | "editor" | "curriculum" | "automation" | "share";
 export type ThemeMode = "dark" | "light";
+// 사용자 선택 강조색 — index.css의 html[data-accent] 팔레트와 1:1. zinc = 속성 없음(기본).
+export type AccentColor = "zinc" | "blue" | "indigo" | "violet" | "teal";
+export const ACCENT_COLORS: readonly AccentColor[] = ["zinc", "blue", "indigo", "violet", "teal"];
 export type AutomationSection = "codaro" | "custom" | "tasks" | "browserUse" | "computerUse";
 
 // 라이브 에이전트 실행 뷰로 라우팅되는 서브라인(기존 3-섹션 스크롤 페이지와 분리).

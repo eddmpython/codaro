@@ -21,7 +21,7 @@ export function CurriculumProgressBadge({
       variant="outline"
       className={cn(
         "gap-1 px-2 py-0.5 text-[10px] font-medium",
-        tone === "complete" && "border-emerald-400/50 bg-emerald-100/30 text-emerald-700",
+        tone === "complete" && "border-success/50 text-success",
         tone === "active" && "border-ring/40 bg-accent/30 text-foreground",
         tone === "idle" && "text-muted-foreground",
       )}

@@ -190,7 +190,7 @@ export function CurriculumDependencyPanel({
               key={packageName}
               variant={installed ? "secondary" : "outline"}
             >
-              <span className={cn("size-1.5 rounded-full", installed ? "bg-emerald-500" : "bg-amber-500")} />
+              <span className={cn("size-1.5 rounded-full", installed ? "bg-success" : "bg-warning")} />
               {packageName}
             </Badge>
           );
@@ -209,7 +209,7 @@ export function CurriculumDependencyPanel({
           type="button"
           onClick={copyCommand}
         >
-          {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+          {copied ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
         </button>
         <Button
           className="h-6 gap-1.5 px-2 text-xs"

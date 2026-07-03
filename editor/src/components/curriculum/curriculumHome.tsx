@@ -134,7 +134,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
               <Progress className="mt-2" value={overallPercent} />
               {masteredOutcomes > 0 ? (
                 <div
-                  className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400"
+                  className="mt-2 flex items-center gap-1.5 text-xs text-success"
                   data-curriculum-home-mastery="true"
                 >
                   <CheckCircle2 className="size-3.5" />
@@ -170,10 +170,10 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
 
           {totalDue > 0 ? (
             <section
-              className="rounded-xl border border-amber-300/60 bg-amber-50/50 p-4 dark:border-amber-500/30 dark:bg-amber-500/5"
+              className="rounded-lg border p-4"
               data-curriculum-home-reviews="true"
             >
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <div className="flex items-center gap-2 text-warning">
                 <RotateCcw className="size-4" />
                 <h2 className="text-sm font-semibold">복습할 시간 · {totalDue}개</h2>
               </div>
@@ -204,7 +204,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                     </button>
                     <div className="flex shrink-0 items-center gap-1">
                       <Button
-                        className="h-7 gap-1 px-2 text-[11px] text-emerald-700 hover:bg-emerald-100/60 dark:text-emerald-400"
+                        className="h-7 gap-1 px-2 text-[11px] text-success hover:bg-muted"
                         data-curriculum-home-review-pass="true"
                         size="sm"
                         variant="ghost"
@@ -235,10 +235,10 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
 
           {weakAreas.length > 0 ? (
             <section
-              className="rounded-xl border border-rose-300/50 bg-rose-50/40 p-4 dark:border-rose-500/30 dark:bg-rose-500/5"
+              className="rounded-lg border p-4"
               data-curriculum-home-weak-areas="true"
             >
-              <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400">
+              <div className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="size-4" />
                 <h2 className="text-sm font-semibold">집중하면 좋은 영역</h2>
               </div>
@@ -286,7 +286,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                     <ArrowRight className="size-3.5" />
                   </Button>
                 ) : (
-                  <span className="text-xs font-medium text-emerald-600">전 과정 완주 🎉</span>
+                  <span className="text-xs font-medium text-success">전 과정 완주</span>
                 )}
               </div>
               <div className="space-y-2">
@@ -307,7 +307,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                     >
                       <span className="flex size-5 shrink-0 items-center justify-center">
                         {isDone ? (
-                          <CheckCircle2 className="size-4 text-emerald-500" />
+                          <CheckCircle2 className="size-4 text-success" />
                         ) : (
                           <span
                             className={cn(
@@ -356,7 +356,7 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-sm font-semibold leading-5">{category.name}</h3>
                           {complete ? (
-                            <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
+                            <CheckCircle2 className="size-4 shrink-0 text-success" />
                           ) : (
                             <Badge className="shrink-0" variant="outline">
                               {total}

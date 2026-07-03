@@ -24,6 +24,7 @@ import { usePendingChangesState } from "@/hooks/usePendingChangesState";
 import { useProductSurfaceSelection } from "@/hooks/useProductSurfaceSelection";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
+import { useAccentColor } from "@/hooks/useAccentColor";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLocaleState } from "@/hooks/useLocaleState";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
@@ -125,6 +126,7 @@ function App() {
   });
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const { themeMode, toggleThemeMode } = useThemeMode();
+  const { accentColor, selectAccentColor } = useAccentColor();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
   const {
@@ -375,6 +377,7 @@ function App() {
         selectedCustomCurriculumId={selectedCustomCurriculumId}
         selectedContentId={selectedContentId}
         themeMode={themeMode}
+        accentColor={accentColor}
         aiConnecting={aiConnecting}
         onQueryChange={setQuery}
         onConnectProvider={connectAiProvider}
@@ -385,6 +388,7 @@ function App() {
         onDeleteCustomCurriculum={deleteCustomCurriculum}
         onSurfaceChange={selectSurface}
         onToggleTheme={toggleThemeMode}
+        onSelectAccentColor={selectAccentColor}
         terminalOpen={terminalOpen}
         onToggleTerminal={() => setTerminalOpen((current) => !current)}
       />
