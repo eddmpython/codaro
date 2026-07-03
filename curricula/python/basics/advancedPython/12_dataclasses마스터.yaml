@@ -59,8 +59,6 @@ sections:
     @dataclass 데코레이터는 __init__, __repr__, __eq__ 등의 특수 메서드를 자동 생성합니다. 클래스 속성에 타입 힌트를 추가하면 그것이 인스턴스 필드가 됩니다. 기본값이 있는 필드는 기본값 없는 필드 뒤에 와야 합니다. 데이터를 담는 클래스를 만들 때 보일러플레이트 코드를 크게 줄여줍니다. Python 3.7에서 도입되었으며, 이후 버전에서 기능이 계속 추가되었습니다.
 
     dataclass 옵션: @dataclass(init=True, repr=True, eq=True, order=False, frozen=False)
-  tips:
-  - 'dataclass 옵션: @dataclass(init=True, repr=True, eq=True, order=False, frozen=False)'
   snippet: |-
     from dataclasses import dataclass
 
@@ -100,8 +98,6 @@ sections:
     field() 함수로 각 필드의 동작을 세밀하게 제어합니다. default_factory는 가변 기본값(리스트, 딕셔너리)을 안전하게 사용합니다. repr=False로 __repr__에서 필드를 숨길 수 있습니다. compare=False로 __eq__ 비교에서 제외합니다. init=False로 __init__ 파라미터에서 제외합니다. metadata로 추가 정보를 저장할 수 있습니다.
 
     field(default_factory=dict)처럼 사용하면 각 인스턴스가 독립적인 딕셔너리를 가집니다.
-  tips:
-  - field(default_factory=dict)처럼 사용하면 각 인스턴스가 독립적인 딕셔너리를 가집니다.
   snippet: |-
     from dataclasses import dataclass, field
     from typing import List
@@ -147,8 +143,6 @@ sections:
     __post_init__ 메서드는 __init__이 끝난 후 자동으로 호출됩니다. 필드 값을 기반으로 계산된 속성을 설정하거나 유효성 검사를 수행합니다. InitVar 타입을 사용하면 __init__에만 전달되고 필드로 저장되지 않는 값을 정의할 수 있습니다. __post_init__은 InitVar 값을 순서대로 인자로 받습니다. 복잡한 초기화 로직을 깔끔하게 분리할 수 있습니다.
 
     InitVar 필드는 __repr__이나 __eq__에 포함되지 않습니다.
-  tips:
-  - InitVar 필드는 __repr__이나 __eq__에 포함되지 않습니다.
   snippet: |-
     from dataclasses import dataclass, field
 
@@ -198,8 +192,6 @@ sections:
     frozen=True 옵션은 인스턴스를 불변(immutable)으로 만듭니다. 필드 값을 변경하려고 하면 FrozenInstanceError가 발생합니다. frozen 객체는 해시 가능(hashable)하여 딕셔너리 키나 집합 요소로 사용할 수 있습니다. 불변 객체는 함수형 프로그래밍 패턴과 잘 맞습니다. 변경이 필요하면 replace() 함수로 새 인스턴스를 만듭니다.
 
     frozen=True면 __hash__가 자동 생성됩니다. 가변 dataclass는 unsafe_hash=True로 강제할 수 있습니다.
-  tips:
-  - frozen=True면 __hash__가 자동 생성됩니다. 가변 dataclass는 unsafe_hash=True로 강제할 수 있습니다.
   snippet: |-
     from dataclasses import dataclass
 
@@ -239,8 +231,6 @@ sections:
     Python 3.10+에서 slots=True 옵션이 추가되었습니다. __slots__를 자동 생성하여 메모리를 절약합니다. 많은 인스턴스를 생성할 때 효과적입니다. __dict__가 없어 동적 속성 추가가 불가능합니다. frozen=True와 함께 사용하면 불변 + 메모리 효율적인 객체가 됩니다. 상속 시 부모도 slots를 사용해야 합니다.
 
     weakref가 필요하면 weakref_slot=True 옵션을 추가하세요 (Python 3.11+).
-  tips:
-  - weakref가 필요하면 weakref_slot=True 옵션을 추가하세요 (Python 3.11+).
   snippet: |-
     from dataclasses import dataclass
 
@@ -282,8 +272,6 @@ sections:
     dataclass는 다른 dataclass를 상속할 수 있습니다. 자식 클래스의 필드가 부모 필드 뒤에 추가됩니다. 부모의 기본값 있는 필드 뒤에 자식의 기본값 없는 필드가 오면 오류가 발생합니다. 이 문제는 field(default=...)나 kw_only=True로 해결합니다. Python 3.10+에서는 kw_only 옵션으로 키워드 전용 인자를 지정할 수 있습니다.
 
     복잡한 상속 구조에서는 합성(composition)을 고려하세요.
-  tips:
-  - 복잡한 상속 구조에서는 합성(composition)을 고려하세요.
   snippet: |-
     from dataclasses import dataclass
 

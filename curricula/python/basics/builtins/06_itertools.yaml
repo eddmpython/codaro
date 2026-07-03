@@ -58,8 +58,6 @@ sections:
     itertools은 파이썬 표준 라이브러리입니다. 효율적인 반복과 조합을 위한 이터레이터 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 itertools 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 itertools 모듈을 사용할 수 있습니다.
   snippet: |-
     from itertools import count, cycle, repeat, islice, combinations, permutations, product, chain, zip_longest, tee, filterfalse, takewhile, dropwhile, groupby, accumulate, combinations_with_replacement
 
@@ -89,8 +87,6 @@ sections:
     itertools는 메모리 효율적인 이터레이터를 제공합니다. count()는 무한 카운터, cycle()은 순환 반복, repeat()는 값 반복을 생성합니다. 무한 시퀀스를 다룰 때는 반드시 종료 조건이나 제한이 필요합니다.
 
     무한 이터레이터는 for 루프에서 break 없이 사용하면 무한 루프가 됩니다.
-  tips:
-  - 무한 이터레이터는 for 루프에서 break 없이 사용하면 무한 루프가 됩니다.
   snippet: |-
     counter = count(0)
     first5 = list(islice(counter, 5))
@@ -118,8 +114,6 @@ sections:
     조합론 함수로 모든 가능한 조합과 순열을 생성합니다. combinations()는 순서 무관 조합, permutations()는 순서 있는 순열, product()는 데카르트 곱을 반환합니다. 경우의 수 계산, 완전 탐색에 활용됩니다.
 
     조합과 순열의 차이: combinations([1,2,3], 2)는 (1,2)만, permutations는 (1,2)와 (2,1) 모두 포함.
-  tips:
-  - '조합과 순열의 차이: combinations([1,2,3], 2)는 (1,2)만, permutations는 (1,2)와 (2,1) 모두 포함.'
   snippet: |-
     choices = ['A', 'B', 'C']
     pairs = list(combinations(choices, 2))
@@ -147,8 +141,6 @@ sections:
     여러 이터레이터를 연결하거나 복제할 수 있습니다. chain()은 여러 이터레이터를 순차 연결하고, zip_longest()는 길이가 다른 이터레이터를 짝짓습니다. tee()는 하나의 이터레이터를 여러 개로 복제합니다.
 
     tee로 복제한 이터레이터는 독립적이므로 하나를 소진해도 다른 것에 영향을 주지 않습니다.
-  tips:
-  - tee로 복제한 이터레이터는 독립적이므로 하나를 소진해도 다른 것에 영향을 주지 않습니다.
   snippet: |-
     list1 = [1, 2, 3]
     list2 = [4, 5, 6]
@@ -178,8 +170,6 @@ sections:
     이터레이터를 조건에 따라 필터링하거나 슬라이싱할 수 있습니다. islice()는 인덱스 범위로 자르고, filterfalse()는 조건을 만족하지 않는 것만, takewhile()은 조건이 참인 동안만 가져옵니다.
 
     takewhile과 filter의 차이: takewhile은 조건이 거짓이 되면 즉시 중단하지만 filter는 끝까지 검사합니다.
-  tips:
-  - 'takewhile과 filter의 차이: takewhile은 조건이 거짓이 되면 즉시 중단하지만 filter는 끝까지 검사합니다.'
   snippet: |-
     numbers = range(10)
     sliced = list(islice(numbers, 2, 6))
@@ -207,8 +197,6 @@ sections:
     연속된 동일 요소를 그룹화하거나 누적값을 계산합니다. groupby()는 정렬된 데이터에서 연속된 같은 값을 묶고, accumulate()는 누적 합계나 누적 연산을 수행합니다. 데이터 집계, 통계 분석에 유용합니다.
 
     groupby는 반드시 정렬된 데이터에 사용해야 합니다. 정렬되지 않으면 같은 값이 여러 그룹으로 나뉩니다.
-  tips:
-  - groupby는 반드시 정렬된 데이터에 사용해야 합니다. 정렬되지 않으면 같은 값이 여러 그룹으로 나뉩니다.
   snippet: |-
     data = [1, 1, 2, 2, 2, 3, 1]
     grouped = [(k, len(list(g))) for k, g in groupby(data)]
@@ -236,8 +224,6 @@ sections:
     실무에서 자주 사용하는 itertools 활용 패턴을 살펴봅니다. 배치 처리, 윈도우 슬라이딩, 페이지네이션, 조합 탐색 등 다양한 문제를 itertools로 효율적으로 해결할 수 있습니다.
 
     itertools 함수들은 제너레이터를 반환하므로 메모리를 절약합니다. 필요한 만큼만 소비하세요.
-  tips:
-  - itertools 함수들은 제너레이터를 반환하므로 메모리를 절약합니다. 필요한 만큼만 소비하세요.
   snippet: |-
     def chunk(iterable, size):
         iterator = iter(iterable)

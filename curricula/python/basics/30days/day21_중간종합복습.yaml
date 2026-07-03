@@ -220,8 +220,6 @@ sections:
     여러 개념을 함께 활용하는 실전 문제들입니다. 자료구조, 제어문, 함수, 모듈을 통합적으로 사용하여 문제를 해결합니다.
 
     여러 개념을 함께 사용하면 더 강력한 프로그램을 만들 수 있습니다.
-  tips:
-  - 여러 개념을 함께 사용하면 더 강력한 프로그램을 만들 수 있습니다.
   snippet: |-
     sentence = "python is fun python is powerful"
     words = sentence.split()

@@ -148,8 +148,6 @@ sections:
     내적(dot product)은 두 벡터의 각 원소를 곱해서 더한 값입니다. [1,2,3]과 [4,5,6]의 내적은 1×4 + 2×5 + 3×6 = 32입니다. 내적이 크면 두 벡터가 비슷한 방향을 가리키고 있다는 의미입니다. 머신러닝에서 유사도 측정, 행렬 연산의 기초로 자주 사용됩니다.
 
     np.dot(a, b)는 두 벡터의 내적(스칼라곱)을 계산합니다. 결과는 스칼라 값으로, 두 벡터가 얼마나 같은 방향을 가리키는지 나타냅니다.
-  tips:
-  - np.dot(a, b)는 두 벡터의 내적(스칼라곱)을 계산합니다. 결과는 스칼라 값으로, 두 벡터가 얼마나 같은 방향을 가리키는지 나타냅니다.
   snippet: |-
     length = X[:, 0]
     diameter = X[:, 1]
@@ -179,8 +177,6 @@ sections:
     행렬 곱셈은 첫 행렬의 각 행과 두 번째 행렬의 각 열을 내적한 결과입니다. A@B에서 A가 (m,n) 크기, B가 (n,k) 크기면 결과는 (m,k) 크기입니다. X.T @ X는 X의 전치행렬과 X를 곱한 것으로, 선형 회귀에서 정규방정식을 풀 때 핵심이 되는 연산입니다.
 
     @ 연산자는 행렬 곱셈(matmul)을 수행합니다. np.dot()도 2D 배열에서는 같은 결과지만, @가 더 명시적입니다.
-  tips:
-  - '@ 연산자는 행렬 곱셈(matmul)을 수행합니다. np.dot()도 2D 배열에서는 같은 결과지만, @가 더 명시적입니다.'
   snippet: |-
     XtX = X.T @ X
     XtX.shape
@@ -206,8 +202,6 @@ sections:
     노름(norm)은 벡터의 '크기' 또는 '길이'입니다. 피타고라스 정리로 계산합니다. [3,4]의 노름은 √(3²+4²) = 5입니다. np.linalg는 linear algebra(선형대수)의 약자로, 행렬과 벡터 연산에 관한 함수들이 모여 있습니다.
 
     np.linalg.norm(arr)은 벡터의 유클리드 노름(길이)을 계산합니다. axis 파라미터로 행/열 방향을 지정할 수 있습니다.
-  tips:
-  - np.linalg.norm(arr)은 벡터의 유클리드 노름(길이)을 계산합니다. axis 파라미터로 행/열 방향을 지정할 수 있습니다.
   snippet: |-
     featureNorms = np.linalg.norm(X, axis=0)
     pd.DataFrame({'Feature': featureCols, 'Norm': featureNorms.round(2)})
@@ -259,8 +253,6 @@ sections:
     선형 회귀는 '특성 × 계수 = 나이' 관계를 찾는 것입니다. lstsq(least squares, 최소제곱)는 예측값과 실제값의 차이(오차)의 제곱합을 최소화하는 계수를 찾습니다. Xbias에 1로 채운 열을 추가하는 이유는 절편(bias, 상수항)을 구하기 위함입니다.
 
     np.linalg.lstsq(A, b)는 Ax=b의 최소제곱 해를 구합니다. 반환값은 (계수, 잔차, 행렬 랭크, 특이값)입니다.
-  tips:
-  - np.linalg.lstsq(A, b)는 Ax=b의 최소제곱 해를 구합니다. 반환값은 (계수, 잔차, 행렬 랭크, 특이값)입니다.
   snippet: |-
     Xbias = np.column_stack([np.ones(len(X)), X])
     coeffs, residuals, rank, s = np.linalg.lstsq(Xbias, age, rcond=None)
@@ -370,8 +362,6 @@ sections:
     다항 회귀는 y = ax² + bx + c 같은 곡선 관계를 찾습니다. 선형 회귀(직선)보다 복잡한 패턴을 표현할 수 있습니다. np.polyfit(x, y, deg=2)는 2차 다항식의 계수 [a, b, c]를 찾습니다. 로컬 샘플에서는 껍질 무게와 나이의 관계가 약할 수 있으므로 다항식 결과도 RMSE로 확인합니다.
 
     np.polyfit(x, y, deg)는 deg차 다항식으로 데이터를 피팅합니다. 반환되는 계수는 최고차항부터 상수항 순서입니다.
-  tips:
-  - np.polyfit(x, y, deg)는 deg차 다항식으로 데이터를 피팅합니다. 반환되는 계수는 최고차항부터 상수항 순서입니다.
   snippet: |-
     shellWeight = X[:, 6]
     polyCoeffs = np.polyfit(shellWeight, age, deg=2)
@@ -399,8 +389,6 @@ sections:
     polyval로 피팅된 다항식을 평가합니다.
 
     np.polyval(coeffs, x)는 다항식 계수와 x값으로 다항식을 평가합니다. polyfit과 함께 사용하면 다항 회귀를 쉽게 수행할 수 있습니다.
-  tips:
-  - np.polyval(coeffs, x)는 다항식 계수와 x값으로 다항식을 평가합니다. polyfit과 함께 사용하면 다항 회귀를 쉽게 수행할 수 있습니다.
   snippet: |-
     agePolyPred = np.polyval(polyCoeffs, shellWeight)
     polyErrors = age - agePolyPred
@@ -430,8 +418,6 @@ sections:
     역행렬은 행렬의 '역수' 같은 개념입니다. A × A⁻¹ = I(단위행렬)입니다. 선형 회귀의 정규 방정식 해는 (X^T X)^(-1) X^T y인데, 이 공식을 직접 계산할 수 있습니다. lstsq와 결과가 같지만, 역행렬 방식은 수치적으로 불안정할 수 있어 lstsq가 더 권장됩니다.
 
     np.linalg.inv(A)는 정방행렬의 역행렬을 계산합니다. 단, 역행렬이 존재하지 않으면(특이 행렬) 에러가 발생합니다.
-  tips:
-  - np.linalg.inv(A)는 정방행렬의 역행렬을 계산합니다. 단, 역행렬이 존재하지 않으면(특이 행렬) 에러가 발생합니다.
   snippet: |-
     XtXinv = np.linalg.inv(Xbias.T @ Xbias)
     coeffsNormal = XtXinv @ Xbias.T @ age
@@ -552,8 +538,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

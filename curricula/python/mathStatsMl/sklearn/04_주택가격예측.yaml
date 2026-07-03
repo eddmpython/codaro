@@ -261,8 +261,6 @@ sections:
     교차검증 결과의 평균과 표준편차를 확인합니다. 표준편차가 작으면 모델이 안정적입니다. 표준편차가 크면 데이터 분할에 따라 성능이 크게 달라지는 것입니다.
 
     모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다.
-  tips:
-  - 모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다.
   snippet: |-
     cvMean = cvScores.mean()
     cvStd = cvScores.std()
@@ -290,8 +288,6 @@ sections:
     Ridge 회귀는 LinearRegression에 L2 정규화를 추가한 것입니다. 과적합을 방지하고 모델을 더 안정적으로 만듭니다. alpha 파라미터로 정규화 강도를 조절합니다.
 
     Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
-  tips:
-  - Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
   snippet: |-
     modelRidge = Ridge(alpha=1.0)
     modelRidge.fit(xTrainSc, yTrain)
@@ -358,8 +354,6 @@ sections:
     회귀 계수의 절대값을 비교하여 어떤 특성이 주택 가격에 가장 큰 영향을 미치는지 확인합니다.
 
     양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. 표준화된 입력에서는 계수 절대값으로 어떤 변수가 예측에 더 크게 기여하는지 비교할 수 있습니다.
-  tips:
-  - 양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. 표준화된 입력에서는 계수 절대값으로 어떤 변수가 예측에 더 크게 기여하는지 비교할 수 있습니다.
   snippet: |-
     importance = pd.DataFrame({
         'Feature': featureNames,
@@ -423,8 +417,6 @@ sections:
     부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from sklearn.model_selection import train_test_split, cross_val_score
     from sklearn.preprocessing import StandardScaler

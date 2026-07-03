@@ -504,8 +504,6 @@ sections:
     DevOps 엔지니어가 되어 실전 서버 로그 분석 업무를 수행해봅시다. Lazy Evaluation, 시계열 분석, 에러 패턴 탐지, percentile 계산 등 로그 분석에 필요한 모든 개념을 종합적으로 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import polars as pl
     import random

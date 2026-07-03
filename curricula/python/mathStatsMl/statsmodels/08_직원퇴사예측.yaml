@@ -136,8 +136,6 @@ sections:
     전체 직원 중 몇 퍼센트가 퇴사했는지 확인합니다. 퇴사율은 HR의 핵심 지표로, 산업 평균과 비교하여 우리 회사의 인재 관리 수준을 판단할 수 있습니다. 일반적으로 15% 이상이면 높은 편입니다. Attrition이 Yes/No 문자열이므로 통계 분석을 위해 0/1 숫자로 변환합니다. 이런 이진 변환은 로지스틱 회귀와 t-test 수행에 필수적인 전처리 단계입니다.
 
     mean()으로 0/1 변수의 평균을 구하면 1의 비율, 즉 퇴사율이 됩니다. 05 프로젝트에서 배운 이탈률 계산과 동일한 원리입니다.
-  tips:
-  - mean()으로 0/1 변수의 평균을 구하면 1의 비율, 즉 퇴사율이 됩니다. 05 프로젝트에서 배운 이탈률 계산과 동일한 원리입니다.
   snippet: |-
     hrData['AttritionBinary'] = (hrData['Attrition'] == 'Yes').astype(int)
     attritionRate = hrData['AttritionBinary'].mean()
@@ -165,8 +163,6 @@ sections:
     가설 검정은 두 그룹 간 차이가 우연인지 실제인지 통계적으로 판단하는 방법입니다. 예를 들어 퇴사자 평균 급여가 재직자보다 낮다면, 이 차이가 표본의 우연한 변동인지 실제 모집단에서도 존재하는 차이인지 검정합니다. p-value가 0.05 미만이면 '우연일 확률이 5% 미만'이므로 차이가 유의미하다고 결론짓습니다. 가설 검정은 HR 의사결정에 통계적 근거를 제공합니다.
 
     불리언 인덱싱으로 조건에 맞는 행만 선택합니다. hrData[조건]은 조건이 True인 행만 반환합니다. 01-07 프로젝트에서 배운 데이터 필터링 기법입니다.
-  tips:
-  - 불리언 인덱싱으로 조건에 맞는 행만 선택합니다. hrData[조건]은 조건이 True인 행만 반환합니다. 01-07 프로젝트에서 배운 데이터 필터링 기법입니다.
   snippet: |-
     attritionYes = hrData[hrData['AttritionBinary'] == 1]
     attritionNo = hrData[hrData['AttritionBinary'] == 0]
@@ -228,8 +224,6 @@ sections:
     p-value와 함께 실제 평균 차이도 확인해야 합니다. 표본이 크면 작은 차이도 통계적으로 유의미하게 나올 수 있지만, 실제 비즈니스 의미가 없을 수 있습니다. 예를 들어 퇴사자가 재직자보다 월급이 1만원 낮고 p-value가 0.01이어도, 이 차이로 퇴사를 설명하기는 어렵습니다. 통계적 유의성(p-value)과 실질적 유의성(효과 크기)을 함께 고려해야 의미 있는 결론을 얻습니다.
 
     퇴사자의 평균 급여가 재직자보다 낮다면, 급여 불만족이 퇴사 요인일 수 있습니다. 하지만 상관관계가 인과관계를 의미하지는 않습니다.
-  tips:
-  - 퇴사자의 평균 급여가 재직자보다 낮다면, 급여 불만족이 퇴사 요인일 수 있습니다. 하지만 상관관계가 인과관계를 의미하지는 않습니다.
   snippet: |-
     meanIncomeYes = incomeYes.mean()
     meanIncomeNo = incomeNo.mean()
@@ -361,8 +355,6 @@ sections:
     여러 수치형 변수에 대해 한번에 t-test를 수행하여 퇴사와 가장 관련 있는 요인을 찾습니다. 나이, 급여, 근속연수, 총 경력, 출퇴근 거리, 이전 직장 수, 워라밸 점수 등을 비교합니다. p-value로 정렬하면 퇴사자와 재직자 간 차이가 가장 큰 변수가 무엇인지 한눈에 파악할 수 있습니다. 이는 로지스틱 회귀 모델에 어떤 변수를 넣을지 결정하는 근거가 됩니다.
 
     p-value가 낮은 순서로 정렬하면 퇴사와 가장 관련 있는 변수를 찾을 수 있습니다. Significant가 Yes인 변수는 퇴사자와 재직자 간 차이가 통계적으로 유의미합니다.
-  tips:
-  - p-value가 낮은 순서로 정렬하면 퇴사와 가장 관련 있는 변수를 찾을 수 있습니다. Significant가 Yes인 변수는 퇴사자와 재직자 간 차이가 통계적으로 유의미합니다.
   snippet: |-
     numericVars = ['Age', 'MonthlyIncome', 'YearsAtCompany', 'TotalWorkingYears',
                    'DistanceFromHome', 'NumCompaniesWorked', 'WorkLifeBalance']
@@ -422,8 +414,6 @@ sections:
     여러 변수의 t-test 결과를 막대 그래프로 시각화하면 어떤 요인이 퇴사에 가장 큰 영향을 미치는지 직관적으로 파악할 수 있습니다. 유의미한 변수(p < 0.05)와 그렇지 않은 변수를 색상으로 구분합니다.
 
     빨간색은 통계적으로 유의미한 차이(p < 0.05), 회색은 유의미하지 않은 차이입니다. 막대가 길수록 퇴사자와 재직자 간 차이가 큽니다.
-  tips:
-  - 빨간색은 통계적으로 유의미한 차이(p < 0.05), 회색은 유의미하지 않은 차이입니다. 막대가 길수록 퇴사자와 재직자 간 차이가 큽니다.
   snippet: |-
     import altair as alt
 
@@ -462,8 +452,6 @@ sections:
     t-test는 2개 그룹만 비교할 수 있습니다. 3개 이상 그룹을 비교하려면 ANOVA(Analysis of Variance, 분산분석)를 사용합니다. 직무만족도는 1(매우 낮음)에서 4(매우 높음)까지 4단계로 측정되므로 ANOVA가 적합합니다. ANOVA는 '모든 그룹의 평균이 같다'는 귀무가설을 검정하며, p-value가 0.05 미만이면 최소 한 그룹은 다른 그룹과 유의미하게 다르다고 결론짓습니다.
 
     JobSatisfaction은 1(낮음)에서 4(높음)까지 4단계입니다. groupby().agg()로 각 그룹의 통계량을 계산합니다. 02 프로젝트에서 배운 집계 함수 활용입니다.
-  tips:
-  - JobSatisfaction은 1(낮음)에서 4(높음)까지 4단계입니다. groupby().agg()로 각 그룹의 통계량을 계산합니다. 02 프로젝트에서 배운 집계 함수 활용입니다.
   snippet: |-
     satisfactionGroups = hrData.groupby('JobSatisfaction')['AttritionBinary'].agg(['mean', 'count'])
     satisfactionGroups.columns = ['퇴사율', '인원수']
@@ -491,8 +479,6 @@ sections:
     One-way ANOVA로 직무만족도 4개 그룹 간 퇴사율 차이를 검정합니다. F-statistic은 그룹 간 분산을 그룹 내 분산으로 나눈 값으로, 클수록 그룹 간 차이가 뚜렷합니다. 만족도 1인 그룹의 퇴사율이 만족도 4인 그룹보다 높다면, 직무 만족도 개선이 퇴사 방지에 효과적이라는 통계적 근거가 됩니다. ANOVA 결과가 유의미하면 어떤 그룹 간에 차이가 있는지 사후검정으로 추가 분석할 수 있습니다.
 
     stats.f_oneway()는 One-way ANOVA를 수행합니다. F-statistic은 그룹 간 분산과 그룹 내 분산의 비율입니다. F값이 클수록 그룹 간 차이가 큽니다.
-  tips:
-  - stats.f_oneway()는 One-way ANOVA를 수행합니다. F-statistic은 그룹 간 분산과 그룹 내 분산의 비율입니다. F값이 클수록 그룹 간 차이가 큽니다.
   snippet: |-
     group1 = hrData[hrData['JobSatisfaction'] == 1]['AttritionBinary']
     group2 = hrData[hrData['JobSatisfaction'] == 2]['AttritionBinary']
@@ -528,8 +514,6 @@ sections:
     Boxplot은 ANOVA 분석에 적합한 시각화로, 각 그룹의 중앙값, 사분위수, 이상치를 한눈에 보여줍니다. 직무만족도별 급여 분포를 비교하면 어떤 그룹이 급여가 낮은지 파악할 수 있습니다.
 
     녹색은 재직자, 빨간색은 퇴사자입니다. 박스 안의 선은 중앙값, 박스 상하는 25%-75% 범위입니다. 퇴사자의 급여가 전반적으로 낮다면 급여 불만족이 퇴사 원인일 수 있습니다.
-  tips:
-  - 녹색은 재직자, 빨간색은 퇴사자입니다. 박스 안의 선은 중앙값, 박스 상하는 25%-75% 범위입니다. 퇴사자의 급여가 전반적으로 낮다면 급여 불만족이 퇴사 원인일 수 있습니다.
   snippet: |-
     import seaborn as sns
     import matplotlib.pyplot as plt
@@ -643,8 +627,6 @@ sections:
     승산비(Odds Ratio)로 각 변수의 영향력을 해석합니다. 승산비는 로지스틱 회귀 계수를 exp() 함수로 변환한 값으로, 해당 변수가 1 증가할 때 퇴사 '승산'이 몇 배로 바뀌는지 나타냅니다. 승산비가 1.1이면 10% 증가, 0.9이면 10% 감소입니다. 예를 들어 DistanceFromHome의 승산비가 1.05면 출퇴근 거리가 1km 증가할 때마다 퇴사 승산이 5% 증가한다는 의미입니다.
 
     Odds Ratio가 1.1이면 해당 변수가 1 증가할 때 퇴사 확률이 10% 증가합니다. 0.9이면 10% 감소합니다. 05 프로젝트의 승산비 해석과 동일합니다.
-  tips:
-  - Odds Ratio가 1.1이면 해당 변수가 1 증가할 때 퇴사 확률이 10% 증가합니다. 0.9이면 10% 감소합니다. 05 프로젝트의 승산비 해석과 동일합니다.
   snippet: |-
     oddsRatio = np.exp(logitModel.params)
     pvals = logitModel.pvalues
@@ -768,8 +750,6 @@ sections:
     HR 분석가가 되어 직원 퇴사 요인을 분석합니다. 실제 HR 분석에서는 여러 가설을 검정하고, 유의미한 변수를 조합하여 예측 모델을 만듭니다. 각 미션은 데이터 로딩부터 가설 검정, 로지스틱 회귀까지 전체 과정을 독립적으로 수행합니다. 본 프로젝트에서 배운 t-test, ANOVA, 승산비 해석을 실습을 통해 체화해봅니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import numpy as np

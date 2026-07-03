@@ -90,8 +90,6 @@ sections:
     model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
 
     스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
-  tips:
-  - 스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
   snippet: |-
     class User(BaseModel):
         name: str
@@ -350,8 +348,6 @@ sections:
     model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다.
 
     validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
-  tips:
-  - validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
   snippet: |-
     class Item(BaseModel):
         name: str
@@ -494,8 +490,6 @@ sections:
     지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from pydantic import BaseModel, Field
     from typing import Optional

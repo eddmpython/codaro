@@ -235,8 +235,6 @@ sections:
     히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다.
 
     np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
-  tips:
-  - np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
   snippet: |-
     glucose = clean[:, 1]
     hist, edges = np.histogram(glucose, bins=10)
@@ -264,8 +262,6 @@ sections:
     np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다.
 
     np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
-  tips:
-  - np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
   snippet: |-
     counts = np.bincount(y)
     f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
@@ -291,8 +287,6 @@ sections:
     공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다.
 
     np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
-  tips:
-  - np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
   snippet: |-
     cov = np.cov(clean.T)
     cov.shape
@@ -422,8 +416,6 @@ sections:
     고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다.
 
     np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
-  tips:
-  - np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
   snippet: |-
     c = np.cov(z.T)
     eig, vec = np.linalg.eig(c)
@@ -457,8 +449,6 @@ sections:
     np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다.
 
     np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
-  tips:
-  - np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
   snippet: |-
     def iqr(x):
         return np.percentile(x, 75) - np.percentile(x, 25)
@@ -603,8 +593,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

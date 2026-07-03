@@ -358,8 +358,6 @@ sections:
     레스토랑 매니저가 되어 배운 모든 개념을 활용해서 팁 데이터를 분석해봅시다. 데이터 불러오기, 컬럼 선택, 통계 계산(mean, max, min, describe) 등 지금까지 배운 내용을 모두 사용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset

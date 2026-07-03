@@ -58,8 +58,6 @@ sections:
     os는 파이썬 표준 라이브러리입니다. 운영체제 인터페이스를 제공하는 모듈입니다. 파일 시스템 조작, 경로 처리, 환경 변수 관리 등 다양한 기능을 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 os 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 os 모듈을 사용할 수 있습니다.
   snippet: |-
     import os
     import tempfile
@@ -91,8 +89,6 @@ sections:
     os.path는 경로 문자열을 조작하는 함수들을 제공합니다. join()으로 경로를 결합하고, dirname()과 basename()으로 경로를 분해합니다. 플랫폼에 관계없이 올바른 경로 구분자를 사용하므로 크로스 플랫폼 코드 작성에 필수적입니다.
 
     os.path.join()은 운영체제에 맞는 경로 구분자(Windows: \, Unix: /)를 자동으로 사용합니다.
-  tips:
-  - 'os.path.join()은 운영체제에 맞는 경로 구분자(Windows: \, Unix: /)를 자동으로 사용합니다.'
   snippet: |-
     folderPath = os.path.join('home', 'user', 'documents')
     folderPath
@@ -118,8 +114,6 @@ sections:
     경로의 존재 여부와 타입을 확인하는 함수들입니다. exists()로 존재 확인, isdir()과 isfile()로 타입 확인, isabs()로 절대경로 여부를 판단합니다. 파일 작업 전 반드시 확인하여 에러를 방지합니다.
 
     Codaro 로컬 커널에서는 현재 작업 디렉터리와 권한이 허용된 로컬 경로를 다룰 수 있습니다. 예제는 안전한 임시 경로 중심으로 진행합니다.
-  tips:
-  - Codaro 로컬 커널에서는 현재 작업 디렉터리와 권한이 허용된 로컬 경로를 다룰 수 있습니다. 예제는 안전한 임시 경로 중심으로 진행합니다.
   snippet: |-
     rootExists = os.path.exists('/')
     rootExists
@@ -145,8 +139,6 @@ sections:
     디렉토리를 탐색하고 조작하는 함수들입니다. listdir()로 내용을 확인하고, getcwd()로 현재 디렉토리를 얻으며, mkdir()과 rmdir()로 디렉토리를 생성하고 삭제합니다. 파일 관리 스크립트의 핵심 기능입니다.
 
     Codaro 로컬 커널에서 mkdir/rmdir은 실제 로컬 임시 디렉터리에 적용됩니다. 실습용 경로를 먼저 만들고 삭제 대상을 확인한 뒤 실행하세요.
-  tips:
-  - Codaro 로컬 커널에서 mkdir/rmdir은 실제 로컬 임시 디렉터리에 적용됩니다. 실습용 경로를 먼저 만들고 삭제 대상을 확인한 뒤 실행하세요.
   snippet: |-
     currentDir = os.getcwd()
     currentDir
@@ -172,8 +164,6 @@ sections:
     파일을 관리하는 함수들입니다. remove()로 파일을 삭제하고, rename()으로 이름을 변경하며, stat()으로 파일 정보를 확인합니다. 파일 크기, 수정 시간 등 메타데이터 접근이 가능합니다.
 
     remove()는 파일만, rmdir()은 빈 디렉토리만 삭제합니다. 디렉토리와 내용을 함께 삭제하려면 shutil.rmtree()를 사용하세요.
-  tips:
-  - remove()는 파일만, rmdir()은 빈 디렉토리만 삭제합니다. 디렉토리와 내용을 함께 삭제하려면 shutil.rmtree()를 사용하세요.
   snippet: |-
     testFile = os.path.join(tempfile.gettempdir(), 'codaro_os_sample.txt')
     with open(testFile, 'w') as f:
@@ -205,8 +195,6 @@ sections:
     시스템 환경 변수와 정보에 접근하는 방법입니다. environ은 모든 환경 변수를 담은 딕셔너리이고, getenv()로 개별 변수를 가져옵니다. os.name으로 운영체제를 확인할 수 있습니다.
 
     Codaro 로컬 커널에서는 프로세스 환경 변수를 읽고 현재 실행 프로세스 범위에서 수정할 수 있습니다. 영구 설정은 운영체제 환경 변수 설정에서 관리하세요.
-  tips:
-  - Codaro 로컬 커널에서는 프로세스 환경 변수를 읽고 현재 실행 프로세스 범위에서 수정할 수 있습니다. 영구 설정은 운영체제 환경 변수 설정에서 관리하세요.
   snippet: |-
     systemName = os.name
     systemName

@@ -83,8 +83,6 @@ sections:
     MarkerCluster를 생성하고 마커를 추가합니다. 마커들이 자동으로 그룹화됩니다.
 
     클러스터에 표시된 숫자는 그룹에 포함된 마커 수입니다. 클릭하거나 줌인하면 분리됩니다.
-  tips:
-  - 클러스터에 표시된 숫자는 그룹에 포함된 마커 수입니다. 클릭하거나 줌인하면 분리됩니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
@@ -147,8 +145,6 @@ sections:
     수백 개의 마커를 클러스터로 효율적으로 표시합니다.
 
     200개 마커도 클러스터로 표시하면 지도가 깔끔합니다. 줌인해서 개별 마커를 확인하세요.
-  tips:
-  - 200개 마커도 클러스터로 표시하면 지도가 깔끔합니다. 줌인해서 개별 마커를 확인하세요.
   snippet: |-
     import random
 
@@ -191,8 +187,6 @@ sections:
     클러스터 내 마커에도 팝업과 툴팁을 추가할 수 있습니다.
 
     줌인해서 개별 마커를 클릭하면 팝업이 표시됩니다.
-  tips:
-  - 줌인해서 개별 마커를 클릭하면 팝업이 표시됩니다.
   snippet: |-
     m3 = folium.Map(location=seoulCenter, zoom_start=13)
     cluster3 = MarkerCluster().add_to(m3)
@@ -253,8 +247,6 @@ sections:
     클러스터 내 마커에 커스텀 아이콘을 적용합니다.
 
     클러스터 아이콘(숫자 원)은 자동 생성되고, 개별 마커는 지정한 아이콘으로 표시됩니다.
-  tips:
-  - 클러스터 아이콘(숫자 원)은 자동 생성되고, 개별 마커는 지정한 아이콘으로 표시됩니다.
   snippet: |-
     m4 = folium.Map(location=seoulCenter, zoom_start=12)
     cluster4 = MarkerCluster().add_to(m4)
@@ -313,8 +305,6 @@ sections:
     카테고리별로 별도의 클러스터를 만들어 분류합니다.
 
     LayerControl로 카테고리별 클러스터를 켜고 끌 수 있습니다.
-  tips:
-  - LayerControl로 카테고리별 클러스터를 켜고 끌 수 있습니다.
   snippet: |-
     m5 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -403,8 +393,6 @@ sections:
     MarkerCluster에 다양한 옵션을 설정할 수 있습니다.
 
     maxClusterRadius는 클러스터 반경(픽셀), disableClusteringAtZoom은 클러스터링 해제 줌 레벨입니다.
-  tips:
-  - maxClusterRadius는 클러스터 반경(픽셀), disableClusteringAtZoom은 클러스터링 해제 줌 레벨입니다.
   snippet: |-
     import random
 
@@ -461,8 +449,6 @@ sections:
     showCoverageOnHover 옵션으로 클러스터의 범위를 시각화합니다.
 
     클러스터 위에 마우스를 올리면 포함된 마커들의 범위가 표시됩니다.
-  tips:
-  - 클러스터 위에 마우스를 올리면 포함된 마커들의 범위가 표시됩니다.
   snippet: |-
     import random
 
@@ -515,8 +501,6 @@ sections:
     클러스터와 일반 마커, 도형을 함께 사용합니다.
 
     중요한 위치는 일반 마커로, 대량의 위치는 클러스터로 표시합니다.
-  tips:
-  - 중요한 위치는 일반 마커로, 대량의 위치는 클러스터로 표시합니다.
   snippet: |-
     import random
 

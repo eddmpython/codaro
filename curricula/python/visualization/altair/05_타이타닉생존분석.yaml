@@ -93,8 +93,6 @@ sections:
     survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. 생존 여부별 승객 수를 막대 차트로 표현합니다.
 
     survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
-  tips:
-  - survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
   snippet: |-
     chartSurvived = alt.Chart(titanic).mark_bar().encode(
         x='survived:N',
@@ -164,8 +162,6 @@ sections:
     column 인코딩으로 차트를 가로로 분할합니다. 객실 등급(pclass)으로 분할해봅니다.
 
     pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
-  tips:
-  - pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
   snippet: |-
     chartColumn = alt.Chart(titanic).mark_bar().encode(
         x='survived:N',
@@ -379,8 +375,6 @@ sections:
     이 프로젝트에서 배운 내용을 정리합니다. row와 column으로 차트를 행과 열로 분할했습니다. 2차원 그리드를 만들 수 있습니다. transform_filter()로 조건에 맞는 데이터만 필터링했습니다. alt.datum.컬럼명으로 조건을 지정하고, ==, &, | 연산자를 사용합니다. facet() 메서드로 유연하게 패싯 차트를 만들었습니다. columns로 레이아웃을 조정할 수 있습니다. 각 미션에서 이 개념들을 활용해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd
@@ -426,8 +420,6 @@ sections:
     Facet 차트는 여러 집단을 동시에 비교하므로 생존 컬럼의 의미, 집단 표본, row/column 사양을 함께 확인해야 합니다.
 
     Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다.
-  tips:
-  - Facet은 비교 대상을 늘리는 기능이지만, 생존율의 기준과 표본 검증 없이는 결론을 강하게 말할 수 없습니다.
   snippet: |-
     import altair as alt
     from codaro.curriculum.localData import loadLocalDataset

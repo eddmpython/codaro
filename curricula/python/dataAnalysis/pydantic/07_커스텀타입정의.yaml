@@ -88,8 +88,6 @@ sections:
     Annotated[타입, 메타데이터]로 기존 타입에 검증 규칙을 추가합니다. Field의 제약조건(gt, min_length 등)을 타입 자체에 포함시키면 모든 필드에서 동일한 규칙을 적용할 수 있습니다.
 
     PositiveInt를 사용하는 모든 필드에 gt=0 제약이 자동 적용됩니다. 규칙 변경 시 타입 정의만 수정하면 됩니다.
-  tips:
-  - PositiveInt를 사용하는 모든 필드에 gt=0 제약이 자동 적용됩니다. 규칙 변경 시 타입 정의만 수정하면 됩니다.
   snippet: |-
     PositiveInt = Annotated[int, Field(gt=0)]
     ShortString = Annotated[str, Field(max_length=50)]
@@ -579,8 +577,6 @@ sections:
     지금까지 배운 Annotated, AfterValidator, BeforeValidator, 제약 타입을 활용하여 도메인 특화 타입을 정의합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from typing import Annotated
     from pydantic import BaseModel, Field, AfterValidator, BeforeValidator, ValidationError

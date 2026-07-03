@@ -60,8 +60,6 @@ sections:
     if문은 조건이 True일 때만 코드를 실행합니다. if 조건: 형식으로 쓰며, 조건 뒤에 콜론(:)을 붙이고 실행할 코드는 들여쓰기합니다. 조건이 False면 if 블록을 건너뜁니다.
 
     if문의 조건은 비교 연산자, 논리 연산자, in 연산자 등을 사용할 수 있습니다.
-  tips:
-  - if문의 조건은 비교 연산자, 논리 연산자, in 연산자 등을 사용할 수 있습니다.
   snippet: |-
     age = 20
     if age >= 18:
@@ -94,8 +92,6 @@ sections:
     else는 if 조건이 False일 때 실행됩니다. if-else를 사용하면 조건에 따라 둘 중 하나가 반드시 실행됩니다. else 뒤에도 콜론(:)을 붙이고 들여쓰기합니다.
 
     if-else는 둘 중 하나를 반드시 선택해야 할 때 유용합니다.
-  tips:
-  - if-else는 둘 중 하나를 반드시 선택해야 할 때 유용합니다.
   snippet: |-
     num = 7
     if num % 2 == 0:
@@ -132,8 +128,6 @@ sections:
     elif는 else if의 줄임말로, 여러 조건을 순차적으로 검사합니다. if-elif-else를 사용하면 3개 이상의 경우를 나눌 수 있습니다. 위에서부터 조건을 검사하여 처음 True인 블록만 실행됩니다.
 
     elif는 여러 개 사용할 수 있으며, else는 생략 가능합니다.
-  tips:
-  - elif는 여러 개 사용할 수 있으며, else는 생략 가능합니다.
   snippet: |-
     point = 85
     if point >= 90:
@@ -178,8 +172,6 @@ sections:
     비교 연산자(==, !=, >, <, >=, <=)는 조건문에서 가장 많이 사용됩니다. 두 값을 비교하여 True/False를 반환하며, 이를 if문의 조건으로 사용합니다.
 
     문자열도 비교 연산자로 비교할 수 있습니다(사전 순서).
-  tips:
-  - 문자열도 비교 연산자로 비교할 수 있습니다(사전 순서).
   snippet: |-
     password = '1234'
     if password == '1234':
@@ -216,8 +208,6 @@ sections:
     and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 여러 조건을 동시에 만족해야 할 때 사용합니다. 조건1 and 조건2 형식입니다.
 
     범위 검사는 50 <= value <= 100 형식으로도 가능합니다.
-  tips:
-  - 범위 검사는 50 <= value <= 100 형식으로도 가능합니다.
   snippet: |-
     userAge = 25
     isMember = True
@@ -256,8 +246,6 @@ sections:
     or 연산자는 양쪽 조건 중 하나라도 True면 True를 반환합니다. 여러 조건 중 하나만 만족해도 될 때 사용합니다. 조건1 or 조건2 형식입니다.
 
     or는 첫 번째 True를 만나면 나머지 조건은 검사하지 않습니다.
-  tips:
-  - or는 첫 번째 True를 만나면 나머지 조건은 검사하지 않습니다.
   snippet: |-
     weekend = False
     holiday = True
@@ -296,8 +284,6 @@ sections:
     not 연산자는 조건의 결과를 반대로 뒤집습니다. True는 False로, False는 True로 바꿉니다. not 조건 형식으로 사용합니다.
 
     not count == 0 대신 count != 0을 사용하는 것이 더 읽기 쉽습니다.
-  tips:
-  - not count == 0 대신 count != 0을 사용하는 것이 더 읽기 쉽습니다.
   snippet: |-
     logged = False
     if not logged:
@@ -334,8 +320,6 @@ sections:
     in 연산자는 값이 리스트, 튜플, 집합, 딕셔너리, 문자열에 포함되어 있는지 검사합니다. 값 in 컬렉션 형식으로 사용하며, True/False를 반환합니다.
 
     not in 연산자로 포함되지 않은 것을 검사할 수 있습니다.
-  tips:
-  - not in 연산자로 포함되지 않은 것을 검사할 수 있습니다.
   snippet: |-
     users = ['admin', 'user1', 'user2']
     user = 'user1'
@@ -374,8 +358,6 @@ sections:
     if문 안에 다시 if문을 넣을 수 있습니다. 이를 중첩 조건문이라고 하며, 복잡한 조건을 단계적으로 검사할 때 사용합니다. 들여쓰기 단계가 늘어납니다.
 
     중첩이 깊어지면 and 연산자로 단순화할 수 있습니다.
-  tips:
-  - 중첩이 깊어지면 and 연산자로 단순화할 수 있습니다.
   snippet: |-
     driverAge = 25
     hasLicense = True
@@ -420,8 +402,6 @@ sections:
     삼항 연산자는 if-else를 한 줄로 표현합니다. 값1 if 조건 else 값2 형식으로 쓰며, 조건이 True면 값1, False면 값2를 반환합니다. 간단한 조건 분기에 유용합니다.
 
     삼항 연산자는 간단한 조건에만 사용하세요. 복잡하면 일반 if-else가 더 읽기 쉽습니다.
-  tips:
-  - 삼항 연산자는 간단한 조건에만 사용하세요. 복잡하면 일반 if-else가 더 읽기 쉽습니다.
   snippet: |-
     n = 10
     category = 'even' if n % 2 == 0 else 'odd'

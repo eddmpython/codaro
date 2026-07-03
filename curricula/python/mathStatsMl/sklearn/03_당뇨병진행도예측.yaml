@@ -99,8 +99,6 @@ sections:
     당뇨병 데이터셋은 442명 환자의 10가지 기준값(나이, 성별, BMI, 혈압 등)과 1년 후 질병 진행도를 담고 있습니다. 진행도는 연속적인 숫자이므로 회귀 문제입니다.
 
     이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
-  tips:
-  - 이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
   snippet: |-
     diabetes = load_diabetes()
     X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
@@ -201,8 +199,6 @@ sections:
     LinearRegression은 가장 기본적인 회귀 알고리즘입니다. 입력 특성과 타겟 사이의 선형 관계를 학습합니다. y = w1*x1 + w2*x2 + ... + b 형태의 식을 찾습니다.
 
     coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
-  tips:
-  - coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
   snippet: |-
     model = LinearRegression()
     model.fit(xTrainSc, yTrain)
@@ -252,8 +248,6 @@ sections:
     MSE(Mean Squared Error)는 예측 오차의 제곱 평균입니다. 값이 작을수록 좋습니다. RMSE는 MSE의 제곱근으로, 원래 단위로 해석할 수 있습니다.
 
     MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
-  tips:
-  - MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
   snippet: |-
     mse = mean_squared_error(yTest, yPred)
     rmse = np.sqrt(mse)
@@ -281,8 +275,6 @@ sections:
     MAE(Mean Absolute Error)는 예측 오차의 절대값 평균입니다. MSE보다 이상치에 덜 민감합니다. 평균적으로 얼마나 틀리는지를 나타냅니다.
 
     MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
-  tips:
-  - MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
   snippet: |-
     mae = mean_absolute_error(yTest, yPred)
     f"MAE: {mae:.2f}"
@@ -336,8 +328,6 @@ sections:
     예측값과 실제값을 산점도로 비교합니다. 완벽한 모델이라면 점들이 대각선(y=x) 위에 있어야 합니다.
 
     잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
-  tips:
-  - 잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
   snippet: |-
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.scatter(yTest, yPred, alpha=0.6)
@@ -404,8 +394,6 @@ sections:
     의료 데이터 분석가가 되어 당뇨병 진행도 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, MSE, R²를 모두 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from sklearn.datasets import load_diabetes
     from sklearn.model_selection import train_test_split

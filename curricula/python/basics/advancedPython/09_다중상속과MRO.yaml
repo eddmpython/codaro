@@ -59,8 +59,6 @@ sections:
     파이썬은 다중 상속을 지원합니다. 클래스 정의 시 여러 부모 클래스를 쉼표로 구분하여 지정합니다. 자식 클래스는 모든 부모 클래스의 속성과 메서드를 상속받습니다. 같은 이름의 메서드가 여러 부모에 있으면 MRO에 따라 첫 번째 발견된 것이 사용됩니다. 다중 상속은 강력하지만 복잡성을 증가시킬 수 있습니다. 올바르게 사용하면 코드 재사용성을 높이고 유연한 설계가 가능합니다.
 
     다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다.
-  tips:
-  - 다중 상속에서 super()를 사용하면 MRO를 따라 모든 부모가 올바르게 초기화됩니다.
   snippet: |-
     class Flyable:
         def fly(self):
@@ -110,8 +108,6 @@ sections:
     MRO(Method Resolution Order)는 메서드를 찾는 순서입니다. 파이썬은 C3 선형화 알고리즘을 사용합니다. C3는 단조성(부모-자식 순서 유지)과 지역 우선(왼쪽 부모 우선)을 보장합니다. 클래스.__mro__ 또는 클래스.mro()로 MRO를 확인할 수 있습니다. MRO는 클래스 정의 시 계산되며, 유효하지 않은 상속 구조는 TypeError를 발생시킵니다. super()는 MRO의 다음 클래스를 호출합니다.
 
     MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다.
-  tips:
-  - MRO가 유효하지 않으면 'Cannot create a consistent method resolution order' 에러가 발생합니다.
   snippet: |-
     class A:
         pass
@@ -159,8 +155,6 @@ sections:
     다이아몬드 문제는 두 부모가 같은 조상을 가질 때 발생합니다. 조상의 메서드가 두 번 호출될 수 있는 문제입니다. 파이썬의 MRO와 super()는 이 문제를 해결합니다. C3 선형화는 각 클래스가 MRO에서 한 번만 나타나도록 보장합니다. super()를 사용하면 MRO를 따라 각 클래스의 메서드가 한 번씩만 호출됩니다. 협력적 다중 상속(cooperative multiple inheritance)이라고 합니다.
 
     다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요.
-  tips:
-  - 다중 상속에서는 항상 super()를 사용하고, 모든 클래스가 super()를 호출하도록 설계하세요.
   snippet: |-
     class A:
         def __init__(self):
@@ -222,8 +216,6 @@ sections:
     super()는 MRO에서 현재 클래스 다음의 클래스를 반환합니다. super(Type, obj)처럼 인자를 지정할 수도 있습니다. 메서드 내에서 super()를 호출하면 자동으로 현재 클래스와 인스턴스가 사용됩니다. super()는 프록시 객체를 반환하며, 이 프록시가 MRO의 다음 클래스의 메서드를 호출합니다. 협력적 다중 상속에서는 모든 클래스가 super()를 호출해야 체인이 완성됩니다.
 
     super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다.
-  tips:
-  - super()와 **kwargs 패턴을 사용하면 다중 상속에서 인자를 안전하게 전달할 수 있습니다.
   snippet: |-
     class Parent:
         def greet(self):
@@ -265,8 +257,6 @@ sections:
     Mixin은 독립적인 기능을 제공하는 작은 클래스입니다. 단독으로 사용하지 않고 다른 클래스와 조합합니다. Mixin은 보통 특정 기능만 추가하고 인스턴스 상태는 최소화합니다. 이름에 Mixin 접미사를 붙여 용도를 명확히 합니다. 여러 Mixin을 조합해 다양한 기능을 가진 클래스를 만들 수 있습니다. Mixin은 is-a 관계보다 has-a 기능에 가깝습니다.
 
     Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다.
-  tips:
-  - Mixin은 오른쪽에, 주요 부모 클래스는 왼쪽에 배치하는 것이 관례입니다.
   snippet: |-
     class JSONMixin:
         def toJSON(self):
@@ -322,8 +312,6 @@ sections:
     상속보다 합성을 선호하라(Favor composition over inheritance)는 유명한 설계 원칙입니다. 상속은 is-a 관계를 표현하고, 합성은 has-a 관계를 표현합니다. 상속은 부모의 구현에 강하게 결합되어 변경에 취약합니다. 합성은 객체를 멤버로 포함하여 느슨한 결합을 유지합니다. 상속이 적합한 경우: 명확한 is-a 관계, 부모 인터페이스 재사용. 합성이 적합한 경우: 구현 재사용, 유연한 조합이 필요할 때.
 
     변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요.
-  tips:
-  - 변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요.
   snippet: |-
     class Engine:
         def start(self):

@@ -58,8 +58,6 @@ sections:
     pathlib는 파이썬의 객체지향 경로 처리 라이브러리입니다. Path 클래스를 통해 os.path보다 직관적인 API를 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 Path 클래스를 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 Path 클래스를 사용할 수 있습니다.
   snippet: |-
     import tempfile
     from pathlib import Path
@@ -91,8 +89,6 @@ sections:
     Path 객체는 경로를 문자열이 아닌 객체로 다룹니다. 절대 경로 변환, 경로 구성요소 분리, 파일명과 확장자 추출 등 다양한 속성과 메서드를 제공합니다.
 
     parts는 경로를 튜플로 분리하며, parent는 바로 위 디렉토리, parents는 모든 상위 디렉토리를 반환합니다.
-  tips:
-  - parts는 경로를 튜플로 분리하며, parent는 바로 위 디렉토리, parents는 모든 상위 디렉토리를 반환합니다.
   snippet: |-
     absolutePath = Path('.').resolve()
     absolutePath
@@ -118,8 +114,6 @@ sections:
     Path 객체는 / 연산자로 경로를 결합하고, with_name()과 with_suffix()로 파일명과 확장자를 변경할 수 있습니다. relative_to()로 상대 경로를 계산합니다.
 
     / 연산자와 joinpath()는 동일한 결과를 반환합니다. with_name()과 with_suffix()는 원본을 변경하지 않고 새 Path 객체를 반환합니다.
-  tips:
-  - / 연산자와 joinpath()는 동일한 결과를 반환합니다. with_name()과 with_suffix()는 원본을 변경하지 않고 새 Path 객체를 반환합니다.
   snippet: |-
     basePath = Path('/home/user')
     newPath = basePath / 'documents' / 'file.txt'
@@ -147,8 +141,6 @@ sections:
     Path 객체는 경로의 존재 여부, 타입(파일/디렉토리), 절대 경로 여부 등을 확인하는 메서드를 제공합니다. 모든 메서드는 True/False를 반환합니다.
 
     Codaro 로컬 커널에서는 로컬 파일시스템 경로를 다룹니다. Windows에서 절대 경로는 C:\로 시작하고, Unix에서는 /로 시작합니다.
-  tips:
-  - Codaro 로컬 커널에서는 로컬 파일시스템 경로를 다룹니다. Windows에서 절대 경로는 C:\로 시작하고, Unix에서는 /로 시작합니다.
   snippet: |-
     checkPath = Path('.')
     checkPath.exists()
@@ -174,8 +166,6 @@ sections:
     Path 객체는 디렉토리의 내용을 나열하고, 패턴에 맞는 파일을 검색하는 강력한 기능을 제공합니다. iterdir()은 현재 디렉토리를, glob()과 rglob()은 패턴 매칭 검색을 수행합니다.
 
     glob()은 현재 디렉토리만 검색하고, rglob()은 **/ 패턴을 자동으로 적용하여 모든 하위 디렉토리를 검색합니다.
-  tips:
-  - glob()은 현재 디렉토리만 검색하고, rglob()은 **/ 패턴을 자동으로 적용하여 모든 하위 디렉토리를 검색합니다.
   snippet: |-
     currentDir = Path('.')
     [item.name for item in currentDir.iterdir()][:10]
@@ -201,8 +191,6 @@ sections:
     Path 객체는 read_text(), write_text()로 텍스트 파일을, read_bytes(), write_bytes()로 바이너리 파일을 간단히 처리합니다. 파일을 자동으로 열고 닫아 안전합니다.
 
     Codaro 로컬 커널에서는 지정한 로컬 경로에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어쓰므로 실습용 경로에서 실행하세요.
-  tips:
-  - Codaro 로컬 커널에서는 지정한 로컬 경로에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어쓰므로 실습용 경로에서 실행하세요.
   snippet: |-
     pathlibScratch = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch'
     pathlibScratch.mkdir(parents=True, exist_ok=True)

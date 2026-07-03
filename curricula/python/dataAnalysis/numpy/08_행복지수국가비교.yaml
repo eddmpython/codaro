@@ -153,8 +153,6 @@ sections:
     np.stack()은 여러 배열을 새로운 차원을 추가하면서 쌓습니다. 마치 카드를 쌓아 카드 덱을 만드는 것과 같습니다. 4개의 (156,) 배열을 stack하면 (4, 156) 배열이 됩니다. 첫 번째 차원이 '어떤 지표인가'를, 두 번째 차원이 '어느 국가인가'를 나타냅니다.
 
     np.stack([a, b, c])은 새로운 축을 추가하여 배열을 쌓습니다. 결과 shape은 (3, 원래길이)가 됩니다. axis 파라미터로 쌓는 방향을 조절할 수 있습니다.
-  tips:
-  - np.stack([a, b, c])은 새로운 축을 추가하여 배열을 쌓습니다. 결과 shape은 (3, 원래길이)가 됩니다. axis 파라미터로 쌓는 방향을 조절할 수 있습니다.
   snippet: |-
     indicators = np.stack([gdp, social, health, freedom])
     indicators.shape
@@ -180,8 +178,6 @@ sections:
     axis=1로 스택하면 열 방향으로 쌓입니다. 결과 shape이 달라집니다.
 
     axis=0(기본): 행 방향으로 쌓아 (4, 156) 형태. axis=1: 열 방향으로 쌓아 (156, 4) 형태가 됩니다.
-  tips:
-  - 'axis=0(기본): 행 방향으로 쌓아 (4, 156) 형태. axis=1: 열 방향으로 쌓아 (156, 4) 형태가 됩니다.'
   snippet: |-
     indicatorsCol = np.stack([gdp, social, health, freedom], axis=1)
     indicatorsCol.shape
@@ -207,8 +203,6 @@ sections:
     np.split()은 배열을 여러 조각으로 나눕니다. 케이크를 N등분하는 것과 같습니다. 먼저 점수순으로 정렬한 뒤, 상위/중위/하위 3개 그룹으로 나눕니다. 주의할 점은 배열 크기가 정확히 나누어 떨어져야 합니다. 156개국을 3으로 나누면 나머지가 생기므로 앞부분만 사용합니다.
 
     np.split(arr, n)은 배열을 n개의 동일한 크기로 분할합니다. 정확히 나누어 떨어지지 않으면 에러가 발생합니다.
-  tips:
-  - np.split(arr, n)은 배열을 n개의 동일한 크기로 분할합니다. 정확히 나누어 떨어지지 않으면 에러가 발생합니다.
   snippet: |-
     sortIdx = np.argsort(score)[::-1]
     sortedScore = score[sortIdx]
@@ -240,8 +234,6 @@ sections:
     np.array_split()은 split의 유연한 버전입니다. 156개국을 5개 그룹으로 나누면 정확히 나눠지지 않는데(156÷5=31.2), array_split은 앞쪽 그룹에 하나씩 더 배분하여 32, 32, 31, 31, 30개로 나눕니다. 정확한 등분이 불가능할 때 유용합니다.
 
     np.array_split()은 나머지가 있을 때 앞쪽 그룹에 하나씩 더 배분합니다. split과 달리 항상 성공합니다.
-  tips:
-  - np.array_split()은 나머지가 있을 때 앞쪽 그룹에 하나씩 더 배분합니다. split과 달리 항상 성공합니다.
   snippet: |-
     fiveGroups = np.array_split(sortedScore, 5)
     groupSizes = [len(g) for g in fiveGroups]
@@ -269,8 +261,6 @@ sections:
     np.tile()은 배열을 타일처럼 반복해서 붙입니다. 화장실 바닥에 같은 타일을 반복해서 깔듯이, 같은 패턴을 여러 번 복사합니다. 세계 평균값 배열(4개 지표)을 156개 국가만큼 반복하면, 각 국가와 세계 평균을 비교하는 계산이 쉬워집니다.
 
     np.tile(arr, reps)는 배열을 reps 횟수만큼 타일처럼 반복합니다. 2D 배열의 경우 (행 반복, 열 반복) 형태로 지정합니다.
-  tips:
-  - np.tile(arr, reps)는 배열을 reps 횟수만큼 타일처럼 반복합니다. 2D 배열의 경우 (행 반복, 열 반복) 형태로 지정합니다.
   snippet: |-
     worldAvg = np.array([np.mean(gdp), np.mean(social), np.mean(health), np.mean(freedom)])
     worldAvgTiled = np.tile(worldAvg, (len(score), 1))
@@ -322,8 +312,6 @@ sections:
     np.repeat()는 각 요소를 개별적으로 반복합니다. tile이 [1,2,3] → [1,2,3,1,2,3]이라면, repeat는 [1,2,3] → [1,1,2,2,3,3]입니다. 각 그룹의 라벨을 해당 그룹 크기만큼 반복해서 '1그룹, 1그룹, ..., 2그룹, 2그룹, ...'처럼 모든 국가에 그룹 번호를 할당할 수 있습니다.
 
     np.repeat(arr, n)은 각 요소를 n번 반복합니다. n이 배열이면 각 요소마다 다른 횟수로 반복할 수 있습니다.
-  tips:
-  - np.repeat(arr, n)은 각 요소를 n번 반복합니다. n이 배열이면 각 요소마다 다른 횟수로 반복할 수 있습니다.
   snippet: |-
     groupLabels = np.array([1, 2, 3])
     repeatLabels = np.repeat(groupLabels, [len(topGroup), len(midGroup), len(lowGroup)])
@@ -351,8 +339,6 @@ sections:
     np.meshgrid()는 두 배열의 모든 조합을 만듭니다. 체스판의 좌표를 만드는 것과 비슷합니다. x=[1,2], y=[a,b]가 있으면 (1,a), (1,b), (2,a), (2,b) 모든 조합을 생성합니다. 국가 5개의 점수로 meshgrid를 만들면 5×5 = 25개의 모든 국가 쌍을 비교할 수 있습니다.
 
     np.meshgrid(x, y)는 두 1D 배열로 2D 좌표 그리드를 만듭니다. 모든 (x, y) 조합을 표현할 때 사용합니다.
-  tips:
-  - np.meshgrid(x, y)는 두 1D 배열로 2D 좌표 그리드를 만듭니다. 모든 (x, y) 조합을 표현할 때 사용합니다.
   snippet: |-
     top5Score = score[sortIdx[:5]]
     top5Country = country[sortIdx[:5]]
@@ -408,8 +394,6 @@ sections:
     np.clip()은 값의 범위를 제한합니다. 마치 종이를 자르듯이 지정한 최소/최대 범위를 벗어나는 값을 잘라냅니다. np.clip(score, 5, 7)은 5보다 작은 값은 5로, 7보다 큰 값은 7로 바꿉니다. 극단적인 이상치(outlier)가 분석을 왜곡하는 것을 방지할 때 유용합니다.
 
     np.clip(arr, min, max)는 배열의 값을 min과 max 사이로 제한합니다. min보다 작으면 min으로, max보다 크면 max로 설정됩니다.
-  tips:
-  - np.clip(arr, min, max)는 배열의 값을 min과 max 사이로 제한합니다. min보다 작으면 min으로, max보다 크면 max로 설정됩니다.
   snippet: |-
     clippedScore = np.clip(score, 5, 7)
     f"원본 범위: {np.min(score):.2f}~{np.max(score):.2f}, 클리핑 후: {np.min(clippedScore):.2f}~{np.max(clippedScore):.2f}"
@@ -435,8 +419,6 @@ sections:
     np.searchsorted()는 정렬된 배열에서 특정 값이 들어갈 위치를 찾습니다. 사전에서 단어가 어디에 들어갈지 찾는 것과 같습니다. 오름차순 정렬된 점수 배열에서 각 국가 점수의 위치를 찾으면, 그 위치가 바로 '몇 번째로 낮은가'를 나타내므로 백분위 순위를 계산할 수 있습니다.
 
     np.searchsorted(sorted_arr, values)는 정렬된 배열에서 values가 삽입될 인덱스를 반환합니다. 이진 탐색을 사용하여 매우 빠릅니다.
-  tips:
-  - np.searchsorted(sorted_arr, values)는 정렬된 배열에서 values가 삽입될 인덱스를 반환합니다. 이진 탐색을 사용하여 매우 빠릅니다.
   snippet: |-
     sortedScoreAsc = np.sort(score)
     percentileRank = np.searchsorted(sortedScoreAsc, score) / len(score) * 100
@@ -557,8 +539,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

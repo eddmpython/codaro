@@ -81,8 +81,6 @@ sections:
     Icon()의 color 파라미터로 마커 색상을 지정합니다. 18가지 색상을 사용할 수 있습니다.
 
     카테고리별로 색상을 다르게 하면 한눈에 구분할 수 있습니다. 음식점은 빨강, 카페는 파랑 등으로 구분하세요.
-  tips:
-  - 카테고리별로 색상을 다르게 하면 한눈에 구분할 수 있습니다. 음식점은 빨강, 카페는 파랑 등으로 구분하세요.
   snippet: |-
     seoulLoc = [37.5665, 126.9780]
     colorList = ["red", "blue", "green", "purple", "orange",
@@ -137,8 +135,6 @@ sections:
     icon 파라미터로 마커 안의 아이콘을 변경합니다. Glyphicon과 Font Awesome 아이콘을 사용할 수 있습니다.
 
     Font Awesome 아이콘을 사용하려면 prefix='fa'를 추가하세요. 더 다양한 아이콘을 사용할 수 있습니다.
-  tips:
-  - Font Awesome 아이콘을 사용하려면 prefix='fa'를 추가하세요. 더 다양한 아이콘을 사용할 수 있습니다.
   snippet: |-
     glyphicons = ["home", "star", "heart", "cloud", "music",
                   "camera", "user", "glass", "flag", "gift"]
@@ -187,8 +183,6 @@ sections:
     popup에 HTML을 넣어 이미지, 링크, 표 등을 표시할 수 있습니다.
 
     Popup() 객체를 사용하면 max_width로 팝업 너비를 조절할 수 있습니다.
-  tips:
-  - Popup() 객체를 사용하면 max_width로 팝업 너비를 조절할 수 있습니다.
   snippet: |-
     htmlContent = """
     <div style="font-family: Arial; width: 200px;">
@@ -245,8 +239,6 @@ sections:
     Tooltip() 객체로 툴팁을 더 세밀하게 제어할 수 있습니다.
 
     permanent=True로 설정하면 마우스를 올리지 않아도 항상 툴팁이 표시됩니다.
-  tips:
-  - permanent=True로 설정하면 마우스를 올리지 않아도 항상 툴팁이 표시됩니다.
   snippet: |-
     m5 = folium.Map(location=seoulLoc, zoom_start=14)
 
@@ -297,8 +289,6 @@ sections:
     DivIcon()으로 HTML/CSS를 사용한 완전한 커스텀 마커를 만들 수 있습니다.
 
     DivIcon은 아무 HTML이나 마커로 사용할 수 있어 자유도가 높습니다. 로고, 이모지, 커스텀 디자인 모두 가능합니다.
-  tips:
-  - DivIcon은 아무 HTML이나 마커로 사용할 수 있어 자유도가 높습니다. 로고, 이모지, 커스텀 디자인 모두 가능합니다.
   snippet: |-
     spots = [
         {"name": "1번", "loc": [37.5665, 126.9780]},
@@ -383,8 +373,6 @@ sections:
     DivIcon으로 이모지를 마커로 사용할 수 있습니다.
 
     이모지 마커는 직관적이고 귀엽습니다. 카테고리별로 다른 이모지를 사용하면 구분이 쉽습니다.
-  tips:
-  - 이모지 마커는 직관적이고 귀엽습니다. 카테고리별로 다른 이모지를 사용하면 구분이 쉽습니다.
   snippet: |-
     emojiSpots = [
         {"name": "카페", "loc": [37.5665, 126.9780], "emoji": "☕"},
@@ -445,8 +433,6 @@ sections:
     CircleMarker()는 크기가 고정된 원형 마커입니다. 줌 레벨에 상관없이 같은 크기로 표시됩니다.
 
     CircleMarker의 radius는 픽셀 단위입니다. Circle()의 radius는 미터 단위라서 줌에 따라 크기가 변합니다.
-  tips:
-  - CircleMarker의 radius는 픽셀 단위입니다. Circle()의 radius는 미터 단위라서 줌에 따라 크기가 변합니다.
   snippet: |-
     m8 = folium.Map(location=seoulLoc, zoom_start=14)
 
@@ -533,8 +519,6 @@ sections:
     데이터 값에 따라 마커 크기나 색상을 다르게 표시합니다.
 
     데이터 값을 시각적 요소(크기, 색상, 투명도)에 매핑하면 패턴을 쉽게 파악할 수 있습니다.
-  tips:
-  - 데이터 값을 시각적 요소(크기, 색상, 투명도)에 매핑하면 패턴을 쉽게 파악할 수 있습니다.
   snippet: |-
     stores = [
         {"name": "강남점", "loc": [37.4979, 127.0276], "sales": 100},
@@ -731,8 +715,6 @@ sections:
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
     각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   snippet: |-
     import folium
     tourCourse = [

@@ -57,8 +57,6 @@ sections:
     csv는 파이썬 표준 라이브러리입니다. CSV(Comma-Separated Values) 파일을 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 csv 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 csv 모듈을 사용할 수 있습니다.
   snippet: |-
     import csv
     import tempfile
@@ -96,8 +94,6 @@ sections:
     csv.reader()는 CSV 파일을 한 줄씩 읽어 리스트로 반환합니다. 각 행은 문자열 리스트가 되며, 반복문으로 모든 행을 처리할 수 있습니다. 데이터 분석, 로그 파싱, 스프레드시트 처리에 필수적입니다.
 
     next(reader)를 사용하면 헤더 행을 건너뛰고 데이터만 처리할 수 있습니다.
-  tips:
-  - next(reader)를 사용하면 헤더 행을 건너뛰고 데이터만 처리할 수 있습니다.
   snippet: |-
     sampleCsv = csvScratch / 'sample.csv'
     with open(sampleCsv, 'w') as f:
@@ -138,8 +134,6 @@ sections:
     csv.writer()는 리스트를 CSV 파일로 저장합니다. writerow()로 한 행씩, writerows()로 여러 행을 한 번에 작성할 수 있습니다. 데이터 내보내기, 리포트 생성, 로그 저장에 활용됩니다.
 
     newline=''을 사용하면 불필요한 빈 줄이 생기지 않습니다. Windows에서 특히 중요합니다.
-  tips:
-  - newline=''을 사용하면 불필요한 빈 줄이 생기지 않습니다. Windows에서 특히 중요합니다.
   snippet: |-
     outputCsv = csvScratch / 'output.csv'
     with open(outputCsv, 'w', newline='') as f:
@@ -180,8 +174,6 @@ sections:
     DictReader는 각 행을 딕셔너리로 읽어 컬럼명으로 접근할 수 있습니다. DictWriter는 딕셔너리를 CSV로 저장합니다. 인덱스 대신 키 이름을 사용하여 코드 가독성이 높아지고, 컬럼 순서 변경에도 안전합니다.
 
     writeheader()로 fieldnames를 자동으로 첫 행에 작성할 수 있습니다.
-  tips:
-  - writeheader()로 fieldnames를 자동으로 첫 행에 작성할 수 있습니다.
   snippet: |-
     peopleCsv = csvScratch / 'people.csv'
     with open(peopleCsv, 'w') as f:
@@ -222,8 +214,6 @@ sections:
     CSV 파일의 구분자, 인용 문자, 인용 방식을 커스터마이즈할 수 있습니다. delimiter로 쉼표 외 다른 구분자를 사용하고, quotechar로 인용 문자를 지정하며, quoting으로 인용 전략을 설정합니다. TSV, 파이프 구분 등 다양한 형식을 처리할 수 있습니다.
 
     QUOTE_MINIMAL은 필요할 때만, QUOTE_ALL은 모든 필드를, QUOTE_NONNUMERIC은 숫자 외 모든 필드를 인용합니다.
-  tips:
-  - QUOTE_MINIMAL은 필요할 때만, QUOTE_ALL은 모든 필드를, QUOTE_NONNUMERIC은 숫자 외 모든 필드를 인용합니다.
   snippet: |-
     tsvFile = csvScratch / 'data.tsv'
     with open(tsvFile, 'w') as f:
@@ -264,8 +254,6 @@ sections:
     Sniffer는 CSV 파일의 형식을 자동으로 감지합니다. Dialect는 CSV 포맷 설정을 재사용 가능하게 만듭니다. 다양한 형식의 CSV 파일을 자동으로 처리하거나, 일관된 포맷으로 파일을 생성할 때 유용합니다.
 
     Sniffer는 파일의 처음 일부만 읽어 형식을 추론하므로 빠르고 메모리 효율적입니다.
-  tips:
-  - Sniffer는 파일의 처음 일부만 읽어 형식을 추론하므로 빠르고 메모리 효율적입니다.
   snippet: |-
     unknownFile = csvScratch / 'unknown.csv'
     with open(unknownFile, 'w') as f:
@@ -312,8 +300,6 @@ sections:
     실무에서 자주 사용하는 CSV 처리 패턴을 살펴봅니다. 데이터 필터링, 집계, 변환, 병합 등 다양한 작업을 CSV로 수행할 수 있습니다. 스프레드시트 자동화, 리포트 생성, ETL 작업에 활용됩니다.
 
     대용량 CSV는 한 번에 메모리에 로드하지 말고 스트리밍 방식으로 처리하세요.
-  tips:
-  - 대용량 CSV는 한 번에 메모리에 로드하지 말고 스트리밍 방식으로 처리하세요.
   snippet: |-
     salesCsv = csvScratch / 'sales.csv'
     with open(salesCsv, 'w') as f:

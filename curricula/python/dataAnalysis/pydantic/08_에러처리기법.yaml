@@ -84,8 +84,6 @@ sections:
     ValidationError가 발생하면 errors() 메서드로 각 에러의 상세 정보를 리스트로 얻습니다. 각 항목은 loc(위치), msg(메시지), type(에러 타입), input(입력값)을 포함합니다. error_count()는 발생한 에러의 총 개수를 반환합니다.
 
     에러 개수는 error_count()로, 에러 목록은 errors()로, 모델 이름은 title 속성으로 확인합니다.
-  tips:
-  - 에러 개수는 error_count()로, 에러 목록은 errors()로, 모델 이름은 title 속성으로 확인합니다.
   snippet: |-
     class User(BaseModel):
         name: str = Field(min_length=2)
@@ -199,8 +197,6 @@ sections:
     json() 메서드는 에러 정보를 JSON 문자열로 반환합니다. 하지만 직접 API 응답 형식을 정의하면 더 유연하게 에러를 표현할 수 있습니다. 필드명을 점 표기법으로 변환하거나, 에러 메시지를 한글화하는 등의 가공이 가능합니다.
 
     loc은 튜플이므로 '.'.join()으로 'address.zipCode' 같은 점 표기법 경로로 변환합니다.
-  tips:
-  - loc은 튜플이므로 '.'.join()으로 'address.zipCode' 같은 점 표기법 경로로 변환합니다.
   snippet: |-
     errorJson = validationErr.json()
     errorJson
@@ -614,8 +610,6 @@ sections:
     지금까지 배운 ValidationError 분석, 커스텀 메시지, 안전한 검증, 배치 처리, 로깅을 활용하여 완전한 에러 처리 시스템을 구축합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from pydantic import BaseModel, Field, field_validator, ValidationError
     from typing import Optional

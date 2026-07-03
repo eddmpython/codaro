@@ -60,8 +60,6 @@ sections:
     open() 함수로 파일을 엽니다. open(파일경로, 모드) 형식으로 쓰며, 파일 객체를 반환합니다. 사용 후에는 close()로 닫아야 합니다. 기본 모드는 읽기('r')입니다.
 
     파일은 반드시 close()로 닫아야 리소스가 해제됩니다. 노트북 환경에서는 파일 목록 패널에서 생성된 txt 파일을 확인할 수 있습니다.
-  tips:
-  - 파일은 반드시 close()로 닫아야 리소스가 해제됩니다. 노트북 환경에서는 파일 목록 패널에서 생성된 txt 파일을 확인할 수 있습니다.
   snippet: |-
     f = open('test.txt', 'w')
     f.write('Hello World')
@@ -94,8 +92,6 @@ sections:
     read() 메서드로 파일 내용을 읽습니다. 전체 내용을 문자열로 반환합니다. readline()은 한 줄씩, readlines()는 모든 줄을 리스트로 반환합니다.
 
     readlines()는 각 줄에 줄바꿈 문자(\n)를 포함합니다.
-  tips:
-  - readlines()는 각 줄에 줄바꿈 문자(\n)를 포함합니다.
   snippet: |-
     writer = open('data.txt', 'w')
     writer.write('Line 1\nLine 2\nLine 3')
@@ -135,8 +131,6 @@ sections:
     write() 메서드로 파일에 문자열을 씁니다. 'w' 모드는 기존 내용을 지우고, 'a' 모드는 끝에 추가합니다. write()는 쓴 문자 수를 반환합니다.
 
     'w' 모드는 기존 파일을 완전히 지우므로 주의하세요.
-  tips:
-  - '''w'' 모드는 기존 파일을 완전히 지우므로 주의하세요.'
   snippet: |-
     fileObj = open('message.txt', 'w')
     count = fileObj.write('Hello Python')
@@ -168,8 +162,6 @@ sections:
     with 문을 사용하면 파일을 자동으로 닫아줍니다. with open(경로, 모드) as 변수: 형식으로 쓰며, 블록이 끝나면 자동으로 close()가 호출됩니다. 안전하고 권장되는 방법입니다.
 
     with 문은 close()를 잊어버릴 걱정이 없어 안전합니다.
-  tips:
-  - with 문은 close()를 잊어버릴 걱정이 없어 안전합니다.
   snippet: |-
     with open('test.txt', 'w') as outFile:
         outFile.write('With statement')
@@ -207,8 +199,6 @@ sections:
     파일 모드는 파일을 어떻게 열지 결정합니다. 'r'(읽기), 'w'(쓰기), 'a'(추가), 'r+'(읽기/쓰기) 등이 있습니다. 텍스트 모드가 기본이며, 'b'를 붙이면 바이너리 모드입니다.
 
     파일이 없을 때 'r'은 에러, 'w'와 'a'는 파일을 생성합니다.
-  tips:
-  - 파일이 없을 때 'r'은 에러, 'w'와 'a'는 파일을 생성합니다.
   snippet: |-
     with open('test.txt', 'w') as wf:
         wf.write('Read mode test')
@@ -246,8 +236,6 @@ sections:
     파일 객체는 for문으로 순회할 수 있습니다. 각 줄을 하나씩 가져오므로 메모리 효율적입니다. 큰 파일을 처리할 때 유용합니다.
 
     strip()으로 줄바꿈 문자를 제거할 수 있습니다.
-  tips:
-  - strip()으로 줄바꿈 문자를 제거할 수 있습니다.
   snippet: |-
     with open('items.txt', 'w') as creator:
         creator.write('Apple\nBanana\nCherry')

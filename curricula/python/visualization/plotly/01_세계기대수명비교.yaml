@@ -420,8 +420,6 @@ sections:
     지금까지 배운 모든 내용을 활용해서 gapminder 데이터를 다양한 각도로 분석해봅시다. 데이터 필터링, groupby 집계, px.bar 시각화, color/labels/title 설정까지 전 과정을 직접 수행합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import plotly.express as px
     import pandas as pd

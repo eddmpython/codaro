@@ -58,8 +58,6 @@ sections:
     collections은 파이썬 표준 라이브러리입니다. Counter, deque, defaultdict 등 특수 컨테이너를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 collections 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 collections 모듈을 사용할 수 있습니다.
   snippet: |-
     from collections import Counter, defaultdict, deque, namedtuple, ChainMap
 
@@ -89,8 +87,6 @@ sections:
     Counter는 요소의 등장 횟수를 세는 특수 딕셔너리입니다. most_common()으로 가장 많이 등장한 요소를 찾고, 산술 연산으로 카운터를 합치거나 뺄 수 있습니다. 투표 집계, 단어 빈도 분석, 통계 처리에 필수적입니다.
 
     Counter는 존재하지 않는 키에 대해 0을 반환합니다. KeyError가 발생하지 않습니다.
-  tips:
-  - Counter는 존재하지 않는 키에 대해 0을 반환합니다. KeyError가 발생하지 않습니다.
   snippet: |-
     fruits = ['apple', 'banana', 'apple', 'cherry', 'banana', 'apple']
     fruitCount = Counter(fruits)
@@ -118,8 +114,6 @@ sections:
     defaultdict는 존재하지 않는 키에 접근할 때 기본값을 자동으로 생성합니다. int, list, set 등을 기본 팩토리로 지정하면 초기화 없이 바로 사용할 수 있습니다. 그룹화, 집계, 인덱싱 작업을 간결하게 만듭니다.
 
     defaultdict(lambda: 값)으로 커스텀 기본값을 설정할 수 있습니다.
-  tips:
-  - 'defaultdict(lambda: 값)으로 커스텀 기본값을 설정할 수 있습니다.'
   snippet: |-
     scores = defaultdict(int)
     scores['alice'] += 10
@@ -151,8 +145,6 @@ sections:
     deque는 양쪽 끝에서 빠르게 삽입과 삭제가 가능한 자료구조입니다. append()/pop()은 오른쪽, appendleft()/popleft()는 왼쪽에서 작동합니다. 리스트보다 양 끝 연산이 훨씬 빠르며, 큐, 스택, 슬라이딩 윈도우에 활용됩니다.
 
     deque(maxlen=n)으로 크기 제한 큐를 만들면 자동으로 오래된 요소가 제거됩니다.
-  tips:
-  - deque(maxlen=n)으로 크기 제한 큐를 만들면 자동으로 오래된 요소가 제거됩니다.
   snippet: |-
     dq = deque([1, 2, 3])
     dq.append(4)
@@ -182,8 +174,6 @@ sections:
     namedtuple은 필드 이름으로 접근할 수 있는 튜플입니다. 인덱스 대신 속성명을 사용하여 코드 가독성을 높이고, 불변성으로 안전성을 보장합니다. 경량 데이터 클래스, 설정 객체, 반환값 구조화에 적합합니다.
 
     _asdict()로 namedtuple을 OrderedDict로 변환할 수 있습니다.
-  tips:
-  - _asdict()로 namedtuple을 OrderedDict로 변환할 수 있습니다.
   snippet: |-
     Point = namedtuple('Point', ['x', 'y'])
     p = Point(3, 4)
@@ -211,8 +201,6 @@ sections:
     ChainMap은 여러 딕셔너리를 하나의 뷰로 묶습니다. 조회 시 첫 번째 딕셔너리부터 순서대로 검색하며, 설정 우선순위나 변수 스코프 구현에 유용합니다. 실제 병합 없이 논리적으로 합치므로 메모리 효율적입니다.
 
     ChainMap.maps로 내부 딕셔너리 리스트에 접근할 수 있습니다.
-  tips:
-  - ChainMap.maps로 내부 딕셔너리 리스트에 접근할 수 있습니다.
   snippet: |-
     defaults = {'color': 'red', 'size': 10}
     custom = {'size': 20}
@@ -242,8 +230,6 @@ sections:
     실무에서 자주 사용하는 collections 활용 패턴을 살펴봅니다. 투표 집계, 로그 분석, 최근 항목 관리, 데이터 구조화 등 다양한 문제를 collections로 효율적으로 해결할 수 있습니다.
 
     OrderedDict는 Python 3.7+에서는 일반 dict도 순서를 유지하므로 특별한 경우를 제외하면 dict 사용을 권장합니다.
-  tips:
-  - OrderedDict는 Python 3.7+에서는 일반 dict도 순서를 유지하므로 특별한 경우를 제외하면 dict 사용을 권장합니다.
   snippet: |-
     votes = ['Alice', 'Bob', 'Alice', 'Charlie', 'Bob', 'Alice']
     voteCount = Counter(votes)

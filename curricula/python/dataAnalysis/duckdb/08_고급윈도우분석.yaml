@@ -647,8 +647,6 @@ sections:
     고급 윈도우 함수를 종합 활용하여 타이타닉 데이터를 심층 분석해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import duckdb

@@ -84,8 +84,6 @@ sections:
     BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가 됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다.
 
     인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다.
-  tips:
-  - 인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다.
   snippet: |-
     class User(BaseModel):
         name: str
@@ -121,8 +119,6 @@ sections:
     Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 "30"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는 숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다.
 
     변환이 불가능한 경우(예: "invalid"를 int로)에는 ValidationError가 발생합니다. Pydantic은 "스마트" 변환만 수행합니다.
-  tips:
-  - '변환이 불가능한 경우(예: "invalid"를 int로)에는 ValidationError가 발생합니다. Pydantic은 "스마트" 변환만 수행합니다.'
   snippet: |-
     converted = User(name="Bob", age="30", email="bob@test.com")
     converted.age, type(converted.age)
@@ -148,8 +144,6 @@ sections:
     변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를 얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다.
 
     errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다.
-  tips:
-  - errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다.
   snippet: |-
     from pydantic import ValidationError
 
@@ -221,8 +215,6 @@ sections:
     Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는 딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다.
 
     Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다.
-  tips:
-  - Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다.
   snippet: |-
     userDict = user.model_dump()
     userDict
@@ -341,8 +333,6 @@ sections:
     지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from pydantic import BaseModel
     from typing import Optional

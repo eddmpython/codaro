@@ -314,8 +314,6 @@ sections:
     Plotly 입문은 인터랙티브라는 특징을 말로 아는 데서 끝나지 않습니다. 로컬 데이터로 Figure를 만들고, trace와 layout이 분석 질문을 제대로 담는지 확인해야 합니다.
 
     Plotly도 Figure 객체를 검증하면 “보이는 차트”를 넘어 재사용 가능한 분석 산출물이 됩니다.
-  tips:
-  - Plotly도 Figure 객체를 검증하면 “보이는 차트”를 넘어 재사용 가능한 분석 산출물이 됩니다.
   snippet: |-
     import plotly.express as px
     from codaro.curriculum.localData import loadLocalDataset

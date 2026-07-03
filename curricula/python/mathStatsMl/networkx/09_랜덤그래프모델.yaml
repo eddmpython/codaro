@@ -85,8 +85,6 @@ sections:
     Erdős-Rényi(ER) 모델은 1959년 헝가리 수학자 Paul Erdős와 Alfréd Rényi가 제안한 가장 고전적인 랜덤 그래프입니다. n개의 노드가 있을 때, 가능한 모든 노드 쌍이 확률 p로 독립적으로 연결됩니다. 수학적으로 분석이 용이하여 그래프 이론의 기초가 되었지만, 실제 네트워크와는 다른 특성을 보입니다.
 
     ER 모델의 예상 엣지 수는 n(n-1)/2 × p입니다. p가 1/(n-1)보다 크면 거대 컴포넌트가 형성됩니다.
-  tips:
-  - ER 모델의 예상 엣지 수는 n(n-1)/2 × p입니다. p가 1/(n-1)보다 크면 거대 컴포넌트가 형성됩니다.
   snippet: |-
     erGraph = nx.erdos_renyi_graph(n=50, p=0.1, seed=42)
     numNodesER = erGraph.number_of_nodes()
@@ -153,8 +151,6 @@ sections:
     Barabási-Albert(BA) 모델은 1999년 물리학자 Albert-László Barabási와 Réka Albert가 제안한 모델로, '부익부' 현상을 반영합니다. 네트워크가 성장할 때 새 노드는 이미 연결이 많은 노드에 더 연결되려는 경향이 있습니다(선호적 연결, Preferential Attachment). 이 메커니즘은 월드와이드웹, 인용 네트워크, 소셜 네트워크 등에서 관찰되는 허브의 존재를 설명합니다.
 
     BA 모델은 척도없는(scale-free) 네트워크를 생성합니다. 소수의 허브가 많은 연결을 가집니다.
-  tips:
-  - BA 모델은 척도없는(scale-free) 네트워크를 생성합니다. 소수의 허브가 많은 연결을 가집니다.
   snippet: |-
     baGraph = nx.barabasi_albert_graph(n=50, m=2, seed=42)
     numNodesBA = baGraph.number_of_nodes()
@@ -184,8 +180,6 @@ sections:
     BA 그래프의 차수 분포는 멱법칙(Power-law)을 따릅니다. P(k) ∝ k^(-γ) 형태로, 로그-로그 그래프에서 직선으로 나타납니다. 대부분의 노드는 적은 연결을 가지지만, 소수의 허브는 매우 많은 연결을 가집니다. 이러한 '척도없는(Scale-free)' 특성은 네트워크가 특정 규모에 구애받지 않고 자기유사성을 보임을 의미합니다.
 
     멱법칙 분포는 롱테일(long tail)입니다. 대부분은 적은 연결, 극소수가 매우 많은 연결을 가집니다.
-  tips:
-  - 멱법칙 분포는 롱테일(long tail)입니다. 대부분은 적은 연결, 극소수가 매우 많은 연결을 가집니다.
   snippet: |-
     degListBA = [d for n, d in baGraph.degree()]
 
@@ -224,8 +218,6 @@ sections:
     Watts-Strogatz(WS) 모델은 1998년 Duncan Watts와 Steven Strogatz가 제안한 스몰월드 네트워크 모델입니다. 규칙적인 격자에서 시작하여 일부 엣지를 무작위로 재연결합니다. 이렇게 하면 지역적으로는 높은 클러스터링(친구의 친구가 친구)을 유지하면서, 전역적으로는 짧은 평균 경로(소수의 단계로 누구든 도달 가능)를 가지게 됩니다.
 
     p=0이면 규칙 격자(높은 클러스터링, 긴 경로), p=1이면 랜덤 그래프(낮은 클러스터링, 짧은 경로)입니다.
-  tips:
-  - p=0이면 규칙 격자(높은 클러스터링, 긴 경로), p=1이면 랜덤 그래프(낮은 클러스터링, 짧은 경로)입니다.
   snippet: |-
     wsGraph = nx.watts_strogatz_graph(n=50, k=4, p=0.3, seed=42)
     numNodesWS = wsGraph.number_of_nodes()
@@ -255,8 +247,6 @@ sections:
     스몰월드 네트워크는 '6단계 분리(Six Degrees of Separation)' 현상을 설명합니다. 세상 누구나 평균 6단계의 아는 사람 관계로 연결된다는 개념입니다. 스몰월드 네트워크는 높은 클러스터링(지역적 밀집)과 짧은 평균 경로(전역적 연결)를 동시에 가집니다. 이 두 특성의 조합이 실제 소셜 네트워크, 신경망, 전력망 등에서 관찰됩니다.
 
     WS 모델은 높은 클러스터링(지역 연결)과 짧은 경로(전역 도달)를 모두 달성합니다. 실제 소셜 네트워크와 유사합니다.
-  tips:
-  - WS 모델은 높은 클러스터링(지역 연결)과 짧은 경로(전역 도달)를 모두 달성합니다. 실제 소셜 네트워크와 유사합니다.
   snippet: |-
     clustER = nx.average_clustering(erGraph)
     clustBA = nx.average_clustering(baGraph)
@@ -349,8 +339,6 @@ sections:
     실제 네트워크(가라테 클럽)의 특성을 랜덤 그래프 모델들과 비교합니다. 동일한 노드 수와 엣지 수를 가진 각 모델의 랜덤 그래프를 생성하고, 클러스터링 계수와 평균 경로 길이를 비교합니다. 어떤 모델이 실제 네트워크와 가장 유사한 특성을 보이는지 확인합니다.
 
     실제 소셜 네트워크는 보통 BA(허브 존재)와 WS(높은 클러스터링)의 특성을 함께 보입니다.
-  tips:
-  - 실제 소셜 네트워크는 보통 BA(허브 존재)와 WS(높은 클러스터링)의 특성을 함께 보입니다.
   snippet: |-
     karate = nx.karate_club_graph()
     nK = karate.number_of_nodes()
@@ -439,8 +427,6 @@ sections:
     지금까지 배운 랜덤 그래프 모델을 활용하여 실전 미션을 수행해봅시다. 파라미터를 변경하며 그래프 특성의 변화를 관찰하고, 재연결 확률에 따른 스몰월드 특성을 탐구합니다.
 
     각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   snippet: |-
     import networkx as nx
     import matplotlib.pyplot as plt

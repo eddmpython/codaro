@@ -80,8 +80,6 @@ sections:
     Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
 
     zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
-  tips:
-  - zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
@@ -108,8 +106,6 @@ sections:
     줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
 
     마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
-  tips:
-  - 마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=10)
     m2
@@ -134,8 +130,6 @@ sections:
     Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
 
     popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
-  tips:
-  - popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
   snippet: |-
     m4 = folium.Map(location=seoulCenter, zoom_start=14)
     folium.Marker(location=seoulCenter).add_to(m4)
@@ -162,8 +156,6 @@ sections:
     여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
 
     딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
-  tips:
-  - 딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
   snippet: |-
     places = [
         {"name": "서울시청", "loc": [37.5665, 126.9780]},
@@ -214,8 +206,6 @@ sections:
     tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
 
     tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
-  tips:
-  - tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
   snippet: |-
     m7 = folium.Map(location=seoulCenter, zoom_start=14)
     folium.Marker(
@@ -293,8 +283,6 @@ sections:
     Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
 
     자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
-  tips:
-  - 자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
   snippet: |-
     m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -357,8 +345,6 @@ sections:
     모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
 
     fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
-  tips:
-  - fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
   snippet: |-
     m10 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -458,8 +444,6 @@ sections:
     업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고 검증해야 합니다.
 
     Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
-  tips:
-  - Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
   snippet: |-
     branchSites = [
         {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
@@ -508,8 +492,6 @@ sections:
     지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
 
     각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   snippet: |-
     import folium
     cafes = [

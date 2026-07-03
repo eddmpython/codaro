@@ -390,8 +390,6 @@ sections:
     이 프로젝트에서 배운 내용을 정리하면: selection_interval/binding_select로 인터랙션, when().then().otherwise()로 조건부 스타일, + 연산자로 레이어 겹치기, | 와 & 로 차트 배치, add_params()로 여러 파라미터 추가, 공통 selection을 공유해 차트 연동입니다. 이제 Altair의 모든 기능을 마스터했습니다. 배운 개념들을 자유롭게 조합해 나만의 대시보드를 만들어봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd
@@ -443,8 +441,6 @@ sections:
     대시보드는 여러 차트를 묶는 만큼 입력 데이터, selection, concat 구조가 모두 맞아야 합니다. 완성 spec을 검사하는 루프를 추가합니다.
 
     Altair 대시보드의 품질은 concat과 selection이 spec으로 검증될 때 올라갑니다.
-  tips:
-  - Altair 대시보드의 품질은 concat과 selection이 spec으로 검증될 때 올라갑니다.
   snippet: |-
     import altair as alt
     from codaro.curriculum.localData import loadLocalDataset

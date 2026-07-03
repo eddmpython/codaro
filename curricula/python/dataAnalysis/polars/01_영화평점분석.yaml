@@ -353,8 +353,6 @@ sections:
     업무에서 집계 결과를 보고서나 자동화 파이프라인에 넘길 때는 DataFrame이 만들어졌다는 사실만으로 충분하지 않습니다. 먼저 필요한 컬럼이 있는지 확인하고, 결과가 말이 되는지 예측한 뒤, 의도적으로 깨진 결과를 검증 함수가 잡아내는지 확인합니다. 마지막으로 기준값을 바꿔도 결론이 안정적인지 실험합니다.
 
     실무 집계는 결과를 눈으로만 보는 것이 아니라 데이터 계약, 예상 결론, 실패 케이스, 기준값 변화까지 함께 남겨야 재사용할 수 있습니다.
-  tips:
-  - 실무 집계는 결과를 눈으로만 보는 것이 아니라 데이터 계약, 예상 결론, 실패 케이스, 기준값 변화까지 함께 남겨야 재사용할 수 있습니다.
   snippet: |-
     requiredColumns = {"Title", "Genre", "Director", "Year", "Rating", "Revenue (Millions)"}
     missingColumns = requiredColumns - set(movies.columns)
@@ -392,8 +390,6 @@ sections:
     지금까지 배운 select, filter, group_by, mean을 활용하여 다양한 분석을 해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import polars as pl
     from io import StringIO

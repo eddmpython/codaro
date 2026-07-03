@@ -102,8 +102,6 @@ sections:
     TestCase는 다양한 assert 메서드를 제공하여 값을 검증할 수 있습니다.
 
     각 assert 메서드는 실패 시 자동으로 상세한 에러 메시지를 생성합니다. msg 파라미터로 커스텀 메시지를 추가할 수 있습니다.
-  tips:
-  - 각 assert 메서드는 실패 시 자동으로 상세한 에러 메시지를 생성합니다. msg 파라미터로 커스텀 메시지를 추가할 수 있습니다.
   snippet: |-
     import unittest
 
@@ -158,8 +156,6 @@ sections:
     setUp()과 tearDown()으로 각 테스트 전후에 실행되는 코드를 정의할 수 있습니다.
 
     setUp()은 각 테스트 메서드마다 실행되므로, 테스트 간 독립성을 보장합니다. 테스트 순서에 의존하지 않는 코드를 작성하세요.
-  tips:
-  - setUp()은 각 테스트 메서드마다 실행되므로, 테스트 간 독립성을 보장합니다. 테스트 순서에 의존하지 않는 코드를 작성하세요.
   snippet: |-
     import unittest
 
@@ -220,8 +216,6 @@ sections:
     assertRaises()로 특정 예외가 발생하는지 검증할 수 있습니다.
 
     assertRaises는 함수를 직접 호출하거나 with 문과 함께 사용할 수 있습니다. with 문이 더 유연하고 읽기 쉽습니다.
-  tips:
-  - assertRaises는 함수를 직접 호출하거나 with 문과 함께 사용할 수 있습니다. with 문이 더 유연하고 읽기 쉽습니다.
   snippet: |-
     import unittest
 
@@ -282,8 +276,6 @@ sections:
     여러 테스트를 그룹화하거나 조건부로 스킵할 수 있습니다.
 
     subTest()를 사용하면 반복문에서 일부가 실패해도 나머지 케이스를 계속 테스트할 수 있습니다.
-  tips:
-  - subTest()를 사용하면 반복문에서 일부가 실패해도 나머지 케이스를 계속 테스트할 수 있습니다.
   snippet: |-
     import unittest
 
@@ -342,8 +334,6 @@ sections:
     unittest.mock으로 테스트 더블(Mock, Patch)을 만들어 의존성을 제어할 수 있습니다.
 
     Mock 객체는 호출 횟수, 인자 등을 자동으로 기록하므로 상호작용을 쉽게 검증할 수 있습니다.
-  tips:
-  - Mock 객체는 호출 횟수, 인자 등을 자동으로 기록하므로 상호작용을 쉽게 검증할 수 있습니다.
   snippet: |-
     import unittest
     from unittest.mock import Mock
@@ -394,8 +384,6 @@ sections:
     실제 프로젝트에서 자주 사용되는 테스트 패턴들입니다.
 
     실제 프로젝트에서는 테스트 파일을 tests/ 디렉토리에 분리하고, python -m unittest discover로 자동 실행합니다.
-  tips:
-  - 실제 프로젝트에서는 테스트 파일을 tests/ 디렉토리에 분리하고, python -m unittest discover로 자동 실행합니다.
   snippet: |-
     import unittest
 

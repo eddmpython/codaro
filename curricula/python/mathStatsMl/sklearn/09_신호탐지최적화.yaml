@@ -63,8 +63,6 @@ sections:
     와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
 
     와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
-  tips:
-  - 와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
   snippet: |-
     import pandas as pd
     import numpy as np
@@ -146,8 +144,6 @@ sections:
     기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
 
     SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
-  tips:
-  - SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
   snippet: |-
     svcBase = SVC(random_state=42)
     svcBase.fit(xTrainSc, yTrain)
@@ -178,8 +174,6 @@ sections:
     탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
 
     C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
-  tips:
-  - C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
   snippet: |-
     paramGrid = {
         "C": [0.1, 1, 10, 100],
@@ -215,8 +209,6 @@ sections:
     GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
 
     GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
-  tips:
-  - GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
   snippet: |-
     gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
     gridSearch.fit(xTrainSc, yTrain)
@@ -443,8 +435,6 @@ sections:
     최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
 
     교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
-  tips:
-  - 교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
   snippet: |-
     cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
     print(f"CV Scores: {cvScores}")
@@ -504,8 +494,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import numpy as np

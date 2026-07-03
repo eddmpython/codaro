@@ -60,8 +60,6 @@ sections:
     itertools는 무한히 값을 생성하는 세 가지 이터레이터를 제공합니다. count는 시작값부터 step씩 증가하는 무한 수열을 생성합니다. cycle은 iterable의 요소를 무한히 반복합니다. repeat은 같은 값을 무한히(또는 지정된 횟수만큼) 반복합니다. 이들은 지연 평가(lazy evaluation)되어 메모리를 거의 사용하지 않습니다. 무한 이터레이터를 사용할 때는 반드시 islice, takewhile 등으로 제한하거나 break로 루프를 종료해야 합니다.
 
     count와 zip을 조합하면 enumerate와 비슷한 효과를 낼 수 있습니다.
-  tips:
-  - count와 zip을 조합하면 enumerate와 비슷한 효과를 낼 수 있습니다.
   snippet: |-
     from itertools import count, islice
 
@@ -91,8 +89,6 @@ sections:
     종료 이터레이터는 입력 iterable을 가공하여 유한한 결과를 생성합니다. takewhile은 조건이 참인 동안 요소를 가져옵니다. dropwhile은 조건이 참인 동안 요소를 건너뜁니다. islice는 시퀀스의 일부분을 슬라이싱합니다. filterfalse는 filter의 반대로 조건이 거짓인 요소를 반환합니다. 이들은 모두 지연 평가되어 효율적입니다.
 
     takewhile과 dropwhile은 정렬된 데이터에서 특히 유용합니다.
-  tips:
-  - takewhile과 dropwhile은 정렬된 데이터에서 특히 유용합니다.
   snippet: |-
     from itertools import takewhile, dropwhile
 
@@ -126,8 +122,6 @@ sections:
     itertools는 수학적 조합을 생성하는 함수들을 제공합니다. product는 여러 iterable의 데카르트 곱(모든 조합)을 생성합니다. permutations는 순서가 있는 순열을 생성합니다. combinations는 순서 없는 조합을 생성합니다. combinations_with_replacement는 중복을 허용하는 조합입니다. 이들은 알고리즘 문제 해결이나 가능한 모든 경우를 탐색할 때 유용합니다.
 
     permutations의 개수는 n!/(n-r)!, combinations는 n!/(r!(n-r)!)입니다.
-  tips:
-  - permutations의 개수는 n!/(n-r)!, combinations는 n!/(r!(n-r)!)입니다.
   snippet: |-
     from itertools import product
 
@@ -159,8 +153,6 @@ sections:
     groupby는 iterable의 연속된 동일한 키를 가진 요소들을 그룹화합니다. SQL의 GROUP BY와 다르게, 먼저 데이터를 정렬해야 원하는 그룹화가 됩니다. 정렬 없이 사용하면 같은 키라도 떨어져 있으면 별도의 그룹이 됩니다. groupby는 (키, 그룹 이터레이터) 쌍을 생성하며, 그룹 이터레이터는 한 번만 순회할 수 있습니다. 데이터 분류나 연속 구간 처리에 유용합니다.
 
     그룹 이터레이터를 바로 list()로 변환해두지 않으면 다음 그룹으로 넘어갈 때 소진됩니다.
-  tips:
-  - 그룹 이터레이터를 바로 list()로 변환해두지 않으면 다음 그룹으로 넘어갈 때 소진됩니다.
   snippet: |-
     from itertools import groupby
 
@@ -192,8 +184,6 @@ sections:
     chain은 여러 iterable을 하나로 연결합니다. chain.from_iterable은 iterable의 iterable을 평탄화합니다. zip_longest는 길이가 다른 iterable들을 zip할 때 짧은 쪽을 fillvalue로 채웁니다. 일반 zip은 가장 짧은 iterable에서 멈추지만, zip_longest는 가장 긴 iterable까지 진행합니다. 이들은 데이터 병합이나 평탄화에 자주 사용됩니다.
 
     tee는 이터레이터를 복제하지만, 원본 이터레이터를 더 이상 사용하면 안 됩니다.
-  tips:
-  - tee는 이터레이터를 복제하지만, 원본 이터레이터를 더 이상 사용하면 안 됩니다.
   snippet: |-
     from itertools import chain
 
@@ -227,8 +217,6 @@ sections:
     accumulate는 iterable의 누적 결과를 생성합니다. 기본적으로 누적 합계를 계산하지만, func 인자로 다른 연산(곱셈, 최대값 등)을 지정할 수 있습니다. Python 3.8부터는 initial 인자로 초기값을 지정할 수 있습니다. reduce와 비슷하지만, accumulate는 모든 중간 결과를 반환합니다. 누적 합계, 누적 곱, 러닝 맥스/민 등을 계산할 때 유용합니다.
 
     accumulate는 지연 평가되어 대용량 데이터에서도 효율적입니다.
-  tips:
-  - accumulate는 지연 평가되어 대용량 데이터에서도 효율적입니다.
   snippet: |-
     from itertools import accumulate
 
@@ -258,8 +246,6 @@ sections:
     itertools는 함수 이름을 외우는 것보다, 많은 데이터를 한 번에 만들지 않고 흘려보내며 필요한 결과만 검증하는 감각이 중요합니다. 특히 groupby는 SQL GROUP BY처럼 자동으로 같은 키를 모아주지 않으므로, 실행 전에 정렬 여부가 결과에 어떤 영향을 주는지 예측해야 합니다. 이 실수는 예외가 나지 않는 논리 버그라서 검증이 더 중요합니다.
 
     itertools를 쓸 때는 결과를 전부 만드는 습관보다, 정렬 조건과 경우의 수를 먼저 예측하고 작은 샘플로 검증하는 습관이 더 중요합니다.
-  tips:
-  - itertools를 쓸 때는 결과를 전부 만드는 습관보다, 정렬 조건과 경우의 수를 먼저 예측하고 작은 샘플로 검증하는 습관이 더 중요합니다.
   snippet: |-
     from itertools import groupby
 

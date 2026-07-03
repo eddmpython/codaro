@@ -155,8 +155,6 @@ sections:
     hue 파라미터는 Seaborn의 핵심 기능입니다. 세 번째 변수(보통 범주형)를 색상으로 매핑하여 그룹별 패턴을 한눈에 파악할 수 있습니다. 범례는 자동으로 생성됩니다. 품종별로 색상을 다르게 하면 각 품종의 특성 차이가 명확하게 보입니다.
 
     hue='컬럼명'으로 범주형 변수를 색상에 매핑합니다. 범례가 자동 생성되고, 기본 색상 팔레트가 적용됩니다. 연속형 변수를 지정하면 그라데이션 색상이 적용됩니다.
-  tips:
-  - hue='컬럼명'으로 범주형 변수를 색상에 매핑합니다. 범례가 자동 생성되고, 기본 색상 팔레트가 적용됩니다. 연속형 변수를 지정하면 그라데이션 색상이 적용됩니다.
   snippet: |-
     figHue, axHue = plt.subplots(figsize=(8, 6))
     sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', ax=axHue)
@@ -411,8 +409,6 @@ sections:
     산점도는 보기 좋게 그리는 것만으로 끝나지 않습니다. 데이터가 기대한 구조인지 확인하고, 차트가 실제로 세 품종을 색으로 구분했는지 검증해야 합니다. 이 단계에서는 setosa가 꽃잎 길이만으로도 다른 품종과 분리될 것이라고 먼저 예측한 뒤, 차트와 데이터 요약이 그 예측을 뒷받침하는지 확인합니다.
 
     시각화 수업에서도 검증 함수가 필요합니다. 데이터 구조, 범례, 축 라벨, 점 개수를 확인하면 차트가 보고서에 들어가기 전에 깨진 상태를 잡을 수 있습니다.
-  tips:
-  - 시각화 수업에서도 검증 함수가 필요합니다. 데이터 구조, 범례, 축 라벨, 점 개수를 확인하면 차트가 보고서에 들어가기 전에 깨진 상태를 잡을 수 있습니다.
   snippet: |-
     requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
     missingColumns = requiredColumns - set(iris.columns)
@@ -460,8 +456,6 @@ sections:
     지금까지 배운 scatterplot, hue, palette를 활용해서 다양한 산점도를 만들어봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset

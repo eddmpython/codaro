@@ -421,8 +421,6 @@ sections:
     교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset

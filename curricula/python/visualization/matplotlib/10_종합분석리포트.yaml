@@ -66,8 +66,6 @@ sections:
     모든 개념을 활용한 종합 분석 리포트를 만듭니다. gapminder와 tips 데이터를 사용하여 다양한 관점에서 데이터를 분석합니다. inset_axes와 Normalize 등 새로운 개념도 배웁니다.
 
     종합 분석에는 다양한 matplotlib 서브모듈이 필요합니다. GridSpec은 레이아웃, inset_axes는 인셋 차트, Normalize와 cm은 컬러맵 설정에 사용됩니다.
-  tips:
-  - 종합 분석에는 다양한 matplotlib 서브모듈이 필요합니다. GridSpec은 레이아웃, inset_axes는 인셋 차트, Normalize와 cm은 컬러맵 설정에 사용됩니다.
   snippet: |-
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
@@ -537,8 +535,6 @@ sections:
     지금까지 배운 모든 개념을 활용해서 나만의 종합 분석 리포트를 만들어봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec

@@ -79,8 +79,6 @@ sections:
     FeatureGroup()은 여러 요소를 하나의 그룹으로 묶습니다. 그룹 단위로 표시/숨김을 제어할 수 있습니다.
 
     마커를 그룹에 추가하고(add_to(group)), 그룹을 지도에 추가합니다(add_to(map)).
-  tips:
-  - 마커를 그룹에 추가하고(add_to(group)), 그룹을 지도에 추가합니다(add_to(map)).
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=13)
@@ -141,8 +139,6 @@ sections:
     여러 FeatureGroup을 만들어 카테고리별로 마커를 분류합니다.
 
     그룹별로 아이콘 색상을 다르게 하면 구분하기 쉽습니다.
-  tips:
-  - 그룹별로 아이콘 색상을 다르게 하면 구분하기 쉽습니다.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -233,8 +229,6 @@ sections:
     LayerControl()을 추가하면 우측 상단에 레이어 토글 버튼이 생깁니다.
 
     우측 상단 아이콘을 클릭하면 레이어 목록이 나타납니다. 체크박스로 레이어를 켜고 끌 수 있습니다.
-  tips:
-  - 우측 상단 아이콘을 클릭하면 레이어 목록이 나타납니다. 체크박스로 레이어를 켜고 끌 수 있습니다.
   snippet: |-
     m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -305,8 +299,6 @@ sections:
     베이스 레이어는 라디오 버튼(하나만 선택), 오버레이는 체크박스(다중 선택)입니다. FeatureGroup은 기본적으로 오버레이입니다.
 
     타일 레이어는 베이스(라디오), FeatureGroup은 오버레이(체크박스)로 표시됩니다.
-  tips:
-  - 타일 레이어는 베이스(라디오), FeatureGroup은 오버레이(체크박스)로 표시됩니다.
   snippet: |-
     m4 = folium.Map(location=seoulCenter, zoom_start=13, tiles=None)
 
@@ -359,8 +351,6 @@ sections:
     show=False로 설정하면 처음에는 숨겨진 상태로 시작합니다.
 
     선택적 정보(주차장, 화장실 등)는 show=False로 숨겨두면 지도가 깔끔합니다.
-  tips:
-  - 선택적 정보(주차장, 화장실 등)는 show=False로 숨겨두면 지도가 깔끔합니다.
   snippet: |-
     m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -427,8 +417,6 @@ sections:
     마커뿐 아니라 원, 폴리곤 등 모든 요소를 그룹에 넣을 수 있습니다.
 
     마커와 영역을 별도 그룹으로 분리하면 사용자가 원하는 정보만 볼 수 있습니다.
-  tips:
-  - 마커와 영역을 별도 그룹으로 분리하면 사용자가 원하는 정보만 볼 수 있습니다.
   snippet: |-
     m6 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -513,8 +501,6 @@ sections:
     LayerControl의 collapsed 옵션으로 기본 펼침/접힘 상태를 설정합니다.
 
     collapsed=False면 처음부터 레이어 목록이 펼쳐져 있습니다. 레이어가 중요할 때 사용합니다.
-  tips:
-  - collapsed=False면 처음부터 레이어 목록이 펼쳐져 있습니다. 레이어가 중요할 때 사용합니다.
   snippet: |-
     m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -563,8 +549,6 @@ sections:
     여러 카테고리와 타일을 조합한 복잡한 레이어 구조를 만듭니다.
 
     베이스 레이어(타일)와 오버레이(마커 그룹)를 조합하면 유연한 지도를 만들 수 있습니다.
-  tips:
-  - 베이스 레이어(타일)와 오버레이(마커 그룹)를 조합하면 유연한 지도를 만들 수 있습니다.
   snippet: |-
     m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
@@ -826,8 +810,6 @@ sections:
     레이어 지도는 정보가 많아질수록 누락과 과표시가 생기기 쉽습니다. 업무용 운영 지도에서는 시설, 리스크, 고객 접점을 분리하고, 어떤 레이어가 기본으로 보일지 예측한 뒤 HTML 렌더 결과로 검증합니다.
 
     레이어 관리는 지도 꾸미기가 아니라 정보 과밀도를 제어하는 설계입니다. 기본 표시, 숨김 표시, 미분류 오류를 코드로 검증해야 운영 지도가 믿을 만해집니다.
-  tips:
-  - 레이어 관리는 지도 꾸미기가 아니라 정보 과밀도를 제어하는 설계입니다. 기본 표시, 숨김 표시, 미분류 오류를 코드로 검증해야 운영 지도가 믿을 만해집니다.
   snippet: |-
     operationSites = [
         {"name": "강남 고객센터", "category": "support", "loc": [37.4979, 127.0276]},

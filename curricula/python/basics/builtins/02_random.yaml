@@ -57,8 +57,6 @@ sections:
     random은 파이썬 표준 라이브러리입니다. 난수를 생성하고 무작위 선택을 수행하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 random 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 random 모듈을 사용할 수 있습니다.
   snippet: |-
     import random
 
@@ -88,8 +86,6 @@ sections:
     random 모듈은 난수를 생성하는 파이썬 표준 라이브러리입니다. random()은 0.0 이상 1.0 미만의 실수를 반환하고, randint()는 지정 범위의 정수를 반환합니다. uniform()은 특정 범위의 실수를 생성합니다. 게임, 시뮬레이션, 테스트 데이터 생성에 필수적입니다.
 
     randint(a, b)는 a와 b를 모두 포함하지만, randrange(a, b)는 b를 포함하지 않습니다.
-  tips:
-  - randint(a, b)는 a와 b를 모두 포함하지만, randrange(a, b)는 b를 포함하지 않습니다.
   snippet: |-
     randomFloat = random.random()
     randomFloat
@@ -115,8 +111,6 @@ sections:
     시퀀스에서 무작위로 요소를 선택하는 함수들입니다. choice()는 하나를 선택하고, choices()는 여러 개를 중복 허용하여 선택합니다. sample()은 중복 없이 여러 개를 선택합니다. 이들은 추첨, 무작위 샘플링, 게임 구현에 유용합니다.
 
     sample()의 k는 모집단 크기를 초과할 수 없지만, choices()는 가능합니다.
-  tips:
-  - sample()의 k는 모집단 크기를 초과할 수 없지만, choices()는 가능합니다.
   snippet: |-
     fruits = ['apple', 'banana', 'cherry', 'date']
     chosen = random.choice(fruits)
@@ -144,8 +138,6 @@ sections:
     shuffle()은 리스트를 제자리에서 무작위로 섞습니다. 카드 게임, 플레이리스트 섞기, 데이터 무작위화에 사용됩니다. 원본 리스트가 변경되므로 주의해야 하며, 복사본을 만들어 섞는 것이 안전합니다.
 
     shuffle()은 반환값이 없습니다. shuffled = random.shuffle(list)는 None을 반환합니다.
-  tips:
-  - shuffle()은 반환값이 없습니다. shuffled = random.shuffle(list)는 None을 반환합니다.
   snippet: |-
     deck = [1, 2, 3, 4, 5]
     random.shuffle(deck)
@@ -173,8 +165,6 @@ sections:
     random 모듈은 다양한 확률 분포를 지원합니다. 정규분포(gauss), 삼각분포(triangular), 베타분포(betavariate) 등 통계적 시뮬레이션과 과학 계산에 사용되는 분포들을 제공합니다. 실제 데이터를 모방하는 테스트 데이터를 생성할 때 유용합니다.
 
     gauss()는 정규분포를, normalvariate()는 스레드 안전한 정규분포를 생성합니다.
-  tips:
-  - gauss()는 정규분포를, normalvariate()는 스레드 안전한 정규분포를 생성합니다.
   snippet: |-
     normalValue = random.gauss(100, 15)
     normalValue
@@ -200,8 +190,6 @@ sections:
     seed()는 난수 생성기의 시작점을 설정합니다. 같은 시드를 사용하면 항상 같은 난수 시퀀스가 생성되어 재현 가능한 결과를 얻을 수 있습니다. 디버깅, 테스트, 과학 실험에서 필수적입니다. getstate()와 setstate()로 난수 생성기 상태를 저장하고 복원할 수 있습니다.
 
     시드를 설정하지 않으면 시스템 시간을 기반으로 난수가 생성됩니다.
-  tips:
-  - 시드를 설정하지 않으면 시스템 시간을 기반으로 난수가 생성됩니다.
   snippet: |-
     random.seed(42)
     firstValue = random.randint(1, 100)
@@ -233,8 +221,6 @@ sections:
     random 모듈의 실전 활용 예제를 살펴봅니다. 주사위 굴리기, 동전 던지기, 비밀번호 생성, 로또 번호 추첨 등 실생활 문제를 해결할 수 있습니다. 여러 함수를 조합하여 복잡한 무작위 작업을 구현합니다.
 
     보안이 중요한 경우 secrets 모듈을 사용하세요. random은 암호학적으로 안전하지 않습니다.
-  tips:
-  - 보안이 중요한 경우 secrets 모듈을 사용하세요. random은 암호학적으로 안전하지 않습니다.
   snippet: |-
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)

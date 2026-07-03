@@ -85,8 +85,6 @@ sections:
     BaseSettings를 상속한 클래스는 필드명과 같은 이름의 환경변수에서 자동으로 값을 읽습니다. 필드에 기본값을 지정하면 환경변수가 없을 때 사용됩니다. 타입 힌트에 따라 문자열 환경변수가 자동으로 int, bool 등으로 변환됩니다.
 
     BaseSettings는 대소문자를 구분하지 않습니다. appName 필드는 APPNAME, AppName, appname 등 어떤 형태의 환경변수도 읽습니다.
-  tips:
-  - BaseSettings는 대소문자를 구분하지 않습니다. appName 필드는 APPNAME, AppName, appname 등 어떤 형태의 환경변수도 읽습니다.
   snippet: |-
     class AppSettings(BaseSettings):
         appName: str = "MyApp"
@@ -315,8 +313,6 @@ sections:
     비밀번호, API 키 같은 민감한 정보는 로그에 노출되면 안 됩니다. SecretStr 타입을 사용하면 출력 시 자동으로 마스킹되고, get_secret_value()로만 실제 값에 접근할 수 있습니다. 디버깅 로그에서 비밀이 노출되는 것을 방지합니다.
 
     SecretStr은 repr에서 '**********'로 표시됩니다. 실제 값은 .get_secret_value() 메서드로 접근합니다.
-  tips:
-  - SecretStr은 repr에서 '**********'로 표시됩니다. 실제 값은 .get_secret_value() 메서드로 접근합니다.
   snippet: |-
     class AuthSettings(BaseSettings):
         model_config = {"env_prefix": "AUTH_"}
@@ -403,8 +399,6 @@ sections:
     설정을 매번 새로 로드하면 성능이 낭비됩니다. functools.lru_cache를 사용하면 설정 객체를 캐싱하여 애플리케이션 전체에서 동일한 인스턴스를 재사용합니다. FastAPI 등 프레임워크에서 권장하는 패턴입니다.
 
     lru_cache는 동일한 인자에 대해 같은 결과를 반환합니다. 설정을 변경하려면 getSettings.cache_clear()로 캐시를 비워야 합니다.
-  tips:
-  - lru_cache는 동일한 인자에 대해 같은 결과를 반환합니다. 설정을 변경하려면 getSettings.cache_clear()로 캐시를 비워야 합니다.
   snippet: |-
     from functools import lru_cache
 
@@ -539,8 +533,6 @@ sections:
     지금까지 배운 BaseSettings, 접두사, 중첩 설정, SecretStr, JSON 환경변수를 활용하여 실제 애플리케이션 설정 시스템을 구축합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from pydantic_settings import BaseSettings
     from pydantic import BaseModel, Field, SecretStr

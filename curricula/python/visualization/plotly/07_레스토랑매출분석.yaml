@@ -625,8 +625,6 @@ sections:
     배운 내용으로 추가 분석 대시보드를 만들어봅시다. 이 실습에서는 density_heatmap, box plot, bar chart, make_subplots, 데이터 전처리(파생 변수 생성), 그룹별 집계 등 모든 개념을 종합적으로 활용합니다. 각 미션은 실제 레스토랑 분석 시나리오를 반영하여 구성되었으며, 완성하면 팁에 영향을 미치는 다양한 요인을 깊이 이해할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import plotly.express as px
     import pandas as pd

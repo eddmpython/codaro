@@ -434,8 +434,6 @@ sections:
     항공사 데이터 분석가가 되어 지금까지 배운 모든 시계열 기법을 활용해봅시다. 날짜 변환, 시계열 인덱스 설정, groupby 집계, pct_change 증가율, rolling 이동평균, pivot_table 교차표 등 모든 개념을 종합적으로 사용합니다. 실무에서 시계열 데이터를 분석할 때 이런 단계들을 거쳐 인사이트를 도출합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset

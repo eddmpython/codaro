@@ -98,8 +98,6 @@ sections:
     sin, cos, tan은 직각삼각형의 변의 비율로 정의됩니다. 30°(π/6), 45°(π/4), 60°(π/3) 같은 특수각의 삼각비는 √2, √3을 포함한 정확한 값으로 표현됩니다. sin(π/6) = 1/2, cos(π/4) = √2/2, tan(π/3) = √3입니다. SymPy는 이 값들을 소수가 아닌 기호로 정확하게 표현합니다. tan(x) = sin(x)/cos(x) 관계도 자동으로 인식합니다.
 
     sin(π/6) = 1/2, cos(π/4) = √2/2, tan(π/3) = √3입니다. SymPy는 정확한 값을 기호로 표현합니다.
-  tips:
-  - sin(π/6) = 1/2, cos(π/4) = √2/2, tan(π/3) = √3입니다. SymPy는 정확한 값을 기호로 표현합니다.
   snippet: x = symbols('x')
   exercise:
     prompt: 2단계. 기본 삼각함수 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
@@ -120,8 +118,6 @@ sections:
     피타고라스 항등식 sin²x + cos²x = 1은 단위원에서 유도되는 가장 기본적인 관계입니다. 모든 x에 대해 성립하며, 이를 변형하면 tan²x + 1 = sec²x, 1 + cot²x = csc²x도 얻습니다. trigsimp()는 이 항등식을 자동으로 적용합니다. sin⁴x + 2sin²x·cos²x + cos⁴x = (sin²x + cos²x)² = 1도 계산합니다.
 
     trigsimp()는 삼각함수 수식을 간소화합니다. 피타고라스 항등식을 적용하여 sin²+cos²=1로 변환합니다.
-  tips:
-  - trigsimp()는 삼각함수 수식을 간소화합니다. 피타고라스 항등식을 적용하여 sin²+cos²=1로 변환합니다.
   snippet: |-
     identity = sin(x)**2 + cos(x)**2
     result = trigsimp(identity)
@@ -198,8 +194,6 @@ sections:
     역삼각함수는 비율로부터 각도를 구합니다. asin(1/2)는 sin(θ)=1/2인 θ=π/6을 반환합니다. asin의 범위는 [-π/2, π/2], acos는 [0, π], atan은 (-π/2, π/2)입니다. sin(asin(x)) = x는 항상 성립하지만, asin(sin(x)) = x는 범위 내에서만 성립합니다. 역삼각함수의 미분 d/dx asin(x) = 1/√(1-x²)은 적분에서 자주 등장합니다.
 
     asin(1/2) = π/6, acos(√2/2) = π/4, atan(1) = π/4입니다. 역삼각함수의 미분은 1/√(1-x²) 형태입니다.
-  tips:
-  - asin(1/2) = π/6, acos(√2/2) = π/4, atan(1) = π/4입니다. 역삼각함수의 미분은 1/√(1-x²) 형태입니다.
   snippet: |-
     asin1 = asin(Rational(1, 2))
     acos1 = acos(sqrt(2)/2)
@@ -228,8 +222,6 @@ sections:
     삼각방정식 sin(x) = 1/2의 해는 x = π/6 + 2nπ 또는 x = 5π/6 + 2nπ로 무한히 많습니다. solve()는 주기성을 제외한 주값(principal value)을 반환합니다. 복합 방정식 2sin(x)cos(x) = 1은 sin(2x) = 1로 변환되어 x = π/4가 됩니다. SymPy는 항등식을 활용하여 복잡한 삼각방정식도 풉니다.
 
     삼각방정식의 해는 주기성이 있어 무한히 많습니다. SymPy는 주값(principal value)을 반환합니다.
-  tips:
-  - 삼각방정식의 해는 주기성이 있어 무한히 많습니다. SymPy는 주값(principal value)을 반환합니다.
   snippet: |-
     sol1 = solve(sin(x) - Rational(1, 2), x)
     sol1
@@ -341,8 +333,6 @@ sections:
     이제 삼각함수의 항등식, 방정식, 미적분을 종합적으로 연습합니다. 미션1에서는 피타고라스 항등식의 변형들을 정리합니다. (1-cos²θ)/sinθ = sinθ임을 확인하고, sin⁴θ - cos⁴θ가 간단히 정리됨을 봅니다. 미션2에서는 sin(φ)+cos(φ)=0인 방정식을 풀고, sin³φ를 미분하고, sinφ·cos²φ를 적분합니다. 이 연습들은 물리학과 공학 문제의 기초가 됩니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from sympy import symbols, sin, cos, tan, trigsimp, expand_trig, simplify
 

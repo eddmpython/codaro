@@ -55,8 +55,6 @@ sections:
     urllib은 파이썬 표준 라이브러리입니다. URL 작업을 위한 여러 하위 모듈을 제공합니다. urllib.request는 URL 열기, urllib.parse는 URL 파싱, urllib.error는 예외 처리를 담당합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 urllib 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 urllib 모듈을 사용할 수 있습니다.
   snippet: |-
     import urllib.request
     import urllib.parse
@@ -90,8 +88,6 @@ sections:
     urllib.request는 URL을 열고 데이터를 읽는 기능을 제공합니다. urlopen()으로 간단한 GET 요청을 보내고, Request 객체로 헤더와 메서드를 커스터마이즈할 수 있습니다. 웹 API 호출, 웹 스크래핑, 데이터 다운로드에 활용됩니다.
 
     외부 URL 접근은 네트워크 상태와 대상 사이트 정책에 영향을 받을 수 있습니다. 로컬 파일이나 안정적인 공개 데이터를 함께 준비하면 실습이 더 재현 가능합니다.
-  tips:
-  - 외부 URL 접근은 네트워크 상태와 대상 사이트 정책에 영향을 받을 수 있습니다. 로컬 파일이나 안정적인 공개 데이터를 함께 준비하면 실습이 더 재현 가능합니다.
   snippet: |-
     url = 'https://httpbin.org/get'
     fallbackResponse = b'{"origin": "local", "url": "https://httpbin.org/get"}'
@@ -129,8 +125,6 @@ sections:
     urllib.parse는 URL을 구성 요소로 분해하거나 조합하는 기능을 제공합니다. urlparse()로 URL을 파싱하고, urljoin()으로 상대 URL을 절대 URL로 변환하며, quote()와 unquote()로 URL 인코딩을 처리합니다.
 
     quote_plus()는 공백을 +로 인코딩합니다. quote()는 %20으로 인코딩합니다.
-  tips:
-  - quote_plus()는 공백을 +로 인코딩합니다. quote()는 %20으로 인코딩합니다.
   snippet: |-
     url = 'https://example.com:8080/path/to/page?key=value#section'
     parsed = urllib.parse.urlparse(url)
@@ -158,8 +152,6 @@ sections:
     쿼리 문자열은 URL에서 데이터를 전달하는 방법입니다. urlencode()로 딕셔너리를 쿼리 문자열로 변환하고, parse_qs()와 parse_qsl()로 쿼리 문자열을 파싱합니다. API 호출, 폼 제출, 검색 요청에 필수적입니다.
 
     parse_qs()는 값을 리스트로 반환하고, parse_qsl()은 튜플 리스트로 반환합니다.
-  tips:
-  - parse_qs()는 값을 리스트로 반환하고, parse_qsl()은 튜플 리스트로 반환합니다.
   snippet: |-
     params = {'name': 'John Doe', 'age': 30, 'city': 'Seoul'}
     queryString = urllib.parse.urlencode(params)
@@ -187,8 +179,6 @@ sections:
     urllib.error는 URL 작업 중 발생하는 예외를 제공합니다. HTTPError는 HTTP 상태 코드 에러(404, 500 등)를 처리하고, URLError는 네트워크 문제나 잘못된 URL을 처리합니다. 안정적인 웹 클라이언트 구현에 필수적입니다.
 
     HTTPError는 URLError의 하위 클래스이므로 HTTPError를 먼저 처리해야 합니다.
-  tips:
-  - HTTPError는 URLError의 하위 클래스이므로 HTTPError를 먼저 처리해야 합니다.
   snippet: |-
     url = 'https://httpbin.org/status/404'
     try:
@@ -228,8 +218,6 @@ sections:
     Request 객체로 요청을 세밀하게 제어할 수 있습니다. 커스텀 헤더를 추가하고, POST 데이터를 전송하며, 타임아웃을 설정할 수 있습니다. User-Agent 설정, API 인증, 폼 제출 등 실전 웹 프로그래밍에 필요합니다.
 
     POST 데이터는 bytes 형식이어야 하므로 encode('utf-8')로 변환해야 합니다.
-  tips:
-  - POST 데이터는 bytes 형식이어야 하므로 encode('utf-8')로 변환해야 합니다.
   snippet: |-
     url = 'https://httpbin.org/headers'
     headers = {'User-Agent': 'MyApp/1.0'}
@@ -316,8 +304,6 @@ sections:
     urllib 실습은 네트워크 성공에만 의존하면 학습 흐름이 흔들립니다. 로컬 JSON 파일을 file:// URL로 읽고, 실패 시 fallback을 반환하며, 쿼리와 스킴을 검증하는 방식으로 재현 가능한 URL 클라이언트 흐름을 만듭니다.
 
     실무 변주: fallback 데이터를 로컬 파일, 메모리 기본값, 빈 결과 세 가지로 나누고 각 URL 실패 원인별로 어떤 값을 돌려줄지 정책표를 만들어 보세요.
-  tips:
-  - '실무 변주: fallback 데이터를 로컬 파일, 메모리 기본값, 빈 결과 세 가지로 나누고 각 URL 실패 원인별로 어떤 값을 돌려줄지 정책표를 만들어 보세요.'
   snippet: |-
     import json
     import tempfile

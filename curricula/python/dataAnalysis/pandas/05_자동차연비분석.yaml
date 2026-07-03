@@ -181,8 +181,6 @@ sections:
     nlargest(N, '컬럼') 메서드는 지정한 컬럼 기준으로 가장 큰 값 N개를 바로 뽑아줍니다. sort_values(..., ascending=False).head(N)과 같은 결과지만 훨씬 간결하고 의미가 명확합니다. TOP 10, TOP 100 같은 순위 분석에 매우 유용합니다.
 
     nlargest()와 반대로 nsmallest()는 가장 작은 값 N개를 뽑습니다. 예를 들어 mpg.nsmallest(10, 'mpg')는 연비가 가장 낮은 10대를 보여줍니다.
-  tips:
-  - nlargest()와 반대로 nsmallest()는 가장 작은 값 N개를 뽑습니다. 예를 들어 mpg.nsmallest(10, 'mpg')는 연비가 가장 낮은 10대를 보여줍니다.
   snippet: mpg.nlargest(10, 'mpg')[['name', 'mpg', 'origin', 'model_year']]
   exercise:
     prompt: 6단계. TOP N 뽑기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
@@ -450,8 +448,6 @@ sections:
     배운 모든 내용을 활용해서 분석해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset

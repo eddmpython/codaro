@@ -181,8 +181,6 @@ sections:
     인구 크기를 점 크기로 표현합니다. 3개의 차원(GDP, 기대수명, 인구)을 동시에 시각화합니다.
 
     size 파라미터로 연속형 변수를 점 크기에 매핑합니다. sizes=(최소, 최대)로 크기 범위를 지정합니다. alpha는 투명도(0~1)로 겹치는 점을 구분하는 데 도움이 됩니다.
-  tips:
-  - size 파라미터로 연속형 변수를 점 크기에 매핑합니다. sizes=(최소, 최대)로 크기 범위를 지정합니다. alpha는 투명도(0~1)로 겹치는 점을 구분하는 데 도움이 됩니다.
   snippet: |-
     figSize, axSize = plt.subplots(figsize=(12, 7))
     sns.scatterplot(data=gap2007, x='gdpPercap', y='lifeExp', hue='continent', size='pop', sizes=(20, 1000), palette='Set1', alpha=0.7, ax=axSize)
@@ -244,8 +242,6 @@ sections:
     대륙별로 패널을 분리하여 비교합니다. col 파라미터로 범주별 패널을 생성합니다.
 
     col 파라미터로 범주별 패널을 생성합니다. col_wrap은 한 줄에 표시할 패널 수를 지정합니다. 각 패널이 독립적인 스케일을 가지므로 대륙별 패턴을 자세히 볼 수 있습니다.
-  tips:
-  - col 파라미터로 범주별 패널을 생성합니다. col_wrap은 한 줄에 표시할 패널 수를 지정합니다. 각 패널이 독립적인 스케일을 가지므로 대륙별 패턴을 자세히 볼 수 있습니다.
   snippet: |-
     gCol = sns.relplot(data=gap2007, x='gdpPercap', y='lifeExp', hue='continent', size='pop', sizes=(20, 500), col='continent', col_wrap=3, palette='Set1', alpha=0.7, height=4)
     gCol.figure.suptitle('GDP vs Life Expectancy by Continent', y=1.02)
@@ -273,8 +269,6 @@ sections:
     시간에 따른 변화를 선 그래프로 확인합니다. relplot에서 kind='line'으로 선 그래프를 그립니다.
 
     relplot()에서 kind='line'으로 선 그래프를 그립니다. marker='o'로 데이터 포인트를 표시합니다. kind 기본값은 'scatter'입니다.
-  tips:
-  - relplot()에서 kind='line'으로 선 그래프를 그립니다. marker='o'로 데이터 포인트를 표시합니다. kind 기본값은 'scatter'입니다.
   snippet: |-
     continentAvg = gapminder.groupby(['year', 'continent'])[['lifeExp', 'gdpPercap']].mean().reset_index()
     gLine = sns.relplot(data=continentAvg, x='year', y='lifeExp', hue='continent', kind='line', palette='Set1', height=5, aspect=1.5, marker='o')
@@ -304,8 +298,6 @@ sections:
     스타일로 추가 차원을 표현합니다. style 파라미터로 선 스타일이나 마커 모양을 구분합니다.
 
     style 파라미터로 선 스타일(실선, 점선 등)이나 마커 모양을 구분합니다. hue와 style에 같은 변수를 지정하면 색상과 스타일 모두로 구분되어 흑백 인쇄에서도 구분 가능합니다.
-  tips:
-  - style 파라미터로 선 스타일(실선, 점선 등)이나 마커 모양을 구분합니다. hue와 style에 같은 변수를 지정하면 색상과 스타일 모두로 구분되어 흑백 인쇄에서도 구분 가능합니다.
   snippet: |-
     gapAsia = gapminder[(gapminder['continent'] == 'Asia') & (gapminder['country'].isin(['Korea, Rep.', 'Japan', 'China', 'India']))].copy()
     gStyle = sns.relplot(data=gapAsia, x='year', y='lifeExp', hue='country', style='country', kind='line', markers=True, palette='Dark2', height=5, aspect=1.5)
@@ -395,8 +387,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
@@ -428,8 +418,6 @@ sections:
     Gapminder 산점도는 GDP, 기대수명, 인구, 대륙을 한 번에 보여 줍니다. 로그 축을 쓰기 전 양수 조건을 확인하고, 최신 연도 기준으로 해석을 고정합니다.
 
     다차원 차트는 멋있지만, 로그 축과 size 의미가 데이터 조건을 만족해야 해석 가능한 보고서가 됩니다.
-  tips:
-  - 다차원 차트는 멋있지만, 로그 축과 size 의미가 데이터 조건을 만족해야 해석 가능한 보고서가 됩니다.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 

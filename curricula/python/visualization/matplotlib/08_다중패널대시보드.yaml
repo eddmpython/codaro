@@ -527,8 +527,6 @@ sections:
     지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec

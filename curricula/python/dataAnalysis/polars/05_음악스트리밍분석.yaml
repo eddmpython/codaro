@@ -60,8 +60,6 @@ sections:
     Spotify 음악 스트리밍 데이터를 분석합니다. 수천 개의 트랙에 대한 정보가 담겨 있으며, 곡명, 아티스트, 장르, 인기도(popularity) 등의 정보를 포함합니다. 이번 프로젝트에서는 문자열 처리(str.contains, str.to_lowercase)와 윈도우 함수(over, rank)를 배웁니다. over()는 그룹별 계산을 하되 원본 행을 유지하는 강력한 기능이고, rank()는 순위를 매기는 함수입니다. 이 두 개를 조합하면 "아티스트별로 가장 인기 있는 곡"처럼 그룹 내 순위를 구할 수 있습니다.
 
     이 데이터셋은 수만 개의 곡 정보를 포함하고 있어 대용량 데이터 처리 연습에 적합합니다. Polars는 이런 규모의 데이터도 빠르게 필터링하고 그룹화할 수 있습니다.
-  tips:
-  - 이 데이터셋은 수만 개의 곡 정보를 포함하고 있어 대용량 데이터 처리 연습에 적합합니다. Polars는 이런 규모의 데이터도 빠르게 필터링하고 그룹화할 수 있습니다.
   snippet: |-
     import polars as pl
     from io import StringIO
@@ -465,8 +463,6 @@ sections:
     배운 모든 내용을 활용해서 분석해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import polars as pl
     from io import StringIO

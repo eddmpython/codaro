@@ -55,8 +55,6 @@ sections:
     inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다.
 
     inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다.
-  tips:
-  - inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다.
   snippet: |-
     import inspect
 
@@ -92,8 +90,6 @@ sections:
     inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다.
 
     isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드
-  tips:
-  - 'isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드'
   snippet: |-
     import inspect
 
@@ -139,8 +135,6 @@ sections:
     signature()로 함수의 매개변수 정보를 추출할 수 있습니다.
 
     signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다.
-  tips:
-  - signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다.
   snippet: |-
     import inspect
 
@@ -180,8 +174,6 @@ sections:
     getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다.
 
     getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요.
-  tips:
-  - getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요.
   snippet: |-
     import inspect
 
@@ -234,8 +226,6 @@ sections:
     getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다.
 
     getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다.
-  tips:
-  - getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다.
   snippet: |-
     import importlib.util
     import inspect
@@ -309,8 +299,6 @@ sections:
     inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다.
 
     프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다.
-  tips:
-  - 프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다.
   snippet: |-
     import inspect
 
@@ -348,8 +336,6 @@ sections:
     inspect 모듈을 활용한 실무 패턴들입니다.
 
     inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다.
-  tips:
-  - inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다.
   snippet: |-
     import inspect
 

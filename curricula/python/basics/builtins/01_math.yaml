@@ -58,8 +58,6 @@ sections:
     math는 파이썬 표준 수학 라이브러리입니다. 삼각함수, 로그, 지수, 반올림 등 다양한 수학 함수를 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 math 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 math 모듈을 사용할 수 있습니다.
   snippet: |-
     import math
 
@@ -89,8 +87,6 @@ sections:
     math 모듈은 파이썬의 표준 수학 라이브러리입니다. 제곱근, 거듭제곱, 절댓값 등 기본적인 수학 계산부터 과학 계산까지 다양한 함수를 제공합니다. 모든 함수는 부동소수점 연산을 수행하며, 정확하고 빠른 계산을 보장합니다.
 
     sqrt()는 음수에 사용하면 ValueError가 발생합니다. 복소수 계산은 cmath 모듈을 사용하세요.
-  tips:
-  - sqrt()는 음수에 사용하면 ValueError가 발생합니다. 복소수 계산은 cmath 모듈을 사용하세요.
   snippet: |-
     squareRoot = math.sqrt(16)
     squareRoot
@@ -116,8 +112,6 @@ sections:
     삼각함수는 각도를 다루는 계산에 필수적입니다. math 모듈의 삼각함수는 라디안 단위를 사용하므로, 도(degree)를 라디안으로 변환해야 합니다. sin, cos, tan 함수와 역삼각함수 asin, acos, atan을 제공합니다.
 
     파이썬의 삼각함수는 라디안을 사용합니다. 도 단위는 radians()로 변환하세요.
-  tips:
-  - 파이썬의 삼각함수는 라디안을 사용합니다. 도 단위는 radians()로 변환하세요.
   snippet: |-
     angleInRadians = math.radians(45)
     angleInRadians
@@ -143,8 +137,6 @@ sections:
     로그와 지수 함수는 과학 계산, 금융, 데이터 분석에서 자주 사용됩니다. math.log()는 자연로그(밑이 e), math.log10()은 상용로그(밑이 10)를 계산합니다. math.exp()는 e의 거듭제곱을 계산합니다.
 
     log(x, base)로 임의의 밑을 지정할 수 있습니다. 예: math.log(8, 2) = 3
-  tips:
-  - 'log(x, base)로 임의의 밑을 지정할 수 있습니다. 예: math.log(8, 2) = 3'
   snippet: |-
     exponential = math.exp(1)
     exponential
@@ -170,8 +162,6 @@ sections:
     수를 정수로 변환하는 방법은 여러 가지입니다. ceil()은 올림, floor()는 내림, trunc()는 소수점 제거를 수행합니다. round()는 내장 함수로 반올림하지만, math.modf()는 정수부와 소수부를 분리합니다.
 
     음수에서 ceil()과 floor()의 동작에 주의하세요. ceil(-3.2) = -3, floor(-3.2) = -4
-  tips:
-  - 음수에서 ceil()과 floor()의 동작에 주의하세요. ceil(-3.2) = -3, floor(-3.2) = -4
   snippet: |-
     ceilingValue = math.ceil(3.2)
     ceilingValue
@@ -197,8 +187,6 @@ sections:
     math 모듈은 중요한 수학 상수를 제공합니다. math.pi는 원주율(3.141592...), math.e는 자연상수(2.718281...), math.tau는 2π, math.inf는 무한대를 나타냅니다. 이 상수들은 과학 계산에 필수적입니다.
 
     math.tau는 2π로, 라디안 계산에서 더 직관적입니다. 한 바퀴는 tau 라디안입니다.
-  tips:
-  - math.tau는 2π로, 라디안 계산에서 더 직관적입니다. 한 바퀴는 tau 라디안입니다.
   snippet: |-
     radius = 5
     circleArea = math.pi * radius ** 2
@@ -226,8 +214,6 @@ sections:
     math 모듈을 실전에서 활용하는 예제를 살펴봅니다. 거리 계산, 각도 변환, 통계 계산 등 다양한 분야에서 수학 함수를 조합하여 복잡한 문제를 해결할 수 있습니다.
 
     hypot()는 여러 인자를 받을 수 있습니다. math.hypot(3, 4, 5)로 3차원 거리를 계산할 수 있습니다.
-  tips:
-  - hypot()는 여러 인자를 받을 수 있습니다. math.hypot(3, 4, 5)로 3차원 거리를 계산할 수 있습니다.
   snippet: |-
     hypotenuse = math.hypot(3, 4)
     hypotenuse

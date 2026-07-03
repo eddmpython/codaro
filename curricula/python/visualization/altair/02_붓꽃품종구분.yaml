@@ -126,8 +126,6 @@ sections:
     color 인코딩으로 품종(species)을 색상으로 구분합니다. 이전 프로젝트에서도 사용한 개념입니다. 품종별로 데이터가 어떻게 분포하는지 한눈에 파악할 수 있습니다.
 
     color="species:N"에서 :N은 명목형(Nominal) 데이터 타입입니다. 범주형 데이터에 사용하며, Altair가 자동으로 구분되는 색상을 할당합니다.
-  tips:
-  - color="species:N"에서 :N은 명목형(Nominal) 데이터 타입입니다. 범주형 데이터에 사용하며, Altair가 자동으로 구분되는 색상을 할당합니다.
   snippet: |-
     chartColor = alt.Chart(iris).mark_point().encode(
         x="petal_length:Q",
@@ -160,8 +158,6 @@ sections:
     size 인코딩으로 점의 크기에 또 다른 변수를 매핑합니다. encode() 괄호 안에 size를 추가하면 됩니다. 꽃받침 길이(sepal_length)를 크기로 표현하면, x(꽃잎 길이), y(꽃잎 너비), color(품종), size(꽃받침 길이) 총 4개의 변수를 한 차트에 표현할 수 있습니다. 값이 클수록 점이 커지므로, 꽃받침이 긴 품종이 어느 것인지 쉽게 파악할 수 있습니다.
 
     size="sepal_length:Q"에서 :Q는 수량형(Quantitative) 데이터입니다. 연속적인 수치 데이터에 사용하며, 값이 클수록 점이 커집니다.
-  tips:
-  - size="sepal_length:Q"에서 :Q는 수량형(Quantitative) 데이터입니다. 연속적인 수치 데이터에 사용하며, 값이 클수록 점이 커집니다.
   snippet: |-
     chartSize = alt.Chart(iris).mark_point().encode(
         x="petal_length:Q",
@@ -196,8 +192,6 @@ sections:
     shape 인코딩으로 점의 모양을 변경할 수 있습니다. color처럼 encode() 괄호 안에 shape를 추가합니다. 색상 대신 모양으로 품종을 구분하면, 흑백 인쇄에서도 구분이 가능합니다. Altair는 자동으로 원, 사각형, 삼각형 등 서로 다른 모양을 할당합니다. 색상과 모양을 함께 사용하면 더 명확해집니다. 같은 컬럼을 color와 shape 둘 다에 지정할 수 있습니다.
 
     shape 인코딩은 명목형(:N) 데이터에만 사용할 수 있습니다. 원, 사각형, 삼각형 등 최대 8개 모양을 지원합니다.
-  tips:
-  - shape 인코딩은 명목형(:N) 데이터에만 사용할 수 있습니다. 원, 사각형, 삼각형 등 최대 8개 모양을 지원합니다.
   snippet: |-
     chartShape = alt.Chart(iris).mark_point().encode(
         x="petal_length:Q",
@@ -351,8 +345,6 @@ sections:
     Altair 차트는 화면에 보이는 그림이면서 동시에 JSON spec입니다. 그래서 완성된 차트가 품종을 색상과 모양으로 구분하는지, 제목과 축 인코딩이 들어갔는지 코드로 검증할 수 있습니다. 먼저 setosa는 꽃잎 길이에서 다른 품종과 분리될 것이라고 예측합니다. 그런 다음 데이터 요약과 차트 spec을 함께 확인해, 보고서에 넣기 전에 차트가 의도대로 만들어졌는지 검사합니다.
 
     Altair는 차트를 spec으로 표현하기 때문에 화면을 눈으로 확인하지 않아도 인코딩 누락을 테스트할 수 있습니다. 시각화 자동화와 보고서 생성에서 특히 유용한 습관입니다.
-  tips:
-  - Altair는 차트를 spec으로 표현하기 때문에 화면을 눈으로 확인하지 않아도 인코딩 누락을 테스트할 수 있습니다. 시각화 자동화와 보고서 생성에서 특히 유용한 습관입니다.
   snippet: |-
     requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
     missingColumns = requiredColumns - set(iris.columns)
@@ -399,8 +391,6 @@ sections:
     배운 내용을 정리하면, 이 프로젝트에서는 mark_point와 mark_circle로 점을 그렸습니다. mark_circle은 채워진 원을 그립니다. encode()에서 color로 색상, size로 크기, shape로 모양을 지정했습니다. 여러 인코딩을 조합하면 한 차트에 많은 정보를 담을 수 있습니다. alt.X(), alt.Color() 등으로 축 제목을 설정하고, properties()로 차트 크기를 조절했습니다. 각 미션에서 이 개념들을 활용해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd

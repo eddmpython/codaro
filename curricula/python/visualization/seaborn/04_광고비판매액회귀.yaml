@@ -190,8 +190,6 @@ sections:
     ci 파라미터로 신뢰구간의 수준을 변경할 수 있습니다. 기본값은 95%이며, 99%, 68% 등으로 조절하거나 ci=None으로 음영을 제거할 수 있습니다. 신뢰구간이 넓을수록 추정의 불확실성이 큽니다.
 
     ci=95(기본), ci=99, ci=68 등으로 신뢰구간을 설정합니다. ci=None으로 음영을 제거합니다. 신뢰구간은 부트스트랩 방법으로 계산됩니다.
-  tips:
-  - ci=95(기본), ci=99, ci=68 등으로 신뢰구간을 설정합니다. ci=None으로 음영을 제거합니다. 신뢰구간은 부트스트랩 방법으로 계산됩니다.
   snippet: |-
     figCi, (axCi99, axCiNone) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -456,8 +454,6 @@ sections:
     지금까지 배운 regplot, ci, scatter_kws, line_kws를 활용해서 다양한 회귀 시각화를 만들어봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
@@ -506,8 +502,6 @@ sections:
     회귀선은 그럴듯해 보이기 쉽습니다. 광고비와 매출의 관계를 먼저 수치로 확인하고, 차트가 회귀선과 축 라벨을 제대로 담았는지 검증합니다.
 
     회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요.
-  tips:
-  - 회귀 차트는 모델링 전 탐색 도구입니다. 차트와 수치가 같은 방향을 가리키는지 항상 함께 확인하세요.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 

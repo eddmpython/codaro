@@ -468,8 +468,6 @@ sections:
     다양한 스타일을 비교해봅니다. axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다.
 
     axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다. with 문 안에서만 해당 스타일이 적용되고 이후에는 원래 스타일로 돌아갑니다.
-  tips:
-  - axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다. with 문 안에서만 해당 스타일이 적용되고 이후에는 원래 스타일로 돌아갑니다.
   snippet: |-
     styles = ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']
     figStyles, axesStyles = plt.subplots(1, 5, figsize=(20, 4))
@@ -555,8 +553,6 @@ sections:
     종합 리포트는 차트를 많이 넣는 것이 아니라 질문, 데이터 계약, 핵심 지표, 검증 가능한 차트를 일관되게 묶는 일입니다. 펭귄 데이터로 보고서에 들어갈 주장과 차트를 같이 검증합니다.
 
     종합 EDA의 품질은 차트 수가 아니라, 입력 검증과 주장 검증이 리포트 안에 남아 있는지로 판단합니다.
-  tips:
-  - 종합 EDA의 품질은 차트 수가 아니라, 입력 검증과 주장 검증이 리포트 안에 남아 있는지로 판단합니다.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 
@@ -602,8 +598,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset

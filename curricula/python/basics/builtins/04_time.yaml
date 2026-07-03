@@ -58,8 +58,6 @@ sections:
     time은 파이썬 표준 라이브러리입니다. 시간 측정과 제어를 담당하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 time 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 time 모듈을 사용할 수 있습니다.
   snippet: |-
     import time
 
@@ -89,8 +87,6 @@ sections:
     time 모듈은 시간 측정과 제어를 담당합니다. time()은 1970년 1월 1일 이후의 초를 반환하고, sleep()은 프로그램을 일시 정지하며, perf_counter()는 고정밀 시간 측정에 사용됩니다. 성능 분석, 타이머, 주기적 작업에 필수적입니다.
 
     perf_counter()는 sleep()과 시스템 시간 변경에 영향받지 않아 성능 측정에 이상적입니다.
-  tips:
-  - perf_counter()는 sleep()과 시스템 시간 변경에 영향받지 않아 성능 측정에 이상적입니다.
   snippet: |-
     timestamp = time.time()
     timestamp
@@ -116,8 +112,6 @@ sections:
     타임스탬프를 읽기 쉬운 형식으로 변환할 수 있습니다. localtime()은 타임스탬프를 구조화된 시간으로 변환하고, strftime()은 원하는 형식의 문자열을 만듭니다. gmtime()은 UTC 시간을 반환합니다.
 
     로컬 시간과 UTC 시간의 차이는 time.timezone 변수로 확인할 수 있습니다.
-  tips:
-  - 로컬 시간과 UTC 시간의 차이는 time.timezone 변수로 확인할 수 있습니다.
   snippet: |-
     current = time.time()
     timeStruct = time.localtime(current)
@@ -145,8 +139,6 @@ sections:
     프로그램의 성능을 측정하려면 perf_counter()를 사용합니다. 시작 시점과 종료 시점의 차이로 실행 시간을 계산할 수 있습니다. 알고리즘 비교, 병목 지점 발견, 최적화 효과 검증에 활용됩니다.
 
     timeit 모듈은 더 정확한 벤치마크를 제공하지만 간단한 측정은 perf_counter()로 충분합니다.
-  tips:
-  - timeit 모듈은 더 정확한 벤치마크를 제공하지만 간단한 측정은 perf_counter()로 충분합니다.
   snippet: |-
     start = time.perf_counter()
     result = [i * i for i in range(10000)]
@@ -178,8 +170,6 @@ sections:
     sleep()은 지정된 시간만큼 프로그램을 일시 정지합니다. 초 단위로 지정하며 소수점으로 밀리초 단위도 가능합니다. API 호출 간격 조절, 폴링, 애니메이션 프레임 제어에 사용됩니다.
 
     정확한 주기를 원한다면 sleep 후 시간 오차를 보정해야 합니다.
-  tips:
-  - 정확한 주기를 원한다면 sleep 후 시간 오차를 보정해야 합니다.
   snippet: |-
     time.sleep(1)
     'Done'
@@ -205,8 +195,6 @@ sections:
     Python은 여러 종류의 시계를 제공합니다. monotonic()은 항상 증가하는 시간, process_time()은 CPU 사용 시간, thread_time()은 스레드별 시간을 측정합니다. 각 시계는 특정 목적에 최적화되어 있습니다.
 
     sleep()은 process_time()에 포함되지 않습니다. CPU를 실제로 사용한 시간만 측정합니다.
-  tips:
-  - sleep()은 process_time()에 포함되지 않습니다. CPU를 실제로 사용한 시간만 측정합니다.
   snippet: |-
     tick = time.monotonic()
     time.sleep(1)
@@ -238,8 +226,6 @@ sections:
     실무에서 자주 사용하는 시간 측정 패턴을 살펴봅니다. 타임아웃 구현, 진행률 표시, 재시도 로직, 성능 프로파일링 등 실생활 문제를 time 모듈로 해결할 수 있습니다.
 
     로그 파일에는 time.strftime()으로 읽기 쉬운 형식의 타임스탬프를 기록하세요.
-  tips:
-  - 로그 파일에는 time.strftime()으로 읽기 쉬운 형식의 타임스탬프를 기록하세요.
   snippet: |-
     limitSeconds = 3
     deadline = time.time() + limitSeconds

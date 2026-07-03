@@ -160,8 +160,6 @@ sections:
     불리언(Boolean)은 '참(True) 또는 거짓(False)' 두 가지 값만 가지는 데이터 타입입니다. mag >= 6.0이라고 쓰면 NumPy는 160개 모든 지진 샘플에 대해 '규모가 6.0 이상인가?'를 확인하고, 각각 True 또는 False로 답한 배열을 만들어 줍니다. 이렇게 만든 True/False 배열을 불리언 배열이라 하며, 이것으로 원하는 데이터만 골라낼 수 있습니다.
 
     NumPy 배열에 비교 연산을 적용하면 각 요소에 대한 True/False 불리언 배열이 반환됩니다. 이 배열을 인덱싱에 사용할 수 있습니다.
-  tips:
-  - NumPy 배열에 비교 연산을 적용하면 각 요소에 대한 True/False 불리언 배열이 반환됩니다. 이 배열을 인덱싱에 사용할 수 있습니다.
   snippet: |-
     strong = mag >= 6.0
     strong[:10]
@@ -187,8 +185,6 @@ sections:
     불리언 인덱싱은 True/False 배열을 '체크리스트'처럼 사용해서 True인 항목만 골라내는 기법입니다. mag[strong]이라고 쓰면 strong 배열이 True인 위치의 규모 값만 추출됩니다. 160개 샘플 중 규모 6.0 이상인 지진만 깔끔하게 걸러낼 수 있습니다. 엑셀의 필터 기능을 코드 한 줄로 구현하는 것입니다.
 
     불리언 배열을 인덱스로 사용하면 True인 위치의 요소만 선택됩니다. mag[mag >= 6.0]처럼 한 줄로 쓸 수도 있습니다.
-  tips:
-  - 불리언 배열을 인덱스로 사용하면 True인 위치의 요소만 선택됩니다. mag[mag >= 6.0]처럼 한 줄로 쓸 수도 있습니다.
   snippet: |-
     filtered = mag[strong]
     filtered.shape
@@ -214,8 +210,6 @@ sections:
     불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. 강진 비율을 구해봅시다.
 
     불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. True는 1, False는 0으로 취급되기 때문입니다.
-  tips:
-  - 불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. True는 1, False는 0으로 취급되기 때문입니다.
   snippet: |-
     ratio = np.sum(strong) / len(mag) * 100
     f"규모 6.0 이상 비율: {ratio:.2f}%"
@@ -241,8 +235,6 @@ sections:
     두 개 이상의 조건을 동시에 적용할 수 있습니다. &는 '그리고(AND)'로 두 조건을 모두 만족해야 하고, |는 '또는(OR)'로 둘 중 하나만 만족해도 됩니다. (mag >= 5.0) & (mag < 6.0)은 '5.0 이상이면서 동시에 6.0 미만'인 중규모 지진을 찾습니다. 각 조건을 괄호로 감싸는 것이 중요합니다.
 
     NumPy에서 여러 조건을 결합할 때는 & (and), | (or), ~ (not)을 사용합니다. 각 조건은 반드시 괄호로 감싸야 합니다.
-  tips:
-  - NumPy에서 여러 조건을 결합할 때는 & (and), | (or), ~ (not)을 사용합니다. 각 조건은 반드시 괄호로 감싸야 합니다.
   snippet: |-
     medium = (mag >= 5.0) & (mag < 6.0)
     count = np.sum(medium)
@@ -270,8 +262,6 @@ sections:
     백분위수(percentile)는 '전체 중 몇 %가 이 값보다 작은가'를 나타냅니다. 예를 들어 75번째 백분위수가 5.5라면, 전체 지진의 75%가 규모 5.5 미만이라는 뜻입니다. 25%, 50%, 75% 백분위수를 보면 데이터가 어떻게 분포되어 있는지 한눈에 파악할 수 있습니다. 50번째 백분위수는 중앙값(median)과 같습니다.
 
     np.percentile(arr, q)는 q번째 백분위수를 반환합니다. 50번째 백분위수는 중앙값과 같습니다.
-  tips:
-  - np.percentile(arr, q)는 q번째 백분위수를 반환합니다. 50번째 백분위수는 중앙값과 같습니다.
   snippet: |-
     q1 = np.percentile(mag, 25)
     q2 = np.percentile(mag, 50)
@@ -301,8 +291,6 @@ sections:
     np.where()는 조건에 따라 다른 값을 지정하는 함수입니다. np.where(조건, 참일때 값, 거짓일때 값) 형태로 씁니다. 엑셀의 IF 함수와 똑같이 작동합니다. mag >= 6.0 조건이 True면 'Strong', False면 'Normal'을 할당해서 160개 지진 샘플 전체를 한 번에 분류할 수 있습니다.
 
     np.where(condition, x, y)는 조건이 True인 곳은 x, False인 곳은 y를 반환합니다. 엑셀의 IF 함수와 비슷합니다.
-  tips:
-  - np.where(condition, x, y)는 조건이 True인 곳은 x, False인 곳은 y를 반환합니다. 엑셀의 IF 함수와 비슷합니다.
   snippet: |-
     category = np.where(mag >= 6.0, 'Strong', 'Normal')
     category[:10]
@@ -357,8 +345,6 @@ sections:
     np.unique()는 배열에서 '중복을 제거한 고유한 값들'을 찾아줍니다. 예를 들어 ['A', 'B', 'A', 'C', 'B']에서 unique를 적용하면 ['A', 'B', 'C']가 됩니다. return_counts=True를 추가하면 각 값이 몇 번 나타났는지도 함께 알려줍니다. 분류 결과별 지진 수를 세는 데 유용합니다.
 
     np.unique()는 배열의 고유한 값들을 반환합니다. return_counts=True를 추가하면 각 값의 빈도도 함께 반환됩니다.
-  tips:
-  - np.unique()는 배열의 고유한 값들을 반환합니다. return_counts=True를 추가하면 각 값의 빈도도 함께 반환됩니다.
   snippet: |-
     labels, counts = np.unique(level, return_counts=True)
     pd.DataFrame({'Category': labels, 'Count': counts})
@@ -446,8 +432,6 @@ sections:
     argsort()는 '정렬하면 각 값이 몇 번째에 위치할지'를 알려주는 인덱스 배열을 반환합니다. 예를 들어 [3, 1, 2]를 argsort하면 [1, 2, 0]이 나오는데, 이는 '1번 위치 값(1)이 가장 작고, 다음은 2번 위치(2), 그 다음은 0번 위치(3)'라는 뜻입니다. [::-1]로 역순으로 만들면 내림차순 정렬 인덱스가 되어 상위 10개 강진을 쉽게 찾을 수 있습니다.
 
     np.argsort()는 정렬된 인덱스를 반환합니다. [::-1]로 역순으로 만들어 내림차순 정렬 인덱스를 얻습니다.
-  tips:
-  - np.argsort()는 정렬된 인덱스를 반환합니다. [::-1]로 역순으로 만들어 내림차순 정렬 인덱스를 얻습니다.
   snippet: |-
     order = np.argsort(mag)[::-1]
     top = mag[order[:10]]
@@ -525,8 +509,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

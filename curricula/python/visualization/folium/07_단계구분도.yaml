@@ -80,8 +80,6 @@ sections:
     Choropleth()는 GeoJSON과 데이터를 연결하여 색상을 자동 매핑합니다. key_on으로 GeoJSON 속성을, columns로 데이터 컬럼을 지정합니다.
 
     GeoJSON의 properties에 있는 id와 데이터의 키를 매칭시킵니다.
-  tips:
-  - GeoJSON의 properties에 있는 id와 데이터의 키를 매칭시킵니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
 
@@ -196,8 +194,6 @@ sections:
     Choropleth 클래스 대신 GeoJson에 style_function을 사용하면 더 유연하게 구현할 수 있습니다.
 
     getColor 함수에서 값에 따라 색상을 반환합니다. 임계값을 조절하여 구간을 설정합니다.
-  tips:
-  - getColor 함수에서 값에 따라 색상을 반환합니다. 임계값을 조절하여 구간을 설정합니다.
   snippet: |-
     m1 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -272,8 +268,6 @@ sections:
     branca 라이브러리로 연속적인 컬러 스케일을 만들 수 있습니다. Folium에 포함되어 있습니다.
 
     LinearColormap은 값에 따라 색상을 선형으로 보간합니다. 최소~최대 범위를 자동으로 매핑합니다.
-  tips:
-  - LinearColormap은 값에 따라 색상을 선형으로 보간합니다. 최소~최대 범위를 자동으로 매핑합니다.
   snippet: |-
     import branca.colormap as cm
 
@@ -356,8 +350,6 @@ sections:
     ColorMap에 caption을 추가하고 지도에 add_to()하면 범례가 표시됩니다.
 
     caption은 범례 제목입니다. 범례는 지도 우측 하단에 표시됩니다.
-  tips:
-  - caption은 범례 제목입니다. 범례는 지도 우측 하단에 표시됩니다.
   snippet: |-
     m3 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -434,8 +426,6 @@ sections:
     StepColormap은 구간별로 색상을 나눕니다. 연속이 아닌 이산적인 범주에 적합합니다.
 
     index는 구간 경계값 리스트입니다. 4개 색상이면 3개 경계가 필요합니다.
-  tips:
-  - index는 구간 경계값 리스트입니다. 4개 색상이면 3개 경계가 필요합니다.
   snippet: |-
     m4 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -514,8 +504,6 @@ sections:
     툴팁에 지역명과 데이터 값을 함께 표시합니다.
 
     GeoJSON properties에 직접 데이터를 넣으면 tooltip에서 바로 사용할 수 있습니다.
-  tips:
-  - GeoJSON properties에 직접 데이터를 넣으면 tooltip에서 바로 사용할 수 있습니다.
   snippet: |-
     m5 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -638,8 +626,6 @@ sections:
     highlight_function으로 마우스 호버 시 강조 효과를 추가합니다.
 
     하이라이트로 사용자가 어느 지역을 보고 있는지 명확하게 알 수 있습니다.
-  tips:
-  - 하이라이트로 사용자가 어느 지역을 보고 있는지 명확하게 알 수 있습니다.
   snippet: |-
     m6 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -740,8 +726,6 @@ sections:
     여러 종류의 데이터를 레이어로 구분하고 전환할 수 있게 합니다.
 
     LayerControl로 인구/면적 레이어를 전환할 수 있습니다.
-  tips:
-  - LayerControl로 인구/면적 레이어를 전환할 수 있습니다.
   snippet: |-
     m7 = folium.Map(location=[37.555, 126.98], zoom_start=12)
 
@@ -1045,8 +1029,6 @@ sections:
     단계구분도는 색이 칠해진다고 끝이 아닙니다. GeoJSON의 지역 키와 데이터 키가 정확히 맞는지, 임계값을 바꾸면 어떤 지역의 등급이 달라지는지 예측하고 검증해야 실무 리포트로 쓸 수 있습니다.
 
     단계구분도는 색상보다 키 매칭과 기준선 검증이 먼저입니다. 데이터-경계 불일치를 잡고 임계값 실험을 거쳐야 의사결정용 지도가 됩니다.
-  tips:
-  - 단계구분도는 색상보다 키 매칭과 기준선 검증이 먼저입니다. 데이터-경계 불일치를 잡고 임계값 실험을 거쳐야 의사결정용 지도가 됩니다.
   snippet: |-
     serviceGeo = {
         "type": "FeatureCollection",

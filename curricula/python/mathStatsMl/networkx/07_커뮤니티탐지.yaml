@@ -88,8 +88,6 @@ sections:
     모듈성(Modularity)은 2004년 Newman과 Girvan이 제안한 커뮤니티 분할의 품질 지표입니다. 커뮤니티 내부의 실제 연결 수가 무작위 그래프에서 기대되는 연결 수보다 얼마나 많은지를 측정합니다. -0.5 ~ 1 범위이며, 0.3 이상이면 유의미한 커뮤니티 구조가 있고, 0.7 이상이면 매우 강한 구조입니다. 대부분의 커뮤니티 탐지 알고리즘은 이 모듈성을 최대화하려고 합니다.
 
     모듈성이 0.3 이상이면 의미 있는 커뮤니티 구조가 있다고 봅니다. 0.7 이상이면 매우 강한 구조입니다.
-  tips:
-  - 모듈성이 0.3 이상이면 의미 있는 커뮤니티 구조가 있다고 봅니다. 0.7 이상이면 매우 강한 구조입니다.
   snippet: |-
     G = nx.Graph()
     G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
@@ -120,8 +118,6 @@ sections:
     그리디 모듈성 최적화 알고리즘은 처음에 각 노드를 개별 커뮤니티로 시작하여, 모듈성이 가장 많이 증가하는 방향으로 커뮤니티를 병합해 나갑니다. Clauset, Newman, Moore가 2004년에 제안한 이 방법은 O(n log² n)의 시간 복잡도로 빠르면서도 효과적입니다. 커뮤니티 수를 미리 지정할 필요가 없으며, 알고리즘이 최적의 분할을 자동으로 찾습니다.
 
     greedy_modularity_communities()는 frozenset의 리스트를 반환합니다. set()으로 변환하면 다루기 쉽습니다.
-  tips:
-  - greedy_modularity_communities()는 frozenset의 리스트를 반환합니다. set()으로 변환하면 다루기 쉽습니다.
   snippet: |-
     communities = community.greedy_modularity_communities(G)
     commList = [set(c) for c in communities]
@@ -198,8 +194,6 @@ sections:
     레미제라블(Les Misérables) 네트워크는 Victor Hugo의 소설에 등장하는 인물들 간의 관계를 나타냅니다. 77명의 인물과 254개의 관계로 구성되며, 같은 장면에 함께 등장하면 연결됩니다. 이 데이터셋은 네트워크 분석의 대표적인 벤치마크로, 장발장(Valjean), 코제트(Cosette), 마리우스(Marius) 등 스토리라인별로 자연스러운 커뮤니티가 형성되어 있습니다.
 
     레미제라블은 Victor Hugo의 소설입니다. 장발장(Valjean), 코제트(Cosette) 등 유명 캐릭터가 등장합니다.
-  tips:
-  - 레미제라블은 Victor Hugo의 소설입니다. 장발장(Valjean), 코제트(Cosette) 등 유명 캐릭터가 등장합니다.
   snippet: |-
     lesmis = nx.les_miserables_graph()
     numNodesLM = lesmis.number_of_nodes()
@@ -302,8 +296,6 @@ sections:
     루뱅(Louvain) 알고리즘은 2008년 벨기에 루뱅 대학에서 개발된 대규모 네트워크용 커뮤니티 탐지 방법입니다. 2단계 과정을 반복합니다. 먼저 각 노드를 이웃 커뮤니티로 이동시켜 로컬 모듈성을 최적화하고, 그 다음 커뮤니티들을 하나의 노드로 축약하여 새 그래프를 만듭니다. 이 과정을 모듈성 증가가 없을 때까지 반복합니다. 수백만 노드의 네트워크도 처리할 수 있으며, 그리디보다 높은 모듈성을 달성하는 경우가 많습니다.
 
     루뱅 알고리즘은 그리디보다 더 높은 모듈성을 달성하는 경우가 많습니다. 대규모 네트워크에서도 빠릅니다.
-  tips:
-  - 루뱅 알고리즘은 그리디보다 더 높은 모듈성을 달성하는 경우가 많습니다. 대규모 네트워크에서도 빠릅니다.
   snippet: |-
     louvainComms = community.louvain_communities(lesmis, seed=42)
     louvainList = [set(c) for c in louvainComms]
@@ -361,8 +353,6 @@ sections:
     가라테 클럽은 실제 분리 결과가 알려진 유일한 벤치마크 데이터입니다. 1977년 Zachary가 관찰한 실제 분열과 알고리즘이 탐지한 커뮤니티를 비교하여 알고리즘의 정확도를 검증할 수 있습니다. 네트워크 구조만으로 실제 사회적 분열을 얼마나 정확하게 예측할 수 있는지 확인해봅니다.
 
     커뮤니티 탐지 알고리즘이 실제 분리를 상당히 정확하게 예측합니다. 네트워크 구조만으로 그룹을 발견할 수 있습니다.
-  tips:
-  - 커뮤니티 탐지 알고리즘이 실제 분리를 상당히 정확하게 예측합니다. 네트워크 구조만으로 그룹을 발견할 수 있습니다.
   snippet: |-
     karate = nx.karate_club_graph()
 
@@ -393,8 +383,6 @@ sections:
     지금까지 배운 커뮤니티 탐지 알고리즘을 활용하여 실전 미션을 수행해봅시다. 여러 알고리즘의 결과를 비교하고, 피렌체 가문 네트워크에서 역사적 동맹 관계를 탐지해봅니다.
 
     각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
   snippet: |-
     import networkx as nx
     from networkx.algorithms import community

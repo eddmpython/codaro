@@ -60,8 +60,6 @@ sections:
     소셜미디어 게시물 데이터를 생성합니다. 실무에서는 Twitter API, Instagram API 등에서 수집한 데이터를 사용하지만, 여기서는 실습용으로 1000개의 샘플 게시물을 생성합니다. 게시 시간(postTime), 플랫폼(platform), 좋아요(likes), 댓글(comments), 공유(shares), 해시태그(hashtag) 등 실제 소셜미디어 분석에 필요한 정보를 포함합니다. 시간대별, 플랫폼별 패턴을 분석하여 최적의 게시 전략을 수립할 수 있습니다.
 
     random.seed(42)를 사용하면 매번 동일한 랜덤 데이터가 생성되어 재현 가능한 분석이 됩니다. 실무에서는 재현성이 중요하므로 시드를 고정하는 습관을 들이는 것이 좋습니다.
-  tips:
-  - random.seed(42)를 사용하면 매번 동일한 랜덤 데이터가 생성되어 재현 가능한 분석이 됩니다. 실무에서는 재현성이 중요하므로 시드를 고정하는 습관을 들이는 것이 좋습니다.
   snippet: |-
     import polars as pl
     from datetime import datetime, timedelta
@@ -222,8 +220,6 @@ sections:
     플랫폼별로 게시물 수, 평균 좋아요, 평균 댓글, 평균 공유를 계산합니다. 이를 통해 어떤 플랫폼이 인게이지먼트가 높은지 비교할 수 있습니다. 일반적으로 Instagram은 좋아요 수가 높고, Twitter는 공유(리트윗)가 활발하며, Facebook은 댓글이 많은 경향이 있습니다. round(1)로 소수점 첫째 자리까지만 표시하여 가독성을 높입니다.
 
     pl.len()은 그룹 내 행 개수를 세는 집계 함수입니다. 최신 Polars에서는 그룹 행 수 집계에 pl.len()을 사용합니다.
-  tips:
-  - pl.len()은 그룹 내 행 개수를 세는 집계 함수입니다. 최신 Polars에서는 그룹 행 수 집계에 pl.len()을 사용합니다.
   snippet: |-
     df.group_by("platform").agg([
         pl.len().alias("postCount"),
@@ -256,8 +252,6 @@ sections:
     플랫폼과 시간대(오전/오후)별로 집계합니다. when-then-otherwise로 hour를 오전(0-11)과 오후(12-23)로 분류한 후, 플랫폼과 시간대 두 개의 컬럼으로 그룹화합니다. 이렇게 다중 그룹 집계를 하면 "Instagram은 오후에 좋아요가 많다" 같은 세밀한 인사이트를 발견할 수 있습니다. sort()로 플랫폼과 시간대 순으로 정렬하여 비교하기 쉽게 만듭니다.
 
     group_by([컬럼1, 컬럼2])로 여러 컬럼을 동시에 그룹화할 수 있습니다. 결과는 모든 조합에 대한 집계가 생성됩니다. SQL의 GROUP BY col1, col2와 동일합니다.
-  tips:
-  - group_by([컬럼1, 컬럼2])로 여러 컬럼을 동시에 그룹화할 수 있습니다. 결과는 모든 조합에 대한 집계가 생성됩니다. SQL의 GROUP BY col1, col2와 동일합니다.
   snippet: |-
     df = df.with_columns(
         pl.when(pl.col("hour") < 12)
@@ -574,8 +568,6 @@ sections:
     소셜미디어 분석가가 되어 배운 모든 개념을 심층적으로 활용해봅시다. unpivot으로 메트릭 변환, over로 그룹별 비교, rolling으로 트렌드 분석, 복합 체이닝으로 다단계 분석을 모두 사용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import polars as pl
     from datetime import datetime, timedelta

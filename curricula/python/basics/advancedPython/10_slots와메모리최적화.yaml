@@ -58,8 +58,6 @@ sections:
     __slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가 생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다.
 
     __slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다.
-  tips:
-  - __slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다.
   snippet: |-
     class Point:
         __slots__ = ('x', 'y')
@@ -99,8 +97,6 @@ sections:
     sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로 오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의 크기는 포함되지 않습니다.
 
     정확한 메모리 측정은 tracemalloc 모듈을 사용하세요.
-  tips:
-  - 정확한 메모리 측정은 tracemalloc 모듈을 사용하세요.
   snippet: |-
     import sys
 
@@ -164,8 +160,6 @@ sections:
     상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다. 부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 문제가 됩니다.
 
     다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다.
-  tips:
-  - 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다.
   snippet: |-
     class Parent:
         __slots__ = ('a', 'b')
@@ -215,8 +209,6 @@ sections:
     __slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다. 기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에 추가해야 합니다.
 
     pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다.
-  tips:
-  - pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다.
   snippet: |-
     class Strict:
         __slots__ = ('x', 'y')
@@ -252,8 +244,6 @@ sections:
     weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__ 클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다.
 
     WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다.
-  tips:
-  - WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다.
   snippet: |-
     import weakref
 
@@ -291,8 +281,6 @@ sections:
     __slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리 절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다.
 
     Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다.
-  tips:
-  - Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다.
   snippet: |-
     class Normal:
         def __init__(self, x):

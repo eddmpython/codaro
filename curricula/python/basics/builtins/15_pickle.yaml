@@ -57,8 +57,6 @@ sections:
     pickle은 파이썬 표준 라이브러리입니다. Python 객체를 바이너리 형태로 직렬화하고 역직렬화하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 pickle 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 pickle 모듈을 사용할 수 있습니다.
   snippet: |-
     import pickle
     import os
@@ -98,8 +96,6 @@ sections:
     pickle.dump()는 Python 객체를 바이너리 파일로 저장하고, pickle.load()는 바이너리 파일에서 객체를 복원합니다. 딕셔너리, 리스트, 클래스 인스턴스 등 거의 모든 Python 객체를 저장할 수 있습니다. 머신러닝 모델 저장, 게임 세이브, 데이터 캐싱에 필수적입니다.
 
     pickle은 바이너리 형식이므로 사람이 읽을 수 없습니다. 디버깅이 필요하면 JSON을 사용하세요.
-  tips:
-  - pickle은 바이너리 형식이므로 사람이 읽을 수 없습니다. 디버깅이 필요하면 JSON을 사용하세요.
   snippet: |-
     userData = {'name': 'Alice', 'age': 30, 'scores': [95, 88, 92]}
     with open(pickleScratch / 'user.pkl', 'wb') as f:
@@ -128,8 +124,6 @@ sections:
     pickle.dumps()는 객체를 바이트 문자열로 변환하고, pickle.loads()는 바이트에서 객체를 복원합니다. 파일이 아닌 메모리나 네트워크로 객체를 전송할 때 유용합니다. 데이터베이스 저장, 메시지 큐, 분산 시스템에 활용됩니다.
 
     dumps/loads는 파일 I/O 없이 빠르게 직렬화할 수 있어 메모리 캐싱에 적합합니다.
-  tips:
-  - dumps/loads는 파일 I/O 없이 빠르게 직렬화할 수 있어 메모리 캐싱에 적합합니다.
   snippet: |-
     dataDict = {'x': 10, 'y': 20, 'z': 30}
     serializedBytes = pickle.dumps(dataDict)
@@ -156,8 +150,6 @@ sections:
     pickle은 많은 Python 객체를 직렬화할 수 있습니다. 기본 타입, 컬렉션, 날짜 객체, 사용자 정의 클래스의 상태 저장에 활용할 수 있습니다. JSON과 달리 set, datetime 같은 Python 전용 타입도 보존할 수 있어 강력하지만, 신뢰한 로컬 데이터에만 사용해야 합니다.
 
     pickle은 신뢰할 수 없는 소스의 데이터를 로드하면 위험합니다. 악의적인 코드가 실행될 수 있습니다.
-  tips:
-  - pickle은 신뢰할 수 없는 소스의 데이터를 로드하면 위험합니다. 악의적인 코드가 실행될 수 있습니다.
   snippet: |-
     tagSet = {'python', 'pickle', 'tutorial'}
     with open(pickleScratch / 'tags.pkl', 'wb') as f:
@@ -190,8 +182,6 @@ sections:
     pickle은 여러 프로토콜 버전을 지원합니다. 높은 버전일수록 효율적이지만 하위 Python 버전과 호환되지 않을 수 있습니다. protocol 파라미터로 버전을 지정하며, HIGHEST_PROTOCOL을 사용하면 최신 버전을 자동 선택합니다.
 
     대용량 데이터는 HIGHEST_PROTOCOL을 사용하면 크기와 속도가 최적화됩니다.
-  tips:
-  - 대용량 데이터는 HIGHEST_PROTOCOL을 사용하면 크기와 속도가 최적화됩니다.
   snippet: |-
     simpleData = {'key': 'value'}
     defaultBytes = pickle.dumps(simpleData)
@@ -218,8 +208,6 @@ sections:
     하나의 파일에 여러 객체를 순차적으로 저장하고 복원할 수 있습니다. dump()를 여러 번 호출하여 저장하고, load()를 반복하여 순서대로 불러옵니다. 관련된 여러 데이터를 한 파일에 묶어 관리할 때 유용합니다.
 
     관련된 여러 객체는 리스트나 딕셔너리로 묶어서 한 번에 저장하는 것이 더 편리합니다.
-  tips:
-  - 관련된 여러 객체는 리스트나 딕셔너리로 묶어서 한 번에 저장하는 것이 더 편리합니다.
   snippet: |-
     obj1 = {'type': 'config', 'value': 100}
     obj2 = ['item1', 'item2', 'item3']
@@ -256,8 +244,6 @@ sections:
     실무에서 자주 사용하는 pickle 활용 패턴을 살펴봅니다. 계산 결과 캐싱, 사용자 세션 저장, 머신러닝 모델 체크포인트, 게임 세이브 등 다양한 시나리오에서 pickle을 효과적으로 사용할 수 있습니다.
 
     pickle 파일은 Python 버전이 다르면 호환되지 않을 수 있습니다. 장기 저장은 JSON이나 데이터베이스를 고려하세요.
-  tips:
-  - pickle 파일은 Python 버전이 다르면 호환되지 않을 수 있습니다. 장기 저장은 JSON이나 데이터베이스를 고려하세요.
   snippet: |-
     cachePath = pickleScratch / 'cache.pkl'
     if os.path.exists(cachePath):
@@ -296,8 +282,6 @@ sections:
     pickle은 로컬에서 신뢰한 Python 객체를 빠르게 저장할 때만 사용합니다. 이 흐름에서는 체크포인트를 저장하고, 경로와 버전, 필수 필드를 검증하며, 깨진 파일을 좁힌 예외로 처리합니다.
 
     실무 변주: 체크포인트에 schemaVersion과 expiresAt을 추가하고, 오래된 캐시는 재학습 큐로 보내는 검증 함수를 만들어 보세요.
-  tips:
-  - '실무 변주: 체크포인트에 schemaVersion과 expiresAt을 추가하고, 오래된 캐시는 재학습 큐로 보내는 검증 함수를 만들어 보세요.'
   snippet: |-
     pickleWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_pickle_workflow_')).resolve()
     checkpointData = {

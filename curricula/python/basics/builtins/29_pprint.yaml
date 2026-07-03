@@ -55,8 +55,6 @@ sections:
     pprint는 파이썬 표준 라이브러리입니다. 복잡한 데이터 구조를 읽기 쉽게 포맷팅하여 출력합니다.
 
     Codaro 환경에서는 pformat()을 사용하여 문자열로 반환합니다. 일반 Python에서는 pprint()가 직접 콘솔에 출력합니다.
-  tips:
-  - Codaro 환경에서는 pformat()을 사용하여 문자열로 반환합니다. 일반 Python에서는 pprint()가 직접 콘솔에 출력합니다.
   snippet: |-
     import pprint
 
@@ -90,8 +88,6 @@ sections:
     pformat()은 데이터 구조를 보기 좋게 포맷팅한 문자열을 반환합니다.
 
     pformat()은 객체를 수정하지 않고 문자열만 반환하므로, 로그 파일이나 디버그 메시지에 안전하게 사용할 수 있습니다.
-  tips:
-  - pformat()은 객체를 수정하지 않고 문자열만 반환하므로, 로그 파일이나 디버그 메시지에 안전하게 사용할 수 있습니다.
   snippet: |-
     import pprint
 
@@ -123,8 +119,6 @@ sections:
     width와 depth 파라미터로 출력 형식을 세밀하게 제어할 수 있습니다.
 
     width를 좁게 설정하면 더 많은 줄바꿈이 발생하여 세로로 긴 출력이 됩니다. 터미널 폭에 맞춰 조정하세요.
-  tips:
-  - width를 좁게 설정하면 더 많은 줄바꿈이 발생하여 세로로 긴 출력이 됩니다. 터미널 폭에 맞춰 조정하세요.
   snippet: |-
     import pprint
 
@@ -162,8 +156,6 @@ sections:
     PrettyPrinter 객체를 생성하면 동일한 설정으로 여러 번 사용할 수 있습니다.
 
     PrettyPrinter 객체를 만들면 동일한 포맷 설정을 여러 곳에서 재사용할 수 있어 일관성을 유지하기 좋습니다.
-  tips:
-  - PrettyPrinter 객체를 만들면 동일한 포맷 설정을 여러 곳에서 재사용할 수 있어 일관성을 유지하기 좋습니다.
   snippet: |-
     import pprint
 
@@ -206,8 +198,6 @@ sections:
     딕셔너리 키를 정렬하여 출력하면 일관된 순서로 데이터를 확인할 수 있습니다.
 
     sort_dicts=True는 딕셔너리 비교나 디버깅 시 유용합니다. 동일한 데이터가 항상 같은 순서로 출력됩니다.
-  tips:
-  - sort_dicts=True는 딕셔너리 비교나 디버깅 시 유용합니다. 동일한 데이터가 항상 같은 순서로 출력됩니다.
   snippet: |-
     import pprint
 
@@ -245,8 +235,6 @@ sections:
     pprint는 복잡한 데이터 구조를 디버깅하고 로그에 기록할 때 매우 유용합니다.
 
     디버깅 시 pformat()을 로깅 메시지에 포함하면 복잡한 객체의 상태를 쉽게 추적할 수 있습니다.
-  tips:
-  - 디버깅 시 pformat()을 로깅 메시지에 포함하면 복잡한 객체의 상태를 쉽게 추적할 수 있습니다.
   snippet: |-
     import pprint
 
@@ -298,8 +286,6 @@ sections:
     실제 프로젝트에서 pprint를 활용하는 다양한 패턴들입니다.
 
     pprint는 JSON과 달리 파이썬 객체 그대로 출력하므로, None, True, False 등이 파이썬 형식으로 표시됩니다.
-  tips:
-  - pprint는 JSON과 달리 파이썬 객체 그대로 출력하므로, None, True, False 등이 파이썬 형식으로 표시됩니다.
   snippet: |-
     import pprint
 

@@ -88,8 +88,6 @@ sections:
     다중 타일 레이어를 지원하는 베이스 맵을 만듭니다.
 
     여러 타일을 추가하면 LayerControl에서 전환할 수 있습니다.
-  tips:
-  - 여러 타일을 추가하면 LayerControl에서 전환할 수 있습니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
 
@@ -158,8 +156,6 @@ sections:
     주요 랜드마크는 개별 마커로 강조합니다.
 
     중요한 위치는 개별 마커로 표시하여 클러스터에 묻히지 않게 합니다.
-  tips:
-  - 중요한 위치는 개별 마커로 표시하여 클러스터에 묻히지 않게 합니다.
   snippet: |-
     landmarks = [
         {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
@@ -194,8 +190,6 @@ sections:
     카페 위치를 클러스터로 표시합니다. 대량 데이터를 효율적으로 관리합니다.
 
     60개 카페가 클러스터로 깔끔하게 표시됩니다.
-  tips:
-  - 60개 카페가 클러스터로 깔끔하게 표시됩니다.
   snippet: |-
     cafeCluster = MarkerCluster(name="카페")
 
@@ -260,8 +254,6 @@ sections:
     음식점용 별도 클러스터를 만들어 카테고리를 분리합니다.
 
     show=False로 기본 숨김 상태입니다. LayerControl에서 켤 수 있습니다.
-  tips:
-  - show=False로 기본 숨김 상태입니다. LayerControl에서 켤 수 있습니다.
   snippet: |-
     restaurantCluster = MarkerCluster(name="음식점", show=False)
 
@@ -324,8 +316,6 @@ sections:
     관광객 밀도를 히트맵으로 시각화합니다.
 
     히트맵도 FeatureGroup에 넣으면 레이어 컨트롤로 제어됩니다.
-  tips:
-  - 히트맵도 FeatureGroup에 넣으면 레이어 컨트롤로 제어됩니다.
   snippet: |-
     densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
 
@@ -400,8 +390,6 @@ sections:
     서울의 주요 구 경계를 GeoJSON으로 표시합니다.
 
     컬러맵 범례가 우측 하단에 표시됩니다.
-  tips:
-  - 컬러맵 범례가 우측 하단에 표시됩니다.
   snippet: |-
     guBoundaries = {
         "type": "FeatureCollection",
@@ -522,8 +510,6 @@ sections:
     추천 관광 코스를 경로로 표시합니다.
 
     실선과 점선으로 코스를 구분합니다.
-  tips:
-  - 실선과 점선으로 코스를 구분합니다.
   snippet: |-
     routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
 
@@ -614,8 +600,6 @@ sections:
     LayerControl을 추가하여 모든 레이어를 제어합니다.
 
     collapsed=False로 항상 펼쳐진 상태로 표시됩니다.
-  tips:
-  - collapsed=False로 항상 펼쳐진 상태로 표시됩니다.
   snippet: |-
     folium.LayerControl(collapsed=False).add_to(tourMap)
 
@@ -859,8 +843,6 @@ sections:
     종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
 
     종합 프로젝트는 화면 완성도가 아니라 검증 가능한 데이터-지도 파이프라인으로 평가해야 합니다.
-  tips:
-  - 종합 프로젝트는 화면 완성도가 아니라 검증 가능한 데이터-지도 파이프라인으로 평가해야 합니다.
   snippet: |-
     import folium
     from folium.plugins import HeatMap, MarkerCluster

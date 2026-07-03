@@ -60,8 +60,6 @@ sections:
     모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
 
     처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
-  tips:
-  - 처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
   snippet: |-
     import math
 
@@ -92,8 +90,6 @@ sections:
     from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
 
     필요한 함수만 가져오면 코드가 깔끔해집니다.
-  tips:
-  - 필요한 함수만 가져오면 코드가 깔끔해집니다.
   snippet: |-
     from math import sqrt
 
@@ -124,8 +120,6 @@ sections:
     as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
 
     별칭은 짧고 의미있게 지으세요.
-  tips:
-  - 별칭은 짧고 의미있게 지으세요.
   snippet: |-
     import math as m
 
@@ -156,8 +150,6 @@ sections:
     math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
 
     math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
-  tips:
-  - math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
   snippet: |-
     from math import sqrt
 
@@ -188,8 +180,6 @@ sections:
     random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
 
     난수는 실행할 때마다 다른 값이 나옵니다.
-  tips:
-  - 난수는 실행할 때마다 다른 값이 나옵니다.
   snippet: |-
     from random import randint
 
@@ -220,8 +210,6 @@ sections:
     datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
 
     datetime 객체는 여러 속성과 메서드를 제공합니다.
-  tips:
-  - datetime 객체는 여러 속성과 메서드를 제공합니다.
   snippet: |-
     from datetime import datetime
 
@@ -254,8 +242,6 @@ sections:
     실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다.
 
     import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
-  tips:
-  - import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
   snippet: |-
     from datetime import datetime
     from pathlib import Path

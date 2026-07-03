@@ -498,8 +498,6 @@ sections:
     지금까지 배운 모든 내용을 활용해서 팁 데이터를 심층 분석해봅시다. 히스토그램, 박스플롯, color, facet, labels, nbins 등 모든 기능을 종합적으로 사용합니다. 데이터 전처리(파생 변수 생성)도 포함됩니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import plotly.express as px
     import pandas as pd
@@ -545,8 +543,6 @@ sections:
     분포 분석은 bin 개수, 그룹 색상, 이상치 처리에 따라 결론이 달라집니다. 히스토그램과 박스 플롯을 만들고 Figure 내부 구조를 검증합니다.
 
     분포 차트는 bin 설정을 바꾸어도 핵심 결론이 유지되는지 확인해야 실무 보고서에 넣을 수 있습니다.
-  tips:
-  - 분포 차트는 bin 설정을 바꾸어도 핵심 결론이 유지되는지 확인해야 실무 보고서에 넣을 수 있습니다.
   snippet: |-
     import plotly.express as px
     from codaro.curriculum.localData import loadLocalDataset

@@ -186,8 +186,6 @@ sections:
     산점도는 두 변수 간의 관계를 점으로 표시하는 차트입니다. x축에 꽃받침 길이, y축에 꽃받침 너비를 배치하면 두 변수의 상관관계를 파악할 수 있습니다. 점들이 어떤 패턴을 보이는지 관찰해봅시다.
 
     ax.scatter(x, y)로 산점도를 그립니다. x와 y에는 같은 길이의 배열이나 Series를 전달합니다. plot()과 달리 점들을 선으로 연결하지 않고 개별 점으로 표시합니다.
-  tips:
-  - ax.scatter(x, y)로 산점도를 그립니다. x와 y에는 같은 길이의 배열이나 Series를 전달합니다. plot()과 달리 점들을 선으로 연결하지 않고 개별 점으로 표시합니다.
   snippet: |-
     figScatter, axScatter = plt.subplots(figsize=(10, 7))
     axScatter.scatter(iris['sepal_length'], iris['sepal_width'])
@@ -411,8 +409,6 @@ sections:
     지금까지 배운 내용을 활용해서 붓꽃 데이터를 다양한 관점에서 분석해봅시다. scatter, marker, text, legend, subplots 등 모든 개념을 종합적으로 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import matplotlib.pyplot as plt
     import seaborn as sns

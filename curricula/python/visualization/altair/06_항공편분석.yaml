@@ -160,8 +160,6 @@ sections:
     히트맵은 2차원 데이터를 색상의 진하기로 표현하는 차트입니다. 숫자가 클수록 진한 색, 작을수록 옅은 색으로 표시됩니다. mark_rect()는 "사각형 모양으로 그려라"는 뜻입니다. rect는 rectangle(사각형)의 줄임말입니다. x축에 연도, y축에 월을 배치하고, color에 승객 수를 넣으면 각 칸의 색상이 승객 수에 따라 달라집니다. 이렇게 하면 어느 연도 어느 달에 승객이 많았는지 색상만으로도 한눈에 파악할 수 있습니다.
 
     히트맵은 2차원 데이터를 색상으로 표현합니다. 여름철(6-8월) 승객이 많고, 연도가 지날수록 전체 승객이 증가합니다.
-  tips:
-  - 히트맵은 2차원 데이터를 색상으로 표현합니다. 여름철(6-8월) 승객이 많고, 연도가 지날수록 전체 승객이 증가합니다.
   snippet: |-
     chartHeatmap = alt.Chart(flights).mark_rect().encode(
         x='year:O',
@@ -404,8 +402,6 @@ sections:
     이 프로젝트에서 배운 내용을 정리하면: mark_rect()로 히트맵 그리기, mark_line()으로 라인 차트 그리기, sort로 순서 정렬, scale로 색상 변경, legend로 범례 설정, tooltip으로 상세 정보 표시입니다. 이제 배운 개념들을 직접 조합해서 새로운 차트를 만들어봅시다. 미션마다 어떤 개념을 사용하는지 확인하세요.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd
@@ -453,8 +449,6 @@ sections:
     항공편 시계열은 연도와 월 조합이 정확해야 heatmap이 의미를 가집니다. 키 중복과 색상 인코딩을 함께 검증합니다.
 
     Heatmap은 예쁘게 보이기 전에 키 유일성과 색상 값의 의미를 검증해야 합니다.
-  tips:
-  - Heatmap은 예쁘게 보이기 전에 키 유일성과 색상 값의 의미를 검증해야 합니다.
   snippet: |-
     import altair as alt
     from codaro.curriculum.localData import loadLocalDataset

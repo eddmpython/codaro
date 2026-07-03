@@ -60,8 +60,6 @@ sections:
     partial은 함수의 일부 인자를 미리 고정하여 새로운 함수를 만드는 도구입니다. 원본 함수와 고정할 인자를 받아 partial 객체를 반환합니다. 이 객체는 함수처럼 호출할 수 있으며, 호출 시 나머지 인자만 전달하면 됩니다. 커링(currying)의 간편한 구현이며, 콜백 함수에 추가 인자를 전달하거나, 설정이 다른 여러 버전의 함수를 만들 때 유용합니다. 키워드 인자도 고정할 수 있어 유연하게 활용됩니다.
 
     partial 객체의 func, args, keywords 속성으로 원본 함수와 고정된 인자를 확인할 수 있습니다.
-  tips:
-  - partial 객체의 func, args, keywords 속성으로 원본 함수와 고정된 인자를 확인할 수 있습니다.
   snippet: |-
     from functools import partial
 
@@ -98,8 +96,6 @@ sections:
     wraps는 데코레이터에서 원본 함수의 메타데이터(__name__, __doc__, __annotations__ 등)를 wrapper 함수로 복사하는 데코레이터입니다. wraps 없이 데코레이터를 만들면 래핑된 함수가 원본 함수의 정보를 잃어버려 디버깅과 문서화에 문제가 됩니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 합니다. 데코레이터를 작성할 때 항상 wraps를 사용하는 것이 모범 사례입니다.
 
     WRAPPER_ASSIGNMENTS와 WRAPPER_UPDATES 상수로 복사할 속성을 커스터마이징할 수 있습니다.
-  tips:
-  - WRAPPER_ASSIGNMENTS와 WRAPPER_UPDATES 상수로 복사할 속성을 커스터마이징할 수 있습니다.
   snippet: |-
     from functools import wraps
 
@@ -149,8 +145,6 @@ sections:
     lru_cache는 함수의 호출 결과를 캐싱하여 동일한 인자로 다시 호출될 때 계산 없이 캐시된 결과를 반환하는 데코레이터입니다. LRU는 Least Recently Used의 약자로, 캐시가 가득 차면 가장 오래 사용되지 않은 항목을 제거합니다. maxsize 인자로 캐시 크기를 지정하며, None이면 무제한입니다. 피보나치, 팩토리얼 같은 재귀 함수나 비용이 큰 계산에 매우 효과적입니다. Python 3.9+에서는 @cache가 @lru_cache(maxsize=None)의 단축형으로 제공됩니다.
 
     가변 객체(리스트, 딕셔너리)는 해시할 수 없어 lru_cache와 함께 사용할 수 없습니다.
-  tips:
-  - 가변 객체(리스트, 딕셔너리)는 해시할 수 없어 lru_cache와 함께 사용할 수 없습니다.
   snippet: |-
     from functools import lru_cache
 
@@ -189,8 +183,6 @@ sections:
     Python 3.9에서 추가된 cache는 lru_cache(maxsize=None)의 간편한 별칭입니다. 캐시 크기 제한 없이 모든 호출 결과를 저장합니다. 메모리 사용량에 제한이 없으므로 주의가 필요하지만, 반복 호출이 많고 인자 조합이 제한된 경우에 최적입니다. lru_cache와 마찬가지로 cache_info()와 cache_clear() 메서드를 제공합니다.
 
     메모리가 제한된 환경에서는 maxsize를 지정한 lru_cache를 사용하세요.
-  tips:
-  - 메모리가 제한된 환경에서는 maxsize를 지정한 lru_cache를 사용하세요.
   snippet: |-
     from functools import cache
 
@@ -229,8 +221,6 @@ sections:
     singledispatch는 첫 번째 인자의 타입에 따라 다른 구현을 호출하는 제네릭 함수를 만드는 데코레이터입니다. 함수 오버로딩을 파이썬에서 구현하는 방법입니다. 기본 함수를 @singledispatch로 데코레이트하고, 각 타입별 구현을 @func.register로 등록합니다. 등록된 타입이 없으면 기본 함수가 호출됩니다. 다형성을 함수 수준에서 구현할 때 유용합니다.
 
     메서드에는 singledispatchmethod를 사용하세요.
-  tips:
-  - 메서드에는 singledispatchmethod를 사용하세요.
   snippet: |-
     from functools import singledispatch
 
@@ -282,8 +272,6 @@ sections:
     total_ordering은 __eq__와 하나의 순서 비교 메서드(__lt__, __le__, __gt__, __ge__ 중 하나)만 정의하면 나머지 비교 메서드를 자동으로 생성해주는 클래스 데코레이터입니다. 완전한 비교 지원을 위해 6개의 비교 메서드를 모두 작성하는 번거로움을 줄여줍니다. 다만 자동 생성된 메서드는 직접 구현한 것보다 약간 느릴 수 있으니, 성능이 중요하면 직접 구현을 고려하세요.
 
     dataclass(order=True)도 비슷한 기능을 제공합니다.
-  tips:
-  - dataclass(order=True)도 비슷한 기능을 제공합니다.
   snippet: |-
     from functools import total_ordering
 

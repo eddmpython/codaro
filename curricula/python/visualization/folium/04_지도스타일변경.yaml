@@ -80,8 +80,6 @@ sections:
     기본 타일은 OpenStreetMap입니다. tiles 파라미터를 지정하지 않으면 자동 적용됩니다.
 
     OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
-  tips:
-  - OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=12)
@@ -108,8 +106,6 @@ sections:
     CartoDB는 깔끔한 스타일의 타일을 제공합니다. Positron은 밝은 테마, DarkMatter는 어두운 테마입니다.
 
     Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
-  tips:
-  - Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
   snippet: |-
     m3 = folium.Map(
         location=seoulCenter,
@@ -142,8 +138,6 @@ sections:
     외부 타일 서버를 사용할 때는 URL과 attribution을 함께 지정합니다. attribution이 없으면 최신 Folium에서는 실행 오류가 납니다.
 
     외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
-  tips:
-  - 외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
   snippet: |-
     m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
 
@@ -182,8 +176,6 @@ sections:
     동일한 위치를 여러 타일 스타일로 비교해봅니다.
 
     어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
-  tips:
-  - 어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
   snippet: |-
     tiles = [
         "OpenStreetMap",
@@ -218,8 +210,6 @@ sections:
     TileLayer()로 지도에 타일 레이어를 추가합니다. 여러 타일을 겹쳐 사용하거나 전환할 수 있습니다.
 
     tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
-  tips:
-  - tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
   snippet: |-
     m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
@@ -250,8 +240,6 @@ sections:
     URL 템플릿으로 외부 타일 서버를 사용할 수 있습니다. {z}, {x}, {y}는 줌 레벨과 타일 좌표입니다.
 
     attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
-  tips:
-  - attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
   snippet: |-
     m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
 
@@ -290,8 +278,6 @@ sections:
     타일의 투명도를 조절하여 여러 타일을 겹쳐 볼 수 있습니다.
 
     opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
-  tips:
-  - opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
   snippet: |-
     m13 = folium.Map(location=seoulCenter, zoom_start=12)
 
@@ -332,8 +318,6 @@ sections:
     용도에 따라 적합한 타일을 선택합니다.
 
     밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
-  tips:
-  - 밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
   snippet: |-
     dataMap = folium.Map(
         location=seoulCenter,
@@ -398,8 +382,6 @@ sections:
     LayerControl로 낮/밤 모드를 전환할 수 있는 지도를 만듭니다.
 
     우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
-  tips:
-  - 우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
   snippet: |-
     places = [
         {"name": "서울시청", "loc": [37.5665, 126.9780]},

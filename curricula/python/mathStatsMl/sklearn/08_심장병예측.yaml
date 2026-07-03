@@ -180,8 +180,6 @@ sections:
     GradientBoosting은 이전 모델의 잔차(오차)를 학습하는 순차적 앙상블입니다. n_estimators로 트리 개수, learning_rate로 학습률을 조절합니다.
 
     Boosting은 순차적으로 모델을 학습합니다. 각 단계에서 이전 모델이 틀린 샘플에 가중치를 부여하여 점진적으로 성능을 개선합니다.
-  tips:
-  - Boosting은 순차적으로 모델을 학습합니다. 각 단계에서 이전 모델이 틀린 샘플에 가중치를 부여하여 점진적으로 성능을 개선합니다.
   snippet: |-
     gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
     gb.fit(xTrainSc, yTrain)
@@ -233,8 +231,6 @@ sections:
     predict_proba로 클래스별 확률을 얻습니다. 양성(심장병) 확률을 기준으로 ROC 분석을 수행합니다.
 
     predict_proba는 각 클래스에 속할 확률을 반환합니다. 이진분류에서 [:,1]은 양성(1) 클래스 확률입니다.
-  tips:
-  - predict_proba는 각 클래스에 속할 확률을 반환합니다. 이진분류에서 [:,1]은 양성(1) 클래스 확률입니다.
   snippet: |-
     yProba = gb.predict_proba(xTestSc)
     yProbaPos = yProba[:, 1]
@@ -261,8 +257,6 @@ sections:
     ROC 곡선은 다양한 임계값에서 TPR(민감도)과 FPR(1-특이도)의 관계를 보여줍니다.
 
     ROC 곡선이 왼쪽 상단에 가까울수록 좋은 모델입니다. 대각선은 무작위 분류기의 성능입니다.
-  tips:
-  - ROC 곡선이 왼쪽 상단에 가까울수록 좋은 모델입니다. 대각선은 무작위 분류기의 성능입니다.
   snippet: |-
     fpr, tpr, thresholds = roc_curve(yTest, yProbaPos)
 
@@ -303,8 +297,6 @@ sections:
     AUC(Area Under Curve)는 ROC 곡선 아래 면적입니다. 1에 가까울수록 좋은 분류 성능을 의미합니다.
 
     AUC 해석 기준: 0.9+ 우수, 0.8-0.9 좋음, 0.7-0.8 보통, 0.6-0.7 낮음, 0.5 무작위
-  tips:
-  - 'AUC 해석 기준: 0.9+ 우수, 0.8-0.9 좋음, 0.7-0.8 보통, 0.6-0.7 낮음, 0.5 무작위'
   snippet: |-
     auc = roc_auc_score(yTest, yProbaPos)
     print(f"AUC: {auc:.4f}")
@@ -358,8 +350,6 @@ sections:
     learning_rate는 각 트리의 기여도를 조절합니다. 낮을수록 많은 트리가 필요하지만 안정적입니다.
 
     learning_rate가 너무 높으면 과적합, 너무 낮으면 학습 부족(underfitting)이 발생합니다. 일반적으로 0.01~0.1 사이 값을 사용합니다.
-  tips:
-  - learning_rate가 너무 높으면 과적합, 너무 낮으면 학습 부족(underfitting)이 발생합니다. 일반적으로 0.01~0.1 사이 값을 사용합니다.
   snippet: |-
     lrList = [0.01, 0.05, 0.1, 0.2, 0.5]
     aucList = []
@@ -408,8 +398,6 @@ sections:
     GradientBoosting도 특성 중요도를 제공합니다. 심장병 예측에 중요한 요인을 확인합니다.
 
     심장병 예측에서 주로 thalach(최대심박수), cp(흉통유형), ca(주요혈관수), oldpeak(ST depression) 등이 중요합니다.
-  tips:
-  - 심장병 예측에서 주로 thalach(최대심박수), cp(흉통유형), ca(주요혈관수), oldpeak(ST depression) 등이 중요합니다.
   snippet: |-
     impGb = pd.DataFrame({"feature": X.columns, "importance": gb.feature_importances_})
     impGb = impGb.sort_values("importance", ascending=True)
@@ -446,8 +434,6 @@ sections:
     RandomForest(Bagging)와 GradientBoosting(Boosting)의 성능을 비교합니다.
 
     Bagging(RF)은 분산을 줄이고, Boosting(GB)은 편향을 줄입니다. 데이터 특성에 따라 적합한 방법이 다릅니다.
-  tips:
-  - Bagging(RF)은 분산을 줄이고, Boosting(GB)은 편향을 줄입니다. 데이터 특성에 따라 적합한 방법이 다릅니다.
   snippet: |-
     from sklearn.ensemble import RandomForestClassifier
 
@@ -508,8 +494,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import numpy as np

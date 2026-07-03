@@ -127,8 +127,6 @@ sections:
     IS NULL로 age가 없는 승객만 조회합니다. 로컬 titanic 샘플에서는 age 결측이 없어 결과가 비어 있을 수 있습니다. =로는 NULL을 비교할 수 없습니다. NULL은 '알 수 없는 값'이므로 age = NULL은 항상 FALSE를 반환합니다. 반드시 IS NULL 구문을 사용해야 합니다.
 
     NULL은 '알 수 없음'을 의미합니다. age = NULL은 동작하지 않습니다. 반드시 IS NULL 또는 IS NOT NULL을 사용하세요.
-  tips:
-  - NULL은 '알 수 없음'을 의미합니다. age = NULL은 동작하지 않습니다. 반드시 IS NULL 또는 IS NOT NULL을 사용하세요.
   snippet: |-
     duckdb.sql("""
         SELECT pclass, sex, fare, embarked
@@ -237,8 +235,6 @@ sections:
     HAVING은 GROUP BY 결과를 필터링합니다. WHERE가 개별 행을 필터링한다면, HAVING은 그룹을 필터링합니다.
 
     HAVING은 GROUP BY 이후에 실행됩니다. WHERE는 그룹화 전, HAVING은 그룹화 후 필터링입니다. 집계 함수 결과로 필터링할 때는 HAVING을 사용하세요.
-  tips:
-  - HAVING은 GROUP BY 이후에 실행됩니다. WHERE는 그룹화 전, HAVING은 그룹화 후 필터링입니다. 집계 함수 결과로 필터링할 때는 HAVING을 사용하세요.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -562,8 +558,6 @@ sections:
     HAVING과 NULL 처리, CASE WHEN, IN 연산자를 활용해 타이타닉 데이터를 분석합니다. 실무에서는 결측치 처리와 그룹 필터링이 필수적이며, 이 미션을 통해 이러한 패턴을 연습합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import duckdb

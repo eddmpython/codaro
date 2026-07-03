@@ -95,8 +95,6 @@ sections:
     async def로 비동기 함수를 정의하고 await로 비동기 작업을 대기합니다.
 
     await는 async 함수 내부에서만 사용하고, 로컬 스크립트에서는 asyncio.run()으로 시작 함수를 실행하면 재현성이 좋습니다.
-  tips:
-  - await는 async 함수 내부에서만 사용하고, 로컬 스크립트에서는 asyncio.run()으로 시작 함수를 실행하면 재현성이 좋습니다.
   snippet: |-
     import asyncio
 
@@ -134,8 +132,6 @@ sections:
     asyncio.gather()와 asyncio.create_task()로 여러 비동기 작업을 동시에 실행할 수 있습니다.
 
     gather()는 모든 작업이 완료될 때까지 기다리고, as_completed()는 완료되는 순서대로 결과를 받을 수 있습니다.
-  tips:
-  - gather()는 모든 작업이 완료될 때까지 기다리고, as_completed()는 완료되는 순서대로 결과를 받을 수 있습니다.
   snippet: |-
     import asyncio
 
@@ -195,8 +191,6 @@ sections:
     asyncio.wait_for()로 타임아웃을 설정하고, task.cancel()로 작업을 취소할 수 있습니다.
 
     타임아웃은 네트워크 요청이나 외부 서비스 호출 시 필수적입니다. 무한 대기를 방지할 수 있습니다.
-  tips:
-  - 타임아웃은 네트워크 요청이나 외부 서비스 호출 시 필수적입니다. 무한 대기를 방지할 수 있습니다.
   snippet: |-
     import asyncio
 
@@ -248,8 +242,6 @@ sections:
     async with로 비동기 컨텍스트 매니저를, async for로 비동기 이터레이터를 사용할 수 있습니다.
 
     async with와 async for는 파일 I/O, 데이터베이스 연결, 스트리밍 데이터 처리에 유용합니다.
-  tips:
-  - async with와 async for는 파일 I/O, 데이터베이스 연결, 스트리밍 데이터 처리에 유용합니다.
   snippet: |-
     import asyncio
 
@@ -305,8 +297,6 @@ sections:
     비동기 함수에서도 일반적인 try-except 문법을 사용하여 예외를 처리할 수 있습니다.
 
     return_exceptions=True를 사용하면 예외가 발생해도 다른 작업이 계속 실행되고, 예외는 결과 리스트에 포함됩니다.
-  tips:
-  - return_exceptions=True를 사용하면 예외가 발생해도 다른 작업이 계속 실행되고, 예외는 결과 리스트에 포함됩니다.
   snippet: |-
     import asyncio
 
@@ -362,8 +352,6 @@ sections:
     asyncio를 활용한 실전 예제들입니다.
 
     Semaphore를 사용하면 동시 실행 작업 수를 제한할 수 있어, 리소스 관리와 부하 조절에 유용합니다.
-  tips:
-  - Semaphore를 사용하면 동시 실행 작업 수를 제한할 수 있어, 리소스 관리와 부하 조절에 유용합니다.
   snippet: |-
     import asyncio
 

@@ -58,8 +58,6 @@ sections:
     with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다.
 
     with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
-  tips:
-  - with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
   snippet: |-
     from pathlib import Path
     import tempfile
@@ -103,8 +101,6 @@ sections:
     컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다.
 
     __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
-  tips:
-  - __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
   snippet: |-
     class SimpleContext:
         def __enter__(self):
@@ -149,8 +145,6 @@ sections:
     컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다.
 
     with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
-  tips:
-  - with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
   snippet: |-
     class FileManager:
         def __init__(self, filename, mode):
@@ -211,8 +205,6 @@ sections:
     컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다.
 
     __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
-  tips:
-  - __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
   snippet: |-
     class ExceptionSuppressor:
         def __enter__(self):
@@ -263,8 +255,6 @@ sections:
     하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다.
 
     다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.
-  tips:
-  - '다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.'
   snippet: |-
     sourceFile = day28Scratch / 'source.txt'
     destFile = day28Scratch / 'dest.txt'
@@ -302,8 +292,6 @@ sections:
     컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다.
 
     컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
-  tips:
-  - 컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
   snippet: |-
     import time
 
@@ -358,8 +346,6 @@ sections:
     고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상 기록, 오류, 정리 상태를 검증합니다.
 
     실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요.
-  tips:
-  - '실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요.'
   snippet: |-
     from pathlib import Path
     import tempfile

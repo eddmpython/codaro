@@ -79,8 +79,6 @@ sections:
     GeoJSON은 type, geometry, properties로 구성됩니다. geometry에 좌표 정보가 있고, properties에 속성 정보가 있습니다.
 
     주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다.
-  tips:
-  - '주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다.'
   snippet: |-
     pointGeo = {
         "type": "Feature",
@@ -123,8 +121,6 @@ sections:
     Polygon 타입으로 영역을 표현합니다. 좌표 리스트의 리스트 형태이고, 시작점과 끝점이 같아야 합니다.
 
     Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
-  tips:
-  - Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -191,8 +187,6 @@ sections:
     FeatureCollection으로 여러 Feature를 하나로 묶습니다. 대부분의 GeoJSON 파일은 이 형태입니다.
 
     properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
-  tips:
-  - properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -319,8 +313,6 @@ sections:
     style_function으로 GeoJSON 요소의 스타일을 지정합니다. 함수는 feature를 받아 스타일 딕셔너리를 반환합니다.
 
     feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
-  tips:
-  - feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
   snippet: |-
     m3 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -373,8 +365,6 @@ sections:
     GeoJsonPopup과 GeoJsonTooltip으로 클릭/호버 시 정보를 표시합니다. fields에 표시할 속성을 지정합니다.
 
     aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
-  tips:
-  - aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
   snippet: |-
     m5 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -413,8 +403,6 @@ sections:
     highlight_function으로 마우스 호버 시 스타일을 변경합니다.
 
     하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
-  tips:
-  - 하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
   snippet: |-
     m7 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -487,8 +475,6 @@ sections:
     LineString 타입으로 선(경로, 도로)을 표현합니다.
 
     LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
-  tips:
-  - LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
   snippet: |-
     m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
 
@@ -569,8 +555,6 @@ sections:
     서울의 구 경계를 간단한 GeoJSON으로 표현합니다.
 
     실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
-  tips:
-  - 실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
   snippet: |-
     m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
 
@@ -926,8 +910,6 @@ sections:
     GeoJSON 업무에서 가장 흔한 오류는 지도가 안 그려지는 문제가 아니라, 그럴듯하게 그려졌지만 좌표 순서나 속성 키가 틀린 상태입니다. 실행 전에 [경도, 위도] 순서를 예측하고, 폴리곤이 닫혔는지, 필수 속성이 있는지 검증해야 합니다.
 
     GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
-  tips:
-  - GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
   snippet: |-
     deliveryZonesGeo = {
         "type": "FeatureCollection",

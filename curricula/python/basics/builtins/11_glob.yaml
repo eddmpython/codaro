@@ -108,8 +108,6 @@ sections:
     **/ 패턴과 recursive=True 옵션을 사용하면 현재 디렉토리뿐만 아니라 모든 하위 디렉토리까지 검색할 수 있습니다. 대규모 프로젝트에서 특정 확장자 파일을 모두 찾을 때 유용합니다.
 
     재귀 검색은 파일이 많을 경우 시간이 걸릴 수 있습니다. 가능하면 검색 범위를 제한하세요.
-  tips:
-  - 재귀 검색은 파일이 많을 경우 시간이 걸릴 수 있습니다. 가능하면 검색 범위를 제한하세요.
   snippet: |-
     recursivePattern = '**/*.py'
     allPyFiles = glob.glob(recursivePattern, recursive=True)
@@ -137,8 +135,6 @@ sections:
     glob.iglob()는 glob.glob()의 이터레이터 버전입니다. 파일 목록을 한 번에 메모리에 로드하지 않고 순차적으로 처리할 수 있어 메모리 효율적입니다. 대량의 파일을 다룰 때 유용합니다.
 
     이터레이터는 한 번만 순회할 수 있습니다. 다시 사용하려면 새로 생성해야 합니다.
-  tips:
-  - 이터레이터는 한 번만 순회할 수 있습니다. 다시 사용하려면 새로 생성해야 합니다.
   snippet: |-
     logPattern = '*.log'
     logIterator = glob.iglob(logPattern)
@@ -166,8 +162,6 @@ sections:
     문자 범위([a-z], [0-9])와 복합 패턴을 사용하여 더 정교한 파일 검색이 가능합니다. 특정 명명 규칙을 따르는 파일을 찾거나 정규식처럼 패턴을 조합할 수 있습니다.
 
     복잡한 패턴은 정규식보다 간단하지만 제한적입니다. 복잡한 검색은 re 모듈과 결합하세요.
-  tips:
-  - 복잡한 패턴은 정규식보다 간단하지만 제한적입니다. 복잡한 검색은 re 모듈과 결합하세요.
   snippet: |-
     lowerPattern = '[a-z]*.txt'
     lowerFiles = glob.glob(lowerPattern)
@@ -195,8 +189,6 @@ sections:
     glob를 실전에서 활용하는 방법을 살펴봅니다. 여러 확장자 동시 검색, 파일 개수 확인, 최신 파일 찾기 등 실무에서 자주 사용하는 패턴을 학습합니다.
 
     os.path, pathlib과 함께 사용하면 강력한 파일 관리 도구가 됩니다.
-  tips:
-  - os.path, pathlib과 함께 사용하면 강력한 파일 관리 도구가 됩니다.
   snippet: |-
     extensions = ['*.py', '*.yaml']
     multiFiles = [f for ext in extensions for f in glob.glob(ext)]

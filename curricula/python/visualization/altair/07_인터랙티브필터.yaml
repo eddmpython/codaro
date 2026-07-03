@@ -181,8 +181,6 @@ sections:
     앞에서는 드래그로 영역을 선택했습니다. 이번에는 클릭으로 항목을 선택하는 방법을 배웁니다. selection_point()는 "마우스 클릭으로 개별 항목을 선택하게 하라"는 명령입니다. point는 "점"이라는 뜻입니다. fields=['origin'] 파라미터는 "origin(생산국) 필드 기준으로 선택하라"는 의미입니다. 범례에서 'usa'를 클릭하면 usa 자동차만 선택되고, 'japan'을 클릭하면 일본 자동차만 선택됩니다.
 
     opacity도 when().then().otherwise()로 조절합니다. 선택된 점은 불투명, 나머지는 반투명으로 표시됩니다.
-  tips:
-  - opacity도 when().then().otherwise()로 조절합니다. 선택된 점은 불투명, 나머지는 반투명으로 표시됩니다.
   snippet: |-
     click = alt.selection_point(fields=['origin'], bind='legend')
 
@@ -596,8 +594,6 @@ sections:
     이 프로젝트에서 배운 내용을 정리하면: selection_interval()로 드래그 선택, selection_point()로 클릭 선택, when().then().otherwise()로 조건부 스타일, binding_range()로 슬라이더, binding_select()로 드롭다운, alt.datum으로 데이터 접근, & (그리고)와 | (또는) 연산자입니다. 이제 배운 개념들을 조합해 새로운 인터랙티브 차트를 만들어봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd

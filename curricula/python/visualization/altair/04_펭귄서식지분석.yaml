@@ -93,8 +93,6 @@ sections:
     mark_area()는 선 아래 영역을 채운 차트를 만듭니다. mark_bar()가 막대를 그리는 것처럼, mark_area()는 영역을 그립니다. 종(species)별 펭귄 수를 영역 차트로 표현합니다. x축에 종, y축에 개수(count())를 배치합니다. 영역 차트는 막대 차트와 비슷하지만 더 부드럽게 보이며, 연속적인 흐름을 표현할 때 유용합니다.
 
     mark_area()는 mark_bar()와 비슷하지만 부드러운 곡선으로 영역을 채웁니다. 연속적인 데이터 흐름을 표현할 때 유용합니다.
-  tips:
-  - mark_area()는 mark_bar()와 비슷하지만 부드러운 곡선으로 영역을 채웁니다. 연속적인 데이터 흐름을 표현할 때 유용합니다.
   snippet: |-
     chartArea = alt.Chart(penguins).mark_area().encode(
         x='species:N',
@@ -125,8 +123,6 @@ sections:
     color 인코딩을 추가하면 종별 영역을 구분할 수 있습니다. 로컬 penguins 샘플은 섬마다 한 종만 배치되어 있어 실제 결과는 섬별 단일 색 영역으로 보입니다.
 
     Biscoe 섬에는 Gentoo, Dream 섬에는 Chinstrap, Torgersen 섬에는 Adelie 샘플이 들어 있습니다.
-  tips:
-  - Biscoe 섬에는 Gentoo, Dream 섬에는 Chinstrap, Torgersen 섬에는 Adelie 샘플이 들어 있습니다.
   snippet: |-
     chartStacked = alt.Chart(penguins).mark_area().encode(
         x='island:N',
@@ -474,8 +470,6 @@ sections:
     이 프로젝트에서 배운 내용을 정리합니다. mark_area()로 영역 차트를, mark_rule()로 선을, mark_text()로 텍스트를 그렸습니다. + 연산자로 여러 차트를 레이어로 겹쳤습니다. 두 차트를 더하면 하나로 합쳐집니다. opacity로 투명도를, dy로 텍스트 위치를, strokeDash로 점선을 설정했습니다. 각 미션에서 이 개념들을 활용해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import altair as alt
     import pandas as pd

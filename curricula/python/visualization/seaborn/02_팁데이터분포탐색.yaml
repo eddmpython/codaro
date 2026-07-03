@@ -119,8 +119,6 @@ sections:
     histplot()은 연속형 변수의 분포를 막대 그래프로 표현합니다. bins 파라미터로 구간 개수를 조절하고, kde=True로 커널 밀도 추정 곡선을 함께 표시할 수 있습니다. 팁 금액의 분포를 확인해봅니다.
 
     sns.histplot(data, x='컬럼명')으로 히스토그램을 그립니다. bins로 구간 개수를 조절합니다. 구간이 많을수록 세밀하게, 적을수록 전체 추세를 파악하기 좋습니다.
-  tips:
-  - sns.histplot(data, x='컬럼명')으로 히스토그램을 그립니다. bins로 구간 개수를 조절합니다. 구간이 많을수록 세밀하게, 적을수록 전체 추세를 파악하기 좋습니다.
   snippet: |-
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.histplot(data=tips, x='tip', bins=20, ax=ax)
@@ -274,8 +272,6 @@ sections:
     stripplot()은 범주형 변수와 연속형 변수의 관계를 개별 점으로 표시합니다. 히스토그램이 분포의 모양을 보여준다면, stripplot은 실제 데이터 포인트의 위치를 보여줍니다. 요일별 팁 분포를 점으로 확인해봅니다.
 
     sns.stripplot(data, x='범주형', y='연속형')으로 범주별 데이터 포인트를 표시합니다. 점이 겹칠 수 있어 데이터가 많으면 jitter(좌우 흔들림)로 분산시킵니다.
-  tips:
-  - sns.stripplot(data, x='범주형', y='연속형')으로 범주별 데이터 포인트를 표시합니다. 점이 겹칠 수 있어 데이터가 많으면 jitter(좌우 흔들림)로 분산시킵니다.
   snippet: |-
     figStrip, axStrip = plt.subplots(figsize=(8, 6))
     sns.stripplot(data=tips, x='day', y='tip', ax=axStrip)
@@ -305,8 +301,6 @@ sections:
     swarmplot()은 stripplot과 비슷하지만 점이 겹치지 않도록 자동으로 배치합니다. 데이터의 분포 모양과 밀집 정도를 동시에 파악할 수 있습니다. 단, 데이터가 많으면 계산 시간이 오래 걸릴 수 있습니다.
 
     swarmplot()은 점이 겹치지 않아 실제 데이터 분포를 정확히 보여줍니다. 단, 데이터가 1000개 이상이면 느려지므로 stripplot을 권장합니다.
-  tips:
-  - swarmplot()은 점이 겹치지 않아 실제 데이터 분포를 정확히 보여줍니다. 단, 데이터가 1000개 이상이면 느려지므로 stripplot을 권장합니다.
   snippet: |-
     figSwarm, axSwarm = plt.subplots(figsize=(8, 6))
     sns.swarmplot(data=tips, x='day', y='tip', ax=axSwarm)
@@ -467,8 +461,6 @@ sections:
     지금까지 배운 histplot, stripplot, swarmplot, hue, multiple을 활용해서 다양한 분포를 탐색해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
@@ -517,8 +509,6 @@ sections:
     분포 차트는 평균만 보는 습관을 깨기 위한 도구입니다. 팁 금액이 한쪽으로 치우쳐 있는지 예측하고, 히스토그램이 그 질문을 정확히 보여 주는지 검증합니다.
 
     분포 분석은 히스토그램을 그린 뒤 끝내지 말고, 어떤 집단의 분포가 왜 다른지 다음 질문을 뽑아야 합니다.
-  tips:
-  - 분포 분석은 히스토그램을 그린 뒤 끝내지 말고, 어떤 집단의 분포가 왜 다른지 다음 질문을 뽑아야 합니다.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 

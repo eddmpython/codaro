@@ -59,8 +59,6 @@ sections:
     ABC(Abstract Base Class)는 인스턴스화할 수 없는 추상 클래스입니다. abc 모듈의 ABC 클래스를 상속하거나 metaclass=ABCMeta를 지정합니다. @abstractmethod로 데코레이트된 메서드는 서브클래스에서 반드시 구현해야 합니다. 추상 메서드를 구현하지 않으면 서브클래스도 인스턴스화할 수 없습니다. ABC는 인터페이스 계약을 강제하여 API 일관성을 보장합니다. collections.abc에는 Iterable, Mapping 등 유용한 추상 클래스가 정의되어 있습니다.
 
     ABC 자체를 인스턴스화하려고 하면 TypeError: Can't instantiate abstract class가 발생합니다.
-  tips:
-  - 'ABC 자체를 인스턴스화하려고 하면 TypeError: Can''t instantiate abstract class가 발생합니다.'
   snippet: |-
     from abc import ABC, abstractmethod
 
@@ -128,8 +126,6 @@ sections:
     추상 프로퍼티는 서브클래스에서 반드시 정의해야 하는 속성입니다. @property와 @abstractmethod를 함께 사용합니다. Python 3.3 이전에는 @abstractproperty가 있었지만 이제는 데코레이터를 조합합니다. @abstractmethod는 가장 안쪽(아래쪽)에 위치해야 합니다. 추상 classmethod와 staticmethod도 같은 방식으로 정의합니다. 추상 프로퍼티는 설정자(setter)나 삭제자(deleter)도 추상화할 수 있습니다.
 
     Python 3.3+에서는 @abstractproperty 대신 @property + @abstractmethod를 사용합니다.
-  tips:
-  - Python 3.3+에서는 @abstractproperty 대신 @property + @abstractmethod를 사용합니다.
   snippet: |-
     from abc import ABC, abstractmethod
 
@@ -185,8 +181,6 @@ sections:
     ABC를 사용한 인터페이스 설계는 명시적인 계약을 만듭니다. 인터페이스를 상속받는 클래스는 정해진 메서드를 반드시 구현해야 합니다. 이는 팀 협업이나 대규모 프로젝트에서 API 일관성을 보장합니다. 추상 클래스에 docstring을 작성하면 인터페이스 문서화도 됩니다. 기본 구현을 제공하면서 일부만 추상화할 수도 있습니다. 추상 메서드 안에도 코드를 작성할 수 있으며 super()로 호출할 수 있습니다.
 
     register() 메서드로 기존 클래스를 ABC의 가상 서브클래스로 등록할 수 있습니다.
-  tips:
-  - register() 메서드로 기존 클래스를 ABC의 가상 서브클래스로 등록할 수 있습니다.
   snippet: |-
     from abc import ABC, abstractmethod
 
@@ -278,8 +272,6 @@ sections:
     덕 타이핑(duck typing)은 '오리처럼 걷고 꽥꽥거리면 오리다'라는 원칙입니다. 객체의 타입보다 객체가 어떤 메서드를 가지고 있는지가 중요합니다. 파이썬은 동적 타이핑 언어로 덕 타이핑을 자연스럽게 지원합니다. isinstance 검사 대신 hasattr이나 EAFP(허락보다 용서가 쉽다) 스타일을 사용합니다. 덕 타이핑은 유연하지만 런타임에 오류가 발생할 수 있습니다. ABC와 덕 타이핑은 상호 보완적입니다.
 
     LBYL(Look Before You Leap)보다 EAFP가 파이썬에서 권장됩니다.
-  tips:
-  - LBYL(Look Before You Leap)보다 EAFP가 파이썬에서 권장됩니다.
   snippet: |-
     class Duck:
         def quack(self):
@@ -337,8 +329,6 @@ sections:
     typing.Protocol은 Python 3.8에서 도입된 구조적 서브타이핑입니다. 명시적으로 상속하지 않아도 필요한 메서드를 가지면 타입 검사를 통과합니다. 덕 타이핑을 정적 타입 검사와 결합합니다. runtime_checkable 데코레이터를 추가하면 isinstance로도 검사할 수 있습니다. Protocol은 ABC와 달리 상속이 필요 없어 기존 클래스와의 호환성이 좋습니다.
 
     Protocol은 타입 힌팅용이며, runtime_checkable은 메서드 존재만 확인하고 시그니처는 검사하지 않습니다.
-  tips:
-  - Protocol은 타입 힌팅용이며, runtime_checkable은 메서드 존재만 확인하고 시그니처는 검사하지 않습니다.
   snippet: |-
     from typing import Protocol
 
@@ -396,8 +386,6 @@ sections:
     ABC는 플러그인 시스템이나 전략 패턴 구현에 유용합니다. 플러그인 시스템에서 모든 플러그인이 구현해야 할 인터페이스를 ABC로 정의합니다. 전략 패턴에서 다양한 알고리즘을 같은 인터페이스로 교체할 수 있습니다. 의존성 주입(Dependency Injection)에서도 인터페이스를 ABC로 정의합니다. register 메서드로 기존 클래스를 가상 서브클래스로 등록할 수 있습니다.
 
     가상 서브클래스는 isinstance를 통과하지만 실제로 추상 메서드 구현을 강제하지는 않습니다.
-  tips:
-  - 가상 서브클래스는 isinstance를 통과하지만 실제로 추상 메서드 구현을 강제하지는 않습니다.
   snippet: |-
     from abc import ABC, abstractmethod
 

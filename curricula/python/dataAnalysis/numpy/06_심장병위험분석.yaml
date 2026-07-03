@@ -171,8 +171,6 @@ sections:
     concatenate(연결하다)는 여러 배열을 하나로 이어붙이는 함수입니다. 기차 객차를 연결하듯이 배열들을 순서대로 붙입니다. 예를 들어 [1,2,3]과 [4,5]를 concatenate하면 [1,2,3,4,5]가 됩니다. 여러 소스의 데이터를 하나로 합칠 때 유용합니다.
 
     np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
-  tips:
-  - np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
   snippet: |-
     concat = np.concatenate([age, chol])
     concat.shape
@@ -198,8 +196,6 @@ sections:
     여러 변수를 열로 나란히 붙여 2차원 테이블을 만듭니다. 각 1차원 배열을 reshape(-1, 1)로 열 벡터로 바꾼 뒤, axis=1(열 방향)로 결합합니다. -1은 '나머지 크기는 자동 계산해줘'라는 의미입니다. 결과적으로 303명 × 3개 변수의 테이블이 만들어집니다.
 
     axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
-  tips:
-  - axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
   snippet: |-
     c1 = age.reshape(-1, 1)
     c2 = chol.reshape(-1, 1)
@@ -231,8 +227,6 @@ sections:
     vstack, hstack, column_stack은 concatenate보다 직관적인 결합 함수입니다. vstack은 vertical(수직) stack으로 배열들을 위아래로 쌓고, hstack은 horizontal(수평) stack으로 좌우로 붙입니다. column_stack은 1차원 배열들을 각각 하나의 열로 만들어 옆으로 붙여줍니다.
 
     np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
-  tips:
-  - np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
   snippet: |-
     v = np.vstack([age, chol, bp])
     v.shape
@@ -284,8 +278,6 @@ sections:
     any()는 '하나라도 있으면 True', all()은 '전부 다 그래야 True'입니다. 예를 들어 np.any(chol > 240)은 콜레스테롤 240 초과인 환자가 한 명이라도 있는지 확인합니다. np.all(bp < 180)은 모든 환자의 혈압이 180 미만인지 검사합니다. 데이터 전체에 대한 조건 검증에 유용합니다.
 
     np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
-  tips:
-  - np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
   snippet: |-
     hi1 = chol > 240
     hi2 = bp > 140
@@ -317,8 +309,6 @@ sections:
     각 환자별로 위험 요인이 있는지 확인합니다.
 
     axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
-  tips:
-  - axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
   snippet: |-
     risks = np.column_stack([hi1, hi2, age > 60])
     any2 = np.any(risks, axis=1)
@@ -348,8 +338,6 @@ sections:
     나이순으로 데이터를 정렬합니다.
 
     np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
-  tips:
-  - np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
   snippet: |-
     sorted_ = np.sort(age)
     sorted_[:10]
@@ -375,8 +363,6 @@ sections:
     argsort로 정렬 인덱스를 얻어 다른 배열도 같이 정렬합니다.
 
     np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
-  tips:
-  - np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
   snippet: |-
     order = np.argsort(age)
     arr1 = age[order]
@@ -440,8 +426,6 @@ sections:
     cumsum(cumulative sum, 누적합)은 배열의 값을 순서대로 더해가는 함수입니다. [1,2,3]의 cumsum은 [1, 1+2, 1+2+3] = [1, 3, 6]입니다. 나이순 정렬된 심장병 유무(1 또는 0) 데이터에 cumsum을 적용하면, 각 나이까지 심장병 환자가 몇 명인지 누적 수를 볼 수 있습니다.
 
     np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
-  tips:
-  - np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
   snippet: |-
     t = target[order]
     cumsum = np.cumsum(t)
@@ -558,8 +542,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

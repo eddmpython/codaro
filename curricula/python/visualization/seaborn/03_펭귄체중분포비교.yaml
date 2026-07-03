@@ -185,8 +185,6 @@ sections:
     violinplot()은 박스플롯과 KDE를 결합한 형태입니다. 양쪽으로 대칭인 KDE 곡선으로 분포의 모양을 보여줍니다. 박스플롯보다 분포의 세부적인 형태(다봉분포, 비대칭 등)를 파악하기 좋습니다.
 
     sns.violinplot()은 분포의 모양(밀도)을 시각화합니다. 폭이 넓은 부분은 데이터가 많은 구간입니다. inner 파라미터로 내부 표시를 조절할 수 있습니다.
-  tips:
-  - sns.violinplot()은 분포의 모양(밀도)을 시각화합니다. 폭이 넓은 부분은 데이터가 많은 구간입니다. inner 파라미터로 내부 표시를 조절할 수 있습니다.
   snippet: |-
     figViolin, axViolin = plt.subplots(figsize=(8, 6))
     sns.violinplot(data=penguins, x='species', y='body_mass_g', ax=axViolin)
@@ -218,8 +216,6 @@ sections:
     violinplot에 hue를 적용하면 두 그룹의 분포를 나란히 비교할 수 있습니다. split=True를 설정하면 한 바이올린을 반으로 나누어 두 그룹을 좌우에 표시합니다. 공간을 절약하면서 직접 비교가 가능합니다.
 
     split=True는 두 그룹을 하나의 바이올린 좌우에 표시합니다. hue가 2개 범주일 때만 사용 가능하며, 직접적인 비교에 효과적입니다.
-  tips:
-  - split=True는 두 그룹을 하나의 바이올린 좌우에 표시합니다. hue가 2개 범주일 때만 사용 가능하며, 직접적인 비교에 효과적입니다.
   snippet: |-
     figSplit, axSplit = plt.subplots(figsize=(10, 6))
     sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
@@ -486,8 +482,6 @@ sections:
     지금까지 배운 boxplot, violinplot, hue, split, inner를 활용해서 다양한 분포를 비교해봅시다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import seaborn as sns
     from codaro.curriculum.localData import loadLocalDataset
@@ -536,8 +530,6 @@ sections:
     boxplot과 violinplot은 집단 간 차이를 빠르게 비교하지만, 결측값과 범주 수를 먼저 확인하지 않으면 차트 해석이 흔들립니다. Gentoo가 더 무겁다는 예측을 데이터와 차트 양쪽에서 확인합니다.
 
     분포 비교는 “누가 큰가”에서 멈추지 말고, 다른 지표에서도 같은 결론이 유지되는지 확인해야 실무 보고서가 강해집니다.
-  tips:
-  - 분포 비교는 “누가 큰가”에서 멈추지 말고, 다른 지표에서도 같은 결론이 유지되는지 확인해야 실무 보고서가 강해집니다.
   snippet: |-
     from codaro.curriculum.localData import loadLocalDataset
 

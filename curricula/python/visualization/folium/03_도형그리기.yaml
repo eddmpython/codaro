@@ -82,8 +82,6 @@ sections:
     Circle()은 실제 거리(미터) 기준으로 원을 그립니다. radius는 미터 단위입니다.
 
     Circle의 radius는 미터 단위입니다. 500이면 반경 500m입니다. 줌 레벨을 바꿔도 실제 크기는 동일합니다.
-  tips:
-  - Circle의 radius는 미터 단위입니다. 500이면 반경 500m입니다. 줌 레벨을 바꿔도 실제 크기는 동일합니다.
   snippet: |-
     seoulCenter = [37.5665, 126.9780]
     m1 = folium.Map(location=seoulCenter, zoom_start=14)
@@ -128,8 +126,6 @@ sections:
     CircleMarker()는 픽셀 기준으로 원을 그립니다. 줌 레벨이 바뀌어도 화면상 크기가 동일합니다.
 
     Circle은 실제 영역 표시(반경 1km 배달 범위)에, CircleMarker는 데이터 포인트 크기 표시(인구수 비례)에 적합합니다.
-  tips:
-  - Circle은 실제 영역 표시(반경 1km 배달 범위)에, CircleMarker는 데이터 포인트 크기 표시(인구수 비례)에 적합합니다.
   snippet: |-
     m2 = folium.Map(location=seoulCenter, zoom_start=14)
 
@@ -176,8 +172,6 @@ sections:
     원의 외곽선과 채우기 색상, 투명도, 두께를 설정합니다.
 
     weight는 외곽선 두께(픽셀)입니다. fill=False면 테두리만 그립니다.
-  tips:
-  - weight는 외곽선 두께(픽셀)입니다. fill=False면 테두리만 그립니다.
   snippet: |-
     m4 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -244,8 +238,6 @@ sections:
     Rectangle()은 두 모서리 좌표로 사각형을 그립니다. bounds에 [[남서], [북동]] 좌표를 전달합니다.
 
     bounds는 [[남서쪽 위도, 경도], [북동쪽 위도, 경도]] 순서입니다. 좌하단과 우상단 좌표입니다.
-  tips:
-  - bounds는 [[남서쪽 위도, 경도], [북동쪽 위도, 경도]] 순서입니다. 좌하단과 우상단 좌표입니다.
   snippet: |-
     m5 = folium.Map(location=[37.5725, 126.9768], zoom_start=16)
 
@@ -296,8 +288,6 @@ sections:
     PolyLine()은 좌표 리스트를 연결한 선을 그립니다. 경로, 도로, 노선 표시에 사용합니다.
 
     locations는 [위도, 경도] 좌표의 리스트입니다. 순서대로 선이 연결됩니다.
-  tips:
-  - locations는 [위도, 경도] 좌표의 리스트입니다. 순서대로 선이 연결됩니다.
   snippet: |-
     m7 = folium.Map(location=[37.5283, 126.9340], zoom_start=14)
 
@@ -356,8 +346,6 @@ sections:
     선의 스타일을 다양하게 변경합니다. dash_array로 점선을 만들 수 있습니다.
 
     dash_array="10"은 10픽셀 선, 10픽셀 공백입니다. "10, 20"은 10픽셀 선, 20픽셀 공백입니다.
-  tips:
-  - dash_array="10"은 10픽셀 선, 10픽셀 공백입니다. "10, 20"은 10픽셀 선, 20픽셀 공백입니다.
   snippet: |-
     m9 = folium.Map(location=seoulCenter, zoom_start=13)
 
@@ -438,8 +426,6 @@ sections:
     Polygon()은 좌표 리스트로 닫힌 다각형을 그립니다. 시작점과 끝점이 자동으로 연결됩니다.
 
     Polygon은 자동으로 첫 점과 마지막 점을 연결합니다. PolyLine처럼 열린 선이 아닙니다.
-  tips:
-  - Polygon은 자동으로 첫 점과 마지막 점을 연결합니다. PolyLine처럼 열린 선이 아닙니다.
   snippet: |-
     m10 = folium.Map(location=seoulCenter, zoom_start=14)
 
@@ -498,8 +484,6 @@ sections:
     원, 사각형, 선, 다각형을 조합하여 복잡한 지도를 만듭니다.
 
     여러 도형을 겹쳐 그릴 때 투명도를 적절히 조절하세요. fill_opacity가 너무 높으면 겹친 부분이 안 보입니다.
-  tips:
-  - 여러 도형을 겹쳐 그릴 때 투명도를 적절히 조절하세요. fill_opacity가 너무 높으면 겹친 부분이 안 보입니다.
   snippet: |-
     storeLocation = [37.5665, 126.9780]
     m12 = folium.Map(location=storeLocation, zoom_start=14)
@@ -719,8 +703,6 @@ sections:
     도형 지도는 영역이 그려졌다고 끝이 아닙니다. 업무용 구역, 경로, 반경 지도에서는 다각형 꼭짓점 수, 좌표 범위, 반경 기준, 렌더 결과를 코드로 검증해야 보고서와 운영 판단에 쓸 수 있습니다.
 
     도형 지도는 시각화와 검증을 분리하지 않습니다. 구역 다각형, 실제 반경, 이동 경로, 기준 변경 실험이 함께 있어야 운영자가 믿고 쓰는 지도 학습이 됩니다.
-  tips:
-  - 도형 지도는 시각화와 검증을 분리하지 않습니다. 구역 다각형, 실제 반경, 이동 경로, 기준 변경 실험이 함께 있어야 운영자가 믿고 쓰는 지도 학습이 됩니다.
   snippet: |-
     serviceZones = [
         {

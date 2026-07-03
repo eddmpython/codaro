@@ -57,8 +57,6 @@ sections:
     json은 파이썬 표준 라이브러리입니다. JSON(JavaScript Object Notation) 데이터를 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 json 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 json 모듈을 사용할 수 있습니다.
   snippet: |-
     import json
     import tempfile
@@ -96,8 +94,6 @@ sections:
     json 모듈은 Python 객체와 JSON 문자열 간 변환을 제공합니다. dumps()는 Python 객체를 JSON 문자열로 직렬화하고, loads()는 JSON 문자열을 Python 객체로 역직렬화합니다. API 통신, 설정 파일, 데이터 교환에 필수적입니다.
 
     JSON의 true/false는 Python의 True/False로, null은 None으로 자동 변환됩니다.
-  tips:
-  - JSON의 true/false는 Python의 True/False로, null은 None으로 자동 변환됩니다.
   snippet: |-
     userData = {'name': 'Alice', 'age': 30, 'city': 'Seoul'}
     jsonString = json.dumps(userData)
@@ -125,8 +121,6 @@ sections:
     dump()는 Python 객체를 JSON 파일로 저장하고, load()는 JSON 파일을 Python 객체로 읽어옵니다. 설정 파일, 데이터 캐싱, 영속성 저장에 활용됩니다. 파일 핸들을 직접 전달하여 효율적으로 처리합니다.
 
     대용량 데이터는 dump/load가 dumps/loads보다 메모리 효율적입니다.
-  tips:
-  - 대용량 데이터는 dump/load가 dumps/loads보다 메모리 효율적입니다.
   snippet: |-
     configData = {'theme': 'dark', 'language': 'ko', 'notifications': True}
     with open(jsonScratch / 'config.json', 'w', encoding='utf-8') as f:
@@ -155,8 +149,6 @@ sections:
     JSON 출력을 사람이 읽기 쉽게 포맷팅할 수 있습니다. indent는 들여쓰기 수준을 지정하고, sort_keys는 키를 정렬하며, separators는 구분자를 커스터마이즈합니다. 디버깅, 로그, 설정 파일 작성에 유용합니다.
 
     ensure_ascii=False를 사용하면 한글, 이모지 등이 \uXXXX 형태로 변환되지 않습니다.
-  tips:
-  - ensure_ascii=False를 사용하면 한글, 이모지 등이 \uXXXX 형태로 변환되지 않습니다.
   snippet: |-
     studentData = {'name': '김철수', 'grade': 'A', 'score': 95}
     prettyJson = json.dumps(studentData, indent=2, ensure_ascii=False)
@@ -183,8 +175,6 @@ sections:
     JSON은 제한된 데이터 타입만 지원합니다. Python의 일부 타입은 JSON으로 직렬화할 수 없거나 변환 시 타입이 바뀝니다. 딕셔너리, 리스트, 문자열, 숫자, 불린, None만 직접 지원되며, 날짜나 집합 등은 커스텀 처리가 필요합니다.
 
     set, datetime, custom 객체는 기본적으로 직렬화할 수 없습니다. 커스텀 인코더가 필요합니다.
-  tips:
-  - set, datetime, custom 객체는 기본적으로 직렬화할 수 없습니다. 커스텀 인코더가 필요합니다.
   snippet: |-
     mixedData = {
         'text': 'Hello',
@@ -225,8 +215,6 @@ sections:
     기본 지원되지 않는 타입을 JSON으로 변환하려면 default 함수를 사용합니다. 역직렬화 시 커스텀 변환은 object_hook으로 구현합니다. 날짜, 집합, 사용자 정의 클래스 등을 JSON으로 처리할 수 있습니다.
 
     복잡한 객체는 __dict__를 사용하여 딕셔너리로 변환한 후 직렬화할 수 있습니다.
-  tips:
-  - 복잡한 객체는 __dict__를 사용하여 딕셔너리로 변환한 후 직렬화할 수 있습니다.
   snippet: |-
     def customEncoder(obj):
         if isinstance(obj, set):
@@ -263,8 +251,6 @@ sections:
     실무에서 자주 사용하는 JSON 활용 패턴을 살펴봅니다. API 응답 처리, 설정 파일 관리, 로그 저장, 데이터 교환 등 다양한 시나리오에서 JSON을 효과적으로 사용할 수 있습니다.
 
     JSON 파일은 주석을 지원하지 않습니다. 설명이 필요하면 '_comment' 키를 사용하세요.
-  tips:
-  - JSON 파일은 주석을 지원하지 않습니다. 설명이 필요하면 '_comment' 키를 사용하세요.
   snippet: |-
     apiResponse = '{"status": "success", "data": {"users": 150, "active": 120}}'
     parsedResponse = json.loads(apiResponse)

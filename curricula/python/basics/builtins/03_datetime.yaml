@@ -59,8 +59,6 @@ sections:
     datetime은 파이썬 표준 라이브러리입니다. 날짜와 시간을 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 datetime 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 datetime 모듈을 사용할 수 있습니다.
   snippet: |-
     from datetime import date, datetime, timedelta
 
@@ -90,8 +88,6 @@ sections:
     datetime 모듈은 날짜와 시간을 다루는 파이썬 표준 라이브러리입니다. date는 날짜만, time은 시간만, datetime은 날짜와 시간을 함께 표현합니다. 각 객체는 불변이므로 연산 결과로 새 객체가 생성됩니다. 일정 관리, 로그 분석, 데이터 처리에 필수적입니다.
 
     datetime.now()로 현재 날짜와 시간을 가져올 수 있습니다.
-  tips:
-  - datetime.now()로 현재 날짜와 시간을 가져올 수 있습니다.
   snippet: |-
     birthday = date(2000, 1, 15)
     birthday
@@ -117,8 +113,6 @@ sections:
     timedelta는 두 날짜 사이의 차이를 나타내거나 날짜에 더하고 뺄 수 있습니다. days, seconds, microseconds로 시간 간격을 표현하며, weeks 파라미터도 사용할 수 있습니다. D-day 계산, 기한 설정, 일정 관리에 활용됩니다.
 
     timedelta는 weeks 파라미터를 지원합니다. timedelta(weeks=2)는 14일과 같습니다.
-  tips:
-  - timedelta는 weeks 파라미터를 지원합니다. timedelta(weeks=2)는 14일과 같습니다.
   snippet: |-
     currentDate = date.today()
     weekLater = currentDate + timedelta(days=7)
@@ -146,8 +140,6 @@ sections:
     strftime()은 날짜를 문자열로 변환하고, strptime()은 문자열을 날짜로 변환합니다. 포맷 코드(%Y, %m, %d 등)로 원하는 형식을 지정할 수 있습니다. 로그 파일 분석, 사용자 입력 처리, API 통신에서 필수적입니다.
 
     strftime과 strptime의 포맷 문자열은 정확히 일치해야 합니다.
-  tips:
-  - strftime과 strptime의 포맷 문자열은 정확히 일치해야 합니다.
   snippet: |-
     myDate = date(2024, 3, 15)
     formatted = myDate.strftime('%Y-%m-%d')
@@ -175,8 +167,6 @@ sections:
     날짜 객체에서 개별 구성 요소를 추출할 수 있습니다. year, month, day, hour, minute, second, microsecond 속성으로 각 요소에 접근합니다. weekday()는 요일을, isocalendar()는 ISO 주차를 반환합니다.
 
     weekday()는 0(월)~6(일), isoweekday()는 1(월)~7(일)을 반환합니다.
-  tips:
-  - weekday()는 0(월)~6(일), isoweekday()는 1(월)~7(일)을 반환합니다.
   snippet: |-
     someDate = date(2024, 12, 25)
     yearValue = someDate.year
@@ -208,8 +198,6 @@ sections:
     날짜 객체는 비교 연산자(<, >, ==, !=, <=, >=)를 지원합니다. 과거 날짜가 미래 날짜보다 작으므로 날짜 리스트를 정렬할 수 있습니다. 기한 체크, 유효성 검증, 일정 정렬에 활용됩니다.
 
     max()와 min()으로 날짜 리스트에서 가장 최근/오래된 날짜를 찾을 수 있습니다.
-  tips:
-  - max()와 min()으로 날짜 리스트에서 가장 최근/오래된 날짜를 찾을 수 있습니다.
   snippet: |-
     date1 = date(2024, 1, 1)
     date2 = date(2024, 12, 31)
@@ -239,8 +227,6 @@ sections:
     실무에서 자주 사용하는 날짜 처리 패턴을 살펴봅니다. D-day 계산, 나이 계산, 영업일 계산, 월말/월초 처리 등 실생활 문제를 datetime으로 해결할 수 있습니다.
 
     calendar 모듈과 함께 사용하면 월말일, 윤년 등을 쉽게 처리할 수 있습니다.
-  tips:
-  - calendar 모듈과 함께 사용하면 월말일, 윤년 등을 쉽게 처리할 수 있습니다.
   snippet: |-
     targetDate = date(2025, 1, 1)
     todayDate = date.today()

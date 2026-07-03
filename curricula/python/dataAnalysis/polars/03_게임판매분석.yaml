@@ -121,8 +121,6 @@ sections:
     head()로 상위 N개 행을 확인합니다. 데이터가 Rank(순위) 순으로 정렬되어 있어 가장 많이 팔린 게임들이 상위에 위치합니다. Wii Sports, Super Mario Bros 등 역대급 히트작들을 볼 수 있습니다.
 
     head(N)은 상위 N개 행만 보여줍니다. 괄호 안의 숫자를 바꿔서 원하는 개수를 볼 수 있습니다.
-  tips:
-  - head(N)은 상위 N개 행만 보여줍니다. 괄호 안의 숫자를 바꿔서 원하는 개수를 볼 수 있습니다.
   snippet: games.head(5)
   exercise:
     prompt: 3단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
@@ -285,8 +283,6 @@ sections:
     집계 결과에 의미 있는 이름을 붙이려면 alias()를 사용합니다. alias()를 사용하지 않으면 컬럼명이 "Global_Sales"로 유지되어 원본인지 합계인지 구분하기 어렵습니다. "totalSales"처럼 명확한 이름을 붙이면 결과를 이해하기 쉽습니다.
 
     alias("새이름")은 집계 결과 컬럼에 원하는 이름을 붙입니다. 나중에 시각화할 때 더 읽기 쉬운 이름을 쓸 수 있습니다.
-  tips:
-  - alias("새이름")은 집계 결과 컬럼에 원하는 이름을 붙입니다. 나중에 시각화할 때 더 읽기 쉬운 이름을 쓸 수 있습니다.
   snippet: |-
     games.group_by("Platform").agg(
         pl.col("Global_Sales").sum().alias("totalSales")
@@ -314,8 +310,6 @@ sections:
     agg()에 여러 집계를 리스트로 전달하면 한번에 여러 통계를 구할 수 있습니다. sum(총합), mean(평균), count(개수) 등 다양한 집계 함수를 조합하면 데이터의 여러 측면을 동시에 파악할 수 있습니다. 각 집계에 alias()로 이름을 붙여 구분합니다.
 
     agg([...]) 안에 여러 집계를 나열합니다. 각 집계에 alias를 붙여서 결과를 구분하세요.
-  tips:
-  - agg([...]) 안에 여러 집계를 나열합니다. 각 집계에 alias를 붙여서 결과를 구분하세요.
   snippet: |-
     games.group_by("Platform").agg([
         pl.col("Global_Sales").sum().alias("totalSales"),
@@ -476,8 +470,6 @@ sections:
     게임 분석가가 되어 판매 데이터를 분석해봅시다. 다중 열 선택, 복합 조건 필터, 다중 그룹 집계를 모두 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import polars as pl
     from io import StringIO

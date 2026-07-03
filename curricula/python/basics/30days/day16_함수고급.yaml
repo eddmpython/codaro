@@ -60,8 +60,6 @@ sections:
     매개변수에 기본값을 지정하면 인자를 생략할 수 있습니다. def 함수명(매개변수=기본값): 형식으로 쓰며, 호출시 인자를 주지 않으면 기본값이 사용됩니다. 필수 매개변수 뒤에 와야 합니다.
 
     기본값이 없는 매개변수는 기본값이 있는 매개변수보다 앞에 와야 합니다.
-  tips:
-  - 기본값이 없는 매개변수는 기본값이 있는 매개변수보다 앞에 와야 합니다.
   snippet: |-
     def greet(name='Guest'):
         return 'Hello ' + name
@@ -94,8 +92,6 @@ sections:
     키워드 인자는 매개변수 이름을 명시하여 값을 전달합니다. 함수명(매개변수=값) 형식으로 쓰며, 순서와 관계없이 전달할 수 있습니다. 코드 가독성이 높아집니다.
 
     위치 인자는 키워드 인자보다 앞에 와야 합니다.
-  tips:
-  - 위치 인자는 키워드 인자보다 앞에 와야 합니다.
   snippet: |-
     def introduce(name, age, city):
         return name + ' ' + str(age) + ' ' + city
@@ -128,8 +124,6 @@ sections:
     위치 인자와 키워드 인자를 함께 사용할 수 있습니다. 위치 인자를 먼저 쓰고 키워드 인자를 뒤에 씁니다. 필수 매개변수는 위치로, 선택적 매개변수는 키워드로 전달하면 편리합니다.
 
     기본값이 있는 매개변수는 키워드로 전달하면 가독성이 좋습니다.
-  tips:
-  - 기본값이 있는 매개변수는 키워드로 전달하면 가독성이 좋습니다.
   snippet: |-
     def orderFood(menu, quantity=1, spicy=False):
         result = menu + ' x' + str(quantity)
@@ -168,8 +162,6 @@ sections:
     *args는 임의 개수의 위치 인자를 받습니다. def 함수명(*args): 형식으로 쓰며, args는 튜플로 전달됩니다. 몇 개의 인자가 올지 모를 때 사용합니다.
 
     args는 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
-  tips:
-  - args는 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
   snippet: |-
     def sumAll(*args):
         total = 0
@@ -208,8 +200,6 @@ sections:
     *args는 일반 매개변수와 함께 사용할 수 있습니다. 일반 매개변수를 먼저 쓰고 *args를 뒤에 씁니다. 필수 인자와 선택적 인자를 함께 받을 때 유용합니다.
 
     *args 뒤에는 키워드 전용 매개변수만 올 수 있습니다.
-  tips:
-  - '*args 뒤에는 키워드 전용 매개변수만 올 수 있습니다.'
   snippet: |-
     def makeList(first, *rest):
         result = [first]
@@ -248,8 +238,6 @@ sections:
     **kwargs는 임의 개수의 키워드 인자를 받습니다. def 함수명(**kwargs): 형식으로 쓰며, kwargs는 딕셔너리로 전달됩니다. 키-값 쌍을 여러 개 받을 때 사용합니다.
 
     kwargs도 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
-  tips:
-  - kwargs도 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
   snippet: |-
     def printInfo(**kwargs):
         result = ''
@@ -288,8 +276,6 @@ sections:
     **kwargs는 일반 매개변수, *args와 함께 사용할 수 있습니다. 순서는 일반 매개변수, *args, **kwargs입니다. 매우 유연한 함수를 만들 수 있습니다.
 
     **kwargs는 설정이나 옵션을 받을 때 매우 유용합니다.
-  tips:
-  - '**kwargs는 설정이나 옵션을 받을 때 매우 유용합니다.'
   snippet: |-
     def createUser(userId, **options):
         info = 'User: ' + userId
@@ -332,8 +318,6 @@ sections:
     *args와 **kwargs를 함께 사용하면 모든 종류의 인자를 받을 수 있습니다. def 함수명(*args, **kwargs): 형식으로 쓰며, 위치 인자는 args로, 키워드 인자는 kwargs로 전달됩니다.
 
     매우 유연하지만 과도한 사용은 코드 가독성을 해칠 수 있습니다.
-  tips:
-  - 매우 유연하지만 과도한 사용은 코드 가독성을 해칠 수 있습니다.
   snippet: |-
     def flexibleFunc(*args, **kwargs):
         posCount = len(args)
@@ -370,8 +354,6 @@ sections:
     lambda는 이름 없는 함수를 만듭니다. lambda 매개변수: 표현식 형식으로 쓰며, 표현식의 결과가 자동으로 반환됩니다. 간단한 함수를 한 줄로 만들 때 사용합니다.
 
     lambda는 한 줄 표현식만 가능하며, 복잡한 로직에는 일반 함수를 사용하세요.
-  tips:
-  - lambda는 한 줄 표현식만 가능하며, 복잡한 로직에는 일반 함수를 사용하세요.
   snippet: |-
     square = lambda x: x * x
     square(5)
@@ -400,8 +382,6 @@ sections:
     lambda에서 조건식(삼항 연산자)을 사용할 수 있습니다. lambda 매개변수: 값1 if 조건 else 값2 형식으로 쓰며, 조건에 따라 다른 값을 반환할 수 있습니다.
 
     복잡한 조건은 lambda보다 일반 함수가 읽기 쉽습니다.
-  tips:
-  - 복잡한 조건은 lambda보다 일반 함수가 읽기 쉽습니다.
   snippet: |-
     checkEven = lambda n: 'even' if n % 2 == 0 else 'odd'
     checkEven(8)

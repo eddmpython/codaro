@@ -58,8 +58,6 @@ sections:
     sys는 파이썬 인터프리터와 관련된 시스템 정보를 제공하는 표준 라이브러리입니다. 버전 정보, 모듈 경로, 표준 스트림 등을 다룹니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 sys 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 sys 모듈을 사용할 수 있습니다.
   snippet: |-
     import sys
     import tempfile
@@ -85,8 +83,6 @@ sections:
     sys 모듈은 현재 실행 중인 파이썬의 버전 정보를 제공합니다. version_info는 major, minor, micro 버전을 튜플로 제공하며, 버전 비교에 활용할 수 있습니다.
 
     version_info는 튜플이므로 직접 비교 연산이 가능합니다.
-  tips:
-  - version_info는 튜플이므로 직접 비교 연산이 가능합니다.
   snippet: |-
     pythonVersion = sys.version
     pythonVersion
@@ -112,8 +108,6 @@ sections:
     sys.path는 파이썬이 모듈을 검색하는 디렉토리 목록입니다. sys.modules는 현재 로드된 모듈을 딕셔너리 형태로 관리합니다.
 
     sys.path를 수정하면 동적으로 모듈 검색 경로를 변경할 수 있습니다.
-  tips:
-  - sys.path를 수정하면 동적으로 모듈 검색 경로를 변경할 수 있습니다.
   snippet: |-
     searchPaths = sys.path
     searchPaths
@@ -139,8 +133,6 @@ sections:
     sys는 표준 입력, 출력, 에러 스트림을 제공합니다. stdin, stdout, stderr를 통해 입출력을 제어할 수 있습니다.
 
     Codaro 로컬 커널에서는 표준 스트림이 현재 실행 세션의 입출력 채널과 연결됩니다.
-  tips:
-  - Codaro 로컬 커널에서는 표준 스트림이 현재 실행 세션의 입출력 채널과 연결됩니다.
   snippet: |-
     stdoutStream = sys.stdout
     stdoutStream
@@ -166,8 +158,6 @@ sections:
     sys 모듈은 파이썬 인터프리터의 실행 환경 정보를 제공합니다. 실행 파일 경로, 설치 위치, 재귀 깊이 등을 확인할 수 있습니다.
 
     setrecursionlimit()로 재귀 깊이를 변경할 수 있지만 신중히 사용하세요.
-  tips:
-  - setrecursionlimit()로 재귀 깊이를 변경할 수 있지만 신중히 사용하세요.
   snippet: |-
     executablePath = sys.executable
     executablePath
@@ -193,8 +183,6 @@ sections:
     sys.argv는 명령행 인자를 리스트로 제공합니다. implementation은 파이썬 구현 정보를 담고 있습니다.
 
     CPython, PyPy, Jython 등 다양한 파이썬 구현체를 구분할 수 있습니다.
-  tips:
-  - CPython, PyPy, Jython 등 다양한 파이썬 구현체를 구분할 수 있습니다.
   snippet: |-
     commandArgs = sys.argv
     commandArgs

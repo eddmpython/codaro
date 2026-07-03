@@ -172,8 +172,6 @@ sections:
     imshow()는 2차원 배열을 이미지로 표시하는 함수입니다. 상관행렬을 imshow()에 전달하면 각 셀의 값에 따라 색상이 지정됩니다. 기본 컬러맵은 viridis로, 낮은 값은 보라색, 높은 값은 노란색으로 표시됩니다.
 
     ax.imshow(2D배열)로 히트맵을 그립니다. 반환값(im)은 이미지 객체로, 나중에 컬러바를 추가할 때 사용합니다. 기본적으로 배열의 값 범위에 맞춰 색상이 자동으로 매핑됩니다.
-  tips:
-  - ax.imshow(2D배열)로 히트맵을 그립니다. 반환값(im)은 이미지 객체로, 나중에 컬러바를 추가할 때 사용합니다. 기본적으로 배열의 값 범위에 맞춰 색상이 자동으로 매핑됩니다.
   snippet: |-
     figHeat, axHeat = plt.subplots(figsize=(8, 6))
     im = axHeat.imshow(corrMatrix)
@@ -455,8 +453,6 @@ sections:
     지금까지 배운 내용을 활용해서 다양한 데이터의 상관관계를 분석해봅시다. imshow, cmap, colorbar, text 등 모든 개념을 종합적으로 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import matplotlib.pyplot as plt
     import seaborn as sns

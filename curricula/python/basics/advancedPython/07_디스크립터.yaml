@@ -59,8 +59,6 @@ sections:
     디스크립터는 속성 접근을 가로채는 객체입니다. __get__, __set__, __delete__ 중 하나 이상을 구현하면 디스크립터가 됩니다. 클래스 속성으로 할당된 디스크립터는 해당 속성에 접근할 때 자동으로 호출됩니다. __get__(self, obj, objtype)은 속성을 읽을 때, __set__(self, obj, value)는 속성에 값을 할당할 때, __delete__(self, obj)는 속성을 삭제할 때 호출됩니다. obj는 인스턴스, objtype은 클래스입니다. 클래스에서 직접 접근하면 obj는 None입니다.
 
     __set_name__(self, owner, name)은 클래스 생성 시 자동으로 호출되어 속성 이름을 알려줍니다.
-  tips:
-  - __set_name__(self, owner, name)은 클래스 생성 시 자동으로 호출되어 속성 이름을 알려줍니다.
   snippet: |-
     class Verbose:
         def __get__(self, obj, objtype=None):
@@ -104,8 +102,6 @@ sections:
     비데이터 디스크립터(non-data descriptor)는 __get__만 정의합니다. 인스턴스 __dict__에 같은 이름의 속성이 있으면 그것이 우선합니다. 함수, classmethod, staticmethod가 비데이터 디스크립터입니다. 함수는 클래스에서 정의되면 비데이터 디스크립터가 되어, 인스턴스에서 접근할 때 바운드 메서드로 변환됩니다. 비데이터 디스크립터는 인스턴스별로 다른 값을 가질 수 있게 합니다.
 
     함수가 메서드로 동작하는 것도 함수의 __get__이 self를 바인딩하기 때문입니다.
-  tips:
-  - 함수가 메서드로 동작하는 것도 함수의 __get__이 self를 바인딩하기 때문입니다.
   snippet: |-
     class NonData:
         def __get__(self, obj, objtype=None):
@@ -145,8 +141,6 @@ sections:
     데이터 디스크립터(data descriptor)는 __get__과 __set__ 모두 정의합니다. 데이터 디스크립터는 인스턴스 __dict__보다 우선합니다. 따라서 인스턴스에서 속성에 값을 할당해도 디스크립터의 __set__이 호출됩니다. property가 데이터 디스크립터의 대표적인 예입니다. 데이터 디스크립터는 속성 접근을 완전히 제어할 때 사용합니다. __delete__만 있어도 데이터 디스크립터로 취급됩니다.
 
     __set__에서 실제로 아무것도 안 해도 데이터 디스크립터가 됩니다.
-  tips:
-  - __set__에서 실제로 아무것도 안 해도 데이터 디스크립터가 됩니다.
   snippet: |-
     class DataDesc:
         def __get__(self, obj, objtype=None):
@@ -198,8 +192,6 @@ sections:
     property는 파이썬 내장 디스크립터입니다. getter, setter, deleter 함수를 받아 속성처럼 동작합니다. property(fget, fset, fdel, doc)로 생성하거나 @property 데코레이터를 사용합니다. 내부적으로 __get__에서 fget을 호출하고, __set__에서 fset을 호출합니다. property를 직접 구현하면 디스크립터의 동작을 이해할 수 있습니다. classmethod, staticmethod도 디스크립터로 구현되어 있습니다.
 
     classmethod의 __get__은 첫 번째 인자로 클래스를 바인딩합니다.
-  tips:
-  - classmethod의 __get__은 첫 번째 인자로 클래스를 바인딩합니다.
   snippet: |-
     class Circle:
         def __init__(self, radius):
@@ -253,8 +245,6 @@ sections:
     디스크립터의 가장 일반적인 활용은 속성 검증입니다. __set__에서 값을 검증하고 조건에 맞지 않으면 예외를 발생시킵니다. 타입 검사, 범위 검사, 형식 검사 등 다양한 검증 로직을 캡슐화할 수 있습니다. 한 번 정의한 검증 디스크립터는 여러 클래스, 여러 속성에서 재사용할 수 있습니다. 이는 property의 setter마다 검증 코드를 반복하는 것보다 효율적입니다.
 
     dataclasses의 field와 함께 사용하면 더 강력한 데이터 검증이 가능합니다.
-  tips:
-  - dataclasses의 field와 함께 사용하면 더 강력한 데이터 검증이 가능합니다.
   snippet: |-
     class Typed:
         def __init__(self, expectedType):
@@ -326,8 +316,6 @@ sections:
     지연 로딩(lazy loading)은 속성에 처음 접근할 때만 값을 계산하고 이후에는 캐시된 값을 반환합니다. 비용이 많이 드는 계산이나 데이터 로딩에 유용합니다. 비데이터 디스크립터로 구현하면 첫 접근 후 인스턴스 __dict__에 저장되어 이후 접근은 디스크립터를 거치지 않습니다. Python 3.8+에서는 functools.cached_property가 이 패턴을 제공합니다.
 
     cached_property는 스레드 안전하지 않습니다. 멀티스레드에서는 주의가 필요합니다.
-  tips:
-  - cached_property는 스레드 안전하지 않습니다. 멀티스레드에서는 주의가 필요합니다.
   snippet: |-
     class LazyProperty:
         def __init__(self, func):

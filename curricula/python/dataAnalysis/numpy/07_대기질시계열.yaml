@@ -142,8 +142,6 @@ sections:
     NaN(Not a Number)은 '숫자가 아님'이라는 뜻으로, 결측값을 나타냅니다. 측정 장비 고장, 데이터 입력 누락 등으로 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. 실제 데이터 분석에서는 결측값 처리가 매우 중요합니다.
 
     np.isnan()은 NaN(Not a Number) 여부를 불리언 배열로 반환합니다. NaN은 결측값을 나타내는 특수한 부동소수점 값입니다.
-  tips:
-  - np.isnan()은 NaN(Not a Number) 여부를 불리언 배열로 반환합니다. NaN은 결측값을 나타내는 특수한 부동소수점 값입니다.
   snippet: |-
     mask = np.isnan(ozone)
     mask[:20]
@@ -278,8 +276,6 @@ sections:
     결측값을 다른 값으로 대체하는 것을 '대체(imputation)'라고 합니다. 가장 간단한 방법은 0으로 대체하는 것입니다. np.where(조건, 참일때 값, 거짓일때 값)을 사용해서 NaN이면 0을, 아니면 원래 값을 선택합니다. 단, 0으로 대체하면 평균이 왜곡될 수 있어서 주의가 필요합니다.
 
     np.where(condition, x, y)로 조건에 따라 값을 선택할 수 있습니다. 여기서는 NaN을 0으로 대체했습니다.
-  tips:
-  - np.where(condition, x, y)로 조건에 따라 값을 선택할 수 있습니다. 여기서는 NaN을 0으로 대체했습니다.
   snippet: |-
     filled = np.where(np.isnan(ozone), 0, ozone)
     filled[:20]
@@ -332,8 +328,6 @@ sections:
     np.zeros(크기)는 지정한 크기만큼 0으로 채워진 배열을 생성합니다. 대체 대신 NaN을 제거하고 유효한 데이터만 남기는 방법도 있습니다. ~mask는 mask의 반대(NaN이 아닌 위치)이므로, ozone[~mask]로 유효한 값들만 추출할 수 있습니다.
 
     np.zeros(shape)는 0으로 채워진 배열을 생성합니다. ~(틸다)는 불리언 배열을 반전시켜 NaN이 아닌 위치를 선택합니다.
-  tips:
-  - np.zeros(shape)는 0으로 채워진 배열을 생성합니다. ~(틸다)는 불리언 배열을 반전시켜 NaN이 아닌 위치를 선택합니다.
   snippet: |-
     count = np.sum(~mask)
     valid = np.zeros(count)
@@ -363,8 +357,6 @@ sections:
     NaN 외에 무한대(infinity)도 특수한 값입니다. 0으로 나누기 등의 연산에서 발생할 수 있습니다. np.isinf()는 무한대(inf, -inf) 여부를 확인하고, np.isfinite()는 값이 '유한한 숫자'인지(NaN도 아니고 무한대도 아닌) 확인합니다. 데이터 품질 검증에 유용합니다.
 
     np.isinf()는 무한대(inf, -inf) 여부를, np.isfinite()는 유한한 숫자인지(NaN과 inf가 아닌)를 검사합니다.
-  tips:
-  - np.isinf()는 무한대(inf, -inf) 여부를, np.isfinite()는 유한한 숫자인지(NaN과 inf가 아닌)를 검사합니다.
   snippet: |-
     solar = df['Solar.R'].values
     inf = np.any(np.isinf(solar[~np.isnan(solar)]))
@@ -394,8 +386,6 @@ sections:
     월별 오존 평균을 계산합니다.
 
     flatten()은 다차원 배열을 1차원으로 평탄화합니다. 복잡한 구조의 결과를 단순하게 만들 때 유용합니다.
-  tips:
-  - flatten()은 다차원 배열을 1차원으로 평탄화합니다. 복잡한 구조의 결과를 단순하게 만들 때 유용합니다.
   snippet: |-
     month = df['Month'].values
     months = np.unique(month)
@@ -545,8 +535,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import numpy as np
     import pandas as pd

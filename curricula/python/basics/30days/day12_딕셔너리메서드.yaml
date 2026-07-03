@@ -60,8 +60,6 @@ sections:
     get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다.
 
     get()은 설정값이나 옵션 처리에 매우 유용합니다.
-  tips:
-  - get()은 설정값이나 옵션 처리에 매우 유용합니다.
   snippet: |-
     config = {'host': 'localhost', 'port': 8080}
     config.get('host')
@@ -90,8 +88,6 @@ sections:
     keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다.
 
     keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
-  tips:
-  - keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
   snippet: |-
     grade = {'math': 85, 'english': 90, 'science': 88}
     grade.keys()
@@ -120,8 +116,6 @@ sections:
     values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다.
 
     values()는 값의 존재 확인이나 통계 계산에 유용합니다.
-  tips:
-  - values()는 값의 존재 확인이나 통계 계산에 유용합니다.
   snippet: |-
     exam = {'math': 85, 'english': 90, 'science': 88}
     exam.values()
@@ -150,8 +144,6 @@ sections:
     items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다.
 
     items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
-  tips:
-  - items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
   snippet: |-
     product = {'name': '노트북', 'price': 1200000, 'stock': 5}
     product.items()
@@ -180,8 +172,6 @@ sections:
     update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다.
 
     update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
-  tips:
-  - update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
   snippet: |-
     user = {'name': '김철수', 'age': 30}
     extra = {'city': '서울', 'job': 'developer'}
@@ -214,8 +204,6 @@ sections:
     pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다.
 
     pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
-  tips:
-  - pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
   snippet: |-
     stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
     stock.pop('mouse')
@@ -244,8 +232,6 @@ sections:
     popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다.
 
     popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
-  tips:
-  - popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
   snippet: |-
     queue = {'first': 1, 'second': 2, 'third': 3}
     queue.popitem()
@@ -274,8 +260,6 @@ sections:
     clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다.
 
     clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
-  tips:
-  - clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
   snippet: |-
     temp = {'a': 1, 'b': 2, 'c': 3}
     temp.clear()
@@ -306,8 +290,6 @@ sections:
     setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다.
 
     setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
-  tips:
-  - setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
   snippet: |-
     cache = {'name': '김철수', 'age': 30}
     cache.setdefault('name', '이영희')
@@ -336,8 +318,6 @@ sections:
     딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다.
 
     상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
-  tips:
-  - 상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
   snippet: |-
     setting = {'host': 'localhost', 'port': 8080}
     setting.update({'user': 'admin', 'timeout': 30})

@@ -86,8 +86,6 @@ sections:
     요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다. 모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다.
 
     요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다.
-  tips:
-  - 요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다.
   snippet: |-
     class CreateUserRequest(BaseModel):
         username: str = Field(min_length=3, max_length=50, description="사용자명")
@@ -728,8 +726,6 @@ sections:
     지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from pydantic import BaseModel, Field, computed_field
     from typing import Optional, Literal

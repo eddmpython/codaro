@@ -113,8 +113,6 @@ sections:
     COUNT(*)는 테이블의 전체 행 수를 셉니다. 집계 함수 중 가장 기본이 되는 함수로, 데이터가 몇 건인지 빠르게 파악할 때 사용합니다. 타이타닉 데이터에 몇 명의 승객이 기록되어 있는지 확인해봅시다. 이 정보는 이후 생존율 계산의 분모가 됩니다.
 
     COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다.
-  tips:
-  - COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다.
   snippet: duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
   exercise:
     prompt: 3단계. 전체 승객 수 세기 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
@@ -167,8 +165,6 @@ sections:
     DISTINCT는 중복을 제거한 고유 값만 반환합니다. 데이터에 어떤 값들이 존재하는지 파악할 때 유용합니다. 객실 등급(pclass)이 몇 종류인지, 어떤 값들인지 확인해봅시다. 타이타닉에는 1등석, 2등석, 3등석 세 가지 등급이 있으며, 등급에 따라 생존율이 크게 달랐습니다.
 
     DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
-  tips:
-  - DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
   snippet: duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
   exercise:
     prompt: 5단계. 고유 값 확인 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
@@ -189,8 +185,6 @@ sections:
     GROUP BY는 데이터를 특정 컬럼 기준으로 그룹화하여 집계합니다. 엑셀의 피벗 테이블과 비슷한 개념으로, 범주별 통계를 낼 때 필수적입니다. 객실 등급별로 승객이 몇 명인지 세어봅시다. 1등석, 2등석, 3등석 승객 수의 차이를 통해 당시 사회 구조를 엿볼 수 있습니다.
 
     GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
-  tips:
-  - GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
   snippet: |-
     duckdb.sql("""
         SELECT pclass, COUNT(*) AS passengers
@@ -221,8 +215,6 @@ sections:
     SUM() 함수는 숫자 컬럼의 합계를 계산합니다. survived 컬럼은 생존=1, 사망=0으로 코딩되어 있으므로, SUM(survived)는 곧 생존자 수가 됩니다. 객실 등급별 생존자 수를 계산해봅시다. 이 결과를 보면 1등석 승객의 생존자가 많다는 것을 알 수 있지만, 정확한 비교를 위해서는 생존율(비율)을 계산해야 합니다.
 
     survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
-  tips:
-  - survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
   snippet: |-
     duckdb.sql("""
         SELECT pclass, SUM(survived) AS survivors
@@ -253,8 +245,6 @@ sections:
     AVG() 함수로 평균을 계산합니다. survived 컬럼이 0과 1로만 이루어져 있으므로, AVG(survived)는 1의 비율, 즉 생존율이 됩니다. 예를 들어 10명 중 6명이 생존했다면 평균은 0.6이고, 이는 60% 생존율을 의미합니다. 100을 곱하면 퍼센트로 표시됩니다. 이 방법은 이진(0/1) 데이터의 비율을 계산하는 표준적인 SQL 패턴입니다.
 
     AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다.
-  tips:
-  - AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -289,8 +279,6 @@ sections:
     MIN()과 MAX() 함수로 최소값과 최대값을 구합니다. 데이터의 범위를 파악하는 데 유용하며, 이상치를 탐지하는 데도 활용됩니다. 객실 등급별 요금(fare) 범위를 확인해봅시다. 1등석은 최저 0달러부터 최고 500달러가 넘는 요금까지 분포하며, 3등석은 상대적으로 좁은 범위를 가집니다.
 
     MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
-  tips:
-  - MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -329,8 +317,6 @@ sections:
     ORDER BY 절은 쿼리 결과를 특정 컬럼 기준으로 정렬합니다. 기본적으로 오름차순(ASC, 작은 값 먼저)으로 정렬되며, 데이터를 보기 좋게 정리하거나 상위/하위 항목을 찾을 때 필수입니다. 생존율이 낮은 순서부터 높은 순서로 정렬해봅시다. 어느 등급의 생존율이 가장 낮았는지 명확하게 볼 수 있습니다.
 
     ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
-  tips:
-  - ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -369,8 +355,6 @@ sections:
     DESC(descending)를 ORDER BY 뒤에 붙이면 내림차순(큰 값 먼저)으로 정렬됩니다. 실무에서는 "상위 10개", "가장 많이 팔린 상품" 같은 분석에 DESC를 자주 사용합니다. 생존율이 높은 등급부터 표시해봅시다. 1등석 승객의 생존율이 가장 높고, 3등석이 가장 낮다는 것을 명확하게 확인할 수 있습니다.
 
     DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다.
-  tips:
-  - DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다.
   snippet: |-
     duckdb.sql("""
         SELECT
@@ -500,8 +484,6 @@ sections:
     배운 GROUP BY와 집계 함수를 활용하여 타이타닉 데이터를 다양한 관점에서 분석합니다. COUNT, SUM, AVG, MIN, MAX를 적절히 조합하고 ORDER BY로 결과를 정렬하면 의미 있는 인사이트를 도출할 수 있습니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import duckdb

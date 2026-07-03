@@ -61,8 +61,6 @@ sections:
     namedtuple은 인덱스 대신 이름으로 요소에 접근할 수 있는 튜플입니다. 일반 튜플처럼 불변(immutable)이고 해시 가능합니다. 메모리 효율적이며 일반 클래스보다 가볍습니다. _fields, _asdict(), _replace() 등 유용한 메서드를 제공합니다. 간단한 데이터 구조에 적합하며, 더 복잡한 경우 dataclass를 사용합니다. Python 3.6+에서는 typing.NamedTuple로 타입 힌트를 추가할 수 있습니다.
 
     namedtuple은 CSV 행이나 데이터베이스 레코드를 표현할 때 유용합니다.
-  tips:
-  - namedtuple은 CSV 행이나 데이터베이스 레코드를 표현할 때 유용합니다.
   snippet: |-
     from collections import namedtuple
 
@@ -93,8 +91,6 @@ sections:
     defaultdict는 존재하지 않는 키에 접근할 때 자동으로 기본값을 생성합니다. 생성자에 팩토리 함수를 전달합니다. list, int, set 등을 팩토리로 자주 사용합니다. 그룹화, 카운팅, 집계 등의 패턴에서 if 키 존재 검사를 제거합니다. 일반 딕셔너리처럼 모든 메서드를 사용할 수 있습니다. 중첩 defaultdict로 다차원 구조도 만들 수 있습니다.
 
     defaultdict(lambda: '기본값')처럼 람다로 커스텀 기본값을 만들 수 있습니다.
-  tips:
-  - 'defaultdict(lambda: ''기본값'')처럼 람다로 커스텀 기본값을 만들 수 있습니다.'
   snippet: |-
     from collections import defaultdict
 
@@ -134,8 +130,6 @@ sections:
     Counter는 해시 가능한 객체의 개수를 세는 특수 딕셔너리입니다. iterable을 전달하면 자동으로 빈도를 계산합니다. most_common(n)으로 가장 흔한 n개를 가져옵니다. Counter끼리 +, -, &, | 연산이 가능합니다. elements()로 개수만큼 요소를 반복합니다. 텍스트 분석, 투표 집계 등에 유용합니다.
 
     Counter()는 빈 카운터, Counter(a=1, b=2)는 직접 지정도 가능합니다.
-  tips:
-  - Counter()는 빈 카운터, Counter(a=1, b=2)는 직접 지정도 가능합니다.
   snippet: |-
     from collections import Counter
 
@@ -167,8 +161,6 @@ sections:
     deque(double-ended queue)는 양 끝에서 O(1) 시간에 추가/삭제가 가능합니다. 리스트의 왼쪽 삽입/삭제는 O(n)이지만 deque는 O(1)입니다. maxlen을 지정하면 고정 크기 버퍼로 동작합니다. rotate(n)으로 요소를 회전할 수 있습니다. 큐, 스택, 슬라이딩 윈도우 등에 사용합니다. appendleft, popleft, extendleft 등 왼쪽 연산을 지원합니다.
 
     deque는 스레드 안전한 append와 popleft를 제공합니다.
-  tips:
-  - deque는 스레드 안전한 append와 popleft를 제공합니다.
   snippet: |-
     from collections import deque
 
@@ -202,8 +194,6 @@ sections:
     OrderedDict는 삽입 순서를 보장하는 딕셔너리입니다. Python 3.7+에서 일반 dict도 순서를 보장하지만, OrderedDict는 추가 기능이 있습니다. move_to_end()로 요소를 끝으로 이동할 수 있습니다. 순서까지 고려하여 동등성을 비교합니다. popitem(last=False)로 첫 번째 항목을 제거할 수 있습니다. LRU 캐시 구현 등에 유용합니다.
 
     일반적인 경우 Python 3.7+ dict로 충분하며, 특수 기능이 필요할 때 OrderedDict를 사용합니다.
-  tips:
-  - 일반적인 경우 Python 3.7+ dict로 충분하며, 특수 기능이 필요할 때 OrderedDict를 사용합니다.
   snippet: |-
     from collections import OrderedDict
 
@@ -239,8 +229,6 @@ sections:
     ChainMap은 여러 딕셔너리를 하나처럼 연결합니다. 키 검색은 첫 번째 딕셔너리부터 순서대로 진행됩니다. 쓰기 작업은 첫 번째 딕셔너리에만 적용됩니다. 설정 계층(기본값 → 사용자 설정 → 환경변수)에 유용합니다. new_child()로 새 계층을 추가할 수 있습니다. maps 속성으로 원본 딕셔너리 리스트에 접근합니다.
 
     ChainMap은 복사 없이 여러 딕셔너리를 논리적으로 합칩니다.
-  tips:
-  - ChainMap은 복사 없이 여러 딕셔너리를 논리적으로 합칩니다.
   snippet: |-
     from collections import ChainMap
 

@@ -123,8 +123,6 @@ sections:
     model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
 
     엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
-  tips:
-  - 엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
   snippet: |-
     class StrictData(BaseModel):
         model_config = {"strict": True}
@@ -442,8 +440,6 @@ sections:
     model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
 
     mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
-  tips:
-  - mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
   snippet: |-
     class Sample(BaseModel):
         createdAt: datetime

@@ -86,8 +86,6 @@ sections:
     sklearn.datasets에는 다양한 내장 데이터셋이 있습니다. load_wine()은 이탈리아 한 지역에서 재배한 세 가지 품종의 와인 178개 샘플을 제공합니다. 13가지 화학 성분(알코올, 산도, 마그네슘 등) 측정값이 특성입니다.
 
     load_wine()은 Bunch 객체를 반환합니다. data는 특성(X), target은 레이블(y), feature_names는 컬럼명, target_names는 클래스명입니다.
-  tips:
-  - load_wine()은 Bunch 객체를 반환합니다. data는 특성(X), target은 레이블(y), feature_names는 컬럼명, target_names는 클래스명입니다.
   snippet: |-
     from sklearn.datasets import load_wine
     import pandas as pd
@@ -243,8 +241,6 @@ sections:
     학습된 모델로 테스트 데이터의 품종을 예측합니다. predict()는 클래스 레이블을, predict_proba()는 각 클래스의 확률을 반환합니다.
 
     predict_proba()는 각 클래스에 속할 확률을 반환합니다. 3개 클래스이므로 각 샘플마다 3개의 확률값이 나오고, 합은 1입니다. 가장 높은 확률의 클래스가 예측 결과입니다.
-  tips:
-  - predict_proba()는 각 클래스에 속할 확률을 반환합니다. 3개 클래스이므로 각 샘플마다 3개의 확률값이 나오고, 합은 1입니다. 가장 높은 확률의 클래스가 예측 결과입니다.
   snippet: |-
     yPred = model.predict(xTestSc)
     yPred
@@ -270,8 +266,6 @@ sections:
     정확도(accuracy)는 전체 샘플 중 올바르게 예측한 비율입니다. 가장 직관적인 평가 지표이지만, 클래스 불균형이 있으면 오해를 줄 수 있습니다.
 
     accuracy_score(실제값, 예측값) 순서입니다. 0.97은 97%를 의미합니다. 모델이 테스트 데이터의 97%를 올바르게 분류했습니다.
-  tips:
-  - accuracy_score(실제값, 예측값) 순서입니다. 0.97은 97%를 의미합니다. 모델이 테스트 데이터의 97%를 올바르게 분류했습니다.
   snippet: |-
     from sklearn.metrics import accuracy_score
 
@@ -434,8 +428,6 @@ sections:
     품질 관리 담당자가 되어 와인 품종 분류 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, accuracy_score, confusion_matrix를 모두 활용합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     from sklearn.datasets import load_wine
     from sklearn.model_selection import train_test_split

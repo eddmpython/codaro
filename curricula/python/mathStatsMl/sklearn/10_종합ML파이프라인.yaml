@@ -147,8 +147,6 @@ sections:
     분석에 사용할 특성을 선택하고 수치형/범주형으로 분류합니다.
 
     Age와 Embarked에 결측치가 있습니다. Pipeline에서 SimpleImputer로 자동 처리합니다.
-  tips:
-  - Age와 Embarked에 결측치가 있습니다. Pipeline에서 SimpleImputer로 자동 처리합니다.
   snippet: |-
     numCols = ["Age", "SibSp", "Parch", "Fare"]
     catCols = ["Pclass", "Sex", "Embarked"]
@@ -184,8 +182,6 @@ sections:
     학습/테스트 데이터로 분할합니다. 파이프라인 구축 전에 분할하여 데이터 누수를 방지합니다.
 
     전처리(스케일링, 인코딩)는 반드시 분할 후 학습 데이터에만 fit하고 테스트 데이터에는 transform만 적용합니다. Pipeline이 이를 자동으로 처리합니다.
-  tips:
-  - 전처리(스케일링, 인코딩)는 반드시 분할 후 학습 데이터에만 fit하고 테스트 데이터에는 transform만 적용합니다. Pipeline이 이를 자동으로 처리합니다.
   snippet: |-
     xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     xTrain.shape, xTest.shape
@@ -211,8 +207,6 @@ sections:
     ColumnTransformer로 수치형/범주형 컬럼에 다른 전처리를 적용합니다.
 
     ColumnTransformer는 컬럼별로 다른 변환을 적용합니다. remainder='passthrough'로 나머지 컬럼을 유지하거나 'drop'으로 제거할 수 있습니다.
-  tips:
-  - ColumnTransformer는 컬럼별로 다른 변환을 적용합니다. remainder='passthrough'로 나머지 컬럼을 유지하거나 'drop'으로 제거할 수 있습니다.
   snippet: |-
     numPipeline = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
@@ -260,8 +254,6 @@ sections:
     전처리와 모델을 하나의 파이프라인으로 연결합니다. fit과 predict가 한 번에 실행됩니다.
 
     Pipeline.fit()은 모든 전처리 단계의 fit_transform()과 마지막 모델의 fit()을 순차적으로 실행합니다. predict()도 마찬가지입니다.
-  tips:
-  - Pipeline.fit()은 모든 전처리 단계의 fit_transform()과 마지막 모델의 fit()을 순차적으로 실행합니다. predict()도 마찬가지입니다.
   snippet: |-
     fullPipeline = Pipeline([
         ("preprocessor", preprocessor),
@@ -292,8 +284,6 @@ sections:
     파이프라인 전체에 교차검증을 적용합니다. 각 폴드에서 전처리도 다시 수행됩니다.
 
     파이프라인에 교차검증을 적용하면 각 폴드에서 전처리가 독립적으로 수행되어 데이터 누수를 완벽히 방지합니다.
-  tips:
-  - 파이프라인에 교차검증을 적용하면 각 폴드에서 전처리가 독립적으로 수행되어 데이터 누수를 완벽히 방지합니다.
   snippet: |-
     cvScores = cross_val_score(fullPipeline, xTrain, yTrain, cv=5, scoring="accuracy")
     print(f"CV Scores: {cvScores}")
@@ -320,8 +310,6 @@ sections:
     파이프라인의 모델 파라미터를 GridSearchCV로 튜닝합니다. 파라미터명에 단계명을 접두사로 붙입니다.
 
     파이프라인 파라미터명 형식: '단계명__파라미터명'. classifier__n_estimators는 classifier 단계의 n_estimators 파라미터입니다.
-  tips:
-  - '파이프라인 파라미터명 형식: ''단계명__파라미터명''. classifier__n_estimators는 classifier 단계의 n_estimators 파라미터입니다.'
   snippet: |-
     paramGrid = {
         "classifier__n_estimators": [50, 100],
@@ -464,8 +452,6 @@ sections:
     파이프라인에서 특성 중요도를 추출합니다. OneHotEncoder로 생성된 특성명을 복원합니다.
 
     타이타닉 생존 예측에서 Sex(성별), Fare(요금), Age(나이), Pclass(좌석등급)가 중요한 요인입니다. 여성, 고가 티켓, 1등석 승객의 생존율이 높았습니다.
-  tips:
-  - 타이타닉 생존 예측에서 Sex(성별), Fare(요금), Age(나이), Pclass(좌석등급)가 중요한 요인입니다. 여성, 고가 티켓, 1등석 승객의 생존율이 높았습니다.
   snippet: |-
     numFeatures = numCols
     catEncoder = bestPipe.named_steps["preprocessor"].named_transformers_["cat"].named_steps["encoder"]
@@ -496,8 +482,6 @@ sections:
     지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
-  tips:
-  - 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   snippet: |-
     import pandas as pd
     import numpy as np

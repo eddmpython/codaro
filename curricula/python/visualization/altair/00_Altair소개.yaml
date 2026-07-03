@@ -396,8 +396,6 @@ sections:
     Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
 
     Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
-  tips:
-  - Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
   snippet: |-
     import altair as alt
     from codaro.curriculum.localData import loadLocalDataset

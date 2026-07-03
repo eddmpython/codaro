@@ -57,8 +57,6 @@ sections:
     string은 파이썬 표준 라이브러리입니다. 문자열 처리에 유용한 상수와 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
     이 섹션을 먼저 실행하면 아래 모든 예제에서 string 모듈을 사용할 수 있습니다.
-  tips:
-  - 이 섹션을 먼저 실행하면 아래 모든 예제에서 string 모듈을 사용할 수 있습니다.
   snippet: |-
     import secrets
     import string
@@ -88,8 +86,6 @@ sections:
     string 모듈은 자주 사용하는 문자 집합을 미리 정의한 상수를 제공합니다. ascii_letters는 모든 영문자, digits는 숫자, punctuation은 특수문자를 포함합니다. 입력 검증, 랜덤 문자열 생성, 비밀번호 정책에 활용됩니다.
 
     이 상수들은 불변 문자열이므로 직접 수정할 수 없습니다. 필요하면 복사해서 사용하세요.
-  tips:
-  - 이 상수들은 불변 문자열이므로 직접 수정할 수 없습니다. 필요하면 복사해서 사용하세요.
   snippet: |-
     allLetters = string.ascii_letters
     allLetters
@@ -115,8 +111,6 @@ sections:
     string 상수를 활용하여 입력 문자열을 검증할 수 있습니다. 문자열이 특정 문자 집합으로만 구성되어 있는지 확인하거나, 허용되지 않은 문자가 포함되어 있는지 검사합니다. 사용자 입력 검증, 데이터 정제에 필수적입니다.
 
     보안이 중요한 경우 secrets 모듈로 비밀번호를 생성하세요. random은 예측 가능합니다.
-  tips:
-  - 보안이 중요한 경우 secrets 모듈로 비밀번호를 생성하세요. random은 예측 가능합니다.
   snippet: |-
     inputText = '12345'
     isOnlyDigits = all(c in string.digits for c in inputText)
@@ -144,8 +138,6 @@ sections:
     string.Template은 $변수명 형식의 간단한 문자열 템플릿을 제공합니다. substitute()로 값을 치환하고, safe_substitute()는 누락된 변수를 그대로 둡니다. 설정 파일, 이메일 템플릿, 보고서 생성에 유용합니다.
 
     f-string이나 format()보다 간단하지만 기능이 제한적입니다. 복잡한 포맷팅은 f-string을 사용하세요.
-  tips:
-  - f-string이나 format()보다 간단하지만 기능이 제한적입니다. 복잡한 포맷팅은 f-string을 사용하세요.
   snippet: |-
     greetTemplate = string.Template('Hello, $name!')
     greetMessage = greetTemplate.substitute(name='Alice')
@@ -173,8 +165,6 @@ sections:
     string.Formatter는 format() 메서드의 동작을 커스터마이즈할 수 있습니다. vformat()으로 직접 포맷팅하고, parse()로 포맷 문자열을 분석합니다. 도메인 특화 포맷팅, 다국어 지원, 커스텀 변환에 활용됩니다.
 
     대부분의 경우 f-string이나 .format()이 더 편리합니다. Formatter는 고급 커스터마이징이 필요할 때만 사용하세요.
-  tips:
-  - 대부분의 경우 f-string이나 .format()이 더 편리합니다. Formatter는 고급 커스터마이징이 필요할 때만 사용하세요.
   snippet: |-
     formatter = string.Formatter()
     formattedText = formatter.vformat('{0}님의 점수: {1}', ('Alice', 95), {})
@@ -202,8 +192,6 @@ sections:
     string 모듈은 문자열 처리 유틸리티 함수를 제공합니다. capwords()는 각 단어의 첫 글자를 대문자로 변환합니다. str 메서드와 유사하지만 미묘한 차이가 있어 특정 상황에서 유용합니다.
 
     str.title()과 비슷하지만 capwords()는 여러 공백을 하나로 정규화합니다.
-  tips:
-  - str.title()과 비슷하지만 capwords()는 여러 공백을 하나로 정규화합니다.
   snippet: |-
     sentence = 'hello world from python'
     titleCased = string.capwords(sentence)
@@ -231,8 +219,6 @@ sections:
     실무에서 자주 사용하는 string 모듈 활용 패턴을 살펴봅니다. 비밀번호 생성, 입력 검증, 이메일 템플릿, 식별자 생성 등 다양한 시나리오에서 string을 효과적으로 사용할 수 있습니다.
 
     보안이 중요한 비밀번호 생성은 secrets.choice()를 사용하세요.
-  tips:
-  - 보안이 중요한 비밀번호 생성은 secrets.choice()를 사용하세요.
   snippet: |-
     charset = string.ascii_letters + string.digits
     randomString = ''.join(secrets.choice(charset) for _ in range(8))
@@ -260,8 +246,6 @@ sections:
     string 모듈은 단순 상수 모음이 아니라 입력 검증, 안전한 코드 생성, 템플릿 누락 확인에 연결할 때 실무 가치가 커집니다. 여기서는 계정 초대 메시지를 만들면서 허용 문자, 누락 변수, 출력 형식을 검증합니다.
 
     실무 변주: 초대 코드 길이와 허용 문자 정책을 팀별로 다르게 두고, 템플릿 누락 변수 리포트를 운영 로그 형식으로 바꿔 보세요.
-  tips:
-  - '실무 변주: 초대 코드 길이와 허용 문자 정책을 팀별로 다르게 두고, 템플릿 누락 변수 리포트를 운영 로그 형식으로 바꿔 보세요.'
   snippet: |-
     safeAlphabet = ''.join(
         c for c in string.ascii_uppercase + string.digits
