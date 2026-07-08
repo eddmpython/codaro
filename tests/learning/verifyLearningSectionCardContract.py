@@ -75,7 +75,8 @@ def main() -> int:
         "exercise selected state marker": "data-learning-exercise-input-state={exerciseSelected ? \"selected\" : \"ready\"}",
         "exercise direct editor title": "직접 해보기",
         "exercise direct editor aria label": "직접 해보기 코드 편집기",
-        "exercise check accent button": "bg-accent-brand",
+        "accent action token": "bg-accent-brand",
+        "run success completion record": "recordLessonMissionComplete",
         "result marker": 'data-learning-section-part="result"',
         "section narrative renderer": "function SectionNarrative",
         "structured body renderer": "function StructuredSectionLearningBody",
@@ -167,7 +168,7 @@ def main() -> int:
         require(source, token, label, failures)
 
     markdown_body_tokens = {
-        "reading column width": "max-w-[70ch]",
+        "reading column width": "max-w-3xl",
         "reading body token": "text-md text-foreground",
         "bare list renderer": "function BareList",
         "top rule grid renderer": "function TopRuleGrid",
@@ -256,13 +257,6 @@ def main() -> int:
         "exercise before result",
         failures,
     )
-    require_order(
-        text,
-        'data-learning-section-part="result"',
-        'data-learning-section-part="check"',
-        "result before check",
-        failures,
-    )
 
     marker_count = text.count("data-learning-section-part")
     if marker_count < 4:
@@ -302,6 +296,10 @@ def main() -> int:
             "bg-zinc-950",
             "border-zinc-200",
             "🎉",
+            # 별도 검증 버튼과 채점 패널은 폐지 — 완료는 실습 셀 실행 성공으로 기록한다.
+            "data-learning-exercise-check",
+            "CheckResultPanel",
+            "runExerciseCheck",
         ),
         AI_PANEL: (
             "Codaro 어시스턴트",

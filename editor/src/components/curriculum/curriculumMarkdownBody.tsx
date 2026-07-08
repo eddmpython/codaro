@@ -19,7 +19,7 @@ import type { BlockConfig } from "@/types";
 import type { ReactNode } from "react";
 
 // 3계층 표면 모델 (curriculum-card-contract.md "카드 시각 규칙"의 SSOT 구현):
-//   읽기 계층  = bare 타이포 (박스·아이콘칩 없음, max-w-[70ch])
+//   읽기 계층  = bare 타이포 (박스·아이콘칩 없음, max-w-3xl)
 //   신호 계층  = 좌측 2px rail (border-l-2 + pl-4, 배경 없음)
 //   자료/상호작용 계층 = hairline 박스 (rounded-lg border, 코드는 bg-code)
 // 본문은 text-foreground 100%, muted는 키커·캡션·부제 전용.
@@ -32,7 +32,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const title = payloadText(payload, "title") || block.title || blockLabel(block);
     const subtitle = payloadText(payload, "subtitle") || block.description;
     return (
-      <div className="min-w-0 max-w-[70ch]">
+      <div className="min-w-0 max-w-3xl">
         <h2 className="text-lg font-semibold text-foreground">{stripMarkdown(title)}</h2>
         {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
       </div>
@@ -48,7 +48,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const points = payloadItems(payload, "points");
     return (
       <div className="space-y-4">
-        <div className="min-w-0 max-w-[70ch]">
+        <div className="min-w-0 max-w-3xl">
           <h2 className="text-lg font-semibold text-foreground">{stripMarkdown(title)}</h2>
           {subtitle ? <p className="mt-1.5 text-md text-foreground">{stripMarkdown(subtitle)}</p> : null}
           {description ? <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{stripMarkdown(description)}</p> : null}
@@ -128,11 +128,11 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const options = payloadTextList(payload.options);
     return (
       <div className="space-y-3">
-        <div className="min-w-0 max-w-[70ch]">
+        <div className="min-w-0 max-w-3xl">
           <div className="text-xs font-medium text-muted-foreground">확인 문제</div>
           <div className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(question)}</div>
         </div>
-        <div className="grid max-w-[70ch] gap-2">
+        <div className="grid max-w-3xl gap-2">
           {options.map((option, index) => (
             <div className="flex items-start gap-3 rounded-lg border px-4 py-2.5 text-md text-foreground" key={`${option}-${index}`}>
               <span className="mt-1 text-xs font-medium tabular-nums text-muted-foreground">{index + 1}</span>
@@ -213,7 +213,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
   return (
     <div className="space-y-3">
       {block.description ? (
-        <p className="max-w-[70ch] text-sm leading-6 text-muted-foreground">{block.description}</p>
+        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{block.description}</p>
       ) : null}
       <MarkdownBlock content={block.content} />
     </div>
@@ -224,7 +224,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
 function SectionLead({ title, subtitle }: { title?: string; subtitle?: string }) {
   if (!title && !subtitle) return null;
   return (
-    <div className="min-w-0 max-w-[70ch]">
+    <div className="min-w-0 max-w-3xl">
       {title ? <h3 className="text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3> : null}
       {subtitle ? <p className={cn("text-sm leading-6 text-muted-foreground", title && "mt-0.5")}>{stripMarkdown(subtitle)}</p> : null}
     </div>
@@ -369,7 +369,7 @@ function CalloutCell({ block, payload }: { block: BlockConfig; payload: Record<s
   const { rail, labelTone, Icon } = resolved;
 
   return (
-    <aside className={cn("min-w-0 max-w-[70ch] border-l-2 py-0.5 pl-4", rail)}>
+    <aside className={cn("min-w-0 max-w-3xl border-l-2 py-0.5 pl-4", rail)}>
       <div className={cn("flex items-center gap-1.5 text-xs font-semibold", labelTone)}>
         <Icon className="size-3.5" />
         {stripMarkdown(title)}
@@ -402,7 +402,7 @@ function StepPracticeCell({ block, payload }: { block: BlockConfig; payload: Rec
 
   return (
     <div className="space-y-3">
-      <div className="min-w-0 max-w-[70ch]">
+      <div className="min-w-0 max-w-3xl">
         <div className="text-xs font-medium text-muted-foreground">{stepNumber ? `STEP ${stepNumber}` : "실습 단계"}</div>
         <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {description ? <p className="mt-1 text-md text-foreground">{stripMarkdown(description)}</p> : null}
@@ -436,7 +436,7 @@ function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: R
 
   return (
     <div className="space-y-3">
-      <div className="min-w-0 max-w-[70ch]">
+      <div className="min-w-0 max-w-3xl">
         <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
         <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {content ? <p className="mt-1 text-md text-foreground">{stripMarkdown(content)}</p> : null}
@@ -446,7 +446,7 @@ function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: R
           <ScrollableCode code={code} />
         </div>
       ) : null}
-      {footerText ? <p className="max-w-[70ch] text-sm leading-6 text-muted-foreground">{stripMarkdown(footerText)}</p> : null}
+      {footerText ? <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{stripMarkdown(footerText)}</p> : null}
     </div>
   );
 }
@@ -514,7 +514,7 @@ function ConceptRowCell({ block, payload }: { block: BlockConfig; payload: Recor
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-[70ch] divide-y">
+        <div className="max-w-3xl divide-y">
           {rows.map((row, index) => {
             const concept = payloadText(row, "concept") || payloadText(row, "title") || payloadText(row, "term") || payloadText(row, "label") || "개념";
             const explain = payloadText(row, "explain") || payloadText(row, "explanation") || payloadText(row, "analogy") || payloadText(row, "description") || payloadText(row, "content");
@@ -580,7 +580,7 @@ function DefinitionCell({ block, payload }: { block: BlockConfig; payload: Recor
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-[70ch] divide-y">
+        <div className="max-w-3xl divide-y">
           {rows.map((row, index) => {
             const term = payloadText(row, "term") || payloadText(row, "title") || "용어";
             const english = payloadText(row, "english") || payloadText(row, "en");
@@ -614,7 +614,7 @@ function MisconceptionCell({ block, payload }: { block: BlockConfig; payload: Re
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-[70ch] space-y-3">
+        <div className="max-w-3xl space-y-3">
           {rows.map((row, index) => {
             const myth = payloadText(row, "myth") || payloadText(row, "wrong") || payloadText(row, "misconception");
             const truth = payloadText(row, "truth") || payloadText(row, "right") || payloadText(row, "fact") || payloadText(row, "reality");
@@ -645,7 +645,7 @@ function TimelineCell({ block, payload }: { block: BlockConfig; payload: Record<
   return (
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
-      <div className="max-w-[70ch] space-y-0">
+      <div className="max-w-3xl space-y-0">
         {rows.map((row, index) => {
           const label = payloadText(row, "step") || payloadText(row, "label") || String(index + 1);
           const head = payloadText(row, "title") || payloadText(row, "name");
@@ -905,7 +905,7 @@ function DetailList({ items, label }: { items: Array<Record<string, unknown>>; l
 // bare 불릿 리스트 — 읽기 계층. 항목별 박스·체크아이콘 없음.
 function BareList({ items, ordered = false }: { items: string[]; ordered?: boolean }) {
   return (
-    <ul className="max-w-[70ch] space-y-1.5">
+    <ul className="max-w-3xl space-y-1.5">
       {items.map((item, index) => (
         <li className="flex gap-2.5 text-md text-foreground" key={`${item}-${index}`}>
           {ordered ? (
@@ -1130,7 +1130,7 @@ function MarkdownBlock({ content }: { content: string }) {
   });
   flushLists("tail");
 
-  return <div className="min-w-0 max-w-[70ch] space-y-3 break-words">{rendered}</div>;
+  return <div className="min-w-0 max-w-3xl space-y-3 break-words">{rendered}</div>;
 }
 
 function ScrollableCode({ code }: { code: string }) {
