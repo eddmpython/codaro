@@ -44,16 +44,17 @@ EDITOR_ROOT = PROJECT_ROOT / "editor"
 
 
 def resolveCurriculaRoot() -> Path:
-    """base curriculum 콘텐츠 위치를 해석한다. 배포 wheel은 editor webBuild처럼 base curriculum을
-    codaro 패키지 안(codaro/curricula/python)에 번들하므로 그 경로를 우선하고, 개발 체크아웃에서는
-    repo 루트의 curricula/python으로 폴백한다. (PRD Bundle 전략: base install 기본 포함 = base curriculum)"""
+    """base curriculum 콘텐츠 위치를 해석한다. 개발 체크아웃에서는 repo 루트 curricula/python(SSOT)을
+    우선한다. 릴리즈 스테이징이 만드는 로컬 번들 사본(codaro/curricula)이 작업트리에 남아 있어도
+    낡은 사본이 원본을 가리면 안 된다. 배포 wheel에는 repo 루트 경로가 없으므로 패키지 번들이 잡힌다.
+    (Bundle 전략: base install 기본 포함 = base curriculum)"""
     configured = os.environ.get("CODARO_STUDY_DIR")
     if configured:
         return Path(configured).expanduser().resolve()
-    bundled = PACKAGE_ROOT / "curricula" / "python"
-    if bundled.exists():
-        return bundled
-    return PROJECT_ROOT / "curricula" / "python"
+    devRoot = PROJECT_ROOT / "curricula" / "python"
+    if devRoot.exists():
+        return devRoot
+    return PACKAGE_ROOT / "curricula" / "python"
 
 
 CURRICULA_ROOT = resolveCurriculaRoot()

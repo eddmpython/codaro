@@ -38,17 +38,18 @@ class StudyData(BaseModel):
 
 def _curriculaPythonRoot() -> Path:
     """server.resolveCurriculaRoot와 같은 규칙으로 base curriculum 루트를 찾는다:
-    CODARO_STUDY_DIR 환경변수 → 패키지 번들(codaro/curricula/python) → 개발 repo 루트 폴백."""
+    CODARO_STUDY_DIR 환경변수 → 개발 repo 루트(curricula/python, SSOT) → 패키지 번들 폴백.
+    개발 체크아웃에 릴리즈 스테이징 사본(codaro/curricula)이 남아 있어도 원본을 가리지 않는다."""
     import os
 
     configured = os.environ.get("CODARO_STUDY_DIR")
     if configured:
         return Path(configured).expanduser().resolve()
+    devRoot = Path(__file__).resolve().parents[3] / "curricula" / "python"
+    if devRoot.exists():
+        return devRoot
     packageRoot = Path(__file__).resolve().parent.parent  # src/codaro/
-    bundled = packageRoot / "curricula" / "python"
-    if bundled.exists():
-        return bundled
-    return Path(__file__).resolve().parents[3] / "curricula" / "python"
+    return packageRoot / "curricula" / "python"
 
 
 def _loadCurriculaRegistry() -> Any:
