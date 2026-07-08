@@ -291,58 +291,6 @@ sections:
     type: noError
     noError: 마지막 줄 값 확인하기의 마지막 표현식이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 마지막 줄 값 확인하기 실행 결과에 직접 바꾼 마지막 표현식 값이 표시되어야 합니다.
-- id: workflow_validation
-  title: 첫 실행 검증 루프
-  structuredPrimary: true
-  subtitle: 예측 → 실행 → 오류 확인 → 실무 출력
-  goal: 첫 실행 검증 루프에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
-  explanation: |-
-    처음 배우는 print()도 업무 코드처럼 검증할 수 있습니다. 화면에 보일 문장을 먼저 예상하고, 실제 출력 문자열을 캡처해서 비교합니다. 이렇게 하면 단순히 눈으로 보는 연습에서 벗어나 자동으로 맞고 틀림을 확인하는 습관을 만들 수 있습니다.
-
-    초보 단계에서도 assert를 쓰면 내가 예상한 출력과 실제 출력이 같은지 자동으로 확인할 수 있습니다. 이 습관이 나중에 데이터 분석, 자동화, 테스트 코드로 그대로 이어집니다.
-  snippet: |-
-    from contextlib import redirect_stdout
-    from io import StringIO
-
-    def capturePrintOutput(action):
-        stream = StringIO()
-        with redirect_stdout(stream):
-            action()
-        return stream.getvalue()
-
-    expectedOutput = "Hello World\n"
-    actualOutput = capturePrintOutput(lambda: print("Hello World"))
-
-    assert actualOutput == expectedOutput
-    actualOutput
-  exercise:
-    prompt: 첫 실행 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
-    starterCode: |-
-      from contextlib import redirect_stdout
-      from io import StringIO
-
-      def capturePrintOutput(action):
-          stream = StringIO()
-          with redirect_stdout(stream):
-              action()
-          return stream.getvalue()
-
-      expectedOutput = "Hello World\n"
-      actualOutput = capturePrintOutput(lambda: print("Hello World"))
-
-      assert actualOutput == expectedOutput
-      actualOutput
-    hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
-  check:
-    type: noError
-    noError: 첫 실행 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: 첫 실행 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
 - id: practice
   title: Day 1 종합 복습
   structuredPrimary: true
