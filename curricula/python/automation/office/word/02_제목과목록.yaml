@@ -17,7 +17,7 @@ meta:
     - automation.word.paragraphs
   estimatedMinutes: 35
   seo:
-    title: "Word 제목과 목록 — add_heading + List Bullet/Number"
+    title: "Word 제목과 목록 - add_heading + List Bullet/Number"
     description: "보고서 목차 골격을 만든다. add_heading 레벨별 제목과 List Bullet/Number 스타일로 정렬된 목록."
     keywords:
       - python-docx add_heading
@@ -27,7 +27,7 @@ meta:
 intro:
   direction: "보고서 목차 골격을 코드로 만든다. add_heading 레벨 1-3과 List Bullet/Number 스타일이 한 문서에 결합되는 패턴."
   benefits:
-    - "보고서 목차 자동 생성 — 헤더 + 본문 + 항목 구조를 한 함수 호출로."
+    - "보고서 목차 자동 생성 - 헤더 + 본문 + 항목 구조를 한 함수 호출로."
     - "List Bullet/Number 스타일이 docx 표준 스타일과 일관됨."
     - "10강 회의록 자동 생성기의 목차 골격 패턴이 본 강의에서 정착."
   diagram:
@@ -151,7 +151,7 @@ sections:
       resultCheck: "출력 5."
 
   - id: validation
-    title: "3단계. 검증 — 목차 골격 통합"
+    title: "3단계. 검증 - 목차 골격 통합"
     structuredPrimary: true
     subtitle: "buildReportSkeleton + 스타일 확인"
     goal: "보고서 골격을 만드는 함수 결과의 헤더 레벨과 목록 스타일을 한 셀에서 검증한다."
@@ -185,7 +185,7 @@ sections:
       assert len(bullets) == 4
       [(p.text, p.style.name) for p in reopened.paragraphs]
     exercise:
-      prompt: "buildReportSkeleton 함수의 빈 줄을 채우세요 — 각 section의 items를 List Number 스타일(번호 매김)로 출력하도록."
+      prompt: "buildReportSkeleton 함수의 빈 줄을 채우세요 - 각 section의 items를 List Number 스타일(번호 매김)로 출력하도록."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -216,7 +216,7 @@ sections:
       resultCheck: "출력 4 (List Number 단락 4개)."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "목차 골격 생성기"
     goal: "데이터 dict를 받아 헤더 + 본문 + 목록이 들어간 보고서 골격 함수를 만든다."
     why: "헤더 + 본문 + 목록이 결합된 골격은 한국식 주간 보고서·임원 브리핑·기획서의 99%가 따르는 형태입니다. 본 강의 패턴이 10강 회의록 생성기의 핵심 구조로 그대로 들어가며, dict → docx 매핑 사고가 모든 문서 자동화의 출발점이 됩니다."

@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.numericMath
   status: draft
   version: 1
-  note: "초안 — math·random 표준 모듈 오개념 시드. 사람이 정제 필요."
+  note: "초안 - math·random 표준 모듈 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.numericMath.missingImport

@@ -1,6 +1,6 @@
 meta:
   id: requests_13
-  title: 환율 조회·환산 — 매매기준율로 외화 인보이스를 원화로
+  title: 환율 조회·환산 - 매매기준율로 외화 인보이스를 원화로
   order: 13
   category: requests
   difficulty: ⭐⭐
@@ -19,7 +19,7 @@ meta:
     - automation.webApi.get
   estimatedMinutes: 45
   seo:
-    title: "환율 조회·환산 자동화 — 한국수출입은행 Open API로 외화 인보이스 원화 계산"
+    title: "환율 조회·환산 자동화 - 한국수출입은행 Open API로 외화 인보이스 원화 계산"
     description: "한국수출입은행 환율 Open API의 매매기준율(deal_bas_r)을 requests로 받아 decimal로 100단위 통화 보정과 ROUND_HALF_UP 반올림까지 정확히 원화로 환산한다. 무역·해외결제·회계 마감을 자동화한다."
     keywords:
       - 환율 조회
@@ -32,7 +32,7 @@ intro:
   direction: "외화 인보이스·해외결제·외화자산 평가를 매매기준율로 원화 환산하는 흐름을 자동화한다. 돈 계산이라 float이 아닌 decimal로 정확히 하고, JPY·IDR 같은 100단위 통화와 반올림 규칙까지 맞춘다."
   benefits:
     - "해외 인보이스를 매번 환율 사이트 보며 손계산하던 일을 코드 한 번으로. 회당 30분 × 결제 주기마다 반복되던 환산·검산을 없앤다."
-    - "돈은 float이면 오차가 쌓인다 — 0.1+0.2조차 0.3이 아니다. decimal로 계산하고 ROUND_HALF_UP으로 원화 단위까지 정확히 떨어뜨린다."
+    - "돈은 float이면 오차가 쌓인다 - 0.1+0.2조차 0.3이 아니다. decimal로 계산하고 ROUND_HALF_UP으로 원화 단위까지 정확히 떨어뜨린다."
     - "환율은 키 없이 샘플로 폴백하고, 파싱·100단위 보정·반올림은 표준 decimal만으로 네트워크 없이 검증한다."
   diagram:
     steps:
@@ -52,7 +52,7 @@ intro:
 
 sections:
   - id: parse_rate
-    title: "1단계. 환율 응답 파싱 — 콤마와 100단위 표기"
+    title: "1단계. 환율 응답 파싱 - 콤마와 100단위 표기"
     structuredPrimary: true
     subtitle: "deal_bas_r 콤마 제거 + cur_unit의 (100)"
     goal: "환율 API 응답 한 건에서 매매기준율을 decimal로 파싱하고, 통화 단위(1 또는 100)를 읽는다."
@@ -60,9 +60,9 @@ sections:
     explanation: |-
       한국수출입은행 환율 응답의 각 항목은 cur_unit(통화 코드), cur_nm(통화명), deal_bas_r(매매 기준율), ttb/tts(송금 받을 때/보낼 때) 등을 담는다. 우리는 환산 기준이 되는 deal_bas_r을 쓴다.
 
-      두 가지를 정규화한다. (1) deal_bas_r은 '1,389.5'처럼 천단위 콤마가 들어간 문자열이라 콤마를 떼고 Decimal로 만든다. (2) cur_unit이 'JPY(100)'이면 그 환율은 100엔 기준이므로 단위(unitSize)를 100으로 잡는다 — 1엔이 아니다.
+      두 가지를 정규화한다. (1) deal_bas_r은 '1,389.5'처럼 천단위 콤마가 들어간 문자열이라 콤마를 떼고 Decimal로 만든다. (2) cur_unit이 'JPY(100)'이면 그 환율은 100엔 기준이므로 단위(unitSize)를 100으로 잡는다 - 1엔이 아니다.
     tips:
-      - "deal_bas_r은 float()이 아니라 Decimal()로 만든다 — 돈 계산에 float을 쓰면 오차가 쌓인다."
+      - "deal_bas_r은 float()이 아니라 Decimal()로 만든다 - 돈 계산에 float을 쓰면 오차가 쌓인다."
       - "cur_unit에 '(100)'이 있으면 100단위 통화(엔·루피아 등)다. 단위를 안 나누면 100배 틀린다."
     snippet: |-
       from decimal import Decimal
@@ -118,7 +118,7 @@ sections:
 
       Decimal은 10진 소수를 있는 그대로 다룬다. Decimal('0.1') + Decimal('0.2')는 정확히 Decimal('0.3')이다. 환율·금액처럼 정확도가 중요한 값은 처음부터 Decimal로 만들고, 문자열로 생성한다(Decimal(0.1)은 float을 거쳐 다시 부정확해지므로 Decimal('0.1')로).
     tips:
-      - "Decimal은 문자열로 만든다 — Decimal('0.1')은 정확, Decimal(0.1)은 float을 거쳐 부정확하다."
+      - "Decimal은 문자열로 만든다 - Decimal('0.1')은 정확, Decimal(0.1)은 float을 거쳐 부정확하다."
       - "딱 떨어지는 정수 곱셈도 float이면 표시 오차가 날 수 있으니, 돈은 일관되게 Decimal로 다룬다."
     snippet: |-
       from decimal import Decimal
@@ -141,7 +141,7 @@ sections:
         total
       hints:
         - "빈칸에도 0.1을 넣어 0.1을 세 번 더한다."
-        - "Decimal은 문자열로 만들어야 정확하다 — \"0.1\"."
+        - "Decimal은 문자열로 만들어야 정확하다 - \"0.1\"."
       check:
         type: noError
         noError: "Decimal 덧셈이 예외 없이 끝나야 한다."
@@ -151,18 +151,18 @@ sections:
       resultCheck: "float은 0.1+0.2≠0.3, decimal은 정확히 0.3이다."
 
   - id: to_krw
-    title: "3단계. 원화 환산 — 100단위 보정과 반올림"
+    title: "3단계. 원화 환산 - 100단위 보정과 반올림"
     structuredPrimary: true
     subtitle: "금액 × 매매기준율 ÷ 단위, ROUND_HALF_UP"
     goal: "외화 금액을 매매기준율로 원화로 환산하되, 100단위 통화를 보정하고 원 단위로 반올림한다."
-    why: "원화는 1원 단위라 소수점을 반올림해 떨어뜨려야 한다. 그냥 round()는 사사오입(은행가 반올림)이라 4168.5를 4168로 내릴 수 있다 — 회계 관행인 ROUND_HALF_UP은 4169로 올린다. 규칙을 명시해야 검산이 맞는다."
+    why: "원화는 1원 단위라 소수점을 반올림해 떨어뜨려야 한다. 그냥 round()는 사사오입(은행가 반올림)이라 4168.5를 4168로 내릴 수 있다 - 회계 관행인 ROUND_HALF_UP은 4169로 올린다. 규칙을 명시해야 검산이 맞는다."
     explanation: |-
       환산식은 금액 × 매매기준율 ÷ 단위다. USD처럼 단위가 1이면 그대로, JPY(100)처럼 100단위면 100으로 나눠 1통화당 원화로 만든다.
 
       마지막에 quantize(Decimal('1'), ROUND_HALF_UP)로 원 단위까지 반올림한다. Python 기본 round()는 4168.5를 가장 가까운 짝수(4168)로 내리는 '은행가 반올림'이라 회계와 어긋날 수 있다. ROUND_HALF_UP은 0.5를 항상 올려(4169) 우리가 아는 반올림과 같다.
     tips:
-      - "원화는 정수다 — quantize(Decimal('1'), rounding=ROUND_HALF_UP)로 원 단위까지 떨어뜨린다."
-      - "amount는 Decimal(str(amount))로 감싼다 — CSV의 문자열 금액과 정수 금액을 모두 안전하게 받는다."
+      - "원화는 정수다 - quantize(Decimal('1'), rounding=ROUND_HALF_UP)로 원 단위까지 떨어뜨린다."
+      - "amount는 Decimal(str(amount))로 감싼다 - CSV의 문자열 금액과 정수 금액을 모두 안전하게 받는다."
     snippet: |-
       from decimal import Decimal, ROUND_HALF_UP
 
@@ -199,7 +199,7 @@ sections:
       resultCheck: "1,250달러=1,736,875원, 50,000엔=456,725원, 반올림은 ROUND_HALF_UP."
 
   - id: fetch_rates
-    title: "4단계. 실전 호출 — 한국수출입은행 환율 API"
+    title: "4단계. 실전 호출 - 한국수출입은행 환율 API"
     structuredPrimary: true
     subtitle: "requests.get + os.environ + dryRun"
     goal: "한국수출입은행 환율 API를 부르는 실제 호출 함수를 만들되, 키가 없으면 샘플로 폴백하고 통화별 환율 표를 만든다."
@@ -209,7 +209,7 @@ sections:
 
       fetchRates는 dryRun이 True거나 키가 없으면 네트워크를 타지 않고 sample을 돌려준다. 받은 항목을 parseRate로 정규화해 통화 코드 기준 dict로 만들면, 인보이스의 통화로 바로 환율을 찾을 수 있다.
     tips:
-      - "authkey를 코드에 박거나 커밋하지 않는다 — 환경변수(KOREAEXIM_API_KEY)로만. 한국수출입은행에서 무료 발급."
+      - "authkey를 코드에 박거나 커밋하지 않는다 - 환경변수(KOREAEXIM_API_KEY)로만. 한국수출입은행에서 무료 발급."
       - "환율은 영업일 09:00경 갱신되고 주말·공휴일엔 직전 영업일 값이 유지된다(12강 영업일 계산과 결합). 주말 searchdate는 빈 배열이 올 수 있어 직전 영업일로 재조회한다."
     snippet: |-
       import os
@@ -293,7 +293,7 @@ sections:
       resultCheck: "키가 없어도 sample 응답이 통화별 환율 표로 정규화된다."
 
   - id: practice
-    title: "5단계. 종합 실전 — 해외 인보이스 CSV → 원화 환산 CSV"
+    title: "5단계. 종합 실전 - 해외 인보이스 CSV → 원화 환산 CSV"
     structuredPrimary: true
     subtitle: "통화·금액 목록을 한 흐름으로 원화 합계까지"
     goal: "통화·금액이 담긴 해외 인보이스 CSV를 읽어 통화별 환율로 원화 환산하고, 원화 표와 합계를 CSV로 산출한다."
@@ -304,7 +304,7 @@ sections:
       실전에서는 sample 대신 fetchRates(..., dryRun=False, authkey=키)로 그날 환율을 받으면 같은 흐름이 그대로 돈다. 100단위 통화(엔)도 toKrw가 단위를 보정하므로 행마다 신경 쓸 게 없다.
     tips:
       - "통화별 환율 표(rateByCode)를 미리 만들어 두면 인보이스 행마다 바로 환율을 찾는다."
-      - "원화 합계는 Decimal(0)에서 시작해 누적한다 — sum의 start를 Decimal로 줘야 float이 섞이지 않는다."
+      - "원화 합계는 Decimal(0)에서 시작해 누적한다 - sum의 start를 Decimal로 줘야 float이 섞이지 않는다."
     snippet: |-
       import csv
       import io
@@ -408,7 +408,7 @@ sections:
 
     blocks:
       - type: tip
-        content: "흔한 오개념: ① 돈을 float으로 계산해 1원씩 어긋난다 — Decimal로 한다. ② JPY·IDR 같은 100단위 통화를 1단위로 곱해 100배 틀린다 — cur_unit의 (100)을 보고 나눈다. ③ 환율은 24시간 갱신이 아니다 — 영업일 09:00경 고시되고 주말·공휴일은 직전 영업일 값이라, 주말 searchdate는 빈 배열이 와서 직전 영업일로 재조회해야 한다."
+        content: "흔한 오개념: ① 돈을 float으로 계산해 1원씩 어긋난다 - Decimal로 한다. ② JPY·IDR 같은 100단위 통화를 1단위로 곱해 100배 틀린다 - cur_unit의 (100)을 보고 나눈다. ③ 환율은 24시간 갱신이 아니다 - 영업일 09:00경 고시되고 주말·공휴일은 직전 영업일 값이라, 주말 searchdate는 빈 배열이 와서 직전 영업일로 재조회해야 한다."
       - type: list
         style: bullet
         items:

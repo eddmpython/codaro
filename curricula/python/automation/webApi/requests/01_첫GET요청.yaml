@@ -1,6 +1,6 @@
 meta:
   id: requests_01
-  title: 첫 GET 요청 — 공공 데이터 조회
+  title: 첫 GET 요청 - 공공 데이터 조회
   order: 1
   category: requests
   difficulty: ⭐
@@ -18,7 +18,7 @@ meta:
     - automation.webApi.intro
   estimatedMinutes: 40
   seo:
-    title: "requests.get 첫 요청 — status_code, raise_for_status, .json() 파싱"
+    title: "requests.get 첫 요청 - status_code, raise_for_status, .json() 파싱"
     description: "requests.get으로 공공 API에 첫 호출을 보내고 status_code 확인, raise_for_status 가드, .json() 파싱으로 안전한 데이터 수집 골격을 만든다."
     keywords:
       - requests.get
@@ -31,7 +31,7 @@ intro:
   direction: "requests.get 한 줄로 외부 API에 첫 호출을 보내고, status_code · raise_for_status · .json() 세 단계로 응답을 안전하게 처리하는 골격을 만든다."
   benefits:
     - "본 트랙의 모든 강의가 이 골격에서 확장된다. 02-10강이 이 4줄 패턴의 변주."
-    - "주간 50분 절감 — 매일 10분씩 공공 데이터를 사이트에서 옮기는 일이 2초로."
+    - "주간 50분 절감 - 매일 10분씩 공공 데이터를 사이트에서 옮기는 일이 2초로."
     - "응답 객체 단위 assert 패턴을 익혀 네트워크 없는 환경에서도 호출 로직 회귀를 잡는다."
   diagram:
     steps:
@@ -57,7 +57,7 @@ sections:
     goal: "httpbin.org/get에 단발 호출을 보내고 status_code가 200인지 확인한다."
     why: "본 트랙의 모든 호출이 이 한 줄에서 출발합니다. timeout 의무화가 트랙 전체의 첫 안전 가드입니다."
     explanation: |-
-      requests.get(url, timeout=10)으로 GET 호출을 보냅니다. timeout은 의무입니다 — 빼면 서버가 응답하지 않을 때 스크립트가 영구 정지합니다. 응답은 Response 객체이며 status_code 속성으로 200/4xx/5xx를 구분합니다.
+      requests.get(url, timeout=10)으로 GET 호출을 보냅니다. timeout은 의무입니다 - 빼면 서버가 응답하지 않을 때 스크립트가 영구 정지합니다. 응답은 Response 객체이며 status_code 속성으로 200/4xx/5xx를 구분합니다.
     tips:
       - "httpbin.org는 HTTP 요청을 그대로 echo해 주는 학습 표준 엔드포인트입니다. 인증 없이, 차단 없이, 본 트랙 전반의 검증용으로 재사용됩니다."
     snippet: |-
@@ -86,7 +86,7 @@ sections:
     goal: "httpbin.org/get 응답을 dict로 파싱하고 핵심 키를 꺼낸다."
     why: "API 응답의 99%는 JSON입니다. .json()이 본 트랙에서 가장 자주 호출되는 메서드입니다."
     explanation: |-
-      r.json()은 응답 본문을 Python dict 또는 list로 파싱합니다. 응답이 JSON이 아니면 json.JSONDecodeError를 던집니다. .text는 문자열 그대로, .content는 바이트입니다 — 셋의 자리를 구분해야 합니다.
+      r.json()은 응답 본문을 Python dict 또는 list로 파싱합니다. 응답이 JSON이 아니면 json.JSONDecodeError를 던집니다. .text는 문자열 그대로, .content는 바이트입니다 - 셋의 자리를 구분해야 합니다.
     tips:
       - ".json()은 매번 파싱을 수행하므로 같은 응답을 여러 번 쓰려면 변수에 한 번 담아 두세요."
     snippet: |-
@@ -160,7 +160,7 @@ sections:
       resultCheck: "출력 'fail:500'."
 
   - id: step4_real_data
-    title: "4단계. 실 공공 데이터 — 서울 날씨"
+    title: "4단계. 실 공공 데이터 - 서울 날씨"
     structuredPrimary: true
     subtitle: "wttr.in/Seoul, 인증 불필요"
     goal: "실제 공공 API(wttr.in)에서 서울 현재 기온을 한 줄로 가져온다."
@@ -201,7 +201,7 @@ sections:
     explanation: |-
       함정1: r.text는 문자열입니다. dict처럼 ['key']로 접근하면 TypeError. r.json()으로 파싱해야 dict가 됩니다. 함정2: 200만 성공으로 보고 if r.status_code == 200으로 가드하면 201·204 같은 성공 응답이 누락됩니다. raise_for_status가 표준입니다.
     tips:
-      - ".content는 바이트(bytes)입니다 — 이미지·파일 다운로드(08강)에서만 쓰고 본 강의 같은 JSON 응답에는 .json()을 씁니다."
+      - ".content는 바이트(bytes)입니다 - 이미지·파일 다운로드(08강)에서만 쓰고 본 강의 같은 JSON 응답에는 .json()을 씁니다."
     snippet: |-
       import requests
 
@@ -221,14 +221,14 @@ sections:
         asJson = r.___()
         asJson["url"]
       hints:
-        - "메서드 이름은 json — 괄호 호출 필요."
+        - "메서드 이름은 json - 괄호 호출 필요."
     check:
       type: noError
       noError: ".json()은 괄호로 호출하는 메서드입니다."
       resultCheck: "출력은 'https://httpbin.org/get' 또는 유사 URL."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "안전 호출 함수와 다중 도시 날씨 수집"
     goal: "fetchJson 헬퍼를 만들어 재사용하고, 여러 도시의 날씨를 한 번에 가져온다."
     why: "이 두 패턴이 본 트랙의 02-10강에서 가장 자주 재사용되는 빌딩 블록입니다."

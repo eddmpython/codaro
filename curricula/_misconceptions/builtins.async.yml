@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.async
   status: draft
   version: 1
-  note: "초안 — asyncio 기초(async/await, 이벤트 루프) 흔한 오개념 시드. 사람이 정제 필요."
+  note: "초안 - asyncio 기초(async/await, 이벤트 루프) 흔한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.async.missingAwait

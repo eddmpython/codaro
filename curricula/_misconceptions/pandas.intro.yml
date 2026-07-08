@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.intro
   status: draft
   version: 1
-  note: "초안 — pandas Series/DataFrame 첫 만남에서 흔한 오개념."
+  note: "초안 - pandas Series/DataFrame 첫 만남에서 흔한 오개념."
 
 misconceptions:
   - id: pandas.intro.seriesAsList
@@ -12,7 +12,7 @@ misconceptions:
       - kind: codePattern
         appliesTo: code
         pattern: "\\.iloc\\s*\\[\\s*[0-9]+\\s*:\\s*[0-9]+\\s*\\]\\.iloc"
-        description: ".iloc 결과에 다시 .iloc 체이닝 — 인덱스가 변하는 줄 모름."
+        description: ".iloc 결과에 다시 .iloc 체이닝 - 인덱스가 변하는 줄 모름."
       - kind: errorPattern
         appliesTo: error
         pattern: "KeyError.*not in (index|axis)"

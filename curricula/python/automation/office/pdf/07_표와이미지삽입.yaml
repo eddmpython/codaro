@@ -20,7 +20,7 @@ meta:
     - automation.pdf.create
   estimatedMinutes: 60
   seo:
-    title: "reportlab Platypus — 표와 이미지가 들어간 한글 PDF 보고서"
+    title: "reportlab Platypus - 표와 이미지가 들어간 한글 PDF 보고서"
     description: "Platypus Table, Image, SimpleDocTemplate로 데이터 표와 로고가 들어간 보고서를 만든다. colWidths 의무화로 페이지 밖으로 나가는 사고를 막는다."
     keywords:
       - reportlab Platypus
@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "SimpleDocTemplate(path, pagesize), build(flowables)"
     goal: "단락 두 개가 들어간 PDF를 SimpleDocTemplate으로 만든다."
-    why: "월간 매출 보고, 분기 사업계획, 협력사 견적서 — 표와 이미지가 같이 들어가는 보고서를 좌표로 직접 그리면 페이지가 늘어날 때마다 사람이 줄을 다시 맞춰야 합니다. SimpleDocTemplate은 flowable 리스트만 넘기면 자동으로 페이지를 흘려보내므로, 보고서 양식이 데이터 길이에 따라 길어져도 코드는 그대로입니다. 10강 청구서 빌더가 이 패턴을 그대로 씁니다."
+    why: "월간 매출 보고, 분기 사업계획, 협력사 견적서 - 표와 이미지가 같이 들어가는 보고서를 좌표로 직접 그리면 페이지가 늘어날 때마다 사람이 줄을 다시 맞춰야 합니다. SimpleDocTemplate은 flowable 리스트만 넘기면 자동으로 페이지를 흘려보내므로, 보고서 양식이 데이터 길이에 따라 길어져도 코드는 그대로입니다. 10강 청구서 빌더가 이 패턴을 그대로 씁니다."
     explanation: |-
       SimpleDocTemplate(path, pagesize=A4)로 컨테이너를 만들고 build([flow1, flow2, ...])에 flowable 리스트를 넘기면 페이지가 자동으로 흘러갑니다. Paragraph는 가장 흔한 flowable입니다.
     tips:
@@ -353,7 +353,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "5단계. 검증 루프 — 텍스트 + 표 동시 검증"
+    title: "5단계. 검증 루프 - 텍스트 + 표 동시 검증"
     structuredPrimary: true
     subtitle: "PdfReader 본문 + pdfplumber 표 비교"
     goal: "완성된 보고서에서 본문 키워드와 표 추출 결과를 동시에 assert한다."
@@ -498,7 +498,7 @@ sections:
       resultCheck: "출력 1."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "표 + 이미지 보고서 생성기"
     goal: "Platypus 패턴을 함수로 묶어 실용 보고서 생성기 두 개를 만든다."
     why: "함수 형태로 묶어두면 본인 업무 데이터로 바로 가져갈 수 있습니다."

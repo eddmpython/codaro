@@ -187,7 +187,7 @@ sections:
     noError: save와 load_workbook 사이에 경로 문자열이 동일해야 FileNotFoundError가 나지 않습니다.
     resultCheck: reopened.sheetnames의 길이와 내용이 저장 직전 의도와 일치해야 합니다.
 - id: step5_default_sheet_pitfall
-  title: 5단계. 자주 만나는 함정 — 빈 기본 시트
+  title: 5단계. 자주 만나는 함정 - 빈 기본 시트
   structuredPrimary: true
   subtitle: 기본 "Sheet"가 보고서에 남는 문제
   goal: 빈 기본 시트를 명시적으로 정리하지 않으면 보고서에 의도치 않은 시트가 남는다는 것을 직접 확인한다.
@@ -220,7 +220,7 @@ sections:
     noError: active.title 대입이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 최종 sheetnames에 "Sheet"가 없어야 assert를 통과합니다.
 - id: validation
-  title: 6단계. 검증 루프 — 보고서 구조 계약
+  title: 6단계. 검증 루프 - 보고서 구조 계약
   structuredPrimary: true
   subtitle: 예측 → 실행 → 검증
   goal: 보고서 양식을 생성하는 함수가 "summary/detail/raw 3시트로 시작한다"는 계약을 깨지 않는지 자동 검증한다.
@@ -276,7 +276,7 @@ sections:
     noError: buildReportSkeleton 호출이 ValueError 없이 끝나야 합니다.
     resultCheck: reopened.sheetnames가 ["summary", "detail", "raw"]과 같아야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: 워크북 생성·시트 구성·저장·재오픈 검증의 4박자를 두 가지 실무 시나리오에 직접 적용한다.
@@ -375,8 +375,8 @@ sections:
   - type: list
     style: bullet
     items:
-    - Workbook() — 메모리에 빈 .xlsx 구조 생성
-    - workbook.active.title — 기본 시트 이름을 즉시 바꿔 "Sheet" 잔재 제거
-    - create_sheet(title, index) — 시트 순서까지 의도적으로 제어
-    - save(path) / load_workbook(path) — 저장과 재오픈을 짝으로 사용
+    - Workbook() - 메모리에 빈 .xlsx 구조 생성
+    - workbook.active.title - 기본 시트 이름을 즉시 바꿔 "Sheet" 잔재 제거
+    - create_sheet(title, index) - 시트 순서까지 의도적으로 제어
+    - save(path) / load_workbook(path) - 저장과 재오픈을 짝으로 사용
     - 시트 이름 리스트(sheetnames)는 보고서의 계약이고, assert로 잠가 둔다

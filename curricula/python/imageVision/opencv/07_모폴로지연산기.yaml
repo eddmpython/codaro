@@ -375,7 +375,7 @@ sections:
     noError: morphologyEx 호출과 카운트가 끝나야 합니다.
     resultCheck: holeFilled가 True이고 edgePreserved가 True여야 합니다.
 - id: practice
-  title: 실습 — flower OTSU + open/close 정리
+  title: 실습 - flower OTSU + open/close 정리
   structuredPrimary: true
   subtitle: 실제 사진의 모폴로지 후처리
   goal: flower 사진을 그레이스케일 → OTSU 이진화한 뒤 OPEN과 CLOSE를 차례로 적용해 마스크 픽셀 수가 어떻게 변하는지 확인합니다.

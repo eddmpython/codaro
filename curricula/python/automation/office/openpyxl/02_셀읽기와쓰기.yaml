@@ -244,7 +244,7 @@ sections:
     noError: writer.save와 load_workbook 모두 같은 경로 객체를 사용해야 합니다.
     resultCheck: 다시 읽은 행 수와 마지막 행의 값이 추가한 데이터와 같아야 합니다.
 - id: validation
-  title: 6단계. 검증 루프 — dict 데이터 → 정확한 좌표
+  title: 6단계. 검증 루프 - dict 데이터 → 정확한 좌표
   structuredPrimary: true
   subtitle: 예측 → 실행 → 검증
   goal: 사람이 만든 dict 데이터를 받아 정확한 셀 좌표에 쓰는 함수를 만들고, 다시 읽어 결과를 자동 검증한다.
@@ -316,7 +316,7 @@ sections:
     noError: writeStats 호출이 ValueError 없이 끝나야 합니다.
     resultCheck: 헤더와 값 row의 길이가 dict 항목 수와 같아야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: 두 가지 좌표 접근(`cell`, `append`)과 컬럼 변환 유틸을 실무 양식에 직접 적용한다.

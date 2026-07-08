@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.timeSeries
   status: draft
   version: 1
-  note: "초안 — 시계열(datetime 변환·resample) 단계 오개념 시드. 실무 시계열 빈출. 사람이 정제 필요."
+  note: "초안 - 시계열(datetime 변환·resample) 단계 오개념 시드. 실무 시계열 빈출. 사람이 정제 필요."
 
 misconceptions:
   - id: pandas.timeSeries.stringDateAccessor

@@ -2,7 +2,7 @@ meta:
   outcomeId: ml.intro
   status: draft
   version: 1
-  note: "초안 — 머신러닝 입문(scikit-learn fit/predict) 오개념 시드. 사람이 정제 필요."
+  note: "초안 - 머신러닝 입문(scikit-learn fit/predict) 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: ml.intro.predictBeforeFit

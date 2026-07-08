@@ -20,5 +20,5 @@ whenToUse: 알림 채널 추가, Webhook 트리거 설계, 모바일 반응형 U
 
 ## 관련
 
-- [[automation-tasks-reports]] — 트리거되는 태스크 정의
-- [[mounting-and-integration]] — 외부 HTTP surface
+- [[automation-tasks-reports]] - 트리거되는 태스크 정의
+- [[mounting-and-integration]] - 외부 HTTP surface

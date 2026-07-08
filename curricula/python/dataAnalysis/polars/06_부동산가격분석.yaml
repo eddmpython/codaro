@@ -101,7 +101,7 @@ sections:
 
     .schema는 DataFrame의 컬럼명과 타입을 딕셔너리 형태로 반환합니다. pandas의 .dtypes와 비슷하지만, Polars는 타입 정보가 더 명확하고 세분화되어 있습니다. Float64는 64비트 부동소수점, Int64는 64비트 정수를 의미하며, 이 정보로 메모리 사용량도 예측할 수 있습니다.
   tips:
-  - cast 메서드로 타입을 변환할 수 있습니다 — pl.col("chas").cast(pl.Int8)처럼.
+  - cast 메서드로 타입을 변환할 수 있습니다 - pl.col("chas").cast(pl.Int8)처럼.
   snippet: housing.schema
   exercise:
     prompt: .schema 대신 .dtypes나 .head()를 호출해 다른 형태의 메타정보를 비교하세요.
@@ -124,7 +124,7 @@ sections:
 
     is_null은 null 여부를 Boolean으로 반환하는 표현식입니다. pl.all은 모든 컬럼을 선택하므로, pl.all().is_null().sum()은 각 컬럼의 null 개수를 한 번에 계산합니다. True는 1로, False는 0으로 계산되어 sum으로 개수를 셀 수 있습니다. pandas의 df.isnull().sum()과 동일한 결과를 제공합니다.
   tips:
-  - Polars의 select는 표현식을 받아 새 DataFrame을 만듭니다 — pandas의 [컬럼]과 달리 항상 select 안에서 표현식을 평가합니다.
+  - Polars의 select는 표현식을 받아 새 DataFrame을 만듭니다 - pandas의 [컬럼]과 달리 항상 select 안에서 표현식을 평가합니다.
   snippet: housing.select(pl.all().is_null().sum())
   exercise:
     prompt: pl.all 대신 pl.col("medv")처럼 특정 컬럼만 검사해보세요.
@@ -184,7 +184,7 @@ sections:
 
     drop_nulls는 null이 포함된 행을 제거합니다. subset에 컬럼명 리스트를 주면 그 컬럼들만 검사합니다. subset을 생략하면 모든 컬럼을 검사하여, 어느 하나라도 null이 있으면 해당 행이 제거됩니다. shape로 제거 전후 행 개수를 비교하면 얼마나 삭제되었는지 확인할 수 있습니다.
   tips:
-  - drop_nulls는 데이터를 잃는 연산입니다 — 제거 전 housingNull.shape와 비교해 손실 비율을 항상 확인하세요.
+  - drop_nulls는 데이터를 잃는 연산입니다 - 제거 전 housingNull.shape와 비교해 손실 비율을 항상 확인하세요.
   snippet: |-
     housingClean = housingNull.drop_nulls(subset=["rm"])
     housingClean.shape
@@ -211,7 +211,7 @@ sections:
 
     fill_null(값)은 null을 지정한 값으로 채웁니다. item은 DataFrame의 단일 값을 Python 스칼라로 추출하는 메서드입니다. 표현식도 인자로 줄 수 있지만, 여기서는 명확성을 위해 먼저 평균을 계산했습니다. forward_fill, backward_fill로 앞/뒤 값으로 채울 수도 있습니다.
   tips:
-  - 평균으로 채우면 분산이 인위적으로 작아집니다 — 표준편차가 중요한 분석에서는 다른 imputation 전략을 고려하세요.
+  - 평균으로 채우면 분산이 인위적으로 작아집니다 - 표준편차가 중요한 분석에서는 다른 imputation 전략을 고려하세요.
   snippet: |-
     rmMean = housing.select(pl.col("rm").mean()).item()
     housingFilled = housingNull.with_columns(
@@ -244,7 +244,7 @@ sections:
 
     pl.when은 여러 조건을 연결하는 표현식입니다. 조건은 위에서 아래로 순차적으로 평가되므로 순서가 중요합니다. pl.lit는 상수 값을 표현식으로 변환하며, 문자열과 숫자 모두 사용 가능합니다. SQL의 CASE WHEN, pandas의 np.where와 유사합니다.
   tips:
-  - 조건 순서가 중요합니다. 위쪽 조건이 만족되면 아래는 평가되지 않습니다 — 30 이상을 먼저 잡고 20 이상을 잡는 순서를 유지하세요.
+  - 조건 순서가 중요합니다. 위쪽 조건이 만족되면 아래는 평가되지 않습니다 - 30 이상을 먼저 잡고 20 이상을 잡는 순서를 유지하세요.
   snippet: |-
     housingGrade = housing.with_columns(
         pl.when(pl.col("medv") >= 30)
@@ -315,13 +315,13 @@ sections:
 
     n_unique는 중복을 제외한 고유값 개수를 반환합니다. pandas의 nunique와 동일한 기능입니다. 범주형 데이터의 카테고리 개수를 확인하거나, 컬럼이 고유 식별자(ID)로 사용 가능한지 판단할 때 유용합니다. value_counts와 함께 사용하면 각 고유값의 빈도도 확인할 수 있습니다.
   tips:
-  - n_unique == 행 수면 그 컬럼은 고유 식별자(ID)로 사용 가능합니다 — orderId, userId 같은 컬럼이 그렇습니다.
+  - n_unique == 행 수면 그 컬럼은 고유 식별자(ID)로 사용 가능합니다 - orderId, userId 같은 컬럼이 그렇습니다.
   snippet: housing.select(pl.col("chas").n_unique())
   exercise:
     prompt: chas 대신 medv나 crim으로 바꿔 n_unique가 큰 값을 확인하고 연속 변수와의 차이를 비교하세요.
     starterCode: housing.select(pl.col("chas").n_unique())
     hints:
-    - medv는 가격이라 거의 모든 값이 unique입니다 — n_unique가 행 수에 가까워집니다.
+    - medv는 가격이라 거의 모든 값이 unique입니다 - n_unique가 행 수에 가까워집니다.
     - 결과는 단일 값을 가진 1x1 DataFrame입니다.
   check:
     type: noError
@@ -338,7 +338,7 @@ sections:
 
     std는 표준편차를 계산합니다. 기본적으로 표본 표준편차(n-1로 나눔)를 사용하며, ddof=0 파라미터로 모집단 표준편차(n으로 나눔)를 계산할 수 있습니다. 표준편차는 평균과 함께 사용하여 데이터 분포를 이해하는 핵심 지표입니다. var로 분산(표준편차의 제곱)도 계산할 수 있습니다.
   tips:
-  - mean ± 1 std 안에 약 68%의 데이터가 들어갑니다 — 정규분포 가정하에서.
+  - mean ± 1 std 안에 약 68%의 데이터가 들어갑니다 - 정규분포 가정하에서.
   snippet: |-
     housing.select(
         pl.col("medv").mean().alias("mean"),
@@ -440,7 +440,7 @@ sections:
 
     join은 두 DataFrame을 결합합니다. on은 공통 키 컬럼, how는 조인 방식입니다. left는 왼쪽 테이블 기준, inner는 양쪽 모두 있는 것만, outer는 모든 행 유지, cross는 카티전 곱을 의미합니다. pandas의 merge와 유사하지만 Polars는 더 빠릅니다.
   tips:
-  - 두 테이블의 키 컬럼 dtype이 같아야 join이 동작합니다 — Int vs Float 차이로 조인이 비어버리는 경우가 흔합니다.
+  - 두 테이블의 키 컬럼 dtype이 같아야 join이 동작합니다 - Int vs Float 차이로 조인이 비어버리는 경우가 흔합니다.
   snippet: |-
     housingJoined = housing.join(
         regionInfo,
@@ -560,7 +560,7 @@ sections:
       housingRaw = pl.read_csv(StringIO(loadLocalDataset("boston_housing").to_csv(index=False)))
     hints:
     - when-then으로 rmGroup 컬럼을 large/small로 만든 뒤 group_by로 집계하세요.
-    - 큰 방 그룹이 medv가 더 높을 것입니다 — 가설을 수치로 검증하세요.
+    - 큰 방 그룹이 medv가 더 높을 것입니다 - 가설을 수치로 검증하세요.
   check:
     type: noError
     noError: 분석 코드가 KeyError 없이 실행되어야 합니다.
@@ -591,7 +591,7 @@ sections:
   explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
     집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
   tips:
-  - validate* 함수는 분석 시작 전 항상 호출하는 가드 패턴입니다 — 실패하면 ValueError로 즉시 중단합니다.
+  - validate* 함수는 분석 시작 전 항상 호출하는 가드 패턴입니다 - 실패하면 ValueError로 즉시 중단합니다.
   - any와 all 집계는 boolean 표현식에 붙여 빠른 조건 검증을 만들 수 있습니다.
   snippet: |-
     import polars as pl

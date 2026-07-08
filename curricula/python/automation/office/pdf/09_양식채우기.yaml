@@ -20,7 +20,7 @@ meta:
     - automation.pdf.create
   estimatedMinutes: 50
   seo:
-    title: "PDF 양식 자동 채우기 — pypdf AcroForm"
+    title: "PDF 양식 자동 채우기 - pypdf AcroForm"
     description: "reportlab으로 신청서 양식 PDF를 만들고 pypdf로 필드 값을 자동 입력한다. 한 페이지짜리 인사·총무 신청서 자동화의 골격이다."
     keywords:
       - pypdf AcroForm
@@ -56,7 +56,7 @@ sections:
     structuredPrimary: true
     subtitle: "canvas.acroForm.textfield"
     goal: "이름·전화 두 텍스트 필드가 있는 한 페이지 신청서 PDF를 만든다."
-    why: "근로계약서, 출장 신청서, 휴가 신청서, 정부 보조금 신청서 — 인사·총무는 같은 양식 PDF에 사람별 정보만 바꿔 N장 만드는 작업을 매주 합니다. 양식 채우기를 코드로 풀려면 우선 채울 양식이 있어야 하므로, 회사 양식 PDF를 받기 전 학습용으로 reportlab AcroForm으로 즉석 만듭니다. 실무에서는 templatePath만 회사 양식 경로로 바꾸면 같은 코드가 그대로 돌아갑니다."
+    why: "근로계약서, 출장 신청서, 휴가 신청서, 정부 보조금 신청서 - 인사·총무는 같은 양식 PDF에 사람별 정보만 바꿔 N장 만드는 작업을 매주 합니다. 양식 채우기를 코드로 풀려면 우선 채울 양식이 있어야 하므로, 회사 양식 PDF를 받기 전 학습용으로 reportlab AcroForm으로 즉석 만듭니다. 실무에서는 templatePath만 회사 양식 경로로 바꾸면 같은 코드가 그대로 돌아갑니다."
     explanation: |-
       Canvas의 acroForm.textfield(name='...', x, y, width, height)가 텍스트 입력 필드를 추가합니다. name이 채우기 단계에서 key가 됩니다.
     tips:
@@ -299,7 +299,7 @@ sections:
       resultCheck: "출력 4."
 
   - id: validation
-    title: "4단계. 검증 루프 — 모든 결과 PDF 필드 검증"
+    title: "4단계. 검증 루프 - 모든 결과 PDF 필드 검증"
     structuredPrimary: true
     subtitle: "get_fields로 입력값 확인"
     goal: "생성된 모든 PDF의 양식 필드 값이 의도한 신청자 데이터와 일치하는지 확인한다."
@@ -472,7 +472,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "신청서 일괄 생성기 + 양식 필드 자동 탐색"
     goal: "양식 PDF + 신청자 CSV → 채워진 PDF 묶음, 그리고 받은 양식의 필드 이름을 자동 추출하는 두 도구를 만든다."
     why: "양식 자동 입력의 끝은 데이터 소스(CSV)에서 시작해 결과 PDF 폴더로 끝나는 한 파이프라인입니다. 회사 양식이 새로 오면 필드 이름을 먼저 알아야 입력 dict를 짤 수 있어, 필드 자동 탐색이 짝패로 따라옵니다."

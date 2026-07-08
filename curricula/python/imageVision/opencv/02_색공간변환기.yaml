@@ -366,7 +366,7 @@ sections:
     noError: 세 cvtColor 호출과 차이 계산이 NameError 없이 끝나야 합니다.
     resultCheck: diffMax가 5 이하, diffMean이 1 미만, isExactly가 False여야 합니다.
 - id: practice
-  title: 실습 — HSV 색 추출
+  title: 실습 - HSV 색 추출
   structuredPrimary: true
   subtitle: cv2.inRange로 특정 색 마스크
   goal: 사람이 만든 작은 컬러 패치 이미지에서 빨강만 골라내는 HSV 마스크를 만들고, 추출된 픽셀 수가 기대값과 같은지 확인합니다.

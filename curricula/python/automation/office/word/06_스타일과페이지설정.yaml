@@ -18,7 +18,7 @@ meta:
     - automation.word.runs
   estimatedMinutes: 50
   seo:
-    title: "Word 스타일과 페이지 설정 — styles.add_style, Pt, Inches"
+    title: "Word 스타일과 페이지 설정 - styles.add_style, Pt, Inches"
     description: "사내 양식 스타일을 정의하고 페이지 여백·크기를 코드로 설정. 03강 East Asian font 흡수."
     keywords:
       - python-docx styles
@@ -170,7 +170,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "3단계. 검증 — 양식 함수 통합"
+    title: "3단계. 검증 - 양식 함수 통합"
     structuredPrimary: true
     subtitle: "applyCodaroStyles 통합"
     goal: "스타일 + 여백을 한 함수에서 적용하고 결과를 검증한다."
@@ -211,7 +211,7 @@ sections:
       assert reopened.sections[0].top_margin == Inches(0.8)
       reopened.paragraphs[0].style.name
     exercise:
-      prompt: "applyCodaroStyles 본체를 완성하세요 — CodaroBody 스타일 등록(East Asian font까지) + 네 면 여백을 모두 marginInches로 설정."
+      prompt: "applyCodaroStyles 본체를 완성하세요 - CodaroBody 스타일 등록(East Asian font까지) + 네 면 여백을 모두 marginInches로 설정."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -247,9 +247,9 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "사내 양식 토대 함수"
-    goal: "applyCodaroStyles 확장 — 헤더 스타일까지 등록."
+    goal: "applyCodaroStyles 확장 - 헤더 스타일까지 등록."
     why: "본 함수가 트랙 후반의 핵심 빌딩 블록입니다."
     explanation: |-
       미션: applyCodaroStyles에 CodaroHeading 스타일도 추가. font.size Pt(14), bold.

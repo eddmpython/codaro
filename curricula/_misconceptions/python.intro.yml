@@ -2,7 +2,7 @@ meta:
   outcomeId: python.intro
   status: draft
   version: 1
-  note: "초안 — 첫 레슨(Hello World·print) 오개념 시드. Predict-Run-Reconcile-Adapt 루프 1단계. 사람이 정제 필요."
+  note: "초안 - 첫 레슨(Hello World·print) 오개념 시드. Predict-Run-Reconcile-Adapt 루프 1단계. 사람이 정제 필요."
 
 misconceptions:
   - id: python.intro.printWithoutParentheses
@@ -48,7 +48,7 @@ misconceptions:
       - kind: errorPattern
         appliesTo: error
         pattern: "NameError: name '[A-Za-z_][A-Za-z0-9_]*' is not defined"
-        description: "정의되지 않은 이름 참조 — 따옴표 누락 또는 미정의 변수."
+        description: "정의되지 않은 이름 참조 - 따옴표 누락 또는 미정의 변수."
     diagnostic:
       message: "따옴표가 없으면 Python 은 그 단어를 변수 이름으로 봅니다. 글자를 그대로 출력하려면 따옴표로 감싸고, 변수라면 먼저 값을 정의했는지 확인하세요."
       references: ["python.intro", "python.variables"]

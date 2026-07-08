@@ -21,7 +21,7 @@ meta:
     - pandas.intro
   estimatedMinutes: 55
   seo:
-    title: "PDF 표를 코드로 추출 — pdfplumber + pandas"
+    title: "PDF 표를 코드로 추출 - pdfplumber + pandas"
     description: "국세청·통계청 PDF의 표를 pdfplumber로 뽑아 pandas DataFrame과 CSV로 정리한다. 선 없는 표·병합 셀 한계와 해결법을 함께 다룬다."
     keywords:
       - pdfplumber extract_tables
@@ -357,7 +357,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "5단계. 검증 루프 — 추출 → DataFrame → CSV 왕복"
+    title: "5단계. 검증 루프 - 추출 → DataFrame → CSV 왕복"
     structuredPrimary: true
     subtitle: "shape·합계·CSV 재오픈 통합 assert"
     goal: "추출 → DataFrame → CSV 저장 → 재오픈까지 한 셀에서 자동 검증한다."
@@ -492,7 +492,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "표 PDF → CSV 도구"
     goal: "표 추출과 후처리 패턴을 결합한 실용 함수 두 개를 작성한다."
     why: "표 추출은 데이터 분석의 시작 지점입니다. 손으로 옮기지 않게 만드는 게 모든 후속 작업의 시간을 줄입니다."

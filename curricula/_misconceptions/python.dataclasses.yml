@@ -2,7 +2,7 @@ meta:
   outcomeId: python.dataclasses
   status: draft
   version: 1
-  note: "초안 — dataclass 단계 오개념 시드. 사람이 정제 필요."
+  note: "초안 - dataclass 단계 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: python.dataclasses.mutableDefault

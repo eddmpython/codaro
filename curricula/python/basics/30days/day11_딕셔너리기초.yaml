@@ -354,7 +354,7 @@ sections:
     list, dict, set은 mutable이라 hash가 안 됩니다. 키로 넣으면 TypeError가 납니다. frozenset은 immutable이라 키로 쓸 수 있습니다.
     한 딕셔너리 안에서 여러 종류의 키 타입을 섞어도 됩니다. 단, 같은 값(예: 1과 True)이 같은 해시를 갖는 경우 같은 키로 취급되는 함정이 있습니다.
   tips:
-  - "튜플 키 활용 — `coords = {(0, 0): 'origin', (1, 0): 'right'}` 같은 좌표 매핑."
+  - "튜플 키 활용 - `coords = {(0, 0): 'origin', (1, 0): 'right'}` 같은 좌표 매핑."
   - "1과 True는 같은 키로 취급됩니다. d = {1: 'a', True: 'b'}는 결과적으로 {1: 'b'}가 됩니다."
   snippet: |-
     mixedKeyDict = {

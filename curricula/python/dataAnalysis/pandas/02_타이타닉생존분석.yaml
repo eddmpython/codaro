@@ -142,7 +142,7 @@ sections:
 
     대괄호 1겹과 2겹의 차이가 핵심입니다. titanic 대괄호 single은 Series를 반환하고, titanic 대괄호 double은 DataFrame을 반환합니다. 여러 컬럼을 선택할 때는 반드시 2겹으로 작성해야 합니다.
   tips:
-  - 한 컬럼만 선택하더라도 titanic 대괄호 double로 쓰면 DataFrame 형태를 유지할 수 있습니다 — 시각화 라이브러리는 보통 DataFrame을 요구합니다.
+  - 한 컬럼만 선택하더라도 titanic 대괄호 double로 쓰면 DataFrame 형태를 유지할 수 있습니다 - 시각화 라이브러리는 보통 DataFrame을 요구합니다.
   snippet: titanic[['survived', 'pclass', 'sex', 'age']]
   exercise:
     prompt: 리스트의 컬럼 수를 2개로 줄이거나 fare를 추가해 결과 컬럼 수가 어떻게 달라지는지 확인하세요.
@@ -165,7 +165,7 @@ sections:
 
     비교 연산자는 ==, !=, >, <, >=, <= 등이 있습니다. 할당의 =과 비교의 ==를 구분해야 합니다. x = 5는 값을 대입하고, x == 5는 같은지 비교합니다.
   tips:
-  - Boolean Series의 sum()은 True의 개수를 줍니다 — (titanic 컬럼 == 값).sum()이 곧 조건을 만족하는 행 수입니다.
+  - Boolean Series의 sum()은 True의 개수를 줍니다 - (titanic 컬럼 == 값).sum()이 곧 조건을 만족하는 행 수입니다.
   snippet: titanic['survived'] == 1
   exercise:
     prompt: == 1을 != 1이나 == 0으로 바꿔 결과 Boolean Series가 뒤집히는지 확인하세요.
@@ -188,7 +188,7 @@ sections:
 
     필터링 결과를 새 변수에 저장하면 추가 분석을 할 수 있습니다. len은 행의 개수를 세는 함수입니다. .shape[0]이나 .count()를 사용해도 같은 결과를 얻을 수 있습니다.
   tips:
-  - 생존자 수 / 전체 수가 곧 생존율입니다 — 99 / 180 = 0.55.
+  - 생존자 수 / 전체 수가 곧 생존율입니다 - 99 / 180 = 0.55.
   snippet: |-
     survivors = titanic[titanic['survived'] == 1]
     len(survivors)
@@ -263,7 +263,7 @@ sections:
 
     describe()는 01번 프로젝트에서 처음 배운 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값), 75%(3사분위), max(최대)를 자동으로 계산해줍니다.
   tips:
-  - fare의 max가 $512인데 mean이 $32인 큰 격차는 분포가 한쪽으로 치우쳐 있다는 신호입니다 — 1등석 운임이 극단적으로 비쌌습니다.
+  - fare의 max가 $512인데 mean이 $32인 큰 격차는 분포가 한쪽으로 치우쳐 있다는 신호입니다 - 1등석 운임이 극단적으로 비쌌습니다.
   snippet: titanic.describe()
   exercise:
     prompt: include=all 옵션을 추가해 문자열 컬럼(sex 등)의 통계도 함께 보세요.
@@ -286,7 +286,7 @@ sections:
 
     normalize=True의 결과는 0에서 1 사이의 소수로 표시됩니다. 백분율로 보려면 * 100을 곱하면 됩니다.
   tips:
-  - normalize=True 결과의 sum()은 항상 1.0이 되어야 합니다 — 그렇지 않으면 결측치가 있다는 신호입니다.
+  - normalize=True 결과의 sum()은 항상 1.0이 되어야 합니다 - 그렇지 않으면 결측치가 있다는 신호입니다.
   snippet: titanic['pclass'].value_counts(normalize=True)
   exercise:
     prompt: pclass 대신 sex나 survived로 바꿔 성별/생존 비율을 비교하세요.
@@ -331,7 +331,7 @@ sections:
     후 생존율을 계산하면 100%가 나옵니다. 이는 전체 생존율 55%, 남성 생존율 25%와 비교하면 압도적으로 높은 수치입니다. 로컬 샘플에서 성별 차이가 크게 설계되었음을
     데이터가 입증합니다.
   tips:
-  - 문자열 비교는 따옴표가 필수입니다 — sex == female이 아니라 sex == "female"이어야 합니다(파이썬 변수처럼 인식되어 NameError).
+  - 문자열 비교는 따옴표가 필수입니다 - sex == female이 아니라 sex == "female"이어야 합니다(파이썬 변수처럼 인식되어 NameError).
   snippet: titanic[titanic['sex'] == 'female']['survived'].mean()
   exercise:
     prompt: female을 male로 바꿔 남성 생존율을 구하고 여성과 비교하세요.
@@ -354,7 +354,7 @@ sections:
 
     loc에서 열을 리스트로 주면 여러 컬럼을 동시에 선택할 수 있습니다. titanic.loc 행조건 컬럼리스트 형태로 사용하면 생존자의 나이, 성별, 등급을 한번에 볼 수 있습니다.
   tips:
-  - .loc은 SettingWithCopyWarning을 피해갑니다 — 값을 변경하려면 반드시 .loc 표기법을 쓰세요.
+  - .loc은 SettingWithCopyWarning을 피해갑니다 - 값을 변경하려면 반드시 .loc 표기법을 쓰세요.
   snippet: titanic.loc[titanic['survived'] == 1, 'age'].head()
   exercise:
     prompt: age 대신 fare로 바꾸거나 컬럼을 리스트로 만들어 여러 컬럼을 동시에 선택하세요.
@@ -377,7 +377,7 @@ sections:
 
     loc과 iloc의 차이는 loc은 레이블(컬럼명, 인덱스명), iloc은 정수 위치로 선택한다는 점입니다. loc[0]은 인덱스 이름이 0인 행을, iloc[0]은 첫 번째 행을 의미합니다. 조건 기반 필터링에는 loc, 위치 기반 선택에는 iloc을 사용하세요.
   tips:
-  - iloc은 음수도 받습니다 — iloc[-1]은 마지막 행입니다.
+  - iloc은 음수도 받습니다 - iloc[-1]은 마지막 행입니다.
   snippet: titanic.iloc[0]
   exercise:
     prompt: 0을 5나 -1로 바꿔 다섯 번째 행, 마지막 행을 선택해보세요.
@@ -400,7 +400,7 @@ sections:
 
     슬라이싱에서 콜론만 쓰면 전체를 의미합니다. iloc 전체:5는 처음 5행 전체 컬럼, iloc 전체, 전체:3은 전체 행의 처음 3개 컬럼을 선택합니다. iloc 음수 -1은 마지막 행, iloc 음수 -5:는 마지막 5개 행을 선택합니다.
   tips:
-  - 슬라이스 끝 인덱스는 제외됩니다 — iloc[0:3]은 인덱스 0, 1, 2 세 행만 가져옵니다.
+  - 슬라이스 끝 인덱스는 제외됩니다 - iloc[0:3]은 인덱스 0, 1, 2 세 행만 가져옵니다.
   snippet: titanic.iloc[0:3, 0:4]
   exercise:
     prompt: 슬라이스를 더 넓은 범위로 늘리거나 음수 인덱스를 활용해 결과 shape가 어떻게 달라지는지 확인하세요.
@@ -423,7 +423,7 @@ sections:
 
     변주 실험: 어린이 기준을 13세에서 16세로 바꾸고, 생존율이 변하는지 같은 코드로 비교하세요.
   tips:
-  - groupby + mean으로 등급별 생존율을 한 줄에 만들 수 있습니다 — 이건 다음 강의(pandas 03)의 핵심 주제입니다.
+  - groupby + mean으로 등급별 생존율을 한 줄에 만들 수 있습니다 - 이건 다음 강의(pandas 03)의 핵심 주제입니다.
   - .loc[정수]는 인덱스 레이블이 정수인 행을 가져옵니다. RangeIndex DataFrame에서는 iloc과 같은 결과가 나옵니다.
   snippet: |-
     import pandas as pd

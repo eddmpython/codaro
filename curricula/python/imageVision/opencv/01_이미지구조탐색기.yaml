@@ -396,7 +396,7 @@ sections:
     noError: cv2.rectangle 호출이 TypeError 없이 끝나야 합니다.
     resultCheck: insidePixel이 [0, 255, 0]이고 outsidePixel이 [0, 0, 0]이며 rectangleFilled가 True여야 합니다.
 - id: practice
-  title: 실습 — china 이미지 한눈 분석
+  title: 실습 - china 이미지 한눈 분석
   structuredPrimary: true
   subtitle: 구조 정보 한 번에
   goal: china.jpg에 대해 shape, dtype, 채널별 평균, 가운데 픽셀, ROI 평균을 dict 한 개로 묶어 돌려주는 손 함수를 만듭니다.

@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.dataFormats
   status: draft
   version: 1
-  note: "초안 — json/csv 직렬화 흔한 오개념 시드. 실무 자동화 진입. 사람이 정제 필요."
+  note: "초안 - json/csv 직렬화 흔한 오개념 시드. 실무 자동화 진입. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.dataFormats.loadsVsDumps

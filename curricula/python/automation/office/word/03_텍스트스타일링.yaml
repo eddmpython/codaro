@@ -17,7 +17,7 @@ meta:
     - automation.word.paragraphs
   estimatedMinutes: 40
   seo:
-    title: "Word 텍스트 스타일링 — run, font, East Asian font 패턴"
+    title: "Word 텍스트 스타일링 - run, font, East Asian font 패턴"
     description: "Bold·색상·크기를 run 단위로 적용. 한글 East Asian font 의무 패턴으로 폰트 깨짐 차단."
     keywords:
       - python-docx run font
@@ -27,7 +27,7 @@ meta:
 intro:
   direction: "단락을 run 단위로 쪼개 굵기·색·크기를 적용한다. 한글 East Asian font 의무 패턴을 본 강의에서 정착시킨다."
   benefits:
-    - "Bold·색·크기를 run 단위로 제어 — docx 모든 강조 표현이 가능."
+    - "Bold·색·크기를 run 단위로 제어 - docx 모든 강조 표현이 가능."
     - "East Asian font 패턴 한 번 익히면 한글 폰트 깨짐이 트랙 끝까지 없음."
     - "06강 스타일 정의 함수의 베이스가 되는 함수 형태 정착."
   diagram:
@@ -130,7 +130,7 @@ sections:
       reopened = Document(docxPath)
       reopened.paragraphs[0].runs[0].font.name
     exercise:
-      prompt: "applyKoreanFont의 함수 본체를 직접 작성하세요 — East Asian font까지 정확히 설정해야 한글이 깨지지 않습니다."
+      prompt: "applyKoreanFont의 함수 본체를 직접 작성하세요 - East Asian font까지 정확히 설정해야 한글이 깨지지 않습니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -161,7 +161,7 @@ sections:
       resultCheck: "True 출력 (이름과 East Asian 둘 다 적용)."
 
   - id: validation
-    title: "3단계. 검증 — 한글 강조 단락 통합"
+    title: "3단계. 검증 - 한글 강조 단락 통합"
     structuredPrimary: true
     subtitle: "Bold + 한글 폰트 + 크기"
     goal: "강조된 한글 단락 함수의 결과를 단위 assert로 검증한다."
@@ -202,7 +202,7 @@ sections:
       assert runs[1].font.size == Pt(14)
       [(r.text, r.bold) for r in runs]
     exercise:
-      prompt: "buildEmphasis 본체를 완성하세요 — boldText는 Bold + Pt(14) 크기 + 빨강(0xC0,0x39,0x2B)을 모두 적용하고, 두 run 모두 한글 폰트가 들어가야 합니다."
+      prompt: "buildEmphasis 본체를 완성하세요 - boldText는 Bold + Pt(14) 크기 + 빨강(0xC0,0x39,0x2B)을 모두 적용하고, 두 run 모두 한글 폰트가 들어가야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -236,7 +236,7 @@ sections:
       resultCheck: "(True, 177800, RGBColor(0xC0, 0x39, 0x2B)) 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "한글 강조 단락 생성기"
     goal: "단락 빌더 함수를 직접 작성한다."
     why: "본 패턴이 트랙 후반의 모든 단락 생성 함수에 재사용됩니다."

@@ -17,7 +17,7 @@ meta:
     - automation.word.edit
   estimatedMinutes: 55
   seo:
-    title: "Word CSV mail merge — 200명 가정통신문 자동 생성"
+    title: "Word CSV mail merge - 200명 가정통신문 자동 생성"
     description: "CSV 명단에서 가정통신문 200장을 한 번에 자동 생성. 학교 행정 10시간이 30초로."
     keywords:
       - mail merge python
@@ -208,7 +208,7 @@ sections:
       resultCheck: "출력 3."
 
   - id: validation
-    title: "3단계. 검증 — 각 docx 자리표시자 잔여 확인"
+    title: "3단계. 검증 - 각 docx 자리표시자 잔여 확인"
     structuredPrimary: true
     subtitle: "모든 결과의 자리표시자 잔여 검사"
     goal: "생성된 모든 docx에 자리표시자가 한 개도 남지 않는지 검증한다."
@@ -265,7 +265,7 @@ sections:
           assert "{{" not in combined
       [p.name for p in outputs]
     exercise:
-      prompt: "verifyAllFilled 함수를 작성하세요 — outputs 리스트의 모든 docx에서 자리표시자 잔여 여부를 검사해 (잔여 없는 파일 수, 잔여 있는 파일 수)를 튜플로 반환."
+      prompt: "verifyAllFilled 함수를 작성하세요 - outputs 리스트의 모든 docx에서 자리표시자 잔여 여부를 검사해 (잔여 없는 파일 수, 잔여 있는 파일 수)를 튜플로 반환."
       starterCode: |-
         import csv
         from pathlib import Path
@@ -324,7 +324,7 @@ sections:
       resultCheck: "(3, 0) 출력 (빈 값이라도 키만 있으면 모두 치환됨)."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "가정통신문 일괄 생성기"
     goal: "표 안 자리표시자도 처리하는 mailMerge로 확장."
     why: "07강 패턴을 그대로 가져와 mail merge 전 흐름을 완성."
@@ -418,7 +418,7 @@ sections:
       - type: list
         style: bullet
         items:
-          - "Email 트랙 03강과 결합 — 생성된 docx를 학부모에게 자동 발송"
+          - "Email 트랙 03강과 결합 - 생성된 docx를 학부모에게 자동 발송"
           - "PDF 변환 (LibreOffice headless) 후 발송"
           - "발송 결과 로그를 CSV에 추가"
           - "헤더 매핑 dict로 한국식 컬럼명(이름→name) 자동 변환"

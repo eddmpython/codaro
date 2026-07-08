@@ -19,7 +19,7 @@ meta:
     - automation.word.edit
   estimatedMinutes: 60
   seo:
-    title: "docxtpl로 Jinja 템플릿 채우기 — 영업 제안서 for-loop"
+    title: "docxtpl로 Jinja 템플릿 채우기 - 영업 제안서 for-loop"
     description: "docxtpl로 {{ }}, {% for %} 같은 Jinja 문법을 docx 안에 직접 사용. 견적 항목 for-loop이 압권."
     keywords:
       - docxtpl
@@ -30,7 +30,7 @@ intro:
   direction: "docxtpl로 Jinja2 문법을 docx 안에 직접 사용한다. {{ }} 단일 치환부터 {% for %} 루프까지."
   benefits:
     - "영업 박과장의 제안서 5건 × 30분이 5건 × 10초로 줄어든다."
-    - "견적 항목 표를 Jinja for-loop으로 동적 생성 — python-docx로는 복잡한 작업."
+    - "견적 항목 표를 Jinja for-loop으로 동적 생성 - python-docx로는 복잡한 작업."
     - "07강 단순 치환 한계(같은 단락 안 두 run 분리 자리표시자)도 docxtpl이 자동 처리."
   diagram:
     steps:
@@ -173,7 +173,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "3단계. 검증 — 영업 제안서 자동 생성"
+    title: "3단계. 검증 - 영업 제안서 자동 생성"
     structuredPrimary: true
     subtitle: "단순 + for-loop 결합"
     goal: "고객사·담당자·견적 항목이 모두 들어간 제안서가 정확히 만들어지는지 검증."
@@ -224,7 +224,7 @@ sections:
       assert "{{" not in combined
       combined.strip().splitlines()[:5]
     exercise:
-      prompt: "buildProposalTemplate과 renderProposal 본체를 완성하세요 — 양식에는 {% for %} 루프로 items를 출력하고, render는 합계까지 계산해 context에 주입."
+      prompt: "buildProposalTemplate과 renderProposal 본체를 완성하세요 - 양식에는 {% for %} 루프로 items를 출력하고, render는 합계까지 계산해 context에 주입."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -264,7 +264,7 @@ sections:
       resultCheck: "(True, True, True) 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "다수 제안서 일괄 생성"
     goal: "여러 고객사용 제안서를 한 번에 만든다."
     snippet: |-
@@ -332,4 +332,4 @@ sections:
           - "필터 (date 포맷, 천 단위 구분자)"
           - "표 행 동적 추가 ({% tr for %})"
           - "이미지 동적 삽입 ({{ logo | image }})"
-          - "08강 mailMerge와 결합 — docxtpl 기반 N장 생성"
+          - "08강 mailMerge와 결합 - docxtpl 기반 N장 생성"

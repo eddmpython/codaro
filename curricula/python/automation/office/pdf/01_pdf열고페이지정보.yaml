@@ -21,7 +21,7 @@ meta:
     - python.modulesAndIo
   estimatedMinutes: 40
   seo:
-    title: "pypdf로 PDF 열기 — PdfReader, pages, metadata 일괄 점검"
+    title: "pypdf로 PDF 열기 - PdfReader, pages, metadata 일괄 점검"
     description: "받은 50개 PDF의 페이지 수와 작성자·제목 메타데이터를 코드 한 번으로 표로 정리한다. PdfReader 기본 흐름과 함수화 패턴을 익힌다."
     keywords:
       - pypdf PdfReader
@@ -242,7 +242,7 @@ sections:
       resultCheck: "len(report)가 4이고 마지막 dict의 author가 '윤대리'여야 합니다."
 
   - id: validation
-    title: "4단계. 검증 루프 — 일괄 점검 결과 자동 확인"
+    title: "4단계. 검증 루프 - 일괄 점검 결과 자동 확인"
     structuredPrimary: true
     subtitle: "리스트 결과를 assert로 통째 검증"
     goal: "5개 PDF를 만들고 일괄 점검 결과를 assert 한 묶음으로 검증한다."
@@ -391,7 +391,7 @@ sections:
       resultCheck: "결과가 None이어야 합니다."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     structuredPrimary: true
     subtitle: "독립 실행 가능한 PDF 일괄 점검 도구"
     goal: "PdfReader + metadata + 일괄 점검을 결합한 작은 도구 두 개를 직접 작성한다."

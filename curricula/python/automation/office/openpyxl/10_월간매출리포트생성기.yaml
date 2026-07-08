@@ -386,7 +386,7 @@ sections:
     noError: Table ref가 detail.max_row 기준으로 만들어져야 합니다.
     resultCheck: 행 추가 시 ref의 끝 행 번호가 한 증가해야 합니다.
 - id: validation
-  title: 6단계. 검증 루프 — 보고서 생성기의 종합 계약
+  title: 6단계. 검증 루프 - 보고서 생성기의 종합 계약
   structuredPrimary: true
   subtitle: 한 함수로 전체 보고서 + 재오픈 전수 검증
   goal: 입력 DataFrame을 받아 summary/detail/raw 세 시트의 완성된 보고서를 만들고, 재오픈 후 모든 요소(시트·표·차트·수식·조건부 서식)를 자동 검증한다.
@@ -533,7 +533,7 @@ sections:
     noError: buildMonthlyReport이 정의된 환경에서 호출되어야 합니다.
     resultCheck: assert가 모두 통과하고 sheetnames가 ["summary", "detail", "raw"]여야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: 통합 보고서 생성 함수를 다른 도메인 데이터에 재사용하고, 입력 검증 실패 케이스도 자동 확인한다.
@@ -562,7 +562,7 @@ sections:
       target = Path(workdir.name) / "mission.xlsx"
       ___
     hints:
-    - 미션1은 buildScoreReport(path, frame) 함수를 직접 정의 — group_by class, summary + detail + raw 3시트.
+    - 미션1은 buildScoreReport(path, frame) 함수를 직접 정의 - group_by class, summary + detail + raw 3시트.
     - 미션2는 try/except로 세 잘못된 입력에 ValueError가 나는지 확인.
   check:
     noError: 미션1 함수가 ValueError 없이 끝나야 합니다. 미션2는 의도된 ValueError가 떠야 합니다.
@@ -700,4 +700,4 @@ sections:
     - 재오픈 후 시트 이름, 헤더 스타일, SUM 수식, 차트 개수, 표, raw 행 수까지 전수 검증
   - type: text
     content: |-
-      이 함수의 호출 인터페이스(path, frame)를 그대로 두면, 매월 다른 데이터로 같은 보고서를 자동으로 만들 수 있습니다. 다음 단계는 이 함수를 스케줄러나 메일 자동화에 붙이는 것입니다 — 그건 자동화 카테고리의 다른 강의에서 다룹니다.
+      이 함수의 호출 인터페이스(path, frame)를 그대로 두면, 매월 다른 데이터로 같은 보고서를 자동으로 만들 수 있습니다. 다음 단계는 이 함수를 스케줄러나 메일 자동화에 붙이는 것입니다 - 그건 자동화 카테고리의 다른 강의에서 다룹니다.

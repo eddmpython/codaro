@@ -2,7 +2,7 @@ meta:
   outcomeId: matplotlib.basics
   status: draft
   version: 1
-  note: "초안 — matplotlib 기본 플롯 오개념 시드. 시각화 진입. 사람이 정제 필요."
+  note: "초안 - matplotlib 기본 플롯 오개념 시드. 시각화 진입. 사람이 정제 필요."
 
 misconceptions:
   - id: matplotlib.basics.missingPyplotImport

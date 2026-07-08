@@ -304,7 +304,7 @@ sections:
     noError: 체이닝 호출이 끝나야 합니다.
     resultCheck: isExactly200이 True여야 합니다.
 - id: practice
-  title: 실습 — flower 다양한 편집
+  title: 실습 - flower 다양한 편집
   structuredPrimary: true
   subtitle: 같은 함수 다른 입력
   goal: flower 이미지에 동일한 crop/rotate/transpose 변환을 적용해 결과 dict가 같은 형식으로 돌아오는지 확인합니다.

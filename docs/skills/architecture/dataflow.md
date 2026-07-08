@@ -21,5 +21,5 @@ whenToUse: 의존 그래프 변경, rerun 범위 알고리즘 수정, side effec
 
 ## 관련
 
-- [[reactive-execution]] — 자동 재실행 의미론
-- [[transparent-scope-isolation]] — 변수 정의/사용 추론
+- [[reactive-execution]] - 자동 재실행 의미론
+- [[transparent-scope-isolation]] - 변수 정의/사용 추론

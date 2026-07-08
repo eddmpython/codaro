@@ -226,7 +226,7 @@ const categoryLabels: Record<string, { title: string; track: string; description
   resilience: {
     title: "운영 안전",
     track: "자동화",
-    description: "다시 실행해도, 중간에 죽어도 안전한 자동화 — 멱등성·체크포인트·원자적 쓰기.",
+    description: "다시 실행해도, 중간에 죽어도 안전한 자동화 - 멱등성·체크포인트·원자적 쓰기.",
   },
   inputCtl: {
     title: "입력·GUI 자동화",
@@ -316,7 +316,7 @@ const categoryTree: CurriculumCategoryTreeNode[] = [
   {
     id: "dev-literacy",
     name: "개발 교양",
-    description: "코드를 짜기 전 알아야 할 개발 세계의 지도 — 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.",
+    description: "코드를 짜기 전 알아야 할 개발 세계의 지도 - 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.",
     categories: ["devTools"],
   },
 ];

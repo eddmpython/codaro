@@ -512,7 +512,7 @@ sections:
     noError: Day 14 종합 복습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: Day 14 종합 복습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
 - id: reflection
-  title: Day 14 회고 — 반복문 패턴 굳히기
+  title: Day 14 회고 - 반복문 패턴 굳히기
   structuredPrimary: true
   subtitle: 기억 굳히기
   goal: Day 14에서 다룬 for/while과 흐름 제어(break, continue)의 차이를 자기 말로 정리한다.

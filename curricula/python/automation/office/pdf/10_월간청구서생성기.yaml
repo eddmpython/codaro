@@ -21,7 +21,7 @@ meta:
     - automation.pdf.security
   estimatedMinutes: 90
   seo:
-    title: "월간 청구서 자동 생성기 — CSV → 고객별 한글 PDF 묶음"
+    title: "월간 청구서 자동 생성기 - CSV → 고객별 한글 PDF 묶음"
     description: "01-09강에서 익힌 모든 패턴을 한 사이클에 결합한다. CSV 거래 데이터를 받아 고객별 한글 청구서 PDF를 일괄 생성하는 회계팀 실무 도구."
     keywords:
       - PDF 청구서 자동 생성
@@ -460,7 +460,7 @@ sections:
       resultCheck: "출력 3."
 
   - id: validation
-    title: "4단계. 검증 루프 — 일괄 결과 합계 자동 검증"
+    title: "4단계. 검증 루프 - 일괄 결과 합계 자동 검증"
     structuredPrimary: true
     subtitle: "각 PDF 본문 + 데이터 합계 일치"
     goal: "생성된 모든 청구서의 합계가 CSV 데이터의 부가세 포함 합계와 일치하는지 한 셀에서 검증한다."
@@ -689,7 +689,7 @@ sections:
       resultCheck: "리스트에 '75,000' 포함."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "회사 양식에 맞는 청구서 생성기"
     goal: "본인 회사 양식에 맞춘 청구서 생성기로 확장한다."
     why: "본 강의의 출력물은 학습용 청구서입니다. 실무 이전에 본인 양식으로 한 번 확장해보는 게 자동화 적용의 첫 단추입니다."
@@ -821,9 +821,9 @@ sections:
       - type: list
         style: bullet
         items:
-          - "Email 트랙 10강과 결합 — 생성된 청구서 PDF를 고객별 메일로 자동 발송"
-          - "08강 패턴 추가 — 청구서마다 'INTERNAL' 워터마크 + 비밀번호 (사외 공유용)"
+          - "Email 트랙 10강과 결합 - 생성된 청구서 PDF를 고객별 메일로 자동 발송"
+          - "08강 패턴 추가 - 청구서마다 'INTERNAL' 워터마크 + 비밀번호 (사외 공유용)"
           - "월별 디렉터리 자동 생성 (out/2026-05/, out/2026-06/)"
           - "결제 상태 dashboard 한 페이지 추가 (송장 발행 / 입금 완료 / 미수)"
-          - "openpyxl 트랙과 결합 — 청구서 발행 로그를 xlsx 대시보드로 자동 정리"
-          - "llmBasics 트랙과 결합 — 청구 내역 LLM 요약 코멘트를 청구서 상단에 자동 삽입"
+          - "openpyxl 트랙과 결합 - 청구서 발행 로그를 xlsx 대시보드로 자동 정리"
+          - "llmBasics 트랙과 결합 - 청구 내역 LLM 요약 코멘트를 청구서 상단에 자동 삽입"

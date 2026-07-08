@@ -18,7 +18,7 @@ meta:
     - automation.email.attachments
   estimatedMinutes: 50
   seo:
-    title: "표와 차트가 들어간 일일 메일 — DataFrame.to_html + 인라인 이미지"
+    title: "표와 차트가 들어간 일일 메일 - DataFrame.to_html + 인라인 이미지"
     description: "운영팀 일일 보고 메일을 DataFrame.to_html 표 + matplotlib png 인라인 이미지로 자동화. 100분/주 작업이 10초로 줄어든다."
     keywords:
       - DataFrame to_html
@@ -211,7 +211,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "4단계. 검증 루프 — 표 + 차트 일일 메일 통합 assert"
+    title: "4단계. 검증 루프 - 표 + 차트 일일 메일 통합 assert"
     structuredPrimary: true
     subtitle: "HTML 본문 + 첨부 cid + 첨부 수"
     goal: "buildDailyReport 함수가 만든 메시지의 HTML 표·인라인 이미지·첨부 수를 한 셀에서 검증한다."
@@ -303,7 +303,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "일일 보고서 발송기"
     goal: "운영팀 일일 보고서를 직접 작성한다."
     why: "운영 김대리가 매일 아침 매출 집계를 엑셀로 정리하고 캡쳐해서 팀장에게 메일 보내던 100분/주 작업이 사라집니다. 표 HTML + 인라인 차트 + (선택) PDF 첨부를 한 함수에 묶으면 데이터만 바꿔 매일 같은 메일을 자동 발송할 수 있고, 본 함수가 10강 주간 발송기의 메일 빌더로 그대로 재사용됩니다."
@@ -351,7 +351,7 @@ sections:
                   msg["From"] = "ops@example.com"
                   msg["To"] = toAddr
                   msg["Subject"] = "일일 매출 보고"
-                  msg.set_content("HTML 미지원 클라이언트용 본문 — 표와 차트는 HTML 본문에 포함", charset="utf-8")
+                  msg.set_content("HTML 미지원 클라이언트용 본문 - 표와 차트는 HTML 본문에 포함", charset="utf-8")
                   tableHtml = df.to_html(index=False, border=1)
                   msg.add_alternative(
                       f"<h2>일일 매출</h2>{tableHtml}<p><img src=\"cid:chart\"></p>",
@@ -395,5 +395,5 @@ sections:
           - "여러 차트(매출 + 비용)를 cid 다르게 두 개 인라인"
           - "표 색상 강조 (전일 대비 증감 색깔)"
           - "수신자별 다른 데이터 cut (지역장별)"
-          - "10강 결합 — 일일 보고서 + 주간 보고서 자동 분기 발송"
+          - "10강 결합 - 일일 보고서 + 주간 보고서 자동 분기 발송"
           - "PDF 트랙 10강의 청구서 PDF를 첨부로 추가"

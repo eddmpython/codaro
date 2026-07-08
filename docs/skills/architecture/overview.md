@@ -1,6 +1,6 @@
 ---
 id: architecture-overview
-title: 아키텍처 방향 — 5층 구조
+title: 아키텍처 방향 - 5층 구조
 description: Five-layer architecture overview for the Codaro runtime.
 category: architecture
 section: reference
@@ -25,11 +25,11 @@ whenToUse: 새 모듈 어느 레이어에 속할지 결정, 레이어 간 의존
 
 ```
 src/codaro/
-├── core/         # primitives — errorGuard, outputDescriptor, serverLog, appRuntime, customTool
+├── core/         # primitives - errorGuard, outputDescriptor, serverLog, appRuntime, customTool
 ├── engine/       # document model + execution runtime + reactive dataflow
 │   ├── document/ kernel/ runtime/ system/
-├── domain/       # business — curriculum, ai, automation
-├── transport/    # ui/widget bridge + app shell — api, webBuild
+├── domain/       # business - curriculum, ai, automation
+├── transport/    # ui/widget bridge + app shell - api, webBuild
 ├── extensions/   # plugin hooks
 ├── server.py     # entry
 └── cli.py        # entry

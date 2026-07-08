@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.textProcessing
   status: draft
   version: 1
-  note: "초안 — 문자열 처리(join/base64) 흔한 오개념 시드. 사람이 정제 필요."
+  note: "초안 - 문자열 처리(join/base64) 흔한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.textProcessing.joinNonString

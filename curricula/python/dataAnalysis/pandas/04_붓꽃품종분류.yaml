@@ -152,13 +152,13 @@ sections:
   structuredPrimary: true
   subtitle: dropna()
   goal: dropna()로 결측이 있는 행을 제거한 DataFrame을 만들고 원본/정제 행 수를 비교한다.
-  why: 결측치 처리의 첫 번째 전략은 삭제입니다. 표본이 충분히 많고 결측이 일부일 때 가장 안전합니다 — iris는 결측이 없어 행 수가 그대로지만 패턴은 익혀둡니다.
+  why: 결측치 처리의 첫 번째 전략은 삭제입니다. 표본이 충분히 많고 결측이 일부일 때 가장 안전합니다 - iris는 결측이 없어 행 수가 그대로지만 패턴은 익혀둡니다.
   explanation: |-
     dropna() 메서드는 결측치가 있는 행을 삭제합니다. 기본적으로 한 행에 하나라도 결측치가 있으면 그 행 전체를 제거합니다. 이 데이터는 결측치가 없어서 삭제되는 행이 없지만, 실제 데이터에서는 자주 사용하는 전처리 방법입니다. 원본은 유지되고 새로운 DataFrame을 반환합니다.
 
     dropna()는 기본적으로 행(row)을 삭제하지만, axis=1을 추가하면 열(column)을 삭제합니다. 또한 subset=['컬럼명']을 지정하면 특정 컬럼의 결측치만 기준으로 삼을 수 있습니다.
   tips:
-  - dropna(how='all')은 모든 컬럼이 결측인 행만 삭제합니다 — 기본값(how='any')보다 보수적입니다.
+  - dropna(how='all')은 모든 컬럼이 결측인 행만 삭제합니다 - 기본값(how='any')보다 보수적입니다.
   snippet: |-
     clean = iris.dropna()
     len(iris), len(clean)
@@ -183,7 +183,7 @@ sections:
   explanation: fillna() 메서드는 결측치를 특정 값으로 대체합니다. 삭제하는 대신 채우는 방식으로 처리할 수 있습니다. 0으로 채우거나, 평균값(fillna(df.mean())),
     중앙값(fillna(df.median())), 최빈값 등 다양한 전략을 사용할 수 있습니다. 데이터의 특성에 맞는 방법을 선택하는 것이 중요합니다.
   tips:
-  - fillna(method='ffill')은 앞 행 값으로, method='bfill'은 뒤 행 값으로 채웁니다 — 시계열에서 자주 씁니다.
+  - fillna(method='ffill')은 앞 행 값으로, method='bfill'은 뒤 행 값으로 채웁니다 - 시계열에서 자주 씁니다.
   snippet: |-
     filled = iris.fillna(0)
     filled.isna().sum()
@@ -210,7 +210,7 @@ sections:
 
     assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼'] = 값 방식도 가능하지만, Codaro에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다.
   tips:
-  - assign 인자에 lambda를 넘기면 메서드 체이닝 중간에서도 새 컬럼을 만들 수 있습니다 — df.query(...).assign(area=lambda d: d.x * d.y).
+  - assign 인자에 lambda를 넘기면 메서드 체이닝 중간에서도 새 컬럼을 만들 수 있습니다 - df.query(...).assign(area=lambda d: d.x * d.y).
   snippet: |-
     withArea = iris.assign(petalArea=iris['petal_length'] * iris['petal_width'])
     withArea.head()
@@ -304,7 +304,7 @@ sections:
   why: 분류 모델 학습 전 연속값을 범주로 묶는 binning이 흔한 전처리입니다. lambda 안의 if-else 한 줄이 가장 빠른 binning 패턴입니다.
   explanation: lambda 표현식 안에서 a if 조건 else b 형태를 쓰면 조건부 변환이 가능합니다. petal_length가 3보다 크면 large, 아니면 small로 분류합니다. value_counts로 각 범주에 몇 개씩 들어갔는지 확인할 수 있습니다.
   tips:
-  - 더 복잡한 분류는 def 함수로 빼는 것이 가독성이 좋습니다 — apply는 함수 이름도 받습니다.
+  - 더 복잡한 분류는 def 함수로 빼는 것이 가독성이 좋습니다 - apply는 함수 이름도 받습니다.
   snippet: |-
     iris['petal_length'].apply(lambda x: 'large' if x > 3 else 'small').value_counts()
   exercise:
@@ -327,7 +327,7 @@ sections:
   explanation: |-
     map() 메서드는 값을 다른 값으로 매핑(치환)합니다. 딕셔너리를 넣으면 키를 찾아서 대응하는 값으로 바꿔줍니다. 코드 값을 의미 있는 이름으로 바꾸거나, 영어를 한글로 변환하는 등 다양하게 활용할 수 있습니다. apply보다 간단하고 빠르게 값을 변환할 수 있습니다.
 
-    map과 apply의 차이는 명확합니다 — map은 딕셔너리나 Series로 1대1 매핑만 가능하지만 빠릅니다. apply는 복잡한 로직도 처리할 수 있지만 느립니다. 단순 치환은 map, 조건문이나 계산은 apply를 사용하세요.
+    map과 apply의 차이는 명확합니다 - map은 딕셔너리나 Series로 1대1 매핑만 가능하지만 빠릅니다. apply는 복잡한 로직도 처리할 수 있지만 느립니다. 단순 치환은 map, 조건문이나 계산은 apply를 사용하세요.
   tips:
   - dict에 없는 키는 NaN이 됩니다. dict.get(키, 기본값) 흉내를 내려면 fillna로 보강하거나 apply로 옮기세요.
   snippet: |-
@@ -354,7 +354,7 @@ sections:
   explanation: pandas에서 문자열 컬럼을 다룰 때는 .str 접근자를 사용합니다. .str을 붙이면 파이썬의 모든 문자열 메서드를 사용할 수 있습니다. upper()는
     대문자로, lower()는 소문자로 변환합니다. 그 외에도 split(), replace(), strip() 등 다양한 문자열 처리 기능을 제공합니다.
   tips:
-  - .str은 결측치(NaN)를 자동으로 건너뜁니다 — NaN.upper()로 에러가 나지 않습니다.
+  - .str은 결측치(NaN)를 자동으로 건너뜁니다 - NaN.upper()로 에러가 나지 않습니다.
   snippet: iris['species'].str.upper().head()
   exercise:
     prompt: upper 대신 title이나 capitalize로 바꿔 첫 글자만 대문자로 만드는 결과를 비교하세요.
@@ -394,7 +394,7 @@ sections:
   why: 같은 데이터가 두 번 들어오면 평균이 왜곡됩니다. 중복 확인은 데이터 정제의 마지막 점검 단계입니다.
   explanation: duplicated()는 중복 행을 True로 표시합니다. 첫 번째 발견은 False로 두고 두 번째부터 True로 표시하는 게 기본 동작입니다. sum()으로 True의 개수, 즉 중복 행 수를 셉니다.
   tips:
-  - duplicated(keep=False)는 중복된 모든 행을 True로 표시합니다 — 첫 발견도 포함됩니다.
+  - duplicated(keep=False)는 중복된 모든 행을 True로 표시합니다 - 첫 발견도 포함됩니다.
   - duplicated(subset=['species'])처럼 특정 컬럼만 기준으로 중복을 판단할 수도 있습니다.
   snippet: iris.duplicated().sum()
   exercise:
@@ -415,7 +415,7 @@ sections:
   why: duplicated로 발견했다면 제거가 다음 단계입니다. 정제 전후 길이 차이가 중복 제거된 행 수와 같은지 검증하는 습관이 중요합니다.
   explanation: drop_duplicates()로 중복 행을 제거합니다. 첫 번째 발견을 남기고 두 번째부터 삭제하는 게 기본입니다. keep='last'로 마지막을 남기거나 keep=False로 모든 중복을 삭제할 수 있습니다.
   tips:
-  - len(iris) - len(unique)가 iris.duplicated().sum()과 같아야 합니다 — 그렇지 않으면 옵션을 잘못 쓴 것입니다.
+  - len(iris) - len(unique)가 iris.duplicated().sum()과 같아야 합니다 - 그렇지 않으면 옵션을 잘못 쓴 것입니다.
   snippet: |-
     unique = iris.drop_duplicates()
     len(iris), len(unique)

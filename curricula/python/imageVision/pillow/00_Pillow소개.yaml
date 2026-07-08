@@ -393,7 +393,7 @@ sections:
 
     예제에서는 160x100 흰 캔버스에 파란 사각형과 노란 원을 그리고, validateRgbImage 가드로 입력 계약(RGB + size > 0)을 확인합니다. 그다음 그레이스케일 변환에서 mode가 RGB → L로 바뀌고 채널 수가 줄어드는지, 썸네일에서 size가 줄어드는지를 assert로 확인합니다.
 
-    이 패턴은 다음 강의들에서 그대로 반복됩니다 — 입력 만들기 → Pillow 메서드 → assert로 결과 확정.
+    이 패턴은 다음 강의들에서 그대로 반복됩니다 - 입력 만들기 → Pillow 메서드 → assert로 결과 확정.
   tips:
   - 합성 이미지(Image.new + ImageDraw)는 정답을 알고 있어 회귀 테스트로 쓰기 좋습니다.
   - image.size는 (width, height)이고 NumPy로 변환하면 (height, width)로 바뀝니다. 순서가 반대인 점을 기억하세요.

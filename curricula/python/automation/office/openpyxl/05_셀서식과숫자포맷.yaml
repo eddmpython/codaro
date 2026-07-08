@@ -36,7 +36,7 @@ intro:
     - label: Fill
       detail: 셀 배경 색상.
     - label: Border / Alignment
-      detail: 테두리와 정렬 — 표가 표처럼 보이게 한다.
+      detail: 테두리와 정렬 - 표가 표처럼 보이게 한다.
     - label: number_format / NamedStyle
       detail: 숫자 표현과 스타일 재사용.
     runtime:
@@ -348,7 +348,7 @@ sections:
     noError: column_dimensions의 키는 컬럼 문자, row_dimensions는 정수 인덱스입니다.
     resultCheck: B 컬럼 width가 20, 1행 height가 30이어야 합니다.
 - id: validation
-  title: 7단계. 검증 루프 — 스타일 보존 확인
+  title: 7단계. 검증 루프 - 스타일 보존 확인
   structuredPrimary: true
   subtitle: 저장 → 재오픈 → 스타일 비교
   goal: NamedStyle을 적용한 보고서를 저장 후 다시 열어, 스타일 이름과 핵심 속성이 보존되는지 확인한다.
@@ -441,7 +441,7 @@ sections:
     noError: 두 NamedStyle 모두 add_named_style로 등록되어야 합니다.
     resultCheck: A2의 style이 "dataRow"여야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: Font·Fill·Border·Alignment·NumberFormat·NamedStyle·컬럼너비를 두 가지 보고서에 결합한다.
@@ -580,7 +580,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      Font/Fill/Border/Alignment, 숫자 포맷, NamedStyle, 컬럼/행 크기까지 — 보고서의 시각적 표준을 코드로 만들었습니다. 다음 강의에서는 같은 표 위에 조건부 서식으로 "신호등" 효과를 얹습니다.
+      Font/Fill/Border/Alignment, 숫자 포맷, NamedStyle, 컬럼/행 크기까지 - 보고서의 시각적 표준을 코드로 만들었습니다. 다음 강의에서는 같은 표 위에 조건부 서식으로 "신호등" 효과를 얹습니다.
   - type: list
     style: bullet
     items:

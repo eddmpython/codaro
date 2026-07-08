@@ -213,7 +213,7 @@ sections:
         # 행 수가 늘수록 ratio가 커진다. 작은 표에서는 측정값이 흔들릴 수 있으니 시간 대소를 단정하지 않는다.
         {"slow": round(slowElapsed, 3), "fast": round(fastElapsed, 3), "ratio": round(slowElapsed / max(fastElapsed, 1e-6), 1)}
       solution: |-
-        # starterCode와 동일 — 도서 10권으로 비교, ratio 값이 5권일 때보다 커지는 것을 확인
+        # starterCode와 동일 - 도서 10권으로 비교, ratio 값이 5권일 때보다 커지는 것을 확인
         # 행 수가 N배가 되면 셀별 입력 시간도 거의 N배가 되지만, 일괄 입력은 거의 그대로
         # 따라서 ratio = slow/fast가 N배 가까이 커진다
         pass

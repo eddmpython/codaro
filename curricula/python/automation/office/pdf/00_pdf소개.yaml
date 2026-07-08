@@ -19,7 +19,7 @@ meta:
     - python.modulesAndIo
   estimatedMinutes: 30
   seo:
-    title: PDF 자동화 소개 — pypdf·pdfplumber·reportlab으로 사무 PDF를 끝낸다
+    title: PDF 자동화 소개 - pypdf·pdfplumber·reportlab으로 사무 PDF를 끝낸다
     description: "받은 PDF에서 텍스트·표를 뽑고, 새 PDF로 만들고, 묶고·자르고·잠그는 흐름을 로컬 Python으로 완결한다. 10개 프로젝트 학습 흐름과 한글 폰트 정책을 정리한다."
     keywords:
       - pdf 자동화
@@ -160,7 +160,7 @@ sections:
         headers: ["라이브러리", "역할", "사용 강의", "라이선스"]
         rows:
           - ["pypdf", "읽기, 페이지 추출, 병합, 분할, 메타데이터, 암호화", "01·02·03·08·09·10", "BSD"]
-          - ["pdfplumber", "텍스트와 표 구조 추출 — pypdf의 빈자리", "03·04·10", "MIT"]
+          - ["pdfplumber", "텍스트와 표 구조 추출 - pypdf의 빈자리", "03·04·10", "MIT"]
           - ["reportlab", "PDF 생성 (저수준, 한글 폰트 임베드 가능)", "05·06·07·08·10", "BSD"]
       - type: note
         title: "왜 PyMuPDF·fpdf2를 쓰지 않나"
@@ -175,10 +175,10 @@ sections:
       - type: table
         headers: ["페르소나", "주간 PDF 작업", "이 트랙 졸업 시 산출물"]
         rows:
-          - ["회계팀 김대리", "매월 200건 거래내역에서 고객별 청구서 PDF 수동 작성", "10강 — CSV 한 번 돌리면 200개 청구서"]
-          - ["총무팀 박과장", "협력사 견적·계약서 PDF 50종 분리·통합 반복", "02강 — 자동 분리·병합 스크립트"]
-          - ["마케팅 이주임", "사외 공유 PDF에 워터마크·패스워드 수동 처리", "08강 — 일괄 워터마크·암호화"]
-          - ["HR 윤대리", "국세청·공공기관 PDF 표를 엑셀에 손으로 옮김", "04강 — pdfplumber 표 추출 → CSV"]
+          - ["회계팀 김대리", "매월 200건 거래내역에서 고객별 청구서 PDF 수동 작성", "10강 - CSV 한 번 돌리면 200개 청구서"]
+          - ["총무팀 박과장", "협력사 견적·계약서 PDF 50종 분리·통합 반복", "02강 - 자동 분리·병합 스크립트"]
+          - ["마케팅 이주임", "사외 공유 PDF에 워터마크·패스워드 수동 처리", "08강 - 일괄 워터마크·암호화"]
+          - ["HR 윤대리", "국세청·공공기관 PDF 표를 엑셀에 손으로 옮김", "04강 - pdfplumber 표 추출 → CSV"]
 
   - id: capability_map
     title: "4. 10개 프로젝트로 다루는 능력"
@@ -209,8 +209,8 @@ sections:
       - type: list
         style: check
         items:
-          - "한글 폰트 임베드 — reportlab 기본 폰트로는 한글이 박스(□)로 깨집니다. 06강에서 시스템에 설치된 한글 폰트(Windows 맑은 고딕 / macOS AppleSDGothicNeo / Linux NanumGothic)를 OS별로 찾아 등록하는 헬퍼 함수를 만들고, 06~10강이 모두 그 헬퍼를 재사용합니다."
-          - "한글 PDF 표 추출 — pdfplumber는 한국 정부 PDF의 세로 병합 셀이나 선 없는 표에 어긋날 수 있습니다. 04강에서 table_settings 튜닝과 한계를 모두 솔직히 다룹니다. 손이 더 정확할 때는 손이 빠르다는 점도 같이 가르칩니다."
+          - "한글 폰트 임베드 - reportlab 기본 폰트로는 한글이 박스(□)로 깨집니다. 06강에서 시스템에 설치된 한글 폰트(Windows 맑은 고딕 / macOS AppleSDGothicNeo / Linux NanumGothic)를 OS별로 찾아 등록하는 헬퍼 함수를 만들고, 06~10강이 모두 그 헬퍼를 재사용합니다."
+          - "한글 PDF 표 추출 - pdfplumber는 한국 정부 PDF의 세로 병합 셀이나 선 없는 표에 어긋날 수 있습니다. 04강에서 table_settings 튜닝과 한계를 모두 솔직히 다룹니다. 손이 더 정확할 때는 손이 빠르다는 점도 같이 가르칩니다."
       - type: note
         title: "폰트 파일은 저장소에 동봉하지 않는다"
         content: "라이선스 부담과 저장소 크기 때문에 .ttf 파일을 강의 자료에 넣지 않습니다. 대신 06강의 registerKoreanFont() 헬퍼가 OS별로 시스템 폰트를 자동으로 찾고, 못 찾으면 어떤 명령으로 설치하라고 안내합니다(Linux는 apt install fonts-nanum, Windows·macOS는 기본 폰트 사용)."

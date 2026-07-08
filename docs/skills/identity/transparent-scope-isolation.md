@@ -1,6 +1,6 @@
 ---
 id: transparent-scope-isolation
-title: 실행 모델 — 투명 스코프 격리
+title: 실행 모델 - 투명 스코프 격리
 description: Python-native scope isolation principles for Codaro block execution.
 category: identity
 section: concepts
@@ -20,5 +20,5 @@ whenToUse: 셀 실행 의미론, 변수 주입, 네임스페이스 격리 설계
 
 ## 관련
 
-- [[reactive-execution]] — 변수 변경의 하위 셀 전파
-- [[percent-format]] — 셀 경계 정의
+- [[reactive-execution]] - 변수 변경의 하위 셀 전파
+- [[percent-format]] - 셀 경계 정의

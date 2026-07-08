@@ -1,6 +1,6 @@
 meta:
   id: '35'
-  title: 동시성 — threading, multiprocessing, futures
+  title: 동시성 - threading, multiprocessing, futures
   day: 35
   category: advancedPython
   tags:

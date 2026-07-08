@@ -16,7 +16,7 @@ meta:
     - automation.email.receive
   estimatedMinutes: 50
   seo:
-    title: "메일 룰 기반 자동 분류 — 발신자/제목 → 폴더 이동"
+    title: "메일 룰 기반 자동 분류 - 발신자/제목 → 폴더 이동"
     description: "발신자와 제목 룰을 정의해 받은 메일을 자동으로 폴더 분류. inbox zero를 코드로 달성."
     keywords:
       - 메일 자동 분류
@@ -162,7 +162,7 @@ sections:
       resultCheck: "출력 []."
 
   - id: validation
-    title: "3단계. 검증 루프 — 룰 매칭 단위 검증"
+    title: "3단계. 검증 루프 - 룰 매칭 단위 검증"
     structuredPrimary: true
     subtitle: "matchRule을 단위 assert"
     goal: "다양한 발신자/제목 조합으로 matchRule이 의도대로 분류하는지 검증한다."
@@ -222,7 +222,7 @@ sections:
       resultCheck: "'ok' 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "발신자 도메인별 자동 분류 도구"
     goal: "발신자 도메인을 자동 추출해 폴더로 분류하는 함수를 만든다."
     why: "1인 사장님이 매일 30분씩 손으로 받은 메일을 폴더로 옮기는 사이클이 사라집니다. 발신자 도메인 → 폴더 룰 하나로 거래처·관공서·뉴스레터 분류가 한 번에 끝나고, 본 트랙 후반의 dryRun → 실행 패턴과 결합하면 inbox zero가 코드로 매일 자동 유지됩니다."

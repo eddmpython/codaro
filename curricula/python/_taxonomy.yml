@@ -2670,7 +2670,7 @@ lessonOutcomes:
     estimatedMinutes: 90
     lessonRole: project
 
-  # advancedPython 트랙 — 나머지 백필
+  # advancedPython 트랙 - 나머지 백필
   "advancedPython/03_클로저와상태관리":
     outcomes: [python.advancedSyntax]
     prerequisites: [python.functions]
@@ -2942,7 +2942,7 @@ lessonOutcomes:
     estimatedMinutes: 40
     lessonRole: project
 
-  # openpyxl 트랙 — 파일 기반 엑셀 자동화
+  # openpyxl 트랙 - 파일 기반 엑셀 자동화
   "openpyxl/00_openpyxl소개":
     outcomes: [automation.excel.intro]
     prerequisites: [python.functions, python.modulesAndIo]
@@ -3002,7 +3002,7 @@ lessonOutcomes:
     estimatedMinutes: 90
     lessonRole: project
 
-  # xlwings 트랙 — 라이브 Excel 자동화
+  # xlwings 트랙 - 라이브 Excel 자동화
   "xlwings/00_xlwings소개":
     outcomes: [automation.excel.intro]
     prerequisites: [python.functions, python.modulesAndIo]

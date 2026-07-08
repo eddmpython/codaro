@@ -429,7 +429,7 @@ sections:
     noError: try/except, exception, extra 흐름이 KeyError 없이 끝나야 합니다.
     resultCheck: 결과 dict의 firstLine이 "ERROR|req-001|나누기 실패"이고 hasTraceback이 True여야 합니다.
 - id: practical
-  title: 실전 — API 호출 로깅
+  title: 실전 - API 호출 로깅
   structuredPrimary: true
   subtitle: 함수 한 개로 컨텍스트 묶기
   goal: API 호출을 흉내내는 함수 안에서 시작/성공/실패 record를 한 번에 남기고, 호출 직후 캡처된 로그 라인을 검증합니다.
@@ -511,7 +511,7 @@ sections:
     noError: callApi 정의와 두 번 호출이 NameError 없이 끝나야 합니다.
     resultCheck: lineCount가 3이고 errorLines가 정확히 1개 항목이며, failResult의 status가 'error'여야 합니다.
 - id: workflow_validation
-  title: 검증 루프 — 구조화 로그 품질 게이트
+  title: 검증 루프 - 구조화 로그 품질 게이트
   structuredPrimary: true
   subtitle: JSON 한 줄로 운영 친화 포맷
   goal: 커스텀 Formatter로 record를 JSON 한 줄로 직렬화하고 그 JSON을 다시 파싱해 필수 필드가 빠지지 않았는지 검증합니다.
@@ -605,7 +605,7 @@ sections:
     noError: WorkflowJsonFormatter 정의와 JSON 파싱이 KeyError/JSONDecodeError 없이 끝나야 합니다.
     resultCheck: parsedRecords가 2개 항목 리스트이고 첫 항목의 requestId가 'req-101'이어야 합니다.
 - id: practice
-  title: 종합 복습 — 로깅 미니 시스템
+  title: 종합 복습 - 로깅 미니 시스템
   structuredPrimary: true
   subtitle: configure 함수 한 개로 일관된 설정
   goal: configureLogger 함수가 이름, 레벨, 포맷을 받아 항상 같은 핸들러 1개를 반환하도록 만들고, 두 번 호출해도 핸들러가 중복되지 않는지 확인합니다.

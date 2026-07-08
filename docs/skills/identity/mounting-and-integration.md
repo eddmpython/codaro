@@ -20,5 +20,5 @@ whenToUse: 외부 프레임워크(FastAPI/Django/Flask) 통합, root_path 처리
 
 ## 관련
 
-- [[execution-engine]] — 엔진 추상화
-- [[architecture-overview]] — transport 레이어
+- [[execution-engine]] - 엔진 추상화
+- [[architecture-overview]] - transport 레이어

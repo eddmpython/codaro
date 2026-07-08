@@ -92,7 +92,7 @@ sections:
   why: 그룹별 분석에 들어가기 전에 그룹마다 표본이 몇 개인지 알아야 합니다. 표본이 1~2개인 그룹은 평균이 불안정하므로 분석 정책을 미리 정할 수 있습니다.
   explanation: Adelie 152, Gentoo 124, Chinstrap 68마리입니다. value_counts는 컬럼의 고유 값마다 등장 횟수를 세서 내림차순으로 정렬한 Series를 반환합니다. groupby + size와 같은 결과지만 한 줄로 끝납니다.
   tips:
-  - value_counts(normalize=True)를 쓰면 횟수 대신 비율을 반환합니다 — Adelie가 전체의 약 44%임을 바로 볼 수 있습니다.
+  - value_counts(normalize=True)를 쓰면 횟수 대신 비율을 반환합니다 - Adelie가 전체의 약 44%임을 바로 볼 수 있습니다.
   snippet: penguins['species'].value_counts()
   exercise:
     prompt: species 대신 sex나 island 컬럼으로 바꿔 어떤 분포가 나오는지 확인하세요.
@@ -188,7 +188,7 @@ sections:
     prompt: body_mass_g 대신 flipper_length_mm로 바꿔 종별 평균 날개 길이를 구해보세요.
     starterCode: penguins.groupby('species')['body_mass_g'].mean()
     hints:
-    - 숫자 컬럼이면 mean을 호출할 수 있습니다 — bill_length_mm, bill_depth_mm도 시도해보세요.
+    - 숫자 컬럼이면 mean을 호출할 수 있습니다 - bill_length_mm, bill_depth_mm도 시도해보세요.
     - 결과는 Series이고 인덱스는 항상 'Adelie', 'Chinstrap', 'Gentoo' 알파벳 순입니다.
   check:
     type: contains
@@ -247,7 +247,7 @@ sections:
 
     reset_index()를 사용하지 않으면 결과가 Series 형태로 나옵니다. DataFrame으로 만들려면 reset_index()를 붙이거나, 처음부터 groupby('species')[['body_mass_g']].mean()처럼 2겹 대괄호를 사용하면 됩니다.
   tips:
-  - groupby의 as_index=False 옵션도 같은 결과를 줍니다 — penguins.groupby('species', as_index=False)['body_mass_g'].mean().
+  - groupby의 as_index=False 옵션도 같은 결과를 줍니다 - penguins.groupby('species', as_index=False)['body_mass_g'].mean().
   snippet: penguins.groupby('species')['body_mass_g'].mean().reset_index()
   exercise:
     prompt: reset_index()를 빼고 실행한 결과(Series)와 붙인 결과(DataFrame)를 비교해 type()으로 차이를 확인하세요.
@@ -264,13 +264,13 @@ sections:
   structuredPrimary: true
   subtitle: 종 + 성별
   goal: groupby(['species','sex'])로 두 컬럼 조합별 평균을 구해 교차 분석을 한다.
-  why: 한 컬럼만으로는 보이지 않는 패턴이 두 컬럼 조합에서 드러납니다 — 같은 종 안에서도 수컷이 암컷보다 무거운 패턴은 species만으로는 안 보입니다.
+  why: 한 컬럼만으로는 보이지 않는 패턴이 두 컬럼 조합에서 드러납니다 - 같은 종 안에서도 수컷이 암컷보다 무거운 패턴은 species만으로는 안 보입니다.
   explanation: |-
     groupby는 하나의 컬럼뿐만 아니라 여러 컬럼을 동시에 기준으로 사용할 수 있습니다. 리스트 형태로 여러 컬럼을 전달하면 해당 컬럼들의 조합으로 그룹이 만들어집니다. 예를 들어 ['species', 'sex']로 그룹핑하면 (Adelie, MALE), (Adelie, FEMALE), (Gentoo, MALE), (Gentoo, FEMALE)... 이렇게 종과 성별의 모든 조합별로 그룹이 생성됩니다. 교차 분석이 필요할 때 매우 유용합니다. 같은 종 내에서도 수컷과 암컷의 체중 차이를 비교할 수 있습니다.
 
     여러 컬럼으로 그룹핑하면 결과의 인덱스가 MultiIndex(다층 인덱스)가 됩니다. reset_index()로 평평하게 만들거나, as_index=False 파라미터를 추가하면 처음부터 평평한 DataFrame을 얻을 수 있습니다.
   tips:
-  - MultiIndex Series는 .unstack()으로 두 번째 인덱스를 컬럼으로 펼칠 수 있습니다 — 교차표 형태가 됩니다.
+  - MultiIndex Series는 .unstack()으로 두 번째 인덱스를 컬럼으로 펼칠 수 있습니다 - 교차표 형태가 됩니다.
   snippet: penguins.groupby(['species', 'sex'])['body_mass_g'].mean()
   exercise:
     prompt: groupby의 리스트를 [species, sex] 대신 [island, species]로 바꿔 섬별/종별 평균을 구해보세요.
@@ -293,13 +293,13 @@ sections:
 
     agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할 수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다.
   tips:
-  - agg에 lambda도 넘길 수 있습니다 — agg(['mean', lambda s: s.max() - s.min()])처럼 범위(range)를 즉석에서 정의 가능합니다.
+  - agg에 lambda도 넘길 수 있습니다 - agg(['mean', lambda s: s.max() - s.min()])처럼 범위(range)를 즉석에서 정의 가능합니다.
   snippet: penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
   exercise:
     prompt: 리스트에 'std', 'median'을 추가해 표준편차와 중앙값까지 한 번에 보세요.
     starterCode: penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
     hints:
-    - std가 클수록 그룹 내 체중 편차가 큽니다 — Gentoo가 std가 가장 큰 종입니다.
+    - std가 클수록 그룹 내 체중 편차가 큽니다 - Gentoo가 std가 가장 큰 종입니다.
     - median과 mean이 차이가 크면 분포가 한쪽으로 치우쳐 있다는 신호입니다.
   check:
     type: contains
@@ -318,7 +318,7 @@ sections:
 
     딕셔너리의 값으로 리스트를 주면 한 컬럼에 여러 함수를 적용할 수 있습니다. 예: {'body_mass_g': ['mean', 'std'], 'bill_length_mm': 'max'}처럼 작성하면 체중은 평균과 표준편차, 부리는 최대값을 계산합니다.
   tips:
-  - pandas 0.25+ 에서는 named aggregation도 가능합니다 — agg(avg_mass=('body_mass_g','mean'))처럼 결과 컬럼 이름을 직접 지정할 수 있습니다.
+  - pandas 0.25+ 에서는 named aggregation도 가능합니다 - agg(avg_mass=('body_mass_g','mean'))처럼 결과 컬럼 이름을 직접 지정할 수 있습니다.
   snippet: |-
     penguins.groupby('species').agg({
         'body_mass_g': 'mean',
@@ -351,13 +351,13 @@ sections:
 
     query()는 내부적으로 문자열을 파싱해서 조건을 평가합니다. 비교 연산자(>, <, ==, !=)뿐만 아니라 and, or, not 같은 논리 연산자도 사용할 수 있습니다. 예: query('body_mass_g > 4000 and sex == "MALE"')
   tips:
-  - query 문자열 안에서 외부 변수를 쓰려면 @ 접두사를 붙입니다 — threshold = 5000; query('body_mass_g > @threshold').
+  - query 문자열 안에서 외부 변수를 쓰려면 @ 접두사를 붙입니다 - threshold = 5000; query('body_mass_g > @threshold').
   snippet: penguins.query('body_mass_g > 5000')
   exercise:
     prompt: 조건을 '4500 < body_mass_g < 5500'처럼 범위 형태로 바꿔 chained comparison을 시도하세요.
     starterCode: penguins.query('body_mass_g > 5000')
     hints:
-    - query는 파이썬 chained comparison(a < x < b)을 지원합니다 — DataFrame[] 방식보다 자연스럽습니다.
+    - query는 파이썬 chained comparison(a < x < b)을 지원합니다 - DataFrame[] 방식보다 자연스럽습니다.
     - 결과 shape의 행 수가 조건에 맞는 행 수와 같아야 합니다.
   check:
     type: contains
@@ -424,7 +424,7 @@ sections:
 
     idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예: penguins['body_mass_g'].idxmax(skipna=False)
   tips:
-  - groupby와 함께 쓰면 더 강력합니다 — penguins.loc[penguins.groupby('species')['body_mass_g'].idxmax()]는 종별 최대 체중 행을 모두 가져옵니다.
+  - groupby와 함께 쓰면 더 강력합니다 - penguins.loc[penguins.groupby('species')['body_mass_g'].idxmax()]는 종별 최대 체중 행을 모두 가져옵니다.
   snippet: |-
     maxIdx = penguins['body_mass_g'].idxmax()
     penguins.loc[maxIdx]
@@ -451,7 +451,7 @@ sections:
 
     변주 실험: 성별까지 groupby에 포함해 species, sex 조합별 평균을 만들고, 표본 수가 1개인 그룹을 리포트에서 제외할지 정책을 정하세요.
   tips:
-  - 합성 4행 DataFrame은 정답을 알고 있으므로 assert로 결과를 100% 고정할 수 있습니다 — 회귀 테스트의 패턴입니다.
+  - 합성 4행 DataFrame은 정답을 알고 있으므로 assert로 결과를 100% 고정할 수 있습니다 - 회귀 테스트의 패턴입니다.
   - named aggregation(count=('body_mass_g','size'))은 결과 컬럼 이름을 미리 정해 리포트 형태로 바로 사용 가능합니다.
   snippet: |-
     import pandas as pd
@@ -511,7 +511,7 @@ sections:
 
     각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   tips:
-  - "분석 시작 전 가설을 한 문장으로 적어보세요 — 예: '수컷 펭귄은 모든 종에서 암컷보다 부리가 길 것이다'."
+  - "분석 시작 전 가설을 한 문장으로 적어보세요 - 예: '수컷 펭귄은 모든 종에서 암컷보다 부리가 길 것이다'."
   snippet: |-
     import pandas as pd
     from codaro.curriculum.localData import loadLocalDataset

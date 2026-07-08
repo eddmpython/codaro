@@ -35,7 +35,7 @@ intro:
     - label: 차트 생성
       detail: BarChart/LineChart/PieChart 중 선택해 add_data/set_categories.
     - label: 시트에 배치
-      detail: ws.add_chart(chart, anchor) — anchor는 차트 좌상단 셀 좌표.
+      detail: ws.add_chart(chart, anchor) - anchor는 차트 좌상단 셀 좌표.
     - label: 차트 보존 재오픈
       detail: 재오픈 후 ws._charts 리스트에 의도한 개수와 제목이 보존되는지 assert로 확인.
     runtime:
@@ -260,7 +260,7 @@ sections:
     noError: anchor 문자열은 유효한 셀 좌표여야 합니다.
     resultCheck: chart.width가 25여야 합니다.
 - id: validation
-  title: 5단계. 검증 루프 — 차트 보존 확인
+  title: 5단계. 검증 루프 - 차트 보존 확인
   structuredPrimary: true
   subtitle: 저장 → 재오픈 → _charts 길이 비교
   goal: 차트를 추가한 보고서를 저장 후 다시 열어 차트가 보존되는지 자동으로 확인한다.
@@ -366,7 +366,7 @@ sections:
     noError: PieChart 영역이 BarChart와 같은 데이터를 정확한 Reference로 잡아야 합니다.
     resultCheck: _charts 길이가 3이어야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: BarChart·LineChart·PieChart를 두 가지 보고서 시나리오에 결합한다.
@@ -395,7 +395,7 @@ sections:
       target = Path(workdir.name) / "mission.xlsx"
       ___
     hints:
-    - 미션1은 같은 데이터에 두 차트 — anchor를 분리해 같은 시트에 배치.
+    - 미션1은 같은 데이터에 두 차트 - anchor를 분리해 같은 시트에 배치.
     - 미션2 DataLabelList에 showPercent=True, showCatName=True.
   check:
     noError: Reference 영역이 데이터 범위와 일치해야 합니다.
@@ -404,7 +404,7 @@ sections:
   - type: tip
     content: 두 차트를 같은 시트에 배치할 때는 anchor 셀을 충분히 떨어뜨려 둬야 시각적으로 겹치지 않습니다.
   - type: expansion
-    title: "미션1: 주간 매출 — BarChart + LineChart 한 시트"
+    title: "미션1: 주간 매출 - BarChart + LineChart 한 시트"
     blocks:
     - type: code
       title: 데이터 + 두 차트
@@ -499,4 +499,4 @@ sections:
     - "titles_from_data=True로 첫 행을 시리즈 이름으로 자동 인식."
     - BarChart=카테고리 비교, LineChart=시간 흐름, PieChart=비율 구성.
     - DataLabelList(showPercent, showCatName)로 슬라이스 라벨 제어.
-    - "ws.add_chart(chart, anchor) — anchor는 좌상단 셀 좌표 문자열."
+    - "ws.add_chart(chart, anchor) - anchor는 좌상단 셀 좌표 문자열."

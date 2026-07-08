@@ -25,5 +25,5 @@ whenToUse: 새 블록 타입 추가, 파서/writer 변경, 외부 포맷 호환 
 
 ## 관련
 
-- [[percent-format]] — 기본 직렬화 포맷
-- [[execution-engine]] — 블록 실행 인터페이스
+- [[percent-format]] - 기본 직렬화 포맷
+- [[execution-engine]] - 블록 실행 인터페이스

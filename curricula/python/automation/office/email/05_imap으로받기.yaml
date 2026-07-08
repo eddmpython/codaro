@@ -17,7 +17,7 @@ meta:
     - automation.email.send
   estimatedMinutes: 50
   seo:
-    title: "imaplib로 메일 받기 — IMAP4_SSL, select, search, fetch"
+    title: "imaplib로 메일 받기 - IMAP4_SSL, select, search, fetch"
     description: "imaplib.IMAP4_SSL로 메일함을 코드로 다룬다. 최근 N일 메일 검색 후 제목 목록을 만든다. 본인 메일 계정 환경변수 필수."
     keywords:
       - imaplib
@@ -27,7 +27,7 @@ meta:
 intro:
   direction: "imaplib.IMAP4_SSL로 메일함에 접속해 검색·조회한다. 본인 메일 계정 환경변수가 필요하며, 항상 별도 폴더(INBOX/CodaroTest)에서만 작업."
   benefits:
-    - "사장님의 매일 30분 메일 분류를 위한 첫 단계 — 받은 메일 목록을 코드로 다루기."
+    - "사장님의 매일 30분 메일 분류를 위한 첫 단계 - 받은 메일 목록을 코드로 다루기."
     - "imaplib는 표준. 외부 패키지 0개로 IMAP 전 흐름 처리."
     - "Gmail·Naver·Outlook IMAP4 모두 같은 패턴으로 접속."
   diagram:
@@ -103,7 +103,7 @@ sections:
     structuredPrimary: true
     subtitle: "conn.select('INBOX/CodaroTest')"
     goal: "INBOX/CodaroTest 폴더만 선택해 실수로 inbox 본문에 접근하지 않게 한다."
-    why: "본 트랙 안전 정책 — IMAP 작업은 항상 별도 폴더에서. 학습 중 inbox 메일을 실수로 삭제하는 사고를 사전 차단합니다."
+    why: "본 트랙 안전 정책 - IMAP 작업은 항상 별도 폴더에서. 학습 중 inbox 메일을 실수로 삭제하는 사고를 사전 차단합니다."
     explanation: |-
       conn.select(폴더명)을 호출하면 그 폴더가 활성화됩니다. 없는 폴더면 자동 생성되지 않으므로 conn.create('INBOX.CodaroTest')로 미리 생성. Gmail은 INBOX/CodaroTest, 일반 IMAP은 INBOX.CodaroTest 표기 차이.
     tips:
@@ -205,7 +205,7 @@ sections:
       resultCheck: "빈 리스트 출력."
 
   - id: validation
-    title: "4단계. 검증 루프 — 환경 가드 자동 검증"
+    title: "4단계. 검증 루프 - 환경 가드 자동 검증"
     structuredPrimary: true
     subtitle: "환경변수 가드 + 함수 시그니처 단위 검증"
     goal: "환경변수가 없을 때 함수가 안전하게 빈 리스트를 돌려주는지 한 셀에서 검증한다."
@@ -266,7 +266,7 @@ sections:
       resultCheck: "출력 []."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "최근 메일 제목 모으기 도구"
     goal: "IMAP 패턴을 함수로 묶어 본인 계정 또는 환경 가드 동작을 검증한다."
     why: "검색 + 조회 + 환경 가드 세 가지가 한 함수에 모이면 06강 첨부 자동 저장과 07강 룰 기반 분류가 같은 진입점에서 시작합니다. 환경변수가 없는 CI에서는 자동 skip, 본인 계정에서는 실 IMAP 호출이 같은 코드 경로로 흐르는 게 본 강의의 도착점입니다."
@@ -343,4 +343,4 @@ sections:
           - "결과 캐싱 (UID 기록 후 다음 호출에 SEEN 표시)"
           - "여러 폴더 동시 조회 (CodaroTest + Archive)"
           - "Naver IMAP으로 동일 패턴 전환"
-          - "06강 결합 — 검색 결과를 첨부 저장 함수로 넘기기"
+          - "06강 결합 - 검색 결과를 첨부 저장 함수로 넘기기"

@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.merge
   status: draft
   version: 1
-  note: "초안 — DataFrame 병합(merge/join) 단계 오개념 시드. 실무 데이터 결합 빈출. 사람이 정제 필요."
+  note: "초안 - DataFrame 병합(merge/join) 단계 오개념 시드. 실무 데이터 결합 빈출. 사람이 정제 필요."
 
 misconceptions:
   - id: pandas.merge.keyNotFound

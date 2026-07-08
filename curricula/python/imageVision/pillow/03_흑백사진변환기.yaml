@@ -309,7 +309,7 @@ sections:
     noError: 네 변환 호출과 dict 구성이 끝나야 합니다.
     resultCheck: 네 결과 모두 'mode' 키를 가지고 binary uniqueCount가 2여야 합니다.
 - id: practice
-  title: 실습 — bloomTone 함수
+  title: 실습 - bloomTone 함수
   structuredPrimary: true
   subtitle: 입력별 동일 흐름
   goal: bloomTone(image) 함수가 RGB 입력을 받아 gray/binary/sepia 세 결과를 dict로 돌려주도록 만들고, flower와 china 입력에 같은 형식으로 적용합니다.

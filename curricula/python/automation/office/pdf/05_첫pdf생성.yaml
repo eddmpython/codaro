@@ -19,7 +19,7 @@ meta:
     - automation.pdf.read
   estimatedMinutes: 45
   seo:
-    title: "reportlab Canvas — 첫 PDF 생성하기"
+    title: "reportlab Canvas - 첫 PDF 생성하기"
     description: "Canvas, drawString, setFont, showPage, save 5개 함수로 첫 PDF를 만든다. 좌하단 (0,0) 좌표계와 단위 pt를 손에 익힌다."
     keywords:
       - reportlab Canvas
@@ -55,7 +55,7 @@ sections:
     structuredPrimary: true
     subtitle: "Canvas, drawString, showPage, save"
     goal: "Hello PDF 한 줄이 들어간 한 페이지 PDF를 만든다."
-    why: "사외 견적서, 사내 주간보고, 협력사 발주서 — 사무에서 만드는 모든 PDF는 결국 'Canvas 만들기 → 텍스트 그리기 → showPage → save' 네 동작의 변주입니다. 다섯 함수를 한 번에 손에 익히면 06강 한글 폰트, 07강 표·이미지, 10강 청구서 빌더까지 같은 형태로 자연스럽게 확장됩니다."
+    why: "사외 견적서, 사내 주간보고, 협력사 발주서 - 사무에서 만드는 모든 PDF는 결국 'Canvas 만들기 → 텍스트 그리기 → showPage → save' 네 동작의 변주입니다. 다섯 함수를 한 번에 손에 익히면 06강 한글 폰트, 07강 표·이미지, 10강 청구서 빌더까지 같은 형태로 자연스럽게 확장됩니다."
     explanation: |-
       Canvas(str(path)) 호출로 PDF 작성용 객체를 만들고, drawString(x, y, text)로 좌표에 문자열을 그립니다. showPage()는 현재 페이지를 닫고 다음 페이지를 시작합니다. 마지막에 save()를 호출해야 파일이 디스크에 쓰입니다.
     tips:
@@ -262,7 +262,7 @@ sections:
       resultCheck: "출력이 7."
 
   - id: validation
-    title: "5단계. 검증 루프 — 생성 → 재오픈 단위 assert"
+    title: "5단계. 검증 루프 - 생성 → 재오픈 단위 assert"
     structuredPrimary: true
     subtitle: "페이지 수 + 본문 키워드 통합 검증"
     goal: "함수로 만든 PDF의 페이지 수와 모든 페이지 본문 키워드를 한 셀에서 검증한다."
@@ -379,7 +379,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "데이터 → PDF 변환 함수"
     goal: "데이터 리스트로부터 PDF를 만드는 작은 함수 두 개를 작성한다."
     why: "데이터에서 PDF를 만드는 함수를 직접 작성해야 10강 청구서 생성기의 흐름이 자연스럽습니다."

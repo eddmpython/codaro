@@ -105,7 +105,7 @@ sections:
     amountColumn = next(sheet.iter_cols(min_row=2, min_col=3, max_col=3, values_only=True))
     sum(amountColumn), max(amountColumn), min(amountColumn)
   exercise:
-    prompt: amount의 평균을 한 줄로 구해 보세요. (힌트 — sum/len 또는 statistics.mean)
+    prompt: amount의 평균을 한 줄로 구해 보세요. (힌트 - sum/len 또는 statistics.mean)
     starterCode: |-
       from openpyxl import Workbook
       from statistics import mean
@@ -280,7 +280,7 @@ sections:
     noError: 병합과 해제 범위 문자열이 같아야 합니다.
     resultCheck: 해제 후 merged_cells.ranges가 빈 시퀀스여야 합니다.
 - id: validation
-  title: 6단계. 검증 루프 — 다중 시트 보고서의 계약
+  title: 6단계. 검증 루프 - 다중 시트 보고서의 계약
   structuredPrimary: true
   subtitle: 예측 → 실행 → 검증
   goal: 카테고리 분리 함수가 만든 보고서를 다시 열어 시트별 행 수와 합계가 원본과 일치하는지 자동 검증한다.
@@ -386,7 +386,7 @@ sections:
     noError: buildRegionReport가 ValueError 없이 끝나야 합니다.
     resultCheck: originalTotal과 rebuiltTotal이 같아야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: iter_rows·범위 슬라이스·다중 시트 분리·셀 병합 네 가지를 두 가지 시나리오에 결합한다.
@@ -526,8 +526,8 @@ sections:
   - type: list
     style: bullet
     items:
-    - iter_rows / iter_cols — 행/열 방향 순회, values_only로 값만 빠르게
-    - "ws['A1:C3'] — 사각 범위 슬라이스, 좌표 직관"
-    - merge_cells / unmerge_cells — 헤더 시각적 정렬
+    - iter_rows / iter_cols - 행/열 방향 순회, values_only로 값만 빠르게
+    - "ws['A1:C3'] - 사각 범위 슬라이스, 좌표 직관"
+    - merge_cells / unmerge_cells - 헤더 시각적 정렬
     - 다중 시트 분리 = defaultdict + create_sheet의 짝
-    - "분리 결과의 합 = 원본의 합 — 데이터 손실을 막는 핵심 계약"
+    - "분리 결과의 합 = 원본의 합 - 데이터 손실을 막는 핵심 계약"

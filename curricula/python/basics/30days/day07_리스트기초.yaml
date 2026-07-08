@@ -435,7 +435,7 @@ sections:
     noError: Day 7 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 7 종합 복습 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
 - id: reflection
-  title: Day 7 회고 — 리스트 첫 감각 굳히기
+  title: Day 7 회고 - 리스트 첫 감각 굳히기
   structuredPrimary: true
   subtitle: 기억 굳히기
   goal: Day 7에서 다룬 리스트 생성, 인덱싱, 슬라이싱의 핵심을 자기 말로 정리한다.

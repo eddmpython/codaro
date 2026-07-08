@@ -19,7 +19,7 @@ meta:
     - python.modulesAndIo
   estimatedMinutes: 30
   seo:
-    title: "requests 자동화 소개 — REST API로 일일 데이터 수집 파이프라인"
+    title: "requests 자동화 소개 - REST API로 일일 데이터 수집 파이프라인"
     description: "requests 한 패키지로 외부 API 호출·인증·페이지네이션·파일 전송을 다루고 마지막에 httpx async로 병렬을 확장한다. 10개 프로젝트로 주간 8시간 절감 목표."
     keywords:
       - requests
@@ -31,7 +31,7 @@ meta:
 intro:
   direction: "외부 API에서 매일 받아야 하는 데이터를 requests 한 패키지로 자동 수집·결합·통보한다. 마지막 한 강의만 httpx로 비동기·병렬을 다룬다."
   benefits:
-    - "주간 8시간 이상 절감 — 미세먼지·환율·외부 검색·Slack 알림·페이지네이션 수집."
+    - "주간 8시간 이상 절감 - 미세먼지·환율·외부 검색·Slack 알림·페이지네이션 수집."
     - "10개 프로젝트로 GET·POST·헤더·세션·페이지네이션·스트리밍·비동기까지 한 트랙에서 끝낸다."
     - "안전 정책 4종(환경변수, timeout, sandbox URL, dryRun)이 모든 강의 첫 셀에 의무로 들어가 학습 중 사고를 사전 차단."
   diagram:
@@ -132,7 +132,7 @@ sections:
           - ["os.environ + dryRun 가드", "자격증명·안전 패턴", "03 이후 공통"]
       - type: note
         title: "왜 urllib·aiohttp·requests-html을 쓰지 않나"
-        content: "urllib는 표준이지만 JSON·세션·헤더에 보일러플레이트가 폭증해 학습 효율이 떨어집니다. aiohttp는 비동기 전용이라 학습 곡선이 가팔라 단 한 강의(09) 노출에 부적합 — 동일 API 모양의 httpx가 requests 사용자에게 이전 비용이 가장 낮습니다. requests-html은 메인터넌스 정체로 권장하지 않습니다."
+        content: "urllib는 표준이지만 JSON·세션·헤더에 보일러플레이트가 폭증해 학습 효율이 떨어집니다. aiohttp는 비동기 전용이라 학습 곡선이 가팔라 단 한 강의(09) 노출에 부적합 - 동일 API 모양의 httpx가 requests 사용자에게 이전 비용이 가장 낮습니다. requests-html은 메인터넌스 정체로 권장하지 않습니다."
 
   - id: persona_match
     title: "3. 누가 어느 강의에서 답을 얻나"
@@ -143,10 +143,10 @@ sections:
       - type: table
         headers: ["페르소나", "주간 API 작업", "이 트랙 졸업 시 산출물"]
         rows:
-          - ["데이터 분석 김주임", "매일 공공데이터포털에서 미세먼지·기상 조회 → 엑셀 정리 (40분/일)", "01·07·10강 — 페이지네이션 자동 수집 + DataFrame 저장"]
-          - ["운영 박대리", "매일 환율 사이트 보고 사내 게시판에 옮김 (15분/일)", "02·05강 — 환율 API + 안전 호출 + 로컬 캐시"]
-          - ["마케팅 정주임", "캠페인 결과를 Naver/Kakao Open API로 점검 (회당 30분)", "03·08강 — 헤더 인증 + 이미지 일괄 다운로드"]
-          - ["DevOps 박과장", "배치 결과를 Slack에 수동 통보 (장애당 10분)", "04·05강 — POST 호출 + 재시도 가드"]
+          - ["데이터 분석 김주임", "매일 공공데이터포털에서 미세먼지·기상 조회 → 엑셀 정리 (40분/일)", "01·07·10강 - 페이지네이션 자동 수집 + DataFrame 저장"]
+          - ["운영 박대리", "매일 환율 사이트 보고 사내 게시판에 옮김 (15분/일)", "02·05강 - 환율 API + 안전 호출 + 로컬 캐시"]
+          - ["마케팅 정주임", "캠페인 결과를 Naver/Kakao Open API로 점검 (회당 30분)", "03·08강 - 헤더 인증 + 이미지 일괄 다운로드"]
+          - ["DevOps 박과장", "배치 결과를 Slack에 수동 통보 (장애당 10분)", "04·05강 - POST 호출 + 재시도 가드"]
 
   - id: capability_map
     title: "4. 10개 프로젝트로 다루는 능력"
@@ -174,10 +174,10 @@ sections:
       - type: list
         style: check
         items:
-          - "자격증명은 환경변수만 — 코드에 평문 API 키 금지. os.environ['NAVER_CLIENT_ID']."
-          - "timeout 의무화 — 모든 호출에 timeout=10 이상. 무한 대기로 스크립트가 영구 정지되는 사고 차단."
-          - "sandbox/예제 URL 우선 — httpbin.org, 공공 sample, GitHub public API로 동작 확인 후 실 API."
-          - "dryRun 일관성 — POST/PUT/DELETE 같은 부수효과 호출은 기본 dryRun=True. 실 호출은 명시적으로 dryRun=False."
+          - "자격증명은 환경변수만 - 코드에 평문 API 키 금지. os.environ['NAVER_CLIENT_ID']."
+          - "timeout 의무화 - 모든 호출에 timeout=10 이상. 무한 대기로 스크립트가 영구 정지되는 사고 차단."
+          - "sandbox/예제 URL 우선 - httpbin.org, 공공 sample, GitHub public API로 동작 확인 후 실 API."
+          - "dryRun 일관성 - POST/PUT/DELETE 같은 부수효과 호출은 기본 dryRun=True. 실 호출은 명시적으로 dryRun=False."
       - type: note
         title: "공공데이터포털 인증키 발급 절차"
         content: "data.go.kr 회원가입 → 원하는 API 페이지에서 '활용신청' → 일반 인증키(Encoding) / 일반 인증키(Decoding) 두 종류 발급. URL에 그대로 붙이려면 Encoding, params= 키워드로 넘기려면 Decoding을 권장합니다. 환경변수 DATA_GO_KR_KEY에 저장하고 코드는 os.environ으로 읽습니다."

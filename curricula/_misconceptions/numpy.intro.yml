@@ -2,7 +2,7 @@ meta:
   outcomeId: numpy.intro
   status: draft
   version: 1
-  note: "초안 — numpy 첫 단계(배열 생성·벡터 연산) 오개념 시드. 데이터 분석 진입. 사람이 정제 필요."
+  note: "초안 - numpy 첫 단계(배열 생성·벡터 연산) 오개념 시드. 데이터 분석 진입. 사람이 정제 필요."
 
 misconceptions:
   - id: numpy.intro.missingImportAlias

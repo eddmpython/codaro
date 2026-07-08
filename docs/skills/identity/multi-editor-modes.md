@@ -33,6 +33,6 @@ Codaro의 제품 표면은 `editor/`이고, 사용자에게 보이는 표면은 
 
 ## 관련
 
-- [[learning-three-pillars]] — 학습 모드의 콘텐츠
-- [[automation-tasks-reports]] — 자동화, 태스크, 실행 결과 산출물
-- [[widget-bridge]] — 모드별 위젯 렌더링
+- [[learning-three-pillars]] - 학습 모드의 콘텐츠
+- [[automation-tasks-reports]] - 자동화, 태스크, 실행 결과 산출물
+- [[widget-bridge]] - 모드별 위젯 렌더링

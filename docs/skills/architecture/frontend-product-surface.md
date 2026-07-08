@@ -13,8 +13,8 @@ whenToUse: 편집기/학습기 화면 추가, 제품 UI 컴포넌트 선택, 제
 
 Codaro의 프론트는 두 폴더 경계로 나눈다.
 
-- `landing/` — GitHub Pages 문서와 글쓰기 표면. React + Vite 정적 사이트 기준.
-- `editor/` — Codaro 제품 표면. 대화, 현재 학습, 노트북, 자동화 UI를 모두 포함한다. React + shadcn/ui 기준.
+- `landing/` - GitHub Pages 문서와 글쓰기 표면. React + Vite 정적 사이트 기준.
+- `editor/` - Codaro 제품 표면. 대화, 현재 학습, 노트북, 자동화 UI를 모두 포함한다. React + shadcn/ui 기준.
 
 폐기된 이전 편집기 앱은 더 이상 제품 표면의 기준이 아니다. 현재 제품 표면의 source of truth는 `editor/` 하나다.
 
@@ -159,7 +159,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 ## 관련
 
-- [[architecture-overview]] — UI는 실행기 구현 세부사항에 직접 묶이지 않는다
-- [[widget-bridge]] — Python descriptor와 프론트 렌더링 경계
-- [[learning-yaml-contract]] — 섹션 단위 학습카드의 YAML SSOT
-- [[learning-three-pillars]] — 학습 모드의 콘텐츠와 철학
+- [[architecture-overview]] - UI는 실행기 구현 세부사항에 직접 묶이지 않는다
+- [[widget-bridge]] - Python descriptor와 프론트 렌더링 경계
+- [[learning-yaml-contract]] - 섹션 단위 학습카드의 YAML SSOT
+- [[learning-three-pillars]] - 학습 모드의 콘텐츠와 철학

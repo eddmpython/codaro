@@ -20,7 +20,7 @@ meta:
     - automation.pdf.create
   estimatedMinutes: 50
   seo:
-    title: "PDF 워터마크와 암호화 — pypdf encrypt + overlay"
+    title: "PDF 워터마크와 암호화 - pypdf encrypt + overlay"
     description: "사외 공유 PDF에 사내전용 워터마크와 패스워드를 한 흐름에 적용한다. 50개 PDF 일괄 보안 처리가 50분에서 6초로 줄어든다."
     keywords:
       - PDF 워터마크
@@ -376,7 +376,7 @@ sections:
       resultCheck: "출력 7."
 
   - id: validation
-    title: "5단계. 검증 루프 — 보안 처리 통합 assert"
+    title: "5단계. 검증 루프 - 보안 처리 통합 assert"
     structuredPrimary: true
     subtitle: "워터마크 텍스트 + 암호화 + 페이지 수 단일 검증"
     goal: "secureExport 결과의 페이지 수, 암호화 여부, 워터마크 텍스트 포함을 한 셀에서 검증한다."
@@ -542,7 +542,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "보안 처리 도구 두 개"
     goal: "워터마크와 암호화 패턴을 결합한 도구 두 개를 작성한다."
     why: "사외 공유 보안 처리는 정형적이고 빈도가 높은 작업입니다. 함수 두 개로 일상 업무 자동화가 됩니다."

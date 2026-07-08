@@ -18,7 +18,7 @@ meta:
     - automation.email.send
   estimatedMinutes: 50
   seo:
-    title: "다수 수신자와 개인화 — CSV → 100명 안내 메일"
+    title: "다수 수신자와 개인화 - CSV → 100명 안내 메일"
     description: "string.Template로 본문을 치환해 CSV 명단에서 100명에게 개인화 메일을 일괄 발송. dryRun으로 안전 검증."
     keywords:
       - 메일 mail merge
@@ -43,7 +43,7 @@ intro:
         detail: "전 명단 메시지 객체를 먼저 생성·검증, 실 발송은 마지막."
     runtime:
       - label: "표준 라이브러리만"
-        detail: "csv, string, email, smtplib — 모두 표준."
+        detail: "csv, string, email, smtplib - 모두 표준."
       - label: "검증"
         detail: "각 메시지의 To와 본문 치환 결과를 assert."
 
@@ -227,7 +227,7 @@ sections:
       resultCheck: "출력 3."
 
   - id: validation
-    title: "4단계. 검증 루프 — 100건 본문 자동 검증"
+    title: "4단계. 검증 루프 - 100건 본문 자동 검증"
     structuredPrimary: true
     subtitle: "모든 메시지 To + 본문 키워드 일괄 assert"
     goal: "buildPersonalizedMessages 결과의 각 메시지가 의도한 수신자와 개인화 본문을 가지는지 한 셀에서 검증한다."
@@ -317,7 +317,7 @@ sections:
       resultCheck: "출력 4."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "안내 메일 일괄 발송기"
     goal: "CSV + Template + dryRun 패턴을 함수로 묶어 일괄 발송기 완성."
     why: "마케팅 정주임이 그대로 가져갈 수 있는 도구가 본 강의의 도착점입니다."
@@ -399,6 +399,6 @@ sections:
         items:
           - "Template 본문에 $today, $deadline 같은 동적 필드 추가"
           - "발송 결과 (성공/실패) 로그를 CSV로 저장"
-          - "수신자별로 다른 첨부 파일 (개인 청구서 PDF) 결합 — PDF 10강과 연결"
+          - "수신자별로 다른 첨부 파일 (개인 청구서 PDF) 결합 - PDF 10강과 연결"
           - "CC/BCC 컬럼을 CSV에 추가해 한 번에 처리"
           - "한국식 직급 매핑: role='대리'면 '대리님', '과장'이면 '과장님'으로 자동 변환"

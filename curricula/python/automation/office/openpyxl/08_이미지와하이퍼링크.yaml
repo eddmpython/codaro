@@ -243,7 +243,7 @@ sections:
     noError: Comment 인자가 두 개(text, author) 모두 필요합니다.
     resultCheck: B3.comment.text와 author가 입력 값과 같아야 합니다.
 - id: validation
-  title: 5단계. 검증 루프 — 상품 카탈로그
+  title: 5단계. 검증 루프 - 상품 카탈로그
   structuredPrimary: true
   subtitle: 저장 → 재오픈 → 이미지·링크·코멘트 보존
   goal: 이미지·URL 링크·내부 링크·코멘트를 모두 결합한 카탈로그를 만들고, 재오픈해 각 요소가 보존됐는지 확인한다.
@@ -362,7 +362,7 @@ sections:
     noError: products의 각 튜플이 5개 요소여야 unpack이 통과합니다.
     resultCheck: _images 길이가 3이어야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: 이미지·외부 URL·내부 링크·코멘트 네 가지를 두 가지 실무 양식에 결합한다.
@@ -468,9 +468,9 @@ sections:
         bookSummary.title = "summary"
         bookSummary.append(["chapter", "link", "note"])
         chapters = [
-            ("chapter1", "1장 — 시작", "필수 읽기"),
-            ("chapter2", "2장 — 응용", "심화"),
-            ("chapter3", "3장 — 종합", "프로젝트"),
+            ("chapter1", "1장 - 시작", "필수 읽기"),
+            ("chapter2", "2장 - 응용", "심화"),
+            ("chapter3", "3장 - 종합", "프로젝트"),
         ]
         for index, (sheetName, label, note) in enumerate(chapters, start=2):
             workBook.create_sheet(sheetName)

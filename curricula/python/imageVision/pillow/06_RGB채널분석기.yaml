@@ -357,7 +357,7 @@ sections:
     noError: split/merge가 끝나야 합니다.
     resultCheck: rIsNowOriginalB와 bIsNowOriginalR 모두 True여야 합니다.
 - id: practice
-  title: 실습 — analyzeChannels 함수
+  title: 실습 - analyzeChannels 함수
   structuredPrimary: true
   subtitle: 통합 채널 진단
   goal: analyzeChannels(image) 함수가 split→평균→dominant 채널까지 한 dict로 묶어 보고하고, flower와 china 두 입력에 같은 형식으로 적용합니다.

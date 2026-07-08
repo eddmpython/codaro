@@ -291,7 +291,7 @@ sections:
     noError: 세 객체 생성과 dict 구성이 끝나야 합니다.
     resultCheck: thumbnailKeepsRatio가 True이고 resizeIgnoresRatio가 True여야 합니다.
 - id: practice
-  title: 실습 — china 메타데이터 진단
+  title: 실습 - china 메타데이터 진단
   structuredPrimary: true
   subtitle: describeImage 함수
   goal: describeImage(image) 함수가 size/mode/format/pixelCount 네 키를 가진 진단 dict를 돌려주도록 만들고, flower와 china 두 입력에 같은 형식으로 적용합니다.

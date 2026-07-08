@@ -386,7 +386,7 @@ sections:
     noError: 세 adaptiveThreshold 호출이 끝나야 합니다.
     resultCheck: count5, count21, count51 모두 양의 정수여야 합니다.
 - id: practice
-  title: 실습 — flower에서 OTSU
+  title: 실습 - flower에서 OTSU
   structuredPrimary: true
   subtitle: 실제 사진 일반화
   goal: flower 컬러 사진을 그레이스케일로 변환해 OTSU 자동 임계값을 적용하고, 객체 픽셀 비율을 dict로 정리합니다.

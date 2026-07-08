@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.fileSystem
   status: draft
   version: 1
-  note: "초안 — 파일 읽기/쓰기 오개념 시드. 사람이 정제 필요."
+  note: "초안 - 파일 읽기/쓰기 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.fileSystem.fileNotFound

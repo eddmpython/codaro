@@ -322,7 +322,7 @@ sections:
     noError: VLOOKUP 영역 좌표가 실제 Codes 시트의 데이터 범위를 포함해야 합니다.
     resultCheck: 4개 VLOOKUP 수식 문자열이 모두 같은 영역과 같은 컬럼 인덱스 2를 사용해야 합니다.
 - id: validation
-  title: 6단계. 검증 루프 — 수식 문자열 계약
+  title: 6단계. 검증 루프 - 수식 문자열 계약
   structuredPrimary: true
   subtitle: 예측 → 실행 → 검증
   goal: 수식 자체가 의도한 함수와 영역을 포함하는지 코드로 검증한다.
@@ -422,7 +422,7 @@ sections:
     noError: buildInvoice가 items 길이에 맞게 subtotal 행을 정확히 계산해야 합니다.
     resultCheck: subtotal 수식 문자열의 영역이 추가된 행 수에 맞게 확장되어야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: 수식 입력·DefinedName·VLOOKUP을 두 가지 양식(견적서·수강신청서)에 적용한다.
@@ -458,7 +458,7 @@ sections:
   - type: tip
     content: 두 미션은 서로 다른 prefix로 변수를 분리합니다.
   - type: expansion
-    title: "미션1: 견적서 — 소계/세금/총액 수식 + DefinedName"
+    title: "미션1: 견적서 - 소계/세금/총액 수식 + DefinedName"
     blocks:
     - type: code
       title: 견적서 생성

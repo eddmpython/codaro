@@ -1,6 +1,6 @@
 ---
 id: percent-format
-title: 파일 포맷 — Percent Format (.py)
+title: 파일 포맷 - Percent Format (.py)
 description: Percent-format notebook conventions that keep files executable as Python.
 category: identity
 section: concepts
@@ -20,5 +20,5 @@ whenToUse: 문서 파서/writer, ipynb 변환, 외부 에디터 호환성 다룰
 
 ## 관련
 
-- [[document-model]] — 블록 중심 내부 모델
-- [[transparent-scope-isolation]] — 셀이 모듈 레벨에서 실행되는 의미
+- [[document-model]] - 블록 중심 내부 모델
+- [[transparent-scope-isolation]] - 셀이 모듈 레벨에서 실행되는 의미

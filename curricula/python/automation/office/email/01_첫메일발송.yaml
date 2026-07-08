@@ -16,7 +16,7 @@ meta:
     - automation.email.intro
   estimatedMinutes: 40
   seo:
-    title: "smtplib 첫 메일 발송 — EmailMessage + dryRun 안전 패턴"
+    title: "smtplib 첫 메일 발송 - EmailMessage + dryRun 안전 패턴"
     description: "smtplib.SMTP_SSL과 EmailMessage로 자기 자신에게 메일을 보낸다. dryRun 안전 패턴으로 학습 중 오발송 차단."
     keywords:
       - smtplib SMTP_SSL
@@ -80,7 +80,7 @@ sections:
       hints:
         - "Subject 문자열 '월간 보고서 발송'."
     check:
-      noError: "헤더 키는 대소문자 구분합니다 — 'Subject'."
+      noError: "헤더 키는 대소문자 구분합니다 - 'Subject'."
       resultCheck: "출력 첫 원소가 '월간 보고서 발송'."
 
   - id: step2_dryrun
@@ -207,7 +207,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "4단계. 검증 루프 — EmailMessage 단위 assert"
+    title: "4단계. 검증 루프 - EmailMessage 단위 assert"
     structuredPrimary: true
     subtitle: "헤더 + 본문 통합 assert"
     goal: "buildMessage가 만든 객체의 From·To·Subject·본문이 모두 의도와 같은지 한 셀에서 검증한다."
@@ -297,7 +297,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "메시지 빌더와 안전한 발송 래퍼"
     goal: "buildMessage와 sendMessage를 직접 작성해 dryRun 패턴이 일관되는지 확인한다."
     why: "두 함수가 본 트랙의 모든 강의에서 재사용되는 핵심 빌딩 블록입니다."

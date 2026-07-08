@@ -1,6 +1,6 @@
 meta:
   id: requests_11
-  title: 사업자등록 상태조회 — 세금계산서 발행 차단 리스트 자동화
+  title: 사업자등록 상태조회 - 세금계산서 발행 차단 리스트 자동화
   order: 11
   category: requests
   difficulty: ⭐⭐
@@ -19,7 +19,7 @@ meta:
     - automation.webApi.get
   estimatedMinutes: 45
   seo:
-    title: "사업자등록 상태조회 자동화 — 국세청 Open API로 휴폐업·과세유형 일괄 확인"
+    title: "사업자등록 상태조회 자동화 - 국세청 Open API로 휴폐업·과세유형 일괄 확인"
     description: "공공데이터포털 국세청 사업자등록 상태조회 Open API를 requests로 호출해 거래처 휴업·폐업·면세·미등록을 일괄 분류하고, 세금계산서 발행 차단 리스트를 자동 생성한다."
     keywords:
       - 사업자등록 상태조회
@@ -32,7 +32,7 @@ intro:
   direction: "거래처 사업자번호 목록을 국세청 공식 Open API로 일괄 조회해 휴업·폐업·면세·미등록을 분류하고, 세금계산서를 끊으면 안 되는 '발행 차단 리스트'를 자동으로 만든다."
   benefits:
     - "월·분기 마감마다 거래처 수백 건의 휴폐업 여부를 홈택스에 하나씩 치던 일을 배치 1회로. 폐업자에게 끊은 세금계산서는 매입세액 불공제로 실제 돈이 샌다."
-    - "로그인·인증서·간편인증이 전혀 필요 없는 공식 API라 깨지지 않는다 — 화면 스크래핑보다 안정적이고 정당하다."
+    - "로그인·인증서·간편인증이 전혀 필요 없는 공식 API라 깨지지 않는다 - 화면 스크래핑보다 안정적이고 정당하다."
     - "serviceKey는 환경변수로 분리하고, 키 없이도 샘플 응답으로 전체 흐름을 학습·검증한다."
   diagram:
     steps:
@@ -52,13 +52,13 @@ intro:
 
 sections:
   - id: choose_method
-    title: "1단계. 방법 결정 — API가 스크래핑을 이긴다"
+    title: "1단계. 방법 결정 - API가 스크래핑을 이긴다"
     structuredPrimary: true
     subtitle: "결정 트리: 공식 API > 일괄 다운로드 > 세션 재사용"
     goal: "자동화 첫 질문을 '로그인을 어떻게 뚫나'가 아니라 '공식 API/일괄기능이 있나'로 바꾸는 결정 트리를 만든다."
     why: "사업자 상태조회는 국세청이 공식 Open API로 제공한다. 그래서 홈택스 화면 로그인 자동화(간편인증·보안플러그인·anti-bot으로 깨짐)가 아니라 requests 한 번이 정답이다. 이 판단이 자동화의 절반이다."
     explanation: |-
-      자동화 대상을 만나면 첫 질문은 "이 작업에 공식 API나 네이티브 일괄기능이 있나?"다. 있으면 화면을 긁지 않는다 — API는 인증서·간편인증·보안플러그인·anti-bot이 없어 깨지지 않고 정당하다.
+      자동화 대상을 만나면 첫 질문은 "이 작업에 공식 API나 네이티브 일괄기능이 있나?"다. 있으면 화면을 긁지 않는다 - API는 인증서·간편인증·보안플러그인·anti-bot이 없어 깨지지 않고 정당하다.
 
       사업자등록 상태조회는 공공데이터포털(data.go.kr)에 국세청 공식 Open API가 있다. 따라서 로그인 자동화는 잘못된 출발점이고, requests로 API를 부르는 게 정공이다. 로그인 세션 재사용(storage_state)은 "공식 경로가 전혀 없을 때"의 마지막 수단이다.
     tips:
@@ -116,7 +116,7 @@ sections:
 
       코드 값에만 의존해 분류하면 문자열 표기 변화에 흔들리지 않는다.
     tips:
-      - "미등록 번호는 b_stt_cd가 빈 문자열('')이고 tax_type에 '등록되지 않은' 안내 문구가 온다 — 정상 응답이지 에러가 아니다."
+      - "미등록 번호는 b_stt_cd가 빈 문자열('')이고 tax_type에 '등록되지 않은' 안내 문구가 온다 - 정상 응답이지 에러가 아니다."
       - "상태 문자열(b_stt)이 아니라 코드(b_stt_cd)로 분기하면 표기가 바뀌어도 안전하다."
     snippet: |-
       STATUS_BY_CODE = {"01": "계속", "02": "휴업", "03": "폐업"}
@@ -172,12 +172,12 @@ sections:
     goal: "여러 건의 상태조회 결과에서 세금계산서를 끊으면 안 되는 거래처를 차단 리스트로 모은다."
     why: "폐업·휴업·미등록 거래처에 세금계산서를 발행하면 매입세액 불공제로 돈이 샌다. 면세사업자에게는 세금계산서가 아니라 계산서를 끊어야 한다. 이걸 사람 눈으로 거르던 일을 코드가 한다."
     explanation: |-
-      발행 차단 대상은 두 가지다. (1) 상태가 정상(계속, b_stt_cd '01')이 아닌 거래처 — 휴업·폐업·미등록. (2) 면세사업자 — tax_type에 '면세'가 들어가면 세금계산서 대상이 아니다.
+      발행 차단 대상은 두 가지다. (1) 상태가 정상(계속, b_stt_cd '01')이 아닌 거래처 - 휴업·폐업·미등록. (2) 면세사업자 - tax_type에 '면세'가 들어가면 세금계산서 대상이 아니다.
 
       buildBlockList는 응답 data를 돌며 이 두 조건 중 하나라도 맞으면 차단 리스트에 넣는다. 정상 일반·간이과세자만 통과한다.
     tips:
       - "차단 사유를 함께 담으면 운영자가 왜 막혔는지 바로 안다(폐업/휴업/미등록/면세)."
-      - "조건은 'b_stt_cd != 01' 또는 'tax_type에 면세 포함' — 둘 중 하나면 차단."
+      - "조건은 'b_stt_cd != 01' 또는 'tax_type에 면세 포함' - 둘 중 하나면 차단."
     snippet: |-
       STATUS_BY_CODE = {"01": "계속", "02": "휴업", "03": "폐업"}
 
@@ -236,17 +236,17 @@ sections:
       resultCheck: "폐업·미등록·면세 세 건이 사유와 함께 차단된다."
 
   - id: real_call
-    title: "4단계. 실전 호출 — serviceKey 위생과 dryRun"
+    title: "4단계. 실전 호출 - serviceKey 위생과 dryRun"
     structuredPrimary: true
     subtitle: "requests.post + os.environ + dryRun 안전판"
     goal: "국세청 상태조회 API를 부르는 실제 호출 함수를 만들되, 키가 없으면 샘플로 폴백해 결정론적으로 검증한다."
-    why: "serviceKey는 자격증명이다 — 코드·커밋·로그에 절대 남기지 않고 환경변수로 분리한다. dryRun 안전판은 키 없이도 전체 파이프라인을 돌려보게 해준다."
+    why: "serviceKey는 자격증명이다 - 코드·커밋·로그에 절대 남기지 않고 환경변수로 분리한다. dryRun 안전판은 키 없이도 전체 파이프라인을 돌려보게 해준다."
     explanation: |-
-      엔드포인트는 POST `https://api.odcloud.kr/api/nts-businessman/v1/status`이고, 쿼리 파라미터에 serviceKey, 본문에 `{"b_no": [사업자번호들]}`(하이픈 없는 숫자, 한 번에 100건)를 보낸다. serviceKey는 os.environ["DATA_GO_KR_KEY"]로 읽는다 — 평문 키를 코드에 넣지 않는다.
+      엔드포인트는 POST `https://api.odcloud.kr/api/nts-businessman/v1/status`이고, 쿼리 파라미터에 serviceKey, 본문에 `{"b_no": [사업자번호들]}`(하이픈 없는 숫자, 한 번에 100건)를 보낸다. serviceKey는 os.environ["DATA_GO_KR_KEY"]로 읽는다 - 평문 키를 코드에 넣지 않는다.
 
       queryStatus는 dryRun이 True거나 키가 없으면 네트워크를 타지 않고 sample 응답을 돌려준다. 학습·테스트는 이 경로로 결정론적으로 검증하고, 실전에서는 dryRun=False로 실제 호출한다.
     tips:
-      - "serviceKey를 코드에 박거나 커밋하지 않는다 — 환경변수(DATA_GO_KR_KEY)로만. 공공데이터포털에서 활용신청 후 무료 발급."
+      - "serviceKey를 코드에 박거나 커밋하지 않는다 - 환경변수(DATA_GO_KR_KEY)로만. 공공데이터포털에서 활용신청 후 무료 발급."
       - "data.go.kr 키는 'URL Encoded'와 '디코딩' 두 형태가 있다. requests의 params=로 넘기면 자동 인코딩되므로 디코딩 키를 쓴다."
     snippet: |-
       import os
@@ -314,7 +314,7 @@ sections:
       resultCheck: "키가 없어도 sample 응답이 반환된다."
 
   - id: practice
-    title: "5단계. 종합 실전 — 거래처 CSV → 발행 차단 CSV"
+    title: "5단계. 종합 실전 - 거래처 CSV → 발행 차단 CSV"
     structuredPrimary: true
     subtitle: "조회·분류·차단을 한 흐름으로"
     goal: "거래처 사업자번호 CSV를 읽어 상태조회 결과로 분류하고, 세금계산서 발행 차단 리스트를 CSV로 산출하는 전체 파이프라인을 완성한다."

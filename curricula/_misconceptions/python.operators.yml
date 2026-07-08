@@ -2,7 +2,7 @@ meta:
   outcomeId: python.operators
   status: draft
   version: 1
-  note: "초안 — 연산자(산술·비교·논리) 단계 오개념 시드. 초급 30일 핵심. 사람이 정제 필요."
+  note: "초안 - 연산자(산술·비교·논리) 단계 오개념 시드. 초급 30일 핵심. 사람이 정제 필요."
 
 misconceptions:
   - id: python.operators.caretAsPower

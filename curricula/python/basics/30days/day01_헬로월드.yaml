@@ -71,10 +71,10 @@ sections:
     variations:
     - prompt: 작은따옴표 대신 큰따옴표로 바꿔도 같은 결과가 나오는지 확인하세요.
       starterCode: print("Hello Codaro")
-      parameterization: 따옴표 종류 변경 — 동일 출력 검증
+      parameterization: 따옴표 종류 변경 - 동일 출력 검증
     - prompt: print() 안에 쉼표로 두 값을 넣으면 어떻게 표시되는지 확인하세요.
       starterCode: print('Hello', 'World')
-      parameterization: 인자 개수 변경 — 공백 구분자 검증
+      parameterization: 인자 개수 변경 - 공백 구분자 검증
   check:
     type: noError
     noError: Hello World의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -316,7 +316,7 @@ sections:
     noError: Day 1 종합 복습의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
     resultCheck: Day 1 종합 복습 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
 - id: reflection
-  title: Day 1 회고 — 오늘 무엇을 배웠나요?
+  title: Day 1 회고 - 오늘 무엇을 배웠나요?
   structuredPrimary: true
   subtitle: 기억 굳히기
   goal: Day 1에서 print()와 주석으로 얻은 첫 감각을 자기 표현으로 정리한다.

@@ -318,7 +318,7 @@ sections:
     noError: editPhoto 정의와 호출이 끝나야 합니다.
     resultCheck: finalSize가 (320, 240), finalMode가 'RGBA'여야 합니다.
 - id: practice
-  title: 실습 — flower에 같은 함수
+  title: 실습 - flower에 같은 함수
   structuredPrimary: true
   subtitle: 일반화 검증
   goal: 같은 editPhoto 함수와 config를 flower 입력에 적용해 결과 dict가 같은 형식으로 돌아오는지 확인합니다.

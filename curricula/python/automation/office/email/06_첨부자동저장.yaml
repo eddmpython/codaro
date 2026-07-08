@@ -18,7 +18,7 @@ meta:
     - automation.email.receive
   estimatedMinutes: 50
   seo:
-    title: "메일 첨부 자동 저장 — BytesParser + walk + disposition"
+    title: "메일 첨부 자동 저장 - BytesParser + walk + disposition"
     description: "받은 메일의 첨부 파일을 자동으로 폴더에 분류 저장한다. 사장님의 매주 150분 첨부 정리가 8초로."
     keywords:
       - 첨부 자동 저장
@@ -43,7 +43,7 @@ intro:
         detail: "part.get_filename()으로 한글 파일명 받고 폴더에 쓰기."
     runtime:
       - label: "테스트 데이터"
-        detail: "발송된 EmailMessage를 as_bytes로 직렬화해 BytesParser로 복원 — 외부 IMAP 의존 없이 검증."
+        detail: "발송된 EmailMessage를 as_bytes로 직렬화해 BytesParser로 복원 - 외부 IMAP 의존 없이 검증."
       - label: "검증"
         detail: "추출된 첨부 파일이 폴더에 실제 생성됐는지 + 파일명/크기 assert."
 
@@ -253,7 +253,7 @@ sections:
       resultCheck: "출력 2."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "월별 자동 정리 도구"
     goal: "첨부를 첨부 종류별 (PDF/CSV/이미지) 폴더로 자동 분류 저장한다."
     why: "1인 사장님이 매월 받는 세금계산서·견적서·계약서 PDF가 100개를 넘으면 손으로 폴더 분류만 한 시간이 사라집니다. Content-Type 기반 분류 + 발신자/월별 분류 두 패턴이 한 함수에 모이면 inbox만 비워도 회계·법무 자료가 자동 정리됩니다. 07강 IMAP 자동 이동과 결합되면 사람이 직접 메일을 열 필요가 사라집니다."
@@ -391,5 +391,5 @@ sections:
           - "발신자별 폴더 추가 분류 (sender/yyyy-mm/filename)"
           - "중복 파일명 처리 (timestamp suffix)"
           - "특정 확장자만 저장 (PDF만, 이미지만)"
-          - "07강 결합 — 저장 후 메일을 'Processed' 폴더로 자동 이동"
-          - "PDF 트랙 04강 결합 — 저장된 PDF 표를 자동 추출해 CSV로"
+          - "07강 결합 - 저장 후 메일을 'Processed' 폴더로 자동 이동"
+          - "PDF 트랙 04강 결합 - 저장된 PDF 표를 자동 추출해 CSV로"

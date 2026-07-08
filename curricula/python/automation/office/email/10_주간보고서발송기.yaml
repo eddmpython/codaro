@@ -24,7 +24,7 @@ meta:
     - automation.email.credentials
   estimatedMinutes: 90
   seo:
-    title: "주간 보고서 자동 발송기 — CSV → HTML+PDF → 다수 발송 + 알림"
+    title: "주간 보고서 자동 발송기 - CSV → HTML+PDF → 다수 발송 + 알림"
     description: "Email 트랙의 모든 패턴을 한 사이클에 결합. CSV → 차트 → HTML 본문 + PDF 첨부 → 다수 발송 + 알림 통합."
     keywords:
       - 주간 보고서 자동화
@@ -293,7 +293,7 @@ sections:
       resultCheck: "출력 'cc@example.com'."
 
   - id: validation
-    title: "4단계. 검증 루프 — aiosmtpd 통합 검증"
+    title: "4단계. 검증 루프 - aiosmtpd 통합 검증"
     structuredPrimary: true
     subtitle: "로컬 SMTP에 자기 자신 발송"
     goal: "aiosmtpd로 로컬 SMTP 서버를 띄우고 자기 자신에게 발송해 수신함 검증."
@@ -382,7 +382,7 @@ sections:
       resultCheck: "출력 2 (aiosmtpd 설치 시) 또는 0."
 
   - id: practice
-    title: "실습 — 통합 발송기"
+    title: "실습 - 통합 발송기"
     subtitle: "데이터 → 보고서 → 다수 발송 전 파이프라인"
     goal: "01-09강의 모든 패턴을 한 함수에 결합한 주간 보고서 발송기를 완성한다."
     why: "운영 김대리의 매주 90분 업무가 본 함수 한 번 실행으로 끝납니다."

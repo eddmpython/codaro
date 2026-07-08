@@ -63,8 +63,8 @@ uv run python -X utf8 tests/run.py list
 
 # 프론트 표면 실행
 
-- `editor/` — 실제 제품 UI 표면. React + shadcn/ui 기준.
-- `landing/` — GitHub Pages 문서와 블로그 표면.
+- `editor/` - 실제 제품 UI 표면. React + shadcn/ui 기준.
+- `landing/` - GitHub Pages 문서와 블로그 표면.
 - 폐기된 이전 편집기는 현재 저장소의 실행 표면으로 보지 않는다.
 
 제품 프론트를 반복 개발할 때는 `editor/`를 기준으로 본다.

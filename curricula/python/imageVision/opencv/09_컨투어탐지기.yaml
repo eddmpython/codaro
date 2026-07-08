@@ -434,7 +434,7 @@ sections:
     noError: classifyShape 정의와 호출이 끝나야 합니다.
     resultCheck: rectangleCount가 1 이상, circleCount가 1 이상이어야 합니다.
 - id: practice
-  title: 실습 — Canny → findContours 파이프라인
+  title: 실습 - Canny → findContours 파이프라인
   structuredPrimary: true
   subtitle: 실제 사진의 객체 검출
   goal: flower 사진에 Canny → findContours를 적용해 검출된 객체 수와 면적 합을 dict로 정리하고, 면적이 작은 객체를 필터링하는 함수를 만듭니다.

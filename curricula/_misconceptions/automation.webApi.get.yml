@@ -2,7 +2,7 @@ meta:
   outcomeId: automation.webApi.get
   status: draft
   version: 1
-  note: "초안 — requests GET 요청 흔한 오개념 시드. 자동화 webApi 진입. 사람이 정제 필요."
+  note: "초안 - requests GET 요청 흔한 오개념 시드. 자동화 webApi 진입. 사람이 정제 필요."
 
 misconceptions:
   - id: automation.webApi.get.missingSchema

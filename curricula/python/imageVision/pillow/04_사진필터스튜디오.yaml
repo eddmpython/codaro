@@ -360,7 +360,7 @@ sections:
     noError: 세 filter 호출이 끝나야 합니다.
     resultCheck: smoothDecreases와 detailIncreases 모두 True여야 합니다.
 - id: practice
-  title: 실습 — 종합 필터 진단 함수
+  title: 실습 - 종합 필터 진단 함수
   structuredPrimary: true
   subtitle: 여섯 필터 한 dict
   goal: applyFilters(image) 함수가 BLUR/SHARPEN/CONTOUR/FIND_EDGES/SMOOTH/DETAIL 여섯 필터를 모두 적용해 std/mean을 dict로 돌려주도록 만듭니다.

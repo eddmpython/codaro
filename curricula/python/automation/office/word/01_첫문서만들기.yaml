@@ -17,7 +17,7 @@ meta:
     - automation.word.intro
   estimatedMinutes: 35
   seo:
-    title: "python-docx 첫 문서 — Document·add_paragraph·save"
+    title: "python-docx 첫 문서 - Document·add_paragraph·save"
     description: "python-docx로 첫 docx 파일을 만든다. Document 객체와 단락의 기본 구조를 손에 익힌다."
     keywords:
       - python-docx Document
@@ -25,7 +25,7 @@ meta:
       - docx save
 
 intro:
-  direction: "python-docx의 가장 단순한 흐름 — Document 만들고, 단락 추가하고, 저장. 본 트랙의 모든 강의가 이 형태에서 확장된다."
+  direction: "python-docx의 가장 단순한 흐름 - Document 만들고, 단락 추가하고, 저장. 본 트랙의 모든 강의가 이 형태에서 확장된다."
   benefits:
     - "Document → 단락 → save 3 단계 흐름이 손에 박힌다."
     - "TemporaryDirectory + 재오픈 assert 검증 패턴이 본 강의에 안착."
@@ -146,11 +146,11 @@ sections:
       resultCheck: "True 출력."
 
   - id: validation
-    title: "3단계. 검증 루프 — 재오픈 + paragraphs assert"
+    title: "3단계. 검증 루프 - 재오픈 + paragraphs assert"
     structuredPrimary: true
     subtitle: "buildHelloDoc + Document 재오픈"
     goal: "buildHelloDoc 함수의 결과를 재오픈해 의도한 단락이 모두 있는지 한 셀에서 검증한다."
-    why: "Word 자동화의 핵심 검증 패턴 — 저장 후 다시 열어 paragraphs로 확인."
+    why: "Word 자동화의 핵심 검증 패턴 - 저장 후 다시 열어 paragraphs로 확인."
     explanation: |-
       함수가 docx를 만들고, 결과를 Document로 다시 열어 paragraphs 텍스트와 길이를 한 묶음 assert.
     tips:
@@ -176,7 +176,7 @@ sections:
       assert reopened.paragraphs[2].text == "gamma"
       [p.text for p in reopened.paragraphs]
     exercise:
-      prompt: "buildLabeledDoc 함수를 완성하세요 — 각 줄 앞에 '[N] '(1부터 시작하는 번호) 접두사를 붙여 단락으로 저장."
+      prompt: "buildLabeledDoc 함수를 완성하세요 - 각 줄 앞에 '[N] '(1부터 시작하는 번호) 접두사를 붙여 단락으로 저장."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -200,7 +200,7 @@ sections:
       resultCheck: "출력 ['[1] alpha', '[2] beta', '[3] gamma']."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "텍스트 → docx 변환기"
     goal: "텍스트 파일의 각 줄을 단락으로 변환하는 함수를 만든다."
     why: "텍스트에서 docx로의 변환은 빈도 높은 작업입니다. 회의 메모(.txt)를 양식 docx로 옮기는 첫 단계."

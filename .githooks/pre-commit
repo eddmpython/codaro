@@ -1,0 +1,25 @@
+#!/bin/sh
+# Block em dash (U+2014) in staged docs and curricula content.
+# Rule SSOT: CLAUDE.md "문서와 커리큘럼에 em dash 문자(U+2014) 절대 금지".
+# Scope: every *.md file plus everything under curricula/.
+
+emdash="$(printf '\342\200\224')"
+blocked=0
+
+for file in $(git diff --cached --name-only --diff-filter=ACM); do
+  case "$file" in
+    *.md|curricula/*) ;;
+    *) continue ;;
+  esac
+  if git show ":$file" | grep -q "$emdash"; then
+    echo "blocked: em dash(U+2014) found in staged file: $file" >&2
+    blocked=1
+  fi
+done
+
+if [ "$blocked" -ne 0 ]; then
+  echo "blocked: replace em dash with '-' or rewrite the sentence (CLAUDE.md rule)" >&2
+  exit 1
+fi
+
+exit 0

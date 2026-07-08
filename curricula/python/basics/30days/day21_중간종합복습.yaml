@@ -427,7 +427,7 @@ sections:
     noError: Day 21 종합 복습에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 21 종합 복습 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
 - id: reflection
-  title: Day 21 회고 — 중간 종합 점검
+  title: Day 21 회고 - 중간 종합 점검
   structuredPrimary: true
   subtitle: 기억 굳히기
   goal: Day 1-20 의 누적 개념 중 자신이 가장 약한 영역을 한 가지 골라 학습 계획을 세운다.

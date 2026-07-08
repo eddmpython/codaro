@@ -17,7 +17,7 @@ meta:
     - automation.email.send
   estimatedMinutes: 45
   seo:
-    title: "HTML 메일과 PDF 첨부 — EmailMessage add_attachment"
+    title: "HTML 메일과 PDF 첨부 - EmailMessage add_attachment"
     description: "EmailMessage.add_alternative로 HTML 본문을, add_attachment로 PDF/이미지 첨부를 자동화한다. 한글 파일명 깨짐도 해결."
     keywords:
       - EmailMessage HTML
@@ -218,7 +218,7 @@ sections:
       resultCheck: "출력 ['회계_청구서_홍길동.pdf']."
 
   - id: validation
-    title: "4단계. 검증 루프 — HTML + 첨부 통합 assert"
+    title: "4단계. 검증 루프 - HTML + 첨부 통합 assert"
     structuredPrimary: true
     subtitle: "메시지 구조 + 첨부 메타 일괄"
     goal: "buildEmailWithAttachment 함수가 만든 메시지의 콘텐츠 타입과 첨부 파일명을 한 셀에서 검증한다."
@@ -302,7 +302,7 @@ sections:
       resultCheck: "출력 2."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "마케팅 안내 메일 빌더"
     goal: "HTML 본문 + 한글 첨부 PDF가 들어간 안내 메일 빌더를 직접 작성한다."
     why: "마케팅 정주임의 실무 메일 패턴 그대로입니다. 함수 하나로 모든 안내 메일을 일관되게 만듭니다."
@@ -360,12 +360,12 @@ sections:
 
               msg = buildCampaignEmail(
                   "customer@example.com",
-                  "Codaro 5월 안내 — 신기능 출시",
+                  "Codaro 5월 안내 - 신기능 출시",
                   "<h1>Codaro 5월</h1><p>새 기능을 확인하세요</p>",
                   missionPdf,
                   "Codaro_5월_안내.pdf",
               )
-              assert msg["Subject"] == "Codaro 5월 안내 — 신기능 출시"
+              assert msg["Subject"] == "Codaro 5월 안내 - 신기능 출시"
               attachments = list(msg.iter_attachments())
               assert attachments[0].get_filename() == "Codaro_5월_안내.pdf"
               msg["Subject"], attachments[0].get_filename()
@@ -378,6 +378,6 @@ sections:
         items:
           - "첨부 여러 개 (CSV + PDF + 이미지) 동시 발송"
           - "HTML 본문에 회사 로고를 인라인 이미지(Content-ID)로 삽입 (04강 미리보기)"
-          - "수신자별로 다른 첨부 (개인화 청구서) — 03강 결합"
+          - "수신자별로 다른 첨부 (개인화 청구서) - 03강 결합"
           - "첨부 크기 제한 (Gmail 25MB) 체크 함수"
           - "첨부 파일명을 회사명+날짜 패턴으로 자동 생성"

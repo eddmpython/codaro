@@ -126,21 +126,21 @@ uv run python -X utf8 tests/run.py gate attempts
 
 `tests/`는 평면이 아니라 도메인 트리로 관리한다. **pytest 스위트와 그 도메인의 verify/audit gate 드라이버를 같은 폴더에 둔다.**
 
-- `tests/run.py` — gate runner 진입점(SSOT). gate를 이름이 아니라 **경로 리터럴**로 직접 실행한다. 항상 루트에 둔다.
-- `tests/<domain>/test*.py` — 도메인별 pytest 스위트. `backend` gate가 재귀 수집한다.
-- `tests/<domain>/verify*.py` · `tests/<domain>/audit*.py` — 같은 도메인의 gate 드라이버. `tests/run.py`가 경로 리터럴로 직접 실행한다. 도메인: `architecture` `automation` `classroom` `curriculum` `document` `learning` `runtime` `share` `surface` `teacher`, 그리고 제품 전반 audit은 `product`. 드라이버는 `Path(__file__).resolve().parents[2]`로 repo ROOT를 잡는다.
-- `tests/verifyRootClean.py` — root 구조 계약 enforcer. 구조 SSOT(`repository-structure.md`)가 이 경로를 명시하므로 도메인 폴더로 내리지 않고 루트에 고정한다.
-- `tests/conftest.py` — `tests/` 루트를 `sys.path`에 올려 도메인 스위트가 루트 공유 헬퍼를 bare import 하게 하는 부트스트랩.
-- `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` — 여러 테스트가 import 하는 공유 인프라. 도메인 폴더의 playwright 드라이버는 직접 실행되므로 각자 `tests/` 루트를 `sys.path`에 올려 import 한다.
-- `tests/_predictStrictCategories.txt`, `tests/_strongSignalCategories.txt` — gate 드라이버가 `ROOT/"tests"/...` 경로로 읽는 카테고리 allowlist 데이터.
-- `tests/_attempts/` — **운영과 분리된 실험 샌드박스**. 아래 규칙 참조.
+- `tests/run.py` - gate runner 진입점(SSOT). gate를 이름이 아니라 **경로 리터럴**로 직접 실행한다. 항상 루트에 둔다.
+- `tests/<domain>/test*.py` - 도메인별 pytest 스위트. `backend` gate가 재귀 수집한다.
+- `tests/<domain>/verify*.py` · `tests/<domain>/audit*.py` - 같은 도메인의 gate 드라이버. `tests/run.py`가 경로 리터럴로 직접 실행한다. 도메인: `architecture` `automation` `classroom` `curriculum` `document` `learning` `runtime` `share` `surface` `teacher`, 그리고 제품 전반 audit은 `product`. 드라이버는 `Path(__file__).resolve().parents[2]`로 repo ROOT를 잡는다.
+- `tests/verifyRootClean.py` - root 구조 계약 enforcer. 구조 SSOT(`repository-structure.md`)가 이 경로를 명시하므로 도메인 폴더로 내리지 않고 루트에 고정한다.
+- `tests/conftest.py` - `tests/` 루트를 `sys.path`에 올려 도메인 스위트가 루트 공유 헬퍼를 bare import 하게 하는 부트스트랩.
+- `tests/browserStaticServer.py`, `tests/playwrightCli.py`, `tests/authorReferenceChecks.py` - 여러 테스트가 import 하는 공유 인프라. 도메인 폴더의 playwright 드라이버는 직접 실행되므로 각자 `tests/` 루트를 `sys.path`에 올려 import 한다.
+- `tests/_predictStrictCategories.txt`, `tests/_strongSignalCategories.txt` - gate 드라이버가 `ROOT/"tests"/...` 경로로 읽는 카테고리 allowlist 데이터.
+- `tests/_attempts/` - **운영과 분리된 실험 샌드박스**. 아래 규칙 참조.
 
 새 verify/audit 드라이버는 해당 도메인 폴더에 두고, `tests/run.py` gate 정의의 경로 리터럴과 `product` 메타-audit의 증거 경로를 같은 변경에서 맞춘다.
 
 ## 실험 샌드박스 (`tests/_attempts/`)
 
 - 새 자동화 메커니즘(브라우저 무중단 객체 유지, OS 자동화 객체 상주 등)은 정식 gate에 박기 전에 `tests/_attempts/<카테고리>/`에서 먼저 프로토타이핑한다. 계약 SSOT는 `tests/_attempts/README.md`다.
-- `tests/_attempts/`는 **git 미추적**이다(`.gitignore`에 `tests/_attempts/`). 안의 코드·데이터는 전부 로컬 전용이라 저장소에 올라가지 않는다 — 검증된 산출물만 `src/` + 정식 `tests/<domain>/`로 졸업시킨다. (dartlab의 스크래치 인큐베이터 체계와 동일.)
+- `tests/_attempts/`는 **git 미추적**이다(`.gitignore`에 `tests/_attempts/`). 안의 코드·데이터는 전부 로컬 전용이라 저장소에 올라가지 않는다 - 검증된 산출물만 `src/` + 정식 `tests/<domain>/`로 졸업시킨다. (dartlab의 스크래치 인큐베이터 체계와 동일.)
 - `backend` gate(`pytest tests/`)는 `--ignore=tests/_attempts`로 이 디렉터리를 수집하지 않으므로 실험이 깨져도 preflight/CI는 흔들리지 않는다. `_attempts`는 `preflight`, `quality-cycle`, CI 어디에도 들어가지 않는다.
 - 실험을 돌려보려면 전용 비운영 gate `attempts`(`tier="experiment"`)를 쓴다. 이 tier는 `tests/run.py tier fast|surface|release` 스윕에도 포함되지 않는다.
 - 실험이 검증되면 메커니즘을 `src/codaro/`로 이식하고, 정식 회귀 테스트를 `tests/<domain>/`에 추가해 gate로 배선한 뒤, `_attempts/`의 실험 파일은 삭제한다. `_attempts/`는 누적 보관소가 아니라 회전 작업대다.

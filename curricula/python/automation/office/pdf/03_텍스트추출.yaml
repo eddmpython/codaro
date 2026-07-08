@@ -20,7 +20,7 @@ meta:
     - python.strings
   estimatedMinutes: 50
   seo:
-    title: "PDF 텍스트 추출 — pypdf와 pdfplumber 비교"
+    title: "PDF 텍스트 추출 - pypdf와 pdfplumber 비교"
     description: "회의록 PDF에서 본문 텍스트를 뽑아 마크다운으로 정리한다. pypdf.extract_text와 pdfplumber.open 두 방식의 강점·약점을 직접 비교한다."
     keywords:
       - PDF 텍스트 추출
@@ -301,7 +301,7 @@ sections:
       resultCheck: "출력에 '> 결정:' 줄이 포함되어야 합니다."
 
   - id: validation
-    title: "5단계. 검증 루프 — 추출 결과 자동 비교"
+    title: "5단계. 검증 루프 - 추출 결과 자동 비교"
     structuredPrimary: true
     subtitle: "키워드 포함 + 길이 비교 단일 assert"
     goal: "추출 결과가 의도한 키워드를 포함하는지 한 셀에서 자동 검증한다."
@@ -420,7 +420,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "본문 검색기 + 회의록 정리기"
     goal: "텍스트 추출 패턴을 활용한 실용 함수 두 개를 작성한다."
     why: "키워드 검색과 회의록 정리는 빈도가 가장 높은 PDF 텍스트 활용 사례입니다."

@@ -21,7 +21,7 @@ meta:
     - automation.word.template
   estimatedMinutes: 90
   seo:
-    title: "회의록 자동 생성기 — 회의 메모 JSON → 양식 회의록 docx"
+    title: "회의록 자동 생성기 - 회의 메모 JSON → 양식 회의록 docx"
     description: "Word 트랙 모든 패턴을 한 함수에 결합. 회의 메모 JSON에서 표·머리말·서명란 회의록 docx 자동 생성."
     keywords:
       - 회의록 자동
@@ -231,7 +231,7 @@ sections:
       resultCheck: "출력 3."
 
   - id: validation
-    title: "3단계. 검증 — 회의록 통합 검증"
+    title: "3단계. 검증 - 회의록 통합 검증"
     structuredPrimary: true
     subtitle: "단락 + 표 + 머리말 일괄 assert"
     goal: "buildMinutes 결과의 모든 요소를 한 셀에서 검증."
@@ -348,7 +348,7 @@ sections:
       resultCheck: "('김대리', 'QA 진행', '2026-05-31') 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "다수 회의록 일괄 생성기"
     goal: "여러 회의 메모를 받아 폴더에 N개 회의록 docx를 만든다."
     explanation: |-
@@ -434,7 +434,7 @@ sections:
       - type: list
         style: bullet
         items:
-          - "Email 트랙 03강과 결합 — 회의록 docx를 참석자에게 자동 발송"
+          - "Email 트랙 03강과 결합 - 회의록 docx를 참석자에게 자동 발송"
           - "PDF 변환 (`soffice --headless --convert-to pdf minutes.docx`)"
           - "회의록 → 캘린더 ics (다음 회의 일정 자동)"
           - "회의록에서 액션 아이템만 추출해 별도 docx (todo 목록)"

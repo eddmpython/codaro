@@ -2,7 +2,7 @@ meta:
   outcomeId: builtins.contextManagers
   status: draft
   version: 1
-  note: "초안 — with 문/컨텍스트 매니저 흔한 오개념 시드. 사람이 정제 필요."
+  note: "초안 - with 문/컨텍스트 매니저 흔한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: builtins.contextManagers.useAfterClose

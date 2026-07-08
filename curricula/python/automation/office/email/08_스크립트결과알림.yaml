@@ -190,7 +190,7 @@ sections:
       resultCheck: "출력 1."
 
   - id: validation
-    title: "3단계. 검증 루프 — 예외 시 알림 메시지 검증"
+    title: "3단계. 검증 루프 - 예외 시 알림 메시지 검증"
     structuredPrimary: true
     subtitle: "알림 호출 + 본문 내용 단위 assert"
     goal: "예외가 발생했을 때 buildNotification이 호출되고 본문에 예외 정보가 들어가는지 검증한다."
@@ -295,7 +295,7 @@ sections:
       resultCheck: "True 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "야간 배치 알림 래퍼"
     goal: "기존 함수에 알림 데코레이터를 적용해 예외 시 자동 알림 흐름을 완성한다."
     why: "DevOps 박과장이 야간 ETL 실패를 다음 날 아침에야 발견하던 사이클이 즉시 알림으로 바뀝니다. 데코레이터 한 줄 추가로 어떤 스크립트든 알림 흐름이 붙고, 실패 본문에 traceback이 함께 도착해 새벽 호출 없이도 원인을 즉시 파악합니다. 본 패턴은 10강 주간 발송기에서 실패 시 fallback 알림으로 그대로 재사용됩니다."
@@ -440,4 +440,4 @@ sections:
           - "Slack 웹훅과 동시 전송 (SMTP + HTTP POST)"
           - "심각도별 다른 수신자 (Critical → 팀장, Warning → 팀)"
           - "재시도 3회 실패 시에만 알림 (false positive 줄이기)"
-          - "10강 결합 — 주간 발송기 결과에 본 알림 패턴 결합"
+          - "10강 결합 - 주간 발송기 결과에 본 알림 패턴 결합"

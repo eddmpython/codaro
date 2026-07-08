@@ -440,7 +440,7 @@ sections:
     noError: measure 함수 정의와 네 필터 호출이 끝나야 합니다.
     resultCheck: 결과 리스트 길이가 5이고 'original' 항목의 flatStd가 가장 큰 값이어야 합니다.
 - id: practice
-  title: 실습 — 컬러 필터 일반화
+  title: 실습 - 컬러 필터 일반화
   structuredPrimary: true
   subtitle: 단채널 → 3채널
   goal: 단채널에서 익힌 네 필터를 sklearn flower 컬러 이미지에 그대로 적용해 shape가 (H, W, 3)을 유지하고 결과들이 채널별 통계로 비교 가능한지 확인합니다.

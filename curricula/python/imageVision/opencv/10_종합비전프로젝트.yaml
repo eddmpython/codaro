@@ -479,7 +479,7 @@ sections:
     noError: detectColorObjects 정의와 호출이 끝나야 합니다.
     resultCheck: detection의 objectCount가 2여야 합니다.
 - id: practice
-  title: 실습 — flower 사진 빨강 검출
+  title: 실습 - flower 사진 빨강 검출
   structuredPrimary: true
   subtitle: 실제 사진 일반화
   goal: flower 사진에 detectColorObjects를 적용해 빨강 영역(0, 80, 80)~(10, 255, 255)을 찾고, 결과 boxes 중 가장 큰 객체의 면적을 정수로 확인합니다.

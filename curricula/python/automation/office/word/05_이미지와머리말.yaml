@@ -19,7 +19,7 @@ meta:
     - automation.word.paragraphs
   estimatedMinutes: 45
   seo:
-    title: "Word 이미지와 머리말 — add_picture, sections.header/footer"
+    title: "Word 이미지와 머리말 - add_picture, sections.header/footer"
     description: "회사 로고와 페이지 머리말·꼬리말을 코드로 적용. 한국 공문서 양식의 핵심."
     keywords:
       - python-docx add_picture
@@ -29,7 +29,7 @@ meta:
 intro:
   direction: "회사 로고를 본문 또는 머리말에 삽입하고, 모든 페이지에 머리말·꼬리말을 적용한다."
   benefits:
-    - "사내 표준 양식 — 모든 보고서에 일관된 로고·머리말·페이지번호 자동 적용."
+    - "사내 표준 양식 - 모든 보고서에 일관된 로고·머리말·페이지번호 자동 적용."
     - "add_picture(path, width=Inches(N))로 비율 유지 삽입."
     - "sections.header/footer 패턴으로 모든 페이지에 자동 반복."
   diagram:
@@ -148,7 +148,7 @@ sections:
       resultCheck: "출력 'Codaro 사내 문서'."
 
   - id: validation
-    title: "3단계. 검증 — 로고 + 머리말 통합"
+    title: "3단계. 검증 - 로고 + 머리말 통합"
     structuredPrimary: true
     subtitle: "buildBrandedDoc + inline_shapes/header.text"
     goal: "로고와 머리말이 모두 포함된 함수의 결과를 검증한다."
@@ -181,7 +181,7 @@ sections:
       assert len(reopened.inline_shapes) == 1
       len(reopened.inline_shapes)
     exercise:
-      prompt: "buildBrandedDoc 본체를 직접 작성하세요 — 머리말 회사명 + 로고(width Inches(2)) + 본문 단락이 모두 들어가야 합니다."
+      prompt: "buildBrandedDoc 본체를 직접 작성하세요 - 머리말 회사명 + 로고(width Inches(2)) + 본문 단락이 모두 들어가야 합니다."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -214,7 +214,7 @@ sections:
       resultCheck: "('Codaro Lab', 1) 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "회사 양식 보고서 베이스"
     goal: "로고 + 머리말 + 꼬리말 페이지번호가 들어간 보고서 베이스 함수를 만든다."
     why: "06강 스타일 함수와 결합돼 사내 표준 양식이 완성됩니다."

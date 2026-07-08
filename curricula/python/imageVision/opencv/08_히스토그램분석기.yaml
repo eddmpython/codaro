@@ -371,7 +371,7 @@ sections:
     noError: 세 CLAHE 호출이 끝나야 합니다.
     resultCheck: monotonicGrowth가 True이고 stdHigh가 stdLow보다 명백히 커야 합니다.
 - id: practice
-  title: 실습 — china 사진 대비 향상
+  title: 실습 - china 사진 대비 향상
   structuredPrimary: true
   subtitle: 컬러 LAB CLAHE
   goal: china 컬러 사진의 L 채널을 저대비 범위로 압축한 뒤 LAB 색공간에서 CLAHE를 적용해, 색 보존과 대비 회복 여부를 검증합니다.

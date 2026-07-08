@@ -374,7 +374,7 @@ sections:
     noError: crop/resize/rotate 호출이 끝나야 합니다.
     resultCheck: croppedShape가 (200, 300, 3), resizedShape가 (100, 100, 3), rotatedShape가 (100, 100, 3)이어야 합니다.
 - id: practice
-  title: 실습 — 보간법 비교
+  title: 실습 - 보간법 비교
   structuredPrimary: true
   subtitle: NEAREST vs LINEAR vs CUBIC
   goal: 같은 이미지를 4배 확대할 때 세 가지 보간법의 결과 shape, 표준편차, 인접 픽셀 차이를 한 dict로 비교해 화질 감각을 정량적으로 잡습니다.

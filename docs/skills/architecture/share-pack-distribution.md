@@ -119,7 +119,7 @@ permissions:
 
 ## 관련
 
-- [[curriculum-registry]] — built-in curriculum과 imported pack의 경계
-- [[curriculum-authoring]] — 공유 가능한 curriculum YAML 품질 기준
-- [[automation-authoring-loop]] — 공유 가능한 automation recipe 작성 기준
-- [[automation-tasks-reports]] — 설치 후 task 등록과 실행 경계
+- [[curriculum-registry]] - built-in curriculum과 imported pack의 경계
+- [[curriculum-authoring]] - 공유 가능한 curriculum YAML 품질 기준
+- [[automation-authoring-loop]] - 공유 가능한 automation recipe 작성 기준
+- [[automation-tasks-reports]] - 설치 후 task 등록과 실행 경계

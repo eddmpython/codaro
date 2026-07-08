@@ -176,7 +176,7 @@ sections:
 - id: model_choice
   blocks:
   - type: sectionHeader
-    title: 🎯 기본 모델 선택 — claude-haiku-4-5
+    title: 🎯 기본 모델 선택 - claude-haiku-4-5
     subtitle: 학습과 자동화에 잘 맞는 모델
   - type: note
     style: info

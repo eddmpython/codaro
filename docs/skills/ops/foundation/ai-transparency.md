@@ -19,5 +19,5 @@ whenToUse: AI UI 컴포넌트 디자인, 시스템 프롬프트 표시 결정, t
 
 ## 관련
 
-- [[ai-integration]] — tool_use surface
-- [[ai-sensory-system]] — 감각계 출력도 동일 원칙
+- [[ai-integration]] - tool_use surface
+- [[ai-sensory-system]] - 감각계 출력도 동일 원칙

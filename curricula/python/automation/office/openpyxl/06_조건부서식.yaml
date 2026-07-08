@@ -15,7 +15,7 @@ meta:
   - FormulaRule
   seo:
     title: openpyxl 조건부 서식 - ColorScale·DataBar·CellIs·FormulaRule
-    description: KPI 신호등, 데이터바, 수식 기반 조건 강조까지 — openpyxl의 4가지 조건부 서식 규칙을 실무 보고서 패턴으로 정리합니다.
+    description: KPI 신호등, 데이터바, 수식 기반 조건 강조까지 - openpyxl의 4가지 조건부 서식 규칙을 실무 보고서 패턴으로 정리합니다.
     keywords:
     - openpyxl 조건부서식
     - ColorScaleRule
@@ -241,7 +241,7 @@ sections:
     noError: 수식 문자열의 따옴표가 짝을 맞춰야 합니다.
     resultCheck: rule.formula에 AND가 포함되어야 합니다.
 - id: validation
-  title: 5단계. 검증 루프 — KPI 대시보드 계약
+  title: 5단계. 검증 루프 - KPI 대시보드 계약
   structuredPrimary: true
   subtitle: 저장 → 재오픈 → 규칙 보존 확인
   goal: 조건부 서식 규칙이 저장 후 다시 열어도 보존되는지 확인한다.
@@ -353,7 +353,7 @@ sections:
     noError: buildKpiDashboard가 ValueError 없이 끝나야 합니다.
     resultCheck: endRow가 추가된 행 수에 맞게 6이어야 합니다.
 - id: practice
-  title: 실습 — 종합 미션 2개
+  title: 실습 - 종합 미션 2개
   structuredPrimary: true
   subtitle: import부터 검증까지 독립 실행
   goal: ColorScale·CellIs·FormulaRule을 두 가지 현실 시나리오에 결합한다.
@@ -391,7 +391,7 @@ sections:
   - type: tip
     content: ColorScale과 CellIs를 같은 영역에 함께 적용해 색과 강조를 동시에 줄 수 있습니다.
   - type: expansion
-    title: "미션1: 시험 점수 — ColorScale + 60점 미만 빨강"
+    title: "미션1: 시험 점수 - ColorScale + 60점 미만 빨강"
     blocks:
     - type: code
       title: 점수표와 두 규칙 적용
@@ -437,7 +437,7 @@ sections:
         assert "B2:B6" in examRanges
         examRanges
   - type: expansion
-    title: "미션2: 예산 vs 실제 — FormulaRule로 초과 행 강조"
+    title: "미션2: 예산 vs 실제 - FormulaRule로 초과 행 강조"
     blocks:
     - type: code
       title: 예산 표 + FormulaRule 적용
@@ -487,12 +487,12 @@ sections:
   blocks:
   - type: text
     content: |-
-      조건부 서식은 사람의 눈이 표를 읽기 전에 결론을 미리 그려 주는 도구입니다. ColorScale은 분포, DataBar는 상대 크기, CellIs는 임계값, FormulaRule은 복합 조건 — 네 가지를 상황에 맞게 골라 쓰세요.
+      조건부 서식은 사람의 눈이 표를 읽기 전에 결론을 미리 그려 주는 도구입니다. ColorScale은 분포, DataBar는 상대 크기, CellIs는 임계값, FormulaRule은 복합 조건 - 네 가지를 상황에 맞게 골라 쓰세요.
   - type: list
     style: bullet
     items:
-    - ColorScaleRule — 분포 기반 신호등(3색이 표준)
-    - DataBarRule — 셀 안 막대 그래프
-    - CellIsRule — operator + formula 리스트로 임계값 강조
-    - FormulaRule — 다른 셀을 보는 복합 조건, $ 위치가 핵심
+    - ColorScaleRule - 분포 기반 신호등(3색이 표준)
+    - DataBarRule - 셀 안 막대 그래프
+    - CellIsRule - operator + formula 리스트로 임계값 강조
+    - FormulaRule - 다른 셀을 보는 복합 조건, $ 위치가 핵심
     - 조건부 서식은 _cf_rules에 영역 문자열 키로 저장되므로 재오픈 검증이 가능

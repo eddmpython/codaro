@@ -369,7 +369,7 @@ sections:
     noError: 네 enhance 호출이 끝나야 합니다.
     resultCheck: 결과 리스트 길이가 5여야 합니다.
 - id: practice
-  title: 실습 — enhanceTone 함수
+  title: 실습 - enhanceTone 함수
   structuredPrimary: true
   subtitle: 입력별 동일 보정
   goal: enhanceTone(image, factors=dict) 함수가 네 enhancer를 사용자 지정 factor로 적용하고 결과를 보고합니다.

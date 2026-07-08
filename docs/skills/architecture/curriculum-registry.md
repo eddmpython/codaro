@@ -72,7 +72,7 @@ curricula/
 
 ## 관련
 
-- [[learning-three-pillars]] — 기본 커리큘럼과 AI 생성 YAML의 제품 사상
-- [[document-model]] — YAML이 block document로 전개되는 방식
-- [[frontend-product-surface]] — reference curriculum을 제품 UI에서 다루는 방식
-- [[curriculum-authoring]] — 커리큘럼 작성 절차와 lazy uv 의존성 기준
+- [[learning-three-pillars]] - 기본 커리큘럼과 AI 생성 YAML의 제품 사상
+- [[document-model]] - YAML이 block document로 전개되는 방식
+- [[frontend-product-surface]] - reference curriculum을 제품 UI에서 다루는 방식
+- [[curriculum-authoring]] - 커리큘럼 작성 절차와 lazy uv 의존성 기준

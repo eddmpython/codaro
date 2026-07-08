@@ -1,6 +1,6 @@
 meta:
   id: devTools_gitFirstSteps
-  title: Git 첫 사이클 — init부터 commit까지 머리로 먼저
+  title: Git 첫 사이클 - init부터 commit까지 머리로 먼저
   order: 2
   category: devTools
   difficulty: ⭐⭐
@@ -19,7 +19,7 @@ meta:
     - devLiteracy.commandLine
   estimatedMinutes: 18
   seo:
-    title: "Git 첫 사이클 — init·add·commit·log를 명령 분해로 이해하기"
+    title: "Git 첫 사이클 - init·add·commit·log를 명령 분해로 이해하기"
     description: "git init→add→commit→log 한 사이클과 작업트리·스테이징·이력 3영역을 명령 분해와 실제 터미널 출력 예시로 코드 실행 없이 읽고 이해하는 개발 교양 자료."
     keywords:
       - git 기초
@@ -47,7 +47,7 @@ intro:
     runtime:
       - label: "읽기 전용 개념 카드"
         detail: "코드 실행이 없는 개념 읽기 자료다. 명령 분해와 출력 예시로 Git 사이클의 큰 그림을 잡는다."
-      - label: "다음 행동 — git 실습"
+      - label: "다음 행동 - git 실습"
         detail: "개념을 잡았다면 빈 폴더에서 git init→add→commit→log를 직접 쳐보며 출력이 예시와 같은지 확인한다."
 
 sections:
@@ -55,7 +55,7 @@ sections:
     title: "1. 이번엔 Git이 '어떻게' 도는지 본다"
     blocks:
       - type: hero
-        title: "Git 첫 사이클 — 빈 폴더가 첫 기록을 갖기까지"
+        title: "Git 첫 사이클 - 빈 폴더가 첫 기록을 갖기까지"
         subtitle: "명령을 외우는 게 아니라, 각 명령이 무엇을 어디로 옮기는지 그림으로 잡는다"
         points:
           - title: "세 영역의 이동"
@@ -66,7 +66,7 @@ sections:
             description: "한 번 커밋한 지점으로는 언제든 돌아올 수 있다. 그래서 자주 커밋하는 게 좋다."
 
   - id: three_areas
-    title: "2. Git의 세 영역 — 변경은 단계로 옮겨진다"
+    title: "2. Git의 세 영역 - 변경은 단계로 옮겨진다"
     blocks:
       - type: featureCards
         title: "add와 commit은 '영역 사이의 이동'이다"
@@ -110,7 +110,7 @@ sections:
             explain: "이번 커밋을 설명하는 메시지. 나중에 이력에서 '무엇을 왜 바꿨는지' 알아보게 한다."
 
   - id: cycle
-    title: "4. 한 사이클 — init에서 log까지"
+    title: "4. 한 사이클 - init에서 log까지"
     blocks:
       - type: timeline
         title: "빈 폴더가 첫 이력을 갖기까지"
@@ -122,11 +122,11 @@ sections:
           - { step: 5, title: "git log", description: "지금까지의 커밋 이력을 확인한다. 방금 만든 커밋이 보인다." }
       - type: note
         style: info
-        title: "처음 한 번 — 신원 설정"
+        title: "처음 한 번 - 신원 설정"
         content: "git을 처음 쓰는 컴퓨터라면 첫 commit 전에 이름·이메일을 한 번 설정해야 한다. git config --global user.name \"내이름\" 과 git config --global user.email \"메일주소\" 를 먼저 쳐 두자. 안 해 두면 첫 commit에서 '누가 커밋했는지 알 수 없다'는 안내가 뜬다."
 
   - id: status
-    title: "5. git status — 지금 무슨 일이 일어났나"
+    title: "5. git status - 지금 무슨 일이 일어났나"
     blocks:
       - type: text
         content: "막힐 때마다 가장 먼저 치는 명령이 git status 다. 어떤 파일이 변경됐고, 무엇이 스테이징됐는지, 다음에 무엇을 하면 되는지까지 알려준다. 아래는 파일을 하나 만든 직후의 전형적인 출력이다."
@@ -141,10 +141,10 @@ sections:
           - { out: "        notes.txt" }
           - { out: 'nothing added to commit but untracked files present (use "git add" to track)' }
       - type: text
-        content: "한 줄씩 읽어 보자. 'On branch main'은 지금 main이라는 갈래(브랜치)에 있다는 뜻이다(환경에 따라 master로 보일 수 있는데 둘 다 정상, 기본 브랜치 이름 차이일 뿐이다). 'No commits yet'은 아직 커밋이 하나도 없다는 뜻. 'Untracked files'는 'Git이 아직 추적하지 않는 새 파일'(notes.txt)이고, 친절하게도 다음에 할 일(git add)까지 괄호로 알려준다. Git의 출력은 대부분 이렇게 다음 행동을 안내한다 — 그래서 읽는 습관이 중요하다."
+        content: "한 줄씩 읽어 보자. 'On branch main'은 지금 main이라는 갈래(브랜치)에 있다는 뜻이다(환경에 따라 master로 보일 수 있는데 둘 다 정상, 기본 브랜치 이름 차이일 뿐이다). 'No commits yet'은 아직 커밋이 하나도 없다는 뜻. 'Untracked files'는 'Git이 아직 추적하지 않는 새 파일'(notes.txt)이고, 친절하게도 다음에 할 일(git add)까지 괄호로 알려준다. Git의 출력은 대부분 이렇게 다음 행동을 안내한다 - 그래서 읽는 습관이 중요하다."
 
   - id: log
-    title: "6. git log — 이력을 줄 단위로 읽기"
+    title: "6. git log - 이력을 줄 단위로 읽기"
     blocks:
       - type: annotatedCode
         title: "git log --oneline 출력 해설"
@@ -153,10 +153,10 @@ sections:
           - { code: "e4f5a6b  fix typo in notes", note: "최신 커밋이 맨 위. 왼쪽 e4f5a6b 는 커밋의 짧은 해시(지문), 오른쪽은 메시지다. 해시는 0-9·a-f 만 쓰는 16진수다." }
           - { code: "a1b2c3d  first commit", note: "그 아래는 더 과거의 커밋. 위로 갈수록 최신, 아래로 갈수록 처음이다." }
       - type: text
-        content: "커밋 해시는 각 저장 지점을 가리키는 고유한 주소다. 'a1b2c3d 로 되돌려줘'처럼 특정 시점을 지목할 때 쓴다. 메시지가 부실하면 이 목록만 보고는 무엇을 한 커밋인지 알 수 없다 — 그래서 메시지가 중요하다."
+        content: "커밋 해시는 각 저장 지점을 가리키는 고유한 주소다. 'a1b2c3d 로 되돌려줘'처럼 특정 시점을 지목할 때 쓴다. 메시지가 부실하면 이 목록만 보고는 무엇을 한 커밋인지 알 수 없다 - 그래서 메시지가 중요하다."
 
   - id: messages
-    title: "7. 커밋 메시지 — 권장 vs 지양"
+    title: "7. 커밋 메시지 - 권장 vs 지양"
     blocks:
       - type: doDont
         title: "미래의 나를 위한 한 줄"
@@ -164,12 +164,12 @@ sections:
           title: "권장 (Do)"
           items:
             - "무엇을 왜 바꿨는지 현재형 한 줄로 요약한다. 예: '로그인 실패 시 에러 메시지 추가'"
-            - "한 커밋에는 한 가지 변경만 담는다 — 되돌리기 쉽고 읽기 쉽다."
+            - "한 커밋에는 한 가지 변경만 담는다 - 되돌리기 쉽고 읽기 쉽다."
         dont:
           title: "지양 (Don't)"
           items:
-            - "'수정', 'asdf', 'ㅁㄴㅇ' 같은 무의미한 메시지 — 이력에서 아무 정보도 주지 못한다."
-            - "여러 기능 변경을 한 커밋에 몰아넣기 — 나중에 일부만 되돌릴 수 없다."
+            - "'수정', 'asdf', 'ㅁㄴㅇ' 같은 무의미한 메시지 - 이력에서 아무 정보도 주지 못한다."
+            - "여러 기능 변경을 한 커밋에 몰아넣기 - 나중에 일부만 되돌릴 수 없다."
 
   - id: misconceptions
     title: "8. 초심자가 자주 하는 착각"

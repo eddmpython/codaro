@@ -17,13 +17,13 @@ print(type(obj).__name__)
 print([attr for attr in dir(obj) if not attr.startswith('_')])
 ```
 
-내가 가진 게 정말 `DataFrame` 인지 `Series` 인지 — 자주 헷갈리는 게 pandas 객체끼리의
+내가 가진 게 정말 `DataFrame` 인지 `Series` 인지 - 자주 헷갈리는 게 pandas 객체끼리의
 혼동이다. `df.head()` 는 DataFrame 에 있지만 `dict.head()` 는 없다.
 
 ## 2. None 객체 점검
 
 `None.something` 은 거의 모든 AttributeError 의 단골 원인. `func()` 가 `None` 을 반환하는
-경우 — 흔한 예: `sorted_list = items.sort()` (sort 는 in-place, None 반환).
+경우 - 흔한 예: `sorted_list = items.sort()` (sort 는 in-place, None 반환).
 
 ```python
 result = some_call()

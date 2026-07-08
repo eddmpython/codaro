@@ -88,7 +88,7 @@ categoryMeta = {
     'xlwings': {
         'icon': 'sync_alt',
         'color': 'teal',
-        'description': '실행 중인 Excel을 Python으로 라이브 제어 — 셀, 차트, VBA, UDF까지',
+        'description': '실행 중인 Excel을 Python으로 라이브 제어 - 셀, 차트, VBA, UDF까지',
         'imageUrl': None,
     },
     'pdf': {
@@ -274,7 +274,7 @@ categoryMeta = {
     'resilience': {
         'icon': 'shield',
         'color': 'teal',
-        'description': '다시 실행해도, 중간에 죽어도 안전한 자동화를 만든다 — 멱등성·체크포인트·원자적 쓰기',
+        'description': '다시 실행해도, 중간에 죽어도 안전한 자동화를 만든다 - 멱등성·체크포인트·원자적 쓰기',
         'imageUrl': None,
     },
     'inputCtl': {
@@ -411,7 +411,7 @@ categoryTree = [
     {
         'id': 'dev-literacy',
         'name': '개발 교양',
-        'description': '코드를 짜기 전 알아야 할 개발 세계의 지도 — 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.',
+        'description': '코드를 짜기 전 알아야 할 개발 세계의 지도 - 도구·문화·용어를 그림과 비유로 이해하는 한 파일 읽기 자료.',
         'folder': 'devLiteracy',
         'categories': ['devTools'],
     },

@@ -2,7 +2,7 @@ meta:
   outcomeId: python.advancedSyntax
   status: draft
   version: 1
-  note: "초안 — Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+  note: "초안 - Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: python.advancedSyntax.generatorConsumedOnce

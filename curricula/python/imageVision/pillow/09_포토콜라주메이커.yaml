@@ -349,7 +349,7 @@ sections:
     noError: makeCollage 정의와 두 호출이 끝나야 합니다.
     resultCheck: isCorrect22와 isCorrect33 모두 True여야 합니다.
 - id: practice
-  title: 실습 — 영역 평균 검증
+  title: 실습 - 영역 평균 검증
   structuredPrimary: true
   subtitle: 셀별 통계 분리
   goal: 2×2 콜라주의 4개 셀 영역 평균을 NumPy 슬라이싱으로 측정해 각 셀이 의도한 이미지인지 확인하는 검증 함수를 만듭니다.

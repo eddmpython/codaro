@@ -17,7 +17,7 @@ meta:
     - automation.word.paragraphs
   estimatedMinutes: 45
   seo:
-    title: "Word 표 만들기 — add_table, cell, merge_cells"
+    title: "Word 표 만들기 - add_table, cell, merge_cells"
     description: "보고서에 들어가는 비교표를 코드로 만든다. 셀 병합·헤더 강조 패턴 포함."
     keywords:
       - python-docx add_table
@@ -27,7 +27,7 @@ meta:
 intro:
   direction: "보고서·계약서에 들어가는 비교표를 코드로 만든다. 셀 병합과 헤더 강조까지."
   benefits:
-    - "직원 명단·결재라인·견적 항목 표 자동 생성 — 30분 손작업이 5초."
+    - "직원 명단·결재라인·견적 항목 표 자동 생성 - 30분 손작업이 5초."
     - "table.cell(i, j).text 패턴으로 모든 셀 데이터를 깔끔히 채움."
     - "10강 회의록의 참석자·결정사항 표 패턴이 본 강의에서 정착."
   diagram:
@@ -177,7 +177,7 @@ sections:
       resultCheck: "출력 'Seoul S01'."
 
   - id: validation
-    title: "3단계. 검증 — 비교표 빌더"
+    title: "3단계. 검증 - 비교표 빌더"
     structuredPrimary: true
     subtitle: "buildComparisonTable + cell 검증"
     goal: "비교표 빌더 함수의 결과를 셀 단위로 한 번에 검증한다."
@@ -212,7 +212,7 @@ sections:
       assert tbl.cell(3, 1).text == "60000"
       tbl.cell(0, 0).text, tbl.cell(3, 0).text
     exercise:
-      prompt: "buildComparisonTable 본체를 직접 작성하세요 — 헤더 행 + 데이터 행을 모두 채우는 add_table 흐름."
+      prompt: "buildComparisonTable 본체를 직접 작성하세요 - 헤더 행 + 데이터 행을 모두 채우는 add_table 흐름."
       starterCode: |-
         from pathlib import Path
         from tempfile import TemporaryDirectory
@@ -242,7 +242,7 @@ sections:
       resultCheck: "('region', '60000') 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "한국식 결재라인 표"
     goal: "담당·검토·승인 결재라인 표 함수를 만든다."
     why: "결재라인 표는 한국 보고서·기안서·품의서의 99%에 들어가는 표준 구성요소입니다. 담당·검토·승인 3컬럼이 손에 익으면 사내 양식 자동화의 절반이 끝납니다."

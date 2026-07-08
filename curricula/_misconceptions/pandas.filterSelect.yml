@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.filterSelect
   status: draft
   version: 1
-  note: "초안 — loc/iloc, boolean masking, chained assignment 등 데이터 분석 핵심 오개념."
+  note: "초안 - loc/iloc, boolean masking, chained assignment 등 데이터 분석 핵심 오개념."
 
 misconceptions:
   - id: pandas.filterSelect.locIlocConfusion
@@ -12,7 +12,7 @@ misconceptions:
       - kind: predictionMismatch
         appliesTo: prediction
         expectedField: shape
-        description: "row 수가 1 차이 — loc/iloc 슬라이싱 의미 차이를 모름."
+        description: "row 수가 1 차이 - loc/iloc 슬라이싱 의미 차이를 모름."
     diagnostic:
       message: "위치 기반 `iloc[a:b]` 은 Python 슬라이싱처럼 b를 **제외**, label 기반 `loc[a:b]` 은 b를 **포함**합니다."
       references: ["pandas.filterSelect", "pandas.intro"]
@@ -41,7 +41,7 @@ misconceptions:
       message: "boolean Series 는 `&` (and), `|` (or), `~` (not) 로 결합합니다. `and`/`or` 는 단일 값을 기대해서 Series에 못 씁니다. 각 조건은 괄호로 감싸야 합니다."
       references: ["pandas.filterSelect"]
     correction:
-      hint: "`df[(df.a > 0) & (df.b < 5)]` — 괄호 + `&`. 가독성이 떨어지면 `df.query('a > 0 and b < 5')` 도 가능."
+      hint: "`df[(df.a > 0) & (df.b < 5)]` - 괄호 + `&`. 가독성이 떨어지면 `df.query('a > 0 and b < 5')` 도 가능."
       miniExercise: |
         import pandas as pd
         df = pd.DataFrame({"a": [1, -1, 3], "b": [4, 5, 2]})
@@ -50,12 +50,12 @@ misconceptions:
 
   - id: pandas.filterSelect.chainedAssignmentWarning
     label: "체인 할당으로 원본 변경 시도"
-    summary: "`df[df.a > 0]['b'] = 0` 같이 chained indexing 에 할당 — SettingWithCopyWarning 또는 원본 미변경."
+    summary: "`df[df.a > 0]['b'] = 0` 같이 chained indexing 에 할당 - SettingWithCopyWarning 또는 원본 미변경."
     triggers:
       - kind: codePattern
         appliesTo: code
         pattern: "\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*="
-        description: "두 개의 `[]` 인덱싱 후 할당 — chained assignment."
+        description: "두 개의 `[]` 인덱싱 후 할당 - chained assignment."
       - kind: errorPattern
         appliesTo: error
         pattern: "SettingWithCopyWarning"

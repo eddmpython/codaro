@@ -20,7 +20,7 @@ meta:
     - python.functions
   estimatedMinutes: 40
   seo:
-    title: "pypdf PdfWriter — PDF 병합과 분할 자동화"
+    title: "pypdf PdfWriter - PDF 병합과 분할 자동화"
     description: "여러 PDF를 코드로 묶고, 한 PDF를 단원별로 자르는 흐름. PdfWriter.add_page와 write의 기본 패턴을 손에 익힌다."
     keywords:
       - pypdf 병합
@@ -258,7 +258,7 @@ sections:
       resultCheck: "출력이 5여야 합니다."
 
   - id: validation
-    title: "4단계. 검증 루프 — 병합·분할 결과 자동 비교"
+    title: "4단계. 검증 루프 - 병합·분할 결과 자동 비교"
     structuredPrimary: true
     subtitle: "원본 페이지 합 = 병합 결과, 분할 합 = 원본"
     goal: "여러 PDF를 병합한 결과의 페이지 합과 원본 합이 일치하는지, 분할 결과 합이 원본과 같은지 한 셀에서 검증한다."
@@ -381,7 +381,7 @@ sections:
       resultCheck: "문자열이 출력되어야 합니다."
 
   - id: practice
-    title: "실습 — 종합 미션 2개"
+    title: "실습 - 종합 미션 2개"
     subtitle: "협력사별 묶음, 단원별 분할 도구"
     goal: "병합과 분할 패턴을 결합한 작은 도구 두 개를 직접 작성한다."
     why: "한 함수 안에 PdfReader + PdfWriter + Path 처리가 모두 들어와야 자동화 도구가 완성됩니다."

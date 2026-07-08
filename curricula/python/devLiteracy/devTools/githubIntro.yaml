@@ -1,6 +1,6 @@
 meta:
   id: devTools_githubIntro
-  title: GitHub 소개 — 깃헙이 무엇인지 그림으로 이해하기
+  title: GitHub 소개 - 깃헙이 무엇인지 그림으로 이해하기
   order: 0
   category: devTools
   difficulty: ⭐
@@ -18,7 +18,7 @@ meta:
   prerequisites: []
   estimatedMinutes: 15
   seo:
-    title: "GitHub 소개 — 깃헙이 무엇인지 그림과 비유로 이해하기"
+    title: "GitHub 소개 - 깃헙이 무엇인지 그림과 비유로 이해하기"
     description: "Git과 GitHub의 차이, 저장소·커밋·브랜치·풀 리퀘스트 같은 핵심 개념을 코드 없이 그림과 비유로 읽고 이해하는 한 파일 개발 교양 자료."
     keywords:
       - GitHub이란
@@ -30,7 +30,7 @@ meta:
 intro:
   direction: "GitHub이 무엇이고 왜 거의 모든 개발자가 쓰는지, Git과 어떻게 다른지를 코드 실행 없이 그림과 비유로 읽고 이해한다. 마지막 핵심 정리 체크리스트로 스스로 설명할 수 있는지 확인한다."
   benefits:
-    - "Git과 GitHub의 차이를 한 문장으로 설명할 수 있다 — 가장 흔한 입문 오개념을 먼저 푼다."
+    - "Git과 GitHub의 차이를 한 문장으로 설명할 수 있다 - 가장 흔한 입문 오개념을 먼저 푼다."
     - "저장소·커밋·브랜치·풀 리퀘스트가 무엇인지 일상 비유로 구분할 수 있다."
     - "코드를 한 줄도 치지 않고, 개념 지도만 머릿속에 그린 뒤 다음 실습 트랙으로 넘어간다."
   diagram:
@@ -46,7 +46,7 @@ intro:
     runtime:
       - label: "읽기 전용 개념 카드"
         detail: "이 자료는 코드 실행이 없는 개념 읽기 카드다. 그림·비교·비유로 GitHub의 큰 그림을 잡는다."
-      - label: "다음 행동 — git 실습"
+      - label: "다음 행동 - git 실습"
         detail: "개념을 잡았다면 이어지는 git 실습 트랙에서 로컬 터미널로 실제 commit·push를 쳐본다."
 
 sections:
@@ -54,7 +54,7 @@ sections:
     title: "1. GitHub은 코드의 공유 플랫폼이다"
     blocks:
       - type: hero
-        title: "GitHub — 전 세계 개발자가 코드를 모으고 함께 고치는 곳"
+        title: "GitHub - 전 세계 개발자가 코드를 모으고 함께 고치는 곳"
         subtitle: "코드용 구글 드라이브 + 협업 공간이라고 생각하면 가깝다"
         points:
           - emoji: "🌍"
@@ -80,7 +80,7 @@ sections:
         title: "파일 버전을 관리하는 두 방식"
         subtitle: "왼쪽처럼 해본 적 있다면, 그 문제를 Git이 푼다"
         before:
-          label: "수동 — 파일명에 버전 붙이기"
+          label: "수동 - 파일명에 버전 붙이기"
           code: |-
             보고서.docx
             보고서_최종.docx
@@ -88,7 +88,7 @@ sections:
             보고서_최종_진짜최종_v2.docx
             보고서_최종_진짜최종_v2_김대리수정.docx
         after:
-          label: "Git — 한 파일 + 이력"
+          label: "Git - 한 파일 + 이력"
           code: |-
             보고서.docx        # 파일은 하나, 모든 버전은 이력에
             $ git log --oneline
@@ -99,7 +99,7 @@ sections:
         content: "파일명에 버전을 붙이는 방식은 누가 무엇을 언제 왜 바꿨는지 알 수 없고, 협업하면 _김대리수정 _박과장수정 이 끝없이 늘어난다. Git은 파일을 하나로 두고 모든 변경을 '커밋' 이력으로 쌓아, 언제든 과거로 되돌리고 누가 무엇을 바꿨는지 추적한다."
 
   - id: git_vs_github
-    title: "3. Git과 GitHub은 다르다 — 1순위 오개념"
+    title: "3. Git과 GitHub은 다르다 - 1순위 오개념"
     blocks:
       - type: compare
         title: "Git ≠ GitHub"
@@ -109,7 +109,7 @@ sections:
           subtitle: "내 컴퓨터에서 도는 프로그램"
           icon: "💻"
           items:
-            - "버전 관리 도구 자체 — 설치해서 쓰는 소프트웨어"
+            - "버전 관리 도구 자체 - 설치해서 쓰는 소프트웨어"
             - "인터넷이 없어도 로컬에서 커밋·브랜치가 된다"
             - "리누스 토르발스가 만든 오픈소스 명령어 도구"
         right:
@@ -175,19 +175,19 @@ sections:
         rows:
           - emoji: "📦"
             concept: "저장소(Repository)"
-            explain: "프로젝트 전용 폴더 한 개 — 그 안에 코드·문서·기록이 모두 들어 있는 작업 상자."
+            explain: "프로젝트 전용 폴더 한 개 - 그 안에 코드·문서·기록이 모두 들어 있는 작업 상자."
             accent: cyan
           - emoji: "📸"
             concept: "커밋(Commit)"
-            explain: "게임의 세이브 포인트 — 언제든 그 지점으로 되돌아갈 수 있게 현재 상태를 저장한다."
+            explain: "게임의 세이브 포인트 - 언제든 그 지점으로 되돌아갈 수 있게 현재 상태를 저장한다."
             accent: emerald
           - emoji: "🌿"
             concept: "브랜치(Branch)"
-            explain: "원본을 복사해 만든 평행 우주 — 마음껏 실험하다 좋으면 본 줄기에 합치고, 아니면 버린다."
+            explain: "원본을 복사해 만든 평행 우주 - 마음껏 실험하다 좋으면 본 줄기에 합치고, 아니면 버린다."
             accent: amber
           - emoji: "☁️"
             concept: "원격(Remote) / push·pull"
-            explain: "구글 드라이브에 올리고(push) 내려받기(pull) — 내 작업을 모두의 기준본과 맞춘다."
+            explain: "구글 드라이브에 올리고(push) 내려받기(pull) - 내 작업을 모두의 기준본과 맞춘다."
             accent: sky
 
   - id: flow
@@ -211,13 +211,13 @@ sections:
           - { step: 4, title: "commit", description: "변경을 메시지와 함께 스냅샷으로 쌓는다." }
           - { step: 5, title: "push", description: "내 사본(원격)에 올린다." }
           - { step: 6, title: "pull request", description: "원본에 '합쳐 달라'고 제안하고 리뷰받는다." }
-          - { step: 7, title: "merge", description: "리뷰가 통과하면 본줄기에 합쳐진다 — 기여 완료." }
+          - { step: 7, title: "merge", description: "리뷰가 통과하면 본줄기에 합쳐진다 - 기여 완료." }
 
   - id: commit_habits
     title: "9. 좋은 커밋 메시지 습관"
     blocks:
       - type: doDont
-        title: "커밋 메시지 — 권장 vs 지양"
+        title: "커밋 메시지 - 권장 vs 지양"
         subtitle: "메시지는 미래의 나와 동료가 읽는 변경 이력이다"
         do:
           title: "권장 (Do)"

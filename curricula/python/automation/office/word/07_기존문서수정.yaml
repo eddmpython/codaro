@@ -17,7 +17,7 @@ meta:
     - automation.word.styles
   estimatedMinutes: 45
   seo:
-    title: "Word 자리표시자 치환 — Document(path) + {{name}} 치환"
+    title: "Word 자리표시자 치환 - Document(path) + {{name}} 치환"
     description: "기존 docx를 열어 {{name}} 형태 자리표시자를 데이터로 치환. mail merge의 단순 패턴."
     keywords:
       - python-docx open
@@ -28,7 +28,7 @@ intro:
   direction: "기존 docx 양식을 열어 {{name}} 형태 자리표시자를 데이터로 치환한다. 09강 docxtpl의 단순 버전."
   benefits:
     - "양식을 한 번 만들어두면 데이터 dict로 N장 자동 채우기."
-    - "{{name}} 자리표시자는 09강 docxtpl과 동일한 문법 — 일관성."
+    - "{{name}} 자리표시자는 09강 docxtpl과 동일한 문법 - 일관성."
     - "08강 CSV mail merge의 기반 함수가 본 강의에서 만들어짐."
   diagram:
     steps:
@@ -50,7 +50,7 @@ sections:
     structuredPrimary: true
     subtitle: "Document(path)"
     goal: "Document에 path를 넘겨 기존 docx를 객체로 연다."
-    why: "본 강의의 출발점. 만들기와 다른 점은 첫 줄에서 끝납니다. 디자인팀이 만든 사내 표준 양식을 그대로 사용하면서 데이터만 코드로 채우는 패턴 — Word 자동화 현장에서 가장 자주 쓰이는 흐름입니다."
+    why: "본 강의의 출발점. 만들기와 다른 점은 첫 줄에서 끝납니다. 디자인팀이 만든 사내 표준 양식을 그대로 사용하면서 데이터만 코드로 채우는 패턴 - Word 자동화 현장에서 가장 자주 쓰이는 흐름입니다."
     explanation: |-
       Document() 인자 없이는 빈 새 문서. Document(path)는 기존 docx 객체로 로드. paragraphs/tables/sections 모두 그대로 접근 가능.
     snippet: |-
@@ -167,7 +167,7 @@ sections:
       resultCheck: "치환 후 자리표시자가 사라져야 함."
 
   - id: validation
-    title: "3단계. 검증 — 자리표시자 잔여 확인"
+    title: "3단계. 검증 - 자리표시자 잔여 확인"
     structuredPrimary: true
     subtitle: "치환 후 paragraphs.text에 {{ }} 없음"
     goal: "치환 후 결과 docx에 자리표시자가 한 개도 남지 않는지 확인한다."
@@ -207,7 +207,7 @@ sections:
       assert "김대리" in combined
       combined
     exercise:
-      prompt: "findMissingPlaceholders 함수를 작성하세요 — 치환 후 결과 docx에서 남아 있는 모든 자리표시자(예: '{{role}}')를 set으로 반환."
+      prompt: "findMissingPlaceholders 함수를 작성하세요 - 치환 후 결과 docx에서 남아 있는 모든 자리표시자(예: '{{role}}')를 set으로 반환."
       starterCode: |-
         import re
         from pathlib import Path
@@ -248,7 +248,7 @@ sections:
       resultCheck: "['{{role}}', '{{team}}'] 출력."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "양식 채움 함수"
     goal: "단락 + 표 안의 자리표시자를 모두 치환하는 fillTemplate 함수."
     why: "표 셀에 자리표시자가 있는 경우가 많습니다. 단락만 다루면 부족합니다."
@@ -324,6 +324,6 @@ sections:
         items:
           - "머리말·꼬리말 안 자리표시자도 치환"
           - "이미지 자리표시자 ({{logo}} → 실제 이미지 삽입)"
-          - "표 행 동적 추가 ({{#each items}} 패턴 — 09강 docxtpl이 더 강력)"
+          - "표 행 동적 추가 ({{#each items}} 패턴 - 09강 docxtpl이 더 강력)"
           - "조건부 단락 삭제 ({{#if condition}} 형태)"
-          - "08강과 결합 — CSV의 각 행으로 fillTemplate 호출"
+          - "08강과 결합 - CSV의 각 행으로 fillTemplate 호출"

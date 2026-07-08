@@ -17,7 +17,7 @@ meta:
     - automation.email.send
   estimatedMinutes: 45
   seo:
-    title: "안전한 자격증명 관리 — 환경변수 + dryRun 일관 패턴"
+    title: "안전한 자격증명 관리 - 환경변수 + dryRun 일관 패턴"
     description: "발송·수신 모듈에 자격증명을 안전하게 관리. .env 활용, dryRun 일관 패턴, 환경 검증."
     keywords:
       - 환경변수 관리
@@ -250,7 +250,7 @@ sections:
       resultCheck: "출력 '월간 보고서'."
 
   - id: practice
-    title: "실습 — 종합 미션"
+    title: "실습 - 종합 미션"
     subtitle: "환경 격리 발송 모듈"
     goal: "loadEnvFile + validate + sendEmail을 한 모듈로 묶어 환경 격리된 안전 발송기 완성."
     why: "회사 PC에 평문 비밀번호가 박힌 스크립트가 git에 커밋되면 보안 사고와 계정 정지로 직결됩니다. .env 파일 + load → validate → dryRun 흐름을 한 모듈에 모으면 자격증명 관리 정책이 한 곳에서 강제되고, 10강 주간 보고서 발송기는 이 모듈을 그대로 백엔드로 사용해 보안과 안전 모두를 한 줄로 처리합니다."

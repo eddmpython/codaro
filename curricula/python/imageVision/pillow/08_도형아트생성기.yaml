@@ -314,7 +314,7 @@ sections:
     noError: drawArt 정의와 호출이 끝나야 합니다.
     resultCheck: shapeCount가 4이고 nonBgRatio가 0~1 사이여야 합니다.
 - id: practice
-  title: 실습 — 추상 아트 생성
+  title: 실습 - 추상 아트 생성
   structuredPrimary: true
   subtitle: 랜덤 도형 합성
   goal: 시드 고정 난수로 도형 위치와 색을 정해 추상 아트를 만들고 결과 통계 dict를 돌려주는 함수를 만듭니다.

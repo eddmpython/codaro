@@ -19,7 +19,7 @@ meta:
     - python.modulesAndIo
   estimatedMinutes: 25
   seo:
-    title: "Word 자동화 소개 — python-docx + docxtpl로 양식 문서 자동화"
+    title: "Word 자동화 소개 - python-docx + docxtpl로 양식 문서 자동화"
     description: "근로계약서·회의록·가정통신문 같은 양식화된 docx를 데이터에서 자동 생성. 10개 프로젝트로 mail merge까지."
     keywords:
       - python-docx
@@ -31,7 +31,7 @@ intro:
   direction: "근로계약서·회의록·가정통신문 같은 양식화된 Word 문서를 데이터에서 자동 생성한다. python-docx + docxtpl 두 라이브러리로 mail merge까지."
   benefits:
     - "HR 인사담당자의 근로계약서 N장, 학교 행정의 가정통신문 200장 자동 생성."
-    - "한국 사무환경 특화 — 한글 폰트(맑은 고딕) East Asian font 패턴, 한국 양식 사례."
+    - "한국 사무환경 특화 - 한글 폰트(맑은 고딕) East Asian font 패턴, 한국 양식 사례."
     - "docxtpl Jinja 템플릿으로 영업 제안서·회의록 자동 채우기."
   diagram:
     steps:
@@ -81,7 +81,7 @@ sections:
       - type: list
         style: bullet
         items:
-          - "목차(TOC) 자동 생성 불가 — docx에 TOC 필드만 삽입, Word에서 사용자가 '필드 업데이트'로 채워야 함."
+          - "목차(TOC) 자동 생성 불가 - docx에 TOC 필드만 삽입, Word에서 사용자가 '필드 업데이트'로 채워야 함."
           - "동적 페이지번호는 sections.header에 단순 텍스트만. 동적 번호는 XML 직접 편집 필요(05강에서 패턴만)."
           - "수식·추적 변경·차트 직접 생성 불가. 차트는 matplotlib png를 add_picture로."
       - type: tip
@@ -93,10 +93,10 @@ sections:
       - type: table
         headers: ["페르소나", "주간 Word 작업", "이 트랙 졸업 시 산출물"]
         rows:
-          - ["HR 인사담당자", "신입 N명 근로계약서 양식 채우기", "08·09강 — CSV → 근로계약서 N장 자동"]
-          - ["영업 박과장", "제안서 양식에 고객사·금액 매번 교체", "07·09강 — docxtpl Jinja for-loop"]
-          - ["학교 행정 김선생님", "가정통신문 200명 학생별 발송", "08강 — mail merge 패턴"]
-          - ["컨설팅 이대표", "매주 회의록 양식 채우기", "10강 — 회의 메모 JSON → 회의록 docx"]
+          - ["HR 인사담당자", "신입 N명 근로계약서 양식 채우기", "08·09강 - CSV → 근로계약서 N장 자동"]
+          - ["영업 박과장", "제안서 양식에 고객사·금액 매번 교체", "07·09강 - docxtpl Jinja for-loop"]
+          - ["학교 행정 김선생님", "가정통신문 200명 학생별 발송", "08강 - mail merge 패턴"]
+          - ["컨설팅 이대표", "매주 회의록 양식 채우기", "10강 - 회의 메모 JSON → 회의록 docx"]
 
   - id: korean_fonts
     title: "5. 한글 East Asian font 함정"
@@ -140,7 +140,7 @@ sections:
         items:
           - "모든 결과 docx는 TemporaryDirectory에 저장하고 Document로 다시 열어 assert."
           - "03강 East Asian font 패턴이 06강 스타일 정의 함수에 흡수, 이후 모든 강의에서 재사용."
-          - "07강 자리표시자 형식은 {{name}} Jinja 스타일로 통일 — 09강 docxtpl과 자연스럽게 연결."
+          - "07강 자리표시자 형식은 {{name}} Jinja 스타일로 통일 - 09강 docxtpl과 자연스럽게 연결."
           - "10강 회의록은 데이터(JSON) → 표·머리말·서명란 docx 한 함수에 모든 패턴 결합."
       - type: tip
         content: "본 트랙을 시작하기 전에 라이브러리 패널에서 python-docx와 docxtpl 준비 상태를 확인하세요."

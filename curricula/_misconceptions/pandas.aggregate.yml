@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.aggregate
   status: draft
   version: 1
-  note: "초안 — groupby 결과 타입과 집계 함수 호출에서 흔한 함정."
+  note: "초안 - groupby 결과 타입과 집계 함수 호출에서 흔한 함정."
 
 misconceptions:
   - id: pandas.aggregate.groupbyResultIsLazy

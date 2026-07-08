@@ -2,7 +2,7 @@ meta:
   outcomeId: pandas.loadFrame
   status: draft
   version: 1
-  note: "초안 — read_csv 와 데이터 로딩 단계의 흔한 함정."
+  note: "초안 - read_csv 와 데이터 로딩 단계의 흔한 함정."
 
 misconceptions:
   - id: pandas.loadFrame.encodingFailure
@@ -12,7 +12,7 @@ misconceptions:
       - kind: errorPattern
         appliesTo: error
         pattern: "UnicodeDecodeError.*(utf-8|0xb|0xf|0xc3|0xa0)"
-        description: "UTF-8 디코딩 실패 — 한국어 환경에서 매우 흔함."
+        description: "UTF-8 디코딩 실패 - 한국어 환경에서 매우 흔함."
     diagnostic:
       message: "한글 데이터는 인코딩이 cp949 또는 euc-kr 인 경우가 많습니다. UnicodeDecodeError는 인코딩 불일치 신호입니다."
       references: ["pandas.loadFrame"]
@@ -54,7 +54,7 @@ misconceptions:
       - kind: codePattern
         appliesTo: code
         pattern: "Unnamed:?\\s*0"
-        description: "'Unnamed: 0' 컬럼 참조 — 인덱스가 데이터로 새어 들어왔다는 신호."
+        description: "'Unnamed: 0' 컬럼 참조 - 인덱스가 데이터로 새어 들어왔다는 신호."
     diagnostic:
       message: "이전에 `to_csv()` 로 저장하면서 `index=False` 를 안 줬을 때 인덱스가 데이터 컬럼으로 남습니다. 다시 읽으면 'Unnamed: 0' 으로 나타납니다."
       references: ["pandas.loadFrame"]

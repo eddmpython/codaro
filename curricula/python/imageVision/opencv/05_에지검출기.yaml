@@ -383,7 +383,7 @@ sections:
     noError: 오버레이 적용과 평균 계산이 끝나야 합니다.
     resultCheck: maskPixels가 양수이고 rWentUp이 True여야 합니다.
 - id: practice
-  title: 실습 — flower에 LoG 적용
+  title: 실습 - flower에 LoG 적용
   structuredPrimary: true
   subtitle: 다른 입력에서 일반화
   goal: flower 샘플에 LoG(GaussianBlur + Laplacian)를 적용해 결과 통계가 china 입력과 어떻게 다른지 dict로 비교합니다.

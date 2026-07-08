@@ -26,5 +26,5 @@ whenToUse: 새 엔진 구현, capability 추가 (execute/interrupt/variables/fil
 
 ## 관련
 
-- [[local-first-runtime]] — 로컬 기본 실행 정책
-- [[reactive-execution]] — 의존 그래프 위에서 동작
+- [[local-first-runtime]] - 로컬 기본 실행 정책
+- [[reactive-execution]] - 의존 그래프 위에서 동작
