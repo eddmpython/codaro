@@ -70,7 +70,9 @@
 - TLS: 브라우저 안 ssl.wrap_socket은 fd 없어 불가(원리적 한계) -> **로컬 프록시 TLS 종단으로 https status 200**.
 - 원리적 불가(로컬 전속 확정): 진짜 threading, xlwings, pyautogui, playwright, torch.
 - 실익 경계(정직): 이 브리지는 "로컬 엔진 연결 상태에서 브라우저 UI로 매끄럽게" 구간에서 빛난다. 로컬 엔진 완전 부재 시엔 파일/pandas권까지만(프록시 제공 주체가 없음).
-- 다음 검증(Phase 1 편입 전): 보안(프록시 allowlist+페어링, SSRF/내부망), JSPI Firefox/Safari 범위, 자식 워커 메모리/부팅.
+- 추가 실측(같은 세션): concurrent.futures 투명 에뮬 = cloudpickle로 클로저/람다 워커 왕복 성공(로컬 결과 일치). **브라우저 범위 = Chrome/Edge 전용**: Firefox 150은 JSPI·File System Access 둘 다 미지원 실측(브리지·진짜파일 불가, 기본 Pyodide 계산까지만). 02 §2 브라우저 정책과 일치.
+- 딜레마(다음 종합에서 판정): 자식워커 subprocess·병렬은 로컬 엔진 없이 자족. 소켓 프록시는 로컬 엔진 필요 -> "로컬 있으면 그냥 로컬 실행과 뭐가 다른가"를 실익 경계로 판정해야 함.
+- 다음 검증(Phase 1 편입 전): 보안(프록시 allowlist+페어링, SSRF/내부망), Safari 범위, 자식 워커 메모리/부팅.
 
 ## 미결 (블로킹 순)
 

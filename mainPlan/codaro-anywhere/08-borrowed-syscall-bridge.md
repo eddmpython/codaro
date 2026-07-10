@@ -19,6 +19,7 @@
 | File System Access(진짜 폴더) | PASS | - | mountNativeFS write + openpyxl xlsx |
 | threading.Thread.start | **FAIL** (pthread-stubs, "can't start new thread") | 여전히 FAIL | sys.thread_info 확인 |
 | 병렬 계산 | FAIL | **PASS** - Worker 풀 4개 speedup 3.81배 | 별도 WASM 힙 = 별도 GIL |
+| concurrent.futures 투명 에뮬 | FAIL | **PASS** - cloudpickle로 클로저/람다 워커 왕복, 로컬 결과 일치 | ProcessPoolExecutor 대체 가능 |
 | socket 블로킹 recv | FAIL (Emscripten TimeoutError) | **PASS** - BridgedSocket | - |
 | http.client / urllib.urlopen | FAIL | **PASS** - example.com status 200 | 수정 없는 표준 라이브러리 |
 | smtplib | FAIL | **PASS** - 로컬 SMTP에 ehlo 250 + 메일 전송 | aiosmtpd 서버 로그 확인 |
@@ -42,6 +43,11 @@
 - `subprocess.run`을 몽키패치. argv[0]이 파이썬이면 `-c` 코드/스크립트를 자식 Pyodide 워커로 run_sync 라우팅해 동기 CompletedProcess 반환.
 - 자식은 독립 인터프리터(부모 전역 안 보임 = 프로세스 격리 시맨틱 보존). mountNativeFS 핸들을 자식과 공유하면 스크립트가 진짜 파일을 읽는다.
 - 비파이썬 프로세스(git/ffmpeg)는 로컬 엔진 있으면 라우팅, 없으면 명확한 에러(현재의 크립틱 실패 대체).
+
+## 3.4 브라우저 지원 범위 (실측, 결정적)
+- **Chrome/Edge 전용.** Firefox 150 실측: JSPI 미지원(WebAssembly.Suspending 없음), run_sync 실패, File System Access 미지원. 즉 브리지(소켓·subprocess)도 진짜 파일도 Firefox에서 불가.
+- Chromium 대조: JSPI·run_sync·FSA 전부 PASS.
+- 귀결: 웹 티어 고급 기능(브리지+진짜 파일)은 Chromium 계열 한정. Firefox/Safari는 기본 Pyodide(pandas 등 계산)까지만, 나머지는 로컬 티어로 안내([02 §2](02-entry-and-bootstrap.md)와 일치).
 
 ## 4. 정체성 정합
 
