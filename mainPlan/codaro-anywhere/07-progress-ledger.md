@@ -74,6 +74,13 @@
 - 딜레마(다음 종합에서 판정): 자식워커 subprocess·병렬은 로컬 엔진 없이 자족. 소켓 프록시는 로컬 엔진 필요 -> "로컬 있으면 그냥 로컬 실행과 뭐가 다른가"를 실익 경계로 판정해야 함.
 - 다음 검증(Phase 1 편입 전): 보안(프록시 allowlist+페어링, SSRF/내부망), Safari 범위, 자식 워커 메모리/부팅.
 
+### 2026-07-10 - 전문가 종합 판정 + make-or-break 실측: 발명을 두 티어로 가름
+
+- **판정: 부분 채택.** 자족 티어(자식워커 subprocess·Worker풀 병렬·cloudpickle ProcessPoolExecutor·FS Access·데이터 스택)는 로컬 엔진 0으로 성립하는 진짜 발명 -> 학습 표면부터 민다. 프록시 티어(raw socket·smtplib·임의 TLS)는 없애려던 로컬 의존을 되살리고 SSRF+레이턴시를 새로 사는 잘못된 아키텍처 -> 기본 비노출, narrow convenience(allowlist+fail-closed) opt-in만.
+- **신규성 정직화**: JSPI(Pyodide 공식)·WS/TCP 프록시(websockify 10년 선례)·HTTP 패치(pyodide-http)는 기성품. 방어 가능한 신규성 = capability router(능력별 실행지 자동 배정)뿐. syscall은 그 백엔드.
+- **make-or-break 실측 PASS**: 브라우저 세션 네임스페이스 전체(DataFrame·클로저·config·StringIO)를 cloudpickle로 자식워커에 왕복 -> 하류 셀 실행 결과 로컬과 완전 일치, skipped 0. 즉 "셀을 로컬로 라우팅"이 매끄럽다(값 상태는 직렬화 이동, OS 자원만 예외인데 그건 로컬에서 새로 여는 것). 프록시 티어의 존재 이유("상태 locality")가 반박됨.
+- 제품화 첫 출하 = 자족 티어(subprocess 자식워커·병렬·HTTP fetch)를 학습 표면에. socket/smtplib은 로컬 티어로 표기.
+
 ## 미결 (블로킹 순)
 
 1. 웹 표면 브랜드/도메인(CF Pages 프로젝트명) 결정 - Phase 2 전까지.

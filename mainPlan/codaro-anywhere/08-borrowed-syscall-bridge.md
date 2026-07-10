@@ -5,6 +5,17 @@
 
 ---
 
+## 0. 판정 (전문가 종합, 2026-07-10): 부분 채택 - 두 티어로 가른다
+
+이 발명은 경제학이 정반대인 두 물건이 한 이름으로 묶여 있다. 갈라야 판정이 선다.
+
+- **자족 티어(로컬 엔진 불필요) = 진짜 발명, 밀 가치 명확.** 자식 Pyodide 워커 subprocess, Worker 풀 병렬(3.81배), cloudpickle ProcessPoolExecutor, File System Access 실폴더, pandas/numpy/polars/duckdb/opencv. 설치 0·로컬 프로세스 0·SSRF 표면 0으로 "로컬처럼"이 성립한다. **학습 표면부터 여기를 민다.**
+- **프록시 티어(로컬 WS<->TCP 필수) = 인상적이나 잘못된 아키텍처, 기본 비노출.** raw socket·smtplib·비-CORS HTTP·임의 TLS. 없애려던 로컬 의존을 되살리고 SSRF + chatty 레이턴시를 새로 산다. 로컬 엔진이 이미 있으면 정직한 길은 syscall 터널링이 아니라 **그 셀을 로컬 인터프리터로 라우팅**하는 것(이미 결정된 capability router). 프록시 터널은 narrow convenience(굵은 단발 op + 호스트 allowlist + SSRF fail-closed)로만 opt-in 잔존.
+
+**신규성 정직화:** JSPI/run_sync(Pyodide 공식 기능), WS<->TCP 프록시(emscripten websocket_to_posix_proxy·websockify, 10년 선례), HTTP 몽키패치(pyodide-http, JupyterLite 사용)는 대부분 기성품이다. 방어 가능한 신규성은 개별 syscall이 아니라 **능력별 실행지 라우터**(AST 분석으로 셀을 브라우저/로컬/Actions에 자동 배정, 수정 없는 표준 라이브러리가 티어를 몰라도 동작)다. 밀 자산은 "빌린 시스템콜"이 아니라 이 라우터이고, syscall은 그 백엔드일 뿐이다.
+
+**과대평가 교정:** "socket status 200"은 CORS 공개 호스트면 프록시도 로컬도 없이 브라우저 fetch로 되는 영역이다(pyodide-http). 프록시가 유일하게 필요한 건 비-CORS·SMTP·raw TCP·임의 TLS뿐 - 실익을 그 좁은 범위로만 계상한다.
+
 ## 1. 한 줄 발명
 
 **JSPI(WebAssembly 스택 스위칭) 위에 syscall 브리지를 얹으면, 브라우저 안 CPython이 로컬의 소켓·프로세스를 빌려 쓴다. 수정 없는 표준 라이브러리(http.client·urllib·smtplib·subprocess)가 그대로 돈다.**
@@ -49,6 +60,11 @@
 - Chromium 대조: JSPI·run_sync·FSA 전부 PASS.
 - 귀결: 웹 티어 고급 기능(브리지+진짜 파일)은 Chromium 계열 한정. Firefox/Safari는 기본 Pyodide(pandas 등 계산)까지만, 나머지는 로컬 티어로 안내([02 §2](02-entry-and-bootstrap.md)와 일치).
 
+## 3.5 "셀을 로컬로 라우팅"이 매끄러운가 (make-or-break 실측, PASS)
+프록시 티어를 죽이고 "셀을 로컬 라우팅"으로 대체하려면, 브라우저 세션 상태가 다른 엔진으로 넘어가야 한다. 실측: 브라우저 메인이 df(DataFrame)·multiplier(int)·transform(지역변수 캡처 클로저)·config(dict)·open_file(StringIO)을 정의 -> cloudpickle로 네임스페이스 전체 직렬화 -> 자식 워커("로컬 엔진 대역")에서 재수화 -> 하류 셀(df 합계 + transform 매핑) 실행. 결과: total 66, mapped [7,14,21], 로컬 대조와 완전 일치, **skipped 0(StringIO 살아있는 객체까지 왕복)**.
+- 귀결: 값 상태(DataFrame·클로저·버퍼·설정)는 직렬화로 매끄럽게 이동한다. 상태 파편화는 원리적 장벽이 아니다. 따라서 프록시 티어의 유일한 존재 이유였던 "실행 상태 locality"가 반박됐다 - **로컬 라우팅이 정답, syscall 터널링 불필요.**
+- 정직한 한계: 진짜 OS 자원(실제 파일 핸들·열린 소켓·DB 커넥션)은 직렬화 불가. 단 그것들은 로컬 라우팅 대상 셀이 로컬에서 새로 여는 자원이라 이동 대상이 아니다.
+
 ## 4. 정체성 정합
 
 - 이것이 "WASM에게 로컬을 빌려주자"([00](00-product-vision.md))의 **문자 그대로의 구현**이다. 브라우저는 화면, 소켓·프로세스의 진실은 로컬 프록시/엔진.
@@ -59,6 +75,11 @@
 
 - 진짜 threading(같은 힙 공유메모리 스레드): pthread 미빌드. Worker 풀은 별도 힙이라 공유 전역/락 시맨틱이 다르다. `threading` 자체를 쓰는 레슨은 로컬 전속.
 - xlwings(Excel COM), pyautogui(데스크톱), playwright(브라우저 조작), torch(네이티브 휠). 프록시로도 못 빌림 - 호스트 자원 자체가 브라우저에 없음.
+
+## 5.5 제품화 경로 (전문가 종합 결론)
+- **첫 출하 = 자족 티어를 학습 표면에 적용**(socket/smtplib 17레슨이 아님 - 그건 프록시 의존이라 최악의 출발점). subprocess 레슨은 자식 워커(로컬 0·SSRF 0), HTTP 레슨은 CORS 공개 API에 fetch, 병렬 레슨은 Worker 풀 + cloudpickle.
+- **socket 실연결·smtplib 실전송 레슨은 "로컬 티어"로 표기하고 셀을 로컬 엔진으로 라우팅**(브라우저에서 raw socket 흉내 금지).
+- 강등 사다리: 브라우저 충족 -> browser / 프록시 전용 능력 + 로컬 연결됨 -> 셀 전체 로컬 라우팅 / 로컬 미연결 -> 포터블 부트스트랩 유도 / Firefox·Safari -> 로컬 티어 또는 읽기전용. 임의 TCP 터널 기본 노출 절대 금지.
 
 ## 6. 리스크와 다음 검증 (Phase 1 편입 전)
 
