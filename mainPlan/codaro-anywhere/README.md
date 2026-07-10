@@ -26,7 +26,7 @@ web surface (Cloudflare Pages, 무료 정적)
 
 1. **PyodideEngine** - `ExecutionEngine` Protocol([executionEngine.py:75](../../src/codaro/runtime/executionEngine.py))의 두 번째 구현. Web Worker에서 Pyodide를 돌리고, 기존 localWorker의 순수 Python 코어(cellScope dict 격리 + registry 주입 + AST 수확)와 `kernel/reactive.py`·`document/analysis.py`를 그대로 탑재한다. 조사 결론: 이 코어는 OS 의존이 없어 수정 없이 이식 가능하다.
 2. **capability router** - 셀 코드의 AST에서 요구 능력(파일 I/O·패키지·프로세스/OS)을 정적 판정하고 티어를 배정한다. 로컬 연결 시 로컬 우선, 미연결 시 브라우저 가능 셀만 즉시 실행, 불가 셀은 "로컬 연결" 또는 "클라우드 실행" 배지.
-3. **진입 부트스트랩** - Chromium/Edge File System Access API로 진짜 사용자 폴더를 웹 티어에 마운트. 로컬 티어는 임베디드 CPython 포터블 번들(10~15MB, 무설치·무관리자)로 "웹페이지가 자기 런타임을 데려오는" UX. localhost 연결은 PNA preflight + CORS 배선.
+3. **진입 부트스트랩** - Chromium/Edge File System Access API로 진짜 사용자 폴더를 웹 티어에 마운트. 로컬 티어는 임베디드 CPython 포터블 번들(10~15MB, 무설치·무관리자)로 "웹페이지가 자기 런타임을 데려오는" UX. localhost 연결은 LNA 사용자 권한 프롬프트 + CORS 배선(census로 PNA 폐기 확인).
 4. **WebRTC 개인 클라우드** - 런처(상주 트레이)가 방 코드/QR을 발급하고, 외부 브라우저가 P2P 데이터채널로 내 로컬 엔진에 직결한다. "네 클라우드는 네 컴퓨터다."
 5. **ActionsEngine** - 사용자 소유 리포의 GitHub Actions를 dispatch→poll 배치 런타임으로. 리액티브 문서는 정의상 처음부터 재실행 가능하므로 스테이트리스 VM이 치명상이 아니다. 자동화 태스크의 무료 클라우드 승격(Harvest 레일)을 겸한다.
 

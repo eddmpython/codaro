@@ -19,7 +19,7 @@
 
 ### 2.2 PyodideEngine (신설, Phase 1)
 - 위치: Web Worker 안에서 Pyodide(WASM CPython) 로드. 메인 스레드는 UI만.
-- 탑재물(이식, 수정 최소): localWorker의 cellScope+registry+AST 수확 코어, document/analysis.py, kernel/reactive.py, 문서 포맷 파서(percentFormat 등 문자열 기반 순수 함수), _normalizeResult(polars 분기 제외 - polars는 Pyodide 배포판에 없음, localWorker.py:679).
+- 탑재물(이식, 수정 최소): localWorker의 cellScope+registry+AST 수확 코어, document/analysis.py, kernel/reactive.py, 문서 포맷 파서(percentFormat 등 문자열 기반 순수 함수), _normalizeResult 전체 - census(2026-07-10)로 polars 1.33·duckdb 1.5·opencv 4.11이 Pyodide 314 배포판에 신규 포함 확인되어 polars 분기(localWorker.py:679)도 브라우저에서 산다.
 - 걷어낼 것: os.chdir(targetCwd)(localWorker.py:238), 모듈 mtime autoreload(171-195), OPENBLAS/OMP 스레드 env(22-24), multiprocessing/psutil/Job Object 전부(브라우저 탭 자체가 격리 단위라 필요성 소멸).
 - 파일: 기본 Emscripten 가상 FS. Chromium 계열에서 File System Access API 디렉터리 핸들을 마운트하면 진짜 사용자 폴더([02 §3](02-entry-and-bootstrap.md)).
 - 패키지: Pyodide 공식 배포 패키지(numpy·pandas·matplotlib·scikit-learn 등) + micropip(순수 휠). 그 밖은 라우터가 브라우저 불가 판정.
@@ -51,7 +51,7 @@
 
 ### 3.3 레슨 라벨 (빌드 타임)
 - 커리큘럼 472개 YAML의 snippet/solution 코드에 판정기를 돌려 레슨별 browserRunnable(true/false/부분) 라벨을 빌드 타임 생성한다. 프론트가 이미 YAML 전체를 번들하므로(editor/src/lib/curriculaRegistry.ts:16-19) 라벨 생성은 같은 파이프라인의 확장이다.
-- 2026-07 조사 분포 참고: 패키지 상위 pandas 116·numpy 108·matplotlib 100·scikit-learn 59(브라우저권), 원리 불가 xlwings 11·pyautogui 8·playwright 11·torch 11(로컬/Actions행).
+- census 실측(2026-07-10, 판정기 프로토타입, 473 파일): **browser 314 + wheel 후 browser 84(codaro import, Phase 1 해결) = 398/473(84%)**, localOnly 71, partial 4, 미확인 0. dataAnalysis(57)·visualization(55)·mathStatsMl(55) 100% 브라우저권, imageVision 48/62, automation 73/128, basics 94/100. localOnly 원인 = subprocess 12·playwright 11·xlwings 11·torch/torchvision 11·pyautogui 8·smtplib 5 등 전부 예상된 로컬 전속 능력.
 
 ## 4. 결과 일관성 계약
 
@@ -68,7 +68,7 @@
 | 신설 | editor/src/lib/execution/pyodideEngine.ts + worker | Web Worker Pyodide 로더·세션·인터럽트 |
 | 신설 | src/codaro/document/capability.py | AST 능력 판정기(analysis.py 확장) - 빌드 라벨과 서버 양쪽에서 사용 |
 | 수정 | editor/src/lib/api.ts | 실행 호출을 라우터 경유로(직접 fetch 금지 규칙은 기존 lib 래퍼 계약 유지) |
-| 수정 | src/codaro/server.py:263-282 | CORS 허용 목록 + PNA preflight 응답([02 §4](02-entry-and-bootstrap.md)) |
+| 수정 | src/codaro/server.py:263-282 | CORS 허용 목록에 웹 표면 오리진 추가(LNA는 브라우저 권한 프롬프트라 서버 헤더 불요, [02 §4](02-entry-and-bootstrap.md)) |
 | 수정 | editor/src/components/terminal/terminalPanel.tsx:71 | WS 주소 하드코딩 -> 설정 API base 준수(하이브리드 전제) |
 | 참조 불변 | src/codaro/kernel/*, runtime/executionEngine.py | Protocol 계약 그대로. LocalEngine 무수정 |
 

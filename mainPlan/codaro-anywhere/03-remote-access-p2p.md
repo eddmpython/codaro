@@ -46,12 +46,17 @@
 ### 3.4 명시적 비설계
 - 비밀번호 인증(재사용·유출 위험, 기기 키가 대체), 공개 접속 URL, 중계 서버에 엔진 API를 노출하는 relay-as-a-service. TURN 릴레이는 암호화된 DTLS 패킷만 지나간다(내용 접근 불가).
 
-## 4. Phase 0 census (착수 전 검증 항목)
+## 4. census 결과 (2026-07-10 확정) 와 잔여 검증
 
-1. TURN 무료 경로: Cloudflare 무료 TURN 티어의 현행 한도·카드 요구 여부 실측. 불충족 시 폴백 = "동일 네트워크(집 안 Wi-Fi) 한정 v1"로 축소하고 TURN은 후속.
-2. 시그널링 워커의 무료 지속 조건(카드 불필요 확인 포함).
-3. 모바일 브라우저(Android Chrome 우선)에서 DataChannel 처리량·에디터 표면 실사용성.
-4. 기존 연결 상태 스토어(connectionStatus, 재연결 바)와의 통합 지점 확인 - 원격 끊김도 같은 UX 어휘로.
+확정된 것:
+1. **TURN: 월 1,000GB 무료 티어는 있으나 카드 등록이 사실상 필요**(커뮤니티 보고 기준 무카드 경로 없음). 따라서 **카드 0장 v1 경로 확정 = STUN(구글·Cloudflare 무제한 무료) + Workers 무료 시그널링 + 직결 실패 시 수동/QR 폴백**. TURN 릴레이는 "카드 등록 사용자 한정 옵션"으로 강등(기본 아님). 자격증명은 TURN key 서버 보관 + 단기 credential 발급 모델(TTL 최대 48h).
+2. 시그널링: Cloudflare Workers Free = 카드 불필요, 일 100,000 요청 - offer/answer 교환 용도로 충분. 수동/QR 교환은 실존 선례(QWBP 등 SDP 압축 프로토콜) 있으나 trickle ICE 부재로 UX 비용 큼 - 폴백으로만.
+3. Chrome 147+부터 WebSocket에도 LNA 권한 프롬프트가 적용된다([02 §4](02-entry-and-bootstrap.md)) - 단 P2P DataChannel 경로 자체는 localhost 접속이 아니라 이 게이트와 무관(WebRTC의 LNA 게이팅 여부는 미확인, 잔여 항목).
+
+잔여 검증(Phase 4 착수 전):
+1. WebRTC(ICE 후보 수집)의 LNA 게이팅 여부 실기기 확인.
+2. 모바일 브라우저(Android Chrome 우선)에서 DataChannel 처리량·에디터 표면 실사용성.
+3. 기존 연결 상태 스토어(connectionStatus, 재연결 바)와의 통합 지점 확인 - 원격 끊김도 같은 UX 어휘로.
 
 ## 5. 착지 기준
 

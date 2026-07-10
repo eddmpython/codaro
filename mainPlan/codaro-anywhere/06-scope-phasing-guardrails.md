@@ -29,7 +29,7 @@
 - 게이트: 웹 표면에서 browserRunnable 레슨 엔드투엔드(열람 -> 실행 -> 결과) + 라우팅 판정 스냅샷 + K5(가짜 실행 경로 제거 확인).
 
 ### Phase 3 - 로컬 브리지 + 부트스트랩
-- PNA/CORS 배선, health 프로브 자동 감지, 페어링 승인(웹 오리진 최초 1회), 터미널 WS 하드코딩 수정.
+- LNA 권한 프롬프트 대응(HTTPS 필수·targetAddressSpace·거부 시 안내 UI) + CORS 오리진 배선, health 프로브 자동 감지, 페어링 승인(웹 오리진 최초 1회), 터미널 WS 하드코딩 수정(147+ WS도 LNA 게이트).
 - 포터블 번들(임베디드 CPython) 빌드 파이프라인 + 코드 서명(선결) + "로컬 연결" 동선.
 - 게이트: 신규 PC 실측 - 웹 표면 첫 방문에서 로컬급 승격까지 5분 이내, 승인 없는 오리진 연결 거부.
 
@@ -95,7 +95,7 @@
 ## 6. 영향 요약 (v1 전체)
 
 - 신설: editor/src/lib/execution/(router·pyodideEngine·worker), src/codaro/document/capability.py, 웹 표면 빌드 변형 + CF Pages 배포 워크플로, 포터블 번들 파이프라인(launcher 트리), 시그널링 워커(P4), Actions 템플릿(P5).
-- 수정: src/codaro/server.py(CORS/PNA), editor/src/lib/api.ts(라우터 경유), editor/src/components/terminal/terminalPanel.tsx(WS base), launcher/PACKAGING.md(포터블 형태).
+- 수정: src/codaro/server.py(CORS 오리진), editor/src/lib/api.ts(라우터 경유 + LNA 거부 감지), editor/src/components/terminal/terminalPanel.tsx(WS base), launcher/PACKAGING.md(포터블 형태).
 - 불변: src/codaro/kernel/*, src/codaro/runtime/localEngine.py·localWorker.py(코어의 이식 원본으로만 참조), landing/, curricula/ 데이터.
 
 ## 7. CLAUDE.md 게이트 개정안 (사용자 승인 대기)

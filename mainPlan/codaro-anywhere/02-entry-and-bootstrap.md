@@ -25,7 +25,7 @@
 - Chromium showDirectoryPicker로 디렉터리 핸들 획득 -> Pyodide FS에 마운트(mountNativeFS 계열 API). 이후 open()·pandas.read_csv가 진짜 사용자 파일을 읽고 쓴다.
 - 권한 지속성: 핸들은 IndexedDB에 보관하고 재방문 시 재승인 요청. 권한 UI 문구는 "이 폴더 안에서만"임을 명시.
 - 경계: 마운트 폴더 밖 접근은 가상 FS로 남는다. 라우터 배지가 어느 파일계에 썼는지 표시(일관성 계약, [01 §4](01-tier-architecture.md)).
-- Phase 0 census: mountNativeFS의 현행 API 형태·안정성, 쓰기 성능, 권한 재승인 UX를 실측(2026-07 조사는 가능성 확인까지만).
+- census 확정(2026-07-10, Pyodide 314.0.2 소스 확인): API는 `mountNativeFS(path, FileSystemDirectoryHandle)`(Experimental), picker(showDirectoryPicker)는 메인 스레드 전용이나 핸들은 postMessage로 Worker에 전달 가능 - 본 설계의 "메인에서 권한, Worker에서 마운트" 패턴 성립. 쓰기는 `syncfs()` 수동 호출 필수. 구현이 MEMFS 사본 기반이라 대용량 폴더는 메모리·동기화 비용에 비례 - 대용량 벤치는 Phase 1 항목. Chrome 122+ 영구 권한("모든 방문에 허용")으로 재승인 UX 완화.
 
 ## 4. localhost 연결 배선 (웹 표면 -> 로컬 엔진)
 
@@ -35,9 +35,11 @@
 |---|---|---|
 | API base 주입 | VITE_CODARO_API_BASE 지원(editor/src/lib/api.ts:71) | 정적 빌드에서 127.0.0.1:8765 기본 후보 + 상태 프로브 |
 | CORS | localhost 계열 + CODARO_DEV_ORIGINS(src/codaro/server.py:263-282) | 웹 표면 오리진(Pages 도메인) 허용 추가 |
-| PNA | 없음 | Chromium Private Network Access preflight에 Access-Control-Allow-Private-Network: true 응답 추가(server 미들웨어) |
-| 터미널 WS | window.location.host 하드코딩(editor/src/components/terminal/terminalPanel.tsx:71) | 설정 API base 준수로 수정 |
+| LNA 권한 | 없음 | census(2026-07-10) 확정: PNA(서버 preflight 헤더 opt-in)는 폐기됐고 Local Network Access **사용자 권한 프롬프트** 모델로 대체됨. Chrome 142+에서 fetch/XHR, 147+에서 WebSocket까지 게이트. 서버 측 특수 헤더는 불요(일반 CORS만 필요), 페이지는 HTTPS(secure context) 필수, 필요 시 fetch에 targetAddressSpace: "loopback" 선언. 프론트가 권한 거부 상태를 감지해 안내 UI로 착지시킨다 |
+| 터미널 WS | window.location.host 하드코딩(editor/src/components/terminal/terminalPanel.tsx:71) | 설정 API base 준수로 수정 + LNA 프롬프트(147+) 이후 재연결 처리 |
 | SPA 경로 | 에디터 vite base "/" + PWA 절대경로 전제 | 웹 표면 빌드 변형에서 base 파라미터화 + SW 캐시 경로 정리 |
+
+- 브라우저별 현행(census): Edge는 Chromium 동반(147 동일), Firefox도 자체 LNA 출하 진행(150+ 정책 존재, 세부 상이 - 실기기 확인 항목), Safari는 LNA 없음(단 HTTPS -> http://127.0.0.1 mixed content 동작은 별도 확인 필요).
 
 - 감지 프로토콜: 페이지 로드 시 GET /api/health를 127.0.0.1:8765로 프로브(짧은 타임아웃). 성공 시 "로컬 연결됨" 배지 + 라우터 규칙 1(전 셀 local) 활성.
 - 보안: 로컬 엔진은 원래 무인증 로컬 전용이었다. 웹 오리진에서 접속을 여는 순간 오리진 allowlist + 최초 1회 페어링 승인(트레이 알림에서 허용)을 요구한다. 상세 위협 모델은 [03 §3](03-remote-access-p2p.md)과 공유.
