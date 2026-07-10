@@ -16,7 +16,7 @@
 | K5 | 가짜 실행의 정식 표면 승격 | 현행 print 정규식 시뮬레이션(editor/src/lib/localRuntime.ts:5-37)은 파이썬이 아니다. 검증 정직성 위반. 실행은 진짜 CPython(WASM 포함)만 |
 | K6 | 브라우저 티어의 학습 SSOT 승격 | 숙달·검증 기준 실행은 로컬 불변. 게이트 개정은 보조 티어 허용까지([06 §7](06-scope-phasing-guardrails.md)) |
 | K7 | 확장 프로그램 + Native Messaging 브리지 | 네이티브 호스트 설치가 어차피 필요해 런처 대비 이점 0([02 §6](02-entry-and-bootstrap.md)) |
-| K8 | 브라우저 리눅스 VM(x86 에뮬) 채택 | 수백 MB·5~20배 감속·라이선스 리스크. 능력 요구는 local/actions 티어가 이미 흡수 |
+| K8 | 브라우저 리눅스 VM(CheerpX/WebVM·container2wasm·v86) 채택 | 재검토 census(2026-07-10)로 확정 기각: CheerpX는 **32비트 x86 전용**이라 numpy 1.22+(2021)부터 i686 휠 미제공·torch 32비트 휠 부재 - "진짜 pip 생태계"가 실제로 성립 안 함. 감속 5~10배(벤더 자인, 부동소수 취약), 인터넷은 사용자별 Tailscale 로그인 단일 경로, VM 내 서버->같은 페이지 접속은 유료 클라우드 릴레이(BrowserPod)로만. 에뮬 계열은 ~100배+ 감속. 계산상 이득도 localOnly 71 중 ~20레슨(84%->~90%)에 불과. 상세=07 원장 |
 | K9 | 원격 접속의 공개 URL·비밀번호 인증·relay 서비스화 | 개인 1인 페어링 모델만([03 §3.4](03-remote-access-p2p.md)) |
 | K10 | landing(GitHub Pages) 슬롯 침범 | 웹 표면은 Cloudflare Pages 별도 배포. 문서/블로그 SSOT 불변([02 §5](02-entry-and-bootstrap.md)) |
 
@@ -27,6 +27,15 @@
 | H1 | 과제방(교실) 관련 전 유스케이스(Actions 채점 포함) | 과제방 자체가 보류·폐기 검토 중(2026-07-10 사용자 결정). 전제로 쓰지 않는다 |
 | H2 | 커리큘럼 읽기 전용 정적 뷰어(landing 확장) | 게이트 무충돌 독립 옵션이나 본 PRD보다 후순위로 사용자가 내림 |
 | H3 | SharedArrayBuffer 협조적 인터럽트 | Worker.terminate 방식이 v1. SAB는 CF Pages 헤더 확보 후 개선 항목 |
+
+## 감시 항목 (KILL 재개 트리거 - 분기 1회 점검)
+
+K8(브라우저 리눅스 VM)은 기각이되, 아래 중 하나가 현실화되면 재평가한다:
+
+1. CheerpX(또는 동급 JIT 가상화)의 **64비트 지원** 출시 - 현재 최대 결격 사유. 벤더는 "future updates" 문구만 유지 중.
+2. 오픈소스/무료 JIT 가상화 대안 등장(현재 실용 속도 계열은 CheerpX 독점뿐).
+3. WASIX의 브라우저 네트워킹 완성 + CPython 포크 성숙 - native 휠 인덱스(numpy/pandas 등)는 이미 실존하므로 브라우저 SDK 투자만 살아나면 "VM 없는 리눅스 능력" 경로가 열림.
+4. Pyodide pyemscripten 휠 생태계(PEP 783, 2026-04 승인)가 못 메우는 실사용 수요가 사용자에게서 확인될 때.
 
 ## Non-Goals (v1 범위 밖)
 

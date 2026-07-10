@@ -48,6 +48,17 @@
 - Actions: 공개 리포 무제한·4vCPU/16GB, 비공개 월 2,000분·2vCPU/8GB. workflow_dispatch는 수초~1분 픽업(cron 지연과 별개), 잡당 6시간. fine-grained PAT 최소 권한 = **Actions write**(contents 아님). 60일 비활성 자동 꺼짐은 공개 리포만. ToS 원문 확보: "리포 프로젝트와 무관한 워크로드" 금지 명문 - 사용자 소유 리포 모델(K4)이 정확한 경계.
 - 코드 서명: EV의 SmartScreen 즉시 평판 폐지(2024). Azure Artifact Signing(구 Trusted Signing)은 개인 가입이 미국/캐나다 한정 - 한국 개인 불가. 현실 = OV 인증서(연 $200대) + 평판 자연 축적. Phase 3 비용 확정.
 
+### 2026-07-10 - 브라우저 리눅스 VM 재검토 (K8 유지 확정 + 감시 트리거 신설)
+
+사용자 요청("브라우저에 리눅스 wasm을 돌릴 수 있을까")으로 K8 재검토, 웹 census 수행. 결론 = 기각 유지, 05에 감시 트리거 4종 신설.
+
+- **결정적 사실: CheerpX(실용 속도가 나오는 유일한 JIT 가상화)는 2026-07 현재도 32비트 x86 전용.** numpy는 1.22(2021-12)부터 i686 휠 미제공, torch는 32비트 리눅스 휠 자체가 없음 - "브라우저에서 진짜 pip 생태계"가 실제로는 성립하지 않는다(구식 apt i386/소스빌드 의존). 64비트는 "future updates" 문구가 2024년부터 그대로.
+- 성능 5~10배 감속(벤더 자인, 부동소수·벡터 파이프라인 취약 인정). 인터넷은 사용자별 Tailscale 로그인이 단일 경로(fetch 브리지는 벤더가 공식 거부). VM 안 웹서버를 같은 페이지에서 접속하는 것은 CheerpX 단독 불가 - 벤더의 답은 유료 클라우드 릴레이(BrowserPod Portals)로, "브라우저 안 로컬"의 의미가 희석됨. 벤더의 상업 베팅 자체가 IDE/에이전트 샌드박스(BrowserPod)로 이동.
+- 라이선스: 개인과 **1인 회사 상용까지 무료**(출처 표기 + self-hosting 불가 조건), 2인+ 상용은 비공개 견적. 참고: 현재 Codaro(1인)는 무료 범위이나 self-host 불가 조건이 로컬-우선 철학과 충돌.
+- 에뮬 계열: container2wasm(Bochs, ~100-1000배 추정)·v86(32비트 P4급)은 학습 루프 실격. WALI는 연구 단계(브라우저용 아님). WASIX는 native 휠 인덱스(numpy/pandas/pyarrow 등)가 실존하나 브라우저 네트워킹 미완("on the works") + CPython 독자 포크 리스크.
+- 반대편 구조 변화가 더 큼: PEP 776(CPython 3.14 Emscripten tier 3) + PEP 783(pyemscripten 휠 PyPI 배포, 2026-04 승인) + JSPI Chrome 기본 - **Pyodide 진영이 공식 파이프라인에 올라타 커버리지 갭이 좁혀지는 방향**. 스레딩 부재만 상수.
+- 실익 계산 재확인: localOnly 71 중 브라우저-리눅스가 풀 수 있는 것은 낙관해도 subprocess 12 + torch ~11(32비트 사실로 이마저 무효) + smtplib ~5 수준. 84% -> ~90% 이득에 무게·감속·터널·라이선스 비용 - 기각 타당.
+
 ## 미결 (블로킹 순)
 
 1. 웹 표면 브랜드/도메인(CF Pages 프로젝트명) 결정 - Phase 2 전까지.
