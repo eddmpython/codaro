@@ -87,6 +87,10 @@
 2. 코드 서명 OV 인증서 조달 - Phase 3 선결.
 3. 잔여 소검증: FSA 대용량 벤치(Phase 1), WebRTC의 LNA 게이팅 여부·Firefox LNA 세부(Phase 4 전).
 
+### 2026-07-11 - 엔드투엔드 실증: 진짜 레슨이 브라우저에서 채점됨
+- 진짜 curricula YAML을 읽어 브라우저 실행+noError 채점 실측(webPythonLesson.html+runLessonE2E.py): day03(연산자) 브라우저 PASS 결과 30(채점 루프 성립). 01_subprocess기초 순정=FAIL(Errno 138), 자족 티어=PASS 결과 3(레슨 assert 통과=자식 파이썬 진짜 실행). **발명이 localOnly 레슨을 무설치 브라우저 레슨으로 전환함을 실제 콘텐츠로 증명.** 상세=08 §3.6.
+- 발명 루프(토론1->테스트->토론2/종합->테스트) 완결. 자족 티어는 실제 레슨으로 검증됨. Phase 1 착수 준비 완료.
+
 ## NEXT (다음 세션 재개 지점)
 
 - **Phase 1 착수 가능 상태.** 첫 작업 = wheel 서브셋 로드 스파이크: src/codaro의 kernel/document 순수 모듈 + localWorker 코어를 Pyodide 314에 올려 셀 실행·리액티브가 도는지 검증([01 §5 메모](01-tier-architecture.md)). 성공 기준 = 동등성 테스트 초안 통과.

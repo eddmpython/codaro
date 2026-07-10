@@ -65,6 +65,11 @@
 - 귀결: 값 상태(DataFrame·클로저·버퍼·설정)는 직렬화로 매끄럽게 이동한다. 상태 파편화는 원리적 장벽이 아니다. 따라서 프록시 티어의 유일한 존재 이유였던 "실행 상태 locality"가 반박됐다 - **로컬 라우팅이 정답, syscall 터널링 불필요.**
 - 정직한 한계: 진짜 OS 자원(실제 파일 핸들·열린 소켓·DB 커넥션)은 직렬화 불가. 단 그것들은 로컬 라우팅 대상 셀이 로컬에서 새로 여는 자원이라 이동 대상이 아니다.
 
+## 3.6 실제 커리큘럼 레슨 엔드투엔드 (PASS, 손코딩 아님)
+진짜 curricula YAML을 읽어 브라우저에서 실행 + noError 채점까지 실측(tests/_attempts/webPythonLesson.html + runLessonE2E.py):
+- basics/30days/day03(연산자): 브라우저 Pyodide로 snippet 실행 -> noError PASS, 결과 30. **채점 루프 전체가 브라우저에서 성립**.
+- automation/os/procCtl/01_subprocess기초: 순정 브라우저 = FAIL(Errno 138, 진짜 localOnly 확인). **자족 티어(자식워커 브리지) = PASS, 결과 3**. 레슨 solution의 `assert completed.stdout.strip() == "3"`이 통과 = 자식 파이썬이 진짜로 print(1+2) 실행. **발명이 localOnly 레슨을 무설치 브라우저 레슨으로 전환함을 실제 콘텐츠로 증명.**
+
 ## 4. 정체성 정합
 
 - 이것이 "WASM에게 로컬을 빌려주자"([00](00-product-vision.md))의 **문자 그대로의 구현**이다. 브라우저는 화면, 소켓·프로세스의 진실은 로컬 프록시/엔진.
