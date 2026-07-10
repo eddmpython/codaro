@@ -48,6 +48,7 @@ web surface (Cloudflare Pages, 무료 정적)
 6. [05-killlist-and-non-goals.md](05-killlist-and-non-goals.md) - 안 하는 것(기각 3건·중앙 실행 팜·가짜 실행·과제방 유스케이스 보류 등).
 7. [06-scope-phasing-guardrails.md](06-scope-phasing-guardrails.md) - Phase 0~5, 기계 가드레일, 테스트 매트릭스, 롤백, 개발자+PM 이중 평가, CLAUDE.md 게이트 개정안.
 8. [07-progress-ledger.md](07-progress-ledger.md) - 결정 원장·세션 간 재개(NEXT).
+9. [08-borrowed-syscall-bridge.md](08-borrowed-syscall-bridge.md) - **발명 + 실측**: JSPI 위 syscall 브리지로 소켓·프로세스를 로컬에서 빌려 http.client/urllib/smtplib/subprocess를 브라우저에서 살린 headless 검증 결과.
 
 ---
 

@@ -59,6 +59,19 @@
 - 반대편 구조 변화가 더 큼: PEP 776(CPython 3.14 Emscripten tier 3) + PEP 783(pyemscripten 휠 PyPI 배포, 2026-04 승인) + JSPI Chrome 기본 - **Pyodide 진영이 공식 파이프라인에 올라타 커버리지 갭이 좁혀지는 방향**. 스레딩 부재만 상수.
 - 실익 계산 재확인: localOnly 71 중 브라우저-리눅스가 풀 수 있는 것은 낙관해도 subprocess 12 + torch ~11(32비트 사실로 이마저 무효) + smtplib ~5 수준. 84% -> ~90% 이득에 무게·감속·터널·라이선스 비용 - 기각 타당.
 
+### 2026-07-10 - 발명 실측: "빌린 시스템콜 브리지" (목표 "발명하자 토론·테스트 루프")
+
+토론1(4전문가 가설) -> 테스트 -> 토론2 루프로 진행. tests/_attempts/webPythonProbe.html에 능력 프로브 + 3 브리지를 만들어 headless(Chrome, Pyodide 314.0.2, crossOriginIsolated=true) 실측. 상세 = [08-borrowed-syscall-bridge.md](08-borrowed-syscall-bridge.md).
+
+- **핵심 발견: JSPI(run_sync)가 브라우저 블로킹 파이썬을 성립시킨다.** 이 위에서 안 되던 syscall을 로컬로 라우팅.
+- socket: Emscripten 내장 소켓 블로킹 recv 실패 -> BridgedSocket(WebSocket->로컬 WS/TCP 프록시) 몽키패치 -> **수정 없는 http.client/urllib status 200, smtplib 메일 실전송 성공**.
+- subprocess: Errno 138 -> 자식 Pyodide 워커 라우팅 -> **CompletedProcess stdout 'child ok' rc 7, 격리 확인**.
+- 병렬: threading은 원천 불가(pthread-stubs) -> Worker 풀 **3.81배** 실측.
+- TLS: 브라우저 안 ssl.wrap_socket은 fd 없어 불가(원리적 한계) -> **로컬 프록시 TLS 종단으로 https status 200**.
+- 원리적 불가(로컬 전속 확정): 진짜 threading, xlwings, pyautogui, playwright, torch.
+- 실익 경계(정직): 이 브리지는 "로컬 엔진 연결 상태에서 브라우저 UI로 매끄럽게" 구간에서 빛난다. 로컬 엔진 완전 부재 시엔 파일/pandas권까지만(프록시 제공 주체가 없음).
+- 다음 검증(Phase 1 편입 전): 보안(프록시 allowlist+페어링, SSRF/내부망), JSPI Firefox/Safari 범위, 자식 워커 메모리/부팅.
+
 ## 미결 (블로킹 순)
 
 1. 웹 표면 브랜드/도메인(CF Pages 프로젝트명) 결정 - Phase 2 전까지.

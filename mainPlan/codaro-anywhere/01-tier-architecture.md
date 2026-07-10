@@ -32,6 +32,9 @@
 
 ## 3. capability router
 
+### 3.0 빌린 시스템콜 브리지 (실측 발명, [08](08-borrowed-syscall-bridge.md))
+브라우저 티어의 능력 경계는 고정이 아니다. JSPI(run_sync) 위 syscall 브리지로 소켓·프로세스를 로컬에서 빌리면, 순정 Pyodide가 못 하던 http.client/urllib/smtplib/subprocess가 무수정 동작한다(headless 실측). 라우터는 "브라우저 불가"를 즉시 local로 넘기기 전에 "브리지로 빌릴 수 있나"를 먼저 판정한다: 소켓/파이썬 subprocess는 로컬 프록시/자식워커가 있으면 브리지, 없으면 local. 진짜 threading·데스크톱·네이티브휠은 브리지로도 불가라 local 전속.
+
 ### 3.1 능력 어휘 (v1은 3종으로 한정)
 | 능력 | AST 신호(예) | browser | actions | local |
 |---|---|---|---|---|
