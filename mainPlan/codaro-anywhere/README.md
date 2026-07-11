@@ -50,6 +50,7 @@ web surface (Cloudflare Pages, 무료 정적)
 8. [07-progress-ledger.md](07-progress-ledger.md) - 결정 원장·세션 간 재개(NEXT).
 9. [08-borrowed-syscall-bridge.md](08-borrowed-syscall-bridge.md) - **발명 + 실측**: JSPI 위 syscall 브리지로 소켓·프로세스를 로컬에서 빌려 http.client/urllib/smtplib/subprocess를 브라우저에서 살린 headless 검증 결과.
 10. [09-non-pyodide-real-runtime.md](09-non-pyodide-real-runtime.md) - **비-Pyodide 탐색**: 파이썬이 "실제 로컬 서버처럼" 도는 브라우저 가상화. CheerpX 실측(진짜 CPython 3.7.3+스레드+UDS는 되나 netdev 부재로 서버 unreachable) + 토론 랭킹(v86+lwIP가 유일한 오픈소스 로컬 인바운드 경로).
+11. [10-browser-as-server.md](10-browser-as-server.md) - **재프레임 + 엔드투엔드 실측(정말로 가능한 방향)**: "로컬 서버=소켓 아니라 WSGI 인터페이스". 진짜 Flask가 Pyodide에서 소켓 0으로 라우팅/sqlite/세션, Service Worker가 페이지 fetch를 연결 -> 페이지가 표준 fetch로 브라우저 안 파이썬 서버 호출(GET/POST/201/상태유지 PASS). VM보다 압도적 실현가능.
 
 ---
 
