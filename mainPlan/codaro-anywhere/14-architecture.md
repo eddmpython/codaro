@@ -81,6 +81,28 @@ PyodideEngine (Web Worker 안 Pyodide 314)
 - 원격: WebRTC P2P로 외부 브라우저→내 로컬 엔진([03]).
 - 무인: 자동화 태스크를 사용자 리포 Actions로 승격([04]).
 
+## 6.5 모듈성 (완벽한 모듈화 가능한가)
+
+정직한 답: **거의 완벽하게 모듈화되나, "완벽"은 아니다.** 가장 깨끗한 경계(ExecutionEngine Protocol) 위에 지어 대부분 독립 모듈이지만, 원리적으로 못 떼는 교차 관심사가 있다.
+
+**깨끗한 모듈 (독립 교체·테스트 가능):**
+- **ExecutionEngine Protocol** = 최강 seam. 각 티어(Local/Pyodide/Actions)가 같은 인터페이스 구현, 서로 모름.
+- **Capability router** = 순수 함수 (셀 AST -> 티어 결정). 무상태, 단독 테스트.
+- **WSGI/ASGI 어댑터** ([10]) = 프레임워크를 소켓 없이 구동하는 순수 모듈.
+- **Service Worker** = 프레임워크 무관(method/path/body만 전달). 앱 교체 무영향.
+- **셸 디스패처** ([12]) = 명령->핸들러 테이블.
+- **CheckpointChain** ([13]) = page-diff/복원/시간여행 캡슐화 클래스.
+
+**교차 관심사 (완벽 분리 불가 - 캡슐화 대신 "능력 계약"으로 표현해야 함):**
+1. **런타임 몽키패치**: 빌린 시스템콜 브리지는 builtins.input·socket.create_connection·subprocess.run을 전역 교체한다. 이건 합성(composition)이 아니라 런타임 주입(injection)이라 깨끗한 모듈 경계가 아니다. -> "syscall 가로채기 능력"으로 계약화.
+2. **JSPI/run_sync 공유 의존**: 브리지·터미널 input·모든 블로킹 op이 공유한다. 공유 인프라(모듈이 아니라 기반).
+3. **엔진 내부 접근**: 복원 리액티브가 `pyodide._module.HEAPU8`·`_emscripten_stack_restore`에 손댄다. 엔진 내부 누수 -> "메모리 체크포인트 능력"을 PyodideEngine이 노출하고 리액티브가 소비하는 계약으로 모델.
+4. **페이지 전역 전제조건**: crossOriginIsolated(COOP/COEP)는 SharedArrayBuffer·스냅샷의 전제. 모듈이 아니라 환경 precondition(티어 전체가 공유).
+
+**설계 원칙**: 위 교차 관심사를 숨은 전역으로 두지 말고 **명시적 능력 계약(capability contract)으로 노출**하라. 예: PyodideEngine이 `MemoryCheckpointCapability`·`SyscallInterceptCapability`를 제공하고, 리액티브·브리지가 그걸 주입받아 쓴다. 그러면 "완벽 모듈화"는 아니어도 결합이 인터페이스로 드러나 테스트·교체·추론 가능해진다. 숨기면 스파게티, 드러내면 계약.
+
+**결론**: 티어·라우터·표면·어댑터는 완벽 모듈화 O. 브리지·복원엔진은 엔진 내부/런타임에 의존하는 "능력 소비 모듈"이라 독립은 아니고 계약 결합. 이게 이 도메인(WASM 런타임 조작)의 정직한 상한이다.
+
 ## 7. 기존 Codaro 5층과의 관계
 기존: core → engine(document/kernel/runtime/system) → domain(curriculum/ai/automation) → transport(api/webBuild) → entry. 
 Codaro Anywhere는 **engine 레이어에 PyodideEngine·ActionsEngine을 추가**하고, **transport에 capability router + 브라우저 서버/터미널 표면**을 얹는다. domain·core는 무수정. 즉 아키텍처 개편이 아니라 기존 스왑 지점(ExecutionEngine Protocol)을 활용한 확장이다.
