@@ -92,8 +92,8 @@ export function HomePage() {
               </Text>
             </VStack>
             <HStack gap={3}>
-              <Button as="a" href={appPath("/learn")} variant="primary" label="커리큘럼 보기" icon={<BookOpen size={16} aria-hidden="true" />} />
-              <Button as="a" href={brand.repoUrl} target="_blank" rel="noopener noreferrer" variant="ghost" label="어떻게 되나 보기" endContent={<ArrowRight size={15} aria-hidden="true" />} />
+              <Button as="a" href={appPath("/app/")} variant="primary" label="브라우저에서 노트북 열기" icon={<Terminal size={16} aria-hidden="true" />} />
+              <Button as="a" href={appPath("/learn")} variant="secondary" label="커리큘럼 보기" icon={<BookOpen size={16} aria-hidden="true" />} />
             </HStack>
           </VStack>
         </div>

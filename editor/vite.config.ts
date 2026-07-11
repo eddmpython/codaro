@@ -22,7 +22,15 @@ function manualChunks(id: string) {
   return "vendor";
 }
 
+// 웹(Pages) 서빙용 빌드 변형: 같은 에디터를 서브패스(/codaro/app/)에 올릴 때만 env로 덮는다.
+// 로컬 제품 빌드(webBuild)는 기본값 그대로라 영향이 없다.
+// base 값은 슬래시 없이 받는다(예: "codaro/app") - Git Bash(MSYS)가 선행 "/"를 윈도 경로로
+// 변환해 망가뜨리므로 여기서 정규화한다.
+const webBase = process.env.CODARO_WEB_BASE;
+const webOutDir = process.env.CODARO_WEB_OUT;
+
 export default defineConfig({
+  base: webBase ? `/${webBase.replace(/^\/+|\/+$/g, "")}/` : "/",
   plugins: [
     react(),
     tailwindcss(),
@@ -43,7 +51,7 @@ export default defineConfig({
   build: {
     assetsDir: "_app",
     emptyOutDir: true,
-    outDir: "../src/codaro/webBuild",
+    outDir: webOutDir || "../src/codaro/webBuild",
     rollupOptions: {
       output: {
         manualChunks,

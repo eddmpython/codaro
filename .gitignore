@@ -53,6 +53,7 @@ landing/build/
 landing/.svelte-kit/
 landing/static/blog/assets/
 landing/static/docs/blog/assets/
+landing/static/app/
 
 # MkDocs build
 site/

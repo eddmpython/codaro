@@ -33,6 +33,17 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Install Editor
+        working-directory: editor
+        run: npm install
+
+      - name: Build Editor Web Variant
+        working-directory: editor
+        env:
+          CODARO_WEB_BASE: codaro/app
+          CODARO_WEB_OUT: ../landing/static/app
+        run: npm run build
+
       - name: Install
         working-directory: landing
         run: npm install

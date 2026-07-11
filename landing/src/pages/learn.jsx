@@ -27,8 +27,8 @@ export function LearnPage() {
             </Text>
           </VStack>
           <HStack gap={3} justify="center">
-            <Button as="a" href={brand.launcherDownloadUrl} variant="primary" size="lg" label="Codaro로 시작" icon={<Download size={17} aria-hidden="true" />} />
-            <Button as="a" href="#curriculum" variant="secondary" size="lg" label="커리큘럼 보기" icon={<BookOpen size={16} aria-hidden="true" />} />
+            <Button as="a" href={brand.appPath("/app/")} variant="primary" size="lg" label="브라우저에서 노트북 열기" icon={<BookOpen size={16} aria-hidden="true" />} />
+            <Button as="a" href={brand.launcherDownloadUrl} variant="secondary" size="lg" label="로컬로 완전하게" icon={<Download size={17} aria-hidden="true" />} />
           </HStack>
         </VStack>
       </div>
