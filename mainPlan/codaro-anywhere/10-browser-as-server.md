@@ -67,7 +67,7 @@ tests/_attempts/webPyServer.html + webPyServerSw.js. 페이지가 평범한 `fet
 
 ## 6. 전문가 독립 수렴 (검증)
 4렌즈 토론이 이 아키텍처에 독립적으로 수렴함(내가 빌드·실측한 것과 동일). 1위 = "SW 리버스 프록시 + 상주 Pyodide Worker(WSGI/ASGI, fetch-투명)". 확장 로드맵도 합의:
-- **FastAPI(ASGI)**: httpx.ASGITransport(app) 또는 in-memory scope/receive/send 루프로 소켓 없이 구동. pydantic 검증·미들웨어·DI가 실제로 실행(422 검증 등). h11/anyio/starlette 순수 파이썬이라 micropip 가능(pydantic-core는 wasm 휠 필요 -> Pyodide 314 배포판 확인).
+- **FastAPI(ASGI) = 검증 완료(PASS)**: pydantic-core(Rust) wasm 휠이 micropip로 설치됨. httpx.ASGITransport로 소켓 없이 구동. tests/_attempts/webPyServerAsgi.html로 엔드투엔드 실측: 페이지 fetch -> SW -> FastAPI. GET 200(미들웨어 X-Codaro 헤더 실행)/POST 201/상태유지(total 12->17)/**누락 필드 POST -> 422 진짜 pydantic 검증**(`Field required`). Flask(WSGI)와 FastAPI(ASGI) 둘 다 브라우저 로컬 서버로 성립.
 - **SharedWorker 단일 프로세스 서버**: 모든 탭이 한 앱/한 sqlite를 공유(진짜 localhost 모델), 쓰기 자연 직렬화. OPFS sqlite VFS로 영속(재방문에도 DB 생존).
 - **힙 스냅샷 웜스타트**([08 계열 검증 자산]): 프레임워크+앱 import 끝낸 힙을 스냅샷 -> loadPyodide({snapshot})로 콜드부트(수초) 제거, "이미 떠 있던 서버" 즉시성. 단 sqlite fd 열기 전 스냅샷/복원 후 재오픈 규율 필요.
 - **SSE/청크 스트리밍**: ASGI http.response.body(more_body) 이벤트를 respondWith의 ReadableStream 청크로 밀면 실제 스트리밍. WebSocket 업그레이드는 SW fetch로 불가 -> SSE/롱폴로 대체.
