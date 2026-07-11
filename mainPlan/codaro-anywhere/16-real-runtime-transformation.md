@@ -17,20 +17,24 @@ Pyodide 공식 makeMemorySnapshot으로 fork 실측:
 
 **즉 "스냅샷을 워커에 주입 = 프로세스 fork"가 성립.** 프로세스를 184ms에 spawn -> ProcessPoolExecutor/multiprocessing이 실용화(콜드부트 2.8s 제거).
 
-## 2. 프론티어: warm fork (재임포트 스킵)
+## 2. 프론티어: warm fork (재임포트 스킵) - 양쪽 다 막힘 실측
 
-warm 상태(pandas 로드) 스냅샷은 **`Unexpected hiwire entry at index 6`으로 실패**. import가 만든 JS 참조(hiwire 엔트리)를 공식 스냅샷이 처리 못 함.
-- 경계 확정: **bare(패키지 전) fork = 됨. warm(패키지/import 후) fork = hiwire 경계가 막음.**
-- 진짜 탈바꿈(warm 프로세스를 즉시 복제 = 재임포트 0)은 **emval/hiwire shadow 저널링**이 필요(핸들별 직렬화가능 그림자를 기록해 자식에서 같은 인덱스로 재수화). [13] 로드맵의 그 깊은 문제와 동일. 이게 "브라우저 파이썬 프로세스 OS"의 마지막 열쇠.
+warm 상태(pandas 로드) 즉시 복제를 두 방식으로 시도, 둘 다 막힘:
+- **공식 makeMemorySnapshot**: `Unexpected hiwire entry at index 6`. import가 만든 JS 참조(hiwire)를 공식 스냅샷이 거부.
+- **raw 메모리 주입**(우리 page-injection으로 hiwire 검사 우회 시도): 자식 메모리를 부모 크기로 grow하는 핸들(wasmMemory.grow) 미노출 + 부분 주입이 인터프리터를 fatal 손상(`memory access out of bounds` -> `Pyodide already fatally failed`). 두 인스턴스가 wasm 모듈은 공유하나 인스턴스 상태(hiwire 테이블·JS 글루)가 달라 raw 바이트 주입이 정합 안 됨.
+- **경계 확정**: bare(패키지 전) fork = 됨. **warm(패키지/import 후) fork = 공식(hiwire)·raw(인스턴스상태) 둘 다 막힘 = 진짜 프론티어.** 필요한 것 = emval/hiwire shadow 저널링(수일 규모, [13] 로드맵과 동일).
 
-## 3. 탈바꿈 개념 (토론 랭킹 통합 예정)
-전문가 토론(프로세스OS/wasm스레드/속도/런타임통합 4렌즈) 진행 중. 완료 시 통합:
-- 스냅샷-fork 프로세스 OS(워커=프로세스, 스케줄러, IPC)
-- 진짜 병렬(독립힙 워커 = 독립 GIL) / pthread 빌드
-- WebGPU로 numpy 초월 / 콜드부트 제거
-- 흩어진 hack의 통합 런타임
+## 3. 탈바꿈 개념 (전문가 토론 종합)
 
-## 4. 잠정 판정
-- **스냅샷-fork는 진짜 탈바꿈의 기반**: bare fork 15.4배로 프로세스 spawn 실용화 실증. 이걸로 [08]의 자식워커 subprocess·병렬을 "느린 콜드부트"에서 "즉시 fork"로 바꿈.
-- **마지막 열쇠 = hiwire shadow**: warm fork(재임포트 0)가 되면 단일 인터프리터가 진짜 멀티프로세스 런타임으로 완성. 이건 수일 규모 시스템 연구(Pyodide hiwire 내부 훅).
-- 실험 파일(git 미추적): tests/_attempts/webSnapshotFork.html.
+토론이 낸 개념들 - "진짜 런타임"의 물성(빠른 생성·상태복원·물리적 병렬·GPU 산술)을 각 병목에 대응:
+- **PyProc - 브라우저 파이썬 프로세스 OS** (가장 통합적): 메인스레드=커널. 프로세스 테이블(pid->worker/state/parentPid), 스케줄러(태스크->워커 run-queue, 상한=hardwareConcurrency), 시그널(SIGKILL=terminate, SIGINT=setInterruptBuffer, SIGSTOP=디스패치 보류), IPC 이중채널(제어=postMessage+cloudpickle / 고속=SAB 링버퍼+Atomics 제로카피). **핵심 신규성: multiprocessing.shared_memory를 SharedArrayBuffer에 back -> numpy 배열 프로세스 간 진짜 제로카피 공유**(복사 흉내를 넘은 물리 공유, 브라우저에서 처음). 네이티브 processSupervisor.py의 ResourceLimits/좀비수거 계약 그대로 포팅.
+- **차분 프로세스 이미지**: 워커 리셋을 full 재fork(memcpy 수십ms) 대신 live-diff 역적용(2.4ms)으로 pristine 복귀 -> Pool을 계속 warm 유지. 프로세스별 checkpoint/restore = 시간여행·크래시 복구(죽은 워커=이미지 재fork+로그 replay).
+- **진짜 N코어 병렬(오늘)**: 독립힙 워커 N = 독립 GIL N = N코어 물리 동시실행. embarrassingly-parallel(Pool.map)이 numpy 단일스레드 열세를 병렬 처리량으로 상쇄.
+- **프론티어**: nogil-WASM(Python 3.13 free-threaded + pthread + SAB 공유힙)=진짜 공유메모리 스레드, WebGPU=numpy 산술 초월(둘 다 실PC/빌드 필요).
+
+## 4. 판정
+- **탈바꿈의 기반 실증**: bare 스냅샷 fork 184ms(cold 2839ms의 15.4배), 독립 프로세스. 프로세스 생성이 "부팅"에서 "이미지 로드"로.
+- **실용 경로(오늘 가능)**: warm-fork(막힘) 대신 **미리 예열한 워커 풀**(페이지 로드 시 K워커를 패키지까지 warm-up, 비용 은닉) + **PyProc 프로세스 OS 모델**(프로세스테이블/스케줄러/IPC/SAB 공유메모리) + **차분 리셋**(live-diff로 워커 pristine 복귀 2.4ms). 이 셋이면 재임포트 없이 즉시 태스크 처리 = 실질적 warm 런타임.
+- **진짜 신규 = SAB 백드 shared_memory**: numpy 프로세스 간 제로카피 공유는 흉내가 아닌 물리 능력. 다음 실측 후보.
+- **마지막 프론티어 = hiwire shadow**(warm fork), **nogil-WASM**(공유메모리 스레드), **WebGPU**(산술). 각각 수일~수주 시스템 연구.
+- 실험 파일(git 미추적): tests/_attempts/webSnapshotFork.html(bare fork PASS), webWarmFork.html(warm fork 막힘 기록).
