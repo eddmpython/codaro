@@ -49,6 +49,7 @@ web surface (Cloudflare Pages, 무료 정적)
 7. [06-scope-phasing-guardrails.md](06-scope-phasing-guardrails.md) - Phase 0~5, 기계 가드레일, 테스트 매트릭스, 롤백, 개발자+PM 이중 평가, CLAUDE.md 게이트 개정안.
 8. [07-progress-ledger.md](07-progress-ledger.md) - 결정 원장·세션 간 재개(NEXT).
 9. [08-borrowed-syscall-bridge.md](08-borrowed-syscall-bridge.md) - **발명 + 실측**: JSPI 위 syscall 브리지로 소켓·프로세스를 로컬에서 빌려 http.client/urllib/smtplib/subprocess를 브라우저에서 살린 headless 검증 결과.
+10. [09-non-pyodide-real-runtime.md](09-non-pyodide-real-runtime.md) - **비-Pyodide 탐색**: 파이썬이 "실제 로컬 서버처럼" 도는 브라우저 가상화. CheerpX 실측(진짜 CPython 3.7.3+스레드+UDS는 되나 netdev 부재로 서버 unreachable) + 토론 랭킹(v86+lwIP가 유일한 오픈소스 로컬 인바운드 경로).
 
 ---
 
