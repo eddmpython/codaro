@@ -53,6 +53,8 @@ web surface (Cloudflare Pages, 무료 정적)
 11. [10-browser-as-server.md](10-browser-as-server.md) - **재프레임 + 엔드투엔드 실측(정말로 가능한 방향)**: "로컬 서버=소켓 아니라 WSGI 인터페이스". 진짜 Flask/FastAPI가 Pyodide에서 소켓 0으로 라우팅/sqlite/세션/pydantic검증, Service Worker가 페이지 fetch를 연결 -> 페이지가 표준 fetch로 브라우저 안 파이썬 서버 호출(GET/POST/201/422/상태유지 PASS). 속도: 서버 로직은 로컬급(numpy만 예외). VM보다 압도적 실현가능.
 12. [11-beyond-local-directions.md](11-beyond-local-directions.md) - **로컬 초월 방향 검토**: WebGPU 수치가속(numpy 86배 약점 뒤집기, 실PC 필요-headless 검증불가) + 실행환경=값(makeMemorySnapshot 공식+HEAPU8 검증) + 영속 상태서버(sqlite+IndexedDB 재시작 생존 PASS). 3축 초월, 무인데몬만 원리적 상한.
 13. [12-serverless-web-terminal.md](12-serverless-web-terminal.md) - **서버 없는 웹 터미널 발명 + 엔드투엔드 실측**: 셸=파이썬 프로그램(Pyodide), 명령/pip/python 진짜 실행, **JSPI로 input()이 진짜 블록/재개(실시간 대화형 PASS)**. 토론 1위 pysh=실측본, 2위 codash 하이브리드(진짜 OS 명령만 로컬 라우팅).
+18. [17-pyproc-process-os.md](17-pyproc-process-os.md) - **대혁신 실물: PyProc 브라우저 파이썬 프로세스 OS**. 검증조각(스냅샷fork·워커풀·SAB IPC·복원)을 하나의 프로세스 커널로 융합. 실측: 4워커 진짜 병렬 map 2.67배·정확, multiprocessing.Pool API. 전문가 4렌즈 만장일치 대혁신. 다음 돌파=nogil+pthread 커스텀빌드(제로카피+공유스레드).
+
 17. [16-real-runtime-transformation.md](16-real-runtime-transformation.md) - **진짜 런타임 탈바꿈(발명+실측)**: 힙 스냅샷을 fork 프리미티브로 승격 -> 단일 인터프리터가 프로세스 OS로. 실측: bare 스냅샷 fork 15.4배 빠름(184ms vs cold 2839ms)·독립 프로세스. warm fork(재임포트0)는 hiwire 경계가 막음(프론티어=emval shadow). 토론 랭킹 통합 예정.
 
 16. [15-browserpy-module.md](15-browserpy-module.md) - **모듈화(설계+참조구현+소비자 PASS)**: 발명들을 프레임워크 무관 ESM 모듈로. 교차 관심사(HEAPU8·스택·몽키패치)를 능력 계약(MemoryCapability 등) 뒤 캡슐화. 소비자가 깨끗한 API만으로 복원 리액티브 사용(HEAPU8 직접접근 0) 실측 PASS. codaro/dartlab/xlpod 공통 소비.
