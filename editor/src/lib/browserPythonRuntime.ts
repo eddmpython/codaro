@@ -1,32 +1,188 @@
-// browserPythonRuntime.ts - pyproc(브라우저 파이썬 프로세스 OS) 소비 세임.
-// codaro가 공용 런타임 pyproc을 실제 import하는 첫 지점 = SSOT 성립의 증명점.
-// 실행 SSOT는 로컬 Python 불변이고, 이 브라우저 티어는 보조(Chromium/Edge + crossOriginIsolated).
-// 설계 근거: mainPlan/codaro-anywhere/18-pyproc-repo-extraction.md, 14-architecture.md.
-import { boot, PyProc } from "pyproc";
-import type { BootOptions, PyProcBootInfo, Runtime } from "pyproc";
+// browserPythonRuntime.ts - pyproc(브라우저 파이썬 런타임) 소비 세임 = 브라우저 커널.
+// 같은 노트북이 로컬 백엔드(apiOnline)와 브라우저(WASM CPython)를 모두 쓴다. 백엔드가 없으면
+// notebookRuntime이 이 커널로 셀을 진짜 실행한다(과거 print 정규식 시뮬레이션 대체).
+// 실행 SSOT는 로컬 Python 불변이고 이 티어는 보조다. 설계 근거: mainPlan/codaro-anywhere/14, 19.
+// pyproc은 첫 실행에서 lazy import(런타임 다운로드 지연 + 코드 스플릿). 단일 boot 경로는
+// SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
+import type { ExecutionResult, VariableInfo } from "@/types";
 
-export interface BrowserPythonSession {
-  readonly runtime: Runtime;
+type PyRuntime = {
   run(code: string): unknown;
+  runAsync(code: string): Promise<unknown>;
+  install(pkg: string): Promise<void>;
+  loadPackages(pkgs: string | string[]): Promise<void>;
+};
+
+let runtimePromise: Promise<PyRuntime> | null = null;
+const stdoutLines: string[] = [];
+const stderrLines: string[] = [];
+let previousVariables = new Map<string, VariableInfo>();
+const attemptedPackages = new Set<string>();
+
+async function ensureRuntime(): Promise<PyRuntime> {
+  if (!runtimePromise) {
+    runtimePromise = import("pyproc")
+      .then(({ boot }) =>
+        boot({
+          stdout: (line: string) => stdoutLines.push(line),
+          stderr: (line: string) => stderrLines.push(line),
+        }),
+      )
+      .catch((error: unknown) => {
+        runtimePromise = null;
+        throw error;
+      }) as Promise<PyRuntime>;
+  }
+  return runtimePromise;
 }
 
-/** 브라우저 파이썬 런타임을 부팅한다. Chromium/Edge + crossOriginIsolated 필요. */
-export async function createBrowserPythonSession(opts?: BootOptions): Promise<BrowserPythonSession> {
-  const runtime = await boot(opts);
+/** 브라우저 커널이 이미 부팅됐는지(부팅 대기 없이 상태 표시용). */
+export function isBrowserKernelBooted(): boolean {
+  return runtimePromise !== null;
+}
+
+// 사용자 전역을 VariableInfo 목록(JSON)으로 뽑는다. 밑줄 프리픽스는 내부용이라 제외.
+const VARIABLES_SNIPPET = `
+def _codaro_variables():
+    import json as _json
+    entries = []
+    for _name, _value in list(globals().items()):
+        if _name.startswith("_"):
+            continue
+        _type = type(_value).__name__
+        if _type in ("module", "function", "builtin_function_or_method", "type"):
+            continue
+        try:
+            _repr = repr(_value)
+        except Exception as _exc:
+            _repr = f"<repr 실패: {_exc}>"
+        if len(_repr) > 120:
+            _repr = _repr[:117] + "..."
+        _entry = {"name": _name, "typeName": _type, "repr": _repr}
+        try:
+            _entry["size"] = len(_value)
+        except Exception:
+            pass
+        _shape = getattr(_value, "shape", None)
+        if _shape is not None:
+            _entry["shape"] = str(_shape)
+        _dtype = getattr(_value, "dtype", None)
+        if _dtype is not None:
+            _entry["dtype"] = str(_dtype)
+        entries.append(_entry)
+    return _json.dumps(entries)
+_codaro_variables()
+`;
+
+function collectVariables(runtime: PyRuntime): VariableInfo[] {
+  try {
+    const raw = runtime.run(VARIABLES_SNIPPET);
+    return JSON.parse(String(raw)) as VariableInfo[];
+  } catch (error) {
+    console.warn("browser kernel variable collection failed", error);
+    return [];
+  }
+}
+
+function computeDelta(current: VariableInfo[]) {
+  const currentByName = new Map(current.map((item) => [item.name, item]));
+  const added: VariableInfo[] = [];
+  const updated: VariableInfo[] = [];
+  const removed: string[] = [];
+  for (const item of current) {
+    const before = previousVariables.get(item.name);
+    if (!before) added.push(item);
+    else if (before.repr !== item.repr || before.typeName !== item.typeName) updated.push(item);
+  }
+  for (const name of previousVariables.keys()) {
+    if (!currentByName.has(name)) removed.push(name);
+  }
+  previousVariables = currentByName;
+  return { added, updated, removed };
+}
+
+// 패키지 보장: pyodide 배포판(loadPackages) 우선, 실패 시 micropip(install). 실패는 비치명 -
+// 진짜 import 오류가 셀 stderr로 정직하게 드러난다.
+async function ensurePackages(runtime: PyRuntime, packages: string[]): Promise<void> {
+  for (const name of packages) {
+    const key = name.trim().toLowerCase();
+    if (!key || attemptedPackages.has(key)) continue;
+    attemptedPackages.add(key);
+    try {
+      await runtime.loadPackages([key]);
+    } catch {
+      try {
+        await runtime.install(key);
+      } catch (error) {
+        console.warn(`browser kernel package unavailable: ${key}`, error);
+      }
+    }
+  }
+}
+
+function drainBuffers() {
+  const stdout = stdoutLines.join("\n");
+  const stderr = stderrLines.join("\n");
+  stdoutLines.length = 0;
+  stderrLines.length = 0;
+  return { stdout, stderr };
+}
+
+/** 셀 하나를 브라우저 WASM CPython에서 진짜 실행한다. */
+export async function executeBrowserBlock(
+  blockId: string,
+  code: string,
+  executionCount: number,
+  packages: string[] = [],
+): Promise<ExecutionResult> {
+  const runtime = await ensureRuntime();
+  await ensurePackages(runtime, packages);
+  drainBuffers();
+
+  let resultRepr = "";
+  let errorText = "";
+  try {
+    const value = await runtime.runAsync(code);
+    if (value !== undefined && value !== null) {
+      resultRepr = String(value);
+      const proxy = value as { destroy?: () => void };
+      if (typeof proxy.destroy === "function") proxy.destroy();
+    }
+  } catch (error) {
+    errorText = error instanceof Error ? error.message : String(error);
+  }
+
+  const { stdout, stderr } = drainBuffers();
+  const variables = errorText ? [] : collectVariables(runtime);
+  const stateDelta = errorText ? { added: [], updated: [], removed: [] } : computeDelta(variables);
+  const combinedStdout = resultRepr ? (stdout ? `${stdout}\n${resultRepr}` : resultRepr) : stdout;
+
   return {
-    runtime,
-    run: (code: string) => runtime.run(code),
+    type: "text",
+    blockId,
+    data: null,
+    stdout: combinedStdout,
+    stderr: errorText ? (stderr ? `${stderr}\n${errorText}` : errorText) : stderr,
+    variables,
+    stateDelta,
+    executionCount,
+    status: errorText ? "error" : "success",
   };
 }
 
-export interface ProcessPool {
-  readonly pool: PyProc;
-  readonly info: PyProcBootInfo;
-}
-
-/** 프로세스 OS 풀을 spawn한다(스냅샷-fork 병렬, 독립 GIL N개 = N코어). */
-export async function spawnProcessPool(n: number): Promise<ProcessPool> {
-  const pool = new PyProc();
-  const info = await pool.boot(n);
-  return { pool, info };
+/** 노트북 전체를 순차 실행한다(브라우저 티어는 리액티브 그래프 대신 문서 순서). */
+export async function runBrowserNotebook(
+  blocks: { id: string; code: string }[],
+  packages: string[] = [],
+): Promise<{ results: Record<string, ExecutionResult>; variables: VariableInfo[] }> {
+  const results: Record<string, ExecutionResult> = {};
+  let lastVariables: VariableInfo[] = [];
+  let executionCount = 0;
+  for (const block of blocks) {
+    executionCount += 1;
+    const result = await executeBrowserBlock(block.id, block.code, executionCount, packages);
+    results[block.id] = result;
+    if (result.status !== "error") lastVariables = result.variables;
+  }
+  return { results, variables: lastVariables };
 }

@@ -1,8 +1,9 @@
 import { codaroApi, type ReactiveResponse } from "@/lib/api";
 import { runAutomationSessionCell } from "@/lib/automationCellRuntime";
 import type { ResultMap } from "@/lib/assistantContext";
+import { executeBrowserBlock, runBrowserNotebook } from "@/lib/browserPythonRuntime";
 import { isKernelExecutableBlock, isPersistentAutomationBlock } from "@/lib/cellModel";
-import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localRuntime";
+import { firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
 import { emptyReactiveDiagnostics } from "@/lib/reactiveDiagnostics";
@@ -148,18 +149,32 @@ export async function runNotebookBlock({
   }
 
   if (!apiOnline) {
-    await sleep(250);
-    const result = buildLocalExecutionResult(block, code, localExecutionCount);
-    return {
-      sessionId,
-      result,
-      variables: result.variables,
-      notice: {
-        tone: "success",
-        title: translate("runtime.cellRunDone"),
-        detail: firstOutputLine(result) || translate("runtime.outputReady"),
-      },
-    };
+    // 백엔드 없음 = 브라우저 티어. WASM CPython(pyproc)에서 진짜 실행한다(시뮬레이션 아님).
+    try {
+      const result = await executeBrowserBlock(block.id, code, localExecutionCount, [
+        ...runtimePackages,
+        ...inferCodePackages(code),
+      ]);
+      return {
+        sessionId,
+        result,
+        variables: result.variables,
+        notice: {
+          tone: result.status === "error" ? "error" : "success",
+          title: result.status === "error" ? translate("runtime.cellRunFailed") : translate("runtime.cellRunDone"),
+          detail: firstOutputLine(result) || translate("runtime.outputReady"),
+        },
+      };
+    } catch (error) {
+      return {
+        sessionId,
+        notice: {
+          tone: "error",
+          title: translate("runtime.executionFailed"),
+          detail: errorMessage(error),
+        },
+      };
+    }
   }
 
   const activeSession = await ensureRuntimeSession(sessionId);
@@ -264,26 +279,36 @@ export async function runReactiveNotebook({
   }
 
   if (!apiOnline) {
-    await sleep(350);
-    const localBlocks = codeBlocks.filter(isKernelExecutableBlock);
-    const results = Object.fromEntries(
-      localBlocks.map((block, index) => [
-        block.id,
-        buildLocalExecutionResult(block, drafts[block.id] ?? block.content, index + 1),
-      ]),
-    ) as ResultMap;
-    const lastResult = Object.values(results).at(-1);
-    return {
-      sessionId,
-      results,
-      variables: lastResult?.variables ?? [],
-      diagnostics: emptyReactiveDiagnostics,
-      notice: {
-        tone: "success",
-        title: translate("runtime.notebookRunDone"),
-        detail: translate("runtime.evaluatedCells", { count: localBlocks.length }),
-      },
-    };
+    // 백엔드 없음 = 브라우저 티어. 리액티브 그래프(백엔드 소유) 대신 문서 순서로 진짜 실행한다.
+    try {
+      const localBlocks = codeBlocks.filter(isKernelExecutableBlock);
+      const { results, variables } = await runBrowserNotebook(
+        localBlocks.map((block) => ({ id: block.id, code: drafts[block.id] ?? block.content })),
+        inferDocumentRuntimePackages(document, drafts),
+      );
+      return {
+        sessionId,
+        results: results as ResultMap,
+        variables,
+        diagnostics: emptyReactiveDiagnostics,
+        notice: {
+          tone: "success",
+          title: translate("runtime.notebookRunDone"),
+          detail: translate("runtime.evaluatedCells", { count: localBlocks.length }),
+        },
+      };
+    } catch (error) {
+      return {
+        sessionId,
+        variables: previousVariables,
+        diagnostics: emptyReactiveDiagnostics,
+        notice: {
+          tone: "error",
+          title: translate("runtime.notebookRunFailed"),
+          detail: errorMessage(error),
+        },
+      };
+    }
   }
 
   const activeSession = await ensureRuntimeSession(sessionId);
@@ -466,6 +491,3 @@ function firstMessageLine(value: string) {
   return value.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
 }
 
-function sleep(milliseconds: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
-}
