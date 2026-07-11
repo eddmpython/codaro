@@ -1,0 +1,19 @@
+/* brandTokens.css - astryx neutral 테마 위에 Codaro 브랜드를 얹는다.
+   1) astryx의 light-dark() 색을 landing의 data-theme(다크 기본)에 동기화.
+   2) accent를 Codaro amber(#f5a524 / 라이트는 #b45309)로 오버라이드.
+   theme.css 다음에 import되어 토큰을 덮는다. */
+
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root {
+  --color-accent: light-dark(#b45309, #f5a524);
+  --color-text-accent: light-dark(#b45309, #f5a524);
+  --color-icon-accent: light-dark(#b45309, #f5a524);
+  --color-on-accent: light-dark(#fff7ed, #1a1206);
+}

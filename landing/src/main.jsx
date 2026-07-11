@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import "@astryxdesign/core/reset.css";
 import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
+import "./styles/brandTokens.css";
 import "./styles.css";
 import "./styles/homeAstryx.css";
 

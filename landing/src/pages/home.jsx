@@ -20,6 +20,7 @@ import { Card } from "@astryxdesign/core/Card";
 import { Divider } from "@astryxdesign/core/Divider";
 import { brand } from "../lib/brand.js";
 import { faqEntries } from "../lib/faq.js";
+import { PythonRunner } from "../components/pythonRunner.jsx";
 
 const appPath = (path = "/") => brand.appPath(path);
 
@@ -120,15 +121,16 @@ export function HomePage() {
             </Heading>
             <Text type="body" color="muted">
               브라우저 탭에서 진짜 Python이 돕니다. 프로세스·병렬·상태 복원까지 되는 런타임 위에서, 서버도
-              설치도 없이 배우고 실행하고, 로컬로 완전하게 이어집니다.
+              설치도 없이 배우고 실행하고, 로컬로 완전하게 이어집니다. 아래에서 바로 실행해보세요.
             </Text>
           </div>
-          <div className="homeHeroActions" style={{ justifyContent: "flex-start" }}>
+          <PythonRunner />
+          <div className="homeHeroActions" style={{ justifyContent: "flex-start", marginTop: 18 }}>
             <Button
               as="a"
-              href={appPath("/docs")}
+              href={appPath("/learn")}
               variant="primary"
-              label="커리큘럼 둘러보기"
+              label="브라우저에서 학습 시작"
               icon={<BookOpen size={16} aria-hidden="true" />}
             />
             <Button
