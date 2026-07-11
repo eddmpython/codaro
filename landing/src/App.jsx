@@ -26,6 +26,7 @@ import { sharePacks } from "./lib/sharePacks.js";
 import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
 import { HomePage } from "./pages/home.jsx";
+import { LearnPage } from "./pages/learn.jsx";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
 
@@ -47,6 +48,7 @@ const proofItems = [
 
 const navItems = [
   { href: "/", label: "홈" },
+  { href: "/learn", label: "학습" },
   { href: "/docs/blog", label: "소식" },
   { href: "/packs", label: "팩" },
   { href: "/tools", label: "도구" },
@@ -355,6 +357,16 @@ function resolveRoute(path) {
         url: "/",
       },
       element: <HomePage />,
+    };
+  }
+  if (path === "/learn") {
+    return {
+      meta: {
+        title: "브라우저에서 배우는 Python",
+        description: "472개 공개 레슨을 브라우저에서. 설치 없이 배우고, 로컬로 완전하게 이어지는 Codaro 커리큘럼.",
+        url: "/learn",
+      },
+      element: <LearnPage />,
     };
   }
   if (path === "/docs") return docsIndexRoute();

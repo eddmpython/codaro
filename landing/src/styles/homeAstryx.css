@@ -119,6 +119,82 @@
   padding-block: 84px;
 }
 
+/* /learn 학습 페이지 */
+.learnDomainNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 40px;
+  position: sticky;
+  top: 0;
+  padding-block: 12px;
+  background: var(--color-background, transparent);
+  z-index: 2;
+}
+
+.learnDomainChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border, rgba(120, 120, 130, 0.28));
+  font-size: 13px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.learnDomainChip span {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.learnDomain {
+  padding-block: 40px 12px;
+  border-top: 1px solid var(--color-border, rgba(120, 120, 130, 0.18));
+}
+
+.learnTrack {
+  margin-bottom: 30px;
+}
+
+.learnTrack > * + * {
+  margin-top: 14px;
+}
+
+.learnLessonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.learnLessonCard {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.learnLessonEmoji {
+  font-size: 20px;
+  line-height: 1.2;
+  flex: none;
+}
+
+.learnLessonTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.learnTag {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--color-background-muted, rgba(120, 120, 130, 0.12));
+  opacity: 0.85;
+}
+
 @media (max-width: 900px) {
   .homeGrid2,
   .homeGrid3,
@@ -127,5 +203,8 @@
   }
   .homeHero {
     padding-block: 72px 56px;
+  }
+  .learnLessonGrid {
+    grid-template-columns: 1fr;
   }
 }

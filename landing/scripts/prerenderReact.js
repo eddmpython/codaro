@@ -37,6 +37,7 @@ const viteServer = await createServer({
   logLevel: "silent",
 });
 const { HomePage } = await viteServer.ssrLoadModule("/src/pages/home.jsx");
+const { LearnPage } = await viteServer.ssrLoadModule("/src/pages/learn.jsx");
 
 const routes = [
   {
@@ -45,6 +46,12 @@ const routes = [
     description: "배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오.",
     body: renderToStaticMarkup(createElement(HomePage)),
     jsonLd: faqPageJsonLd(faqEntries),
+  },
+  {
+    path: "/learn",
+    title: "브라우저에서 배우는 Python",
+    description: "472개 공개 레슨을 브라우저에서. 설치 없이 배우고, 로컬로 완전하게 이어지는 Codaro 커리큘럼.",
+    body: renderToStaticMarkup(createElement(LearnPage)),
   },
   {
     path: "/docs",

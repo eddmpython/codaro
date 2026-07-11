@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js",
+    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateCurriculum.js && node scripts/generateOgImage.js",
     "build": "vite build",
     "postbuild": "node scripts/prerenderReact.js && node scripts/postbuild.js",
     "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
