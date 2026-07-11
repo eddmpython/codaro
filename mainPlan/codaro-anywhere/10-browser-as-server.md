@@ -47,7 +47,7 @@ tests/_attempts/webPyServer.html + webPyServerSw.js. 페이지가 평범한 `fet
 |---|---|---|
 | 진짜 프레임워크(Flask/FastAPI) | O(무거움) | **O(가벼움, 순수 파이썬 micropip)** |
 | 비트/버전 | 32비트, python 3.7 | **wasm32, python 3.14** |
-| 속도 | 5~20배(v86)~100배(container2wasm) | **네이티브 4~7배(Pyodide, 실측)** |
+| 속도 | 5~20배(v86)~100배(container2wasm) | **인터프리터 로직=네이티브 대등(실측, 3.14가 로컬3.12 이김). JSON ~1.7배. numpy BLAS는 ~86배(단일스레드·no-AVX). 서버 워크로드는 IO/인터프리터 바운드라 런타임급** |
 | 크기 | 수십 MB 이미지 | Pyodide 코어 + Flask 순수휠 |
 | 페이지->서버 접속 | lwIP 자체구현 필요 | **Service Worker(기성)** |
 | 소켓/네트워크 스택 | 필요(없어서 실패) | **불필요(인터페이스로 대체)** |
@@ -57,6 +57,14 @@ tests/_attempts/webPyServer.html + webPyServerSw.js. 페이지가 평범한 `fet
 - 자족 티어([08]): Flask 핸들러 안에서 subprocess(자식워커)·pandas·File System Access·병렬(Worker풀) 사용 가능 -> "진짜 일하는 로컬 서버".
 - 힙 스냅샷([03/08 계열]): 서버 상태를 스냅샷/복원 -> 즉시 재개, 상주 느낌.
 - percent format 노트북: 학습에서 만든 코드가 이 로컬 서버의 엔드포인트로 승격(Harvest 레일의 웹 버전).
+
+## 4.5 속도 실측 (진짜 런타임 수준인가)
+같은 코드 로컬(3.12) vs 브라우저 Pyodide(3.14):
+- 순수 파이썬 루프 300만: 로컬 447ms / 브라우저 404ms (**브라우저가 더 빠름** - 3.14 인터프리터 개선이 WASM 페널티 상쇄).
+- dict/str 50만: 로컬 292ms / 브라우저 243ms (브라우저 우위).
+- JSON 직렬화 10만: 로컬 62ms / 브라우저 106ms (~1.7배).
+- numpy 400x400 matmul x10: 로컬 9ms / 브라우저 774ms (**~86배** - 네이티브 BLAS 멀티코어+AVX vs WASM 단일스레드+128bit SIMD).
+- **결론: 서버 워크로드(라우팅·JSON·sqlite·로직)는 인터프리터/IO 바운드라 로컬급 = 진짜 런타임 수준. 대규모 수치/ML만 로컬 몫.** "Pyodide 3~5배 느림"은 옛말(3.14 기준 인터프리터는 대등).
 
 ## 5. 정직한 한계
 
