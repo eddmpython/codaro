@@ -53,8 +53,21 @@
 - base 1회는 전체(약 360MB) 복사. 시간여행 범위가 길면 base+델타 누적.
 - Chromium 계열(HEAPU8 접근·성능).
 
-## 4. 판정 (돌파 후)
-- **작동한다**: 미리성장 천장 + 완전해시로 pandas 워크로드까지 sound. 리액티브 편집이 재실행 없이 복원+하류만으로 9.1배(콜드 대비 ~165배) 빠르고 정확. 시간여행(임의 체크포인트 즉시 점프) 성립. Pyodide 공식 스냅샷이 금지한 mid-session 복원을 뚫음.
-- **남은 개선(토론 진행 중)**: (a) 천장 크기 자동조정/동적 재베이스(초과 시 안전 재성장), (b) 델타만 복원(base 통째 307MB 복사 40ms -> 델타 복원으로 단축), (c) emval shadow로 JS핸들 쓰는 셀까지 확대, (d) refcount churn 완화(gc.freeze/immortal)로 델타 축소.
-- **제품 편입 경로**: 리액티브 그래프가 셀별로 "복원 안전(순수 파이썬·천장 안)"을 판정해 복원, 아니면 재실행 폴백(하이브리드). tierUsed로 투명. Codaro 리액티브 엔진의 새 실행 모델.
-- **실험 파일(git 미추적)**: tests/_attempts/webReactiveRestore.html. CheckpointChain(page-diff 완전해시), restore, 시간여행 구현.
+## 4. 개선 (토론 -> 실측, 라이브-차분 복원 PASS)
+
+전문가 토론(4렌즈: wasm메모리/cpython내부/emval경계/실용시스템)에서 나온 개선을 실측:
+
+**라이브-차분 복원 (구현+실측 PASS): 복원 12배 빠름, 20배 적게 write**
+- 기존 restore = HEAPU8.set(base 307MB memcpy) = 29ms.
+- 개선 = **체크포인트별 페이지 해시 배열을 저장해두고, 복원 시 현재 상태 해시와 목표 해시를 비교(재해싱 0)해 다른 페이지만 write** + Wasm 스택포인터 복원(_emscripten_stack_restore).
+- 실측: **2.4ms, 234페이지 14.63MB만 write** (전체 307MB 대비 20배 절약), 정확(c1 상태 정확 복원, 인터프리터 생존). 인접 시간여행이 사실상 즉시.
+
+**남은 개선 (토론 로드맵, 미실측):**
+- **동적 천장**: 천장 고정 추측 대신, 성장 감지 시 기하급수(2x) 재성장 + 꼬리만 재베이스. 핵심 통찰: sbrk break < byteLength는 합법이라 물리축소 없이 논리 힙을 과거 작은값으로 "un-grow" 가능(malloc이 [oldBreak, ceiling)를 grow 없이 재흡수). 천장 초과 크래시 해소.
+- **emval/hiwire shadow 저널**: Python이 쥔 JS 핸들(정수 ID)을 체크포인트마다 얕은 복제로 저널링, 복원 시 같은 ID에 재수화 -> JS핸들 쓰는 셀까지 확대. 복원 불가 자원(File/fetch/WebSocket)은 revoked-proxy로 명확한 에러(silent dangling 방지).
+- **refcount/GC churn 소거**: gc.freeze()+gc.disable()+immortal화로 "읽기만 해도 헤더 페이지 dirty" 문제 제거 -> 델타를 진짜 데이터 변이로 수렴(수백 페이지 -> 한자리).
+- **실행경계 오라클**: canRestore()=stackSave()==baseline AND idle(await 아님) AND non-restorable 핸들 없음. 실행 중 복원 거부로 못박음.
+
+## 5. 판정
+- **발명 성립 + 돌파 + 개선까지 실증**: mid-session 임의 복원(공식 스냅샷 금지 영역)을 pandas 워크로드에서 sound하게, 라이브-차분으로 2.4ms 복원. Codaro 리액티브 엔진의 새 실행 모델(재실행 대신 복원).
+- **제품 편입 경로**: 리액티브 그래프가 셀별 "복원 안전(순수 파이썬·천장 안)"을 판정해 복원, 아니면 재실행 폴백(하이브리드). tierUsed 투명. 실험 = tests/_attempts/webReactiveRestore.html(CheckpointChain: page-diff 완전해시 + 라이브-차분 복원 + 시간여행).
