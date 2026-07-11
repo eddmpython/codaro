@@ -51,7 +51,8 @@ web surface (Cloudflare Pages, 무료 정적)
 9. [08-borrowed-syscall-bridge.md](08-borrowed-syscall-bridge.md) - **발명 + 실측**: JSPI 위 syscall 브리지로 소켓·프로세스를 로컬에서 빌려 http.client/urllib/smtplib/subprocess를 브라우저에서 살린 headless 검증 결과.
 10. [09-non-pyodide-real-runtime.md](09-non-pyodide-real-runtime.md) - **비-Pyodide 탐색**: 파이썬이 "실제 로컬 서버처럼" 도는 브라우저 가상화. CheerpX 실측(진짜 CPython 3.7.3+스레드+UDS는 되나 netdev 부재로 서버 unreachable) + 토론 랭킹(v86+lwIP가 유일한 오픈소스 로컬 인바운드 경로).
 11. [10-browser-as-server.md](10-browser-as-server.md) - **재프레임 + 엔드투엔드 실측(정말로 가능한 방향)**: "로컬 서버=소켓 아니라 WSGI 인터페이스". 진짜 Flask/FastAPI가 Pyodide에서 소켓 0으로 라우팅/sqlite/세션/pydantic검증, Service Worker가 페이지 fetch를 연결 -> 페이지가 표준 fetch로 브라우저 안 파이썬 서버 호출(GET/POST/201/422/상태유지 PASS). 속도: 서버 로직은 로컬급(numpy만 예외). VM보다 압도적 실현가능.
-12. [11-beyond-local-directions.md](11-beyond-local-directions.md) - **로컬 초월 방향 검토**: WebGPU 수치가속(numpy 86배 약점 뒤집기, 실PC 필요-headless 검증불가) + 실행환경=값(makeMemorySnapshot 공식+HEAPU8 검증, 로컬이 원리적으로 못 함). 토론 랭킹 통합 예정.
+12. [11-beyond-local-directions.md](11-beyond-local-directions.md) - **로컬 초월 방향 검토**: WebGPU 수치가속(numpy 86배 약점 뒤집기, 실PC 필요-headless 검증불가) + 실행환경=값(makeMemorySnapshot 공식+HEAPU8 검증) + 영속 상태서버(sqlite+IndexedDB 재시작 생존 PASS). 3축 초월, 무인데몬만 원리적 상한.
+13. [12-serverless-web-terminal.md](12-serverless-web-terminal.md) - **서버 없는 웹 터미널 발명 + 엔드투엔드 실측**: 셸=파이썬 프로그램(Pyodide), 명령/pip/python 진짜 실행, **JSPI로 input()이 진짜 블록/재개(실시간 대화형 PASS)**. 토론 1위 pysh=실측본, 2위 codash 하이브리드(진짜 OS 명령만 로컬 라우팅).
 
 ---
 
