@@ -55,6 +55,8 @@ web surface (Cloudflare Pages, 무료 정적)
 13. [12-serverless-web-terminal.md](12-serverless-web-terminal.md) - **서버 없는 웹 터미널 발명 + 엔드투엔드 실측**: 셸=파이썬 프로그램(Pyodide), 명령/pip/python 진짜 실행, **JSPI로 input()이 진짜 블록/재개(실시간 대화형 PASS)**. 토론 1위 pysh=실측본, 2위 codash 하이브리드(진짜 OS 명령만 로컬 라우팅).
 18. [17-pyproc-process-os.md](17-pyproc-process-os.md) - **대혁신 실물: PyProc 브라우저 파이썬 프로세스 OS**. 검증조각(스냅샷fork·워커풀·SAB IPC·복원)을 하나의 프로세스 커널로 융합. 실측: 4워커 진짜 병렬 map 2.67배·정확, multiprocessing.Pool API. 전문가 4렌즈 만장일치 대혁신. 다음 돌파=nogil+pthread 커스텀빌드(제로카피+공유스레드).
 
+19. [18-pyproc-repo-extraction.md](18-pyproc-repo-extraction.md) - **레포 분리 실물 착수**: 웹 파이썬 발명(런타임·복원 리액티브·프로세스 OS·능력 계약)을 codaro 밖 별도 레포 `github.com/eddmpython/pyproc`(초기 커밋 `4132302`, main 전용)로 승격. codaro `tests/_attempts` 검증조각 4모듈을 프레임워크 무관 ESM으로 정리, codaro/dartlab 급 규칙 문서·훅·의존성0 게이트(21/21 PASS). codaro가 first consumer, "참조"가 아니라 "실제 import"로만 SSOT 성립. 다음=PyodideEngine이 pyproc을 실제 import.
+
 17. [16-real-runtime-transformation.md](16-real-runtime-transformation.md) - **진짜 런타임 탈바꿈(발명+실측)**: 힙 스냅샷을 fork 프리미티브로 승격 -> 단일 인터프리터가 프로세스 OS로. 실측: bare 스냅샷 fork 15.4배 빠름(184ms vs cold 2839ms)·독립 프로세스. warm fork(재임포트0)는 hiwire 경계가 막음(프론티어=emval shadow). 토론 랭킹 통합 예정.
 
 16. [15-browserpy-module.md](15-browserpy-module.md) - **모듈화(설계+참조구현+소비자 PASS)**: 발명들을 프레임워크 무관 ESM 모듈로. 교차 관심사(HEAPU8·스택·몽키패치)를 능력 계약(MemoryCapability 등) 뒤 캡슐화. 소비자가 깨끗한 API만으로 복원 리액티브 사용(HEAPU8 직접접근 0) 실측 PASS. codaro/dartlab/xlpod 공통 소비.
