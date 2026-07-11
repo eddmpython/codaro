@@ -20,7 +20,6 @@ import { Card } from "@astryxdesign/core/Card";
 import { Divider } from "@astryxdesign/core/Divider";
 import { brand } from "../lib/brand.js";
 import { faqEntries } from "../lib/faq.js";
-import { PythonRunner } from "../components/pythonRunner.jsx";
 
 const appPath = (path = "/") => brand.appPath(path);
 
@@ -110,6 +109,20 @@ export function HomePage() {
         <Text type="body-sm" color="subtle">
           Windows x64 · 런타임 포함 · 오프라인 실행 · 무료
         </Text>
+        <div className="heroFrame" aria-hidden="true">
+          <div className="heroFrameBar">
+            <span className="heroDots"><span /><span /><span /></span>
+            <span className="heroFrameName">codaro.local · spend_report.py</span>
+            <span className="heroRunPill">검증 실행</span>
+          </div>
+          <div className="heroFrameBody">
+            <div className="heroCodeLine"><span className="tokC"># %% Python</span></div>
+            <div className="heroCodeLine">import pandas as pd</div>
+            <div className="heroCodeLine">df = pd.<span className="tokFn">read_csv</span>(<span className="tokS">"spend.csv"</span>)</div>
+            <div className="heroCodeLine">report = df.<span className="tokFn">groupby</span>(<span className="tokS">"week"</span>).<span className="tokFn">sum</span>()</div>
+            <pre className="heroOut"># week      spend{"\n"}2025-W21    412,900{"\n"}2025-W22    388,120</pre>
+          </div>
+        </div>
       </section>
 
       <section className="homeWrap homeSection">
@@ -121,11 +134,10 @@ export function HomePage() {
             </Heading>
             <Text type="body" color="muted">
               브라우저 탭에서 진짜 Python이 돕니다. 프로세스·병렬·상태 복원까지 되는 런타임 위에서, 서버도
-              설치도 없이 배우고 실행하고, 로컬로 완전하게 이어집니다. 아래에서 바로 실행해보세요.
+              설치도 없이 배우고 실행하고, 로컬로 완전하게 이어집니다.
             </Text>
           </div>
-          <PythonRunner />
-          <div className="homeHeroActions" style={{ justifyContent: "flex-start", marginTop: 18 }}>
+          <div className="homeHeroActions" style={{ justifyContent: "flex-start", marginTop: 4 }}>
             <Button
               as="a"
               href={appPath("/learn")}

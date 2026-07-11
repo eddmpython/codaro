@@ -5,20 +5,32 @@
   display: block;
 }
 
+/* 한국어 헤드라인은 단어 단위로 줄바꿈(글자 단위 파괴 방지). */
+.homeAstryx h1,
+.homeAstryx h2,
+.homeAstryx h3,
+.learnPage h1,
+.learnPage h2,
+.lessonPage h1,
+.lessonPage h2 {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 .homeWrap {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1080px;
   margin-inline: auto;
   padding-inline: 24px;
 }
 
 .homeHero {
-  padding-block: 104px 76px;
+  padding-block: 92px 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 22px;
+  gap: 20px;
 }
 
 .homeHeroActions {
@@ -29,15 +41,103 @@
 }
 
 .homeHeroHeadline {
-  max-width: 20ch;
+  width: 100%;
+  max-width: 720px;
+  word-break: keep-all;
 }
 
 .homeHeroLead {
-  max-width: 52ch;
+  width: 100%;
+  max-width: 580px;
+  word-break: keep-all;
 }
 
 .homeSection {
-  padding-block: 68px;
+  padding-block: 60px;
+}
+
+/* 히어로 제품 미리보기 프레임 */
+.heroFrame {
+  width: 100%;
+  max-width: 760px;
+  margin-top: 26px;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid var(--color-border, rgba(120, 120, 130, 0.28));
+  background: var(--color-background-card, rgba(255, 255, 255, 0.02));
+  overflow: hidden;
+  box-shadow: 0 30px 70px -34px rgba(0, 0, 0, 0.7);
+}
+
+.heroFrameBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--color-border, rgba(120, 120, 130, 0.22));
+}
+
+.heroDots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.heroDots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.22;
+}
+
+.heroFrameName {
+  font-size: 12.5px;
+  opacity: 0.6;
+  margin-right: auto;
+  font-family: ui-monospace, "Space Grotesk", monospace;
+}
+
+.heroRunPill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 7px;
+  background: var(--color-accent, #f5a524);
+  color: var(--color-on-accent, #1a1206);
+  font-weight: 600;
+}
+
+.heroFrameBody {
+  padding: 18px;
+  font-family: ui-monospace, "SFMono-Regular", "Space Grotesk", monospace;
+  font-size: 13.5px;
+  line-height: 1.75;
+  overflow-x: auto;
+}
+
+.heroCodeLine {
+  white-space: pre;
+}
+
+.heroOut {
+  margin: 12px 0 0;
+  padding: 13px 15px;
+  border-radius: 9px;
+  background: var(--color-background-muted, rgba(120, 120, 130, 0.1));
+  white-space: pre;
+  font-size: 12.5px;
+  opacity: 0.86;
+}
+
+.tokC {
+  opacity: 0.5;
+}
+
+.tokFn {
+  color: var(--color-syntax-function, #a0caff);
+}
+
+.tokS {
+  color: var(--color-syntax-string, #a6d2a2);
 }
 
 .homeSectionHead {

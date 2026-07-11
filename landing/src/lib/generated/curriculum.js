@@ -22,8 +22,7 @@ export const curriculumTree = [
             ],
             "emoji": "👋",
             "direction": "헬로월드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day01",
-            "code": "print('Hello World')"
+            "slug": "basics/30days/day01"
           },
           {
             "id": "day02",
@@ -39,8 +38,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "변수와 데이터 타입에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day02",
-            "code": "msg = 'Python'\nmsg"
+            "slug": "basics/30days/day02"
           },
           {
             "id": "day03",
@@ -56,8 +54,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "연산자에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day03",
-            "code": "itemA = 10\nitemB = 20\nitemA + itemB"
+            "slug": "basics/30days/day03"
           },
           {
             "id": "day04",
@@ -73,8 +70,7 @@ export const curriculumTree = [
             ],
             "emoji": "📝",
             "direction": "문자열 기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day04",
-            "code": "first = 'Hello'\nsecond = 'World'\nfirst + ' ' + second"
+            "slug": "basics/30days/day04"
           },
           {
             "id": "day05",
@@ -90,8 +86,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "문자열 인덱싱/슬라이싱에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day05",
-            "code": "lang = 'Python'\nlang[0]"
+            "slug": "basics/30days/day05"
           },
           {
             "id": "day06",
@@ -107,8 +102,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛠️",
             "direction": "문자열 메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day06",
-            "code": "text = 'hello python'\ntext.upper()"
+            "slug": "basics/30days/day06"
           },
           {
             "id": "day07",
@@ -124,8 +118,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "리스트기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day07",
-            "code": "items = [1, 2, 3, 4, 5]\nitems"
+            "slug": "basics/30days/day07"
           },
           {
             "id": "day08",
@@ -141,8 +134,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "리스트메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day08",
-            "code": "nums = [1, 2, 3]\nnums.append(4)\nnums"
+            "slug": "basics/30days/day08"
           },
           {
             "id": "day09",
@@ -158,8 +150,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔒",
             "direction": "튜플에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day09",
-            "code": "nums = (1, 2, 3, 4, 5)\nnums"
+            "slug": "basics/30days/day09"
           },
           {
             "id": "day10",
@@ -175,8 +166,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "집합에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day10",
-            "code": "nums = {1, 2, 3, 4, 5}\nnums"
+            "slug": "basics/30days/day10"
           },
           {
             "id": "day11",
@@ -192,8 +182,7 @@ export const curriculumTree = [
             ],
             "emoji": "📖",
             "direction": "딕셔너리기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day11",
-            "code": "lang = {'name': 'Python', 'type': 'Language', 'year': 1991}\nlang"
+            "slug": "basics/30days/day11"
           },
           {
             "id": "day12",
@@ -209,8 +198,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "딕셔너리메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day12",
-            "code": "config = {'host': 'localhost', 'port': 8080}\nconfig.get('host')"
+            "slug": "basics/30days/day12"
           },
           {
             "id": "day13",
@@ -226,8 +214,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔀",
             "direction": "조건문에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day13",
-            "code": "age = 20\nif age >= 18:\n    result = 'adult'\nresult"
+            "slug": "basics/30days/day13"
           },
           {
             "id": "day14",
@@ -243,8 +230,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔁",
             "direction": "반복문에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day14",
-            "code": "numbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\n    total = total + num\ntotal"
+            "slug": "basics/30days/day14"
           },
           {
             "id": "day15",
@@ -260,8 +246,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚙️",
             "direction": "함수기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day15",
-            "code": "def greet():\n    msg = 'Hello'\n    return msg\n\ngreet()"
+            "slug": "basics/30days/day15"
           },
           {
             "id": "day16",
@@ -277,8 +262,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "함수고급에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day16",
-            "code": "def greet(name='Guest'):\n    return 'Hello ' + name\n\ngreet()"
+            "slug": "basics/30days/day16"
           },
           {
             "id": "day17",
@@ -294,8 +278,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "스코프와클로저에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day17",
-            "code": "def calculate():\n    result = 10 + 20\n    return result\n\ncalculate()"
+            "slug": "basics/30days/day17"
           },
           {
             "id": "day18",
@@ -311,8 +294,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "모듈과import에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day18",
-            "code": "import math\n\nmath.sqrt(16)"
+            "slug": "basics/30days/day18"
           },
           {
             "id": "day19",
@@ -328,8 +310,7 @@ export const curriculumTree = [
             ],
             "emoji": "📄",
             "direction": "파일입출력에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day19",
-            "code": "f = open('test.txt', 'w')\nf.write('Hello World')\nf.close()\n'File created'"
+            "slug": "basics/30days/day19"
           },
           {
             "id": "day20",
@@ -345,8 +326,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛡️",
             "direction": "예외처리에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day20",
-            "code": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    result = 'Error occurred'\n\nresult"
+            "slug": "basics/30days/day20"
           },
           {
             "id": "day21",
@@ -362,8 +342,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "중간 종합 복습에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day21",
-            "code": "phrase = \"Python Programming\"\nphrase.lower().replace('p', 'J')"
+            "slug": "basics/30days/day21"
           },
           {
             "id": "day22",
@@ -379,8 +358,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏗️",
             "direction": "클래스 기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day22",
-            "code": "class Dog:\n    pass\n\nmyDog = Dog()\ntype(myDog)"
+            "slug": "basics/30days/day22"
           },
           {
             "id": "day23",
@@ -396,8 +374,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "클래스 고급에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day23",
-            "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\n    def speak(self):\n        return 'Some sound'\n\nclass Dog(Animal):\n    pass\n\nmyDog = Dog('Buddy')\nmyDog.name"
+            "slug": "basics/30days/day23"
           },
           {
             "id": "day24",
@@ -413,8 +390,7 @@ export const curriculumTree = [
             ],
             "emoji": "✨",
             "direction": "특수 메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day24",
-            "code": "class Book:\n    def __init__(self, title, author):\n        self.title = title\n        self.author = author\n\n    def __str__(self):\n        return self.title + ' by ' + self.author\n\nbook = Book('Python Guide', 'Kim')\nstr(book)"
+            "slug": "basics/30days/day24"
           },
           {
             "id": "day25",
@@ -430,8 +406,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "프로퍼티와 데코레이터에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day25",
-            "code": "class Circle:\n    def __init__(self, radius):\n        self.radius = radius\n\n    @property\n    def area(self):\n        return 3.14 * self.radius ** 2\n\ncir = Circle(5)\ncir.area"
+            "slug": "basics/30days/day25"
           },
           {
             "id": "day26",
@@ -447,8 +422,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔄",
             "direction": "컴프리헨션에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day26",
-            "code": "nums = [1, 2, 3, 4, 5]\nsquared = [x ** 2 for x in nums]\nsquared"
+            "slug": "basics/30days/day26"
           },
           {
             "id": "day27",
@@ -464,8 +438,7 @@ export const curriculumTree = [
             ],
             "emoji": "♻️",
             "direction": "제너레이터와 이터레이터에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day27",
-            "code": "def simpleGen():\n    yield 1\n    yield 2\n    yield 3\n\ngen = simpleGen()\nnext(gen), next(gen), next(gen)"
+            "slug": "basics/30days/day27"
           },
           {
             "id": "day28",
@@ -480,8 +453,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "고급 문법 종합에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day28",
-            "code": "from pathlib import Path\nimport tempfile\n\nday28Scratch = Path(tempfile.mkdtemp(prefix='codaro_day28_'))\ntestFile = day28Scratch / 'test.txt'\ncontent = ''\nwith open(testFile, 'w') as f:\n    f.write('Hello World')\n    content = 'written'\ncontent"
+            "slug": "basics/30days/day28"
           },
           {
             "id": "day29",
@@ -497,8 +469,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧮",
             "direction": "알고리즘 연습에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day29",
-            "code": "def bubbleSort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - i - 1):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr\n\nunsorted = [64, 34, 25, 12, 22, 11, 90]\nbubbleSort(unsorted[:])"
+            "slug": "basics/30days/day29"
           },
           {
             "id": "day30",
@@ -514,8 +485,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎓",
             "direction": "최종 프로젝트에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.",
-            "slug": "basics/30days/day30",
-            "code": "def analyzeWords(text):\n    words = text.lower().split()\n    frequency = {}\n    for word in words:\n        cleaned = word.strip('.,!?')\n        if cleaned:\n            frequency[cleaned] = frequency.get(cleaned, 0) + 1\n    return frequency\n\nsampleText = 'hello world hello python world'\nanalyzeWords(sampleText)"
+            "slug": "basics/30days/day30"
           }
         ]
       },
@@ -536,8 +506,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚡",
             "direction": "람다와 고차 함수에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/01",
-            "code": "add = lambda x, y: x + y\nadd(3, 5)"
+            "slug": "basics/advancedPython/01"
           },
           {
             "id": "02",
@@ -553,8 +522,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎭",
             "direction": "함수 데코레이터 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/02",
-            "code": "def simpleDecorator(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return result\n    return wrapper\n\n@simpleDecorator\ndef greet(name):\n    return f\"Hello, {name}!\"\n\ngreet(\"Python\")"
+            "slug": "basics/advancedPython/02"
           },
           {
             "id": "03",
@@ -570,8 +538,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔒",
             "direction": "클로저와 상태 관리에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/03",
-            "code": "def outer(x):\n    def inner(y):\n        return x + y\n    return inner\n\naddFive = outer(5)\naddFive(3)"
+            "slug": "basics/advancedPython/03"
           },
           {
             "id": "04",
@@ -587,8 +554,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "functools 완벽 가이드에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/04",
-            "code": "from functools import partial\n\ndef multiply(a, b):\n    return a * b\n\ndouble = partial(multiply, 2)\ntriple = partial(multiply, 3)\ndouble(5), triple(5)"
+            "slug": "basics/advancedPython/04"
           },
           {
             "id": "05",
@@ -604,8 +570,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔄",
             "direction": "itertools 마스터에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/05",
-            "code": "from itertools import count, islice\n\ncounter = count(10, 2)\nlist(islice(counter, 5))"
+            "slug": "basics/advancedPython/05"
           },
           {
             "id": "06",
@@ -621,8 +586,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏭",
             "direction": "메타클래스에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/06",
-            "code": "class MyClass:\n    pass\n\nobj = MyClass()\n\ntype(obj), type(MyClass), type(type)"
+            "slug": "basics/advancedPython/06"
           },
           {
             "id": "07",
@@ -638,8 +602,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "디스크립터에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/07",
-            "code": "class Verbose:\n    def __get__(self, obj, objtype=None):\n        return f\"Getting from {objtype.__name__}\"\n\n    def __set__(self, obj, value):\n        return f\"Setting to {value}\"\n\nclass MyClass:\n    attr = Verbose()\n\nMyClass.attr, MyClass().attr"
+            "slug": "basics/advancedPython/07"
           },
           {
             "id": "8",
@@ -655,8 +618,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "추상 클래스와 프로토콜에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/8",
-            "code": "from abc import ABC, abstractmethod\n\nclass Shape(ABC):\n    @abstractmethod\n    def area(self):\n        pass\n\n    @abstractmethod\n    def perimeter(self):\n        pass\n\nclass Rectangle(Shape):\n    def __init__(self, width, height):\n        self.width = width\n        self.height = height\n\n    def area(self):\n        return self.width * self.height\n\n    def perimeter(self):\n        return 2 * (self.width + self.height)\n\nRectangle(3, 4).area()"
+            "slug": "basics/advancedPython/8"
           },
           {
             "id": "9",
@@ -672,8 +634,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔀",
             "direction": "다중 상속과 MRO에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/9",
-            "code": "class Flyable:\n    def fly(self):\n        return \"Flying\"\n\nclass Swimmable:\n    def swim(self):\n        return \"Swimming\"\n\nclass Duck(Flyable, Swimmable):\n    def quack(self):\n        return \"Quack!\"\n\nduck = Duck()\nduck.fly(), duck.swim(), duck.quack()"
+            "slug": "basics/advancedPython/9"
           },
           {
             "id": "10",
@@ -689,8 +650,7 @@ export const curriculumTree = [
             ],
             "emoji": "💾",
             "direction": "slots와 메모리 최적화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/10",
-            "code": "class Point:\n    __slots__ = ('x', 'y')\n\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\np = Point(3, 4)\np.x, p.y"
+            "slug": "basics/advancedPython/10"
           },
           {
             "id": "11",
@@ -706,8 +666,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏷️",
             "direction": "타입 힌팅 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/11",
-            "code": "from typing import Generic, TypeVar\n\nT = TypeVar('T')\n\nclass Box(Generic[T]):\n    def __init__(self, item: T):\n        self.item = item\n\n    def get(self) -> T:\n        return self.item\n\nintBox: Box[int] = Box(42)\nstrBox: Box[str] = Box(\"hello\")\nintBox.get(), strBox.get()"
+            "slug": "basics/advancedPython/11"
           },
           {
             "id": "12",
@@ -723,8 +682,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "dataclasses 마스터에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/12",
-            "code": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n\npt = Point(3.0, 4.0)\npt"
+            "slug": "basics/advancedPython/12"
           },
           {
             "id": "13",
@@ -740,8 +698,7 @@ export const curriculumTree = [
             ],
             "emoji": "📚",
             "direction": "collections 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/13",
-            "code": "from collections import namedtuple\n\nPoint = namedtuple('Point', ['x', 'y'])\npt = Point(3, 4)\npt.x, pt.y, pt[0], pt[1]"
+            "slug": "basics/advancedPython/13"
           },
           {
             "id": "14",
@@ -757,8 +714,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏷️",
             "direction": "enum과 상수 관리에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/14",
-            "code": "from enum import Enum\n\nclass Color(Enum):\n    RED = 1\n    GREEN = 2\n    BLUE = 3\n\nColor.RED, Color.RED.name, Color.RED.value"
+            "slug": "basics/advancedPython/14"
           },
           {
             "id": "15",
@@ -774,8 +730,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔒",
             "direction": "typing 고급에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/15",
-            "code": "from typing import Literal\n\ndef setMode(mode: Literal['read', 'write', 'append']) -> str:\n    return f\"Mode set to {mode}\"\n\nsetMode('read'), setMode('write')"
+            "slug": "basics/advancedPython/15"
           },
           {
             "id": "16",
@@ -791,8 +746,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔁",
             "direction": "재귀와 분할정복에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/16",
-            "code": "def countdown(n):\n    if n <= 0:\n        return []\n    return [n] + countdown(n - 1)\n\ncountdown(5)"
+            "slug": "basics/advancedPython/16"
           },
           {
             "id": "17",
@@ -808,8 +762,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "정렬 알고리즘에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/17",
-            "code": "def bubbleSort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr\n\nbubbleSort([64, 34, 25, 12, 22, 11, 90])"
+            "slug": "basics/advancedPython/17"
           },
           {
             "id": "18",
@@ -825,8 +778,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "탐색 알고리즘에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/18",
-            "code": "def linearSearch(arr, target):\n    for i, val in enumerate(arr):\n        if val == target:\n            return i\n    return -1\n\nlinearNums = [4, 2, 7, 1, 9, 3, 6, 8, 5]\nlinearIdx = linearSearch(linearNums, 7)\nf\"7의 인덱스: {linearIdx}\""
+            "slug": "basics/advancedPython/18"
           },
           {
             "id": "19",
@@ -842,8 +794,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧩",
             "direction": "동적 프로그래밍에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/19",
-            "code": "def fibRecursive(n):\n    if n <= 1:\n        return n\n    return fibRecursive(n - 1) + fibRecursive(n - 2)\n\ndef fibDP(n, memo=None):\n    if memo is None:\n        memo = {}\n    if n in memo:\n        return memo[n]\n    if n <= 1:\n        return n\n    memo[n] = fibDP(n - 1, memo) + fibDP(n - 2, memo)\n    return memo[n]\n\nf\"DP 피보나치(30): {fibDP(30)}\""
+            "slug": "basics/advancedPython/19"
           },
           {
             "id": "20",
@@ -859,8 +810,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏗️",
             "direction": "자료구조 구현에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/20",
-            "code": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, item):\n        self.items.append(item)\n\n    def pop(self):\n        if not self.isEmpty():\n            return self.items.pop()\n        return None\n\n    def peek(self):\n        if not self.isEmpty():\n            return self.items[-1]\n        return None\n\n    def isEmpty(self):\n        return len(self.items) == 0\n\n    def size(self):\n        return len(self.items)\n\nstk = Stack()\nstk.push(10)\nstk.push(20)\nstk.push(30)\nstkPeek = stk.peek()\nstkPop = stk.pop()\nstkSize = stk.size()\n(stkPeek, stkPop, stkSize)"
+            "slug": "basics/advancedPython/20"
           },
           {
             "id": "21",
@@ -876,8 +826,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "디자인 패턴 1에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/21",
-            "code": "class SingletonMeta(type):\n    _instances = {}\n\n    def __call__(cls, *args, **kwargs):\n        if cls not in cls._instances:\n            cls._instances[cls] = super().__call__(*args, **kwargs)\n        return cls._instances[cls]\n\nclass Database(metaclass=SingletonMeta):\n    def __init__(self):\n        self.connection = \"Connected\"\n\ndb1 = Database()\ndb2 = Database()\nsingletonCheck = db1 is db2\nsingletonCheck"
+            "slug": "basics/advancedPython/21"
           },
           {
             "id": "22",
@@ -893,8 +842,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎭",
             "direction": "디자인 패턴 2에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/22",
-            "code": "from abc import ABC, abstractmethod\n\nclass Observer(ABC):\n    @abstractmethod\n    def update(self, message):\n        pass\n\nclass Subject:\n    def __init__(self):\n        self._observers = []\n\n    def attach(self, observer):\n        self._observers.append(observer)\n\n    def detach(self, observer):\n        self._observers.remove(observer)\n\n    def notify(self, message):\n        for observer in self._observers:\n            observer.update(message)\n\nclass EmailSubscriber(Observer):\n    def __init__(self, name):\n        self.name = name\n        self.messages = []\n\n    def update(self, message):\n        self.messages.append(message)\n\nclass SMSSubscriber(Observer):\n    def __init__(self, phone):\n        self.phone = phone\n        self.messages = []\n\n    def update(self, message):\n        self.mes"
+            "slug": "basics/advancedPython/22"
           },
           {
             "id": "23",
@@ -910,8 +858,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "함수형 패턴에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/23",
-            "code": "def pureAdd(a, b):\n    return a + b\n\ndef pureMultiply(nums, factor):\n    return [n * factor for n in nums]\n\ndef pureFilter(nums, predicate):\n    return [n for n in nums if predicate(n)]\n\naddResult = pureAdd(3, 5)\nmulResult = pureMultiply([1, 2, 3], 2)\nfilterResult = pureFilter([1, 2, 3, 4, 5], lambda x: x % 2 == 0)\npureResults = (addResult, mulResult, filterResult)\npureResults"
+            "slug": "basics/advancedPython/23"
           },
           {
             "id": "24",
@@ -927,8 +874,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔮",
             "direction": "메타프로그래밍에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/24",
-            "code": "class SimpleMeta(type):\n    def __new__(mcs, name, bases, namespace):\n        namespace['created_by'] = 'SimpleMeta'\n        return super().__new__(mcs, name, bases, namespace)\n\nclass MyClass(metaclass=SimpleMeta):\n    pass\n\nmetaInstance = MyClass()\nmetaCreatedBy = MyClass.created_by\nmetaType = type(MyClass)\nmetaResult = (metaCreatedBy, metaType.__name__)\nmetaResult"
+            "slug": "basics/advancedPython/24"
           },
           {
             "id": "25",
@@ -944,8 +890,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "정규표현식 고급에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/25",
-            "code": "import re\n\nreviewText = \"Hello World 123 Python3.9\"\nreviewDigits = re.findall(r'\\d+', reviewText)\nreviewWords = re.findall(r'\\w+', reviewText)\nreviewSplit = re.split(r'\\s+', reviewText)\nreviewResult = (reviewDigits, reviewWords, reviewSplit)\nreviewResult"
+            "slug": "basics/advancedPython/25"
           },
           {
             "id": "26",
@@ -961,8 +906,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚡",
             "direction": "코드 최적화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/26",
-            "code": "def findDupSlow(nums):\n    dups = []\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] == nums[j] and nums[i] not in dups:\n                dups.append(nums[i])\n    return dups\n\ndef findDupFast(nums):\n    seen = set()\n    dups = set()\n    for num in nums:\n        if num in seen:\n            dups.add(num)\n        seen.add(num)\n    return list(dups)\n\ntcNums = [1, 2, 3, 2, 4, 3, 5]\ntcSlow = findDupSlow(tcNums)\ntcFast = findDupFast(tcNums)\ntcResult = (tcSlow, tcFast)\ntcResult"
+            "slug": "basics/advancedPython/26"
           },
           {
             "id": "27",
@@ -978,8 +922,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔤",
             "direction": "문자열 알고리즘에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/27",
-            "code": "def bfSearch(text, pattern):\n    textLen = len(text)\n    patLen = len(pattern)\n    positions = []\n    for i in range(textLen - patLen + 1):\n        match = True\n        for j in range(patLen):\n            if text[i + j] != pattern[j]:\n                match = False\n                break\n        if match:\n            positions.append(i)\n    return positions\n\nbfText = \"AABAACAADAABAAABAA\"\nbfPattern = \"AABA\"\nbfResult = bfSearch(bfText, bfPattern)\nbfResult"
+            "slug": "basics/advancedPython/27"
           },
           {
             "id": "28",
@@ -995,8 +938,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "수학 알고리즘에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/28",
-            "code": "def isPrime(n):\n    if n < 2:\n        return False\n    if n == 2:\n        return True\n    if n % 2 == 0:\n        return False\n    for i in range(3, int(n ** 0.5) + 1, 2):\n        if n % i == 0:\n            return False\n    return True\n\nprimeCheck = [isPrime(n) for n in [1, 2, 17, 20, 97]]\nprimeResult = primeCheck\nprimeResult"
+            "slug": "basics/advancedPython/28"
           },
           {
             "id": "29",
@@ -1012,8 +954,7 @@ export const curriculumTree = [
             ],
             "emoji": "✨",
             "direction": "클린 코드에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/29",
-            "code": "badData = [1, 2, 3]\nuserAges = [25, 30, 35]\n\nx = 86400\nSECONDS_PER_DAY = 86400\n\nflag = True\nisUserLoggedIn = True\nhasPermission = False\ncanEdit = True\n\nnamingResult = {\n    \"bad\": \"d, x, flag\",\n    \"good\": \"userAges, SECONDS_PER_DAY, isLoggedIn\"\n}\nnamingResult"
+            "slug": "basics/advancedPython/29"
           },
           {
             "id": "30",
@@ -1029,8 +970,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "종합 문제 풀이에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.",
-            "slug": "basics/advancedPython/30",
-            "code": "from time import time as getTime\n\nclass CacheNode:\n    def __init__(self, key, value, ttl):\n        self.key = key\n        self.value = value\n        self.expiry = getTime() + ttl\n        self.prev = None\n        self.next = None\n\nclass LRUCacheWithTTL:\n    def __init__(self, capacity, defaultTtl=60):\n        self.capacity = capacity\n        self.defaultTtl = defaultTtl\n        self.cache = {}\n        self.head = CacheNode(None, None, 0)\n        self.tail = CacheNode(None, None, 0)\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def removeNode(self, node):\n        node.prev.next = node.next\n        node.next.prev = node.prev\n\n    def addToFront(self, node):\n        node.next = self.head.next\n        node.prev = self.head\n        self.head.next.prev = node\n       "
+            "slug": "basics/advancedPython/30"
           },
           {
             "id": "31",
@@ -1045,8 +985,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔒",
             "direction": "컨텍스트 매니저에서 자원 열기/사용/닫기 흐름을 한 블록으로 묶고 예외 안전성을 코드로 확인합니다.",
-            "slug": "basics/advancedPython/31",
-            "code": "class TraceContext:\n    def __init__(self, label):\n        self.label = label\n        self.events = []\n\n    def __enter__(self):\n        self.events.append(f\"enter:{self.label}\")\n        return self\n\n    def __exit__(self, excType, excValue, traceback):\n        self.events.append(f\"exit:{self.label}:{excType.__name__ if excType else 'ok'}\")\n        return False\n\ntrace = TraceContext(\"task\")\nwith trace as ctx:\n    ctx.events.append(\"body\")\n\ntrace.events"
+            "slug": "basics/advancedPython/31"
           },
           {
             "id": "32",
@@ -1062,8 +1001,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚙️",
             "direction": "제너레이터 심화에서 외부와 양방향으로 통신하는 흐름과 lazy 파이프라인을 코드로 확인합니다.",
-            "slug": "basics/advancedPython/32",
-            "code": "def innerRange(start, end):\n    for value in range(start, end):\n        yield value\n    return f\"inner:{start}-{end}\"\n\ndef chained():\n    firstReturn = yield from innerRange(0, 3)\n    secondReturn = yield from innerRange(10, 12)\n    return [firstReturn, secondReturn]\n\ngen = chained()\nyielded = list(gen)\n\nyielded"
+            "slug": "basics/advancedPython/32"
           },
           {
             "id": "33",
@@ -1079,8 +1017,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔁",
             "direction": "async와 코루틴에서 await로 멈춤/재개하는 흐름과 여러 코루틴을 동시에 진행시키는 패턴을 코드로 확인합니다.",
-            "slug": "basics/advancedPython/33",
-            "code": "import asyncio\n\nasync def greet(name, delay):\n    await asyncio.sleep(delay)\n    return f\"hello:{name}\"\n\nasync def main():\n    first = await greet(\"alice\", 0.01)\n    second = await greet(\"bob\", 0.01)\n    return [first, second]\n\nasyncio.run(main())"
+            "slug": "basics/advancedPython/33"
           },
           {
             "id": "34",
@@ -1095,8 +1032,7 @@ export const curriculumTree = [
             ],
             "emoji": "🪢",
             "direction": "match와 패턴매칭에서 분기 조건을 if/elif 사슬 대신 구조 패턴으로 표현하고 가독성이 어떻게 달라지는지 확인합니다.",
-            "slug": "basics/advancedPython/34",
-            "code": "def classify(value):\n    match value:\n        case 0:\n            return \"zero\"\n        case 1 | 2 | 3:\n            return \"small\"\n        case n if n < 0:\n            return f\"negative:{n}\"\n        case _:\n            return \"other\"\n\n[classify(value) for value in [-2, 0, 1, 3, 5, 10]]"
+            "slug": "basics/advancedPython/34"
           },
           {
             "id": "35",
@@ -1112,8 +1048,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧵",
             "direction": "동시성에서 IO/CPU 부하를 어떤 도구로 병렬화해야 하는지 코드로 확인하고 race condition을 직접 재현/수정합니다.",
-            "slug": "basics/advancedPython/35",
-            "code": "import time\nfrom concurrent.futures import ThreadPoolExecutor\n\ndef ioJob(seconds):\n    time.sleep(seconds)\n    return seconds\n\ndef cpuJob(n):\n    total = 0\n    for index in range(n):\n        total += index * index\n    return total\n\nstart = time.perf_counter()\nwith ThreadPoolExecutor(max_workers=4) as pool:\n    ioResults = list(pool.map(ioJob, [0.05] * 4))\nioElapsed = time.perf_counter() - start\n\nstart = time.perf_counter()\nwith ThreadPoolExecutor(max_workers=4) as pool:\n    cpuResults = list(pool.map(cpuJob, [200_000] * 4))\ncpuElapsed = time.perf_counter() - start\n\n{\"ioElapsed\": ioElapsed, \"cpuElapsed\": cpuElapsed}"
+            "slug": "basics/advancedPython/35"
           }
         ]
       },
@@ -1132,8 +1067,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "math 수학 함수에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/01_math",
-            "code": "import math\n\n# 정상 로드 확인\nmath.pi"
+            "slug": "basics/builtins/01_math"
           },
           {
             "id": "02_random",
@@ -1147,8 +1081,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎲",
             "direction": "random 난수 생성에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/02_random",
-            "code": "import random\n\n# 모듈 로드 확인\n'random 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/02_random"
           },
           {
             "id": "03_datetime",
@@ -1163,8 +1096,7 @@ export const curriculumTree = [
             ],
             "emoji": "📅",
             "direction": "datetime 날짜와 시간에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/03_datetime",
-            "code": "from datetime import date, datetime, timedelta\n\n# 모듈 로드 확인\n'datetime 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/03_datetime"
           },
           {
             "id": "04_time",
@@ -1179,8 +1111,7 @@ export const curriculumTree = [
             ],
             "emoji": "⏱️",
             "direction": "time 시간 측정과 제어에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/04_time",
-            "code": "import time\n\n# 모듈 로드 확인\n'time 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/04_time"
           },
           {
             "id": "05_collections",
@@ -1195,8 +1126,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "collections 특수 컨테이너에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/05_collections",
-            "code": "from collections import Counter, defaultdict, deque, namedtuple, ChainMap\n\n# 모듈 로드 확인\n'collections 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/05_collections"
           },
           {
             "id": "06_itertools",
@@ -1211,8 +1141,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔄",
             "direction": "itertools 이터레이터 도구에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/06_itertools",
-            "code": "from itertools import count, cycle, repeat, islice, combinations, permutations, product, chain, zip_longest, tee, filterfalse, takewhile, dropwhile, groupby, accumulate, combinations_with_replacement\n\n# 모듈 로드 확인\n'itertools 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/06_itertools"
           },
           {
             "id": "07_functools",
@@ -1227,8 +1156,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "functools 함수형 프로그래밍에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/07_functools",
-            "code": "from functools import partial, reduce, lru_cache, wraps, total_ordering, cmp_to_key\n\n# 모듈 로드 확인\n'functools 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/07_functools"
           },
           {
             "id": "08_os",
@@ -1243,8 +1171,7 @@ export const curriculumTree = [
             ],
             "emoji": "📁",
             "direction": "os 운영체제 인터페이스에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/08_os",
-            "code": "import os\nimport tempfile\n\n# 정상 로드 확인\nos.name"
+            "slug": "basics/builtins/08_os"
           },
           {
             "id": "09_pathlib",
@@ -1259,8 +1186,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗂️",
             "direction": "pathlib 객체지향 경로에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/09_pathlib",
-            "code": "import tempfile\nfrom pathlib import Path\n\ncurrentPath = Path('.')\ncurrentPath"
+            "slug": "basics/builtins/09_pathlib"
           },
           {
             "id": "10_sys",
@@ -1275,8 +1201,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚙️",
             "direction": "sys 시스템 파라미터에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/10_sys",
-            "code": "import sys\nimport tempfile"
+            "slug": "basics/builtins/10_sys"
           },
           {
             "id": "11_glob",
@@ -1290,8 +1215,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔎",
             "direction": "glob 파일 패턴 매칭에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/11_glob",
-            "code": "import glob\nimport os\nimport tempfile"
+            "slug": "basics/builtins/11_glob"
           },
           {
             "id": "12_shutil",
@@ -1306,8 +1230,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "shutil 파일 연산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/12_shutil",
-            "code": "import shutil"
+            "slug": "basics/builtins/12_shutil"
           },
           {
             "id": "13_json",
@@ -1321,8 +1244,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "json JSON 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/13_json",
-            "code": "import json\nimport tempfile\nfrom pathlib import Path\n\njsonScratch = Path(tempfile.gettempdir()) / 'codaro_json_scratch'\njsonScratch.mkdir(parents=True, exist_ok=True)\n\n'json 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/13_json"
           },
           {
             "id": "14_csv",
@@ -1336,8 +1258,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "csv CSV 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/14_csv",
-            "code": "import csv\nimport tempfile\nfrom pathlib import Path\n\ncsvScratch = Path(tempfile.gettempdir()) / 'codaro_csv_scratch'\ncsvScratch.mkdir(parents=True, exist_ok=True)\n\n'csv 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/14_csv"
           },
           {
             "id": "15_pickle",
@@ -1351,8 +1272,7 @@ export const curriculumTree = [
             ],
             "emoji": "🥒",
             "direction": "pickle 객체 직렬화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/15_pickle",
-            "code": "import pickle\nimport os\nimport tempfile\nfrom pathlib import Path\n\npickleScratch = Path(tempfile.gettempdir()) / 'codaro_pickle_scratch'\npickleScratch.mkdir(parents=True, exist_ok=True)\n\n'pickle 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/15_pickle"
           },
           {
             "id": "16_struct",
@@ -1366,8 +1286,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "struct 바이너리 데이터에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/16_struct",
-            "code": "import struct\nimport tempfile\nfrom pathlib import Path\n\nstructScratch = Path(tempfile.gettempdir()) / 'codaro_struct_scratch'\nstructScratch.mkdir(parents=True, exist_ok=True)\n\n'struct 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/16_struct"
           },
           {
             "id": "17_string",
@@ -1381,8 +1300,7 @@ export const curriculumTree = [
             ],
             "emoji": "📝",
             "direction": "string 문자열 도구에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/17_string",
-            "code": "import secrets\nimport string\n\n'string 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/17_string"
           },
           {
             "id": "18_textwrap",
@@ -1398,8 +1316,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "textwrap 텍스트 래핑과 포맷팅에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/18_textwrap",
-            "code": "import textwrap"
+            "slug": "basics/builtins/18_textwrap"
           },
           {
             "id": "19_difflib",
@@ -1414,8 +1331,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "difflib 시퀀스 비교에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/19_difflib",
-            "code": "import difflib"
+            "slug": "basics/builtins/19_difflib"
           },
           {
             "id": "20_base64",
@@ -1430,8 +1346,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "base64 Base64 인코딩에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/20_base64",
-            "code": "import base64\nimport binascii"
+            "slug": "basics/builtins/20_base64"
           },
           {
             "id": "21_urllib",
@@ -1446,8 +1361,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌐",
             "direction": "urllib URL 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/21_urllib",
-            "code": "import urllib.request\nimport urllib.parse\nimport urllib.error\n\n# 정상 로드 확인\n'urllib 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/21_urllib"
           },
           {
             "id": "22_email",
@@ -1462,8 +1376,7 @@ export const curriculumTree = [
             ],
             "emoji": "📧",
             "direction": "email 이메일 처리에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/22_email",
-            "code": "from email.message import EmailMessage\nfrom email.mime.text import MIMEText\nfrom email.mime.multipart import MIMEMultipart\n\n# 정상 로드 확인\n'email 모듈이 정상적으로 로드되었습니다'"
+            "slug": "basics/builtins/22_email"
           },
           {
             "id": "23_asyncio",
@@ -1479,8 +1392,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚡",
             "direction": "asyncio 비동기 I/O에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/23_asyncio",
-            "code": "import asyncio\n\nasync def greet():\n    return \"Hello Async\"\n\nresult = asyncio.run(greet())\nresult"
+            "slug": "basics/builtins/23_asyncio"
           },
           {
             "id": "24_argparse",
@@ -1495,8 +1407,7 @@ export const curriculumTree = [
             ],
             "emoji": "🖥️",
             "direction": "argparse 명령줄 인자 파싱에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/24_argparse",
-            "code": "import argparse\n\nparser = argparse.ArgumentParser(description='간단한 파서')\nparser.add_argument('name', help='이름 입력')\n\nargs = parser.parse_args(['홍길동'])\nargs.name"
+            "slug": "basics/builtins/24_argparse"
           },
           {
             "id": "25_logging",
@@ -1511,8 +1422,7 @@ export const curriculumTree = [
             ],
             "emoji": "📝",
             "direction": "logging으로 print 디버그를 대체해 운영에서 검색 가능한 로그를 남기는 흐름을 익힙니다.",
-            "slug": "basics/builtins/25_logging",
-            "code": "import logging\n\nlogging.warning('warmup warning')\nlogging.error('warmup error')\n\n\"logging module ready\""
+            "slug": "basics/builtins/25_logging"
           },
           {
             "id": "26_unittest",
@@ -1527,8 +1437,7 @@ export const curriculumTree = [
             ],
             "emoji": "✅",
             "direction": "unittest 단위 테스트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/26_unittest",
-            "code": "import unittest\n\nclass SimpleTest(unittest.TestCase):\n    def testAddition(self):\n        total = 2 + 2\n        self.assertEqual(total, 4)\n\nsuite = unittest.TestLoader().loadTestsFromTestCase(SimpleTest)\nrunner = unittest.TextTestRunner(verbosity=0)\noutcome = runner.run(suite)\n\noutcome.wasSuccessful()"
+            "slug": "basics/builtins/26_unittest"
           },
           {
             "id": "27_timeit",
@@ -1543,8 +1452,7 @@ export const curriculumTree = [
             ],
             "emoji": "⏱️",
             "direction": "timeit 성능 측정에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/27_timeit",
-            "code": "import timeit\n\nduration = timeit.timeit('x = 2 + 2', number=100000)\nduration"
+            "slug": "basics/builtins/27_timeit"
           },
           {
             "id": "28_copy",
@@ -1559,8 +1467,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "copy 객체 복사에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/28_copy",
-            "code": "import copy\n\noriginal = [1, 2, 3]\nduplicated = copy.copy(original)\n\noriginal, duplicated"
+            "slug": "basics/builtins/28_copy"
           },
           {
             "id": "29_pprint",
@@ -1575,8 +1482,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "pprint 예쁜 출력에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/29_pprint",
-            "code": "import pprint\n\ndata = {'name': 'Alice', 'age': 30, 'skills': ['Python', 'JavaScript', 'SQL']}\n\nformatted = pprint.pformat(data)\nformatted"
+            "slug": "basics/builtins/29_pprint"
           },
           {
             "id": "30_inspect",
@@ -1591,8 +1497,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "inspect 객체 검사에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "basics/builtins/30_inspect",
-            "code": "import inspect\n\ndef greet(name):\n    return f\"Hello {name}\"\n\nsig = inspect.signature(greet)\nstr(sig)"
+            "slug": "basics/builtins/30_inspect"
           },
           {
             "id": "31",
@@ -1608,8 +1513,7 @@ export const curriculumTree = [
             ],
             "emoji": "📡",
             "direction": "subprocess에서 외부 명령을 실행하고 결과/오류/종료 코드를 표준 객체로 받아 자동화 흐름을 코드로 확인합니다.",
-            "slug": "basics/builtins/31",
-            "code": "import subprocess\nimport sys\n\nresult = subprocess.run(\n    [sys.executable, \"-c\", \"print('hello from child')\"],\n    capture_output=True,\n    text=True,\n)\n\n{\"returncode\": result.returncode, \"stdoutLines\": result.stdout.splitlines(), \"stderr\": result.stderr}"
+            "slug": "basics/builtins/31"
           },
           {
             "id": "32",
@@ -1625,8 +1529,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧰",
             "direction": "contextlib에서 자원 관리 패턴을 짧은 코드로 표현하고 with 블록의 책임 경계를 코드로 확인합니다.",
-            "slug": "basics/builtins/32",
-            "code": "from contextlib import contextmanager\n\n@contextmanager\ndef trace(label, log):\n    log.append(f\"open:{label}\")\n    try:\n        yield label\n    finally:\n        log.append(f\"close:{label}\")\n\nevents = []\nwith trace(\"task\", events) as bound:\n    events.append(f\"body:{bound}\")\n\nevents"
+            "slug": "basics/builtins/32"
           },
           {
             "id": "33",
@@ -1641,8 +1544,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗃",
             "direction": "tempfile에서 자원 정리가 보장된 임시 파일·디렉터리를 만들어 실습/테스트 IO가 워크스페이스를 더럽히지 않도록 합니다.",
-            "slug": "basics/builtins/33",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as workspace:\n    root = Path(workspace)\n    (root / \"input.txt\").write_text(\"hello\", encoding=\"utf-8\")\n    (root / \"result.txt\").write_text(\"ok\", encoding=\"utf-8\")\n    snapshot = sorted(p.name for p in root.iterdir())\n\ncleanedUp = not Path(workspace).exists()\n{\"snapshot\": snapshot, \"cleanedUp\": cleanedUp}"
+            "slug": "basics/builtins/33"
           },
           {
             "id": "34",
@@ -1658,8 +1560,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔐",
             "direction": "hashlib와 secrets에서 보안과 무결성을 다루는 표준 흐름을 코드로 확인하고 흔한 함정(랜덤 vs 안전 랜덤)을 식별합니다.",
-            "slug": "basics/builtins/34",
-            "code": "import hashlib\n\npayloadOne = \"hello codaro\".encode(\"utf-8\")\npayloadTwo = \"hello codaro\".encode(\"utf-8\")\npayloadThree = \"hello world\".encode(\"utf-8\")\n\ndigestOne = hashlib.sha256(payloadOne).hexdigest()\ndigestTwo = hashlib.sha256(payloadTwo).hexdigest()\ndigestThree = hashlib.sha256(payloadThree).hexdigest()\n\n{\"sameInputMatches\": digestOne == digestTwo, \"differentInputDiffers\": digestOne != digestThree, \"length\": len(digestOne)}"
+            "slug": "basics/builtins/34"
           },
           {
             "id": "35",
@@ -1674,8 +1575,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗜",
             "direction": "zipfile와 tarfile에서 아카이브를 만들고 읽고 추출하는 흐름을 코드로 확인하고 path traversal 같은 위험을 피하는 패턴을 익힙니다.",
-            "slug": "basics/builtins/35",
-            "code": "import tempfile\nimport zipfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as workspace:\n    root = Path(workspace)\n    diskFile = root / \"report.txt\"\n    diskFile.write_text(\"disk content\", encoding=\"utf-8\")\n\n    archive = root / \"result.zip\"\n    with zipfile.ZipFile(archive, \"w\", compression=zipfile.ZIP_DEFLATED) as zip:\n        zip.write(diskFile, arcname=\"report.txt\")\n        zip.writestr(\"memory.txt\", \"in-memory content\")\n\n    with zipfile.ZipFile(archive, \"r\") as zip:\n        names = zip.namelist()\n        sizeMap = {info.filename: info.file_size for info in zip.infolist()}\n\n{\"names\": sorted(names), \"memorySize\": sizeMap[\"memory.txt\"]}"
+            "slug": "basics/builtins/35"
           }
         ]
       }
@@ -1703,8 +1603,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "DuckDB소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_00",
-            "code": "import duckdb\n\nworkflowCon = duckdb.connect()\nworkflowCon.sql(\"\"\"\n    CREATE OR REPLACE TABLE lessonOrders AS\n    SELECT * FROM (VALUES\n        ('A-100', 'paid', 50000, 'web'),\n        ('A-101', 'pending', 20000, 'app'),\n        ('A-102', 'paid', 120000, 'web'),\n        ('A-103', 'cancelled', 15000, 'store'),\n        ('A-104', 'paid', 62000, 'app')\n    ) AS t(orderId, status, amount, channel)\n\"\"\")\n\nexpectedPaidRevenue = 232000\nexpectedPaidCount = 3\nrowCount = workflowCon.sql(\"SELECT COUNT(*) FROM lessonOrders\").fetchone()[0]\n\nassert rowCount == 5\nrowCount"
+            "slug": "dataAnalysis/duckdb/duckdb_00"
           },
           {
             "id": "duckdb_00b",
@@ -1720,8 +1619,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "MotherDuck소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_00b",
-            "code": "import duckdb\n\nworkflowCon = duckdb.connect()\nworkflowCon.sql(\"\"\"\n    CREATE OR REPLACE TABLE lessonOrders AS\n    SELECT * FROM (VALUES\n        ('A-100', 'paid', 50000, 'web'),\n        ('A-101', 'pending', 20000, 'app'),\n        ('A-102', 'paid', 120000, 'web'),\n        ('A-103', 'cancelled', 15000, 'store'),\n        ('A-104', 'paid', 62000, 'app')\n    ) AS t(orderId, status, amount, channel)\n\"\"\")\n\nexpectedPaidRevenue = 232000\nexpectedPaidCount = 3\nrowCount = workflowCon.sql(\"SELECT COUNT(*) FROM lessonOrders\").fetchone()[0]\n\nassert rowCount == 5\nrowCount"
+            "slug": "dataAnalysis/duckdb/duckdb_00b"
           },
           {
             "id": "duckdb_01",
@@ -1736,8 +1634,7 @@ export const curriculumTree = [
             ],
             "emoji": "🍽️",
             "direction": "레스토랑팁기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_01",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"tips\")\ntips = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_01"
           },
           {
             "id": "duckdb_02",
@@ -1752,8 +1649,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚢",
             "direction": "타이타닉생존통계에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_02",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"titanic\")\ntitanic = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_02"
           },
           {
             "id": "duckdb_03",
@@ -1768,8 +1664,7 @@ export const curriculumTree = [
             ],
             "emoji": "💵",
             "direction": "팁패턴분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_03",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"tips\")\ntips = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_03"
           },
           {
             "id": "duckdb_04",
@@ -1784,8 +1679,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚢",
             "direction": "타이타닉심층분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_04",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"titanic\")\ntitanic = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_04"
           },
           {
             "id": "duckdb_05",
@@ -1801,8 +1695,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "팁서브쿼리분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_05",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"tips\")\ntips = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_05"
           },
           {
             "id": "duckdb_06",
@@ -1818,8 +1711,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "CTE단계별분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_06",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndfTips = loadLocalDataset(\"tips\")\ndfTitanic = loadLocalDataset(\"titanic\")\ntips = duckdb.from_df(dfTips)\ntitanic = duckdb.from_df(dfTitanic)"
+            "slug": "dataAnalysis/duckdb/duckdb_06"
           },
           {
             "id": "duckdb_07",
@@ -1834,8 +1726,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏆",
             "direction": "윈도우함수기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_07",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndf = loadLocalDataset(\"tips\")\ntips = duckdb.from_df(df)"
+            "slug": "dataAnalysis/duckdb/duckdb_07"
           },
           {
             "id": "duckdb_08",
@@ -1851,8 +1742,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "고급윈도우분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_08",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndfTitanic = loadLocalDataset(\"titanic\")\ntitanic = duckdb.from_df(dfTitanic)"
+            "slug": "dataAnalysis/duckdb/duckdb_08"
           },
           {
             "id": "duckdb_09",
@@ -1868,8 +1758,7 @@ export const curriculumTree = [
             ],
             "emoji": "✍️",
             "direction": "문자열과패턴에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_09",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndfTitanic = loadLocalDataset(\"titanic\")\nif \"name\" not in dfTitanic.columns:\n    titleCycle = [\"Mr.\", \"Mrs.\", \"Miss.\", \"Master.\", \"Dr.\", \"Rev.\"]\n    dfTitanic = dfTitanic.copy()\n    dfTitanic[\"name\"] = [\n        f\"Passenger{index:03d}, {titleCycle[index % len(titleCycle)]} Local\"\n        for index in range(len(dfTitanic))\n    ]\n\ntitanic = duckdb.from_df(dfTitanic)"
+            "slug": "dataAnalysis/duckdb/duckdb_09"
           },
           {
             "id": "duckdb_10",
@@ -1885,8 +1774,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔥",
             "direction": "종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/duckdb/duckdb_10",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\nimport duckdb\n\ndfTips = loadLocalDataset(\"tips\")\ndfTitanic = loadLocalDataset(\"titanic\")\nif \"name\" not in dfTitanic.columns:\n    titleCycle = [\"Mr.\", \"Mrs.\", \"Miss.\", \"Master.\", \"Dr.\", \"Rev.\"]\n    dfTitanic = dfTitanic.copy()\n    dfTitanic[\"name\"] = [\n        f\"Passenger{index:03d}, {titleCycle[index % len(titleCycle)]} Local\"\n        for index in range(len(dfTitanic))\n    ]\n\ntips = duckdb.from_df(dfTips)\ntitanic = duckdb.from_df(dfTitanic)"
+            "slug": "dataAnalysis/duckdb/duckdb_10"
           }
         ]
       },
@@ -1907,8 +1795,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "NumPy소개에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_00",
-            "code": "import numpy as np\n\nsales = np.array([\n    [120_000, 135_000, 128_000],\n    [90_000, 98_000, 102_000],\n])\ndiscountRates = np.array([[0.1], [0.05]])\n\ndiscounted = sales * (1 - discountRates)\nbranchTotals = discounted.sum(axis=1)\n\nassert discounted.shape == (2, 3)\nassert np.allclose(branchTotals, [344_700, 275_500])\nassert sales.dtype.kind in {\"i\", \"u\"}"
+            "slug": "dataAnalysis/numpy/numpy_00"
           },
           {
             "id": "numpy_01",
@@ -1924,8 +1811,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎮",
             "direction": "포켓몬스탯분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_01",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_01"
           },
           {
             "id": "numpy_02",
@@ -1941,8 +1827,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌡️",
             "direction": "기온데이터탐색에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_02",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_02"
           },
           {
             "id": "numpy_03",
@@ -1958,8 +1843,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "지진발생패턴에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_03",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_03"
           },
           {
             "id": "numpy_04",
@@ -1975,8 +1859,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎵",
             "direction": "음악특성분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_04",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_04"
           },
           {
             "id": "numpy_05",
@@ -1992,8 +1875,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚖️",
             "direction": "BMI계산기에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_05",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_05"
           },
           {
             "id": "numpy_06",
@@ -2009,8 +1891,7 @@ export const curriculumTree = [
             ],
             "emoji": "❤️",
             "direction": "심장병위험분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_06",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_06"
           },
           {
             "id": "numpy_07",
@@ -2026,8 +1907,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌫️",
             "direction": "대기질시계열에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_07",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_07"
           },
           {
             "id": "numpy_08",
@@ -2043,8 +1923,7 @@ export const curriculumTree = [
             ],
             "emoji": "😊",
             "direction": "행복지수국가비교에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_08",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_08"
           },
           {
             "id": "numpy_09",
@@ -2060,8 +1939,7 @@ export const curriculumTree = [
             ],
             "emoji": "🐚",
             "direction": "전복나이예측에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_09",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_09"
           },
           {
             "id": "numpy_10",
@@ -2077,8 +1955,7 @@ export const curriculumTree = [
             ],
             "emoji": "🩺",
             "direction": "당뇨병종합분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.",
-            "slug": "dataAnalysis/numpy/numpy_10",
-            "code": "import numpy as np\nimport pandas as pd"
+            "slug": "dataAnalysis/numpy/numpy_10"
           }
         ]
       },
@@ -2098,8 +1975,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "판다스소개에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_00",
-            "code": "import pandas as pd\n\norders = pd.DataFrame({\n    \"orderId\": [\"O-1\", \"O-2\", \"O-3\"],\n    \"day\": [\"Mon\", \"Mon\", \"Tue\"],\n    \"amount\": [12000, 8000, 15000],\n})\n\ndaily = orders.groupby(\"day\", as_index=False)[\"amount\"].sum()\n\nassert list(orders.columns) == [\"orderId\", \"day\", \"amount\"]\nassert daily.set_index(\"day\").loc[\"Mon\", \"amount\"] == 20000\nassert daily[\"amount\"].sum() == orders[\"amount\"].sum()"
+            "slug": "dataAnalysis/pandas/pandas_00"
           },
           {
             "id": "pandas_01",
@@ -2113,8 +1989,7 @@ export const curriculumTree = [
             ],
             "emoji": "🍽️",
             "direction": "레스토랑팁분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_01",
-            "code": "import pandas as pd"
+            "slug": "dataAnalysis/pandas/pandas_01"
           },
           {
             "id": "pandas_02",
@@ -2130,8 +2005,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚢",
             "direction": "타이타닉 180명 로컬 승객 샘플로 Boolean Indexing + value_counts + loc/iloc을 손에 익혀 \"필터링 → 집계 → 위치 기반 선택\" 흐름을 완성합니다.",
-            "slug": "dataAnalysis/pandas/pandas_02",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\ntitanic = loadLocalDataset(\"titanic\")\ntitanic.shape"
+            "slug": "dataAnalysis/pandas/pandas_02"
           },
           {
             "id": "pandas_03",
@@ -2147,8 +2021,7 @@ export const curriculumTree = [
             ],
             "emoji": "🐧",
             "direction": "펭귄 데이터로 groupby + agg + query를 익혀 \"필터링 → 그룹 집계 → 극값 행 추출\" 흐름을 한 번에 손에 익힙니다.",
-            "slug": "dataAnalysis/pandas/pandas_03",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\npenguins = loadLocalDataset(\"penguins\")\npenguins.shape"
+            "slug": "dataAnalysis/pandas/pandas_03"
           },
           {
             "id": "pandas_04",
@@ -2164,8 +2037,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "붓꽃 데이터로 결측치 처리 + assign 파생 컬럼 + apply/map + 문자열 처리까지, 데이터 정제의 전 흐름을 한 강의에 익힙니다.",
-            "slug": "dataAnalysis/pandas/pandas_04",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\niris = loadLocalDataset(\"iris\")\niris.shape"
+            "slug": "dataAnalysis/pandas/pandas_04"
           },
           {
             "id": "pandas_05",
@@ -2181,8 +2053,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚗",
             "direction": "자동차연비분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_05",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\nmpg = loadLocalDataset(\"mpg\")\nmpg.shape"
+            "slug": "dataAnalysis/pandas/pandas_05"
           },
           {
             "id": "pandas_06",
@@ -2198,8 +2069,7 @@ export const curriculumTree = [
             ],
             "emoji": "✈️",
             "direction": "항공편시계열분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_06",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\nflights = loadLocalDataset(\"flights\")\nflights.shape"
+            "slug": "dataAnalysis/pandas/pandas_06"
           },
           {
             "id": "pandas_07",
@@ -2215,8 +2085,7 @@ export const curriculumTree = [
             ],
             "emoji": "💎",
             "direction": "다이아몬드가격분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_07",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\ndiamonds = loadLocalDataset(\"diamonds\")\ndiamonds.shape"
+            "slug": "dataAnalysis/pandas/pandas_07"
           },
           {
             "id": "pandas_08",
@@ -2232,8 +2101,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚗",
             "direction": "교통사고원인분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_08",
-            "code": "import pandas as pd\nfrom codaro.curriculum.localData import loadLocalDataset\n\ncrashes = loadLocalDataset(\"car_crashes\")\ncrashes.shape"
+            "slug": "dataAnalysis/pandas/pandas_08"
           },
           {
             "id": "pandas_09",
@@ -2249,8 +2117,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "두데이터합치기에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_09",
-            "code": "import pandas as pd\n\ncustomers = pd.DataFrame({\n    'customerId': [1, 2, 3, 4],\n    'name': ['김철수', '이영희', '박민수', '최지은'],\n    'grade': ['VIP', '일반', 'VIP', '일반']\n})\ncustomers"
+            "slug": "dataAnalysis/pandas/pandas_09"
           },
           {
             "id": "pandas_10",
@@ -2266,8 +2133,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚀",
             "direction": "실전종합프로젝트에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.",
-            "slug": "dataAnalysis/pandas/pandas_10",
-            "code": "import pandas as pd\n\ndef sampleGithubIssues(repo=\"pandas-dev/pandas\"):\n    project = repo.split(\"/\")[-1]\n    return [\n        {\n            \"number\": 101,\n            \"title\": f\"[{project}] Improve groupby documentation for beginners\",\n            \"state\": \"open\",\n            \"created_at\": \"2026-01-15T09:30:00Z\",\n            \"comments\": 4,\n            \"user\": {\"login\": \"dataTeacher\"},\n        },\n        {\n            \"number\": 102,\n            \"title\": f\"[{project}] Fix read_csv encoding edge case\",\n            \"state\": \"closed\",\n            \"created_at\": \"2026-01-10T12:00:00Z\",\n            \"comments\": 8,\n            \"user\": {\"login\": \"csvMaintainer\"},\n        },\n        {\n            \"number\": 103,\n            \"title\": f\"[{project}] Add examples for datetime parsing\",\n            \"state\":"
+            "slug": "dataAnalysis/pandas/pandas_10"
           },
           {
             "id": "pandas_11",
@@ -2282,8 +2148,7 @@ export const curriculumTree = [
             ],
             "emoji": "🪪",
             "direction": "데이터를 읽는 첫 순간의 타입 추론을 점검하고, 식별자를 문자열로 지켜 조인까지 안전하게 연결한다.",
-            "slug": "dataAnalysis/pandas/pandas_11",
-            "code": "import io\nimport pandas as pd\n\ncsv = \"id,amount\\n00123,10\\n00045,20\\n00123,30\\n\"\ndf = pd.read_csv(io.StringIO(csv))\n\nidDtypeName = str(df[\"id\"].dtype)\nfirstId = df[\"id\"].iloc[0]\n\nassert idDtypeName == \"int64\"\nassert firstId == 123\nidDtypeName"
+            "slug": "dataAnalysis/pandas/pandas_11"
           }
         ]
       },
@@ -2304,8 +2169,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Polars소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_00",
-            "code": "import polars as pl\n\norderFrame = pl.DataFrame({\n    \"orderId\": [1001, 1002, 1003, 1004, 1005, 1006],\n    \"channel\": [\"web\", \"store\", \"web\", \"partner\", \"store\", \"web\"],\n    \"quantity\": [3, 2, 5, 1, 4, 2],\n    \"unitPrice\": [12000, 18000, 9000, 40000, 15000, 22000],\n    \"refund\": [0, 0, 1, 0, 0, 0],\n})\n\ndef validateOrderFrame(frame: pl.DataFrame) -> bool:\n    requiredColumns = {\"orderId\", \"channel\", \"quantity\", \"unitPrice\", \"refund\"}\n    missingColumns = requiredColumns - set(frame.columns)\n    if missingColumns:\n        raise ValueError(f\"필수 컬럼 누락: {sorted(missingColumns)}\")\n    if frame.select((pl.col(\"quantity\") <= 0).any()).item():\n        raise ValueError(\"quantity는 0보다 커야 합니다.\")\n    if frame.select((pl.col(\"unitPrice\") <= 0).any()).item():\n        raise ValueError(\"unitPrice는 0보다 커야 합니"
+            "slug": "dataAnalysis/polars/polars_00"
           },
           {
             "id": "polars_01",
@@ -2321,8 +2185,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎬",
             "direction": "영화평점분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_01",
-            "code": "import polars as pl"
+            "slug": "dataAnalysis/polars/polars_01"
           },
           {
             "id": "polars_02",
@@ -2338,8 +2201,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌡️",
             "direction": "날씨데이터분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_02",
-            "code": "import polars as pl"
+            "slug": "dataAnalysis/polars/polars_02"
           },
           {
             "id": "polars_03",
@@ -2355,8 +2217,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎮",
             "direction": "게임판매분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_03",
-            "code": "import polars as pl\nfrom io import StringIO\nfrom codaro.curriculum.localData import loadLocalDataset\n\ngameCsv = loadLocalDataset(\"video_games\").to_csv(index=False)\ngames = pl.read_csv(StringIO(gameCsv))\ngames.shape"
+            "slug": "dataAnalysis/polars/polars_03"
           },
           {
             "id": "polars_04",
@@ -2372,8 +2233,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "주식데이터분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_04",
-            "code": "import polars as pl\nfrom io import StringIO\nfrom codaro.curriculum.localData import loadLocalDataset\n\nstockCsv = loadLocalDataset(\"apple_stock\").to_csv(index=False)\ndf = pl.read_csv(StringIO(stockCsv))\ndf.shape"
+            "slug": "dataAnalysis/polars/polars_04"
           },
           {
             "id": "polars_05",
@@ -2388,8 +2248,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎵",
             "direction": "음악스트리밍분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_05",
-            "code": "import polars as pl\nfrom io import StringIO\nfrom codaro.curriculum.localData import loadLocalDataset\n\nspotifyCsv = loadLocalDataset(\"spotify_songs\").to_csv(index=False)\nspotify = pl.read_csv(StringIO(spotifyCsv))\nspotify.shape"
+            "slug": "dataAnalysis/polars/polars_05"
           },
           {
             "id": "polars_06",
@@ -2405,8 +2264,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏠",
             "direction": "Boston 주택 506개 데이터로 Polars의 null 처리 + when-then + n_unique/std + join 흐름을 손에 익혀 실무 부동산 분석의 표준 패턴을 완성합니다.",
-            "slug": "dataAnalysis/polars/polars_06",
-            "code": "import polars as pl\nfrom io import StringIO\nfrom codaro.curriculum.localData import loadLocalDataset\n\nhousingCsv = loadLocalDataset(\"boston_housing\").to_csv(index=False)\nhousing = pl.read_csv(StringIO(housingCsv))\nhousing"
+            "slug": "dataAnalysis/polars/polars_06"
           },
           {
             "id": "polars_07",
@@ -2421,8 +2279,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚽",
             "direction": "스포츠통계분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_07",
-            "code": "import polars as pl\nfrom io import StringIO\nfrom codaro.curriculum.localData import loadLocalDataset\n\nfifaCsv = loadLocalDataset(\"fifa_players\").to_csv(index=False)\ndf = pl.read_csv(StringIO(fifaCsv))\ndf.shape"
+            "slug": "dataAnalysis/polars/polars_07"
           },
           {
             "id": "polars_08",
@@ -2438,8 +2295,7 @@ export const curriculumTree = [
             ],
             "emoji": "📱",
             "direction": "소셜미디어분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_08",
-            "code": "import polars as pl\nfrom datetime import datetime, timedelta\nimport random\n\nrandom.seed(42)\nbaseDate = datetime(2024, 1, 1)\nhashtags = [\"#python\", \"#data\", \"#ai\", \"#ml\", \"#tech\", \"#coding\", \"#dev\", \"#learn\"]\nplatforms = [\"twitter\", \"instagram\", \"facebook\"]\n\nposts = []\nfor i in range(1000):\n    posts.append({\n        \"postId\": i + 1,\n        \"postTime\": baseDate + timedelta(hours=random.randint(0, 24 * 180)),\n        \"platform\": random.choice(platforms),\n        \"likes\": random.randint(0, 1000),\n        \"comments\": random.randint(0, 200),\n        \"shares\": random.randint(0, 100),\n        \"hashtag\": random.choice(hashtags),\n    })\n\ndf = pl.DataFrame(posts)\ndf.head(5)"
+            "slug": "dataAnalysis/polars/polars_08"
           },
           {
             "id": "polars_09",
@@ -2454,8 +2310,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "대용량로그분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_09",
-            "code": "import polars as pl\nimport random\nfrom datetime import datetime, timedelta\n\nrandom.seed(42)\nn = 10000\nlevels = [\"INFO\", \"WARN\", \"ERROR\", \"DEBUG\"]\nendpoints = [\"/api/users\", \"/api/products\", \"/api/orders\", \"/api/auth\", \"/api/search\"]\nstatusCodes = [200, 201, 400, 401, 403, 404, 500, 502, 503]\n\nbase = datetime(2024, 1, 1)\nlogs = pl.DataFrame({\n    \"timestamp\": [base + timedelta(seconds=random.randint(0, 86400 * 7)) for _ in range(n)],\n    \"level\": [random.choice(levels) for _ in range(n)],\n    \"endpoint\": [random.choice(endpoints) for _ in range(n)],\n    \"responseTime\": [random.randint(10, 2000) for _ in range(n)],\n    \"statusCode\": [random.choice(statusCodes) for _ in range(n)],\n})\nlogs.head()"
+            "slug": "dataAnalysis/polars/polars_09"
           },
           {
             "id": "polars_10",
@@ -2470,8 +2325,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏆",
             "direction": "실전종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "dataAnalysis/polars/polars_10",
-            "code": "import polars as pl\n\nprojectPlan = pl.DataFrame({\n    \"단계\": [\"1.로드\", \"2.전처리\", \"3.결합\", \"4.변환\", \"5.필터\", \"6.집계\", \"7.윈도우\", \"8.피벗\", \"9.Lazy\", \"10.대시보드\"],\n    \"핵심함수\": [\"read_csv\", \"cast/null\", \"join\", \"with_columns\", \"filter\", \"group_by\", \"over\", \"pivot\", \"lazy/collect\", \"agg\"],\n    \"설명\": [\"3개 DataFrame 생성\", \"타입변환/결측치\", \"movieId로 조인\", \"ROI/등급 파생\", \"조건 추출\", \"장르별 통계\", \"순위/누적\", \"교차표 생성\", \"쿼리 최적화\", \"종합 요약\"]\n})\nprojectPlan"
+            "slug": "dataAnalysis/polars/polars_10"
           }
         ]
       },
@@ -2491,8 +2345,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pydantic소개에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_00",
-            "code": "from typing import Literal\nfrom pydantic import BaseModel, Field, ValidationError, computed_field, field_validator\n\nclass OrderInput(BaseModel):\n    orderId: str\n    customer: str\n    amount: int = Field(gt=0)\n    status: Literal['paid', 'pending', 'cancelled']\n\n    @field_validator('orderId', 'customer')\n    @classmethod\n    def stripRequiredText(cls, value):\n        cleaned = value.strip()\n        if not cleaned:\n            raise ValueError('text field must not be empty')\n        return cleaned\n\n    @computed_field\n    @property\n    def isRevenue(self) -> bool:\n        return self.status == 'paid'\n\nvalidOrder = OrderInput.model_validate({\n    'orderId': ' A-100 ',\n    'customer': ' kim ',\n    'amount': '120000',\n    'status': 'paid',\n})\n\nassert validOrder.orderId == 'A-100'\nassert valid"
+            "slug": "dataAnalysis/pydantic/pydantic_00"
           },
           {
             "id": "pydantic_01",
@@ -2507,8 +2360,7 @@ export const curriculumTree = [
             ],
             "emoji": "👤",
             "direction": "사용자모델만들기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_01",
-            "code": "import pydantic\nfrom pydantic import BaseModel, ValidationError"
+            "slug": "dataAnalysis/pydantic/pydantic_01"
           },
           {
             "id": "pydantic_02",
@@ -2523,8 +2375,7 @@ export const curriculumTree = [
             ],
             "emoji": "✅",
             "direction": "필드검증기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_02",
-            "code": "import pydantic\nfrom pydantic import BaseModel, Field, ValidationError, field_validator, model_validator, computed_field"
+            "slug": "dataAnalysis/pydantic/pydantic_02"
           },
           {
             "id": "pydantic_03",
@@ -2539,8 +2390,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏗️",
             "direction": "중첩모델설계에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_03",
-            "code": "import pydantic\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, Field, ValidationError"
+            "slug": "dataAnalysis/pydantic/pydantic_03"
           },
           {
             "id": "pydantic_04",
@@ -2555,8 +2405,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔄",
             "direction": "타입변환기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_04",
-            "code": "import pydantic"
+            "slug": "dataAnalysis/pydantic/pydantic_04"
           },
           {
             "id": "pydantic_05",
@@ -2571,8 +2420,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚙️",
             "direction": "설정관리기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_05",
-            "code": "from pydantic import BaseModel, Field, SecretStr, field_validator\nfrom pydantic_settings import BaseSettings, SettingsConfigDict"
+            "slug": "dataAnalysis/pydantic/pydantic_05"
           },
           {
             "id": "pydantic_06",
@@ -2587,8 +2435,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "JSON스키마생성에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_06",
-            "code": "import json\nimport pydantic\nfrom enum import Enum\nfrom typing import Optional, List, Dict\nfrom pydantic import BaseModel, Field, ConfigDict"
+            "slug": "dataAnalysis/pydantic/pydantic_06"
           },
           {
             "id": "pydantic_07",
@@ -2603,8 +2450,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "커스텀타입정의에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_07",
-            "code": "import re\nimport pydantic\nfrom typing import Annotated, Optional\nfrom pydantic import BaseModel, Field, BeforeValidator, AfterValidator, ValidationError"
+            "slug": "dataAnalysis/pydantic/pydantic_07"
           },
           {
             "id": "pydantic_08",
@@ -2619,8 +2465,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚨",
             "direction": "에러처리기법에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_08",
-            "code": "import pydantic\nfrom pydantic import BaseModel, Field, ValidationError, field_validator"
+            "slug": "dataAnalysis/pydantic/pydantic_08"
           },
           {
             "id": "pydantic_09",
@@ -2635,8 +2480,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚡",
             "direction": "FastAPI통합에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_09",
-            "code": "import pydantic\nfrom typing import Optional, List\nfrom pydantic import BaseModel, Field, ValidationError"
+            "slug": "dataAnalysis/pydantic/pydantic_09"
           },
           {
             "id": "pydantic_10",
@@ -2651,8 +2495,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚀",
             "direction": "종합데이터파이프라인에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.",
-            "slug": "dataAnalysis/pydantic/pydantic_10",
-            "code": "import pydantic"
+            "slug": "dataAnalysis/pydantic/pydantic_10"
           }
         ]
       }
@@ -2680,8 +2523,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Altair소개에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_00",
-            "code": "import altair as alt\nfrom codaro.curriculum.localData import loadLocalDataset\n\naltairMpg = loadLocalDataset(\"mpg\")\nrequiredColumns = {\"mpg\", \"horsepower\", \"weight\", \"origin\"}\nmissingColumns = requiredColumns - set(altairMpg.columns)\n\nassert not missingColumns, f\"필수 컬럼 누락: {missingColumns}\"\nassert altairMpg[[\"mpg\", \"horsepower\", \"weight\"]].gt(0).all().all()\nassert altairMpg[[\"weight\", \"mpg\"]].corr().loc[\"weight\", \"mpg\"] < -0.5"
+            "slug": "visualization/altair/altair_00"
           },
           {
             "id": "altair_01",
@@ -2695,8 +2537,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚗",
             "direction": "자동차연비탐색에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_01",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\nmpg = loadLocalDataset(\"mpg\")"
+            "slug": "visualization/altair/altair_01"
           },
           {
             "id": "altair_02",
@@ -2712,8 +2553,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "붓꽃품종구분에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_02",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\niris = loadLocalDataset(\"iris\")"
+            "slug": "visualization/altair/altair_02"
           },
           {
             "id": "altair_03",
@@ -2728,8 +2568,7 @@ export const curriculumTree = [
             ],
             "emoji": "💵",
             "direction": "팁데이터분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_03",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\ntips = loadLocalDataset(\"tips\")"
+            "slug": "visualization/altair/altair_03"
           },
           {
             "id": "altair_04",
@@ -2743,8 +2582,7 @@ export const curriculumTree = [
             ],
             "emoji": "🐧",
             "direction": "펭귄서식지분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_04",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\npenguins = loadLocalDataset(\"penguins\")"
+            "slug": "visualization/altair/altair_04"
           },
           {
             "id": "altair_05",
@@ -2759,8 +2597,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚢",
             "direction": "타이타닉생존분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_05",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\ntitanic = loadLocalDataset(\"titanic\")"
+            "slug": "visualization/altair/altair_05"
           },
           {
             "id": "altair_06",
@@ -2775,8 +2612,7 @@ export const curriculumTree = [
             ],
             "emoji": "✈️",
             "direction": "항공편분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_06",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\nflights = loadLocalDataset(\"flights\")"
+            "slug": "visualization/altair/altair_06"
           },
           {
             "id": "altair_07",
@@ -2791,8 +2627,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎮",
             "direction": "인터랙티브필터에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_07",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\nmpg = loadLocalDataset(\"mpg\")"
+            "slug": "visualization/altair/altair_07"
           },
           {
             "id": "altair_08",
@@ -2807,8 +2642,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "다중뷰연결에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_08",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\niris = loadLocalDataset(\"iris\")"
+            "slug": "visualization/altair/altair_08"
           },
           {
             "id": "altair_09",
@@ -2822,8 +2656,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔄",
             "direction": "고급데이터변환에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_09",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\ntips = loadLocalDataset(\"tips\")"
+            "slug": "visualization/altair/altair_09"
           },
           {
             "id": "altair_10",
@@ -2838,8 +2671,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "종합대시보드에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.",
-            "slug": "visualization/altair/altair_10",
-            "code": "import altair as alt\nimport pandas as pd\nimport warnings\nwarnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\nfrom codaro.curriculum.localData import loadLocalDataset\n\nmpg = loadLocalDataset(\"mpg\")"
+            "slug": "visualization/altair/altair_10"
           }
         ]
       },
@@ -2859,8 +2691,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Folium 소개에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_00",
-            "code": "import folium\n\nofficeSites = [\n    {\"name\": \"서울 운영센터\", \"loc\": [37.5665, 126.9780], \"priority\": \"core\"},\n    {\"name\": \"강남 상담센터\", \"loc\": [37.4979, 127.0276], \"priority\": \"high\"},\n    {\"name\": \"홍대 체험존\", \"loc\": [37.5563, 126.9236], \"priority\": \"medium\"},\n]\n\ndef validateSite(site):\n    lat, lon = site[\"loc\"]\n    if not (33 <= lat <= 39 and 124 <= lon <= 132):\n        raise ValueError(f\"한국 좌표 범위 밖: {site['name']}\")\n    if site[\"priority\"] not in {\"core\", \"high\", \"medium\"}:\n        raise ValueError(f\"알 수 없는 우선순위: {site['priority']}\")\n    return True\n\nvalidationResult = [validateSite(site) for site in officeSites]\nvalidationResult"
+            "slug": "visualization/folium/folium_00"
           },
           {
             "id": "folium_01",
@@ -2875,8 +2706,7 @@ export const curriculumTree = [
             ],
             "emoji": "📍",
             "direction": "첫지도만들기에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_01",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_01"
           },
           {
             "id": "folium_02",
@@ -2892,8 +2722,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "다양한마커표현에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_02",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_02"
           },
           {
             "id": "folium_03",
@@ -2909,8 +2738,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔷",
             "direction": "도형 그리기에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_03",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_03"
           },
           {
             "id": "folium_04",
@@ -2925,8 +2753,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "지도 스타일 변경에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_04",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_04"
           },
           {
             "id": "folium_05",
@@ -2941,8 +2768,7 @@ export const curriculumTree = [
             ],
             "emoji": "📚",
             "direction": "레이어 관리에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_05",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_05"
           },
           {
             "id": "folium_06",
@@ -2957,8 +2783,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗾",
             "direction": "GeoJSON 활용에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_06",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_06"
           },
           {
             "id": "folium_07",
@@ -2973,8 +2798,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌈",
             "direction": "단계구분도에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_07",
-            "code": "import folium"
+            "slug": "visualization/folium/folium_07"
           },
           {
             "id": "folium_08",
@@ -2989,8 +2813,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔥",
             "direction": "히트맵에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_08",
-            "code": "import folium\nfrom folium.plugins import HeatMap"
+            "slug": "visualization/folium/folium_08"
           },
           {
             "id": "folium_09",
@@ -3005,8 +2828,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "마커 클러스터에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_09",
-            "code": "import folium\nfrom folium.plugins import MarkerCluster"
+            "slug": "visualization/folium/folium_09"
           },
           {
             "id": "folium_10",
@@ -3021,8 +2843,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏆",
             "direction": "종합 지도 프로젝트에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.",
-            "slug": "visualization/folium/folium_10",
-            "code": "import folium\nfrom folium.plugins import HeatMap, MarkerCluster\nimport branca.colormap as cm\nimport random"
+            "slug": "visualization/folium/folium_10"
           }
         ]
       },
@@ -3043,8 +2864,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Matplotlib소개에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_00",
-            "code": "import pandas as pd\nimport matplotlib.pyplot as plt\n\nreportData = pd.DataFrame({\n    \"month\": [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n    \"revenue\": [82, 91, 105, 112, 121, 130],\n    \"cost\": [55, 58, 62, 64, 68, 72],\n    \"target\": [100, 100, 100, 100, 100, 100],\n})\n\ndef validateChartFrame(frame: pd.DataFrame) -> bool:\n    requiredColumns = {\"month\", \"revenue\", \"cost\", \"target\"}\n    missingColumns = requiredColumns - set(frame.columns)\n    if missingColumns:\n        raise ValueError(f\"필수 컬럼 누락: {sorted(missingColumns)}\")\n    if frame[[\"revenue\", \"cost\", \"target\"]].lt(0).any().any():\n        raise ValueError(\"금액 컬럼은 음수가 될 수 없습니다.\")\n    return True\n\nvalidateChartFrame(reportData)\nreportData"
+            "slug": "visualization/matplotlib/matplotlib_00"
           },
           {
             "id": "matplotlib_01",
@@ -3060,8 +2880,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "주가추세분석에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_01",
-            "code": "import matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_01"
           },
           {
             "id": "matplotlib_02",
@@ -3077,8 +2896,7 @@ export const curriculumTree = [
             ],
             "emoji": "💵",
             "direction": "팁데이터분포탐색에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_02",
-            "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_02"
           },
           {
             "id": "matplotlib_03",
@@ -3094,8 +2912,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "붓꽃품종산점도에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_03",
-            "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_03"
           },
           {
             "id": "matplotlib_04",
@@ -3111,8 +2928,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "대륙별인구비교에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_04",
-            "code": "import matplotlib.pyplot as plt\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_04"
           },
           {
             "id": "matplotlib_05",
@@ -3128,8 +2944,7 @@ export const curriculumTree = [
             ],
             "emoji": "🐧",
             "direction": "펭귄체중분석에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_05",
-            "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_05"
           },
           {
             "id": "matplotlib_06",
@@ -3145,8 +2960,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔥",
             "direction": "상관관계히트맵에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_06",
-            "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport numpy as np"
+            "slug": "visualization/matplotlib/matplotlib_06"
           },
           {
             "id": "matplotlib_07",
@@ -3161,8 +2975,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌡️",
             "direction": "시계열다중축차트에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_07",
-            "code": "import matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_07"
           },
           {
             "id": "matplotlib_08",
@@ -3178,8 +2991,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "다중패널대시보드에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_08",
-            "code": "import matplotlib.pyplot as plt\nfrom matplotlib.gridspec import GridSpec\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport numpy as np"
+            "slug": "visualization/matplotlib/matplotlib_08"
           },
           {
             "id": "matplotlib_09",
@@ -3195,8 +3007,7 @@ export const curriculumTree = [
             ],
             "emoji": "📝",
             "direction": "고급주석차트에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_09",
-            "code": "import matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_09"
           },
           {
             "id": "matplotlib_10",
@@ -3212,8 +3023,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "종합분석리포트에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.",
-            "slug": "visualization/matplotlib/matplotlib_10",
-            "code": "import matplotlib.pyplot as plt\nfrom matplotlib.gridspec import GridSpec\nfrom mpl_toolkits.axes_grid1.inset_locator import inset_axes\nfrom matplotlib.colors import Normalize\nimport matplotlib.cm as cm\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport numpy as np\nimport pandas as pd"
+            "slug": "visualization/matplotlib/matplotlib_10"
           }
         ]
       },
@@ -3233,8 +3043,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Plotly소개에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_00",
-            "code": "import plotly.express as px\nfrom codaro.curriculum.localData import loadLocalDataset\n\nplotlyTips = loadLocalDataset(\"tips\")\nrequiredColumns = {\"total_bill\", \"tip\", \"time\", \"day\"}\nmissingColumns = requiredColumns - set(plotlyTips.columns)\n\nassert not missingColumns, f\"필수 컬럼 누락: {missingColumns}\"\nassert plotlyTips[\"total_bill\"].gt(plotlyTips[\"tip\"]).all()\n\nbillTipCorrelation = plotlyTips[[\"total_bill\", \"tip\"]].corr().loc[\"total_bill\", \"tip\"]\nassert billTipCorrelation > 0.6\nround(float(billTipCorrelation), 3)"
+            "slug": "visualization/plotly/plotly_00"
           },
           {
             "id": "plotly_01",
@@ -3248,8 +3057,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "세계기대수명비교에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_01",
-            "code": "import plotly.express as px\nimport pandas as pd"
+            "slug": "visualization/plotly/plotly_01"
           },
           {
             "id": "plotly_02",
@@ -3264,8 +3072,7 @@ export const curriculumTree = [
             ],
             "emoji": "💵",
             "direction": "팁데이터분포분석에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_02",
-            "code": "import plotly.express as px\nimport pandas as pd\n\ntips = px.data.tips()\ntips.head()"
+            "slug": "visualization/plotly/plotly_02"
           },
           {
             "id": "plotly_03",
@@ -3281,8 +3088,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "붓꽃품종분류에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_03",
-            "code": "import plotly.express as px\nimport pandas as pd\niris = px.data.iris()\niris"
+            "slug": "visualization/plotly/plotly_03"
           },
           {
             "id": "plotly_04",
@@ -3297,8 +3103,7 @@ export const curriculumTree = [
             ],
             "emoji": "💰",
             "direction": "GDP기대수명관계에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_04",
-            "code": "import plotly.express as px\nimport pandas as pd\ngapminder = px.data.gapminder()\ndf2007 = gapminder[gapminder['year'] == 2007]\ndf2007.head()"
+            "slug": "visualization/plotly/plotly_04"
           },
           {
             "id": "plotly_05",
@@ -3313,8 +3118,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗺️",
             "direction": "세계인구지도에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_05",
-            "code": "import plotly.express as px\nimport pandas as pd\ndf = px.data.gapminder()\ndf.head()"
+            "slug": "visualization/plotly/plotly_05"
           },
           {
             "id": "plotly_06",
@@ -3328,8 +3132,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "시간에따른세계변화에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_06",
-            "code": "import plotly.express as px\nimport pandas as pd\ngap = px.data.gapminder()\ngap.shape"
+            "slug": "visualization/plotly/plotly_06"
           },
           {
             "id": "plotly_07",
@@ -3345,8 +3148,7 @@ export const curriculumTree = [
             ],
             "emoji": "🍽️",
             "direction": "레스토랑매출분석에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_07",
-            "code": "import plotly.express as px\nfrom plotly.subplots import make_subplots\nimport plotly.graph_objects as go\nimport pandas as pd\n\ntips = px.data.tips()\ntips"
+            "slug": "visualization/plotly/plotly_07"
           },
           {
             "id": "plotly_08",
@@ -3361,8 +3163,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "대륙별계층구조에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_08",
-            "code": "import plotly.express as px\nimport pandas as pd\n\ngapminder = px.data.gapminder()\ndf2007 = gapminder.query(\"year == 2007\")\ndf2007.head()"
+            "slug": "visualization/plotly/plotly_08"
           },
           {
             "id": "plotly_09",
@@ -3378,8 +3179,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "주식시계열분석에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_09",
-            "code": "import plotly.express as px\nimport plotly.graph_objects as go\nfrom plotly.subplots import make_subplots\nimport pandas as pd\n\nstocks = px.data.stocks()\nstocks.shape"
+            "slug": "visualization/plotly/plotly_09"
           },
           {
             "id": "plotly_10",
@@ -3394,8 +3194,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "종합대시보드에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.",
-            "slug": "visualization/plotly/plotly_10",
-            "code": "import plotly.express as px\nimport plotly.graph_objects as go\nfrom plotly.subplots import make_subplots\nimport pandas as pd\n\ngapminder = px.data.gapminder()\ndf2007 = gapminder[gapminder['year'] == 2007]\ngapminder"
+            "slug": "visualization/plotly/plotly_10"
           }
         ]
       },
@@ -3416,8 +3215,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Seaborn소개에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_00",
-            "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\n\nseabornTips = loadLocalDataset(\"tips\")\nrequiredColumns = {\"total_bill\", \"tip\", \"sex\", \"smoker\", \"day\", \"time\", \"size\"}\nmissingColumns = requiredColumns - set(seabornTips.columns)\n\nassert not missingColumns, f\"필수 컬럼 누락: {missingColumns}\"\nassert len(seabornTips) >= 100\nassert seabornTips[\"total_bill\"].gt(seabornTips[\"tip\"]).all()\n\nprediction = \"계산 금액이 클수록 팁도 대체로 커질 것이다\"\ncorrelation = seabornTips[[\"total_bill\", \"tip\"]].corr().loc[\"total_bill\", \"tip\"]\nassert correlation > 0.6\n\nprint(prediction, round(correlation, 3))"
+            "slug": "visualization/seaborn/seaborn_00"
           },
           {
             "id": "seaborn_01",
@@ -3432,8 +3230,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "붓꽃품종산점도에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_01",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt"
+            "slug": "visualization/seaborn/seaborn_01"
           },
           {
             "id": "seaborn_02",
@@ -3449,8 +3246,7 @@ export const curriculumTree = [
             ],
             "emoji": "💵",
             "direction": "팁데이터분포탐색에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_02",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt"
+            "slug": "visualization/seaborn/seaborn_02"
           },
           {
             "id": "seaborn_03",
@@ -3465,8 +3261,7 @@ export const curriculumTree = [
             ],
             "emoji": "🐧",
             "direction": "펭귄체중분포비교에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_03",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt"
+            "slug": "visualization/seaborn/seaborn_03"
           },
           {
             "id": "seaborn_04",
@@ -3482,8 +3277,7 @@ export const curriculumTree = [
             ],
             "emoji": "📺",
             "direction": "광고비판매액회귀에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_04",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd"
+            "slug": "visualization/seaborn/seaborn_04"
           },
           {
             "id": "seaborn_05",
@@ -3499,8 +3293,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚢",
             "direction": "타이타닉생존분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_05",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt"
+            "slug": "visualization/seaborn/seaborn_05"
           },
           {
             "id": "seaborn_06",
@@ -3516,8 +3309,7 @@ export const curriculumTree = [
             ],
             "emoji": "✈️",
             "direction": "항공편승객시계열에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_06",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nflights = loadLocalDataset('flights')\nflights"
+            "slug": "visualization/seaborn/seaborn_06"
           },
           {
             "id": "seaborn_07",
@@ -3532,8 +3324,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌍",
             "direction": "세계기대수명분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_07",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\ngapminder = loadLocalDataset(\"gapminder\")\ngapminder"
+            "slug": "visualization/seaborn/seaborn_07"
           },
           {
             "id": "seaborn_08",
@@ -3549,8 +3340,7 @@ export const curriculumTree = [
             ],
             "emoji": "💎",
             "direction": "다이아몬드가격분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_08",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\ndiamonds = loadLocalDataset('diamonds')\ndiamonds"
+            "slug": "visualization/seaborn/seaborn_08"
           },
           {
             "id": "seaborn_09",
@@ -3566,8 +3356,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚗",
             "direction": "자동차연비종합분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_09",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nmpg = loadLocalDataset('mpg').dropna()\nmpg"
+            "slug": "visualization/seaborn/seaborn_09"
           },
           {
             "id": "seaborn_10",
@@ -3583,8 +3372,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "종합EDA리포트에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.",
-            "slug": "visualization/seaborn/seaborn_10",
-            "code": "import seaborn as sns\nfrom codaro.curriculum.localData import loadLocalDataset\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nsns.set_theme(style='whitegrid', palette='Set2', font_scale=1.1)\npenguins = loadLocalDataset('penguins').dropna()\npenguins"
+            "slug": "visualization/seaborn/seaborn_10"
           }
         ]
       }
@@ -3610,8 +3398,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "NetworkX 소개에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_00",
-            "code": "import networkx as nx\n\nhandoffEdges = [\n    (\"sales\", \"support\", 1),\n    (\"support\", \"ops\", 2),\n    (\"ops\", \"finance\", 1),\n    (\"ops\", \"engineering\", 1),\n    (\"engineering\", \"infra\", 2),\n    (\"support\", \"customer_success\", 2),\n]\n\nworkflowGraph = nx.Graph()\nworkflowGraph.add_weighted_edges_from(handoffEdges)\n\nexpectedNodes = {\"sales\", \"support\", \"ops\", \"finance\", \"engineering\", \"infra\", \"customer_success\"}\nif set(workflowGraph.nodes()) != expectedNodes:\n    raise ValueError(\"인수인계 네트워크의 부서 목록이 예상과 다릅니다.\")\nif any(data[\"weight\"] <= 0 for _, _, data in workflowGraph.edges(data=True)):\n    raise ValueError(\"인수인계 비용은 0보다 커야 합니다.\")\n\nsalesToFinanceCost = nx.shortest_path_length(workflowGraph, \"sales\", \"finance\", weight=\"weight\")\nbetweenness = nx.betweenness_centrality(workflowGraph, weight=\"weight\""
+            "slug": "mathStatsMl/networkx/networkx_00"
           },
           {
             "id": "networkx_01",
@@ -3626,8 +3413,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌐",
             "direction": "첫그래프만들기에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_01",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_01"
           },
           {
             "id": "networkx_02",
@@ -3642,8 +3428,7 @@ export const curriculumTree = [
             ],
             "emoji": "➡️",
             "direction": "방향그래프와가중치에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_02",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_02"
           },
           {
             "id": "networkx_03",
@@ -3658,8 +3443,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛤️",
             "direction": "최단경로찾기에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_03",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_03"
           },
           {
             "id": "networkx_04",
@@ -3675,8 +3459,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "중심성분석에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_04",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_04"
           },
           {
             "id": "networkx_05",
@@ -3691,8 +3474,7 @@ export const curriculumTree = [
             ],
             "emoji": "🥋",
             "direction": "소셜네트워크분석에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_05",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_05"
           },
           {
             "id": "networkx_06",
@@ -3707,8 +3489,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "연결성분석에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_06",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_06"
           },
           {
             "id": "networkx_07",
@@ -3723,8 +3504,7 @@ export const curriculumTree = [
             ],
             "emoji": "👥",
             "direction": "커뮤니티탐지에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_07",
-            "code": "import networkx as nx\nfrom networkx.algorithms import community\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_07"
           },
           {
             "id": "networkx_08",
@@ -3739,8 +3519,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "그래프알고리즘에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_08",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_08"
           },
           {
             "id": "networkx_09",
@@ -3755,8 +3534,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎲",
             "direction": "랜덤그래프모델에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_09",
-            "code": "import networkx as nx\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_09"
           },
           {
             "id": "networkx_10",
@@ -3771,8 +3549,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎓",
             "direction": "종합네트워크프로젝트에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.",
-            "slug": "mathStatsMl/networkx/networkx_10",
-            "code": "import networkx as nx\nfrom networkx.algorithms import community\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/networkx/networkx_10"
           }
         ]
       },
@@ -3792,8 +3569,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "scipy소개에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_00",
-            "code": "import numpy as np\nfrom scipy import optimize, stats\n\nlatencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)\n\ndef validateLatencySamples(samples):\n    values = np.asarray(samples, dtype=float)\n    if values.size < 5:\n        raise ValueError(\"통계 검정에는 최소 5개 이상의 측정값이 필요합니다.\")\n    if not np.isfinite(values).all():\n        raise ValueError(\"지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.\")\n    if (values <= 0).any():\n        raise ValueError(\"지연시간은 0보다 커야 합니다.\")\n    return values\n\ncleanLatency = validateLatencySamples(latencySamples)\ncleanLatency.mean(), cleanLatency.std(ddof=1)"
+            "slug": "mathStatsMl/scipy/scipy_00"
           },
           {
             "id": "scipy_01",
@@ -3808,8 +3584,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎲",
             "direction": "확률분포탐색기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_01",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import stats\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/scipy/scipy_01"
           },
           {
             "id": "scipy_02",
@@ -3824,8 +3599,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧪",
             "direction": "AB테스트분석에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_02",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import stats\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nnp.random.seed(42)\ncontrolGroup = np.random.normal(loc=50, scale=15, size=1000)\ntreatmentGroup = np.random.normal(loc=53, scale=15, size=1000)"
+            "slug": "mathStatsMl/scipy/scipy_02"
           },
           {
             "id": "scipy_03",
@@ -3840,8 +3614,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "데이터보간기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_03",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import interpolate\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nhours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])\ntemps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])"
+            "slug": "mathStatsMl/scipy/scipy_03"
           },
           {
             "id": "scipy_04",
@@ -3856,8 +3629,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "곡선피팅마스터에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_04",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import optimize\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nnp.random.seed(42)\nmonths = np.arange(1, 13)\nusers = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)\nusers = np.maximum(users, 0).astype(int)"
+            "slug": "mathStatsMl/scipy/scipy_04"
           },
           {
             "id": "scipy_05",
@@ -3872,8 +3644,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔔",
             "direction": "정규성검정기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_05",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import stats\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nnp.random.seed(42)\nnormalData = np.random.normal(loc=50, scale=10, size=100)\npurchaseData = np.random.lognormal(mean=4, sigma=1, size=150)"
+            "slug": "mathStatsMl/scipy/scipy_05"
           },
           {
             "id": "scipy_06",
@@ -3888,8 +3659,7 @@ export const curriculumTree = [
             ],
             "emoji": "💰",
             "direction": "포트폴리오최적화에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_06",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import optimize\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nassets = ['Stock A', 'Stock B', 'Bond', 'Gold']\nreturns = np.array([0.12, 0.10, 0.05, 0.07])\n\ncovMatrix = np.array([\n    [0.0225, 0.0135, 0.0020, 0.0010],\n    [0.0135, 0.0196, 0.0015, 0.0005],\n    [0.0020, 0.0015, 0.0025, 0.0002],\n    [0.0010, 0.0005, 0.0002, 0.0100]\n])\n\nassetDf = pd.DataFrame({\n    'Asset': assets,\n    'Return': [f'{r*100:.1f}%' for r in returns],\n    'Volatility': [f'{np.sqrt(covMatrix[i,i])*100:.1f}%' for i in range(len(assets))]\n})\nassetDf"
+            "slug": "mathStatsMl/scipy/scipy_06"
           },
           {
             "id": "scipy_07",
@@ -3904,8 +3674,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔊",
             "direction": "신호필터링에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_07",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import signal\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nfs = 500\nt = np.linspace(0, 1, fs)\n\ncleanSig = np.sin(2 * np.pi * 5 * t)\nnoise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))\nnoisySig = cleanSig + noise"
+            "slug": "mathStatsMl/scipy/scipy_07"
           },
           {
             "id": "scipy_08",
@@ -3920,8 +3689,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "수치적분기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_08",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import integrate\nimport matplotlib.pyplot as plt\nimport pandas as pd"
+            "slug": "mathStatsMl/scipy/scipy_08"
           },
           {
             "id": "scipy_09",
@@ -3936,8 +3704,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "스펙트럼분석기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_09",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import fft\nfrom scipy import signal\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nfs = 500\nduration = 2\nt = np.linspace(0, duration, fs * duration, endpoint=False)\n\nfreq1, amp1 = 5, 1.0\nfreq2, amp2 = 15, 0.5\nfreq3, amp3 = 30, 0.3\n\nsig1 = amp1 * np.sin(2 * np.pi * freq1 * t)\nsig2 = amp2 * np.sin(2 * np.pi * freq2 * t)\nsig3 = amp3 * np.sin(2 * np.pi * freq3 * t)\n\ncompositeSignal = sig1 + sig2 + sig3"
+            "slug": "mathStatsMl/scipy/scipy_09"
           },
           {
             "id": "scipy_10",
@@ -3952,8 +3719,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔬",
             "direction": "종합과학프로젝트에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.",
-            "slug": "mathStatsMl/scipy/scipy_10",
-            "code": "import scipy\n\nimport numpy as np\nfrom scipy import signal, fft, stats, optimize, integrate\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nnp.random.seed(42)\nfs = 1000\nduration = 10\nt = np.linspace(0, duration, fs * duration, endpoint=False)\nn = len(t)\n\nrotationFreq = 50\nnormalVib = 1.0 * np.sin(2 * np.pi * rotationFreq * t)\nnormalVib += 0.3 * np.sin(2 * np.pi * 2 * rotationFreq * t)\n\ndefectFreq = 120\ndefectVib = 0.4 * np.sin(2 * np.pi * defectFreq * t)\n\npowerNoise = 0.2 * np.sin(2 * np.pi * 60 * t)\nrandomNoise = 0.3 * np.random.randn(n)\n\nrawSignal = normalVib + defectVib + powerNoise + randomNoise"
+            "slug": "mathStatsMl/scipy/scipy_10"
           }
         ]
       },
@@ -3973,8 +3739,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "sklearn소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_00",
-            "code": "from sklearn.datasets import make_classification\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, f1_score\n\nfeatures, target = make_classification(\n    n_samples=240,\n    n_features=6,\n    n_informative=4,\n    n_redundant=0,\n    class_sep=1.4,\n    random_state=42,\n)\nxTrain, xTest, yTrain, yTest = train_test_split(\n    features, target, test_size=0.25, random_state=42, stratify=target\n)\n\nriskPipeline = Pipeline([\n    (\"scaler\", StandardScaler()),\n    (\"classifier\", LogisticRegression(max_iter=1000, random_state=42)),\n])\n\ndef fitRiskModel(pipeline, featureMatrix, labels):\n    pipeline.fit(featureMatrix, labe"
+            "slug": "mathStatsMl/sklearn/sklearn_00"
           },
           {
             "id": "sklearn_01",
@@ -3989,8 +3754,7 @@ export const curriculumTree = [
             ],
             "emoji": "🍷",
             "direction": "와인품질분류에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_01",
-            "code": "import sklearn"
+            "slug": "mathStatsMl/sklearn/sklearn_01"
           },
           {
             "id": "sklearn_02",
@@ -4005,8 +3769,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏥",
             "direction": "유방암진단에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_02",
-            "code": "from sklearn.datasets import load_breast_cancer\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score\nfrom sklearn.metrics import confusion_matrix, classification_report\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns"
+            "slug": "mathStatsMl/sklearn/sklearn_02"
           },
           {
             "id": "sklearn_03",
@@ -4021,8 +3784,7 @@ export const curriculumTree = [
             ],
             "emoji": "💉",
             "direction": "당뇨병진행도예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_03",
-            "code": "from sklearn.datasets import load_diabetes\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/sklearn/sklearn_03"
           },
           {
             "id": "sklearn_04",
@@ -4037,8 +3799,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏠",
             "direction": "주택가격예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_04",
-            "code": "from sklearn.model_selection import train_test_split, cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LinearRegression, Ridge\nfrom sklearn.metrics import mean_squared_error, r2_score\nfrom codaro.curriculum.localData import loadLocalDataset\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/sklearn/sklearn_04"
           },
           {
             "id": "sklearn_05",
@@ -4053,8 +3814,7 @@ export const curriculumTree = [
             ],
             "emoji": "✍️",
             "direction": "손글씨숫자인식에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_05",
-            "code": "from sklearn.datasets import load_digits\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, classification_report, confusion_matrix\nfrom sklearn.decomposition import PCA\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns"
+            "slug": "mathStatsMl/sklearn/sklearn_05"
           },
           {
             "id": "sklearn_06",
@@ -4069,8 +3829,7 @@ export const curriculumTree = [
             ],
             "emoji": "👥",
             "direction": "고객세분화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_06",
-            "code": "from sklearn.datasets import make_blobs, make_moons\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.cluster import KMeans\nfrom sklearn.metrics import silhouette_score\nfrom sklearn.decomposition import PCA\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt"
+            "slug": "mathStatsMl/sklearn/sklearn_06"
           },
           {
             "id": "sklearn_07",
@@ -4085,8 +3844,7 @@ export const curriculumTree = [
             ],
             "emoji": "📡",
             "direction": "소나신호분류에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_07",
-            "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler, LabelEncoder\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score, classification_report, confusion_matrix\nimport matplotlib.pyplot as plt\nfrom codaro.curriculum.localData import loadLocalDataset\n\nsonar = loadLocalDataset(\"sonar\")\nsonar"
+            "slug": "mathStatsMl/sklearn/sklearn_07"
           },
           {
             "id": "sklearn_08",
@@ -4101,8 +3859,7 @@ export const curriculumTree = [
             ],
             "emoji": "❤️",
             "direction": "심장병예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_08",
-            "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.ensemble import GradientBoostingClassifier\nfrom sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, classification_report\nimport matplotlib.pyplot as plt\nfrom codaro.curriculum.localData import loadLocalDataset\n\nheart = loadLocalDataset(\"heart\")\nheart"
+            "slug": "mathStatsMl/sklearn/sklearn_08"
           },
           {
             "id": "sklearn_09",
@@ -4117,8 +3874,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "신호탐지최적화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_09",
-            "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.svm import SVC\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score, classification_report\nimport matplotlib.pyplot as plt\n\nwine = load_wine()\nX = pd.DataFrame(wine.data, columns=wine.feature_names)\ny = wine.target\nX.shape, np.unique(y)"
+            "slug": "mathStatsMl/sklearn/sklearn_09"
           },
           {
             "id": "sklearn_10",
@@ -4133,8 +3889,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔧",
             "direction": "종합ML파이프라인에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sklearn/sklearn_10",
-            "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV\nfrom sklearn.preprocessing import StandardScaler, OneHotEncoder\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, classification_report, roc_auc_score\nimport matplotlib.pyplot as plt\nfrom codaro.curriculum.localData import loadLocalDataset\n\ntitanic = loadLocalDataset(\"titanic_passengers\")\ntitanic.head()"
+            "slug": "mathStatsMl/sklearn/sklearn_10"
           }
         ]
       },
@@ -4154,8 +3909,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "statsmodels소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_00",
-            "code": "import pandas as pd\nimport statsmodels.api as sm\nfrom statsmodels.stats.diagnostic import het_breuschpagan\nfrom codaro.curriculum.localData import loadLocalDataset\n\nmarketingData = loadLocalDataset(\"advertising\")\nrequiredColumns = [\"TV\", \"Radio\", \"Newspaper\", \"Sales\"]\n\nmissingColumns = [column for column in requiredColumns if column not in marketingData.columns]\nif missingColumns:\n    raise ValueError(f\"필수 컬럼이 없습니다: {missingColumns}\")\nif marketingData[requiredColumns].isna().any().any():\n    raise ValueError(\"회귀분석 전 결측치를 처리해야 합니다.\")\n\nreportY = marketingData[\"Sales\"]\nreportX = sm.add_constant(marketingData[[\"TV\", \"Radio\", \"Newspaper\"]])\nreportModel = sm.OLS(reportY, reportX).fit()\n\nmarketingData[requiredColumns].head()"
+            "slug": "mathStatsMl/statsmodels/statsmodels_00"
           },
           {
             "id": "statsmodels_01",
@@ -4170,8 +3924,7 @@ export const curriculumTree = [
             ],
             "emoji": "📺",
             "direction": "광고비매출예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_01",
-            "code": "import statsmodels.api as sm"
+            "slug": "mathStatsMl/statsmodels/statsmodels_01"
           },
           {
             "id": "statsmodels_02",
@@ -4186,8 +3939,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏠",
             "direction": "부동산가격예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_02",
-            "code": "import pandas as pd\nimport statsmodels.api as sm\nfrom codaro.curriculum.localData import loadLocalDataset\n\nbostonData = loadLocalDataset(\"boston_housing\")\nbostonData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_02"
           },
           {
             "id": "statsmodels_03",
@@ -4202,8 +3954,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏥",
             "direction": "의료보험비용예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_03",
-            "code": "import pandas as pd\nimport statsmodels.api as sm\nfrom codaro.curriculum.localData import loadLocalDataset\n\ninsuranceData = loadLocalDataset(\"insurance\")\ninsuranceData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_03"
           },
           {
             "id": "statsmodels_04",
@@ -4218,8 +3969,7 @@ export const curriculumTree = [
             ],
             "emoji": "✈️",
             "direction": "항공수요예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_04",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom statsmodels.tsa.seasonal import seasonal_decompose\nfrom statsmodels.tsa.arima.model import ARIMA\nfrom codaro.curriculum.localData import loadLocalDataset\n\nairData = loadLocalDataset(\"airline_passengers\")\nairData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_04"
           },
           {
             "id": "statsmodels_05",
@@ -4235,8 +3985,7 @@ export const curriculumTree = [
             ],
             "emoji": "📞",
             "direction": "고객이탈예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_05",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom statsmodels.formula.api import logit\nfrom codaro.curriculum.localData import loadLocalDataset\n\nchurnData = loadLocalDataset(\"churn\")\nchurnData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_05"
           },
           {
             "id": "statsmodels_06",
@@ -4251,8 +4000,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "다중회귀심화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_06",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom codaro.curriculum.localData import loadLocalDataset\n\nadData = loadLocalDataset(\"advertising\")\nadData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_06"
           },
           {
             "id": "statsmodels_07",
@@ -4267,8 +4015,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "경제지표회귀분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_07",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nimport plotly.express as px\nimport plotly.graph_objects as go\n\nmacro = sm.datasets.macrodata.load_pandas().data\nmacro.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_07"
           },
           {
             "id": "statsmodels_08",
@@ -4284,8 +4031,7 @@ export const curriculumTree = [
             ],
             "emoji": "👔",
             "direction": "직원퇴사예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_08",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom scipy import stats\nimport plotly.express as px\nimport plotly.graph_objects as go\nfrom codaro.curriculum.localData import loadLocalDataset\n\nhrData = loadLocalDataset(\"hr_attrition\")\nhrData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_08"
           },
           {
             "id": "statsmodels_09",
@@ -4301,8 +4047,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚴",
             "direction": "자전거수요예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_09",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom statsmodels.tsa.arima.model import ARIMA\nfrom statsmodels.tsa.stattools import adfuller, acf, pacf\nfrom statsmodels.graphics.tsaplots import plot_acf, plot_pacf\nimport plotly.express as px\nimport plotly.graph_objects as go\nfrom plotly.subplots import make_subplots\nfrom codaro.curriculum.localData import loadLocalDataset\n\ndemandData = loadLocalDataset(\"bike_demand\")\ndemandData['Date'] = pd.to_datetime(demandData['Date'])\ndemandData = demandData.set_index('Date')\ndemandData.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_09"
           },
           {
             "id": "statsmodels_10",
@@ -4318,8 +4063,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏆",
             "direction": "종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/statsmodels/statsmodels_10",
-            "code": "import pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom statsmodels.tsa.api import VAR\nfrom statsmodels.tsa.stattools import adfuller, grangercausalitytests\nimport plotly.express as px\nimport plotly.graph_objects as go\nfrom plotly.subplots import make_subplots\n\nmacro = sm.datasets.macrodata.load_pandas().data\nmacro['date'] = pd.to_datetime(macro['year'].astype(int).astype(str) + '-' + (macro['quarter'].astype(int) * 3 - 2).astype(str) + '-01')\nmacro = macro.set_index('date')\nmacro.shape"
+            "slug": "mathStatsMl/statsmodels/statsmodels_10"
           }
         ]
       },
@@ -4339,8 +4083,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "SymPy소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_00",
-            "code": "import sympy as sp\n\nx = sp.symbols('x', nonnegative=True)\nfixedCost = 120000\nunitPrice = 5000\nunitCost = 2000\n\nrevenueExpr = unitPrice * x\ncostExpr = fixedCost + unitCost * x\nprofitExpr = sp.simplify(revenueExpr - costExpr)\nbreakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]\n\nassert profitExpr == 3000 * x - 120000\nassert breakEvenQuantity == 40\nprofitExpr, breakEvenQuantity"
+            "slug": "mathStatsMl/sympy/sympy_00"
           },
           {
             "id": "sympy_01",
@@ -4355,8 +4098,7 @@ export const curriculumTree = [
             ],
             "emoji": "✏️",
             "direction": "기초수식계산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_01",
-            "code": "from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_01"
           },
           {
             "id": "sympy_02",
@@ -4372,8 +4114,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "대입과계산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_02",
-            "code": "from sympy import symbols, expand, factor, simplify, sqrt, Rational\nfrom sympy import pi, E, N\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_02"
           },
           {
             "id": "sympy_03",
@@ -4389,8 +4130,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "방정식풀이에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_03",
-            "code": "from sympy import symbols, solve, Eq, solveset, S\nfrom sympy import sqrt, Rational, simplify, expand\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_03"
           },
           {
             "id": "sympy_04",
@@ -4406,8 +4146,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "미분기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_04",
-            "code": "from sympy import symbols, diff, simplify, expand, solve, Eq\nfrom sympy import sin, cos, tan, exp, log, sqrt, pi\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_04"
           },
           {
             "id": "sympy_05",
@@ -4423,8 +4162,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "적분기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_05",
-            "code": "from sympy import symbols, integrate, diff, simplify, expand\nfrom sympy import sin, cos, exp, log, sqrt, pi, oo, Rational\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_05"
           },
           {
             "id": "sympy_06",
@@ -4440,8 +4178,7 @@ export const curriculumTree = [
             ],
             "emoji": "∞",
             "direction": "극한과급수에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_06",
-            "code": "from sympy import symbols, limit, series, summation, Sum\nfrom sympy import sin, cos, exp, log, sqrt, pi, oo, Rational\nfrom sympy import simplify, factorial\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_06"
           },
           {
             "id": "sympy_07",
@@ -4457,8 +4194,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "삼각함수활용에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_07",
-            "code": "from sympy import symbols, sin, cos, tan, cot, sec, csc\nfrom sympy import asin, acos, atan, atan2\nfrom sympy import pi, sqrt, Rational, simplify\nfrom sympy import trigsimp, expand_trig, solve, diff, integrate\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_07"
           },
           {
             "id": "sympy_08",
@@ -4474,8 +4210,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "행렬연산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_08",
-            "code": "from sympy import Matrix, eye, zeros, ones, diag\nfrom sympy import symbols, solve, Eq, sqrt, Rational\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_08"
           },
           {
             "id": "sympy_09",
@@ -4490,8 +4225,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "수식시각화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_09",
-            "code": "from sympy import symbols, sin, cos, exp, log, sqrt, pi\nfrom sympy import diff, integrate, solve\nfrom sympy.plotting import plot, plot_parametric, plot3d\nimport matplotlib.pyplot as plt\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_09"
           },
           {
             "id": "sympy_10",
@@ -4506,8 +4240,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎓",
             "direction": "종합수학문제에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "mathStatsMl/sympy/sympy_10",
-            "code": "from sympy import symbols, solve, Eq, diff, integrate, simplify\nfrom sympy import sin, cos, exp, log, sqrt, pi, Rational\nfrom sympy import limit, series, summation, oo\nfrom sympy import Matrix, dsolve, Function\nfrom sympy.plotting import plot\nfrom sympy import init_printing\ninit_printing()"
+            "slug": "mathStatsMl/sympy/sympy_10"
           }
         ]
       }
@@ -4534,8 +4267,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧠",
             "direction": "ndarray → tensor → 정규화 → 모델 입력 형식까지의 변환 흐름을 단계별로 만듭니다.",
-            "slug": "imageVision/deepVision/deepVision_01",
-            "code": "import torch\nimport torchvision\nfrom torchvision import transforms\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\ntorch.__version__, torchvision.__version__"
+            "slug": "imageVision/deepVision/deepVision_01"
           },
           {
             "id": "deepVision_02",
@@ -4550,8 +4282,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏷",
             "direction": "모델을 평가 모드로 만들고, 단일 이미지를 전처리해 추론한 뒤 top-5 라벨을 표시합니다.",
-            "slug": "imageVision/deepVision/deepVision_02",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models import resnet18, ResNet18_Weights\nfrom torchvision import transforms\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nweights = ResNet18_Weights.DEFAULT\nmodel = resnet18(weights=weights)\ntype(model).__name__"
+            "slug": "imageVision/deepVision/deepVision_02"
           },
           {
             "id": "deepVision_03",
@@ -4566,8 +4297,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "분류층을 제거한 ResNet으로 사진을 벡터로 변환하고, 벡터의 모양과 의미를 확인합니다.",
-            "slug": "imageVision/deepVision/deepVision_03",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models import resnet18, ResNet18_Weights\nimport torch.nn as nn\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nweights = ResNet18_Weights.DEFAULT\nmodel = resnet18(weights=weights)\nmodel.eval()\nlayers = list(model.children())\n[type(layer).__name__ for layer in layers]"
+            "slug": "imageVision/deepVision/deepVision_03"
           },
           {
             "id": "deepVision_04",
@@ -4582,8 +4312,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔎",
             "direction": "다양한 변형이 가해진 사진 라이브러리를 만들고, 질의 사진과 비슷한 N장을 코사인 유사도로 검색합니다.",
-            "slug": "imageVision/deepVision/deepVision_04",
-            "code": "import torch\nimport torchvision\nimport torch.nn as nn\nimport torch.nn.functional as F\nfrom torchvision.models import resnet18, ResNet18_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nflower = load_sample_image('flower.jpg')\n\ndef addNoise(img, sigma):\n    noise = np.random.RandomState(42).normal(0, sigma, img.shape)\n    return (img.astype(np.float32) + noise).clip(0, 255).astype(np.uint8)\n\nlibrary = [\n    ('china', china),\n    ('china_rot', np.rot90(china, k=1).copy()),\n    ('china_noisy', addNoise(china, 15)),\n    ('flower', flower),\n    ('flower_rot', np.rot90(flower, k=1).copy()),\n    ('flower_noisy', addNoise(flower, 15)),\n]\nlen(library), library[0][0]"
+            "slug": "imageVision/deepVision/deepVision_04"
           },
           {
             "id": "deepVision_05",
@@ -4598,8 +4327,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "사전학습 Faster R-CNN으로 사진을 추론하고 점수 임곗값으로 결과를 필터링해 박스를 시각화합니다.",
-            "slug": "imageVision/deepVision/deepVision_05",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\ndetWeights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT\ndetector = fasterrcnn_resnet50_fpn(weights=detWeights, box_score_thresh=0.5)\ndetector.eval()\ntype(detector).__name__"
+            "slug": "imageVision/deepVision/deepVision_05"
           },
           {
             "id": "deepVision_06",
@@ -4613,8 +4341,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧩",
             "direction": "DeepLabV3를 호출해 픽셀별 클래스 예측을 얻고 마스크를 컬러맵으로 시각화합니다.",
-            "slug": "imageVision/deepVision/deepVision_06",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models.segmentation import deeplabv3_resnet50, DeepLabV3_ResNet50_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nsegWeights = DeepLabV3_ResNet50_Weights.DEFAULT\nsegModel = deeplabv3_resnet50(weights=segWeights)\nsegModel.eval()\ntype(segModel).__name__"
+            "slug": "imageVision/deepVision/deepVision_06"
           },
           {
             "id": "deepVision_07",
@@ -4629,8 +4356,7 @@ export const curriculumTree = [
             ],
             "emoji": "🤸",
             "direction": "사람 형태의 합성 이미지 또는 외부 사진에 사전학습 모델을 적용해 키포인트와 골격을 시각화합니다.",
-            "slug": "imageVision/deepVision/deepVision_07",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models.detection import keypointrcnn_resnet50_fpn, KeypointRCNN_ResNet50_FPN_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nsampleImg = load_sample_image('china.jpg')\nsampleImg.shape"
+            "slug": "imageVision/deepVision/deepVision_07"
           },
           {
             "id": "deepVision_08",
@@ -4645,8 +4371,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎓",
             "direction": "사전학습 ResNet에서 분류층을 새로 갈아 끼우고 그 층만 학습하는 표준 전이학습 흐름을 구현합니다.",
-            "slug": "imageVision/deepVision/deepVision_08",
-            "code": "import torch\nimport torch.nn as nn\nimport torch.optim as optim\nimport torch.nn.functional as F\nimport torchvision\nfrom torchvision.models import resnet18, ResNet18_Weights\nfrom torchvision import transforms\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nflower = load_sample_image('flower.jpg')\n\ndef augment(img, seed):\n    rng = np.random.RandomState(seed)\n    rotated = np.rot90(img, k=rng.choice([0, 1, 2, 3])).copy()\n    if rng.random() < 0.5:\n        rotated = rotated[:, ::-1].copy()\n    noisy = (rotated.astype(np.float32) + rng.normal(0, 8, rotated.shape)).clip(0, 255).astype(np.uint8)\n    return noisy\n\nchinaSet = [(augment(china, seed=i), 0) for i in range(12)]\nflowerSet = [(augment(flower, seed=i"
+            "slug": "imageVision/deepVision/deepVision_08"
           },
           {
             "id": "deepVision_09",
@@ -4661,8 +4386,7 @@ export const curriculumTree = [
             ],
             "emoji": "⚖️",
             "direction": "두 모델을 같은 이미지에 적용해 top-1 라벨과 추론 시간을 측정해 비교합니다.",
-            "slug": "imageVision/deepVision/deepVision_09",
-            "code": "import torch\nimport torchvision\nimport time\nfrom torchvision.models import resnet18, ResNet18_Weights, resnet50, ResNet50_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nweights18 = ResNet18_Weights.DEFAULT\nweights50 = ResNet50_Weights.DEFAULT\nmodel18 = resnet18(weights=weights18)\nmodel50 = resnet50(weights=weights50)\nmodel18.eval()\nmodel50.eval()\nsum(p.numel() for p in model18.parameters()), sum(p.numel() for p in model50.parameters())"
+            "slug": "imageVision/deepVision/deepVision_09"
           },
           {
             "id": "deepVision_10",
@@ -4677,8 +4401,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧪",
             "direction": "세 모델을 동시에 호출해 사진 한 장에서 (라벨, 박스 리스트, 세그 마스크) 세 결과를 모은 보고서를 만듭니다.",
-            "slug": "imageVision/deepVision/deepVision_10",
-            "code": "import torch\nimport torchvision\nfrom torchvision.models import resnet18, ResNet18_Weights\nfrom torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights\nfrom torchvision.models.segmentation import deeplabv3_resnet50, DeepLabV3_ResNet50_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom matplotlib.patches import Rectangle\nfrom sklearn.datasets import load_sample_image\n\nclsWeights = ResNet18_Weights.DEFAULT\ndetWeights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT\nsegWeights = DeepLabV3_ResNet50_Weights.DEFAULT\nclassifier = resnet18(weights=clsWeights).eval()\ndetector = fasterrcnn_resnet50_fpn(weights=detWeights, box_score_thresh=0.5).eval()\nsegmenter = deeplabv3_resnet50(weights=segWeights).eval()\ntype(classifier).__name__, type(detector).__name__,"
+            "slug": "imageVision/deepVision/deepVision_10"
           }
         ]
       },
@@ -4699,8 +4422,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "OpenCV는 이미지를 NumPy 배열로 다루는 컴퓨터 비전 라이브러리입니다. 이 트랙은 배열 shape/dtype/채널을 매 단계마다 확인하면서 검출 결과까지 검증하는 흐름을 배웁니다.",
-            "slug": "imageVision/opencv/opencv_00",
-            "code": "import cv2\nimport numpy as np\n\nintroImage = np.zeros((96, 144, 3), dtype=np.uint8)\ncv2.rectangle(introImage, (20, 24), (124, 72), (255, 255, 255), -1)\ncv2.line(introImage, (20, 24), (124, 72), (0, 0, 255), 3)\n\ndef validateBgrImage(image):\n    if image.dtype != np.uint8:\n        raise ValueError(f\"uint8 이미지가 아닙니다: {image.dtype}\")\n    if image.ndim != 3 or image.shape[2] != 3:\n        raise ValueError(f\"BGR 3채널 이미지가 아닙니다: {image.shape}\")\n    return True\n\nvalidateBgrImage(introImage)\n\ngray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)\nedges = cv2.Canny(gray, 80, 160)\n\nassert gray.shape == (96, 144), f\"gray shape: {gray.shape}\"\nassert gray.ndim == 2, f\"gray ndim: {gray.ndim}\"\nassert edges.dtype == np.uint8, f\"edges dtype: {edges.dtype}\"\nassert int((edges > 0).sum()) > 0, \"에지 픽셀이 검출되지 않았습니다\"\n\n"
+            "slug": "imageVision/opencv/opencv_00"
           },
           {
             "id": "opencv_01",
@@ -4716,8 +4438,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔬",
             "direction": "load_sample_image로 받은 ndarray의 shape/dtype/채널을 직접 출력하고, BGR↔RGB 변환을 손으로 확인합니다.",
-            "slug": "imageVision/opencv/opencv_01",
-            "code": "from sklearn.datasets import load_sample_image\n\nflowerRgb = load_sample_image('flower.jpg')\n\n{\n    'type': type(flowerRgb).__name__,\n    'shape': flowerRgb.shape,\n    'dtype': str(flowerRgb.dtype),\n}"
+            "slug": "imageVision/opencv/opencv_01"
           },
           {
             "id": "opencv_02",
@@ -4733,8 +4454,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌈",
             "direction": "cvtColor로 색공간을 바꾼 뒤 split으로 채널을 분리하고, HSV 마스크로 특정 색을 추출하는 흐름까지 한 강의에서 끝냅니다.",
-            "slug": "imageVision/opencv/opencv_02",
-            "code": "import cv2\nfrom sklearn.datasets import load_sample_image\n\nphotoRgb = load_sample_image('china.jpg')\nphotoBgr = cv2.cvtColor(photoRgb, cv2.COLOR_RGB2BGR)\n\n{\n    'shape': photoBgr.shape,\n    'dtype': str(photoBgr.dtype),\n    'firstPixelRgb': photoRgb[0, 0].tolist(),\n    'firstPixelBgr': photoBgr[0, 0].tolist(),\n}"
+            "slug": "imageVision/opencv/opencv_02"
           },
           {
             "id": "opencv_03",
@@ -4750,8 +4470,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "resize의 dsize, rotate의 90° 회전, getRotationMatrix2D + warpAffine로 임의 각도, NumPy 슬라이싱으로 crop, flip 한 줄로 거울 변환까지 진행합니다.",
-            "slug": "imageVision/opencv/opencv_03",
-            "code": "import cv2\nfrom sklearn.datasets import load_sample_image\n\nbaseBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)\n\n{\n    'shape': baseBgr.shape,\n    'dtype': str(baseBgr.dtype),\n    'width': baseBgr.shape[1],\n    'height': baseBgr.shape[0],\n}"
+            "slug": "imageVision/opencv/opencv_03"
           },
           {
             "id": "opencv_04",
@@ -4767,8 +4486,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔮",
             "direction": "합성 노이즈 이미지를 만들어 cv2.blur, GaussianBlur, medianBlur, bilateralFilter 결과를 각각 적용하고, 노이즈 표준편차와 에지 보존을 같은 셀에서 평가합니다.",
-            "slug": "imageVision/opencv/opencv_04",
-            "code": "import cv2\nimport numpy as np\n\nfilterRng = np.random.default_rng(42)\ncleanPatch = np.full((96, 128), 120, dtype=np.uint8)\ncv2.rectangle(cleanPatch, (32, 24), (96, 72), 190, -1)\nrawNoise = filterRng.normal(0, 18, cleanPatch.shape).astype(np.int16)\nnoisyPatch = np.clip(cleanPatch.astype(np.int16) + rawNoise, 0, 255).astype(np.uint8)\n\nflatBgRoi = noisyPatch[5:20, 5:25]\n\n{\n    'shape': noisyPatch.shape,\n    'dtype': str(noisyPatch.dtype),\n    'flatBgStd': round(float(flatBgRoi.std()), 2),\n    'meanDiff': round(float(abs(noisyPatch.astype(int) - cleanPatch.astype(int)).mean()), 2),\n}"
+            "slug": "imageVision/opencv/opencv_04"
           },
           {
             "id": "opencv_05",
@@ -4784,8 +4502,7 @@ export const curriculumTree = [
             ],
             "emoji": "📐",
             "direction": "합성 도형 입력으로 정답 위치를 미리 알고 검증한 뒤, 실제 사진에 적용해 임계값 변경이 검출 픽셀 수에 어떻게 반영되는지 확인합니다.",
-            "slug": "imageVision/opencv/opencv_05",
-            "code": "import cv2\nfrom sklearn.datasets import load_sample_image\n\nedgePhotoBgr = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\ngrayPhoto = cv2.cvtColor(edgePhotoBgr, cv2.COLOR_BGR2GRAY)\n\n{\n    'inputShape': edgePhotoBgr.shape,\n    'grayShape': grayPhoto.shape,\n    'grayDtype': str(grayPhoto.dtype),\n    'grayMean': round(float(grayPhoto.mean()), 1),\n}"
+            "slug": "imageVision/opencv/opencv_05"
           },
           {
             "id": "opencv_06",
@@ -4800,8 +4517,7 @@ export const curriculumTree = [
             ],
             "emoji": "⬛",
             "direction": "합성 입력에서 객체 픽셀 수를 미리 계산해 두고 각 방식의 결과를 검증한 뒤, 그래디언트 조명이 있는 입력에서 적응형의 강점을 확인합니다.",
-            "slug": "imageVision/opencv/opencv_06",
-            "code": "import cv2\nimport numpy as np\n\nthresholdCanvas = np.full((100, 140), 70, dtype=np.uint8)\ncv2.rectangle(thresholdCanvas, (35, 25), (105, 75), 190, -1)\ncv2.circle(thresholdCanvas, (70, 50), 18, 230, -1)\n\n{\n    'shape': thresholdCanvas.shape,\n    'dtype': str(thresholdCanvas.dtype),\n    'backgroundPixels': int((thresholdCanvas == 70).sum()),\n    'objectPixels': int((thresholdCanvas > 120).sum()),\n    'totalPixels': int(thresholdCanvas.size),\n}"
+            "slug": "imageVision/opencv/opencv_06"
           },
           {
             "id": "opencv_07",
@@ -4816,8 +4532,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔲",
             "direction": "합성 입력에 점 노이즈와 구멍을 의도적으로 넣고, 각 연산 후 흰 픽셀 수가 어떻게 변하는지 dict로 비교합니다.",
-            "slug": "imageVision/opencv/opencv_07",
-            "code": "import cv2\nimport numpy as np\n\nmorphCanvas = np.zeros((100, 140), dtype=np.uint8)\ncv2.rectangle(morphCanvas, (30, 25), (100, 75), 255, -1)\ncv2.circle(morphCanvas, (65, 50), 10, 0, -1)\nmorphCanvas[10, 10] = 255\nmorphCanvas[15, 130] = 255\nmorphCanvas[90, 20] = 255\nmorphCanvas[85, 125] = 255\n\n{\n    'shape': morphCanvas.shape,\n    'whitePixels': int((morphCanvas == 255).sum()),\n    'singlePointNoise': int(morphCanvas[10, 10]),\n    'insideHoleIsBlack': int(morphCanvas[50, 65]) == 0,\n}"
+            "slug": "imageVision/opencv/opencv_07"
           },
           {
             "id": "opencv_08",
@@ -4832,8 +4547,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "합성 저대비 입력에서 평활화 전후 표준편차를 비교하고, LAB 색공간을 거쳐 컬러 이미지에 안전하게 적용하는 흐름을 다룹니다.",
-            "slug": "imageVision/opencv/opencv_08",
-            "code": "import cv2\nimport numpy as np\n\nhistCanvas = np.tile(np.linspace(95, 155, 160, dtype=np.uint8), (100, 1))\ncv2.rectangle(histCanvas, (45, 25), (115, 75), 135, -1)\n\n{\n    'shape': histCanvas.shape,\n    'dtype': str(histCanvas.dtype),\n    'minMax': (int(histCanvas.min()), int(histCanvas.max())),\n    'std': round(float(histCanvas.std()), 2),\n}"
+            "slug": "imageVision/opencv/opencv_08"
           },
           {
             "id": "opencv_09",
@@ -4848,8 +4562,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔍",
             "direction": "합성 입력에 사각형/원/타원 세 도형을 그리고 findContours → 면적 측정 → 분류 → 외접 도형 그리기 흐름을 정량 검증합니다.",
-            "slug": "imageVision/opencv/opencv_09",
-            "code": "import cv2\nimport numpy as np\n\ncontourCanvas = np.zeros((300, 400), dtype=np.uint8)\ncv2.rectangle(contourCanvas, (50, 50), (150, 150), 255, -1)\ncv2.circle(contourCanvas, (280, 100), 30, 255, -1)\ncv2.ellipse(contourCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)\n\n{\n    'shape': contourCanvas.shape,\n    'whitePixels': int((contourCanvas == 255).sum()),\n    'expectedRectArea': 100 * 100,\n    'expectedCircleArea': round(3.14159 * 30 * 30, 0),\n    'expectedEllipseArea': round(3.14159 * 60 * 30, 0),\n}"
+            "slug": "imageVision/opencv/opencv_09"
           },
           {
             "id": "opencv_10",
@@ -4864,8 +4577,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "합성 입력에서 정답을 미리 계산하고 파이프라인 결과를 dict로 검증한 뒤, flower 사진에 일반화하는 흐름.",
-            "slug": "imageVision/opencv/opencv_10",
-            "code": "import cv2\nimport numpy as np\n\nsceneCanvas = np.full((140, 180, 3), 35, dtype=np.uint8)\ncv2.circle(sceneCanvas, (55, 70), 24, (0, 0, 255), -1)\ncv2.rectangle(sceneCanvas, (110, 45), (155, 95), (0, 0, 230), -1)\ncv2.circle(sceneCanvas, (20, 20), 3, (0, 0, 255), -1)\n\n{\n    'shape': sceneCanvas.shape,\n    'dtype': str(sceneCanvas.dtype),\n    'isBgr': sceneCanvas.shape[2] == 3,\n    'cornerColor': sceneCanvas[5, 5].tolist(),\n}"
+            "slug": "imageVision/opencv/opencv_10"
           }
         ]
       },
@@ -4886,8 +4598,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Pillow는 이미지를 Image 객체로 다루는 편집·합성 라이브러리입니다. 이 트랙은 mode/size/픽셀 통계를 매 단계 확인하면서 자르기·필터·합성·저장까지 검증하는 흐름을 배웁니다.",
-            "slug": "imageVision/pillow/pillow_00",
-            "code": "from PIL import Image, ImageDraw, ImageStat\n\nintroImage = Image.new(\"RGB\", (160, 100), \"white\")\nintroDraw = ImageDraw.Draw(introImage)\nintroDraw.rectangle((20, 20, 140, 80), fill=(80, 140, 220), outline=(20, 60, 120), width=4)\nintroDraw.ellipse((58, 28, 102, 72), fill=(240, 210, 80))\n\ndef validateRgbImage(image):\n    if image.mode != \"RGB\":\n        raise ValueError(f\"RGB 이미지가 아닙니다: {image.mode}\")\n    if image.size[0] < 1 or image.size[1] < 1:\n        raise ValueError(f\"이미지 크기가 올바르지 않습니다: {image.size}\")\n    return True\n\nvalidateRgbImage(introImage)\n\ngrayImage = introImage.convert(\"L\")\nthumbImage = introImage.copy()\nthumbImage.thumbnail((80, 80))\n\nassert grayImage.mode == \"L\", f\"gray mode: {grayImage.mode}\"\nassert grayImage.size == (160, 100), f\"gray size: {grayImage.size}\"\nassert thumbImage"
+            "slug": "imageVision/pillow/pillow_00"
           },
           {
             "id": "pillow_01",
@@ -4903,8 +4614,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌸",
             "direction": "load_sample_image → Image.fromarray → size/mode 점검 → thumbnail/resize 비교 → 메타데이터 검증 함수 흐름.",
-            "slug": "imageVision/pillow/pillow_01",
-            "code": "from PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nflowerArray = load_sample_image('flower.jpg')\nflowerImage = Image.fromarray(flowerArray)\n\n{\n    'arrayType': type(flowerArray).__name__,\n    'imageType': type(flowerImage).__name__,\n    'arrayShape': flowerArray.shape,\n}"
+            "slug": "imageVision/pillow/pillow_01"
           },
           {
             "id": "pillow_02",
@@ -4919,8 +4629,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏯",
             "direction": "crop의 (left, upper, right, lower) 4-tuple → rotate의 expand 효과 → transpose 90° 정확 변환 → 체이닝 흐름.",
-            "slug": "imageVision/pillow/pillow_02",
-            "code": "from PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nchinaImage = Image.fromarray(load_sample_image('china.jpg'))\n\n{\n    'size': chinaImage.size,\n    'width': chinaImage.size[0],\n    'height': chinaImage.size[1],\n    'mode': chinaImage.mode,\n    'aspectRatio': round(chinaImage.size[0] / chinaImage.size[1], 2),\n}"
+            "slug": "imageVision/pillow/pillow_02"
           },
           {
             "id": "pillow_03",
@@ -4935,8 +4644,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎞️",
             "direction": "convert('L') → point(이진화) → split/merge로 세피아 → mode/픽셀 통계 비교 흐름.",
-            "slug": "imageVision/pillow/pillow_03",
-            "code": "from PIL import Image\nfrom sklearn.datasets import load_sample_image\n\npic = Image.fromarray(load_sample_image('flower.jpg'))\n\n{\n    'mode': pic.mode,\n    'size': pic.size,\n    'isRgb': pic.mode == 'RGB',\n    'pixelCount': pic.size[0] * pic.size[1],\n}"
+            "slug": "imageVision/pillow/pillow_03"
           },
           {
             "id": "pillow_04",
@@ -4952,8 +4660,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎭",
             "direction": "합성 입력에 여섯 필터를 적용하고 std/mean 같은 통계 dict로 결과를 비교한 뒤, GaussianBlur 파라미터 효과까지 다룹니다.",
-            "slug": "imageVision/pillow/pillow_04",
-            "code": "import numpy as np\nfrom PIL import Image, ImageFilter\nfrom sklearn.datasets import load_sample_image\n\ncanvas = Image.fromarray(load_sample_image('flower.jpg'))\ncanvasArr = np.asarray(canvas)\n\n{\n    'mode': canvas.mode,\n    'size': canvas.size,\n    'baseStd': round(float(canvasArr.std()), 2),\n    'baseMean': round(float(canvasArr.mean()), 2),\n}"
+            "slug": "imageVision/pillow/pillow_04"
           },
           {
             "id": "pillow_05",
@@ -4969,8 +4676,7 @@ export const curriculumTree = [
             ],
             "emoji": "☀️",
             "direction": "Brightness는 평균, Contrast는 표준편차, Color는 채도, Sharpness는 디테일에 각각 영향을 주는지 정량 검증.",
-            "slug": "imageVision/pillow/pillow_05",
-            "code": "import numpy as np\nfrom PIL import Image, ImageEnhance\nfrom sklearn.datasets import load_sample_image\n\nframe = Image.fromarray(load_sample_image('china.jpg'))\nframeArr = np.asarray(frame)\n\n{\n    'mode': frame.mode,\n    'size': frame.size,\n    'baseMean': round(float(frameArr.mean()), 2),\n    'baseStd': round(float(frameArr.std()), 2),\n}"
+            "slug": "imageVision/pillow/pillow_05"
           },
           {
             "id": "pillow_06",
@@ -4986,8 +4692,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "split → 채널별 평균/histogram → merge로 채널 교환 → 가드 함수.",
-            "slug": "imageVision/pillow/pillow_06",
-            "code": "from PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nsource = Image.fromarray(load_sample_image('china.jpg'))\n\n{\n    'mode': source.mode,\n    'size': source.size,\n    'pixelCount': source.size[0] * source.size[1],\n}"
+            "slug": "imageVision/pillow/pillow_06"
           },
           {
             "id": "pillow_07",
@@ -5003,8 +4708,7 @@ export const curriculumTree = [
             ],
             "emoji": "💧",
             "direction": "ImageDraw.text → RGBA 변환 → alpha 마스크로 paste → 위치 정렬 흐름.",
-            "slug": "imageVision/pillow/pillow_07",
-            "code": "import numpy as np\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nbase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA')\nbaseArr = np.asarray(base)\n\n{\n    'mode': base.mode,\n    'size': base.size,\n    'channelCount': baseArr.shape[2],\n    'alphaInitial': int(baseArr[..., 3].mean()),\n}"
+            "slug": "imageVision/pillow/pillow_07"
           },
           {
             "id": "pillow_08",
@@ -5020,8 +4724,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎨",
             "direction": "Image.new로 캔버스 → ImageDraw로 그리기 → 도형별 픽셀 수 검증 → 함수로 묶기.",
-            "slug": "imageVision/pillow/pillow_08",
-            "code": "import numpy as np\nfrom PIL import Image, ImageDraw\n\nboard = Image.new('RGB', (400, 300), color='white')\nboardArr = np.asarray(board)\n\n{\n    'size': board.size,\n    'mode': board.mode,\n    'meanPixel': round(float(boardArr.mean()), 1),\n    'isAllWhite': float(boardArr.mean()) == 255.0,\n}"
+            "slug": "imageVision/pillow/pillow_08"
           },
           {
             "id": "pillow_09",
@@ -5037,8 +4740,7 @@ export const curriculumTree = [
             ],
             "emoji": "🖼️",
             "direction": "캔버스 생성 → 셀 크기 계산 → 이미지 resize → paste → 영역별 검증.",
-            "slug": "imageVision/pillow/pillow_09",
-            "code": "from PIL import Image\nfrom sklearn.datasets import load_sample_image\n\nflower = Image.fromarray(load_sample_image('flower.jpg'))\nchina = Image.fromarray(load_sample_image('china.jpg'))\n\n{\n    'flowerSize': flower.size,\n    'chinaSize': china.size,\n    'sameSize': flower.size == china.size,\n}"
+            "slug": "imageVision/pillow/pillow_09"
           },
           {
             "id": "pillow_10",
@@ -5054,8 +4756,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎬",
             "direction": "각 단계를 dict로 보고하는 editPhoto 함수 → 합성 입력 검증 → china/flower 일반화 → 가드 함수.",
-            "slug": "imageVision/pillow/pillow_10",
-            "code": "import numpy as np\nfrom PIL import Image, ImageFilter, ImageEnhance, ImageDraw\nfrom sklearn.datasets import load_sample_image\n\noriginal = Image.fromarray(load_sample_image('china.jpg'))\noriginalArr = np.asarray(original)\n\n{\n    'mode': original.mode,\n    'size': original.size,\n    'baseMean': round(float(originalArr.mean()), 2),\n    'baseStd': round(float(originalArr.std()), 2),\n}"
+            "slug": "imageVision/pillow/pillow_10"
           }
         ]
       },
@@ -5075,8 +4776,7 @@ export const curriculumTree = [
             ],
             "emoji": "📄",
             "direction": "합성된 비스듬한 문서 이미지를 만들고, 네 모서리를 골라 호모그래피로 직사각형 좌표계로 정렬합니다.",
-            "slug": "imageVision/visionApps/visionApps_01",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\n\ndocument = np.full((400, 300, 3), 255, dtype=np.uint8)\ncv2.putText(document, \"Codaro Doc Scanner\", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (10, 10, 10), 2)\ncv2.putText(document, \"Lesson 01 - homography\", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (40, 40, 40), 1)\ncv2.rectangle(document, (20, 180), (280, 380), (40, 40, 40), 1)\ncv2.putText(document, \"BODY TEXT\", (40, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (40, 40, 40), 2)\ndocument.shape"
+            "slug": "imageVision/visionApps/visionApps_01"
           },
           {
             "id": "visionApps_02",
@@ -5091,8 +4791,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔳",
             "direction": "QR 코드를 만들고 사진에 합성한 뒤 OpenCV로 자동 디코드합니다.",
-            "slug": "imageVision/visionApps/visionApps_02",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nqrEncoder = cv2.QRCodeEncoder.create()\nqrSmall = qrEncoder.encode(\"https://codaro.example\")\nqrSmall.shape, qrSmall.dtype"
+            "slug": "imageVision/visionApps/visionApps_02"
           },
           {
             "id": "visionApps_03",
@@ -5107,8 +4806,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔠",
             "direction": "합성 영문 이미지에 OCR을 적용하고 전처리(흑백·임곗값·확대) 효과를 비교합니다.",
-            "slug": "imageVision/visionApps/visionApps_03",
-            "code": "import pytesseract\nimport cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\n\ntry:\n    version = str(pytesseract.get_tesseract_version())\nexcept Exception as exc:\n    version = f\"unavailable: {exc.__class__.__name__}\"\nversion"
+            "slug": "imageVision/visionApps/visionApps_03"
           },
           {
             "id": "visionApps_04",
@@ -5123,8 +4821,7 @@ export const curriculumTree = [
             ],
             "emoji": "🇰🇷",
             "direction": "PIL로 한국어가 포함된 합성 이미지를 만들고 easyocr Reader로 인식 결과를 받습니다.",
-            "slug": "imageVision/visionApps/visionApps_04",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom PIL import Image, ImageDraw, ImageFont\n\ncanvasImg = Image.new('RGB', (500, 200), color=(255, 255, 255))\ndraw = ImageDraw.Draw(canvasImg)\ntry:\n    font = ImageFont.truetype('malgun.ttf', 36)\nexcept Exception:\n    try:\n        font = ImageFont.truetype('AppleGothic.ttf', 36)\n    except Exception:\n        font = ImageFont.load_default()\ndraw.text((20, 30), \"코다로 비전\", font=font, fill=(10, 10, 10))\ndraw.text((20, 100), \"한국어 OCR 테스트\", font=font, fill=(40, 40, 40))\ncanvasArray = np.array(canvasImg)\ncanvasArray.shape"
+            "slug": "imageVision/visionApps/visionApps_04"
           },
           {
             "id": "visionApps_05",
@@ -5139,8 +4836,7 @@ export const curriculumTree = [
             ],
             "emoji": "🙈",
             "direction": "Haar 캐스케이드로 얼굴 박스를 검출하고 박스 영역에 모자이크를 적용합니다.",
-            "slug": "imageVision/visionApps/visionApps_05",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\ncascadePath = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'\ndetector = cv2.CascadeClassifier(cascadePath)\nnot detector.empty()"
+            "slug": "imageVision/visionApps/visionApps_05"
           },
           {
             "id": "visionApps_06",
@@ -5154,8 +4850,7 @@ export const curriculumTree = [
             ],
             "emoji": "🙇",
             "direction": "두 사진을 같은 인코더에 통과시키고 코사인 유사도와 임곗값으로 동일 객체 판별을 구현합니다.",
-            "slug": "imageVision/visionApps/visionApps_06",
-            "code": "import torch\nimport torchvision\nimport torch.nn as nn\nimport torch.nn.functional as F\nfrom torchvision.models import resnet18, ResNet18_Weights\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\nfrom PIL import Image\nimport cv2\n\nweights = ResNet18_Weights.DEFAULT\nmodel = resnet18(weights=weights).eval()\nencoder = nn.Sequential(*list(model.children())[:-1]).eval()\npreprocess = weights.transforms()\ntype(encoder).__name__"
+            "slug": "imageVision/visionApps/visionApps_06"
           },
           {
             "id": "visionApps_07",
@@ -5169,8 +4864,7 @@ export const curriculumTree = [
             ],
             "emoji": "🪞",
             "direction": "임시 폴더에 사진을 만든 뒤 phash를 계산해 거리 임곗값으로 중복 그룹을 만듭니다.",
-            "slug": "imageVision/visionApps/visionApps_07",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nimport shutil\nfrom pathlib import Path\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\ntempDir = Path(tempfile.gettempdir()) / 'codaro_apps_07'\nif tempDir.exists():\n    shutil.rmtree(tempDir)\ntempDir.mkdir()\nchina = load_sample_image('china.jpg')\nflower = load_sample_image('flower.jpg')\n\ndef save(img, name):\n    Image.fromarray(img).save(tempDir / name)\n\nsave(china, 'china_orig.png')\nsave((china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8), 'china_bright.png')\nsave((china.astype(np.float32) * 0.85 - 5).clip(0, 255).astype(np.uint8), 'china_dim.png')\nsave(china[:, ::-1].copy(), 'china_flip.png')\nsave(flower, 'flower_orig.png')\nsave((flower.astype(np.float32) * 0.95).clip(0, 255"
+            "slug": "imageVision/visionApps/visionApps_07"
           },
           {
             "id": "visionApps_08",
@@ -5185,8 +4879,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎬",
             "direction": "영상을 처음부터 끝까지 읽으며 차분값이 큰 N개 프레임을 골라 썸네일로 저장합니다.",
-            "slug": "imageVision/visionApps/visionApps_08",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nif not videoPath.exists():\n    width, height = 320, 240\n    fps = 24\n    fourcc = cv2.VideoWriter_fourcc(*'mp4v')\n    writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))\n    for idx in range(60):\n        frame = np.zeros((height, width, 3), dtype=np.uint8)\n        intensity = int(255 * idx / 59)\n        frame[:] = (intensity, 100, 255 - intensity)\n        cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)\n        writer.write(frame)\n    writer.release()\nvideoPath.exists()"
+            "slug": "imageVision/visionApps/visionApps_08"
           },
           {
             "id": "visionApps_09",
@@ -5200,8 +4893,7 @@ export const curriculumTree = [
             ],
             "emoji": "🖥",
             "direction": "mss로 화면 일부를 캡처한 뒤 색 분석과 변화 감지를 적용합니다.",
-            "slug": "imageVision/visionApps/visionApps_09",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nimport cv2\n\ntry:\n    import mss\n    with mss.mss() as sct:\n        monitorsInfo = list(sct.monitors)\n    mssStatus = 'ready'\nexcept Exception as exc:\n    monitorsInfo = []\n    mssStatus = f\"failed: {exc.__class__.__name__}\"\nmssStatus, len(monitorsInfo)"
+            "slug": "imageVision/visionApps/visionApps_09"
           },
           {
             "id": "visionApps_10",
@@ -5216,8 +4908,7 @@ export const curriculumTree = [
             ],
             "emoji": "🗂",
             "direction": "임시 입력 폴더의 사진을 노출 진단 + 중복 검출로 분류하고 출력 폴더에 그룹별로 복사합니다.",
-            "slug": "imageVision/visionApps/visionApps_10",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nimport shutil\nfrom pathlib import Path\nfrom PIL import Image\nfrom sklearn.datasets import load_sample_image\n\ninputDir = Path(tempfile.gettempdir()) / 'codaro_apps_10_input'\noutputDir = Path(tempfile.gettempdir()) / 'codaro_apps_10_output'\nfor path in [inputDir, outputDir]:\n    if path.exists():\n        shutil.rmtree(path)\n    path.mkdir()\nchina = load_sample_image('china.jpg')\nflower = load_sample_image('flower.jpg')\n\ndef write(img, name):\n    Image.fromarray(img).save(inputDir / name)\n\nwrite(china, 'china_a.png')\nwrite((china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8), 'china_b.png')\nwrite(flower, 'flower_a.png')\nwrite((flower.astype(np.float32) * 0.92).clip(0, 255).astype(np.uint8), 'flower_b.p"
+            "slug": "imageVision/visionApps/visionApps_10"
           }
         ]
       },
@@ -5237,8 +4928,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧱",
             "direction": "빈 캔버스를 numpy로 만들고 픽셀을 직접 채워 이미지가 ndarray라는 사실을 손으로 체화합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_01",
-            "code": "import numpy as np\n\ncanvas = np.zeros((200, 300, 3), dtype=np.uint8)\ncanvas.shape"
+            "slug": "imageVision/visionBasics/visionBasics_01"
           },
           {
             "id": "visionBasics_02",
@@ -5253,8 +4943,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧭",
             "direction": "같은 위치를 (y, x)와 (x, y)로 번갈아 적어 보며 원점·축 방향·인덱스 순서의 차이를 직접 확인합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_02",
-            "code": "import numpy as np\n\nimg = np.zeros((50, 80, 3), dtype=np.uint8)\nimg[10, 60] = [255, 255, 255]\npixel = img[10, 60]\npixel"
+            "slug": "imageVision/visionBasics/visionBasics_02"
           },
           {
             "id": "visionBasics_03",
@@ -5269,8 +4958,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎚",
             "direction": "컬러 이미지를 R/G/B 세 장으로 분해하고 다시 합치며 채널이 독립된 흑백 이미지임을 확인합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_03",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nflower = load_sample_image('flower.jpg')\nflower.shape, flower.dtype"
+            "slug": "imageVision/visionBasics/visionBasics_03"
           },
           {
             "id": "visionBasics_04",
@@ -5285,8 +4973,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌈",
             "direction": "같은 사진을 RGB, HSV, Lab으로 변환하며 각 색공간이 강조하는 정보를 비교합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_04",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nflower = load_sample_image('flower.jpg')\nredLike = (flower[:, :, 0] > 150) & (flower[:, :, 1] < 100) & (flower[:, :, 2] < 100)\nredLike.sum(), redLike.shape"
+            "slug": "imageVision/visionBasics/visionBasics_04"
           },
           {
             "id": "visionBasics_05",
@@ -5301,8 +4988,7 @@ export const curriculumTree = [
             ],
             "emoji": "✂️",
             "direction": "사진의 일부를 잘라 다른 자리에 붙이고, 슬라이싱이 원본을 공유하는 view인지 독립 사본인지를 확인합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_05",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nflower = load_sample_image('flower.jpg')\nh, w = flower.shape[:2]\nroi = flower[h // 4: h * 3 // 4, w // 4: w * 3 // 4]\nroi.shape"
+            "slug": "imageVision/visionBasics/visionBasics_05"
           },
           {
             "id": "visionBasics_06",
@@ -5317,8 +5003,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔢",
             "direction": "밝기·대비·평균 합성을 모두 산술식으로 표현하고 clip으로 0~255 범위에 가둡니다.",
-            "slug": "imageVision/visionBasics/visionBasics_06",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\n\nbright = np.array([240, 250, 255], dtype=np.uint8)\noverflow = bright + np.uint8(30)\noverflow"
+            "slug": "imageVision/visionBasics/visionBasics_06"
           },
           {
             "id": "visionBasics_07",
@@ -5333,8 +5018,7 @@ export const curriculumTree = [
             ],
             "emoji": "📈",
             "direction": "256칸 표를 직접 만들어 픽셀에 적용하고, 동일 변환을 LUT 없이 한 결과와 속도를 비교합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_07",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nidentityLut = np.arange(256, dtype=np.uint8)\nsameAsOriginal = identityLut[china]\nnp.array_equal(sameAsOriginal, china)"
+            "slug": "imageVision/visionBasics/visionBasics_07"
           },
           {
             "id": "visionBasics_08",
@@ -5349,8 +5033,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎭",
             "direction": "bool 배열을 만들고 적용하며 이미지 처리에서 마스크가 가장 자주 쓰이는 도구라는 점을 체화합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_08",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\ngray = (china.astype(np.float32) * np.array([0.299, 0.587, 0.114])).sum(axis=2).astype(np.uint8)\nbrightMask = gray > 180\nbrightMask.sum(), brightMask.mean()"
+            "slug": "imageVision/visionBasics/visionBasics_08"
           },
           {
             "id": "visionBasics_09",
@@ -5365,8 +5048,7 @@ export const curriculumTree = [
             ],
             "emoji": "📊",
             "direction": "평균·표준편차·히스토그램·percentile을 직접 계산해 사진 한 장을 숫자로 진단합니다.",
-            "slug": "imageVision/visionBasics/visionBasics_09",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\noverallMean = china.mean()\noverallStd = china.std()\noverallMean, overallStd"
+            "slug": "imageVision/visionBasics/visionBasics_09"
           },
           {
             "id": "visionBasics_10",
@@ -5381,8 +5063,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛠",
             "direction": "이전 강의에서 익힌 도구를 조합해 자동 노출·화이트밸런스·콘트라스트 함수를 만들고 종합 보정기로 묶습니다.",
-            "slug": "imageVision/visionBasics/visionBasics_10",
-            "code": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\n\ndef autoExposure(img, target=128.0):\n    base = img.astype(np.float32)\n    delta = target - base.mean()\n    return (base + delta).clip(0, 255).astype(np.uint8)\n\nexposed = autoExposure(china)\nexposed.mean()"
+            "slug": "imageVision/visionBasics/visionBasics_10"
           }
         ]
       },
@@ -5402,8 +5083,7 @@ export const curriculumTree = [
             ],
             "emoji": "📍",
             "direction": "Harris와 goodFeaturesToTrack 으로 같은 이미지의 코너를 찾고 매개변수 조정의 영향을 확인합니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_01",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\ngray = cv2.cvtColor(china, cv2.COLOR_RGB2GRAY)\ngray.shape, gray.dtype"
+            "slug": "imageVision/visionFeatures/visionFeatures_01"
           },
           {
             "id": "visionFeatures_02",
@@ -5418,8 +5098,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔑",
             "direction": "ORB로 키포인트와 디스크립터를 추출하고 회전·크기 변화에 강건한지 직접 확인합니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_02",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\norb = cv2.ORB_create(nfeatures=500)\ntype(orb).__name__"
+            "slug": "imageVision/visionFeatures/visionFeatures_02"
           },
           {
             "id": "visionFeatures_03",
@@ -5434,8 +5113,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "두 이미지에서 ORB 디스크립터를 추출하고 매칭, 정렬, 필터링까지의 흐름을 한 셀씩 실행합니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_03",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nh, w = china.shape[:2]\nrotMat = cv2.getRotationMatrix2D((w / 2, h / 2), angle=15, scale=1.0)\nrotMat[:, 2] += [20, -10]\nwarped = cv2.warpAffine(china, rotMat, (w, h))\nwarped.shape"
+            "slug": "imageVision/visionFeatures/visionFeatures_03"
           },
           {
             "id": "visionFeatures_04",
@@ -5450,8 +5128,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧮",
             "direction": "매칭 점들에서 호모그래피를 추정하고 warpPerspective로 정렬해 두 사진을 한 좌표계에 겹칩니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_04",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nh, w = china.shape[:2]\nrotMat = cv2.getRotationMatrix2D((w / 2, h / 2), angle=18, scale=1.0)\nrotMat[:, 2] += [25, 12]\nwarped = cv2.warpAffine(china, rotMat, (w, h))\n\norb = cv2.ORB_create(nfeatures=1000)\ngrayA = cv2.cvtColor(china, cv2.COLOR_RGB2GRAY)\ngrayB = cv2.cvtColor(warped, cv2.COLOR_RGB2GRAY)\nkpA, descA = orb.detectAndCompute(grayA, mask=None)\nkpB, descB = orb.detectAndCompute(grayB, mask=None)\nbf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)\nknn = bf.knnMatch(descA, descB, k=2)\ngood = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]\nsrcPts = np.array([kpA[m.queryIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)"
+            "slug": "imageVision/visionFeatures/visionFeatures_04"
           },
           {
             "id": "visionFeatures_05",
@@ -5466,8 +5143,7 @@ export const curriculumTree = [
             ],
             "emoji": "🖼",
             "direction": "합성된 두 장(원본의 왼쪽 절반과 회전·이동한 오른쪽 절반)으로 파노라마 한 장을 만듭니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_05",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_sample_image\n\nchina = load_sample_image('china.jpg')\nh, w = china.shape[:2]\nleftHalf = china[:, : int(w * 0.6)].copy()\nrightCut = china[:, int(w * 0.4):].copy()\nrotMat = cv2.getRotationMatrix2D((rightCut.shape[1] / 2, h / 2), angle=5, scale=1.0)\nrightHalf = cv2.warpAffine(rightCut, rotMat, (rightCut.shape[1], h))\nleftHalf.shape, rightHalf.shape"
+            "slug": "imageVision/visionFeatures/visionFeatures_05"
           },
           {
             "id": "visionFeatures_06",
@@ -5482,8 +5158,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎞",
             "direction": "합성 mp4를 만든 뒤 VideoCapture로 한 프레임씩 읽어 분석합니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_06",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nstr(videoPath)"
+            "slug": "imageVision/visionFeatures/visionFeatures_06"
           },
           {
             "id": "visionFeatures_07",
@@ -5498,8 +5173,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚦",
             "direction": "두 프레임의 차이를 임곗값으로 마스크화하고, MOG2 모델로 같은 영상에서 더 정교한 결과를 얻습니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_07",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nif not videoPath.exists():\n    width, height = 320, 240\n    fps = 24\n    fourcc = cv2.VideoWriter_fourcc(*'mp4v')\n    writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))\n    for idx in range(60):\n        frame = np.zeros((height, width, 3), dtype=np.uint8)\n        intensity = int(255 * idx / 59)\n        frame[:] = (intensity, 100, 255 - intensity)\n        cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)\n        writer.write(frame)\n    writer.release()\nvideoPath.exists()"
+            "slug": "imageVision/visionFeatures/visionFeatures_07"
           },
           {
             "id": "visionFeatures_08",
@@ -5514,8 +5188,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌊",
             "direction": "첫 프레임의 코너점을 모아 매 프레임마다 새 위치를 계산해 추적 궤적을 그립니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_08",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nif not videoPath.exists():\n    width, height = 320, 240\n    fps = 24\n    fourcc = cv2.VideoWriter_fourcc(*'mp4v')\n    writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))\n    for idx in range(60):\n        frame = np.zeros((height, width, 3), dtype=np.uint8)\n        intensity = int(255 * idx / 59)\n        frame[:] = (intensity, 100, 255 - intensity)\n        cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)\n        writer.write(frame)\n    writer.release()\n\ncap = cv2.VideoCapture(str(videoPath))\nok, firstBgr = cap.read()\ncap.release()\nfirstGray = cv2.cvtColor(firstBgr, cv2.COLOR_BGR2GRAY)\nstartPoints ="
+            "slug": "imageVision/visionFeatures/visionFeatures_08"
           },
           {
             "id": "visionFeatures_09",
@@ -5530,8 +5203,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎯",
             "direction": "첫 프레임에서 박스를 정해 트래커를 초기화하고, 매 프레임 박스를 갱신해 시각화합니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_09",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nif not videoPath.exists():\n    width, height = 320, 240\n    fps = 24\n    fourcc = cv2.VideoWriter_fourcc(*'mp4v')\n    writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))\n    for idx in range(60):\n        frame = np.zeros((height, width, 3), dtype=np.uint8)\n        intensity = int(255 * idx / 59)\n        frame[:] = (intensity, 100, 255 - intensity)\n        cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)\n        writer.write(frame)\n    writer.release()\n\ncap = cv2.VideoCapture(str(videoPath))\nok, firstFrame = cap.read()\ncap.release()\ninitialBox = (40, 100, 40, 40)\ninitialBox"
+            "slug": "imageVision/visionFeatures/visionFeatures_09"
           },
           {
             "id": "visionFeatures_10",
@@ -5546,8 +5218,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧰",
             "direction": "영상 + 초기 박스를 입력받아 트래킹 결과와 요약 보고서를 반환하는 함수 trackAndReport를 만듭니다.",
-            "slug": "imageVision/visionFeatures/visionFeatures_10",
-            "code": "import cv2\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport tempfile\nfrom pathlib import Path\n\nvideoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'\nif not videoPath.exists():\n    width, height = 320, 240\n    fps = 24\n    fourcc = cv2.VideoWriter_fourcc(*'mp4v')\n    writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))\n    for idx in range(60):\n        frame = np.zeros((height, width, 3), dtype=np.uint8)\n        intensity = int(255 * idx / 59)\n        frame[:] = (intensity, 100, 255 - intensity)\n        cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)\n        writer.write(frame)\n    writer.release()\n\ndefaultBox = (40, 100, 40, 40)\ndefaultBox"
+            "slug": "imageVision/visionFeatures/visionFeatures_10"
           }
         ]
       }
@@ -5573,8 +5244,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Playwright로 로컬 HTML을 열고 사용자 관점의 클릭, 입력, 검증, 증거 저장 흐름을 익힌다.",
-            "slug": "automation/playwright/playwright_00",
-            "code": "outcomes = [\n    \"로컬 HTML 화면을 열고 제목과 문구를 검증한다\",\n    \"접근성 이름 기반 locator로 버튼과 입력칸을 조작한다\",\n    \"스크린샷과 JSON 상태 리포트를 scratch 경로에 저장한다\",\n    \"네트워크 응답을 mock해 실패와 성공 상태를 반복 검증한다\",\n]\n\nassert len(outcomes) == 4\nassert any(\"스크린샷\" in item for item in outcomes)\noutcomes"
+            "slug": "automation/playwright/playwright_00"
           },
           {
             "id": "playwright_01",
@@ -5588,8 +5258,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Playwright로 Chromium 페이지를 만들고 제목, 본문, 클릭 결과, 완료 상태를 순서대로 검증한다.",
-            "slug": "automation/playwright/playwright_01",
-            "code": "from playwright.sync_api import sync_playwright\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.set_content(\"<title>Daily Check</title><main><h1>Ready</h1></main>\")\n    actualTitle = page.title()\n    browser.close()\n\nassert actualTitle == \"Daily Check\"\nactualTitle"
+            "slug": "automation/playwright/playwright_01"
           },
           {
             "id": "playwright_02",
@@ -5603,8 +5272,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "role, label, text, test id locator로 폼을 채우고 사용자 관점의 결과를 검증한다.",
-            "slug": "automation/playwright/playwright_02",
-            "code": "from playwright.sync_api import sync_playwright, expect\n\nhtml = \"\"\"\n<main>\n  <h1>재고 점검</h1>\n  <button>새로고침</button>\n</main>\n\"\"\"\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.set_content(html)\n    expect(page.get_by_role(\"heading\", name=\"재고 점검\")).to_be_visible()\n    buttonText = page.get_by_role(\"button\", name=\"새로고침\").inner_text()\n    browser.close()\n\nassert buttonText == \"새로고침\"\nbuttonText"
+            "slug": "automation/playwright/playwright_02"
           },
           {
             "id": "playwright_03",
@@ -5618,8 +5286,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "수동 sleep 대신 Playwright의 자동 대기와 expect 검증으로 화면 변화를 안정적으로 확인한다.",
-            "slug": "automation/playwright/playwright_03",
-            "code": "from playwright.sync_api import sync_playwright, expect\n\nhtml = \"\"\"\n<button onclick=\"setTimeout(() => document.querySelector('[data-testid=status]').textContent='완료', 80)\">시작</button>\n<p data-testid=\"status\">대기</p>\n\"\"\"\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.set_content(html)\n    page.get_by_role(\"button\", name=\"시작\").click()\n    status = page.get_by_test_id(\"status\")\n    expect(status).to_have_text(\"완료\")\n    result = status.inner_text()\n    browser.close()\n\nassert result == \"완료\"\nresult"
+            "slug": "automation/playwright/playwright_03"
           },
           {
             "id": "playwright_04",
@@ -5633,8 +5300,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "브라우저 점검 결과를 스크린샷과 JSON 리포트로 남기고 저장 경로를 안전하게 관리한다.",
-            "slug": "automation/playwright/playwright_04",
-            "code": "from pathlib import Path\nimport os\nimport tempfile\n\nbaseDir = Path(os.environ.get(\"CODARO_PLAYWRIGHT_OUTPUT_DIR\", tempfile.gettempdir()))\noutputDir = baseDir / \"codaro-playwright-evidence\"\noutputDir.mkdir(parents=True, exist_ok=True)\n\nassert outputDir.is_dir()\nassert outputDir.name == \"codaro-playwright-evidence\"\nstr(outputDir)"
+            "slug": "automation/playwright/playwright_04"
           },
           {
             "id": "playwright_05",
@@ -5648,8 +5314,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "page.route로 API 응답을 통제하고 성공, 빈 데이터, 실패 상태를 반복 검증한다.",
-            "slug": "automation/playwright/playwright_05",
-            "code": "import json\nfrom playwright.sync_api import sync_playwright, expect\n\nappHtml = \"\"\"\n<main><h1>주문 API</h1><p data-testid=\"count\">loading</p></main>\n<script>\nfetch('/api/orders').then(r => r.json()).then(data => {\n  document.querySelector('[data-testid=count]').textContent = String(data.orders.length)\n})\n</script>\n\"\"\"\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.route(\"**/app\", lambda route: route.fulfill(status=200, content_type=\"text/html; charset=utf-8\", body=appHtml))\n    page.route(\"**/api/orders\", lambda route: route.fulfill(status=200, content_type=\"application/json\", body=json.dumps({\"orders\": [1, 2, 3]})))\n    page.goto(\"https://codaro.local/app\")\n    expect(page.get_by_test_id(\"count\")).to_have_text(\"3\")\n    coun"
+            "slug": "automation/playwright/playwright_05"
           },
           {
             "id": "playwright_06",
@@ -5663,8 +5328,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "쿠키와 localStorage를 브라우저 context에 저장하고 새 페이지에서 상태가 유지되는지 검증한다.",
-            "slug": "automation/playwright/playwright_06",
-            "code": "from playwright.sync_api import sync_playwright\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    context = browser.new_context()\n    context.add_cookies([{\"name\": \"session\", \"value\": \"lesson-user\", \"url\": \"https://codaro.local\"}])\n    page = context.new_page()\n    page.route(\"**/*\", lambda route: route.fulfill(status=200, content_type=\"text/html; charset=utf-8\", body=\"<p>cookie check</p>\"))\n    page.goto(\"https://codaro.local\")\n    cookieText = page.evaluate(\"document.cookie\")\n    browser.close()\n\nassert \"session=lesson-user\" in cookieText\ncookieText"
+            "slug": "automation/playwright/playwright_06"
           },
           {
             "id": "playwright_07",
@@ -5678,8 +5342,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "반복되는 locator와 검증 코드를 함수와 클래스로 묶어 재사용 가능한 브라우저 점검 루틴을 만든다.",
-            "slug": "automation/playwright/playwright_07",
-            "code": "def dashboardHtml(title: str, status: str) -> str:\n    return f\"<main><h1>{title}</h1><p data-testid='status'>{status}</p></main>\"\n\nhtml = dashboardHtml(\"주문 대시보드\", \"정상\")\nassert \"<h1>주문 대시보드</h1>\" in html\nassert \"data-testid='status'\" in html\nhtml"
+            "slug": "automation/playwright/playwright_07"
           },
           {
             "id": "playwright_08",
@@ -5693,8 +5356,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Playwright 브라우저 점검을 pytest 함수와 subprocess 실행으로 감싸 자동 검증 흐름을 익힌다.",
-            "slug": "automation/playwright/playwright_08",
-            "code": "testSource = '''\nfrom playwright.sync_api import sync_playwright\n\ndef test_dashboard_title():\n    with sync_playwright() as p:\n        browser = p.chromium.launch(headless=True)\n        page = browser.new_page()\n        page.set_content(\"<title>Dashboard</title>\")\n        assert page.title() == \"Dashboard\"\n        browser.close()\n'''\n\nassert \"def test_dashboard_title\" in testSource\nassert \"sync_playwright\" in testSource\ntestSource.strip().splitlines()[0]"
+            "slug": "automation/playwright/playwright_08"
           },
           {
             "id": "playwright_09",
@@ -5708,8 +5370,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "콘솔 로그, trace zip, 실패 스크린샷을 모아 브라우저 자동화 실패 원인을 설명 가능한 증거로 바꾼다.",
-            "slug": "automation/playwright/playwright_09",
-            "code": "from playwright.sync_api import sync_playwright\n\nmessages = []\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.on(\"console\", lambda message: messages.append(message.text))\n    page.set_content(\"<script>console.log('dashboard ready')</script>\")\n    browser.close()\n\nassert messages == [\"dashboard ready\"]\nmessages"
+            "slug": "automation/playwright/playwright_09"
           },
           {
             "id": "playwright_10",
@@ -5723,8 +5384,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "로그인 폼, 네트워크 mock, 화면 검증, 스크린샷, JSON 리포트를 하나의 브라우저 점검 함수로 묶는다.",
-            "slug": "automation/playwright/playwright_10",
-            "code": "appHtml = \"\"\"\n<main>\n  <h1>운영 점검</h1>\n  <label>이메일 <input name=\"email\" /></label>\n  <button type=\"button\">로그인</button>\n  <p data-testid=\"status\">로그인 전</p>\n  <p data-testid=\"orders\">주문 0건</p>\n</main>\n\"\"\"\n\nassert \"이메일\" in appHtml\nassert \"로그인\" in appHtml\nassert 'data-testid=\"orders\"' in appHtml\nappHtml"
+            "slug": "automation/playwright/playwright_10"
           }
         ]
       },
@@ -5743,8 +5403,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "매일 받은편지함 정리와 정기 보고서 발송을 Python 표준 라이브러리만으로 자동화한다. 외부 패키지 0개로 회사 보안 정책에 막힐 일이 없다.",
-            "slug": "automation/email/email_00",
-            "code": ""
+            "slug": "automation/email/email_00"
           },
           {
             "id": "email_01",
@@ -5757,8 +5416,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "smtplib.SMTP_SSL과 email.message.EmailMessage 두 객체로 첫 메일 발송 함수를 만든다. dryRun 안전 패턴을 처음부터 의무로 적용한다.",
-            "slug": "automation/email/email_01",
-            "code": "from email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"me@example.com\"\nmsg[\"To\"] = \"me@example.com\"\nmsg[\"Subject\"] = \"Codaro 첫 메일\"\nmsg.set_content(\"본문입니다. Codaro PDF 트랙 발송 테스트.\", charset=\"utf-8\")\n\nmsg[\"From\"], msg[\"To\"], msg[\"Subject\"], msg.get_content().strip()"
+            "slug": "automation/email/email_01"
           },
           {
             "id": "email_02",
@@ -5771,8 +5429,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "HTML 본문과 PDF 첨부가 들어간 메일을 EmailMessage 한 객체로 만든다. 한글 파일명 깨짐 함정도 같이 해결한다.",
-            "slug": "automation/email/email_02",
-            "code": "from email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"me@example.com\"\nmsg[\"To\"] = \"you@example.com\"\nmsg[\"Subject\"] = \"HTML 안내\"\nmsg.set_content(\"HTML을 지원하지 않는 클라이언트용 본문입니다.\", charset=\"utf-8\")\nmsg.add_alternative(\n    \"<h1>Codaro</h1><p>HTML 본문입니다.</p>\",\n    subtype=\"html\",\n)\nmsg.get_content_type(), [p.get_content_type() for p in msg.iter_parts()]"
+            "slug": "automation/email/email_02"
           },
           {
             "id": "email_03",
@@ -5787,8 +5444,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "CSV 명단을 받아 string.Template로 본문을 치환하고, 100명에게 개인화된 메일을 안전하게 발송한다. 60분 손작업이 5초가 된다.",
-            "slug": "automation/email/email_03",
-            "code": "import csv\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\nworkdir = TemporaryDirectory()\ncsvPath = Path(workdir.name) / \"list.csv\"\ncsvPath.write_text(\n    \"name,email,role\\n\"\n    \"김대리,kim@example.com,대리\\n\"\n    \"박과장,park@example.com,과장\\n\"\n    \"이주임,lee@example.com,주임\\n\",\n    encoding=\"utf-8\",\n)\n\nwith open(csvPath, \"r\", encoding=\"utf-8\") as f:\n    recipients = list(csv.DictReader(f))\nlen(recipients), recipients[0]"
+            "slug": "automation/email/email_03"
           },
           {
             "id": "email_04",
@@ -5801,8 +5457,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "매일 운영 데이터를 표와 차트가 들어간 HTML 메일로 자동 발송한다. 일일 20분 × 5일 = 100분/주가 10초로 줄어든다.",
-            "slug": "automation/email/email_04",
-            "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"region\": [\"Seoul\", \"Busan\", \"Daegu\"],\n    \"amount\": [120000, 80000, 60000],\n})\nhtml = df.to_html(index=False, border=1)\n\"Seoul\" in html and \"<table\" in html"
+            "slug": "automation/email/email_04"
           },
           {
             "id": "email_05",
@@ -5816,8 +5471,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "imaplib.IMAP4_SSL로 메일함에 접속해 검색·조회한다. 본인 메일 계정 환경변수가 필요하며, 항상 별도 폴더(INBOX/CodaroTest)에서만 작업.",
-            "slug": "automation/email/email_05",
-            "code": "import imaplib\nimport os\n\nIMAP_HOST = \"imap.gmail.com\"\n\ndef connectImap():\n    user = os.environ.get(\"IMAP_USER\")\n    appPass = os.environ.get(\"IMAP_APP_PASS\")\n    if not user or not appPass:\n        return None\n    conn = imaplib.IMAP4_SSL(IMAP_HOST)\n    conn.login(user, appPass)\n    return conn\n\nconn = connectImap()\nstate = \"connected\" if conn else \"skipped (no env vars)\"\nif conn:\n    conn.logout()\nstate"
+            "slug": "automation/email/email_05"
           },
           {
             "id": "email_06",
@@ -5831,8 +5485,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "받은 메일의 첨부 파일을 코드로 자동 추출·저장한다. 세금계산서·견적서·계약서 PDF가 매주 30분 × 5일 손정리하던 작업이 8초로.",
-            "slug": "automation/email/email_06",
-            "code": "from email.message import EmailMessage\nfrom email.parser import BytesParser\nfrom email.policy import default\n\noriginal = EmailMessage()\noriginal[\"From\"] = \"me@example.com\"\noriginal[\"To\"] = \"you@example.com\"\noriginal[\"Subject\"] = \"round trip\"\noriginal.set_content(\"body\", charset=\"utf-8\")\n\nserialized = original.as_bytes()\nrestored = BytesParser(policy=default).parsebytes(serialized)\nrestored[\"Subject\"], restored.get_content().strip()"
+            "slug": "automation/email/email_06"
           },
           {
             "id": "email_07",
@@ -5845,8 +5498,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "발신자·제목 룰로 메일을 자동 폴더에 분류한다. 사장님의 매일 30분 분류 작업이 5초로 줄어든다.",
-            "slug": "automation/email/email_07",
-            "code": "rules = [\n    {\"keyword\": \"@nts.go.kr\", \"field\": \"from\", \"folder\": \"TaxOffice\"},\n    {\"keyword\": \"세금계산서\", \"field\": \"subject\", \"folder\": \"Invoices\"},\n    {\"keyword\": \"@vendor.com\", \"field\": \"from\", \"folder\": \"Vendors\"},\n]\n\ndef matchRule(rules, sender, subject):\n    for rule in rules:\n        if rule[\"field\"] == \"from\" and rule[\"keyword\"] in sender:\n            return rule[\"folder\"]\n        if rule[\"field\"] == \"subject\" and rule[\"keyword\"] in subject:\n            return rule[\"folder\"]\n    return None\n\nmatchRule(rules, \"office@nts.go.kr\", \"민원 통보\"), matchRule(rules, \"billing@vendor.com\", \"월간 세금계산서 첨부\")"
+            "slug": "automation/email/email_07"
           },
           {
             "id": "email_08",
@@ -5859,8 +5511,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "야간 배치 스크립트의 예외를 잡아 즉시 알림 메일을 보낸다. 평균 30분 대응 지연이 즉시 통보로 줄어든다.",
-            "slug": "automation/email/email_08",
-            "code": "import traceback\nfrom email.message import EmailMessage\n\ndef buildNotification(scriptName, exc, tb=None, toAddr=\"ops@example.com\"):\n    msg = EmailMessage()\n    msg[\"From\"] = \"alerts@example.com\"\n    msg[\"To\"] = toAddr\n    msg[\"Subject\"] = f\"[FAIL] {scriptName}\"\n    body = (\n        f\"Script: {scriptName}\\n\"\n        f\"Error type: {type(exc).__name__}\\n\"\n        f\"Error message: {exc}\\n\\n\"\n        f\"Traceback:\\n{tb or 'no traceback'}\"\n    )\n    msg.set_content(body, charset=\"utf-8\")\n    return msg\n\ntry:\n    raise ValueError(\"DB connection failed\")\nexcept Exception as exc:\n    alert = buildNotification(\"nightly_etl\", exc, traceback.format_exc())\nalert[\"Subject\"], \"DB connection\" in alert.get_content()"
+            "slug": "automation/email/email_08"
           },
           {
             "id": "email_09",
@@ -5874,8 +5525,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "발송·수신 모듈의 자격증명을 환경변수와 dryRun으로 일관되게 관리한다. 평문 비밀번호 사고와 .env 커밋 사고를 모두 차단.",
-            "slug": "automation/email/email_09",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nimport os\n\ndef loadEnvFile(path):\n    loaded = {}\n    for raw in Path(path).read_text(encoding=\"utf-8\").splitlines():\n        line = raw.strip()\n        if not line or line.startswith(\"#\"):\n            continue\n        key, _, value = line.partition(\"=\")\n        loaded[key.strip()] = value.strip().strip('\"').strip(\"'\")\n    for key, value in loaded.items():\n        os.environ[key] = value\n    return list(loaded.keys())\n\nworkdir = TemporaryDirectory()\nenvPath = Path(workdir.name) / \".env\"\nenvPath.write_text(\n    \"# Codaro Email\\n\"\n    \"SMTP_USER=me@example.com\\n\"\n    'SMTP_APP_PASS=\"app pass 16자\"\\n',\n    encoding=\"utf-8\",\n)\nkeys = loadEnvFile(envPath)\nkeys, os.environ.get(\"SMTP_USER\")"
+            "slug": "automation/email/email_09"
           },
           {
             "id": "email_10",
@@ -5889,8 +5539,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "01-09강의 모든 패턴을 한 사이클에 묶는다. CSV 데이터 → 차트 + PDF → HTML 메일 → 다수 발송 → 알림 모니터링. aiosmtpd로 실 발송 통합 검증.",
-            "slug": "automation/email/email_10",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nimport pandas as pd\n\nworkdir = TemporaryDirectory()\nbase = Path(workdir.name)\ndf = pd.DataFrame({\n    \"region\": [\"Seoul\", \"Busan\", \"Daegu\", \"Incheon\"],\n    \"amount\": [1200000, 800000, 600000, 550000],\n})\nfig, ax = plt.subplots(figsize=(8, 4))\ndf.plot.bar(x=\"region\", y=\"amount\", ax=ax, legend=False)\nax.set_title(\"Weekly Sales\")\nax.set_ylabel(\"amount\")\npngPath = base / \"chart.png\"\nfig.savefig(pngPath, bbox_inches=\"tight\")\nplt.close(fig)\npngPath.stat().st_size > 0"
+            "slug": "automation/email/email_10"
           }
         ]
       },
@@ -5910,8 +5559,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Excel 로컬 자동화 입문에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.",
-            "slug": "automation/excel/excel_01",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom openpyxl import Workbook, load_workbook\n\nexcelTemp = TemporaryDirectory()\nexcelRoot = Path(excelTemp.name)\nsalesPath = excelRoot / \"sales_report.xlsx\"\n\nworkbook = Workbook()\nsheet = workbook.active\nsheet.title = \"sales\"\nsheet.append([\"date\", \"region\", \"product\", \"amount\"])\nsheet.append([\"2026-05-01\", \"Seoul\", \"Notebook\", 1250000])\nsheet.append([\"2026-05-02\", \"Busan\", \"Monitor\", 420000])\nsheet.append([\"2026-05-03\", \"Seoul\", \"Keyboard\", 180000])\nworkbook.save(salesPath)\n\nassert salesPath.exists()\nsalesPath"
+            "slug": "automation/excel/excel_01"
           },
           {
             "id": "excel_02",
@@ -5926,8 +5574,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Excel 데이터 읽기와 정제에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.",
-            "slug": "automation/excel/excel_02",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom openpyxl import Workbook\nimport pandas as pd\n\nexcelTemp = TemporaryDirectory()\nexcelRoot = Path(excelTemp.name)\nordersPath = excelRoot / \"orders.xlsx\"\n\nworkbook = Workbook()\nsheet = workbook.active\nsheet.title = \"orders\"\nsheet.append([\"order_id\", \"region\", \"quantity\", \"unit_price\"])\nsheet.append([\"A001\", \"Seoul\", 3, 120000])\nsheet.append([\"A002\", \"Busan\", 2, 80000])\nsheet.append([\"A003\", \"Seoul\", 5, 45000])\nworkbook.save(ordersPath)\n\norders = pd.read_excel(ordersPath, sheet_name=\"orders\")\nassert list(orders.columns) == [\"order_id\", \"region\", \"quantity\", \"unit_price\"]\norders"
+            "slug": "automation/excel/excel_02"
           },
           {
             "id": "excel_03",
@@ -5942,8 +5589,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "Excel 리포트 자동 생성에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.",
-            "slug": "automation/excel/excel_03",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nimport pandas as pd\nfrom openpyxl import load_workbook\nfrom openpyxl.chart import BarChart, Reference\nfrom codaro.curriculum.localData import loadLocalDataset\n\nexcelTemp = TemporaryDirectory()\nexcelRoot = Path(excelTemp.name)\nreportPath = excelRoot / \"tips_report.xlsx\"\n\ntips = loadLocalDataset(\"tips\")\ntipsReport = tips.assign(tip_rate=tips[\"tip\"] / tips[\"total_bill\"])\nsummary = tipsReport.groupby(\"time\", as_index=False).agg(order_count=(\"tip\", \"size\"), avg_tip=(\"tip\", \"mean\"), avg_tip_rate=(\"tip_rate\", \"mean\"))\n\nassert set(summary[\"time\"]) == {\"Lunch\", \"Dinner\"}\nsummary.round(3)"
+            "slug": "automation/excel/excel_03"
           }
         ]
       },
@@ -5962,8 +5608,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "openpyxl은 Excel 프로그램과 무관하게 .xlsx 파일 자체를 코드로 만들고 읽는 라이브러리입니다. 서버, CI, macOS, Linux 어디서든 같은 코드가 돕니다.",
-            "slug": "automation/openpyxl/openpyxl_00",
-            "code": "import openpyxl\nfrom openpyxl import Workbook\n\nbook = Workbook()\nsheet = book.active\nsheet[\"A1\"] = \"ready\"\n\nassert sheet[\"A1\"].value == \"ready\"\nprint(openpyxl.__version__)"
+            "slug": "automation/openpyxl/openpyxl_00"
           },
           {
             "id": "openpyxl_01",
@@ -5978,8 +5623,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "워크북을 만들고 시트를 추가·정렬·삭제한 뒤 .xlsx 파일로 저장하고, 다시 열어 시트 구조를 코드로 검증합니다.",
-            "slug": "automation/openpyxl/openpyxl_01",
-            "code": "from openpyxl import Workbook\n\nworkbook = Workbook()\nsheet = workbook.active\nsheet.title, workbook.sheetnames"
+            "slug": "automation/openpyxl/openpyxl_01"
           },
           {
             "id": "openpyxl_02",
@@ -5994,8 +5638,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "시트 안의 셀을 좌표 두 방식으로 읽고 쓰며, append와 명시적 좌표 지정의 장단점을 직접 비교합니다.",
-            "slug": "automation/openpyxl/openpyxl_02",
-            "code": "from openpyxl import Workbook\n\nbook = Workbook()\nsheet = book.active\nsheet[\"A1\"] = \"name\"\ncellByLetter = sheet[\"A1\"]\ncellByIndex = sheet.cell(row=1, column=1)\ncellByLetter.value, cellByIndex.value, cellByLetter is cellByIndex"
+            "slug": "automation/openpyxl/openpyxl_02"
           },
           {
             "id": "openpyxl_03",
@@ -6010,8 +5653,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "시트의 셀들을 행·열·범위 단위로 순회하고, 카테고리 기준으로 다중 시트로 분리합니다. 보고서가 여러 시트를 갖는 진짜 이유를 이 강의에서 만든다.",
-            "slug": "automation/openpyxl/openpyxl_03",
-            "code": "from openpyxl import Workbook\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"date\", \"region\", \"amount\"])\nsheet.append([\"2026-05-01\", \"Seoul\", 120000])\nsheet.append([\"2026-05-02\", \"Busan\", 80000])\nsheet.append([\"2026-05-03\", \"Seoul\", 45000])\n\nlist(sheet.iter_rows(min_row=2, values_only=True))"
+            "slug": "automation/openpyxl/openpyxl_03"
           },
           {
             "id": "openpyxl_04",
@@ -6027,8 +5669,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "셀에 수식 문자열을 직접 쓰고, 저장된 파일을 data_only로 다시 열어 캐시된 결과값을 읽습니다. DefinedName으로 수식을 사람이 읽기 좋게 만듭니다.",
-            "slug": "automation/openpyxl/openpyxl_04",
-            "code": "from openpyxl import Workbook\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"region\", \"amount\"])\nsheet.append([\"Seoul\", 120000])\nsheet.append([\"Busan\", 80000])\nsheet[\"A4\"] = \"total\"\nsheet[\"B4\"] = \"=SUM(B2:B3)\"\nsheet[\"B4\"].value"
+            "slug": "automation/openpyxl/openpyxl_04"
           },
           {
             "id": "openpyxl_05",
@@ -6044,8 +5685,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "셀의 글자, 배경, 테두리, 정렬, 숫자 포맷을 코드로 부여하고, NamedStyle로 재사용 가능한 스타일 라이브러리를 만듭니다.",
-            "slug": "automation/openpyxl/openpyxl_05",
-            "code": "from openpyxl import Workbook\nfrom openpyxl.styles import Font\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"date\", \"region\", \"amount\"])\nheaderFont = Font(name=\"Calibri\", size=12, bold=True, color=\"FFFFFFFF\")\nfor cell in sheet[1]:\n    cell.font = headerFont\nsheet[\"A1\"].font.bold, sheet[\"A1\"].font.color.rgb"
+            "slug": "automation/openpyxl/openpyxl_05"
           },
           {
             "id": "openpyxl_06",
@@ -6060,8 +5700,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "셀 값에 따라 색을 자동으로 입히는 조건부 서식을 KPI 대시보드 관점에서 익힙니다. 사람이 표를 읽기 전에 색만으로 결론이 보이게 만듭니다.",
-            "slug": "automation/openpyxl/openpyxl_06",
-            "code": "from openpyxl import Workbook\nfrom openpyxl.formatting.rule import ColorScaleRule\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"region\", \"amount\"])\nfor region, amount in [(\"Seoul\", 120000), (\"Busan\", 80000), (\"Daegu\", 30000), (\"Incheon\", 65000)]:\n    sheet.append([region, amount])\n\nrule = ColorScaleRule(\n    start_type=\"min\", start_color=\"FFF8696B\",\n    mid_type=\"percentile\", mid_value=50, mid_color=\"FFFFEB84\",\n    end_type=\"max\", end_color=\"FF63BE7B\",\n)\nsheet.conditional_formatting.add(\"B2:B5\", rule)\nlist(sheet.conditional_formatting._cf_rules.keys())"
+            "slug": "automation/openpyxl/openpyxl_06"
           },
           {
             "id": "openpyxl_07",
@@ -6077,8 +5716,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "표 데이터를 Reference로 잡아 막대·선·파이 차트를 만들고 시트에 위치 좌표로 배치합니다. 차트 제목, 축 라벨, 범례, 데이터 라벨까지 코드로 제어합니다.",
-            "slug": "automation/openpyxl/openpyxl_07",
-            "code": "from openpyxl import Workbook\nfrom openpyxl.chart import BarChart, Reference\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"region\", \"amount\"])\nfor region, amount in [(\"Seoul\", 120000), (\"Busan\", 80000), (\"Daegu\", 30000), (\"Incheon\", 65000)]:\n    sheet.append([region, amount])\n\nchart = BarChart()\nchart.title = \"지역별 매출\"\nchart.x_axis.title = \"지역\"\nchart.y_axis.title = \"금액\"\n\ndataRef = Reference(sheet, min_col=2, min_row=1, max_col=2, max_row=5)\ncategoryRef = Reference(sheet, min_col=1, min_row=2, max_row=5)\nchart.add_data(dataRef, titles_from_data=True)\nchart.set_categories(categoryRef)\n\nsheet.add_chart(chart, \"D2\")\nlen(sheet._charts), chart.title"
+            "slug": "automation/openpyxl/openpyxl_07"
           },
           {
             "id": "openpyxl_08",
@@ -6093,8 +5731,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "이미지 삽입, 외부 URL과 내부 시트 하이퍼링크, 셀 코멘트를 결합해 상품 카탈로그 같은 인터랙티브 보고서를 만듭니다.",
-            "slug": "automation/openpyxl/openpyxl_08",
-            "code": "from io import BytesIO\nfrom PIL import Image as PILImage\nfrom openpyxl import Workbook\nfrom openpyxl.drawing.image import Image as XlImage\n\nbook = Workbook()\nsheet = book.active\nsheet.append([\"product\", \"image\"])\nsheet.append([\"pen\", \"여기 이미지\"])\n\nswatch = PILImage.new(\"RGB\", (80, 40), (48, 84, 150))\nbuffer = BytesIO()\nswatch.save(buffer, format=\"PNG\")\nbuffer.seek(0)\n\nsheetImage = XlImage(buffer)\nsheet.add_image(sheetImage, \"B2\")\nlen(sheet._images)"
+            "slug": "automation/openpyxl/openpyxl_08"
           },
           {
             "id": "openpyxl_09",
@@ -6109,8 +5746,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "입력 양식의 무결성을 표·데이터 검증·고정창·자동 필터로 잠가, 사람이 잘못된 값을 넣을 수 없는 보고서 양식을 만듭니다.",
-            "slug": "automation/openpyxl/openpyxl_09",
-            "code": "from openpyxl import Workbook\nfrom openpyxl.worksheet.table import Table\n\nbook = Workbook()\nsheet = book.active\nsheet.title = \"orders\"\nsheet.append([\"order_id\", \"region\", \"amount\", \"status\"])\nfor row in [\n    (\"A001\", \"Seoul\", 120000, \"ok\"),\n    (\"A002\", \"Busan\", 80000, \"refund\"),\n    (\"A003\", \"Daegu\", 30000, \"ok\"),\n]:\n    sheet.append(list(row))\n\ntable = Table(displayName=\"ordersTable\", ref=\"A1:D4\")\nsheet.add_table(table)\nsheet.tables[\"ordersTable\"].ref"
+            "slug": "automation/openpyxl/openpyxl_09"
           },
           {
             "id": "openpyxl_10",
@@ -6125,8 +5761,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "지금까지 익힌 모든 openpyxl 기술(시트·수식·서식·조건부 서식·차트·표·검증)을 하나의 함수로 묶어 월간 매출 리포트 자동 생성기를 완성합니다.",
-            "slug": "automation/openpyxl/openpyxl_10",
-            "code": "import pandas as pd\n\ndef validateSalesFrame(frame):\n    requiredColumns = {\"date\", \"region\", \"product\", \"amount\"}\n    missingColumns = requiredColumns - set(frame.columns)\n    if missingColumns:\n        raise ValueError(f\"필수 컬럼이 빠졌습니다: {sorted(missingColumns)}\")\n    if len(frame) == 0:\n        raise ValueError(\"매출 데이터가 비어 있습니다.\")\n    if (frame[\"amount\"] <= 0).any():\n        raise ValueError(\"amount는 0보다 커야 합니다.\")\n    return True\n\nsalesFrame = pd.DataFrame([\n    {\"date\": \"2026-05-01\", \"region\": \"Seoul\", \"product\": \"Notebook\", \"amount\": 1250000},\n    {\"date\": \"2026-05-02\", \"region\": \"Busan\", \"product\": \"Monitor\", \"amount\": 420000},\n    {\"date\": \"2026-05-03\", \"region\": \"Seoul\", \"product\": \"Keyboard\", \"amount\": 180000},\n    {\"date\": \"2026-05-04\", \"region\": \"Daegu\", \"product\": \"Mouse\", \"amount\""
+            "slug": "automation/openpyxl/openpyxl_10"
           }
         ]
       },
@@ -6145,8 +5780,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "받은 PDF에서 텍스트·표를 뽑고, 새 PDF로 만들고, 묶고·자르고·잠그는 사무 PDF 작업 전 과정을 로컬 Python 한 사이클로 끝낸다. Excel 앱이나 외부 서비스 없이 완결된다.",
-            "slug": "automation/pdf/pdf_00",
-            "code": "import io\nimport pdfplumber\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen import canvas\n\nbuffer = io.BytesIO()\npage = canvas.Canvas(buffer)\npage.drawString(72, 720, \"Codaro PDF ready\")\npage.save()\n\nbuffer.seek(0)\nreader = PdfReader(buffer)\nassert len(reader.pages) == 1\n\nbuffer.seek(0)\nwith pdfplumber.open(buffer) as pdf:\n    text = pdf.pages[0].extract_text() or \"\"\n\nassert \"Codaro PDF ready\" in text\nprint(text)"
+            "slug": "automation/pdf/pdf_00"
           },
           {
             "id": "pdf_01",
@@ -6160,8 +5794,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "받은 PDF에서 페이지 수·제목·작성자·작성일 같은 메타 정보를 코드로 뽑아 표로 정리한다. 50개 PDF 일괄 점검이 25분에서 2초로 줄어드는 흐름을 만든다.",
-            "slug": "automation/pdf/pdf_01",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen.canvas import Canvas\n\nworkdir = TemporaryDirectory()\nsamplePath = Path(workdir.name) / \"sample.pdf\"\ncanvas = Canvas(str(samplePath))\nfor idx in range(3):\n    canvas.drawString(72, 720, f\"page {idx + 1}\")\n    canvas.showPage()\ncanvas.save()\n\nreader = PdfReader(samplePath)\nlen(reader.pages)"
+            "slug": "automation/pdf/pdf_01"
           },
           {
             "id": "pdf_02",
@@ -6175,8 +5808,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "여러 PDF를 한 PDF로 묶고, 한 PDF를 단원별로 자르는 작업을 코드로 처리한다. 협력사 PDF 50종 분리·통합 반복 작업이 40분에서 5초로 줄어드는 흐름이다.",
-            "slug": "automation/pdf/pdf_02",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader, PdfWriter\nfrom reportlab.pdfgen.canvas import Canvas\n\nworkdir = TemporaryDirectory()\nsrcPath = Path(workdir.name) / \"src.pdf\"\noutPath = Path(workdir.name) / \"out.pdf\"\n\ncanvas = Canvas(str(srcPath))\ncanvas.drawString(72, 720, \"source page\")\ncanvas.showPage()\ncanvas.save()\n\nwriter = PdfWriter()\nwriter.add_page(PdfReader(srcPath).pages[0])\nwriter.write(str(outPath))\n\nlen(PdfReader(outPath).pages)"
+            "slug": "automation/pdf/pdf_02"
           },
           {
             "id": "pdf_03",
@@ -6189,8 +5821,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "회의록·계약서·보고서 PDF에서 본문 텍스트를 코드로 뽑아 마크다운으로 정리한다. 1시간 손작업이 8초로 줄어드는 흐름이다.",
-            "slug": "automation/pdf/pdf_03",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen.canvas import Canvas\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"note.pdf\"\ncanvas = Canvas(str(pdfPath))\ncanvas.drawString(72, 720, \"Codaro PDF lesson\")\ncanvas.drawString(72, 700, \"extract_text demo\")\ncanvas.showPage()\ncanvas.save()\n\nbody = PdfReader(pdfPath).pages[0].extract_text()\nbody"
+            "slug": "automation/pdf/pdf_03"
           },
           {
             "id": "pdf_04",
@@ -6204,8 +5835,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "정부 통계·세금계산서·금융 보고서의 표를 코드로 뽑아 DataFrame과 CSV로 변환한다. 90분 손작업이 10초로 줄어드는 흐름이다.",
-            "slug": "automation/pdf/pdf_04",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom reportlab.lib import colors\nfrom reportlab.lib.pagesizes import A4\nfrom reportlab.platypus import SimpleDocTemplate, Table, TableStyle\n\ndef buildTablePdf(path):\n    rows = [\n        [\"region\", \"q1\", \"q2\", \"q3\"],\n        [\"Seoul\", \"120\", \"135\", \"150\"],\n        [\"Busan\", \"80\", \"78\", \"92\"],\n        [\"Daegu\", \"60\", \"65\", \"70\"],\n    ]\n    doc = SimpleDocTemplate(str(path), pagesize=A4)\n    tbl = Table(rows)\n    tbl.setStyle(TableStyle([\n        (\"GRID\", (0, 0), (-1, -1), 0.5, colors.black),\n        (\"FONTNAME\", (0, 0), (-1, 0), \"Helvetica-Bold\"),\n    ]))\n    doc.build([tbl])\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"table.pdf\"\nbuildTablePdf(pdfPath)\npdfPath.stat().st_size > 0"
+            "slug": "automation/pdf/pdf_04"
           },
           {
             "id": "pdf_05",
@@ -6219,8 +5849,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "reportlab의 Canvas로 영문 텍스트가 들어간 한 페이지 PDF를 만든다. 좌표계와 폰트, 페이지 단위 모두를 손에 익히는 출발점이다.",
-            "slug": "automation/pdf/pdf_05",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen.canvas import Canvas\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"hello.pdf\"\ncanvas = Canvas(str(pdfPath))\ncanvas.drawString(72, 720, \"Hello PDF\")\ncanvas.showPage()\ncanvas.save()\n\nbody = PdfReader(pdfPath).pages[0].extract_text()\n\"Hello PDF\" in (body or \"\")"
+            "slug": "automation/pdf/pdf_05"
           },
           {
             "id": "pdf_06",
@@ -6234,8 +5863,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "reportlab 기본 폰트는 한글이 □로 깨진다. 시스템에 설치된 한글 폰트를 OS별로 찾아 등록하는 헬퍼를 만들고, Paragraph로 단락 스타일까지 다룬다.",
-            "slug": "automation/pdf/pdf_06",
-            "code": "import sys\nfrom pathlib import Path\nfrom reportlab.pdfbase import pdfmetrics\nfrom reportlab.pdfbase.ttfonts import TTFont\n\ndef registerKoreanFont():\n    candidates = {\n        \"win32\": [r\"C:\\Windows\\Fonts\\malgun.ttf\"],\n        \"darwin\": [\n            \"/System/Library/Fonts/AppleSDGothicNeo.ttc\",\n            \"/Library/Fonts/AppleSDGothicNeo.ttc\",\n        ],\n        \"linux\": [\n            \"/usr/share/fonts/truetype/nanum/NanumGothic.ttf\",\n            \"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc\",\n        ],\n    }\n    for path in candidates.get(sys.platform, []):\n        if Path(path).exists():\n            pdfmetrics.registerFont(TTFont(\"Korean\", path))\n            return \"Korean\"\n    raise FileNotFoundError(\n        \"한글 폰트를 찾지 못했습니다. Linux는 'apt install fonts-nanum', \"\n        \"Wi"
+            "slug": "automation/pdf/pdf_06"
           },
           {
             "id": "pdf_07",
@@ -6249,8 +5877,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "데이터 표와 로고가 들어간 한글 보고서를 Platypus로 만든다. 120분 손작업이 15초로 줄어드는 흐름이다.",
-            "slug": "automation/pdf/pdf_07",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.lib.pagesizes import A4\nfrom reportlab.lib.styles import getSampleStyleSheet\nfrom reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"doc.pdf\"\nstyles = getSampleStyleSheet()\ndoc = SimpleDocTemplate(str(pdfPath), pagesize=A4)\ndoc.build([\n    Paragraph(\"Report Title\", styles[\"Title\"]),\n    Spacer(1, 12),\n    Paragraph(\"body line one\", styles[\"BodyText\"]),\n])\n\nbody = PdfReader(pdfPath).pages[0].extract_text() or \"\"\n\"Report Title\" in body and \"body line one\" in body"
+            "slug": "automation/pdf/pdf_07"
           },
           {
             "id": "pdf_08",
@@ -6264,8 +5891,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "사외 공유 PDF에 '사내전용' 워터마크와 패스워드 보호를 코드로 일괄 적용한다. 50개 PDF 처리가 50분에서 6초로 줄어든다.",
-            "slug": "automation/pdf/pdf_08",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen.canvas import Canvas\n\ndef makeWatermark(path, text):\n    canvas = Canvas(str(path))\n    canvas.setFillColorRGB(0.7, 0.7, 0.7)\n    canvas.setFont(\"Helvetica-Bold\", 60)\n    canvas.drawCentredString(298, 421, text)\n    canvas.showPage()\n    canvas.save()\n\nworkdir = TemporaryDirectory()\nwmPath = Path(workdir.name) / \"wm.pdf\"\nmakeWatermark(wmPath, \"CONFIDENTIAL\")\nbody = PdfReader(wmPath).pages[0].extract_text() or \"\"\n\"CONFIDENTIAL\" in body"
+            "slug": "automation/pdf/pdf_08"
           },
           {
             "id": "pdf_09",
@@ -6279,8 +5905,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "신청서·양식 PDF의 텍스트 필드를 코드로 일괄 채운다. 인사·총무에서 동일 양식 N장을 손으로 채우던 작업이 한 번의 함수 호출이 된다.",
-            "slug": "automation/pdf/pdf_09",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom pypdf import PdfReader\nfrom reportlab.pdfgen.canvas import Canvas\n\ndef buildForm(path):\n    canvas = Canvas(str(path))\n    canvas.drawString(72, 750, \"Application Form\")\n    canvas.drawString(72, 720, \"Name:\")\n    canvas.acroForm.textfield(name=\"applicantName\", x=140, y=715, width=200, height=20)\n    canvas.drawString(72, 690, \"Phone:\")\n    canvas.acroForm.textfield(name=\"applicantPhone\", x=140, y=685, width=200, height=20)\n    canvas.showPage()\n    canvas.save()\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"form.pdf\"\nbuildForm(pdfPath)\n\nfields = PdfReader(pdfPath).get_fields()\nsorted(fields.keys()) if fields else []"
+            "slug": "automation/pdf/pdf_09"
           },
           {
             "id": "pdf_10",
@@ -6294,8 +5919,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "01-09강의 모든 패턴을 한 사이클에 묶는다. CSV 거래 데이터에서 고객별 한글 청구서 PDF 묶음을 만드는 회계팀 실무 도구를 완성한다.",
-            "slug": "automation/pdf/pdf_10",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nimport pandas as pd\n\nworkdir = TemporaryDirectory()\nbase = Path(workdir.name)\ncsvPath = base / \"deals.csv\"\ncsvPath.write_text(\n    \"customer,item,qty,unit_price\\n\"\n    \"Codaro Lab,Subscription,2,50000\\n\"\n    \"Codaro Lab,Onboarding,1,200000\\n\"\n    \"Acme Corp,Subscription,5,50000\\n\"\n    \"Acme Corp,Support,3,30000\\n\",\n    encoding=\"utf-8\",\n)\n\ndef loadInvoices(csvPath):\n    df = pd.read_csv(csvPath)\n    df[\"amount\"] = df[\"qty\"] * df[\"unit_price\"]\n    invoices = []\n    for customer, group in df.groupby(\"customer\"):\n        items = group[[\"item\", \"qty\", \"unit_price\", \"amount\"]].to_dict(\"records\")\n        invoices.append({\n            \"customer\": customer,\n            \"items\": items,\n            \"subtotal\": int(group[\"amount\"].sum()"
+            "slug": "automation/pdf/pdf_10"
           }
         ]
       },
@@ -6314,8 +5938,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "실전파이썬 소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/practical/00_실전파이썬소개",
-            "code": "def normalizeTask(rawTask):\n    title = rawTask.get('title', '').strip()\n    status = rawTask.get('status', '').strip().lower()\n    minutes = int(rawTask.get('minutes', 0))\n\n    if not title:\n        raise ValueError('title is required')\n    if status not in {'todo', 'doing', 'done'}:\n        raise ValueError('unsupported status')\n    if minutes <= 0:\n        raise ValueError('minutes must be positive')\n\n    return {\n        'title': title,\n        'status': status,\n        'minutes': minutes,\n        'urgent': status != 'done' and minutes >= 60,\n    }\n\ntask = normalizeTask({'title': '  report ', 'status': 'DOING', 'minutes': '75'})\nassert task == {'title': 'report', 'status': 'doing', 'minutes': 75, 'urgent': True}\ntask"
+            "slug": "automation/practical/00_실전파이썬소개"
           }
         ]
       },
@@ -6334,8 +5957,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "근로계약서·회의록·가정통신문 같은 양식화된 Word 문서를 데이터에서 자동 생성한다. python-docx + docxtpl 두 라이브러리로 mail merge까지.",
-            "slug": "automation/word/word_00",
-            "code": ""
+            "slug": "automation/word/word_00"
           },
           {
             "id": "word_01",
@@ -6348,8 +5970,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "python-docx의 가장 단순한 흐름 - Document 만들고, 단락 추가하고, 저장. 본 트랙의 모든 강의가 이 형태에서 확장된다.",
-            "slug": "automation/word/word_01",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\n\nworkdir = TemporaryDirectory()\npdfPath = Path(workdir.name) / \"hello.docx\"\n\ndoc = Document()\ndoc.add_paragraph(\"Hello docx\")\ndoc.add_paragraph(\"Codaro Word lesson 01\")\ndoc.save(pdfPath)\n\nreopened = Document(pdfPath)\n[p.text for p in reopened.paragraphs]"
+            "slug": "automation/word/word_01"
           },
           {
             "id": "word_02",
@@ -6362,8 +5983,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "보고서 목차 골격을 코드로 만든다. add_heading 레벨 1-3과 List Bullet/Number 스타일이 한 문서에 결합되는 패턴.",
-            "slug": "automation/word/word_02",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\n\nworkdir = TemporaryDirectory()\ndocxPath = Path(workdir.name) / \"headings.docx\"\n\ndoc = Document()\ndoc.add_heading(\"월간 보고서\", level=0)\ndoc.add_heading(\"1. 매출 현황\", level=1)\ndoc.add_heading(\"1.1. 지역별\", level=2)\ndoc.add_paragraph(\"Seoul 1,200,000원\")\ndoc.save(docxPath)\n\nreopened = Document(docxPath)\n[(p.text, p.style.name) for p in reopened.paragraphs]"
+            "slug": "automation/word/word_02"
           },
           {
             "id": "word_03",
@@ -6376,8 +5996,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "단락을 run 단위로 쪼개 굵기·색·크기를 적용한다. 한글 East Asian font 의무 패턴을 본 강의에서 정착시킨다.",
-            "slug": "automation/word/word_03",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\n\nworkdir = TemporaryDirectory()\ndocxPath = Path(workdir.name) / \"runs.docx\"\n\ndoc = Document()\np = doc.add_paragraph()\np.add_run(\"일반 텍스트 \")\nbold = p.add_run(\"강조 부분\")\nbold.bold = True\ndoc.save(docxPath)\n\nreopened = Document(docxPath)\nruns = reopened.paragraphs[0].runs\n[(r.text, r.bold) for r in runs]"
+            "slug": "automation/word/word_03"
           },
           {
             "id": "word_04",
@@ -6390,8 +6009,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "보고서·계약서에 들어가는 비교표를 코드로 만든다. 셀 병합과 헤더 강조까지.",
-            "slug": "automation/word/word_04",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\n\nworkdir = TemporaryDirectory()\ndocxPath = Path(workdir.name) / \"table.docx\"\n\ndoc = Document()\ntbl = doc.add_table(rows=3, cols=4, style=\"Table Grid\")\n\nheaders = [\"region\", \"q1\", \"q2\", \"q3\"]\nfor colIdx, value in enumerate(headers):\n    tbl.cell(0, colIdx).text = value\n\nrows = [[\"Seoul\", \"120\", \"135\", \"150\"], [\"Busan\", \"80\", \"78\", \"92\"]]\nfor rowIdx, rowData in enumerate(rows, start=1):\n    for colIdx, value in enumerate(rowData):\n        tbl.cell(rowIdx, colIdx).text = value\n\ndoc.save(docxPath)\n\nreopened = Document(docxPath)\ntbl2 = reopened.tables[0]\ntbl2.cell(0, 0).text, tbl2.cell(1, 1).text"
+            "slug": "automation/word/word_04"
           },
           {
             "id": "word_05",
@@ -6405,8 +6023,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "회사 로고를 본문 또는 머리말에 삽입하고, 모든 페이지에 머리말·꼬리말을 적용한다.",
-            "slug": "automation/word/word_05",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\nfrom docx.shared import Inches\nfrom PIL import Image as PILImage\n\nworkdir = TemporaryDirectory()\nbase = Path(workdir.name)\nimgPath = base / \"logo.png\"\nPILImage.new(\"RGB\", (120, 40), color=(48, 84, 150)).save(imgPath)\n\ndocxPath = base / \"with_logo.docx\"\ndoc = Document()\ndoc.add_picture(str(imgPath), width=Inches(2))\ndoc.add_paragraph(\"로고 아래 본문\")\ndoc.save(docxPath)\n\nreopened = Document(docxPath)\nlen(reopened.inline_shapes)"
+            "slug": "automation/word/word_05"
           },
           {
             "id": "word_06",
@@ -6420,8 +6037,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "사내 양식의 단락·헤더 스타일을 add_style로 정의하고 페이지 여백·크기를 일관되게 설정한다.",
-            "slug": "automation/word/word_06",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\nfrom docx.enum.style import WD_STYLE_TYPE\nfrom docx.oxml.ns import qn\nfrom docx.shared import Pt\n\ndef ensureCodaroBody(doc):\n    if \"CodaroBody\" in doc.styles:\n        return doc.styles[\"CodaroBody\"]\n    style = doc.styles.add_style(\"CodaroBody\", WD_STYLE_TYPE.PARAGRAPH)\n    style.font.name = \"맑은 고딕\"\n    style.font.size = Pt(11)\n    style.element.rPr.rFonts.set(qn(\"w:eastAsia\"), \"맑은 고딕\")\n    return style\n\nworkdir = TemporaryDirectory()\ndocxPath = Path(workdir.name) / \"styled.docx\"\ndoc = Document()\nensureCodaroBody(doc)\ndoc.add_paragraph(\"본문 첫 줄\", style=\"CodaroBody\")\ndoc.add_paragraph(\"본문 둘째 줄\", style=\"CodaroBody\")\ndoc.save(docxPath)\n\nreopened = Document(docxPath)\n[(p.text, p.style.name) for p in reop"
+            "slug": "automation/word/word_06"
           },
           {
             "id": "word_07",
@@ -6434,8 +6050,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "기존 docx 양식을 열어 {{name}} 형태 자리표시자를 데이터로 치환한다. 09강 docxtpl의 단순 버전.",
-            "slug": "automation/word/word_07",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\n\nworkdir = TemporaryDirectory()\nbase = Path(workdir.name)\ntemplatePath = base / \"tpl.docx\"\n\nseed = Document()\nseed.add_paragraph(\"계약서 양식\")\nseed.add_paragraph(\"성명: {{name}}\")\nseed.add_paragraph(\"입사일: {{join_date}}\")\nseed.save(templatePath)\n\nopened = Document(templatePath)\n[p.text for p in opened.paragraphs]"
+            "slug": "automation/word/word_07"
           },
           {
             "id": "word_08",
@@ -6448,8 +6063,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "CSV 명단의 각 행으로 양식 docx를 채워 N장을 자동 생성. 학교 행정의 가정통신문 200장이 10시간에서 30초로.",
-            "slug": "automation/word/word_08",
-            "code": "import csv\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\nworkdir = TemporaryDirectory()\ncsvPath = Path(workdir.name) / \"students.csv\"\ncsvPath.write_text(\n    \"name,grade,classroom,number,parent\\n\"\n    \"김민수,3,1,12,김부모\\n\"\n    \"박지영,3,1,13,박부모\\n\"\n    \"이수진,3,2,5,이부모\\n\",\n    encoding=\"utf-8\",\n)\nwith open(csvPath, \"r\", encoding=\"utf-8\") as f:\n    students = list(csv.DictReader(f))\nlen(students), students[0]"
+            "slug": "automation/word/word_08"
           },
           {
             "id": "word_09",
@@ -6463,8 +6077,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "docxtpl로 Jinja2 문법을 docx 안에 직접 사용한다. {{ }} 단일 치환부터 {% for %} 루프까지.",
-            "slug": "automation/word/word_09",
-            "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nfrom docx import Document\nfrom docxtpl import DocxTemplate\n\nworkdir = TemporaryDirectory()\nbase = Path(workdir.name)\ntplPath = base / \"tpl.docx\"\n\nseed = Document()\nseed.add_paragraph(\"계약자: {{ name }}\")\nseed.add_paragraph(\"직급: {{ role }}\")\nseed.save(tplPath)\n\ntpl = DocxTemplate(str(tplPath))\ntpl.render({\"name\": \"김대리\", \"role\": \"대리\"})\noutPath = base / \"filled.docx\"\ntpl.save(outPath)\n\n[p.text for p in Document(outPath).paragraphs]"
+            "slug": "automation/word/word_09"
           },
           {
             "id": "word_10",
@@ -6477,8 +6090,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "01-09강 모든 패턴을 한 사이클에 묶는다. 회의 메모(JSON)에서 한국 컨설팅 회의록 양식 docx를 한 함수 호출로 생성.",
-            "slug": "automation/word/word_10",
-            "code": "meetingNote = {\n    \"title\": \"Codaro 주간 동기화\",\n    \"date\": \"2026-05-28\",\n    \"location\": \"회의실 A\",\n    \"attendees\": [\n        {\"name\": \"김대리\", \"role\": \"기획\"},\n        {\"name\": \"박과장\", \"role\": \"개발\"},\n        {\"name\": \"이팀장\", \"role\": \"리드\"},\n    ],\n    \"agenda\": [\n        \"1Q 매출 리뷰\",\n        \"신기능 출시 일정\",\n        \"다음 분기 계획\",\n    ],\n    \"decisions\": [\n        \"신기능은 5월 31일 출시\",\n        \"마케팅 캠페인 6월 1일 시작\",\n    ],\n    \"actions\": [\n        {\"who\": \"김대리\", \"what\": \"PRD 작성\", \"due\": \"2026-05-30\"},\n        {\"who\": \"박과장\", \"what\": \"QA 진행\", \"due\": \"2026-05-31\"},\n    ],\n}\nmeetingNote[\"title\"], len(meetingNote[\"attendees\"])"
+            "slug": "automation/word/word_10"
           }
         ]
       },
@@ -6498,8 +6110,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "xlwings로 실행 중인 Excel 프로세스를 Python에서 안전하게 열고, 셀에 값을 쓰고, 정리하는 흐름을 익힌다.",
-            "slug": "automation/xlwings/xlwings_00",
-            "code": "xlwingsOutcomes = [\n    \"백그라운드 Excel을 열고 셀에 값을 쓰고 안전하게 종료한다\",\n    \"상품 가격표 2D 데이터를 한 번에 Range에 일괄 입력한다\",\n    \"pandas DataFrame을 Excel 시트와 양방향으로 왕복한다\",\n    \"매출 데이터로 막대 차트와 표(Table)를 자동 생성한다\",\n    \"@xw.func로 Excel 수식으로 호출되는 Python UDF를 만든다\",\n]\n\nassert len(xlwingsOutcomes) == 5\nassert any(\"차트\" in item for item in xlwingsOutcomes)\nxlwingsOutcomes"
+            "slug": "automation/xlwings/xlwings_00"
           },
           {
             "id": "xlwings_01",
@@ -6515,8 +6126,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "with xw.App 컨텍스트로 백그라운드 Excel을 띄우고, 워크북을 만들고, 셀 한 칸과 가로 한 줄을 안전하게 읽고 쓰는 흐름을 완성한다.",
-            "slug": "automation/xlwings/xlwings_01",
-            "code": "contract = {\n    \"sheetName\": \"smoke\",\n    \"titleCell\": \"A1\",\n    \"titleValue\": \"xlwings 첫 연결\",\n    \"headerCells\": \"B1:D1\",\n    \"headerValues\": [\"product\", \"qty\", \"price\"],\n}\n\nassert contract[\"titleCell\"] == \"A1\"\nassert len(contract[\"headerValues\"]) == 3\ncontract"
+            "slug": "automation/xlwings/xlwings_01"
           },
           {
             "id": "xlwings_02",
@@ -6531,8 +6141,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "출판사의 도서 카탈로그(ISBN, 제목, 저자, 가격)를 한 번의 Range 대입으로 입력하고, expand(\"table\")로 영역을 자동 인식한 뒤 round-trip 검증한다.",
-            "slug": "automation/xlwings/xlwings_02",
-            "code": "bookHeader = [\"isbn\", \"title\", \"author\", \"price\"]\nbookRows = [\n    [\"9788966262649\", \"프로그래머의 뇌\", \"펠리에나 헤르마스\", 22000],\n    [\"9791168473690\", \"아주 작은 습관의 힘\", \"제임스 클리어\", 16800],\n    [\"9788932473901\", \"달러구트 꿈 백화점\", \"이미예\", 13800],\n    [\"9791191891027\", \"퓨처 셀프\", \"벤저민 하디\", 18500],\n    [\"9788954682152\", \"역행자\", \"자청\", 19800],\n]\nbookCatalog = [bookHeader] + bookRows\n\nassert len(bookCatalog) == 6\nassert all(len(row) == 4 for row in bookCatalog)\nbookCatalog"
+            "slug": "automation/xlwings/xlwings_02"
           },
           {
             "id": "xlwings_03",
@@ -6547,8 +6156,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "올림픽 종목별로 시트가 나뉜 워크북을 만들고, sheets 컬렉션을 순회하며 각 종목의 메달 표를 자동 인식한 뒤 국가별 메달 집계 시트를 추가한다.",
-            "slug": "automation/xlwings/xlwings_03",
-            "code": "import xlwings as xw\n\neventMedals = {\n    \"swimming\": [\n        [\"country\", \"gold\", \"silver\", \"bronze\"],\n        [\"USA\", 9, 8, 7],\n        [\"Australia\", 7, 4, 6],\n        [\"China\", 2, 3, 1],\n    ],\n    \"athletics\": [\n        [\"country\", \"gold\", \"silver\", \"bronze\"],\n        [\"USA\", 14, 11, 9],\n        [\"Kenya\", 4, 2, 5],\n        [\"Jamaica\", 1, 3, 2],\n        [\"Ethiopia\", 1, 1, 2],\n    ],\n    \"gymnastics\": [\n        [\"country\", \"gold\", \"silver\", \"bronze\"],\n        [\"China\", 3, 3, 2],\n        [\"Japan\", 2, 3, 2],\n        [\"USA\", 1, 2, 4],\n    ],\n}\n\nwith xw.App(visible=False) as eventApp:\n    eventBook = eventApp.books.add()\n    eventNames = list(eventMedals.keys())\n    firstEvent = eventNames[0]\n    eventBook.sheets[0].name = firstEvent\n    eventBook.sheets[firstEvent][\"A1\"].value = eventMedal"
+            "slug": "automation/xlwings/xlwings_03"
           },
           {
             "id": "xlwings_04",
@@ -6563,8 +6171,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "항공편 운항 데이터(편명·노선·시간·승객 수)를 pandas DataFrame으로 만들고 Excel 시트와 양방향으로 왕복하는 패턴을 익힌다.",
-            "slug": "automation/xlwings/xlwings_04",
-            "code": "import pandas as pd\nimport xlwings as xw\n\nflightDf = pd.DataFrame({\n    \"flightNo\": [\"KE001\", \"OZ211\", \"TW901\"],\n    \"route\": [\"ICN-LAX\", \"ICN-NRT\", \"ICN-CEB\"],\n    \"passengers\": [318, 264, 189],\n})\n\nwith xw.App(visible=False) as dfApp:\n    dfBook = dfApp.books.add()\n    withIndexSheet = dfBook.sheets.active\n    withIndexSheet.name = \"withIndex\"\n    withIndexSheet[\"A1\"].value = flightDf\n\n    noIndexSheet = dfBook.sheets.add(\"noIndex\")\n    noIndexSheet[\"A1\"].options(index=False).value = flightDf\n\n    withIndexHeader = withIndexSheet[\"A1:D1\"].value\n    noIndexHeader = noIndexSheet[\"A1:C1\"].value\n\nassert withIndexHeader[0] is None\nassert noIndexHeader == [\"flightNo\", \"route\", \"passengers\"]\n{\"withIndex\": withIndexHeader, \"noIndex\": noIndexHeader}"
+            "slug": "automation/xlwings/xlwings_04"
           },
           {
             "id": "xlwings_05",
@@ -6579,8 +6186,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "학생 4과목 성적표에 평균/합계 수식을 코드로 자동 입력하고, 점수 컬럼은 정수 서식, 헤더와 평균 행은 색상으로 강조한 뒤 열 너비를 자동 맞춤한다.",
-            "slug": "automation/xlwings/xlwings_05",
-            "code": "import pandas as pd\nimport xlwings as xw\n\ngradesDf = pd.DataFrame({\n    \"name\": [\"김민서\", \"이도윤\", \"박서아\", \"정하은\", \"최우진\"],\n    \"korean\": [88, 92, 75, 95, 81],\n    \"math\": [91, 85, 88, 79, 93],\n    \"english\": [86, 89, 72, 90, 84],\n})\n\nwith xw.App(visible=False) as fApp:\n    fBook = fApp.books.add()\n    fSheet = fBook.sheets.active\n    fSheet.name = \"grades\"\n    fSheet[\"A1\"].options(index=False).value = gradesDf\n\n    dataRange = fSheet[\"A1\"].expand(\"table\")\n    lastRow = dataRange.last_cell.row\n    fSheet[\"E1\"].value = \"average\"\n    for r in range(2, lastRow + 1):\n        fSheet[f\"E{r}\"].formula = f\"=AVERAGE(B{r}:D{r})\"\n\n    fApp.calculate()\n    averages = [round(fSheet[f\"E{r}\"].value, 1) for r in range(2, lastRow + 1)]\n    firstFormula = fSheet[\"E2\"].formula\n\nassert averages == [88.3, 88.7, 78.3,"
+            "slug": "automation/xlwings/xlwings_05"
           },
           {
             "id": "xlwings_06",
@@ -6595,8 +6201,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "노래별 일일 스트리밍 수 데이터로 막대 차트를 코드로 자동 생성하고, 차트 종류·위치·크기를 지정한 뒤 데이터가 바뀌면 어떻게 갱신되는지 검증한다.",
-            "slug": "automation/xlwings/xlwings_06",
-            "code": "import pandas as pd\nimport xlwings as xw\n\nstreamDf = pd.DataFrame({\n    \"track\": [\"Dynamite\", \"Butter\", \"Permission to Dance\", \"My Universe\", \"Yet to Come\"],\n    \"streams\": [1240000, 1080000, 920000, 870000, 1150000],\n})\n\nwith xw.App(visible=False) as cApp:\n    cBook = cApp.books.add()\n    cSheet = cBook.sheets.active\n    cSheet.name = \"streams\"\n    cSheet[\"A1\"].options(index=False).value = streamDf\n\n    sourceRange = cSheet[\"A1\"].expand(\"table\")\n    chart = cSheet.charts.add()\n    chart.set_source_data(sourceRange)\n    chart.name = \"trackBar\"\n\n    chartName = chart.name\n    chartCount = len(cSheet.charts)\n\nassert chartName == \"trackBar\"\nassert chartCount == 1\n{\"name\": chartName, \"count\": chartCount}"
+            "slug": "automation/xlwings/xlwings_06"
           },
           {
             "id": "xlwings_07",
@@ -6611,8 +6216,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "영화 박스오피스 데이터를 Excel \"표\"(ListObject)로 승격하고, 영화가 추가될 때마다 합계 행이 자동으로 따라오는 동적 합계 자동화를 만든다.",
-            "slug": "automation/xlwings/xlwings_07",
-            "code": "import pandas as pd\nimport xlwings as xw\n\nboxOfficeDf = pd.DataFrame({\n    \"title\": [\"기생충\", \"범죄도시2\", \"한산\", \"헌트\", \"공조2\"],\n    \"audience\": [10310000, 12692000, 7263000, 4351000, 6982000],\n    \"revenue\": [85900000000, 130020000000, 76300000000, 41080000000, 71290000000],\n})\n\nwith xw.App(visible=False) as tApp:\n    tBook = tApp.books.add()\n    tSheet = tBook.sheets.active\n    tSheet.name = \"boxOffice\"\n    tSheet[\"A1\"].options(index=False).value = boxOfficeDf\n\n    sourceRange = tSheet[\"A1\"].expand(\"table\")\n    boxTable = tSheet.tables.add(source=sourceRange, name=\"boxOfficeTable\")\n\n    tableName = boxTable.name\n    tableHeaders = boxTable.header_row_range.value\n    dataRowCount = boxTable.data_body_range.rows.count\n\nassert tableName == \"boxOfficeTable\"\nassert tableHeaders == [\"title\", \"audience"
+            "slug": "automation/xlwings/xlwings_07"
           },
           {
             "id": "xlwings_08",
@@ -6627,8 +6231,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "도시별로 흩어진 일일 대기질 측정 워크북 3개를 한 App에서 차례로 열어 데이터를 추출하고, 한 통합 워크북에 원본과 도시별 평균 시트를 함께 모으는 자동화를 만든다.",
-            "slug": "automation/xlwings/xlwings_08",
-            "code": "import pandas as pd\nimport xlwings as xw\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\ncityData = {\n    \"seoul\": pd.DataFrame({\n        \"date\": [\"2026-05-26\", \"2026-05-27\", \"2026-05-28\"],\n        \"pm10\": [42, 58, 35],\n        \"pm25\": [28, 35, 22],\n    }),\n    \"busan\": pd.DataFrame({\n        \"date\": [\"2026-05-26\", \"2026-05-27\", \"2026-05-28\"],\n        \"pm10\": [31, 38, 27],\n        \"pm25\": [19, 24, 16],\n    }),\n    \"incheon\": pd.DataFrame({\n        \"date\": [\"2026-05-26\", \"2026-05-27\", \"2026-05-28\"],\n        \"pm10\": [48, 65, 41],\n        \"pm25\": [31, 42, 26],\n    }),\n}\n\nairTemp = TemporaryDirectory()\nairRoot = Path(airTemp.name)\ncityPaths = {city: airRoot / f\"{city}.xlsx\" for city in cityData}\n\nwith xw.App(visible=False) as prepApp:\n    for city, df in cityData.items():\n   "
+            "slug": "automation/xlwings/xlwings_08"
           },
           {
             "id": "xlwings_09",
@@ -6643,8 +6246,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "VBA 모듈이 들어있는 xlsm 워크북에 환율 변환 함수를 코드로 등록하고 Python에서 book.macro로 호출한 뒤, 반대 방향(Excel 버튼 → Python)인 RunPython 패턴을 학습한다.",
-            "slug": "automation/xlwings/xlwings_09",
-            "code": "import xlwings as xw\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\nfxTemp = TemporaryDirectory()\nfxPath = Path(fxTemp.name) / \"fx_converter.xlsm\"\n\nwith xw.App(visible=False) as fxApp:\n    fxBook = fxApp.books.add()\n    fxSheet = fxBook.sheets.active\n    fxSheet.name = \"rates\"\n    fxSheet[\"A1\"].value = \"환율 변환 도구\"\n    fxBook.save(str(fxPath))\n    savedExtension = fxPath.suffix\n    fxBook.close()\n\nassert savedExtension == \".xlsm\"\nassert fxPath.exists()\n{\"path\": str(fxPath.name), \"ext\": savedExtension}"
+            "slug": "automation/xlwings/xlwings_09"
           },
           {
             "id": "xlwings_10",
@@ -6659,8 +6261,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "@xw.func 데코레이터로 BMI·칼로리 계산을 Excel 수식으로 만들고, 트랙에서 배운 모든 패턴(2D 입력, DataFrame 왕복, 수식, 서식, 차트, 표, 매크로)을 묶어 일일 운동 보고서 봇을 완성한다.",
-            "slug": "automation/xlwings/xlwings_10",
-            "code": "import xlwings as xw\n\n@xw.func\ndef bmi(weightKg: float, heightM: float) -> float:\n    return round(weightKg / (heightM ** 2), 2)\n\n@xw.func\ndef runCalories(weightKg: float, minutes: float, pace: float = 1.0) -> float:\n    baseRate = 0.063\n    return round(weightKg * minutes * baseRate * pace, 1)\n\nbmiList = [bmi(70, 1.75), bmi(58, 1.62), bmi(82, 1.80)]\ncalorieList = [runCalories(70, 30), runCalories(58, 45, 1.2), runCalories(82, 60, 0.8)]\n\nassert bmiList == [22.86, 22.10, 25.31]\nassert calorieList == [132.3, 197.3, 248.0]\n{\"bmi\": bmiList, \"calories\": calorieList}"
+            "slug": "automation/xlwings/xlwings_10"
           }
         ]
       },
@@ -6678,8 +6279,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 기반 작업 폴더에서 pathlib.Path로 경로를 만들고 조각으로 분해해 파일 시스템을 다룰 감각을 잡는다.",
-            "slug": "automation/fileOps/fileOps_01",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    (base / \"주문\").mkdir()\n    createdNames = sorted(item.name for item in base.iterdir())\n\nassert createdNames == [\"주문\"]\ncreatedNames"
+            "slug": "automation/fileOps/fileOps_01"
           },
           {
             "id": "fileOps_02",
@@ -6692,8 +6292,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 작업 폴더에서 텍스트와 JSON 파일을 안전하게 쓰고 읽어 자동화 결과를 영속화한다.",
-            "slug": "automation/fileOps/fileOps_02",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    note = Path(td) / \"today.txt\"\n    note.write_text(\"자동화 시작\", encoding=\"utf-8\")\n    restored = note.read_text(encoding=\"utf-8\")\n\nassert restored == \"자동화 시작\"\nrestored"
+            "slug": "automation/fileOps/fileOps_02"
           },
           {
             "id": "fileOps_03",
@@ -6706,8 +6305,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 격리 공간에 가짜 폴더 트리를 만들고 iterdir, rglob, 패턴 필터로 필요한 파일만 골라낸다.",
-            "slug": "automation/fileOps/fileOps_03",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    (base / \"sales\" / \"2024\").mkdir(parents=True)\n    (base / \"sales\" / \"2025\").mkdir(parents=True)\n    (base / \"sales\" / \"2024\" / \"jan.csv\").write_text(\"\", encoding=\"utf-8\")\n    (base / \"sales\" / \"2025\" / \"feb.csv\").write_text(\"\", encoding=\"utf-8\")\n    created = sorted(p.relative_to(base).as_posix() for p in base.rglob(\"*.csv\"))\n\nassert created == [\"sales/2024/jan.csv\", \"sales/2025/feb.csv\"]\ncreated"
+            "slug": "automation/fileOps/fileOps_03"
           },
           {
             "id": "fileOps_04",
@@ -6720,8 +6318,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "shutil과 pathlib을 함께 써서 임시 폴더 안에서 파일을 복제하고 옮기고 이름을 바꾸며 충돌을 처리한다.",
-            "slug": "automation/fileOps/fileOps_04",
-            "code": "import shutil\nimport tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    source = base / \"source\" / \"summary.txt\"\n    archive = base / \"archive\"\n    source.parent.mkdir()\n    archive.mkdir()\n    source.write_text(\"주문 12건\", encoding=\"utf-8\")\n    copied = Path(shutil.copy2(source, archive / source.name))\n    status = {\n        \"exists\": copied.exists(),\n        \"sameContent\": copied.read_text(encoding=\"utf-8\") == \"주문 12건\",\n        \"mtimeMatch\": copied.stat().st_mtime == source.stat().st_mtime,\n    }\n\nassert status == {\"exists\": True, \"sameContent\": True, \"mtimeMatch\": True}\nstatus"
+            "slug": "automation/fileOps/fileOps_04"
           },
           {
             "id": "fileOps_05",
@@ -6734,8 +6331,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "임시 폴더 안에서 즉시 삭제와 격리 폴더 이동 두 방식을 비교해 실수에서 회복 가능한 자동화 흐름을 만든다.",
-            "slug": "automation/fileOps/fileOps_05",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    target = Path(td) / \"today.log\"\n    target.write_text(\"hi\", encoding=\"utf-8\")\n    firstExists = target.exists()\n    target.unlink(missing_ok=True)\n    secondExists = target.exists()\n    target.unlink(missing_ok=True)\n\nassert firstExists is True\nassert secondExists is False\n{\"first\": firstExists, \"second\": secondExists}"
+            "slug": "automation/fileOps/fileOps_05"
           },
           {
             "id": "fileOps_06",
@@ -6748,8 +6344,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "zipfile 모듈로 격리 폴더 안에서 zip을 만들고 풀고 압축률과 무결성을 검증한다.",
-            "slug": "automation/fileOps/fileOps_06",
-            "code": "import tempfile\nimport zipfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    (base / \"a.txt\").write_text(\"hello\", encoding=\"utf-8\")\n    (base / \"b.txt\").write_text(\"world\", encoding=\"utf-8\")\n    target = base / \"bundle.zip\"\n    with zipfile.ZipFile(target, \"w\") as zf:\n        zf.write(base / \"a.txt\", arcname=\"a.txt\")\n        zf.write(base / \"b.txt\", arcname=\"b.txt\")\n    with zipfile.ZipFile(target) as zf:\n        names = sorted(zf.namelist())\n\nassert names == [\"a.txt\", \"b.txt\"]\nnames"
+            "slug": "automation/fileOps/fileOps_06"
           },
           {
             "id": "fileOps_07",
@@ -6762,8 +6357,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 격리 폴더에서 mtime과 SHA-256 해시를 기준으로 변경된 파일만 골라 동기화하는 작은 백업 함수를 만든다.",
-            "slug": "automation/fileOps/fileOps_07",
-            "code": "import hashlib\nimport tempfile\nfrom pathlib import Path\n\n\ndef sha256OfFile(path: Path) -> str:\n    hasher = hashlib.sha256()\n    with open(path, \"rb\") as f:\n        for chunk in iter(lambda: f.read(8192), b\"\"):\n            hasher.update(chunk)\n    return hasher.hexdigest()\n\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    first = base / \"first.bin\"\n    second = base / \"second.bin\"\n    first.write_bytes(b\"codaro\")\n    second.write_bytes(b\"codaro\")\n    summary = {\"sameContent\": sha256OfFile(first) == sha256OfFile(second)}\n\nassert summary == {\"sameContent\": True}\nsummary"
+            "slug": "automation/fileOps/fileOps_07"
           },
           {
             "id": "fileOps_08",
@@ -6776,8 +6370,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "임시 폴더 안에서 확장자 규칙으로 파일을 분류하고 빈 폴더를 정리해 어수선한 다운로드 폴더를 자동으로 깨끗하게 만든다.",
-            "slug": "automation/fileOps/fileOps_08",
-            "code": "rules = {\".csv\": \"tabular\", \".json\": \"tabular\", \".png\": \"images\", \".log\": \"logs\"}\n\n\ndef classify(suffix: str) -> str:\n    return rules.get(suffix.lower(), \"_other\")\n\n\nassert classify(\".CSV\") == \"tabular\"\nassert classify(\".PNG\") == \"images\"\nassert classify(\".xyz\") == \"_other\"\n[classify(\".CSV\"), classify(\".png\"), classify(\".xyz\")]"
+            "slug": "automation/fileOps/fileOps_08"
           },
           {
             "id": "fileOps_09",
@@ -6790,8 +6383,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 격리 폴더에서 Path.stat로 크기, 수정 시각, 권한을 읽어 자동화 리포트에 그대로 들어갈 메타데이터 dict를 만든다.",
-            "slug": "automation/fileOps/fileOps_09",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    target = Path(td) / \"data.bin\"\n    target.write_bytes(b\"abcdefgh\")\n    size = target.stat().st_size\n\nassert size == 8\nsize"
+            "slug": "automation/fileOps/fileOps_09"
           },
           {
             "id": "fileOps_10",
@@ -6804,8 +6396,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "tempfile 안에 가짜 다운로드 폴더를 만들고 분류, 백업, 빈 폴더 정리, JSON 리포트 저장까지 한 사이클을 종합 프로젝트로 묶는다.",
-            "slug": "automation/fileOps/fileOps_10",
-            "code": "import tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as td:\n    base = Path(td)\n    (base / \"report.csv\").write_text(\"a,b\\n1,2\", encoding=\"utf-8\")\n    (base / \"photo.png\").write_bytes(b\"\\x89PNGfake\")\n    (base / \"today.log\").write_text(\"ok\", encoding=\"utf-8\")\n    (base / \"memo.docx\").write_text(\"draft\", encoding=\"utf-8\")\n    initial = sorted(p.name for p in base.iterdir())\n\nassert initial == [\"memo.docx\", \"photo.png\", \"report.csv\", \"today.log\"]\ninitial"
+            "slug": "automation/fileOps/fileOps_10"
           }
         ]
       },
@@ -6823,8 +6414,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui의 PAUSE와 FAILSAFE 안전장치를 설정해 GUI 자동화 중 통제 불능 사고를 막는 시작 패턴을 만든다.",
-            "slug": "automation/inputCtl/inputCtl_01",
-            "code": "import pyautogui\n\npyautogui.PAUSE = 0.05\nsummary = {\"pause\": pyautogui.PAUSE}\n\nassert summary == {\"pause\": 0.05}\nsummary"
+            "slug": "automation/inputCtl/inputCtl_01"
           },
           {
             "id": "inputCtl_02",
@@ -6837,8 +6427,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui로 모니터 해상도와 현재 마우스 위치를 실제 호출로 읽고, 좌표가 화면 안에 있는지 검사해 자동화의 좌표 감각을 만든다.",
-            "slug": "automation/inputCtl/inputCtl_02",
-            "code": "import pyautogui\n\nscreen = pyautogui.size()\nwidth, height = screen.width, screen.height\n\nassert isinstance(width, int) and width > 0\nassert isinstance(height, int) and height > 0\n(width, height)"
+            "slug": "automation/inputCtl/inputCtl_02"
           },
           {
             "id": "inputCtl_03",
@@ -6851,8 +6440,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui.moveTo와 click을 실제 호출하면서 현재 좌표 복귀 패턴과 안전 래퍼를 만들어 마우스 자동화의 기본 동작을 익힌다.",
-            "slug": "automation/inputCtl/inputCtl_03",
-            "code": "import pyautogui\n\norigin = pyautogui.position()\npyautogui.moveTo(origin.x, origin.y, duration=0.0)\nmoved = pyautogui.position()\npyautogui.moveTo(origin.x, origin.y, duration=0.0)\n\nassert moved.x == origin.x\nassert moved.y == origin.y\n(origin.x, origin.y)"
+            "slug": "automation/inputCtl/inputCtl_03"
           },
           {
             "id": "inputCtl_04",
@@ -6865,8 +6453,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui의 키보드 API에서 유효 키 집합과 write/press/hotkey 시그니처를 직접 다뤄 키 입력 자동화의 표준 래퍼를 만든다.",
-            "slug": "automation/inputCtl/inputCtl_04",
-            "code": "import pyautogui\n\nkeys = set(pyautogui.KEYBOARD_KEYS)\nrequired = {\"enter\", \"tab\", \"esc\"}\n\nassert required.issubset(keys)\nsorted(required & keys)"
+            "slug": "automation/inputCtl/inputCtl_04"
           },
           {
             "id": "inputCtl_05",
@@ -6879,8 +6466,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui.screenshot으로 화면 전체와 부분 영역을 실제로 캡처해 임시 파일에 저장하고 PIL.Image로 결과를 검증하는 흐름을 만든다.",
-            "slug": "automation/inputCtl/inputCtl_05",
-            "code": "import pyautogui\n\nscreenshot = pyautogui.screenshot()\nwidth, height = screenshot.size\n\nassert width > 0\nassert height > 0\nscreenshot.size"
+            "slug": "automation/inputCtl/inputCtl_05"
           },
           {
             "id": "inputCtl_06",
@@ -6893,8 +6479,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "PIL로 합성 이미지를 만들고 pyautogui.locate로 부분 이미지를 찾아 GUI 자동화의 이미지 매치 흐름을 실제로 실행해 본다.",
-            "slug": "automation/inputCtl/inputCtl_06",
-            "code": "from PIL import Image, ImageDraw\n\nhaystack = Image.new(\"RGB\", (120, 80), \"white\")\ndrawer = ImageDraw.Draw(haystack)\ndrawer.rectangle((20, 20, 40, 40), fill=\"black\")\n\nassert haystack.size == (120, 80)\nassert haystack.getpixel((30, 30)) == (0, 0, 0)\nhaystack.size"
+            "slug": "automation/inputCtl/inputCtl_06"
           },
           {
             "id": "inputCtl_07",
@@ -6907,8 +6492,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyperclip으로 시스템 클립보드에 텍스트를 직접 복사하고 다시 받아 클립보드 자동화의 실제 왕복을 학습한다.",
-            "slug": "automation/inputCtl/inputCtl_07",
-            "code": "import pyperclip\n\npyperclip.copy(\"codaro automation\")\nrestored = pyperclip.paste()\n\nassert restored == \"codaro automation\"\nrestored"
+            "slug": "automation/inputCtl/inputCtl_07"
           },
           {
             "id": "inputCtl_08",
@@ -6921,8 +6505,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pynput.keyboard의 Key 상수와 KeyCode, Listener 클래스를 직접 다뤄 키 이벤트 수집과 정지 키 분기를 실 코드로 구현한다.",
-            "slug": "automation/inputCtl/inputCtl_08",
-            "code": "from pynput.keyboard import Key\n\nenter = Key.enter\nesc = Key.esc\n\nassert enter.name == \"enter\"\nassert esc is Key.esc\n(enter.name, esc.name)"
+            "slug": "automation/inputCtl/inputCtl_08"
           },
           {
             "id": "inputCtl_09",
@@ -6935,8 +6518,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "pyautogui.position과 size로 화면 상태를 직접 읽고 마우스 위치 영역에 따라 자동화 액션을 분기하는 결정 함수를 만든다.",
-            "slug": "automation/inputCtl/inputCtl_09",
-            "code": "import pyautogui\n\n\ndef readState() -> dict:\n    cursor = pyautogui.position()\n    screen = pyautogui.size()\n    return {\n        \"cursor\": {\"x\": cursor.x, \"y\": cursor.y},\n        \"screen\": {\"width\": screen.width, \"height\": screen.height},\n    }\n\n\nstate = readState()\n\nassert set(state.keys()) == {\"cursor\", \"screen\"}\nassert state[\"screen\"][\"width\"] > 0\nstate[\"screen\"]"
+            "slug": "automation/inputCtl/inputCtl_09"
           },
           {
             "id": "inputCtl_10",
@@ -6949,8 +6531,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "안전 설정, 상태 관측, 영역 캡처, 이미지 매치, 클립보드 보고를 묶어 한 사이클로 동작하는 화면 점검 매크로를 직접 만들어 본다.",
-            "slug": "automation/inputCtl/inputCtl_10",
-            "code": "import pyautogui\n\n\ndef bootstrapAutomation(pauseSeconds: float = 0.05) -> dict:\n    pyautogui.PAUSE = pauseSeconds\n    pyautogui.FAILSAFE = True\n    return {\"pause\": pyautogui.PAUSE, \"failsafe\": pyautogui.FAILSAFE}\n\n\nbootstrap = bootstrapAutomation(0.05)\n\nassert bootstrap == {\"pause\": 0.05, \"failsafe\": True}\nbootstrap"
+            "slug": "automation/inputCtl/inputCtl_10"
           }
         ]
       },
@@ -6968,8 +6549,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess.run으로 Python 자체를 자식 프로세스로 실행하면서 returncode와 stdout, stderr를 안전하게 캡처한다.",
-            "slug": "automation/procCtl/procCtl_01",
-            "code": "import subprocess\nimport sys\n\ncompleted = subprocess.run(\n    [sys.executable, \"-c\", \"print('hi codaro')\"],\n    capture_output=True,\n    text=True,\n)\n\nassert completed.returncode == 0\nassert completed.stdout.strip() == \"hi codaro\"\ncompleted.stdout.strip()"
+            "slug": "automation/procCtl/procCtl_01"
           },
           {
             "id": "procCtl_02",
@@ -6982,8 +6562,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess 인자를 리스트로 전달하는 안전한 방식과 shell=True의 함정을 비교해 인용 사고 없이 외부 명령을 호출한다.",
-            "slug": "automation/procCtl/procCtl_02",
-            "code": "import subprocess\nimport sys\n\ncompleted = subprocess.run(\n    [sys.executable, \"-X\", \"utf8\", \"-c\", \"import sys; print(sys.argv[1])\", \"hello world\"],\n    capture_output=True,\n    text=True,\n    encoding=\"utf-8\",\n)\n\nassert completed.stdout.strip() == \"hello world\"\ncompleted.stdout.strip()"
+            "slug": "automation/procCtl/procCtl_02"
           },
           {
             "id": "procCtl_03",
@@ -6996,8 +6575,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess.run의 timeout 인자와 TimeoutExpired, CalledProcessError를 좁힌 예외 처리로 자동화에서 멈춤 사고와 실패 사고를 안전하게 다룬다.",
-            "slug": "automation/procCtl/procCtl_03",
-            "code": "import subprocess\nimport sys\n\nevents = []\ntry:\n    subprocess.run(\n        [sys.executable, \"-c\", \"import time; time.sleep(5)\"],\n        timeout=0.3,\n    )\nexcept subprocess.TimeoutExpired as exc:\n    events.append({\"timeout\": round(exc.timeout, 3), \"cmd\": exc.cmd[-1]})\n\nassert events == [{\"timeout\": 0.3, \"cmd\": \"import time; time.sleep(5)\"}]\nevents"
+            "slug": "automation/procCtl/procCtl_03"
           },
           {
             "id": "procCtl_04",
@@ -7010,8 +6588,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess.Popen으로 자식의 stdout을 줄 단위로 받으며 실시간 처리 흐름과 두 자식 간 파이프 연결을 안전하게 다룬다.",
-            "slug": "automation/procCtl/procCtl_04",
-            "code": "import subprocess\nimport sys\n\nwith subprocess.Popen(\n    [sys.executable, \"-c\", \"print('start')\"],\n    stdout=subprocess.PIPE,\n    text=True,\n) as proc:\n    stdout, _ = proc.communicate()\n\nassert proc.returncode == 0\nassert stdout.strip() == \"start\"\nstdout.strip()"
+            "slug": "automation/procCtl/procCtl_04"
           },
           {
             "id": "procCtl_05",
@@ -7024,8 +6601,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess.run의 env와 cwd 인자로 자식 프로세스의 환경 변수와 작업 디렉터리를 명시적으로 제어한다.",
-            "slug": "automation/procCtl/procCtl_05",
-            "code": "import os\nimport subprocess\nimport sys\n\nchildEnv = os.environ.copy()\nchildEnv[\"CODARO_TAG\"] = \"automation\"\ncompleted = subprocess.run(\n    [sys.executable, \"-c\", \"import os; print(os.environ.get('CODARO_TAG'))\"],\n    env=childEnv,\n    capture_output=True,\n    text=True,\n)\n\nassert completed.stdout.strip() == \"automation\"\nassert \"CODARO_TAG\" not in os.environ\ncompleted.stdout.strip()"
+            "slug": "automation/procCtl/procCtl_05"
           },
           {
             "id": "procCtl_06",
@@ -7038,8 +6614,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "shutil.which로 실행 파일 존재를 먼저 확인하고 subprocess.run을 감싼 작은 래퍼 함수로 외부 도구를 안전하게 호출한다.",
-            "slug": "automation/procCtl/procCtl_06",
-            "code": "import shutil\nimport sys\n\npythonPath = shutil.which(sys.executable)\nghostPath = shutil.which(\"definitely-not-a-real-tool-xyz\")\n\nassert pythonPath is not None\nassert ghostPath is None\n{\"python\": pythonPath is not None, \"ghost\": ghostPath}"
+            "slug": "automation/procCtl/procCtl_06"
           },
           {
             "id": "procCtl_07",
@@ -7052,8 +6627,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "psutil 패키지로 현재 Python 프로세스와 자식 프로세스의 PID, 이름, cmdline, 부모 관계를 조회해 자동화 관찰성을 만든다.",
-            "slug": "automation/procCtl/procCtl_07",
-            "code": "import os\n\nimport psutil\n\nproc = psutil.Process(os.getpid())\nsummary = {\n    \"pid\": proc.pid,\n    \"isPython\": \"python\" in proc.name().lower(),\n}\n\nassert summary[\"pid\"] == os.getpid()\nassert summary[\"isPython\"] is True\nsummary"
+            "slug": "automation/procCtl/procCtl_07"
           },
           {
             "id": "procCtl_08",
@@ -7066,8 +6640,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "psutil로 CPU와 메모리 사용량을 측정하고 임계값을 넘는 자식 프로세스를 식별해 자동화 관찰 흐름을 완성한다.",
-            "slug": "automation/procCtl/procCtl_08",
-            "code": "import psutil\n\nsample = psutil.cpu_percent(interval=0.1)\n\nassert 0.0 <= sample <= 100.0\nsample"
+            "slug": "automation/procCtl/procCtl_08"
           },
           {
             "id": "procCtl_09",
@@ -7080,8 +6653,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "subprocess.Popen으로 만든 자식을 terminate와 kill로 안전하게 종료하고 returncode로 종료 원인을 분류한다.",
-            "slug": "automation/procCtl/procCtl_09",
-            "code": "import subprocess\nimport sys\n\nwith subprocess.Popen(\n    [sys.executable, \"-c\", \"import time; time.sleep(5)\"],\n    stdout=subprocess.PIPE,\n    text=True,\n) as proc:\n    proc.terminate()\n    returncode = proc.wait(timeout=3)\n\nassert returncode != 0\nreturncode"
+            "slug": "automation/procCtl/procCtl_09"
           },
           {
             "id": "procCtl_10",
@@ -7094,8 +6666,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "외부 도구 래퍼, 타임아웃, 종료 분류를 모아 여러 명령을 순서대로 실행하고 JSON 리포트를 저장하는 종합 빌드 러너를 만든다.",
-            "slug": "automation/procCtl/procCtl_10",
-            "code": "import sys\n\njobs = [\n    {\"name\": \"step-1\", \"args\": [sys.executable, \"-c\", \"print('first')\"], \"timeout\": 5.0},\n    {\"name\": \"step-2\", \"args\": [sys.executable, \"-c\", \"print('second')\"], \"timeout\": 5.0},\n]\nsummary = {\"count\": len(jobs), \"names\": [job[\"name\"] for job in jobs]}\n\nassert summary == {\"count\": 2, \"names\": [\"step-1\", \"step-2\"]}\nsummary"
+            "slug": "automation/procCtl/procCtl_10"
           }
         ]
       },
@@ -7115,8 +6686,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "같은 입력을 두 번 실행해도 결과가 한 번 실행한 것과 같도록, 처리한 작업 키를 디스크 원장(ledger)에 남겨 재실행을 안전하게 만든다.",
-            "slug": "automation/resilience/resilience_01",
-            "code": "import json\nimport tempfile\nfrom pathlib import Path\n\nledger = {\"order-1\", \"order-2\"}\n\nwith tempfile.TemporaryDirectory() as tmp:\n    ledgerPath = Path(tmp) / \"ledger.json\"\n    ledgerPath.write_text(json.dumps(sorted(ledger)), encoding=\"utf-8\")\n    loaded = set(json.loads(ledgerPath.read_text(encoding=\"utf-8\")))\n\nassert loaded == ledger\nloaded"
+            "slug": "automation/resilience/resilience_01"
           },
           {
             "id": "resilience_02",
@@ -7131,8 +6701,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "진행 위치를 디스크 체크포인트에 남겨, 작업이 중간에 죽어도 처음부터가 아니라 죽은 지점부터 이어서 처리하게 만든다.",
-            "slug": "automation/resilience/resilience_02",
-            "code": "import json\nimport tempfile\nfrom pathlib import Path\n\nwith tempfile.TemporaryDirectory() as tmp:\n    checkpointPath = Path(tmp) / \"checkpoint.json\"\n    checkpointPath.write_text(json.dumps({\"lastDone\": 5}), encoding=\"utf-8\")\n    loaded = json.loads(checkpointPath.read_text(encoding=\"utf-8\"))\n\nassert loaded[\"lastDone\"] == 5\nloaded"
+            "slug": "automation/resilience/resilience_02"
           },
           {
             "id": "resilience_03",
@@ -7147,8 +6716,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "임시 파일에 전량을 먼저 쓰고 os.replace로 한 번에 교체해, 쓰는 도중 죽어도 파일이 반쪽으로 남지 않게 만든다.",
-            "slug": "automation/resilience/resilience_03",
-            "code": "import tempfile\nfrom pathlib import Path\n\ndef unsafeWrite(path, chunks):\n    with open(path, \"w\", encoding=\"utf-8\") as handle:\n        for i, chunk in enumerate(chunks):\n            if i == 2:\n                raise RuntimeError(\"crashed mid-write\")\n            handle.write(chunk)\n\nwith tempfile.TemporaryDirectory() as tmp:\n    path = Path(tmp) / \"report.txt\"\n    path.write_text(\"OLD-DATA\", encoding=\"utf-8\")\n    crashed = \"\"\n    try:\n        unsafeWrite(path, [\"AAA\", \"BBB\", \"CCC\"])\n    except RuntimeError as exc:\n        crashed = str(exc)\n    after = path.read_text(encoding=\"utf-8\")\n\nassert crashed == \"crashed mid-write\"\nassert after != \"OLD-DATA\"\nassert after == \"AAABBB\"\ncorruptedLen = len(after)\nassert corruptedLen == 6\ncorruptedLen"
+            "slug": "automation/resilience/resilience_03"
           }
         ]
       },
@@ -7166,8 +6734,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "watchdog의 Observer와 FileSystemEventHandler로 임시 폴더에서 발생한 파일 생성 이벤트를 짧은 시간 안에 감지하고 즉시 멈춘다.",
-            "slug": "automation/watchSched/watchSched_01",
-            "code": "from watchdog.events import FileSystemEventHandler\n\n\nclass CreatedCollector(FileSystemEventHandler):\n    def __init__(self, sink: list) -> None:\n        super().__init__()\n        self.sink = sink\n\n    def on_created(self, event) -> None:\n        self.sink.append(event.src_path)\n\n\nsink = []\nhandler = CreatedCollector(sink)\nhandler.on_created(type(\"Event\", (), {\"src_path\": \"fake.txt\"})())\n\nassert sink == [\"fake.txt\"]\nsink"
+            "slug": "automation/watchSched/watchSched_01"
           },
           {
             "id": "watchSched_02",
@@ -7180,8 +6747,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "watchdog의 on_created, on_modified, on_deleted, on_moved 콜백을 모두 구현해 한 폴더 안에서 일어나는 모든 변화를 분류한다.",
-            "slug": "automation/watchSched/watchSched_02",
-            "code": "from watchdog.events import FileSystemEventHandler\n\n\nclass EventClassifier(FileSystemEventHandler):\n    def __init__(self) -> None:\n        super().__init__()\n        self.events = {\"created\": [], \"modified\": [], \"deleted\": [], \"moved\": []}\n\n    def on_created(self, event):\n        self.events[\"created\"].append(event.src_path)\n\n    def on_modified(self, event):\n        self.events[\"modified\"].append(event.src_path)\n\n    def on_deleted(self, event):\n        self.events[\"deleted\"].append(event.src_path)\n\n    def on_moved(self, event):\n        self.events[\"moved\"].append((event.src_path, event.dest_path))\n\n\nclassifier = EventClassifier()\nclassifier.on_created(type(\"E\", (), {\"src_path\": \"a\"})())\nclassifier.on_deleted(type(\"E\", (), {\"src_path\": \"a\"})())\n\nassert classifier.events[\"created\"] == ["
+            "slug": "automation/watchSched/watchSched_02"
           },
           {
             "id": "watchSched_03",
@@ -7194,8 +6760,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "watchdog이 같은 파일에 짧은 시간 안에 여러 modified 이벤트를 보내는 상황에서 디바운스 함수로 안정된 한 번의 처리만 수행한다.",
-            "slug": "automation/watchSched/watchSched_03",
-            "code": "import time\n\nlastSeen: dict[str, float] = {}\nprocessed: list[str] = []\n\n\ndef debounce(key: str, windowSeconds: float) -> bool:\n    now = time.monotonic()\n    if key in lastSeen and now - lastSeen[key] < windowSeconds:\n        return False\n    lastSeen[key] = now\n    processed.append(key)\n    return True\n\n\nfirst = debounce(\"note.txt\", 0.2)\nsecond = debounce(\"note.txt\", 0.2)\n\nassert first is True\nassert second is False\nprocessed"
+            "slug": "automation/watchSched/watchSched_03"
           },
           {
             "id": "watchSched_04",
@@ -7208,8 +6773,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "watchdog의 PatternMatchingEventHandler로 재귀 감시 트리에서 원하는 확장자 패턴만 골라 자동화 입력으로 받는다.",
-            "slug": "automation/watchSched/watchSched_04",
-            "code": "from watchdog.events import FileCreatedEvent, PatternMatchingEventHandler\n\n\ncollected: list[str] = []\n\n\nclass CsvCollector(PatternMatchingEventHandler):\n    def on_created(self, event):\n        collected.append(event.src_path)\n\n\nhandler = CsvCollector(patterns=[\"*.csv\"], ignore_patterns=[\"*.tmp\"], ignore_directories=True)\nhandler.dispatch(FileCreatedEvent(\"report.csv\"))\nhandler.dispatch(FileCreatedEvent(\"scratch.tmp\"))\n\nassert collected == [\"report.csv\"]\ncollected"
+            "slug": "automation/watchSched/watchSched_04"
           },
           {
             "id": "watchSched_05",
@@ -7222,8 +6786,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "schedule 라이브러리로 인터벌과 시간 기반 작업을 정의하고 run_pending으로 셀에서 직접 실행 흐름을 확인한다.",
-            "slug": "automation/watchSched/watchSched_05",
-            "code": "results: list[int] = []\n\n\ndef runJob() -> None:\n    results.append(len(results) + 1)\n\n\nrunJob()\nrunJob()\n\nassert results == [1, 2]\nresults"
+            "slug": "automation/watchSched/watchSched_05"
           },
           {
             "id": "watchSched_06",
@@ -7236,8 +6799,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "APScheduler의 BlockingScheduler를 짧게 가동해 백그라운드 작업 등록과 안전한 종료 흐름을 셀에서 확인한다.",
-            "slug": "automation/watchSched/watchSched_06",
-            "code": "from apscheduler.schedulers.background import BackgroundScheduler\n\nscheduler = BackgroundScheduler()\nscheduler.start()\nisRunning = scheduler.running\nscheduler.shutdown()\n\nassert isRunning is True\nassert scheduler.running is False\nisRunning"
+            "slug": "automation/watchSched/watchSched_06"
           },
           {
             "id": "watchSched_07",
@@ -7250,8 +6812,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "APScheduler의 CronTrigger와 IntervalTrigger를 직접 만들어 다음 실행 시각을 계산하고 자동화 스케줄을 설계한다.",
-            "slug": "automation/watchSched/watchSched_07",
-            "code": "from apscheduler.triggers.cron import CronTrigger\n\ntrigger = CronTrigger(hour=12, minute=30, timezone=\"UTC\")\nsummary = {\"type\": type(trigger).__name__}\n\nassert summary == {\"type\": \"CronTrigger\"}\nsummary"
+            "slug": "automation/watchSched/watchSched_07"
           },
           {
             "id": "watchSched_08",
@@ -7264,8 +6825,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "스케줄 정의를 JSON 파일로 저장하고 다시 읽어 복원하는 흐름으로 영속 스케줄 자동화의 표준 패턴을 익힌다.",
-            "slug": "automation/watchSched/watchSched_08",
-            "code": "schedule = [\n    {\"name\": \"daily-report\", \"trigger\": \"cron\", \"hour\": 9, \"minute\": 0},\n    {\"name\": \"every-10-min\", \"trigger\": \"interval\", \"minutes\": 10},\n]\nsummary = {\"count\": len(schedule), \"names\": [job[\"name\"] for job in schedule]}\n\nassert summary == {\"count\": 2, \"names\": [\"daily-report\", \"every-10-min\"]}\nsummary"
+            "slug": "automation/watchSched/watchSched_08"
           },
           {
             "id": "watchSched_09",
@@ -7278,8 +6838,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "작업 실패 시 좁힌 예외를 잡고 백오프 시간을 늘려 가며 재시도하는 패턴으로 자동화 안정성을 만든다.",
-            "slug": "automation/watchSched/watchSched_09",
-            "code": "counter = 0\n\n\ndef flakyJob() -> str:\n    global counter\n    counter += 1\n    if counter < 3:\n        raise RuntimeError(f\"attempt {counter}\")\n    return \"done\"\n\n\nattempts = []\nwhile True:\n    try:\n        result = flakyJob()\n        attempts.append((\"success\", result))\n        break\n    except RuntimeError as exc:\n        attempts.append((\"fail\", str(exc)))\n\nassert attempts == [(\"fail\", \"attempt 1\"), (\"fail\", \"attempt 2\"), (\"success\", \"done\")]\nattempts"
+            "slug": "automation/watchSched/watchSched_09"
           },
           {
             "id": "watchSched_10",
@@ -7292,8 +6851,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "watchdog 감시, 디바운스, 스케줄, JSON 영속화를 한데 모아 한 사이클의 폴더 변화를 자동 리포트로 남기는 종합 프로젝트를 만든다.",
-            "slug": "automation/watchSched/watchSched_10",
-            "code": "import tempfile\nimport time\nfrom pathlib import Path\n\nfrom watchdog.events import PatternMatchingEventHandler\nfrom watchdog.observers import Observer\n\n\ndef collectCsvEvents(filenames: list, sleepSeconds: float = 0.5) -> list:\n    collected: list[str] = []\n\n    class Collector(PatternMatchingEventHandler):\n        def on_created(self, event):\n            collected.append(Path(event.src_path).name)\n\n    with tempfile.TemporaryDirectory() as td:\n        base = Path(td)\n        observer = Observer()\n        observer.schedule(\n            Collector(patterns=[\"*.csv\"], ignore_directories=True),\n            str(base),\n            recursive=False,\n        )\n        observer.start()\n        try:\n            for name in filenames:\n                (base / name).write_text(\"\", encoding=\"utf-8\")\n      "
+            "slug": "automation/watchSched/watchSched_10"
           }
         ]
       },
@@ -7314,8 +6872,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "정규표현식소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_00",
-            "code": "import re\n\ncontactText = '''\n김개발 <kim@example.com> 010-1234-5678\nlee@company.co.kr / 02-987-6543\n잘못된 주소: hello@ / 번호: 12345\n'''\n\nemailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')\nphonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')\n\nemails = emailPattern.findall(contactText)\nphones = phonePattern.findall(contactText)\n\nassert emails == ['kim@example.com', 'lee@company.co.kr']\nassert phones == ['010-1234-5678', '02-987-6543']\nemails, phones"
+            "slug": "automation/regex/regex_00"
           },
           {
             "id": "regex_01",
@@ -7330,8 +6887,7 @@ export const curriculumTree = [
             ],
             "emoji": "📧",
             "direction": "이메일주소추출에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_01",
-            "code": "import re\nimport json"
+            "slug": "automation/regex/regex_01"
           },
           {
             "id": "regex_02",
@@ -7347,8 +6903,7 @@ export const curriculumTree = [
             ],
             "emoji": "📱",
             "direction": "전화번호형식통일에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_02",
-            "code": "import re"
+            "slug": "automation/regex/regex_02"
           },
           {
             "id": "regex_03",
@@ -7363,8 +6918,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔗",
             "direction": "URL구조분해에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_03",
-            "code": "import re"
+            "slug": "automation/regex/regex_03"
           },
           {
             "id": "regex_04",
@@ -7379,8 +6933,7 @@ export const curriculumTree = [
             ],
             "emoji": "🏷️",
             "direction": "HTML태그제거에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_04",
-            "code": "import re"
+            "slug": "automation/regex/regex_04"
           },
           {
             "id": "regex_05",
@@ -7395,8 +6948,7 @@ export const curriculumTree = [
             ],
             "emoji": "📋",
             "direction": "로그파일분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_05",
-            "code": "import re"
+            "slug": "automation/regex/regex_05"
           },
           {
             "id": "regex_06",
@@ -7411,8 +6963,7 @@ export const curriculumTree = [
             ],
             "emoji": "📅",
             "direction": "날짜형식변환에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_06",
-            "code": "import re"
+            "slug": "automation/regex/regex_06"
           },
           {
             "id": "regex_07",
@@ -7427,8 +6978,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔐",
             "direction": "개인정보마스킹에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_07",
-            "code": "import re"
+            "slug": "automation/regex/regex_07"
           },
           {
             "id": "regex_08",
@@ -7443,8 +6993,7 @@ export const curriculumTree = [
             ],
             "emoji": "🧹",
             "direction": "텍스트정제토큰화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_08",
-            "code": "import re"
+            "slug": "automation/regex/regex_08"
           },
           {
             "id": "regex_09",
@@ -7459,8 +7008,7 @@ export const curriculumTree = [
             ],
             "emoji": "🔬",
             "direction": "고급패턴매칭에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_09",
-            "code": "import re"
+            "slug": "automation/regex/regex_09"
           },
           {
             "id": "regex_10",
@@ -7475,8 +7023,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚀",
             "direction": "LLM전처리파이프라인에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.",
-            "slug": "automation/regex/regex_10",
-            "code": "import re"
+            "slug": "automation/regex/regex_10"
           }
         ]
       },
@@ -7496,8 +7043,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "외부 API에서 매일 받아야 하는 데이터를 requests 한 패키지로 자동 수집·결합·통보한다. 마지막 한 강의만 httpx로 비동기·병렬을 다룬다.",
-            "slug": "automation/requests/requests_00",
-            "code": "import httpx\nimport requests\n\nversions = {\n    \"requests\": requests.__version__,\n    \"httpx\": httpx.__version__,\n}\n\nassert all(versions.values())\nprint(versions)"
+            "slug": "automation/requests/requests_00"
           },
           {
             "id": "requests_01",
@@ -7511,8 +7057,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "requests.get 한 줄로 외부 API에 첫 호출을 보내고, status_code · raise_for_status · .json() 세 단계로 응답을 안전하게 처리하는 골격을 만든다.",
-            "slug": "automation/requests/requests_01",
-            "code": "import requests\n\nr = requests.get(\"https://httpbin.org/get\", timeout=10)\nr.status_code"
+            "slug": "automation/requests/requests_01"
           },
           {
             "id": "requests_11",
@@ -7527,8 +7072,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "거래처 사업자번호 목록을 국세청 공식 Open API로 일괄 조회해 휴업·폐업·면세·미등록을 분류하고, 세금계산서를 끊으면 안 되는 '발행 차단 리스트'를 자동으로 만든다.",
-            "slug": "automation/requests/requests_11",
-            "code": "def chooseMethod(hasOfficialApi, hasBulkDownload, needsLogin):\n    if hasOfficialApi:\n        return \"공식 API (requests)\"\n    if hasBulkDownload:\n        return \"네이티브 일괄 다운로드 후 처리\"\n    if needsLogin:\n        return \"수동 인증 1회 + 세션 재사용\"\n    return \"공개 페이지 직접 조회\"\n\nmethod = chooseMethod(hasOfficialApi=True, hasBulkDownload=False, needsLogin=True)\n\nassert method == \"공식 API (requests)\"\nmethod"
+            "slug": "automation/requests/requests_11"
           },
           {
             "id": "requests_12",
@@ -7543,8 +7087,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "거래·정산·배송 마감일을 '영업일 기준'으로 정확히 계산한다. 공휴일은 매년 대체·임시공휴일로 바뀌므로, 공공데이터 특일정보 API로 그 해 공휴일을 받아 datetime으로 주말·공휴일을 함께 건너뛴다.",
-            "slug": "automation/requests/requests_12",
-            "code": "from datetime import date, datetime\n\ndef parseHolidays(items):\n    holidays = set()\n    for item in items:\n        if item[\"isHoliday\"] == \"Y\":\n            holidays.add(datetime.strptime(str(item[\"locdate\"]), \"%Y%m%d\").date())\n    return holidays\n\nitems = [\n    {\"dateName\": \"1월1일\", \"isHoliday\": \"Y\", \"locdate\": 20250101},\n    {\"dateName\": \"임시공휴일\", \"isHoliday\": \"Y\", \"locdate\": 20250127},\n    {\"dateName\": \"설날\", \"isHoliday\": \"Y\", \"locdate\": 20250128},\n    {\"dateName\": \"설날\", \"isHoliday\": \"Y\", \"locdate\": 20250129},\n    {\"dateName\": \"설날\", \"isHoliday\": \"Y\", \"locdate\": 20250130},\n    {\"dateName\": \"제헌절\", \"isHoliday\": \"N\", \"locdate\": 20250717},\n]\nholidays = parseHolidays(items)\n\nassert date(2025, 1, 27) in holidays\nassert date(2025, 7, 17) not in holidays\nassert len(holidays) == 5\nsorted(holidays)"
+            "slug": "automation/requests/requests_12"
           },
           {
             "id": "requests_13",
@@ -7559,8 +7102,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "외화 인보이스·해외결제·외화자산 평가를 매매기준율로 원화 환산하는 흐름을 자동화한다. 돈 계산이라 float이 아닌 decimal로 정확히 하고, JPY·IDR 같은 100단위 통화와 반올림 규칙까지 맞춘다.",
-            "slug": "automation/requests/requests_13",
-            "code": "from decimal import Decimal\n\ndef parseRate(item):\n    code = item[\"cur_unit\"].split(\"(\")[0]\n    unitSize = 100 if \"(100)\" in item[\"cur_unit\"] else 1\n    rate = Decimal(item[\"deal_bas_r\"].replace(\",\", \"\"))\n    return {\"code\": code, \"unitSize\": unitSize, \"rate\": rate}\n\nusd = parseRate({\"cur_unit\": \"USD\", \"deal_bas_r\": \"1,389.5\"})\njpy = parseRate({\"cur_unit\": \"JPY(100)\", \"deal_bas_r\": \"913.45\"})\n\nassert usd == {\"code\": \"USD\", \"unitSize\": 1, \"rate\": Decimal(\"1389.5\")}\nassert jpy[\"code\"] == \"JPY\"\nassert jpy[\"unitSize\"] == 100\njpy"
+            "slug": "automation/requests/requests_13"
           }
         ]
       }
@@ -7587,8 +7129,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "개발자가 검은 화면에 글자를 치는 그 '터미널'이 무엇이고, 왜 클릭 대신 타이핑으로 컴퓨터를 다루는지, 명령 한 줄이 어떤 부품으로 이루어지는지를 코드 실행 없이 그림과 세션 예시로 읽고 이해한다.",
-            "slug": "devLiteracy/devTools/devTools_commandLineIntro",
-            "code": ""
+            "slug": "devLiteracy/devTools/devTools_commandLineIntro"
           },
           {
             "id": "devTools_gitFirstSteps",
@@ -7603,8 +7144,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "GitHub 소개가 '왜·무엇'이었다면, 이번엔 Git이 실제로 어떻게 도는지를 머리로 먼저 그린다. '명령줄 첫걸음'에서 익힌 '프로그램+옵션+인자' 분해 습관을 이번엔 git 명령에 그대로 적용해, init→add→commit→log 한 사이클을 명령 분해와 실제 터미널 출력 예시로 코드 실행 없이 읽고 이해한 뒤, 직접 손으로 쳐볼 준비를 한다.",
-            "slug": "devLiteracy/devTools/devTools_gitFirstSteps",
-            "code": ""
+            "slug": "devLiteracy/devTools/devTools_gitFirstSteps"
           },
           {
             "id": "devTools_githubIntro",
@@ -7619,8 +7159,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "GitHub이 무엇이고 왜 거의 모든 개발자가 쓰는지, Git과 어떻게 다른지를 코드 실행 없이 그림과 비유로 읽고 이해한다. 마지막 핵심 정리 체크리스트로 스스로 설명할 수 있는지 확인한다.",
-            "slug": "devLiteracy/devTools/devTools_githubIntro",
-            "code": ""
+            "slug": "devLiteracy/devTools/devTools_githubIntro"
           }
         ]
       }
@@ -7647,8 +7186,7 @@ export const curriculumTree = [
             ],
             "emoji": "",
             "direction": "LLM통합소개에서 Claude API를 호출하고 응답을 안전하게 다루는 표준 흐름을 만든다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_00",
-            "code": "import importlib.metadata as metadata\nimport anthropic\n\nversion = metadata.version(\"anthropic\")\nclientClass = anthropic.Anthropic\n\nassert version\nassert clientClass.__name__ == \"Anthropic\"\nprint(version)"
+            "slug": "aiIntegration/llmBasics/llmBasics_00"
           },
           {
             "id": "llmBasics_01",
@@ -7663,8 +7201,7 @@ export const curriculumTree = [
             ],
             "emoji": "🚀",
             "direction": "Anthropic 클라이언트 생성, model/max_tokens/messages 인자 구성, content 블록에서 텍스트 추출까지 한 번의 호출 흐름을 완성한다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_01",
-            "code": "import os\nimport anthropic\n\nhasKey = bool(os.environ.get(\"ANTHROPIC_API_KEY\"))\nsdkVersion = anthropic.__version__\n(hasKey, sdkVersion)"
+            "slug": "aiIntegration/llmBasics/llmBasics_01"
           },
           {
             "id": "llmBasics_02",
@@ -7678,8 +7215,7 @@ export const curriculumTree = [
             ],
             "emoji": "🎭",
             "direction": "빈 system → 짧은 system → 형식 강제 system 순으로 변주해 응답이 어떻게 변하는지 시각화하고, 자동화에서 재사용할 수 있는 system 빌더 함수를 만든다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_02",
-            "code": "import anthropic\n\nclient = anthropic.Anthropic()\nbaseResponse = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=200,\n    messages=[{\"role\": \"user\", \"content\": \"재귀 함수가 무엇인지 알려줘.\"}],\n)\nbaseAnswer = \"\".join(block.text for block in baseResponse.content if block.type == \"text\")\nbaseAnswer"
+            "slug": "aiIntegration/llmBasics/llmBasics_02"
           },
           {
             "id": "llmBasics_03",
@@ -7693,8 +7229,7 @@ export const curriculumTree = [
             ],
             "emoji": "💬",
             "direction": "단일 메시지 → 직접 누적 → ChatSession 클래스화 순으로 대화 패턴을 발전시키며 자동화에서 재사용 가능한 구조를 만든다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_03",
-            "code": "import anthropic\n\nclient = anthropic.Anthropic()\nfirstResponse = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=120,\n    messages=[{\"role\": \"user\", \"content\": \"내 이름은 김민준이야.\"}],\n)\nsecondResponse = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=120,\n    messages=[{\"role\": \"user\", \"content\": \"내 이름이 뭐였지?\"}],\n)\nsecondAnswer = \"\".join(block.text for block in secondResponse.content if block.type == \"text\")\nsecondAnswer"
+            "slug": "aiIntegration/llmBasics/llmBasics_03"
           },
           {
             "id": "llmBasics_04",
@@ -7708,8 +7243,7 @@ export const curriculumTree = [
             ],
             "emoji": "💰",
             "direction": "usage 구조 확인 → 가격표 함수 → 호출 단위 비용 계산기 → 누적 로거 순으로 비용 인프라를 만든다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_04",
-            "code": "import anthropic\n\nclient = anthropic.Anthropic()\nresponse = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=128,\n    messages=[{\"role\": \"user\", \"content\": \"오늘의 한 줄 격언을 들려줘.\"}],\n)\nusageDict = response.usage.model_dump()\nusageDict"
+            "slug": "aiIntegration/llmBasics/llmBasics_04"
           },
           {
             "id": "llmBasics_05",
@@ -7723,8 +7257,7 @@ export const curriculumTree = [
             ],
             "emoji": "🌊",
             "direction": "동기 호출 baseline → text 청크 누적 → 진행 표시 → final 메시지로 ChatSession 확장 순서로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_05",
-            "code": "import time\nimport anthropic\n\nclient = anthropic.Anthropic()\nsyncStart = time.time()\nsyncResponse = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=300,\n    messages=[{\"role\": \"user\", \"content\": \"Python 데코레이터를 처음 배우는 사람에게 자세히 설명해 줘.\"}],\n)\nsyncElapsed = round(time.time() - syncStart, 2)\nsyncAnswer = \"\".join(block.text for block in syncResponse.content if block.type == \"text\")\n(syncElapsed, len(syncAnswer))"
+            "slug": "aiIntegration/llmBasics/llmBasics_05"
           },
           {
             "id": "llmBasics_06",
@@ -7738,8 +7271,7 @@ export const curriculumTree = [
             ],
             "emoji": "📦",
             "direction": "자유 응답 → JSON 강제 system → assistant prefill → 검증·재시도 함수 순으로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_06",
-            "code": "import json\nimport anthropic\n\nclient = anthropic.Anthropic()\nrequest = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=200,\n    messages=[{\"role\": \"user\", \"content\": \"주문 정보 한 건을 JSON으로 만들어 줘. 키는 orderId, customer, amount.\"}],\n)\nrawText = \"\".join(block.text for block in request.content if block.type == \"text\")\ntry:\n    parsed = json.loads(rawText)\n    parseStatus = \"ok\"\nexcept json.JSONDecodeError as exc:\n    parsed = None\n    parseStatus = f\"fail: {exc.msg}\"\n(parseStatus, rawText[:80])"
+            "slug": "aiIntegration/llmBasics/llmBasics_06"
           },
           {
             "id": "llmBasics_07",
@@ -7753,8 +7285,7 @@ export const curriculumTree = [
             ],
             "emoji": "💾",
             "direction": "캐싱 없는 baseline → 캐시 시스템 적용 → 적중률 측정 → 캐싱 단가까지 반영한 비용 계산기 순으로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_07",
-            "code": "import anthropic\n\nlongSystem = (\n    \"너는 데이터 분석 자동화 도구야. 다음 규칙을 모두 따른다.\\n\"\n    + (\"- 응답은 반드시 한국어로만 작성한다.\\n\" * 20)\n    + (\"- 응답에는 추가 설명이나 코드 블록 마크다운을 절대 포함하지 않는다.\\n\" * 20)\n    + (\"- 응답은 가능한 한 짧고 명확하게 작성하고, 핵심만 전달한다.\\n\" * 20)\n    + \"- 사용자가 묻는 한 가지 질문에만 정확히 답한다.\"\n)\n\nclient = anthropic.Anthropic()\nfirst = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=120,\n    system=longSystem,\n    messages=[{\"role\": \"user\", \"content\": \"오늘 학습 팁 하나만 알려줘.\"}],\n)\nsecond = client.messages.create(\n    model=\"claude-haiku-4-5\",\n    max_tokens=120,\n    system=longSystem,\n    messages=[{\"role\": \"user\", \"content\": \"내일 학습 팁 하나만 알려줘.\"}],\n)\n(first.usage.input_tokens, second.usage.input_tokens)"
+            "slug": "aiIntegration/llmBasics/llmBasics_07"
           },
           {
             "id": "llmBasics_08",
@@ -7768,8 +7299,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛠️",
             "direction": "도구 스키마 정의 → 첫 tool_use 받기 → tool_result 회신 → 루프 함수화 순으로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_08",
-            "code": "weatherTool = {\n    \"name\": \"get_weather\",\n    \"description\": \"특정 도시의 현재 날씨를 조회한다. 도시 이름을 받아 섭씨 기온과 날씨 상태를 돌려준다.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n            \"city\": {\n                \"type\": \"string\",\n                \"description\": \"조회할 도시의 한국어 또는 영어 이름.\",\n            },\n        },\n        \"required\": [\"city\"],\n    },\n}\ntools = [weatherTool]\ntools[0][\"name\"]"
+            "slug": "aiIntegration/llmBasics/llmBasics_08"
           },
           {
             "id": "llmBasics_09",
@@ -7783,8 +7313,7 @@ export const curriculumTree = [
             ],
             "emoji": "🛠️",
             "direction": "도구 두 개 정의 → dispatcher 함수 → 잘못된 도구·인자 처리 → ToolKit 클래스화 순으로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_09",
-            "code": "weatherTool = {\n    \"name\": \"get_weather\",\n    \"description\": \"특정 도시의 현재 날씨를 조회한다. 도시 이름이 명시될 때만 사용한다.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\"city\": {\"type\": \"string\"}},\n        \"required\": [\"city\"],\n    },\n}\nholidayTool = {\n    \"name\": \"list_holidays\",\n    \"description\": \"특정 연도의 한국 공휴일 목록을 돌려준다. 사용자가 휴일 정보를 요청할 때만 사용한다.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\"year\": {\"type\": \"integer\"}},\n        \"required\": [\"year\"],\n    },\n}\ntools = [weatherTool, holidayTool]\n[tool[\"name\"] for tool in tools]"
+            "slug": "aiIntegration/llmBasics/llmBasics_09"
           },
           {
             "id": "llmBasics_10",
@@ -7800,8 +7329,7 @@ export const curriculumTree = [
             ],
             "emoji": "🤖",
             "direction": "도구 정의(데이터 로드·요약·집계) → 캐시 시스템 → JSON 출력 강제 → 종합 봇 클래스화 순으로 발전시킨다.",
-            "slug": "aiIntegration/llmBasics/llmBasics_10",
-            "code": "import json\nfrom typing import Callable\nfrom codaro.curriculum.localData import loadLocalDataset\n\nclass DataToolKit:\n    def __init__(self) -> None:\n        self.schemas: list[dict] = []\n        self.handlers: dict[str, Callable[[dict], str]] = {}\n\n    def register(self, schema: dict, handler: Callable[[dict], str]) -> None:\n        self.schemas.append(schema)\n        self.handlers[schema[\"name\"]] = handler\n\n    def dispatch(self, name: str, payload: dict) -> str:\n        if name not in self.handlers:\n            return json.dumps({\"error\": f\"unknown tool {name}\"})\n        try:\n            return self.handlers[name](payload)\n        except (KeyError, ValueError, TypeError) as exc:\n            return json.dumps({\"error\": str(exc)})\n\ndef handleLoad(payload: dict) -> str:\n    frame = loadLoca"
+            "slug": "aiIntegration/llmBasics/llmBasics_10"
           }
         ]
       }
