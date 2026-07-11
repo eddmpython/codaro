@@ -12,6 +12,7 @@ tests/_attempts/pyproc.js(커널) + pyprocWorker.js(프로세스):
 - **4 워커 프로세스 spawn** (16코어 머신, 콜드 부팅 avg 3227ms - 스냅샷-fork면 ~184ms).
 - **진짜 병렬 map**: 8 태스크(소수 개수) 병렬 130ms vs 직렬 347ms = **2.67배 빠름, 결과 정확**(2762 일치).
 - 깨끗한 API: `const pp = new PyProc(); await pp.boot(4); const r = await pp.map(fnSrc, args);` = multiprocessing.Pool 등가.
+- **정직 노트**: 두 핵심 능력은 각각 실측됨 - 병렬 map(위, 2.67배)과 스냅샷-fork spawn(webSnapshotFork.html, 15.4배/184ms). 그러나 둘을 한 테스트로 합친 PyProc.boot(n, useSnapshot=true)는 부모+워커 다수 Pyodide 인스턴스가 headless 메모리/시간 한계에 걸려 타임아웃(테스트 환경 제약, 코드는 pyproc.js에 존재). 실제 편입 시 워커를 페이지 로드 때 미리 예열하는 방식으로 회피.
 
 ## 2. 아키텍처 (검증조각의 융합)
 ```text
