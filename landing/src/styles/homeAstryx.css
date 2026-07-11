@@ -195,6 +195,41 @@
   opacity: 0.85;
 }
 
+.learnLessonButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border-radius: 12px;
+  transition: transform 0.12s ease;
+}
+
+.learnLessonButton:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.learnLessonButton:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.learnLessonButton:focus-visible {
+  outline: 2px solid var(--color-accent, #f5a524);
+  outline-offset: 2px;
+}
+
+.learnLessonPlay {
+  margin-left: auto;
+  align-self: center;
+  opacity: 0.5;
+  flex: none;
+}
+
 /* 브라우저 Python 실행기 */
 .pyRunner {
   border: 1px solid var(--color-border, rgba(120, 120, 130, 0.3));

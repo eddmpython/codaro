@@ -1,7 +1,7 @@
 // pythonRunner.jsx - 브라우저에서 진짜 Python을 실행하는 위젯(pyproc).
 // 단일 boot()+runAsync() 경로는 SharedArrayBuffer/COOP-COEP가 필요 없어 GitHub Pages에서도 돈다.
 // pyproc은 첫 실행 클릭에서 lazy import(코드 스플릿 + 큰 런타임 다운로드 지연). SSR 안전(렌더 시 브라우저 API 미접근).
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@astryxdesign/core/Button";
 import { Badge } from "@astryxdesign/core/Badge";
@@ -21,12 +21,20 @@ const STATUS_LABEL = {
   ready: "준비됨",
 };
 
-export function PythonRunner({ initialCode = DEFAULT_CODE }) {
+export function PythonRunner({ initialCode = DEFAULT_CODE, load }) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState("idle");
   const rtRef = useRef(null);
   const linesRef = useRef([]);
+
+  // 외부(레슨 카드)에서 코드를 실어 보내면 에디터에 로드한다. load.nonce가 바뀔 때마다 반영.
+  useEffect(() => {
+    if (load && typeof load.code === "string" && load.code.length > 0) {
+      setCode(load.code);
+      setOutput("");
+    }
+  }, [load]);
 
   async function ensureRuntime() {
     if (rtRef.current) return rtRef.current;

@@ -36,6 +36,26 @@ function domainOf(fileRel) {
   return fileRel.split(/[\\/]/)[0];
 }
 
+// 레슨 문서에서 첫 실행 코드(snippet)를 재귀로 찾는다. sections[].snippet 등 위치가 다양하다.
+function findFirstSnippet(node, depth = 0) {
+  if (!node || depth > 8) return "";
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = findFirstSnippet(item, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (typeof node === "object") {
+    if (typeof node.snippet === "string" && node.snippet.trim().length > 0) return node.snippet;
+    for (const value of Object.values(node)) {
+      const found = findFirstSnippet(value, depth + 1);
+      if (found) return found;
+    }
+  }
+  return "";
+}
+
 const files = existsSync(CURRICULA) ? walkYaml(CURRICULA) : [];
 const domains = new Map();
 let lessonCount = 0;
@@ -61,6 +81,7 @@ for (const file of files) {
     emoji: (doc.intro && doc.intro.emoji) || "",
     direction: (doc.intro && doc.intro.direction) || (meta.seo && meta.seo.description) || "",
     slug: `${domain}/${track}/${meta.id}`,
+    code: findFirstSnippet(doc).slice(0, 800),
   };
   if (!domains.has(domain)) domains.set(domain, new Map());
   const tracks = domains.get(domain);
