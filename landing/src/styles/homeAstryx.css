@@ -230,6 +230,17 @@
   flex: none;
 }
 
+.learnActiveLesson {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-accent, #f5a524);
+  background: var(--color-accent-muted, rgba(245, 165, 36, 0.08));
+}
+
 /* 브라우저 Python 실행기 */
 .pyRunner {
   border: 1px solid var(--color-border, rgba(120, 120, 130, 0.3));

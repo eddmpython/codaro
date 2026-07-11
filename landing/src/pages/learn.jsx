@@ -15,9 +15,9 @@ export function LearnPage() {
   const [loaded, setLoaded] = useState(null);
   const nonceRef = useRef(0);
 
-  function runLesson(code) {
-    if (!code) return;
-    setLoaded({ code, nonce: (nonceRef.current += 1) });
+  function runLesson(lesson) {
+    if (!lesson || !lesson.code) return;
+    setLoaded({ code: lesson.code, title: lesson.title, direction: lesson.direction, nonce: (nonceRef.current += 1) });
     if (typeof document !== "undefined") {
       const el = document.getElementById("py-runner");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -63,6 +63,15 @@ export function LearnPage() {
             불러오세요. 이 탭 안에서 진짜 CPython이 돕니다.
           </Text>
         </div>
+        {loaded && loaded.title && (
+          <div className="learnActiveLesson">
+            <Badge variant="accent" label="레슨" />
+            <div>
+              <Text type="body-sm" weight="600">{loaded.title}</Text>
+              {loaded.direction && <Text type="body-sm" color="muted">{loaded.direction}</Text>}
+            </div>
+          </div>
+        )}
         <PythonRunner load={loaded} />
       </section>
 
@@ -93,7 +102,7 @@ export function LearnPage() {
                       className="learnLessonButton"
                       disabled={!lesson.code}
                       title={lesson.code ? "이 레슨의 코드를 실행기로 불러오기" : "실행 코드 없음"}
-                      onClick={() => runLesson(lesson.code)}
+                      onClick={() => runLesson(lesson)}
                     >
                       <Card padding={4}>
                         <div className="learnLessonCard">
