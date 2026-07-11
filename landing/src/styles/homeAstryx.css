@@ -24,6 +24,36 @@
   padding-inline: 24px;
 }
 
+/* astryx 정본 조합용 페이지 셸: 중앙 정렬 + 풀블리드 밴드 */
+.homeShell {
+  width: 100%;
+  max-width: 1060px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.homeHeroPad {
+  padding-block: 76px 44px;
+}
+
+.homeSectionPad {
+  padding-block: 60px;
+}
+
+.homeBand {
+  background: var(--color-background-muted, rgba(120, 120, 130, 0.07));
+  padding-block: 68px;
+  border-block: 1px solid var(--color-border, rgba(120, 120, 130, 0.16));
+}
+
+.homeBand + .homeBand {
+  border-top: 0;
+}
+
+.homeBandStrong {
+  background: var(--color-background-surface, rgba(255, 255, 255, 0.02));
+}
+
 .homeHero {
   padding-block: 92px 64px;
   display: flex;
