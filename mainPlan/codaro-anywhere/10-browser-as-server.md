@@ -65,5 +65,12 @@ tests/_attempts/webPyServer.html + webPyServerSw.js. 페이지가 평범한 `fet
 - "발명"인가: Service Worker·WSGI·Pyodide 전부 기성. 새로운 건 개별 벽돌이 아니라 **재프레임("서버=인터페이스")과 그 위의 제품화**다. 08 브리지와 같은 정직: 조합이되, VM 경로보다 압도적으로 실현가능한 올바른 조합.
 - 실험 파일(git 미추적): tests/_attempts/webPyServer.html, webPyServerSw.js, (WSGI 단독=scratchpad runFlask.py). 제품 편입 시 editor 표면 + Pyodide 워커로 승격.
 
-## 6. 판정
-**이것이 09까지의 "무거운 VM" 대비 "정말로 가능한" 방향이다.** 진짜 파이썬 웹 서버가 오늘 브라우저에서 가볍게 돌고, 페이지가 표준 fetch로 접속하며, 검증된 자족 티어와 결합해 "진짜 일하는 로컬 서버"가 된다. 다음: FastAPI(ASGI)·스트리밍·OPFS 영속을 실측하고 editor 제품 표면에 편입.
+## 6. 전문가 독립 수렴 (검증)
+4렌즈 토론이 이 아키텍처에 독립적으로 수렴함(내가 빌드·실측한 것과 동일). 1위 = "SW 리버스 프록시 + 상주 Pyodide Worker(WSGI/ASGI, fetch-투명)". 확장 로드맵도 합의:
+- **FastAPI(ASGI)**: httpx.ASGITransport(app) 또는 in-memory scope/receive/send 루프로 소켓 없이 구동. pydantic 검증·미들웨어·DI가 실제로 실행(422 검증 등). h11/anyio/starlette 순수 파이썬이라 micropip 가능(pydantic-core는 wasm 휠 필요 -> Pyodide 314 배포판 확인).
+- **SharedWorker 단일 프로세스 서버**: 모든 탭이 한 앱/한 sqlite를 공유(진짜 localhost 모델), 쓰기 자연 직렬화. OPFS sqlite VFS로 영속(재방문에도 DB 생존).
+- **힙 스냅샷 웜스타트**([08 계열 검증 자산]): 프레임워크+앱 import 끝낸 힙을 스냅샷 -> loadPyodide({snapshot})로 콜드부트(수초) 제거, "이미 떠 있던 서버" 즉시성. 단 sqlite fd 열기 전 스냅샷/복원 후 재오픈 규율 필요.
+- **SSE/청크 스트리밍**: ASGI http.response.body(more_body) 이벤트를 respondWith의 ReadableStream 청크로 밀면 실제 스트리밍. WebSocket 업그레이드는 SW fetch로 불가 -> SSE/롱폴로 대체.
+
+## 7. 판정
+**이것이 09까지의 "무거운 VM" 대비 "정말로 가능한" 방향이다.** 진짜 파이썬 웹 서버가 오늘 브라우저에서 가볍게 돌고, 페이지가 표준 fetch로 접속하며, 검증된 자족 티어([08])·힙 스냅샷([08 계열])과 결합해 "진짜 일하는 상주 로컬 서버"가 된다. Codaro 정체성(GUI=API, 상주 로컬엔진)과 정확히 정합. 다음: FastAPI(ASGI)·SSE·OPFS 영속·스냅샷 웜스타트 실측 후 editor 제품 표면 편입.
