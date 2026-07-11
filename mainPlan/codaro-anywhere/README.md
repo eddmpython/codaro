@@ -57,6 +57,8 @@ web surface (Cloudflare Pages, 무료 정적)
 
 19. [18-pyproc-repo-extraction.md](18-pyproc-repo-extraction.md) - **레포 분리 실물 착수**: 웹 파이썬 발명(런타임·복원 리액티브·프로세스 OS·능력 계약)을 codaro 밖 별도 레포 `github.com/eddmpython/pyproc`(초기 커밋 `4132302`, main 전용)로 승격. codaro `tests/_attempts` 검증조각 4모듈을 프레임워크 무관 ESM으로 정리, codaro/dartlab 급 규칙 문서·훅·의존성0 게이트(21/21 PASS). codaro가 first consumer, "참조"가 아니라 "실제 import"로만 SSOT 성립. 다음=PyodideEngine이 pyproc을 실제 import.
 
+20. [19-web-service-build.md](19-web-service-build.md) - **웹 서비스 완성 구현 계획(착수)**: React+astryx(@astryxdesign/core 0.1.4, StyleX 기반) 디자인 시스템으로 랜딩·학습 웹 재구축 + pyproc 위 codaro FastAPI 브라우저 서빙(SW+ASGI) + GitHub Pages 갈아엎기. P0 실증 완료: astryx가 landing Vite에서 빌드 통과(95모듈). doc 14(아키텍처) 구현 계획, P0~P6 phasing.
+
 17. [16-real-runtime-transformation.md](16-real-runtime-transformation.md) - **진짜 런타임 탈바꿈(발명+실측)**: 힙 스냅샷을 fork 프리미티브로 승격 -> 단일 인터프리터가 프로세스 OS로. 실측: bare 스냅샷 fork 15.4배 빠름(184ms vs cold 2839ms)·독립 프로세스. warm fork(재임포트0)는 hiwire 경계가 막음(프론티어=emval shadow). 토론 랭킹 통합 예정.
 
 16. [15-browserpy-module.md](15-browserpy-module.md) - **모듈화(설계+참조구현+소비자 PASS)**: 발명들을 프레임워크 무관 ESM 모듈로. 교차 관심사(HEAPU8·스택·몽키패치)를 능력 계약(MemoryCapability 등) 뒤 캡슐화. 소비자가 깨끗한 API만으로 복원 리액티브 사용(HEAPU8 직접접근 0) 실측 PASS. codaro/dartlab/xlpod 공통 소비.
