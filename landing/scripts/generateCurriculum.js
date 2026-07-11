@@ -3,12 +3,36 @@
 // docsNav/posts 생성기와 같은 패턴. 빌드 prebuild 단계에서 돈다.
 import { dirname, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CURRICULA = resolve(__dirname, "../../curricula/python");
 const OUT = resolve(__dirname, "../src/lib/generated/curriculum.js");
+// 레슨 상세는 static(publicDir)에 JSON으로 써서 /learn/<slug>가 fetch한다(번들 회피).
+const LESSON_DIR = resolve(__dirname, "../static/lessons");
+
+function lessonDetail(doc, lesson) {
+  const sections = Array.isArray(doc.sections) ? doc.sections : [];
+  return {
+    id: lesson.id,
+    title: lesson.title,
+    emoji: lesson.emoji,
+    direction: lesson.direction,
+    tags: lesson.tags,
+    intro: doc.intro && typeof doc.intro === "object"
+      ? { points: Array.isArray(doc.intro.points) ? doc.intro.points.map(String) : [], benefits: Array.isArray(doc.intro.benefits) ? doc.intro.benefits.map(String) : [] }
+      : { points: [], benefits: [] },
+    sections: sections.map((s) => ({
+      title: s.title ? String(s.title) : "",
+      subtitle: s.subtitle ? String(s.subtitle) : "",
+      goal: s.goal ? String(s.goal) : "",
+      why: s.why ? String(s.why) : "",
+      explanation: s.explanation ? String(s.explanation) : "",
+      snippet: typeof s.snippet === "string" ? s.snippet : "",
+    })).filter((s) => s.title || s.explanation || s.snippet),
+  };
+}
 
 const DOMAIN_LABELS = {
   basics: "파이썬 기초",
@@ -88,6 +112,10 @@ for (const file of files) {
   if (!tracks.has(track)) tracks.set(track, []);
   tracks.get(track).push(lesson);
   lessonCount += 1;
+
+  const detailPath = resolve(LESSON_DIR, `${domain}/${track}/${meta.id}.json`);
+  mkdirSync(dirname(detailPath), { recursive: true });
+  writeFileSync(detailPath, JSON.stringify(lessonDetail(doc, lesson)));
 }
 
 const tree = DOMAIN_ORDER.filter((d) => domains.has(d)).map((domain) => {

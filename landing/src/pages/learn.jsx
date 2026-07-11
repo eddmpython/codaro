@@ -1,6 +1,5 @@
 // learn.jsx - /learn 학습 페이지. astryx 디자인. App.jsx와 prerenderReact.js가 공유하는 SSOT.
 // 커리큘럼 트리는 빌드시 생성(scripts/generateCurriculum.js). 레슨 실행(브라우저 런타임)은 P3에서 배선.
-import { useRef, useState } from "react";
 import { BookOpen, Download, Globe, Play, Sparkles } from "lucide-react";
 import { Heading } from "@astryxdesign/core/Heading";
 import { Text } from "@astryxdesign/core/Text";
@@ -11,19 +10,9 @@ import { brand } from "../lib/brand.js";
 import { curriculumTree, curriculumLessonCount } from "../lib/generated/curriculum.js";
 import { PythonRunner } from "../components/pythonRunner.jsx";
 
+const appPath = (path = "/") => brand.appPath(path);
+
 export function LearnPage() {
-  const [loaded, setLoaded] = useState(null);
-  const nonceRef = useRef(0);
-
-  function runLesson(lesson) {
-    if (!lesson || !lesson.code) return;
-    setLoaded({ code: lesson.code, title: lesson.title, direction: lesson.direction, nonce: (nonceRef.current += 1) });
-    if (typeof document !== "undefined") {
-      const el = document.getElementById("py-runner");
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-
   return (
     <main className="learnPage">
       <section className="homeWrap homeHero" style={{ paddingBlock: "84px 40px" }}>
@@ -59,20 +48,11 @@ export function LearnPage() {
           <Text type="label" color="accent">지금 바로</Text>
           <Heading level={2} type="display-3">브라우저에서 Python을 실행해보세요.</Heading>
           <Text type="body" color="muted">
-            설치도 서버도 없습니다. 아래 코드를 고쳐서 실행하거나, 커리큘럼에서 레슨을 눌러 그 코드를 여기로
-            불러오세요. 이 탭 안에서 진짜 CPython이 돕니다.
+            설치도 서버도 없습니다. 아래 코드를 고쳐서 실행하거나, 커리큘럼에서 레슨을 열어 단계별로 배우고
+            실행하세요. 이 탭 안에서 진짜 CPython이 돕니다.
           </Text>
         </div>
-        {loaded && loaded.title && (
-          <div className="learnActiveLesson">
-            <Badge variant="accent" label="레슨" />
-            <div>
-              <Text type="body-sm" weight="600">{loaded.title}</Text>
-              {loaded.direction && <Text type="body-sm" color="muted">{loaded.direction}</Text>}
-            </div>
-          </div>
-        )}
-        <PythonRunner load={loaded} />
+        <PythonRunner />
       </section>
 
       <section className="homeWrap homeSection" id="curriculum" style={{ paddingTop: 20 }}>
@@ -96,13 +76,11 @@ export function LearnPage() {
                 <Heading level={3} type="title">{track.track}</Heading>
                 <div className="learnLessonGrid">
                   {track.lessons.map((lesson) => (
-                    <button
+                    <a
                       key={lesson.slug}
-                      type="button"
                       className="learnLessonButton"
-                      disabled={!lesson.code}
-                      title={lesson.code ? "이 레슨의 코드를 실행기로 불러오기" : "실행 코드 없음"}
-                      onClick={() => runLesson(lesson)}
+                      href={appPath(`/learn/${lesson.slug}`)}
+                      title={`${lesson.title} 레슨 열기`}
                     >
                       <Card padding={4}>
                         <div className="learnLessonCard">
@@ -120,7 +98,7 @@ export function LearnPage() {
                           {lesson.code && <Play size={14} className="learnLessonPlay" aria-hidden="true" />}
                         </div>
                       </Card>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>

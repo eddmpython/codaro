@@ -27,6 +27,7 @@ import { faqEntries } from "./lib/faq.js";
 import { tools } from "./lib/tools/registry.js";
 import { HomePage } from "./pages/home.jsx";
 import { LearnPage } from "./pages/learn.jsx";
+import { LessonPage } from "./pages/lessonPage.jsx";
 
 const docsModules = import.meta.glob("./lib/generated/docsPages/*.js");
 
@@ -367,6 +368,17 @@ function resolveRoute(path) {
         url: "/learn",
       },
       element: <LearnPage />,
+    };
+  }
+  if (path.startsWith("/learn/")) {
+    const slug = path.slice("/learn/".length).replace(/\/$/, "");
+    return {
+      meta: {
+        title: "레슨",
+        description: "브라우저에서 바로 실행하는 Codaro Python 레슨.",
+        url: path,
+      },
+      element: <LessonPage slug={slug} />,
     };
   }
   if (path === "/docs") return docsIndexRoute();

@@ -241,6 +241,45 @@
   background: var(--color-accent-muted, rgba(245, 165, 36, 0.08));
 }
 
+/* 레슨 상세 페이지 */
+.lessonPoints {
+  margin: 18px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.lessonSections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lessonCell {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.lessonSnippet {
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, rgba(120, 120, 130, 0.24));
+  background: var(--color-background-muted, rgba(120, 120, 130, 0.06));
+  font-family: ui-monospace, "SFMono-Regular", "Space Grotesk", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 /* 브라우저 Python 실행기 */
 .pyRunner {
   border: 1px solid var(--color-border, rgba(120, 120, 130, 0.3));
