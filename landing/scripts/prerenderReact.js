@@ -8,6 +8,9 @@ import { sharePacks } from "../src/lib/sharePacks.js";
 import { tools } from "../src/lib/tools/registry.js";
 import { brand } from "../src/lib/brand.js";
 import { faqEntries } from "../src/lib/faq.js";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { createServer } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const landingRoot = resolve(__dirname, "..");
@@ -24,12 +27,23 @@ const docsContentEntries = await Promise.all(
 );
 const docsContentByModule = Object.fromEntries(docsContentEntries);
 
+// 홈은 App.jsx의 HomePage를 단일 SSOT로 React SSR한다(수기 homeBody 대신).
+// node는 JSX를 못 읽으므로 Vite ssrLoadModule로 온더플라이 트랜스파일해 로드한다.
+const viteServer = await createServer({
+  root: resolve(__dirname, ".."),
+  configFile: resolve(__dirname, "../vite.config.js"),
+  server: { middlewareMode: true },
+  appType: "custom",
+  logLevel: "silent",
+});
+const { HomePage } = await viteServer.ssrLoadModule("/src/pages/home.jsx");
+
 const routes = [
   {
     path: "/",
     title: "Python 학습과 개인 자동화 스튜디오",
     description: "배우는 코드가 바로 실행되고, 실행한 코드가 자동화가 되는 local-first Python 스튜디오.",
-    body: homeBody(),
+    body: renderToStaticMarkup(createElement(HomePage)),
     jsonLd: faqPageJsonLd(faqEntries),
   },
   {
@@ -141,6 +155,8 @@ for (const [from, to] of redirects) {
 }
 
 console.log(`[react-prerender] routes=${routes.length} redirects=${redirects.length}`);
+
+await viteServer.close();
 
 function sitePath(pathValue) {
   const value = pathValue || "/";
