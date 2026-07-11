@@ -1,21 +1,23 @@
-// home.jsx - 랜딩 홈 페이지. App.jsx와 prerenderReact.js가 공유하는 단일 SSOT.
-// (기존 App.jsx의 HomePage를 분리한 것. prerender가 이 컴포넌트를 React SSR로 렌더한다.)
-import { useEffect, useRef } from "react";
+// home.jsx - 랜딩 홈. App.jsx와 prerenderReact.js가 공유하는 단일 SSOT(React SSR).
+// astryx 디자인 시스템으로 재설계. 레이아웃 스캐폴딩은 styles/homeAstryx.css.
 import {
   ArrowRight,
   BookOpen,
   Check,
   CheckCircle2,
   Download,
-  FileCheck2,
-  Library,
-  Play,
-  Settings2,
+  Globe,
   ShieldCheck,
-  Star,
   Terminal,
   Workflow,
+  Zap,
 } from "lucide-react";
+import { Heading } from "@astryxdesign/core/Heading";
+import { Text } from "@astryxdesign/core/Text";
+import { Button } from "@astryxdesign/core/Button";
+import { Badge } from "@astryxdesign/core/Badge";
+import { Card } from "@astryxdesign/core/Card";
+import { Divider } from "@astryxdesign/core/Divider";
 import { brand } from "../lib/brand.js";
 import { faqEntries } from "../lib/faq.js";
 
@@ -48,364 +50,243 @@ const surfaces = [
   },
 ];
 
+const flowSteps = [
+  { icon: BookOpen, num: "01 배운다", title: "커리큘럼 셀", copy: "예측 → 실행 → 오류 → 검증 흐름을 한 학습 카드 안에서." },
+  { icon: Terminal, num: "02 실행한다", title: "로컬 런타임", copy: "percent format .py를 내 PC에서 그대로 실행하고 결과를 확인." },
+  { icon: Workflow, num: "03 승격한다", title: "dry-run 태스크", copy: "검증된 셀을 반복 가능한 개인 자동화로 키운다." },
+];
+
+const tierRows = [
+  { surface: "커리큘럼 학습", web: "브라우저에서 완전", local: "완전", note: "콘텐츠 + 브라우저 Python 실행" },
+  { surface: "채팅 · 에디터 · 노트북", web: "브라우저에서 실행", local: "완전", note: "대규모 numpy만 로컬 몫" },
+  { surface: "터미널(PTY)", web: "서버리스 셸로 대체", local: "완전", note: "진짜 PTY는 로컬" },
+  { surface: "자동화(상주 스케줄)", web: "로컬 전용", local: "완전", note: "탭이 닫히면 못 돌아 로컬/Actions 티어" },
+];
+
 const releaseLinks = [
   { href: brand.launcherChecksumUrl, label: "체크섬" },
   { href: brand.releaseManifestUrl, label: "manifest" },
   { href: brand.pythonRuntimeUrl, label: "Python runtime" },
-  { href: brand.pythonRuntimeChecksumUrl, label: "runtime checksum" },
   { href: brand.launcherSbomUrl, label: "SBOM" },
   { href: brand.releaseUrl, label: "GitHub Releases" },
 ];
 
-function useRevealObserver() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const root = ref.current;
-    if (!root) return undefined;
-    const raf = requestAnimationFrame(() => root.classList.add("is-loaded"));
-    const targets = root.querySelectorAll(".observe");
-    if (!("IntersectionObserver" in window) || targets.length === 0) {
-      targets.forEach((el) => el.classList.add("in-view"));
-      return () => cancelAnimationFrame(raf);
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.18, rootMargin: "0px 0px -40px 0px" },
-    );
-    targets.forEach((el) => io.observe(el));
-    return () => {
-      cancelAnimationFrame(raf);
-      io.disconnect();
-    };
-  }, []);
-  return ref;
-}
-
-function TrustItem({ icon: Icon, title, copy }) {
-  return (
-    <article className="trustItem">
-      <Icon size={21} aria-hidden="true" />
-      <div>
-        <h3>{title}</h3>
-        <p>{copy}</p>
-      </div>
-    </article>
-  );
-}
-
 export function HomePage() {
-  const rootRef = useRevealObserver();
   return (
-    <main className="homePage" ref={rootRef}>
-      <section className="heroSection" aria-labelledby="home-title">
-        <p className="eyebrow reveal" style={{ "--d": "0ms" }}>
-          LOCAL-FIRST · PYTHON STUDIO
-        </p>
-        <h1 id="home-title" className="reveal" style={{ "--d": "80ms" }}>
-          배운 코드가 그대로 실행되고, 실행이 곧 자동화가 된다.
-        </h1>
-        <p className="heroLead reveal" style={{ "--d": "180ms" }}>
-          채팅·에디터·커리큘럼·자동화를 하나의 로컬 <span className="latin">Python</span> 작업대에서 잇습니다.
-        </p>
-        <div className="heroActions reveal" style={{ "--d": "260ms" }}>
-          <a className="primaryButton" href={brand.launcherDownloadUrl}>
-            <Download size={17} aria-hidden="true" />
-            Codaro.exe 다운로드
-          </a>
-          <a className="secondaryButton" href={brand.repoUrl} rel="noopener noreferrer" target="_blank">
-            GitHub에서 보기
-            <ArrowRight size={16} aria-hidden="true" />
-          </a>
+    <main className="homeAstryx">
+      <section className="homeWrap homeHero">
+        <Badge variant="neutral" label="LOCAL-FIRST · PYTHON STUDIO" />
+        <div className="homeHeroHeadline">
+          <Heading level={1} type="display-1">
+            배운 코드가 그대로 실행되고, 실행이 곧 자동화가 된다.
+          </Heading>
         </div>
-        <p className="heroReassure reveal" style={{ "--d": "340ms" }}>
-          Windows x64 · 런타임 포함 · 오프라인 실행 · 무료
-        </p>
-        <div className="heroFrameWrap reveal" style={{ "--d": "440ms" }}>
-          <img
-            className="heroMascot"
-            src={brand.avatarHeroUrl}
-            alt="Codaro 마스코트"
-            width="236"
-            height="236"
+        <div className="homeHeroLead">
+          <Text type="body-lg" color="muted">
+            채팅·에디터·커리큘럼·자동화를 하나의 로컬 Python 작업대에서 잇습니다.
+          </Text>
+        </div>
+        <div className="homeHeroActions">
+          <Button
+            as="a"
+            href={brand.launcherDownloadUrl}
+            variant="primary"
+            size="lg"
+            label="Codaro.exe 다운로드"
+            icon={<Download size={17} aria-hidden="true" />}
           />
-          <div className="productFrame" aria-label="Codaro 로컬 실행 미리보기">
-            <div className="frameChrome">
-              <span className="dots" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
-              <span>codaro.local — spend_report.py</span>
-              <span className="runBtn">
-                <Play size={12} aria-hidden="true" />
-                검증 실행
-              </span>
-            </div>
-            <div className="frameBody workField">
-              <div className="codeLine">
-                <span className="tok-c"># %% Python</span>
-              </div>
-              <div className="codeLine">import pandas as pd</div>
-              <div className="codeLine">
-                df = pd.<span className="tok-fn">read_csv</span>(<span className="tok-s">"spend.csv"</span>)
-              </div>
-              <div className="codeLine">
-                report = df.<span className="tok-fn">groupby</span>(<span className="tok-s">"week"</span>).<span className="tok-fn">sum</span>()
-              </div>
-              <div className="runRow">
-                <span>▸ 실행</span>
-                <span className="runBar" aria-hidden="true"></span>
-              </div>
-              <div className="outputLine">
-                <span className="tok-c"># week&nbsp;&nbsp;&nbsp;spend</span>
-                {"\n"}2025-W21&nbsp;&nbsp;&nbsp;412,900
-              </div>
-            </div>
-            <span className="verifiedPill">
-              <Check size={13} aria-hidden="true" />
-              검증 완료
-            </span>
+          <Button
+            as="a"
+            href={brand.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="secondary"
+            size="lg"
+            label="GitHub에서 보기"
+            endContent={<ArrowRight size={16} aria-hidden="true" />}
+          />
+        </div>
+        <Text type="body-sm" color="subtle">
+          Windows x64 · 런타임 포함 · 오프라인 실행 · 무료
+        </Text>
+      </section>
+
+      <section className="homeWrap homeSection">
+        <Card padding={6} variant="muted">
+          <div className="homeSectionHead" style={{ marginBottom: 18 }}>
+            <Badge variant="accent" label="CODARO ANYWHERE" icon={<Globe size={13} aria-hidden="true" />} />
+            <Heading level={2} type="display-3">
+              설치 없이, 브라우저에서 바로 배운다.
+            </Heading>
+            <Text type="body" color="muted">
+              브라우저 탭에서 진짜 Python이 돕니다. 프로세스·병렬·상태 복원까지 되는 런타임 위에서, 서버도
+              설치도 없이 배우고 실행하고, 로컬로 완전하게 이어집니다.
+            </Text>
           </div>
-        </div>
+          <div className="homeHeroActions" style={{ justifyContent: "flex-start" }}>
+            <Button
+              as="a"
+              href={appPath("/docs")}
+              variant="primary"
+              label="커리큘럼 둘러보기"
+              icon={<BookOpen size={16} aria-hidden="true" />}
+            />
+            <Button
+              as="a"
+              href={brand.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="ghost"
+              label="어떻게 되나 보기"
+              endContent={<ArrowRight size={15} aria-hidden="true" />}
+            />
+          </div>
+        </Card>
       </section>
 
-      <section className="trustBand observe" aria-label="Codaro 신뢰 신호">
-        <div className="trustStrip">
-          <span>
-            <Star size={14} aria-hidden="true" />
-            GitHub 공개 저장소
-          </span>
-          <span>
-            <ShieldCheck size={14} aria-hidden="true" />
-            SHA256 · SBOM 검증 배포
-          </span>
-          <span>
-            <Download size={14} aria-hidden="true" />
-            Windows x64 단일 실행 파일
-          </span>
-          <span>
-            <BookOpen size={14} aria-hidden="true" />
-            463개 공개 커리큘럼 레슨
-          </span>
+      <section className="homeWrap homeSection">
+        <div className="homeSectionHead">
+          <Text type="label" color="accent">네 개의 표면, 하나의 문서 모델</Text>
+          <Heading level={2} type="display-3">학습과 자동화가 갈라지지 않는다.</Heading>
+          <Text type="body" color="muted">
+            채팅, 에디터, 커리큘럼, 자동화가 같은 셀 흐름을 공유합니다. 맥락이 끊기지 않습니다.
+          </Text>
         </div>
-      </section>
-
-      <section className="contentBand productBand observe">
-        <div className="sectionIntro">
-          <p className="eyebrow">// 네 개의 표면, 하나의 문서 모델</p>
-          <h2>학습과 자동화가 갈라지지 않는다.</h2>
-          <p>채팅, 에디터, 커리큘럼, 자동화가 같은 셀 흐름을 공유합니다. 맥락이 끊기지 않습니다.</p>
-        </div>
-        <div className="surfaceGrid">
-          {surfaces.map((surface) => (
-            <article className="surfaceCard" key={surface.label}>
-              <p className="surfaceLabel">{surface.label}</p>
-              <h3>{surface.title}</h3>
-              <span>{surface.copy}</span>
-              <div className="surfaceMini">{surface.mini}</div>
-            </article>
+        <div className="homeGrid2">
+          {surfaces.map((s) => (
+            <Card key={s.label} padding={5}>
+              <div className="homeCardStack">
+                <Badge variant="neutral" label={s.label} />
+                <Heading level={3} type="title">{s.title}</Heading>
+                <Text type="body-sm" color="muted">{s.copy}</Text>
+                <div className="homeMini">{s.mini}</div>
+              </div>
+            </Card>
           ))}
         </div>
       </section>
 
-      <section className="contentBand seeItWork observe" aria-labelledby="home-see-title">
-        <div className="sectionIntro">
-          <p className="eyebrow">// 직접 보기</p>
-          <h2 id="home-see-title">한 화면에서 배우고 · 실행하고 · 승격한다.</h2>
-          <p>학습 셀을 실행 가능한 리포트 자동화로 전환하는 실제 작업 흐름.</p>
+      <section className="homeWrap homeSection">
+        <div className="homeSectionHead">
+          <Text type="label" color="accent">작동 방식</Text>
+          <Heading level={2} type="display-3">배운 코드가 자동화가 되기까지.</Heading>
         </div>
-        <div className="editorShell" aria-label="Codaro 로컬 에디터 미리보기">
-          <div className="editorChrome">
-            <div className="windowDots" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <strong>codaro.local</strong>
-            <button type="button" aria-label="설정">
-              <Settings2 size={15} aria-hidden="true" />
-            </button>
-          </div>
-          <div className="editorWorkspace">
-            <aside className="editorSidebar">
-              <div className="sidebarBrand">
-                <img src={brand.avatarSmallUrl} alt="" width="34" height="34" />
-                <div>
-                  <strong>Codaro</strong>
-                  <span>local studio</span>
-                </div>
+        <div className="homeGrid3">
+          {flowSteps.map((f) => (
+            <Card key={f.num} padding={5}>
+              <div className="homeCardStack">
+                <f.icon size={22} aria-hidden="true" />
+                <Text type="label" color="subtle">{f.num}</Text>
+                <Heading level={3} type="title">{f.title}</Heading>
+                <Text type="body-sm" color="muted">{f.copy}</Text>
               </div>
-              <a href={appPath("/")}>
-                <BookOpen size={16} aria-hidden="true" />
-                채팅
-              </a>
-              <a className="active" href={appPath("/")}>
-                <Terminal size={16} aria-hidden="true" />
-                에디터
-              </a>
-              <a href={appPath("/")}>
-                <CheckCircle2 size={16} aria-hidden="true" />
-                커리큘럼
-              </a>
-              <a href={appPath("/")}>
-                <Workflow size={16} aria-hidden="true" />
-                자동화
-              </a>
-            </aside>
-            <section className="editorCanvas">
-              <div className="editorTopbar">
-                <div>
-                  <p>오늘의 작업</p>
-                  <strong>CSV 정리를 주간 리포트 자동화로</strong>
-                </div>
-                <button type="button">
-                  <Play size={15} aria-hidden="true" />
-                  검증 실행
-                </button>
-              </div>
-              <div className="workspaceGrid">
-                <div className="chatPane">
-                  <p className="paneLabel">채팅</p>
-                  <div className="message user">매주 지출 CSV를 리포트로 만들고 싶어요.</div>
-                  <div className="message system">학습 셀, 검증 셀, dry-run 태스크로 흐름을 분리했어요.</div>
-                </div>
-                <div className="notebookPane">
-                  <div className="cellHeader">
-                    <span># %% Python</span>
-                    <strong>preview</strong>
-                  </div>
-                  <pre>{`import pandas as pd
-df = pd.read_csv("spend.csv")
-report = df.groupby("week").sum()`}</pre>
-                  <div className="runResult">실행 성공 · 검증 가능 · 태스크 승격 가능</div>
-                </div>
-              </div>
-            </section>
-          </div>
+            </Card>
+          ))}
         </div>
       </section>
 
-      <section className="contentBand flowSection observe" aria-labelledby="home-flow-title">
-        <div className="sectionIntro">
-          <p className="eyebrow">// 작동 방식</p>
-          <h2 id="home-flow-title">배운 코드가 자동화가 되기까지.</h2>
+      <section className="homeWrap homeSection">
+        <div className="homeSectionHead">
+          <Text type="label" color="accent">정직한 등급</Text>
+          <Heading level={2} type="display-3">무엇이 웹에서 되고, 무엇이 로컬 몫인가.</Heading>
+          <Text type="body" color="muted">
+            브라우저에서 되는 표면은 웹으로 완전히, 안 되는 것은 로컬 티어로 이어집니다. 과장하지 않습니다.
+          </Text>
         </div>
-        <div className="flowGrid">
-          <article className="flowStep">
-            <p className="flowNum">01 배운다</p>
-            <h3>커리큘럼 셀</h3>
-            <p>예측 → 실행 → 오류 → 검증 흐름을 한 학습 카드 안에서.</p>
-          </article>
-          <article className="flowStep">
-            <p className="flowNum">02 실행한다</p>
-            <h3>로컬 런타임</h3>
-            <p>percent format <span className="latin">.py</span>를 내 PC에서 그대로 실행하고 결과를 확인.</p>
-          </article>
-          <article className="flowStep">
-            <p className="flowNum">03 승격한다</p>
-            <h3>dry-run 태스크</h3>
-            <p>검증된 셀을 반복 가능한 개인 자동화로 키운다.</p>
-            <img className="flowMascot" src={brand.avatarFaceUrl} alt="" />
-          </article>
-        </div>
-      </section>
-
-      <section className="splitSection releaseSection observe">
-        <div>
-          <p className="eyebrow">// 검증</p>
-          <h2>다운로드 전에 직접 검증할 수 있다.</h2>
-          <p>
-            학습과 실행의 기준은 브라우저 샌드박스가 아니라 당신의 로컬 Python 환경입니다.
-            릴리즈의 체크섬·manifest·SBOM으로 받기 전에 확인하세요.
-          </p>
-          <div className="trustList">
-            <TrustItem icon={ShieldCheck} title="로컬 우선" copy="코드·노트북·산출물은 모두 내 PC에 남는다." />
-            <TrustItem icon={FileCheck2} title="검증 가능한 배포" copy="launcher 체크섬·manifest·SBOM을 함께 공개한다." />
-            <TrustItem icon={Library} title="AI는 선택적" copy="학습·실행·자동화는 AI 없이도 완전 동작한다." />
-          </div>
-        </div>
-        <div>
-          <div className="checksumPanel" aria-label="릴리즈 자산">
-            <div className="head">
-              <span className="dot" aria-hidden="true"></span>
-              GitHub Releases / latest
-            </div>
-            <p className="sha">
-              Codaro.exe{"          "}<span className="tok-c"># 단일 실행 파일</span>
-              {"\n"}Codaro.exe.sha256{"   "}<span className="tok-c"># SHA256 체크섬</span>
-              {"\n"}codaro.spdx.json{"    "}<span className="tok-c"># SBOM</span>
-              {"\n"}release-manifest.json <span className="tok-c"># 버전 핀</span>
-              {"\n"}python-runtime…zip{"  "}<span className="tok-c"># 관리형 런타임</span>
-            </p>
-            <div className="checksumChips" aria-label="릴리즈 검증 링크">
-              {releaseLinks.map((link) => (
-                <a key={link.href} href={link.href}>
-                  {link.label}
-                </a>
+        <Card padding={2}>
+          <table className="homeTierTable">
+            <thead>
+              <tr>
+                <th>표면</th>
+                <th>웹</th>
+                <th>로컬</th>
+                <th>메모</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tierRows.map((r) => (
+                <tr key={r.surface}>
+                  <td>{r.surface}</td>
+                  <td>{r.web}</td>
+                  <td>{r.local}</td>
+                  <td style={{ opacity: 0.7 }}>{r.note}</td>
+                </tr>
               ))}
+            </tbody>
+          </table>
+        </Card>
+      </section>
+
+      <section className="homeWrap homeSection">
+        <div className="homeGrid2">
+          <div className="homeCardStack">
+            <Text type="label" color="accent">검증</Text>
+            <Heading level={2} type="display-3">다운로드 전에 직접 검증할 수 있다.</Heading>
+            <Text type="body" color="muted">
+              학습과 실행의 기준은 브라우저 샌드박스가 아니라 당신의 로컬 Python 환경입니다.
+              릴리즈의 체크섬·manifest·SBOM으로 받기 전에 확인하세요.
+            </Text>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
+              <Text type="body-sm"><ShieldCheck size={14} style={{ verticalAlign: "-2px", marginRight: 8 }} aria-hidden="true" />로컬 우선 · 코드와 산출물은 내 PC에</Text>
+              <Text type="body-sm"><Check size={14} style={{ verticalAlign: "-2px", marginRight: 8 }} aria-hidden="true" />체크섬 · manifest · SBOM 공개</Text>
+              <Text type="body-sm"><Zap size={14} style={{ verticalAlign: "-2px", marginRight: 8 }} aria-hidden="true" />AI는 선택적 · 학습·실행·자동화는 AI 없이도 완전 동작</Text>
             </div>
           </div>
+          <Card padding={5}>
+            <div className="homeCardStack">
+              <Text type="label" color="subtle"><CheckCircle2 size={13} style={{ verticalAlign: "-2px", marginRight: 6 }} aria-hidden="true" />GitHub Releases / latest</Text>
+              <div className="homeMini" style={{ opacity: 0.85 }}>
+                {"Codaro.exe            # 단일 실행 파일\nCodaro.exe.sha256     # SHA256 체크섬\ncodaro.spdx.json      # SBOM\nrelease-manifest.json # 버전 핀\npython-runtime.zip    # 관리형 런타임"}
+              </div>
+              <Divider />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {releaseLinks.map((l) => (
+                  <Button key={l.href} as="a" href={l.href} variant="secondary" size="sm" label={l.label} />
+                ))}
+              </div>
+            </div>
+          </Card>
         </div>
       </section>
 
-      <section className="contentBand observe">
-        <div className="brandMoment">
-          <div className="brandField workField" aria-hidden="true"></div>
-          <div className="brandMomentArt">
-            <img src={brand.avatarHeroUrl} alt="Codaro 마스코트" />
-          </div>
-          <div className="brandMomentBody">
-            <h2>코드를 배우는 일이 외롭지 않도록.</h2>
-            <p>
-              Codaro는 혼자 공부하는 사람이 끝까지 가도록 돕는 로컬 작업대입니다.
-              배운 코드가 멈추지 않고 내 일을 대신할 때까지.
-            </p>
-            <a href={brand.repoUrl} rel="noopener noreferrer" target="_blank">
-              GitHub에서 보기
-              <ArrowRight size={14} aria-hidden="true" />
-            </a>
-          </div>
+      <section className="homeWrap homeSection">
+        <div className="homeSectionHead">
+          <Text type="label" color="accent">FAQ</Text>
+          <Heading level={2} type="display-3">자주 묻는 질문</Heading>
         </div>
-      </section>
-
-      <section className="contentBand faqBand observe" aria-labelledby="home-faq-title">
-        <div className="sectionIntro">
-          <p className="eyebrow">// FAQ</p>
-          <h2 id="home-faq-title">자주 묻는 질문</h2>
-          <p>
-            Jupyter·marimo와의 차이, AI 사용 여부, 라이선스, 프라이버시까지 — 처음 Codaro를 접할 때
-            가장 많이 나오는 8개 질문을 한 곳에 정리했다.
-          </p>
-        </div>
-        <div className="faqList">
+        <div>
           {faqEntries.map((entry, index) => (
-            <details key={entry.question} className="faqItem" open={index === 0}>
+            <details key={entry.question} className="homeFaqItem" open={index === 0}>
               <summary>{entry.question}</summary>
-              <p>{entry.answer}</p>
+              <div style={{ marginTop: 8 }}>
+                <Text type="body-sm" color="muted">{entry.answer}</Text>
+              </div>
             </details>
           ))}
         </div>
       </section>
 
-      <section className="contentBand finalCta observe" aria-label="지금 시작하기">
-        <img src={brand.avatarFaceUrl} alt="" width="96" height="96" />
-        <h2>지금, 배운 코드를 자동화로 바꿔보세요.</h2>
-        <div className="heroActions">
-          <a className="primaryButton" href={brand.launcherDownloadUrl}>
-            <Download size={17} aria-hidden="true" />
-            Codaro.exe 다운로드
-          </a>
-          <a className="secondaryButton" href={brand.repoUrl} rel="noopener noreferrer" target="_blank">
-            GitHub에서 보기
-            <ArrowRight size={16} aria-hidden="true" />
-          </a>
+      <section className="homeWrap homeFinalCta">
+        <Heading level={2} type="display-2">지금, 배운 코드를 자동화로 바꿔보세요.</Heading>
+        <div className="homeHeroActions">
+          <Button
+            as="a"
+            href={brand.launcherDownloadUrl}
+            variant="primary"
+            size="lg"
+            label="Codaro.exe 다운로드"
+            icon={<Download size={17} aria-hidden="true" />}
+          />
+          <Button
+            as="a"
+            href={brand.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="secondary"
+            size="lg"
+            label="GitHub에서 보기"
+            endContent={<ArrowRight size={16} aria-hidden="true" />}
+          />
         </div>
       </section>
     </main>

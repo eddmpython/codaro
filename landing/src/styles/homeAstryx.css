@@ -1,0 +1,131 @@
+/* homeAstryx.css - 랜딩 홈의 레이아웃 스캐폴딩.
+   시각 디자인(색·타이포·컴포넌트)은 astryx가 담당하고, 여기서는 폭·간격·그리드 구조만 잡는다. */
+
+.homeAstryx {
+  display: block;
+}
+
+.homeWrap {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.homeHero {
+  padding-block: 104px 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+}
+
+.homeHeroActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.homeHeroHeadline {
+  max-width: 20ch;
+}
+
+.homeHeroLead {
+  max-width: 52ch;
+}
+
+.homeSection {
+  padding-block: 68px;
+}
+
+.homeSectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 34px;
+  max-width: 62ch;
+}
+
+.homeGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.homeGrid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.homeGrid4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.homeCardStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.homeMini {
+  margin-top: 6px;
+  font-family: ui-monospace, "SFMono-Regular", "Space Grotesk", monospace;
+  white-space: pre-wrap;
+  font-size: 12.5px;
+  line-height: 1.6;
+  opacity: 0.72;
+}
+
+.homeTierTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.homeTierTable th,
+.homeTierTable td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-border, rgba(120, 120, 130, 0.24));
+}
+
+.homeTierTable th {
+  font-weight: 600;
+}
+
+.homeFaqItem {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border, rgba(120, 120, 130, 0.24));
+}
+
+.homeFaqItem summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.homeFinalCta {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-block: 84px;
+}
+
+@media (max-width: 900px) {
+  .homeGrid2,
+  .homeGrid3,
+  .homeGrid4 {
+    grid-template-columns: 1fr;
+  }
+  .homeHero {
+    padding-block: 72px 56px;
+  }
+}
