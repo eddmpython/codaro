@@ -42,7 +42,21 @@ Pyodide 314는 진짜 CPython이지만 Emscripten 단일 인터프리터라 thre
 3. **WASIX(@wasmer/sdk) + JS vnet 루프백**: WASIX CPython은 pthreads+fork 빌드라 진짜 스레드·bind/listen/accept가 POSIX 시맨틱으로 동작. 페이지가 JS vnet으로 서버에 접속. 약점: 브라우저 네트워킹 미완("on the works")이라 커스텀 vnet 배선 필요, CDN 로드는 Pyodide처럼 가벼움.
 4. CheerpX: 위 실측대로 netdev 부재 + proprietary + 32비트 -> 이 목표엔 부적합.
 
-## 4. 잠정 판정
-- CheerpX는 "진짜 CPython이 브라우저에서 돈다"는 증명엔 성공(스레드·소켓 API). 그러나 32비트·Python 3.7.3(구버전)·느림·네트워크 부재로 "로컬 서버 제품"엔 부적합.
-- 다음 시도: v86 NetworkAdapter + JS TCP/IP 스택으로 "페이지가 VM 서버에 접속"을 실증할 수 있는지. 이게 되면 진짜 "로컬 서버처럼"이 성립. 안 되면 이 방향의 원리적 한계가 확정.
-- 실험 파일: tests/_attempts/webRealPython.html(CheerpX), git 미추적. 하네스는 세션 scratchpad.
+## 3.7 WASIX 실측: CDN 드롭인 실패
+@wasmer/sdk 0.10.0(esm.sh) + python/python: exit 45, 출력 없음, pageerror "Unable to initialize the context and store". 브라우저 스레드/네트워킹 미성숙으로 초기화 실패. 토론이 밝힌 "browser networking on the works" 그대로. -> vendored 자산 + 커스텀 vnet 배선 없이는 불가.
+
+## 4. 최종 판정 (다양한 시도 후)
+**"파이썬이 실제 로컬 서버처럼 도는 브라우저 가상화"는 새 원리(primitive)로 발명되지 않는다. 유일한 실현 경로는 "진짜 OS를 WASM으로 돌리고(무겁고 느림) 그 네트워크를 페이지에 브리지"하는 통합이다.** 실측으로 확정한 지형:
+
+| 방식 | 진짜 런타임(스레드/소켓) | 페이지가 서버 접속 | 오픈소스·로컬 | 실용성 |
+|---|---|---|---|---|
+| Pyodide | X (원천 불가) | - | O | 서버 아님 |
+| CheerpX | O (CPython3.7.3+스레드+UDS 실측) | X (netdev 부재, Tailscale 전용) | X(proprietary)·32bit | 런타임 증명O, 서버X |
+| WASIX(@wasmer/sdk) | O (pthreads 빌드) | 커스텀 vnet 필요 | O | CDN 드롭인 실패(미성숙) |
+| **v86 + lwIP-wasm** | **O (진짜 Linux 커널)** | **O (raw 프레임->JS lwIP)** | **O·완전로컬** | 32bit·5~20배 느림·lwIP 자체구현 |
+| container2wasm | O (x86_64 가능) | O (c2w-net) | O | 100배+ 느림 |
+
+- **정직한 결론**: 이건 발명이 아니라 통합이다(사용자가 08 브리지 때 간파한 것과 동일 패턴). v86·lwIP·이더넷프레임브리징 전부 기성 기술. 새로운 건 "이걸 리액티브 파이썬 학습 도구에 로컬-only로 엮는" 제품화뿐이고, 그마저 무게(수십 MB 이미지)·속도(5~20배)·32비트 한계를 감수해야 한다.
+- **런타임 절반은 실증됨**: 진짜 CPython + 진짜 스레드 + 진짜 소켓 IPC가 브라우저 VM에서 돈다(CheerpX UDS 실측). 없는 절반 = 페이지<->VM TCP 브리지, 경로는 v86+lwIP로 특정됨(미구현, 별개 큰 빌드).
+- 다음(원할 경우): v86 + Alpine i686 + lwIP-wasm 브리지를 실제 빌드해 "페이지가 VM 안 uvicorn에 TCP 접속"을 실증. 이건 실험이 아니라 이미지 호스팅+lwIP 배선을 포함한 수 시간 규모 빌드.
+- 실험 파일(git 미추적): tests/_attempts/webRealPython.html(CheerpX 진짜 python3+스레드+UDS), webWasix.html(WASIX 실패 기록). 하네스는 세션 scratchpad.
