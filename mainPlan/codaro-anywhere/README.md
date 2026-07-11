@@ -53,6 +53,7 @@ web surface (Cloudflare Pages, 무료 정적)
 11. [10-browser-as-server.md](10-browser-as-server.md) - **재프레임 + 엔드투엔드 실측(정말로 가능한 방향)**: "로컬 서버=소켓 아니라 WSGI 인터페이스". 진짜 Flask/FastAPI가 Pyodide에서 소켓 0으로 라우팅/sqlite/세션/pydantic검증, Service Worker가 페이지 fetch를 연결 -> 페이지가 표준 fetch로 브라우저 안 파이썬 서버 호출(GET/POST/201/422/상태유지 PASS). 속도: 서버 로직은 로컬급(numpy만 예외). VM보다 압도적 실현가능.
 12. [11-beyond-local-directions.md](11-beyond-local-directions.md) - **로컬 초월 방향 검토**: WebGPU 수치가속(numpy 86배 약점 뒤집기, 실PC 필요-headless 검증불가) + 실행환경=값(makeMemorySnapshot 공식+HEAPU8 검증) + 영속 상태서버(sqlite+IndexedDB 재시작 생존 PASS). 3축 초월, 무인데몬만 원리적 상한.
 13. [12-serverless-web-terminal.md](12-serverless-web-terminal.md) - **서버 없는 웹 터미널 발명 + 엔드투엔드 실측**: 셸=파이썬 프로그램(Pyodide), 명령/pip/python 진짜 실행, **JSPI로 input()이 진짜 블록/재개(실시간 대화형 PASS)**. 토론 1위 pysh=실측본, 2위 codash 하이브리드(진짜 OS 명령만 로컬 라우팅).
+14. [13-restore-based-reactive.md](13-restore-based-reactive.md) - **제대로 된 발명 시도(조합 아닌 새 메커니즘)**: WASM엔 없는 dirty-page 추적을 실행경계 해시 diff로 재구성, page-diff 체크포인트 체인을 리액티브 그래프에 결합해 재실행 없이 복원. **작동 코어 PASS**(값상태 시간여행, 복원 4~6ms, 정확), **프론티어 FAIL**(메모리 성장 셀 복원 시 crash - WASM append-only + emval 경계, 아무도 sound하게 못 푼 문제). 정직한 다음경로=하이브리드(값셀 복원·할당셀 재실행).
 
 ---
 
