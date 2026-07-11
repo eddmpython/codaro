@@ -28,6 +28,7 @@
     "marked": "^16.4.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.7.76",
+    "pyproc": "github:eddmpython/pyproc#2eb211f4a0ec4f8f827160ac0c69212e590e701f",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "yaml": "^2.8.3"

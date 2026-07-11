@@ -8,6 +8,7 @@ import { Badge } from "@astryxdesign/core/Badge";
 import { Card } from "@astryxdesign/core/Card";
 import { brand } from "../lib/brand.js";
 import { curriculumTree, curriculumLessonCount } from "../lib/generated/curriculum.js";
+import { PythonRunner } from "../components/pythonRunner.jsx";
 
 export function LearnPage() {
   return (
@@ -38,6 +39,17 @@ export function LearnPage() {
           <Sparkles size={13} style={{ verticalAlign: "-2px", marginRight: 6 }} aria-hidden="true" />
           레슨 실행 런타임(브라우저 Python)은 배선 중입니다. 지금은 로컬에서 완전 동작합니다.
         </Text>
+      </section>
+
+      <section className="homeWrap homeSection" style={{ paddingBlock: "16px 40px" }}>
+        <div className="homeSectionHead">
+          <Text type="label" color="accent">지금 바로</Text>
+          <Heading level={2} type="display-3">브라우저에서 Python을 실행해보세요.</Heading>
+          <Text type="body" color="muted">
+            설치도 서버도 없습니다. 아래 코드를 고쳐서 실행하면 이 탭 안에서 진짜 CPython이 돕니다.
+          </Text>
+        </div>
+        <PythonRunner />
       </section>
 
       <section className="homeWrap homeSection" id="curriculum" style={{ paddingTop: 20 }}>

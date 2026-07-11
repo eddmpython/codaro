@@ -195,6 +195,92 @@
   opacity: 0.85;
 }
 
+/* 브라우저 Python 실행기 */
+.pyRunner {
+  border: 1px solid var(--color-border, rgba(120, 120, 130, 0.3));
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-background-muted, rgba(120, 120, 130, 0.06));
+}
+
+.pyRunnerBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border, rgba(120, 120, 130, 0.22));
+}
+
+.pyRunnerDots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.pyRunnerDots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.28;
+}
+
+.pyRunnerTitle {
+  font-size: 13px;
+  opacity: 0.72;
+  margin-right: auto;
+  font-family: ui-monospace, "Space Grotesk", monospace;
+}
+
+.pyRunnerCode {
+  width: 100%;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  padding: 16px;
+  background: transparent;
+  color: inherit;
+  font-family: ui-monospace, "SFMono-Regular", "Space Grotesk", monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+.pyRunnerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--color-border, rgba(120, 120, 130, 0.22));
+  flex-wrap: wrap;
+}
+
+.pyRunnerHint {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.pyRunnerOutput {
+  margin: 0;
+  padding: 16px;
+  border-top: 1px solid var(--color-border, rgba(120, 120, 130, 0.22));
+  font-family: ui-monospace, "SFMono-Regular", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  background: var(--color-background, rgba(0, 0, 0, 0.02));
+}
+
+.pySpin {
+  animation: pySpin 0.9s linear infinite;
+}
+
+@keyframes pySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 900px) {
   .homeGrid2,
   .homeGrid3,
