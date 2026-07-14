@@ -62,6 +62,13 @@ export type VariableDelta = {
   removed: string[];
 };
 
+export type ExecutionArtifact = {
+  kind: string;
+  label: string;
+  path: string;
+  detail?: string;
+};
+
 export type ExecutionResult = {
   type: string;
   blockId?: string | null;
@@ -72,6 +79,7 @@ export type ExecutionResult = {
   stateDelta: VariableDelta;
   executionCount: number;
   status: string;
+  artifacts?: ExecutionArtifact[];
 };
 
 export type AutomationSessionCellPayload = {

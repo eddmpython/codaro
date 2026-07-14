@@ -34,6 +34,7 @@ import { loadSharePackCurriculum } from "@/lib/sharePackOperations";
 import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
 import { providerProfileReady } from "@/lib/providerProfile";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
+import { installBrowserPythonRuntimeDiagnostics } from "@/lib/browserPythonRuntime";
 import {
   SidebarInset,
   SidebarProvider,
@@ -52,6 +53,12 @@ function App() {
     root.dataset.keyboardOpen = viewportInsets.isKeyboardOpen ? "true" : "false";
     root.style.setProperty("--keyboard-height", `${viewportInsets.keyboardHeight}px`);
   }, [viewportInsets.isKeyboardOpen, viewportInsets.keyboardHeight]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("codaroBrowserRuntimeDiagnostics")) return undefined;
+    return installBrowserPythonRuntimeDiagnostics();
+  }, []);
 
   useEffect(() => {
     const handler = (event: Event) => {

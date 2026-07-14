@@ -138,6 +138,29 @@ export function ExecutionOutput({
         <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
       </ScrollArea>
       )}
+      {result.artifacts?.length ? (
+        <div
+          className="mt-3 rounded-md border border-border/70 bg-background/70 px-3 py-2 text-xs leading-5"
+          data-runtime-artifacts="true"
+        >
+          <div className="mb-1 font-medium text-foreground">{t("system.runtimeArtifacts")}</div>
+          <div className="space-y-1">
+            {result.artifacts.map((artifact) => (
+              <div
+                key={`${artifact.kind}:${artifact.path}`}
+                className="min-w-0"
+                data-runtime-artifact-kind={artifact.kind}
+              >
+                <span className="text-muted-foreground">{artifact.label}: </span>
+                <span className="break-all font-mono text-[11px]">{artifact.path}</span>
+                {artifact.detail ? (
+                  <span className="ml-1 text-muted-foreground">{artifact.detail}</span>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {hasError ? (
         <div
           className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"

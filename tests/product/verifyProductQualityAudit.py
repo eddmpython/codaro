@@ -25,6 +25,7 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-contract",
     "runtime-recovery-browser",
     "pyproc-assets-browser",
+    "pyproc-runtime-fs-browser",
     "curriculum-quality-matrix",
     "curriculum-executability",
     "curriculum-top-tier-audit",
@@ -498,6 +499,50 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "pyproc-assets-browser/pyproc-assets-report.json",
+                "payloadGitHead",
+            )),
+        ),
+    ),
+    ProductQualityRequirement(
+        requirementId="pyproc-runtime-fs-browser-flow",
+        requirement="Pyproc browser runtime gate verifies Codaro uses Runtime.fs as a shared browser file world visible to Python open().",
+        evidenceChecks=(
+            ("editor/src/lib/browserPythonRuntime.ts", (
+                "fs: PyRuntimeFileSystem",
+                "/home/web/codaro",
+                "Runtime.fs",
+                "writeBrowserRunRecord",
+                "pythonRunRecordMatches",
+                "installBrowserPythonRuntimeDiagnostics",
+                "browser-runtime-run-record",
+            )),
+            ("editor/src/components/app/appPrimitives.tsx", (
+                "data-runtime-artifacts",
+                "data-runtime-artifact-kind",
+                "system.runtimeArtifacts",
+            )),
+            ("tests/surface/verifyPyprocRuntimeFsPlaywright.py", (
+                "pyproc-runtime-fs-report.json",
+                "codaroBrowserRuntimeDiagnostics",
+                "diagnostics.executeBlock",
+                "diagnostics.readTextFile",
+                "Python open",
+                "Runtime.fs",
+                "pythonOpenShared",
+            )),
+            ("tests/run.py", (
+                "\"pyproc-runtime-fs-browser\"",
+                "tests/surface/verifyPyprocRuntimeFsPlaywright.py",
+                "output/test-runner/pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "pyproc-runtime-fs-browser",
+                "pyproc-runtime-fs-report.json",
+                "Runtime.fs",
+                "pythonOpenShared",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",
                 "payloadGitHead",
             )),
         ),

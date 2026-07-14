@@ -70,6 +70,15 @@ runtime failure는 한 덩어리 오류가 아니다.
 - 각 vendor 파일의 `sha256-` integrity는 브라우저 `crypto.subtle.digest`로 다시 계산한다.
 - process worker payload가 실행 가능한 module 형태를 잃으면 실패해야 한다.
 
+## 웹 파이썬 파일 세계
+
+브라우저 티어가 로컬급 OS에 가까워지려면 셀 실행이 메모리 안 값만 남기는 것이 아니라 파일 세계에도 남아야 한다.
+
+- `pyproc-runtime-fs-browser`는 editor build에서 실제 pyproc을 boot하고, `Runtime.fs`로 셀 소스와 실행 기록을 `/home/web/codaro`에 쓴다.
+- 첫 번째 셀의 실행 기록은 `output/test-runner/pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json`에 `runtimeFileSystem: Runtime.fs`, `pythonOpenShared: true`, source/run record path로 남는다.
+- 두 번째 셀은 Python `open()`으로 첫 번째 셀의 `/home/web/codaro/runs/*.json`을 읽어야 한다. JS `Runtime.fs`와 Python 파일 IO가 같은 파일 세계를 공유하지 못하면 실패한다.
+- 실행 결과 UI는 `data-runtime-artifacts`로 브라우저 FS 셀 소스와 실행 기록 경로를 보여준다.
+
 ## Provider/Teacher Loop
 
 scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지 못한다.
@@ -183,6 +192,7 @@ uv run python -X utf8 tests/run.py gate install-launcher-smoke
 uv run python -X utf8 tests/run.py gate runtime-recovery-contract
 uv run python -X utf8 tests/run.py gate runtime-recovery-browser
 uv run python -X utf8 tests/run.py gate pyproc-assets-browser
+uv run python -X utf8 tests/run.py gate pyproc-runtime-fs-browser
 uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
 uv run python -X utf8 tests/run.py gate curriculum-top-tier-audit
 uv run python -X utf8 tests/run.py gate playwright-curriculum-runtime
@@ -192,8 +202,8 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `architecture-boundary`는 report가 없는 빠른 집중 gate지만 `quality-cycle` command log path/size/freshness로 현재 커밋에서 실행됐는지 확인한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. 첫 사용자 완주 audit은 `dogfood-alpha-audit/dogfood-alpha-report.json`의 fresh 여부와 `gitHead`로 대조한다. 자동화 IDE audit은 `automation-ide-audit/automation-ide-report.json`의 fresh 여부와 `gitHead`로 대조한다. 진단/운영 표면은 `diagnostic-summary-contract/diagnostic-summary-report.json`의 fresh 여부와 `gitHead`로 대조한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe, `pyproc-assets-browser/pyproc-assets-report.json`, `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 화면은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. runtime 복구 UX는 `runtime-recovery-browser/runtime-recovery-report.json`의 fresh 여부와 `gitHead`로 대조한다. 학습 품질은 `curriculum-quality-matrix/curriculum-quality-report.json`, `curriculum-top-tier-audit/curriculum-top-tier-report.json`, `playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher 설치/실행 smoke는 `install-launcher-smoke/install-launcher-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `architecture-boundary`는 report가 없는 빠른 집중 gate지만 `quality-cycle` command log path/size/freshness로 현재 커밋에서 실행됐는지 확인한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. 첫 사용자 완주 audit은 `dogfood-alpha-audit/dogfood-alpha-report.json`의 fresh 여부와 `gitHead`로 대조한다. 자동화 IDE audit은 `automation-ide-audit/automation-ide-report.json`의 fresh 여부와 `gitHead`로 대조한다. 진단/운영 표면은 `diagnostic-summary-contract/diagnostic-summary-report.json`의 fresh 여부와 `gitHead`로 대조한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe, `pyproc-assets-browser/pyproc-assets-report.json`, `pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json`, `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 화면은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. runtime 복구 UX는 `runtime-recovery-browser/runtime-recovery-report.json`의 fresh 여부와 `gitHead`로 대조한다. 학습 품질은 `curriculum-quality-matrix/curriculum-quality-report.json`, `curriculum-top-tier-audit/curriculum-top-tier-report.json`, `playwright-curriculum-runtime/playwright-curriculum-runtime-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher 설치/실행 smoke는 `install-launcher-smoke/install-launcher-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 
-목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, `automation-ide-audit`, 개별 gate 결과가 tracked worktree clean 상태에서 최신 `output/test-runner/quality-cycle/sequence-summary.json`과 `output/test-runner/ai-live-smoke/live-smoke-report.json`을 현재 `gitHead`와 대조해 stale artifact가 아님을 확인해야 한다. 이 최종 artifact 검사는 22개 product gate 통과, 각 gate command log path/size/freshness와 실제 repo-local log 파일 존재/크기, `softFailureCount: 0`, live provider credential, clarification-before-provider, `resolve-learning-goal → search-curricula → compose-master-plan` 추천·조합, gap evidence 뒤 `packages-check → write-curriculum-yaml`, `packages-check → cell-call` exact sequence를 함께 본다. live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`과 quality-cycle `softFailureCount`를 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.
+목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, `automation-ide-audit`, 개별 gate 결과가 tracked worktree clean 상태에서 최신 `output/test-runner/quality-cycle/sequence-summary.json`과 `output/test-runner/ai-live-smoke/live-smoke-report.json`을 현재 `gitHead`와 대조해 stale artifact가 아님을 확인해야 한다. 이 최종 artifact 검사는 23개 product gate 통과, 각 gate command log path/size/freshness와 실제 repo-local log 파일 존재/크기, `softFailureCount: 0`, live provider credential, clarification-before-provider, `resolve-learning-goal → search-curricula → compose-master-plan` 추천·조합, gap evidence 뒤 `packages-check → write-curriculum-yaml`, `packages-check → cell-call` exact sequence를 함께 본다. live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`과 quality-cycle `softFailureCount`를 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.

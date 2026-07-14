@@ -20,6 +20,8 @@ PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
 PYTHON_STDLIB = EDITOR_DIR / "src" / "lib" / "pythonStdlib.ts"
 LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
 DEP_GRAPH_LAYOUT = EDITOR_DIR / "src" / "lib" / "dependencyGraphLayout.ts"
+APP_PRIMITIVES = EDITOR_DIR / "src" / "components" / "app" / "appPrimitives.tsx"
+APP_ENTRY = EDITOR_DIR / "src" / "App.tsx"
 
 
 def main() -> int:
@@ -61,6 +63,8 @@ def sourceContractFailures() -> list[str]:
         PACKAGE_INFERENCE,
         PYTHON_STDLIB,
         LOCALE_COPY,
+        APP_PRIMITIVES,
+        APP_ENTRY,
     ):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
@@ -77,6 +81,8 @@ def sourceContractFailures() -> list[str]:
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     stdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
     localeText = LOCALE_COPY.read_text(encoding="utf-8")
+    appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
+    appEntryText = APP_ENTRY.read_text(encoding="utf-8")
     required = {
         EDITOR_PACKAGE: (
             "\"pyproc:assets\"",
@@ -110,6 +116,11 @@ def sourceContractFailures() -> list[str]:
             "assetIntegrity",
             "loadAssetIntegrity",
             "fetch(assetIntegrityUrl()",
+            "fs: PyRuntimeFileSystem",
+            "Runtime.fs",
+            "/home/web/codaro",
+            "writeBrowserRunRecord",
+            "installBrowserPythonRuntimeDiagnostics",
         ),
         AUTOMATION_CELL_RUNTIME: (
             "runAutomationCell",
@@ -139,6 +150,16 @@ def sourceContractFailures() -> list[str]:
         LOCALE_COPY: (
             "라이브러리 준비 실패",
             "uv로 준비한 뒤 실행했습니다",
+            "런타임 산출물",
+        ),
+        APP_PRIMITIVES: (
+            "data-runtime-artifacts",
+            "data-runtime-artifact-kind",
+            "system.runtimeArtifacts",
+        ),
+        APP_ENTRY: (
+            "codaroBrowserRuntimeDiagnostics",
+            "installBrowserPythonRuntimeDiagnostics",
         ),
     }
     sourceByPath = {
@@ -151,6 +172,8 @@ def sourceContractFailures() -> list[str]:
         PACKAGE_INFERENCE: inferenceText,
         PYTHON_STDLIB: stdlibText,
         LOCALE_COPY: localeText,
+        APP_PRIMITIVES: appPrimitivesText,
+        APP_ENTRY: appEntryText,
     }
     for path, tokens in required.items():
         text = sourceByPath[path]

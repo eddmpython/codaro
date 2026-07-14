@@ -7,10 +7,18 @@
 import type { ExecutionResult, VariableInfo } from "@/types";
 
 type PyRuntime = {
+  fs: PyRuntimeFileSystem;
   run(code: string): unknown;
   runAsync(code: string): Promise<unknown>;
   install(pkg: string): Promise<void>;
   loadPackages(pkgs: string | string[]): Promise<void>;
+};
+
+type PyRuntimeFileSystem = {
+  writeFile(path: string, data: string | Uint8Array, opts?: { encoding?: "utf8" | "binary" }): void;
+  readFile(path: string, opts?: { encoding?: "utf8" | "binary" }): Uint8Array | string;
+  mkdirTree(path: string): void;
+  exists(path: string): boolean;
 };
 
 type PyProcAssetIntegrity = {
@@ -31,11 +39,17 @@ const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
 let previousVariables = new Map<string, VariableInfo>();
 const attemptedPackages = new Set<string>();
+const browserFsRoot = "/home/web/codaro";
+const browserFsCellsDir = `${browserFsRoot}/cells`;
+const browserFsRunsDir = `${browserFsRoot}/runs`;
 
 function assetIntegrityUrl(): string {
   const envUrl = import.meta.env.VITE_PYPROC_ASSET_INTEGRITY_URL;
   if (typeof envUrl === "string" && envUrl.trim()) return envUrl;
-  return new URL("pyproc-assets.json", import.meta.env.BASE_URL || "/").pathname;
+  const appBase = import.meta.env.BASE_URL || "/";
+  const baseHref = new URL(appBase, window.location.origin).href;
+  const manifestUrl = new URL("pyproc-assets.json", baseHref);
+  return `${manifestUrl.pathname}${manifestUrl.search}${manifestUrl.hash}`;
 }
 
 async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
@@ -162,6 +176,111 @@ function drainBuffers() {
   return { stdout, stderr };
 }
 
+function browserSafeBlockName(blockId: string): string {
+  const safe = blockId.replace(/[^A-Za-z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "");
+  return safe || "cell";
+}
+
+function ensureBrowserFileWorld(runtime: PyRuntime): void {
+  runtime.fs.mkdirTree(browserFsCellsDir);
+  runtime.fs.mkdirTree(browserFsRunsDir);
+}
+
+function pythonBool(value: unknown): boolean {
+  return value === true || String(value).toLowerCase() === "true";
+}
+
+function pythonFileEquals(runtime: PyRuntime, path: string, expected: string): boolean {
+  const code = [
+    "import pathlib as _codaroPathlib",
+    `_codaroPathlib.Path(${JSON.stringify(path)}).read_text(encoding="utf-8") == ${JSON.stringify(expected)}`,
+  ].join("\n");
+  return pythonBool(runtime.run(code));
+}
+
+function pythonRunRecordMatches(runtime: PyRuntime, path: string, blockId: string, status: string): boolean {
+  const code = [
+    "import json as _codaroJson",
+    `_codaroRecord = _codaroJson.load(open(${JSON.stringify(path)}, encoding="utf-8"))`,
+    `_codaroRecord.get("blockId") == ${JSON.stringify(blockId)} and _codaroRecord.get("status") == ${JSON.stringify(status)}`,
+  ].join("\n");
+  return pythonBool(runtime.run(code));
+}
+
+function writeBrowserCellSource(runtime: PyRuntime, blockId: string, code: string) {
+  ensureBrowserFileWorld(runtime);
+  const sourcePath = `${browserFsCellsDir}/${browserSafeBlockName(blockId)}.py`;
+  runtime.fs.writeFile(sourcePath, code, { encoding: "utf8" });
+  const pythonOpenVerified = pythonFileEquals(runtime, sourcePath, code);
+  if (!pythonOpenVerified) {
+    throw new Error(`browser Runtime.fs source mirror was not visible to Python open(): ${sourcePath}`);
+  }
+  return { sourcePath, pythonOpenVerified };
+}
+
+function writeBrowserRunRecord(
+  runtime: PyRuntime,
+  record: {
+    blockId: string;
+    executionCount: number;
+    status: string;
+    stdout: string;
+    stderr: string;
+    resultRepr: string;
+    sourcePath: string;
+  },
+) {
+  ensureBrowserFileWorld(runtime);
+  const resultPath = `${browserFsRunsDir}/${browserSafeBlockName(record.blockId)}.json`;
+  const payload = {
+    ...record,
+    resultPath,
+    completedAt: new Date().toISOString(),
+    runtime: {
+      tier: "browser",
+      engine: "pyproc",
+      fileSystem: "Runtime.fs",
+      pythonOpenShared: true,
+    },
+  };
+  const text = `${JSON.stringify(payload, null, 2)}\n`;
+  runtime.fs.writeFile(resultPath, text, { encoding: "utf8" });
+  runtime.fs.writeFile(`${browserFsRunsDir}/latest.json`, text, { encoding: "utf8" });
+  const readBack = JSON.parse(String(runtime.fs.readFile(resultPath, { encoding: "utf8" }))) as { blockId?: string; status?: string };
+  if (readBack.blockId !== record.blockId || readBack.status !== record.status) {
+    throw new Error(`browser Runtime.fs run record readback mismatch: ${resultPath}`);
+  }
+  const pythonOpenVerified = pythonRunRecordMatches(runtime, resultPath, record.blockId, record.status);
+  if (!pythonOpenVerified) {
+    throw new Error(`browser Runtime.fs run record was not visible to Python open(): ${resultPath}`);
+  }
+  return { resultPath, latestPath: `${browserFsRunsDir}/latest.json`, pythonOpenVerified };
+}
+
+function browserFileArtifacts(evidence: {
+  sourcePath: string;
+  resultPath: string;
+  latestPath: string;
+  pythonOpenVerified: boolean;
+}) {
+  return [
+    {
+      kind: "browser-runtime-source-file",
+      label: "브라우저 FS 셀 소스",
+      path: evidence.sourcePath,
+      detail: "pyproc Runtime.fs writeFile, Python open() 공유 확인",
+    },
+    {
+      kind: "browser-runtime-run-record",
+      label: "브라우저 FS 실행 기록",
+      path: evidence.resultPath,
+      detail: evidence.pythonOpenVerified
+        ? `latest: ${evidence.latestPath}, Python open() 확인`
+        : `latest: ${evidence.latestPath}`,
+    },
+  ];
+}
+
 /** 셀 하나를 브라우저 WASM CPython에서 진짜 실행한다. */
 export async function executeBrowserBlock(
   blockId: string,
@@ -175,7 +294,11 @@ export async function executeBrowserBlock(
 
   let resultRepr = "";
   let errorText = "";
+  let sourcePath = "";
+  let artifacts: ReturnType<typeof browserFileArtifacts> = [];
   try {
+    const sourceEvidence = writeBrowserCellSource(runtime, blockId, code);
+    sourcePath = sourceEvidence.sourcePath;
     const value = await runtime.runAsync(code);
     if (value !== undefined && value !== null) {
       resultRepr = String(value);
@@ -187,6 +310,24 @@ export async function executeBrowserBlock(
   }
 
   const { stdout, stderr } = drainBuffers();
+  const status = errorText ? "error" : "success";
+  try {
+    if (sourcePath) {
+      const runEvidence = writeBrowserRunRecord(runtime, {
+        blockId,
+        executionCount,
+        status,
+        stdout,
+        stderr: errorText ? (stderr ? `${stderr}\n${errorText}` : errorText) : stderr,
+        resultRepr,
+        sourcePath,
+      });
+      artifacts = browserFileArtifacts({ sourcePath, ...runEvidence });
+    }
+  } catch (error) {
+    const fileError = error instanceof Error ? error.message : String(error);
+    errorText = errorText ? `${errorText}\n${fileError}` : fileError;
+  }
   const variables = errorText ? [] : collectVariables(runtime);
   const stateDelta = errorText ? { added: [], updated: [], removed: [] } : computeDelta(variables);
   const combinedStdout = resultRepr ? (stdout ? `${stdout}\n${resultRepr}` : resultRepr) : stdout;
@@ -201,6 +342,7 @@ export async function executeBrowserBlock(
     stateDelta,
     executionCount,
     status: errorText ? "error" : "success",
+    artifacts,
   };
 }
 
@@ -219,4 +361,37 @@ export async function runBrowserNotebook(
     if (result.status !== "error") lastVariables = result.variables;
   }
   return { results, variables: lastVariables };
+}
+
+type BrowserPythonRuntimeDiagnostics = {
+  executeBlock: typeof executeBrowserBlock;
+  isBooted: typeof isBrowserKernelBooted;
+  readTextFile: (path: string) => Promise<string>;
+  runNotebook: typeof runBrowserNotebook;
+};
+
+declare global {
+  interface Window {
+    __codaroBrowserPythonDiagnostics?: BrowserPythonRuntimeDiagnostics;
+  }
+}
+
+export function installBrowserPythonRuntimeDiagnostics(): () => void {
+  const previous = window.__codaroBrowserPythonDiagnostics;
+  window.__codaroBrowserPythonDiagnostics = {
+    executeBlock: executeBrowserBlock,
+    isBooted: isBrowserKernelBooted,
+    readTextFile: async (path: string) => {
+      const runtime = await ensureRuntime();
+      return String(runtime.fs.readFile(path, { encoding: "utf8" }));
+    },
+    runNotebook: runBrowserNotebook,
+  };
+  return () => {
+    if (previous) {
+      window.__codaroBrowserPythonDiagnostics = previous;
+    } else {
+      delete window.__codaroBrowserPythonDiagnostics;
+    }
+  };
 }
