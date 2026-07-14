@@ -13,21 +13,55 @@ type PyRuntime = {
   loadPackages(pkgs: string | string[]): Promise<void>;
 };
 
+type PyProcAssetIntegrity = {
+  files?: { path: string; url: string; integrity: string; roles?: string[] }[];
+};
+
+type PyProcModule = {
+  boot(opts: {
+    stdout?: (line: string) => void;
+    stderr?: (line: string) => void;
+    assetIntegrity?: PyProcAssetIntegrity;
+  }): Promise<PyRuntime>;
+};
+
 let runtimePromise: Promise<PyRuntime> | null = null;
+let assetIntegrityPromise: Promise<PyProcAssetIntegrity | null> | null = null;
 const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
 let previousVariables = new Map<string, VariableInfo>();
 const attemptedPackages = new Set<string>();
 
+function assetIntegrityUrl(): string {
+  const envUrl = import.meta.env.VITE_PYPROC_ASSET_INTEGRITY_URL;
+  if (typeof envUrl === "string" && envUrl.trim()) return envUrl;
+  return new URL("pyproc-assets.json", import.meta.env.BASE_URL || "/").pathname;
+}
+
+async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
+  if (!assetIntegrityPromise) {
+    assetIntegrityPromise = fetch(assetIntegrityUrl(), { cache: "no-store", credentials: "same-origin" })
+      .then((response) => (response.ok ? response.json() as Promise<PyProcAssetIntegrity> : null))
+      .catch((error: unknown) => {
+        console.warn("pyproc asset manifest unavailable", error);
+        return null;
+      });
+  }
+  return assetIntegrityPromise;
+}
+
 async function ensureRuntime(): Promise<PyRuntime> {
   if (!runtimePromise) {
     runtimePromise = import("pyproc")
-      .then(({ boot }) =>
-        boot({
+      .then(async (module) => {
+        const { boot } = module as unknown as PyProcModule;
+        const assetIntegrity = await loadAssetIntegrity();
+        return boot({
           stdout: (line: string) => stdoutLines.push(line),
           stderr: (line: string) => stderrLines.push(line),
-        }),
-      )
+          ...(assetIntegrity ? { assetIntegrity } : {}),
+        });
+      })
       .catch((error: unknown) => {
         runtimePromise = null;
         throw error;

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run pyproc:assets",
     "check": "tsc -b",
+    "pyproc:assets": "node scripts/generatePyprocAssets.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -24,7 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
-    "pyproc": "github:eddmpython/pyproc#74d30810d6ca004bed8f046a9edf0ec92d08a460",
+    "pyproc": "github:eddmpython/pyproc#7ac859b2f09c8a3a83d2f808afb48550293f63df",
     "radix-ui": "^1.4.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",

@@ -4,12 +4,16 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
 EDITOR_DIR = ROOT / "editor"
+EDITOR_PACKAGE = EDITOR_DIR / "package.json"
+PYPROC_ASSET_SCRIPT = EDITOR_DIR / "scripts" / "generatePyprocAssets.mjs"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
+BROWSER_RUNTIME = EDITOR_DIR / "src" / "lib" / "browserPythonRuntime.ts"
 AUTOMATION_CELL_RUNTIME = EDITOR_DIR / "src" / "lib" / "automationCellRuntime.ts"
 LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
@@ -23,34 +27,70 @@ def main() -> int:
     nodeFailure, nodeOutput = runRuntimeProbe()
     if nodeFailure:
         failures.append(nodeFailure)
+    assetFailure, assetOutput = runPyprocAssetScriptProbe()
+    if assetFailure:
+        failures.append(assetFailure)
+    installedAssetFailure, installedAssetOutput = runInstalledPyprocAssetProbe()
+    if installedAssetFailure:
+        failures.append(installedAssetFailure)
 
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
         if nodeOutput:
             print(nodeOutput, file=sys.stderr)
+        if assetOutput:
+            print(assetOutput, file=sys.stderr)
+        if installedAssetOutput:
+            print(installedAssetOutput, file=sys.stderr)
         return 1
 
-    print(f"ok: editor runtime package preflight verified {nodeOutput}")
+    print(f"ok: editor runtime package preflight verified {nodeOutput} {assetOutput} {installedAssetOutput}")
     return 0
 
 
 def sourceContractFailures() -> list[str]:
     failures: list[str] = []
-    for path in (NOTEBOOK_RUNTIME, AUTOMATION_CELL_RUNTIME, LOCAL_RUNTIME, PACKAGE_INFERENCE, PYTHON_STDLIB, LOCALE_COPY):
+    for path in (
+        EDITOR_PACKAGE,
+        PYPROC_ASSET_SCRIPT,
+        NOTEBOOK_RUNTIME,
+        BROWSER_RUNTIME,
+        AUTOMATION_CELL_RUNTIME,
+        LOCAL_RUNTIME,
+        PACKAGE_INFERENCE,
+        PYTHON_STDLIB,
+        LOCALE_COPY,
+    ):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
 
     if failures:
         return failures
 
+    packageText = EDITOR_PACKAGE.read_text(encoding="utf-8")
+    assetScriptText = PYPROC_ASSET_SCRIPT.read_text(encoding="utf-8")
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
+    browserRuntimeText = BROWSER_RUNTIME.read_text(encoding="utf-8")
     automationCellText = AUTOMATION_CELL_RUNTIME.read_text(encoding="utf-8")
     localRuntimeText = LOCAL_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     stdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
     localeText = LOCALE_COPY.read_text(encoding="utf-8")
     required = {
+        EDITOR_PACKAGE: (
+            "\"pyproc:assets\"",
+            "vite build && npm run pyproc:assets",
+        ),
+        PYPROC_ASSET_SCRIPT: (
+            "CODARO_PYPROC_PACKAGE_ROOT",
+            "CODARO_WEB_OUT",
+            "pyproc-assets.json",
+            "vendor/pyproc",
+            "getPyProcAssetManifest",
+            "sha256-",
+            "collectGraph",
+        ),
         NOTEBOOK_RUNTIME: (
             "runAutomationSessionCell",
             "isKernelExecutableBlock",
@@ -62,6 +102,14 @@ def sourceContractFailures() -> list[str]:
             "executeReactive",
             "runtime.libraryFailed",
             "runtime.uvPrepared",
+        ),
+        BROWSER_RUNTIME: (
+            "VITE_PYPROC_ASSET_INTEGRITY_URL",
+            "new URL(\"pyproc-assets.json\"",
+            "import.meta.env.BASE_URL",
+            "assetIntegrity",
+            "loadAssetIntegrity",
+            "fetch(assetIntegrityUrl()",
         ),
         AUTOMATION_CELL_RUNTIME: (
             "runAutomationCell",
@@ -94,7 +142,10 @@ def sourceContractFailures() -> list[str]:
         ),
     }
     sourceByPath = {
+        EDITOR_PACKAGE: packageText,
+        PYPROC_ASSET_SCRIPT: assetScriptText,
         NOTEBOOK_RUNTIME: runtimeText,
+        BROWSER_RUNTIME: browserRuntimeText,
         AUTOMATION_CELL_RUNTIME: automationCellText,
         LOCAL_RUNTIME: localRuntimeText,
         PACKAGE_INFERENCE: inferenceText,
@@ -107,6 +158,153 @@ def sourceContractFailures() -> list[str]:
             if token not in text:
                 failures.append(f"{path.relative_to(ROOT)} missing {token}")
     return failures
+
+
+def runPyprocAssetScriptProbe() -> tuple[str | None, str]:
+    node = shutil.which("node")
+    if not node:
+        return "node is required for pyproc asset script verification", ""
+
+    with tempfile.TemporaryDirectory(prefix="codaro-pyproc-assets-") as tempDir:
+        tempRoot = Path(tempDir)
+        packageRoot = tempRoot / "pkg"
+        outDir = tempRoot / "out"
+        (packageRoot / "src" / "runtime").mkdir(parents=True)
+        (packageRoot / "src" / "processOs").mkdir(parents=True)
+        (packageRoot / "src" / "runtime" / "assets.js").write_text(
+            """
+export function getPyProcAssetManifest(opts = {}) {
+  const root = String(opts.baseURL || "/vendor/pyproc/").replace(/\\/?$/, "/");
+  return {
+    version: 1,
+    packageRoot: root,
+    policy: {
+      sameOriginRequired: true,
+      preserveRelativeImports: true,
+      runtimePreflight: true,
+      note: "probe",
+    },
+    assets: [{
+      role: "processWorker",
+      path: "src/processOs/worker.js",
+      kind: "module-worker",
+      sameOrigin: true,
+      usedBy: ["probe"],
+      reason: "probe",
+      url: root + "src/processOs/worker.js",
+    }],
+  };
+}
+""".strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        (packageRoot / "src" / "processOs" / "worker.js").write_text(
+            'import "./helper.js";\nexport const workerReady = true;\n',
+            encoding="utf-8",
+        )
+        (packageRoot / "src" / "processOs" / "helper.js").write_text(
+            "export const helperReady = true;\n",
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [
+                node,
+                str(PYPROC_ASSET_SCRIPT),
+                "--package-root",
+                str(packageRoot),
+                "--out-dir",
+                str(outDir),
+                "--baseURL",
+                "/vendor/pyproc/",
+            ],
+            cwd=EDITOR_DIR,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+        output = result.stdout.strip()
+        if result.returncode != 0:
+            return "pyproc asset script probe failed", output
+
+        manifestPath = outDir / "pyproc-assets.json"
+        workerPath = outDir / "vendor" / "pyproc" / "src" / "processOs" / "worker.js"
+        helperPath = outDir / "vendor" / "pyproc" / "src" / "processOs" / "helper.js"
+        if not manifestPath.is_file():
+            return "pyproc asset script did not write pyproc-assets.json", output
+        if not workerPath.is_file() or not helperPath.is_file():
+            return "pyproc asset script did not copy the import graph", output
+        manifest = json.loads(manifestPath.read_text(encoding="utf-8"))
+        graph = manifest["entrypoints"][0]["graph"]
+        files = manifest["files"]
+        if graph != ["src/processOs/helper.js", "src/processOs/worker.js"]:
+            return f"pyproc asset script graph mismatch: {graph}", output
+        if sorted(file["path"] for file in files) != graph:
+            return "pyproc asset script files mismatch", output
+        if not all(file["url"].startswith("/vendor/pyproc/") for file in files):
+            return "pyproc asset script URL base mismatch", output
+        if not all(file["integrity"].startswith("sha256-") for file in files):
+            return "pyproc asset script did not write sha256 SRI", output
+        return None, json.dumps({"pyprocAssetFiles": len(files), "pyprocAssetGraph": graph}, ensure_ascii=False)
+
+
+def runInstalledPyprocAssetProbe() -> tuple[str | None, str]:
+    node = shutil.which("node")
+    if not node:
+        return "node is required for installed pyproc asset verification", ""
+
+    with tempfile.TemporaryDirectory(prefix="codaro-installed-pyproc-assets-") as tempDir:
+        outDir = Path(tempDir) / "out"
+        result = subprocess.run(
+            [
+                node,
+                str(PYPROC_ASSET_SCRIPT),
+                "--out-dir",
+                str(outDir),
+                "--baseURL",
+                "/vendor/pyproc/",
+            ],
+            cwd=EDITOR_DIR,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+        output = result.stdout.strip()
+        if result.returncode != 0:
+            return "installed pyproc asset script probe failed", output
+        manifestPath = outDir / "pyproc-assets.json"
+        if not manifestPath.is_file():
+            return "installed pyproc package did not produce pyproc-assets.json", output
+        manifest = json.loads(manifestPath.read_text(encoding="utf-8"))
+        roles = sorted(entrypoint["role"] for entrypoint in manifest["entrypoints"])
+        expectedRoles = [
+            "machineWorker",
+            "processWorker",
+            "pyprocServiceWorker",
+            "sharedKernelHost",
+            "wasiWorker",
+        ]
+        if roles != expectedRoles:
+            return f"installed pyproc asset roles mismatch: {roles}", output
+        files = manifest["files"]
+        if len(files) < len(expectedRoles):
+            return "installed pyproc asset graph is too small", output
+        missingCopies = [
+            file["path"]
+            for file in files
+            if not (outDir / "vendor" / "pyproc" / Path(file["path"])).is_file()
+        ]
+        if missingCopies:
+            return f"installed pyproc copied graph missing files: {missingCopies[:3]}", output
+        if not all(file["integrity"].startswith("sha256-") for file in files):
+            return "installed pyproc asset graph has non-SRI entries", output
+        return None, json.dumps({"installedPyprocAssetFiles": len(files), "installedPyprocRoles": roles}, ensure_ascii=False)
 
 
 def runRuntimeProbe() -> tuple[str | None, str]:
@@ -274,6 +472,15 @@ const automationCellRuntime = loadModule({automationRuntimePath}, (specifier) =>
 const runtime = loadModule({runtimePath}, (specifier) => {{
   if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
   if (specifier === "@/lib/automationCellRuntime") return automationCellRuntime;
+  if (specifier === "@/lib/browserPythonRuntime") return {{
+    executeBrowserBlock: async (blockId, code, executionCount) => ({{
+      ...fakeResult,
+      blockId,
+      data: code,
+      executionCount,
+    }}),
+    runBrowserNotebook: async () => ({{ results: {{}}, variables: [] }}),
+  }};
   if (specifier === "@/lib/cellModel") return cellModel;
   if (specifier === "@/lib/localeCopy") return {{ translate }};
   if (specifier === "@/lib/localRuntime") return {{
