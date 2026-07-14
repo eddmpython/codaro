@@ -39,6 +39,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
     ),
     "pyproc-assets-browser": ("output/test-runner/pyproc-assets-browser/pyproc-assets-report.json",),
+    "pyproc-asgi-browser": ("output/test-runner/pyproc-asgi-browser/pyproc-asgi-report.json",),
     "pyproc-runtime-fs-browser": ("output/test-runner/pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
@@ -263,6 +264,15 @@ GATES: dict[str, Gate] = {
         ),
         ci_required=False,
     ),
+    "pyproc-asgi-browser": Gate(
+        tier="surface",
+        description="editor build의 브라우저 pyproc AsgiServer가 소켓 없이 Python 요청/응답을 dispatch하는지 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPyprocAsgiPlaywright.py")),
+        ),
+        ci_required=False,
+    ),
     "curriculum-quality-matrix": Gate(
         tier="fast",
         description="대표 structured YAML과 실제 전체 curriculum YAML의 학습 흐름, 패키지, 실습 계약을 확인한다.",
@@ -400,6 +410,7 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-browser",
     "pyproc-assets-browser",
     "pyproc-runtime-fs-browser",
+    "pyproc-asgi-browser",
     "curriculum-quality-matrix",
     "curriculum-executability",
     "curriculum-top-tier-audit",
@@ -960,8 +971,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 39:
-        failures.append(f"expected 39 gates, found {len(GATES)}")
+    if len(GATES) != 40:
+        failures.append(f"expected 40 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

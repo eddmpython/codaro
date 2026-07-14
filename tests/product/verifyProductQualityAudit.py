@@ -26,6 +26,7 @@ PRODUCT_QUALITY_GATES = (
     "runtime-recovery-browser",
     "pyproc-assets-browser",
     "pyproc-runtime-fs-browser",
+    "pyproc-asgi-browser",
     "curriculum-quality-matrix",
     "curriculum-executability",
     "curriculum-top-tier-audit",
@@ -543,6 +544,43 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",
+                "payloadGitHead",
+            )),
+        ),
+    ),
+    ProductQualityRequirement(
+        requirementId="pyproc-asgi-browser-flow",
+        requirement="Pyproc browser server gate verifies Codaro dispatches Python ASGI request and response inside the browser runtime.",
+        evidenceChecks=(
+            ("editor/src/lib/browserPythonRuntime.ts", (
+                "enableAsgiServer",
+                "verifyBrowserAsgiServer",
+                "pyproc-asgi",
+                "x-codaro-runtime",
+                "/codaro/pyproc-asgi",
+                "browser-os-server",
+            )),
+            ("tests/surface/verifyPyprocAsgiPlaywright.py", (
+                "pyproc-asgi-report.json",
+                "codaroBrowserRuntimeDiagnostics",
+                "diagnostics.verifyAsgiServer",
+                "asgi-request-round-trip",
+                "asgi-install-contract",
+                "pyproc-asgi-browser",
+            )),
+            ("tests/run.py", (
+                "\"pyproc-asgi-browser\"",
+                "tests/surface/verifyPyprocAsgiPlaywright.py",
+                "output/test-runner/pyproc-asgi-browser/pyproc-asgi-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "pyproc-asgi-browser",
+                "pyproc-asgi-report.json",
+                "AsgiServer",
+                "browser-os-server",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "pyproc-asgi-browser/pyproc-asgi-report.json",
                 "payloadGitHead",
             )),
         ),

@@ -8,6 +8,7 @@ import type { ExecutionResult, VariableInfo } from "@/types";
 
 type PyRuntime = {
   fs: PyRuntimeFileSystem;
+  enableAsgiServer(cfg?: { app?: string }): PyRuntimeAsgiServer;
   run(code: string): unknown;
   runAsync(code: string): Promise<unknown>;
   install(pkg: string): Promise<void>;
@@ -19,6 +20,24 @@ type PyRuntimeFileSystem = {
   readFile(path: string, opts?: { encoding?: "utf8" | "binary" }): Uint8Array | string;
   mkdirTree(path: string): void;
   exists(path: string): boolean;
+};
+
+type PyRuntimeAsgiResponse = {
+  status: number;
+  headers: [string, string][];
+  body: string;
+  bodyBytes: Uint8Array;
+};
+
+type PyRuntimeAsgiServer = {
+  install(): Promise<{ app?: string; transport?: string }>;
+  serve(
+    method: string,
+    path: string,
+    body?: string | Uint8Array | null,
+    query?: string,
+    headers?: [string, string][] | null,
+  ): Promise<PyRuntimeAsgiResponse>;
 };
 
 type PyProcAssetIntegrity = {
@@ -281,6 +300,74 @@ function browserFileArtifacts(evidence: {
   ];
 }
 
+function responseHeadersToRecord(headers: [string, string][]): Record<string, string> {
+  const record: Record<string, string> = {};
+  for (const [name, value] of headers) {
+    record[name.toLowerCase()] = value;
+  }
+  return record;
+}
+
+function asgiBodyText(response: PyRuntimeAsgiResponse): string {
+  if (response.body) return response.body;
+  return new TextDecoder().decode(response.bodyBytes);
+}
+
+/** 브라우저 커널 안 Python ASGI 앱을 소켓 없이 요청/응답 왕복으로 검증한다. */
+export async function verifyBrowserAsgiServer() {
+  const runtime = await ensureRuntime();
+  const appName = "_codaroAsgiApp";
+  runtime.run([
+    "import json as _codaroJson",
+    `async def ${appName}(scope, receive, send):`,
+    "    _event = await receive()",
+    "    _headers = {k.decode(): v.decode() for k, v in scope.get('headers', [])}",
+    "    _payload = {",
+    "        'runtime': 'pyproc-asgi',",
+    "        'method': scope.get('method'),",
+    "        'path': scope.get('path'),",
+    "        'query': scope.get('query_string', b'').decode(),",
+    "        'requestBody': _event.get('body', b'').decode(),",
+    "        'header': _headers.get('x-codaro-gate'),",
+    "    }",
+    "    _body = _codaroJson.dumps(_payload, sort_keys=True).encode()",
+    "    await send({",
+    "        'type': 'http.response.start',",
+    "        'status': 207,",
+    "        'headers': [(b'content-type', b'application/json'), (b'x-codaro-runtime', b'pyproc-asgi')],",
+    "    })",
+    "    await send({'type': 'http.response.body', 'body': _body})",
+  ].join("\n"));
+  const asgi = runtime.enableAsgiServer({ app: appName });
+  const installed = await asgi.install();
+  const request = {
+    method: "POST",
+    path: "/codaro/pyproc-asgi",
+    query: "value=41",
+    body: JSON.stringify({ source: "codaro-product-gate", value: 41 }),
+    header: "browser-os-server",
+  };
+  const response = await asgi.serve(
+    request.method,
+    request.path,
+    request.body,
+    request.query,
+    [["x-codaro-gate", request.header]],
+  );
+  const bodyText = asgiBodyText(response);
+  const body = JSON.parse(bodyText) as Record<string, unknown>;
+  return {
+    appName,
+    installed,
+    request,
+    status: response.status,
+    headers: responseHeadersToRecord(response.headers),
+    body,
+    bodyText,
+    bodyByteLength: response.bodyBytes.byteLength,
+  };
+}
+
 /** 셀 하나를 브라우저 WASM CPython에서 진짜 실행한다. */
 export async function executeBrowserBlock(
   blockId: string,
@@ -368,6 +455,7 @@ type BrowserPythonRuntimeDiagnostics = {
   isBooted: typeof isBrowserKernelBooted;
   readTextFile: (path: string) => Promise<string>;
   runNotebook: typeof runBrowserNotebook;
+  verifyAsgiServer: typeof verifyBrowserAsgiServer;
 };
 
 declare global {
@@ -386,6 +474,7 @@ export function installBrowserPythonRuntimeDiagnostics(): () => void {
       return String(runtime.fs.readFile(path, { encoding: "utf8" }));
     },
     runNotebook: runBrowserNotebook,
+    verifyAsgiServer: verifyBrowserAsgiServer,
   };
   return () => {
     if (previous) {

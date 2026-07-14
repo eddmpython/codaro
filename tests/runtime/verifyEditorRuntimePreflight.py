@@ -120,6 +120,9 @@ def sourceContractFailures() -> list[str]:
             "Runtime.fs",
             "/home/web/codaro",
             "writeBrowserRunRecord",
+            "enableAsgiServer",
+            "verifyBrowserAsgiServer",
+            "verifyAsgiServer",
             "installBrowserPythonRuntimeDiagnostics",
         ),
         AUTOMATION_CELL_RUNTIME: (

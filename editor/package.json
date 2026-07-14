@@ -25,7 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
-    "pyproc": "github:eddmpython/pyproc#7ac859b2f09c8a3a83d2f808afb48550293f63df",
+    "pyproc": "github:eddmpython/pyproc#a7fc83906cfa7bf24c009c8631043738423fa84a",
     "radix-ui": "^1.4.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
