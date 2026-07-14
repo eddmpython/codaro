@@ -24,6 +24,7 @@ PRODUCT_QUALITY_GATES = (
     "install-launcher-smoke",
     "runtime-recovery-contract",
     "runtime-recovery-browser",
+    "pyproc-assets-browser",
     "curriculum-quality-matrix",
     "curriculum-executability",
     "curriculum-top-tier-audit",
@@ -469,6 +470,36 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("docs/skills/ops/product/service-candidate.md", ("runtime-recovery-report.json", "cellCallBlockedAfterPackageFailure")),
             ("docs/skills/ops/foundation/testing-and-gates.md", ("runtime-recovery-browser/runtime-recovery-report.json", "payloadGitHead")),
+        ),
+    ),
+    ProductQualityRequirement(
+        requirementId="pyproc-assets-browser-flow",
+        requirement="Pyproc asset manifest gate verifies the built editor surface serves same-origin vendor graph files with matching SRI.",
+        evidenceChecks=(
+            ("tests/surface/verifyPyprocAssetsPlaywright.py", (
+                "pyproc-assets.json",
+                "pyproc-assets-report.json",
+                "vendor-graph-sri",
+                "process-worker-payload",
+                "crypto.subtle.digest",
+                "sameOriginVendorUrls",
+                "sriVerified",
+            )),
+            ("tests/run.py", (
+                "\"pyproc-assets-browser\"",
+                "tests/surface/verifyPyprocAssetsPlaywright.py",
+                "output/test-runner/pyproc-assets-browser/pyproc-assets-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "pyproc-assets-browser",
+                "pyproc-assets-report.json",
+                "sameOriginVendorUrls",
+                "sriVerified",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "pyproc-assets-browser/pyproc-assets-report.json",
+                "payloadGitHead",
+            )),
         ),
     ),
     ProductQualityRequirement(
