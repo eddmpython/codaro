@@ -25,6 +25,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Install editor
+        working-directory: editor
+        run: npm ci
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
