@@ -28,10 +28,11 @@
 - 472개 canonical route가 semantic SSR 문서와 같은 URL의 interactive editor를 함께 제공한다.
 - pathname에서 `LessonRef`를 복원하고 code, output, 자동 검증, hint, evidence, 다음 학습을 같은 surface에 연결했다.
 - `web-learning`, `learning-method`, hydration, SEO, public claim과 Light/Dark canonical lesson Chromium case가 통과했다.
+- Pages `main@3a18dd97`의 Day 1 canonical URL을 direct cold load해 H1 `헬로월드`, `codaro-runtime-tier=web`, `codaro-lesson-runtime-tier=browser`와 편집 가능한 학습실이 같은 URL에서 복원됨을 확인했다.
+- 실제 배포 화면에서 instructional image, 학습 목표, 첫 editable exercise와 자동 기록 안내가 별도 reveal command 없이 노출됨을 확인했다.
 
 ## 남은 조건
 
-- push된 commit의 실제 Pages direct reload와 cold load smoke
 - keyboard, screen reader와 대표 학습자의 사람 학습성 검수
 
 완료 전에는 `_done`으로 이동하지 않는다.

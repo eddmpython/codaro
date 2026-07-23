@@ -8,7 +8,7 @@
 
 이 폴더의 machine gate와 사람 화면 검수, 실제 Pages 배포 증거가 모두 같은 commit을 가리킬 때만 `_done` 전이를 검토한다.
 
-현재 Home은 실제 product capture 위에 code, output, verification을 읽을 수 있는 Proof Studio workbench를 두고 첫 CTA를 canonical interactive lesson으로 연결한다. 공개 `/learn`은 총량·도메인 카드 대신 이어하기, 검색, 여섯 outcome path와 Web 310개·Local 162개의 capability 경계를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 같은 URL에서 interactive editor가 시작된다. hydration 전후 root/meta/JSON-LD 안정성과 CLS를 검사하고 Home·Learn 390px/1440px Light/Dark 감사에서 image load, text/control overlap과 horizontal overflow 0을 확인했다. source build와 대표 browser case는 green이지만 push된 commit의 실제 Pages 배포 smoke, 검색 index 유입, 수동 접근성 검수와 사람 브랜드 검수가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
+현재 Home은 실제 product capture 위에 code, output, verification을 읽을 수 있는 Proof Studio workbench를 두고 첫 CTA를 canonical interactive lesson으로 연결한다. 공개 `/learn`은 총량·도메인 카드 대신 이어하기, 검색, 여섯 outcome path와 Web 310개·Local 162개의 capability 경계를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 같은 URL에서 interactive editor가 시작된다. hydration 전후 root/meta/JSON-LD 안정성과 CLS를 검사하고 Home·Learn 390px/1440px Light/Dark 감사에서 image load, text/control overlap과 horizontal overflow 0을 확인했다. source build와 대표 browser case가 green이며 Pages workflow `29988292985`로 배포된 `main@3a18dd97`의 Home, Learn, Lesson, Run direct smoke와 실제 Web Python 출력을 확인했다. 검색 유입, 수동 접근성 검수와 사람 브랜드 검수가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
 
 ## 목표
 

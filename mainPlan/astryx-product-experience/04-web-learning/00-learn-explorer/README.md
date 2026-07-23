@@ -27,10 +27,12 @@
 - 첫 화면을 이어하기, 검색, Web/Local 수량과 여섯 결과 경로 중심으로 다시 구성했다.
 - 초기 추천 행은 3개, 검색 결과는 최대 30개로 제한하고 모든 진입 링크를 canonical interactive lesson으로 연결했다.
 - Light/Dark Landing Learn desktop/mobile Chromium case와 `landing-public` 계약이 통과했다.
+- Pages `main@3a18dd97`의 `/learn/` direct load에서 Web 310, Local 162, 전체 472와 이어하기, 검색, 결과 경로가 실제 배포물에 표시됨을 확인했다.
+- 390x844 공개 화면에서 제목, 이어하기, 검색, 첫 결과 경로가 한 흐름에 보이고 horizontal overflow가 0임을 확인했다.
 
 ## 남은 조건
 
 - 실제 검색 유입과 keyboard, screen reader, 한국어 IME 수동 검수
-- 결과 경로별 사람 콘텐츠 검수와 배포 commit의 Pages smoke
+- 결과 경로별 사람 콘텐츠 검수
 
 완료 전에는 `_done`으로 이동하지 않는다.

@@ -9,7 +9,7 @@
 
 각 폴더는 자체 종료 조건과 증거를 가진다. 두 작업이 모두 검증되기 전에는 이 workstream을 `_done`으로 이동하지 않는다.
 
-현재 공용 셸은 `RuntimeCapabilityRail`로 Web Run과 Local Studio capability를 같은 component tree에서 나눈다. 정적 Web은 `codaro-runtime-tier=web`, Local FastAPI SPA router는 `codaro-runtime-tier=local`을 주입하고 canonical lesson은 별도 `codaro-lesson-runtime-tier`로 browser와 Local 필요 범위를 설명한다. `RunRouteState@1` schema와 TypeScript adapter가 surface, path, lesson, section, document, task, runtime tier를 정규화하고 URL query, `history.state`, `popstate`, session storage를 연결한다. `/learn/lesson/<category>/<contentId>/`는 pathname에서 같은 `LessonRef`를 복원해 문서와 실행 학습실을 함께 소유하고 `/run/`은 자유 Notebook으로 분리됐다. `DEFAULT_SURFACE`와 1급 nav도 학습 우선으로 바뀌었다. route contract, `design-system-contract`, Light/Dark 대표 Chromium matrix는 green이지만 실제 배포 `/run/`, Local WebView2와 전체 keyboard/AT matrix가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
+현재 공용 셸은 `RuntimeCapabilityRail`로 Web Run과 Local Studio capability를 같은 component tree에서 나눈다. 정적 Web은 `codaro-runtime-tier=web`, Local FastAPI SPA router는 `codaro-runtime-tier=local`을 주입하고 canonical lesson은 별도 `codaro-lesson-runtime-tier`로 browser와 Local 필요 범위를 설명한다. `RunRouteState@1` schema와 TypeScript adapter가 surface, path, lesson, section, document, task, runtime tier를 정규화하고 URL query, `history.state`, `popstate`, session storage를 연결한다. `/learn/lesson/<category>/<contentId>/`는 pathname에서 같은 `LessonRef`를 복원해 문서와 실행 학습실을 함께 소유하고 `/run/`은 자유 Notebook으로 분리됐다. `DEFAULT_SURFACE`와 1급 nav도 학습 우선으로 바뀌었다. route contract, `design-system-contract`, Light/Dark 대표 Chromium matrix가 green이며 `main@3a18dd97` Pages 배포에서 Home, Learn, Lesson, Run direct load와 실제 Web Python 출력까지 확인했다. Local WebView2와 전체 keyboard/AT matrix가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
 
 ## 목표
 

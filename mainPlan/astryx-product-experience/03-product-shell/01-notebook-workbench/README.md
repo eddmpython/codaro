@@ -26,10 +26,12 @@
 - `scratch.py` starter cell, Web/Local runtime, 세션 자동 반영, Python/Markdown 셀 추가와 전체 실행 command bar를 구현했다.
 - mobile 44px 실행 control과 desktop 전역 도구 예약 영역을 적용했다.
 - `web-learning`, `learning-method`, Light/Dark `astryx-journey`에서 Run과 Notebook 대표 case가 통과했다.
+- Pages `main@3a18dd97`의 `/run/`을 cold load한 뒤 `모든 셀 실행` 한 번으로 `항목 수: 3`, `합계: 38100`, `평균: 12700` 출력과 브라우저 FS 실행 기록이 같은 cell 아래 자동 표시되는 것을 확인했다.
+- 공개 desktop Run에서 전역 도구와 command bar 겹침, page horizontal overflow가 모두 0임을 확인했다.
 
 ## 남은 조건
 
 - 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order 수동 검수
-- 배포 commit의 Web `/run/` cold load와 Local 설치본 round trip 증거
+- 배포 commit의 Local 설치본 round trip 증거
 
 완료 전에는 `_done`으로 이동하지 않는다.

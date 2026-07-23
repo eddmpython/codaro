@@ -29,10 +29,11 @@ Codaro 첫 화면에서 실제 코드 수정, 출력, 검증이 선명하게 보
 - Home을 실제 code, output, verification이 주인공인 Proof Studio hero와 학습 loop, 결과 경로, Web/Local 경계로 재구성했다.
 - 1440x900과 390x844 Light/Dark Chromium screenshot에서 다음 band 노출, image load, overflow와 control overlap 0을 확인했다.
 - `landing-public`, hydration, SEO, public claim과 `astryx-journey` machine gate가 통과했다.
+- Pages workflow `29988292985`가 `main@3a18dd97`을 성공 배포했고 공개 Home과 primary canonical lesson direct link를 실제 브라우저에서 확인했다.
+- 공개 Home을 desktop Light/Dark와 390x844 Light에서 촬영해 제품명, code, output, verification, primary action, 다음 product media가 첫 viewport에 보이고 horizontal overflow가 0임을 확인했다.
 
 ## 남은 조건
 
-- push된 commit의 실제 Pages 배포 screenshot과 direct-link smoke
 - keyboard, screen reader, forced-colors 수동 접근성 검수와 사람 브랜드 검수
 
 완료 전에는 `_done`으로 이동하지 않는다.
