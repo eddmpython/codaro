@@ -87,6 +87,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "product-experience-browser": (
         "output/test-runner/product-experience-browser/product-experience-report.json",
     ),
+    "astryx-journey": (
+        "output/test-runner/astryx-journey/astryx-journey-report.json",
+    ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "plan-quality": (
@@ -567,9 +570,21 @@ GATES: dict[str, Gate] = {
             ), timeoutSeconds=1200),
         ),
     ),
+    "astryx-journey": Gate(
+        tier="surface",
+        description="현재 source를 build한 뒤 Landing·Learn·Run·Local의 Astryx 대표 여정을 Dark·Light에서 각각 확인한다.",
+        commands=(command((
+            "uv",
+            "run",
+            "python",
+            "-X",
+            "utf8",
+            "tests/product/verifyAstryxJourneyAudit.py",
+        ), timeoutSeconds=2400),),
+    ),
     "web-learning": Gate(
         tier="surface",
-        description="공개 학습 route부터 Web Run 편집·자동 강검증·resume·archive까지 설치 없는 학습 흐름을 확인한다.",
+        description="공개 학습 route부터 Web Run 편집·자동 저장 reload resume·자동 강검증·archive까지 설치 없는 학습 흐름을 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="landing"),
             command((
@@ -578,6 +593,10 @@ GATES: dict[str, Gate] = {
             )),
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyWebLearningRoutes.py")),
             command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/surface/verifyNotebookAutosavePlaywright.py", "--reuse-build",
+            ), timeoutSeconds=300),
             command(("node", "scripts/verifyRunRouteState.mjs"), cwd="editor"),
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
@@ -707,6 +726,7 @@ PRODUCT_QUALITY_GATES = (
     "landing-public",
     "local-studio-browser",
     "product-experience-browser",
+    "astryx-journey",
     "frontend-performance-budget",
     "landing-build",
     "launcher-test",
@@ -731,6 +751,7 @@ PRODUCT_RELEASE_GATES = (
     "landing-public",
     "removed-learning-concepts",
     "product-experience-browser",
+    "astryx-journey",
     "local-studio-browser",
     "learning-evidence-contract",
     "learning-efficacy-report",
@@ -1301,8 +1322,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 54:
-        failures.append(f"expected 54 gates, found {len(GATES)}")
+    if len(GATES) != 55:
+        failures.append(f"expected 55 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

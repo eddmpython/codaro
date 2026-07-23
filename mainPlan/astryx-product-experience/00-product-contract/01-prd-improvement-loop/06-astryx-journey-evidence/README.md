@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 machine journey는 Landing Home mobile·desktop, Landing Learn, Web Learn·Lesson·Run, Local Learn·native Lesson·Run·Automation의 11개 Chromium case를 통과한다. 모든 case에서 Astryx theme, overflow·control overlap 0, accessible name, image load, screenshot을 검사했고 두 lesson의 확인·제출·hint reveal control은 0개다. `reveal-only-control` negative fixture도 실행 상태로 이미 제공할 수 있는 내용을 클릭 뒤에 숨기는 계약으로 거부한다. 실제 Windows WebView2 capture와 수동 AT·IME·forced-colors, 12명 학습성 연구가 없으므로 `completionEligible=false`이며 `_done`이 아니다.
+2026-07-23 machine journey는 Landing Home mobile·desktop, Landing Learn catalog, public canonical lesson, Web Learn·Lesson·Run, Local Learn·native Lesson·Run·Automation의 12개 Chromium case를 Dark·Light 각각 통과한다. 24개 scheme별 evidence에서 Astryx theme, overflow·control overlap 0, accessible name, image load, 분리된 screenshot을 검사했고 두 lesson의 확인·제출·hint reveal control은 0개다. `reveal-only-control` negative fixture도 실행 상태로 이미 제공할 수 있는 내용을 클릭 뒤에 숨기는 계약으로 거부한다. 실제 Windows WebView2 capture와 수동 AT·IME·forced-colors, 12명 학습성 연구가 없으므로 `completionEligible=false`이며 `_done`이 아니다.
 
 ## 목표
 

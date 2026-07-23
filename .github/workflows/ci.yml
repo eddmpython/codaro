@@ -30,10 +30,16 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: editor/package-lock.json
+          cache-dependency-path: |
+            editor/package-lock.json
+            landing/package-lock.json
 
       - name: Install editor
         working-directory: editor
+        run: npm ci
+
+      - name: Install landing
+        working-directory: landing
         run: npm ci
 
       - name: Install uv
@@ -207,6 +213,10 @@ jobs:
       - name: Verify full product experience
         timeout-minutes: 30
         run: uv run python -X utf8 tests/run.py gate product-experience-browser
+
+      - name: Verify Astryx dual-theme journey
+        timeout-minutes: 45
+        run: uv run python -X utf8 tests/run.py gate astryx-journey
 
   launcher:
     # 다운로드 엔진(타임아웃/재시도/resume mock 테스트)과 provision 경로를 실제 배포 타깃인

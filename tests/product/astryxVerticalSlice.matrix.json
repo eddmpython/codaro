@@ -1,10 +1,15 @@
 {
   "schemaVersion": 1,
   "selection": "astryx-journey",
+  "colorSchemes": [
+    "dark",
+    "light"
+  ],
   "cases": [
     "landing-home-mobile",
     "landing-home-desktop",
-    "landing-learn-catalog-desktop",
+    "landing-learn-desktop",
+    "landing-public-lesson-desktop",
     "web-learning-home-mobile",
     "web-lesson-mobile",
     "web-run-mobile",
@@ -17,6 +22,7 @@
   "requiredSurfaces": [
     "landing-home",
     "landing-learn",
+    "landing-public-lesson",
     "learning-home",
     "web-lesson",
     "web-run",

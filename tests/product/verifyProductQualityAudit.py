@@ -45,6 +45,7 @@ PRODUCT_QUALITY_GATES = (
     "landing-public",
     "local-studio-browser",
     "product-experience-browser",
+    "astryx-journey",
     "frontend-performance-budget",
     "landing-build",
     "launcher-test",

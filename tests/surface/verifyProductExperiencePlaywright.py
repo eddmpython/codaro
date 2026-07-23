@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / "src"))
 REPORT_ROOT = ROOT / "output" / "test-runner" / "product-experience-browser"
 REPORT_PATH = REPORT_ROOT / "product-experience-report.json"
 SCREENSHOT_ROOT = REPORT_ROOT / "screenshots"
+ASTRYX_JOURNEY_MATRIX_PATH = ROOT / "tests" / "product" / "astryxVerticalSlice.matrix.json"
 
 
 def activeReportPath() -> Path:
@@ -48,6 +49,25 @@ def activeReportPath() -> Path:
 
 def utcTimestamp() -> str:
     return datetime.now(tz=UTC).isoformat(timespec="seconds")
+
+
+def astryxJourneyCaseNames(availableNames: set[str]) -> list[str]:
+    matrix = json.loads(ASTRYX_JOURNEY_MATRIX_PATH.read_text(encoding="utf-8"))
+    names = matrix.get("cases") if isinstance(matrix, dict) else None
+    if (
+        not isinstance(matrix, dict)
+        or matrix.get("schemaVersion") != 1
+        or matrix.get("selection") != "astryx-journey"
+        or not isinstance(names, list)
+        or not names
+        or not all(isinstance(name, str) and name for name in names)
+        or len(names) != len(set(names))
+    ):
+        raise ValueError("Astryx journey matrix case selection is invalid")
+    missingNames = sorted(set(names) - availableNames)
+    if missingNames:
+        raise ValueError("Astryx journey matrix names unknown browser cases: " + ", ".join(missingNames))
+    return names
 
 
 def authoredAssessmentSolution(relativePath: str, mode: str, checkId: str) -> str:
@@ -1958,6 +1978,7 @@ def runBrowserMatrix(
             cases = browserCases(landingPort, webPort, localPort)
             selectedCase = os.environ.get("CODARO_PRODUCT_CASE", "").strip()
             if selectedCase:
+                selectedCaseOrder: list[str] | None = None
                 selectedNames = {selectedCase}
                 if selectedCase == "local-w0-conformance":
                     selectedNames = {
@@ -1981,20 +2002,8 @@ def runBrowserMatrix(
                         "local-native-schedule-assessment-progression-desktop",
                     }
                 elif selectedCase == "astryx-journey":
-                    selectedNames = {
-                        "landing-home-mobile",
-                        "landing-home-desktop",
-                        "landing-public-lesson-desktop",
-                        "web-learning-home-mobile",
-                        "web-learning-home-desktop",
-                        "web-lesson-mobile",
-                        "web-run-mobile",
-                        "web-run-desktop",
-                        "local-learning-home-desktop",
-                        "local-strong-learning-desktop",
-                        "local-run-minimum",
-                        "local-automation-desktop",
-                    }
+                    selectedCaseOrder = astryxJourneyCaseNames({case["name"] for case in cases})
+                    selectedNames = set(selectedCaseOrder)
                 elif selectedCase == "web-learning":
                     selectedNames = {
                         "web-learning-home-mobile",
@@ -2021,7 +2030,11 @@ def runBrowserMatrix(
                     selectedNames.update(
                         case["name"] for case in cases if case["name"].startswith("local-")
                     )
-                cases = [case for case in cases if case["name"] in selectedNames]
+                if selectedCaseOrder is not None:
+                    casesByName = {case["name"]: case for case in cases}
+                    cases = [casesByName[name] for name in selectedCaseOrder]
+                else:
+                    cases = [case for case in cases if case["name"] in selectedNames]
                 if not cases:
                     raise ValueError(f"unknown CODARO_PRODUCT_CASE: {selectedCase}")
             for case in cases:
@@ -3240,7 +3253,8 @@ def runBrowserMatrix(
                         AUDIT_SCRIPT,
                         {"surface": case["surface"], "expectedTier": case.get("expectedTier")},
                     )
-                    screenshotPath = SCREENSHOT_ROOT / f"{case['name']}.png"
+                    screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
+                    screenshotPath.parent.mkdir(parents=True, exist_ok=True)
                     page.screenshot(path=str(screenshotPath), full_page=False)
                     page.wait_for_timeout(100)
                     consoleErrorSnapshot = list(consoleErrors)
@@ -3371,6 +3385,7 @@ def main() -> int:
         "gate": os.environ.get("CODARO_PRODUCT_GATE", "product-experience-browser"),
         "status": "passed" if not failures else "failed",
         "passed": not failures,
+        "colorScheme": os.environ.get("CODARO_PRODUCT_COLOR_SCHEME", "dark").strip().lower(),
         "gitHead": gitHead(),
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),

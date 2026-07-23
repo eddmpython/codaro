@@ -47,6 +47,7 @@ REQUIRED_QUALITY_GATES = {
     "design-system-contract",
     "learning-method",
     "product-experience-browser",
+    "astryx-journey",
     "visual-assets",
     "web-learning",
     "landing-public",

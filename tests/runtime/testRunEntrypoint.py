@@ -73,6 +73,7 @@ def testGateNamesAreStable() -> None:
         "landing-public",
         "local-studio-browser",
         "product-experience-browser",
+        "astryx-journey",
         "frontend-performance-budget",
         "learning-card-contract",
         "learning-card-browser",
@@ -92,6 +93,22 @@ def testGateNamesAreStable() -> None:
         "root-clean",
         "docs",
         "backend",
+    )
+    assert runner.GATE_ARTIFACTS["astryx-journey"] == (
+        "output/test-runner/astryx-journey/astryx-journey-report.json",
+    )
+    assert runner.GATES["astryx-journey"].commands == (
+        runner.GateCommand(
+            args=(
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "tests/product/verifyAstryxJourneyAudit.py",
+            ),
+            timeoutSeconds=2400,
+        ),
     )
     assert runner.changedCycleGates((
         "editor/src/App.tsx",
@@ -140,6 +157,7 @@ def testGateNamesAreStable() -> None:
         "landing-public",
         "local-studio-browser",
         "product-experience-browser",
+        "astryx-journey",
         "frontend-performance-budget",
         "landing-build",
         "launcher-test",
@@ -164,6 +182,7 @@ def testGateNamesAreStable() -> None:
         "landing-public",
         "removed-learning-concepts",
         "product-experience-browser",
+        "astryx-journey",
         "local-studio-browser",
         "learning-evidence-contract",
         "learning-efficacy-report",

@@ -14,8 +14,13 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_PATH = ROOT / "tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json"
 MATRIX_PATH = ROOT / "tests/product/astryxVerticalSlice.matrix.json"
 PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.py"
-PRODUCT_BROWSER_REPORT_PATH = ROOT / "output/test-runner/astryx-journey/product-experience-report.json"
+PRODUCT_BROWSER_REPORT_ROOT = ROOT / "output/test-runner/astryx-journey"
 REPORT_PATH = ROOT / "output/test-runner/astryx-journey/astryx-journey-report.json"
+NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
+SOURCE_BUILDS = (
+    ("landing", ROOT / "landing", ROOT / "landing/build/index.html"),
+    ("editor", ROOT / "editor", ROOT / "src/codaro/webBuild/index.html"),
+)
 
 
 def utcTimestamp() -> str:
@@ -27,6 +32,54 @@ def loadObject(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"JSON root must be an object: {path.relative_to(ROOT).as_posix()}")
     return payload
+
+
+def currentGitHead() -> str:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise ValueError("cannot read current Git head") from exc
+    gitHead = result.stdout.strip()
+    if len(gitHead) not in {40, 64}:
+        raise ValueError("current Git head is invalid")
+    return gitHead
+
+
+def buildCurrentSources() -> dict[str, dict[str, Any]]:
+    facts: dict[str, dict[str, Any]] = {}
+    for name, workingDirectory, outputPath in SOURCE_BUILDS:
+        try:
+            result = subprocess.run(
+                (NPM_COMMAND, "run", "build"),
+                cwd=workingDirectory,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=900,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise ValueError(f"{name} current-source build could not run") from exc
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()[-1_500:]
+            raise ValueError(f"{name} current-source build failed: {detail}")
+        if not outputPath.is_file():
+            raise ValueError(f"{name} current-source build output is missing")
+        facts[name] = {
+            "command": "npm run build",
+            "outputPath": outputPath.relative_to(ROOT).as_posix(),
+            "passed": True,
+        }
+    return facts
 
 
 def rejectRevealOnlyFixture() -> dict[str, Any]:
@@ -48,51 +101,27 @@ def rejectRevealOnlyFixture() -> dict[str, Any]:
     }
 
 
-def verifyJourney() -> dict[str, Any]:
-    matrix = loadObject(MATRIX_PATH)
-    expectedNames = matrix.get("cases")
-    requiredSurfaces = matrix.get("requiredSurfaces")
-    selection = matrix.get("selection")
-    if (
-        not isinstance(expectedNames, list)
-        or len(expectedNames) != 11
-        or not all(isinstance(item, str) and item for item in expectedNames)
-        or not isinstance(requiredSurfaces, list)
-        or not all(isinstance(item, str) and item for item in requiredSurfaces)
-        or selection != "astryx-journey"
-    ):
-        raise ValueError("Astryx vertical slice matrix is invalid")
-    command = (
-        "uv", "run", "--with", "playwright", "python", "-X", "utf8",
-        str(PRODUCT_BROWSER_PATH.relative_to(ROOT)),
-    )
-    environment = os.environ.copy()
-    environment["CODARO_PRODUCT_CASE"] = str(selection)
-    environment["CODARO_PRODUCT_REPORT_PATH"] = str(PRODUCT_BROWSER_REPORT_PATH.relative_to(ROOT))
-    result = subprocess.run(
-        command,
-        cwd=ROOT,
-        env=environment,
-        capture_output=True,
-        text=True,
-        timeout=900,
-    )
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout).strip()[-1_500:]
-        raise ValueError(f"Astryx journey browser matrix failed: {detail}")
-    report = loadObject(PRODUCT_BROWSER_REPORT_PATH)
+def verifyJourneyReport(
+    reportPath: Path,
+    expectedNames: list[str],
+    requiredSurfaces: list[str],
+    colorScheme: str,
+) -> dict[str, Any]:
+    report = loadObject(reportPath)
     cases = report.get("cases")
+    if report.get("colorScheme") != colorScheme:
+        raise ValueError(f"Astryx journey report has wrong color scheme: {colorScheme}")
     if not isinstance(cases, list):
-        raise ValueError("Astryx journey browser report has no cases")
+        raise ValueError(f"Astryx journey browser report has no cases: {colorScheme}")
     actualNames = [case.get("name") for case in cases if isinstance(case, dict)]
-    if set(actualNames) != set(expectedNames) or len(actualNames) != len(expectedNames):
-        raise ValueError("Astryx journey browser report does not match the sealed matrix")
+    if actualNames != expectedNames:
+        raise ValueError(f"Astryx journey browser report does not match the sealed matrix: {colorScheme}")
     surfaces: set[str] = set()
     imageProofCases = 0
     learningCases = 0
     for case in cases:
         if not isinstance(case, dict):
-            raise ValueError("Astryx journey case is not an object")
+            raise ValueError(f"Astryx journey case is not an object: {colorScheme}")
         audit = case.get("audit")
         screenshot = ROOT / str(case.get("screenshot") or "")
         if (
@@ -105,7 +134,15 @@ def verifyJourney() -> dict[str, Any]:
             or not screenshot.is_file()
             or screenshot.stat().st_size < 1_024
         ):
-            raise ValueError(f"Astryx journey case evidence is incomplete: {case.get('name')}")
+            raise ValueError(
+                f"Astryx journey case evidence is incomplete: {colorScheme}/{case.get('name')}"
+            )
+        expectedScreenshotPart = f"/screenshots/{colorScheme}/"
+        screenshotRef = "/" + str(case.get("screenshot") or "").replace("\\", "/")
+        if expectedScreenshotPart not in screenshotRef:
+            raise ValueError(
+                f"Astryx journey screenshot is not isolated by color scheme: {colorScheme}/{case.get('name')}"
+            )
         surface = str(case.get("surface"))
         surfaces.add(surface)
         if surface == "landing-home" and int(audit.get("visibleImageCount") or 0) > 0:
@@ -113,21 +150,87 @@ def verifyJourney() -> dict[str, Any]:
         if surface in {"web-lesson", "local-lesson"}:
             learningCases += 1
             if audit.get("forbiddenLearningControls") != []:
-                raise ValueError(f"redundant learning control returned: {case.get('name')}")
+                raise ValueError(
+                    f"redundant learning control returned: {colorScheme}/{case.get('name')}"
+                )
     missingSurfaces = sorted(set(requiredSurfaces) - surfaces)
     if missingSurfaces:
-        raise ValueError("Astryx journey misses surfaces: " + ", ".join(missingSurfaces))
+        raise ValueError(
+            f"Astryx journey misses surfaces in {colorScheme}: " + ", ".join(missingSurfaces)
+        )
     if imageProofCases != 2 or learningCases != 2:
-        raise ValueError("Astryx journey image or learning proof count is incomplete")
+        raise ValueError(f"Astryx journey image or learning proof count is incomplete: {colorScheme}")
     return {
         "browser": report.get("browser"),
         "caseCount": len(cases),
         "forbiddenLearningControls": 0,
         "imageProofCases": imageProofCases,
         "learningCases": learningCases,
-        "matrixPath": MATRIX_PATH.relative_to(ROOT).as_posix(),
-        "reportPath": PRODUCT_BROWSER_REPORT_PATH.relative_to(ROOT).as_posix(),
+        "reportPath": reportPath.relative_to(ROOT).as_posix(),
         "surfaces": sorted(surfaces),
+    }
+
+
+def verifyJourney() -> dict[str, Any]:
+    matrix = loadObject(MATRIX_PATH)
+    expectedNames = matrix.get("cases")
+    requiredSurfaces = matrix.get("requiredSurfaces")
+    selection = matrix.get("selection")
+    colorSchemes = matrix.get("colorSchemes")
+    if (
+        matrix.get("schemaVersion") != 1
+        or not isinstance(expectedNames, list)
+        or not expectedNames
+        or not all(isinstance(item, str) and item for item in expectedNames)
+        or len(expectedNames) != len(set(expectedNames))
+        or not isinstance(requiredSurfaces, list)
+        or not all(isinstance(item, str) and item for item in requiredSurfaces)
+        or len(requiredSurfaces) != len(set(requiredSurfaces))
+        or selection != "astryx-journey"
+        or colorSchemes != ["dark", "light"]
+    ):
+        raise ValueError("Astryx vertical slice matrix is invalid")
+
+    schemeFacts: dict[str, dict[str, Any]] = {}
+    for colorScheme in colorSchemes:
+        reportPath = PRODUCT_BROWSER_REPORT_ROOT / f"product-experience-{colorScheme}-report.json"
+        command = (
+            "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+            str(PRODUCT_BROWSER_PATH.relative_to(ROOT)),
+        )
+        environment = os.environ.copy()
+        environment["CODARO_PRODUCT_CASE"] = str(selection)
+        environment["CODARO_PRODUCT_COLOR_SCHEME"] = colorScheme
+        environment["CODARO_PRODUCT_REPORT_PATH"] = str(reportPath.relative_to(ROOT))
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            env=environment,
+            capture_output=True,
+            text=True,
+            timeout=900,
+        )
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()[-1_500:]
+            raise ValueError(f"Astryx journey browser matrix failed in {colorScheme}: {detail}")
+        schemeFacts[colorScheme] = verifyJourneyReport(
+            reportPath,
+            expectedNames,
+            requiredSurfaces,
+            colorScheme,
+        )
+
+    browserFacts = {json.dumps(facts["browser"], sort_keys=True) for facts in schemeFacts.values()}
+    if len(browserFacts) != 1:
+        raise ValueError("Astryx journey schemes used different browser engines")
+    return {
+        "browser": next(iter(schemeFacts.values()))["browser"],
+        "caseCount": len(expectedNames),
+        "evidenceCaseCount": len(expectedNames) * len(colorSchemes),
+        "colorSchemes": colorSchemes,
+        "forbiddenLearningControls": 0,
+        "matrixPath": MATRIX_PATH.relative_to(ROOT).as_posix(),
+        "schemes": schemeFacts,
     }
 
 
@@ -136,9 +239,14 @@ def main() -> int:
     started = time.monotonic()
     failures: list[str] = []
     facts: dict[str, Any] = {}
+    gitHead = "unknown"
     try:
+        gitHead = currentGitHead()
+        facts["builds"] = buildCurrentSources()
         facts["negativeFixture"] = rejectRevealOnlyFixture()
         facts["journey"] = verifyJourney()
+        if currentGitHead() != gitHead:
+            raise ValueError("Git head changed while the Astryx journey was running")
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         failures.append(str(error))
     completionBlockers = [
@@ -152,6 +260,7 @@ def main() -> int:
         "audit": "astryx-journey",
         "status": "passed" if not failures else "failed",
         "passed": not failures,
+        "gitHead": gitHead,
         "machineEligible": not failures,
         "completionEligible": False,
         "startedAt": startedAt,
@@ -169,7 +278,11 @@ def main() -> int:
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print(f"ok: Astryx journey verified ({facts['journey']['caseCount']} cases, completionEligible=false)")
+    print(
+        "ok: Astryx journey verified "
+        f"({facts['journey']['caseCount']} cases x "
+        f"{len(facts['journey']['colorSchemes'])} color schemes, completionEligible=false)"
+    )
     return 0
 
 
