@@ -21,7 +21,7 @@ export function resolveRoute(path, routeData = null, search = "") {
   if (path === "/learn") {
     return {
       meta: learnMeta,
-      element: <LearnPage />,
+      element: <LearnPage search={search} />,
     };
   }
   const lessonRoute = parseLessonRoute(path);
@@ -67,7 +67,7 @@ export function resolveRoute(path, routeData = null, search = "") {
   if (path.startsWith("/docs/blog/")) {
     return blogPostRoute(path.replace("/docs/blog/", ""));
   }
-  if (path === "/search") return searchRoute();
+  if (path === "/search") return searchRoute(search);
   if (path === "/tools") return toolsRoute();
   if (path.startsWith("/tools/")) return toolRoute(path.replace("/tools/", ""));
   if (path.startsWith("/docs/")) {

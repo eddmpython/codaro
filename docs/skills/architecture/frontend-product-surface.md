@@ -63,7 +63,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/lib/pendingChanges.ts` | pending 변경 승인/거절과 승인 뒤 열 표면 결정 |
 | `editor/src/lib/chatStartExamples.ts` | 빈 채팅 시작 예시와 현재 학습 목표 예시. `surfaceModel.ts`의 target surface/flow role을 붙여 기존 레슨 추천과 검증된 셀 recipe가 먼저 보이게 유지 |
 | `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장 모델, 저장 후 현재 학습 열기 정책, 적용 계획, 사이드바 표시용 projection |
-| `editor/src/components/curriculum/curriculumDependencyPanel.tsx` | 현재 레슨의 `meta.packages` 기반 라이브러리 준비 패널. 패키지 확인/누락 설치/터미널 명령 열기 UI를 소유하고, 커리큘럼 섹션 렌더러는 이 패널을 호출만 한다 |
+| `editor/src/components/curriculum/curriculumDependencyPanel.tsx` | 현재 레슨의 `meta.packages` 기반 라이브러리 준비 패널. 필요한 패키지명, 준비 진행, 한 번의 준비·재시도 동작만 보여주며 명령 문자열·환경 경로·터미널 제어는 학습 표면에 노출하지 않는다 |
 | `editor/src/components/app/curriculumSidebarTree.tsx` | 현재 학습 tree ownership |
 | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 tree ownership |
 | `tests/surface/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
@@ -79,7 +79,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - assistant 응답과 pending 승인 hook이 나만의 커리큘럼 저장/열기 절차를 각자 복붙하면 실패다. 저장 후 현재 학습 열기 정책은 `customCurricula.ts`의 `saveAndOpenCustomCurriculum`이 맡는다.
 - assistant 응답, local fallback, turn hook이 적용 payload shape를 각자 다시 정의하면 실패다. `assistantArtifactRouting.ts`의 `AssistantArtifactApplication`과 `buildAssistantArtifactApplication`을 기준으로 쓴다.
 - `chatSurface.tsx`가 `curriculumSidebarTree`, `automationSidebarTree`, YAML 카드 렌더러, 패키지 준비 내부를 import하면 실패다. 채팅은 입구와 provider 연결만 책임진다.
-- `curriculumSurface.tsx`가 패키지 설치 상태, 설치 명령 생성, 누락 패키지 설치 loop를 직접 품으면 실패다. 섹션 카드 렌더러는 YAML/셀 흐름을 맡고, 패키지 준비 표면은 `curriculumDependencyPanel.tsx`가 맡는다.
+- `curriculumSurface.tsx`가 패키지 준비 상태나 누락 패키지 준비 loop를 직접 품으면 실패다. 섹션 카드 렌더러는 YAML/셀 흐름을 맡고, 패키지 준비 표면은 `curriculumDependencyPanel.tsx`가 맡는다.
 - `editor/src/hooks/*` 또는 `editor/src/lib/*`가 `editor/src/components/*` 구현을 import하면 실패다. 표시용 타입과 projection은 lib 경계에 둔다.
 - 컴포넌트, route, hook이 `codaroApi`를 직접 호출하면 실패다. server 통신은 `editor/src/lib/*`의 명명된 경계 함수를 통해서만 한다.
 - assistant 응답이 자동화를 primary route로 직접 열면 실패다. 자동화는 검증된 셀/recipe 뒤에 이어지는 second loop다.

@@ -13,8 +13,9 @@ export function CurriculumProgressBadge({
   label?: string;
 }) {
   const safeTotal = Math.max(total, 0);
-  const safeCompleted = Math.max(Math.min(completed, safeTotal || completed), 0);
-  const percent = safeTotal > 0 ? Math.round((safeCompleted / safeTotal) * 100) : 0;
+  if (safeTotal === 0) return null;
+  const safeCompleted = Math.max(Math.min(completed, safeTotal), 0);
+  const percent = Math.round((safeCompleted / safeTotal) * 100);
   const tone = percent >= 100 ? "complete" : percent > 0 ? "active" : "idle";
   return (
     <Badge
@@ -26,12 +27,12 @@ export function CurriculumProgressBadge({
         tone === "idle" && "text-muted-foreground",
       )}
       data-progress-badge={tone}
-      title={`${label} ${safeCompleted}/${safeTotal || "-"} (${percent}%)`}
+      title={`${label} ${safeCompleted}/${safeTotal} (${percent}%)`}
     >
       <Trophy className="size-3" />
       <span data-progress-fraction="true">
         {safeCompleted}
-        <span className="text-muted-foreground">/{safeTotal || "-"}</span>
+        <span className="text-muted-foreground">/{safeTotal}</span>
       </span>
       <span className="ml-1 text-muted-foreground">{percent}%</span>
     </Badge>

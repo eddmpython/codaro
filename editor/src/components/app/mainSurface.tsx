@@ -4,7 +4,6 @@ import { useLocale } from "@/lib/localeContext";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
-import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 import type {
   AiProfile,
@@ -74,9 +73,7 @@ type MainSurfaceProps = {
   onConnectAi: () => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
-  onImportLearningArchive: (archive: LearningArchiveMaterialization) => Promise<void> | void;
   onNewChat: () => void;
-  onOpenTerminalCommand: (command: string) => void;
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
   onRefreshAutomation: () => void;
@@ -198,37 +195,20 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     }
     return (
       <CurrentLearningSurface
-        aiConnecting={props.aiConnecting}
-        aiProfile={props.aiProfile}
         apiOnline={props.apiOnline}
-        assistantCollapsed={props.assistantCollapsed}
-        assistantLoading={props.assistantLoading}
         canRun={props.canRun}
-        cellHelpByBlockId={props.cellHelpByBlockId}
         categories={props.categories}
         contents={props.contents}
         curriculumDocument={props.curriculumDocument}
         drafts={props.drafts}
         loadState={props.loadState}
-        messages={props.messages}
-        pendingBlocks={props.pendingBlocks}
-        prompt={props.prompt}
         referenceLoading={props.referenceLoading}
         results={props.results}
         runningBlockId={props.runningBlockId}
         selectedCategory={props.selectedCategory}
         selectedContentId={props.selectedContentId}
         selectedCurriculumBlockId={props.selectedCurriculumBlockId}
-        onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-        onAsk={props.onAsk}
-        onCellAsk={props.onCellAsk}
-        onConnectAi={props.onConnectAi}
         onDraftChange={props.onDraftChange}
-        onImportLearningArchive={props.onImportLearningArchive}
-        onNewChat={props.onNewChat}
-        onOpenTerminalCommand={props.onOpenTerminalCommand}
-        onPromptChange={props.onPromptChange}
-        onRejectPendingBlocks={props.onRejectPendingBlocks}
         onRunBlock={props.onRunBlock}
         onSelectCurriculumBlock={props.onSelectCurriculumBlock}
       />

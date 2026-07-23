@@ -13,10 +13,10 @@ def testEvidenceStatusLeadsWithAutomaticLearningFeedback() -> None:
     locale = LOCALE_COPY.read_text(encoding="utf-8")
 
     assert 't("learning.evidence.autoRecord")' in overview
-    assert '"learning.evidence.autoRecord": "풀이 검증 결과는 자동으로 기록됩니다."' in locale
+    assert '"learning.evidence.autoRecord": "풀이 결과는 학습 기록에 자동으로 저장됩니다."' in locale
     assert (
         '"learning.evidence.autoRecord": '
-        '"Verified practice results are recorded automatically."'
+        '"Practice results are saved to your learning record automatically."'
     ) in locale
 
     assert "강한 검증 {summary.events}건" not in overview
@@ -31,11 +31,10 @@ def testEvidenceCountsRemainAvailableWithoutLeadingTheLesson() -> None:
     assert "data-learning-evidence-conflicts={summary.conflicts}" in overview
     assert 'label={t("learning.evidence.export", { count: summary.events })}' in overview
     assert (
-        '"learning.evidence.export": "학습 작업 내보내기 · 검증 기록 {count}건 포함"'
+        '"learning.evidence.export": "학습 작업 내보내기 · 학습 기록 {count}건 포함"'
         in locale
     )
     assert (
         '"learning.evidence.export": '
-        '"Export learning work · includes {count} verification records"'
+        '"Export learning work · includes {count} learning records"'
     ) in locale
-

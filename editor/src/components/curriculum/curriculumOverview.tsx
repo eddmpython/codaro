@@ -11,7 +11,7 @@ import {
 import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 import { AUTOMATION_UPDATED_EVENT } from "@/lib/automationState";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
-import { IconButton, LoadingInline, PendingNotebookBar } from "@/components/app/appPrimitives";
+import { IconButton, LoadingInline } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Workflow } from "lucide-react";
 import type { BlockConfig, CodaroDocument } from "@/types";
@@ -26,28 +26,38 @@ import { cellDomId, scrollToCell } from "./curriculumNavigation";
 import { LearningDomainVisual } from "./learningDomainVisual";
 import { useLocale } from "@/lib/localeContext";
 
-export function LearningEvidenceBar({
+export function LearningArchiveMenu({
   document,
-  drafts,
+  drafts = {},
   lessonRef,
   localRuntime,
   onImportArchive,
 }: {
-  document: CodaroDocument;
-  drafts: Record<string, string>;
+  document?: CodaroDocument;
+  drafts?: Record<string, string>;
   lessonRef: string;
   localRuntime: boolean;
   onImportArchive: (archive: LearningArchiveMaterialization) => Promise<void> | void;
 }) {
   const { t } = useLocale();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [summary, setSummary] = useState<WebLearningEvidenceSummary>({ conflicts: 0, events: 0 });
   const [notice, setNotice] = useState("");
+  const [noticeTone, setNoticeTone] = useState<"error" | "status">("status");
   const [automationDrafts, setAutomationDrafts] = useState<LearningArchiveMaterialization["automationDrafts"]>([]);
   const [adoptedAutomationDraftIds, setAdoptedAutomationDraftIds] = useState<Set<string>>(new Set());
+  const showStatus = (message: string) => {
+    setNoticeTone("status");
+    setNotice(message);
+  };
+  const showError = (message: string) => {
+    setNoticeTone("error");
+    setNotice(message);
+  };
 
   const refreshAutomationDrafts = useCallback(async (archive?: LearningArchiveMaterialization | null) => {
-    if (!localRuntime) {
+    if (!localRuntime || !lessonRef) {
       setAutomationDrafts([]);
       setAdoptedAutomationDraftIds(new Set());
       return;
@@ -72,7 +82,10 @@ export function LearningEvidenceBar({
           if (active) setSummary(next);
         })
         .catch((error: unknown) => {
-          if (active) setNotice(error instanceof Error ? error.message : "학습 증거를 읽지 못했습니다.");
+          if (active) {
+            console.error("학습 증거 요약을 읽지 못했습니다.", error);
+            showError("학습 기록을 읽지 못했습니다. 브라우저 저장 공간을 확인한 뒤 다시 시도해 주세요.");
+          }
         });
     };
     refresh();
@@ -85,11 +98,13 @@ export function LearningEvidenceBar({
 
   useEffect(() => {
     void refreshAutomationDrafts().catch((error: unknown) => {
-      setNotice(error instanceof Error ? error.message : "자동화 초안을 읽지 못했습니다.");
+      console.error("학습 데이터의 자동화 초안을 읽지 못했습니다.", error);
+      showError("저장된 자동화 초안을 읽지 못했습니다. 브라우저 저장 공간을 확인해 주세요.");
     });
   }, [refreshAutomationDrafts]);
 
   const exportArchive = async () => {
+    if (!document || !lessonRef) return;
     try {
       const archive = await exportBrowserLearningArchive({ document, drafts, lessonRef });
       const url = URL.createObjectURL(new Blob([archive], { type: "application/json" }));
@@ -103,26 +118,28 @@ export function LearningEvidenceBar({
         anchor.remove();
         URL.revokeObjectURL(url);
       }, 1_000);
-      setNotice("현재 레슨의 문서, 코드, 학습 기록을 내보냈습니다.");
+      showStatus("최근 학습 작업을 내보냈습니다.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "학습 작업을 내보내지 못했습니다.");
+      console.error("학습 작업을 내보내지 못했습니다.", error);
+      showError("학습 작업을 내보내지 못했습니다. 저장 공간을 확인한 뒤 다시 시도해 주세요.");
     }
   };
 
   const importArchive = async (file: File | undefined) => {
     if (!file) return;
+    setMenuOpen(true);
     try {
       const rawArchive = await file.text();
       const parsed = JSON.parse(rawArchive) as unknown;
       if (isRecord(parsed) && parsed.kind === "codaro.learning-evidence-archive") {
         const receipt = await importLearningEvidenceArchive(rawArchive);
         const migrationNotice = receipt.migrated
-          ? ` ${receipt.migrated}건의 이전 레슨 주소를 현재 주소로 옮겼습니다.`
+          ? ` 이전 수업의 학습 기록 ${receipt.migrated}건도 현재 수업으로 옮겼습니다.`
           : "";
-        setNotice(
+        showStatus(
           receipt.conflicted
-            ? `${receipt.inserted}건을 가져왔고 ${receipt.conflicted}건의 충돌을 격리했습니다.${migrationNotice}`
-            : `${receipt.inserted}건을 가져왔고 ${receipt.skipped}건은 이미 저장되어 있습니다.${migrationNotice}`,
+            ? `학습 기록 ${receipt.inserted}건을 가져왔습니다. 기존 기록과 다른 ${receipt.conflicted}건은 덮어쓰지 않고 별도로 보관했습니다.${migrationNotice}`
+            : `학습 기록 ${receipt.inserted}건을 가져왔습니다. ${receipt.skipped}건은 이미 저장되어 있습니다.${migrationNotice}`,
         );
       } else {
         const receipt = await importBrowserLearningArchive(rawArchive);
@@ -130,17 +147,18 @@ export function LearningEvidenceBar({
         await refreshAutomationDrafts(receipt.materialized);
         const automationCount = receipt.materialized.automationDrafts.length;
         const automationNotice = automationCount
-          ? ` 자동화 초안 ${automationCount}개는 실행하지 않고 비활성 상태로 보관했습니다.`
+          ? ` 자동화 초안 ${automationCount}개는 자동으로 실행하지 않고 작업 메뉴에 보관했습니다.`
           : "";
-        setNotice(
-          `"${receipt.materialized.document.title}" 작업을 복원했습니다. 검증 기록 ${receipt.evidence.inserted}건을 합쳤습니다.${automationNotice}`,
+        showStatus(
+          `"${receipt.materialized.document.title}" 작업과 학습 기록 ${receipt.evidence.inserted}건을 복원했습니다.${automationNotice}`,
         );
       }
       const next = await readLearningEvidenceSummary();
       setSummary(next);
       window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "학습 작업을 가져오지 못했습니다.");
+      console.warn("학습 작업을 가져오지 못했습니다.", error);
+      showError("학습 작업을 가져오지 못했습니다. Codaro 학습 데이터 파일인지 확인해 주세요.");
     } finally {
       if (inputRef.current) inputRef.current.value = "";
     }
@@ -150,90 +168,118 @@ export function LearningEvidenceBar({
     try {
       const receipt = await adoptLearningArchiveAutomationDraft(draftId);
       setAdoptedAutomationDraftIds((current) => new Set(current).add(draftId));
-      setNotice(
+      showStatus(
         receipt.adopted
-          ? `"${receipt.task.name}" 자동화를 비활성·무예약 상태로 준비했습니다.`
-          : `"${receipt.task.name}" 자동화가 이미 준비되어 있습니다.`,
+          ? `"${receipt.task.name}" 자동화 초안을 작업 메뉴에 추가했습니다. 직접 켜기 전에는 실행되지 않습니다.`
+          : `"${receipt.task.name}" 자동화 초안은 이미 작업 메뉴에 있습니다.`,
       );
       window.dispatchEvent(new CustomEvent(AUTOMATION_UPDATED_EVENT));
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "자동화 초안을 옮기지 못했습니다.");
+      console.error("학습 데이터의 자동화 초안을 옮기지 못했습니다.", error);
+      showError("자동화 초안을 옮기지 못했습니다. Local 연결 상태를 확인해 주세요.");
     }
   };
 
   return (
-    <>
-      <aside
-        className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 py-2 sm:px-6"
-        data-learning-evidence-conflicts={summary.conflicts}
-        data-learning-evidence-events={summary.events}
-        data-learning-evidence-runtime={localRuntime ? "local" : "web"}
-        data-learning-evidence-summary="true"
-        data-learning-archive-runtime={localRuntime ? "local" : "web"}
-        data-learning-archive-summary="true"
-      >
-        <div className="min-w-0 flex-1 text-xs text-muted-foreground" aria-live="polite">
-          <span className="font-medium text-foreground">{t("learning.evidence.autoRecord")}</span>
-          {notice ? <span className="ml-2">{notice}</span> : null}
+    <section
+      className="border-y border-border"
+      data-learning-archive-management="true"
+    >
+      {noticeTone === "error" && notice ? (
+        <div
+          className="border-b border-destructive px-3 py-2 text-sm text-destructive"
+          data-learning-archive-error="true"
+          role="alert"
+        >
+          {notice}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <IconButton
-            className="size-8 rounded-md"
-            label={t("learning.evidence.export", { count: summary.events })}
-            variant="ghost"
-            onClick={() => void exportArchive()}
-          >
-            <Download />
-          </IconButton>
-          <IconButton
-            className="size-8 rounded-md"
-            label={t("learning.evidence.import")}
-            variant="ghost"
-            onClick={() => inputRef.current?.click()}
-          >
-            <Upload />
-          </IconButton>
-          <input
-            accept="application/json,.json"
-            className="sr-only"
-            data-learning-archive-import-input="true"
-            data-learning-evidence-import-input="true"
-            ref={inputRef}
-            type="file"
-            onChange={(event) => void importArchive(event.currentTarget.files?.[0])}
-          />
-        </div>
-      </aside>
-      {localRuntime && automationDrafts.length ? (
-        <section className="border-b border-border px-1 py-3" data-learning-automation-drafts="true">
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Workflow className="size-4" />
-            Local 자동화 초안
-          </div>
-          <div className="divide-y divide-border">
-            {automationDrafts.map((draft) => {
-              const adopted = adoptedAutomationDraftIds.has(draft.draftId);
-              return (
-                <div className="flex flex-wrap items-center gap-3 py-2" key={draft.draftId}>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-foreground">{draft.name}</div>
-                    {draft.description ? <div className="mt-1 text-xs text-muted-foreground">{draft.description}</div> : null}
-                  </div>
-                  {adopted ? (
-                    <span className="text-xs font-medium text-muted-foreground">비활성 작업으로 준비됨</span>
-                  ) : (
-                    <Button size="sm" variant="outline" onClick={() => void adoptAutomationDraft(draft.draftId)}>
-                      <Workflow />
-                      자동화로 옮기기
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
       ) : null}
-    </>
+      <details
+        data-learning-archive-menu="true"
+        open={menuOpen}
+        onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+      >
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/35 focus-visible:bg-muted/35 [&::-webkit-details-marker]:hidden">
+          <span>학습 데이터 관리</span>
+          <span className="text-xs font-normal tabular-nums text-muted-foreground">
+            학습 기록 {summary.events}건
+          </span>
+        </summary>
+        <div
+          className="border-t border-border px-3 py-3"
+          data-learning-evidence-conflicts={summary.conflicts}
+          data-learning-evidence-events={summary.events}
+          data-learning-evidence-runtime={localRuntime ? "local" : "web"}
+          data-learning-evidence-summary="true"
+          data-learning-archive-runtime={localRuntime ? "local" : "web"}
+          data-learning-archive-summary="true"
+        >
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="min-w-0 flex-1 text-xs text-muted-foreground" aria-live="polite">
+              <span className="font-medium text-foreground">{t("learning.evidence.autoRecord")}</span>
+              {noticeTone === "status" && notice ? <span className="ml-2">{notice}</span> : null}
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <IconButton
+                className="size-8 rounded-md"
+                disabled={!document || !lessonRef}
+                label={t("learning.evidence.export", { count: summary.events })}
+                variant="ghost"
+                onClick={() => void exportArchive()}
+              >
+                <Download />
+              </IconButton>
+              <IconButton
+                className="size-8 rounded-md"
+                label={t("learning.evidence.import")}
+                variant="ghost"
+                onClick={() => inputRef.current?.click()}
+              >
+                <Upload />
+              </IconButton>
+              <input
+                accept="application/json,.json"
+                className="sr-only"
+                data-learning-archive-import-input="true"
+                data-learning-evidence-import-input="true"
+                ref={inputRef}
+                type="file"
+                onChange={(event) => void importArchive(event.currentTarget.files?.[0])}
+              />
+            </div>
+          </div>
+          {localRuntime && automationDrafts.length ? (
+            <section className="mt-3 border-t border-border pt-3" data-learning-automation-drafts="true">
+              <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <Workflow className="size-4" />
+                자동화 초안
+              </div>
+              <div className="divide-y divide-border">
+                {automationDrafts.map((draft) => {
+                  const adopted = adoptedAutomationDraftIds.has(draft.draftId);
+                  return (
+                    <div className="flex flex-wrap items-center gap-3 py-2" key={draft.draftId}>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-foreground">{draft.name}</div>
+                        {draft.description ? <div className="mt-1 text-xs text-muted-foreground">{draft.description}</div> : null}
+                      </div>
+                      {adopted ? (
+                        <span className="text-xs font-medium text-muted-foreground">작업 메뉴에 추가됨</span>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => void adoptAutomationDraft(draft.draftId)}>
+                          <Workflow />
+                          자동화로 옮기기
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+        </div>
+      </details>
+    </section>
   );
 }
 
@@ -244,31 +290,23 @@ export function LearningOverviewHeader({
   contents = [],
   document,
   introBlock,
-  pendingBlocks,
   referenceLoading,
   sections,
   selectedCategory,
   selectedCategoryLabel,
   selectedContentId,
   selectedContentLabel,
-  onAcceptPendingBlocks,
-  onRejectPendingBlocks,
-  onOpenTerminalCommand,
 }: {
   apiOnline: boolean;
   contents?: Array<{ contentId: string; title: string }>;
   document: CodaroDocument;
   introBlock?: BlockConfig;
-  pendingBlocks: BlockConfig[];
   referenceLoading: boolean;
   sections: CurriculumSectionGroup[];
   selectedCategory: string;
   selectedCategoryLabel: string;
   selectedContentId: string;
   selectedContentLabel: string;
-  onAcceptPendingBlocks: () => void;
-  onRejectPendingBlocks: () => void;
-  onOpenTerminalCommand: (command: string) => void;
 }) {
   const overview = curriculumOverview(document, introBlock);
   const declaredLearnItems = overview.points.length
@@ -345,14 +383,8 @@ export function LearningOverviewHeader({
         <CurriculumDependencyPanel
           apiOnline={apiOnline}
           document={document}
-          onOpenTerminalCommand={onOpenTerminalCommand}
         />
       </div>
-      <PendingNotebookBar
-        pendingBlocks={pendingBlocks}
-        onAccept={onAcceptPendingBlocks}
-        onReject={onRejectPendingBlocks}
-      />
     </header>
   );
 }

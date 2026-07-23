@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 export type ResultMap = Record<string, ExecutionResult>;
 
 export type RenderCodeCellEditor = (args: {
+  ariaLabel: string;
   autoFocus?: boolean;
   block: BlockConfig;
   draft: string;

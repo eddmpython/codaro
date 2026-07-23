@@ -3,13 +3,11 @@ import {
   GraduationCap,
   Home,
   Loader2,
-  Trash2,
 } from "lucide-react";
-import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import { useMemo, type Dispatch, type SetStateAction } from "react";
 
 import { useSidebarExpansionState } from "@/hooks/useSidebarExpansionState";
 
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -50,7 +48,6 @@ type CurriculumSidebarTreeProps = {
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
-  onDeleteCustomCurriculum: (id: string) => void;
 };
 
 export function CurriculumSidebarTree({
@@ -68,12 +65,10 @@ export function CurriculumSidebarTree({
   onSelectCategory,
   onSelectContent,
   onSelectCustomCurriculum,
-  onDeleteCustomCurriculum,
   text,
 }: CurriculumSidebarTreeProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { expandedCategories, setExpandedCategories, expandedTreeNodes, setExpandedTreeNodes } = useSidebarExpansionState();
-  const [deleteTarget, setDeleteTarget] = useState<SidebarCustomCurriculum | null>(null);
   const hasQuery = Boolean(query.trim());
   const customItems = customCurricula.filter((item) => {
     const trimmed = query.trim().toLowerCase();
@@ -139,9 +134,9 @@ export function CurriculumSidebarTree({
         <SidebarGroupContent>
           <SidebarMenu>
             {customItems.length ? customItems.map((item) => (
-              <SidebarMenuItem className="group/custom relative" key={item.id}>
+              <SidebarMenuItem key={item.id}>
                 <SidebarMenuButton
-                  className="h-7 pr-8 px-2 text-[13px] [&>svg]:size-3.5"
+                  className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
                   isActive={item.id === selectedCustomCurriculumId}
                   tooltip={item.title}
                   onClick={() => navigateToCustomCurriculum(item.id)}
@@ -149,19 +144,6 @@ export function CurriculumSidebarTree({
                   <GraduationCap />
                   <span>{item.title}</span>
                 </SidebarMenuButton>
-                <button
-                  aria-label={`${item.title} 삭제`}
-                  className="absolute right-1 top-0.5 z-10 flex size-6 items-center justify-center rounded-md text-sidebar-foreground/45 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive focus:opacity-100 group-hover/custom:opacity-100"
-                  title="삭제"
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setDeleteTarget(item);
-                  }}
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
               </SidebarMenuItem>
             )) : (
               <SidebarMenuItem>
@@ -173,63 +155,7 @@ export function CurriculumSidebarTree({
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-      <CustomCurriculumDeleteDialog
-        item={deleteTarget}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (!deleteTarget) return;
-          onDeleteCustomCurriculum(deleteTarget.id);
-          setDeleteTarget(null);
-        }}
-      />
     </>
-  );
-}
-
-function CustomCurriculumDeleteDialog({
-  item,
-  onCancel,
-  onConfirm,
-}: {
-  item: SidebarCustomCurriculum | null;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  if (!item) return null;
-
-  return (
-    <div
-      aria-labelledby="delete-custom-curriculum-title"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/55 px-4 backdrop-blur-sm"
-      role="dialog"
-      onClick={onCancel}
-    >
-      <div
-        className="w-full max-w-sm rounded-md border bg-popover p-4 text-popover-foreground shadow-lg"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-destructive/10 text-destructive">
-            <Trash2 className="size-4" />
-          </span>
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold" id="delete-custom-curriculum-title">나만의 커리큘럼 삭제</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              {item.title} 커리큘럼을 삭제할까요? 이 작업은 되돌릴 수 없습니다.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <Button size="sm" type="button" variant="outline" onClick={onCancel}>
-            취소
-          </Button>
-          <Button size="sm" type="button" variant="destructive" onClick={onConfirm}>
-            삭제
-          </Button>
-        </div>
-      </div>
-    </div>
   );
 }
 

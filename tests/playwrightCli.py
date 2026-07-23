@@ -78,6 +78,8 @@ class PlaywrightCli:
         env = os.environ.copy()
         env["PLAYWRIGHT_DAEMON_SESSION_DIR"] = str(self._daemonDir)
         env["PLAYWRIGHT_SERVER_REGISTRY"] = str(self._serverRegistryDir)
+        env["PWTEST_DAEMON_SESSION_DIR"] = str(self._daemonDir)
+        env["PWTEST_SERVER_REGISTRY"] = str(self._serverRegistryDir)
         env["PLAYWRIGHT_SKIP_BROWSER_GC"] = "1"
         return env
 

@@ -22,6 +22,10 @@ DEPENDENCY_PANEL = ROOT / "editor" / "src" / "components" / "curriculum" / "curr
 MARKDOWN_BODY = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumMarkdownBody.tsx"
 CURRICULA_REGISTRY = ROOT / "editor" / "src" / "lib" / "curriculaRegistry.ts"
 APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives.tsx"
+CURRENT_LEARNING_SURFACE = ROOT / "editor" / "src" / "components" / "app" / "currentLearningSurface.tsx"
+NOTEBOOK_PANEL = ROOT / "editor" / "src" / "components" / "notebook" / "notebookPanel.tsx"
+PRODUCT_SIDEBAR = ROOT / "editor" / "src" / "components" / "app" / "productSidebar.tsx"
+TOP_BAR = ROOT / "editor" / "src" / "components" / "app" / "topBar.tsx"
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
 APP = ROOT / "editor" / "src" / "App.tsx"
@@ -71,7 +75,8 @@ def main() -> int:
         SURFACE, SECTION_RENDERER, CURRICULUM_OVERVIEW, CURRICULUM_LEARNING_CELL,
         CURRICULUM_TOC, MARKDOWN_DATA_CELLS, MARKDOWN_RICH_TEXT, CURRICULUM_HOME,
         DEPENDENCY_PANEL, MARKDOWN_BODY, CURRICULA_REGISTRY,
-        APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH,
+        APP_PRIMITIVES, CURRENT_LEARNING_SURFACE, NOTEBOOK_PANEL, PRODUCT_SIDEBAR, TOP_BAR,
+        CELL_ACTIONS, AI_PANEL, APP, TERMINAL_PANEL, TERMINAL_LAUNCH,
         LOCALE_COPY, PACKAGE_INFERENCE, PACKAGE_PREPARATION, PYTHON_STDLIB, CELL_MODEL,
         LEARNING_ATTEMPT, LEARNING_CHECK_SPEC, BROWSER_CHECK_EXECUTOR,
         WEB_LEARNING_EVIDENCE, LEARNING_EVIDENCE_OPERATIONS, CURRICULUM_PROGRESS,
@@ -107,6 +112,10 @@ def main() -> int:
     )
     curriculaRegistryText = CURRICULA_REGISTRY.read_text(encoding="utf-8")
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
+    currentLearningSurfaceText = CURRENT_LEARNING_SURFACE.read_text(encoding="utf-8")
+    notebookPanelText = NOTEBOOK_PANEL.read_text(encoding="utf-8")
+    productSidebarText = PRODUCT_SIDEBAR.read_text(encoding="utf-8")
+    topBarText = TOP_BAR.read_text(encoding="utf-8")
     localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
     packageInferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     packagePreparationText = PACKAGE_PREPARATION.read_text(encoding="utf-8")
@@ -154,7 +163,7 @@ def main() -> int:
         "section heading marker": 'data-learning-section-heading="true"',
         "non-interactive section heading": '<header className="grid w-full min-w-0',
         "push toc marker": 'data-learning-toc="push"',
-        "push toc width expansion": "hover:w-72",
+        "push toc state width expansion": 'expanded ? "w-72',
         "single-card structured branch": "structured ? (",
         "legacy fallback branch": "variant=\"embedded\"",
         "contract source detector": 'block.sourceType?.startsWith("sectionContract:")',
@@ -162,7 +171,8 @@ def main() -> int:
         "exercise source mapping": 'block.sourceType === "sectionContract:exercise"',
         "snippet part assignment": 'data-learning-section-part="snippet"',
         "snippet kicker marker": 'data-learning-snippet-kicker="true"',
-        "structured exercise direct editor": "autoFocus: exerciseSelected",
+        "structured exercise direct editor does not steal entry focus": "autoFocus: false",
+        "structured exercise accessible editor name": "ariaLabel: `${blockLabel(exercise)} 직접 해보기 코드 편집기`",
         "code cell direct editor marker": 'data-learning-code-input="editor"',
         "code input role marker": 'data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}',
         "code input selected marker": "data-learning-code-input-state={isSelected ? \"selected\" : \"ready\"}",
@@ -466,10 +476,10 @@ def main() -> int:
         require(webLearningEvidenceText, token, label, failures)
 
     evidence_surface_tokens = {
-        "automatic evidence saved state": 'data-learning-evidence-state={evidenceSaveState}',
+        "automatic evidence saved state": "data-learning-evidence-state={",
         "Local automatic evidence append": "codaroApi.appendLearningEvidence",
         "shared strong event builder": "createWebStrongCheckEvidenceEvent",
-        "visible evidence summary": 'data-learning-evidence-summary="true"',
+        "settings evidence summary": 'data-learning-evidence-summary="true"',
         "evidence export command": "serializeWebLearningEvidenceArchive",
         "evidence import command": "importWebLearningEvidenceArchive",
         "evidence import file input": 'data-learning-evidence-import-input="true"',
@@ -486,6 +496,63 @@ def main() -> int:
         source = "\n".join((text, learningEvidenceOperationsText, curriculumAssessmentQueueText))
         require(source, token, label, failures)
 
+    require(
+        productSidebarText,
+        'data-product-learning-data-settings="true"',
+        "learning data settings boundary",
+        failures,
+    )
+    require(
+        productSidebarText,
+        'const learningMode = surface === "curriculum"',
+        "curriculum focus mode",
+        failures,
+    )
+    require(
+        productSidebarText,
+        'data-product-brand="escape"',
+        "curriculum escape action",
+        failures,
+    )
+    if "LearningArchiveMenu" in SURFACE.read_text(encoding="utf-8") or "LearningArchiveMenu" in curriculumHomeText:
+        failures.append("learning archive management must stay outside curriculum surfaces")
+    if "CellAiActions" in SECTION_RENDERER.read_text(encoding="utf-8") or "CellAiActions" in CURRICULUM_LEARNING_CELL.read_text(encoding="utf-8"):
+        failures.append("curriculum cells must not expose manual AI controls")
+    if "TeacherPanel" in currentLearningSurfaceText:
+        failures.append("curriculum must not render a duplicate teacher panel")
+    if "PendingNotebookBar" in CURRICULUM_OVERVIEW.read_text(encoding="utf-8"):
+        failures.append("curriculum must not render pending AI authoring controls")
+    for token, label in (
+        ('maxHeight: "22rem"', "bounded content-fit editor"),
+        ("revision === saveRevisionRef.current", "autosave request revision guard"),
+        ("activeLessonRef.current === pending.lessonRef", "autosave lesson identity guard"),
+        ('if (lessonChanged) {\n      setStorageError("");\n      flushPendingWorkspace();', "autosave lesson error reset"),
+        ('if (surface === "curriculum") setTerminalOpen(false);', "curriculum terminal close"),
+        ("!event.currentTarget.contains(document.activeElement)", "TOC focus-preserving pointer exit"),
+        ('import { Dialog } from "radix-ui"', "accessible delete dialog primitive"),
+        ("learningMode ? null : (", "curriculum management dialog suppression"),
+    ):
+        source = (
+            notebookPanelText if label == "bounded content-fit editor"
+            else currentLearningSurfaceText if label.startswith("autosave")
+            else appText if "terminal" in label
+            else CURRICULUM_TOC.read_text(encoding="utf-8") if label.startswith("TOC")
+            else productSidebarText
+        )
+        require(source, token, label, failures)
+    require(
+        topBarText,
+        'const showAssistantToggle = surface === "editor"',
+        "editor-only assistant toggle",
+        failures,
+    )
+    require(
+        topBarText,
+        'surface !== "curriculum" && showStatusNotice',
+        "curriculum diagnostic export suppression",
+        failures,
+    )
+
     package_panel_tokens = {
         "package panel marker": 'data-learning-package-panel="true"',
         "package panel explicit package source": "declaredDocumentPackages(document)",
@@ -493,23 +560,56 @@ def main() -> int:
         "package install action marker": 'data-learning-package-install="true"',
         "package item marker": "data-learning-package-item={packageName}",
         "package installed marker": 'data-learning-package-installed={installed ? "true" : "false"}',
-        "package command row marker": 'data-learning-package-command-row="true"',
-        "package command marker": 'data-learning-package-command="true"',
-        "package terminal open marker": 'data-learning-package-terminal-open="true"',
-        "package terminal run copy": "터미널에서 실행",
         "package progress marker": 'data-learning-package-progress="true"',
         "package progress state import": "type PackageInstallProgress",
         "package installed names model": "installedCurriculumPackageNameSet(installedPackages)",
         "package missing model": "missingCurriculumPackages(requiredPackages, installedNames)",
-        "package command ready model": "curriculumPackageTerminalCommandReady({ apiOnline, installCommand, missingPackages })",
         "package active message model": "curriculumPackageActiveMessage({ checking, installProgress })",
         "package status model": "curriculumPackageStatus({ checking, error, installProgress, missingPackages })",
-        "package install button progress": "${installProgress.index}/${installProgress.total} 설치 중",
-        "package ready copy": "준비됨",
+        "package install button progress": "${installProgress.index}/${installProgress.total} 준비 중",
+        "package prepare action": "라이브러리 준비",
+        "package retry action": "다시 시도",
+        "package success copy": "`${packageName} 준비 완료`",
+        "package failure copy": "`${packageName}을 준비하지 못했습니다. 다시 시도하세요.`",
         "package install result copy": "packageInstallStatusText",
     }
     for label, token in package_panel_tokens.items():
         require(dependencyPanelText, token, label, failures)
+    require(
+        dependencyPanelText,
+        "if (!apiOnline || !requiredPackages.length) return null;",
+        "inactive Web package panel suppression",
+        failures,
+    )
+    require(
+        dependencyPanelText,
+        "if (!missingPackages.length && !installProgress && !error) return null;",
+        "ready package panel suppression",
+        failures,
+    )
+    package_panel_forbidden_tokens = (
+        "curriculumPackageInstallCommand",
+        "curriculumPackageTerminalCommandReady",
+        "packageInstallCommand",
+        "installCommand",
+        "installEnvironment",
+        "commandError",
+        "navigator.clipboard",
+        "TerminalSquare",
+        "data-learning-package-command",
+        "data-learning-package-terminal-open",
+        "터미널에서 실행",
+        "result.environment",
+        "result.installer",
+        "result.message",
+        "durationMs",
+    )
+    for token in package_panel_forbidden_tokens:
+        if token in dependencyPanelText:
+            failures.append(f"learning package panel leaks management or implementation detail: {token}")
+    for forbiddenCopy in ('"서버 필요"', '"설치 필요 없음"', ': "준비됨"'):
+        if forbiddenCopy in dependencyPanelText:
+            failures.append(f"inactive package copy must not remain visible: {forbiddenCopy}")
 
     cell_action_tokens = {
         "cell help popover marker": 'data-cell-ai-popover="true"',
@@ -531,23 +631,20 @@ def main() -> int:
     for label, token in ai_panel_tokens.items():
         require(aiPanelText, token, label, failures)
 
-    terminal_tokens = {
-        "terminal launch submits curriculum command": "setTerminalLaunchIntent({ command, id: Date.now(), submit: true })",
-        "terminal launch model import in app": 'type { TerminalLaunchIntent } from "@/lib/terminalLaunch"',
-        "terminal launch helper import in panel": 'terminalLaunchInput, type TerminalLaunchIntent',
-        "terminal launch input helper": "function terminalLaunchInput",
-        "terminal launch submit flag": "submit?: boolean",
-        "terminal launch sends transformed input": "data: terminalLaunchInput(intent)",
-        "terminal launch appends enter": 'return `${intent.command}\\r`',
-    }
-    for label, token in terminal_tokens.items():
-        if label in {"terminal launch submits curriculum command", "terminal launch model import in app"}:
-            source = appText
-        elif label in {"terminal launch helper import in panel", "terminal launch sends transformed input"}:
-            source = terminalPanelText
-        else:
-            source = terminalLaunchText
-        require(source, token, label, failures)
+    learning_command_sources = "\n".join((
+        dependencyPanelText,
+        CURRICULUM_OVERVIEW.read_text(encoding="utf-8"),
+        SURFACE.read_text(encoding="utf-8"),
+        currentLearningSurfaceText,
+    ))
+    for token in (
+        "onOpenTerminalCommand",
+        "data-learning-package-command",
+        "data-learning-package-terminal-open",
+        "curriculumPackageInstallCommand",
+    ):
+        if token in learning_command_sources:
+            failures.append(f"learning surface must not expose terminal command flow: {token}")
 
     markdown_body_tokens = {
         "reading column width": "max-w-3xl",
@@ -588,6 +685,35 @@ def main() -> int:
     for label, token in code_payload_tokens.items():
         require(appPrimitivesText, token, label, failures)
 
+    learner_output_forbidden_tokens = {
+        "learner output hides runtime artifact paths": "data-runtime-artifacts",
+        "learner output hides runtime artifact kinds": "data-runtime-artifact-kind",
+        "learner output hides execution counters": "#{result.executionCount}",
+        "learner output hides internal artifact label": "system.runtimeArtifacts",
+    }
+    for label, token in learner_output_forbidden_tokens.items():
+        if token in appPrimitivesText:
+            failures.append(f"{label}: found {token}")
+
+    learner_feedback_tokens = {
+        "plain completed feedback": "연습 완료",
+        "plain retry feedback": "다시 확인해 보세요",
+        "silent successful evidence persistence": 'evidenceSaveState === "error"',
+        "short evidence recovery": "학습 기록을 저장하지 못했습니다. 셀을 다시 실행해 주세요.",
+    }
+    for label, token in learner_feedback_tokens.items():
+        require(text, token, label, failures)
+
+    learner_feedback_forbidden_tokens = {
+        "strong-check jargon": "격리 검증 통과",
+        "practice-check jargon": "연습 검증 통과",
+        "visible evidence implementation detail": "검증 증거가 이 브라우저에 저장되었습니다.",
+        "duplicate exercise success badge": "statusLabel(exerciseRunning",
+    }
+    for label, token in learner_feedback_forbidden_tokens.items():
+        if token in text:
+            failures.append(f"{label}: found {token}")
+
     locale_copy_tokens = {
         "copy action label": "스니펫 복사",
         "copy button text": "복사",
@@ -610,15 +736,40 @@ def main() -> int:
         "package status union": 'export type CurriculumPackageStatus = "installing" | "checking" | "error" | "missing" | "ready"',
         "installed package names projection": "function installedCurriculumPackageNameSet",
         "missing package projection": "function missingCurriculumPackages",
-        "terminal command readiness": "function curriculumPackageTerminalCommandReady",
         "active package message": "function curriculumPackageActiveMessage",
         "package panel status": "function curriculumPackageStatus",
-        "package progress text": "${installProgress.index}/${installProgress.total} 단계",
-        "uv install delay copy": "처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.",
-        "package API boundary kept": "codaroApi.packageInstallCommand(packageNames)",
+        "package progress text": "${installProgress.index}/${installProgress.total}",
+        "package install API boundary kept": "codaroApi.packageInstall(packageName)",
     }
     for label, token in package_preparation_tokens.items():
         require(packagePreparationText, token, label, failures)
+    for token in ("packageInstallCommand", "curriculumPackageTerminalCommandReady", "uv", "wheel"):
+        if token in packagePreparationText:
+            failures.append(f"learning package preparation exposes implementation detail: {token}")
+
+    editor_accessibility_tokens = {
+        "learning editor defaults to no autofocus": "autoFocus = false",
+        "CodeMirror textbox receives accessible name": "EditorView.contentAttributes.of({",
+        "CodeMirror textbox aria label": '"aria-label": ariaLabel',
+        "CodeMirror textbox multiline semantics": '"aria-multiline": "true"',
+        "standalone learning editor name": "ariaLabel: `${blockLabel(block)} 코드 편집기`",
+        "learning title wraps": "whitespace-normal break-words",
+        "section heading wraps": "max-w-3xl break-words",
+    }
+    editor_accessibility_sources = {
+        "learning editor defaults to no autofocus": currentLearningSurfaceText,
+        "CodeMirror textbox receives accessible name": notebookPanelText,
+        "CodeMirror textbox aria label": notebookPanelText,
+        "CodeMirror textbox multiline semantics": notebookPanelText,
+        "standalone learning editor name": CURRICULUM_LEARNING_CELL.read_text(encoding="utf-8"),
+        "learning title wraps": CURRICULUM_LEARNING_CELL.read_text(encoding="utf-8"),
+        "section heading wraps": SECTION_RENDERER.read_text(encoding="utf-8"),
+    }
+    for label, token in editor_accessibility_tokens.items():
+        require(editor_accessibility_sources[label], token, label, failures)
+    for token in ("autoFocus: exerciseSelected", "autoFocus: isSelected", "block truncate text-[15px]"):
+        if token in text:
+            failures.append(f"learning editor focus or title clipping regression: {token}")
 
     stdlib_tokens = {
         "io is stdlib": '"io"',

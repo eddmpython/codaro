@@ -31,7 +31,7 @@ MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES = 50_000
 MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES = 100_000
 MAX_LAZY_CURRICULUM_BUNDLE_RATIO = 1.08
 MAX_CSS_BYTES = 160_000
-REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
+REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumMarkdown", "curriculumSurface")
 
 
 def currentGitHead() -> str | None:
@@ -136,7 +136,7 @@ def main() -> int:
             failures.append(f"expected a named {label} chunk in built assets")
 
     configText = VITE_CONFIG.read_text(encoding="utf-8")
-    for token in ("codeSplitting", "@codemirror", "@radix-ui", "vendor"):
+    for token in ("codeSplitting", "curriculumMarkdown", "@codemirror", "@radix-ui", "vendor"):
         if token not in configText:
             failures.append(f"vite config missing performance split token {token}")
 

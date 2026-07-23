@@ -3,12 +3,11 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
-  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
 
+import { useBrowserLayoutEffect } from "../lib/useBrowserLayoutEffect.js";
 import { codaroTheme } from "../styles/generated/codaro.js";
 import { resolveDensity, themeCanvasColors } from "../styles/generated/codaroTheme.ts";
 
@@ -17,7 +16,6 @@ const darkMediaQuery = "(prefers-color-scheme: dark)";
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
 const themeModes = ["system", "light", "dark"];
 const CodaroThemeContext = createContext(null);
-const useBrowserLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function readStoredTheme() {
   if (typeof window === "undefined") return "system";
@@ -27,12 +25,6 @@ function readStoredTheme() {
   } catch {
     return "system";
   }
-}
-
-function readMediaQuery(query) {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function"
-    ? window.matchMedia(query).matches
-    : false;
 }
 
 function storeThemeMode(mode) {
@@ -45,27 +37,36 @@ function storeThemeMode(mode) {
 }
 
 function useMediaQuery(query) {
-  const [matches, setMatches] = useState(() => readMediaQuery(query));
+  const [state, setState] = useState({ matches: false, ready: false });
 
-  useEffect(() => {
+  useBrowserLayoutEffect(() => {
     if (!window.matchMedia) return undefined;
     const media = window.matchMedia(query);
-    const onChange = (event) => setMatches(event.matches);
-    setMatches(media.matches);
+    const onChange = (event) => setState({ matches: event.matches, ready: true });
+    setState({ matches: media.matches, ready: true });
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, [query]);
 
-  return matches;
+  return state;
 }
 
 export function CodaroThemeProvider({ children, initialSurface = "landing" }) {
-  const [themeMode, setThemeModeState] = useState(readStoredTheme);
+  const [themeMode, setThemeModeState] = useState("system");
   const [designSurface, setDesignSurface] = useState(initialSurface);
-  const prefersDark = useMediaQuery(darkMediaQuery);
-  const reducedMotion = useMediaQuery(reducedMotionQuery);
+  const darkPreference = useMediaQuery(darkMediaQuery);
+  const reducedMotionPreference = useMediaQuery(reducedMotionQuery);
+  const prefersDark = darkPreference.matches;
+  const reducedMotion = reducedMotionPreference.matches;
   const resolvedTheme = themeMode === "system" ? (prefersDark ? "dark" : "light") : themeMode;
   const densityMode = resolveDensity(designSurface);
+
+  useBrowserLayoutEffect(() => {
+    const storedTheme = readStoredTheme();
+    setThemeModeState((currentTheme) => (
+      currentTheme === storedTheme ? currentTheme : storedTheme
+    ));
+  }, []);
 
   const setThemeMode = useCallback((nextMode) => {
     const normalized = themeModes.includes(nextMode) ? nextMode : "system";
@@ -80,16 +81,18 @@ export function CodaroThemeProvider({ children, initialSurface = "landing" }) {
   useBrowserLayoutEffect(() => {
     const root = document.documentElement;
     const canvasColor = themeCanvasColors[resolvedTheme];
-    root.dataset.theme = resolvedTheme;
-    root.dataset.resolvedTheme = resolvedTheme;
     root.dataset.density = densityMode;
     root.dataset.accent = "plum";
-    root.classList.toggle("dark", resolvedTheme === "dark");
-    root.style.colorScheme = resolvedTheme;
-    root.style.backgroundColor = canvasColor;
-    const themeColor = document.querySelector('meta[name="theme-color"]');
-    themeColor?.setAttribute("content", canvasColor);
-  }, [densityMode, resolvedTheme]);
+    if (themeMode !== "system" || darkPreference.ready) {
+      root.dataset.theme = resolvedTheme;
+      root.dataset.resolvedTheme = resolvedTheme;
+      root.classList.toggle("dark", resolvedTheme === "dark");
+      root.style.colorScheme = resolvedTheme;
+      root.style.backgroundColor = canvasColor;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      themeColor?.setAttribute("content", canvasColor);
+    }
+  }, [darkPreference.ready, densityMode, resolvedTheme, themeMode]);
 
   const value = useMemo(
     () => ({

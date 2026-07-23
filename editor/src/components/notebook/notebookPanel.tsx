@@ -149,6 +149,20 @@ const codeCellEditorTheme = EditorView.theme({
   },
 });
 
+const contentFitCodeCellEditorTheme = EditorView.theme({
+  "&": {
+    maxHeight: "22rem",
+  },
+  ".cm-scroller": {
+    maxHeight: "22rem",
+    overflow: "auto",
+  },
+  ".cm-content": {
+    minHeight: "0",
+    padding: "0.5rem 0",
+  },
+});
+
 export function NotebookPanel({
   apiOnline,
   canRun,
@@ -452,7 +466,9 @@ const aiCommentGutter = gutter({
 });
 
 export function CodeCellEditor({
+  ariaLabel = "코드 편집기",
   autoFocus = false,
+  density = "comfortable",
   placeholderText = "",
   value,
   onChange,
@@ -463,7 +479,9 @@ export function CodeCellEditor({
   aiComments,
   onAiCommentClick,
 }: {
+  ariaLabel?: string;
   autoFocus?: boolean;
+  density?: "comfortable" | "content-fit";
   placeholderText?: string;
   value: string;
   onChange: (value: string) => void;
@@ -525,6 +543,10 @@ export function CodeCellEditor({
         syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
         highlightActiveLine(),
         placeholder(placeholderText),
+        EditorView.contentAttributes.of({
+          "aria-label": ariaLabel,
+          "aria-multiline": "true",
+        }),
         EditorView.lineWrapping,
         autocompletion({
           override: [aiCompletionSource],
@@ -556,6 +578,7 @@ export function CodeCellEditor({
         ])),
         keymap.of([indentWithTab, ...closeBracketsKeymap, ...completionKeymap, ...defaultKeymap, ...historyKeymap]),
         codeCellEditorTheme,
+        density === "content-fit" ? Prec.highest(contentFitCodeCellEditorTheme) : [],
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChangeRef.current(update.state.doc.toString());
@@ -622,6 +645,7 @@ export function CodeCellEditor({
   return (
     <div
       className="bg-transparent text-code-foreground"
+      data-code-editor-density={density}
       ref={hostRef}
     />
   );
@@ -776,6 +800,7 @@ function DocumentBlock({
           data-notebook-input="code"
         >
           <CodeCellEditor
+            ariaLabel={`${cellTitle} 코드 편집기`}
             autoFocus={autoFocus}
             placeholderText="Python 코드를 입력하세요"
             value={draft}

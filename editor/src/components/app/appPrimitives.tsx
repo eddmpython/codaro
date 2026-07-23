@@ -15,11 +15,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { WidgetHost, isWidgetDescriptor } from "@/components/widgets/widgetHost";
 import { blockLabel } from "@/lib/cellModel";
+import {
+  automationExecutionPresentation,
+  automationPresentationCopy,
+} from "@/lib/automationPresentation";
 import { statusLabel, stringifyData } from "@/lib/displayFormat";
 import { useLocale } from "@/lib/localeContext";
+import { learnerFacingErrorText } from "@/lib/tracebackParser";
 import { cn } from "@/lib/utils";
 import { useWidgetSession } from "@/lib/widgetSession";
-import type { AutomationSessionCellPayload, BlockConfig, ExecutionResult } from "@/types";
+import type { BlockConfig, ExecutionResult } from "@/types";
 
 export function IconButton({
   children,
@@ -104,22 +109,39 @@ export function ExecutionOutput({
   const contextSessionId = useWidgetSession();
   const sessionId = sessionIdOverride !== undefined ? sessionIdOverride : contextSessionId;
   const packageError = result.status === "package-error";
-  const hasError = packageError || result.status === "error" || Boolean(result.stderr);
+  const automationOutput = result.type === "automation"
+    ? automationExecutionPresentation(result, t)
+    : null;
+  const hasError = automationOutput
+    ? automationOutput.hasError
+    : packageError || result.status === "error" || Boolean(result.stderr);
   const widgetDescriptor = !hasError && isWidgetDescriptor(result.data) ? result.data : null;
   const dataframeData = !widgetDescriptor && !hasError && result.type === "dataframe" ? asDataFramePayload(result.data) : null;
-  const automationData = !hasError && result.type === "automation" ? asAutomationSessionPayload(result.data) : null;
-  const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
+  const automationError = hasError && result.type === "automation";
+  const rawOutput = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
+  const output = automationOutput
+    ? `${automationOutput.copy.title}\n${automationOutput.copy.detail}`
+    : hasError
+      ? learnerFacingErrorText(rawOutput)
+      : rawOutput;
   return (
     <div
-      className={cn("rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}
+      aria-atomic="true"
+      aria-label={t("system.output")}
+      aria-live={hasError ? "assertive" : "polite"}
+      className={cn("min-w-0 max-w-full overflow-hidden rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}
+      data-automation-summary={
+        automationOutput?.presentation.state
+      }
       data-execution-output="true"
       data-execution-output-status={hasError ? "error" : "ok"}
+      role={hasError ? "alert" : "status"}
     >
       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
         <span className="font-medium uppercase text-muted-foreground">{t("system.output")}</span>
-        <Badge variant={hasError ? "destructive" : "outline"}>
-          {statusLabel(result.status || "done")} #{result.executionCount}
-        </Badge>
+        {hasError && !automationError ? (
+          <Badge variant="destructive">{statusLabel(result.status || "error")}</Badge>
+        ) : null}
       </div>
       {widgetDescriptor ? (
         <div data-execution-output-mode="widget">
@@ -131,37 +153,14 @@ export function ExecutionOutput({
         </div>
       ) : dataframeData ? (
         <DataFrameOutput data={dataframeData} />
-      ) : automationData ? (
-        <AutomationSessionOutput output={output} payload={automationData} />
+      ) : automationOutput?.valid ? (
+        <AutomationSessionOutput presentation={automationOutput.presentation} />
       ) : (
       <ScrollArea className="max-h-72">
-        <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
+        <pre className="max-w-full whitespace-pre-wrap break-words font-mono text-sm leading-6">{output}</pre>
       </ScrollArea>
       )}
-      {result.artifacts?.length ? (
-        <div
-          className="mt-3 border-t border-border/70 pt-3 text-xs leading-5"
-          data-runtime-artifacts="true"
-        >
-          <div className="font-medium text-foreground">{t("system.runtimeArtifacts")}</div>
-          <div className="mt-1 divide-y divide-border/70">
-            {result.artifacts.map((artifact) => (
-              <div
-                key={`${artifact.kind}:${artifact.path}`}
-                className="grid min-w-0 gap-0.5 py-2"
-                data-runtime-artifact-kind={artifact.kind}
-              >
-                <span className="font-medium text-muted-foreground">{artifact.label}</span>
-                <code className="break-all font-mono text-[11px] text-foreground">{artifact.path}</code>
-                {artifact.detail ? (
-                  <span className="text-[11px] text-muted-foreground">{artifact.detail}</span>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
-      {hasError ? (
+      {hasError && !automationError ? (
         <div
           className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"
           data-runtime-recovery={packageError ? "package-error" : "cell-error"}
@@ -169,10 +168,18 @@ export function ExecutionOutput({
           <XCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
           <div className="min-w-0">
             <div className="font-medium text-foreground">
-              {packageError ? t("system.recoverPackageError.title") : t("system.recoverCellError.title")}
+              {packageError
+                ? t("system.recoverPackageError.title")
+                : automationError
+                  ? t("runtime.automationFailed")
+                  : t("system.recoverCellError.title")}
             </div>
             <div className="text-muted-foreground">
-              {packageError ? t("system.recoverPackageError.detail") : t("system.recoverCellError.detail")}
+              {packageError
+                ? t("system.recoverPackageError.detail")
+                : automationError
+                  ? t("runtime.automationFailedDetail")
+                  : t("system.recoverCellError.detail")}
             </div>
           </div>
         </div>
@@ -188,45 +195,23 @@ type DataFramePayload = {
   truncated?: boolean;
 };
 
-function asAutomationSessionPayload(data: unknown): AutomationSessionCellPayload | null {
-  if (!data || typeof data !== "object") return null;
-  const record = data as Partial<AutomationSessionCellPayload>;
-  if (typeof record.sessionKey !== "string" || typeof record.action !== "string") return null;
-  if (typeof record.kind !== "string" || typeof record.status !== "string") return null;
-  return record as AutomationSessionCellPayload;
-}
-
 function AutomationSessionOutput({
-  output,
-  payload,
+  presentation,
 }: {
-  output: string;
-  payload: AutomationSessionCellPayload;
+  presentation: ReturnType<typeof automationExecutionPresentation>["presentation"];
 }) {
+  const { t } = useLocale();
+  const copy = automationPresentationCopy(presentation, t);
   return (
-    <div className="space-y-2" data-automation-session-output="true">
-      <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        <Badge variant="outline">{payload.kind}</Badge>
-        <Badge variant="outline">{payload.op ?? payload.action}</Badge>
-        <Badge variant={payload.status === "success" || payload.status === "closed" ? "outline" : "secondary"}>
-          {payload.status}
-        </Badge>
-        {payload.opened ? <Badge variant="secondary">opened</Badge> : null}
-        {payload.closed ? <Badge variant="secondary">closed</Badge> : null}
-      </div>
-      <div className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
-        <div className="min-w-0">
-          <span className="font-medium text-foreground">session</span>{" "}
-          <span className="break-all">{payload.sessionId ?? payload.sessionKey}</span>
-        </div>
-        <div className="min-w-0">
-          <span className="font-medium text-foreground">action</span>{" "}
-          <span className="break-all">{payload.action}</span>
-        </div>
-      </div>
-      <ScrollArea className="max-h-44">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-5">{output}</pre>
-      </ScrollArea>
+    <div
+      className="space-y-1.5"
+      data-automation-session-output="true"
+      data-automation-summary={presentation.state}
+    >
+      <div className="font-medium text-foreground">{copy.title}</div>
+      <pre className="max-h-48 max-w-full overflow-auto whitespace-pre-wrap break-words text-sm leading-6 text-foreground">
+        {copy.detail}
+      </pre>
     </div>
   );
 }

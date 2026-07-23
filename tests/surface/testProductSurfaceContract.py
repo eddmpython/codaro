@@ -163,6 +163,7 @@ def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
 def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     source = _read("editor/src/components/app/productSidebar.tsx")
     flowNav = _read("editor/src/components/app/productFlowNav.tsx")
+    curriculumTree = _read("editor/src/components/app/curriculumSidebarTree.tsx")
 
     assert "ProductFlowNav" in source
     assert "CurriculumSidebarTree" in source
@@ -173,7 +174,10 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "HIDDEN_SURFACES" not in source
     assert ".filter((item) => item.visibleInSidebar)" not in source
     assert "buildSidebarCurriculumTree" not in source
-    assert "CustomCurriculumDeleteDialog" not in source
+    assert "CustomCurriculumDeleteDialog" not in curriculumTree
+    assert "CustomCurriculumDeleteDialog" in source
+    assert 'data-product-learning-data-settings="true"' in source
+    assert "LearningArchiveMenu" in source
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
     assert "productSidebarFlowItems(runtimeTier)" in flowNav
@@ -205,7 +209,8 @@ def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
     navigationHook = _read("editor/src/hooks/useCurriculumNavigationState.ts")
 
     assert "buildSidebarCurriculumTree" in curriculumTree
-    assert "CustomCurriculumDeleteDialog" in curriculumTree
+    assert "CustomCurriculumDeleteDialog" not in curriculumTree
+    assert "CustomCurriculumDeleteDialog" in productSidebar
     assert "useSidebarExpansionState" in curriculumTree
     assert "AutomationSidebarTree" in automationTree
     assert "selectedSection: AutomationSection" in automationTree
@@ -215,6 +220,18 @@ def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
     assert 'from "@/lib/customCurricula"' in navigationHook
     assert 'from "@/components/app/curriculumSidebarTree"' not in navigationHook
     assert 'from "@/components/app/productSidebar"' not in navigationHook
+
+
+def testCustomCurriculumManagementDoesNotHijackTheLearningRoute() -> None:
+    navigationHook = _read("editor/src/hooks/useCurriculumNavigationState.ts")
+    deleteBody = navigationHook.split(
+        "const deleteCustomCurriculum = useCallback",
+        maxsplit=1,
+    )[1].split("return {", maxsplit=1)[0]
+
+    assert "id === selectedCustomCurriculumId" in deleteBody
+    assert 'setSurface("curriculum")' not in deleteBody
+    assert "onNavigateCurriculum(" not in deleteBody
 
 
 def testProductSurfaceCopyMatchesFocusedFlow() -> None:
@@ -360,7 +377,7 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/lib/customCurricula.ts`",
         "`saveAndOpenCustomCurriculum`",
         "`editor/src/components/curriculum/curriculumDependencyPanel.tsx`",
-        "패키지 확인/누락 설치/터미널 명령 열기",
+        "필요한 패키지명, 준비 진행, 한 번의 준비·재시도 동작",
         "`editor/src/components/app/curriculumSidebarTree.tsx`",
         "`editor/src/components/app/automationSidebarTree.tsx`",
         "`tests/surface/testProductSurfaceContract.py`",

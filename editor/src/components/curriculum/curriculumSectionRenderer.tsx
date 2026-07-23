@@ -1,5 +1,3 @@
-import type { CellAiHelpState } from "@/lib/assistantTypes";
-import type { CellAiAction } from "@/lib/cellModel";
 import type { BlockConfig } from "@/types";
 import type { WebStrongCheckEvidenceEvent, WebStrongCheckEvidenceInput } from "@/lib/webLearningEvidence";
 import { blockLabel, stripBullet, stripMarkdown } from "@/lib/cellModel";
@@ -11,9 +9,6 @@ import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { dueAssessmentSectionIds, type AssessmentQueueContract } from "@/lib/curriculumAssessmentQueue";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
 import { Lightbulb, Loader2, Play } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { statusLabel } from "@/lib/displayFormat";
-import { CellAiActions } from "@/components/app/cellAiActions";
 import { cn } from "@/lib/utils";
 import { CurriculumLearningCell, curriculumInitialDraft } from "./curriculumLearningCell";
 import { isRecord, payloadTextList, readPayloadText, readSectionContract } from "./curriculumSurfaceHelpers";
@@ -24,7 +19,6 @@ import { SectionNarrative } from "./curriculumOverview";
 export function CurriculumSectionCard({
   canRun,
   category,
-  cellHelpByBlockId,
   contentId,
   drafts,
   index,
@@ -33,14 +27,12 @@ export function CurriculumSectionCard({
   runningBlockId,
   section,
   selectedBlockId,
-  onCellAsk,
   onDraftChange,
   onRunBlock,
   onSelectBlock,
 }: {
   canRun: boolean;
   category: string;
-  cellHelpByBlockId: Record<string, CellAiHelpState>;
   contentId: string;
   drafts: Record<string, string>;
   index: number;
@@ -49,7 +41,6 @@ export function CurriculumSectionCard({
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
-  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
@@ -63,7 +54,7 @@ export function CurriculumSectionCard({
       data-learning-section-card={section.id}
       data-learning-section-mode={readPayloadText(section.contract?.assessmentMode) || "acquisition"}
       data-learning-section-structured={structured ? "true" : "false"}
-      id={cellDomId(section.anchorBlockId)}
+      id={section.titleBlock ? cellDomId(section.anchorBlockId) : undefined}
     >
       <header className="grid w-full min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-3 border-b border-border px-4 py-4 text-left sm:px-6">
         <span
@@ -80,7 +71,7 @@ export function CurriculumSectionCard({
           ) : readPayloadText(section.contract?.assessmentMode) === "retrieval" ? (
             <span className="mb-1 block text-xs font-medium text-accent-brand">기억에서 다시 풀기</span>
           ) : null}
-          <h2 className="max-w-3xl text-lg font-bold text-foreground">{section.title}</h2>
+          <h2 className="max-w-3xl break-words text-lg font-bold text-foreground">{section.title}</h2>
           {section.subtitle ? <p className="mt-1 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">{section.subtitle}</p> : null}
         </div>
       </header>
@@ -91,7 +82,6 @@ export function CurriculumSectionCard({
         <StructuredSectionLearningBody
           canRun={canRun}
           category={category}
-          cellHelpByBlockId={cellHelpByBlockId}
           contentId={contentId}
           drafts={drafts}
           renderCodeCellEditor={renderCodeCellEditor}
@@ -99,7 +89,6 @@ export function CurriculumSectionCard({
           runningBlockId={runningBlockId}
           section={section}
           selectedBlockId={selectedBlockId}
-          onCellAsk={onCellAsk}
           onDraftChange={onDraftChange}
           onRunBlock={onRunBlock}
           onSelectBlock={onSelectBlock}
@@ -110,7 +99,6 @@ export function CurriculumSectionCard({
             <CurriculumLearningCell
               block={block}
               canRun={canRun}
-              cellHelp={cellHelpByBlockId[block.id]}
               draft={drafts[block.id] ?? curriculumInitialDraft(block)}
               isRunning={runningBlockId === block.id}
               isSelected={block.id === selectedBlockId}
@@ -118,7 +106,6 @@ export function CurriculumSectionCard({
               renderCodeCellEditor={renderCodeCellEditor}
               result={results[block.id]}
               variant="embedded"
-              onAsk={(action, question) => onCellAsk(action, block, question)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
               onSelect={() => onSelectBlock(block.id)}
@@ -260,7 +247,6 @@ export function sectionInfo(block: BlockConfig) {
 export function StructuredSectionLearningBody({
   canRun,
   category,
-  cellHelpByBlockId,
   contentId,
   drafts,
   renderCodeCellEditor,
@@ -268,14 +254,12 @@ export function StructuredSectionLearningBody({
   runningBlockId,
   section,
   selectedBlockId,
-  onCellAsk,
   onDraftChange,
   onRunBlock,
   onSelectBlock,
 }: {
   canRun: boolean;
   category: string;
-  cellHelpByBlockId: Record<string, CellAiHelpState>;
   contentId: string;
   drafts: Record<string, string>;
   renderCodeCellEditor: RenderCodeCellEditor;
@@ -283,7 +267,6 @@ export function StructuredSectionLearningBody({
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
-  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
@@ -356,7 +339,7 @@ export function StructuredSectionLearningBody({
       setEvidenceSaveState("saving");
       const evidenceInput = {
           actual: attemptCheck.actual,
-          aiHelpUsed: Boolean(cellHelpByBlockId[exercise.id]),
+          aiHelpUsed: false,
           artifacts: attemptCheck.artifacts,
           assessmentMode: sectionAssessmentMode(section),
           blockId: exercise.id,
@@ -422,19 +405,14 @@ export function StructuredSectionLearningBody({
           <div className="flex flex-wrap items-start gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
-              <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{blockLabel(exercise)}</h3>
+              <h3 className="mt-1 break-words text-[15px] font-bold leading-6 text-foreground">{blockLabel(exercise)}</h3>
               {exerciseDescription ? (
                 <p className="mt-1 max-w-3xl text-md font-normal text-foreground">
                   {exerciseDescription}
                 </p>
               ) : null}
             </div>
-            <div className="flex shrink-0 items-center gap-1.5">
-              {exerciseRunning || exerciseResult ? (
-                <Badge className="h-7 rounded-md px-2 text-xs" variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
-                  {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
-                </Badge>
-              ) : null}
+            <div className="flex shrink-0 items-center">
               <IconButton
                 className="size-7 rounded-md [&_svg]:size-3.5"
                 disabled={!canRun || exerciseRunning}
@@ -447,24 +425,19 @@ export function StructuredSectionLearningBody({
               >
                 {exerciseRunning ? <Loader2 className="animate-spin" /> : <Play />}
               </IconButton>
-              <CellAiActions
-                helpState={cellHelpByBlockId[exercise.id]}
-                selected={exerciseSelected}
-                onAsk={(action, question) => onCellAsk(action, exercise, question)}
-              />
             </div>
           </div>
 
           <div className="mt-3">
             <div
-              aria-label={`${blockLabel(exercise)} 직접 해보기 코드 편집기`}
               className="rounded-lg border border-border bg-code transition-colors hover:border-ring/60 focus-within:border-ring"
               data-learning-exercise-input="editor"
               data-learning-exercise-input-role="student-practice"
               data-learning-exercise-input-state={exerciseSelected ? "selected" : "ready"}
             >
               {renderCodeCellEditor({
-                autoFocus: exerciseSelected,
+                ariaLabel: `${blockLabel(exercise)} 직접 해보기 코드 편집기`,
+                autoFocus: false,
                 block: exercise,
                 draft: exerciseDraft,
                 onChange: updateExerciseDraft,
@@ -476,7 +449,6 @@ export function StructuredSectionLearningBody({
 
           {exerciseResult || exerciseRunning ? (
             <div className="mt-3" data-learning-section-part="result">
-              <div className="mb-1.5 text-xs font-medium text-muted-foreground">실행 결과</div>
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
             </div>
           ) : null}
@@ -505,26 +477,26 @@ export function StructuredSectionLearningBody({
               data-learning-check-result={attemptCheck.state}
               data-learning-check-evidence={attemptCheck.evidence}
               data-learning-check-executor={attemptCheck.executor}
+              data-learning-evidence-state={
+                attemptCheck.passed && attemptCheck.evidence === "strong"
+                  ? evidenceSaveState
+                  : undefined
+              }
               role="status"
             >
               <div className="font-bold text-foreground">
                 {attemptCheck.passed
-                  ? attemptCheck.evidence === "strong" ? "격리 검증 통과" : "연습 검증 통과"
+                  ? "연습 완료"
                   : attemptCheck.state === "unsupported"
-                    ? "연습 결과 확인"
-                    : "연습 검증 미통과"}
+                    ? "출력을 확인해 보세요"
+                    : "다시 확인해 보세요"}
               </div>
-              <p className="mt-1 leading-6 text-muted-foreground">{attemptCheck.feedback}</p>
-              {attemptCheck.passed && attemptCheck.evidence === "strong" ? (
-                <p
-                  className={cn("mt-1 leading-6", evidenceSaveState === "error" ? "text-destructive" : "text-muted-foreground")}
-                  data-learning-evidence-state={evidenceSaveState}
-                >
-                  {evidenceSaveState === "stored"
-                    ? "검증 증거가 이 브라우저에 저장되었습니다."
-                    : evidenceSaveState === "error"
-                      ? "검증은 통과했지만 증거 저장에 실패했습니다. 다시 실행해 주세요."
-                      : "검증 증거를 저장하는 중입니다."}
+              {!attemptCheck.passed ? (
+                <p className="mt-1 leading-6 text-muted-foreground">{attemptCheck.feedback}</p>
+              ) : null}
+              {attemptCheck.passed && attemptCheck.evidence === "strong" && evidenceSaveState === "error" ? (
+                <p className="mt-1 leading-6 text-destructive">
+                  학습 기록을 저장하지 못했습니다. 셀을 다시 실행해 주세요.
                 </p>
               ) : null}
               {!attemptCheck.passed && exercise.guide?.hints?.[0] ? (
@@ -542,7 +514,6 @@ export function StructuredSectionLearningBody({
             <CurriculumLearningCell
               block={block}
               canRun={canRun}
-              cellHelp={cellHelpByBlockId[block.id]}
               draft={drafts[block.id] ?? curriculumInitialDraft(block)}
               isRunning={runningBlockId === block.id}
               isSelected={block.id === selectedBlockId}
@@ -550,7 +521,6 @@ export function StructuredSectionLearningBody({
               renderCodeCellEditor={renderCodeCellEditor}
               result={results[block.id]}
               variant="embedded"
-              onAsk={(action, question) => onCellAsk(action, block, question)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
               onSelect={() => onSelectBlock(block.id)}

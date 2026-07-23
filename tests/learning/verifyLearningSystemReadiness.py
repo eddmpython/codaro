@@ -93,7 +93,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "meta:",
                     "intro:",
                     "sections:",
-                    "title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check",
+                    "title → subtitle → goal → why → explanation → tips → snippet → exercise → result → automatic feedback",
                     "sectionContract:*",
                     "contractGapCount: 0",
                 )),
@@ -151,35 +151,58 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
         ),
         fileCriterion(
             "section-card-render-contract",
-            "Section learning cards render as one structured card with stable marker parts.",
+            "The composed curriculum surface renders each section as one structured card with stable marker parts.",
             (
                 ("editor/src/components/curriculum/curriculumSurface.tsx", (
+                    "LearningOverviewHeader",
+                    "CurriculumSectionCard",
+                    "groupCurriculumSections",
+                )),
+                ("editor/src/components/curriculum/curriculumSectionRenderer.tsx", (
                     "data-learning-section-card",
                     "data-learning-section-structured",
                     "data-learning-section-part",
                     "data-learning-section-index",
                     "data-learning-section-heading",
-                    "data-learning-toc=\"push\"",
                     "data-learning-exercise-input",
                     "data-learning-exercise-input-role",
-                    "data-learning-code-input",
-                    "data-learning-code-input-role",
                     "sectionContract:snippet",
                     "sectionContract:exercise",
-                    "function SectionNarrative",
-                    "function StructuredSectionLearningBody",
+                    "export function StructuredSectionLearningBody",
+                )),
+                ("editor/src/components/curriculum/curriculumOverview.tsx", (
+                    "export function SectionNarrative",
+                    "data-learning-section-part=\"overview\"",
+                )),
+                ("editor/src/components/curriculum/curriculumToc.tsx", (
+                    "data-learning-toc=\"push\"",
+                    "data-learning-toc-section",
+                )),
+                ("editor/src/components/curriculum/curriculumLearningCell.tsx", (
+                    "data-learning-code-input",
+                    "data-learning-code-input-role",
                 )),
                 ("editor/src/components/curriculum/curriculumDependencyPanel.tsx", (
-                    "data-learning-package-command-row",
-                    "data-learning-package-terminal-open",
                     "data-learning-package-status",
                     "data-learning-package-item",
+                    "data-learning-package-install",
+                    "라이브러리 준비",
+                    "다시 시도",
                 )),
                 ("editor/src/components/curriculum/curriculumMarkdownBody.tsx", (
+                    "displayKind === \"prose\"",
+                    "displayKind === \"practice\"",
+                    "<ProseLearningCell",
+                    "<PracticePromptCell",
+                    "<MarkdownBlock",
+                )),
+                ("editor/src/components/curriculum/curriculumMarkdownDataCells.tsx", (
                     "function SectionLead",
-                    "function ProseLearningCell",
-                    "function PracticePromptCell",
-                    "function MarkdownBlock",
+                    "export function ProseLearningCell",
+                    "export function PracticePromptCell",
+                )),
+                ("editor/src/components/curriculum/curriculumMarkdownRichText.tsx", (
+                    "export function MarkdownBlock",
                 )),
                 ("editor/src/components/app/appPrimitives.tsx", (
                     "data-code-payload=\"snippet\"",
@@ -274,10 +297,14 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             "Lesson overview title, direction, and learn list flow directly into the lesson in desktop and mobile browser rendering.",
             (
                 ("editor/src/components/curriculum/curriculumSurface.tsx", (
+                    "LearningOverviewHeader",
+                    "CurriculumSectionCard",
+                )),
+                ("editor/src/components/curriculum/curriculumOverview.tsx", (
                     "data-learning-overview",
                     "data-learning-overview-part=\"learn-list\"",
                     "오늘 배우는 것",
-                    "SectionNarrative",
+                    "export function SectionNarrative",
                 )),
                 ("tests/learning/verifyLearningCardPlaywright.py", (
                     "yamlToDocument",

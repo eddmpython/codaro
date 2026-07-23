@@ -15,6 +15,10 @@ PYPROC_ASSET_SCRIPT = EDITOR_DIR / "scripts" / "generatePyprocAssets.mjs"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
 BROWSER_RUNTIME = EDITOR_DIR / "src" / "lib" / "browserPythonRuntime.ts"
 AUTOMATION_CELL_RUNTIME = EDITOR_DIR / "src" / "lib" / "automationCellRuntime.ts"
+AUTOMATION_PRESENTATION = EDITOR_DIR / "src" / "lib" / "automationPresentation.ts"
+LEARNING_ATTEMPT_CHECK = EDITOR_DIR / "src" / "lib" / "learningAttemptCheck.ts"
+DISPLAY_FORMAT = EDITOR_DIR / "src" / "lib" / "displayFormat.ts"
+TRACEBACK_PARSER = EDITOR_DIR / "src" / "lib" / "tracebackParser.ts"
 LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
 PYTHON_STDLIB = EDITOR_DIR / "src" / "lib" / "pythonStdlib.ts"
@@ -22,6 +26,7 @@ LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
 DEP_GRAPH_LAYOUT = EDITOR_DIR / "src" / "lib" / "dependencyGraphLayout.ts"
 APP_PRIMITIVES = EDITOR_DIR / "src" / "components" / "app" / "appPrimitives.tsx"
 APP_ENTRY = EDITOR_DIR / "src" / "App.tsx"
+DAY01_CURRICULUM = ROOT / "curricula" / "python" / "basics" / "30days" / "day01_헬로월드.yaml"
 
 
 def main() -> int:
@@ -59,12 +64,17 @@ def sourceContractFailures() -> list[str]:
         NOTEBOOK_RUNTIME,
         BROWSER_RUNTIME,
         AUTOMATION_CELL_RUNTIME,
+        AUTOMATION_PRESENTATION,
+        LEARNING_ATTEMPT_CHECK,
+        DISPLAY_FORMAT,
+        TRACEBACK_PARSER,
         LOCAL_RUNTIME,
         PACKAGE_INFERENCE,
         PYTHON_STDLIB,
         LOCALE_COPY,
         APP_PRIMITIVES,
         APP_ENTRY,
+        DAY01_CURRICULUM,
     ):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
@@ -77,6 +87,10 @@ def sourceContractFailures() -> list[str]:
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
     browserRuntimeText = BROWSER_RUNTIME.read_text(encoding="utf-8")
     automationCellText = AUTOMATION_CELL_RUNTIME.read_text(encoding="utf-8")
+    automationPresentationText = AUTOMATION_PRESENTATION.read_text(encoding="utf-8")
+    learningAttemptText = LEARNING_ATTEMPT_CHECK.read_text(encoding="utf-8")
+    displayFormatText = DISPLAY_FORMAT.read_text(encoding="utf-8")
+    tracebackParserText = TRACEBACK_PARSER.read_text(encoding="utf-8")
     localRuntimeText = LOCAL_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
     stdlibText = PYTHON_STDLIB.read_text(encoding="utf-8")
@@ -127,9 +141,35 @@ def sourceContractFailures() -> list[str]:
         ),
         AUTOMATION_CELL_RUNTIME: (
             "runAutomationCell",
-            "runtime.automationCellDone",
-            "runtime.automationCellFailed",
+            "automationPresentationCopy",
             "AutomationSessionCellPayload",
+        ),
+        AUTOMATION_PRESENTATION: (
+            "automationExecutionPresentation",
+            "automationPresentationCopy",
+            "automationSessionPresentation",
+            "runtime.automationStarted",
+            "runtime.automationCompleted",
+            "runtime.automationCancelled",
+            "runtime.automationTimedOut",
+            "runtime.automationFailed",
+            "sanitizeAutomationDetail",
+            "cancelledStatuses",
+            "timeoutStatuses",
+            "failedStatuses",
+            "readableFields",
+        ),
+        LEARNING_ATTEMPT_CHECK: (
+            "evaluateLearningAttempt",
+            "practiceActualOutput",
+            "stringifyData",
+            "decodePythonStringRepr",
+        ),
+        TRACEBACK_PARSER: (
+            "learnerFacingErrorText",
+            "pythonErrorSummary",
+            "sanitizeLearnerErrorDetail",
+            "CELL_FILE_HINTS",
         ),
         LOCAL_RUNTIME: (
             "buildLocalExecutionResult",
@@ -153,12 +193,10 @@ def sourceContractFailures() -> list[str]:
         LOCALE_COPY: (
             "라이브러리 준비 실패",
             "uv로 준비한 뒤 실행했습니다",
-            "런타임 산출물",
         ),
         APP_PRIMITIVES: (
-            "data-runtime-artifacts",
-            "data-runtime-artifact-kind",
-            "system.runtimeArtifacts",
+            "automationExecutionPresentation",
+            "learnerFacingErrorText",
         ),
         APP_ENTRY: (
             "codaroBrowserRuntimeDiagnostics",
@@ -171,6 +209,10 @@ def sourceContractFailures() -> list[str]:
         NOTEBOOK_RUNTIME: runtimeText,
         BROWSER_RUNTIME: browserRuntimeText,
         AUTOMATION_CELL_RUNTIME: automationCellText,
+        AUTOMATION_PRESENTATION: automationPresentationText,
+        LEARNING_ATTEMPT_CHECK: learningAttemptText,
+        DISPLAY_FORMAT: displayFormatText,
+        TRACEBACK_PARSER: tracebackParserText,
         LOCAL_RUNTIME: localRuntimeText,
         PACKAGE_INFERENCE: inferenceText,
         PYTHON_STDLIB: stdlibText,
@@ -357,6 +399,11 @@ def runRuntimeProbe() -> tuple[str | None, str]:
 def nodeProbeScript() -> str:
     runtimePath = json.dumps(str(NOTEBOOK_RUNTIME), ensure_ascii=False)
     automationRuntimePath = json.dumps(str(AUTOMATION_CELL_RUNTIME), ensure_ascii=False)
+    automationPresentationPath = json.dumps(str(AUTOMATION_PRESENTATION), ensure_ascii=False)
+    learningAttemptPath = json.dumps(str(LEARNING_ATTEMPT_CHECK), ensure_ascii=False)
+    displayFormatPath = json.dumps(str(DISPLAY_FORMAT), ensure_ascii=False)
+    tracebackParserPath = json.dumps(str(TRACEBACK_PARSER), ensure_ascii=False)
+    day01CurriculumPath = json.dumps(str(DAY01_CURRICULUM), ensure_ascii=False)
     inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
     stdlibPath = json.dumps(str(PYTHON_STDLIB), ensure_ascii=False)
     layoutPath = json.dumps(str(DEP_GRAPH_LAYOUT), ensure_ascii=False)
@@ -389,6 +436,7 @@ function loadModule(filePath, customRequire) {{
 
 const calls = [];
 let installFails = false;
+let automationFixture = "success";
 const fakeResult = {{
   type: "execute_result",
   blockId: "cell-1",
@@ -399,6 +447,28 @@ const fakeResult = {{
   stateDelta: {{ added: [], updated: [], removed: [] }},
   executionCount: 1,
   status: "ok",
+}};
+const cancelledBackendPayload = {{
+  sessionKey: "browser:orders",
+  sessionId: "session-private-cancelled",
+  kind: "browser",
+  op: "step",
+  action: "navigate",
+  status: "cancelled",
+  result: {{}},
+  step: {{
+    id: "step-private-cancelled",
+    sessionId: "session-private-cancelled",
+    action: "navigate",
+    status: "cancelled",
+    startedAt: "2026-07-23T00:00:00+00:00",
+    finishedAt: "2026-07-23T00:00:01+00:00",
+    durationMs: 1000,
+    error: "Emergency stop is active: 사용자 요청 session-private-cancelled browser:orders 123e4567-e89b-42d3-a456-426614174000",
+    result: {{}},
+  }},
+  state: null,
+  opened: false,
 }};
 const fakeApi = {{
   createSession: async () => {{
@@ -442,6 +512,7 @@ const fakeApi = {{
   }},
   runAutomationCell: async (payload) => {{
     calls.push(["automation-cell", payload.blockId, payload.executionKind, payload.sessionId]);
+    if (automationFixture === "cancelled") return cancelledBackendPayload;
     return {{
       sessionKey: "browser:orders",
       sessionId: "auto-session-1",
@@ -468,8 +539,19 @@ const inference = loadModule({inferencePath}, (specifier) => {{
 function translate(key, values) {{
   const messages = {{
     "runtime.cellRunDone": "셀 실행 완료",
-    "runtime.automationCellDone": "자동화 셀 실행 완료",
-    "runtime.automationCellFailed": "자동화 셀 실패",
+    "runtime.automationStarted": "자동화 시작",
+    "runtime.automationStartedDetail": "자동화가 준비되어 다음 동작을 이어갈 수 있습니다.",
+    "runtime.automationCompleted": "자동화 완료",
+    "runtime.automationCompletedDetail": "요청한 동작을 마쳤습니다.",
+    "runtime.automationCancelled": "자동화 중단",
+    "runtime.automationCancelledDetail": "비상 정지 또는 취소 요청으로 자동화를 중단했습니다.",
+    "runtime.automationCancelledReason": "자동화를 중단했습니다. 사유: {{reason}}",
+    "runtime.automationTimedOut": "자동화 시간 초과",
+    "runtime.automationTimedOutDetail": "제한 시간 안에 동작을 마치지 못했습니다.",
+    "runtime.automationTimedOutReason": "제한 시간 안에 동작을 마치지 못했습니다. 사유: {{reason}}",
+    "runtime.automationFailed": "자동화 실패",
+    "runtime.automationFailedDetail": "오류를 확인하고 자동화를 다시 실행해 주세요.",
+    "runtime.automationOutputUnavailable": "자동화 결과를 안전하게 표시할 수 없습니다. 다시 실행해 주세요.",
     "runtime.executionFailed": "실행 실패",
     "runtime.evaluatedCells": "{{count}}개 셀을 평가했습니다.",
     "runtime.libraryFailed": "라이브러리 준비 실패",
@@ -489,8 +571,214 @@ const cellModel = {{
   isPersistentAutomationBlock: (block) => block.type === "automation" && ["browser", "os", "mouse"].includes(block.executionKind),
   isKernelExecutableBlock: (block) => (block.type === "code" || block.type === "automation") && !(block.type === "automation" && ["browser", "os", "mouse"].includes(block.executionKind)),
 }};
+const automationPresentation = loadModule({automationPresentationPath}, (specifier) => {{
+  if (specifier === "@/types") return {{}};
+  return require(specifier);
+}});
+const displayFormat = loadModule({displayFormatPath}, (specifier) => require(specifier));
+const tracebackParser = loadModule({tracebackParserPath}, (specifier) => require(specifier));
+const learningAttempt = loadModule({learningAttemptPath}, (specifier) => {{
+  if (specifier === "@/lib/browserLearningCheckExecutor") {{
+    return {{ executeBrowserStrongCheck: async () => {{ throw new Error("unexpected strong check"); }} }};
+  }}
+  if (specifier === "@/lib/displayFormat") return displayFormat;
+  if (specifier === "@/lib/learningCheckSpec") return {{ parseStrongLearningCheckSpec: () => null }};
+  if (specifier === "@/lib/localLearningCheckExecutor") {{
+    return {{ executeLocalStrongCheck: async () => {{ throw new Error("unexpected strong check"); }} }};
+  }}
+  if (specifier === "@/types" || specifier === "@/lib/webLearningEvidence") return {{}};
+  return require(specifier);
+}});
+const yaml = require(require.resolve("yaml", {{ paths: [{editorDir}] }}));
+const day01 = yaml.parse(fs.readFileSync({day01CurriculumPath}, "utf8"));
+const notebookExpression = day01.sections.find((section) => section.id === "notebook_expression");
+assert.ok(notebookExpression, "day01 notebook_expression lesson exists");
+const notebookExpressionAttempt = await learningAttempt.evaluateLearningAttempt(
+  notebookExpression.check,
+  {{
+    ...fakeResult,
+    type: "text",
+    data: "'Hello Notebook'",
+    stdout: "",
+    status: "done",
+  }},
+  notebookExpression.exercise.starterCode,
+  "local",
+);
+assert.equal(notebookExpressionAttempt.actual, "Hello Notebook");
+assert.equal(notebookExpressionAttempt.expected, "Hello Notebook");
+assert.equal(notebookExpressionAttempt.passed, true);
+assert.equal(notebookExpressionAttempt.state, "verified");
+assert.equal(
+  learningAttempt.practiceActualOutput({{
+    ...fakeResult,
+    type: "text",
+    data: "'data must not replace stdout'",
+    stdout: "stdout wins\\n",
+    status: "done",
+  }}),
+  "stdout wins",
+);
+const pyodideSyntaxError = [
+  "PythonError: Traceback (most recent call last):",
+  '  File "/lib/python314.zip/_pyodide/_base.py", line 597, in eval_code_async',
+  "    await CodeRunner(",
+  '  File "/lib/python314.zip/_pyodide/_base.py", line 411, in run_async',
+  '  File "<exec>", line 3',
+  "    print(",
+  "         ^",
+  "SyntaxError: '(' was never closed",
+  "session-private-syntax 123e4567-e89b-42d3-a456-426614174000",
+].join("\\n");
+assert.equal(
+  tracebackParser.learnerFacingErrorText(pyodideSyntaxError),
+  "SyntaxError: '(' was never closed\\nline 3",
+);
+const pyodideNameError = [
+  "Traceback (most recent call last):",
+  '  File "/lib/python314.zip/_pyodide/_base.py", line 411, in run_async',
+  '  File "/home/web/codaro/cells/py-private.py", line 2, in <module>',
+  "NameError: name 'total' is not defined",
+].join("\\n");
+assert.equal(
+  tracebackParser.learnerFacingErrorText(pyodideNameError),
+  "NameError: name 'total' is not defined\\nline 2",
+);
+const missingFileError = tracebackParser.learnerFacingErrorText(
+  "FileNotFoundError: [Errno 2] No such file or directory: '/home/web/codaro/runs/private.json' "
+  + "session-private-file 123e4567-e89b-42d3-a456-426614174000",
+);
+assert.equal(missingFileError, "FileNotFoundError: [Errno 2] No such file or directory");
+assert.doesNotMatch(
+  tracebackParser.learnerFacingErrorText(pyodideSyntaxError),
+  /_pyodide|python314[.]zip|[/]lib[/]|session-private|123e4567/,
+);
+assert.equal(
+  tracebackParser.learnerFacingErrorText("라이브러리 준비 실패\\ninstall failed"),
+  "라이브러리 준비 실패\\ninstall failed",
+);
+assert.equal(
+  automationPresentation.sanitizeAutomationDetail(
+    "완료 123e4567-e89b-42d3-a456-426614174000 session-private-7 browser:orders",
+  ),
+  "완료",
+);
+assert.equal(
+  automationPresentation.sanitizeAutomationDetail(
+    '실패 {{"sessionId":"private-1","action":"click","status":"failed","opened":false}}',
+  ),
+  "실패",
+);
+assert.equal(
+  automationPresentation.sanitizeAutomationDetail(
+    "https://example.test/orders?view=student&sessionId=secret&sessionKey=browser%3Aorders#overview /home/web/codaro/cells/py-private.py",
+  ),
+  "https://example.test/orders?view=student#overview",
+);
+for (const [status, expectedKind] of [
+  ["cancelled", "cancelled"],
+  ["canceled", "cancelled"],
+  ["timeout", "timeout"],
+  ["timed-out", "timeout"],
+]) {{
+  const presentation = automationPresentation.automationSessionPresentation({{
+    ...cancelledBackendPayload,
+    status,
+    step: {{
+      ...cancelledBackendPayload.step,
+      status,
+      error: status === "timeout" || status === "timed-out"
+        ? "step timeout after 30 seconds session-private-cancelled browser:orders"
+        : "Emergency stop is active: 사용자 요청 session-private-cancelled browser:orders",
+    }},
+  }});
+  assert.equal(presentation.state, "failed");
+  assert.equal(presentation.failureKind, expectedKind);
+}}
+const emptyStderrCancellation = automationPresentation.automationExecutionPresentation(
+  {{ data: cancelledBackendPayload, status: "error", stderr: "" }},
+  translate,
+);
+assert.equal(emptyStderrCancellation.hasError, true);
+assert.equal(emptyStderrCancellation.copy.title, "자동화 중단");
+assert.equal(emptyStderrCancellation.copy.detail, "자동화를 중단했습니다. 사유: 사용자 요청");
+assert.doesNotMatch(
+  emptyStderrCancellation.copy.title + emptyStderrCancellation.copy.detail,
+  /session-private-cancelled|browser:orders|123e4567-e89b-42d3-a456-426614174000|sessionId|action|status/,
+);
+const malformedOutput = automationPresentation.automationExecutionPresentation(
+  {{
+    data: {{
+      sessionId: "session-version-skew-private",
+      kind: "browser",
+      action: "navigate",
+      status: "success",
+      state: {{ title: "VERSION_SKEW_INTERNAL_STATE" }},
+    }},
+    status: "error",
+    stderr: "",
+  }},
+  translate,
+);
+assert.equal(malformedOutput.valid, false);
+assert.equal(malformedOutput.hasError, true);
+assert.equal(malformedOutput.copy.title, "자동화 실패");
+assert.equal(malformedOutput.copy.detail, "자동화 결과를 안전하게 표시할 수 없습니다. 다시 실행해 주세요.");
+assert.doesNotMatch(
+  malformedOutput.copy.title + malformedOutput.copy.detail,
+  /session-version-skew-private|VERSION_SKEW_INTERNAL_STATE|sessionId|action|status/,
+);
+const unopenedSessionOutput = automationPresentation.automationExecutionPresentation(
+  {{
+    data: null,
+    status: "error",
+    stderr: "자동화 실패\\nAutomation session is not open: browser:orders session-private-unopened",
+  }},
+  translate,
+);
+assert.equal(unopenedSessionOutput.valid, false);
+assert.equal(unopenedSessionOutput.presentation.failureKind, "failed");
+assert.equal(unopenedSessionOutput.copy.title, "자동화 실패");
+assert.equal(unopenedSessionOutput.copy.detail, "Automation session is not open");
+assert.doesNotMatch(
+  unopenedSessionOutput.copy.detail,
+  /browser:orders|session-private-unopened|sessionId|sessionKey/,
+);
+const networkFailureOutput = automationPresentation.automationExecutionPresentation(
+  {{
+    data: null,
+    status: "error",
+    stderr: "자동화 실패\\nNetwork request failed /home/web/codaro/runs/private-run.json session-private-network",
+  }},
+  translate,
+);
+assert.equal(networkFailureOutput.valid, false);
+assert.equal(networkFailureOutput.presentation.failureKind, "failed");
+assert.equal(networkFailureOutput.copy.title, "자동화 실패");
+assert.equal(networkFailureOutput.copy.detail, "Network request failed");
+assert.doesNotMatch(
+  networkFailureOutput.copy.detail,
+  /[/]home[/]web[/]codaro[/]runs|private-run|session-private-network/,
+);
+const interruptedOutput = automationPresentation.automationExecutionPresentation(
+  {{
+    data: null,
+    status: "error",
+    stderr: "자동화 실패\\nEmergency stop is active: 사용자 요청 browser:orders session-private-interrupted",
+  }},
+  translate,
+);
+assert.equal(interruptedOutput.valid, false);
+assert.equal(interruptedOutput.presentation.failureKind, "cancelled");
+assert.equal(interruptedOutput.copy.title, "자동화 중단");
+assert.equal(interruptedOutput.copy.detail, "자동화를 중단했습니다. 사유: 사용자 요청");
+assert.doesNotMatch(
+  interruptedOutput.copy.detail,
+  /Emergency stop|browser:orders|session-private-interrupted|sessionId|sessionKey/,
+);
 const automationCellRuntime = loadModule({automationRuntimePath}, (specifier) => {{
   if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/automationPresentation") return automationPresentation;
   if (specifier === "@/lib/localeCopy") return {{ translate }};
   if (specifier === "@/types") return {{}};
   return require(specifier);
@@ -594,7 +882,41 @@ const automationOutcome = await runtime.runNotebookBlock({{
 assert.equal(automationOutcome.sessionId, "session-1");
 assert.equal(automationOutcome.automationSessionId, "auto-session-1");
 assert.equal(automationOutcome.result.status, "done");
-assert.match(automationOutcome.notice.title, /자동화 셀 실행 완료/);
+assert.equal(automationOutcome.notice.title, "자동화 시작");
+assert.equal(automationOutcome.notice.detail, "stub\\nabout:blank");
+assert.equal(automationOutcome.result.stdout, "자동화 시작\\nstub\\nabout:blank");
+assert.equal(automationOutcome.result.stderr, "");
+assert.equal(automationOutcome.result.data.sessionId, "auto-session-1");
+assert.doesNotMatch(
+  automationOutcome.result.stdout + automationOutcome.notice.title + automationOutcome.notice.detail,
+  /auto-session-1|browser:orders|sessionId|sessionKey|opened|closed|action/,
+);
+assert.deepEqual(calls.map((call) => call[0]), ["automation-cell"]);
+
+calls.length = 0;
+automationFixture = "cancelled";
+const cancelledAutomation = await runtime.runNotebookBlock({{
+  apiOnline: true,
+  block: automationBlock,
+  code: automationBlock.content,
+  localExecutionCount: 3,
+  runtimePackages: ["numpy"],
+  sessionId: "session-1",
+  automationSessionId: "auto-session-1",
+}});
+assert.equal(cancelledAutomation.result.status, "error");
+assert.equal(cancelledAutomation.notice.title, "자동화 중단");
+assert.equal(cancelledAutomation.notice.detail, "자동화를 중단했습니다. 사유: 사용자 요청");
+assert.equal(
+  cancelledAutomation.result.stderr,
+  "자동화 중단\\n자동화를 중단했습니다. 사유: 사용자 요청",
+);
+assert.equal(cancelledAutomation.result.stdout, "");
+assert.equal(cancelledAutomation.result.data.status, "cancelled");
+assert.doesNotMatch(
+  cancelledAutomation.result.stderr + cancelledAutomation.notice.title + cancelledAutomation.notice.detail,
+  /session-private-cancelled|browser:orders|123e4567-e89b-42d3-a456-426614174000|sessionId|sessionKey|opened|closed|action|status/,
+);
 assert.deepEqual(calls.map((call) => call[0]), ["automation-cell"]);
 
 calls.length = 0;
@@ -663,6 +985,7 @@ const graphLayout = loadModule({layoutPath}, (specifier) => require(specifier));
 process.stdout.write(JSON.stringify({{
   directRun: outcome.notice.detail,
   automationRun: automationOutcome.notice.detail,
+  automationCancelled: cancelledAutomation.notice.detail,
   failure: failed.notice.title,
   reactiveOrder: calls.map((call) => call[0]),
 }}, null, 2));

@@ -122,6 +122,11 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .appFrame {
   min-height: 100vh;
 }
@@ -1059,6 +1064,49 @@ input:focus-visible {
 .searchResults {
   max-width: 860px;
   margin-top: 20px;
+}
+
+.searchPage {
+  min-height: calc(100svh - 64px);
+}
+
+.searchState {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 8px;
+  min-height: 180px;
+  padding: 22px 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+}
+
+.searchState strong {
+  color: var(--card-foreground);
+}
+
+.searchState p {
+  margin: 0;
+}
+
+.searchRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--card-foreground);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.searchRetry:hover {
+  border-color: var(--ring);
 }
 
 .searchResults a {

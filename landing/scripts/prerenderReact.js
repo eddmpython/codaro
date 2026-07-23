@@ -11,7 +11,7 @@ import { curriculumLessons } from "../src/lib/generated/curriculum.js";
 import { buildLearningResourceJsonLd } from "../src/lib/seo.js";
 import { buildBreadcrumbJsonLd } from "../src/lib/seo.js";
 import { designSurfaceForPath } from "../src/lib/publicRouting.js";
-import { homeMeta, learnMeta } from "../src/lib/publicMeta.js";
+import { homeMeta, learnMeta, searchMeta } from "../src/lib/publicMeta.js";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { createServer } from "vite";
@@ -140,8 +140,7 @@ const routes = [
   })),
   {
     path: "/search",
-    title: "검색",
-    description: "Codaro 문서와 글을 한 번에 검색한다.",
+    ...searchMeta,
     body: searchBody(),
   },
   {

@@ -174,6 +174,7 @@ def verifyEntryPoints(failures: list[str]) -> None:
 
 def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     landingProvider = (ROOT / "landing/src/components/codaroThemeProvider.jsx").read_text(encoding="utf-8")
+    landingBrowserEffect = (ROOT / "landing/src/lib/useBrowserLayoutEffect.js").read_text(encoding="utf-8")
     editorProvider = (ROOT / "editor/src/lib/codaroDesign.tsx").read_text(encoding="utf-8")
     for label, source in (("landing", landingProvider), ("editor", editorProvider)):
         require('const themeStorageKey = "codaro-theme"' in source, f"{label} theme storage key is not shared", failures)
@@ -191,11 +192,28 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         require("themeCanvasColors" in source, f"{label} provider must use generated canvas colors", failures)
         require("root.dataset.theme = resolvedTheme" in source, f"{label} provider misses resolved data-theme", failures)
         require('meta[name="theme-color"]' in source, f"{label} provider must update browser chrome color", failures)
-        require("useLayoutEffect" in source, f"{label} provider must settle theme before browser paint", failures)
+        if label == "landing":
+            require(
+                "useBrowserLayoutEffect" in source
+                and 'from "../lib/useBrowserLayoutEffect.js"' in source
+                and "useLayoutEffect" in landingBrowserEffect
+                and 'typeof window === "undefined"' in landingBrowserEffect,
+                "landing provider must use the SSR-safe shared prepaint effect",
+                failures,
+            )
+        else:
+            require("useLayoutEffect" in source, "editor provider must settle theme before browser paint", failures)
 
     require(
-        "useState(readStoredTheme)" in landingProvider,
-        "landing must initialize from stored theme before the first React paint",
+        'useState("system")' in landingProvider
+        and "const storedTheme = readStoredTheme()" in landingProvider,
+        "landing must hydrate from the SSR theme before restoring the stored theme",
+        failures,
+    )
+    require(
+        "useState({ matches: false, ready: false })" in landingProvider
+        and "themeMode !== \"system\" || darkPreference.ready" in landingProvider,
+        "landing media queries must preserve the bootstrapped system theme until layout-time synchronization",
         failures,
     )
 
@@ -223,6 +241,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     lessonPage = (ROOT / "landing/src/pages/lesson.jsx").read_text(encoding="utf-8")
     publicRouting = (ROOT / "landing/src/lib/publicRouting.js").read_text(encoding="utf-8")
     curriculum = (ROOT / "editor/src/components/curriculum/curriculumSurface.tsx").read_text(encoding="utf-8")
+    curriculumHome = (ROOT / "editor/src/components/curriculum/curriculumHome.tsx").read_text(encoding="utf-8")
+    curriculumToc = (ROOT / "editor/src/components/curriculum/curriculumToc.tsx").read_text(encoding="utf-8")
+    curriculumLearningCell = (ROOT / "editor/src/components/curriculum/curriculumLearningCell.tsx").read_text(encoding="utf-8")
+    curriculumSectionRenderer = (ROOT / "editor/src/components/curriculum/curriculumSectionRenderer.tsx").read_text(encoding="utf-8")
     loadingSurface = (ROOT / "editor/src/components/app/currentLearningSurface.tsx").read_text(encoding="utf-8")
     notebookSurface = (ROOT / "editor/src/components/app/notebookSurface.tsx").read_text(encoding="utf-8")
     runtimeRail = (ROOT / "editor/src/components/app/runtimeCapabilityRail.tsx").read_text(encoding="utf-8")
@@ -231,6 +253,8 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     automationRunInspector = (ROOT / "editor/src/components/automation/automationRunInspector.tsx").read_text(encoding="utf-8")
     mainSurface = (ROOT / "editor/src/components/app/mainSurface.tsx").read_text(encoding="utf-8")
     topBar = (ROOT / "editor/src/components/app/topBar.tsx").read_text(encoding="utf-8")
+    productSidebar = (ROOT / "editor/src/components/app/productSidebar.tsx").read_text(encoding="utf-8")
+    app = (ROOT / "editor/src/App.tsx").read_text(encoding="utf-8")
     editorCss = (ROOT / "editor/src/index.css").read_text(encoding="utf-8")
     require(
         all(
@@ -263,7 +287,32 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     )
     require('data-learning-overview-start="true"' not in curriculum, "redundant lesson start button returned", failures)
     require('data-curriculum-loading="true"' in loadingSurface, "deep-linked lesson needs a non-interactive loading state", failures)
-    require('className="hidden min-h-0 xl:block"' in loadingSurface, "mobile learning must not place the assistant before lesson cards", failures)
+    require(
+        "TeacherPanel" not in loadingSurface
+        and "CellAiActions" not in curriculumLearningCell
+        and "CellAiActions" not in curriculumSectionRenderer
+        and 'const showAssistantToggle = surface === "editor"' in topBar,
+        "curriculum must rely on automatic inline feedback without duplicate AI controls",
+        failures,
+    )
+    require(
+        'const learningMode = surface === "curriculum"' in productSidebar
+        and 'data-learning-focus-mode={learningMode ? "true" : "false"}' in productSidebar
+        and 'data-product-brand="escape"' in productSidebar
+        and 'data-product-learning-data-settings="true"' in productSidebar
+        and "{learningMode ? null : (" in productSidebar
+        and "LearningArchiveMenu" not in curriculum
+        and "LearningArchiveMenu" not in curriculumHome,
+        "curriculum focus mode must remove product utilities while keeping one real escape action",
+        failures,
+    )
+    require(
+        'data-learning-toc-expanded={expanded ? "true" : "false"}' in curriculumToc
+        and "hover:w-72" not in curriculumToc
+        and '--learning-toc-width' in loadingSurface,
+        "curriculum TOC must expand in layout without an overlay hover rail",
+        failures,
+    )
     require(
         'data-notebook-assistant-shell="desktop"' in notebookSurface
         and 'className="hidden min-h-0 xl:block"' in notebookSurface,
@@ -312,11 +361,18 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        'data-topbar-external-links="desktop"' in topBar
-        and 'className="hidden items-center gap-0.5 xl:flex"' in topBar
+        'data-topbar-external-links="desktop"' not in topBar
+        and "SocialLinks" not in topBar
+        and "CODARO_LINKS" not in topBar
+        and "topbar.githubStar" not in topBar
+        and 'data-top-control-lane="true"' in app
+        and '{surface === "curriculum" ? null : (' in app
+        and 'className="relative h-9 shrink-0 border-b border-border bg-background"' in app
         and 'data-topbar-diagnostic="desktop"' in topBar
+        and 'surface !== "curriculum" && showStatusNotice' in topBar
+        and 'const showStatusNotice = surface !== "curriculum"' in topBar
         and 'className="hidden xl:block"' in topBar,
-        "compact top bars must reserve the notebook action area by hiding external and diagnostic controls",
+        "product top controls must reserve a layout lane and exclude external marketing links",
         failures,
     )
 

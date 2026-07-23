@@ -531,10 +531,9 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "installBrowserPythonRuntimeDiagnostics",
                 "browser-runtime-run-record",
             )),
-            ("editor/src/components/app/appPrimitives.tsx", (
-                "data-runtime-artifacts",
-                "data-runtime-artifact-kind",
-                "system.runtimeArtifacts",
+            ("tests/learning/verifyLearningSectionCardContract.py", (
+                "learner output hides runtime artifact paths",
+                "learner output hides execution counters",
             )),
             ("tests/surface/verifyPyprocRuntimeFsPlaywright.py", (
                 "pyproc-runtime-fs-report.json",

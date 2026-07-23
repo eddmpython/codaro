@@ -57,7 +57,11 @@ function groupByTrack(categories: CurriculumCategory[]): TrackGroup[] {
   ];
 }
 
-export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }: CurriculumHomeProps) {
+export function CurriculumHome({
+  categories,
+  onSelectCategory,
+  onSelectLesson,
+}: CurriculumHomeProps) {
   const { summary } = useCurriculumProgress();
   const { reviews } = useCurriculumReviews();
   const groups = useMemo(() => groupByTrack(categories), [categories]);

@@ -102,6 +102,59 @@ def hydrationCases() -> list[dict[str, Any]]:
     return [
         {"name": "home", "route": "/", "lessonRef": None},
         {"name": "learn", "route": "/learn", "lessonRef": None},
+        {"name": "home-light", "route": "/", "lessonRef": None, "storedTheme": "light"},
+        {"name": "home-dark", "route": "/", "lessonRef": None, "storedTheme": "dark"},
+        {
+            "name": "home-system-dark",
+            "route": "/",
+            "lessonRef": None,
+            "colorScheme": "dark",
+            "expectedTheme": "dark",
+        },
+        {"name": "learn-light", "route": "/learn", "lessonRef": None, "storedTheme": "light"},
+        {"name": "learn-dark", "route": "/learn", "lessonRef": None, "storedTheme": "dark"},
+        {
+            "name": "learn-system-dark-mobile",
+            "route": "/learn",
+            "lessonRef": None,
+            "colorScheme": "dark",
+            "expectedTheme": "dark",
+            "viewport": {"width": 390, "height": 844},
+        },
+        {
+            "name": "learn-path-query",
+            "route": "/learn",
+            "query": "?path=dataReporting",
+            "lessonRef": None,
+            "expectedPath": "dataReporting",
+            "delayClientMs": 350,
+        },
+        {
+            "name": "search-query",
+            "route": "/search",
+            "query": "?q=python",
+            "lessonRef": None,
+            "expectedQuery": "python",
+            "delayClientMs": 350,
+        },
+        {
+            "name": "search-empty-mobile",
+            "route": "/search",
+            "query": "?q=__codaro_no_result__",
+            "lessonRef": None,
+            "expectedQuery": "__codaro_no_result__",
+            "expectedSearchState": "empty",
+            "viewport": {"width": 390, "height": 844},
+        },
+        {
+            "name": "search-index-failure",
+            "route": "/search",
+            "query": "?q=python",
+            "lessonRef": None,
+            "expectedQuery": "python",
+            "expectedSearchState": "error",
+            "failSearchIndex": True,
+        },
         {
             "name": "browser-lesson",
             "route": str(browserLesson["route"]),
@@ -159,19 +212,97 @@ def runBrowserAudit(
 
 def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, Any], list[str]]:
     route = str(case["route"])
-    url = f"http://127.0.0.1:{port}/codaro{encodedRoute(route)}"
-    ssrContext = browser.new_context(java_script_enabled=False, viewport={"width": 1280, "height": 900})
-    hydratedContext = browser.new_context(viewport={"width": 1280, "height": 900})
+    routeQuery = str(case.get("query") or "")
+    url = f"http://127.0.0.1:{port}/codaro{encodedRoute(route)}{routeQuery}"
+    viewport = case.get("viewport") or {"width": 1280, "height": 900}
+    colorScheme = str(case.get("colorScheme") or "light")
+    ssrContext = browser.new_context(
+        java_script_enabled=False,
+        viewport=viewport,
+        color_scheme=colorScheme,
+    )
+    hydratedContext = browser.new_context(viewport=viewport, color_scheme=colorScheme)
     failures: list[str] = []
     consoleMessages: list[dict[str, str]] = []
+    storedTheme = case.get("storedTheme")
+    expectedPath = case.get("expectedPath")
+    expectedQuery = case.get("expectedQuery")
+    expectedTheme = case.get("expectedTheme")
+    expectedSearchState = case.get("expectedSearchState")
+    failSearchIndex = bool(case.get("failSearchIndex"))
+    delayClientMs = int(case.get("delayClientMs") or 0)
     try:
         ssrPage = ssrContext.new_page()
         ssrPage.goto(url, wait_until="networkidle", timeout=45_000)
         ssrSnapshot = pageSnapshot(ssrPage)
 
+        if storedTheme:
+            hydratedContext.add_init_script(
+                f"""
+                window.localStorage.setItem("codaro-theme", {json.dumps(storedTheme)})
+                """
+            )
         hydratedContext.add_init_script(
             """
             window.__codaroCls = 0;
+            window.__codaroThemeTransitions = [];
+            window.__codaroFirstVisualState = null;
+            const elementVisible = (element) => {
+              if (!element) return false;
+              const style = window.getComputedStyle(element);
+              const rect = element.getBoundingClientRect();
+              return style.display !== "none"
+                && style.visibility !== "hidden"
+                && Number(style.opacity || 1) > 0
+                && rect.width > 0
+                && rect.height > 0;
+            };
+            const captureFirstVisualState = () => {
+              const pathSelect = document.querySelector(".learnPathSelect select");
+              const searchInput = document.querySelector(".searchBox input");
+              return {
+                routeQueryPending:
+                  document.documentElement.getAttribute("data-route-query-pending"),
+                selectedPath: pathSelect?.value || null,
+                selectedPathPresent: Boolean(pathSelect),
+                selectedPathVisible: elementVisible(pathSelect),
+                searchQuery: searchInput?.value || null,
+                searchQueryPresent: Boolean(searchInput),
+                searchQueryVisible: elementVisible(searchInput),
+              };
+            };
+            try {
+              const paintObserver = new PerformanceObserver((list, observer) => {
+                if (list.getEntries().some((entry) => entry.name === "first-contentful-paint")) {
+                  window.__codaroFirstVisualState = captureFirstVisualState();
+                  observer.disconnect();
+                }
+              });
+              paintObserver.observe({ type: "paint", buffered: true });
+            } catch (error) {
+              window.__codaroFirstVisualStateError = String(error);
+            }
+            const installThemeObserver = () => {
+              const themeRoot = document.documentElement;
+              if (!themeRoot || window.__codaroThemeObserver) return false;
+              const recordTheme = () => {
+                const value = themeRoot.getAttribute("data-theme");
+                const transitions = window.__codaroThemeTransitions;
+                if (value && transitions.at(-1) !== value) transitions.push(value);
+              };
+              window.__codaroThemeObserver = new MutationObserver(recordTheme);
+              window.__codaroThemeObserver.observe(themeRoot, {
+                attributes: true,
+                attributeFilter: ["data-theme"],
+              });
+              recordTheme();
+              return true;
+            };
+            if (!installThemeObserver()) {
+              const themeObserverTimer = window.setInterval(() => {
+                if (installThemeObserver()) window.clearInterval(themeObserverTimer);
+              }, 0);
+            }
             try {
               new PerformanceObserver((list) => {
                 for (const entry of list.getEntries()) {
@@ -184,6 +315,21 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
             """
         )
         page = hydratedContext.new_page()
+        if delayClientMs:
+            def delayClientBundle(route: Any) -> None:
+                time.sleep(delayClientMs / 1000)
+                route.continue_()
+
+            page.route("**/assets/index-*.js", delayClientBundle)
+        if failSearchIndex:
+            page.route(
+                "**/assets/data-search-*.js",
+                lambda route: route.fulfill(
+                    status=200,
+                    content_type="application/javascript",
+                    body="throw new Error('simulated search index failure');",
+                ),
+            )
         page.on(
             "console",
             lambda message: consoleMessages.append(
@@ -200,6 +346,9 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
         hydratedSnapshot = pageSnapshot(page)
         cls = float(page.evaluate("window.__codaroCls || 0"))
         observerError = page.evaluate("window.__codaroClsObserverError || null")
+        firstVisualStateError = page.evaluate(
+            "window.__codaroFirstVisualStateError || null"
+        )
         lessonRef = case.get("lessonRef")
 
         if lessonRef:
@@ -213,10 +362,96 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
             if hydratedSnapshot["editorLessonRef"] != lessonRef:
                 failures.append(f"{case['name']}: interactive lesson identity changed")
         else:
-            if ssrSnapshot["rootHtmlHash"] != hydratedSnapshot["rootHtmlHash"]:
+            expectsClientStateChange = bool(storedTheme or expectedTheme or expectedPath or expectedQuery)
+            if not expectsClientStateChange and ssrSnapshot["rootHtmlHash"] != hydratedSnapshot["rootHtmlHash"]:
                 failures.append(f"{case['name']}: hydrated root differs from server markup")
-            if ssrSnapshot["rootText"] != hydratedSnapshot["rootText"]:
+            if not expectsClientStateChange and ssrSnapshot["rootText"] != hydratedSnapshot["rootText"]:
                 failures.append(f"{case['name']}: hydrated visible text differs from server text")
+        if storedTheme and hydratedSnapshot["resolvedTheme"] != storedTheme:
+            failures.append(
+                f"{case['name']}: stored theme {storedTheme} resolved as "
+                f"{hydratedSnapshot['resolvedTheme']}"
+            )
+        if expectedTheme and hydratedSnapshot["resolvedTheme"] != expectedTheme:
+            failures.append(
+                f"{case['name']}: expected system theme {expectedTheme}, got "
+                f"{hydratedSnapshot['resolvedTheme']}"
+            )
+        if expectedTheme and any(
+            theme != expectedTheme for theme in hydratedSnapshot["themeTransitions"]
+        ):
+            failures.append(
+                f"{case['name']}: system theme changed during hydration: "
+                f"{hydratedSnapshot['themeTransitions']}"
+            )
+        if expectedPath and hydratedSnapshot["selectedPath"] != expectedPath:
+            failures.append(
+                f"{case['name']}: expected path {expectedPath}, got "
+                f"{hydratedSnapshot['selectedPath']}"
+            )
+        if expectedPath:
+            firstVisualState = hydratedSnapshot["firstVisualState"]
+            if not firstVisualState:
+                failures.append(f"{case['name']}: first visual state was not captured")
+            elif not firstVisualState["selectedPathPresent"]:
+                failures.append(f"{case['name']}: path filter was absent at first paint")
+            elif (
+                firstVisualState["selectedPathVisible"]
+                and firstVisualState["selectedPath"] != expectedPath
+            ):
+                failures.append(
+                    f"{case['name']}: wrong path was visible at first paint: "
+                    f"{firstVisualState['selectedPath']}"
+                )
+            if (
+                delayClientMs
+                and firstVisualState
+                and firstVisualState["routeQueryPending"] != "true"
+            ):
+                failures.append(
+                    f"{case['name']}: delayed hydration did not retain the query guard at first paint"
+                )
+        if expectedQuery and hydratedSnapshot["searchQuery"] != expectedQuery:
+            failures.append(
+                f"{case['name']}: expected query {expectedQuery}, got "
+                f"{hydratedSnapshot['searchQuery']}"
+            )
+        if expectedQuery:
+            firstVisualState = hydratedSnapshot["firstVisualState"]
+            if not firstVisualState:
+                failures.append(f"{case['name']}: first visual state was not captured")
+            elif not firstVisualState["searchQueryPresent"]:
+                failures.append(f"{case['name']}: search input was absent at first paint")
+            elif (
+                firstVisualState["searchQueryVisible"]
+                and firstVisualState["searchQuery"] != expectedQuery
+            ):
+                failures.append(
+                    f"{case['name']}: wrong query was visible at first paint: "
+                    f"{firstVisualState['searchQuery']}"
+                )
+            if (
+                delayClientMs
+                and firstVisualState
+                and firstVisualState["routeQueryPending"] != "true"
+            ):
+                failures.append(
+                    f"{case['name']}: delayed hydration did not retain the query guard at first paint"
+                )
+        if expectedSearchState and hydratedSnapshot["searchState"] != expectedSearchState:
+            failures.append(
+                f"{case['name']}: expected search state {expectedSearchState}, got "
+                f"{hydratedSnapshot['searchState']}"
+            )
+        if expectedSearchState == "empty" and hydratedSnapshot["searchEmptyText"] != "검색 결과가 없습니다.":
+            failures.append(f"{case['name']}: empty search guidance is not visible")
+        if expectedSearchState == "error":
+            if hydratedSnapshot["searchErrorText"] != "학습 검색을 불러오지 못했습니다.":
+                failures.append(f"{case['name']}: search failure guidance is not visible")
+            if not hydratedSnapshot["searchRetryVisible"]:
+                failures.append(f"{case['name']}: search retry command is not visible")
+        if (expectedPath or expectedQuery) and hydratedSnapshot["routeQueryPending"]:
+            failures.append(f"{case['name']}: route query stayed pending after hydration")
         if ssrSnapshot["metadata"] != hydratedSnapshot["metadata"]:
             failures.append(f"{case['name']}: hydrated metadata differs from SSR metadata")
         if ssrSnapshot["structuredData"] != hydratedSnapshot["structuredData"]:
@@ -235,6 +470,11 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
             )
         if observerError:
             failures.append(f"{case['name']}: layout shift observer failed: {observerError}")
+        if firstVisualStateError:
+            failures.append(
+                f"{case['name']}: first visual state observer failed: "
+                f"{firstVisualStateError}"
+            )
         if cls > MAX_CLS:
             failures.append(f"{case['name']}: CLS {cls:.4f} exceeds {MAX_CLS:.2f}")
         for message in consoleMessages:
@@ -248,6 +488,17 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
             "name": case["name"],
             "route": route,
             "lessonRef": lessonRef,
+            "query": routeQuery,
+            "delayClientMs": delayClientMs,
+            "storedTheme": storedTheme,
+            "colorScheme": colorScheme,
+            "resolvedTheme": hydratedSnapshot["resolvedTheme"],
+            "themeTransitions": hydratedSnapshot["themeTransitions"],
+            "selectedPath": hydratedSnapshot["selectedPath"],
+            "searchQuery": hydratedSnapshot["searchQuery"],
+            "searchState": hydratedSnapshot["searchState"],
+            "firstVisualState": hydratedSnapshot["firstVisualState"],
+            "routeQueryPending": hydratedSnapshot["routeQueryPending"],
             "rootHtmlStable": ssrSnapshot["rootHtmlHash"] == hydratedSnapshot["rootHtmlHash"],
             "rootTextStable": ssrSnapshot["rootText"] == hydratedSnapshot["rootText"],
             "rootTransitionedToEditor": bool(
@@ -308,6 +559,8 @@ def pageSnapshot(page: Any) -> dict[str, Any]:
     lessonCount = lessonLocator.count()
     editorLessonLocator = page.locator("[data-learning-lesson-ref]")
     editorLessonCount = editorLessonLocator.count()
+    selectedPathLocator = page.get_by_role("combobox", name="목표 경로")
+    selectedPathCount = selectedPathLocator.count()
     return {
         "rootHtmlHash": hashlib.sha256(rootHtml.encode("utf-8")).hexdigest(),
         "rootText": rootText,
@@ -322,6 +575,38 @@ def pageSnapshot(page: Any) -> dict[str, Any]:
             editorLessonLocator.first.get_attribute("data-learning-lesson-ref")
             if editorLessonCount
             else None
+        ),
+        "resolvedTheme": page.evaluate(
+            "document.documentElement.getAttribute('data-theme')"
+        ),
+        "themeTransitions": page.evaluate(
+            "window.__codaroThemeTransitions || []"
+        ),
+        "selectedPath": (
+            selectedPathLocator.evaluate("element => element.value || null")
+            if selectedPathCount == 1
+            else None
+        ),
+        "searchQuery": page.evaluate(
+            "document.querySelector('.searchBox input')?.value || null"
+        ),
+        "searchState": page.evaluate(
+            "document.querySelector('.searchResults')?.getAttribute('data-search-state') || null"
+        ),
+        "searchEmptyText": page.evaluate(
+            "document.querySelector('[data-search-state=\"empty\"] .searchState strong')?.textContent || null"
+        ),
+        "searchErrorText": page.evaluate(
+            "document.querySelector('[data-search-state=\"error\"] .searchState strong')?.textContent || null"
+        ),
+        "searchRetryVisible": page.evaluate(
+            "Boolean(document.querySelector('[data-search-state=\"error\"] .searchRetry'))"
+        ),
+        "routeQueryPending": page.evaluate(
+            "document.documentElement.getAttribute('data-route-query-pending')"
+        ),
+        "firstVisualState": page.evaluate(
+            "window.__codaroFirstVisualState || null"
         ),
     }
 

@@ -261,6 +261,81 @@ def waitForLearningLessonRoute(page: Any, contentId: str, category: str = "30day
         )
         raise AssertionError(f"learning route did not settle: {state}") from error
     page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
+    mobileOverlay = page.locator('[data-slot="sheet-overlay"][data-state="open"]:visible')
+    if mobileOverlay.count():
+        page.keyboard.press("Escape")
+        mobileOverlay.wait_for(state="hidden", timeout=20_000)
+
+
+def openLearningDataSettings(page: Any) -> Any:
+    learningData = page.locator('[data-product-learning-data-settings="true"]:visible')
+    if learningData.count():
+        page.wait_for_timeout(200)
+        archiveMenu = learningData.locator('[data-learning-archive-menu="true"]')
+        if archiveMenu.get_attribute("open") is None:
+            archiveMenu.locator("summary").click(timeout=20_000)
+        summary = learningData.locator('[data-learning-evidence-summary="true"]')
+        summary.wait_for(state="visible", timeout=20_000)
+        return summary
+
+    settings = page.locator('[data-product-appearance-settings="true"]:visible')
+    if not settings.count():
+        brand = page.locator('[data-product-brand="escape"]:visible')
+        if not brand.count():
+            sidebarTrigger = page.locator('[data-sidebar="trigger"]:visible').first
+            sidebarTrigger.click(timeout=20_000)
+            brand = page.locator('[data-product-brand="escape"]:visible')
+            brand.wait_for(state="visible", timeout=20_000)
+        brand.first.click(timeout=20_000)
+        page.wait_for_function(
+            """
+            () => new URL(window.location.href).searchParams.get('surface') !== 'curriculum'
+              && document.querySelector('[data-product-nav="flow"]')
+            """,
+            timeout=20_000,
+        )
+        mobileOverlay = page.locator('[data-slot="sheet-overlay"][data-state="open"]:visible')
+        if mobileOverlay.count():
+            page.keyboard.press("Escape")
+            mobileOverlay.wait_for(state="hidden", timeout=20_000)
+        settings = page.locator('[data-product-appearance-settings="true"]:visible')
+        if not settings.count():
+            sidebarTrigger = page.locator('[data-sidebar="trigger"]:visible').first
+            sidebarTrigger.click(timeout=20_000)
+            settings = page.locator('[data-product-appearance-settings="true"]:visible')
+        settings.wait_for(state="visible", timeout=20_000)
+        page.wait_for_timeout(300)
+    settings.first.click(timeout=20_000)
+    page.locator('[data-slot="popover-content"][data-state="open"]:visible').wait_for(
+        state="visible",
+        timeout=20_000,
+    )
+    page.wait_for_timeout(200)
+    learningData = page.locator('[data-product-learning-data-settings="true"]:visible')
+    try:
+        learningData.wait_for(state="visible", timeout=20_000)
+    except Exception as error:
+        state = page.evaluate(
+            """
+            () => ({
+              surface: new URL(window.location.href).searchParams.get('surface'),
+              sheet: Array.from(document.querySelectorAll('[data-slot="sheet-content"]'))
+                .map((node) => ({ state: node.getAttribute('data-state'), visible: !!node.getClientRects().length })),
+              settings: Array.from(document.querySelectorAll('[data-product-appearance-settings]'))
+                .map((node) => ({ state: node.getAttribute('data-state'), visible: !!node.getClientRects().length })),
+              popovers: Array.from(document.querySelectorAll('[data-slot="popover-content"]'))
+                .map((node) => ({ state: node.getAttribute('data-state'), visible: !!node.getClientRects().length })),
+              learningData: document.querySelectorAll('[data-product-learning-data-settings]').length,
+            })
+            """
+        )
+        raise AssertionError(f"learning data settings did not open: {state}") from error
+    archiveMenu = learningData.locator('[data-learning-archive-menu="true"]')
+    if archiveMenu.get_attribute("open") is None:
+        archiveMenu.locator("summary").click(timeout=20_000)
+    summary = learningData.locator('[data-learning-evidence-summary="true"]')
+    summary.wait_for(state="visible", timeout=20_000)
+    return summary
 
 
 def waitForStoredLearningArchiveDraft(page: Any, lessonRef: str, expected: str) -> None:
@@ -1634,13 +1709,18 @@ async ({ surface, expectedTier }) => {
       };
       request.onsuccess = () => {
         const database = request.result;
-        const transaction = database.transaction(["events", "metadata"], "readonly");
+        const transaction = database.transaction(["events", "conflicts", "metadata"], "readonly");
         const events = transaction.objectStore("events").getAll();
+        const conflicts = transaction.objectStore("conflicts").getAll();
         const header = transaction.objectStore("metadata").get("store-header");
         transaction.onerror = () => reject(transaction.error);
         transaction.oncomplete = () => {
           database.close();
-          resolve({ events: events.result || [], header: header.result || null });
+          resolve({
+            events: events.result || [],
+            conflicts: conflicts.result || [],
+            header: header.result || null,
+          });
         };
       };
     });
@@ -1651,6 +1731,7 @@ async ({ surface, expectedTier }) => {
     webStrongEvidenceEventCount = evidenceStore.events.filter(
       (event) => event?.kind === "StrongCheckVerified"
     ).length;
+    webEvidenceConflictCount = evidenceStore.conflicts.length;
     webEvidenceStoreHeader = evidenceStore.header;
     webLegacyReaderRejected = await new Promise((resolve) => {
       const request = indexedDB.open("codaro-learning-evidence-v1", 2);
@@ -1662,9 +1743,14 @@ async ({ surface, expectedTier }) => {
     });
   } catch {}
   const evidenceSummary = document.querySelector("[data-learning-evidence-summary]");
-  webEvidenceSummaryCount = Number(evidenceSummary?.getAttribute("data-learning-evidence-events") || 0);
-  webEvidenceConflictCount = Number(evidenceSummary?.getAttribute("data-learning-evidence-conflicts") || 0);
-  const learningEvidenceRuntime = evidenceSummary?.getAttribute("data-learning-evidence-runtime") || null;
+  webEvidenceSummaryCount = evidenceSummary
+    ? Number(evidenceSummary.getAttribute("data-learning-evidence-events") || 0)
+    : surface === "web-lesson" ? webEvidenceEventCount : 0;
+  if (surface !== "web-lesson") {
+    webEvidenceConflictCount = Number(evidenceSummary?.getAttribute("data-learning-evidence-conflicts") || 0);
+  }
+  const learningEvidenceRuntime = evidenceSummary?.getAttribute("data-learning-evidence-runtime")
+    || (surface === "web-lesson" ? "web" : null);
   return {
     surface,
     expectedTier,
@@ -1732,6 +1818,9 @@ async ({ surface, expectedTier }) => {
     ).length,
     learningVisualDecisionCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"] [data-learning-visual-decision="true"]'
+    ).length,
+    learningArchiveManagementCount: document.querySelectorAll(
+      '[data-learning-archive-management="true"]'
     ).length,
     bulkLearningProgressCount: document.querySelectorAll('[data-curriculum-home-progress="true"]').length,
     webProgressLessonCount,
@@ -1825,6 +1914,8 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             failures.append(f"{name}: backend assignment tools block the web lesson")
         if audit["forbiddenLearningControls"]:
             failures.append(f"{name}: redundant learning controls {audit['forbiddenLearningControls']}")
+        if audit["learningArchiveManagementCount"]:
+            failures.append(f"{name}: learning data management leaked into the lesson surface")
         if case.get("verifyDraftAutosaveBeforeEvidence"):
             if audit["webEvidenceEventCount"] != 0 or audit["webStrongEvidenceEventCount"] != 0:
                 failures.append(
@@ -1848,7 +1939,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         if not audit["webLegacyReaderRejected"]:
             failures.append(f"{name}: IndexedDB v2 reader was not rejected after v3 cutover")
         if audit["webEvidenceSummaryCount"] != audit["webEvidenceEventCount"]:
-            failures.append(f"{name}: visible evidence summary does not match the append-only store")
+            failures.append(f"{name}: evidence projection does not match the append-only store")
         if case.get("verifyLegacyProgressMigration"):
             legacyImport = header.get("legacyImport") if isinstance(header, dict) else None
             sources = legacyImport.get("sources") if isinstance(legacyImport, dict) else None
@@ -2481,12 +2572,12 @@ def runBrowserMatrix(
                                     f'retrieval remained due after accepted evidence: {evidence_chain}'
                                 ) from error
                         if case.get("verifyEvidenceArchive"):
+                            archiveSummary = openLearningDataSettings(page)
                             try:
                                 with page.expect_download(timeout=20_000) as download_info:
                                     page.get_by_role("button", name="학습 작업 내보내기").click()
                             except Exception as error:
-                                notice = page.locator('[data-learning-evidence-summary="true"]').inner_text()
-                                raise AssertionError(f"initial Web archive export did not download: {notice}") from error
+                                raise AssertionError(f"initial Web archive export did not download: {error}") from error
                             archive_path = download_info.value.path()
                             if archive_path is None:
                                 raise AssertionError("learning archive download has no local path")
@@ -2548,25 +2639,14 @@ def runBrowserMatrix(
                                 or files[0].get("byteLength") != len(canonical)
                             ):
                                 raise AssertionError("learning archive manifest, document, or evidence is invalid")
+                            openLearningDataSettings(page)
                             import_input = page.locator('[data-learning-evidence-import-input="true"]')
                             import_input.set_input_files({
                                 "name": "codaro-portable-learning-archive.json",
                                 "mimeType": "application/json",
                                 "buffer": webLearningArchiveBytes,
                             })
-                            page.wait_for_function(
-                                """
-                                () => document.querySelector('[data-learning-evidence-summary]')
-                                  ?.textContent?.includes('작업을 복원했습니다.')
-                                """,
-                                timeout=20_000,
-                            )
-                            page.wait_for_function(
-                                """
-                                () => new URL(window.location.href).searchParams.get('lesson') === 'day01_헬로월드'
-                                """,
-                                timeout=20_000,
-                            )
+                            waitForLearningLessonRoute(page, "day01_헬로월드")
                             pushLearningLessonRoute(page, "day02_변수와데이터타입")
                             page.evaluate("() => window.history.back()")
                             waitForLearningLessonRoute(page, "day01_헬로월드")
@@ -2610,12 +2690,12 @@ def runBrowserMatrix(
                                 arg=post_import_draft_source,
                                 timeout=20_000,
                             )
+                            archiveSummary = openLearningDataSettings(page)
                             try:
                                 with page.expect_download(timeout=20_000) as restored_download_info:
                                     page.get_by_role("button", name="학습 작업 내보내기").click()
                             except Exception as error:
-                                notice = page.locator('[data-learning-evidence-summary="true"]').inner_text()
-                                raise AssertionError(f"restored Web archive export did not download: {notice}") from error
+                                raise AssertionError(f"restored Web archive export did not download: {error}") from error
                             restored_archive_path = restored_download_info.value.path()
                             if restored_archive_path is None:
                                 raise AssertionError("restored Web learning archive download has no local path")
@@ -2623,6 +2703,7 @@ def runBrowserMatrix(
                             restored_archive = json.loads(restored_archive_bytes.decode("utf-8"))
                             if portableLearningArchivePayloads(restored_archive) != portable_payloads:
                                 raise AssertionError("Web reload and re-export did not preserve portable payload bytes")
+                            pushLearningLessonRoute(page, "day01_헬로월드")
                             interrupted_draft_source = "print('recovered interrupted import')"
                             interrupted_archive_bytes = portableLearningArchiveBytes(
                                 restored_archive,
@@ -2652,6 +2733,7 @@ def runBrowserMatrix(
                                 "30days/day01_헬로월드",
                                 interrupted_root_hash,
                             )
+                            archiveSummary = openLearningDataSettings(page)
                             with page.expect_download(timeout=20_000) as recovered_download_info:
                                 page.get_by_role("button", name="학습 작업 내보내기").click()
                             recovered_archive_path = recovered_download_info.value.path()
@@ -2663,6 +2745,8 @@ def runBrowserMatrix(
                                 raise AssertionError("interrupted Web import recovery lost portable payload bytes")
                             webLearningArchiveBytes = recovered_archive_bytes
                             webLearningArchiveDraftSource = interrupted_draft_source
+                            openLearningDataSettings(page)
+                            import_input = page.locator('[data-learning-evidence-import-input="true"]')
                             legacy_archive = json.loads(json.dumps(archive, ensure_ascii=False))
                             from codaro.curriculum.evidenceArchive import migrateEvidenceEventLessonRef
 
@@ -2697,7 +2781,7 @@ def runBrowserMatrix(
                             page.wait_for_function(
                                 """
                                 () => document.querySelector('[data-learning-evidence-summary]')
-                                  ?.textContent?.includes('1건의 이전 레슨 주소를 현재 주소로 옮겼습니다.')
+                                  ?.textContent?.includes('이전 수업의 학습 기록 1건도 현재 수업으로 옮겼습니다.')
                                 """,
                                 timeout=20_000,
                             )
@@ -2714,8 +2798,8 @@ def runBrowserMatrix(
                             })
                             page.wait_for_function(
                                 """
-                                () => document.querySelector('[data-learning-evidence-summary]')
-                                  ?.textContent?.includes('payload hash가 일치하지 않습니다')
+                                () => document.querySelector('[data-learning-archive-error]')
+                                  ?.textContent?.includes('Codaro 학습 데이터 파일인지 확인해 주세요.')
                                 """,
                                 timeout=20_000,
                             )
@@ -2755,7 +2839,7 @@ def runBrowserMatrix(
                             page.wait_for_function(
                                 """
                                 () => document.querySelector('[data-learning-evidence-summary]')
-                                  ?.textContent?.includes('1건의 충돌을 격리했습니다.')
+                                  ?.textContent?.includes('기존 기록과 다른 1건은 덮어쓰지 않고 별도로 보관했습니다.')
                                 """,
                                 timeout=20_000,
                             )

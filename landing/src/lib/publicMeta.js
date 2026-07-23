@@ -18,3 +18,11 @@ export const learnMeta = {
   image: "/brand/codaro-og.png",
   imageAlt: "Codaro 공개 Python 교육 과정",
 };
+
+export const searchMeta = {
+  title: "검색",
+  description: "Codaro 공개 레슨, 문서, 글을 한 번에 검색한다.",
+  url: "/search",
+  image: "/brand/codaro-og.png",
+  imageAlt: "Codaro 공개 학습·문서 검색",
+};

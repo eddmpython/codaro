@@ -2,7 +2,7 @@
 
 상태: 진행
 
-최신 공식 Chromium `product-experience-browser`는 Landing Home·Learn catalog, Web/Local learning home, Web Lesson/Run, Local Run/Automation 63개 case를 63/63으로 통과했고 `local-studio-browser`도 26/26 green이다. 두 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`는 모두 0이며 report의 학습 화면 금지 확인·제출·hint reveal control도 0이다. Seaborn capstone의 CSV table 2개와 PNG image 2개, Day 19 archive artifact transfer를 실제 Web evidence에서 확인했다. `learning-method`, `web-learning`, `landing-public`, `repository-simplification`도 공식 green이다. public source는 472개 canonical lesson route의 SEO·hydration을 검증했고 `RunRouteState@1`, canonical Python/TypeScript `MasteryPolicy@1`, full learning archive v2의 materialization과 Local atomic rollback이 구현됐다. `dogfood-alpha-audit` 13/13과 `product-quality-audit` 10/10은 모두 wiring coverage이며 실제 제품 점수나 완료 판정이 아니다. 현재 machine audit는 strong CheckSpec 1,413개/467레슨, weak-only 0, mastery·transfer·retrieval 각 467/472다. identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467이며 전체 engine, 실제 WebView2, forced-colors, zoom, 수동 screen-reader matrix도 남아 있다. 현재 GitHub Pages는 이전 build라 canonical lesson과 `/run/`이 404이고 독립 R10 raw report도 없다. 따라서 이 workstream은 `진행`이며 `_done`이 아니다.
+최신 공식 Chromium `product-experience-browser`는 Landing Home·Learn catalog, Web/Local learning home, Web Lesson/Run, Local Run/Automation 63개 case를 63/63으로 통과했고 `local-studio-browser`도 26/26 green이다. 두 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`는 모두 0이며 report의 학습 화면 금지 확인·제출·hint reveal control도 0이다. Seaborn capstone의 CSV table 2개와 PNG image 2개, Day 19 archive artifact transfer를 실제 Web evidence에서 확인했다. `learning-method`, `web-learning`, `landing-public`, `repository-simplification`도 공식 green이다. public source는 472개 canonical lesson route의 SEO·hydration을 검증했고 `RunRouteState@1`, canonical Python/TypeScript `MasteryPolicy@1`, full learning archive v2의 materialization과 Local atomic rollback이 구현됐다. `dogfood-alpha-audit` 13/13과 `product-quality-audit` 10/10은 모두 wiring coverage이며 실제 제품 점수나 완료 판정이 아니다. 현재 machine audit는 strong CheckSpec 1,413개/467레슨, weak-only 0, mastery·transfer·retrieval 각 467/472다. identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467이며 전체 engine, 실제 WebView2, forced-colors, zoom, 수동 screen-reader matrix도 남아 있다. GitHub Pages의 이전 HEAD에는 canonical lesson route와 `/run/`이 이미 배포돼 있다. 이번 학습 셀 높이·상단 배치·출력 정보·hydration UX 수정은 push와 Pages 배포가 끝난 뒤 실제 desktop/mobile URL에서 다시 검증해야 한다. 독립 R10 raw report와 독립 보안 검수도 없다. 따라서 이 workstream은 `진행`이며 `_done`이 아니다.
 
 ## 목표
 
@@ -16,6 +16,17 @@ Astryx migration을 보기 좋은 screenshot 몇 장으로 끝내지 않는다. 
 - token generator 결과가 fresh하고 legacy hardcoded color allowlist가 0 또는 문서화된 third-party 예외뿐이다.
 - radius 8px 초과 rounded rectangle, nested card, emoji primary icon이 제품 코드에 없다.
 - light/dark/system, accent, reduced motion이 같은 Theme state를 사용한다.
+
+### 학습 관련성
+
+- 학습 surface의 모든 보이는 요소는 목표 이해, 학습 자료·개념, 코드 작성·실행, 결과 해석, 자동 feedback, 다음 학습 이동 중 하나에 직접 기여해야 한다.
+- 이 목록에 직접 기여하지 않는 visible element는 제품 결함으로 기록하고 즉시 제거한다. 하나라도 남으면 release와 `_done` 전이를 모두 차단한다.
+- 관리·홍보·진단·내부 상태 UI는 학습 surface에서 0개여야 한다. 내부 경로, runtime artifact, 실행 일련번호, 운영 badge도 사용자에게 노출하지 않는다.
+- `surface=curriculum`은 focus mode다. 제품 전환 nav, terminal utility, Provider·제품 설정, diagnostic export, 전역 Teacher panel, 셀별 수동 AI control을 렌더하지 않는다. 브랜드에는 Local `home` 또는 Web `editor`로 나가는 단 하나의 실제 escape action만 둔다.
+- archive import/export와 사용자 커리큘럼 삭제는 학습 surface가 아니라 비학습 surface의 `제품 설정 > 학습 데이터`에서만 제공한다. 자동 저장은 계속 동작하며 실제 저장 실패만 현재 학습 맥락 안에 다음 행동과 함께 표시한다.
+- 와이드 화면의 학습 목차는 본문 위로 떠서 덮지 않고 grid track 안에서 48px에서 288px로 확장된다. hover와 keyboard focus 양쪽에서 본문·상단 control과 교차가 0이어야 하며 좁은 화면에서는 숨긴다.
+- 확인·제출 버튼 0 같은 단순 control 개수로 통과시키지 않는다. 실행·중지·다시 시도·학습 이동처럼 학습자의 명시적 의도가 필요한 control은 허용하되, 각 요소의 `learning relevance` 근거가 없으면 실패다.
+- `learning-method`는 visible element의 역할과 control intent를 검사하고, `product-experience-browser`는 실제 desktop/mobile DOM과 캡처에서 비학습 UI 노출 0을 검증한다.
 
 ### 반응형과 시각
 
@@ -107,7 +118,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `architecture-boundary` | platform | yes | every change | browser/local 경계와 dependency 방향 |
 | `design-system-contract` | design system | yes | every change | Astryx version, token, component/state matrix |
 | `learning-evidence-contract` | learning platform | yes | every change | 단일 evidence, dedup, mastery policy |
-| `learning-method` | learning product | yes | every change | 자동 feedback·hint·next와 control intent |
+| `learning-method` | learning product | yes | every change | 자동 feedback·hint·next, learning relevance와 control intent |
 | `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/467 |
 | `curriculum-quality-matrix` | curriculum | yes | every change | path metadata·check·visual coverage |
 | `curriculum-top-tier-audit` | curriculum | no | human approval completion | 독립 assessment 승인과 top-tier completion eligibility |
@@ -134,14 +145,14 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | --- | --- |
 | `design-system-contract` | `verifyDesignSystemContract.py`, `verifyAstryxFoundationPlaywright.py`, `verifyAstryxBrowserTierPlaywright.py` |
 | `learning-evidence-contract` | evidence uniqueness, canonical mastery, Python/TS conformance, legacy writer removal tests |
-| `learning-method` | method Playwright, flow friction, control intent, scheduler, meaningful attempt, sandbox tests |
+| `learning-method` | method Playwright, flow friction, visible-element learning relevance, control intent, scheduler, meaningful attempt, sandbox tests |
 | `learning-content` | 472 identity, featured/remaining ledger, check strength, metadata, retrieval/transfer tests |
 | `web-learning` | generated routes, Web learning Playwright, browser/local check parity, progress/archive tests |
 | `visual-assets` | manifest, instructional purpose, budget, capture freshness/redaction tests |
 | `landing-public` | `npm run build` lifecycle 뒤 landing experience, SEO, hydration tests |
 | `removed-learning-concepts` | prediction/classroom/dead source/generated policy negative tests |
 | `repository-simplification` | dead Landing source, unused illustration, generated source policy, module boundary tests |
-| `product-experience-browser` | responsive matrix, accessibility, visual regression, performance, route/history tests |
+| `product-experience-browser` | responsive matrix, accessibility, visual regression, performance, route/history, desktop/mobile 비학습 UI 노출 0 tests |
 | `local-studio-browser` | Local Home/Automation fixture, provider, recovery, archive tests |
 | `learning-efficacy-report` | protocol/report fixture와 hash/stale/privacy schema tests |
 | `plan-quality` | 봉인된 raw report, rubric·scope hash, evaluator 독립성, P0/P1 ledger, link/path/symbol/gate `PlanFactAudit`; 점수 threshold 없음 |

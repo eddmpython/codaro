@@ -1,16 +1,10 @@
 import type { BlockConfig, ExecutionResult } from "@/types";
-import type { CellAiHelpState } from "@/lib/assistantTypes";
-import type { CellAiAction, LearningCellKind } from "@/lib/cellModel";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { CellAiActions } from "@/components/app/cellAiActions";
 import { CurriculumMarkdownBody } from "./curriculumMarkdownBody";
-import { blockLabel, executionKindLabel, stripMarkdown } from "@/lib/cellModel";
-import { Badge } from "@/components/ui/badge";
-import { statusLabel } from "@/lib/displayFormat";
+import { blockLabel, stripMarkdown } from "@/lib/cellModel";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
-import { CheckCircle2, GraduationCap, Layers3, Lightbulb, ListChecks, Loader2, MessageSquare, Play, Sparkles, Target, TerminalSquare } from "lucide-react";
-import type { ComponentType } from "react";
+import { Loader2, Play } from "lucide-react";
 import { isRecord, readPayloadText } from "./curriculumSurfaceHelpers";
 import type { RenderCodeCellEditor } from "./curriculumSurfaceModels";
 import { cellDomId } from "./curriculumNavigation";
@@ -18,37 +12,31 @@ import { cellDomId } from "./curriculumNavigation";
 export function CurriculumLearningCell({
   block,
   canRun,
-  cellHelp,
   draft,
   isRunning,
   isSelected,
   renderCodeCellEditor,
   result,
   variant = "standalone",
-  onAsk,
   onDraftChange,
   onRun,
   onSelect,
 }: {
   block: BlockConfig;
   canRun: boolean;
-  cellHelp?: CellAiHelpState;
   draft: string;
   isRunning: boolean;
   isSelected: boolean;
   renderCodeCellEditor: RenderCodeCellEditor;
   result?: ExecutionResult;
   variant?: "standalone" | "embedded";
-  onAsk: (action: CellAiAction, question?: string) => void;
   onDraftChange: (value: string) => void;
   onRun: (sourceOverride?: string) => void;
   onSelect: () => void;
 }) {
   const role = block.role ?? (block.type === "code" ? "snippet" : "explanation");
-  const resultStatus = isRunning ? "running" : result?.status ?? "idle";
   const isSnippetCode = block.type === "code" && role === "snippet";
   const embedded = variant === "embedded";
-  const showStatus = isRunning || Boolean(result);
   const draftRef = useRef(draft);
 
   useEffect(() => {
@@ -82,7 +70,7 @@ export function CurriculumLearningCell({
       return (
         <section
           className={cn(
-            "group relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4",
+            "relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4",
             isSelected && "border-accent-brand",
           )}
           data-learning-cell="embedded"
@@ -90,9 +78,6 @@ export function CurriculumLearningCell({
           id={cellDomId(block.id)}
           onClick={onSelect}
         >
-          <div className="absolute right-0 top-0 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-            <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
-          </div>
           <CurriculumMarkdownBody block={block} />
         </section>
       );
@@ -100,13 +85,10 @@ export function CurriculumLearningCell({
 
     return (
       <section
-        className="group relative min-w-0 rounded-lg border bg-card text-card-foreground"
+        className="relative min-w-0 rounded-lg border bg-card text-card-foreground"
         id={cellDomId(block.id)}
         onClick={onSelect}
       >
-        <div className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-          <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
-        </div>
         <div className="p-5">
           <CurriculumMarkdownBody block={block} />
         </div>
@@ -118,8 +100,8 @@ export function CurriculumLearningCell({
     <section
       className={cn(
         embedded
-          ? "group relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4"
-          : "group min-w-0 rounded-lg border bg-card text-card-foreground",
+          ? "relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4"
+          : "min-w-0 rounded-lg border bg-card text-card-foreground",
         embedded && isSelected && "border-accent-brand",
       )}
       data-learning-cell={embedded ? "embedded" : "standalone"}
@@ -129,13 +111,8 @@ export function CurriculumLearningCell({
       <div className={cn("min-w-0", !embedded && "p-5")}>
         <div className="flex items-center gap-2">
           <button className="min-w-0 flex-1 text-left" type="button" onClick={onSelect}>
-            <span className="block truncate text-[15px] font-bold leading-6 text-foreground">{blockLabel(block)}</span>
+            <span className="block whitespace-normal break-words text-[15px] font-bold leading-6 text-foreground">{blockLabel(block)}</span>
           </button>
-          {showStatus ? (
-            <Badge className="h-7 rounded-md px-2 text-xs" variant={resultStatus === "error" ? "destructive" : "outline"}>
-              {statusLabel(resultStatus)}
-            </Badge>
-          ) : null}
           <IconButton
             className="size-7 rounded-md [&_svg]:size-3.5"
             disabled={!canRun}
@@ -148,7 +125,6 @@ export function CurriculumLearningCell({
           >
             {isRunning ? <Loader2 className="animate-spin" /> : <Play />}
           </IconButton>
-          <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
         </div>
         <div className="mt-3 space-y-3">
           {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
@@ -156,7 +132,6 @@ export function CurriculumLearningCell({
             <p className="max-w-3xl text-md font-normal text-foreground">{stripMarkdown(block.guide.description)}</p>
           ) : null}
           <div
-            aria-label={`${blockLabel(block)} 코드 편집기`}
             className="rounded-lg border border-border bg-code transition-colors hover:border-ring/60 focus-within:border-ring"
             data-learning-code-input="editor"
             data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}
@@ -164,7 +139,8 @@ export function CurriculumLearningCell({
             onClick={onSelect}
           >
             {renderCodeCellEditor({
-              autoFocus: isSelected,
+              ariaLabel: `${blockLabel(block)} 코드 편집기`,
+              autoFocus: false,
               block,
               draft,
               onChange: updateDraft,
@@ -230,32 +206,6 @@ export function CurriculumSectionTitle({
       </button>
     </section>
   );
-}
-
-export function curriculumTypeMeta(block: BlockConfig, kind: LearningCellKind): { label: string; Icon: ComponentType<{ className?: string }> } {
-  const sourceType = block.sourceType ?? "";
-  const displayKind = block.displayKind ?? "";
-  const role = block.role ?? "";
-
-  if (sourceType === "intro") return { label: "소개", Icon: Sparkles };
-  if (sourceType === "section") return { label: "섹션", Icon: Layers3 };
-  if (sourceType === "localRunner") return { label: "실행", Icon: TerminalSquare };
-  if (sourceType === "expansion" || role === "exercise") return { label: "실습", Icon: Play };
-  if (sourceType === "list") return { label: "목록", Icon: ListChecks };
-  if (sourceType === "table" || displayKind === "table") return { label: "표", Icon: Layers3 };
-  if (sourceType === "compare" || sourceType === "fullWidthComparison" || displayKind === "comparison") return { label: "비교", Icon: Layers3 };
-  if (sourceType === "tip" || sourceType === "tipCard" || sourceType === "note" || displayKind === "callout") return { label: "노트", Icon: Lightbulb };
-  if (sourceType === "warning" || role === "check" || displayKind === "quiz") return { label: "검증", Icon: CheckCircle2 };
-  if (displayKind === "cardGrid") return { label: "카드", Icon: Sparkles };
-  if (displayKind === "resource") return { label: "자료", Icon: MessageSquare };
-  if (displayKind === "media") return { label: "미디어", Icon: Play };
-  if (displayKind === "hero" || displayKind === "title" || role === "title") return { label: "타이틀", Icon: Target };
-  if (block.type === "code") {
-    if (role === "snippet") return { label: "스니펫", Icon: TerminalSquare };
-    return { label: executionKindLabel(block.executionKind), Icon: TerminalSquare };
-  }
-  if (kind === "visual") return { label: "시각화", Icon: Sparkles };
-  return { label: "개념", Icon: GraduationCap };
 }
 
 export function curriculumInitialDraft(block: BlockConfig) {

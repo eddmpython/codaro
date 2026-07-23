@@ -324,7 +324,20 @@ AUTOMATION_REQUIREMENTS = (
             ("editor/src/lib/automationCellRuntime.ts", (
                 "runAutomationSessionCell",
                 "codaroApi.runAutomationCell",
-                "runtime.automationCellDone",
+                "automationPresentationCopy",
+            )),
+            ("editor/src/lib/automationPresentation.ts", (
+                "automationExecutionPresentation",
+                "automationPresentationCopy",
+                "automationSessionPresentation",
+                "cancelledStatuses",
+                "timeoutStatuses",
+                "runtime.automationStarted",
+                "runtime.automationCompleted",
+                "runtime.automationCancelled",
+                "runtime.automationTimedOut",
+                "runtime.automationFailed",
+                "sanitizeAutomationDetail",
             )),
             ("editor/src/lib/notebookRuntime.ts", (
                 "isPersistentAutomationBlock(block)",

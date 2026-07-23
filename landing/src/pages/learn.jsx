@@ -19,6 +19,7 @@ import { Text } from "@astryxdesign/core/Text";
 import { ProductVisual } from "../components/productVisual.jsx";
 import { brand } from "../lib/brand.js";
 import { curriculumLessons, curriculumRuntimeCounts, curriculumTree } from "../lib/generated/curriculum.js";
+import { useBrowserLayoutEffect } from "../lib/useBrowserLayoutEffect.js";
 
 const domainCopy = {
   basics: "값을 만들고 바꾸며 Python의 실행 감각을 익힙니다.",
@@ -132,17 +133,16 @@ const featuredLessons = [...new Map(
     .map((lesson) => [`${lesson.track}/${lesson.id}`, lesson]),
 ).values()];
 
-function initialPathFilter() {
-  if (typeof window === "undefined") return "all";
-  const pathId = new URLSearchParams(window.location.search).get("path");
+function pathFilterFromSearch(search) {
+  const pathId = new URLSearchParams(search).get("path");
   return guidedPaths.some((item) => item.pathId === pathId) ? pathId : "all";
 }
 
-export function LearnPage() {
+export function LearnPage({ search = "" }) {
   const firstPublicLesson = curriculumLessons.find((lesson) => lesson.runtimeTier === "browser") || curriculumLessons[0];
   const [query, setQuery] = useState("");
   const [runtime, setRuntime] = useState("all");
-  const [selectedPath, setSelectedPath] = useState(initialPathFilter);
+  const [selectedPath, setSelectedPath] = useState("all");
   const [resumeLesson, setResumeLesson] = useState(null);
 
   const matchingLessons = useMemo(() => {
@@ -164,6 +164,10 @@ export function LearnPage() {
     () => new Set(visibleLessons.map((lesson) => `${lesson.track}/${lesson.id}`)),
     [visibleLessons],
   );
+
+  useBrowserLayoutEffect(() => {
+    setSelectedPath(pathFilterFromSearch(search));
+  }, [search]);
 
   useEffect(() => {
     try {
@@ -278,7 +282,7 @@ export function LearnPage() {
               처음에는 추천 시작점만 보여줍니다. 검색하거나 목표와 실행 환경을 고르면 관련 결과를 최대 30개까지 펼칩니다.
             </Text>
           </div>
-          <div className="learnExplorerControls">
+          <div className="learnExplorerControls" data-route-query-sensitive="true">
             <fieldset className="learnRuntimeSegments">
               <legend>실행 환경</legend>
               {[
@@ -304,7 +308,7 @@ export function LearnPage() {
               </select>
             </label>
           </div>
-          <p className="learnResultCount" aria-live="polite">
+          <p className="learnResultCount" aria-live="polite" data-route-query-sensitive="true">
             {discoveryActive
               ? `${matchingLessons.length}개 중 ${visibleLessons.length}개 표시`
               : `추천 시작점 ${visibleLessons.length}개`}
@@ -312,7 +316,7 @@ export function LearnPage() {
         </div>
       </section>
 
-      <nav className="learnDomainNav" aria-label="검색 결과 도메인">
+      <nav className="learnDomainNav" aria-label="검색 결과 도메인" data-route-query-sensitive="true">
         <div className="homeShell learnDomainNavInner">
           {curriculumTree.map((domain) => {
             const hasVisibleLesson = domain.tracks.some((track) =>
@@ -326,7 +330,7 @@ export function LearnPage() {
         </div>
       </nav>
 
-      <div className="learnCatalog">
+      <div className="learnCatalog" data-route-query-sensitive="true">
         {curriculumTree.map((domain, domainIndex) => {
           const lessons = domain.tracks
             .flatMap((track) => track.lessons)

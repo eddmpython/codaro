@@ -18,15 +18,17 @@ import "./styles/lessonAstryx.css";
 const root = document.getElementById("root");
 const routeData = readRouteData();
 const initialPath = getBrowserPath();
+const hasPrerenderedMarkup = root.hasChildNodes();
+const initialSearch = hasPrerenderedMarkup ? "" : window.location.search;
 const application = (
   <React.StrictMode>
     <CodaroThemeProvider initialSurface={designSurfaceForPath(initialPath)}>
-      <App initialPath={initialPath} initialRouteData={routeData} />
+      <App initialPath={initialPath} initialRouteData={routeData} initialSearch={initialSearch} />
     </CodaroThemeProvider>
   </React.StrictMode>
 );
 
-if (root.hasChildNodes()) hydrateRoot(root, application);
+if (hasPrerenderedMarkup) hydrateRoot(root, application);
 else createRoot(root).render(application);
 
 function readRouteData() {

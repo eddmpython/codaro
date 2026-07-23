@@ -24,6 +24,15 @@
         root.dataset.resolvedTheme = resolved;
         root.dataset.accent = "plum";
         root.dataset.density = "public";
+        if (
+          window.location.search &&
+          /\/(?:learn|search)\/?$/.test(window.location.pathname)
+        ) {
+          root.dataset.routeQueryPending = "true";
+          window.setTimeout(function () {
+            root.removeAttribute("data-route-query-pending");
+          }, 4000);
+        }
         root.style.colorScheme = resolved;
         root.style.backgroundColor = canvas;
         document.querySelector('meta[name="theme-color"]').setAttribute("content", canvas);

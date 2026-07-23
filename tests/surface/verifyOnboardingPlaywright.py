@@ -55,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     appPort = args.port or freeAppPort()
-    api = OnboardingStubApi(port=freePort())
+    api = OnboardingStubApi(port=freePort(), notebookDocument=automationNotebookPayload())
     api.start()
     url = f"http://127.0.0.1:{appPort}/#chat"
     workspace = repoLocalPlaywrightWorkspace(ROOT, "onboarding-browser")
@@ -93,6 +93,26 @@ def main(argv: list[str] | None = None) -> int:
         sidebarClearance = recordCheck(checks, "curriculum-sidebar-scrollbar-clearance", cli.eval(jsAssertCurriculumSidebarScrollbarClearance()))
         sidebarToggle = recordCheck(checks, "curriculum-sidebar-toggle", cli.eval(jsAssertCurriculumSidebarToggle()))
         curriculumHome = recordCheck(checks, "curriculum-home", cli.eval(jsAssertCurriculumHome()))
+        cli.eval(jsOpenSurface("노트북"))
+        cli.waitEval(
+            "Boolean(document.querySelector('[data-automation-session-cell=\"true\"]'))",
+            "automation notebook cell",
+        )
+        automationOutput = recordCheck(
+            checks,
+            "automation-output-summary",
+            cli.eval(jsAssertAutomationOutput()),
+        )
+        automationCancelled = recordCheck(
+            checks,
+            "automation-cancelled-output",
+            cli.eval(jsAssertAutomationCancelledOutput()),
+        )
+        automationVersionSkew = recordCheck(
+            checks,
+            "automation-version-skew-output",
+            cli.eval(jsAssertAutomationVersionSkewOutput()),
+        )
         cli.eval(jsOpenSurface("대화"))
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
         api.ready = True
@@ -118,7 +138,8 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"ok: onboarding browser verified {fallback} {diagnosticExport} {providerCta} "
             f"{fallbackSettings} {defaultLesson} {sidebar} {sidebarClearance} {sidebarToggle} "
-            f"{curriculumHome} {ready} {settings}"
+            f"{curriculumHome} {automationOutput} {automationCancelled} {automationVersionSkew} "
+            f"{ready} {settings}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
@@ -175,6 +196,9 @@ def onboardingSignals(apiCalls: list[str], checks: list[dict[str, Any]]) -> dict
         "curriculumDefaultLesson": "curriculum-default-lesson" in checkIds,
         "curriculumGroupsVisible": "curriculum-sidebar-groups" in checkIds,
         "curriculumScrollbarClearance": "curriculum-sidebar-scrollbar-clearance" in checkIds,
+        "automationOutputSummary": "automation-output-summary" in checkIds,
+        "automationCancelledOutput": "automation-cancelled-output" in checkIds,
+        "automationVersionSkewOutput": "automation-version-skew-output" in checkIds,
     }
 
 
@@ -220,12 +244,14 @@ def currentGitHead() -> str | None:
 
 
 class OnboardingStubApi:
-    def __init__(self, *, port: int) -> None:
+    def __init__(self, *, port: int, notebookDocument: dict[str, Any] | None = None) -> None:
         self.port = port
         self.baseUrl = f"http://127.0.0.1:{port}"
+        self.notebookDocument = notebookDocument
         self.ready = False
         self.calls: list[str] = []
         self.checkCalls = 0
+        self.automationCalls = 0
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
 
@@ -244,6 +270,7 @@ class OnboardingStubApi:
             "GET /api/system/diagnostics",
             "GET /api/system/diagnostics/export",
             "GET /api/ai/profile",
+            "POST /api/automation/session-cell",
         }
         missing = sorted(required - set(self.calls))
         if missing:
@@ -278,7 +305,12 @@ class OnboardingStubApi:
                 if path == "/api/health":
                     self._sendJson({"status": "ok"})
                 elif path == "/api/bootstrap":
-                    self._sendJson({"appMode": False, "documentPath": None, "workspaceRoot": str(ROOT), "rootPath": str(ROOT)})
+                    self._sendJson({
+                        "appMode": False,
+                        "documentPath": "stub-automation.py" if owner.notebookDocument else None,
+                        "workspaceRoot": str(ROOT),
+                        "rootPath": str(ROOT),
+                    })
                 elif path == "/api/system/diagnostics":
                     self._sendJson(diagnosticPayload(owner.ready))
                 elif path == "/api/system/diagnostics/export":
@@ -383,6 +415,26 @@ class OnboardingStubApi:
                     })
                 elif path == "/api/kernel/create":
                     self._sendJson({"sessionId": "onboarding-session", "status": "ready"})
+                elif path == "/api/document/load" and owner.notebookDocument:
+                    self._sendJson({
+                        "document": owner.notebookDocument,
+                        "exists": True,
+                        "path": "stub-automation.py",
+                    })
+                elif path == "/api/document/save":
+                    self._sendJson({
+                        "accepted": True,
+                        "path": "stub-automation.py",
+                        "saveRevision": 1,
+                    })
+                elif path == "/api/automation/session-cell":
+                    owner.automationCalls += 1
+                    if owner.automationCalls == 1:
+                        self._sendJson(successAutomationPayload())
+                    elif owner.automationCalls == 2:
+                        self._sendJson(cancelledAutomationPayload())
+                    else:
+                        self._sendJson(versionSkewAutomationPayload())
                 elif path.startswith("/api/kernel/") and path.endswith("/execute"):
                     self._sendJson({
                         "type": "execute_result",
@@ -680,10 +732,202 @@ def jsAssertExerciseCheck() -> str:
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   if (!result) throw new Error('automatic practice verification did not render after execution');
-  if (!result.textContent || !result.textContent.includes('연습 검증 통과')) throw new Error('automatic practice verification label missing');
+  if (!result.textContent || !result.textContent.includes('연습 완료')) throw new Error('automatic practice completion label missing');
+  const output = exercise.querySelector('[data-execution-output="true"]');
+  if (!output || !output.textContent?.includes('hello')) throw new Error('learner output missing');
+  if (output.getAttribute('role') !== 'status' || output.getAttribute('aria-live') !== 'polite') {
+    throw new Error('successful learning output must use polite status semantics');
+  }
+  const outputText = output.querySelector('pre');
+  if (!outputText || !['anywhere', 'break-word'].includes(getComputedStyle(outputText).overflowWrap)) {
+    throw new Error('plain learning output must wrap long content');
+  }
+  const forbiddenOutputDetails = ['런타임 산출물', '브라우저 FS 셀 소스', '브라우저 FS 실행 기록', '성공 #', '격리 검증', '검증 증거'];
+  const leakedOutputDetails = forbiddenOutputDetails.filter((item) => exercise.textContent?.includes(item));
+  if (leakedOutputDetails.length) throw new Error('internal output details leaked: ' + leakedOutputDetails.join(', '));
+  if (exercise.querySelector('[data-runtime-artifacts], [data-runtime-artifact-kind]')) throw new Error('runtime artifact UI returned');
+  if (output.querySelector('button, [role="button"], [aria-haspopup]')) {
+    throw new Error('plain learning output must not contain management controls');
+  }
   if (document.querySelector('[data-learning-exercise-check="true"]')) throw new Error('redundant verify button returned');
   if (document.querySelector('[data-lesson-completed="true"]')) throw new Error('practice-only evidence falsely completed the lesson');
   return 'exercise-check-ok';
+})()
+""")
+
+
+def jsAssertAutomationOutput() -> str:
+    return compactJs("""
+(async () => {
+  const cell = document.querySelector('[data-automation-session-cell="true"]');
+  if (!cell) throw new Error('automation session cell missing');
+  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  if (!runButton) throw new Error('automation run button missing');
+  runButton.click();
+  let output = null;
+  for (let i = 0; i < 80; i++) {
+    output = cell.querySelector('[data-automation-session-output="true"]');
+    if (output) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!output) throw new Error('automation output did not render after execution');
+  const executionOutput = cell.querySelector('[data-execution-output="true"]');
+  if (!executionOutput) throw new Error('automation execution output container missing');
+  if (executionOutput.getAttribute('role') !== 'status' || executionOutput.getAttribute('aria-live') !== 'polite') {
+    throw new Error('successful automation output must use polite status semantics');
+  }
+  if (output.getAttribute('data-automation-summary') !== 'started') {
+    throw new Error('automation output summary state is not started');
+  }
+  const text = output.textContent || '';
+  const required = [
+    '자동화 시작',
+    '주문 페이지 준비됨',
+    '주문 페이지',
+    'https://example.test/orders',
+    '?view=student#overview',
+  ];
+  const missing = required.filter((item) => !text.includes(item));
+  if (missing.length) throw new Error('automation output summary missing: ' + missing.join(', '));
+  const forbidden = [
+    'auto-session-private-1',
+    'browser:orders',
+    '123e4567-e89b-42d3-a456-426614174000',
+    'sessionId',
+    'sessionKey',
+    'action',
+    'status',
+    'opened',
+    'closed',
+    'sessionId=',
+    'sessionKey=',
+    '/home/web/codaro/',
+    '/home/hub/codaro/',
+    '런타임 산출물',
+    '브라우저 FS',
+    '진단',
+  ];
+  const leaked = forbidden.filter((item) => text.includes(item));
+  if (leaked.length) throw new Error('automation internals leaked into output: ' + leaked.join(', '));
+  if (executionOutput.querySelector('button, [role="button"], [aria-haspopup], [data-runtime-artifacts], [data-runtime-artifact-kind]')) {
+    throw new Error('automation output must not contain management controls or runtime artifacts');
+  }
+  const detail = output.querySelector('pre');
+  if (!detail) throw new Error('automation detail missing');
+  const detailStyle = getComputedStyle(detail);
+  if (!['anywhere', 'break-word'].includes(detailStyle.overflowWrap)) {
+    throw new Error('long automation URLs must wrap on narrow screens');
+  }
+  if (detailStyle.overflowY !== 'auto' || detailStyle.maxHeight === 'none') {
+    throw new Error('automation detail must keep a bounded scroll height');
+  }
+  if (detail.scrollWidth > detail.clientWidth + 1) {
+    throw new Error('long automation URL overflows its output width');
+  }
+  return 'automation-output-summary-ok';
+})()
+""")
+
+
+def jsAssertAutomationCancelledOutput() -> str:
+    return compactJs("""
+(async () => {
+  const cells = [...document.querySelectorAll('[data-automation-session-cell="true"]')];
+  const cell = cells[1];
+  if (!cell) throw new Error('cancelled automation fixture cell missing');
+  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  if (!runButton) throw new Error('cancelled automation run button missing');
+  runButton.click();
+  let output = null;
+  for (let i = 0; i < 80; i++) {
+    output = cell.querySelector('[data-execution-output="true"]');
+    if (output) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!output) throw new Error('cancelled automation output did not render');
+  if (output.getAttribute('data-automation-summary') !== 'failed') {
+    throw new Error('cancelled automation must map to failed presentation state');
+  }
+  if (output.getAttribute('data-execution-output-status') !== 'error') {
+    throw new Error('cancelled automation must map to error execution state');
+  }
+  if (output.getAttribute('role') !== 'alert' || output.getAttribute('aria-live') !== 'assertive') {
+    throw new Error('cancelled automation must use assertive alert semantics');
+  }
+  const text = output.textContent || '';
+  if (!text.includes('자동화 중단')) throw new Error('cancelled automation title missing');
+  if (!text.includes('자동화를 중단했습니다. 사유: 사용자 요청')) {
+    throw new Error('cancelled automation reason missing');
+  }
+  if (text.includes('자동화 완료')) throw new Error('cancelled automation was presented as complete');
+  const forbidden = [
+    'session-private-cancelled',
+    'browser:orders',
+    'step-private-cancelled',
+    '123e4567-e89b-42d3-a456-426614174000',
+    'Emergency stop is active',
+    'sessionId',
+    'sessionKey',
+    'action',
+    'status',
+    'opened',
+    'closed',
+    '/home/web/codaro/',
+    '/home/hub/codaro/',
+  ];
+  const leaked = forbidden.filter((item) => text.includes(item));
+  if (leaked.length) throw new Error('cancelled automation leaked internals: ' + leaked.join(', '));
+  if (output.querySelector('button, [role="button"], [aria-haspopup], [data-runtime-artifacts]')) {
+    throw new Error('cancelled automation output contains management controls');
+  }
+  return 'automation-cancelled-output-ok';
+})()
+""")
+
+
+def jsAssertAutomationVersionSkewOutput() -> str:
+    return compactJs("""
+(async () => {
+  const cells = [...document.querySelectorAll('[data-automation-session-cell="true"]')];
+  const cell = cells[2];
+  if (!cell) throw new Error('version-skew automation fixture cell missing');
+  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  if (!runButton) throw new Error('version-skew automation run button missing');
+  runButton.click();
+  let output = null;
+  for (let i = 0; i < 80; i++) {
+    output = cell.querySelector('[data-execution-output="true"]');
+    if (output) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!output) throw new Error('version-skew automation output did not render');
+  if (output.getAttribute('data-automation-summary') !== 'failed') {
+    throw new Error('invalid automation payload must map to failed presentation state');
+  }
+  if (output.getAttribute('role') !== 'alert' || output.getAttribute('aria-live') !== 'assertive') {
+    throw new Error('invalid automation payload must use assertive alert semantics');
+  }
+  const text = output.textContent || '';
+  if (!text.includes('자동화 실패')) throw new Error('safe automation failure title missing');
+  if (!text.includes('자동화 결과를 안전하게 표시할 수 없습니다. 다시 실행해 주세요.')) {
+    throw new Error('safe version-skew guidance missing');
+  }
+  const forbidden = [
+    'session-version-skew-private',
+    'VERSION_SKEW_INTERNAL_STATE',
+    'VERSION_SKEW_INTERNAL_RESULT',
+    'sessionId',
+    'action',
+    'status',
+    'opened',
+    'closed',
+  ];
+  const leaked = forbidden.filter((item) => text.includes(item));
+  if (leaked.length) throw new Error('version-skew payload leaked internals: ' + leaked.join(', '));
+  if (output.querySelector('button, [role="button"], [aria-haspopup], [data-runtime-artifacts]')) {
+    throw new Error('version-skew output contains management controls');
+  }
+  return 'automation-version-skew-output-ok';
 })()
 """)
 
@@ -896,6 +1140,117 @@ def diagnosticExportPayload(ready: bool) -> dict[str, Any]:
             "secrets": "redacted",
             "policy": "token/apiKey/secret/authorization/oauth/sk values are removed",
         },
+    }
+
+
+def successAutomationPayload() -> dict[str, Any]:
+    return {
+        "sessionKey": "browser:orders",
+        "sessionId": "auto-session-private-1",
+        "kind": "browser",
+        "op": "open",
+        "action": "open",
+        "status": "success",
+        "opened": True,
+        "closed": False,
+        "state": {
+            "title": "주문 페이지",
+            "url": (
+                "https://example.test/orders/"
+                "very-long-order-reference-without-mobile-breakpoints-"
+                "very-long-order-reference-without-mobile-breakpoints"
+                "?view=student&sessionId=secret&sessionKey=browser%3Aorders#overview"
+            ),
+        },
+        "result": {
+            "message": (
+                "주문 페이지 준비됨 "
+                "123e4567-e89b-42d3-a456-426614174000 "
+                "/home/web/codaro/cells/py-private.py"
+            ),
+        },
+    }
+
+
+def cancelledAutomationPayload() -> dict[str, Any]:
+    return {
+        "sessionKey": "browser:orders",
+        "sessionId": "session-private-cancelled",
+        "kind": "browser",
+        "op": "step",
+        "action": "navigate",
+        "status": "cancelled",
+        "result": {},
+        "step": {
+            "id": "step-private-cancelled",
+            "sessionId": "session-private-cancelled",
+            "action": "navigate",
+            "status": "cancelled",
+            "startedAt": "2026-07-23T00:00:00+00:00",
+            "finishedAt": "2026-07-23T00:00:01+00:00",
+            "durationMs": 1000,
+            "error": (
+                "Emergency stop is active: 사용자 요청 "
+                "session-private-cancelled browser:orders "
+                "123e4567-e89b-42d3-a456-426614174000 "
+                "/home/hub/codaro/runs/run-private.json"
+            ),
+            "result": {},
+        },
+        "state": None,
+        "opened": False,
+    }
+
+
+def versionSkewAutomationPayload() -> dict[str, Any]:
+    return {
+        "sessionId": "session-version-skew-private",
+        "kind": "browser",
+        "op": "step",
+        "action": "navigate",
+        "status": "success",
+        "opened": False,
+        "closed": False,
+        "state": {"title": "VERSION_SKEW_INTERNAL_STATE"},
+        "result": {"message": "VERSION_SKEW_INTERNAL_RESULT"},
+    }
+
+
+def automationNotebookPayload() -> dict[str, Any]:
+    return {
+        "id": "automation-output-notebook",
+        "title": "자동화 출력 확인.py",
+        "metadata": {"sourceFormat": "codaro", "tags": ["automation"]},
+        "runtime": {"defaultEngine": "local", "reactiveMode": "hybrid", "packages": []},
+        "blocks": [
+            {
+                "id": "automation-cell-1",
+                "type": "automation",
+                "role": "exercise",
+                "displayKind": "cell",
+                "executionKind": "browser",
+                "content": '{"op":"open","session":"orders"}',
+                "title": "주문 페이지 자동화",
+            },
+            {
+                "id": "automation-cell-2",
+                "type": "automation",
+                "role": "exercise",
+                "displayKind": "cell",
+                "executionKind": "browser",
+                "content": '{"op":"step","session":"orders","action":"navigate"}',
+                "title": "비상 정지 출력 확인",
+            },
+            {
+                "id": "automation-cell-3",
+                "type": "automation",
+                "role": "exercise",
+                "displayKind": "cell",
+                "executionKind": "browser",
+                "content": '{"op":"step","session":"version-skew","action":"navigate"}',
+                "title": "버전 차이 출력 확인",
+            },
+        ],
     }
 
 

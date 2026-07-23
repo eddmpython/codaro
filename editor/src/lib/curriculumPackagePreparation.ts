@@ -1,6 +1,6 @@
 import { codaroApi } from "@/lib/api";
 import { normalizePackageName } from "@/lib/packageInference";
-import type { PackageInfo, PackageInstallCommand, PackageInstallResult } from "@/types";
+import type { PackageInfo, PackageInstallResult } from "@/types";
 
 export type PackageInstallProgress = {
   name: string;
@@ -18,18 +18,6 @@ export function missingCurriculumPackages(requiredPackages: string[], installedN
   return requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
 }
 
-export function curriculumPackageTerminalCommandReady({
-  apiOnline,
-  installCommand,
-  missingPackages,
-}: {
-  apiOnline: boolean;
-  installCommand: string;
-  missingPackages: string[];
-}): boolean {
-  return Boolean(apiOnline && installCommand && missingPackages.length);
-}
-
 export function curriculumPackageActiveMessage({
   checking,
   installProgress,
@@ -38,9 +26,9 @@ export function curriculumPackageActiveMessage({
   installProgress: PackageInstallProgress | null;
 }): string | null {
   if (installProgress) {
-    return `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`;
+    return `${installProgress.name} 준비 중입니다. ${installProgress.index}/${installProgress.total}`;
   }
-  return checking ? "필요한 라이브러리 설치 상태를 확인 중입니다." : null;
+  return checking ? "학습에 필요한 라이브러리를 확인 중입니다." : null;
 }
 
 export function curriculumPackageStatus({
@@ -66,8 +54,4 @@ export async function listCurriculumPackages(): Promise<PackageInfo[]> {
 
 export async function installCurriculumPackage(packageName: string): Promise<PackageInstallResult> {
   return codaroApi.packageInstall(packageName);
-}
-
-export async function curriculumPackageInstallCommand(packageNames: string[]): Promise<PackageInstallCommand> {
-  return codaroApi.packageInstallCommand(packageNames);
 }

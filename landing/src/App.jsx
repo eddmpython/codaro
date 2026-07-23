@@ -4,6 +4,7 @@ import { useCodaroTheme } from "./components/codaroThemeProvider.jsx";
 import { brand, basePath } from "./lib/brand.js";
 import { appPath, designSurfaceForPath, getBrowserPath, legacyRedirect } from "./lib/publicRouting.js";
 import { buildBreadcrumbJsonLd } from "./lib/seo.js";
+import { useBrowserLayoutEffect } from "./lib/useBrowserLayoutEffect.js";
 import { resolveRoute } from "./routes/resolvePublicRoute.jsx";
 
 function updateMeta(meta) {
@@ -95,9 +96,14 @@ function App({ initialPath = null, initialRouteData = null, initialSearch = "" }
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  useEffect(() => {
-    setSearch(window.location.search);
-  }, []);
+  useBrowserLayoutEffect(() => {
+    const browserSearch = window.location.search;
+    if (search !== browserSearch) {
+      setSearch(browserSearch);
+      return;
+    }
+    document.documentElement.removeAttribute("data-route-query-pending");
+  }, [search]);
 
   useEffect(() => setDesignSurface(designSurfaceForPath(path)), [path, setDesignSurface]);
 

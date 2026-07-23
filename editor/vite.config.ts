@@ -16,6 +16,11 @@ const codeSplitting = {
       priority: 60,
     },
     {
+      name: "curriculumMarkdown",
+      test: /[\\/]components[\\/]curriculum[\\/]curriculumMarkdown[^\\/]*\.tsx?$/,
+      priority: 55,
+    },
+    {
       name: "curriculumSurface",
       test: /[\\/]components[\\/]curriculum[\\/]curriculumSurface\.tsx$/,
       priority: 50,

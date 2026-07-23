@@ -10,7 +10,6 @@ import { ProviderReconnectBar } from "@/components/app/providerReconnectBar";
 import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import { TerminalPanel } from "@/components/terminal/terminalPanel";
-import type { TerminalLaunchIntent } from "@/lib/terminalLaunch";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
@@ -273,6 +272,12 @@ function App() {
     validateAiProvider,
   } = useProviderConnection({ apiOnline, onNotice: applyNotice });
 
+  useEffect(() => {
+    if (surface === "curriculum" && providerSettingsOpen) {
+      setProviderSettingsOpen(false);
+    }
+  }, [providerSettingsOpen, setProviderSettingsOpen, surface]);
+
   const providerReady = providerProfileReady(aiProfile);
   const reconnect = useProviderReconnect({
     apiOnline,
@@ -312,6 +317,7 @@ function App() {
     selectCurriculumCategoryState,
     selectCurriculumContentState,
     selectCurriculumLessonState,
+    selectedCustomCurriculumId,
     setSelectedCustomCurriculumId,
     setSurface,
     onNavigateCurriculum: navigateCurriculumSelection,
@@ -482,11 +488,13 @@ function App() {
   }, []);
 
   const [terminalOpen, setTerminalOpen] = useState(false);
-  const [terminalLaunchIntent, setTerminalLaunchIntent] = useState<TerminalLaunchIntent | null>(null);
-  const openTerminalCommand = useCallback((command: string) => {
-    setTerminalOpen(true);
-    setTerminalLaunchIntent({ command, id: Date.now(), submit: true });
+  const toggleTerminal = useCallback(() => {
+    setTerminalOpen((current) => !current);
   }, []);
+
+  useEffect(() => {
+    if (surface === "curriculum") setTerminalOpen(false);
+  }, [surface]);
 
   return (
     <LocaleProvider value={localeState}>
@@ -509,6 +517,8 @@ function App() {
         contentsLoading={contentsLoading}
         contents={contents}
         customCurricula={sidebarCustomCurricula}
+        learningDocument={curriculumDocument}
+        learningDrafts={drafts}
         query={query}
         referenceLoading={referenceLoading}
         runtimeTier={runRouteState.runtimeTier}
@@ -527,22 +537,28 @@ function App() {
         onSelectContent={selectCurriculumContent}
         onSelectCustomCurriculum={selectCustomCurriculum}
         onDeleteCustomCurriculum={deleteCustomCurriculum}
+        onImportLearningArchive={applyLearningArchive}
         onSurfaceChange={selectSurface}
         onToggleTheme={toggleThemeMode}
         onSelectAccentColor={selectAccentColor}
         terminalOpen={terminalOpen}
-        onToggleTerminal={() => setTerminalOpen((current) => !current)}
+        onToggleTerminal={toggleTerminal}
       />
 
       <SidebarInset className="relative flex h-svh min-h-0 min-w-0 flex-col overflow-hidden">
-        <TopControls
-          assistantCollapsed={assistantCollapsed}
-          notice={notice}
-          showSidebarTrigger
-          surface={surface}
-          onCopyDiagnosticExport={copyDiagnosticExport}
-          onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
-        />
+        <div
+          className="relative h-9 shrink-0 border-b border-border bg-background"
+          data-top-control-lane="true"
+        >
+          <TopControls
+            assistantCollapsed={assistantCollapsed}
+            notice={notice}
+            showSidebarTrigger
+            surface={surface}
+            onCopyDiagnosticExport={copyDiagnosticExport}
+            onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
+          />
+        </div>
         <div className="min-h-0 flex-1">
             <MainSurface
               aiConnecting={aiConnecting}
@@ -583,13 +599,11 @@ function App() {
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
               onDraftChange={updateDraft}
-              onImportLearningArchive={applyLearningArchive}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);
               }}
               onNewChat={startNewChat}
-              onOpenTerminalCommand={openTerminalCommand}
               onPromptChange={setPrompt}
               onRejectPendingBlocks={rejectPendingBlocks}
               onRefreshAutomation={refreshAutomation}
@@ -609,36 +623,41 @@ function App() {
               onToggleEStop={toggleEStop}
             />
         </div>
-        <ProviderReconnectBar
-          variant={reconnect.variant}
-          busy={aiConnecting}
-          onAction={handleReconnectAction}
-          onDismiss={reconnect.dismiss}
-        />
-        {terminalOpen ? (
+        {surface === "curriculum" ? null : (
+          <ProviderReconnectBar
+            variant={reconnect.variant}
+            busy={aiConnecting}
+            onAction={handleReconnectAction}
+            onDismiss={reconnect.dismiss}
+          />
+        )}
+        {terminalOpen && surface !== "curriculum" ? (
           <div className="h-72 min-h-0 shrink-0">
             <TerminalPanel
-              launchIntent={terminalLaunchIntent}
               themeMode={resolvedTheme}
-              onClose={() => setTerminalOpen(false)}
+              onClose={() => {
+                setTerminalOpen(false);
+              }}
             />
           </div>
         ) : null}
       </SidebarInset>
 
-      <ProviderSettingsSheet
-        aiConnecting={aiConnecting}
-        aiProfile={aiProfile}
-        apiOnline={apiOnline}
-        open={providerSettingsOpen}
-        providerValidation={providerValidation}
-        onOauthLogin={startOauthProviderLogin}
-        onOauthLogout={logoutOauthProvider}
-        onOpenChange={setProviderSettingsOpen}
-        onSaveApiProvider={saveApiProvider}
-        onSelectProvider={selectAiProvider}
-        onValidateProvider={validateAiProvider}
-      />
+      {surface === "curriculum" ? null : (
+        <ProviderSettingsSheet
+          aiConnecting={aiConnecting}
+          aiProfile={aiProfile}
+          apiOnline={apiOnline}
+          open={providerSettingsOpen}
+          providerValidation={providerValidation}
+          onOauthLogin={startOauthProviderLogin}
+          onOauthLogout={logoutOauthProvider}
+          onOpenChange={setProviderSettingsOpen}
+          onSaveApiProvider={saveApiProvider}
+          onSelectProvider={selectAiProvider}
+          onValidateProvider={validateAiProvider}
+        />
+      )}
     </SidebarProvider>
     </WidgetSessionProvider>
     </LocaleProvider>

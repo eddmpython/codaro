@@ -1,4 +1,9 @@
 import { codaroApi } from "@/lib/api";
+import {
+  automationPresentationCopy,
+  automationSessionPresentation,
+  sanitizeAutomationDetail,
+} from "@/lib/automationPresentation";
 import { translate } from "@/lib/localeCopy";
 import type {
   AppNotice,
@@ -32,18 +37,21 @@ export async function runAutomationSessionCell({
       executionKind: block.executionKind ?? null,
       sessionId: automationSessionId,
     });
-    const status = payload.status === "success" || payload.status === "closed" ? "done" : "error";
+    const presentation = automationSessionPresentation(payload);
+    const copy = automationPresentationCopy(presentation, translate);
+    const status = presentation.state === "failed" ? "error" : "done";
     return {
       automationSessionId: payload.closed ? null : payload.sessionId,
       automationSessionKey: payload.sessionKey,
-      result: automationResult(block, payload, executionCount, status),
+      result: automationResult(block, payload, executionCount, status, presentation),
       notice: {
         tone: status === "error" ? "error" : "success",
-        title: status === "error" ? translate("runtime.automationCellFailed") : translate("runtime.automationCellDone"),
-        detail: automationNoticeDetail(payload),
+        title: copy.title,
+        detail: copy.detail,
       },
     };
   } catch (error) {
+    const detail = sanitizeAutomationDetail(errorMessage(error));
     return {
       automationSessionId,
       result: {
@@ -51,7 +59,10 @@ export async function runAutomationSessionCell({
         blockId: block.id,
         data: null,
         stdout: "",
-        stderr: errorMessage(error),
+        stderr: [
+          translate("runtime.automationFailed"),
+          detail,
+        ].filter(Boolean).join("\n"),
         variables: [],
         stateDelta: { added: [], updated: [], removed: [] },
         executionCount,
@@ -59,8 +70,8 @@ export async function runAutomationSessionCell({
       },
       notice: {
         tone: "error",
-        title: translate("runtime.automationCellFailed"),
-        detail: errorMessage(error),
+        title: translate("runtime.automationFailed"),
+        detail: detail || translate("runtime.automationFailedDetail"),
       },
     };
   }
@@ -71,41 +82,24 @@ function automationResult(
   payload: AutomationSessionCellPayload,
   executionCount: number,
   status: "done" | "error",
+  presentation: ReturnType<typeof automationSessionPresentation>,
 ): ExecutionResult {
+  const copy = automationPresentationCopy(presentation, translate);
+  const output = [
+    copy.title,
+    copy.detail,
+  ].filter(Boolean).join("\n");
   return {
     type: "automation",
     blockId: block.id,
     data: payload,
-    stdout: automationOutput(payload),
-    stderr: status === "error" ? JSON.stringify(payload, null, 2) : "",
+    stdout: status === "error" ? "" : output,
+    stderr: status === "error" ? output : "",
     variables: [],
     stateDelta: { added: [], updated: [], removed: [] },
     executionCount,
     status,
   };
-}
-
-function automationOutput(payload: AutomationSessionCellPayload): string {
-  return JSON.stringify({
-    op: payload.op ?? payload.action,
-    action: payload.action,
-    status: payload.status,
-    sessionId: payload.sessionId,
-    sessionKey: payload.sessionKey,
-    opened: Boolean(payload.opened),
-    closed: Boolean(payload.closed),
-    state: payload.state ?? null,
-    result: payload.result ?? null,
-  }, null, 2);
-}
-
-function automationNoticeDetail(payload: AutomationSessionCellPayload): string {
-  const lifecycle = payload.closed
-    ? "closed"
-    : payload.opened
-      ? "opened"
-      : payload.status;
-  return `${payload.action} · ${lifecycle} · ${payload.sessionId ?? payload.sessionKey}`;
 }
 
 function errorMessage(error: unknown) {

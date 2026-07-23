@@ -64,27 +64,35 @@ def main(argv: list[str] | None = None) -> int:
         clickCustomCurriculum(cli)
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
         cli.waitEval(jsLearningOverviewReady(), "learning overview")
+        entryEditor = cli.eval(jsAssertLearningEntryEditor())
+        domIds = cli.eval(jsAssertLearningDomIdIntegrity())
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
-        desktopDependency = cli.eval(jsAssertDependencyPanel("desktop"))
+        desktopDependency = cli.eval(jsAssertNoInactiveDependencyPanel("desktop"))
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
         desktopVisual = cli.eval(jsAssertLearningVisualIntegrity("desktop"))
         desktopContractGaps = cli.eval(jsAssertContractGapSignalHidden("desktop"))
+        desktopFocus = cli.eval(jsAssertCurriculumFocusMode("desktop"))
+        narrowToc = cli.eval(jsAssertTocHiddenAtNarrowWidth())
+        surfacePurity = cli.eval(jsAssertLearningSurfacePurity())
         cli.run("resize", "1680", "900")
         toc = cli.eval(jsAssertTocPushRail())
+        topControlLane = cli.eval(jsAssertTopControlLane())
         cli.run("resize", "390", "844")
         cli.waitEval(jsLearningOverviewReady(), "learning overview after mobile resize")
         cli.waitEval(jsStructuredCardReady(), "structured learning card after mobile resize")
         mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
-        mobileDependency = cli.eval(jsAssertDependencyPanel("mobile"))
+        mobileDependency = cli.eval(jsAssertNoInactiveDependencyPanel("mobile"))
         mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
         mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
         mobileVisual = cli.eval(jsAssertLearningVisualIntegrity("mobile"))
         mobileContractGaps = cli.eval(jsAssertContractGapSignalHidden("mobile"))
+        mobileFocus = cli.eval(jsAssertCurriculumFocusMode("mobile"))
         print(
             "ok: Playwright structured learning card verified "
-            f"{deleteDialog} {desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
-            f"{toc} {mobileOverview} {mobileDependency} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps}"
+            f"{deleteDialog} {entryEditor} {domIds} {desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
+            f"{desktopFocus} {narrowToc} {surfacePurity} {toc} {topControlLane} "
+            f"{mobileOverview} {mobileDependency} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps} {mobileFocus}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
@@ -144,7 +152,17 @@ def materializedStructuredLessonDocument() -> dict[str, Any]:
     payload = document.model_dump(mode="json")
     payload["id"] = "curriculum-playwright-structured-section-card"
     assertMaterializedContract(payload)
-    return compactDocumentForBrowserStorage(payload)
+    compact = compactDocumentForBrowserStorage(payload)
+    blocks = compact.get("blocks")
+    if isinstance(blocks, list):
+        blocks.insert(1, {
+            "id": "fallback-preamble",
+            "type": "markdown",
+            "content": "첫 섹션 전에 필요한 내용을 바로 확인합니다.",
+            "role": "learning",
+            "displayKind": "prose",
+        })
+    return compact
 
 
 def assertMaterializedContract(document: dict[str, Any]) -> None:
@@ -436,6 +454,16 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (overview.querySelector('[data-learning-overview-part="benefit"]')) {{
     throw new Error('benefits grid should be removed');
   }}
+  const progressBadge = overview.querySelector('[data-progress-badge]');
+  if (progressBadge) {{
+    const progressTitle = progressBadge.getAttribute('title') || '';
+    if (progressTitle.includes('/-') || (progressBadge.textContent || '').includes('/-')) {{
+      throw new Error('lesson progress exposes an unknown denominator');
+    }}
+  }}
+  if ((overview.textContent || '').includes('0/-')) {{
+    throw new Error('incomplete lesson progress placeholder leaked into the learning overview');
+  }}
   const litColor = /(emerald|rose|amber|violet|sky|orange|cyan|indigo|fuchsia|zinc|slate|gray)-[0-9]/;
   const surfaceRoots = [overview, ...Array.from(document.querySelectorAll('[data-learning-section-card]'))];
   for (const root of surfaceRoots) {{
@@ -466,33 +494,69 @@ def jsAssertLearningOverview(viewport: str) -> str:
 """)
 
 
-def jsAssertDependencyPanel(viewport: str) -> str:
+def jsAssertNoInactiveDependencyPanel(_viewport: str) -> str:
     return compactJs("""
 (() => {
   const panel = document.querySelector('[data-learning-package-panel="true"]');
-  if (!panel) throw new Error('learning package panel missing');
-  const status = panel.getAttribute('data-learning-package-status');
-  if (!['checking', 'missing', 'ready', 'error'].includes(status || '')) {
-    throw new Error('unexpected package panel status: ' + status);
+  if (panel) throw new Error('inactive package management must not interrupt Web learning');
+  return 'inactive-dependency-hidden';
+})()
+""")
+
+
+def jsAssertLearningEntryEditor() -> str:
+    return compactJs("""
+(() => {
+  const pane = document.querySelector('[data-learning-content-pane="true"] [data-radix-scroll-area-viewport]');
+  const overview = document.querySelector('[data-learning-overview="true"]');
+  const input = document.querySelector('[data-learning-exercise-input="editor"]');
+  const textbox = input?.querySelector('.cm-content[role="textbox"]');
+  if (!pane || !overview || !input || !textbox) throw new Error('learning entry editor scope missing');
+  if (document.activeElement === textbox || textbox.contains(document.activeElement)) {
+    throw new Error('learning editor stole focus on lesson entry');
   }
-  const installButton = panel.querySelector('[data-learning-package-install="true"]');
-  if (!installButton) throw new Error('package install action missing');
-  const commandRow = panel.querySelector('[data-learning-package-command-row="true"]');
-  if (!commandRow) throw new Error('package terminal command row missing');
-  const commandText = commandRow.querySelector('[data-learning-package-command="true"]');
-  if (!commandText) throw new Error('package terminal command text missing');
-  const terminalButton = commandRow.querySelector('[data-learning-package-terminal-open="true"]');
-  if (!terminalButton) throw new Error('package terminal open action missing');
-  const item = panel.querySelector('[data-learning-package-item="pandas"]');
-  if (!item) throw new Error('pandas package badge missing');
-  if (!item.hasAttribute('data-learning-package-installed')) {
-    throw new Error('package installed marker missing');
+  if (pane.scrollTop > 4) {
+    throw new Error('lesson entry skipped overview: scrollTop=' + Math.round(pane.scrollTop));
   }
-  const text = panel.textContent || '';
-  if (!text.includes('라이브러리') || !text.includes('uv로 준비') || !text.includes('터미널에서 실행')) {
-    throw new Error('package panel copy missing');
+  const label = textbox.getAttribute('aria-label') || '';
+  if (!label.includes('DataFrame 만들기') || !label.includes('직접 해보기 코드 편집기')) {
+    throw new Error('actual CodeMirror textbox is missing a section/practice accessible name: ' + label);
   }
-  return 'dependency-panel-ok';
+  if (input.hasAttribute('aria-label')) {
+    throw new Error('accessible name must be attached to the textbox, not only its wrapper');
+  }
+  return 'entry-focus-and-editor-name-ok';
+})()
+""")
+
+
+def jsAssertLearningDomIdIntegrity() -> str:
+    return compactJs("""
+(() => {
+  const pane = document.querySelector('[data-learning-content-pane="true"]');
+  if (!pane) throw new Error('learning pane missing');
+  const elements = Array.from(pane.querySelectorAll('[id]'));
+  const counts = new Map();
+  elements.forEach((element) => counts.set(element.id, (counts.get(element.id) || 0) + 1));
+  const duplicates = Array.from(counts.entries())
+    .filter(([, count]) => count > 1)
+    .map(([id, count]) => `${id}:${count}`);
+  if (duplicates.length) {
+    throw new Error('duplicate learning DOM ids: ' + duplicates.join(', '));
+  }
+  const fallbackCard = pane.querySelector('[data-learning-section-card^="section-fallback-"]');
+  if (!fallbackCard) throw new Error('fallback section render path missing');
+  if (fallbackCard.id) throw new Error('fallback section wrapper must not compete for its first cell anchor');
+  const fallbackAnchor = fallbackCard.querySelector('[data-learning-cell][id]');
+  if (!fallbackAnchor) throw new Error('fallback section cell anchor missing');
+  if (document.getElementById(fallbackAnchor.id) !== fallbackAnchor) {
+    throw new Error('fallback cell anchor does not resolve uniquely');
+  }
+  return JSON.stringify({
+    learningDomIds: elements.length,
+    duplicateIds: duplicates.length,
+    fallbackAnchor: fallbackAnchor.id,
+  });
 })()
 """)
 
@@ -559,39 +623,60 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
 def jsAssertCustomCurriculumDeleteDialog() -> str:
     return compactJs(f"""
 (async () => {{
-  const wait = () => new Promise((resolve) => setTimeout(resolve, 80));
+  const wait = () => new Promise((resolve) => setTimeout(resolve, 120));
+  const visible = (element) => {{
+    if (!element) return false;
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+  }};
   const itemTitle = {json.dumps(FIXTURE_TITLE)};
-  const deleteButton = () => [...document.querySelectorAll('button')]
+  const deleteButtons = () => [...document.querySelectorAll('button')]
     .find((button) => button.getAttribute('aria-label') === `${{itemTitle}} 삭제`);
-  let button = deleteButton();
-  if (!button) throw new Error('custom curriculum delete button missing');
+  const hiddenManagement = deleteButtons();
+  if (hiddenManagement) {{
+    throw new Error('custom curriculum management must not exist in curriculum DOM');
+  }}
+  const escape = document.querySelector('[data-product-brand="escape"]');
+  if (!visible(escape)) throw new Error('curriculum escape action missing');
+  escape.click();
+  await wait();
+  const settings = document.querySelector('[data-product-appearance-settings="true"]');
+  if (!visible(settings)) throw new Error('product settings unavailable outside curriculum');
+  settings.click();
+  await wait();
+  const button = deleteButtons();
+  if (!visible(button)) throw new Error('custom curriculum management missing from product settings');
   button.click();
   await wait();
-  let dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+  let dialog = document.querySelector('[role="dialog"]');
   if (!dialog) throw new Error('delete confirmation dialog missing');
+  if (!dialog.contains(document.activeElement)) throw new Error('delete dialog did not receive focus');
+  const appRoot = document.querySelector('#root');
+  if (!appRoot || appRoot.getAttribute('aria-hidden') !== 'true') {{
+    throw new Error('delete dialog did not hide the background application');
+  }}
+  settings.focus();
+  await wait();
+  if (!dialog.contains(document.activeElement)) throw new Error('delete dialog did not trap focus');
   if (!(dialog.textContent || '').includes('나만의 커리큘럼 삭제')) throw new Error('delete dialog title missing');
   if (!(dialog.textContent || '').includes(itemTitle)) throw new Error('delete dialog item title missing');
   const cancel = [...dialog.querySelectorAll('button')].find((item) => item.textContent?.trim() === '취소');
   if (!cancel) throw new Error('delete cancel button missing');
   cancel.click();
   await wait();
-  if (document.querySelector('[role="dialog"][aria-modal="true"]')) throw new Error('delete dialog did not close on cancel');
-  if (!deleteButton()) throw new Error('custom curriculum disappeared after cancel');
-  button = deleteButton();
-  button.click();
-  await wait();
-  dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
-  if (!dialog) throw new Error('delete confirmation dialog missing after reopen');
-  const confirm = [...dialog.querySelectorAll('button')].find((item) => item.textContent?.trim() === '삭제');
-  if (!confirm) throw new Error('delete confirm button missing');
-  confirm.click();
-  await wait();
-  if (deleteButton()) throw new Error('custom curriculum still visible after delete');
+  if (document.querySelector('[role="dialog"]')) throw new Error('delete dialog did not close on cancel');
   const stored = JSON.parse(localStorage.getItem({json.dumps(STORAGE_KEY)}) || '[]');
-  if (stored.some((item) => item.id === 'custom-playwright-structured-section-card')) {{
-    throw new Error('custom curriculum remained in storage');
+  if (!stored.some((item) => item.id === 'custom-playwright-structured-section-card')) {{
+    throw new Error('custom curriculum disappeared after cancel');
   }}
-  return 'custom-curriculum-delete-dialog-ok';
+  const curriculumUrl = new URL(window.location.href);
+  curriculumUrl.searchParams.delete('surface');
+  curriculumUrl.hash = '#curriculum';
+  window.history.pushState({{}}, '', curriculumUrl);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+  await wait();
+  return 'custom-curriculum-management-settings-ok';
 }})()
 """)
 
@@ -619,9 +704,6 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!['ready', 'selected'].includes(exerciseInput.getAttribute('data-learning-exercise-input-state') || '')) {{
     throw new Error('student practice state missing');
   }}
-  if (!(exerciseInput.getAttribute('aria-label') || '').includes('직접 해보기 코드 편집기')) {{
-    throw new Error('student practice aria label missing');
-  }}
   if (!(exercise.textContent || '').includes('직접 해보기')) {{
     throw new Error('student practice section label missing');
   }}
@@ -640,32 +722,42 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (exerciseEditorRect.width <= 0 || exerciseEditorRect.height <= 0) {{
     throw new Error('editor size');
   }}
+  const densityRoot = exerciseInput.querySelector('[data-code-editor-density="content-fit"]');
+  if (!densityRoot) throw new Error('lesson editor must use content-fit density');
+  const scroller = exerciseEditor.querySelector('.cm-scroller');
+  if (!scroller) throw new Error('editor scroller missing');
+  if (Number.parseFloat(getComputedStyle(scroller).maxHeight) > 352.5) {{
+    throw new Error('lesson editor max height is not bounded');
+  }}
+  const content = exerciseEditor.querySelector('.cm-content');
+  const lines = Array.from(exerciseEditor.querySelectorAll('.cm-line'));
+  if (!content || !lines.length) throw new Error('editor content lines missing');
+  if (!(content.getAttribute('aria-label') || '').includes('직접 해보기 코드 편집기')) {{
+    throw new Error('actual student practice textbox aria label missing');
+  }}
+  const contentStyle = window.getComputedStyle(content);
+  const lineHeight = Number.parseFloat(window.getComputedStyle(lines[0]).lineHeight);
+  const contentAllowance =
+    (Number.isFinite(lineHeight) ? lineHeight * lines.length : 24 * lines.length)
+    + Number.parseFloat(contentStyle.paddingTop)
+    + Number.parseFloat(contentStyle.paddingBottom)
+    + 4;
+  if (content.getBoundingClientRect().height > contentAllowance) {{
+    throw new Error(
+      'lesson editor reserves empty height: '
+      + Math.round(content.getBoundingClientRect().height)
+      + ' > '
+      + Math.round(contentAllowance)
+    );
+  }}
   if ((exercise.textContent || '').includes('클릭해서 직접 입력하세요.')) {{
     throw new Error('preview remains');
   }}
   if (!(exerciseEditor.textContent || '').includes('frame = ___')) {{
     throw new Error('starter missing');
   }}
-  const helpButton = exercise.querySelector('button[aria-label="이 셀에서 AI 도움 요청"]');
-  if (!helpButton) throw new Error('help missing');
-  if (helpButton.getAttribute('data-cell-ai-help-trigger') !== 'always-visible') {{
-    throw new Error('help marker');
-  }}
-  if (Number(window.getComputedStyle(helpButton).opacity) < 0.99) {{
-    throw new Error('help hidden');
-  }}
-  let helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
-  if (!helpPopover) {{
-    helpButton.click();
-    await new Promise((resolve) => setTimeout(resolve, 60));
-    helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
-  }}
-  if (!helpPopover) throw new Error('popover missing');
-  if (!helpPopover.querySelector('[data-cell-ai-question="true"]')) {{
-    throw new Error('question missing');
-  }}
-  if (!(helpPopover.textContent || '').includes('이 셀에서 바로 질문')) {{
-    throw new Error('popover title missing');
+  if (exercise.querySelector('[data-cell-ai-help-trigger], [data-cell-ai-popover]')) {{
+    throw new Error('manual AI controls must stay out of curriculum cells');
   }}
   const exerciseRect = exercise.getBoundingClientRect();
   if (exerciseEditorRect.left < exerciseRect.left - 1 || exerciseEditorRect.right > exerciseRect.right + 1) {{
@@ -679,7 +771,7 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
     viewport: {json.dumps(viewport)},
     directEditor: true,
     snippetCopy: true,
-    helpVisible: true,
+    manualAiControls: 0,
   }});
 }})()
 """)
@@ -703,8 +795,16 @@ def jsAssertLearningVisualIntegrity(viewport: str) -> str:
     '[data-learning-section-index="true"]',
     '[data-learning-section-heading="true"]',
     '[data-code-payload-copy="true"]',
-    '[data-cell-ai-help-trigger="always-visible"]',
   ];
+  for (const heading of card.querySelectorAll('h2, h3')) {{
+    const style = getComputedStyle(heading);
+    if (style.whiteSpace === 'nowrap' || style.textOverflow === 'ellipsis') {{
+      throw new Error('learning heading is clipped instead of wrapping: ' + (heading.textContent || '').trim());
+    }}
+    if (heading.scrollWidth > heading.clientWidth + 2) {{
+      throw new Error('learning heading horizontal overflow: ' + (heading.textContent || '').trim());
+    }}
+  }}
   for (const root of [overview, card]) {{
     const rootRect = root.getBoundingClientRect();
     selectors.forEach((selector) => {{
@@ -775,15 +875,30 @@ def jsAssertContractGapSignalHidden(viewport: str) -> str:
 
 def jsAssertTocPushRail() -> str:
     return compactJs("""
-(() => {
+(async () => {
+  const wait = () => new Promise((resolve) => setTimeout(resolve, 220));
+  const overlapX = (left, right) => Math.min(left.right, right.right) - Math.max(left.left, right.left);
+  const assertNoContentOverlap = (tocRect, phase) => {
+    const pane = document.querySelector('[data-learning-content-pane="true"]');
+    if (!pane) throw new Error('learning content pane missing');
+    const paneRect = pane.getBoundingClientRect();
+    if (overlapX(tocRect, paneRect) > 1) {
+      throw new Error(`push TOC overlaps lesson content during ${phase}`);
+    }
+  };
   const toc = document.querySelector('[data-learning-toc="push"]');
   if (!toc) throw new Error('push TOC marker is missing');
-  const rect = toc.getBoundingClientRect();
-  if (rect.width <= 0 || rect.width > 64) {
-    throw new Error('push TOC should render as one collapsed rail, width=' + rect.width);
+  let rect = toc.getBoundingClientRect();
+  if (rect.width < 47 || rect.width > 49) {
+    throw new Error('push TOC should render as a stable 48px rail, width=' + rect.width);
   }
+  assertNoContentOverlap(rect, 'collapsed state');
   const buttons = Array.from(toc.querySelectorAll('button[title]'));
   if (!buttons.length) throw new Error('push TOC has no cell buttons');
+  const sectionCards = Array.from(document.querySelectorAll('[data-learning-section-card]'));
+  if (buttons.length !== sectionCards.length) {
+    throw new Error('push TOC must have exactly one item per section');
+  }
   const labels = buttons.map((button) => button.getAttribute('title') || '');
   const uniqueLabels = new Set(labels);
   if (uniqueLabels.size !== labels.length) {
@@ -792,7 +907,168 @@ def jsAssertTocPushRail() -> str:
   if (toc.querySelector('.absolute.right-full')) {
     throw new Error('push TOC still uses an overlay flyout');
   }
-  return JSON.stringify({ toc: 'push', width: Math.round(rect.width), items: buttons.length });
+  buttons.forEach((button, index) => {
+    const expectedIndex = String(index + 1).padStart(2, '0');
+    if (button.getAttribute('data-learning-toc-section-index') !== expectedIndex) {
+      throw new Error('push TOC section index mismatch');
+    }
+    if (button.querySelector('svg')) {
+      throw new Error('push TOC section item must use its number instead of a generic type icon');
+    }
+  });
+
+  toc.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  await wait();
+  rect = toc.getBoundingClientRect();
+  if (toc.getAttribute('data-learning-toc-expanded') !== 'true' || rect.width < 287 || rect.width > 289) {
+    throw new Error('hover must expand the in-flow TOC to 288px, width=' + rect.width);
+  }
+  assertNoContentOverlap(rect, 'hover expansion');
+  const label = buttons[0].querySelector('span:last-child');
+  if (!label || Number(getComputedStyle(label).opacity) < 0.99 || buttons[0].getBoundingClientRect().width < 250) {
+    throw new Error('hover expansion does not reveal the section label in the full-width button');
+  }
+  toc.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }));
+  await wait();
+  if (toc.getBoundingClientRect().width < 47 || toc.getBoundingClientRect().width > 49) {
+    throw new Error('TOC did not return to its stable collapsed width after hover');
+  }
+
+  buttons[0].focus();
+  await wait();
+  rect = toc.getBoundingClientRect();
+  if (toc.getAttribute('data-learning-toc-expanded') !== 'true' || rect.width < 287) {
+    throw new Error('keyboard focus did not expand the TOC');
+  }
+  assertNoContentOverlap(rect, 'focus expansion');
+  if (Number(getComputedStyle(label).opacity) < 0.99 || buttons[0].getBoundingClientRect().width < 250) {
+    throw new Error('keyboard focus expansion does not reveal the label');
+  }
+  buttons[0].blur();
+  await wait();
+  if (toc.getBoundingClientRect().width < 47 || toc.getBoundingClientRect().width > 49) {
+    throw new Error('TOC did not collapse after keyboard focus left');
+  }
+  return JSON.stringify({ toc: 'in-flow', collapsed: 48, expanded: Math.round(rect.width), items: buttons.length });
+})()
+""")
+
+
+def jsAssertTocHiddenAtNarrowWidth() -> str:
+    return compactJs("""
+(() => {
+  const root = document.querySelector('[data-learning-lesson-ref]');
+  const pane = document.querySelector('[data-learning-content-pane="true"]');
+  const toc = document.querySelector('[data-learning-toc="push"]');
+  if (!root || !pane || !toc) throw new Error('narrow TOC scope missing');
+  const tocRect = toc.getBoundingClientRect();
+  const rootRect = root.getBoundingClientRect();
+  const paneRect = pane.getBoundingClientRect();
+  if (tocRect.width !== 0 || tocRect.height !== 0) {
+    throw new Error('TOC must stay hidden below the 2xl breakpoint');
+  }
+  if (Math.abs(rootRect.width - paneRect.width) > 1) {
+    throw new Error('hidden TOC still reserves lesson width');
+  }
+  return JSON.stringify({ toc: 'hidden-narrow', contentWidth: Math.round(paneRect.width) });
+})()
+""")
+
+
+def jsAssertCurriculumFocusMode(viewport: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const shell = document.querySelector('[data-learning-focus-mode="true"]');
+  const mobileSidebarClosed = innerWidth < 768 && !shell;
+  if (!shell && !mobileSidebarClosed) throw new Error('curriculum focus mode marker missing');
+  const visible = (element) => {{
+    if (!element) return false;
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+  }};
+  const forbidden = [
+    ...document.querySelectorAll('[data-product-nav="flow"], [data-product-nav="utility"], [data-product-provider-settings="true"], [data-product-appearance-settings="true"], [data-cell-ai-help-trigger], [data-topbar-diagnostic="desktop"], [data-provider-reconnect-bar], [data-provider-card]'),
+  ].filter(visible);
+  if (forbidden.length) throw new Error('non-learning controls remain visible in curriculum focus mode');
+  const brand = shell?.querySelector('[data-product-brand="escape"]');
+  if (!mobileSidebarClosed && (!brand || !brand.getAttribute('aria-label') || !brand.getAttribute('title'))) {{
+    throw new Error('focus mode needs one named product escape action');
+  }}
+  const pane = document.querySelector('[data-learning-content-pane="true"]');
+  if (!pane) throw new Error('learning content pane missing in focus mode');
+  if (pane.querySelector('[data-learning-archive-menu], [data-learning-evidence-summary]')) {{
+    throw new Error('learning data management leaked into the learning surface');
+  }}
+  if (document.querySelector('[data-accent-palette], [data-product-learning-data-settings="true"]')) {{
+    throw new Error('product settings must not remain in curriculum DOM');
+  }}
+  return JSON.stringify({{
+    viewport: {json.dumps(viewport)},
+    focusMode: true,
+    sidebar: mobileSidebarClosed ? 'closed' : 'focused',
+    visibleDistractions: forbidden.length,
+  }});
+}})()
+""")
+
+
+def jsAssertLearningSurfacePurity() -> str:
+    return compactJs("""
+(() => {
+  const pane = document.querySelector('[data-learning-content-pane="true"]');
+  if (!pane) throw new Error('learning pane missing');
+  for (const selector of [
+    '[data-learning-archive-menu]',
+    '[data-learning-evidence-summary]',
+    '[data-cell-ai-help-trigger]',
+    '[data-cell-ai-popover]',
+  ]) {
+    if (pane.querySelector(selector)) throw new Error('non-learning UI leaked into lesson: ' + selector);
+  }
+  if (document.querySelector('[data-product-learning-data-settings="true"], [data-accent-palette]')) {
+    throw new Error('product learning-data settings must not exist while learning');
+  }
+  return JSON.stringify({ learningSurface: 'focused', managementControls: 0, manualAiControls: 0 });
+})()
+""")
+
+
+def jsAssertTopControlLane() -> str:
+    return compactJs("""
+(() => {
+  const lane = document.querySelector('[data-top-control-lane="true"]');
+  const lesson = document.querySelector('[data-learning-lesson-ref]');
+  const toc = document.querySelector('[data-learning-toc="push"]');
+  if (!lane || !lesson || !toc) throw new Error('top control lane scope is missing');
+  const laneRect = lane.getBoundingClientRect();
+  const lessonRect = lesson.getBoundingClientRect();
+  const tocRect = toc.getBoundingClientRect();
+  if (laneRect.height < 32 || laneRect.height > 44) {
+    throw new Error('top control lane height is invalid: ' + laneRect.height);
+  }
+  if (lessonRect.top < laneRect.bottom - 1 || tocRect.top < laneRect.bottom - 1) {
+    throw new Error('lesson surface or TOC overlaps the top control lane');
+  }
+  const controls = Array.from(lane.querySelectorAll('button, a'))
+    .map((item) => item.getBoundingClientRect())
+    .filter((rect) => rect.width > 0 && rect.height > 0);
+  for (const control of controls) {
+    if (control.top < laneRect.top - 1 || control.bottom > laneRect.bottom + 1) {
+      throw new Error('top control escapes its reserved lane');
+    }
+    const overlapX = Math.min(control.right, tocRect.right) - Math.max(control.left, tocRect.left);
+    const overlapY = Math.min(control.bottom, tocRect.bottom) - Math.max(control.top, tocRect.top);
+    if (overlapX > 1 && overlapY > 1) {
+      throw new Error('top control overlaps curriculum TOC');
+    }
+  }
+  return JSON.stringify({
+    topControlLane: Math.round(laneRect.height),
+    lessonTop: Math.round(lessonRect.top),
+    tocTop: Math.round(tocRect.top),
+    controls: controls.length,
+  });
 })()
 """)
 

@@ -64,7 +64,12 @@ def testCurriculumDependencyPanelDelegatesPackageApiBoundary() -> None:
     assert "codaroApi" not in source
     assert "listCurriculumPackages" in source
     assert "installCurriculumPackage" in source
-    assert "curriculumPackageInstallCommand" in source
+    assert "curriculumPackageInstallCommand" not in source
+    assert "packageInstallCommand" not in source
+    assert "onOpenTerminalCommand" not in source
+    assert "result.environment" not in source
+    assert "result.installer" not in source
+    assert "result.message" not in source
 
 
 def testClassroomFrontendStaysRemovedFromCoreLearningProduct() -> None:
@@ -386,6 +391,7 @@ def testPersistentAutomationCellsUseSessionCellBoundary() -> None:
     automationRuntime = _read("editor/src/lib/automationCellRuntime.ts")
     runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
     output = _read("editor/src/components/app/appPrimitives.tsx")
+    presentation = _read("editor/src/lib/automationPresentation.ts")
 
     assert "runAutomationCell" in api
     assert '"/api/automation/session-cell"' in api
@@ -398,6 +404,27 @@ def testPersistentAutomationCellsUseSessionCellBoundary() -> None:
     assert "const [automationSessions, setAutomationSessions]" in runtimeHook
     assert "applyAutomationSessionOutcome" in runtimeHook
     assert 'data-automation-session-output="true"' in output
+    assert "automationExecutionPresentation" in output
+    assert "automationSessionPresentation" in automationRuntime
+    assert "automationExecutionPresentation" in presentation
+    assert "automationOutputUnavailable" in presentation
+    assert '"cancelled"' in presentation
+    assert '"canceled"' in presentation
+    assert '"timeout"' in presentation
+    assert "sanitizeAutomationDetail" in presentation
+    assert "payload.sessionId ?? payload.sessionKey" not in output
+    assert "{payload.action}" not in output
+    assert "{payload.kind}" not in output
+    assert "JSON.stringify({" not in automationRuntime
+    assert "result.artifacts?.length" not in output
+    assert "data-runtime-artifacts" not in output
+    assert "data-runtime-artifact-kind" not in output
+    assert "system.runtimeArtifacts" not in output
+    assert 'role={hasError ? "alert" : "status"}' in output
+    assert 'aria-live={hasError ? "assertive" : "polite"}' in output
+    assert "break-words" in output
+    assert "max-h-48" in output
+    assert "const output = automationOutput" in output
 
 
 def testFrontendStateDoesNotImportComponentImplementations() -> None:

@@ -1,5 +1,6 @@
 import type { ExecutionResult } from "@/types";
 import { executeBrowserStrongCheck } from "@/lib/browserLearningCheckExecutor";
+import { stringifyData } from "@/lib/displayFormat";
 import { parseStrongLearningCheckSpec } from "@/lib/learningCheckSpec";
 import { executeLocalStrongCheck } from "@/lib/localLearningCheckExecutor";
 import type { LearningEvidenceArtifact, LearningEvidencePackageAsset } from "@/lib/webLearningEvidence";
@@ -26,9 +27,11 @@ export async function evaluateLearningAttempt(
   runtimeTier: "local" | "web",
 ): Promise<LearningAttemptCheck> {
   const status = result.status.toLowerCase();
-  const actual = normalizeOutput(result.stdout);
   const expected = normalizeOutput(textValue(checkConfig?.outputExact));
   const deterministic = isDeterministicPracticeCheckConfig(checkConfig);
+  const actual = deterministic
+    ? practiceActualOutput(result)
+    : normalizeOutput(result.stdout);
   const strongSpec = parseStrongLearningCheckSpec(checkConfig);
 
   if (!new Set(["success", "ok", "done"]).has(status)) {
@@ -38,7 +41,7 @@ export async function evaluateLearningAttempt(
       evidence: "none",
       executor: strongSpec ? (runtimeTier === "local" ? "local-sandbox" : "browser-worker") : "none",
       expected,
-      feedback: "실행 오류를 먼저 고치세요. 다시 실행하면 검증도 자동으로 이어집니다.",
+      feedback: "오류 메시지를 확인하고 코드를 고친 뒤 다시 실행해 보세요.",
       fixtureHash: strongSpec?.fixtureHash ?? "",
       passed: false,
       source,
@@ -56,9 +59,7 @@ export async function evaluateLearningAttempt(
       evidence: checked.passed ? "strong" : "none",
       executor: checked.executor,
       expected: checked.expected,
-      feedback: runtimeTier === "local" && checked.passed
-        ? `${checked.detail} Local 증거 저장소에 자동 기록합니다.`
-        : checked.detail,
+      feedback: learnerFeedback(checked.state, checked.detail),
       fixtureHash: strongSpec.fixtureHash,
       packages: strongSpec.packageAssets.map((asset) => ({
         ...asset,
@@ -76,7 +77,7 @@ export async function evaluateLearningAttempt(
       evidence: "none",
       executor: "none",
       expected: "",
-      feedback: "실행 결과는 확인했지만 이 실습의 자동 완료 기준은 아직 준비 중이라 진행 완료로 기록하지 않았습니다.",
+      feedback: "이 연습은 자동 확인을 지원하지 않습니다. 출력과 목표를 직접 비교해 보세요.",
       fixtureHash: "",
       passed: false,
       source,
@@ -103,7 +104,7 @@ export async function evaluateLearningAttempt(
     evidence: "practice",
     executor: "practice",
     expected,
-    feedback: "출력이 목표와 정확히 일치해 이번 연습 기록에 자동 반영했습니다.",
+    feedback: "목표한 출력과 일치합니다.",
     fixtureHash: "",
     passed: true,
     source,
@@ -115,12 +116,85 @@ export function isDeterministicPracticeCheckConfig(checkConfig: Record<string, u
   return checkConfig?.type === "outputExact" && typeof checkConfig.outputExact === "string";
 }
 
+export function practiceActualOutput(result: ExecutionResult): string {
+  const stdout = normalizeOutput(result.stdout);
+  if (stdout) return stdout;
+
+  const displayValue = stringifyData(result.data);
+  const value = result.type === "text" && typeof result.data === "string"
+    ? decodePythonStringRepr(displayValue)
+    : displayValue;
+  return normalizeOutput(value);
+}
+
 function normalizeOutput(value: string): string {
   return value.replace(/\r\n?/g, "\n").trim();
 }
 
+function decodePythonStringRepr(value: string): string {
+  const trimmed = value.trim();
+  const quote = trimmed.at(0);
+  if ((quote !== "'" && quote !== "\"") || trimmed.at(-1) !== quote) return value;
+
+  const body = trimmed.slice(1, -1);
+  let decoded = "";
+  for (let index = 0; index < body.length; index += 1) {
+    const character = body[index];
+    if (character !== "\\" || index === body.length - 1) {
+      decoded += character;
+      continue;
+    }
+
+    const escaped = body[index + 1];
+    const simpleEscape = {
+      "\\": "\\",
+      "'": "'",
+      "\"": "\"",
+      a: "\x07",
+      b: "\b",
+      f: "\f",
+      n: "\n",
+      r: "\r",
+      t: "\t",
+      v: "\v",
+    }[escaped];
+    if (simpleEscape !== undefined) {
+      decoded += simpleEscape;
+      index += 1;
+      continue;
+    }
+
+    const width = escaped === "x" ? 2 : escaped === "u" ? 4 : escaped === "U" ? 8 : 0;
+    const hex = width ? body.slice(index + 2, index + 2 + width) : "";
+    if (width && hex.length === width && /^[0-9a-f]+$/i.test(hex)) {
+      const codePoint = Number.parseInt(hex, 16);
+      if (codePoint <= 0x10ffff) {
+        decoded += String.fromCodePoint(codePoint);
+        index += width + 1;
+        continue;
+      }
+    }
+
+    decoded += `\\${escaped}`;
+    index += 1;
+  }
+  return decoded;
+}
+
 function displayOutput(value: string): string {
   return value ? `“${value.replace(/\n/g, " ↵ ")}”` : "빈 출력";
+}
+
+function learnerFeedback(
+  state: "error" | "mismatch" | "unsupported" | "verified",
+  detail: string,
+): string {
+  if (state === "verified") return "목표대로 동작했습니다.";
+  if (state === "mismatch") return detail;
+  if (state === "unsupported") {
+    return "이 브라우저에서는 자동 확인을 사용할 수 없습니다. 출력과 목표를 직접 비교해 보세요.";
+  }
+  return "자동 확인을 마치지 못했습니다. 잠시 뒤 셀을 다시 실행해 주세요.";
 }
 
 function textValue(value: unknown): string {

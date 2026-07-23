@@ -1,26 +1,21 @@
-import type { CellAiHelpState } from "@/lib/assistantTypes";
 import type { BlockConfig, CodaroDocument } from "@/types";
-import type { CellAiAction } from "@/lib/cellModel";
 import { useEffect, useMemo, useState } from "react";
-import { readLearningEvidenceEvents, usesLocalLearningEvidence } from "@/lib/learningEvidenceOperations";
+import { readLearningEvidenceEvents } from "@/lib/learningEvidenceOperations";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { RenderCodeCellEditor, ResultMap } from "./curriculumSurfaceModels";
-import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 
 export { CurriculumHeaderProgress } from "./curriculumOverview";
 export { CurriculumCellToc } from "./curriculumToc";
-import { LearningEvidenceBar, LearningOverviewHeader } from "./curriculumOverview";
+import { LearningOverviewHeader } from "./curriculumOverview";
 import { CurriculumSectionCard, dueAssessmentBlocks, groupCurriculumSections } from "./curriculumSectionRenderer";
 
 export function CurriculumView({
   apiOnline,
   canRun,
-  cellHelpByBlockId,
   contents = [],
   document,
   drafts,
-  pendingBlocks,
   referenceLoading,
   renderCodeCellEditor,
   results,
@@ -30,22 +25,16 @@ export function CurriculumView({
   selectedCategory,
   selectedContentLabel,
   selectedContentId,
-  onAcceptPendingBlocks,
-  onCellAsk,
+  storageError,
   onDraftChange,
-  onImportLearningArchive,
-  onRejectPendingBlocks,
   onRunBlock,
-  onOpenTerminalCommand,
   onSelectBlock,
 }: {
   apiOnline: boolean;
   canRun: boolean;
-  cellHelpByBlockId: Record<string, CellAiHelpState>;
   contents?: Array<{ contentId: string; title: string }>;
   document: CodaroDocument;
   drafts: Record<string, string>;
-  pendingBlocks: BlockConfig[];
   referenceLoading: boolean;
   renderCodeCellEditor: RenderCodeCellEditor;
   results: ResultMap;
@@ -55,13 +44,9 @@ export function CurriculumView({
   selectedCategory: string;
   selectedContentLabel: string;
   selectedContentId: string;
-  onAcceptPendingBlocks: () => void;
-  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
+  storageError?: string;
   onDraftChange: (blockId: string, value: string) => void;
-  onImportLearningArchive: (archive: LearningArchiveMaterialization) => Promise<void> | void;
-  onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
-  onOpenTerminalCommand: (command: string) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   const [assessmentBlocks, setAssessmentBlocks] = useState<BlockConfig[]>([]);
@@ -94,7 +79,7 @@ export function CurriculumView({
   }, [document.blocks, selectedCategory, selectedContentId]);
 
   return (
-    <ScrollArea className="h-full min-h-0 min-w-0">
+    <ScrollArea className="h-full min-h-0 min-w-0" data-learning-content-pane="true">
       <div className="min-w-0 p-4">
         <div className="mx-auto min-w-0 max-w-5xl">
           <LearningOverviewHeader
@@ -102,32 +87,29 @@ export function CurriculumView({
             contents={contents}
             document={document}
             introBlock={introBlock}
-            pendingBlocks={pendingBlocks}
             referenceLoading={referenceLoading}
             sections={curriculumSections.sections}
             selectedCategory={selectedCategory}
             selectedCategoryLabel={selectedCategoryLabel}
             selectedContentId={selectedContentId}
             selectedContentLabel={selectedContentLabel}
-            onOpenTerminalCommand={onOpenTerminalCommand}
-            onAcceptPendingBlocks={onAcceptPendingBlocks}
-            onRejectPendingBlocks={onRejectPendingBlocks}
           />
 
-          <LearningEvidenceBar
-            document={document}
-            drafts={drafts}
-            lessonRef={`${selectedCategory}/${selectedContentId}`}
-            localRuntime={usesLocalLearningEvidence()}
-            onImportArchive={onImportLearningArchive}
-          />
+          {storageError ? (
+            <div
+              className="border-b border-destructive px-4 py-2 text-sm text-destructive sm:px-6"
+              data-learning-storage-alert="true"
+              role="alert"
+            >
+              {storageError}
+            </div>
+          ) : null}
 
           <div>
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}
                 category={selectedCategory}
-                cellHelpByBlockId={cellHelpByBlockId}
                 contentId={selectedContentId}
                 drafts={drafts}
                 index={index}
@@ -137,14 +119,12 @@ export function CurriculumView({
                 runningBlockId={runningBlockId}
                 section={section}
                 selectedBlockId={selectedBlockId}
-                onCellAsk={onCellAsk}
                 onDraftChange={onDraftChange}
                 onRunBlock={onRunBlock}
                 onSelectBlock={onSelectBlock}
               />
             ))}
           </div>
-
         </div>
       </div>
     </ScrollArea>

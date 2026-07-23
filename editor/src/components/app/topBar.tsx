@@ -7,25 +7,21 @@ import {
   ClipboardCheck,
   PanelRightClose,
   PanelRightOpen,
-  Star,
   XCircle,
 } from "lucide-react";
 
-import { SocialLinks } from "@/components/app/socialLinks";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CODARO_LINKS } from "@/lib/externalLinks";
 import { useLocale } from "@/lib/localeContext";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 import type { AppNotice } from "@/types";
 
-// 탑바(전폭 헤더 바)를 제거하고 컨트롤만 floating 오버레이로 띄운다.
+// 얇은 전용 레인 안에 현재 작업과 관련된 컨트롤만 둔다.
 // - 좌상단: 사이드바 토글
-// - 우상단: SNS 아이콘 + GitHub 스타 + (에디터/커리큘럼) 어시스턴트 패널 토글
+// - 우상단: 에디터 어시스턴트 패널 토글
 // - 상단 중앙: 진단/상태 알림(에러·경고일 때만)
-// 본문/우측 패널은 세로 전체를 그대로 쓰고, 헤더 바가 만들던 경계선은 사라진다.
 // 노트북 실행 버튼은 에디터 본문(NotebookPanel)으로 이동했다.
 export function TopControls({
   assistantCollapsed,
@@ -43,8 +39,8 @@ export function TopControls({
   onToggleAssistant: () => void;
 }) {
   const { t } = useLocale();
-  const showAssistantToggle = surface === "editor" || surface === "curriculum";
-  const showStatusNotice = notice.tone === "error" || notice.tone === "warning";
+  const showAssistantToggle = surface === "editor";
+  const showStatusNotice = surface !== "curriculum" && (notice.tone === "error" || notice.tone === "warning");
 
   return (
     <>
@@ -61,21 +57,7 @@ export function TopControls({
       ) : null}
 
       <div className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5">
-        <div className="hidden items-center gap-0.5 xl:flex" data-topbar-external-links="desktop">
-          <SocialLinks />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button asChild className="h-6 gap-1 px-2 text-[11px] [&_svg]:size-3" size="sm" variant="outline">
-                <a aria-label={t("topbar.githubStar")} href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
-                  <Star className="fill-amber-400 text-amber-400" />
-                  <span className="hidden sm:inline">{t("topbar.githubStar")}</span>
-                </a>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t("topbar.githubStar")}</TooltipContent>
-          </Tooltip>
-        </div>
-        {showStatusNotice && onCopyDiagnosticExport ? (
+        {surface !== "curriculum" && showStatusNotice && onCopyDiagnosticExport ? (
           <div className="hidden xl:block" data-topbar-diagnostic="desktop">
             <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
           </div>
