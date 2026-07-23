@@ -1,37 +1,15 @@
 import { postJson, requestJson } from "./transport";
+import {
+  createDocumentSaveRequest,
+  documentSaveSupportsKeepalive,
+  type DocumentSaveOptions,
+} from "@/lib/documentSavePolicy";
 import type { CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult, ReactiveDiagnostics, VariableInfo } from "@/types";
 
 export type ReactiveResponse = {
   results: ExecutionResult[];
   executionOrder: string[];
 } & Partial<ReactiveDiagnostics>;
-
-export const DOCUMENT_SAVE_KEEPALIVE_MAX_BYTES = 60 * 1024;
-
-export type DocumentSaveOptions = {
-  keepalive?: boolean;
-  saveDocumentId?: string;
-  saveRevision?: number;
-  saveSessionId?: string;
-};
-
-type DocumentSaveRequest = {
-  path: string | null;
-  document: CodaroDocument;
-  saveDocumentId?: string;
-  saveRevision?: number;
-  saveSessionId?: string;
-};
-
-export function documentSaveSupportsKeepalive(
-  path: string | null,
-  document: CodaroDocument,
-  options: DocumentSaveOptions = {},
-): boolean {
-  const request = createDocumentSaveRequest(path, document, options);
-  return new TextEncoder().encode(JSON.stringify(request)).byteLength
-    <= DOCUMENT_SAVE_KEEPALIVE_MAX_BYTES;
-}
 
 export const runtimeApi = {
   loadDocument: (path: string) => postJson<{ path: string; document: CodaroDocument; exists: boolean }>(
@@ -129,17 +107,3 @@ export const runtimeApi = {
   sessionPackageInstall: (sessionId: string, name: string) =>
     postJson<PackageInstallResult>(`/api/kernel/${sessionId}/packages/install`, { name }),
 };
-
-function createDocumentSaveRequest(
-  path: string | null,
-  document: CodaroDocument,
-  options: DocumentSaveOptions,
-): DocumentSaveRequest {
-  return {
-    path,
-    document,
-    saveDocumentId: options.saveDocumentId,
-    saveRevision: options.saveRevision,
-    saveSessionId: options.saveSessionId,
-  };
-}

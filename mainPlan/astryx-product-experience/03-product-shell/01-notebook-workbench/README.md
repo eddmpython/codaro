@@ -45,7 +45,7 @@
 - `editor/src/components/notebook/notebookPanel.tsx`: runnable starter cell, code cell, output·error 렌더링
 - `editor/src/components/notebook/notebookPanel.css`: code/output 계층, mobile control, desktop global-tool 예약 영역
 - `editor/src/components/app/notebookSurface.tsx`: Notebook panel과 inspector 조합
-- `editor/src/hooks/useNotebookDocumentState.ts`, `editor/src/lib/notebookPersistence.ts`: Web durable draft와 Local debounce·revision·경로 소유권·bounded keepalive 저장
+- `editor/src/hooks/useNotebookDocumentState.ts`, `editor/src/lib/notebookPersistence.ts`, `editor/src/lib/documentSavePolicy.ts`: Web durable draft와 Local debounce·revision·경로 소유권·bounded keepalive 저장
 - `src/codaro/api/documentRouter.py`: workspace 고유 경로, stale revision 거절, Jupyter 원본 보호 사본
 - `src/codaro/document/service.py`: Python·Percent·Jupyter 공용 원자 저장
 - `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`: 단일 cell과 reactive notebook 실행 상태

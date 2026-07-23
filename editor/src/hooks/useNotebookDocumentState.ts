@@ -17,7 +17,7 @@ import {
   type NotebookPersistenceResult,
   type NotebookPersistenceState,
 } from "@/lib/notebookPersistence";
-import { documentSaveSupportsKeepalive } from "@/lib/api/runtimeApi";
+import { documentSaveSupportsKeepalive } from "@/lib/documentSavePolicy";
 import type { BlockConfig, CodaroDocument } from "@/types";
 
 type UseNotebookDocumentStateOptions = {

@@ -16,6 +16,7 @@ def testBrowserNotebookRoundTripAndCorruptionFallback(tmp_path: Path) -> None:
     bundle = tmp_path / "notebookPersistenceEntry.mjs"
     modulePath = (ROOT / "editor/src/lib/notebookPersistence.ts").as_posix()
     runtimeApiModulePath = (ROOT / "editor/src/lib/api/runtimeApi.ts").as_posix()
+    savePolicyModulePath = (ROOT / "editor/src/lib/documentSavePolicy.ts").as_posix()
     entry.write_text(
         f"""
 import {{
@@ -27,6 +28,8 @@ import {{
 import {{
   DOCUMENT_SAVE_KEEPALIVE_MAX_BYTES,
   documentSaveSupportsKeepalive,
+}} from {savePolicyModulePath!r};
+import {{
   runtimeApi,
 }} from {runtimeApiModulePath!r};
 
