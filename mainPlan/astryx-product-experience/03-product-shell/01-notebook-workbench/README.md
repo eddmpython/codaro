@@ -34,4 +34,46 @@
 - 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order 수동 검수
 - 배포 commit의 Local 설치본 round trip 증거
 
+## 영향 파일
+
+- `editor/src/components/notebook/notebookCommandBar.tsx`: runtime, autosave, cell 추가와 전체 실행 command bar
+- `editor/src/components/notebook/notebookPanel.tsx`: runnable starter cell, code cell, output·error 렌더링
+- `editor/src/components/notebook/notebookPanel.css`: code/output 계층, mobile control, desktop global-tool 예약 영역
+- `editor/src/components/app/notebookSurface.tsx`: Notebook panel과 inspector 조합
+- `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`: 단일 cell과 reactive notebook 실행 상태
+- `tests/surface/verifyProductExperiencePlaywright.py`, `tests/surface/verifyMobileLayout.py`: Run 대표 여정과 overlap·viewport 계약
+
+## 영향 함수·심볼
+
+- `NotebookCommandBar`, `NotebookPanel`, `NotebookSurface`
+- `SCRATCH_STARTER_CODE`, `CodeCellEditor`, `DocumentBlock`, `InsertCellButton`
+- `runNotebookBlock`, `runReactiveNotebook`, `ensureRuntimeSession`
+- `NotebookSurfaceProps`, `RuntimeSessionResult`, `RunNotebookResult`
+
+## 테스트
+
+- `uv run python -X utf8 tests/run.py gate web-learning`: Web lesson과 Run 실행, 출력, 자동 검증 대표 흐름
+- `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: `web-run-mobile`, `web-run-desktop`, `local-run-minimum` 대표 case
+- `uv run python -X utf8 tests/run.py gate mobile-layout`: 44px mobile 실행 control과 responsive layout 계약
+- `uv run python -X utf8 tests/run.py gate product-experience-browser`: Notebook 실행과 출력, overlap, horizontal overflow 감사
+- 실제 긴 문서의 keyboard 순서와 screen reader reading order는 별도 사람 검수로 남긴다.
+
+## 롤백
+
+- command bar와 Notebook CSS를 함께 되돌리되 `runNotebookBlock`, reactive dependency, document 저장 계약은 유지한다.
+- starter cell rollback은 durable 사용자 문서를 덮어쓰지 않고 새 빈 문서의 초기값에만 적용한다.
+- desktop global-tool 예약 영역을 되돌릴 때 command bar와 floating control의 overlap 검사를 먼저 red로 확인한다.
+
+## 평가
+
+### 개발자 관점
+
+- 기존 runtime API를 유지하면서 starter document와 command surface를 추가해 실행 엔진 회귀 범위를 제한했다.
+- 대표 Chromium case는 green이지만 실제 WebView2의 긴 notebook, IME, keyboard-only 조작 증거가 없어 완료 자격은 없다.
+
+### PM 관점
+
+- `/run/` 첫 진입에서 편집 가능한 코드와 실행 결과가 바로 보이고 별도 확인 command 없이 출력이 cell 아래에 나타난다.
+- 공개 Web과 Local 설치본의 같은-document round trip 증거가 남아 있어 상태는 `진행`이다.
+
 완료 전에는 `_done`으로 이동하지 않는다.

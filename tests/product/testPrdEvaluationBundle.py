@@ -41,6 +41,70 @@ def testScopeAllowlistIncludesProductEvidenceAndRejectsHistory() -> None:
     assert not builder.isPathIncluded("output/test-runner/report.json")
 
 
+def testLatestIncludedScopeCommitSkipsExcludedMetadataOnlyCommit(monkeypatch: pytest.MonkeyPatch) -> None:
+    builder = loadBuilder()
+    metadataCommit = "1" * 40
+    sourceCommit = "2" * 40
+    responses = {
+        ("rev-list", "--first-parent", metadataCommit): f"{metadataCommit}\n{sourceCommit}\n".encode(),
+        (
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-only",
+            "--no-renames",
+            "-r",
+            "-z",
+            "-m",
+            "--first-parent",
+            metadataCommit,
+        ): (
+            b"mainPlan/astryx-product-experience/00-product-contract/"
+            b"01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml\0"
+        ),
+        (
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-only",
+            "--no-renames",
+            "-r",
+            "-z",
+            "-m",
+            "--first-parent",
+            sourceCommit,
+        ): b"editor/src/lib/learningEvent.ts\0",
+    }
+
+    monkeypatch.setattr(builder, "runGit", lambda *args: responses[args])
+
+    assert builder.latestIncludedScopeCommit(metadataCommit) == sourceCommit
+
+
+def testLatestIncludedScopeCommitKeepsIncludedHead(monkeypatch: pytest.MonkeyPatch) -> None:
+    builder = loadBuilder()
+    sourceCommit = "3" * 40
+    responses = {
+        ("rev-list", "--first-parent", sourceCommit): f"{sourceCommit}\n".encode(),
+        (
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-only",
+            "--no-renames",
+            "-r",
+            "-z",
+            "-m",
+            "--first-parent",
+            sourceCommit,
+        ): b"tests/product/testPrdEvaluationBundle.py\0",
+    }
+
+    monkeypatch.setattr(builder, "runGit", lambda *args: responses[args])
+
+    assert builder.latestIncludedScopeCommit(sourceCommit) == sourceCommit
+
+
 def testDeterministicZipHasReadOnlyEntries() -> None:
     builder = loadBuilder()
     entries = (

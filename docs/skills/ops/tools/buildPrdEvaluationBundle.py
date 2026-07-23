@@ -233,6 +233,30 @@ def currentGitHead() -> str:
     return value
 
 
+def latestIncludedScopeCommit(gitHead: str) -> str:
+    history = runGit("rev-list", "--first-parent", gitHead).decode("ascii", errors="strict").splitlines()
+    for commit in history:
+        if len(commit) not in {40, 64}:
+            raise BundleError("git history contains an invalid commit ID")
+        changedPaths = decodeGitPaths(
+            runGit(
+                "diff-tree",
+                "--root",
+                "--no-commit-id",
+                "--name-only",
+                "--no-renames",
+                "-r",
+                "-z",
+                "-m",
+                "--first-parent",
+                commit,
+            )
+        )
+        if any(isPathIncluded(path) for path in changedPaths):
+            return commit
+    raise BundleError("git history does not contain an evaluation scope commit")
+
+
 def changedScopeStatuses() -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
     changed = decodeGitPaths(runGit("diff", "--name-status", "--no-renames", "-z", "HEAD"))
@@ -366,10 +390,11 @@ def buildEvaluationScopeManifest(entries: tuple[BundleEntry, ...], *, gitHead: s
 
 def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
     gitHead = currentGitHead()
+    scopeCommit = latestIncludedScopeCommit(gitHead)
     beforeStatuses = changedScopeStatuses()
     entries = collectBundleEntries()
     beforeDiffHash = dirtyDiffHash(entries, beforeStatuses)
-    scope = buildEvaluationScopeManifest(entries, gitHead=gitHead, diffHash=beforeDiffHash)
+    scope = buildEvaluationScopeManifest(entries, gitHead=scopeCommit, diffHash=beforeDiffHash)
     archiveBytes = buildZipBytes(entries)
     if currentGitHead() != gitHead or changedScopeStatuses() != beforeStatuses:
         raise BundleError("evaluation scope changed while the bundle was being built")
