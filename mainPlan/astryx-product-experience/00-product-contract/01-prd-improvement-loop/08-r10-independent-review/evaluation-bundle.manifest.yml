@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 5daf63c3fce9934df3605674bdbc9d7099c39a64
+  gitCommit: 43b92db11cfaa9873e70656cd86ef351f1811067
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: ee0bc989cbcb2473752d2eb7c3a803a05bf5dc1170e173d7e24ea7eeb84ad891
-  fileCount: 2668
-  totalBytes: 87958839
+  manifestHash: 15659de950212f770971b64b2d0f0640b9c7435787b28b6678f52ae4fc3da160
+  fileCount: 2669
+  totalBytes: 87959208
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: f9ac60692e182717e9571ea4c8911c859f5f55539cbe6a04d95cd793d8c3c54a
-  bytes: 88473009
+  sha256: 31a5b44a4eac03ab520945bc0566d5c161eca68de2cdbbd0be9d8d0d91080f29
+  bytes: 88473526
   format: zip
   compression: stored
   compressionMethod: 0
@@ -5225,8 +5225,8 @@ files:
   kind: repository
   sourcePath: editor/src/hooks/useLocaleState.ts
 - path: editor/src/hooks/useNotebookDocumentState.ts
-  sha256: a66775643121052d55b0eeb74e64f65fb1c7e171a45dd3ade364a6e4fab53a5d
-  bytes: 19127
+  sha256: 5542aa7450d2ab70d68926aace3183cf58866b8fdf262fc5db4da6b38733b77f
+  bytes: 19131
   kind: repository
   sourcePath: editor/src/hooks/useNotebookDocumentState.ts
 - path: editor/src/hooks/useNotebookRuntimeState.ts
@@ -5310,8 +5310,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/api/providerApi.ts
 - path: editor/src/lib/api/runtimeApi.ts
-  sha256: 62b2b99aaffd34ebb4bc94ceecc1e70e1a1ca9e99af5c1dcafb61be8799fe86e
-  bytes: 4856
+  sha256: 9819b2f7463a1bbba731d45ab86c81e1b36e316c8ae6e8fadbfcc5e63dd428ae
+  bytes: 3980
   kind: repository
   sourcePath: editor/src/lib/api/runtimeApi.ts
 - path: editor/src/lib/api/shareApi.ts
@@ -5514,6 +5514,11 @@ files:
   bytes: 6360
   kind: repository
   sourcePath: editor/src/lib/documentModel.ts
+- path: editor/src/lib/documentSavePolicy.ts
+  sha256: 98bb498e45b569be2b962214cebc986272118757d7340ba8af16474b3c570de9
+  bytes: 1071
+  kind: repository
+  sourcePath: editor/src/lib/documentSavePolicy.ts
 - path: editor/src/lib/externalLinks.ts
   sha256: 22a5f849e8ca7b45397ea61bfb41bd426335a37e4121a16902d7ab3d7d7629c9
   bytes: 377
@@ -10104,8 +10109,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/00-astryx-proof-shell/README.md
 - path: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
-  sha256: 491f1f7bac54ae1cd9a306a491512dbe7e2b700a0141281ff3e75f1858208c29
-  bytes: 6755
+  sha256: 92d91505f80d383fe0a9089f75e4a1d84469af66c18035a9f2d73fd7df00bb3f
+  bytes: 6795
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
 - path: mainPlan/astryx-product-experience/03-product-shell/README.md
@@ -13189,8 +13194,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testMobileShell.py
 - path: tests/surface/testNotebookPersistence.py
-  sha256: 57cf7746402acc6385d77eb3c165ff50fd6f80302b8c2435d81ce555c37763da
-  bytes: 6763
+  sha256: 235d07f321226a3ed6bae87c6cfab9dd209b118966f9b40438689d202ec72399
+  bytes: 6893
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
