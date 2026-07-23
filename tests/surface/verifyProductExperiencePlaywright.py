@@ -336,6 +336,56 @@ def waitForWebLearningEvidenceEventCount(
     )
 
 
+def readLocalLearningEvidenceSummary(page: Any) -> dict[str, int]:
+    summary = page.evaluate(
+        """
+        async () => {
+          const response = await fetch('/api/curriculum/evidence/summary', {
+            cache: 'no-store',
+          });
+          if (!response.ok) {
+            throw new Error(`Local learning evidence summary failed: ${response.status}`);
+          }
+          const payload = await response.json();
+          return {
+            conflicts: Number(payload?.conflicts),
+            events: Number(payload?.events),
+          };
+        }
+        """
+    )
+    if (
+        not isinstance(summary, dict)
+        or not isinstance(summary.get("events"), int)
+        or not isinstance(summary.get("conflicts"), int)
+    ):
+        raise AssertionError(f"Local learning evidence summary is invalid: {summary}")
+    return summary
+
+
+def waitForLocalLearningEvidenceEventCount(
+    page: Any,
+    expected: int,
+    *,
+    timeout: int = 20_000,
+) -> None:
+    deadline = time.monotonic() + timeout / 1_000
+    lastSummary: dict[str, int] | None = None
+    while time.monotonic() < deadline:
+        lastSummary = readLocalLearningEvidenceSummary(page)
+        eventCount = lastSummary["events"]
+        if eventCount == expected:
+            return
+        if eventCount > expected:
+            raise AssertionError(
+                f"Local learning evidence exceeded {expected} event(s): {lastSummary}"
+            )
+        page.wait_for_timeout(100)
+    raise AssertionError(
+        f"Local learning evidence did not reach {expected} event(s): {lastSummary}"
+    )
+
+
 def openLearningDataSettings(page: Any) -> Any:
     learningData = page.locator('[data-product-learning-data-settings="true"]:visible')
     if learningData.count():
@@ -1512,6 +1562,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             ),
             "viewport": {"width": 900, "height": 760},
             "surface": "local-lesson",
+            "expectedTier": "local",
             "waitFor": "[data-learning-section-card]",
             "runLocalLearningCell": True,
             "expectedCheckExecutor": "local-sandbox",
@@ -1529,6 +1580,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             ),
             "viewport": {"width": 900, "height": 760},
             "surface": "local-lesson",
+            "expectedTier": "local",
             "waitFor": "[data-learning-section-card]",
             "importWebEvidenceArchive": True,
             "expectedEvidenceCount": 2,
@@ -1620,6 +1672,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             1,
         )
         local_case["surface"] = "local-lesson"
+        local_case["expectedTier"] = "local"
         local_case.pop("runLearningCell", None)
         local_case["runLocalLearningCell"] = True
         local_case["expectedCheckExecutor"] = "local-sandbox"
@@ -1733,6 +1786,7 @@ async ({ surface, expectedTier }) => {
     .filter((label) => forbiddenLearningLabels.has(label));
   const missingImageAlt = visibleImages.filter((image) => !image.hasAttribute("alt")).length;
   const rail = document.querySelector("[data-runtime-tier]");
+  const routeRuntime = document.querySelector("[data-run-route-runtime]");
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -1820,10 +1874,28 @@ async ({ surface, expectedTier }) => {
   }
   const learningEvidenceRuntime = evidenceSummary?.getAttribute("data-learning-evidence-runtime")
     || (surface === "web-lesson" ? "web" : null);
+  if (surface === "local-lesson") {
+    try {
+      const response = await fetch('/api/curriculum/evidence/summary', {
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        throw new Error(`Local learning evidence summary failed: ${response.status}`);
+      }
+      const localSummary = await response.json();
+      webEvidenceSummaryCount = Number(localSummary?.events);
+      webEvidenceConflictCount = Number(localSummary?.conflicts);
+    } catch {
+      webEvidenceSummaryCount = -1;
+      webEvidenceConflictCount = -1;
+    }
+  }
   return {
     surface,
     expectedTier,
-    runtimeTier: rail?.getAttribute("data-runtime-tier") || null,
+    runtimeTier: rail?.getAttribute("data-runtime-tier")
+      || routeRuntime?.getAttribute("data-run-route-runtime")
+      || null,
     runtimeText: rail?.textContent?.replace(/\\s+/g, " ").trim() || "",
     rootTheme: document.documentElement.getAttribute("data-astryx-theme"),
     density: document.documentElement.getAttribute("data-density"),
@@ -2054,8 +2126,6 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 f"{name}: expected {expected_evidence} Local evidence event(s), "
                 f"got {audit['webEvidenceSummaryCount']}"
             )
-        if audit["learningEvidenceRuntime"] != "local":
-            failures.append(f"{name}: Local lesson evidence controls used the wrong runtime")
         expectedCompletedLessons = case.get("expectCompletedLessons")
         if (
             expectedCompletedLessons is not None
@@ -3103,8 +3173,7 @@ def runBrowserMatrix(
                             raise AssertionError(
                                 f"Local check expected executor {case['expectedCheckExecutor']}, got {firstExecutor}"
                             )
-                        emptySummary = page.locator('[data-learning-evidence-summary="true"]')
-                        beforeEvidenceCount = int(emptySummary.get_attribute("data-learning-evidence-events") or "-1")
+                        beforeEvidenceCount = readLocalLearningEvidenceSummary(page)["events"]
                         if beforeEvidenceCount != localEvidenceExpected:
                             raise AssertionError(
                                 f"failed Local attempt changed evidence count: expected {localEvidenceExpected}, "
@@ -3176,14 +3245,7 @@ def runBrowserMatrix(
                             )
                         localEvidenceExpected += 1
                         case["expectedEvidenceCount"] = localEvidenceExpected
-                        page.wait_for_function(
-                            """
-                            (expected) => document.querySelector('[data-learning-evidence-summary]')
-                              ?.getAttribute('data-learning-evidence-events') === String(expected)
-                            """,
-                            arg=localEvidenceExpected,
-                            timeout=20_000,
-                        )
+                        waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
                         localEvidenceIdentity = page.evaluate(
                             """
                             async () => {
@@ -3262,14 +3324,7 @@ def runBrowserMatrix(
                         releaseLocalKernelSessions(page, case, localPort)
                         page.reload(wait_until="domcontentloaded", timeout=30_000)
                         page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
-                        page.wait_for_function(
-                            """
-                            (expected) => document.querySelector('[data-learning-evidence-summary]')
-                              ?.getAttribute('data-learning-evidence-events') === String(expected)
-                            """,
-                            arg=localEvidenceExpected,
-                            timeout=20_000,
-                        )
+                        waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
                     if case.get("importWebEvidenceArchive"):
                         if webLearningArchiveBytes is None:
                             raise AssertionError("Web learning archive was not produced before the Local handoff case")
@@ -3277,6 +3332,7 @@ def runBrowserMatrix(
                             raise AssertionError("Web learning archive draft source was not captured")
                         page.wait_for_load_state("networkidle", timeout=30_000)
                         page.wait_for_timeout(500)
+                        openLearningDataSettings(page)
                         local_import_input = page.locator('[data-learning-archive-import-input="true"]')
                         local_import_input.set_input_files({
                             "name": "codaro-web-learning-archive.json",
@@ -3287,30 +3343,36 @@ def runBrowserMatrix(
                         web_events = learningArchiveJsonPayload(web_learning_archive, "evidence")["events"]
                         importedEvidenceExpected = localEvidenceExpected + len(web_events)
                         try:
-                            page.wait_for_function(
-                                """
-                                (expected) => document.querySelector('[data-learning-evidence-summary]')
-                                  ?.getAttribute('data-learning-evidence-events') === String(expected)
-                                """,
-                                arg=importedEvidenceExpected,
-                                timeout=20_000,
+                            waitForLearningLessonRoute(page, "day01_헬로월드")
+                            waitForLocalLearningEvidenceEventCount(
+                                page,
+                                importedEvidenceExpected,
                             )
                         except Exception as error:
-                            summary_locator = page.locator('[data-learning-evidence-summary="true"]')
-                            summary_text = summary_locator.inner_text()
-                            evidence_runtime = summary_locator.get_attribute("data-learning-evidence-runtime")
-                            selected_file_count = local_import_input.evaluate("input => input.files?.length || 0")
+                            api_summary = readLocalLearningEvidenceSummary(page)
+                            route_state = page.evaluate(
+                                """
+                                () => ({
+                                  category: new URL(window.location.href).searchParams.get('category'),
+                                  lesson: new URL(window.location.href).searchParams.get('lesson'),
+                                  lessonRef: document.querySelector('[data-learning-lesson-ref]')
+                                    ?.getAttribute('data-learning-lesson-ref') || null,
+                                  surface: new URL(window.location.href).searchParams.get('surface'),
+                                })
+                                """
+                            )
                             raise AssertionError(
-                                f"Local evidence import did not reach {importedEvidenceExpected} events; summary={summary_text!r}; "
-                                f"runtime={evidence_runtime!r}; selectedFiles={selected_file_count}; "
+                                f"Local evidence import did not reach {importedEvidenceExpected} events; "
+                                f"apiSummary={api_summary}; route={route_state}; "
                                 f"httpFailures={httpFailures[-3:]}"
                             ) from error
+                        openLearningDataSettings(page)
                         automation_drafts = web_learning_archive.get("automationDrafts", [])
                         if automation_drafts:
                             expected_draft_id = str(automation_drafts[0].get("draftId", ""))
                             page.wait_for_selector('[data-learning-automation-drafts="true"]', timeout=20_000)
                             page.get_by_role("button", name="자동화로 옮기기").click()
-                            page.get_by_text("비활성 작업으로 준비됨", exact=True).wait_for(timeout=20_000)
+                            page.get_by_text("작업 메뉴에 추가됨", exact=True).wait_for(timeout=20_000)
                             task_payload = page.evaluate(
                                 """
                                 async () => {
@@ -3365,16 +3427,9 @@ def runBrowserMatrix(
                         localEvidenceExpected = importedEvidenceExpected
                         case["expectedEvidenceCount"] = localEvidenceExpected
                         releaseLocalKernelSessions(page, case, localPort)
-                        page.reload(wait_until="domcontentloaded", timeout=30_000)
+                        page.goto(case["url"], wait_until="domcontentloaded", timeout=30_000)
                         page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
-                        page.wait_for_function(
-                            """
-                            (expected) => document.querySelector('[data-learning-evidence-summary]')
-                              ?.getAttribute('data-learning-evidence-events') === String(expected)
-                            """,
-                            arg=localEvidenceExpected,
-                            timeout=20_000,
-                        )
+                        waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
                         page.wait_for_function(
                             """
                             (expected) => Array.from(document.querySelectorAll('.cm-content'))
